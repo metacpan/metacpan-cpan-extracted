@@ -19,7 +19,7 @@ Data-Object Hash Function (Values) Class
 
   use Data::Object::Hash::Func::Values;
 
-  my $func = Data::Object::Hash::Func::Values->new(@args);
+  my $func = Data::Object::Hash::Func::Values->new;
 
   $func->execute;
 
@@ -30,7 +30,6 @@ Data::Object::Hash::Func
 =attributes
 
 arg1(Object, req, ro)
-args(ArrayRef[StringLike], opt, ro)
 
 =libraries
 

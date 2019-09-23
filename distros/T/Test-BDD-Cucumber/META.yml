@@ -16,11 +16,94 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Test-BDD-Cucumber
+provides:
+  App::pherkin:
+    file: lib/App/pherkin.pm
+    version: '0.660001'
+  TAP::Parser::Iterator::PherkinStream:
+    file: lib/TAP/Parser/Iterator/PherkinStream.pm
+    version: '0.660001'
+  TAP::Parser::SourceHandler::Feature:
+    file: lib/TAP/Parser/SourceHandler/Feature.pm
+    version: '0.660001'
+  Test::BDD::Cucumber:
+    file: lib/Test/BDD/Cucumber.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Errors:
+    file: lib/Test/BDD/Cucumber/Errors.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Executor:
+    file: lib/Test/BDD/Cucumber/Executor.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Extension:
+    file: lib/Test/BDD/Cucumber/Extension.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Harness:
+    file: lib/Test/BDD/Cucumber/Harness.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Harness::Data:
+    file: lib/Test/BDD/Cucumber/Harness/Data.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Harness::JSON:
+    file: lib/Test/BDD/Cucumber/Harness/JSON.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Harness::TAP:
+    file: lib/Test/BDD/Cucumber/Harness/TAP.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Harness::TermColor:
+    file: lib/Test/BDD/Cucumber/Harness/TermColor.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Harness::TestBuilder:
+    file: lib/Test/BDD/Cucumber/Harness/TestBuilder.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::I18N::Data:
+    file: lib/Test/BDD/Cucumber/I18N/Data.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::I18n:
+    file: lib/Test/BDD/Cucumber/I18n.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Loader:
+    file: lib/Test/BDD/Cucumber/Loader.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Dataset:
+    file: lib/Test/BDD/Cucumber/Model/Dataset.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Document:
+    file: lib/Test/BDD/Cucumber/Model/Document.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Feature:
+    file: lib/Test/BDD/Cucumber/Model/Feature.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Line:
+    file: lib/Test/BDD/Cucumber/Model/Line.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Result:
+    file: lib/Test/BDD/Cucumber/Model/Result.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Scenario:
+    file: lib/Test/BDD/Cucumber/Model/Scenario.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::Step:
+    file: lib/Test/BDD/Cucumber/Model/Step.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Model::TagSpec:
+    file: lib/Test/BDD/Cucumber/Model/TagSpec.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Parser:
+    file: lib/Test/BDD/Cucumber/Parser.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::StepContext:
+    file: lib/Test/BDD/Cucumber/StepContext.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::StepFile:
+    file: lib/Test/BDD/Cucumber/StepFile.pm
+    version: '0.660001'
+  Test::BDD::Cucumber::Util:
+    file: lib/Test/BDD/Cucumber/Util.pm
+    version: '0.660001'
 requires:
   Clone: '0'
-  Digest::SHA: '0'
   File::Find::Rule: '0'
-  Getopt::Long: '0'
   JSON::MaybeXS: '1.001000'
   List::MoreUtils: '0'
   List::Util: '1.33'
@@ -32,15 +115,15 @@ requires:
   TAP::Parser::Iterator::Stream: '0'
   TAP::Parser::SourceHandler: '0'
   Term::ANSIColor: '3.00'
-  Test2::API: '1.302084'
+  Test2::API: '1.302087'
   Test::More: '0'
-  Type::Tiny: '0'
+  Types::Standard: '0'
   YAML::Syck: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/pherkin/test-bdd-cucumber-perl/issues
   repository: https://github.com/pherkin/test-bdd-cucumber-perl.git
-version: '0.64'
+version: '0.660001'
 x_contributors:
   - 'Aliaksei Palkanau <lifusexitus@gmail.com>'
   - 'Ben Rogers <ben@bdr.org>'
@@ -58,6 +141,7 @@ x_contributors:
   - 'Paul Cochrane <cochrane@driftnoise.com>'
   - 'Tomas Pokorny <tnt@verotel.cz>'
   - 'glauschwuffel <glauschwuffel@nomaden.org>'
+  - 'intrigeri <intrigeri@boum.org>'
   - 'poum <poum@cpan.org>'
   - 'rjp <rjpartington@googlemail.com>'
   - 'vti <viacheslav.t@gmail.com>'

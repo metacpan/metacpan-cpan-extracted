@@ -9,8 +9,6 @@ use Carp;
 
 use MS::Reader::PepXML::Result;
 
-our $VERSION = 0.006;
-
 sub _post_load {
 
     my ($self) = @_;

@@ -1,11 +1,11 @@
 package Quiq::Database::Row::Array;
 use base qw/Quiq::Database::Row/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -43,8 +43,8 @@ our $TableClass = 'Quiq::Database::ResultSet::Array'; # Default-Tabellenklasse
 
 =head4 Synopsis
 
-    $row = $class->new(\@values);
-    $row = $class->new(\@titles,\@values);
+  $row = $class->new(\@values);
+  $row = $class->new(\@titles,\@values);
 
 =head4 Description
 
@@ -86,7 +86,7 @@ sub new {
 
 =head4 Synopsis
 
-    $arr|@arr = $row->asArray;
+  $arr|@arr = $row->asArray;
 
 =head4 Description
 
@@ -111,8 +111,8 @@ sub asArray {
 
 =head4 Synopsis
 
-    $str = $row->asString;
-    $str = $row->asString($colSep);
+  $str = $row->asString;
+  $str = $row->asString($colSep);
 
 =head4 Description
 
@@ -136,7 +136,7 @@ sub asString {
 
 =head4 Synopsis
 
-    $newRow = $row->copy;
+  $newRow = $row->copy;
 
 =cut
 
@@ -153,7 +153,7 @@ sub copy {
 
 =head4 Synopsis
 
-    $bool = $row->isRaw;
+  $bool = $row->isRaw;
 
 =cut
 
@@ -167,7 +167,7 @@ sub isRaw {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

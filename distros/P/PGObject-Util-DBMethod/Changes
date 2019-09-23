@@ -1,25 +1,27 @@
 Revision history for PGObject-Util-DBMethod
 
-1.00.002
-	2017-05-10
-	Remove MYMETA.json from distribution archive
+1.00.003 2019-09-20
+         Correct dist to exclude MYMETA.json from archive
+         as - still - pointed out by Kwalitee
 
-1.00.001
-	2014-02-24
-	Bumped up required Perl version from 5.6 to 5.8
+1.00.002 2017-05-10
+         Remove MYMETA.json from distribution archive
 
-1.00	2014-02-22
-	Added arg_list argument to dbmethod to allow ordered lists of args
-	to be read from the generated method's argument list.
+1.00.001 2014-02-24
+         Bumped up required Perl version from 5.6 to 5.8
 
-	Added merge_back argument to dbmethod, to allow the method to return
-	$self, after merging $self with the first record found.
+1.00	 2014-02-22
+	 Added arg_list argument to dbmethod to allow ordered lists of args
+	 to be read from the generated method's argument list.
 
-	Minor tuning of Makefile.PL
+	 Added merge_back argument to dbmethod, to allow the method to return
+	 $self, after merging $self with the first record found.
 
-0.02	2014-02-17
-	Added scalar return handling, so $ref = $self->mymethod returns the
-	first row found.
+	 Minor tuning of Makefile.PL
 
-0.01    2014-02-15
-        First version, released on an unsuspecting world.
+0.02	 2014-02-17
+	 Added scalar return handling, so $ref = $self->mymethod returns the
+	 first row found.
+
+0.01     2014-02-15
+         First version, released on an unsuspecting world.

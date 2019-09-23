@@ -1,17 +1,18 @@
 package Quiq::Cascm;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Database::Row::Array;
-use Quiq::Shell;
 use Quiq::AnsiColor;
+use Quiq::Shell;
 use Quiq::Path;
+use Quiq::Converter;
 use Quiq::Terminal;
 use Quiq::CommandLine;
 use Quiq::TempDir;
@@ -61,7 +62,7 @@ L<https://search.ca.com/assets/SiteAssets/TEC486141_External/TEC486141.pdf>
 
 =head4 Synopsis
 
-    $scm = $class->new(@attVal);
+  $scm = $class->new(@attVal);
 
 =head4 Attributes
 
@@ -167,6 +168,7 @@ sub new {
         # Private Attribute
         db => undef,                  # wenn DB-Zugriff über UDL
         sh => undef,
+        a => Quiq::AnsiColor->new(-t STDOUT),
         @_,
     );
 
@@ -197,7 +199,7 @@ sub new {
 
 =head4 Synopsis
 
-    $abstract = $scm->abstract($regex);
+  $abstract = $scm->abstract($regex);
 
 =head4 Arguments
 
@@ -220,44 +222,44 @@ matcht, und ihren Inhalt.
 
 =head4 Example
 
-    $ ruv-dss-repo abstract Seitz_X
-    S6800_0_Seitz_X_Deployment TTEST
-        tools/post_deployment/deploy_ddl.pl 34
-        tools/post_deployment/deploy_udf.pl 28
-    
-    S6800_0_Seitz_X_Deployment_Test TTEST
-        ddl/table/test_table.sql 4
-        ddl/udf/lib/test_function.sql 1
-    
-    S6800_0_Seitz_X_Fahrstuhl_1 Entwicklung
-    
-    S6800_0_Seitz_X_Fahrstuhl_2 Entwicklung
-    
-    S6800_0_Seitz_X_MetaData TTEST
-        ddl/udf/lib/rv_create_dbobject_ddl.sql 5
-        lib/zenmod/DSS/MetaData.pm 14
-    
-    S6800_0_Seitz_X_Portierte_Programme Entwicklung
-        bin/stichtag.pl 1
-        bin/verd_prd_zuord_dim.pl 24
-        bin/vertr_kms_progn_hist.pl 4
-        lib/zenmod/Sparhist.pm 37
-        tab_clone.pl 4
-        tools/wasMussIchTesten.pl 1
-    
-    S6800_0_Seitz_X_Portierte_Tabellen TTEST
-        ddl/table/q12b067.sql 0
-        ddl/table/q98b3s33.sql 0
-        ddl/table/sf_ga_liste_online_renta.sql 1
-        ddl/table/sf_kredu_meldw_dz_zlms_vol_wkv.sql 6
-        ddl/table/sf_vden_agt_liste.sql 1
-    
-    S6800_0_Seitz_X_Session TTEST
-        ddl/udf/lib/rv_stage.sql 2
-        lib/zenmod/DSS/Session.pm 2
-    
-    S6800_0_Seitz_X_ZenMods TTEST
-        lib/zenmod/DSSDB/Greenplum.pm 108
+  $ ruv-dss-repo abstract Seitz_X
+  S6800_0_Seitz_X_Deployment TTEST
+      tools/post_deployment/deploy_ddl.pl 34
+      tools/post_deployment/deploy_udf.pl 28
+  
+  S6800_0_Seitz_X_Deployment_Test TTEST
+      ddl/table/test_table.sql 4
+      ddl/udf/lib/test_function.sql 1
+  
+  S6800_0_Seitz_X_Fahrstuhl_1 Entwicklung
+  
+  S6800_0_Seitz_X_Fahrstuhl_2 Entwicklung
+  
+  S6800_0_Seitz_X_MetaData TTEST
+      ddl/udf/lib/rv_create_dbobject_ddl.sql 5
+      lib/zenmod/DSS/MetaData.pm 14
+  
+  S6800_0_Seitz_X_Portierte_Programme Entwicklung
+      bin/stichtag.pl 1
+      bin/verd_prd_zuord_dim.pl 24
+      bin/vertr_kms_progn_hist.pl 4
+      lib/zenmod/Sparhist.pm 37
+      tab_clone.pl 4
+      tools/wasMussIchTesten.pl 1
+  
+  S6800_0_Seitz_X_Portierte_Tabellen TTEST
+      ddl/table/q12b067.sql 0
+      ddl/table/q98b3s33.sql 0
+      ddl/table/sf_ga_liste_online_renta.sql 1
+      ddl/table/sf_kredu_meldw_dz_zlms_vol_wkv.sql 6
+      ddl/table/sf_vden_agt_liste.sql 1
+  
+  S6800_0_Seitz_X_Session TTEST
+      ddl/udf/lib/rv_stage.sql 2
+      lib/zenmod/DSS/Session.pm 2
+  
+  S6800_0_Seitz_X_ZenMods TTEST
+      lib/zenmod/DSSDB/Greenplum.pm 108
 
 =cut
 
@@ -266,7 +268,7 @@ matcht, und ihren Inhalt.
 sub abstract {
     my ($self,$regex) = @_;
 
-    my $a = Quiq::AnsiColor->new(-t STDOUT);
+    my $a = $self->a;
 
     # Packages und ihre Stage bestimmen
 
@@ -306,8 +308,9 @@ sub abstract {
             $a->str('green',$state);
 
         for my $item (sort keys %$itemH) {
-            $str .= sprintf "    %s %s\n",$item,
-                $a->str('green',$itemH->{$item});
+            (my $realItem = $item) =~ s|/zenmod/|/|;
+            my $version = $itemH->{$item};
+            $str .= sprintf "    %s %s\n",$realItem,$a->str('green',$version);
         }
     }
 
@@ -322,7 +325,7 @@ sub abstract {
 
 =head4 Synopsis
 
-    $output = $scm->edit($repoFile,$package);
+  $output = $scm->edit($repoFile,$package);
 
 =head4 Arguments
 
@@ -335,7 +338,10 @@ Datei mit Repository-Pfadangabe.
 =item $package
 
 Package, dem die ausgecheckte Datei (mit reservierter Version)
-beim Einchecken zugeordnet wird.
+beim Einchecken zugeordnet wird. Das Package muss I<nicht> auf der
+untersten Stufe stehen. Befindet es sich auf einer höheren Stufe, wird
+intern ein Transportpackage erzeugt, das die Dateien zu der Stufe
+des Package bewegt.
 
 =back
 
@@ -352,9 +358,7 @@ ob er seine Änderungen ins Repository übertragen möchte oder nicht.
 Anschließend wird die Repository-Datei wieder eingecheckt. Dies
 geschieht, gleichgültig, ob sie geändert wurde oder nicht. CASCM
 vergibt nur dann eine neue Versionsnummer, wenn die Datei sich
-geändert hat. Das Package $package wird vorher auf die unterste Stufe
-bewegt, falls es sich dort nicht bereits befindet, und hinterher
-wieder zurück bewegt.
+geändert hat.
 
 =cut
 
@@ -370,7 +374,7 @@ sub edit {
     # Vollständigen Pfad der Repository-Datei ermitteln
     my $file = $self->repoFileToFile($repoFile);
 
-    # Prüfe, ob Package existiert
+    # Ermittele die Stufe des Package
 
     my $state = $self->packageState($package);
     if (!$state) {
@@ -379,8 +383,16 @@ sub edit {
             Package => $package,
         );
     }
-    # Wir bewegen das Package auf die unterste Stufe ("Entwicklung")
-    $self->movePackage($self->states->[0],$package);
+
+    # Erzeuge ein Transportpackage, falls sich das Zielpackage
+    # nicht auf der untersten Stufe befindet
+
+    my $transportPackage;
+    if ($state ne $self->states->[0]) {
+        my $name = Quiq::Converter->intToWord(time);
+        $transportPackage = "S6800_0_Seitz_Lift_$name";
+        $output .= $self->createPackage($transportPackage);
+    }
 
     # Lokale Kopie der Datei erstellen
 
@@ -395,7 +407,7 @@ sub edit {
                 'Local file exists and differs from repository file.'.
                     ' Which file: l=local, r=repository, q=quit?',
                 -values => 'l/r/q',
-                -default => 'l',
+                -default => 'r',
             );
             if ($which eq 'q') {
                 return $output;
@@ -421,37 +433,72 @@ sub edit {
     $p->copy($localFile,$backupFile);
 
     # Checke Datei aus
-    $output .= $self->checkout($package,$repoFile);
+    $output .= $self->checkout($transportPackage || $package,$repoFile);
 
+    my $fileChanged = 0;
     my $editor = $ENV{'EDITOR'} || 'vi';
-    Quiq::Shell->exec("$editor $localFile");
-    if ($p->compare($localFile,$backupFile)) {
-        my $answ = Quiq::Terminal->askUser(
-            "Save changes to repository?",
-            -values => 'y/n',
-            -default => 'y',
-        );
-        if ($answ eq 'y') {
-            my $workspace = $self->workspace;
-            $p->copy($localFile,"$workspace/$repoFile",
-                -overwrite => 1,
-                -preserve => 1,
+    while (1) {
+        Quiq::Shell->exec("$editor $localFile");
+        if ($p->compare($localFile,$backupFile)) {
+            # Im Falle von Perl-Code diesen auf Syntaxfehler hin überprüfen
+
+            my $sytaxError = 0;
+            my $ext = $p->extension($localFile);
+            if ($ext eq 'pm' || $ext eq 'pl') {
+                my $out = $self->sh->exec("perl -c $localFile",
+                    -capture => 'stdout+stderr',
+                    -sloppy => 1,
+                );
+                print $self->a->str('red',$out);
+                if ($out !~ /syntax OK/) {
+                    $sytaxError = 1;
+                }
+            }
+
+            # Rückfrage an Benutzer
+
+            my $answ = Quiq::Terminal->askUser(
+                "Save changes to repository (y=yes, n=no, e=edit)?",
+                -values => 'y/n/e',
+                -default => $sytaxError? 'e': 'y',
             );
+            if ($answ eq 'y') {
+                my $workspace = $self->workspace;
+                $p->copy($localFile,"$workspace/$repoFile",
+                    -overwrite => 1,
+                    -preserve => 1,
+                );
+                $fileChanged = 1;
+            }
+            elsif ($answ eq 'e') {
+                redo;
+            }
         }
+        elsif (!$p->compare($localFile,$origFile)) {
+            # Wir löschen die Lokale Datei und Original-Datei, wenn sie
+            # nach dem Verlassen des Editors identisch sind
+            $p->delete($origFile);
+            $p->delete($localFile);
+        }
+        last;
     }
-    elsif (!$p->compare($localFile,$origFile)) {
-        # Wir löschen die Lokale Datei und Original-Datei, wenn sie
-        # nach dem Verlassen des Editors identisch sind
-        $p->delete($origFile);
-        $p->delete($localFile);
+
+    if (!$fileChanged) {
+        say $self->a->str('green','NO CHANGE');
     }
 
     # Checke Datei ein. Wenn sie nicht geändert wurde (kein Copy oben),
     # wird keine neue Version erzeugt.
-    $output .= $self->checkin($package,$repoFile);
-
-    # Package zurückbewegen, falls wir es holen mussten
-    $self->movePackage($state,$package);
+    $output .= $self->checkin($transportPackage || $package,$repoFile);
+    
+    if ($transportPackage) {
+        if ($fileChanged) {
+            $output .= $self->movePackage($state,$transportPackage);
+            $output .= $self->switchPackage($state,$transportPackage,
+                $package,$repoFile);
+        }
+        $output .= $self->deletePackages($transportPackage);
+    }
 
     # Die Backup-Datei löschen wir immer
     $p->delete($backupFile);
@@ -465,7 +512,7 @@ sub edit {
 
 =head4 Synopsis
 
-    $scm->view($repoFile);
+  $scm->view($repoFile);
 
 =head4 Arguments
 
@@ -506,7 +553,7 @@ sub view {
 
 =head4 Synopsis
 
-    $output = $scm->putFiles($package,$repoDir,@files);
+  $output = $scm->putFiles($package,$repoDir,@files);
 
 =head4 Arguments
 
@@ -514,7 +561,10 @@ sub view {
 
 =item $package
 
-Package, dem die Dateien innerhalb von CASCM zugeordnet werden.
+Package, dem die Dateien innerhalb von CASCM zugeordnet werden. Das
+Package muss I<nicht> auf der untersten Stufe stehen. Befindet es sich
+auf einer höheren Stufe, wird intern ein Transportpackage erzeugt,
+das die Dateien zu der Stufe des Package bewegt.
 
 =item $repoDir
 
@@ -554,6 +604,28 @@ sub putFiles {
     my $p = Quiq::Path->new;
 
     my $output = '';
+
+    # Ermittele die Stufe des Package
+
+    my $state = $self->packageState($package);
+    if (!$state) {
+        $self->throw(
+            'CASCM-00099: Package does not exist',
+            Package => $package,
+        );
+    }
+
+    # Erzeuge ein Transportpackage, falls sich das Zielpackage
+    # nicht auf der untersten Stufe befindet
+
+    my $transportPackage;
+    if ($state ne $self->states->[0]) {
+        my $name = Quiq::Converter->intToWord(time);
+        $transportPackage = "S6800_0_Seitz_Lift_$name";
+        $output .= $self->createPackage($transportPackage);
+    }
+
+    my @items;
     for my $srcFile (@files) {
         my (undef,$file) = $p->split($srcFile);
         my $repoFile = sprintf '%s/%s',$repoDir,$file;
@@ -569,7 +641,9 @@ sub putFiles {
             }
 
             # Checke Repository-Datei aus
-            $output .= $self->checkout($package,$repoFile);
+
+            $output .= $self->checkout($transportPackage ||
+                $package,$repoFile);
         }
 
         # Kopiere externe Datei in den Workspace. Entweder ist
@@ -581,7 +655,18 @@ sub putFiles {
         );
 
         # Checke Workspace-Datei ins Repository ein
-        $output .= $self->checkin($package,$repoFile);  
+        $output .= $self->checkin($transportPackage || $package,$repoFile);  
+
+        # Liste der Items im Packate (nur relevant
+        # im Falle eines Transportpackage)
+        push @items,$file;
+    }
+
+    if ($transportPackage) {
+        $output .= $self->movePackage($state,$transportPackage);
+        $output .= $self->switchPackage($state,$transportPackage,
+            $package,@items);
+        $output .= $self->deletePackages($transportPackage);
     }
 
     return $output;
@@ -593,7 +678,7 @@ sub putFiles {
 
 =head4 Synopsis
 
-    $output = $scm->putDir($package,$dir);
+  $output = $scm->putDir($package,$dir);
 
 =head4 Arguments
 
@@ -659,7 +744,7 @@ sub putDir {
 
 =head4 Synopsis
 
-    $output = $scm->checkout($package,@repoFiles);
+  $output = $scm->checkout($package,@repoFiles);
 
 =head4 Arguments
 
@@ -719,7 +804,7 @@ sub checkout {
 
 =head4 Synopsis
 
-    $output = $scm->checkin($package,$repoFile);
+  $output = $scm->checkin($package,$repoFile);
 
 =head4 Arguments
 
@@ -773,7 +858,7 @@ sub checkin {
 
 =head4 Synopsis
 
-    $version = $scm->versionNumber($repoFile);
+  $version = $scm->versionNumber($repoFile);
 
 =head4 Arguments
 
@@ -811,7 +896,7 @@ sub versionNumber {
 
 =head4 Synopsis
 
-    $info = $scm->versionInfo($repoFile);
+  $info = $scm->versionInfo($repoFile);
 
 =head4 Arguments
 
@@ -861,7 +946,7 @@ sub versionInfo {
 
 =head4 Synopsis
 
-    $file = $scm->getVersion($repoFile,$version,$destDir);
+  $file = $scm->getVersion($repoFile,$version,$destDir);
 
 =head4 Arguments
 
@@ -965,7 +1050,7 @@ sub getVersion {
 
 =head4 Synopsis
 
-    $diff = $scm->diff($repoFile,$version1,$version2);
+  $diff = $scm->diff($repoFile,$version1,$version2);
 
 =head4 Arguments
 
@@ -1019,7 +1104,7 @@ sub diff {
 
 =head4 Synopsis
 
-    $output = $scm->deleteVersion($repoFile);
+  $output = $scm->deleteVersion($repoFile);
 
 =head4 Arguments
 
@@ -1070,7 +1155,7 @@ sub deleteVersion {
 
 =head4 Synopsis
 
-    $scm->deleteToVersion($repoFile,$version,$backupDir);
+  $scm->deleteToVersion($repoFile,$version,$backupDir);
 
 =head4 Arguments
 
@@ -1129,7 +1214,7 @@ sub deleteToVersion {
 
 =head4 Synopsis
 
-    $output = $scm->deleteAllVersions($repoFile,$backupDir);
+  $output = $scm->deleteAllVersions($repoFile,$backupDir);
 
 =head4 Arguments
 
@@ -1195,7 +1280,7 @@ sub deleteAllVersions {
 
 =head4 Synopsis
 
-    $tab = $scm->findItem($namePattern);
+  $tab = $scm->findItem($namePattern);
 
 =head4 Arguments
 
@@ -1287,7 +1372,7 @@ sub findItem {
 
 =head4 Synopsis
 
-    $output = $scm->removeItems($package,@repoFile);
+  $output = $scm->removeItems($package,@repoFile);
 
 =head4 Arguments
 
@@ -1352,7 +1437,7 @@ sub removeItems {
 
 =head4 Synopsis
 
-    $file = $scm->repoFileToFile($repoFile);
+  $file = $scm->repoFileToFile($repoFile);
 
 =head4 Arguments
 
@@ -1411,7 +1496,7 @@ sub repoFileToFile {
 
 =head4 Synopsis
 
-    $output = $scm->createPackage($package);
+  $output = $scm->createPackage($package);
 
 =head4 Arguments
 
@@ -1456,7 +1541,7 @@ sub createPackage {
 
 =head4 Synopsis
 
-    $output = $scm->deletePackages(@packages);
+  $output = $scm->deletePackages(@packages);
 
 =head4 Arguments
 
@@ -1512,7 +1597,7 @@ sub deletePackages {
 
 =head4 Synopsis
 
-    $output = $scm->renamePackage($oldName,$newName);
+  $output = $scm->renamePackage($oldName,$newName);
 
 =head4 Arguments
 
@@ -1562,7 +1647,7 @@ sub renamePackage {
 
 =head4 Synopsis
 
-    @rows | $tab = $scm->showPackage($package);
+  @rows | $tab = $scm->showPackage($package);
 
 =head4 Returns
 
@@ -1576,62 +1661,62 @@ und liefere diese Ergebnismenge zurück.
 
 =head4 Example
 
-    $scm->showPackage('S6800_0_Seitz_IMS_Obsolete_Files');
-    =>
-    1 id
-    2 item_path
-    3 item_type
-    4 version
-    5 versiondataobjid
-    
-    1         2                                         3   4    5
-    | 4002520 | CPM_META/q07i101.cols.xml               | 1 |  1 | 5965056 |
-    | 3992044 | CPM_META/q07i102.cols.xml               | 1 |  9 | 6017511 |
-    | 4114775 | CPM_META/q07i105.cols.xml               | 1 |  2 | 6146470 |
-    | 3992045 | CPM_META/q07i109.cols.xml               | 1 |  6 | 5968199 |
-    | 3992046 | CPM_META/q07i113.cols.xml               | 1 |  6 | 5968200 |
-    | 4233433 | CPM_META/q24i200shw.cpmload.xml         | 1 | 13 | 6327078 |
-    | 4233434 | CPM_META/q24i200shw.flm.cpmload.xml     | 1 |  4 | 6318106 |
-    | 4233435 | CPM_META/q24i210kumul.cpmload.xml       | 1 | 11 | 6327079 |
-    | 4233436 | CPM_META/q24i210kumul.flm.cpmload.xml   | 1 |  4 | 6318108 |
-    | 4233437 | CPM_META/q24i210risiko.cpmload.xml      | 1 | 13 | 6336633 |
-    | 4233438 | CPM_META/q24i210risiko.flm.cpmload.xml  | 1 |  4 | 6318110 |
-    | 4233439 | CPM_META/q24i210schaden.cpmload.xml     | 1 | 13 | 6327081 |
-    | 4233440 | CPM_META/q24i210schaden.flm.cpmload.xml | 1 |  4 | 6318112 |
-    | 4003062 | CPM_META/q33i001.cols.xml               | 1 |  3 | 5981911 |
-    | 4003063 | CPM_META/q33i003.cols.xml               | 1 |  4 | 5981912 |
-    | 4003064 | CPM_META/q33i005.cols.xml               | 1 |  3 | 5981913 |
-    | 4003065 | CPM_META/q33i206.cols.xml               | 1 |  3 | 5981914 |
-    | 4115111 | CPM_META/q44i912.cols.xml               | 1 |  2 | 6157279 |
-    | 4144529 | CPM_META/q44i912.cpmload.xml            | 1 |  2 | 6318380 |
-    | 4144530 | CPM_META/q44i912.flm.cpmload.xml        | 1 |  2 | 6318381 |
-    | 4115112 | CPM_META/q44i913.cols.xml               | 1 |  3 | 6237929 |
-    | 4115113 | CPM_META/q44i914.cols.xml               | 1 |  4 | 6249865 |
-    | 4144531 | CPM_META/q44i914.cpmload.xml            | 1 |  7 | 6318382 |
-    | 4144532 | CPM_META/q44i914.flm.cpmload.xml        | 1 |  2 | 6318383 |
-    | 4095239 | CPM_META/q46i080.cpmload.xml            | 1 |  3 | 6327923 |
-    | 4095240 | CPM_META/q46i080.flm.cpmload.xml        | 1 |  2 | 6318576 |
-    | 4095550 | CPM_META/q46i081.cpmload.xml            | 1 |  3 | 6327924 |
-    | 4095551 | CPM_META/q46i081.flm.cpmload.xml        | 1 |  2 | 6318578 |
-    | 4095548 | CPM_META/q46i084.cpmload.xml            | 1 |  3 | 6327925 |
-    | 4095549 | CPM_META/q46i084.flm.cpmload.xml        | 1 |  2 | 6318580 |
-    | 4003101 | CPM_META/q80i102.cols.xml               | 1 |  4 | 5974529 |
-    | 3936189 | ddl/table/q31i001.sql                   | 1 |  1 | 5885525 |
-    | 3936190 | ddl/table/q31i002.sql                   | 1 |  1 | 5885526 |
-    | 3936191 | ddl/table/q31i003.sql                   | 1 |  1 | 5885527 |
-    | 3936192 | ddl/table/q31i004.sql                   | 1 |  1 | 5885528 |
-    | 3936193 | ddl/table/q31i007.sql                   | 1 |  1 | 5885529 |
-    | 3936194 | ddl/table/q31i014.sql                   | 1 |  1 | 5885530 |
-    | 3936195 | ddl/table/q31i017.sql                   | 1 |  1 | 5885531 |
-    | 4144537 | ddl/table/q44i912_cpm.sql               | 1 |  1 | 6163139 |
-    | 4144538 | ddl/table/q44i914_cpm.sql               | 1 |  1 | 6163140 |
-    | 3936311 | ddl/table/q65i001.sql                   | 1 |  1 | 5885647 |
-    | 3936312 | ddl/table/q65i002.sql                   | 1 |  1 | 5885648 |
-    | 3936313 | ddl/table/q65i003.sql                   | 1 |  1 | 5885649 |
-    | 3936314 | ddl/table/q65i030.sql                   | 1 |  1 | 5885650 |
-    | 4060343 | ddl/udf/rv_cpm_load_ims.sql             | 1 |  1 | 6038412 |
-    | 4060442 | ddl/udf/rv_cpm_load_imsh.sql            | 1 |  2 | 6039389 |
-    | 4060883 | ddl/udf/rv_cpm_load_imshr.sql           | 1 |  1 | 6039379 |
+  $scm->showPackage('S6800_0_Seitz_IMS_Obsolete_Files');
+  =>
+  1 id
+  2 item_path
+  3 item_type
+  4 version
+  5 versiondataobjid
+  
+  1         2                                         3   4    5
+  | 4002520 | CPM_META/q07i101.cols.xml               | 1 |  1 | 5965056 |
+  | 3992044 | CPM_META/q07i102.cols.xml               | 1 |  9 | 6017511 |
+  | 4114775 | CPM_META/q07i105.cols.xml               | 1 |  2 | 6146470 |
+  | 3992045 | CPM_META/q07i109.cols.xml               | 1 |  6 | 5968199 |
+  | 3992046 | CPM_META/q07i113.cols.xml               | 1 |  6 | 5968200 |
+  | 4233433 | CPM_META/q24i200shw.cpmload.xml         | 1 | 13 | 6327078 |
+  | 4233434 | CPM_META/q24i200shw.flm.cpmload.xml     | 1 |  4 | 6318106 |
+  | 4233435 | CPM_META/q24i210kumul.cpmload.xml       | 1 | 11 | 6327079 |
+  | 4233436 | CPM_META/q24i210kumul.flm.cpmload.xml   | 1 |  4 | 6318108 |
+  | 4233437 | CPM_META/q24i210risiko.cpmload.xml      | 1 | 13 | 6336633 |
+  | 4233438 | CPM_META/q24i210risiko.flm.cpmload.xml  | 1 |  4 | 6318110 |
+  | 4233439 | CPM_META/q24i210schaden.cpmload.xml     | 1 | 13 | 6327081 |
+  | 4233440 | CPM_META/q24i210schaden.flm.cpmload.xml | 1 |  4 | 6318112 |
+  | 4003062 | CPM_META/q33i001.cols.xml               | 1 |  3 | 5981911 |
+  | 4003063 | CPM_META/q33i003.cols.xml               | 1 |  4 | 5981912 |
+  | 4003064 | CPM_META/q33i005.cols.xml               | 1 |  3 | 5981913 |
+  | 4003065 | CPM_META/q33i206.cols.xml               | 1 |  3 | 5981914 |
+  | 4115111 | CPM_META/q44i912.cols.xml               | 1 |  2 | 6157279 |
+  | 4144529 | CPM_META/q44i912.cpmload.xml            | 1 |  2 | 6318380 |
+  | 4144530 | CPM_META/q44i912.flm.cpmload.xml        | 1 |  2 | 6318381 |
+  | 4115112 | CPM_META/q44i913.cols.xml               | 1 |  3 | 6237929 |
+  | 4115113 | CPM_META/q44i914.cols.xml               | 1 |  4 | 6249865 |
+  | 4144531 | CPM_META/q44i914.cpmload.xml            | 1 |  7 | 6318382 |
+  | 4144532 | CPM_META/q44i914.flm.cpmload.xml        | 1 |  2 | 6318383 |
+  | 4095239 | CPM_META/q46i080.cpmload.xml            | 1 |  3 | 6327923 |
+  | 4095240 | CPM_META/q46i080.flm.cpmload.xml        | 1 |  2 | 6318576 |
+  | 4095550 | CPM_META/q46i081.cpmload.xml            | 1 |  3 | 6327924 |
+  | 4095551 | CPM_META/q46i081.flm.cpmload.xml        | 1 |  2 | 6318578 |
+  | 4095548 | CPM_META/q46i084.cpmload.xml            | 1 |  3 | 6327925 |
+  | 4095549 | CPM_META/q46i084.flm.cpmload.xml        | 1 |  2 | 6318580 |
+  | 4003101 | CPM_META/q80i102.cols.xml               | 1 |  4 | 5974529 |
+  | 3936189 | ddl/table/q31i001.sql                   | 1 |  1 | 5885525 |
+  | 3936190 | ddl/table/q31i002.sql                   | 1 |  1 | 5885526 |
+  | 3936191 | ddl/table/q31i003.sql                   | 1 |  1 | 5885527 |
+  | 3936192 | ddl/table/q31i004.sql                   | 1 |  1 | 5885528 |
+  | 3936193 | ddl/table/q31i007.sql                   | 1 |  1 | 5885529 |
+  | 3936194 | ddl/table/q31i014.sql                   | 1 |  1 | 5885530 |
+  | 3936195 | ddl/table/q31i017.sql                   | 1 |  1 | 5885531 |
+  | 4144537 | ddl/table/q44i912_cpm.sql               | 1 |  1 | 6163139 |
+  | 4144538 | ddl/table/q44i914_cpm.sql               | 1 |  1 | 6163140 |
+  | 3936311 | ddl/table/q65i001.sql                   | 1 |  1 | 5885647 |
+  | 3936312 | ddl/table/q65i002.sql                   | 1 |  1 | 5885648 |
+  | 3936313 | ddl/table/q65i003.sql                   | 1 |  1 | 5885649 |
+  | 3936314 | ddl/table/q65i030.sql                   | 1 |  1 | 5885650 |
+  | 4060343 | ddl/udf/rv_cpm_load_ims.sql             | 1 |  1 | 6038412 |
+  | 4060442 | ddl/udf/rv_cpm_load_imsh.sql            | 1 |  2 | 6039389 |
+  | 4060883 | ddl/udf/rv_cpm_load_imshr.sql           | 1 |  1 | 6039379 |
 
 =cut
 
@@ -1695,7 +1780,7 @@ sub showPackage {
 
 =head4 Synopsis
 
-    $output = $scm->switchPackage($stage,$fromPackage,$toPackage,@files);
+  $output = $scm->switchPackage($stage,$fromPackage,$toPackage,@files);
 
 =head4 Arguments
 
@@ -1764,7 +1849,7 @@ sub switchPackage {
 
 =head4 Synopsis
 
-    $scm->promote($state,@packages);
+  $scm->promote($state,@packages);
 
 =head4 Arguments
 
@@ -1816,7 +1901,7 @@ sub promote {
 
 =head4 Synopsis
 
-    $scm->demote($state,@packages);
+  $scm->demote($state,@packages);
 
 =head4 Arguments
 
@@ -1868,7 +1953,7 @@ sub demote {
 
 =head4 Synopsis
 
-    $scm->movePackage($state,$package);
+  $output = $scm->movePackage($state,$package);
 
 =head4 Arguments
 
@@ -1934,7 +2019,7 @@ sub movePackage {
 
 =head4 Synopsis
 
-    $state = $scm->packageState($package);
+  $state = $scm->packageState($package);
 
 =head4 Arguments
 
@@ -1993,7 +2078,7 @@ sub packageState {
 
 =head4 Synopsis
 
-    $tab = $scm->listPackages;
+  $tab = $scm->listPackages;
 
 =head4 Returns
 
@@ -2044,7 +2129,7 @@ sub listPackages {
 
 =head4 Synopsis
 
-    $scm->sync;
+  $scm->sync;
 
 =head4 Description
 
@@ -2079,7 +2164,7 @@ sub sync {
 
 =head4 Synopsis
 
-    @states | $stateA = $scm->states;
+  @states | $stateA = $scm->states;
 
 =cut
 
@@ -2100,8 +2185,8 @@ sub states {
 
 =head4 Synopsis
 
-    $tab = $scm->sql($sql);
-    $tab = $scm->sql($file);
+  $tab = $scm->sql($sql);
+  $tab = $scm->sql($file);
 
 =head4 Arguments
 
@@ -2146,7 +2231,7 @@ sub sql {
 
 =head4 Synopsis
 
-    @arr = $scm->credentialsOptions;
+  @arr = $scm->credentialsOptions;
 
 =head4 Description
 
@@ -2197,7 +2282,7 @@ sub credentialsOptions {
 
 =head4 Synopsis
 
-    $output = $scm->runCmd($cmd,$c);
+  $output = $scm->runCmd($cmd,$c);
 
 =head4 Arguments
 
@@ -2287,7 +2372,7 @@ sub runCmd {
 
 =head4 Synopsis
 
-    $tab = $scm->runSql($sql);
+  $tab = $scm->runSql($sql);
 
 =head4 Arguments
 
@@ -2323,7 +2408,7 @@ sub runSql {
 
     $sql = Quiq::Unindent->trimNl($sql);
     if ($self->verbose > 1) {
-        my $a = Quiq::AnsiColor->new;
+        my $a = $self->a;
         (my $sql = $sql) =~ s/^(.*)/'> '.$a->str('bold',$1)/meg;
         if (!$udl) {
             $sql .= "\n";
@@ -2386,7 +2471,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

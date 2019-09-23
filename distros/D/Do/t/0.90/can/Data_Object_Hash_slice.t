@@ -15,17 +15,17 @@ slice
 
   # given {1..8}
 
-  my $slice = $hash->slice(1,5); # {1=>2,5=>6}
+  $hash->slice(1,3); # [2,4]
 
 =description
 
-The slice method returns a hash reference containing the elements in the hash
-at the key(s) specified in the arguments. This method returns a
-L<Data::Object::Hash> object.
+The slice method returns an array reference of the values that correspond to
+the key(s) specified in the arguments. This method returns a
+L<Data::Object::Array> object.
 
 =signature
 
-slice(Any $arg1) : Any
+slice(Str @args) : ArrayObject
 
 =type
 
@@ -39,6 +39,6 @@ use_ok 'Data::Object::Hash';
 
 my $data = Data::Object::Hash->new({1..8});
 
-is_deeply $data->slice(1,5), {1=>2,5=>6};
+is_deeply $data->slice(1,3), [2,4];
 
 ok 1 and done_testing;

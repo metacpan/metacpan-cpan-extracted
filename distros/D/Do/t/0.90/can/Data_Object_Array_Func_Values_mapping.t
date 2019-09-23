@@ -39,9 +39,8 @@ my @data;
 
 @data = Data::Object::Array::Func::Values->mapping();
 
-is @data, 2;
+is @data, 1;
 
 is $data[0], 'arg1';
-is $data[1], '@args';
 
 ok 1 and done_testing;

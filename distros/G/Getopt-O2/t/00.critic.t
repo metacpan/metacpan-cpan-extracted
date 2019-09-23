@@ -6,7 +6,7 @@ use warnings;
 use File::Spec;
 use Test::More;
 use English qw(-no_match_vars);
-use Env qw(NO_CRITIC);
+use Env qw(USE_CRITIC);
 ##------------------------------------------------------------------------------
 use constant GENTLE => 5;
 use constant BRUTAL => 1;
@@ -15,8 +15,8 @@ our $VERSION = '1.03';
 my $TEST_CRITIC = BRUTAL;
 my $TEST_VERBOSE = 1;
 ##------------------------------------------------------------------------------
-if ($NO_CRITIC) {
-	my $msg = 'Perl::Critic test skipped due to $ENV{NO_CRITIC}';
+if (!defined $USE_CRITIC || !$USE_CRITIC) {
+	my $msg = 'Perl::Critic test skipped due to lack of $ENV{USE_CRITIC}';
 	plan( skip_all => $msg );
 } else {
 	eval "use Test::Perl::Critic (-verbose => 11)";

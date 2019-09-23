@@ -35,7 +35,7 @@ This example is extracting from a file.
 
   use Data::Object::Data;
 
-  my $data = Data::Object::Data->new(data => [,"..."]);
+  my $data = Data::Object::Data->new(data => [,'...']);
 
 This example is extracting from existing data.
 

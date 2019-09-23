@@ -81,7 +81,14 @@ Make sure the authorization scripts are executable
 	# Archlinux
 	find /usr/share/perl5/site_perl/Dancer2/Plugin  -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;
 
-Create your application ( TestService ) e.g. at /opt/TestService/
+quick view the Dancer2::Plugin::WebService documentation as web page
+
+	install darkhttpd (once)
+	pod2html --infile=/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm --outfile=/tmp/index.html --title="Dancer2 WebService" --verbose
+	darkhttpd /tmp --addr 0.0.0.0 --port 80 --chroot --index index.html
+	yourbrowser http://yourserver
+
+Create your application with the name e.g.  TestService  at the directory  /opt/TestService
 
 	dancer2 gen --application TestService --directory TestService --path /opt --overwrite
 	chown -R dancer:dancer /opt/TestService
@@ -310,6 +317,7 @@ start the application manual
 	
 	# development
 	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
+	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml,/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm -a /opt/TestService/bin/app.psgi
 
 	# without Plack
 	sudo -u dancer perl /opt/TestService/bin/app.psgi

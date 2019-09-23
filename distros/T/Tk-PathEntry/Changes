@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::PathEntry.
 
+3.08    2019-09-22 (SREZIC)
+	- stable release with the changes in 3.07_50
+
+3.07_50 2019-09-20 (SREZIC)
+	- use <...> instead of File::Glob::glob (for perl 5.30 compat)
+
 3.07	2018-01-15 (SREZIC)
 	- stable release with the changes in 3.06_50
 
@@ -8,24 +14,27 @@ Revision history for Perl extension Tk::PathEntry.
 	  in the test suite
 	- META.* update for repository change (now it's on github)
 
+3.06	2014-03-18 (WITTROCK)
+	- no changes
+
 3.05	2009-06-02 (WITTROCK)
 	- no functional changes, just corrected file permissions
 
-3.04
+3.04	2009-05-31 (WITTROCK)
 	- Remove problem when the focus is in the choices listbox and the
 	  user clicks into a different widget
 	- Use standard Glob if File::Glob isn't installed (old Perl versions)
 
-3.03
+3.03	Not Released
 	- no functional changes, just declared File::Glob as a prerequisite
 
-3.02
+3.02	2009-02-01 (SREZIC)
 	- protect test scripts from non-existing DISPLAYs
 
-3.01
+3.01	2009-01-12 (SREZIC)
 	- fixed wrong usage of Finish() method
 
-3.00
+3.00	2007-09-19 (WITTROCK)
 	- New options -pathcompletion, -dircolor, -height, -messagecommand
 	- User defined alternative for the Tab key for path completion
 	- Enable the options and bindings of Tk::Listbox for Tk::PathEntry
@@ -35,34 +44,34 @@ Revision history for Perl extension Tk::PathEntry.
 	- Allow whitespace and non-Ascii characters in pathname
 	- Supplements to the POD
 
-2.23
+2.23	2004-09-04 (SREZIC)
 	- fixes for Windows
 
-2.21
+2.21	2003-11-13 (SREZIC)
 	- Tk804.025 compatibility fixes
 
-2.20
+2.20	Not Released
 	- make sure PathEntry dialog is closed before executing the callback
 
-2.19
+2.19	Not Released
 	- Tab loops through all choices, PageUp/PageDown also implemented
 	- dialog.t obeys BATCH variable
 
-2.18
+2.18	Not Released
 	- new -cancelcmd option
 	- -selectcmd is now documented and should be used instead of
 	  bind("<Return>">
 
-2.17
+2.17	2002-01-24 (SREZIC)
 	- ~ expansion
 	- new (yet undocumented) -autocomplete and -selectcmd option
 	- the choices widget is now a (selectable) Listbox, not a Label
 	- added Return binding to Tk::PathEntry::Dialog
 	- fixes
 
-2.10
+2.10	2001-05-06 (SREZIC)
 	- better POD
 	- added Changes and README files
 
-2.08
+2.08	2001-05-03 (SREZIC)
 	- first public CPAN release

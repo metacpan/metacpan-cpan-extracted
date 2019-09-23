@@ -1,11 +1,11 @@
 package Quiq::Sql::Analyzer;
 use base qw/Quiq::Dbms/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -21,10 +21,10 @@ L<Quiq::Dbms>
 
 =head1 SYNOPSIS
 
-    use Quiq::Sql::Analyzer;
-    
-    my $aly = Quiq::Sql::Analyzer->new($dbms);
-    my $aly = Quiq::Sql::Analyzer->new($dbms,$version);
+  use Quiq::Sql::Analyzer;
+  
+  my $aly = Quiq::Sql::Analyzer->new($dbms);
+  my $aly = Quiq::Sql::Analyzer->new($dbms,$version);
 
 =head1 METHODS
 
@@ -34,7 +34,7 @@ L<Quiq::Dbms>
 
 =head4 Synopsis
 
-    $bool = $aly->isCreateFunction($stmt);
+  $bool = $aly->isCreateFunction($stmt);
 
 =head4 Arguments
 
@@ -68,7 +68,7 @@ sub isCreateFunction {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

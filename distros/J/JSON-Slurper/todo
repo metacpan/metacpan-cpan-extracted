@@ -1,0 +1,12 @@
+Testing
+
+# in tests, test the passed in line feed, and test the encoding https://perldoc.perl.org/Encode/Guess.html
+# test that default has expected attributes?
+# need to test functional/object methods the same.
+# Need to test using JSON::PP and Cpanel::JSON::XS the same
+
+# should we have files that I know are generated with those settings and then compare?
+# reference https://metacpan.org/source/NEILB/File-JSON-Slurper-0.03/t ?
+# We could have files that are generated with those settings? Like slurper settings, or encoder/decoder settings, or file slurper settings
+# the test class can have the JSON encoder that it used to generate that file.
+# reusable test helpers for functional/object interfaces so we're not duplicating code.

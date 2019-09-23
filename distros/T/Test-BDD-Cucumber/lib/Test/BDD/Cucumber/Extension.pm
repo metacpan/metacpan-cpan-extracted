@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Extension;
-$Test::BDD::Cucumber::Extension::VERSION = '0.64';
+$Test::BDD::Cucumber::Extension::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::Extension - Abstract superclass for extensions
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 
@@ -133,7 +133,7 @@ Note: B<executed> steps, so not called for skipped steps.
 Invoked by the Executor after each executed step in $scenario.
 Reports errors by calling croak().
 
-$failed indicates that the step has not been completed succesfully;
+$failed indicates that the step has not been completed successfully;
 this means the step can have failed, be marked as TODO or pending
 (not implemented).
 

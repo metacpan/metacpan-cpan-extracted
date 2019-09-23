@@ -15,7 +15,7 @@ use Encode::Locale  qw();
 
 use Term::Choose         qw();
 use Term::Choose::Screen qw( clear_screen );
-use Term::Choose::Util   qw( choose_a_dir choose_a_number );
+use Term::Choose::Util   qw();
 use Term::Form           qw();
 
 use App::DBBrowser::Auxil;
@@ -61,13 +61,13 @@ sub from_col_by_col {
     $sql->{insert_into_args} = [];
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $col_names = $sql->{insert_into_cols};
     if ( ! @$col_names ) {
         $sf->__print_args( $sql );
         # Choose a number
-        my $col_count = choose_a_number( 3,
-            { name => 'Number of columns: ', small_first => 1, mouse => $sf->{o}{table}{mouse}, confirm => 'Confirm',
-              back => 'Back', clear_screen => 0, hide_cursor => 0 } #
+        my $col_count = $tu->choose_a_number( 3,
+            { current_selection_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
         );
         if ( ! $col_count ) {
             return;
@@ -446,10 +446,11 @@ sub __directory {
 
 sub __new_dir_search {
     my ( $sf ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
     # Choose
-    my $dir_ec = choose_a_dir(
-        { dir => $default_dir, decoded => 0, mouse => $sf->{o}{table}{mouse}, clear_screen => 1, hide_cursor => 0 }
+    my $dir_ec = $tu->choose_a_directory(
+        { init_dir => $default_dir, decoded => 0, clear_screen => 1 }
     );
     if ( $dir_ec ) {
         $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_ec;

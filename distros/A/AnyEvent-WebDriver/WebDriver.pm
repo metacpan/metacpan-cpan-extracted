@@ -4,8 +4,9 @@ AnyEvent::WebDriver - control browsers using the W3C WebDriver protocol
 
 =head1 SYNOPSIS
 
-   # start geckodriver or any other w3c-compatible webdriver via the shell
-   $ geckdriver -b myfirefox/firefox --log trace --port 4444
+   # start geckodriver(chromedriver or any other webdriver via the shell
+   $ geckodriver -b myfirefox/firefox --log trace --port 4444
+   # chromedriver --port=4444
 
    # then use it
    use AnyEvent::WebDriver;
@@ -35,15 +36,10 @@ AnyEvent::WebDriver - control browsers using the W3C WebDriver protocol
 
 =head1 DESCRIPTION
 
-WARNING: BEFORE VERSION 1.0, API CHANGES ARE LIKELY.
-
-This module aims to implement the W3C WebDriver specification which is the
-standardised equivalent to the Selenium WebDriver API., which in turn aims
+This module aims to implement the L<W3C
+WebDriver|https://www.w3.org/TR/webdriver1/> specification which is the
+standardised equivalent to the Selenium WebDriver API, which in turn aims
 at remotely controlling web browsers such as Firefox or Chromium.
-
-At the time of this writing, it was so brand new that I could only get
-C<geckodriver> (for Firefox) to work, but that is expected to be fixed
-very soon indeed.
 
 One of the design goals of this module was to stay very close to the
 language and words used in the WebDriver specification itself, so to make
@@ -52,6 +48,14 @@ module, you would need to refer to the W3C WebDriver recommendation, which
 can be found L<here|https://www.w3.org/TR/webdriver1/>:
 
    https://www.w3.org/TR/webdriver1/
+
+Mozilla's C<geckodriver> has had webdriver for a long time, while
+C<chromedriver> only has basic and mostly undocumented webdriver support
+since release 77.
+
+In debian GNU/Linux, you can install the C<firefoxdriver> or
+C<chromium-driver> packages to get the firefox/chromium webdrivers,
+respectively.
 
 =head2 CONVENTIONS
 
@@ -68,7 +72,7 @@ use Carp ();
 use AnyEvent ();
 use AnyEvent::HTTP ();
 
-our $VERSION = 0.91;
+our $VERSION = '1.0';
 
 our $WEB_ELEMENT_IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 our $WEB_WINDOW_IDENTIFIER  =  "window-fcc6-11e5-b4f8-330a88ab9d7f";
@@ -165,7 +169,7 @@ sub AUTOLOAD {
 Create a new WebDriver object. Example for a remote WebDriver connection
 (the only type supported at the moment):
 
-   my $wd = new AnyEvent::WebDriver host => "localhost", port => 4444;
+   my $wd = new AnyEvent::WebDriver endpoint => "http://localhost:4444";
 
 Supported keys are:
 
@@ -202,8 +206,8 @@ requests, which assumes you have a reasonably stable connection (such as
 to C<localhost> :) and that the WebDriver has a persistent timeout much
 higher than what L<AnyEvent::HTTP> uses.
 
-You can force connections to be closed for non-idempotent requests by
-setting this to C<undef>.
+You can force connections to be closed for non-idempotent requests (the
+safe default of L<AnyEvent::HTTP>) by setting this to C<undef>.
 
 =back
 
@@ -298,8 +302,8 @@ sub set_session {
 =head2 SIMPLIFIED API
 
 This section documents the simplified API, which is really just a very
-thin wrapper around the WebDriver protocol commands. They all block (using
-L<AnyEvent> condvars) the caller until the result is available, so must
+thin wrapper around the WebDriver protocol commands. They all block the
+caller until the result is available (using L<AnyEvent> condvars), so must
 not be called from an event loop callback - see L<EVENT BASED API> for an
 alternative.
 
@@ -331,7 +335,7 @@ $wd->{capabilities} >> is set to the returned capabilities.
 
 Simple example of creating a WebDriver object and a new session:
 
-   my $wd = new AnyEvent::Selenium endpoint => "http://localhost:4545";
+   my $wd = new AnyEvent::WebDriver endpoint => "http://localhost:4444";
    $wd->new_session ({});
 
 Real-world example with capability negotiation:
@@ -348,7 +352,7 @@ Real-world example with capability negotiation:
                browserName => "firefox",
                "moz:firefoxOptions" => {
                   binary => "firefox/firefox",
-                  args => ["-devtools"],
+                  args => ["-devtools", "-headless"],
                   prefs => {
                      "dom.webnotifications.enabled" => \0,
                      "dom.push.enabled" => \0,
@@ -357,6 +361,16 @@ Real-world example with capability negotiation:
                      "browser.link.open_newwindow.restrictions" => 0,
                      "dom.popup_allowed_events" => "",
                      "dom.disable_open_during_load" => \1,
+                  },
+               },
+            },
+            {
+               browserName => "chrome",
+               "goog:chromeOptions" => {
+                  binary => "/bin/chromium",
+                  args => ["--no-sandbox", "--headless"],
+                  prefs => {
+                     # ...
                   },
                },
             },
@@ -372,8 +386,8 @@ Firefox-specific capability documentation can be found L<on
 MDN|https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities>,
 Chrome-specific capability documentation might be found
 L<here|http://chromedriver.chromium.org/capabilities>, but the latest
-release at the time of this writing has effectively no WebDriver support
-at all, and canary releases are not freely downloadable.
+release at the time of this writing (chromedriver 77) has essentially no
+webdriver documentation about chrome capabilities.
 
 If you have URLs for Safari/IE/Edge etc. capabilities, feel free to tell
 me about them.
@@ -382,6 +396,8 @@ me about them.
 
 sub new_session_ {
    my ($self, $kv, $cb) = @_;
+
+   $kv->{capabilities} ||= {}; # required by protocol
 
    local $self->{_ep} = "$self->{endpoint}/";
    $self->post_ (session => $kv, sub {
@@ -1055,7 +1071,8 @@ Create a screenshot, returning it as a PNG image in a C<data:> URL.
 
 =item $wd->take_element_screenshot ($element)
 
-Accept a simple dialog, if present.
+Similar to C<take_screenshot>, but only takes a screenshot of the bounding
+box of a single element.
 
 =cut
 
@@ -1674,9 +1691,9 @@ Example: call C<find_elements> to find all C<IMG> elements:
 
 This module was unintentionally created (it started inside some quickly
 hacked-together script) simply because I couldn't get the existing
-C<Selenium::Remote::Driver> module to work, ever, despite multiple
-attempts over the years and trying to report multiple bugs, which have
-been completely ignored. It's also not event-based, so, yeah...
+C<Selenium::Remote::Driver> module to work reliably, ever, despite
+multiple attempts over the years and trying to report multiple bugs, which
+have been completely ignored. It's also not event-based, so, yeah...
 
 =head1 AUTHOR
 

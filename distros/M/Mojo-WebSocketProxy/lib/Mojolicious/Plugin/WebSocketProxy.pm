@@ -13,7 +13,7 @@ use Log::Any qw($log);
 # Other backend types may be available; we default to 'jsonrpc' in the code below
 use Mojo::WebSocketProxy::Backend::JSONRPC;
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 sub register {
     my ($self, $app, $config) = @_;

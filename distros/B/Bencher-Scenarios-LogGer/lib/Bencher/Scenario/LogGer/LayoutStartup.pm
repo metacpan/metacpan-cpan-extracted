@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::LayoutStartup;
 
-our $DATE = '2018-12-20'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2019-09-18'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Bencher::Scenario::LogGer::LayoutStartup
 
 =head1 VERSION
 
-This document describes version 0.014 of Bencher::Scenario::LogGer::LayoutStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2018-12-20.
+This document describes version 0.015 of Bencher::Scenario::LogGer::LayoutStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2019-09-18.
 
 =head1 SYNOPSIS
 
@@ -71,9 +71,9 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<Log::ger::Layout::JSON> 0.001
 
-L<Log::ger::Layout::LTSV> 0.001
+L<Log::ger::Layout::LTSV> 0.003
 
-L<Log::ger::Layout::Pattern> 0.001
+L<Log::ger::Layout::Pattern> 0.004
 
 L<Log::ger::Layout::YAML> 0.001
 
@@ -113,7 +113,7 @@ L<Log::ger::Layout::YAML>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::LayoutStartup >>):
 
@@ -121,11 +121,11 @@ Benchmark with default options (C<< bencher -m LogGer::LayoutStartup >>):
  +--------------+-----------+-----------+------------+---------+---------+
  | participant  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
  +--------------+-----------+-----------+------------+---------+---------+
- | load-YAML    |        67 |      15   |        1   | 5.8e-05 |      21 |
- | load-LTSV    |        70 |      14   |        1   |   6e-05 |      20 |
- | load-JSON    |        71 |      14   |        1.1 | 3.2e-05 |      20 |
- | load-Pattern |        71 |      14   |        1.1 | 5.5e-05 |      20 |
- | baseline     |       190 |       5.3 |        2.8 | 2.7e-05 |      20 |
+ | load-JSON    |        75 |        13 |        1   | 3.1e-05 |      20 |
+ | load-YAML    |        75 |        13 |        1   | 1.7e-05 |      20 |
+ | load-LTSV    |        76 |        13 |        1   | 3.4e-05 |      20 |
+ | load-Pattern |        77 |        13 |        1   | 1.3e-05 |      20 |
+ | baseline     |       170 |         6 |        2.2 | 3.6e-05 |      20 |
  +--------------+-----------+-----------+------------+---------+---------+
 
 
@@ -135,11 +135,11 @@ Benchmark module startup overhead (C<< bencher -m LogGer::LayoutStartup --module
  +---------------------------+-----------+------------------------+------------+---------+---------+
  | participant               | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Layout::JSON    |        14 |                      9 |          1 | 8.8e-05 |      20 |
- | Log::ger::Layout::YAML    |        14 |                      9 |          1 | 4.4e-05 |      20 |
- | Log::ger::Layout::LTSV    |        14 |                      9 |          1 | 6.1e-05 |      20 |
- | Log::ger::Layout::Pattern |        14 |                      9 |          1 | 2.4e-05 |      21 |
- | perl -e1 (baseline)       |         5 |                      0 |          3 | 7.2e-05 |      20 |
+ | Log::ger::Layout::YAML    |      13.3 |                    7.2 |        1   | 1.3e-05 |      20 |
+ | Log::ger::Layout::JSON    |      13.3 |                    7.2 |        1   | 5.3e-06 |      20 |
+ | Log::ger::Layout::LTSV    |      13   |                    6.9 |        1   | 1.8e-05 |      20 |
+ | Log::ger::Layout::Pattern |      13   |                    6.9 |        1   |   2e-05 |      20 |
+ | perl -e1 (baseline)       |       6.1 |                    0   |        2.2 | 1.9e-05 |      21 |
  +---------------------------+-----------+------------------------+------------+---------+---------+
 
 
@@ -167,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

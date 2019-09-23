@@ -7,6 +7,7 @@ debian/rules
 debian/source/format
 debian/watch
 devel/compositional-inverse.pl
+devel/grep-linear-recurrence.pl
 devel/grep-power-prefix-digits.pl
 devel/grep.pl
 devel/oeis-cleanup.pl

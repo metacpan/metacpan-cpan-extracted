@@ -19,7 +19,7 @@ name: Getopt-O2
 provides:
   Getopt::O2:
     file: lib/Getopt/O2.pm
-    version: v1.0.20
+    version: v1.1.0
   Getopt::O2::Rule:
     file: lib/Getopt/O2.pm
 requires:
@@ -27,5 +27,5 @@ requires:
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.0.20
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

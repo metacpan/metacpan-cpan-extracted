@@ -1,12 +1,6 @@
 use 5.006;
-use strict;
-use warnings;
-use Test::More;
-
-# Leave verbose turned on for the sake of coverage, even though it makes
-# the results quite lengthy.
-use Sub::Multi::Tiny::Util '*VERBOSE';
-BEGIN { $VERBOSE = 99; }
+use lib::relative '.';
+use Kit;
 
 {
     package main::my_multi;     # We're making main::my_multi()

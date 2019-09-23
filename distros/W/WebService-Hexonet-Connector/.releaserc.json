@@ -11,7 +11,7 @@
         [
             "@semantic-release/exec",
             {
-                "prepareCmd": "./updateVersion.sh ${nextRelease.version} ${options.branch} && (./scripts/rebuild.sh || ./scripts/rebuild.sh) && ./scripts/buildrelease.sh ${nextRelease.version}",
+                "prepareCmd": "./updateVersion.sh ${nextRelease.version} ${options.branch} && ./scripts/generatedocs.sh && ./scripts/rebuild.sh && ./scripts/buildrelease.sh ${nextRelease.version}",
                 "publishCmd": "./scripts/upload.sh ${nextRelease.version}"
             }
         ],

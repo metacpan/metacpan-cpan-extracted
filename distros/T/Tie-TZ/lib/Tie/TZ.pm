@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -24,7 +24,7 @@ use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $TZ);
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-$VERSION = 9;
+$VERSION = 10;
 
 @ISA = ('Exporter');
 @EXPORT_OK = qw($TZ);
@@ -128,16 +128,17 @@ Tie::TZ - tied $TZ setting %ENV and calling tzset()
 C<Tie::TZ> provides a tied C<$TZ> variable which gets and sets the TZ
 environment variable C<$ENV{'TZ'}>.  When it changes C<%ENV> it calls
 C<tzset()> (see L<POSIX>) if available, ensuring the C library notices the
-change for subsequent C<localtime> etc.
+change for subsequent C<localtime()> etc.
 
     $TZ = 'GMT';
     # does  $ENV{'TZ'}='GMT'; POSIX::tzset();
 
-For a plain set you can just as easily store and C<tzset> yourself (or have
-a function do the combo).  The power of a tied variable comes when using
-C<local> to have a different timezone temporarily.  Any C<goto>, C<return>,
-C<die>, etc, exiting the block will restore the old setting, including a
-C<tzset> for it.
+For a plain set, you can just as easily store and C<tzset()> yourself (or
+have a function do the combination).  The power of a tied variable comes
+when using C<local> to have a different timezone temporarily.  Any C<goto>,
+C<return>, C<die>, etc, exiting the block will restore the old setting,
+including a C<tzset()> for it.  See F<examples/tie-tz.pl> in the sources for
+complete program.
 
     { local $TZ = 'GMT';
       print ctime();
@@ -159,37 +160,37 @@ the settings you're using might be the same -- just store to C<$TZ> and it
 notices when there's no change.  If you never store anything different from
 the startup value then the C<POSIX> module is not even loaded.
 
-If C<tzset> is not implemented on your system then C<Tie::TZ> just sets the
-environment variable.  This is only likely on a very old or very limited C
-library.  Of course setting the environment variable might or might not
+If C<tzset()> is not implemented on your system then C<Tie::TZ> just sets
+the environment variable.  This is only likely on a very old or very limited
+C library.  Of course setting the environment variable might or might not
 affect the timezone in force (see L<perlport/Time and Date>).
 
 =head2 Uses
 
-Quite often C<tzset> is not actually needed.  Decent C libraries look for a
-new TZ each time in the various C<localtime> etc functions.  Here are some
-cases where you do need it,
+On many systems C<tzset()> is not actually needed.  Decent C libraries look
+for a new TZ each time in the various C<localtime()> etc functions.  Here
+are some cases where you do need it,
 
 =over 4
 
 =item *
 
-Using Perl-level C<localtime> in threaded Perl 5.8.8 (whether using threads
-or not).  Normally Perl arranges to call C<tzset> if the C library doesn't
-(based on a configure test, see L<Config>).  But in 5.8.8 and earlier Perl
-didn't do that on C<localtime_r>, and in some versions of GNU C that
-function needed an explicit C<tzset>.
+Using Perl-level C<localtime()> in threaded Perl 5.8.8 (whether using
+threads or not).  Normally Perl arranges to call C<tzset()> if the C library
+doesn't (based on a configure test, see L<Config>).  But in 5.8.8 and
+earlier Perl didn't do that on C<localtime_r>, and in some versions of GNU C
+that function needed an explicit C<tzset()>.
 
 =item *
 
-Using C<localtime> from C code on older systems which don't check for a new
-C<TZ> each time.  Even if Perl's configure test does the right thing for
-Perl level calls you may not be so lucky deep in external libraries.
+Using C<localtime()> from C code on older systems which don't check for a
+new C<TZ> each time.  Even if Perl's configure test does the right thing for
+Perl level calls, you may not be so fortunate deep in external libraries.
 
 =item *
 
 When using the global variables C<timezone>, C<daylight> and C<tzname>,
-either from C code or from the C<POSIX> module C<tzname> function.
+either from C code or from the C<POSIX> module C<tzname()> function.
 
 =back
 
@@ -201,13 +202,12 @@ C<$Tie::TZ::TZ>,
     use Tie::TZ;
     $Tie::TZ::TZ = 'GMT';
 
-Import C<$TZ> in the usual way (see L<Exporter>) as a shorthand, either by
-name
+Import C<$TZ> in the usual way (see L<Exporter>) to shorten, either by name
 
     use Tie::TZ '$TZ';
     $TZ = 'GMT';
 
-or C<":all"> imports everything (there's only C<$TZ> at the moment)
+or C<":all"> imports everything (there's only C<$TZ> presently)
 
     use Tie::TZ ':all';
     $TZ = 'GMT';
@@ -215,16 +215,16 @@ or C<":all"> imports everything (there's only C<$TZ> at the moment)
 =head1 OTHER NOTES
 
 The C<Env> module can make a tied C<$TZ> in a similar way if you're
-confident you don't need C<tzset>.  The C<local> trick above works equally
+confident you don't need C<tzset()>.  The C<local> trick above works equally
 well with C<Env>.  You can also apply C<local> directly to C<$ENV{'TZ'}>,
 eg. C<local $ENV{'TZ'} = 'EST+10'>, except you can't unset that way.
 (Attempting to store C<undef> provokes a warning before Perl 5.10 and comes
 out as the empty string, which might be subtly different to unset.)
 
 When you get sick of the C library timezone handling have a look at
-C<DateTime::TimeZone>.  Its copy of the Olson timezone database makes it big
-(no doubt you could turf what you don't use), but it's all Perl and is much
-friendlier for calculations in multiple zones.
+C<DateTime::TimeZone>.  It's a full copy of the Olson timezone database so
+is big (no doubt you could turf what you don't use), but it's all Perl and
+is friendlier for calculations in multiple zones.
 
 =head1 SEE ALSO
 
@@ -236,7 +236,7 @@ http://user42.tuxfamily.org/tie-tz/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 Tie-TZ is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

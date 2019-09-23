@@ -1,10 +1,10 @@
 package Quiq::ClassLoader;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -16,9 +16,9 @@ Quiq::ClassLoader - Lade Perl-Klassen automatisch
 
 =head1 SYNOPSIS
 
-    use Quiq::ClassLoader;
-    
-    my $obj = My::Class->new; # lädt My/Class.pm
+  use Quiq::ClassLoader;
+  
+  my $obj = My::Class->new; # lädt My/Class.pm
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,7 @@ Müde, C<use>-Anweisungen für das Laden von Perl-Klassen zu schreiben?
 Dieses Modul reduziert das Laden aller Klassen auf eine
 einzige Anweisung:
 
-    use Quiq::ClassLoader;
+  use Quiq::ClassLoader;
 
 Danach werden alle Klassen automatisch mit ihrem ersten
 Methodenaufruf geladen. Dies geschieht bei jeder Methode,
@@ -87,12 +87,12 @@ ihre Basisklassen (sofern vorhanden) selbständig lädt.
 Eine Klasse I<My::Class> wird in einer Datei mit dem Pfad C<My/Class.pm>
 definiert und irgendwo unter C<@INC> installiert. Sie hat den Inhalt:
 
-    package My::Class;
-    use base qw/<BASECLASSES>/;
-    
-    <SOURCE>
-    
-    1;
+  package My::Class;
+  use base qw/<BASECLASSES>/;
+  
+  <SOURCE>
+  
+  1;
 
 Hierbei ist <BASECLASSES> die Liste der Basisklassen und <SOURCE>
 der Quelltext der Klasse (einschließlich der
@@ -118,24 +118,24 @@ eine Exception ausgelöst.
 Die AUTOLOAD-Methode, die I<< Quiq::ClassLoader >> definiert, ist recht einfach
 (Fehlerbehandlung hier vereinfacht):
 
-    sub AUTOLOAD {
-        my $this = shift;
-        # @_: Methodenargumente
-    
-        my ($class,$sub) = our $AUTOLOAD =~ /^(.*)::(\w+)$/;
-        return if $sub !~ /[^A-Z]/;
-    
-        eval "use $class";
-        if ($@) {
-            die "Modul kann nicht geladen werden\n";
-        }
-    
-        unless ($this->can($sub)) {
-            die "Methode existiert nicht\n";
-        }
-    
-        return $this->$sub(@_);
-    }
+  sub AUTOLOAD {
+      my $this = shift;
+      # @_: Methodenargumente
+  
+      my ($class,$sub) = our $AUTOLOAD =~ /^(.*)::(\w+)$/;
+      return if $sub !~ /[^A-Z]/;
+  
+      eval "use $class";
+      if ($@) {
+          die "Modul kann nicht geladen werden\n";
+      }
+  
+      unless ($this->can($sub)) {
+          die "Methode existiert nicht\n";
+      }
+  
+      return $this->$sub(@_);
+  }
 
 Lediglich der erste Methodenaufruf einer noch nicht geladenen
 Klasse läuft über diese AUTOLOAD-Methode. Alle folgenden
@@ -154,16 +154,16 @@ Fehlers, einschließlich Stacktrace.
 
 Aufbau des Exception-Texts:
 
-    Exception:
-        CLASSLOADER-<N>: <TEXT>
-    Class:
-        <CLASS>
-    Method:
-        <METHOD>()
-    Error:
-        <ERROR>
-    Stacktrace:
-        <STACKTRACE>
+  Exception:
+      CLASSLOADER-<N>: <TEXT>
+  Class:
+      <CLASS>
+  Method:
+      <METHOD>()
+  Error:
+      <ERROR>
+  Stacktrace:
+      <STACKTRACE>
 
 =head2 Kann eine Klasse selbst eine AUTOLOAD-Methode haben?
 
@@ -224,7 +224,7 @@ unshift @UNIVERSAL::ISA,'Quiq::ClassLoader';
 
 =head4 Synopsis
 
-    $this->AUTOLOAD;
+  $this->AUTOLOAD;
 
 =head4 Description
 
@@ -310,7 +310,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

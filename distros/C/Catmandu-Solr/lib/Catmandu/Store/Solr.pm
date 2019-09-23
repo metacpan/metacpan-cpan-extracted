@@ -18,7 +18,7 @@ Catmandu::Store::Solr - A searchable store backed by Solr
 
 =cut
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0304';
 
 =head1 SYNOPSIS
 
@@ -70,14 +70,15 @@ our $VERSION = '0.0303';
     $store->bag->each(sub { ... });
     $store->bag->take(10)->each(sub { ... });
 
-    # Some stores can be searched
+    # Search
+    # Any extra arguments will be passed on as is to Solr
     my $hits = $store->bag->search(query => 'name:Patrick');
 
 =cut
 
 has url        => (is => 'ro', default => sub {'http://localhost:8983/solr'});
 has keep_alive => (is => 'ro', default => sub {0});
-has solr => (is => 'lazy');
+has solr    => (is => 'lazy');
 has bag_key => (is => 'lazy', alias => 'bag_field');
 has on_error => (
     is  => 'ro',

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2010 Kevin Ryde
+# Copyright 2008, 2010, 2012 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -49,7 +49,7 @@ foreach my $row ([0, 'Red'],
 
 sub my_item_create {
   my ($menu) = @_;
-  return Gtk2::RadioMenuItem->new_with_label (undef, '');
+  return Gtk2::RadioMenuItem->new_with_label ([], rand());
 }
 sub my_item_data {
   my ($menu, $model, $iter, $item) = @_;
@@ -63,9 +63,9 @@ sub my_item_data {
   my $str = $model->get_value ($iter, 1);
   $item->get_child->set_text ($str);
 }
-my $menu = Gtk2::Ex::MenuView->new (model => $liststore,
-                                    item_create_func => \&my_item_create,
-                                    item_data_func => \&my_item_data);
+my $menu = Gtk2::Ex::MenuView->new (model => $liststore);
+$menu->signal_connect (item_create_or_update => \&my_item_create);
+# item_data_func => \&my_item_data);
 $baritem->set_submenu ($menu);
 
 my $tearoff = Gtk2::TearoffMenuItem->new;

@@ -6,7 +6,7 @@ use strict;
 use 5.010001;
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_number choose_a_subset );
+use Term::Choose::Util qw();
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
@@ -73,6 +73,7 @@ sub col_function {
 sub __choose_columns {
     my ( $sf, $sql, $function, $arg_count, $cols ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     if ( ! $arg_count ) {
         return;
     }
@@ -85,10 +86,9 @@ sub __choose_columns {
     }
     else {
         # Choose
-        return choose_a_subset(
+        return $tu->choose_a_subset(
             $cols,
-            { name => $function . ': ', layout => 1, sofar_separator => ',', mouse => $sf->{o}{table}{mouse},
-              keep_chosen => 1, hide_cursor => 0 }
+            { current_selection_label => $function . ': ', layout => 1, current_selection_separator => ',', keep_chosen => 1 }
         );
     }
 }
@@ -98,6 +98,7 @@ sub __prepare_col_func {
     my ( $sf, $func, $qt_col ) = @_; # $qt_col -> $arg
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $quote_f;
     if ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
         my $prompt = $func eq 'Epoch_to_Date' ? 'DATE' : 'DATETIME';
@@ -125,8 +126,8 @@ sub __prepare_col_func {
     elsif ( $func eq 'Truncate' ) {
         my $info = $func . ': ' . $qt_col;
         my $name = "Decimal places: ";
-        my $precision = choose_a_number( 2,
-            { name => $name, info => $info, small_first => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0, hide_cursor => 0 }
+        my $precision = $tu->choose_a_number( 2,
+            { current_selection_label => $name, info => $info, small_first => 1 }
         );
         return if ! defined $precision;
         $quote_f = $plui->truncate( $qt_col, $precision );

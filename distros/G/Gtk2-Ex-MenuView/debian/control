@@ -1,4 +1,4 @@
-# Copyright 2008, 2010 Kevin Ryde
+# Copyright 2008, 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -19,10 +19,10 @@ Source: libgtk2-ex-menuview-perl
 Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.1
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/gtk2-ex-menuview/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libgtk2-ex-menuview-perl
 Architecture: all

@@ -8,7 +8,7 @@ configure_requires:
   Canary::Stability: '2012'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +25,4 @@ requires:
   AnyEvent::HTTP: '2.22'
   JSON::PP: '2.273'
   common::sense: '3.74'
-version: 0.91
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.0'

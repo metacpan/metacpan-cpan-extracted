@@ -1,11 +1,11 @@
 package Quiq::Html::Page;
 use base qw/Quiq::Html::Base/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -25,15 +25,15 @@ L<Quiq::Html::Base>
 
 =head1 SYNOPSIS
 
-    use Quiq::Html::Page;
-    
-    $h = Quiq::Html::Producer->new;
-    
-    $obj = Quiq::Html::Page->new(
-        body => 'hello world!',
-    );
-    
-    $html = $obj->html($h);
+  use Quiq::Html::Page;
+  
+  $h = Quiq::Html::Producer->new;
+  
+  $obj = Quiq::Html::Page->new(
+      body => 'hello world!',
+  );
+  
+  $html = $obj->html($h);
 
 =head1 ATTRIBUTES
 
@@ -65,17 +65,17 @@ css => $url, eine JavaScript-Datei durch die Angabe eines Paars
 js => $url geladen. Hat $url die Endung .css oder .js, kann die
 Typangabe auch weggelassen werden. Beispiel:
 
-    load => [
-        css => 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
-        js => 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js',
-    ],
+  load => [
+      css => 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
+      js => 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js',
+  ],
 
 Oder kurz (da die Dateiendungen den Typ verraten):
 
-    load => [
-        'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
-        'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js',
-    ],
+  load => [
+      'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
+      'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js',
+  ],
 
 =item noNewline => $bool (Default: 0)
 
@@ -121,7 +121,7 @@ Einrückung des Inhalts der obersten Elemente <head> und <body>.
 
 =head4 Synopsis
 
-    $obj = $class->new(@keyVal);
+  $obj = $class->new(@keyVal);
 
 =cut
 
@@ -170,8 +170,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $obj->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $obj->html($h);
+  $html = $class->html($h,@keyVal);
 
 =cut
 
@@ -258,7 +258,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

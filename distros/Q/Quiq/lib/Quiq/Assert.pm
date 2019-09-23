@@ -1,11 +1,11 @@
 package Quiq::Assert;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Math;
 
@@ -23,18 +23,18 @@ L<Quiq::Object>
 
 =head1 SYNOPSIS
 
-    use Quiq::Assert;
-    
-    my $a = Quiq::Assert->new;
-    
-    # Prüfe, ob Wert in Aufzählung vorkommt
-    $a->isEnumValue('Birne',['Apfel','Birne','Pflaume']);
-    
-    # Prüfe, ob Wert nicht leer ist
-    $a->isNotNull('xyz');
-    
-    # Prüfe, ob Wert eine Zahl ist
-    $a->isNumber(3.14152);
+  use Quiq::Assert;
+  
+  my $a = Quiq::Assert->new;
+  
+  # Prüfe, ob Wert in Aufzählung vorkommt
+  $a->isEnumValue('Birne',['Apfel','Birne','Pflaume']);
+  
+  # Prüfe, ob Wert nicht leer ist
+  $a->isNotNull('xyz');
+  
+  # Prüfe, ob Wert eine Zahl ist
+  $a->isNumber(3.14152);
 
 =head1 DESCRIPTION
 
@@ -46,15 +46,15 @@ Methode zurück, im Fehlerfall wirft sie eine Exception.
 
 Test von der Kommandozeile aus:
 
-    $ perl -MQuiq::Assert -E 'Quiq::Assert->isNotNull("",-name=>"x")'
-    Exception:
-        ASSERT-00002: Value is null
-    Name:
-        x
-    Stacktrace:
-        Quiq::Assert::isNotNull() [+1 -e]
-          Quiq::Object::throw() [+210 .../Quiq/Assert.pm]
-            Quiq::Stacktrace::asString() [+425 .../Quiq/Object.pm]
+  $ perl -MQuiq::Assert -E 'Quiq::Assert->isNotNull("",-name=>"x")'
+  Exception:
+      ASSERT-00002: Value is null
+  Name:
+      x
+  Stacktrace:
+      Quiq::Assert::isNotNull() [+1 -e]
+        Quiq::Object::throw() [+210 .../Quiq/Assert.pm]
+          Quiq::Stacktrace::asString() [+425 .../Quiq/Object.pm]
 
 =head1 METHODS
 
@@ -64,7 +64,7 @@ Test von der Kommandozeile aus:
 
 =head4 Synopsis
 
-    $a = $class->new;
+  $a = $class->new;
 
 =head4 Returns
 
@@ -98,7 +98,7 @@ Objektmethode aufgerufen werden.
 
 =head4 Synopsis
 
-    $bool = $this->isEnumValue($val,\@values,@opt);
+  $bool = $this->isEnumValue($val,\@values,@opt);
 
 =head4 Arguments
 
@@ -187,7 +187,7 @@ sub isEnumValue {
 
 =head4 Synopsis
 
-    $bool = $this->isNotNull($val,@opt);
+  $bool = $this->isNotNull($val,@opt);
 
 =head4 Arguments
 
@@ -266,7 +266,7 @@ sub isNotNull {
 
 =head4 Synopsis
 
-    $bool = $this->isNumber($val,@opt);
+  $bool = $this->isNumber($val,@opt);
 
 =head4 Arguments
 
@@ -348,7 +348,7 @@ sub isNumber {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

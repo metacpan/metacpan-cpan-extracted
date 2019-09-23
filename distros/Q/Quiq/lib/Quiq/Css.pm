@@ -1,11 +1,11 @@
 package Quiq::Css;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::String;
@@ -40,7 +40,7 @@ Format des generierten CSS-Code.
 
 =head4 Synopsis
 
-    $css = $class->new($format);
+  $css = $class->new($format);
 
 =head4 Arguments
 
@@ -58,10 +58,10 @@ Format des generierten CSS-Code. Zulässige Werte:
 
 Der CSS-Code wird mehrzeilig generiert:
 
-    .comment {
-        color: #408080;
-        font-style: italic;
-    }
+  .comment {
+      color: #408080;
+      font-style: italic;
+  }
 
 =over 4
 
@@ -71,7 +71,7 @@ Der CSS-Code wird mehrzeilig generiert:
 
 Der CSS-Code wird einzeilig generiert:
 
-    .comment { color: #408080; font-style: italic; }
+  .comment { color: #408080; font-style: italic; }
 
 =back
 
@@ -106,8 +106,8 @@ sub new {
 
 =head4 Synopsis
 
-    $properties = $this->properties(@properties);
-    $properties = $this->properties(\@properties);
+  $properties = $this->properties(@properties);
+  $properties = $this->properties(\@properties);
 
 =head4 Description
 
@@ -127,15 +127,15 @@ wird, wird diese Methode gerufen.
 
 Erzeuge Properties für HTML style-Attribut:
 
-    $properties = Quiq::Css->properties(
-        fontStyle => 'italic',
-        marginLeft => '0.5cm',
-        marginRight => '0.5cm',
-    );
+  $properties = Quiq::Css->properties(
+      fontStyle => 'italic',
+      marginLeft => '0.5cm',
+      marginRight => '0.5cm',
+  );
 
 liefert
 
-    font-style: italic; margin-left: 0.5cm; margin-right: 0.5cm;
+  font-style: italic; margin-left: 0.5cm; margin-right: 0.5cm;
 
 =cut
 
@@ -172,8 +172,8 @@ sub properties {
 
 =head4 Synopsis
 
-    $rule = $this->rule($selector,\@properties);
-    $rule = $this->rule($selector,@properties);
+  $rule = $this->rule($selector,\@properties);
+  $rule = $this->rule($selector,@properties);
 
 =head4 Description
 
@@ -187,19 +187,19 @@ einen Leerstring ('').
 
 Erzeuge eine einfache Style Rule:
 
-    $rule = Quiq::Css->rule('p.abstract',
-        fontStyle => 'italic',
-        marginLeft => '0.5cm',
-        marginRight => '0.5cm',
-    );
+  $rule = Quiq::Css->rule('p.abstract',
+      fontStyle => 'italic',
+      marginLeft => '0.5cm',
+      marginRight => '0.5cm',
+  );
 
 liefert
 
-    p.abstract {
-        font-style: italic;
-        margin-left: 0.5cm;
-        margin-right: 0.5cm;
-    }
+  p.abstract {
+      font-style: italic;
+      margin-left: 0.5cm;
+      margin-right: 0.5cm;
+  }
 
 =cut
 
@@ -232,7 +232,7 @@ sub rule {
 
 =head4 Synopsis
 
-    $rules = $css->rules($selector=>\@properties,...);
+  $rules = $css->rules($selector=>\@properties,...);
 
 =head4 Arguments
 
@@ -278,10 +278,10 @@ sub rules {
 
 =head4 Synopsis
 
-    $rules = $css->restrictedRules($localSelector,
-        $selector => \@properties,
-        ...
-    );
+  $rules = $css->restrictedRules($localSelector,
+      $selector => \@properties,
+      ...
+  );
 
 =head4 Arguments
 
@@ -350,10 +350,10 @@ sub restrictedRules {
 
 =head4 Synopsis
 
-    $rules = $css->rulesFromObject($obj,
-        $key => [$selector,@properties],
-        ...
-    );
+  $rules = $css->rulesFromObject($obj,
+      $key => [$selector,@properties],
+      ...
+  );
 
 =head4 Arguments
 
@@ -390,40 +390,40 @@ B<< Beispiel aus Quiq::Html::Verbatim >>
 Im Konstruktor werden die Objekt-Attribute vereinbart. Diese
 können bei der Instantiierung des Objektes gesetzt werden.
 
-    my $self = $class->SUPER::new(
-        cssTableProperties => undef,
-        cssLnProperties => undef,
-        cssMarginProperties => undef,
-        cssTextProperties => undef,
-        ...
-    );
+  my $self = $class->SUPER::new(
+      cssTableProperties => undef,
+      cssLnProperties => undef,
+      cssMarginProperties => undef,
+      cssTextProperties => undef,
+      ...
+  );
 
 In der Methode, die die CSS-Regeln erzeugt, werden die zugehörigen
 Selektoren und Default-Properties vereinbart.
 
-    $rules .= $css->rulesFromObject($self,
-        cssTableProperties => [".xxx-table"],
-        cssLnProperties => [".xxx-ln",color=>'#808080'],
-        cssMarginProperties => [".xxx-margin",width=>'0.6em'],
-        cssTextProperties => [".xxx-text"],
-    );
+  $rules .= $css->rulesFromObject($self,
+      cssTableProperties => [".xxx-table"],
+      cssLnProperties => [".xxx-ln",color=>'#808080'],
+      cssMarginProperties => [".xxx-margin",width=>'0.6em'],
+      cssTextProperties => [".xxx-text"],
+  );
 
 Beim Konstruktor-Aufruf können die Default-Properties ergänzt ('+'
 als erstes Element in der Property-Liste) oder ersetzt (keine
 Angabe) oder gelöscht werden (leere Liste).
 
-    my $obj = Quiq::Hash->new(
-        cssTableProperties => [backgroundColor=>'#f0f0f0'],  # ersetzen
-        cssLnProperties => ['>',color=>'black'],             # ersetzen
-        cssMarginProperties => ['+',backgroundColor=>'red'], # ergänzen
-        cssTextProperties => [],                             # löschen
-    );
+  my $obj = Quiq::Hash->new(
+      cssTableProperties => [backgroundColor=>'#f0f0f0'],  # ersetzen
+      cssLnProperties => ['>',color=>'black'],             # ersetzen
+      cssMarginProperties => ['+',backgroundColor=>'red'], # ergänzen
+      cssTextProperties => [],                             # löschen
+  );
 
 Resultierende CSS-Regeln:
 
-    .xxx-table { background-color: #f0f0f0; }
-    .xxx-ln { color: black; }
-    .xxx-margin { width: 0.6em; background-color: red; }
+  .xxx-table { background-color: #f0f0f0; }
+  .xxx-ln { color: black; }
+  .xxx-margin { width: 0.6em; background-color: red; }
 
 =cut
 
@@ -464,7 +464,7 @@ sub rulesFromObject {
 
 =head4 Synopsis
 
-    $rules = $this->makeFlat($rules);
+  $rules = $this->makeFlat($rules);
 
 =head4 Arguments
 
@@ -495,7 +495,7 @@ sub makeFlat {
 
 =head4 Synopsis
 
-    $styleTags = Quiq::Css->style($h,@specs);
+  $styleTags = Quiq::Css->style($h,@specs);
 
 =head4 Arguments
 
@@ -528,7 +528,7 @@ Zeichenkette $string wird hinzugefügt.
 
 Zeichenkette wird als URL interpretiert und ein <link>-Tag
 
-    <link rel="stylesheet" type="text/css" href="$url" />
+  <link rel="stylesheet" type="text/css" href="$url" />
 
 hinzugefügt.
 
@@ -542,31 +542,31 @@ Wird zu @specs expandiert.
 
 B<Code zum Laden eines externen Stylesheet:>
 
-    $style = Quiq::Css->style('/css/stylesheet.css');
-    =>
-    <link rel="stylesheet" type="text/css" href="/css/stylesheet.css" />
+  $style = Quiq::Css->style('/css/stylesheet.css');
+  =>
+  <link rel="stylesheet" type="text/css" href="/css/stylesheet.css" />
 
 B<Stylesheet aus Datei einfügen:>
 
-    $style = Quiq::Css->style('inline:/css/stylesheet.css');
-    =>
-    <Inhalt der Datei /css/stylesheet.css>
+  $style = Quiq::Css->style('inline:/css/stylesheet.css');
+  =>
+  <Inhalt der Datei /css/stylesheet.css>
 
 B<Mehrere Stylesheet-Spezifikationen:>
 
-    $style = Quiq::Css->style(
-        '/css/stylesheet1.css'
-        '/css/stylesheet2.css'
-    );
-    =>
-    <link rel="stylesheet" type="text/css" href="/css/stylesheet1.css" />
-    <link rel="stylesheet" type="text/css" href="/css/stylesheet2.css" />
+  $style = Quiq::Css->style(
+      '/css/stylesheet1.css'
+      '/css/stylesheet2.css'
+  );
+  =>
+  <link rel="stylesheet" type="text/css" href="/css/stylesheet1.css" />
+  <link rel="stylesheet" type="text/css" href="/css/stylesheet2.css" />
 
 B<Mehrere Stylesheet-Spezifikationen via Arrayreferenz:>
 
-    $style = Quiq::Css->style(
-        ['/css/stylesheet1.css','/css/stylesheet2.css']
-    );
+  $style = Quiq::Css->style(
+      ['/css/stylesheet1.css','/css/stylesheet2.css']
+  );
 
 Dies ist nützlich, wenn die Spezifikation von einem Parameter
 einer umgebenden Methode kommt.
@@ -634,7 +634,7 @@ sub style {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

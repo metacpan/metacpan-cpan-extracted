@@ -16,7 +16,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk";
+my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && -f "../../perl.release.mk";
 my $eumm_recent_enough = $ExtUtils::MakeMaker::VERSION >= 6.54;
 
 if (!$eumm_recent_enough) {
@@ -36,6 +36,7 @@ WriteMakefile
     AUTHOR         => 'Slaven Rezic <srezic@cpan.org>',
    'VERSION_FROM'  => 'PathEntry.pm',
    'ABSTRACT'      => 'Entry widget for selecting paths with completion',
+   'LICENSE'       => 'perl_5',
    'PREREQ_PM'     => { Tk => 800.020 },
 
     ($eumm_recent_enough
@@ -54,6 +55,9 @@ sub MY::postamble {
 	$postamble .= <<'EOF';
 
 PERL_TEST_DISTRIBUTION_CHANGES=yes
+# - prereq: "Undefined subroutine &Test::Distribution::prereq::WriteMakefile"
+# - podcover: some internal Tk methods not documented
+PERL_TEST_DISTRIBUTION_OPTS=not prereq,podcover
 
 .include "../../perl.release.mk"
 .include "../../perl.git.mk"

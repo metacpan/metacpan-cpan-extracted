@@ -22,7 +22,7 @@ with qw(
 
 use parent 'Data::Object::Array::Base';
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # METHODS
 
@@ -1211,6 +1211,26 @@ L<Data::Object::Number> object. This method is an alias to the length method.
 
 =head2 slice
 
+  kvslice(Any @args) : HashObject
+
+The kvslice method returns a hash reference containing the elements in the
+array at the index(es) specified in the arguments. This method returns a
+L<Data::Object::Hash> object.
+
+=over 4
+
+=item slice example
+
+  # given [1..5]
+
+  $array->kvslice(2,4); # {2=>3, 4=>5}
+
+=back
+
+=cut
+
+=head2 slice
+
   slice(Any $arg1) : Any
 
 The slice method returns an array reference containing the elements in the
@@ -1329,7 +1349,7 @@ execution. Note: This method modifies the array.
 
 =head2 values
 
-  values(Str $arg1) : ArrayObject
+  values() : ArrayObject
 
 The values method returns an array reference consisting of the elements in the
 array. This method essentially copies the content of the array into a new
@@ -1349,11 +1369,11 @@ container. This method returns a L<Data::Object::Array> object.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

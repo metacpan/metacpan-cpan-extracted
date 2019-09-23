@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -31,7 +31,7 @@ use Gtk2;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 4;
+our $VERSION = 5;
 
 use Glib::Object::Subclass
   'Gtk2::Menu',

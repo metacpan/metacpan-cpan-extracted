@@ -1,11 +1,11 @@
 package Quiq::Gnuplot::Process;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Gnuplot::Plot;
 use Quiq::FileHandle;
@@ -36,7 +36,7 @@ Ein Gnuplot-Prozess erzeugt Plots.
 
 =head4 Synopsis
 
-    $gnu = Quiq::Gnuplot::Process->new;
+  $gnu = Quiq::Gnuplot::Process->new;
 
 =cut
 
@@ -66,8 +66,8 @@ sub new {
 
 =head4 Synopsis
 
-    $gnu->render($plt);
-    $img = $gnu->render($plt); # funktioniert nicht
+  $gnu->render($plt);
+  $img = $gnu->render($plt); # funktioniert nicht
 
 =head4 Description
 
@@ -306,7 +306,7 @@ sub render {
 
 =head4 Synopsis
 
-    $gnu->print(@data);
+  $gnu->print(@data);
 
 =cut
 
@@ -330,7 +330,7 @@ sub print {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

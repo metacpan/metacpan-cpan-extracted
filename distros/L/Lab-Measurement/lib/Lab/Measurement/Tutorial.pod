@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 How to read the documentation
 
@@ -147,7 +147,7 @@ package are installed, see L<Lab::VISA::Installation>. The I<VISA interactive
 control>, part of the NI VISA installation, can be used to get a list of
 connected equipment.
 
-We first connect the DMM via USB:
+We first connect the DMM via USB. The serial number can be found using I<VISA interactive control> or from the utility menu of the instrument.
 
  use 5.010;
  use Lab::Moose;
@@ -155,6 +155,7 @@ We first connect the DMM via USB:
  my $multimeter = instrument(
      type => 'Agilent34410A',
      connection_type => 'VISA::USB',
+     connection_options => {serial => '00B50DAE'},
  );
 
 To use the LAN interface, set the C<connection_type> to I<VISA::VXI11> and
@@ -936,6 +937,89 @@ C<meta_data> attribute to the C<start> method:
      measurement => $meas,
      datafile   => $datafile,
      meta_data => {foo_string => "123", bar_array => [1, 2, 3]},
+ );
+
+=head1 Custom measurement control without the Sweep layer
+
+Here we describe measurement control without the Sweep API. One can still use
+the Datafolder, Datafile, and live plotting features, as they are implemented
+independently of the Sweep layer.
+For example, the 2D sweep example from above could be rewritten like this:
+
+ use Lab::Moose; # get instrument, datafolder, datafile, linspace
+ use Lab::Moose::Countdown; # get countdown
+ 
+ my $gate_source = instrument(
+     type            => 'DummySource',
+     connection_type => 'Debug',
+     connection_options => {verbose => 0},
+     
+     # Safety limits:
+     max_units => 10, min_units => -10,
+     max_units_per_step => 0.11, max_units_per_second => 10
+ );
+  
+ my $bias_source = instrument(
+     type               => 'DummySource',
+     connection_type => 'Debug',
+     connection_options => {verbose => 0},
+ 
+     # Safety limits:
+     max_units => 10, min_units => -10,
+     max_units_per_step => 0.11, max_units_per_second => 10
+ );
+ 
+ my $folder = datafolder();
+ my $datafile = datafile(folder => $folder, filename => 'data.dat',
+                         columns => [qw/gate bias current/]);
+ 
+ $datafile->add_plot(
+     type => 'pm3d',
+     x => 'gate',
+     y => 'bias',
+     z => 'current'
+     );
+ 
+ my @gate_values = linspace(from => 0, to => 1, step => 0.1);
+ my @bias_values = linspace(from => -1, to => 1, step => 0.1);
+ 
+ for my $gate_value (@gate_values) {
+     $gate_source->set_level(value => $gate_value);
+     
+     # go to bias sweep start point and wait 5 sec
+     $bias_source->set_level(value => $bias_values[0]);
+     countdown(5);
+     
+     for my $bias_value (@bias_values) {
+         $bias_source->set_level(value => $bias_value);
+         $datafile->log(
+             gate => $gate_value,
+             bias => $bias_value,
+             current => $bias_value + $gate_value,
+             );
+     }
+     $datafile->new_block();
+ }
+ 
+ $bias_source->set_level(value => 0);
+
+One can also use the stabilization routines used by some sweep types like the
+Step::Temperature sweep:
+
+ use Lab::Moose;
+ use Lab::Moose::Stabilizer;
+ my $instrument = instrument(type => 'OI_ITC503', ...);
+
+ # Set temp and stabilize
+ $instrument->set_T(value => $temp);
+ stabilize(
+     instrument => $instrument,
+     setpoint   => $temp,
+     getter     => 'get_T',
+     tolerance_setpoint   => 0.1, 
+     tolerance_std_dev    => 0.1,
+     measurement_interval => 10,
+     observation_time     => 100,
  );
 
 =head1 Writing new instrument drivers

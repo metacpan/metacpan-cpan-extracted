@@ -23,8 +23,9 @@ Sub::Multi::Tiny - Multisubs/multimethods (multiple dispatch) yet another way!
     say my_multi(2, 5);     # -> 32
     say my_multi(1295);     # -> 1337
 
-**Limitation:** At present, dispatch is solely by arity, and only one
-candidate can have each arity.  This limitation will be removed in the future.
+The default dispatcher dispatches solely by arity, and only one
+candidate can have each arity.  For more flexible dispatching, see
+[Sub::Multi::Tiny::Dispatcher::TypeParams](https://metacpan.org/pod/Sub::Multi::Tiny::Dispatcher::TypeParams).
 
 # DESCRIPTION
 
@@ -35,12 +36,13 @@ are `sub`s tagged with the `:M` attribute.  The names of the impls are
 preserved but not used specifically by Sub::Multi::Tiny.
 
 Within a multisub package, the name of the sub being defined is available
-for recursion.  For example (using `where`, not yet implemented):
+for recursion.  For example (using `where`, supported by
+[Sub::Multi::Tiny::Dispatcher::TypeParams](https://metacpan.org/pod/Sub::Multi::Tiny::Dispatcher::TypeParams)):
 
     {
         package main::fib;
-        use Sub::Multi::Tiny qw($n);
-        sub base  :M($n where { $_ eq 0 })  { 1 }
+        use Sub::Multi::Tiny qw(D:TypeParams $n);
+        sub base  :M($n where { $_ <= 1 })  { 1 }
         sub other :M($n)                    { $n * fib($n-1) }
     }
 
@@ -58,13 +60,17 @@ creates these as package variables so that they can be used unqualified
 in the multisub implementations.
 
 A parameter `D:Dispatcher` can also be given to specify the dispatcher to
-use.  If `Dispatcher` includes a double-colon, it will be used as a full
-package name.  Otherwise, `Sub::Multi::Tiny::Dispatcher::` will be prepended.
+use --- see ["CUSTOM DISPATCH"](#custom-dispatch).
+
+Also sets ["$VERBOSE" in Sub::Multi::Tiny::Util](https://metacpan.org/pod/Sub::Multi::Tiny::Util#VERBOSE) if the environment variable
+`SUB_MULTI_TINY_VERBOSE` has a truthy value.  If the `SUB_MULTI_TINY_VERBOSE`
+value is numeric, `$VERBOSE` is set to that value; otherwise, `$VERBOSE` is
+set to 1.
 
 # CUSTOM DISPATCH
 
 This module includes a default dispatcher (implemented in
-[Sub::Multi::Tiny::DefaultDispatcher](https://metacpan.org/pod/Sub::Multi::Tiny::DefaultDispatcher).  To use a different dispatcher,
+[Sub::Multi::Tiny::Dispatcher::Default](https://metacpan.org/pod/Sub::Multi::Tiny::Dispatcher::Default).  To use a different dispatcher,
 define or import a sub `MakeDispatcher()` into the package before
 compilation ends.  That sub will be called to create the dispatcher.
 For example:
@@ -82,6 +88,15 @@ or
         use Sub::Multi::Tiny;
         use APackageThatImportsMakeDispatcherIntoMainFoo;
     }
+
+As a shortcut, you can specify a dispatcher on the `use` line.  For example:
+
+    use Sub::Multi::Tiny qw(D:Foo $var);
+
+will use dispatcher `Sub::Multi::Tiny::Dispatcher::Foo`.  Any name with a
+double-colon will be used as a full package name.  E.g., `D:Bar::Quux` will
+use dispatcher `Bar::Quux`.  If `Foo` does not include a double-colon,
+`Sub::Multi::Tiny::Dispatcher::` will be prepended.
 
 # DEBUGGING
 
@@ -169,11 +184,12 @@ You can also look for information at:
 - This distribution
 
     See the tests in the `t/` directory distributed with this software
-    for examples.
+    for usage examples.
 
 # BUGS
 
-This isn't Damian code ;) .
+- It's not as tiny as I thought it would be!
+- This isn't Damian code ;) .
 
 # AUTHOR
 

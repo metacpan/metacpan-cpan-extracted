@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::CheckIssues; # git description: v0.009-10-g49cc7be
+package Dist::Zilla::Plugin::CheckIssues; # git description: v0.010-8-gf6e9be7
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Retrieve count of outstanding RT and github issues for your distribution
 # KEYWORDS: plugin bugs issues rt github
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -110,18 +110,19 @@ sub get_issues
     if ($self->rt)
     {
         my %rt_data = $self->_rt_data_for_dist($dist_name);
+        if (defined $rt_data{open} and defined $rt_data{stalled}) {
+            my $colour = $rt_data{open} ? 'bright_red'
+                : $rt_data{stalled} ? 'yellow'
+                : 'green';
 
-        my $colour = $rt_data{open} ? 'bright_red'
-            : $rt_data{stalled} ? 'yellow'
-            : 'green';
+            my @text = (
+                'Issues on RT (https://rt.cpan.org/Public/Dist/Display.html?Name=' . $dist_name . '):',
+                '  open: ' .  ($rt_data{open} || 0) . '   stalled: ' . ($rt_data{stalled} || 0),
+            );
 
-        my @text = (
-            'Issues on RT (https://rt.cpan.org/Public/Dist/Display.html?Name=' . $dist_name . '):',
-            '  open: ' .  ($rt_data{open} || 0) . '   stalled: ' . ($rt_data{stalled} || 0),
-        );
-
-        @text = map { colored($_, $colour) } @text if $self->colour;
-        push @issues, @text;
+            @text = map colored($_, $colour), @text if $self->colour;
+            push @issues, @text;
+        }
     }
 
     if ($self->github
@@ -132,12 +133,13 @@ sub get_issues
         {
             my $colour = $issue_count ? 'bright_red' : 'green';
 
+            my $url = 'https://github.com/'.$owner_name.'/'.$repo_name;
             my @text = (
-                'Issues on github (https://github.com/' . $owner_name . '/' . $repo_name . '):',
+                'Issues and/or pull requests on github ('.$url.'/issues and '.$url.'/pulls):',
                 '  open: ' . $issue_count,
             );
 
-            @text = map { colored($_, $colour) } @text if $self->colour;
+            @text = map colored($_, $colour), @text if $self->colour;
             push @issues, @text;
         }
     }
@@ -176,7 +178,7 @@ sub _rt_data_raw
 
     $self->log_debug('fetching RT bug data...');
     my $data = $self->_fetch('https://rt.cpan.org/Public/bugs-per-dist.json');
-    $self->log('could not fetch RT data?'), return if not $data;
+    return if not $data;
     return $data;
 }
 
@@ -187,7 +189,7 @@ sub _github_issue_count
     $self->log_debug('fetching github issues data...');
 
     my $json = $self->_fetch('https://api.github.com/repos/' . $owner_name . '/' . $repo_name);
-    $self->log('could not fetch github data?'), return if not $json;
+    return if not $json;
 
     require JSON::MaybeXS; JSON::MaybeXS->VERSION('1.001000');
     my $data = JSON::MaybeXS->new(utf8 => 0)->decode($json);
@@ -200,7 +202,11 @@ sub _fetch
 
     require HTTP::Tiny;
     my $res = HTTP::Tiny->new->get($url);
-    return if not $res->{success};
+    if (not $res->{success}) {
+        $self->log('could not fetch from '.$url.': got '
+            .($res->{status} && $res->{content} ? $res->{status}.' '.$res->{content} : 'unknown'));
+        return;
+    }
 
     my $data = $res->{content};
 
@@ -227,7 +233,7 @@ Dist::Zilla::Plugin::CheckIssues - Retrieve count of outstanding RT and github i
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -243,7 +249,7 @@ In your F<dist.ini>:
 =head1 DESCRIPTION
 
 This is a L<Dist::Zilla> plugin that retrieves the RT and/or github issue
-counts for your distribution before release.  Place it immediately before
+and pull request counts for your distribution before release.  Place it immediately before
 C<[ConfirmRelease]> in your F<dist.ini> to give you an opportunity to abort the
 release if you forgot to fix a bug or merge a pull request.
 

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 10;
+use Test::Most tests => 19;
 use Test::NoWarnings;
 use CHI;
 
@@ -23,6 +23,22 @@ CLASS: {
 	ok($l->calls() == 1);
 	ok($l->barney() eq 'betty');
 	ok($l->calls() == 1);
+	my @abc = $l->abc();
+	ok(scalar(@abc) == 3);
+	my @a = $l->a();
+	ok(scalar(@a) == 1);
+	ok($a[0] eq 'a');
+
+	ok(!defined($l->empty()));
+	ok(!defined($l->empty()));
+
+	# White box test the cache
+	ok($cache->get('barney') eq 'betty');
+	my $a = $cache->get('a');
+	ok(ref($a) eq 'ARRAY');
+	my $abc = $cache->get('abc');
+	ok(ref($abc) eq 'ARRAY');
+	ok(scalar(@{$abc}) == 3);
 
 	# foreach my $key($cache->get_keys()) {
 		# diag($key);
@@ -48,6 +64,17 @@ sub barney {
 		return $self->{'x'} = $param;
 	}
 	return $self->{'x'};
+}
+
+sub abc {
+	return ('a', 'b', 'c');
+}
+
+sub a {
+	return 'a';
+}
+
+sub empty {
 }
 
 sub calls {

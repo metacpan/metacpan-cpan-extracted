@@ -1,12 +1,12 @@
 package Quiq::Template;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -29,35 +29,35 @@ L<Quiq::Hash>
 
 Template-Datei C<test.html> oder Template-String C<$str>:
 
-    <html>
-    <head>
-      <title>__TITLE__</title>
-    </head>
-    <body>
-      __BODY__
-    </body>
+  <html>
+  <head>
+    <title>__TITLE__</title>
+  </head>
+  <body>
+    __BODY__
+  </body>
 
 Code:
 
-    $tpl = Quiq::Template->new('html','test.html');
-    -oder-
-    $tpl = Quiq::Template->new('html',\$str);
-    
-    $tpl->replace(
-        __TITLE__ => 'Testseite',
-        __BODY__ => 'Hello World!',
-    );
-    $str = $tpl->asString;
+  $tpl = Quiq::Template->new('html','test.html');
+  -oder-
+  $tpl = Quiq::Template->new('html',\$str);
+  
+  $tpl->replace(
+      __TITLE__ => 'Testseite',
+      __BODY__ => 'Hello World!',
+  );
+  $str = $tpl->asString;
 
 Resultat C<$str>:
 
-    <html>
-    <head>
-      <title>Testseite</title>
-    </head>
-    <body>
-      Hello World!
-    </body>
+  <html>
+  <head>
+    <title>Testseite</title>
+  </head>
+  <body>
+    Hello World!
+  </body>
 
 =head1 METHODS
 
@@ -67,8 +67,8 @@ Resultat C<$str>:
 
 =head4 Synopsis
 
-    $tpl = Quiq::Template->new($type,$file,@opt);
-    $tpl = Quiq::Template->new($type,\$str,@opt);
+  $tpl = Quiq::Template->new($type,$file,@opt);
+  $tpl = Quiq::Template->new($type,\$str,@opt);
 
 =head4 Options
 
@@ -189,7 +189,7 @@ sub new {
 
 =head4 Synopsis
 
-    @arr | $arr = $tpl->placeholders;
+  @arr | $arr = $tpl->placeholders;
 
 =cut
 
@@ -207,7 +207,7 @@ sub placeholders {
 
 =head4 Synopsis
 
-    $tpl = $tpl->replace(@keyVal);
+  $tpl = $tpl->replace(@keyVal);
 
 =head4 Returns
 
@@ -228,36 +228,36 @@ ob dieser im Template vorkommt. Wenn nicht, wird eine Exception geworfen.
 
 Subroutine liefert Platzhalter-Wert:
 
-    my $tpl = Quiq::Template->new('xml',\$Order);
-    $tpl->replace(
-        __CUSTNR__ => $kundenNr,
-        __LIEFERNAME__ => $vor->{'liefername'},
-        __LIEFERSTRASSE__ => $lieferstrasse,
-        __LIEFERHAUSNR__ => $lieferhausnr,
-        __LIEFERPLZ__ => $vor->{'lieferplz'},
-        __LIEFERORT__ => $vor->{'lieferort'},
-        __LIEFERLAND_ISO__ => $vor->{'lieferland_iso'},
-        __BESTELLDATUM__ => POSIX::strftime('%Y-%m',localtime),
-        __BESTELLNUMMER__ => $vor->{'vorgang_bestellnummer'},
-        __WAEHRUNG__ => $waehrung,
-        __ENVIRONMENT__ => $test? 'T': 'L',
-        __ORDERLINES__ => sub {
-            my @arr;
-            my $i = 0;
-            for my $pos (@$posA) {
-                my $tpl = Quiq::Template->new('xml',\$OrderLine);
-                $tpl->replace(
-                    __I__ => $i++,
-                    __LIEFERNR__ => $pos->{'posten_liefernr'},
-                    __ARTBE__ => $pos->{'posten_artbe'},
-                    __ANZAHL__ => $pos->{'posten_anzahl'},
-                    __EPREIS__ => $pos->{'posten_epreis'},
-                );
-                push @arr,$tpl;
-            }
-            return \@arr;
-        },
-    );
+  my $tpl = Quiq::Template->new('xml',\$Order);
+  $tpl->replace(
+      __CUSTNR__ => $kundenNr,
+      __LIEFERNAME__ => $vor->{'liefername'},
+      __LIEFERSTRASSE__ => $lieferstrasse,
+      __LIEFERHAUSNR__ => $lieferhausnr,
+      __LIEFERPLZ__ => $vor->{'lieferplz'},
+      __LIEFERORT__ => $vor->{'lieferort'},
+      __LIEFERLAND_ISO__ => $vor->{'lieferland_iso'},
+      __BESTELLDATUM__ => POSIX::strftime('%Y-%m',localtime),
+      __BESTELLNUMMER__ => $vor->{'vorgang_bestellnummer'},
+      __WAEHRUNG__ => $waehrung,
+      __ENVIRONMENT__ => $test? 'T': 'L',
+      __ORDERLINES__ => sub {
+          my @arr;
+          my $i = 0;
+          for my $pos (@$posA) {
+              my $tpl = Quiq::Template->new('xml',\$OrderLine);
+              $tpl->replace(
+                  __I__ => $i++,
+                  __LIEFERNR__ => $pos->{'posten_liefernr'},
+                  __ARTBE__ => $pos->{'posten_artbe'},
+                  __ANZAHL__ => $pos->{'posten_anzahl'},
+                  __EPREIS__ => $pos->{'posten_epreis'},
+              );
+              push @arr,$tpl;
+          }
+          return \@arr;
+      },
+  );
 
 Die Subroutine, die den Wert des Platzhalters __ORDERLINES__ berechnet,
 liefert keinen String, sondern eine Referenz auf ein Array von
@@ -378,8 +378,8 @@ sub replace {
 
 =head4 Synopsis
 
-    $key = $tpl->key($arg);
-    ($key,@attr) = $tpl->key($arg);
+  $key = $tpl->key($arg);
+  ($key,@attr) = $tpl->key($arg);
 
 =head4 Description
 
@@ -407,7 +407,7 @@ MEMO: Die Methode ist so gestaltet, dass (weitere) Einsetzungsattribute
 definiert werden können, wenn als Platzhalter eine Arrayreferenz
 übergeben wird, z.B.
 
-    ['__ITEMS__',call=>sub {...}]
+  ['__ITEMS__',call=>sub {...}]
 
 Die Ersetzungsattribute werden im Arraykontext neben dem Schlüssel
 zurückgegeben und können in replace() den Ersetzungsvorgang in
@@ -438,7 +438,7 @@ sub key {
 
 =head4 Synopsis
 
-    $str = $tpl->value($arg);
+  $str = $tpl->value($arg);
 
 =head4 Description
 
@@ -517,20 +517,20 @@ sub value {
 
 =head4 Synopsis
 
-    $tpl->removeOptional;
+  $tpl->removeOptional;
 
 =head4 Description
 
 Entferne die <optional>-Metatags aus dem Template-Text.
 Ein <optional>-Metatag hat die Struktur
 
-    <!--optional-->...<!--/optional-->
+  <!--optional-->...<!--/optional-->
 
 oder
 
-    <!--optional-->
-    ...
-    <!--/optional-->
+  <!--optional-->
+  ...
+  <!--/optional-->
 
 <optional>-Konstrukte können geschachtelt sein. Sie werden von innen
 nach außen aufgelöst.
@@ -771,7 +771,7 @@ sub removeOptional_5_10 { # moderne Version für Perl 5.10 und höher. while ers
 
 =head4 Synopsis
 
-    $str = $tpl->asString;
+  $str = $tpl->asString;
 
 =cut
 
@@ -788,7 +788,7 @@ sub asString {
 
 =head4 Synopsis
 
-    $str = $tpl->asStringNL;
+  $str = $tpl->asStringNL;
 
 =cut
 
@@ -803,7 +803,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

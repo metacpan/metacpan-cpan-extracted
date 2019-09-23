@@ -1,10 +1,10 @@
 package Quiq::ClassConfig;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Perl;
 
@@ -20,38 +20,38 @@ Quiq::ClassConfig - Verwalte Information auf Klassenebene
 
 Klasse einbinden:
 
-    use base qw/... Quiq::ClassConfig/;
+  use base qw/... Quiq::ClassConfig/;
 
 Information definieren (Anwendungsbeispiel):
 
-    package Model::Object;
-    
-    __PACKAGE__->def(
-        table => 'Object',
-        prefix => 'Obj',
-        columns => [
-            id => {
-                domain => 'Integer',
-                primaryKey => 1,
-                notNull => 1,
-                description => 'Primärschlüssel',
-            },
-            ...
-        ],
-        ...
-    );
+  package Model::Object;
+  
+  __PACKAGE__->def(
+      table => 'Object',
+      prefix => 'Obj',
+      columns => [
+          id => {
+              domain => 'Integer',
+              primaryKey => 1,
+              notNull => 1,
+              description => 'Primärschlüssel',
+          },
+          ...
+      ],
+      ...
+  );
 
 Information abfragen:
 
-    my $table = Model::Object->defGet('table');
-    =>
-    Object
+  my $table = Model::Object->defGet('table');
+  =>
+  Object
 
 Information suchen:
 
-    my $table = Model::Object->defSearch('table');
-    =>
-    Object
+  my $table = Model::Object->defSearch('table');
+  =>
+  Object
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ setzen, lesen) diesen Hash.
 
 =head4 Synopsis
 
-    $h = $class->def(@keyVal);
+  $h = $class->def(@keyVal);
 
 =head4 Arguments
 
@@ -122,8 +122,8 @@ sub def {
 
 =head4 Synopsis
 
-    $val = $class->defGet($key);
-    @vals = $class->defGet(@keys);
+  $val = $class->defGet($key);
+  @vals = $class->defGet(@keys);
 
 =head4 Arguments
 
@@ -176,7 +176,7 @@ sub defGet {
 
 =head4 Synopsis
 
-    $val = $class->defMemoize($key,$sub);
+  $val = $class->defMemoize($key,$sub);
 
 =head4 Arguments
 
@@ -190,11 +190,11 @@ Schlüssel
 
 Subroutine, die den Wert berechnet. Diese hat den Aufbau
 
-    sub {
-        my ($class,$key) = @_;
-        ...
-        return $val;
-    }
+  sub {
+      my ($class,$key) = @_;
+      ...
+      return $val;
+  }
 
 =back
 
@@ -234,7 +234,7 @@ sub defMemoize {
 
 =head4 Synopsis
 
-    $val = $class->defSearch($key);
+  $val = $class->defSearch($key);
 
 =head4 Arguments
 
@@ -281,7 +281,7 @@ sub defSearch {
 
 =head4 Synopsis
 
-    @arr | $arr = $class->defCumulate($key);
+  @arr | $arr = $class->defCumulate($key);
 
 =head4 Arguments
 
@@ -312,30 +312,30 @@ die Liste der Attributnamen bestimmt werden soll.
 
 Klassenhierarchie:
 
-    package Object;
-    use base/Quiq::ClassConfig/;
-    
-    __PACKAGE__->def(
-        Attributes => [qw/
-            Id
-        /],
-    );
-    
-    package Person;
-    use base qw/Object/;
-    
-    __PACKAGE__->def(
-        Attributes => [qw/
-            Vorname
-            Nachname
-        /],
-    );
+  package Object;
+  use base/Quiq::ClassConfig/;
+  
+  __PACKAGE__->def(
+      Attributes => [qw/
+          Id
+      /],
+  );
+  
+  package Person;
+  use base qw/Object/;
+  
+  __PACKAGE__->def(
+      Attributes => [qw/
+          Vorname
+          Nachname
+      /],
+  );
 
 Attributes der Klasse Person:
 
-    @attributes = Person->defCumulate('Attributes');
-    =>
-    ('Id', 'Vorname', 'Nachname')
+  @attributes = Person->defCumulate('Attributes');
+  =>
+  ('Id', 'Vorname', 'Nachname')
 
 =cut
 
@@ -362,7 +362,7 @@ sub defCumulate {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

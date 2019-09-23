@@ -1,11 +1,11 @@
 package Quiq::Html::Widget::SelectMenu;
 use base qw/Quiq::Html::Widget/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -67,11 +67,11 @@ Liste der möglichen Werte.
 
 Liste der möglichen Werte und ihrer Anzeigetexte. Beispiel:
 
-    optionPairs => [
-        0 => 'Nein',
-        1 => 'Ja',
-        2 => 'Vielleicht',
-    ]
+  optionPairs => [
+      0 => 'Nein',
+      1 => 'Ja',
+      2 => 'Vielleicht',
+  ]
 
 =item texts => \@text (Default: [])
 
@@ -93,7 +93,7 @@ verschiedene Hintergrundfarben genutzt werden.
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =cut
 
@@ -145,8 +145,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =cut
 
@@ -220,7 +220,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

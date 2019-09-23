@@ -1,12 +1,12 @@
 package Quiq::Confluence::Markup;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 
@@ -55,7 +55,7 @@ erweitert.
 
 =head4 Synopsis
 
-    $gen = $class->new;
+  $gen = $class->new;
 
 =head4 Description
 
@@ -86,8 +86,8 @@ sub new {
 
 =head4 Synopsis
 
-    $markup = $gen->section($level,$title);
-    $markup = $gen->section($level,$title,$body);
+  $markup = $gen->section($level,$title);
+  $markup = $gen->section($level,$title,$body);
 
 =head4 Alias
 
@@ -111,37 +111,37 @@ trim() von einer etwaigen Einrückung befreit.
 
 Ohne Body:
 
-    $gen->section(1,'Test');
+  $gen->section(1,'Test');
 
 erzeugt
 
-    h1. Test
+  h1. Test
 
 =item *
 
 Mit Body:
 
-    $gen->section(1,'Test',"Dies ist ein Test.");
+  $gen->section(1,'Test',"Dies ist ein Test.");
 
 erzeugt
 
-    h1. Test
-    
-    Dies ist ein Test.
+  h1. Test
+  
+  Dies ist ein Test.
 
 =item *
 
 Eine Einrückung wird automatisch entfernt:
 
-    $gen->section(1,'Test',q~
-        Dies ist ein Test.
-    ~);
+  $gen->section(1,'Test',q~
+      Dies ist ein Test.
+  ~);
 
 erzeugt
 
-    h1. Test
-    
-    Dies ist ein Test.
+  h1. Test
+  
+  Dies ist ein Test.
 
 =back
 
@@ -174,7 +174,7 @@ sub section {
 
 =head4 Synopsis
 
-    $markup = $gen->paragraph($text);
+  $markup = $gen->paragraph($text);
 
 =head4 Description
 
@@ -192,24 +192,24 @@ ersetzt, da ein Paragraph in Confluence-Wiki Syntax einzeilig ist.
 
 Text:
 
-    $gen->paragraph("Dies ist\nein Test.");
+  $gen->paragraph("Dies ist\nein Test.");
 
 erzeugt
 
-    Dies ist ein Test.
+  Dies ist ein Test.
 
 =item *
 
 Eine Einrückung wird automatisch entfernt:
 
-    $gen->paragraph(q~
-        Dies ist
-        ein Test.
-    ~);
+  $gen->paragraph(q~
+      Dies ist
+      ein Test.
+  ~);
 
 erzeugt
 
-    Dies ist ein Test.
+  Dies ist ein Test.
 
 =back
 
@@ -238,7 +238,7 @@ sub paragraph {
 
 =head4 Synopsis
 
-    $markup = $gen->code($type,$code,@opts);
+  $markup = $gen->code($type,$code,@opts);
 
 =head4 Options
 
@@ -285,15 +285,15 @@ Syntax-Typen findet sich in o.g. Confluence-Doku.
 
 Ein eingeklappter Code-Block:
 
-    $gen->code('perl',"print 'Hello, world!';",
-        -collapse => 1,
-    );
+  $gen->code('perl',"print 'Hello, world!';",
+      -collapse => 1,
+  );
 
 erzeugt
 
-    {code:language=perl|collapse=true}
-    print 'Hello, world!';
-    {code}
+  {code:language=perl|collapse=true}
+  print 'Hello, world!';
+  {code}
 
 =back
 
@@ -348,7 +348,7 @@ sub code {
 
 =head4 Synopsis
 
-    $markup = $gen->noFormat($text,@opts);
+  $markup = $gen->noFormat($text,@opts);
 
 =head4 Options
 
@@ -380,13 +380,13 @@ bei dem zusätzlich die Umrandung unterdrückt werden kann.
 
 Anzeige eines regulären Ausdrucks:
 
-    $gen->noFormat('m|/([^/]+)xxx{5}$|',
-        -noPanel => 1,
-    );
+  $gen->noFormat('m|/([^/]+)xxx{5}$|',
+      -noPanel => 1,
+  );
 
 erzeugt
 
-    {noformat:nopanel=true}m|/([^/]+)xxx{5}$|{noformat}
+  {noformat:nopanel=true}m|/([^/]+)xxx{5}$|{noformat}
 
 =back
 
@@ -429,7 +429,7 @@ sub noFormat {
 
 =head4 Synopsis
 
-    $markup = $gen->panel($body,@opts);
+  $markup = $gen->panel($body,@opts);
 
 =head4 Options
 
@@ -529,7 +529,7 @@ sub panel {
 
 =head4 Synopsis
 
-    $markup = $gen->tableOfContents(@opts);
+  $markup = $gen->tableOfContents(@opts);
 
 =head4 Options
 
@@ -669,8 +669,8 @@ sub tableOfContents {
 
 =head4 Synopsis
 
-    $str = $this->fmt($format,$text);
-    $str = $this->fmt($color,$text);
+  $str = $this->fmt($format,$text);
+  $str = $this->fmt($color,$text);
 
 =head4 Description
 
@@ -734,7 +734,7 @@ Confluence-Formatierungen. Es schützt die Zeichen in $text, so
 dass diese formatierungsfrei dargestellt werden. Geschützt werden
 die Zeichen:
 
-    - * _ + ^ ~ [ ] { }
+  - * _ + ^ ~ [ ] { }
 
 Die Interpretation als Metazeichen wird durch das Voranstellen
 eines Backslash (\) verhindert.
@@ -796,7 +796,7 @@ sub fmt {
 
 =head4 Synopsis
 
-    $str = $gen->lineBreak;
+  $str = $gen->lineBreak;
 
 =cut
 
@@ -815,7 +815,7 @@ sub lineBreak {
 
 =head4 Synopsis
 
-    $str = $this->testPage;
+  $str = $this->testPage;
 
 =head4 Description
 
@@ -830,7 +830,7 @@ Generiere eine Seite mit Wiki-Markup. Das Markup kann nach Confluence
 
 Test-Seite von der Kommandozeile ins Wiki übertragen:
 
-    $ quiq-confluence test-page | quiq-confluence update-page PAGE_ID
+  $ quiq-confluence test-page | quiq-confluence update-page PAGE_ID
 
 =item *
 
@@ -842,7 +842,7 @@ Manuelle Übertragung:
 
 Markup generieren:
 
-    $ quiq-confluence test-page
+  $ quiq-confluence test-page
 
 =item 2.
 
@@ -949,7 +949,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -3,9 +3,9 @@
 package Quiq::Test::Class::Method::Test;
 use base qw/Quiq::Test::Class/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
 # -----------------------------------------------------------------------------
 

@@ -1,11 +1,11 @@
 package Quiq::ExampleCode;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::String;
@@ -29,32 +29,32 @@ L<Quiq::Hash>
 STDOUT schreiben. Das Resultat (Skalar- oder List-Kontext) wird
 direkt zurückgeliefert.
 
-    my $exa = Quiq::ExampleCode->new;
-    $res|@res = $exa->execute($code,-variables=>\@keyval);
-    ...
+  my $exa = Quiq::ExampleCode->new;
+  $res|@res = $exa->execute($code,-variables=>\@keyval);
+  ...
 
 (2) Code $code ausführen und den Code selbst und sein Resultat in
 Form eines Objektes zurückliefern. Die Ausgabe auf STDOUT
 unterbleibt.
 
-    my $exa = Quiq::ExampleCode->new(
-        -objectReturn => 1,
-        -verbose => 0,
-    );
+  my $exa = Quiq::ExampleCode->new(
+      -objectReturn => 1,
+      -verbose => 0,
+  );
 
 Ausführung im Skalar-Kontext:
 
-    $obj = $exa->execute($code,-variables=>\@keyval);
-    my $code = $obj->code;
-    my $res = $obj->result;
-    ...
+  $obj = $exa->execute($code,-variables=>\@keyval);
+  my $code = $obj->code;
+  my $res = $obj->result;
+  ...
 
 Im List-Kontext:
 
-    $obj = $exa->execute($code,-variables=>\@keyval,-listContext=>1);
-    my $code = $obj->code;
-    my $resA = $obj->result;
-    ...
+  $obj = $exa->execute($code,-variables=>\@keyval,-listContext=>1);
+  my $code = $obj->code;
+  my $resA = $obj->result;
+  ...
 
 =head1 DESCRIPTION
 
@@ -68,46 +68,46 @@ gestellt werden.
 
 Variable vorab setzen:
 
-    $exa->setVariable(
-        ffm => $ffm,
-    );
-    my $cmd = $exa->execute(q|
-        $ffm->videoToImages('video.mp4','img',
-            -aspectRatio => '4:3',
-            -framestep => 6,
-            -start => 3,
-            -stop => 10,
-        );
-    |);
+  $exa->setVariable(
+      ffm => $ffm,
+  );
+  my $cmd = $exa->execute(q|
+      $ffm->videoToImages('video.mp4','img',
+          -aspectRatio => '4:3',
+          -framestep => 6,
+          -start => 3,
+          -stop => 10,
+      );
+  |);
 
 Variable per Option -variables bei Aufruf setzen:
 
-    my $cmd = $exa->execute(q|
-        $ffm->videoToImages('video.mp4','img',
-            -aspectRatio => '4:3',
-            -framestep => 6,
-            -start => 3,
-            -stop => 10,
-        );|,
-        -variables => [
-            ffm => $ffm,
-        ],
-    );
+  my $cmd = $exa->execute(q|
+      $ffm->videoToImages('video.mp4','img',
+          -aspectRatio => '4:3',
+          -framestep => 6,
+          -start => 3,
+          -stop => 10,
+      );|,
+      -variables => [
+          ffm => $ffm,
+      ],
+  );
 
 oder (in anderer Reihenfolge):
 
-    my $cmd = $exa->execute(
-        -variables => [
-            ffm => $ffm,
-        ],q|
-            $ffm->videoToImages('video.mp4','img',
-                -aspectRatio => '4:3',
-                -framestep => 6,
-                -start => 3,
-                -stop => 10,
-            );
-        |,
-    );
+  my $cmd = $exa->execute(
+      -variables => [
+          ffm => $ffm,
+      ],q|
+          $ffm->videoToImages('video.mp4','img',
+              -aspectRatio => '4:3',
+              -framestep => 6,
+              -start => 3,
+              -stop => 10,
+          );
+      |,
+  );
 
 =head1 METHODS
 
@@ -117,7 +117,7 @@ oder (in anderer Reihenfolge):
 
 =head4 Synopsis
 
-    $exa = $class->new(@opt);
+  $exa = $class->new(@opt);
 
 =head4 Options
 
@@ -184,7 +184,7 @@ sub new {
 
 =head4 Synopsis
 
-    $exa->setVariable(@keyVal);
+  $exa->setVariable(@keyVal);
 
 =head4 Description
 
@@ -197,11 +197,11 @@ selbst mit der Option -variables angegeben werden.
 
 =head4 Example
 
-    $exa->setVariable(
-        obj => $obj,
-        x => $x,
-        y => $y,
-    );
+  $exa->setVariable(
+      obj => $obj,
+      x => $x,
+      y => $y,
+  );
 
 =cut
 
@@ -228,7 +228,7 @@ sub setVariable {
 
 =head4 Synopsis
 
-    $res|@res = $exa->execute($code,@opt);
+  $res|@res = $exa->execute($code,@opt);
 
 =head4 Options
 
@@ -275,27 +275,27 @@ zusätzlich der Beispielcode und das Resultat ausgegeben.
 
 Der Aufruf
 
-    $cmd = $exa->execute(q|
-        $ffm->videoToImages('video.mp4','img',
-            -aspectRatio => '4:3',
-            -framestep => 6,
-            -start => 3,
-            -stop => 10,
-        );
-    |);
+  $cmd = $exa->execute(q|
+      $ffm->videoToImages('video.mp4','img',
+          -aspectRatio => '4:3',
+          -framestep => 6,
+          -start => 3,
+          -stop => 10,
+      );
+  |);
 
 führt zu der Ausgabe
 
-    $ffm->videoToImages('video.mp4','img',
-        -aspectRatio => '4:3',
-        -framestep => 6,
-        -start => 3,
-        -stop => 10,
-    );
-    =>
-    ffmpeg -y -loglevel error -stats -i 'video.mp4'
-        -vf 'framestep=6,crop=ih/3*4:ih'
-        -ss 3 -t 7 -qscale:v 2 'img/%06d.jpg'
+  $ffm->videoToImages('video.mp4','img',
+      -aspectRatio => '4:3',
+      -framestep => 6,
+      -start => 3,
+      -stop => 10,
+  );
+  =>
+  ffmpeg -y -loglevel error -stats -i 'video.mp4'
+      -vf 'framestep=6,crop=ih/3*4:ih'
+      -ss 3 -t 7 -qscale:v 2 'img/%06d.jpg'
 
 Der Text nach '=>' ist der gelieferte Wert $cmd.
 
@@ -379,7 +379,7 @@ sub execute {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use constant {
 
@@ -81,17 +81,44 @@ of the following is true:
 
 =back
 
-=head1 LEAK DETECTION
+=head1 MEMORY LEAKS
 
-It’s easy to create inadvertent memory leaks using promises.
-As of version 0.07, any Promise::ES6 instances that are created while
+It’s easy to create inadvertent memory leaks using promises in Perl.
+Here are a few “pointers” (heh) to bear in mind:
+
+=over
+
+=item * As of version 0.07, any Promise::ES6 instances that are created while
 C<$Promise::ES6::DETECT_MEMORY_LEAKS> is set to a truthy value are
 “leak-detect-enabled”, which means that if they survive until their original
 process’s global destruction, a warning is triggered.
 
-B<NOTE:> If your application needs recursive promises (e.g., to poll
-iteratively for completion of a task), C<use feature 'current_sub'>
-may help you avoid memory leaks.
+=item * If your application needs recursive promises (e.g., to poll
+iteratively for completion of a task), the C<current_sub> feature (i.e.,
+C<__SUB__>) may help you avoid memory leaks.
+
+=item * Garbage collection before Perl 5.18 seems to have been buggy.
+If you work with such versions and end up chasing leaks,
+try manually deleting as many references/closures as possible. See
+F<t/race_success.t> for a notated example.
+
+You may also (counterintuitively, IMO) find that this:
+
+    my ($resolve, $reject);
+
+    my $promise = Promise::ES6->new( sub { ($resolve, $reject) = @_ } );
+
+    # … etc.
+
+… works better than:
+
+    my $promise = Promise::ES6->new( sub {
+        my ($resolve, $reject) = @_;
+
+        # … etc.
+    } );
+
+=back
 
 =head1 SEE ALSO
 
@@ -106,6 +133,12 @@ CPAN contains a number of other modules that implement promises.
 Promise::ES6’s distinguishing features are simplicity and lightness.
 By design, it implements B<just> the standard Promise API and doesn’t
 assume you use, e.g., L<AnyEvent>.
+
+=head1 LICENSE & COPYRIGHT
+
+Copyright 2019 Gasper Software Consulting.
+
+This library is licensed under the same terms as Perl itself.
 
 =cut
 
@@ -122,11 +155,11 @@ sub new {
     my $value;
     my $value_sr = bless \$value, _PENDING_CLASS();
 
-    my @dependents;
+    my @children;
 
     my $self = bless {
         _pid => $$,
-        _dependents => \@dependents,
+        _children => \@children,
         _value_sr => $value_sr,
         _detect_leak => $DETECT_MEMORY_LEAKS,
     }, $class;
@@ -138,7 +171,7 @@ sub new {
     my $resolver = sub {
         $$value_sr = $_[0];
         bless $value_sr, _RESOLUTION_CLASS();
-        _propagate_if_needed( $value_sr, \@dependents );
+        _propagate_if_needed( $value_sr, \@children );
     };
 
     my $rejecter = sub {
@@ -149,7 +182,7 @@ sub new {
             $_UNHANDLED_REJECTIONS{$value_sr} = $value_sr;
         }
 
-        _propagate_if_needed( $value_sr, \@dependents );
+        _propagate_if_needed( $value_sr, \@children );
     };
 
     local $@;
@@ -166,7 +199,7 @@ sub new {
 }
 
 sub _propagate_if_needed {
-    my ($value_sr, $dependents_ar) = @_;
+    my ($value_sr, $children_ar) = @_;
 
     my $propagate_cr;
     $propagate_cr = sub {
@@ -182,11 +215,13 @@ sub _propagate_if_needed {
             $$value_sr = $$repromise_value_sr;
             bless $value_sr, ref($repromise_value_sr);
 
-            for my $subpromise (@$dependents_ar) {
+            # It may not be necessary to empty out @$children_ar, but
+            # let’s do so anyway so Perl will delete references ASAP.
+            # It’s safe to do so because from here on $value_sr is
+            # no longer a pending value.
+            for my $subpromise (splice @$children_ar) {
                 $subpromise->_finish($value_sr);
             }
-
-            @$dependents_ar = ();
         }
     };
 
@@ -204,9 +239,9 @@ sub then {
         _pid => $$,
 
         _value_sr => $value_sr,
-        _dependents => [],
+        _children => [],
 
-        _parent_completion_callbacks => [ $on_resolve, $on_reject ],
+        _on_finish => [ $on_resolve, $on_reject ],
 
         _detect_leak => $DETECT_MEMORY_LEAKS,
     };
@@ -217,7 +252,7 @@ sub then {
         $new->_finish( $self->{'_value_sr'} );
     }
     else {
-        push @{ $self->{'_dependents'} }, $new;
+        push @{ $self->{'_children'} }, $new;
     }
 
     return $new;
@@ -242,7 +277,13 @@ sub _finish {
 
     local $@;
 
-    my $callback = $self->{'_parent_completion_callbacks'};
+    # A promise that new() created won’t have on-finish callbacks,
+    # but a promise that came from then/catch/finally will.
+    # It’s a good idea to delete _on_finish in order to trigger garbage
+    # collection as soon and as reliably as possible. It’s safe to do so
+    # because _finish() is only called once.
+    my $callback = delete $self->{'_on_finish'};
+
     $callback &&= $callback->[ $value_sr->isa( _REJECTION_CLASS() ) ? 1 : 0 ];
 
     # Only needed when catching, but the check would be more expensive
@@ -274,7 +315,7 @@ sub _finish {
     }
 
     _propagate_if_needed(
-        @{$self}{ qw( _value_sr  _dependents ) },
+        @{$self}{ qw( _value_sr  _children ) },
     );
 
     return;
@@ -333,31 +374,39 @@ sub race {
     my ($class, $iterable) = @_;
     my @promises = map { _is_promise($_) ? $_ : $class->resolve($_) } @$iterable;
 
-    return $class->new(sub {
-        my ($resolve, $reject) = @_;
+    my ($resolve, $reject);
 
-        my $is_done;
+    # Perl 5.16 and earlier leak memory when the callbacks are handled
+    # inside the closure here.
+    my $new = $class->new(sub {
+        ($resolve, $reject) = @_;
+    } );
 
-        for my $promise (@promises) {
-            last if $is_done;
+    my $is_done;
 
-            $promise->then(sub {
-                my ($value) = @_;
+    for my $promise (@promises) {
+        last if $is_done;
 
-                return if $is_done;
-                $is_done = 1;
+        $promise->then(sub {
+            return if $is_done;
+            $is_done = 1;
 
-                $resolve->($value);
-            }, sub {
-                my ($reason) = @_;
+            $resolve->($_[0]);
 
-                return if $is_done;
-                $is_done = 1;
+            # Proactively eliminate references:
+            $resolve = $reject = undef;
+        }, sub {
+            return if $is_done;
+            $is_done = 1;
 
-                $reject->($reason);
-            });
-        }
-    });
+            $reject->($_[0]);
+
+            # Proactively eliminate references:
+            $resolve = $reject = undef;
+        });
+    }
+
+    return $new;
 }
 
 sub _is_promise {

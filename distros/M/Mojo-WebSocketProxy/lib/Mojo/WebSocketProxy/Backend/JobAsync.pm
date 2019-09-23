@@ -14,7 +14,7 @@ use JSON::MaybeUTF8 qw(encode_json_utf8 decode_json_utf8);
 use Log::Any qw($log);
 use MojoX::JSON::RPC::Client;
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 __PACKAGE__->register_type('job_async');
 

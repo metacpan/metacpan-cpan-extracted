@@ -8,28 +8,28 @@ use Moo;
 
 with 'Catmandu::Importer';
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
-has host          => (is => 'ro', default => sub { 'ldap://127.0.0.1:389' });
+has host          => (is => 'ro', default   => sub {'ldap://127.0.0.1:389'});
 has base          => (is => 'ro', predicate => 1);
 has password      => (is => 'ro', predicate => 1);
 has search_base   => (is => 'ro', predicate => 1);
 has search_filter => (is => 'ro', predicate => 1);
-has ldap          => (is => 'ro', lazy => 1, builder => '_build_ldap');
-has attributes    => (
+has ldap          => (is => 'ro', lazy      => 1, builder => '_build_ldap');
+has attributes => (
     is     => 'ro',
     coerce => sub {
         my $attrs = $_[0];
         if (is_string $attrs) {
-            return { map { $_ => {} } split ',', $attrs };
+            return {map {$_ => {}} split ',', $attrs};
         }
         if (is_array_ref $attrs) {
-            return { map { $_ => {} } @$attrs };
+            return {map {$_ => {}} @$attrs};
         }
         if ($attrs) {
             for my $attr (keys %$attrs) {
                 $attrs->{$attr} = {} unless ref $attrs->{$attr};
-            };
+            }
         }
         $attrs;
     },
@@ -38,7 +38,8 @@ has attributes    => (
 sub _build_ldap {
     my $self = $_[0];
     my $ldap = Net::LDAP->new($self->host, raw => qr/;binary/) || confess $@;
-    my $bind = $self->has_base
+    my $bind
+        = $self->has_base
         ? $self->has_password
             ? $ldap->bind($self->base, password => $self->password)
             : $ldap->bind($self->base)
@@ -71,14 +72,17 @@ sub generator {
     sub {
         state $search = $self->_new_search;
         my $entry = $search->shift_entry // return;
-        my $data = {};
+        my $data  = {};
         if (my $attrs = $self->attributes) {
             for my $attr (keys %$attrs) {
                 my $config = $attrs->{$attr};
-                my $val = $entry->get_value($attr, asref => $config->{array}) // next;
-                $data->{$config->{as} // $attr} = $config->{array} ? [@$val] : $val;
+                my $val = $entry->get_value($attr, asref => $config->{array})
+                    // next;
+                $data->{$config->{as} // $attr}
+                    = $config->{array} ? [@$val] : $val;
             }
-        } else {
+        }
+        else {
             for my $attr ($entry->attributes) {
                 my $val = $entry->get_value($attr, asref => 1);
                 $data->{$attr} = [@$val];

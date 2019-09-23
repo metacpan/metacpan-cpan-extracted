@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.702';
+our $VERSION = '1.703';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -37,7 +37,6 @@ BEGIN {
 
 
 sub new {
-    # the function 'choose' uses its own implicit new
     my $class = shift;
     my ( $opt ) = @_;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
@@ -216,8 +215,10 @@ sub __get_key {
 
 
 sub choose {
-    if ( ref $_[0] ne 'Term::Choose' ) {
-        return __choose( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::Choose' ), @_ );
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->__choose( @_ );
     }
     my $self = shift;
     return $self->__choose( @_ );
@@ -1164,7 +1165,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.702
+Version 1.703
 
 =cut
 

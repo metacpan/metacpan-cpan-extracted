@@ -1,12 +1,12 @@
 package Quiq::Converter;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use POSIX ();
 use Time::Local ();
@@ -31,7 +31,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $nlName = $this->newlineToName($nl);
+  $nlName = $this->newlineToName($nl);
 
 =head4 Description
 
@@ -67,7 +67,7 @@ sub newlineToName {
 
 =head4 Synopsis
 
-    $camel = $this->snakeCaseToCamelCase($snake);
+  $camel = $this->snakeCaseToCamelCase($snake);
 
 =head4 Description
 
@@ -76,12 +76,12 @@ Bezeichner und liefere diesen zurück.
 
 Snake Case:
 
-    ims-apply-delta-row-by-row
-    ims_apply_delta_row_by_row
+  ims-apply-delta-row-by-row
+  ims_apply_delta_row_by_row
 
 Camel Case:
 
-    imsApplyDeltaRowByRow
+  imsApplyDeltaRowByRow
 
 =cut
 
@@ -103,7 +103,7 @@ sub snakeCaseToCamelCase {
 
 =head4 Synopsis
 
-    $strHex = $this->strToHex($str);
+  $strHex = $this->strToHex($str);
 
 =cut
 
@@ -124,7 +124,7 @@ sub strToHex {
 
 =head4 Synopsis
 
-    $html = $this->textToHtml($text);
+  $html = $this->textToHtml($text);
 
 =head4 Description
 
@@ -151,8 +151,8 @@ sub textToHtml {
 
 =head4 Synopsis
 
-    $class->doubleDecode(\$str);
-    $newStr = $class->doubleDecode($str);
+  $class->doubleDecode(\$str);
+  $newStr = $class->doubleDecode($str);
 
 =head4 Description
 
@@ -187,8 +187,8 @@ sub doubleDecode {
 
 =head4 Synopsis
 
-    $class->umlautToAscii(\$str);
-    $newStr = $class->umlautToAscii($str);
+  $class->umlautToAscii(\$str);
+  $newStr = $class->umlautToAscii($str);
 
 =head4 Description
 
@@ -228,7 +228,7 @@ sub umlautToAscii {
 
 =head4 Synopsis
 
-    $x = $this->germanToProgramNumber($germanX);
+  $x = $this->germanToProgramNumber($germanX);
 
 =head4 Description
 
@@ -255,8 +255,8 @@ sub germanToProgramNumber {
 
 =head4 Synopsis
 
-    $word = $this->intToWord($n);
-    $word = $this->intToWord($n,$alphabet);
+  $word = $this->intToWord($n);
+  $word = $this->intToWord($n,$alphabet);
 
 =head4 Returns
 
@@ -272,22 +272,22 @@ Das Alphabet, über welchem die Worte gebildet werden, wird in Form
 einer Zeichenkette angegeben, in der jedes Zeichen einmal
 vorkommt. Per Default wird das Alphabet
 
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 verwendet. Die Funktion implementiert folgende Abbildung:
 
-    0 -> ''
-    1 -> 'A'
-    2 -> 'B'
-    
-    ...
-    26 -> 'Z'
-    27 -> 'AA'
-    28 -> 'AB'
-    ...
-    52 -> 'AZ'
-    53 -> 'BA'
-    ...
+  0 -> ''
+  1 -> 'A'
+  2 -> 'B'
+  
+  ...
+  26 -> 'Z'
+  27 -> 'AA'
+  28 -> 'AB'
+  ...
+  52 -> 'AZ'
+  53 -> 'BA'
+  ...
 
 =cut
 
@@ -321,7 +321,7 @@ sub intToWord {
 
 =head4 Synopsis
 
-    $px = $this->ptToPx($pt);
+  $px = $this->ptToPx($pt);
 
 =head4 Alias
 
@@ -345,7 +345,7 @@ Pixel-Wert (Number)
 
 Rechne Punkt in Pixel um und liefere das Resultat zurück.
 
-    1 Punkt = 1/0.75 Pixel
+  1 Punkt = 1/0.75 Pixel
 
 =cut
 
@@ -367,7 +367,7 @@ sub ptToPx {
 
 =head4 Synopsis
 
-    $pt = $this->pxToPt($px);
+  $pt = $this->pxToPt($px);
 
 =head4 Alias
 
@@ -391,7 +391,7 @@ Punkt-Wert (Number)
 
 Rechne Pixel in Punkt um und liefere das Resultat zurück.
 
-    1 Pixel = 0.75 Punkt
+  1 Pixel = 0.75 Punkt
 
 =cut
 
@@ -415,7 +415,7 @@ sub pxToPt {
 
 =head4 Synopsis
 
-    $str = $class->epochToDuration($epoch,$truncate,$format);
+  $str = $class->epochToDuration($epoch,$truncate,$format);
 
 =head4 Alias
 
@@ -425,15 +425,15 @@ secondsToDuration()
 
 Wandele eine Zeitangabe in Sekunden in eine Zeichenkette der Form
 
-    HH:MM:SS  ($format nicht angegeben oder 1)
+  HH:MM:SS  ($format nicht angegeben oder 1)
 
 oder
 
-    HHhMMmSSs ($format == 2)
+  HHhMMmSSs ($format == 2)
 
 oder
 
-    HhMmSs ($format == 3)
+  HhMmSs ($format == 3)
 
 =cut
 
@@ -484,21 +484,21 @@ sub epochToDuration {
 
 =head4 Synopsis
 
-    $t = $class->timestampToEpoch($timestamp);
+  $t = $class->timestampToEpoch($timestamp);
 
 =head4 Description
 
 Es wird vorausgesetzt, dass der Timestamp das Format
 
-    YYYY-MM-DD HH24:MI:SSXFF
+  YYYY-MM-DD HH24:MI:SSXFF
 
 hat.
 
 Fehlende Teile werden als 0 angenommen, so dass insbesondere
 auch folgende Formate gewandelt werden können:
 
-    YYYY-MM-DD HH24:MI:SS    (keine Sekundenbruchteile)
-    YYYY-MM-DD               (kein Zeitanteil)
+  YYYY-MM-DD HH24:MI:SS    (keine Sekundenbruchteile)
+  YYYY-MM-DD               (kein Zeitanteil)
 
 Diese Methode ist z.B. nützlich, um einen Oracle-Timestamp
 (in lokaler Zeit) nach Epoch zu wandeln.
@@ -530,7 +530,7 @@ sub timestampToEpoch {
 
 =head4 Synopsis
 
-    $timestamp = $class->epochToTimestamp($t);
+  $timestamp = $class->epochToTimestamp($t);
 
 =head4 Description
 
@@ -568,7 +568,7 @@ sub epochToTimestamp {
 
 =head4 Synopsis
 
-    $arr|@arr = $class->stringToKeyVal($str);
+  $arr|@arr = $class->stringToKeyVal($str);
 
 =head4 Description
 
@@ -576,20 +576,20 @@ Liefere die in der Zeichenkette enthaltenen Schlüssel/Wert-Paare.
 
 Die Schlüssel/Wert-Paare haben die Form:
 
-    $key="$val"
+  $key="$val"
 
 oder
 
-    $key='$val'
+  $key='$val'
 
 oder
 
-    $key={$val}
+  $key={$val}
 
 Wenn $val kein Whitespace enthält, können die Anführungsstriche
 weggelassen werden:
 
-    $key=$val
+  $key=$val
 
 =head4 Caveats
 
@@ -598,9 +598,9 @@ keine doppelten Anführungsstiche enthalten.
 
 =head4 Example
 
-    $class->stringToKeyVal(q|var1=val1 var2="val2"|);
-    =>
-    ('var1','val1','var2','val2a')
+  $class->stringToKeyVal(q|var1=val1 var2="val2"|);
+  =>
+  ('var1','val1','var2','val2a')
 
 =cut
 
@@ -624,7 +624,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

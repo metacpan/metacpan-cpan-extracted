@@ -1,12 +1,12 @@
 package Quiq::Gd::Image;
 use base qw/GD::Image Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use GD ();
 use Scalar::Util ();
@@ -38,11 +38,11 @@ L<Quiq::Object>
 
 =head1 SYNOPSIS
 
-    use Quiq::Gd::Image;
-    
-    my $img = Quiq::Gd::Image->new(100,100);
-    $img->background('#ffffff');
-    print $img->jpg;
+  use Quiq::Gd::Image;
+  
+  my $img = Quiq::Gd::Image->new(100,100);
+  $img->background('#ffffff');
+  print $img->jpg;
 
 =head1 DESCRIPTION
 
@@ -96,21 +96,21 @@ Dies Portabilität wird von der Methode L<color|"color() - Alloziere Farbe">() s
 
 Konstruktor-Aufruf ersetzen:
 
-    $img = Quiq::Gd::Image->new($width,$height);
+  $img = Quiq::Gd::Image->new($width,$height);
 
 statt
 
-    $img = GD::Image->new($width,$height);
+  $img = GD::Image->new($width,$height);
 
 =item 2.
 
 Nach dem Konstruktor-Aufruf die Hintergrundfarbe setzen:
 
-    $white = $img->background(255,255,255);
+  $white = $img->background(255,255,255);
 
 statt
 
-    $white = $img->colorAllocate(255,255,255);
+  $white = $img->colorAllocate(255,255,255);
 
 =item 3.
 
@@ -120,21 +120,21 @@ Anwendung testen. Sie sollte fehlerfrei laufen.
 
 =head2 Text in ein existierendes Bild schreiben
 
-    use Quiq::Gd::Font;
-    use Quiq::Gd::Image;
-    use Quiq::Path;
-    
-    my $fnt = Quiq::Gd::Font->new('gdMediumBoldFont');
-    my $img = Quiq::Gd::Image->new('bild.jpg');
-    my $color = $img->color(255,0,0);
-    $img->string($fnt,10,10,'TEST',$color);
-    Quiq::Path->write('bild.jpg',$img->jpeg);
+  use Quiq::Gd::Font;
+  use Quiq::Gd::Image;
+  use Quiq::Path;
+  
+  my $fnt = Quiq::Gd::Font->new('gdMediumBoldFont');
+  my $img = Quiq::Gd::Image->new('bild.jpg');
+  my $color = $img->color(255,0,0);
+  $img->string($fnt,10,10,'TEST',$color);
+  Quiq::Path->write('bild.jpg',$img->jpeg);
 
 =head2 Hintergrund transparent machen
 
-    my $img = Quiq::Gd::Image->new($width,$height);
-    my $white = $img->background(255,255,255);
-    $img->transparent($white);
+  my $img = Quiq::Gd::Image->new($width,$height);
+  my $white = $img->background(255,255,255);
+  $img->transparent($white);
 
 =head1 METHODS
 
@@ -144,10 +144,10 @@ Anwendung testen. Sie sollte fehlerfrei laufen.
 
 =head4 Synopsis
 
-    $img = $class->new($file);
-    $img = $class->new($data);
-    $img = $class->new($width,$height);
-    $img = $class->new($width,$height,$maxColors);
+  $img = $class->new($file);
+  $img = $class->new($data);
+  $img = $class->new($width,$height);
+  $img = $class->new($width,$height,$maxColors);
 
 =head4 Returns
 
@@ -236,13 +236,13 @@ sub new {
 
 =head4 Synopsis
 
-    $color = $img->color;             # Default-Farbe
-    $color = $img->color(undef);      # Default-Farbe
-    $color = $img->color($n);         # Index, bereits allozierte GD-Farbe
-    $color = $img->color($r,$g,$b);   # dezimal
-    $color = $img->color(\@rgb);      # dezimal als Array-Referenz
-    $color = $img->color('RRGGBB');   # hexadezimal
-    $color = $img->color('#RRGGBB');  # hexadezimal
+  $color = $img->color;             # Default-Farbe
+  $color = $img->color(undef);      # Default-Farbe
+  $color = $img->color($n);         # Index, bereits allozierte GD-Farbe
+  $color = $img->color($r,$g,$b);   # dezimal
+  $color = $img->color(\@rgb);      # dezimal als Array-Referenz
+  $color = $img->color('RRGGBB');   # hexadezimal
+  $color = $img->color('#RRGGBB');  # hexadezimal
 
 =head4 Aliases
 
@@ -341,7 +341,7 @@ sub color {
 
 =head4 Synopsis
 
-    $color = $img->background(@color);
+  $color = $img->background(@color);
 
 =head4 Returns
 
@@ -380,7 +380,7 @@ sub background {
 
 =head4 Synopsis
 
-    $img->border($color);
+  $img->border($color);
 
 =head4 Returns
 
@@ -414,7 +414,7 @@ sub border {
 
 =head4 Synopsis
 
-    $img->string($font,$x,$y,$string,$color,@opt);
+  $img->string($font,$x,$y,$string,$color,@opt);
 
 =head4 Options
 
@@ -443,16 +443,16 @@ werden, daher erlaubt die Methode nur diese beiden Ausrichtungen.
 Die Position ($x,$y) ist in beiden Ausrichtungen die linke Ecke
 oberhalb des ersten Zeichens.
 
-    horizontal          vertikal
-    
-    ($x,$y)
-       x---------+         +---+
-       | ....... |         | . |
-       +---------+         | . |
-                           | . |
-                           | . |
-                           | . |
-                   ($x,$y) x---+
+  horizontal          vertikal
+  
+  ($x,$y)
+     x---------+         +---+
+     | ....... |         | . |
+     +---------+         | . |
+                         | . |
+                         | . |
+                         | . |
+                 ($x,$y) x---+
 
 =cut
 
@@ -539,7 +539,7 @@ sub string {
 
 =head4 Synopsis
 
-    $img->stringUp($font,$x,$y,$string,$color);
+  $img->stringUp($font,$x,$y,$string,$color);
 
 =head4 Returns
 
@@ -564,7 +564,7 @@ sub stringUp {
 
 =head4 Synopsis
 
-    $img->stringCentered($font,$orientation,$x,$y,$string,$color);
+  $img->stringCentered($font,$orientation,$x,$y,$string,$color);
 
 =cut
 
@@ -596,7 +596,7 @@ sub stringCentered {
 
 =head4 Synopsis
 
-    @colors | $colorA = $img->rainbowColors($n);
+  @colors | $colorA = $img->rainbowColors($n);
 
 =head4 Returns
 
@@ -612,17 +612,17 @@ Werte für $n: 4, 8, 16, 32, 64, 128, 256, 512, 1024.
 Die Regenbogenfarben können verwendet werden, um die Werte
 eines Wertebereichs in einen Farbverlauf zu übersetzen.
 
-    Farbe     % Wertebereich  R   G   B
-    --------- -------------- --- --- ---
-    Blau             0        0   0  255
-                                  |        G-Anteil nimmt zu
-    Hellblau        25        0  255 255
-                                      |    B-Anteil nimmt ab
-    Gruen           50        0  255  0
-                              |            R-Anteil nimmt zu
-    Gelb            75       255 255  0
-                                  |        G-Anteil nimmt ab
-    Rot            100       255  0   0
+  Farbe     % Wertebereich  R   G   B
+  --------- -------------- --- --- ---
+  Blau             0        0   0  255
+                                |        G-Anteil nimmt zu
+  Hellblau        25        0  255 255
+                                    |    B-Anteil nimmt ab
+  Gruen           50        0  255  0
+                            |            R-Anteil nimmt zu
+  Gelb            75       255 255  0
+                                |        G-Anteil nimmt ab
+  Rot            100       255  0   0
 
 =cut
 
@@ -671,7 +671,7 @@ sub rainbowColors {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

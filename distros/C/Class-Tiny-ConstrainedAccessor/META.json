@@ -66,14 +66,14 @@
             "Type::Tiny" : "0",
             "lib::relative" : "0.002",
             "parent" : "0",
-            "vars::i" : "1.07"
+            "vars::i" : "2.000000"
          }
       }
    },
    "provides" : {
       "Class::Tiny::ConstrainedAccessor" : {
          "file" : "lib/Class/Tiny/ConstrainedAccessor.pm",
-         "version" : "0.000010"
+         "version" : "0.000012"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/cxw42/Class-Tiny-ConstrainedAccessor"
       }
    },
-   "version" : "0.000010",
+   "version" : "0.000012",
    "x_contributors" : [
       "Christopher White <cxw@cpan.org>",
       "Toby Inkster <tobyink@cpan.org>"

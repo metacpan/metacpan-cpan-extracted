@@ -1,12 +1,12 @@
 package Quiq::Database::Connection;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -50,10 +50,10 @@ Relationalen Datenbank.
 
 =head4 Synopsis
 
-    $db = $class->new(@opt);
-    $db = $class->new($udl,@opt);
-    $db = $class->new($udlObj,@opt);
-    $db2 = $db->new(@opt);
+  $db = $class->new(@opt);
+  $db = $class->new($udl,@opt);
+  $db = $class->new($udlObj,@opt);
+  $db2 = $db->new(@opt);
 
 =head4 Alias
 
@@ -249,7 +249,7 @@ sub new {
 
 =head4 Synopsis
 
-    $db = $class->newFromSbit($db);
+  $db = $class->newFromSbit($db);
 
 =cut
 
@@ -271,8 +271,8 @@ sub newFromSbit {
 
 =head4 Synopsis
 
-    $db->disconnect;
-    $db->disconnect($commit);
+  $db->disconnect;
+  $db->disconnect($commit);
 
 =head4 Alias
 
@@ -319,7 +319,7 @@ sub disconnect {
 
 =head4 Synopsis
 
-    $bool = $class->dbExists($udl);
+  $bool = $class->dbExists($udl);
 
 =head4 Description
 
@@ -344,8 +344,8 @@ sub dbExists {
 
 =head4 Synopsis
 
-    $n = $db->maxBlobSize;
-    $n = $db->maxBlobSize($n);
+  $n = $db->maxBlobSize;
+  $n = $db->maxBlobSize($n);
 
 =head4 Description
 
@@ -374,8 +374,8 @@ sub maxBlobSize {
 
 =head4 Synopsis
 
-    $bool = $db->strict;
-    $bool = $db->strict($bool);
+  $bool = $db->strict;
+  $bool = $db->strict($bool);
 
 =head4 Description
 
@@ -383,17 +383,17 @@ Bei eingeschaltetem Strict-Modus wird eine Exception
 
 =head4 Example
 
-    my $db = Quiq::Database::Connection->new('dbi#mysql',
-        -handle => $main::dbh,
-    );
-    
-    ...
-    
-    $db->strict(1);
-    
-    # bei Datenbank-Fehler wird Exception geworfen
-    
-    $db->strict(0)
+  my $db = Quiq::Database::Connection->new('dbi#mysql',
+      -handle => $main::dbh,
+  );
+  
+  ...
+  
+  $db->strict(1);
+  
+  # bei Datenbank-Fehler wird Exception geworfen
+  
+  $db->strict(0)
 
 =cut
 
@@ -409,7 +409,7 @@ sub strict {
 
 =head4 Synopsis
 
-    $sqlObj = $db->stmt;
+  $sqlObj = $db->stmt;
 
 =head4 Alias
 
@@ -420,7 +420,7 @@ sqlEngine()
 Liefere das Sql-Objekt der Datenbankverbindung. Mit dem Sql-Objekt
 lassen sich SQL-Statements generieren, z.B.
 
-    $stmt = $db->stmt->dropTable($table);
+  $stmt = $db->stmt->dropTable($table);
 
 =cut
 
@@ -441,14 +441,14 @@ sub stmt {
 
 =head4 Synopsis
 
-    $udlObj = $db->udl;
+  $udlObj = $db->udl;
 
 =head4 Description
 
 Liefere das Udl-Objekt der Datenbankverbindung. Das Udl-Objekt
 hält Information über die Datenbankverbindung, z.B.
 
-    $user = $db->udl->user;
+  $user = $db->udl->user;
 
 =cut
 
@@ -466,7 +466,7 @@ sub udl {
 
 =head4 Synopsis
 
-    $time = $cur->startTime;
+  $time = $cur->startTime;
 
 =cut
 
@@ -482,7 +482,7 @@ sub startTime {
 
 =head4 Synopsis
 
-    $time = $cur->time;
+  $time = $cur->time;
 
 =cut
 
@@ -504,7 +504,7 @@ DBMS-spezifische Unterscheidungen vorgenommen werden müssen.
 
 =head4 Synopsis
 
-    $dbms = $db->dbms;
+  $dbms = $db->dbms;
 
 =cut
 
@@ -520,7 +520,7 @@ sub dbms {
 
 =head4 Synopsis
 
-    ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $db->dbmsTestVector;
+  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $db->dbmsTestVector;
 
 =cut
 
@@ -536,7 +536,7 @@ sub dbmsTestVector {
 
 =head4 Synopsis
 
-    $bool = $db->isOracle;
+  $bool = $db->isOracle;
 
 =head4 Description
 
@@ -557,7 +557,7 @@ sub isOracle {
 
 =head4 Synopsis
 
-    $bool = $db->isPostgreSQL;
+  $bool = $db->isPostgreSQL;
 
 =head4 Description
 
@@ -578,7 +578,7 @@ sub isPostgreSQL {
 
 =head4 Synopsis
 
-    $bool = $db->isSQLite;
+  $bool = $db->isSQLite;
 
 =head4 Description
 
@@ -599,7 +599,7 @@ sub isSQLite {
 
 =head4 Synopsis
 
-    $bool = $db->isMySQL;
+  $bool = $db->isMySQL;
 
 =head4 Description
 
@@ -620,7 +620,7 @@ sub isMySQL {
 
 =head4 Synopsis
 
-    $bool = $db->isAccess;
+  $bool = $db->isAccess;
 
 =head4 Description
 
@@ -641,7 +641,7 @@ sub isAccess {
 
 =head4 Synopsis
 
-    $bool = $db->isMSSQL;
+  $bool = $db->isMSSQL;
 
 =head4 Description
 
@@ -664,7 +664,7 @@ sub isMSSQL {
 
 =head4 Synopsis
 
-    $dbh = $db->handle;
+  $dbh = $db->handle;
 
 =cut
 
@@ -682,14 +682,14 @@ sub handle {
 
 =head4 Synopsis
 
-    $rowClass = $this->defaultRowClass($raw);
+  $rowClass = $this->defaultRowClass($raw);
 
 =head4 Description
 
 Liefere den Namen der Default-Rowklasse:
 
-    Quiq::Database::Row::Object  ($raw ist "falsch")
-    Quiq::Database::Row::Array   ($raw ist "wahr")
+  Quiq::Database::Row::Object  ($raw ist "falsch")
+  Quiq::Database::Row::Array   ($raw ist "wahr")
 
 Auf die Default-Rowklasse werden Datensätze instantiiert, für die
 bei einer Datenbank-Selektion oder einer Instantiierung einer
@@ -713,35 +713,35 @@ gelogged werden.
 
 Für die gesamte Session:
 
-    $db = Quiq::Database::Connection->new($udl,-log=>1);
+  $db = Quiq::Database::Connection->new($udl,-log=>1);
 
 Innerhalb eines Abschnitts:
 
-    $db->openLog;
-    ...
-    $db->closeLog;
+  $db->openLog;
+  ...
+  $db->closeLog;
 
 Testen, ob Db-Logging eingeschaltet ist:
 
-    $db->isLog;
+  $db->isLog;
 
 Schreiben eigener Meldungen ins Log:
 
-    $db->printLog($msg);
+  $db->printLog($msg);
 
 Scheiben von Fortschrittsmeldungen ins Log:
 
-    $db->startProgressLog($n);
-    while (...) {
-        $db->printProgressLog($msg);
-    }
-    $db->endProgressLog;
+  $db->startProgressLog($n);
+  while (...) {
+      $db->printProgressLog($msg);
+  }
+  $db->endProgressLog;
 
 =head3 isLog() - Prüfe, ob Logging eingeschaltet ist
 
 =head4 Synopsis
 
-    $bool = $db->isLog;
+  $bool = $db->isLog;
 
 =cut
 
@@ -757,7 +757,7 @@ sub isLog {
 
 =head4 Synopsis
 
-    $db->openLog;
+  $db->openLog;
 
 =cut
 
@@ -775,7 +775,7 @@ sub openLog {
 
 =head4 Synopsis
 
-    $db->writeLog(@str);
+  $db->writeLog(@str);
 
 =head4 Description
 
@@ -815,7 +815,7 @@ sub writeLog {
 
 =head4 Synopsis
 
-    $db->msgToLog($msg);
+  $db->msgToLog($msg);
 
 =head4 Alias
 
@@ -828,13 +828,13 @@ Die Methode liefert keinen Wert zurück.
 
 Der Logfileeintrag hat folgenden Aufbau:
 
-    <LogMsgSeparator>
-    <LogMsgPrefix> <msg>
+  <LogMsgSeparator>
+  <LogMsgPrefix> <msg>
 
 Mit Defaultwerten:
 
-    ---
-    # <msg>
+  ---
+  # <msg>
 
 Ist die Meldung mehrzeilig, wird der LogMsgPrefix jeder
 Zeile vorangestellt.
@@ -872,7 +872,7 @@ sub msgToLog {
 
 =head4 Synopsis
 
-    $db->stmtToLog($stmt);
+  $db->stmtToLog($stmt);
 
 =head4 Description
 
@@ -881,13 +881,13 @@ Die Methode liefert keinen Wert zurück.
 
 Der Logfileeintrag hat folgenden Aufbau:
 
-    <LogMsgSeparator>
-    <stmt>
+  <LogMsgSeparator>
+  <stmt>
 
 Mit Defaultwerten:
 
-    ===
-    <stmt>
+  ===
+  <stmt>
 
 Ist die Meldung mehrzeilig, wird der LogMsgPrefix jeder
 Zeile vorangestellt.
@@ -916,7 +916,7 @@ sub stmtToLog {
 
 =head4 Synopsis
 
-    $db->timeToLog($time);
+  $db->timeToLog($time);
 
 =head4 Description
 
@@ -925,7 +925,7 @@ Die Methode liefert keinen Wert zurück.
 
 Der Logfileeintrag hat per Default folgenden Aufbau:
 
-    /* <time> */
+  /* <time> */
 
 =cut
 
@@ -951,7 +951,7 @@ sub timeToLog {
 
 =head4 Synopsis
 
-    $db->closeLog;
+  $db->closeLog;
 
 =cut
 
@@ -969,7 +969,7 @@ sub closeLog {
 
 =head4 Synopsis
 
-    $db->startProgressLog($n);
+  $db->startProgressLog($n);
 
 =cut
 
@@ -997,7 +997,7 @@ sub startProgressLog {
 
 =head4 Synopsis
 
-    $db->printProgressLog($msg);
+  $db->printProgressLog($msg);
 
 =head4 Description
 
@@ -1006,11 +1006,11 @@ Die Methode liefert keinen Wert zurück.
 
 Der Logfileeintrag hat folgenden Aufbau:
 
-    <LogMsgPrefix> <msg>
+  <LogMsgPrefix> <msg>
 
 Mit Defaultwerten:
 
-    # <msg>
+  # <msg>
 
 Ist die Meldung mehrzeilig, wird sie einzeilig gemacht, indem
 NEWLINE durch SPACE ersetzt wird.
@@ -1042,7 +1042,7 @@ sub printProgressLog {
 
 =head4 Synopsis
 
-    $db->endProgressLog($msg);
+  $db->endProgressLog($msg);
 
 =cut
 
@@ -1072,7 +1072,7 @@ sub endProgressLog {
 
 =head4 Synopsis
 
-    $db->exportTable($table,$file);
+  $db->exportTable($table,$file);
 
 =head4 Description
 
@@ -1110,7 +1110,7 @@ sub exportTable {
 
 =head4 Synopsis
 
-    $db->importTable($table,$file);
+  $db->importTable($table,$file);
 
 =head4 Description
 
@@ -1158,7 +1158,7 @@ sub importTable {
 
 =head4 Synopsis
 
-    $db->lockTable($table);
+  $db->lockTable($table);
 
 =cut
 
@@ -1178,7 +1178,7 @@ sub lockTable {
 
 =head4 Synopsis
 
-    $cur = $db->sql($stmt,@opt);
+  $cur = $db->sql($stmt,@opt);
 
 =head4 Options
 
@@ -1231,13 +1231,13 @@ Code notwendig sein, wenn Konstrukte enthalten sind,
 die von DBI/DBD irrtümlich als Bind-Variablen interpretiert werden.
 Z.B. bei folgender Trigger-Definition das ":new":
 
-    CREATE OR REPLACE TRIGGER x_before_insert
-    BEFORE INSERT
-        ON x
-        FOR EACH ROW
-    BEGIN
-        :new.create_date := sysdate;
-    END;
+  CREATE OR REPLACE TRIGGER x_before_insert
+  BEFORE INSERT
+      ON x
+      FOR EACH ROW
+  BEGIN
+      :new.create_date := sysdate;
+  END;
 
 Ohne -forceExec=>1 würde das Statement lediglich präpariert,
 nicht ausgeführt.
@@ -1286,25 +1286,25 @@ zum Client. Das ist für große Ergebnismengen fatal.
 Um die Datensätze in Chunks zu holen, muss ein CURSOR verwendet
 werden:
 
-    DECLARE <cursor> CURSOR FOR <stmt>;
-    FETCH <n> FROM <cursor>;
-    ...
-    CLOSE <cursor>;
+  DECLARE <cursor> CURSOR FOR <stmt>;
+  FETCH <n> FROM <cursor>;
+  ...
+  CLOSE <cursor>;
 
 Hierbei ist:
 
-    <cursor> der Name des Cursors
-    <stmt> das SELECT-Statement
-    <n> die Anzahl der zu fetchenden Datensätze
+  <cursor> der Name des Cursors
+  <stmt> das SELECT-Statement
+  <n> die Anzahl der zu fetchenden Datensätze
 
 Die Methode $db->sql() implementiert im Falle von PostgreSQL
 SELECTs durch obige Anweisungsfolge, wenn die Option -fetchMode
 gesetzt ist.
 
-    -fetchMode=>0|1|2 (Default: 0)
-        0=Defaultverhalten, 1=dekl. Cursor, 2=dekl. Cursor + extra Session
-    -chunkSize=>$n (Default: 500)
-        Fetche Datensätze in Chunks von $n Stück
+  -fetchMode=>0|1|2 (Default: 0)
+      0=Defaultverhalten, 1=dekl. Cursor, 2=dekl. Cursor + extra Session
+  -chunkSize=>$n (Default: 500)
+      Fetche Datensätze in Chunks von $n Stück
 
 =cut
 
@@ -1500,7 +1500,7 @@ sub sql {
 
 =head4 Synopsis
 
-    $cur = $db->sqlAtomic($stmt,@opt);
+  $cur = $db->sqlAtomic($stmt,@opt);
 
 =head4 Description
 
@@ -1550,7 +1550,7 @@ sub sqlAtomic {
 
 =head4 Synopsis
 
-    $cur = $db->setSchema($schema);
+  $cur = $db->setSchema($schema);
 
 =head4 Description
 
@@ -1597,7 +1597,7 @@ sub setSchema {
 
 =head4 Synopsis
 
-    $cur = $db->setEncoding($charset);
+  $cur = $db->setEncoding($charset);
 
 =cut
 
@@ -1618,7 +1618,7 @@ sub setEncoding {
 
 =head4 Synopsis
 
-    $cur = $db->setDateFormat;
+  $cur = $db->setDateFormat;
 
 =cut
 
@@ -1641,7 +1641,7 @@ sub setDateFormat {
 
 =head4 Synopsis
 
-    $cur = $db->setNumberFormat;
+  $cur = $db->setNumberFormat;
 
 =cut
 
@@ -1664,7 +1664,7 @@ sub setNumberFormat {
 
 =head4 Synopsis
 
-    $cur = $db->setSearchPath(@schemas);
+  $cur = $db->setSearchPath(@schemas);
 
 =head4 Description
 
@@ -1702,7 +1702,7 @@ sub setSearchPath {
 
 =head4 Synopsis
 
-    $cur = $db->begin;
+  $cur = $db->begin;
 
 =head4 Description
 
@@ -1745,8 +1745,8 @@ sub begin {
 
 =head4 Synopsis
 
-    $cur = $db->commit;
-    $cur = $db->commit($commit);
+  $cur = $db->commit;
+  $cur = $db->commit($commit);
 
 =head4 Description
 
@@ -1793,7 +1793,7 @@ sub commit {
 
 =head4 Synopsis
 
-    $cur = $db->rollback;
+  $cur = $db->rollback;
 
 =head4 Description
 
@@ -1828,7 +1828,7 @@ sub rollback {
 
 =head4 Synopsis
 
-    $cur = $db->save($table,$row,@where);
+  $cur = $db->save($table,$row,@where);
 
 =head4 Description
 
@@ -1908,7 +1908,7 @@ sub save {
 
 =head4 Synopsis
 
-    $titleA|@titles = $db->titles(@select);
+  $titleA|@titles = $db->titles(@select);
 
 =head4 Description
 
@@ -1946,7 +1946,7 @@ sub titles {
 
 =head4 Synopsis
 
-    $title = $db->primaryKey($table);
+  $title = $db->primaryKey($table);
 
 =head4 Description
 
@@ -1973,7 +1973,7 @@ sub primaryKey {
 
 =head4 Synopsis
 
-    $tab|@rows|$cur = $db->select(@select,@opt);
+  $tab|@rows|$cur = $db->select(@select,@opt);
 
 =head4 Options
 
@@ -2059,7 +2059,7 @@ sub select {
 
 =head4 Synopsis
 
-    $row|@vals = $db->lookup(@select,@opt);
+  $row|@vals = $db->lookup(@select,@opt);
 
 =head4 Options
 
@@ -2171,7 +2171,7 @@ sub lookup {
 
 =head4 Synopsis
 
-    $row = $db->loadRow($table,@keyVal);
+  $row = $db->loadRow($table,@keyVal);
 
 =head4 Description
 
@@ -2213,7 +2213,7 @@ sub loadRow {
 
 =head4 Synopsis
 
-    $row = $db->nullRow(@select,@opt);
+  $row = $db->nullRow(@select,@opt);
 
 =head4 Options
 
@@ -2247,7 +2247,7 @@ weiteren Aufrufen wird diese Row kopiert.
 
 Null-Datensatz einer Tabelle instantiieren
 
-    $per = Quiq::Database::Connection->nullRow('person');
+  $per = Quiq::Database::Connection->nullRow('person');
 
 =back
 
@@ -2291,8 +2291,8 @@ sub nullRow {
 
 =head4 Synopsis
 
-    @keyVal|%hash|$arr = $db->values(@select);
-    $hash = $db->values(@select,-hash=>1);
+  @keyVal|%hash|$arr = $db->values(@select);
+  $hash = $db->values(@select,-hash=>1);
 
 =head4 Options
 
@@ -2347,64 +2347,64 @@ C<< -hash=>1 >> angegeben ist.
 
 Alle Werte einer Kolumne (sortiert):
 
-    @arr = $db->values(
-        -select => 'per_nachname',
-        -from => 'person',
-        -orderBy => 1,
-    );
+  @arr = $db->values(
+      -select => 'per_nachname',
+      -from => 'person',
+      -orderBy => 1,
+  );
 
 Nur verschiedene Werte (sortiert):
 
-    @arr = $db->values(
-        -select => 'per_nachname',
-        -distinct => 1,
-        -from => 'person',
-        -orderBy => 1,
-    );
+  @arr = $db->values(
+      -select => 'per_nachname',
+      -distinct => 1,
+      -from => 'person',
+      -orderBy => 1,
+  );
 
 Abbildung von Id auf Nachname:
 
-    %hash = $db->values(
-        -select => 'per_id','per_nachname',
-        -from => 'person',
-    );
+  %hash = $db->values(
+      -select => 'per_id','per_nachname',
+      -from => 'person',
+  );
 
 Dasselbe, nur dass eine Referenz (Hash-Objekt) geliefert wird:
 
-    $hash = $db->values(
-        -select => 'per_id','per_nachname',
-        -from => 'person',
-        -hash => 1,
-    );
+  $hash = $db->values(
+      -select => 'per_id','per_nachname',
+      -from => 'person',
+      -hash => 1,
+  );
 
 Lookup-Hash für Nachname:
 
-    $hash = $db->values(
-        -select => 'per_nachname',1,
-        -from => 'person',
-        -hash => 1,
-    );
+  $hash = $db->values(
+      -select => 'per_nachname',1,
+      -from => 'person',
+      -hash => 1,
+  );
 
 Array mit Paaren:
 
-    @arr = $db->values(
-        -select => 'per_id','per_nachname',
-        -from => 'person',
-    );
+  @arr = $db->values(
+      -select => 'per_id','per_nachname',
+      -from => 'person',
+  );
 
 Dasselbe, nur dass eine Referenz (Array-Objekt) geliefert wird:
 
-    $arr = $db->values(
-        -select => 'per_id','per_nachname',
-        -from => 'person',
-    );
+  $arr = $db->values(
+      -select => 'per_id','per_nachname',
+      -from => 'person',
+  );
 
 Array mit Abfolge von Tripeln:
 
-    @arr = $db->values(
-        -select => 'per_id','per_nachname','per_vorname',
-        -from => 'person',
-    );
+  @arr = $db->values(
+      -select => 'per_id','per_nachname','per_vorname',
+      -from => 'person',
+  );
 
 =cut
 
@@ -2448,7 +2448,7 @@ sub values {
 
 =head4 Synopsis
 
-    $val = $db->value(@select,@opt);
+  $val = $db->value(@select,@opt);
 
 =head4 Options
 
@@ -2527,9 +2527,9 @@ sub value {
 
 =head4 Synopsis
 
-    $cur = $db->insert($table,@opt,$row);
-    $cur = $db->insert($table,@opt,@keyVal);
-    $cur = $db->insert($table,@opt,\@keys,\@values);
+  $cur = $db->insert($table,@opt,$row);
+  $cur = $db->insert($table,@opt,@keyVal);
+  $cur = $db->insert($table,@opt,\@keys,\@values);
 
 =head4 Options
 
@@ -2581,17 +2581,17 @@ sub insert {
 
 =head4 Synopsis
 
-    $cur = $db->insertRows($table,\@keys,
-        [@vals1],
-        [@vals2],
-        ...
-    );
-    
-    $cur = $db->insertRows($table,\@keys,
-        @vals1,
-        @vals2,
-        ...
-    );
+  $cur = $db->insertRows($table,\@keys,
+      [@vals1],
+      [@vals2],
+      ...
+  );
+  
+  $cur = $db->insertRows($table,\@keys,
+      @vals1,
+      @vals2,
+      ...
+  );
 
 =head4 Description
 
@@ -2607,23 +2607,23 @@ das Resultat der Ausführung (Cursor) zurück
 
 Datensätze als Arrays
 
-    $db->insertRows('person',
-        [qw/per_id per_vorname per_nachname per_geburtstag/],
-        [qw/1 Frank Seitz 31.1.1961/],
-        [qw/2 Hanno Seitz 7.4.2000/],
-        [qw/3 Linus Seitz 11.11.2002/],
-    );
+  $db->insertRows('person',
+      [qw/per_id per_vorname per_nachname per_geburtstag/],
+      [qw/1 Frank Seitz 31.1.1961/],
+      [qw/2 Hanno Seitz 7.4.2000/],
+      [qw/3 Linus Seitz 11.11.2002/],
+  );
 
 =item *
 
 Datensätze als Abfolge von Werten
 
-    $db->insertRows('person',
-        [qw/per_id per_vorname per_nachname per_geburtstag/],
-        qw/1 Frank Seitz 31.1.1961/,
-        qw/2 Hanno Seitz 7.4.2000/,
-        qw/3 Linus Seitz 11.11.2002/,
-    );
+  $db->insertRows('person',
+      [qw/per_id per_vorname per_nachname per_geburtstag/],
+      qw/1 Frank Seitz 31.1.1961/,
+      qw/2 Hanno Seitz 7.4.2000/,
+      qw/3 Linus Seitz 11.11.2002/,
+  );
 
 =back
 
@@ -2646,12 +2646,12 @@ sub insertRows {
 
 =head4 Synopsis
 
-    $cur = $db->insertMulti($table,\@keys,[
-            [@vals1],
-            [@vals2],
-            ...
-        ]
-    );
+  $cur = $db->insertMulti($table,\@keys,[
+          [@vals1],
+          [@vals2],
+          ...
+      ]
+  );
 
 =head4 Description
 
@@ -2661,23 +2661,23 @@ das Resultat der Ausführung (Cursor) zurück.
 Im Unterschied zur Methode $db->L<insertRows|"insertRows() - Füge mehrere Datensätze zu Tabelle hinzu">() führt diese
 Methode ein einziges INSERT-Statement mit allen Daten aus, à la
 
-    INSERT INTO person
-        (per_id, per_vorname, per_nachname, per_geburtstag)
-    VALUES
-        ('1', 'Linus', 'Seitz', '2002-11-11'),
-        ('2', 'Hanno', 'Seitz', '2000-04-07')
-        ('3', 'Emily', 'Philippi', '1997-05-05')
-        ...
+  INSERT INTO person
+      (per_id, per_vorname, per_nachname, per_geburtstag)
+  VALUES
+      ('1', 'Linus', 'Seitz', '2002-11-11'),
+      ('2', 'Hanno', 'Seitz', '2000-04-07')
+      ('3', 'Emily', 'Philippi', '1997-05-05')
+      ...
 
 =head4 Example
 
-    $db->insertMulti('person',
-        [qw/per_id per_vorname per_nachname per_geburtstag/],[
-            [qw/1 Linus Seitz 2002-11-11/],
-            [qw/2 Hanno Seitz 2000-04-07/],
-            [qw/3 Emily Philippi 1997-05-05/],
-        ]
-    );
+  $db->insertMulti('person',
+      [qw/per_id per_vorname per_nachname per_geburtstag/],[
+          [qw/1 Linus Seitz 2002-11-11/],
+          [qw/2 Hanno Seitz 2000-04-07/],
+          [qw/3 Emily Philippi 1997-05-05/],
+      ]
+  );
 
 =cut
 
@@ -2698,9 +2698,9 @@ sub insertMulti {
 
 =head4 Synopsis
 
-    $cur = $db->update($table,$row); [1]
-    $cur = $db->update($table,$row,@where); [2]
-    $cur = $db->update($table,@keyVal,-where,@where); # [3]
+  $cur = $db->update($table,$row); [1]
+  $cur = $db->update($table,$row,@where); [2]
+  $cur = $db->update($table,@keyVal,-where,@where); # [3]
 
 =head4 Description
 
@@ -2761,8 +2761,8 @@ sub update {
 
 =head4 Synopsis
 
-    $cur = $db->delete($table,$row,@where);
-    $cur = $db->delete($table,@where);
+  $cur = $db->delete($table,$row,@where);
+  $cur = $db->delete($table,@where);
 
 =head4 Description
 
@@ -2806,8 +2806,8 @@ sub delete {
 
 =head4 Synopsis
 
-    @schemas | $schemaA = $db->schemas(@opt);
-    %schemas | $schemaH = $db->schemas(-hash=>1,@opt);
+  @schemas | $schemaA = $db->schemas(@opt);
+  %schemas | $schemaH = $db->schemas(-hash=>1,@opt);
 
 =head4 Options
 
@@ -2889,11 +2889,11 @@ sub schemas {
 
 =head4 Synopsis
 
-    $cur = $db->createTable($table,
-        [$colName,@colOpts],
-        ...
-        @opt,
-    );
+  $cur = $db->createTable($table,
+      [$colName,@colOpts],
+      ...
+      @opt,
+  );
 
 =head4 Options
 
@@ -2960,7 +2960,7 @@ sub createTable {
 
 =head4 Synopsis
 
-    $cur = $db->dropTable($table);
+  $cur = $db->dropTable($table);
 
 =head4 Description
 
@@ -3003,7 +3003,7 @@ sub dropTable {
 
 =head4 Synopsis
 
-    $bool = $db->tableExists($table);
+  $bool = $db->tableExists($table);
 
 =head4 Description
 
@@ -3045,7 +3045,7 @@ sub tableExists {
 
 =head4 Synopsis
 
-    $db->analyzeTable($table);
+  $db->analyzeTable($table);
 
 =head4 Description
 
@@ -3067,8 +3067,8 @@ sub analyzeTable {
 
 =head4 Synopsis
 
-    $cur = $db->addForeignKeyConstraint($tableName,\@tableCols,
-        $refTableName,@opt);
+  $cur = $db->addForeignKeyConstraint($tableName,\@tableCols,
+      $refTableName,@opt);
 
 =head4 Description
 
@@ -3091,7 +3091,7 @@ sub addForeignKeyConstraint {
 
 =head4 Synopsis
 
-    $n = $db->countRows($tableName);
+  $n = $db->countRows($tableName);
 
 =cut
 
@@ -3109,7 +3109,7 @@ sub countRows {
 
 =head4 Synopsis
 
-    $tab = $db->tableDiff($table1,$table2,@opt);
+  $tab = $db->tableDiff($table1,$table2,@opt);
 
 =head4 Arguments
 
@@ -3162,35 +3162,35 @@ etwaig vorhandener Daten-Differenzen. Sie tut dies mittels SQL und ist
 dadurch auch auf großen Datenmengen sehr schnell. Der Vergleich
 geschieht durch die Bildung der zwei Differenzmengen
 
-    -- Alle Zeilen in Tabelle 1, die nicht in Tabelle 2 vorkommen
-    
-    SELECT
-        COLUMNS1
-    FROM
-        TABLE1
-    EXCEPT
-    SELECT
-        COLUMNS2
-    FROM
-        TABLE2
-    ORDER BY
-        COLUMNS1
+  -- Alle Zeilen in Tabelle 1, die nicht in Tabelle 2 vorkommen
+  
+  SELECT
+      COLUMNS1
+  FROM
+      TABLE1
+  EXCEPT
+  SELECT
+      COLUMNS2
+  FROM
+      TABLE2
+  ORDER BY
+      COLUMNS1
 
 und
 
-    -- Alle Zeilen in Tabelle 2, die nicht in Tabelle 1 vorkommen
-    
-    SELECT
-        COLUMNS2
-    FROM
-        TABLE2
-    EXCEPT
-    SELECT
-        COLUMNS1
-    FROM
-        TABLE1
-    ORDER BY
-        COLUMNS2
+  -- Alle Zeilen in Tabelle 2, die nicht in Tabelle 1 vorkommen
+  
+  SELECT
+      COLUMNS2
+  FROM
+      TABLE2
+  EXCEPT
+  SELECT
+      COLUMNS1
+  FROM
+      TABLE1
+  ORDER BY
+      COLUMNS2
 
 Sind beide Differenzmengen leer, sind die Tabellen identisch.
 
@@ -3205,23 +3205,23 @@ Vergleich der Tabelle q68t999 in den Schemata xv882js und xv882js_test_01
 über das Programm quiq-db-table-diff, das ein Frontend zur Methode
 tableDiff() darstellt:
 
-    $ quiq-db-table-diff dbi#postgresql:dsstest%xv882js:*@tdca.ruv.de:5432 xv882js.q68t999 xv882js_test_01.q68t999
-     1 sourceTable
-     2 pgmname
-     3 tabname
-     4 jobname
-     5 anz_ins
-     6 anz_upd
-     7 anz_del
-     8 upd_dat
-     9 status
-    10 runtime
-    
-    1   2                 3         4   5          6   7    8                            9   10
-    | A | xv882js_160538  | q68t340 |   | 37806420 | 0 | -1 | 2019-04-25 09:30:12.034297 |   | 2019-04-25 09:29:51 |
-    | B | xv882js_2285224 | q68t340 |   | 37806420 | 0 | -1 | 2019-04-25 09:33:33.987502 |   | 2019-04-25 09:33:11 |
-    
-    2 rows
+  $ quiq-db-table-diff dbi#postgresql:dsstest%xv882js:*@tdca.ruv.de:5432 xv882js.q68t999 xv882js_test_01.q68t999
+   1 sourceTable
+   2 pgmname
+   3 tabname
+   4 jobname
+   5 anz_ins
+   6 anz_upd
+   7 anz_del
+   8 upd_dat
+   9 status
+  10 runtime
+  
+  1   2                 3         4   5          6   7    8                            9   10
+  | A | xv882js_160538  | q68t340 |   | 37806420 | 0 | -1 | 2019-04-25 09:30:12.034297 |   | 2019-04-25 09:29:51 |
+  | B | xv882js_2285224 | q68t340 |   | 37806420 | 0 | -1 | 2019-04-25 09:33:33.987502 |   | 2019-04-25 09:33:11 |
+  
+  2 rows
 
 =cut
 
@@ -3382,7 +3382,7 @@ sub tableDiff {
 
 =head4 Synopsis
 
-    $tab = $db->doublets($table,@opt);
+  $tab = $db->doublets($table,@opt);
 
 =head4 Arguments
 
@@ -3432,10 +3432,10 @@ mit den Treffern zurück.
 
 =head4 Example
 
-    $  perl -MQuiq::Database::Connection -E 'print Quiq::Database::Connection\
-         ->new("dbi#postgresql:dsstest%xv882js:*\@tdca.ruv.de:5432")\
-         ->doublets("dss_meta.cpm_load_objects",-columns=>"load_object,\
-         target_object",-limit=>10)->asTable'
+  $  perl -MQuiq::Database::Connection -E 'print Quiq::Database::Connection\
+       ->new("dbi#postgresql:dsstest%xv882js:*\@tdca.ruv.de:5432")\
+       ->doublets("dss_meta.cpm_load_objects",-columns=>"load_object,\
+       target_object",-limit=>10)->asTable'
 
 =cut
 
@@ -3521,7 +3521,7 @@ sub doublets {
 
 =head4 Synopsis
 
-    $cur = $db->columnExists($table,$column);
+  $cur = $db->columnExists($table,$column);
 
 =head4 Description
 
@@ -3558,7 +3558,7 @@ sub columnExists {
 
 =head4 Synopsis
 
-    $cur = $db->addColumn($table,$column,@colDef,@opt);
+  $cur = $db->addColumn($table,$column,@colDef,@opt);
 
 =head4 Options
 
@@ -3573,11 +3573,11 @@ liefere undef.
 
 =head4 Example
 
-    $cur = $db->addColumn('person','mag_eis',
-        type => 'STRING(1)',
-        notNull => 1,
-        default => 1,
-    );
+  $cur = $db->addColumn('person','mag_eis',
+      type => 'STRING(1)',
+      notNull => 1,
+      default => 1,
+  );
 
 =cut
 
@@ -3616,7 +3616,7 @@ sub addColumn {
 
 =head4 Synopsis
 
-    $cur = $db->dropColumn($table,$column);
+  $cur = $db->dropColumn($table,$column);
 
 =head4 Description
 
@@ -3653,7 +3653,7 @@ sub dropColumn {
 
 =head4 Synopsis
 
-    $cur = $db->modifyColumn($table,$column,$property=>$value);
+  $cur = $db->modifyColumn($table,$column,$property=>$value);
 
 =head4 Description
 
@@ -3680,7 +3680,7 @@ sub modifyColumn {
 
 =head4 Synopsis
 
-    $cur = $db->renameColumn($table,$oldName,$newName;
+  $cur = $db->renameColumn($table,$oldName,$newName;
 
 =head4 Description
 
@@ -3707,7 +3707,7 @@ sub renameColumn {
 
 =head4 Synopsis
 
-    $n = $db->distinctValues($table,$column);
+  $n = $db->distinctValues($table,$column);
 
 =cut
 
@@ -3725,7 +3725,7 @@ sub distinctValues {
 
 =head4 Synopsis
 
-    $val = $db->minValue($table,$column);
+  $val = $db->minValue($table,$column);
 
 =cut
 
@@ -3743,7 +3743,7 @@ sub minValue {
 
 =head4 Synopsis
 
-    $val = $db->maxValue($table,$column);
+  $val = $db->maxValue($table,$column);
 
 =cut
 
@@ -3760,7 +3760,7 @@ sub maxValue {
 
 =head4 Synopsis
 
-    ($count,$distinctCount,$min,$max) = $db->countDistinctMinMax($table,$column);
+  ($count,$distinctCount,$min,$max) = $db->countDistinctMinMax($table,$column);
 
 =head4 Description
 
@@ -3792,7 +3792,7 @@ sub countDistinctMinMax {
 
 =head4 Synopsis
 
-    $bool = $db->indexExists($table,\@colNames);
+  $bool = $db->indexExists($table,\@colNames);
 
 =head4 Description
 
@@ -3838,7 +3838,7 @@ sub indexExists {
 
 =head4 Synopsis
 
-    $cur = $db->createIndex($table,\@colNames,@opt);
+  $cur = $db->createIndex($table,\@colNames,@opt);
 
 =head4 Options
 
@@ -3916,7 +3916,7 @@ sub createIndex {
 
 =head4 Synopsis
 
-    $cur = $db->createUniqueIndex($table,\@colNames,@opt);
+  $cur = $db->createUniqueIndex($table,\@colNames,@opt);
 
 =head4 Options
 
@@ -3946,7 +3946,7 @@ sub createUniqueIndex {
 
 =head4 Synopsis
 
-    $cur = $db->dropIndex($table,\@colNames);
+  $cur = $db->dropIndex($table,\@colNames);
 
 =cut
 
@@ -3971,7 +3971,7 @@ sub dropIndex {
 
 =head4 Synopsis
 
-    $db->createSequence($name,@opt);
+  $db->createSequence($name,@opt);
 
 =head4 Options
 
@@ -4041,7 +4041,7 @@ sub createSequence {
 
 =head4 Synopsis
 
-    $cur = $db->dropSequence($name);
+  $cur = $db->dropSequence($name);
 
 =head4 Description
 
@@ -4078,7 +4078,7 @@ sub dropSequence {
 
 =head4 Synopsis
 
-    $db->setSequence($sequence,$n);
+  $db->setSequence($sequence,$n);
 
 =head4 Description
 
@@ -4108,7 +4108,7 @@ sub setSequence {
 
 =head4 Synopsis
 
-    $n = $db->nextValue($sequence);
+  $n = $db->nextValue($sequence);
 
 =head4 Description
 
@@ -4170,7 +4170,7 @@ sub nextValue {
 
 =head4 Synopsis
 
-    $cur = $db->createView($viewName,$selectStmt,@opt);
+  $cur = $db->createView($viewName,$selectStmt,@opt);
 
 =head4 Options
 
@@ -4220,7 +4220,7 @@ sub createView {
 
 =head4 Synopsis
 
-    $cur = $db->dropView($viewName);
+  $cur = $db->dropView($viewName);
 
 =head4 Description
 
@@ -4261,7 +4261,7 @@ sub dropView {
 
 =head4 Synopsis
 
-    $bool = $db->viewExists($viewName);
+  $bool = $db->viewExists($viewName);
 
 =head4 Description
 
@@ -4300,12 +4300,12 @@ sub viewExists {
 
 =head4 Synopsis
 
-    $cur = $db->createTrigger($table,$name,$when,$event,$level,$body,@opt);
-    $cur = $db->createTrigger($table,$name,$when,$event,$level,
-        $dbms => $body,
-        ...,
-        @opt
-    );
+  $cur = $db->createTrigger($table,$name,$when,$event,$level,$body,@opt);
+  $cur = $db->createTrigger($table,$name,$when,$event,$level,
+      $dbms => $body,
+      ...,
+      @opt
+  );
 
 =head4 Options
 
@@ -4333,14 +4333,14 @@ auf einem bestimmten RDBMS läuft. Oder es können, um portabel
 programmieren zu können, unterschiedliche Prozedur-Rümpfe für
 verschiedene RDBMSe definiert werden:
 
-    ...
-    Oracle => "
-    <oracle_body>
-    ",
-    PostgreSQL => "
-    <postgresql_body>
-    ",
-    ...
+  ...
+  Oracle => "
+  <oracle_body>
+  ",
+  PostgreSQL => "
+  <postgresql_body>
+  ",
+  ...
 
 Die Methode wählt dann die zur Datenbank $db passende
 Rumpf-Definition aus.
@@ -4349,47 +4349,47 @@ Rumpf-Definition aus.
 
 Erzeuge unterschiedlichen Triggercode für Oracle und PostgreSQL:
 
-    $db->createTrigger('mytab','mytrig','before','insert|update','row',
-        Oracle => "
-        BEGIN
-            :new.c := 'a';
-        END
-        ",
-        PostgreSQL => "
-        BEGIN
-            NEW.c = 'a';
-            RETURN NEW;
-        END;
-        ",
-    );
+  $db->createTrigger('mytab','mytrig','before','insert|update','row',
+      Oracle => "
+      BEGIN
+          :new.c := 'a';
+      END
+      ",
+      PostgreSQL => "
+      BEGIN
+          NEW.c = 'a';
+          RETURN NEW;
+      END;
+      ",
+  );
 
 Für Oracle wird ein Trigger mit Rumpf erzeugt:
 
-    CREATE TRIGGER mytrig
-    BEFORE INSERT OR UPDATE ON mytab
-    FOR EACH ROW
-    BEGIN
-        :new.c := 'a';
-    END;
+  CREATE TRIGGER mytrig
+  BEFORE INSERT OR UPDATE ON mytab
+  FOR EACH ROW
+  BEGIN
+      :new.c := 'a';
+  END;
 
 Für PostgreSQL wird zunächst eine Funktion C<set_c_proc> (Triggername
 plus "_proc") erzeugt, welche die Triggerfunktionalität implementiert:
 
-    CREATE FUNCTION mytrig_proc()
-    RETURNS trigger
-    AS $SQL$
-    BEGIN
-        NEW.c = 'a';
-        RETURN NEW;
-    END;
-    $SQL$ LANGUAGE plpgsql
+  CREATE FUNCTION mytrig_proc()
+  RETURNS trigger
+  AS $SQL$
+  BEGIN
+      NEW.c = 'a';
+      RETURN NEW;
+  END;
+  $SQL$ LANGUAGE plpgsql
 
 Dann wird der Trigger definiert, der diese Funktion aufruft:
 
-    CREATE TRIGGER set_c
-    BEFORE INSERT OR UPDATE ON mytab
-    FOR EACH ROW
-    EXECUTE PROCEDURE mytrig_proc()
+  CREATE TRIGGER set_c
+  BEFORE INSERT OR UPDATE ON mytab
+  FOR EACH ROW
+  EXECUTE PROCEDURE mytrig_proc()
 
 =cut
 
@@ -4452,7 +4452,7 @@ sub createTrigger {
 
 =head4 Synopsis
 
-    $cur = $db->dropTrigger($name);
+  $cur = $db->dropTrigger($name);
 
 =cut
 
@@ -4482,7 +4482,7 @@ sub dropTrigger {
 
 =head4 Synopsis
 
-    $bool = $db->triggerExists($name);
+  $bool = $db->triggerExists($name);
 
 =cut
 
@@ -4524,7 +4524,7 @@ sub triggerExists {
 
 =head4 Synopsis
 
-    $tab|@rows|$cur = $db->diff(@args);
+  $tab|@rows|$cur = $db->diff(@args);
 
 =head4 Options
 
@@ -4568,16 +4568,16 @@ Die Zeit, die seit Start des Statements vergangen ist
 
 Diese Zeiten können vom Cursor abgefragt werden mittels:
 
-    $cur->startTime;
-    $cur->execTime;
-    $cur->time;
+  $cur->startTime;
+  $cur->execTime;
+  $cur->time;
 
 =head2 Parallele Datenbankverbindung
 
 Eine parallele Verbindung zur gleichen Datenbank unter dem gleichen
 User kann mittels
 
-    $db2 = $db->new;
+  $db2 = $db->new;
 
 aufgebaut werden. Dies kann nützlich sein, um einen nebenläufigen
 Transkationsrahmen zu eröffnen.
@@ -4587,7 +4587,7 @@ Transkationsrahmen zu eröffnen.
 Wird ein Cursor benötigt, ohne dass ein Statement ausgeführt
 werden soll, kann ein Null-Cursor erzeugt werden:
 
-    $cur = $db->sql;
+  $cur = $db->sql;
 
 =head2 Statement-Generierung
 
@@ -4598,11 +4598,11 @@ Verbindungsaufbau passend zum DBMS instantiiert wurde.
 Alle SQL-Generierungsmethoden der Klasse Quiq::Sql können
 über diese Methode aufgerufen werden, zum Beispiel:
 
-    $stmt = $db->stmt->createTable('person',
-        ['per_id',type=>'INTEGER',primaryKey=>1],
-        ['per_vorname',type=>'STRING(20)'],
-        ['per_nachname',type=>'STRING(20)'],
-    );
+  $stmt = $db->stmt->createTable('person',
+      ['per_id',type=>'INTEGER',primaryKey=>1],
+      ['per_vorname',type=>'STRING(20)'],
+      ['per_nachname',type=>'STRING(20)'],
+  );
 
 =head2 Statement-Generierung plus -Ausführung
 
@@ -4610,11 +4610,11 @@ Die meisten Statements der Klasse Quiq::Sql können auch
 direkt ausgeführt werden, ohne dass das Statement zuvor
 generiert werden muss, zum Beispiel:
 
-    $db->createTable('person',
-        ['per_id',type=>'INTEGER',primaryKey=>1],
-        ['per_vorname',type=>'STRING(20)'],
-        ['per_nachname',type=>'STRING(20)'],
-    );
+  $db->createTable('person',
+      ['per_id',type=>'INTEGER',primaryKey=>1],
+      ['per_vorname',type=>'STRING(20)'],
+      ['per_nachname',type=>'STRING(20)'],
+  );
 
 Die direkte Ausführung ist einer getrennten Generierung
 und Ausführung vorzuziehen, da die Quiq::Database::Connection-Methoden bei der
@@ -4625,14 +4625,14 @@ Ausführung teilweise DBMS-abhängige Sonderbehandlungen vornehmen.
 Anstelle der Default Sql-Klasse Quiq::Sql kann beim Verbindungsaufbau
 eine anwendungspezifische Klasse vereinbart werden:
 
-    package MyApp::Sql;
-    use base qw/Quiq::Sql/;
-    
-    ...
-    
-    package main;
-    
-    $db = Quiq::Database::Connection->new(...,-sqlClass=>'MyApp::Sql');
+  package MyApp::Sql;
+  use base qw/Quiq::Sql/;
+  
+  ...
+  
+  package main;
+  
+  $db = Quiq::Database::Connection->new(...,-sqlClass=>'MyApp::Sql');
 
 =head2 Prepare/Bind
 
@@ -4642,36 +4642,36 @@ ein Bind-Cursor geliefert.
 
 =head3 Beispiel mit INSERT
 
-    my $bindCur = $db->insert('person',
-        per_id => \'?',
-        per_vorname => \'?',
-        per_nachname => \'?',
-    );
-    
-    $bindCur->bind(
-        1,'Rudi','Ratlos',
-        2,'Elli','Pirelli',
-        3,'Erika','Mustermann',
-    );
+  my $bindCur = $db->insert('person',
+      per_id => \'?',
+      per_vorname => \'?',
+      per_nachname => \'?',
+  );
+  
+  $bindCur->bind(
+      1,'Rudi','Ratlos',
+      2,'Elli','Pirelli',
+      3,'Erika','Mustermann',
+  );
 
 =head3 Beispiel mit SELECT
 
-    my $bindCur = $db->select(
-        -from => 'person',
-        -where => 'per_nachname = ?',
-    );
-    
-    my $cur = $bindCur->bind('Mustermann');
-    while (my $row = $cur->fetch) {
-        print $row->asString,"\n";
-    }
-    $cur->close;
+  my $bindCur = $db->select(
+      -from => 'person',
+      -where => 'per_nachname = ?',
+  );
+  
+  my $cur = $bindCur->bind('Mustermann');
+  while (my $row = $cur->fetch) {
+      print $row->asString,"\n";
+  }
+  $cur->close;
 
 =head2 Lookup von Datensätzen
 
 =head3 Selektion eines eindeutigen Objekts
 
-    $row = $db->lookup('person',-where,per_id=>4711);
+  $row = $db->lookup('person',-where,per_id=>4711);
 
 Es ist ein Fehler, wenn
 
@@ -4690,41 +4690,41 @@ mehr als ein Datensatz existiert
 Soll die Methode undef liefern, wenn kein Datensatz existiert,
 wird -sloppy=>1 angegeben:
 
-    $row = $db->lookup('person',-sloppy=>1,-where,per_id=>4711);
+  $row = $db->lookup('person',-sloppy=>1,-where,per_id=>4711);
 
 Soll ein leerer Datensatz geliefert werden, der gesuchte Datensatz
 nicht gefunden wird, wird -new=>1 angegeben:
 
-    $row = $db->lookup('person',-new=>1,-where,per_id=>4711);
+  $row = $db->lookup('person',-new=>1,-where,per_id=>4711);
 
 Der Aufruf liefert also immer einen Datensatz. Mit der Methode
 rowStatus() kann geprüft werden, ob der Datensatz selektiert oder
 neu erzeugt wurde:
 
-    if ($row->rowStatus eq 'I') {
-        # initialisieren
-    
-        $row->set(
-            per_id => $db->nextValue('id');
-            per_vorname => 'Erika',
-            per_namchname => 'Mustermann',
-        );
-    
-        # speichern
-        $db->insert('person',$row);
-    }
+  if ($row->rowStatus eq 'I') {
+      # initialisieren
+  
+      $row->set(
+          per_id => $db->nextValue('id');
+          per_vorname => 'Erika',
+          per_namchname => 'Mustermann',
+      );
+  
+      # speichern
+      $db->insert('person',$row);
+  }
 
 =head2 Einfügen von Datensätzen
 
 =head3 Ad hoc
 
-    my $per_id = $db->nextValue('id');
-    $db->insert('person',
-        per_id => $per_id,
-        per_vorname => 'Rudi',
-        per_nachname => 'Ratlos',
-    );
-    my $per = $db->lookup('person',-where,per_id=>$per_id);
+  my $per_id = $db->nextValue('id');
+  $db->insert('person',
+      per_id => $per_id,
+      per_vorname => 'Rudi',
+      per_nachname => 'Ratlos',
+  );
+  my $per = $db->lookup('person',-where,per_id=>$per_id);
 
 Der Datensatz wird durch Aufzählung der Kolumnen/Wert-Paare zur
 Tabelle hinzugefügt. Um das Objekt im Programm zu haben, muss
@@ -4732,28 +4732,28 @@ der Datensatz selektiert werden.
 
 =head3 Mittels anonymem Row-Objekt
 
-    my $per = $db->nullRow('person');
-    $per->set(
-        per_id => $db->nextValue('id'),
-        per_vorname => 'Rudi',
-        per_nachname => 'Ratlos',
-    );
-    $db->insert('person',$row);
+  my $per = $db->nullRow('person');
+  $per->set(
+      per_id => $db->nextValue('id'),
+      per_vorname => 'Rudi',
+      per_nachname => 'Ratlos',
+  );
+  $db->insert('person',$row);
 
 =head3 Mittels Objekt (noch nicht implementiert)
 
-    my $per = Person->new($db,
-        per_id => $db->nextValue('id'),
-        per_vorname => 'Rudi',
-        per_nachname => 'Ratlos',
-    );
-    $per->insert($db);
+  my $per = Person->new($db,
+      per_id => $db->nextValue('id'),
+      per_vorname => 'Rudi',
+      per_nachname => 'Ratlos',
+  );
+  $per->insert($db);
 
 =head2 Default-Schema
 
 Per UDL kann ein Default-Schema definiert werden:
 
-    dbi#DBMS:DB%USER:PASSW;schema=SCHEMA
+  dbi#DBMS:DB%USER:PASSW;schema=SCHEMA
 
 Namen von Datenbank-Objekten, die ohne Schema-Präfix angegeben
 werden, werden auf dieses Schema bezogen. Auf diese Weise
@@ -4774,7 +4774,7 @@ SCHEMA verwendet werden.
 Die maximale Größe eines BLOB/TEXT-Werts muss im Falle von Oracle
 eingestellt werden. Dies geschieht durch Aufruf von maxBlobSize():
 
-    $db->maxBlobSize(500*1024); # 0,5 MB
+  $db->maxBlobSize(500*1024); # 0,5 MB
 
 Der Defaultwert ist 1024*1024 Bytes (1MB).
 
@@ -4782,43 +4782,43 @@ Der Defaultwert ist 1024*1024 Bytes (1MB).
 
 =head3 Tabelle erzeugen
 
-    $db->createTable('person',
-        ['per_id',type=>'INTEGER',primaryKey=>1],
-        ['per_vorname',type=>'STRING(20)'],
-        ['per_nachname',type=>'STRING(20)'],
-        ['per_foto',type=>'BLOB'],
-    );
+  $db->createTable('person',
+      ['per_id',type=>'INTEGER',primaryKey=>1],
+      ['per_vorname',type=>'STRING(20)'],
+      ['per_nachname',type=>'STRING(20)'],
+      ['per_foto',type=>'BLOB'],
+  );
 
 =head3 Daten speichern
 
-    $cur = $db->insert('person',
-        per_id => \'?',
-        per_vorname => \'?',
-        per_nachname => \'?',
-        per_foto => \'?',
-    );
-    
-    # BLOB-Kolumne bekannt machen, damit die Schnittstelle
-    # die notwendigen Sonderbehandlungen für diesen Datentyp
-    # durchführen kann. Dies ist im Falle von Oracle und PostgreSQL
-    # nötig, da diese die Daten speziell kodieren. Bei SQLite und MySQL
-    # ist das nicht erforderlich. Der Aufruf von bindTypes() sollte aus
-    # Portabilitätsgründen aber immer gemacht werden.
-    
-    $cur->bindTypes(undef,undef,undef,'BLOB');
-    
-    my $foto = Quiq::Path->read('/home/pirelli/Picture/elli.jpg');
-    $cur->bind(1,'Elli','Pirelli',$foto);
+  $cur = $db->insert('person',
+      per_id => \'?',
+      per_vorname => \'?',
+      per_nachname => \'?',
+      per_foto => \'?',
+  );
+  
+  # BLOB-Kolumne bekannt machen, damit die Schnittstelle
+  # die notwendigen Sonderbehandlungen für diesen Datentyp
+  # durchführen kann. Dies ist im Falle von Oracle und PostgreSQL
+  # nötig, da diese die Daten speziell kodieren. Bei SQLite und MySQL
+  # ist das nicht erforderlich. Der Aufruf von bindTypes() sollte aus
+  # Portabilitätsgründen aber immer gemacht werden.
+  
+  $cur->bindTypes(undef,undef,undef,'BLOB');
+  
+  my $foto = Quiq::Path->read('/home/pirelli/Picture/elli.jpg');
+  $cur->bind(1,'Elli','Pirelli',$foto);
 
 =head3 Daten selektieren
 
-    $per = $db->lookup('person',-where,per_id=>1);
+  $per = $db->lookup('person',-where,per_id=>1);
 
 =head2 TEXT-Datentyp
 
 Wie BLOB-Datentyp, aber als Bind-Typ TXET angeben:
 
-    $cur->bindTypes(undef,undef,undef,'TEXT');
+  $cur->bindTypes(undef,undef,undef,'TEXT');
 
 Auch hier ist dies wegen Oracle erforderlich.
 
@@ -4827,7 +4827,7 @@ Auch hier ist dies wegen Oracle erforderlich.
 Beim Verbindungsaufbau kann angegeben werden, ob das Perl-Programm
 UTF-8 Encoding verwendet:
 
-    $db = Quiq::Database::Connection->new($udl,-utf8=>1);
+  $db = Quiq::Database::Connection->new($udl,-utf8=>1);
 
 Die Option sorgt dafür, dass Zeichenketten-Daten (STRING, TEXT)
 als UTF-8 Zeichenketten auf der Datenbank gespeichert werden und
@@ -4840,9 +4840,9 @@ Existiert eine Lowlevel-Handle bereits, kann sie mit der Option
 
 Beispiel: Eine DBI MySQL-Handle $dbh wird als Lowlevel-Handle verwendet,
 
-    UDL braucht nur die
-    
-       $db = Quiq::Database::Connection->new('dbi#mysql',-handle=>$dbh);
+  UDL braucht nur die
+  
+     $db = Quiq::Database::Connection->new('dbi#mysql',-handle=>$dbh);
 
 =head2 Zugriff auf MS Access Datenbank
 
@@ -4858,52 +4858,52 @@ Access-Datenbank zuzugreifen.
 
 mtools: L<http://mdbtools.sourceforge.net/>
 
-    # yum install mdbtools
+  # yum install mdbtools
 
 =head4 ODBC Driver Manager
 
 unixODBC: L<http://http://www.unixodbc.org/>
 
-    # yum install unixODBC
+  # yum install unixODBC
 
 =head4 Perl DBI-Treiber für ODBC
 
 DBD::ODBC: L<https://metacpan.org/pod/DBD::ODBC>
 
-    # cpanm DBD::ODBC
+  # cpanm DBD::ODBC
 
 =head3 Konfiguration
 
 ODBC-Treiber (aus den mtools) definieren:
 
-    # vi /etc/odbcinst.ini
-    [MDBTools]
-    Description = MDB Tools ODBC
-    Driver      = libmdbodbc.so
-    FileUsage   = 1
+  # vi /etc/odbcinst.ini
+  [MDBTools]
+  Description = MDB Tools ODBC
+  Driver      = libmdbodbc.so
+  FileUsage   = 1
 
 Datenquelle definieren:
 
-    # vi /etc/odbc.ini
-    [test]
-    Description = Access Test-Datenbank
-    Driver      = MDB Tools ODBC
-    Database    = /path/to/file.mdb
+  # vi /etc/odbc.ini
+  [test]
+  Description = Access Test-Datenbank
+  Driver      = MDB Tools ODBC
+  Database    = /path/to/file.mdb
 
 =head3 Perl-Programm
 
 Von Perl aus auf die Access-Datenbank zugreifen:
 
-    my $udl = 'dbi#access:test';
-    my $db = Quiq::Database::Connection->new($udl,-utf8=>1);
-    
-    my $stmt = 'select * from tdruckdaten';
-    my $tab = $db->select($stmt);
-    print $tab->asTable;
+  my $udl = 'dbi#access:test';
+  my $db = Quiq::Database::Connection->new($udl,-utf8=>1);
+  
+  my $stmt = 'select * from tdruckdaten';
+  my $tab = $db->select($stmt);
+  print $tab->asTable;
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

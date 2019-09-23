@@ -19,7 +19,7 @@
 
 use 5.006;
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 use lib 't';
 use MyTestHelpers;
@@ -35,7 +35,7 @@ use Math::OEIS::Stripped;
 # VERSION
 
 {
-  my $want_version = 12;
+  my $want_version = 13;
   is ($Math::OEIS::Stripped::VERSION, $want_version,
       'VERSION variable');
   is (Math::OEIS::Stripped->VERSION,  $want_version,
@@ -95,17 +95,12 @@ diag "test filename: ",$test_stripped_filename;
     is (join(':',@values), '-999:8:7');
   }
 
-  {
-    # non-existent A-number
-    my @values = $stripped->anum_to_values('A111111');
+  # non-existent or bogus A-numbers are non found
+  foreach my $anum ('A111111', 'A000002xyz', 'ZZZ') {
+    my @values = $stripped->anum_to_values($anum);
     is (scalar(@values), 0);
-    my $str = $stripped->anum_to_values_str('A111111');
+    my $str = $stripped->anum_to_values_str($anum);
     is ($str, undef);
-  }
-  {
-    my @values = $stripped->anum_to_values('A000002xyz');
-    is (join(':',@values), '',
-        'bogus A000002xyz should be not-found');
   }
 
   {

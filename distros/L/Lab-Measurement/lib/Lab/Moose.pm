@@ -1,5 +1,5 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.682';
+$Lab::Moose::VERSION = '3.690';
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 use warnings;
@@ -151,7 +151,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 SYNOPSIS
 
@@ -245,7 +245,7 @@ The default type is L<'Gnuplot'|Lab::Moose::DataFile::Gnuplot>.
 
 =head2 sweep/sweep_datafile
 
-These are described in a separate tutorial: L<Lab::Moose::Sweep::Tutorial>.
+These are described in a separate tutorial: L<Lab::Measurement::Tutorial>.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -253,7 +253,7 @@ This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2018       Simon Reinhardt
+            2018-2019  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

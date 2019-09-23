@@ -4,12 +4,12 @@ BEGIN {
 }
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Time::HiRes ();
 use Quiq::Option;
@@ -39,7 +39,7 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    $sh = $class->new(@opt);
+  $sh = $class->new(@opt);
 
 =head4 Options
 
@@ -73,11 +73,11 @@ Dies ist nützlich, falls die Kommandozeile ein Passwort enthält,
 das im Log ausgeixt werden soll. Die Methode wird auf dem
 Shell-Objekt gerufen:
 
-    logRewrite => sub {
-        my ($sh,$cmd) = @_;
-        # $cmd umschreiben
-        return $cmd;
-    },
+  logRewrite => sub {
+      my ($sh,$cmd) = @_;
+      # $cmd umschreiben
+      return $cmd;
+  },
 
 =item msgPrefix => $str (Default: '')
 
@@ -141,7 +141,7 @@ sub new {
 
 =head4 Synopsis
 
-    $sh->%METH;
+  $sh->%METH;
 
 =head4 Description
 
@@ -176,7 +176,7 @@ sub DESTROY {
 
 =head4 Synopsis
 
-    $str|@arr = $this->exec($cmd,@opt);
+  $str|@arr = $this->exec($cmd,@opt);
 
 =head4 Options
 
@@ -215,7 +215,7 @@ Schreibe jegliche Ausgabe von $cmd auf stdout und stderr nach
 $name-NNNN.log. NNNN ist eine laufende Nummer, die mit jedem
 Programmaufruf um 1 erhöht wird. Beispiel:
 
-    perl -MQuiq::Shell -E 'Quiq::Shell->exec("echo hallo",-outputTo=>"echo")'
+  perl -MQuiq::Shell -E 'Quiq::Shell->exec("echo hallo",-outputTo=>"echo")'
 
 =item -quiet => $bool (Default: 0)
 
@@ -248,27 +248,27 @@ implizit die Option -sloppy gesetzt.
 
 Unterdrücke Ausgabe auf stdout und stderr:
 
-    $this->exec($cmd,-quiet=>1);
+  $this->exec($cmd,-quiet=>1);
 
 Liefere Ausgabe auf stdout:
 
-    $stdout = $this->exec($cmd,-capture=>'stdout');
+  $stdout = $this->exec($cmd,-capture=>'stdout');
 
 Liefere Ausgabe auf stderr:
 
-    $stderr = $this->exec($cmd,-capture=>'stderr');
+  $stderr = $this->exec($cmd,-capture=>'stderr');
 
 Liefere Ausgabe auf stdout und stderr zusammen:
 
-    $output = $this->exec($cmd,-capture=>'stdout+stderr');
+  $output = $this->exec($cmd,-capture=>'stdout+stderr');
 
 Liefere Ausgabe auf stdout und stderr getrennt:
 
-    ($stdout,$stderr) = $this->exec($cmd,-capture=>'stdout,stderr');
+  ($stdout,$stderr) = $this->exec($cmd,-capture=>'stdout,stderr');
 
 Keine Exception, liefere Exitcode:
 
-    $exitCode = $this->exec($cmd,-sloppy=>1);
+  $exitCode = $this->exec($cmd,-sloppy=>1);
 
 =cut
 
@@ -411,7 +411,7 @@ sub exec {
 
 =head4 Synopsis
 
-    $sh->cd($dir);
+  $sh->cd($dir);
 
 =head4 Returns
 
@@ -459,7 +459,7 @@ sub cd {
 
 =head4 Synopsis
 
-    $this->back;
+  $this->back;
 
 =cut
 
@@ -500,7 +500,7 @@ sub back {
 
 =head4 Synopsis
 
-    $dir = $sh->backDir;
+  $dir = $sh->backDir;
 
 =head4 Returns
 
@@ -527,7 +527,7 @@ sub backDir {
 
 =head4 Synopsis
 
-    $this->checkError($code,$errMsg,@cmd);
+  $this->checkError($code,$errMsg,@cmd);
 
 =head4 Returns
 
@@ -542,13 +542,13 @@ eine Execption aus, wenn der Status ungleich 0 ist.
 
 Prüfe den Ausführungsstatus von system():
 
-    system($cmd);
-    Quiq::Shell->checkError($?,$!,$cmd);
+  system($cmd);
+  Quiq::Shell->checkError($?,$!,$cmd);
 
 Prüfe den Ausführungsstatus des Backtick-Operators:
 
-    $str = `$cmd`;
-    Quiq::Shell->checkError($?,$!,$cmd);
+  $str = `$cmd`;
+  Quiq::Shell->checkError($?,$!,$cmd);
 
 =cut
 
@@ -598,7 +598,7 @@ sub checkError {
 
 =head4 Synopsis
 
-    $sh->_logCmd($cmd);
+  $sh->_logCmd($cmd);
 
 =head4 Description
 
@@ -629,7 +629,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

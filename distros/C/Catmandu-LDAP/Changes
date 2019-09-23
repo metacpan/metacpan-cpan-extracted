@@ -1,9 +1,12 @@
 Revision history for Catmandu-LDAP
 
+0.0105  2019-09-20 10:05:51 CEST
+  - add missing dependency
+
 0.0104  2017-02-23 09:50:43 CET
   - Moving to Dist::Milla
   - Adding POD
-  
+
 0.0103  2013-03-26
   - import confess
 

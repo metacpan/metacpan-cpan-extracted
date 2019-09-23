@@ -1,11 +1,11 @@
 package Quiq::ContentProcessor::SubType;
 use base qw/Quiq::ContentProcessor::BaseType/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ L<Quiq::ContentProcessor::BaseType>
 
 =head4 Synopsis
 
-    $sty = $class->create($sec,$parent);
+  $sty = $class->create($sec,$parent);
 
 =head4 Arguments
 
@@ -82,7 +82,7 @@ sub create {
 
 =head4 Synopsis
 
-    $name = $sty->name;
+  $name = $sty->name;
 
 =head4 Description
 
@@ -121,7 +121,7 @@ sub name {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -4,11 +4,13 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.076';
+our $VERSION = '0.101';
 use Exporter 'import';
-our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu
-                     insert_sep get_term_size get_term_width unicode_sprintf );
+our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
+                     insert_sep get_term_size get_term_width unicode_sprintf
+                     choose_a_dir choose_dirs ); # 21.09.2019    # after transition -> remove
 
+use Carp                  qw( croak );
 use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
 use File::Basename        qw( dirname );
@@ -18,21 +20,274 @@ use List::Util            qw( sum );
 use Encode::Locale qw();
 use File::HomeDir  qw();
 
-use Term::Choose           qw( choose );
-use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose                  qw( choose );
+use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose::ValidateOptions qw( validate_options );
 
 
-sub choose_dirs {
+
+sub new {
+    my $class = shift;
     my ( $opt ) = @_;
-    my ( $o, $start_dir ) = _prepare_opt_choose_path( $opt );
-    if ( ! defined $o->{prompt} ) {
-        $o->{prompt} = ' ';
+    my $instance_defaults = _defaults();
+    if ( defined $opt ) {
+        croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
+        validate_options( _valid_options( 'new' ), $opt );
+        for my $key ( keys %$opt ) {
+            $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
     }
+    my $self = bless $instance_defaults, $class;
+    $self->{backup_instance_defaults} = { %$instance_defaults };
+    return $self;
+}
+
+
+sub __restore_defaults {
+    my ( $self ) = @_;
+    if ( exists $self->{backup_instance_defaults} ) {
+        my $instance_defaults = $self->{backup_instance_defaults};
+        for my $key ( keys %$self ) {
+            if ( $key eq 'backup_instance_defaults' ) {
+                next;
+            }
+            elsif ( exists $instance_defaults->{$key} ) {
+                $self->{$key} = $instance_defaults->{$key};
+            }
+            else {
+                delete $self->{$key};
+            }
+        }
+    }
+}
+
+
+sub __prepare_opt {
+    my ( $self, $opt ) = @_;
+    if ( ! defined $opt ) {
+        $opt = {};
+    }
+    croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
+
+    ############################################################### 21.09.2019 # after transition -> remove,
+    if ( ! defined $opt->{init_dir} && defined $opt->{dir} ) {
+        $opt->{init_dir} = $opt->{dir};
+    }
+    if ( ! defined $opt->{parent_dir} && defined $opt->{up} ) {
+        $opt->{parent_dir} = $opt->{up};
+    }
+    if ( ! defined $opt->{current_selection_label} && defined $opt->{name} ) {
+        $opt->{current_selection_label} = $opt->{name};
+    }
+    if ( ! defined $opt->{alignment} && defined $opt->{justify} ) {
+        $opt->{alignment} = $opt->{justify};
+    }
+    if ( ! defined $opt->{thousands_separator} && defined $opt->{thsd_sep} ) {
+        $opt->{thousands_separator} = $opt->{thsd_sep};
+    }
+    if ( ! defined $opt->{current_selection_begin} && defined $opt->{sofar_begin} ) {
+        $opt->{current_selection_begin} = $opt->{sofar_begin};
+    }
+    if ( ! defined $opt->{current_selection_separator} && defined $opt->{sofar_separator} ) {
+        $opt->{current_selection_separator} = $opt->{sofar_separator};
+    }
+    if ( ! defined $opt->{current_selection_end} && defined $opt->{sofar_end} ) {
+        $opt->{current_selection_end} = $opt->{sofar_end};
+    }
+    ###############################################################
+
+    if ( %$opt ) {
+        my $sub =  ( caller( 1 ) )[3];
+        $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
+        validate_options( _valid_options( $sub ), $opt );
+        for my $key ( keys %$opt ) {
+            $self->{$key} = $opt->{$key} if defined $opt->{$key};
+        }
+    }
+}
+
+
+sub _valid_options {
+    my ( $caller ) = @_;
+    my %valid = (
+        all_by_default => '[ 0 1 ]',
+        clear_screen   => '[ 0 1 ]',
+        color          => '[ 0 1 ]',
+        decoded        => '[ 0 1 ]',
+        enchanted      => '[ 0 1 ]',
+        hide_cursor    => '[ 0 1 ]',
+        index          => '[ 0 1 ]',
+        keep_chosen    => '[ 0 1 ]',
+        mouse          => '[ 0 1 2 3 4 ]',     # 05.09.2019    # after transition -> '[ 0 1 ]',
+        order          => '[ 0 1 ]',
+        show_hidden    => '[ 0 1 ]',
+        small_first    => '[ 0 1 ]',
+        alignment      => '[ 0 1 2 ]',
+        layout         => '[ 0 1 2 3 ]',
+        lf             => 'ARRAY',
+        mark           => 'ARRAY',
+        info           => 'Str',
+        init_dir       => 'Str',
+        add_dir        => 'Str',
+        back           => 'Str',
+        show_files     => 'Str',
+        confirm        => 'Str',
+        parent_dir     => 'Str',
+        prefix         => 'Str',
+        prompt         => 'Str',
+        reset          => 'Str',
+        current_selection_begin     => 'Str',
+        current_selection_end       => 'Str',
+        current_selection_label     => 'Str',
+        current_selection_separator => 'Str',
+        thousands_separator         => 'Str',
+        ####################### 21.09.2019    # after transition -> remove
+        dir             => 'Str',
+        name            => 'Str',
+        up              => 'Str',
+        justify         => '[ 0 1 2 ]',
+        thsd_sep        => 'Str',
+        sofar_begin     => 'Str',
+        sofar_end       => 'Str',
+        sofar_separator => 'Str',
+        #######################
+    );
+    my $options;
+    if ( $caller eq 'new' ) {
+        $options = [ keys %valid ];
+    }
+    else {
+        $options = _routine_options( $caller );
+    }
+    return { map { $_ => $valid{$_} } @$options };
+};
+
+
+sub _defaults {
+    return {
+        alignment      => 0,
+        all_by_default => 1,
+        clear_screen   => 0,
+        color          => 0,
+        decoded        => 1,
+        enchanted      => 1,
+        hide_cursor    => 1,
+        index          => 0,
+        #info          => undef,
+        #init_dir      => undef
+        keep_chosen    => 0,
+        layout         => 1,
+        #lf            => undef,
+        add_dir        => 'ADD_DIR',
+        back           => 'BACK',
+        show_files     => 'SHOW_FILES',
+        confirm        => 'CONFIRM',
+        parent_dir     => 'PARENT_DIR',
+        #mark          => undef,
+        mouse          => 0,
+        order          => 1,
+        prefix         => '',
+        #prompt        => undef,
+        reset          => 'reset',
+        show_hidden    => 1,
+        small_first    => 0,
+        current_selection_begin     => '',
+        current_selection_end       => '',
+        #current_selection_label    => undef,
+        current_selection_separator => ', ',
+        thousands_separator         => ',',
+
+    };
+};
+
+
+sub _routine_options {
+    my ( $caller ) = @_;
+    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color lf current_selection_label
+                  dir name justify up thsd_sep sofar_begin sofar_end sofar_separator ) ); # 21.09.2019    # after transition remove: dir name justify up thsd_sep sofar_begin sofar_end sofar_separator
+    my $options;
+    if ( $caller eq 'choose_directories' ) {
+        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded add_dir ) ];
+    }
+    elsif ( $caller eq 'choose_a_directory' ) {
+        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded ) ];
+    }
+    elsif ( $caller eq 'choose_a_file' ) {
+        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden parent_dir decoded show_files ) ];
+    }
+    elsif ( $caller eq 'choose_a_number' ) {
+        $options = [ @every, qw( small_first reset thousands_separator) ];
+    }
+    elsif ( $caller eq 'choose_a_subset' ) {
+        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default current_selection_begin current_selection_end current_selection_separator mark ) ];
+    }
+    elsif ( $caller eq 'settings_menu' ) {
+        $options = [ @every ];
+    }
+    return $options;
+}
+
+
+sub __prepare_path {
+    my ( $self ) = @_;
+    my $init_dir;
+    if ( $self->{decoded} ) {
+        $init_dir = encode( 'locale_fs', $self->{init_dir} );
+    }
+    else {
+        $init_dir = $self->{init_dir};
+    }
+    if ( defined $init_dir && ! -d $init_dir ) {
+        my $prompt = "Could not find the directory \"$init_dir\". Falling back to the home directory.";
+        choose(
+            [ 'Press ENTER to continue' ],
+            { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
+        );
+        $init_dir = File::HomeDir->my_home();
+    }
+    if ( ! defined $init_dir ) {
+        $init_dir = File::HomeDir->my_home();
+    }
+    if ( ! -d $init_dir ) {
+        die "Could not find the home directory.";
+    }
+    return $init_dir;
+}
+
+
+sub _prepare_string { decode( 'locale_fs', shift ) }
+
+
+############################################################################# 21.09.2019    # after transition -> remove
+sub choose_dirs {
+    croak "'choose_dirs' is not a method and deprecated. Use 'choose_directories' instead." if ref $_[0] eq __PACKAGE__;
+    my $ob = __PACKAGE__->new();
+    delete $ob->{backup_instance_defaults};
+    return $ob->choose_directories( @_ );
+}
+sub choose_a_dir {
+    croak "'choose_a_dir' is not a method and deprecated. Use 'choose_a_directory' instead." if ref $_[0] eq __PACKAGE__;
+    my $ob = __PACKAGE__->new();
+    delete $ob->{backup_instance_defaults};
+    return $ob->choose_a_directory( @_ );
+}
+########################################################################################################################
+
+
+sub choose_directories {
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->choose_directories( @_ );
+    }
+    my ( $self, $opt ) = @_;
+    $self->__prepare_opt( $opt );
+    my $init_dir = $self->__prepare_path();
     my $new = [];
-    my $dir = realpath $start_dir;
+    my $dir = realpath $init_dir;
     my $prev_encoded = $dir;
-    my @pre = ( undef, $o->{confirm}, $o->{add_dir}, $o->{up} );
-    my $default_idx = $o->{enchanted}  ? $#pre : 0;
+    my @pre = ( undef, $self->{confirm}, $self->{add_dir}, $self->{parent_dir} );
+    my $default_idx = $self->{enchanted}  ? $#pre : 0;
 
     while ( 1 ) {
         my ( $dh, @dirs );
@@ -43,33 +298,33 @@ sub choose_dirs {
             print "$@";
             choose(
                 [ 'Press Enter:' ],
-                { prompt => '', hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
             );
             $dir = dirname $dir;
             next;
         }
         while ( my $file = readdir $dh ) {
             next if $file =~ /^\.\.?\z/;
-            next if $file =~ /^\./ && ! $o->{show_hidden};
+            next if $file =~ /^\./ && ! $self->{show_hidden};
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
         my @tmp;
-        if ( ! defined $o->{name} ) {
-            $o->{name} = 'New: ';
+        if ( ! defined $self->{current_selection_label} ) {
+            $self->{current_selection_label} = 'Dirs: ';
         }
-        push @tmp, $o->{name} . join( ', ', map { s/ /\ /g; $_ } @$new );
-        push @tmp, ' ++' . decode( 'locale_fs', "[$prev_encoded]" );
-        if ( length $o->{prompt} ) {
-            push @tmp, $o->{prompt};
+        push @tmp, $self->{current_selection_label} . join( ', ', map { s/ /\ /g; $_ } @$new ) . '    <<-add-dir-' . decode( 'locale_fs', "[ $prev_encoded ]" );
+        if ( length $self->{prompt} ) {
+            push @tmp, $self->{prompt};
         }
         my $lines = join( "\n", @tmp );
         # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
-              lf => [ 0, length $o->{name} ], alignment => $o->{alignment}, layout => $o->{layout}, order => $o->{order},
-              clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
+            { info => $self->{info}, prompt => $lines, default => $default_idx, alignment => $self->{alignment},
+              layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              color => $self->{color}, lf => $self->{lf}, undef => $self->{back} }
         );
         if ( ! defined $choice ) {
             if ( @$new ) {
@@ -77,14 +332,16 @@ sub choose_dirs {
                 $default_idx = 0;
                 next;
             }
+            $self->__restore_defaults();
             return;
         }
-        $default_idx = $o->{enchanted}  ? $#pre : 0;
-        if ( $choice eq $o->{confirm} ) {
+        $default_idx = $self->{enchanted}  ? $#pre : 0;
+        if ( $choice eq $self->{confirm} ) {
+            $self->__restore_defaults();
             return $new;
         }
-        elsif ( $choice eq $o->{add_dir} ) {
-            if ( $o->{decoded} ) {
+        elsif ( $choice eq $self->{add_dir} ) {
+            if ( $self->{decoded} ) {
                 push @$new, decode( 'locale_fs', $prev_encoded );
             }
             else {
@@ -95,77 +352,41 @@ sub choose_dirs {
             $prev_encoded = $dir;
             next;
         }
-        $dir = $choice eq $o->{up} ? dirname( $dir ) : catdir( $dir, encode 'locale_fs', $choice );
+        $dir = $choice eq $self->{parent_dir} ? dirname( $dir ) : catdir( $dir, encode 'locale_fs', $choice );
         $default_idx = 0 if $prev_encoded eq $dir;
         $prev_encoded = $dir;
     }
 }
 
 
-sub _prepare_opt_choose_path {
-    my ( $opt ) = @_;
-    if ( ! defined $opt ) {
-        $opt = {};
+sub choose_a_directory {
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->choose_a_directory( @_ );
     }
-    my $dir = encode( 'locale_fs', $opt->{dir} ); # documentation ###
-    if ( defined $dir && ! -d $dir ) {
-        my $prompt = "Could not find the directory \"$dir\". Falling back to the home directory.";
-        choose(
-            [ 'Press ENTER to continue' ],
-            { prompt => $prompt, hide_cursor => $opt->{hide_cursor}, mouse => $opt->{mouse} }
-        );
-        $dir = File::HomeDir->my_home();
-    }
-    $dir = File::HomeDir->my_home()                  if ! defined $dir;
-    die "Could not find the home directory \"$dir\"" if ! -d $dir;
-    my $defaults =  {
-        info         => '',
-        name         => undef,
-        prompt       => undef,
-        show_hidden  => 1,
-        clear_screen => 0,
-        mouse        => 0,
-        layout       => 1,
-        order        => 1,
-        alignment    => 0,
-        hide_cursor  => 1,
-        enchanted    => 1,
-        confirm      => ' OK ',
-        add_dir      => ' ++ ',
-        up           => ' .. ',
-        choose_file => ' >F ',
-        back         => ' << ',
-        decoded      => 1,
-    };
-    #for my $opt ( keys %$opt ) {
-    #    die "$opt: invalid option!" if ! exists $defaults->{$opt};
-    #}
-    my $o = {};
-    for my $key ( keys %$defaults ) {
-        $o->{$key} = defined $opt->{$key} ? $opt->{$key} : $defaults->{$key};
-    }
-    return $o, $dir;
-}
-
-
-sub _prepare_string { decode( 'locale_fs', shift ) }
-
-
-sub choose_a_dir {
-    my ( $opt ) = @_;
-    return _choose_a_path( $opt, 0 );
+    my ( $self, $opt ) = @_;
+    $self->__prepare_opt( $opt );
+    my $init_dir = $self->__prepare_path();
+    return $self->__choose_a_path( $init_dir, 0 );
 }
 
 sub choose_a_file {
-    my ( $opt ) = @_;
-    return _choose_a_path( $opt, 1 );
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->choose_a_file( @_ );
+    }
+    my ( $self, $opt ) = @_;
+    $self->__prepare_opt( $opt );
+    my $init_dir = $self->__prepare_path();
+    return $self->__choose_a_path( $init_dir, 1 );
 }
 
-sub _choose_a_path {
-    my ( $opt, $a_file ) = @_;
-    my ( $o, $dir ) = _prepare_opt_choose_path( $opt );
-    my @pre = ( undef, ( $a_file ? $o->{choose_file} : $o->{confirm} ), $o->{up} );
-    my $default_idx = $o->{enchanted}  ? 2 : 0;
+sub __choose_a_path {
+    my ( $self, $dir, $a_file ) = @_;
+    my @pre = ( undef, ( $a_file ? $self->{show_files} : $self->{confirm} ), $self->{parent_dir} );
+    my $default_idx = $self->{enchanted}  ? 2 : 0;
     my $prev_encoded = $dir;
     my $wildcard = ' ? ';
 
@@ -178,53 +399,69 @@ sub _choose_a_path {
             print "$@";
             choose(
                 [ 'Press Enter:' ],
-                { prompt => '', hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
             );
             $dir = dirname $dir;
             next;
         }
         while ( my $file = readdir $dh ) {
             next if $file =~ /^\.\.?\z/;
-            next if $file =~ /^\./ && ! $o->{show_hidden};
+            next if $file =~ /^\./ && ! $self->{show_hidden};
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
         my @tmp;
-        if ( ! defined $o->{name} ) {
-            $o->{name} = 'New: '; # a_file
+        if ( ! defined $self->{current_selection_label} ) {
+            $self->{current_selection_label} = $a_file ? 'File: ' : 'Dir: ';
         }
         if ( $a_file ) {
-            push @tmp, $o->{name} . _prepare_string( catfile $dir, $wildcard );
+            push @tmp, $self->{current_selection_label} . _prepare_string( catfile $dir, $wildcard );
         }
         else {
-            push @tmp, $o->{name} . _prepare_string( $dir );
+            push @tmp, $self->{current_selection_label} . _prepare_string( $dir );
         }
-        if ( defined $o->{prompt} && length $o->{prompt} ) {
-            push @tmp, $o->{prompt};
+        if ( defined $self->{prompt} && length $self->{prompt} ) {
+            push @tmp, $self->{prompt};
         }
         my $lines = join( "\n", @tmp );
         # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $lines, info => $o->{info}, undef => $o->{back}, default => $default_idx,
-              mouse => $o->{mouse}, hide_cursor => $o->{hide_cursor}, alignment => $o->{alignment},
-              layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
+            { info => $self->{info}, prompt => $lines, default => $default_idx, alignment => $self->{alignment},
+              layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              color => $self->{color}, lf => $self->{lf}, undef => $self->{back} }
         );
         if ( ! defined $choice ) {
+            $self->__restore_defaults();
             return;
         }
-        elsif ( $choice eq $o->{confirm} ) {
-            return decode 'locale_fs', $prev_encoded if $o->{decoded};
-            return $prev_encoded;
+        elsif ( $choice eq $self->{confirm} ) {
+            my $returned_dir;
+            if ( $self->{decoded} ) {
+                $returned_dir = decode 'locale_fs', $prev_encoded
+            }
+            else {
+                $returned_dir = $prev_encoded;
+            }
+            $self->__restore_defaults();
+            return $returned_dir;
         }
-        elsif ( $choice eq $o->{choose_file} ) {
-            my $file = _a_file( $o, $dir, $wildcard );
+        elsif ( $choice eq $self->{show_files} ) {
+            my $file = $self->__a_file( $dir, $wildcard );
             next if ! length $file;
-            return decode 'locale_fs', $file if $o->{decoded};
-            return $file;
+            my $returned_file;
+            if ( $self->{decoded} ) {
+                $returned_file = decode 'locale_fs', $file;
+            }
+            else {
+                $returned_file = $file;
+            }
+            $self->__restore_defaults();
+            return $returned_file;
         }
         $choice = encode( 'locale_fs', $choice );
-        if ( $choice eq $o->{up} ) {
+        if ( $choice eq $self->{parent_dir} ) {
             $dir = dirname $dir;
         }
         else {
@@ -234,17 +471,17 @@ sub _choose_a_path {
             $default_idx = 0;
         }
         else {
-            $default_idx = $o->{enchanted}  ? 2 : 0;
+            $default_idx = $self->{enchanted}  ? 2 : 0;
         }
         $prev_encoded = $dir;
     }
 }
 
 
-
-sub _a_file {
-    my ( $o, $dir, $wildcard ) = @_;
+sub __a_file {
+    my ( $self, $dir, $wildcard ) = @_;
     my $prev_encoded = '';
+    my $chosen_file;
 
     while ( 1 ) {
         my ( $dh, @files );
@@ -255,13 +492,13 @@ sub _a_file {
             print "$@";
             choose(
                 [ 'Press Enter:' ],
-                { prompt => '', hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+                { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
             );
             return;
         }
         while ( my $file = readdir $dh ) {
             next if $file =~ /^\.\.?\z/;
-            next if $file =~ /^\./ && ! $o->{show_hidden};
+            next if $file =~ /^\./ && ! $self->{show_hidden};
             push @files, decode( 'locale_fs', $file ) if -f catdir $dir, $file;
         }
         closedir $dh;
@@ -269,110 +506,125 @@ sub _a_file {
             my $prompt =  sprintf "No files in %s.", _prepare_string( $dir );
             choose(
                 [ ' < ' ],
-                { prompt => $prompt, hide_cursor => $o->{hide_cursor}, mouse => $o->{mouse} }
+                { prompt => $prompt, hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse} }
             );
             return;
         }
         my @tmp;
-        if ( ! defined $o->{name} ) {
-            $o->{name} = 'New: '; # file
+        if ( ! defined $self->{current_selection_label} ) {
+            $self->{current_selection_label} = 'New: '; # file
         }
-        push @tmp, $o->{name} . _prepare_string( catfile $dir, length $prev_encoded ? $prev_encoded : $wildcard );
-        if ( defined $o->{prompt} && length $o->{prompt} ) {
-            push @tmp, $o->{prompt};
+        push @tmp, $self->{current_selection_label} . _prepare_string( catfile $dir, length $prev_encoded ? $prev_encoded : $wildcard );
+        if ( defined $self->{prompt} && length $self->{prompt} ) {
+            push @tmp, $self->{prompt};
         }
         my $lines = join( "\n", @tmp );
-        my @pre = ( undef, $o->{confirm} );
+        my @pre = ( undef );
+        if ( $chosen_file ) {
+            push @pre, $self->{confirm};
+        }
         # Choose
-        my $choice = choose(
+        $chosen_file = choose(
             [ @pre, sort( @files ) ],
-            { prompt => $lines, info => $o->{info}, undef => $o->{back}, mouse => $o->{mouse}, alignment => $o->{alignment},
-              layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
+            { info => $self->{info}, prompt => $lines, alignment => $self->{alignment},
+              layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              color => $self->{color}, lf => $self->{lf}, undef => $self->{back} }
         );
-        if ( ! length $choice ) {
+        if ( ! length $chosen_file ) {
             return;
         }
-        elsif ( $choice eq $o->{confirm} ) {
+        elsif ( $chosen_file eq $self->{confirm} ) {
             return if ! length $prev_encoded;
             return catfile $dir, $prev_encoded;
         }
         else {
-            $prev_encoded = encode( 'locale_fs', $choice );
+            $prev_encoded = encode( 'locale_fs', $chosen_file );
         }
     }
 }
 
 
 sub choose_a_number {
-    my ( $digits, $opt ) = @_;
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->choose_a_number( @_ );
+    }
+    my ( $self, $digits, $opt ) = @_;
     if ( ref $digits ) {
         $opt = $digits;
         $digits = 7;
     }
-    if ( ! defined $opt ) {
-        $opt = {};
-    }
-    my $info        = defined $opt->{info}         ? $opt->{info}         : '';
-    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : '';
-    my $name        =         $opt->{name};
-    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $small       = defined $opt->{small_first}  ? $opt->{small_first}  : 0;
-    my $thsd_sep    = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
-    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $back        = defined $opt->{back}         ? $opt->{back}         : '<<'; #'BACK';
-    my $confirm     = defined $opt->{confirm}      ? $opt->{confirm}      : 'OK'; #'CONFIRM';
-    my $hide_cursor = defined $opt->{hide_cursor}  ? $opt->{hide_cursor}  : 1;
-    #-------------------------------------------#
-    my $back_short = defined $opt->{back_short}   ? $opt->{back_short}   : '<<';
-    my $reset      = defined $opt->{reset}        ? $opt->{reset}        : 'reset';
+    $self->__prepare_opt( $opt );
     my $tab        = '  -  ';
-    my $len_tab = print_columns( $tab ); #
-    my $longest = $digits + int( ( $digits - 1 ) / 3 ) * length $thsd_sep;
+    my $tab_w = print_columns( $tab );
+    my $sep_w;
+    if ( $self->{color} ) {
+        ( my $tmp_sep = $self->{thousands_separator} ) =~ s/\e\[[\d;]*m//msg;
+        $sep_w = print_columns( $tmp_sep );
+    }
+    else {
+        $sep_w = print_columns( $self->{thousands_separator} );
+    }
+    my $longest = $digits + int( ( $digits - 1 ) / 3 ) * $sep_w;
     my @choices_range = ();
     for my $di ( 0 .. $digits - 1 ) {
         my $begin = 1 . '0' x $di;
         $begin = 0 if $di == 0;
-        $begin = insert_sep( $begin, $thsd_sep );
+        $begin = insert_sep( $begin, $self->{thousands_separator} );
         ( my $end = $begin ) =~ s/^[01]/9/;
         unshift @choices_range, sprintf " %*s%s%*s", $longest, $begin, $tab, $longest, $end;
     }
-    my $confirm_tmp = sprintf "%-*s", $longest * 2 + $len_tab, $confirm;
-    my $back_tmp    = sprintf "%-*s", $longest * 2 + $len_tab, $back;
+    my ( $back_w, $confirm_w );
+    if ( $self->{color} ) {
+        ( my $tmp_back    = $self->{back}    ) =~ s/\e\[[\d;]*m//msg;
+        ( my $tmp_confirm = $self->{confirm} ) =~ s/\e\[[\d;]*m//msg;
+        $back_w    = print_columns( $tmp_back    );
+        $confirm_w = print_columns( $tmp_confirm );
+    }
+    else {
+        $back_w    = print_columns( $self->{back}    );
+        $confirm_w = print_columns( $self->{confirm} );
+    }
+    my $back_tmp    = $self->{back}    . ' ' x ( $longest * 2 + $tab_w + 1 - $back_w );
+    my $confirm_tmp = $self->{confirm} . ' ' x ( $longest * 2 + $tab_w + 1 - $confirm_w );
     if ( print_columns( "$choices_range[0]" ) > get_term_width() ) {
         @choices_range = ();
         for my $di ( 0 .. $digits - 1 ) {
             my $begin = 1 . '0' x $di;
             $begin = 0 if $di == 0;
-            $begin = insert_sep( $begin, $thsd_sep );
+            $begin = insert_sep( $begin, $self->{thousands_separator} );
             unshift @choices_range, sprintf "%*s", $longest, $begin;
         }
-        $confirm_tmp = $confirm;
-        $back_tmp    = $back;
+        $confirm_tmp = $self->{confirm};
+        $back_tmp    = $self->{back};
     }
     my %numbers;
     my $result;
-    if ( ! defined $name ) {
-        $name = '> ';
+    if ( ! defined $self->{current_selection_label} ) {
+        $self->{current_selection_label} = '> ';
     }
 
     NUMBER: while ( 1 ) {
 
         my $new_result = length $result ? $result : '';
-        my $row = sprintf(  "${name}%*s", $longest, $new_result );
+        my $row = sprintf(  "%s%*s", $self->{current_selection_label}, $longest, $new_result );
         if ( print_columns( $row ) > get_term_width() ) {
             $row = $new_result;
         }
         my @tmp = ( $row );
-        if ( length $prompt ) {
-            push @tmp, $prompt;
+        if ( length $self->{prompt} ) {
+            push @tmp, $self->{prompt};
         }
         my $lines = join "\n", @tmp;
         my @pre = ( undef, $confirm_tmp ); # confirm if $result ?
         # Choose
         my $range = choose(
-            $small ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
-            { prompt => $lines, info => $info, layout => 3, alignment => 1, mouse => $mouse,
-              clear_screen => $clear, undef => $back_tmp, hide_cursor => $hide_cursor }
+            $self->{small_first} ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
+            { info => $self->{info}, prompt => $lines, layout => 3, alignment => 1, mouse => $self->{mouse},
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
+              lf => $self->{lf}, undef => $back_tmp }
         );
         if ( ! defined $range ) {
             if ( defined $result ) {
@@ -381,108 +633,97 @@ sub choose_a_number {
                 next NUMBER;
             }
             else {
+                $self->__restore_defaults();
                 return;
             }
         }
         if ( $range eq $confirm_tmp ) {
-            return if ! defined $result;
-            $result =~ s/\Q$thsd_sep\E//g if $thsd_sep ne '';
+            if ( $self->{thousands_separator} ne '' && defined $result ) {
+                $result =~ s/\Q$self->{thousands_separator}\E//g;
+            }
+            $self->__restore_defaults();
             return $result;
         }
         my $zeros = ( split /\s*-\s*/, $range )[0];
         $zeros =~ s/^\s*\d//;
         my $zeros_no_sep;
-        if ( $thsd_sep eq '' ) {
+        if ( $self->{thousands_separator} eq '' ) {
             $zeros_no_sep = $zeros;
         }
         else {
-            ( $zeros_no_sep = $zeros ) =~ s/\Q$thsd_sep\E//g;
+            ( $zeros_no_sep = $zeros ) =~ s/\Q$self->{thousands_separator}\E//g;
         }
         my $count_zeros = length $zeros_no_sep;
         my @choices = $count_zeros ? map( $_ . $zeros, 1 .. 9 ) : ( 0 .. 9 );
         # Choose
         my $number = choose(
-            [ undef, @choices, $reset ],
-            { prompt => $lines, layout => 1, alignment => 2, order => 0, hide_cursor => $hide_cursor,
-              mouse => $mouse, clear_screen => $clear, undef => $back_short }
+            [ undef, @choices, $self->{reset} ],
+            { info => $self->{info}, prompt => $lines, layout => 1, alignment => 2, order => 0,
+              mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              color => $self->{color}, lf => $self->{lf}, undef => '<<' }
         );
         next if ! defined $number;
-        if ( $number eq $reset ) {
+        if ( $number eq $self->{reset} ) {
             delete $numbers{$count_zeros};
         }
         else {
-            $number =~ s/\Q$thsd_sep\E//g if $thsd_sep ne '';
+            $number =~ s/\Q$self->{thousands_separator}\E//g if $self->{thousands_separator} ne '';
             $numbers{$count_zeros} = $number;
         }
         $result = sum( @numbers{keys %numbers} );
-        $result = insert_sep( $result, $thsd_sep );
+        $result = insert_sep( $result, $self->{thousands_separator} );
     }
 }
 
 
 sub choose_a_subset {
-    my ( $available, $opt ) = @_;
-    if ( ! defined $opt ) {
-        $opt = {};
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->choose_a_subset( @_ );
     }
-    my $info        = defined $opt->{info}            ? $opt->{info}            : '';
-    my $name        =         $opt->{name};
-    my $prompt      = defined $opt->{prompt}          ? $opt->{prompt}          : '';
-    my $keep_chosen = defined $opt->{keep_chosen}     ? $opt->{keep_chosen}     : 0;
-    my $mark        =         $opt->{mark};
-    my $index       = defined $opt->{index}           ? $opt->{index}           : 0;
-    my $clear       = defined $opt->{clear_screen}    ? $opt->{clear_screen}    : 0;
-    my $mouse       = defined $opt->{mouse}           ? $opt->{mouse}           : 0;
-    my $layout      = defined $opt->{layout}          ? $opt->{layout}          : 3;
-    my $order       = defined $opt->{order}           ? $opt->{order}           : 1;
-    my $prefix      = defined $opt->{prefix}          ? $opt->{prefix}          : ( $layout == 3 ? '  ' : '' );
-    my $alignment   = defined $opt->{alignment}       ? $opt->{alignment}       : 0;
-    my $confirm     = defined $opt->{confirm}         ? $opt->{confirm}         : ( ' ' x length $prefix ) . '-OK-';
-    my $back        = defined $opt->{back}            ? $opt->{back}            : ( ' ' x length $prefix ) . ' << ';
-    my $hide_cursor = defined $opt->{hide_cursor}     ? $opt->{hide_cursor}     : 1;
-    my $default_all = defined $opt->{all_by_default}  ? $opt->{all_by_default}  : 1; # documentation
-    my $list_begin  = defined $opt->{sofar_begin}     ? $opt->{sofar_begin}     : '';
-    my $list_sep    = defined $opt->{sofar_separator} ? $opt->{sofar_separator} : ', ';
-    my $list_end    = defined $opt->{sofar_end}       ? $opt->{sofar_end}       : '';
-    #--------------------------------------#
-    #my $subseq_tab = 4;
-    #my $subseq_tab = print_columns( $name || '  ' );
+    my ( $self, $available, $opt ) = @_;
+    $self->__prepare_opt( $opt );
     my $new_idx =[];
     my $curr_avail = [ @$available ];
     my $bu = [];
+    my @pre = ( undef, $self->{confirm} );
 
     while ( 1 ) {
         my @tmp;
-        my $sofar = $name;
+        my $sofar = defined $self->{current_selection_label} ? $self->{current_selection_label} : '';
         #if ( @{$available}[@$new_idx] ) {
         if ( @$new_idx ) {
-            $sofar .= $list_begin . join( $list_sep, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $list_end;
+            $sofar .= $self->{current_selection_begin} . join( $self->{current_selection_separator}, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $self->{current_selection_end};
         }
         elsif ( $opt->{all_by_default} ) {
-            $sofar .= $list_begin . '*' . $list_end;
+            $sofar .= $self->{current_selection_begin} . '*' . $self->{current_selection_end};
         }
         @tmp = ( $sofar );
-        if ( length $prompt ) {
-            push @tmp, $prompt;
+        if ( length $self->{prompt} ) {
+            push @tmp, $self->{prompt};
         }
-        my @pre = ( undef, $confirm );
-        if ( defined $mark && @$mark ) {
-            $mark = [ map { $_ + @pre } @$mark ];
+
+        if ( defined $self->{mark} && @{$self->{mark}} ) {
+            $self->{mark} = [ map { $_ + @pre } @{$self->{mark}} ];
         }
         my $lines = join "\n", @tmp;
         # Choose
         my @idx = choose(
-            [ @pre, map { $prefix . ( defined $_ ? $_ : '' ) } @$curr_avail ],
-            { prompt => $lines, info => $info, layout => $layout, mouse => $mouse, clear_screen => $clear,
-              alignment => $alignment, index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ],
-              undef => $back, hide_cursor => $hide_cursor, mark => $mark, include_highlighted => 2 }
+            [ @pre, map { $self->{prefix} . ( defined $_ ? $_ : '' ) } @$curr_avail ],
+            { info => $self->{info}, prompt => $lines, layout => $self->{layout}, index => 1,
+              alignment => $self->{alignment}, order => $self->{order}, mouse => $self->{mouse},
+              meta_items => [ 0 .. $#pre ], mark => $self->{mark}, include_highlighted => 2,
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              color => $self->{color}, lf => $self->{lf}, undef => $self->{back} }
         );
-        $mark = undef;
+        $self->{mark} = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
             if ( @$bu ) {
                 ( $curr_avail, $new_idx ) = @{pop @$bu};
                 next;
             }
+            $self->__restore_defaults();
             return;
         }
         push @$bu, [ [ @$curr_avail ], [ @$new_idx ] ];
@@ -490,7 +731,7 @@ sub choose_a_subset {
         my @tmp_idx;
         for my $i ( reverse @idx ) {
             $i -= @pre;
-            if ( ! $keep_chosen ) {
+            if ( ! $self->{keep_chosen} ) {
                 splice( @$curr_avail, $i, 1 );
                 for my $used_i ( sort { $a <=> $b } @$new_idx ) {
                     last if $used_i > $i;
@@ -504,33 +745,39 @@ sub choose_a_subset {
             if ( ! @$new_idx && $opt->{all_by_default} ) {
                 $new_idx = [ 0 .. $#{$available} ];
             }
-            return $index ? $new_idx : [ @{$available}[@$new_idx] ];
+            $self->__restore_defaults();
+            return $self->{index} ? $new_idx : [ @{$available}[@$new_idx] ];
         }
     }
 }
 
 
 sub settings_menu {
-    my ( $menu, $curr, $opt ) = @_;
-    if ( ! defined $opt ) {
-        $opt = {};
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->settings_menu( @_ );
     }
-    die "'in_place' is no longer a valid option!'" if exists $opt->{in_place} && defined $opt->{in_place}; ###
-    my $info        = defined $opt->{info}         ? $opt->{info}         : '';
-    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
-    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $confirm     = defined $opt->{confirm}      ? $opt->{confirm}      : 'CONFIRM';
-    my $back        = defined $opt->{back}         ? $opt->{back}         : 'BACK';
-    my $hide_cursor = defined $opt->{hide_cursor}  ? $opt->{hide_cursor}  : 1;
-    $back    = '  ' . $back;
-    $confirm = '  ' . $confirm;
+    my ( $self, $menu, $curr, $opt ) = @_;
+    $self->__prepare_opt( $opt );
+    if ( ! defined $self->{prompt} ) {
+        $self->{prompt} = 'Choose:'; # choose default prompt
+    }
+    $self->{back}    = '  ' . $self->{back};
+    $self->{confirm} = '  ' . $self->{confirm};
     my $longest = 0;
     my $new     = {};
+    my $name_w  = {};
     for my $sub ( @$menu ) {
         my ( $key, $name ) = @$sub;
-        my $name_w = print_columns( "$name" );
-        $longest      = $name_w if $name_w > $longest;
+        if ( $self->{color} ) {
+            ( my $tmp_name = $name ) =~ s/\e\[[\d;]*m//msg;
+            $name_w->{$key} = print_columns( $tmp_name );
+        }
+        else {
+            $name_w->{$key} = print_columns( $name );
+        }
+        $longest      = $name_w->{$key} if $name_w->{$key} > $longest;
         $curr->{$key} = 0       if ! defined $curr->{$key};
         $new->{$key}  = $curr->{$key};
     }
@@ -538,21 +785,31 @@ sub settings_menu {
     for my $sub ( @$menu ) {
         my ( $key, $name, $values ) = @$sub;
         my $current = $values->[$new->{$key}];
-        push @print_keys, sprintf "%-*s [%s]", $longest, $name, $current;
+        push @print_keys, $name . ( ' '  x ( $longest - $name_w->{$key} ) ) . " [$current]";
     }
-    my @pre = ( undef, $confirm );
+    my @pre = ( undef, $self->{confirm} );
     $ENV{TC_RESET_AUTO_UP} = 0;
     my $default = 0;
     my $count = 0;
 
     while ( 1 ) {
+        my @tmp;
+        if ( defined $self->{current_selection_label} ) {
+            push @tmp, $self->{current_selection_label} . '' . join( ', ', map { "$_=$new->{$_}" } keys %$new ) . '';
+        }
+        if ( defined $self->{prompt} && length $self->{prompt} ) {
+            push @tmp, $self->{prompt};
+        }
+        my $lines = join( "\n", @tmp );
         # Choose
         my $idx = choose(
             [ @pre, @print_keys ],
-            { prompt => $prompt, info => $info, index => 1, default => $default, layout => 3, alignment => 0,
-              mouse => $mouse, clear_screen => $clear, undef => $back, hide_cursor => $hide_cursor }
+            { info => $self->{info}, prompt => $lines, index => 1, default => $default, layout => 3, alignment => 0,
+              mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              color => $self->{color}, lf => $self->{lf}, undef => $self->{back} }
         );
         if ( ! $idx ) {
+            $self->__restore_defaults();
             return;
         }
         elsif ( $idx == $#pre ) {
@@ -565,6 +822,7 @@ sub settings_menu {
                 $curr->{$key} = $new->{$key};
                 $change++;
             }
+            $self->__restore_defaults();
             return $change; #
         }
         my $i = $idx - @pre;
@@ -585,17 +843,17 @@ sub settings_menu {
             $default = $idx;
         }
         ++$count;
-        ++$new->{$key};
+        my $curr_value = $values->[$new->{$key}];
+        $new->{$key}++;
         if ( $new->{$key} == @$values ) {
             $new->{$key} = 0;
         }
-        $print_keys[$i] =~ s/\[[^\[\]]+\]\z/[$values->[$new->{$key}]]/;
+        my $new_value = $values->[$new->{$key}];
+        $print_keys[$i] =~ s/  \[ \Q$curr_value\E \] \z /[$new_value]/x;
     }
 }
 
 
-
-# Removed documentation 08.02.2018:
 
 sub insert_sep {
     my ( $number, $separator ) = @_;
@@ -645,6 +903,8 @@ sub unicode_sprintf {
 
 
 
+
+
 1;
 
 __END__
@@ -655,21 +915,36 @@ __END__
 
 =head1 NAME
 
-Term::Choose::Util - CLI related functions.
+Term::Choose::Util - TUI-related functions for selecting directories, files, numbers and subsets of lists.
 
 =head1 VERSION
 
-Version 0.076
+Version 0.101
 
 =cut
 
 =head1 SYNOPSIS
 
+Functional interface:
+
+    use Term::Choose::Util qw( choose_a_directory );
+
+    my $chosen_directory = choose_a_directory();
+
+Object-oriented interface:
+
+    use Term::Choose::Util;
+
+    my $ob = Term::Choose->new ();
+
+    my $chosen_directory = $ob->choose_a_directory();
+
+
 See L</SUBROUTINES>.
 
 =head1 DESCRIPTION
 
-This module provides some CLI related functions required by L<App::DBBrowser>, L<App::YTDL> and L<Term::TablePrint>.
+This module provides TUI-related functions for selecting directories, files, numbers and subsets of lists.
 
 =head1 EXPORT
 
@@ -679,9 +954,9 @@ Nothing by default.
 
 Values in brackets are default values.
 
-Unknown option names are ignored.
+Options are passed as a hash reference. The options argument is the last (or the only) argument.
 
-Options available for all functions:
+=head3 Options available for all subroutines
 
 =over
 
@@ -695,17 +970,11 @@ Values: [0],1.
 
 =item
 
-info
+color
 
-A string placed on top of of the output.
+Enables the support for color and text formatting escape sequences.
 
-=item
-
-mouse
-
-See the option I<mouse> in L<Term::Choose>
-
-Values: [0],1,2,3,4.
+Values: [0],1.
 
 =item
 
@@ -717,40 +986,85 @@ Values: 0,[1].
 
 =item
 
+info
+
+A string placed on top of of the output.
+
+Default: undef
+
+=item
+
+mouse
+
+Enable the mouse mode. An item can be chosen with the left mouse key, the right mouse key can be used instead of the
+SpaceBar key.
+
+Values: [0],1.
+
+=item
+
+current_selection_label
+
+The value of I<current_selection_label> is a string which is placed in front of the "chosen so far" info output.
+
+With C<settings_menu> the "chosen so far" info output is only shown if I<current_selection_label> is defined.
+
+Defaults: C<choose_directories>: 'Dirs: ', C<choose_a_directory>: 'Dir: ', C<choose_a_file>: 'File: ', C<choose_a_number>: ' >',
+C<choose_a_subset>: '', C<settings_menu>: undef
+
+The "chosen so far" info output is placed between the I<info> string and the I<prompt> string.
+
+=item
+
 prompt
 
 A string placed on top of the available choices.
 
+Default: undef
+
+=item
+
 back
 
-Allows to overwrite the default string of the menu entry "back".
+Customize the string of the menu entry "back".
+
+Default: C<BACK>
 
 =item
 
 confirm
 
-Allows to overwrite the default string of the menu entry "confirm".
+Customize the string of the menu entry "confirm".
+
+Default: C<CONFIRM>.
 
 =back
 
-=head2 choose_a_dir
+=head2 new
 
-    $chosen_directory = choose_a_dir( { layout => 1, ... } )
+    $ob = Term::Choose::Util->new( { mouse => 1, ... } );
 
-With C<choose_a_dir> the user can browse through the directory tree (as far as the granted rights permit it) and
-choose a directory which is returned.
+Returns a new Term::Choose::Util object.
+
+Options: all
+
+=head2 choose_a_directory
+
+    $chosen_directory = choose_a_directory( { layout => 1, ... } )
+
+With C<choose_a_directory> the user can browse through the directory tree and choose a directory which is then returned.
 
 To move around in the directory tree:
 
 - select a directory and press C<Return> to enter in the selected directory.
 
-- choose the "up"-menu-entry (C< .. >) to move upwards.
+- choose the "parent_dir" menu entry to move upwards.
 
-To return the current working-directory as the chosen directory choose C< OK >.
+To return the current working-directory as the chosen directory choose the "confirm" menu entry.
 
-The "back"-menu-entry (C< << >) causes C<choose_a_dir> to return nothing.
+The "back" menu entry causes C<choose_a_directory> to return nothing.
 
-As an argument it can be passed a reference to a hash. With this hash the user can set the different options:
+Options:
 
 =over
 
@@ -758,7 +1072,7 @@ As an argument it can be passed a reference to a hash. With this hash the user c
 
 alignment
 
-Elements in columns are left justified if set to 0, right justified if set to 1 and centered if set to 2.
+Elements in columns are aligned to the left if set to 0, aligned to the right if set to 1 and centered if set to 2.
 
 Values: [0],1,2.
 
@@ -772,16 +1086,9 @@ Values: 0,[1].
 
 =item
 
-dir
-
-Set the starting point directory. Defaults to the home directory or the current working directory if the home directory
-cannot be found.
-
-=item
-
 enchanted
 
-If set to 1, the default cursor position is on the "up" menu entry. If the directory name remains the same after an
+If set to 1, the default cursor position is on the "parent_dir" menu entry. If the directory name remains the same after an
 user input, the default cursor position changes to "back".
 
 If set to 0, the default cursor position is on the "back" menu entry.
@@ -790,9 +1097,11 @@ Values: 0,[1].
 
 =item
 
-justify
+init_dir
 
-Deprecated. Use I<alignment> instead.
+Set the starting point directory. Defaults to the home directory.
+
+If the option I<decoded> is enabled (default), I<init_dir> expects the directory path as a decoded string.
 
 =item
 
@@ -822,63 +1131,74 @@ Values: 0,[1].
 
 =item
 
-up
+parent_dir
 
-Overwrite the default string (C< .. >) of the menu entry "up".
+Customize the string of the menu entry "parent_dir".
+
+Default: C<PARENT>
 
 =back
 
 =head2 choose_a_file
 
-    $chosen_file = choose_a_file( { layout => 1, ... } )
+    $chosen_file = choose_a_file( { show_hidden => 0, ... } )
 
-Browse the directory tree the same way as described for C<choose_a_dir>. Select C<E<gt>F> (string can be changed with
-the option I<choose_file>) to get the files of the current directory. To return the chosen file select C< OK >.
+Browse the directory tree the same way as described for C<choose_a_directory>. Select the "show_files" menu entry to get the
+files of the current directory. To return the chosen file select the "confirm" menu entry.
 
-The options are passed as a reference to a hash. See L</choose_a_dir> for the different options
-
-=head2 choose_dirs
-
-    $chosen_directories = choose_dirs( { layout => 1, ... } )
-
-C<choose_dirs> is similar to C<choose_a_dir> but it is possible to return multiple directories.
-
-Different to C<choose_a_dir>:
-
-C< ++ > (change with option I<add_dir>) adds the current directory to the list of chosen directories.
-
-To return the chosen list of directories (as an array reference) select the "confirm"-menu-entry C< OK >.
-
-The "back"-menu-entry ( C< << > ) removes the last added directory. If the list of chosen directories is empty,
-C< << > causes C<choose_dirs> to return nothing.
-
-C<choose_dirs> uses the same option as C<choose_a_dir>. The option I<prompt> can used to put empty lines between the
-header row and the menu (I<prompt> set to a single space means one empty line).
-
-=over
-
-=back
-
-=head2 choose_a_number
-
-    $new = choose_a_number( 5, { name => 'Testnumber ' }  );
-
-This function lets you choose/compose a number (unsigned integer) which is returned.
-
-The fist argument - "digits" - is an integer and determines the range of the available numbers. For example setting the
-first argument to 6 would offer a range from 0 to 999999.
-
-The second and optional argument is a reference to a hash with these keys (options):
+Options as in L</choose_a_directory> plus
 
 =over
 
 =item
 
-name
+show_files
 
-The value of I<name> is put in front of the composed number in the info-output.
+Customize the string of the menu entry "show_files".
 
-Default: "> ";
+Default: C<SHOW_FILES>
+
+=back
+
+=head2 choose_directories
+
+    $chosen_directories = choose_directories( { mouse => 1, ... } )
+
+C<choose_directories> is similar to C<choose_a_directory> but it is possible to return multiple directories.
+
+Use the  "add_dir" menu entry to add the current directory to the list of chosen directories.
+
+To return the list of chosen directories (as an array reference) select the "confirm" menu entry.
+
+The "back" menu entry removes the last added directory. If the list of chosen directories is empty, "back" causes
+C<choose_directories> to return nothing.
+
+Options as in L</choose_a_directory> plus
+
+=over
+
+=item
+
+add_dir
+
+Customize the string of the menu entry "add_dir".
+
+Default: C<ADD_DIR>
+
+=back
+
+=head2 choose_a_number
+
+    $new = choose_a_number( 5, { current_selection_label => 'Number: ', ... }  );
+
+This function lets you choose/compose a number (unsigned integer) which is returned.
+
+The fist argument is an integer and determines the range of the available numbers. For example setting the
+first argument to 4 would offer a range from 0 to 9999.
+
+Options:
+
+=over
 
 =item
 
@@ -888,23 +1208,23 @@ Put the small number ranges on top.
 
 =item
 
-thsd_sep
+thousands_separator
 
 Sets the thousands separator.
 
-Default: comma (,).
+Default: C<,>
 
 =back
 
 =head2 choose_a_subset
 
-    $subset = choose_a_subset( \@available_items, { name => 'new> ' } )
+    $subset = choose_a_subset( \@available_items, { current_selection_label => 'new> ', ... } )
 
 C<choose_a_subset> lets you choose a subset from a list.
 
-As a first argument it is required a reference to an array which provides the available list.
+The first argument is a reference to an array which provides the available list.
 
-The optional second argument is a hash reference. The following options are available:
+Options:
 
 =over
 
@@ -912,7 +1232,7 @@ The optional second argument is a hash reference. The following options are avai
 
 alignment
 
-Elements in columns are left justified if set to 0, right justified if set to 1 and centered if set to 2.
+Elements in columns are aligned to the left if set to 0, aligned to the right if set to 1 and centered if set to 2.
 
 Values: [0],1,2.
 
@@ -920,13 +1240,9 @@ Values: [0],1,2.
 
 index
 
-If true, the index positions in the available list of the made choices is returned.
+If true, the index positions in the available list of the made choices are returned.
 
-=item
-
-justify
-
-Deprecated. Use I<alignment> instead.
+Values: [0],1.
 
 =item
 
@@ -953,12 +1269,6 @@ C<choose_a_subset> is called.
 
 =item
 
-name
-
-The value of I<name> is a string. It is placed in front of the subset-info-output.
-
-=item
-
 order
 
 If set to 1, the items are ordered vertically else they are ordered horizontally.
@@ -974,45 +1284,39 @@ prefix
 I<prefix> expects as its value a string. This string is put in front of the elements of the available list in the menu.
 The chosen elements are returned without this I<prefix>.
 
-The default value is "  " if the I<layout> is 3 else the default is the empty string ("").
+Default: empty string.
 
 =item
 
-sofar_begin
+current_selection_begin
 
-The value of I<sofar_begin> is a string.
+Info output: the I<current_selection_begin> string is placed between the I<current_selection_label> string and the chosen elements as soon as an
+element has been chosen.
 
-Subset-info-output: I<sofar_begin> is placed between the I<name> string and the chosen elements as soon as an element
-has been chosen.
-
-Default: empty
+Default: empty string
 
 =item
 
-sofar_separator
+current_selection_separator
 
-The value of I<sofar_separator> is a string.
-
-Subset-info-output: I<sofar_separator> is placed between the chosen list elements.
+Info output: I<current_selection_separator> is placed between the chosen list elements.
 
 Default: C< ,>
 
 =item
 
-sofar_end
+current_selection_end
 
-The value of I<sofar_end> is a string.
+Info output: as soon as elements have been chosen the I<current_selection_end> string is placed at the end of the chosen elements.
 
-Subset-info-output: as soon as elements have been chosen I<sofar_end> if placed at the end of the chosen elements.
-
-Default: empty
+Default: empty string
 
 =back
 
-To return the chosen subset (as an array reference) select the "confirm"-menu-entry C<-OK->.
+To return the chosen subset (as an array reference) select the "confirm" menu entry.
 
-The "back"-menu-entry (C< << >) removes the last added chosen items. If the list of chosen items is empty,
-" << " causes C<choose_a_subset> to return nothing.
+The "back" menu entry removes the last added chosen items. If the list of chosen items is empty, "back" causes
+C<choose_a_subset> to return nothing.
 
 =head2 settings_menu
 
@@ -1036,7 +1340,7 @@ The first argument is a reference to an array of arrays. These arrays have three
 
 =item
 
-the name of the option
+the unique name of the option
 
 =item
 
@@ -1062,15 +1366,91 @@ the values (C<0> if not defined) are the indexes of the current value of the res
 
 =back
 
-With the optional third argument can be passed the options.
-
 When C<settings_menu> is called, it displays for each array entry a row with the prompt string and the current value.
-It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next. If the
-end of the list of the values is reached, it begins from the beginning of the list.
+It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next. After
+scrolling through the list once the cursor jumps back to the top row.
 
-If the "back"-menu-entry (C<BACK>) is chosen, C<settings_menu> does not apply the made changes and returns nothing. If
-the "confirm"-menu-entry (C<CONFIRM>) is chosen, C<settings_menu> applies the made changes and returns the number of
-made changes.
+If the "back" menu entry is chosen, C<settings_menu> does not apply the made changes and returns nothing. If the
+"confirm" menu entry is chosen, C<settings_menu> applies the made changes in place to the passed configuration
+hash-reference (second argument) and returns the number of made changes.
+
+Setting the option I<current_selection_label> to a defined value adds an info output line.
+
+=head1 DEPRECATIONS
+
+=head2 Functions
+
+=over
+
+=item
+
+choose_a_dir
+
+The function C<choose_a_dir> is deprecated. Use C<choose_a_directory> instead.
+
+=item
+
+choose_dirs
+
+The function C<choose_dirs> is deprecated. Use C<choose_directories> instead.
+
+=back
+
+=head2 Options
+
+=over
+
+=item
+
+justify
+
+The option I<justify> is deprecated. Use I<alignment> instead.
+
+=item
+
+dir
+
+The option I<dir> is deprecated. Use I<init_dir> instead.
+
+=item
+
+up
+
+The option I<up> is deprecated. Use I<parent_dir> instead.
+
+=item
+
+name
+
+The option I<name> is deprecated. Use I<current_selection_label> instead.
+
+=item
+
+thsd_sep
+
+The option I<thsd_sep> is deprecated. Use I<thousands_separator> instead.
+
+=item
+
+sofar_begin
+
+The option I<sofar_begin> is deprecated. Use I<current_selection_begin> instead.
+
+=item
+
+sofar_separator
+
+The option I<sofar_separator> is deprecated. Use I<current_selection_separator> instead.
+
+=item
+
+sofar_end
+
+The option I<sofar_end> is deprecated. Use I<current_selection_end> instead.
+
+=back
+
+Deprecated functions and options will be removed.
 
 =head1 REQUIREMENTS
 
@@ -1086,7 +1466,7 @@ Ensure the encoding layer for STDOUT, STDERR and STDIN are set to the correct va
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Term::TablePrint
+    perldoc Term::Choose::Util
 
 =head1 AUTHOR
 

@@ -1,11 +1,11 @@
 package Quiq::Html::Table::Simple;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -29,13 +29,13 @@ durch Listen angegeben werden.
 Der Wert des Objekt-Attributs C<rows>, das den Inhalt der Tabelle
 definiert, hat den Aufbau:
 
-    [[@keyValTr,[@keyValTd,$content],...],...]
-    ^^          ^                   ^    ^
-    ||          |                   |    weitere Zeilen
-    ||          |                   weitere Kolumnen
-    ||          erste Kolumne
-    |erste Zeile mit Attributen @keyValTr
-    Array der Zeilen
+  [[@keyValTr,[@keyValTd,$content],...],...]
+  ^^          ^                   ^    ^
+  ||          |                   |    weitere Zeilen
+  ||          |                   weitere Kolumnen
+  ||          erste Kolumne
+  |erste Zeile mit Attributen @keyValTr
+  Array der Zeilen
 
 Die Listen C<@keyValTr> und C<@KeyValTd> definieren die Attribute
 der C<tr>- bzw. C<td>-Tags. Besteht C<@keyValTr> aus einer
@@ -88,17 +88,17 @@ C<width>-Attribut der Tabelle.
 
 Klasse:
 
-    $html = Quiq::Html::Table::Simple->html($h,
-        class => 'my-table',
-        border => 1,
-        rows => [
-            ['my-title',['A'],[colspan=>2,'B']],
-            [[rowspan=>2,'a1'],['de'],['Text1_de']],
-            [['en'],['Text1_en']],
-            [[rowspan=>2,'a2'],['de'],['Text2_de']],
-            [['en'],['Text2_en']],
-        ],
-    );
+  $html = Quiq::Html::Table::Simple->html($h,
+      class => 'my-table',
+      border => 1,
+      rows => [
+          ['my-title',['A'],[colspan=>2,'B']],
+          [[rowspan=>2,'a1'],['de'],['Text1_de']],
+          [['en'],['Text1_en']],
+          [[rowspan=>2,'a2'],['de'],['Text2_de']],
+          [['en'],['Text2_en']],
+      ],
+  );
 
 =over 2
 
@@ -115,44 +115,44 @@ gemacht.
 
 Aussehen:
 
-    +--+-----------+
-    |A |B          |
-    +--+--+--------+
-    |  |de|Text1_de|
-    |a1+--+--------+
-    |  |en|Text1_en|
-    +--+--+--------+
-    |  |de|Text2_de|
-    |a2+--+--------+
-    |  |en|Text2_wn|
-    +--+--+--------+
+  +--+-----------+
+  |A |B          |
+  +--+--+--------+
+  |  |de|Text1_de|
+  |a1+--+--------+
+  |  |en|Text1_en|
+  +--+--+--------+
+  |  |de|Text2_de|
+  |a2+--+--------+
+  |  |en|Text2_wn|
+  +--+--+--------+
 
 HTML:
 
-    <table class="my-table" border="1" cellspacing="0">
-    <tr class="my-title">
-      <td>A</td>
-      <td colspan="2">B</td>
-    </tr>
-    <tr>
-      <td rowspan="2">a1</td>
-      <td>de</td>
-      <td>Text1_de</td>
-    </tr>
-    <tr>
-      <td>en</td>
-      <td>Text1_en</td>
-    </tr>
-    <tr>
-      <td rowspan="2">a2</td>
-      <td>de</td>
-      <td>Text2_de</td>
-    </tr>
-    <tr>
-      <td>en</td>
-      <td>Text2_en</td>
-    </tr>
-    </table>
+  <table class="my-table" border="1" cellspacing="0">
+  <tr class="my-title">
+    <td>A</td>
+    <td colspan="2">B</td>
+  </tr>
+  <tr>
+    <td rowspan="2">a1</td>
+    <td>de</td>
+    <td>Text1_de</td>
+  </tr>
+  <tr>
+    <td>en</td>
+    <td>Text1_en</td>
+  </tr>
+  <tr>
+    <td rowspan="2">a2</td>
+    <td>de</td>
+    <td>Text2_de</td>
+  </tr>
+  <tr>
+    <td>en</td>
+    <td>Text2_en</td>
+  </tr>
+  </table>
 
 =head1 METHODS
 
@@ -162,7 +162,7 @@ HTML:
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Description
 
@@ -201,8 +201,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -280,7 +280,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

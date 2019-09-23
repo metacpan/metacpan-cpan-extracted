@@ -1,12 +1,12 @@
 package Quiq::Confluence::Client;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use LWP::UserAgent ();
 use Quiq::Option;
@@ -47,7 +47,7 @@ erweitert.
 
 =head4 Synopsis
 
-    $cli = $class->new(@keyVal);
+  $cli = $class->new(@keyVal);
 
 =head4 Arguments
 
@@ -84,12 +84,12 @@ Instantiiere einen Client für Confluence mit den Eigenschaften
 
 Client für Atlassian Demo-Instanz:
 
-    $cli = Quiq::Confluence::Client->new(
-        url => 'https://<name>.atlassian.net',
-        user => 'admin',
-        password => '<password>',
-        verbose => 1,
-    );
+  $cli = Quiq::Confluence::Client->new(
+      url => 'https://<name>.atlassian.net',
+      user => 'admin',
+      password => '<password>',
+      verbose => 1,
+  );
 
 =cut
 
@@ -119,7 +119,7 @@ sub new {
 
 =head4 Synopsis
 
-    $pag = $cli->createPage($parentId,$title,$markup,@opts);
+  $pag = $cli->createPage($parentId,$title,$markup,@opts);
 
 =head4 Arguments
 
@@ -234,7 +234,7 @@ sub createPage {
 
 =head4 Synopsis
 
-    $pag = $cli->deletePage($pageId);
+  $pag = $cli->deletePage($pageId);
 
 =head4 Arguments
 
@@ -276,7 +276,7 @@ sub deletePage {
 
 =head4 Synopsis
 
-    $pag = $cli->getPage($pageId);
+  $pag = $cli->getPage($pageId);
 
 =head4 Arguments
 
@@ -319,7 +319,7 @@ sub getPage {
 
 =head4 Synopsis
 
-    $cli->updatePage($pageId,$markup,@opts);
+  $cli->updatePage($pageId,$markup,@opts);
 
 =head4 Arguments
 
@@ -449,7 +449,7 @@ sub updatePage {
 
 =head4 Synopsis
 
-    $pag = $cli->createAttachment($parentId,$file);
+  $pag = $cli->createAttachment($parentId,$file);
 
 =head4 Arguments
 
@@ -503,8 +503,8 @@ gerufen.
 
 =head4 Synopsis
 
-    $res = $cli->send($method,$path);
-    $res = $cli->send($method,$path,$contentType,$content);
+  $res = $cli->send($method,$path);
+  $res = $cli->send($method,$path,$contentType,$content);
 
 =head4 Arguments
 
@@ -526,10 +526,10 @@ Der Content-Type des HTTP-Body, z.B. 'application/json'.
 
 Der Inhalt des HTTP-Body, z.B. (auf die Toplevel-Attribute umbrochen)
 
-    {"version":{"number":24},
-    "body":{"storage":{"representation":"wiki","value":"{cheese}"}},
-    "title":"Testseite",
-    "type":"page"}
+  {"version":{"number":24},
+  "body":{"storage":{"representation":"wiki","value":"{cheese}"}},
+  "title":"Testseite",
+  "type":"page"}
 
 =back
 
@@ -603,8 +603,8 @@ sub send {
 
 =head4 Synopsis
 
-    $url = $cli->url;
-    $url = $cli->url($path);
+  $url = $cli->url;
+  $url = $cli->url($path);
 
 =head4 Arguments
 
@@ -631,15 +631,15 @@ Ohne Argument wird der Server-URL geliefert.
 
 Der Code
 
-    $cli = Quiq::Confluence::Client->new(
-        url => 'https://<name>.atlassian.net',
-        ...
-    );
-    $url = $cli->url('wiki/rest/api/content/32788');
+  $cli = Quiq::Confluence::Client->new(
+      url => 'https://<name>.atlassian.net',
+      ...
+  );
+  $url = $cli->url('wiki/rest/api/content/32788');
 
 liefert
 
-    https://<name>.atlassian.net/wiki/rest/api/content/32788
+  https://<name>.atlassian.net/wiki/rest/api/content/32788
 
 =cut
 
@@ -660,7 +660,7 @@ sub url {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

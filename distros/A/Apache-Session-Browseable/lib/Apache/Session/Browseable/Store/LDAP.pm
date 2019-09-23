@@ -159,8 +159,11 @@ sub ldap {
         \@servers,
         onerror => undef,
         (
-            $self->{args}->{ldapPort}
-            ? ( port => $self->{args}->{ldapPort} )
+            $self->{args}->{ldapRaw} ? ( raw => $self->{args}->{ldapRaw} )
+            : ()
+        ),
+        (
+            $self->{args}->{ldapPort} ? ( port => $self->{args}->{ldapPort} )
             : ()
         ),
     ) or die( 'Unable to connect to ' . join( ' ', @servers ) );
@@ -223,8 +226,8 @@ objects are stored in an LDAP directory file using the Net::LDAP Perl module.
 
 This module requires one argument in the usual Apache::Session style. The
 keys ldapServer, ldapBase, ldapBindDN, ldapBindPassword are required. The key
-ldapPort, ldapObjectClass, ldapAttributeId, ldapAttributeContent, ldapAttributeIndex
-are optional.
+ldapPort, ldapObjectClass, ldapAttributeId, ldapAttributeContent,
+ldapAttributeIndex, and ldapRaw are optional.
 Example:
 
  tie %s, 'Apache::Session::Browseable::LDAP', undef,
@@ -238,6 +241,7 @@ Example:
         ldapAttributeId      => 'cn',
         ldapAttributeContent => 'description',
         ldapAttributeIndex   => 'ou',
+        ldapRaw              => '(?i:^jpegPhoto|;binary)',
     };
 
 =head1 AUTHOR

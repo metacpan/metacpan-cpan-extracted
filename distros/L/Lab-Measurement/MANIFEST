@@ -61,6 +61,8 @@ examples/Sweeps/coulomb-diamonds.pl
 examples/Sweeps/frequency-sweep.pl
 examples/Sweeps/gate-frequency-sweep.pl
 examples/Sweeps/gate-trace.pl
+examples/Sweeps/manual-T-IV-freq.pl
+examples/Sweeps/manual.pl
 examples/Sweeps/voltage-sweep.pl
 lib/Lab/Bus.pm
 lib/Lab/Bus/DEBUG.pm
@@ -348,6 +350,7 @@ t/Moose/Instrument/ZI_MFLI.t
 t/Moose/Instrument/ZI_MFLI.yml
 t/Moose/Instrument/base.t
 t/Moose/Plot.t
+t/Moose/Stabilizer.t
 t/Moose/Sweep-Continuous.t
 t/Moose/Sweep-Plot.t
 t/Moose/Sweep.t

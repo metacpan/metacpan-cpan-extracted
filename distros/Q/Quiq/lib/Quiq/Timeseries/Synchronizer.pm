@@ -1,11 +1,11 @@
 package Quiq::Timeseries::Synchronizer;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::Array;
@@ -29,47 +29,47 @@ L<Quiq::Hash>
 
 Instantiiere Objekt, vereinbare Zeitraster und Werte
 
-    my $tsy = Quiq::Timeseries::Synchronizer->new(600,
-        qw/Temperature Windspeed/,
-        -geoCoordinates => 1, # $latitude,$longitude bei add()
-        -offset => 300,
-    );
+  my $tsy = Quiq::Timeseries::Synchronizer->new(600,
+      qw/Temperature Windspeed/,
+      -geoCoordinates => 1, # $latitude,$longitude bei add()
+      -offset => 300,
+  );
 
 Füge Temperatur-Daten hinzu
 
-    for my $row (Temperature->select($db,@where)) {
-        $tsy->add($row->time,$row->latitude,$row->longitude,
-            Temperature => $row->value,
-        );
-    }
+  for my $row (Temperature->select($db,@where)) {
+      $tsy->add($row->time,$row->latitude,$row->longitude,
+          Temperature => $row->value,
+      );
+  }
 
 Füge Windgeschwindigkeits-Daten hinzu
 
-    for my $row (WindSpeed->select($db,@where)) {
-        $tsy->add($row->time,$row->latitude,$row->longitude,
-            Windspeed => $row->value,
-        );
-    }
+  for my $row (WindSpeed->select($db,@where)) {
+      $tsy->add($row->time,$row->latitude,$row->longitude,
+          Windspeed => $row->value,
+      );
+  }
 
 Generiere Tabelle mit Daten
 
-    my ($titleA,$rowA) = $tsy->rows(
-        Temperature => [roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
-        WindSpeed => [roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
-        -noValue => 'NULL',
-    );
+  my ($titleA,$rowA) = $tsy->rows(
+      Temperature => [roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
+      WindSpeed => [roundTo=>2,meanValue=>1,count=>1,stdDeviation=>1],
+      -noValue => 'NULL',
+  );
 
 Die resultierende Tabelle besitzt folgende Kolumnen:
 
-    0 Time               (Rasterpunkt)
-    1 Latitude           (Breite des Geo-Mittelpunkts)
-    2 Longitude          (Länge des Geo-Mittelpunkts)
-    3 Temperature        (Mittelwert)
-    4 Temperature_Count  (Anzahl Werte)
-    5 Temperature_StdDev (Standardabweichung)
-    6 WindSpeed          (Mittelwert)
-    7 WindSpeed_Count    (Anzahl Werte)
-    8 WindSpeed_StdDev   (Standardabweichung)
+  0 Time               (Rasterpunkt)
+  1 Latitude           (Breite des Geo-Mittelpunkts)
+  2 Longitude          (Länge des Geo-Mittelpunkts)
+  3 Temperature        (Mittelwert)
+  4 Temperature_Count  (Anzahl Werte)
+  5 Temperature_StdDev (Standardabweichung)
+  6 WindSpeed          (Mittelwert)
+  7 WindSpeed_Count    (Anzahl Werte)
+  8 WindSpeed_StdDev   (Standardabweichung)
 
 =head1 DESCRIPTION
 
@@ -77,11 +77,11 @@ Die Klasse richtet eine oder mehrere Zeitreihen auf ein
 gemeinsames Zeitraster mit der Intervallbreite $interval aus. Die
 Intervallbreite wird in Sekunden angegeben.
 
-    $interval = 600;
+  $interval = 600;
 
 legt das Zeitraster auf 0, 10, 20, 30, 40, 50 Minuten.
 
-    $interval = 600, -offset => 300
+  $interval = 600, -offset => 300
 
 legt das Zeitraster auf 5, 15, 25, 35, 45, 55 Minuten.
 
@@ -93,7 +93,7 @@ legt das Zeitraster auf 5, 15, 25, 35, 45, 55 Minuten.
 
 =head4 Synopsis
 
-    $tsy = $class->new($interval,@param,@opt);
+  $tsy = $class->new($interval,@param,@opt);
 
 =head4 Options
 
@@ -201,8 +201,8 @@ sub new {
 
 =head4 Synopsis
 
-    $tsy->add($time,$param=>$value,...);
-    $tsy->add($time,$latitude,$longitude,$param=>$value,...);
+  $tsy->add($time,$param=>$value,...);
+  $tsy->add($time,$latitude,$longitude,$param=>$value,...);
 
 =head4 Description
 
@@ -305,7 +305,7 @@ sub add {
 
 =head4 Synopsis
 
-    $tsy->addParameter($param);
+  $tsy->addParameter($param);
 
 =head4 Description
 
@@ -332,7 +332,7 @@ sub addParameter {
 
 =head4 Synopsis
 
-    @arr | $arr = $tsy->parameters;
+  @arr | $arr = $tsy->parameters;
 
 =head4 Description
 
@@ -354,11 +354,11 @@ sub parameters {
 
 =head4 Synopsis
 
-    [$titleA,$rowA] = $tsy->rows(
-        $param => [$paramOpt=>$val,...],
-        ...,
-        @opt,
-    );
+  [$titleA,$rowA] = $tsy->rows(
+      $param => [$paramOpt=>$val,...],
+      ...,
+      @opt,
+  );
 
 =head4 Options
 
@@ -611,7 +611,7 @@ sub rows {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

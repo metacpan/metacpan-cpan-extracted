@@ -4,15 +4,16 @@
 # George Bouras, george.mpouras@yandex.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.1.6';
+our	$VERSION = '4.1.8';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
 use	Storable;
-use	Data::Dumper;	$Data::Dumper::Indent=2; $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
-use	XML::Hash::XS;	$XML::Hash::XS::root='Data'; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::canonical=1; $XML::Hash::XS::doc=0;
+use	Data::Dumper;	$Data::Dumper::Sortkeys=0; $Data::Dumper::Indent=2; $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
 use	YAML::XS;		$YAML::XS::QuoteNumericStrings=1;
-use JSON::XS;		my $JSON=JSON::XS->new; $JSON->utf8(1); $JSON->max_depth(1024); $JSON->indent(1); $JSON->pretty(1); $JSON->space_before(0); $JSON->space_after(0); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1);
+use	XML::Hash::XS;	$XML::Hash::XS::root='Data'; $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
+use JSON::XS;		my $JSON=JSON::XS->new; $JSON->canonical(0); $JSON->pretty(1); $JSON->indent(1); $JSON->space_before(0); $JSON->space_after(0); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->utf8(1); $JSON->max_depth(1024);
+
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
 
@@ -20,6 +21,8 @@ has error			=> (is=>'rw', lazy=>1, default=> 0);
 has formats			=> (is=>'ro', lazy=>0, default=> sub{ {json=> 'application/json', xml=> 'text/xml', yaml=> 'text/x-yaml', perl=> 'text/html', human=> 'text/html'} });
 has formats_regex	=> (is=>'ro', lazy=>0, default=> sub{ $_ = join '|', sort keys %{ $_[0]->formats }; $_ = qr/^($_)$/; $_ });
 has Format			=> (is=>'rw', lazy=>1, default=> sub{ {from=>undef, to=>undef}} );
+has sort			=> (is=>'rw', lazy=>1, default=> 0);
+has pretty			=> (is=>'rw', lazy=>1, default=> 2);
 has route_name		=> (is=>'rw', lazy=>1, default=> '');
 has ClientIP		=> (is=>'rw', lazy=>1, default=> '');
 has reply_text		=> (is=>'rw', lazy=>1, default=> '');
@@ -173,7 +176,7 @@ closedir __SESSIONDIR;
 
 	# format input/output
 
-		for (qw/from to/) {
+		foreach (qw/from to/) {
 
 			if (exists $app->request->query_parameters->{$_}) {
 
@@ -190,6 +193,23 @@ closedir __SESSIONDIR;
 			$plg->Format->{$_} = $plg->config->{'Default format'}
 			}
 		}
+
+	# if the output should be sorted, sort([0|1])
+	$plg->{sort} = ((exists $app->request->query_parameters->{sort}) && ($app->request->query_parameters->{sort} =~/(?i)1|t|y/)) ? 1:0;
+
+	# if the output should be human readable : pretty([0|2])
+	if (exists $app->request->query_parameters->{pretty}) {
+
+		if ($app->request->query_parameters->{pretty} =~/(?i)1|t|y/) {
+		$plg->pretty(1)
+		}
+		else {
+		$plg->pretty(0)
+		}
+	}
+	else {
+	$plg->pretty(2)
+	}
 
 	# add header
 	$app->request->header('Content-Type'=> $plg->formats->{$plg->Format->{to}});
@@ -481,20 +501,33 @@ my $plg=shift;
 $plg->reply_text('');
 
 	eval {
-	if    ($plg->Format->{to} eq 'json')	{ $plg->{reply_text} = $JSON->encode($_[0]) }
-	elsif ($plg->Format->{to} eq 'xml')		{ $plg->{reply_text} = XML::Hash::XS::hash2xml $_[0] }
-	elsif ($plg->Format->{to} eq 'yaml')	{ $plg->{reply_text} = YAML::XS::Dump $_[0] }
-	elsif ($plg->Format->{to} eq 'perl')	{ $plg->{reply_text} = Data::Dumper::Dumper $_[0] }
-	elsif ($plg->Format->{to} eq 'human')	{ $Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"}); $plg->{reply_text} = Encode::encode('utf8', $plg->{reply_text}) }
+	if    ($plg->Format->{to} eq 'json') {
+	$JSON->pretty($plg->pretty);
+	$JSON->canonical($plg->sort);
+	$plg->{reply_text} = $JSON->encode($_[0])
+	}
+	elsif ($plg->Format->{to} eq 'xml') {
+	$XML::Hash::XS::canonical=$plg->sort;
+	$XML::Hash::XS::indent=$plg->pretty;
+	$plg->{reply_text} = XML::Hash::XS::hash2xml $_[0]
+	}
+	elsif ($plg->Format->{to} eq 'perl') {
+	$Data::Dumper::Indent=$plg->pretty;
+	$Data::Dumper::Sortkeys=$plg->sort;
+	$plg->{reply_text} = Data::Dumper::Dumper $_[0]
+	}
+	elsif ($plg->Format->{to} eq 'yaml')  { $plg->{reply_text} = YAML::XS::Dump $_[0] }
+	elsif ($plg->Format->{to} eq 'human') { $Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"}); $plg->{reply_text} = Encode::encode('utf8', $plg->{reply_text}) }
 	};
 
 	if ($@) {
 	$@=~s/[\v\h]+/ /g;
 	$plg->error("hash to string convertion failed because : $@");
-	return ''
+	''
 	}
-
-$plg->reply_text
+	else {
+	$plg->reply_text
+	}
 }
 
 
@@ -682,7 +715,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, sessions, persist
 
 =head1 VERSION
 
-version 4.1.6
+version 4.1.8
 
 =head1 SYNOPSIS
 
@@ -697,7 +730,7 @@ The replies through this module have the extra key B<error> . At success B<error
 
 =head2 Your routes
 
-  POST AllKeys?to=yamk    posted data  {"k1":"v1"}
+  POST AllKeys?to=yaml    posted data  {"k1":"v1"}
   POST SomeKeys?to=xml    posted data  {"k1":"v1"}
   POST login              posted data  {"username":"joe", "password":"souvlaki"}
   POST LoginNeeded_store  posted data  {"token":"2d85b82b158e", "k1":"v1", "k2":"v2"}
@@ -725,9 +758,15 @@ The replies through this module have the extra key B<error> . At success B<error
 
   dance;
 
-=head1 POLYMORPHISM
+=head1 Control output : sort, pretty, to, from
 
-Define input/output format using the url parameters "to" and "from" . You can mix input/output formats independently. Supported formats are 
+url parameters to control the reply
+
+I<sort> if true, the keys are returned sorted. The default is false because it is faster. Valid values are true, 1, yes, false, 0, no
+
+I<pretty> if false, the data are returned as one line compacted. The default is true, for human readable output. Valid values are true, 1, yes, false, 0, no
+
+I<from> , I<to> define the input/output format. You can mix input/output formats independently. Supported formats are 
 
   json
   xml
@@ -735,7 +774,7 @@ Define input/output format using the url parameters "to" and "from" . You can mi
   perl
   human
 
-If missing the default is the I<config.yml> property
+I<from> default is the I<config.yml> property
 
   plugins :
     WebService :
@@ -743,10 +782,10 @@ If missing the default is the I<config.yml> property
 
 =head2 Examples
 
-  GET   SomeRoute?to=human
-  GET   SomeRoute?to=perl
+  GET   SomeRoute?to=human&sort=true&pretty=true
+  GET   SomeRoute?to=perl&sort=true&pretty=false
 
-  POST  SomeRoute?to=xml'              posted data  {"k1":"v1"}
+  POST  SomeRoute?to=xml&sort=true'    posted data  {"k1":"v1"}
   POST  SomeRoute?to=yaml'             posted data  {"k1":"v1"}
   POST  SomeRoute?to=perl'             posted data  {"k1":"v1"}
   POST  SomeRoute?from=json;to=human'  posted data  {"k1":"v1"}

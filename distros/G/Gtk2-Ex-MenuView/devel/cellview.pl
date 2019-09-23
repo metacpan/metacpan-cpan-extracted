@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2016 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -15,7 +15,7 @@
 # for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with Gtk2-Ex-MenuView.  If not, see <http://www.gnu.org/licenses/>.
 
 use strict;
 use warnings;

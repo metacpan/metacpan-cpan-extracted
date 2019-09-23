@@ -1,11 +1,11 @@
 package Quiq::Parameters;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -31,13 +31,13 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    # Options/Property-Werte an Variablen zuweisen
-    $argA = $class->extract(1,$properties,$encoding,\@params,
-        $maxArgs,@optRef);
-    
-    # Options/Property-Wertpaare per Optionsobjekt zurückgeben
-    ($argA,$opt) = $class->extract(0,$properties,$encoding,\@params,
-        $maxArgs,@optVal);
+  # Options/Property-Werte an Variablen zuweisen
+  $argA = $class->extract(1,$properties,$encoding,\@params,
+      $maxArgs,@optRef);
+  
+  # Options/Property-Wertpaare per Optionsobjekt zurückgeben
+  ($argA,$opt) = $class->extract(0,$properties,$encoding,\@params,
+      $maxArgs,@optVal);
 
 =head4 Arguments
 
@@ -126,25 +126,25 @@ Eine mögliche Wrapper-Methode für eine finale Parameterverarbeitung,
 die bei zu wenig/zu vielen Argumenten oder nicht vereinbarten
 Optionen eine Exception wirft:
 
-    sub parameters {
-        my ($self,$varMode,$properties,$encoding,$paramA,$minArgs,
-            $maxArgs) = splice @_,0,6;
-    
-        my ($argA,$opt) = Quiq::Parameters->extract($varMode,$properties,
-            $encoding,$paramA,$maxArgs,@_);
-        if (@$paramA) {
-            die "ERROR: Unexpected parameter(s): @$paramA\n";
-        }
-        elsif (@$argA < $minArgs) {
-            die "ERROR: Too few arguments\n";
-        }
-    
-        if ($varMode) {
-            return wantarray? @$argA: $argA;
-        }
-    
-        return ($argA,$opt);
-    }
+  sub parameters {
+      my ($self,$varMode,$properties,$encoding,$paramA,$minArgs,
+          $maxArgs) = splice @_,0,6;
+  
+      my ($argA,$opt) = Quiq::Parameters->extract($varMode,$properties,
+          $encoding,$paramA,$maxArgs,@_);
+      if (@$paramA) {
+          die "ERROR: Unexpected parameter(s): @$paramA\n";
+      }
+      elsif (@$argA < $minArgs) {
+          die "ERROR: Too few arguments\n";
+      }
+  
+      if ($varMode) {
+          return wantarray? @$argA: $argA;
+      }
+  
+      return ($argA,$opt);
+  }
 
 =cut
 
@@ -285,7 +285,7 @@ Anwendungsfälle.
 
 =head4 Synopsis
 
-    $class->extractPropertiesToVariables(\@params,@optRef);
+  $class->extractPropertiesToVariables(\@params,@optRef);
 
 =head4 Arguments
 
@@ -317,29 +317,29 @@ zur Verarbeitung von Methodenparametern genutzt.
 Methode, die eine WikiMedia-Tabelle generiert. Die Tabelleneigenschaften
 werden als Property/Wert-Paare übergeben:
 
-    sub table {
-        my $self = shift;
-        # @_: @keyVal
-    
-        my $alignA = [];
-        my $bodyBackground = '#ffffff';
-        my $caption = undef;
-        my $rowA = [];
-        my $titleBackground = '#e8e8e8';
-        my $titleA = [];
-        my $valueCb = undef;
-    
-        Quiq::Parameters->extractPropertiesToVariables(\@_,
-            alignments => \$alignA,
-            bodyBackground => \$bodyBackground,
-            caption => \$caption,
-            rows => \$rowA,
-            titleBackground => \$titleBackground,
-            titles => \$titleA,
-            valueCallback => \$valueCb,
-        );
-        ...
-    }
+  sub table {
+      my $self = shift;
+      # @_: @keyVal
+  
+      my $alignA = [];
+      my $bodyBackground = '#ffffff';
+      my $caption = undef;
+      my $rowA = [];
+      my $titleBackground = '#e8e8e8';
+      my $titleA = [];
+      my $valueCb = undef;
+  
+      Quiq::Parameters->extractPropertiesToVariables(\@_,
+          alignments => \$alignA,
+          bodyBackground => \$bodyBackground,
+          caption => \$caption,
+          rows => \$rowA,
+          titleBackground => \$titleBackground,
+          titles => \$titleA,
+          valueCallback => \$valueCb,
+      );
+      ...
+  }
 
 =cut
 
@@ -365,7 +365,7 @@ sub extractPropertiesToVariables {
 
 =head4 Synopsis
 
-    $opt = $class->extractPropertiesToObject(\@params,@propVal);
+  $opt = $class->extractPropertiesToObject(\@params,@propVal);
 
 =head4 Arguments
 
@@ -397,21 +397,21 @@ zur Verarbeitung von Methodenparametern genutzt.
 Methode, die eine WikiMedia-Tabelle generiert. Die Tabelleneigenschaften
 werden als Property/Wert-Paare übergeben:
 
-    sub table {
-        my $self = shift;
-        # @_: @keyVal
-    
-        my $opt = Quiq::Parameters->extractPropertiesToObject(\@_,
-            alignments => [],
-            bodyBackground => '#ffffff',
-            caption => undef,
-            rows => [],
-            titleBackground => '#e8e8e8',
-            titles => [],
-            valueCallback => undef,
-        );
-        ...
-    }
+  sub table {
+      my $self = shift;
+      # @_: @keyVal
+  
+      my $opt = Quiq::Parameters->extractPropertiesToObject(\@_,
+          alignments => [],
+          bodyBackground => '#ffffff',
+          caption => undef,
+          rows => [],
+          titleBackground => '#e8e8e8',
+          titles => [],
+          valueCallback => undef,
+      );
+      ...
+  }
 
 =cut
 
@@ -437,7 +437,7 @@ sub extractPropertiesToObject {
 
 =head4 Synopsis
 
-    @args | $argA = $class->extractToVariables(\@params,$minArgs,$maxArgs,@optRef);
+  @args | $argA = $class->extractToVariables(\@params,$minArgs,$maxArgs,@optRef);
 
 =head4 Arguments
 
@@ -481,21 +481,21 @@ oder zu viele Argumente, wird eine Exception geworfen.
 
 Konstruktor mit einer variablen Anzahl an Argumenten und zwei Optionen:
 
-    sub new {
-        my $class = shift;
-        # @_: $url,@opt -or- $url,$user,$passw,@opt
-    
-    
-        my $color = 1;
-        my $debug = 0;
-    
-        my $argA = Quiq::Parameters->extractToVariables(\@_,1,3,
-            -color => \$color,
-            -debug => \$debug,
-        );
-        my ($url,$user,$password) = @$argA;
-        ...
-    }
+  sub new {
+      my $class = shift;
+      # @_: $url,@opt -or- $url,$user,$passw,@opt
+  
+  
+      my $color = 1;
+      my $debug = 0;
+  
+      my $argA = Quiq::Parameters->extractToVariables(\@_,1,3,
+          -color => \$color,
+          -debug => \$debug,
+      );
+      my ($url,$user,$password) = @$argA;
+      ...
+  }
 
 =cut
 
@@ -526,7 +526,7 @@ sub extractToVariables {
 
 =head4 Synopsis
 
-    ($argA,$opt) = $class->extractToObject(\@params,$minArgs,$maxArgs,@optVal);
+  ($argA,$opt) = $class->extractToObject(\@params,$minArgs,$maxArgs,@optVal);
 
 =head4 Arguments
 
@@ -597,7 +597,7 @@ sub extractToObject {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

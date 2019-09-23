@@ -1,11 +1,11 @@
 package Quiq::ContentProcessor;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -33,17 +33,17 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    use Quiq::ContentProcessor;
-    
-    $cop = Quiq::ContentProcessor->new('.mytool');
-    $cop->registerType('MyTool::A','a','A','A');
-    $cop->registerType('MyTool::B','b','B','A');
-    ...
-    $cop->load(@paths)->commit;
-    
-    for my $ent ($cop->entities) {
-        $cop->msg($ent->name);
-    }
+  use Quiq::ContentProcessor;
+  
+  $cop = Quiq::ContentProcessor->new('.mytool');
+  $cop->registerType('MyTool::A','a','A','A');
+  $cop->registerType('MyTool::B','b','B','A');
+  ...
+  $cop->load(@paths)->commit;
+  
+  for my $ent ($cop->entities) {
+      $cop->msg($ent->name);
+  }
 
 =head1 DESCRIPTION
 
@@ -89,17 +89,17 @@ Die Methode msg() schreibt eine Ausgabe nach STDERR. Der erste
 Parameter gibt den Verbosity-Level an. Ist dieser größer als der
 eingestellte Verbosity-Level, unterbleibt die Ausgabe.
 
-    $cop->msg(2,$text);
+  $cop->msg(2,$text);
 
 Ist kein Level angegeben, erfolgt die Ausgabe I<immer>:
 
-    $cop->msg($text);
+  $cop->msg($text);
 
 Der Meldungstext $text kann printf-Formatelemente enthalten, diese
 werden wie bei printf durch die zusätzlich angegebenen Argumente
 ersetzt:
 
-    $cop->msg($text,@args);
+  $cop->msg($text,@args);
 
 =head1 EXAMPLES
 
@@ -107,20 +107,20 @@ Füge alle Entitäts-Definitionen im Storage zu einem einzigen
 Datenstrom zusammen und schreibe diesen nach STDOUT (z.B. für
 Refactoring):
 
-    $cop->load->fetch('-');
+  $cop->load->fetch('-');
 
 Übertrage alle Entitäts-Definitionen im Storage in Verzeichnis $dir
 (das Verzeichnis hat die gleiche Struktur wie das Verzeichnis def
 im Storage):
 
-    $cop->load->fetch->($dir);
+  $cop->load->fetch->($dir);
 
 Liste alle Entitäten vom Typ $type auf:
 
-    $cop->load;
-    for my $ent ($cop->entities($type)) {
-        $cop->msg($ent->name);
-    }
+  $cop->load;
+  for my $ent ($cop->entities($type)) {
+      $cop->msg($ent->name);
+  }
 
 =head1 METHODS
 
@@ -130,7 +130,7 @@ Liste alle Entitäten vom Typ $type auf:
 
 =head4 Synopsis
 
-    $cop = $class->new($storage,@opt);
+  $cop = $class->new($storage,@opt);
 
 =head4 Arguments
 
@@ -207,8 +207,8 @@ sub new {
 
 =head4 Synopsis
 
-    $path = $cop->storage;
-    $path = $cop->storage($subPath);
+  $path = $cop->storage;
+  $path = $cop->storage($subPath);
 
 =head4 Arguments
 
@@ -253,8 +253,8 @@ sub storage {
 
 =head4 Synopsis
 
-    $cop->registerType($pluginClass,$extension,$entityType,$sectionType,@keyVal);
-    $cop->registerType($pluginClass,$extension); # universelles Plugin
+  $cop->registerType($pluginClass,$extension,$entityType,$sectionType,@keyVal);
+  $cop->registerType($pluginClass,$extension); # universelles Plugin
 
 =head4 Arguments
 
@@ -332,7 +332,7 @@ sub registerType {
 
 =head4 Synopsis
 
-    @types | $typeA = $cop->entityTypes;
+  @types | $typeA = $cop->entityTypes;
 
 =head4 Returns
 
@@ -371,7 +371,7 @@ sub entityTypes {
 
 =head4 Synopsis
 
-    $plg = $cop->plugin($sec);
+  $plg = $cop->plugin($sec);
 
 =head4 Arguments
 
@@ -449,7 +449,7 @@ sub plugin {
 
 =head4 Synopsis
 
-    $cop = $cop->init;
+  $cop = $cop->init;
 
 =head4 Returns
 
@@ -488,7 +488,7 @@ sub init {
 
 =head4 Synopsis
 
-    $cop = $cop->commit(@opt);
+  $cop = $cop->commit(@opt);
 
 =head4 Options
 
@@ -577,8 +577,8 @@ sub commit {
 
 =head4 Synopsis
 
-    $cop = $cop->load;
-    $cop = $cop->load(@paths);
+  $cop = $cop->load;
+  $cop = $cop->load(@paths);
 
 =head4 Arguments
 
@@ -662,7 +662,7 @@ sub load {
 
 =head4 Synopsis
 
-    $cop = $cop->fetchToDir($dir,$layout,@opt);
+  $cop = $cop->fetchToDir($dir,$layout,@opt);
 
 =head4 Arguments
 
@@ -796,8 +796,8 @@ sub fetchToDir {
 
 =head4 Synopsis
 
-    @files = $cop->filesToFetch;
-    @files = $cop->filesToFetch($layout);
+  @files = $cop->filesToFetch;
+  @files = $cop->filesToFetch($layout);
 
 =head4 Arguments
 
@@ -824,7 +824,7 @@ String-Referenz angegeben sein.
 Diese (Basisklassen-)Methode liefert für jede Entität die
 Datei-Definiton
 
-    [$ent->entityFile, $ent->sourceRef]
+  [$ent->entityFile, $ent->sourceRef]
 
 Damit erzeugt die Methode fetch() die gleiche Struktur wie
 der ContentProcessor im Storage-Verzeichnis def.
@@ -859,7 +859,7 @@ sub filesToFetch {
 
 =head4 Synopsis
 
-    $regex = $cop->extensionRegex;
+  $regex = $cop->extensionRegex;
 
 =head4 Returns
 
@@ -911,7 +911,7 @@ sub extensionRegex {
 
 =head4 Synopsis
 
-    @files | $fileA = $cop->findFiles($dir,@opt);
+  @files | $fileA = $cop->findFiles($dir,@opt);
 
 =head4 Arguments
 
@@ -980,7 +980,7 @@ sub findFiles {
 
 =head4 Synopsis
 
-    @entities | $entityA = $cop->parseFiles(@files);
+  @entities | $entityA = $cop->parseFiles(@files);
 
 =head4 Arguments
 
@@ -1100,7 +1100,7 @@ sub parseFiles {
 
 =head4 Synopsis
 
-    $cop->processSubSection($fileEnt,$ent,$mainSec,$sec);
+  $cop->processSubSection($fileEnt,$ent,$mainSec,$sec);
 
 =head4 Arguments
 
@@ -1148,8 +1148,8 @@ sub processSubSection {
 
 =head4 Synopsis
 
-    @entities | $entityA = $cop->entities;
-    @entities | $entityA = $cop->entities($type);
+  @entities | $entityA = $cop->entities;
+  @entities | $entityA = $cop->entities($type);
 
 =head4 Arguments
 
@@ -1225,7 +1225,7 @@ sub entities {
 
 =head4 Synopsis
 
-    $h = $cop->needsTestDb;
+  $h = $cop->needsTestDb;
 
 =head4 Returns
 
@@ -1257,7 +1257,7 @@ sub needsTestDb {
 
 =head4 Synopsis
 
-    $h = $cop->needsUpdateDb;
+  $h = $cop->needsUpdateDb;
 
 =head4 Returns
 
@@ -1291,7 +1291,7 @@ sub needsUpdateDb {
 
 =head4 Synopsis
 
-    $str = $cop->info;
+  $str = $cop->info;
 
 =head4 Returns
 
@@ -1328,8 +1328,8 @@ sub info {
 
 =head4 Synopsis
 
-    $cop->msg($text,@args);
-    $cop->msg($level,$text,@args);
+  $cop->msg($text,@args);
+  $cop->msg($level,$text,@args);
 
 =head4 Arguments
 
@@ -1392,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -8,7 +8,7 @@ use 5.010001;
 use File::Spec::Functions qw( catfile );
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_subset settings_menu );
+use Term::Choose::Util qw();
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
@@ -131,6 +131,7 @@ sub database_setting {
                 $old_idx_group = $idx_group;
             }
             if ( $choices->[$idx_group] eq $reset ) {
+                my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
                 my @databases;
                 for my $section ( keys %$db_opt ) {
                     push @databases, $section if $section ne $plugin;
@@ -142,9 +143,9 @@ sub database_setting {
                     );
                     next GROUP;
                 }
-                my $choices = choose_a_subset(
+                my $choices = $tu->choose_a_subset(
                     [ sort @databases ],
-                    { name => 'Reset DB: ', mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
+                    { current_selection_label => 'Reset DB: ' }
                 );
                 if ( ! $choices->[0] ) {
                     next GROUP;
@@ -206,9 +207,10 @@ sub database_setting {
 
 sub __settings_menu_wrap_db {
     my ( $sf, $db_opt, $section, $sub_menu, $prompt ) = @_;
-    my $changed = settings_menu(
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $changed = $tu->settings_menu(
         $sub_menu, $db_opt->{$section},
-        { prompt => $prompt, mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
+        { prompt => $prompt }
     );
     return if ! $changed;
     $sf->{write_config}++;

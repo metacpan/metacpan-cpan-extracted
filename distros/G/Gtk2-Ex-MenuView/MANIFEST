@@ -27,7 +27,6 @@ examples/radiogroup.pl
 examples/simple.pl
 examples/twiddle.pl
 inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Gtk2/Ex/MenuView.pm
 lib/Gtk2/Ex/MenuView/Menu.pm
 Makefile.PL
@@ -39,9 +38,13 @@ t/MenuView-display.t
 t/MenuView-weaken.t
 t/MenuView.t
 t/MyTestHelpers.pm
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

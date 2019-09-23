@@ -9,7 +9,6 @@ use Carp;
 
 use MS::Reader::ProtXML::Group;
 
-our $VERSION = 0.003;
 
 sub _pre_load {
 

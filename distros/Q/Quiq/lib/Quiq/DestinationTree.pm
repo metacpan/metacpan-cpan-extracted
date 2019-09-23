@@ -1,12 +1,12 @@
 package Quiq::DestinationTree;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::DirHandle;
@@ -27,16 +27,16 @@ L<Quiq::Object>
 
 =head1 SYNOPSIS
 
-    use Quiq::DestinationTree;
-    
-    $dt = Quiq::DestinationTree->(@dirs);
-    ...
-    # Dateien und Verzeichnisse erzeugen
-    $dt->addFile($file,$content);
-    $dt->addDir($dir);
-    ...
-    # Überzählige Dateien und Verzeichnisse entfernen
-    $dt->cleanup;
+  use Quiq::DestinationTree;
+  
+  $dt = Quiq::DestinationTree->(@dirs);
+  ...
+  # Dateien und Verzeichnisse erzeugen
+  $dt->addFile($file,$content);
+  $dt->addDir($dir);
+  ...
+  # Überzählige Dateien und Verzeichnisse entfernen
+  $dt->cleanup;
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ kontrollieren.
 
 =head4 Synopsis
 
-    $tree = $class->new(@dirs,@opt);
+  $tree = $class->new(@dirs,@opt);
 
 =head4 Options
 
@@ -83,7 +83,7 @@ erzeugt noch entfernt).
 
 Liste von Einzeldateien. Beispiel:
 
-    -files=>[glob '*_1.sql'],
+  -files=>[glob '*_1.sql'],
 
 =item -force => $bool (Default: 0)
 
@@ -229,7 +229,7 @@ sub new {
 
 =head4 Synopsis
 
-    $bool = $tree->addDir($dir);
+  $bool = $tree->addDir($dir);
 
 =head4 Description
 
@@ -293,7 +293,7 @@ sub addDir {
 
 =head4 Synopsis
 
-    @paths | $pathA = $tree->paths;
+  @paths | $pathA = $tree->paths;
 
 =head4 Description
 
@@ -313,11 +313,11 @@ Die Liste enthält sowohl Verzeichnisse also auch Dateien.
 
 Sortierung herstellen:
 
-    @paths = sort $tree->paths;
+  @paths = sort $tree->paths;
 
 Nur Dateien erhalten:
 
-    @paths = grep {!-d} $tree->paths;
+  @paths = grep {!-d} $tree->paths;
 
 =cut
 
@@ -335,17 +335,17 @@ sub paths {
 
 =head4 Synopsis
 
-    $bool = $tree->addFile($file,$data,@opt);
-    $bool = $tree->addFile($file,\$data,@opt);
-    $bool = $tree->addFile($file,@opt);
-    $bool = $tree->addFile($file,
-        -generate => $bool,
-        -onGenerate => sub {
-            ...
-            return $data;
-        },
-        @opt
-    );
+  $bool = $tree->addFile($file,$data,@opt);
+  $bool = $tree->addFile($file,\$data,@opt);
+  $bool = $tree->addFile($file,@opt);
+  $bool = $tree->addFile($file,
+      -generate => $bool,
+      -onGenerate => sub {
+          ...
+          return $data;
+      },
+      @opt
+  );
 
 =head4 Options
 
@@ -554,7 +554,7 @@ sub addFile {
 
 =head4 Synopsis
 
-    @arr | $arr = $tree->obsoletePaths;
+  @arr | $arr = $tree->obsoletePaths;
 
 =head4 Description
 
@@ -579,7 +579,7 @@ sub obsoletePaths {
 
 =head4 Synopsis
 
-    $bool = $tree->removePath($path);
+  $bool = $tree->removePath($path);
 
 =head4 Description
 
@@ -637,9 +637,9 @@ sub removePath {
 
 =head4 Synopsis
 
-    $n|@paths = $tree->cleanup;
-    $n|@paths = $tree->cleanup($ask);
-    $n|@paths = $tree->cleanup($ask,\$timer);
+  $n|@paths = $tree->cleanup;
+  $n|@paths = $tree->cleanup($ask);
+  $n|@paths = $tree->cleanup($ask,\$timer);
 
 =head4 Returns
 
@@ -729,7 +729,7 @@ sub cleanup {
 
 =head4 Synopsis
 
-    $dt->close;
+  $dt->close;
 
 =head4 Description
 
@@ -751,7 +751,7 @@ sub close {
 
 =head4 Synopsis
 
-    $text = $tree->getText($textDe);
+  $text = $tree->getText($textDe);
 
 =head4 Returns
 
@@ -785,7 +785,7 @@ sub getText {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

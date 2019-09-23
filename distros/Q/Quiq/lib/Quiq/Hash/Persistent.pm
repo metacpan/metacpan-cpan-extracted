@@ -1,11 +1,11 @@
 package Quiq::Hash::Persistent;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Storable;
 
@@ -26,20 +26,20 @@ L<Quiq::Hash>
 Definition des Konstruktors in einer abgeleiteten Klasse (in diesem
 Fall ohne Konstruktorargumente):
 
-    package MyClass;
-    use base qw/Quiq::Hash::Persistent/;
-    
-    sub new {
-        my $class = shift;
-        ...
-        return $class->SUPER::new($file,$timeout,sub {
-            my $class = shift;
-            ...
-            return $class->Quiq::Hash::new(
-                ...
-            );
-        };
-    }
+  package MyClass;
+  use base qw/Quiq::Hash::Persistent/;
+  
+  sub new {
+      my $class = shift;
+      ...
+      return $class->SUPER::new($file,$timeout,sub {
+          my $class = shift;
+          ...
+          return $class->Quiq::Hash::new(
+              ...
+          );
+      };
+  }
 
 =over 2
 
@@ -74,7 +74,7 @@ Die anonyme Subroutine liefert einen Hash der Klasse Quiq::Hash
 
 =head4 Synopsis
 
-    $h = $class->new($file,$timeout,$sub);
+  $h = $class->new($file,$timeout,$sub);
 
 =head4 Arguments
 
@@ -146,7 +146,7 @@ sub new {
 
 =head4 Synopsis
 
-    $file = $self->cacheFile;
+  $file = $self->cacheFile;
 
 =head4 Returns
 
@@ -160,7 +160,7 @@ Liefere den Pfad der Cachedatei.
 
 =head4 Synopsis
 
-    $timeout = $self->cacheTimeout;
+  $timeout = $self->cacheTimeout;
 
 =head4 Returns
 
@@ -172,7 +172,7 @@ Liefere das für die Cachedatei definierte Timeout.
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

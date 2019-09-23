@@ -1,11 +1,11 @@
 package Quiq::Html::Pygments;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::CommandLine;
 use Quiq::Shell;
@@ -31,32 +31,32 @@ L<Quiq::Hash>
 
 Modul laden:
 
-    use Quiq::Html::Pygments;
+  use Quiq::Html::Pygments;
 
 Liefere die CSS-Regeln für Pygments-Style 'emacs', eingeschränkt
 auf einen Container 'highlight', der den gehighlighteten Code
 aufnimmt:
 
-    ($rules,$bgColor) = Quiq::Html::Pygments->css('emacs','highlight');
-    # .highlight .hll { background-color: #ffffcc }
-    # ...
-    # #f8f8f8
+  ($rules,$bgColor) = Quiq::Html::Pygments->css('emacs','highlight');
+  # .highlight .hll { background-color: #ffffcc }
+  # ...
+  # #f8f8f8
 
 Erzeuge Syntax-Highlighting für Perl-Code $code. Der gelieferte
 HTML-Code $html muss in einen Container 'highlight' (s.o.)
 eingebettet werden, damit die oben erzeugten CSS-Regeln greifen:
 
-    $html = Quiq::Html::Pygments->html('perl',$code);
+  $html = Quiq::Html::Pygments->html('perl',$code);
 
 Liefere die Namen aller Pygments-Styles:
 
-    @styles = Quiq::Html::Pygments->styles;
+  @styles = Quiq::Html::Pygments->styles;
 
 Liefere eine HTML-Seite mit einem Darstellungsbeispiel
 für jeden Pygments-Style. Gehighlightet wird der Code $code
 der Programmiersprache $lang:
 
-    $html = Quiq::Html::Pygments->stylesPage($h,$lang,$code);
+  $html = Quiq::Html::Pygments->stylesPage($h,$lang,$code);
 
 =head1 DESCRIPTION
 
@@ -73,9 +73,9 @@ um gehighlighteten Quelltext in HTML-Seiten integrieren zu können.
 
 =head4 Synopsis
 
-    ($rules,$bgColor) | $rules = $class->css;
-    ($rules,$bgColor) | $rules = $class->css($style);
-    ($rules,$bgColor) | $rules = $class->css($style,$selector);
+  ($rules,$bgColor) | $rules = $class->css;
+  ($rules,$bgColor) | $rules = $class->css($style);
+  ($rules,$bgColor) | $rules = $class->css($style,$selector);
 
 =head4 Arguments
 
@@ -117,24 +117,24 @@ Pygments-Style $style.
 
 Gib die CSS-Regeln für den Pyments-Style 'emacs' aus:
 
-    print scalar Quiq::Html::Pygments->css('emacs');
-    __END__
-    .hll { background-color: #ffffcc }
-    .c { color: #008800; font-style: italic } /* Comment */
-    .err { border: 1px solid #FF0000 } /* Error */
-    .k { color: #AA22FF; font-weight: bold } /* Keyword */
-    .o { color: #666666 } /* Operator */
+  print scalar Quiq::Html::Pygments->css('emacs');
+  __END__
+  .hll { background-color: #ffffcc }
+  .c { color: #008800; font-style: italic } /* Comment */
+  .err { border: 1px solid #FF0000 } /* Error */
+  .k { color: #AA22FF; font-weight: bold } /* Keyword */
+  .o { color: #666666 } /* Operator */
 
 Gib die CSS-Regeln für den Pyments-Style 'emacs' und
 Parent-Elemente der Klasse 'highlight' aus:
 
-    print scalar Quiq::Html::Pygments->css('emacs','.syntax');
-    __END__
-    .syntax .hll { background-color: #ffffcc }
-    .syntax .c { color: #008800; font-style: italic } /* Comment */
-    .syntax .err { border: 1px solid #FF0000 } /* Error */
-    .syntax .k { color: #AA22FF; font-weight: bold } /* Keyword */
-    .syntax .o { color: #666666 } /* Operator */
+  print scalar Quiq::Html::Pygments->css('emacs','.syntax');
+  __END__
+  .syntax .hll { background-color: #ffffcc }
+  .syntax .c { color: #008800; font-style: italic } /* Comment */
+  .syntax .err { border: 1px solid #FF0000 } /* Error */
+  .syntax .k { color: #AA22FF; font-weight: bold } /* Keyword */
+  .syntax .o { color: #666666 } /* Operator */
 
 =cut
 
@@ -181,7 +181,7 @@ sub css {
 
 =head4 Synopsis
 
-    $html = $class->html($lang,$code);
+  $html = $class->html($lang,$code);
 
 =head4 Arguments
 
@@ -193,7 +193,7 @@ Die Sprache des Quelltexts $code. In Pygments-Terminiologie
 handelt es sich um den Namen eines "Lexers". Die Liste aller
 Lexer liefert das Kommando:
 
-    $ pygmentize -L lexers
+  $ pygmentize -L lexers
 
 =item $code
 
@@ -240,7 +240,7 @@ sub html {
 
 =head4 Synopsis
 
-    @styles | $styleA = $class->styles;
+  @styles | $styleA = $class->styles;
 
 =head4 Returns
 
@@ -254,7 +254,7 @@ zurück. Im Skalarkontext liefere ein Referenz auf die Liste.
 Interaktiv lässt sich die (kommentierte) Liste aller Styles
 ermitteln mit:
 
-    $ pygmentize -L styles
+  $ pygmentize -L styles
 
 =cut
 
@@ -281,7 +281,7 @@ sub styles {
 
 =head4 Synopsis
 
-    $html = $class->stylesPage($h,$lang,$code);
+  $html = $class->stylesPage($h,$lang,$code);
 
 =head4 Arguments
 
@@ -318,11 +318,11 @@ Style am besten passt.
 
 Generiere eine Seite mit allen Styles und schreibe sie auf Datei $file:
 
-    my $h = Quiq::Html::Tag->new;
-    my $html = Quiq::Html::Pygments->stylesPage($h,'perl',q~
-        PERL-CODE
-    ~));
-    Quiq::Path->write($file,$html);
+  my $h = Quiq::Html::Tag->new;
+  my $html = Quiq::Html::Pygments->stylesPage($h,'perl',q~
+      PERL-CODE
+  ~));
+  Quiq::Path->write($file,$html);
 
 =cut
 
@@ -367,7 +367,7 @@ sub stylesPage {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

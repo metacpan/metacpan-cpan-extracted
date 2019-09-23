@@ -61,6 +61,6 @@
          "x_repository" : "https://github.com/nigelhorne/Class-Simple-Cached"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

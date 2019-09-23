@@ -1,5 +1,8 @@
 Revision history for perl distribution Toadfarm
 
+0.82 2019-09-20T08:00:35+0900
+ - Removed "Reload" plugin, since it's buggy and unsupported #30
+
 0.81 2019-09-19T10:10:38+0900
  - Fix t/log.t #27
 

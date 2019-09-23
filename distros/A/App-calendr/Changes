@@ -1,5 +1,11 @@
 Revision history for App::calendr
 
+0.26  Sat Sep 21 10:55:00 2019
+      - Added author unit test scripts (xt/meta-json.t and xt/meta-yml.t).
+
+0.25  Fri Sep 20 19:15:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.24  Sun Mar 31 11:40:00 2019
       - Used namespace::autoclean instead.
 

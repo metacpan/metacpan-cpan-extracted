@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2012 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -22,7 +22,6 @@
 #
 
 use strict;
-use warnings;
 use Tie::TZ qw($TZ);
 use POSIX ('ctime');
 

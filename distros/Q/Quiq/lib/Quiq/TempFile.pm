@@ -1,11 +1,11 @@
 package Quiq::TempFile;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use Quiq::Path;
@@ -38,8 +38,8 @@ im String-Kontext automatisch zum Datei-Pfad.
 
 =head4 Synopsis
 
-    $file = $class->new(@opt);
-    $file = $class->new($data,@opt);
+  $file = $class->new(@opt);
+  $file = $class->new($data,@opt);
 
 =head4 Arguments
 
@@ -135,7 +135,7 @@ sub new {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

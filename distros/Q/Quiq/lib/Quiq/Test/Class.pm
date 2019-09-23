@@ -1,12 +1,12 @@
 package Quiq::Test::Class;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -44,11 +44,11 @@ Startup(N), Shutdown(N), Setup(N), Teardown(N) und Test(N). Der Typ der
 Testmethode wird als Subroutine-Attribut angegeben. Eine Testmethode
 besitzt folgenden Aufbau:
 
-    sub NAME : TYPE(N) {
-        my $self = shift;
-        ...
-        return;
-    }
+  sub NAME : TYPE(N) {
+      my $self = shift;
+      ...
+      return;
+  }
 
 Hierbei ist NAME der Name der Testmethode, TYPE der Typ der
 Testmethode und N die Anzahl der Tests innerhalb der Methode.
@@ -146,14 +146,14 @@ sollen alle folgenden Tests übergangen werden.
 Eine Überprüfung der Voraussetzungen in der ersten Testmethode
 kann folgendermaßen vorgenommen werden:
 
-    sub initMethod : Init(0) {
-        my $self = shift;
-    
-        if (...auf Eigenschaft testen...) {
-            $self->skipAllTests('...Meldung...');
-            return;
-        }
-    }
+  sub initMethod : Init(0) {
+      my $self = shift;
+  
+      if (...auf Eigenschaft testen...) {
+          $self->skipAllTests('...Meldung...');
+          return;
+      }
+  }
 
 =cut
 
@@ -172,7 +172,7 @@ our @Methods;
 
 =head4 Synopsis
 
-    $test = $class->new;
+  $test = $class->new;
 
 =head4 Description
 
@@ -224,8 +224,8 @@ sub new {
 
 =head4 Synopsis
 
-    $val = $test->get($key);
-    @vals = $test->get(@keys);
+  $val = $test->get($key);
+  @vals = $test->get(@keys);
 
 =head4 Description
 
@@ -258,7 +258,7 @@ sub get {
 
 =head4 Synopsis
 
-    $test->set(@keyVal);
+  $test->set(@keyVal);
 
 =head4 Description
 
@@ -291,8 +291,8 @@ sub set {
 
 =head4 Synopsis
 
-    $dir = $this->fixtureDir(@opt);
-    $dir = $this->fixtureDir($subpath,@opt);
+  $dir = $this->fixtureDir(@opt);
+  $dir = $this->fixtureDir($subpath,@opt);
 
 =head4 Options
 
@@ -342,8 +342,8 @@ sub fixtureDir {
 
 =head4 Synopsis
 
-    $dir = $this->testDir;
-    $dir = $this->testDir($subPath);
+  $dir = $this->testDir;
+  $dir = $this->testDir($subPath);
 
 =head4 Description
 
@@ -379,7 +379,7 @@ sub testDir {
 
 =head4 Synopsis
 
-    $fullPath = $this->testPath($file);
+  $fullPath = $this->testPath($file);
 
 =cut
 
@@ -411,7 +411,7 @@ sub testPath {
 
 =head4 Synopsis
 
-    @arr = $test->methods($type);
+  @arr = $test->methods($type);
 
 =head4 Description
 
@@ -419,13 +419,13 @@ Liefere die Liste der Testmethoden von Typ $type.
 
 Folgende Typen von Testmethoden sind definiert:
 
-    Init
-    Foreach
-    Startup
-    Setup
-    Test
-    Teardown
-    Shutdown
+  Init
+  Foreach
+  Startup
+  Setup
+  Test
+  Teardown
+  Shutdown
 
 =cut
 
@@ -446,7 +446,7 @@ sub methods {
 
 =head4 Synopsis
 
-    $this->runTests;
+  $this->runTests;
 
 =head4 Description
 
@@ -597,7 +597,7 @@ sub runTests {
 
 =head4 Synopsis
 
-    $test->skipAllTests($msg);
+  $test->skipAllTests($msg);
 
 =head4 Alias
 
@@ -634,8 +634,8 @@ sub skipAllTests {
 
 =head4 Synopsis
 
-    $test->skipTest($msg);
-    $test->skipTest($n,$msg);
+  $test->skipTest($msg);
+  $test->skipTest($n,$msg);
 
 =head4 Description
 
@@ -702,7 +702,7 @@ werden. Wenn dies vollständig passiert ist, können die Aliase entfallen.
 
 =head4 Synopsis
 
-    $bool = $test->useOk($module);
+  $bool = $test->useOk($module);
 
 =cut
 
@@ -723,8 +723,8 @@ sub useOk {
 
 =head4 Synopsis
 
-    $bool = $test->syntaxOk($program);
-    $bool = $test->syntaxOk($program,$text);
+  $bool = $test->syntaxOk($program);
+  $bool = $test->syntaxOk($program,$text);
 
 =head4 Arguments
 
@@ -780,8 +780,8 @@ sub syntaxOk {
 
 =head4 Synopsis
 
-    $bool = $test->ok($bool);
-    $bool = $test->ok($bool,$text);
+  $bool = $test->ok($bool);
+  $bool = $test->ok($bool,$text);
 
 =head4 Alias
 
@@ -812,8 +812,8 @@ sub ok {
 
 =head4 Synopsis
 
-    $bool = $test->in($got,\@expected);
-    $bool = $test->in($got,\@expected,$text);
+  $bool = $test->in($got,\@expected);
+  $bool = $test->in($got,\@expected,$text);
 
 =head4 Alias
 
@@ -873,8 +873,8 @@ sub in_orig {
 
 =head4 Synopsis
 
-    $bool = $test->is($got,$expected);
-    $bool = $test->is($got,$expected,$text);
+  $bool = $test->is($got,$expected);
+  $bool = $test->is($got,$expected,$text);
 
 =head4 Alias
 
@@ -905,8 +905,8 @@ sub is {
 
 =head4 Synopsis
 
-    $bool = $test->isnt($got,$expected);
-    $bool = $test->isnt($got,$expected,$text);
+  $bool = $test->isnt($got,$expected);
+  $bool = $test->isnt($got,$expected,$text);
 
 =head4 Alias
 
@@ -937,9 +937,9 @@ sub isnt {
 
 =head4 Synopsis
 
-    $bool = $test->floatIs($got,$expected);
-    $bool = $test->floatIs($got,$expected,$places);
-    $bool = $test->floatIs($got,$expected,$places,$text);
+  $bool = $test->floatIs($got,$expected);
+  $bool = $test->floatIs($got,$expected,$places);
+  $bool = $test->floatIs($got,$expected,$places,$text);
 
 =head4 Description
 
@@ -979,8 +979,8 @@ sub floatIs {
 
 =head4 Synopsis
 
-    $bool = $test->isClass($ref,$class);
-    $bool = $test->isClass($ref,$class,$text);
+  $bool = $test->isClass($ref,$class);
+  $bool = $test->isClass($ref,$class,$text);
 
 =head4 Description
 
@@ -1009,8 +1009,8 @@ sub isClass {
 
 =head4 Synopsis
 
-    $bool = $test->isDeeply($gotRef,$expectedRef);
-    $bool = $test->isDeeply($gotref,$expectedRef,$text);
+  $bool = $test->isDeeply($gotRef,$expectedRef);
+  $bool = $test->isDeeply($gotref,$expectedRef,$text);
 
 =cut
 
@@ -1032,8 +1032,8 @@ sub isDeeply {
 
 =head4 Synopsis
 
-    $bool = $test->like($got,qr/$expected/);
-    $bool = $test->like($got,qr/$expected/,$text);
+  $bool = $test->like($got,qr/$expected/);
+  $bool = $test->like($got,qr/$expected/,$text);
 
 =head4 Alias
 
@@ -1064,8 +1064,8 @@ sub like {
 
 =head4 Synopsis
 
-    $bool = $test->unlike($got,qr/$expected/);
-    $bool = $test->unlike($got,qr/$expected/,$text);
+  $bool = $test->unlike($got,qr/$expected/);
+  $bool = $test->unlike($got,qr/$expected/,$text);
 
 =head4 Alias
 
@@ -1096,14 +1096,14 @@ sub unlike {
 
 =head4 Synopsis
 
-    $bool = $test->cmpOk($this,$op,$that);
-    $bool = $test->cmpOk($this,$op,$that,$text);
+  $bool = $test->cmpOk($this,$op,$that);
+  $bool = $test->cmpOk($this,$op,$that,$text);
 
 =head4 Example
 
 Vergleich auf numerische Verschiedenheit:
 
-    $test->cmpOk($bigNum,'!=',$otherBigNum);
+  $test->cmpOk($bigNum,'!=',$otherBigNum);
 
 =cut
 
@@ -1127,7 +1127,7 @@ sub cmpOk {
 
 =head4 Synopsis
 
-    $bool = $test->diag(@msg);
+  $bool = $test->diag(@msg);
 
 =cut
 
@@ -1145,7 +1145,7 @@ sub diag {
 
 =head4 Synopsis
 
-    @attrib = $class->MODIFY_CODE_ATTRIBUTES($ref,@attrib);
+  @attrib = $class->MODIFY_CODE_ATTRIBUTES($ref,@attrib);
 
 =head4 Description
 
@@ -1198,7 +1198,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

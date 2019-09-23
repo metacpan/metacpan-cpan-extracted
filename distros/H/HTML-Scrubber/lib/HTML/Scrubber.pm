@@ -13,7 +13,7 @@ use List::Util qw(any);
 
 our ( @_scrub, @_scrub_fh );
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 # my my my my, these here to prevent foolishness like
@@ -381,7 +381,7 @@ HTML::Scrubber - Perl extension for scrubbing/sanitizing HTML
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =for stopwords html cpan callback homepage Perlbrew perltidy repository
 
@@ -758,7 +758,7 @@ D. H. <podmaster@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ruslan Zakirov, Nigel Metheringham, 2003-2004 D. H.
+This software is copyright (c) 2018 by Ruslan Zakirov, Nigel Metheringham, 2003-2004 D. H.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -786,7 +786,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Scrubber>
+L<https://metacpan.org/release/HTML-Scrubber>
 
 =item *
 
@@ -822,14 +822,6 @@ L<http://cpanratings.perl.org/d/HTML-Scrubber>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Scrubber>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -840,7 +832,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Scrubber>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Scrubber>
 

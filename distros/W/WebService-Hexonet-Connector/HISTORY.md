@@ -1,3 +1,15 @@
+## [2.2.4](https://github.com/hexonet/perl-sdk/compare/v2.2.3...v2.2.4) (2019-09-20)
+
+
+### Bug Fixes
+
+* **dev-deps:** reviewed necessary list of deps for tests ([8c40644](https://github.com/hexonet/perl-sdk/commit/8c40644))
+* **Travis:** check apt installation change ([6bad49a](https://github.com/hexonet/perl-sdk/commit/6bad49a))
+* **Travis:** include default package installation ([a5bebe3](https://github.com/hexonet/perl-sdk/commit/a5bebe3))
+* **Travis:** install specific package versions ([124c11c](https://github.com/hexonet/perl-sdk/commit/124c11c))
+* **Travis:** review cpanm and dep installation ([0436ca5](https://github.com/hexonet/perl-sdk/commit/0436ca5))
+* **Travis:** review installation of cpanimus ([6066687](https://github.com/hexonet/perl-sdk/commit/6066687))
+
 ## [2.2.3](https://github.com/hexonet/perl-sdk/compare/v2.2.2...v2.2.3) (2019-09-19)
 
 

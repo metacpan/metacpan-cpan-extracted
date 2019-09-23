@@ -2,7 +2,7 @@ package Plack::App::Catmandu::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use parent 'Plack::Component';
 use Catmandu;
@@ -40,8 +40,9 @@ sub _build_router {
             {method => ['GET', 'HEAD']},
         );
     }
-    $router->connect('/',     {action => 'list'}, {method => ['GET', 'HEAD']});
-    $router->connect('/{id}', {action => 'show'}, {method => ['GET', 'HEAD']});
+    $router->connect('/', {action => 'list'}, {method => ['GET', 'HEAD']});
+    $router->connect('/{id}', {action => 'show'},
+        {method => ['GET', 'HEAD']});
     $router;
 }
 

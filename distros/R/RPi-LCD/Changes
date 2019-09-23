@@ -1,5 +1,10 @@
 Revision history for RPi-LCD
 
+2.3604  2019-09-21
+        - added RPi::Const as a prereq (replacing RPi::WiringPi::Constant).
+          (see #7)
+        - bump prereq of WiringPi::API to 2.3616
+
 2.3603  2017-06-25
         - bump prereq of WiringPI::API to 2.3612
 

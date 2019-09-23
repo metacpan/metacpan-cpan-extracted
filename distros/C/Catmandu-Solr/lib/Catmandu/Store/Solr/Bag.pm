@@ -10,7 +10,7 @@ use Catmandu::Error;
 use Moo;
 use MooX::Aliases;
 
-our $VERSION = "0.0303";
+our $VERSION = "0.0304";
 
 with 'Catmandu::Bag';
 with 'Catmandu::CQLSearchable';

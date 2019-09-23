@@ -1,12 +1,12 @@
 package Quiq::Database::Row::Object;
 use base qw/Quiq::Database::Row/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -46,10 +46,10 @@ our $TableClass = 'Quiq::Database::ResultSet::Object';
 
 =head4 Synopsis
 
-    $row = $class->new($db,@keyVal); # [1]
-    $row = $class->new(\@titles,\@values,@keyVal); # [2]
-    $row = $class->new(\@titles,@keyVal); # [3]
-    $row = $class->new(@keyVal); # [4]
+  $row = $class->new($db,@keyVal); # [1]
+  $row = $class->new(\@titles,\@values,@keyVal); # [2]
+  $row = $class->new(\@titles,@keyVal); # [3]
+  $row = $class->new(@keyVal); # [4]
 
 =head4 Description
 
@@ -121,7 +121,7 @@ sub new {
 
 =head4 Synopsis
 
-    $bool = $row->exists($key);
+  $bool = $row->exists($key);
 
 =head4 Description
 
@@ -143,8 +143,8 @@ sub exists {
 
 =head4 Synopsis
 
-    $val = $row->get($key);
-    @vals = $row->get(@keys);
+  $val = $row->get($key);
+  @vals = $row->get(@keys);
 
 =head4 Description
 
@@ -177,7 +177,7 @@ sub get {
 
 =head4 Synopsis
 
-    $val = $row->try($key);
+  $val = $row->try($key);
 
 =head4 Description
 
@@ -199,7 +199,7 @@ sub try {
 
 =head4 Synopsis
 
-    $row->set(@keyVal);
+  $row->set(@keyVal);
 
 =head4 Description
 
@@ -229,7 +229,7 @@ sub set {
 
 =head4 Synopsis
 
-    $row->init($obj);
+  $row->init($obj);
 
 =head4 Description
 
@@ -265,7 +265,7 @@ sub init {
 
 =head4 Synopsis
 
-    $row->initFromCgi($cgi);
+  $row->initFromCgi($cgi);
 
 =head4 Description
 
@@ -294,7 +294,7 @@ sub initFromCgi {
 
 =head4 Synopsis
 
-    $row->addAttribute(@keys);
+  $row->addAttribute(@keys);
 
 =head4 Description
 
@@ -326,7 +326,7 @@ sub addAttribute {
 
 =head4 Synopsis
 
-    $row->removeColumn(@keys);
+  $row->removeColumn(@keys);
 
 =head4 Description
 
@@ -363,7 +363,7 @@ sub removeColumn {
 
 =head4 Synopsis
 
-    $row->add(@keyVal);
+  $row->add(@keyVal);
 
 =head4 Alias
 
@@ -406,7 +406,7 @@ sub add {
 
 =head4 Synopsis
 
-    $val = $row->memoize($key,$sub);
+  $val = $row->memoize($key,$sub);
 
 =head4 Description
 
@@ -435,8 +435,8 @@ sub memoize {
 
 =head4 Synopsis
 
-    $val = $row->getSet($key);
-    $val = $row->getSet($key,$val);
+  $val = $row->getSet($key);
+  $val = $row->getSet($key,$val);
 
 =head4 Examples
 
@@ -451,20 +451,20 @@ nicht der Fall ist, kann es mit $row->add(xxx=>$val) eingeführt
 werden. Diese Form der Attributmethode wird von selbst per
 AUTOLOAD erzeugt, braucht also nicht implementiert werden
 
-    sub xxx {
-        return shift->getSet(xxx=>@_);
-    }
+  sub xxx {
+      return shift->getSet(xxx=>@_);
+  }
 
 =item *
 
 Eine Attributmethode, die eine Liste oder eine Arrayreferenz liefert
 
-    sub xxx {
-        my $self = shift;
-        # @_: $arr
-        my $arr = $self->getSet(xxx=>@_);
-        return wantarray? @$arr: $arr;
-    }
+  sub xxx {
+      my $self = shift;
+      # @_: $arr
+      my $arr = $self->getSet(xxx=>@_);
+      return wantarray? @$arr: $arr;
+  }
 
 =back
 
@@ -524,8 +524,8 @@ sub getSet {
 
 =head4 Synopsis
 
-    $rowStatus = $row->rowStatus;
-    $rowStatus = $row->rowStatus($rowStatus);
+  $rowStatus = $row->rowStatus;
+  $rowStatus = $row->rowStatus($rowStatus);
 
 =head4 Description
 
@@ -598,8 +598,8 @@ sub rowStatus {
 
 =head4 Synopsis
 
-    $titleA|@titles = $row->titles; # [1]
-    $titleA|@titles = $class->titles($db); # [2]
+  $titleA|@titles = $row->titles; # [1]
+  $titleA|@titles = $class->titles($db); # [2]
 
 =head4 Description
 
@@ -642,7 +642,7 @@ sub titles {
 
 =head4 Synopsis
 
-    $bool = $row->isModified($title);
+  $bool = $row->isModified($title);
 
 =head4 Description
 
@@ -663,8 +663,8 @@ sub isModified {
 
 =head4 Synopsis
 
-    @keys|$keyA = $row->modifiedColumns;
-    @pairs|$pairA = $row->modifiedColumns(-withValue=>1);
+  @keys|$keyA = $row->modifiedColumns;
+  @pairs|$pairA = $row->modifiedColumns(-withValue=>1);
 
 =head4 Options
 
@@ -675,7 +675,7 @@ sub isModified {
 Einschränkung auf die angegebenen Kolumnen. Ist als Kolumnenname
 eine Arrayreferenz
 
-    [$key=>$retKey]
+  [$key=>$retKey]
 
 angegeben, wird Kolumne $key geprüft, aber $retKey als Kolumnenname
 geliefert. Dies ist bei View-Datensätzen nützlich, wenn $row ein
@@ -696,14 +696,14 @@ Generiere eine SET-Klausel für ein UPDATE-Statement aus einem
 View-Datensatz, dessen Kolumnen teilweise anders beannt sind,
 als die der zu aktualierenden Tabelle:
 
-    @setClause = $row->modifiedColumns(
-        -columns=>[
-            lieferantid,
-            [lieferantenartikelnr=>'liefernr'],
-            [ekpreis=>'preis_ek'],
-        ],
-        -widthValues=>1,
-    );
+  @setClause = $row->modifiedColumns(
+      -columns=>[
+          lieferantid,
+          [lieferantenartikelnr=>'liefernr'],
+          [ekpreis=>'preis_ek'],
+      ],
+      -widthValues=>1,
+  );
 
 =cut
 
@@ -753,7 +753,7 @@ sub modifiedColumns {
 
 =head4 Synopsis
 
-    @clauses|$clauseA = $row->setClauseFromModifiedRow(@columns);
+  @clauses|$clauseA = $row->setClauseFromModifiedRow(@columns);
 
 =head4 See Also
 
@@ -765,21 +765,21 @@ Auf einen View-Datensatz wurden Werte geschrieben. Wir wissen
 nicht, welche Information sich geändert hat. Die Methode
 setClauseFromModifiedRow() liefert uns die SET-Klausel für ein UPDATE:
 
-    @setClause = $row->setClauseFromModifiedRow(
-        [lieferantenid=>'lieferantid'],
-        [lieferantenartikelnr=>'liefernr'],
-        [ekpreis=>'preis_ek'],
-        [lieferantenid1=>'lieferantid_1'],
-        [lieferantenartikelnr1=>'liefernr_1'],
-        [ekpreis1=>'preis_ek_1'],
-        [lieferantenid2=>'lieferantid_2'],
-        [lieferantenartikelnr2=>'liefernr_2'],
-        [ekpreis2=>'preis_ek_2'],
-    );
-    $db->update('shopartikellieferanteninfo',
-        @setClause,
-        -where,artikelid => $artId,
-    );
+  @setClause = $row->setClauseFromModifiedRow(
+      [lieferantenid=>'lieferantid'],
+      [lieferantenartikelnr=>'liefernr'],
+      [ekpreis=>'preis_ek'],
+      [lieferantenid1=>'lieferantid_1'],
+      [lieferantenartikelnr1=>'liefernr_1'],
+      [ekpreis1=>'preis_ek_1'],
+      [lieferantenid2=>'lieferantid_2'],
+      [lieferantenartikelnr2=>'liefernr_2'],
+      [ekpreis2=>'preis_ek_2'],
+  );
+  $db->update('shopartikellieferanteninfo',
+      @setClause,
+      -where,artikelid => $artId,
+  );
 
 Wurde keine der Kolumnen geändert, liefert setClauseFromModifiedRow() eine leere
 Liste und $db->update() ist eine Nulloperation.
@@ -804,7 +804,7 @@ sub setClauseFromModifiedRow {
 
 =head4 Synopsis
 
-    $row->absorbModifications;
+  $row->absorbModifications;
 
 =head4 Description
 
@@ -838,7 +838,7 @@ sub absorbModifications {
 
 =head4 Synopsis
 
-    $str = $row->modificationInfo;
+  $str = $row->modificationInfo;
 
 =cut
 
@@ -873,7 +873,7 @@ sub modificationInfo {
 
 =head4 Synopsis
 
-    $row = $row->parentExists($type);
+  $row = $row->parentExists($type);
 
 =head4 Description
 
@@ -895,7 +895,7 @@ sub parentExists {
 
 =head4 Synopsis
 
-    $row->addParent($type,$parentRow);
+  $row->addParent($type,$parentRow);
 
 =head4 Description
 
@@ -919,7 +919,7 @@ sub addParent {
 
 =head4 Synopsis
 
-    $parentRow = $row->getParent($type);
+  $parentRow = $row->getParent($type);
 
 =head4 Description
 
@@ -943,7 +943,7 @@ sub getParent {
 
 =head4 Synopsis
 
-    $bool = $row->childTypeExists($type);
+  $bool = $row->childTypeExists($type);
 
 =head4 Description
 
@@ -965,7 +965,7 @@ sub childTypeExists {
 
 =head4 Synopsis
 
-    $tab = $row->addChildType($type,$rowClass,\@titles);
+  $tab = $row->addChildType($type,$rowClass,\@titles);
 
 =head4 Description
 
@@ -973,7 +973,7 @@ Bevor Kind-Datensätze einem Datenstatz zugeordnet werden können, muss
 ein entsprechendes ResultSet-Objekt hinzugefügt werden. Dieses wird
 per $type angesprochen. Z.B. liefert
 
-    $tab = $row->getChilds($type);
+  $tab = $row->getChilds($type);
 
 die Menge der zugeordenten Kind-Objekte vom Typ $type.
 
@@ -993,7 +993,7 @@ sub addChildType {
 
 =head4 Synopsis
 
-    $row->addChild($type,$childRow);
+  $row->addChild($type,$childRow);
 
 =head4 Description
 
@@ -1015,7 +1015,7 @@ sub addChild {
 
 =head4 Synopsis
 
-    @rows|$rowT = $row->getChilds($type);
+  @rows|$rowT = $row->getChilds($type);
 
 =head4 Description
 
@@ -1043,7 +1043,7 @@ der Klasse Quiq::Database::Row::Array gemeinsam.
 
 =head4 Synopsis
 
-    $arr|@arr = $row->asArray;
+  $arr|@arr = $row->asArray;
 
 =head4 Description
 
@@ -1072,8 +1072,8 @@ sub asArray {
 
 =head4 Synopsis
 
-    $str = $row->asString;
-    $str = $row->asString($colSep);
+  $str = $row->asString;
+  $str = $row->asString($colSep);
 
 =head4 Description
 
@@ -1103,7 +1103,7 @@ sub asString {
 
 =head4 Synopsis
 
-    $newRow = $row->copy;
+  $newRow = $row->copy;
 
 =head4 Description
 
@@ -1113,12 +1113,12 @@ auf die Kopie zurück.
 Die Kopie ist identisch zum Original, bis darauf, dass der
 Daten-Hash und der Änderungs-Hash kopiert werden:
 
-    Daten-Hash.........................: kopiert
-    Referenz auf Titel-Liste...........: identisch
-    Datensatz-Status...................: identisch
-    Änderungs-Hash.....................: kopiert
-    Referenz auf Kind-Datensätze-Hash..: identisch
-    Referenz auf Eltern-Datensätze-Hash: identisch
+  Daten-Hash.........................: kopiert
+  Referenz auf Titel-Liste...........: identisch
+  Datensatz-Status...................: identisch
+  Änderungs-Hash.....................: kopiert
+  Referenz auf Kind-Datensätze-Hash..: identisch
+  Referenz auf Eltern-Datensätze-Hash: identisch
 
 =cut
 
@@ -1142,7 +1142,7 @@ sub copy {
 
 =head4 Synopsis
 
-    $bool = $row->isRaw;
+  $bool = $row->isRaw;
 
 =cut
 
@@ -1160,20 +1160,20 @@ sub isRaw {
 
 =head4 Synopsis
 
-    $str = $row->asRecord;
-    $str = $row->asRecord($null);
-    $str = $row->asRecord($null,$indent);
+  $str = $row->asRecord;
+  $str = $row->asRecord($null);
+  $str = $row->asRecord($null,$indent);
 
 =head4 Description
 
 Liefere den Datensatz in mehrzeiliger Record-Darstellung.
 Die Darstellung hat den Aufbau:
 
-    <key1>:
-        <val1>
-    <key2>:
-        <val2>
-    ...
+  <key1>:
+      <val1>
+  <key2>:
+      <val2>
+  ...
 
 Der optionale Parameter $null gibt an, welcher Wert für einen Nullwert
 ausgegeben wird. Per Default wird NULL ausgegeben. Ist $null undef,
@@ -1222,7 +1222,7 @@ sub asRecord {
 
 =head4 Synopsis
 
-    $row->copyData($row0,@opt);
+  $row->copyData($row0,@opt);
 
 =head4 Options
 
@@ -1296,7 +1296,7 @@ sub copyData {
 
 =head4 Synopsis
 
-    $cur = $row->save($db);
+  $cur = $row->save($db);
 
 =head4 Description
 
@@ -1328,8 +1328,8 @@ wird die Methode $row->insert() gerufen.
 
 ['D' (zu löschen)]
 
-    Es wird eine Delete-Operation auf der Datenbank ausgeführt, d.h. es
-    wird die Methode $row->delete() gerufen.
+  Es wird eine Delete-Operation auf der Datenbank ausgeführt, d.h. es
+  wird die Methode $row->delete() gerufen.
 
 =cut
 
@@ -1369,8 +1369,8 @@ sub save {
 
 =head4 Synopsis
 
-    $ref = $row->weaken($key);
-    $ref = $row->weaken($key=>$ref);
+  $ref = $row->weaken($key);
+  $ref = $row->weaken($key=>$ref);
 
 =head4 Description
 
@@ -1394,7 +1394,7 @@ sub weaken {
 
 =head4 Synopsis
 
-    $tab|@rows|$cur = $class->select($db,@select,@opt);
+  $tab|@rows|$cur = $class->select($db,@select,@opt);
 
 =head4 Options
 
@@ -1447,7 +1447,7 @@ sub select {
 
 =head4 Synopsis
 
-    $row|@vals = $class->lookup($db,@select,@opt);
+  $row|@vals = $class->lookup($db,@select,@opt);
 
 =head4 Options
 
@@ -1494,7 +1494,7 @@ sub lookup {
 
 =head4 Synopsis
 
-    $val = $class->value($db,@select,@opt);
+  $val = $class->value($db,@select,@opt);
 
 =head4 Options
 
@@ -1520,7 +1520,7 @@ sub value {
 
 =head4 Synopsis
 
-    $sbitRow = $row->toSbit($sbitClass);
+  $sbitRow = $row->toSbit($sbitClass);
 
 =head4 Arguments
 
@@ -1575,8 +1575,8 @@ sub toSbit {
 
 =head4 Synopsis
 
-    $val = $row->AUTOLOAD;
-    $val = $row->AUTOLOAD($val);
+  $val = $row->AUTOLOAD;
+  $val = $row->AUTOLOAD($val);
 
 =head4 Description
 
@@ -1635,7 +1635,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,14 +1,14 @@
 package LWP::UserAgent::Patch::Retry;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2019-09-20'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 use Log::ger;
 
-use Module::Patch 0.12 qw();
+use Module::Patch qw();
 use base qw(Module::Patch);
 
 our %config;
@@ -60,7 +60,7 @@ sub patch_data {
         patches => [
             {
                 action => 'wrap',
-                mod_version => qr/^6\.0.+/,
+                mod_version => qr/^6\.+/,
                 sub_name => 'send_request',
                 code => $p_send_request,
             },
@@ -83,7 +83,7 @@ LWP::UserAgent::Patch::Retry - Add retries
 
 =head1 VERSION
 
-This document describes version 0.04 of LWP::UserAgent::Patch::Retry (from Perl distribution LWP-UserAgent-Patch-Retry), released on 2017-07-10.
+This document describes version 0.050 of LWP::UserAgent::Patch::Retry (from Perl distribution LWP-UserAgent-Patch-Retry), released on 2019-09-20.
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -29,16 +29,23 @@ $t->get_ok('/foo')->status_is(200);
 $t->get_ok('/bar')->status_is(500);
 $t->get_ok('/baz')->status_is(404);
 
-is_deeply(
-  \@main::messages,
-  [
-    [L_INFO    => 'GET /foo 200'],
-    [L_ERR     => 'Oops!'],
-    [L_WARNING => 'GET /bar 500'],
-    [L_INFO    => 'GET /baz 404']
-  ],
-  'syslog messages',
-) or diag explain \@main::messages;
+my @expected = (
+  [L_INFO    => qr{GET /foo 200}],
+  [L_ERR     => qr{Oops!}],
+  [L_WARNING => qr{GET /bar 500}],
+  [L_INFO    => qr{GET /baz 404}],
+);
+
+my $i = 0;
+while (@expected) {
+  my $msg = shift @main::messages;
+  my $exp = shift @expected;
+
+  is $msg->[0],   $exp->[0], "log level $i";
+  like $msg->[1], $exp->[1], "log message $i";
+
+  $i++;
+}
 
 done_testing;
 

@@ -1,11 +1,11 @@
 package Quiq::AnsiColor;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Term::ANSIColor ();
 
@@ -23,10 +23,10 @@ L<Quiq::Object>
 
 =head1 SYNOPSIS
 
-    use Quiq::AnsiColor;
-    
-    my $a = Quiq::AnsiColor->new(-t STDOUT);
-    printf "%s\n",$a->str('bold white on_cyan','Hello, world!');
+  use Quiq::AnsiColor;
+  
+  my $a = Quiq::AnsiColor->new(-t STDOUT);
+  printf "%s\n",$a->str('bold white on_cyan','Hello, world!');
 
 =head1 DESCRIPTION
 
@@ -37,16 +37,16 @@ erfolgt bei Aufruf des Konstruktors.
 
 =head2 Terminal-Eigenschaften
 
-    Allgemein    Vordergrund  Hintergrund
-    -----------  -----------  -----------
-    dark         black        on_black
-    bold         red          on_red
-    underline    green        on_green
-    blink        yellow       on_yellow
-    reverse      blue         on_blue
-    concealed    magenta      on_magenta
-    reset        cyan         on_cyan
-                 white        on_white
+  Allgemein    Vordergrund  Hintergrund
+  -----------  -----------  -----------
+  dark         black        on_black
+  bold         red          on_red
+  underline    green        on_green
+  blink        yellow       on_yellow
+  reverse      blue         on_blue
+  concealed    magenta      on_magenta
+  reset        cyan         on_cyan
+               white        on_white
 
 Es kann eine Kombination aus Eigenschaften angegeben werden. Mehrere
 aus der Rubrik "Allgemein", eine aus der Rubrik "Vordergrund",
@@ -62,15 +62,15 @@ Debian-Repository enthalten.
 
 =head3 Nach PDF wandeln
 
-    $ PROGRAM | aha | wkhtmltopdf - FILE.pdf
+  $ PROGRAM | aha | wkhtmltopdf - FILE.pdf
 
 =head3 Drucken
 
-    $ PROGRAM | aha | wkhtmltopdf - - | lpr
+  $ PROGRAM | aha | wkhtmltopdf - - | lpr
 
 =head3 Im Pager anzeigen
 
-    $ PROGRAM | less -R
+  $ PROGRAM | less -R
 
 =head1 METHODS
 
@@ -80,8 +80,8 @@ Debian-Repository enthalten.
 
 =head4 Synopsis
 
-    $a = $class->new;
-    $a = $class->new($bool);
+  $a = $class->new;
+  $a = $class->new($bool);
 
 =head4 Arguments
 
@@ -124,7 +124,7 @@ sub new {
 
 =head4 Synopsis
 
-    $bool = $a->active;
+  $bool = $a->active;
 
 =head4 Returns
 
@@ -148,7 +148,7 @@ sub active {
 
 =head4 Synopsis
 
-    $str = $a->str($attr,$str);
+  $str = $a->str($attr,$str);
 
 =head4 Arguments
 
@@ -196,7 +196,7 @@ sub str {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

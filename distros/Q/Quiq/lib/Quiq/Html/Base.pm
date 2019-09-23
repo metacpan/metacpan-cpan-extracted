@@ -1,11 +1,11 @@
 package Quiq::Html::Base;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ und sollte abgeschafft werden)
 
 =head4 Synopsis
 
-    $obj = $class->new(@keyVal);
+  $obj = $class->new(@keyVal);
 
 =head4 Description
 
@@ -84,7 +84,7 @@ sub new {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

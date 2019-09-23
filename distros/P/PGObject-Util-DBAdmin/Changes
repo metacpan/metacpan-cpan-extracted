@@ -1,5 +1,7 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.0.2   2019-09-20
+        Fix the MANIFEST listing non-existing files
 
 1.0.1   2019-07-09
         Fix: the 'verify_helpers' API bleeds output through to the

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU General Public License along
 # with Gtk2-Ex-MenuView.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# maybe:
+# add-tearoffs - toplevel or all?
+#
+
+
 package Gtk2::Ex::MenuView;
 use 5.008;
 use strict;
@@ -30,7 +36,7 @@ use Gtk2::Ex::MenuView::Menu;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 4;
+our $VERSION = 5;
 
 use constant _submenu_class => 'Gtk2::Ex::MenuView::Menu';
 
@@ -47,34 +53,41 @@ BEGIN {
 
 use Glib::Object::Subclass
   _submenu_class(),
-  signals => { 'item-create-or-update'
-               => { param_types   => ['Gtk2::MenuItem',
-                                      'Gtk2::TreeModel',
-                                      'Gtk2::TreePath',
-                                      'Gtk2::TreeIter'],
-                    return_type   => 'Gtk2::MenuItem',
-                    flags         => ['action','run-last'],
-                    accumulator   => \&Glib::Ex::SignalBits::accumulator_first_defined,
-                  },
-               'separator-create-or-update'
-               => { param_types   => ['Gtk2::MenuItem',
-                                      'Gtk2::TreeModel',
-                                      'Gtk2::TreePath',
-                                      'Gtk2::TreeIter'],
-                    return_type   => 'Gtk2::MenuItem',
-                    flags         => ['action'],
-                    accumulator   => \&Glib::Ex::SignalBits::accumulator_first_defined,
-                  },
-               activate
-               => { param_types => ['Gtk2::MenuItem',
-                                    'Gtk2::TreeModel',
-                                    'Gtk2::TreePath',
-                                    'Gtk2::TreeIter'],
-                    return_type => undef },
+  signals => {
+              'item-create-or-update' =>
+              { param_types   => ['Gtk2::MenuItem',
+                                  'Gtk2::TreeModel',
+                                  'Gtk2::TreePath',
+                                  'Gtk2::TreeIter'],
+                return_type   => 'Gtk2::MenuItem',
+                flags         => ['action','run-last'],
+                accumulator   => \&Glib::Ex::SignalBits::accumulator_first_defined,
+              },
+              
+              'separator-create-or-update' =>
+              { param_types   => ['Gtk2::MenuItem',
+                                  'Gtk2::TreeModel',
+                                  'Gtk2::TreePath',
+                                  'Gtk2::TreeIter'],
+                return_type   => 'Gtk2::MenuItem',
+                flags         => ['action'],
+                accumulator   => \&Glib::Ex::SignalBits::accumulator_first_defined,
+              },
+
+              activate =>
+              { param_types => ['Gtk2::MenuItem',
+                                'Gtk2::TreeModel',
+                                'Gtk2::TreePath',
+                                'Gtk2::TreeIter'],
+                return_type => undef },
              },
   properties => [ Glib::ParamSpec->object
                   ('model',
-                   'Model',
+                   (do {
+                     my $str = 'Model';
+                     eval { require Locale::Messages;
+                            Locale::Messages::dgettext('gtk20-properties',$str)
+                            } || $str }),
                    'TreeModel to display.',
                    'Gtk2::TreeModel',
                    Glib::G_PARAM_READWRITE),
@@ -934,8 +947,8 @@ One use for a C<Gtk2::CheckMenuItem> is to have the C<active> property
 display and control a column in the model.  In C<item-create-or-update> do
 C<< $item->set_active >> to make the item show the model data, then in the
 C<activate> signal handler do C<< $model->set >> to put the item's new
-C<active> state into the model.  See F<examples/checkitem.pl> in the sources
-for a complete sample program.
+C<active> state into the model.  See F<examples/checkitem.pl> for a complete
+sample program.
 
 C<< $model->set >> under C<activate> will cause MenuView to call
 C<item-create-or-update> again because the model row has changed, and
@@ -989,7 +1002,7 @@ The only thing to note is that as of Gtk 2.20 a CellView doesn't
 automatically redraw if the model row changes.  C<item-create-or-update> is
 called for a row change and from there you can force a redraw with
 C<< $cellview->set_displayed_row >> with the same path already set in it.
-See F<examples/cellview.pl> in the sources for a complete program.
+See F<examples/cellview.pl> for a complete program.
 
 Often a single CellRenderer can be shared among all the items created.
 Drawing is done one cell at a time so different attribute values applied for
@@ -1012,8 +1025,8 @@ so for example
 Like a plain C<Gtk2::Menu>, a MenuView will be a top-level object in the
 builder and then either connected up as the submenu of a menuitem somewhere
 (in another menu or menubar), or just created ready to be popped up
-explicitly by event handler code.  See F<examples/builder.pl> in the sources
-for a complete program.
+explicitly by event handler code.  See F<examples/builder.pl> for a complete
+program.
 
 =head2 Subclassing
 
@@ -1068,7 +1081,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-menuview/index.html>
 
 =head1 LICENSE
 
-Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2017, 2019 Kevin Ryde
 
 Gtk2-Ex-MenuView is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

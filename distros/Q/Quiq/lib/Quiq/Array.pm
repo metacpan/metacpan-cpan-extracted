@@ -1,12 +1,12 @@
 package Quiq::Array;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Encode ();
 use Quiq::Reference;
@@ -32,11 +32,11 @@ auf ein ungeblesstes Perl-Array angewendet werden.
 
 Aufruf als Objektmethode:
 
-    $arr->$meth(...);
+  $arr->$meth(...);
 
 Aufruf als Klassenmethode:
 
-    $class->$meth(\@arr, ...);
+  $class->$meth(\@arr, ...);
 
 =head1 METHODS
 
@@ -46,8 +46,8 @@ Aufruf als Klassenmethode:
 
 =head4 Synopsis
 
-    $arr = $class->new;
-    $arr = $class->new(\@arr);
+  $arr = $class->new;
+  $arr = $class->new(\@arr);
 
 =head4 Description
 
@@ -73,8 +73,8 @@ sub new {
 
 =head4 Synopsis
 
-    ($only1A,$only2A,$bothA) = $arr1->different(\@arr2);
-    ($only1A,$only2A,$bothA) = $class->different(\@arr1,\@arr2);
+  ($only1A,$only2A,$bothA) = $arr1->different(\@arr2);
+  ($only1A,$only2A,$bothA) = $class->different(\@arr1,\@arr2);
 
 =head4 Alias
 
@@ -125,7 +125,7 @@ durch ihre Objekt-Id identifiziert. Die Liste der
 Datenbankobjekte sei @idsDb und die Liste der Objekte der
 Benutzerauswahl sei @idsUser. Dann liefert der Aufruf
 
-    ($idsNew,$idsDel) = $idsUserA->different(\@idsDb);
+  ($idsNew,$idsDel) = $idsUserA->different(\@idsDb);
 
 mit @$idsNew die Liste der zur Datenbank hinzuzufügenden Objekte und
 mit @$idsDel die Liste der von der Datenbank zu entfernenden Objekte.
@@ -138,10 +138,10 @@ Prüfe zwei Arrays auf Identiät
 Prüfe, ob zwei Arrays die gleichen Elemente enthalten, aber nicht
 unbedingt in der gleichen Reihenfolge:
 
-    ($only1,$only2) = $arr1->different(\@arr2);
-    if (!@$only1 && !@$only2) {
-        # @$arr1 und @$arr2 enthalten die gleichen Elemente
-    }
+  ($only1,$only2) = $arr1->different(\@arr2);
+  if (!@$only1 && !@$only2) {
+      # @$arr1 und @$arr2 enthalten die gleichen Elemente
+  }
 
 =back
 
@@ -186,8 +186,8 @@ sub different {
 
 =head4 Synopsis
 
-    $arr->decode($encoding);
-    $class->decode(\@arr,$encoding);
+  $arr->decode($encoding);
+  $class->decode(\@arr,$encoding);
 
 =head4 Description
 
@@ -212,8 +212,8 @@ sub decode {
 
 =head4 Synopsis
 
-    $bool = $arr->exists($str);
-    $bool = $class->exists(\@arr,$str);
+  $bool = $arr->exists($str);
+  $bool = $class->exists(\@arr,$str);
 
 =head4 Description
 
@@ -243,10 +243,10 @@ sub exists {
 
 =head4 Synopsis
 
-    $val = $arr->extractKeyVal($key);
-    $val = $arr->extractKeyVal($key,$step);
-    $val = $class->extractKeyVal(\@arr,$key);
-    $val = $class->extractKeyVal(\@arr,$key,$step);
+  $val = $arr->extractKeyVal($key);
+  $val = $arr->extractKeyVal($key,$step);
+  $val = $class->extractKeyVal(\@arr,$key);
+  $val = $class->extractKeyVal(\@arr,$key,$step);
 
 =head4 Alias
 
@@ -290,8 +290,8 @@ sub extractKeyVal {
 
 =head4 Synopsis
 
-    $bool = $arr->eq(\@arr);
-    $bool = $class->eq(\@arr1,\@arr2);
+  $bool = $arr->eq(\@arr);
+  $bool = $class->eq(\@arr1,\@arr2);
 
 =head4 Description
 
@@ -335,8 +335,8 @@ sub eq {
 
 =head4 Synopsis
 
-    $val = $arr->findPairValue($key);
-    $val = $class->findPairValue(\@arr,$key);
+  $val = $arr->findPairValue($key);
+  $val = $class->findPairValue(\@arr,$key);
 
 =head4 Returns
 
@@ -371,8 +371,8 @@ sub findPairValue {
 
 =head4 Synopsis
 
-    $i = $arr->index($val);
-    $i = $class->index(\@arr,$val);
+  $i = $arr->index($val);
+  $i = $class->index(\@arr,$val);
 
 =head4 Description
 
@@ -403,8 +403,8 @@ sub index {
 
 =head4 Synopsis
 
-    $e = $arr->last;
-    $e = $class->last(\@arr);
+  $e = $arr->last;
+  $e = $class->last(\@arr);
 
 =cut
 
@@ -421,8 +421,8 @@ sub last {
 
 =head4 Synopsis
 
-    $l = $arr->maxLength;
-    $l = $class>maxLength(\@arr);
+  $l = $arr->maxLength;
+  $l = $class>maxLength(\@arr);
 
 =head4 Description
 
@@ -451,10 +451,10 @@ sub maxLength {
 
 =head4 Synopsis
 
-    $arr2 | @arr = $class->pick(\@arr,$n,$m);
-    $arr2 | @arr = $class->pick(\@arr,$n);
-    $arr2 | @arr = $arr->pick($n,$m);
-    $arr2 | @arr = $arr->pick($n);
+  $arr2 | @arr = $class->pick(\@arr,$n,$m);
+  $arr2 | @arr = $class->pick(\@arr,$n);
+  $arr2 | @arr = $arr->pick($n,$m);
+  $arr2 | @arr = $arr->pick($n);
 
 =head4 Description
 
@@ -490,8 +490,8 @@ sub pick {
 
 =head4 Synopsis
 
-    $arr->push($e);
-    $class->push(\@arr,$e);
+  $arr->push($e);
+  $class->push(\@arr,$e);
 
 =cut
 
@@ -512,8 +512,8 @@ sub push {
 
 =head4 Synopsis
 
-    $arr2|@arr2 = $arr->select($test);
-    $arr2|@arr2 = $class->select(\@arr,$test);
+  $arr2|@arr2 = $arr->select($test);
+  $arr2|@arr2 = $class->select(\@arr,$test);
 
 =head4 Description
 
@@ -566,10 +566,10 @@ sub select {
 
 =head4 Synopsis
 
-    $arr->shuffle;
-    $arr->shuffle($factor);
-    $class->shuffle(\@arr);
-    $class->shuffle(\@arr,$factor);
+  $arr->shuffle;
+  $arr->shuffle($factor);
+  $class->shuffle(\@arr);
+  $class->shuffle(\@arr,$factor);
 
 =head4 Arguments
 
@@ -618,8 +618,8 @@ sub shuffle {
 
 =head4 Synopsis
 
-    $arr | @arr = $arr->sort;
-    $arr | @arr = $class->sort(\@arr);
+  $arr | @arr = $arr->sort;
+  $arr | @arr = $class->sort(\@arr);
 
 =head4 Description
 
@@ -652,10 +652,10 @@ sub sort {
 
 =head4 Synopsis
 
-    %hash | $hashH = $arr->toHash;
-    %hash | $hashH = $arr->toHash($val);
-    %hash | $hashH = $class->toHash(\@arr);
-    %hash | $hashH = $class->toHash(\@arr,$val);
+  %hash | $hashH = $arr->toHash;
+  %hash | $hashH = $arr->toHash($val);
+  %hash | $hashH = $class->toHash(\@arr);
+  %hash | $hashH = $class->toHash(\@arr,$val);
 
 =head4 Arguments
 
@@ -677,9 +677,9 @@ Hash. Im Skalarkontext wird eine Referenz auf den Hash geliefert.
 
 =head4 Description
 
-    Erzeuge aus Array @$arr bzw. @arr einen Hash mit den Werten des Array
-    als Schlüssel und dem Wert $val als deren Werte und liefere diesen zurück.
-    Ist $val nicht angegeben, werden alle Werte des Hash auf 1 gesetzt.
+  Erzeuge aus Array @$arr bzw. @arr einen Hash mit den Werten des Array
+  als Schlüssel und dem Wert $val als deren Werte und liefere diesen zurück.
+  Ist $val nicht angegeben, werden alle Werte des Hash auf 1 gesetzt.
 
 =cut
 
@@ -706,8 +706,8 @@ sub toHash {
 
 =head4 Synopsis
 
-    $gcd = $arr->%METHOD;
-    $gcd = $class->gcd(\@arr);
+  $gcd = $arr->%METHOD;
+  $gcd = $class->gcd(\@arr);
 
 =head4 Description
 
@@ -740,8 +740,8 @@ sub gcd {
 
 =head4 Synopsis
 
-    $min = $arr->min;
-    $min = $class->min(\@arr);
+  $min = $arr->min;
+  $min = $class->min(\@arr);
 
 =head4 Description
 
@@ -769,8 +769,8 @@ sub min {
 
 =head4 Synopsis
 
-    $max = $arr->max;
-    $max = $class->max(\@arr);
+  $max = $arr->max;
+  $max = $class->max(\@arr);
 
 =head4 Description
 
@@ -798,8 +798,8 @@ sub max {
 
 =head4 Synopsis
 
-    ($min,$max) = $arr->minMax;
-    ($min,$max) = $class->minMax(\@arr);
+  ($min,$max) = $arr->minMax;
+  ($min,$max) = $class->minMax(\@arr);
 
 =head4 Description
 
@@ -828,8 +828,8 @@ sub minMax {
 
 =head4 Synopsis
 
-    $x = $arr->meanValue;
-    $x = $class->meanValue(\@arr);
+  $x = $arr->meanValue;
+  $x = $class->meanValue(\@arr);
 
 =head4 Description
 
@@ -859,8 +859,8 @@ sub meanValue {
 
 =head4 Synopsis
 
-    $x = $arr->standardDeviation;
-    $x = $class->standardDeviation(\@arr);
+  $x = $arr->standardDeviation;
+  $x = $class->standardDeviation(\@arr);
 
 =head4 Description
 
@@ -885,8 +885,8 @@ sub standardDeviation {
 
 =head4 Synopsis
 
-    $x = $arr->variance;
-    $x = $class->variance(\@arr);
+  $x = $arr->variance;
+  $x = $class->variance(\@arr);
 
 =head4 Description
 
@@ -920,8 +920,8 @@ sub variance {
 
 =head4 Synopsis
 
-    $x = $arr->median;
-    $x = $class->median(\@arr);
+  $x = $arr->median;
+  $x = $class->median(\@arr);
 
 =head4 Description
 
@@ -962,26 +962,26 @@ sub median {
 
 =head4 Synopsis
 
-    $str = $arr->dump;
-    $str = $arr->dump($colSep);
-    $str = $class->dump(\@arr);
-    $str = $class->dump(\@arr,$colSep);
+  $str = $arr->dump;
+  $str = $arr->dump($colSep);
+  $str = $class->dump(\@arr);
+  $str = $class->dump(\@arr,$colSep);
 
 =head4 Description
 
 Liefere eine einzeilige, externe Repräsentation für Array $arr bzw. @arr
 im Format
 
-    elem0|elem1|...|elemN
+  elem0|elem1|...|elemN
 
 Die Array-Elemente werden durch "|" (bzw. $colSep) getrennt. In den
 Elementen werden folgende Wandlungen vorgenommen:
 
-    undef    -> '' (undef wird zu Leerstring)
-    \        -> \\ (Backslash wird verdoppelt)
-    $colSep  -> \!
-    LF       -> \n
-    CR       -> \r
+  undef    -> '' (undef wird zu Leerstring)
+  \        -> \\ (Backslash wird verdoppelt)
+  $colSep  -> \!
+  LF       -> \n
+  CR       -> \r
 
 =cut
 
@@ -1019,8 +1019,8 @@ sub dump {
 
 =head4 Synopsis
 
-    $arr = $class->restore($str);
-    $arr = $class->restore($str,$colSep);
+  $arr = $class->restore($str);
+  $arr = $class->restore($str,$colSep);
 
 =head4 Description
 
@@ -1060,7 +1060,7 @@ sub restore {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

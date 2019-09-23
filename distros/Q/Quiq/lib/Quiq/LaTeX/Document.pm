@@ -1,11 +1,11 @@
 package Quiq::LaTeX::Document;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Reference;
 use Quiq::Unindent;
@@ -27,32 +27,32 @@ L<Quiq::Hash>
 
 Der Code
 
-    use Quiq::LaTeX::Document;
-    use Quiq::LaTeX::Code;
-    
-    my $l = Quiq::LaTeX::Code->new;
-    
-    my $doc = Quiq::LaTeX::Document->new(
-        body => 'Hallo Welt',
-    );
-    
-    my $code = $doc->latex($l);
+  use Quiq::LaTeX::Document;
+  use Quiq::LaTeX::Code;
+  
+  my $l = Quiq::LaTeX::Code->new;
+  
+  my $doc = Quiq::LaTeX::Document->new(
+      body => 'Hallo Welt',
+  );
+  
+  my $code = $doc->latex($l);
 
 produziert
 
-    \documentclass[ngerman,a4paper]{scrartcl}
-    \usepackage[T1]{fontenc}
-    \usepackage{lmodern}
-    \usepackage[utf8]{inputenc}
-    \usepackage{babel}
-    \usepackage{geometry}
-    \usepackage{microtype}
-    \geometry{height=22.5cm,bottom=3.8cm}
-    \setlength{\parindent}{0em}
-    \setlength{\parskip}{0.5ex}
-    \begin{document}
-    Hallo Welt!
-    \end{document}
+  \documentclass[ngerman,a4paper]{scrartcl}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+  \usepackage[utf8]{inputenc}
+  \usepackage{babel}
+  \usepackage{geometry}
+  \usepackage{microtype}
+  \geometry{height=22.5cm,bottom=3.8cm}
+  \setlength{\parindent}{0em}
+  \setlength{\parskip}{0.5ex}
+  \begin{document}
+  Hallo Welt!
+  \end{document}
 
 =head1 METHODS
 
@@ -62,7 +62,7 @@ produziert
 
 =head4 Synopsis
 
-    $doc = $class->new(@keyVal);
+  $doc = $class->new(@keyVal);
 
 =head4 Arguments
 
@@ -134,7 +134,7 @@ Dukument-Optionen.
 Liste der Packages, die zusätzlich geladen werden sollen.
 Die Elemente sind Schlüssel/Wert-Paare der Art:
 
-    $package => \@options
+  $package => \@options
 
 =item paperSize => $paperSize (Default: 'a4paper')
 
@@ -233,8 +233,8 @@ sub new {
 
 =head4 Synopsis
 
-    $code = $doc->latex($l);
-    $code = $class->latex($l,@keyVal);
+  $code = $doc->latex($l);
+  $code = $class->latex($l,@keyVal);
 
 =head4 Description
 
@@ -433,7 +433,7 @@ sub latex {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

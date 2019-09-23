@@ -1,11 +1,11 @@
 package Quiq::TimeLapse::RangeDef;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::OrderedHash;
 use Quiq::Path;
@@ -26,23 +26,23 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    # Klasse laden
-    use %CLASS;
-    
-    # Instantiiere Range-Defintions-Objekt
-    $trd = Quiq::TimeLapse::RangeDef->new('/my/timelapse/dir');
-    
-    # Liste der Clip-Bezeichner
-    @keys = $trd->clipKeys;
-    
-    # Hash der Clip-Properties
-    $h = $trd->clipProperties;
-    
-    # Liste der Range-Bezeichner
-    @keys = $trd->rangeKeys;
-    
-    # Bildfolgen-Ausdruck zu einem Clip- oder Range-Bezeichner
-    $expr = $trd->expression($key);
+  # Klasse laden
+  use %CLASS;
+  
+  # Instantiiere Range-Defintions-Objekt
+  $trd = Quiq::TimeLapse::RangeDef->new('/my/timelapse/dir');
+  
+  # Liste der Clip-Bezeichner
+  @keys = $trd->clipKeys;
+  
+  # Hash der Clip-Properties
+  $h = $trd->clipProperties;
+  
+  # Liste der Range-Bezeichner
+  @keys = $trd->rangeKeys;
+  
+  # Bildfolgen-Ausdruck zu einem Clip- oder Range-Bezeichner
+  $expr = $trd->expression($key);
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ einer Zeile wird entfernt.
 
 Eine Clip-Definition hat den Aufbau:
 
-    Clip: KEY PROPERTY=VALUE ...
+  Clip: KEY PROPERTY=VALUE ...
 
 C<KEY> ist der Name/Bezeichner des Clip. Die Property-Liste
 C<PROPERTY=VALUE ...>  ist optional.
@@ -140,19 +140,19 @@ wenn die Folgezeilen mit Whitespace eingeleitet werden.
 Ein Bildfolgen-Ausdruck EXPR besteht aus 0 oder mehr Teilausdrücken, die
 mit Whitespace voneinender getrennt sind. Teilausdrücke sind:
 
-    N  .................. Einzelbild N
-    N-M ................. Bildnummern-Bereich N bis M
-    KEY ................. die Bilder des Clip oder Range KEY
-    all ................. sämtliche Bilder des Zeitraffer-Verzeichnisses
-    used ................ die Bilder aller Ranges
-    unused .............. die Bilder, die zu keinem Range gehören
-    junk ................ Bilder von unused, die per {} ausgesondert sind
-    duplicate(N,EXPR) ... jedes Bild in EXPR wird N-mal dupliziert
-    randomize(N,EXPR) ... zufällige Auswahl von N Bildern aus Vorrat EXPR
-    repeat(N,EXPR) ...... Bildfolge EXPR wird N-mal wiederholt
-    reverse(EXPR) ....... Bildfolge EXPR wird umgedreht
-    {EXPR} .............. die Bilder aus EXPR werden als Junk betrachtet
-    [EXPR] .............. Teilsausdruck EXPR wird nicht berücksichtigt
+  N  .................. Einzelbild N
+  N-M ................. Bildnummern-Bereich N bis M
+  KEY ................. die Bilder des Clip oder Range KEY
+  all ................. sämtliche Bilder des Zeitraffer-Verzeichnisses
+  used ................ die Bilder aller Ranges
+  unused .............. die Bilder, die zu keinem Range gehören
+  junk ................ Bilder von unused, die per {} ausgesondert sind
+  duplicate(N,EXPR) ... jedes Bild in EXPR wird N-mal dupliziert
+  randomize(N,EXPR) ... zufällige Auswahl von N Bildern aus Vorrat EXPR
+  repeat(N,EXPR) ...... Bildfolge EXPR wird N-mal wiederholt
+  reverse(EXPR) ....... Bildfolge EXPR wird umgedreht
+  {EXPR} .............. die Bilder aus EXPR werden als Junk betrachtet
+  [EXPR] .............. Teilsausdruck EXPR wird nicht berücksichtigt
 
 Betrachten wir C<all>, C<used>, C<unused>, C<junk> als Mengen,
 also Bildvorräte ohne Berücksichtigung der Reihenfolge, gilt:
@@ -175,10 +175,10 @@ C<junk> ist eine Teilmenge von C<unused>
 
 =head1 EXAMPLE
 
-    # Bilder 1 .. 58
-    Clip: autofahrt framerate=8
-    strecke1 1-23 {24-30}
-    strecke2 31-58
+  # Bilder 1 .. 58
+  Clip: autofahrt framerate=8
+  strecke1 1-23 {24-30}
+  strecke2 31-58
 
 =head1 METHODS
 
@@ -188,7 +188,7 @@ C<junk> ist eine Teilmenge von C<unused>
 
 =head4 Synopsis
 
-    $trd = $class->new($dir);
+  $trd = $class->new($dir);
 
 =head4 Arguments
 
@@ -359,7 +359,7 @@ sub new {
 
 =head4 Synopsis
 
-    @files|$fileA = $trd->files;
+  @files|$fileA = $trd->files;
 
 =head4 Returns
 
@@ -386,7 +386,7 @@ sub files {
 
 =head4 Synopsis
 
-    @keys|$keyA = $trd->clipKeys;
+  @keys|$keyA = $trd->clipKeys;
 
 =head4 Returns
 
@@ -412,7 +412,7 @@ sub clipKeys {
 
 =head4 Synopsis
 
-    $h = $trd->clipProperties($key);
+  $h = $trd->clipProperties($key);
 
 =head4 Returns
 
@@ -437,7 +437,7 @@ sub clipProperties {
 
 =head4 Synopsis
 
-    @keys|$keyA = $trd->rangeKeys;
+  @keys|$keyA = $trd->rangeKeys;
 
 =head4 Returns
 
@@ -463,7 +463,7 @@ sub rangeKeys {
 
 =head4 Synopsis
 
-    $n = $trd->rangeCount;
+  $n = $trd->rangeCount;
 
 =head4 Returns
 
@@ -488,7 +488,7 @@ sub rangeCount {
 
 =head4 Synopsis
 
-    $expr = $trd->expression($key);
+  $expr = $trd->expression($key);
 
 =head4 Returns
 
@@ -525,7 +525,7 @@ sub expression {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

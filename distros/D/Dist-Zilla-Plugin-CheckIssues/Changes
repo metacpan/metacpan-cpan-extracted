@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-CheckIssues
 
+0.011     2019-09-21 16:50:53Z
+          - print the links to github issues and PRs, rather than the top
+            level repository (RT#129876)
+          - no longer mutes errors in case of network issues
+
 0.010     2016-06-23 02:13:20Z
           - warn if resources metadata could not be inferred from the
             distribution in the 'dzil issues' command

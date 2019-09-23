@@ -4,7 +4,7 @@ Attean::API::AbbreviatingSerializer - Role for serializers that can abbreviate I
 
 =head1 VERSION
 
-This document describes Attean::API::AbbreviatingSerializer version 0.023
+This document describes Attean::API::AbbreviatingSerializer version 0.024
 
 =head1 DESCRIPTION
 
@@ -39,6 +39,13 @@ in the serialized data should be resolved.
 
 A L<URI::NamespaceMap> object representing prefix and namespace URI
 pairs that can be used to create abbreviations.
+
+=item C<< omit_base >>
+
+A boolean attribute that can be set to true if the serializer should
+not include the base URI in the serialized output. This is useful for
+making relative URIs that can be resolved by other systems.
+
 
 =back
 

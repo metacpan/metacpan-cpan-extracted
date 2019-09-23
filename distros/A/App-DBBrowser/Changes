@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.210    2019-09-21
+        - Term::Choose::Util: use object-oriented interface.
+
 2.209    2019-09-09
         - Bugfix in 'subqueries': term_width -> get_term_width.
 

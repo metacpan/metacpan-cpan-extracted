@@ -4,7 +4,7 @@ Applify - Write object oriented scripts with ease
 
 # VERSION
 
-0.18
+0.19
 
 # DESCRIPTION
 

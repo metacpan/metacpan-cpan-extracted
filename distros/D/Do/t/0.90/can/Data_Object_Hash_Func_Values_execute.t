@@ -17,7 +17,6 @@ execute
 
   my $func = Data::Object::Hash::Func::Values->new(
     arg1 => $data,
-    args => [1,3]
   );
 
   my $result = $func->execute;
@@ -49,11 +48,10 @@ my $func;
 $data = Data::Object::Hash->new({1..8});
 $func = Data::Object::Hash::Func::Values->new(
   arg1 => $data,
-  args => [1,3]
 );
 
 my $result = $func->execute;
 
-is_deeply $result, [2,4];
+is_deeply [sort { $a <=> $b } @$result], [2, 4, 6, 8];
 
 ok 1 and done_testing;

@@ -1,0 +1,16 @@
+Changes
+lib/PGObject/Util/DBChange.pm
+lib/PGObject/Util/DBChange/History.pm
+MANIFEST
+README
+t/00-load.t
+t/10-non-db.t
+t/data/sql/test1.sql
+t/data/sql/test2.sql
+t/data/sql/test3.sql
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

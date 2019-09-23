@@ -49,8 +49,10 @@
             "Moo" : "1.005000",
             "URI::Escape" : "1.60",
             "XML::LibXML::Simple" : "0.91",
+            "XML::LibXML::XPathContext" : "0",
             "XML::Struct" : "0.16",
             "YAML::XS" : "0.34",
+            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -77,7 +79,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-SRU"
       }
    },
-   "version" : "0.424",
+   "version" : "0.425",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -86,6 +88,7 @@
       "Jakob Voss <voss@gbv.de>",
       "Johann Rolschewski <jorol@cpan.org>",
       "Johann Rolschewski <rolschewski@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <njfranck@ca20c526.ugent.be>",
       "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",

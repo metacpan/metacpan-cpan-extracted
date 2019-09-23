@@ -34,5 +34,7 @@ t/12-stop.t
 t/13-unix-daemonize.t
 t/14-without-port-env.pl
 t/14-without-port.t
+t/15-udp-server.pl
+t/15-udp.t
 META.yml
 MANIFEST

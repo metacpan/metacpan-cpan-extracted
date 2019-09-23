@@ -1,11 +1,11 @@
 package Quiq::PostgreSql::CopyFormat;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -21,13 +21,13 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    use Quiq::PostgreSql::CopyFormat;
-    
-    # Instantiiere Objekt
-    my $cpy = Quiq::PostgreSql::CopyFormat->new($width);
-    
-    # Übersetze Array in COPY-Zeile
-    my $line = $cpy->arrayToLine(\@arr);
+  use Quiq::PostgreSql::CopyFormat;
+  
+  # Instantiiere Objekt
+  my $cpy = Quiq::PostgreSql::CopyFormat->new($width);
+  
+  # Übersetze Array in COPY-Zeile
+  my $line = $cpy->arrayToLine(\@arr);
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ Anzahl der Kolumnen pro Zeile.
 
 =head4 Synopsis
 
-    $cpy = $class->new($width);
+  $cpy = $class->new($width);
 
 =head4 Arguments
 
@@ -93,7 +93,7 @@ sub new {
 
 =head4 Synopsis
 
-    $line = $cpy->arrayToLine(\@arr);
+  $line = $cpy->arrayToLine(\@arr);
 
 =head4 Arguments
 
@@ -147,7 +147,7 @@ sub arrayToLine {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

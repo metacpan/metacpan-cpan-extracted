@@ -8,5 +8,6 @@ on 'test', sub {
   requires 'Test::Pod' , '0';
 };
 
+requires 'Moo', '0';
 requires 'Catmandu', '>=1.0201';
 requires 'Net::LDAP', '>=0.04';

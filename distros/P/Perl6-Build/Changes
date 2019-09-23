@@ -1,5 +1,8 @@
 Revision history for Perl6-Build
 
+0.101  2019-09-20 22:10:21 JST
+  - Use https://rakudo.org (#2)
+
 0.100  2019-05-11 07:18:14 JST
   - Add https://rakudostar.com/files/star/ for rakudo-star download urls (#1)
   - Move guts to Perl6::Build::CLI class (#1)

@@ -1,11 +1,11 @@
 package Quiq::TableRow;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Scalar::Util ();
 
@@ -38,7 +38,7 @@ der Klasse Quiq::Table. Details siehe dort.
 
 =head4 Synopsis
 
-    $row = $class->new($tab,\@arr);
+  $row = $class->new($tab,\@arr);
 
 =head4 Arguments
 
@@ -89,7 +89,7 @@ sub new {
 
 =head4 Synopsis
 
-    $value = $row->get($column);
+  $value = $row->get($column);
 
 =head4 Arguments
 
@@ -125,7 +125,7 @@ sub get {
 
 =head4 Synopsis
 
-    @values | $valueA = $row->values;
+  @values | $valueA = $row->values;
 
 =head4 Returns
 
@@ -150,7 +150,7 @@ sub values {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

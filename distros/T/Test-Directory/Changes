@@ -8,4 +8,6 @@ Revision history for Perl extension Test::Directory.
       -add support for subdirs
       -implicitly do File::Spec->join(split'/',$path) on all paths
 
-
+0.05  2019-09-21
+	-fix merge issues that prevented some features from being released
+	-add overloaded {} operator

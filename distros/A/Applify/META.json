@@ -54,7 +54,7 @@
          "web" : "https://github.com/jhthorsen/applify"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Roy Storey <kiwiroy@cpan.org>"

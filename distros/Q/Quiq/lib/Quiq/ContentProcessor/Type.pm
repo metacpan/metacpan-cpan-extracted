@@ -1,11 +1,11 @@
 package Quiq::ContentProcessor::Type;
 use base qw/Quiq::ContentProcessor::BaseType/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -30,15 +30,15 @@ Die Plugin-Klassen bilden eine Hierarchie von Klassen, an deren
 Spitze eine allgemeine, abstrakte Klasse steht (stehen sollte),
 die von der dieser Klasse abgeleitet ist:
 
-    package Jaz::Type;
-    use base qw/Quiq::ContentProcessor::Type/;
-    
-    __PACKAGE__->def(
-        ContentAllowed => 0,
-        Attributes => [qw/
-            Name
-        /],
-    );
+  package Jaz::Type;
+  use base qw/Quiq::ContentProcessor::Type/;
+  
+  __PACKAGE__->def(
+      ContentAllowed => 0,
+      Attributes => [qw/
+          Name
+      /],
+  );
 
 Ob der Abschnitt eines Typs einen Inhalt zulässt und welches die
 zulässigen Attribute sind, wird mit den Klassen-Attributen
@@ -56,22 +56,22 @@ für den ContentProcessor essentiellen Attribute (siehe Code der
 Methode). Die Methode wird in der Typ-Klasse überschrieben und von
 dort aus gerufen:
 
-    package Jaz::Type::Program::Shell;
-    use base qw/Jaz::Type::Program/;
-    
-    __PACKAGE__->def(
-        Attributes => [qw/
-            <Spezifische Attribute des Typs>
-        /],
-    );
-    
-    sub create {
-        my ($class,$sec,$cop,$plg) = @_;
-    
-        return $class->SUPER::create($sec,$cop,$plg,
-            <Eigenschaften der Entität>
-        );
-    }
+  package Jaz::Type::Program::Shell;
+  use base qw/Jaz::Type::Program/;
+  
+  __PACKAGE__->def(
+      Attributes => [qw/
+          <Spezifische Attribute des Typs>
+      /],
+  );
+  
+  sub create {
+      my ($class,$sec,$cop,$plg) = @_;
+  
+      return $class->SUPER::create($sec,$cop,$plg,
+          <Eigenschaften der Entität>
+      );
+  }
 
 =head2 Standard-Attribute
 
@@ -154,7 +154,7 @@ C<undef>. Die Methode wird überschrieben.
 
 =head4 Synopsis
 
-    $ent = $class->create($sec,$cop,$plg,@keyVal);
+  $ent = $class->create($sec,$cop,$plg,@keyVal);
 
 =head4 Arguments
 
@@ -229,7 +229,7 @@ sub create {
 
 =head4 Synopsis
 
-    $entityId = $ent->entityId;
+  $entityId = $ent->entityId;
 
 =head4 Description
 
@@ -268,7 +268,7 @@ sub entityId {
 
 =head4 Synopsis
 
-    $entityType = $ent->entityType;
+  $entityType = $ent->entityType;
 
 =head4 Returns
 
@@ -298,7 +298,7 @@ sub entityType {
 
 =head4 Synopsis
 
-    $name = $ent->name;
+  $name = $ent->name;
 
 =head4 Description
 
@@ -345,8 +345,8 @@ sub name {
 
 =head4 Synopsis
 
-    $file = $ent->entityFile;
-    $file = $ent->entityFile($dir);
+  $file = $ent->entityFile;
+  $file = $ent->entityFile($dir);
 
 =head4 Arguments
 
@@ -396,7 +396,7 @@ sub entityFile {
 
 =head4 Synopsis
 
-    $source = $ent->fileSource;
+  $source = $ent->fileSource;
 
 =head4 Returns
 
@@ -422,7 +422,7 @@ sub fileSource {
 
 =head4 Synopsis
 
-    $sourceR = $ent->fileSourceRef;
+  $sourceR = $ent->fileSourceRef;
 
 =head4 Returns
 
@@ -447,7 +447,7 @@ sub fileSourceRef {
 
 =head4 Synopsis
 
-    $ent->appendFileSource($sec);
+  $ent->appendFileSource($sec);
 
 =head4 Returns
 
@@ -475,7 +475,7 @@ sub appendFileSource {
 
 =head4 Synopsis
 
-    $str = $ent->pureCode;
+  $str = $ent->pureCode;
 
 =cut
 
@@ -494,7 +494,7 @@ sub pureCode {
 
 =head4 Synopsis
 
-    @files = $ent->outputFiles;
+  @files = $ent->outputFiles;
 
 =head4 Description
 
@@ -519,8 +519,8 @@ sub outputFiles {
 
 =head4 Synopsis
 
-    $needsTest = $ent->needsTest;
-    $needsTest = $ent->needsTest($state);
+  $needsTest = $ent->needsTest;
+  $needsTest = $ent->needsTest($state);
 
 =head4 Arguments
 
@@ -595,8 +595,8 @@ sub needsTest {
 
 =head4 Synopsis
 
-    $needsUpdate = $ent->needsUpdate;
-    $needsUpdate = $ent->needsUpdate($state);
+  $needsUpdate = $ent->needsUpdate;
+  $needsUpdate = $ent->needsUpdate($state);
 
 =head4 Arguments
 
@@ -662,7 +662,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

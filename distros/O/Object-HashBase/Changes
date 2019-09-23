@@ -1,3 +1,7 @@
+0.007     2019-09-19 16:43:04-07:00 America/Los_Angeles
+
+    - Add < and > attribute prefixes (read only and write-only)
+
 0.006     2017-10-20 20:37:09-07:00 America/Los_Angeles
 
     - Allow custom module versions in inlined copies

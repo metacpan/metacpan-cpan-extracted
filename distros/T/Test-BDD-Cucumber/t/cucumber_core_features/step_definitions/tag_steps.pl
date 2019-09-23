@@ -1,5 +1,7 @@
 #!perl
 
+package tag_feature_step_functions;
+
 use strict;
 use warnings;
 
@@ -107,8 +109,8 @@ Given 'a feature tagged with "@foo"', sub {
         <<'HEREDOC'
 @foo
 Feature: Name
-	Scenario: first
-	  Given bla
+        Scenario: first
+          Given bla
 HEREDOC
     );
     S->{'scenarios'} = $feature->scenarios;

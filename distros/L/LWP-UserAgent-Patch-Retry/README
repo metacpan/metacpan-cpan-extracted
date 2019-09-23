@@ -2,9 +2,9 @@ NAME
     LWP::UserAgent::Patch::Retry - Add retries
 
 VERSION
-    This document describes version 0.04 of LWP::UserAgent::Patch::Retry
+    This document describes version 0.050 of LWP::UserAgent::Patch::Retry
     (from Perl distribution LWP-UserAgent-Patch-Retry), released on
-    2017-07-10.
+    2019-09-20.
 
 SYNOPSIS
      use LWP::UserAgent::Patch::Retry -n => 2, -delay => 3;
@@ -64,7 +64,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2013 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2015, 2013 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

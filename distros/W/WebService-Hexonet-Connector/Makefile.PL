@@ -22,9 +22,6 @@ WriteMakefile(
         'Config'               => 0
     },
     TEST_REQUIRES => {
-        'Perl::Critic'           => 1.132,
-        'CPAN::Uploader'         => 0.103013,
-        'Devel::Cover'           => 1.30,
         'Test::More'             => 0,
         'Test::Exception'        => 0.43,
         'Test::RequiresInternet' => 0.05,

@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use Try::Tiny ();
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 has invocant => (
   is => 'ro',
@@ -78,6 +78,14 @@ sub finally {
   return $self;
 }
 
+sub maybe {
+  my ($self) = @_;
+
+  $self->on_default(sub{''});
+
+  return $self;
+}
+
 sub result {
   my ($self, @args) = @_;
 
@@ -101,7 +109,7 @@ sub result {
 
     if(!$returned) {
       $returned = $default->($caught) if $default;
-      die $caught if !$returned;
+      die $caught if not defined $returned;
     }
   }, Try::Tiny::finally(sub {
     my $finally = $self->on_finally;
@@ -417,6 +425,23 @@ arguments were provided by the invocant.
 
 =cut
 
+=head2 maybe
+
+  maybe() : Object
+
+The maybe method registers a default C<catch> condition that returns an falsy,
+i.e. an empty string, if an exception is encountered.
+
+=over 4
+
+=item maybe example
+
+  $try = $try->maybe;
+
+=back
+
+=cut
+
 =head2 no_catch
 
   no_catch() : Object
@@ -510,11 +535,11 @@ arguments were passed directly to this method.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

@@ -1,11 +1,11 @@
 package Quiq::Html::Table::List;
 use base qw/Quiq::Html::Table::Base/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -89,39 +89,39 @@ Liste der Kolumnentitel.
 Attribute von tr- und td-Elemeten setzen. Für jedes Element
 wird eine Arrayreferenz geliefert:
 
-    $e = Quiq::Html::Table::List->new(
-        titles => [qw/Id Name Vorname/],
-        align => [qw/right left left/],
-        rows => \@obj,
-        rowCallback => sub {
-            my ($row,$i) = @_;
-    
-            my $trA = [class=>'TRCLASS'];
-            push my @tds,[class=>'TDCLASS',$row->get('ATTRIBUTE')];
-            ...
-    
-            return ($trA,@tds);
-        },
-    );
-    $html = $e->html($h);
+  $e = Quiq::Html::Table::List->new(
+      titles => [qw/Id Name Vorname/],
+      align => [qw/right left left/],
+      rows => \@obj,
+      rowCallback => sub {
+          my ($row,$i) = @_;
+  
+          my $trA = [class=>'TRCLASS'];
+          push my @tds,[class=>'TDCLASS',$row->get('ATTRIBUTE')];
+          ...
+  
+          return ($trA,@tds);
+      },
+  );
+  $html = $e->html($h);
 
 Lediglich Werte ausgeben. Für das tr-Element wird C<undef> geliefert,
 für die td-Elemente ein skalarer Wert (der Content des Elements):
 
-    $e = Quiq::Html::Table::List->new(
-        titles => [qw/Id Name Vorname/],
-        align => [qw/right left left/],
-        rows => \@obj,
-        rowCallback => sub {
-            my ($row,$i) = @_;
-    
-            push @arr,$row->get('ATTRIBUTE');
-            ...
-    
-            return (undef,@arr);
-        },
-    );
-    $html = $e->html($h);
+  $e = Quiq::Html::Table::List->new(
+      titles => [qw/Id Name Vorname/],
+      align => [qw/right left left/],
+      rows => \@obj,
+      rowCallback => sub {
+          my ($row,$i) = @_;
+  
+          push @arr,$row->get('ATTRIBUTE');
+          ...
+  
+          return (undef,@arr);
+      },
+  );
+  $html = $e->html($h);
 
 =head1 METHODS
 
@@ -131,7 +131,7 @@ für die td-Elemente ein skalarer Wert (der Content des Elements):
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Description
 
@@ -173,8 +173,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -297,7 +297,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

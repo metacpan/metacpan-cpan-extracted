@@ -1,12 +1,22 @@
-# $Id: fail.t 1306 2004-05-13 10:59:01Z jonasbn $
+#!/usr/bin/env perl
 
-use Test::More tests => 1;
+use strict;
+use warnings;
 
-BEGIN {
-	use lib qw(t);
-	require NN;
-};
+use English qw(-no_match_vars);
+use FindBin qw($Bin);
+use lib ("$Bin/../t", 't');
 
-warn "This is a fake test, please refer to the TODO file";
+use Test::More;
+use Test::Fatal qw(dies_ok);
 
-ok(1);
+## no critic ( ProhibitStringyEval ProhibitComplexRegexes RequireDotMatchAnything RequireLineBoundaryMatching RequireExtendedFormatting)
+
+local $EVAL_ERROR = q{}; # protect existing $@ ($EVAL_ERROR)
+my $rv = eval 'use Example::Abstractionless';
+
+diag("Diagnostics ($rv): ", $EVAL_ERROR);
+
+like($EVAL_ERROR, qr/Class Example::Abstractionless must define is_holiday, holidays for class Date::Holidays::Abstract at/, 'abstraction not implemented, we observe a compilation error');
+
+done_testing();

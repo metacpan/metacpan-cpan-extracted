@@ -1,11 +1,11 @@
 package Quiq::Math;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use 5.010;
 use Quiq::Formatter;
@@ -33,7 +33,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $pi = $class->pi;
+  $pi = $class->pi;
 
 =cut
 
@@ -51,8 +51,8 @@ sub pi {
 
 =head4 Synopsis
 
-    $y = $class->roundTo($x,$n);
-    $y = $class->roundTo($x,$n,$normalize);
+  $y = $class->roundTo($x,$n);
+  $y = $class->roundTo($x,$n,$normalize);
 
 =head4 Description
 
@@ -63,7 +63,7 @@ normalizeNumber() normalisiert.
 
 Bei $n > 0 rundet die Methode mittels
 
-    $y = sprintf '%.*f',$n,$x;
+  $y = sprintf '%.*f',$n,$x;
 
 bei $n == 0 mittels roundToInt().
 
@@ -92,7 +92,7 @@ sub roundTo {
 
 =head4 Synopsis
 
-    $n = $class->roundToInt($x);
+  $n = $class->roundToInt($x);
 
 =head4 Description
 
@@ -104,13 +104,13 @@ Für negative $x ist es umgekehrt.
 
 Folgender Ansatz funktioniert nicht
 
-    $n = sprintf '%.0f',$x;
+  $n = sprintf '%.0f',$x;
 
 denn dieser gibt inkonsistente Ergebnisse
 
-    0.5 => 0
-    1.5 => 2
-    2.5 => 2
+  0.5 => 0
+  1.5 => 2
+  2.5 => 2
 
 =cut
 
@@ -126,7 +126,7 @@ sub roundToInt {
 
 =head4 Synopsis
 
-    ($minRounded,$maxRounded) = $class->roundMinMax($min,$max);
+  ($minRounded,$maxRounded) = $class->roundMinMax($min,$max);
 
 =head4 Description
 
@@ -181,7 +181,7 @@ sub roundMinMax {
 
 =head4 Synopsis
 
-    $gcd = $class->gcd($a,b);
+  $gcd = $class->gcd($a,b);
 
 =head4 Description
 
@@ -206,7 +206,7 @@ sub gcd {
 
 =head4 Synopsis
 
-    $rad = $class->degreeToRad($degree);
+  $rad = $class->degreeToRad($degree);
 
 =cut
 
@@ -223,7 +223,7 @@ sub degreeToRad {
 
 =head4 Synopsis
 
-    $degree = $class->radToDegree($rad);
+  $degree = $class->radToDegree($rad);
 
 =cut
 
@@ -242,7 +242,7 @@ sub radToDegree {
 
 =head4 Synopsis
 
-    ($latitude,$longitude) = $class->geoMidpoint(\@coordinates);
+  ($latitude,$longitude) = $class->geoMidpoint(\@coordinates);
 
 =head4 Arguments
 
@@ -318,7 +318,7 @@ sub geoMidpoint {
 
 =head4 Synopsis
 
-    $dezDeg = $class->geoToDegree($deg,$min,$sec,$dir);
+  $dezDeg = $class->geoToDegree($deg,$min,$sec,$dir);
 
 =head4 Description
 
@@ -327,8 +327,8 @@ Himmelsrichtung in eine dezimale Gradzahl und liefere diese zurück.
 
 =head4 Example
 
-    50 6 44 N -> 50.11222
-    50 6 44 S -> -50.11222
+  50 6 44 N -> 50.11222
+  50 6 44 S -> -50.11222
 
 =cut
 
@@ -363,7 +363,7 @@ sub geoToDegree {
 
 =head4 Synopsis
 
-    $km = $class->geoDistance($lat1,$lon1,$lat2,$lon2);
+  $km = $class->geoDistance($lat1,$lon1,$lat2,$lon2);
 
 =head4 Description
 
@@ -373,10 +373,10 @@ der Geokoordinaten ist in Grad.
 
 Der Berechnung liegt die Formel zugrunde:
 
-    km = 1.852*60*180/pi*acos(
-        sin($lat1*pi/180)*sin($lat2*pi/180)+
-        cos($lat1*pi/180)*cos($lat2*pi/180)*cos(($lon2-$lon1)*pi/180)
-    )
+  km = 1.852*60*180/pi*acos(
+      sin($lat1*pi/180)*sin($lat2*pi/180)+
+      cos($lat1*pi/180)*cos($lat2*pi/180)*cos(($lon2-$lon1)*pi/180)
+  )
 
 =head4 See Also
 
@@ -396,13 +396,13 @@ L<Blog Martin Kompf - Entfernungsberechnung|http://www.kompf.de/gps/distcalc.htm
 
 Abstand zw. zwei Längengraden (359. und 360.) am Äquator:
 
-    sprintf '%.2f',Quiq::Math->geoDistance(0,359,0,360);
-    # -> 111.12
+  sprintf '%.2f',Quiq::Math->geoDistance(0,359,0,360);
+  # -> 111.12
 
 Abstand zw. zwei Längengraden am Pol:
 
-    Quiq::Math->geoDistance(90,359,90,360);
-    # -> 0
+  Quiq::Math->geoDistance(90,359,90,360);
+  # -> 0
 
 =cut
 
@@ -433,7 +433,7 @@ sub geoDistance {
 
 =head4 Synopsis
 
-    $km = $class->latitudeDistance($lat);
+  $km = $class->latitudeDistance($lat);
 
 =head4 Description
 
@@ -464,7 +464,7 @@ sub latitudeDistance {
 
 =head4 Synopsis
 
-    $factor = $class->valueToPixelFactor($length,$min,$max)
+  $factor = $class->valueToPixelFactor($length,$min,$max)
 
 =head4 Returns
 
@@ -492,7 +492,7 @@ sub valueToPixelFactor {
 
 =head4 Synopsis
 
-    $factor = $class->pixelToValueFactor($length,$min,$max);
+  $factor = $class->pixelToValueFactor($length,$min,$max);
 
 =head4 Returns
 
@@ -519,7 +519,7 @@ sub pixelToValueFactor {
 
 =head4 Synopsis
 
-    $x = $class->valueToPixelX($width,$xMin,$xMax,$xVal);
+  $x = $class->valueToPixelX($width,$xMin,$xMax,$xVal);
 
 =head4 Alias
 
@@ -551,7 +551,7 @@ sub valueToPixelX {
 
 =head4 Synopsis
 
-    $y = $class->valueToPixelY($height,$yMin,$yMax,$yVal);
+  $y = $class->valueToPixelY($height,$yMin,$yMax,$yVal);
 
 =head4 Description
 
@@ -576,7 +576,7 @@ sub valueToPixelY {
 
 =head4 Synopsis
 
-    $y = $class->interpolate($x0,$y0,$x1,$y1,$x);
+  $y = $class->interpolate($x0,$y0,$x1,$y1,$x);
 
 =head4 Returns
 
@@ -606,7 +606,7 @@ sub interpolate {
 
 =head4 Synopsis
 
-    $bool = $class->isNumber($str);
+  $bool = $class->isNumber($str);
 
 =cut
 
@@ -624,13 +624,13 @@ sub isNumber {
 
 =head4 Synopsis
 
-    $val = $class->spikeValue($v1,$v2,$v3,$t1,$t3);
+  $val = $class->spikeValue($v1,$v2,$v3,$t1,$t3);
 
 =head4 Description
 
 Berechnung gemäß der Mail von Wilhelm Petersen vom 2017-05-03:
 
-    $v = (abs($v2-($v3+$v1)/2)-abs(($v3-$v1)/2))/($t3/60-$t1/60);
+  $v = (abs($v2-($v3+$v1)/2)-abs(($v3-$v1)/2))/($t3/60-$t1/60);
 
 Die Parameter $t1 und $t2 werden in Sekunden angeben, die
 Funktion rechnet jedoch in Minuten, daher die Division durch 60.
@@ -648,7 +648,7 @@ sub spikeValue {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,11 +1,11 @@
 package Quiq::ModelCache;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -23,23 +23,23 @@ L<Quiq::Hash>
 
 Instantiiere das Modell-Objekt für eine Reihe von Tabellen:
 
-    $mod = Quiq::ModelCache->new($db,@types);
+  $mod = Quiq::ModelCache->new($db,@types);
 
 Liefere alle Datensätze einer Tabelle:
 
-    @rows|$tab = $mod->all($type);
+  @rows|$tab = $mod->all($type);
 
 Liefere Datensatz zu Primärschlüssel:
 
-    $row = $mod->lookup($type,$id);
+  $row = $mod->lookup($type,$id);
 
 Liefere zu einem Datensatz alle Kind-Datensätze einer Kind-Tabelle:
 
-    @rows|$tab = $mod->childs($row,$childType);
+  @rows|$tab = $mod->childs($row,$childType);
 
 Liefere zu einem Datensatz den Eltern-Datensatz einer Eltern-Tabelle:
 
-    $row = $mod->parent($row,$parentType);
+  $row = $mod->parent($row,$parentType);
 
 =head1 DESCRIPTION
 
@@ -58,55 +58,55 @@ wird, ist die Klasse nicht für Tabellen mit Massendaten geeignet.
 
 Tabellen:
 
-    Person  Telefon
-    ------  -------
-    id      id
-    name    person_id
-            nummer
+  Person  Telefon
+  ------  -------
+  id      id
+  name    person_id
+          nummer
 
 Programm:
 
-    my $mod = Quiq::ModelCache->new($db,
-        'person',
-        'telefon',
-    );
-    
-    for my $per ($mod->all('person')) {
-        printf "%s\n",$per->name;
-        for my $tel ($mod->childs($per,'telefon')) {
-            printf "  %s\n",$tel->nummer;
-        }
-    }
-    __END__
-    Frank Seitz
-      0176/78243503
+  my $mod = Quiq::ModelCache->new($db,
+      'person',
+      'telefon',
+  );
+  
+  for my $per ($mod->all('person')) {
+      printf "%s\n",$per->name;
+      for my $tel ($mod->childs($per,'telefon')) {
+          printf "  %s\n",$tel->nummer;
+      }
+  }
+  __END__
+  Frank Seitz
+    0176/78243503
 
 =head2 Kolumnen mit Präfix
 
 Tabellen:
 
-    Person    Telefon
-    ------    -------
-    per_id    tel_id
-    per_name  tel_person_id
-              tel_nummer
+  Person    Telefon
+  ------    -------
+  per_id    tel_id
+  per_name  tel_person_id
+            tel_nummer
 
 Programm:
 
-    my $mod = Quiq::ModelCache->new($db,
-        [person => 'per'],
-        [telefon => 'tel'],
-    );
-    
-    for my $per ($mod->all('person')) {
-        printf "%s\n",$per->per_name;
-        for my $tel ($mod->childs($per,'telefon')) {
-            printf "  %s\n",$tel->tel_nummer;
-        }
-    }
-    __END__
-    Frank Seitz
-      0176/78243503
+  my $mod = Quiq::ModelCache->new($db,
+      [person => 'per'],
+      [telefon => 'tel'],
+  );
+  
+  for my $per ($mod->all('person')) {
+      printf "%s\n",$per->per_name;
+      for my $tel ($mod->childs($per,'telefon')) {
+          printf "  %s\n",$tel->tel_nummer;
+      }
+  }
+  __END__
+  Frank Seitz
+    0176/78243503
 
 =head1 METHODS
 
@@ -116,7 +116,7 @@ Programm:
 
 =head4 Synopsis
 
-    $mod = $class->new($db,@types);
+  $mod = $class->new($db,@types);
 
 =head4 Description
 
@@ -155,7 +155,7 @@ sub new {
 
 =head4 Synopsis
 
-    @rows|$tab = $mod->all($type);
+  @rows|$tab = $mod->all($type);
 
 =head4 Description
 
@@ -196,7 +196,7 @@ sub all {
 
 =head4 Synopsis
 
-    $ent = $mod->lookup($type,$id);
+  $ent = $mod->lookup($type,$id);
 
 =head4 Description
 
@@ -233,7 +233,7 @@ sub lookup {
 
 =head4 Synopsis
 
-    @rows|$tab = $mod->childs($row,$childType);
+  @rows|$tab = $mod->childs($row,$childType);
 
 =head4 Description
 
@@ -274,7 +274,7 @@ sub childs {
 
 =head4 Synopsis
 
-    $par = $mod->parent($row,$parentType);
+  $par = $mod->parent($row,$parentType);
 
 =head4 Description
 
@@ -305,18 +305,18 @@ sub parent {
 
 =head4 Synopsis
 
-    $pk = $mod->pk($type);
+  $pk = $mod->pk($type);
 
 =head4 Description
 
 Liefere den Namen der Primärschlüsselkolumne des Modell-Objekts $type.
 Ohne vereinbarten Kolumnenpräfix lautet der Name
 
-    id
+  id
 
 Mit vereinbarten Kolumnenpräfix lautet der Name
 
-    <prefix>_id
+  <prefix>_id
 
 =cut
 
@@ -333,7 +333,7 @@ sub pk {
 
 =head4 Synopsis
 
-    $fk = $mod->fk($type,$parentType);
+  $fk = $mod->fk($type,$parentType);
 
 =head4 Description
 
@@ -342,11 +342,11 @@ vom Typ $type für ein Parent-Modell-Objekt vom Typ $parentType.
 
 Ohne vereinbarten Kolumnenpräfix für $type lautet der Name
 
-    <parentType>_id
+  <parentType>_id
 
 Mit vereinbarten Kolumnenpräfix für $type lautet der Name
 
-    <prefix>_<parentType>_id
+  <prefix>_<parentType>_id
 
 =cut
 
@@ -361,7 +361,7 @@ sub fk {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

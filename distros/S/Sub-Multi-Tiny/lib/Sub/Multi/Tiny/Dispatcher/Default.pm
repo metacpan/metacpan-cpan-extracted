@@ -10,7 +10,7 @@ use Guard;
 use Sub::Multi::Tiny::Util qw(_hlog _line_mark_string _make_positional_copier
                                 _complete_dispatcher);
 
-our $VERSION = '0.000006'; # TRIAL
+our $VERSION = '0.000011'; # TRIAL
 
 # Documentation {{{1
 
@@ -53,12 +53,21 @@ sub MakeDispatcher {
     my (%candidates_by_arity, %copiers_by_arity);   # TODO make this cleaner
     foreach my $impl (@{$hr->{impls}}) {
         my $arity = @{$impl->{args}};
-        die "I can't yet distinguish between candidates of the same arity"
+        die "Two candidates of the same arity ($arity) - try D:TypeParams?"
             if exists $candidates_by_arity{$arity};
         $candidates_by_arity{$arity} = $impl->{code};
         $copiers_by_arity{$arity} =
             _make_positional_copier($hr->{defined_in}, $impl);
-    }
+
+        # Die cleanly if we got something we can't handle
+        foreach my $arg (@{$impl->{args}}) {
+            die "Type constraint on $impl->{candidate_name}, arg $arg->{name}"
+                . '- try D:TypeParams?' if $arg->{type};
+            die "'where' clause on $impl->{candidate_name}, arg $arg->{name}"
+                . '- try D:TypeParams?' if $arg->{where};
+        } #foreach $arg
+
+    } #foreach $impl
 
     # Make the dispatcher
     $code .= _line_mark_string <<EOT;

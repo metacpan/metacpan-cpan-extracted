@@ -1,12 +1,12 @@
 package Quiq::LineProcessor;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -35,22 +35,22 @@ Methoden zur Manipulation des Arrays von Zeilen zur Verfügung.
 Für eine Fehlerbehandlung können die Methoden $par->input()
 und $line->number() genutzt werden:
 
-    $class->throw(
-        'SDOC-00001: K\{} and k\{} are not supported anymore',
-        Input => ''.$par->input,
-        Line => $line->number,
-    );
+  $class->throw(
+      'SDOC-00001: K\{} and k\{} are not supported anymore',
+      Input => ''.$par->input,
+      Line => $line->number,
+  );
 
 produziert (z.B.)
 
-    Exception:
-        SDOC-00001: K{} and k{} is not supported anymore
-    Input:
-        /tmp/test.sdoc
-    Line:
-        20
-    Stacktrace:
-        ...
+  Exception:
+      SDOC-00001: K{} and k{} is not supported anymore
+  Input:
+      /tmp/test.sdoc
+  Line:
+      20
+  Stacktrace:
+      ...
 
 =head1 METHODS
 
@@ -60,9 +60,9 @@ produziert (z.B.)
 
 =head4 Synopsis
 
-    $par = $class->new($file,@opt);
-    $par = $class->new(\$str,@opt);
-    $par = $class->new(\@lines,@opt);
+  $par = $class->new($file,@opt);
+  $par = $class->new(\$str,@opt);
+  $par = $class->new(\@lines,@opt);
 
 =head4 Options
 
@@ -225,7 +225,7 @@ sub new {
 
 =head4 Synopsis
 
-    $input = $par->input;
+  $input = $par->input;
 
 =head4 Description
 
@@ -246,7 +246,7 @@ sub input {
 
 =head4 Synopsis
 
-    $lineClass = $par->lineClass;
+  $lineClass = $par->lineClass;
 
 =head4 Description
 
@@ -266,7 +266,7 @@ sub lineClass {
 
 =head4 Synopsis
 
-    @lines | $lineA = $par->lines(\@lines);
+  @lines | $lineA = $par->lines(\@lines);
 
 =head4 Description
 
@@ -291,7 +291,7 @@ sub lines {
 
 =head4 Synopsis
 
-    $line = $par->shiftLine;
+  $line = $par->shiftLine;
 
 =head4 Description
 
@@ -312,7 +312,7 @@ sub shiftLine {
 
 =head4 Synopsis
 
-    $line = $par->shiftLineIfEq($str);
+  $line = $par->shiftLineIfEq($str);
 
 =head4 Description
 
@@ -335,7 +335,7 @@ sub shiftLineIfEq {
 
 =head4 Synopsis
 
-    $par->removeEmptyLines;
+  $par->removeEmptyLines;
 
 =head4 Description
 
@@ -361,8 +361,8 @@ sub removeEmptyLines {
 
 =head4 Synopsis
 
-    $str = $par->dump($format);
-    $str = $par->dump;
+  $str = $par->dump($format);
+  $str = $par->dump;
 
 =head4 Description
 
@@ -393,7 +393,7 @@ sub dump {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.72'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  WiringPi::API: '2.3612'
+  RPi::Const: '1.04'
+  WiringPi::API: '2.3616'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/rpi-lcd/issues
   repository: https://github.com/stevieb9/rpi-lcd.git
-version: '2.3603'
+version: '2.3604'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

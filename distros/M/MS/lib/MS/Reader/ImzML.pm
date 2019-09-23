@@ -1,4 +1,4 @@
-package MS::Reader::ImzML 0.001;
+package MS::Reader::ImzML;
 
 use strict;
 use warnings;

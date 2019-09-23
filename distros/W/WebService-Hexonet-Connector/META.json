@@ -49,11 +49,8 @@
       },
       "test" : {
          "requires" : {
-            "CPAN::Uploader" : "0.103013",
             "Config" : "0",
-            "Devel::Cover" : "1.3",
             "POSIX" : "0",
-            "Perl::Critic" : "1.132",
             "Readonly" : "2.05",
             "Scalar::Util" : "0",
             "Test::Exception" : "0.43",
@@ -64,6 +61,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.2.3",
+   "version" : "v2.2.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

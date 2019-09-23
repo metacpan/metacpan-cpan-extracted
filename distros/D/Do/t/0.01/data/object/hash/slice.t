@@ -15,10 +15,10 @@ subtest 'test the slice method' => sub {
   my $slice    = $hash->slice(@argument);
 
   isnt refaddr($hash), refaddr($slice);
-  is_deeply $slice, {1 => 2, 3 => 4};
+  is_deeply $slice, [2, 4];
 
   isa_ok $hash,  'Data::Object::Hash';
-  isa_ok $slice, 'Data::Object::Hash';
+  isa_ok $slice, 'Data::Object::Array';
 };
 
 ok 1 and done_testing;

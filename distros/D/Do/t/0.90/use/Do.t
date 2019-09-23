@@ -32,8 +32,9 @@ Modern Perl
 This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
-L<Data::Object>; please see that documentation to learn more, or review
-L<Data::Object::Use>.
+L<Data::Object>; Please see that documentation to learn more. Also, you can
+read the L<overview|https://github.com/iamalnewkirk/do/blob/master/OVERVIEW.md>
+and project L<wiki|https://github.com/iamalnewkirk/do/wiki>.
 
 =headers
 

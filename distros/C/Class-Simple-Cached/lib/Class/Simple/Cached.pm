@@ -13,11 +13,11 @@ Class::Simple::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ for example by changing its state.
 
 Creates a Class::Simple::Cached object.
 
-It takes one manadatory parameter: cache,
+It takes one mandatory parameter: cache,
 which is an object which understands get() and set() calls,
 such as an L<CHI> object.
 
@@ -83,30 +83,66 @@ sub _caller_class
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
-
 	$param =~ s/.*:://;
 
-	return if($param eq 'DESTROY');
 	my $self = shift;
+	my $cache = $self->{'cache'};
+
+	if($param eq 'DESTROY') {
+		if(defined($^V) && ($^V ge 'v5.14.0')) {
+			return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
+		}
+		$cache->clear();
+		return;
+	}
+
 	# my $func = $self->{'object'} . "::$param";
 	my $func = $param;
 	my $object = $self->{'object'};
 
-	if($param !~ /^[gs]et_/) {
-		my $cache = $self->{'cache'};
+	# if($param =~ /^[gs]et_/) {
+		# # $param = "SUPER::$param";
+		# return $object->$func(\@_);
+	# }
 
-		if(scalar(@_) == 0) {
-			if(my $rc = $cache->get($param)) {
-				return $rc;
+	if(scalar(@_) == 0) {
+		# Retrieving a value
+		if(my $rc = $cache->get($param)) {
+			if(ref($rc) eq 'ARRAY') {
+				return @{$rc};
 			}
+			if($rc eq __PACKAGE__ . ">UNDEF<") {
+				return;
+			}
+			return $rc;
 		}
-
-		# $param = "SUPER::$param";
-		# return $cache->set($param, $self->$param(@_), 'never');
-		return $cache->set($param, $object->$func(@_), 'never');
+		if(wantarray) {
+			my @rc = $object->$func();
+			if(scalar(@rc) == 0) {
+				return;
+			}
+			$cache->set($param, \@rc, 'never');
+			return @rc;
+		}
+		my $rc = $object->$func();
+		if(!defined($rc)) {
+			$cache->set($param, __PACKAGE__ . ">UNDEF<", 'never');
+			return;
+		}
+		return $cache->set($param, $rc, 'never');
 	}
+
 	# $param = "SUPER::$param";
-	$object->$func(@_);
+	# return $cache->set($param, $self->$param(@_), 'never');
+	if($_[1]) {
+		# Storing an array
+		# We store a ref to the array, and dereference on retrieval
+		my $val = $object->$func(\@_);
+		$cache->set($param, $val, 'never');
+		return @{$val};
+	}
+	# Storing a scalar
+	return $cache->set($param, $object->$func($_[0]), 'never');
 }
 
 =head1 AUTHOR
@@ -114,6 +150,8 @@ sub AUTOLOAD {
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
+
+Doesn't work with L<Memoize>.
 
 Please report any bugs or feature requests to C<bug-class-simple-cached at rt.cpan.org>,
 or through the web interface at

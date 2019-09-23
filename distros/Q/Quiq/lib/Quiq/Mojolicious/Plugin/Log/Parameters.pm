@@ -1,11 +1,11 @@
 package Quiq::Mojolicious::Plugin::Log::Parameters;
 use base qw/Mojolicious::Plugin/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -21,11 +21,11 @@ Mojolicious::Plugin
 
 =head1 SYNOPSIS
 
-    # Mojolicious
-    $app->plugin('Quiq::Mojolicious::Plugin::Log::Parameters');
-    
-    # Mojolicious::Lite
-    plugin 'Quiq::Mojolicious::Plugin::Log::Parameters';
+  # Mojolicious
+  $app->plugin('Quiq::Mojolicious::Plugin::Log::Parameters');
+  
+  # Mojolicious::Lite
+  plugin 'Quiq::Mojolicious::Plugin::Log::Parameters';
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ empfängt.
 
 =head4 Synopsis
 
-    $plugin->register($app,$conf);
+  $plugin->register($app,$conf);
 
 =head4 Description
 
@@ -77,7 +77,7 @@ sub register {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

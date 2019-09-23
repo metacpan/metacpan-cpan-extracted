@@ -12,11 +12,11 @@ the PGObject Framework
 
 =head1 VERSION
 
-Version 1.00.002
+Version 1.00.003
 
 =cut
 
-our $VERSION = '1.00.002';
+our $VERSION = '1.00.003';
 
 
 =head1 SYNOPSIS

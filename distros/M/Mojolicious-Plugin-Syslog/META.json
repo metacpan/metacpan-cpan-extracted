@@ -48,13 +48,13 @@
       "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-syslog",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jhthorsen/mojolicious-plugin-syslog",
+         "url" : "https://github.com/jhthorsen/mojolicious-plugin-syslog.git",
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-syslog"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

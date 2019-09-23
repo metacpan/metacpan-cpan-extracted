@@ -1,11 +1,11 @@
 package Quiq::Database::Cursor;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Database::Row::Array;
 use Quiq::Database::Row::Object;
@@ -42,7 +42,7 @@ Statement-Ausführung auf einer Relationalen Datenbank.
 
 =head4 Synopsis
 
-    $cur = $class->new(@keyVal);
+  $cur = $class->new(@keyVal);
 
 =head4 Description
 
@@ -91,7 +91,7 @@ sub new {
 
 =head4 Synopsis
 
-    $cur->close;
+  $cur->close;
 
 =head4 Alias
 
@@ -128,7 +128,7 @@ sub close {
 
 =head4 Synopsis
 
-    $n = $cur->bindVars;
+  $n = $cur->bindVars;
 
 =cut
 
@@ -144,8 +144,8 @@ sub bindVars {
 
 =head4 Synopsis
 
-    @arr|$arr = $cur->bindTypes(@dataTypes);
-    @arr|$arr = $cur->bindTypes;
+  @arr|$arr = $cur->bindTypes(@dataTypes);
+  @arr|$arr = $cur->bindTypes;
 
 =cut
 
@@ -161,7 +161,7 @@ sub bindTypes {
 
 =head4 Synopsis
 
-    $db = $cur->db;
+  $db = $cur->db;
 
 =cut
 
@@ -177,7 +177,7 @@ sub db {
 
 =head4 Synopsis
 
-    $n = $cur->hits;
+  $n = $cur->hits;
 
 =head4 Description
 
@@ -198,7 +198,7 @@ sub hits {
 
 =head4 Synopsis
 
-    $id = $cur->id;
+  $id = $cur->id;
 
 =head4 Alias
 
@@ -227,7 +227,7 @@ sub id {
 
 =head4 Synopsis
 
-    $op = $cur->rowOperation;
+  $op = $cur->rowOperation;
 
 =head4 Description
 
@@ -248,7 +248,7 @@ sub rowOperation {
 
 =head4 Synopsis
 
-    $rowClass = $cur->rowClass;
+  $rowClass = $cur->rowClass;
 
 =cut
 
@@ -264,7 +264,7 @@ sub rowClass {
 
 =head4 Synopsis
 
-    $stmt = $cur->stmt;
+  $stmt = $cur->stmt;
 
 =head4 Description
 
@@ -288,7 +288,7 @@ sub stmt {
 
 =head4 Synopsis
 
-    @titles | $titlesA = $cur->titles;
+  @titles | $titlesA = $cur->titles;
 
 =head4 Description
 
@@ -312,7 +312,7 @@ sub titles {
 
 =head4 Synopsis
 
-    $bool = $cur->fromCache;
+  $bool = $cur->fromCache;
 
 =head4 Description
 
@@ -333,7 +333,7 @@ sub fromCache {
 
 =head4 Synopsis
 
-    $bool = $cur->isSelect;
+  $bool = $cur->isSelect;
 
 =head4 Description
 
@@ -356,7 +356,7 @@ sub isSelect {
 
 =head4 Synopsis
 
-    $time = $cur->startTime;
+  $time = $cur->startTime;
 
 =cut
 
@@ -372,7 +372,7 @@ sub startTime {
 
 =head4 Synopsis
 
-    $time = $cur->execTime;
+  $time = $cur->execTime;
 
 =cut
 
@@ -388,7 +388,7 @@ sub execTime {
 
 =head4 Synopsis
 
-    $time = $cur->elapsed;
+  $time = $cur->elapsed;
 
 =head4 Alias
 
@@ -416,7 +416,7 @@ sub elapsed {
 
 =head4 Synopsis
 
-    $cur2 = $cur->bind(@vals);
+  $cur2 = $cur->bind(@vals);
 
 =head4 Description
 
@@ -467,7 +467,7 @@ sub bind {
 
 =head4 Synopsis
 
-    $row = $cur->fetch;
+  $row = $cur->fetch;
 
 =head4 Description
 
@@ -581,9 +581,9 @@ sub fetch {
 
 =head4 Synopsis
 
-    @rows | $tab = $cur->fetchAll;
-    @rows | $tab = $cur->fetchAll($autoClose);
-    @rows | $tab = $cur->fetchAll($autoClose,$limit);
+  @rows | $tab = $cur->fetchAll;
+  @rows | $tab = $cur->fetchAll($autoClose);
+  @rows | $tab = $cur->fetchAll($autoClose,$limit);
 
 =head4 Arguments
 
@@ -660,7 +660,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

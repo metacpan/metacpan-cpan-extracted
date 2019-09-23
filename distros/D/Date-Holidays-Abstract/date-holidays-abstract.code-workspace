@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+        "perlSyntax.includePaths": [
+            "/Users/jonasbn/.perlbrew/libs/perl-5.28.1@date-holidays-abstract/lib/perl5/darwin-2level",
+            "/Users/jonasbn/.perlbrew/libs/perl-5.28.1@date-holidays-abstract/lib/perl5"
+        ],
+        "perlSyntax.perlExecutable": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.28.1/bin/perl",
+        "perlcritic.additionalArguments": [
+            "--profile",
+            "t/perlcriticrc"
+        ]
+    }
+}

@@ -1,11 +1,11 @@
 package Quiq::Confluence::Page;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use JSON ();
 use Quiq::Debug;
@@ -37,7 +37,7 @@ auf die Information in der Antwort zugegriffen werden.
 
 =head4 Synopsis
 
-    $pag = $class->new($json);
+  $pag = $class->new($json);
 
 =head4 Arguments
 
@@ -79,7 +79,7 @@ sub new {
 
 =head4 Synopsis
 
-    $h = $pag->hash;
+  $h = $pag->hash;
 
 =head4 Returns
 
@@ -106,7 +106,7 @@ sub hash {
 
 =head4 Synopsis
 
-    $id = $pag->id;
+  $id = $pag->id;
 
 =head4 Returns
 
@@ -131,7 +131,7 @@ sub id {
 
 =head4 Synopsis
 
-    $space = $pag->space;
+  $space = $pag->space;
 
 =head4 Returns
 
@@ -156,7 +156,7 @@ sub space {
 
 =head4 Synopsis
 
-    $title = $pag->title;
+  $title = $pag->title;
 
 =head4 Returns
 
@@ -182,7 +182,7 @@ sub title {
 
 =head4 Synopsis
 
-    $n = $pag->version;
+  $n = $pag->version;
 
 =head4 Returns
 
@@ -209,7 +209,7 @@ sub version {
 
 =head4 Synopsis
 
-    $str = $pag->asString;
+  $str = $pag->asString;
 
 =head4 Returns
 
@@ -234,7 +234,7 @@ sub asString {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

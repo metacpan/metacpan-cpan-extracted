@@ -1,12 +1,12 @@
 package Quiq::FileHandle;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -31,28 +31,28 @@ L<Quiq::Object>
 
 Datei schreiben:
 
-    my $fh = Quiq::FileHandle->new('>',$path);
-    $fh->print("Test\n");
-    $fh->close;
+  my $fh = Quiq::FileHandle->new('>',$path);
+  $fh->print("Test\n");
+  $fh->close;
 
 Datei lesen:
 
-    my $fh = Quiq::FileHandle->new('<',$path);
-    while (<$fh>) {
-        print;
-    }
-    $fh->close;
+  my $fh = Quiq::FileHandle->new('<',$path);
+  while (<$fh>) {
+      print;
+  }
+  $fh->close;
 
 Zähler-Datei mit Locking:
 
-    my $fh = Quiq::FileHandle->new('+>>',$file,-lock=>'EX');
-    $fh->seek(0);
-    my $count = <$fh> || "0\n";
-    chomp $count;
-    $fh->truncate;
-    $fh->print(++$count,"\n");
-    
-    # Der Lock bleibt so lange bestehen bis $fh aus dem Scope geht
+  my $fh = Quiq::FileHandle->new('+>>',$file,-lock=>'EX');
+  $fh->seek(0);
+  my $count = <$fh> || "0\n";
+  chomp $count;
+  $fh->truncate;
+  $fh->print(++$count,"\n");
+  
+  # Der Lock bleibt so lange bestehen bis $fh aus dem Scope geht
 
 Siehe auch Quiq::LockedCounter.
 
@@ -69,10 +69,10 @@ Daten gelesen oder geschrieben werden können.
 
 =head4 Synopsis
 
-    $fh = $class->new($mode,$path,@opt);
-    $fh = $class->new($globRef,@opt);
-    $fh = $class->new('<'); # Lesen von STDIN
-    $fh = $class->new('>'); # Schreiben nach STDOUT
+  $fh = $class->new($mode,$path,@opt);
+  $fh = $class->new($globRef,@opt);
+  $fh = $class->new('<'); # Lesen von STDIN
+  $fh = $class->new('>'); # Schreiben nach STDOUT
 
 =head4 Alias
 
@@ -110,19 +110,19 @@ Objekt zurück.
 
 Filehandle-Objekt für STDOUT:
 
-    $fh = Quiq::FileHandle->new(\*STDOUT);
+  $fh = Quiq::FileHandle->new(\*STDOUT);
 
 Lesen von STDIN:
 
-    $fh = $class->new('<');
-    $fh = $class->new('<','');
-    $fh = $class->new('<','-');
+  $fh = $class->new('<');
+  $fh = $class->new('<','');
+  $fh = $class->new('<','-');
 
 Schreiben nach STDOUT:
 
-    $fh = $class->new('>');
-    $fh = $class->new('>','');
-    $fh = $class->new('>','-');
+  $fh = $class->new('>');
+  $fh = $class->new('>','');
+  $fh = $class->new('>','-');
 
 =cut
 
@@ -211,7 +211,7 @@ sub new {
 
 =head4 Synopsis
 
-    $fh->destroy;
+  $fh->destroy;
 
 =head4 Alias
 
@@ -250,7 +250,7 @@ sub destroy {
 
 =head4 Synopsis
 
-    $data = $fh->read($n);
+  $data = $fh->read($n);
 
 =head4 Description
 
@@ -288,13 +288,13 @@ sub read {
 
 =head4 Synopsis
 
-    $data = $fh->readData;
+  $data = $fh->readData;
 
 =head4 Description
 
 Lies Daten in der Repräsentation
 
-    <LENGTH><DATA>
+  <LENGTH><DATA>
 
 und liefere <DATA> zurück. <LENGTH> ist ein 32 Bit Integer und <DATA>
 sind beliebige Daten mit <LENGTH> Bytes Länge.
@@ -305,7 +305,7 @@ nach dem Einlesen anscheinend nicht dekodiert werden. Warum?
 Wurden die Daten $data in einem Encoding wie UTF-8 geschrieben, müssen
 diese anschließend decodiert werden mit
 
-    Encode::decode('utf-8',$data);
+  Encode::decode('utf-8',$data);
 
 Auf der FileHandle $fh das Encoding zu definieren, ist I<nicht>
 richtig, da die Längenangabe diesem Encoding nicht unterliegt!
@@ -335,7 +335,7 @@ sub readData {
 
 =head4 Synopsis
 
-    $line = $fh->readLine;
+  $line = $fh->readLine;
 
 =head4 Description
 
@@ -364,7 +364,7 @@ sub readLine {
 
 =head4 Synopsis
 
-    @lines|$lineA = $fh->readLines($n);
+  @lines|$lineA = $fh->readLines($n);
 
 =head4 Description
 
@@ -377,11 +377,11 @@ Zeilen gelesen wurden, sonst C<undef>.
 
 Liefere Chunks von 1000 Pfaden:
 
-    my $fh = Quiq::FileHandle->new('-|',"find @$dirA -name '*.xml.gz'");
-    while (my $fileA = $fh->readLines(1000)) {
-        ...
-    }
-    $fh->close;
+  my $fh = Quiq::FileHandle->new('-|',"find @$dirA -name '*.xml.gz'");
+  while (my $fileA = $fh->readLines(1000)) {
+      ...
+  }
+  $fh->close;
 
 =cut
 
@@ -409,7 +409,7 @@ sub readLines {
 
 =head4 Synopsis
 
-    $line = $fh->readLineChomp;
+  $line = $fh->readLineChomp;
 
 =head4 Description
 
@@ -437,7 +437,7 @@ sub readLineChomp {
 
 =head4 Synopsis
 
-    $line = $fh->readLineNoWhiteSpace;
+  $line = $fh->readLineNoWhiteSpace;
 
 =head4 Description
 
@@ -470,7 +470,7 @@ sub readLineNoWhiteSpace {
 
 =head4 Synopsis
 
-    $c = $fh->getc;
+  $c = $fh->getc;
 
 =cut
 
@@ -496,7 +496,7 @@ sub getc {
 
 =head4 Synopsis
 
-    $data = $fh->slurp;
+  $data = $fh->slurp;
 
 =head4 Returns
 
@@ -513,9 +513,9 @@ bestimmten Position gelesen werden soll.
 
 Lies gesamten Inhalt einer Datei ab Position $pos:
 
-    my $fh = Quiq::FileHandle->open('<',$logFile);
-    $fh->seek($pos);
-    my $data = $fh->slurp;
+  my $fh = Quiq::FileHandle->open('<',$logFile);
+  $fh->seek($pos);
+  my $data = $fh->slurp;
 
 =cut
 
@@ -535,7 +535,7 @@ sub slurp {
 
 =head4 Synopsis
 
-    $fh->print(@data);
+  $fh->print(@data);
 
 =head4 Alias
 
@@ -568,13 +568,13 @@ sub print {
 
 =head4 Synopsis
 
-    $fh->writeData($data);
+  $fh->writeData($data);
 
 =head4 Description
 
 Schreibe die Daten $data in der Repräsentation
 
-    <LENGTH><DATA>
+  <LENGTH><DATA>
 
 Hierbei ist <LENGTH> ein 32 Bit Integer, der die Länge der
 darauffolgenden Daten <DATA> in Bytes angibt.
@@ -582,7 +582,7 @@ darauffolgenden Daten <DATA> in Bytes angibt.
 Liegen die Daten $data in einem Encoding wie UTF-8 vor, müssen diese
 zuvor encodiert werden mit
 
-    Encode::encode('utf-8',$data);
+  Encode::encode('utf-8',$data);
 
 Auf der FileHandle $fh das Encoding zu definieren, ist I<nicht>
 richtig, da die Längenangabe diesem Encoding nicht unterliegt!
@@ -607,8 +607,8 @@ sub writeData {
 
 =head4 Synopsis
 
-    $fh->truncate;
-    $fh->truncate($length);
+  $fh->truncate;
+  $fh->truncate($length);
 
 =head4 Description
 
@@ -641,8 +641,8 @@ sub truncate {
 
 =head4 Synopsis
 
-    $fh->seek($pos);
-    $fh->seek($pos,$whence);
+  $fh->seek($pos);
+  $fh->seek($pos,$whence);
 
 =head4 Description
 
@@ -672,7 +672,7 @@ sub seek {
 
 =head4 Synopsis
 
-    $pos = $fh->tell;
+  $pos = $fh->tell;
 
 =head4 Description
 
@@ -702,7 +702,7 @@ sub tell {
 
 =head4 Synopsis
 
-    $fh->lock($lockMode);
+  $fh->lock($lockMode);
 
 =head4 Description
 
@@ -767,7 +767,7 @@ sub lock {
 
 =head4 Synopsis
 
-    $fh->unlock;
+  $fh->unlock;
 
 =head4 Description
 
@@ -796,7 +796,7 @@ sub unlock {
 
 =head4 Synopsis
 
-    $fh = $fh->setEncoding($encoding);
+  $fh = $fh->setEncoding($encoding);
 
 =head4 Returns
 
@@ -828,8 +828,8 @@ sub setEncoding {
 
 =head4 Synopsis
 
-    $fh->autoFlush;
-    $fh->autoFlush($bool);
+  $fh->autoFlush;
+  $fh->autoFlush($bool);
 
 =cut
 
@@ -852,8 +852,8 @@ sub autoFlush {
 
 =head4 Synopsis
 
-    $fh->binmode;
-    $fh->binmode($layer);
+  $fh->binmode;
+  $fh->binmode($layer);
 
 =head4 Description
 
@@ -877,7 +877,7 @@ sub binmode {
 
 =head4 Synopsis
 
-    $class->captureStderr(\$str);
+  $class->captureStderr(\$str);
 
 =head4 Returns
 
@@ -912,7 +912,7 @@ sub captureStderr {
 
 =head4 Synopsis
 
-    $data = $class->slurpFromStdin;
+  $data = $class->slurpFromStdin;
 
 =head4 Returns
 
@@ -935,7 +935,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

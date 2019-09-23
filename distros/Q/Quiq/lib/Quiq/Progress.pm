@@ -1,11 +1,11 @@
 package Quiq::Progress;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -28,34 +28,34 @@ L<Quiq::Hash>
 
 Mit print:
 
-    use Quiq::Progress;
-    
-    $| = 1;
-    my $n = 5;
-    my $p = Quiq::Progress->new($n);
-    print $p->msg('Waiting...');
-    for my $i (1 .. $n) {
-        sleep 1;
-        print $p->msg($i,'i/n x% t/t(t) x/s t/1');
-    }
-    print $p->msg;
+  use Quiq::Progress;
+  
+  $| = 1;
+  my $n = 5;
+  my $p = Quiq::Progress->new($n);
+  print $p->msg('Waiting...');
+  for my $i (1 .. $n) {
+      sleep 1;
+      print $p->msg($i,'i/n x% t/t(t) x/s t/1');
+  }
+  print $p->msg;
 
 Mit R1::Log2:
 
-    use R1::Log2;
-    use Quiq::Progress;
-    
-    my $log = R1::Log2->new(\*STDOUT);
-    
-    my $msg;
-    my $n = 5;
-    my $p = Quiq::Progress->new($n);
-    for my $i (1 .. $n) {
-        sleep 1;
-        $msg = sprintf '%s %s %s %s %s',$p->info($i);
-        $log->printCr($msg);
-    }
-    $log->printLn($msg);
+  use R1::Log2;
+  use Quiq::Progress;
+  
+  my $log = R1::Log2->new(\*STDOUT);
+  
+  my $msg;
+  my $n = 5;
+  my $p = Quiq::Progress->new($n);
+  for my $i (1 .. $n) {
+      sleep 1;
+      $msg = sprintf '%s %s %s %s %s',$p->info($i);
+      $log->printCr($msg);
+  }
+  $log->printLn($msg);
 
 Ohne Gesamtanzahl der Schritte. Anmerkungen:
 
@@ -74,21 +74,21 @@ Ausgabe I/N nur I, statt ZEIT/GESAMTZEIT(RESTZEIT) nur ZEIT)
 
 *
 
-    use Quiq::Progress;
-    
-    $| = 1;
-    my $p = Quiq::Progress->new;
-    for my $i (1 .. 5) {
-        print $p->msg($i,'i/n x% t/t(t) x/h x/s t/1');
-        sleep 1;
-    }
-    print $p->msg;
-    1 0s 3600000/h 1000.00/s 0.00s/1\r
-    2 1s 7200/h 2.00/s 0.50s/1\r
-    3 2s 5400/h 1.50/s 0.67s/1\r
-    4 3s 4788/h 1.33/s 0.75s/1\r
-    5 4s 4500/h 1.25/s 0.80s/1\r
-    5 5s 3600/h 1.00/s 1.00s/1\r
+  use Quiq::Progress;
+  
+  $| = 1;
+  my $p = Quiq::Progress->new;
+  for my $i (1 .. 5) {
+      print $p->msg($i,'i/n x% t/t(t) x/h x/s t/1');
+      sleep 1;
+  }
+  print $p->msg;
+  1 0s 3600000/h 1000.00/s 0.00s/1\r
+  2 1s 7200/h 2.00/s 0.50s/1\r
+  3 2s 5400/h 1.50/s 0.67s/1\r
+  4 3s 4788/h 1.33/s 0.75s/1\r
+  5 4s 4500/h 1.25/s 0.80s/1\r
+  5 5s 3600/h 1.00/s 1.00s/1\r
 
 =head1 ATTRIBUTES
 
@@ -124,7 +124,7 @@ Die letzte von msg() erzeugte Meldung.
 
 =head4 Synopsis
 
-    $pi = $class->new($n,@opt);
+  $pi = $class->new($n,@opt);
 
 =head4 Arguments
 
@@ -145,7 +145,7 @@ Gesamtzahl der Schritte
 Die Klasse liefert Meldungen. Mit -show=>0 kann die Ausgabe von
 Meldungen an-/abgeschaltet werden. Beispiel:
 
-    $pi = $class->new($n,-show=>$verbose);
+  $pi = $class->new($n,-show=>$verbose);
 
 =back
 
@@ -193,7 +193,7 @@ sub new {
 
 =head4 Synopsis
 
-    $pi->step($i);
+  $pi->step($i);
 
 =head4 Arguments
 
@@ -233,7 +233,7 @@ sub step {
 
 =head4 Synopsis
 
-    $str = $pi->count;
+  $str = $pi->count;
 
 =head4 Description
 
@@ -262,7 +262,7 @@ sub count {
 
 =head4 Synopsis
 
-    $str = $pi->percent;
+  $str = $pi->percent;
 
 =head4 Description
 
@@ -290,7 +290,7 @@ sub percent {
 
 =head4 Synopsis
 
-    $str = $pi->time;
+  $str = $pi->time;
 
 =head4 Description
 
@@ -336,8 +336,8 @@ sub time {
 
 =head4 Synopsis
 
-    $str = $pi->performance;
-    $str = $pi->performance($prec);
+  $str = $pi->performance;
+  $str = $pi->performance($prec);
 
 =head4 Arguments
 
@@ -372,8 +372,8 @@ sub performance {
 
 =head4 Synopsis
 
-    $str = $pi->timePerStep;
-    $str = $pi->timePerStep($prec);
+  $str = $pi->timePerStep;
+  $str = $pi->timePerStep($prec);
 
 =head4 Arguments
 
@@ -411,8 +411,8 @@ sub timePerStep {
 
 =head4 Synopsis
 
-    ($count,$percent,$time,$performance,$timePerStep) = $pi->info;
-    ($count,$percent,$time,$performance,$timePerStep) = $pi->info($i);
+  ($count,$percent,$time,$performance,$timePerStep) = $pi->info;
+  ($count,$percent,$time,$performance,$timePerStep) = $pi->info($i);
 
 =head4 Arguments
 
@@ -481,9 +481,9 @@ sub info {
 
 =head4 Synopsis
 
-    $str = $pi->msg;
-    $str = $pi->msg($fmt,@args);
-    $str = $pi->msg($i,$fmt,@args);
+  $str = $pi->msg;
+  $str = $pi->msg($fmt,@args);
+  $str = $pi->msg($i,$fmt,@args);
 
 =head4 Arguments
 
@@ -663,8 +663,8 @@ sub msg {
 
 =head4 Synopsis
 
-    $str = $pi->warn(@args);
-    $str = $pi->warn($fmt,@args);
+  $str = $pi->warn(@args);
+  $str = $pi->warn($fmt,@args);
 
 =head4 Arguments
 
@@ -695,7 +695,7 @@ Erzeugte Meldung
 Schreibe Warnung nach STDERR, die oberhalb der Fortschrittsanzeige
 erscheint:
 
-    warn $pro->warn("WARNING: Pfad erfüllt Regex nicht: $file");
+  warn $pro->warn("WARNING: Pfad erfüllt Regex nicht: $file");
 
 =cut
 
@@ -737,7 +737,7 @@ sub warn {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

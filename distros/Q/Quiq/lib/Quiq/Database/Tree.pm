@@ -1,11 +1,11 @@
 package Quiq::Database::Tree;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Time::HiRes ();
 
@@ -37,7 +37,7 @@ Baumstruktur operieren zu können.
 
 =head4 Synopsis
 
-    $tree = $class->new($tab,$pkColumn,$fkColumn);
+  $tree = $class->new($tab,$pkColumn,$fkColumn);
 
 =head4 Description
 
@@ -49,30 +49,30 @@ $fkColumn in einer hierarchischen Beziehung.
 
 Datensätze:
 
-    id parent_id name
-    -- --------- ----
-    1  NULL      A
-    2  1         B
-    3  2         C
-    4  1         D
+  id parent_id name
+  -- --------- ----
+  1  NULL      A
+  2  1         B
+  3  2         C
+  4  1         D
 
 Pfade:
 
-    A
-    A/B
-    A/B/C
-    A/D
+  A
+  A/B
+  A/B/C
+  A/D
 
 Baum:
 
-    A
-    +-B
-    | \-C
-    +-D
+  A
+  +-B
+  | \-C
+  +-D
 
 Aufruf:
 
-    $tree = Quiq::Database::Tree->new($tab,'id','parent_id');
+  $tree = Quiq::Database::Tree->new($tab,'id','parent_id');
 
 =cut
 
@@ -115,7 +115,7 @@ sub new {
 
 =head4 Synopsis
 
-    $tab = $tree->table;
+  $tab = $tree->table;
 
 =head4 Description
 
@@ -125,7 +125,7 @@ Liefere das ResultSet-Objekt, das beim Konstruktor angegeben wurde.
 
 =head4 Synopsis
 
-    $h = $tree->pkIndex;
+  $h = $tree->pkIndex;
 
 =head4 Description
 
@@ -136,7 +136,7 @@ Primary-Key-Index indiziert.
 
 =head4 Synopsis
 
-    $type = $tree->type;
+  $type = $tree->type;
 
 =head4 Description
 
@@ -149,8 +149,8 @@ Datensatz-Verknüpfung definiert ist.
 
 =head4 Synopsis
 
-    @rows|$tab = $tree->childs($row);
-    @rows|$tab = $tree->childs($pk);
+  @rows|$tab = $tree->childs($row);
+  @rows|$tab = $tree->childs($pk);
 
 =head4 Description
 
@@ -164,14 +164,14 @@ ResultSet-Objekt mit den Datensätzen.
 
 Aufruf:
 
-    @rows = $tree->childs(1);
+  @rows = $tree->childs(1);
 
 Resultat:
 
-    id parent_id name
-    -- --------- ----
-    2  1         B
-    4  1         D
+  id parent_id name
+  -- --------- ----
+  2  1         B
+  4  1         D
 
 =cut
 
@@ -190,8 +190,8 @@ sub childs {
 
 =head4 Synopsis
 
-    @rows = $tree->descendants($row);
-    @rows = $tree->descendants($pk);
+  @rows = $tree->descendants($row);
+  @rows = $tree->descendants($pk);
 
 =head4 Description
 
@@ -206,15 +206,15 @@ mit den Datensätzen.
 
 Aufruf:
 
-    @rows = $tree->descendants(1);
+  @rows = $tree->descendants(1);
 
 Resultat:
 
-    id parent_id name
-    -- --------- ----
-    2  1         B
-    3  2         C
-    4  1         D
+  id parent_id name
+  -- --------- ----
+  2  1         B
+  3  2         C
+  4  1         D
 
 =cut
 
@@ -237,7 +237,7 @@ sub descendants {
 
 =head4 Synopsis
 
-    $tree->generatePathAttribute($key,$valColumn,$sep);
+  $tree->generatePathAttribute($key,$valColumn,$sep);
 
 =head4 Description
 
@@ -249,16 +249,16 @@ der Trenn-Zeichenkette $sep. Die Methode liefert keinen Wert zurück.
 
 Aufruf:
 
-    $tree->generatePathAttribute('path','name','/');
+  $tree->generatePathAttribute('path','name','/');
 
 Erweitert alle Datensätze um das Attribut 'path':
 
-    id parent_id name path
-    -- --------- ---- -----
-    1  NULL      A    A
-    2  1         B    A/B
-    3  2         C    A/B/C
-    4  1         D    A/D
+  id parent_id name path
+  -- --------- ---- -----
+  1  NULL      A    A
+  2  1         B    A/B
+  3  2         C    A/B/C
+  4  1         D    A/D
 
 =cut
 
@@ -280,8 +280,8 @@ sub generatePathAttribute {
 
 =head4 Synopsis
 
-    $row = $tree->lookup($pk);
-    $row = $tree->lookup($row);
+  $row = $tree->lookup($pk);
+  $row = $tree->lookup($row);
 
 =head4 Description
 
@@ -307,8 +307,8 @@ sub lookup {
 
 =head4 Synopsis
 
-    $par = $tree->parent($row);
-    $par = $tree->parent($pk);
+  $par = $tree->parent($row);
+  $par = $tree->parent($pk);
 
 =head4 Description
 
@@ -320,13 +320,13 @@ keinen Eltern-Datensatz, liefere undef.
 
 Aufruf:
 
-    $row = $tree->parent(3);
+  $row = $tree->parent(3);
 
 Resultat (ein Datensatz):
 
-    id parent_id name
-    -- --------- ----
-    2  1         B
+  id parent_id name
+  -- --------- ----
+  2  1         B
 
 =cut
 
@@ -344,14 +344,14 @@ sub parent {
 
 =head4 Synopsis
 
-    @rows = $tree->path($row);
-    @rows = $tree->path($pk);
-    
-    @values = $tree->path($row,$key);
-    @values = $tree->path($pk,$key);
-    
-    $path = $tree->path($row,$key,$sep);
-    $path = $tree->path($pk,$key,$sep);
+  @rows = $tree->path($row);
+  @rows = $tree->path($pk);
+  
+  @values = $tree->path($row,$key);
+  @values = $tree->path($pk,$key);
+  
+  $path = $tree->path($row,$key,$sep);
+  $path = $tree->path($pk,$key,$sep);
 
 =head4 Description
 
@@ -375,20 +375,20 @@ Pfad als Liste von id-Werten
 
 Aufruf:
 
-    @values = $tree->path(3,'id');
+  @values = $tree->path(3,'id');
 
 Resultat:
 
-    (1,2,3)
+  (1,2,3)
 
 Datensätze und ihre id-Wert-Pfade:
 
-    id parent_id name @values
-    -- --------- ---- -------
-    1  NULL      A    (1)
-    2  1         B    (1,2)
-    3  2         C    (1,2,3)
-    4  1         D    (1,4)
+  id parent_id name @values
+  -- --------- ---- -------
+  1  NULL      A    (1)
+  2  1         B    (1,2)
+  3  2         C    (1,2,3)
+  4  1         D    (1,4)
 
 =item *
 
@@ -396,20 +396,20 @@ Pfad als Zeichenkette
 
 Aufruf:
 
-    $path = $tree->path(3,'name','/');
+  $path = $tree->path(3,'name','/');
 
 Resultat:
 
-    'A/B/C'
+  'A/B/C'
 
 Datensätze und ihre name-Pfade:
 
-    id parent_id name $path
-    -- --------- ---- -----
-    1  NULL      A    A
-    2  1         B    A/B
-    3  2         C    A/B/C
-    4  1         D    A/D
+  id parent_id name $path
+  -- --------- ---- -----
+  1  NULL      A    A
+  2  1         B    A/B
+  3  2         C    A/B/C
+  4  1         D    A/D
 
 =back
 
@@ -452,7 +452,7 @@ sub path {
 
 =head4 Synopsis
 
-    @rows|$rowA = $tree->rows;
+  @rows|$rowA = $tree->rows;
 
 =head4 Description
 
@@ -473,8 +473,8 @@ sub rows {
 
 =head4 Synopsis
 
-    @rows|$tab = $tree->siblings($row);
-    @rows|$tab = $tree->siblings($pk);
+  @rows|$tab = $tree->siblings($row);
+  @rows|$tab = $tree->siblings($pk);
 
 =head4 Description
 
@@ -509,7 +509,7 @@ sub siblings {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

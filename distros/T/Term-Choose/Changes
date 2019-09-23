@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.703   2019-09-21
+    - Update unicode tables.
+    - Update functional interface.
+
 1.702   2019-09-13
     - Option 'lf': fixed documentation.
 

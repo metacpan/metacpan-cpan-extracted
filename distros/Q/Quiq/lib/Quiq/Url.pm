@@ -1,11 +1,11 @@
 package Quiq::Url;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Array;
 use Quiq::Option;
@@ -30,7 +30,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $encStr = $class->encode($str);
+  $encStr = $class->encode($str);
 
 =head4 Description
 
@@ -40,11 +40,11 @@ Zeichenkette zurück.
 
 In der Zeichenkette werden alle Zeichen außer
 
-    * - . _ 0-9 A-Z a-z
+  * - . _ 0-9 A-Z a-z
 
 durch
 
-    %xx
+  %xx
 
 ersetzt, wobei xx dem Hexadezimalwert des Zeichens entspricht.
 
@@ -71,7 +71,7 @@ sub encode {
 
 =head4 Synopsis
 
-    $str = $class->decode($encStr);
+  $str = $class->decode($encStr);
 
 =head4 Description
 
@@ -102,8 +102,8 @@ sub decode {
 
 =head4 Synopsis
 
-    $queryStr = $class->queryEncode(@opt,@keyVal);
-    $queryStr = $class->queryEncode($initialChar,@opt,@keyVal);
+  $queryStr = $class->queryEncode(@opt,@keyVal);
+  $queryStr = $class->queryEncode($initialChar,@opt,@keyVal);
 
 =head4 Options
 
@@ -131,33 +131,33 @@ zusammen.
 
 Querystring mit Semikolon als Trennzeichen:
 
-    $str = Quiq::Url->queryEncode(a=>1,b=>2,c=>3);
-    =>
-    a=1;b=2;c=3
+  $str = Quiq::Url->queryEncode(a=>1,b=>2,c=>3);
+  =>
+  a=1;b=2;c=3
 
 Querystring mit Kaufmannsund als Trennzeichen:
 
-    $url .= Quiq::Url->queryEncode(-separator=>'&',d=>4,e=>5);
-    =>
-    ?a=1&b=2&c=3&d=4,e=5
+  $url .= Quiq::Url->queryEncode(-separator=>'&',d=>4,e=>5);
+  =>
+  ?a=1&b=2&c=3&d=4,e=5
 
 Querystring mit einleitendem Fragezeichen:
 
-    $url = Quiq::Url->queryEncode('?',a=>1,b=>2,c=>3);
-    =>
-    ?a=1;b=2;c=3
+  $url = Quiq::Url->queryEncode('?',a=>1,b=>2,c=>3);
+  =>
+  ?a=1;b=2;c=3
 
 =head4 Details
 
 Als Trennzeichen zwischen den Paaren wird per Default ein
 Semikolon (;) verwendet:
 
-    key1=val1;key2=val2;...;keyN=valN
+  key1=val1;key2=val2;...;keyN=valN
 
 Ist der erste Parameter ein Fragezeichen (?), Semikolon (;) oder
 Kaufmannsund (&), wird dieses dem Query String vorangestellt:
 
-    ?key1=val1;key2=val2;...;keyN=valN
+  ?key1=val1;key2=val2;...;keyN=valN
 
 Das Fragezeichen ist für die URL-Generierung nützlich, das Semikolon
 und das Kaufmannsund für die Konkatenation von Querystrings.
@@ -165,11 +165,11 @@ und das Kaufmannsund für die Konkatenation von Querystrings.
 Ist der Wert eines Schlüssels eine Arrayreferenz, wird für
 jedes Arrayelement ein eigenes Schlüssel/Wert-Paar erzeugt:
 
-    a => [1,2,3]
+  a => [1,2,3]
 
 wird zu
 
-    a=1;a=2;a=3
+  a=1;a=2;a=3
 
 =cut
 
@@ -233,7 +233,7 @@ sub queryEncode {
 
 =head4 Synopsis
 
-    @arr | $arr = $class->queryDecode($queryStr);
+  @arr | $arr = $class->queryDecode($queryStr);
 
 =head4 Description
 
@@ -272,8 +272,8 @@ sub queryDecode {
 
 =head4 Synopsis
 
-    ($schema,$user,$passw,$host,$port,$path,$query,$fragment,@opt) =
-        $class->split($url);
+  ($schema,$user,$passw,$host,$port,$path,$query,$fragment,@opt) =
+      $class->split($url);
 
 =head4 Options
 
@@ -298,34 +298,34 @@ Leerstring ('') geliefert.
 
 Ein vollständiger URL hat die Form:
 
-    schema://[user[:passw]@]host[:port]/[path][?query][#fragment]
-    ------    ----  -----   ----  ----   ----   -----   --------
-       1       2      3      4     5      6       7        8
-    
-    1 = Schema (http, ftp, ...)
-    2 = Benutzername
-    3 = Passwort
-    4 = Hostname (kann auch IP-Adresse sein)
-    5 = Port
-    6 = Pfad (Gesamtpfad, evtl. einschließlich Pathinfo)
-    7 = Querystring
-    8 = Searchstring (wird nicht an den Server übermittelt)
+  schema://[user[:passw]@]host[:port]/[path][?query][#fragment]
+  ------    ----  -----   ----  ----   ----   -----   --------
+     1       2      3      4     5      6       7        8
+  
+  1 = Schema (http, ftp, ...)
+  2 = Benutzername
+  3 = Passwort
+  4 = Hostname (kann auch IP-Adresse sein)
+  5 = Port
+  6 = Pfad (Gesamtpfad, evtl. einschließlich Pathinfo)
+  7 = Querystring
+  8 = Searchstring (wird nicht an den Server übermittelt)
 
 Die Funktion akzeptiert auch unvollständige HTTP URLs:
 
-    http://host.domain
-    
-    http://host.domain:port/
-    
-    http://host.domain:port/this/is/a/path
-    
-    /this/is/a/path?arg1=val1&arg2=val2&arg3=val3#text
-    
-    is/a/path?arg1=val1&arg2=val2&arg3=val3
-    
-    path?arg1=val1&arg2=val2&arg3=val3
-    
-    ?arg1=val1&arg2=val2&arg3=val3
+  http://host.domain
+  
+  http://host.domain:port/
+  
+  http://host.domain:port/this/is/a/path
+  
+  /this/is/a/path?arg1=val1&arg2=val2&arg3=val3#text
+  
+  is/a/path?arg1=val1&arg2=val2&arg3=val3
+  
+  path?arg1=val1&arg2=val2&arg3=val3
+  
+  ?arg1=val1&arg2=val2&arg3=val3
 
 Der Querystring ist alles zwischen '?' und '#', der konkrete Aufbau,
 wie Trennzeichen usw., spielt keine Rolle.
@@ -397,7 +397,7 @@ sub split {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

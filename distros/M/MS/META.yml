@@ -19,12 +19,11 @@ name: MS
 provides:
   MS:
     file: lib/MS.pm
-    version: '0.008'
+    version: '0.204001'
   MS::CV:
     file: lib/MS/CV.pm
   MS::Mass:
     file: lib/MS/Mass.pm
-    version: '0.001'
   MS::PepInfo:
     file: lib/MS/PepInfo.pm
   MS::Peptide:
@@ -33,25 +32,20 @@ provides:
     file: lib/MS/Protein.pm
   MS::Reader:
     file: lib/MS/Reader.pm
-    version: '0.203'
   MS::Reader::ImzML:
     file: lib/MS/Reader/ImzML.pm
-    version: '0.001'
   MS::Reader::ImzML::Spectrum:
     file: lib/MS/Reader/ImzML/Spectrum.pm
   MS::Reader::MGF:
     file: lib/MS/Reader/MGF.pm
-    version: '0.001'
   MS::Reader::MGF::Spectrum:
     file: lib/MS/Reader/MGF/Spectrum.pm
   MS::Reader::MSn:
     file: lib/MS/Reader/MSn.pm
-    version: '0.001'
   MS::Reader::MSn::Spectrum:
     file: lib/MS/Reader/MSn/Spectrum.pm
   MS::Reader::MzIdentML:
     file: lib/MS/Reader/MzIdentML.pm
-    version: '0.001'
   MS::Reader::MzIdentML::DBSequence:
     file: lib/MS/Reader/MzIdentML/DBSequence.pm
   MS::Reader::MzIdentML::Peptide:
@@ -66,7 +60,6 @@ provides:
     file: lib/MS/Reader/MzIdentML/SpectrumIdentificationResult.pm
   MS::Reader::MzML:
     file: lib/MS/Reader/MzML.pm
-    version: '0.006'
   MS::Reader::MzML::Chromatogram:
     file: lib/MS/Reader/MzML/Chromatogram.pm
   MS::Reader::MzML::Record:
@@ -75,30 +68,24 @@ provides:
     file: lib/MS/Reader/MzML/Spectrum.pm
   MS::Reader::MzQuantML:
     file: lib/MS/Reader/MzQuantML.pm
-    version: '0.001'
   MS::Reader::MzXML:
     file: lib/MS/Reader/MzXML.pm
-    version: '0.005'
   MS::Reader::MzXML::Spectrum:
     file: lib/MS/Reader/MzXML/Spectrum.pm
   MS::Reader::PepXML:
     file: lib/MS/Reader/PepXML.pm
-    version: '0.006'
   MS::Reader::PepXML::Result:
     file: lib/MS/Reader/PepXML/Result.pm
   MS::Reader::ProtXML:
     file: lib/MS/Reader/ProtXML.pm
-    version: '0.003'
   MS::Reader::ProtXML::Group:
     file: lib/MS/Reader/ProtXML/Group.pm
   MS::Reader::XML:
     file: lib/MS/Reader/XML.pm
-    version: '0.001'
   MS::Reader::XML::CV:
     file: lib/MS/Reader/XML/CV.pm
   MS::Reader::XML::Record:
     file: lib/MS/Reader/XML/Record.pm
-    version: '0.001'
   MS::Reader::XML::Record::CV:
     file: lib/MS/Reader/XML/Record/CV.pm
   MS::Search::DB:
@@ -108,10 +95,12 @@ provides:
   MS::Spectrum:
     file: lib/MS/Spectrum.pm
 requires:
+  BioX::Seq: '0'
   Compress::BGZF: '0'
   Data::Lock: '0'
   File::ShareDir: '1.00'
   HTTP::Tiny: '0'
+  List::MoreUtils: '0'
   Module::Pluggable: '0'
   Net::FTP: '0'
   PerlIO::gzip: '0'
@@ -120,4 +109,4 @@ requires:
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://github.com/jvolkening/p5-MS
-version: '0.008'
+version: '0.204001'

@@ -1,11 +1,11 @@
 package Quiq::Epoch;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -52,9 +52,9 @@ Zeitpunkt ist hochauflösend, umfasst also auch Sekundenbruchteile.
 
 =head4 Synopsis
 
-    $t = $class->new;
-    $t = $class->new($epoch);
-    $t = $class->new($iso);
+  $t = $class->new;
+  $t = $class->new($epoch);
+  $t = $class->new($iso);
 
 =head4 Description
 
@@ -90,7 +90,7 @@ sub new {
 
 =head4 Synopsis
 
-    $epoch = $t->epoch;
+  $epoch = $t->epoch;
 
 =head4 Description
 
@@ -98,9 +98,9 @@ Liefere den Epoch-Wert des Zeitpunkts.
 
 =head4 Example
 
-    Quiq::Epoch->new->epoch;
-    =>
-    1464342621.73231
+  Quiq::Epoch->new->epoch;
+  =>
+  1464342621.73231
 
 =cut
 
@@ -116,7 +116,7 @@ sub epoch {
 
 =head4 Synopsis
 
-    ($s,$mi,$h,$d,$m,$y) = $t->localtime;
+  ($s,$mi,$h,$d,$m,$y) = $t->localtime;
 
 =head4 Description
 
@@ -128,11 +128,11 @@ erhöht werden.
 
 =head4 Example
 
-    Quiq::Epoch->new(1559466751)->localtime;
-    =>
-    (31,12,11,2,6,2019) # 2019-06-02 11:12:31
-    
-    (in Zeitzone MESZ)
+  Quiq::Epoch->new(1559466751)->localtime;
+  =>
+  (31,12,11,2,6,2019) # 2019-06-02 11:12:31
+  
+  (in Zeitzone MESZ)
 
 =cut
 
@@ -154,7 +154,7 @@ sub localtime {
 
 =head4 Synopsis
 
-    $str = $t->as($fmt);
+  $str = $t->as($fmt);
 
 =head4 Arguments
 
@@ -185,9 +185,9 @@ Der Zeitpunkt wird in der lokalen Zeitzone interpretiert.
 
 =head4 Example
 
-    Quiq::Epoch->new->as('YYYY-MM-DD HH:MI:SS');
-    =>
-    2016-05-27 11:50:21
+  Quiq::Epoch->new->as('YYYY-MM-DD HH:MI:SS');
+  =>
+  2016-05-27 11:50:21
 
 =cut
 
@@ -214,7 +214,7 @@ sub as {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

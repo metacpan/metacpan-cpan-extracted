@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Measure the emotional sentiment of text
 
-our $VERSION = '0.1502';
+our $VERSION = '0.1600';
 
 use Moo;
 use strictures 2;
@@ -112,32 +112,12 @@ has familiarity => (
 sub analyze {
     my ($self) = @_;
 
-    my @sentences = $self->_get_sentences();
-
     my @scores;
     my ( $known, $unknown ) = ( 0, 0 );
 
-    for my $sentence ( @sentences ) {
-        my @words = _tokenize($sentence);
-
+    for my $sentence ( $self->_get_sentences ) {
         my $score = 0;
-
-        for my $word ( @words ) {
-            $word = $self->_stemword($word);
-
-            my $value = exists $self->positive->wordlist->{$word} ? 1
-                : exists $self->negative->wordlist->{$word} ? -1 : 0;
-
-            if ( $value ) {
-                $known++;
-            }
-            else {
-                $unknown++;
-            }
-
-            $score += $value;
-        }
-
+        ( $score, $known, $unknown ) = $self->get_sentence( $sentence, $known, $unknown );
         push @scores, $score;
     }
 
@@ -147,7 +127,9 @@ sub analyze {
 }
 
 
-sub averaged_score {
+sub averaged_score { shift->averaged_scores(@_) }
+
+sub averaged_scores {
     my ( $self, $bins ) = @_;
 
     $bins ||= 10;
@@ -164,35 +146,20 @@ sub averaged_score {
 }
 
 
-sub nrc_sentiment {
+sub nrc_sentiment { shift->nrc_analyze(@_) };
+
+sub nrc_analyze {
     my ($self) = @_;
 
-    my $null_state = { anger=>0, anticipation=>0, disgust=>0, fear=>0, joy=>0, negative=>0, positive=>0, sadness=>0, surprise=>0, trust=>0 };
-
-    my @sentences = $self->_get_sentences();
+    my $null_state = { map { $_ => 0 } qw/ anger anticipation disgust fear joy negative positive sadness surprise trust / };
 
     my @scores;
     my ( $known, $unknown ) = ( 0, 0 );
 
-    for my $sentence ( @sentences ) {
-        my @words = _tokenize($sentence);
+    for my $sentence ( $self->_get_sentences ) {
+        my $score = {};
 
-        my $score;
-
-        for my $word ( @words ) {
-            $word = $self->_stemword($word);
-
-            if ( exists $self->emotion->wordlist->{$word} ) {
-                $known++;
-
-                for my $key ( keys %{ $self->emotion->wordlist->{$word} } ) {
-                    $score->{$key} += $self->emotion->wordlist->{$word}{$key};
-                }
-            }
-            else {
-                $unknown++;
-            }
-        }
+        ( $score, $known, $unknown ) = $self->nrc_get_sentence( $sentence, $known, $unknown );
 
         $score = $null_state
             unless $score;
@@ -209,13 +176,11 @@ sub nrc_sentiment {
 sub get_word {
     my ( $self, $word ) = @_;
 
-    $word = $self->_stemword($word);
+    $word = $self->_stemword($word)
+        if $self->stem;
 
-    return exists $self->positive->wordlist->{$word} || exists $self->negative->wordlist->{$word}
-        ? {
-            positive => exists $self->positive->wordlist->{$word} ? 1 : 0,
-            negative => exists $self->negative->wordlist->{$word} ? 1 : 0,
-        }
+    return exists $self->positive->wordlist->{$word} ? 1
+        : exists $self->negative->wordlist->{$word} ? -1
         : undef;
 }
 
@@ -223,7 +188,8 @@ sub get_word {
 sub nrc_get_word {
     my ( $self, $word ) = @_;
 
-    $word = $self->_stemword($word);
+    $word = $self->_stemword($word)
+        if $self->stem;
 
     return exists $self->emotion->wordlist->{$word}
         ? $self->emotion->wordlist->{$word}
@@ -232,32 +198,52 @@ sub nrc_get_word {
 
 
 sub get_sentence {
-    my ( $self, $sentence ) = @_;
+    my ( $self, $sentence, $known, $unknown ) = @_;
 
-    my @words = _tokenize($sentence);
+    my @words = $self->tokenize($sentence);
 
-    my %score;
+    my $score = 0;
 
     for my $word ( @words ) {
-        $score{$word} = $self->get_word($word);
+        my $value = $self->get_word($word);
+        if ( $value ) {
+            $known++;
+        }
+        else {
+            $unknown++;
+        }
+
+        $score += $value
+            if defined $value;
     }
 
-    return \%score;
+    return $score, $known, $unknown;
 }
 
 
 sub nrc_get_sentence {
-    my ( $self, $sentence ) = @_;
+    my ( $self, $sentence, $known, $unknown ) = @_;
 
-    my @words = _tokenize($sentence);
+    my @words = $self->tokenize($sentence);
 
-    my %score;
+    my $score = {};
 
     for my $word ( @words ) {
-        $score{$word} = $self->nrc_get_word($word);
+        my $value = $self->nrc_get_word($word);
+
+        if ( $value ) {
+            $known++;
+
+            for my $key ( keys %$value ) {
+                $score->{$key} += $value->{$key};
+            }
+        }
+        else {
+            $unknown++;
+        }
     }
 
-    return \%score;
+    return $score, $known, $unknown;
 }
 
 
@@ -271,8 +257,9 @@ sub ratio {
     return $ratio;
 }
 
-sub _tokenize {
-    my ($sentence) = @_;
+
+sub tokenize {
+    my ( $self, $sentence ) = @_;
     $sentence =~ s/[[:punct:]]//g;  # Drop punctuation
     $sentence =~ s/\d//g;           # Drop digits
     my @words = grep { $_ } map { lc $_ } split /\s+/, $sentence;
@@ -282,11 +269,10 @@ sub _tokenize {
 sub _stemword {
     my ( $self, $word ) = @_;
 
-    if ( $self->stem ) {
-        my @stems = $self->stemmer->stemWord($word);
-        $word = [ sort @stems ]->[0]
-            if @stems;
-    }
+    my @stems = $self->stemmer->stemWord($word);
+
+    $word = [ sort @stems ]->[0]
+        if @stems;
 
     return $word;
 }
@@ -316,7 +302,7 @@ Lingua::EN::Opinion - Measure the emotional sentiment of text
 
 =head1 VERSION
 
-version 0.1502
+version 0.1600
 
 =head1 SYNOPSIS
 
@@ -326,23 +312,30 @@ version 0.1502
   my $opinion = Lingua::EN::Opinion->new( file => '/some/file.txt', stem => 1 );
   $opinion->analyze();
 
+  my $scores = $opinion->scores;
+
   my $ratio = $opinion->ratio(); # Knowns / ( Knowns + Unknowns )
   $ratio = $opinion->ratio(1); # Unknowns / ( Knowns + Unknowns )
 
-  my $score = $opinion->averaged_score(5);
+  $scores = $opinion->averaged_scores(5);
 
-  my $sentiment = $opinion->get_word('foo');
-  $sentiment = $opinion->get_sentence('Mary had a little lamb.');
+  my $score = $opinion->get_word('foo');
+  my ( $known, $unknown );
+  my $sentence = 'Mary had a little lamb.';
+  ( $score, $known, $unknown ) = $opinion->get_sentence($sentence);
 
   # NRC:
-  $opinion = Lingua::EN::Opinion->new( text => 'Mary had a little lamb...' );
-  $opinion->nrc_sentiment();
+  $opinion = Lingua::EN::Opinion->new( text => "$sentence It's fleece was ..." );
+  $opinion->nrc_analyze();
+
+  $scores = $opinion->nrc_scores;
 
   $ratio = $opinion->ratio();
   $ratio = $opinion->ratio(1);
 
-  $sentiment = $opinion->nrc_get_word('foo');
-  $sentiment = $opinion->nrc_get_sentence('Mary had a little lamb.');
+  $score = $opinion->nrc_get_word('happy');
+  ( $score, $known, $unknown ) = $opinion->nrc_get_sentence($sentence);
+  $score = $opinion->nrc_get_sentence($sentence);
 
 =head1 DESCRIPTION
 
@@ -350,25 +343,38 @@ A C<Lingua::EN::Opinion> object measures the emotional sentiment of
 text and saves the results in the B<scores> and B<nrc_scores>
 attributes.
 
+When run against the positive and negative classified training reviews
+in the dataset referenced under L</"SEE ALSO">, this module does ...
+okay.  Out of 25k reviews, the F<eg/pos-neg> program gets about 70%
+correct.
+
 =head1 ATTRIBUTES
 
 =head2 file
+
+  $file = $opinion->file;
 
 The text file to analyze.
 
 =head2 text
 
+  $text = $opinion->text;
+
 A text string to analyze instead of a text file.
 
 =head2 stem
+
+  $stem = $opinion->stem;
 
 Boolean flag to indicate that word stemming should take place.
 
 For example, "horses" becomes "horse" and "hooves" becomes "hoof."
 
-This is the proper way to use this module.
+This is the proper way to use this module but takes ... a lot longer.
 
 =head2 stemmer
+
+  $stemmer = $opinion->stemmer;
 
 Require the L<WordNet::QueryData> and L<WordNet::stem> modules to stem
 each word of the provided file or text.
@@ -380,30 +386,44 @@ ignored.
 
 =head2 sentences
 
+  $sentences = $opinion->sentences;
+
 Computed result.  An array reference of every sentence!
 
 =head2 scores
 
+  $scores = $opinion->scores;
+
 Computed result.  An array reference of the score of each sentence.
 
 =head2 nrc_scores
+
+  $scores = $opinion->nrc_scores;
 
 Computed result.  An array reference of hash references containing the
 NRC scores for each sentence.
 
 =head2 positive
 
+  $positive = $opinion->positive;
+
 Computed result.  A module to use to L</analyze>.
 
 =head2 negative
+
+  $negative = $opinion->negative;
 
 Computed result.  A module to use to L</analyze>.
 
 =head2 emotion
 
+  $emotion = $opinion->emotion;
+
 Computed result.  The module to used to find the L</nrc_sentiment>.
 
 =head2 familiarity
+
+  $familiarity = $opinion->familiarity;
 
 Computed result.  Hash reference of total known and unknown words:
 
@@ -423,17 +443,22 @@ Create a new C<Lingua::EN::Opinion> object.
 
 =head2 analyze
 
-  $opinion->analyze();
+  $scores = $opinion->analyze();
 
 Measure the positive/negative emotional sentiment of text.
 
-This method sets the B<scores> and B<sentences> attributes.
+This method sets the B<familiarity>, B<scores> and B<sentences>
+attributes.
 
 =head2 averaged_score
 
-  $averaged = $opinion->averaged_score($bins);
+Synonym for the L</averaged_scores> method.
 
-Compute the averaged score given a number of (integer) B<bins>.
+=head2 averaged_scores
+
+  $scores = $opinion->averaged_scores($bins);
+
+Compute the averaged scores given a number of (integer) B<bins>.
 
 Default: C<10>
 
@@ -442,11 +467,15 @@ it loses information detail.
 
 For example, if there are 400 sentences, B<bins> of 10 will result in
 40 data points.  Each point will be the mean of each successive
-bin-sized set of points in the analyzed score.
+bin-sized set of points in the analyzed scores.
 
 =head2 nrc_sentiment
 
-  $opinion->nrc_sentiment();
+Synonym for the L</nrc_analyze> method.
+
+=head2 nrc_analyze
+
+  $scores = $opinion->nrc_analyze();
 
 Compute the NRC sentiment of the given text.
 
@@ -463,36 +492,45 @@ This is given by a C<0/1> list of these 10 emotional elements:
   surprise
   trust
 
-This method sets the B<nrc_scores> and B<sentences> attributes.
+This method sets the B<familiarity>, B<nrc_scores> and B<sentences>
+attributes.
 
 =head2 get_word
 
   $sentiment = $opinion->get_word($word);
 
-Get the positive/negative sentiment for a given word.  Return a
-hash reference of positive/negative keys.  If the word does not exist,
-return C<undef>.
+Get the positive/negative sentiment for a given word.  Return
+C<undef>, C<0> or C<1> for "does not exist", "is positive" or "is
+negative", respectively.
 
 =head2 nrc_get_word
 
   $sentiment = $opinion->nrc_get_word($word);
 
 Get the NRC emotional sentiment for a given word.  Return a hash
-reference of the NRC emotions.  If the word does not exist, return
-C<undef>.
+reference of the NRC emotions as detailed in L</nrc_analyze>.  If the
+word does not exist, return C<undef>.
 
 =head2 get_sentence
 
-  $values = $opinion->get_sentence($sentence);
+  ( $score, $known, $unknown ) = $opinion->get_sentence($sentence);
+  ( $score, $known, $unknown ) = $opinion->get_sentence( $sentence, $known, $unknown );
 
-Return the positive/negative values for the words of the given
-sentence.
+Return the integer value for the sum of the word scores of the given
+sentence.  Also return B<known> and B<unknown> values for the number
+of familiar words.
+
+The B<known> and B<unknown> arguments refer to the L</familiarity> and
+are incremented by this routine.
 
 =head2 nrc_get_sentence
 
-  $values = $opinion->nrc_get_sentence($sentence);
+  ( $score, $known, $unknown ) = $opinion->nrc_get_sentence($sentence);
+  ( $score, $known, $unknown ) = $opinion->nrc_get_sentence( $sentence, $known, $unknown );
 
-Return the NRC emotion values for each word of the given sentence.
+Return the summed NRC emotion values for each word of the given
+sentence as a hash reference.  Also return B<known> and B<unknown>
+values for the number of familiar words.
 
 =head2 ratio
 
@@ -503,6 +541,13 @@ Default: C<0>
 
 If the method is given a C<1> as an argument, the unknown words ratio
 is returned.  Otherwise the known ratio is returned by default.
+
+=head2 tokenize
+
+  @words = $opinion->tokenize($sentence);
+
+Drop punctuation and digits, then split the sentence by whitespace and
+return the resulting lower-cased "word" list.
 
 =head1 SEE ALSO
 
@@ -525,6 +570,8 @@ L<https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon>
 L<http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm>
 
 L<http://techn.ology.net/book-of-revelation-sentiment-analysis/> is a write-up using this technique.
+
+L<https://ai.stanford.edu/~amaas/data/sentiment/> is the "Large Movie Review Dataset"
 
 =head1 AUTHOR
 

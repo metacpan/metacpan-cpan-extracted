@@ -21,9 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Test::BDD::Cucumber",
   "PREREQ_PM" => {
     "Clone" => 0,
-    "Digest::SHA" => 0,
     "File::Find::Rule" => 0,
-    "Getopt::Long" => 0,
     "JSON::MaybeXS" => "1.001000",
     "List::MoreUtils" => 0,
     "List::Util" => "1.33",
@@ -35,9 +33,9 @@ my %WriteMakefileArgs = (
     "TAP::Parser::Iterator::Stream" => 0,
     "TAP::Parser::SourceHandler" => 0,
     "Term::ANSIColor" => "3.00",
-    "Test2::API" => "1.302084",
+    "Test2::API" => "1.302087",
     "Test::More" => 0,
-    "Type::Tiny" => 0,
+    "Types::Standard" => 0,
     "YAML::Syck" => 0
   },
   "TEST_REQUIRES" => {
@@ -45,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::Exception" => 0
   },
-  "VERSION" => "0.64",
+  "VERSION" => "0.660001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,9 +52,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Clone" => 0,
-  "Digest::SHA" => 0,
   "File::Find::Rule" => 0,
-  "Getopt::Long" => 0,
   "IO::Scalar" => 0,
   "JSON::MaybeXS" => "1.001000",
   "List::MoreUtils" => 0,
@@ -69,11 +65,11 @@ my %FallbackPrereqs = (
   "TAP::Parser::Iterator::Stream" => 0,
   "TAP::Parser::SourceHandler" => 0,
   "Term::ANSIColor" => "3.00",
-  "Test2::API" => "1.302084",
+  "Test2::API" => "1.302087",
   "Test::Differences" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Type::Tiny" => 0,
+  "Types::Standard" => 0,
   "YAML::Syck" => 0
 );
 

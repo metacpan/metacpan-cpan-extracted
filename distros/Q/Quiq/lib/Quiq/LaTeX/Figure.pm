@@ -1,11 +1,11 @@
 package Quiq::LaTeX::Figure;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Reference;
 
@@ -25,19 +25,19 @@ L<Quiq::Hash>
 
 Der Code
 
-    use Quiq::LaTeX::Figure;
-    use Quiq::LaTeX::Code;
-    
-    my $doc = Quiq::LaTeX::Figure->new(
-        FIXME
-    );
-    
-    my $l = Quiq::LaTeX::Code->new;
-    my $code = $tab->latex($l);
+  use Quiq::LaTeX::Figure;
+  use Quiq::LaTeX::Code;
+  
+  my $doc = Quiq::LaTeX::Figure->new(
+      FIXME
+  );
+  
+  my $l = Quiq::LaTeX::Code->new;
+  my $code = $tab->latex($l);
 
 produziert
 
-    FIXME
+  FIXME
 
 =head1 METHODS
 
@@ -47,7 +47,7 @@ produziert
 
 =head4 Synopsis
 
-    $doc = $class->new(@keyVal);
+  $doc = $class->new(@keyVal);
 
 =head4 Arguments
 
@@ -181,8 +181,8 @@ sub new {
 
 =head4 Synopsis
 
-    $code = $fig->latex($l);
-    $code = $class->latex($l,@keyVal);
+  $code = $fig->latex($l);
+  $code = $class->latex($l,@keyVal);
 
 =head4 Description
 
@@ -299,7 +299,7 @@ sub latex {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -9,20 +9,14 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Hash::Func';
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # BUILD
 
 has arg1 => (
   is => 'ro',
   isa => 'HashLike',
-  req => 1
-);
-
-has args => (
-  is => 'ro',
-  isa => 'ArrayRef[Str]',
-  opt => 1
+  req => 1,
 );
 
 # METHODS
@@ -30,13 +24,13 @@ has args => (
 sub execute {
   my ($self) = @_;
 
-  my ($data, @args) = $self->unpack;
+  my ($data) = $self->unpack;
 
-  return [@args ? @{$data}{@args} : values(%$data)];
+  return [values %$data];
 }
 
 sub mapping {
-  return ('arg1', '@args');
+  return ('arg1');
 }
 
 1;
@@ -59,7 +53,7 @@ Data-Object Hash Function (Values) Class
 
   use Data::Object::Hash::Func::Values;
 
-  my $func = Data::Object::Hash::Func::Values->new(@args);
+  my $func = Data::Object::Hash::Func::Values->new;
 
   $func->execute;
 
@@ -101,14 +95,6 @@ The attribute is read-only, accepts C<(Object)> values, and is optional.
 
 =cut
 
-=head2 args
-
-  args(ArrayRef[StringLike])
-
-The attribute is read-only, accepts C<(ArrayRef[StringLike])> values, and is optional.
-
-=cut
-
 =head1 METHODS
 
 This package implements the following methods.
@@ -129,7 +115,6 @@ Executes the function logic and returns the result.
 
   my $func = Data::Object::Hash::Func::Values->new(
     arg1 => $data,
-    args => [1,3]
   );
 
   my $result = $func->execute;
@@ -156,11 +141,11 @@ Returns the ordered list of named function object arguments.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

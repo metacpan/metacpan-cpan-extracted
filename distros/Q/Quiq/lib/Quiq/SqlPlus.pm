@@ -1,11 +1,11 @@
 package Quiq::SqlPlus;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 use Quiq::Option;
@@ -27,104 +27,104 @@ L<Quiq::Object>
 
 Der Aufruf
 
-    my $script = Quiq::SqlPlus->script('test.sql',q|
-            SELECT
-                *
-            FROM
-                all_users
-            ORDER BY
-                username
-            ;
-        |,
-        -before => q|
-            SELECT
-                SYSDATE AS t0
-            FROM
-                dual
-            ;
-        |,
-        -after => q|
-            SELECT
-                SYSDATE AS t1
-            FROM
-                dual
-            ;
-        |,
-        -author => 'Frank Seitz',
-        -description => q|
-            Dies ist ein Test-Skript.
-        |,
-    );
+  my $script = Quiq::SqlPlus->script('test.sql',q|
+          SELECT
+              *
+          FROM
+              all_users
+          ORDER BY
+              username
+          ;
+      |,
+      -before => q|
+          SELECT
+              SYSDATE AS t0
+          FROM
+              dual
+          ;
+      |,
+      -after => q|
+          SELECT
+              SYSDATE AS t1
+          FROM
+              dual
+          ;
+      |,
+      -author => 'Frank Seitz',
+      -description => q|
+          Dies ist ein Test-Skript.
+      |,
+  );
 
 erzeugt
 
-    -- NAME
-    --     test.sql
-    --
-    -- DESCRIPTION
-    --     Dies ist ein Test-Skript.
-    --
-    -- AUTHOR
-    --     Frank Seitz
-    
-    COLUMN tempdatum NEW_VALUE startdatum NOPRINT
-    
-    SELECT
-        TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS tempdatum
-    FROM
-        dual;
-    
-    SPOOL test.sql.&&startdatum..log
-    
-    SET ECHO ON
-    SET FEEDBACK ON
-    SET VERIFY OFF
-    SET HEADING ON
-    SET TAB OFF
-    SET PAGESIZE 0
-    SET TRIMSPOOL ON
-    SET LINESIZE 10000
-    SET SERVEROUTPUT ON SIZE 10000
-    SET SQLBLANKLINES ON
-    SET TIMING ON
-    
-    WHENEVER OSERROR EXIT FAILURE ROLLBACK
-    WHENEVER SQLERROR EXIT FAILURE ROLLBACK
-    
-    ALTER SESSION SET NLS_NUMERIC_CHARACTERS=",.";
-    ALTER SESSION set NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS';
-    
-    -- ZUSTAND ZUVOR
-    
-    SELECT
-        SYSDATE AS t0
-    FROM
-        dual
-    ;
-    
-    -- OPERATION
-    
-    SELECT
-        *
-    FROM
-        all_users
-    ORDER BY
-        username
-    ;
-    
-    -- ZUSTAND DANACH
-    
-    SELECT
-        SYSDATE AS t1
-    FROM
-        dual
-    ;
-    
-    ROLLBACK;
-    
-    EXIT
-    
-    -- eof
+  -- NAME
+  --     test.sql
+  --
+  -- DESCRIPTION
+  --     Dies ist ein Test-Skript.
+  --
+  -- AUTHOR
+  --     Frank Seitz
+  
+  COLUMN tempdatum NEW_VALUE startdatum NOPRINT
+  
+  SELECT
+      TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS tempdatum
+  FROM
+      dual;
+  
+  SPOOL test.sql.&&startdatum..log
+  
+  SET ECHO ON
+  SET FEEDBACK ON
+  SET VERIFY OFF
+  SET HEADING ON
+  SET TAB OFF
+  SET PAGESIZE 0
+  SET TRIMSPOOL ON
+  SET LINESIZE 10000
+  SET SERVEROUTPUT ON SIZE 10000
+  SET SQLBLANKLINES ON
+  SET TIMING ON
+  
+  WHENEVER OSERROR EXIT FAILURE ROLLBACK
+  WHENEVER SQLERROR EXIT FAILURE ROLLBACK
+  
+  ALTER SESSION SET NLS_NUMERIC_CHARACTERS=",.";
+  ALTER SESSION set NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS';
+  
+  -- ZUSTAND ZUVOR
+  
+  SELECT
+      SYSDATE AS t0
+  FROM
+      dual
+  ;
+  
+  -- OPERATION
+  
+  SELECT
+      *
+  FROM
+      all_users
+  ORDER BY
+      username
+  ;
+  
+  -- ZUSTAND DANACH
+  
+  SELECT
+      SYSDATE AS t1
+  FROM
+      dual
+  ;
+  
+  ROLLBACK;
+  
+  EXIT
+  
+  -- eof
 
 =head1 METHODS
 
@@ -134,7 +134,7 @@ erzeugt
 
 =head4 Synopsis
 
-    $script = $class->script($name,$sql,@opt);
+  $script = $class->script($name,$sql,@opt);
 
 =head4 Arguments
 
@@ -145,7 +145,7 @@ erzeugt
 Name des Skripts. Der Name wird in einen Kommentar an den Anfang
 des Skripts gesetzt und für die Benennung der Logdatei genutzt
 
-    NAME-YYYYMMDDHHMMSS.log
+  NAME-YYYYMMDDHHMMSS.log
 
 wobei der Zeitanteil beim Aufruf des Skripts gesetzt wird.
 
@@ -312,7 +312,7 @@ sub script {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

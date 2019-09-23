@@ -21,9 +21,14 @@ t/32_same_arity.t
 t/33_recursion.t
 t/34_invalid_param.pl
 t/34_invalid_param.t
+t/35_invalid_type.pl
+t/35_invalid_type.t
+t/36_invalid_where.pl
+t/36_invalid_where.t
 t/40_type_tiny.t
 t/41_type_tiny_verbose.t
 t/42_pos_and_named.t
+t/43_recursion_fib.t
 t/Kit.pm
 xt/check-prereqs.t
 META.yml

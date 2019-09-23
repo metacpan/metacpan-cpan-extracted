@@ -1,9 +1,14 @@
-0.014   2018-12-20 (PERLANCAR)
+0.015   2019-09-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Overhead: add benchmark against 'use strict and/or warnings'.
+
+
+0.014   2018-12-20  Released-By: PERLANCAR
 
 	- Add Mojo::Log as participant.
 
 
-0.013   2018-12-20 (PERLANCAR)
+0.013   2018-12-20  Released-By: PERLANCAR
 
 	- Add Log::Dispatch and Log::Dispatch::Null as participants.
 
@@ -11,7 +16,7 @@
 	  just takes to long (>1min) with Log::Dispatch.
 
 
-0.012   2017-08-04 (PERLANCAR)
+0.012   2017-08-04  Released-By: PERLANCAR
 
 	- Adjust level benchmark to newest version of Log::ger.
 
@@ -21,7 +26,7 @@
 	- Remove scenario: Startup (already replaced by Overhead).
 
 
-0.011   2017-08-01 (PERLANCAR)
+0.011   2017-08-01  Released-By: PERLANCAR
 
 	- NullOutput: Add participants: Log::Contextual+Log4perl,
           Log::Contextual+SimpleLogger, Log::Dispatchouli.
@@ -30,21 +35,21 @@
 	  because it's nicer with code_startup mode).
 
 
-0.010   2017-07-13 (PERLANCAR)
+0.010   2017-07-13  Released-By: PERLANCAR
 
         - Add Log::Any 1.00, Log::ger {0.012,0.013,0.016} to archive/.
 
         - Startup: Add participants Log::ger::App, Log::ger::Like::Log4perl.
 
 
-0.009   2017-07-02 (PERLANCAR)
+0.009   2017-07-02  Released-By: PERLANCAR
 
         - Add scenarios: LayoutStartup, InitTarget.
 
         - Add past Log::ger versions to sample Startup benchmark.
 
 
-0.008   2017-06-30 (PERLANCAR)
+0.008   2017-06-30  Released-By: PERLANCAR
 
 	- Bump Log::ger version to 0.011.
 
@@ -55,17 +60,17 @@
 	- [Bugfix] Forgot to include Log::Log4perl::Tiny in modules.
 
 
-0.007   2017-06-30 (PERLANCAR)
+0.007   2017-06-30  Released-By: PERLANCAR
 
         - Add participants: Log::Log4perl & Log::Log4perl::Tiny.
 
 
-0.006   2017-06-28 (PERLANCAR)
+0.006   2017-06-28  Released-By: PERLANCAR
 
 	- NullOutput: Add participant: Log::ger+LGP:SingleLog.
 
 
-0.005   2017-06-26 (PERLANCAR)
+0.005   2017-06-26  Released-By: PERLANCAR
 
 	- Add scenario: LogGer::OutputStartup.
 
@@ -74,25 +79,25 @@
 	- Bump Log::ger version 0.005 -> 0.008.
 
 
-0.004   2017-06-23 (PERLANCAR)
+0.004   2017-06-23  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.005.
 
 	- NullOutput: Add participant: checking level with Log::Fast.
 
 
-0.003   2017-06-22 (PERLANCAR)
+0.003   2017-06-22  Released-By: PERLANCAR
 
 	- Add participant for null logging: Log::Fast.
 
 
-0.002   2017-06-19 (PERLANCAR)
+0.002   2017-06-19  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild with updated Log::ger (0.004).
 
 
-0.001   2017-06-19 (PERLANCAR)
+0.001   2017-06-19  Released-By: PERLANCAR
 
         - First release.

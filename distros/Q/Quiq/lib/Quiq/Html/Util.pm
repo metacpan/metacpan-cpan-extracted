@@ -1,11 +1,11 @@
 package Quiq::Html::Util;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Time::HiRes ();
 
@@ -29,8 +29,8 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $class->insertDurationBytes(\$html,$t0);
-    $html2 = $class->insertDurationBytes($html1,$t0);
+  $class->insertDurationBytes(\$html,$t0);
+  $html2 = $class->insertDurationBytes($html1,$t0);
 
 =cut
 
@@ -60,7 +60,7 @@ sub insertDurationBytes {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

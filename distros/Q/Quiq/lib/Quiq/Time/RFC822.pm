@@ -1,11 +1,11 @@
 package Quiq::Time::RFC822;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use POSIX qw/:locale_h/;
 
@@ -45,7 +45,7 @@ Zeitangabe nach RFC 822
 
 =head4 Synopsis
 
-    $str = $class->get($val);
+  $str = $class->get($val);
 
 =head4 Description
 
@@ -54,7 +54,7 @@ liefere diese zurück.
 
 B<Zeitangabe nach RFC 822>
 
-    Wdy, DD-Mon-YYYY HH:MM:SS GMT
+  Wdy, DD-Mon-YYYY HH:MM:SS GMT
 
 B<Arguments>
 
@@ -64,24 +64,24 @@ Tages im Format HH:MM), ein bestimmter Zeitpunkt in Unix-Zeit
 Minuten, Stunden, Tagen oder Jahren (relativ zum aktuellen Zeitpunkt)
 oder 'now' und 0 zulässig:
 
-    N         (Unix-Zeit)
-    HH:MM     (Zeitpunkt in der Zukunft)
-    +N[ydhms] (Zeit-Offset)
-    now       (jetzt)
-    0         (Beginn Unix Epoch)
+  N         (Unix-Zeit)
+  HH:MM     (Zeitpunkt in der Zukunft)
+  +N[ydhms] (Zeit-Offset)
+  now       (jetzt)
+  0         (Beginn Unix Epoch)
 
 B<Examples>
 
-    1502795715 (irgendein Zeitpunkt in Unix-Zeit)
-    23:00      (heute 23:00 lokale Zeit, wenn akt. lokale Uhrzeit < 23:00)
-    8:00       (morgen 8:00 lokale Zeit, wenn akt. lokale Uhrzeit >= 8:00)
-    +1y        (plus ein Jahr)
-    +7d        (plus sieben Tage)
-    +10h       (plus zehn Stunden)
-    +30m       (plus eine halbe Stunde)
-    +30s       (plus 30 Sekunden)
-    now        (jetzt)
-    0          (1.1.1970 00:00:00)
+  1502795715 (irgendein Zeitpunkt in Unix-Zeit)
+  23:00      (heute 23:00 lokale Zeit, wenn akt. lokale Uhrzeit < 23:00)
+  8:00       (morgen 8:00 lokale Zeit, wenn akt. lokale Uhrzeit >= 8:00)
+  +1y        (plus ein Jahr)
+  +7d        (plus sieben Tage)
+  +10h       (plus zehn Stunden)
+  +30m       (plus eine halbe Stunde)
+  +30s       (plus 30 Sekunden)
+  now        (jetzt)
+  0          (1.1.1970 00:00:00)
 
 =cut
 
@@ -146,7 +146,7 @@ sub get {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

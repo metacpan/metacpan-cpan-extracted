@@ -11,8 +11,6 @@ use Data::Lock qw/dlock dunlock/;
 use Storable qw/dclone/;
 use XML::Parser;
 
-our $VERSION = 0.001;
-
 
 # this will be called at the end of the new() constructor (prior to parsing)
 sub _post_load {

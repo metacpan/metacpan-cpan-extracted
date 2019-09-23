@@ -1,12 +1,12 @@
 package Quiq::MediaWiki::Markup;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 use Quiq::Parameters;
@@ -72,7 +72,7 @@ L<https://meta.wikimedia.org/>
 
 =head4 Synopsis
 
-    $gen = $class->new;
+  $gen = $class->new;
 
 =head4 Description
 
@@ -106,7 +106,7 @@ dass alle Blöcke einfach konkateniert werden können.
 
 =head4 Synopsis
 
-    $code = $gen->code($text,$withFormatting);
+  $code = $gen->code($text,$withFormatting);
 
 =head4 Arguments
 
@@ -152,26 +152,26 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 Text:
 
-    $gen->code("Dies ist\nein Test.");
+  $gen->code("Dies ist\nein Test.");
 
 erzeugt
 
-    |  Dies ist
-    |  ein Test.
+  |  Dies ist
+  |  ein Test.
 
 =item *
 
 Eine Einrückung der Quelle wird automatisch entfernt:
 
-    $gen->code(q~
-        Dies ist
-        ein Test.
-    ~);
+  $gen->code(q~
+      Dies ist
+      ein Test.
+  ~);
 
 erzeugt
 
-    |  Dies ist
-    |  ein Test.
+  |  Dies ist
+  |  ein Test.
 
 =back
 
@@ -202,7 +202,7 @@ sub code {
 
 =head4 Synopsis
 
-    $code = $gen->comment($text);
+  $code = $gen->comment($text);
 
 =head4 Arguments
 
@@ -228,15 +228,15 @@ per trim() von einer etwaigen Einrückung befreit.
 Ist der Kommentar einzeilig, wird die Kommentar-Klammer auf die
 gleiche Zeile gesetzt:
 
-    <!-- TEXT -->
+  <!-- TEXT -->
 
 Ist der Kommentar mehrzeilig, wird die Kommentar-Klammer auf
 separate Zeilen gesetzt und der Text um zwei Leerzeichen
 eingerückt:
 
-    <!--
-      TEXT
-    -->
+  <!--
+    TEXT
+  -->
 
 =head4 See Also
 
@@ -256,27 +256,27 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 Einzeiliger Kommentar:
 
-    $gen->comment('Dies ist ein Kommentar');
+  $gen->comment('Dies ist ein Kommentar');
 
 erzeugt
 
-    <!-- Dies ist ein Kommentar -->
+  <!-- Dies ist ein Kommentar -->
 
 =item *
 
 Mehrzeiliger Kommentar:
 
-    $gen->comment(q~
-        Dies ist
-        ein Kommentar
-    ~);
+  $gen->comment(q~
+      Dies ist
+      ein Kommentar
+  ~);
 
 erzeugt
 
-    <!--
-      Dies ist
-      ein Kommentar
-    -->
+  <!--
+    Dies ist
+    ein Kommentar
+  -->
 
 =back
 
@@ -311,7 +311,7 @@ sub comment {
 
 =head4 Synopsis
 
-    $code = $gen->horizontalRule;
+  $code = $gen->horizontalRule;
 
 =head4 Returns
 
@@ -334,11 +334,11 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 =head4 Example
 
-    $gen->horizontalRule;
+  $gen->horizontalRule;
 
 erzeugt
 
-    ----
+  ----
 
 =cut
 
@@ -355,7 +355,7 @@ sub horizontalRule {
 
 =head4 Synopsis
 
-    $code = $gen->image(@keyVal);
+  $code = $gen->image(@keyVal);
 
 =head4 Options
 
@@ -430,15 +430,15 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Images>
 
 =head4 Example
 
-    $gen->image(
-        file => 'Ein_testbild.png',
-        width => 1200,
-        height => 900,
-    );
+  $gen->image(
+      file => 'Ein_testbild.png',
+      width => 1200,
+      height => 900,
+  );
 
 erzeugt
 
-    [[File:Ein_testbild.png|1200x900px]]
+  [[File:Ein_testbild.png|1200x900px]]
 
 =cut
 
@@ -509,8 +509,8 @@ sub image {
 
 =head4 Synopsis
 
-    $code = $gen->item($type,$val);
-    $code = $gen->item($type,$key,$val);
+  $code = $gen->item($type,$val);
+  $code = $gen->item($type,$key,$val);
 
 =head4 Arguments
 
@@ -577,53 +577,53 @@ L<https://www.mediawiki.org/wiki/Help:Lists>
 
 Punktliste
 
-    $gen->item('*','Apfel');
+  $gen->item('*','Apfel');
 
 produziert
 
-    * Apfel
+  * Apfel
 
 =item *
 
 Nummerierungsliste
 
-    $gen->item('#','Apfel');
+  $gen->item('#','Apfel');
 
 produziert
 
-    # Apfel
+  # Apfel
 
 =item *
 
 Definitionsliste
 
-    $gen->item(';',A=>'Apfel);
+  $gen->item(';',A=>'Apfel);
 
 produziert
 
-    ; A : Apfel
+  ; A : Apfel
 
 =item *
 
 Item einer untergeordneten Liste
 
-    $gen->item('#*','Apfel');
+  $gen->item('#*','Apfel');
 
 produziert
 
-    *#* Apfel
+  *#* Apfel
 
 =item *
 
 Item mit einer untergeordneten Liste als Wert
 
-    $gen->item('#',"* Apfel\n* Birne\n*Pflaume");
+  $gen->item('#',"* Apfel\n* Birne\n*Pflaume");
 
 produziert
 
-    #* Apfel
-    #* Birne
-    #* Pflaume
+  #* Apfel
+  #* Birne
+  #* Pflaume
 
 =back
 
@@ -684,7 +684,7 @@ sub item {
 
 =head4 Synopsis
 
-    $code = $gen->list($type,\@items);
+  $code = $gen->list($type,\@items);
 
 =head4 Arguments
 
@@ -746,67 +746,67 @@ L<https://www.mediawiki.org/wiki/Help:Lists>
 
 Punktliste
 
-    $gen->list('*',['Apfel','Birne','Pflaume']);
+  $gen->list('*',['Apfel','Birne','Pflaume']);
 
 produziert
 
-    * Apfel
-    * Birne
-    * Pflaume
+  * Apfel
+  * Birne
+  * Pflaume
 
 =item *
 
 Nummerierungsliste
 
-    $gen->list('#',['Apfel','Birne','Pflaume']);
+  $gen->list('#',['Apfel','Birne','Pflaume']);
 
 produziert
 
-    # Apfel
-    # Birne
-    # Pflaume
+  # Apfel
+  # Birne
+  # Pflaume
 
 =item *
 
 Definitionsliste
 
-    $gen->list(';',[A=>'Apfel',B=>'Birne',C=>'Pflaume']);
+  $gen->list(';',[A=>'Apfel',B=>'Birne',C=>'Pflaume']);
 
 produziert
 
-    ; A : Apfel
-    ; B : Birne
-    ; C : Pflaume
+  ; A : Apfel
+  ; B : Birne
+  ; C : Pflaume
 
 =back
 
-    * Geschachtelte Liste:
-    
-         $code .= $gen->list('#',[
-             'Obst',
-             $gen->list('*',[
-                 'Apfel',
-                 'Birne',
-                 'Pflaume',
-             ]),
-             'Gemüse',
-             $gen->list('*',[
-                 'Gurke',
-                 'Spinat',
-                 'Tomate',
-             ]),
-         ]);
-    
-       produziert
-    
-         # Obst
-         #* Apfel
-         #* Birne
-         #* Pflaume
-         # Gemüse
-         #* Gurke
-         #* Spinat
-         #* Tomate
+  * Geschachtelte Liste:
+  
+       $code .= $gen->list('#',[
+           'Obst',
+           $gen->list('*',[
+               'Apfel',
+               'Birne',
+               'Pflaume',
+           ]),
+           'Gemüse',
+           $gen->list('*',[
+               'Gurke',
+               'Spinat',
+               'Tomate',
+           ]),
+       ]);
+  
+     produziert
+  
+       # Obst
+       #* Apfel
+       #* Birne
+       #* Pflaume
+       # Gemüse
+       #* Gurke
+       #* Spinat
+       #* Tomate
 
 =cut
 
@@ -835,7 +835,7 @@ sub list {
 
 =head4 Synopsis
 
-    $code = $gen->paragraph($text);
+  $code = $gen->paragraph($text);
 
 =head4 Arguments
 
@@ -876,26 +876,26 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 Text:
 
-    $gen->paragraph("Dies ist\nein Test.");
+  $gen->paragraph("Dies ist\nein Test.");
 
 erzeugt
 
-    Dies ist
-    ein Test.
+  Dies ist
+  ein Test.
 
 =item *
 
 Eine Einrückung wird automatisch entfernt:
 
-    $gen->paragraph(q~
-        Dies ist
-        ein Test.
-    ~);
+  $gen->paragraph(q~
+      Dies ist
+      ein Test.
+  ~);
 
 erzeugt
 
-    Dies ist
-    ein Test.
+  Dies ist
+  ein Test.
 
 =back
 
@@ -920,7 +920,7 @@ sub paragraph {
 
 =head4 Synopsis
 
-    $code = $gen->section($level,$title);
+  $code = $gen->section($level,$title);
 
 =head4 Arguments
 
@@ -958,11 +958,11 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 =head4 Example
 
-    $gen->section(3,'Eine Überschrift');
+  $gen->section(3,'Eine Überschrift');
 
 produziert
 
-    === Eine Überschrift ===
+  === Eine Überschrift ===
 
 =cut
 
@@ -981,7 +981,7 @@ sub section {
 
 =head4 Synopsis
 
-    $code = $gen->table(@keyVal);
+  $code = $gen->table(@keyVal);
 
 =head4 Arguments
 
@@ -1020,17 +1020,17 @@ Liste der Kolumnentitel.
 Subroutine, die für I<jeden> Wert (caption, title, row value) aufgerufen
 wird:
 
-    valueCallback => sub {
-        my $val = shift;
-        ...
-        return $val;
-    }
+  valueCallback => sub {
+      my $val = shift;
+      ...
+      return $val;
+  }
 
 Die Subroutine wird z.B. von Sdoc verwendet, um Segmente zu expandieren:
 
-    valueCallback => sub {
-        return $self->expandText($m,\shift);
-    }
+  valueCallback => sub {
+      return $self->expandText($m,\shift);
+  }
 
 =back
 
@@ -1065,58 +1065,58 @@ CSS der Klasse "wikitable": L<https://www.mediawiki.org/wiki/Manual:CSS>
 
 Der Code
 
-    $gen->table(
-        alignments => ['left','right','center'],
-        caption => 'Eine Tabelle',
-        titles => ['L','R','Z'],
-        rows => [
-            ['A',1,'ABCDEFG'],
-            ['AB',12,'HIJKL'],
-            ['ABC',123,'MNO'],
-            ['ABCD',1234,'P'],
-        ],
-    );
+  $gen->table(
+      alignments => ['left','right','center'],
+      caption => 'Eine Tabelle',
+      titles => ['L','R','Z'],
+      rows => [
+          ['A',1,'ABCDEFG'],
+          ['AB',12,'HIJKL'],
+          ['ABC',123,'MNO'],
+          ['ABCD',1234,'P'],
+      ],
+  );
 
 produziert
 
-    {| class="wikitable"
-    |+ style="caption-side: bottom; font-weight: normal"|Eine Tabelle
-    |-
-    ! style="background-color: #e8e8e8; text-align: left" |L
-    ! style="background-color: #e8e8e8; text-align: right" |R
-    ! style="background-color: #e8e8e8" |Z
-    |-
-    | style="background-color: #ffffff" |A
-    | style="background-color: #ffffff; text-align: right" |1
-    | style="background-color: #ffffff; text-align: center" |ABCDEFG
-    |-
-    | style="background-color: #ffffff" |AB
-    | style="background-color: #ffffff; text-align: right" |12
-    | style="background-color: #ffffff; text-align: center" |HIJKL
-    |-
-    | style="background-color: #ffffff" |ABC
-    | style="background-color: #ffffff; text-align: right" |123
-    | style="background-color: #ffffff; text-align: center" |MNO
-    |-
-    | style="background-color: #ffffff" |ABCD
-    | style="background-color: #ffffff; text-align: right" |1234
-    | style="background-color: #ffffff; text-align: center" |P
-    |}
+  {| class="wikitable"
+  |+ style="caption-side: bottom; font-weight: normal"|Eine Tabelle
+  |-
+  ! style="background-color: #e8e8e8; text-align: left" |L
+  ! style="background-color: #e8e8e8; text-align: right" |R
+  ! style="background-color: #e8e8e8" |Z
+  |-
+  | style="background-color: #ffffff" |A
+  | style="background-color: #ffffff; text-align: right" |1
+  | style="background-color: #ffffff; text-align: center" |ABCDEFG
+  |-
+  | style="background-color: #ffffff" |AB
+  | style="background-color: #ffffff; text-align: right" |12
+  | style="background-color: #ffffff; text-align: center" |HIJKL
+  |-
+  | style="background-color: #ffffff" |ABC
+  | style="background-color: #ffffff; text-align: right" |123
+  | style="background-color: #ffffff; text-align: center" |MNO
+  |-
+  | style="background-color: #ffffff" |ABCD
+  | style="background-color: #ffffff; text-align: right" |1234
+  | style="background-color: #ffffff; text-align: center" |P
+  |}
 
 was in der Darstellung so aussieht
 
-    +-------+--------------------+
-    | L     |      R |     Z     |
-    +----------------------------+
-    | A     |      1 |  ABCDEFG  |
-    +----------------------------+
-    | AB    |     12 |   HIJKL   |
-    +----------------------------+
-    | ABC   |    123 |    MNO    |
-    +----------------------------+
-    | ABCD  |   1234 |     P     |
-    +----------------------------+
-             Eine Tabelle
+  +-------+--------------------+
+  | L     |      R |     Z     |
+  +----------------------------+
+  | A     |      1 |  ABCDEFG  |
+  +----------------------------+
+  | AB    |     12 |   HIJKL   |
+  +----------------------------+
+  | ABC   |    123 |    MNO    |
+  +----------------------------+
+  | ABCD  |   1234 |     P     |
+  +----------------------------+
+           Eine Tabelle
 
 =cut
 
@@ -1226,7 +1226,7 @@ sub table {
 
 =head4 Synopsis
 
-    $code = $gen->tableOfContents($bool);
+  $code = $gen->tableOfContents($bool);
 
 =head4 Arguments
 
@@ -1267,21 +1267,21 @@ Syntax: L<https://www.mediawiki.org/wiki/Manual:Table_of_contents>
 
 Inhaltsverzeichnis setzen
 
-    $gen->tableOfContents(1);
+  $gen->tableOfContents(1);
 
 erzeugt
 
-    __TOC__
+  __TOC__
 
 =item *
 
 Inhaltsverzeichnis unterdrücken
 
-    $gen->tableOfContents(0);
+  $gen->tableOfContents(0);
 
 erzeugt
 
-    __NOTOC__
+  __NOTOC__
 
 =back
 
@@ -1302,7 +1302,7 @@ sub tableOfContents {
 
 =head4 Synopsis
 
-    $str = $gen->fmt($type,$text);
+  $str = $gen->fmt($type,$text);
 
 =head4 Description
 
@@ -1320,55 +1320,55 @@ Es existieren die Formatierungen:
 
 Der Text wird als einzeiliger Kommentar gesetzt. Erzeugt:
 
-    <!-- TEXT -->
+  <!-- TEXT -->
 
 =item italic
 
 Erzeugt:
 
-    ''TEXT''
+  ''TEXT''
 
 =item bold
 
 Erzeugt:
 
-    '''TEXT'''
+  '''TEXT'''
 
 =item boldItalic
 
 Erzeugt:
 
-    '''''TEXT'''''
+  '''''TEXT'''''
 
 =item code
 
 Der Text wird nicht interpretiert. Erzeugt:
 
-    <code><nowiki>TEXT</nowiki></code>
+  <code><nowiki>TEXT</nowiki></code>
 
 =item codeWithFormatting
 
 Inline-Formatierungen wie bold und italic sind möglich. Erzeugt:
 
-    <code>TEXT</code>
+  <code>TEXT</code>
 
 =item nowiki
 
 Erzeugt:
 
-    <nowiki>TEXT</nowiki>
+  <nowiki>TEXT</nowiki>
 
 =item nl
 
 Erzeugt:
 
-    <br />
+  <br />
 
 =item quote
 
 Erzeugt:
 
-    <q>TEXT</q>
+  <q>TEXT</q>
 
 =back
 
@@ -1438,7 +1438,7 @@ sub fmt {
 
 =head4 Synopsis
 
-    $code = $gen->indent($n);
+  $code = $gen->indent($n);
 
 =head4 Returns
 
@@ -1461,11 +1461,11 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 =head4 Example
 
-    $gen->indent(2);
+  $gen->indent(2);
 
 erzeugt
 
-    ::
+  ::
 
 =cut
 
@@ -1482,7 +1482,7 @@ sub indent {
 
 =head4 Synopsis
 
-    $code = $gen->link($type,$destination,$text);
+  $code = $gen->link($type,$destination,$text);
 
 =head4 Arguments
 
@@ -1529,22 +1529,22 @@ Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 Interner Link
 
-    $gen->link('internal','Transaktionssicherheit',
-        'Abschnitt Transaktiossicherheit');
+  $gen->link('internal','Transaktionssicherheit',
+      'Abschnitt Transaktiossicherheit');
 
 erzeugt
 
-    [[#Transaktionssicherheit|Abschnitt Transaktiossicherheit]]
+  [[#Transaktionssicherheit|Abschnitt Transaktiossicherheit]]
 
 =item *
 
 Externer Link
 
-    $gen->link('external','http::/fseitz.de','Homepage Frank Seitz');
+  $gen->link('external','http::/fseitz.de','Homepage Frank Seitz');
 
 erzeugt
 
-    [http::/fseitz.de/ Homepage Frank Seitz]
+  [http::/fseitz.de/ Homepage Frank Seitz]
 
 =back
 
@@ -1573,7 +1573,7 @@ sub link {
 
 =head4 Synopsis
 
-    $code = $gen->protect($text);
+  $code = $gen->protect($text);
 
 =head4 Description
 
@@ -1604,7 +1604,7 @@ sub protect {
 
 =head4 Synopsis
 
-    $code = $this->testPage;
+  $code = $this->testPage;
 
 =head4 Description
 
@@ -1613,7 +1613,7 @@ MediaWiki übertragen und dort optisch begutachtet werden.
 
 =head4 Example
 
-    $ perl -MQuiq::MediaWiki::Markup -C -E 'print Quiq::MediaWiki::Markup->testPage'
+  $ perl -MQuiq::MediaWiki::Markup -C -E 'print Quiq::MediaWiki::Markup->testPage'
 
 =cut
 
@@ -1823,7 +1823,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

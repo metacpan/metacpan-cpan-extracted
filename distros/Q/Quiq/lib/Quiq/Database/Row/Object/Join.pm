@@ -1,11 +1,11 @@
 package Quiq::Database::Row::Object::Join;
 use base qw/Quiq::Database::Row::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Array;
 use Quiq::Hash;
@@ -42,7 +42,7 @@ Template auf der Klassenvariable C<$Select> definiert.
 
 =head4 Synopsis
 
-    $tmpl = $class->selectTemplate;
+  $tmpl = $class->selectTemplate;
 
 =head4 Returns
 
@@ -63,20 +63,20 @@ die Methode L<selectStmt|"selectStmt() - Liefere Select-Statement der Klasse">()
 Beispiel für die Definition eines Select-Template auf der
 Klassenvariable C<$select>:
 
-    our $Select = <<'__SQL__';
-    SELECT
-        %SELECT%
-    FROM
-        odin.route rou
-        LEFT JOIN odin.section sec
-        ON rou.id = sec.route_id
-        LEFT JOIN odin.passage pas
-        ON sec.id = pas.section_id
-        LEFT JOIN odin.passage_measseq pam
-        ON pas.id = pam.passage_id
-        LEFT JOIN odin.measseq mea
-        ON pam.measseq_id = mea.id
-    __SQL__
+  our $Select = <<'__SQL__';
+  SELECT
+      %SELECT%
+  FROM
+      odin.route rou
+      LEFT JOIN odin.section sec
+      ON rou.id = sec.route_id
+      LEFT JOIN odin.passage pas
+      ON sec.id = pas.section_id
+      LEFT JOIN odin.passage_measseq pam
+      ON pas.id = pam.passage_id
+      LEFT JOIN odin.measseq mea
+      ON pam.measseq_id = mea.id
+  __SQL__
 
 Die Select-Klausel ist notwendig, da das Statement sonst nicht
 syntaktisch korrekt gebildet ist. Die Platzhalter C<%WHERE%>,
@@ -113,7 +113,7 @@ sub selectTemplate {
 
 =head4 Synopsis
 
-    $stmt = $class->selectStmt($db,@select);
+  $stmt = $class->selectStmt($db,@select);
 
 =head4 Returns
 
@@ -145,7 +145,7 @@ sub selectStmt {
 
 =head4 Synopsis
 
-    $newRow = $row->cast($db,$newClass);
+  $newRow = $row->cast($db,$newClass);
 
 =head4 Arguments
 
@@ -262,7 +262,7 @@ sub cast {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

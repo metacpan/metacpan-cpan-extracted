@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object';
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 1;
 
@@ -46,8 +46,9 @@ Modern Perl
 This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
-L<Data::Object>; please see that documentation to learn more, or review
-L<Data::Object::Use>.
+L<Data::Object>; Please see that documentation to learn more. Also, you can
+read the L<overview|https://github.com/iamalnewkirk/do/blob/master/OVERVIEW.md>
+and project L<wiki|https://github.com/iamalnewkirk/do/wiki>.
 
 =cut
 
@@ -76,11 +77,11 @@ completely isolated Perl installations.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

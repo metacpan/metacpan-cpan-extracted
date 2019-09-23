@@ -7,7 +7,7 @@ use warnings;
 
 use Data::Object::Utility;
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 sub import {
   my ($class, @args) = @_;
@@ -413,11 +413,11 @@ details.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

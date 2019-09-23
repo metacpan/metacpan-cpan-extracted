@@ -25,8 +25,10 @@ DESCRIPTION
     This package aims to provide a modern Perl development framework and
     foundational set of types, functions, classes, patterns, and interfaces
     for jump-starting application development. This package inherits all
-    behavior from Data::Object; please see that documentation to learn
-    more, or review Data::Object::Use.
+    behavior from Data::Object; Please see that documentation to learn
+    more. Also, you can read the overview
+    <https://github.com/iamalnewkirk/do/blob/master/OVERVIEW.md> and
+    project wiki <https://github.com/iamalnewkirk/do/wiki>.
 
 INSTALLATION
 
@@ -54,11 +56,11 @@ INSTALLATION
 
 CREDITS
 
-    Al Newkirk, +303
+    Al Newkirk, +309
 
     Anthony Brummett, +10
 
-    Adam Hopkins, +1
+    Adam Hopkins, +2
 
     José Joaquín Atria, +1
 

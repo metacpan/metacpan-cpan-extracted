@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Executor;
-$Test::BDD::Cucumber::Executor::VERSION = '0.64';
+$Test::BDD::Cucumber::Executor::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::Executor - Run through Feature and Harness objects
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 
@@ -36,6 +36,7 @@ require Test2::Formatter::TAP;
 # Needed for subtest() -- we don't want to import all its functions though
 require Test::More;
 
+use Test::BDD::Cucumber::StepFile ();
 use Test::BDD::Cucumber::StepContext;
 use Test::BDD::Cucumber::Util;
 use Test::BDD::Cucumber::Model::Result;
@@ -166,11 +167,6 @@ sub execute {
     # Get all scenarios
     my @scenarios = @{ $feature->scenarios() };
 
-    # Filter them by the tag spec, if we have one
-    if ( defined $tag_spec ) {
-        @scenarios = $tag_spec->filter(@scenarios);
-    }
-
     $_->pre_feature( $feature, $feature_stash ) for @{ $self->extensions };
     for my $outline (@scenarios) {
 
@@ -181,7 +177,8 @@ sub execute {
                 scenario      => $outline,
                 feature       => $feature,
                 feature_stash => $feature_stash,
-                harness       => $harness
+                harness       => $harness,
+                tagspec       => $tag_spec,
             }
         );
     }
@@ -215,29 +212,53 @@ representing the Background
 
 sub execute_outline {
     my ( $self, $options ) = @_;
-    my ( $feature, $feature_stash, $harness, $outline, $background )
-      = @$options{qw/ feature feature_stash harness scenario background /};
+    my ( $feature, $feature_stash, $harness, $outline, $background, $tagspec )
+      = @$options{qw/ feature feature_stash harness scenario background tagspec /};
 
     # Multiply out Scenario Outlines as appropriate
-    my @datasets = @{ $outline->data };
-    @datasets = ( {} ) unless @datasets;
+    my @datasets = @{ $outline->datasets };
+    if (not @datasets) {
+        if (not $tagspec or $tagspec->filter($outline) ) {
+            $self->execute_scenario(
+                {
+                    feature => $feature,
+                    feature_stash => $feature_stash,
+                    harness => $harness,
+                    scenario => $outline,
+                    background => $background,
+                    scenario_stash => {},
+                    outline_state => {},
+                    dataset => {},
+                });
+        }
 
-    my $outline_state = {};
+        return;
+    }
 
-    foreach my $dataset (@datasets) {
-        $self->execute_scenario(
-            {
-                feature => $feature,
-                feature_stash => $feature_stash,
-                harness => $harness,
-                scenario => $outline,
-                background => $background,
-                scenario_stash => {},
-                outline_state => $outline_state,
-                dataset => $dataset,
-            });
+    if ($tagspec) {
+        @datasets = $tagspec->filter(@datasets);
+        return unless @datasets;
+    }
 
-        $outline_state->{'short_circuit'} ||= $self->_bail_out;
+
+    foreach my $rows (@datasets) {
+        my $outline_state = {};
+
+        foreach my $row (@{$rows->data}) {
+            $self->execute_scenario(
+                {
+                    feature => $feature,
+                    feature_stash => $feature_stash,
+                    harness => $harness,
+                    scenario => $outline,
+                    background => $background,
+                    scenario_stash => {},
+                    outline_state => $outline_state,
+                    dataset => $row,
+                });
+
+            $outline_state->{'short_circuit'} ||= $self->_bail_out;
+        }
     }
 }
 
@@ -583,16 +604,6 @@ sub dispatch {
             my $ctx = context();
             $ctx->pass( "Starting to execute step: " . $context->text );
 
-            # Execute!
-            no warnings 'redefine';
-
-            local *Test::BDD::Cucumber::StepFile::S = sub {
-                return $context->stash->{'scenario'};
-            };
-            local *Test::BDD::Cucumber::StepFile::C = sub {
-                return $context;
-            };
-
             # Take a copy of this. Turns out actually matching against it
             # directly causes all sorts of weird-ass heisenbugs which mst has
             # promised to investigate.
@@ -607,7 +618,18 @@ sub dispatch {
             @match_locations = pairwise { [ $a, $b ] } @starts, @ends;
 
             # OK, actually execute
-            eval { $coderef->($context) };
+            eval {
+                no warnings 'redefine';
+
+                local *Test::BDD::Cucumber::StepFile::_S = sub {
+                    return $context->stash->{'scenario'};
+                };
+                local *Test::BDD::Cucumber::StepFile::_C = sub {
+                    return $context;
+                };
+
+                $coderef->($context)
+            };
             if ($@) {
                 $ctx->fail("Step ran successfully", $@);
             }

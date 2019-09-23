@@ -1,11 +1,11 @@
 package Quiq::Html::Widget;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -68,8 +68,8 @@ $w->disabled() festgestellt werden kann.
 
 =head4 Synopsis
 
-    $name = $w->name;
-    $name = $w->name($name);
+  $name = $w->name;
+  $name = $w->name($name);
 
 =head4 Description
 
@@ -96,9 +96,9 @@ sub name {
 
 =head4 Synopsis
 
-    $value | $valueA = $w->value;
-    $value = $w->value($value);
-    $valueA = $w->value(\@values);
+  $value | $valueA = $w->value;
+  $value = $w->value($value);
+  $valueA = $w->value(\@values);
 
 =head4 Description
 
@@ -142,7 +142,7 @@ sub value {
 
 =head4 Synopsis
 
-    $bool = $w->hidden;
+  $bool = $w->hidden;
 
 =head4 Description
 
@@ -162,7 +162,7 @@ sub hidden {
 
 =head4 Synopsis
 
-    $bool = $w->disabled;
+  $bool = $w->disabled;
 
 =head4 Description
 
@@ -180,7 +180,7 @@ sub disabled {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

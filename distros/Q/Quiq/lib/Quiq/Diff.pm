@@ -1,11 +1,11 @@
 package Quiq::Diff;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::Shell;
@@ -30,7 +30,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $diff = $class->diff($str1,$str2);
+  $diff = $class->diff($str1,$str2);
 
 =head4 Arguments
 
@@ -81,7 +81,7 @@ sub diff {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

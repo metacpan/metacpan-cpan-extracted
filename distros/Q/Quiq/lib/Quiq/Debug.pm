@@ -1,11 +1,11 @@
 package Quiq::Debug;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
@@ -28,7 +28,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $str = $this->dump($ref,@opt);
+  $str = $this->dump($ref,@opt);
 
 =head4 Arguments
 
@@ -54,7 +54,7 @@ np(). Die Optionen @opt werden an diese Funktion weiter geleitet.
 
 =head4 Example
 
-    Quiq::Debug->dump($obj,colored=>1))
+  Quiq::Debug->dump($obj,colored=>1))
 
 =cut
 
@@ -73,7 +73,7 @@ sub dump {
 
 =head4 Synopsis
 
-    $str = $this->modulePaths;
+  $str = $this->modulePaths;
 
 =head4 Description
 
@@ -84,16 +84,16 @@ Perl Moduldateien. Ein Modulpfad pro Zeile, alphabetisch sortiert.
 
 Die aktuell geladenen Moduldateien auf STDOUT ausgeben:
 
-    print Quiq::Debug->modulePaths;
-    ==>
-    /home/fs/lib/perl5/Quiq/Debug.pm
-    /home/fs/lib/perl5/Quiq/Object.pm
-    /home/fs/lib/perl5/Perl/Quiq/Stacktrace.pm
-    /usr/share/perl/5.20/base.pm
-    /usr/share/perl/5.20/strict.pm
-    /usr/share/perl/5.20/vars.pm
-    /usr/share/perl/5.20/warnings.pm
-    /usr/share/perl/5.20/warnings/register.pm
+  print Quiq::Debug->modulePaths;
+  ==>
+  /home/fs/lib/perl5/Quiq/Debug.pm
+  /home/fs/lib/perl5/Quiq/Object.pm
+  /home/fs/lib/perl5/Perl/Quiq/Stacktrace.pm
+  /usr/share/perl/5.20/base.pm
+  /usr/share/perl/5.20/strict.pm
+  /usr/share/perl/5.20/vars.pm
+  /usr/share/perl/5.20/warnings.pm
+  /usr/share/perl/5.20/warnings/register.pm
 
 =cut
 
@@ -108,7 +108,7 @@ sub modulePaths {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

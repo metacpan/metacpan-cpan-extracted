@@ -1,11 +1,11 @@
 package Quiq::Html::Widget::Hidden;
 use base qw/Quiq::Html::Widget/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -60,32 +60,32 @@ Das Element wird nicht submittet.
 
 Html::Tag-Objekt instantiieren:
 
-    $obj = Quiq::Html::Tag->new;
+  $obj = Quiq::Html::Tag->new;
 
 Keine Information:
 
-    $html = Quiq::Html::Widget::Hidden->html($h);
-    -->
-    Leerstring
+  $html = Quiq::Html::Widget::Hidden->html($h);
+  -->
+  Leerstring
 
 Wert:
 
-    $html = Quiq::Html::Widget::Hidden->html($h,
-        name => 'x',
-        value => 4711,
-    );
-    -->
-    <input type="hidden" name="x" value="4711" />\n
+  $html = Quiq::Html::Widget::Hidden->html($h,
+      name => 'x',
+      value => 4711,
+  );
+  -->
+  <input type="hidden" name="x" value="4711" />\n
 
 Liste von Werten:
 
-    $html = Quiq::Html::Widget::Hidden->html($h,
-        name => 'x',
-        value => [4711,4712],
-    );
-    -->
-    <input type="hidden" name="x" value="4711" />\n
-    <input type="hidden" name="x" value="4712" />\n
+  $html = Quiq::Html::Widget::Hidden->html($h,
+      name => 'x',
+      value => [4711,4712],
+  );
+  -->
+  <input type="hidden" name="x" value="4711" />\n
+  <input type="hidden" name="x" value="4712" />\n
 
 =head1 METHODS
 
@@ -95,7 +95,7 @@ Liste von Werten:
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =cut
 
@@ -130,8 +130,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =cut
 
@@ -189,7 +189,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

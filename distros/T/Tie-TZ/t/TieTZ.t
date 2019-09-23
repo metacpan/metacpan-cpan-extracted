@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -25,7 +25,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $want_version = 9;
+my $want_version = 10;
 is ($Tie::TZ::VERSION, $want_version, 'VERSION variable');
 is (Tie::TZ->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { Tie::TZ->VERSION($want_version); 1 },

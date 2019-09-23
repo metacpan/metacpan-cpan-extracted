@@ -1,11 +1,11 @@
 package Quiq::OrderedHash;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 
@@ -36,7 +36,7 @@ Hinzufügereihenfolge.
 
 =head4 Synopsis
 
-    $oh = $class->new(@keyVal);
+  $oh = $class->new(@keyVal);
 
 =head4 Description
 
@@ -65,7 +65,7 @@ sub new {
 
 =head4 Synopsis
 
-    @arr|$val = $oh->get(@keys);
+  @arr|$val = $oh->get(@keys);
 
 =head4 Description
 
@@ -97,7 +97,7 @@ sub get {
 
 =head4 Synopsis
 
-    $oh->set(@keyVal);
+  $oh->set(@keyVal);
 
 =head4 Returns
 
@@ -133,7 +133,7 @@ sub set {
 
 =head4 Synopsis
 
-    $oh->setDelete(@keyVal);
+  $oh->setDelete(@keyVal);
 
 =head4 Description
 
@@ -174,7 +174,7 @@ sub setDelete {
 
 =head4 Synopsis
 
-    $obj->clear(@keyVal);
+  $obj->clear(@keyVal);
 
 =head4 Description
 
@@ -201,7 +201,7 @@ sub clear {
 
 =head4 Synopsis
 
-    $oh2 = $oh->copy;
+  $oh2 = $oh->copy;
 
 =head4 Description
 
@@ -226,7 +226,7 @@ sub copy {
 
 =head4 Synopsis
 
-    $oh->delete(@keys);
+  $oh->delete(@keys);
 
 =head4 Description
 
@@ -263,7 +263,7 @@ sub delete {
 
 =head4 Synopsis
 
-    $n = $hash->increment($key);
+  $n = $hash->increment($key);
 
 =head4 Description
 
@@ -284,7 +284,7 @@ sub increment {
 
 =head4 Synopsis
 
-    @keys|$keys = $oh->keys;
+  @keys|$keys = $oh->keys;
 
 =head4 Description
 
@@ -307,7 +307,7 @@ sub keys {
 
 =head4 Synopsis
 
-    $n = $oh->hashSize;
+  $n = $oh->hashSize;
 
 =head4 Description
 
@@ -328,7 +328,7 @@ sub hashSize {
 
 =head4 Synopsis
 
-    $oh->unshift($key=>$val);
+  $oh->unshift($key=>$val);
 
 =head4 Description
 
@@ -356,7 +356,7 @@ sub unshift {
 
 =head4 Synopsis
 
-    @arr|$arr = $oh->values;
+  @arr|$arr = $oh->values;
 
 =head4 Description
 
@@ -388,7 +388,7 @@ sub values {
 
 =head4 Synopsis
 
-    $oh->exists($key);
+  $oh->exists($key);
 
 =head4 Description
 
@@ -409,7 +409,7 @@ sub exists {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

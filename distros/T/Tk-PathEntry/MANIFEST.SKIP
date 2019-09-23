@@ -67,3 +67,5 @@
 
 ^\.appveyor\.yml$
 ^\.travis.yml$
+
+^Tk-PathEntry-.*\.tar\.gz$

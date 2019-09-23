@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::Model::Feature;
-$Test::BDD::Cucumber::Model::Feature::VERSION = '0.64';
+$Test::BDD::Cucumber::Model::Feature::VERSION = '0.660001';
 use Moo;
 use Types::Standard qw( Str ArrayRef InstanceOf );
 
@@ -9,7 +9,7 @@ Test::BDD::Cucumber::Model::Feature - Model to represent a feature file, parsed
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,16 @@ background section.
 
 has 'background' =>
   ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Scenario'] );
+
+=head2 keyword_original
+
+The keyword used in the input file; equivalent to specification
+keyword C<Feature>.
+
+=cut
+
+has 'keyword_original' => ( is => 'rw', isa => Str );
+
 
 =head2 scenarios
 

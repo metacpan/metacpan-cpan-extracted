@@ -41,7 +41,7 @@ is(
 );
 
 cmp_deeply(
-    [ grep { /^\[CheckIssues\]/ } @{ $tzil->log_messages } ],
+    [ grep /^\[CheckIssues\]/, @{ $tzil->log_messages } ],
     [
         '[CheckIssues] failed to find a github repo in metadata',
     ],

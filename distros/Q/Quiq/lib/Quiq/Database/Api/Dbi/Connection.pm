@@ -1,11 +1,11 @@
 package Quiq::Database::Api::Dbi::Connection;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use DBI ();
@@ -50,7 +50,7 @@ Name des DBMS, für DBMS-spezifische Fallunterscheidungen.
 
 =head4 Synopsis
 
-    $db = $class->new($udlObj);
+  $db = $class->new($udlObj);
 
 =head4 Description
 
@@ -259,7 +259,7 @@ sub new {
 
 =head4 Synopsis
 
-    $db->destroy;
+  $db->destroy;
 
 =head4 Description
 
@@ -303,8 +303,8 @@ sub DESTROY {
 
 =head4 Synopsis
 
-    $bool = $db->strict;
-    $bool = $db->strict($bool);
+  $bool = $db->strict;
+  $bool = $db->strict($bool);
 
 =head4 Description
 
@@ -368,8 +368,8 @@ sub strict {
 
 =head4 Synopsis
 
-    $n = $db->maxBlobSize;
-    $n = $db->maxBlobSize($n);
+  $n = $db->maxBlobSize;
+  $n = $db->maxBlobSize($n);
 
 =head4 Description
 
@@ -409,7 +409,7 @@ sub maxBlobSize {
 
 =head4 Synopsis
 
-    $cur = $db->sql($stmt,$forceExec);
+  $cur = $db->sql($stmt,$forceExec);
 
 =head4 Description
 
@@ -520,7 +520,7 @@ sub sql {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

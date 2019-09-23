@@ -1,11 +1,11 @@
 package Quiq::TimeLapse::Sequence;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Duration;
 use Quiq::Path;
@@ -31,14 +31,14 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    # Klasse laden
-    use %CLASS;
-    
-    # Instantiiere Sequence-Objekt
-    $tsq = Quiq::TimeLapse::Sequence->new(\@images);
-    
-    # Exportiere Bilddateien in Verzeichnis
-    $tsq->export($dir);
+  # Klasse laden
+  use %CLASS;
+  
+  # Instantiiere Sequence-Objekt
+  $tsq = Quiq::TimeLapse::Sequence->new(\@images);
+  
+  # Exportiere Bilddateien in Verzeichnis
+  $tsq->export($dir);
 
 =head1 METHODS
 
@@ -48,7 +48,7 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    $tsq = $class->new(\@images);
+  $tsq = $class->new(\@images);
 
 =head4 Arguments
 
@@ -89,7 +89,7 @@ sub new {
 
 =head4 Synopsis
 
-    $n = $tsq->count;
+  $n = $tsq->count;
 
 =head4 Returns
 
@@ -114,7 +114,7 @@ sub count {
 
 =head4 Synopsis
 
-    $duration = $tsq->duration($framerate);
+  $duration = $tsq->duration($framerate);
 
 =head4 Returns
 
@@ -141,7 +141,7 @@ sub duration {
 
 =head4 Synopsis
 
-    $tsq->export($destDir);
+  $tsq->export($destDir);
 
 =head4 Arguments
 
@@ -195,7 +195,7 @@ sub export {
 
 =head4 Synopsis
 
-    $tsq->morph($n,$destDir);
+  $tsq->morph($n,$destDir);
 
 =head4 Arguments
 
@@ -273,7 +273,7 @@ sub morph {
 
 =head4 Synopsis
 
-    $tsq->generate($file,@opt);
+  $tsq->generate($file,@opt);
 
 =head4 Arguments
 
@@ -459,7 +459,7 @@ sub generate {
 
 =head4 Synopsis
 
-    @images|$imageA = $tsq->images;
+  @images|$imageA = $tsq->images;
 
 =head4 Returns
 
@@ -485,7 +485,7 @@ sub images {
 
 =head4 Synopsis
 
-    $sha1 = $tsq->sha1(@keyVal);
+  $sha1 = $tsq->sha1(@keyVal);
 
 =head4 Returns
 
@@ -530,7 +530,7 @@ sub sha1 {
 
 =head4 Synopsis
 
-    $tsq = $tsq->pick($n);
+  $tsq = $tsq->pick($n);
 
 =head4 Returns
 
@@ -563,7 +563,7 @@ sub pick {
 
 =head4 Synopsis
 
-    $tsq = $tsq->reverse;
+  $tsq = $tsq->reverse;
 
 =head4 Returns
 
@@ -590,7 +590,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

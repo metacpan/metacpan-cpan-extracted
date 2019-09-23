@@ -1,11 +1,11 @@
 package Quiq::Database::ResultSet::Array;
 use base qw/Quiq::Database::ResultSet/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 
@@ -34,7 +34,7 @@ Datensätzen in Array-Repräsentation.
 
 =head4 Synopsis
 
-    $idx = $tab->columnIndex($title);
+  $idx = $tab->columnIndex($title);
 
 =head4 Description
 
@@ -64,7 +64,7 @@ sub columnIndex {
 
 =head4 Synopsis
 
-    $rowClass = $class->defaultRowClass;
+  $rowClass = $class->defaultRowClass;
 
 =head4 Description
 
@@ -90,7 +90,7 @@ sub defaultRowClass {
 
 =head4 Synopsis
 
-    $row = $tab->lookupSub($key=>$val);
+  $row = $tab->lookupSub($key=>$val);
 
 =head4 Description
 
@@ -126,7 +126,7 @@ sub lookupSub {
 
 =head4 Synopsis
 
-    @vals|$valA = $tab->values($key);
+  @vals|$valA = $tab->values($key);
 
 =cut
 
@@ -151,7 +151,7 @@ sub values {
 
 =head4 Synopsis
 
-    %idx|$idxH = $tab->index($key);
+  %idx|$idxH = $tab->index($key);
 
 =cut
 
@@ -174,7 +174,7 @@ sub index {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

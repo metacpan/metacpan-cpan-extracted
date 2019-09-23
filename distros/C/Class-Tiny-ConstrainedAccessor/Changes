@@ -1,5 +1,12 @@
 Revision history for Class-Tiny-ConstrainedAccessor
 
+0.000012    2019-09-20
+        - Production release of 0.000011
+
+0.000011    2019-09-18 (TRIAL VERSION)
+        - Update required vars::i version (fixes a regression) (#6).
+          Thanks to ANDK for reporting!
+
 0.000010    2019-05-25
         - Non-trial release of 0.000009
 
@@ -36,5 +43,5 @@ Revision history for Class-Tiny-ConstrainedAccessor
         - Run as far back as 5.006 (GH-2).
 
 0.000001    2019-03-12 (TRIAL VERSION)
-        First version, released on an unsuspecting world.
+        - First version, released on an unsuspecting world.
 

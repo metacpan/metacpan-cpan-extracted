@@ -1,20 +1,22 @@
+0.05  2019-09-20
+  - Add missing dependency declarations as reported by Kwalitee
 
- ** 0.04 / 2019-07-12
+0.04  2019-07-12
   - Fix package name in inheritance (Weasel::Widgets::HTML instead
     of Weasel::Widget::HTML)
   - When clicking on an option in the Select widget, wait for the
     DOM to be built before generating the actual click.
 
- ** 0.03 / 2019-02-28
+0.03  2019-02-28
   - Adapt to changes in Dojo::Widgets::HTML (::Selectable and ::Select)
     which now feature a 'value' method which is separate from
     "get_attribute('value')" in the sense that the returned value depends
     on the selectedness of the option.
 
- ** 0.02 / 2016-07-09
+0.02  2016-07-09
   - Return the 'value' attribute from the 'valueNode' subnode when
     asking for a SELECT widget's value
 
- ** 0.01 / 2016-06-23
+0.01  2016-06-23
   - Initial release to replace LedgerSMB's
     (https://github.com/ledgersmb/LedgerSMB) test code

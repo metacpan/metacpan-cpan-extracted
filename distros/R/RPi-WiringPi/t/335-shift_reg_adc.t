@@ -9,16 +9,16 @@ use RPi::Const qw(:all);
 use Test::More;
 
 if (! $ENV{RPI_SHIFTREG}){
-#    plan skip_all => "RPI_SHIFTREG environment variable not set\n";
+    plan skip_all => "RPI_SHIFTREG environment variable not set\n";
 }
 
 if (! $ENV{RPI_MCP3008}){
-#    plan skip_all => "RPI_MCP3008 environment variable not set\n";
+    plan skip_all => "RPI_MCP3008 environment variable not set\n";
 }
 
 if (! $ENV{PI_BOARD}){
     $ENV{NO_BOARD} = 1;
-#    plan skip_all => "Not on a Pi board\n";
+    plan skip_all => "Not on a Pi board\n";
 }
 
 my $adc_pin = 26;

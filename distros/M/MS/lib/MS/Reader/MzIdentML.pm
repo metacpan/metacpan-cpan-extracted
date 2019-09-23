@@ -15,8 +15,6 @@ use MS::Reader::MzIdentML::PeptideEvidence;
 use MS::Reader::MzIdentML::ProteinAmbiguityGroup;
 use MS::CV qw/:MS/;
 
-our $VERSION = 0.001;
-
 BEGIN {
 
     *fetch_peptide_by_id         = \&_fetch_seqitem_by_id;

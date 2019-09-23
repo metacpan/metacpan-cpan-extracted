@@ -4,4 +4,10 @@ use strict;
 
 use Test::More;
 use Test::Prereq;
-prereq_ok( undef, [ 'Term::Choose::Screen', 'Term::Choose::Win32' ] );
+prereq_ok( undef, [
+    'Term::Choose::LineFold',
+    'Term::Choose::Linux',
+    'Term::Choose::Screen',
+    'Term::Choose::ValidateOptions',
+    'Term::Choose::Win32'
+] );

@@ -3,11 +3,11 @@ package RPi::LCD;
 use strict;
 use warnings;
 
-our $VERSION = '2.3603';
+our $VERSION = '2.3604';
 
 use parent 'WiringPi::API';
 use Carp qw(confess);
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 
 sub new {
     my $self = bless {}, shift;

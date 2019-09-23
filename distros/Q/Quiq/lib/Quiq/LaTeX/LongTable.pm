@@ -1,12 +1,12 @@
 package Quiq::LaTeX::LongTable;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -24,60 +24,60 @@ L<Quiq::Hash>
 
 Der Code
 
-    use Quiq::LaTeX::LongTable;
-    use Quiq::LaTeX::Code;
-    
-    my $tab = Quiq::LaTeX::LongTable->new(
-        alignments => ['l','r','c'],
-        caption => 'Ein Test',
-        titles => ['Links','Rechts','Zentriert'],
-        rows => [
-            ['A',1,'AB'],
-            ['AB',2,'CD'],
-            ['ABC',3,'EF'],
-            ['ABCD',4,'GH'],
-        ],
-    );
-    
-    my $l = Quiq::LaTeX::Code->new;
-    my $code = $tab->latex($l);
+  use Quiq::LaTeX::LongTable;
+  use Quiq::LaTeX::Code;
+  
+  my $tab = Quiq::LaTeX::LongTable->new(
+      alignments => ['l','r','c'],
+      caption => 'Ein Test',
+      titles => ['Links','Rechts','Zentriert'],
+      rows => [
+          ['A',1,'AB'],
+          ['AB',2,'CD'],
+          ['ABC',3,'EF'],
+          ['ABCD',4,'GH'],
+      ],
+  );
+  
+  my $l = Quiq::LaTeX::Code->new;
+  my $code = $tab->latex($l);
 
 produziert
 
-    \begin{longtable}{|lrc|}
-    \hline
-    Links & Rechts & Zentriert \\ \hline
-    \endfirsthead
-    \multicolumn{3}{r}{\emph{Fortsetzung}} \
-    \hline
-    Links & Rechts & Zentriert \\ \hline
-    \endhead
-    \hline
-    \multicolumn{3}{r}{\emph{weiter nächste Seite}} \
-    \endfoot
-    \caption{Ein Test}
-    \endlastfoot
-    A & 1 & AB \\ \hline
-    AB & 2 & CD \\ \hline
-    ABC & 3 & EF \\ \hline
-    ABCD & 4 & GH \\ \hline
-    \end{longtable}
+  \begin{longtable}{|lrc|}
+  \hline
+  Links & Rechts & Zentriert \\ \hline
+  \endfirsthead
+  \multicolumn{3}{r}{\emph{Fortsetzung}} \
+  \hline
+  Links & Rechts & Zentriert \\ \hline
+  \endhead
+  \hline
+  \multicolumn{3}{r}{\emph{weiter nächste Seite}} \
+  \endfoot
+  \caption{Ein Test}
+  \endlastfoot
+  A & 1 & AB \\ \hline
+  AB & 2 & CD \\ \hline
+  ABC & 3 & EF \\ \hline
+  ABCD & 4 & GH \\ \hline
+  \end{longtable}
 
 was im LaTeX-Dokument in etwa so aussieht
 
-    +--------------------------+
-    | Links  Rechts  Zentriert |
-    +--------------------------+
-    | A           1     AB     |
-    +--------------------------+
-    | AB         12     CD     |
-    +--------------------------+
-    | ABC       123     EF     |
-    +--------------------------+
-    | ABCD     1234     GH     |
-    +--------------------------+
-    
-        Tabelle 1: Ein Test
+  +--------------------------+
+  | Links  Rechts  Zentriert |
+  +--------------------------+
+  | A           1     AB     |
+  +--------------------------+
+  | AB         12     CD     |
+  +--------------------------+
+  | ABC       123     EF     |
+  +--------------------------+
+  | ABCD     1234     GH     |
+  +--------------------------+
+  
+      Tabelle 1: Ein Test
 
 =head1 METHODS
 
@@ -87,7 +87,7 @@ was im LaTeX-Dokument in etwa so aussieht
 
 =head4 Synopsis
 
-    $tab = $class->new(@keyVal);
+  $tab = $class->new(@keyVal);
 
 =head4 Arguments
 
@@ -146,16 +146,16 @@ Liste der Tabellenzeilen.
 Subroutine, die für jede Zeile in @rows die Zeileninformation
 liefert, die in den LaTeX-Code eingesetzt wird. Default:
 
-    sub {
-        my ($self,$l,$row,$n) = @_;
-    
-        my @row;
-        for my $val (@$row) {
-            push @row,$l->protect($val);
-        }
-    
-        return @row;
-    }
+  sub {
+      my ($self,$l,$row,$n) = @_;
+  
+      my @row;
+      for my $val (@$row) {
+          push @row,$l->protect($val);
+      }
+  
+      return @row;
+  }
 
 =item titleColor => $color
 
@@ -168,7 +168,7 @@ wird der Titel eingesetzt. Auf diesem Weg kann ein Makro
 auf jeden Titel angewendet werden. Z.B. serifenlosen, fetten Font
 einstellen:
 
-    titleWrapper => '\textsf{\textbf{%s}}'
+  titleWrapper => '\textsf{\textbf{%s}}'
 
 =item titles => \@titles (Default: [])
 
@@ -179,10 +179,10 @@ Liste der Kolumnentitel.
 Subroutine, die die Titelinformation liefert, die in den
 LaTeX-Code eingesetzt wird. Default:
 
-    sub {
-        my ($self,$l,$title,$n) = @_;
-        return $l->protect($title);
-    }
+  sub {
+      my ($self,$l,$title,$n) = @_;
+      return $l->protect($title);
+  }
 
 =back
 
@@ -246,8 +246,8 @@ sub new {
 
 =head4 Synopsis
 
-    $code = $tab->latex($l);
-    $code = $class->latex($l,@keyVal);
+  $code = $tab->latex($l);
+  $code = $class->latex($l,@keyVal);
 
 =head4 Description
 
@@ -433,7 +433,7 @@ sub latex {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

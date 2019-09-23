@@ -1,5 +1,8 @@
 Revision history for Catmandu-XLS
 
+0.09  2019-09-20 10:00:47 CEST
+  - add missing dependency
+
 0.08  2016-01-12 16:31:41 CET
   - Add Spreadsheet::ParseXLSX to cpanfile
   - GH#5: Fix XSLX importer to keep the formatting rules of columns

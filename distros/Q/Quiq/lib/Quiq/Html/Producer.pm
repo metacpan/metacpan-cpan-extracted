@@ -1,11 +1,11 @@
 package Quiq::Html::Producer;
 use base qw/Quiq::Html::Construct/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -30,22 +30,22 @@ Quiq::Html::Tag implementiert.
 
 Vererbungshierarchie:
 
-    Quiq::Html::Tag        (einzelne HTML-Tags)
-        |
-    Quiq::Html::Construct  (einfache Konstrukte aus HTML-Tags)
-        |
-    Quiq::Html::Producer   (vereinigte Funktionalität)
+  Quiq::Html::Tag        (einzelne HTML-Tags)
+      |
+  Quiq::Html::Construct  (einfache Konstrukte aus HTML-Tags)
+      |
+  Quiq::Html::Producer   (vereinigte Funktionalität)
 
 Einfacher Anwendungsfall:
 
-    my $h = Quiq::Html::Producer->new;
-    print Quiq::Html::Page->html($h,
-        ...
-    );
+  my $h = Quiq::Html::Producer->new;
+  print Quiq::Html::Page->html($h,
+      ...
+  );
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

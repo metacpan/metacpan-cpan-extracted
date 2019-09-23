@@ -1,5 +1,7 @@
 #!perl
 
+package calculator_feature_step_functions;
+
 use strict;
 use warnings;
 

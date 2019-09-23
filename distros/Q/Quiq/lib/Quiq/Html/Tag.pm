@@ -1,12 +1,12 @@
 package Quiq::Html::Tag;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -40,7 +40,7 @@ erzeugt werden kann.
 
 Ein Objekt der Klasse wird instantiiert durch
 
-    my $h = Quiq::Html::Tag->new;
+  my $h = Quiq::Html::Tag->new;
 
 Die Methoden dieses Objekts generieren (X)HTML.
 
@@ -51,11 +51,11 @@ alle Element-Typen des W3C HTML/XHTML Standard und liefert bei Aufruf
 eine formatierte Tag-Repräsentation des betreffenden Element-Typs
 und seiner Attribute. Beispiel:
 
-    $str = $h->tag('img',src=>'URL');
+  $str = $h->tag('img',src=>'URL');
 
 ergibt
 
-    <img src="URL" alt="" />
+  <img src="URL" alt="" />
 
 Das Beispiel verdeutlicht, dass der Methode tag() die
 Element-Typen "kennt". In diesem Fall "weiß" die Methode, dass
@@ -64,7 +64,7 @@ Elemente des Typs 'img' leer sind und diese ein Pflicht-Attribut
 
 Die Methode tag() hat die Signatur:
 
-    $str = $h->tag($elem,@keyVal,$content);
+  $str = $h->tag($elem,@keyVal,$content);
 
 Hierbei ist $elem der Element-Typ, @keyVal die Liste der
 Attribut/Wert-Paare und Optionen (siehe unten) und $content
@@ -74,13 +74,13 @@ Da die Argumente der Methode die gleiche Abfolge haben wie die
 Bestandteile eines Tag in HTML, können die Methodenaufrufe in Perl
 analog geschachtelt werden wie die Tags in HTML. Beispiel:
 
-    $h->tag('a',href=>'URL1',
-        $h->tag('img',src=>'URL2'),
-    );
+  $h->tag('a',href=>'URL1',
+      $h->tag('img',src=>'URL2'),
+  );
 
 ergibt
 
-    <a href="URL1"><img src="URL2" alt="" /></a>
+  <a href="URL1"><img src="URL2" alt="" /></a>
 
 =head2 Methode cat()
 
@@ -91,24 +91,24 @@ HTML-Elemente zusammen.
 
 Die Methode cat() hat folgende Signatur:
 
-    $str = $h->cat(@args);
+  $str = $h->cat(@args);
 
 Hierbei ist @args die Liste der HTML-Elemente, die zusammengefügt
 werden sollen.
 
 Beispiel:
 
-    $h->cat(
-        $h->tag('li','Orange'),
-        $h->tag('li','Zitrone'),
-        $h->tag('li','Ananas'),
-    );
+  $h->cat(
+      $h->tag('li','Orange'),
+      $h->tag('li','Zitrone'),
+      $h->tag('li','Ananas'),
+  );
 
 ergibt
 
-    <li>Orange</li>
-    <li>Zitrone</li>
-    <li>Ananas</li>
+  <li>Orange</li>
+  <li>Zitrone</li>
+  <li>Ananas</li>
 
 Die Methode cat() wird von der Methode tag() intern gerufen, um
 den Content des Tag zu konstruieren. Erstreckt sich der Content
@@ -117,34 +117,34 @@ Methode tag() das Ende der @keyVal Argumente angezeigt werden.
 Dies geschieht durch Setzen des Arguments '-' vor die
 Content-Argumente.
 
-    $h->tag('ul','-',
-        $h->tag('li','Orange'),
-        $h->tag('li','Zitrone'),
-        $h->tag('li','Ananas'),
-    );
+  $h->tag('ul','-',
+      $h->tag('li','Orange'),
+      $h->tag('li','Zitrone'),
+      $h->tag('li','Ananas'),
+  );
 
 ergibt
 
-    <ul>
-      <li>Orange</li>
-      <li>Zitrone</li>
-      <li>Ananas</li>
-    </ul>
+  <ul>
+    <li>Orange</li>
+    <li>Zitrone</li>
+    <li>Ananas</li>
+  </ul>
 
 Der Inhalt eines Tag kann nicht nur aus HTML-Elementen bestehen,
 sondern auch einfachen Text enthalten oder aus einer Mischung
 aus Text und Elementen bestehen. Beispiel:
 
-    $h->tag('p','-',
-       'Auf ',$h->tag('a',href=>'http://cpan.org','CPAN'),
-       ' sind ',$h->tag('b','viele'),' Module!',
-    );
+  $h->tag('p','-',
+     'Auf ',$h->tag('a',href=>'http://cpan.org','CPAN'),
+     ' sind ',$h->tag('b','viele'),' Module!',
+  );
 
 ergibt
 
-    <p>
-      Auf <a href="http://cpan.org">CPAN</a> sind <b>viele</b> Module!
-    </p>
+  <p>
+    Auf <a href="http://cpan.org">CPAN</a> sind <b>viele</b> Module!
+  </p>
 
 =head2 Komplexere HTML-Strukturen
 
@@ -152,31 +152,31 @@ Mit der Methode tag() lassen sich beliebig komplexe HTML-Strukturen
 generieren. Der folgende Code produziert ein einfaches, bis auf
 die fehlende Dokumenttyp-Deklaration vollständiges HTML-Dokument.
 
-    $h->tag('html','-',
-        $h->tag('head',
-            $h->tag('title','Test'),
-        ),
-        $h->tag('body',
-            $h->tag('p',q|
-                Hallo
-                Welt!
-            |),
-        ),
-    );
+  $h->tag('html','-',
+      $h->tag('head',
+          $h->tag('title','Test'),
+      ),
+      $h->tag('body',
+          $h->tag('p',q|
+              Hallo
+              Welt!
+          |),
+      ),
+  );
 
 liefert
 
-    <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-      <title>Test</title>
-    </head>
-    <body>
-    <p>
-      Hallo
-      Welt!
-    </p>
-    </body>
-    </html>
+  <html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+  <p>
+    Hallo
+    Welt!
+  </p>
+  </body>
+  </html>
 
 =head2 Formatierung
 
@@ -184,14 +184,14 @@ Wer die obigen Beispiele genau betrachtet, bemerkt, dass die Tags
 nicht alle mit der gleichen Formatierung generiert werden.
 Der a-Tag umschließt seinen Inhalt unmittelbar
 
-    <a ...>INHALT</a>
+  <a ...>INHALT</a>
 
 wohingegen der p-Tag seinen Inhalt um zwei Leerzeichen einrückt
 und der Begin- und End-Tag auf einer eignenen Zeile stehen
 
-    <p>
-      INHALT
-    </p>
+  <p>
+    INHALT
+  </p>
 
 Dies sind zwei der Formatierungsvarianten, die die Methode
 tag() kennt.
@@ -205,41 +205,41 @@ e=empty mit Zeilenumbruch
 Der Tag hat keinen Inhalt und steht auf einer eigenen Zeile (d.h.
 er wird mit \n abgeschlossen):
 
-    <br />\n
+  <br />\n
 
 E=empty ohne Zeilenumbruch
 
 Wie e, nur dass der Tag nicht auf einer eigenen Zeile steht (also
 nicht mit \n abgeschlossen wird):
 
-    <img ... />
+  <img ... />
 
 i=inline
 
 Der Tag umschließt seinen Inhalt unmittelbar, es wird
 kein \n angehängt:
 
-    <a ...>IRGENDEIN\n
-    INHALT</a>
+  <a ...>IRGENDEIN\n
+  INHALT</a>
 
 m=multiline mit Einrückung
 
 Der Inhalt wird um zwei Leerzeichen eingerückt, der Tag umschließt
 diesen auf getrennten Zeilen. Das Konstrukt endet mit einem \n:
 
-    <p ...>\n
-      IRGENDEIN\n
-      INHALT\n
-    </p>\n
+  <p ...>\n
+    IRGENDEIN\n
+    INHALT\n
+  </p>\n
 
 M=multiline ohne Einrückung
 
 Wie m, nur dass der Inhalt nicht eingerückt wird:
 
-    <html ...>\n
-    HEAD\n
-    BODY\n
-    </html>\n
+  <html ...>\n
+  HEAD\n
+  BODY\n
+  </html>\n
 
 p=protected
 
@@ -247,7 +247,7 @@ Der Inhalt wird einzeilig gemacht, indem LF- und CR-Zeichen durch
 die Entities &#10; und &#13; ersetzt werden und vom Tag
 unmittelbar umschlossen werden.
 
-    <pre ...>IRGENDEIN&#10;INHALT</pre>\n
+  <pre ...>IRGENDEIN&#10;INHALT</pre>\n
 
 Diese Formatierung schützt den Tag-Inhalt davor, dass er
 durch eine Einrückung äußerer Tags verändert wird. Sie wird
@@ -257,14 +257,14 @@ v=variable
 
 Enthält der Inhalt keine Zeilenumbrüche, wird er einzeilig ausgelegt:
 
-    <title>INHALT</title>\n
+  <title>INHALT</title>\n
 
 Enthält der Inhalt Zeilenumbrüche, wird er mehrzeilig ausgelegt:
 
-    <title>
-      EIN
-      TITEL
-    </title>
+  <title>
+    EIN
+    TITEL
+  </title>
 
 =head2 Setzen von data-* Attributen
 
@@ -276,31 +276,31 @@ Die Methode tag() unterstützt data-* Attribute auf zwei Weisen:
 
 Einzelne Attribute:
 
-    $h->tag('form',
-        'data-x' => 'a',
-        'data-y' => 'b',
-        'data-z' => 'c',
-         ...
-    );
+  $h->tag('form',
+      'data-x' => 'a',
+      'data-y' => 'b',
+      'data-z' => 'c',
+       ...
+  );
 
 =item 2.
 
 Liste von Attributen:
 
-    $h->tag('form',
-        data => [
-            x => 'a',
-            y => 'b',
-            z => 'c',
-        ],
-        ...
-    );
+  $h->tag('form',
+      data => [
+          x => 'a',
+          y => 'b',
+          z => 'c',
+      ],
+      ...
+  );
 
 =back
 
 Das Resultat in beiden Fällen:
 
-    <form data-z="c" data-y="b" data-x="a" ...></form>
+  <form data-z="c" data-y="b" data-x="a" ...></form>
 
 =head2 HTML Element-Typen
 
@@ -308,89 +308,89 @@ Die Methode tag() kennt alle Element-Typen des W3C-Standards. Die
 folgende Liste gibt den Element-Typ, die Default-Formatierung und
 die Default-Attribute an:
 
-    Element   Format  Default-Attribute
-    
-    a           i
-    abbr        i
-    acronym     i
-    address     v
-    area        e
-    b           i
-    base        e
-    bdo         i
-    big         i
-    blockquote  m
-    body        M
-    br          e
-    button      v
-    caption     v
-    cite        i
-    code        i
-    col         e
-    colgroup    m
-    dd          v
-    del         i
-    dfn         i
-    div         m
-    dl          m
-    dt          v
-    em          i
-    fieldset    m
-    form        M
-    frame       e
-    frameset    m
-    h1          v
-    h2          v
-    h3          v
-    h4          v
-    h5          v
-    h6          v
-    head        m
-    hr          e
-    html        M     xmlns=>'http://www.w3.org/1999/xhtml' (nur XHTML)
-    i           i
-    iframe      v
-    img         E     alt=>''
-    input       e
-    ins         i
-    kbd         i
-    label       v
-    legend      v
-    li          v
-    link        e
-    map         m
-    meta        e
-    noframes    m
-    noscript    m
-    object      m
-    ol          m
-    optgroup    m
-    option      v
-    p           m
-    param       e
-    pre         p
-    q           i
-    samp        i
-    script      m     type=>'text/javascript'
-    select      v
-    small       i
-    span        i
-    strong      i
-    style       m     type=>'text/css'
-    sub         i
-    sup         i
-    table       M
-    tbody       m
-    td          v
-    textarea    p
-    tfoot       m
-    th          v
-    thead       m
-    title       v
-    tr          m
-    tt          i
-    ul          m
-    var         i
+  Element   Format  Default-Attribute
+  
+  a           i
+  abbr        i
+  acronym     i
+  address     v
+  area        e
+  b           i
+  base        e
+  bdo         i
+  big         i
+  blockquote  m
+  body        M
+  br          e
+  button      v
+  caption     v
+  cite        i
+  code        i
+  col         e
+  colgroup    m
+  dd          v
+  del         i
+  dfn         i
+  div         m
+  dl          m
+  dt          v
+  em          i
+  fieldset    m
+  form        M
+  frame       e
+  frameset    m
+  h1          v
+  h2          v
+  h3          v
+  h4          v
+  h5          v
+  h6          v
+  head        m
+  hr          e
+  html        M     xmlns=>'http://www.w3.org/1999/xhtml' (nur XHTML)
+  i           i
+  iframe      v
+  img         E     alt=>''
+  input       e
+  ins         i
+  kbd         i
+  label       v
+  legend      v
+  li          v
+  link        e
+  map         m
+  meta        e
+  noframes    m
+  noscript    m
+  object      m
+  ol          m
+  optgroup    m
+  option      v
+  p           m
+  param       e
+  pre         p
+  q           i
+  samp        i
+  script      m     type=>'text/javascript'
+  select      v
+  small       i
+  span        i
+  strong      i
+  style       m     type=>'text/css'
+  sub         i
+  sup         i
+  table       M
+  tbody       m
+  td          v
+  textarea    p
+  tfoot       m
+  th          v
+  thead       m
+  title       v
+  tr          m
+  tt          i
+  ul          m
+  var         i
 
 Das Default-Format kann mit der Option -fmt=>$val bei Aufruf
 der Methode tag() überschrieben werden.
@@ -407,7 +407,7 @@ Bei -nl=>0 wird kein Zeilenumbruch angehängt.
 Per Default wird XHTML-Code generiert. Um klassischen HTML-Code
 zu generieren, wird die HTML-Version gesetzt:
 
-    Quiq::Html::Tag->setDefault(htmlVersion=>'html-4.01');
+  Quiq::Html::Tag->setDefault(htmlVersion=>'html-4.01');
 
 Ab diesem Aufruf instantiieren die nachfolgenden Konstruktor-Aufrufe
 (sofern sie die htmlVersion nicht selbst setzen) Objekte zur Generierung
@@ -415,7 +415,7 @@ von klassischem HTML.
 
 Der generierte Code sieht bei klassischem HTML folgendermaßen aus:
 
-    <a href="URL1"><img src="URL2" alt=""></a>
+  <a href="URL1"><img src="URL2" alt=""></a>
 
 Man beachte, dass der img-Tag nun mit '>', nicht mit ' />'
 abgeschlossen ist.
@@ -425,11 +425,11 @@ abgeschlossen ist.
 HTML-Code mit großgeschriebenen Element- und Attributnamen wird
 nach folgender Setzung erzeugt:
 
-    Quiq::Html::Tag->setDefault(htmlVersion=>'html-4.01',uppercase=>1);
+  Quiq::Html::Tag->setDefault(htmlVersion=>'html-4.01',uppercase=>1);
 
 Der generierte Code sieht dann so aus:
 
-    <A HREF="URL1"><IMG SRC="URL2" ALT=""></A>
+  <A HREF="URL1"><IMG SRC="URL2" ALT=""></A>
 
 Ist XHTML ('xhtml-1.0') eingestellt, hat die Option uppercase=>1
 keinen Einfluss.
@@ -806,8 +806,8 @@ my %Domain = (
 
 =head4 Synopsis
 
-    $h = $class->new(@keyVal);
-    $h = $class->new($htmlVersion,@keyVal);
+  $h = $class->new(@keyVal);
+  $h = $class->new($htmlVersion,@keyVal);
 
 =head4 Description
 
@@ -840,9 +840,9 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $h->tag($elem,@keyVal); # [1]
-    $html = $h->tag($elem,@keyVal,$content); # [2]
-    $html = $h->tag($elem,@keyVal,'-',@content); # [3]
+  $html = $h->tag($elem,@keyVal); # [1]
+  $html = $h->tag($elem,@keyVal,$content); # [2]
+  $html = $h->tag($elem,@keyVal,'-',@content); # [3]
 
 =head4 Options
 
@@ -853,9 +853,9 @@ sub new {
 Ende der Attribut/Wert-Liste. Die restlichen Argumente werden
 zum Inhalt konkateniert.
 
-    $h->tag('p',class=>'p1','-',
-        'Ein ',$h->tag('b','kurzer'),' Text.'
-    );
+  $h->tag('p',class=>'p1','-',
+      'Ein ',$h->tag('b','kurzer'),' Text.'
+  );
 
 Man beachte die Kommata zwischen den Argumenten.
 
@@ -863,9 +863,9 @@ Ohne '-' wird allein das letzte Argument als Inhalt aufgefasst.
 Besteht der Inhalt aus mehreren Teilen, müssen die Teile
 dann konkateniert werden:
 
-    $h->tag('p',class => 'p1',
-        'Ein '.$h->tag('b','kurzer').' Text.'
-    );
+  $h->tag('p',class => 'p1',
+      'Ein '.$h->tag('b','kurzer').' Text.'
+  );
 
 =item -checkLevel => 0|1|2 (Default: 1)
 
@@ -877,7 +877,7 @@ Generiere den HTML-Code einzeilig mit so wenig Whitespace wie möglich.
 Soll sämtlicher HTML-Code einzeilig erzeugt werden,
 genügt es, beim Konstruktor das Attribut compact zu setzen:
 
-    $h = Quiq::Html::Tag->new(...,compact=>1);
+  $h = Quiq::Html::Tag->new(...,compact=>1);
 
 =item -contentInd => $n (Default: undef)
 
@@ -897,16 +897,16 @@ Erzeuge nur den Content und den End-Tag. Diese Option ist nützlich,
 wenn der HTML-Code inkrementell geschrieben wird und z.B. im Fehlerfall
 nur der Rest mit schließenden Tags generiert werden soll.
 
-    my $html = $h->tag('html',
-        -endTagOnly => 1,
-        $h->tag('body',
-            -endTagOnly => 1,
-            '-',
-            $h->tag('h1','Fatal Error'),
-            $h->tag('pre',$msg),
-        )
-    );
-    $http->append($html);
+  my $html = $h->tag('html',
+      -endTagOnly => 1,
+      $h->tag('body',
+          -endTagOnly => 1,
+          '-',
+          $h->tag('h1','Fatal Error'),
+          $h->tag('pre',$msg),
+      )
+  );
+  $http->append($html);
 
 =item -fmt => 'e'|'m'|'p'|'v'|'i' (Default: richtet sich nach $tag)
 
@@ -933,31 +933,31 @@ gesetzt und um -ind=>$n Leerzeichen eingerückt. Ist der Content
 leer, wird der End-Tag direkt hinter den Begin-Tag gesetzt.
 (html, head, body, form, p, div, script, style, ...)
 
-    <TAG ...>
-      CONTENT
-    </TAG>\n
+  <TAG ...>
+    CONTENT
+  </TAG>\n
 
 Ist der Content leer:
 
-    <TAG ...></TAG>
+  <TAG ...></TAG>
 
 =item 'M' (multiline, ohne Einrückung)
 
 Wie 'm', nur ohne Einrückung (html, ...)
 
-    <TAG ...>
-    CONTENT
-    </TAG>\n
+  <TAG ...>
+  CONTENT
+  </TAG>\n
 
 =item 'c' (cdata)
 
 Wie 'm', nur dass der Content in CDATA eingefasst wird:
 
-    <TAG ...>
-      // <![CDATA[
-      CONTENT
-      // ]]>
-    </TAG>
+  <TAG ...>
+    // <![CDATA[
+    CONTENT
+    // ]]>
+  </TAG>
 
 Der W3 HTML Validator bemängelt die Zeichen & und > dann nicht
 im Content. (script)
@@ -968,7 +968,7 @@ Der Content wird geschützt, indem dieser einzeilig gemacht
 (LF und CR werden durch &#10; und &#13; ersetzt) und unmittelbar
 zwischen Begin- und End-Tag gesetzt wird (pre, textarea, ...).
 
-    <TAG ...>CONTENT</TAG>\n
+  <TAG ...>CONTENT</TAG>\n
 
 =item 'P' (protect, Einrückung entfernen)
 
@@ -979,13 +979,13 @@ Wie 'p', nur dass die Einrückung des Content entfernt wird.
 Ist der Content einzeilig, wird er unmittelbar zwischen Begin-
 und End-Tag gesetzt:
 
-    <TAG ...>CONTENT</TAG>\n
+  <TAG ...>CONTENT</TAG>\n
 
 Ist der Content mehrzeilig, wird er eingerückt:
 
-    <TAG ...>
-      CONTENT
-    </TAG>\n
+  <TAG ...>
+    CONTENT
+  </TAG>\n
 
 (title, h1-h6, ...)
 
@@ -994,8 +994,8 @@ Ist der Content mehrzeilig, wird er eingerückt:
 Der Content wird belassen wie er ist. Dies ist der Default für Tags,
 die in Fließtext eingesetzt werden. Ein NEWLINE wird nicht angehängt.
 
-    Text Text <TAG ...>Text Text
-    Text</TAG> Text Text
+  Text Text <TAG ...>Text Text
+  Text</TAG> Text Text
 
 (a, b, span, ...)
 
@@ -1003,7 +1003,7 @@ die in Fließtext eingesetzt werden. Ein NEWLINE wird nicht angehängt.
 
 Bei Wert 0 generiere keinen End-Tag bei leerem Content, sondern
 
-    <TAG .../>
+  <TAG .../>
 
 =item -ignoreIf => $bool (Default: 0)
 
@@ -1044,17 +1044,17 @@ Anzahl NEWLINEs am Ende.
 
 -nl => 0 (kein NEWLINE):
 
-    <TAG>CONTENT</TAG>
+  <TAG>CONTENT</TAG>
 
 -nl => 1 (ein NEWLINE):
 
-    <TAG>CONTENT</TAG>\n
+  <TAG>CONTENT</TAG>\n
 
 -nl => 2 (zwei NEWLINEs):
 
-    <TAG>CONTENT</TAG>\n\n
+  <TAG>CONTENT</TAG>\n\n
 
-    usw.
+  usw.
 
 =item -placeholders => \@keyVal (Default: undef)
 
@@ -1076,10 +1076,10 @@ Mit dieser Option kann der Tag verändert werden. Anwendungsfall:
 statt eigentlich beim Aufruf angegebenen td soll ein th-Tag
 gesetzt werden. Beispiel:
 
-    $h->tag('td',
-        -tag => 'th',
-        ...
-    );
+  $h->tag('td',
+      -tag => 'th',
+      ...
+  );
 
 Siehe: Quiq::Html::Table::Simple
 
@@ -1116,35 +1116,35 @@ selbst als Wert generiert.
 
 HTML
 
-    <TAG ... ATTRIBUTE ...>
+  <TAG ... ATTRIBUTE ...>
 
 XHTML
 
-    <TAG ... ATTRIBUTE="ATTRIBUTE" ...>
+  <TAG ... ATTRIBUTE="ATTRIBUTE" ...>
 
 Boolsche Attribute sind:
 
-    checked
-    declare
-    defer
-    disabled
-    ismap
-    multiple
-    nohref
-    noresize
-    readonly
-    selected
+  checked
+  declare
+  defer
+  disabled
+  ismap
+  multiple
+  nohref
+  noresize
+  readonly
+  selected
 
 B<Default-Attribute>
 
 Für einige Elemente sind Default-Attribute vereinbart, die nicht
 explizit gesetzt werden müssen.
 
-    Element Attribute
-    
-    form    method => 'post', enctype => 'multipart/form-data'
-    script  type => 'text/javascript'
-    style   type => 'text/css'
+  Element Attribute
+  
+  form    method => 'post', enctype => 'multipart/form-data'
+  script  type => 'text/javascript'
+  style   type => 'text/css'
 
 =cut
 
@@ -1609,7 +1609,7 @@ sub tag {
 
 =head4 Synopsis
 
-    $str = $this->wrapTag($maxWidth,$str);
+  $str = $this->wrapTag($maxWidth,$str);
 
 =cut
 
@@ -1649,7 +1649,7 @@ sub wrapTag {
 
 =head4 Synopsis
 
-    $html = $h->cat(@opt,@args);
+  $html = $h->cat(@opt,@args);
 
 =head4 Options
 
@@ -1680,70 +1680,70 @@ resultierenden HTML-Code zurück.
 
 Der Aufruf
 
-    $h->cat(
-        ['doctype'],
-        ['comment',-nl=>2,'Copyright Lieschen Müller'],
-        ['HTML',
-            ['HEAD',
-                ['TITLE','Meine Homepage'],
-                ['STYLE',q|
-                    .text { color: red; }
-                |],
-            ],
-            ['BODY',
-                ['H1','Hallo Welt!'],
-                ['P',class=>'text',q|
-                    Ich heiße Lieschen Müller und dies
-                    ist meine Homepage.
-                |],
-            ],
-        ]
-    );
+  $h->cat(
+      ['doctype'],
+      ['comment',-nl=>2,'Copyright Lieschen Müller'],
+      ['HTML',
+          ['HEAD',
+              ['TITLE','Meine Homepage'],
+              ['STYLE',q|
+                  .text { color: red; }
+              |],
+          ],
+          ['BODY',
+              ['H1','Hallo Welt!'],
+              ['P',class=>'text',q|
+                  Ich heiße Lieschen Müller und dies
+                  ist meine Homepage.
+              |],
+          ],
+      ]
+  );
 
 ist äquivalent zu
 
-    $h->cat(
-        $h->doctype,
-        $h->comment(-nl=>2,'Copyright Lieschen Müller'),
-        $h->tag('html','-',
-            $h->tag('head','-',
-                $h->tag('title','Meine Homepage'),
-                $h->tag('style',q|
-                    .text { color: red; }
-                |),
-            ),
-            $h->tag('body','-',
-                $h->tag('h1','Hallo Welt!'),
-                $h->tag('p',class=>'text',q|
-                    Ich heiße Lieschen Müller und dies
-                    ist meine Homepage.
-                |),
-            ),
-        ),
-    );
+  $h->cat(
+      $h->doctype,
+      $h->comment(-nl=>2,'Copyright Lieschen Müller'),
+      $h->tag('html','-',
+          $h->tag('head','-',
+              $h->tag('title','Meine Homepage'),
+              $h->tag('style',q|
+                  .text { color: red; }
+              |),
+          ),
+          $h->tag('body','-',
+              $h->tag('h1','Hallo Welt!'),
+              $h->tag('p',class=>'text',q|
+                  Ich heiße Lieschen Müller und dies
+                  ist meine Homepage.
+              |),
+          ),
+      ),
+  );
 
 Beide liefern
 
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-    
-    <!-- Copyright Lieschen Müller -->
-    
-    <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-      <title>Meine Homepage</title>
-      <style type="text/css">
-        .text { color: red; }
-      </style>
-    </head>
-    <body>
-    <h1>Hallo Welt!</h1>
-    <p class="text">
-      Ich heiße Lieschen Müller und dies
-      ist meine Homepage.
-    </p>
-    </body>
-    </html>
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+  
+  <!-- Copyright Lieschen Müller -->
+  
+  <html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Meine Homepage</title>
+    <style type="text/css">
+      .text { color: red; }
+    </style>
+  </head>
+  <body>
+  <h1>Hallo Welt!</h1>
+  <p class="text">
+    Ich heiße Lieschen Müller und dies
+    ist meine Homepage.
+  </p>
+  </body>
+  </html>
 
 =cut
 
@@ -1822,7 +1822,7 @@ sub cat {
 
 =head4 Synopsis
 
-    $str = $h->doctype(@opt);
+  $str = $h->doctype(@opt);
 
 =head4 Options
 
@@ -1842,7 +1842,7 @@ Ergänze Doctype um $n Zeilenumbrüche.
 
 Liefere <!DOCTYPE>-Tag:
 
-    <!DOCTYPE ...>
+  <!DOCTYPE ...>
 
 Der Tag ergibt sich aus der eingestellten HTML-Variante.
 
@@ -1927,7 +1927,7 @@ sub doctype {
 
 =head4 Synopsis
 
-    $html = $h->comment(@keyVal,$content);
+  $html = $h->comment(@keyVal,$content);
 
 =head4 Options
 
@@ -1937,13 +1937,13 @@ Wie Methode tag()
 
 Liefere HTML Kommentar-Tag:
 
-    <!-- TEXT -->
+  <!-- TEXT -->
 
 bzw.
 
-    <!--
-      TEXT
-    -->
+  <!--
+    TEXT
+  -->
 
 wenn TEXT mehrzeilig ist.
 
@@ -1966,7 +1966,7 @@ sub comment {
 
 =head4 Synopsis
 
-    $html = $h->protect($text);
+  $html = $h->protect($text);
 
 =head4 Description
 
@@ -1995,19 +1995,19 @@ sub protect {
 
 =head4 Synopsis
 
-    $html = $h->optional(@keyVal,$content);
+  $html = $h->optional(@keyVal,$content);
 
 =head4 Description
 
 Liefere optional-Klammer:
 
-    <!--optional-->...<!--/optional-->
+  <!--optional-->...<!--/optional-->
 
 bzw.
 
-    <!--optional-->
-    ...
-    <!--/optional-->
+  <!--optional-->
+  ...
+  <!--/optional-->
 
 wenn $content mehrzeilig ist.
 
@@ -2068,7 +2068,7 @@ sub optional {
 
 =head4 Synopsis
 
-    $h->checkValue($dom,$val);
+  $h->checkValue($dom,$val);
 
 =head4 Description
 
@@ -2094,7 +2094,7 @@ sub checkValue {
 
 =head4 Synopsis
 
-    $val = $this->imgSrcValue($val,$embedImage);
+  $val = $this->imgSrcValue($val,$embedImage);
 
 =cut
 
@@ -2131,7 +2131,7 @@ sub imgSrcValue {
 
 =head4 Synopsis
 
-    $class->import(@keyVal);
+  $class->import(@keyVal);
 
 =head4 Description
 
@@ -2146,11 +2146,11 @@ Die Methode liefert keinen Wert zurück.
 
 =item XHTML (Default):
 
-    use Quiq::Html::Tag;
+  use Quiq::Html::Tag;
 
 =item HTML (Großschreibung) statt XHTML generieren:
 
-    use Quiq::Html::Tag(htmlVersion=>'html-4.01',uppercase=>1);
+  use Quiq::Html::Tag(htmlVersion=>'html-4.01',uppercase=>1);
 
 =back
 
@@ -2174,7 +2174,7 @@ sub import {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

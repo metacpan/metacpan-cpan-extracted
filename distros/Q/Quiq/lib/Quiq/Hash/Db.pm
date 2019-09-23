@@ -1,12 +1,12 @@
 package Quiq::Hash::Db;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Fcntl ();
 use DB_File ();
@@ -31,7 +31,7 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    my $h = $class->new($file,$mode);
+  my $h = $class->new($file,$mode);
 
 =head4 Arguments
 
@@ -45,11 +45,11 @@ Datei, in dem der Hash gespeichert wird.
 
 Modus, in dem die Datei geöffnet wird:
 
-    Mode  Bedeutung
-    ----  --------------------------------------------------------------
-     r    nur lesen, Datei muss existieren
-     w    nur schreiben, Datei wird angelegt, falls nicht existent
-     rw   lesen und schreiben, Datei wird angelegt, falls nicht existent
+  Mode  Bedeutung
+  ----  --------------------------------------------------------------
+   r    nur lesen, Datei muss existieren
+   w    nur schreiben, Datei wird angelegt, falls nicht existent
+   rw   lesen und schreiben, Datei wird angelegt, falls nicht existent
 
 =back
 
@@ -109,7 +109,7 @@ sub new {
 
 =head4 Synopsis
 
-    $h->sync;
+  $h->sync;
 
 =cut
 
@@ -137,7 +137,7 @@ sub sync {
 
 =head4 Synopsis
 
-    $h->close;
+  $h->close;
 
 =head4 Description
 
@@ -159,7 +159,7 @@ sub close {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

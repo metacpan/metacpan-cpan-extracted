@@ -1,6 +1,6 @@
 package Catmandu::Importer::XLS;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -10,33 +10,33 @@ use Moo;
 
 with 'Catmandu::Importer';
 
-has xls => (is => 'ro', builder => '_build_xls');
-has header => (is => 'ro', default => sub { 1 });
-has columns => (is => 'ro' , default => sub { 0 });
+has xls     => (is => 'ro', builder => '_build_xls');
+has header  => (is => 'ro', default => sub {1});
+has columns => (is => 'ro', default => sub {0});
 has fields => (
     is     => 'rw',
     coerce => sub {
         my $fields = $_[0];
-        if (ref $fields eq 'ARRAY') { return $fields }
-        if (ref $fields eq 'HASH')  { return [sort keys %$fields] }
+        if (ref $fields eq 'ARRAY') {return $fields}
+        if (ref $fields eq 'HASH') {return [sort keys %$fields]}
         return [split ',', $fields];
     },
 );
-has worksheet => (is => 'ro' , default => sub { 0 });
-has _n => (is => 'rw', default => sub { 0 });
-has _row_min => (is => 'rw');
-has _row_max => (is => 'rw');
-has _col_min => (is => 'rw');
-has _col_max => (is => 'rw');
+has worksheet => (is => 'ro', default => sub {0});
+has _n        => (is => 'rw', default => sub {0});
+has _row_min  => (is => 'rw');
+has _row_max  => (is => 'rw');
+has _col_min  => (is => 'rw');
+has _col_max  => (is => 'rw');
 
 sub BUILD {
     my $self = shift;
 
-    if ( $self->header ) {
-        if ( $self->fields ) {
+    if ($self->header) {
+        if ($self->fields) {
             $self->{_n}++;
         }
-        elsif ( $self->columns ) {
+        elsif ($self->columns) {
             $self->fields([$self->_get_cols]);
             $self->{_n}++;
         }
@@ -46,7 +46,7 @@ sub BUILD {
         }
     }
     else {
-        if ( !$self->fields || $self->columns ) {
+        if (!$self->fields || $self->columns) {
             $self->fields([$self->_get_cols]);
         }
     }
@@ -54,10 +54,14 @@ sub BUILD {
 
 sub _build_xls {
     my ($self) = @_;
-    my $parser   = Spreadsheet::ParseExcel->new();
-    my $xls = $parser->parse( $self->file ) or  Catmandu::Error->throw("could not parse file \"$self->{file}\": " . $parser->error());
+    my $parser = Spreadsheet::ParseExcel->new();
+    my $xls    = $parser->parse($self->file)
+        or Catmandu::Error->throw(
+        "could not parse file \"$self->{file}\": " . $parser->error());
 
-    $xls = $xls->worksheet($self->worksheet) or Catmandu::Error->throw("worksheet $self->{worksheet} does not exist.");
+    $xls = $xls->worksheet($self->worksheet)
+        or Catmandu::Error->throw(
+        "worksheet $self->{worksheet} does not exist.");
     ($self->{_row_min}, $self->{_row_max}) = $xls->row_range();
     ($self->{_col_min}, $self->{_col_max}) = $xls->col_range();
     return $xls;
@@ -70,10 +74,10 @@ sub generator {
             my @data = $self->_get_row();
             $self->{_n}++;
             my @fields = @{$self->fields()};
-            my %hash = map { 
+            my %hash   = map {
                 my $key = shift @fields;
-                defined $_  ? ($key => $_) : ()
-                } @data;
+                defined $_ ? ($key => $_) : ()
+            } @data;
             return \%hash;
         }
         return;
@@ -83,13 +87,13 @@ sub generator {
 sub _get_row {
     my ($self) = @_;
     my @row;
-    for my $col ( $self->_col_min .. $self->_col_max ) {
-        my $cell = $self->xls->get_cell( $self->_n, $col );
+    for my $col ($self->_col_min .. $self->_col_max) {
+        my $cell = $self->xls->get_cell($self->_n, $col);
         if ($cell) {
-            push(@row,$cell->value());
+            push(@row, $cell->value());
         }
-        else{
-            push(@row, undef);            
+        else {
+            push(@row, undef);
         }
     }
     return @row;
@@ -99,18 +103,18 @@ sub _get_cols {
     my ($self) = @_;
 
     my @row;
-    for my $col ( $self->_col_min .. $self->_col_max ) {
-       
+    for my $col ($self->_col_min .. $self->_col_max) {
+
         if (!$self->header || $self->columns) {
-            push(@row,int2col($col));
+            push(@row, int2col($col));
         }
         else {
-            my $cell = $self->xls->get_cell( $self->_n, $col );
+            my $cell = $self->xls->get_cell($self->_n, $col);
             if ($cell) {
-                push(@row,$cell->value());
+                push(@row, $cell->value());
             }
-            else{
-                push(@row, undef);            
+            else {
+                push(@row, undef);
             }
         }
     }

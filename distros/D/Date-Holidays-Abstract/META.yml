@@ -27,7 +27,7 @@ name: Date-Holidays-Abstract
 provides:
   Date::Holidays::Abstract:
     file: lib/Date/Holidays/Abstract.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   Class::Virtually::Abstract: '0'
   perl: '5.006'
@@ -35,6 +35,6 @@ resources:
   bugtracker: https://github.com/jonasbn/perl-date-holidays-abstract/issues
   homepage: https://github.com/jonasbn/perl-date-holidays-abstract
   repository: https://github.com/jonasbn/perl-date-holidays-abstract.git
-version: '0.08'
+version: '0.10'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

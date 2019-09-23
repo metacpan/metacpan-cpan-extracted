@@ -1,12 +1,12 @@
 package Quiq::DirHandle;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -22,13 +22,13 @@ L<Quiq::Object>
 
 =head1 SYNOPSIS
 
-    use Quiq::DirHandle;
-    
-    my $dh = Quiq::DirHandle->new($dir);
-    while (my $entry = $dh->next) {
-        say $entry;
-    }
-    $dh->close;
+  use Quiq::DirHandle;
+  
+  my $dh = Quiq::DirHandle->new($dir);
+  while (my $entry = $dh->next) {
+      say $entry;
+  }
+  $dh->close;
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ ein Verzeichnis geöffnet und über seine Einträge iteriert werden.
 
 =head4 Synopsis
 
-    $dh = $class->new($dir);
+  $dh = $class->new($dir);
 
 =head4 Description
 
@@ -75,7 +75,7 @@ sub new {
 
 =head4 Synopsis
 
-    $dh->close;
+  $dh->close;
 
 =head4 Description
 
@@ -108,7 +108,7 @@ sub close {
 
 =head4 Synopsis
 
-    $entry = $dh->next;
+  $entry = $dh->next;
 
 =head4 Description
 
@@ -128,7 +128,7 @@ sub next {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

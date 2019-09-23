@@ -21,7 +21,7 @@ with qw(
 
 use parent 'Data::Object::Scalar::Base';
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # METHODS
 
@@ -225,11 +225,11 @@ This method will throw an exception if called.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

@@ -1,7 +1,11 @@
 #!perl
 
+package core_features_steps_functions;
+
 use strict;
 use warnings;
+
+use Carp::Always;
 
 use Test::More;
 use Test::BDD::Cucumber::Harness::Data;

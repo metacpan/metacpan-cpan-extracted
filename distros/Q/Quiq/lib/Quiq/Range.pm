@@ -1,11 +1,11 @@
 package Quiq::Range;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -21,30 +21,30 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    use Quiq::Range;
-    
-    # Instantiierung
-    my $rng = Quiq::Range->new($spec);
-    
-    # Übersetzung in ein Array von Integern
-    my @arr = Quiq::Range->numbers;
+  use Quiq::Range;
+  
+  # Instantiierung
+  my $rng = Quiq::Range->new($spec);
+  
+  # Übersetzung in ein Array von Integern
+  my @arr = Quiq::Range->numbers;
 
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert eine Liste von Integern. Diese wird
 vom Nutzer spezifiziert als eine Aufzählung von Angaben der Art
 
-    N     einzelner Integer
-    N-M   Bereich von Integern
+  N     einzelner Integer
+  N-M   Bereich von Integern
 
 die durch Komma getrennt aufgezählt werden können. Beispiele:
 
-    Spezfikation          Array von Integern
-    --------------------- ----------------------------------
-    7                     7
-    1-4                   1 2 3 4
-    1,2,3,4               1 2 3 4
-    3,5,7-10,16,81-85,101 3 5 7 8 9 10 16 81 82 83 84 85 101
+  Spezfikation          Array von Integern
+  --------------------- ----------------------------------
+  7                     7
+  1-4                   1 2 3 4
+  1,2,3,4               1 2 3 4
+  3,5,7-10,16,81-85,101 3 5 7 8 9 10 16 81 82 83 84 85 101
 
 =head1 ATTRIBUTES
 
@@ -68,7 +68,7 @@ Die Übersetzung der Spezifikation in ein Array von Integern.
 
 =head4 Synopsis
 
-    $rng = $class->new($spec);
+  $rng = $class->new($spec);
 
 =head4 Arguments
 
@@ -119,8 +119,8 @@ sub new {
 
 =head4 Synopsis
 
-    @numbers | $numberA = $rng->numbers;
-    @numbers | $numberA = $class->numbers($spec);
+  @numbers | $numberA = $rng->numbers;
+  @numbers | $numberA = $class->numbers($spec);
 
 =head4 Returns
 
@@ -146,7 +146,7 @@ sub numbers {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

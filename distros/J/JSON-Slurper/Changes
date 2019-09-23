@@ -1,0 +1,11 @@
+Revision history for JSON-Slurper
+
+0.03  2019-09-22 00:58:28 CDT
+        - Allow refs to be passed to spurt_json.
+
+0.02  2019-09-21 19:10:01 CDT
+        - Use read_binary/write_binary to avoid double encoding/decoding (Fixes #1)
+        - Documentation fixes.
+
+0.01  2019-09-21 18:03:38 CDT
+        - Initial release

@@ -1,12 +1,12 @@
 package Quiq::Udl;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 use Quiq::Database::Config;
@@ -28,35 +28,35 @@ L<Quiq::Hash>
 
 Klasse laden:
 
-    use Quiq::Udl;
+  use Quiq::Udl;
 
 Objekt instantiieren:
 
-    my $udlStr = 'dbi#oracle:xyz%xyz_admin:koala3@pluto.gaga.de:1521';
-    my $udl = Quiq::Udl->new($udlStr);
+  my $udlStr = 'dbi#oracle:xyz%xyz_admin:koala3@pluto.gaga.de:1521';
+  my $udl = Quiq::Udl->new($udlStr);
 
 UDL aus Konfigurationsdatei:
 
-    my $udl = Quiq::Udl->new('test-db');
+  my $udl = Quiq::Udl->new('test-db');
 
 UDL-Komponenten:
 
-    print $udl->api,"\n";      # dbi
-    print $udl->dbms,"\n";     # oracle
-    print $udl->db,"\n";       # xyz
-    print $udl->user,"\n";     # xyz_admin
-    print $udl->password,"\n"; # koala3
-    print $udl->host,"\n";     # pluto.gaga.de
-    print $udl->port,"\n";     # 1521
-    
-    my $optionH = $udl->options;
-    while (($key,$val) = each %$optionH) {
-        print "$key=$val\n";
-    }
+  print $udl->api,"\n";      # dbi
+  print $udl->dbms,"\n";     # oracle
+  print $udl->db,"\n";       # xyz
+  print $udl->user,"\n";     # xyz_admin
+  print $udl->password,"\n"; # koala3
+  print $udl->host,"\n";     # pluto.gaga.de
+  print $udl->port,"\n";     # 1521
+  
+  my $optionH = $udl->options;
+  while (($key,$val) = each %$optionH) {
+      print "$key=$val\n";
+  }
 
 UDL als String:
 
-    print $udl->asString,"\n"; # $udlStr
+  print $udl->asString,"\n"; # $udlStr
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ wie ein Universal Resource Locator eine Web-Resource adressiert.
 
 Ein UDL hat den Aufbau:
 
-    api#dbms:db%user:password@host:port;options
+  api#dbms:db%user:password@host:port;options
 
 Ein Objekt der Klasse kapselt einen UDL und bietet Methoden,
 um auf die einzelnen Komponenten zuzugreifen. Kommen Metazeichen
@@ -117,10 +117,10 @@ Referenz auf Hash mit optionalen Angaben.
 
 =head4 Synopsis
 
-    $udl = $class->new;
-    $udl = $class->new($udlStr);
-    $udl = $class->new(@keyVal);
-    $udl = $class->new($name);
+  $udl = $class->new;
+  $udl = $class->new($udlStr);
+  $udl = $class->new(@keyVal);
+  $udl = $class->new($name);
 
 =head4 Arguments
 
@@ -191,8 +191,8 @@ sub new {
 
 =head4 Synopsis
 
-    $api = $udl->api;
-    $api = $udl->api($api);
+  $api = $udl->api;
+  $api = $udl->api($api);
 
 =cut
 
@@ -214,8 +214,8 @@ sub api {
 
 =head4 Synopsis
 
-    $dbms = $udl->dbms;
-    $dbms = $udl->dbms($dbms);
+  $dbms = $udl->dbms;
+  $dbms = $udl->dbms($dbms);
 
 =cut
 
@@ -237,8 +237,8 @@ sub dbms {
 
 =head4 Synopsis
 
-    $db = $udl->db;
-    $db = $udl->db($db);
+  $db = $udl->db;
+  $db = $udl->db($db);
 
 =cut
 
@@ -260,8 +260,8 @@ sub db {
 
 =head4 Synopsis
 
-    $user = $udl->user;
-    $user = $udl->user($user);
+  $user = $udl->user;
+  $user = $udl->user($user);
 
 =cut
 
@@ -283,8 +283,8 @@ sub user {
 
 =head4 Synopsis
 
-    $password = $udl->password;
-    $password = $udl->password($password);
+  $password = $udl->password;
+  $password = $udl->password($password);
 
 =cut
 
@@ -306,8 +306,8 @@ sub password {
 
 =head4 Synopsis
 
-    $host = $udl->host;
-    $host = $udl->host($host);
+  $host = $udl->host;
+  $host = $udl->host($host);
 
 =cut
 
@@ -329,8 +329,8 @@ sub host {
 
 =head4 Synopsis
 
-    $port = $udl->port;
-    $port = $udl->port($port);
+  $port = $udl->port;
+  $port = $udl->port($port);
 
 =cut
 
@@ -352,10 +352,10 @@ sub port {
 
 =head4 Synopsis
 
-    $hash = $udl->options;
-    $hash = $udl->options($str);
-    $hash = $udl->options(@keyVal);
-    $hash = $udl->options(\%hash);
+  $hash = $udl->options;
+  $hash = $udl->options($str);
+  $hash = $udl->options(@keyVal);
+  $hash = $udl->options(\%hash);
 
 =head4 Description
 
@@ -398,8 +398,8 @@ sub options {
 
 =head4 Synopsis
 
-    ($api,$dbms,$db,$user,$password,$host,$port,$options) =
-        $udl->split($udl);
+  ($api,$dbms,$db,$user,$password,$host,$port,$options) =
+      $udl->split($udl);
 
 =head4 Description
 
@@ -424,7 +424,7 @@ sub split {
 
 =head4 Synopsis
 
-    $apiClass = $udl->apiClass;
+  $apiClass = $udl->apiClass;
 
 =head4 Description
 
@@ -433,7 +433,7 @@ Verbindungsaufbau zur Datenbank statt.
 
 Die API-Klasse für das DBI-API ist:
 
-    Quiq::Database::Api::Dbi::Connection
+  Quiq::Database::Api::Dbi::Connection
 
 =cut
 
@@ -450,7 +450,7 @@ sub apiClass {
 
 =head4 Synopsis
 
-    $udlStr = $udl->asString;
+  $udlStr = $udl->asString;
 
 =head4 Options
 
@@ -549,7 +549,7 @@ sub asString {
 
 =head4 Synopsis
 
-    ($api,$dbms,$db,$user,$password,$host,$port,$options) = $udl->components;
+  ($api,$dbms,$db,$user,$password,$host,$port,$options) = $udl->components;
 
 =head4 Description
 
@@ -580,7 +580,7 @@ sub components {
 
 =head4 Synopsis
 
-    $dsn = $udl->dsn;
+  $dsn = $udl->dsn;
 
 =head4 Description
 
@@ -658,9 +658,9 @@ sub dsn {
 
 =head4 Synopsis
 
-    $udl->udl($udlStr);
-    $udl->udl(@keyVal);
-    $udlStr = $udl->udl;
+  $udl->udl($udlStr);
+  $udl->udl(@keyVal);
+  $udlStr = $udl->udl;
 
 =head4 Description
 
@@ -770,7 +770,7 @@ sub udl {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

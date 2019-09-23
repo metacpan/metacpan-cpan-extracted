@@ -1,5 +1,23 @@
 Revision history for Lingua-EN-Opinion
 
+0.1600 2019-09-22 08:17:06
+    - Improve documentation.
+    - Multiple code fixes... `git log -p` for the intrepid.
+    - Add tests.
+    - Improve the eg/ example code.
+
+0.1505 2019-09-20 17:59:23
+    - Fix SYNOPSIS code.
+    - Clean-up test code.
+
+0.1504 2019-09-20 13:03:45
+    - Fix the eg/pos-neg code.
+    - Improve documentation.
+
+0.1503 2019-09-20 09:22:00
+    - Clean-up eg/ code.
+    - Improve documentation.
+
 0.1502 2019-09-18 11:31:55
     - Update eg/ code with the ->ratio method.
     - Fix documentation typo.

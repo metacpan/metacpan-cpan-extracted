@@ -1,11 +1,11 @@
 package Quiq::CommandLine;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -21,27 +21,27 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    use Quiq::CommandLine;
-    
-    my $c = Quiq::CommandLine->new('iconv');
-    $c->addOption(
-        -f => 'utf-8',
-        -t => 'latin1',
-    );
-    $c->addString('|','enscript');
-    $c->addBoolOption(
-        '--no-header' => 1,
-        '--landscape' => 1,
-    );
-    $c->addLongOption(
-        '--font' => 'Courier8',
-    );
-    $c->addString('2>/dev/null','|','ps2pdf','-');
-    $c->addArgument('/tmp/test.pdf');
-    
-    my $cmd = $c->command;
-    __END__
-    iconv -f utf-8 -t latin1 | enscript --no-header --landscape --font=Courier8 2>/dev/null | ps2pdf - /tmp/test.pdf
+  use Quiq::CommandLine;
+  
+  my $c = Quiq::CommandLine->new('iconv');
+  $c->addOption(
+      -f => 'utf-8',
+      -t => 'latin1',
+  );
+  $c->addString('|','enscript');
+  $c->addBoolOption(
+      '--no-header' => 1,
+      '--landscape' => 1,
+  );
+  $c->addLongOption(
+      '--font' => 'Courier8',
+  );
+  $c->addString('2>/dev/null','|','ps2pdf','-');
+  $c->addArgument('/tmp/test.pdf');
+  
+  my $cmd = $c->command;
+  __END__
+  iconv -f utf-8 -t latin1 | enscript --no-header --landscape --font=Courier8 2>/dev/null | ps2pdf - /tmp/test.pdf
 
 =head1 DESCRIPTION
 
@@ -58,8 +58,8 @@ sondern variieren können.
 
 =head4 Synopsis
 
-    $c = $class->new;
-    $c = $class->new($str);
+  $c = $class->new;
+  $c = $class->new($str);
 
 =head4 Arguments
 
@@ -85,7 +85,7 @@ festgelegt werden.
 
 Erzeuge eine Kommandozeile für das Kommando C<enscript>:
 
-    $c = Quiq::CommandLine->new('enscript');
+  $c = Quiq::CommandLine->new('enscript');
 
 =cut
 
@@ -111,7 +111,7 @@ sub new {
 
 =head4 Synopsis
 
-    $cmd->addArgument(@args);
+  $cmd->addArgument(@args);
 
 =head4 Arguments
 
@@ -137,11 +137,11 @@ Kommandozeile hinzugefügt.
 
 =head4 Example
 
-    $c->addArgument("/tmp/preview-$$.pdf",'',"Dies ist ein Test");
+  $c->addArgument("/tmp/preview-$$.pdf",'',"Dies ist ein Test");
 
 ergänzt die Kommandozeile um die drei Argumente
 
-    ... /tmp/preview-4711.pdf '' 'Dies ist ein Test'
+  ... /tmp/preview-4711.pdf '' 'Dies ist ein Test'
 
 =cut
 
@@ -177,7 +177,7 @@ sub addArgument {
 
 =head4 Synopsis
 
-    $cmd->addBoolOption(@boolOptions);
+  $cmd->addBoolOption(@boolOptions);
 
 =head4 Arguments
 
@@ -203,16 +203,16 @@ Prädikat bestimmt wird (siehe Beispiel).
 
 =head4 Example
 
-    $c->addBoolOption(
-        '--no-header' => 1,
-        '--landscape' => 0,
-        '--truncate-lines' => 1,
-    );
+  $c->addBoolOption(
+      '--no-header' => 1,
+      '--landscape' => 0,
+      '--truncate-lines' => 1,
+  );
 
 ergänzt die Kommandozeile um die Optionen C<--no-header> und
 C<--truncate-lines>, aber nicht um die Option C<--landscape>
 
-    ... --no-header --truncate-lines
+  ... --no-header --truncate-lines
 
 =cut
 
@@ -243,7 +243,7 @@ sub addBoolOption {
 
 =head4 Synopsis
 
-    $cmd->addOption(@optVal);
+  $cmd->addOption(@optVal);
 
 =head4 Arguments
 
@@ -300,7 +300,7 @@ sub addOption {
 
 =head4 Synopsis
 
-    $cmd->addEqOption(@optVal);
+  $cmd->addEqOption(@optVal);
 
 =head4 Alias
 
@@ -329,15 +329,15 @@ Gleichheitszeichen (=) getrennt.
 
 =head4 Example
 
-    $c->addEqOption(
-        '--columns' => 2,
-        '--font' => 'Courier10',
-        '--margins' => '0:0:0:0',
-    );
+  $c->addEqOption(
+      '--columns' => 2,
+      '--font' => 'Courier10',
+      '--margins' => '0:0:0:0',
+  );
 
 ergänzt die Kommandozeile um die Optionen
 
-    ... --columns=2 --font=Courier10 --margins=0:0:0:0
+  ... --columns=2 --font=Courier10 --margins=0:0:0:0
 
 =cut
 
@@ -378,7 +378,7 @@ sub addEqOption {
 
 =head4 Synopsis
 
-    $cmd->addString(@strings);
+  $cmd->addString(@strings);
 
 =head4 Arguments
 
@@ -402,11 +402,11 @@ Kommandozeile hinzugefügt.
 
 =head4 Example
 
-    $c->addString('2>/dev/null','|','ps2pdf','-','-');
+  $c->addString('2>/dev/null','|','ps2pdf','-','-');
 
 ergänzt die Kommandozeile um
 
-    ... 2>/dev/null | ps2pdf - -
+  ... 2>/dev/null | ps2pdf - -
 
 =cut
 
@@ -443,7 +443,7 @@ sub addString {
 
 =head4 Synopsis
 
-    $cmd = $c->command;
+  $cmd = $c->command;
 
 =head4 Returns
 
@@ -470,7 +470,7 @@ sub command {
 
 =head4 Synopsis
 
-    $str2 = $this->value($str1);
+  $str2 = $this->value($str1);
 
 =head4 Arguments
 
@@ -496,27 +496,27 @@ Programmargument zur Kommandozeile hinzugefügt werden kann.
 
 Undef:
 
-    $c->value(undef);
-    =>
-    undef
+  $c->value(undef);
+  =>
+  undef
 
 Leerstring:
 
-    $c->value("");
-    =>
-    ''
+  $c->value("");
+  =>
+  ''
 
 Zeichenkette ohne Whitespace oder Shell-Metazeichen:
 
-    $c->value("/tmp/test.pdf");
-    =>
-    /tmp/test.pdf
+  $c->value("/tmp/test.pdf");
+  =>
+  /tmp/test.pdf
 
 Zeichenkette mit Whitespace und/oder Shell-Metazeichen:
 
-    $c->value("Dies ist ein Test");
-    =>
-    'Dies ist ein Test'
+  $c->value("Dies ist ein Test");
+  =>
+  'Dies ist ein Test'
 
 =cut
 
@@ -536,7 +536,7 @@ sub value {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

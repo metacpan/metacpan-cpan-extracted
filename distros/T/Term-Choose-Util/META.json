@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Cwd" : "0",
             "Encode" : "0",
             "Encode::Locale" : "0",
@@ -41,8 +42,6 @@
             "File::Spec::Functions" : "0",
             "List::Util" : "0",
             "Term::Choose" : "1.700",
-            "Term::Choose::LineFold" : "1.700",
-            "Term::Choose::Linux" : "1.700",
             "perl" : "5.008003",
             "strict" : "0",
             "warnings" : "0"
@@ -57,6 +56,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose-Util"
       }
    },
-   "version" : "0.076",
+   "version" : "0.101",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

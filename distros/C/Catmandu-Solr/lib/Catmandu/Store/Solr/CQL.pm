@@ -9,9 +9,9 @@ use Moo;
 
 with 'Catmandu::Logger';
 
-our $VERSION = "0.0303";
+our $VERSION = "0.0304";
 
-has parser => (is => 'ro', lazy => 1, builder => '_build_parser');
+has parser  => (is => 'ro', lazy => 1, builder => '_build_parser');
 has mapping => (is => 'ro');
 
 my $any_field         = qr'^(srw|cql)\.(serverChoice|anywhere)$'i;

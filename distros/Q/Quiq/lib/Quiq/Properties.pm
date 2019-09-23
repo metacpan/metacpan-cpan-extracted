@@ -1,11 +1,11 @@
 package Quiq::Properties;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Parameters;
 use Quiq::String;
@@ -67,26 +67,26 @@ mehrzeiligen Wert enthält.
 
 Erzeuge eine formatierte Liste von Float-Werten:
 
-    my @values = (
-        234.567,
-          5.45,
-      92345.6,
-         42.56739,
-    );
-    
-    my $prp = Quiq::Properties->new(\@values);
-    
-    my $text;
-    for (@values) {
-        $text .= $prp->format('text',$_)."\n";
-    }
-    print $text;
-    
-    __END__
-      234.56700
-        5.45000
-    92345.60000
-       42.56739
+  my @values = (
+      234.567,
+        5.45,
+    92345.6,
+       42.56739,
+  );
+  
+  my $prp = Quiq::Properties->new(\@values);
+  
+  my $text;
+  for (@values) {
+      $text .= $prp->format('text',$_)."\n";
+  }
+  print $text;
+  
+  __END__
+    234.56700
+      5.45000
+  92345.60000
+     42.56739
 
 =head1 METHODS
 
@@ -96,8 +96,8 @@ Erzeuge eine formatierte Liste von Float-Werten:
 
 =head4 Synopsis
 
-    $prp = $class->new(@opt);
-    $prp = $class->new(\@values,@opt);
+  $prp = $class->new(@opt);
+  $prp = $class->new(\@values,@opt);
 
 =head4 Arguments
 
@@ -175,8 +175,8 @@ sub new {
 
 =head4 Synopsis
 
-    $align = $prp->align;
-    $align = $prp->align($align);
+  $align = $prp->align;
+  $align = $prp->align($align);
 
 =head4 Returns
 
@@ -221,7 +221,7 @@ sub align {
 
 =head4 Synopsis
 
-    $bool = $prp->multiLine;
+  $bool = $prp->multiLine;
 
 =head4 Returns
 
@@ -247,7 +247,7 @@ sub multiLine {
 
 =head4 Synopsis
 
-    $scale = $prp->scale;
+  $scale = $prp->scale;
 
 =head4 Returns
 
@@ -273,8 +273,8 @@ sub scale {
 
 =head4 Synopsis
 
-    $type = $prp->type;
-    $type = $prp->type($type);
+  $type = $prp->type;
+  $type = $prp->type($type);
 
 =head4 Returns
 
@@ -325,7 +325,7 @@ sub type {
 
 =head4 Synopsis
 
-    $width = $prp->width;
+  $width = $prp->width;
 
 =head4 Returns
 
@@ -377,7 +377,7 @@ sub width {
 
 =head4 Synopsis
 
-    $prp->analyze($value);
+  $prp->analyze($value);
 
 =head4 Arguments
 
@@ -481,7 +481,7 @@ sub analyze {
 
 =head4 Synopsis
 
-    $str = $prp->format($format,$val);
+  $str = $prp->format($format,$val);
 
 =head4 Arguments
 
@@ -582,7 +582,7 @@ sub format {
 
 =head4 Synopsis
 
-    $prp->set($type,$align);
+  $prp->set($type,$align);
 
 =head4 Arguments
 
@@ -619,7 +619,7 @@ sub set {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 package Hash::Subset;
 
-our $DATE = '2019-07-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-09-20'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -22,8 +22,12 @@ sub hash_subset {
         for (keys %$keys_src) {
             $subset{$_} = $hash->{$_} if exists $hash->{$_};
         }
+    } elsif ($ref eq 'CODE') {
+        for (keys %$hash) {
+            $subset{$_} = $hash->{$_} if $keys_src->($_, $hash->{$_});
+        }
     } else {
-        die "Second argument (keys_src) must be a hashref/arrayref";
+        die "Second argument (keys_src) must be a hashref/arrayref/coderef";
     }
     %subset;
 }
@@ -41,8 +45,12 @@ sub hashref_subset {
         for (keys %$keys_src) {
             $subset->{$_} = $hash->{$_} if exists $hash->{$_};
         }
+    } elsif ($ref eq 'CODE') {
+        for (keys %$hash) {
+            $subset->{$_} = $hash->{$_} if $keys_src->($_, $hash->{$_});
+        }
     } else {
-        die "Second argument (keys_src) must be a hashref/arrayref";
+        die "Second argument (keys_src) must be a hashref/arrayref/coderef";
     }
     $subset;
 }
@@ -62,7 +70,7 @@ Hash::Subset - Produce subset of a hash
 
 =head1 VERSION
 
-This document describes version 0.003 of Hash::Subset (from Perl distribution Hash-Subset), released on 2019-07-10.
+This document describes version 0.004 of Hash::Subset (from Perl distribution Hash-Subset), released on 2019-09-20.
 
 =head1 SYNOPSIS
 
@@ -76,7 +84,68 @@ This document describes version 0.003 of Hash::Subset (from Perl distribution Ha
  my %subset = hash_subset   ({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => (b=>2, c=>3)
  my $subset = hashref_subset({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => {b=>2, c=>3}
 
+ # filtering keys using a coderef
+ my %subset = hash_subset   ({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bc]/}); # => (b=>2, c=>3)
+ my $subset = hashref_subset({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bc]/}); # => {b=>2, c=>3}
+
+A use case is when you use hash arguments:
+
+ sub func1 {
+     my %args = @_; # known arguments: foo, bar, baz
+     ...
+ }
+
+ sub func2 {
+     my %args = @_; # known arguments: all func1 arguments as well as qux, quux
+
+     # call func1 with all arguments passed to us
+     my $res = func1(hash_subset(\%args, [qw/foo bar baz/]));
+
+     # postprocess result
+     ...
+ }
+
+If you use L<Rinci> metadata in your code, this will come in handy, for example:
+
+ my %common_args = (
+     foo => {...},
+     bar => {...},
+     baz => {...},
+ );
+
+ $SPEC{func1} = {
+    v => 1.1,
+    args => {
+        %common_args,
+    },
+ };
+ sub func1 {
+     my %args = @_;
+     ...
+ }
+
+ $SPEC{func2} = {
+    v => 1.1,
+    args => {
+        %common_args,
+        # func2 supports all func1 arguments plus a couple of others
+        qux  => { ... },
+        quux => { ... },
+    },
+ };
+ sub func2 {
+     my %args = @_;
+
+     # call func1 with all arguments passed to us
+     my $res = func1(hash_subset(\%args, $SPEC{func1}{args}));
+
+     # postprocess result
+     ...
+ }
+
 =head1 DESCRIPTION
+
+Keywords: hash arguments, hash picking, hash grep, hash filtering
 
 =head1 FUNCTIONS
 
@@ -88,8 +157,13 @@ Usage:
 
  my %subset  = hash_subset   (\%hash, \@keys);
  my $subset  = hashref_subset(\%hash, \@keys);
+
  my %subset  = hash_subset   (\%hash, \%another_hash);
  my $subset  = hashref_subset(\%hash, \%another_hash);
+
+ # filter_sub is called with args ($key, $value) and return true when key should be included
+ my %subset  = hash_subset   (\%hash, \&filter_sub);
+ my $subset  = hashref_subset(\%hash, \&filter_sub);
 
 Produce subset of C<%hash>, returning the subset hash (or hashref, in the case
 of C<hashref_subset> function).
@@ -134,7 +208,12 @@ feature.
 
 =head1 SEE ALSO
 
-Some other hash utilities: L<Hash::MostUtils>
+L<Hash::Util::Pick> also allows you to create a hash subset by specifying the
+wanted keys in a list or via filtering using a coderef. This XS module should
+perhaps be preferred over Hash::Subset for its performance, but there are some
+cases where you cannot use XS modules.
+
+See some benchmarks in L<Bencher::Scenarios::HashPicking>.
 
 =head1 AUTHOR
 

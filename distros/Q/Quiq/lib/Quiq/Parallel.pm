@@ -1,11 +1,11 @@
 package Quiq::Parallel;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::Parameters;
@@ -34,34 +34,34 @@ jeweils eine Sekunde schlafen. Die Ausführungsdauer beträgt
 ungefähr 50/I<Anzahl CPUs> Sekunden, da immer I<Anzahl CPUs>
 Prozesse parallel ausgeführt werden.
 
-    Quiq::Parallel->runArray([1..50],sub {
-        my ($elem,$i) = @_;
-        sleep 1;
-        return;
-    });
+  Quiq::Parallel->runArray([1..50],sub {
+      my ($elem,$i) = @_;
+      sleep 1;
+      return;
+  });
 
 Bei großen Datenmengen oder wenn die Gesamtmenge vorab nicht bekannt
 ist, bietet sich die Methode $class->L<runFetch|"runFetch() - Führe Subroutine parallel über gefetchten Elementen aus">() an. Hier ein
 Beispiel mit einer unbekannt großen Datenbank-Selektion:
 
-    my $cur = $db->select("
-            <SELECT Statement>
-        ",
-        -cursor => 1,
-    );
-    
-    Quiq::Parallel->runFetch(sub {
-            my $i = shift;
-            return $cur->fetch;
-        },
-        sub {
-            my ($row,$i) = @_;
-    
-            <$row verarbeiten>
-    
-            return;
-        },
-    );
+  my $cur = $db->select("
+          <SELECT Statement>
+      ",
+      -cursor => 1,
+  );
+  
+  Quiq::Parallel->runFetch(sub {
+          my $i = shift;
+          return $cur->fetch;
+      },
+      sub {
+          my ($row,$i) = @_;
+  
+          <$row verarbeiten>
+  
+          return;
+      },
+  );
 
 =head1 METHODS
 
@@ -71,7 +71,7 @@ Beispiel mit einer unbekannt großen Datenbank-Selektion:
 
 =head4 Synopsis
 
-    $class->runArray(\@elements,$sub,@opt);
+  $class->runArray(\@elements,$sub,@opt);
 
 =head4 Arguments
 
@@ -121,7 +121,7 @@ sub runArray {
 
 =head4 Synopsis
 
-    $class->runFetch($fetchSub,$execSub,@opt);
+  $class->runFetch($fetchSub,$execSub,@opt);
 
 =head4 Arguments
 
@@ -131,7 +131,7 @@ sub runArray {
 
 Subroutine, die das nächste gefetchte Element liefert:
 
-    $e = $fetchSub->($i); # $i-ter Fetch-Aufruf
+  $e = $fetchSub->($i); # $i-ter Fetch-Aufruf
 
 =item $execSub
 
@@ -157,7 +157,7 @@ Die maximale Anzahl parallel laufender Prozesse.
 Verzeichnis, in das die Ausgaben der Prozesse auf STDOUT und STDERR
 geschrieben werden, jeweils in eine eigene Datei mit dem Namen
 
-    NNNNNN.out
+  NNNNNN.out
 
 Die sechstellige Zahl NNNNNNN ist die Nummer des Prozesses in der
 Aufrufreihenfolge.
@@ -190,7 +190,7 @@ werden.
 
 Tipp: Die Anzahl der vorhandenen CPUs liefert die Methode
 
-    $n = Quiq::System->numberOfCpus;
+  $n = Quiq::System->numberOfCpus;
 
 Die Ausgaben der Prozesse auf STDOUT und STDERR werden in Dateien
 gespeichert, wenn Option -outputDir und/oder -outputFile angegeben sind.
@@ -344,7 +344,7 @@ sub runFetch {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

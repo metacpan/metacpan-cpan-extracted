@@ -22,7 +22,7 @@ use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
 
-our $VERSION = '2.3632';
+our $VERSION = '2.3633';
 
 my $fatal_exit = 1;
 

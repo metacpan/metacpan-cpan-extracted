@@ -36,6 +36,7 @@ WriteMakefile(
     PREREQ_PM => {
         'strict'                 => 0,
         'warnings'               => 0,
+        'Carp'                   => 0,
         'Cwd'                    => 0,
         'Encode'                 => 0,
         'Encode::Locale'         => 0,
@@ -45,8 +46,6 @@ WriteMakefile(
         'File::Spec::Functions'  => 0,
         'List::Util'             => 0,
         'Term::Choose'           => '1.700',
-        'Term::Choose::Linux'    => '1.700',
-        'Term::Choose::LineFold' => '1.700',
         %prereqs_os_specific,
     },
     dist  => {

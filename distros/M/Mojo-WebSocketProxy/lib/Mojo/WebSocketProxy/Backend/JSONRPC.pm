@@ -13,13 +13,64 @@ use curry;
 
 use MojoX::JSON::RPC::Client;
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 __PACKAGE__->register_type('jsonrpc');
 
 sub url { return shift->{url} }
 
 my $request_number = 0;
+
+=head2 call_rpc
+
+Description: Makes a remote call to a  process  returning the result to the client in JSON format. 
+Before, After and error actions can be specified using call backs.
+It takes the following arguments 
+
+=over 4
+
+=item - $c  : L<Mojolicious::Controller>
+
+=item - $req_storage A hashref of attributes stored with the request.  This routine uses some of the,  
+following named arguments. 
+
+=over 4 
+
+=item - url, if not specified url set on C<< $self >> object is used. Must be supplied by either method. 
+
+=item - method, The name of the method at the remote end (this is appened to C<< $request_storage->{url} >> )
+
+=item - msg_type, a name for this method if not supplied C<method> is used. 
+
+=item - call_params, a hashref of arguments on top of C<req_storage> to send to remote method. This will be suplemented with C<< $req_storage->{args} >>
+added as an C<args> key and be merged with C<< $req_storage->{stash_params} >> with stash_params overwriting any matching 
+keys in C<call_params>. 
+
+=item - rpc_response_callback,  If supplied this will be run with C<< Mojolicious::Controller >> instance the rpc_response and C<< $req_storage >>. 
+B<Note:> if C<< rpc_response_callback >> is supplied the success and error callbacks are not used. 
+
+=item - before_get_rpc_response,  array ref of subroutines to run before the remote response, is passed C<< $c >> and C<< req_storage >> 
+
+=item - after_get_rpc_response, arrayref of subroutines to run after the remote response,  is passed C<< $c >> and C<< req_storage >> 
+called only when there is an actual response from the remote call .  IE if there is communication  error with the call it will 
+not be called versus an error message being returned from the call when it will. 
+
+=item - before_call, arrayref of subroutines called before the request to the remote service is made. 
+
+=item -  error,  a subroutine reference that will be called with C<< Mojolicious::Controller >> the rpc_response and C<< $req_storage >> 
+if a C<< $response->{error} >>  error was returned from the remote call, and C<< $req_storage->{rpc_response_cb} >> was not passed. 
+
+=item - success, a subroutines reference that will be called if there was no error returned from the remote call and  C<< $req_storage->{rpc_response_cb} >> was not passed. 
+
+=item - rpc_failure_cb, a sub routine reference to call if the remote call fails at a http level. Called with C<< Mojolicious::Controller >> the rpc_response and C<< $req_storage >> 
+
+=back
+
+=back 
+
+Returns undef. 
+
+=cut
 
 sub call_rpc {
     my ($self, $c, $req_storage) = @_;
@@ -40,6 +91,7 @@ sub call_rpc {
     my $before_get_rpc_response_hook = delete($req_storage->{before_get_rpc_response}) || [];
     my $after_got_rpc_response_hook  = delete($req_storage->{after_got_rpc_response})  || [];
     my $before_call_hook             = delete($req_storage->{before_call})             || [];
+    my $rpc_failure_cb               = delete($req_storage->{rpc_failure_cb})          || 0;
 
     my $callobj = {
         # enough for short-term uniqueness
@@ -70,6 +122,7 @@ sub call_rpc {
                         $details .= ', code: ' . ($err->{code} // 'n/a') . ', response: ' . $err->{message};
                     }
                     warn "WrongResponse [$msg_type], details: $details";
+                    $rpc_failure_cb->($c, $res, $req_storage) if $rpc_failure_cb;
                     $api_response = $c->wsp_error($msg_type, 'WrongResponse', 'Sorry, an error occurred while processing your request.');
                     $c->send({json => $api_response}, $req_storage);
                     return;
@@ -79,6 +132,7 @@ sub call_rpc {
 
                 if ($res->is_error) {
                     warn $res->error_message;
+                    $rpc_failure_cb->($c, $res, $req_storage) if $rpc_failure_cb;
                     $api_response = $c->wsp_error($msg_type, 'CallError', 'Sorry, an error occurred while processing your request.');
                     $c->send({json => $api_response}, $req_storage);
                     return;

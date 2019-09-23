@@ -1,5 +1,5 @@
 package Lab::Instrument::SR830;
-$Lab::Instrument::SR830::VERSION = '3.682';
+$Lab::Instrument::SR830::VERSION = '3.690';
 #ABSTRACT: Stanford Research SR830 lock-in amplifier
 
 use strict;
@@ -268,7 +268,7 @@ Lab::Instrument::SR830 - Stanford Research SR830 lock-in amplifier
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Catmandu-Solr
 
+0.0304  2019-09-20 09:52:59 CEST
+       - add missing dependency
+
 0.0303  2017-10-03 16:55:18 CEST
        - support http keep-alive
 

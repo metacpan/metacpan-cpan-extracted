@@ -14,7 +14,7 @@ use FindBin               qw( $RealBin $RealScript );
 use Encode::Locale qw();
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( insert_sep choose_a_number choose_a_subset settings_menu choose_a_dir );
+use Term::Choose::Util qw( insert_sep );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
@@ -433,9 +433,8 @@ sub set_options {
             }
             elsif ( $opt eq '_mouse' ) {
                 my $prompt = 'Choose: ';
-                my $list = [ 0, 1, 2, 3, 4 ];
                 my $sub_menu = [
-                    [ 'mouse', "- Mouse mode", $list ]
+                    [ 'mouse', "- Mouse mode", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -533,9 +532,10 @@ sub set_options {
 
 sub __settings_menu_wrap {
     my ( $sf, $section, $sub_menu, $prompt ) = @_;
-    my $changed = settings_menu(
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $changed = $tu->settings_menu(
         $sub_menu, $sf->{o}{$section},
-        { prompt => $prompt, mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
+        { prompt => $prompt }
     );
     return if ! $changed;
     $sf->{write_config}++;
@@ -544,15 +544,16 @@ sub __settings_menu_wrap {
 
 sub __choose_a_subset_wrap {
     my ( $sf, $section, $opt, $available, $prompt ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $current = $sf->{o}{$section}{$opt};
     # Choose_list
     my $info = 'Cur: ' . join( ', ', @$current );
     my $name = 'New: ';
-    my $list = choose_a_subset(
+    my $list = $tu->choose_a_subset(
         $available,
-        { prompt => $prompt, name => $name, info => $info, prefix => '- ', keep_chosen => 0,
-          mouse => $sf->{o}{table}{mouse}, index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
-          clear_screen => 1, hide_cursor => 0 }
+        { prompt => $prompt, current_selection_label => $name, info => $info, prefix => '- ', keep_chosen => 0,
+          index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back}, layout => 3,
+          clear_screen => 1 }
     );
     return if ! defined $list;
     return if ! @$list;
@@ -564,15 +565,15 @@ sub __choose_a_subset_wrap {
 
 sub __choose_a_number_wrap {
     my ( $sf, $section, $opt, $prompt, $digits, $small_first ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $current = $sf->{o}{$section}{$opt};
     my $w = $digits + int( ( $digits - 1 ) / 3 ) * length $sf->{o}{G}{thsd_sep};
     my $info = 'Cur: ' . sprintf( "%*s", $w, insert_sep( $current, $sf->{o}{G}{thsd_sep} ) );
     my $name = 'New: ';
     #$info = $prompt . "\n" . $info;
     # Choose_a_number
-    my $choice = choose_a_number( $digits,
-        { prompt => $prompt, name => $name, info => $info, small_first => $small_first,
-          mouse => $sf->{o}{table}{mouse}, clear_screen => 1, hide_cursor => 0 }
+    my $choice = $tu->choose_a_number( $digits,
+        { prompt => $prompt, current_selection_label => $name, info => $info, small_first => $small_first, clear_screen => 1 }
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
@@ -603,21 +604,22 @@ sub __group_readline {
 }
 
 
-sub __choose_a_dir_wrap {
-    my ( $sf, $section, $opt ) = @_;
-    my $info;
-    if ( defined $sf->{o}{$section}{$opt} ) {
-        $info = '<< ' . $sf->{o}{$section}{$opt};
-    }
-    # Choose_a_dir
-    my $dir = choose_a_dir(
-        { name => 'OK ', info => $info, mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
-    );
-    return if ! length $dir;
-    $sf->{o}{$section}{$opt} = $dir;
-    $sf->{write_config}++;
-    return;
-}
+#sub __choose_a_dir_wrap {
+#    my ( $sf, $section, $opt ) = @_;
+#    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+#    my $info;
+#    if ( defined $sf->{o}{$section}{$opt} ) {
+#        $info = '<< ' . $sf->{o}{$section}{$opt};
+#    }
+#    # Choose_a_dir
+#    my $dir = $tu->choose_a_directory(
+#        { current_selection_label => 'OK ', info => $info }
+#    );
+#    return if ! length $dir;
+#    $sf->{o}{$section}{$opt} = $dir;
+#    $sf->{write_config}++;
+#    return;
+#}
 
 
 sub __write_config_files {

@@ -1,11 +1,11 @@
 package Quiq::System;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Shell;
 use Quiq::FileHandle;
@@ -34,7 +34,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $n = $this->numberOfCpus;
+  $n = $this->numberOfCpus;
 
 =head4 Description
 
@@ -81,8 +81,8 @@ sub numberOfCpus {
 
 =head4 Synopsis
 
-    $hostname = $this->hostname;
-    $hostname = $this->hostname($ip);
+  $hostname = $this->hostname;
+  $hostname = $this->hostname($ip);
 
 =head4 Description
 
@@ -116,8 +116,8 @@ sub hostname {
 
 =head4 Synopsis
 
-    $ip = $this->ip;
-    $ip = $this->ip($hostname);
+  $ip = $this->ip;
+  $ip = $this->ip($hostname);
 
 =head4 Description
 
@@ -146,7 +146,7 @@ sub ip {
 
 =head4 Synopsis
 
-    $encoding = $this->encoding;
+  $encoding = $this->encoding;
 
 =head4 Description
 
@@ -164,9 +164,9 @@ Pragma encoding
 
 Gib non-ASCII-Zeichen im Encoding der Umgebung auf STDOUT aus:
 
-    my $encoding = Quiq::System->encoding;
-    binmode STDOUT,":encoding($encoding)";
-    print "äöüßÄÖÜ\n";
+  my $encoding = Quiq::System->encoding;
+  binmode STDOUT,":encoding($encoding)";
+  print "äöüßÄÖÜ\n";
 
 =cut
 
@@ -188,8 +188,8 @@ sub encoding {
 
 =head4 Synopsis
 
-    $user = $this->user;
-    $user = $this->user($uid);
+  $user = $this->user;
+  $user = $this->user($uid);
 
 =head4 Description
 
@@ -220,7 +220,7 @@ sub user {
 
 =head4 Synopsis
 
-    $uid = $this->uid($user);
+  $uid = $this->uid($user);
 
 =head4 Description
 
@@ -250,7 +250,7 @@ sub uid {
 
 =head4 Synopsis
 
-    $path = $class->searchProgram($program);
+  $path = $class->searchProgram($program);
 
 =head4 Options
 
@@ -308,7 +308,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

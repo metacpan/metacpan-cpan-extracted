@@ -1,8 +1,20 @@
+Revision history for Text::Trim
 
-1.01    Mon Feb 27 2006
+1.03    2019-09-22
+        - Per 1.02_01, module will now build successfully on certain 
+          systems with unprivileged accounts.
+
+1.02_01 2019-09-21
+        - Minor documentation cleanup
+        - RT#128743: POD misses license information
+        - RT#128092: Makefile.PL: compat code does not work everywhere
+
+1.02    2010-04-06
+        - undef values are now caught and passed through
+
+1.01    2006-02-27
         - Added reference to String::Strip in docs
         - Added docs and tests demonstrating unicode support
 
-1.00	Wed Feb 22 2006
+1.00	2006-02-22
 	- Initial version
-    

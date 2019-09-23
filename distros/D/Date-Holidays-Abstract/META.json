@@ -60,7 +60,7 @@
    "provides" : {
       "Date::Holidays::Abstract" : {
          "file" : "lib/Date/Holidays/Abstract.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/jonasbn/perl-date-holidays-abstract"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

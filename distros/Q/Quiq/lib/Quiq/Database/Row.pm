@@ -1,11 +1,11 @@
 package Quiq::Database::Row;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Perl;
 use Quiq::Database::ResultSet::Object;
@@ -34,7 +34,7 @@ Ein Objekt der Klasse repräsentiert einen Datensatz.
 
 =head4 Synopsis
 
-    $tableClass = $this->tableClass;
+  $tableClass = $this->tableClass;
 
 =head4 Returns
 
@@ -67,16 +67,16 @@ Tabellenklasse bei Array-Datensätzen: C<< Quiq::Database::ResultSet::Array >>
 Abweichend vom Default kann eine abgeleitete Datensatzklasse die
 Tabellenklasse über die Klassenvariable
 
-    our $TableClass = '...';
+  our $TableClass = '...';
 
 festlegen.
 
 Ferner ist es möglich, die Tabellenklasse bei der Selektion per
 Option festzulegen:
 
-    $tab = $rowClass->select($db,
-        -tableClass => $tableClass,
-    );
+  $tab = $rowClass->select($db,
+      -tableClass => $tableClass,
+  );
 
 =cut
 
@@ -120,7 +120,7 @@ sub tableClass {
 
 =head4 Synopsis
 
-    $tab = $class->makeTable(\@titles,\@data);
+  $tab = $class->makeTable(\@titles,\@data);
 
 =head4 Description
 
@@ -131,23 +131,23 @@ Datensätzen @rows und liefere eine Referenz auf dieses Objekt zurück.
 
 Instanttierung über spezifische Datensatz-Klasse:
 
-    $tab = Person->makeTable(
-        [qw/per_id per_vorname per_nachname per_geburtsdatum/],
-        qw/1 Rudi Ratlos 1971-04-23/,
-        qw/2 Erika Mustermann 1955-03-16/,
-        qw/3 Harry Hirsch 1948-07-22/,
-        qw/3 Susi Sorglos 1992-10-23/,
-    );
+  $tab = Person->makeTable(
+      [qw/per_id per_vorname per_nachname per_geburtsdatum/],
+      qw/1 Rudi Ratlos 1971-04-23/,
+      qw/2 Erika Mustermann 1955-03-16/,
+      qw/3 Harry Hirsch 1948-07-22/,
+      qw/3 Susi Sorglos 1992-10-23/,
+  );
 
 Instanttierung über anonyme Datensatz-Klasse:
 
-    $tab = Quiq::Database::Row::Object->makeTable(
-        [qw/per_id per_vorname per_nachname per_geburtsdatum/],
-        qw/1 Rudi Ratlos 1971-04-23/,
-        qw/2 Erika Mustermann 1955-03-16/,
-        qw/3 Harry Hirsch 1948-07-22/,
-        qw/3 Susi Sorglos 1992-10-23/,
-    );
+  $tab = Quiq::Database::Row::Object->makeTable(
+      [qw/per_id per_vorname per_nachname per_geburtsdatum/],
+      qw/1 Rudi Ratlos 1971-04-23/,
+      qw/2 Erika Mustermann 1955-03-16/,
+      qw/3 Harry Hirsch 1948-07-22/,
+      qw/3 Susi Sorglos 1992-10-23/,
+  );
 
 =cut
 
@@ -173,7 +173,7 @@ sub makeTable {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

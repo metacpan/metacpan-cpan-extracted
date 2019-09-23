@@ -1,11 +1,11 @@
 package Quiq::JQuery::Tabs;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 use Quiq::Html::List;
@@ -61,36 +61,36 @@ L<Tabs Widget Beispiele|http://jqueryui.com/tabs/>
 
 Perl:
 
-    $html = Quiq::JQuery::Tabs->html($h,
-        id => 'tabs',
-        tabs => [
-            {
-                label => 'A',
-                link => '#a',
-                content => $h->tag('p',
-                    -text => 1,
-                    'Text des Reiters A',
-                ),
-            },{
-                label => 'B',
-                link => 'b',
-            },
-        ],
-    );
+  $html = Quiq::JQuery::Tabs->html($h,
+      id => 'tabs',
+      tabs => [
+          {
+              label => 'A',
+              link => '#a',
+              content => $h->tag('p',
+                  -text => 1,
+                  'Text des Reiters A',
+              ),
+          },{
+              label => 'B',
+              link => 'b',
+          },
+      ],
+  );
 
 HTML:
 
-    <div id="tabs">
-      <ul>
-        <li><a href="#a">A</a></li>
-        <li><a href="b">B</a></li>
-      </ul>
-      <div id="a">
-        <p>
-          Text des Reiters A
-        </p>
-      </div>
+  <div id="tabs">
+    <ul>
+      <li><a href="#a">A</a></li>
+      <li><a href="b">B</a></li>
+    </ul>
+    <div id="a">
+      <p>
+        Text des Reiters A
+      </p>
     </div>
+  </div>
 
 =head1 METHODS
 
@@ -100,7 +100,7 @@ HTML:
 
 =head4 Synopsis
 
-    $obj = $class->new(@keyVal);
+  $obj = $class->new(@keyVal);
 
 =head4 Description
 
@@ -132,8 +132,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $obj->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $obj->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -198,7 +198,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

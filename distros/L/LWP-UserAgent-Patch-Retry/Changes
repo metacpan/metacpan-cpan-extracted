@@ -1,22 +1,29 @@
-0.04    2017-07-10 (PERLANCAR)
+0.050   2019-09-20  Released-By: PERLANCAR; Urgency: medium
+
+	- No functional changes.
+
+	- Lax version checking: 6.0.x -> 6.x.
+
+
+0.04    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.03    2015-08-17 (PERLANCAR)
+0.03    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.02    2013-11-02 (SHARYANTO)
+0.02    2013-11-02  Released-By: SHARYANTO
 
         - No functional changes. Fix example in Synopsis.
 
 
-0.01    2013-11-02 (SHARYANTO)
+0.01    2013-11-02  Released-By: SHARYANTO
 
         - First release.

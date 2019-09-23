@@ -1,11 +1,11 @@
 package Quiq::Pod::Generator;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 
@@ -48,7 +48,7 @@ Einrücktiefe bei Code-Abschnitten und Listen.
 
 =head4 Synopsis
 
-    $pg = $class->new(@keyVal);
+  $pg = $class->new(@keyVal);
 
 =head4 Description
 
@@ -59,9 +59,9 @@ dieses Objekt zurück.
 
 Generiere POD mit Einrückung 2:
 
-    $pg = Quiq::Pod::Generator->new(
-        indentation => 2,
-    );
+  $pg = Quiq::Pod::Generator->new(
+      indentation => 2,
+  );
 
 =cut
 
@@ -92,7 +92,7 @@ wiedergegeben.
 
 =head4 Synopsis
 
-    $pod = $pg->encoding($encoding);
+  $pod = $pg->encoding($encoding);
 
 =head4 Description
 
@@ -101,11 +101,11 @@ den resultierenden POD-Code zurück.
 
 =head4 Example
 
-    $pg->encoding('utf-8');
+  $pg->encoding('utf-8');
 
 erzeugt
 
-    =encoding utf-8
+  =encoding utf-8
 
 =cut
 
@@ -122,8 +122,8 @@ sub encoding {
 
 =head4 Synopsis
 
-    $pod = $pg->section($level,$title);
-    $pod = $pg->section($level,$title,$body);
+  $pod = $pg->section($level,$title);
+  $pod = $pg->section($level,$title,$body);
 
 =head4 Description
 
@@ -141,40 +141,40 @@ von einer Einrückung befreit.
 
 ohne Body
 
-    $pg->section(1,'Test');
+  $pg->section(1,'Test');
 
 erzeugt
 
-    =head1 Test
+  =head1 Test
 
 =item *
 
 mit Body
 
-    $pg->section(1,'Test',"Dies ist\nein Test.");
+  $pg->section(1,'Test',"Dies ist\nein Test.");
 
 erzeugt
 
-    =head1 Test
-    
-    Dies ist
-    ein Test.
+  =head1 Test
+  
+  Dies ist
+  ein Test.
 
 =item *
 
 eine Einrückung wird automatisch entfernt
 
-    $pg->section(1,'DESCRIPTION',q~
-        Dies ist
-        ein Test.
-    ~);
+  $pg->section(1,'DESCRIPTION',q~
+      Dies ist
+      ein Test.
+  ~);
 
 erzeugt
 
-    =head1 Test
-    
-    Dies ist
-    ein Test.
+  =head1 Test
+  
+  Dies ist
+  ein Test.
 
 =back
 
@@ -202,7 +202,7 @@ sub section {
 
 =head4 Synopsis
 
-    $pod = $pg->code($text);
+  $pod = $pg->code($text);
 
 =head4 Description
 
@@ -211,15 +211,15 @@ resultierenden POD-Code zurück.
 
 =head4 Example
 
-    $pg->code("sub f {\n    return 1;\n}");
+  $pg->code("sub f {\n    return 1;\n}");
 
 erzeugt
 
-    $n Leerzeichen
-    ----
-        sub f {
-            return 1;
-        }
+  $n Leerzeichen
+  ----
+      sub f {
+          return 1;
+      }
 
 Der Code ist um $n Leerzeichen (den Wert des Objekt-Attributs
 "indentation") eingerückt.
@@ -245,7 +245,7 @@ sub code {
 
 =head4 Synopsis
 
-    $pod = $pg->bulletList(\@items);
+  $pod = $pg->bulletList(\@items);
 
 =head4 Description
 
@@ -254,21 +254,21 @@ den resultierenden POD-Code zurück.
 
 =head4 Example
 
-    $pg->bulletList(['Eins','Zwei']);
+  $pg->bulletList(['Eins','Zwei']);
 
 erzeugt
 
-    =over 4
-    
-    =item *
-    
-    Eins
-    
-    =item *
-    
-    Zwei
-    
-    =back
+  =over 4
+  
+  =item *
+  
+  Eins
+  
+  =item *
+  
+  Zwei
+  
+  =back
 
 =cut
 
@@ -299,7 +299,7 @@ sub bulletList {
 
 =head4 Synopsis
 
-    $pod = $pg->orderedList(\@items);
+  $pod = $pg->orderedList(\@items);
 
 =head4 Description
 
@@ -308,21 +308,21 @@ den resultierenden POD-Code zurück.
 
 =head4 Example
 
-    $pg->orderedList(['Eins','Zwei']);
+  $pg->orderedList(['Eins','Zwei']);
 
 erzeugt
 
-    =over 4
-    
-    =item 1.
-    
-    Eins
-    
-    =item 2.
-    
-    Zwei
-    
-    =back
+  =over 4
+  
+  =item 1.
+  
+  Eins
+  
+  =item 2.
+  
+  Zwei
+  
+  =back
 
 =cut
 
@@ -354,7 +354,7 @@ sub orderedList {
 
 =head4 Synopsis
 
-    $pod = $pg->definitionList(\@items);
+  $pod = $pg->definitionList(\@items);
 
 =head4 Description
 
@@ -365,25 +365,25 @@ den resultierenden POD-Code zurück.
 
 Die Aufrufe
 
-    $pg->definitionList([A=>'Eins',B=>'Zwei']);
+  $pg->definitionList([A=>'Eins',B=>'Zwei']);
 
 oder
 
-    $pg->definitionList([['A','Eins'],['B','Zwei']]);
+  $pg->definitionList([['A','Eins'],['B','Zwei']]);
 
 erzeugen
 
-    =over 4
-    
-    =item A
-    
-    Eins
-    
-    =item B
-    
-    Zwei
-    
-    =back
+  =over 4
+  
+  =item A
+  
+  Eins
+  
+  =item B
+  
+  Zwei
+  
+  =back
 
 =cut
 
@@ -418,7 +418,7 @@ sub definitionList {
 
 =head4 Synopsis
 
-    $pod = $pg->for($format,$code);
+  $pod = $pg->for($format,$code);
 
 =head4 Description
 
@@ -434,26 +434,26 @@ for-Instruktion erzeugt, ansonsten eine begin/end-Instruktion.
 
 einzeiliger Code
 
-    $pg->for('html','<img src="figure1.png" />');
+  $pg->for('html','<img src="figure1.png" />');
 
 erzeugt
 
-    =for html <img src="figure1.png" />
+  =for html <img src="figure1.png" />
 
 =item *
 
 mehrzeiliger Code
 
-    $pg->for('html',qq|Ein Bild:\n<img src="figure1.png" />|);
+  $pg->for('html',qq|Ein Bild:\n<img src="figure1.png" />|);
 
 erzeugt
 
-    =begin html
-    
-    Ein Bild:
-    <img src="figure1.png" />
-    
-    =end html
+  =begin html
+  
+  Ein Bild:
+  <img src="figure1.png" />
+  
+  =end html
 
 =back
 
@@ -483,7 +483,7 @@ sub for {
 
 =head4 Synopsis
 
-    $pod = $pg->pod;
+  $pod = $pg->pod;
 
 =head4 Description
 
@@ -493,11 +493,11 @@ POD-Instruktion beginnt ebenfalls einen POD-Block.
 
 =head4 Example
 
-    $pg->pod;
+  $pg->pod;
 
 erzeugt
 
-    =pod
+  =pod
 
 =cut
 
@@ -514,7 +514,7 @@ sub pod {
 
 =head4 Synopsis
 
-    $pod = $pg->cut;
+  $pod = $pg->cut;
 
 =head4 Description
 
@@ -523,11 +523,11 @@ danach kein Perl-Code folgt.
 
 =head4 Example
 
-    $pg->cut;
+  $pg->cut;
 
 erzeugt
 
-    =cut
+  =cut
 
 =cut
 
@@ -546,7 +546,7 @@ sub cut {
 
 =head4 Synopsis
 
-    $str = $this->fmt($type,$text);
+  $str = $this->fmt($type,$text);
 
 =head4 Description
 
@@ -560,21 +560,21 @@ wenn in $text die Zeichen '<' oder '>' vorkommen.
 
 Nomal:
 
-    $pg->fmt('C','$x');
-    =>
-    C<$x>
+  $pg->fmt('C','$x');
+  =>
+  C<$x>
 
 1x > eingebettet:
 
-    $pg->fmt('C','$class->new()');
-    =>
-    C<< $class->new() >>
+  $pg->fmt('C','$class->new()');
+  =>
+  C<< $class->new() >>
 
 2x > eingebettet:
 
-    $pg->fmt('C','$x >> $y');
-    =>
-    C<<< $x >> $y >>>
+  $pg->fmt('C','$x >> $y');
+  =>
+  C<<< $x >> $y >>>
 
 =cut
 
@@ -602,7 +602,7 @@ sub fmt {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

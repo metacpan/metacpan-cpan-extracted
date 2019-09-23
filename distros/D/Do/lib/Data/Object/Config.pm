@@ -9,7 +9,7 @@ use Carp ();
 
 use Import::Into;
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # BUILD
 
@@ -181,6 +181,11 @@ sub choose {
   # config throwable
   if (subject($type, 'withthrowable')) {
     return ['config_withthrowable', 0];
+  }
+
+  # config tryable
+  if (subject($type, 'withtryable')) {
+    return ['config_withtryable', 0];
   }
 
   return ['config_core', 1];
@@ -550,6 +555,12 @@ sub config_withstashable {
 sub config_withthrowable {
   [
     prepare_call('with', 'Data::Object::Role::Throwable')
+  ]
+}
+
+sub config_withtryable {
+  [
+    prepare_call('with', 'Data::Object::Role::Tryable')
   ]
 }
 
@@ -1788,13 +1799,30 @@ consume the L<Data::Object::Role::Throwable> role.
 
 =cut
 
+=head2 config_withtryable
+
+  config_withtryable() : ArrayRef
+
+The config_withtryable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Tryable> role.
+
+=over 4
+
+=item config_withtryable example
+
+  my $plans = config_withtryable;
+
+=back
+
+=cut
+
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

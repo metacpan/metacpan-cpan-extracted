@@ -1,12 +1,12 @@
 package Quiq::String;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Encode::Guess ();
 use Encode ();
@@ -33,7 +33,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $len = $class->maxLineLength($text);
+  $len = $class->maxLineLength($text);
 
 =head4 Arguments
 
@@ -81,8 +81,8 @@ sub maxLineLength {
 
 =head4 Synopsis
 
-    $str = $class->autoDecode($str);
-    $str = $class->autoDecode($str,$otherEncoding);
+  $str = $class->autoDecode($str);
+  $str = $class->autoDecode($str,$otherEncoding);
 
 =head4 Description
 
@@ -148,8 +148,8 @@ sub autoDecode {
 
 =head4 Synopsis
 
-    $str2 = $class->indent($str,$indentStr,@opt);
-    $class->indent(\$str,$indentStr,@opt);
+  $str2 = $class->indent($str,$indentStr,@opt);
+  $class->indent(\$str,$indentStr,@opt);
 
 =head4 Options
 
@@ -186,11 +186,11 @@ hinzugefügt, außer Leerzeilen.
 
 Texteinrückung um vier Leerzeichen
 
-    $class->indent($txt,' ' x 4);
-    
-    |Dies ist                   |    Dies ist
-    |ein Test-   - wird zu ->   |    ein Test-
-    |Text.                      |    Text.
+  $class->indent($txt,' ' x 4);
+  
+  |Dies ist                   |    Dies ist
+  |ein Test-   - wird zu ->   |    ein Test-
+  |Text.                      |    Text.
 
 =back
 
@@ -244,7 +244,7 @@ sub indent {
 
 =head4 Synopsis
 
-    $n = $class->determineIndentation($str);
+  $n = $class->determineIndentation($str);
 
 =head4 Description
 
@@ -252,10 +252,10 @@ Ermittele die Einrücktiefe des Textes $str und liefere diese zurück.
 Die Einrücktiefe ist der größte gemeinsame Teiler aller
 Zeilen-Einrückungen. Beispiel:
 
-    |Dies
-    |    ist
-    |       ein
-    |           Test
+  |Dies
+  |    ist
+  |       ein
+  |           Test
 
 Einrücktiefe ist 4.
 
@@ -284,8 +284,8 @@ sub determineIndentation {
 
 =head4 Synopsis
 
-    $str = $class->reduceIndentation($n,$str);
-    $class->reduceIndentation($n,\$str);
+  $str = $class->reduceIndentation($n,$str);
+  $class->reduceIndentation($n,\$str);
 
 =head4 Description
 
@@ -295,21 +295,21 @@ Reduziere die Einrücktiefe des Textes $str auf Tiefe $n.
 
 Text:
 
-    |Dies
-    |    ist
-    |        ein
-    |            Test
+  |Dies
+  |    ist
+  |        ein
+  |            Test
 
 Reduktion auf Einrücktiefe 2:
 
-    Quiq::String->reduceIndentation(2,$str);
+  Quiq::String->reduceIndentation(2,$str);
 
 Resultat:
 
-    |Dies
-    |  ist
-    |    ein
-    |      Test
+  |Dies
+  |  ist
+  |    ein
+  |      Test
 
 =cut
 
@@ -344,8 +344,8 @@ sub reduceIndentation {
 
 =head4 Synopsis
 
-    $str = $class->removeIndentation($str,@opt); # [1]
-    $class->removeIndentation(\$str,@opt);       # [2]
+  $str = $class->removeIndentation($str,@opt); # [1]
+  $class->removeIndentation(\$str,@opt);       # [2]
 
 =head4 Options
 
@@ -403,35 +403,35 @@ Eine Leerzeile ist eine Zeile, die nur aus Whitespace besteht.
 
 Einrückung entfernen, Leerzeile übergehen:
 
-    |
-    |  Dies ist
-    |              <- Leerzeile ohne Einrückung
-    |  ein Test-
-    |  Text.
-    |
+  |
+  |  Dies ist
+  |              <- Leerzeile ohne Einrückung
+  |  ein Test-
+  |  Text.
+  |
 
 wird zu
 
-    |Dies ist
-    |
-    |ein Test-
-    |Text.
+  |Dies ist
+  |
+  |ein Test-
+  |Text.
 
 =item *
 
 Tiefere Einrückung bleibt bestehen:
 
-    |
-    |    Dies ist
-    |  ein Test-
-    |  Text.
-    |
+  |
+  |    Dies ist
+  |  ein Test-
+  |  Text.
+  |
 
 wird zu
 
-    |  Dies ist
-    |ein Test-
-    |Text.
+  |  Dies ist
+  |ein Test-
+  |Text.
 
 =back
 
@@ -485,8 +485,8 @@ sub removeIndentation {
 
 =head4 Synopsis
 
-    $str = $class->removeIndentationNl($str,@opt); # [1]
-    $class->removeIndentationNl(\$str,@opt);       # [2]
+  $str = $class->removeIndentationNl($str,@opt); # [1]
+  $class->removeIndentationNl(\$str,@opt);       # [2]
 
 =cut
 
@@ -515,8 +515,8 @@ sub removeIndentationNl {
 
 =head4 Synopsis
 
-    $newCode = $this->removeComments($code,$start);
-    $newCode = $this->removeComments($code,$start,$stop);
+  $newCode = $this->removeComments($code,$start);
+  $newCode = $this->removeComments($code,$start,$stop);
 
 =head4 Description
 
@@ -534,17 +534,17 @@ Kommentar-Zeichenkette) im Quelltext zusätzlich ein Leerzeichen
 oder Tab vorausgeht, sofern es nicht am Anfang der Zeile
 steht. D.h.
 
-    my $ind = ' ' x 4; # Einrückung
-                      ^ ^
-                      hier müssen Leerzeichen (oder Tabs) stehen
-    
-    my $ind = ' ' x 4;# Einrückung
-                      ^
-                      Wird nicht erkannt!
-    
-    my $ind = ' ' x 4; #Einrückung
-                       ^
-                       Wird nicht erkannt!
+  my $ind = ' ' x 4; # Einrückung
+                    ^ ^
+                    hier müssen Leerzeichen (oder Tabs) stehen
+  
+  my $ind = ' ' x 4;# Einrückung
+                    ^
+                    Wird nicht erkannt!
+  
+  my $ind = ' ' x 4; #Einrückung
+                     ^
+                     Wird nicht erkannt!
 
 Im Falle von mehrzeiligen Kommentaren ($start und $stop sind
 definiert) ist dies das vorausgehende Leereichen nicht nötig.
@@ -553,23 +553,23 @@ definiert) ist dies das vorausgehende Leereichen nicht nötig.
 
 HTML, XML:
 
-    $code = Quiq::String->removeComments($code,'<!--','-->');
+  $code = Quiq::String->removeComments($code,'<!--','-->');
 
 C, Java, CSS:
 
-    $code = Quiq::String->removeComments($code,'/*','*/');
+  $code = Quiq::String->removeComments($code,'/*','*/');
 
 C++, JavaScript:
 
-    $code = Quiq::String->removeComments($code,'//');
+  $code = Quiq::String->removeComments($code,'//');
 
 Shell, Perl, Python, Ruby, ...:
 
-    $code = Quiq::String->removeComments($code,'#');
+  $code = Quiq::String->removeComments($code,'#');
 
 SQL:
 
-    $code = Quiq::String->removeComments($code,'--');
+  $code = Quiq::String->removeComments($code,'--');
 
 =cut
 
@@ -649,7 +649,7 @@ sub removeComments {
 
 =head4 Synopsis
 
-    $quotedStr = $class->quote($str);
+  $quotedStr = $class->quote($str);
 
 =head4 Description
 
@@ -678,7 +678,7 @@ sub quote {
 
 =head4 Synopsis
 
-    $text = $class->wrap($text,@opt);
+  $text = $class->wrap($text,@opt);
 
 =head4 Options
 
@@ -721,13 +721,13 @@ bleiben, muss jeder Paragraph einzeln umbrochen werden.
 
 Maximale Zeilenlänge auf 12 Zeichen begrenzen:
 
-    $txt = "Dies ist ein Test mit einem kurzen Text.";
-    $txt = Quiq::String->wrap($txt,-width=>12);
-    # =>
-    Dies ist ein
-    Test mit
-    einem kurzen
-    Text.
+  $txt = "Dies ist ein Test mit einem kurzen Text.";
+  $txt = Quiq::String->wrap($txt,-width=>12);
+  # =>
+  Dies ist ein
+  Test mit
+  einem kurzen
+  Text.
 
 =cut
 
@@ -783,7 +783,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

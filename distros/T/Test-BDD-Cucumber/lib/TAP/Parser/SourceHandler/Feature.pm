@@ -1,5 +1,5 @@
 package TAP::Parser::SourceHandler::Feature;
-$TAP::Parser::SourceHandler::Feature::VERSION = '0.64';
+$TAP::Parser::SourceHandler::Feature::VERSION = '0.660001';
 use strict;
 use warnings;
 

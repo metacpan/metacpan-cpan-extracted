@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::TestBuilder;
-$Test::BDD::Cucumber::Harness::TestBuilder::VERSION = '0.64';
+$Test::BDD::Cucumber::Harness::TestBuilder::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::TestBuilder - Temporary redirector to TAP harness
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 

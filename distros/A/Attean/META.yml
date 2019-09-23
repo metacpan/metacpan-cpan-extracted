@@ -10,6 +10,7 @@ build_requires:
   Test::Exception: 0
   Test::LWP::UserAgent: 0
   Test::More: 0.88
+  Test::Requires: 0
   XML::Simple: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
@@ -62,4 +63,4 @@ resources:
   homepage: http://search.cpan.org/dist/Attean/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/attean/
-version: '0.023'
+version: '0.024'

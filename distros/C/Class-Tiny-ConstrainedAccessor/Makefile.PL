@@ -188,7 +188,7 @@ my %opts = (
         'MooseX::Types' => '0',
         'MooseX::Types::Moose' => '0',
         'Type::Tiny' => '0',
-        'vars::i' => '1.07',
+        'vars::i' => '2.000000',    # See #6
     },
     PREREQ_PM => {
         'Class::Tiny' => '0',

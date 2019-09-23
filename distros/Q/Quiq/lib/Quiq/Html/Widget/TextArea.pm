@@ -1,11 +1,11 @@
 package Quiq::Html::Widget::TextArea;
 use base qw/Quiq::Html::Widget/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Html::Tag;
 
@@ -75,7 +75,7 @@ Anfänglicher Wert des Felds.
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =cut
 
@@ -114,8 +114,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html;
-    $html = $class->html(@keyVal);
+  $html = $e->html;
+  $html = $class->html(@keyVal);
 
 =cut
 
@@ -152,7 +152,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

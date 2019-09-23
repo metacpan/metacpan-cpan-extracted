@@ -57,7 +57,6 @@ t/corpus/test.imzML.gz
 t/corpus/test.mgf.gz
 t/corpus/test.ms1.gz
 t/corpus/test.ms2.gz
-t/corpus/test.mzid.gz
 t/corpus/test.mzML.gz
 t/corpus/test.mzq.gz
 t/corpus/test.mzXML.gz

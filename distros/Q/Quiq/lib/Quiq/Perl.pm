@@ -1,12 +1,12 @@
 package Quiq::Perl;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Object;
 use Cwd ();
@@ -42,8 +42,8 @@ abgesichert sind.
 
 =head4 Synopsis
 
-    $this->autoFlush($fh);
-    $this->autoFlush($fh,$bool);
+  $this->autoFlush($fh);
+  $this->autoFlush($fh,$bool);
 
 =head4 Description
 
@@ -51,9 +51,9 @@ Schalte Pufferung auf Dateihandle ein oder aus.
 
 Der Aufruf ist äquivalent zu
 
-    $oldFh = select $fh;
-    $| = $bool;
-    select $oldFh;
+  $oldFh = select $fh;
+  $| = $bool;
+  select $oldFh;
 
 =head4 See Also
 
@@ -61,7 +61,7 @@ perldoc -f select
 
 =head4 Example
 
-    Quiq::Perl->autoFlush(*STDOUT);
+  Quiq::Perl->autoFlush(*STDOUT);
 
 =cut
 
@@ -85,8 +85,8 @@ sub autoFlush {
 
 =head4 Synopsis
 
-    $class->binmode($fh);
-    $class->binmode($fh,$layer);
+  $class->binmode($fh);
+  $class->binmode($fh,$layer);
 
 =head4 Description
 
@@ -100,7 +100,7 @@ perldoc -f binmode
 
 =head4 Example
 
-    Quiq::Perl->binmode(*STDOUT,':encoding(utf-8)');
+  Quiq::Perl->binmode(*STDOUT,':encoding(utf-8)');
 
 =cut
 
@@ -128,7 +128,7 @@ sub binmode {
 
 =head4 Synopsis
 
-    Quiq::Perl->print($fh,@data);
+  Quiq::Perl->print($fh,@data);
 
 =head4 Description
 
@@ -142,7 +142,7 @@ perldoc -f print
 
 =head4 Example
 
-    Quiq::Perl->print($fh,"Hello world\n");
+  Quiq::Perl->print($fh,"Hello world\n");
 
 =cut
 
@@ -174,7 +174,7 @@ sub print {
 
 =head4 Synopsis
 
-    $class->use($class,$sloppy);
+  $class->use($class,$sloppy);
 
 =head4 Description
 
@@ -218,7 +218,7 @@ sub use {
 
 =head4 Synopsis
 
-    @arr|$val = Quiq::Perl->perlDoFile($file);
+  @arr|$val = Quiq::Perl->perlDoFile($file);
 
 =head4 Description
 
@@ -233,15 +233,15 @@ Genaue Funktionsbeschreibung siehe Perl-Dokumentation.
 
 Laden einer Konfigurationsdatei:
 
-    %cfg = Quiq::Perl->perlDoFile($file);
+  %cfg = Quiq::Perl->perlDoFile($file);
 
 Inhalt Konfigurationsdatei:
 
-    use strict;
-    
-    host => 'localhost',
-    datenbank => 'entw1',
-    benutzer => ['sys','system']
+  use strict;
+  
+  host => 'localhost',
+  datenbank => 'entw1',
+  benutzer => ['sys','system']
 
 =cut
 
@@ -279,7 +279,7 @@ sub perlDoFile {
 
 =head4 Synopsis
 
-    $type = $this->sigilToType($sigil);
+  $type = $this->sigilToType($sigil);
 
 =head4 Description
 
@@ -311,7 +311,7 @@ sub sigilToType {
 
 =head4 Synopsis
 
-    $refH = $this->stash($package);
+  $refH = $this->stash($package);
 
 =head4 Description
 
@@ -354,8 +354,8 @@ sub stash {
 
 =head4 Synopsis
 
-    @arr|$arr = $this->packages;
-    @arr|$arr = $this->packages($package);
+  @arr|$arr = $this->packages;
+  @arr|$arr = $this->packages($package);
 
 =head4 Description
 
@@ -378,25 +378,25 @@ nicht gecacht, sondern mit jedem Aufruf neu ermittelt.
 
 Liste aller Packages, die das Programm aktuell geladen hat:
 
-    @arr = Quiq::Perl->packages;
+  @arr = Quiq::Perl->packages;
 
 =item *
 
 Liste in sortierter Form
 
-    @arr = Quiq::Perl->packages->sort;
+  @arr = Quiq::Perl->packages->sort;
 
 =item *
 
 Liste, eingeschränkt auf Packages, deren Name einen Regex erfüllt:
 
-    @arr = Quiq::Perl->packages->select(qr/patch\d+/);
+  @arr = Quiq::Perl->packages->select(qr/patch\d+/);
 
 =item *
 
 Liste aller Packages unterhalb und einschließlich Package X:
 
-    @arr = Quiq::Perl->packages('X');
+  @arr = Quiq::Perl->packages('X');
 
 =back
 
@@ -445,7 +445,7 @@ sub packages {
 
 =head4 Synopsis
 
-    $class->createClass($newClass,@baseClasses);
+  $class->createClass($newClass,@baseClasses);
 
 =head4 Description
 
@@ -488,7 +488,7 @@ sub createClass {
 
 =head4 Synopsis
 
-    $bool = $class->classExists($class);
+  $bool = $class->classExists($class);
 
 =head4 Alias
 
@@ -502,9 +502,9 @@ wenn Klasse existiert, andernfalls I<falsch>.
 
 =head4 Example
 
-    Quiq::Perl->classExists('Quiq::Object');
-    ==>
-    1
+  Quiq::Perl->classExists('Quiq::Object');
+  ==>
+  1
 
 =cut
 
@@ -527,7 +527,7 @@ sub classExists {
 
 =head4 Synopsis
 
-    $class->loadClass($class);
+  $class->loadClass($class);
 
 =head4 Description
 
@@ -537,7 +537,7 @@ der Klasse noch nicht gibt.
 
 =head4 Example
 
-    Quiq::Perl->loadClass('My::Application');
+  Quiq::Perl->loadClass('My::Application');
 
 =cut
 
@@ -559,7 +559,7 @@ sub loadClass {
 
 =head4 Synopsis
 
-    @arr | $arr = $this->baseClasses($class);
+  @arr | $arr = $this->baseClasses($class);
 
 =head4 Description
 
@@ -570,22 +570,22 @@ einschließlich UNIVERSAL und deren Basisklassen.
 
 Gegeben folgende Vererbungshierarchie:
 
-    Pkg6  Pkg7
-      \   /
-     UNIVERSAL
-    
-       Pkg1
-        |
-       Pkg2
-       / \
-     Pkg3 Pkg4
-       \ /
-       Pkg5
+  Pkg6  Pkg7
+    \   /
+   UNIVERSAL
+  
+     Pkg1
+      |
+     Pkg2
+     / \
+   Pkg3 Pkg4
+     \ /
+     Pkg5
 
 Der Aufruf Quiq::Perl->baseClasses('Pkg5') liefert ein Array
 mit den Elementen
 
-    Pkg3 Pkg2 Pkg1 Pkg4 UNIVERSAL Pkg6 Pkg7
+  Pkg3 Pkg2 Pkg1 Pkg4 UNIVERSAL Pkg6 Pkg7
 
 Die Klassen Pkg2 und Pkg1 werden nicht wiederholt.
 
@@ -611,7 +611,7 @@ sub baseClasses {
 
 =head4 Synopsis
 
-    @arr | $arr = $this->baseClassesISA($class);
+  @arr | $arr = $this->baseClassesISA($class);
 
 =head4 Description
 
@@ -622,18 +622,18 @@ Jede Basisklasse kommt in der Liste genau einmal vor.
 
 Gegeben folgende Vererbungshierarchie:
 
-      Pkg1
-       |
-      Pkg2
-      / \
-    Pkg3 Pkg4
-      \ /
-      Pkg5
+    Pkg1
+     |
+    Pkg2
+    / \
+  Pkg3 Pkg4
+    \ /
+    Pkg5
 
 Der Aufruf Quiq::Perl->baseClassesISA('Pkg5') liefert ein Array
 mit den Elementen
 
-    Pkg3 Pkg2 Pkg1 Pkg4
+  Pkg3 Pkg2 Pkg1 Pkg4
 
 Die Klassen Pkg2 und Pkg1 werden nicht wiederholt.
 
@@ -658,7 +658,7 @@ sub baseClassesISA {
 
 =head4 Synopsis
 
-    @arr | $arr = $this->hierarchyISA($class);
+  @arr | $arr = $this->hierarchyISA($class);
 
 =head4 Description
 
@@ -669,18 +669,18 @@ in der Hierarchie mehrfach vor, erscheint sie mehrfach in der Liste.
 
 Gegeben folgende Vererbungshierarchie:
 
-      Pkg1
-       |
-      Pkg2
-      / \\
-    Pkg3 Pkg4
-      \ /
-      Pkg5
+    Pkg1
+     |
+    Pkg2
+    / \\
+  Pkg3 Pkg4
+    \ /
+    Pkg5
 
 Der Aufruf Quiq::Perl->hierarchyISA('Pkg5') liefert ein Array
 mit den Elementen
 
-    Pkg3 Pkg2 Pkg1 Pkg4 Pkg2 Pkg1
+  Pkg3 Pkg2 Pkg1 Pkg4 Pkg2 Pkg1
 
 Die Basisklassen Pkg2 und Pkg1 erscheinen zweimal.
 
@@ -707,7 +707,7 @@ sub hierarchyISA {
 
 =head4 Synopsis
 
-    @arr | $arr = $this->subClasses($class);
+  @arr | $arr = $this->subClasses($class);
 
 =head4 Description
 
@@ -717,18 +717,18 @@ Liefere die Liste der Subklassen der Klasse $class.
 
 Gegeben folgende Vererbungshierarchie:
 
-      Pkg1
-       |
-      Pkg2
-      / \
-    Pkg3 Pkg4
-      \ /
-      Pkg5
+    Pkg1
+     |
+    Pkg2
+    / \
+  Pkg3 Pkg4
+    \ /
+    Pkg5
 
 Der Aufruf Quiq::Perl->subClasses('Pkg1') liefert ein Array
 mit den Elementen:
 
-    Pkg2 Pkg3 Pkg4 Pkg5
+  Pkg2 Pkg3 Pkg4 Pkg5
 
 Die Reihenfolge der Elemente ist nicht definiert.
 
@@ -738,13 +738,13 @@ Die Reihenfolge der Elemente ist nicht definiert.
 
 Liste in sortierter Form
 
-    @arr = Quiq::Perl->subClasses('Pkg1')->sort;
+  @arr = Quiq::Perl->subClasses('Pkg1')->sort;
 
 =item *
 
 Liste, eingeschränkt auf Klassen, deren Name einen Regex erfüllt:
 
-    @arr = Quiq::Perl->subClasses('Pkg1')->select(qr/[45]/);
+  @arr = Quiq::Perl->subClasses('Pkg1')->select(qr/[45]/);
 
 =back
 
@@ -771,7 +771,7 @@ sub subClasses {
 
 =head4 Synopsis
 
-    ($nextClass,$nextMeth) = $this->nextMethod($class,$name,$startClass);
+  ($nextClass,$nextMeth) = $this->nextMethod($class,$name,$startClass);
 
 =cut
 
@@ -801,7 +801,7 @@ sub nextMethod {
 
 =head4 Synopsis
 
-    $classPath = $class->classNameToPath($className);
+  $classPath = $class->classNameToPath($className);
 
 =head4 Description
 
@@ -810,7 +810,7 @@ Klassenpfad (ohne Dateiendung) und liefere diesen zurück.
 
 =head4 Example
 
-    'A::B::C' => 'A/B/C'
+  'A::B::C' => 'A/B/C'
 
 =cut
 
@@ -828,7 +828,7 @@ sub classNameToPath {
 
 =head4 Synopsis
 
-    $className = $class->classPathToName($classPath);
+  $className = $class->classPathToName($classPath);
 
 =head4 Description
 
@@ -838,8 +838,8 @@ diesen zurück.
 
 =head4 Example
 
-    'A/B/C' ==> 'A::B::C'
-    'A/B/C.pm' ==> 'A::B::C'
+  'A/B/C' ==> 'A::B::C'
+  'A/B/C.pm' ==> 'A::B::C'
 
 =cut
 
@@ -862,8 +862,8 @@ sub classPathToName {
 
 =head4 Synopsis
 
-    $this->createAlias($package,$sym=>$ref);
-    $this->createAlias($sym=>$ref);
+  $this->createAlias($package,$sym=>$ref);
+  $this->createAlias($sym=>$ref);
 
 =head4 Description
 
@@ -873,8 +873,8 @@ zurück.
 
 Der Aufruf ist äquivalent zu:
 
-    no strict 'refs';
-    *{"$package\::$sym"} = $ref;
+  no strict 'refs';
+  *{"$package\::$sym"} = $ref;
 
 Ist $package nicht angegeben wird das Package des Aufrufers
 (d.h. das Package, aus dem heraus der Aufruf erfolgt) genommen.
@@ -887,13 +887,13 @@ Ist $package nicht angegeben wird das Package des Aufrufers
 
 Alias für Subroutine aus anderer Klasse:
 
-    Quiq::Perl->createAlias('MyClass',mySub=>\&MyClass1::mySub1);
+  Quiq::Perl->createAlias('MyClass',mySub=>\&MyClass1::mySub1);
 
 =item *
 
 Eintrag einer Closure in die Symboltabelle:
 
-    Quiq::Perl->createAlias(__PACKAGE__,mySub=>sub { <code> });
+  Quiq::Perl->createAlias(__PACKAGE__,mySub=>sub { <code> });
 
 =back
 
@@ -919,7 +919,7 @@ sub createAlias {
 
 =head4 Synopsis
 
-    $ref = $this->createHash($package,$sym);
+  $ref = $this->createHash($package,$sym);
 
 =head4 Description
 
@@ -934,13 +934,13 @@ diesen zurück.
 
 Erzeuge in $class den Hash %H:
 
-    $ref = $this->createHash($class,'H');
+  $ref = $this->createHash($class,'H');
 
 =item *
 
 die Referenz kann geblesst werden:
 
-    bless $ref,'Quiq::Hash';
+  bless $ref,'Quiq::Hash';
 
 =back
 
@@ -963,11 +963,11 @@ sub createHash {
 
 =head4 Synopsis
 
-    $ref = $this->getHash($package,$name);
+  $ref = $this->getHash($package,$name);
 
 =head4 Example
 
-    $ref = Quiq::Perl->getHash($package,'H');
+  $ref = Quiq::Perl->getHash($package,'H');
 
 =cut
 
@@ -994,7 +994,7 @@ sub getHash {
 
 =head4 Synopsis
 
-    $ref = $this->setHash($package,$name,$ref);
+  $ref = $this->setHash($package,$name,$ref);
 
 =head4 Description
 
@@ -1012,7 +1012,7 @@ Die Methode kopiert den Wert, sie erzeugt keinen Alias!
 
 Setze Paket-Hash 'h' auf den Wert %hash:
 
-    $ref = Quiq::Perl->setHash($package,'h',\%hash);
+  $ref = Quiq::Perl->setHash($package,'h',\%hash);
 
 =back
 
@@ -1035,7 +1035,7 @@ sub setHash {
 
 =head4 Synopsis
 
-    $ref = $this->createArray($package,$sym);
+  $ref = $this->createArray($package,$sym);
 
 =head4 Description
 
@@ -1050,13 +1050,13 @@ Referenz dieses zurück.
 
 Erzeuge in $class das Array @A:
 
-    $ref = Quiq::Perl->createArray($class,'A');
+  $ref = Quiq::Perl->createArray($class,'A');
 
 =item *
 
 die Referenz kann geblesst werden:
 
-    bless $ref,'Quiq::Array';
+  bless $ref,'Quiq::Array';
 
 =back
 
@@ -1079,11 +1079,11 @@ sub createArray {
 
 =head4 Synopsis
 
-    $ref = $this->getArray($package,$name);
+  $ref = $this->getArray($package,$name);
 
 =head4 Example
 
-    $ref = Quiq::Perl->getArray($package,'A');
+  $ref = Quiq::Perl->getArray($package,'A');
 
 =cut
 
@@ -1110,7 +1110,7 @@ sub getArray {
 
 =head4 Synopsis
 
-    $ref = $this->setArray($package,$name,$ref);
+  $ref = $this->setArray($package,$name,$ref);
 
 =head4 Description
 
@@ -1128,7 +1128,7 @@ Die Methode kopiert den Wert, sie erzeugt keinen Alias!
 
 Setze Paket-Array 'a' auf den Wert @arr:
 
-    $ref = Quiq::Perl->setArray($package,'a',\@arr);
+  $ref = Quiq::Perl->setArray($package,'a',\@arr);
 
 =back
 
@@ -1151,7 +1151,7 @@ sub setArray {
 
 =head4 Synopsis
 
-    $ref = $this->setScalar($package,$name,$val);
+  $ref = $this->setScalar($package,$name,$val);
 
 =head4 Description
 
@@ -1166,7 +1166,7 @@ und liefere eine Referenz auf die Variable zurück.
 
 Setze Paket-Skalar 'n' auf den Wert 99:
 
-    $ref = $this->setScalar($package,n=>99);
+  $ref = $this->setScalar($package,n=>99);
 
 =back
 
@@ -1189,7 +1189,7 @@ sub setScalar {
 
 =head4 Synopsis
 
-    $this->setScalarValue($package,$name=>$val);
+  $this->setScalarValue($package,$name=>$val);
 
 =head4 Description
 
@@ -1203,7 +1203,7 @@ Setze Package-Skalar mit dem Namen $name auf den Wert $val.
 
 Setze Paket-Skalar 'n' auf den Wert 99:
 
-    $ref = Quiq::Perl->setScalarValue($package,n=>99);
+  $ref = Quiq::Perl->setScalarValue($package,n=>99);
 
 =back
 
@@ -1227,7 +1227,7 @@ sub setScalarValue {
 
 =head4 Synopsis
 
-    $val = $this->getScalarValue($package,$name);
+  $val = $this->getScalarValue($package,$name);
 
 =head4 Example
 
@@ -1237,7 +1237,7 @@ sub setScalarValue {
 
 Ermittele Wert von Paket-Skalar 'n':
 
-    $val = Quiq::Perl->getScalarValue($package,'n');
+  $val = Quiq::Perl->getScalarValue($package,'n');
 
 =back
 
@@ -1259,7 +1259,7 @@ sub getScalarValue {
 
 =head4 Synopsis
 
-    $ref = $this->setVar($package,$sigil,$name,$ref);
+  $ref = $this->setVar($package,$sigil,$name,$ref);
 
 =head4 Description
 
@@ -1278,19 +1278,19 @@ Die Subroutine kopiert den Wert, sie erzeugt keinen Alias!
 
 Skalar
 
-    $ref = Quiq::Perl->setVar($package,'$','s',\99);
+  $ref = Quiq::Perl->setVar($package,'$','s',\99);
 
 =item *
 
 Array
 
-    $ref = Quiq::Perl->setVar($package,'@','a',\@arr);
+  $ref = Quiq::Perl->setVar($package,'@','a',\@arr);
 
 =item *
 
 Hash
 
-    $ref = Quiq::Perl->setVar($package,'%','h',\%hash);
+  $ref = Quiq::Perl->setVar($package,'%','h',\%hash);
 
 =back
 
@@ -1324,7 +1324,7 @@ sub setVar {
 
 =head4 Synopsis
 
-    $ref = $this->getVar($package,$sigil,$name,@opt);
+  $ref = $this->getVar($package,$sigil,$name,@opt);
 
 =head4 Options
 
@@ -1417,7 +1417,7 @@ sub getVar {
 
 =head4 Synopsis
 
-    $ref = $this->setSubroutine($package,$name=>$ref);
+  $ref = $this->setSubroutine($package,$name=>$ref);
 
 =head4 Returns
 
@@ -1433,15 +1433,15 @@ wird diese ersetzt.
 
 Definition:
 
-    $ref = Quiq::Perl->setSubroutine('My::Class',m=>sub {...});
+  $ref = Quiq::Perl->setSubroutine('My::Class',m=>sub {...});
 
 Aufruf:
 
-    My::Class->m(...);
+  My::Class->m(...);
 
 oder
 
-    $ref->(...);
+  $ref->(...);
 
 =cut
 
@@ -1461,7 +1461,7 @@ sub setSubroutine {
 
 =head4 Synopsis
 
-    $ref = $this->getSubroutine($package,$name);
+  $ref = $this->getSubroutine($package,$name);
 
 =head4 Description
 
@@ -1491,7 +1491,7 @@ sub getSubroutine {
 
 =head4 Synopsis
 
-    @paths|$pathA = $class->basicIncPaths;
+  @paths|$pathA = $class->basicIncPaths;
 
 =head4 Description
 
@@ -1526,7 +1526,7 @@ sind I<nicht> enthalten.
 
 Die Liste entspricht dem Ergebnis des Aufrufs
 
-    $ PERLLIB= PERL5LIB= perl -le 'print join "\n",@INC'
+  $ PERLLIB= PERL5LIB= perl -le 'print join "\n",@INC'
 
 =head4 See Also
 
@@ -1544,17 +1544,17 @@ L<incPaths|"incPaths() - Alle Modul-Suchpfade">()
 
 =head4 Example
 
-    Quiq::Perl->basicIncPaths;
-    ==>
-    /etc/perl
-    /usr/local/lib/x86_64-linux-gnu/perl/5.20.2
-    /usr/local/share/perl/5.20.2
-    /usr/lib/x86_64-linux-gnu/perl5/5.20
-    /usr/share/perl5
-    /usr/lib/x86_64-linux-gnu/perl/5.20
-    /usr/share/perl/5.20
-    /usr/local/lib/site_perl
-    .
+  Quiq::Perl->basicIncPaths;
+  ==>
+  /etc/perl
+  /usr/local/lib/x86_64-linux-gnu/perl/5.20.2
+  /usr/local/share/perl/5.20.2
+  /usr/lib/x86_64-linux-gnu/perl5/5.20
+  /usr/share/perl5
+  /usr/lib/x86_64-linux-gnu/perl/5.20
+  /usr/share/perl/5.20
+  /usr/local/lib/site_perl
+  .
 
 =cut
 
@@ -1579,7 +1579,7 @@ sub basicIncPaths {
 
 =head4 Synopsis
 
-    @paths|$pathA = $class->additionalIncPaths;
+  @paths|$pathA = $class->additionalIncPaths;
 
 =head4 Description
 
@@ -1624,7 +1624,7 @@ sub additionalIncPaths {
 
 =head4 Synopsis
 
-    @paths|$pathA = $class->incPaths;
+  @paths|$pathA = $class->incPaths;
 
 =head4 Description
 
@@ -1663,11 +1663,11 @@ sub incPaths {
 
 =head4 Synopsis
 
-    $pod = $this->getPod($file);
-    $pod = $this->getPod(\$text);
-    
-    ($pod,$encoding) = $this->getPod($file);
-    ($pod,$encoding) = $this->getPod(\$text);
+  $pod = $this->getPod($file);
+  $pod = $this->getPod(\$text);
+  
+  ($pod,$encoding) = $this->getPod($file);
+  ($pod,$encoding) = $this->getPod(\$text);
 
 =head4 Description
 
@@ -1718,8 +1718,8 @@ sub getPod {
 
 =head4 Synopsis
 
-    $this->getPodValues($file,@keyRef);
-    $this->getPodValues(\$text,@keyRef);
+  $this->getPodValues($file,@keyRef);
+  $this->getPodValues(\$text,@keyRef);
 
 =cut
 
@@ -1749,8 +1749,8 @@ sub getPodValues {
 
 =head4 Synopsis
 
-    $newCode = $this->removePod($code);
-    $this->removePod(\$code);
+  $newCode = $this->removePod($code);
+  $this->removePod(\$code);
 
 =head4 Description
 
@@ -1778,7 +1778,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

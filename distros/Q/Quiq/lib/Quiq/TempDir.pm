@@ -1,11 +1,11 @@
 package Quiq::TempDir;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use File::Temp ();
@@ -37,7 +37,7 @@ im String-Kontext automatisch zum Verzeichnis-Pfad.
 
 =head4 Synopsis
 
-    $dir = $class->new;
+  $dir = $class->new;
 
 =head4 Returns
 
@@ -61,7 +61,7 @@ sub new {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

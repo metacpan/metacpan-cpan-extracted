@@ -1,11 +1,11 @@
 package Quiq::SoapWsdlServiceCgi::Demo;
 use base qw/Quiq::SoapWsdlServiceCgi/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use POSIX ();
 
@@ -29,15 +29,15 @@ L<Quiq::SoapWsdlServiceCgi>
 
 =head4 Synopsis
 
-    $time = $class->serverTime;
+  $time = $class->serverTime;
 
 =head4 Wsdl
 
-    _RETURN $string
+  _RETURN $string
 
 =begin WSDL
 
-_RETURN $string
+  _RETURN $string
 
 =end WSDL
 
@@ -55,7 +55,7 @@ sub serverTime {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

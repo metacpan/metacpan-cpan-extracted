@@ -44,6 +44,6 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Mojo-WebSocketProxy/issues
   repository: git://github.com/binary-com/perl-Mojo-WebSocketProxy.git
-version: '0.12'
+version: '0.13'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -70,7 +70,7 @@ use NoNetworkHits;
         join("\n",
             'Issues on RT (https://rt.cpan.org/Public/Dist/Display.html?Name=DZT-Sample):',
             '  open: 48   stalled: 4',
-            'Issues on github (https://github.com/dude/project):',
+            'Issues and/or pull requests on github (https://github.com/dude/project/issues and https://github.com/dude/project/pulls):',
             '  open: 3',
             ''
         ),
@@ -116,7 +116,7 @@ use NoNetworkHits;
         join("\n",
             'Issues on RT (https://rt.cpan.org/Public/Dist/Display.html?Name=DZT-Sample):',
             '  open: 48   stalled: 4',
-            'Issues on github (https://github.com/anonymous/junk):',
+            'Issues and/or pull requests on github (https://github.com/anonymous/junk/issues and https://github.com/anonymous/junk/pulls):',
             '  open: 5',
             ''
         ),

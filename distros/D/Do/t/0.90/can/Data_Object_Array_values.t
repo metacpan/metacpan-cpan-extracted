@@ -25,7 +25,7 @@ container. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-values(Str $arg1) : ArrayObject
+values() : ArrayObject
 
 =type
 

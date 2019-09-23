@@ -1,10 +1,6 @@
 use 5.006;
-use strict;
-use warnings;
-use Test::More;
-
-#use Sub::Multi::Tiny::Util '*VERBOSE';
-#BEGIN { $VERBOSE = 99; }
+use lib::relative '.';
+use Kit;
 
 #---------------------------------------------------------------
 # Mixing positional and named parameters

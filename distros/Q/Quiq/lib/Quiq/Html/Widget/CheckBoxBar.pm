@@ -1,11 +1,11 @@
 package Quiq::Html::Widget::CheckBoxBar;
 use base qw/Quiq::Html::Widget/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Html::Widget::CheckBox;
 
@@ -89,7 +89,7 @@ aktiviert.
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Description
 
@@ -134,8 +134,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -202,7 +202,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

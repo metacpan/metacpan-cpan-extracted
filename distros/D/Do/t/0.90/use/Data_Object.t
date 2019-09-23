@@ -31,9 +31,50 @@ Development Framework
 This package aims to provide a modern Perl development framework and
 foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
-L<Data::Object::Config>.
+L<Data::Object::Config>, and offers the same functionality as the L<Do>
+package. Please see that documentation to learn more, or get started quickly by
+reviewing the L<"basic usage"|/convention> and L<"configurations"|/framework>,
+or the L<overview|https://github.com/iamalnewkirk/do/blob/master/OVERVIEW.md>
+and project L<wiki|https://github.com/iamalnewkirk/do/wiki>.
 
 =headers
+
+
++=head1 OVERVIEW
+
+The following describes this distribution in a few key points:
+
++=over 4
+
++=item *
+
+It enables advanced object-orientation
+
++=item *
+
+It provides a pluggable standard library (of sorts)
+
++=item *
+
+It enables sane defaults on import (strict, warnings, say, etc)
+
++=item *
+
+It enables calling methods on native data types
+
++=item *
+
+It enables type-constrainable class attributes and subroutine signatures
+
++=item *
+
+It enables user-defined type libraries with simple syntax
+
++=item *
+
+It's all modular; i.e. use as much, or as little, as is needed
+
++=back
 
 +=head1 CONVENTION
 
@@ -137,9 +178,25 @@ class we just created.
 
 +=head1 FRAMEWORK
 
-Do (aka Data-Object) is a robust modern Perl development framework, embracing
-Perl's multi-paradigm programming nature, flexibility and vast ecosystem that
-many engineers already know and love.
+The Data-Object framework is a robust modern Perl development framework,
+embracing Perl's multi-paradigm programming nature, flexibility and vast
+ecosystem that many engineers already know and love.
+
++=head2 keywords
+
+  package main;
+
+  use Do;
+
+  raise 'Oops';
+
+  1;
+
+
+The framework automatically makes the following short list of new keyword
+functions available to the calling package: C<cast>, C<const>, C<do>,
+C<is_false>, C<is_true>, C<false>, C<true>, and C<raise>. Please see
+L<Data::Object::Export> for details on each keyword function.
 
 +=head2 core
 

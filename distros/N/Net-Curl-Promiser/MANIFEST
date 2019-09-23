@@ -1,0 +1,19 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+examples/anyevent.pl
+examples/epoll.pl
+examples/select.pl
+lib/Net/Curl/Promiser.pm
+lib/Net/Curl/Promiser/AnyEvent.pm
+lib/Net/Curl/Promiser/Select.pm
+t/Net-Curl-Promiser-AnyEvent.t
+t/Net-Curl-Promiser-Select.t
+t/lib/ClientTest.pm
+t/lib/MyServer.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,7 +7,7 @@ no indirect;
 
 use Mojo::Util qw(class_to_path);
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 our %CLASSES = ();
 

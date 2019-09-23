@@ -8,7 +8,10 @@ use List::Util qw( min max sum0 );
 
 my $input_file = shift || die "Usage: perl $0 /some/file.txt\n";
 
-my $opinion = Lingua::EN::Opinion->new( file => $input_file );
+my $opinion = Lingua::EN::Opinion->new(
+    file => $input_file,
+    stem => 1,
+);
 $opinion->analyze();
 
 my %score;
@@ -17,23 +20,31 @@ my %score;
 my $min = min( @{ $opinion->scores } );
 my $max = max( @{ $opinion->scores } );
 
-print "Most positive sentences:\n";
+my $i = 0;
+
+print "Most positive sentences ($max):\n";
 for my $sentence ( map { [ $score{$_} => $_ ] } @{ $opinion->sentences } ) {
     next unless $sentence->[0] == $max;
-    print "\t$sentence->[1]\n";
+    $i++;
+    print "\t$i. $sentence->[1]\n";
 }
 print "\n";
-print "Most negative sentences:\n";
+
+$i = 0;
+print "Most negative sentences ($min):\n";
 for my $sentence ( map { [ $score{$_} => $_ ] } @{ $opinion->sentences } ) {
     next unless $sentence->[0] == $min;
-    print "\t$sentence->[1]\n";
+    $i++;
+    print "\t$i. $sentence->[1]\n";
 }
 print "\n";
 print 'Total sentence score: ', sum0( @{ $opinion->scores } ), "\n";
 print 'Total number of sentences: ', scalar( @{ $opinion->sentences } ), "\n";
 print 'Average sentence score: ', mean( @{ $opinion->scores } ), "\n";
 
-printf "known: %d, unknown: %d, known/total: %.2f\n",
+printf "Known: %d, Unknown: %d, Known/Total: %.2f\n",
     $opinion->familiarity->{known},
     $opinion->familiarity->{unknown},
     $opinion->ratio;
+
+printf "Weighted score: %.4f\n", mean( @{ $opinion->scores } ) * $opinion->ratio;

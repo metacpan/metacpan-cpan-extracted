@@ -9,23 +9,18 @@ get '/foo' => sub {
   my $c = shift;
   Mojo::IOLoop->timer(0.1 => sub { $c->render(text => 'foo') });
 };
-my @original_subscribers = message_subscribers();
-is @original_subscribers, 1, 'original message subscriber';
 
+my $n_original_subscribers = n_message_subscribers();
 plugin syslog => {only_syslog => 1};
-is_deeply [message_subscribers()], \@original_subscribers,
-  'syslog not activated';
+is n_message_subscribers(), $n_original_subscribers, 'syslog not activated';
 
 app->mode('live');
 plugin syslog => {};
-my @both_subscribers = message_subscribers();
-is @both_subscribers, 2, 'syslog and original subscribed';
-isnt $both_subscribers[-1], $original_subscribers[-1], 'syslog is second';
+is n_message_subscribers(), 2, 'syslog and original subscribed';
 
 plugin syslog => {only_syslog => 1};
-my @only_syslog = message_subscribers();
-is @only_syslog, 1, 'only syslog subscribed';
-is $only_syslog[0], $both_subscribers[-1], 'syslog is first';
+my $n_only_syslog = n_message_subscribers();
+is $n_only_syslog, 1, 'only syslog subscribed';
 
 my @log;
 app->log->level('debug');
@@ -52,6 +47,6 @@ like $log[-1][1], qr|^GET "/foo" \(\w+\) 200 OK \(\d+\.?\d*s\)$|, 'access log'
 
 done_testing;
 
-sub message_subscribers {
-  return @{app->log->subscribers('message')};
+sub n_message_subscribers {
+  return int @{app->log->subscribers('message')};
 }

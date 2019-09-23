@@ -6,7 +6,7 @@ use strict;
 use 5.010001;
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_number );
+use Term::Choose::Util qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
@@ -557,6 +557,7 @@ sub limit_offset {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my @pre = ( undef, $sf->{i}{ok} );
     $sql->{limit_stmt}  = '';
     $sql->{offset_stmt} = '';
@@ -586,8 +587,8 @@ sub limit_offset {
             $sql->{limit_stmt} = " LIMIT";
             $ax->print_sql( $sql );
             # Choose_a_number
-            my $limit = choose_a_number( $digits,
-                { name => 'LIMIT: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0, hide_cursor => 0 }
+            my $limit = $tu->choose_a_number( $digits,
+                { current_selection_label => 'LIMIT: ' }
             );
             if ( ! defined $limit ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};
@@ -604,8 +605,8 @@ sub limit_offset {
             $sql->{offset_stmt} = " OFFSET";
             $ax->print_sql( $sql );
             # Choose_a_number
-            my $offset = choose_a_number( $digits,
-                { name => 'OFFSET: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0, hide_cursor => 0 }
+            my $offset = $tu->choose_a_number( $digits,
+                { current_selection_label => 'OFFSET: ' }
             );
             if ( ! defined $offset ) {
                 ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @bu};

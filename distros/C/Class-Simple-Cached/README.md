@@ -4,7 +4,7 @@ Class::Simple::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.01
+Version 0.03
 
 # SYNOPSIS
 
@@ -20,11 +20,11 @@ for example by changing its state.
 
 Creates a Class::Simple::Cached object.
 
-It takes one manadatory parameter: cache,
+It takes one mandatory parameter: cache,
 which is an object which understands get() and set() calls,
 such as an [CHI](https://metacpan.org/pod/CHI) object.
 
-It takes one optional argument: super,
+It takes one optional argument: object,
 which is an object which is taken to be the object to be cached.
 If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class::Simple) is instantiated
 and that is used.
@@ -34,6 +34,8 @@ and that is used.
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
+
+Doesn't work with [Memoize](https://metacpan.org/pod/Memoize).
 
 Please report any bugs or feature requests to `bug-class-simple-cached at rt.cpan.org`,
 or through the web interface at
@@ -72,6 +74,12 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019 Nigel Horne.
+Author Nigel Horne: `njh@bandsman.co.uk`
+Copyright (C) 2019, Nigel Horne
 
-This program is released under the following licence: GPL2
+Usage is subject to licence terms.
+The licence terms of this software are as follows:
+Personal single user, single computer use: GPL2
+All other users (including Commercial, Charity, Educational, Government)
+must apply in writing for a licence for use from Nigel Horne at the
+above e-mail.

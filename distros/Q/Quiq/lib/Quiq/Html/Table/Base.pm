@@ -1,11 +1,11 @@
 package Quiq::Html::Table::Base;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ Wert des width-Attributs der Tabelle.
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Description
 
@@ -126,8 +126,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h,$body);
-    $html = $class->html($h,$body,@keyVal);
+  $html = $e->html($h,$body);
+  $html = $class->html($h,$body,@keyVal);
 
 =head4 Arguments
 
@@ -197,7 +197,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
 # Output as Format: read from stdin and output it as code in the given format
 # https://github.com/sshaw/output-as-format
 #
-# Based of of copy-as-format for Emacs: https://github.com/sshaw/copy-as-format
+# Based off copy-as-format for Emacs: https://github.com/sshaw/copy-as-format
 #
 # Copyright (c) 2017 Skye Shaw
 #
@@ -18,10 +18,13 @@ use warnings;
 use Getopt::Std;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub HELP_MESSAGE {
     my $out = shift;
+    # Not yet
+    #  -perl     Same as -l perl
+
     print $out <<USAGE
 usage: oaf [-mps] [-f format] [-l lang]
 Output stdin as code in the given format
@@ -45,6 +48,11 @@ sub html_escape {
   my %escapes = ('&' => '&amp;', '<' => '&lt;');
 
   $$text =~ s/[&<]/$escapes{$&}/eg;
+}
+
+sub indent {
+  my ($text, $n) = @_;
+  $$text =~ s/^/' ' x $n/gme;
 }
 
 sub disqus {
@@ -95,7 +103,7 @@ sub markdown {
   my ($snippet, $multiline) = @_;
 
   if ($multiline) {
-    $snippet =~ s/^/' ' x 4/gme;
+    indent(\$snippet, 4);
     print $snippet;
   }
   else {
@@ -110,6 +118,44 @@ sub mediawiki {
   $markup .= ' inline' unless $multiline;
   $markup .= sprintf ">\n%s</syntaxhighlight>", $snippet;
   print $markup;
+}
+
+sub orgmode {
+  my ($snippet, $multiline, $lang) = @_;
+
+  if ($multiline) {
+    printf "#+BEGIN_SRC %s\n%s\n#+END_SRC\n", $lang || '', $snippet;
+  }
+  else {
+    # Cannot escape '~' within Org-mode's code formatting
+    # entities and empty space don't work.
+    printf '~%s~', $snippet;
+  }
+}
+
+sub pod {
+  my ($snippet, $multiline, $lang) = @_;
+
+  if ($multiline) {
+    indent(\$snippet, 2);
+    print $snippet;
+  }
+  else {
+    $snippet =~ s/<</E<lt>E<lt>/g;
+    printf 'C<< %s >>', $snippet;
+  }
+}
+
+sub rst {
+  my ($snippet, $multiline, $lang) = @_;
+
+  if ($multiline) {
+    indent(\$snippet, 4);
+    printf ".. code::\n\n%s\n", $snippet;
+  }
+  else {
+    printf '``%s``', $snippet;
+  }
 }
 
 sub slack {
@@ -133,15 +179,17 @@ my %formats = (bitbucket => \&github,
                jira      => \&jira,
                markdown  => \&markdown,
                mediawiki => \&mediawiki,
+               orgmode   => \&orgmode,
+               pod       => \&pod,
+               rst       => \&rst,
                slack     => \&slack);
 
 HELP_MESSAGE(*STDERR) && exit 1 unless getopts('f:ml:ps', \%options);
 
 if ($options{p}) {
-  local $,=', ';
   local $\= "\n";
 
-  print sort keys %formats;
+  print for sort keys %formats;
 
   exit;
 }

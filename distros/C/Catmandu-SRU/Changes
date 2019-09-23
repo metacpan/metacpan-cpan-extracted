@@ -1,5 +1,8 @@
 Revision history for Catmandu-SRU
 
+0.425  2019-09-20 10:11:50 CEST
+  - add missing dependencies
+
 0.424  2019-08-26 13:59:52 CEST
   - remove the picaxml parser (now part of Catmandu-PICA)
 

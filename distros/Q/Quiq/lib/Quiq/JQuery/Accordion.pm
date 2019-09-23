@@ -1,11 +1,11 @@
 package Quiq::JQuery::Accordion;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 
@@ -64,32 +64,32 @@ L<Accordion Widget Beispiele|http://jqueryui.com/accordion/>
 
 Perl:
 
-    $html = Quiq::JQuery::Accordion->html($h,
-        id => 'accordion',
-        tabs => [{
-                label => 'A',
-                link => 'a',
-            },{
-                label => 'B',
-                content => $h->tag('p',
-                    -text => 1,
-                    'Text des Reiters B',
-                ),
-        }],
-    );
+  $html = Quiq::JQuery::Accordion->html($h,
+      id => 'accordion',
+      tabs => [{
+              label => 'A',
+              link => 'a',
+          },{
+              label => 'B',
+              content => $h->tag('p',
+                  -text => 1,
+                  'Text des Reiters B',
+              ),
+      }],
+  );
 
 HTML:
 
-    <div id="accordion">
-      <h3><a href="a">A</a></h3>
-      <div></div>
-      <h3>B</h3>
-      <div>
-        <p>
-          Text des Reiters B
-        </p>
-      </div>
+  <div id="accordion">
+    <h3><a href="a">A</a></h3>
+    <div></div>
+    <h3>B</h3>
+    <div>
+      <p>
+        Text des Reiters B
+      </p>
     </div>
+  </div>
 
 =head1 METHODS
 
@@ -99,7 +99,7 @@ HTML:
 
 =head4 Synopsis
 
-    $obj = $class->new(@keyVal);
+  $obj = $class->new(@keyVal);
 
 =head4 Description
 
@@ -132,8 +132,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $obj->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $obj->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -188,7 +188,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

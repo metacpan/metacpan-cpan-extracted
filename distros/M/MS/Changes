@@ -1,5 +1,18 @@
 Revision history for MS
 
+0.204001 2019-09-20
+        Yet another attempt to address versioning inconsistency
+
+0.204   2019-09-20
+        Un-fix versioning regression issue -- use same version for all modules
+
+0.008002 2019-09-20
+        Fix inconsistent versioning between modules
+        Fix missing return value in MS::Reader::MzXML
+
+0.008001 2019-09-20
+        Fixed missing List::MoreUtils dependency in Build.PL
+
 0.008    2019-09-18
         Fixed incomplete parsing of MzIdentML SequenceCollection children
         Full POD coverage, added pod-coverage.t

@@ -1,11 +1,11 @@
 package Quiq::Ssh;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -35,18 +35,18 @@ SSH Netzprotokoll direkt spricht.
 Sollte es bei der Installation von Net::SSH::Perl in
 Crypt::Curve25519 zu dem Fehler kommen
 
-    curve25519-donna-c64.c:99:1: error: conflicting types for ‘fmul’
-     fmul(felem output, const felem in2, const felem in) {
-     ^~~~
-    In file included from /home/fs2/sys/opt/perlbrew/perls/perl-5.30.0/lib/5.30.0/x86_64-linux/CORE/perl.h:2068,
-                     from Curve25519.xs:3:
-    /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:30:20: note: previous declaration of ‘fmul’ was here
-     __MATHCALL_NARROW (__MATHCALL_NAME (mul), __MATHCALL_REDIR_NAME (mul), 2);
-                ^~~~~~~~~~~~~~~
+  curve25519-donna-c64.c:99:1: error: conflicting types for ‘fmul’
+   fmul(felem output, const felem in2, const felem in) {
+   ^~~~
+  In file included from /home/fs2/sys/opt/perlbrew/perls/perl-5.30.0/lib/5.30.0/x86_64-linux/CORE/perl.h:2068,
+                   from Curve25519.xs:3:
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:30:20: note: previous declaration of ‘fmul’ was here
+   __MATHCALL_NARROW (__MATHCALL_NAME (mul), __MATHCALL_REDIR_NAME (mul), 2);
+              ^~~~~~~~~~~~~~~
 
 kann dieser mit
 
-    $ grep -rl "fmul" ./ | xargs sed -i 's/fmul/fixedvar/g'
+  $ grep -rl "fmul" ./ | xargs sed -i 's/fmul/fixedvar/g'
 
 behoben werden. Siehe: L<https://github.com/ajgb/crypt-curve25519/issues/9#issuecomment-447845725>
 
@@ -54,7 +54,7 @@ behoben werden. Siehe: L<https://github.com/ajgb/crypt-curve25519/issues/9#issue
 
 Zeige Inhalt des Homeverzeichnisses auf Host dssp an:
 
-    $ perl -MQuiq::Ssh -E 'print Quiq::Ssh->new("dssp")->exec("ls")'
+  $ perl -MQuiq::Ssh -E 'print Quiq::Ssh->new("dssp")->exec("ls")'
 
 =head1 METHODS
 
@@ -64,7 +64,7 @@ Zeige Inhalt des Homeverzeichnisses auf Host dssp an:
 
 =head4 Synopsis
 
-    $ssh = $class->new($host,@opt);
+  $ssh = $class->new($host,@opt);
 
 =head4 Arguments
 
@@ -154,8 +154,8 @@ sub new {
 
 =head4 Synopsis
 
-    ($stdout,$stderr) = $ssh->exec($cmd,@opt);
-    ($stdout,$stderr,$exit) = $ssh->exec($cmd,-sloppy=>1,@opt);
+  ($stdout,$stderr) = $ssh->exec($cmd,@opt);
+  ($stdout,$stderr,$exit) = $ssh->exec($cmd,-sloppy=>1,@opt);
 
 =head4 Arguments
 
@@ -244,7 +244,7 @@ sub exec {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

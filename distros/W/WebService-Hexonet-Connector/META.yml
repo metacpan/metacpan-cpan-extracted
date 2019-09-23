@@ -3,12 +3,9 @@ abstract: 'Connector library for the insanely fast L<HEXONET Backend API|https:/
 author:
   - 'hexonet <middleware@hexonet.net>'
 build_requires:
-  CPAN::Uploader: '0.103013'
   Config: '0'
-  Devel::Cover: '1.3'
   ExtUtils::MakeMaker: '0'
   POSIX: '0'
-  Perl::Critic: '1.132'
   Readonly: '2.05'
   Scalar::Util: '0'
   Test::Exception: '0.43'
@@ -42,5 +39,5 @@ requires:
   perl: '5.026000'
   utf8: '0'
   version: '0.9917'
-version: v2.2.3
+version: v2.2.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

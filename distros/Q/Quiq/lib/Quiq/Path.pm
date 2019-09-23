@@ -4,12 +4,12 @@ BEGIN {
 }
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -55,7 +55,7 @@ Eine Dateisystem-Operation ist eine Operation auf einem I<Pfad>.
 
 =head4 Synopsis
 
-    $p = $class->new;
+  $p = $class->new;
 
 =head4 Returns
 
@@ -85,7 +85,7 @@ sub new {
 
 =head4 Synopsis
 
-    $this->append($file,$data,@opt);
+  $this->append($file,$data,@opt);
 
 =head4 Arguments
 
@@ -130,8 +130,8 @@ sub append {
 
 =head4 Synopsis
 
-    $this->checkFileSecurity($file); # nur Owner darf schreiben und lesen
-    $this->checkFileSecurity($file,$readableByOthers); # nur Owner darf schreiben
+  $this->checkFileSecurity($file); # nur Owner darf schreiben und lesen
+  $this->checkFileSecurity($file,$readableByOthers); # nur Owner darf schreiben
 
 =head4 Arguments
 
@@ -196,7 +196,7 @@ sub checkFileSecurity {
 
 =head4 Synopsis
 
-    $bool = $class->compare($file1,$file2);
+  $bool = $class->compare($file1,$file2);
 
 =head4 Description
 
@@ -225,7 +225,7 @@ sub compare {
 
 =head4 Synopsis
 
-    $bool = $class->compareData($file,$data);
+  $bool = $class->compareData($file,$data);
 
 =head4 Alias
 
@@ -264,7 +264,7 @@ sub compareData {
 
 =head4 Synopsis
 
-    $class->copy($srcPath,$destPath,@opt);
+  $class->copy($srcPath,$destPath,@opt);
 
 =head4 Options
 
@@ -364,7 +364,7 @@ sub copy {
 
 =head4 Synopsis
 
-    $class->copyToDir($srcFile,$destDir,@opt);
+  $class->copyToDir($srcFile,$destDir,@opt);
 
 =head4 Options
 
@@ -415,7 +415,7 @@ sub copyToDir {
 
 =head4 Synopsis
 
-    $class->duplicate($method,$srcPath,$destPath,@opt);
+  $class->duplicate($method,$srcPath,$destPath,@opt);
 
 =head4 Options
 
@@ -433,10 +433,10 @@ relevant).
 Mache Datei $srcPath nach Methode $method unter $destPath verfügbar.
 Werte für $method:
 
-    copy
-    move -or- rename
-    link
-    symlink
+  copy
+  move -or- rename
+  link
+  symlink
 
 =cut
 
@@ -486,7 +486,7 @@ sub duplicate {
 
 =head4 Synopsis
 
-    $changed = $this->edit($file,@opt);
+  $changed = $this->edit($file,@opt);
 
 =head4 Arguments
 
@@ -552,7 +552,7 @@ sub edit {
 
 =head4 Synopsis
 
-    $encoding = $class->encoding($path,$altEncoding);
+  $encoding = $class->encoding($path,$altEncoding);
 
 =head4 Description
 
@@ -614,7 +614,7 @@ sub encoding {
 
 =head4 Synopsis
 
-    $class->link($path,$link);
+  $class->link($path,$link);
 
 =head4 Description
 
@@ -646,7 +646,7 @@ sub link {
 
 =head4 Synopsis
 
-    $nl = $class->newlineStr($file);
+  $nl = $class->newlineStr($file);
 
 =head4 Description
 
@@ -656,12 +656,12 @@ liefere undef.
 
 =head4 Example
 
-    local $/ = Quiq::Path->newlineStr($file);
-    
-    while (<$fh>) {
-        chomp;
-        # Zeile verarbeiten
-    }
+  local $/ = Quiq::Path->newlineStr($file);
+  
+  while (<$fh>) {
+      chomp;
+      # Zeile verarbeiten
+  }
 
 =cut
 
@@ -700,7 +700,7 @@ sub newlineStr {
 
 =head4 Synopsis
 
-    $file = $this->nextFile($name,$n,$ext);
+  $file = $this->nextFile($name,$n,$ext);
 
 =head4 Arguments
 
@@ -725,7 +725,7 @@ Extension der Datei.
 Ermittele und liefere den nächsten Namen einer Datei. Der Dateiname
 hat den Aufbau
 
-    NAME-NNNN.EXT
+  NAME-NNNN.EXT
 
 Die laufende Nummer NNNN (deren Breite durch den zweiten Parameter
 festgelegt) wird anhand der vorhandenen Dateien im Dateisystem
@@ -735,15 +735,15 @@ ermittelt und um 1 erhöht.
 
 Es liegt noch keine Datei vor:
 
-    $file = Quiq::Path->nextFile('myfile',3,'log');
-    =>
-    myfile-001.log
+  $file = Quiq::Path->nextFile('myfile',3,'log');
+  =>
+  myfile-001.log
 
 Die Datei mit der höchsten Nummer ist myfile-031.log:
 
-    $file = Quiq::Path->nextFile('myfile',3,'log');
-    =>
-    myfile-032.log
+  $file = Quiq::Path->nextFile('myfile',3,'log');
+  =>
+  myfile-032.log
 
 =cut
 
@@ -766,7 +766,7 @@ sub nextFile {
 
 =head4 Synopsis
 
-    $data = $class->read($file,@opt);
+  $data = $class->read($file,@opt);
 
 =head4 Options
 
@@ -878,7 +878,7 @@ sub read {
 
 =head4 Synopsis
 
-    $this->truncate($file);
+  $this->truncate($file);
 
 =head4 Arguments
 
@@ -916,8 +916,8 @@ sub truncate {
 
 =head4 Synopsis
 
-    $file = $this->tempFile(@opt);
-    $file = $this->tempFile($data,@opt);
+  $file = $this->tempFile(@opt);
+  $file = $this->tempFile($data,@opt);
 
 =head4 Arguments
 
@@ -961,7 +961,7 @@ sub tempFile {
 
 =head4 Synopsis
 
-    $this->unindent($file);
+  $this->unindent($file);
 
 =head4 Arguments
 
@@ -1002,9 +1002,9 @@ sub unindent {
 
 =head4 Synopsis
 
-    $class->write($file); # leere Datei
-    $class->write($file,$data,@opt);
-    $class->write($file,\$data,@opt);
+  $class->write($file); # leere Datei
+  $class->write($file,$data,@opt);
+  $class->write($file,\$data,@opt);
 
 =head4 Options
 
@@ -1145,7 +1145,7 @@ sub write {
 
 =head4 Synopsis
 
-    $class->writeIfDifferent($file,$data);
+  $class->writeIfDifferent($file,$data);
 
 =cut
 
@@ -1170,10 +1170,10 @@ sub writeIfDifferent {
 
 =head4 Synopsis
 
-    $class->writeInline($file,<<'__EOT__',@opt);
-    DATA
-    ...
-    __EOT__
+  $class->writeInline($file,<<'__EOT__',@opt);
+  DATA
+  ...
+  __EOT__
 
 =cut
 
@@ -1197,7 +1197,7 @@ sub writeInline {
 
 =head4 Synopsis
 
-    $n = $this->count($dir);
+  $n = $this->count($dir);
 
 =head4 Arguments
 
@@ -1244,7 +1244,7 @@ sub count {
 
 =head4 Synopsis
 
-    @paths | $pathA = $this->entries($dir,@opt);
+  @paths | $pathA = $this->entries($dir,@opt);
 
 =head4 Arguments
 
@@ -1315,7 +1315,7 @@ sub entries {
 
 =head4 Synopsis
 
-    @paths|$pathA = $class->find($path,@opt);
+  @paths|$pathA = $class->find($path,@opt);
 
 =head4 Options
 
@@ -1551,8 +1551,8 @@ sub find {
 
 =head4 Synopsis
 
-    $path = $class->findProgram($program);
-    $path = $class->findProgram($program,$sloppy);
+  $path = $class->findProgram($program);
+  $path = $class->findProgram($program,$sloppy);
 
 =head4 Arguments
 
@@ -1604,7 +1604,7 @@ sub findProgram {
 
 =head4 Synopsis
 
-    $max = $class->maxFilename($dir);
+  $max = $class->maxFilename($dir);
 
 =head4 Description
 
@@ -1638,7 +1638,7 @@ sub maxFilename {
 
 =head4 Synopsis
 
-    $max = $class->maxFileNumber($dir,@opt);
+  $max = $class->maxFileNumber($dir,@opt);
 
 =head4 Options
 
@@ -1708,7 +1708,7 @@ sub maxFileNumber {
 
 =head4 Synopsis
 
-    $class->mkdir($dir,@opt);
+  $class->mkdir($dir,@opt);
 
 =head4 Options
 
@@ -1830,7 +1830,7 @@ sub mkdir {
 
 =head4 Synopsis
 
-    $class->rmdir($dir);
+  $class->rmdir($dir);
 
 =head4 Arguments
 
@@ -1875,7 +1875,7 @@ sub rmdir {
 
 =head4 Synopsis
 
-    $dir = $this->tempDir(@opt);
+  $dir = $this->tempDir(@opt);
 
 =head4 Returns
 
@@ -1913,7 +1913,7 @@ sub tempDir {
 
 =head4 Synopsis
 
-    $absolutePath = $class->absolute($path);
+  $absolutePath = $class->absolute($path);
 
 =head4 Alias
 
@@ -1946,7 +1946,7 @@ sub absolute {
 
 =head4 Synopsis
 
-    $duration = $this->age($path);
+  $duration = $this->age($path);
 
 =head4 Arguments
 
@@ -1992,7 +1992,7 @@ sub age {
 
 =head4 Synopsis
 
-    $basename = $class->basename($path,@opt);
+  $basename = $class->basename($path,@opt);
 
 =head4 Alias
 
@@ -2049,7 +2049,7 @@ sub basename {
 
 =head4 Synopsis
 
-    $class->chmod($path,$mode);
+  $class->chmod($path,$mode);
 
 =head4 Description
 
@@ -2079,7 +2079,7 @@ sub chmod {
 
 =head4 Synopsis
 
-    $class->delete($path);
+  $class->delete($path);
 
 =head4 Description
 
@@ -2134,7 +2134,7 @@ sub delete {
 
 =head4 Synopsis
 
-    $bool = $this->exists($path);
+  $bool = $this->exists($path);
 
 =head4 Description
 
@@ -2156,7 +2156,7 @@ sub exists {
 
 =head4 Synopsis
 
-    $path = $class->expandTilde($path);
+  $path = $class->expandTilde($path);
 
 =head4 Returns
 
@@ -2195,7 +2195,7 @@ sub expandTilde {
 
 =head4 Synopsis
 
-    $ext = $class->extension($path);
+  $ext = $class->extension($path);
 
 =head4 Description
 
@@ -2217,7 +2217,7 @@ sub extension {
 
 =head4 Synopsis
 
-    $newPath = $this->newExtension($path,$ext);
+  $newPath = $this->newExtension($path,$ext);
 
 =head4 Description
 
@@ -2246,7 +2246,7 @@ sub newExtension {
 
 =head4 Synopsis
 
-    $filename = $class->filename($path);
+  $filename = $class->filename($path);
 
 =head4 Description
 
@@ -2268,8 +2268,8 @@ sub filename {
 
 =head4 Synopsis
 
-    $path = $this->glob($pat);
-    @paths = $this->glob($pat);
+  $path = $this->glob($pat);
+  @paths = $this->glob($pat);
 
 =head4 Description
 
@@ -2312,7 +2312,7 @@ sub glob {
 
 =head4 Synopsis
 
-    $bool = $class->isEmpty($path);
+  $bool = $class->isEmpty($path);
 
 =cut
 
@@ -2350,7 +2350,7 @@ sub isEmpty {
 
 =head4 Synopsis
 
-    $mode = $this->mode($path);
+  $mode = $this->mode($path);
 
 =head4 Description
 
@@ -2364,16 +2364,16 @@ Liefere die Zugriffsrechte des Pfads $path.
 
 Permissions oktal anzeigen
 
-    printf "%04o\n",Quiq::Path->mode('/etc/passwd');
-    0644
+  printf "%04o\n",Quiq::Path->mode('/etc/passwd');
+  0644
 
 =item *
 
 Prüfen, ob eine Datei für andere lesbar oder schreibbar ist
 
-    if ($mode & 00066) {
-        die "ERROR: File ist readable or writable for others\n";
-    }
+  if ($mode & 00066) {
+      die "ERROR: File ist readable or writable for others\n";
+  }
 
 =back
 
@@ -2403,8 +2403,8 @@ sub mode {
 
 =head4 Synopsis
 
-    $mtime = $class->mtime($path);
-    $mtime = $class->mtime($path,$mtime);
+  $mtime = $class->mtime($path);
+  $mtime = $class->mtime($path,$mtime);
 
 =head4 Description
 
@@ -2451,7 +2451,7 @@ sub mtime {
 
 =head4 Synopsis
 
-    $bool = $class->newer($path1,$path2);
+  $bool = $class->newer($path1,$path2);
 
 =head4 Description
 
@@ -2491,7 +2491,7 @@ sub newer {
 
 =head4 Synopsis
 
-    $path = $class->readlink($symlinkPath);
+  $path = $class->readlink($symlinkPath);
 
 =head4 Alias
 
@@ -2529,7 +2529,7 @@ sub readlink {
 
 =head4 Synopsis
 
-    $newPath = $class->removeExtension($path);
+  $newPath = $class->removeExtension($path);
 
 =head4 Description
 
@@ -2553,7 +2553,7 @@ sub removeExtension {
 
 =head4 Synopsis
 
-    $class->rename($oldPath,$newPath,@opt);
+  $class->rename($oldPath,$newPath,@opt);
 
 =head4 Options
 
@@ -2582,10 +2582,10 @@ Wert zurück.
 Zielpfad erzeugen, Quellpfad entfernen mit -recursive=>1.
 Ausgangslage: Unterhalb von /tmp existieren weder a noch x.
 
-    my $srcPath = '/tmp/a/b/c/d/f';
-    my $destPath = '/tmp/x/b/c/d/f';
-    Quiq::Path->write($srcPath,'',-recursive=>1);
-    Quiq::Path->rename($srcPath,$destPath,-recursive=>1);
+  my $srcPath = '/tmp/a/b/c/d/f';
+  my $destPath = '/tmp/x/b/c/d/f';
+  Quiq::Path->write($srcPath,'',-recursive=>1);
+  Quiq::Path->rename($srcPath,$destPath,-recursive=>1);
 
 Nach Ausführung existiert der der Pfad /tmp/x/b/c/d/f, aber der Pfad
 /tmp/a nicht mehr.
@@ -2656,7 +2656,7 @@ sub rename {
 
 =head4 Synopsis
 
-    ($dir,$file,$base,$ext) = $class->split($path);
+  ($dir,$file,$base,$ext) = $class->split($path);
 
 =head4 Description
 
@@ -2691,7 +2691,7 @@ sub split {
 
 =head4 Synopsis
 
-    @arr = $class->%METHOD($path);
+  @arr = $class->%METHOD($path);
 
 =head4 Arguments
 
@@ -2714,7 +2714,7 @@ Information als 13-elementige Liste zurück.
 
 Der Aufruf ist äquivalent zu
 
-    stat $path
+  stat $path
 
 mit dem Unterschied, dass
 
@@ -2764,7 +2764,7 @@ sub stat {
 
 =head4 Synopsis
 
-    $class->symlink($path,$symlink);
+  $class->symlink($path,$symlink);
 
 =head4 Description
 
@@ -2808,7 +2808,7 @@ sub symlink {
 
 =head4 Synopsis
 
-    $class->symlinkRelative($path,$symlink,@opt);
+  $class->symlinkRelative($path,$symlink,@opt);
 
 =head4 Options
 
@@ -2841,17 +2841,17 @@ relativer Pfad als Fortsetzung von $symlink gesehen werden.
 
 =head4 Example
 
-    Quiq::Path->symlinkRelative('a','x')
-    # x => a
-    
-    Quiq::Path->symlinkRelative('a/b','x')
-    # x => a/b
-    
-    Quiq::Path->symlinkRelative('a/b','x/y')
-    # x/y => ../a/b
-    
-    Quiq::Path->symlinkRelative('a/b','x/y/z')
-    # x/y/z => ../../a/b
+  Quiq::Path->symlinkRelative('a','x')
+  # x => a
+  
+  Quiq::Path->symlinkRelative('a/b','x')
+  # x => a/b
+  
+  Quiq::Path->symlinkRelative('a/b','x/y')
+  # x/y => ../a/b
+  
+  Quiq::Path->symlinkRelative('a/b','x/y/z')
+  # x/y/z => ../../a/b
 
 =cut
 
@@ -2923,7 +2923,7 @@ sub symlinkRelative {
 
 =head4 Synopsis
 
-    $mtime = $this->mtime($path);
+  $mtime = $this->mtime($path);
 
 =head4 Arguments
 
@@ -2959,7 +2959,7 @@ sub touch {
 
 =head4 Synopsis
 
-    $uid = $this->%METHOD($path);
+  $uid = $this->%METHOD($path);
 
 =head4 Description
 
@@ -2978,7 +2978,7 @@ sub uid {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

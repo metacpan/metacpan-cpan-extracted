@@ -6,7 +6,7 @@ use strict;
 use 5.010001;
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( choose_a_subset choose_a_number settings_menu insert_sep );
+use Term::Choose::Util qw( insert_sep );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
@@ -124,11 +124,11 @@ sub input_filter {
 
 sub __empty_to_null {
     my ( $sf ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tmp = { empty_to_null => $sf->{empty_to_null} };
-    settings_menu(
+    $tu->settings_menu(
         [ [ 'empty_to_null', "  Empty fields to NULL", [ 'NO', 'YES' ] ] ],
-        $tmp,
-        { mouse => $sf->{o}{table}{mouse}, hide_cursor => 0 }
+        $tmp
     );
     $sf->{empty_to_null} = $tmp->{empty_to_null};
 }
@@ -173,13 +173,14 @@ sub __prepare_header_and_mark {
 
 sub __choose_columns {
     my ( $sf, $sql ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $aoa = $sql->{insert_into_args};
     my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
     # Choose
-    my $col_idx = choose_a_subset(
+    my $col_idx = $tu->choose_a_subset(
         $header,
-        { name => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, mouse => $sf->{o}{table}{mouse},
-          index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0, hide_cursor => 0 } # order
+        { current_selection_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1,
+          index => 1, confirm => $sf->{i}{ok}, back => '<<' } # order
     );
     if ( ! defined $col_idx ) {
         return;
@@ -410,11 +411,12 @@ sub __merge_rows {
 sub __split_table {
     my ( $sf, $sql, $waiting ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $aoa = $sql->{insert_into_args};
     # Choose
-    my $col_count = choose_a_number(
+    my $col_count = $tu->choose_a_number(
         length( scalar @{$aoa->[0]} ),
-        { name => 'Number columns new table: ', small_first => 1, hide_cursor => 0 }
+        { current_selection_label => 'Number columns new table: ', small_first => 1 }
     );
     if ( ! defined $col_count ) {
         return;
@@ -504,6 +506,7 @@ sub __search_and_replace {
     my ( $sf, $sql, $waiting ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
 
     SEARCH_AND_REPLACE: while ( 1 ) {
         my $mods = [ 'g', 'i', 'e', 'e' ];
@@ -571,10 +574,10 @@ sub __search_and_replace {
         my $aoa = $sql->{insert_into_args};
         my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
         # Choose
-        my $col_idx = choose_a_subset(
+        my $col_idx = $tu->choose_a_subset(
             $header,
-            { name => 'Columns: ', info => $info, layout => 0, all_by_default => 1, mouse => $sf->{o}{table}{mouse},
-              index => 1, confirm => $sf->{i}{ok}, back => '<<', clear_screen => 0, hide_cursor => 0 }
+            { current_selection_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1,
+              index => 1, confirm => $sf->{i}{ok}, back => '<<' }
         );
         if ( ! defined $col_idx ) {
             next SEARCH_AND_REPLACE;

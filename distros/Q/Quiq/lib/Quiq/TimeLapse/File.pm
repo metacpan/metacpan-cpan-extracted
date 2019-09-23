@@ -1,11 +1,11 @@
 package Quiq::TimeLapse::File;
 use base qw/Quiq::File::Image/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::TimeLapse::Filename;
 
@@ -23,32 +23,32 @@ L<Quiq::File::Image>
 
 =head1 SYNOPSIS
 
-    # Klasse laden
-    use %CLASS;
-    
-    # Instantiiere Bilddatei-Objekt
-    $img = Quiq::TimeLapse::File->new('/my/image/dir/000219-3000x2250-G0080108.jpg');
-    
-    # Nummer
-    $n = $img->number; # 219
-    
-    # Breite
-    $width = $img->width; # 3000
-    
-    # Höhe
-    $height = $img->height; # 2250
-    
-    # Name
-    $name = $img->name; # 'G0080108'
-    
-    # weitere Methoden siehe Basisklasse
+  # Klasse laden
+  use %CLASS;
+  
+  # Instantiiere Bilddatei-Objekt
+  $img = Quiq::TimeLapse::File->new('/my/image/dir/000219-3000x2250-G0080108.jpg');
+  
+  # Nummer
+  $n = $img->number; # 219
+  
+  # Breite
+  $width = $img->width; # 3000
+  
+  # Höhe
+  $height = $img->height; # 2250
+  
+  # Name
+  $name = $img->name; # 'G0080108'
+  
+  # weitere Methoden siehe Basisklasse
 
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert eine Bilddatei, die Teil
 einer Bildsequenz ist. Der Dateiname hat den Aufbau
 
-    NNNNNN-WIDTHxHEIGHT[-NAME].EXT
+  NNNNNN-WIDTHxHEIGHT[-NAME].EXT
 
 Hierbei ist NNNNNN die Bild-Nummer.
 
@@ -60,7 +60,7 @@ Hierbei ist NNNNNN die Bild-Nummer.
 
 =head4 Synopsis
 
-    $img = $class->new($file);
+  $img = $class->new($file);
 
 =head4 Arguments
 
@@ -110,7 +110,7 @@ L<BASE CLASS|"BASE CLASS">).
 
 =head4 Synopsis
 
-    $n = $img->number;
+  $n = $img->number;
 
 =head4 Returns
 
@@ -134,7 +134,7 @@ sub number {
 
 =head4 Synopsis
 
-    $width = $img->width;
+  $width = $img->width;
 
 =head4 Returns
 
@@ -159,7 +159,7 @@ sub width {
 
 =head4 Synopsis
 
-    $height = $img->height;
+  $height = $img->height;
 
 =head4 Returns
 
@@ -184,7 +184,7 @@ sub height {
 
 =head4 Synopsis
 
-    $text = $img->text;
+  $text = $img->text;
 
 =head4 Returns
 
@@ -206,7 +206,7 @@ sub text {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

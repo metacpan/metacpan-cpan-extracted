@@ -1,11 +1,11 @@
 package Quiq::ImagePool;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::ImagePool::Directory;
@@ -32,7 +32,7 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    $ipl = $class->new($path);
+  $ipl = $class->new($path);
 
 =head4 Arguments
 
@@ -67,8 +67,8 @@ sub new {
 
 =head4 Synopsis
 
-    $path = $ipl->root;
-    $path = $ipl->root($subPath);
+  $path = $ipl->root;
+  $path = $ipl->root($subPath);
 
 =head4 Description
 
@@ -80,9 +80,9 @@ hinzu.
 
 Mit Subpfad:
 
-    $ipl->root('cache');
-    =>
-    <POOLDIR>/cache
+  $ipl->root('cache');
+  =>
+  <POOLDIR>/cache
 
 =cut
 
@@ -108,7 +108,7 @@ sub root {
 
 =head4 Synopsis
 
-    $dir = $ipl->directory($name);
+  $dir = $ipl->directory($name);
 
 =head4 Arguments
 
@@ -155,7 +155,7 @@ sub directory {
 
 =head4 Synopsis
 
-    $path = $ipl->cacheFile($img,$op,@args);
+  $path = $ipl->cacheFile($img,$op,@args);
 
 =head4 Arguments
 
@@ -209,7 +209,7 @@ sub cacheFile {
 
 =head4 Synopsis
 
-    @images|$imageA = $ipl->images($key,@opt);
+  @images|$imageA = $ipl->images($key,@opt);
 
 =head4 Arguments
 
@@ -275,7 +275,7 @@ sub images {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

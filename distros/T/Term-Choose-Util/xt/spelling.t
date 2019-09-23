@@ -22,3 +22,7 @@ stackoverflow
 pwd
 dir
 de
+Dirs
+SpaceBar
+TUI
+DEPRECATIONS

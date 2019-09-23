@@ -1,11 +1,11 @@
 package Quiq::Http::Client;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::Url;
@@ -45,18 +45,18 @@ Siehe quiq-http-client
 
 =head2 GET-Request
 
-    my $msg = Quiq::Http::Client->get($url);
-    print $msg->asString;
+  my $msg = Quiq::Http::Client->get($url);
+  print $msg->asString;
 
 =head2 POST-Request
 
-    my $sMsg = Quiq::Http::Message->new(
-        contentType => 'text/plain',
-        contentLength => -1,
-        body => 'Dies ist ein Test',
-    );
-    my $rMsg = Quiq::Http::Client->put($url,$sMsg);
-    print $rMsg->asString;
+  my $sMsg = Quiq::Http::Message->new(
+      contentType => 'text/plain',
+      contentLength => -1,
+      body => 'Dies ist ein Test',
+  );
+  my $rMsg = Quiq::Http::Client->put($url,$sMsg);
+  print $rMsg->asString;
 
 =head1 METHODS
 
@@ -66,7 +66,7 @@ Siehe quiq-http-client
 
 =head4 Synopsis
 
-    $rMsg = $class->sendReceive($op,$url,$sMsg,@opt);
+  $rMsg = $class->sendReceive($op,$url,$sMsg,@opt);
 
 =head4 Arguments
 
@@ -213,7 +213,7 @@ sub sendReceive {
 
 =head4 Synopsis
 
-    $msg = $class->get($url,@opt);
+  $msg = $class->get($url,@opt);
 
 =head4 Arguments
 
@@ -261,7 +261,7 @@ sub get {
 
 =head4 Synopsis
 
-    $rMsg = $class->post($url,$sMsg,@opt);
+  $rMsg = $class->post($url,$sMsg,@opt);
 
 =head4 Arguments
 
@@ -299,7 +299,7 @@ sub post {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous::Magnet;
-$Lab::Moose::Sweep::Continuous::Magnet::VERSION = '3.682';
+$Lab::Moose::Sweep::Continuous::Magnet::VERSION = '3.690';
 #ABSTRACT: Continuous sweep of magnetic field
 
 
@@ -49,7 +49,7 @@ Lab::Moose::Sweep::Continuous::Magnet - Continuous sweep of magnetic field
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 SYNOPSIS
 

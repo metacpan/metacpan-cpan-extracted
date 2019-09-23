@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/applify/issues
   homepage: https://github.com/jhthorsen/applify
   repository: https://github.com/jhthorsen/applify.git
-version: '0.18'
+version: '0.19'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'Roy Storey <kiwiroy@cpan.org>'

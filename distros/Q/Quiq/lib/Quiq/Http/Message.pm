@@ -1,12 +1,12 @@
 package Quiq::Http::Message;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Reference;
 use Quiq::Http::Cookie;
@@ -46,34 +46,34 @@ als Basisklasse verwendet.
 
 =head2 Einfache HTTP-Nachricht
 
-    my $msg = Quiq::Http::Message->new(
-        contentType => 'text/plain',
-        body => "Hello world\n"
-    );
-    print $msg->asString;
+  my $msg = Quiq::Http::Message->new(
+      contentType => 'text/plain',
+      body => "Hello world\n"
+  );
+  print $msg->asString;
 
 generiert auf STDOUT
 
-    Content-Type: text/plain
-    Content-Length: 12
-    
-    Hello world
+  Content-Type: text/plain
+  Content-Length: 12
+  
+  Hello world
 
 =head2 HTTP-Nachricht über Socket schicken (siehe auch Quiq::Http::Client)
 
-    my $sock = Quiq::Socket->new($host,$port);
-    
-    my $msg = Quiq::Http::Message->new(
-        contentType => 'text/plain',
-        body => "Hello world\n"
-    );
-    
-    print $sock $msg->asString;
+  my $sock = Quiq::Socket->new($host,$port);
+  
+  my $msg = Quiq::Http::Message->new(
+      contentType => 'text/plain',
+      body => "Hello world\n"
+  );
+  
+  print $sock $msg->asString;
 
 =head2 HTTP-Nachricht vom Server empfangen
 
-    my $msg = Quiq::Http::Message->new(received=>1,$socket);
-    print $msg->asString;
+  my $msg = Quiq::Http::Message->new(received=>1,$socket);
+  print $msg->asString;
 
 Die Setzung received=>1 bewirkt, dass wir bei der Auswertung der
 Headerzeilen nicht strikt sind, d.h. bei unbekannten Headern wird
@@ -83,8 +83,8 @@ sie wird nicht aus den Attributen gewonnen.
 
 =head2 HTTP-Nachricht aus Datei
 
-    my $msg = Quiq::Http::Message->new('http/message01.txt');
-    print $msg->asString;
+  my $msg = Quiq::Http::Message->new('http/message01.txt');
+  print $msg->asString;
 
 =head1 METHODS
 
@@ -115,10 +115,10 @@ my $GetSet = sub {
 
 =head4 Synopsis
 
-    $http = $class->new(@keyVal);
-    $http = $class->new(@keyVal,$fh);
-    $http = $class->new(@keyVal,$file);
-    $http = $class->new(@keyVal,\$str);
+  $http = $class->new(@keyVal);
+  $http = $class->new(@keyVal,$fh);
+  $http = $class->new(@keyVal,$file);
+  $http = $class->new(@keyVal,\$str);
 
 =head4 Returns
 
@@ -226,7 +226,7 @@ sub new {
 
 =head4 Synopsis
 
-    $http->set(@keyVal);
+  $http->set(@keyVal);
 
 =head4 Returns
 
@@ -241,20 +241,20 @@ Eigenschaften siehe L<new|"new() - Instantiiere ein HTTP Nachrichten-Objekt">().
 
 Ein HTTP-Request ohne Inhalt:
 
-    $http->set(
-        host => $host,
-        connection => 'close',
-    );
+  $http->set(
+      host => $host,
+      connection => 'close',
+  );
 
 Eine HTTP-Response:
 
-    $http->set(
-        contentType => 'text/html',
-        charset => 'utf-8',
-        setCookie => [id=>4711],
-        setCookie => [user=>'seitzf'],
-        body => "Test\n",
-    );
+  $http->set(
+      contentType => 'text/html',
+      charset => 'utf-8',
+      setCookie => [id=>4711],
+      setCookie => [user=>'seitzf'],
+      body => "Test\n",
+  );
 
 =cut
 
@@ -314,8 +314,8 @@ oder L<setCookie|"setCookie() - Setze/Liefere Set-Cookie Header">()).
 
 =head4 Synopsis
 
-    $bool = $http->received($bool);
-    $bool = $http->received;
+  $bool = $http->received($bool);
+  $bool = $http->received;
 
 =cut
 
@@ -331,8 +331,8 @@ sub received {
 
 =head4 Synopsis
 
-    $protocol = $http->protocol($protocol);
-    $protocol = $http->protocol;
+  $protocol = $http->protocol($protocol);
+  $protocol = $http->protocol;
 
 =head4 Description
 
@@ -353,8 +353,8 @@ sub protocol {
 
 =head4 Synopsis
 
-    $status = $http->status($status);
-    $status = $http->status;
+  $status = $http->status($status);
+  $status = $http->status;
 
 =head4 Description
 
@@ -375,8 +375,8 @@ sub status {
 
 =head4 Synopsis
 
-    $statusText = $http->statusText($statusText);
-    $statusText = $http->statusText;
+  $statusText = $http->statusText($statusText);
+  $statusText = $http->statusText;
 
 =head4 Description
 
@@ -397,8 +397,8 @@ sub statusText {
 
 =head4 Synopsis
 
-    $type = $http->contentType($type);
-    $type = $http->contentType;
+  $type = $http->contentType($type);
+  $type = $http->contentType;
 
 =cut
 
@@ -414,8 +414,8 @@ sub contentType {
 
 =head4 Synopsis
 
-    $charset = $http->charset($charset);
-    $charset = $http->charset;
+  $charset = $http->charset($charset);
+  $charset = $http->charset;
 
 =head4 Description
 
@@ -436,8 +436,8 @@ sub charset {
 
 =head4 Synopsis
 
-    $userPass = $http->authorization($userPass);
-    $userPass = $http->authorization;
+  $userPass = $http->authorization($userPass);
+  $userPass = $http->authorization;
 
 =cut
 
@@ -453,8 +453,8 @@ sub authorization {
 
 =head4 Synopsis
 
-    $val = $http->transferEncoding($val);
-    $val = $http->transferEncoding;
+  $val = $http->transferEncoding($val);
+  $val = $http->transferEncoding;
 
 =cut
 
@@ -470,8 +470,8 @@ sub transferEncoding {
 
 =head4 Synopsis
 
-    $n = $http->contentLength($n);
-    $n = $http->contentLength;
+  $n = $http->contentLength($n);
+  $n = $http->contentLength;
 
 =cut
 
@@ -487,8 +487,8 @@ sub contentLength {
 
 =head4 Synopsis
 
-    $val = $http->expires($val);
-    $val = $http->expires;
+  $val = $http->expires($val);
+  $val = $http->expires;
 
 =cut
 
@@ -504,8 +504,8 @@ sub expires {
 
 =head4 Synopsis
 
-    $host = $http->host($host);
-    $host = $http->host;
+  $host = $http->host($host);
+  $host = $http->host;
 
 =cut
 
@@ -521,8 +521,8 @@ sub host {
 
 =head4 Synopsis
 
-    $userAgent = $http->userAgent($userAgent);
-    $userAgent = $http->userAgent;
+  $userAgent = $http->userAgent($userAgent);
+  $userAgent = $http->userAgent;
 
 =cut
 
@@ -538,8 +538,8 @@ sub userAgent {
 
 =head4 Synopsis
 
-    $val = $http->connection($val);
-    $val = $http->connection;
+  $val = $http->connection($val);
+  $val = $http->connection;
 
 =cut
 
@@ -555,8 +555,8 @@ sub connection {
 
 =head4 Synopsis
 
-    $url = $http->location($val);
-    $url = $http->location;
+  $url = $http->location($val);
+  $url = $http->location;
 
 =cut
 
@@ -572,10 +572,10 @@ sub location {
 
 =head4 Synopsis
 
-    $http->refresh($n);
-    $http->refresh($n,$url);
-    ($n,$url) = $http->refresh;
-    $arr = $http->refresh;
+  $http->refresh($n);
+  $http->refresh($n,$url);
+  ($n,$url) = $http->refresh;
+  $arr = $http->refresh;
 
 =cut
 
@@ -605,9 +605,9 @@ sub refresh {
 
 =head4 Synopsis
 
-    $http->setCookie($name=>$value,@options);
-    @cookies = $http->setCookie;
-    $cookieA = $http->setCookie;
+  $http->setCookie($name=>$value,@options);
+  @cookies = $http->setCookie;
+  $cookieA = $http->setCookie;
 
 =head4 Description
 
@@ -623,11 +623,11 @@ die Liste geliefert.
 
 Generiere Id und setze permanenten Cookie, der nach 5 Jahren abläuft:
 
-    $id = Quiq::Converter->intToWord(time);
-    $http->setCookie(
-        id => $id,
-        expires => '+5y',
-    );
+  $id = Quiq::Converter->intToWord(time);
+  $http->setCookie(
+      id => $id,
+      expires => '+5y',
+  );
 
 =cut
 
@@ -667,23 +667,23 @@ ein Leerstring.
 
 Der Body kann gesetzt werden:
 
-    $http->body($data);
+  $http->body($data);
 
 Oder er kann per Referenz "in place" manipuliert werden:
 
-    $ref = $http->bodyRef;
-    $$ref =~ /__TIME__/strftime '%F %H:%M:%S %Z',localtime/eg;
+  $ref = $http->bodyRef;
+  $$ref =~ /__TIME__/strftime '%F %H:%M:%S %Z',localtime/eg;
 
 Sein Wert wird geliefert durch:
 
-    $data = $http->body;
+  $data = $http->body;
 
 =head3 body() - Setze/Liefere Body
 
 =head4 Synopsis
 
-    $body = $http->body($body);
-    $body = $http->body;
+  $body = $http->body($body);
+  $body = $http->body;
 
 =cut
 
@@ -699,7 +699,7 @@ sub body {
 
 =head4 Synopsis
 
-    $ref = $http->bodyRef;
+  $ref = $http->bodyRef;
 
 =cut
 
@@ -715,7 +715,7 @@ sub bodyRef {
 
 =head4 Synopsis
 
-    $http->append($data);
+  $http->append($data);
 
 =cut
 
@@ -738,9 +738,9 @@ sub append {
 
 =head4 Synopsis
 
-    $http->fromString($fh);
-    $http->fromString($file);
-    $http->fromString(\$str);
+  $http->fromString($fh);
+  $http->fromString($file);
+  $http->fromString(\$str);
 
 =head4 Description
 
@@ -880,7 +880,7 @@ sub fromString {
 
 =head4 Synopsis
 
-    $str = $http->asString;
+  $str = $http->asString;
 
 =cut
 
@@ -978,7 +978,7 @@ sub asString {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

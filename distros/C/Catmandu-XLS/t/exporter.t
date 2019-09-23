@@ -18,10 +18,8 @@ my @rows = (
 
 # XLS
 # default
-my ( $fh, $filename ) = tempfile();
-my $exporter = Catmandu::Exporter::XLS->new(
-    fh => $fh,
-);
+my ($fh, $filename) = tempfile();
+my $exporter = Catmandu::Exporter::XLS->new(fh => $fh,);
 isa_ok($exporter, 'Catmandu::Exporter::XLS');
 can_ok($exporter, 'add');
 can_ok($exporter, 'add_many');
@@ -31,63 +29,59 @@ for my $row (@rows) {
 }
 $exporter->commit();
 close($fh);
-my $rows = Catmandu::Importer::XLS->new( file => $filename )->to_array;
-is_deeply ($rows->[0], {number => 1, letter => 'a'}, 'XLS default');
+my $rows = Catmandu::Importer::XLS->new(file => $filename)->to_array;
+is_deeply($rows->[0], {number => 1, letter => 'a'}, 'XLS default');
 
 # header
-( $fh, $filename ) = tempfile();
-$exporter = Catmandu::Exporter::XLS->new(
-    fh => $fh,
-    header => 0,
-);
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::XLS->new(fh => $fh, header => 0,);
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLS->new( file => $filename )->to_array;
-is_deeply ($rows->[0], {1 => '2', a => 'b'}, 'XLS option header');
+$rows = Catmandu::Importer::XLS->new(file => $filename)->to_array;
+is_deeply($rows->[0], {1 => '2', a => 'b'}, 'XLS option header');
 
-( $fh, $filename ) = tempfile();
+($fh, $filename) = tempfile();
 $exporter = Catmandu::Exporter::XLS->new(
-    fh => $fh,
-    header => { letter => 'CHAR', number => 'NR' },
+    fh     => $fh,
+    header => {letter => 'CHAR', number => 'NR'},
 );
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLS->new( file => $filename )->to_array;
-is_deeply ($rows->[0], {CHAR => 'a', NR => '1'}, 'XLS option header (backward compatibility)');
+$rows = Catmandu::Importer::XLS->new(file => $filename)->to_array;
+is_deeply(
+    $rows->[0],
+    {CHAR => 'a', NR => '1'},
+    'XLS option header (backward compatibility)'
+);
 
 # fields
-( $fh, $filename ) = tempfile();
-$exporter = Catmandu::Exporter::XLS->new(
-    fh => $fh,
-    fields => 'letter',
-);
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::XLS->new(fh => $fh, fields => 'letter',);
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLS->new( file => $filename )->to_array;
-is_deeply ($rows->[0], { letter => 'a' }, 'XLS option fields');
+$rows = Catmandu::Importer::XLS->new(file => $filename)->to_array;
+is_deeply($rows->[0], {letter => 'a'}, 'XLS option fields');
 
 # colums
-( $fh, $filename ) = tempfile();
+($fh, $filename) = tempfile();
 $exporter = Catmandu::Exporter::XLS->new(
-    fh => $fh,
-    fields => 'number,letter',
+    fh      => $fh,
+    fields  => 'number,letter',
     columns => 'NUMBER,LETTER',
 );
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLS->new( file => $filename )->to_array;
-is_deeply ($rows->[0], { NUMBER => 1, LETTER => 'a' }, 'XLS option columns');
+$rows = Catmandu::Importer::XLS->new(file => $filename)->to_array;
+is_deeply($rows->[0], {NUMBER => 1, LETTER => 'a'}, 'XLS option columns');
 
 # XLSX
 # default
-( $fh, $filename ) = tempfile();
-$exporter = Catmandu::Exporter::XLSX->new(
-    fh => $fh,
-);
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::XLSX->new(fh => $fh,);
 isa_ok($exporter, 'Catmandu::Exporter::XLSX');
 can_ok($exporter, 'add');
 can_ok($exporter, 'add_many');
@@ -97,55 +91,53 @@ for my $row (@rows) {
 }
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLSX->new( file => $filename )->to_array;
-is_deeply ($rows->[0], {number => 1, letter => 'a'}, 'XLSX default');
+$rows = Catmandu::Importer::XLSX->new(file => $filename)->to_array;
+is_deeply($rows->[0], {number => 1, letter => 'a'}, 'XLSX default');
 
 # header
-( $fh, $filename ) = tempfile();
-$exporter = Catmandu::Exporter::XLSX->new(
-    fh => $fh,
-    header => 0,
-);
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::XLSX->new(fh => $fh, header => 0,);
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLSX->new( file => $filename )->to_array;
-is_deeply ($rows->[0], {1 => '2', a => 'b'}, 'XLSX option header');
+$rows = Catmandu::Importer::XLSX->new(file => $filename)->to_array;
+is_deeply($rows->[0], {1 => '2', a => 'b'}, 'XLSX option header');
 
-( $fh, $filename ) = tempfile();
+($fh, $filename) = tempfile();
 $exporter = Catmandu::Exporter::XLSX->new(
-    fh => $fh,
-    header => { letter => 'CHAR', number => 'NR' },
+    fh     => $fh,
+    header => {letter => 'CHAR', number => 'NR'},
 );
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLSX->new( file => $filename )->to_array;
-is_deeply ($rows->[0], {CHAR => 'a', NR => '1'}, 'XLS option header (backward compatibility)');
+$rows = Catmandu::Importer::XLSX->new(file => $filename)->to_array;
+is_deeply(
+    $rows->[0],
+    {CHAR => 'a', NR => '1'},
+    'XLS option header (backward compatibility)'
+);
 
 # fields
-( $fh, $filename ) = tempfile();
-$exporter = Catmandu::Exporter::XLSX->new(
-    fh => $fh,
-    fields => 'letter',
-);
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::XLSX->new(fh => $fh, fields => 'letter',);
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLSX->new( file => $filename )->to_array;
-is_deeply ($rows->[0], { letter => 'a' }, 'XLSX option fields');
+$rows = Catmandu::Importer::XLSX->new(file => $filename)->to_array;
+is_deeply($rows->[0], {letter => 'a'}, 'XLSX option fields');
 
 # colums
-( $fh, $filename ) = tempfile();
+($fh, $filename) = tempfile();
 $exporter = Catmandu::Exporter::XLSX->new(
-    fh => $fh,
-    fields => 'number,letter',
+    fh      => $fh,
+    fields  => 'number,letter',
     columns => 'NUMBER,LETTER',
 );
 $exporter->add_many(\@rows);
 $exporter->commit();
 close($fh);
-$rows = Catmandu::Importer::XLSX->new( file => $filename )->to_array;
-is_deeply ($rows->[0], { NUMBER => 1, LETTER => 'a' }, 'XLSX option columns');;
+$rows = Catmandu::Importer::XLSX->new(file => $filename)->to_array;
+is_deeply($rows->[0], {NUMBER => 1, LETTER => 'a'}, 'XLSX option columns');
 
 done_testing;

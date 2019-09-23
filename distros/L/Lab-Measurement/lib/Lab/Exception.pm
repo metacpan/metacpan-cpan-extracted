@@ -1,5 +1,5 @@
 package Lab::Exception;
-$Lab::Exception::VERSION = '3.682';
+$Lab::Exception::VERSION = '3.690';
 #ABSTRACT: Exception handling classes
 
 #
@@ -173,7 +173,7 @@ Lab::Exception - Exception handling classes
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 COPYRIGHT AND LICENSE
 

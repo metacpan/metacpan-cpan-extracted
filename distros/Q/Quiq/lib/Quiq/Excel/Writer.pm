@@ -1,11 +1,11 @@
 package Quiq::Excel::Writer;
 use base qw/Excel::Writer::XLSX/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 
@@ -48,8 +48,8 @@ Dokumentation siehe Basisklasse.
 
 =head4 Synopsis
 
-    $wkb = $class->new($file);
-    $wkb = $class->new($fh);
+  $wkb = $class->new($file);
+  $wkb = $class->new($fh);
 
 =head4 Arguments
 
@@ -100,7 +100,7 @@ sub new {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

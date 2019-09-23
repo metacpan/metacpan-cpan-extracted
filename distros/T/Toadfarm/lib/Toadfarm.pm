@@ -11,7 +11,7 @@ use Mojo::Util qw(class_to_path monkey_patch);
 
 use constant DEBUG => $ENV{TOADFARM_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 BEGIN {
   $ENV{TOADFARM_ACTION} //= (@ARGV and $ARGV[0] =~ /^(reload|start|stop)$/) ? $1 : 'load';
@@ -308,7 +308,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 =head1 VERSION
 
-0.81
+0.82
 
 =head1 DESCRIPTION
 
@@ -417,10 +417,6 @@ You can also start the application with normal L<Mojolicious> commands:
 =item * L<Toadfarm::Plugin::AccessLog>
 
 Log each request that hit your application.
-
-=item * L<Toadfarm::Plugin::Reload>
-
-Reload Hypnotoad with a L<GitHub push hook|https://help.github.com/articles/about-webhooks/>.
 
 =item * L<Mojolicious::Plugin::SizeLimit>
 

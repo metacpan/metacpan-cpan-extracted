@@ -1,11 +1,11 @@
 package Quiq::ImageMagick;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Shell;
 use Quiq::File::Image;
@@ -44,7 +44,7 @@ realisieren.
 
 =head4 Synopsis
 
-    $cmd = $class->new;
+  $cmd = $class->new;
 
 =head4 Description
 
@@ -72,7 +72,7 @@ sub new {
 
 =head4 Synopsis
 
-    $cmd->addElement($str);
+  $cmd->addElement($str);
 
 =head4 Description
 
@@ -88,15 +88,15 @@ $str in einfache Anführungsstriche eingefasst.
 
 Ohne Whitespace:
 
-    $cmd->addElement('input.jpg');
-    =>
-    input.gif
+  $cmd->addElement('input.jpg');
+  =>
+  input.gif
 
 Mit Whitespace:
 
-    $cmd->addElement('Sonne am Abend.jpg');
-    =>
-    'Sonne am Abend.jpg'
+  $cmd->addElement('Sonne am Abend.jpg');
+  =>
+  'Sonne am Abend.jpg'
 
 =cut
 
@@ -125,7 +125,7 @@ sub addElement {
 
 =head4 Synopsis
 
-    $cmd->addCommand($command);
+  $cmd->addCommand($command);
 
 =head4 Description
 
@@ -136,9 +136,9 @@ Die Methode liefert keinen Wert zurück.
 
 Kommando convert:
 
-    $cmd->addCommand('convert');
-    =>
-    convert
+  $cmd->addCommand('convert');
+  =>
+  convert
 
 =cut
 
@@ -159,8 +159,8 @@ sub addCommand {
 
 =head4 Synopsis
 
-    $cmd->addOption($opt);
-    $cmd->addOption($opt=>$val);
+  $cmd->addOption($opt);
+  $cmd->addOption($opt=>$val);
 
 =head4 Description
 
@@ -171,15 +171,15 @@ Wert $val. Die Methode liefert keinen Wert zurück.
 
 Option ohne Wert:
 
-    $cmd->addOption('-negate');
-    =>
-    -negate
+  $cmd->addOption('-negate');
+  =>
+  -negate
 
 Option mit Wert:
 
-    $cmd->addOption(-rotate=>90);
-    =>
-    -rotate 90
+  $cmd->addOption(-rotate=>90);
+  =>
+  -rotate 90
 
 =cut
 
@@ -214,7 +214,7 @@ sub addOption {
 
 =head4 Synopsis
 
-    $str = $cmd->command;
+  $str = $cmd->command;
 
 =head4 Description
 
@@ -237,7 +237,7 @@ sub command {
 
 =head4 Synopsis
 
-    $cmd->execute;
+  $cmd->execute;
 
 =head4 Description
 
@@ -266,7 +266,7 @@ sub execute {
 
 =head4 Synopsis
 
-    $cmd = $class->resizeFill($input,$output,$size,$background);
+  $cmd = $class->resizeFill($input,$output,$size,$background);
 
 =head4 Arguments
 
@@ -353,7 +353,7 @@ sub resizeFill {
 
 =head4 Synopsis
 
-    $cmd = $class->resizeStretch($input,$output,$size);
+  $cmd = $class->resizeStretch($input,$output,$size);
 
 =head4 Arguments
 
@@ -417,7 +417,7 @@ sub resizeStretch {
 
 =head4 Synopsis
 
-    $cmd = $class->negate($input,$output);
+  $cmd = $class->negate($input,$output);
 
 =head4 Arguments
 
@@ -468,7 +468,7 @@ sub negate {
 
 =head4 Synopsis
 
-    $cmd = $class->morph($input1,$input2,$outPattern,$n);
+  $cmd = $class->morph($input1,$input2,$outPattern,$n);
 
 =head4 Arguments
 
@@ -512,22 +512,22 @@ Besser ist es, die Bilder paarweise zu morphen und das letzte Bild
 Erzeuge einen convert-Aufruf für 5 Zwischenbilder (hier an der
 Kommandozeile):
 
-    $ perl -MQuiq::ImageMagick -E 'say Quiq::ImageMagick->morph("1.jpg","2.jpg","tmp/%02d.jpg",5)->command'
+  $ perl -MQuiq::ImageMagick -E 'say Quiq::ImageMagick->morph("1.jpg","2.jpg","tmp/%02d.jpg",5)->command'
 
 Erzeugtes Kommando:
 
-    convert 1.jpg 2.jpg -morph 5 tmp/%02d.jpg
+  convert 1.jpg 2.jpg -morph 5 tmp/%02d.jpg
 
 Wird das Kommando ausgeführt, entstehen in Unterverzeichnis tmp
 (das vorab existieren muss) sechs Bilder:
 
-    00.jpg entspricht 1.jpg (die Bilder sind nicht identisch!)
-    01.jpg
-    02.jpg
-    03.jpg
-    04.jpg
-    05.jpg
-    06.jpg entspricht 2.jpg (die Bilder sind nicht identisch!)
+  00.jpg entspricht 1.jpg (die Bilder sind nicht identisch!)
+  01.jpg
+  02.jpg
+  03.jpg
+  04.jpg
+  05.jpg
+  06.jpg entspricht 2.jpg (die Bilder sind nicht identisch!)
 
 =cut
 
@@ -565,7 +565,7 @@ sub morph {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

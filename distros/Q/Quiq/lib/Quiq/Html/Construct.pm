@@ -1,11 +1,11 @@
 package Quiq::Html::Construct;
 use base qw/Quiq::Html::Tag/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -37,7 +37,7 @@ einer eigenen Klasse rechtfertigen.
 
 =head4 Synopsis
 
-    $html = $class->loadFiles(@spec);
+  $html = $class->loadFiles(@spec);
 
 =head4 Description
 
@@ -81,7 +81,7 @@ sub loadFiles {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

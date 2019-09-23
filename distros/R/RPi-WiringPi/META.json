@@ -69,6 +69,6 @@
          "web" : "https://github.com/stevieb9/rpi-wiringpi"
       }
    },
-   "version" : "2.3632",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "2.3633",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

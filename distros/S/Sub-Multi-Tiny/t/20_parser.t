@@ -1,17 +1,11 @@
 use 5.006;
-use strict;
-use warnings;
+use lib::relative '.';
+use Kit;
 
 use Sub::Multi::Tiny::SigParse; # DUT
 
 use Data::PowerSet 'powerset';
 use Test::Fatal;
-use Test::More;
-
-use constant {
-    true => !!1,
-    false => !!0,
-};
 
 # Reduce typing
 sub _p {

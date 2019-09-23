@@ -1,11 +1,11 @@
 package Quiq::Dbms;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -21,25 +21,25 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    use Quiq::Dbms;
-    
-    # Instantiierung
-    my $d = Quiq::Dbms->new($dbms);
-    
-    # Namen der bekannten Datensysteme
-    my @names = Quiq::Dbms->dbmsNames;
-    
-    # Boolsche Variable für Tests
-    ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $d->dbmsVector;
-    
-    # Test-Methoden
-    
-    $bool = $d->isOracle;
-    $bool = $d->isPostgreSQL;
-    $bool = $d->isSQLite;
-    $bool = $d->isMySQL;
-    $bool = $d->isAccess;
-    $bool = $d->isMSSQL;
+  use Quiq::Dbms;
+  
+  # Instantiierung
+  my $d = Quiq::Dbms->new($dbms);
+  
+  # Namen der bekannten Datensysteme
+  my @names = Quiq::Dbms->dbmsNames;
+  
+  # Boolsche Variable für Tests
+  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $d->dbmsVector;
+  
+  # Test-Methoden
+  
+  $bool = $d->isOracle;
+  $bool = $d->isPostgreSQL;
+  $bool = $d->isSQLite;
+  $bool = $d->isMySQL;
+  $bool = $d->isAccess;
+  $bool = $d->isMSSQL;
 
 =head1 DESCRIPTION
 
@@ -71,8 +71,8 @@ Versionsnummer des DBMS.
 
 =head4 Synopsis
 
-    $d = $class->new($dbms);
-    $d = $class->new($dbms,$version);
+  $d = $class->new($dbms);
+  $d = $class->new($dbms,$version);
 
 =head4 Arguments
 
@@ -129,18 +129,18 @@ sub new {
 
 =head4 Synopsis
 
-    $namesA | @names = $this->dbmsNames;
+  $namesA | @names = $this->dbmsNames;
 
 =head4 Description
 
 Liefere folgende Liste von DBMS-Namen (in dieser Reihenfolge):
 
-    Oracle
-    PostgreSQL
-    SQLite
-    MySQL
-    Access
-    MSSQL
+  Oracle
+  PostgreSQL
+  SQLite
+  MySQL
+  Access
+  MSSQL
 
 =cut
 
@@ -160,7 +160,7 @@ sub dbmsNames {
 
 =head4 Synopsis
 
-    ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $d->dbmsTestVector;
+  ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $d->dbmsTestVector;
 
 =head4 Description
 
@@ -172,12 +172,12 @@ Die Methode ist für Programmcode nützlich, der DBMS-spezifische
 Unterscheidungen macht. Der Code braucht dann lediglich auf den
 Wert einer Variable prüfen
 
-    if ($oracle) ...
+  if ($oracle) ...
 
 statt einen umständlichen und fehleranfälligen Stringvergleich
 durchzuführen
 
-    if ($dbms eq 'Oracle') ...
+  if ($dbms eq 'Oracle') ...
 
 =cut
 
@@ -194,7 +194,7 @@ sub dbmsTestVector {
 
 =head4 Synopsis
 
-    $bool = $d->isOracle;
+  $bool = $d->isOracle;
 
 =head4 Description
 
@@ -215,7 +215,7 @@ sub isOracle {
 
 =head4 Synopsis
 
-    $bool = $d->isPostgreSQL;
+  $bool = $d->isPostgreSQL;
 
 =head4 Description
 
@@ -236,7 +236,7 @@ sub isPostgreSQL {
 
 =head4 Synopsis
 
-    $bool = $d->isSQLite;
+  $bool = $d->isSQLite;
 
 =head4 Description
 
@@ -257,7 +257,7 @@ sub isSQLite {
 
 =head4 Synopsis
 
-    $bool = $d->isMySQL;
+  $bool = $d->isMySQL;
 
 =head4 Description
 
@@ -278,7 +278,7 @@ sub isMySQL {
 
 =head4 Synopsis
 
-    $bool = $d->isAccess;
+  $bool = $d->isAccess;
 
 =head4 Description
 
@@ -299,7 +299,7 @@ sub isAccess {
 
 =head4 Synopsis
 
-    $bool = $d->isMSSQL;
+  $bool = $d->isMSSQL;
 
 =head4 Description
 
@@ -318,7 +318,7 @@ sub isMSSQL {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

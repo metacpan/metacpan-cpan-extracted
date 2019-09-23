@@ -1,14 +1,5 @@
 package Sub::Multi::Tiny;
 
-# Test string:
-# perl -Ilib -E '{package main::my_multi; use Sub::Multi::Tiny; sub foo { say -foo }; sub bar { say -bar } }'
-
-# Test string for attributes:
-# $ perl -MData::Dumper -Mstrict -Mwarnings -E 'use Attribute::Handlers; sub Foo::Loud :ATTR { say "Foo::Loud ATTR called"; say Dumper(\@_); } package Foo; sub bar :Loud {say "Foo::bar" } package main; say -before; Foo::bar; say -after;'
-
-# Test string for this module:
-# perl -Ilib -Mstrict -Mwarnings -MCarp::Always -E 'package main::multi; use Sub::Multi::Tiny qw($foo); sub try :M($foo, @bar) { ... }'
-
 use 5.006;
 use strict;
 use warnings;
@@ -16,12 +7,13 @@ use warnings;
 require Attribute::Handlers;    # Listed here so automated tools see it
 
 use Import::Into;
+use Scalar::Util qw(looks_like_number);
 use Sub::Multi::Tiny::SigParse;
 use Sub::Multi::Tiny::Util ':all';
 use subs ();
 use vars ();
 
-our $VERSION = '0.000006'; # TRIAL
+our $VERSION = '0.000011'; # TRIAL
 
 use constant { true => !!1, false => !!0 };
 
@@ -53,8 +45,9 @@ Sub::Multi::Tiny - Multisubs/multimethods (multiple dispatch) yet another way!
     say my_multi(2, 5);     # -> 32
     say my_multi(1295);     # -> 1337
 
-B<Limitation:> At present, dispatch is solely by arity, and only one
-candidate can have each arity.  This limitation will be removed in the future.
+The default dispatcher dispatches solely by arity, and only one
+candidate can have each arity.  For more flexible dispatching, see
+L<Sub::Multi::Tiny::Dispatcher::TypeParams>.
 
 =head1 DESCRIPTION
 
@@ -65,12 +58,13 @@ are C<sub>s tagged with the C<:M> attribute.  The names of the impls are
 preserved but not used specifically by Sub::Multi::Tiny.
 
 Within a multisub package, the name of the sub being defined is available
-for recursion.  For example (using C<where>, not yet implemented):
+for recursion.  For example (using C<where>, supported by
+L<Sub::Multi::Tiny::Dispatcher::TypeParams>):
 
     {
         package main::fib;
-        use Sub::Multi::Tiny qw($n);
-        sub base  :M($n where { $_ eq 0 })  { 1 }
+        use Sub::Multi::Tiny qw(D:TypeParams $n);
+        sub base  :M($n where { $_ <= 1 })  { 1 }
         sub other :M($n)                    { $n * fib($n-1) }
     }
 
@@ -124,8 +118,12 @@ creates these as package variables so that they can be used unqualified
 in the multisub implementations.
 
 A parameter C<D:Dispatcher> can also be given to specify the dispatcher to
-use.  If C<Dispatcher> includes a double-colon, it will be used as a full
-package name.  Otherwise, C<Sub::Multi::Tiny::Dispatcher::> will be prepended.
+use --- see L</CUSTOM DISPATCH>.
+
+Also sets L<Sub::Multi::Tiny::Util/$VERBOSE> if the environment variable
+C<SUB_MULTI_TINY_VERBOSE> has a truthy value.  If the C<SUB_MULTI_TINY_VERBOSE>
+value is numeric, C<$VERBOSE> is set to that value; otherwise, C<$VERBOSE> is
+set to 1.
 
 =cut
 
@@ -133,7 +131,10 @@ sub import {
     my $multi_package = caller;     # The package that defines the multisub
     my $my_package = shift;         # The package we are
 
-    $VERBOSE = 1 if $ENV{SUB_MULTI_TINY_VERBOSE};
+    for($ENV{SUB_MULTI_TINY_VERBOSE}) {
+        last unless $_;
+        $VERBOSE = looks_like_number($_) ? 0+ $_ : 1;
+    }
 
     if(@_ && $_[0] eq ':nop') {
         _hlog { __PACKAGE__ . ':nop => Taking no action' } 0;    # Always
@@ -374,7 +375,7 @@ __END__
 =head1 CUSTOM DISPATCH
 
 This module includes a default dispatcher (implemented in
-L<Sub::Multi::Tiny::DefaultDispatcher>.  To use a different dispatcher,
+L<Sub::Multi::Tiny::Dispatcher::Default>.  To use a different dispatcher,
 define or import a sub C<MakeDispatcher()> into the package before
 compilation ends.  That sub will be called to create the dispatcher.
 For example:
@@ -393,7 +394,14 @@ or
         use APackageThatImportsMakeDispatcherIntoMainFoo;
     }
 
-=cut
+As a shortcut, you can specify a dispatcher on the C<use> line.  For example:
+
+    use Sub::Multi::Tiny qw(D:Foo $var);
+
+will use dispatcher C<Sub::Multi::Tiny::Dispatcher::Foo>.  Any name with a
+double-colon will be used as a full package name.  E.g., C<D:Bar::Quux> will
+use dispatcher C<Bar::Quux>.  If C<Foo> does not include a double-colon,
+C<Sub::Multi::Tiny::Dispatcher::> will be prepended.
 
 =head1 DEBUGGING
 
@@ -496,13 +504,19 @@ L<Sub::Multi::Tiny>
 =item * This distribution
 
 See the tests in the C<t/> directory distributed with this software
-for examples.
+for usage examples.
 
 =back
 
 =head1 BUGS
 
-This isn't Damian code ;) .
+=over
+
+=item * It's not as tiny as I thought it would be!
+
+=item * This isn't Damian code ;) .
+
+=back
 
 =head1 AUTHOR
 

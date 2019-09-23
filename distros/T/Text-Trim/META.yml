@@ -1,21 +1,30 @@
 ---
-name: Text-Trim
-version: 1.02
+abstract: 'remove leading and/or trailing whitespace from strings'
 author:
-  - 'Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>'
-abstract: remove leading and/or trailing whitespace from strings
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  perl: 5
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+  - 'Ryan Thompson <rjt@cpan.org>'
 build_requires:
-  Test::More: 0
-provides:
-  Text::Trim:
-    file: lib/Text/Trim.pm
-    version: 1.02
-generated_by: Module::Build version 0.33
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
+name: Text-Trim
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  X_metaspec:
+    version: 2
+  repository: https://github.com/rjt-pl/Text-Trim.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

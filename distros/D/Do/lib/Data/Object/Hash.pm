@@ -22,7 +22,7 @@ with qw(
 
 use parent 'Data::Object::Hash::Base';
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # METHODS
 
@@ -584,6 +584,26 @@ hash. This method returns a L<Data::Object::Array> object.
 
 =cut
 
+=head2 kvslice
+
+  kvslice(Str @args) : HashObject
+
+The kvslice method returns a hash reference containing the elements in the hash
+at the key(s) specified in the arguments. This method returns a
+L<Data::Object::Hash> object.
+
+=over 4
+
+=item kvslice example
+
+  # given {1..8}
+
+  my $kvslice = $hash->kvslice(1,5); # {1=>2,5=>6}
+
+=back
+
+=cut
+
 =head2 le
 
   le(Any $arg1) : NumObject
@@ -855,11 +875,11 @@ execution.
 
 =head2 slice
 
-  slice(Any $arg1) : Any
+  slice(Str @args) : ArrayObject
 
-The slice method returns a hash reference containing the elements in the hash
-at the key(s) specified in the arguments. This method returns a
-L<Data::Object::Hash> object.
+The slice method returns an array reference of the values that correspond to
+the key(s) specified in the arguments. This method returns a
+L<Data::Object::Array> object.
 
 =over 4
 
@@ -867,7 +887,7 @@ L<Data::Object::Hash> object.
 
   # given {1..8}
 
-  my $slice = $hash->slice(1,5); # {1=>2,5=>6}
+  $hash->slice(1,3); # [2,4]
 
 =back
 
@@ -935,7 +955,7 @@ L<Data::Object::Hash> object.
 
 =head2 values
 
-  values(Str $arg1) : ArrayObject
+  values() : ArrayObject
 
 The values method returns an array reference consisting of the values of the
 elements in the hash. This method returns a L<Data::Object::Array> object.
@@ -947,7 +967,6 @@ elements in the hash. This method returns a L<Data::Object::Array> object.
   # given {1..8}
 
   $hash->values; # [2,4,6,8]
-  $hash->values(1,3); # [2,4]
 
 =back
 
@@ -955,11 +974,11 @@ elements in the hash. This method returns a L<Data::Object::Array> object.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

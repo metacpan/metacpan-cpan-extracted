@@ -1,5 +1,12 @@
 Revision history for perl distribution Mojolicious-Plugin-Syslog
 
+0.03 2019-09-22T21:10:50+0900
+ - Made env.t compatible with latest Mojolicious
+
+0.02 2019-09-20T09:50:04+0900
+ - Allow access logging to be enabled, even if syslog is disabled
+ - Add support for %A, %F and %U in log format
+
 0.01 2019-04-27T22:44:31+0700
  - Can log to syslog
  - Can be configured using environment variables

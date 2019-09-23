@@ -7,7 +7,7 @@ use Lingua::EN::Opinion;
 use List::Util qw( max );
 
 my $input_file = shift || die "Usage: perl $0 /some/file.txt\n";
-my $emotion    = shift || 'joy,sadness';  # anger anticipation disgust fear joy negative positive sadness surprise trust
+my $emotion    = shift || 'positive,negative';  # anger anticipation disgust fear joy negative positive sadness surprise trust
 my $width      = shift || 800;
 my $height     = shift || 400;
 

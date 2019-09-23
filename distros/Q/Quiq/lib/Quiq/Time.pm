@@ -1,12 +1,12 @@
 package Quiq::Time;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use POSIX ();
 use Time::Local ();
@@ -43,21 +43,21 @@ alle Tage haben genau 86400 Sekunden (keine Schaltsekunden).
 
 =head4 Synopsis
 
-    $ti = $class->new($year,$month,$day,$hour,$minute,$second);
-    $ti = $class->new($year,$month,$day,$hour,$minute);
-    $ti = $class->new($year,$month,$day,$hour);
-    $ti = $class->new($year,$month,$day);
-    $ti = $class->new($year,$month);
-    $ti = $class->new($year);
-    $ti = $class->new(local=>$epoch);
-    $ti = $class->new(utc=>$epoch);
-    $ti = $class->new(dmy=>'D M Y');
-    $ti = $class->new(dmyhms=>'D M Y H M S');
-    $ti = $class->new(ymd=>'Y M D');
-    $ti = $class->new(ymdhm=>'Y M D');
-    $ti = $class->new(ymdhms=>'Y M D H M S');
-    $ti = $class->new(parse=>'D.M.Y ...'|'M/D/Y ...'|'Y-M-D ...');
-    $ti = $class->new;
+  $ti = $class->new($year,$month,$day,$hour,$minute,$second);
+  $ti = $class->new($year,$month,$day,$hour,$minute);
+  $ti = $class->new($year,$month,$day,$hour);
+  $ti = $class->new($year,$month,$day);
+  $ti = $class->new($year,$month);
+  $ti = $class->new($year);
+  $ti = $class->new(local=>$epoch);
+  $ti = $class->new(utc=>$epoch);
+  $ti = $class->new(dmy=>'D M Y');
+  $ti = $class->new(dmyhms=>'D M Y H M S');
+  $ti = $class->new(ymd=>'Y M D');
+  $ti = $class->new(ymdhm=>'Y M D');
+  $ti = $class->new(ymdhms=>'Y M D H M S');
+  $ti = $class->new(parse=>'D.M.Y ...'|'M/D/Y ...'|'Y-M-D ...');
+  $ti = $class->new;
 
 =head4 Description
 
@@ -85,7 +85,7 @@ sub new {
 
 =head4 Synopsis
 
-    $ti2 = $ti->copy;
+  $ti2 = $ti->copy;
 
 =head4 Description
 
@@ -106,7 +106,7 @@ sub copy {
 
 =head4 Synopsis
 
-    ($year,$month,$day,$hour,$minute,$second) = $ti->asArray;
+  ($year,$month,$day,$hour,$minute,$second) = $ti->asArray;
 
 =cut
 
@@ -125,22 +125,22 @@ sub asArray {
 
 =head4 Synopsis
 
-    $ti = $class->set($year,$month,$day,$hour,$minute,$second);
-    $ti = $class->set($year,$month,$day,$hour,$minute);
-    $ti = $class->set($year,$month,$day,$hour);
-    $ti = $class->set($year,$month,$day);
-    $ti = $class->set($year,$month);
-    $ti = $class->set($year);
-    $ti = $class->set(local=>$epoch);
-    $ti = $class->set(utc=>$epoch);
-    $ti = $class->set(dmy=>'D M Y');
-    $ti = $class->set(dmyhm=>'D M Y H M');
-    $ti = $class->set(dmyhms=>'D M Y H M S');
-    $ti = $class->set(ymd=>'Y M D');
-    $ti = $class->set(ymdhm=>'Y M D');
-    $ti = $class->set(ymdhms=>'Y M D H M S');
-    $ti = $class->set(parse=>'D.M.Y ...'|'M/D/Y ...'|'Y-M-D ...');
-    $ti = $class->set;
+  $ti = $class->set($year,$month,$day,$hour,$minute,$second);
+  $ti = $class->set($year,$month,$day,$hour,$minute);
+  $ti = $class->set($year,$month,$day,$hour);
+  $ti = $class->set($year,$month,$day);
+  $ti = $class->set($year,$month);
+  $ti = $class->set($year);
+  $ti = $class->set(local=>$epoch);
+  $ti = $class->set(utc=>$epoch);
+  $ti = $class->set(dmy=>'D M Y');
+  $ti = $class->set(dmyhm=>'D M Y H M');
+  $ti = $class->set(dmyhms=>'D M Y H M S');
+  $ti = $class->set(ymd=>'Y M D');
+  $ti = $class->set(ymdhm=>'Y M D');
+  $ti = $class->set(ymdhms=>'Y M D H M S');
+  $ti = $class->set(parse=>'D.M.Y ...'|'M/D/Y ...'|'Y-M-D ...');
+  $ti = $class->set;
 
 =head4 Description
 
@@ -270,7 +270,7 @@ sub set {
 
 =head4 Synopsis
 
-    $ti = $ti->setTime($hour,$minute,$second);
+  $ti = $ti->setTime($hour,$minute,$second);
 
 =head4 Description
 
@@ -316,7 +316,7 @@ sub setTime {
 
 =head4 Synopsis
 
-    $ti = $ti->truncate($unit);
+  $ti = $ti->truncate($unit);
 
 =head4 Description
 
@@ -326,10 +326,10 @@ und liefere das Zeitobjekt zurück.
 
 =head4 Example
 
-    $ti = Quiq::Time->new(2005,12,28,22,56,37);
-    $ti->truncate('D');
-    ==>
-    2005-12-28-00-00-00
+  $ti = Quiq::Time->new(2005,12,28,22,56,37);
+  $ti->truncate('D');
+  ==>
+  2005-12-28-00-00-00
 
 =cut
 
@@ -360,7 +360,7 @@ sub truncate {
 
 =head4 Synopsis
 
-    $year = $ti->year;
+  $year = $ti->year;
 
 =cut
 
@@ -376,7 +376,7 @@ sub year {
 
 =head4 Synopsis
 
-    $month = $ti->month;
+  $month = $ti->month;
 
 =head4 Description
 
@@ -396,7 +396,7 @@ sub month {
 
 =head4 Synopsis
 
-    $day = $ti->day;
+  $day = $ti->day;
 
 =cut
 
@@ -412,7 +412,7 @@ sub day {
 
 =head4 Synopsis
 
-    $str = $ti->dayAbbr;
+  $str = $ti->dayAbbr;
 
 =head4 Description
 
@@ -435,7 +435,7 @@ sub dayAbbr {
 
 =head4 Synopsis
 
-    $n = $ti->dayName;
+  $n = $ti->dayName;
 
 =head4 Description
 
@@ -459,7 +459,7 @@ sub dayName {
 
 =head4 Synopsis
 
-    $str = $ti->monthName;
+  $str = $ti->monthName;
 
 =head4 Description
 
@@ -512,7 +512,7 @@ sub monthName {
 
 =head4 Synopsis
 
-    $n = $ti->dayOfWeek;
+  $n = $ti->dayOfWeek;
 
 =head4 Description
 
@@ -535,7 +535,7 @@ sub dayOfWeek {
 
 =head4 Synopsis
 
-    $n = $ti->daysOfMonth;
+  $n = $ti->daysOfMonth;
 
 =head4 Description
 
@@ -562,7 +562,7 @@ sub daysOfMonth {
 
 =head4 Synopsis
 
-    $n = $ti->dayOfYear;
+  $n = $ti->dayOfYear;
 
 =head4 Description
 
@@ -588,7 +588,7 @@ sub dayOfYear {
 
 =head4 Synopsis
 
-    ($year,$n) = $ti->weekOfYear;
+  ($year,$n) = $ti->weekOfYear;
 
 =head4 Description
 
@@ -624,9 +624,9 @@ sub weekOfYear {
 
 =head4 Synopsis
 
-    $epoch = $ti->epoch('local');
-    $epoch = $ti->epoch('utc');
-    $epoch = $ti->epoch;
+  $epoch = $ti->epoch('local');
+  $epoch = $ti->epoch('utc');
+  $epoch = $ti->epoch;
 
 =head4 Description
 
@@ -655,7 +655,7 @@ sub epoch {
 
 =head4 Synopsis
 
-    $bool = $ti->isLeapyear;
+  $bool = $ti->isLeapyear;
 
 =head4 Description
 
@@ -679,7 +679,7 @@ sub isLeapyear {
 
 =head4 Synopsis
 
-    $str = $ti->strftime($fmt);
+  $str = $ti->strftime($fmt);
 
 =cut
 
@@ -704,8 +704,8 @@ sub strftime {
 
 =head4 Synopsis
 
-    $str = $ti->ddmmyyyy;
-    $str = $ti->ddmmyyyy($sep);
+  $str = $ti->ddmmyyyy;
+  $str = $ti->ddmmyyyy($sep);
 
 =head4 Description
 
@@ -731,14 +731,14 @@ sub ddmmyyyy {
 
 =head4 Synopsis
 
-    $str = $ti->ddmmyyyyhhmmss;
+  $str = $ti->ddmmyyyyhhmmss;
 
 =head4 Description
 
 Liefere Datum/Zeit im Format "DD.MM.YYYY HH:MI:SS". Der Aufruf ist
 äquvalent zu
 
-    $str = $ti->ddmmyyyy.' '.$ti->hhmmss;
+  $str = $ti->ddmmyyyy.' '.$ti->hhmmss;
 
 =cut
 
@@ -755,8 +755,8 @@ sub ddmmyyyyhhmmss {
 
 =head4 Synopsis
 
-    $str = $ti->dmy;
-    $str = $ti->dmy($sep);
+  $str = $ti->dmy;
+  $str = $ti->dmy($sep);
 
 =head4 Description
 
@@ -782,14 +782,14 @@ sub dmy {
 
 =head4 Synopsis
 
-    $str = $ti->dmyhhmmss;
+  $str = $ti->dmyhhmmss;
 
 =head4 Description
 
 Liefere Datum/Zeit im Format "D.M.YYYY HH:MI:SS". Der Aufruf ist
 äquvalent zu
 
-    $str = $ti->dmy.' '.$ti->hhmmss;
+  $str = $ti->dmy.' '.$ti->hhmmss;
 
 =cut
 
@@ -806,15 +806,15 @@ sub dmyhhmmss {
 
 =head4 Synopsis
 
-    $str = $ti->dump;
-    $str = $ti->dump($sep);
+  $str = $ti->dump;
+  $str = $ti->dump($sep);
 
 =head4 Description
 
 Liefere den internen Zustand des Zeitobjekts als Zeichenkette
 im Format
 
-    YYYY-MM-DD-hh-mm-ss
+  YYYY-MM-DD-hh-mm-ss
 
 Ist $sep angegeben, verwende diesen String anstelle von '-' als
 Trenner.
@@ -839,8 +839,8 @@ sub dump {
 
 =head4 Synopsis
 
-    $str = $ti->hhmmss;
-    $str = $ti->hhmmss($sep);
+  $str = $ti->hhmmss;
+  $str = $ti->hhmmss($sep);
 
 =head4 Description
 
@@ -867,8 +867,8 @@ sub hhmmss {
 
 =head4 Synopsis
 
-    $str = $ti->hhmm;
-    $str = $ti->hhmm($sep);
+  $str = $ti->hhmm;
+  $str = $ti->hhmm($sep);
 
 =head4 Description
 
@@ -894,8 +894,8 @@ sub hhmm {
 
 =head4 Synopsis
 
-    $str = $ti->yymmdd;
-    $str = $ti->yymmdd($sep);
+  $str = $ti->yymmdd;
+  $str = $ti->yymmdd($sep);
 
 =head4 Description
 
@@ -918,8 +918,8 @@ sub yymmdd {
 
 =head4 Synopsis
 
-    $str = $ti->yyyymmdd;
-    $str = $ti->yyyymmdd($sep);
+  $str = $ti->yyyymmdd;
+  $str = $ti->yyyymmdd($sep);
 
 =head4 Description
 
@@ -945,8 +945,8 @@ sub yyyymmdd {
 
 =head4 Synopsis
 
-    $str = $ti->yyyymmddhhmmss;
-    $str = $ti->yyyymmddhhmmss($sep);
+  $str = $ti->yyyymmddhhmmss;
+  $str = $ti->yyyymmddhhmmss($sep);
 
 =head4 Alias
 
@@ -958,7 +958,7 @@ Liefere Datum/Zeit im Format "YYYY-MM-DDXHH:MI:SS", wobei X
 das Trennzeichen zwischen Datum und Uhrzeit ist. Der Aufruf ist
 äquvalent zu
 
-    $str = $ti->yyyymmdd.$sep.$ti->hhmmss;
+  $str = $ti->yyyymmdd.$sep.$ti->hhmmss;
 
 Ist $sep nicht angegeben, wird ein Leerzeichen als Trenner genommen.
 
@@ -983,8 +983,8 @@ sub yyyymmddhhmmss {
 
 =head4 Synopsis
 
-    $str = $ti->yyyymmddhhmm;
-    $str = $ti->yyyymmddhhmm($sep);
+  $str = $ti->yyyymmddhhmm;
+  $str = $ti->yyyymmddhhmm($sep);
 
 =head4 Description
 
@@ -992,7 +992,7 @@ Liefere Datum/Zeit im Format "YYYY-MM-DDXHH:MI", wobei X
 das Trennzeichen zwischen Datum und Uhrzeit ist. Der Aufruf ist
 äquvalent zu
 
-    $str = $ti->yyyymmdd.$sep.$ti->hhmm;
+  $str = $ti->yyyymmdd.$sep.$ti->hhmm;
 
 Ist $sep nicht angegeben, wird ein Leerzeichen als Trenner genommen.
 
@@ -1012,14 +1012,14 @@ sub yyyymmddhhmm {
 
 =head4 Synopsis
 
-    $str = $ti->yyyymmddxhhmmss;
+  $str = $ti->yyyymmddxhhmmss;
 
 =head4 Description
 
 Liefere Datum/Zeit im Format "YYYY-MM-DD+HH:MI:SS". Der Aufruf ist
 äquvalent zu
 
-    $str = $ti->yyyymmddhhmmss('+');
+  $str = $ti->yyyymmddhhmmss('+');
 
 =cut
 
@@ -1037,7 +1037,7 @@ sub yyyymmddxhhmmss {
 
 =head4 Synopsis
 
-    $ti = $ti->add($n1,$unit1,$n2,$unit2,...);
+  $ti = $ti->add($n1,$unit1,$n2,$unit2,...);
 
 =head4 Description
 
@@ -1048,10 +1048,10 @@ sein.
 
 =head4 Example
 
-    $ti = Quiq::Time->new(2005,12,28,22,56,37);
-    $ti->add(3,'Y',5,'M',-1,'D');
-    ==>
-    2009-05-27-22-56-37
+  $ti = Quiq::Time->new(2005,12,28,22,56,37);
+  $ti->add(3,'Y',5,'M',-1,'D');
+  ==>
+  2009-05-27-22-56-37
 
 =cut
 
@@ -1081,7 +1081,7 @@ sub add {
 
 =head4 Synopsis
 
-    $ti = $ti->addYears($n);
+  $ti = $ti->addYears($n);
 
 =head4 Description
 
@@ -1097,19 +1097,19 @@ zurück.
 
 Jahre hinzuaddieren
 
-    $ti = Quiq::Time->new(2005,12,28,22,56,37);
-    $ti->addYears(5);
-    ==>
-    2010-12-28-00-00-00
+  $ti = Quiq::Time->new(2005,12,28,22,56,37);
+  $ti->addYears(5);
+  ==>
+  2010-12-28-00-00-00
 
 =item *
 
 Jahre abziehen
 
-    $ti = Quiq::Time->new(2005,12,28,22,56,37);
-    $ti->addYears(-6);
-    ==>
-    1999-12-28-00-00-00
+  $ti = Quiq::Time->new(2005,12,28,22,56,37);
+  $ti->addYears(-6);
+  ==>
+  1999-12-28-00-00-00
 
 =back
 
@@ -1132,7 +1132,7 @@ sub addYears {
 
 =head4 Synopsis
 
-    $ti = $ti->addMonths($n);
+  $ti = $ti->addMonths($n);
 
 =head4 Description
 
@@ -1168,7 +1168,7 @@ sub addMonths {
 
 =head4 Synopsis
 
-    $ti = $ti->addDays($n);
+  $ti = $ti->addDays($n);
 
 =head4 Description
 
@@ -1197,7 +1197,7 @@ sub addDays {
 
 =head4 Synopsis
 
-    $ti = $ti->addHours($n);
+  $ti = $ti->addHours($n);
 
 =head4 Description
 
@@ -1226,7 +1226,7 @@ sub addHours {
 
 =head4 Synopsis
 
-    $ti = $ti->addMinutes($n);
+  $ti = $ti->addMinutes($n);
 
 =head4 Description
 
@@ -1255,7 +1255,7 @@ sub addMinutes {
 
 =head4 Synopsis
 
-    $ti = $ti->addSeconds($n);
+  $ti = $ti->addSeconds($n);
 
 =head4 Description
 
@@ -1286,7 +1286,7 @@ sub addSeconds {
 
 =head4 Synopsis
 
-    $bool = $ti1->equal($ti2);
+  $bool = $ti1->equal($ti2);
 
 =head4 Description
 
@@ -1307,7 +1307,7 @@ sub equal {
 
 =head4 Synopsis
 
-    $bool = $ti1->less($ti2);
+  $bool = $ti1->less($ti2);
 
 =head4 Description
 
@@ -1328,7 +1328,7 @@ sub less {
 
 =head4 Synopsis
 
-    $bool = $ti1->lessOrEqual($ti2);
+  $bool = $ti1->lessOrEqual($ti2);
 
 =head4 Description
 
@@ -1351,7 +1351,7 @@ sub lessOrEqual {
 
 =head4 Synopsis
 
-    $dur = $ti1->diff($ti2);
+  $dur = $ti1->diff($ti2);
 
 =head4 Description
 
@@ -1360,11 +1360,11 @@ Zeitdauer-Objekt $dur zurück.
 
 Dauer in Sekunden:
 
-    $sec = $dur->asSeconds;
+  $sec = $dur->asSeconds;
 
 Dauer als Zeichenkette (I<D>dI<H>hI<M>mI<S.X>s):
 
-    $str = $dur->asString;
+  $str = $dur->asString;
 
 =cut
 
@@ -1383,8 +1383,8 @@ sub diff {
 
 =head4 Synopsis
 
-    $n = $class->monthAbbrToNum($abbr);
-    $n = $class->monthAbbrToNum($abbr,$lang);
+  $n = $class->monthAbbrToNum($abbr);
+  $n = $class->monthAbbrToNum($abbr,$lang);
 
 =head4 Description
 
@@ -1447,7 +1447,7 @@ sub monthAbbrToNum {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

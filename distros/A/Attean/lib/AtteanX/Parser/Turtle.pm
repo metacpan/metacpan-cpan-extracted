@@ -10,7 +10,7 @@ AtteanX::Parser::Turtle - Turtle RDF Parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle version 0.023
+This document describes AtteanX::Parser::Turtle version 0.024
 
 =head1 SYNOPSIS
 
@@ -44,9 +44,10 @@ A boolean indicating whether term values should be canonicalized during parsing.
 
 =cut
 
-package AtteanX::Parser::Turtle 0.023 {
+package AtteanX::Parser::Turtle 0.024 {
 	use Moo;
 	use Types::Standard qw(Bool ArrayRef HashRef Str Maybe InstanceOf);
+	use Types::Namespace qw( NamespaceMap );
 	use utf8;
 	use Carp qw(carp);
 	use Encode qw(encode);
@@ -74,7 +75,7 @@ Returns true if the parser has a namespace map, false otherwise.
 
 =cut
 
-	has 'namespaces' => (is => 'rw', isa => Maybe[InstanceOf['URI::NamespaceMap']], predicate => 'has_namespaces');
+	has 'namespaces' => (is => 'rw', isa => Maybe[NamespaceMap], predicate => 'has_namespaces');
 	has	'_stack'	=> (
 		is => 'ro',
 		isa => ArrayRef,

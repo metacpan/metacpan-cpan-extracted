@@ -5,7 +5,7 @@ use Catmandu::Store::Solr;
 use Catmandu;
 use Moo;
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0304';
 
 with 'Catmandu::Importer';
 
@@ -59,7 +59,7 @@ sub generator {
 
         shift(@$hits);
 
-        }
+    }
 }
 
 sub count {

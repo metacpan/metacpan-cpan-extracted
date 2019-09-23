@@ -5,7 +5,17 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
-0.023  2019-04-30
+0.024  2019-09-22
+
+ - (Addition) Add attribute in AbbreviatingSerializer to omit base
+   declaration to have all relative URIs (#135 from @kjetilk).
+ - (Update) Added ground_blanks attribute to Attean::SimpleQueryEvaluator.
+ - (Update) Fixed bug in AtteanX::API::Lexer that caused infinite recursion
+   when finding EOF in the middle of an escape sequence.
+ - (Update) Updates to use namespace types, available in Types::Attean
+   (#129, #137 from @kjetilk).
+
+0.024  2019-04-30
 
  - (Addition) Add a simple factory for temporary models (#132 from
    @kjetilk).

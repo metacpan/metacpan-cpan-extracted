@@ -1,11 +1,11 @@
 package Quiq::Stopwatch;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Time::HiRes ();
 
@@ -25,23 +25,23 @@ L<Quiq::Object>
 
 Eine Stoppuhr:
 
-    use Quiq::Stopwatch;
-    
-    my $stw = Quiq::Stopwatch->new;
-    ...
-    printf "%.2f\n",$stw->elapsed;
+  use Quiq::Stopwatch;
+  
+  my $stw = Quiq::Stopwatch->new;
+  ...
+  printf "%.2f\n",$stw->elapsed;
 
 Zwei Stoppuhren für Gesamtzeit und Zwischenzeiten:
 
-    use Quiq::Stopwatch;
-    
-    my $stw = Quiq::Stopwatch->new(2); # Start von zwei Timern
-    ...
-    printf "%.2f\n",$stw->restart(1); # Abschnittszeit (Timer 1)
-    ...
-    printf "%.2f\n",$stw->restart(1); # Abschnittszeit (Timer 1)
-    ...
-    printf "%.2f\n",$stw->elapsed; # Gesamtzeit (Timer 0)
+  use Quiq::Stopwatch;
+  
+  my $stw = Quiq::Stopwatch->new(2); # Start von zwei Timern
+  ...
+  printf "%.2f\n",$stw->restart(1); # Abschnittszeit (Timer 1)
+  ...
+  printf "%.2f\n",$stw->restart(1); # Abschnittszeit (Timer 1)
+  ...
+  printf "%.2f\n",$stw->elapsed; # Gesamtzeit (Timer 0)
 
 =head1 DESCRIPTION
 
@@ -68,8 +68,8 @@ Klasse Quiq::Duration
 
 =head4 Synopsis
 
-    $stw = $class->new;
-    $stw = $class->new($n);
+  $stw = $class->new;
+  $stw = $class->new($n);
 
 =head4 Arguments
 
@@ -111,8 +111,8 @@ sub new {
 
 =head4 Synopsis
 
-    $sec = $stw->elapsed;
-    $sec = $stw->elapsed($i);
+  $sec = $stw->elapsed;
+  $sec = $stw->elapsed($i);
 
 =head4 Arguments
 
@@ -148,8 +148,8 @@ sub elapsed {
 
 =head4 Synopsis
 
-    $sec = $stw->restart;
-    $sec = $stw->restart($i);
+  $sec = $stw->restart;
+  $sec = $stw->restart($i);
 
 =head4 Arguments
 
@@ -189,7 +189,7 @@ sub restart {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::TermColor;
-$Test::BDD::Cucumber::Harness::TermColor::VERSION = '0.64';
+$Test::BDD::Cucumber::Harness::TermColor::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::TermColor - Prints colorized text to the screen
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 
@@ -131,7 +131,7 @@ sub feature {
         {
             indent => 0,
             color  => $self->_colors->{'feature'},
-            text   => $feature->name,
+            text   => $feature->keyword_original . ': ' . $feature->name,
             follow_up =>
               [ map { $_->content } @{ $feature->satisfaction || [] } ],
             trailing => 1
@@ -148,7 +148,7 @@ sub feature_done {
 sub scenario {
     my ( $self, $scenario, $dataset, $longest ) = @_;
     my $text =
-        "Scenario: "
+      $scenario->keyword_original . ': '
       . color( $self->_colors->{'scenario_name'} )
       . ( $scenario->name || '' );
 
@@ -157,7 +157,8 @@ sub scenario {
             indent       => 2,
             color        => $self->_colors->{'scenario'},
             text         => $text,
-            follow_up    => [],
+            follow_up    =>
+              [ map { $_->content } @{ $scenario->description || [] } ],
             trailing     => 0,
             longest_line => ( $longest || 0 )
         }
@@ -297,7 +298,7 @@ sub _display {
     # Print follow-up lines...
     for my $line ( @{ $options->{'follow_up'} || [] } ) {
         print $fh color 'reset';
-        print $fh ' ' x ( $options->{'indent'} + 2 );
+        print $fh ' ' x ( $options->{'indent'} + 4 );
         print $fh color $options->{'color'};
         print $fh $line;
         print $fh color 'reset';

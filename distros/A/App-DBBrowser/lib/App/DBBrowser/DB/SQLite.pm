@@ -13,7 +13,7 @@ use DBI            qw();
 use Encode::Locale qw();
 
 use Term::Choose       qw();
-use Term::Choose::Util qw( choose_dirs );
+use Term::Choose::Util qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Opt::DBGet;
@@ -81,10 +81,11 @@ sub get_databases {
         return $databases;
     }
     if ( $choice eq $change ) {
-        my $info = 'Del ' . join( ', ', @$dirs );
-        my $name = ' OK ';
-        my $new_dirs = choose_dirs(
-            { name => $name, info => "Where to search for databases?\n" . $info, hide_cursor => 0 }
+        my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+        my $info = 'Curr: ' . join( ', ', @$dirs );
+        my $name = 'New : ';
+        my $new_dirs = $tu->choose_directories(
+            { current_selection_label => $name, info => "Where to search for databases?\n" . $info }
         );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;

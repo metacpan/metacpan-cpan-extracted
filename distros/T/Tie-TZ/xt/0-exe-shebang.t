@@ -2,7 +2,7 @@
 
 # 0-exe-shebang.t -- check EXE_FILES use #!perl for interpreter
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2011 Kevin Ryde
 
 # 0-exe-shebang.t is shared by several distributions.
 #
@@ -21,7 +21,6 @@
 
 require 5;
 use strict;
-use Test::More;
 
 Test::ExeFilesShebang->Test_More(verbose => 1);
 exit 0;
@@ -74,7 +73,7 @@ sub check {
   foreach (@exe_files) {
     my $filename = $_;
     unless (open FH, "<$filename") {
-      &$diag ("Oops, cannot open $filename");
+      &$diag ("Oops, cannot open $filename: $!");
       $good = 0;
     }
     my $line = <FH>;

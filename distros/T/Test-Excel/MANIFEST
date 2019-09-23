@@ -32,12 +32,12 @@ t/exp-7.xls
 t/got-7.xls
 t/exp-8.xls
 t/got-8.xls
-t/pod.t
 t/spec-1.txt
 t/spec-2.txt
 t/spec-3.txt
-t/manifest.t
-t/meta-json.t
-t/meta-yml.t
+xt/pod.t
+xt/manifest.t
+xt/meta-json.t
+xt/meta-yml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,12 +1,12 @@
 package Quiq::Database::DataAnalysis;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::Unindent;
@@ -43,7 +43,7 @@ ausgegeben werden.
 
 =head4 Synopsis
 
-    $obj = $class->new($db,@select,@opt);
+  $obj = $class->new($db,@select,@opt);
 
 =head4 Arguments
 
@@ -98,16 +98,16 @@ durch und liefere ein Objekt, das das Analyseergebnis repräsentiert,
 zurück. Folgende Information wird für alle Kolumnen der Datenquelle
 ermittelt:
 
-    COUNT(DISTINCT <column>) - Anzahl der verschiedenen Werte
-    COUNT(<column>)          - Anzahl der Werte, die nicht NULL sind
-    MIN(LENGTH(<column>))    - Länge des kürzesten Werts
-    MAX(LENGTH(<column>))    - Länge des längsten Werts
-    MIN(<column>)            - Kleinster Wert (gemäß Datentyp)
-    MAX(<column>)            - Größter Wert (gemäß Datentyp)
+  COUNT(DISTINCT <column>) - Anzahl der verschiedenen Werte
+  COUNT(<column>)          - Anzahl der Werte, die nicht NULL sind
+  MIN(LENGTH(<column>))    - Länge des kürzesten Werts
+  MAX(LENGTH(<column>))    - Länge des längsten Werts
+  MIN(<column>)            - Kleinster Wert (gemäß Datentyp)
+  MAX(<column>)            - Größter Wert (gemäß Datentyp)
 
 Ferner wird ermittelt:
 
-    COUNT(1)                 - Anzahl aller Zeilen der Datenquelle
+  COUNT(1)                 - Anzahl aller Zeilen der Datenquelle
 
 Das Ergebnis der Analyse kann mit der Methode $obj->asTable() ausgegeben
 werden.
@@ -116,48 +116,48 @@ werden.
 
 Datenanalyse einer Tabelle q06i001, die Ergebnismenge wird einen Tag gecacht:
 
-    print Quiq::Database::DataAnalysis->new($db,'q06i001',-cache=>86400)->asTable;
-    __END__
-    q06i001
-    
-    30.088.616 rows
-    
-    1 <column>
-    2 COUNT(DISTINCT <column>)
-    3 COUNT(<column>)
-    4 MIN(LENGTH(<column>))
-    5 MAX(LENGTH(<column>))
-    6 MIN(<column>)
-    7 MAX(<column>)
-    8 DISTINCT <column>
-    
-    1                2            3            4    5    6                          7                           8
-    | fid            |        101 | 30.088.616 |  1 |  3 | 0                        | 808                       |                    |
-    | ag             |          5 | 30.088.616 |  2 |  2 | 25                       | 29                        | 25, 26, 27, 28, 29 |
-    | kdnr           |  2.805.719 | 30.088.616 |  9 |  9 | 111111200                | 900002009                 |                    |
-    | vsnr           |  2.971.673 | 30.088.616 |  6 |  9 | 230243                   | 999999999                 |                    |
-    | lfd_nr         |        439 | 30.088.616 |  1 |  3 | 1                        | 439                       |                    |
-    | com_dat        |          1 | 30.088.616 |  1 |  1 | 0                        | 0                         | 0                  |
-    | wirk_dat       |     12.553 | 30.088.616 |  7 |  7 | 1000101                  | 2190731                   |                    |
-    | vwnd_kz        |          1 | 30.088.616 |  1 |  1 | 0                        | 0                         | 0                  |
-    | cur_dat        |      8.408 | 30.088.616 |  1 |  7 | 0                        | 2190418                   |                    |
-    | va             |         18 | 30.088.616 |  1 |  2 | 0                        | 99                        |                    |
-    | nf             |     11.855 | 30.088.616 |  1 |  7 | 0                        | 2990101                   |                    |
-    | sost_kz        |          3 | 30.088.616 |  1 |  1 | 0                        | 2                         | 0, 1, 2            |
-    | stor_dat       |     12.762 | 30.088.616 |  1 |  7 | 0                        | 2990101                   |                    |
-    | berech_ab      |     11.950 | 30.088.616 |  1 |  7 | 0                        | 2190630                   |                    |
-    | ges_beitr_brt  |    543.939 | 30.088.616 |  4 | 11 | -1717145.01              | 9944894.74                |                    |
-    | fpr_stop_kz    |          4 | 30.088.616 |  0 |  1 |                          | 3                         | '', 1, 2, 3        |
-    | umstlg_kz      |          3 | 30.088.616 |  1 |  1 | 0                        | 2                         | 0, 1, 2            |
-    | masch_aend_grd |         25 | 30.088.616 |  1 |  2 | 0                        | 99                        |                    |
-    | nnr            |      1.093 | 30.088.616 |  1 |  4 | 0                        | 9998                      |                    |
-    | lfd_tp_nr      |        277 | 30.088.616 |  1 |  3 | 1                        | 277                       |                    |
-    | lg_zt          | 30.088.616 | 30.088.616 | 24 | 24 | 060508000100001000000033 | 190418160157999000007760  |                    |
-    | tech_ab        |     12.553 | 30.088.616 | 10 | 10 | 1900-01-01               | 2019-07-31                |                    |
-    | tech_bis       |     12.293 | 30.088.616 | 10 | 10 | 1900-01-01               | 9999-12-31                |                    |
-    | upd_dat        |      5.572 | 30.088.616 | 19 | 26 | 2006-05-10 08:13:11      | 2019-04-19 00:02:05.66096 |                    |
-    
-    24 columns
+  print Quiq::Database::DataAnalysis->new($db,'q06i001',-cache=>86400)->asTable;
+  __END__
+  q06i001
+  
+  30.088.616 rows
+  
+  1 <column>
+  2 COUNT(DISTINCT <column>)
+  3 COUNT(<column>)
+  4 MIN(LENGTH(<column>))
+  5 MAX(LENGTH(<column>))
+  6 MIN(<column>)
+  7 MAX(<column>)
+  8 DISTINCT <column>
+  
+  1                2            3            4    5    6                          7                           8
+  | fid            |        101 | 30.088.616 |  1 |  3 | 0                        | 808                       |                    |
+  | ag             |          5 | 30.088.616 |  2 |  2 | 25                       | 29                        | 25, 26, 27, 28, 29 |
+  | kdnr           |  2.805.719 | 30.088.616 |  9 |  9 | 111111200                | 900002009                 |                    |
+  | vsnr           |  2.971.673 | 30.088.616 |  6 |  9 | 230243                   | 999999999                 |                    |
+  | lfd_nr         |        439 | 30.088.616 |  1 |  3 | 1                        | 439                       |                    |
+  | com_dat        |          1 | 30.088.616 |  1 |  1 | 0                        | 0                         | 0                  |
+  | wirk_dat       |     12.553 | 30.088.616 |  7 |  7 | 1000101                  | 2190731                   |                    |
+  | vwnd_kz        |          1 | 30.088.616 |  1 |  1 | 0                        | 0                         | 0                  |
+  | cur_dat        |      8.408 | 30.088.616 |  1 |  7 | 0                        | 2190418                   |                    |
+  | va             |         18 | 30.088.616 |  1 |  2 | 0                        | 99                        |                    |
+  | nf             |     11.855 | 30.088.616 |  1 |  7 | 0                        | 2990101                   |                    |
+  | sost_kz        |          3 | 30.088.616 |  1 |  1 | 0                        | 2                         | 0, 1, 2            |
+  | stor_dat       |     12.762 | 30.088.616 |  1 |  7 | 0                        | 2990101                   |                    |
+  | berech_ab      |     11.950 | 30.088.616 |  1 |  7 | 0                        | 2190630                   |                    |
+  | ges_beitr_brt  |    543.939 | 30.088.616 |  4 | 11 | -1717145.01              | 9944894.74                |                    |
+  | fpr_stop_kz    |          4 | 30.088.616 |  0 |  1 |                          | 3                         | '', 1, 2, 3        |
+  | umstlg_kz      |          3 | 30.088.616 |  1 |  1 | 0                        | 2                         | 0, 1, 2            |
+  | masch_aend_grd |         25 | 30.088.616 |  1 |  2 | 0                        | 99                        |                    |
+  | nnr            |      1.093 | 30.088.616 |  1 |  4 | 0                        | 9998                      |                    |
+  | lfd_tp_nr      |        277 | 30.088.616 |  1 |  3 | 1                        | 277                       |                    |
+  | lg_zt          | 30.088.616 | 30.088.616 | 24 | 24 | 060508000100001000000033 | 190418160157999000007760  |                    |
+  | tech_ab        |     12.553 | 30.088.616 | 10 | 10 | 1900-01-01               | 2019-07-31                |                    |
+  | tech_bis       |     12.293 | 30.088.616 | 10 | 10 | 1900-01-01               | 9999-12-31                |                    |
+  | upd_dat        |      5.572 | 30.088.616 | 19 | 26 | 2006-05-10 08:13:11      | 2019-04-19 00:02:05.66096 |                    |
+  
+  24 columns
 
 =cut
 
@@ -335,7 +335,7 @@ sub new {
 
 =head4 Synopsis
 
-    $str = $obj->asTable;
+  $str = $obj->asTable;
 
 =cut
 
@@ -425,7 +425,7 @@ sub asTable {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

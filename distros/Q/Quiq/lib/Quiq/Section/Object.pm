@@ -1,12 +1,12 @@
 package Quiq::Section::Object;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 
@@ -80,8 +80,8 @@ Zeilennummer in Quelldatei.
 
 =head4 Synopsis
 
-    $sec = $class->new($type,$keyValH);
-    $sec = $class->new($type,$keyValH,$keyA,$content,$source,$file,$line);
+  $sec = $class->new($type,$keyValH);
+  $sec = $class->new($type,$keyValH,$keyA,$content,$source,$file,$line);
 
 =head4 Arguments
 
@@ -183,8 +183,8 @@ sub new {
 
 =head4 Synopsis
 
-    $type = $sec->type;
-    $type = $sec->type($type);
+  $type = $sec->type;
+  $type = $sec->type($type);
 
 =head4 Returns
 
@@ -216,8 +216,8 @@ sub type {
 
 =head4 Synopsis
 
-    $brackets = $sec->brackets;
-    $brackets = $sec->brackets($brackets);
+  $brackets = $sec->brackets;
+  $brackets = $sec->brackets($brackets);
 
 =head4 Returns
 
@@ -256,7 +256,7 @@ sub brackets {
 
 =head4 Synopsis
 
-    $fullType = $sec->fullType;
+  $fullType = $sec->fullType;
 
 =head4 Description
 
@@ -278,7 +278,7 @@ sub fullType {
 
 =head4 Synopsis
 
-    $keyA|@keys = $sec->keys;
+  $keyA|@keys = $sec->keys;
 
 =head4 Description
 
@@ -300,7 +300,7 @@ sub keys {
 
 =head4 Synopsis
 
-    $hash|@arr = $sec->keyValHash;
+  $hash|@arr = $sec->keyValHash;
 
 =head4 Returns
 
@@ -322,8 +322,8 @@ sub keyValHash {
 
 =head4 Synopsis
 
-    $content = $sec->content;
-    $content = $sec->content($content);
+  $content = $sec->content;
+  $content = $sec->content($content);
 
 =head4 Returns
 
@@ -349,7 +349,7 @@ sub content {
 
 =head4 Synopsis
 
-    $ref = $sec->contentRef;
+  $ref = $sec->contentRef;
 
 =head4 Returns
 
@@ -369,7 +369,7 @@ sub contentRef {
 
 =head4 Synopsis
 
-    $contentN = $sec->contentNL;
+  $contentN = $sec->contentNL;
 
 =head4 Returns
 
@@ -390,7 +390,7 @@ sub contentNL {
 
 =head4 Synopsis
 
-    $file = $sec->file;
+  $file = $sec->file;
 
 =head4 Returns
 
@@ -410,7 +410,7 @@ sub file {
 
 =head4 Synopsis
 
-    $mtime = $sec->mtime;
+  $mtime = $sec->mtime;
 
 =head4 Returns
 
@@ -437,7 +437,7 @@ sub mtime {
 
 =head4 Synopsis
 
-    $n = $sec->line;
+  $n = $sec->line;
 
 =head4 Returns
 
@@ -457,7 +457,7 @@ sub line {
 
 =head4 Synopsis
 
-    ($file,$line) = $sec->fileInfo;
+  ($file,$line) = $sec->fileInfo;
 
 =head4 Returns
 
@@ -480,7 +480,7 @@ sub fileInfo {
 
 =head4 Synopsis
 
-    $source = $sec->source;
+  $source = $sec->source;
 
 =head4 Returns
 
@@ -500,7 +500,7 @@ sub source {
 
 =head4 Synopsis
 
-    $ref = $sec->sourceRef;
+  $ref = $sec->sourceRef;
 
 =head4 Returns
 
@@ -520,7 +520,7 @@ sub sourceRef {
 
 =head4 Synopsis
 
-    $sec->deleteSource;
+  $sec->deleteSource;
 
 =head4 Returns
 
@@ -541,7 +541,7 @@ sub deleteSource {
 
 =head4 Synopsis
 
-    $sec->transferSource;
+  $sec->transferSource;
 
 =head4 Returns
 
@@ -579,7 +579,7 @@ sub transferSource {
 
 =head4 Synopsis
 
-    $sec->removeEofMarker;
+  $sec->removeEofMarker;
 
 =head4 Returns
 
@@ -606,7 +606,7 @@ sub removeEofMarker {
 
 =head4 Synopsis
 
-    $val = $sec->append($key=>$str);
+  $val = $sec->append($key=>$str);
 
 =head4 Arguments
 
@@ -644,8 +644,8 @@ sub append {
 
 =head4 Synopsis
 
-    $val = $sec->get($key);
-    @vals = $sec->get(@keys);
+  $val = $sec->get($key);
+  @vals = $sec->get(@keys);
 
 =head4 Arguments
 
@@ -700,7 +700,7 @@ sub get {
 
 =head4 Synopsis
 
-    $arr|@arr = $sec->getArray($key);
+  $arr|@arr = $sec->getArray($key);
 
 =head4 Arguments
 
@@ -745,8 +745,8 @@ sub getArray {
 
 =head4 Synopsis
 
-    $bool = $sec->getBool($key);
-    $bool = $sec->getBool($key,$default);
+  $bool = $sec->getBool($key);
+  $bool = $sec->getBool($key,$default);
 
 =head4 Arguments
 
@@ -804,7 +804,7 @@ sub getBool {
 
 =head4 Synopsis
 
-    $val = $sec->getMandatory($key);
+  $val = $sec->getMandatory($key);
 
 =head4 Arguments
 
@@ -852,7 +852,7 @@ sub getMandatory {
 
 =head4 Synopsis
 
-    $ref = $sec->getRef($key);
+  $ref = $sec->getRef($key);
 
 =cut
 
@@ -869,7 +869,7 @@ sub getRef {
 
 =head4 Synopsis
 
-    ($key,$val) = $sec->search(\@sections,\@keys);
+  ($key,$val) = $sec->search(\@sections,\@keys);
 
 =head4 Description
 
@@ -911,8 +911,8 @@ sub search {
 
 =head4 Synopsis
 
-    $val = $sec->try($key);
-    @vals = $sec->try(@keys);
+  $val = $sec->try($key);
+  @vals = $sec->try(@keys);
 
 =head4 Description
 
@@ -934,7 +934,7 @@ sub try {
 
 =head4 Synopsis
 
-    $val = $sec->memoize($key,$sub);
+  $val = $sec->memoize($key,$sub);
 
 =head4 Description
 
@@ -949,15 +949,15 @@ gerechnet werden soll.
 
 =head4 Example
 
-    sub name {
-        return shift->memoize('name',sub {
-            my ($self,$key) = @_;
-            my $name = $self->get(ucfirst $key);
-            $name =~ s/^\W+//;
-            $name =~ s|\W+|/|g;
-            return $name;
-        });
-    }
+  sub name {
+      return shift->memoize('name',sub {
+          my ($self,$key) = @_;
+          my $name = $self->get(ucfirst $key);
+          $name =~ s/^\W+//;
+          $name =~ s|\W+|/|g;
+          return $name;
+      });
+  }
 
 =cut
 
@@ -981,7 +981,7 @@ sub memoize {
 
 =head4 Synopsis
 
-    $val = $sec->memoizeWeaken($key,$sub);
+  $val = $sec->memoizeWeaken($key,$sub);
 
 =head4 Description
 
@@ -1012,7 +1012,7 @@ sub memoizeWeaken {
 
 =head4 Synopsis
 
-    $sec->set(@keyVal);
+  $sec->set(@keyVal);
 
 =head4 Arguments
 
@@ -1045,7 +1045,7 @@ sub set {
 
 =head4 Synopsis
 
-    $sec->setDefault(@keyVal);
+  $sec->setDefault(@keyVal);
 
 =head4 Arguments
 
@@ -1068,12 +1068,12 @@ setze ihn auf den angegebenen Defaultwert.
 
 =head4 Example
 
-    $sec->setDefault(
-        Width => 1000,
-        EntityMenuWidth => 345,
-        BorderWidth => 1,
-        PackageMenuHeight => 34,
-    );
+  $sec->setDefault(
+      Width => 1000,
+      EntityMenuWidth => 345,
+      BorderWidth => 1,
+      PackageMenuHeight => 34,
+  );
 
 =cut
 
@@ -1099,7 +1099,7 @@ sub setDefault {
 
 =head4 Synopsis
 
-    $sec->add(@keyVal);
+  $sec->add(@keyVal);
 
 =head4 Arguments
 
@@ -1132,7 +1132,7 @@ sub add {
 
 =head4 Synopsis
 
-    $sec->push($key,$val);
+  $sec->push($key,$val);
 
 =head4 Arguments
 
@@ -1169,8 +1169,8 @@ sub push {
 
 =head4 Synopsis
 
-    $ref = $sec->weaken($key);
-    $ref = $sec->weaken($key=>$ref);
+  $ref = $sec->weaken($key);
+  $ref = $sec->weaken($key=>$ref);
 
 =head4 Description
 
@@ -1192,7 +1192,7 @@ sub weaken {
 
 =head4 Synopsis
 
-    $sec->validate($contentAllowed,\@keys);
+  $sec->validate($contentAllowed,\@keys);
 
 =head4 Arguments
 
@@ -1298,7 +1298,7 @@ sub validate {
 
 =head4 Synopsis
 
-    $sec->lockKeys;
+  $sec->lockKeys;
 
 =cut
 
@@ -1318,7 +1318,7 @@ sub lockKeys {
 
 =head4 Synopsis
 
-    $sec->error($msg,@keyVal);
+  $sec->error($msg,@keyVal);
 
 =head4 Arguments
 
@@ -1370,8 +1370,8 @@ sub error {
 
 =head4 Synopsis
 
-    $val = $this->AUTOLOAD;
-    $val = $this->AUTOLOAD($val);
+  $val = $this->AUTOLOAD;
+  $val = $this->AUTOLOAD($val);
 
 =head4 Description
 
@@ -1432,7 +1432,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

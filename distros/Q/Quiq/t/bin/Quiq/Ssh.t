@@ -3,9 +3,9 @@
 package Quiq::Ssh::Test;
 use base qw/Quiq::Test::Class/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
 # -----------------------------------------------------------------------------
 

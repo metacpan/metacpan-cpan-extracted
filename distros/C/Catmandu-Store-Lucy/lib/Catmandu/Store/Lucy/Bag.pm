@@ -13,7 +13,7 @@ use Moo;
 with 'Catmandu::Bag';
 with 'Catmandu::Searchable';
 
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 has _bag_query => (is => 'ro', lazy => 1, builder => '_build_bag_query');
 

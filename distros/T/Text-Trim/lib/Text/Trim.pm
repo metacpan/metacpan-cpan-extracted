@@ -9,11 +9,11 @@ Text::Trim - remove leading and/or trailing whitespace from strings
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 SYNOPSIS
 
@@ -63,9 +63,9 @@ Functions called in void context change their arguments in-place
 
     trim(@strings); # All strings in @strings are trimmed in-place
 
-    ltrim($text); # remove leading whitespace on $text
+    ltrim($text);   # remove leading whitespace on $text
 
-    rtrim; # remove trailing whitespace on $_
+    rtrim;          # remove trailing whitespace on $_
 
 No changes are made to arguments in non-void contexts.
 
@@ -73,18 +73,19 @@ No changes are made to arguments in non-void contexts.
 
 Values passed in are changed and returned without affecting the originals.
 
-    @result = trim(@strings); # @strings is unchanged
+    @result = trim(@strings);    # @strings is unchanged
 
-    @result = rtrim; # @result contains rtrimmed $_
+    @result = rtrim;             # @result contains rtrimmed $_
 
     ($result) = ltrim(@strings); # like $result = ltrim($strings[0]);
 
 =head2 scalar context
 
 As list context but multiple arguments are stringified before being returned.
-Single arguments are unaffected.  This means that under these circumstances, the
-value of $" ($LIST_SEPARATOR) is used to join the values. If you don't want
-this, make sure you only use single arguments when calling in scalar context.
+Single arguments are unaffected.  This means that under these circumstances,
+the value of C<$"> (C<$LIST_SEPARATOR>) is used to join the values. If you
+don't want this, make sure you only use single arguments when calling in
+scalar context.
 
     @strings = ("\thello\n", "\tthere\n");
     $trimmed = trim(@strings);
@@ -114,8 +115,8 @@ if all elements are undefined then the return value is also undefined.
 
 =head2 trim
 
-Removes leading and trailing whitespace from all arguments, or $_ if none are
-provided.
+Removes leading and trailing whitespace from all arguments, or C<$_> if none
+are provided.
 
 =cut
 
@@ -131,7 +132,7 @@ sub trim {
 
 =head2 rtrim 
 
-Like trim() but removes only trailing (right) whitespace.
+Like C<trim()> but removes only trailing (right) whitespace.
 
 =cut
 
@@ -147,7 +148,7 @@ sub rtrim {
 
 =head2 ltrim
 
-Like trim() but removes only leading (left) whitespace.
+Like C<trim()> but removes only leading (left) whitespace.
 
 =cut
 
@@ -167,7 +168,7 @@ __END__
 
 =head1 UNICODE
 
-Because this module is implemented using perl regular expressions, it is capable
+Because this module is implemented using Perl regular expressions, it is capable
 of recognising and removing unicode whitespace characters (such as non-breaking
 spaces) from scalars with the utf8 flag on. See L<Encode> for details about the
 utf8 flag.
@@ -178,14 +179,29 @@ Note that this only applies in the case of perl versions after 5.8.0 or so.
 
 Brent B. Powers' L<String::Strip> performs a similar function in XS.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>
+B<Matt Lawrence> E<lt>mattlaw@cpan.orgE<gt> - Original author and maintainer
+
+B<Ryan Thompson> E<lt>rjt@cpan.orgE<gt> - Co-maintainer, miscellaneous fixes
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-text-trim@rt.cpan.org>, 
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trim>.
 
 =head1 ACKNOWLEDGEMENTS
 
 Terrence Brannon E<lt>metaperl@gmail.comE<gt> for bringing my attention to
 L<String::Strip> and suggesting documentation changes.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+L<http://dev.perl.org/licenses/artistic.html>
 
 =cut
 

@@ -1,11 +1,11 @@
 package Quiq::Database::Api;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Database::Api::Dbi::Connection;
 
@@ -28,23 +28,23 @@ wird durch zwei Klassen definiert:
 
 B<< Quiq::Database::Api::*::Connection >>
 
-    $db = $class->new($udlObj);  # Datenbankverbindung aufbauen
-    $cur = $db->sql($stmt);      # SQL-Statement ausführen
-    $db->destroy;                # Datenbankverbindung abbauen
+  $db = $class->new($udlObj);  # Datenbankverbindung aufbauen
+  $cur = $db->sql($stmt);      # SQL-Statement ausführen
+  $db->destroy;                # Datenbankverbindung abbauen
 
 B<< Quiq::Database::Api::*::Cursor >>
 
-    $cur = $class->new(@keyVal); # Cursor instantiieren
-    
-    $n = $cur->bindVars;         # Anzahl Bind-Variablen
-    $n = $cur->hits;             # Anzahl "Treffer"
-    $id = $cur->id;              # Generierter Autoinkrement-Wert
-    $titlesA = $cur->titles;     # Kolumnentitel
-    
-    $cur2 = $cur->bind(@vals);   # Platzhalter einsetzen
-    $row = $cur->fetch;          # nächsten Datensatz lesen
-    
-    $cur->destroy;               # Cursor schließen
+  $cur = $class->new(@keyVal); # Cursor instantiieren
+  
+  $n = $cur->bindVars;         # Anzahl Bind-Variablen
+  $n = $cur->hits;             # Anzahl "Treffer"
+  $id = $cur->id;              # Generierter Autoinkrement-Wert
+  $titlesA = $cur->titles;     # Kolumnentitel
+  
+  $cur2 = $cur->bind(@vals);   # Platzhalter einsetzen
+  $row = $cur->fetch;          # nächsten Datensatz lesen
+  
+  $cur->destroy;               # Cursor schließen
 
 Die bislang einzige Lowlevel-Datenbank-Schnittstelle ist DBI, die
 die beiden Klassen umfasst:
@@ -72,7 +72,7 @@ die gleichen Methoden implementieren.
 
 =head4 Synopsis
 
-    $db = $class->connect($udlObj);
+  $db = $class->connect($udlObj);
 
 =head4 Description
 
@@ -82,14 +82,14 @@ Datenbankverbindung zurück.
 
 =head4 Example
 
-    use Quiq::Database::Api;
-    
-    my $udl = 'dbi#mysql:test%root';
-    my $udlObj = Quiq::Udl->new($udl);
-    my $db = Quiq::Database::Api->connect($udlObj);
-    print ref($db),"\n";
-    __END__
-    Quiq::Database::Api::Dbi::Connection
+  use Quiq::Database::Api;
+  
+  my $udl = 'dbi#mysql:test%root';
+  my $udlObj = Quiq::Udl->new($udl);
+  my $db = Quiq::Database::Api->connect($udlObj);
+  print ref($db),"\n";
+  __END__
+  Quiq::Database::Api::Dbi::Connection
 
 =cut
 
@@ -109,7 +109,7 @@ sub connect {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

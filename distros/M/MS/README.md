@@ -8,9 +8,6 @@ MS - Core libraries for mass spectrometry
 DESCRIPTION
 -----------
 
-NOTE: The current API is subject to  minor changes. This notice will be removed
-when the API is considered stable.
-
 The `MS::` namespace is intended as a hub for mass spectrometry-related
 development in Perl. This core package includes a number of parsers for HUPO
 PSI standards and other common file formats, as well as core functionality for

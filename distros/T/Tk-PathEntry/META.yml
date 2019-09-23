@@ -4,22 +4,23 @@ author:
   - 'Slaven Rezic <srezic@cpan.org>'
   - 'Klaus Wittrock <wittrock@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Tk-PathEntry
 no_index:
   directory:
     - t
     - inc
 requires:
-  Tk: 800.02
+  Tk: '800.02'
 resources:
   repository: git://github.com/eserte/tk-pathentry.git
-version: 3.07
+version: '3.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

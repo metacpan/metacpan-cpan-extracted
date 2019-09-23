@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::TAP;
-$Test::BDD::Cucumber::Harness::TAP::VERSION = '0.64';
+$Test::BDD::Cucumber::Harness::TAP::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::TAP - Generate results in TAP format
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 
@@ -38,14 +38,18 @@ sub feature {
     my ( $self, $feature ) = @_;
 
     my $ctx = context();
-    $ctx->note(join('', 'Feature ', $feature->name, "\n", map { $_->content } @{ $feature->satisfaction }));
+    $ctx->note(join('', $feature->keyword_original, ' ',
+                    $feature->name, "\n",
+                    map { $_->content } @{ $feature->satisfaction }));
     $ctx->release;
 }
 
 sub scenario {
     my ( $self, $scenario, $dataset ) = @_;
     my $ctx = context();
-    $ctx->note('Scenario ' . ($scenario->name || ''));
+    $ctx->note(join('', $scenario->keyword_original, ' ',
+                    ($scenario->name || ''), "\n",
+                    map { $_->content} @{ $scenario->description }));
     $ctx->release;
 }
 sub scenario_done { }

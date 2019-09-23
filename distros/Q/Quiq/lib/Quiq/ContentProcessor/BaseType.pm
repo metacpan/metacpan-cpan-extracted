@@ -1,11 +1,11 @@
 package Quiq::ContentProcessor::BaseType;
 use base qw/Quiq::Section::Object Quiq::ClassConfig/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ ihrer Subklassen.
 
 =head4 Synopsis
 
-    @attributes | $attributeA = $class->attributes;
+  @attributes | $attributeA = $class->attributes;
 
 =head4 Returns
 
@@ -79,7 +79,7 @@ sub attributes {
 
 =head4 Synopsis
 
-    $bool = $class->contentAllowed;
+  $bool = $class->contentAllowed;
 
 =head4 Returns
 
@@ -107,7 +107,7 @@ sub contentAllowed {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

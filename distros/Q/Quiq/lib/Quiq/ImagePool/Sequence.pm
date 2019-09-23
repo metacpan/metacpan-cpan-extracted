@@ -1,12 +1,12 @@
 package Quiq::ImagePool::Sequence;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::OrderedHash;
 use Quiq::FileHandle;
@@ -49,7 +49,7 @@ Liste aller Bilder.
 
 =head4 Synopsis
 
-    $ims = $class->new($file,$lst);
+  $ims = $class->new($file,$lst);
 
 =head4 Arguments
 
@@ -126,7 +126,7 @@ sub new {
 
 =head4 Synopsis
 
-    $n = $ims->count;
+  $n = $ims->count;
 
 =head4 Description
 
@@ -146,7 +146,7 @@ sub count {
 
 =head4 Synopsis
 
-    @keys|$keyA = $ims->keys;
+  @keys|$keyA = $ims->keys;
 
 =head4 Description
 
@@ -167,7 +167,7 @@ sub keys {
 
 =head4 Synopsis
 
-    $bool = $ims->exists($key);
+  $bool = $ims->exists($key);
 
 =head4 Description
 
@@ -188,7 +188,7 @@ sub exists {
 
 =head4 Synopsis
 
-    @def|$defA = $ims->def($key);
+  @def|$defA = $ims->def($key);
 
 =head4 Description
 
@@ -216,7 +216,7 @@ sub def {
 
 =head4 Synopsis
 
-    $range = $ims->spec($key);
+  $range = $ims->spec($key);
 
 =head4 Description
 
@@ -237,7 +237,7 @@ sub spec {
 
 =head4 Synopsis
 
-    @images|$imageA = $ims->specImages($key);
+  @images|$imageA = $ims->specImages($key);
 
 =head4 Arguments
 
@@ -309,8 +309,8 @@ sub specImages {
 
 =head4 Synopsis
 
-    $modifier = $ims->modifier($key);
-    $modifier = $ims->modifier($key=>$modifier);
+  $modifier = $ims->modifier($key);
+  $modifier = $ims->modifier($key=>$modifier);
 
 =head4 Description
 
@@ -341,8 +341,8 @@ sub modifier {
 
 =head4 Synopsis
 
-    @images|$imageA = $ims->images;
-    @images|$imageA = $ims->images($key);
+  @images|$imageA = $ims->images;
+  @images|$imageA = $ims->images($key);
 
 =head4 Arguments
 
@@ -378,7 +378,7 @@ sub images {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

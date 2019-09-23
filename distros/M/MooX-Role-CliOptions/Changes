@@ -1,0 +1,19 @@
+Revision history for MooX-Role-CliOptions
+
+0.04    2019-09-21 21:53:00
+        Removed tests for moodulino.pl since they do not test the Role
+        itself and system() behaves erratically on some systems.
+
+0.03.1_001 2019-09-21 20:13:00
+        Added Test::MockModule to build requirements. Investigating test
+        failures with system() on some platforms.
+
+0.03    2019-09-21 16:53:00
+        Corrected version number in POD.
+
+0.02    2019-09-21 16:44:00
+        Removed dependency on '//=' operator.
+
+0.01    2019-09-21 16:00:00
+        First version, released on an unsuspecting world.
+

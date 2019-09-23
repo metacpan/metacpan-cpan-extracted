@@ -1,5 +1,35 @@
 Revision history for Perl extension Sub-Multi-Tiny
 
+0.000011 2019-09-20T21:41:16Z
+
+    - Fix POD typo (thanks to MANWAR)
+
+0.000010 2019-09-20T02:36:46Z (TRIAL RELEASE)
+
+    - Add tests
+    - Refactor out common test code
+    - In D:Default, die loudly on type or where checks, rather
+      than ignoring them silently.
+    - Update documentation
+
+0.000009 2019-09-14T02:28:08Z (TRIAL RELEASE)
+
+    - Fix Dispatcher::TypeParams to run on older Perls (#8)
+
+0.000008 2019-09-13T22:16:40Z (TRIAL RELEASE)
+
+    - Fix t/Kit.pm to run on older Perls
+
+0.000007 2019-09-12T01:13:30Z (TRIAL RELEASE)
+
+    - The SUB_MULTI_TINY_VERBOSE environment value can have a numeric value
+    - New dependency on Scalar::Util
+    - Added voluminous test output on earlier Perls in hopes of tracking
+        down cpantesters failures.
+    - Use t/Kit.pm consistently in test files
+    - Verbose test output while covering, so the lines that provide that
+        output are covered!
+
 0.000006 2019-09-11T00:46:14Z
 
     - Added a Type::Params-based dispatcher
@@ -30,3 +60,4 @@ Revision history for Perl extension Sub-Multi-Tiny
 
     - Initial release to CPAN.  Only supports dispatch by arity.
 
+# vi: set ts=4 sts=4 sw=4 et ai: #

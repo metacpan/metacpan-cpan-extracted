@@ -1,11 +1,11 @@
 package Quiq::Html::Widget::SelectMenuColor;
 use base qw/Quiq::Html::Widget::SelectMenu/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Color;
 use Quiq::String;
@@ -45,27 +45,27 @@ der Klasse Quiq::Color akzeptiert.
 
 Erzeuge Auswahlmenü mit farbigen Texten:
 
-    $w = Quiq::Html::Widget::SelectMenuColor->new(
-        id => 'smc1',
-        name => 'smc1',
-        applyColorsTo => 'fg',
-        options => [qw/Apfel Birne Orange/],
-        colors => [qw/ff0000 006400 ff8c00/],
-        value => 'Birne',
-    );
-    print $w->html($h);
+  $w = Quiq::Html::Widget::SelectMenuColor->new(
+      id => 'smc1',
+      name => 'smc1',
+      applyColorsTo => 'fg',
+      options => [qw/Apfel Birne Orange/],
+      colors => [qw/ff0000 006400 ff8c00/],
+      value => 'Birne',
+  );
+  print $w->html($h);
 
 Erzeuge Auswahlmenü mit farbigen Hintergründen:
 
-    $w = Quiq::Html::Widget::SelectMenuColor->new(
-        id => 'smc1',
-        name => 'smc1',
-        applyColorsTo => 'bg',
-        options => [qw/Apfel Birne Orange/],
-        colors => [qw/ff0000 006400 ff8c00/],
-        value => 'Birne',
-    );
-    print $w->html($h);
+  $w = Quiq::Html::Widget::SelectMenuColor->new(
+      id => 'smc1',
+      name => 'smc1',
+      applyColorsTo => 'bg',
+      options => [qw/Apfel Birne Orange/],
+      colors => [qw/ff0000 006400 ff8c00/],
+      value => 'Birne',
+  );
+  print $w->html($h);
 
 =head1 METHODS
 
@@ -75,7 +75,7 @@ Erzeuge Auswahlmenü mit farbigen Hintergründen:
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =cut
 
@@ -107,8 +107,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =cut
 
@@ -176,7 +176,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

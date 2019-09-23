@@ -15,7 +15,8 @@ BEGIN {
             print STDERR "XXX XXX XXX --- PID $$: DESTROYing Promise::ES6 at DESTRUCT time!$/";
             print STDERR Dumper(@_);
 
-            exit 1;
+            # Avoid exit() so that we’ll see all possible problems.
+            $? = 1;
         }
 
         return $destroy_cr->(@_);

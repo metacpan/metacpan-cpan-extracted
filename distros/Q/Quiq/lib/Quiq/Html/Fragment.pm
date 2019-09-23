@@ -1,11 +1,11 @@
 package Quiq::Html::Fragment;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -30,11 +30,11 @@ die in ein bestehendes HTML-Dokument eingebettet wird.
 
 Der generierte Code hat den Aufbau:
 
-    [<DOCTYPE>]
-    
-    <STYLE CODE>
-    <HTML CODE>
-    <JAVASCRIPT CODE>
+  [<DOCTYPE>]
+  
+  <STYLE CODE>
+  <HTML CODE>
+  <JAVASCRIPT CODE>
 
 Über dem Code kann eine globale Platzhalter-Ersetzung durchgeführt
 werden.
@@ -81,7 +81,7 @@ z.B. für die getrennte Angabe von CSS-URLs und CSS-Definitionen.
 
 =head4 Synopsis
 
-    $c = $class->new(@keyVal);
+  $c = $class->new(@keyVal);
 
 =head4 Description
 
@@ -127,8 +127,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $obj->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $obj->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -163,7 +163,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

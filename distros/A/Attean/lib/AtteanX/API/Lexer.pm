@@ -7,7 +7,7 @@ AtteanX::API::Lexer - Role defining common functionality for lexers.
 
 =head1 VERSION
 
-This document describes AtteanX::API::Lexer version 0.023
+This document describes AtteanX::API::Lexer version 0.024
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ of characters, constant strings, and fixed-length buffers.
 
 =cut
 
-package AtteanX::API::Lexer 0.023 {
+package AtteanX::API::Lexer 0.024 {
 	use strict;
 	use Types::Standard qw(FileHandle Ref Str Int ArrayRef HashRef ConsumerOf InstanceOf);
 
@@ -173,7 +173,9 @@ Consume and return C<< $length >> characters  from the start of the buffer.
 		my $self	= shift;
 		my $len		= shift;
 		while (length($self->{buffer}) < $len) {
+			my $curlen	= length($self->{buffer});
 			$self->fill_buffer;
+			last if (length($self->{buffer}) == $curlen);
 		}
 	
 		my $word	= substr($self->{buffer}, 0, $len, '');

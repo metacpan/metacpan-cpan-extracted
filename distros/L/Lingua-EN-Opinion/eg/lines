@@ -20,7 +20,7 @@ my $averaged = $cma ? [ central_moving_averages( $param, $opinion->scores ) ]
                     : $opinion->averaged_score($param);
 
 my @data = ( 
-    [ 1 .. @$averaged ],
+    [ 0 .. @$averaged - 1 ],
     [ (0) x @$averaged ],
     $averaged,
 );
@@ -37,7 +37,7 @@ $graph->set(
     y_min_value   => min( @$averaged ),
     x_min_value   => 0,
     x_max_value   => scalar(@$averaged),
-    x_tick_number => scalar(@$averaged) / 10,
+    x_tick_number => scalar(@$averaged),
 );
 
 my $gd = $graph->plot(\@data);

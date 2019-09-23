@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 1;
 
@@ -46,17 +46,15 @@ App::Gre - A grep clone using Perl regexp's with better file filtering, defaults
     -y1                output style 1, grouped by file, and line number preceeding matches
     -y2                output style 2, classic grep style
     -y3                output style 3, no file/line info
-    -[no]xbinary       filters out binary files
-    -[no][x][i]name[e]=<str>
-                       include files by name
-    -[no][x][i]path[e]=<str>
-                       include files by full path name
-    -[no][x][i][r]ext=<str>
-                       include files by extension name
-    -[no][x][i]line1[e]=<str>
-                       include files by the first line in the file
-    -[no]{perl,html,php,js,java,cc,...}
-                       include files matching builtin filter combo
+    -xbinary           filters out binary files*
+    -name=<str>        include files by name*
+    -path=<str>        include files by full path name*
+    -ext=<str>         include files by extension name*
+    -line1=<str>       include files by the first line in the file*
+    -{perl,html,php,js,java,cc,...}
+                       include files matching builtin filter combo*
+
+* can be further modified by adding no, i, e, r, x
 
 =head1 DESCRIPTION
 
@@ -172,8 +170,6 @@ the filters.
 
 Symlinks are not followed. This is usually what you want and otherwise
 you might end up in an infinite loop.
-
-=head1 IDEAS
 
 You can do multiline regexp's '^sub.*^\}' (with the addition of the
 -m option)

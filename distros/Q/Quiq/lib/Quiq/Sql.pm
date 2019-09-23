@@ -1,12 +1,12 @@
 package Quiq::Sql;
 use base qw/Quiq::Dbms/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -31,25 +31,25 @@ L<Quiq::Dbms>
 
 Das Programm
 
-    use Quiq::Sql;
-    
-    my $sql = Quiq::Sql->new('Oracle');
-    
-    my $stmt = $sql->createTable('person',
-        ['per_id',type=>'INTEGER',primaryKey=>1],
-        ['per_vorname',type=>'STRING(30)'],
-        ['per_nachname',type=>'STRING(30)',notNull=>1],
-    );
-    
-    print $stmt,"\n";
+  use Quiq::Sql;
+  
+  my $sql = Quiq::Sql->new('Oracle');
+  
+  my $stmt = $sql->createTable('person',
+      ['per_id',type=>'INTEGER',primaryKey=>1],
+      ['per_vorname',type=>'STRING(30)'],
+      ['per_nachname',type=>'STRING(30)',notNull=>1],
+  );
+  
+  print $stmt,"\n";
 
 generiert das CREATE TABLE Statement
 
-    CREATE TABLE person (
-        per_id NUMBER PRIMARY KEY,
-        per_vorname STRING2(30),
-        per_nachname STRING2(30) NOT NULL
-    )
+  CREATE TABLE person (
+      per_id NUMBER PRIMARY KEY,
+      per_vorname STRING2(30),
+      per_nachname STRING2(30) NOT NULL
+  )
 
 (man beachte die Abbildung der Kolumnentypen)
 
@@ -66,10 +66,10 @@ DBMS den passenden SQL-Code erzeugen.
 
 Folgende DBMSe werden von der Klasse unterstützt:
 
-    Oracle
-    PostgreSQL
-    SQLite
-    MySQL
+  Oracle
+  PostgreSQL
+  SQLite
+  MySQL
 
 =head1 METHODS
 
@@ -79,7 +79,7 @@ Folgende DBMSe werden von der Klasse unterstützt:
 
 =head4 Synopsis
 
-    ($stmt1,@arr) = $this->split($stmt);
+  ($stmt1,@arr) = $this->split($stmt);
 
 =head4 Description
 
@@ -93,17 +93,17 @@ und anschließend mit sprintf() wieder zusammengefügt werden.
 
 Zerlege Statement in Bestandteile:
 
-    $stmt1 = "SELECT 'a', 'b' FROM x WHERE x = 'c' AND y = 'd''e'";
-    ($stmt2,@arr) = $class->split($stmt1);
-    =>
-    "SELECT '%s', '%s' FROM x WHERE x = '%s' AND y = '%s''%s'"
-    ('a','b','c','d','e')
+  $stmt1 = "SELECT 'a', 'b' FROM x WHERE x = 'c' AND y = 'd''e'";
+  ($stmt2,@arr) = $class->split($stmt1);
+  =>
+  "SELECT '%s', '%s' FROM x WHERE x = '%s' AND y = '%s''%s'"
+  ('a','b','c','d','e')
 
 Füge Bestandteile wieder zusammen:
 
-    $stmt2 = sprintf($stmt2,@arr);
-    =>
-    "SELECT 'a', 'b' FROM x WHERE x = 'c' AND y = 'd''e'"
+  $stmt2 = sprintf($stmt2,@arr);
+  =>
+  "SELECT 'a', 'b' FROM x WHERE x = 'c' AND y = 'd''e'"
 
 =cut
 
@@ -125,7 +125,7 @@ sub split {
 
 =head4 Synopsis
 
-    $stmtResolved = $sql->resolve($stmt,@vals);
+  $stmtResolved = $sql->resolve($stmt,@vals);
 
 =head4 Description
 
@@ -138,11 +138,11 @@ sehen möchte.
 
 =head4 Example
 
-    $stmt = 'SELECT * FROM t WHERE x = ? AND y > ?';
-    @vals = (47,11);
-    $stmtResolved = $sql->resolve($stmt,@vals);
-    =>
-    "SELECT * FROM t WHERE x = '47' AND y > '11'"
+  $stmt = 'SELECT * FROM t WHERE x = ? AND y > ?';
+  @vals = (47,11);
+  $stmtResolved = $sql->resolve($stmt,@vals);
+  =>
+  "SELECT * FROM t WHERE x = '47' AND y > '11'"
 
 =cut
 
@@ -177,7 +177,7 @@ sub resolve {
 
 =head4 Synopsis
 
-    $newStmt = $sql->removeSelectClause($stmt);
+  $newStmt = $sql->removeSelectClause($stmt);
 
 =head4 Description
 
@@ -203,7 +203,7 @@ sub removeSelectClause {
 
 =head4 Synopsis
 
-    $newStmt = $sql->removeOrderByClause($stmt);
+  $newStmt = $sql->removeOrderByClause($stmt);
 
 =head4 Description
 
@@ -229,8 +229,8 @@ sub removeOrderByClause {
 
 =head4 Synopsis
 
-    $name = $sql->checkName($name);
-    $sql->checkName(\$name);
+  $name = $sql->checkName($name);
+  $sql->checkName(\$name);
 
 =head4 Description
 
@@ -279,7 +279,7 @@ sub checkName {
 
 =head4 Synopsis
 
-    $script = $class->stmtListToScript(@stmt)
+  $script = $class->stmtListToScript(@stmt)
 
 =head4 Description
 
@@ -313,35 +313,35 @@ Diverse Details werden unterschieden (siehe EXAMPLES).
 
 So verhält es sich im Detail:
 
-    $script = Quiq::Sql->stmtListToScript(
-        '-- TEXT1',
-        'STMT1',
-        "STMT2\n...',
-        "STMT3 (\n....\n)",
-        '-- TEXT2',
-        'STMT4',
-        '-- eof',
-    );
+  $script = Quiq::Sql->stmtListToScript(
+      '-- TEXT1',
+      'STMT1',
+      "STMT2\n...',
+      "STMT3 (\n....\n)",
+      '-- TEXT2',
+      'STMT4',
+      '-- eof',
+  );
 
 wird zu:
 
-    -- TEXT1     Kommentar am Anfang => danach "\n\n"
-    
-    STMT1;       einzeiliges Statement => danach ";\n\n")
-    
-    STMT2        mehrzeilges Statement => danach "\n;\n")
-        ...
-    ;
-    STMT3 (      mehrzeiles Statement mit ) => danach ";\n")
-        ...
-    );
-    
-    -- TEXT2     innerer Kommentar => davor "\n", danach "\n\n"
-    
-    STMT4;       (wie einzeiliges Statement oben)
-    
-    -- eof       Kommentar am Ende, nach einzeiligem Statement
-                 => davor nichts, danach "\n"
+  -- TEXT1     Kommentar am Anfang => danach "\n\n"
+  
+  STMT1;       einzeiliges Statement => danach ";\n\n")
+  
+  STMT2        mehrzeilges Statement => danach "\n;\n")
+      ...
+  ;
+  STMT3 (      mehrzeiles Statement mit ) => danach ";\n")
+      ...
+  );
+  
+  -- TEXT2     innerer Kommentar => davor "\n", danach "\n\n"
+  
+  STMT4;       (wie einzeiliges Statement oben)
+  
+  -- eof       Kommentar am Ende, nach einzeiligem Statement
+               => davor nichts, danach "\n"
 
 =cut
 
@@ -376,7 +376,7 @@ sub stmtListToScript {
 
 =head4 Synopsis
 
-    @commands | $commandA = $sql->commands;
+  @commands | $commandA = $sql->commands;
 
 =cut
 
@@ -468,8 +468,8 @@ Methoden für die portable Spezifikation von Kolumnen-Datentypen.
 
 =head4 Synopsis
 
-    $dbmsType = $sql->dataType($portableType);
-    ($dbmsType,$args) = $sql->dataType($portableType);
+  $dbmsType = $sql->dataType($portableType);
+  ($dbmsType,$args) = $sql->dataType($portableType);
 
 =head4 Description
 
@@ -480,14 +480,14 @@ im Listkontext liefere Typ und Argumente getrennt.
 
 B<Typ-Abbildung>
 
-    Portabel   Oracle     PostgreSQL SQLite    MySQL
-    ---------- ---------- ---------- --------- ----------
-    STRING     VARCHAR2   VARCHAR    TEXT      VARCHAR
-    TEXT       CLOB       TEXT       TEXT      LONGTEXT
-    INTEGER    NUMBER     NUMERIC    INTEGER   (TINY|SMALL|MEDIUM|BIG)INT
-    REAL       NUMBER     NUMERIC    REAL      DECIMAL
-    DATETIME   TIMESTAMP  TIMESTAMP  TIMESTAMP TIMESTAMP
-    BLOB       BLOB       BYTEA      BLOB      LONGBLOB
+  Portabel   Oracle     PostgreSQL SQLite    MySQL
+  ---------- ---------- ---------- --------- ----------
+  STRING     VARCHAR2   VARCHAR    TEXT      VARCHAR
+  TEXT       CLOB       TEXT       TEXT      LONGTEXT
+  INTEGER    NUMBER     NUMERIC    INTEGER   (TINY|SMALL|MEDIUM|BIG)INT
+  REAL       NUMBER     NUMERIC    REAL      DECIMAL
+  DATETIME   TIMESTAMP  TIMESTAMP  TIMESTAMP TIMESTAMP
+  BLOB       BLOB       BYTEA      BLOB      LONGBLOB
 
 =over 2
 
@@ -501,20 +501,20 @@ VARCHAR2 kann bei Oracle max 4000 Zeichen lang sein
 
 Einige Konvertierungen im Falle von Oracle:
 
-    $type = $sql->dataType('STRING');
-    # => 'VARCHAR2'
-    
-    $type = $sql->dataType('STRING(20)');
-    # => 'VARCHAR2(20)'
-    
-    ($type,$args) = $sql->dataType('STRING');
-    # => ('VARCHAR2','')
-    
-    ($type,$args) = $sql->dataType('STRING(20)');
-    # => ('VARCHAR2','(20)')
-    
-    ($type,$args) = $sql->dataType('DATETIME');
-    # => ('TIMESTAMP','(0)')
+  $type = $sql->dataType('STRING');
+  # => 'VARCHAR2'
+  
+  $type = $sql->dataType('STRING(20)');
+  # => 'VARCHAR2(20)'
+  
+  ($type,$args) = $sql->dataType('STRING');
+  # => ('VARCHAR2','')
+  
+  ($type,$args) = $sql->dataType('STRING(20)');
+  # => ('VARCHAR2','(20)')
+  
+  ($type,$args) = $sql->dataType('DATETIME');
+  # => ('TIMESTAMP','(0)')
 
 =cut
 
@@ -647,8 +647,8 @@ sub dataType {
 
 =head4 Synopsis
 
-    $colDef = $sql->columnDef(@colDef);
-    $colDef = $sql->columnDef($portableType,@colDef);
+  $colDef = $sql->columnDef(@colDef);
+  $colDef = $sql->columnDef($portableType,@colDef);
 
 =head4 Description
 
@@ -726,24 +726,24 @@ Das Attribut autoIncrement ist nicht portabel, es ist
 Portabler Typ wird verwendet, wenn nichts anderes
 für das DBMS angegeben ist:
 
-    $sql = Quiq::Sql->new('Oracle');
-    $type = $sql->columnDef(
-        type => 'STRING(20)',
-    );
-    ==>
-    'VARCHAR2(20)'
+  $sql = Quiq::Sql->new('Oracle');
+  $type = $sql->columnDef(
+      type => 'STRING(20)',
+  );
+  ==>
+  'VARCHAR2(20)'
 
 =item *
 
 DBMS-Typ wird verwendet, wenn angegeben:
 
-    $sql = Quiq::Sql->new('Oracle');
-    $type = $sql->columnDef(
-        type => 'INTEGER(5)',
-        oracleType => 'NUMBER(5)',
-    );
-    ==>
-    'NUMBER(5)'
+  $sql = Quiq::Sql->new('Oracle');
+  $type = $sql->columnDef(
+      type => 'INTEGER(5)',
+      oracleType => 'NUMBER(5)',
+  );
+  ==>
+  'NUMBER(5)'
 
 =back
 
@@ -827,7 +827,7 @@ sub columnDef {
 
 =head4 Synopsis
 
-    $stmt = $sql->comment($text);
+  $stmt = $sql->comment($text);
 
 =head4 Description
 
@@ -839,15 +839,15 @@ wie die SQL-Statements per Default nicht mit einem Newline.
 
 =head4 Example
 
-    Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut
-    labore et dolore magna
+  Lorem ipsum dolor sit amet, consetetur sadipscing
+  elitr, sed diam nonumy eirmod tempor invidunt ut
+  labore et dolore magna
 
 wird zu
 
-    -- Lorem ipsum dolor sit amet, consetetur sadipscing
-    -- elitr, sed diam nonumy eirmod tempor invidunt ut
-    -- labore et dolore magna
+  -- Lorem ipsum dolor sit amet, consetetur sadipscing
+  -- elitr, sed diam nonumy eirmod tempor invidunt ut
+  -- labore et dolore magna
 
 =cut
 
@@ -876,8 +876,8 @@ sub comment {
 
 =head4 Synopsis
 
-    @stmt = $class->setDateFormat;
-    @stmt = $class->setDateFormat($format);
+  @stmt = $class->setDateFormat;
+  @stmt = $class->setDateFormat($format);
 
 =head4 Description
 
@@ -896,14 +896,14 @@ YYYY-MM-DD HH:MM:SS
 
 B<Oracle>
 
-    (iso)
-    ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
-    ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SSXFF'
+  (iso)
+  ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
+  ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SSXFF'
 
 B<PostgreSQL>
 
-    (iso)
-    SET datestyle TO iso, ymd
+  (iso)
+  SET datestyle TO iso, ymd
 
 B<SQLite>
 
@@ -953,8 +953,8 @@ sub setDateFormat {
 
 =head4 Synopsis
 
-    @stmt = $class->setNumberFormat;
-    @stmt = $class->setNumberFormat($format);
+  @stmt = $class->setNumberFormat;
+  @stmt = $class->setNumberFormat($format);
 
 =head4 Description
 
@@ -963,7 +963,7 @@ setzte angloamerikanisches Format.
 
 B<Oracle>
 
-    ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '.,'
+  ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '.,'
 
 B<PostgreSQL>
 
@@ -1010,17 +1010,17 @@ sub setNumberFormat {
 
 =head4 Synopsis
 
-    $class->setSchema($schema);
+  $class->setSchema($schema);
 
 =head4 Description
 
 B<Oracle>
 
-    ALTER SESSION SET CURRENT_SCHEMA = <schema>
+  ALTER SESSION SET CURRENT_SCHEMA = <schema>
 
 B<PostgreSQL>
 
-    SET search_path TO <schema>
+  SET search_path TO <schema>
 
 =over 2
 
@@ -1038,7 +1038,7 @@ sie im Falle eines ROLLBACK sonst verfällt.
 
 B<SQLite>
 
-    <leer>
+  <leer>
 
 SQLite hat das Konzept mehrerer Schemata, von denen eins das
 Default-Schema ist, nicht.
@@ -1051,7 +1051,7 @@ aufgelöst. Die zuerst hinzugefügte Tabelle ist der Dafault.
 
 B<MySQL>
 
-    USE <schema>
+  USE <schema>
 
 =cut
 
@@ -1091,25 +1091,25 @@ sub setSchema {
 
 =head4 Synopsis
 
-    $stmt = $class->setSearchPath(@schemas);
+  $stmt = $class->setSearchPath(@schemas);
 
 =head4 Description
 
 B<Oracle>
 
-    <not implemented>
+  <not implemented>
 
 B<PostgreSQL>
 
-    SET search_path TO SCHEMA, ...
+  SET search_path TO SCHEMA, ...
 
 B<SQLite>
 
-    <not implemented>
+  <not implemented>
 
 B<MySQL>
 
-    <not implemented>
+  <not implemented>
 
 =cut
 
@@ -1148,30 +1148,30 @@ sub setSearchPath {
 
 =head4 Synopsis
 
-    $stmt = $class->setEncoding($charset);
+  $stmt = $class->setEncoding($charset);
 
 =head4 Description
 
 Werte für $charset:
 
-    iso-8859-1
-    utf-8
+  iso-8859-1
+  utf-8
 
 B<Oracle>
 
-    <not implemented>
+  <not implemented>
 
 B<PostgreSQL>
 
-    SET client_encoding TO <charset>
+  SET client_encoding TO <charset>
 
 B<SQLite>
 
-    <not implemented>
+  <not implemented>
 
 B<MySQL>
 
-    <not implemented>
+  <not implemented>
 
 =cut
 
@@ -1218,25 +1218,25 @@ sub setEncoding {
 
 =head4 Synopsis
 
-    $stmt = $class->lockTable($table);
+  $stmt = $class->lockTable($table);
 
 =head4 Description
 
 B<Oracle>
 
-    LOCK TABLE <table> IN EXCLUSIVE MODE NOWAIT
+  LOCK TABLE <table> IN EXCLUSIVE MODE NOWAIT
 
 B<PostgreSQL>
 
-    LOCK TABLE <table> IN EXCLUSIVE MODE NOWAIT
+  LOCK TABLE <table> IN EXCLUSIVE MODE NOWAIT
 
 B<SQLite>
 
-    nicht implementiert
+  nicht implementiert
 
 B<MySQL>
 
-    nicht implementiert
+  nicht implementiert
 
 =cut
 
@@ -1264,7 +1264,7 @@ sub lockTable {
 
 =head4 Synopsis
 
-    $stmt = $class->createUser($name,$password,@opt);
+  $stmt = $class->createUser($name,$password,@opt);
 
 =head4 Options
 
@@ -1333,7 +1333,7 @@ sub createUser {
 
 =head4 Synopsis
 
-    $stmt = $class->createSchema($name);
+  $stmt = $class->createSchema($name);
 
 =cut
 
@@ -1365,7 +1365,7 @@ sub createSchema {
 
 =head4 Synopsis
 
-    $stmt = $class->dropSchema($name);
+  $stmt = $class->dropSchema($name);
 
 =cut
 
@@ -1402,8 +1402,8 @@ sub dropSchema {
 
 =head4 Synopsis
 
-    ($schema,$table) = $class->splitTableName($name);
-    ($schema,$table) = $class->splitTableName($name,$sloppy);
+  ($schema,$table) = $class->splitTableName($name);
+  ($schema,$table) = $class->splitTableName($name,$sloppy);
 
 =head4 Alias
 
@@ -1450,11 +1450,11 @@ sub splitTableName {
 
 =head4 Synopsis
 
-    $stmt = $sql->createTable($table,
-        [$colName,@colDef],
-        ...
-        @opt,
-    );
+  $stmt = $sql->createTable($table,
+      [$colName,@colDef],
+      ...
+      @opt,
+  );
 
 =head4 Options
 
@@ -1591,7 +1591,7 @@ sub createTable {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropTable($table);
+  $stmt = $sql->dropTable($table);
 
 =cut
 
@@ -1620,7 +1620,7 @@ sub dropTable {
 
 =head4 Synopsis
 
-    $stmt = $sql->analyzeTable($table);
+  $stmt = $sql->analyzeTable($table);
 
 =cut
 
@@ -1648,7 +1648,7 @@ sub analyzeTable {
 
 =head4 Synopsis
 
-    $table = $sql->legalizeTablename($table);
+  $table = $sql->legalizeTablename($table);
 
 =head4 Description
 
@@ -1656,8 +1656,8 @@ Legalisiere Tabellennamen durch Quotierung, wenn dieser Sonderzeichen
 enthält. Dies geschieht bei MySQL durch Backticks, z.B. bei Tabellen,
 deren Name einen Bindestrich enthält:
 
-    Meine-Tabelle -> `Meine-Tabelle`
-    Mein-Schema.Meine-Tabelle -> `Meine-Schema`.`Meine-Tabelle`
+  Meine-Tabelle -> `Meine-Tabelle`
+  Mein-Schema.Meine-Tabelle -> `Meine-Schema`.`Meine-Tabelle`
 
 Für die anderen DBMSe ist das Feature aktuell nicht implementiert,
 d.h. es wird immer der unveränderte Tabellenname zurückgegeben.
@@ -1688,7 +1688,7 @@ sub legalizeTablename {
 
 =head4 Synopsis
 
-    $stmt = $sql->addColumn($table,$column,@colDef);
+  $stmt = $sql->addColumn($table,$column,@colDef);
 
 =head4 Description
 
@@ -1699,19 +1699,19 @@ in die DBMS-spezifische Zeichenkette gewandelt.
 
 B<PostgreSQL Syntax>
 
-    ALTER TABLE table ADD COLUMN column type ...
+  ALTER TABLE table ADD COLUMN column type ...
 
 B<Oracle Syntax>
 
-    ALTER TABLE table ADD (column type ...)
+  ALTER TABLE table ADD (column type ...)
 
 B<SQLite Syntax>
 
-    ALTER TABLE table ADD COLUMN column type ...
+  ALTER TABLE table ADD COLUMN column type ...
 
 B<MySQL Syntax>
 
-    ALTER TABLE table ADD COLUMN column type ...
+  ALTER TABLE table ADD COLUMN column type ...
 
 Die Punkte stehen für zusätzliche optionale Kolumnen-Angaben, wie
 "DEFAULT expr", "NOT NULL", "PRIMARY KEY" usw.
@@ -1752,7 +1752,7 @@ sub addColumn {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropColumn($table,$column);
+  $stmt = $sql->dropColumn($table,$column);
 
 =head4 Description
 
@@ -1761,11 +1761,11 @@ entfernt.
 
 B<Oracle, PostgreSQL, MySQL Syntax>
 
-    ALTER TABLE table DROP COLUMN column
+  ALTER TABLE table DROP COLUMN column
 
 B<SQLite Syntax>
 
-    Eine Kolumne kann nicht entfernt werden (geprüft 3.6.13)
+  Eine Kolumne kann nicht entfernt werden (geprüft 3.6.13)
 
 =cut
 
@@ -1797,7 +1797,7 @@ sub dropColumn {
 
 =head4 Synopsis
 
-    $stmt = $sql->modifyColumn($table,$column,$property=>$value);
+  $stmt = $sql->modifyColumn($table,$column,$property=>$value);
 
 =head4 Description
 
@@ -1811,20 +1811,20 @@ B<NULL>
 
 =item PostgreSQL:
 
-    ALTER TABLE t ALTER COLUMN c DROP NOT NULL
+  ALTER TABLE t ALTER COLUMN c DROP NOT NULL
 
 =item Oracle:
 
-    ALTER TABLE t MODIFY c NULL
+  ALTER TABLE t MODIFY c NULL
 
 =item MySQL:
 
-    NOT NULL scheint nicht ohne Kenntnis des Kolumnentyps
-    manipuliert werden zu können (5.1.41).
+  NOT NULL scheint nicht ohne Kenntnis des Kolumnentyps
+  manipuliert werden zu können (5.1.41).
 
 =item SQLite:
 
-    Eine Kolumne kann nicht modifiziert werden (geprüft 3.6.22)
+  Eine Kolumne kann nicht modifiziert werden (geprüft 3.6.22)
 
 =back
 
@@ -1834,20 +1834,20 @@ B<NOT NULL>
 
 =item PostgreSQL:
 
-    ALTER TABLE t ALTER COLUMN c SET NOT NULL
+  ALTER TABLE t ALTER COLUMN c SET NOT NULL
 
 =item Oracle:
 
-    ALTER TABLE t MODIFY COLUMN c NULL
+  ALTER TABLE t MODIFY COLUMN c NULL
 
 =item MySQL:
 
-    NOT NULL scheint nicht ohne Kenntnis des Kolumnentyps
-    manipuliert werden zu können (5.1.41).
+  NOT NULL scheint nicht ohne Kenntnis des Kolumnentyps
+  manipuliert werden zu können (5.1.41).
 
 =item SQLite:
 
-    Eine Kolumne kann nicht modifiziert werden (geprüft 3.6.22)
+  Eine Kolumne kann nicht modifiziert werden (geprüft 3.6.22)
 
 =back
 
@@ -1857,19 +1857,19 @@ B<TYPE>
 
 =item PostgreSQL:
 
-    nicht implementiert
+  nicht implementiert
 
 =item Oracle:
 
-    ALTER TABLE <t> MODIFY COLUMN <c> <type>
+  ALTER TABLE <t> MODIFY COLUMN <c> <type>
 
 =item MySQL:
 
-    nicht implementiert
+  nicht implementiert
 
 =item SQLite:
 
-    Eine Kolumne kann nicht modifiziert werden (geprüft 3.6.22)
+  Eine Kolumne kann nicht modifiziert werden (geprüft 3.6.22)
 
 =back
 
@@ -1936,7 +1936,7 @@ sub modifyColumn {
 
 =head4 Synopsis
 
-    $stmt = $sql->renameColumn($table,$oldName,$newName)
+  $stmt = $sql->renameColumn($table,$oldName,$newName)
 
 =head4 Description
 
@@ -1949,19 +1949,19 @@ B<Syntax>
 
 =item PostgreSQL:
 
-    ALTER TABLE t RENAME COLUMN c1 TO c2
+  ALTER TABLE t RENAME COLUMN c1 TO c2
 
 =item Oracle:
 
-    ALTER TABLE t RENAME COLUMN c1 TO c2
+  ALTER TABLE t RENAME COLUMN c1 TO c2
 
 =item MySQL:
 
-    nicht implementiert
+  nicht implementiert
 
 =item SQLite:
 
-    nicht implementiert
+  nicht implementiert
 
 =back
 
@@ -1995,7 +1995,7 @@ sub renameColumn {
 
 =head4 Synopsis
 
-    $stmt = $sql->addPrimaryKeyConstraint($tableName,\@colNames,@opt);
+  $stmt = $sql->addPrimaryKeyConstraint($tableName,\@colNames,@opt);
 
 =head4 Options
 
@@ -2021,18 +2021,18 @@ Name des Tablespace, in dem der Index erzeugt wird
 
 B<Oracle Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        PRIMARY KEY (<TABLE_COLUMNS>)
-        USING INDEX TABLESPACE <TABLESPACE_NAME>
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      PRIMARY KEY (<TABLE_COLUMNS>)
+      USING INDEX TABLESPACE <TABLESPACE_NAME>
+      EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
 
 B<PostgreSQL Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        PRIMARY KEY (<TABLE_COLUMNS>)
-        USING INDEX TABLESPACE <TABLESPACE_NAME>
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      PRIMARY KEY (<TABLE_COLUMNS>)
+      USING INDEX TABLESPACE <TABLESPACE_NAME>
 
 =cut
 
@@ -2101,8 +2101,8 @@ sub addPrimaryKeyConstraint {
 
 =head4 Synopsis
 
-    $stmt = $sql->addForeignKeyConstraint($tableName,\@tableCols,
-        $refTableName,@opt);
+  $stmt = $sql->addForeignKeyConstraint($tableName,\@tableCols,
+      $refTableName,@opt);
 
 =head4 Options
 
@@ -2141,31 +2141,31 @@ ein Primary Key auf der referenzierten Tabelle definiert ist.
 
 B<Oracle Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        FOREIGN KEY (<TABLE_COLUMNS>)
-        REFERENCES <REF_TABLE_NAME>
-        ON DELETE <ACTION>
-        DEFERRABLE INITIALLY DEFERRED
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
-        DISABLE
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      FOREIGN KEY (<TABLE_COLUMNS>)
+      REFERENCES <REF_TABLE_NAME>
+      ON DELETE <ACTION>
+      DEFERRABLE INITIALLY DEFERRED
+      EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+      DISABLE
 
 B<PostgreSQL Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        FOREIGN KEY (<TABLE_COLUMNS>)
-        REFERENCES <REF_TABLE_NAME>
-        ON DELETE <ACTION>
-        DEFERRABLE INITIALLY DEFERRED
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      FOREIGN KEY (<TABLE_COLUMNS>)
+      REFERENCES <REF_TABLE_NAME>
+      ON DELETE <ACTION>
+      DEFERRABLE INITIALLY DEFERRED
 
 B<MySQL Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        FOREIGN KEY (<TABLE_COLUMNS>)
-        REFERENCES <REF_TABLE_NAME> (REF_TABLE_COLUMNS)
-        ON DELETE <ACTION>
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      FOREIGN KEY (<TABLE_COLUMNS>)
+      REFERENCES <REF_TABLE_NAME> (REF_TABLE_COLUMNS)
+      ON DELETE <ACTION>
 
 =cut
 
@@ -2277,7 +2277,7 @@ sub addForeignKeyConstraint {
 
 =head4 Synopsis
 
-    $stmt = $sql->addNotNullConstraint($tableName,$colName,@opt);
+  $stmt = $sql->addNotNullConstraint($tableName,$colName,@opt);
 
 =head4 Options
 
@@ -2298,18 +2298,18 @@ protokollliert (nur Oracle).
 
 B<Oracle Syntax>
 
-    ALTER TABLE <TABLE_NAME> MODIFY (
-        <COLUMN NAME>
-        CONSTRAINT <CONSTRAINT_NAME>
-        NOT NULL
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
-    )
+  ALTER TABLE <TABLE_NAME> MODIFY (
+      <COLUMN NAME>
+      CONSTRAINT <CONSTRAINT_NAME>
+      NOT NULL
+      EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+  )
 
 B<PostgreSQL Syntax>
 
-    ALTER TABLE <TABLE_NAME>
-        ALTER COLUMN <COLUMN_NAME>
-        SET NOT NULL
+  ALTER TABLE <TABLE_NAME>
+      ALTER COLUMN <COLUMN_NAME>
+      SET NOT NULL
 
 =cut
 
@@ -2371,7 +2371,7 @@ sub addNotNullConstraint {
 
 =head4 Synopsis
 
-    $stmt = $sql->addCheckConstraint($tableName,$clause,@opt);
+  $stmt = $sql->addCheckConstraint($tableName,$clause,@opt);
 
 =head4 Options
 
@@ -2392,16 +2392,16 @@ protokollliert (nur Oracle).
 
 B<Oracle Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        CHECK (<CHECK_CLAUSE>)
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      CHECK (<CHECK_CLAUSE>)
+      EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
 
 B<PostgreSQL Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        CHECK (<CHECK_CLAUSE>)
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      CHECK (<CHECK_CLAUSE>)
 
 =cut
 
@@ -2462,7 +2462,7 @@ sub addCheckConstraint {
 
 =head4 Synopsis
 
-    $stmt = $sql->addUniqueConstraint($tableName,\@colNames,@opt);
+  $stmt = $sql->addUniqueConstraint($tableName,\@colNames,@opt);
 
 =head4 Options
 
@@ -2492,18 +2492,18 @@ dieses zurück.
 
 B<Oracle Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        UNIQUE (<TABLE_COLUMNS>)
-        USING INDEX TABLESPACE <TABLESPACE_NAME>
-        EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      UNIQUE (<TABLE_COLUMNS>)
+      USING INDEX TABLESPACE <TABLESPACE_NAME>
+      EXCEPTIONS INTO <EXCEPTION_TABLE_NAME>
 
 B<PostgreSQL Syntax>
 
-    ALTER TABLE <TABLE_NAME> ADD
-        CONSTRAINT <CONSTRAINT_NAME>
-        UNIQUE (<TABLE_COLUMNS>)
-        USING INDEX TABLESPACE <TABLESPACE_NAME>
+  ALTER TABLE <TABLE_NAME> ADD
+      CONSTRAINT <CONSTRAINT_NAME>
+      UNIQUE (<TABLE_COLUMNS>)
+      USING INDEX TABLESPACE <TABLESPACE_NAME>
 
 =cut
 
@@ -2568,7 +2568,7 @@ sub addUniqueConstraint {
 
 =head4 Synopsis
 
-    $indexName = $sql->indexName($table,\@colNames);
+  $indexName = $sql->indexName($table,\@colNames);
 
 =cut
 
@@ -2592,7 +2592,7 @@ sub indexName {
 
 =head4 Synopsis
 
-    $stmt = $sql->createIndex($tableName,\@colNames,@opt);
+  $stmt = $sql->createIndex($tableName,\@colNames,@opt);
 
 =head4 Options
 
@@ -2619,25 +2619,25 @@ Generiere ein CREATE INDEX Statement und liefere dieses zurück.
 
 B<Oracle Syntax>
 
-    CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
-        (<TABLE_COLUMNS>)
-        TABLESPACE <TABLESPACE_NAME>
+  CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
+      (<TABLE_COLUMNS>)
+      TABLESPACE <TABLESPACE_NAME>
 
 B<PostgreSQL Syntax>
 
-    CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
-        (<TABLE_COLUMNS>)
-        TABLESPACE <TABLESPACE_NAME>
+  CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
+      (<TABLE_COLUMNS>)
+      TABLESPACE <TABLESPACE_NAME>
 
 B<SQLite Syntax>
 
-    CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
-        (<TABLE_COLUMNS>)
+  CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
+      (<TABLE_COLUMNS>)
 
 B<MySQL Syntax>
 
-    CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
-        (<TABLE_COLUMNS>)
+  CREATE [UNIQUE] INDEX <INDEX_NAME> ON <TABLE_NAME>
+      (<TABLE_COLUMNS>)
 
 =cut
 
@@ -2705,7 +2705,7 @@ sub createIndex {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropIndex($tableName,\@colNames);
+  $stmt = $sql->dropIndex($tableName,\@colNames);
 
 =head4 Description
 
@@ -2713,7 +2713,7 @@ Generiere ein DROP INDEX Statement und liefere dieses zurück.
 
 B<Syntax>
 
-    DROP INDEX <INDEX_NAME>
+  DROP INDEX <INDEX_NAME>
 
 =cut
 
@@ -2742,7 +2742,7 @@ sub dropIndex {
 
 =head4 Synopsis
 
-    @stmt = $sql->createSequence($name,@opt);
+  @stmt = $sql->createSequence($name,@opt);
 
 =head4 Options
 
@@ -2812,7 +2812,7 @@ sub createSequence {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropSequence($name);
+  $stmt = $sql->dropSequence($name);
 
 =head4 Description
 
@@ -2849,7 +2849,7 @@ sub dropSequence {
 
 =head4 Synopsis
 
-    @stmt = $sql->setSequence($name,$n);
+  @stmt = $sql->setSequence($name,$n);
 
 =head4 Description
 
@@ -2912,7 +2912,7 @@ sub setSequence {
 
 =head4 Synopsis
 
-    $stmt = $sql->createFunction($name,$body,@opt);
+  $stmt = $sql->createFunction($name,$body,@opt);
 
 =head4 Options
 
@@ -2932,11 +2932,11 @@ Generiere "RETURNS $type" Klausel.
 
 B<PostgreSQL>
 
-    CREATE OR REPLACE FUNCTION <name>()
-    RETURNS <returns>
-    AS $SQL$
-      <body>
-    $SQL$ LANGUAGE plpgsql
+  CREATE OR REPLACE FUNCTION <name>()
+  RETURNS <returns>
+  AS $SQL$
+    <body>
+  $SQL$ LANGUAGE plpgsql
 
 =over 2
 
@@ -2995,13 +2995,13 @@ sub createFunction {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropFunction($name);
+  $stmt = $sql->dropFunction($name);
 
 =head4 Description
 
 B<PostgreSQL>
 
-    DROP FUNCTION <name>() CASCADE
+  DROP FUNCTION <name>() CASCADE
 
 =cut
 
@@ -3039,10 +3039,10 @@ sub dropFunction {
 
 =head4 Synopsis
 
-    $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
-        $body,@opt);
-    $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
-        -execute => $proc,@opt);
+  $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
+      $body,@opt);
+  $stmt = $sql->createTrigger($table,$name,$when,$event,$level,
+      -execute => $proc,@opt);
 
 =head4 Options
 
@@ -3062,21 +3062,21 @@ Generiere "EXECUTE PROCEDURE $proc()" Klausel.
 
 B<Oracle>
 
-    $stmt = $sql->createTrigger(
-        '<table>',
-        '<name>',
-        'before',
-        'insert|update',
-        'row',
-        -replace => 1,'
-        <body>
-        '
-    );
-    
-    CREATE OR REPLACE TRIGGER <name>
-    BEFORE INSERT OR UPDATE ON <table>
-    FOR EACH ROW
-    <body>
+  $stmt = $sql->createTrigger(
+      '<table>',
+      '<name>',
+      'before',
+      'insert|update',
+      'row',
+      -replace => 1,'
+      <body>
+      '
+  );
+  
+  CREATE OR REPLACE TRIGGER <name>
+  BEFORE INSERT OR UPDATE ON <table>
+  FOR EACH ROW
+  <body>
 
 =over 2
 
@@ -3089,19 +3089,19 @@ Trigger-Body definieren.
 
 B<PostgreSQL>
 
-    $stmt = $sql->createTrigger(
-        '<table>',
-        '<name>',
-        'before',
-        'insert|update',
-        'row',
-        -execute => '<proc>',
-    );
-    
-    CREATE TRIGGER <name>
-    BEFORE INSERT OR UPDATE ON <table>
-    FOR EACH ROW
-    EXECUTE PROCEDURE <proc>()
+  $stmt = $sql->createTrigger(
+      '<table>',
+      '<name>',
+      'before',
+      'insert|update',
+      'row',
+      -execute => '<proc>',
+  );
+  
+  CREATE TRIGGER <name>
+  BEFORE INSERT OR UPDATE ON <table>
+  FOR EACH ROW
+  EXECUTE PROCEDURE <proc>()
 
 =over 2
 
@@ -3172,13 +3172,13 @@ sub createTrigger {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropTrigger($name);
+  $stmt = $sql->dropTrigger($name);
 
 =head4 Description
 
 B<Oracle>
 
-    DROP TRIGGER <name>
+  DROP TRIGGER <name>
 
 =cut
 
@@ -3202,13 +3202,13 @@ sub dropTrigger {
 
 =head4 Synopsis
 
-    $stmt = $sql->enableTrigger($table,$tigger);
+  $stmt = $sql->enableTrigger($table,$tigger);
 
 =head4 Description
 
 B<PostgreSQL>
 
-    ALTER TABLE <table> ENABLE TRIGGER <trigger>
+  ALTER TABLE <table> ENABLE TRIGGER <trigger>
 
 =cut
 
@@ -3236,13 +3236,13 @@ sub enableTrigger {
 
 =head4 Synopsis
 
-    $stmt = $sql->disableTrigger($table,$tigger);
+  $stmt = $sql->disableTrigger($table,$tigger);
 
 =head4 Description
 
 B<PostgreSQL>
 
-    ALTER TABLE <table> DISABLE TRIGGER <trigger>
+  ALTER TABLE <table> DISABLE TRIGGER <trigger>
 
 =cut
 
@@ -3272,7 +3272,7 @@ sub disableTrigger {
 
 =head4 Synopsis
 
-    $stmt = $sql->createView($viewName,$selectStmt);
+  $stmt = $sql->createView($viewName,$selectStmt);
 
 =head4 Description
 
@@ -3293,7 +3293,7 @@ sub createView {
 
 =head4 Synopsis
 
-    $stmt = $sql->dropView($viewName);
+  $stmt = $sql->dropView($viewName);
 
 =head4 Description
 
@@ -3316,7 +3316,7 @@ sub dropView {
 
 =head4 Synopsis
 
-    $stmt = $sql->grant($objType,$objName,$privs,$roles);
+  $stmt = $sql->grant($objType,$objName,$privs,$roles);
 
 =head4 Description
 
@@ -3330,13 +3330,13 @@ Generiere ein GRANT-Statement und liefere dieses zurück.
 
 PostgreSQL GRANT auf Tabelle
 
-    $stmt = $sql->grant('TABLE','tab1','ALL','PUBLIC');
+  $stmt = $sql->grant('TABLE','tab1','ALL','PUBLIC');
 
 generiert
 
-    GRANT ALL
-        ON TABLE tab1
-        TO PUBLIC
+  GRANT ALL
+      ON TABLE tab1
+      TO PUBLIC
 
 =back
 
@@ -3379,7 +3379,7 @@ sub grant {
 
 =head4 Synopsis
 
-    $stmt = $sql->grantUser($userName,$privs);
+  $stmt = $sql->grantUser($userName,$privs);
 
 =head4 Example
 
@@ -3389,12 +3389,12 @@ sub grant {
 
 Oracle GRANT für Benutzer
 
-    $stmt = $sql->grantUser('user1','connect, resource, dba');
+  $stmt = $sql->grantUser('user1','connect, resource, dba');
 
 generiert
 
-    GRANT connect, resource, dba
-        TO user1
+  GRANT connect, resource, dba
+      TO user1
 
 =back
 
@@ -3431,7 +3431,7 @@ sub grantUser {
 
 =head4 Synopsis
 
-    $stmt = $sql->begin;
+  $stmt = $sql->begin;
 
 =cut
 
@@ -3447,7 +3447,7 @@ sub begin {
 
 =head4 Synopsis
 
-    $stmt = $sql->commit;
+  $stmt = $sql->commit;
 
 =cut
 
@@ -3463,7 +3463,7 @@ sub commit {
 
 =head4 Synopsis
 
-    $stmt = $sql->rollback;
+  $stmt = $sql->rollback;
 
 =cut
 
@@ -3481,9 +3481,9 @@ sub rollback {
 
 =head4 Synopsis
 
-    $stmt = $sql->select($stmt,@opt);
-    $stmt = $sql->select($table,@opt);
-    $stmt = $sql->select(@opt);
+  $stmt = $sql->select($stmt,@opt);
+  $stmt = $sql->select($table,@opt);
+  $stmt = $sql->select(@opt);
 
 =head4 Options
 
@@ -3621,7 +3621,7 @@ B<FROM-Aliase>
 Bei PostgreSQL ist ein FROM-Alias zwingend erforderlich, wenn die
 FROM-Klausel ein Ausdruck ist statt ein Tabellenname, z.B.
 
-    ... FROM (<SELECT_STMT>) AS x ...
+  ... FROM (<SELECT_STMT>) AS x ...
 
 Bei Oracle ist ein Alias in dem Fall nicht erforderlich, kann aber
 angegeben werden. Ein FROM-Alias wird bei Oracle aber IL<lt>nicht> mit
@@ -3635,82 +3635,82 @@ angegeben werden. Ein FROM-Alias wird bei Oracle aber IL<lt>nicht> mit
 
 SELECT ohne Option mit einem Argument
 
-    $stmt = $sql->select('x');
-    =>
-    SELECT
-        *
-    FROM
-        x
+  $stmt = $sql->select('x');
+  =>
+  SELECT
+      *
+  FROM
+      x
 
 =item *
 
 SELECT ohne Option mit mehreren Argumenten
 
-    $stmt = $sql->select('x',vorname=>'Elli',nachname=>'Pirelli');
-    =>
-    SELECT
-        *
-    FROM
-        x
-    WHERE
-        vorname = 'Elli'
-        AND nachname = 'Pirelli'
+  $stmt = $sql->select('x',vorname=>'Elli',nachname=>'Pirelli');
+  =>
+  SELECT
+      *
+  FROM
+      x
+  WHERE
+      vorname = 'Elli'
+      AND nachname = 'Pirelli'
 
 =item *
 
 SELECT mit Statement-Platzhaltern
 
-    $stmt = $sql->select("
-        SELECT
-            *
-        FROM
-            x
-        WHERE
-            vorname = '__VORNAME__'
-            AND nachname = '__NACHNAME__'
-        ",
-        -args =>
-             VORNAME => 'Elli',
-             NACHNAME => 'Pirelli'
-    );
-    =>
-    SELECT
-        *
-    FROM
-        x
-    WHERE
-        vorname = 'Elli'
-        AND nachname = 'Pirelli'
+  $stmt = $sql->select("
+      SELECT
+          *
+      FROM
+          x
+      WHERE
+          vorname = '__VORNAME__'
+          AND nachname = '__NACHNAME__'
+      ",
+      -args =>
+           VORNAME => 'Elli',
+           NACHNAME => 'Pirelli'
+  );
+  =>
+  SELECT
+      *
+  FROM
+      x
+  WHERE
+      vorname = 'Elli'
+      AND nachname = 'Pirelli'
 
 =item *
 
 SELECT mit Statement-Muster
 
-    my $select = <<'__SQL__';
-    SELECT
-        %SELECT%
-    FROM
-        station sta LEFT JOIN parameter par
-        ON par_station_id = sta_id
-    __SQL__
-    
-    $stmt = $sql->select(
-        -stmt => $select,
-        -select => qw/sta_id sta_name par_id par_name/,
-        -orderBy => qw/sta_name par_name/,
-    );
-    =>
-    SELECT
-        sta_id,
-        sta_name,
-        par_id,
-        par_name
-    FROM
-        station sta LEFT JOIN parameter par
-        ON par_station_id = sta_id
-    ORDER BY
-        sta_name,
-        par_name
+  my $select = <<'__SQL__';
+  SELECT
+      %SELECT%
+  FROM
+      station sta LEFT JOIN parameter par
+      ON par_station_id = sta_id
+  __SQL__
+  
+  $stmt = $sql->select(
+      -stmt => $select,
+      -select => qw/sta_id sta_name par_id par_name/,
+      -orderBy => qw/sta_name par_name/,
+  );
+  =>
+  SELECT
+      sta_id,
+      sta_name,
+      par_id,
+      par_name
+  FROM
+      station sta LEFT JOIN parameter par
+      ON par_station_id = sta_id
+  ORDER BY
+      sta_name,
+      par_name
 
 =back
 
@@ -4063,10 +4063,10 @@ sub select {
 
 =head4 Synopsis
 
-    $stmt = $sql->insert($table,$row);
-    $stmt = $sql->insert($table,%keyVal);
-    $stmt = $sql->insert($table,@keyVal);
-    $stmt = $sql->insert($table,\@keys,\@vals);
+  $stmt = $sql->insert($table,$row);
+  $stmt = $sql->insert($table,%keyVal);
+  $stmt = $sql->insert($table,@keyVal);
+  $stmt = $sql->insert($table,\@keys,\@vals);
 
 =head4 Description
 
@@ -4094,119 +4094,119 @@ Werte leer, wird ein Null-Statement (Leerstring) geliefert.
 
 Normales INSERT, Schlüssel/Wert-Paare
 
-    $stmt = $sql->insert('person',
-        per_id => 10,
-        per_vorname => 'Hanno',
-        per_nachname => 'Seitz',
-        per_geburtstag => undef,
-    );
-    
-    =>
-    
-    INSERT INTO person
-    (
-        per_id,
-        per_vorname,
-        per_nachname,
-    )
-    VALUES
-    (
-        '10',
-        'Hanno',
-        'Seitz',
-    )
+  $stmt = $sql->insert('person',
+      per_id => 10,
+      per_vorname => 'Hanno',
+      per_nachname => 'Seitz',
+      per_geburtstag => undef,
+  );
+  
+  =>
+  
+  INSERT INTO person
+  (
+      per_id,
+      per_vorname,
+      per_nachname,
+  )
+  VALUES
+  (
+      '10',
+      'Hanno',
+      'Seitz',
+  )
 
 =item *
 
 Normales Insert, Schlüssel und Werte als getrennte Listen
 
-    @keys = qw/per_id per_vorname per_nachname per_geburtstag/;
-    @vals = (10,'Hanno','Seitz',undef);
-    $stmt = $sql->insert('person',\@keys,\@vals);
-    
-    =>
-    
-    INSERT INTO person
-    (
-        per_id,
-        per_vorname,
-        per_nachname,
-    )
-    VALUES
-    (
-        '10',
-        'Hanno',
-        'Seitz',
-    )
+  @keys = qw/per_id per_vorname per_nachname per_geburtstag/;
+  @vals = (10,'Hanno','Seitz',undef);
+  $stmt = $sql->insert('person',\@keys,\@vals);
+  
+  =>
+  
+  INSERT INTO person
+  (
+      per_id,
+      per_vorname,
+      per_nachname,
+  )
+  VALUES
+  (
+      '10',
+      'Hanno',
+      'Seitz',
+  )
 
 =item *
 
 INSERT mit berechnetem Kolumnenwert
 
-    $stmt = $sql->insert('objekt',
-        obj_id => 4711,
-        obj_letzteaenderung => \'SYSDATE',
-    );
-    
-    =>
-    
-    INSERT INTO objekt
-    (
-        obj_id,
-        obj_letzteaenderung
-    )
-    VALUES
-    (
-        '4711',
-        SYSDATE
-    )
+  $stmt = $sql->insert('objekt',
+      obj_id => 4711,
+      obj_letzteaenderung => \'SYSDATE',
+  );
+  
+  =>
+  
+  INSERT INTO objekt
+  (
+      obj_id,
+      obj_letzteaenderung
+  )
+  VALUES
+  (
+      '4711',
+      SYSDATE
+  )
 
 =item *
 
 Null-Statements
 
-    $stmt = $sql->insert('person');
-    
-    =>
-    
-    ''
-    
-    $stmt = $sql->insert('person',
-        per_id => '',
-        per_vorname => '',
-        per_nachname => '',
-        per_geburtstag => '',
-    );
-    
-    =>
-    
-    ''
+  $stmt = $sql->insert('person');
+  
+  =>
+  
+  ''
+  
+  $stmt = $sql->insert('person',
+      per_id => '',
+      per_vorname => '',
+      per_nachname => '',
+      per_geburtstag => '',
+  );
+  
+  =>
+  
+  ''
 
 =item *
 
 INSERT mit Platzhaltern
 
-    $stmt = $sql->insert('person',
-        per_id => \'?',
-        per_vorname => \'?',
-        per_nachname => \'?',
-        per_geburtstag => \'?',
-    );
-    
-    INSERT INTO person
-    (
-        per_id,
-        per_vorname,
-        per_nachname,
-        per_geburtstag
-    )
-    VALUES
-    (
-        ?,
-        ?,
-        ?,
-        ?
-    )
+  $stmt = $sql->insert('person',
+      per_id => \'?',
+      per_vorname => \'?',
+      per_nachname => \'?',
+      per_geburtstag => \'?',
+  );
+  
+  INSERT INTO person
+  (
+      per_id,
+      per_vorname,
+      per_nachname,
+      per_geburtstag
+  )
+  VALUES
+  (
+      ?,
+      ?,
+      ?,
+      ?
+  )
 
 =back
 
@@ -4271,12 +4271,12 @@ sub insert {
 
 =head4 Synopsis
 
-    $stmt = $sql->insertMulti($table,\@keys,[
-            [@vals1],
-            [@vals2],
-            ...
-        ]
-    );
+  $stmt = $sql->insertMulti($table,\@keys,[
+          [@vals1],
+          [@vals2],
+          ...
+      ]
+  );
 
 =head4 Description
 
@@ -4286,20 +4286,20 @@ Arrays mit gleich vielen Elementen wie @keys.
 
 =head4 Example
 
-    $stmt = $sql->insertMulti('person',
-        [qw/per_id per_vorname per_nachname per_geburtstag/],[
-            [qw/1 Linus Seitz 2002-11-11/],
-            [qw/2 Hanno Seitz 2000-04-07/],
-            [qw/3 Emily Philippi 1997-05-05/],
-        ]
-    );
-    =>
-    INSERT INTO person
-        (per_id, per_vorname, per_nachname, per_geburtstag)
-    VALUES
-        ('1', 'Linus', 'Seitz', '2002-11-11'),
-        ('2', 'Hanno', 'Seitz', '2000-04-07')
-        ('3', 'Emily', 'Philippi', '1997-05-05')
+  $stmt = $sql->insertMulti('person',
+      [qw/per_id per_vorname per_nachname per_geburtstag/],[
+          [qw/1 Linus Seitz 2002-11-11/],
+          [qw/2 Hanno Seitz 2000-04-07/],
+          [qw/3 Emily Philippi 1997-05-05/],
+      ]
+  );
+  =>
+  INSERT INTO person
+      (per_id, per_vorname, per_nachname, per_geburtstag)
+  VALUES
+      ('1', 'Linus', 'Seitz', '2002-11-11'),
+      ('2', 'Hanno', 'Seitz', '2000-04-07')
+      ('3', 'Emily', 'Philippi', '1997-05-05')
 
 =cut
 
@@ -4337,14 +4337,14 @@ sub insertMulti {
 
 =head4 Synopsis
 
-    $stmt = $sql->update($table,@keyVal,-where,@where);
+  $stmt = $sql->update($table,@keyVal,-where,@where);
 
 =head4 Example
 
-    $stmt = $sql->update('person',
-        per_geburtstag => '7.4.2000',
-        -where,per_id => 4711,
-    );
+  $stmt = $sql->update('person',
+      per_geburtstag => '7.4.2000',
+      -where,per_id => 4711,
+  );
 
 =cut
 
@@ -4384,7 +4384,7 @@ sub update {
 
 =head4 Synopsis
 
-    $stmt = $sql->delete($table,@opt,@where);
+  $stmt = $sql->delete($table,@opt,@where);
 
 =head4 Options
 
@@ -4431,62 +4431,62 @@ sub delete {
 
 =head3 Vergleichsoperatoren: <EXPR> <OP> <EXPR>
 
-    !=
-    <
-    <=
-    =
-    >
-    >=
-    (NOT) BETWEEN
-    (NOT) IN
-    (NOT) LIKE
+  !=
+  <
+  <=
+  =
+  >
+  >=
+  (NOT) BETWEEN
+  (NOT) IN
+  (NOT) LIKE
 
 =head3 Aggregatfunktionen: <OP>(<EXPR>)
 
-    Implement.
-    ------------
-    AVG
-    COUNT
-    MAX
-    MIN
-    SUM
-                  Oracle       PostgreSQL   SQLite       MySQL
-                  ------------ ------------ ------------ ------------
-                                            GROUP_CONCAT
-                                            TOTAL
+  Implement.
+  ------------
+  AVG
+  COUNT
+  MAX
+  MIN
+  SUM
+                Oracle       PostgreSQL   SQLite       MySQL
+                ------------ ------------ ------------ ------------
+                                          GROUP_CONCAT
+                                          TOTAL
 
 =head3 Funktionen: <OP>(<EXPR>,...)
 
-    Implement.    Oracle       PostgreSQL   SQLite       MySQL
-    ------------- ------------ ------------ ------------ ------------
-                                            ABS
-                                            COALESCE
-                                            GLOB
-                                            IFNULL
-                                            HEX
-                                            LENGTH
-    LOWER         LOWER        LOWER        LOWER
-                                            LTRIM
-                                            MAX
-                                            MIN
-                                            NULLIF
-                                            QUOTE
-                                            RANDOM
-                                            RANDOMBLOB
-                                            REPLACE
-                                            ROUND
-                                            RTRIM
-    SUBSTR        SUBSTR       SUBSTR       SUBSTR
-                                            TRIM
-                                            TYPEOF
-    UPPER         UPPER        UPPER        UPPER
-    CAT           ||                        ||
+  Implement.    Oracle       PostgreSQL   SQLite       MySQL
+  ------------- ------------ ------------ ------------ ------------
+                                          ABS
+                                          COALESCE
+                                          GLOB
+                                          IFNULL
+                                          HEX
+                                          LENGTH
+  LOWER         LOWER        LOWER        LOWER
+                                          LTRIM
+                                          MAX
+                                          MIN
+                                          NULLIF
+                                          QUOTE
+                                          RANDOM
+                                          RANDOMBLOB
+                                          REPLACE
+                                          ROUND
+                                          RTRIM
+  SUBSTR        SUBSTR       SUBSTR       SUBSTR
+                                          TRIM
+                                          TYPEOF
+  UPPER         UPPER        UPPER        UPPER
+  CAT           ||                        ||
 
 =head3 opFunc() - Generiere Funktionsaufruf
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opFunc($op,@args);
+  $sqlExpr = $sql->opFunc($op,@args);
 
 =head4 Description
 
@@ -4514,7 +4514,7 @@ sub opFunc {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opRel($op,$arg);
+  $sqlExpr = $sql->opRel($op,$arg);
 
 =head4 Description
 
@@ -4538,7 +4538,7 @@ sub opRel {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opAS($op,$arg,$name);
+  $sqlExpr = $sql->opAS($op,$arg,$name);
 
 =head4 Description
 
@@ -4563,7 +4563,7 @@ sub opAS {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opBETWEEN($op,$arg1,$arg2);
+  $sqlExpr = $sql->opBETWEEN($op,$arg1,$arg2);
 
 =head4 Description
 
@@ -4588,7 +4588,7 @@ sub opBETWEEN {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opCASEXPR($op,@args);
+  $sqlExpr = $sql->opCASEXPR($op,@args);
 
 =head4 Description
 
@@ -4621,7 +4621,7 @@ sub opCASEXPR {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opCAST($op,$dataType,$arg);
+  $sqlExpr = $sql->opCAST($op,$dataType,$arg);
 
 =cut
 
@@ -4647,7 +4647,7 @@ sub opCAST {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->opIN($op,@arr);
+  $sqlExpr = $sql->opIN($op,@arr);
 
 =head4 Description
 
@@ -4689,7 +4689,7 @@ sub opIN {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->keyExpr($expr);
+  $sqlExpr = $sql->keyExpr($expr);
 
 =head4 Description
 
@@ -4709,33 +4709,33 @@ ungequotete Bezeichner sind (und keine Werte).
 
 Einfacher Bezeichner
 
-    $sql->keyExpr('per_id');
-    ==>
-    "per_id"
+  $sql->keyExpr('per_id');
+  ==>
+  "per_id"
 
 =item *
 
 Ausdruck als Zeichenkette (nicht empfohlen, da nicht portabel)
 
-    $sql->keyExpr('UPPER(per_nachname)');
-    ==>
-    "UPPER(per_nachname)"
+  $sql->keyExpr('UPPER(per_nachname)');
+  ==>
+  "UPPER(per_nachname)"
 
 =item *
 
 Portabler Ausdruck
 
-    $sql->keyExpr(['UPPER',['per_nachname']]);
-    ==>
-    "UPPER(per_nachname)"
+  $sql->keyExpr(['UPPER',['per_nachname']]);
+  ==>
+  "UPPER(per_nachname)"
 
 =item *
 
 Portabler Ausdruck mit Stringreferenz (wird String-Literal)
 
-    $sql->keyExpr(['UPPER',[\'Ratlos']]);
-    ==>
-    "UPPER('Ratlos')"
+  $sql->keyExpr(['UPPER',[\'Ratlos']]);
+  ==>
+  "UPPER('Ratlos')"
 
 =back
 
@@ -4766,7 +4766,7 @@ sub keyExpr {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->valExpr($expr);
+  $sqlExpr = $sql->valExpr($expr);
 
 =head4 Description
 
@@ -4785,33 +4785,33 @@ dass seine elementaren Komponenten Literale, keine Bezeichner sind.
 
 Literal
 
-    $sql->valExpr('Kai Nelust');
-    ==>
-    "'Kai Nelust'"
+  $sql->valExpr('Kai Nelust');
+  ==>
+  "'Kai Nelust'"
 
 =item *
 
 Ausdruck
 
-    $sql->valExpr(\'USERNAME');
-    ==>
-    "USERNAME"
+  $sql->valExpr(\'USERNAME');
+  ==>
+  "USERNAME"
 
 =item *
 
 Portabler Ausdruck
 
-    $sql->valExpr(['UPPER','Kai Nelust']);
-    ==>
-    "UPPER('Kai Nelust')"
+  $sql->valExpr(['UPPER','Kai Nelust']);
+  ==>
+  "UPPER('Kai Nelust')"
 
 =item *
 
 Portabler Ausdruck mit Stringreferenz (wird Identifier-Ausdruck)
 
-    $sql->valExpr(['LOWER',\'USERNAME']);
-    ==>
-    "LOWER(USERNAME)"
+  $sql->valExpr(['LOWER',\'USERNAME']);
+  ==>
+  "LOWER(USERNAME)"
 
 =back
 
@@ -4839,7 +4839,7 @@ sub valExpr {
 
 =head4 Synopsis
 
-    $sqlExpr = $sql->whereExpr($expr);
+  $sqlExpr = $sql->whereExpr($expr);
 
 =head4 Description
 
@@ -4856,33 +4856,33 @@ Der Ausdruck besteht aus einem Operator gefolgt von einem Wert-Ausdruck.
 
 Literal
 
-    $sql->whereExpr('Kai Nelust');
-    ==>
-    "= 'Kai Nelust'"
+  $sql->whereExpr('Kai Nelust');
+  ==>
+  "= 'Kai Nelust'"
 
 =item *
 
 Ausdruck
 
-    $sql->whereExpr(\'USERNAME');
-    ==>
-    "= USERNAME"
+  $sql->whereExpr(\'USERNAME');
+  ==>
+  "= USERNAME"
 
 =item *
 
 Portabler Ausdruck
 
-    $sql->whereExpr(['!=',['UPPER','Kai Nelust']]);
-    ==>
-    "!= UPPER('Kai Nelust')"
+  $sql->whereExpr(['!=',['UPPER','Kai Nelust']]);
+  ==>
+  "!= UPPER('Kai Nelust')"
 
 =item *
 
 Portabler Ausdruck mit Stringreferenz (wird Identifier-Ausdruck)
 
-    $sql->whereExpr(['!=',['LOWER',\'USERNAME']]);
-    ==>
-    "!= LOWER(USERNAME)"
+  $sql->whereExpr(['!=',['LOWER',\'USERNAME']]);
+  ==>
+  "!= LOWER(USERNAME)"
 
 =back
 
@@ -4911,7 +4911,7 @@ sub whereExpr {
 
 =head4 Synopsis
 
-    $str = $sql->expr($type,$op,@args);
+  $str = $sql->expr($type,$op,@args);
 
 =cut
 
@@ -4969,8 +4969,8 @@ sub expr {
 
 =head4 Synopsis
 
-    $literal = $sql->stringLiteral($str);
-    $literal = $sql->stringLiteral($str,$default);
+  $literal = $sql->stringLiteral($str);
+  $literal = $sql->stringLiteral($str,$default);
 
 =head4 Description
 
@@ -4986,27 +4986,27 @@ B<Anmerkung>: PostgreSQL erlaubt aktuell Escape-Sequenzen in
 String-Literalen. Wir behandeln diese nicht. Escape-Sequenzen sollten in
 postgresql.conf abgeschaltet werden mit der Setzung:
 
-    standard_conforming_strings = on
+  standard_conforming_strings = on
 
 =head4 Examples
 
 Eingebettete Anführungsstriche:
 
-    $sel->stringLiteral('Sie hat's');
-    =>
-    "'Sie hat''s'"
+  $sel->stringLiteral('Sie hat's');
+  =>
+  "'Sie hat''s'"
 
 Leerstring, wenn kein Wert:
 
-    $sel->stringLiteral('');
-    =>
-    ""
+  $sel->stringLiteral('');
+  =>
+  ""
 
 'NULL', wenn kein Wert:
 
-    $sel->stringLiteral('','NULL');
-    =>
-    "NULL"
+  $sel->stringLiteral('','NULL');
+  =>
+  "NULL"
 
 =cut
 
@@ -5034,7 +5034,7 @@ sub stringLiteral {
 
 =head4 Synopsis
 
-    $selectClause = $sql->selectClause(@select);
+  $selectClause = $sql->selectClause(@select);
 
 =cut
 
@@ -5057,7 +5057,7 @@ sub selectClause {
 
 =head4 Synopsis
 
-    $fromClause = $sql->fromClause(@from);
+  $fromClause = $sql->fromClause(@from);
 
 =head4 Description
 
@@ -5116,7 +5116,7 @@ sub fromClause {
 
 =head4 Synopsis
 
-    $where = $sql->whereClause(@where);
+  $where = $sql->whereClause(@where);
 
 =head4 Description
 
@@ -5188,7 +5188,7 @@ sub whereClause {
 
 =head4 Synopsis
 
-    $set = $sql->setClause(@keyVal);
+  $set = $sql->setClause(@keyVal);
 
 =cut
 
@@ -5217,7 +5217,7 @@ sub setClause {
 
 =head4 Synopsis
 
-    $str = $sql->exists(@opt,@select);
+  $str = $sql->exists(@opt,@select);
 
 =head4 Options
 
@@ -5268,7 +5268,7 @@ sub exists {
 
 =head4 Synopsis
 
-    $str = $sql->notExists(@select);
+  $str = $sql->notExists(@select);
 
 =cut
 
@@ -5286,28 +5286,28 @@ sub notExists {
 
 =head4 Synopsis
 
-    $stmt = $sql->diff(
-        $keyCol,
-        $fromClause,
-        [$type,$col1,$col2,$col2Expr],
-        ...
-        @where,
-        @selOpts
-    );
+  $stmt = $sql->diff(
+      $keyCol,
+      $fromClause,
+      [$type,$col1,$col2,$col2Expr],
+      ...
+      @where,
+      @selOpts
+  );
 
 =head4 Example
 
-    $tab = $db->diff(
-        't.id',
-        "de_ticket t LEFT OUTER JOIN spielgemeinschaftanteil s\n".
-        'ON t.id = s.spielid*65536+1',
-        ['N','t.subscription'=>'s.dauerschein'],
-        ['N','t.product_id'=>'s.spielgemeinschaftid',
-            \'CASE %C WHEN 9685 THEN 24 WHEN 9684 THEN 26 WHEN 9687 THEN 28 END',
-        ],
-        't.product_ticket_type'=>'LOTTERY_CLUB_TICKET',
-        -limit => 100,
-    );
+  $tab = $db->diff(
+      't.id',
+      "de_ticket t LEFT OUTER JOIN spielgemeinschaftanteil s\n".
+      'ON t.id = s.spielid*65536+1',
+      ['N','t.subscription'=>'s.dauerschein'],
+      ['N','t.product_id'=>'s.spielgemeinschaftid',
+          \'CASE %C WHEN 9685 THEN 24 WHEN 9684 THEN 26 WHEN 9687 THEN 28 END',
+      ],
+      't.product_ticket_type'=>'LOTTERY_CLUB_TICKET',
+      -limit => 100,
+  );
 
 =cut
 
@@ -5385,7 +5385,7 @@ sub diff {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,12 +1,12 @@
 package Quiq::Section::Parser;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 no bytes;
 use Quiq::Section::Object;
@@ -33,13 +33,13 @@ Ein Objekt der Klasse repräsentiert einen Parser für "Abschnitte".
 
 Ein Abschnitt hat den Aufbau:
 
-    # [IDENTIFIER]
-    
-    KEY:
-        VALUE
-    ...
-    
-    CONTENT
+  # [IDENTIFIER]
+  
+  KEY:
+      VALUE
+  ...
+  
+  CONTENT
 
 =over 4
 
@@ -121,7 +121,7 @@ Anzahl der geparsten Bytes. Das Attribut kann nur abgefragt werden.
 
 =head4 Synopsis
 
-    $par = $class->new(@keyVal);
+  $par = $class->new(@keyVal);
 
 =head4 Returns
 
@@ -168,9 +168,9 @@ sub new {
 
 =head4 Synopsis
 
-    $objA|@objs = $par->parse(undef[,$sub]);
-    $objA|@objs = $par->parse($file[,$sub]);
-    $objA|@objs = $par->parse(\$text[,$sub]);
+  $objA|@objs = $par->parse(undef[,$sub]);
+  $objA|@objs = $par->parse($file[,$sub]);
+  $objA|@objs = $par->parse(\$text[,$sub]);
 
 =head4 Arguments
 
@@ -198,10 +198,10 @@ der Return-Wert von parse() ignoriert.
 Ist der Parameter $sub nicht angegeben, wird folgende
 Default-Definition genutzt:
 
-    sub {
-        # @_: $type,$keyValH,$keyA,$content,$source,$file,$lineNumber
-        return Quiq::Section::Object->new(@_);
-    }
+  sub {
+      # @_: $type,$keyValH,$keyA,$content,$source,$file,$lineNumber
+      return Quiq::Section::Object->new(@_);
+  }
 
 =back
 
@@ -494,7 +494,7 @@ sub parse {
 
 =head4 Synopsis
 
-    $obj = $par->section($identifier,$keyValH,$keyA,$content,$source,$file,$lineNumber);
+  $obj = $par->section($identifier,$keyValH,$keyA,$content,$source,$file,$lineNumber);
 
 =head4 Arguments
 
@@ -565,7 +565,7 @@ sub section {
 
 =head4 Synopsis
 
-    $par->error($@,$source,$file,$lineNumber);
+  $par->error($@,$source,$file,$lineNumber);
 
 =head4 Arguments
 
@@ -648,16 +648,16 @@ I<KEY>-Zeile kann nicht auskommentiert werden, da sie den
 betreffenden I<KEY/VALUE>-Abschnitt einleitet.  Beispiel
 (dargestellt mit Pipe- statt Ausrufungszeichen):
 
-    Name:
-        width
-    
-    || BriefDescription:
-    ||     Liefere die Breite und Höhe des Bildes
+  Name:
+      width
+  
+  || BriefDescription:
+  ||     Liefere die Breite und Höhe des Bildes
 
 Ergebnis:
 
-    Name:
-        width
+  Name:
+      width
 
 =head2 VALUE auskommentieren
 
@@ -669,14 +669,14 @@ I<VALUE>-Zeile eingefügt wird. Ab dem ersten Leerzeichen werden bis
 zum Ende der Zeile alle Zeichen ignoriert. Beispiel (mit Pipe-
 statt Ausrufungszeichen):
 
-    Imports:
-        || Old::Hash
-        New::Hash || neue Hash-Klasse
+  Imports:
+      || Old::Hash
+      New::Hash || neue Hash-Klasse
 
 Ergebnis:
 
-    Imports:
-        New::Hash
+  Imports:
+      New::Hash
 
 =head2 Start-Zeichenkette CONTENT
 
@@ -697,8 +697,8 @@ am Ende von I<CONTENT> signifikant, muss dessen Ende mit einer
 Stop-Zeichenkette gekennzeichnet werden. Sie Stop-Zeichenkette
 wird durch Schlüssel/Wert-Paar C<Stop:> definiert:
 
-    Stop:
-        --END--
+  Stop:
+      --END--
 
 C<Stop:> ist eine Parser-Direktive, die nur für den Abschnitt gilt, in
 dem sie definiert ist. Die Stop-Zeichenkette beendet I<CONTENT> und
@@ -709,26 +709,26 @@ zählt nicht zum I<CONTENT> hinzu.
 Besteht eine Datei aus einem einzelnen Abschnitt, kann die
 Abschnitts-Einleitungszeile
 
-    # IDENTIFIER
+  # IDENTIFIER
 
 weggelassen werden, wenn IDENTIFIER (mit Klammerung)
 als Default-Section definiert wird:
 
-    $par = Quiq::Section::Parser->new(
-        defaultSection => $identifier,
-        ...
-    );
+  $par = Quiq::Section::Parser->new(
+      defaultSection => $identifier,
+      ...
+  );
 
 Als Beispiel siehe quiq-confluence:
 
-    my $par = Quiq::Section::Parser->new(
-        defaultSection => '[ConfluencePage]',
-    );
-    my ($sec) = $par->parse($file);
+  my $par = Quiq::Section::Parser->new(
+      defaultSection => '[ConfluencePage]',
+  );
+  my ($sec) = $par->parse($file);
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

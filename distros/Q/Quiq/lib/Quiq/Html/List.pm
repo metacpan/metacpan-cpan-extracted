@@ -1,11 +1,11 @@
 package Quiq::Html::List;
 use base qw/Quiq::Html::Base/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -66,21 +66,21 @@ Die I<Unordered List> ist der Default.
 
 Der Aufruf
 
-    $html = Quiq::Html::List->html($h,
-        id => 'list01',
-        class => 'list',
-        isText => 1,
-        items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
-    );
+  $html = Quiq::Html::List->html($h,
+      id => 'list01',
+      class => 'list',
+      isText => 1,
+      items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
+  );
 
 liefert
 
-    <ul id="list01" class="list">
-      <li>Apfel &amp; Birne</li>
-      <li>Orange</li>
-      <li>Pflaume</li>
-      <li>Zitrone</li>
-    </ul>
+  <ul id="list01" class="list">
+    <li>Apfel &amp; Birne</li>
+    <li>Orange</li>
+    <li>Pflaume</li>
+    <li>Zitrone</li>
+  </ul>
 
 =head2 Ordered List
 
@@ -89,22 +89,22 @@ C<< type=>'ordered' >> erzeugt.
 
 Der Aufruf
 
-    $html = Quiq::Html::List->html($h,
-        type => 'ordered',
-        id => 'list02',
-        class => 'list',
-        isText => 1,
-        items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
-    );
+  $html = Quiq::Html::List->html($h,
+      type => 'ordered',
+      id => 'list02',
+      class => 'list',
+      isText => 1,
+      items => ['Apfel & Birne','Orange','Pflaume','Zitrone'],
+  );
 
 liefert
 
-    <ol id="list02" class="list">
-      <li>Apfel &amp; Birne</li>
-      <li>Orange</li>
-      <li>Pflaume</li>
-      <li>Zitrone</li>
-    </ol>
+  <ol id="list02" class="list">
+    <li>Apfel &amp; Birne</li>
+    <li>Orange</li>
+    <li>Pflaume</li>
+    <li>Zitrone</li>
+  </ol>
 
 =head1 METHODS
 
@@ -114,7 +114,7 @@ liefert
 
 =head4 Synopsis
 
-    $obj = $class->new(@keyVal);
+  $obj = $class->new(@keyVal);
 
 =head4 Description
 
@@ -147,8 +147,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $obj->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $obj->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -189,7 +189,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

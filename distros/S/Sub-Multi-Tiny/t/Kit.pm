@@ -1,3 +1,5 @@
+# -*- perl -*-
+
 # Kit.pm: test kit for Sub::Multi::Tiny
 package # hide from PAUSE
     Kit;
@@ -7,14 +9,36 @@ use strict;
 use warnings;
 
 use parent 'Exporter';
-use vars::i '@EXPORT' => qw(find_file_in_t get_perl_filename run_perl);
+use vars::i '@EXPORT' => qw(fails_ok find_file_in_t get_perl_filename here
+                            is_covering run_perl true false);
 
 use Config;
 use Cwd 'abs_path';
+use Data::Dumper;
 use File::Spec;
 use Import::Into;
 use IPC::Run3;
 use Test::More;
+
+# is_covering: is Devel::Cover running?
+sub is_covering {
+    return !!(eval 'Devel::Cover::get_coverage()');
+} #is_covering()
+
+# Set verbosity:
+#   - on for coverage of _hlog statements
+#   - on for debugging of test failures in <5.18    XXX DEBUG
+# Note that verbosity will also be on if $ENV{SUB_MULTI_TINY_VERBOSE} is set.
+use Sub::Multi::Tiny::Util '*VERBOSE';
+BEGIN {
+    $VERBOSE = 99 if is_covering || $] lt '5.018';
+}
+
+use constant {
+    true => !!1,
+    false => !!0,
+};
+
 
 # Get the filename of the Perl interpreter running this. {{{1
 # Modified from perlvar.
@@ -66,14 +90,13 @@ sub run_perl {
     my ($out, $err);
 
     # Check if we are running under cover(1) from Devel::Cover
-    my $is_covering = !!(eval 'Devel::Cover::get_coverage()');
-    diag $is_covering ? 'Devel::Cover running' : 'Devel::Cover not covering';
+    diag is_covering() ? 'Devel::Cover running' : 'Devel::Cover not covering';
 
     # Note: See App-PRT/t/App-PRT-CLI.t for code to find test scripts in
-    # script vs. blib/script.
+    # script vs. blib/script, if that later becomes necessary.
 
     # Make the command to run script/prt.
-    my @cmd = ($perl, $is_covering ? ('-MDevel::Cover=-silent,1') : ());
+    my @cmd = ($perl, is_covering() ? ('-MDevel::Cover=-silent,1') : ());
 
     push @cmd, map { "-I$_" } @INC;
     push @cmd, @$lrArgs;
@@ -85,12 +108,51 @@ sub run_perl {
     return ($out, $err, $exitstatus);
 } #run_perl
 
+# here: Return the caller's line number, in parentheses.
+# Useful for the message on an ok() or is().
+sub here {
+    my (undef, undef, $lineno) = caller;
+    return "line $lineno";
+} #here
+
+# Execute a file and check its error message.  Skips on Windows.
+# Usage: fails_ok('filename in t', qr/regex error should match/);
+sub fails_ok {
+    my ($filename, $regex) = @_;
+    my (undef, undef, $lineno) = caller;
+
+    SKIP: {
+        # Skip rather than falsely fail - see
+        # https://github.com/rjbs/IPC-Run3/pull/9 and RT#95308.  Example at
+        # http://www.cpantesters.org/cpan/report/277b2ad8-6bf8-1014-b7dc-c8197f9146ad
+        skip 'MSWin32 gives a false failure on this test', 2
+            if $^O eq 'MSWin32';
+
+        # We have to run the test in a separate Perl process so we can see
+        # errors at INIT time
+
+        # Find the Perl file to run
+        my $pl_file = find_file_in_t($filename, 'r');
+        my ($out, $err, $exitstatus) = run_perl([$pl_file]);
+
+        cmp_ok $exitstatus>>8, '!=', 0,
+            "returned a failure indication (line $lineno)";
+        like $err, $regex, "error message as expected (line $lineno)";
+
+    }
+} #fails_ok
+
 # Import
 sub import {
-    my $target = caller;
+    my ($target, $filename) = caller;
     __PACKAGE__->export_to_level(1, @_);
     $_->import::into($target) foreach qw(strict warnings Config Cwd
         File::Spec IPC::Run3 Test::More);
+
+    $Data::Dumper::Indent = 1;  # fixed indentation per level
+
+    diag '#' x 40;
+    diag $filename;
 }
 
 1;

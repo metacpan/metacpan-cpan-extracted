@@ -1,12 +1,12 @@
 package Quiq::JQuery::Form::ViewEdit;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 use Quiq::Hash;
@@ -167,65 +167,65 @@ Liste der Widgets, die in das Layout eingesetzt werden.
 
 =head1 EXAMPLE
 
-    $html = Quiq::JQuery::Form::ViewEdit->html($h,
-        instantiate => 1,
-        id => 'personForm',
-        state => 'insert',
-        action => $c->url_for('/person/speichern'),
-        onSuccess => q|
-            function () {
-                var d = new Date;
-                var date = $.formatDate(d,'YYYY-MM-DD hh:mm:ss');
-                $('input[name=formTime]').val(date);
-            }
-        |,
-        text => {
-            saveButton => 'Speichern',
-            deleteButton => 'Löschen',
-            editCheckbox => 'Bearbeiten',
-        },
-        layout => $h->cat(
-            Quiq::Html::Table::Simple->html($h,
-                class => 'form',
-                rows => [
-                    ['form-section',[colspan=>2,'Person']],
-                    ['form-widget',['Id:'],['__PER_ID__']],
-                    ['form-widget',['Vorname:'],['__PER_VORNAME__']],
-                    ['form-widget',['Nachname:'],['__PER_NACHNAME__']],
-                ],
-            ),
-            Quiq::Html::Table::Simple->html($h,
-                class => 'form',
-                rows => [
-                    [['__SAVE__ __DELETE__ __EDIT__']],
-                ],
-            ),
-        ),
-        widgets => [
-            Quiq::Html::Widget::Hidden->new(
-                name => 'formular',
-                value => 'person',
-            ),
-            Quiq::Html::Widget::Hidden->new(
-                name => 'formTime',
-                value => $formTime,
-            ),
-            Quiq::Html::Widget::ReadOnly->new(
-                name => 'per_id',
-                value => $per->per_id,
-            ),
-            Quiq::Html::Widget::TextField->new(
-                name => 'per_vorname',
-                size => 30,
-                value => $per->per_vorname,
-            ),
-            Quiq::Html::Widget::TextField->new(
-                name => 'per_nachname',
-                size => 30,
-                value => $per->per_nachname,
-            ),
-        ],
-    );
+  $html = Quiq::JQuery::Form::ViewEdit->html($h,
+      instantiate => 1,
+      id => 'personForm',
+      state => 'insert',
+      action => $c->url_for('/person/speichern'),
+      onSuccess => q|
+          function () {
+              var d = new Date;
+              var date = $.formatDate(d,'YYYY-MM-DD hh:mm:ss');
+              $('input[name=formTime]').val(date);
+          }
+      |,
+      text => {
+          saveButton => 'Speichern',
+          deleteButton => 'Löschen',
+          editCheckbox => 'Bearbeiten',
+      },
+      layout => $h->cat(
+          Quiq::Html::Table::Simple->html($h,
+              class => 'form',
+              rows => [
+                  ['form-section',[colspan=>2,'Person']],
+                  ['form-widget',['Id:'],['__PER_ID__']],
+                  ['form-widget',['Vorname:'],['__PER_VORNAME__']],
+                  ['form-widget',['Nachname:'],['__PER_NACHNAME__']],
+              ],
+          ),
+          Quiq::Html::Table::Simple->html($h,
+              class => 'form',
+              rows => [
+                  [['__SAVE__ __DELETE__ __EDIT__']],
+              ],
+          ),
+      ),
+      widgets => [
+          Quiq::Html::Widget::Hidden->new(
+              name => 'formular',
+              value => 'person',
+          ),
+          Quiq::Html::Widget::Hidden->new(
+              name => 'formTime',
+              value => $formTime,
+          ),
+          Quiq::Html::Widget::ReadOnly->new(
+              name => 'per_id',
+              value => $per->per_id,
+          ),
+          Quiq::Html::Widget::TextField->new(
+              name => 'per_vorname',
+              size => 30,
+              value => $per->per_vorname,
+          ),
+          Quiq::Html::Widget::TextField->new(
+              name => 'per_nachname',
+              size => 30,
+              value => $per->per_nachname,
+          ),
+      ],
+  );
 
 =head1 METHODS
 
@@ -235,7 +235,7 @@ Liste der Widgets, die in das Layout eingesetzt werden.
 
 =head4 Synopsis
 
-    $javascript = $class->pluginCode;
+  $javascript = $class->pluginCode;
 
 =head4 Description
 
@@ -398,7 +398,7 @@ sub pluginCode {
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Description
 
@@ -449,8 +449,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -516,7 +516,7 @@ sub html {
 
 =head4 Synopsis
 
-    $javaScript = $e->instantiate;
+  $javaScript = $e->instantiate;
 
 =head4 Description
 
@@ -570,7 +570,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

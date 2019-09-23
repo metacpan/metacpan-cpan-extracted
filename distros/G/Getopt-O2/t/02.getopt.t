@@ -48,8 +48,8 @@ use parent 'Getopt::O2';
 	my $cmdline = __PACKAGE__->new();
 	my $mock = Test::MockObject::Extends->new($cmdline);
 
-	$mock->mock(getOptionRules => sub {
-		$cmdline->SUPER::getOptionRules,
+	$mock->mock(get_option_rules => sub {
+		$cmdline->SUPER::get_option_rules,
 		'e|enum=?' => ['A choice', 'values' => [qw(foo splort gnarf)]],
 		'f|flag' => ['A flag', 'default' => undef],
 		'p|param=s' => 'A parameter',
@@ -103,7 +103,7 @@ use parent 'Getopt::O2';
 	my $cmdline = __PACKAGE__->new();
 	my $mock = Test::MockObject::Extends->new($cmdline);
 
-	$mock->mock(getOptionRules => sub {
+	$mock->mock(get_option_rules => sub {
 		return qw(flag)
 	});
 	eval {$mock->getopt({})};
@@ -118,7 +118,7 @@ use parent 'Getopt::O2';
 	my $mock = Test::MockObject::Extends->new($cmdline);
 	my (%options, @leftover);
 
-	$mock->mock(getOptionRules => sub {
+	$mock->mock(get_option_rules => sub {
 		'flag' => 'A flag',
 		'param=s' => 'A parameter'
 	});
@@ -147,7 +147,7 @@ use parent 'Getopt::O2';
 	my $cmdline = __PACKAGE__->new();
 	my $mock = Test::MockObject::Extends->new($cmdline);
 
-	$mock->mock(getOptionRules => sub {
+	$mock->mock(get_option_rules => sub {
 		'invalid=T' => 'Invalid type'
 	});
 
@@ -186,7 +186,7 @@ use parent 'Getopt::O2';
 	my $mock = Test::MockObject::Extends->new($cmdline);
 	my %options;
 
-	$mock->mock(getOptionRules => sub {
+	$mock->mock(get_option_rules => sub {
 		return
 			'f|file=s' => 'File',
 			'a|one+' => 'Flag #1',
@@ -214,7 +214,7 @@ use parent 'Getopt::O2';
 	my $mock = Test::MockObject::Extends->new($cmdline);
 	my %options;
 
-	$mock->mock(getOptionRules => sub {
+	$mock->mock(get_option_rules => sub {
 		return
 			'one=s' => 'Value #1',
 			'three=s' => 'Value #2',
@@ -281,7 +281,7 @@ use parent 'Getopt::O2';
 		my $cmdline = __PACKAGE__->new();
 		my $mock = Test::MockObject::Extends->new($cmdline);
 
-		$mock->mock(getOptionRules => sub {
+		$mock->mock(get_option_rules => sub {
 			return @{$set->{set} || []};
 		});
 
@@ -304,7 +304,7 @@ use parent 'Getopt::O2';
 		'param.mandatory' => {
 			ARGV => ['-f'],
 			arg => 'file',
-			fmt => 'Option "--%s" needs a mandatory value.',
+			fmt => 'Option "--%s" requires a value.',
 			set => ['f|file=s' => 'Mandatory file']
 		},
 
@@ -350,7 +350,7 @@ use parent 'Getopt::O2';
 		'param.invalid.list' => {
 			ARGV => ['--list', undef],
 			arg => 'list',
-			fmt => 'Option "--%s" needs a mandatory value.',
+			fmt => 'Option "--%s" requires a value.',
 			set => ['list=s@' => 'List parameter']
 		},
 
@@ -398,7 +398,7 @@ use parent 'Getopt::O2';
 		my $cmdline = __PACKAGE__->new();
 		my $mock = Test::MockObject::Extends->new($cmdline);
 
-		$mock->mock(getOptionRules => sub {
+		$mock->mock(get_option_rules => sub {
 			return @{$set->{set} || []};
 		});
 		$mock->mock(error => sub {

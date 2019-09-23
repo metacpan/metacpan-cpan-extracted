@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -348,7 +348,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Ruslan Zakirov, Nigel
+    This software is copyright (c) 2018 by Ruslan Zakirov, Nigel
     Metheringham, 2003-2004 D. H.
 
     This is free software; you can redistribute it and/or modify it under
@@ -373,7 +373,7 @@ SUPPORT
       A modern, open-source CPAN search engine, useful to view POD in HTML
       format.
 
-      http://metacpan.org/release/HTML-Scrubber
+      https://metacpan.org/release/HTML-Scrubber
 
       * Search CPAN
 
@@ -402,12 +402,6 @@ SUPPORT
 
       http://cpanratings.perl.org/d/HTML-Scrubber
 
-      * CPAN Forum
-
-      The CPAN Forum is a web forum for discussing Perl modules.
-
-      http://cpanforum.com/dist/HTML-Scrubber
-
       * CPANTS
 
       The CPANTS is a website that analyzes the Kwalitee ( code metrics )
@@ -417,8 +411,8 @@ SUPPORT
 
       * CPAN Testers
 
-      The CPAN Testers is a network of smokers who run automated tests on
-      uploaded CPAN distributions.
+      The CPAN Testers is a network of smoke testers who run automated
+      tests on uploaded CPAN distributions.
 
       http://www.cpantesters.org/distro/H/HTML-Scrubber
 

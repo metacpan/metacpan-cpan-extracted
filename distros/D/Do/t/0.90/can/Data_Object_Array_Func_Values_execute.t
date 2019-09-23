@@ -17,7 +17,6 @@ execute
 
   my $func = Data::Object::Array::Func::Values->new(
     arg1 => $data,
-    args => [0,1]
   );
 
   my $result = $func->execute;
@@ -49,11 +48,10 @@ my $func;
 $data = Data::Object::Array->new([1..4]);
 $func = Data::Object::Array::Func::Values->new(
   arg1 => $data,
-  args => [0,1]
 );
 
 my $result = $func->execute;
 
-is_deeply $result, [1,2];
+is_deeply $result, [1,2,3,4];
 
 ok 1 and done_testing;

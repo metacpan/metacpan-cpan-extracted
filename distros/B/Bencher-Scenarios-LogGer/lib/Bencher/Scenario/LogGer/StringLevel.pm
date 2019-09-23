@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::StringLevel;
 
-our $DATE = '2018-12-20'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2019-09-18'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ Bencher::Scenario::LogGer::StringLevel - Benchmark string_level()
 
 =head1 VERSION
 
-This document describes version 0.014 of Bencher::Scenario::LogGer::StringLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2018-12-20.
+This document describes version 0.015 of Bencher::Scenario::LogGer::StringLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2019-09-18.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Util> 0.025
+L<Log::ger::Util> 0.028
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -88,7 +88,7 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::StringLevel >>):
 
@@ -96,8 +96,8 @@ Benchmark with default options (C<< bencher -m LogGer::StringLevel >>):
  +---------+-----------+-----------+------------+---------+---------+
  | dataset | rate (/s) | time (ns) | vs_slowest |  errors | samples |
  +---------+-----------+-----------+------------+---------+---------+
- | 10      |    800000 |      1300 |       1    | 1.7e-09 |      20 |
- | warn    |   3960000 |       253 |       4.95 | 5.7e-11 |      20 |
+ | 10      |    820000 |      1200 |          1 | 2.2e-09 |      20 |
+ | warn    |   4900000 |       200 |          6 | 2.2e-10 |      24 |
  +---------+-----------+-----------+------------+---------+---------+
 
 
@@ -107,8 +107,8 @@ Benchmark module startup overhead (C<< bencher -m LogGer::StringLevel --module-s
  +---------------------+-----------+------------------------+------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Util      |        12 |                      6 |          1 | 5.5e-05 |      20 |
- | perl -e1 (baseline) |         6 |                      0 |          2 |   7e-05 |      21 |
+ | Log::ger::Util      |      11   |                    4.8 |        1   | 2.9e-05 |      20 |
+ | perl -e1 (baseline) |       6.2 |                    0   |        1.8 |   2e-05 |      20 |
  +---------------------+-----------+------------------------+------------+---------+---------+
 
 
@@ -136,7 +136,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Unit;
-$Lab::Moose::Instrument::SCPI::Unit::VERSION = '3.682';
+$Lab::Moose::Instrument::SCPI::Unit::VERSION = '3.690';
 #ABSTRACT: Role for SCPI UNIT subsystem.
 
 use Moose::Role;
@@ -41,7 +41,7 @@ Lab::Moose::Instrument::SCPI::Unit - Role for SCPI UNIT subsystem.
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 METHODS
 

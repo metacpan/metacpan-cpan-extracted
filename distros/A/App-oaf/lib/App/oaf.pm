@@ -4,12 +4,12 @@ package App::oaf;
 
 =head1 NAME
 
-App::oaf - Output stdin as GitHub/Slack/JIRA/HipChat/... Formatted code
+App::oaf - Output stdin as GitHub/Slack/JIRA etc... formatted code
 
 =head1 SYNOPSIS
 
 Output as Format will read from stdin and output code formatted
-for GitHub/Slack/JIRA/HipChat/...
+for GitHub/Slack/JIRA/ etc...
 
   usage: oaf [-mps] [-f format] [-l lang]
   Output stdin as code in the given format
@@ -50,6 +50,8 @@ Currently there are two ways to install.
 
 =head2 CPAN
 
+This requires your system to have L<Perl|https://www.perl.org/get.html> installed.
+
   cpan App::oaf
 
 =head1 SUPPORTED FORMATS & SERVICES
@@ -73,6 +75,12 @@ Currently there are two ways to install.
 =item * Markdown
 
 =item * MediaWiki
+
+=item * Org-mode
+
+=item * POD
+
+=item * reStructuredText
 
 =item * Slack
 

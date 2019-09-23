@@ -4,8 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 
-#use Data::Dumper;   # DEBUG
-
 use parent 'Exporter';
 use vars::i '@EXPORT' => qw(MakeDispatcher);
 
@@ -16,7 +14,7 @@ use Sub::Multi::Tiny::Util qw(_hlog _line_mark_string _make_positional_copier
 use Type::Params qw(multisig);
 use Type::Tiny ();
 
-our $VERSION = '0.000006'; # TRIAL
+our $VERSION = '0.000011'; # TRIAL
 
 # Documentation {{{1
 
@@ -130,7 +128,9 @@ sub MakeDispatcher {
     # Make the dispatcher
     $code .= _line_mark_string <<'EOT';
             # Find the candidate
-            local @_ = $data[0]->(@_);      # $checker.  Dies on error.
+            @_ = $data[0]->(@_);      # $checker.  Dies on error.
+                # NOTE: this change can't be `local`ized because `goto`
+                # undoes the `local` - see #8
             $candidate = $data[1]->[${^TYPE_PARAMS_MULTISIG}];   # impls
             $copier = $data[2]->[${^TYPE_PARAMS_MULTISIG}];      # copiers
 EOT

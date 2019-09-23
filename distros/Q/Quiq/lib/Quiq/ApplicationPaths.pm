@@ -1,10 +1,10 @@
 package Quiq::ApplicationPaths;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Cwd ();
 use Hash::Util ();
@@ -19,20 +19,20 @@ Quiq::ApplicationPaths - Ermittele Pfade einer Unix-Applikation
 
 =head1 SYNOPSIS
 
-    # Homedir: <prefix>/opt/<application> (<prefix> kann leer sein)
-    
-    use FindBin qw/$Bin/;
-    use lib "$Bin/../lib/perl5";  # .. d.h. $depth == 1
-    use Quiq::ApplicationPaths;
-    
-    my $app = Quiq::ApplicationPaths->new;
-    
-    my $name = $app->name;        # <application>
-    my $prefix = $app->prefix;    # <prefix>
-    
-    my $homeDir = $app->homeDir;  # <prefix>/opt/<application>
-    my $etcDir = $app->etcDir;    # <prefix>/etc/opt/<application>
-    my $varDir = $app->varDir;    # <prefix>/var/opt/<application>
+  # Homedir: <prefix>/opt/<application> (<prefix> kann leer sein)
+  
+  use FindBin qw/$Bin/;
+  use lib "$Bin/../lib/perl5";  # .. d.h. $depth == 1
+  use Quiq::ApplicationPaths;
+  
+  my $app = Quiq::ApplicationPaths->new;
+  
+  my $name = $app->name;        # <application>
+  my $prefix = $app->prefix;    # <prefix>
+  
+  my $homeDir = $app->homeDir;  # <prefix>/opt/<application>
+  my $etcDir = $app->etcDir;    # <prefix>/etc/opt/<application>
+  my $varDir = $app->varDir;    # <prefix>/var/opt/<application>
 
 =head1 DESCRIPTION
 
@@ -70,19 +70,19 @@ Struktur im Home-Verzeichnis des Benutzers befinden
 
 /opt/<application>/...
 
-    prefix()  : (Leerstring)
-    name()    : <application>
-    homeDir() : /opt/<application>
-    etcDir()  : /etc/opt/<application>
-    varDir()  : /var/opt/<application>
+  prefix()  : (Leerstring)
+  name()    : <application>
+  homeDir() : /opt/<application>
+  etcDir()  : /etc/opt/<application>
+  varDir()  : /var/opt/<application>
 
 /home/<user>/opt/<application>/...
 
-    prefix()  : /home/<user>
-    name()    : <application>
-    homeDir() : /home/<user>/opt/<application>
-    etcDir()  : /home/<user>/etc/opt/<application>
-    varDir()  : /home/<user>/var/opt/<application>
+  prefix()  : /home/<user>
+  name()    : <application>
+  homeDir() : /home/<user>/opt/<application>
+  etcDir()  : /home/<user>/etc/opt/<application>
+  varDir()  : /home/<user>/var/opt/<application>
 
 =head1 METHODS
 
@@ -92,8 +92,8 @@ Struktur im Home-Verzeichnis des Benutzers befinden
 
 =head4 Synopsis
 
-    $app = $class->new;
-    $app = $class->new($depth);
+  $app = $class->new;
+  $app = $class->new($depth);
 
 =head4 Arguments
 
@@ -176,7 +176,7 @@ sub new {
 
 =head4 Synopsis
 
-    $name = $app->name;
+  $name = $app->name;
 
 =head4 Description
 
@@ -196,8 +196,8 @@ sub name {
 
 =head4 Synopsis
 
-    $prefix = $app->prefix;
-    $prefix = $app->prefix($subPath);
+  $prefix = $app->prefix;
+  $prefix = $app->prefix($subPath);
 
 =head4 Description
 
@@ -229,8 +229,8 @@ sub prefix {
 
 =head4 Synopsis
 
-    $homeDir = $app->homeDir;
-    $homeDir = $app->homeDir($subPath);
+  $homeDir = $app->homeDir;
+  $homeDir = $app->homeDir($subPath);
 
 =head4 Description
 
@@ -260,8 +260,8 @@ sub homeDir {
 
 =head4 Synopsis
 
-    $etcDir = $app->etcDir;
-    $etcDir = $app->etcDir($subPath);
+  $etcDir = $app->etcDir;
+  $etcDir = $app->etcDir($subPath);
 
 =head4 Description
 
@@ -291,8 +291,8 @@ sub etcDir {
 
 =head4 Synopsis
 
-    $varDir = $app->varDir;
-    $varDir = $app->varDir($subPath);
+  $varDir = $app->varDir;
+  $varDir = $app->varDir($subPath);
 
 =head4 Description
 
@@ -330,22 +330,22 @@ des Konstruktors behandelt werden. Beispiele:
 
 Installation mit Unterscheidung nach Versionsnummer:
 
-    <prefix>/opt/<application>/<version>
-    <prefix>/etc/opt/<application>/<version>
-    <prefix>/var/opt/<application>/<version>
+  <prefix>/opt/<application>/<version>
+  <prefix>/etc/opt/<application>/<version>
+  <prefix>/var/opt/<application>/<version>
 
 Installation mit Unterscheidung nach Versionsnummer in eigenem
 Subverzeichnis:
 
-    <prefix>/opt/<application>/version/<version>
-    <prefix>/etc/opt/<application>/<version>
-    <prefix>/var/opt/<application>/<version>
+  <prefix>/opt/<application>/version/<version>
+  <prefix>/etc/opt/<application>/<version>
+  <prefix>/var/opt/<application>/<version>
 
 Kein opt-Unterverzeichnis in etc und var:
 
-    <prefix>/opt/<application>
-    <prefix>/etc/<application>
-    <prefix>/var/<application>
+  <prefix>/opt/<application>
+  <prefix>/etc/<application>
+  <prefix>/var/<application>
 
 =head3 Optionaler Trenner bei etcDir() und varDir()
 
@@ -353,15 +353,15 @@ Die Methoden etcDir() und varDir() könnten um eine Variante mit
 zwei Parametern erweitert werden, die die Vorgabe des
 Trennzeichens erlaubt:
 
-    $path = $app->etcDir('','.conf');
-    # <prefix>/etc/opt/<application>.conf
-    
-    $path = $app->varDir('','.log');
-    # <prefix>/etc/opt/<application>.log
+  $path = $app->etcDir('','.conf');
+  # <prefix>/etc/opt/<application>.conf
+  
+  $path = $app->varDir('','.log');
+  # <prefix>/etc/opt/<application>.log
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

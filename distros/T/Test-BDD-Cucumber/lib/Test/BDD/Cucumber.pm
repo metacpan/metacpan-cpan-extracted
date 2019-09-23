@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber;
-$Test::BDD::Cucumber::VERSION = '0.64';
+$Test::BDD::Cucumber::VERSION = '0.660001';
 use strict;
 use warnings;
 1;
@@ -12,7 +12,7 @@ Test::BDD::Cucumber - Feature-complete Cucumber-style testing in Perl
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ One thing need specific mentioning:
 =over 4
 
 =item * Due to the use of its own parser, differences probably exist
-in the intepretation of feature files when comparing to Cucumber.
+in the interpretation of feature files when comparing to Cucumber.
 
 Also L<see the issue|https://github.com/pherkin/test-bdd-cucumber-perl/issues/73> for
 tracking this topic.

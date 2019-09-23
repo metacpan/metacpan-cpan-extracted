@@ -1,5 +1,8 @@
 Revision history for App::Gre.
 
+0.18  Sat Sep 21 01:21:11 CDT 2019
+    - Make it work on Windows
+
 0.17  Thu Oct 26 11:10:44 CDT 2017
     - Docs improvements
 

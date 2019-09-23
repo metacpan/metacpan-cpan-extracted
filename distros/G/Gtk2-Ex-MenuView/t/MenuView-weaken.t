@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2012 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -25,8 +25,8 @@ use Test::More;
 use lib 't';
 use MyTestHelpers;
 
-# Test::Weaken 3 for "contents"
-my $have_test_weaken = eval "use Test::Weaken 3;
+# Test::Weaken 3.010 for constructor multiple values
+my $have_test_weaken = eval "use Test::Weaken 3.010;
                              use Test::Weaken::Gtk2;
                              1";
 if (! $have_test_weaken) {
@@ -118,11 +118,10 @@ sub my_contents {
          # Gtk2->main;
          MyTestHelpers::wait_for_event ($menuview, 'map-event');
          $child_count = scalar @{[$menuview->get_children]};
-         return [ $menuview, $store ];
+         return $menuview, $store;
        },
        destructor => sub {
-         my ($aref) = @_;
-         my $menuview = $aref->[0];
+         my ($menuview, $store) = @_;
          $menuview->popdown;
        },
        contents => \&my_contents,

@@ -6,13 +6,14 @@ use Carp qw/confess/;
 use IO::Socket::INET;
 use Scalar::Util qw/reftype/;
 
-$Net::Graphite::VERSION = '0.17';
+$Net::Graphite::VERSION = '0.18';
 
 our $TEST = 0;   # if true, don't send anything to graphite
 
 sub new {
     my $class = shift;
     my %args = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+
     return bless {
         host                 => '127.0.0.1',
         port                 => 2003,
@@ -20,9 +21,13 @@ sub new {
         return_connect_error => 0,
         proto                => 'tcp',
         timeout              => 1,
+        # flush_limit
         # path
         # transformer
         %args,
+
+        # private
+        _flush_buffer        => [],
         # _socket
     }, $class;
 }
@@ -33,11 +38,11 @@ sub send {
     $value = shift if @_ % 2;   # single value passed in
     my %args = @_;
 
-    my $plaintext;
     if ($args{data}) {
         my $xform = $args{transformer} || $self->transformer;
         if ($xform) {
-            $plaintext = $xform->($args{data});
+            # FIXME
+            $self->{_flush_buffer} = [ $xform->($args{data}) ];
         }
         else {
             if (ref $args{data}) {
@@ -48,7 +53,7 @@ sub send {
                     # hash structure from Yves
                     my $start_path = $args{path} ? $args{path} : $self->path;
                     foreach my $epoch (sort {$a <=> $b} keys %{ $args{data} }) {
-                        _fill_lines_for_epoch(\$plaintext, $epoch, $args{data}{$epoch}, $start_path);
+                        $self->_fill_lines_for_epoch($epoch, $args{data}{$epoch}, $start_path);
                     }
                 }
                 # TODO - not sure what structure is most useful;
@@ -65,12 +70,13 @@ sub send {
                 # }
                 # how about sth of DBI? XML? maybe not
                 else {
-                    confess "Arg 'data' passed to send method is a ref but has no plaintext transformer";
+                    confess "Arg 'data' passed to send method is a ref but has no transformer";
                 }
             }
             else {
-                # this obsoletes plaintext; just pass 'data' without a transformer
-                $plaintext = $args{data};
+                # passed plaintext without a transformer
+                # FIXME
+                $self->{_flush_buffer} = [ $args{data} ];
             }
         }
     }
@@ -79,46 +85,57 @@ sub send {
         my $path = $args{path} || $self->path;
         my $time = $args{time} || time;
 
-        $plaintext = "$path $value $time\n";
+        $self->{_flush_buffer} = [ "$path $value $time\n" ];
     }
 
-    $self->trace($plaintext) if $self->{trace};
+    $self->flush();
+
+    return join('', @{ $self->{_flush_buffer} });    # FIXME
+}
+
+sub flush {
+    my ($self) = @_;
+    return unless
+      my $flush_buffer = $self->{_flush_buffer};
+    return unless @$flush_buffer;
+
+    $self->trace($flush_buffer) if $self->{trace};
 
     unless ($Net::Graphite::TEST) {
+        # FIXME: need to deal with incompletely-sent metrics
         if ($self->connect()) {
-            my $buf = $plaintext;
-            while (length($buf)) {
-                my $res = $self->{_socket}->send($buf);
-                if (not defined $res) {
-                    next if $! == EINTR;
-                    last; # not sure what to do here
-                }
+            foreach my $buf (@$flush_buffer) {
+                while (length($buf)) {
+                    my $res = $self->{_socket}->send($buf);
+                    if (not defined $res) {
+                        next if $! == EINTR;
+                        last; # not sure what to do here
+                    }
 
-                last unless $res; # should never happen
-                substr($buf, 0, $res, '');
+                    substr($buf, 0, $res, '');
+                }
+                if (length($buf) && not $self->{fire_and_forget}) {
+                    confess "Error sending data";
+                }
             }
         }
         # I didn't close the socket!
     }
-
-    return $plaintext;
 }
 
 sub _fill_lines_for_epoch {
-    # note: $in_out_str_ref is a reference to a string,
-    # not so much for performance but as an accumulator in this recursive function
-    my ($in_out_str_ref, $epoch, $hash, $path) = @_;
+    my ($self, $epoch, $hash, $path) = @_;
 
     # still in the "branches"
     if (ref $hash) {
         foreach my $key (sort keys %$hash) {
             my $value = $hash->{$key};
-            _fill_lines_for_epoch($in_out_str_ref, $epoch, $value, "$path.$key");
+            $self->_fill_lines_for_epoch($epoch, $value, "$path.$key");
         }
     }
     # reached the "leaf" value
     else {
-        $$in_out_str_ref .= "$path $hash $epoch\n";
+        push @{ $self->{_flush_buffer} }, "$path $hash $epoch\n";
     }
 }
 
@@ -161,6 +178,11 @@ sub trace {
 }
 
 ### mutators
+sub flush_limit {
+    my ($self, $limit) = @_;
+    $self->{flush_limit} = $limit if defined $limit;
+    return $self->{flush_limit};
+}
 sub path {
     my ($self, $path) = @_;
     $self->{path} = $path if defined $path;
@@ -193,8 +215,10 @@ Net::Graphite - Interface to Graphite
       timeout               => 1,                # timeout of socket connect in seconds
       fire_and_forget       => 0,                # if true, ignore sending errors
       return_connect_error  => 0,                # if true, forward connect error to caller
+      flush_limit           => 0,                # if true, send after this many metrics are ready
 
-      path                  => 'foo.bar.baz', # optional, use when sending single values
+      path                  => 'foo.bar.baz',    # optional, use when sending single values
+      transformer           => sub { my $data = shift; ...; return $plaintext },
   );
 
   # to check for connection error (when return_connect_error => 1) do:
@@ -264,6 +288,18 @@ because the socket will close when the $graphite object goes out of scope.
 Get an open a socket to the graphite server, either the currently connected one
 or, if not already connected, a new one.
 Not normally needed.
+
+=head2 flush
+
+Explicitly flush (send) the buffer of metrics.
+Not normally needed (C<< ->send >> flushes at the end already).
+
+=head2 flush_limit
+
+In case you send a very large hash (for example) of metrics,
+building up the internal data structure that gets sent
+can consume a lot of memory. The flush_limit allows instead
+for sending after this many metrics have accumulated.
 
 =head2 path
 

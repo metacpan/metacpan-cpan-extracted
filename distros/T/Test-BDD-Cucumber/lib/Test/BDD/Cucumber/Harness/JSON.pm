@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::JSON;
-$Test::BDD::Cucumber::Harness::JSON::VERSION = '0.64';
+$Test::BDD::Cucumber::Harness::JSON::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::JSON - Generate results to JSON file
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =head1 DESCRIPTION
 
@@ -93,31 +93,25 @@ sub shutdown {
 ### Internal formating methods ###
 ##################################
 
-sub get_keyword {
-    my ( $self, $line_ref ) = @_;
-    my ($keyword) = $line_ref->content =~ /^(\w+)/;
-    return $keyword;
-}
-
 sub format_tags {
     my ( $self, $tags_ref ) = @_;
     return [ map { { name => '@' . $_ } } @$tags_ref ];
 }
 
 sub format_description {
-    my ( $self, $feature ) = @_;
-    return join "\n", map { $_->content } @{ $feature->satisfaction };
+    my ( $self, $description ) = @_;
+    return join "\n", map { $_->content } @{ $description };
 }
 
 sub format_feature {
     my ( $self, $feature ) = @_;
     return {
         uri         => $feature->name_line->filename,
-        keyword     => $self->get_keyword( $feature->name_line ),
+        keyword     => $feature->keyword_original,
         id          => $self->_generate_stable_id( $feature->name_line ),
         name        => $feature->name,
         line        => $feature->name_line->number,
-        description => $self->format_description($feature),
+        description => $self->format_description($feature->satisfaction),
         tags        => $self->format_tags( $feature->tags ),
         elements    => []
     };
@@ -126,13 +120,14 @@ sub format_feature {
 sub format_scenario {
     my ( $self, $scenario, $dataset ) = @_;
     return {
-        keyword => $self->get_keyword( $scenario->line ),
-        id      => $self->_generate_stable_id( $scenario->line ),
-        name    => $scenario->name,
-        line    => $scenario->line->number,
-        tags    => $self->format_tags( $scenario->tags ),
-        type    => $scenario->background ? 'background' : 'scenario',
-        steps   => []
+        keyword     => $scenario->keyword_original,
+        id          => $self->_generate_stable_id( $scenario->line ),
+        name        => $scenario->name,
+        line        => $scenario->line->number,
+        description => $self->format_description($scenario->description),
+        tags        => $self->format_tags( $scenario->tags ),
+        type        => $scenario->background ? 'background' : 'scenario',
+        steps       => []
     };
 }
 

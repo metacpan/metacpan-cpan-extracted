@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::StepFile;
-$Test::BDD::Cucumber::StepFile::VERSION = '0.64';
+$Test::BDD::Cucumber::StepFile::VERSION = '0.660001';
 =head1 NAME
 
 Test::BDD::Cucumber::StepFile - Functions for creating and loading Step Definitions
 
 =head1 VERSION
 
-version 0.64
+version 0.660001
 
 =cut
 
@@ -19,6 +19,7 @@ use File::Spec qw/rel2abs/;
 use Scalar::Util qw/reftype/;
 
 use Test::BDD::Cucumber::I18n qw(languages langdef keyword_to_subname);
+
 require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(Step Transform Before After C S);
@@ -147,8 +148,17 @@ inside a step definition>.
 
 =cut
 
-sub S { croak "You can only call `S` inside a step definition" }
-sub C { croak "You can only call `C` inside a step definition" }
+# We need an extra level of indirection when we want to support step functions
+# loaded into their own packages (which we do, for cleanliness); the exporter
+# binds the subs declared below to S and C symbols in the imported-into package
+# That prevents us from binding a different function to these symbols at
+# execution time.
+# We *can* bind the _S and _C functions declared below.
+sub S { _S() }
+sub C { _C() }
+
+sub _S { croak "You can only call `S` inside a step definition" }
+sub _C { croak "You can only call `C` inside a step definition" }
 
 =head2 load
 

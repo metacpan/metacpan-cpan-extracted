@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Sys::Syslog qw(:standard :macros);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 my %PRIORITY = (
   debug => LOG_DEBUG,
@@ -14,30 +14,22 @@ my %PRIORITY = (
 );
 
 sub register {
-  my ($self, $app, $params) = @_;
-  my %config = %{$params || {}};
+  my ($self, $app, $config) = @_;
 
-  $config{enable} //= $ENV{MOJO_SYSLOG_ENABLE} // $app->mode ne 'development';
-  return unless $config{enable};
+  $self->_add_syslog($app, %$config)
+    if $config->{enable} // $ENV{MOJO_SYSLOG_ENABLE}
+    // $app->mode ne 'development';
 
-  $config{facility} ||= $ENV{MOJO_SYSLOG_FACILITY} || LOG_USER;
-  $config{ident}    ||= $ENV{MOJO_SYSLOG_IDENT}    || $app->moniker;
-  $config{logopt}   ||= $ENV{MOJO_SYSLOG_LOGOPT}   || 'ndelay,pid';
-
-  $config{access_log} //= $ENV{MOJO_SYSLOG_ACCESS_LOG};
-  $config{access_log} = '%H "%P" (%I) %C %M (%Ts)'
-    if ($config{access_log} || '') eq '1';
-
-  openlog @config{qw(ident logopt facility)};
-  $app->log->unsubscribe('message') if $config{only_syslog};
-  $app->log->unsubscribe(message => \&_syslog);
-  $app->log->on(message => \&_syslog);
-
-  $self->_add_access_log($app, \%config) if $config{access_log};
+  $self->_add_access_log($app, %$config)
+    if $config->{access_log} // $ENV{MOJO_SYSLOG_ACCESS_LOG};
 }
 
 sub _add_access_log {
-  my ($self, $app, $config) = @_;
+  my ($self, $app, %config) = @_;
+
+  my $log_format = $config{access_log} || $ENV{MOJO_SYSLOG_ACCESS_LOG} || 'v1';
+  $log_format = '%H "%P" (%I) %C %M (%Ts)'            if $log_format =~ /^v?1$/;
+  $log_format = '[%I] %R %H %U %C %M "%F" "%A" (%Ts)' if $log_format =~ /^v?2$/;
 
   $app->hook(
     before_routes => sub {
@@ -45,32 +37,45 @@ sub _add_access_log {
     }
   );
 
+  my %extractors = (
+    A => sub { $_[1]->headers->user_agent || '' },
+    C => sub { $_[2]->code },
+    F => sub { $_[1]->headers->referrer || '' },
+    H => sub { $_[1]->method },
+    I => sub { $_[1]->request_id },
+    M => sub { $_[2]->message || $_[2]->default_message($_[2]->code) },
+    P => sub { $_[1]->url->path->to_abs_string },
+    R => sub { $_[0]->tx->remote_address },
+    T => sub { $_[0]->helpers->timing->elapsed(__PACKAGE__) // 0 },
+    U => sub { $_[1]->url->to_abs->to_string },
+  );
+
+  my $re = join '|', sort keys %extractors;
+  $re = qr{\%($re)};
+
   $app->hook(
     after_dispatch => sub {
       my $c = shift;
-
-      my $timing  = $c->helpers->timing;
-      my $elapsed = $timing->elapsed(__PACKAGE__) // 0;
-
-      my $req  = $c->req;
-      my $res  = $c->res;
-      my $code = $res->code;
-
-      my %MSG = (
-        C => $code,
-        H => $req->method,
-        I => $req->request_id,
-        M => $res->message || $res->default_message($code),
-        P => $req->url->path->to_abs_string,
-        T => $elapsed,
-      );
-
+      my ($req, $res) = ($c->req, $c->res);
       my $level   = $res->is_server_error ? 'warn' : 'info';
-      my $message = $config->{access_log};
-      $message =~ s!\%([CHIMPRT])!$MSG{$1}!g;
+      my $message = $log_format;
+      $message =~ s!$re!$extractors{$1}->($c, $req, $res)!ge;
       $c->app->log->$level($message);
     }
   );
+}
+
+sub _add_syslog {
+  my ($self, $app, %config) = @_;
+
+  $config{facility} ||= $ENV{MOJO_SYSLOG_FACILITY} || LOG_USER;
+  $config{ident}    ||= $ENV{MOJO_SYSLOG_IDENT}    || $app->moniker;
+  $config{logopt}   ||= $ENV{MOJO_SYSLOG_LOGOPT}   || 'ndelay,pid';
+
+  openlog @config{qw(ident logopt facility)};
+  $app->log->unsubscribe('message') if $config{only_syslog};
+  $app->log->unsubscribe(message => \&_syslog);
+  $app->log->on(message => \&_syslog);
 }
 
 sub _syslog {
@@ -99,6 +104,10 @@ L<Mojo::Log> use L<Sys::Syslog> in addition (or instead) of file logging.
 This can be useful when starting Hypnotoad through Systemd, but want simple
 logging of error messages to syslog.
 
+This plugin can also be used for only access logging, as an alternative to
+L<Mojolicious::Plugin::AccessLog>. This is done by forcing L</enable> to
+"0" and enabling L</access_log>.
+
 =head1 METHODS
 
 =head2 register
@@ -116,20 +125,35 @@ config parameters are:
 Used to enable logging of access to resources with a route enpoint. This means
 that static files will not be logged, even if this option is enabled.
 
-This can be "1" or a string. Will use the default format, if "1" is specified:
+This can be "v1" or a string. Will use the default format, if "v1" is specified:
 
   %H "%P" (%I) %C %M (%Ts)
    |   |    |   |  |   \- Time in seconds for this request
-   |   |    |   |  \- Response message, ex "OK"
-   |   |    |   \- Response code, ex 200, 404, ...
+   |   |    |   |  \- Response message
+   |   |    |   \- Response code
    |   |    \- A unique identified for this request
    |   \- The path requested
-   \- The HTTP method used, ex GET, POST ...
+   \- The HTTP method used
 
 Default to the "MOJO_SYSLOG_ACCESS_LOG" environment variable or disabled by
 default.
 
-This feature and format is highly EXPERIMENTAL.
+The default format is EXPERIMENTAL.
+
+Supported log variables:
+
+  | Variable | Value                                   |
+  |----------|-----------------------------------------|
+  | %A       | User-Agent request header               |
+  | %C       | Response status code, ex "200"          |
+  | %F       | Referer request header                  |
+  | %H       | HTTP request method, ex "GET", "POST"   |
+  | %I       | Mojolicious request ID                  |
+  | %M       | Response message, ex OK                 |
+  | %P       | Request URL path                        |
+  | %R       | Remote address                          |
+  | %T       | Time in seconds for this request        |
+  | %U       | Absolute request URL, without user info |
 
 =item * enable
 

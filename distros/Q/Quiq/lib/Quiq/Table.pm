@@ -1,11 +1,11 @@
 package Quiq::Table;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 use Quiq::Properties;
@@ -28,63 +28,63 @@ L<Quiq::Hash>
 
 Mit Kolumnennamen:
 
-    use Quiq::Table;
-    
-    # Daten
-    
-    @rows = (
-        [1,  'A',  76.253],
-        [12, 'AB', 1.7   ],
-        [123,'ABC',9999  ],
-    );
-    
-    # Objekt instantiieren
-    $tab = Quiq::Table->new(['a','b','c'],\@rows);
-    
-    # Werte der Kolumne b
-    
-    @values = $tab->values('b');
-    say "@values";
-    ==>
-    A AB ABC
-    
-    # Ausgabe als Text-Tabelle
-    
-    print $tab->asText;
-    ==>
-    |   1 | A   |   76.253 |
-    |  12 | AB  |    1.700 |
-    | 123 | ABC | 9999.000 |
+  use Quiq::Table;
+  
+  # Daten
+  
+  @rows = (
+      [1,  'A',  76.253],
+      [12, 'AB', 1.7   ],
+      [123,'ABC',9999  ],
+  );
+  
+  # Objekt instantiieren
+  $tab = Quiq::Table->new(['a','b','c'],\@rows);
+  
+  # Werte der Kolumne b
+  
+  @values = $tab->values('b');
+  say "@values";
+  ==>
+  A AB ABC
+  
+  # Ausgabe als Text-Tabelle
+  
+  print $tab->asText;
+  ==>
+  |   1 | A   |   76.253 |
+  |  12 | AB  |    1.700 |
+  | 123 | ABC | 9999.000 |
 
 Ohne Kolumnennamen:
 
-    use Quiq::Table;
-    
-    # Daten
-    
-    @rows = (
-        [1,  'A',  76.253],
-        [12, 'AB', 1.7   ],
-        [123,'ABC',9999  ],
-    );
-    
-    # Objekt instantiieren
-    $tab = Quiq::Table->new(3,\@rows);
-    
-    # Werte der Kolumne 1 (0-basierte Zählung)
-    
-    @values = $tab->values(1);
-    say "@values";
-    ==>
-    A AB ABC
-    
-    # Ausgabe als Text-Tabelle
-    
-    print $tab->asText;
-    ==>
-    |   1 | A   |   76.253 |
-    |  12 | AB  |    1.700 |
-    | 123 | ABC | 9999.000 |
+  use Quiq::Table;
+  
+  # Daten
+  
+  @rows = (
+      [1,  'A',  76.253],
+      [12, 'AB', 1.7   ],
+      [123,'ABC',9999  ],
+  );
+  
+  # Objekt instantiieren
+  $tab = Quiq::Table->new(3,\@rows);
+  
+  # Werte der Kolumne 1 (0-basierte Zählung)
+  
+  @values = $tab->values(1);
+  say "@values";
+  ==>
+  A AB ABC
+  
+  # Ausgabe als Text-Tabelle
+  
+  print $tab->asText;
+  ==>
+  |   1 | A   |   76.253 |
+  |  12 | AB  |    1.700 |
+  | 123 | ABC | 9999.000 |
 
 =head1 DESCRIPTION
 
@@ -106,10 +106,10 @@ Siehe quiq-ls
 
 =head4 Synopsis
 
-    $tab = $class->new($width);
-    $tab = $class->new($width,\@rows);
-    $tab = $class->new(\@columns);
-    $tab = $class->new(\@columns,\@rows);
+  $tab = $class->new($width);
+  $tab = $class->new($width,\@rows);
+  $tab = $class->new(\@columns);
+  $tab = $class->new(\@columns,\@rows);
 
 =head4 Arguments
 
@@ -189,7 +189,7 @@ sub new {
 
 =head4 Synopsis
 
-    @columns | $columnA = $tab->columns;
+  @columns | $columnA = $tab->columns;
 
 =head4 Returns
 
@@ -222,7 +222,7 @@ sub columns {
 
 =head4 Synopsis
 
-    $count = $tab->count;
+  $count = $tab->count;
 
 =head4 Returns
 
@@ -247,8 +247,8 @@ sub count {
 
 =head4 Synopsis
 
-    $pos = $tab->pos($column);
-    $pos = $tab->pos($pos);
+  $pos = $tab->pos($column);
+  $pos = $tab->pos($pos);
 
 =head4 Arguments
 
@@ -301,8 +301,8 @@ sub pos {
 
 =head4 Synopsis
 
-    $prp = $tab->properties($pos);
-    $prp = $tab->properties($column);
+  $prp = $tab->properties($pos);
+  $prp = $tab->properties($column);
 
 =head4 Arguments
 
@@ -352,7 +352,7 @@ sub properties {
 
 =head4 Synopsis
 
-    $tab->push(\@arr);
+  $tab->push(\@arr);
 
 =head4 Arguments
 
@@ -392,7 +392,7 @@ sub push {
 
 =head4 Synopsis
 
-    @rows | $rowA = $tab->rows;
+  @rows | $rowA = $tab->rows;
 
 =head4 Returns
 
@@ -420,8 +420,8 @@ sub rows {
 
 =head4 Synopsis
 
-    @values | $valueA = $tab->values($pos,@opt);
-    @values | $valueA = $tab->values($column,@opt);
+  @values | $valueA = $tab->values($pos,@opt);
+  @values | $valueA = $tab->values($column,@opt);
 
 =head4 Arguments
 
@@ -490,7 +490,7 @@ sub values {
 
 =head4 Synopsis
 
-    $width = $tab->width;
+  $width = $tab->width;
 
 =head4 Returns
 
@@ -516,7 +516,7 @@ sub width {
 
 =head4 Synopsis
 
-    $text = $tab->asText(@opt);
+  $text = $tab->asText(@opt);
 
 =head4 Options
 
@@ -527,11 +527,11 @@ sub width {
 Callback-Funktion, die für jede Zelle gerufen wird und eine Termnal-Farbe
 für die jeweilige Zelle liefert. Die Funktion hat die Struktur:
 
-    sub {
-        my ($tab,$row,$pos,$val) = @_;
-        ...
-        return $color;
-    }
+  sub {
+      my ($tab,$row,$pos,$val) = @_;
+      ...
+      return $color;
+  }
 
 Die Terminal-Farbe ist eine Zeichenkette, wie sie Quiq::AnsiColor
 erwartet. Anwendungsbeispiel siehe quiq-ls.
@@ -588,7 +588,7 @@ sub asText {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,10 +1,10 @@
 package Quiq::Unindent;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -18,34 +18,34 @@ Quiq::Unindent - Entferne Einrückung von "Here Document" oder String-Literal
 
 Klasse laden:
 
-    use Quiq::Unindent;
+  use Quiq::Unindent;
 
 Eingerücktes "Here Document":
 
-    {
-        $text = Quiq::Unindent->hereDoc(<<'    EOT');
-        Dies ist
-        ein Text
-        EOT
-    
-        print $text;
-    }
+  {
+      $text = Quiq::Unindent->hereDoc(<<'    EOT');
+      Dies ist
+      ein Text
+      EOT
+  
+      print $text;
+  }
 
 Eingerücktes mehrzeiliges String-Literal:
 
-    {
-        $text = Quiq::Unindent->string('
-            Dies ist
-            ein Text
-        ');
-    
-        print $text;
-    }
+  {
+      $text = Quiq::Unindent->string('
+          Dies ist
+          ein Text
+      ');
+  
+      print $text;
+  }
 
 Resultat in beiden Fällen:
 
-    Dies ist
-    ein Text
+  Dies ist
+  ein Text
 
 =head1 DESCRIPTION
 
@@ -61,9 +61,9 @@ String-Literalen und "Here Documents" entfernt werden kann.
 
 =head4 Synopsis
 
-    $str = $class->hereDoc(<<'EOT');
-        <Text>
-    EOT
+  $str = $class->hereDoc(<<'EOT');
+      <Text>
+  EOT
 
 =head4 Description
 
@@ -95,47 +95,47 @@ den Beispielen.
 
 Gegenüberstellung der Syntax
 
-    {
-        $text = Quiq::Unindent->hereDoc(<<'    EOT');
-        Dies ist
-        ein Text
-        EOT
-    }
+  {
+      $text = Quiq::Unindent->hereDoc(<<'    EOT');
+      Dies ist
+      ein Text
+      EOT
+  }
 
 ist äquivalent zu
 
-    {
-        $text = <<'EOT';
-    Dies ist
-    ein Text
-    EOT
-    }
+  {
+      $text = <<'EOT';
+  Dies ist
+  ein Text
+  EOT
+  }
 
 =item 2.
 
 Sub-Einrückungen und Leerzeilen
 
-    {
-        $text = Quiq::Unindent->hereDoc(<<'    EOT');
-    
-          Dies ist der
-        erste Absatz.
-    
-          Dies ist ein
-        zweiter Absatz.
-    
-        EOT
-    }
+  {
+      $text = Quiq::Unindent->hereDoc(<<'    EOT');
+  
+        Dies ist der
+      erste Absatz.
+  
+        Dies ist ein
+      zweiter Absatz.
+  
+      EOT
+  }
 
 ergibt
 
-    |
-    |  Dies ist der
-    |erste Absatz.
-    |
-    |  Dies ist ein
-    |zweiter Absatz.
-    |
+  |
+  |  Dies ist der
+  |erste Absatz.
+  |
+  |  Dies ist ein
+  |zweiter Absatz.
+  |
 
 d.h. Sub-Einrückungen und Leerzeilen bleiben erhalten.
 
@@ -182,9 +182,9 @@ sub hereDoc {
 
 =head4 Synopsis
 
-    $str = $class->string('
-        <Text>
-    ');
+  $str = $class->string('
+      <Text>
+  ');
 
 =head4 Description
 
@@ -214,39 +214,39 @@ Anführungsstriche auf einer eigenen Zeile stehen.
 
 Gegenüberstellung der Syntax:
 
-    {
-        $text = Quiq::Unindent->string('
-            Dies ist
-            ein Text
-        ');
-    }
+  {
+      $text = Quiq::Unindent->string('
+          Dies ist
+          ein Text
+      ');
+  }
 
 ist äquivalent zu
 
-    {
-        $text = 'Dies ist
-    ein Text
-    ';
-    }
+  {
+      $text = 'Dies ist
+  ein Text
+  ';
+  }
 
 =item 2.
 
 Varianten
 
-    $text = Quiq::Unindent->string(q~
-        Dies ist
-        ein Text
-    ~);
-    
-    $text = Quiq::Unindent->string("
-        Dies ist
-        ein Text mit $variable
-    ");
-    
-    $text = Quiq::Unindent->string(qq~
-        Dies ist
-        ein Text mit $variable
-    ~);
+  $text = Quiq::Unindent->string(q~
+      Dies ist
+      ein Text
+  ~);
+  
+  $text = Quiq::Unindent->string("
+      Dies ist
+      ein Text mit $variable
+  ");
+  
+  $text = Quiq::Unindent->string(qq~
+      Dies ist
+      ein Text mit $variable
+  ~);
 
 =back
 
@@ -270,7 +270,7 @@ sub string {
 
 =head4 Synopsis
 
-    $strOut = $class->trim($strIn);
+  $strOut = $class->trim($strIn);
 
 =head4 Description
 
@@ -305,54 +305,54 @@ geeignet.
 
 Leerraum am Anfang und am Ende wird entfernt
 
-    {
-        $text = Quiq::Unindent->trim("
-    
-            SELECT
-                *
-            FROM
-                person
-            WHERE
-                nachname = 'Schulz'
-    
-        ");
-    }
+  {
+      $text = Quiq::Unindent->trim("
+  
+          SELECT
+              *
+          FROM
+              person
+          WHERE
+              nachname = 'Schulz'
+  
+      ");
+  }
 
 ergibt
 
-    |SELECT
-    |    *
-    |FROM
-    |    person
-    |WHERE
-    |    nachname = 'Schulz'
-                            ^
-                            kein Newline
+  |SELECT
+  |    *
+  |FROM
+  |    person
+  |WHERE
+  |    nachname = 'Schulz'
+                          ^
+                          kein Newline
 
 =item 2.
 
 Interne Anwendung
 
-    sub select {
-        my ($self,$stmt) = @_;
-    
-        $stmt = Quiq::Unindent->trim($stmt);
-        if ($self->debug) {
-            warn $stmt,"\n";
-        }
-        ...
-    }
+  sub select {
+      my ($self,$stmt) = @_;
+  
+      $stmt = Quiq::Unindent->trim($stmt);
+      if ($self->debug) {
+          warn $stmt,"\n";
+      }
+      ...
+  }
 
 Aufruf mit eingerücktem String-Literal, das I<intern> behandelt wird:
 
-    $db->select("
-        SELECT
-            *
-        FROM
-            person
-        WHERE
-            nachname = 'Schulz'
-    ");
+  $db->select("
+      SELECT
+          *
+      FROM
+          person
+      WHERE
+          nachname = 'Schulz'
+  ");
 
 =back
 
@@ -376,7 +376,7 @@ sub trim {
 
 =head4 Synopsis
 
-    $strOut = $class->trimNl($strIn);
+  $strOut = $class->trimNl($strIn);
 
 =head4 Description
 
@@ -403,7 +403,7 @@ sub trimNl {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

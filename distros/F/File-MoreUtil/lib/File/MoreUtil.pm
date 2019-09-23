@@ -1,7 +1,7 @@
 package File::MoreUtil;
 
 our $DATE = '2019-08-17'; # DATE
-our $VERSION = '0.621'; # VERSION
+our $VERSION = '0.622'; # VERSION
 
 use 5.010001;
 use strict;
@@ -150,7 +150,7 @@ File::MoreUtil - File-related utilities
 
 =head1 VERSION
 
-This document describes version 0.621 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2019-08-17.
+This document describes version 0.622 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2019-08-17.
 
 =head1 SYNOPSIS
 
@@ -311,6 +311,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<App::FileTestUtils> includes CLI's for functions like L</dir_empty>, etc.
 
 =head1 AUTHOR
 

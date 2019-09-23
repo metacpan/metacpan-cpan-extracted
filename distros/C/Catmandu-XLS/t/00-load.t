@@ -4,6 +4,7 @@ use Test::More;
 use Test::Exception;
 
 my $pkg;
+
 BEGIN {
     $pkg = 'Catmandu::Exporter::XLS';
     use_ok $pkg;

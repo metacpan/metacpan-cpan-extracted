@@ -1,11 +1,11 @@
 package Quiq::Ipc;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::Shell;
@@ -31,10 +31,10 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $out = Quiq::Ipc->filter($cmd,$in,@opt);
-    ($out,$err) = Quiq::Ipc->filter($cmd,$in,@opt);
-    $out = Quiq::Ipc->filter($cmd,@opt);
-    ($out,$err) = Quiq::Ipc->filter($cmd,@opt);
+  $out = Quiq::Ipc->filter($cmd,$in,@opt);
+  ($out,$err) = Quiq::Ipc->filter($cmd,$in,@opt);
+  $out = Quiq::Ipc->filter($cmd,@opt);
+  ($out,$err) = Quiq::Ipc->filter($cmd,@opt);
 
 =head4 Options
 
@@ -110,7 +110,7 @@ sub filter {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

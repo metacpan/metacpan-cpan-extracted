@@ -1,11 +1,11 @@
 package Quiq::TimeLapse::Directory;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Quiq::TimeLapse::File;
@@ -28,50 +28,50 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    # Klasse laden
-    use Quiq::TimeLapse::Directory;
-    
-    # Instantiiere Verzeichnis-Objekt
-    $tdr = Quiq::TimeLapse::Directory->new('/my/image/dir');
-    
-    # Anzahl der enthaltenen Bilder
-    $n = $tdr->count;
-    
-    # Niedrigste Bildnummer
-    $n = $tdr->minNumber;
-    
-    # Höchste Bildnummer
-    $n = $tdr->maxNumber;
-    
-    # alle Bilder (des Verzeichnisses oder aus range.def, wenn definiert)
-    @images = $tdr->images;
-    
-    # Bilder eines Nummernbereichs
-    
-    @images = $tdr->images('113-234');
-    @images = $tdr->images('290-');
-    @images = $tdr->images('422');
-    
-    # Bilder zu einem Bezeichner aus range.def
-    @images = $tdr->images('autofahrt');
-    
-    # Alle Bilder des Verzeichnisses
-    @images = $tdr->images('all');
-    
-    # Alle Bilder aus range.def (leer, wenn range.def nicht existiert)
-    @images = $tdr->images('used');
-    
-    # Alle Bilder des Verzeichnisses, die nicht range.def vorkommen
-    # (leer, wenn range.def nicht existiert)
-    @images = $tdr->images('unused');
-    
-    # Lookup eines Bildes
-    $img = $tdr->image(422); # liefert undef, wenn nicht existent
-    
-    # Liefere das Objekt mit den Range- und Clip-Definitionen. Über
-    # dieses Objekt können die Bildfolgen von Ranges und Clips gezielt
-    # abgerufen werden. Details siehe Quiq::TimeLapse::RangeDef
-    $trd = $tdr->rangeDef;
+  # Klasse laden
+  use Quiq::TimeLapse::Directory;
+  
+  # Instantiiere Verzeichnis-Objekt
+  $tdr = Quiq::TimeLapse::Directory->new('/my/image/dir');
+  
+  # Anzahl der enthaltenen Bilder
+  $n = $tdr->count;
+  
+  # Niedrigste Bildnummer
+  $n = $tdr->minNumber;
+  
+  # Höchste Bildnummer
+  $n = $tdr->maxNumber;
+  
+  # alle Bilder (des Verzeichnisses oder aus range.def, wenn definiert)
+  @images = $tdr->images;
+  
+  # Bilder eines Nummernbereichs
+  
+  @images = $tdr->images('113-234');
+  @images = $tdr->images('290-');
+  @images = $tdr->images('422');
+  
+  # Bilder zu einem Bezeichner aus range.def
+  @images = $tdr->images('autofahrt');
+  
+  # Alle Bilder des Verzeichnisses
+  @images = $tdr->images('all');
+  
+  # Alle Bilder aus range.def (leer, wenn range.def nicht existiert)
+  @images = $tdr->images('used');
+  
+  # Alle Bilder des Verzeichnisses, die nicht range.def vorkommen
+  # (leer, wenn range.def nicht existiert)
+  @images = $tdr->images('unused');
+  
+  # Lookup eines Bildes
+  $img = $tdr->image(422); # liefert undef, wenn nicht existent
+  
+  # Liefere das Objekt mit den Range- und Clip-Definitionen. Über
+  # dieses Objekt können die Bildfolgen von Ranges und Clips gezielt
+  # abgerufen werden. Details siehe Quiq::TimeLapse::RangeDef
+  $trd = $tdr->rangeDef;
 
 =head1 DESCRIPTION
 
@@ -119,7 +119,7 @@ Exception geworfen.
 
 =head4 Synopsis
 
-    $tdr = $class->new($dir);
+  $tdr = $class->new($dir);
 
 =head4 Arguments
 
@@ -196,8 +196,8 @@ sub new {
 
 =head4 Synopsis
 
-    $path = $tdr->dir;
-    $path = $tdr->dir($subPath);
+  $path = $tdr->dir;
+  $path = $tdr->dir($subPath);
 
 =head4 Description
 
@@ -229,7 +229,7 @@ sub dir {
 
 =head4 Synopsis
 
-    $n = $tdr->count;
+  $n = $tdr->count;
 
 =head4 Returns
 
@@ -254,7 +254,7 @@ sub count {
 
 =head4 Synopsis
 
-    $n = $tdr->minNumber;
+  $n = $tdr->minNumber;
 
 =head4 Returns
 
@@ -280,7 +280,7 @@ sub minNumber {
 
 =head4 Synopsis
 
-    $n = $tdr->maxNumber;
+  $n = $tdr->maxNumber;
 
 =head4 Returns
 
@@ -308,7 +308,7 @@ sub maxNumber {
 
 =head4 Synopsis
 
-    @numbers|$numberA = $tdr->numbers($expr);
+  @numbers|$numberA = $tdr->numbers($expr);
 
 =head4 Returns
 
@@ -391,7 +391,7 @@ sub numbers {
 
 =head4 Synopsis
 
-    $str = $tdr->resolveFunctionExpression($name,$args);
+  $str = $tdr->resolveFunctionExpression($name,$args);
 
 =head4 Returns
 
@@ -459,7 +459,7 @@ sub resolveFunctionExpression {
 
 =head4 Synopsis
 
-    $str = $tdr->resolveIdentifier($key);
+  $str = $tdr->resolveIdentifier($key);
 
 =head4 Returns
 
@@ -561,7 +561,7 @@ sub resolveIdentifier {
 
 =head4 Synopsis
 
-    $str = $tdr->resolveRange($n,$m);
+  $str = $tdr->resolveRange($n,$m);
 
 =head4 Returns
 
@@ -598,8 +598,8 @@ sub resolveRange {
 
 =head4 Synopsis
 
-    @images|$imageA = $tdr->images;
-    @images|$imageA = $tdr->images($expr);
+  @images|$imageA = $tdr->images;
+  @images|$imageA = $tdr->images($expr);
 
 =head4 Arguments
 
@@ -657,7 +657,7 @@ sub images {
 
 =head4 Synopsis
 
-    $img = $tdr->image($n);
+  $img = $tdr->image($n);
 
 =head4 Arguments
 
@@ -705,7 +705,7 @@ sub image {
 
 =head4 Synopsis
 
-    $class->importImages($dir,$srcDir);
+  $class->importImages($dir,$srcDir);
 
 =head4 Arguments
 
@@ -841,7 +841,7 @@ sub importImages {
 
 =head4 Synopsis
 
-    $class->reorganize($dir,@opt);
+  $class->reorganize($dir,@opt);
 
 =head4 Arguments
 
@@ -875,10 +875,10 @@ je 500 Bilddateien verteilt werden.
 
 Es wird die Unterverzeichnisstruktur angelegt
 
-    000001  (für Bilder mit Bildnummer 1 bis Bildnummer 500)
-    000501  (Bildnummer 501 bis 1000)
-    001001  (Bildnummer 1001 bis 1500)
-    usw.
+  000001  (für Bilder mit Bildnummer 1 bis Bildnummer 500)
+  000501  (Bildnummer 501 bis 1000)
+  001001  (Bildnummer 1001 bis 1500)
+  usw.
 
 und die Bilder in ihr Verzeichnis bewegt. Befindet sich eine Bilddatei
 bereits im richtigen Verzeichnis, wird sie nicht bewegt.
@@ -957,7 +957,7 @@ sub reorganize {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

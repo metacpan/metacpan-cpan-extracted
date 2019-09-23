@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/toadfarm"
       }
    },
-   "version" : "0.81",
+   "version" : "0.82",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

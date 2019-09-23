@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = 12;
+our $VERSION = 13;
 
 sub local_directories {
   # my ($class) = @_;

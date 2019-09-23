@@ -3,7 +3,7 @@ package Mojo::WebSocketProxy::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 sub parse_req {
     my ($c, $req_storage) = @_;
@@ -47,7 +47,7 @@ sub _check_sanity {
     }
 
     if (@failed) {
-        my $result = $c->wsp_error('sanity_check', 'SanityCheckFailed', 'Parameters sanity check failed.');
+        my $result = $c->wsp_error('error', 'SanityCheckFailed', 'Parameters sanity check failed.');
         # emit notification
         $c->tx->emit(sanity_failed => \@failed);
         return $result;

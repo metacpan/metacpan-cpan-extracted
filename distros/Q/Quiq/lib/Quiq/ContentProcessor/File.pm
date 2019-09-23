@@ -1,11 +1,11 @@
 package Quiq::ContentProcessor::File;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    $fil = $class->new($ent,@keyVal);
+  $fil = $class->new($ent,@keyVal);
 
 =cut
 
@@ -60,7 +60,7 @@ sub new {
 
 =head4 Synopsis
 
-    $data = $fil->generate;
+  $data = $fil->generate;
 
 =cut
 
@@ -80,7 +80,7 @@ sub generate {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

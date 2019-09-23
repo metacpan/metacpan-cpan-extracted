@@ -1,11 +1,11 @@
 package Quiq::Program;
 use base qw/Quiq::Process Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Perl;
 use Encode ();
@@ -43,43 +43,43 @@ L<Quiq::Hash>
 
 Programm:
 
-    #!/usr/bin/env perl
-    
-    use Quiq::Program;
-    exit Quiq::Program->run('MyProg')->exitCode;
-    
-    # eof
+  #!/usr/bin/env perl
+  
+  use Quiq::Program;
+  exit Quiq::Program->run('MyProg')->exitCode;
+  
+  # eof
 
 Programm-Klasse:
 
-    package MyProg;
-    use base 'Quiq::Program';
-    
-    sub main {
-        my $self = shift;
-        ...
-        return;
-    }
-    
-    # eof
+  package MyProg;
+  use base 'Quiq::Program';
+  
+  sub main {
+      my $self = shift;
+      ...
+      return;
+  }
+  
+  # eof
 
 Optionen und Argumente:
 
-    my ($error,$opt,$argA) = $self->options(
-        ...
-        -help => 0,
-    );
-    if ($error) {
-        $self->help(10,"ERROR: $error");
-    }
-    elsif ($opt->help) {
-        $self->help;
-    }
-    elsif (@$argA != 1) {
-        $self->help(11,'ERROR: Falsche Anzahl Argumente');
-    }
-    my $myArg = shift @$argA;
-    ...
+  my ($error,$opt,$argA) = $self->options(
+      ...
+      -help => 0,
+  );
+  if ($error) {
+      $self->help(10,"ERROR: $error");
+  }
+  elsif ($opt->help) {
+      $self->help;
+  }
+  elsif (@$argA != 1) {
+      $self->help(11,'ERROR: Falsche Anzahl Argumente');
+  }
+  my $myArg = shift @$argA;
+  ...
 
 =head1 METHODS
 
@@ -89,7 +89,7 @@ Optionen und Argumente:
 
 =head4 Synopsis
 
-    $prg = Quiq::Program->run($programClass,@options);
+  $prg = Quiq::Program->run($programClass,@options);
 
 =head4 Options
 
@@ -148,8 +148,8 @@ sub run {
 
 =head4 Synopsis
 
-    $prg->exit;
-    $prg->exit($exitCode);
+  $prg->exit;
+  $prg->exit($exitCode);
 
 =head4 Description
 
@@ -181,8 +181,8 @@ sub exit {
 
 =head4 Synopsis
 
-    $exitCode = $prg->exitCode;
-    $exitCode = $prg->exitCode($exitCode);
+  $exitCode = $prg->exitCode;
+  $exitCode = $prg->exitCode($exitCode);
 
 =cut
 
@@ -205,7 +205,7 @@ sub exitCode {
 
 =head4 Synopsis
 
-    $name = $this->name;
+  $name = $this->name;
 
 =head4 Description
 
@@ -230,7 +230,7 @@ sub name {
 
 =head4 Synopsis
 
-    $prg->main;
+  $prg->main;
 
 =cut
 
@@ -247,7 +247,7 @@ sub main {
 
 =head4 Synopsis
 
-    $prg->catch($exception);
+  $prg->catch($exception);
 
 =head4 Description
 
@@ -278,7 +278,7 @@ sub catch {
 
 =head4 Synopsis
 
-    $prg->finish;
+  $prg->finish;
 
 =cut
 
@@ -297,8 +297,8 @@ sub finish {
 
 =head4 Synopsis
 
-    $envH = $this->env;
-    $envH = $this->env(\%env);
+  $envH = $this->env;
+  $envH = $this->env(\%env);
 
 =cut
 
@@ -321,8 +321,8 @@ sub env {
 
 =head4 Synopsis
 
-    $argA|@args = $this->argv;
-    $argA|@args = $this->argv(\@argv);
+  $argA|@args = $this->argv;
+  $argA|@args = $this->argv(\@argv);
 
 =cut
 
@@ -345,8 +345,8 @@ sub argv {
 
 =head4 Synopsis
 
-    $fh = $this->stdin;
-    $fh = $this->stdin($fh);
+  $fh = $this->stdin;
+  $fh = $this->stdin($fh);
 
 =cut
 
@@ -369,8 +369,8 @@ sub stdin {
 
 =head4 Synopsis
 
-    $fh = $this->stdout;
-    $fh = $this->stdout($fh);
+  $fh = $this->stdout;
+  $fh = $this->stdout($fh);
 
 =cut
 
@@ -393,8 +393,8 @@ sub stdout {
 
 =head4 Synopsis
 
-    $fh = $this->stderr;
-    $fh = $this->stderr($fh);
+  $fh = $this->stderr;
+  $fh = $this->stderr($fh);
 
 =cut
 
@@ -419,7 +419,7 @@ sub stderr {
 
 =head4 Synopsis
 
-    $encoding = $prg->encoding;
+  $encoding = $prg->encoding;
 
 =head4 Description
 
@@ -442,7 +442,7 @@ sub encoding {
 
 =head4 Synopsis
 
-    $str = $prg->decode($str);
+  $str = $prg->decode($str);
 
 =cut
 
@@ -460,7 +460,7 @@ sub decode {
 
 =head4 Synopsis
 
-    $str = $prg->encode($str);
+  $str = $prg->encode($str);
 
 =cut
 
@@ -480,9 +480,9 @@ sub encode {
 
 =head4 Synopsis
 
-    [1] ($argA,$opt) = $prg->parameters($sloppy,$minArgs,$maxArgs,@optVal);
-    [2] $opt = $prg->parameters($sloppy,0,0,@optVal);
-    [3] $argA = $prg->parameters($sloppy,$minArgs,$maxArgs,@optVal);
+  [1] ($argA,$opt) = $prg->parameters($sloppy,$minArgs,$maxArgs,@optVal);
+  [2] $opt = $prg->parameters($sloppy,0,0,@optVal);
+  [3] $argA = $prg->parameters($sloppy,$minArgs,$maxArgs,@optVal);
 
 =head4 Arguments
 
@@ -566,7 +566,7 @@ sub parameters {
 
 =head4 Synopsis
 
-    ($error,$optH,$argA) = $prg->options(@keyVal);
+  ($error,$optH,$argA) = $prg->options(@keyVal);
 
 =head4 Description
 
@@ -610,9 +610,9 @@ sub options {
 
 =head4 Synopsis
 
-    $val = $prg->opt($key);   # [1]
-    @vals = $prg->opt(@keys); # [2]
-    $optH = $prg->opt;        # [3]
+  $val = $prg->opt($key);   # [1]
+  @vals = $prg->opt(@keys); # [2]
+  $optH = $prg->opt;        # [3]
 
 =cut
 
@@ -638,7 +638,7 @@ sub opt {
 
 =head4 Synopsis
 
-    $dir = $prg->projectDir($depth);
+  $dir = $prg->projectDir($depth);
 
 =head4 Description
 
@@ -653,11 +653,11 @@ absoluten Pfad komplettiert.
 
 Wurde das Programm myprog unter dem Pfad
 
-    /opt/myapp/bin/myprog
+  /opt/myapp/bin/myprog
 
 installiert, dann liefert $prg->projectDir(1) den Pfad
 
-    /opt/myapp
+  /opt/myapp
 
 als Projektverzeichnis.
 
@@ -695,7 +695,7 @@ sub projectDir {
 
 =head4 Synopsis
 
-    $sec = $prg->elapsed;
+  $sec = $prg->elapsed;
 
 =head4 Returns
 
@@ -722,8 +722,8 @@ sub elapsed {
 
 =head4 Synopsis
 
-    $prg->log($fmt,@args);
-    $prg->log($level,$fmt,@args);
+  $prg->log($fmt,@args);
+  $prg->log($level,$fmt,@args);
 
 =head4 Description
 
@@ -733,13 +733,13 @@ angegeben, wird 1 angenommen.
 
 Die Logmeldung wird per
 
-    printf STDERR $fmt,@args;
+  printf STDERR $fmt,@args;
 
 erzeugt. Endet $fmt nicht mit einem Newline, wird es hinzugefügt.
 
 Per Default ist der LogLevel 0. Er wird mit
 
-    $prg->logLevel($n); # $n > 0
+  $prg->logLevel($n); # $n > 0
 
 eingestellt.
 
@@ -757,10 +757,10 @@ Die Argumente der Methode werden I<immer> ausgewertet, auch wenn
 kein Logging erfolgt. Ist damit ein größerer Aufwand verbunden,
 kann es sinnvoll sein, eine Bedingung zu formulieren:
 
-    if ($level >= $prg->logLevel) {
-        # $msg mit großem Aufwand erzeugen
-        $prg->log($level,$msg);
-    }
+  if ($level >= $prg->logLevel) {
+      # $msg mit großem Aufwand erzeugen
+      $prg->log($level,$msg);
+  }
 
 =back
 
@@ -792,9 +792,9 @@ sub log {
 
 =head4 Synopsis
 
-    $self->help;
-    $self->help($exitCode);
-    $self->help($exitCode,$msg);
+  $self->help;
+  $self->help($exitCode);
+  $self->help($exitCode,$msg);
 
 =head4 Description
 
@@ -885,7 +885,7 @@ sub help {
 
 =head4 Synopsis
 
-    $prg = $class->new(@options);
+  $prg = $class->new(@options);
 
 =head4 Options
 
@@ -959,7 +959,7 @@ sub new {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

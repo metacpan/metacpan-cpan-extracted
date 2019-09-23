@@ -1,11 +1,11 @@
 package Quiq::Digest;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Digest::MD5 ();
 
@@ -29,7 +29,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $md5 = $class->md5(@data);
+  $md5 = $class->md5(@data);
 
 =head4 Arguments
 
@@ -64,7 +64,7 @@ sub md5 {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

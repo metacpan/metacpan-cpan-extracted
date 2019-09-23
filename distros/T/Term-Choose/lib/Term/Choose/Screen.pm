@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.702';
+our $VERSION = '1.703';
 
 use Exporter qw( import );
 
@@ -74,7 +74,6 @@ BEGIN {
         $show_cursor = qx(tput cnorm);
         $hide_cursor = qx(tput civis);
     }
-
 }
 
 

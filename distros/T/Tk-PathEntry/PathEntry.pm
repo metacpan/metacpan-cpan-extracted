@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (c) 2001,2002,2003,2007,2008,2009,2017,2018 Slaven Rezic. All rights reserved.
+# Copyright (c) 2001,2002,2003,2007,2008,2009,2017,2018,2019 Slaven Rezic. All rights reserved.
 # Copyright (c) 2007,2009 Klaus Wittrock. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -16,12 +16,7 @@ package Tk::PathEntry;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '3.07';
-
-# Allow whitespace in file pathes.
-# Silently use standard glob for old versions of Perl (you may get trouble
-# with whitespace in file pathes, of course).
-BEGIN { eval {require File::Glob; File::Glob->import(':glob'); 1} }
+$VERSION = '3.08';
 
 use base qw(Tk::Derived Tk::Entry);
 
@@ -450,10 +445,7 @@ sub _get_choices {
 	    [$pathname];
 	}
     } else {
-	my $glob;
-	$glob = "$pathname*";
-	use File::Glob ':glob';   # allow whitespace in $pathname
-	[ glob($glob) ];
+	[ <$pathname*> ];
     }
 }
 

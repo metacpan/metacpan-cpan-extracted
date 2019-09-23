@@ -1,11 +1,11 @@
 package Quiq::JQuery::Function;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 
@@ -33,14 +33,14 @@ Diese Klasse erweitert das jQuery-Objekt um nützliche Funktionen.
 
 =head4 Synopsis
 
-    $javaScript = $class->formatDate;
+  $javaScript = $class->formatDate;
 
 =head4 Description
 
 Die JavaScript-Funktion formatiert ein JavaScript Datums-Objekt
 gemäß dem angegebenen Muster:
 
-    str = $.formatDate(d,fmt);
+  str = $.formatDate(d,fmt);
 
 =over 4
 
@@ -231,7 +231,7 @@ sub formatDate {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

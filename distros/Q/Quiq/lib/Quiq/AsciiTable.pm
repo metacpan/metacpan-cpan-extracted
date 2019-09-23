@@ -1,11 +1,11 @@
 package Quiq::AsciiTable;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Unindent;
 use Quiq::FileHandle;
@@ -34,12 +34,12 @@ Eigenschaften der Tabelle abzufragen.
 
 Eine ASCII-Tabelle hat den allgemeinen Aufbau:
 
-    Right Left Center
-    ----- ---- ------
-        1 A      A
-       21 AB    AB
-      321 ABC   ABC
-     4321 ABCD  ABCD
+  Right Left Center
+  ----- ---- ------
+      1 A      A
+     21 AB    AB
+    321 ABC   ABC
+   4321 ABCD  ABCD
 
 Die Tabelle besteht aus einem Tabellen-Kopf und einem
 Tabellen-Körper. Der Kopf enthält die Kolumnen-Titel und der
@@ -66,36 +66,36 @@ sind die Werte weder eindeutig links noch rechts ausgerichtet.
 
 Der Tabellen-Kopf, also die Titel, können mehrzeilig sein:
 
-    Right Left
+  Right Left
 
-    Aligned Aligned Centered
-    ------- ------- --------
-          1 A          A
-         21 AB         AB
-        321 ABC        ABC
-       4321 ABCD      ABCD
+  Aligned Aligned Centered
+  ------- ------- --------
+        1 A          A
+       21 AB         AB
+      321 ABC        ABC
+     4321 ABCD      ABCD
 
 Die Titel sind optional, können also auch fehlen:
 
-    ----- ---- ------
-        1 A      A
-       21 AB    AB
-      321 ABC   ABC
-     4321 ABCD  ABCD
+  ----- ---- ------
+      1 A      A
+     21 AB    AB
+    321 ABC   ABC
+   4321 ABCD  ABCD
 
 Die Kolumnenwerte können mehrzeilig sein:
 
-    Right   Left
+  Right   Left
 
-    Aligned   Aligned          Centered
-    -------   --------------   --------
-          1   This is             A
-              the first row
-    
-          2   Second row          B
-    
-          3   The third           C
-              row
+  Aligned   Aligned          Centered
+  -------   --------------   --------
+        1   This is             A
+            the first row
+  
+        2   Second row          B
+  
+        3   The third           C
+            row
 
 Bei einer Tabelle mit mehrzeiligen Kolumnenwerten werden die
 Zeilen durch Trennzeilen getrennt, gleichgültig, ob die einzelne
@@ -104,18 +104,18 @@ Zeile 2). Die Trennzeile kann eine einfache Leerzeile sein oder
 Bindestriche enthalten wie die Trennzeile zwischen Tabellen-Kopf
 und -Körper:
 
-    Right   Left
+  Right   Left
 
-    Aligned   Aligned          Centered
-    -------   --------------   --------
-          1   This is             A
-              the first line
-    -------   --------------   --------
-          2   Second line         B
-    -------   --------------   --------
-          3   The third           C
-              line
-    -------   --------------   --------
+  Aligned   Aligned          Centered
+  -------   --------------   --------
+        1   This is             A
+            the first line
+  -------   --------------   --------
+        2   Second line         B
+  -------   --------------   --------
+        3   The third           C
+            line
+  -------   --------------   --------
 
 Generell gilt ferner:
 
@@ -140,7 +140,7 @@ Leerzeien oberhalb und unterhalb der Tabelle werden entfernt.
 
 =head4 Synopsis
 
-    $tab = $class->new($str);
+  $tab = $class->new($str);
 
 =head4 Arguments
 
@@ -362,8 +362,8 @@ sub new {
 
 =head4 Synopsis
 
-    @align | $alignA = $tab->alignments;
-    @align | $alignA = $tab->alignments($domain);
+  @align | $alignA = $tab->alignments;
+  @align | $alignA = $tab->alignments($domain);
 
 =head4 Arguments
 
@@ -417,18 +417,18 @@ Linksbündig (left aligned).
 
 Tabelle:
 
-    Right Left    Centered
+  Right Left    Centered
 
-    Aligned Aligned  Header
-    ------- ------- --------
-          1 A          A
-         21 AB         AB
-        321 ABC        ABC
+  Aligned Aligned  Header
+  ------- ------- --------
+        1 A          A
+       21 AB         AB
+      321 ABC        ABC
 
 Resultat:
 
-    @align = $tab->alignments;
-    # ('r','l','c')
+  @align = $tab->alignments;
+  # ('r','l','c')
 
 =cut
 
@@ -452,7 +452,7 @@ sub alignments {
 
 =head4 Synopsis
 
-    $bool = $tab->multiLine;
+  $bool = $tab->multiLine;
 
 =head4 Returns
 
@@ -466,29 +466,29 @@ Liefere 1, wenn die Tabelle eine MultiLine-Tabelle ist, andernfalls 0.
 
 Tabelle:
 
-    Right Left    Centered
+  Right Left    Centered
 
-    Aligned Aligned  Header
-    ------- ------- --------
-          1 Erste       A
-            Zeile
-    
-          2 Zweite      B
-            Zeile
-    
-          3 Dritte      C
-            Zeile
+  Aligned Aligned  Header
+  ------- ------- --------
+        1 Erste       A
+          Zeile
+  
+        2 Zweite      B
+          Zeile
+  
+        3 Dritte      C
+          Zeile
 
 Resultat:
 
-    $multiLine = $tab->multiLine;
-    # 1
+  $multiLine = $tab->multiLine;
+  # 1
 
 =head3 rows() - Liste der Zeilen
 
 =head4 Synopsis
 
-    @rows | $rowA = $tab->rows;
+  @rows | $rowA = $tab->rows;
 
 =head4 Returns
 
@@ -499,20 +499,20 @@ Liste.
 
 Tabelle:
 
-    Right Left    Centered
+  Right Left    Centered
 
-    Aligned Aligned  Header
-    ------- ------- --------
-          1 A          A
-         21 AB         AB
-        321 ABC        ABC
+  Aligned Aligned  Header
+  ------- ------- --------
+        1 A          A
+       21 AB         AB
+      321 ABC        ABC
 
 Resultat:
 
-    @rows = $tab->rows;
-    # (['1',  'A',  'A'],
-    #  ['21', 'AB', 'AB'],
-    #  ['321','ABC','ABC'])
+  @rows = $tab->rows;
+  # (['1',  'A',  'A'],
+  #  ['21', 'AB', 'AB'],
+  #  ['321','ABC','ABC'])
 
 =cut
 
@@ -530,7 +530,7 @@ sub rows {
 
 =head4 Synopsis
 
-    @titles | $titleA = $tab->titles;
+  @titles | $titleA = $tab->titles;
 
 =head4 Returns
 
@@ -541,18 +541,18 @@ auf die Liste.
 
 Tabelle:
 
-    Right Left    Centered
+  Right Left    Centered
 
-    Aligned Aligned  Header
-    ------- ------- --------
-          1 A          A
-         21 AB         AB
-        321 ABC        ABC
+  Aligned Aligned  Header
+  ------- ------- --------
+        1 A          A
+       21 AB         AB
+      321 ABC        ABC
 
 Resultat:
 
-    @titles = $tab->titles;
-    # ("Right\nAligned","Left\nAligned","Centered\nHeader")
+  @titles = $tab->titles;
+  # ("Right\nAligned","Left\nAligned","Centered\nHeader")
 
 =cut
 
@@ -570,7 +570,7 @@ sub titles {
 
 =head4 Synopsis
 
-    $n = $tab->width;
+  $n = $tab->width;
 
 =head4 Returns
 
@@ -584,18 +584,18 @@ Liefere die Anzahl der Kolumnen der Tabelle.
 
 Tabelle:
 
-    Right Left    Centered
+  Right Left    Centered
 
-    Aligned Aligned  Header
-    ------- ------- --------
-          1 A          A
-         21 AB         AB
-        321 ABC        ABC
+  Aligned Aligned  Header
+  ------- ------- --------
+        1 A          A
+       21 AB         AB
+      321 ABC        ABC
 
 Resultat:
 
-    $n = $tab->width;
-    # 3
+  $n = $tab->width;
+  # 3
 
 =head2 Formate
 
@@ -603,7 +603,7 @@ Resultat:
 
 =head4 Synopsis
 
-    $str = $class->asText;
+  $str = $class->asText;
 
 =head4 Returns
 
@@ -626,7 +626,7 @@ sub asText {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

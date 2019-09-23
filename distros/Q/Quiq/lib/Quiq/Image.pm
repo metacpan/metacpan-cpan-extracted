@@ -1,11 +1,11 @@
 package Quiq::Image;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::Path;
@@ -31,7 +31,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $aspectRatio = $this->aspectRatio($width,$height);
+  $aspectRatio = $this->aspectRatio($width,$height);
 
 =head4 Description
 
@@ -62,8 +62,8 @@ sub aspectRatio {
 
 =head4 Synopsis
 
-    @files|$fileA = $class->findImages(@filesAndDirs);
-    @images|$imageA = $class->findImages(@filesAndDirs,-objects=>1);
+  @files|$fileA = $class->findImages(@filesAndDirs);
+  @images|$imageA = $class->findImages(@filesAndDirs,-objects=>1);
 
 =head4 Options
 
@@ -159,7 +159,7 @@ sub findImages {
 
 =head4 Synopsis
 
-    $standardName = $class->standardName($n,$width,$height,$extension,@opt);
+  $standardName = $class->standardName($n,$width,$height,$extension,@opt);
 
 =head4 Options
 
@@ -176,7 +176,7 @@ Ergänzender Text zum Bild.
 Erzeuge einen Standard-Bild-Namen und liefere diesen zurück.
 Ein Standard-Bild-Name hat den Aufbau:
 
-    NNNNNN-WIDTHxHEIGHT[-NAME].EXT
+  NNNNNN-WIDTHxHEIGHT[-NAME].EXT
 
 Hierbei ist:
 
@@ -246,7 +246,7 @@ sub standardName {
 
 =head4 Synopsis
 
-    $type = $class->type($file,@opt);
+  $type = $class->type($file,@opt);
 
 =head4 Options
 
@@ -351,7 +351,7 @@ sub type {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,12 +1,12 @@
 package Quiq::Gd::Font;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use GD ();
 use Quiq::Math;
@@ -29,13 +29,13 @@ Abstraktion für GD- und TrueType-Fonts, die von GD nicht gemacht wird.
 
 =head2 Geometrie der (monospaced) GD-Fonts
 
-    Name             Breite Höhe
-    ---------------- ------ ----
-    gdTinyFont         5      8
-    gdSmallFont        6     13
-    gdMediumBoldFont   7     13
-    gdLargeFont        8     16
-    gdGiantFont        9     15
+  Name             Breite Höhe
+  ---------------- ------ ----
+  gdTinyFont         5      8
+  gdSmallFont        6     13
+  gdMediumBoldFont   7     13
+  gdLargeFont        8     16
+  gdGiantFont        9     15
 
 =head1 EXAMPLES
 
@@ -45,13 +45,13 @@ Abstraktion für GD- und TrueType-Fonts, die von GD nicht gemacht wird.
 
 GD-Font instantiieren
 
-    $fnt = Quiq::Gd::Font->new('gdSmallFont');
+  $fnt = Quiq::Gd::Font->new('gdSmallFont');
 
 =item *
 
 TrueType-Font instantiieren
 
-    $fnt = Quiq::Gd::Font->new('/opt/fonts/pala.ttf',20);
+  $fnt = Quiq::Gd::Font->new('/opt/fonts/pala.ttf',20);
 
 =back
 
@@ -79,10 +79,10 @@ unless ($r) {
 
 =head4 Synopsis
 
-    $fnt = $class->new($name);
-    $fnt = $class->new($name,$pt);
-    $fnt = $class->new("$name,$pt");
-    $fnt = $class->new($fnt);
+  $fnt = $class->new($name);
+  $fnt = $class->new($name,$pt);
+  $fnt = $class->new("$name,$pt");
+  $fnt = $class->new($fnt);
 
 =head4 Description
 
@@ -170,7 +170,7 @@ sub new {
 
 =head4 Synopsis
 
-    $name = $fnt->name;
+  $name = $fnt->name;
 
 =head4 Description
 
@@ -192,7 +192,7 @@ sub name {
 
 =head4 Synopsis
 
-    $pt = $fnt->pt;
+  $pt = $fnt->pt;
 
 =head4 Description
 
@@ -213,7 +213,7 @@ sub pt {
 
 =head4 Synopsis
 
-    $bool = $fnt->isTrueType;
+  $bool = $fnt->isTrueType;
 
 =head4 Description
 
@@ -234,7 +234,7 @@ sub isTrueType {
 
 =head4 Synopsis
 
-    ($width,$height,$xOffset,$yOffset) = $fnt->stringGeometry($str,@opt);
+  ($width,$height,$xOffset,$yOffset) = $fnt->stringGeometry($str,@opt);
 
 =head4 Options
 
@@ -259,21 +259,21 @@ B<Geometrie>
 
 TrueType-Fonts können um einen beliebigen Winkel gedreht werden.
 
-            4,5
-            /\
-           /  \
-          /  T \ 2,3
-         /  X  /
-    6,7 /  E  /
-        \ T  /
-         \  /
-          \/
-          0,1
-    
-    $width = $bounds[2]-$bounds[6]
-    $height = $bounds[1]-$bounds[5]
-    $xOffset = -$bounds[6]
-    $yOffset = $up? 0: -$bounds[5]
+          4,5
+          /\
+         /  \
+        /  T \ 2,3
+       /  X  /
+  6,7 /  E  /
+      \ T  /
+       \  /
+        \/
+        0,1
+  
+  $width = $bounds[2]-$bounds[6]
+  $height = $bounds[1]-$bounds[5]
+  $xOffset = -$bounds[6]
+  $yOffset = $up? 0: -$bounds[5]
 
 Von dieser Möglichkeit machen wir allerdings keinen Gebrauch. Wir
 lassen lediglich 0 und 90 Grad zu. Das sind die Möglichkeiten, die
@@ -360,7 +360,7 @@ sub stringGeometry {
 
 =head4 Synopsis
 
-    $width = $fnt->charWidth(@opt);
+  $width = $fnt->charWidth(@opt);
 
 =head4 Alias
 
@@ -404,7 +404,7 @@ sub charWidth {
 
 =head4 Synopsis
 
-    $height = $fnt->charHeight(@opt);
+  $height = $fnt->charHeight(@opt);
 
 =head4 Alias
 
@@ -449,7 +449,7 @@ sub charHeight {
 
 =head4 Synopsis
 
-    $width = $fnt->digitWidth(@opt);
+  $width = $fnt->digitWidth(@opt);
 
 =head4 Options
 
@@ -487,7 +487,7 @@ sub digitWidth {
 
 =head4 Synopsis
 
-    $height = $fnt->digitHeight(@opt);
+  $height = $fnt->digitHeight(@opt);
 
 =head4 Options
 
@@ -525,7 +525,7 @@ sub digitHeight {
 
 =head4 Synopsis
 
-    $n = $fnt->stringWidth($str,@opt);
+  $n = $fnt->stringWidth($str,@opt);
 
 =head4 Options
 
@@ -570,7 +570,7 @@ sub stringWidth {
 
 =head4 Synopsis
 
-    $n = $fnt->stringHeight($str,@opt);
+  $n = $fnt->stringHeight($str,@opt);
 
 =head4 Options
 
@@ -621,7 +621,7 @@ und Fontgrößen müssen die Methoden u.U. erweitert werden.
 
 =head4 Synopsis
 
-    $n = $g->alignRightOffset;
+  $n = $g->alignRightOffset;
 
 =head4 Description
 
@@ -666,7 +666,7 @@ sub alignRightOffset {
 
 =head4 Synopsis
 
-    $n = $g->alignTopOffset;
+  $n = $g->alignTopOffset;
 
 =head4 Description
 
@@ -698,7 +698,7 @@ sub alignTopOffset {
 
 =head4 Synopsis
 
-    $n = $fnt->hCenterOffset;
+  $n = $fnt->hCenterOffset;
 
 =head4 Description
 
@@ -724,7 +724,7 @@ sub hCenterOffset {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

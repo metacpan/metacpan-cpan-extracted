@@ -1,12 +1,12 @@
 package Quiq::Socket;
 use base qw/IO::Socket::INET Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 
@@ -44,11 +44,11 @@ alle Methoden dieser Klasse.
 
 Sende GET-Request an Google und gib die Antwort aus:
 
-    my $sock = Quiq::Socket->new('google.com',80);
-    print $sock "GET /\n";
-    while (<$sock>) {
-        print;
-    }
+  my $sock = Quiq::Socket->new('google.com',80);
+  print $sock "GET /\n";
+  while (<$sock>) {
+      print;
+  }
 
 =head1 METHODS
 
@@ -58,7 +58,7 @@ Sende GET-Request an Google und gib die Antwort aus:
 
 =head4 Synopsis
 
-    $sock = $class->new($host,$port,@opt);
+  $sock = $class->new($host,$port,@opt);
 
 =head4 Options
 
@@ -115,7 +115,7 @@ sub new {
 
 =head4 Synopsis
 
-    $data = $sock->slurp;
+  $data = $sock->slurp;
 
 =head4 Description
 
@@ -138,7 +138,7 @@ sub slurp {
 
 =head4 Synopsis
 
-    $sock->close;
+  $sock->close;
 
 =cut
 
@@ -158,7 +158,7 @@ sub close {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

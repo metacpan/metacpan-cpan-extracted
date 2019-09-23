@@ -17,7 +17,7 @@ my %log;
 
 $t->app->routes->get(
   '/with-request-base' => sub {
-    my $c = shift;
+    my $c    = shift;
     my $base = $c->req->param('X-Request-Base') || '';
 
     $c->req->url->base(Mojo::URL->new($base)) if $base;

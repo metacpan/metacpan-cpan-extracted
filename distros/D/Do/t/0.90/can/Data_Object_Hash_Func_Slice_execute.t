@@ -54,6 +54,6 @@ $func = Data::Object::Hash::Func::Slice->new(
 
 my $result = $func->execute;
 
-is_deeply $result, {1=>2,5=>6};
+is_deeply $result, [2, 6];
 
 ok 1 and done_testing;

@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -25,7 +25,7 @@ use vars qw($VERSION);
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-$VERSION = 9;
+$VERSION = 10;
 
 sub new {
   my ($class, %self) = @_;
@@ -156,7 +156,8 @@ Time::TZ -- object-oriented TZ settings
 This is an object-oriented approach to C<TZ> environment variable settings,
 ie. C<$ENV{'TZ'}>.  A C<Time::TZ> object holds a TZ string and has methods
 to make calculations in that zone by temporarily changing the C<TZ>
-environment variable (see L<Tie::TZ>).
+environment variable (see L<Tie::TZ>).  See F<examples/time-tz.pl> in the
+sources for complete program.
 
 The advantage of this approach is that it needs only a modest amount of code
 and uses the same system timezones as other programs.  Of course what system
@@ -278,7 +279,7 @@ http://user42.tuxfamily.org/tie-tz/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 Tie-TZ is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

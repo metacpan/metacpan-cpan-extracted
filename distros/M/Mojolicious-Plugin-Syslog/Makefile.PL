@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
       homepage   => 'https://github.com/jhthorsen/mojolicious-plugin-syslog',
       repository => {
         type => 'git',
-        url  => 'https://github.com/jhthorsen/mojolicious-plugin-syslog',
+        url  => 'https://github.com/jhthorsen/mojolicious-plugin-syslog.git',
         web  => 'https://github.com/jhthorsen/mojolicious-plugin-syslog',
       },
     },

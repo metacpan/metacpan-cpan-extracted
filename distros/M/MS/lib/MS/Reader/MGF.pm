@@ -11,8 +11,6 @@ use Data::Lock;
 
 use MS::Reader::MGF::Spectrum;
 
-our $VERSION = 0.001;
-
 # Perform parsing of the MGF (this is called by the parent class - do not
 # change the method name )
 

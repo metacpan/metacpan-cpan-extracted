@@ -1,11 +1,11 @@
 package Quiq::Gnuplot::Graph;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ Ein Objekt der Klasse repräsentiert einen Graph.
 
 =head4 Synopsis
 
-    $gph = Quiq::Gnuplot::Graph->new(@keyVal);
+  $gph = Quiq::Gnuplot::Graph->new(@keyVal);
 
 =cut
 
@@ -60,7 +60,7 @@ sub new {
 
 =head4 Synopsis
 
-    $bool = $gph->hasData;
+  $bool = $gph->hasData;
 
 =cut
 
@@ -76,7 +76,7 @@ sub hasData {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

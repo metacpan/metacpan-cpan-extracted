@@ -1,11 +1,11 @@
 package Quiq::Http::Client::Lwp;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use LWP::UserAgent ();
@@ -31,7 +31,7 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $data = $class->get($url,@opt);
+  $data = $class->get($url,@opt);
 
 =head4 Options
 
@@ -117,7 +117,7 @@ sub get {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

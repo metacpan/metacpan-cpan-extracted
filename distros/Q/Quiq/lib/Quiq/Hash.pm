@@ -1,12 +1,12 @@
 package Quiq::Hash;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -27,26 +27,26 @@ L<Quiq::Object>
 
 Klasse laden:
 
-    use Quiq::Hash;
+  use Quiq::Hash;
 
 Hash-Objekt instantiieren:
 
-    my $h = Quiq::Hash->new(a=>1,b=>1,c=>3);
+  my $h = Quiq::Hash->new(a=>1,b=>1,c=>3);
 
 Werte abfragen oder setzen:
 
-    my $v = $h->get('a'); # oder: $v = $h->{'a'};
-    $h->set(b=>2);        # oder: $h->{'b'} = 2;
+  my $v = $h->get('a'); # oder: $v = $h->{'a'};
+  $h->set(b=>2);        # oder: $h->{'b'} = 2;
 
 Unerlaubte Zugriffe:
 
-    $v = $h->get('d');    # Exception!
-    $h->set(d=>4);        # Exception!
+  $v = $h->get('d');    # Exception!
+  $h->set(d=>4);        # Exception!
 
 Erlaubte Zugriffe;
 
-    $v = $h->try('d');    # undef
-    $h->add(d=>4);
+  $v = $h->try('d');    # undef
+  $h->add(d=>4);
 
 =head1 DESCRIPTION
 
@@ -81,11 +81,11 @@ our $SetCount = 0;
 
 =head4 Synopsis
 
-    $h = $class->new;                       # [1]
-    $h = $class->new(@keyVal);              # [2]
-    $h = $class->new(\@keys,\@vals[,$val]); # [3]
-    $h = $class->new(\@keys[,$val]);        # [4]
-    $h = $class->new(\%hash);               # [5]
+  $h = $class->new;                       # [1]
+  $h = $class->new(@keyVal);              # [2]
+  $h = $class->new(\@keys,\@vals[,$val]); # [3]
+  $h = $class->new(\@keys[,$val]);        # [4]
+  $h = $class->new(\%hash);               # [5]
 
 =head4 Description
 
@@ -189,7 +189,7 @@ sub new {
 
 =head4 Synopsis
 
-    $h = $class->fabricate($subClass,...);
+  $h = $class->fabricate($subClass,...);
 
 =head4 Description
 
@@ -224,8 +224,8 @@ sub fabricate {
 
 =head4 Synopsis
 
-    $val = $h->get($key);
-    @vals = $h->get(@keys);
+  $val = $h->get($key);
+  @vals = $h->get(@keys);
 
 =head4 Description
 
@@ -234,8 +234,8 @@ liefere keine Liste, sondern den Wert des ersten Schlüssels.
 
 Alternative Formulierung:
 
-    $val = $h->{$key};    # ein Schlüssel
-    @vals = @{$h}{@keys}; # mehrere Schlüssel
+  $val = $h->{$key};    # ein Schlüssel
+  @vals = @{$h}{@keys}; # mehrere Schlüssel
 
 =cut
 
@@ -264,7 +264,7 @@ sub get {
 
 =head4 Synopsis
 
-    $valS = $h->getRef($key);
+  $valS = $h->getRef($key);
 
 =head4 Description
 
@@ -277,20 +277,20 @@ nicht erneut zugewiesen werden.
 
 Alternative Formulierung:
 
-    $valS = \$h->{$key};
+  $valS = \$h->{$key};
 
 =head4 Example
 
 Newline an Wert anhängen mit getRef():
 
-    $valS = $h->getRef('x');
-    $$valS .= "\n";
+  $valS = $h->getRef('x');
+  $$valS .= "\n";
 
 Dasselbe ohne getRef():
 
-    $val = $h->get('x');
-    $val .= "\n";
-    $val->set(x=>$val);
+  $val = $h->get('x');
+  $val .= "\n";
+  $val->set(x=>$val);
 
 =cut
 
@@ -306,7 +306,7 @@ sub getRef {
 
 =head4 Synopsis
 
-    @arr|$arr = $h->getArray($key);
+  @arr|$arr = $h->getArray($key);
 
 =head4 Description
 
@@ -331,8 +331,8 @@ sub getArray {
 
 =head4 Synopsis
 
-    $val = $h->try($key);
-    @vals = $h->try(@keys);
+  $val = $h->try($key);
+  @vals = $h->try(@keys);
 
 =head4 Description
 
@@ -365,7 +365,7 @@ sub try {
 
 =head4 Synopsis
 
-    $h->set(@keyVal);
+  $h->set(@keyVal);
 
 =head4 Description
 
@@ -373,8 +373,8 @@ Setze die angegebenen Schlüssel/Wert-Paare.
 
 Alternative Formulierung:
 
-    $h->{$key} = $val;    # ein Schlüssel/Wert-Paar
-    @{$h}{@keys} = @vals; # mehrere Schlüssel/Wert-Paare
+  $h->{$key} = $val;    # ein Schlüssel/Wert-Paar
+  @{$h}{@keys} = @vals; # mehrere Schlüssel/Wert-Paare
 
 =cut
 
@@ -405,8 +405,8 @@ sub set {
 
 =head4 Synopsis
 
-    $val = $h->add($key=>$val);
-    @vals = $h->add(@keyVal);
+  $val = $h->add($key=>$val);
+  @vals = $h->add(@keyVal);
 
 =head4 Description
 
@@ -442,7 +442,7 @@ sub add {
 
 =head4 Synopsis
 
-    $val = $h->memoize($key,$sub);
+  $val = $h->memoize($key,$sub);
 
 =head4 Description
 
@@ -456,13 +456,13 @@ gerechnet werden soll.
 
 Alternative Formulierungen:
 
-    $val = $h->{$key} //= $h->$sub($key);
+  $val = $h->{$key} //= $h->$sub($key);
 
 oder
 
-    $val = $h->{$key} //= do {
-        # Implementierung der Subroutine
-    };
+  $val = $h->{$key} //= do {
+      # Implementierung der Subroutine
+  };
 
 =cut
 
@@ -479,7 +479,7 @@ sub memoize {
 
 =head4 Synopsis
 
-    $ref = $h->memoizeWeaken($key,$sub);
+  $ref = $h->memoizeWeaken($key,$sub);
 
 =head4 Description
 
@@ -517,18 +517,18 @@ sub memoizeWeaken {
 
 =head4 Synopsis
 
-    $val = $h->compute($key,$sub);
+  $val = $h->compute($key,$sub);
 
 =head4 Description
 
 Wende Subroutine $sub auf den Wert des Schlüssels $key an. Die
 Subroutine hat die Struktur:
 
-    sub {
-        my ($h,$key) = @_;
-        ...
-        return $val;
-    }
+  sub {
+      my ($h,$key) = @_;
+      ...
+      return $val;
+  }
 
 Der Rückgabewert der Subroutine wird an Schlüssel $key zugewiesen.
 
@@ -536,10 +536,10 @@ Der Rückgabewert der Subroutine wird an Schlüssel $key zugewiesen.
 
 Methode L<increment|"increment() - Inkrementiere (Integer-)Wert">() mit apply() realisiert:
 
-    $val = $h->compute($key,sub {
-        my ($h,$key) = @_;
-        return $h->{$key}+1; # nicht $h->{$key}++!
-    });
+  $val = $h->compute($key,sub {
+      my ($h,$key) = @_;
+      return $h->{$key}+1; # nicht $h->{$key}++!
+  });
 
 =cut
 
@@ -558,8 +558,8 @@ sub compute {
 
 =head4 Synopsis
 
-    $val = $h->AUTOLOAD;
-    $val = $h->AUTOLOAD($val);
+  $val = $h->AUTOLOAD;
+  $val = $h->AUTOLOAD($val);
 
 =head4 Description
 
@@ -577,11 +577,11 @@ in die Methodenschnittstelle einer Klasse zu integrieren.
 
 Gegenüberstellung:
 
-    Hash-Zugriff           get()/set()               Methoden-Zugriff
-    --------------------   -----------------------   --------------------
-    $name = $h->{'name'}   $name = $h->get('name')   $name = $h->name
-    $h->{'name'} = $name   $h->set(name=>$name)      $h->name($name) -or-
-                                                     $h->name = $name
+  Hash-Zugriff           get()/set()               Methoden-Zugriff
+  --------------------   -----------------------   --------------------
+  $name = $h->{'name'}   $name = $h->get('name')   $name = $h->name
+  $h->{'name'} = $name   $h->set(name=>$name)      $h->name($name) -or-
+                                                   $h->name = $name
 
 In der letzten Spalte ("Methoden-Zugriff") steht die Syntax der
 automatisch generierten Akzessor-Methoden.
@@ -589,8 +589,8 @@ automatisch generierten Akzessor-Methoden.
 Die Akzessor-Methode wird als lvalue-Methode generiert, d.h. die
 Hash-Komponente kann per Akzessor-Aufruf manipuliert werden. Beispiele:
 
-    $h->name = $name;
-    $h->name =~ s/-//g;
+  $h->name = $name;
+  $h->name =~ s/-//g;
 
 Die Erzeugung einer Akzessor-Methode erfolgt (vom Aufrufer unbemerkt)
 beim ersten Aufruf. Danach wird die Methode unmittelbar gerufen.
@@ -655,7 +655,7 @@ sub AUTOLOAD :lvalue {
 
 =head4 Synopsis
 
-    @keys|$keyA = $h->keys;
+  @keys|$keyA = $h->keys;
 
 =head4 Description
 
@@ -666,7 +666,7 @@ Die Reihenfolge der Schlüssel ist undefiniert.
 
 Alternative Formulierung:
 
-    @keys = keys %$h;
+  @keys = keys %$h;
 
 =cut
 
@@ -684,7 +684,7 @@ sub keys {
 
 =head4 Synopsis
 
-    $n = $h->hashSize;
+  $n = $h->hashSize;
 
 =head4 Description
 
@@ -692,7 +692,7 @@ Liefere die Anzahl der Schlüssel/Wert-Paare des Hash.
 
 Alternative Formulierung:
 
-    $n = keys %$h;
+  $n = keys %$h;
 
 =cut
 
@@ -709,8 +709,8 @@ sub hashSize {
 
 =head4 Synopsis
 
-    $class->validate(\%hash,\@keys);
-    $class->validate(\%hash,\%keys);
+  $class->validate(\%hash,\@keys);
+  $class->validate(\%hash,\%keys);
 
 =head4 Description
 
@@ -752,8 +752,8 @@ sub validate {
 
 =head4 Synopsis
 
-    $h2 = $h->copy;
-    $h2 = $h->copy(@keyVal);
+  $h2 = $h->copy;
+  $h2 = $h->copy(@keyVal);
 
 =head4 Description
 
@@ -790,7 +790,7 @@ sub copy {
 
 =head4 Synopsis
 
-    $h = $h->join(\%hash);
+  $h = $h->join(\%hash);
 
 =head4 Returns
 
@@ -810,12 +810,12 @@ Ein Hash-Objekt mit vorgegebenen Attributen aus einem anoymen Hash
 erzeugen. Der anonyme Hash darf weniger, aber nicht mehr Attribute
 enthalten:
 
-    $h = Quiq::Hash->new([qw/
-        name
-        label
-        width
-        height
-    /])->join(\%hash);
+  $h = Quiq::Hash->new([qw/
+      name
+      label
+      width
+      height
+  /])->join(\%hash);
 
 =cut
 
@@ -839,7 +839,7 @@ sub join {
 
 =head4 Synopsis
 
-    $h->delete(@keys);
+  $h->delete(@keys);
 
 =head4 Description
 
@@ -848,8 +848,8 @@ der zulässigen Schlüssel ändert sich dadurch nichts!
 
 Alternative Formulierung:
 
-    delete $h->{$key};   # einzelner Schlüssel
-    delete @{$h}{@keys}; # mehrere Schlüssel
+  delete $h->{$key};   # einzelner Schlüssel
+  delete @{$h}{@keys}; # mehrere Schlüssel
 
 =cut
 
@@ -872,7 +872,7 @@ sub delete {
 
 =head4 Synopsis
 
-    $h->clear;
+  $h->clear;
 
 =head4 Description
 
@@ -880,7 +880,7 @@ Leere Hash, d.h. entferne alle Schlüssel/Wert-Paare.
 
 Alternative Formulierung:
 
-    %$h = ();
+  %$h = ();
 
 =cut
 
@@ -900,7 +900,7 @@ sub clear {
 
 =head4 Synopsis
 
-    $bool = $h->exists($key);
+  $bool = $h->exists($key);
 
 =head4 Description
 
@@ -909,7 +909,7 @@ liefere I<wahr>, andernfalls I<falsch>.
 
 Alternative Formulierung:
 
-    $bool = exists $self->{$key};
+  $bool = exists $self->{$key};
 
 =cut
 
@@ -926,7 +926,7 @@ sub exists {
 
 =head4 Synopsis
 
-    $bool = $h->defined($key);
+  $bool = $h->defined($key);
 
 =head4 Description
 
@@ -935,7 +935,7 @@ liefere I<wahr>, andernfalls I<falsch>.
 
 Alternative Formulierung:
 
-    $bool = defined $h->{$key};
+  $bool = defined $h->{$key};
 
 =cut
 
@@ -952,7 +952,7 @@ sub defined {
 
 =head4 Synopsis
 
-    $bool = $h->isEmpty;
+  $bool = $h->isEmpty;
 
 =head4 Description
 
@@ -961,7 +961,7 @@ andernfalls I<falsch>.
 
 Alternative Formulierung:
 
-    $bool = %$h;
+  $bool = %$h;
 
 =cut
 
@@ -980,7 +980,7 @@ sub isEmpty {
 
 =head4 Synopsis
 
-    $bool = $h->isLocked;
+  $bool = $h->isLocked;
 
 =head4 Description
 
@@ -1014,7 +1014,7 @@ sub isLocked {
 
 =head4 Synopsis
 
-    $h = $h->lockKeys;
+  $h = $h->lockKeys;
 
 =head4 Description
 
@@ -1023,7 +1023,7 @@ werden. Wird dies versucht, wird eine Exception geworfen.
 
 Alternative Formulierung:
 
-    Hash::Util::lock_keys(%$h);
+  Hash::Util::lock_keys(%$h);
 
 Die Methode liefert eine Referenz auf den Hash zurück.
 
@@ -1043,7 +1043,7 @@ sub lockKeys {
 
 =head4 Synopsis
 
-    $h = $h->unlockKeys;
+  $h = $h->unlockKeys;
 
 =head4 Description
 
@@ -1052,11 +1052,11 @@ manipuliert werden. Die Methode liefert eine Referenz auf den Hash
 zurück. Damit kann der Hash gleich nach der Instantiierung
 entsperrt werden:
 
-    return Quiq::Hash->new(...)->unlockKeys;
+  return Quiq::Hash->new(...)->unlockKeys;
 
 Alternative Formulierung:
 
-    Hash::Util::unlock_keys(%$h);
+  Hash::Util::unlock_keys(%$h);
 
 =cut
 
@@ -1076,7 +1076,7 @@ sub unlockKeys {
 
 =head4 Synopsis
 
-    $n = $h->arraySize($key);
+  $n = $h->arraySize($key);
 
 =cut
 
@@ -1105,7 +1105,7 @@ sub arraySize {
 
 =head4 Synopsis
 
-    $h->push($key,@values);
+  $h->push($key,@values);
 
 =head4 Arguments
 
@@ -1146,7 +1146,7 @@ sub push {
 
 =head4 Synopsis
 
-    $h->unshift($key,$val);
+  $h->unshift($key,$val);
 
 =head4 Arguments
 
@@ -1183,7 +1183,7 @@ sub unshift {
 
 =head4 Synopsis
 
-    $n = $h->increment($key);
+  $n = $h->increment($key);
 
 =head4 Description
 
@@ -1192,7 +1192,7 @@ Resultat zurück.
 
 Alternative Formulierung:
 
-    $n = ++$h->{$key};
+  $n = ++$h->{$key};
 
 =cut
 
@@ -1209,7 +1209,7 @@ sub increment {
 
 =head4 Synopsis
 
-    $y = $h->addNumber($key,$x);
+  $y = $h->addNumber($key,$x);
 
 =head4 Description
 
@@ -1218,7 +1218,7 @@ liefere das Resultat zurück.
 
 Alternative Formulierung:
 
-    $y = $h->{$key} += $x;
+  $y = $h->{$key} += $x;
 
 =cut
 
@@ -1235,8 +1235,8 @@ sub addNumber {
 
 =head4 Synopsis
 
-    $ref = $h->weaken($key);
-    $ref = $h->weaken($key=>$ref);
+  $ref = $h->weaken($key);
+  $ref = $h->weaken($key=>$ref);
 
 =head4 Description
 
@@ -1269,7 +1269,7 @@ sub weaken {
 
 =head4 Synopsis
 
-    $n = $h->buckets;
+  $n = $h->buckets;
 
 =head4 Description
 
@@ -1305,7 +1305,7 @@ sub buckets {
 
 =head4 Synopsis
 
-    $n = $h->bucketsUsed;
+  $n = $h->bucketsUsed;
 
 =head4 Description
 
@@ -1332,7 +1332,7 @@ sub bucketsUsed {
 
 =head4 Synopsis
 
-    $n = $this->getCount;
+  $n = $this->getCount;
 
 =head4 Description
 
@@ -1353,7 +1353,7 @@ sub getCount {
 
 =head4 Synopsis
 
-    $n = $this->setCount;
+  $n = $this->setCount;
 
 =head4 Description
 
@@ -1377,20 +1377,20 @@ sub setCount {
 Anzahl Zugriffe pro CPU-Sekunde im Vergleich zwischen verschiedenen
 Zugriffsmethoden:
 
-    A - Hash: $h->{$k}
-    B - Hash: eval{$h->{$k}}
-    C - Restricted Hash: $h->{$k}
-    D - Restricted Hash: eval{$h->{$k}}
-    E - Quiq::Hash: $h->{$k}
-    F - Quiq::Hash: $h->get($k)
-    
-           Rate    F    D    B    E    C    A
-    F 1401111/s   -- -71% -74% -82% -83% -84%
-    D 4879104/s 248%   --  -8% -37% -40% -44%
-    B 5297295/s 278%   9%   -- -32% -35% -39%
-    E 7803910/s 457%  60%  47%   --  -4% -11%
-    C 8104988/s 478%  66%  53%   4%   --  -7%
-    A 8745272/s 524%  79%  65%  12%   8%   --
+  A - Hash: $h->{$k}
+  B - Hash: eval{$h->{$k}}
+  C - Restricted Hash: $h->{$k}
+  D - Restricted Hash: eval{$h->{$k}}
+  E - Quiq::Hash: $h->{$k}
+  F - Quiq::Hash: $h->get($k)
+  
+         Rate    F    D    B    E    C    A
+  F 1401111/s   -- -71% -74% -82% -83% -84%
+  D 4879104/s 248%   --  -8% -37% -40% -44%
+  B 5297295/s 278%   9%   -- -32% -35% -39%
+  E 7803910/s 457%  60%  47%   --  -4% -11%
+  C 8104988/s 478%  66%  53%   4%   --  -7%
+  A 8745272/s 524%  79%  65%  12%   8%   --
 
 Den Hash via $h->L<get|"get() - Werte abfragen">() zuzugreifen (F) ist ca. 85% langsamer
 als der einfachste Hash-Lookup (A). Wird auf den Methodenaufruf
@@ -1405,44 +1405,44 @@ werden.
 
 Das Benchmark-Programm (bench-hash):
 
-    #!/usr/bin/env perl
-    
-    use strict;
-    use warnings;
-    
-    use Benchmark;
-    use Hash::Util;
-    use Quiq::Hash;
-    
-    my $h1 = {0=>'a',1=>'b',2=>'c',3=>'d',4=>'e',5=>'f'};
-    my $h2 = Hash::Util::lock_ref_keys({0=>'a',1=>'b',2=>'c',3=>'d',4=>'e',5=>'f'});
-    my $h3 = Quiq::Hash->new({0=>'a',1=>'b',2=>'c',3=>'d',4=>'e',5=>'f'});
-    
-    my $i = 0;
-    Benchmark::cmpthese(-10,{
-        A => sub {
-            $h1->{$i++%5};
-        },
-        B => sub {
-            eval{$h1->{$i++%5}};
-        },
-        C => sub {
-            $h2->{$i++%5};
-        },
-        D => sub {
-            eval{$h2->{$i++%5}};
-        },
-        E => sub {
-            $h3->{$i++%5};
-        },
-        F => sub {
-            $h3->get($i++%5);
-        },
-    });
+  #!/usr/bin/env perl
+  
+  use strict;
+  use warnings;
+  
+  use Benchmark;
+  use Hash::Util;
+  use Quiq::Hash;
+  
+  my $h1 = {0=>'a',1=>'b',2=>'c',3=>'d',4=>'e',5=>'f'};
+  my $h2 = Hash::Util::lock_ref_keys({0=>'a',1=>'b',2=>'c',3=>'d',4=>'e',5=>'f'});
+  my $h3 = Quiq::Hash->new({0=>'a',1=>'b',2=>'c',3=>'d',4=>'e',5=>'f'});
+  
+  my $i = 0;
+  Benchmark::cmpthese(-10,{
+      A => sub {
+          $h1->{$i++%5};
+      },
+      B => sub {
+          eval{$h1->{$i++%5}};
+      },
+      C => sub {
+          $h2->{$i++%5};
+      },
+      D => sub {
+          eval{$h2->{$i++%5}};
+      },
+      E => sub {
+          $h3->{$i++%5};
+      },
+      F => sub {
+          $h3->get($i++%5);
+      },
+  });
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

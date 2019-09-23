@@ -3,9 +3,9 @@
 package Quiq::Database::Tree::Test;
 use base qw/Quiq::Test::Class/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
 use Quiq::Perl;
 use Quiq::Database::Tree;

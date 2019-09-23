@@ -1,0 +1,54 @@
+{
+   "abstract" : "Wrapper to simplify using Moo with Getopt::Long",
+   "author" : [
+      "Jim Bacon <boftx@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooX-Role-CliOptions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "Moo" : "0",
+            "MooX::StrictConstructor" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "2.36",
+            "Moo::Role" : "0",
+            "Pod::Usage" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -16,7 +16,7 @@ use POSIX;
 
 Readonly my $SOCKETTIMEOUT => 300;    # 300s or 5 min
 
-use version 0.9917; our $VERSION = version->declare('v2.2.3');
+use version 0.9917; our $VERSION = version->declare('v2.2.4');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 

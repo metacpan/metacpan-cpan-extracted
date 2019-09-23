@@ -1,12 +1,12 @@
 package Quiq::LineProcessor::Line;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ dem Zeileninhalt (Text) und einer Zeilennummer.
 
 =head4 Synopsis
 
-    $ln = $class->new($text,$number,\$input);
+  $ln = $class->new($text,$number,\$input);
 
 =head4 Description
 
@@ -74,9 +74,9 @@ sub new {
 
 =head4 Synopsis
 
-    $text = $ln->text;
-    $text = $ln->text($text);
-    $text = $ln->text($text,$strip);
+  $text = $ln->text;
+  $text = $ln->text($text);
+  $text = $ln->text($text,$strip);
 
 =head4 Description
 
@@ -107,7 +107,7 @@ sub text {
 
 =head4 Synopsis
 
-    $text = $ln->textNl;
+  $text = $ln->textNl;
 
 =head4 Description
 
@@ -128,8 +128,8 @@ sub textNl {
 
 =head4 Synopsis
 
-    $n = $ln->number;
-    $n = $ln->number($n);
+  $n = $ln->number;
+  $n = $ln->number($n);
 
 =cut
 
@@ -149,8 +149,8 @@ sub number {
 
 =head4 Synopsis
 
-    $inputR = $ln->inputR;
-    $inputR = $ln->inputR(\$input);
+  $inputR = $ln->inputR;
+  $inputR = $ln->inputR(\$input);
 
 =head4 Description
 
@@ -177,7 +177,7 @@ sub inputR {
 
 =head4 Synopsis
 
-    $input = $ln->input;
+  $input = $ln->input;
 
 =cut
 
@@ -196,7 +196,7 @@ sub input {
 
 =head4 Synopsis
 
-    $bool = $ln->isEmpty;
+  $bool = $ln->isEmpty;
 
 =head4 Description
 
@@ -216,7 +216,7 @@ sub isEmpty {
 
 =head4 Synopsis
 
-    $n = $ln->indentation;
+  $n = $ln->indentation;
 
 =head4 Description
 
@@ -239,7 +239,7 @@ sub indentation {
 
 =head4 Synopsis
 
-    $n = $ln->length;
+  $n = $ln->length;
 
 =head4 Description
 
@@ -261,7 +261,7 @@ sub length {
 
 =head4 Synopsis
 
-    $ln->append($text);
+  $ln->append($text);
 
 =head4 Description
 
@@ -283,7 +283,7 @@ sub append {
 
 =head4 Synopsis
 
-    $ln->trim;
+  $ln->trim;
 
 =head4 Description
 
@@ -307,7 +307,7 @@ sub trim {
 
 =head4 Synopsis
 
-    $ln->unindent($n);
+  $ln->unindent($n);
 
 =head4 Description
 
@@ -332,8 +332,8 @@ sub unindent {
 
 =head4 Synopsis
 
-    $str = $ln->dump($format);
-    $str = $ln->dump;
+  $str = $ln->dump($format);
+  $str = $ln->dump;
 
 =head4 Description
 
@@ -353,7 +353,7 @@ Text der Zeile plus Newline (Default).
 Text der Zeile plus Newline und vorangestellter
 Zeilennummer im Format:
 
-    NNNN: TEXT
+  NNNN: TEXT
 
 =back
 
@@ -382,7 +382,7 @@ sub dump {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

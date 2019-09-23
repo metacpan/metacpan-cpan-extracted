@@ -22,6 +22,5 @@ t/data/mock2/sql/upgrade/lsmb0.1-0.2.sql
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-url_layout
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

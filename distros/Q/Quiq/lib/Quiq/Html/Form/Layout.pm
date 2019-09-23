@@ -1,11 +1,11 @@
 package Quiq::Html::Form::Layout;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Html::Widget::Hidden;
 use Quiq::Template;
@@ -37,11 +37,11 @@ Unterstriche am Anfang und am Ende ergänzt wird.
 
 Beispiele:
 
-    Widget-Name  Platzhalter
-    -----------  -----------
-    vorname      __VORNAME__
-    nachname     __NACHNAME__
-    aktion       __AKTION__
+  Widget-Name  Platzhalter
+  -----------  -----------
+  vorname      __VORNAME__
+  nachname     __NACHNAME__
+  aktion       __AKTION__
 
 Anmerkungen:
 
@@ -88,55 +88,55 @@ Liste der Widgets, die in das Layout eingesetzt werden.
 
 Der Code
 
-    Quiq::Html::Form::Layout->html($h,
-        layout => Quiq::Html::Table::Simple->html($h,
-            class => 'form',
-            rows => [
-                [['Vorname:'],['__VORNAME__']],
-                [['Nachname:'],['__NACHNAME__']],
-                [[''],['__AKTION__']],
-            ],
-        ),
-        widgets => [
-            Quiq::Html::Widget::Hidden->new(
-                name => 'id',
-                value => '4711',
-            ),
-            Quiq::Html::Widget::TextField->new(
-                name => 'vorname',
-                value => 'Lieschen',
-            ),
-            Quiq::Html::Widget::TextField->new(
-                name => 'nachname',
-                value => 'Müller',
-            ),
-            Quiq::Html::Widget::Button->new(
-                id => 'speichern',
-                name => 'aktion',
-                value => 'speichern',
-                content => 'Speichern',
-            ),
-        ],
-    );
+  Quiq::Html::Form::Layout->html($h,
+      layout => Quiq::Html::Table::Simple->html($h,
+          class => 'form',
+          rows => [
+              [['Vorname:'],['__VORNAME__']],
+              [['Nachname:'],['__NACHNAME__']],
+              [[''],['__AKTION__']],
+          ],
+      ),
+      widgets => [
+          Quiq::Html::Widget::Hidden->new(
+              name => 'id',
+              value => '4711',
+          ),
+          Quiq::Html::Widget::TextField->new(
+              name => 'vorname',
+              value => 'Lieschen',
+          ),
+          Quiq::Html::Widget::TextField->new(
+              name => 'nachname',
+              value => 'Müller',
+          ),
+          Quiq::Html::Widget::Button->new(
+              id => 'speichern',
+              name => 'aktion',
+              value => 'speichern',
+              content => 'Speichern',
+          ),
+      ],
+  );
 
 erzeugt
 
-    <input type="hidden" name="id" value="4711">
-    <table class="form" cellspacing="0">
-    <tr>
-      <td>Vorname:</td>
-      <td><input type="text" name="vorname" value="Lieschen" /></td>
-    </tr>
-    <tr>
-      <td>Nachname:</td>
-      <td><input type="text" name="nachname" value="Müller" /></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><button id="speichern" name="aktion" type="button"
-        value="speichern">Speichern</button></td>
-    </tr>
-    </table>
+  <input type="hidden" name="id" value="4711">
+  <table class="form" cellspacing="0">
+  <tr>
+    <td>Vorname:</td>
+    <td><input type="text" name="vorname" value="Lieschen" /></td>
+  </tr>
+  <tr>
+    <td>Nachname:</td>
+    <td><input type="text" name="nachname" value="Müller" /></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><button id="speichern" name="aktion" type="button"
+      value="speichern">Speichern</button></td>
+  </tr>
+  </table>
 
 Das tabellarische Layout wird hier von einer anderen Klasse
 (Quiq::Html::Table::Simple) geliefert, die die Tabelle
@@ -150,7 +150,7 @@ erzeugt.
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Description
 
@@ -184,8 +184,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Description
 
@@ -249,7 +249,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

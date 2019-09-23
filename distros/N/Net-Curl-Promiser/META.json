@@ -1,0 +1,64 @@
+{
+   "abstract" : "A Promise interface for L<Net::Curl::Multi>",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Curl-Promiser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Curl" : "0",
+            "Promise::ES6" : "0.07"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Net::Server::HTTP" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/FGasper/p5-Net-Curl-Promiser/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/FGasper/p5-Net-Curl-Promiser.git",
+         "web" : "https://github.com/FGasper/p5-Net-Curl-Promiser"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

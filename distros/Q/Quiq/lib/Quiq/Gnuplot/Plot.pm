@@ -1,11 +1,11 @@
 package Quiq::Gnuplot::Plot;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Gnuplot::Graph;
 use Quiq::Gnuplot::Arrow;
@@ -35,7 +35,7 @@ Ein Objekt der Klasse repräsentiert einen Plot.
 
 =head4 Synopsis
 
-    $plt = Quiq::Gnuplot::Plot->new;
+  $plt = Quiq::Gnuplot::Plot->new;
 
 =cut
 
@@ -81,8 +81,8 @@ sub new {
 
 =head4 Synopsis
 
-    $title = $plt->title;
-    $title = $plt->title($title);
+  $title = $plt->title;
+  $title = $plt->title($title);
 
 =cut
 
@@ -105,8 +105,8 @@ sub title {
 
 =head4 Synopsis
 
-    $plt->addGraph($gph);
-    $plt->addGraph(@keyVal);
+  $plt->addGraph($gph);
+  $plt->addGraph(@keyVal);
 
 =head4 Alias
 
@@ -149,8 +149,8 @@ sub addGraph {
 
 =head4 Synopsis
 
-    $plt->addArrow($arw);
-    $plt->addArrow(@keyVal);
+  $plt->addArrow($arw);
+  $plt->addArrow(@keyVal);
 
 =head4 Description
 
@@ -184,8 +184,8 @@ sub addArrow {
 
 =head4 Synopsis
 
-    $plt->addLabel($lab);
-    $plt->addLabel(@keyVal);
+  $plt->addLabel($lab);
+  $plt->addLabel(@keyVal);
 
 =head4 Description
 
@@ -219,7 +219,7 @@ sub addLabel {
 
 =head4 Synopsis
 
-    @gph | $gphA = $plt->graphsWithData;
+  @gph | $gphA = $plt->graphsWithData;
 
 =cut
 
@@ -243,7 +243,7 @@ sub graphsWithData {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

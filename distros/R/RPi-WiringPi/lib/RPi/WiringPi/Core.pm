@@ -8,7 +8,7 @@ use parent 'RPi::SysInfo';
 use JSON;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3632';
+our $VERSION = '2.3633';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;

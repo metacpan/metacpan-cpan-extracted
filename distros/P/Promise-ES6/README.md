@@ -53,17 +53,38 @@ of the following is true:
 - 2) The unhandled rejection happens via an uncaught exception
 (even within the constructor).
 
-# LEAK DETECTION
+# MEMORY LEAKS
 
-It’s easy to create inadvertent memory leaks using promises.
-As of version 0.07, any Promise::ES6 instances that are created while
+It’s easy to create inadvertent memory leaks using promises in Perl.
+Here are a few “pointers” (heh) to bear in mind:
+
+- As of version 0.07, any Promise::ES6 instances that are created while
 `$Promise::ES6::DETECT_MEMORY_LEAKS` is set to a truthy value are
 “leak-detect-enabled”, which means that if they survive until their original
 process’s global destruction, a warning is triggered.
+- If your application needs recursive promises (e.g., to poll
+iteratively for completion of a task), the `current_sub` feature (i.e.,
+`__SUB__`) may help you avoid memory leaks.
+- Garbage collection before Perl 5.18 seems to have been buggy.
+If you work with such versions and end up chasing leaks,
+try manually deleting as many references/closures as possible. See
+`t/race_success.t` for a notated example.
 
-**NOTE:** If your application needs recursive promises (e.g., to poll
-iteratively for completion of a task), `use feature 'current_sub'`
-may help you avoid memory leaks.
+    You may also (counterintuitively, IMO) find that this:
+
+        my ($resolve, $reject);
+
+        my $promise = Promise::ES6->new( sub { ($resolve, $reject) = @_ } );
+
+        # … etc.
+
+    … works better than:
+
+        my $promise = Promise::ES6->new( sub {
+            my ($resolve, $reject) = @_;
+
+            # … etc.
+        } );
 
 # SEE ALSO
 
@@ -78,3 +99,9 @@ CPAN contains a number of other modules that implement promises.
 Promise::ES6’s distinguishing features are simplicity and lightness.
 By design, it implements **just** the standard Promise API and doesn’t
 assume you use, e.g., [AnyEvent](https://metacpan.org/pod/AnyEvent).
+
+# LICENSE & COPYRIGHT
+
+Copyright 2019 Gasper Software Consulting.
+
+This library is licensed under the same terms as Perl itself.

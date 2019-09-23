@@ -1,12 +1,12 @@
 package Quiq::Option;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Hash;
 use Scalar::Util ();
@@ -31,8 +31,8 @@ L<Quiq::Object>
 
 =head4 Synopsis
 
-    $opt = $class->extract(@opt,\@args,@keyVal); # Options-Objekt
-    $class->extract(@opt,\@args,@keyVal);        # Options-Variablen
+  $opt = $class->extract(@opt,\@args,@keyVal); # Options-Objekt
+  $class->extract(@opt,\@args,@keyVal);        # Options-Variablen
 
 =head4 Options
 
@@ -72,13 +72,13 @@ Eine Option kann auf verschiedene Weisen angegeben werden.
 
 Als Programm-Optionen:
 
-    --log-level=5    (ein Argument)
-    --logLevel=5     (mixed case)
+  --log-level=5    (ein Argument)
+  --logLevel=5     (mixed case)
 
 Als Methoden-Optionen:
 
-    -log-level 5     (zwei Argumente)
-    -logLevel 5      (mixed case)
+  -log-level 5     (zwei Argumente)
+  -logLevel 5      (mixed case)
 
 Die Schreibweise mit zwei Bindestrichen wird typischerweise bei
 Programmaufrufen angegeben. Die Option besteht aus I<einem> Argument,
@@ -96,7 +96,7 @@ Ist C<< -properties=>1 >> gesetzt, ist die Argumentliste eine
 Abfolge Schlüssel/Wert-Paaren ohne Bindestrich als
 Options-Kennzeichen:
 
-    a 1 b 2 c 3
+  a 1 b 2 c 3
 
 =head4 Examples
 
@@ -106,72 +106,72 @@ Options-Kennzeichen:
 
 Instantiierung eines Options-Objekts:
 
-    sub meth {
-        my $self = shift;
-        # @_: @args
-    
-        my $opt = Quiq::Option->extract(\@_,
-            -logLevel => 1,
-            -verbose => 0,
-        );
-        ...
-    
-        if ($opt->verbose) {
-            ...
-        }
-    }
+  sub meth {
+      my $self = shift;
+      # @_: @args
+  
+      my $opt = Quiq::Option->extract(\@_,
+          -logLevel => 1,
+          -verbose => 0,
+      );
+      ...
+  
+      if ($opt->verbose) {
+          ...
+      }
+  }
 
 Das gelieferte Options-Objekt $opt ist eine Quiq::Hash-Instanz.
 Die Schlüssel haben keine führenden Bindestriche. Eine Abfrage
 des Optionswerts ist per Methode möglich:
 
-    $verbose = $opt->verbose;
+  $verbose = $opt->verbose;
 
 =item *
 
 Setzen von Options-Variablen:
 
-    sub meth {
-        my $self = shift;
-        # @_: @args
-    
-        my $logLevel = 1;
-        my $verbose = 0;
-    
-        Quiq::Option->extract(\@_,
-            -logLevel => \$logLevel,
-            -verbose => \$verbose,
-        );
-        ...
-    
-        if ($verbose) {
-            ...
-        }
-    }
+  sub meth {
+      my $self = shift;
+      # @_: @args
+  
+      my $logLevel = 1;
+      my $verbose = 0;
+  
+      Quiq::Option->extract(\@_,
+          -logLevel => \$logLevel,
+          -verbose => \$verbose,
+      );
+      ...
+  
+      if ($verbose) {
+          ...
+      }
+  }
 
 =item *
 
 Optionen bei Programmaufruf:
 
-    $ prog --log-level=2 --verbose file.txt
+  $ prog --log-level=2 --verbose file.txt
 
 =item *
 
 Optionen bei Methodenaufruf:
 
-    $prog->begin(-logLevel=>2,-verbose=>1,'file.txt');
+  $prog->begin(-logLevel=>2,-verbose=>1,'file.txt');
 
 =item *
 
 Abfrage einer Option:
 
-    $logLevel = $opt->logLevel;
+  $logLevel = $opt->logLevel;
 
 =item *
 
 Abfrage mehrerer Optionen:
 
-    ($verbose,$logLevel) = $opt->get('verbose','logLevel');
+  ($verbose,$logLevel) = $opt->get('verbose','logLevel');
 
 =back
 
@@ -343,7 +343,7 @@ sub extract {
 
 =head4 Synopsis
 
-    @opts|$optA = $class->extractAll(\@arr);
+  @opts|$optA = $class->extractAll(\@arr);
 
 =head4 Description
 
@@ -373,7 +373,7 @@ sub extractAll {
 
 =head4 Synopsis
 
-    $class->extractMulti(@opt,\@arr,$key=>$ref,...);
+  $class->extractMulti(@opt,\@arr,$key=>$ref,...);
 
 =head4 Options
 
@@ -400,28 +400,28 @@ Für das Hinzufügen einer Default-Option, siehe Beispiel.
 
 =head4 Example
 
-    # Optionen
-    
-    my @select;
-    my @from;
-    my @where;
-    my $limit;
-    
-    unshift @_,'-select'; # Default-Option
-    
-    Quiq::Option->extractMulti(\@_,
-        -select => \@select,
-        -from => \@from,
-        -where => \@where,
-        -limit => \$limit,
-    );
-    
-    unless (@from) {
-        die "FROM-Klausel fehlt\n";
-    }
-    unless (@select) {
-        @select = ('*');
-    }
+  # Optionen
+  
+  my @select;
+  my @from;
+  my @where;
+  my $limit;
+  
+  unshift @_,'-select'; # Default-Option
+  
+  Quiq::Option->extractMulti(\@_,
+      -select => \@select,
+      -from => \@from,
+      -where => \@where,
+      -limit => \$limit,
+  );
+  
+  unless (@from) {
+      die "FROM-Klausel fehlt\n";
+  }
+  unless (@select) {
+      @select = ('*');
+  }
 
 =cut
 
@@ -507,7 +507,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

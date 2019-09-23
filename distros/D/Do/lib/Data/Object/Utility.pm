@@ -8,7 +8,7 @@ use warnings;
 use Memoize qw(memoize);
 use Scalar::Util qw(blessed looks_like_number reftype);
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # FUNCTIONS
 
@@ -968,11 +968,11 @@ the provided data type and can be used to perform operations on the data.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

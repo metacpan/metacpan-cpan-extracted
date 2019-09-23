@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-Lucy
 
+0.0104  2019-09-20 10:29:57 CEST
+    - add missing dependency
+
 0.0103  2017-03-27 14:22:09 CEST
     - Remove unneeded SRU sortkeys functionality
 

@@ -1,11 +1,11 @@
 package Quiq::FFmpeg;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::File::Video;
 use POSIX ();
@@ -47,8 +47,8 @@ Methoden Methoden befinden sich im Abschnitt L<Klassenmethoden (vollständige Ko
 
 =head4 Synopsis
 
-    $cmd = $class->new;
-    $cmd = $class->new($str);
+  $cmd = $class->new;
+  $cmd = $class->new($str);
 
 =head4 Description
 
@@ -84,7 +84,7 @@ sub new {
 
 =head4 Synopsis
 
-    $str = $cmd->command;
+  $str = $cmd->command;
 
 =head4 Description
 
@@ -105,7 +105,7 @@ sub command {
 
 =head4 Synopsis
 
-    $fil = $cmd->input($i);
+  $fil = $cmd->input($i);
 
 =head4 Description
 
@@ -137,14 +137,14 @@ sub input {
 
 =head4 Synopsis
 
-    $str = $cmd->suffix;
+  $str = $cmd->suffix;
 
 =head4 Description
 
 Liefere den Suffix für eine Ausgabedatei. Der Suffix ist eine
 Zeichenkette der Form
 
-    NAME-WIDTH-HEIGHT-START-STOP
+  NAME-WIDTH-HEIGHT-START-STOP
 
 wobei Komponenten fehlen können, die nicht definiert sind.
 
@@ -191,8 +191,8 @@ sub suffix {
 
 =head4 Synopsis
 
-    $cmd->addOption($opt);
-    $cmd->addOption($opt=>$val);
+  $cmd->addOption($opt);
+  $cmd->addOption($opt=>$val);
 
 =head4 Description
 
@@ -203,15 +203,15 @@ Wert $val. Die Methode liefert keinen Wert zurück.
 
 Option ohne Wert:
 
-    $cmd->addOption('-y');
-    =>
-    -y
+  $cmd->addOption('-y');
+  =>
+  -y
 
 Option mit Wert:
 
-    $cmd->addOption(-i=>'video/GOPR1409.mp4');
-    =>
-    -i 'video/GOPR1409.mp4'
+  $cmd->addOption(-i=>'video/GOPR1409.mp4');
+  =>
+  -i 'video/GOPR1409.mp4'
 
 =cut
 
@@ -257,7 +257,7 @@ sub addOption {
 
 =head4 Synopsis
 
-    $cmd->addInput($input);
+  $cmd->addInput($input);
 
 =head4 Description
 
@@ -268,20 +268,20 @@ Die Methode liefert keinen Wert zurück.
 
 Dateiname:
 
-    $cmd->addInput('video/GOPR1409.mp4');
-    =>
-    -i 'video/GOPR1409.mp4'
+  $cmd->addInput('video/GOPR1409.mp4');
+  =>
+  -i 'video/GOPR1409.mp4'
 
 Muster:
 
-    $cmd->addInput('img/*.jpg');
-    =>
-    -i 'img/*.jpg'
+  $cmd->addInput('img/*.jpg');
+  =>
+  -i 'img/*.jpg'
 
 Undefiniert:
 
-    $cmd->addInput(undef);
-    =>
+  $cmd->addInput(undef);
+  =>
 
 =cut
 
@@ -304,7 +304,7 @@ sub addInput {
 
 =head4 Synopsis
 
-    $cmd->addFilter($opt,\@filter,$sep);
+  $cmd->addFilter($opt,\@filter,$sep);
 
 =head4 Description
 
@@ -315,9 +315,9 @@ und dem Trenner $sep (Komma oder Semikolon).
 
 Video Filter-Chain:
 
-    $cmd->addFilter(-vf=>['crop=1440:1080','scale=720*a:720']);
-    =>
-    -vf 'crop=1440:1080,scale=720*a:720'
+  $cmd->addFilter(-vf=>['crop=1440:1080','scale=720*a:720']);
+  =>
+  -vf 'crop=1440:1080,scale=720*a:720'
 
 =cut
 
@@ -339,7 +339,7 @@ sub addFilter {
 
 =head4 Synopsis
 
-    $cmd->addStartStop($start,$stop);
+  $cmd->addStartStop($start,$stop);
 
 =head4 Description
 
@@ -350,21 +350,21 @@ den Bereich $start und $stop eingrenzen.
 
 Nur Start-Zeitpunkt:
 
-    $cmd->addStartStop(5.5);
-    =>
-    -ss 5.5
+  $cmd->addStartStop(5.5);
+  =>
+  -ss 5.5
 
 Nur Ende-Zeitpunkt:
 
-    $cmd->addStartStop(undef,20.5);
-    =>
-    -t 20.5
+  $cmd->addStartStop(undef,20.5);
+  =>
+  -t 20.5
 
 Start- und Ende-Zeitpunkt:
 
-    $cmd->addStartStop(5.5,20.5);
-    =>
-    -ss 5.5 -t 20.5
+  $cmd->addStartStop(5.5,20.5);
+  =>
+  -ss 5.5 -t 20.5
 
 =cut
 
@@ -391,7 +391,7 @@ sub addStartStop {
 
 =head4 Synopsis
 
-    $cmd->addBitrate($bitrate);
+  $cmd->addBitrate($bitrate);
 
 =head4 Description
 
@@ -403,9 +403,9 @@ die Option nicht hinzugefügt.
 
 Bitrate von 10000k:
 
-    $cmd->addBitrate(10000);
-    =>
-    -b 10000k
+  $cmd->addBitrate(10000);
+  =>
+  -b 10000k
 
 =cut
 
@@ -427,7 +427,7 @@ sub addBitrate {
 
 =head4 Synopsis
 
-    $cmd->addOutput($output);
+  $cmd->addOutput($output);
 
 =head4 Description
 
@@ -438,15 +438,15 @@ Die Methode liefert keinen Wert zurück.
 
 Dateiname:
 
-    $cmd->addOutput('video/GOPR1409.mp4');
-    =>
-    'video/GOPR1409.mp4'
+  $cmd->addOutput('video/GOPR1409.mp4');
+  =>
+  'video/GOPR1409.mp4'
 
 Muster:
 
-    $cmd->addOutput('img/%06d.jpg');
-    =>
-    'img/%06d.jpg'
+  $cmd->addOutput('img/%06d.jpg');
+  =>
+  'img/%06d.jpg'
 
 =cut
 
@@ -484,7 +484,7 @@ sub addOutput {
 
 =head4 Synopsis
 
-    $cmd->addString($str);
+  $cmd->addString($str);
 
 =head4 Description
 
@@ -495,9 +495,9 @@ Leerzeichen als Trenner.
 
 Kommando nach Objekt-Instantiierung:
 
-    $cmd->addString('ffprobe');
-    =>
-    ffprobe
+  $cmd->addString('ffprobe');
+  =>
+  ffprobe
 
 =cut
 
@@ -521,7 +521,7 @@ sub addString {
 
 =head4 Synopsis
 
-    $cmd->prependString($str);
+  $cmd->prependString($str);
 
 =head4 Description
 
@@ -532,9 +532,9 @@ Ein Leerzeichen wird automatisch hinzugefügt.
 
 Kommando voranstellen:
 
-    $cmd->prependString('ffplay -autoexit');
-    =>
-    ffplay -autoexit ...
+  $cmd->prependString('ffplay -autoexit');
+  =>
+  ffplay -autoexit ...
 
 =cut
 
@@ -560,8 +560,8 @@ sub prependString {
 
 =head4 Synopsis
 
-    $str = $cmd->cropFilter($width,$height);
-    $str = $cmd->cropFilter($width,$height,$xOffset,$yOffset);
+  $str = $cmd->cropFilter($width,$height);
+  $str = $cmd->cropFilter($width,$height,$xOffset,$yOffset);
 
 =head4 Description
 
@@ -572,15 +572,15 @@ Argumente und liefere diese zurück.
 
 Nur Breite und Höhe:
 
-    $cmd->cropFilter(1280,720);
-    =>
-    'crop=1280:720'
+  $cmd->cropFilter(1280,720);
+  =>
+  'crop=1280:720'
 
 Breite, Höhe, X-Offset, Y-Offset:
 
-    $cmd->cropFilter(1280,720,240,0);
-    =>
-    'crop=1280:720:240:0'
+  $cmd->cropFilter(1280,720,240,0);
+  =>
+  'crop=1280:720:240:0'
 
 =cut
 
@@ -609,8 +609,8 @@ sub cropFilter {
 
 =head4 Synopsis
 
-    $str = $cmd->scaleFilter($width,$height);
-    $str = $cmd->scaleFilter("$width:$height");
+  $str = $cmd->scaleFilter($width,$height);
+  $str = $cmd->scaleFilter("$width:$height");
 
 =head4 Description
 
@@ -623,21 +623,21 @@ Sind die Argumente undefiniert, wird eine leere Liste geliefert.
 
 Breite und Höhe als getrennte Argumente:
 
-    $cmd->scaleFilter(1280,720);
-    =>
-    'scale=1280:720'
+  $cmd->scaleFilter(1280,720);
+  =>
+  'scale=1280:720'
 
 Breite und Höhe in einem Argument:
 
-    $cmd->scaleFilter('1280:720');
-    =>
-    'scale=1280:720'
+  $cmd->scaleFilter('1280:720');
+  =>
+  'scale=1280:720'
 
 Undefiniertes Argument:
 
-    @filter = $cmd->scaleFilter(undef);
-    =>
-    ()
+  @filter = $cmd->scaleFilter(undef);
+  =>
+  ()
 
 =cut
 
@@ -671,7 +671,7 @@ sub scaleFilter {
 
 =head4 Synopsis
 
-    $str = $cmd->fpsFilter($fps);
+  $str = $cmd->fpsFilter($fps);
 
 =head4 Description
 
@@ -682,15 +682,15 @@ Ist das Argument undef, liefere eine leere Liste.
 
 Argument:
 
-    $cmd->fpsFilter(24);
-    =>
-    'fps=24'
+  $cmd->fpsFilter(24);
+  =>
+  'fps=24'
 
 Undefiniertes Argument:
 
-    @filter = $cmd->fpsFilter(undef);
-    =>
-    ()
+  @filter = $cmd->fpsFilter(undef);
+  =>
+  ()
 
 =cut
 
@@ -708,7 +708,7 @@ sub fpsFilter {
 
 =head4 Synopsis
 
-    $str = $cmd->framestepFilter($fps);
+  $str = $cmd->framestepFilter($fps);
 
 =head4 Description
 
@@ -719,15 +719,15 @@ Ist das Argument undef, liefere eine leere Liste.
 
 Argument:
 
-    $cmd->framestepFilter(4);
-    =>
-    'framestep=4'
+  $cmd->framestepFilter(4);
+  =>
+  'framestep=4'
 
 Undefiniertes Argument:
 
-    @filter = $cmd->framestepFilter(undef);
-    =>
-    ()
+  @filter = $cmd->framestepFilter(undef);
+  =>
+  ()
 
 =cut
 
@@ -752,8 +752,8 @@ sub framestepFilter {
 
 =head4 Synopsis
 
-    $cmd->outName($name);
-    $name = $cmd->outName;
+  $cmd->outName($name);
+  $name = $cmd->outName;
 
 =head4 Description
 
@@ -764,8 +764,8 @@ Die Angabe wird für den Suffix der Ausgabe-Datei genutzt.
 
 =head4 Synopsis
 
-    $cmd->outSize($width,$height);
-    ($width,$height) = $cmd->outSize;
+  $cmd->outSize($width,$height);
+  ($width,$height) = $cmd->outSize;
 
 =head4 Description
 
@@ -795,8 +795,8 @@ sub outSize {
 
 =head4 Synopsis
 
-    $cmd->outStart($s);
-    $s = $cmd->outStart;
+  $cmd->outStart($s);
+  $s = $cmd->outStart;
 
 =head4 Description
 
@@ -807,8 +807,8 @@ Die Angabe wird für den Suffix der Ausgabe-Datei genutzt.
 
 =head4 Synopsis
 
-    $cmd->outStop($s);
-    $s = $cmd->outStop;
+  $cmd->outStop($s);
+  $s = $cmd->outStop;
 
 =head4 Description
 
@@ -821,7 +821,7 @@ Die Angabe wird für den Suffix der Ausgabe-Datei genutzt.
 
 =head4 Synopsis
 
-    $cmd = $class->imagesToVideo($pattern,$output,@opt);
+  $cmd = $class->imagesToVideo($pattern,$output,@opt);
 
 =head4 Arguments
 
@@ -834,8 +834,8 @@ wird C<-pattern_type glob> gewählt.
 
 Beispiele:
 
-    'img/%06d.jpg' => -i 'img/%06d.jpg'
-    'img/*.jpg'    => -pattern_type glob -i 'img/*.jpg'
+  'img/%06d.jpg' => -i 'img/%06d.jpg'
+  'img/*.jpg'    => -pattern_type glob -i 'img/*.jpg'
 
 =item $output
 
@@ -1025,7 +1025,7 @@ sub imagesToVideo {
 
 =head4 Synopsis
 
-    $cmd = $ffm->videoToImages($input,$dir,@opt);
+  $cmd = $ffm->videoToImages($input,$dir,@opt);
 
 =head4 Options
 
@@ -1077,40 +1077,40 @@ lückenlos aufsteigend.
 
 Ohne Optionen:
 
-    $ffm->videoToImages('video.mp4','img');
-    =>
-    ffmpeg -y -loglevel error -stats
-        -i 'video.mp4'
-        -qscale:v 2
-        'img/%06d.jpg'
+  $ffm->videoToImages('video.mp4','img');
+  =>
+  ffmpeg -y -loglevel error -stats
+      -i 'video.mp4'
+      -qscale:v 2
+      'img/%06d.jpg'
 
 Video-Seitenverhältnis 16:9 zu Bild-Seitenverhältnis 4:3 wandeln:
 
-    $ffm->videoToImages('video.mp4','img',
-        -aspectRatio => '4:3',
-    );
-    =>
-    ffmpeg -y -loglevel error -stats
-        -i 'video.mp4'
-        -vf 'crop=ih/3*4:ih'
-        -qscale:v 2
-        'img/%06d.jpg'
+  $ffm->videoToImages('video.mp4','img',
+      -aspectRatio => '4:3',
+  );
+  =>
+  ffmpeg -y -loglevel error -stats
+      -i 'video.mp4'
+      -vf 'crop=ih/3*4:ih'
+      -qscale:v 2
+      'img/%06d.jpg'
 
 Alle Optionen:
 
-    $ffm->videoToImages('video.mp4','img',
-        -aspectRatio => '4:3',
-        -framestep => 6,
-        -start => 3,
-        -stop => 10,
-    );
-    =>
-    ffmpeg -y -loglevel error -stats
-        -i 'video.mp4'
-        -vf 'framestep=6,crop=ih/3*4:ih'
-        -ss 3 -t 7
-        -qscale:v 2
-        'img/%06d.jpg'
+  $ffm->videoToImages('video.mp4','img',
+      -aspectRatio => '4:3',
+      -framestep => 6,
+      -start => 3,
+      -stop => 10,
+  );
+  =>
+  ffmpeg -y -loglevel error -stats
+      -i 'video.mp4'
+      -vf 'framestep=6,crop=ih/3*4:ih'
+      -ss 3 -t 7
+      -qscale:v 2
+      'img/%06d.jpg'
 
 =cut
 
@@ -1193,7 +1193,7 @@ sub videoToImages {
 
 =head4 Synopsis
 
-    $cmd = $class->extract($input,$output,@opt);
+  $cmd = $class->extract($input,$output,@opt);
 
 =head4 Arguments
 
@@ -1305,7 +1305,7 @@ sub extract {
 
 =head4 Synopsis
 
-    $cmd = $class->extract169To43($input,$output,@opt);
+  $cmd = $class->extract169To43($input,$output,@opt);
 
 =head4 Arguments
 
@@ -1447,8 +1447,8 @@ sub extract169To43 {
 
 =head4 Synopsis
 
-    $cmd = $class->videoInfo($input);
-    $cmd = $class->videoInfo($input,$streamIndex);
+  $cmd = $class->videoInfo($input);
+  $cmd = $class->videoInfo($input,$streamIndex);
 
 =head4 Arguments
 
@@ -1499,7 +1499,7 @@ sub videoInfo {
 
 =head4 Synopsis
 
-    $cmd->execute;
+  $cmd->execute;
 
 =head4 Description
 
@@ -1533,7 +1533,7 @@ sub execute {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

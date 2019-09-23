@@ -2,7 +2,7 @@ package Perl6::Build;
 use strict;
 use warnings;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 1;
 

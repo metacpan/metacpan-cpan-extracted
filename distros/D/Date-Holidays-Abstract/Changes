@@ -1,10 +1,20 @@
 Changes file for Date-Holidays-Abstract
 
-0.08 2018.09-17 maintenance release, update not necessary
+0.10 2019-09-21 maintenance release, update not required
+
+- PR from Mohammad S Anwar correcting some grammar and spelling in documentation
+
+- Improvements and clarifications to documentation
+
+0.09 2019-09-20 maintenance release, update not required
+
+- Improved tests, so compilation error scenario is now working
+
+0.08 2019-09-17 maintenance release, update not required
 
 - Corrected wrong homepage URL
 
-0.07 2014.09.01, maintenance release, update not necessary
+0.07 2014-09-01 maintenance release, update not required
 
 - Updated requirement to Class::Virtually::Abstract instead of Class::Virtual,
   this was the requirment used but not specified. The first is a compile time
@@ -14,8 +24,7 @@ Changes file for Date-Holidays-Abstract
 
 - Bumped up license to Artistic 2.0 (was done in 0.06, forgot to mention)
 
-
-0.06 2014.08.20, maintenance release, update not necessary
+0.06 2014-08-20 maintenance release, update not required
 
 - Migrated from Module::Build to Dist::Zilla
 
@@ -23,8 +32,7 @@ Changes file for Date-Holidays-Abstract
 
 - Updated t/kwalitee.t to more contemporary version
 
-
-0.05 2007.03.13, maintenance release, update not necessary
+0.05 2007-03-13 maintenance release, update not required
 
 - Added missing t/perlcriticrc
 
@@ -37,8 +45,7 @@ Changes file for Date-Holidays-Abstract
 
   This seem to be the defacto way of doing things.
 
-
-0.04 2007.04.12, maintenance release, update not necessary
+0.04 2007-04-12 maintenance release, update not required
 
 - Updated MANIFEST.SKIP to a more contemporary version
 
@@ -56,18 +63,15 @@ Changes file for Date-Holidays-Abstract
 
 - Corrected a spelling error in this file s/top/tip/
 
-
-0.03 2004.05.31, maintenance release, update not necessary
+0.03 2004-05-31 maintenance release, update not required
 
 - Indented code in POD after tip from RJBS
 
-
-0.02 2004.05.26, update not necessary
+0.02 2004-05-26 update not required
 
 - Updated this documentation with more in-depth descriptions of the
   requirements.
 
-
-0.01 2004.05.22, initial release
+0.01 2004-05-22 initial release
 
 - Initial release

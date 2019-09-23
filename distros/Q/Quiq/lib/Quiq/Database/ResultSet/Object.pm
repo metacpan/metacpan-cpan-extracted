@@ -1,11 +1,11 @@
 package Quiq::Database::ResultSet::Object;
 use base qw/Quiq::Database::ResultSet/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Quiq::Hash;
@@ -37,7 +37,7 @@ Datensätzen in Objekt-Repräsentation.
 
 =head4 Synopsis
 
-    $row = $tab->lookupSub($key=>$val);
+  $row = $tab->lookupSub($key=>$val);
 
 =head4 Description
 
@@ -67,8 +67,8 @@ sub lookupSub {
 
 =head4 Synopsis
 
-    @vals|$valA = $tab->values($key,@opt);
-    %vals|$valH = $tab->values($key,@opt,-hash=>1);
+  @vals|$valA = $tab->values($key,@opt);
+  %vals|$valH = $tab->values($key,@opt,-hash=>1);
 
 =head4 Options
 
@@ -144,7 +144,7 @@ sub values {
 
 =head4 Synopsis
 
-    %idx|$idxH = $tab->index(@keys,@opts);
+  %idx|$idxH = $tab->index(@keys,@opts);
 
 =head4 Options
 
@@ -214,7 +214,7 @@ sub index {
 
 =head4 Synopsis
 
-    $min = $tab->min($key);
+  $min = $tab->min($key);
 
 =cut
 
@@ -240,8 +240,8 @@ sub min {
 
 =head4 Synopsis
 
-    $len = $tab->maxLength($key);
-    @len = $tab->maxLength(@keys);
+  $len = $tab->maxLength($key);
+  @len = $tab->maxLength(@keys);
 
 =cut
 
@@ -271,7 +271,7 @@ sub maxLength {
 
 =head4 Synopsis
 
-    $max = $tab->max($key);
+  $max = $tab->max($key);
 
 =cut
 
@@ -297,7 +297,7 @@ sub max {
 
 =head4 Synopsis
 
-    $min = $tab->minStr($key);
+  $min = $tab->minStr($key);
 
 =cut
 
@@ -323,7 +323,7 @@ sub minStr {
 
 =head4 Synopsis
 
-    $max = $tab->maxStr($key);
+  $max = $tab->maxStr($key);
 
 =cut
 
@@ -351,7 +351,7 @@ sub maxStr {
 
 =head4 Synopsis
 
-    $tab->sort($sub);
+  $tab->sort($sub);
 
 =head4 Description
 
@@ -366,10 +366,10 @@ Definition siehe Beispiel.
 
 =head4 Example
 
-    $tab->sort(sub ($$) {
-        my ($a,$b) = @_;
-        uc($a->pfad) cmp uc($b->pfad);
-    });
+  $tab->sort(sub ($$) {
+      my ($a,$b) = @_;
+      uc($a->pfad) cmp uc($b->pfad);
+  });
 
 =cut
 
@@ -390,7 +390,7 @@ sub sort {
 
 =head4 Synopsis
 
-    $tab->absorbModifications;
+  $tab->absorbModifications;
 
 =head4 Returns
 
@@ -420,8 +420,8 @@ sub absorbModifications {
 
 =head4 Synopsis
 
-    $tab->addAttribute($key);
-    $tab->addAttribute($key=>$val);
+  $tab->addAttribute($key);
+  $tab->addAttribute($key=>$val);
 
 =head4 Arguments
 
@@ -464,7 +464,7 @@ sub addAttribute {
 
 =head4 Synopsis
 
-    $tab->normalizeNumber(@titles);
+  $tab->normalizeNumber(@titles);
 
 =head4 Alias
 
@@ -510,8 +510,8 @@ sub normalizeNumber {
 
 =head4 Synopsis
 
-    $tab->addChildType($type);
-    $tab->addChildType($type,$rowClass,\@titles);
+  $tab->addChildType($type);
+  $tab->addChildType($type,$rowClass,\@titles);
 
 =head4 Description
 
@@ -546,8 +546,8 @@ sub addChildType {
 
 =head4 Synopsis
 
-    @rows|$rowT = $tab->selectChilds($db,$primaryKeyColumn,
-        $foreignTable,$foreignKeyColumn,@opt);
+  @rows|$rowT = $tab->selectChilds($db,$primaryKeyColumn,
+      $foreignTable,$foreignKeyColumn,@opt);
 
 =head4 Options
 
@@ -573,15 +573,15 @@ verweist und liefere diese zurück.
 Die Kind-Datensätze werden ihren Eltern-Datensätzen zugeordnet
 und können per
 
-    @childRows = $row->childs("$foreignTable,$foreignKeyColumn");
+  @childRows = $row->childs("$foreignTable,$foreignKeyColumn");
 
 oder
 
-    $childRowT = $row->childs("$foreignTable,$foreignKeyColumn");
+  $childRowT = $row->childs("$foreignTable,$foreignKeyColumn");
 
 abgefragt werden. Z.B.
 
-    -select=>@titles oder -oderBy=>@titles
+  -select=>@titles oder -oderBy=>@titles
 
 Mittels der Option C<< -type=>$type >> kann ein anderer Typbezeichner
 anstelle von "$foreignTable,$foreignKeyColumn" für den Satz an
@@ -652,8 +652,8 @@ sub selectChilds {
 
 =head4 Synopsis
 
-    @rows|$rowT = $tab->selectParents($db,$foreignKeyColumn,
-        $parentTable,$primaryKeyColumn,@opt);
+  @rows|$rowT = $tab->selectParents($db,$foreignKeyColumn,
+      $parentTable,$primaryKeyColumn,@opt);
 
 =head4 Options
 
@@ -679,7 +679,7 @@ enthaltenen Datensätze verwiesen wird und liefere diese zurück.
 Der Parent-Datensatz wird jeweils seinem Kind-Datensatz
 zugeordnet und kann per
 
-    $parentRow = $row->getParent($foreignKeyColumn);
+  $parentRow = $row->getParent($foreignKeyColumn);
 
 abgefragt werden.
 
@@ -741,7 +741,7 @@ sub selectParents {
 
 =head4 Synopsis
 
-    @rows|$rowT = $tab->selectParentRows($db,$fkTitle,$pClass,@select);
+  @rows|$rowT = $tab->selectParentRows($db,$fkTitle,$pClass,@select);
 
 =head4 Returns
 
@@ -775,41 +775,41 @@ definiert eine Primäschlüsselkolumne.
 Bestimme Informationen zu Route, Abschnitt, Fahrt, Fahrt_Parameter
 und Parameter zu der Kombination aus Fahrten und Parametern:
 
-    my @pas_id = $req->getArray('pas_id');
-    my @mea_id = $req->getArray('mea_id');
-    
-    my $tab = FerryBox::Model::Join::RouSecPasPamMea->select($db2,
-        -select => 'rou.id rou_id','sec.id sec_id','pas.id pas_id',
-            'pam.id pam_id','mea.id mea_id',
-        -where,
-            'pas.id' => ['IN',@pas_id],
-            'mea.id' => ['IN',@mea_id],
-    );
-    
-    my $rouT = $tab->selectParentRows($db2,
-        rou_id => 'FerryBox::Model::Table::Route',
-        -select => qw/id name/,
-    );
-    
-    my $secT = $tab->selectParentRows($db2,
-        sec_id => 'FerryBox::Model::Table::Section',
-        -select => qw/id route_id secname/,
-    );
-    
-    my $pasT = $tab->selectParentRows($db2,
-        pas_id => 'FerryBox::Model::Table::Passage',
-        -select => qw/id section_id starttime/,
-    );
-    
-    my $pamT = $tab->selectParentRows($db2,
-        pam_id => 'FerryBox::Model::Table::Passage_Measseq',
-        -select => qw/id passage_id measseq_id/,
-    );
-    
-    my $meaT = $tab->selectParentRows($db2,
-        mea_id => 'FerryBox::Model::Table::Measseq',
-        -select => qw/id route_id meas/,
-    );
+  my @pas_id = $req->getArray('pas_id');
+  my @mea_id = $req->getArray('mea_id');
+  
+  my $tab = FerryBox::Model::Join::RouSecPasPamMea->select($db2,
+      -select => 'rou.id rou_id','sec.id sec_id','pas.id pas_id',
+          'pam.id pam_id','mea.id mea_id',
+      -where,
+          'pas.id' => ['IN',@pas_id],
+          'mea.id' => ['IN',@mea_id],
+  );
+  
+  my $rouT = $tab->selectParentRows($db2,
+      rou_id => 'FerryBox::Model::Table::Route',
+      -select => qw/id name/,
+  );
+  
+  my $secT = $tab->selectParentRows($db2,
+      sec_id => 'FerryBox::Model::Table::Section',
+      -select => qw/id route_id secname/,
+  );
+  
+  my $pasT = $tab->selectParentRows($db2,
+      pas_id => 'FerryBox::Model::Table::Passage',
+      -select => qw/id section_id starttime/,
+  );
+  
+  my $pamT = $tab->selectParentRows($db2,
+      pam_id => 'FerryBox::Model::Table::Passage_Measseq',
+      -select => qw/id passage_id measseq_id/,
+  );
+  
+  my $meaT = $tab->selectParentRows($db2,
+      mea_id => 'FerryBox::Model::Table::Measseq',
+      -select => qw/id route_id meas/,
+  );
 
 =cut
 
@@ -836,7 +836,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

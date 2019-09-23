@@ -3,9 +3,9 @@
 package Quiq::Database::Row::Object::Table::Test;
 use base qw/Quiq::Test::Class/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
 use Quiq::Database::Connection;

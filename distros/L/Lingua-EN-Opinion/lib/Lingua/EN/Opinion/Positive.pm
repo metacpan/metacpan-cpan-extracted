@@ -1,5 +1,5 @@
 package Lingua::EN::Opinion::Positive;
-$Lingua::EN::Opinion::Positive::VERSION = '0.1502';
+$Lingua::EN::Opinion::Positive::VERSION = '0.1600';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -2041,7 +2041,7 @@ Lingua::EN::Opinion::Positive
 
 =head1 VERSION
 
-version 0.1502
+version 0.1600
 
 =head1 DESCRIPTION
 

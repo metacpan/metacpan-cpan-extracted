@@ -9,7 +9,7 @@ use Moo;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.80'; # VERSION
+our $VERSION = '1.85'; # VERSION
 
 # BUILD
 
@@ -78,8 +78,7 @@ sub data {
 
   fileno $handle or return [];
 
-  # (no longer errors if DATA is missing)
-  # fileno $handle or die "Error with $class: DATA not accessible";
+  fileno $handle or die "Error with $class: DATA not accessible";
 
   seek $handle, 0, 0;
 
@@ -218,7 +217,7 @@ This example is extracting from a file.
 
   use Data::Object::Data;
 
-  my $data = Data::Object::Data->new(data => [,"..."]);
+  my $data = Data::Object::Data->new(data => [,'...']);
 
 This example is extracting from existing data.
 
@@ -535,11 +534,11 @@ matches the given list or item by name.
 
 =head1 CREDITS
 
-Al Newkirk, C<+303>
+Al Newkirk, C<+309>
 
 Anthony Brummett, C<+10>
 
-Adam Hopkins, C<+1>
+Adam Hopkins, C<+2>
 
 José Joaquín Atria, C<+1>
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AdjustRange;
-$Lab::Moose::Instrument::AdjustRange::VERSION = '3.682';
+$Lab::Moose::Instrument::AdjustRange::VERSION = '3.690';
 #ABSTRACT: Role for automatic adjustment of measurement ranges.
 
 use 5.010;
@@ -75,7 +75,7 @@ Lab::Moose::Instrument::AdjustRange - Role for automatic adjustment of measureme
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 DESCRIPTION
 

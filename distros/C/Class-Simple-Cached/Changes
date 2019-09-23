@@ -1,4 +1,11 @@
 Revision history for Class::Simple::Cached
 
+0.03	Fri 20 Sep 13:19:59 EDT 2019
+	Improved handling of caching functionas that return undef
+	Empty the cache when the object is destroyed
+
+0.02	Thu 19 Sep 19:30:43 EDT 2019
+	Fix working with arrays
+
 0.01	Wed 18 Sep 09:23:11 EDT 2019
         First Version

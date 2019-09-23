@@ -38,18 +38,18 @@ no_index:
 provides:
   Sub::Multi::Tiny:
     file: lib/Sub/Multi/Tiny.pm
-    version: '0.000006'
+    version: '0.000011'
   Sub::Multi::Tiny::Dispatcher::Default:
     file: lib/Sub/Multi/Tiny/Dispatcher/Default.pm
-    version: '0.000006'
+    version: '0.000011'
   Sub::Multi::Tiny::Dispatcher::TypeParams:
     file: lib/Sub/Multi/Tiny/Dispatcher/TypeParams.pm
-    version: '0.000006'
+    version: '0.000011'
   Sub::Multi::Tiny::SigParse:
     file: lib/Sub/Multi/Tiny/SigParse.pm
   Sub::Multi::Tiny::Util:
     file: lib/Sub/Multi/Tiny/Util.pm
-    version: '0.000006'
+    version: '0.000011'
 requires:
   Attribute::Handlers: '0.79'
   Carp: '0'
@@ -57,6 +57,7 @@ requires:
   Exporter: '5.57'
   Guard: '1.023'
   Import::Into: '1.002005'
+  Scalar::Util: '1.50'
   Text::Balanced: '2.01'
   Type::Params: '1.004004'
   attributes: '0'
@@ -73,7 +74,9 @@ resources:
   bugtracker: https://github.com/cxw42/Sub-Multi-Tiny/issues
   homepage: https://github.com/cxw42/Sub-Multi-Tiny
   repository: git://github.com/cxw42/Sub-Multi-Tiny.git
-version: '0.000006'
+version: '0.000011'
 x_authority: cpan:CXW
+x_contributors:
+  - 'Mohammad S Anwar <manwar@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

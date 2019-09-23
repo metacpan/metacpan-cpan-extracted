@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of Gtk2-Ex-MenuView.
 #
@@ -21,15 +21,13 @@ use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Gtk2-Ex-MenuView',
+WriteMakefile
+  (NAME         => 'Gtk2::Ex::MenuView',
    ABSTRACT     => 'Menu of items from a TreeModel.',
    VERSION_FROM => 'lib/Gtk2/Ex/MenuView.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
 
    MIN_PERL_VERSION => '5.008',
@@ -43,29 +41,32 @@ MyMakeMakerExtras::WriteMakefile
                     'Glib::Ex::SignalBits' => 9, # new in v.9
                    },
 
-   META_MERGE
-   => { resources
-        => { homepage
-             => 'http://user42.tuxfamily.org/gtk2-ex-menuview/index.html',
-           },
-        optional_features
-        => { maximum_tests
-             => { description => 'Have "make test" do as much as possible.',
-                  requires => { 'Test::Weaken' => '3',
-                                'Test::Weaken::Gtk2' => 0,
-                                'Devel::FindRef' => 0,
-                              },
-                },
-             maximum_devel
-             => { description => 'Stuff used variously for development.',
-                  requires => { 'Gtk2::Ex::WidgetBits' => 0,
-                                'Gtk2::Ex::TreeModelBits' => 0,
-                              },
-                },
-           },
+   META_MERGE =>
+   { resources =>
+     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-menuview/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
+     },
+     no_index => { directory=>['devel','xt'] },
+
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Test::Weaken' => '3',
+           'Test::Weaken::Gtk2' => 0,
+           'Devel::FindRef' => 0,
+         },
+       },
+     },
+     optional_features =>
+     {
+      maximum_interoperation =>
+      { description => 'Have maximum inter-operation with other modules (optional other stuff).',
+        requires => { 'Locale::Messages' => 0 },
       },
+     },
+   },
 
    # exclude capital INIT_INSTANCE etc
-   MyMakeMakerExtras_Pod_Coverage
-   => [ 'Gtk2::Ex::MenuView,also_private=>[qr/^[A-Z_]+$$/]' ],
+   MyMakeMakerExtras_Pod_Coverage =>
+   [ 'Gtk2::Ex::MenuView,also_private=>[qr/^[A-Z_]+$$/]' ],
   );

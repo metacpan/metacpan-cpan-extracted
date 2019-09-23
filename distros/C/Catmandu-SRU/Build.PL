@@ -18,7 +18,7 @@ my %module_build_args = (
     "Wouter Willaert, C<< <wouterw\@inuits.eu> >>"
   ],
   "dist_name" => "Catmandu-SRU",
-  "dist_version" => "0.424",
+  "dist_version" => "0.425",
   "license" => "perl",
   "module_name" => "Catmandu::SRU",
   "recursive_test_files" => 1,
@@ -30,8 +30,10 @@ my %module_build_args = (
     "Moo" => "1.005000",
     "URI::Escape" => "1.60",
     "XML::LibXML::Simple" => "0.91",
+    "XML::LibXML::XPathContext" => 0,
     "XML::Struct" => "0.16",
     "YAML::XS" => "0.34",
+    "namespace::clean" => 0,
     "perl" => "v5.10.1"
   },
   "test_requires" => {

@@ -8,8 +8,10 @@ MANIFEST.SKIP
 README
 t/00-load.t
 t/app-calendr.t
-t/manifest.t
-t/pod.t
+xt/manifest.t
+xt/pod.t
+xt/meta-json.t
+xt/meta-yml.t
 script/calendr
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

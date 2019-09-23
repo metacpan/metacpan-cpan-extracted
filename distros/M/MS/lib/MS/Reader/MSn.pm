@@ -10,8 +10,6 @@ use Data::Dumper;
 
 use MS::Reader::MSn::Spectrum;
 
-our $VERSION = 0.001;
-
 # Perform parsing of the MS1/MS2 (this is called by the parent class - do not
 # change the method name )
 

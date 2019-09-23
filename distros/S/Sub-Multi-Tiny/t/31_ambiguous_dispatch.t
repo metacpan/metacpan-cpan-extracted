@@ -1,11 +1,7 @@
 use 5.006;
-use strict;
-use warnings;
+use lib::relative '.';
+use Kit;
 use Test::Fatal;
-use Test::More;
-
-#use Sub::Multi::Tiny::Util '*VERBOSE';
-#BEGIN { $VERBOSE = 2; }
 
 # --- Attempts to call with an unsupported arity -----------------------
 {

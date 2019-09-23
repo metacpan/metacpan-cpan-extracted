@@ -1,11 +1,11 @@
 package Quiq::Gnuplot::Label;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ positionierbaren Text.
 
 =head4 Synopsis
 
-    $lab = Quiq::Gnuplot::Label->new(@keyVal);
+  $lab = Quiq::Gnuplot::Label->new(@keyVal);
 
 =cut
 
@@ -57,7 +57,7 @@ sub new {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

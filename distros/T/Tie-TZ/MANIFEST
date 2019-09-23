@@ -22,8 +22,6 @@ devel/undef.pl
 devel/Z-tz.c
 examples/tie-tz.pl
 examples/time-tz.pl
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 junk/SelectTZ.pm
 lib/Tie/TZ.pm
 lib/Time/TZ.pm
@@ -39,10 +37,16 @@ t/TimeTZ.t
 t/tzset-calls.t
 t/tzset-not-implemented.t
 t/tzset-other-error.t
+xt/0-examples-xrefs.t
 xt/0-exe-shebang.t
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xtools/my_pod2html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

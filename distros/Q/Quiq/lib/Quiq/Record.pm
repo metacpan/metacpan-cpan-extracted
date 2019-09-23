@@ -1,11 +1,11 @@
 package Quiq::Record;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::String;
 use Quiq::Option;
@@ -43,24 +43,24 @@ ein Wert ein beliebiger einzeiliger oder mehrzeiliger Text ist.
 
 Stringrepräsentation:
 
-    Schlüssel1:
-        Wert1
-    Schlüssel2:
-        Wert2
-    ...
+  Schlüssel1:
+      Wert1
+  Schlüssel2:
+      Wert2
+  ...
 
 oder
 
-    Schlüssel1: Wert1
-    Schlüssel2: Wert2
-    ...
+  Schlüssel1: Wert1
+  Schlüssel2: Wert2
+  ...
 
 oder ein Mischung aus beidem oder
 
-    @@Schlüssel@@
-    Wert1
-    @@Schlüsse2@@
-    Wert2
+  @@Schlüssel@@
+  Wert1
+  @@Schlüsse2@@
+  Wert2
 
 Um die dritte Repräsentation (mit @@Schlüssel@@) zu erzeugen, muss
 als Option -format => '@' angegeben werden.
@@ -73,8 +73,8 @@ als Option -format => '@' angegeben werden.
 
 =head4 Synopsis
 
-    @keyVal | $keyValA = $class->fromString($str);
-    @keyVal | $keyValA = $class->fromString(\$str);
+  @keyVal | $keyValA = $class->fromString($str);
+  @keyVal | $keyValA = $class->fromString(\$str);
 
 =head4 Description
 
@@ -145,7 +145,7 @@ sub fromString {
 
 =head4 Synopsis
 
-    @keyVal | $keyValA = $class->fromFile($file,@opt);
+  @keyVal | $keyValA = $class->fromFile($file,@opt);
 
 =head4 Arguments
 
@@ -196,8 +196,8 @@ sub fromFile {
 
 =head4 Synopsis
 
-    $str = $class->toString(@keyVal,@opt);
-    $str = $class->toString(\@keyVal,@opt);
+  $str = $class->toString(@keyVal,@opt);
+  $str = $class->toString(\@keyVal,@opt);
 
 =head4 Options
 
@@ -207,13 +207,13 @@ sub fromFile {
 
 Im Falle von ':' erzeuge das Format:
 
-    <KEY>:
-        <VAL>
+  <KEY>:
+      <VAL>
 
 Im Falle von '@' erzeuge das Format:
 
-    @@<KEY>@@
-    <VAL>
+  @@<KEY>@@
+  <VAL>
 
 =item -indent => $n (Default: 4)
 
@@ -303,8 +303,8 @@ sub toString {
 
 =head4 Synopsis
 
-    $class->toFile($file,@keyVal,@opt);
-    $class->toFile($file,\@keyVal,@opt);
+  $class->toFile($file,@keyVal,@opt);
+  $class->toFile($file,\@keyVal,@opt);
 
 =head4 Options
 
@@ -332,7 +332,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

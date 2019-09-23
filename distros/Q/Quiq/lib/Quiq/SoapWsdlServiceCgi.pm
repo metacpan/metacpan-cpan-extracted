@@ -2,11 +2,11 @@ package Quiq::SoapWsdlServiceCgi;
 use base qw/Quiq::Object/;
 push our @ISA,qw/SOAP::Server::Parameters/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Pod::WSDL ();
 use SOAP::Transport::HTTP ();
@@ -55,28 +55,28 @@ Vorgehen bei der Realisierung eines konkreten Web Service:
 
 Abgeleitete Klasse mit den Methoden des Web Service implementieren
 
-    package MyWebServiceClass;
-    use base qw/Quiq::SoapWsdlServiceCgi/;
-    
-    =begin WSDL
-    
-    <Pod::WSDL-Spezifikation für Methode myWebServiceMethod1()>
-    
-    =end WSDL
-    
-    =cut
-    
-    sub myWebServiceMethod1 {
-        my ($class,<Parameter der Methode>,$som) = @_;
-    
-        <Implementierung der Methode>
-    
-        return <Return Wert>;
-    }
-    
-    <weitere Methoden>
-    
-    # eof
+  package MyWebServiceClass;
+  use base qw/Quiq::SoapWsdlServiceCgi/;
+  
+  =begin WSDL
+  
+  <Pod::WSDL-Spezifikation für Methode myWebServiceMethod1()>
+  
+  =end WSDL
+  
+  =cut
+  
+  sub myWebServiceMethod1 {
+      my ($class,<Parameter der Methode>,$som) = @_;
+  
+      <Implementierung der Methode>
+  
+      return <Return Wert>;
+  }
+  
+  <weitere Methoden>
+  
+  # eof
 
 Die Signatur der Methoden (Parameter und Returnwerte) muss in
 einem POD-Abschnitt (C<=begin WSDL ... =end WSDL>) gemäß den
@@ -95,13 +95,13 @@ benötigt wird.
 CGI-Programm my-webservice implementieren, das den Web Service
 ausführt:
 
-    #!/usr/bin/env perl
-    
-    use MyWebServiceClass;
-    
-    MyWebServiceClass->run;
-    
-    # eof
+  #!/usr/bin/env perl
+  
+  use MyWebServiceClass;
+  
+  MyWebServiceClass->run;
+  
+  # eof
 
 Der Webservice kann unter einem beliebigen URI installiert
 werden. Wird der URI vom Client mit angehägtem "?wsdl"
@@ -118,7 +118,7 @@ Der Web Service (my-webservice, MyWebServiceClass.pm) kann ohne
 serverseitige Overhead je Methodenaufruf deutlich reduziert. Bei
 einem Test über das Internet
 
-    Client <--Internet--> Server
+  Client <--Internet--> Server
 
 ergab sich eine Beschleunigung um Faktor 3 (0.06s statt 0.2s
 Sekunden für einen Methodenaufruf ohne Parameter, ohne Code und
@@ -126,14 +126,14 @@ ohne Returnwert).
 
 Getestetes Setup (Apache2, ModPerl2) auf Ebene eines VirtualHost:
 
-    <VirtualHost ...>
-      ...
-      PerlResponseHandler ModPerl::Registry
-      PerlOptions +ParseHeaders +Parent
-      PerlSwitches -ILIBRARY_PATH
-      RewriteEngine on
-      RewriteRule ^/URI$ PROGRAM_PATH/my-webservice [H=perl-script]
-    </VirtualHost>
+  <VirtualHost ...>
+    ...
+    PerlResponseHandler ModPerl::Registry
+    PerlOptions +ParseHeaders +Parent
+    PerlSwitches -ILIBRARY_PATH
+    RewriteEngine on
+    RewriteRule ^/URI$ PROGRAM_PATH/my-webservice [H=perl-script]
+  </VirtualHost>
 
 Hierbei ist:
 
@@ -161,12 +161,12 @@ error.log auf den Grund gegangen werden.
 Die WSDL-Generierung durch die WebService-Klasse kann an der
 Kommandozeile getestet werden:
 
-    $ SCRIPT_URI=http://x QUERY_STRING=wsdl perl -MMyWebServiceClass
-        -e 'MyWebServiceClass->run'
+  $ SCRIPT_URI=http://x QUERY_STRING=wsdl perl -MMyWebServiceClass
+      -e 'MyWebServiceClass->run'
 
 Der gleiche Test über das CGI-Programm, das die WebService-Klasse ruft:
 
-    $ SCRIPT_URI=http://x QUERY_STRING=wsdl perl ./mywebservice.cgi
+  $ SCRIPT_URI=http://x QUERY_STRING=wsdl perl ./mywebservice.cgi
 
 =head1 METHODS
 
@@ -176,7 +176,7 @@ Der gleiche Test über das CGI-Programm, das die WebService-Klasse ruft:
 
 =head4 Synopsis
 
-    $class->run;
+  $class->run;
 
 =head4 Description
 
@@ -217,7 +217,7 @@ sub run {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

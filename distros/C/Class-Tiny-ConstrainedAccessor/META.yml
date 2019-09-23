@@ -16,7 +16,7 @@ build_requires:
   Type::Tiny: '0'
   lib::relative: '0.002'
   parent: '0'
-  vars::i: '1.07'
+  vars::i: '2.000000'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '7.10'
@@ -35,7 +35,7 @@ no_index:
 provides:
   Class::Tiny::ConstrainedAccessor:
     file: lib/Class/Tiny/ConstrainedAccessor.pm
-    version: '0.000010'
+    version: '0.000012'
 requires:
   Class::Tiny: '0'
   Scalar::Util: '1.50'
@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues
   repository: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor
-version: '0.000010'
+version: '0.000012'
 x_contributors:
   - 'Christopher White <cxw@cpan.org>'
   - 'Toby Inkster <tobyink@cpan.org>'

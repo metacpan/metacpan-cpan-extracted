@@ -1,11 +1,11 @@
 package Quiq::MediaWiki::Client;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Parameters;
 use Quiq::AnsiColor;
@@ -98,8 +98,8 @@ L<http://lxv0103.ruv.de:8080/api.php>
 
 =head4 Synopsis
 
-    $mw = $class->new($url,@opt);
-    $mw = $class->new($url,$user,$password,@opt);
+  $mw = $class->new($url,@opt);
+  $mw = $class->new($url,$user,$password,@opt);
 
 =head4 Arguments
 
@@ -210,7 +210,7 @@ sub new {
 
 =head4 Synopsis
 
-    $res = $mw->login($user,$password);
+  $res = $mw->login($user,$password);
 
 =head4 Arguments
 
@@ -238,7 +238,7 @@ möglich, was eleganter ist. Siehe Konstruktor.
 
 =head4 Example
 
-    $ perl -MQuiq::MediaWiki::Client -E 'Quiq::MediaWiki::Client->new("http://lxv0103.ruv.de:8080/api.php",-debug=>1)->login("XV882JS","<PASSWORD>")'
+  $ perl -MQuiq::MediaWiki::Client -E 'Quiq::MediaWiki::Client->new("http://lxv0103.ruv.de:8080/api.php",-debug=>1)->login("XV882JS","<PASSWORD>")'
 
 =cut
 
@@ -286,7 +286,7 @@ sub login {
 
 =head4 Synopsis
 
-    $token = $mw->getToken($action);
+  $token = $mw->getToken($action);
 
 =head4 Arguments
 
@@ -345,8 +345,8 @@ sub getToken {
 
 =head4 Synopsis
 
-    $res = $mw->editPage($pageId,$text); # [1]
-    $res = $mw->editPage($title,$text);  # [2]
+  $res = $mw->editPage($pageId,$text); # [1]
+  $res = $mw->editPage($title,$text);  # [2]
 
 =head4 Arguments
 
@@ -453,8 +453,8 @@ sub editPage {
 
 =head4 Synopsis
 
-    $pag = $mw->getPage($pageId,@opt);
-    $pag = $mw->getPage($title,@opt);
+  $pag = $mw->getPage($pageId,@opt);
+  $pag = $mw->getPage($title,@opt);
 
 =head4 Arguments
 
@@ -602,8 +602,8 @@ sub getPage {
 
 =head4 Synopsis
 
-    $res = $mw->movePage($pageId,$newTitle,@opt);
-    $res = $mw->movePage($oldTitle,$newTitle,@opt);
+  $res = $mw->movePage($pageId,$newTitle,@opt);
+  $res = $mw->movePage($oldTitle,$newTitle,@opt);
 
 =head4 Arguments
 
@@ -686,8 +686,8 @@ sub movePage {
 
 =head4 Synopsis
 
-    $res = $mw->siteInfo;
-    $res = $mw->siteInfo(@properties);
+  $res = $mw->siteInfo;
+  $res = $mw->siteInfo(@properties);
 
 =head4 Arguments
 
@@ -712,7 +712,7 @@ bekannten) Properties abgefragt.
 
 =head4 Example
 
-    $ quiq-mediawiki ruv statistics --debug
+  $ quiq-mediawiki ruv statistics --debug
 
 =cut
 
@@ -758,7 +758,7 @@ sub siteInfo {
 
 =head4 Synopsis
 
-    $res = $mw->uploadFile($file);
+  $res = $mw->uploadFile($file);
 
 =head4 Arguments
 
@@ -858,7 +858,7 @@ sub uploadFile {
 
 =head4 Synopsis
 
-    $version = $mw->version;
+  $version = $mw->version;
 
 =head4 Description
 
@@ -888,7 +888,7 @@ sub version {
 
 =head4 Synopsis
 
-    $mw->load($cacheDir,$file,@opt);
+  $mw->load($cacheDir,$file,@opt);
 
 =head4 Arguments
 
@@ -1132,7 +1132,7 @@ sub load {
 
 =head4 Synopsis
 
-    $res = $mw->send($method,$action,@keyVal);
+  $res = $mw->send($method,$action,@keyVal);
 
 =head4 Arguments
 
@@ -1270,8 +1270,8 @@ sub send {
 
 =head4 Synopsis
 
-    $pag = $mw->reduceToPage($res);
-    $pag = $mw->reduceToPage($res,$sloppy);
+  $pag = $mw->reduceToPage($res);
+  $pag = $mw->reduceToPage($res,$sloppy);
 
 =head4 Arguments
 
@@ -1296,22 +1296,22 @@ Reduzierte Response
 Reduziere die Server-Response $res mit einer einelementigen
 Seitenliste der Art
 
-    {
-        query => {
-            pages => {
-                $pageId => {
-                     @keyVal
-                },
-                ...
-            },
-        }
-    }
+  {
+      query => {
+          pages => {
+              $pageId => {
+                   @keyVal
+              },
+              ...
+          },
+      }
+  }
 
 auf
 
-    {
-        @keyVal
-    }
+  {
+      @keyVal
+  }
 
 also auf ein Element und liefere dieses zurück.
 
@@ -1362,7 +1362,7 @@ sub reduceToPage {
 
 =head4 Synopsis
 
-    $mw->log($title,$text);
+  $mw->log($title,$text);
 
 =head4 Description
 
@@ -1387,7 +1387,7 @@ sub log {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

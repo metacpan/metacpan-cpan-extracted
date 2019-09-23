@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 package Dist::Zilla::App::Command::issues;
-# ABSTRACT: Print the count of outstanding RT and github issues for your distribution
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
+# ABSTRACT: Print the count of outstanding RT and github issues for your distribution
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Dist::Zilla::App -command;
 
@@ -28,6 +28,8 @@ sub execute
     # parse dist.ini and load, instantiate all plugins
     my $zilla = $self->zilla;
 
+    $self->app->chrome->logger->unmute;
+
     require List::Util;
     my $plugin = List::Util::first { $_->isa('Dist::Zilla::Plugin::CheckIssues') } @{ $zilla->plugins };
     if (not $plugin)
@@ -47,7 +49,6 @@ sub execute
 
     my @issues = $plugin->get_issues;
 
-    $self->app->chrome->logger->unmute;
     $self->log($_) foreach @issues;
 }
 
@@ -65,7 +66,7 @@ Dist::Zilla::App::Command::issues - Print the count of outstanding RT and github
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

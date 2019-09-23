@@ -7,7 +7,6 @@ use Carp;
 use Data::Dumper;
 use XML::Parser;
 
-our $VERSION = 0.001;
 
 sub new {
 

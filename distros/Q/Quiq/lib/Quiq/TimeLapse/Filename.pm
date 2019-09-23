@@ -1,11 +1,11 @@
 package Quiq::TimeLapse::Filename;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 
@@ -23,33 +23,33 @@ L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
-    # Klasse laden
-    use Quiq::TimeLapse::Filename;
-    
-    # Instantiiere Bildsequenz-Dateinamen
-    $nam = Quiq::TimeLapse::Filename->new('/my/image/dir/000219-3000x2250-G0080108.jpg');
-    
-    # Nummer
-    $n = $nam->number; # 219
-    
-    # Breite
-    $width = $nam->width; # 3000
-    
-    # Höhe
-    $height = $nam->height; # 2250
-    
-    # Extension
-    $extension = $nam->extension; # 'jpg'
-    
-    # Name
-    $name = $nam->name; # 'G0080108'
+  # Klasse laden
+  use Quiq::TimeLapse::Filename;
+  
+  # Instantiiere Bildsequenz-Dateinamen
+  $nam = Quiq::TimeLapse::Filename->new('/my/image/dir/000219-3000x2250-G0080108.jpg');
+  
+  # Nummer
+  $n = $nam->number; # 219
+  
+  # Breite
+  $width = $nam->width; # 3000
+  
+  # Höhe
+  $height = $nam->height; # 2250
+  
+  # Extension
+  $extension = $nam->extension; # 'jpg'
+  
+  # Name
+  $name = $nam->name; # 'G0080108'
 
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert den Namen einer Bildsequenz-Datei.
 Der Name einer Bildsequenz-Datei hat den Aufbau:
 
-    NNNNNN-WIDTHxHEIGHT[-NAME].EXT
+  NNNNNN-WIDTHxHEIGHT[-NAME].EXT
 
 =head1 ATTRIBUTES
 
@@ -85,8 +85,8 @@ Extension
 
 =head4 Synopsis
 
-    $nam = $class->new($file);
-    $nam = $class->new($n,$width,$height,$ext,@opt);
+  $nam = $class->new($file);
+  $nam = $class->new($n,$width,$height,$ext,@opt);
 
 =head4 Arguments
 
@@ -197,7 +197,7 @@ sub new {
 
 =head4 Synopsis
 
-    $n = $nam->number;
+  $n = $nam->number;
 
 =head4 Returns
 
@@ -211,7 +211,7 @@ Liefere die Nummer der Bilddatei.
 
 =head4 Synopsis
 
-    $width = $nam->width;
+  $width = $nam->width;
 
 =head4 Returns
 
@@ -225,7 +225,7 @@ Liefere die Breitenangabe aus dem Bilddateinamen.
 
 =head4 Synopsis
 
-    $height = $nam->height;
+  $height = $nam->height;
 
 =head4 Returns
 
@@ -239,7 +239,7 @@ Liefere die Höhenangabe aus dem Bilddateinamen.
 
 =head4 Synopsis
 
-    $str = $nam->text;
+  $str = $nam->text;
 
 =head4 Returns
 
@@ -264,7 +264,7 @@ sub text {
 
 =head4 Synopsis
 
-    $extension = $nam->extension;
+  $extension = $nam->extension;
 
 =head4 Returns
 
@@ -280,7 +280,7 @@ Liefere die Extension des Bilddateinamens.
 
 =head4 Synopsis
 
-    $filename = $nam->asString;
+  $filename = $nam->asString;
 
 =head4 Returns
 
@@ -314,7 +314,7 @@ sub asString {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

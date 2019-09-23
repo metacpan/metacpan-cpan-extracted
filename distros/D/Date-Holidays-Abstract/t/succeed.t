@@ -1,5 +1,13 @@
-use Test::More tests => 1;
+#!/usr/bin/env perl
 
-use lib qw(t);
+use strict;
+use warnings;
 
-use_ok(LL);
+use FindBin qw($Bin);
+use lib ("$Bin/../t", 't');
+
+use Test::More;
+
+use_ok('Example::Abstraction');
+
+done_testing();

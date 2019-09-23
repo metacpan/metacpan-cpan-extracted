@@ -1,11 +1,11 @@
 package Quiq::Database::Api::Dbi::Cursor;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ Id nach INSERT in Tabelle mit AUTOINCREMENT-Kolumne (MySQL, SQLite)
 
 =head4 Synopsis
 
-    $cur = $class->new(@keyVal);
+  $cur = $class->new(@keyVal);
 
 =head4 Description
 
@@ -93,7 +93,7 @@ sub new {
 
 =head4 Synopsis
 
-    $cur->destroy;
+  $cur->destroy;
 
 =head4 Description
 
@@ -123,7 +123,7 @@ sub destroy {
 
 =head4 Synopsis
 
-    $n = $cur->bindVars;
+  $n = $cur->bindVars;
 
 =head4 Description
 
@@ -144,8 +144,8 @@ sub bindVars {
 
 =head4 Synopsis
 
-    @arr|$arr = $cur->bindTypes(@dataTypes);
-    @arr|$arr = $cur->bindTypes;
+  @arr|$arr = $cur->bindTypes(@dataTypes);
+  @arr|$arr = $cur->bindTypes;
 
 =cut
 
@@ -213,7 +213,7 @@ sub bindTypes {
 
 =head4 Synopsis
 
-    $n = $cur->hits;
+  $n = $cur->hits;
 
 =head4 Description
 
@@ -235,7 +235,7 @@ sub hits {
 
 =head4 Synopsis
 
-    $id = $cur->id;
+  $id = $cur->id;
 
 =cut
 
@@ -251,7 +251,7 @@ sub id {
 
 =head4 Synopsis
 
-    $titlesA = $cur->titles;
+  $titlesA = $cur->titles;
 
 =cut
 
@@ -269,7 +269,7 @@ sub titles {
 
 =head4 Synopsis
 
-    $cur = $cur->bind(@vals);
+  $cur = $cur->bind(@vals);
 
 =head4 Description
 
@@ -333,7 +333,7 @@ sub bind {
 
 =head4 Synopsis
 
-    $row = $cur->fetch;
+  $row = $cur->fetch;
 
 =head4 Description
 
@@ -385,7 +385,7 @@ sub fetch {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

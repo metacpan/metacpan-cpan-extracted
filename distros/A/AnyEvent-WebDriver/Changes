@@ -1,16 +1,22 @@
 Revision history for AnyEvent::WebDriver
 
 TODO: investigate modifer key usage/special key usage in send_element_keys
-TODO: firefox profiles
-TODO: capabilities object?
+TODO: geckodriver/chromedriver autostart classes
+
+1.0  Fri Sep 20 22:15:07 CEST 2019
+	- small protocol fixes.
+        - chromdriver 77 can finally create sessions, but might still not
+          work.
+        - add chrome capabilities example, because the goog:chromeOptions
+          are basiclaly undocumented.
+	- many small documentation fixes.
+	- fix Changes :)
 
 0.91 Tue Sep  4 03:20:56 CEST 2018
 	- actions created via Actions objects no longer queue actions
           to execute concurrently.
-        - default mouse button to 0 instead of 0.
+        - default mouse button to 0 instead of 1.
 	- implement ->cancel action (pointerCancel).
-	- add pauses between events in examples.
-        - doc fixes.
 
 0.9 Fri Aug 31 04:44:10 CEST 2018
 	- enable persistent connections for non-idempotent requests by default.

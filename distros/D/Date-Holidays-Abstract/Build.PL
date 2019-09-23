@@ -19,7 +19,7 @@ my %module_build_args = (
     "Jonas B. <jonasbn\@cpan.org>"
   ],
   "dist_name" => "Date-Holidays-Abstract",
-  "dist_version" => "0.08",
+  "dist_version" => "0.10",
   "license" => "artistic_2",
   "module_name" => "Date::Holidays::Abstract",
   "recursive_test_files" => 1,

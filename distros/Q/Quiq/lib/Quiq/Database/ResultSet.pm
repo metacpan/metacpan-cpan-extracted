@@ -1,11 +1,11 @@
 package Quiq::Database::ResultSet;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -41,14 +41,14 @@ Datensätzen.
 
 =head4 Synopsis
 
-    $tab = $class->new($rowClass,\@titles);
-    $tab = $class->new($rowClass,\@titles,\@rows,@keyVal);
-    
-    $tab = $class->new(\@titles);
-    $tab = $class->new(\@titles,\@rows,@keyVal);
-    
-    $newTab = $tab->new;
-    $newTab = $tab->new(\@rows);
+  $tab = $class->new($rowClass,\@titles);
+  $tab = $class->new($rowClass,\@titles,\@rows,@keyVal);
+  
+  $tab = $class->new(\@titles);
+  $tab = $class->new(\@titles,\@rows,@keyVal);
+  
+  $newTab = $tab->new;
+  $newTab = $tab->new(\@rows);
 
 =head4 Description
 
@@ -109,7 +109,7 @@ sub new {
 
 =head4 Synopsis
 
-    $rowClass = $tab->rowClass;
+  $rowClass = $tab->rowClass;
 
 =cut
 
@@ -125,8 +125,8 @@ sub rowClass {
 
 =head4 Synopsis
 
-    $rowA|@rows = $tab->rows;
-    $rowA|@rows = $tab->rows(\@rows);
+  $rowA|@rows = $tab->rows;
+  $rowA|@rows = $tab->rows(\@rows);
 
 =head4 Description
 
@@ -158,7 +158,7 @@ sub rows {
 
 =head4 Synopsis
 
-    $stmt = $tab->stmt;
+  $stmt = $tab->stmt;
 
 =head4 Description
 
@@ -179,7 +179,7 @@ sub stmt {
 
 =head4 Synopsis
 
-    $stmt = $tab->stmtBody(@opt);
+  $stmt = $tab->stmtBody(@opt);
 
 =head4 Description
 
@@ -190,22 +190,22 @@ Statement ohne Select- und Order-By-Klausel.
 
 Ursprüngliches Select:
 
-    SELECT
-        per_vorname
-        , per_nachname
-    FROM
-        person
-    WHERE
-        per_nachname = 'Schulz'
-    ORDER BY
-        per_vorname
+  SELECT
+      per_vorname
+      , per_nachname
+  FROM
+      person
+  WHERE
+      per_nachname = 'Schulz'
+  ORDER BY
+      per_vorname
 
 Resultierendes Select:
 
-    FROM
-        person
-    WHERE
-        per_nachname = 'Schulz'
+  FROM
+      person
+  WHERE
+      per_nachname = 'Schulz'
 
 =cut
 
@@ -228,7 +228,7 @@ sub stmtBody {
 
 =head4 Synopsis
 
-    $titleA|@titles = $tab->titles;
+  $titleA|@titles = $tab->titles;
 
 =head4 Description
 
@@ -253,7 +253,7 @@ sub titles {
 
 =head4 Synopsis
 
-    $bool = $this->isRaw;
+  $bool = $this->isRaw;
 
 =cut
 
@@ -271,7 +271,7 @@ sub isRaw {
 
 =head4 Synopsis
 
-    $row = $tab->lookup(@opt,$key=>$val);
+  $row = $tab->lookup(@opt,$key=>$val);
 
 =head4 Options
 
@@ -333,7 +333,7 @@ sub lookup {
 
 =head4 Synopsis
 
-    @rows|$tab = $tab->select($testSub);
+  @rows|$tab = $tab->select($testSub);
 
 =head4 Description
 
@@ -345,11 +345,11 @@ Im Skalarkontext liefere ein neues Tabellen-Objekt.
 
 Schränke Produkt-Tabelle auf Produkte mit einem Preis > 100 ein:
 
-    my $sub = sub {
-        my $row = shift;
-        return $row->preis > 100? 1: 0;
-    };
-    $tab = $tab->select($sub);
+  my $sub = sub {
+      my $row = shift;
+      return $row->preis > 100? 1: 0;
+  };
+  $tab = $tab->select($sub);
 
 =cut
 
@@ -384,7 +384,7 @@ sub select {
 
 =head4 Synopsis
 
-    $tab = $class->loadFromFile($file,@opt);
+  $tab = $class->loadFromFile($file,@opt);
 
 =head4 Options
 
@@ -417,11 +417,11 @@ Datensätze. Die Kolumen werden per | getrennt.
 
 =head4 Example
 
-    per_id|per_vorname|per_nachname
-    1|Rudi|Ratlos
-    2|Kai|Nelust
-    3|Elli|Pirelli
-    4|Susi|Sorglos
+  per_id|per_vorname|per_nachname
+  1|Rudi|Ratlos
+  2|Kai|Nelust
+  3|Elli|Pirelli
+  4|Susi|Sorglos
 
 =cut
 
@@ -473,7 +473,7 @@ sub loadFromFile {
 
 =head4 Synopsis
 
-    $tab->saveToFile($file);
+  $tab->saveToFile($file);
 
 =head4 Description
 
@@ -506,7 +506,7 @@ sub saveToFile {
 
 =head4 Synopsis
 
-    $duration = $tab->elapsed;
+  $duration = $tab->elapsed;
 
 =cut
 
@@ -523,8 +523,8 @@ sub elapsed {
 
 =head4 Synopsis
 
-    $fmtA | @fmts = $tab->formats;
-    $fmtA | @fmts = $tab->formats($force);
+  $fmtA | @fmts = $tab->formats;
+  $fmtA | @fmts = $tab->formats($force);
 
 =head4 Description
 
@@ -571,7 +571,7 @@ sub formats {
 
 =head4 Synopsis
 
-    $n = $tab->width;
+  $n = $tab->width;
 
 =cut
 
@@ -587,7 +587,7 @@ sub width {
 
 =head4 Synopsis
 
-    $n = $tab->count;
+  $n = $tab->count;
 
 =cut
 
@@ -603,7 +603,7 @@ sub count {
 
 =head4 Synopsis
 
-    $tab->pop;
+  $tab->pop;
 
 =cut
 
@@ -621,7 +621,7 @@ sub pop {
 
 =head4 Synopsis
 
-    $tab->push($row);
+  $tab->push($row);
 
 =cut
 
@@ -639,7 +639,7 @@ sub push {
 
 =head4 Synopsis
 
-    $rowClass = $class->defaultRowClass;
+  $rowClass = $class->defaultRowClass;
 
 =head4 Description
 
@@ -672,9 +672,9 @@ sub defaultRowClass {
 
 =head4 Synopsis
 
-    $str = $tab->asString;
-    $str = $tab->asString($colSep);
-    $str = $tab->asString($colSep,$rowSep);
+  $str = $tab->asString;
+  $str = $tab->asString($colSep);
+  $str = $tab->asString($colSep,$rowSep);
 
 =head4 Description
 
@@ -705,7 +705,7 @@ sub asString {
 
 =head4 Synopsis
 
-    $str = $tab->asTable(@opt);
+  $str = $tab->asTable(@opt);
 
 =head4 Options
 
@@ -749,33 +749,33 @@ Liefere eine einfache Tabellen-Repräsentation der Tabellendaten.
 
 Beispiel-Ausgabe:
 
-    SELECT
-        *
-    FROM
-        did.mandant
-    WHERE
-        ROWNUM <= 10+1
-    ORDER BY
-        1
-    
-    1 id
-    2 id_person
-    3 bezeichnung
-    4 id_verknuepfungsgruppe
-    
-    1   2          3                         4
-    | 0 | 14485923 | unbekannter Mandant     | 0 |
-    | 1 | 14485924 | Otto                    | 0 |
-    | 2 |  7834646 | Otto  - TZ (HB)         | 0 |
-    | 3 | 14485928 | Schwab Versand GmbH     | 0 |
-    | 4 |  5423454 | Schwab - TZ (HB)        | 0 |
-    | 5 | 14913536 | Hanseatic Bank          | 0 |
-    | 6 | 14485937 | 3-Pagen Versand         | 0 |
-    | 7 |  8371420 | Fegro Markt G. M. B. H. | 0 |
-    | 8 | 14485941 | Heinrich Heine Versand  | 0 |
-    | 9 | 14485942 | Hermes T. Kundendienst  | 0 |
-    
-    0.093s, 10 rows - *MORE ROWS EXIST*
+  SELECT
+      *
+  FROM
+      did.mandant
+  WHERE
+      ROWNUM <= 10+1
+  ORDER BY
+      1
+  
+  1 id
+  2 id_person
+  3 bezeichnung
+  4 id_verknuepfungsgruppe
+  
+  1   2          3                         4
+  | 0 | 14485923 | unbekannter Mandant     | 0 |
+  | 1 | 14485924 | Otto                    | 0 |
+  | 2 |  7834646 | Otto  - TZ (HB)         | 0 |
+  | 3 | 14485928 | Schwab Versand GmbH     | 0 |
+  | 4 |  5423454 | Schwab - TZ (HB)        | 0 |
+  | 5 | 14913536 | Hanseatic Bank          | 0 |
+  | 6 | 14485937 | 3-Pagen Versand         | 0 |
+  | 7 |  8371420 | Fegro Markt G. M. B. H. | 0 |
+  | 8 | 14485941 | Heinrich Heine Versand  | 0 |
+  | 9 | 14485942 | Hermes T. Kundendienst  | 0 |
+  
+  0.093s, 10 rows - *MORE ROWS EXIST*
 
 =cut
 
@@ -888,7 +888,7 @@ sub asTable {
 
 =head4 Synopsis
 
-    $str = $tab->diffReport;
+  $str = $tab->diffReport;
 
 =cut
 
@@ -957,7 +957,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

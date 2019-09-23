@@ -1,12 +1,12 @@
 package Quiq::Database::Row::Object::Table;
 use base qw/Quiq::Database::Row::Object Quiq::ClassConfig/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 use utf8;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Perl;
 
@@ -53,7 +53,7 @@ L<primaryKey|"primaryKey() - Liefere Namen der Primärschlüssel-Kolumne">() gel
 
 =head4 Synopsis
 
-    $tableName = $this->tableName;
+  $tableName = $this->tableName;
 
 =head4 Alias
 
@@ -72,13 +72,13 @@ und liefere diesen zurück.
 
 Tabellenname wird aus Klassenname abgeleitet:
 
-    Adb::Table::Person => person
-    Adb::Person => person
-    Person => person
+  Adb::Table::Person => person
+  Adb::Person => person
+  Person => person
 
 Tabellenname per Klassenvariable definieren:
 
-    our $TableName = 'adb.person';
+  our $TableName = 'adb.person';
 
 =head4 Details
 
@@ -88,7 +88,7 @@ letzte Komponente des Klassennamens.
 Abweichend vom Default kann die Datensatzklasse den Tabellennamen
 über die Klassenvariable
 
-    our $TableName = '...';
+  our $TableName = '...';
 
 festlegen.
 
@@ -140,7 +140,7 @@ sub tableName {
 
 =head4 Synopsis
 
-    $title = $this->primaryKey($db);
+  $title = $this->primaryKey($db);
 
 =head4 Description
 
@@ -175,7 +175,7 @@ sub primaryKey {
 
 =head4 Synopsis
 
-    @where = $row->primaryKeyWhere($db);
+  @where = $row->primaryKeyWhere($db);
 
 =head4 Description
 
@@ -212,7 +212,7 @@ sub primaryKeyWhere {
 
 =head4 Synopsis
 
-    $row = $class->nullRow($db);
+  $row = $class->nullRow($db);
 
 =cut
 
@@ -231,7 +231,7 @@ sub nullRow {
 
 =head4 Synopsis
 
-    $stmt = $class->selectStmt($db,@select);
+  $stmt = $class->selectStmt($db,@select);
 
 =cut
 
@@ -251,7 +251,7 @@ sub selectStmt {
 
 =head4 Synopsis
 
-    $stmt = $row->insertStmt($db);
+  $stmt = $row->insertStmt($db);
 
 =cut
 
@@ -274,7 +274,7 @@ sub insertStmt {
 
 =head4 Synopsis
 
-    $stmt = $row->updateStmt($db);
+  $stmt = $row->updateStmt($db);
 
 =cut
 
@@ -299,7 +299,7 @@ sub updateStmt {
 
 =head4 Synopsis
 
-    $stmt = $row->deleteStmt($db);
+  $stmt = $row->deleteStmt($db);
 
 =cut
 
@@ -318,7 +318,7 @@ sub deleteStmt {
 
 =head4 Synopsis
 
-    $row = $class->load($db,$pkValue);
+  $row = $class->load($db,$pkValue);
 
 =head4 Description
 
@@ -352,7 +352,7 @@ sub load {
 
 =head4 Synopsis
 
-    $cur = $row->insert($db);
+  $cur = $row->insert($db);
 
 =head4 Description
 
@@ -381,7 +381,7 @@ sub insert {
 
 =head4 Synopsis
 
-    $cur = $row->update($db);
+  $cur = $row->update($db);
 
 =head4 Description
 
@@ -410,7 +410,7 @@ sub update {
 
 =head4 Synopsis
 
-    $cur = $row->delete($db);
+  $cur = $row->delete($db);
 
 =head4 Description
 
@@ -437,7 +437,7 @@ sub delete {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

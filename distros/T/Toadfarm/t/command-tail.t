@@ -4,7 +4,7 @@ use File::Temp;
 use IO::Handle;
 use Time::HiRes ();
 
-plan skip_all => 'TEST_TAIL=1' unless $ENV{TEST_TAIL} or -e '.test-all';
+plan skip_all => 'TEST_TAIL=1' unless $ENV{TEST_TAIL};
 plan skip_all => 'ualarm is not implementeed on MSWin32' if $^O eq 'MSWin32';
 plan skip_all => 'Cannot run as root' if $< == 0 or $> == 0;
 

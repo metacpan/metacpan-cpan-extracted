@@ -9,18 +9,30 @@ use List::Util qw( sum0 );
 use Statistics::Lite qw( mean );
 use IO::Prompt::Tiny qw( prompt );
 
-my $dir    = shift || die "Usage: perl $0 /some/folder/of/text/files [prompt]\n";
-my $prompt = shift || 0;
+my $dir     = shift || die "Usage: perl $0 /some/folder/of/text/files [verbose=0] [prompt=0]\n";
+my $verbose = shift // 0;
+my $prompt  = shift // 0;
 
 my @files = File::Find::Rule->file()->name('*.txt')->in($dir);
+
+$SIG{'INT'} = \&summarize;
 
 my $total = 0;
 my $sents = 0;
 my $pos   = 0;
 my $neg   = 0;
 
+my @score = ();
+
+my $i = 0;
+
 for my $file ( sort @files ) {
-    my $opinion = Lingua::EN::Opinion->new( file => $file );
+    $i++;
+
+    my $opinion = Lingua::EN::Opinion->new(
+        file => $file,
+        stem => 1,
+    );
     $opinion->analyze();
 
     my $sum = sum0 @{ $opinion->scores };
@@ -29,23 +41,42 @@ for my $file ( sort @files ) {
     $neg++ if $sum < 0;
 
     $total += $sum;
-    $sents += scalar @{ $opinion->sentences };
 
-    print "\n", '-' x 50, "\n", "File: $file\n\n";
-    print 'Total sentence score: ', $sum, "\n";
-    print 'Total number of sentences: ', scalar( @{ $opinion->sentences } ), "\n";
-    print 'Average sentence score: ', mean( @{ $opinion->scores } ), "\n";
+    my $sent_num = scalar @{ $opinion->sentences };
 
-    printf "known: %d, unknown: %d, known/total: %.2f\n",
-        $opinion->familiarity->{known},
-        $opinion->familiarity->{unknown},
-        $opinion->ratio;
+    $sents += $sent_num;
 
-    if ( $prompt ) {
-        print "\n";
-        my $result = prompt('c to continue; q to quit', 'c');
-        last if $result eq 'q';
+    my $mean  = mean( @{ $opinion->scores } );
+    my $ratio = $opinion->ratio;
+
+    push @score, $mean * $ratio;
+
+    if ( $verbose ) {
+        print "\n", '-' x 50, "\n", "$i. File: $file\n\n";
+        print "Sentence score: $sum\n";
+        print "Number of sentences: $sent_num\n";
+        printf "Average sentence score: %.4f\n", $mean;
+        printf "Words known: %d, unknown: %d, known/total: %.4f\n",
+            $opinion->familiarity->{known},
+            $opinion->familiarity->{unknown},
+            $ratio;
+        printf "Weighted score: %.4f\n", $mean * $ratio;
+
+        if ( $prompt ) {
+            print "\n";
+            my $result = prompt('c to continue; q to quit', 'c');
+            last if $result eq 'q';
+        }
     }
 }
 
-print "\nPositive: $pos, Negative: $neg, Total: $total, Avg: " . ($total / $sents) . "\n";
+summarize();
+
+sub summarize {
+    print "\n", '-' x 50, "\n";
+    printf "Positive: %d, Negative: %d, Positive/Total: %.4f, Negative/Total: %.4f\n",
+        $pos, $neg, $pos / @files, $neg / @files;
+    printf "Total score: %d, Total sentences: %d, Avg score: %.4f, Avg weighted score: %.4f\n",
+        $total, $sents, $total / $sents, mean(@score);
+    exit(0);
+};

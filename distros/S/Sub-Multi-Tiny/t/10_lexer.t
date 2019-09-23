@@ -1,10 +1,9 @@
 use 5.006;
-use strict;
-use warnings;
+use lib::relative '.';
+use Kit;
 
 use Sub::Multi::Tiny::SigParse;
 use Test::Fatal;
-use Test::More;
 
 {
     package FakeYappParser;

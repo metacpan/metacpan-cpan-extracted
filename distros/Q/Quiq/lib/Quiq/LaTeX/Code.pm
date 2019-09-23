@@ -1,11 +1,11 @@
 package Quiq::LaTeX::Code;
 use base qw/Quiq::TeX::Code/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 
@@ -37,7 +37,7 @@ siehe dort.
 
 =head4 Synopsis
 
-    $l = $class->new;
+  $l = $class->new;
 
 =head4 Description
 
@@ -60,7 +60,7 @@ sub new {
 
 =head4 Synopsis
 
-    $code = $l->protect($text);
+  $code = $l->protect($text);
 
 =head4 Description
 
@@ -74,11 +74,11 @@ L<https://www.namsu.de/Extra/strukturen/Sonderzeichen.html>
 
 B<Dollarzeichen>
 
-    $l->protect('Der Text $text wird geschützt.');
+  $l->protect('Der Text $text wird geschützt.');
 
 produziert
 
-    Der Text \$text wird geschützt.
+  Der Text \$text wird geschützt.
 
 =cut
 
@@ -114,7 +114,7 @@ sub protect {
 
 =head4 Synopsis
 
-    $code = $l->env($name,$body,@args);
+  $code = $l->env($name,$body,@args);
 
 =head4 Options
 
@@ -141,13 +141,13 @@ auftreten.
 
 B<Document-Umgebung mit Text>
 
-    $l->env('document','Dies ist ein Text.');
+  $l->env('document','Dies ist ein Text.');
 
 produziert
 
-    \begin{document}
-      Dies ist ein Text.
-    \end{document}
+  \begin{document}
+    Dies ist ein Text.
+  \end{document}
 
 =cut
 
@@ -207,7 +207,7 @@ sub env {
 
 =head4 Synopsis
 
-    $code = $l->section($sectionName,$title);
+  $code = $l->section($sectionName,$title);
 
 =head4 Arguments
 
@@ -243,11 +243,11 @@ zurück.
 
 B<Ein Abschnitt der Ebene 1>
 
-    $l->section('subsection','Ein Abschnitt');
+  $l->section('subsection','Ein Abschnitt');
 
 produziert
 
-    \subsection{Ein Abschnitt}
+  \subsection{Ein Abschnitt}
 
 =cut
 
@@ -285,7 +285,7 @@ sub section {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

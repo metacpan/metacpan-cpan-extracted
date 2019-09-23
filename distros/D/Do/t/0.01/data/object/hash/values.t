@@ -15,7 +15,7 @@ subtest 'test the values method' => sub {
   my $values   = $hash->values(@argument);
 
   isnt refaddr($hash), refaddr($values);
-  is_deeply [sort @{$values}], [sort values %{$hash}];
+  is_deeply [sort { $a <=> $b } @{$values}], [sort { $a <=> $b } values %{$hash}];
 
   isa_ok $hash,   'Data::Object::Hash';
   isa_ok $values, 'Data::Object::Array';

@@ -1,11 +1,11 @@
 package Quiq::Color;
 use base qw/Quiq::Object/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Reference;
 
@@ -23,26 +23,26 @@ L<Quiq::Object>
 
 =head1 SYNOPSIS
 
-    use Quiq::Color;
-    
-    # Instantiierung
-    
-    $col = Quiq::Color->new(255,0,0); # aus dez. RGB-Tripel
-    $col = Quiq::Color->new('ff0000'); # aus hex. RGB-String
-    
-    # Helligkeit
-    
-    $brightness = $col->brightness; # 0 .. 255
-    
-    # Farbname
-    
-    $col->name('red'); # setzen
-    $name = $col->name; # abfragen
-    
-    # Externe Repräsentation
-    
-    $hex = $col->hexString; # 'ff0000' - hex. RGB-String
-    @rgb = $col->rgb; # (255,0,0) - dez. RGB-Tripel
+  use Quiq::Color;
+  
+  # Instantiierung
+  
+  $col = Quiq::Color->new(255,0,0); # aus dez. RGB-Tripel
+  $col = Quiq::Color->new('ff0000'); # aus hex. RGB-String
+  
+  # Helligkeit
+  
+  $brightness = $col->brightness; # 0 .. 255
+  
+  # Farbname
+  
+  $col->name('red'); # setzen
+  $name = $col->name; # abfragen
+  
+  # Externe Repräsentation
+  
+  $hex = $col->hexString; # 'ff0000' - hex. RGB-String
+  @rgb = $col->rgb; # (255,0,0) - dez. RGB-Tripel
 
 =head1 DESCRIPTION
 
@@ -62,10 +62,10 @@ werden.
 
 =head4 Synopsis
 
-    $col = $class->new($r,$g,$b);
-    $col = $class->new(\@rgb);
-    $col = $class->new('rrggbb');
-    $col = $class->new('#rrggbb');
+  $col = $class->new($r,$g,$b);
+  $col = $class->new(\@rgb);
+  $col = $class->new('rrggbb');
+  $col = $class->new('#rrggbb');
 
 =head4 Description
 
@@ -118,7 +118,7 @@ sub new {
 
 =head4 Synopsis
 
-    $brightness = $col->brightness;
+  $brightness = $col->brightness;
 
 =head4 Description
 
@@ -130,7 +130,7 @@ auf einem Hintergrund mit der Farbe genutzt werden sollte.
 
 Die Helligkeitsberechnung erfolgt auf Grundlage der Heuristik:
 
-    $brightness = sqrt 0.299*$r**2 + 0.587*$g**2 + 0.114*$b**2;
+  $brightness = sqrt 0.299*$r**2 + 0.587*$g**2 + 0.114*$b**2;
 
 =head4 See Also
 
@@ -144,9 +144,9 @@ L<http://fseitz.de/blog/index.php?/archives/112-Helligkeit-von-Farben-des-RGB-Fa
 
 =head4 Example
 
-    $col = Quiq::Color->new('ff0000');
-    $brightness = $col->brightness;
-    -> 139.44
+  $col = Quiq::Color->new('ff0000');
+  $brightness = $col->brightness;
+  -> 139.44
 
 =cut
 
@@ -165,8 +165,8 @@ sub brightness {
 
 =head4 Synopsis
 
-    $name = $col->name($name);
-    $name = $col->name;
+  $name = $col->name($name);
+  $name = $col->name;
 
 =head4 Description
 
@@ -178,10 +178,10 @@ einen Leerstring.
 
 =head4 Example
 
-    my $col = Quiq::Color->new(255,0,0);
-    $col->name('red');
-    $name = $col->name;
-    -> 'red'
+  my $col = Quiq::Color->new(255,0,0);
+  $col->name('red');
+  $name = $col->name;
+  -> 'red'
 
 =cut
 
@@ -206,7 +206,7 @@ sub name {
 
 =head4 Synopsis
 
-    $hexStr = $col->hexString;
+  $hexStr = $col->hexString;
 
 =head4 Description
 
@@ -214,9 +214,9 @@ Liefere den Farbwert der Farbe als Hex-String
 
 =head4 Example
 
-    $col = Quiq::Color->new(255,255,255);
-    $hexStr = Quiq::Color->hexString;
-    -> 'ffffff'
+  $col = Quiq::Color->new(255,255,255);
+  $hexStr = Quiq::Color->hexString;
+  -> 'ffffff'
 
 =cut
 
@@ -233,7 +233,7 @@ sub hexString {
 
 =head4 Synopsis
 
-    @rgb | $rgbA = $col->rgb;
+  @rgb | $rgbA = $col->rgb;
 
 =head4 Description
 
@@ -242,9 +242,9 @@ R, G, B. Im Skalarkontext liefere eine Referenz auf die Liste.
 
 =head4 Example
 
-    $col = Quiq::Color->new('ffffff');
-    @rgb = Quiq::Color->rgb;
-    -> (255,255,255)
+  $col = Quiq::Color->new('ffffff');
+  @rgb = Quiq::Color->rgb;
+  -> (255,255,255)
 
 =cut
 
@@ -259,7 +259,7 @@ sub rgb {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

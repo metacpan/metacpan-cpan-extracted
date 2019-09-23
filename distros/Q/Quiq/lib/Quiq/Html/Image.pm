@@ -1,11 +1,11 @@
 package Quiq::Html::Image;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 # -----------------------------------------------------------------------------
 
@@ -27,14 +27,14 @@ Link und Bildunterschrift.
 
 Aufbau eines Image-Blocks:
 
-    [<div [class="CLASS"] [id="ID"] [style="STYLE"]>]
-      [<a href="URL">]
-      <img src="URL" width="WIDTH" height="HEIGHT" alt="ALT" />
-      [<p>
-        <span class="prefix">PREFIX:</span> <span class="caption">CAPTION</span>
-      </p>]
-      [</a>]
-    [</div>]
+  [<div [class="CLASS"] [id="ID"] [style="STYLE"]>]
+    [<a href="URL">]
+    <img src="URL" width="WIDTH" height="HEIGHT" alt="ALT" />
+    [<p>
+      <span class="prefix">PREFIX:</span> <span class="caption">CAPTION</span>
+    </p>]
+    [</a>]
+  [</div>]
 
 Die in eckige Klammern eingefassten Bestandteile ([...]) sind
 optional.
@@ -114,27 +114,27 @@ Die Breite des Bildes.
 
 B<Leerer Block, wenn kein Bild-URL>
 
-    $class->html($h,
-        src => '', # oder undef
-    );
+  $class->html($h,
+      src => '', # oder undef
+  );
 
 produziert:
 
-    ''
+  ''
 
 B<Block nur mit Bild>
 
-    $class->html($h,
-        src => 'illusion.png',
-        width => 100,
-        height => 100,
-    );
+  $class->html($h,
+      src => 'illusion.png',
+      width => 100,
+      height => 100,
+  );
 
 produziert:
 
-    <div>
-      <img src="img/illusion.png" width="100" height="100" alt="">
-    </div>
+  <div>
+    <img src="img/illusion.png" width="100" height="100" alt="">
+  </div>
 
 =head1 METHODS
 
@@ -144,7 +144,7 @@ produziert:
 
 =head4 Synopsis
 
-    $e = $class->new(@keyVal);
+  $e = $class->new(@keyVal);
 
 =head4 Arguments
 
@@ -205,8 +205,8 @@ sub new {
 
 =head4 Synopsis
 
-    $html = $e->html($h);
-    $html = $class->html($h,@keyVal);
+  $html = $e->html($h);
+  $html = $class->html($h,@keyVal);
 
 =head4 Arguments
 
@@ -289,7 +289,7 @@ sub html {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

@@ -1,5 +1,9 @@
 Revision history for App-LedgerSMB-Admin
 
+0.08    2019-09-19
+        Add missing dependency
+        Further MANIFEST cleanup as indicated by CPANTS
+
 0.07    2017-05-10
         Remove MYMETA.json & ignore.txt from distribution archive
 

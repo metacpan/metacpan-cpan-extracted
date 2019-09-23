@@ -14,8 +14,6 @@ use MS::Reader::MzML::Spectrum;
 use MS::Reader::MzML::Chromatogram;
 use MS::CV qw/:MS/;
 
-our $VERSION = 0.006;
-
 use constant FLOAT_TOL => 0.000001;
 
 sub _pre_load {

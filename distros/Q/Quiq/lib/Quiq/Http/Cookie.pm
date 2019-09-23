@@ -1,11 +1,11 @@
 package Quiq::Http::Cookie;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Time::RFC822;
 
@@ -84,17 +84,17 @@ Cookie-Spezifikation von Netscape
 
 =head2 Cookie für eine Browser-Sitzung
 
-    my $cok = Quiq::Http::Cookie->new(sid=>4711);
-    print 'Set-Cookie: ',$cok->asString;
-    __END__
-    Set-Cookie: sid=4711
+  my $cok = Quiq::Http::Cookie->new(sid=>4711);
+  print 'Set-Cookie: ',$cok->asString;
+  __END__
+  Set-Cookie: sid=4711
 
 =head2 Cookie verfällt in einem Jahr (Aufruf am 2011-11-11 12:24:12 GMT)
 
-    my $cok = Quiq::Http::Cookie->new(sid=>4711,expires=>'+1y');
-    print 'Set-Cookie: ',$cok->asString;
-    __END__
-    Set-Cookie: sid=4711; expires=Fri, 11-Nov-2012 12:24:12 GMT
+  my $cok = Quiq::Http::Cookie->new(sid=>4711,expires=>'+1y');
+  print 'Set-Cookie: ',$cok->asString;
+  __END__
+  Set-Cookie: sid=4711; expires=Fri, 11-Nov-2012 12:24:12 GMT
 
 Die Angabe '+1y' wird von Methode L<asString|"asString() - Generiere Zeichenketten-Repräsentation">() durch Aufruf
 von Quiq::Time::RFC822->get() in eine gültige RFC822-Datumsangabe
@@ -108,7 +108,7 @@ gewandelt. Weitere abkürzende Schreibweisen siehe dort.
 
 =head4 Synopsis
 
-    $cok = $class->new($name=>$value,@keyVal);
+  $cok = $class->new($name=>$value,@keyVal);
 
 =head4 Returns
 
@@ -152,7 +152,7 @@ sub new {
 
 =head4 Synopsis
 
-    $str = $cok->asString;
+  $str = $cok->asString;
 
 =head4 Returns
 
@@ -199,7 +199,7 @@ sub asString {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

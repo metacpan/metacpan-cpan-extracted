@@ -1,7 +1,7 @@
 package Debug::Print;
 
-our $DATE = '2018-12-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-09-17'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -147,7 +147,7 @@ Debug::Print - Make debugging with print() more awesome
 
 =head1 VERSION
 
-This document describes version 0.002 of Debug::Print (from Perl distribution Debug-Print), released on 2019-12-31.
+This document describes version 0.003 of Debug::Print (from Perl distribution Debug-Print), released on 2019-09-17.
 
 =head1 SYNOPSIS
 
@@ -225,6 +225,9 @@ For example: don't output if string matches qr/\ADEBUG:/.
 
 so debugging using C<print()> can be more useful. (Although I still recommend
 you to use a proper logging framework.)
+
+This module works by intercepting output to STDOUT using L<Tie::STDOUT>, then
+filter and/or post-process the output.
 
 Caveat: This module is still in its early development. API might change. Current
 limitations:
@@ -335,7 +338,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keithley2400;
-$Lab::Moose::Instrument::Keithley2400::VERSION = '3.682';
+$Lab::Moose::Instrument::Keithley2400::VERSION = '3.690';
 #ABSTRACT: Keithley 2400 voltage/current sourcemeter.
 
 use 5.010;
@@ -113,7 +113,7 @@ Lab::Moose::Instrument::Keithley2400 - Keithley 2400 voltage/current sourcemeter
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 SYNOPSIS
 

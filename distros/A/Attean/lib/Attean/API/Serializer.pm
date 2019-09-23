@@ -7,7 +7,7 @@ Attean::API::Serializer - Serializer role
 
 =head1 VERSION
 
-This document describes Attean::API::Serializer version 0.023
+This document describes Attean::API::Serializer version 0.024
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ UTF-8 encoded byte string.
 
 use Type::Tiny;
 
-package Attean::API::Serializer 0.023 {
+package Attean::API::Serializer 0.024 {
 	use Moo::Role;
 	use Carp qw(confess);
 	
@@ -105,25 +105,27 @@ package Attean::API::Serializer 0.023 {
 	}
 }
 
-package Attean::API::AbbreviatingSerializer 0.023 {
+package Attean::API::AbbreviatingSerializer 0.024 {
 	# Serializer that can make use of a base IRI and/or prefix IRI mappings
-	use Types::Standard qw(InstanceOf ConsumerOf Maybe);
+	use Types::Standard qw(InstanceOf ConsumerOf Maybe Bool);
+	use Types::Namespace qw( NamespaceMap );
 
 	use Moo::Role;
 
 	with 'Attean::API::Serializer';
 
 	has base		=> (is => 'ro', isa => ConsumerOf['Attean::API::IRI'], predicate => 'has_base');
-	has namespaces	=> (is => 'ro', isa => Maybe[InstanceOf['URI::NamespaceMap']], predicate => 'has_namespaces');
+	has namespaces	=> (is => 'ro', isa => Maybe[NamespaceMap], predicate => 'has_namespaces');
+	has omit_base => (is => 'ro', isa => Bool, default => 0);
 }
 
-package Attean::API::AppendableSerializer 0.023 {
+package Attean::API::AppendableSerializer 0.024 {
 	# Serializer for a format that allows multiple serialization calls to be appended and remain syntactically valid
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 }
 
-package Attean::API::TermSerializer 0.023 {
+package Attean::API::TermSerializer 0.024 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -132,7 +134,7 @@ package Attean::API::TermSerializer 0.023 {
 	}
 }
 
-package Attean::API::TripleSerializer 0.023 {
+package Attean::API::TripleSerializer 0.024 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -141,7 +143,7 @@ package Attean::API::TripleSerializer 0.023 {
 	}
 }
 
-package Attean::API::QuadSerializer 0.023 {
+package Attean::API::QuadSerializer 0.024 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -151,7 +153,7 @@ package Attean::API::QuadSerializer 0.023 {
 	}
 }
 
-package Attean::API::MixedStatementSerializer 0.023 {
+package Attean::API::MixedStatementSerializer 0.024 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -161,7 +163,7 @@ package Attean::API::MixedStatementSerializer 0.023 {
 	}
 }
 
-package Attean::API::ResultSerializer 0.023 {
+package Attean::API::ResultSerializer 0.024 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {

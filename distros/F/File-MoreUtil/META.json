@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-SHARYANTO-File-Util"
       }
    },
-   "version" : "0.621",
+   "version" : "0.622",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"

@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   Server::Starter:
     file: lib/Server/Starter.pm
-    version: '0.34'
+    version: '0.35'
   Server::Starter::Guard:
     file: lib/Server/Starter/Guard.pm
 requires:
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kazuho/p5-Server-Starter/issues
   homepage: https://github.com/kazuho/p5-Server-Starter
   repository: git://github.com/kazuho/p5-Server-Starter.git
-version: '0.34'
+version: '0.35'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Andy Jones <andy@broadbean.com>'
@@ -57,6 +57,7 @@ x_contributors:
   - 'Robert Buels <rmb32@cornell.edu>'
   - 'Slaven Rezic <slaven.rezic@idealo.de>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Takumasa Ochi <aeroastro007@gmail.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'Tomoya Kabe <kabe.tomoya@O-02586-MAC.local>'
@@ -65,3 +66,4 @@ x_contributors:
   - 'kazuho <kazuho@d0d07461-0603-4401-acd4-de1884942a52>'
   - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

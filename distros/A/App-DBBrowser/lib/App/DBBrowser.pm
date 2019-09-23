@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.209';
+our $VERSION = '2.210';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -39,8 +39,9 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        tc_default  => { undef => '<<', prompt => 'Choose:', hide_cursor => 0 },
+        tc_default  => { hide_cursor => 0, undef => '<<', prompt => 'Choose:' },
         tf_default  => { hide_cursor => 2 },
+        tcu_default => { hide_cursor => 0 },
         lyt_h       => { order => 0, alignment => 2 },
         lyt_v       => { undef => '  BACK', layout => 3, },
         lyt_v_clear => { undef => '  BACK', layout => 3, clear_screen => 1 },
@@ -98,7 +99,8 @@ sub __options {
         );
         if ( $help ) {
             if ( $sf->{o}{table}{mouse} ) {
-                $sf->{i}{tc_default}{mouse} = $sf->{o}{table}{mouse};
+                $sf->{i}{tc_default}{mouse}  = $sf->{o}{table}{mouse};
+                $sf->{i}{tcu_default}{mouse} = $sf->{o}{table}{mouse};
             }
             print clear_screen();
             require App::DBBrowser::Opt::Set;
@@ -117,7 +119,8 @@ sub __options {
         }
     }
     if ( $sf->{o}{table}{mouse} ) {
-        $sf->{i}{tc_default}{mouse} = $sf->{o}{table}{mouse};
+        $sf->{i}{tc_default}{mouse}  = $sf->{o}{table}{mouse};
+        $sf->{i}{tcu_default}{mouse} = $sf->{o}{table}{mouse};
     }
 }
 
@@ -712,7 +715,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.209
+Version 2.210
 
 =head1 DESCRIPTION
 

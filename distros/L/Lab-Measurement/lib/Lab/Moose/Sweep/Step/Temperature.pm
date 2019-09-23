@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Temperature;
-$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.682';
+$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.690';
 #ABSTRACT: Step/list sweep of temperature
 
 
@@ -8,7 +8,7 @@ use Moose;
 
 extends 'Lab::Moose::Sweep::Step';
 
-with 'Lab::Moose::Stabilizer';
+use Lab::Moose::Stabilizer;
 
 has instrument =>
     ( is => 'ro', isa => 'Lab::Moose::Instrument', required => 1 );
@@ -26,18 +26,14 @@ sub _build_setter {
     return \&_temp_setter;
 }
 
-sub _getter {
-    my $self = shift;
-    return $self->instrument()->get_T();
-}
-
 sub _temp_setter {
     my $self  = shift;
     my $value = shift;
     $self->instrument->set_T( value => $value );
-    $self->stabilize(
+    stabilize(
+        instrument             => $self->instrument,
         setpoint               => $value,
-        getter                 => \&_getter,
+        getter                 => 'get_T',
         tolerance_setpoint     => $self->tolerance_setpoint,
         tolerance_std_dev      => $self->tolerance_std_dev,
         measurement_interval   => $self->measurement_interval,
@@ -63,7 +59,7 @@ Lab::Moose::Sweep::Step::Temperature - Step/list sweep of temperature
 
 =head1 VERSION
 
-version 3.682
+version 3.690
 
 =head1 SYNOPSIS
 
@@ -95,6 +91,7 @@ setpoint.
 This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

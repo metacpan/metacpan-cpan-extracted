@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 # Run Parse::Yapp to generate Sub::Multi::Tiny::SigParse
+package # hide from PAUSE
+    BuildSigParse;
 
 use 5.006;
 use strict;

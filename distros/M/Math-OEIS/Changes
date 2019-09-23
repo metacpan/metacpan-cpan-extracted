@@ -17,6 +17,9 @@ with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 13, September 2019
+    - Name,Stripped avoid some warnings on big A-number not found
+
 Version 12, August 2019
     - Name,Stripped tighter match so return nothing if given a bogus
       A-number string

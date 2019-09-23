@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -20,11 +20,9 @@
 BEGIN { require 5 }
 use strict;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Tie-TZ',
+WriteMakefile
+  (NAME         => 'Tie::TZ',
    ABSTRACT     => 'Tied TZ env var calling tzset() when changed.',
    VERSION_FROM => 'lib/Tie/TZ.pm',
    MIN_PERL_VERSION => '5', # probably not really
@@ -35,16 +33,16 @@ MyMakeMakerExtras::WriteMakefile
                     'Test::More' => 0,
                    },
 
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
 
    META_MERGE =>
    { resources =>
-     { homepage => 'http://user42.tuxfamily.org/tie-tz/index.html' },
-
-     recommends => {
-                    'warnings' => 0,
-                   },
+     { homepage => 'http://user42.tuxfamily.org/tie-tz/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
+     },
+     no_index => { directory=>['devel','xt','xtools'],
+                 }
    },
   );

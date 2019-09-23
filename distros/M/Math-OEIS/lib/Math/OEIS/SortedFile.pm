@@ -28,7 +28,7 @@ eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
     || die "Oops, error making a weaken() fallback: $@";
 
-our $VERSION = 12;
+our $VERSION = 13;
 
 # singleton here results in a separate instance object in each derived subclass
 use Class::Singleton;
@@ -139,15 +139,12 @@ sub anum_to_line {
 
   # Ensure the line is in fact the $anum requested, since a bad $anum causes
   # Search::Dict::look() to return the file position before where it would
-  # be found if it were present.
+  # be found if it were present.  This may be at end-of-file too, or perhaps
+  # even the file could be empty somehow.
   #
-  my $line = readline $fh;
-  ### found line: $line
-  my $got_anum = $self->line_to_anum($line);
-  ### $got_anum
-  ### len: length($got_anum)
-  ### which is anum: $self->line_to_anum($line)
-  return ($self->line_to_anum($line) eq $anum
+  my $line;
+  return (defined ($line = readline $fh)
+          && $self->line_to_anum($line) eq $anum
           ? $line
           : undef);
 }

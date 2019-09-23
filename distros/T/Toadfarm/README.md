@@ -4,7 +4,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 # VERSION
 
-0.81
+0.82
 
 # DESCRIPTION
 
@@ -90,10 +90,6 @@ You can also start the application with normal [Mojolicious](https://metacpan.or
 - [Toadfarm::Plugin::AccessLog](https://metacpan.org/pod/Toadfarm::Plugin::AccessLog)
 
     Log each request that hit your application.
-
-- [Toadfarm::Plugin::Reload](https://metacpan.org/pod/Toadfarm::Plugin::Reload)
-
-    Reload Hypnotoad with a [GitHub push hook](https://help.github.com/articles/about-webhooks/).
 
 - [Mojolicious::Plugin::SizeLimit](https://metacpan.org/pod/Mojolicious::Plugin::SizeLimit)
 

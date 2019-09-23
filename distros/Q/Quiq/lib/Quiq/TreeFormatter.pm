@@ -1,11 +1,11 @@
 package Quiq::TreeFormatter;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 
@@ -25,56 +25,56 @@ L<Quiq::Hash>
 
 Der Code
 
-    use Quiq::TreeFormatter;
-    
-    my $t = Quiq::TreeFormatter->new([
-        [0,'A'],
-        [1,'B'],
-        [2,'C'],
-        [3,'D'],
-        [2,'E'],
-        [2,'F'],
-        [3,'G'],
-        [4,'H'],
-        [1,'I'],
-        [1,'J'],
-        [2,'K'],
-        [2,'L'],
-        [1,'M'],
-        [2,'N'],
-    ]);
-    
-    print $t->asText;
+  use Quiq::TreeFormatter;
+  
+  my $t = Quiq::TreeFormatter->new([
+      [0,'A'],
+      [1,'B'],
+      [2,'C'],
+      [3,'D'],
+      [2,'E'],
+      [2,'F'],
+      [3,'G'],
+      [4,'H'],
+      [1,'I'],
+      [1,'J'],
+      [2,'K'],
+      [2,'L'],
+      [1,'M'],
+      [2,'N'],
+  ]);
+  
+  print $t->asText;
 
 produziert
 
-    A
-    |
-    +--B
-    |  |
-    |  +--C
-    |  |  |
-    |  |  +--D
-    |  |
-    |  +--E
-    |  |
-    |  +--F
-    |     |
-    |     +--G
-    |        |
-    |        +--H
-    |
-    +--I
-    |
-    +--J
-    |  |
-    |  +--K
-    |  |
-    |  +--L
-    |
-    +--M
-       |
-       +--N
+  A
+  |
+  +--B
+  |  |
+  |  +--C
+  |  |  |
+  |  |  +--D
+  |  |
+  |  +--E
+  |  |
+  |  +--F
+  |     |
+  |     +--G
+  |        |
+  |        +--H
+  |
+  +--I
+  |
+  +--J
+  |  |
+  |  +--K
+  |  |
+  |  +--L
+  |
+  +--M
+     |
+     +--N
 
 =head1 DESCRIPTION
 
@@ -105,21 +105,21 @@ nicht in den Subbaum ab. Dies verhindert redundante Baumteile
 und u.U. eine Endlos-Rekursion (wenn die Wiederholung auf einem
 Pfad vorkommt).
 
-    sub hierarchy {
-        my $self = shift;
-        my $stopH = shift || {};
-    
-        my $stop = $stopH->{$self}++;
-        if (!$stop) {
-            my @arr;
-            for my $node ($self->subNodes) {
-                push @arr,map {$_->[0]++; $_} $node->hierarchy($stopH);
-            }
-        }
-        unshift @arr,[0,$self,$stop];
-    
-        return wantarray? @arr: \@arr;
-    }
+  sub hierarchy {
+      my $self = shift;
+      my $stopH = shift || {};
+  
+      my $stop = $stopH->{$self}++;
+      if (!$stop) {
+          my @arr;
+          for my $node ($self->subNodes) {
+              push @arr,map {$_->[0]++; $_} $node->hierarchy($stopH);
+          }
+      }
+      unshift @arr,[0,$self,$stop];
+  
+      return wantarray? @arr: \@arr;
+  }
 
 =head2 Baumknoten als Objekte
 
@@ -128,98 +128,98 @@ eine Klassenhierarchie für eine bestimmte Klasse ($self)
 ermittelt. Die Methode liefert die Klassenhierarchie als
 Paar-Liste für Quiq::TreeFormatter:
 
-    sub classHierarchy {
-        my $self = shift;
-    
-        my @arr;
-        for my $cls ($self->subClasses) {
-            push @arr,map {$_->[0]++; $_} $cls->classHierarchy;
-        }
-        unshift @arr,[0,$self];
-    
-        return wantarray? @arr: \@arr;
-    }
+  sub classHierarchy {
+      my $self = shift;
+  
+      my @arr;
+      for my $cls ($self->subClasses) {
+          push @arr,map {$_->[0]++; $_} $cls->classHierarchy;
+      }
+      unshift @arr,[0,$self];
+  
+      return wantarray? @arr: \@arr;
+  }
 
 Hier sind die Knoten $node Objekte, deren Text für die Darstellung
 im Baum durch eine anonyme Subroutine produziert wird.
 Die Subroutine wird mittels der Option C<-getText> an $t->asText()
 übergeben:
 
-    my $cls = $cop->findEntity('Quiq/ContentProcessor/Type');
-    my $arrA = $cls->classHierarchy;
-    print Quiq::TreeFormatter->new($arrA)->asText(
-        -getText => sub {
-            my ($cls,$level,$stop) = @_;
-    
-            my $str = $cls->name."\n";
-            for my $grp ($cls->groups) {
-                $str .= sprintf ": %s\n",$grp->title;
-                for my $mth ($grp->methods) {
-                    $str .= sprintf ":   %s()\n",$mth->name;
-                }
-            }
-    
-            return $str;
-        },
-    );
+  my $cls = $cop->findEntity('Quiq/ContentProcessor/Type');
+  my $arrA = $cls->classHierarchy;
+  print Quiq::TreeFormatter->new($arrA)->asText(
+      -getText => sub {
+          my ($cls,$level,$stop) = @_;
+  
+          my $str = $cls->name."\n";
+          for my $grp ($cls->groups) {
+              $str .= sprintf ": %s\n",$grp->title;
+              for my $mth ($grp->methods) {
+                  $str .= sprintf ":   %s()\n",$mth->name;
+              }
+          }
+  
+          return $str;
+      },
+  );
 
 Ein Ausschnitt aus der produzierten Ausgabe:
 
-    +--Quiq/ContentProcessor/Type
-       : Erzeugung
-       :   create()
-       : Objektmethoden
-       :   entityFile()
-       :   entityId()
-       :   entityType()
-       :   files()
-       :   fileSource()
-       :   fileSourceRef()
-       :   appendFileSource()
-       :   name()
-       :   pureCode()
-       : Intern
-       :   needsTest()
-       :   needsUpdate()
-       |
-       +--Jaz/Type
-          |
-          +--Jaz/Type/Export
-          |  : Erzeugung
-          |  :   create()
-          |  : Entitäten
-          |  :   entities()
-          |  : Reguläre Ausdrücke
-          |  :   excludeRegex()
-          |  :   selectRegexes()
-          |  : Verzeichnisse
-          |  :   adminDirectories()
-          |  :   rootDirectory()
-          |  : Verzeichnisse
-          |  :   subDirectories()
-          |  : Export
-          |  :   rewriteRules()
-          |  :   export()
-          |
-          +--Jaz/Type/Language
-          |
-          +--Jaz/Type/Library
-          |
-          +--Jaz/Type/Package
-          |  : Erzeugung
-          |  :   create()
-          |  : Eigenschaften
-          |  :   level()
-          |  :   levelName()
-          |  : Entitäten
-          |  :   entities()
-          |  :   hierarchy()
-          |  :   package()
-          |  :   subPackages()
-          |  : Reguläre Ausdrücke
-          |  :   regexes()
-          |
-          ...
+  +--Quiq/ContentProcessor/Type
+     : Erzeugung
+     :   create()
+     : Objektmethoden
+     :   entityFile()
+     :   entityId()
+     :   entityType()
+     :   files()
+     :   fileSource()
+     :   fileSourceRef()
+     :   appendFileSource()
+     :   name()
+     :   pureCode()
+     : Intern
+     :   needsTest()
+     :   needsUpdate()
+     |
+     +--Jaz/Type
+        |
+        +--Jaz/Type/Export
+        |  : Erzeugung
+        |  :   create()
+        |  : Entitäten
+        |  :   entities()
+        |  : Reguläre Ausdrücke
+        |  :   excludeRegex()
+        |  :   selectRegexes()
+        |  : Verzeichnisse
+        |  :   adminDirectories()
+        |  :   rootDirectory()
+        |  : Verzeichnisse
+        |  :   subDirectories()
+        |  : Export
+        |  :   rewriteRules()
+        |  :   export()
+        |
+        +--Jaz/Type/Language
+        |
+        +--Jaz/Type/Library
+        |
+        +--Jaz/Type/Package
+        |  : Erzeugung
+        |  :   create()
+        |  : Eigenschaften
+        |  :   level()
+        |  :   levelName()
+        |  : Entitäten
+        |  :   entities()
+        |  :   hierarchy()
+        |  :   package()
+        |  :   subPackages()
+        |  : Reguläre Ausdrücke
+        |  :   regexes()
+        |
+        ...
 
 =head1 METHODS
 
@@ -229,7 +229,7 @@ Ein Ausschnitt aus der produzierten Ausgabe:
 
 =head4 Synopsis
 
-    $t = $class->new(\@tuples);
+  $t = $class->new(\@tuples);
 
 =head4 Arguments
 
@@ -302,7 +302,7 @@ sub new {
 
 =head4 Synopsis
 
-    $str = $t->asText(@opt);
+  $str = $t->asText(@opt);
 
 =head4 Options
 
@@ -329,67 +329,67 @@ Erzeuge eine Text-Repräsentation des Baums und liefere diese zurück.
 
 B<debug>
 
-    0 0 A
-    1 1   B
-    1 2     C
-    0 3       D
-    1 2     E
-    0 2     F
-    0 3       G
-    0 4         H
-    1 1   I
-    1 1   J
-    1 2     K
-    0 2     L
-    0 1   M
-    0 2     N
+  0 0 A
+  1 1   B
+  1 2     C
+  0 3       D
+  1 2     E
+  0 2     F
+  0 3       G
+  0 4         H
+  1 1   I
+  1 1   J
+  1 2     K
+  0 2     L
+  0 1   M
+  0 2     N
 
 B<compact>
 
-    A
-      B
-        C
-          D
-        E
-        F
-          G
-            H
-      I
-      J
-        K
-        L
-      M
-        N
+  A
+    B
+      C
+        D
+      E
+      F
+        G
+          H
+    I
+    J
+      K
+      L
+    M
+      N
 
 B<tree>
 
-    A
-    |
-    +--B
-    |  |
-    |  +--C
-    |  |  |
-    |  |  +--D
-    |  |
-    |  +--E
-    |  |
-    |  +--F
-    |     |
-    |     +--G
-    |        |
-    |        +--H
-    |
-    +--I
-    |
-    +--J
-    |  |
-    |  +--K
-    |  |
-    |  +--L
-    |
-    +--M
-       |
-       +--N
+  A
+  |
+  +--B
+  |  |
+  |  +--C
+  |  |  |
+  |  |  +--D
+  |  |
+  |  +--E
+  |  |
+  |  +--F
+  |     |
+  |     +--G
+  |        |
+  |        +--H
+  |
+  +--I
+  |
+  +--J
+  |  |
+  |  +--K
+  |  |
+  |  +--L
+  |
+  +--M
+     |
+     +--N
 
 =cut
 
@@ -519,7 +519,7 @@ sub asText {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

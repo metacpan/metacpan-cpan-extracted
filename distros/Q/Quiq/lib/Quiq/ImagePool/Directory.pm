@@ -1,11 +1,11 @@
 package Quiq::ImagePool::Directory;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::TimeLapse::Directory;
 use Quiq::Option;
@@ -31,7 +31,7 @@ L<Quiq::Hash>
 
 =head4 Synopsis
 
-    $dir = $class->new($path);
+  $dir = $class->new($path);
 
 =head4 Arguments
 
@@ -65,7 +65,7 @@ sub new {
 
 =head4 Synopsis
 
-    $seq = $dir->sequence($name,@opt);
+  $seq = $dir->sequence($name,@opt);
 
 =head4 Arguments
 
@@ -136,7 +136,7 @@ sub sequence {
 
 =head4 Synopsis
 
-    @images|$imageA = $dir->images($key);
+  @images|$imageA = $dir->images($key);
 
 =head4 Description
 
@@ -188,7 +188,7 @@ sub images {
 
 =head4 Synopsis
 
-    $img = $dir->image($n);
+  $img = $dir->image($n);
 
 =cut
 
@@ -203,7 +203,7 @@ sub image {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

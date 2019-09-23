@@ -1,10 +1,10 @@
 package Quiq::JavaScript;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Path;
 use Scalar::Util ();
@@ -25,7 +25,7 @@ Quiq::JavaScript - Generierung von JavaScript-Code
 
 =head4 Synopsis
 
-    $line = $class->line($code);
+  $line = $class->line($code);
 
 =head4 Arguments
 
@@ -52,13 +52,13 @@ wie onclick="..." oder onchange="...") eingesetzt werden soll.
 
 Aus
 
-    var s = '';
-    for (var i = 0; i < 10; i++)
-        s += 'x';
+  var s = '';
+  for (var i = 0; i < 10; i++)
+      s += 'x';
 
 wird
 
-    var s = ''; for (var i = 0; i < 10; i++) s += 'x';
+  var s = ''; for (var i = 0; i < 10; i++) s += 'x';
 
 =head4 Details
 
@@ -114,7 +114,7 @@ sub line {
 
 =head4 Synopsis
 
-    $scriptTags = Quiq::JavaScript->script($h,@specs);
+  $scriptTags = Quiq::JavaScript->script($h,@specs);
 
 =head4 Arguments
 
@@ -159,40 +159,40 @@ Wird zu @specs expandiert.
 
 Code zum Laden einer JavaScript-Datei über URL:
 
-    $script = Quiq::JavaScript->script($h,'https://host.dom/scr.js');
-    =>
-    <script src="https://host.dom/scr.js" type="text/javascript"></script>
+  $script = Quiq::JavaScript->script($h,'https://host.dom/scr.js');
+  =>
+  <script src="https://host.dom/scr.js" type="text/javascript"></script>
 
 Code aus Datei einfügen:
 
-    $style = Quiq::JavaScript->script($h,'inline:js/script.css');
-    =>
-    <script type="text/javascript">
-      ...
-    </script>
+  $style = Quiq::JavaScript->script($h,'inline:js/script.css');
+  =>
+  <script type="text/javascript">
+    ...
+  </script>
 
 Code direkt einfügen:
 
-    $style = Quiq::JavaScript->script($h,q|
-        ...
-    |);
-    =>
-    <script type="text/javascript">
+  $style = Quiq::JavaScript->script($h,q|
       ...
-    </script>
+  |);
+  =>
+  <script type="text/javascript">
+    ...
+  </script>
 
 Mehrere Code-Spezifikationen:
 
-    $style = Quiq::JavaScript->script(
-        '...'
-        '...'
-    );
+  $style = Quiq::JavaScript->script(
+      '...'
+      '...'
+  );
 
 Mehrere Code-Spezifikationen via Arrayreferenz:
 
-    $style = Quiq::JavaScript->script(
-        ['...','...']
-    );
+  $style = Quiq::JavaScript->script(
+      ['...','...']
+  );
 
 Dies ist nützlich, wenn die Spezifikation von einem Parameter
 einer umgebenden Methode kommt.
@@ -255,7 +255,7 @@ sub script {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 

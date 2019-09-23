@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.209';
+our $VERSION = '2.210';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,15 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.209
-
-=head1 BACKWARD INCOMPATIBLE CHANGES
-
-Backward incompatible changes introduced with C<2.200>:
-
-Perl minimum version is now C<5.10.1> instead of C<5.8.3>.
-
-New L<Plugin API|App::DBBrowser::DB>.
+Version 2.210
 
 =head1 SYNOPSIS
 
@@ -1054,6 +1046,14 @@ If I<Dir history> is set to C<1> and a directory has already been saved, the dir
 
 To find out the location of the configuration files call C<db-browser -h> and choose I<Path>. The data is saved in JSON
 format.
+
+=head1 BACKWARD INCOMPATIBLE CHANGES
+
+Backward incompatible changes introduced with C<2.200>:
+
+Perl minimum version is now C<5.10.1> instead of C<5.8.3>.
+
+New L<Plugin API|App::DBBrowser::DB>.
 
 =head1 REQUIREMENTS
 

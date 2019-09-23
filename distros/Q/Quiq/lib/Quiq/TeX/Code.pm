@@ -1,11 +1,11 @@
 package Quiq::TeX::Code;
 use base qw/Quiq::Hash/;
 
+use v5.10;
 use strict;
 use warnings;
-use v5.10.0;
 
-our $VERSION = '1.157';
+our $VERSION = '1.158';
 
 use Quiq::Option;
 use Scalar::Util ();
@@ -39,7 +39,7 @@ TeX-Code erzeugt werden.
 
 =head4 Synopsis
 
-    $t = $class->new;
+  $t = $class->new;
 
 =head4 Description
 
@@ -62,7 +62,7 @@ sub new {
 
 =head4 Synopsis
 
-    $code = $t->c($fmt,@args,@opts);
+  $code = $t->c($fmt,@args,@opts);
 
 =head4 Arguments
 
@@ -106,26 +106,26 @@ Erzeuge eine TeX Codezeile und liefere das Resultat zurück.
 
 B<Makro mit Option und Parameter>
 
-    $documentClass = 'article';
-    $fontSize = '12pt';
-    ...
-    $t->c('\documentclass[%s]{%s}',$fontSize,$documentClass);
+  $documentClass = 'article';
+  $fontSize = '12pt';
+  ...
+  $t->c('\documentclass[%s]{%s}',$fontSize,$documentClass);
 
 produziert
 
-    \documentclass[12pt]{article}\n
+  \documentclass[12pt]{article}\n
 
 B<Expansion von Array-Parameter>
 
-    my @opt;
-    push @opt,'labelsep=colon';
-    push @opt,'labelfont=bf';
-    push @opt,'skip=1.5ex';
-    $t->c('\usepackage[%s]{caption}',\@opt);
+  my @opt;
+  push @opt,'labelsep=colon';
+  push @opt,'labelfont=bf';
+  push @opt,'skip=1.5ex';
+  $t->c('\usepackage[%s]{caption}',\@opt);
 
 produziert
 
-    \usepackage[labelsep=colon,labelfont=bf,skip=1.5ex]{caption}
+  \usepackage[labelsep=colon,labelfont=bf,skip=1.5ex]{caption}
 
 =cut
 
@@ -165,7 +165,7 @@ sub c {
 
 =head4 Synopsis
 
-    $code = $t->ci($fmt,@args,@opts);
+  $code = $t->ci($fmt,@args,@opts);
 
 =head4 Arguments
 
@@ -208,19 +208,19 @@ Methodennamen steht für "inline".
 
 B<< Vergleich von $t->ci(), sprintf(), $t->c() >>
 
-    $t->ci('\thead[%sb]{%s}','c','Ein Text');
+  $t->ci('\thead[%sb]{%s}','c','Ein Text');
 
 ist identisch zu
 
-    sprintf '\thead[%sb]{%s}','c','Ein Text';
+  sprintf '\thead[%sb]{%s}','c','Ein Text';
 
 ist identisch zu
 
-    $t->c('\thead[%sb]{%s}','c','Ein Text',-nl=>0);
+  $t->c('\thead[%sb]{%s}','c','Ein Text',-nl=>0);
 
 und produziert
 
-    \thead[cb]{Ein Text}
+  \thead[cb]{Ein Text}
 
 =cut
 
@@ -239,7 +239,7 @@ sub ci {
 
 =head4 Synopsis
 
-    $code = $t->macro($name,@args);
+  $code = $t->macro($name,@args);
 
 =head4 Options
 
@@ -280,70 +280,70 @@ Parameter vollständig weggelassen werden.
 
 B<Macro ohne Argumente>
 
-    $t->macro('\LaTeX');
+  $t->macro('\LaTeX');
 
 produziert
 
-    \LaTeX
+  \LaTeX
 
 B<Kommando mit undefiniertem Argument>
 
-    $t->macro('\LaTeX',-p=>undef);
+  $t->macro('\LaTeX',-p=>undef);
 
 produziert
 
-    \LaTeX
+  \LaTeX
 
 B<Macro mit Leerstring-Argument >
 
-    $t->macro('\LaTeX',-p=>'');
+  $t->macro('\LaTeX',-p=>'');
 
 produziert
 
-    \LaTeX{}
+  \LaTeX{}
 
 B<Macro mit leerer Optionsliste und Parameter>
 
-    @opt = ();
-    $t->macro('\documentclass',-o=>\@opt,-p=>'article');
+  @opt = ();
+  $t->macro('\documentclass',-o=>\@opt,-p=>'article');
 
 produziert
 
-    \documentclass{article}
+  \documentclass{article}
 
 B<Macro mit Opton und Parameter>
 
-    $t->macro('\documentclass',
-        -o => '12pt',
-        -p => 'article',
-    );
+  $t->macro('\documentclass',
+      -o => '12pt',
+      -p => 'article',
+  );
 
 produziert
 
-    \documentclass[12pt]{article}
+  \documentclass[12pt]{article}
 
 B<Macro mit Parameter und mehreren Optionen (Variante 1)>
 
-    $t->macro('\documentclass',
-        -o => 'a4wide,12pt',
-        -p => 'article',
-    );
+  $t->macro('\documentclass',
+      -o => 'a4wide,12pt',
+      -p => 'article',
+  );
 
 produziert
 
-    \documentclass[a4wide,12pt]{article}
+  \documentclass[a4wide,12pt]{article}
 
 B<Macro mit Parameter und mehreren Optionen (Variante 2)>
 
-    @opt = ('a4wide','12pt');
-    $t->macro('\documentclass',
-        -o => \@opt,
-        -p => 'article',
-    );
+  @opt = ('a4wide','12pt');
+  $t->macro('\documentclass',
+      -o => \@opt,
+      -p => 'article',
+  );
 
 produziert
 
-    \documentclass[a4wide,12pt]{article}
+  \documentclass[a4wide,12pt]{article}
 
 =cut
 
@@ -413,7 +413,7 @@ sub macro {
 
 =head4 Synopsis
 
-    $code = $l->comment($text,@opt);
+  $code = $l->comment($text,@opt);
 
 =head4 Options
 
@@ -438,12 +438,12 @@ zurück.
 
 B<Kommentar erzeugen>
 
-    $l->comment("Dies ist\nein Kommentar");
+  $l->comment("Dies ist\nein Kommentar");
 
 produziert
 
-    % Dies ist
-    % ein Kommentar
+  % Dies ist
+  % ein Kommentar
 
 =cut
 
@@ -482,7 +482,7 @@ sub comment {
 
 =head4 Synopsis
 
-    $newLength = $l->modifyLength($length,$expr);
+  $newLength = $l->modifyLength($length,$expr);
 
 =head4 Arguments
 
@@ -511,8 +511,8 @@ unverändert geliefert.
 
 =head4 Example
 
-    $l->modifyLength('1.5ex','*1.5');
-    # 2.25ex
+  $l->modifyLength('1.5ex','*1.5');
+  # 2.25ex
 
 =cut
 
@@ -543,7 +543,7 @@ sub modifyLength {
 
 =head4 Synopsis
 
-    $length = $this->toLength($val);
+  $length = $this->toLength($val);
 
 =head4 Arguments
 
@@ -563,23 +563,23 @@ TeX-Länge (String)
 
 Keine Angabe:
 
-    $class->toLength(undef);
-    # undef
+  $class->toLength(undef);
+  # undef
 
 Angabe in Pixeln ohne Einheit:
 
-    $class->toLength(100);
-    # '75pt'
+  $class->toLength(100);
+  # '75pt'
 
 Angabe in Pixeln mit Einheit:
 
-    $class->toLength('100px');
-    # '75pt'
+  $class->toLength('100px');
+  # '75pt'
 
 Alle anderen Werte bleiben unverändert:
 
-    $class->toLength($val);
-    # $val
+  $class->toLength($val);
+  # $val
 
 =cut
 
@@ -603,7 +603,7 @@ sub toLength {
 
 =head1 VERSION
 
-1.157
+1.158
 
 =head1 AUTHOR
 
