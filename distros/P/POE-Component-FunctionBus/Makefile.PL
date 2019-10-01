@@ -4,22 +4,47 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-    NAME             => 'POE::Component::FunctionBus',
-    AUTHOR           => q{Paul G Webster <daemon@cpan.org>},
-    VERSION_FROM     => 'lib/POE/Component/FunctionBus.pm',
-    ABSTRACT_FROM    => 'lib/POE/Component/FunctionBus.pm',
-    LICENSE          => 'bsd',
-    MIN_PERL_VERSION => '5.006',
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
-    },
-    TEST_REQUIRES => {
-        'Test::More' => '0',
+    NAME                => 'POE::Component::FunctionBus',
+    VERSION_FROM        => 'lib/POE/Component/FunctionBus.pm',
+    ABSTRACT            => 'lib/POE/Component/FunctionBus.pm',
+    AUTHOR              => q{Paul G Webster <daemon@cpan.org>},
+    LICENSE             => 'bsd',
+    META_MERGE   => {
+        dynamic_config  => 0,
+        'meta-spec'     => {
+            version         =>  2
+        },
+        no_index        => {
+            directory       => [qw(examples t)],
+        },
+        prereqs         => {
+            runtime         => {
+                requires        => {
+                    perl            =>  '5.0244'
+                }
+            }
+        },
+        resources => {
+            bugtracker => {
+                web => 'https://github.com/PaulGWebster/p5-POE-Component-FunctionBus/issues'
+            },
+            homepage   => 'https://github.com/PaulGWebster/p5-POE-Component-FunctionBus',
+            license    => [
+                'https://opensource.org/licenses/BSD-3-Clause'
+            ],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/PaulGWebster/p5-POE-Component-FunctionBus.git',
+                web  => 'https://github.com/PaulGWebster/p5-POE-Component-FunctionBus',
+            },
+            x_IRC => 'irc://irc.freenode.net/#perl'
+        },
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'POE'   =>  '1.367'
     },
+    EXE_FILES => [],
+    test      => {TESTS => 't/*.t t/*/*.t'},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'POE-Component-FunctionBus-*' },
 );

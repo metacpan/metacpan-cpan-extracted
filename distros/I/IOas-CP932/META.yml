@@ -3,14 +3,13 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: IOas-CP932
-version: 0.07
+version: 0.08
 abstract: provides CP932 I/O subroutines for UTF-8 script
 author:
   - ina <ina@cpan.org>
 license: perl
 generated_by: pmake.bat
 requires:
-  Encode: 0
   ExtUtils::MakeMaker: 5.4302
   File::Basename: 2.6
   File::Copy: 2.02

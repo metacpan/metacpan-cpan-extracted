@@ -12,6 +12,7 @@ t/lib/ErrorLocation.pm
 t/lib/InlineModule.pm
 t/lib/ThreadsCheck.pm
 t/quotify-5.6.t
+t/quotify-no-hex.t
 t/quotify.t
 t/sub-defer-no-subname.t
 t/sub-defer-threads.t

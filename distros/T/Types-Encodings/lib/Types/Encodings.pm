@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Encodings::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Encodings::VERSION   = '0.002';
+	$Types::Encodings::VERSION   = '0.003';
 }
 
 use Type::Library -base, -declare => qw( Str Bytes Chars );
@@ -21,12 +21,12 @@ declare Str,
 declare Bytes,
 	as Str,
 	where     { !utf8::is_utf8($_) },
-	inline_as { "!utf8::is_utf8($_)" };
+	inline_as { sprintf '(%s) && %s', Str->inline_check($_), "!utf8::is_utf8($_)" };
 
 declare Chars,
 	as Str,
 	where     { utf8::is_utf8($_) or $_ =~ $Types::Encodings::SevenBitSafe },
-	inline_as { "utf8::is_utf8($_) or $_ =~ \$Types::Encodings::SevenBitSafe" };
+	inline_as { sprintf '(%s) && (%s)',  Str->inline_check($_), "utf8::is_utf8($_) or $_ =~ \$Types::Encodings::SevenBitSafe" };
 
 declare_coercion Decode => to_type Chars, {
 	coercion_generator => sub {
@@ -128,7 +128,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

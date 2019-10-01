@@ -50,6 +50,9 @@ SYNOPSIS
       
         # parse single record from string
         my $record = pica_parser('plain', \"...")->next;
+    
+        # guess parser from input string
+        my $parser = pica_guess($string)->new(\$string);
 
 DESCRIPTION
 
@@ -105,6 +108,11 @@ FUNCTIONS
       * PICA::Parser::XML for type xml or picaxml (PICA-XML)
 
       * PICA::Parser::PPXML for type ppxml (PicaPlus-XML)
+
+ pica_guess( $data )
+
+    Guess PICA serialization format from input data. Returns name of the
+    corresponding parser class or undef.
 
  pica_xml_struct( $xml, %options )
 
@@ -206,6 +214,10 @@ METHODS
 
         pica_writer( xml => $file )->write( $record );
         $record->write( xml => $file ); # equivalent if $record is blessed 
+
+ string( [ $type ] )
+
+    Serialize PICA record in a given format (plain by default).
 
 CONTRIBUTORS
 

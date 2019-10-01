@@ -4,10 +4,9 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{IOas::SJIS2004},
-    'VERSION'   => q{0.07},
+    'VERSION'   => q{0.08},
     'ABSTRACT'  => q{provides SJIS2004 I/O subroutines for UTF-8 script},
     'PREREQ_PM' => {
-        'Encode' => '0',
         'ExtUtils::MakeMaker' => '5.4302',
         'File::Basename' => '2.6',
         'File::Copy' => '2.02',

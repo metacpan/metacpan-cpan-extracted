@@ -34,7 +34,7 @@
          "requires" : {
             "HTTP::Request" : "0",
             "HTTP::Status" : "0",
-            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "0",
             "Scalar::Util" : "0",
             "Test::More" : "0",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/markov2/perl5-Net-OAuth2"
       }
    },
-   "version" : "0.65",
+   "version" : "0.66",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 
 =encoding utf8
 
@@ -13,13 +13,20 @@ our $VERSION = '1.005'; # VERSION
 
 Ryu::Observable - plus ça change
 
+=head1 SYNOPSIS
+
+ # Set initial value
+ my $observed = Ryu::Observable->new(123)
+   # and a callback for any changes
+   ->subscribe(sub { print "New value, is now: $_\n" });
+ # Basic numeric increment/decrement should trigger a notification
+ ++$observed;
+ # To assign a new value, use ->set_numeric or ->set_string
+ $observed->set_numeric(88);
+
 =head1 DESCRIPTION
 
-This is by way of being a thing that lets you set up subscriptions on things
-so that you can be notified when said things are in some way not the same as
-the things they used to be, but are indeed now possessed of some detectable
-difference which may be of relevance to the thing that makes use of this thing
-which notifies as per the aforementioned conditions.
+Simple monitorable variables.
 
 =cut
 
@@ -30,6 +37,9 @@ use overload
     '--'   => sub { my $v = --$_[0]->{value}; $_[0]->notify_all; $v },
     'bool' => sub { !!shift->{value} },
     fallback => 1;
+
+use Scalar::Util;
+use List::UtilsBy;
 
 =head1 METHODS
 
@@ -85,12 +95,9 @@ Removes an existing callback.
 =cut
 
 sub unsubscribe {
-    use Scalar::Util qw(refaddr);
-    use List::UtilsBy qw(extract_by);
-    use namespace::clean qw(refaddr extract_by);
     my ($self, @code) = @_;
-    for my $addr (map refaddr($_), @code) {
-        extract_by { refaddr($_) == $addr } @{$self->{subscriptions}};
+    for my $addr (map Scalar::Util::refaddr($_), @code) {
+        List::UtilsBy::extract_by { Scalar::Util::refaddr($_) == $addr } @{$self->{subscriptions}};
     }
     $self
 }
@@ -154,11 +161,9 @@ until the observable is destroyed.
 =cut
 
 sub source {
-    use Scalar::Util qw(weaken);
-    use namespace::clean qw(weaken);
     my ($self) = @_;
     my $src = Ryu::Source->new;
-    weaken(my $copy = $self);
+    Scalar::Util::weaken(my $copy = $self);
     $self->subscribe(my $code = sub {
         return unless my $self = $copy;
         $src->emit($self->value)

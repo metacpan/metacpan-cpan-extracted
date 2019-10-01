@@ -1,0 +1,27 @@
+=head1 OBJECT LAYOUT
+
+    +----------------------------------+
+    | WWW::Mechanize::Chrome ("$mech") |
+    +----------------------------------+
+          |
+          ->driver
+          +----------------------------------+
+          | Chrome::DevToolsProtocol::Target |
+          +----------------------------------+
+          |
+          ->transport
+          +-----------------------------+
+          | Chrome::DevToolsProtocol    |
+          +-----------------------------+
+          |
+          ->transport
+          +-----------------------------------------------+
+          | Chrome::DevToolsProtocol::Transport::Pipe     |
+          | Chrome::DevToolsProtocol::Transport::NetAsync |
+          | Chrome::DevToolsProtocol::Transport::AnyEvent |
+          | Chrome::DevToolsProtocol::Transport::Mojo     |
+          +-----------------------------------------------+
+          |
+          | (FD 3 and 4)
+          |
+          Chrome executable

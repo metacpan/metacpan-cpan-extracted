@@ -32,3 +32,9 @@ Revision history for Mojolicious::Plugin::ValidateTiny
 
 0.18
         Changes to makefile
+
+1.0.0
+        Use flash instead of stash
+
+1.0.1
+        Replace smartmatch

@@ -25,7 +25,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-Encodings";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-Encodings/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-Encodings/v_0-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-Encodings/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-Encodings/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-Encodings/v_0-003>;
 	doap:repository      [
 		a doap:HgRepository;
 		doap:browse <https://github.com/tobyink/p5-types-encodings>;
@@ -57,6 +57,28 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-Encodings-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-Encodings/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Types-Encodings-0.003"^^xsd:string;
+	dc:issued            "2019-10-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Inlined code didn't check value was a Str.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/cxw>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-types-encodings/issues/1>, <https://github.com/tobyink/p5-types-encodings/issues/2>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-Encodings-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/cxw>
+	a                    foaf:Person;
+	foaf:name            "Christopher White";
+	foaf:nick            "CXW";
+	foaf:page            <https://metacpan.org/author/CXW>.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

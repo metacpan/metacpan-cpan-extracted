@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2019.08";
+$Acme::Glue::VERSION = "2019.10";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2019.08
+2019.10
 
 =head1 DESCRIPTION
 
@@ -27,15 +27,40 @@ fond of for whatever reason
 
 Here are the snippets that accompany the photo project
 
-=head2 LEEJO
+=head2 LEEJO (transform.pl)
 
+    #!/usr/bin/env perl
+    #
     # transform an array of hashes into an array of arrays where each array
     # contains the values from the hash sorted by the original hash keys or
     # the passed order of columns (hash slicing)
-    my @field_data = $column_order
-        ? map { [ @$_{ @{ $column_order } } ] } @{ $data }
-        : map { [ @$_{sort keys %$_} ] } @{ $data };
+    my @ordered = $column_order
+        ? map { [ @$_{ @{ $column_order } } ] } @{ $chaos }
+        : map { [ @$_{sort keys %$_} ] } @{ $chaos };
 
+=head2 LEEJO (hopscotch.p6)
+
+    #!/usr/bin/env perl6
+
+    my @court = (
+        [ 'FIN' ],
+        [ 9 ,10 ],
+        [   8   ],
+        [ 6 , 7 ],
+        [   5   ],
+        [   4   ],
+        [ 2 , 3 ],
+        [   1   ],
+    );
+
+    my $skip = @court.[1..*].pick.pick;
+    my @play;
+
+    for @court.reverse -> $hop {
+        @play.push( $hop.map( *.subst( /^$skip$/,'🚫' ).list ) );
+    }
+
+    say @play.reverse.join( "\n" );
 
 =head1 THANKS
 

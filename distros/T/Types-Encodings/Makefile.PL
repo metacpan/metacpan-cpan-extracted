@@ -4,41 +4,42 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "type constraints for Bytes and Chars",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Types-Encodings",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { "perl" => 5.008001, "Type::Library" => 0.004 } },
-                        test => { requires => { "Test::More" => 0.96, "Test::TypeTiny" => 0 } },
-                      },
-  "provides"       => {
-                        "Types::Encodings" => { file => "lib/Types/Encodings.pm", version => 0.002 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Types-Encodings",
-                                        },
-                        homepage     => "https://metacpan.org/release/Types-Encodings",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "hg",
-                                          url  => "git://github.com/tobyink/p5-types-encodings.git",
-                                          web  => "https://github.com/tobyink/p5-types-encodings",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Types-Encodings/project",
-                      },
-  "version"        => 0.002,
+  "abstract"         => "type constraints for Bytes and Chars",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Types-Encodings",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => { requires => { "perl" => 5.008001, "Type::Library" => 0.004 } },
+                          test => { requires => { "Test::More" => 0.96, "Test::TypeTiny" => 0 } },
+                        },
+  "provides"         => {
+                          "Types::Encodings" => { file => "lib/Types/Encodings.pm", version => 0.003 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Types-Encodings",
+                                          },
+                          homepage     => "https://metacpan.org/release/Types-Encodings",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "hg",
+                                            url  => "git://github.com/tobyink/p5-types-encodings.git",
+                                            web  => "https://github.com/tobyink/p5-types-encodings",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-Encodings/project",
+                        },
+  "version"          => 0.003,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

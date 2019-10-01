@@ -2,7 +2,7 @@ package PICA::Writer::Plain;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use charnames qw(:full);
 

@@ -7,9 +7,9 @@ use Test::More;
 use Log::Log4perl qw(:easy);
 
 use WWW::Mechanize::Chrome;
-use lib '.';
 use Test::HTTP::LocalServer;
 
+use lib '.';
 use t::helper;
 
 Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
@@ -18,6 +18,8 @@ my @instances = t::helper::browser_instances();
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
     exit
+} elsif ( $^O =~ /mswin/i ) {
+    plan skip_all => "Pipes are currently unsupported on $^O";
 } else {
     plan tests => 2*@instances;
 };

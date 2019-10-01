@@ -84,6 +84,7 @@ around '_get_default_template_vars' => sub {
   my $c = RapidApp->active_request_context;
   
   my $template = join('/',@args);
+  my $recaptcha_config = $self->BlogCfg->{recaptcha_config};
   
   my $vars = {
     %{ $self->$orig(@args) },
@@ -131,6 +132,14 @@ around '_get_default_template_vars' => sub {
     # Expose this here so its available to non-priv templates:
     mount_url => sub { $c->mount_url },
     
+    accessed_site => sub {
+      $c && $c->req or return undef;
+      my $uri = $c->req->uri or return undef;
+      my $host = $c->req->env->{HTTP_HOST} || $uri->host_port;
+      my $proto = $c->req->env->{HTTP_X_FORWARDED_PROTO} || $uri->scheme || 'http';
+      join('',$proto,'://',$host)
+    },
+    
     local_info => sub {
       my $new     = shift;
       
@@ -148,7 +157,22 @@ around '_get_default_template_vars' => sub {
       }
 
       $err
-    }
+    },
+    
+    recaptcha_script_tag => sub {
+      $recaptcha_config
+        ? '<script src="https://www.google.com/recaptcha/api.js" async defer></script>'
+        : ''
+    },
+    
+    recaptcha_form_item => sub {
+      $recaptcha_config
+        ? join('',
+          '<div class="g-recaptcha" data-sitekey="',
+          $recaptcha_config->{public_key},
+          '"></div>'
+        ) : ''
+    },
     
     
   };

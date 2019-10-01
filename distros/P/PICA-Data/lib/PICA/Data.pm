@@ -2,15 +2,15 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
-    pica_values pica_value pica_fields pica_holdings pica_items);
+    pica_values pica_value pica_fields pica_holdings pica_items pica_guess);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]); 
 
 our $ILN_PATH = PICA::Path->new('101@a');
-our $EPN_PATH = PICA::Path->new('203@/**0');
+our $EPN_PATH = PICA::Path->new('203@/..0');
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype blessed);
@@ -156,6 +156,24 @@ sub pica_path {
     PICA::Path->new(@_)
 }
 
+sub pica_guess {
+    my ($pica) = @_;
+
+    my $format = '';
+    my %count  = (
+        ''       => 0,
+        'Plain'  => ( $pica =~ tr/$// ),
+        'Plus'   => ( $pica =~ tr/\x{0A}// ),
+        'Binary' => ( $pica =~ tr/\x{1D}// ),
+        'XML'    => ( $pica =~ tr/<// ),
+    );
+    $count{$_} > $count{$format} and $format = $_ for grep {$_} keys %count;
+
+    $format = 'PPXML' if $format eq 'XML' and $pica =~ qr{xmlns/ppxml-1\.0};
+
+    $format ? "PICA::Parser::$format" : undef;
+}
+
 sub _pica_module {
     my $base = shift;
     my $type = lc(shift) // '';
@@ -279,6 +297,9 @@ PICA::Data - PICA record processing
     # parse single record from string
     my $record = pica_parser('plain', \"...")->next;
 
+    # guess parser from input string
+    my $parser = pica_guess($string)->new(\$string);
+
 =head1 DESCRIPTION
 
 PICA::Data provides methods, classes, and functions to process
@@ -344,6 +365,11 @@ L<PICA::Parser::XML> for type C<xml> or C<picaxml> (PICA-XML)
 L<PICA::Parser::PPXML> for type C<ppxml> (PicaPlus-XML)
 
 =back
+
+=head2 pica_guess( $data )
+
+Guess PICA serialization format from input data. Returns name of the
+corresponding parser class or C<undef>.
 
 =head2 pica_xml_struct( $xml, %options )
 
@@ -454,11 +480,15 @@ where the C<_id> of each record contains the EPN (subfield C<203@/**0>).
 =head2 write( [ $type [, @options] ] | $writer )
 
 Write PICA record with given L<PICA::Writer::Base|PICA::Writer::> or
-PICA::Writer::Plain by default. This method is a shortcut for blessed
+L<PICA::Writer::Plain> by default. This method is a shortcut for blessed
 record objects:
 
     pica_writer( xml => $file )->write( $record );
     $record->write( xml => $file ); # equivalent if $record is blessed 
+
+=head2 string( [ $type ] )
+
+Serialize PICA record in a given format (C<plain> by default).
 
 =head1 CONTRIBUTORS
 

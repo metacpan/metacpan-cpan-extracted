@@ -11,8 +11,10 @@ t/lib/BrokenModule.pm
 t/lib/FalseModule.pm
 t/lib/TrackLoad.pm
 t/load-module.t
+t/make-role.t
 t/method-conflicts.t
 t/overload.t
+t/proto.t
 t/role-basic-basic.t
 t/role-basic-bugs.t
 t/role-basic-composition.t
@@ -23,6 +25,7 @@ t/role-tiny-composition.t
 t/role-tiny-with.t
 t/role-tiny.t
 t/role-with-inheritance.t
+t/stub.t
 t/subclass.t
 xt/around-does.t
 xt/compose-modifiers.t

@@ -54,6 +54,8 @@
     For security, the link will only work once and expire within a few minutes.
     </p>
     <br>
+    
+    [% recaptcha_script_tag %]<br>
 
     <form 
       action="[% remote_action_path %]/email_login?using=local_info" 
@@ -73,6 +75,13 @@
         <!--
         <label for="remember" class="left"><input type="checkbox" id="remember"> Remember me</label>
         -->
+        
+        [% IF recaptcha_form_item %]
+          <div style="float: right; padding-bottom:10px;">
+            [% recaptcha_form_item %]
+          </div>
+        [% END %]
+        
         <input 
           type="submit" class="button small radius right black" 
           value="Send one-time login link"

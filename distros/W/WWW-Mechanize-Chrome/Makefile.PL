@@ -46,18 +46,22 @@ my %module = (
     PREREQ_PM => {
         'Exporter'           => 5, # for 'import'
         'POSIX'              => 0, # for 'setsid' on POSIXish systems
+        'IPC::Open3'         => 0, # for IPC on Windows
         'File::Spec'         => 0,
 
         'Filter::signatures' => '0.09',
         'Carp'               => 0,
         'Future'             => '0.35', # Some smokers have 0.25 which lacks many features
         'Try::Tiny'          => 0,
-        # This actually is optional
+        'PerlX::Maybe'       => 0, # nicer syntax for optional parameters
         # You need one of the following event loops:
         # AnyEvent, IO::Async, Mojolicious
+        # AnyEvent is the traditional default but it is tested with all three
         'AnyEvent'           => 0,
         'AnyEvent::Future'   => 0,
         'AnyEvent::WebSocket::Client' => 0,
+        #'IO::Async'          => 0, # the pipe handling is tied to IO::Async
+        #'Net::Async::WebSocket' => 0,
 
         # This is a developer-only prerequisite, but oh well
         'Algorithm::Loops'   => 0,
@@ -94,6 +98,8 @@ my %module = (
         'Test::HTTP::LocalServer' => 0.61, # we want the improved IPC
         'URI'          => 0,
         'URI::file'    => 0,
+        'Test::Memory::Cycle' => 0,
+        'Time::HiRes'  => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

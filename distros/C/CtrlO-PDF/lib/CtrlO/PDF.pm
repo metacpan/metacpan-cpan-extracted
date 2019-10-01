@@ -12,7 +12,7 @@ use PDF::API2;
 use PDF::Table;
 use PDF::TextBlock;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME 
 
@@ -24,7 +24,7 @@ CtrlO::PDF - high level PDF creator
   use Text::Lorem;
 
   my $pdf = CtrlO::PDF->new(
-      logo        => "logo.png",
+      logo        => "logo.png", # optional
       orientation => "portrait", # Default
       footer      => "My PDF document footer",
   );
@@ -317,6 +317,7 @@ has logo_height => (
 
 sub _build_logo_height
 {   my $self = shift;
+    return 0 if !$self->_logo_info;
     $self->_logo_info->{height} * $self->logo_scaling;
 }
 
@@ -326,6 +327,7 @@ has logo_width => (
 
 sub _build_logo_width
 {   my $self = shift;
+    return 0 if !$self->_logo_info;
     $self->_logo_info->{width} * $self->logo_scaling;
 }
 
@@ -335,6 +337,7 @@ has _logo_info => (
 
 sub _build__logo_info
 {   my $self = shift;
+    return if !$self->logo;
     image_info($self->logo);
 }
 
@@ -417,8 +420,11 @@ sub text
     if ($self->is_new_page)
     {
         $self->_down($size);
-        $self->_down($self->logo_height);
-        $self->_down($self->logo_padding);
+        if ($self->logo)
+        {
+            $self->_down($self->logo_height);
+            $self->_down($self->logo_padding);
+        }
         $self->_set_is_new_page(0);
     }
 

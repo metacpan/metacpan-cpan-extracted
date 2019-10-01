@@ -4,7 +4,7 @@ author:
   - 'Henry Van Styn <vanstyn@cpan.org>'
 build_requires:
   Catalyst: 0
-  Catalyst::Runtime: 5.90118
+  Catalyst::Runtime: 5.90124
   HTTP::Headers::Util: 6.03
   HTTP::Request::Common: 6.04
   LWP::UserAgent: 6.02
@@ -47,7 +47,7 @@ requires:
   Catalyst::Plugin::Session::State::Cookie: 0.17
   Catalyst::Plugin::Session::Store::DBIC: 0.14
   Catalyst::Plugin::SimpleCAS: 1.001
-  Catalyst::Runtime: 5.90118
+  Catalyst::Runtime: 5.90124
   Catalyst::ScriptRunner: 0
   Catalyst::Test: 0
   Catalyst::Utils: 0
@@ -167,7 +167,7 @@ resources:
   bugtracker: https://github.com/vanstyn/RapidApp/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/RapidApp.git
-version: 1.3105
+version: 1.3106
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
   - 'Torsten Raudssus <torsten@raudss.us>'

@@ -6,7 +6,7 @@ use File::Basename 'basename';
 use Sys::Syslog qw(:standard :macros);
 use Carp;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 sub new {
     my $class = shift;
@@ -24,9 +24,9 @@ sub new {
 }
 
 sub debug { shift->_syslog(debug => LOG_DEBUG => @_) }
-sub warn  { shift->_syslog(warn  => LOG_WARN  => @_) }
+sub warn  { shift->_syslog(warn  => LOG_WARNING => @_) }
 sub info  { shift->_syslog(info  => LOG_INFO  => @_) }
-sub error { shift->_syslog(error => LOG_ERROR => @_) }
+sub error { shift->_syslog(error => LOG_ERR   => @_) }
 sub fatal { shift->_syslog(fatal => LOG_CRIT  => @_) }
 
 sub _syslog {

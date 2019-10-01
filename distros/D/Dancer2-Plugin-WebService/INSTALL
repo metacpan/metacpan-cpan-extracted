@@ -64,15 +64,17 @@ If you have a firewall you should create a rule for the listening port e.g. at R
 	firewall-cmd --reload
 	firewall-cmd --list-all
 
-If you are running the service as user dancer, and want to want to use an authentication method that needs root, add dancer user to sudoers e.g.
+
+If you are running the service as user dancer, and want to want to use an authentication method that needs root privileges
+make sudoers groups to run any command, and the user to the wheel group e.g.
 
 	vi /etc/sudoers
 
-		#includedir /etc/sudoers.d
+		%wheel ALL=(ALL) NOPASSWD: ALL
 
-	vi /etc/sudoers.d/WebService
+	usermod -aG wheel dancer
 
-		dancer ALL=NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
+
 
 Make sure the authorization scripts are executable
 
@@ -134,53 +136,58 @@ Configure your application settings, changing the values to your needs
 vi /opt/TestService/config.yml
 
 
-# enviroment related settings should go to /environments yml files
 
-version                 : 4.1.3
-environment             : production
-charset                 : UTF-8
+
+
+# Enviroment settings are at   environments/*.yml
+
+version                 : 3.0.0
+environment             : development
 plugins                 :
   WebService            :
-    Owner               : dancer Lunchbucket, dancer.Lunchbucket@example.com
-    Session directory   : /var/lib/WebService
-    Session idle timout : 3600
     Default format      : json
+    Session directory   : /var/lib/WebService
+    Session idle timeout: 86400
     Routes              :
-      INeedLogin        : private
-      summer            : public
-      winter            : public
+      mirror            : { Protected: false }
+      somekeys          : { Protected: false }
+      data1             : { Protected: false }
+      data3             : { Protected: false }
+      INeedLogin_store  : { Protected: true, Groups: [ ftp , storage ] }
+      INeedLogin_delete : { Protected: true, Groups: log }
+      INeedLogin_read   : { Protected: true }
 
     Allowed hosts:
     - 127.*
     - 10.*
-    - 172.??.?.*
+    - 172.16.?.*
     - 192.168.1.23
-    - 4.?.?.??
-    - ????:????:????:6d00:20c:29ff:*:ffa3
+    - "????:????:????:6d00:20c:29ff:*:ffa3"
     - "*"
 
     Authentication methods:
-    - Name     : simple
-      Active   : yes
-      Command  : INTERNAL
+    - Name     : INTERNAL
+      Active   : false
       Accounts :
-        <any>  : secret4all
-        user1  : <any>		
-        user2  : pass2
+        user1  : pass1
+        user2  : <any>
+        <any>  : Secret4All
 
-    - Name      : Linux native users
-      Active    : false
-      Command   : MODULE_INSTALL_DIR/AuthScripts/LinuxNative.pl
-      Arguments : [ ]
-      Groups    : [root, ldap , gluster , ceph]
-      Use sudo  : true
+    - Name     : Linux native users
+      Active   : true
+      Command  : MODULE_INSTALL_DIR/AuthScripts/linux.sh
+      Arguments: [ ]
+      Use sudo : true
 
-    - Name      : Basic Apache auth for simple users
-      Active    : true
-      Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
-      Arguments : [ "/etc/htpasswd" ]
-      Groups    : [ ]
-      Use sudo  : no
+    - Name     : Basic Apache auth for simple users
+      Active   : false
+      Command  : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
+      Arguments: [ "/etc/htpasswd" ]
+      Use sudo : false
+
+
+
+
 
 
 Write your rest service code at   /opt/TestService/lib/TestService.pm   e.g.
@@ -325,4 +332,4 @@ start the application manual
 quick test
 
 	ss -tln 'sport = :3000'
-	curl -X GET http://localhost:3000/WebService?to=human
+	curl -X GET http://localhost:3000/WebService

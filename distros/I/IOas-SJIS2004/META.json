@@ -1,6 +1,6 @@
 {
     "name" : "IOas-SJIS2004",
-    "version" : "0.07",
+    "version" : "0.08",
     "abstract" : "provides SJIS2004 I/O subroutines for UTF-8 script",
     "author" : [
         "ina <ina@cpan.org>"
@@ -26,7 +26,6 @@
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Encode" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -43,7 +42,6 @@
         },
         "configure" : {
             "requires" : {
-                "Encode" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -60,7 +58,6 @@
         },
         "runtime" : {
             "requires" : {
-                "Encode" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",

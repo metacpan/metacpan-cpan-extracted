@@ -1,5 +1,9 @@
 Revision history for CtrlO::PDF
 
+0.04 Tue Oct 1 2019
+
+    * Fix uninitialized value warning when no logo specified (thanks Mike West)
+
 0.03 Fri Apr 26 2019
 
     * Another attempt to add the missing font files

@@ -4,5 +4,7 @@ Makefile.PL
 MANIFEST
 README.md
 t/glue.t
+snippets/LEEJO/hopscotch.p6
+snippets/LEEJO/transform.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

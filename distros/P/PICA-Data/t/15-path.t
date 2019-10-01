@@ -5,18 +5,18 @@ use PICA::Path;
 use constant SF => qr{[_A-Za-z0-9]};
 
 my %pathes = (
-    '003*$abc'      => [ [ qr{003.}, undef, qr{[abc]} ] => '003*$abc' ],
-    '003*abc'       => [ [ qr{003.}, undef, qr{[abc]} ] => '003*$abc' ],
+    '003.$abc'      => [ [ qr{003.}, undef, qr{[abc]} ] => '003.$abc' ],
+    '003.abc'       => [ [ qr{003.}, undef, qr{[abc]} ] => '003.$abc' ],
     '001B$0'        => [ [ qr{001B}, undef, qr{[0]} ] ],
-    '123A[0*]/1-3'  => [ [ qr{123A}, qr{0.}, SF, 1, 3 ] ],
+    '123A[0.]/1-3'  => [ [ qr{123A}, qr{0.}, SF, 1, 3 ] ],
     '123+'          => undef,
     '300@'          => undef,
     '003$$'         => undef,
     '123A/-'        => undef,
     '003X/0'        => [ [ qr{003X}, undef, SF, 0, 1 ] => '003X/0' ],
-    '****/10-10'    => [ [ qr{....}, undef, SF, 10, 1 ] => '****/10' ],
-    '****/1-'       => [ [ qr{....}, undef, SF, 1, undef ] => '****/1-' ],
-    '****/0-'       => [ [ qr{....}, undef, SF ] => '****' ],
+    '..../10-10'    => [ [ qr{....}, undef, SF, 10, 1 ] => '..../10' ],
+    '..../1-'       => [ [ qr{....}, undef, SF, 1, undef ] => '..../1-' ],
+    '..../0-'       => [ [ qr{....}, undef, SF ] => '....' ],
 );
 
 foreach my $path (keys %pathes) {
@@ -29,7 +29,7 @@ foreach my $path (keys %pathes) {
     }
 }
 
-is "".PICA::Path->new('003*abc')->stringify(1), '003*abc', 'stringify(1)';
+is "".PICA::Path->new('003.abc')->stringify(1), '003.abc', 'stringify(1)';
 
 my $field = ['123A',undef,_=>'abcdefghijk'];
 my %matches = (

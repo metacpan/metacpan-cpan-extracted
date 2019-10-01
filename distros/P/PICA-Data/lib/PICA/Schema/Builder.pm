@@ -2,7 +2,7 @@ package PICA::Schema::Builder;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);

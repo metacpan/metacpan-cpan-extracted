@@ -86,6 +86,10 @@ sub email_login :Local :Args(0) {
   # Non-posts silently redirect to the home page:
   $c->req->method eq 'POST' or return $c->res->redirect( $c->mount_url );
   
+  Rapi::Blog::Util->opportunistic_recaptcha_verify or return $self->error_response($c,
+    "reCAPTCHA verification required"
+  );
+  
   $c->ra_builder->enable_email_login or return $self->error_response($c,
     "Permission denied - email login is not enabled."
   );
@@ -426,6 +430,11 @@ sub signup :Local :Args(0) {
   unless("$p1" eq "$p2") { 
     $field_errs->{confirm_password}++; 
     push @errs, "Passworrds do not match";
+  }
+  
+  unless(Rapi::Blog::Util->opportunistic_recaptcha_verify) {
+    $field_errs->{'recaptcha'}++; 
+    push @errs, "reCAPTCHA verification required";
   }
   
   my $extra = { field_vals => $p, field_errs => $field_errs };

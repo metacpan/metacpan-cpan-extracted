@@ -150,7 +150,7 @@ subtest 'filter cleanup' => sub {
         my $filtered = $src->filter(
             name => qr/test/
         );
-        is_refcount($filtered, 3, 'has internal copies of chained source on ->completed and for ->{on_item}');
+        is_refcount($filtered, 4, 'has internal copies of chained source on ->completed and for ->{on_item}');
         $src->emit({ name => 'test' })->finish;
         ok($src->completed->is_ready, 'source is marked as ready');
         ok($src->completed->is_ready, 'and so is filtered source');

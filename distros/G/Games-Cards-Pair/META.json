@@ -4,13 +4,13 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Games-Cards-Pair",
    "no_index" : {
@@ -46,15 +46,15 @@
    "provides" : {
       "Games::Cards::Pair" : {
          "file" : "lib/Games/Cards/Pair.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Games::Cards::Pair::Card" : {
          "file" : "lib/Games/Cards/Pair/Card.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Games::Cards::Pair::Params" : {
          "file" : "lib/Games/Cards/Pair/Params.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/manwar/Games-Cards-Pair"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

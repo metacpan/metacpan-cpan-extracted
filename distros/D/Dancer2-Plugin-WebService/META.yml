@@ -1,5 +1,5 @@
 ---
-abstract: 'RESTful Web Services with login, sessions, persistent data, multiple input/output formats, and IP access'
+abstract: 'RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access'
 author:
   - 'George Bouras <george.mpouras@yandex.com>'
 build_requires: {}
@@ -15,7 +15,7 @@ name: Dancer2-Plugin-WebService
 provides:
   Dancer2::Plugin::WebService:
     file: lib/Dancer2/Plugin/WebService.pm
-    version: v4.1.8
+    version: v4.2.0
 requires:
   Dancer2: '0'
   Dancer2::Plugin: '0'
@@ -28,6 +28,6 @@ requires:
   Storable: '0'
   XML::Hash::XS: '0'
   YAML::XS: '0'
-version: 4.1.8
+version: 4.2.0
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

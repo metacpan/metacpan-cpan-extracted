@@ -21,20 +21,22 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious'    => 0,
-        'Validate::Tiny' => 0.984
+        'Mojolicious'       => 0,
+        'Carp'              => 0,
+        'List::Util'        => 0,
+        'Validate::Tiny'    => 0
     },
     META_MERGE   => {
         no_index       => {directory => ['t']},
         resources => {
             bugtracker => {
-                web => 'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny/issues'
+                web => 'https://gitlab.com/AuroraSoftware/Mojolicious-Plugin-Validate-Tiny/issues'
             },
             license    => ['https://opensource.org/licenses/MIT'],
             repository => {
                 type => 'git',
-                url  => 'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny.git',
-                web  => 'https://github.com/crlcu/Mojolicious-Plugin-Validate-Tiny',
+                url  => 'https://gitlab.com/AuroraSoftware/Mojolicious-Plugin-Validate-Tiny.git',
+                web  => 'https://gitlab.com/AuroraSoftware/Mojolicious-Plugin-Validate-Tiny',
             },
         },
     },

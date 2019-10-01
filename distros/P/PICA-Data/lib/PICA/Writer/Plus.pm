@@ -2,7 +2,7 @@ package PICA::Writer::Plus;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use charnames qw(:full);
 
@@ -10,7 +10,7 @@ use parent 'PICA::Writer::Base';
 
 sub SUBFIELD_INDICATOR { "\N{INFORMATION SEPARATOR ONE}" }
 sub END_OF_FIELD       { "\N{INFORMATION SEPARATOR TWO}" }
-sub END_OF_RECORD      { "\N{LINE FEED}"; } # or \N{INFORMATION SEPARATOR THREE}? I would prefer newline separated format
+sub END_OF_RECORD      { "\N{LINE FEED}"; }
 
 sub write_subfield {
     my ($self, $code, $value) = @_;

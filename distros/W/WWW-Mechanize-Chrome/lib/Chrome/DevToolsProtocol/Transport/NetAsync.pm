@@ -1,5 +1,6 @@
 package Chrome::DevToolsProtocol::Transport::NetAsync;
 use strict;
+use Moo 2;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -9,7 +10,7 @@ use IO::Async::Loop;
 use Net::Async::WebSocket::Client;
 Net::Async::WebSocket::Client->VERSION(0.12); # fixes some errors with masked frames
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 NAME
 
@@ -27,18 +28,19 @@ Chrome::DevToolsProtocol::Transport::NetAsync - IO::Async backend for Chrome com
 
 =cut
 
-sub new( $class, %options ) {
-    $options{ loop } ||= IO::Async::Loop->new();
-    bless \%options => $class
-}
+has 'type' => (
+    is => 'ro',
+    default => 'websocket'
+);
 
-sub connection( $self ) {
-    $self->{connection}
-}
+has 'loop' => (
+    is => 'lazy',
+    default => sub { IO::Async::Loop->new() },
+);
 
-sub loop( $self ) {
-    $self->{loop}
-}
+has 'connection' => (
+    is => 'rw',
+);
 
 sub connect( $self, $handler, $got_endpoint, $logger ) {
     $logger ||= sub{};
@@ -90,7 +92,6 @@ sub close( $self ) {
     if( $c) {
         $c->close
     };
-    delete $self->{ua};
 }
 
 sub future( $self ) {

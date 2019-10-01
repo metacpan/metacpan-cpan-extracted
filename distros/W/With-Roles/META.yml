@@ -1,0 +1,29 @@
+---
+abstract: 'Create role/class/object with composed roles'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::Needs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: With-Roles
+no_index:
+  directory:
+    - t
+    - xt
+requires: {}
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=With-Roles
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/With-Roles.git
+version: '0.001000'
+x_authority: cpan:HAARG
+x_breaks: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

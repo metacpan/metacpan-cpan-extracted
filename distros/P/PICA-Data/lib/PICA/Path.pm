@@ -2,7 +2,7 @@ package PICA::Path;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -13,10 +13,10 @@ sub new {
     my ($class, $path) = @_;
 
     confess "invalid pica path" if $path !~ /
-        ([012*.][0-9*.][0-9*.][A-Z@*.]) # tag
-        (\[([0-9*.]{2,3})\])?           # occurence
-        (\$?([_A-Za-z0-9]+))?           # subfields
-        (\/(\d+)?(-(\d+)?)?)?           # position
+        ([012.][0-9.][0-9.][A-Z@.]) # tag
+        (\[([0-9.]{2,3})\])?        # occurence
+        (\$?([_A-Za-z0-9]+))?       # subfields
+        (\/(\d+)?(-(\d+)?)?)?       # position
     /x;
 
     my $field      = $1;
@@ -51,11 +51,9 @@ sub new {
         }
     }
 
-    $field =~ s/\*/./g;
     $field = qr{$field};
     
     if (defined $occurrence) {
-        $occurrence =~ s/\*/./g;
         $occurrence = qr{$occurrence};
     }
 
@@ -126,8 +124,7 @@ sub stringify {
     my ($field, $occurrence, $subfields) = map {
         defined $_ ? do {
             s/^\(\?[^:]*:(.*)\)$/$1/;
-            s/\./*/g;
-            $_ } : undef
+             $_ } : undef
         } ($self->[0], $self->[1], $self->[2]); 
 
     my $str = $field;
@@ -225,12 +222,12 @@ Create a PICA path by parsing the path expression. The expression consists of
 =item
 
 A tag, constisting of three digits, the first C<0> to C<2>, followed by a digit
-or C<@>.  The character C<*> can be used as wildcard.
+or C<@>.  The character C<.> can be used as wildcard.
 
 =item
 
-An optional occurrence, given by two or three digits (or C<*> as wildcard) in brackets,
-e.g. C<[12]>, C<[0*]> or C<[102]>.
+An optional occurrence, given by two or three digits (or C<.> as wildcard) in brackets,
+e.g. C<[12]>, C<[0.]> or C<[102]>.
 
 =item
 

@@ -10,6 +10,18 @@ my $server = Test::HTTP::LocalServer->spawn(
 #    debug => 1,
 );
 
+local @ENV{ qw[
+    HTTP_PROXY
+    http_proxy
+    HTTP_PROXY_ALL
+    http_proxy_all
+    HTTPS_PROXY
+    https_proxy
+    CGI_HTTP_PROXY
+    ALL_PROXY
+    all_proxy
+] };
+
 my $pid = $server->{_pid};
 my $res = kill 0, $pid;
 is $res, 1, "PID $pid is an existing process";

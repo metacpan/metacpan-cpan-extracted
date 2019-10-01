@@ -5,7 +5,7 @@ use Data::Object 'Class';
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has parser => (
   is => 'ro',
@@ -237,7 +237,7 @@ method example($number, $name, $type, $callback) {
 
       return;
     }
-    my ($input, $output) = split /\s*:\s*/, $signature, 2;
+    my ($input, $output) = $signature =~ /(.*) : (.*)/;
 
     my $registry = $self->registry;
 

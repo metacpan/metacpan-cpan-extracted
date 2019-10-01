@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "Catalyst::Plugin::Session::State::Cookie" => "0.17",
     "Catalyst::Plugin::Session::Store::DBIC" => "0.14",
     "Catalyst::Plugin::SimpleCAS" => "1.001",
-    "Catalyst::Runtime" => "5.90118",
+    "Catalyst::Runtime" => "5.90124",
     "Catalyst::ScriptRunner" => 0,
     "Catalyst::Test" => 0,
     "Catalyst::Utils" => 0,
@@ -170,7 +170,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Catalyst" => 0,
-    "Catalyst::Runtime" => "5.90118",
+    "Catalyst::Runtime" => "5.90124",
     "HTTP::Headers::Util" => "6.03",
     "HTTP::Request::Common" => "6.04",
     "LWP::UserAgent" => "6.02",
@@ -181,7 +181,7 @@ my %WriteMakefileArgs = (
     "inc::Module::Install" => "1.08",
     "utf8" => 0
   },
-  "VERSION" => "1.3105",
+  "VERSION" => "1.3106",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t t/unit/*.t"
   }
@@ -212,7 +212,7 @@ my %FallbackPrereqs = (
   "Catalyst::Plugin::Session::State::Cookie" => "0.17",
   "Catalyst::Plugin::Session::Store::DBIC" => "0.14",
   "Catalyst::Plugin::SimpleCAS" => "1.001",
-  "Catalyst::Runtime" => "5.90118",
+  "Catalyst::Runtime" => "5.90124",
   "Catalyst::ScriptRunner" => 0,
   "Catalyst::Test" => 0,
   "Catalyst::Utils" => 0,

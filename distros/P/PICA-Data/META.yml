@@ -13,9 +13,9 @@ build_requires:
   Test::XML: '0.08'
   YAML::Tiny: '1.46'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +23,12 @@ meta-spec:
 name: PICA-Data
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Carp: '0'
   Exporter: '0'
@@ -43,11 +43,11 @@ resources:
   bugtracker: https://github.com/gbv/PICA-Data/issues
   homepage: https://github.com/gbv/PICA-Data
   repository: https://github.com/gbv/PICA-Data.git
-version: '0.37'
+version: '1.00'
 x_contributors:
-  - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
-  - 'Carsten Klee <cKlee@users.noreply.github.com>'
-  - 'Jakob Voss <jakob@nichtich.de>'
-  - 'Jakob Voss <voss@gbv.de>'
+  - 'Carsten Klee <klee@cpan.org>'
+  - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
-  - 'Johann Rolschewski <rolschewski@gmail.com>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

@@ -8,7 +8,7 @@
 
 package Net::OAuth2::Client;
 use vars '$VERSION';
-$VERSION = '0.65';
+$VERSION = '0.66';
 
 use warnings;
 use strict;

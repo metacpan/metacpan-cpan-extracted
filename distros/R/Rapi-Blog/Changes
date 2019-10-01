@@ -1,7 +1,13 @@
 Revision history for Rapi::Blog
 
+1.1002 2019-10-01
+    - Added new template directive 'accessed_site' (VANSTYN)
+    - Added baked-in reCAPTCHA v2 support (experimental) (VANSTYN)
+    - Require IO::Socket::SSL, MIME::Base64, Authen::SASL, LWP::Protocol::https (VANSTYN)
+    - Require RapidApp 1.3106 (VANSTYN)
+
 1.1001 2019-09-11
-    - Require RapidApp 1.3105 -- 1.3104 was a bad release on cpanZZ
+    - Require RapidApp 1.3105 -- 1.3104 was a bad release on cpan
 
 1.1000 2019-09-11
     - Finally rollup extensive unreleased changes into an offcial new release

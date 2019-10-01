@@ -4,13 +4,13 @@ use warnings FATAL => "all";
 
 use Test::More;
 use HTTP::Response;
-use JSON;
+use JSON::MaybeXS;
 
 use Net::OAuth2;
 use Net::OAuth2::AccessToken;
 use Net::OAuth2::Profile::WebServer;
 
-my $json = JSON->new;
+my $json = JSON::MaybeXS->new;
 
 BEGIN {
    eval "require Test::Mock::LWP::Dispatch";

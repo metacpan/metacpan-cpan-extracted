@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,13 +20,13 @@ no_index:
 provides:
   Games::Cards::Pair:
     file: lib/Games/Cards/Pair.pm
-    version: '0.19'
+    version: '0.20'
   Games::Cards::Pair::Card:
     file: lib/Games/Cards/Pair/Card.pm
-    version: '0.19'
+    version: '0.20'
   Games::Cards::Pair::Params:
     file: lib/Games/Cards/Pair/Params.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   Attribute::Memoize: '1.01'
   List::MoreUtils: '0.33'
@@ -38,5 +38,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Games-Cards-Pair.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

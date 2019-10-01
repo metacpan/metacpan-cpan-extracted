@@ -2,7 +2,7 @@ package PICA::Parser::XML;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use Carp qw(croak);
 use XML::LibXML::Reader;
@@ -10,12 +10,9 @@ use XML::LibXML::Reader;
 use parent 'PICA::Parser::Base';
 
 sub new {
-    my ($class, $input, %options) = @_;
+    my $self = PICA::Parser::Base::_new(@_);
+    my $input = $self->{fh};
 
-    my $self = bless { 
-        bless => !!$options{bless},
-    }, $class;
-    
     # check for file or filehandle
     my $ishandle = eval { fileno($input); };
     if ( !$@ && defined $ishandle ) {
@@ -28,7 +25,7 @@ sub new {
             or croak "cannot read from file $input\n";
         $self->{xml_reader} = $reader;
     } elsif ( defined $input && length $input > 0 ) {
-        $input = ${$input} if (ref($input) // '' eq 'SCALAR'); 
+        $input = ${$input} if (ref($input) // '' eq 'SCALAR');
         my $reader = XML::LibXML::Reader->new( string => $input )
             or croak "cannot read XML string $input\n";
         $self->{xml_reader} = $reader;
@@ -50,12 +47,12 @@ sub _next_record {
     # get all field nodes from PICA record;
     foreach my $field_node ( $reader->copyCurrentNode(1)->getChildrenByTagName('*') ) {
         my @field;
-        
+
         # get field tag number
         my $tag = $field_node->getAttribute('tag');
         my $occurrence = $field_node->getAttribute('occurrence') // '';
         push(@field, ($tag, $occurrence));
-            
+
             # get all subfield nodes
             foreach my $subfield_node ( $field_node->getChildrenByTagName('*') ) {
                 my $subfield_code = $subfield_node->getAttribute('code');
@@ -76,7 +73,7 @@ PICA::Parser::XML - PICA+ XML parser
 
 =head2 DESCRIPTION
 
-See L<PICA::Parser::Base> for synopsis and details.
+See L<PICA::Parser::Base> for synopsis and configuration.
 
 The counterpart of this module is L<PICA::Writer::XML>.
 

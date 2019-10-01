@@ -1,13 +1,12 @@
 ---
-abstract: 'Easily scalability'
+abstract: lib/POE/Component/FunctionBus.pm
 author:
   - 'Paul G Webster <daemon@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
@@ -18,7 +17,16 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
-  perl: '5.006'
-version: '0.02'
+  POE: '1.367'
+  perl: '5.0244'
+resources:
+  IRC: irc://irc.freenode.net/#perl
+  bugtracker: https://github.com/PaulGWebster/p5-POE-Component-FunctionBus/issues
+  homepage: https://github.com/PaulGWebster/p5-POE-Component-FunctionBus
+  license: https://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/PaulGWebster/p5-POE-Component-FunctionBus.git
+version: '1569954247'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,6 +6,8 @@ use warnings;
 use RapidApp::Util ':all';
 
 use DateTime;
+use HTTP::Request::Common;
+use LWP::UserAgent;
 
 sub _dt_base_opts {(
   time_zone => 'local'
@@ -64,5 +66,82 @@ sub get_scaffold_cfg {
   }
   return undef;
 }
+
+
+sub recaptcha_active {
+  shift if ($_[0] && $_[0] eq __PACKAGE__);
+  my $c = shift || RapidApp->active_request_context or return 0;
+  
+  my $cfg = $c->ra_builder->recaptcha_config;
+  
+  # When 'strict_mode' is active, we force recaptcha verification in all places it is supported
+  # (i.e. force ->opportunistic_recaptcha_verify to behave the same as ->recaptcha_verify)
+  # This prevents circumventing recaptcha validation by clients constructing their own POST request.
+  # The downside is that if front-side templates fail to properly enable the reCAPTCHA client side 
+  # setup, the associated forms will always fail to submit because reCAPTCHA will always fail
+  return 1 if ($cfg->{strict_mode});
+
+     $cfg->{public_key}
+  && $cfg->{private_key}
+  && $c->req->method eq 'POST'
+  && exists $c->req->params->{'g-recaptcha-response'}
+}
+
+# opportunistic_recaptcha_verify only runs, and possibly fails, if all the needed reCAPTCHA pieces
+# are active. When 'strict_mode' is turned on, this method behaves the same as recaptcha_verify.
+# See the POD for more information of 'strict_mode'
+sub opportunistic_recaptcha_verify {
+  shift if ($_[0] && $_[0] eq __PACKAGE__);
+  my $c = shift || RapidApp->active_request_context or return 1;
+  &recaptcha_active($c) ? &recaptcha_verify($c) : 1
+}
+
+
+sub recaptcha_verify {
+  shift if ($_[0] && $_[0] eq __PACKAGE__);
+  my $c = shift || RapidApp->active_request_context;
+  
+  &recaptcha_active($c) or return 0;
+  
+  my $cfg  = $c->ra_builder->recaptcha_config;
+
+  my $packet = {
+    secret   => $cfg->{private_key},
+    response => $c->req->params->{'g-recaptcha-response'},
+    #remoteip => $c->req->address
+  };
+  my $content_payload = join('&',map { join('=',$_,$packet->{$_}) } keys %$packet);
+  
+  my $url  = $cfg->{verify_url} || 'https://www.google.com/recaptcha/api/siteverify';
+  
+  # for refernece, this is how to turn of certificate validation, which should not be needed
+  # as long as the remote endpoint is a Google system
+  #local $ENV{'PERL_LWP_SSL_VERIFY_HOSTNAME'} = 0;
+  
+  my $ua = LWP::UserAgent->new;
+  $ua->agent('rapi-blog/' . $Rapi::Blog::VERSION);
+  $ua->timeout(30); # 30 seconds
+
+  my $req = HTTP::Request->new( 'POST', $url );
+  $req->header( 'Content-Type' => 'application/x-www-form-urlencoded' );
+  $req->content( $content_payload );
+
+  $c->log->info('Validating reCAPTCHA: POST -> '.$url);
+  my $res = $ua->request($req);
+
+  if($res->is_success) {
+    my $data = decode_json_utf8( $res->decoded_content );
+
+    my $success = $data->{success};
+    $success = $$success if (ref($success)||'' eq 'SCALAR');
+    
+    return $success ? 1 : 0
+  }
+  else {
+    $c->log->error('reCAPTCHA validation failed');
+    return 0;
+  }
+}
+
 
 1;

@@ -4,7 +4,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 NAME
 
@@ -13,10 +13,11 @@ Chrome::DevToolsProtocol::Transport - choose the best transport backend
 =cut
 
 our @loops = (
-    ['Mojo/IOLoop.pm' => 'Chrome::DevToolsProtocol::Transport::Mojo' ],
-    ['IO/Async.pm'    => 'Chrome::DevToolsProtocol::Transport::NetAsync'],
-    ['AnyEvent.pm'    => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
-    ['AE.pm'          => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
+    ['Mojo/IOLoop.pm'   => 'Chrome::DevToolsProtocol::Transport::Mojo' ],
+    ['IO/Async.pm'      => 'Chrome::DevToolsProtocol::Transport::NetAsync'],
+    ['IO/Async/Loop.pm' => 'Chrome::DevToolsProtocol::Transport::Pipe::NetAsync'],
+    ['AnyEvent.pm'      => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
+    ['AE.pm'            => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
     # native POE support would be nice
 
     # The fallback, will always catch due to loading strict (for now)
@@ -32,6 +33,8 @@ our $implementation;
 
 Creates a new instance of the transport using the "best" event loop
 for implementation. The default event loop is currently L<AnyEvent>.
+
+All parameters are passed on to the implementation class.
 
 =cut
 

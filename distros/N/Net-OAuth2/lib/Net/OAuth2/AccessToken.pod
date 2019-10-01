@@ -272,8 +272,8 @@ these method will add the token to the HTTP messages sent.
 
 =head1 SEE ALSO
 
-This module is part of Net-OAuth2 distribution version 0.65,
-built on September 16, 2019. Website: F<http://perl.overmeer.net/CPAN/>.
+This module is part of Net-OAuth2 distribution version 0.66,
+built on October 01, 2019. Website: F<http://perl.overmeer.net/CPAN/>.
 
 =head1 COPYRIGHTS
 

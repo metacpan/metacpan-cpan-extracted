@@ -11,11 +11,15 @@ examples/sendkeys.pl
 examples/url-to-image.pl
 INSTALL
 lib/Chrome/DevToolsProtocol.pm
+lib/Chrome/DevToolsProtocol/Target.pm
 lib/Chrome/DevToolsProtocol/Transport.pm
 lib/Chrome/DevToolsProtocol/Transport/AnyEvent.pm
 lib/Chrome/DevToolsProtocol/Transport/Mojo.pm
 lib/Chrome/DevToolsProtocol/Transport/NetAsync.pm
 lib/Chrome/DevToolsProtocol/Transport/Pipe.pm
+lib/Chrome/DevToolsProtocol/Transport/Pipe/AnyEvent.pm
+lib/Chrome/DevToolsProtocol/Transport/Pipe/Mojo.pm
+lib/Chrome/DevToolsProtocol/Transport/Pipe/NetAsync.pm
 lib/Chrome/DevToolsProtocol/Transport/Win32PipeOpener.pm
 lib/HTTP/Cookies/ChromeDevTools.pm
 lib/WWW/Mechanize/Chrome.pm
@@ -24,6 +28,7 @@ lib/WWW/Mechanize/Chrome/Cookbook.pm
 lib/WWW/Mechanize/Chrome/DSL.pm
 lib/WWW/Mechanize/Chrome/Examples.pm
 lib/WWW/Mechanize/Chrome/Install.pod
+lib/WWW/Mechanize/Chrome/Internals.pod
 lib/WWW/Mechanize/Chrome/Node.pm
 lib/WWW/Mechanize/Chrome/Troubleshooting.pm
 LICENSE
@@ -35,6 +40,8 @@ META.yml
 README
 README.mkdn
 t/00-load.t
+t/01-chrome-devtools-protocol-target-cycle.t
+t/01-chrome-devtools-protocol-target.t
 t/01-chrome-devtools-protocol.t
 t/02-chrome-devtools-tab.t
 t/03-listener-leak-test.t
@@ -107,10 +114,12 @@ t/76-infinite-scroll.html
 t/76-scroll.t
 t/77-reload-fragment.t
 t/78-memleak.t
+t/78-two-instances.t
 t/helper.pm
 t/mixi_jp_index.html
 t/sophos_co_jp_index.html
 t/test-input-with-class.html
+testrules.yml
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t

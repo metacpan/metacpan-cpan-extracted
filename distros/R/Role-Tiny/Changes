@@ -1,5 +1,20 @@
 Revision history for Role-Tiny
 
+2.001001 - 2019-10-01
+  - added tests for make_role
+
+2.001_000 - 2019-09-19
+  - refactored method tracking to allow easier extending (such as by Moo)
+  - added make_role method to make a package into a role, but without
+    exporting any subs into it
+  - refactored sub exporting to allow extensions to do different things with
+    the subs
+
+2.000_009 - 2019-09-06
+  - fix composing roles into packages that have stub subs in them
+  - treat constants consistently with all other subs, no matter where they are
+    defined
+
 2.000008 - 2019-08-05
   - reverting all changes from 2.000007 due to failures on some perl versions
     and a number of downstream users.  The changes will be reintroduced in a

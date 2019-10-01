@@ -16,4 +16,4 @@ no_index:
     - inc
 resources:
   repository: git://git.gnu.org.ua/mojosyslog.git
-version: 1.0
+version: 1.01

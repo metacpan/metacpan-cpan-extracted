@@ -16,7 +16,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -35,6 +35,13 @@ use Encode;
 use Types::Standard qw( ArrayRef Join Split );
 use Types::Encodings qw( Str Bytes Chars Encode Decode );
 use Type::Utils;
+
+UNDEFINED_AND_REFS: {
+	should_fail(undef, Bytes);
+	should_fail(undef, Chars);
+	should_fail(\1, Bytes);
+	should_fail(\1, Chars);
+};
 
 STR_BYTES_CHARS_ENCODE_AND_DECODE: {
 	my $chars          = "café";

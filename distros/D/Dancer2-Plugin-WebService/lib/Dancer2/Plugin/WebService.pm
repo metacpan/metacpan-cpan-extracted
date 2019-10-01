@@ -1,10 +1,10 @@
-# ABSTRACT:RESTful Web Services with login, sessions, persistent data, multiple input/output formats, and IP access
+# ABSTRACT:RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access
 # Multiple input/output formats : JSON , XML , YAML, PERL , HUMAN
 #
 # George Bouras, george.mpouras@yandex.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.1.8';
+our	$VERSION = '4.2.0';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -56,14 +56,14 @@ my $plg = shift;
 my $app = $plg->app;
 
 # Security of the built-in routes
-@{$plg->config->{Routes}}{qw/logout login WebService/} = qw/protected public public/;
+@{$plg->config->{Routes}}{qw/WebService login logout/} = ( {Protected=>0}, {Protected=>0}, {Protected=>1, Groups=>[]} );
 
 # Default settings
-$plg->config->{'Default format'}=	'json' if ((! exists $plg->config->{'Default format'}) || ($plg->config->{'Default format'} !~ $plg->formats_regex));
-$app->config->{content_type}	=	$plg->formats->{ $plg->config->{'Default format'} };
-$app->config->{charset}			//=	'UTF-8';
-$app->config->{encoding}		//=	'UTF-8';
-$app->config->{show_errors}		//=	0;
+$app->config->{charset}        //= 'UTF-8';
+$app->config->{encoding}       //= 'UTF-8';
+$app->config->{show_errors}    //= 0;
+$app->config->{content_type}     = $plg->formats->{ $plg->config->{'Default format'} };
+$plg->config->{'Default format'} = 'json' if ((! exists $plg->config->{'Default format'}) || ($plg->config->{'Default format'} !~ $plg->formats_regex));
 
 # Module directory
 (my $module_dir =__FILE__) =~s|/[^/]+$||;
@@ -101,12 +101,26 @@ unless (-d $module_dir) {warn "Sorry could not find the Dancer2::Plugin::WebServ
 
 delete $plg->config->{'Authentication methods'};
 
-# Check for an active auth method if there are protected routes
-
+	# Check for an active auth method if there are protected routes
+	# Check if the Groups is an array
 	foreach (keys %{$plg->config->{Routes}}) {
-	next if $plg->config->{Routes}->{$_} =~/(?i)pub/;
-	if ($plg->auth_method eq '') {warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n"; exit 1}
-	last
+
+		if ( $plg->config->{Routes}->{$_}->{Protected} ) {
+
+			if ($plg->auth_method eq '') {
+			warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n";
+			exit 1
+			}
+			else {
+
+				if (exists $plg->config->{Routes}->{$_}->{Groups}) {
+				$plg->config->{Routes}->{$_}->{Groups} = [ $plg->config->{Routes}->{$_}->{Groups} ] unless 'ARRAY' eq ref $plg->config->{Routes}->{$_}->{Groups}
+				}
+				else {
+				$plg->config->{Routes}->{$_}->{Groups} = []
+				}
+			}
+		}
 	}
 
 print "\nApplication              : $app->{name}\n";
@@ -127,7 +141,7 @@ opendir __SESSIONDIR, $plg->dir_session or die "Could not list session directory
 
 	foreach my $token (grep ! /^\.+$/, readdir __SESSIONDIR) {
 
-		if ((-f "$plg->{dir_session}/$token/control/lastaccess") && (-f "$plg->{dir_session}/$token/control/username")) {
+		if ((-f "$plg->{dir_session}/$token/control/lastaccess") && (-f "$plg->{dir_session}/$token/control/username") && (-f "$plg->{dir_session}/$token/control/groups")) {
 		my $lastaccess = ${ Storable::retrieve "$plg->{dir_session}/$token/control/lastaccess" };
 
 			if (time - $lastaccess > $plg->Session_timeout) {
@@ -136,7 +150,7 @@ opendir __SESSIONDIR, $plg->dir_session or die "Could not list session directory
 			}
 			else {
 			  $TokenDB{$token}->{data} = {};
-			@{$TokenDB{$token}->{control}}{qw/lastaccess username/} = ($lastaccess, ${ Storable::retrieve "$plg->{dir_session}/$token/control/username" } );
+			@{$TokenDB{$token}->{control}}{qw/lastaccess username groups/} = ($lastaccess, ${Storable::retrieve "$plg->{dir_session}/$token/control/username"}, ${Storable::retrieve "$plg->{dir_session}/$token/control/groups"});
 			opendir __TOKEN, "$plg->{dir_session}/$token/data" or die "Could not read session directory $plg->{dir_session}/$token/data because $!\n";
 
 				foreach my $record (grep ! /^\.+$/, readdir __TOKEN) {
@@ -145,7 +159,7 @@ opendir __SESSIONDIR, $plg->dir_session or die "Could not list session directory
 				}
 
 			close __TOKEN;
-			print "Restore session : $token , having ". scalar(keys %{$TokenDB{$token}->{data}}) ." records\n";
+			print "Restore session : $token , having ". scalar(keys %{$TokenDB{$token}->{data}}) ." records\n"
 			}
 		}
 		else {
@@ -157,6 +171,7 @@ opendir __SESSIONDIR, $plg->dir_session or die "Could not list session directory
 closedir __SESSIONDIR;
 #print 'debug : '. Dumper( $app )                   ;exit;
 #print 'debug : '. Dumper( $plg->config->{Routes} ) ;exit;
+#print 'debug : '. Dumper( $plg->auth_config )      ;exit;
 #print 'debug : '. Dumper  \%TokenDB; exit;
 
 
@@ -201,7 +216,7 @@ closedir __SESSIONDIR;
 	if (exists $app->request->query_parameters->{pretty}) {
 
 		if ($app->request->query_parameters->{pretty} =~/(?i)1|t|y/) {
-		$plg->pretty(1)
+		$plg->pretty(2)
 		}
 		else {
 		$plg->pretty(0)
@@ -256,7 +271,7 @@ closedir __SESSIONDIR;
 # Hook ONLY for the protected routes, before the main app do anything
 
 	$app->add_hook(Dancer2::Core::Hook->new(name=>'before', code=>sub{
-	return if (! exists $plg->config->{Routes}->{$plg->route_name}) || ('public' eq $plg->config->{Routes}->{$plg->route_name});
+	return if (! exists $plg->config->{Routes}->{$plg->route_name}) || (! $plg->config->{Routes}->{$plg->route_name}->{Protected});
 
 	# Halt if the session is expired, otherelse update the lastaccess
 
@@ -285,6 +300,15 @@ closedir __SESSIONDIR;
 		else {
 		$app->halt($plg->reply('error' => "You must provide a token for using the protected route $plg->{route_name}"))
 		}
+
+	# Check if the user is member to all the route's Groups
+
+		foreach ( @{$plg->config->{Routes}->{$plg->route_name}->{Groups}} ) {
+
+			unless (exists $TokenDB{$plg->data->{token}}->{control}->{groups}->{$_} ) {
+			$app->halt($plg->reply('error'=>'Required route groups are '. join(',',@{$plg->config->{Routes}->{$plg->route_name}->{Groups}}) .' your groups are '. join(',', sort keys %{$TokenDB{$plg->data->{token}}->{control}->{groups}})))
+			}
+		}
 	}));
 
 	# Built in route /WebService list the routes
@@ -301,8 +325,8 @@ closedir __SESSIONDIR;
 				'Info'			=> [ qw(version client about) ],
 				'WebService'	=> [ qw(login logout) ],
 				'Application'	=> {
-					'protected' => [ grep $Routes->{$_} eq 'protected', keys %{$Routes} ],
-					'public'    => [ grep $Routes->{$_} eq 'public',    keys %{$Routes} ]
+					'Protected' => [ grep   $Routes->{$_}->{Protected}, keys %{$Routes} ],
+					'Public'    => [ grep ! $Routes->{$_}->{Protected}, keys %{$Routes} ]
 					}
 				}
 			)
@@ -364,7 +388,7 @@ closedir __SESSIONDIR;
 		}
 
 	$plg->data({});
-	$plg->reply(error => 'You have been successfully logged out')
+	$plg->reply()
 	}) foreach 'post','put';
 
 
@@ -396,7 +420,7 @@ closedir __SESSIONDIR;
 	if ($plg->data->{password} eq '')		{ $plg->error('Login failed because the password is blank'); $app->halt($plg->reply) }
 
 	$plg->error('authorization error');
-	my $groups=[];
+	my $groups={};
 
 		# Internal
 		if ('INTERNAL' eq $plg->auth_method) {
@@ -414,15 +438,15 @@ closedir __SESSIONDIR;
 			}
 		}
 
-		# The external auth scripts expects two arguments
+		# The external auth scripts expect at least the two arguments
 		#
 		#	1) username as hex string (for avoiding shell attacks)
 		#	2) password as hex string
 		#
 		# Script output must be the two lines
 		#
-		#	1) The error. 0 for successful login , or at fail, a descriptive short message usually for the fail reason
-		#	2) In case of successful login, the groups that the user belongs (from the ones we have specify)
+		#	1) 0 for successful login , or the error message at fail
+		#	2) All the groups that the user belongs
 
 		else {
 		my @output;
@@ -436,21 +460,7 @@ closedir __SESSIONDIR;
 
 		unless (2 == scalar @output) { $plg->error('Expected 2 lines output instead of '.scalar(@output).' at auth method '.$plg->auth_method ); $app->halt($plg->reply) }
 		$plg->error($output[0]);
-		$app->halt($plg->reply) if $plg->error;
-
-			if (@{$plg->auth_config->{Groups}}) {
-
-			# There are demanded groups
-			my %hash; @hash{ @{$plg->auth_config->{Groups}} }=1;
-			foreach (split /,/,$output[1]) { push @{$groups}, $_ if exists $hash{$_} }
-
-				unless (@{$groups}) {
-				$plg->error('User did not belong to any of the demanded groups: '.join ',',@{$plg->auth_config->{Groups}})
-				}
-			}
-			else {
-			$groups = [split /,/,$output[1]]
-			}
+		map { $groups->{$_} = 1 } split /,/,$output[1]
 		}
 
 	$app->halt($plg->reply) if $plg->error;
@@ -473,9 +483,9 @@ closedir __SESSIONDIR;
 		}
 
 	  $TokenDB{$plg->data->{token}}->{data} = {};
-	@{$TokenDB{$plg->data->{token}}->{control}}{qw/lastaccess username/} = (time,$plg->data->{username});
+	@{$TokenDB{$plg->data->{token}}->{control}}{qw/lastaccess groups username/} = (time,$groups,$plg->data->{username});
 
-		while ( my ($k,$v) = each %{ $TokenDB{$plg->data->{token}}->{control} } ){
+		while (my ($k,$v) = each %{ $TokenDB{$plg->data->{token}}->{control} }) {
 
 			unless ( Storable::lock_store \$v, "$plg->{dir_session}/$plg->{data}->{token}/control/$k" ) {
 			$plg->error("Could not store session data $_[$i] because $!");
@@ -483,7 +493,7 @@ closedir __SESSIONDIR;
 			}
 		}
 
-	$plg->reply('token'=>$plg->data->{token}, 'groups'=>$groups)
+	$plg->reply('token'=>$plg->data->{token}, 'groups'=>[sort keys %{$groups}])
 	}) foreach 'post', 'put'
 }
 
@@ -574,15 +584,15 @@ $plg->reply_text
 
 
 
-#	posted_data();              # returns a hash with all      posted keys/values
-#	posted_data('k1', 'k2');    # returns a hash with selected posted keys/values
+#	posted_data();              # hash with all      posted keys/values
+#	posted_data('k1', 'k2');    # hash with selected posted keys/values
 #
 sub posted_data :PluginKeyword
 {
 my $plg=shift;
 
 	if (@_) {
-	%{$plg->data}{@_}  # %hash{'k1','k2'} k1 v1 k2 v2 Hash Slice
+	%{$plg->data}{@_}  # %hash{'k1','k2'} -> k1 v1 k2 v2
 	}
 	else {
 	%{$plg->data}
@@ -711,11 +721,11 @@ __END__
 
 =head1 NAME
 
-Dancer2::Plugin::WebService - RESTful Web Services with login, sessions, persistent data, multiple input/output formats, and IP access
+Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access
 
 =head1 VERSION
 
-version 4.1.8
+version 4.2.0
 
 =head1 SYNOPSIS
 
@@ -959,7 +969,7 @@ It returns a document of the deleted keys, your can use the url  to=... modifier
   "deleted keys" : [ "rec1", "rec2" ]
   }
 
-=head1 AUTHENTICATION
+=head1 AUTHENTICATION, ROLE BASED ACCESS CONTROL
 
 For using protected routes, you must provide a valid token received from the B<login> route.
 The B<login> route is using the the first active authentication method of the I<config.yml>
@@ -972,11 +982,30 @@ so if you want to allow all users to login no matter the username or the passwor
 
 This make sense if you just want to give anyone the ability for persistent data
 
-At production enviroments, for native Linux authentication mechanism, use the Command
+At production enviroments, probably you want to use an external auth script e.g for the native Linux authentication
 
-  MODULE_INSTALL_DIR/AuthScripts/LinuxNative.pl
+  MODULE_INSTALL_DIR/AuthScripts/linux.sh
 
-If the user do not belong to any of the defined groups then the login will fail, even if the username and password are correct.
+The protected routes, at  config.yml  have   Protected:true and their required groups e.g.  Groups:[grp1,grp2 ...]
+
+The user must be member to all the route Groups otherelse the route will not run.
+
+If the route's Groups list is empty or missing, the route will run with any valid token ignoring the user's group membership.
+
+This is usefull because you can have role based access control at your routes.
+Every user with its token will be able to access only the routes is assigned to.
+
+A sample route definition is
+
+    Routes:      
+      route1:
+        Protected : false
+      route2: 
+        Protected : true
+        Groups    : [ group1 , group2 ... ]
+      route3: 
+        Protected : true
+        Groups    : [ ]
 
 It is easy to write your own scripts for Active Directory, LDAP, facebook integration or whatever.
 
@@ -986,7 +1015,7 @@ Please read the AUTHENTICATION_SCRIPTS for the details
 
 A sample I<config.yml> is the following. 
 
-  version                 : 2.0.0
+  version                 : 3.0.0
   environment             : development
   plugins                 :
     WebService            :
@@ -994,11 +1023,13 @@ A sample I<config.yml> is the following.
       Session directory   : /var/lib/WebService
       Session idle timeout: 86400
       Routes              :
-        INeedLogin_store  : protected
-        INeedLogin_read   : protected
-        route1            : public
-        route2            : public
-        mirror            : public
+        mirror            : { Protected: false }
+        somekeys          : { Protected: false }
+        data1             : { Protected: false }
+        data3             : { Protected: false }
+      INeedLogin_store  : { Protected: true, Groups: [ ftp , storage ] }
+      INeedLogin_delete : { Protected: true, Groups: log }
+      INeedLogin_read   : { Protected: true }
 
       Allowed hosts:
       - 127.*
@@ -1016,18 +1047,16 @@ A sample I<config.yml> is the following.
           user2   : <any>
           <any>   : Secret4All
 
-      - Name      : Linux native users
+      - Name      : Linux users
         Active    : false
-        Command   : MODULE_INSTALL_DIR/AuthScripts/LinuxNative.pl
+        Command   : MODULE_INSTALL_DIR/AuthScripts/linux.sh
         Arguments : [ ]
-        Groups    : [root, glusterfs, ceph]
         Use sudo  : true
 
       - Name      : Basic Apache auth for simple users
         Active    : false
         Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
         Arguments : [ "/etc/htpasswd" ]
-        Groups    : [ ]
         Use sudo  : false
 
 =head1 INSTALLATION
@@ -1066,17 +1095,11 @@ I</opt/TestService/environments/development.yml>
 
 Start the service as user I<dancer>
 
-=head2 production
-
-  plackup --host 0.0.0.0 --port 3000 --server Starman --workers=5 --env production -a /opt/TestService/bin/app.psgi
-
-=head2 development
-
-  plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
+  plackup --host 0.0.0.0 --port 3000 --env production  --server Starman --workers=5 -a /opt/TestService/bin/app.psgi
+  plackup --host 0.0.0.0 --port 3000 --env development --server HTTP::Server::PSGI --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
   plackup --host 0.0.0.0 --port 3000 -a /opt/TestService/bin/app.psgi
 
-=head2 without Plack
-
+  # without Plack
   perl /opt/TestService/bin/app.psgi
 
 view the INSTALL document for details
@@ -1093,7 +1116,7 @@ B<RPC::Any> A simple, unified interface to XML-RPC and JSON-RPC
 
 B<XML::RPC> Pure Perl implementation for an XML-RPC client and server.
 
-B<JSON::RPC> JSON RPC 2.0 Server Implementation 
+B<JSON::RPC> JSON RPC Server Implementation
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for Games::Cards::Pair
 
+0.20  Tue Oct 01 19:35:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.19  Fri Aug 31 17:05:00 2018
       - Replaced "namespace::clean" with "namespace::autoclean".
 

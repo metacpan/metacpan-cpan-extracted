@@ -9,9 +9,9 @@ build_requires:
   Test::More: '1.001003'
   Test::XML: '0.08'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,26 +19,29 @@ meta-spec:
 name: Catmandu-PICA
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Catmandu: '1.0601'
-  Catmandu::SRU: '0.41'
+  Catmandu::SRU: '0.427'
   Moo: '1.0'
-  PICA::Data: '0.36'
+  PICA::Data: '1.00'
   perl: v5.12.0
 resources:
   bugtracker: https://github.com/gbv/Catmandu-PICA/issues
   homepage: https://github.com/gbv/Catmandu-PICA
   repository: https://github.com/gbv/Catmandu-PICA.git
-version: '0.26'
+version: '1.00'
 x_contributors:
   - 'Carsten Klee <klee@cpan.org>'
   - 'E. Choroba <choroba@matfyz.cz>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'julianladisch <julianladisch@users.noreply.github.com>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

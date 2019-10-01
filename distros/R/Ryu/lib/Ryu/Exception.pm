@@ -3,7 +3,7 @@ package Ryu::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 
 =head1 NAME
 
@@ -26,6 +26,7 @@ Generic exceptions interface, implements the 3-part failure codes as described i
 =cut
 
 use Future;
+use Scalar::Util;
 
 =head2 new
 
@@ -76,10 +77,8 @@ Fails the given L<Future> with this exception.
 =cut
 
 sub fail {
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(blessed);
     my ($self, $f) = @_;
-    die "expects a Future" unless blessed($f) && $f->isa('Future');
+    die "expects a Future" unless Scalar::Util::blessed($f) && $f->isa('Future');
     $self->as_future->on_ready($f);
     $f;
 }
@@ -107,10 +106,8 @@ Extracts failure information from a L<Future> and instantiates accordingly.
 =cut
 
 sub from_future {
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(blessed);
     my ($class, $f) = @_;
-    die "expects a Future" unless blessed($f) && $f->isa('Future');
+    die "expects a Future" unless Scalar::Util::blessed($f) && $f->isa('Future');
     die "Future is not ready" unless $f->is_ready;
     my ($msg, $type, @details) = $f->failure or die "Future is not failed?";
     $class->new(

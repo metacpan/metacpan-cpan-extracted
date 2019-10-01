@@ -1,6 +1,6 @@
 package Catmandu::Fix::pica_add;
 
-our $VERSION = '0.26';
+our $VERSION = '1.00';
 
 use Catmandu::Sane;
 use Moo;
@@ -23,10 +23,8 @@ sub emit_value {
     my ($field, $occurrence, $subfield) = map {
         defined $_ ? do {
             s/^\(\?[^:]*:(.*)\)$/$1/;
-            s/\./*/g;
             $_ } : undef
         } ($pica_path->[0], $pica_path->[1], $pica_path->[2]);
-
 
     my ($field_regex, $occurrence_regex) = @$pica_path;
 

@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2019.08
+2019.10
 
 # DESCRIPTION
 
@@ -17,14 +17,40 @@ fond of for whatever reason
 
 Here are the snippets that accompany the photo project
 
-## LEEJO
+## LEEJO (transform.pl)
 
+    #!/usr/bin/env perl
+    #
     # transform an array of hashes into an array of arrays where each array
     # contains the values from the hash sorted by the original hash keys or
     # the passed order of columns (hash slicing)
-    my @field_data = $column_order
-        ? map { [ @$_{ @{ $column_order } } ] } @{ $data }
-        : map { [ @$_{sort keys %$_} ] } @{ $data };
+    my @ordered = $column_order
+        ? map { [ @$_{ @{ $column_order } } ] } @{ $chaos }
+        : map { [ @$_{sort keys %$_} ] } @{ $chaos };
+
+## LEEJO (hopscotch.p6)
+
+    #!/usr/bin/env perl6
+
+    my @court = (
+        [ 'FIN' ],
+        [ 9 ,10 ],
+        [   8   ],
+        [ 6 , 7 ],
+        [   5   ],
+        [   4   ],
+        [ 2 , 3 ],
+        [   1   ],
+    );
+
+    my $skip = @court.[1..*].pick.pick;
+    my @play;
+
+    for @court.reverse -> $hop {
+        @play.push( $hop.map( *.subst( /^$skip$/,'🚫' ).list ) );
+    }
+
+    say @play.reverse.join( "\n" );
 
 # THANKS
 

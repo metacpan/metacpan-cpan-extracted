@@ -31,4 +31,14 @@ foreach ( ($schema, PICA::Schema->new($schema)) ) {
 $validator = Catmandu::Validator::PICA->new( schema => {}, ignore_unknown_fields => 1 );
 check($record);
 
+$record = [
+    [ '021A', undef, a => 'title', d => 'additional', g => 'deprecated', b => 'A', b => 'B' ],
+    ['001U', undef, '0' => 'utf-8']
+];
+$validator = Catmandu::Validator::PICA->new( schema => 't/files/schema.yaml', 
+    ignore_unknown             => 1,
+    allow_deprecated           => 1,
+    ignore_subfield_order      => 1,);
+check($record);
+
 done_testing;

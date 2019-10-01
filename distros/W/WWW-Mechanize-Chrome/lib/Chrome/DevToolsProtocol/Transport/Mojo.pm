@@ -1,6 +1,7 @@
 package Chrome::DevToolsProtocol::Transport::Mojo;
 use strict;
 use Filter::signatures;
+use Moo 2;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 use Scalar::Util 'weaken';
@@ -8,7 +9,7 @@ use Scalar::Util 'weaken';
 use Mojo::UserAgent;
 use Future::Mojo;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 NAME
 
@@ -26,13 +27,18 @@ Chrome::DevToolsProtocol::Transport::Mojo - Mojolicious backend for Chrome commu
 
 =cut
 
-sub new( $class, %options ) {
-    bless \%options => $class
-}
+has 'type' => (
+    is => 'ro',
+    default => 'websocket'
+);
 
-sub connection( $self ) {
-    $self->{connection}
-}
+has connection => (
+    is => 'rw',
+);
+
+has ua => (
+    is => 'rw',
+);
 
 sub connect( $self, $handler, $got_endpoint, $logger ) {
     $logger ||= sub{};
@@ -40,7 +46,7 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
 
     $got_endpoint->then( sub( $endpoint ) {
         $self->{ua} ||= Mojo::UserAgent->new();
-        my $client = $self->{ua};
+        my $client = $self->ua;
 
         $logger->('debug',"Connecting to $endpoint");
         die "Got an undefined endpoint" unless defined $endpoint;

@@ -2,21 +2,24 @@ package PICA::Parser::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use Carp qw(croak);
 
-sub new {
+sub _new {
     my $class = shift;
     my (%options) = @_ % 2 ? (fh => @_) : @_;
 
-    my $input = $options{fh} || \*STDIN;
-
-    my $self = bless {
+    bless({
         bless  => !!$options{bless},
         strict => !!$options{strict},
-    }, $class;
+        fh     => defined $options{fh} ? $options{fh} : \*STDIN
+    }, $class), ;
+}
 
+sub new {
+    my $self = _new(@_);
+    my $input = $self->{fh};
 
     # check for file or filehandle
     my $ishandle = eval { fileno($input); };
@@ -29,7 +32,7 @@ sub new {
         croak "file or filehandle $input does not exists";
     }
 
-    bless $self, $class;
+    $self;
 }
 
 sub next {
@@ -60,7 +63,7 @@ PICA::Parser::Base - abstract base class of PICA parsers
     my $parser = PICA::Parser::Plain->new( $filename );
 
     while ( my $record = $parser->next ) {
-        # do something        
+        # do something
     }
 
     use PICA::Parser::Plus;
@@ -76,13 +79,32 @@ PICA::Parser::Base - abstract base class of PICA parsers
 This abstract base class of PICA+ parsers should not be instantiated directly.
 Use one of the following subclasses instead:
 
-=over 
+=over
 
 =item L<PICA::Parser::Plain>
 
 =item L<PICA::Parser::Plus>
 
+=item L<PICA::Parser::Binary>
+
 =item L<PICA::Parser::XML>
+
+=item L<PICA::Parser::PPXML>
+
+=back
+
+=head2 CONFIGURATION
+
+=over
+
+=item blessed
+
+Return records as instances of L<PICA::Data> (disabled by default).
+
+=item strict
+
+By default faulty fields in records are skipped with warnings. You can make
+them fatal by setting the I<strict> parameter to 1.
 
 =back
 
@@ -91,9 +113,7 @@ Use one of the following subclasses instead:
 =head2 new( [ $input | fh => $input ] [ %options ] )
 
 Initialize parser to read from a given file, handle (e.g. L<IO::Handle>), or
-string reference. L<PICA::Parser::XML> also detects plain XML strings. The
-common option C<blessed> (disabled by default) can be used to return records as
-instances of L<PICA::Data>.
+string reference. L<PICA::Parser::XML> also detects plain XML strings.
 
 =head2 next
 
@@ -105,6 +125,6 @@ C<_id> and C<record>, as defined in L<PICA::Data>.
 See L<Catmandu::Importer::PICA> for usage of this module in L<Catmandu>.
 
 Alternative PICA parsers had been implemented as L<PICA::PlainParser> and
-L<PICA::XMLParser> and included in the release of L<PICA::Record> (deprecated).
+L<PICA::XMLParser> and included in the release of L<PICA::Record> (DEPRECATED).
 
 =cut

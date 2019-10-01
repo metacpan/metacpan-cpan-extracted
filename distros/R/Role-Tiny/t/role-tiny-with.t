@@ -49,7 +49,9 @@ BEGIN {
 }
 
 is $@, '', 'stub composed without error';
-ok exists &ClassConsumeStub::bar && !defined &ClassConsumeStub::bar,
+ok exists &ClassConsumeStub::bar,
   'stub exists in consuming class';
+ok !defined &ClassConsumeStub::bar,
+  'stub consumed as stub';
 
 done_testing;

@@ -1,45 +1,51 @@
 Write your Authorization script/program to any language you prefer.
-It must accept two arguments, provided from the Dancer2::Plugin::WebService
+They must accept at least two arguments, provided from the Dancer2::Plugin::WebService
 
-    username packed as hex string   (to avoid shell attacks)
-    password packed as hex string   (to avoid shell attacks)
-
+	username packed as hex string, to avoid shell attacks, produced e.g    echo -n joe      | xxd -ps
+	password packed as hex string, to avoid shell attacks, produced e.g    echo -n somepass | xxd -ps
 	e.g.
 
-    SomeScript 6a6f65 536f6d6550617373776f7264
+	SomeScript 6a6f65 736f6d6570617373
+
+More arguments can be defined at the config.yml of your service e.g
+
+	Command  : MODULE_INSTALL_DIR/AuthScripts/SomeScript
+	Arguments: [ "a1", "a2", "a3" ]
 
 As a result, the script must print at the standard output the two lines
 
     1st line : 0 if the login is succesfull or a message of the login failure description
-    2rd line : a comma delimitted list of the groups the user is member e.g.
+    2rd line : a comma delimitted list of all the groups the user is member e.g.
 
 	for successful login
 
 		0
-		admins,ftp,ldapadmin
+		joe,ftp,log,storage
 
 	for failed login
 
 		server is on maintenance
-		""
+		-
 
-If the user do not belong to any of the   config.yml  defined groups
-then the login will fail even if the user/pass are correct
+The protected routes, at  config.yml  have  Protected : true
+and a list of a required groups e.g.   Groups : [ group1 , group2 ... ]
+if the authorization script do not return any of the required groups then the route will abort.
 
-	Groups : [ group1 , group2 ... ]
+This is usefull because you can have role based control at your routes.
+Every user with its token will be able to access only the routes are assigned to
 
-For your tests, you can use any of the commands to convert
+For your tests, you can use any of the commands to convert between text and hex
 
-     text to hex
+text to hex
 
-		echo -n joe | xxd -ps
-		echo -n joe | od -A n -t x1 | sed 's/ //g'
-		perl -E 'say unpack "H*", shift' joe
+	echo -n joe | xxd -ps
+	echo -n joe | od -A n -t x1 | sed 's/ //g'
+	perl -E 'say unpack "H*", shift' joe
 
-	hex to text
+hex to text
 
-		echo -n 6a6f65 | xxd -r -ps
-		perl -E 'say pack "H*", shift' 6a6f65
+	echo -n 6a6f65 | xxd -r -ps
+	perl -E 'say pack "H*", shift' 6a6f65
 
 If root privileges are needed, e.g. for the "native Linux" authentication Command,
 set at the config.yml
@@ -47,13 +53,16 @@ set at the config.yml
 	...
 	Use sudo : true
 
-and add the user running the WebService to sudoers e.g.
+Give  the user running the WebService superpowers through /etc/sudoers  e.g.
 
-  vi /etc/sudoers.d/WebService
+	# Allow wheel group to run any command
+	vi /etc/sudoers
+		...
+		%wheel ALL=(ALL) NOPASSWD: ALL
+		...
 
-    dancer ALL=(ALL) NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/AuthScripts/LinuxNative.pl	
+	# Make user member of the wheel group
+	usermod -aG wheel dancer
 
-
-Thats all; now you are ready to write some auth scripts.
 
 George Bouras

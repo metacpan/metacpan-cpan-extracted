@@ -22,6 +22,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Authen::SASL" : "2.16",
             "Catalyst::Controller" : "0",
             "Catalyst::Model" : "0",
             "Catalyst::Model::DBIC::Schema" : "0",
@@ -36,6 +37,7 @@
             "Digest::SHA1" : "0",
             "Email::Abstract" : "0",
             "Email::MIME::CreateHTML" : "0",
+            "Email::Sender" : "1.300031",
             "Email::Sender::Simple" : "0",
             "Email::Sender::Transport" : "0",
             "Email::Sender::Transport::SMTP" : "0",
@@ -46,7 +48,12 @@
             "File::ShareDir" : "0",
             "FindBin" : "0",
             "HTML::Strip" : "2.10",
+            "HTTP::Request::Common" : "6.18",
+            "IO::Socket::SSL" : "2.066",
+            "LWP::Protocol::https" : "6.07",
+            "LWP::UserAgent" : "6.39",
             "List::Util" : "0",
+            "MIME::Base64" : "3.15",
             "Module::Locate" : "0",
             "Module::Runtime" : "0",
             "Moo" : "0",
@@ -61,7 +68,7 @@
             "Plack::Middleware::ConditionalGET" : "0",
             "Pod::Find" : "0",
             "Pod::Usage" : "0",
-            "RapidApp" : "1.3105",
+            "RapidApp" : "1.3106",
             "RapidApp::Builder" : "0",
             "RapidApp::Module::DbicPropPage" : "0",
             "RapidApp::Module::DbicRowDV" : "0",
@@ -106,6 +113,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.1001"
+   "version" : "1.1002"
 }
 

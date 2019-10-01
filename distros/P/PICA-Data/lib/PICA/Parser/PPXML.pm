@@ -2,7 +2,7 @@ package PICA::Parser::PPXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use parent 'PICA::Parser::XML';
 
@@ -44,7 +44,7 @@ PICA::Parser::PPXML - PicaPlus-XML Parser (format variant of the Deutsche Nation
 
 =head1 DESCRIPTION
 
-See L<PICA::Parser::Base> for synopsis and details.
+See L<PICA::Parser::Base> for synopsis and configuration.
 
 =head1 SEE ALSO
 

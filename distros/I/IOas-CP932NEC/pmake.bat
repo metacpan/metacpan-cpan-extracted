@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.20';
+$VERSIONE = '0.23';
 $VERSIONE = $VERSIONE;
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
@@ -44,6 +44,7 @@ C:\> pmake xtest
 C:\> pmake install
 C:\> pmake dist
 C:\> pmake ptar
+C:\> pmake xzvf
 C:\> pmake pwget
 END
     }
@@ -58,6 +59,7 @@ $ ./pmake.bat xtest
 $ ./pmake.bat install
 $ ./pmake.bat dist
 $ ./pmake.bat ptar
+$ ./pmake.bat xzvf
 $ ./pmake.bat pwget
 
 END
@@ -65,9 +67,11 @@ END
 }
 
 # get file list
-open(FH_MANIFEST, 'MANIFEST');
-chomp(my @file = <FH_MANIFEST>);
-close FH_MANIFEST;
+my @file = ();
+if (open(FH_MANIFEST, 'MANIFEST')) {
+    chomp(@file = <FH_MANIFEST>);
+    close FH_MANIFEST;
+}
 
 for my $target (@ARGV) {
 
@@ -206,7 +210,7 @@ for my $target (@ARGV) {
             IOas::CP932          0.06
             IOas::CP932IBM       0.06
             IOas::CP932NEC       0.06
-            IOas::CP932NEC         0.06
+            IOas::CP932X         0.06
             IOas::SJIS2004       0.06
             Jacode4e::RoundTrip  2.13.81.8
             UTF8::R2             0.05
@@ -1035,6 +1039,45 @@ END
         }
     }
 
+    # unzip and untar *.tar.gz
+    elsif ($target =~ /^xzvf$/) {
+        for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
+
+            if ($^O =~ /(?:solaris|linux)/i) {
+                system(qq{gzip -cd $gzfile | tar -xvf -});
+            }
+            else {
+                eval q{
+                    use Compress::Zlib;
+                    use Archive::Tar;
+                };
+
+                my $gz = gzopen($gzfile, 'rb');
+                (my $tarfile = $gzfile) =~ s/\.gz$//xmsi;
+                open(FH_TAR, ">$tarfile") || die "Can't open file: $tarfile\n";
+                binmode FH_TAR;
+                while ($gz->gzreadline(my $line)) {
+                    print FH_TAR $line;
+                }
+                $gz->gzclose;
+                close FH_TAR;
+
+                my $tar = Archive::Tar->new($tarfile,1);
+                for my $file ($tar->list_files){
+                    if (-e $file) {
+                        print STDERR "skip $file is already exists.\n";
+                    }
+                    else {
+                        print STDERR "x $file\n";
+                        $tar->extract($file);
+                    }
+                }
+                unlink $tarfile;
+            }
+        }
+        last;
+    }
+
     # make pwget
     elsif ($target =~ /^pwget(?:\.bat)?$/) {
 
@@ -1272,6 +1315,7 @@ pmake - make of Perl Poor Tools
   pmake.bat install
   pmake.bat dist
   pmake.bat ptar
+  pmake.bat xzvf
   pmake.bat pwget
 
 =head1 DEPENDENCIES

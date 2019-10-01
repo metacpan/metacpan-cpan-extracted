@@ -8,16 +8,16 @@
 
 package Net::OAuth2::AccessToken;
 use vars '$VERSION';
-$VERSION = '0.65';
+$VERSION = '0.66';
 
 use warnings;
 use strict;
 
 our $VERSION;  # to be able to test in devel environment
 
-use JSON        qw/encode_json/;
-use URI::Escape qw/uri_escape/;
-use Encode      qw/find_encoding/;
+use JSON::MaybeXS qw/encode_json/;
+use URI::Escape   qw/uri_escape/;
+use Encode        qw/find_encoding/;
 
 # Attributes to be saved to preserve the session.
 my @session = qw/access_token token_type refresh_token expires_at

@@ -348,7 +348,9 @@ sub _parse_social_entities {
   my $self = shift;
   my $body = $self->body or return ();
   
-  my @ents = $body =~ /(?:^|\s)([#@][-\w]{1,64})\b/g;
+  my @ents = 
+    grep { ! ($_ =~ /^#\d+$/) } # Exclude hashtags that are only numbers
+    $body =~ /(?:^|\s)([#@][-\w]{1,64})\b/g;
   
   return uniq(@ents)
 }

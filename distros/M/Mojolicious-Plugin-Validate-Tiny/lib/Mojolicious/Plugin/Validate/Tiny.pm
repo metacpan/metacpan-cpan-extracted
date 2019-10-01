@@ -1,14 +1,12 @@
 package Mojolicious::Plugin::Validate::Tiny;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use v5.10;
-use strict;
-use warnings;
 use Carp qw/croak/;
+use List::Util qw(any none);
 use Validate::Tiny;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = '0.18';
+our $VERSION = '1.0.1';
+
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -19,16 +17,18 @@ sub register {
         explicit   => 0,
         autofields => 1,
         exclude    => [],
-        %{ $conf || {} } };
+        %{ $conf || {} }
+    };
 
     # Helper do_validation
     $app->helper(
         do_validation => sub {
             my ( $c, $rules, $params ) = @_;
+            
             croak "ValidateTiny: Wrong validatation rules"
-                unless ref($rules) ~~ [ 'ARRAY', 'HASH' ];
+                if (none {$_ eq ref($rules)} ('ARRAY', 'HASH'));
 
-            $c->stash('validate_tiny.was_called', 1);
+            $c->flash('validate_tiny.was_called', 1);
 
             $rules = { checks => $rules } if ref $rules eq 'ARRAY';
             $rules->{fields} ||= [];
@@ -40,7 +40,7 @@ sub register {
             $params->{ $_->name } ||= $_ for (@{ $c->req->uploads });
 
             #Latest mojolicious has an issue in that it doesn't include route supplied parameters so we need to hack that in.
-            $params = { %{$params},  %{$c->stash->{'mojo.captures'}} };
+            $params = { %{$params},  %{$c->flash('mojo.captures') || {}} };
 
             # Autofill fields
             if ( $conf->{autofields} ) {
@@ -62,7 +62,7 @@ sub register {
                 my @fields_wo_rules;
 
                 foreach my $f ( @{ $rules->{fields} } ) {
-                    next if $f ~~ $conf->{exclude};
+                    next if (any {$_ eq $f} @{$conf->{exclude}});
                     push @fields_wo_rules, $f unless exists $h{$f};
                 }
 
@@ -74,7 +74,7 @@ sub register {
                     foreach my $f (@fields_wo_rules) {
                         $errors->{$f} = "No validation rules for field \"$f\"";
                     }
-                    $c->stash( 'validate_tiny.errors' => $errors);
+                    $c->flash('validate_tiny.errors' => $errors);
                     $log->debug($err_msg);
                     return 0;
                 }
@@ -89,14 +89,14 @@ sub register {
                 $result = Validate::Tiny->new( $params, $rules );
             }
             
-            $c->stash( 'validate_tiny.result' => $result );
+            $c->flash('validate_tiny.result' => $result);
 
             if ( $result->success ) {
                 $log->debug('ValidateTiny: Successful');
                 return $result->data;
             } else {
                 $log->debug( 'ValidateTiny: Failed: ' . join( ', ', keys %{ $result->error } ) );
-                $c->stash( 'validate_tiny.errors' => $result->error );
+                $c->flash('validate_tiny.errors' => $result->error);
                 return;
             }
         } );
@@ -105,7 +105,7 @@ sub register {
     $app->helper(
         validator_has_errors => sub {
             my $c      = shift;
-            my $errors = $c->stash('validate_tiny.errors');
+            my $errors = $c->flash('validate_tiny.errors');
 
             return 0 if !$errors || !keys %$errors;
             return 1;
@@ -115,7 +115,7 @@ sub register {
     $app->helper(
         validator_error => sub {
             my ( $c, $name ) = @_;
-            my $errors = $c->stash('validate_tiny.errors');
+            my $errors = $c->flash('validate_tiny.errors');
 
             return $errors unless defined $name;
 
@@ -131,14 +131,14 @@ sub register {
             return '' unless $c->validator_has_errors();
             $params //= {};
 
-		    return $c->stash('validate_tiny.result')->error_string(%$params);
+            return $c->flash('validate_tiny.result')->error_string(%$params);
         } );
 
     # Helper validator_any_error
     $app->helper(
         validator_any_error => sub {
             my ( $c ) = @_;
-            my $errors = $c->stash('validate_tiny.errors');
+            my $errors = $c->flash('validate_tiny.errors');
 
             if ( $errors ) {
                 return ( ( values %$errors )[0] );
@@ -152,8 +152,10 @@ sub register {
     $app->hook(
         after_dispatch => sub {
             my ($c) = @_;
+
+            return 1 if $c->flash('validate_tiny.was_called');
+
             my $stash = $c->stash;
-            return 1 if $stash->{'validate_tiny.was_called'};
 
             if ( $stash->{controller} && $stash->{action} ) {
                 $log->debug("ValidateTiny: No validation in [$stash->{controller}#$stash->{action}]");

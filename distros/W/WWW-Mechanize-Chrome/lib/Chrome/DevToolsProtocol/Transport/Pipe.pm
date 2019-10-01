@@ -3,106 +3,99 @@ use strict;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
-use Scalar::Util 'weaken';
 
-use IO::Async::Loop;
-use IO::Async::Stream;
-
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 NAME
 
-Chrome::DevToolsProtocol::Transport::Pipe - EXPERIMENTAL Local pipe backend for Chrome communication
-
-=head1 SYNOPSIS
-
-    my $t = Chrome::DevToolsProtocol::Transport::Pipe->new;
-    $t->connect( $handler, $got_endpoint, $logger)
-    ->then(sub {
-        my( $connection ) = @_;
-        print "We are connected\n";
-    });
-
-=head1 DESCRIPTION
-
-This is an experimental backend communicating with Chrome using a pipe
-of two file descriptors. At least on Debian, this backend does not implement
-
+Chrome::DevToolsProtocol::Transport::Pipe - choose the best transport backend
 
 =cut
 
-sub new( $class, %options ) {
-    $options{ loop } ||= IO::Async::Loop->new();
-    bless \%options => $class
+our @loops = (
+    ['Mojo/IOLoop.pm'   => 'Chrome::DevToolsProtocol::Transport::Pipe::Mojo' ],
+    ['IO/Async.pm'      => 'Chrome::DevToolsProtocol::Transport::Pipe::NetAsync'],
+    ['IO/Async/Loop.pm' => 'Chrome::DevToolsProtocol::Transport::Pipe::NetAsync'],
+    ['AnyEvent.pm'      => 'Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent'],
+    ['AE.pm'            => 'Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent'],
+    # native POE support would be nice
+
+    # The fallback, will always catch due to loading strict (for now)
+    ['strict.pm'      => 'Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent'],
+);
+our $implementation;
+
+=head1 METHODS
+
+=head2 C<< Chrome::DevToolsProtocol::Transport::Pipe->new(@args) >>
+
+    my $ua = Chrome::DevToolsProtocol::Transport::Pipe->new();
+
+Creates a new instance of the transport using the "best" event loop
+for implementation. The default event loop is currently L<AnyEvent>.
+
+All parameters are passed on to the implementation class.
+
+=cut
+
+sub new($factoryclass, @args) {
+    $implementation ||= $factoryclass->best_implementation();
+
+    # return a new instance
+    $implementation->new(@args);
 }
 
-sub connection( $self ) {
-    $self->{connection}
-}
+sub best_implementation( $class, @candidates ) {
 
-sub loop( $self ) {
-    $self->{loop}
-}
-
-sub connect( $self, $handler, $got_endpoint, $logger ) {
-    $logger ||= sub{};
-    weaken $handler;
-
-    my $buffer;
-
-    $got_endpoint->then( sub( $endpoint ) {
-        die "Got an undefined endpoint" unless defined $endpoint;
-        $self->{connection} = IO::Async::Stream->new(
-            read_handle  => $endpoint->{ reader_fh },
-            write_handle => $endpoint->{ writer_fh },
-            on_write_error => sub {
-                use Data::Dumper;
-                warn Dumper \@_;
-            },
-            on_read => sub( $self, $buffref, $eof ) {
-                while($$buffref =~ s!^(.*?)\0!!) {
-                    #warn "[[$1]]";
-                    my $line = $1;
-                    $handler->on_response( $self, $line );
-                };;
-            },
-        );
-        $self->{loop}->add( $self->connection );
-        Future->done( $self );
-    });
-}
-
-sub send( $self, $message ) {
-    $self->connection->write( $message . "\0" );
-    $self->future->done(1);
-}
-
-sub close( $self ) {
-    my $c = delete $self->{connection};
-    if( $c) {
-        $c->close
+    if(! @candidates) {
+        @candidates = @loops;
     };
-    delete $self->{ua};
-}
 
-sub future( $self ) {
-    my $res = $self->loop->new_future;
-    return $res
-}
+    # Find the currently running/loaded event loop(s)
+    #use Data::Dumper;
+    #$Data::Dumper::Sortkeys = 1;
+    #warn Dumper \%INC;
+    #warn Dumper \@candidates;
+    my @applicable_implementations = map {
+        $_->[1]
+    } grep {
+        $INC{$_->[0]}
+    } @candidates;
 
-=head2 C<< $transport->sleep( $seconds ) >>
-
-    $transport->sleep( 10 )->get; # wait for 10 seconds
-
-Returns a Future that will be resolved in the number of seconds given.
-
-=cut
-
-sub sleep( $self, $seconds ) {
-    Future::Mojo->new_timer( $seconds )
-}
+    # Check which one we can load:
+    for my $impl (@applicable_implementations) {
+        if( eval "require $impl; 1" ) {
+            return $impl;
+        }
+        # else { warn $@ };
+    };
+};
 
 1;
+
+=head1 SUPPORTED BACKENDS
+
+The module will try to guess the best backend to use. The currently supported
+backends are
+
+=over 4
+
+=item *
+
+L<IO::Async>
+
+=item *
+
+L<AnyEvent> (planned)
+
+=item *
+
+L<Mojolicious> (planned)
+
+=back
+
+If you want to substitute another backend, pass its class name instead
+of this module which only acts as a factory.
 
 =head1 REPOSITORY
 
@@ -125,7 +118,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

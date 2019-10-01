@@ -66,11 +66,9 @@
             "Scalar::Util" : "1.47",
             "Syntax::Keyword::Try" : "0.04",
             "Text::CSV" : "0",
-            "Variable::Disposition" : "0.004",
             "curry" : "1.001",
             "curry::weak" : "0",
             "indirect" : "0",
-            "namespace::clean" : "0.27",
             "overload" : "0",
             "parent" : "0",
             "perl" : "5.018",
@@ -102,42 +100,43 @@
             "Test::Files" : "0.14",
             "Test::More" : "0.98",
             "Test::Refcount" : "0.07",
-            "Test::Warnings" : "0.024"
+            "Test::Warnings" : "0.024",
+            "Variable::Disposition" : "0.004"
          }
       }
    },
    "provides" : {
       "Ryu" : {
          "file" : "lib/Ryu.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Buffer" : {
          "file" : "lib/Ryu/Buffer.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Exception" : {
          "file" : "lib/Ryu/Exception.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Node" : {
          "file" : "lib/Ryu/Node.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Observable" : {
          "file" : "lib/Ryu/Observable.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Sink" : {
          "file" : "lib/Ryu/Sink.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Source" : {
          "file" : "lib/Ryu/Source.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       },
       "Ryu::Stream" : {
          "file" : "lib/Ryu/Stream.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       }
    },
    "release_status" : "stable",
@@ -152,14 +151,14 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Amin Marashi <marashi.s.amin@gmail.com>",
       "tm604 <tom@perlsite.co.uk>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

@@ -10,15 +10,32 @@ use POE;
 
 =head1 NAME
 
-POE::Component::FunctionBus - Easily scalability
+POE::Component::FunctionBus - Scalable dynamic function bus
+
+=head1 PECULIARITIES
+
+=head2 UNUSABLE MODULE
+
+This module is a skeleton for a larger module and the author 
+is basically getting his enviroment setup, trying to remember 
+howto get PODs nicely formatted and other bits and bobs, that 
+is the only reason this module has been uploaded. 
+
+This module should not be used by anyone in its current state.
+
+=head2 VERSIONING
+
+The author of this module has taken a rather strange approach 
+to the versioning of the module, basically there the time the 
+source code/package was packaged 'make dist'. 
 
 =head1 VERSION
 
-Version 0.01
+Version 1569954247
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '1569954247';
 
 =head1 DESCRIPTION
 

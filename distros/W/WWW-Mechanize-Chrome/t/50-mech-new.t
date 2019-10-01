@@ -16,11 +16,13 @@ Log::Log4perl->easy_init($ERROR);
 # What instances of Chrome will we try?
 my @instances = t::helper::browser_instances();
 
+my $testcount = 7;
+
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
     exit
 } else {
-    plan tests => 6*@instances;
+    plan tests => $testcount*@instances;
 };
 
 my %args;
@@ -35,7 +37,7 @@ sub new_mech {
     );
 };
 
-t::helper::run_across_instances(\@instances, \&new_mech, 6, sub {
+t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     my( $file, $mech ) = splice @_; # so we move references
     my $version = $mech->chrome_version;
 
@@ -43,46 +45,58 @@ t::helper::run_across_instances(\@instances, \&new_mech, 6, sub {
         and $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} eq 'Chrome::DevToolsProtocol::Transport::Mojo'
     ) {
         SKIP: {
-            skip "Chrome::DevToolsProtocol::Transport::Mojo doesn't support port reuse", 6
+            skip "Chrome::DevToolsProtocol::Transport::Mojo doesn't support port reuse", $testcount
         };
         return;
     } elsif( $version =~ /\b(\d+)\b/ and ($1 == 61 or $1 == 59)) {
         SKIP: {
-            skip "Chrome v$1 doesn't properly handle listing tabs...", 6;
+            skip "Chrome v$1 doesn't properly handle listing tabs...", $testcount;
         };
         return
     };
 
     my $app = $mech->driver;
+    my $transport = $app->transport;
     $mech->{autoclose} = 1;
     my $pid = delete $mech->{pid}; # so that the process survives
 
     # Add one more, just to be on the safe side, so that Chrome doesn't close
     # immediately again:
-    $mech->driver->new_tab()->get;
+    #$mech->driver->new_tab()->get;
+    my $info = $mech->driver->createTarget()->get;
+    my $targetId = $mech->driver->targetId; # this one should close once we discard it
 
-    my @tabs = $app->list_tabs()->get;
-    diag "Tabs open in PID $pid: ", 0+@tabs;
+    #my @tabs = $app->list_tabs()->get;
+    my @tabs = $app->getTargets()->get;
+    note "Tabs open in PID $pid: ", 0+@tabs;
+    #use Data::Dumper; note Dumper \@tabs;
 
-    diag "Releasing mechanize $pid";
+    note "Releasing mechanize $pid";
     undef $mech; # our own tab should now close automatically
-    diag "Released mechanize";
+    note "Released mechanize";
 
     sleep 1;
 
     SKIP: {
         # In some Chrome versions, Chrome goes away when we closed our websocket?!
-        diag "Listing tabs";
+        note "Listing tabs";
         my @new_tabs;
-        my $ok = eval { @new_tabs = $app->list_tabs()->get; 1 };
+        my $ok = eval { @new_tabs = $app->getTargets()->get; 1 };
         if( ! $ok ) {
-            skip "$@", 6;
+            skip "$@", $testcount;
         };
 
         if (! is scalar @new_tabs, @tabs-1, "Our tab was presumably closed") {
             for (@new_tabs) {
                 diag $_->{title};
             };
+        };
+        if( my @kept = grep { $_->{targetId} eq $targetId } @new_tabs ) {
+            pass "And it was our tab that was closed";
+            use Data::Dumper;
+            diag Dumper \@kept;
+        } else {
+            pass "And it was our tab that was closed";
         };
 
     my $magic = sprintf "%s - %s", basename($0), $$;
@@ -93,6 +107,8 @@ t::helper::run_across_instances(\@instances, \&new_mech, 6, sub {
         autoclose => 0,
         reuse     => 1,
         new_tab   => 1,
+        driver    => $app,
+        driver_transport => $transport,
         %args,
     );
     $mech->update_html(<<HTML);
@@ -110,11 +126,13 @@ HTML
         autoclose => 0,
         tab       => qr/^\Q$magic/,
         reuse     => 1,
+        driver    => $app,
+        driver_transport => $transport,
         %args,
     );
     $c = $mech->content;
     like $c, qr/\Q$magic/, "We selected the existing tab"
-        or do { diag $_->{title} for $mech->driver->list_tabs() };
+        or do { diag $_->{title} for $mech->driver->getTargets()->get };
 
     # Now activate the tab and connect to the "current" tab
     # This is ugly for a user currently using that Chrome instance,
@@ -128,11 +146,13 @@ HTML
         autodie   => 0,
         autoclose => 0,
         tab       => 'current',
+        driver    => $app,
+        driver_transport => $transport,
         %args,
     );
     $c = $mech->content;
     like $mech->content, qr/\Q$magic/, "We connected to the current tab"
-        or do { diag $_->{title} for $mech->driver->list_tabs->get() };
+        or do { diag $_->{title} for $mech->driver->getTargets()->get() };
     $mech->autoclose_tab(1);
 
     undef $mech; # and close that tab
@@ -143,6 +163,8 @@ HTML
             autodie => 1,
             tab => qr/\Q$magic/,
             reuse => 1,
+        driver    => $app,
+        driver_transport => $transport,
             %args,
         );
         1;

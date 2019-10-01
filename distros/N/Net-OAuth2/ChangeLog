@@ -3,6 +3,11 @@
 
 All changes by Mark Overmeer unless noted otherwise.
 
+version 0.66: Tue  1 Oct 10:58:28 CEST 2019
+
+	Improvements:
+	- #3 replace JSON with JSON::MaybeXS [James Raspass]
+
 version 0.65: Mon 16 Sep 08:42:09 CEST 2019
 
 	Fixes:

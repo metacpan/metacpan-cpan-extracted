@@ -135,6 +135,11 @@ SUBROUTINES
     hierarchy provides "DOES", then Role::Tiny will not override it.
 
 METHODS
+  make_role
+     Role::Tiny->make_role('Some::Role');
+
+    Makes a package into a role, but does not export any subs into it.
+
   apply_roles_to_package
      Role::Tiny->apply_roles_to_package(
        'Some::Package', 'Some::Role', 'Some::Other::Role'

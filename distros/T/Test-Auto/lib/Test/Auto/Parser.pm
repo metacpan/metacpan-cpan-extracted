@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 use Data::Object 'WithStashable';
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has name => (
   is => 'ro',

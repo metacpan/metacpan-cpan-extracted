@@ -1,0 +1,21 @@
+---
+fields:
+  021A:
+    repeatable: false
+    subfields:
+      b:
+        label: additional titel
+        repeatable: true
+        codes:
+          A:
+            label: A
+        deprecated-codes:
+          B:
+            label: deprecated code
+    deprecated-subfields:
+      g:
+        code: g
+        label: A deprecated subfield
+deprecated-fields:
+  046Q:
+    label: A deprecated field

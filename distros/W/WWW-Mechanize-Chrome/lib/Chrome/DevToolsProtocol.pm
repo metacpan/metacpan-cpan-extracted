@@ -15,7 +15,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 our @CARP_NOT;
 
 =head1 NAME
@@ -72,7 +72,7 @@ has 'host' => (
     default => '127.0.0.1',
 );
 
-=item B<host>
+=item B<port>
 
 The port to connect to
 
@@ -131,6 +131,14 @@ has 'receivers' => (
     default => sub { {} },
 );
 
+has 'reader_fh' => (
+    is => 'ro',
+);
+
+has 'writer_fh' => (
+    is => 'ro',
+);
+
 =item B<on_message>
 
 A callback invoked for every message
@@ -165,6 +173,11 @@ The event-loop specific transport backend
 
 has 'transport' => (
     is => 'ro',
+    handles => ['future'],
+);
+
+has 'is_connected' => (
+    is => 'rw',
 );
 
 around BUILDARGS => sub( $orig, $class, %args ) {
@@ -180,10 +193,6 @@ around BUILDARGS => sub( $orig, $class, %args ) {
 
 Returns a backend-specific generic future
 
-=cut
-
-sub future( $self ) { $self->transport->future }
-
 =head2 C<< ->endpoint >>
 
     my $url = $driver->endpoint();
@@ -192,10 +201,9 @@ Returns the URL endpoint to talk to for the connected tab
 
 =cut
 
-sub endpoint( $self ) {
-    $self->tab
-        and $self->tab->{webSocketDebuggerUrl}
-}
+has 'endpoint' => (
+    is => 'rw', # actually, it isn't really rw, but set-once
+);
 
 =head2 C<< ->add_listener >>
 
@@ -277,13 +285,17 @@ Asynchronously connect to the Chrome browser, returning a Future.
 =cut
 
 sub connect( $self, %args ) {
+    my $s = $self;
+    weaken $s;
     # If we are still connected to a different tab, disconnect from it
-    if( $self->transport and ref $self->transport ) {
+    if( $self->transport and ref $self->transport and $self->transport->type ne 'pipe') {
         $self->transport->close();
     };
-
     # Kick off the connect
     my $endpoint;
+    $args{ writer_fh } //= $self->writer_fh;
+    $args{ reader_fh } //= $self->reader_fh;
+    $args{ endpoint } //= $self->endpoint;
     if( $args{ writer_fh } and $args{ reader_fh }) {
         # Pipe connection
         $args{ transport } ||= 'Chrome::DevToolsProtocol::Transport::Pipe';
@@ -291,87 +303,19 @@ sub connect( $self, %args ) {
             reader_fh => $args{ reader_fh },
             writer_fh => $args{ writer_fh },
         };
+
     } elsif( $args{ endpoint }) {
-        $endpoint = $args{ endpoint };
+        $endpoint = $args{ endpoint } || $self->endpoint;
         $self->log('trace', "Using endpoint $endpoint");
-
-    } elsif( $args{ tab } and ref $args{ tab } eq 'HASH' ) {
-        $endpoint = $args{ tab }->{webSocketDebuggerUrl};
-        $self->log('trace', "Using webSocketDebuggerUrl endpoint $endpoint");
-
-    } elsif( $args{ tab } and $args{ tab } =~ /^\d+$/) {
-        $endpoint = undef;
-
-    } elsif( $args{ new_tab } ) {
-        $endpoint = undef;
-        $self->log('trace', "Using new tab (and fresh endpoint)");
-
-    } else {
-        $endpoint ||= $self->endpoint;
-        $self->log('trace', "Using endpoint " . ($endpoint||'<undef>'));
     };
 
     my $got_endpoint;
     if( ! $endpoint ) {
-        if( $args{ new_tab }) {
-            $got_endpoint = $self->new_tab()->then(sub( $info ) {
-                $self->log('debug', "Created new tab", $info );
-                $self->{tab} = $info;
-                return Future->done( $info->{webSocketDebuggerUrl} );
-            });
-
-        } elsif( defined $args{ tab } and ! ref $args{ tab } and $args{ tab } =~ /^\d+$/ ) {
-            $got_endpoint = $self->list_tabs()->then(sub( @tabs ) {
-                $self->log('debug', "Attached to tab $args{tab}", @tabs );
-                $self->{tab} = $tabs[ $args{ tab }];
-                return Future->done( $self->{tab}->{webSocketDebuggerUrl} );
-            });
-
-        } elsif( ref $args{ tab } eq 'Regexp') {
-            # Let's assume that the tab is a regex:
-
-            $got_endpoint = $self->list_tabs()->then(sub( @tabs ) {
-                (my $tab) = grep { $_->{title} =~ /$args{ tab }/ } @tabs;
-
-                if( ! $tab ) {
-                    $self->log('warn', "Couldn't find a tab matching /$args{ tab }/");
-                    croak "Couldn't find a tab matching /$args{ tab }/";
-                } elsif( ! $tab->{webSocketDebuggerUrl} ) {
-                    local @CARP_NOT = ('Future',@CARP_NOT);
-                    croak "Found the tab but it didn't have a webSocketDebuggerUrl";
-                };
-                $self->{tab} = $tab;
-                $self->log('debug', "Attached to tab $args{tab}", $tab );
-                return Future->done( $self->{tab}->{webSocketDebuggerUrl} );
-            });
-
-        } elsif( ref $args{ tab } ) {
-            # Let's assume that the tab is a tab object:
-            $got_endpoint = $self->list_tabs()->then(sub( @tabs ) {
-                (my $tab) = grep { $_->{id} eq $args{ tab }->{id}} @tabs;
-                $self->{tab} = $tab;
-                $self->log('debug', "Attached to tab $args{tab}", $tab );
-                return Future->done( $self->{tab}->{webSocketDebuggerUrl} );
-            });
-
-        } elsif( $args{ tab } ) {
-            # Let's assume that the tab is the tab id:
-            $got_endpoint = $self->list_tabs()->then(sub( @tabs ) {
-                (my $tab) = grep { $_->{id} eq $args{ tab }} @tabs;
-                $self->{tab} = $tab;
-                $self->log('debug', "Attached to tab $args{tab}", $tab );
-                return Future->done( $self->{tab}->{webSocketDebuggerUrl} );
-            });
-
-        } else {
-            # Attach to the first available tab we find
-            $got_endpoint = $self->list_tabs()->then(sub( @tabs ) {
-                (my $tab) = grep { $_->{webSocketDebuggerUrl} } @tabs;
-                $self->log('debug', "Attached to some tab", $tab );
-                $self->{tab} = $tab;
-                return Future->done( $self->{tab}->{webSocketDebuggerUrl} );
-            });
-        };
+        $got_endpoint = $self->version_info()->then(sub( $info ) {
+            $self->log('debug', "Found webSocket URL", $info );
+            #$self->tab( $info );
+            return Future->done( $info->{webSocketDebuggerUrl} );
+        });
 
     } else {
         $got_endpoint = Future->done( $endpoint );
@@ -380,7 +324,7 @@ sub connect( $self, %args ) {
             $endpoint =~ m!/([^/]+)$!
                 or die "Couldn't find tab id in '$endpoint'";
             $self->{tab} = {
-                id => $1,
+                targetId => $1,
             };
         };
     };
@@ -391,7 +335,6 @@ sub connect( $self, %args ) {
         #croak @args;
         Future->fail( @args );
     });
-
     my $transport = delete $args{ transport }
                     || $self->transport
                     || 'Chrome::DevToolsProtocol::Transport';
@@ -402,8 +345,14 @@ sub connect( $self, %args ) {
         $self->{transport} = $transport->new;
         $transport = $self->{transport};
     };
-
-    return $transport->connect( $self, $got_endpoint, sub { $self->log( @_ ) } );
+    return $transport->connect( $self, $got_endpoint, sub { $s->log( @_ ) } )
+    #->on_ready(sub {
+    #    use Data::Dumper;
+    #    warn Dumper \@_;
+    #})
+    ->on_done(sub {
+        $s->is_connected(1);
+    });
 };
 
 =head2 C<< ->close >>
@@ -686,6 +635,10 @@ sub evaluate( $self, $string, %options ) {
 
 =head2 C<< $chrome->eval >>
 
+    my $result = $chrome->eval('2+2');
+
+Evaluates a Javascript string and returns the result.
+
 =cut
 
 sub eval( $self, $string ) {
@@ -697,6 +650,8 @@ sub eval( $self, $string ) {
 =head2 C<< $chrome->version_info >>
 
     print $chrome->version_info->get->{"Protocol-Version"};
+
+Returns the implemented ChromeDevTooslProtocol protocol version.
 
 =cut
 
@@ -718,7 +673,21 @@ sub protocol_version($self) {
     });
 };
 
+=head2 C<< $target->getVersion >>
+
+Returns information about the Chrome instance we are connected to.
+
+=cut
+
+sub getVersion( $self ) {
+    $self->send_message( 'Browser.getVersion' )
+}
+
 =head2 C<< $chrome->get_domains >>
+
+    my $schema = $chrome->get_domains->get;
+
+Returns the topics of this Chrome DevToolsProtocol implementation.
 
 =cut
 
@@ -746,9 +715,10 @@ sub list_tabs( $self, $type = 'page' ) {
 =cut
 
 sub new_tab( $self, $url=undef ) {
-    my $u = $url ? '?' . $url : '';
+    #my $u = $url ? '?' . $url : '';
     $self->log('trace', "Creating new tab");
-    $self->json_get('new' . $u)
+    #$self->json_get('new' . $u)
+    $self->createTarget( url => $url );
 };
 
 =head2 C<< $chrome->activate_tab >>
@@ -780,6 +750,92 @@ sub close_tab( $self, $tab ) {
              Future->done
         });
 };
+
+=head2 C<< $chrome->getTargets >>
+
+    my @targets = $chrome->getTargets->get;
+
+Gets the list of available targets
+
+=cut
+
+sub getTargets( $self ) {
+    $self->send_message('Target.getTargets')->then(sub( $info ) {
+        Future->done( @{$info->{targetInfos}})
+    });
+}
+
+=head2 C<< $target->getTargetInfo >>
+
+    my $info = $chrome->getTargetInfo( $targetId )->get;
+    print $info->{title};
+
+Returns information about the current target
+
+=cut
+
+sub getTargetInfo( $self, $targetId ) {
+    $self->send_message('Target.getTargetInfo',
+        targetId => $targetId )->then(sub( $info ) {
+            Future->done( $info->{targetInfo})
+    });
+}
+
+=head2 C<< $target->createTarget >>
+
+    my $targetId = $chrome->createTarget(
+        url => 'about:blank',
+        width => 1280,
+        height => 800,
+        newWindow => JSON::false,
+        background => JSON::false,
+    )->get;
+    print $targetId;
+
+Creates a new target
+
+=cut
+
+sub createTarget( $self, %options ) {
+    $options{ url } //= 'about:blank';
+    $self->send_message('Target.createTarget',
+        %options )->then(sub( $info ) {
+            Future->done( $info->{targetId})
+    });
+}
+
+=head2 C<< $target->attachToTarget >>
+
+    my $sessionId = $chrome->attachToTarget(
+        targetId => $targetId,
+    )->get;
+    print $sessionId;
+
+Attaches to the target so we receive events generated by the target
+
+=cut
+
+sub attachToTarget( $self, %options ) {
+    $self->send_message('Target.attachToTarget',
+        %options )->then(sub( $info ) {
+            Future->done( $info->{sessionId})
+    });
+}
+
+=head2 C<< $target->closeTarget >>
+
+    my $targetId = $chrome->closeTarget(
+        targetId => $targetId
+    )->get;
+
+Creates a new target
+
+=cut
+
+sub closeTarget( $self, %options ) {
+    $self->send_message('Target.closeTarget',
+        %options )
+}
 
 package
     Chrome::DevToolsProtocol::EventListener;

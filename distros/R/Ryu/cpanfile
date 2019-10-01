@@ -9,8 +9,6 @@ requires 'List::UtilsBy', '>= 0.10';
 requires 'Log::Any', '>= 1.045';
 requires 'Log::Any::Adapter', '>= 1.045';
 requires 'Syntax::Keyword::Try', '>= 0.04';
-requires 'namespace::clean', '>= 0.27';
-requires 'Variable::Disposition', '>= 0.004';
 requires 'Encode', '>= 1.98';
 
 # Used for transcoding - not essential, but commonly used
@@ -30,6 +28,7 @@ on 'test' => sub {
 	requires 'Test::Warnings', '>= 0.024';
 	requires 'Test::Files', '>= 0.14';
 	requires 'Log::Any::Adapter::TAP', '>= 0.003002';
+	requires 'Variable::Disposition', '>= 0.004';
 
 	recommends 'Test::HexString', '>= 0.03';
 };

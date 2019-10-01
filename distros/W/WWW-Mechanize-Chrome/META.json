@@ -48,6 +48,7 @@
             "HTTP::Headers" : "0",
             "HTTP::Response" : "0",
             "IO::Socket::INET" : "0",
+            "IPC::Open3" : "0",
             "Imager" : "0",
             "Imager::File::PNG" : "0",
             "JSON" : "0",
@@ -56,6 +57,7 @@
             "Moo" : "2",
             "Object::Import" : "0",
             "POSIX" : "0",
+            "PerlX::Maybe" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
             "Try::Tiny" : "0",
@@ -71,7 +73,9 @@
             "Image::Info" : "0",
             "Test::Deep" : "0",
             "Test::HTTP::LocalServer" : "0.61",
+            "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
+            "Time::HiRes" : "0",
             "URI" : "0",
             "URI::file" : "0"
          }
@@ -85,7 +89,7 @@
          "web" : "https://github.com/Corion/WWW-Mechanize-Chrome"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

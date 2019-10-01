@@ -2,7 +2,7 @@ package PICA::Parser::Plain;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '1.00';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -86,22 +86,10 @@ __END__
 
 PICA::Parser::Plain - Plain PICA format parser
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
-See L<PICA::Parser::Base> for synopsis and details.
+See L<PICA::Parser::Base> for synopsis and configuration.
 
 The counterpart of this module is L<PICA::Writer::Plain>.
-
-=head2 Configuration
-
-See L<PICA::Parser::Base> for common configuration parameters.
-
-=over
- 
-=item C<strict>
-
-By default faulty fields in records are skipped with warnings. You can make them fatal by setting the I<strict> parameter to 1.
- 
-=back
 
 =cut

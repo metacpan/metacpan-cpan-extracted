@@ -406,6 +406,14 @@ empty string C<''>.
 This is provided as a top-level variable so non-privileged templates can access it (since they do 
 not have access to the actual context object in C<[% c %]>.
 
+=head2 accessed_site
+
+The external URL actually being used to access the site (experimental). This is actually not as simple
+as it may seem, as different deployment setups can change the environment from which this info can be
+determined. The intent is to provide the same base URL that the client browser is currently using to
+access the site. This is useful when dynamically generating public links, and you do not want to have
+to know/hard-code the site's domain/URL.
+
 =head2 local_info
 
 Access to arbitrary data that is specific to both the current session as well as the current URL/path of
@@ -419,6 +427,27 @@ call to be set as well.
 This also supports the special value 'clear' which can be supplied which will clear/delete the value after
 returning it.
 
+=head2 recaptcha_script_tag
+
+When reCAPTCHA support is enabled via defining a valid C<recaptcha_config>, this returns the HTML script 
+tag which must be included in client side HTML to enable the reCAPTCHA dialog on the page.
+
+=head2 recaptcha_form_item
+
+When reCAPTCHA support is enabled via defining a valid C<recaptcha_config>, AND the required 
+C<recaptcha_script_tag> has been included in the page/template, the C<recaptcha_form_item> provides
+the actual HTML element which presents the "I am not a robot" dialog/checkbox. This is typically
+inserted just before the "Submit" button of a form.
+
+Note: for this to do anything, the page the form submits to must also support the reCAPTCHA v2 API.
+Currently this support is built in on the C<signup> and C<email_login> (AKA forgot_password) endpoints
+of the Remote controller. Additionally, the built-in client-side templates for both of these are also
+configured.
+
+Also note that these templates are designed such that the reCAPTCHA dialog only appears if as 
+C<recaptcha_config> has been defined, and since this requires per-site registration with Google,
+this is not (and cannot be) enabled by default. For more information, refer to the Google recaptcha_config
+v2 documentation.
 
 =head2 Post
 

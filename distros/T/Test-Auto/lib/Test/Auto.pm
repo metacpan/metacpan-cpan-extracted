@@ -8,7 +8,7 @@ use Data::Object::Try;
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 has file => (
   is => 'ro',

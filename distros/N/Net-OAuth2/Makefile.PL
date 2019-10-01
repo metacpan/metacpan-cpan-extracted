@@ -3,12 +3,12 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile
   ( NAME        => 'Net::OAuth2'
-  , VERSION     => '0.65'
+  , VERSION     => '0.66'
   , PREREQ_PM   =>
      { Test::More => 0
      , YAML => 0
      , URI  => '0'
-     , JSON => '0'
+     , JSON::MaybeXS  => '0'
      , LWP::UserAgent => '0'
      , Scalar::Util   => 0
      , HTTP::Request  => 0

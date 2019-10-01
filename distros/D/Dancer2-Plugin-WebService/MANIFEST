@@ -11,8 +11,8 @@ Makefile.PL
 README
 lib/Dancer2/Plugin/AuthScripts/AllowAlways.sh
 lib/Dancer2/Plugin/AuthScripts/HttpBasic.sh
-lib/Dancer2/Plugin/AuthScripts/LinuxNative.pl
-lib/Dancer2/Plugin/AuthScripts/LinuxNative.txt
+lib/Dancer2/Plugin/AuthScripts/linux.sh
+lib/Dancer2/Plugin/AuthScripts/linux.txt
 lib/Dancer2/Plugin/WebService.pm
 t/00-load.t
 t/author-pod-syntax.t

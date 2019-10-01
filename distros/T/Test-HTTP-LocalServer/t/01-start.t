@@ -8,6 +8,17 @@ use Test::More tests => 4;
 
 sub get {
     my( $url ) = @_;
+    local @ENV{ qw[
+        HTTP_PROXY
+        http_proxy
+        HTTP_PROXY_ALL
+        http_proxy_all
+        HTTPS_PROXY
+        https_proxy
+        CGI_HTTP_PROXY
+        ALL_PROXY
+        all_proxy
+    ] };
     HTTP::Tiny->new->get( $url )->{content};
 }
 

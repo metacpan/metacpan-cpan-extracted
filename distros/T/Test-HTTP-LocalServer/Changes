@@ -1,3 +1,8 @@
+0.69 2019-10-01
+    * Protect test suite against HTTP_PROXY (etc) being set, again
+      This is mostly because the module itself doesn't care anymore, but now
+      the test suite needs to protect itself.
+
 0.68 2019-09-30
     * Add ->basic_auth endpoint
 

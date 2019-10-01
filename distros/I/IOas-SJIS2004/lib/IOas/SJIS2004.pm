@@ -11,12 +11,28 @@ package IOas::SJIS2004;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use Symbol ();
+use Jacode4e::RoundTrip; # pmake.bat makes META.yml, META.json and Makefile.PL by /^use /
+
+#-----------------------------------------------------------------------------
+# import
+#-----------------------------------------------------------------------------
+
+sub import {
+    my $self = shift @_;
+    if (defined($_[0]) and ($_[0] =~ /\A[0123456789]/)) {
+        if ($_[0] != $IOas::SJIS2004::VERSION) {
+            my($package,$filename,$line) = caller;
+            die "$filename requires @{[__PACKAGE__]} $_[0], this is version $IOas::SJIS2004::VERSION, stopped at $filename line $line.\n";
+        }
+        shift @_;
+    }
+}
 
 #-----------------------------------------------------------------------------
 # autodetect I/O encoding from package name
@@ -24,33 +40,27 @@ use Symbol ();
 
 (my $__package__ = __PACKAGE__) =~ s/utf81/utf8.1/i;
 my $io_encoding = lc((split /::/, $__package__)[-1]);
-if ($io_encoding =~ /^(?:sjis2004|cp932|cp932ibm|cp932nec|sjis2004|cp00930|keis78|keis83|keis90|jef|jef9p|jipsj|jipse|letsj|utf8|utf8\.1)$/) {
-    eval q{
-use Jacode4e::RoundTrip; # pmake.bat makes META.yml, META.json and Makefile.PL by /^use /
-};
-    die $@ if $@;
-    *_io_input  = sub ($) { my($s)=@_; Jacode4e::RoundTrip::convert(\$s, 'utf8',       $io_encoding); return $s; };
-    *_io_output = sub ($) { my($s)=@_; Jacode4e::RoundTrip::convert(\$s, $io_encoding, 'utf8'      ); return $s; };
-}
-else {
-    eval q{
-use Encode; # pmake.bat makes META.yml, META.json and Makefile.PL by /^use /
-};
-    die $@ if $@;
-    *_io_input  = sub ($) { my($s)=@_; Encode::from_to             ( $s, $io_encoding, 'UTF-8'     ); return $s; };
-    *_io_output = sub ($) { my($s)=@_; Encode::from_to             ( $s, 'UTF-8',      $io_encoding); return $s; };
-}
 
-sub import {
-    my $self = shift @_;
-    if (defined($_[0]) and ($_[0] =~ /\A[0123456789]/)) {
-        if ($_[0] != $IOas::SJIS2004::VERSION) {
-            my($package,$filename,$line) = caller;
-            die "$filename requires IOas::SJIS2004 $_[0], this is version $IOas::SJIS2004::VERSION, stopped at $filename line $line.\n";
-        }
-        shift @_;
-    }
-}
+sub _io_input ($) {
+    my($s) = @_;
+    Jacode4e::RoundTrip::convert(\$s, 'utf8.1', $io_encoding);
+    return $s;
+};
+
+sub _io_output ($) {
+    my($s) = @_;
+    Jacode4e::RoundTrip::convert(\$s, $io_encoding, 'utf8.1', {
+        'OVERRIDE_MAPPING' => {
+            "\xE2\x80\x95" => "\x81\x5C",
+            "\xE2\x88\xA5" => "\x81\x61",
+            "\xEF\xBC\x8D" => "\x81\x7C",
+            "\xE2\x80\x94" => "\x81\x5C",
+            "\xE2\x80\x96" => "\x81\x61",
+            "\xE2\x88\x92" => "\x81\x7C",
+        },
+    });
+    return $s;
+};
 
 #-----------------------------------------------------------------------------
 # Octet Length as I/O Encoding

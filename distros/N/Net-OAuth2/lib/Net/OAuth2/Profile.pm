@@ -8,7 +8,7 @@
 
 package Net::OAuth2::Profile;
 use vars '$VERSION';
-$VERSION = '0.65';
+$VERSION = '0.66';
 
 
 use warnings;
@@ -16,7 +16,7 @@ use strict;
 
 use LWP::UserAgent ();
 use URI            ();
-use JSON           qw/decode_json/;
+use JSON::MaybeXS  qw/decode_json/;
 use Carp           qw/confess carp/;
 use Scalar::Util   qw/blessed/;
 use Encode         qw/encode/;

@@ -1,5 +1,13 @@
 Changelog for Catmandu-PICA
 
+1.00  2019-10-01 19:57:50 CEST
+ - fix SRU test (#67)
+ - fix wildcard from * to . (#66)
+ - fix travis.yml (#65)
+ - deleted data printer
+ - added more PICA::Schema options / allow YAML 
+
+
 0.26  2018-05-30 20:14:10 CEST
  - fix failing test caused by new release of PICA::Data
  - make second argument of pica_match optional 

@@ -15,10 +15,30 @@ BEGIN {
   *_HAVE_IS_UTF8 = defined &utf8::is_utf8 ? sub(){1} : sub(){0};
   *_HAVE_PERLSTRING = defined &B::perlstring ? sub(){1} : sub(){0};
   *_BAD_BACKSLASH_ESCAPE = _HAVE_PERLSTRING() && "$]" == 5.010_000 ? sub(){1} : sub(){0};
+  *_HAVE_HEX_FLOAT = !$ENV{SUB_QUOTE_NO_HEX_FLOAT} && "$]" >= 5.022 ? sub(){1} : sub(){0};
+
+  # This may not be perfect, as we can't tell the format purely from the size
+  # but it should cover the common cases, and other formats are more likely to
+  # be less precise.
+  my $nvsize = 8 * length pack 'F', 0;
+  my $nvmantbits
+    = $nvsize == 16   ? 11
+    : $nvsize == 32   ? 24
+    : $nvsize == 64   ? 53
+    : $nvsize == 80   ? 64
+    : $nvsize == 128  ? 113
+    : $nvsize == 256  ? 237
+                      : 237 # unknown float format
+    ;
+  my $precision = int( log(2)/log(10)*$nvmantbits );
+
+  *_NVSIZE = sub(){$nvsize};
+  *_NVMANTBITS = sub(){$nvmantbits};
+  *_FLOAT_PRECISION = sub(){$precision};
 }
 
-our $VERSION = '2.006003';
-$VERSION = eval $VERSION;
+our $VERSION = '2.006006';
+$VERSION =~ tr/_//d;
 
 our @EXPORT = qw(quote_sub unquote_sub quoted_from_sub qsub);
 our @EXPORT_OK = qw(quotify capture_unroll inlinify sanitize_identifier);
@@ -50,20 +70,52 @@ sub quotify {
     && 0 + $value eq $value
   ) ? (
     $value != $value ? (
-      $value eq -CORE::sin(9**9**9)
-        ? '(-CORE::sin(9**9**9))' # -nan
-        : 'CORE::sin(9**9**9)'    # nan
+      $value eq (9**9**9*0)
+        ? '(9**9**9*0)'    # nan
+        : '(-(9**9**9*0))' # -nan
     )
-    : $value == 9**9**9 ? '(9**9**9)'      # inf
+    : $value == 9**9**9  ? '(9**9**9)'     # inf
     : $value == -9**9**9 ? '(-9**9**9)'    # -inf
-    : int($value) == $value ? $value       # integer
+    : $value == 0 ? (
+      sprintf('%g', $value) eq '-0' ? '-0.0' : '0',
+    )
+    : $value !~ /[e.]/i ? (
+      $value > 0 ? (sprintf '%u', $value)
+                 : (sprintf '%d', $value)
+    )
     : do {
-      my $float = sprintf('%.20f', $value);
-      $float =~ s/(\.[0-9]+?)0+\z/$1/;
-      $float;
+      my $float = $value;
+      my $max_factor = int( log( abs($value) ) / log(2) ) - _NVMANTBITS;
+      my $ex_sign = $max_factor > 0 ? 1 : -1;
+      FACTOR: for my $ex (0 .. abs($max_factor)) {
+        my $num = $value / 2**($ex_sign * $ex);
+        for my $precision (_FLOAT_PRECISION .. _FLOAT_PRECISION+2) {
+          my $formatted = sprintf '%.'.$precision.'g', $num;
+          $float = $formatted
+            if $ex == 0;
+          if ($formatted == $num) {
+            if ($ex) {
+              $float
+                = $formatted
+                . ($ex_sign == 1 ? '*' : '/')
+                . (
+                  $ex > _NVMANTBITS
+                    ? "2**$ex"
+                    : sprintf('%u', 2**$ex)
+                );
+            }
+            last FACTOR;
+          }
+        }
+        if (_HAVE_HEX_FLOAT) {
+          $float = sprintf '%a', $value;
+          last FACTOR;
+        }
+      }
+      "$float";
     }
   )
-  : !length($value) && eval { use warnings 'FATAL' => 'numeric'; $value == 0 } ? '(!1)' # false
+  : !length($value) && length( (my $dummy2 = '') & $value ) ? '(!1)' # false
   : _BAD_BACKSLASH_ESCAPE && _HAVE_IS_UTF8 && utf8::is_utf8($value) ? do {
     $value =~ s/(["\$\@\\[:cntrl:]]|[^\x00-\x7f])/
       $escape{$1} || sprintf('\x{%x}', ord($1))
@@ -216,6 +268,7 @@ sub _context {
       ."  \%^H = (\n"
       . join('', map
       "    ".quotify($_)." => ".quotify($hintshash->{$_}).",\n",
+        grep !(ref $hintshash->{$_} && $hintshash->{$_} =~ /\A(?:\w+(?:::\w+)*=)?[A-Z]+\(0x[[0-9a-fA-F]+\)\z/),
         keys %$hintshash)
       ."  );\n"
       ."}\n"
@@ -482,9 +535,12 @@ arguments.
 
  my $quoted_value = quotify $value;
 
-Quotes a single (non-reference) scalar value for use in a code string.  Numbers
-aren't treated specially and will be quoted as strings, but undef will quoted as
-C<undef()>.
+Quotes a single (non-reference) scalar value for use in a code string.  The
+result should reproduce the original value, including strings, undef, integers,
+and floating point numbers.  The resulting floating point numbers (including
+infinites and not a number) should be precisely equal to the original, if
+possible.  The exact format of the resulting number should not be relied on, as
+it may include hex floats or math expressions.
 
 =head2 capture_unroll
 

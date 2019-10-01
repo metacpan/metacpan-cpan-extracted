@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 
 =head1 NAME
 
@@ -28,15 +28,16 @@ point.
 
 no indirect;
 
+use Scalar::Util ();
+use Ref::Util ();
+use List::Util ();
+use List::UtilsBy;
+use Encode ();
+use Syntax::Keyword::Try;
 use Future;
 use curry::weak;
 
 use Log::Any qw($log);
-
-# Implementation note: it's likely that many new methods will be added to this
-# class over time. Most methods have an attempt at "scope-local imports" using
-# namespace::clean functionality, this is partly to make it easier to copy/paste
-# the code elsewhere for testing, and partly to avoid namespace pollution.
 
 =head1 GLOBALS
 
@@ -62,10 +63,8 @@ An encoder is a coderef which takes input and returns output.
 
 our %ENCODER = (
     utf8 => sub {
-        use Encode qw(encode_utf8);
-        use namespace::clean qw(encode_utf8);
         sub {
-            encode_utf8($_)
+            Encode::encode_utf8($_)
         }
     },
     json => sub {
@@ -96,12 +95,10 @@ $ENCODER{'UTF-8'} = $ENCODER{utf8};
 
 our %DECODER = (
     utf8 => sub {
-        use Encode qw(decode_utf8 FB_QUIET);
-        use namespace::clean qw(decode_utf8 FB_QUIET);
         my $data = '';
         sub {
             $data .= $_;
-            decode_utf8($data, FB_QUIET)
+            Encode::decode_utf8($data, Encode::FB_QUIET)
         }
     },
     json => sub {
@@ -266,10 +263,6 @@ sub encode {
     my ($self, $type) = splice @_, 0, 2;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my $code = ($ENCODER{$type} || $self->can('encode_' . $type) or die "unsupported encoding $type")->(@_);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         $src->emit($code->($_))
     }, $src);
@@ -294,10 +287,6 @@ sub decode {
     my ($self, $type) = splice @_, 0, 2;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my $code = ($DECODER{$type} || $self->can('decode_' . $type) or die "unsupported encoding $type")->(@_);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         $src->emit($code->($_))
     }, $src);
@@ -354,10 +343,6 @@ sub hexdump {
     my ($self, %args) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     my $offset = 0;
     my $in = '';
     $self->each_while_source(sub {
@@ -453,12 +438,8 @@ sub map : method {
     my ($self, $code) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
-        $src->emit(blessed($_)
+        $src->emit(Scalar::Util::blessed($_)
             ? (scalar $_->$code)
             : !ref($code)
             ? $_->{$code}
@@ -487,14 +468,10 @@ into the child arrayrefs, but no further.
 =cut
 
 sub flat_map {
-    use Scalar::Util qw(blessed weaken);
-    use Ref::Util qw(is_plain_arrayref is_plain_coderef);
-    use namespace::clean qw(blessed is_plain_arrayref is_plain_coderef weaken);
-
     my ($self, $code) = splice @_, 0, 2;
 
     # Upgrade ->flat_map(method => args...) to a coderef
-    if(!is_plain_coderef($code)) {
+    if(!Ref::Util::is_plain_coderef($code)) {
         my $method = $code;
         my @args = @_;
         $code = sub { $_->$method(@args) }
@@ -502,7 +479,7 @@ sub flat_map {
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
 
-    weaken(my $weak_sauce = $src);
+    Scalar::Util::weaken(my $weak_sauce = $src);
     my $add = sub  {
         my $v = shift;
         my $src = $weak_sauce or return;
@@ -521,20 +498,20 @@ sub flat_map {
         my $src = $weak_sauce or return;
         for ($code->($_)) {
             my $item = $_;
-            if(is_plain_arrayref($item)) {
+            if(Ref::Util::is_plain_arrayref($item)) {
                 $log->tracef("Have an arrayref of %d items", 0 + @$item);
                 for(@$item) {
                     last if $src->is_ready;
                     $src->emit($_);
                 }
-            } elsif(blessed($item) && $item->isa(__PACKAGE__)) {
+            } elsif(Scalar::Util::blessed($item) && $item->isa(__PACKAGE__)) {
                 $log->tracef("This item is a source");
-                $add->($item->completed);
                 $src->on_ready(sub {
                     return if $item->is_ready;
                     $log->tracef("Marking %s as ready because %s was", $item->describe, $src->describe);
                     shift->on_ready($item->completed);
                 });
+                $add->($item->completed);
                 $item->each_while_source(sub {
                     my $src = $weak_sauce or return;
                     $src->emit($_)
@@ -564,10 +541,6 @@ sub split : method {
     $delim //= qr//;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub { $src->emit($_) for split $delim, $_ }, $src);
 }
 
@@ -586,10 +559,6 @@ sub chunksize : method {
 
     my $buffer = '';
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         $buffer .= $_;
         $src->emit(substr $buffer, 0, $size, '') while length($buffer) >= $size;
@@ -615,17 +584,14 @@ sub batch : method {
     my $buffer = '';
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my @batch;
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        $src->emit([ splice @batch ]) if @batch;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         push @batch, $_;
         while(@batch >= $size and my (@items) = splice @batch, 0, $size) {
             $src->emit(\@items)
         }
-    }, $src);
+    }, $src, cleanup => sub {
+        $src->emit([ splice @batch ]) if @batch;
+    });
 }
 
 =head2 by_line
@@ -642,10 +608,6 @@ sub by_line : method {
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my $buffer = '';
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         $buffer .= $_;
         while($buffer =~ s/^(.*)\Q$delim//) {
@@ -663,9 +625,6 @@ Applies a string prefix to each item.
 sub prefix {
     my ($self, $txt) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        shift->on_ready($src->completed) unless $src->completed->is_ready
-    });
     $self->each_while_source(sub {
         $src->emit($txt . $_)
     }, $src);
@@ -680,9 +639,6 @@ Applies a string suffix to each item.
 sub suffix {
     my ($self, $txt) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        shift->on_ready($src->completed) unless $src->completed->is_ready
-    });
     $self->each_while_source(sub {
         $src->emit($_ . $txt)
     }, $src);
@@ -706,9 +662,6 @@ Example:
 sub sprintf_methods {
     my ($self, $fmt, @methods) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        shift->on_ready($src->completed) unless $src->completed->is_ready
-    });
     $self->each_while_source(sub {
         my ($item) = @_;
         $src->emit(sprintf $fmt, map $item->$_ // '', @methods)
@@ -797,10 +750,19 @@ sub buffer {
     };
     $src->flow_control
         ->each($item_handler)->retain;
-    $self->each_while_source(sub {
+    $self->each(my $code = sub {
         push @pending, $_;
         $item_handler->()
-    }, $src);
+    });
+    $self->completed->on_ready(sub {
+        my ($f) = @_;
+        return if @pending;
+        my $addr = Scalar::Util::refaddr($code);
+        my $count = List::UtilsBy::extract_by { $addr == refaddr($_) } @{$self->{on_item}};
+        $f->on_ready($src->completed) unless $src->is_ready;
+        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
+    });
+    $src;
 }
 
 sub retain {
@@ -871,10 +833,8 @@ item.
 =cut
 
 sub combine_latest : method {
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(blessed);
     my ($self, @sources) = @_;
-    push @sources, sub { @_ } if blessed $sources[-1];
+    push @sources, sub { @_ } if Scalar::Util::blessed $sources[-1];
     my $code = pop @sources;
 
     my $combined = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
@@ -923,10 +883,8 @@ sources which have not yet emitted any items.
 =cut
 
 sub with_latest_from : method {
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(blessed);
     my ($self, @sources) = @_;
-    push @sources, sub { @_ } if blessed $sources[-1];
+    push @sources, sub { @_ } if Scalar::Util::blessed $sources[-1];
     my $code = pop @sources;
 
     my $combined = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
@@ -1024,41 +982,34 @@ Example:
 =cut
 
 sub switch_str {
-    use Variable::Disposition qw(retain_future);
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(retain_future);
     my ($self, $condition, @args) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my @active;
     $self->completed->on_ready(sub {
-        retain_future(
-            Future->needs_all(
-                grep $_, @active
-            )->on_ready(sub {
-                $src->finish
-            })
-        );
+        Future->needs_all(
+            grep $_, @active
+        )->on_ready(sub {
+            $src->finish
+        })->retain
     });
 
     $self->each_while_source(sub {
         my ($item) = $_;
         my $rslt = $condition->($item);
-        retain_future(
-            (blessed($rslt) && $rslt->isa('Future') ? $rslt : Future->done($rslt))->on_done(sub {
-                my ($data) = @_;
-                my @copy = @args;
-                while(my ($k, $v) = splice @copy, 0, 2) {
-                    if(!defined $v) {
-                        # Only a single value (or undef)? That's our default, just use it as-is
-                        return $src->emit(map $k->($_), $item)
-                    } elsif($k eq $data) {
-                        # Key matches our result? Call code with the original item
-                        return $src->emit(map $v->($_), $item)
-                    }
+        (Scalar::Util::blessed($rslt) && $rslt->isa('Future') ? $rslt : Future->done($rslt))->on_done(sub {
+            my ($data) = @_;
+            my @copy = @args;
+            while(my ($k, $v) = splice @copy, 0, 2) {
+                if(!defined $v) {
+                    # Only a single value (or undef)? That's our default, just use it as-is
+                    return $src->emit(map $k->($_), $item)
+                } elsif($k eq $data) {
+                    # Key matches our result? Call code with the original item
+                    return $src->emit(map $v->($_), $item)
                 }
-            })
-        )
+            }
+        })->retain
     }, $src)
 }
 
@@ -1072,20 +1023,17 @@ This is a terrible name for a method, expect it to change.
 =cut
 
 sub ordered_futures {
-    use Scalar::Util qw(refaddr weaken);
-    use namespace::clean qw(refaddr weaken);
-
     my ($self) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my %pending;
-    weaken(my $upstream_completed = $self->completed);
+    Scalar::Util::weaken(my $upstream_completed = $self->completed);
     my $all_finished = 0;
     $upstream_completed->on_ready(sub {
         $all_finished = 1;
         $src->completed->done unless %pending or $src->completed->is_ready;
     });
     $self->each_while_source(sub {
-        my $k = refaddr $_;
+        my $k = Scalar::Util::refaddr $_;
         $pending{$k} = 1;
         $log->tracef('Ordered futures has %d pending', 0 + keys %pending);
         $_->on_done($src->curry::weak::emit)
@@ -1183,7 +1131,6 @@ sub sort_by {
     my @items;
     my @keys;
     $self->completed->on_done(sub {
-        $src->emit($_) for @items[sort { $keys[$a] cmp $keys[$b] } 0 .. $#items];
     })->on_ready(sub {
         return if $src->is_ready;
         shift->on_ready($src->completed);
@@ -1191,7 +1138,11 @@ sub sort_by {
     $self->each_while_source(sub {
         push @items, $_;
         push @keys, $_->$code;
-    }, $src);
+    }, $src, cleanup => sub {
+        my ($f) = @_;
+        return unless $f->is_done;
+        $src->emit($_) for @items[sort { $keys[$a] cmp $keys[$b] } 0 .. $#items];
+    });
 }
 
 =head2 nsort_by
@@ -1208,16 +1159,13 @@ sub nsort_by {
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my @items;
     my @keys;
-    $self->completed->on_done(sub {
-        $src->emit($_) for @items[sort { $keys[$a] <=> $keys[$b] } 0 .. $#items];
-    })->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         push @items, $_;
         push @keys, $_->$code;
-    }, $src);
+    }, $src, cleanup => sub {
+        return unless shift->is_done;
+        $src->emit($_) for @items[sort { $keys[$a] <=> $keys[$b] } 0 .. $#items];
+    });
 }
 
 =head2 rev_sort_by
@@ -1234,16 +1182,13 @@ sub rev_sort_by {
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my @items;
     my @keys;
-    $self->completed->on_done(sub {
-        $src->emit($_) for @items[sort { $keys[$b] cmp $keys[$a] } 0 .. $#items];
-    })->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         push @items, $_;
         push @keys, $_->$code;
-    }, $src);
+    }, $src, cleanup => sub {
+        return unless shift->is_done;
+        $src->emit($_) for @items[sort { $keys[$b] cmp $keys[$a] } 0 .. $#items];
+    });
 }
 
 =head2 rev_nsort_by
@@ -1260,16 +1205,13 @@ sub rev_nsort_by {
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my @items;
     my @keys;
-    $self->completed->on_done(sub {
-        $src->emit($_) for @items[sort { $keys[$b] <=> $keys[$a] } 0 .. $#items];
-    })->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         push @items, $_;
         push @keys, $_->$code;
-    }, $src);
+    }, $src, cleanup => sub {
+        return unless shift->is_done;
+        $src->emit($_) for @items[sort { $keys[$b] <=> $keys[$a] } 0 .. $#items];
+    });
 }
 
 =head2 extract_all
@@ -1289,10 +1231,6 @@ Example:
 sub extract_all {
     my ($self, $pattern) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         $src->emit(+{ %+ }) while m/$pattern/gc;
     }, $src);
@@ -1359,15 +1297,11 @@ sub skip_until {
     my ($self, $condition) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(do {
         if(ref($condition) eq 'CODE') {
             my $reached = 0;
             sub { return $src->emit($_) if $reached ||= $condition->($_); }
-        } elsif(blessed($condition) && $condition->isa('Future')) {
+        } elsif(Scalar::Util::blessed($condition) && $condition->isa('Future')) {
             $condition->on_fail($src->completed)->on_cancel($src->completed);
             sub { $src->emit($_) if $condition->is_done; }
         } else {
@@ -1398,11 +1332,7 @@ sub take_until {
     my ($self, $condition) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
-    if(blessed($condition) && $condition->isa('Ryu::Source')) {
+    if(Scalar::Util::blessed($condition) && $condition->isa('Ryu::Source')) {
         $condition->completed->on_ready(sub {
             $log->warnf('Condition completed: %s and %s', $condition->describe, $src->describe);
             return if $src->is_ready;
@@ -1418,7 +1348,7 @@ sub take_until {
             if(ref($condition) eq 'CODE') {
                 my $reached = 0;
                 sub { return $src->emit($_) unless $reached ||= $condition->($_); }
-            } elsif(blessed($condition) && $condition->isa('Future')) {
+            } elsif(Scalar::Util::blessed($condition) && $condition->isa('Future')) {
                 $condition->on_fail($src->completed)->on_cancel($src->completed);
                 sub { $src->emit($_) unless $condition->is_done; }
             } else {
@@ -1443,11 +1373,6 @@ sub take {
     return $self->empty unless $count > 0;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
-    # $self->completed->on_ready($src->completed);
     $self->each_while_source(sub {
         $log->tracef("Still alive with %d remaining", $count);
         $src->emit($_);
@@ -1467,11 +1392,6 @@ sub first {
     my ($self) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
-
     $self->each_while_source(sub {
         $src->emit($_);
         $src->finish
@@ -1550,12 +1470,10 @@ sub count {
     my $count = 0;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_done(sub {
+    $self->each_while_source(sub { ++$count }, $src, cleanup => sub {
+        return unless shift->is_done;
         $src->emit($count)
-    })->on_ready(
-        $src->completed
-    );
-    $self->each_while_source(sub { ++$count }, $src);
+    });
 }
 
 =head2 sum
@@ -1570,14 +1488,12 @@ sub sum {
     my $sum = 0;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_done(sub {
-        $src->emit($sum)
-    })->on_ready(
-        $src->completed
-    );
     $self->each_while_source(sub {
         $sum += $_
-    }, $src);
+    }, $src, cleanup => sub {
+        return unless shift->is_done;
+        $src->emit($sum)
+    });
 }
 
 =head2 mean
@@ -1706,16 +1622,9 @@ Examples:
 =cut
 
 sub filter {
-    use Scalar::Util qw(blessed);
-    use List::Util qw(any);
-    use namespace::clean qw(blessed);
     my $self = shift;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source((@_ > 1) ? do {
         my %args = @_;
         my $check = sub {
@@ -1724,7 +1633,7 @@ sub filter {
                 if($ref eq 'Regexp') {
                     return 0 unless defined($v) && $v =~ $args{$k};
                 } elsif($ref eq 'ARRAY') {
-                    return 0 unless defined($v) && any { $v eq $_ } @{$args{$k}};
+                    return 0 unless defined($v) && List::Util::any { $v eq $_ } @{$args{$k}};
                 } elsif($ref eq 'CODE') {
                     return 0 for grep !$args{$k}->($_), $v;
                 } else {
@@ -1738,7 +1647,7 @@ sub filter {
         };
         sub {
             my $item = shift;
-            if(blessed $item) {
+            if(Scalar::Util::blessed $item) {
                 for my $k (keys %args) {
                     my $v = $item->$k;
                     return unless $check->($k, $v);
@@ -1784,18 +1693,12 @@ Will skip non-blessed items.
 =cut
 
 sub filter_isa {
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(blessed);
     my ($self, @isa) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $self->completed->on_ready(sub {
-        return if $src->is_ready;
-        shift->on_ready($src->completed);
-    });
     $self->each_while_source(sub {
         my ($item) = @_;
-        return unless blessed $item;
+        return unless Scalar::Util::blessed $item;
         $src->emit($_) if grep $item->isa($_), @isa;
     }, $src);
 }
@@ -1807,8 +1710,6 @@ Emits the given item.
 =cut
 
 sub emit {
-    use Syntax::Keyword::Try;
-    use namespace::clean qw(try catch finally);
     my $self = shift;
     my $completion = $self->completed;
     my @handlers = @{$self->{on_item} || []} or return $self;
@@ -1843,20 +1744,16 @@ sub each : method {
 =cut
 
 sub each_as_source : method {
-    use Variable::Disposition qw(retain_future);
-    use namespace::clean qw(retain_future);
     my ($self, @code) = @_;
 
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     my @active;
     $self->completed->on_ready(sub {
-        retain_future(
-            Future->needs_all(
-                grep $_, @active
-            )->on_ready(sub {
-                $src->finish
-            })
-        );
+        Future->needs_all(
+            grep $_, @active
+        )->on_ready(sub {
+            $src->finish
+        })->retain
     });
 
     $self->each_while_source(sub {
@@ -1898,12 +1795,9 @@ sub cleanup {
 }
 
 sub notify_child_completion {
-    use Scalar::Util qw(refaddr);
-    use List::UtilsBy qw(extract_by);
-    use namespace::clean qw(refaddr extract_by);
-
     my ($self, $child) = @_;
-    if(extract_by { refaddr($child) == refaddr($_) } @{$self->{children}}) {
+    my $addr = Scalar::Util::refaddr($child);
+    if(List::UtilsBy::extract_by { $addr == Scalar::Util::refaddr($_) } @{$self->{children}}) {
         $log->tracef(
             "Removed completed child %s, have %d left",
             $child->describe,
@@ -2016,9 +1910,6 @@ Returns a new L<Ryu::Source> chained from this one.
 =cut
 
 sub chained {
-    use Scalar::Util qw(weaken);
-    use namespace::clean qw(weaken);
-
     my ($self) = shift;
     if(my $class = ref($self)) {
         my $src = $class->new(
@@ -2026,7 +1917,7 @@ sub chained {
             parent     => $self,
             @_
         );
-        weaken($src->{parent});
+        Scalar::Util::weaken($src->{parent});
         push @{$self->{children}}, $src;
         $log->tracef("Constructing chained source for %s from %s (%s)", $src->label, $self->label, $self->completed->state);
         return $src;
@@ -2045,14 +1936,15 @@ parent completes.
 =cut
 
 sub each_while_source {
-    use Scalar::Util qw(refaddr);
-    use List::UtilsBy qw(extract_by);
-    use namespace::clean qw(refaddr extract_by);
-    my ($self, $code, $src) = @_;
+    my ($self, $code, $src, %args) = @_;
     $self->each($code);
-    $src->completed->on_ready(sub {
-        my $count = extract_by { refaddr($_) == refaddr($code) } @{$self->{on_item}};
-        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, refaddr($self), $count);
+    $self->completed->on_ready(sub {
+        my ($f) = @_;
+        $args{cleanup}->($f, $src) if exists $args{cleanup};
+        my $addr = Scalar::Util::refaddr($code);
+        my $count = List::UtilsBy::extract_by { $addr == refaddr($_) } @{$self->{on_item}};
+        $f->on_ready($src->completed) unless $src->is_ready;
+        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
     });
     $src
 }
@@ -2103,14 +1995,12 @@ sub DESTROY {
 }
 
 sub catch {
-    use Scalar::Util qw(blessed);
-    use namespace::clean qw(blessed);
     my ($self, $code) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     $self->completed->on_fail(sub {
         my @failure = @_;
         my $sub = $code->(@failure);
-        if(blessed $sub && $sub->isa('Ryu::Source')) {
+        if(Scalar::Util::blessed $sub && $sub->isa('Ryu::Source')) {
             $sub->each_while_source(sub {
                 $src->emit($_)
             }, $src);

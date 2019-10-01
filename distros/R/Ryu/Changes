@@ -1,5 +1,16 @@
 Revision history for Ryu
 
+1.006     2019-10-01 12:48:37+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - ->with_index and some other methods were not completing when the parent
+    was finished - thanks to Amin Marashi for reporting
+    - lifetime handling for chained sources was simplified, ->each_while_source
+    was supposed to attach handlers for the parent rather than the child source
+    - dropped usage of namespace::clean
+
 1.005     2019-05-05 19:15:56+08:00 Asia/Kuala_Lumpur
     No new features.
 

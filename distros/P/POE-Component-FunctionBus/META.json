@@ -1,9 +1,9 @@
 {
-   "abstract" : "Easily scalability",
+   "abstract" : "lib/POE/Component/FunctionBus.pm",
    "author" : [
       "Paul G Webster <daemon@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
@@ -16,7 +16,9 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
@@ -32,16 +34,27 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0"
+            "POE" : "1.367",
+            "perl" : "5.0244"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PaulGWebster/p5-POE-Component-FunctionBus/issues"
+      },
+      "homepage" : "https://github.com/PaulGWebster/p5-POE-Component-FunctionBus",
+      "license" : [
+         "https://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PaulGWebster/p5-POE-Component-FunctionBus.git",
+         "web" : "https://github.com/PaulGWebster/p5-POE-Component-FunctionBus"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#perl"
+   },
+   "version" : "1569954247",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
