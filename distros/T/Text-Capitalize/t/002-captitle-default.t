@@ -14,7 +14,6 @@ use lib ("$Bin/../lib",  "$Bin/lib");
 use Text::Capitalize 0.4 qw( capitalize_title );
 use Test::Locale::Utils  qw( :all );
 use Test::More;
-use PerlIO::locale;
 
 my $basic_test_cases = define_basic_test_cases();
 my $i18n_test_cases = define_basic_test_cases_i18n();
@@ -25,9 +24,9 @@ my $total = $basic_count + $i18n_count + 1;
 plan tests => $total;
 
 my $builder = Test::More->builder;
-binmode $builder->output,         ":locale";
-binmode $builder->failure_output, ":locale";
-binmode $builder->todo_output,    ":locale";
+binmode $builder->output,         ":encoding(utf-8)";
+binmode $builder->failure_output, ":encoding(utf-8)";
+binmode $builder->todo_output,    ":encoding(utf-8)";
 
 my $i18n_system = is_locale_international();
 

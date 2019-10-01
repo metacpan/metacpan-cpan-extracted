@@ -23,8 +23,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 		serialize
 		assign
 		assign_singletons
-		store_vars
-		json_out
 		yaml_in
 		json_in
 		json_out
@@ -53,9 +51,17 @@ use Carp;
 	$mixer_out_format 				$config->{mixer_out_format}
 	$sample_rate					$config->{sample_rate}
 	$ecasound_tcp_port 				$config->{engine_tcp_port}
-	$ecasound_globals				$config->{engine_globals}
+	$ecasound_globals				$config->{ecasound_globals}
 	$ecasound_buffersize 			$config->{engine_buffersize} 
 	$realtime_profile 				$config->{realtime_profile}
+	$jack_seek_delay    			$config->{engine_base_jack_seek_delay}
+	$jack_transport_mode 			$config->{jack_transport_mode}
+	$ecasound_jack_client_name 		$config->{ecasound_jack_client_name}
+	$ecasound_engine_name 			$config->{ecasound_engine_name}
+	$midi_engine_name 				$config->{midi_engine_name}
+	$use_midi 						$config->{use_midi}
+	$midi_record_buffer 			$config->{midi_record_buffer}
+	$midi_default_input_channel 	$config->{midi_default_input_channel}
 	$eq 							$mastering->{fx_eq}
 	$low_pass 						$mastering->{fx_low_pass}
 	$mid_pass						$mastering->{fx_mid_pass}
@@ -68,11 +74,9 @@ use Carp;
 	$press_space_to_start_transport $config->{press_space_to_start}
 	$execute_on_project_load 		$config->{execute_on_project_load}
 	$initial_mode 					$config->{initial_mode}
-	$midish_enable 					$config->{use_midish}
 	$quietly_remove_tracks 			$config->{quietly_remove_tracks}
 	$use_jack_plumbing 				$config->{use_jack_plumbing}
-	$jack_seek_delay    			$config->{engine_base_jack_seek_delay}
-	$use_monitor_version_for_mixdown $config->{sync_mixdown_and_monitor_version_numbers} 
+	$use_playback_version_for_mixdown $config->{sync_mixdown_and_playback_version_numbers} 
 	$mixdown_encodings 				$config->{mixdown_encodings}
 	$volume_control_operator 		$config->{volume_control_operator}
 	$serialize_formats  	        $config->{serialize_formats}
@@ -81,6 +85,7 @@ use Carp;
 	$beep_command 					$config->{beep_command}
 	$hotkey_beep					$config->{hotkey_beep}
 	$eager							$mode->{eager}
+	$waveform_height 				$config->{waveform_height}
 	$alias							$config->{alias}
 	$hotkeys						$config->{hotkeys}
 	$new_track_rw					$config->{new_track_rw}
@@ -104,11 +109,15 @@ use Carp;
 	$osc_reply_port 				$config->{osc_reply_port}
 	$remote_control_port 			$config->{remote_control_port}
 	$engines						$config->{engines}
+	$default_waveform_height 			$config->{default_waveform_height}
+	$loop_chain_channel_width 	$config->{loop_chain_channel_width}
+	$waveform_pixels_per_second		$config->{waveform_pixels_per_second}
+	$display_waveform					$config->{display_waveform}
 
 ) };
 sub var_map {  $var_map } # to allow outside access while keeping
                           # working lexical
-sub config_vars { grep {$_ ne '**' } keys %$var_map }
+sub config_vars { keys %$var_map }
 
 sub assign {
   # Usage: 

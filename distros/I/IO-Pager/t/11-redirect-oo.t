@@ -23,9 +23,13 @@ TODO:{
     $slurp =~ s/\n\n\z/\n/m;
   }
 
+ SKIP:{
+    skip_no_tty();
+
   our $txt; require './t/08-redirect.pl';
   cmp_ok($txt, 'eq', $slurp, 'Redirection with OO') || $^O =~ /MSWin32/ &&
     diag("If this test fails on Windows and all others pass, things are probably good. CMD appends an extra newline to redirected output.");
+  }
 }
 
 

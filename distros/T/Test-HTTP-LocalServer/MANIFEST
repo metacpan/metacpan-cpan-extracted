@@ -1,8 +1,9 @@
 .gitignore
 Changes
-gen-bzipbomb.pl
-gen-gzipbomb.pl
+development/gen-bzipbomb.pl
+development/gen-gzipbomb.pl
 lib/Test/HTTP/cookie-server
+lib/Test/HTTP/gzip-streamed.psgi
 lib/Test/HTTP/LocalServer.pm
 lib/Test/HTTP/log-server
 LICENSE
@@ -16,6 +17,10 @@ README.mkdn
 t/00-load.t
 t/01-start.t
 t/02-start-stop.t
+t/03-sticky-fields.t
+t/04-server-name.t
+t/05-basic-auth.t
+testrules.yml
 xt/99-changes.t
 xt/99-compile.t
 xt/99-examples.t

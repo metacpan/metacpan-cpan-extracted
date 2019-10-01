@@ -1,0 +1,29 @@
+package Application::Tasks::Stub;
+use Mojo::Base "Application::Task";
+
+use Mojo::Exception;
+use Try::Tiny;
+
+sub run {
+    my ($self, $job) = @_;
+
+    my $ok = 0;
+
+    try {
+        # TODO: write the task logic
+        
+    } catch {
+        my $error = $_;
+        
+        $self->error($error);
+
+        # send error to log
+        $self->log->error($error);
+        
+        $ok = 0;
+    };
+
+    return $ok;
+}
+
+1;

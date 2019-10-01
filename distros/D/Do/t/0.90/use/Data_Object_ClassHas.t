@@ -153,6 +153,17 @@ The C<default> directive expects a coderef and is used to build a default value
 if one is not provided to the constructor. See the L<Moo> documentation for
 more details.
 
++=item mod|modify
+
+  # modify definition
+
+  mod => 1
+  modify => 1
+
+The C<modify> directive denotes whether a pre-existing attribute's definition
+is being modified. This ability is not supported by the L<Moo> object
+superclass.
+
 +=item hnd|handles
 
   # dispatch to value
@@ -173,6 +184,17 @@ documentation for more details.
 
 The C<lazy> directive denotes whether the attribute will be constructed
 on-demand, or on-construction. See the L<Moo> documentation for more details.
+
++=item new
+
+  # lazy attribute
+  # create new_${attribute}
+
+  new => 1
+
+The C<new> directive, if truthy, denotes the the attribute will be constructed
+on-demand, i.e. is lazy, with a builder named C<new_{attribute}>. This ability
+is not supported by the L<Moo> object superclass.
 
 +=item pre|predicate
 

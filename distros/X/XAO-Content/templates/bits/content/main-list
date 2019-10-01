@@ -1,0 +1,7 @@
+<%Content
+  mode="show-list"
+  fields="*"
+  header.path="/bits/content/list-header"
+  path="/bits/content/list-row"
+  footer.path="/bits/content/list-footer"
+%>

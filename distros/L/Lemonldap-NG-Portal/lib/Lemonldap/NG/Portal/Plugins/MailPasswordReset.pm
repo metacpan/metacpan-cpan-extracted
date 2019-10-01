@@ -24,11 +24,15 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORDFORMEMPTY
   PE_PASSWORD_MISMATCH
   PE_PASSWORD_OK
+  PE_PP_INSUFFICIENT_PASSWORD_QUALITY
+  PE_PP_PASSWORD_TOO_SHORT
+  PE_PP_PASSWORD_TOO_YOUNG
+  PE_PP_PASSWORD_IN_HISTORY
   PE_TOKENEXPIRED
   PE_USERNOTFOUND
 );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
@@ -334,7 +338,7 @@ sub _reset {
         else {
 
             # Use HTML template
-            $body = $self->loadTemplate(
+            $body = $self->loadMailTemplate(
                 $req,
                 'mail_confirm',
                 filter => $tr,
@@ -436,6 +440,16 @@ sub changePwd {
         }
     }
 
+    # Check password quality
+    require Lemonldap::NG::Portal::Password::Base;
+    my $cpq =
+      $self->Lemonldap::NG::Portal::Password::Base::checkPasswordQuality(
+        $req->data->{newpassword} );
+    unless ( $cpq == PE_OK ) {
+        $self->ott->setToken( $req, $req->sessionInfo );
+        return $cpq;
+    }
+
     # Modify the password TODO: change this
     # Populate $req->{user} for logging purpose
     my $tmp = $self->conf->{portalRequireOldPassword};
@@ -448,7 +462,10 @@ sub changePwd {
     $self->conf->{portalRequireOldPassword} = $tmp;
 
     # Mail token can be used only one time, delete the session if all is ok
-    return $result unless ( $result == PE_PASSWORD_OK or $result == PE_OK );
+    unless ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
+        $self->ott->setToken( $req, $req->sessionInfo );
+        return $result;
+    }
 
     # Send mail containing the new password
     $req->data->{mailAddress} ||=
@@ -473,7 +490,7 @@ sub changePwd {
     else {
 
         # Use HTML template
-        $body = $self->loadTemplate(
+        $body = $self->loadMailTemplate(
             $req,
             'mail_password',
             filter => $tr,
@@ -533,6 +550,13 @@ sub display {
         DISPLAY_CONFIRMMAILSENT => 0,
         DISPLAY_MAILSENT        => 0,
         DISPLAY_PASSWORD_FORM   => 0,
+        DISPLAY_PPOLICY         => $self->conf->{portalDisplayPasswordPolicy},
+        PPOLICY_MINSIZE         => $self->conf->{passwordPolicyMinSize},
+        PPOLICY_MINLOWER        => $self->conf->{passwordPolicyMinLower},
+        PPOLICY_MINUPPER        => $self->conf->{passwordPolicyMinUpper},
+        PPOLICY_MINDIGIT        => $self->conf->{passwordPolicyMinDigit},
+        DISPLAY_GENERATE_PASSWORD =>
+          $self->conf->{portalDisplayGeneratePassword},
     );
     if ( $req->data->{mailToken}
         and
@@ -593,9 +617,15 @@ sub display {
         $tplPrm{DISPLAY_PASSWORD_FORM} = 1;
     }
 
-    # Display password change form again if passwords mismatch
+    # Display password change form again
+    # - if passwords mismatch
+    # - if password quality check fail
     elsif ($req->error == PE_PASSWORDFORMEMPTY
-        || $req->error == PE_PASSWORD_MISMATCH )
+        || $req->error == PE_PASSWORD_MISMATCH
+        || $req->error == PE_PP_INSUFFICIENT_PASSWORD_QUALITY
+        || $req->error == PE_PP_PASSWORD_TOO_SHORT
+        || $req->error == PE_PP_PASSWORD_TOO_YOUNG
+        || $req->error == PE_PP_PASSWORD_IN_HISTORY )
     {
         $self->logger->debug('Display password form');
         $tplPrm{DISPLAY_PASSWORD_FORM} = $req->sessionInfo->{pwdAllowed};

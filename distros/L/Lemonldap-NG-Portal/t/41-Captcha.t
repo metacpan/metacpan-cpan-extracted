@@ -6,7 +6,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $maintests = 16;
+my $maintests = 17;
 SKIP: {
     eval 'use GD::SecurityImage;use Image::Magick;';
     if ($@) {
@@ -15,11 +15,12 @@ SKIP: {
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel              => 'error',
-                useSafeJail           => 1,
-                loginHistoryEnabled   => 1,
-                captcha_login_enabled => 1,
-                portalMainLogo        => 'common/logos/logo_llng_old.png',
+                logLevel                  => 'error',
+                useSafeJail               => 1,
+                browsersDontStorePassword => 1,
+                loginHistoryEnabled       => 1,
+                captcha_login_enabled     => 1,
+                portalMainLogo            => 'common/logos/logo_llng_old.png',
             }
         }
     );
@@ -31,11 +32,18 @@ SKIP: {
 
     ok( $res = $client->_get( '/', accept => 'text/html' ), 'Unauth request' );
     my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
+    ok(
+        $res->[2]->[0] =~
+m%<input name="password" type="text" class="form-control key" trplaceholder="password" autocomplete="off" required aria-required="true" aria-hidden="true"/>%,
+        'Password: Found text input'
+    );
+
     $query =~ s/.*\btoken=([^&]+).*/token=$1/;
     my $token;
     ok( $token = $1, ' Token value is defined' );
     ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
-        ' Captcha image inserted' );
+        ' Captcha image inserted' )
+      or explain( $res->[2]->[0], '<img src="data:image/png;base64' );
 
     # Try to get captcha value
 

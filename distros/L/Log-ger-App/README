@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
     In your script:
@@ -171,7 +171,7 @@ ENVIRONMENT
   SYSLOG_VERBOSE
   SYSLOG_QUIET
 FAQS
-  Why does re-setting log level (using Log::ger::Util::set_level) doesn't work?
+  Why doesn't re-setting log level using Log::ger::Util::set_level() work?
     (This FAQ item is from Log::ger::Output::Composite's, slightly
     modified).
 
@@ -188,7 +188,22 @@ FAQS
      Log::ger::Output::Composite::set_level('trace');
 
     This sets an internal level setting which is respected and has the
-    highest precedence so all levels settings will use this instead.
+    highest precedence so all levels settings will use this instead. If
+    previously you have:
+
+     Log::ger::Output->set(Composite => {
+         default_level => 'error',
+         outputs => {
+             File => {path=>'/foo', level=>'debug'},
+             Screen => {level=>'info', category_level=>{MyApp=>'warn'}},
+         },
+         category_level => {
+             'MyApp::SubModule1' => 'debug',
+         },
+     });
+
+    then after the "Log::ger::Output::Composite::set_level('trace')", all
+    the above per-category and per-output levels will be set to "trace".
 
 SEE ALSO
     Log::ger

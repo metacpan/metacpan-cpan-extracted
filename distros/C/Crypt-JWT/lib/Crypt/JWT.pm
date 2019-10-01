@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -167,77 +167,29 @@ sub _verify_claims {
     }
   }
 
-  ### iss
-  if (exists $args{verify_iss}) {
-    if (exists $payload->{iss}) {
-      if (ref $args{verify_iss} eq 'Regexp') {
-        croak "JWT: iss claim re check failed" unless $payload->{iss} =~ $args{verify_iss};
+  ### iss, sub, aud, jti
+  foreach my $claim (qw(iss sub aud jti)) {
+    my $check = $args{"verify_$claim"};
+    next unless (defined $check);
+
+    if (exists $payload->{$claim}) {
+      if (ref $check eq 'Regexp') {
+        my $value = $payload->{$claim};
+        $value = "" if !defined $value;
+        croak "JWT: $claim claim re check failed" unless $value =~ $check;
       }
-      elsif (ref $args{verify_iss} eq 'CODE') {
-        croak "JWT: iss claim check failed" unless $args{verify_iss}->($payload->{iss});
+      elsif (ref $check eq 'CODE') {
+        croak "JWT: $claim claim check failed" unless $check->($payload->{$claim});
       }
       else {
-        croak "JWT: verify_iss must be Regexp or CODE";
+        croak "JWT: verify_$claim must be Regexp or CODE";
       }
     }
-    elsif ($args{verify_iss}) {
-      croak "JWT: iss claim required but missing"
+    else {
+      croak "JWT: $claim claim required but missing"
     }
   }
 
-  ### sub
-  if (exists $args{verify_sub}) {
-    if (exists $payload->{sub}) {
-      if (ref $args{verify_sub} eq 'Regexp') {
-        croak "JWT: sub claim re check failed" unless $payload->{sub} =~ $args{verify_sub};
-      }
-      elsif (ref $args{verify_sub} eq 'CODE') {
-        croak "JWT: sub claim check failed" unless $args{verify_sub}->($payload->{sub});
-      }
-      else {
-        croak "JWT: verify_sub must be Regexp or CODE";
-      }
-    }
-    elsif ($args{verify_sub}) {
-      croak "JWT: sub claim required but missing"
-    }
-  }
-
-  ### aud
-  if (exists $args{verify_aud}) {
-    if (exists $payload->{aud}) {
-      if (ref $args{verify_aud} eq 'Regexp') {
-        croak "JWT: aud claim re check failed" unless $payload->{aud} =~ $args{verify_aud};
-      }
-      elsif (ref $args{verify_aud} eq 'CODE') {
-        croak "JWT: aud claim check failed" unless $args{verify_aud}->($payload->{aud});
-      }
-      else {
-        croak "JWT: verify_aud must be Regexp or CODE";
-      }
-    }
-    elsif ($args{verify_aud}) {
-      croak "JWT: aud claim required but missing"
-    }
-  }
-
-  ### jti
-  if (exists $args{verify_jti}) {
-    if (exists $payload->{jti}) {
-      if (ref $args{verify_jti} eq 'Regexp') {
-        croak "JWT: jti claim re check failed" unless $payload->{jti} =~ $args{verify_jti};
-      }
-      elsif (ref $args{verify_jti} eq 'CODE') {
-        croak "JWT: jti claim check failed" unless $args{verify_jti}->($payload->{jti});
-      }
-      else {
-        croak "JWT: verify_jti must be Regexp or CODE";
-      }
-    }
-    elsif ($args{verify_jti}) {
-      croak "JWT: jti claim required but missing"
-    }
-  }
 }
 
 sub _payload_zip {
@@ -752,7 +704,7 @@ sub decode_jwt {
   }
   elsif ($args{token} =~ /^\s*\{.*?\}\s*$/s) {
     my $hash = decode_json($args{token});
-    if ($hash->{payload} && $hash->{protected}) {
+    if (defined $hash->{payload} && $hash->{protected}) {
       # Flattened JWS JSON Serialization
       ($header, $payload) = _decode_jws($hash->{protected}, $hash->{payload}, $hash->{signature}, $hash->{header}, %args);
     }
@@ -1105,7 +1057,7 @@ C<undef> (default) - do not verify 'iss' claim
 
 =item verify_aud
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_aud> is specified and
 claim C<aud> (Audience) is completely missing it is a failure since 0.024
 
 C<CODE ref> - subroutine (with 'aud' claim value passed as argument) should return C<true> otherwise verification fails
@@ -1116,7 +1068,7 @@ C<undef> (default) - do not verify 'aud' claim
 
 =item verify_sub
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_sub> is specified and
 claim C<sub> (Subject) is completely missing it is a failure since 0.024
 
 C<CODE ref> - subroutine (with 'sub' claim value passed as argument) should return C<true> otherwise verification fails
@@ -1127,7 +1079,7 @@ C<undef> (default) - do not verify 'sub' claim
 
 =item verify_jti
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_jti> is specified and
 claim C<jti> (JWT ID) is completely missing it is a failure since 0.024
 
 C<CODE ref> - subroutine (with 'jti' claim value passed as argument) should return C<true> otherwise verification fails

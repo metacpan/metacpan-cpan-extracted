@@ -1,6 +1,6 @@
 package Crypt::Hill::Utils;
 
-$Crypt::Hill::Utils::VERSION   = '0.11';
+$Crypt::Hill::Utils::VERSION   = '0.12';
 $Crypt::Hill::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Hill::Utils - Utils package for Crypt::Hill.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

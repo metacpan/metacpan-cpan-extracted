@@ -82,5 +82,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: git://github.com/jeffreykegler/hoonlint.git
-version: '1.004000'
+version: '1.006000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

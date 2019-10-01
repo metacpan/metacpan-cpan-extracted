@@ -41,7 +41,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add `Do` to the list of dependencies in `cpanfile`:
 
-    requires "Do" => "1.80"; # 1.80 or newer
+    requires "Do" => "1.87"; # 1.87 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your
@@ -54,7 +54,7 @@ completely isolated Perl installations.
 
 # CREDITS
 
-Al Newkirk, `+309`
+Al Newkirk, `+317`
 
 Anthony Brummett, `+10`
 
@@ -70,8 +70,9 @@ Al Newkirk, `awncorp@cpan.org`
 
 Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated here,
+https://github.com/iamalnewkirk/do/blob/master/LICENSE.
 
 # PROJECT
 

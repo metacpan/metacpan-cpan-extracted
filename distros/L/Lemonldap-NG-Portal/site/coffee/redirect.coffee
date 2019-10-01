@@ -1,6 +1,9 @@
 document.onreadystatechange = () ->
 	if document.readyState == "complete"
-		redirect = document.getElementById('redirect').textContent.replace /\s/g, ''
+		try
+			redirect = document.getElementById('redirect').textContent.replace /\s/g, ''
+		catch
+			redirect = document.getElementById('redirect').innerHTML.replace /\s/g, ''
 		if redirect
 			if redirect == 'form'
 				document.getElementById('form').submit()

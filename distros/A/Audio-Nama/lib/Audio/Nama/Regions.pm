@@ -1,4 +1,4 @@
-# ------------ Region routines ----------
+# ------------ Set region for current track ----------
 
 package Audio::Nama;
 use Modern::Perl; use Carp;

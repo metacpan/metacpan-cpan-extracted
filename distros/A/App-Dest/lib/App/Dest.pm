@@ -16,43 +16,15 @@ use Path::Tiny 'path';
 use Text::Diff ();
 use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.22'; # VERSION
-
-my $env;
-
-sub clear {
-    $env = undef;
-    return __PACKAGE__;
-}
-
-sub _env {
-    return $env->{root_dir} if $env and $env->{root_dir};
-
-    $env = {
-        cwd        => Path::Tiny->cwd,
-        dir_depth  => 0,
-        seen_files => {},
-    };
-    $env->{root_dir} = $env->{cwd};
-
-    while ( not $env->{root_dir}->child('.dest')->is_dir ) {
-        if ( $env->{root_dir}->is_rootdir ) {
-            $env->{root_dir} = '';
-            last;
-        }
-        $env->{root_dir} = $env->{root_dir}->parent;
-        $env->{dir_depth}++;
-    }
-
-    return $env->{root_dir};
-}
+our $VERSION = '1.23'; # VERSION
 
 sub init {
-    my ($self) = @_;
-    die "Project already initialized\n" if _env();
+    my $self = _new( shift, 'expect_no_root_dir' );
 
     mkdir('.dest') or die "Unable to create .dest directory\n";
-    open( my $watch, '>', '.dest/watch' ) or die "Unable to create .dest/watch file\n";
+    open( my $watch, '>', '.dest/watch' ) or die "Unable to create ~/.dest/watch file\n";
+
+    $self = _new();
 
     if ( -f 'dest.watch' ) {
         open( my $watches, '<', 'dest.watch' ) or die "Unable to read dest.watch file\n";
@@ -74,43 +46,40 @@ sub init {
             join( "\n", map { '  ' . $_ } @watches ) . "\n" .
             (
                 (@errors)
-                    ? "With the following errors:\n" . join( "\n", map { '  ' . $_ } @errors )
+                    ? "With the following errors:\n" . join( '', map { '  ' . $_ } @errors )
                     : ''
             );
     }
 
-    clear();
-    _env();
     return 0;
 }
 
 sub add {
-    my $self = shift;
-    die "Project not initialized\n" unless _env();
-    die "No directory specified; usage: dest add [directory]\n" unless ( $_[0] );
+    my $self = _new(shift);
+    die "No directory specified; usage: dest add [directory]\n" unless @_;
 
-    my @watches = $self->watch_list;
+    my @watches = $self->_watch_list;
     my @adds    = map {
         my $dir = $_;
         die "Directory specified does not exist\n" unless ( -d $dir );
 
-        my $rel_dir = _rel2root($dir);
+        my $rel_dir = $self->_rel2root($dir);
         die "Directory $dir already added\n" if ( grep { $rel_dir eq $_ } @watches );
         $rel_dir;
     } @_;
 
-    open( my $watch, '>', _rel2dir('.dest/watch') ) or die "Unable to write .dest/watch file\n";
-    print $watch $_, "\n" for ( sort @adds, map { _rel2root($_) } @watches );
-    mkpath("$env->{root_dir}/.dest/$_") for (@adds);
+    open( my $watch, '>', $self->_rel2dir('.dest/watch') ) or die "Unable to write ~/.dest/watch file\n";
+    print $watch $_, "\n" for ( sort @adds, map { $self->_rel2root($_) } @watches );
+    mkpath("$self->{root_dir}/.dest/$_") for (@adds);
+
     return 0;
 }
 
 sub rm {
-    my $self = shift;
-    die "Project not initialized\n" unless _env();
-    die "No directory specified; usage: dest rm [directory]\n" unless ( $_[0] );
+    my $self = _new(shift);
+    die "No directory specified; usage: dest rm [directory]\n" unless @_;
 
-    my @watches = $self->watch_list;
+    my @watches = $self->_watch_list;
     my @rms     = map {
         my $dir = $_;
         $dir //= '';
@@ -118,13 +87,13 @@ sub rm {
 
         die "Directory $dir not currently tracked\n" unless ( grep { $dir eq $_ } @watches );
 
-        _rel2root($dir);
+        $self->_rel2root($dir);
     } @_;
 
-    open( my $watch_file, '>', _rel2dir('.dest/watch') ) or die "Unable to write .dest/watch file\n";
-    for my $watch_dir ( map { _rel2root($_) } @watches ) {
+    open( my $watch_file, '>', $self->_rel2dir('.dest/watch') ) or die "Unable to write ~/.dest/watch file\n";
+    for my $watch_dir ( map { $self->_rel2root($_) } @watches ) {
         if ( grep { $watch_dir eq $_ } @rms ) {
-            rmtree( _rel2dir(".dest/$watch_dir") );
+            rmtree( $self->_rel2dir(".dest/$watch_dir") );
         }
         else {
             print $watch_file $watch_dir, "\n";
@@ -134,30 +103,24 @@ sub rm {
     return 0;
 }
 
-sub watch_list {
-    _env();
-    open( my $watch, '<', _rel2dir('.dest/watch') ) or die "Unable to read ~/.dest/watch file\n";
-    return sort map { chomp; _rel2dir($_) } <$watch>;
-}
-
 sub watches {
-    my ($self) = @_;
-    die "Project not initialized\n" unless _env();
+    my $self = _new(shift);
 
-    my @watches = $self->watch_list;
+    my @watches = $self->_watch_list;
     print join( "\n", @watches ), "\n" if @watches;
+
     return 0;
 }
 
 sub putwatch {
-    my ( $self, $file ) = @_;
-    die "Project not initialized\n" unless _env();
+    my $self   = _new(shift);
+    my ($file) = @_;
     die "File specified does not exist\n" unless ( -f $file );
 
     open( my $new_watches, '<', $file ) or die "Unable to read specified file\n";
 
     my @new = map { chomp; $_ } <$new_watches>;
-    my @old = $self->watch_list;
+    my @old = $self->_watch_list;
 
     for my $old (@old) {
         next if ( grep { $_ eq $old } @new );
@@ -172,15 +135,15 @@ sub putwatch {
 }
 
 sub writewatch {
-    my ($self) = @_;
-    _env();
-    copy( _rel2dir('.dest/watch'), _rel2dir('dest.watch') ) or die "$!\n";
+    my $self = _new(shift);
+
+    copy( $self->_rel2dir('.dest/watch'), $self->_rel2dir('dest.watch') ) or die "$!\n";
+
     return 0;
 }
 
 sub make {
     my ( $self, $path, $ext ) = @_;
-    die "Project not initialized\n" unless _env();
     die "No name specified; usage: dest make [path]\n" unless ($path);
 
     $ext = '.' . $ext if ( defined $ext );
@@ -198,20 +161,303 @@ sub make {
     };
 
     $self->expand($path);
+
     return 0;
 }
 
 sub expand {
     my ( $self, $path ) = @_;
+
     print join( ' ', map { <"$path/$_*"> } qw( deploy verify revert ) ), "\n";
+
     return 0;
 }
 
 sub list {
-    my ( $self, $filter ) = @_;
-    die "Project not initialized\n" unless _env();
+    my $self     = _new(shift);
+    my ($filter) = @_;
 
-    for my $path ( $self->watch_list ) {
+    my $tree = $self->_actions_tree($filter);
+    for my $path ( sort keys %$tree ) {
+        print $path, ( ( @{ $tree->{$path} } ) ? ' actions:' : ' has no actions' ), "\n";
+        print '  ', $_, "\n" for ( @{ $tree->{$path} } );
+    }
+
+    return 0;
+}
+
+sub prereqs {
+    my $self = _new(shift);
+    my ($filter) = @_;
+
+    for my $action ( @{ $self->_prereq_tree($filter)->{actions} } ) {
+        print $action->{action}, ( ( @{ $action->{prereqs} } ) ? ' prereqs:' : ' has no prereqs' ), "\n";
+        print '  ', $_, "\n" for ( @{ $action->{prereqs} } );
+    }
+
+    return 0;
+}
+
+sub status {
+    my $self = _new(shift);
+
+    if ( -f $self->_rel2dir('dest.watch') ) {
+        my $diff = Text::Diff::diff( $self->_rel2dir('.dest/watch'), $self->_rel2dir('dest.watch') );
+        warn "Diff between current watch list and dest.watch file:\n" . $diff . "\n" if ($diff);
+    }
+
+    for my $path ( @{ $self->_status_data->{paths} } ) {
+        print "$path->{state} - $path->{path}\n";
+
+        for my $action ( @{ $path->{actions} } ) {
+            unless ( $action->{modified} ) {
+                print '  ' . ( ( $action->{deployed} ) ? '-' : '+' ) . ' ' . $action->{action} . "\n";
+            }
+            else {
+                print "  $action->{action}\n";
+                print "    M $action->{file}\n";
+            }
+        }
+    }
+
+    return 0;
+}
+
+sub diff {
+    my $self   = _new(shift);
+    my ($path) = @_;
+
+    if ( not defined $path ) {
+        $self->diff($_) for ( $self->_watch_list );
+        return 0;
+    }
+
+    File::DirCompare->compare( $self->_rel2dir( '.dest/' . $self->_rel2root($path) ), $path, sub {
+        my ( $a, $b ) = @_;
+        $a ||= '';
+        $b ||= '';
+
+        return if ( $a =~ /\/dest.wrap$/ or $b =~ /\/dest.wrap$/ or not -f $a or not -f $b );
+        print Text::Diff::diff( $a, $b );
+        return;
+    } );
+
+    return 0;
+}
+
+sub clean {
+    my $self = _new(shift);
+
+    if (@_) {
+        for (@_) {
+            my $dest = $self->_rel2dir(".dest/$_");
+            rmtree($dest);
+            rcopy( $self->_rel2dir($_), $dest );
+        }
+    }
+    else {
+        for ( map { $self->_rel2root($_) } $self->_watch_list ) {
+            my $dest = $self->_rel2dir(".dest/$_");
+            rmtree($dest);
+            dircopy( $self->_rel2dir($_), $dest );
+        }
+    }
+
+    return 0;
+}
+
+sub preinstall {
+    my $self = _new(shift);
+
+    for ( map { $self->_rel2root($_) } $self->_watch_list ) {
+        my $dest = $self->_rel2dir(".dest/$_");
+        rmtree($dest);
+        mkdir($dest);
+    }
+
+    return 0;
+}
+
+sub deploy {
+    my $self = _new(shift);
+    my ( $dry_run, $action ) = _dry_check(@_);
+    die "File to deploy required; usage: dest deploy file\n" unless ($action);
+
+    my $redeploy = delete $self->{redeploy};
+    my $execute_stack = $self->_build_execute_stack( $action, 'deploy', undef, $redeploy );
+    die "Action already deployed\n" if (
+        not @$execute_stack or
+        not scalar( grep { $_->{action} eq $action and $_->{type} eq 'deploy' } @$execute_stack )
+    );
+
+    unless ($dry_run) {
+        $self->_execute_action($_) for (@$execute_stack);
+    }
+    else {
+        _dry_run_report($execute_stack);
+    }
+
+    return 0;
+}
+
+sub redeploy {
+    my $self = _new(shift);
+    $self->{redeploy} = 1;
+    return $self->deploy(@_);
+}
+
+sub revdeploy {
+    my $self = _new(shift);
+    my ($action) = @_;
+
+    $self->revert($action);
+    return $self->deploy($action);
+}
+
+sub verify {
+    my $self = _new(shift);
+    my ($action) = @_;
+
+    return $self->_execute_action( $self->_build_execute_stack( $action, 'verify' )->[0] );
+}
+
+sub revert {
+    my $self = _new(shift);
+    my ( $dry_run, $action ) = _dry_check(@_);
+    die "File to revert required; usage: dest revert file\n" unless ($action);
+
+    my $execute_stack = $self->_build_execute_stack( $action, 'revert' );
+    die "Action not deployed\n" if (
+        not @$execute_stack or
+        not scalar( grep { $_->{action} eq $action and $_->{type} eq 'revert' } @$execute_stack )
+    );
+
+    unless ($dry_run) {
+        $self->_execute_action($_) for (@$execute_stack);
+    }
+    else {
+        _dry_run_report($execute_stack);
+    }
+
+    return 0;
+}
+
+sub update {
+    my $self = _new(shift);
+    my ( $dry_run, @incs ) = _dry_check(@_);
+
+    my $seen_action = {};
+    my $execute_stack;
+
+    for (
+        sort {
+            ( $b->{modified} || 0 ) <=> ( $a->{modified} || 0 ) ||
+            $a->{action} cmp $b->{action}
+        }
+        grep { not $_->{matches} }
+        values %{ $self->_status_data->{actions} }
+    ) {
+        push( @$execute_stack, @{ $self->_build_execute_stack( $_->{action}, 'revert' ) } ) if (
+            $_->{modified} or $_->{deployed}
+        );
+        push( @$execute_stack, @{ $self->_build_execute_stack( $_->{action}, 'deploy', $seen_action ) } );
+    }
+
+    $execute_stack = [
+        grep {
+            my $execution = $_;
+            my $match     = 0;
+
+            for (@incs) {
+                if ( index( $execution->{file}, $_ ) > -1 ) {
+                    $match = 1;
+                    last;
+                }
+            }
+
+            $match;
+        }
+        @$execute_stack
+    ] if (@incs);
+
+    unless ($dry_run) {
+        $self->_execute_action($_) for (@$execute_stack);
+    }
+    else {
+        _dry_run_report($execute_stack);
+    }
+
+    return 0;
+}
+
+sub version {
+    print 'dest version ', $__PACKAGE__::VERSION || 0, "\n";
+    return 0;
+}
+
+sub _new {
+    my ( $self, $expect_no_root_dir ) = @_;
+
+    if ( not ref $self ) {
+        $self = bless( {}, __PACKAGE__ );
+
+        $self->{root_dir} = Path::Tiny->cwd;
+
+        while ( not $self->{root_dir}->child('.dest')->is_dir ) {
+            if ( $self->{root_dir}->is_rootdir ) {
+                $self->{root_dir} = '';
+                last;
+            }
+            $self->{root_dir} = $self->{root_dir}->parent;
+            $self->{dir_depth}++;
+        }
+
+        if ( $expect_no_root_dir ) {
+            die "Project already initialized\n" if $self->{root_dir};
+        }
+        else {
+            die "Project not initialized\n" unless $self->{root_dir};
+        }
+    }
+
+    return $self;
+}
+
+sub _dry_check {
+    my @clean = grep { $_ ne '-d' } @_;
+    return ( @clean != @_ ) ? 1 : 0, @clean;
+}
+
+sub _rel2root {
+    my ( $self, $dir ) = @_;
+    my $path           = path( $dir || '.' );
+
+    try {
+        $path = $path->realpath;
+    }
+    catch {
+        $path = $path->absolute;
+    };
+
+    return $path->relative( $self->{root_dir} )->stringify;
+}
+
+sub _rel2dir {
+    my ( $self, $dir ) = @_;
+    return ( '../' x ( $self->{dir_depth} || 0 ) ) . ( $dir || '.' );
+}
+
+sub _watch_list {
+    my ($self) = @_;
+    open( my $watch, '<', $self->_rel2dir('.dest/watch') ) or die "Unable to read ~/.dest/watch file\n";
+    return sort map { chomp; $self->_rel2dir($_) } <$watch>;
+}
+
+sub _actions_tree {
+    my ( $self, $filter ) = @_;
+
+    my $tree;
+    for my $path ( $self->_watch_list ) {
         my @actions;
 
         find( {
@@ -228,323 +474,220 @@ sub list {
             },
         }, $path );
 
-        print $path, "\n";
-        if (@actions) {
-            print '  ', $_, "\n" for ( sort @actions );
+        $tree->{$path} = [ sort @actions ];
+    }
+
+    return $tree;
+}
+
+sub _prereq_tree {
+    my ( $self, $filter ) = @_;
+    my $tree              = $self->_actions_tree($filter);
+
+    my @actions;
+    for my $path ( sort keys %$tree ) {
+        for my $action ( @{ $tree->{$path} } ) {
+            my ($file) = <"$action/deploy*">;
+            open( my $content, '<', $file ) or die "Unable to read $file\n";
+
+            my $prereqs = [
+                map { $self->_rel2dir($_) }
+                grep { defined }
+                map { /dest\.prereq\b[\s:=-]+(.+?)\s*$/; $1 || undef }
+                grep { /dest\.prereq/ } <$content>
+            ];
+
+            $action = {
+                action  => $action,
+                prereqs => $prereqs,
+            };
+
+            push( @actions, $action );
         }
     }
 
-    return 0;
+    return { tree => $tree, actions => \@actions };
 }
 
-sub status {
+sub _status_data {
     my ($self) = @_;
-    die "Project not initialized\n" unless _env();
 
-    if ( -f _rel2dir('dest.watch') ) {
-        my $diff = Text::Diff::diff( _rel2dir('.dest/watch'), _rel2dir('dest.watch') );
-        warn "Diff between current watch list and dest.watch file:\n" . $diff . "\n" if ($diff);
+    my $actions;
+    my $tree = $self->_actions_tree;
+    for my $path ( keys %$tree ) {
+        for my $action ( @{ $tree->{$path} } ) {
+            $actions->{$action} = {
+                action   => $action,
+                deployed => 1,
+                matches  => 1,
+            };
+        }
     }
 
-    my %seen_actions;
-    for ( $self->watch_list ) {
-        my ( $this_path, $printed_path ) = ( $_, 0 );
+    my @paths;
+    for my $path ( $self->_watch_list ) {
+        my $printed_path = 0;
+        my $data;
 
         try {
-            File::DirCompare->compare( _rel2dir( '.dest/' . _rel2root($this_path) ), $this_path, sub {
-                my ( $a, $b ) = @_;
-                return if ( $a and $a =~ /\/dest.wrap$/ or $b and $b =~ /\/dest.wrap$/ );
-                print 'diff - ', $this_path, "\n" unless ( $printed_path++ );
+            File::DirCompare->compare(
+                $self->_rel2dir( '.dest/' . $self->_rel2root($path) ),
+                $path,
+                sub {
+                    my ( $a, $b ) = @_;
+                    return if ( $a and $a =~ /\/dest.wrap$/ or $b and $b =~ /\/dest.wrap$/ );
+                    $data->{state} = 'diff' unless ( $printed_path++ );
 
-                if ( not $b ) {
-                    print '  - ', _rel2dir( substr( _rel2root($a), 6 ) ), "\n";
-                }
-                elsif ( not $a ) {
-                    print "  + $b\n";
-                }
-                else {
-                    ( my $action = $b ) =~ s,/(?:deploy|verify|revert)(?:\.[^\/]+)?$,,;
-                    print "  $action\n" unless ( $seen_actions{$action}++ );
-                    print "    M $b\n";
-                }
+                    if ( not $b ) {
+                        push(
+                            @{ $data->{actions} },
+                            {
+                                action   => $self->_rel2dir( substr( $self->_rel2root($a), 6 ) ),
+                                deployed => 1,
+                            },
+                        );
+                    }
+                    elsif ( not $a ) {
+                        push(
+                            @{ $data->{actions} },
+                            {
+                                action   => $b,
+                                deployed => 0,
+                            },
+                        );
+                    }
+                    elsif ( $a and $b ) {
+                        ( my $action = $b ) =~ s,/(?:deploy|verify|revert)(?:\.[^\/]+)?$,,;
+                        push(
+                            @{ $data->{actions} },
+                            {
+                                action   => $action,
+                                modified => 1,
+                                file     => $b,
+                            },
+                        );
+                    }
 
-                return;
-            } )
+                    return;
+                },
+            )
         }
         catch {
-            print '? - ', $this_path, "\n" if ( /Not a directory/ );
+            $data->{state} = '?' if ( /Not a directory/ );
         }
         finally {
-            print 'ok - ', $this_path, "\n" unless ( /Not a directory/ or $printed_path );
+            $data->{state} = 'ok' unless $printed_path;
         };
-    }
 
-    return 0;
-}
+        $data->{path} = $path;
+        push( @paths, $data );
 
-sub diff {
-    my ( $self, $path ) = @_;
-    die "Project not initialized\n" unless _env();
-
-    if ( not defined $path ) {
-        $self->diff($_) for ( $self->watch_list );
-        return 0;
-    }
-
-    try {
-        File::DirCompare->compare( _rel2dir( '.dest/' . _rel2root($path) ), $path, sub {
-            my ( $a, $b ) = @_;
-            $a ||= '';
-            $b ||= '';
-
-            return if ( $a =~ /\/dest.wrap$/ or $b =~ /\/dest.wrap$/ );
-            print Text::Diff::diff( $a, $b );
-            return;
-        } )
-    };
-
-    return 0;
-}
-
-sub clean {
-    my $self = shift;
-    die "Project not initialized\n" unless _env();
-
-    if (@_) {
-        for (@_) {
-            my $dest = _rel2dir(".dest/$_");
-            rmtree($dest);
-            rcopy( _rel2dir($_), $dest );
-        }
-    }
-    else {
-        for ( map { _rel2root($_) } $self->watch_list ) {
-            my $dest = _rel2dir(".dest/$_");
-            rmtree($dest);
-            dircopy( _rel2dir($_), $dest );
+        if ( ref $data->{actions} eq 'ARRAY' ) {
+            $actions->{ $_->{action} } = $_ for ( @{ $data->{actions} } );
         }
     }
 
-    return 0;
+    return { paths => \@paths, actions => $actions };
 }
 
-sub preinstall {
-    my ($self) = @_;
-    die "Project not initialized\n" unless _env();
+sub _build_execute_stack {
+    my ( $self, $name, $type, $seen_action, $redeploy ) = @_;
 
-    for ( map { _rel2root($_) } $self->watch_list ) {
-        my $dest = _rel2dir(".dest/$_");
-        rmtree($dest);
-        mkdir($dest);
-    }
-    return 0;
-}
+    my @actions_stack = ($name);
+    my $prereqs       = { map { $_->{action} => $_->{prereqs} } @{ $self->_prereq_tree->{actions} } };
+    my $state         = $self->_status_data->{actions};
 
-sub deploy {
-    my ( $self, $name, $redeploy ) = @_;
-    die "Project not initialized\n" unless _env();
-    die "File to deploy required; usage: dest deploy file\n" unless ($name);
+    my ( @execute_stack, $wraps );
+    $seen_action //= {};
 
-    my $rv = $self->_action( $name, 'deploy', $redeploy );
-    dircopy( $_, _rel2dir( '.dest/' . _rel2root($_) ) )
-        for ( grep { s|/deploy[^/]*$|| } keys %{ $env->{seen_files} } );
+    while (@actions_stack) {
+        my $action = shift @actions_stack;
+        next if ( $seen_action->{$action}++ );
+        push( @actions_stack, @{ $prereqs->{$action} || [] } );
 
-    return $rv;
-}
+        my $location = ( $type ne 'revert' )
+            ? $action
+            : $self->_rel2dir( '.dest/' . $self->_rel2root($action) );
 
-sub verify {
-    my ( $self, $path ) = @_;
-    die "Project not initialized\n" unless _env();
+        my $file = ( <"$location/$type*"> )[0];
 
-    return $self->_action( $path, 'verify' );
-}
-
-sub revert {
-    my ( $self, $name ) = @_;
-    die "Project not initialized\n" unless _env();
-    die "File to revert required; usage: dest revert file\n" unless ($name);
-
-    my $rv = $self->_action( _rel2dir( '.dest/' . _rel2root($name) ), 'revert' );
-    rmtree( _rel2dir( _rel2root($_) ) ) for (
-        grep { s|/revert[^/]*$|| } keys %{ $env->{seen_files} }
-    );
-
-    return $rv;
-}
-
-sub redeploy {
-    my ( $self, $name ) = @_;
-    die "Project not initialized\n" unless _env();
-
-    return $self->deploy( $name, 'redeploy' );
-}
-
-sub revdeploy {
-    my ( $self, $name ) = @_;
-    die "Project not initialized\n" unless _env();
-
-    $self->revert($name);
-    return $self->deploy($name);
-}
-
-sub update {
-    my $self = shift;
-    die "Project not initialized\n" unless _env();
-
-    if ( -f _rel2dir('dest.watch') ) {
-        my @watches = $self->watch_list;
-        open( my $watch, '<', _rel2dir('dest.watch') ) or die "Unable to read dest.watch file\n";
-
-        for my $candidate ( map { chomp; _rel2dir($_) } <$watch> ) {
-            unless ( grep { $_ eq $candidate } @watches ) {
-                $self->add($candidate);
-                warn "Added $candidate to the watch list\n";
+        unless ( exists $wraps->{$action} ) {
+            $wraps->{$action} = undef;
+            my @nodes = split( '/', $self->_rel2root($file) );
+            pop @nodes;
+            shift @nodes if ( defined $nodes[0] and $nodes[0] eq '.dest' );
+            while (@nodes) {
+                my $path = $self->_rel2dir( join( '/', @nodes ) . '/dest.wrap' );
+                if ( -f $path ) {
+                    $wraps->{$action} = $path;
+                    last;
+                }
+                pop @nodes;
             }
         }
+
+        my $add = sub {
+            die "Action file does not exist for: $type $action\n" unless ($file);
+
+            my $executable = ( $wraps->{$action} ) ? $wraps->{$action} : $file;
+            die 'Execute permission denied for: ' . $executable . "\n" unless ( -x $executable );
+
+            unshift(
+                @execute_stack,
+                {
+                    type   => $type,
+                    action => $action,
+                    file   => $file,
+                    wrap   => $wraps->{$action},
+                },
+            );
+
+            if ( $type eq 'deploy' ) {
+                my $verify_file = ( <"$action/verify*"> )[0];
+                die "Action file does not exist for: verify $action\n" unless ($verify_file);
+
+                splice(
+                    @execute_stack,
+                    1,
+                    0,
+                    {
+                        type   => 'verify',
+                        action => $action,
+                        file   => $verify_file,
+                        wrap   => $wraps->{$action},
+                    },
+                );
+            }
+        };
+
+        if ( $type eq 'deploy' ) {
+            $add->() unless ( $state->{$action}{deployed} and not $redeploy );
+        }
+        elsif ( $type eq 'revert' ) {
+            $add->() if ( $state->{$action}{deployed} or $state->{$action}{modified} );
+        }
+        elsif ( $type eq 'verify' ) {
+            $add->();
+        }
     }
 
-    my @paths   = @_;
-    my @watches = $self->watch_list;
-
-    if (@paths) {
-        @watches = grep {
-            my $watch = $_;
-            grep { $_ eq $watch } @paths;
-        } @watches;
-    }
-
-    File::DirCompare->compare( _rel2dir( '.dest/' . _rel2root($_) ), $_, sub {
-        my ( $a, $b ) = @_;
-        return if ( $a and $a =~ /\/dest.wrap$/ or $b and $b =~ /\/dest.wrap$/ );
-
-        if ( not $b ) {
-            $a =~ s|\.dest/||;
-            $self->revert($a);
-        }
-        elsif ( not $a ) {
-            $self->deploy($b);
-        }
-        else {
-            $a =~ s|\.dest/||;
-            $b =~ m|/(\w+)$|;
-
-            my $type = $1;
-
-            if ( $type and $type eq 'deploy' ) {
-                $a =~ s|/\w+$||;
-                $b =~ s|/\w+$||;
-
-                $self->revert($a);
-                $self->deploy($b);
-            }
-            else {
-                $a =~ s|/[^/]+$||;
-
-                $self->revert($a);
-                $self->deploy($a);
-            }
-        }
-    } ) for (@watches);
-
-    return 0;
+    return \@execute_stack;
 }
 
-sub _action {
-    my ( $self, $path, $type, $redeploy ) = @_;
-    $env->{seen_files} = {};
-
-    if ($path) {
-        my @files = <"$path/$type*">;
-        my $file  = $files[0];
-
-        unless ($file) {
-            my $this_file = ( split( '/', $path ) )[-1];
-            die "Unable to $type $this_file "
-                . "(perhaps $this_file $type has already occured or $this_file isn't an action)\n";
-        }
-        $self->_execute( $file, $redeploy ) or die "Failed to $type $path (check interdependencies)\n";
-    }
-    else {
-        find( {
-            follow   => 1,
-            no_chdir => 1,
-            wanted   => sub {
-                return unless ( /\/$type/ );
-                $self->_execute($_) or die "Failed to $type $_\n";
-            },
-        }, $self->watch_list );
-    }
-
-    return 0;
+sub _dry_run_report {
+    my ($execute_stack) = @_;
+    print '' . ( ( $_->{wrap} ) ? $_->{wrap} . ' ' : '' ) . $_->{file}, "\n" for (@$execute_stack);
 }
 
-sub _execute {
-    my ( $self, $file, $run_quiet, $is_dependency ) = @_;
-    return if ( $env->{seen_files}{$file}++ );
-
-    my @nodes = split( '/', _rel2root($file) );
-
-    my $type = pop @nodes;
-    $type =~ s/\..*$//;
-
-    ( my $action = join( '/', @nodes ) ) =~ s|(?<!\w)\.dest/||;
-
-    if (
-        ( $type eq 'deploy' and not $run_quiet and -f _rel2dir( '.dest/' . _rel2root($file) ) ) or
-        ( $type eq 'revert' and not -f $file )
-    ) {
-        if ( $is_dependency ) {
-            return;
-        }
-        else {
-            die 'Action already '. $type . "ed\n";
-        }
-    }
-
-    open( my $content, '<', $file ) or die "Unable to read $file\n";
-
-    for (
-        grep { defined }
-        map { /dest\.prereq\b[\s:=-]+(.+?)\s*$/; $1 || undef }
-        grep { /dest\.prereq/ } <$content>
-    ) {
-        my $rel_dir = _rel2dir($_);
-        my @files   = <"$rel_dir/$type*">;
-
-        die "Unable to find prereq \"$_/$type*\"\n" unless ( $files[0] );
-        my $dest_file = _rel2dir( '.dest/' . _rel2root( $files[0] ) );
-
-        $self->_execute(
-            ( ( $type ne 'revert' ) ? $files[0] : $dest_file ),
-            $run_quiet,
-            'dependency',
-        ) or return 0 if (
-            ( $type eq 'deploy' and not -f $dest_file ) or
-            ( $type eq 'revert' and     -f $dest_file )
-        );
-    }
-
-    my $wrap;
-    shift @nodes if ( $nodes[0] eq '.dest' );
-    while (@nodes) {
-        my $path = _rel2dir( join( '/', @nodes ) . '/dest.wrap' );
-        if ( -f $path ) {
-            $wrap = $path;
-            last;
-        }
-        pop @nodes;
-    }
+sub _execute_action {
+    my ( $self, $input ) = @_;
+    my ( $type, $wrap, $action, $file, $location ) = @$input{ qw( type wrap action file location ) };
 
     my ( $out, $err, $died );
     my $run = sub {
         try {
-            unless ( ($wrap) ? -x $wrap : -x $file ) {
-                $died = 1;
-                die 'Execute permission denied' . ( ($wrap) ? ' on dest.wrap file' : '' ) . "\n";
-            }
-
             run(
-                [ grep { defined } ( ($wrap) ? $wrap : undef ), $file, $type ],
+                [ ( grep { defined } $wrap ), $file, $type ],
                 \undef, \$out, \$err,
             ) or $died = 1;
         }
@@ -566,46 +709,27 @@ sub _execute {
 
     if ( $type eq 'verify' ) {
         $run->();
-
         chomp($out);
-        return ($err) ? 0 : $out if ($run_quiet);
-
         die "$err\n" if ($err);
-        print '', ( ($out) ? 'ok' : 'not ok' ) . " - verify: $action\n";
-        return 0 if ( not $out );
+
+        if ($out) {
+            print "ok - verify: $action\n";
+        }
+        else {
+            die "not ok - verify: $action\n";
+        }
     }
     else {
         print "begin - $type: $action\n";
         $run->();
-
-        $file =~ s|(?<!\w)\.dest/||;
         print "ok - $type: $action\n";
-
-        if ( $type eq 'deploy' ) {
-            ( my $verify_file = $file ) =~ s|([^/]+)$| 'verify' . substr( $1, 6 ) |e;
-            return $self->_execute($verify_file);
-        }
     }
 
-    return 1;
-}
+    my $dest_copy = $self->_rel2dir( '.dest/' . $self->_rel2root($action) );
+    rmtree($dest_copy) unless ( $type eq 'verify' );
+    dircopy( $action, $dest_copy ) if ( $type eq 'deploy' );
 
-sub _rel2root {
-    my ($dir) = @_;
-    my $path  = path( $dir || '.' );
-
-    try {
-        $path = $path->realpath;
-    }
-    catch {
-        $path = $path->absolute;
-    };
-
-    return $path->relative( $env->{root_dir} )->stringify;
-}
-
-sub _rel2dir {
-    return ( '../' x ( $env->{dir_depth} || 0 ) ) . ( $_[0] || '.' );
+    return 0;
 }
 
 1;
@@ -622,7 +746,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)
@@ -631,35 +755,35 @@ version 1.22
 
 =head1 SYNOPSIS
 
-dest COMMAND [DIR || NAME]
+dest COMMAND [OPTIONS]
 
-    dest init            # initialize dest for a project
-    dest add DIR         # add a directory to dest tracking list
-    dest rm DIR          # remove a directory from dest tracking list
+    dest init               # initialize dest for a project
+    dest add DIR            # add a directory to dest tracking list
+    dest rm DIR             # remove a directory from dest tracking list
 
-    dest watches         # returns a list of watched directories
-    dest putwatch FILE   # set watch list to be what's in a file
-    dest writewatch      # creates watch file in project root directory
+    dest watches            # returns a list of watched directories
+    dest putwatch FILE      # set watch list to be what's in a file
+    dest writewatch         # creates watch file in project root directory
 
-    dest make NAME [EXT] # create a named template set (set of 3 files)
-    dest expand NAME     # dump a list of the template set (set of 3 files)
-    dest list [FILTER]   # list all actions in all watches
+    dest make NAME [EXT]    # create a named template set (set of 3 files)
+    dest expand NAME        # dump a list of the template set (set of 3 files)
+    dest list [FILTER]      # list all actions in all watches
 
-    dest status          # check status of tracked directories
-    dest diff [NAME]     # display a diff of any modified actions
-    dest clean [NAME]    # reset dest state to match current files/directories
-    dest preinstall      # set dest state so an "update" will deploy everything
+    dest status             # check status of tracked directories
+    dest diff [NAME]        # display a diff of any modified actions
+    dest clean [NAME]       # reset dest state to match current files/dirs
+    dest preinstall         # set dest state so an update will deploy everything
 
-    dest deploy NAME     # deployment of a specific action
-    dest verify [NAME]   # verification of tracked actions or specific action
-    dest revert NAME     # revertion of a specific action
-    dest redeploy NAME   # deployment of a specific action
-    dest revdeploy NAME  # revert and deployment of a specific action
-    dest update [DIRS]   # automaticall deploy or revert to cause currency
+    dest deploy NAME [-d]   # deployment of a specific action
+    dest verify [NAME]      # verification of tracked actions or specific action
+    dest revert NAME [-d]   # revertion of a specific action
+    dest redeploy NAME [-d] # deployment of a specific action
+    dest revdeploy NAME     # revert and deployment of a specific action
+    dest update [INCS] [-d] # automaticall deploy or revert to cause currency
 
-    dest version         # dest current version
-    dest help            # display command synposis
-    dest man             # display man page
+    dest version            # dest current version
+    dest help               # display command synposis
+    dest man                # display man page
 
 =head1 DESCRIPTION
 
@@ -684,9 +808,9 @@ the development history.
 See below for an example scenario that may help illustrate using C<dest> in a
 pseudo real world situation.
 
-Note that using C<dest> for production deployment, provisioning, or configuration
-management is not advised. Use a full-featured configuration management tool
-instead.
+Note that using C<dest> for production deployment, provisioning, or
+configuration management is not advised. Use a full-featured configuration
+management tool instead.
 
 =head1 COMMANDS
 
@@ -777,6 +901,12 @@ This command will list all tracked directories and every action within each
 directory. If provided a filter, it will limit what's displayed to actions
 containing the filter.
 
+=head2 prereqs [FILTER]
+
+This command will list every action within any tracked directory, then for each
+action, it will list any prereqs of that action. If provided a filter, it will
+limit what's displayed to actions containing the filter.
+
 =head2 status
 
 This command will tell you your current state compared to what the current code
@@ -833,7 +963,7 @@ Here's an example of what you might want:
     dest preinstall
     dest update
 
-=head2 deploy NAME
+=head2 deploy NAME [-d]
 
 This tells C<dest> to deploy a specific action. For example, if you called
 C<status> and got back results like in the status example above, you might then
@@ -843,6 +973,9 @@ want to:
 
 Note that you shouldn't add "/deploy" to the end of that. Also note that a
 C<deploy> call will automatically call C<verify> when complete.
+
+Adding a "-d" flag to the command will cause a "dry run" to run, which will
+not perform any actions but will instead report what actions would happen.
 
 =head2 verify [NAME]
 
@@ -854,25 +987,31 @@ user input/output, verify files must return some value that is either true
 or false. C<dest> will assume that if it sees a true value, verification is
 confirmed. If it receives a false value, verification is assumed to have failed.
 
-=head2 revert NAME
+=head2 revert NAME [-d]
 
 This tells C<dest> to revert a specific action. For example, if you deployed
 C<db/new_function> but then you wanted to revert it, you'd:
 
     dest revert db/new_function
 
-=head2 redeploy NAME
+Adding a "-d" flag to the command will cause a "dry run" to run, which will
+not perform any actions but will instead report what actions would happen.
+
+=head2 redeploy NAME [-d]
 
 This is exactly the same as deploy, except that if you've already deployed an
 action, "redeploy" will let you deploy the action again, whereas "deploy"
 shouldn't.
+
+Adding a "-d" flag to the command will cause a "dry run" to run, which will
+not perform any actions but will instead report what actions would happen.
 
 =head2 revdeploy NAME
 
 This is exactly the same as conducting a revert of an action followed by a
 deploy of the same action.
 
-=head2 update [DIRS]
+=head2 update [INCS] [-d]
 
 This will automatically deploy or revert as appropriate to make your system
 match the code. This will likely be the most common command you run.
@@ -886,12 +1025,15 @@ If there are actions that are in the code that have been deployed, but the
 "deploy" file then deploy the new "deploy" file. (And note that the deployment
 will automatically call C<verify>.)
 
-You can optionally add one or more directories to the end of the update command
-to restrict the update to only operate within the directories you specify.
-This will not prevent cross-directory dependencies, however. For example, if
-you have two tracked directories and limit the update to only one directory and
-within the directory there is an action with a dependency on an action in the
-non-specified directory, that action will be triggered.
+You can optionally add one or more "INCS" strings to the update command to
+restrict the update to only perform operations that include one of the "INCS" in
+its action file. So for example, let's say you have a "db/changes" directory
+with some actions and a "etc/changes" directory with some actions. If you were
+to specify "db/changes" as one of your "INCS", this would only  update actions
+from that directory tree.
+
+Adding a "-d" flag to the command will cause a "dry run" to run, which will
+not perform any actions but will instead report what actions would happen.
 
 =head2 version
 
@@ -907,16 +1049,19 @@ Displays the man page for C<dest>.
 
 =head1 DEPENDENCIES
 
-Sometimes you may have deployments (or revertions) that have dependencies on
-other deployments (or revertions). For example, if you want to add a column
-to a table in a database, that table (and the database) have to exist already.
+Sometimes you may have deployments that have dependencies on other deployments.
+For example, if you want to add a column to a table in a database, that table
+(and the database) have to exist already.
 
-To define a dependency, place the action's name after a C<dest.prereq> marker,
-which itself likely will be after a comment. (The comment marker can be
-whatever the language of the deployment file is.) For example, in a SQL file
-that adds a column, you might have:
+To define a dependency, place the action's name after a C<dest.prereq> marker in
+the deploy action file. This will likely need to be in the form of a comment.
+(The comment marker can be whatever the language of the deployment file is.) For
+example, in a SQL file that adds a column, you might have:
 
     -- dest.prereq: db/schema
+
+Dependencies are defined only in deploy actions. Reverting infers its dependency
+tree from the  dependencies defined in deploy actions, just in reverse.
 
 =head1 WRAPPERS
 
@@ -930,10 +1075,10 @@ Given our database example, we'd likely want each of the action sub-files to be
 pure SQL. In that case, we'll need to write some wrapper program that C<dest>
 will run that will then consume and run the SQL files as appropriate.
 
-C<dest> looks for wrapper files up the chain from the location of the action file.
-Specifically, it'll assume a file is a wrapper if the filename is "dest.wrap".
-If such a file is found, then that file is called, and the name of the action
-sub-file is passed as its only argument.
+C<dest> looks for wrapper files up the chain from the location of the action
+file. Specifically, it'll assume a file is a wrapper if the filename is
+"dest.wrap". If such a file is found, then that file is called, and the name of
+the action sub-file is passed as its only argument.
 
 As an example, let's say I created an action set that looked like this
 
@@ -969,11 +1114,11 @@ root directory of the project) to watch.
 If this "dest.watch" file exists in the root directory of your project, C<dest>
 will add the following behavior:
 
-During an "init" action, the C<dest.watch> file will be read to setup all watched
-directories (as though you manually called the "add" action on each).
+During an "init" action, the C<dest.watch> file will be read to setup all
+watched directories (as though you manually called the "add" action on each).
 
-During a "status" action, C<dest> will report any differences between your current
-watch list and the C<dest.watch> file.
+During a "status" action, C<dest> will report any differences between your
+current watch list and the C<dest.watch> file.
 
 During an "update" action, C<dest> will automatically add (as if you manually
 called the "add" action) each directory in the C<dest.watch> file that is
@@ -982,9 +1127,9 @@ currently not watched by C<dest> prior to executing the update action.
 =head1 EXAMPLE SCENARIO
 
 To help illustrate what C<dest> can do, consider the following example scenario.
-You start a new project that requires the use of a typical database. You want
-to control the schema of that database with progressively executed SQL files.
-You also have data operations that require more functionality than what SQL can
+You start a new project that requires the use of a typical database. You want to
+control the schema of that database with progressively executed SQL files. You
+also have data operations that require more functionality than what SQL can
 provide, so you'd like to have data operations handled by progressively executed
 Perl programs.
 
@@ -1159,8 +1304,6 @@ L<CPANTS|http://cpants.cpanauthors.org/dist/App-Dest>
 L<CPAN Testers|http://www.cpantesters.org/distro/A/App-Dest.html>
 
 =back
-
-=for Pod::Coverage clear watch_list
 
 =head1 AUTHOR
 

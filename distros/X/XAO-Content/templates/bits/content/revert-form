@@ -1,0 +1,30 @@
+<%Condition
+  default.path="/bits/content/content-info"
+  default.pass
+%>
+<P>
+
+To revert to a previously published content please select a date from
+the list below. Once you select it you will be able to alter and preview
+it before publishing.
+<P>
+
+Reverting to the most current date will cancel current changes.
+<P>
+
+<FORM METHOD="GET" ACTION="<%Utility mode="current-url"%>">
+<%Utility mode="pass-cgi-params" result="form" params="name"%>
+
+<SELECT NAME="revert_to">
+<OPTION VALUE="" SELECTED>Please Select</OPTION>
+<%Content
+  mode="content-show-dates"
+  name={<%CgiParam/f name="name"%>}
+  path="/bits/content/revert-option"
+%>
+</SELECT>
+<P>
+
+<INPUT TYPE="SUBMIT" NAME="revert" VALUE="  Revert  ">
+
+</FORM>

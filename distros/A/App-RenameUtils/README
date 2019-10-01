@@ -2,11 +2,11 @@ NAME
     App::RenameUtils - Utilities related to renaming files
 
 VERSION
-    This document describes version 0.001 of App::RenameUtils (from Perl
-    distribution App-RenameUtils), released on 2019-01-15.
+    This document describes version 0.002 of App::RenameUtils (from Perl
+    distribution App-RenameUtils), released on 2019-07-23.
 
 DESCRIPTION
-    This distributions provides the following command-line utilities:
+    This distribution provides the following command-line utilities:
 
     *   rename-swap
 
@@ -29,6 +29,8 @@ SEE ALSO
     rename from File::Rename
 
     perlmv from App::perlmv
+
+    renwd from App::renwd
 
 AUTHOR
     perlancar <perlancar@cpan.org>

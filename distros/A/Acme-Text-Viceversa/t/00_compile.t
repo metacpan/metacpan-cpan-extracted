@@ -44,4 +44,6 @@ Z⅄XMΛᑎ⊥SȢΌԀONWᒣ丬ᒋIH⅁ℲƎpↃᗺ∀
 68L9ᔕ⇁⃓εᘔ⇂0
 END
 
+note $v->ɐsɹǝʌǝɔᴉʌ('added License');
+
 done_testing;

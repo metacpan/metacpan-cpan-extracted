@@ -1,0 +1,19 @@
+<%Page path="/admin/bits/header" PAGENAME="content"%>
+
+<%Styler text="Content Editing" style="page-title"%>
+
+<%Condition
+  a.cgiparam="preview"
+  a.path="/bits/content/main-preview"
+  b.cgiparam="preview_stop"
+  b.path="/bits/content/main-preview-stop"
+  c.cgiparam="publish"
+  c.path="/bits/content/main-publish"
+  d.cgiparam="revert"
+  d.path="/bits/content/main-revert"
+  e.cgiparam="add"
+  e.path="/bits/content/main-add"
+  default.path="/bits/content/main-list"
+%>
+
+<%Page path="/admin/bits/footer"%>

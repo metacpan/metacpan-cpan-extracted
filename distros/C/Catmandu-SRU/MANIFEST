@@ -38,5 +38,5 @@ t/files/meta.xml
 t/files/mods.xml
 t/files/picaxml.xml
 t/files/sru_oai_dc.xml
-t/lib/MockFurl.pm
-t/lib/MockFurlMany.pm
+t/lib/MockHTTPClient.pm
+t/lib/MockHTTPClientMany.pm

@@ -1,0 +1,27 @@
+package TestCase::Application::Routes::Stub;
+use base qw(TestCase::Application::Routes::Test);
+
+use Test::Most;
+
+use Application::Routes::Stub;
+
+
+sub instantiate_service : Test(setup => 1) {
+    my $self = shift;
+
+    $self->setup_router("Application::Routes::Stub");
+}
+
+sub can_be_instantiated: Test(no_plan) {
+    my $self = shift;
+
+    isa_ok($self->current, 'Application::Routes::Stub');
+    can_ok($self->current, (qw/router routes/));
+    isa_ok($self->current->router, 'Mojolicious::Routes::Route');
+}
+
+sub second_test: Test(no_plan) {
+    is('true', 'false');
+}
+
+1;

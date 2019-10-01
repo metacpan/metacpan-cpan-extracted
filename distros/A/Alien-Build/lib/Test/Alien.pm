@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.86'; # VERSION
+our $VERSION = '1.89'; # VERSION
 
 
 our @aliens;
@@ -153,8 +153,21 @@ sub xs_ok
   my($xs, $message) = @_;
   $message ||= 'xs';
 
+  $xs = { xs => $xs } unless ref $xs;
+  # make sure this is a copy because we may
+  # modify it.
+  $xs->{xs} = "@{[ $xs->{xs} ]}";
+  $xs->{pxs}              ||= {};
+  $xs->{cbuilder_check}   ||= 'have_compiler';
+  $xs->{cbuilder_config}  ||= {};
+  $xs->{cbuilder_compile} ||= {};
+  $xs->{cbuilder_link}    ||= {};
+
   require ExtUtils::CBuilder;
-  my $skip = !ExtUtils::CBuilder->new->have_compiler;
+  my $skip = do {
+    my $have_compiler = $xs->{cbuilder_check};
+    !ExtUtils::CBuilder->new( config => $xs->{cbuilder_config} )->$have_compiler;
+  };
 
   if($skip)
   {
@@ -164,14 +177,6 @@ sub xs_ok
     $ctx->release;
     return;
   }
-
-  $xs = { xs => $xs } unless ref $xs;
-  # make sure this is a copy because we may
-  # modify it.
-  $xs->{xs} = "@{[ $xs->{xs} ]}";
-  $xs->{pxs} ||= {};
-  $xs->{cbuilder_compile} ||= {};
-  $xs->{cbuilder_link}    ||= {};
 
   if($xs->{cpp} || $xs->{'C++'})
   {
@@ -259,8 +264,11 @@ sub xs_ok
   if($ok)
   {
     my $cb = ExtUtils::CBuilder->new(
-      config => {
-        lddlflags => join(' ', grep !/^-l/, shellwords map { _flags $_, 'libs' } @aliens) . " $Config{lddlflags}",
+      config => do {
+        my %config = %{ $xs->{cbuilder_config} };
+        my $lddlflags = join(' ', grep !/^-l/, shellwords map { _flags $_, 'libs' } @aliens) . " $Config{lddlflags}";
+        $config{lddlflags} = defined $config{lddlflags} ? "$config{lddlflags} $lddlflags" : $lddlflags;
+        \%config;
       },
     );
 
@@ -438,7 +446,26 @@ sub xs_ok
   $ok;
 }
 
-sub with_subtest (&) { $_[0]; }
+sub with_subtest (&)
+{
+  my($code) = @_;
+
+  # it may be possible to catch a segmentation fault,
+  # but not with signal handlers apparently.  See:
+  # https://feepingcreature.github.io/handling.html
+  return $code if $^O eq 'MSWin32';
+
+  # try to catch a segmentation fault and bail out
+  # with a useful diagnostic.  prove test to swallow
+  # the diagnostic on such failures.
+  sub {
+    local $SIG{SEGV} = sub {
+      my $ctx = context();
+      $ctx->bail("Segmentation fault");
+    };
+    $code->(@_);
+  }
+}
 
 
 sub ffi_ok
@@ -620,7 +647,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.86
+version 1.89
 
 =head1 SYNOPSIS
 
@@ -832,6 +859,16 @@ The XS code.  This is the only required element.
 =item pxs
 
 Extra L<ExtUtils::ParseXS> arguments passed in as a hash reference.
+
+=item cbuilder_check
+
+The compile check that should be done prior to attempting to build.
+Should be one of C<have_compiler> or C<have_cplusplus>.  Defaults
+to C<have_compiler>.
+
+=item cbuilder_config
+
+Hash to override values normally provided by C<Config>.
 
 =item cbuilder_compile
 

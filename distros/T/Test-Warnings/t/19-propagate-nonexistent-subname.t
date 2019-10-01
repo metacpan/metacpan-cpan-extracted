@@ -16,7 +16,7 @@ is($@, '', 'non-existent sub in warning handler does not result in an exception'
 
 SKIP: {
     skip 'PadWalker required for this test', 1
-        if not eval 'require PadWalker';
+        if not eval { require PadWalker; 1 };
     is(
         ${ PadWalker::closed_over(\&Test::Warnings::had_no_warnings)->{'$forbidden_warnings_found'} },
         1,

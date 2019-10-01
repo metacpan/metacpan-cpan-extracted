@@ -6,7 +6,7 @@ use Mouse;
 use Data::Dumper;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -203,15 +203,20 @@ sub save {
 
 sub restore {
     my ( $self, $file ) = @_;
+    unless ($file) {
+        die "No file provided. Aborting";
+    }
     require IO::String;
     my $conf;
     if ( $file eq '-' ) {
         $conf = join '', <STDIN>;
     }
     else {
-        open my $f, $file;
+        die "Unable to read $file" unless ( -r $file );
+        open( my $f, $file ) or die $!;
         $conf = join '', <$f>;
         close $f;
+        die "Empty or malformed file $file" unless ( $conf =~ /\w/s );
     }
     my $res = $self->_post( '/confs/raw', '', IO::String->new($conf),
         'application/json', length($conf) );

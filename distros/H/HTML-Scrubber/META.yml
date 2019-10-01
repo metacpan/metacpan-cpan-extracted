@@ -33,11 +33,11 @@ no_index:
 provides:
   HTML::Scrubber:
     file: lib/HTML/Scrubber.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   HTML::Entities: '0'
   HTML::Parser: '3.47'
-  List::Util: '0'
+  List::Util: '1.33'
   Scalar::Util: '0'
   perl: '5.008'
   strict: '0'
@@ -45,7 +45,7 @@ requires:
 resources:
   homepage: https://github.com/nigelm/html-scrubber
   repository: https://github.com/nigelm/html-scrubber.git
-version: '0.18'
+version: '0.19'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -110,7 +110,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release/0.18
+          tag: release/0.19
           tag_format: release/%v
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

@@ -1,5 +1,8 @@
 Revision history for Perl bundle Bundle::Maintainer::MHASCH
 
+0.002   Sat, 28 Sep 2019 18:30:45 +0200
+        - added Math::Polynomial::ModInt
+
 0.001   Mon, 12 Aug 2019 12:54:06 +0200
         - initial version
 

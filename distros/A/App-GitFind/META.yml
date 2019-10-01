@@ -1,0 +1,118 @@
+---
+abstract: 'Find files anywhere in a Git repository'
+author:
+  - 'Christopher White <cxw@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.39'
+  Carp: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  Getopt::Long: '2.5'
+  Import::Into: '0'
+  List::AutoNumbered: '0.000007'
+  List::Util: '1.43'
+  Parse::Yapp: '0'
+  Path::Class: '0.37'
+  Pod::Markdown: '0'
+  Pod::Text: '0'
+  Sub::Multi::Tiny: '0.000012'
+  Test2::V0: '0.000125'
+  Test::UseAllModules: '0.15'
+  Types::Standard: '1.004004'
+  lib::relative: '1.000'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GitFind
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::GitFind:
+    file: lib/App/GitFind.pm
+    version: '0.000002'
+  App::GitFind::Actions:
+    file: lib/App/GitFind/Actions.pm
+    version: '0.000002'
+  App::GitFind::Base:
+    file: lib/App/GitFind/Base.pm
+    version: '0.000002'
+  App::GitFind::Class:
+    file: lib/App/GitFind/Class.pm
+    version: '0.000002'
+  App::GitFind::Entry:
+    file: lib/App/GitFind/Entry.pm
+    version: '0.000002'
+  App::GitFind::Entry::GitIndex:
+    file: lib/App/GitFind/Entry/GitIndex.pm
+    version: '0.000002'
+  App::GitFind::Entry::OnDisk:
+    file: lib/App/GitFind/Entry/OnDisk.pm
+    version: '0.000002'
+  App::GitFind::Entry::PathClass:
+    file: lib/App/GitFind/Entry/PathClass.pm
+    version: '0.000002'
+  App::GitFind::FileProcessor:
+    file: lib/App/GitFind/FileProcessor.pm
+    version: '0.000002'
+  App::GitFind::FileStatLs:
+    file: lib/App/GitFind/FileStatLs.pm
+    version: '0.000002'
+  App::GitFind::PathClassMicro:
+    file: lib/App/GitFind/PathClassMicro.pm
+    version: '0.000002'
+  App::GitFind::PathClassMicro::Dir:
+    file: lib/App/GitFind/PathClassMicro.pm
+    version: '0.37'
+  App::GitFind::PathClassMicro::Entity:
+    file: lib/App/GitFind/PathClassMicro.pm
+    version: '0.37'
+  App::GitFind::PathClassMicro::File:
+    file: lib/App/GitFind/PathClassMicro.pm
+    version: '0.37'
+  App::GitFind::Searcher:
+    file: lib/App/GitFind/Searcher.pm
+    version: '0.000002'
+  App::GitFind::Searcher::FileSystem:
+    file: lib/App/GitFind/Searcher/FileSystem.pm
+    version: '0.000002'
+  App::GitFind::Searcher::Git:
+    file: lib/App/GitFind/Searcher/Git.pm
+    version: '0.000002'
+  App::GitFind::cmdline:
+    file: lib/App/GitFind/cmdline.pm
+requires:
+  Class::Tiny: '1.001'
+  Class::Tiny::Immutable: '0'
+  Data::Dumper::Compact: '0'
+  Fcntl: '0'
+  File::Find::Object: v0.3.1
+  Getargs::Mixed: '1.04'
+  Getopt::Long: '2.34'
+  Git::Raw: '0.84'
+  Hash::Merge: '0.299'
+  Iterator::Simple: '0.07'
+  List::SomeUtils: '0.50'
+  Math::Cartesian::Product: '1.009'
+  POSIX: '0'
+  Path::Class: '0.37'
+  Pod::Usage: '0'
+  perl: '5.010'
+  vars: '0'
+  vars::i: '1.10'
+resources:
+  bugtracker: https://github.com/cxw42/git-find/issues
+  repository: https://github.com/cxw42/git-find.git
+version: '0.000002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

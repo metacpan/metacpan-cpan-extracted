@@ -1,0 +1,379 @@
+NAME
+    XAO::DO::Web::Content -- Dynamic content management for XAO::Web
+
+SYNOPSIS
+     <%Content name="about_us"%>
+
+DESCRIPTION
+    Obsolete! Do not use in new development.
+
+    For installation and usage instruction see "INSTALLATION AND USAGE"
+    chapter below.
+
+    Content object allows to embed editable content stored in a database
+    into a web page or any other part of a system based on XAO::Web. There
+    are virtually no limitations as to how content can be used.
+
+    For instance the text on "News" page of the site might be a Content
+    element. In that case site administrator would not need to modify any
+    templates, but can edit, preview and publish news using web interface
+    only.
+
+    Another example could be storing complete product description template
+    as a Content object. In that case modifying all product pages at once
+    would be controlled by modifying just one template over the web in
+    content editor.
+
+    A content element is identified by a name that has the same set of
+    restrictions as a XAO::FS ID - up to 30 characters, alpha-numeric and
+    underscore characters only.
+
+    Every bit of content has multiple values associated with it arranged by
+    date of their modification. Most current version of content can be in
+    one of two states - published and unpublished. If it is unpublished then
+    it can only be seen if the special preview mode is turned on. That gives
+    an ability to a site administrator to preview changes and probably make
+    corrections before making these changes available for regular site
+    visitors.
+
+    A configuration for Content objects can be provided as a part of site
+    configuration. Its URI is '/content' and parameters are:
+
+     list_uri    => uri of content storage in the XAO FS, defaults
+                    to '/Content'
+
+     cache_time  => for how long to keep retrieved content in memory cache,
+                    default is 5 minutes
+
+     cache_size  => the size of memory cache in KB, default is 1024
+
+     flag_cb_uri => location of a flag in clipboard that indicates whether
+                    or not the preview mode is on
+
+INSTALLATION AND USE
+    The easiest way to install XAO Content is to use CPAN. Usually you would
+    need to do something like this:
+
+     sudo perl -MCPAN -e'install XAO::DO::Web::Content'
+
+    If you downloaded archive and want to install it manually then usual
+    four commands will do:
+
+     perl Makefile.PL
+     make
+     make test
+     sudo make install
+
+    During execution of Makefile.PL you will be asked for a test database
+    DSN, username and password. If you want to skip the tests enter 'none'
+    for DSN or otherwise give it any disposable database DSN. In most cases
+    OS:MySQL_DBI:test will do. Note: That database content will be
+    completely destroyed after tests.
+
+    Once installed the XAO Content is ready to be used. There are two
+    scenarios to start using it -- if you already have a site where you want
+    to add dynamic content functionality and if you do not have a site and
+    want to just see XAO Content in action.
+
+  TEST SITE TO SEE XAO CONTENT IN ACTION
+    Here are the steps you need to follow to get a simple working site that
+    uses XAO Content:
+
+    1   Sym-link or recursively copy the 'sample' directory from the XAO
+        Content distribution to your 'projects' directory in XAO
+        installation path (usually /usr/local/xao/projects). The name you
+        use for sym-linking is the name of your site --
+        /usr/local/xao/projects/content would mean 'content' as the site
+        name.
+
+    2   Create an empty MySQL database for your site (providing MySQL
+        username/password if required). Inour example we use 'content' as
+        the database name.
+
+         mysqladmin create content
+
+    3   Create empty XAO::FS database on top of MySQL database:
+
+         xao-fs --dsn=OS:MySQL_DBI:content init
+
+    4   Go to /usr/local/xao/projects/content and run configure script:
+
+         cd /usr/local/xao/projects/content
+         perl ./configure.pl
+
+        Enter OS:MySQL_DBI:content as the database DSN and username/password
+        of a user that has full access to that database.
+
+    5   Create database layout required by XAO Content:
+
+         ./bin/build-structure
+
+    6   Configure a virtual server in your Apache config:
+
+         <VirtualHost SOME_HOST_NAME>
+           ServerName SOME_HOST_NAME
+
+           <Directory /usr/local/xao/handlers>
+             Options ExecCGI
+             SetHandler cgi-script
+           </Directory>
+
+           RewriteEngine on
+           RewriteRule   ^/(.*)$  \
+                         /usr/local/xao/handlers/xao-apache.pl/content/$1  \
+                         [L]
+         </VirtualHost>
+
+        Here you replace SOME_HOST_NAME with a something that you have in
+        your DNS or at least in /etc/hosts file. At the last line of
+        RewriteRule the last part of the path is the site name that you used
+        -- you need to change it if you used a different name.
+
+    7   Done! Restart Apache and go to SOME_HOST_NAME in your browser to see
+        how content management works.
+
+  INTEGRATING XAO CONTENT INTO AN EXISTING SITE
+    To integrate XAO Content into an existing site you shoul follow these
+    steps (depending on your site setup not all of them might be
+    applicable):
+
+    1   Copy content*.html files from sample/templates/admin/ to your site's
+        admin directory and modify them to your taste. In general you should
+        make sure that an administrator is logged in before he/she has
+        access to the content editor.
+
+    2   Edit your Config.pm (or Config.pm.proto if you use prototypes) and
+        add the following code to your build_structure() method:
+
+         my $cobj=XAO::Objects->new(objname => 'Web::Content');
+         $cobj->build_structure;
+
+    3   Re-build your data structure using bin/build-structure script or any
+        other tools that you use.
+
+    4   Optionally copy files from sample/bits/content/*,
+        sample/bits/hint-link and sample/hints/* to your site and modify
+        them appropriately. The idea of these files is to show how you can
+        customize default templates used by content editor and to provide
+        useful "Hints" functionality.
+
+    5   In your header file that you include in all you pages (if you have
+        one) add a call to /bits/content/set-preview. That template displays
+        nothing, but sets preview mode to support content editor.
+
+    6   Look into various files in sample/templates for ideas and sample
+        code.
+
+METHODS
+    Content is based in Web::Action object and such depends on 'mode'
+    argument, with the default mode being 'show'.
+
+    All methods if not stated otherwise support the following set of
+    arguments that defines which content object to use:
+
+     name       => Name of content
+     data_id    => ID of a specific version (optional, rarely used)
+     preview    => if non-zero then unpublished version of content will
+                   be used. If that argument is not present then the
+                   clipboard preview flag is used (see flag_cb_uri above)
+
+    The following list of methods also shows 'mode' as the first element
+    (order alphabetically).
+
+    'content-add' => content_add (%)
+        Displays a form for creating new content and when the form is filled
+        -- creates that content accordingly.
+
+        Arguments are:
+
+         form.path      => path to form template
+         success.path   => path to success template
+
+    'content-data' => content_data (%)
+        Displays data text by name according to preview argument or
+        clipboard flag.
+
+        By default it just outputs the content literally without any
+        processing. If 'parse' argument is true then the content will be
+        parsed as if it were a template. Arguments given to 'content-data'
+        will be available to that template in this case.
+
+        If there is a 'default.path' or 'default.template' arguments then
+        they will be displayed in case where there is no content object by
+        that name exists in the database. If default is not given and there
+        is no content found in the database then an error will be thrown.
+
+        Example:
+
+         <%Content name="about_us"%>
+
+         <%Content name="about_us" parse="1" REAL_NAME="John Silver"%>
+
+         <%Content name="about_us"
+                   parse="1"
+                   default.path="/bits/default-about-us"
+                   REAL_NAME="John Silver"
+         %>
+
+    'content-if-preview' => content_if_preview (%)
+        Checks if preview mode is currently on and displays given 'path' or
+        'template' if it is.
+
+    'content-publish' => content_publish (%)
+        Makes preview data block current for the given content. If there
+        were no modifications to the content (no preview data block) then
+        nothing is modified.
+
+        Arguments are:
+
+         name           => content name
+         path/template  => what to display in case of success, optional
+
+    'content_publish_all' => content_publish_all (%)
+        Makes preview data blocks current for all content elements.
+
+    'content-revert' => content_revert (%)
+        Reverts given content to older date by creating or replacing preview
+        data block with a copy of old content.
+
+        Date does not have to match exactly, the data block with closest
+        date equal to or preceeding the given date will be used. If as a
+        result of that the current content is to be used anf there is no
+        preview block defined then no modifications are made.
+
+        If given content did not exist at all at the given time then no
+        modifications are made as well.
+
+        Arguments are:
+
+         name       => content name
+         time       => time to revert to
+
+    'content_revert_all' => content_revert_all (%)
+        Loads older date content for all content elements at once.
+
+    'content-set-preview' => content_set_preview (%)
+        Sets or drop preview flag in the clipboard indicating whether all
+        subsequent calls to the Content should return current or preview
+        content.
+
+        Usually this is used somewhere in the page header on all pages to
+        check for a specific cookie or a CGI parameter to turn on site
+        'preview' mode.
+
+        Example:
+
+         <%Content
+           mode="content-set-preview"
+           value={<%Condition
+                    a.cgiparam="preview_mode"
+                    a.template="1"
+                    b.cookie="preview_mode"
+                    b.template="1"
+                    default.template="0"
+                  %>}
+         %>
+
+    'content-show' => content_show (%)
+        Displays the content by a given name and optionally an ID of a
+        specific release of that content.
+
+        Passes the following parameters to the given template:
+
+         COMMENT        => comment for data
+         CURRENT_ID     => current published element ID
+         DATA_ID        => ID of data block being used
+         DESCRIPTION    => content description
+         EFFECTIVE_TIME => publication effective time
+         INSTRUCTION    => instruction
+         MIME_TYPE      => content data MIME type
+         MOD_TIME       => last modification time
+         NAME           => content name
+         PREVIEW_ID     => id of unpublished data or empty string if published
+         PREVIEW_URL    => URL of a preview page
+         TEXT           => content data
+
+    'content-show-dates' => content_show_dates (%)
+        Displays all publication dates in order from most recent to least
+        recent. If 'name' parameter is given then dates are restricted to
+        that specific element otherwise global list of dates is shown.
+
+        Example:
+
+         <SELECT NAME="xxx">
+         <%Content mode="content-show-dates"
+                   path="/bits/content-date-option"%>
+         </SELECT>
+
+    'content-store' => content_store (%)
+        Stores new content by either replacing current content in the
+        preview data block or by creating a new preview data block if there
+        is no one currently.
+
+        Arguments are:
+
+         name           => content name
+         comment        => comment for that release
+         text           => full text for that release; stripped of whitespace
+                           in the end and in the beginning
+         mime_type      => MIME type, default is text/plain
+
+INTERNAL METHODS
+    The following methods are not available through 'mode' argument and
+    serve various internal purposes.
+
+    build_structure ()
+        Builds supporting structure in the database. Does not destroy
+        existing data -- safe to call on already populated database.
+
+        Usually should be called in Config.pm's build_structure() method.
+
+    cache ()
+        Returns content cache reference.
+
+    data_structure ()
+        Returns a reference to a hash that describes database structure.
+        Usually you would add it to your database description in Config.pm:
+
+         my $cobj=XAO::Objects->new(objname => 'Web::Content');
+
+         my %structure=(
+             MyData => {
+                 ...
+             },
+
+             %{$cobj->data_structure},
+
+             MyOtherData => {
+                 ...
+             }
+         );
+
+        If that looks ugly (it is ugly) then look at build_structure()
+        method description instead.
+
+    get_content ($%)
+        This method returns a Data::Content and Data::Content objects using
+        standard content location definition arguments described in METHODS
+        section preface. It is used in almost every other method to get the
+        data of a content object.
+
+        If called in scalar context then returns only content object,
+        without data.
+
+        Arguments it accepts are (as stated above):
+
+         name       => Name of content (required)
+         data_id    => ID of a specific version (optional, rarely used)
+         preview    => if non-zero then unpublished version of content will
+                       be used. If that argument is not present then the
+                       clipboard preview flag is used (see flag_cb_uri above)
+
+AUTHORS
+    Copyright (c) 2000-2002 XAO Inc.
+
+    Andrew Maltsev <am@xao.com>
+
+SEE ALSO
+    Recommended reading: XAO::DO::Web::Content, XAO::FS, XAO::Web.
+

@@ -1,10 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-use vars qw( @options );
-
-BEGIN {
-  @options = qw(
+our @options = (qw(
     autosync
     autorestart
     watchfiles
@@ -13,16 +10,15 @@ BEGIN {
     dumpresponses
     verbose
     warnings
-  );
-};
+));
 
-use Test::More tests => scalar @options*4 +1+4;
+use Test::More;
+plan tests => scalar @options*4 +4;
 
-SKIP: {
   BEGIN {
     $ENV{PERL_RL} = 0;
-    use_ok('WWW::Mechanize::Shell');
   };
+  require WWW::Mechanize::Shell;
 
   my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
@@ -44,4 +40,3 @@ SKIP: {
   $res = $s->option('doesnotexist','newvalue');
   is( $res, undef, "Nonexisting option returns undef" );
   is( $warned, "Unknown option 'doesnotexist'","Nonexisting option raises a warning" );
-};

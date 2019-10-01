@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -103,13 +103,30 @@ sub check {
         hdebug("  testNewConf() failed");
         return 0;
     }
+    my $separator = $self->newConf->{multiValuesSeparator} || '; ';
     hdebug("  tests succeed");
-    $self->compactConf( $self->newConf );
+    my %conf          = %{ $self->newConf() };
+    my %compactedConf = %{ $self->compactConf( $self->newConf ) };
+    my @removedKeys   = ();
     unless ( $self->confChanged ) {
         hdebug("  no change detected");
         $self->message('__confNotChanged__');
         return 0;
     }
+    unless ( $self->newConf->{dontCompactConf} ) {
+        foreach ( sort keys %conf ) {
+            push @removedKeys, $_ unless exists $compactedConf{$_};
+        }
+    }
+    push @{ $self->changes },
+      (
+        $self->{newConf}->{dontCompactConf}
+        ? { confCompacted => '0' }
+        : {
+            confCompacted => '1',
+            removedKeys   => join( $separator, @removedKeys )
+        }
+      );
     return 1;
 }
 
@@ -160,7 +177,7 @@ sub _scanNodes {
         hdebug("Looking to $name");
 
         # subnode
-        my $subNodes     = $leaf->{nodes} // $leaf->{_nodes};
+        my $subNodes     = $leaf->{nodes}      // $leaf->{_nodes};
         my $subNodesCond = $leaf->{nodes_cond} // $leaf->{_nodes_cond};
 
         ##################################
@@ -383,6 +400,7 @@ sub _scanNodes {
                     }
                     elsif ($h) {
                         hdebug('    opened');
+                        $self->confChanged(1);
                         $self->set( $target, $key, $leaf->{title},
                             $leaf->{data} );
                     }
@@ -451,6 +469,7 @@ sub _scanNodes {
                     }
                     elsif ($h) {
                         hdebug('    opened');
+                        $self->confChanged(1);
                         $self->set( $target, $key, $leaf->{title},
                             $leaf->{data} );
                     }
@@ -564,7 +583,7 @@ sub _scanNodes {
             hdebug('Application list subnode');
             use feature 'state';
             my @cats = split /\//, $1;
-            my $app = pop @cats;
+            my $app  = pop @cats;
             $self->newConf->{applicationList} //= {};
 
             # $cn is a pointer to the parent
@@ -793,6 +812,26 @@ sub _scanNodes {
                     next;
                 }
 
+                # sfExtra: just to replace "over" key
+                if ( $name eq 'sfExtra' ) {
+                    hdebug('     sfExtra');
+                    $self->newConf->{$name} = {};
+                    foreach my $node ( @{ $leaf->{nodes} } ) {
+                        my $tmp;
+                        $tmp->{$_} = $node->{data}->{$_}
+                          foreach (qw(type rule logo label));
+                        $tmp->{over} = {};
+                        foreach ( @{ $node->{data}->{over} } ) {
+                            $tmp->{over}->{ $_->[0] } = $_->[1];
+                        }
+                        $self->newConf->{$name}->{ $node->{title} } = $tmp;
+                    }
+
+                    # TODO: check changes
+                    $self->confChanged(1);
+                    next;
+                }
+
                 $subNodes //= [];
                 my $count = 0;
                 my @old   = (
@@ -872,7 +911,7 @@ sub _scanNodes {
                 }
                 else {
                     @oldHosts = grep { $_ ne $host } @oldHosts;
-                    @oldKeys = keys %{ $self->refConf->{$name}->{$host} };
+                    @oldKeys  = keys %{ $self->refConf->{$name}->{$host} };
                 }
                 foreach my $prm ( @{ $getHost->{h} } ) {
                     $self->newConf->{$name}->{$host}->{ $prm->{k} } =
@@ -1101,14 +1140,14 @@ sub _unitTest {
                 or $attr->{type} =~ /Container$/ )
             {
                 my $keyMsg = $attr->{keyMsgFail} // $type->{keyMsgFail};
-                my $msg    = $attr->{msgFail} // $type->{msgFail};
+                my $msg    = $attr->{msgFail}    // $type->{msgFail};
                 $res = 0
                   unless (
                     $self->_execTest( {
                             keyTest    => $attr->{keyTest} // $type->{keyTest},
                             keyMsgFail => $attr->{keyMsgFail}
                               // $type->{keyMsgFail},
-                            test    => $attr->{test} // $type->{test},
+                            test    => $attr->{test}    // $type->{test},
                             msgFail => $attr->{msgFail} // $type->{msgFail},
                         },
                         $conf->{$key},

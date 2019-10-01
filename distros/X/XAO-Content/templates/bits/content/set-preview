@@ -1,0 +1,7 @@
+<%Condition
+  a.cgiparam="preview_mode"
+  a.path="/bits/content/set-preview-enable"
+  b.cookie="preview_mode"
+  b.path="/bits/content/set-preview-enable"
+  b.COOKIE="1"
+%>

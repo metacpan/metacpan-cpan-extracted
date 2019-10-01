@@ -1,0 +1,48 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th width="12%" trspan="name"></th>
+        <th width="11%" trspan="type"></th>
+        <th width="33%" trspan="label"></th>
+        <th width="11%" trspan="logo"></th>
+        <th width="33%" trspan="rule"></th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="s in currentNode.nodes">
+        <td>
+          <input class="form-control" ng-model="s.title" />
+        </td>
+        <td>
+          <select class="form-control" ng-model="s.data.type">
+            <option ng-repeat="item in currentNode.select" ng-selected="item.k==s.data.type" value="{{item.k}}">{{item.v}}</option>
+          </select>
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.label" />
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.logo" />
+        </td>
+        <td>
+          <input class="form-control" ng-model="s.data.rule" />
+        </td>
+        <td>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newSfExtra'})"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newSfExtra",
+  "icon": "plus-sign"
+}]
+</script>

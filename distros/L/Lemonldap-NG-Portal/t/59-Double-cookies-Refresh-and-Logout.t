@@ -9,17 +9,18 @@ BEGIN {
 my $res;
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel             => 'error',
-            authentication       => 'Demo',
-            userDB               => 'Same',
-            loginHistoryEnabled  => 0,
-            brutForceProtection  => 0,
-            portalMainLogo       => 'common/logos/logo_llng_old.png',
-            requireToken         => 0,
-            securedCookie        => 2,
-            https                => 0,
-            checkUser            => 1,
-            handlerInternalCache => 0,
+            logLevel                  => 'error',
+            authentication            => 'Demo',
+            userDB                    => 'Same',
+            loginHistoryEnabled       => 0,
+            brutForceProtection       => 0,
+            portalMainLogo            => 'common/logos/logo_llng_old.png',
+            requireToken              => 0,
+            securedCookie             => 2,
+            https                     => 0,
+            checkUser                 => 1,
+            handlerInternalCache      => 0,
+            checkUserHiddenAttributes => '_loginHistory hGroups',
         }
     }
 );

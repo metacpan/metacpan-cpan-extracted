@@ -1,6 +1,6 @@
 package Mojo::PDF::Primitive::Table;
 
-our $VERSION = '1.004002'; # VERSION
+our $VERSION = '1.005001'; # VERSION
 
 use List::AllUtils qw/sum uniq/;
 use Types::Standard qw/

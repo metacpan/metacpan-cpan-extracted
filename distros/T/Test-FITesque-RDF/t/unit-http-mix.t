@@ -54,30 +54,29 @@ cmp_deeply($data,
 				  {
 					'user' => 'alice',
 					'-special' => {
-										'regex-fields' => ignore(),
-										'http-requests' => ignore(),
-										'http-responses' => ignore(),
-										'description' => 'Mix HTTP and ordinary params.'
-									  },
-              }
+										'description' => 'Mix HTTP and ordinary params.',
+										'http-pairs' =>
+										[
+										 {
+										  'regex-fields' => {},
+										  'request' => methods(method => 'GET'),
+										  'response' => isa('HTTP::Response'),
+										 }
+										]
+									  }
+				  }
             ]
           ]
         ], 'Main structure ok');
 
-my $params = $data->[0]->[1]->[1]->{'-special'};
+is(scalar @{$data->[0]->[1]->[1]->{'-special'}->{'http-pairs'}}, 1, 'There is one request');
 
-is(scalar @{$params->{'http-requests'}}, 1, 'There is one request');
+my $params = $data->[0]->[1]->[1]->{'-special'}->{'http-pairs'}->[0];
 
-foreach my $req (@{$params->{'http-requests'}}) {
-  object_ok($req, 'Checking request object',
-				isa => ['HTTP::Request'],
-				can => [qw(method uri headers content)]
-			  );
-}
-
-is(${$params->{'http-requests'}}[0]->method, 'GET', 'Second method is GET');
-
-is(scalar @{$params->{'http-responses'}}, 1, 'There is one response');
+object_ok($params->{request}, 'Checking request object',
+			 isa => ['HTTP::Request'],
+			 can => [qw(method uri headers content)]
+			);
 
 done_testing;
 

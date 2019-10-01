@@ -426,7 +426,8 @@ sub rp {
                 },
                 oidcOPMetaDataOptions => {
                     op => {
-                        oidcOPMetaDataOptionsJWKSTimeout  => 0,
+                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
+                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsMaxAge       => 30,

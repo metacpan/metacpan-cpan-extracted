@@ -1,0 +1,5 @@
+<%Content
+  mode="content-add"
+  form.path="/bits/content/add-form"
+  success.path="/bits/content/add-success"
+%>

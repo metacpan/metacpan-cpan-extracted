@@ -1,5 +1,11 @@
 Revision history for Perl module URI::Title
 
+1.902 2019-09-30 BOOK
+  - Show the filename for image files, in addition to format and size (RT#57067)
+  - Avoid https URL in tests (RT#128544)
+  - Remove special handling for spotify (RT#101272)
+  - Ensure dzil correctly adds $VERSION in the main module (RT#117810)
+
 1.901 2016-08-21 BOOK
   - Added various contributors to the META file
   - Use dzil plugin Test::ReportPrereqs to report prereq versions

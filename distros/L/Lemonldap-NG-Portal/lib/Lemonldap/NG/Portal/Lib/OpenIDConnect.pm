@@ -19,7 +19,7 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -630,15 +630,65 @@ sub decodeJSON {
     return $json_hash;
 }
 
+# Create a new Authorization Code
+# @param info hashref of session info
+# @return new Lemonldap::NG::Common::Session object
+
+sub newAuthorizationCode {
+    my ( $self, $rp, $info ) = @_;
+
+    return $self->getOpenIDConnectSession( undef, "authorization_code", undef,
+        $info );
+}
+
+# Get existing Authorization Code
+# @param id
+# @return new Lemonldap::NG::Common::Session object
+
+sub getAuthorizationCode {
+    my ( $self, $id ) = @_;
+
+    return $self->getOpenIDConnectSession( $id, "authorization_code" );
+}
+
+# Create a new Access Token
+# @param info hashref of session info
+# @return new Lemonldap::NG::Common::Session object
+
+sub newAccessToken {
+    my ( $self, $rp, $info ) = @_;
+
+    return $self->getOpenIDConnectSession(
+        undef,
+        "access_token",
+        $self->conf->{oidcRPMetaDataOptions}->{$rp}
+          ->{oidcRPMetaDataOptionsAccessTokenExpiration},
+        $info
+    );
+}
+
+# Get existing Access Token
+# @param id
+# @return new Lemonldap::NG::Common::Session object
+
+sub getAccessToken {
+    my ( $self, $id ) = @_;
+
+    return $self->getOpenIDConnectSession( $id, "access_token" );
+}
+
 # Try to recover the OpenID Connect session corresponding to id and return session
 # If id is set to undef, return a new session
 # @return Lemonldap::NG::Common::Session object
 sub getOpenIDConnectSession {
-    my ( $self, $id, $info ) = @_;
+    my ( $self, $id, $type, $ttl, $info ) = @_;
     my %storage = (
         storageModule        => $self->conf->{oidcStorage},
         storageModuleOptions => $self->conf->{oidcStorageOptions},
     );
+
+    $ttl ||= $self->conf->{timeout};
+
     unless ( $storage{storageModule} ) {
         %storage = (
             storageModule        => $self->conf->{globalStorage},
@@ -652,7 +702,17 @@ sub getOpenIDConnectSession {
             cacheModuleOptions => $self->conf->{localSessionStorageOptions},
             id                 => $id,
             kind               => $self->sessionKind,
-            ( $info ? ( info => $info ) : () ),
+            (
+                $info
+                ? (
+                    info => {
+                        _type  => $type,
+                        _utime => time + $ttl - $self->conf->{timeout},
+                        %{$info}
+                    }
+                  )
+                : ()
+            ),
         }
     );
 
@@ -665,6 +725,26 @@ sub getOpenIDConnectSession {
             $self->logger->error("Unable to create new OpenIDConnect session");
             $self->logger->error( $oidcSession->error );
         }
+        return undef;
+    }
+
+    if ( $id and $type ) {
+        my $storedType = $oidcSession->{data}->{_type};
+
+        # Only check if a type is set in DB, for backward compatibility
+        if ( $storedType and $type ne $storedType ) {
+            $self->logger->error( "Wrong OpenID session type: "
+                  . $oidcSession->{data}->{_type}
+                  . ". Expected: "
+                  . $type );
+            return undef;
+        }
+    }
+
+    # Make sure the token is still valid, we already compensated for
+    # different TTLs when storing _utime
+    if ( time > ( $oidcSession->{data}->{_utime} + $self->conf->{timeout} ) ) {
+        $self->logger->error("Session $id has expired");
         return undef;
     }
 
@@ -768,7 +848,9 @@ sub verifyJWTSignature {
                   . " is present but algorithm is 'none'" );
             return 0;
         }
-        return 1;
+        $self->logger->debug(
+            "JWT algorithm is 'none', signature cannot be verified");
+        return 0;
     }
 
     if ( $alg eq "HS256" or $alg eq "HS384" or $alg eq "HS512" ) {
@@ -978,8 +1060,8 @@ sub createHash {
 # @param fragment Set to true to return fragment component
 # @return void
 sub returnRedirectError {
-    my ( $self, $req, $redirect_url, $error, $error_description, $error_uri,
-        $state, $fragment )
+    my ( $self, $req, $redirect_url, $error, $error_description,
+        $error_uri, $state, $fragment )
       = @_;
 
     my $urldc =
@@ -1027,6 +1109,56 @@ sub returnBearerError {
         ],
         []
     ];
+}
+
+sub checkEndPointAuthenticationCredentials {
+    my ( $self, $req ) = @_;
+
+    # Check authentication
+    my ( $client_id, $client_secret ) =
+      $self->getEndPointAuthenticationCredentials($req);
+
+    unless ($client_id) {
+        $self->logger->error(
+"No authentication provided to get token, or authentication type not supported"
+        );
+        return undef;
+    }
+
+    # Verify that client_id is registered in configuration
+    my $rp = $self->getRP($client_id);
+
+    unless ($rp) {
+        $self->userLogger->error(
+            "No registered Relying Party found with client_id $client_id");
+        return undef;
+    }
+    else {
+        $self->logger->debug("Client id $client_id match Relying Party $rp");
+    }
+
+    # Check client_secret
+    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+        ->{oidcRPMetaDataOptionsPublic} )
+    {
+        $self->logger->debug(
+            "Relying Party $rp is public, do not check client secret");
+    }
+    else {
+        unless ($client_secret) {
+            $self->logger->error(
+"Relying Party $rp is confidential but no client secret was provided to authenticate on token endpoint"
+            );
+            return undef;
+        }
+        unless ( $client_secret eq $self->conf->{oidcRPMetaDataOptions}->{$rp}
+            ->{oidcRPMetaDataOptionsClientSecret} )
+        {
+            $self->logger->error("Wrong credentials for $rp");
+            return undef;
+        }
+    }
+    return $rp;
 }
 
 # Get Client ID and Client Secret
@@ -1146,7 +1278,7 @@ sub createJWT {
     my ( $self, $payload, $alg, $rp ) = @_;
 
     # Payload encoding
-    my $jwt_payload = encode_base64( to_json($payload), "" );
+    my $jwt_payload = encode_base64url( to_json($payload), "" );
 
     # JWT header
     my $jwt_header_hash = { typ => "JWT", alg => $alg };
@@ -1154,7 +1286,7 @@ sub createJWT {
         $jwt_header_hash->{kid} = $self->conf->{oidcServiceKeyIdSig}
           if $self->conf->{oidcServiceKeyIdSig};
     }
-    my $jwt_header = encode_base64( to_json($jwt_header_hash), "" );
+    my $jwt_header = encode_base64url( to_json($jwt_header_hash), "" );
 
     if ( $alg eq "none" ) {
 
@@ -1193,6 +1325,7 @@ sub createJWT {
         # Convert + and / to get Base64 URL valid (RFC 4648)
         $digest =~ s/\+/-/g;
         $digest =~ s/\//_/g;
+        $digest =~ s/=+$//g;
 
         return $jwt_header . "." . $jwt_payload . "." . $digest;
     }
@@ -1338,7 +1471,7 @@ sub buildLogoutResponse {
 
 # Create session_state parameter
 # @param session_id Session ID
-# @param client_id CLient ID
+# @param client_id Client ID
 # return String Session state
 sub createSessionState {
     my ( $self, $session_id, $client_id ) = @_;
@@ -1398,7 +1531,10 @@ sub addRouteFromConf {
             $self->logger->error("$_ parameter not defined");
             next;
         }
-        $self->$adder( $self->path => { $path => $sub }, [ 'GET', 'POST' ] );
+        $self->$adder(
+            $self->path => { $path => $sub },
+            [ 'GET', 'POST' ]
+        );
     }
 }
 
@@ -1520,6 +1656,22 @@ Get UserInfo response
 =head2 decodeJSON
 
 Convert JSON to HashRef
+
+=head2 newAuthorizationCode
+
+Generate new Authorization Code session
+
+=head2 newAccessToken
+
+Generate new Access Token session
+
+=head2 getAuthorizationCode
+
+Get existing Authorization Code session
+
+=head2 getAccessToken
+
+Get existing Access Token session
 
 =head2 getOpenIDConnectSession
 

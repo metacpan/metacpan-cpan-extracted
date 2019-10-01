@@ -223,7 +223,8 @@ setCookie = (name, value, exdays) ->
 
 # Initialization
 datas = {}
-$(document).ready ->
+#$(document).ready ->
+$(window).on 'load', () ->
 	# Get application/init variables
 	datas = getValues()
 	# Export datas for other scripts
@@ -266,8 +267,9 @@ $(document).ready ->
 	if datas['login']
 		$("input[type=password]:first").focus()
 	else
-		# Focus on first visible input
-		$("input[type!=hidden]:first").focus()
+		# If there are no auto-focused fields, focus on first visible input
+		if $("input[autofocus]").length == 0
+			$("input[type!=hidden]:first").focus();
 
 	# Open links in new windows if required
 	if datas['newwindow']

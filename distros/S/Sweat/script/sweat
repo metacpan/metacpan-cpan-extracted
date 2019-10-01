@@ -24,6 +24,7 @@ GetOptions ( \%options,
     'fortune-program=s',
     'newsapi-key=s',
     'country=s',
+    'language=s',
     'no-news',
     'drill-length=i',
     'rest-length=i',
@@ -70,6 +71,7 @@ Entertainment options:
 --fortune-program  Path to your fortune program
 --newsapi_key      Your NewsAPI application key
 --country          Two-letter code of country to fetch articles from
+--language         Two-letter code of language for Wikipedia articles
 --no-news          Use Wikipedia as article source even if NewsAPI is available
 --url-program      Path to a program that opens a URL in your default browser
 
@@ -79,7 +81,8 @@ $0 --shuffle
 $0 --no-chair --speech-program=espeak
 $0 --config=/path/to/sweat/config --no-news
 
-For more thorough documentation, please run `man sweat`.
+For more thorough documentation, please visit https://jmac.org/sweat. (If you
+happen to have the Sweat manpage installed, you can also try `man sweat`.)
 
 END
     exit;
@@ -426,6 +429,20 @@ These options come into play only while running Sweat in entertainment mode
 The two-letter code for the country that NewsAPI will fetch its headlines from.
 
 Default: us
+
+=head3 language
+
+ # On the command line
+ sweat --language=fr
+
+ # In config
+ language: fr
+
+The two-letter code for the language that NewsAPI will use when fetching
+Wikipedia articles.
+
+Default: en
+
 
 =head3 fortune-program
 

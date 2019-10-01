@@ -11,7 +11,7 @@ use warnings;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 has filters => (
     is      => 'rwp',
@@ -42,11 +42,11 @@ sub render {
     my ($self) = @_;
 
     my $str = '';
-    for my $term ( @{ $self->terms } ) {
+    for my $term (@{ $self->terms }) {
         $str .= $term->render;
     }
     my $filter_with = $self->filter_with // '';
-    for my $filter ( @{ $self->filters } ) {
+    for my $filter (@{ $self->filters }) {
         $str =~ s/\Q$filter/$filter_with/g;
     }
     return $str;
@@ -55,7 +55,7 @@ sub render {
 sub walk {
     my ($self, $callback) = @_;
     $callback->($self);
-    for my $term ( @{ $self->terms } ) {
+    for my $term (@{ $self->terms }) {
         $term->walk($callback);
     }
     return;

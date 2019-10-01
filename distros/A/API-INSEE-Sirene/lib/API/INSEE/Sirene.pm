@@ -14,8 +14,8 @@ our @EXPORT_OK = qw(&getEstablishmentsByCriteria &getLegalUnitsByCriteria &getLe
 
 my $API_VERSION = 3;
 my $API_REVISION = 5;
-my $PACKAGE_REVISION = '03';
-our $VERSION = 3.503;
+my $PACKAGE_REVISION = '04';
+our $VERSION = 3.504;
 
 my $EMPTY = q{};
 my $API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V$API_VERSION";
@@ -597,7 +597,7 @@ If you want all fields, you have to specify it explicitly by passing the 'all' p
 
 =back
 
-=head2 FUNCTION RETURN 
+=head2 FUNCTION RETURN
 
 Each function listed above returns the JSON string of the response content in case of success. Else, they return a list, whose the first element is 0, and the second is the complete sent request and the response received with headers.
 To handling the return of these function, you can do somethink like this:
@@ -607,8 +607,6 @@ To handling the return of these function, you can do somethink like this:
   if (!$response_json) {
       print $err;
   }
-
-=back
 
 =head2 ALIAS
 

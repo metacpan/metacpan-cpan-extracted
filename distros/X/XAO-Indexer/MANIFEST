@@ -1,0 +1,46 @@
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+CHANGES
+README
+TODO
+Indexer.pm
+test.pl
+ --------------------------------------
+lib/XAO/DO/Data/Index.pm
+lib/XAO/DO/Data/IndexData.pm
+lib/XAO/DO/Data/IndexIgnore.pm
+lib/XAO/DO/Indexer/Base.pm
+lib/XAO/DO/SpellChecker/Aspell.pm
+lib/XAO/DO/SpellChecker/Base.pm
+lib/XAO/DO/Web/Indexer.pm
+ --------------------------------------
+IndexerSupport/IndexerSupport.pm
+IndexerSupport/IndexerSupport.random
+IndexerSupport/IndexerSupport.xs
+IndexerSupport/Makefile.PL
+ --------------------------------------
+scripts/xao-indexer
+ --------------------------------------
+t/testcases/Indexer/base.pm
+t/testcases/Indexer/spellchecker.pm
+t/testcases/Indexer/basic.pm
+t/testcases/Indexer/incremental.pm
+t/testcases/Indexer/isupport.pm
+t/testcases/Indexer/search.pm
+t/xao/projects/test/objects/Config.pm
+t/xao/projects/test/objects/Data/Bar.pm
+t/xao/projects/test/objects/Data/Foo.pm
+t/xao/projects/test/objects/Indexer/Foo.pm
+t/xao/projects/test/objects/Indexer/IncrFoo.pm
+ --------------------------------------
+bench/bench-sorted-intersection-pos.pl
+bench/bench-sorted-intersection.pl
+bench/bench-template-sort.pl
+bench/sorted-intersection-20040227-am-full.txt
+bench/sorted-intersection-20040301-ape-full.txt
+bench/template-sort-20040225-am-full.txt
+bench/template-sort-20040225-am-short.txt
+META.json                                Module JSON meta-data (added by MakeMaker)

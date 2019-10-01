@@ -26,7 +26,7 @@ config_withdumpable() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

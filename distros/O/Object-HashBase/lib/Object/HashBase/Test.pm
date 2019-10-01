@@ -20,7 +20,7 @@ BEGIN {
 
 return 1 if $NO_RUN;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 # <-- START -->
 
 sub warnings(&) {
@@ -151,11 +151,14 @@ BEGIN {
 
     package
         Object::HashBase::Test::HBase2;
-    use Object::HashBase qw/foo -bar ^baz <bat >ban/;
+    use Object::HashBase qw/foo -bar ^baz <bat >ban +boo/;
 
     Object::HashBase::Test::is(FOO, 'foo', "FOO CONSTANT");
     Object::HashBase::Test::is(BAR, 'bar', "BAR CONSTANT");
     Object::HashBase::Test::is(BAZ, 'baz', "BAZ CONSTANT");
+    Object::HashBase::Test::is(BAT, 'bat', "BAT CONSTANT");
+    Object::HashBase::Test::is(BAN, 'ban', "BAN CONSTANT");
+    Object::HashBase::Test::is(BOO, 'boo', "BOO CONSTANT");
 }
 
 my $ro = Object::HashBase::Test::HBase2->new(foo => 'foo', bar => 'bar', baz => 'baz', bat => 'bat', ban => 'ban');
@@ -165,6 +168,8 @@ is($ro->baz, 'baz', "got baz");
 is($ro->bat, 'bat', "got bat");
 ok(!$ro->can('set_bat'), "No setter for bat");
 ok(!$ro->can('ban'), "No reader for ban");
+ok(!$ro->can('boo'), "No reader for boo");
+ok(!$ro->can('set_boo'), "No setter for boo");
 is($ro->{ban}, 'ban', "ban attribute is set");
 $ro->set_ban('xxx');
 is($ro->{ban}, 'xxx', "ban attribute can be set");

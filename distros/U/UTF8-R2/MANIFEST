@@ -37,6 +37,9 @@ t/1032_qr2_mb.t
 t/1033_s_mb.t
 t/1034_qr3_mb.t
 t/1035_qr4_mb.t
+t/1036_ord_rfc2279.t
+t/1037_ord_rfc3629.t
+t/1038_ord_rfc3629ja_jp.t
 t/2001_podtest.t
 xt/1001_chop.t
 xt/1002_chr.t

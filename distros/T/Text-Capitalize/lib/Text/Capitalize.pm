@@ -105,7 +105,7 @@ $DEBUG = 0;
                      zippify_case
                      capitalize_title_original
                     );
-$VERSION	= '1.3';
+$VERSION	= '1.5';
 
 # Define the pattern to match "exceptions": the minor words
 # that don't usually get capitalized in titles (used by capitalize_title)
@@ -263,8 +263,8 @@ sub capitalize_title {
 
         # Fugliness to get some French names to work, e.g. "d'Alembert", "l'Hospital"
         if ( $word =~ m{^[dl]'}) {
-          $word =~ s{ ^(d') (\w) }{ lc($1) . uc($2) }iex;
-          $word =~ s{ ^(l') (\w) }{ lc($1) . uc($2) }iex;
+          $word =~ s{ ^(d') (\w) }{ lc($1) . ucfirst($2) }iex;
+          $word =~ s{ ^(l') (\w) }{ lc($1) . ucfirst($2) }iex;
 
           # But upcase first char if first or last word
           if ( ($i == $first) or ($i == $last) ) {
@@ -375,7 +375,7 @@ sub scramble_case {
       $uppity = int( rand( 1 + $downers/$uppers) );
 
       if ($uppity) {
-         $c = uc($c);
+         $c = ucfirst($c);
          $uppers++;
        } else {
          $c = lc($c);
@@ -437,7 +437,7 @@ sub zippify_case {
       $uppity = int( rand( 1 + $downers/$uppers ) );
 
       if ($uppity) {
-         $word = uc($word);
+         $word = ucfirst($word);
          $uppers++;
        } else {
          $word = lc($word);

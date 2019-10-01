@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2019-09-17'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-09-18'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -184,7 +184,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -389,7 +389,7 @@ Bool.
 
 =head1 FAQS
 
-=head2 Why does re-setting log level (using Log::ger::Util::set_level) doesn't work?
+=head2 Why doesn't re-setting log level using Log::ger::Util::set_level() work?
 
 (This FAQ item is from L<Log::ger::Output::Composite>'s, slightly modified).
 
@@ -405,7 +405,21 @@ C<Log::ger::Output::Composite::set_level>, for example:
  Log::ger::Output::Composite::set_level('trace');
 
 This sets an internal level setting which is respected and has the highest
-precedence so all levels settings will use this instead.
+precedence so all levels settings will use this instead. If previously you have:
+
+ Log::ger::Output->set(Composite => {
+     default_level => 'error',
+     outputs => {
+         File => {path=>'/foo', level=>'debug'},
+         Screen => {level=>'info', category_level=>{MyApp=>'warn'}},
+     },
+     category_level => {
+         'MyApp::SubModule1' => 'debug',
+     },
+ });
+
+then after the C<Log::ger::Output::Composite::set_level('trace')>, all the above
+per-category and per-output levels will be set to C<trace>.
 
 =head1 SEE ALSO
 

@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.15';
+    $VERSION = '0.16';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -175,6 +175,8 @@ sub connectDB()
         my $dsn = sprintf( $driverConnection->{ dsn }, $database, $host, $port );
         my ( $scheme, $driver, $attr_string, $attr_hash, $driver_dsn ) = DBI->parse_dsn( $dsn ) or die "Can't parse DBI DSN '$dsn'";
         my $data_source = "$scheme:$driver:$driver_dsn";
+        $log->info( $data_source );
+        $log->info( "Conectando no banco $username\@$host\:$database" );
         $self->{ database }->{ connection } = eval { DBI->connect( $data_source, $username, $password, $attr_hash ); };
 
         if ( $@ )

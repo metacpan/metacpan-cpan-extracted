@@ -11,36 +11,36 @@ use Lingua::Awkwords::OneOf;
 use Lingua::Awkwords::String;
 
 my @strings =
-  map { Lingua::Awkwords::String->new( string => $_ ) } qw/blah i/;
+  map { Lingua::Awkwords::String->new(string => $_) } qw/blah i/;
 
 my $oneof = Lingua::Awkwords::OneOf->new;
 
 dies_ok { $oneof->render };
 
-$oneof->add_choice( $strings[0], 1 );
-is( $oneof->render, 'blah' );
+$oneof->add_choice($strings[0], 1);
+is($oneof->render, 'blah');
 
 $oneof->add_filters('b');
-is( $oneof->render, 'lah' );
+is($oneof->render, 'lah');
 
 $oneof->add_filters(qw/l a/);
-is( $oneof->render, 'h' );
+is($oneof->render, 'h');
 
 $oneof->filter_with('qq');
-is( $oneof->render, 'qqqqqqh' );
+is($oneof->render, 'qqqqqqh');
 $oneof->filter_with('');
 
-$oneof->add_choice( $strings[1], 3 );
+$oneof->add_choice($strings[1], 3);
 
 # thanks to the filters and weight, this should produce only 'h' or 'i'
 # at 1:3 odds, roughly
-diag( "srand seed " . srand );
+diag("srand seed " . srand);
 my %results;
-for ( 1 .. 300 ) {
+for (1 .. 300) {
     $results{ $oneof->render }++;
 }
-$deeply->( [ sort keys %results ], [qw/h i/] );
+$deeply->([ sort keys %results ], [qw/h i/]);
 
-ok( $results{i} > 195 && $results{i} < 255, '3:1 odds within tolerance' );
+ok($results{i} > 195 && $results{i} < 255, '3:1 odds within tolerance');
 
 plan tests => 7;

@@ -14,14 +14,12 @@ requires "strict" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
-  requires "Cwd" => "0";
-  requires "Exporter" => "0";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
-  requires "lib" => "0";
+  requires "Test::Output" => "0";
   requires "perl" => "5.016_003";
 };
 

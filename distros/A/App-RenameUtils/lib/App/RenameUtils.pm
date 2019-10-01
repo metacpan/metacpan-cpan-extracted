@@ -1,7 +1,7 @@
 package App::RenameUtils;
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-07-23'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to renaming files
@@ -18,11 +18,11 @@ App::RenameUtils - Utilities related to renaming files
 
 =head1 VERSION
 
-This document describes version 0.001 of App::RenameUtils (from Perl distribution App-RenameUtils), released on 2019-01-15.
+This document describes version 0.002 of App::RenameUtils (from Perl distribution App-RenameUtils), released on 2019-07-23.
 
 =head1 DESCRIPTION
 
-This distributions provides the following command-line utilities:
+This distribution provides the following command-line utilities:
 
 =over
 
@@ -51,6 +51,8 @@ feature.
 L<rename> from L<File::Rename>
 
 L<perlmv> from L<App::perlmv>
+
+L<renwd> from L<App::renwd>
 
 =head1 AUTHOR
 

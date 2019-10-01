@@ -318,9 +318,13 @@ displayed.
 
 Set the policy that C<hoonlint>
 is running to I<policy>.
-C<Test::Whitespace> is the default and,
-in fact,
-the only policy currently implemented.
+C<Test::Whitespace> is the default.
+
+Currently,
+C<Test::Whitespace> is
+the only policy implemented.
+It's conventions are documented in L<a separate
+document|https://jeffreykegler.github.io/hoonlint/misc/whitespace.html>.
 
 =back
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Encode;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

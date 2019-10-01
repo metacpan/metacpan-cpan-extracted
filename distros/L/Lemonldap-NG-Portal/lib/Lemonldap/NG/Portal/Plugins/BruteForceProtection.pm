@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_WAIT);
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -32,20 +32,19 @@ sub run {
     my @lastFailedLoginEpoch = ();
 
     # Auth_N-2 failed login epoch
-    if ( defined $req->sessionInfo->{_loginHistory}->{failedLogin} ) {
-        $countFailed = @{ $req->sessionInfo->{_loginHistory}->{failedLogin} };
-    }
-
+    $countFailed = @{ $req->sessionInfo->{_loginHistory}->{failedLogin} }
+      if ( $req->sessionInfo->{_loginHistory}->{failedLogin} );
     $self->logger->debug(" Number of failedLogin = $countFailed");
+
     return PE_OK
       if ( $countFailed <= $self->conf->{bruteForceProtectionMaxFailed} );
 
     foreach ( 0 .. $self->conf->{bruteForceProtectionMaxFailed} - 1 ) {
-        if ( defined $req->sessionInfo->{_loginHistory}->{failedLogin}->[$_] ) {
-            push @lastFailedLoginEpoch,
-              $req->sessionInfo->{_loginHistory}->{failedLogin}->[$_]->{_utime};
-        }
+        push @lastFailedLoginEpoch,
+          $req->sessionInfo->{_loginHistory}->{failedLogin}->[$_]->{_utime}
+          if ( $req->sessionInfo->{_loginHistory}->{failedLogin}->[$_] );
     }
+
     $self->logger->debug("BruteForceProtection enabled");
 
     # If Auth_N-MaxFailed older than MaxAge -> another try allowed
@@ -54,6 +53,7 @@ sub run {
       $lastFailedLoginEpoch[ $self->conf->{bruteForceProtectionMaxFailed} - 1 ]
       if $self->conf->{bruteForceProtectionMaxFailed};
     $self->logger->debug(" -> MaxAge = $MaxAge");
+
     return PE_OK
       if ( $MaxAge > $self->conf->{bruteForceProtectionMaxAge} );
 

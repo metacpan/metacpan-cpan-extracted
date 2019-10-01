@@ -9,11 +9,11 @@ use warnings;
 use HTML::Parser 3.47 ();
 use HTML::Entities;
 use Scalar::Util ('weaken');
-use List::Util qw(any);
+use List::Util 1.33 qw(any);
 
 our ( @_scrub, @_scrub_fh );
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 # my my my my, these here to prevent foolishness like
@@ -381,7 +381,7 @@ HTML::Scrubber - Perl extension for scrubbing/sanitizing HTML
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =for stopwords html cpan callback homepage Perlbrew perltidy repository
 

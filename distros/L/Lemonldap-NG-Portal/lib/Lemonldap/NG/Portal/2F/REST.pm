@@ -10,14 +10,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor',
   'Lemonldap::NG::Portal::Lib::REST';
 
 # INITIALIZATION
 
-has prefix => ( is => 'ro', default => 'rest' );
+has prefix => ( is => 'rw', default => 'rest' );
 
 has initAttrs => ( is => 'rw', default => sub { {} } );
 
@@ -29,7 +29,8 @@ sub init {
         $self->logger->error('Missing REST verification URL');
         return 0;
     }
-    $self->logo( $self->conf->{rest2fLogo} ) if ( $self->conf->{rest2fLogo} );
+    $self->prefix( $self->conf->{sfPrefix} )
+      if ( $self->conf->{sfPrefix} );
     foreach my $k ( keys %{ $self->conf->{rest2fInitArgs} } ) {
         my $attr = $self->conf->{rest2fInitArgs}->{$k};
         $attr =~ s/^$//;
@@ -89,10 +90,15 @@ sub run {
         $req,
         'ext2fcheck',
         params => {
-            MAIN_LOGO   => $self->conf->{portalMainLogo},
-            SKIN        => $self->p->getSkin($req),
-            TOKEN       => $token,
-            TARGET      => '/rest2fcheck',
+            MAIN_LOGO => $self->conf->{portalMainLogo},
+            SKIN      => $self->p->getSkin($req),
+            TOKEN     => $token,
+            PREFIX    => $self->prefix,
+            TARGET    => '/'
+              . $self->prefix
+              . '2fcheck?skin='
+              . $self->p->getSkin($req),
+            LEGEND      => 'enterRest2fCode',
             CHECKLOGINS => $checkLogins
         }
     );

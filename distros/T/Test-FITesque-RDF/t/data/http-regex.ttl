@@ -21,8 +21,20 @@
     test:purpose "Test fields with regexps"@en ;
     test:test_script <http://example.org/httplist#http_req_res_list_regex> ;
     test:params [
-        test:requests ( :check_acl_location_req :put_new_acl_req :check_result_req ) ;
-        test:responses ( :check_acl_location_res :put_new_acl_res :check_result_res )
+        test:steps (
+            [
+                test:request :check_acl_location_req ;
+                test:response_assertion :check_acl_location_res
+            ]
+            [
+                test:request :put_new_acl_req ;
+                test:response_assertion :put_new_acl_res
+            ]
+            [
+                test:request :check_result_req ;
+                test:response_assertion :check_result_res
+            ]
+        )
     ] .
 
 

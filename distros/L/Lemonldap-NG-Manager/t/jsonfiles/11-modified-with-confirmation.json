@@ -1348,6 +1348,12 @@
       "id": "persistentSessions",
       "title": "persistentSessions",
       "nodes": [{
+        "default": 0,
+        "id": "disablePersistentStorage",
+        "title": "disablePersistentStorage",
+        "type": "bool",
+        "data": 0
+      }, {
         "id": "persistentStorage",
         "title": "persistentStorage",
         "data": "Apache::Session::File"

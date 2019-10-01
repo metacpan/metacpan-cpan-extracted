@@ -30,11 +30,10 @@ requires:
   PerlIO: '0'
   SelectSaver: '0'
   Symbol: '0'
+  Term::ReadKey: '0'
   Tie::Handle: '0'
   base: '0'
-version: '0.42'
+version: '0.43'
 x_runtime:
-  recommends:
-    Term::Pager: 1.5
-    Term::ReadKey: 0
+  recommends: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

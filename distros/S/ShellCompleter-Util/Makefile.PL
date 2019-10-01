@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "ShellCompleter::Util",
   "PREREQ_PM" => {
-    "Complete::Util" => "0.57",
+    "Complete::Util" => "0.602",
     "Exporter" => "5.57",
     "Getopt::Long::Complete" => 0,
     "strict" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.031",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Util" => "0.57",
+  "Complete::Util" => "0.602",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "Getopt::Long::Complete" => 0,

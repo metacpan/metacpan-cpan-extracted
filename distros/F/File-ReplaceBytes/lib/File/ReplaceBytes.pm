@@ -10,10 +10,10 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw/pread pwrite replacebytes/;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 require XSLoader;
-XSLoader::load( 'File::ReplaceBytes', $VERSION );
+XSLoader::load('File::ReplaceBytes', $VERSION);
 
 # see ReplaceBytes.xs for the code
 

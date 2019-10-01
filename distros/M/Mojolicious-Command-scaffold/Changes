@@ -1,0 +1,10 @@
+Revision history for Mojolicious::Command::scaffold
+
+0.0.1   2019-09-27
+        Initial version
+
+0.0.2   2019-09-27
+        Ready to be uploaded on metacpan
+
+0.0.3   2019-09-30
+        When creating migrations, check if the rollback statement is needed

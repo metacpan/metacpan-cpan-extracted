@@ -32,5 +32,5 @@ INSTALLATION ON CENTOS LINUX 7.5 AND ABOVE
 CREATE NEW VERSION (FOR DEVELOPER ONLY)
 
     * README         -- pod2readme lib/CTK.pm
-    * CHANGES        -- Result of command: gmtime | gclip
+    * Changes        -- Result of command: gmtime | gclip
     * lib/CTK.pm     -- In documentation (VERSION) & in code $VERSION

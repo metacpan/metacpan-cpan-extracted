@@ -151,7 +151,7 @@ defined as expected.
 sub is_uc_and_lc_internationalized {
   my $exchars = define_sample_i18n_chars();
 #  use locale;
-  use utf8;
+#  use utf8;
 
   my @checks;
   foreach my $pair ( @{ $exchars } ) {

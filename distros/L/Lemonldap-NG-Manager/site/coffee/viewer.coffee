@@ -9,7 +9,7 @@ This file contains:
  - the AngularJS controller
 ###
 
-llapp = angular.module 'llngManager', ['ui.tree', 'ui.bootstrap', 'llApp', 'ngCookies']
+llapp = angular.module 'llngViewer', ['ui.tree', 'ui.bootstrap', 'llApp', 'ngCookies']
 
 ###
 Main AngularJS controller
@@ -321,6 +321,22 @@ llapp.controller 'TreeCtrl', [
 			$scope.showT = false
 			setHelp scope
 
+		$scope.keyWritable = (scope) ->
+			node = scope.$modelValue
+			# regexp-assemble of:
+			#  authChoice
+			#  cmbModule
+			#  keyText
+			#  menuApp
+			#  menuCat
+			#  rule
+			#  samlAttribute
+			#  samlIDPMetaDataNode
+			#  samlSPMetaDataNode
+			#  sfExtra
+			#  virtualHost
+			return if node.type and node.type.match /^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/ then true else false
+
 		# method `getKey()`:
 		# - return a promise with the data:
 		# 	- from node when set
@@ -351,10 +367,13 @@ llapp.controller 'TreeCtrl', [
 							node.data = node['default']
 						else
 							node.data = data.value
-						if node.data.toString().match /_Hidden_$/
+						if (node.data and node.data.toString().match /_Hidden_$/)
 							node.type = 'text'
 							node.data = '######'
 						# Cast int as int (remember that booleans are int for Perl)
+						if node.type and node.type.match /^(bool|trool|boolOrExpr)$/
+							if typeof node.data == 'string' and node.data.match /^(?:-1|0|1)$/
+								node.data = parseInt(node.data, 10)
 						if node.type and node.type.match /^int$/
 							node.data = parseInt(node.data, 10)
 						# Split SAML types
@@ -450,5 +469,4 @@ llapp.controller 'TreeCtrl', [
 		unless c
 			console.log "Redirecting to /view/latest"
 			$location.path '/view/latest'
-
 ]

@@ -1,0 +1,1 @@
+<%Redirect url={<%Utility/f mode="current-url"%>}%>

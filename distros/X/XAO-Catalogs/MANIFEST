@@ -1,0 +1,22 @@
+CHANGES
+Catalogs.pm
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+TODO
+lib/XAO/DO/Data/Catalog.pm
+lib/XAO/DO/Data/CatalogCategoryMap.pm
+lib/XAO/DO/Data/CatalogData.pm
+lib/XAO/DO/ImportMap/Base.pm
+lib/XAO/DO/ImportMap/Sample.pm
+sample.xml
+scripts/xao-ifilter-sample
+scripts/xao-import-map
+test.pl
+t/testcases/Catalogs/base.pm
+t/testcases/Catalogs/Catalogs.pm
+t/xao/projects/test/objects/Config.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

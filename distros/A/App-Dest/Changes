@@ -1,5 +1,8 @@
 Revision history for App::Dest
 
+1.23      2019-09-24 15:35:10-07:00 America/Los_Angeles
+        - Major rewrite of App::Dest internals and tests (with basically same UI)
+
 1.22      2019-08-27 14:42:23-07:00 America/Los_Angeles
         - Update Travis YAML
         - Remove unnecessary sorts

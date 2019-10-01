@@ -11,5 +11,6 @@ t/01_basic.t
 t/02_special.t
 t/03_no_wh.t
 t/04_amount.t
+t/05_history.t
 META.yml
 MANIFEST

@@ -1,5 +1,17 @@
 Revision history for Alien-Build
 
+1.89      2019-09-25 07:58:39 -0600
+  - Production release identical to 1.88_01
+
+1.88_01   2019-09-24 11:53:18 -0600
+  - Add options cbuilder_check amd cbuilder_config to Test::Alien xs_ok
+    function (gh#140, Test-Alien-CPP#3, Test-Alien-CPP#4)
+
+1.87_01   2019-09-24 07:38:31 -0600
+  - Test::Alien directive with_subtest will attempt to catch SEGV and bail
+    on on test file with a helpful diagnostic.  The prove util frequently
+    does not provide a useful diagnostic for SEGV on its own (gh#138, gh#139).
+
 1.86      2019-09-13 06:27:21 -0600
   - PAUSE permission fix
 

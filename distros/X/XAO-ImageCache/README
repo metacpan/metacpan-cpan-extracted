@@ -1,0 +1,340 @@
+NAME
+    XAO::ImageCache - Images caching by URLs stored in XAO::FS database
+
+SYNOPSIS
+        use XAO::ImageCache;
+
+        # Making new instance of Image Cache object
+        my $image_Cache = XAO::ImageCache->new(
+            list           => $odb->fetch("/Products"),
+            cache_path     => "/var/httpd/shop/product/images/",
+            cache_url      => "/products/images/",
+            source_url_key => "source_img",
+        ) || die "Can't make Image cache!";
+
+        # Init new empty Cache
+        $image_cache->init() || die "Can't init new cache!";
+
+        # Start images checking and downloading to cache
+        $image_cache->check();
+
+DESCRIPTION
+    When we store images links on own database we have no real images on own
+    site. Some time it may be a problem cause images may have no right
+    dimension or may be deleted from source site.
+
+    XAO::ImageCache made for cache locally images his URL stored in XAO
+    Founsation Server. Also, images may be resized automaticaly.
+
+    This module provide easy methods to scan XAO Foundation Server data
+    lists, to extract images source URLs from data objects, to download
+    images to local cache, to resize a local copy of the image to fit into
+    given dimensions and to store the new local URL of the image back to the
+    data object.
+
+METHODS
+    new($%)
+        The constructor returns a new "XAO::ImageCache" object. You can use
+        it to make new images cache or check images of already existent
+        cache.
+
+         my $image_cache = XAO::ImageCache->new(
+             cache_path     => "cache",         # set cache directory to './cache/'
+             source_path    => "cache/source",  # set source directory to './cache/source/'
+             local_path     => "images/copy",   # (optional) try to resolve local urls
+             cache_url      => "images/",       # set cached images (relative) path to 'images/'
+             list           => $odb->fetch("/Products"),
+             source_url_key => 'source_image_url',
+             dest_url_key   => 'dest_image_url',
+             filename_key   => 'product_id',
+             min_width      => 50,              # Source image is ignored if smaller
+             min_height     => 50,
+             size           => {
+                 width  => 320,
+                 height => 200,
+                 save_aspect_ratio => 1,
+             },
+             thumbnails     => {
+                 path     => '/var/httpd/shop/product/images/tbn',
+                 url      => '/products/images/tbn/'
+                 geometry => "25%",
+                 url_key  => 'thumbnail_url',
+             },
+             autocreate     => 1,
+             useragent      => {
+                 agent   => 'My Lovely Browser/v13.01',
+                 timeout => 30,
+             },
+             force_download => 1,               # to enforce re-downloads
+             force_scale    => 1,               # to enforce re-scaling
+             clear_on_error => 0,               # don't clear DB properties even on permanent errors
+         ) || die "Image cache creation failure!";
+
+        A number of configuration parameters can be passed to
+        XAO::ImageCache to tune functionality.
+
+        autocreate
+        cache_path
+        cache_url
+        clear_on_error
+        dest_url_key
+        force_download
+        force_scale
+        list
+        source_url_key
+        size
+        thumbnails
+        useragent
+
+        Follow to CONFIGURATION PARAMETERS section to see what each
+        parameter does.
+
+        If any required parameter is not present an error will be thrown.
+
+    init($)
+        Cache structure initialization.
+
+        Executed automaticaly if "autocreate" parameter present.
+
+        Create image cache directory if non existent and thumbnail cache
+        directory if non existent and defined as initialization parameter.
+
+    check($)
+        Goes through given XAO FS data list, downloads images from source
+        url to cache and puts cache url into destination url key and
+        thumbnail url key (where applicable).
+
+        XAO::ImageCache->download() will be executed for downloading each
+        image.
+
+    download($$)
+        Downloads image into cache directory.
+
+        If "thumbnails" contains "cache_path" parameter, thumbnail is either
+        downloaded into thumbnail cache directory or created from downloaded
+        image.
+
+        Source image URL should be passed as parameter. Source thumbnail URL
+        is an optional parameter:
+
+            $img_cache->download($image_source_url, $thumbnail_source_url);
+
+        Downloaded image is resized if "size" parameter present. Thumbnail
+        is resized as specified by "thumbnails" "geometry" parameter.
+
+        When "force_download" configuration parameter is not set to True
+        value, image will be downloaded into cache only if image is not
+        already cached or if cached image has a later modification date than
+        source image.
+
+    scale_large($$$)
+        Scaling image to given size.
+
+    scale_thumbnail($$$)
+        Creates thumbnail image from given source image.
+
+    remove_cache($)
+        Removing the ENTIRE cache directory from disk.
+
+        Be carefully to use this method!!!
+
+        Cache structure will be removed from disk completely! Set
+        "force_download" parameter to True value to download images to cache
+        without any conditions.
+
+    get_filename($)
+        File name generation for cached images.
+
+        Source image URL should be passed. Returned file name is an MD5
+        digest of the source URL converted to Base64 string with all non
+        alpha numeric characters are converted to "_".
+
+        Example.
+
+            Location:
+            http://localhost/icons/medbutton.jpeg
+
+            provide file name:
+            4aFNA1utpmCNG2wEIF69mg.jpeg
+
+    treat_filename($)
+        Makes sure only file name friendly characters are present: all non
+        alpha numeric characters are converted to "_".
+
+CONFIGURATION PARAMETERS
+    The set of configuration parameters contain required and optional
+    parameters.
+
+    Required parameters should be defined. Execution will be stoped if
+    required parameter not present.
+
+    Optional parameters just configure aditional functionality and may not
+    present.
+
+  Required parameters
+    cache_path
+        - Path string where the cache should be placed.
+
+        May be absolute or relative from current execution directory path.
+
+        For example. Set it to "./cache" if you whant to place cache in
+        "cache" subdirectory of your script working directory.
+
+    cache_url
+        - complet URL (or relative location) to cached images.
+
+        Place here your URL reflection of cache directory in condition with
+        your HTTP server configuration.
+
+        For example. Set it to "http://my.host.com/images/" if your HTTP
+        server configured for provide access to your cache directory by
+        hostname "my.host.com" and location "images/". Cached images names
+        will be added to image URL automaticaly.
+
+    list
+        - reference to "XAO::DO::FS::List" object containing the data
+        objects with Image source URL
+
+        Meaning, your data look like a XAO Foundation Server list of objects
+        with references to images. This parameter should contain reference
+        to to XAO::DO::FS::List object. This reference may be result of
+        XAO::Objects->fetch() methode.
+
+        XAO::ImageCache will process each record of this list.
+
+    source_url_key
+        - data key containing the URL of source image.
+
+        Contain the name of key of data object containing the source image
+        reference.
+
+  Optional parameters
+    dest_url_key
+        - data key for storing URL of image in cache.
+
+        Optional parameter cause image name in cache will be a MD5 Base64
+        digest of source image path where "=" character removed, "\" and "+"
+        translated to "_" and "-" simultaniosely.
+
+        To get cached image name
+
+    size
+        - Prefered image size may set as "geometry" equal to "geometry"
+        parameter of Image::Magick module to pass it dirrectly to
+        Image::Magick Scale function.
+
+        Other way to set the image size is set a width and height keys to
+        preffered values.
+
+        If one of image dimension is not defined then corresponding
+        parameter of original image will be used.
+
+        This way, image will be resized with same aspect ratio (same
+        proportions) to the original image if "save_aspect_ratio" parameter
+        present.
+
+        Image width and height will be resized exactly to given size if
+        "save_aspect_ratio" parameter not present.
+
+        Parameter "geometry" has higher priority and other parameters has no
+        effects if "geometry" peresent.
+
+        For example.
+
+            # Size 320x200 as geometry settings
+            %params = (size => {geometry => "320x200!"} );
+
+            # Size 320x200 as dimensions settings
+            %params = (size => {width => 320, height => 200} );
+
+            # Fit size into 320x200 with saving image proportions
+            %params = (
+                size => {
+                    width                   => 320,
+                    height                   => 200,
+                    save_aspect_ratio => 1,
+                }
+            );
+
+    autocreate
+        - create or check cache content automaticaly.
+
+        If non zero value present, cache directory will be created and
+        images checking will be runned. Otherwithe you should run init() and
+        check() methodes manualy.
+
+        Existent cache directory will not be removed. You may do it manualy
+        using remove_cache() methode.
+
+    force_download
+        - each image should be reloaded to cache and processed without
+        dependance of source image modification time. Any conditions
+        ignored.
+
+    thumbnail
+        - thumbnails creator configuration
+
+        Some thubnails configuration parameters may be set for automatic
+        thumbnails creation. This parameter should contain the reference to
+        hash with thumbnails configuration parameters.
+
+        Only "path" parameter is required. Other parameters are optional.
+
+        path
+            path where thumbnail images should be placed.
+
+        url URL for access to thumbnails directory. Same way as "cache_url".
+
+        url_key
+            Data object key name where thumbnail URL should be stored.
+
+        geometry
+            Geometry string to set thumbnail images size in Image Magick
+            geometry format. May be set as dimension ("320x200!") or as
+            persent of actual size of cached image ("25%").
+
+            Default value is "50%" the half of actual image size.
+
+    useragent
+        - configuration parameters hash for LWP::UserAgent
+
+        agent
+            Default value "XAO-ImageCache/#.##"
+
+        env_proxy
+            Default value 1
+
+        keep_alive
+            Default value 1
+
+        timeout
+            Default value 30
+
+        For more information please follow to LWP::UserAgent
+
+SEE ALSO
+    Specifics of List API can be found in
+
+    XAO::DO::FS::List.
+
+    For additional information please see
+
+    XAO::DO::FS::Glue,
+
+    XAO::DO::FS::Global,
+
+    XAO::DO::FS::Glue::MySQL_DBI,
+
+    Refer to Image::Magick documentation for additional information about
+    setting of image scaling parameters.
+
+    Refer to LWP::UserAgent documentation for additional information about
+    user agent parameters.
+
+BUGS
+    Please, inform me about found bugs.
+
+AUTHORS
+    The XAO::ImageCache package maintained by Konstantin Safronov
+    <skv@xao.com>. Specification by Andrew Maltsew <am@xao.com>
+

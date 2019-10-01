@@ -1,9 +1,9 @@
 # ------------  Bus --------------------
-
+{
 package Audio::Nama::Bus;
 use Modern::Perl; use Carp; 
 use Audio::Nama::Log qw(logsub logpkg);
-use Audio::Nama::Globals qw(:trackrw); 
+use Audio::Nama::Globals qw(:trackrw $setup); 
 our @ISA = qw( Audio::Nama::Object );
 
 # share the following variables with subclasses
@@ -33,8 +33,7 @@ sub new {
 		return
 	}
 	if ( $by_name{$vals{name}} ){ 
-		Audio::Nama::throw("$vals{name}: bus name already exists. Skipping.")
-			unless $Audio::Nama::quiet;
+		#Audio::Nama::throw("$vals{name}: bus name already exists. Skipping.") unless $Audio::Nama::quiet;
 		return;
 	}
 	my $bus = bless { 
@@ -72,21 +71,34 @@ sub last {
 
 sub remove { Audio::Nama::throw($_[0]->name, " is system bus. No can remove.") }
 
-{ my %allows = (REC => 'REC/MON', MON => MON, OFF => 'OFF');
-sub allows { $allows{ $_[0]->rw } }
+sub tracks_on {
+	my $bus = shift;
+	for ( $bus->track_o )
+	{
+	my $old = $setup->{bus}->{oldrw}->{$_->name};
+		$_->set( rw =>  $old) if $old;
+			delete $setup->{bus}->{oldrw}->{$_->name };
+	}
 }
-{ my %forces = (
-		REC => 'REC (allows REC/MON)', 
-		MON => 'MON (forces REC to MON)', 
-		OFF => 'OFF (enforces OFF)'
- );
-sub forces { $forces{ $_[0]->rw } }
+
+sub tracks_off {
+	my $bus = shift;
+	return if not grep { $_->rw ne OFF } $bus->track_o;
+	for ( $bus->track_o )
+	{
+		delete $setup->{bus}->{oldrw}->{$_->name };
+		next if $_->rw eq OFF;
+		$setup->{bus}->{oldrw}->{$_->name } = $_->rw;
+		$_->set( rw => OFF );
+	}	
 }
-	
+
 ## class methods
 
-# sub buses, and Main
-sub all { grep{ ! $Audio::Nama::config->{_is_system_bus}->{$_->name} } values %by_name };
+# all buses that have mutable state, and therefore reason to
+# save or display that state
+
+sub all { values %by_name }
 
 sub overall_last { 
 	my $max = 0;
@@ -98,14 +110,14 @@ sub settings_line {
 	my ($mix,$bus) = @_;
 	
 	my $nothing = '-' x 77 . "\n";
-	#return if $maybe_mix->name eq 'Master' or $maybe_mix->group eq 'Mastering';
+	#return if $maybe_mix->name eq 'Main' or $maybe_mix->group eq 'Mastering';
 	return unless defined $mix;
 
 	my ($bustype) = $bus->class =~ /(\w+)$/;
-	my $line = join " ", $bustype ,$bus->name,"is",$bus->forces;
+	my $line = join " ", $bustype ,$bus->name;
 	$line   .= " Version setting".$bus->version if $bus->version;
 	#$line   .= "feeds", 
-	$line .= " Mix track is ". $mix->rw;
+	$line .= join " "," Mix track",$mix->name,"is",$mix->rec_status;
 	$line = "------[$line]";
 	$line .= '-' x (77 - length $line);
 	$line .= "\n";
@@ -114,7 +126,7 @@ sub settings_line {
 	
 sub trackslist {
 	my $bus = shift;
-	my $mix = $Audio::Nama::tn{$bus->send_id};
+	my $mix = $Audio::Nama::tn{$bus->name}; # XX this will work only for mix tracks with the same name as their bus
 	my @list = ($mix,$bus);
 	push @list, map{$Audio::Nama::tn{$_}} ($mix->name, $bus->tracks);
 	\@list;
@@ -122,60 +134,61 @@ sub trackslist {
 
 sub apply {}  # base class does no routing of its own
 
+sub display_type { 
+	my ($type) = $_[0]->class  =~ /([^:]+)$/;
+	$type = lc $type;
+	$type =~ s/sub//;
+	$type
+}
 
+sub list {
+	my $self = shift;
+	my @fields = qw( name
+                    rw
+                    version
+                    send_type
+                    send_id
+                    class 
+					);
+                    # version
+                    # engine_group
+	my $list = join "", map{"$_: ".$self->$_."\n"} grep {$self->$_} @fields;
+}
 ### subclasses
 {
-package Audio::Nama::SubBus;
+package Audio::Nama::SubBus; # with magic for Main bus
 use Modern::Perl; use Carp; our @ISA = 'Audio::Nama::Bus';
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Util qw(input_node);
-use Audio::Nama::Globals qw(:trackrw);
+use Audio::Nama::Globals qw(:trackrw %tn);
 
 # connect source --> member_track --> mix_track
-
-sub output_is_connectable {
- 	my $bus = shift;
-
-	# Either the bus's mix track is set to REC or MON
- 	
- 	$bus->send_type eq 'track' and $Audio::Nama::tn{$bus->send_id}->rec_status =~ /REC|MON/
-
-	# Or, during mixdown, we connect bus member tracks to Master
-	# even tho Master may be set to OFF
-	
-	or $bus->send_type eq 'track' 
-				and $bus->send_id eq 'Master' 
-				and $Audio::Nama::tn{Mixdown}->rec_status eq 'REC'
-	
-	# or we are connecting directly to a loop device
-	or $bus->send_type eq 'loop' and $bus->send_id =~ /^\w+_(in|out)$/;
-}
 
 sub apply {
 	no warnings 'uninitialized';
 	my ($bus, $g)  = @_;
 	logpkg(__FILE__,__LINE__,'debug', "bus ". $bus->name. ": applying routes");
 	logpkg(__FILE__,__LINE__,'debug', "Bus destination is type: $bus->{send_type}, id: $bus->{send_id}");
+	my @wantme = $bus->wantme;
+	logpkg(__FILE__,__LINE__,'debug', "bus ". $bus->name. " consumed by ".$_->name) for @wantme;
 	map{ 
+		my $member = $_;
 		# connect member track input paths
 		logpkg(__FILE__,__LINE__,'debug', "track ".$_->name);
-		my @path = $_->input_path;
+		my @path = $member->input_path;
 		$g->add_path(@path) if @path;
 		logpkg(__FILE__,__LINE__,'debug',"input path: @path") if scalar @path;
 
-		logpkg(__FILE__,__LINE__,'debug', join " ", "bus output:", $_->name, $bus->send_id);
-
 		# connect member track outputs to target
-		# disregard Master track rec_status when connecting
-		# Main bus during mixdown handling
-
-		Audio::Nama::Graph::add_path_for_send($g, $_->name, $bus->send_type, $bus->send_id )
-			if $bus->output_is_connectable;
+		for (@wantme) { 
+			my $mix_track = $_; 
+			Audio::Nama::Graph::add_path_for_send($g, $member->name, 'track', $mix_track->name)
+		}
 		
 		# add paths for recording
 		
 		Audio::Nama::Graph::add_path_for_rec($g,$_) 
-			if $_->rec_status eq REC
+			if $_->rec
 				and ! $Audio::Nama::mode->preview and ! $Audio::Nama::mode->doodle;
 
 	} grep {$_->rec_status ne OFF} $bus->track_o;
@@ -188,19 +201,23 @@ sub remove {
 
 	my $mix_track = $Audio::Nama::tn{$bus->name};
 
-	if ( defined $mix_track ){
-	 
-		$mix_track->unbusify;
-	
-		# remove mix track unless it has some WAV files
-
-		$mix_track->remove unless scalar @{ $mix_track->versions };
-	}
+	# remove mix track unless it has some WAV files
+	$mix_track->remove if defined $mix_track and not scalar @{ $mix_track->versions };
 
 	# remove bus from index
 	
 	delete $Audio::Nama::bn{$bus->name};
 } 
+sub wantme {
+	my $bus = shift;
+	no warnings 'uninitialized';
+	my @wantme = grep{ 	$_->{rw} =~ /REC|MON/ 
+					and $_->source_type eq 'bus' 
+					and $_->source_id eq $bus->name 
+					and $_->is_used} Audio::Nama::all_tracks();
+	@wantme
+
+}
 }
 {
 package Audio::Nama::SendBusRaw;
@@ -250,7 +267,21 @@ sub apply {
 }
 
 }
+{
+package Audio::Nama::MidiBus;
+use Modern::Perl; use Carp; our @ISA = 'Audio::Nama::Bus';
+use Audio::Nama::Log qw(logsub logpkg);
+use Audio::Nama::Util qw(input_node);
+use Audio::Nama::Globals qw(:trackrw);
 
+sub apply {
+	my ($bus)  = @_;
+	logpkg(__FILE__,__LINE__,'debug', "bus ". $bus->name. ": applying routes");
+	logpkg(__FILE__,__LINE__,'debug', "Bus destination is type: $bus->{send_type}, id: $bus->{send_id}");
+	# 
+}
+sub remove { }  # We never remove the Midi bus
+}
 # ---------- Bus routines --------
 {
 package Audio::Nama;
@@ -264,7 +295,7 @@ our (
 );
 
 sub set_current_bus {
-	my $track = shift || ($this_track ||= $tn{Master});
+	my $track = shift || ($this_track ||= $tn{Main});
 
 	return unless $track; # needed for test environment
 
@@ -274,9 +305,9 @@ sub set_current_bus {
 	$this_sequence = $bn{$track->group} if (ref $bn{$track->group}) =~ /Sequence/;
 
 	my $bus_name = 
-		$track->name =~ /Master|Mixdown/ 	
+		$track->name =~ /Main|Mixdown/ 	
 		? 'Main'
-		: $track->is_mix_track()			
+		: $track->is_mixing()			
 			? $track->name 
 			: $track->group;
 	
@@ -289,26 +320,37 @@ sub select_bus {
 	$this_bus_o = $bus;
 }
 sub add_bus {
+	# creates named bus if necessary
+	# creates named mix track if necessary
+	# sets mix track to MON with bus as source
 	my ($name, @args) = @_; 
 	
+	# don't create bus if such named already exists
 	Audio::Nama::SubBus->new( 
 		name => $name, 
 		send_type => 'track',
 		send_id	 => $name,
-		) unless $Audio::Nama::Bus::by_name{$name};
+		) unless $bn{$name};
+	
+	my $bus = $bn{$name};
+	# modify bus and track settings to activate bus
+	$bus->set(rw => MON); 
 
 	@args = ( 
 		rw 			=> MON,
+		source_type => 'bus',
+		source_id   => $name,
 		@args
 	);
 
-	$tn{$name} and Audio::Nama::pager_newline( qq($name: setting as mix track for bus "$name"));
+	$tn{$name} and pager_newline( qq($name: setting as mix track for bus "$name"));
 
 	my $track = $tn{$name}// add_track($name, width => 2);
 
 	$track->set( @args );
-	
 }
+	
+
 	
 sub add_submix {
 
@@ -372,6 +414,7 @@ sub remove_submix_helper_tracks {
 }
 sub submixes { grep { (ref $_) =~ /SendBusCooked/ } values %Audio::Nama::Bus::by_name }
 
+}
 }
 1;
 __END__

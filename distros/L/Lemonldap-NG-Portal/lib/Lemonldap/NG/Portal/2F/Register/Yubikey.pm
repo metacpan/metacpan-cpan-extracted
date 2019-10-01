@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -103,8 +103,7 @@ sub run {
             my $maxSize = $self->conf->{max2FDevices};
             $self->logger->debug("Nbr 2FDevices = $size / $maxSize");
             if ( $size >= $maxSize ) {
-                $self->userLogger->error(
-                    "Max number of 2F devices is reached !!!");
+                $self->userLogger->warn("Max number of 2F devices is reached");
                 return $self->p->sendHtml(
                     $req, 'error',
                     params => {
@@ -182,12 +181,18 @@ sub run {
         }
 
         # Delete Yubikey device
+        my $UBKName;
+        foreach (@$_2fDevices) {
+            $UBKName = $_->{name} if $_->{epoch} eq $epoch;
+        }
         @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
         $self->logger->debug(
-            "Delete 2F Device : { type => 'UBK', epoch => $epoch }");
+"Delete 2F Device : { type => 'UBK', epoch => $epoch, name => $UBKName }"
+        );
         $self->p->updatePersistentSession( $req,
             { _2fDevices => to_json($_2fDevices) } );
-        $self->userLogger->notice('Yubikey deletion succeed');
+        $self->userLogger->notice(
+            "Yubikey $UBKName unregistration succeeds for $user");
         return [
             200,
             [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],

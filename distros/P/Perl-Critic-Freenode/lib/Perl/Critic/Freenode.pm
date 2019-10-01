@@ -3,7 +3,7 @@ package Perl::Critic::Freenode;
 use strict;
 use warnings;
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 1;
 
@@ -95,6 +95,10 @@ Don't loop over hashes
 =item L<Perl::Critic::Policy::Freenode::ModPerl>
 
 Don't use C<mod_perl> to write web applications
+
+=item L<Perl::Critic::Policy::Freenode::MultidimensionalArrayEmulation>
+
+Don't use multidimensional array emulation
 
 =item L<Perl::Critic::Policy::Freenode::OpenArgs>
 

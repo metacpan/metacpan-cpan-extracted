@@ -6,7 +6,7 @@ use strict;
 use Mouse;
 use Clone 'clone';
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -60,7 +60,7 @@ sub params {
     $self->{conf}->{imgPath} ||= $self->{staticPrefix};
     my %res;
     my @defaultTabs = (qw/appslist password logout loginHistory oidcConsents/);
-    my @customTabs = split( /,\s*/, $self->{conf}->{customMenuTabs} || '' );
+    my @customTabs  = split( /,\s*/, $self->{conf}->{customMenuTabs} || '' );
 
     # Tab to display
     # Get the tab URL parameter
@@ -113,6 +113,16 @@ sub params {
     $res{sfaManager} =
       $self->p->_sfEngine->display2fRegisters( $req, $req->userData );
     $self->logger->debug("Display 2fRegisters link") if $res{sfaManager};
+
+    # Display ContextSwitching link only if allowed
+    my $cswPlugin = $self->p->loadedModules->{
+        'Lemonldap::NG::Portal::Plugins::ContextSwitching'};
+    $res{contextSwitching} =
+        $cswPlugin
+      ? $cswPlugin->displaySwitchContext( $req, $req->userData )
+      : '';
+    $self->logger->debug("Display SwitchContext link -> $res{contextSwitching}")
+      if $res{contextSwitching};
 
     return %res;
 }
@@ -168,7 +178,7 @@ sub appslist {
     my $catlevel = 0;
 
     my $applicationList = clone( $self->conf->{applicationList} );
-    my $filteredList = $self->_filter( $req, $applicationList );
+    my $filteredList    = $self->_filter( $req, $applicationList );
     push @$appslist,
       $self->_buildCategoryHash( $req, "", $filteredList, $catlevel );
 

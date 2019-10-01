@@ -65,7 +65,7 @@ ok( $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
 count(1);
 
 my ( $host, $url, $query ) =
-  expectForm( $res, undef, '/rest2fcheck', 'token', 'code', 'checkLogins' );
+  expectForm( $res, undef, '/rest2fcheck?skin=bootstrap', 'token', 'code', 'checkLogins' );
 $query =~ s/code=/code=1234/;
 
 ok(

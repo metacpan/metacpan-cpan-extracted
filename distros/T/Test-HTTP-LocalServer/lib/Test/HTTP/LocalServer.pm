@@ -1,15 +1,6 @@
 package Test::HTTP::LocalServer;
 use strict;
-# this has to happen here because LWP::Simple creates a $ua
-# on load so any time after this is too late.
-BEGIN {
-  delete @ENV{qw(
-    HTTP_PROXY http_proxy CGI_HTTP_PROXY
-    HTTPS_PROXY https_proxy HTTP_PROXY_ALL http_proxy_all
-  )};
-}
 use 5.008; # We use "fancy" opening of lexical filehandle, see below
-use LWP::Simple;
 use FindBin;
 use File::Spec;
 use File::Temp;
@@ -17,8 +8,10 @@ use URI::URL qw();
 use Carp qw(carp croak);
 use Cwd;
 use File::Basename;
+use Time::HiRes qw ( time sleep );
+use HTTP::Tiny;
 
-our $VERSION = '0.66';
+our $VERSION = '0.68';
 
 =head1 NAME
 
@@ -26,10 +19,11 @@ Test::HTTP::LocalServer - spawn a local HTTP server for testing
 
 =head1 SYNOPSIS
 
-  use LWP::Simple qw(get);
+  use HTTP::Tiny;
   my $server = Test::HTTP::LocalServer->spawn;
 
-  get $server->url, "Retrieve " . $server->url;
+  my $res = HTTP::Tiny->new->get( $server->url );
+  print $res->{content};
 
   $server->stop;
 
@@ -81,18 +75,32 @@ A good idea for a slow server would be
 
 All served HTML will have the first %s replaced by the current location.
 
-The following entries will be removed from C<%ENV>:
+The following entries will be removed from C<%ENV> when making a request:
 
     HTTP_PROXY
     http_proxy
+    HTTP_PROXY_ALL
+    http_proxy_all
     HTTPS_PROXY
     https_proxy
     CGI_HTTP_PROXY
-
-Note that L<LWP::Simple> must be loaded after this module, as it caches
-the entries in C<%ENV> otherwise.
+    ALL_PROXY
+    all_proxy
 
 =cut
+
+sub get {
+    my( $url ) = @_;
+    local *ENV;
+    delete @ENV{qw(
+      HTTP_PROXY http_proxy CGI_HTTP_PROXY
+      HTTPS_PROXY https_proxy HTTP_PROXY_ALL http_proxy_all
+      ALL_PROXY
+      all_proxy
+    )};
+    my $response = HTTP::Tiny->new->get($url);
+    $response->{content}
+}
 
 sub spawn_child_win32 { my ( $self, @cmd ) = @_;
     system(1, @cmd)
@@ -166,9 +174,16 @@ sub spawn {
 
   my @cmd=( $^X, $server_file, $web_page, $logfile, @opts );
   my $pid = $self->spawn_child(@cmd);
-  sleep 1; # overkill, but good enough for the moment
+  my $timeout = time +2;
+  while( time < $timeout and (-s $url_file <= 15)) {
+      sleep( 0.1 ); # overkill, but good enough for the moment
+  }
 
-  open my $server, '<', $url_file
+  my $server;
+  while( time < $timeout and !open $server, '<', $url_file ) {
+      sleep(0.1);
+  };
+  $server
       or die "Couldn't read back URL from '$url_file': $!";
 
   my $url = <$server>;
@@ -193,20 +208,38 @@ if you need to compare results from two runs.
 =cut
 
 sub port {
-  carp __PACKAGE__ . "::port called without a server" unless $_[0]->{_server_url};
-  $_[0]->{_server_url}->port
+  carp __PACKAGE__ . "::port called without a server" unless $_[0]->server_url;
+  $_[0]->server_url->port
 };
 
 =head2 C<< $server->url >>
 
-This returns the url where you can contact the server. This url
+This returns the L<URI> where you can contact the server. This url
 is valid until the C<$server> goes out of scope or you call
+
   $server->stop;
+
+The returned object is a copy that you can modify at your leisure.
 
 =cut
 
 sub url {
-  $_[0]->{_server_url}->abs
+  $_[0]->server_url->abs
+};
+
+=head2 C<< $server->server_url >>
+
+This returns the L<URI> object of the server URL. Use L</$server->url> instead.
+Use this object if you want to modify the hostname or other properties of the
+server object.
+
+Consider this basically an emergency accessor. In about every case,
+using C<< ->url() >> does what you want.
+
+=cut
+
+sub server_url {
+  $_[0]->{_server_url}
 };
 
 =head2 C<< $server->stop >>
@@ -217,7 +250,7 @@ url.
 =cut
 
 sub stop {
-    get( $_[0]->{_server_url} . "quit_server" );
+    get( $_[0]->server_url() . "quit_server" );
     undef $_[0]->{_server_url};
     wait;
     #my $retries = 10;
@@ -239,7 +272,7 @@ cannot be retrieved then.
 
 sub kill {
   CORE::kill( 'KILL' => $_[0]->{ _pid } )
-      or warn "Couldn't kill pid '$_[0]->{ _pid }'";
+      or warn "Couldn't kill pid '$_[0]->{ _pid }': $!";
   wait;
   undef $_[0]->{_server_url};
   undef $_[0]->{_pid};
@@ -256,11 +289,11 @@ as a string.
 
 sub get_log {
   my ($self) = @_;
-  return get( $self->{_server_url} . "get_server_log" );
+  return get( $self->server_url() . "get_server_log" );
 };
 
 sub DESTROY {
-  $_[0]->stop if $_[0]->{_server_url};
+  $_[0]->stop if $_[0]->server_url;
   for my $file (@{$_[0]->{delete}}) {
     unlink $file or warn "Couldn't remove tempfile $file : $!\n";
   };
@@ -283,7 +316,6 @@ program.
 
 sub local {
     my ($self, $htmlfile) = @_;
-    require Cwd;
     require File::Spec;
     my $fn= File::Spec->file_name_is_absolute( $htmlfile )
           ? $htmlfile
@@ -317,6 +349,17 @@ the suggested filename as passed in.
 This URL will issue a redirect to C<$target>. No special care is taken
 towards URL-decoding C<$target> as not to complicate the server code.
 You need to be wary about issuing requests with escaped URL parameters.
+
+=head2 401 basic authentication challenge C<< $server->basic_auth($user, $pass) >>
+
+This URL will issue a 401 basic authentication challenge. The expected user
+and password are encoded in the URL.
+
+    my $challenge_url = $server->basic_auth('foo','secret');
+    my $wrong_pw = URI->new( $challenge_url );
+    $wrong_pw->userinfo('foo:hunter2');
+    $res = HTTP::Tiny->new->get($wrong_pw);
+    is $res->{status}, 401, "We get the challenge with a wrong user/password";
 
 =head2 404 error C<< $server->error_notfound($target) >>
 
@@ -366,6 +409,7 @@ use vars qw(%urls);
     'bzip2' => 'large/bzip/16M',
     'chunked' => 'chunks',
     'download' => 'download/%s',
+    'basic_auth' => 'basic_auth/%s/%s',
 );
 for (keys %urls) {
     no strict 'refs';
@@ -391,7 +435,7 @@ None by default.
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-Copyright (C) 2003-2017 Max Maischein
+Copyright (C) 2003-2019 Max Maischein
 
 =head1 AUTHOR
 

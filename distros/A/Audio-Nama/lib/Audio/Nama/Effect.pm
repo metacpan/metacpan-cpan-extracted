@@ -34,6 +34,7 @@ use Audio::Nama::Object qw(
 				bypassed
 				name
 				surname 
+				predecessor
 
 );
 *this_op			= \&Audio::Nama::this_op;
@@ -157,11 +158,6 @@ sub new {
 	} 
 	$self
 }
-
-# fx method delivers hash, previously via $fx->{ applied}->{$id}
-# TODO: get rid of this entirely
-sub fx	 		{ my $self = shift; $self }	
-
 # provide object
 {
 no warnings 'redefine';
@@ -180,6 +176,8 @@ sub remove_name { my $self = shift; delete $self->{name} }
 sub set_name    { my $self = shift; $self->{name} = shift }
 sub set_surname { my $self = shift; $self->{surname} = shift}
 sub is_controller { my $self = shift; $self->parent } 
+sub is_channel_op { my $self = shift; $Audio::Nama::config->{ecasound_channel_ops}->{$self->type} }
+
 
 sub has_read_only_param {
 	my $self = shift;
@@ -195,37 +193,20 @@ sub registry_index {
 	my $self = shift;
 	$fx_cache->{full_label_to_index}->{ $self->type };
 }
-sub ecasound_controller_index {
+sub ecasound_controller_index { 
 	logsub("&ecasound_controller_index");
 	my $self = shift;
+	my $n = $self->chain;
 	my $id = $self->id;
-	my $chain = $self->chain;
-	my $track = $ti{$chain};
-	my @ops = @{$track->ops};
-	my $operator_count = 0;
-	my $position;
-	for my $i (0..scalar @ops - 1) {
-		$position = $i, last if $ops[$i] eq $id;
-		$operator_count++ if ! Audio::Nama::fxn($ops[$i])->is_controller;
-	}
-	$position -= $operator_count; # skip operators
-	++$position; # translates 0th to chain-position 1
-}
-sub ecasound_operator_index { # does not include offset
-	logsub("&ecasound_operator_index");
-	my $self = shift;
-	my $id = $self->id;
-	my $chain = $self->chain;
-	my $track = $ti{$chain};
-	my @ops = @{$track->ops};
-	my $controller_count = 0;
-	my $position;
-	for my $i (0..scalar @ops - 1) {
-		$position = $i, last if $ops[$i] eq $id;
-		$controller_count++ if Audio::Nama::fxn($ops[$i])->is_controller;
-	}
-	$position -= $controller_count; # skip controllers 
-	++$position; # translates 0th to chain-position 1
+	my $opcount = 0;
+	logpkg(__FILE__,__LINE__,'debug', "id: $id, n: $n, ops: @{ $ti{$n}->ops }" );
+	for my $op (@{ $ti{$n}->ops }) { 
+		# increment only controllers
+		next unless fxn($op)->is_controller;
+		$opcount++;
+		last if $op eq $id;
+	} 
+	$opcount;
 }
 sub ecasound_effect_index { 
 	logsub("&ecasound_effect_index");
@@ -235,13 +216,17 @@ sub ecasound_effect_index {
 	my $opcount = 0;
 	logpkg(__FILE__,__LINE__,'debug', "id: $id, n: $n, ops: @{ $ti{$n}->ops }" );
 	for my $op (@{ $ti{$n}->ops }) { 
-			# increment only for ops, not controllers
-			next if $self->is_controller;
+			my $fx = fxn($op);
+ 			next if $fx->is_controller;
 			++$opcount;   # first index is 1
 			last if $op eq $id
 	} 
 	no warnings 'uninitialized';
 	$self->offset + $opcount;
+}
+sub ecasound_effect_index_ {
+	my $self = shift;
+	1 + first_index {$_->id eq $self->id } $self->track->ops_ecasound_order();
 }
 sub track_effect_index { # the position of the ID in the track's op array
 	my $self = shift;
@@ -249,11 +234,26 @@ sub track_effect_index { # the position of the ID in the track's op array
 	my $pos = first_index {$id eq $_} @{$self->track->ops} ;
 	$pos
 }
+sub controllers {
+	my $self = shift;
+	my %children;
+	# we want controllers with this parent, also controllers
+	# whos parents are children of this parent, and children
+	# of those children
+	no warnings;
+	my @ctrl =	map { $_->id }
+				grep{ $_->{parent} eq $self->id 
+					or $children{$_->{parent}} 
+					and $children{$_->id}++ 
+					} map{ fxn($_)} @{ $self->track->ops };
+
+	@ctrl
+}
 sub sync_one_effect {
-		my $self= shift;
+		my $self = shift;
 		my $chain = $self->chain;
-		Audio::Nama::eval_iam("c-select $chain");
-		Audio::Nama::eval_iam("cop-select " .( $self->offset + $self->ecasound_operator_index ) );
+		$this_engine->current_chain($chain);
+		$this_engine->current_chain_operator($self->ecasound_effect_index);
 		$self->set(params => get_ecasound_cop_params( scalar @{$self->params} ));
 }
 sub offset {
@@ -278,10 +278,15 @@ sub ladspa_id {
 }
 sub nameline {
 	my $self = shift;
-	my @attr_keys = qw( name surname fxname type ladspa_id bypassed trackname);
-	my $nameline = $self->id. ": ". join q(, ), grep{$_} map{$self->$_} @attr_keys;
-	$nameline .= "\n";
-	$nameline
+	my @attr_keys = qw(id name surname fxname type ladspa_id);
+	my %display = map{ $_ => 1         } grep { !/fxname|type|ladspa_id|id/ } @attr_keys;
+	my %attr    = map{ $_ => $self->$_ } @attr_keys ;
+	my $bypassed = $self->{bypassed} ? " (bypassed)" : '';
+	not defined $attr{$_} and delete $attr{$_} for @attr_keys;
+	my $nameline =  join qq( ),  
+			map{ $display{$_} ? "$_:$attr{$_}" : $attr{$_} } grep{$attr{$_}}  @attr_keys;
+	$nameline .= "$bypassed\n";
+	$nameline;
 }
 sub _effect_index { 
 	my $self = shift;
@@ -360,14 +365,8 @@ sub _remove_effect {
 	
 	if( my $track = $ti{$n} ){
 		my @ops_list = @{$track->ops};
-		#say "ops_list: @ops_list";
-		my $perl_version = $^V;
-		my ($minor_version) = $perl_version =~ /^v5\.(\d+)/;
 		my @new_list = grep  { $_ ne $id  } @ops_list;
-		#say "new_list: @new_list";
-		if ($minor_version <= 14) 
-		     {    $track->{ops}   = [ @new_list  ] }
-		else { @{ $track->{ops} } =   @new_list    }
+		$track->{ops} =   [ @new_list ];
 	}
 	#set_current_op($this_track->ops->[0]);
 	#set_current_param(1);
@@ -375,12 +374,11 @@ sub _remove_effect {
 	return(); 
 }
 sub position_effect {
+	#logsub('&position_effect');
 	my($self, $pos) = @_;
 
 	my $op = $self->id;
 	
-	# disabled, debugging needed
-	# we cannot handle controllers
 	#Audio::Nama::pager("$op or $pos: controller not allowed, skipping.\n"), return 
 	#	if grep{ fxn($_)->is_controller } $op, $pos;
 	
@@ -389,14 +387,16 @@ sub position_effect {
 	my $track = $ti{$self->chain};
 
 	my $op_index = $self->track_effect_index;
+	my @children = $self->controllers;
+	my $count = scalar @children + 1;
 	my @new_op_list = @{$track->ops};
 
-	# remove op
-	splice @new_op_list, $op_index, 1;
+	# remove op and children
+	my @op_and_ctrl = splice @new_op_list, $op_index, $count;
 
 	if ( $pos eq 'ZZZ'){
 		# put it at the end
-		push @new_op_list, $op;
+		push @new_op_list, @op_and_ctrl
 	}
 	else { 
 		my $POS = fxn($pos);
@@ -405,15 +405,16 @@ sub position_effect {
 			unless $track eq $track2;
 		my $new_op_index = $POS->track_effect_index; 
 		# insert op
-		splice @new_op_list, $new_op_index, 0, $op;
+		splice @new_op_list, $new_op_index, 0, @op_and_ctrl;
+
 	}
-	# reconfigure the entire engine (inefficient, but easy to do)
+	# easier to reconfigure the engine than to code for
+	# repositioning ecasound effects.
 	say join " - ",@new_op_list;
 	@{$track->ops} = @new_op_list;
 	Audio::Nama::request_setup();
 	$this_track = $track;
-	# this command generates spurious warnings during test
-	process_command('show_track');
+	nama_cmd('show_track');
 }
 
 sub apply_op {
@@ -446,10 +447,10 @@ sub apply_op {
 
 	logpkg(__FILE__,__LINE__,'debug', "command: $add_cmd");
 
-	Audio::Nama::eval_iam("c-select $chain"); 
-	Audio::Nama::eval_iam("cop-select " . $dad->ecasound_effect_index) if $dad;
-	Audio::Nama::eval_iam($add_cmd);
-	Audio::Nama::eval_iam("cop-bypass on") if $self->bypassed;
+	$this_engine->current_chain($chain); 
+	$this_engine->current_chain_operator($dad->ecasound_effect_index) if $dad;
+	$this_engine->ecasound_iam($add_cmd);
+	$this_engine->ecasound_iam("cop-bypass on") if $self->bypassed;
 
 	my $owns = $self->owns;
 	(ref $owns) =~ /ARRAY/ or croak "expected array";
@@ -459,14 +460,14 @@ sub apply_op {
 
 #### Effect related routines, some exported, non-OO
 
+# main namespace imports from us, we'll import manually
+# to work around dependence issues
+
 sub import_engine_subs {
 
-	*valid_engine_setup = \&Audio::Nama::valid_engine_setup;
-	*engine_running		= \&Audio::Nama::engine_running;
-	*eval_iam			= \&Audio::Nama::eval_iam;
-	*ecasound_select_chain = \&Audio::Nama::ecasound_select_chain;
+	*ecasound_iam			= \&Audio::Nama::ecasound_iam;
 	*sleeper			= \&Audio::Nama::sleeper;
-	*process_command    = \&Audio::Nama::process_command;
+	*nama_cmd    = \&Audio::Nama::nama_cmd;
 	*pager				= \&Audio::Nama::pager;
 	*this_op			= \&Audio::Nama::this_op;
 	*this_param			= \&Audio::Nama::this_param;
@@ -491,7 +492,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 					modify_effect
 					modify_multiple_effects
 
-					_update_effect
+					update_ecasound_effect
 					update_effect
 					sync_effect_parameters
 					find_op_offsets
@@ -645,11 +646,12 @@ sub append_effect {
 		}
 		$ui->add_effect_gui(\%args) unless $track->hide;
 
-		$add_effects_sub = sub{ $FX->apply_op };
+		# XX we should announce that will take effect in new setup
+		$add_effects_sub = $FX->is_channel_op ? sub { Audio::Nama::request_setup() } : sub{ $FX->apply_op };
 	}
-	if( Audio::Nama::valid_engine_setup() )
+	if( $this_engine->valid_setup() )
 	{
-		if (Audio::Nama::engine_running())
+		if ($this_engine->started())
 		{ 
 			$track->mute;
 			my $result = Audio::Nama::stop_do_start($add_effects_sub, 0.05);
@@ -671,7 +673,7 @@ sub insert_effect {
 	my %args = %$p;
 	local $config->{category} = 'ECI_FX';
 	return(append_effect(\%args)) if $args{before} eq 'ZZZ';
-	my $running = Audio::Nama::engine_running();
+	my $running = $this_engine->started();
 	pager("Cannot insert effect while engine is recording.\n"), return 
 		if $running and Audio::Nama::ChainSetup::really_recording();
 	pager("Cannot insert effect before controller.\n"), return 
@@ -679,7 +681,7 @@ sub insert_effect {
 	if ($running){
 		$ui->stop_heartbeat;
 		Audio::Nama::mute();
-		Audio::Nama::stop_command();
+		$this_engine->stop_command;
 		sleeper( 0.05); 
 	}
 	my $pos = fxn($args{before}) or die "$args{before}: effect ID not found";
@@ -697,8 +699,7 @@ sub insert_effect {
 
 	# remove corresponding chain operators from the engine
 	logpkg(__FILE__,__LINE__,'debug',"ops to remove and re-apply: @after_ops");
-	my $connected = Audio::Nama::eval_iam('cs-connected');
-	if ( $connected ){  
+	if ( $this_engine->valid_setup ){  
 		map{ remove_op($_)} reverse @after_ops; # reverse order for correct index
 	}
 
@@ -716,12 +717,12 @@ sub insert_effect {
 	logpkg(__FILE__,__LINE__,'debug',sub{"@{$track->ops}"});
 
 	# replace the corresponding Ecasound chain operators
-	if ($connected ){  
+	if ($this_engine->valid_setup){  
 		map{ fxn($_)->apply_op } @after_ops;
 	}
 		
 	if ($running){
-		Audio::Nama::eval_iam('start');	
+		ecasound_iam('start');	
 		sleeper(0.3);
 		Audio::Nama::unmute();
 		$ui->start_heartbeat;
@@ -821,9 +822,10 @@ sub apply_ops {  # in addition to operators in .ecs file
 		my $n = $track->n;
  		next unless Audio::Nama::ChainSetup::is_ecasound_chain($n);
 		logpkg(__FILE__,__LINE__,'debug', "chain: $n, offset: $fx->{offset}->{$n}");
+		$this_engine->reset_ecasound_selections_cache();
+		$this_engine->current_chain($n);
 		$track->apply_ops;
 	}
-	ecasound_select_chain($this_track->n) if defined $this_track;
 }
 
 sub remove_op {
@@ -833,15 +835,18 @@ sub remove_op {
 	local $config->{category} = 'ECI_FX';
 
 	# only if engine is configured
-	return unless Audio::Nama::valid_engine_setup();
+	return unless $this_engine->valid_setup();
 
 	my $id = shift;
 	my $self = fxn($id);
+	Audio::Nama::request_setup(), return if $self->is_channel_op;
 	my $n = $self->chain;
 
 	# select chain
 	
-	return unless ecasound_select_chain($n);
+	return unless $this_engine->valid_setup();
+	
+	$this_engine->current_chain($n);
 
 	# deal separately with controllers and chain operators
 	
@@ -854,23 +859,24 @@ sub remove_op {
 		logpkg(__FILE__,__LINE__,'debug', "ops list for chain $n: @{$ti{$n}->ops}");
 		logpkg(__FILE__,__LINE__,'debug', "operator id to remove: $id");
 		logpkg(__FILE__,__LINE__,'debug', "ready to remove from chain $n, operator id $id, index $index");
-		logpkg(__FILE__,__LINE__,'debug',sub{Audio::Nama::eval_iam("cs")});
-		Audio::Nama::eval_iam("cop-select ".  $self->ecasound_effect_index);
-		logpkg(__FILE__,__LINE__,'debug',sub{"selected operator: ". Audio::Nama::eval_iam("cop-selected")});
-		Audio::Nama::eval_iam("cop-remove");
-		logpkg(__FILE__,__LINE__,'debug',sub{Audio::Nama::eval_iam("cs")});
+		logpkg(__FILE__,__LINE__,'debug',sub{ecasound_iam("cs")});
+		$this_engine->current_chain_operator($self->ecasound_effect_index);
+		logpkg(__FILE__,__LINE__,'debug',sub{"selected operator: ". ecasound_iam("cop-selected")});
+		$this_engine->ecasound_iam("cop-remove");
+		$this_engine->reset_ecasound_selections_cache();
+		logpkg(__FILE__,__LINE__,'debug',sub{ecasound_iam("cs")});
 
 	} else { # controller
 
 		logpkg(__FILE__,__LINE__,'debug', "has parent, assuming controller");
 
 		my $ctrl_index = $self->ecasound_controller_index;
-		logpkg(__FILE__,__LINE__,'debug', Audio::Nama::eval_iam("cs"));
-		Audio::Nama::eval_iam("cop-select ".  $self->root_parent->ecasound_controller_index);
-		logpkg(__FILE__,__LINE__,'debug', "selected operator: ". Audio::Nama::eval_iam("cop-selected"));
-		Audio::Nama::eval_iam("ctrl-select $ctrl_index");
-		Audio::Nama::eval_iam("ctrl-remove");
-		logpkg(__FILE__,__LINE__,'debug', Audio::Nama::eval_iam("cs"));
+		logpkg(__FILE__,__LINE__,'debug', ecasound_iam("cs"));
+		$this_engine->current_chain_operator($self->root_parent->ecasound_controller_index);
+		logpkg(__FILE__,__LINE__,'debug', "selected operator: ". ecasound_iam("cop-selected"));
+		$this_engine->current_controller($ctrl_index);
+		$this_engine->ecasound_iam("ctrl-remove");
+		logpkg(__FILE__,__LINE__,'debug', ecasound_iam("cs"));
 	}
 }
 
@@ -915,7 +921,7 @@ sub new_effect_id {
 ## synchronize Ecasound chain operator parameters 
 #  with Nama effect parameter
 
-sub _update_effect {
+sub update_ecasound_effect {
 	local $config->{category} = 'ECI_FX';
 
 	# update the parameters of the Ecasound chain operator
@@ -923,8 +929,8 @@ sub _update_effect {
 	
 	#logsub("&update_effect");
 
-	return unless Audio::Nama::valid_engine_setup();
-	#my $es = Audio::Nama::eval_iam("engine-status");
+	return unless $this_engine->valid_setup;
+	#my $es = ecasound_iam("engine-status");
 	#logpkg(__FILE__,__LINE__,'debug', "engine is $es");
 	#return if $es !~ /not started|stopped|running/;
 
@@ -940,25 +946,23 @@ sub _update_effect {
 	# $param is zero-based. 
 	# $FX->params is  zero-based.
 
-	my $old_chain = Audio::Nama::eval_iam('c-selected') if Audio::Nama::valid_engine_setup();
-	ecasound_select_chain($chain);
+	$this_engine->current_chain($chain);
 
 	# update Ecasound's copy of the parameter
 	if( $FX->is_controller ){
 		my $i = $FX->ecasound_controller_index;
-		logpkg(__FILE__,__LINE__,'debug', "controller $id: track: $chain, index: $i param: $param, value: $val");
-		Audio::Nama::eval_iam("ctrl-select $i");
-		Audio::Nama::eval_iam("ctrlp-select $param");
-		Audio::Nama::eval_iam("ctrlp-set $val");
+		logpkg(__FILE__,__LINE__,'debug', "controller $id: track: $chain, index: $i, param: $param, value: $val");
+		$this_engine->current_controller($i);
+		$this_engine->current_controller_parameter($param);
+		$this_engine->ecasound_iam("ctrlp-set $val");
 	}
 	else { # is operator
-		my $i = $FX->ecasound_operator_index;
+		my $i = $FX->ecasound_effect_index;
 		logpkg(__FILE__,__LINE__,'debug', "operator $id: track $chain, index: $i, offset: ".  $FX->offset . " param $param, value $val");
-		Audio::Nama::eval_iam("cop-select ". ($FX->offset + $i));
-		Audio::Nama::eval_iam("copp-select $param");
-		Audio::Nama::eval_iam("copp-set $val");
+		$this_engine->current_chain_operator($i);
+		$this_engine->current_chain_operator_parameter($param);
+		$this_engine->ecasound_iam("copp-set $val");
 	}
-	ecasound_select_chain($old_chain);
 }
 
 # set both Nama effect and Ecasound chain operator
@@ -966,12 +970,13 @@ sub _update_effect {
 
 sub update_effect {
 	my ($id, $param, $val) = @_;
-	_update_effect( @_ );
 	return if ! defined fxn($id);
 	fxn($id)->params->[$param] = $val;
+	update_ecasound_effect( @_ );
 }
 
 sub sync_effect_parameters {
+	logsub('&sync_effect_parameters');
 	local $config->{category} = 'ECI_FX';
 
 	# when a controller changes an effect parameter, the
@@ -980,10 +985,12 @@ sub sync_effect_parameters {
 	#
 	# this routine syncs them in prep for save_state()
 	
- 	return unless Audio::Nama::valid_engine_setup();
-	my $old_chain = Audio::Nama::eval_iam('c-selected');
-	map{ $_->sync_one_effect } grep{ $_ }  map{ fxn($_) } ops_with_controller(), ops_with_read_only_params();
-	Audio::Nama::eval_iam("c-select $old_chain");
+ 	return unless $this_engine->valid_setup();
+   	push my @ops, ops_with_controller(), ops_with_read_only_params();
+	return unless @ops;
+	my $old_chain = $this_engine->current_chain;
+	map{ $_->sync_one_effect } grep{ $_ }  map{ fxn($_) } @ops;
+	$this_engine->current_chain($old_chain);
 }
 
 	
@@ -993,8 +1000,8 @@ sub get_ecasound_cop_params {
 	my $count = shift;
 	my @params;
 	for (1..$count){
-		Audio::Nama::eval_iam("copp-select $_");
-		push @params, Audio::Nama::eval_iam("copp-get");
+		$this_engine->current_chain_operator_parameter($_);
+		push @params, ecasound_iam("copp-get");
 	}
 	\@params
 }
@@ -1018,7 +1025,7 @@ sub find_op_offsets {
 
 	local $config->{category} = 'ECI_FX';
 	logsub("&find_op_offsets");
-	my @op_offsets = grep{ /"\d+"/} split "\n",Audio::Nama::eval_iam("cs");
+	my @op_offsets = grep{ /"\d+"/} split "\n",ecasound_iam("cs");
 	logpkg(__FILE__,__LINE__,'debug', join "\n\n",@op_offsets);
 	for my $output (@op_offsets){
 		my $chain_id;
@@ -1081,19 +1088,20 @@ sub set_bypass_state {
 	
 	local $config->{category} = 'ECI_FX';
 	my($track, $bypass_state, @ops) = @_;
+	logsub('&set_bypass_state');
 
 	# only process ops that belong to this track
 	@ops = intersect_with_track_ops_list($track,@ops);
 
+	$this_engine->current_chain($track->n);
 	$track->mute;
-	Audio::Nama::eval_iam("c-select ".$track->n);
 
 	foreach my $op ( @ops)
 	{ 
 		my $FX = fxn($op);
 		my $i = $FX->ecasound_effect_index;
-		Audio::Nama::eval_iam("cop-select $i");
-		Audio::Nama::eval_iam("cop-bypass $bypass_state");
+		$this_engine->current_chain_operator($i);
+		$this_engine->ecasound_iam("cop-bypass $bypass_state");
 		$FX->set(bypassed => ($bypass_state eq 'on') ? 1 : 0);
 	}
 	$track->unmute;
@@ -1114,8 +1122,7 @@ sub set_current_op {
 	my $op_id = shift;
 	my $FX = fxn($op_id);
 	return unless $FX;
-	my $track = $ti{$FX->chain};
-	$project->{current_op}->{$track->name} = $op_id;
+	$project->{current_op}->{$FX->trackname} = $op_id;
 }
 sub set_current_param {
 	my $parameter = shift;
@@ -1210,9 +1217,9 @@ sub fade {
 	my ($param, $from, $to, $seconds) = @_;
 
 	my $id = $self->id;
-	# no fade without Timer::HiRes
+	# no fade without Time::HiRes
 	# no fade unless engine is running
-	if ( engine_running() and $config->{hires_timer} )
+	if ( $this_engine->started() and $config->{hires_timer} )
 	{
 		my $steps = $seconds * $config->{fade_resolution};
 		my $wink  = 1/$config->{fade_resolution};
@@ -1225,6 +1232,43 @@ sub fade {
 		}		
 	}
 	$self->_modify_effect($param, $to)
+}
+
+sub plan_fade {
+	return unless $this_engine->started();
+	my $self = shift;
+	my %args = @_;
+	my $param   = $args{param}   || 1;
+	my $from    = $args{from}    || 0;
+	my $to	    = $args{to}      || 0;
+	my $seconds = $args{seconds} || 1;
+	my $in_future 	= $args{in_future};
+	my $steps 	= $seconds * $config->{fade_resolution};
+	my $wink  	= 1/$config->{fade_resolution};
+	my $id 		= $self->id;
+	my $size 	= ($to - $from)/$steps;
+	logpkg(__FILE__,__LINE__,'debug', "id: $id, param: $param, from: $from, to: $to, seconds: $seconds");
+	if ( not $in_future ){
+		for (1..$steps - 1){
+			$self->_modify_effect($param, $size, '+');
+			sleeper( $wink );
+		}		
+		$self->_modify_effect($param, $to)
+	}
+	else {
+		my $advance = $in_future;
+		my $coderef = sub { $self->_modify_effect($param, $size, '+') };
+		for (1..$steps - 1){
+			$advance += $wink;
+			schedule_fade($advance, $coderef)
+		}		
+		$advance += $wink;
+		schedule_fade($advance, sub { $self->_modify_effect($param, $to) } );
+		sub schedule_fade {
+			my ($after, $sub) = @_;
+			$project->{events}->{"fade_".$setup->{fade_counter}++} = AE::timer( $after, 0, $sub );
+		}
+	}
 }
 
 sub fadein {
@@ -1250,6 +1294,12 @@ sub mute_level {
 sub fade_out_level {
 	my $self = shift;
 	$config->{fade_out_level}->{$self->type}
+}
+sub ecasound_format {
+	my $self = shift;
+	my $cmd = '-'.$self->code;
+	$cmd .= ':'.join ',' ,@{$self->{params}} if $self->{params} and @{$self->{params}} > 0;
+	$cmd
 }
 
 } # end package Effect

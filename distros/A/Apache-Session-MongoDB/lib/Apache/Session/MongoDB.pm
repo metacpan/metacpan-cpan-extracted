@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use AutoLoader 'AUTOLOAD';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 our @ISA     = qw(Apache::Session);
 
 use Apache::Session;
@@ -33,6 +33,7 @@ our $default;
 1;
 
 __END__
+
 sub searchOn {
     my ( $class, $args, $selectField, $value, @fields ) = @_;
     return $class->_query( $args, { $selectField => $value }, @fields );
@@ -49,40 +50,39 @@ sub _query {
     my ( $class, $args, $filter, @fields ) = @_;
     my $col    = $class->_col($args);
     my $cursor = $col->find($filter);
-    my $res;
+    if (@fields) {
+        $cursor =
+          $cursor->fields( { map { $_ => 1 } @fields, "_session_id" => 1 } );
+    }
+    my %res;
     while ( my $r = $cursor->next ) {
         my $id = $r->{_session_id};
         delete $r->{_id};
-        if (@fields) {
-            $res->{$id}->{$_} = $r->{$_} foreach (@fields);
-        }
-        else {
-            $res->{$id} = $r;
-        }
+        $res{$id} = $r;
     }
-    return $res;
+    return \%res;
 }
 
 sub get_key_from_all_sessions {
     my ( $class, $args, $data ) = @_;
-    my $col = $class->_col($args);
+    my $col    = $class->_col($args);
     my $cursor = $col->find( {} );
-    my $res;
+    my %res;
     while ( my $r = $cursor->next ) {
         my $id = $r->{_session_id};
         delete $r->{_id};
         if ( ref($data) eq 'CODE' ) {
-            $res->{$id} = $data->( $r, $id );
+            $res{$id} = $data->( $r, $id );
         }
         elsif ($data) {
             $data = [$data] unless ( ref $data );
-            $res->{$id}->{$_} = $r->{$_} foreach (@$data);
+            $res{$id}->{$_} = $r->{$_} foreach (@$data);
         }
         else {
-            $res->{$id} = $r;
+            $res{$id} = $r;
         }
     }
-    return $res;
+    return \%res;
 }
 
 sub _col {

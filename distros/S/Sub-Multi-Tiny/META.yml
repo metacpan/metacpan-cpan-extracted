@@ -38,18 +38,18 @@ no_index:
 provides:
   Sub::Multi::Tiny:
     file: lib/Sub/Multi/Tiny.pm
-    version: '0.000011'
+    version: '0.000012'
   Sub::Multi::Tiny::Dispatcher::Default:
     file: lib/Sub/Multi/Tiny/Dispatcher/Default.pm
-    version: '0.000011'
+    version: '0.000012'
   Sub::Multi::Tiny::Dispatcher::TypeParams:
     file: lib/Sub/Multi/Tiny/Dispatcher/TypeParams.pm
-    version: '0.000011'
+    version: '0.000012'
   Sub::Multi::Tiny::SigParse:
     file: lib/Sub/Multi/Tiny/SigParse.pm
   Sub::Multi::Tiny::Util:
     file: lib/Sub/Multi/Tiny/Util.pm
-    version: '0.000011'
+    version: '0.000012'
 requires:
   Attribute::Handlers: '0.79'
   Carp: '0'
@@ -74,7 +74,7 @@ resources:
   bugtracker: https://github.com/cxw42/Sub-Multi-Tiny/issues
   homepage: https://github.com/cxw42/Sub-Multi-Tiny
   repository: git://github.com/cxw42/Sub-Multi-Tiny.git
-version: '0.000011'
+version: '0.000012'
 x_authority: cpan:CXW
 x_contributors:
   - 'Mohammad S Anwar <manwar@cpan.org>'

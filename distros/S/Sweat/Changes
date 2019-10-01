@@ -1,5 +1,13 @@
 Revision history for Perl extension Sweat
 
+201909240 2019-09-24T20:55:34Z
+
+    - Adding a "language" config option for setting Wikipedia localization.
+    
+    - Declining to follow links to Wikipedia articles with numerals in the title, in an effort to avoid boring chains of annual-statistics pages.
+
+    - Configuring the internal MediaWiki::API object to automatically retry a few times if any response from the wiki takes more than a couple of seconds.
+    
 201909171 2019-09-18T03:00:57Z
 
     - Making use of File::Which, rather than assuming the presence of a `command` command. (Thanks to Kivanc Yazan for pointing this problem out.)

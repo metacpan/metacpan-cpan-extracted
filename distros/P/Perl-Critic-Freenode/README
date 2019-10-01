@@ -85,6 +85,10 @@ POLICIES
 
       Don't use mod_perl to write web applications
 
+    Perl::Critic::Policy::Freenode::MultidimensionalArrayEmulation
+
+      Don't use multidimensional array emulation
+
     Perl::Critic::Policy::Freenode::OpenArgs
 
       Always use the three-argument form of open()

@@ -17,13 +17,9 @@ sub add_path_for_rec {
 	my($g,$track) = @_;
 
 	logsub("&add_path_for_rec: track ".$track->name);
-	# Track input from a WAV, JACK client, or soundcard
-	# Record 'raw' signal
-	#
-	# Do *not* record signals if the source reports it is
-	# a track, bus or loop
 
-	if( $track->source_type !~ /track|bus|loop/ )
+	# Case 1: Regular track
+	if( $track->source_type !~ /track|bus|loop/  and !  $track->is_mixing)
 	{
 		# create temporary track for rec_file chain
 
@@ -60,45 +56,30 @@ sub add_path_for_rec {
 		});
 
 	} 
-	elsif ($track->source_type =~ /bus|track/) 
+	# Case 2: Mix track
+	elsif ($track->source_type =~ /bus|track/ or $track->is_mixing) 
 	{
 
-		# for tracks with identified (track|bus) input
+		my $name = $track->name . '_rec_file';
+		my $anon = Audio::Nama::SlaveTrack->new( 
+			target => $track->name,
+			rw => OFF,
+			group => 'Temp',
+			hide => 1,
+			novol => 1,
+			nopan => 1,
+			name => $name);
 
-		# cache_tracks/merge_edits has its own logic
-		# therefore these connections (triggered from
-		# generate_setup()) will not affect AFAIK
-		# any other recording scenario
-
-		# special case, record 'cooked' signal
-
-		# generally a bus 
-
-		# - receives a stereo input
-		# - mix track width is set to stereo (default)
-
-		my @edge = ($track->name, 'wav_out'); # cooked signal
+		my @edge = ($track->name, 'wav_out');
 
 		$g->add_path(@edge); 
 
-		# set chain_id to R3 (if original track is 3) 
+		# set chain_id same as original track
 
 		$g->set_edge_attributes(@edge, { 
-			chain_id => 'R'.$track->n,
+			chain_id => $track->n,
 		});
 		
-		# if this path is left unconnected, 
-		# i.e. track gets no input		
-		# it will be removed by prune_graph()
-		
-		# to record raw:
-		
-		# source_type: loop
-		# source_id:   loop,track_name_in
-
-		# but for WAV to contain content, 
-		# we need to guarantee that track_name has
-		# an input
 	}
 }
 sub add_path_for_aux_send {
@@ -197,10 +178,10 @@ sub add_loop {
 		add_far_side_loop($g,$a,$b, in_loop($b))
 	} elsif ($fan_in == 1 and $fan_out == 1){
 
-	# we expect a single user track to feed to Master_in 
+	# we expect a single user track to feed to Main_in 
 	# as multiple user tracks do
 	
-			$b eq 'Master' 
+			$b eq 'Main' 
 				?  add_far_side_loop($g,$a,$b,in_loop($b))
 
 	# otherwise default to near_side ( *_out ) loops

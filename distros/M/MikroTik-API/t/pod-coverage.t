@@ -18,5 +18,5 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
 all_pod_coverage_ok({
-    also_private => [ 'BUILD' ],
+    also_private => [ 'BUILD', 'SO_KEEPALIVE', 'SO_KEEPALIVE', 'SO_SNDTIMEO' ],
 });

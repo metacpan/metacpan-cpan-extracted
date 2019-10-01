@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Test::HTTP::LocalServer;
-use LWP::Simple qw(get);
 
 use Test::More tests => 2;
 
@@ -14,7 +13,13 @@ is $res, 1, "PID $pid is an existing process";
 
 $server->stop;
 
-sleep 5; # just give it more time to be really sure
+my $timeout = time + 5;
 
-$res = kill 0, $pid;
+# just give it more time to be really sure
+while ( time < $timeout ) {
+    sleep 0.1;
+    $res = kill 0, $pid;
+    last if defined $res and $res == 0;
+};
+
 is $res, 0, "PID $pid doesn't exist anymore";

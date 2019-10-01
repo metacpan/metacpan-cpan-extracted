@@ -14,7 +14,7 @@ my $debug     = 'error';
 my $maintests = 18;
 my ( $op, $rp, $res );
 my %handlerOR = ( op => [], rp => [] );
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 LWP::Protocol::PSGI->register(
     sub {
@@ -72,7 +72,7 @@ SKIP: {
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
 
@@ -241,7 +241,6 @@ SKIP: {
 #print STDERR Dumper($res);
 
 count($maintests);
-eval { unlink 't/userdb.db' };
 done_testing( count() );
 
 sub switch {
@@ -266,7 +265,7 @@ sub op {
                     demo => 'Demo;Demo;Demo',
                     sql  => 'DBI;DBI;DBI',
                 },
-                dbiAuthChain        => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain        => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser         => '',
                 dbiAuthPassword     => '',
                 dbiAuthTable        => 'users',
@@ -380,8 +379,9 @@ sub rp {
                 },
                 oidcOPMetaDataOptions => {
                     op => {
-                        oidcOPMetaDataOptionsJWKSTimeout  => 0,
-                        oidcOPMetaDataOptionsClientSecret => "rpsecret",
+                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
+                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
+                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",

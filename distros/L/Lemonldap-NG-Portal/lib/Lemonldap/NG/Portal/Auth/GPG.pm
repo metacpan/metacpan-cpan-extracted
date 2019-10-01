@@ -16,7 +16,7 @@ our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm';
 
-has db => ( is => 'rw' );
+has db  => ( is => 'rw' );
 has tmp => (
     is      => 'rw',
     default => sub {

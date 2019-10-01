@@ -1,0 +1,6 @@
+<%Content
+  mode="content-show"
+  name="<%ID/f%>"
+  preview="1"
+  path="/bits/content/list-row-1"
+%><%End%>

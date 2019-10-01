@@ -26,6 +26,7 @@ my $client = LLNG::Manager::Test->new( {
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,
             impersonationMergeSSOgroups    => 0,
+            checkUserHiddenAttributes      => '_loginHistory hGroups',
             macros                         => {
                 test_impersonation => '"$testPrefix__user/$_user"',
                 _whatToTrace =>

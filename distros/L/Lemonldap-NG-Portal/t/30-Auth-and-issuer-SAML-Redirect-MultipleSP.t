@@ -331,6 +331,7 @@ sub issuer {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
+                pdataDomain            => 'idp.com',
                 portal                 => 'http://auth.idp.com',
                 authentication         => 'Demo',
                 userDB                 => 'Same',
@@ -464,6 +465,7 @@ sub sp {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',
+                pdataDomain                       => 'sp.com',
                 portal                            => 'http://auth.sp.com',
                 authentication                    => 'SAML',
                 userDB                            => 'Same',

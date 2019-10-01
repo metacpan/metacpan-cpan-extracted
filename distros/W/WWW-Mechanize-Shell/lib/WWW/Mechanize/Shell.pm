@@ -15,7 +15,7 @@ use HTML::Display qw();
 use HTML::TokeParser::Simple;
 use B::Deparse;
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 our @EXPORT = qw( &shell );
 
 =head1 NAME
@@ -140,8 +140,8 @@ sub init {
   $self->{redirect_ok_wrapper} = wrap 'WWW::Mechanize::redirect_ok',
     post => sub {
         return unless $_[1];
-        $self->status( "\nRedirecting to ".$_[1]->uri."\n" ); 
-        $_[-1] 
+        $self->status( "\nRedirecting to ".$_[1]->uri."\n" );
+        $_[-1]
     };
 
   # Load the proxy settings from the environment
@@ -707,7 +707,7 @@ sub run_title {
 
 Prints all C<< <H1> >> through C<< <H5> >> strings found in the content,
 indented accordingly.  With an argument, prints only those
-levels; e.g., C<headers 145> prints H1,H4,H5 strings only. 
+levels; e.g., C<headers 145> prints H1,H4,H5 strings only.
 
 =cut
 
@@ -1144,7 +1144,7 @@ sub run_open {
     my $re = $link if ref $link;
     my $count = -1;
     my @possible_links = $self->agent->links();
-    my @links = defined $re 
+    my @links = defined $re
         ? map { $count++; my $t = $_->text; defined $t && $t =~ /$re/ ? $count : () } @possible_links
         : map { $count++; my $t = $_->text; defined $t && $t eq $link ? $count : () } @possible_links;
     if (@links > 1) {
@@ -1449,8 +1449,8 @@ sub run_table {
     };
     $code->();
     my $body = $self->munge_code($code);
-    
-    $self->add_history( 
+
+    $self->add_history(
         "require HTML::TableExtract;\n",
         sprintf( 'my @columns = ( %s );'."\n", join( ",", map( { s/(['\\])/\\$1/g; qq('$_') } @columns ))),
         $body
@@ -1617,8 +1617,8 @@ sub run_eval {
         return
     };
     print join "", @res,"\n";
-    
-    
+
+
     my $script_code = $self->munge_code(qq{print $code, "\\n";});
     #warn "Script: $script_code<<";
     $self->add_history( $script_code );
@@ -1784,7 +1784,7 @@ our %munge_map = (
 sub munge_code {
     my ($self, $code) = @_;
     my $body;
-    
+
     if (ref $code) {
         # Munge code
         my $d = B::Deparse->new('-sC');
@@ -1795,11 +1795,11 @@ sub munge_code {
     } else {
         $body = $code
     }
-    
+
     while (my ($key,$val) = each %munge_map) {
         $body =~ s/$key/$val/gs;
     };
-    
+
     $body
 };
 
@@ -1834,7 +1834,7 @@ sub shell {
   use WWW::Mechanize::FormFiller;
   use base 'WWW::Mechanize::FormFiller::Value::Callback';
 
-  our $VERSION = '0.57';
+  our $VERSION = '0.58';
 
   sub new {
     my ($class,$name,$shell) = @_;
@@ -2078,7 +2078,7 @@ invocation of the shell like with CPAN :
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<https://github.com/Corion/WWW-Mechanize-Shell>.
 
 =head1 SUPPORT

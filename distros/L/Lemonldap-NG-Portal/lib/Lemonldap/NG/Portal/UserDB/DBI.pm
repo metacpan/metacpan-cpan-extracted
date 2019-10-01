@@ -6,7 +6,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 
 extends 'Lemonldap::NG::Portal::Lib::DBI';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # PROPERTIES
 
@@ -38,7 +38,7 @@ sub getUser {
         eval { $self->p->_authentication->setSecurity($req) };
         return PE_ERROR;
     }
-    unless ( $req->data->{entry} = $sth->fetchrow_hashref() ) {
+    unless ( $req->data->{dbientry} = $sth->fetchrow_hashref() ) {
         $self->userLogger->warn("User $user not found");
         eval { $self->p->_authentication->setSecurity($req) };
         return PE_BADCREDENTIALS;
@@ -54,8 +54,8 @@ sub setSessionInfo {
 
     foreach my $var ( keys %{ $self->exportedVars } ) {
         my $attr = $self->exportedVars->{$var};
-        $req->{sessionInfo}->{$var} = $req->data->{entry}->{$attr}
-          if ( defined $req->data->{entry}->{$attr} );
+        $req->{sessionInfo}->{$var} = $req->data->{dbientry}->{$attr}
+          if ( defined $req->data->{dbientry}->{$attr} );
     }
     PE_OK;
 }

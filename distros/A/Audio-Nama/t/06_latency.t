@@ -1,7 +1,5 @@
-use Test::More tests => 6;
+use Test2::Bundle::More;
 use strict;
-use Data::Dumper::Concise;
-
 use Audio::Nama::Lat;
 
 my $lat = Audio::Nama::Lat->new(4,8);
@@ -14,4 +12,5 @@ is_deeply( $lat->add_latency($lat2), Audio::Nama::Lat->new(20,40), "Latency addi
 is_deeply( Audio::Nama::Lat->new(20,40), ($lat + $lat2), "Latency addition, overloading '+' operator");
 is(do{ eval {Audio::Nama::Lat->new(1,0)}; defined $@}, 1, "Exception on Max greater than Min");
 
-1;
+done_testing();
+__END__

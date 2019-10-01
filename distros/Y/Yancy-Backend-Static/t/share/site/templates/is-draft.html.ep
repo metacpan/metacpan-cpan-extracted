@@ -1,0 +1,1 @@
+<%== $item->{draft} ? "Yes a draft" : "Not a draft" =%>

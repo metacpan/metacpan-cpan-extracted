@@ -1,6 +1,7 @@
 use Test::More;
 use JSON;
 use MIME::Base64;
+use Data::Dumper;
 
 require 't/test-psgi-lib.pm';
 
@@ -60,7 +61,7 @@ ok( $res->[2]->[0] eq 'Auth', 'Get auth result' )
   or print "Expect Auth, got $res->[2]->[0]\n";
 count(3);
 
-# Pad path test
+# Bad path test
 
 ok( $res = $client->_get('/[]/test'), 'Try a bad path' );
 ok( $res->[0] == 400, 'Response is 400' );

@@ -1,0 +1,5 @@
+<%Content
+  mode="content-revert-all"
+  time={<%CgiParam/f name="revert_to"%>}
+  path="/bits/content/revert-success"
+%>

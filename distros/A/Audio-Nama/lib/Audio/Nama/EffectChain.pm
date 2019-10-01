@@ -29,58 +29,34 @@ use Audio::Nama::Object qw(
 		ops_list			
         ops_data			
 		inserts_data		
+		fade_data			
 		region				
 		attrib 				
 		class				
+        is_mixing           
+		source_tag 			
 
 		);
 @attributes = qw(
-			name
-			bypass
-			id	
-			project			
-			global		
-			profile	
-			user
-			system	
-			track_name
-			track_version_result 
-			track_version_original
-			track_target_original
-			insert				
-			track_cache	
-			track_target
+
+  		name				
+  		project				
+  		global				
+  		profile				
+  		user				
+  		system				
+  		track_name			
+  		track_version_result 	
+  		track_version_original 	
+  		track_target_original 
+  		insert				
+  		track_cache			
+ 		track_target		
+  		bypass				
+  		id					
+
 	) ;
 
-### 	attributes for searching, sorting, used by external functions
-# 		name				# for user-defined effect chains
-# 
-# 		bypass				# used for identifying effect bypass (obsolete)
-# 		id					# effect id, for storing single effect with controllers
-# 							# for bypass (probably obsolete)	
-# 
-# 		project				# true value identifies project-specific effect chain
-# 
-# 		global				# true value identified global effect chain,
-# 							# not project specific, usually user-defined
-# 
-# 		profile				# name of associated effect profile
-# 
-# 		user				# true value identifies user created effect chain
-# 
-# 		system				# true value identifies system generated effect chain
-# 
-# 		track_name			# applies to a track of this name
-# 
-# 		track_version_result 	# WAV version of track after caching
-# 
-# 		track_version_original 	# WAV version of track before caching 
-# 
-# 		insert				# true value identifies belonging to an insert
-# 		
-# 		track_cache			# true value identifies belonging to track caching
-#
-# 		track_target_original #	WAV files were from this track
 
 %is_attribute = map{ $_ => 1 } @attributes;
 initialize();
@@ -129,6 +105,7 @@ sub new {
 		$vals{inserts_data} ||= [];
 		$vals{ops_list} 	||= [];
 		$vals{ops_data} 	||= {};
+		$vals{fade_data}    ||= [];
 		croak "undeclared field in: @_" if grep{ ! $_is_field{$_} } keys %vals;
 		croak "must have exactly one of 'global' or 'project' fields defined" 
 			unless ($vals{attrib}{global} xor $vals{attrib}{project});
@@ -358,8 +335,16 @@ sub add {
 	my $added = $self->add_ops($track, $args);
 	$self->add_inserts($track);
 	$self->add_region($track) if $self->region;
+	$self->add_fades($track) if $self->fade_data;
 	$added
 
+}
+sub add_fades {
+	my ($self, $track) = @_;
+	map{ 
+		my %h = %$_; 
+		my $fade = Audio::Nama::Fade->new( %h, track => $track->name ) ;
+	} @{ $self->{fade_data} }
 }
 sub destroy {
 	my $self = shift;
@@ -462,7 +447,7 @@ sub new_effect_profile {
 			user		=> 1,
 			global		=> 1,
 			track_name	=> $_,
-			ops_list	=> [ $tn{$_}->fancy_ops ],
+			ops_list	=> [ $tn{$_}->user_ops ],
 			inserts_data => $tn{$_}->inserts,
 		);
 	} @tracks;

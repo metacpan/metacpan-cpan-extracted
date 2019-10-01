@@ -1,7 +1,7 @@
 package ShellCompleter::Util;
 
-our $DATE = '2018-09-25'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $DATE = '2019-08-17'; # DATE
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,6 +56,7 @@ sub run_shell_completer_for_getopt_long_app {
             if ($type eq 'arg') {
                 return _complete($f_args{'{arg}'}, \%c_args);
             } elsif ($type eq 'optval') {
+                return unless $c_args{ospec};
                 return _complete($f_args{ $c_args{ospec} }, \%c_args);
             }
             undef;
@@ -79,7 +80,7 @@ ShellCompleter::Util - Utility routines for App::ShellCompleter::*
 
 =head1 VERSION
 
-This document describes version 0.030 of ShellCompleter::Util (from Perl distribution ShellCompleter-Util), released on 2018-09-25.
+This document describes version 0.031 of ShellCompleter::Util (from Perl distribution ShellCompleter-Util), released on 2019-08-17.
 
 =head1 SYNOPSIS
 
@@ -123,7 +124,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

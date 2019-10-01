@@ -1,7 +1,7 @@
 # File    : Net::FTPSSL
 # Author  : cleach <cleach at cpan dot org>
 # Created : 01 March 2005
-# Version : 0.41
+# Version : 0.42
 # Revision: -Id: FTPSSL.pm,v 1.24 2005/10/23 14:37:12 cleach Exp -
 
 package Net::FTPSSL;
@@ -88,7 +88,7 @@ my $debug_log_msg;  # Used if Debug is turned on
 
 
 BEGIN {
-    $VERSION = "0.41";              # The version of this module!
+    $VERSION = "0.42";              # The version of this module!
 
     my $type = "IO::Socket::SSL";
     $ipv6 = 0;                      # Assume IPv4 only ...
@@ -1053,7 +1053,7 @@ sub _common_list {
   # ----- The Forwarded Arguments --------------------------
   my $path      = shift || undef;  # Causes "" to be treated as "."!
   my $orig_ptrn = shift || undef;  # Only wild cards are * and ? (same as ls cmd)
-  my $ftype     = shift || 0;      # Only used for MLST!
+  my $ftype     = shift || 0;      # Only used for MLSD!
 
   my $dati = "";
 
@@ -3016,6 +3016,16 @@ sub size {
    return ( $self->_test_croak (undef) );   # It's not a regular file!
 }
 
+sub ls {
+   my $self = shift;
+   return ( $self->nlst (@_) );
+}
+
+sub dir {
+   my $self = shift;
+   return ( $self->list (@_) );
+}
+
 sub is_file {
    my $self = shift;
    my $file = shift;
@@ -4651,7 +4661,7 @@ __END__
 
 Net::FTPSSL - A FTP over TLS/SSL class
 
-=head1 VERSION 0.41
+=head1 VERSION 0.42
 
 Z<>
 
@@ -5279,6 +5289,15 @@ lines in the file.
 Finally if the file isn't a regular file, it may in some cases return I<undef>.
 Depending on which FTP command was available to calculate the file's size with.
 
+=item dir( [DIRECTORY [, PATTERN]] )
+
+This is an alias to B<list>.  Returns an array of filenames in the long detailed
+format.
+
+=item ls( [DIRECTORY [, PATTERN]] )
+
+This is an alias to B<nlst>.  Returns an array of filenames in name only format.
+
 =item last_message() or message()
 
 Use either one to collect the last response from the FTPS server.  This is the
@@ -5635,14 +5654,13 @@ collection of modules (libnet).
 
 Please report any bugs with a FTPS log file created via options B<Debug=E<gt>1>
 and B<DebugLogFile=E<gt>"file.txt"> along with your sample code at
-L<http://search.cpan.org/~cleach/Net-FTPSSL-0.41/FTPSSL.pm> or
 L<https://metacpan.org/pod/Net::FTPSSL>.
 
 Patches are appreciated when a log file and sample code are also provided.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009 - 2018 Curtis Leach. All rights reserved.
+Copyright (c) 2009 - 2019 Curtis Leach. All rights reserved.
 
 Copyright (c) 2005 Marco Dalla Stella. All rights reserved.
 

@@ -14,6 +14,9 @@ my $debug = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
 
+eval { require XML::Simple };
+plan skip_all => "Missing dependencies: $@" if ($@);
+
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
     sub {

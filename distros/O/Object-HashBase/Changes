@@ -1,3 +1,7 @@
+0.008     2019-09-24 16:38:29-07:00 America/Los_Angeles
+
+    - Add the '+' attribute prefix (constant only)
+
 0.007     2019-09-19 16:43:04-07:00 America/Los_Angeles
 
     - Add < and > attribute prefixes (read only and write-only)

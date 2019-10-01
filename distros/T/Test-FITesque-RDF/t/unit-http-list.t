@@ -53,9 +53,7 @@ cmp_deeply($data,
               'http_req_res_list_unauthenticated',
               {
 					'-special' => {
-										'regex-fields' => ignore(),
-										'http-requests' => ignore(),
-										'http-responses' => ignore(),
+										'http-pairs' => ignore(),
 										'description' => 'More elaborate HTTP vocab for PUT then GET test'
 									  },
               }
@@ -65,35 +63,30 @@ cmp_deeply($data,
 
 my $params = $data->[0]->[1]->[1]->{'-special'};
 
-is(scalar @{$params->{'http-requests'}}, 2, 'There are two requests');
+is(scalar @{$params->{'http-pairs'}}, 2, 'There are two request-response pairs');
 
-foreach my $req (@{$params->{'http-requests'}}) {
-  object_ok($req, 'Checking request object',
+foreach my $pair (@{$params->{'http-pairs'}}) {
+  object_ok($pair->{request}, 'Checking request object',
 				isa => ['HTTP::Request'],
 				can => [qw(method uri headers content)]
 			  );
-}
-
-is(${$params->{'http-requests'}}[0]->method, 'PUT', 'First method is PUT');
-is(${$params->{'http-requests'}}[1]->method, 'GET', 'Second method is GET');
-
-like(${$params->{'http-requests'}}[0]->content, qr/dahut/, 'First request has content');
-
-
-is(scalar @{$params->{'http-responses'}}, 2, 'There are two responses');
-
-foreach my $res (@{$params->{'http-responses'}}) {
-  object_ok($res, 'Checking response object',
+  object_ok($pair->{response}, 'Checking response object',
 				isa => ['HTTP::Response'],
 				can => [qw(code headers)]
 			  );
 }
 
-is(${$params->{'http-responses'}}[0]->code, '201', 'First code is 201');
-is(${$params->{'http-responses'}}[1]->content_type, 'text/turtle', 'Second ctype is turtle');
+is(${$params->{'http-pairs'}}[0]->{request}->method, 'PUT', 'First method is PUT');
+is(${$params->{'http-pairs'}}[1]->{request}->method, 'GET', 'Second method is GET');
 
-cmp_deeply([${$params->{'http-responses'}}[1]->header('Content-Type')], bag("text/turtle"), 'Response header field value bag comparison can be used for single values');
-cmp_deeply([${$params->{'http-responses'}}[1]->header('Accept-Post')], bag("text/turtle", "application/ld+json"), 'Response header field value bag comparison');
+like(${$params->{'http-pairs'}}[0]->{request}->content, qr/dahut/, 'First request has content');
+
+
+is(${$params->{'http-pairs'}}[0]->{response}->code, '201', 'First code is 201');
+is(${$params->{'http-pairs'}}[1]->{response}->content_type, 'text/turtle', 'Second ctype is turtle');
+
+cmp_deeply([${$params->{'http-pairs'}}[1]->{response}->header('Content-Type')], bag("text/turtle"), 'Response header field value bag comparison can be used for single values');
+cmp_deeply([${$params->{'http-pairs'}}[1]->{response}->header('Accept-Post')], bag("text/turtle", "application/ld+json"), 'Response header field value bag comparison');
 
 # TODO: Test retrieving content from URI
 

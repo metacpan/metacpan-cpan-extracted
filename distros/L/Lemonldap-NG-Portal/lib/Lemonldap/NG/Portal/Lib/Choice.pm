@@ -7,7 +7,7 @@ use Safe;
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 has modules => ( is => 'rw', default => sub { {} } );
 
@@ -188,7 +188,7 @@ sub _buildAuthLoop {
           split( /[;\|]/, $self->conf->{authChoiceModules}->{$_} );
 
         unless ( $_choiceRules->{$_} ) {
-            $self->logger->error("$_ has no rule !!!");
+            $self->logger->error("$_ has no rule");
             $_choiceRules->{$_} = sub { 1 };
         }
         unless ( $_choiceRules->{$_}->( $req->env ) ) {

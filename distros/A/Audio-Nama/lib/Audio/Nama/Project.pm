@@ -31,17 +31,11 @@ sub this_wav_dir {
 	);
 }
 }
-
+sub waveform_dir { join_path(project_dir(), q(.waveform) ) }
 sub project_dir {
 	$config->{opts}->{p} and return $config->{root_dir}; # cwd
 	$project->{name} and join_path( project_root(), $project->{name}) 
 }
-sub this_op { $this_track and $this_track->op }
-sub this_op_o { $this_track and $this_track->op and fxn($this_track->op) }
-sub this_param { $this_track ? $this_track->param : ""}
-sub this_stepsize { $this_track ? $this_track->stepsize : ""}
-sub this_track_name { $this_track ? $this_track->name : "" }
-
 # we prepend a slash 
 sub bus_track_display { 
 	my ($busname, $trackname) = ($this_bus, $this_track && $this_track->name || '');
@@ -58,9 +52,10 @@ sub list_projects {
 }
 
 sub initialize_project_data {
+
 	logsub("&initialize_project_data");
 
-	return if transport_running();
+	-d Audio::Nama::waveform_dir() or mkdir Audio::Nama::waveform_dir();
 	$ui->destroy_widgets();
 	$ui->project_label_configure(
 		-text => uc $project->{name}, 
@@ -88,12 +83,12 @@ sub initialize_project_data {
 
 	$mode->{mastering} = 0;
 
-	$project->{save_file_version_number} = 0; 
 	$project->{track_comments} = {};
 	$project->{track_version_comments} = {};
 	$project->{repo} = undef;
 	$project->{artist} = undef;
 	$project->{bunch} = {};	
+	$project->{sample_rate} = $config->{sample_rate};
 	
 	create_system_buses();
 	$this_bus = 'Main';
@@ -104,11 +99,16 @@ sub initialize_project_data {
 	$mode->{offset_run} = 0;
 	$this_edit = undef;
 	
-	$mode->{preview} = $config->{initial_mode};
+	{
+	no warnings 'uninitialized';
+	$mode->{preview}++ if $config->{initial_mode} eq 'preview';
+	$mode->{doodle}++  if $config->{initial_mode} eq 'doodle';
+	}
 
 	Audio::Nama::ChainSetup::initialize();
 	reset_hotkey_buffers();
 	reset_command_buffer();
+	$this_engine->reset_ecasound_selections_cache();
 
 }
 
@@ -120,12 +120,13 @@ sub load_project {
 	$config->{opts}->{c} and $args{create}++;
 	if (! $project->{name} or $project->{name} and ! -d project_dir() and ! $args{create})
 	{
+		no warnings 'uninitialized';
 		Audio::Nama::pager_newline(qq(Project "$project->{name}" not found. Loading project "untitled".)); 
 		$project->{name} = "untitled", $args{create}++,
 	}
 	if ( ! -d project_dir() )
 	{
-		map{create_dir($_)} project_dir(), this_wav_dir() if $args{create};
+		map{create_dir($_)} project_dir(), this_wav_dir(), waveform_dir() if $args{create};
 	}
 
 	# we used to check each project dir for customized .namarc
@@ -139,12 +140,11 @@ sub load_project {
 	restart_wav_memoize();
 	initialize_project_git_repository();
 	restore_state($args{settings}) unless $config->{opts}->{M} ;
-	initialize_mixer() if not $tn{Master};
 
 	$config->{opts}->{M} = 0; # enable 
 	
-	# $args{nodig} allow skip for convert_project_format
-	dig_ruins() unless (scalar @Audio::Nama::Track::all > 2 ) or $args{nodig};
+	initialize_mixer();
+	dig_ruins(); # in case there are audio files, but no tracks present
 
 	git_commit("initialize new project") if $config->{use_git};
 
@@ -168,21 +168,46 @@ sub restore_state {
 		}
 		else { restore_state_from_vcs($name)  }
 }
+sub initialize_mixer {
+	return if $tn{Main};
+		Audio::Nama::SimpleTrack->new( 
+			group => 'Null', 
+			name => 'Main',
+			send_type => 'soundcard',
+			send_id => 1,
+			width => 2,
+			rw => MON,
+			source_type => 'bus',
+			source_id => 'Main',
+			); 
 
-sub dig_ruins { # only if there are no tracks 
+		my $mixdown = Audio::Nama::MixDownTrack->new( 
+			group => 'Mixdown', 
+			name => 'Mixdown', 
+			width => 2,
+			rw => OFF,
+			source_type => 'track',
+			source_id => 'Main',
+			send_type => 'soundcard',
+			send_id => 1,
+			); 
+	$ui->create_master_and_mix_tracks();
+}
+
+
+
+sub dig_ruins {
 	
 	logsub("&dig_ruins");
 	return if user_tracks_present();
-	logpkg(__FILE__,__LINE__,'debug', "looking for WAV files");
+	logpkg(__FILE__,__LINE__,'debug', "looking for audio files");
 
-	# look for wave files
-		
 	my $d = this_wav_dir();
 	opendir my $wav, $d or carp "couldn't open directory $d: $!";
 
 	# remove version numbers
 	
-	my @wavs = grep{s/(_\d+)?\.wav//i} readdir $wav;
+	my @wavs = grep{s/(_\d+)?\.wav$//i} readdir $wav;
 
 	closedir $wav if $wav;
 
@@ -193,8 +218,6 @@ sub dig_ruins { # only if there are no tracks
 
 	logpkg(__FILE__,__LINE__,'debug', "tracks found: @wavs");
  
-	initialize_mixer();
-
 	map{add_track($_)}@wavs;
 
 }
@@ -223,38 +246,26 @@ sub remove_riff_header_stubs {
 sub create_system_buses {
 	logsub("&create_system_buses");
 
-	# The following are Audio::Nama::Bus objects, no routing.
-	# They are hidden from the user.
-	
 	my $buses = q(
-			Master		# master fader track
-			Mixdown		# mixdown track
-			Mastering	# mastering network
-			Insert		# auxiliary tracks for inserts
-			Cooked		# for track caching
-			Temp		# temp tracks while generating setup
+		Main 		Audio::Nama::SubBus send_type track send_id Main	# master fader track
+		Mixdown		Audio::Nama::Bus									# mixdown track
+		Mastering	Audio::Nama::Bus									# mastering network
+		Insert		Audio::Nama::Bus									# auxiliary tracks for inserts
+		Cooked		Audio::Nama::Bus									# for track caching
+		Temp		Audio::Nama::Bus									# temp tracks while generating setup
+        Null		Audio::Nama::Bus 									# unrouted for Main
+		Midi		Audio::Nama::MidiBus	send_type null send_id null # all MIDI tracks
+		Aux			Audio::Nama::SubBus	send_type null 				# routed only from track source_* and send_* fields
 	);
-	($buses) = strip_comments($buses); # need initial parentheses
-	my @system_buses = split " ", $buses;
-
-	# create them
-	
-	map{ Audio::Nama::Bus->new(name => $_ ) } @system_buses;
-
-	map{ $config->{_is_system_bus}->{$_}++ } @system_buses;
-
-	# create Main bus (the mixer)
-
-	Audio::Nama::SubBus->new(
-		name 		=> 'Main',
-		send_type 	=> 'track', 
-		send_id => 'Master');
-
-	# null bus, routed only from track source_* and send_send_* fields 
-	Audio::Nama::SubBus->new(
-		name 		=> 'null', 
-		send_type => 'null',
-	);
+	($buses) = strip_comments($buses); 	# need initial parentheses
+	$buses =~ s/\A\s+//; 		   	   	# remove initial newline and whitespace
+	$buses =~ s/\s+\z//; 		   		# remove terminating newline and whitespace
+	my @buses = split "\n", $buses;
+	for my $bus (@buses)
+	{
+		my ($name, $class, @args) = split " ",$bus;
+		$class->new(name => $name, @args);
+	}
 }
 
 

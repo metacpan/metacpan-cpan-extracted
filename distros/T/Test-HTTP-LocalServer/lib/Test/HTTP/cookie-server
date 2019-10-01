@@ -3,7 +3,8 @@
 use strict;
 
 require HTTP::Daemon;
-require LWP::UserAgent;
+
+our $VERSION = '0.67';
 
 $|++;
 

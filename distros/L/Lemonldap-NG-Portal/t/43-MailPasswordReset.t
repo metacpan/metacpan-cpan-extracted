@@ -10,10 +10,7 @@ BEGIN {
 }
 
 my ( $res, $user, $pwd );
-my $maintests = 9;
-my $mailSend  = 0;
-
-my $mail2 = 0;
+my $maintests = 12;
 
 SKIP: {
     eval
@@ -50,7 +47,20 @@ SKIP: {
         $res = $client->_post(
             '/resetpwd', IO::String->new($query),
             length => length($query),
-            accept => 'text/html'
+            accept => 'text/html',
+            cookie => 'llnglanguage=fr',
+        ),
+        'Post mail'
+    );
+    like( mail(), qr#<span>Bonjour</span>#, "Found french greeting" );
+
+    # Test another language (#1897)
+    ok(
+        $res = $client->_post(
+            '/resetpwd', IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+            cookie => 'llnglanguage=en',
         ),
         'Post mail'
     );
@@ -62,6 +72,8 @@ SKIP: {
     ok( mail() =~ m%Content-Type: image/png; name="logo_llng_old.png"%,
         'Found custom Main logo in mail' )
       or print STDERR Dumper( mail() );
+    like( mail(), qr#<span>Hello</span>#, "Found english greeting" );
+
     ok( mail() =~ m#a href="http://auth.example.com/resetpwd\?(.*?)"#,
         'Found link in mail' );
     $query = $1;
@@ -89,8 +101,6 @@ SKIP: {
     );
 
     ok( mail() =~ /Your password was changed/, 'Password was changed' );
-
-    #print STDERR Dumper($query);
 }
 count($maintests);
 

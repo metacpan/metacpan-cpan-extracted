@@ -1,0 +1,62 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{currentNode.title}}</h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th width="12%" trspan="name"></th>
+        <th width="11%" trspan="type"></th>
+        <th width="33%" trspan="label"></th>
+        <th width="11%" trspan="logo"></th>
+        <th width="33%" trspan="rule"></th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input class="form-control" ng-model="currentNode.title" />
+        </td>
+        <td>
+          <select class="form-control" ng-model="currentNode.data.type">
+            <option ng-repeat="item in _findContainer().select" ng-selected="item.k===currentNode.data.type" value="{{item.k}}">{{item.v}}</option>
+          </select>
+        </td>
+        <td>
+          <input class="form-control" ng-model="currentNode.data.label" />
+        </td>
+        <td>
+          <input class="form-control" ng-model="currentNode.data.logo" />
+        </td>
+        <td>
+            <input class="form-control" ng-model="currentNode.data.rule" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 trspan="overPrm"></h4>
+  <table class="table">
+    <tr ng-repeat="t in currentNode.data.over">
+      <td>
+        <input class="form-control" ng-model="t[0]" />
+      </td>
+      <td>
+        <input class="form-control" ng-model="t[1]" />
+      </td>
+      <td>
+        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.over,$index)"/>
+        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newSfOver'})"/>
+      </td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newSfOver",
+  "icon": "plus-sign"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+}]
+</script>

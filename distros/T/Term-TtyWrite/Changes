@@ -1,5 +1,8 @@
 Revision history for Term::TtyWrite. See also the git repository.
 
+0.04    September 2019
+        Repo metadata fix
+
 0.03    January 2018
         Mention that OpenBSD has removed the TIOCSTI ioctl. Switch
         license to BSD. Don't allow device names with embedded NUL.

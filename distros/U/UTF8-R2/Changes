@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.06  2019-09-28 00:00:00
+  - supports optimized RFC3629 for ja_JP, by use UTF8::R2 qw(RFC3629.ja_JP)
+  - detects malformed UTF-8 octets(leadless 80-BF) early
+  - created by INABA Hitoshi
+
 0.05  2019-08-14 00:00:00
   - fix POD
   - created by INABA Hitoshi

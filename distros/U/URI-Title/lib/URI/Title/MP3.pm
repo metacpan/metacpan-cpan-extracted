@@ -1,5 +1,5 @@
 package URI::Title::MP3;
-$URI::Title::MP3::VERSION = '1.901';
+$URI::Title::MP3::VERSION = '1.902';
 use warnings;
 use strict;
 
@@ -63,5 +63,9 @@ __END__
 =head1 NAME
 
 URI::Title::MP3 - get titles of MP3 files
+
+=head1 VERSION
+
+version 1.902
 
 =cut

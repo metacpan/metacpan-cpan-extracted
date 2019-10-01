@@ -20,7 +20,7 @@ requires:
   ExtUtils::CBuilder: '0.27'
   ExtUtils::CppGuess: '0'
   Test2::Require: '0.000060'
-  Test::Alien: '1.00'
+  Test::Alien: '1.88'
   Test::Alien::Build: '1.21'
   Text::ParseWords: '0'
   perl: '5.008001'
@@ -29,10 +29,10 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Test-Alien-CPP/issues
   homepage: https://metacpan.org/pod/Test::Alien::CPP
   repository: git://github.com/Perl5-Alien/Test-Alien-CPP.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Roy Storey (KIWIROY)'
-x_generated_by_perl: v5.29.9
+x_generated_by_perl: v5.31.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

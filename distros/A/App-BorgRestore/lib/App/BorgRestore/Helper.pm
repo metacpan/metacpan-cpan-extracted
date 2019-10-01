@@ -3,8 +3,11 @@ use v5.14;
 use strictures 2;
 
 use autodie;
+use Exporter 'import';
 use Function::Parameters;
 use POSIX ();
+
+our @EXPORT_OK = qw(untaint);
 
 =encoding utf-8
 
@@ -21,10 +24,6 @@ App::BorgRestore::Helper provides some general helper functions used in various 
 fun untaint($data, $regex) {
 	$data =~ m/^($regex)$/ or die "Failed to untaint: $data";
 	return $1;
-}
-
-fun untaint_archive_name($archive) {
-	return untaint($archive, qr([a-zA-Z0-9-:+\.]+));
 }
 
 fun format_timestamp($timestamp) {

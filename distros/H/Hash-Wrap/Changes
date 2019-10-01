@@ -1,5 +1,12 @@
 Revision history for Hash-Wrap
 
+0.10      2019-09-25 13:59:31-04:00 America/New_York
+  [BUG FIX]
+
+    * can() produced erroneous and uncompileable code if it was called
+      for an existing attribute which had not yet had an accessor
+      created.
+
 0.09      2019-06-20 16:57:19-04:00 America/New_York
 
   [ENHANCEMENT]

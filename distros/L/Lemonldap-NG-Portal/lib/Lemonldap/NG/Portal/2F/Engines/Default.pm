@@ -21,9 +21,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
+with 'Lemonldap::NG::Portal::Lib::OverConf';
 
 # INITIALIZATION
 
@@ -93,6 +94,43 @@ sub init {
         }
     }
 
+    # Extra 2F modules
+    $self->logger->debug('Processing Extra 2F modules');
+    foreach my $extraKey ( sort keys %{ $self->conf->{sfExtra} } ) {
+
+        my $moduleType = $self->conf->{sfExtra}->{$extraKey}->{type};
+        next unless ($moduleType);
+
+        my %over = %{ $self->conf->{sfExtra}->{$extraKey}->{over} or {} };
+        $self->logger->debug(
+            "Loading extra 2F module $extraKey of type $moduleType");
+        my $m =
+          $self->loadPlugin( "::2F::$moduleType",
+            { sfPrefix => $extraKey, %over } )
+          or return 0;
+
+        # Rule and prefix may be modified by 2F module, reread them
+        my $rule   = $self->conf->{sfExtra}->{$extraKey}->{rule} || 1;
+        my $prefix = $m->prefix;
+
+        # Overwrite logo and label from user configuration
+        $m->logo( $self->conf->{sfExtra}->{$extraKey}->{logo} )
+          if $self->conf->{sfExtra}->{$extraKey}->{logo};
+        $m->label( $self->conf->{sfExtra}->{$extraKey}->{label} )
+          if $self->conf->{sfExtra}->{$extraKey}->{label};
+
+        # Compile rule
+        $rule = $self->p->HANDLER->substitute($rule);
+        unless ( $rule = $self->p->HANDLER->buildSub($rule) ) {
+            $self->error( 'External 2F rule error: '
+                  . $self->p->HANDLER->tsv->{jail}->error );
+            return 0;
+        }
+
+        # Store module
+        push @{ $self->{'sfModules'} }, { p => $prefix, m => $m, r => $rule };
+    }
+
     unless (
         $self->sfReq(
             $self->p->HANDLER->buildSub(
@@ -152,7 +190,7 @@ sub init {
 sub run {
     my ( $self, $req ) = @_;
     my $checkLogins = $req->param('checkLogins');
-    my $spoofId = $req->param('spoofId') || '';
+    my $spoofId     = $req->param('spoofId') || '';
     $self->logger->debug("2F checkLogins set") if ($checkLogins);
 
     # Skip 2F unless a module has been registered
@@ -195,7 +233,7 @@ sub run {
 "Found $removed EXPIRED 2F device(s) => Update persistent session"
             );
             $self->userLogger->notice(
-                " -> $removed EXPIRED 2F device(s) removed");
+                " -> $removed expired 2F device(s) removed");
             @$_2fDevices =
               map { $_->{type} =~ /\bEXPIRED\b/ ? () : $_ } @$_2fDevices;
             $self->p->updatePersistentSession( $req,
@@ -290,7 +328,14 @@ sub run {
             MAIN_LOGO => $self->conf->{portalMainLogo},
             SKIN      => $self->p->getSkin($req),
             TOKEN     => $token,
-            MODULES => [ map { { CODE => $_->prefix, LOGO => $_->logo } } @am ],
+            MODULES   => [
+                map { {
+                        CODE  => $_->prefix,
+                        LOGO  => $_->logo,
+                        LABEL => $_->label
+                    }
+                } @am
+            ],
             CHECKLOGINS => $checkLogins
         }
     );

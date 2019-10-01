@@ -1,0 +1,112 @@
+#!/usr/bin/env perl
+
+package
+  Test::Auto::Cli;
+
+use Do 'Cli';
+
+use File::Basename;
+use File::Find;
+use File::Spec::Functions;
+use Test::Auto;
+use Data::Object::Name;
+
+use File::Path 'make_path';
+
+our $VERSION = '0.02'; # VERSION
+
+=head1 NAME
+
+testauto
+
+=cut
+
+=head1 ABSTRACT
+
+Generate POD from Tests
+
+=cut
+
+=head1 SYNOPSIS
+
+  testauto -i t -o lib -t ./mytemplate
+
+=cut
+
+=head1 DESCRIPTION
+
+This tool lets you generate POD documents from test files that adhere to the
+specification, L<Test::Auto/SPECIFICATION>.
+
+=cut
+
+=head1 OPTIONS
+
+  -h --help      Display help text.
+  -t --template  Filepath for POD template.
+  -p --pattern   Pattern to use to filter files.
+  -o --output    Directory for .pod files.
+  -i --input     Directory for .t files.
+
+=cut
+
+method spec() {
+  return [qw(
+    help|h
+    input|i=s
+    output|o=s
+    pattern|p=s
+    template|t=s
+  )];
+}
+
+method usage() {
+  my $data = $self->data;
+  my $help = $data->contents('head1', 'OPTIONS');
+
+  say join "\n", "$0 [options]", "", @{$help->[0]};
+}
+
+method main(:$args, :$opts) {
+  my @files;
+
+  return $self->fail('usage') if $opts->help;
+
+  my $input = $opts->input || 't';
+  my $output = $opts->output || 'lib';
+  my $pattern = $opts->pattern || '.*';
+  my $template = $opts->template;
+
+  $ENV{TEST_AUTO_TEMPLATE} = $template if $template;
+
+  find fun() { push @files, $File::Find::name if -f && /\.t$/ }, $input;
+
+  @files = sort grep /$pattern/, @files;
+
+  for my $file (@files) {
+    my $test = Test::Auto->new($file);
+    my $parser = $test->parser;
+    my $package = $parser->render('name');
+    my $namer = Data::Object::Name->new($package);
+
+    make_path dirname my $podfile = $namer->format(
+      'path', catfile($output, '%s.pod')
+    );
+
+    my $rendered = $test->document->render;
+
+    open my $fh, '>', $podfile or raise "Can't write POD file: $!";
+
+    print $fh $rendered;
+
+    close $fh;
+
+    say "Created $podfile";
+  }
+
+  return $self;
+}
+
+run Test::Auto::Cli;
+
+__DATA__

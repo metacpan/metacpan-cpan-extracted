@@ -22,14 +22,12 @@ BEGIN {
 }
 
 has customFunctions => ( is => 'rw', isa => 'Maybe[Str]' );
+has useSafeJail     => ( is => 'rw', isa => 'Maybe[Int]' );
+has jail            => ( is => 'rw' );
+has error           => ( is => 'rw' );
 
-has useSafeJail => ( is => 'rw', isa => 'Maybe[Int]' );
-
-has jail => ( is => 'rw' );
-
-has error => ( is => 'rw' );
-
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
+our @builtCustomFunctions;
 
 ## @imethod protected build_jail()
 # Build and return the security jail used to compile rules and headers.
@@ -59,9 +57,9 @@ sub build_jail {
         }
     }
 
-    my @t =
+    @builtCustomFunctions =
       $self->customFunctions ? split( /\s+/, $self->customFunctions ) : ();
-    foreach (@t) {
+    foreach (@builtCustomFunctions) {
         no warnings 'redefine';
         $api->logger->debug("Custom function : $_");
         my $sub = $_;
@@ -90,7 +88,7 @@ sub build_jail {
     $self->jail->share_from( 'Lemonldap::NG::Common::Safelib',
         $Lemonldap::NG::Common::Safelib::functions );
 
-    $self->jail->share_from( __PACKAGE__, [ @t, '&encrypt', '&token' ] );
+    $self->jail->share_from( __PACKAGE__, [ @builtCustomFunctions, '&encrypt', '&token' ] );
     $self->jail->share_from( 'MIME::Base64', ['&encode_base64'] );
 
     #$self->jail->share_from( 'Lemonldap::NG::Handler::Main', ['$_v'] );

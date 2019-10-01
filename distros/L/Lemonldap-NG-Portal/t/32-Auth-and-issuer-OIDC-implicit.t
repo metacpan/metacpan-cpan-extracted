@@ -2,9 +2,10 @@ use lib 'inc';
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
-use MIME::Base64;
+use MIME::Base64 qw/encode_base64 decode_base64 decode_base64url/;
 
 BEGIN {
     require 't/test-lib.pm';
@@ -141,6 +142,14 @@ ok( $prms{session_state}, ' session_state found' );
 ok( $prms{access_token},  ' access_token found' );
 ok( $prms{state},         ' state found' );
 count(5);
+
+# Check attributes in ID Token
+my ( $id_token_header, $id_token_payload, $id_token_signature ) =
+  split( /\./, $prms{id_token} );
+my $id_token_decoded = decode_json( decode_base64url($id_token_payload) );
+ok( $id_token_decoded->{sub} eq "dwho", 'Check sub value' );
+ok( !$id_token_decoded->{name}, 'Claim name must not be in ID token' );
+count(2);
 
 $op->logout($idpId);
 
@@ -315,8 +324,9 @@ sub rp {
                 },
                 oidcOPMetaDataOptions => {
                     op => {
-                        oidcOPMetaDataOptionsJWKSTimeout  => 0,
-                        oidcOPMetaDataOptionsClientSecret => "rpsecret",
+                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
+                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
+                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",

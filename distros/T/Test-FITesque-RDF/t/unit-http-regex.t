@@ -54,32 +54,41 @@ cmp_deeply($data,
               'http_req_res_list_regex',
               {
 					'-special' => {
-										'http-requests' => array_each(isa("HTTP::Request")),
-										'http-responses' => array_each(isa("HTTP::Response")),
 										'description' => 'Test fields with regexps',
-										'regex-fields' => [
-																 {
-																  'Link' => 1
-																 },
-																 {},
-																 {
-																  'Other-Header' => 1,
-																  'Location' => 1
-																 }
-																],
+										'http-pairs' =>
+										[
+										 {
+										  'request' => isa("HTTP::Request"),
+										  'response' => isa("HTTP::Response"),
+										  'regex-fields' => {
+																	'Link' => 1
+																  },
+										 },
+										 {
+										  'request' => isa("HTTP::Request"),
+										  'response' => isa("HTTP::Response"),
+										  'regex-fields' => {},
+										 },
+										 {
+										  'request' => isa("HTTP::Request"),
+										  'response' => isa("HTTP::Response"),
+										  'regex-fields' => {
+																	'Other-Header' => 1,
+																	'Location' => 1
+																  }
+										 }
+										]
 									  },
               }
             ]
           ]
         ], 'Main structure ok');
 
-my $params = $data->[0]->[1]->[1]->{'-special'};
+my $params = $data->[0]->[1]->[1]->{'-special'}->{'http-pairs'};
 
-is(scalar @{$params->{'http-requests'}}, 3, 'There are three requests');
+is(scalar @{$params}, 3, 'There are three pairs');
 
-is(scalar @{$params->{'http-responses'}}, 3, 'There are three responses');
-
-like(${$params->{'http-responses'}}[0]->header('Link'), qr|;\\s|, 'Should be single escaped');
+like($params->[0]->{response}->header('Link'), qr|;\\s|, 'Should be single escaped');
 
 done_testing;
 

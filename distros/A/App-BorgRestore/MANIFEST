@@ -20,7 +20,6 @@ t/find_archives.t
 t/find_archives_mocked.t
 t/handle_added_archives.t
 t/handle_added_archives_with_db.t
-t/helper/untaint.t
 t/pod.t
 t/pod_coverage.t
 t/search_path.t

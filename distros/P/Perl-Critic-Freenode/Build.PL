@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Perl-Critic-Freenode",
-      "dist_version" => "0.030",
+      "dist_version" => "0.031",
       "license" => "artistic_2",
       "module_name" => "Perl::Critic::Freenode",
       "recursive_test_files" => 1,

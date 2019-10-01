@@ -1,0 +1,9 @@
+----------------
+
+Need to check sorting algorithm for compliance with the problem pointed
+out by Andrey Tarasevich in z1. That is that order of elements equal
+from the point of view of sorting algorithm is the same in all keywords
+id lists. Otherwise joining will not work properly.
+
+One possible solution is to sort all ids first and then keep that order
+in all lists that are then by definition subsets of it.

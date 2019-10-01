@@ -15,7 +15,7 @@ my $mailSend = 0;
 
 SKIP: {
     eval
-      'require Email::Sender::Simple;use GD::SecurityImage;use Image::Magick;';
+'require Email::Sender::Simple;use GD::SecurityImage;use Image::Magick;use Text::Unidecode';
     if ($@) {
         skip 'Missing dependencies', $maintests;
     }

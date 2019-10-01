@@ -29,11 +29,15 @@ build_requires (
 );
 
 requires (
+	'Carp' => 0,
     'Digest::MD5' => 0,
-    'IO::Socket::INET' => 0,
+    'IO::Socket::IP' => 0,
     'IO::Socket::SSL' => 0,
-    'Moose' => 0,
+	'Moo' => 0,
+	'MooX::Types::MooseLike::Base' => 0,
     'Time::Out' => 0,
+	'Try::Tiny' => 0,
+	'Type::Tiny' => 0,
     'namespace::autoclean' => 0,
 );
 

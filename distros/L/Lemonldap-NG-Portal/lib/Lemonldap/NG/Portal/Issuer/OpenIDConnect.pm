@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OIDC_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect',
@@ -29,7 +29,7 @@ sub beforeAuth { 'exportRequestParameters' }
 
 use constant sessionKind => 'OIDCI';
 
-has rule => ( is => 'rw' );
+has rule          => ( is => 'rw' );
 has configStorage => (
     is      => 'ro',
     lazy    => 1,
@@ -38,6 +38,14 @@ has configStorage => (
     }
 );
 has ssoMatchUrl => ( is => 'rw' );
+
+has iss => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{oidcServiceMetaDataIssuer} || $_[0]->conf->{portal};
+    }
+);
 
 # OIDC has 7 endpoints managed here as PSGI endpoints or in run() [Main/Issuer.pm
 # manage transparent authentication for run()]:
@@ -49,6 +57,7 @@ has ssoMatchUrl => ( is => 'rw' );
 #  - userinfo    : => userInfo()       for unauth users (RP)
 #  - jwks        : => jwks()           for unauth users (RP)
 #  - register    : => registration()   for unauth users (RP)
+#  - introspect  : => introspection()  for unauth users (RP)
 #
 # Other paths will be handle by run() and return PE_ERROR
 #
@@ -78,22 +87,24 @@ sub init {
     # Manage RP requests
     $self->addRouteFromConf(
         'Unauth',
-        oidcServiceMetaDataEndSessionURI   => 'endSessionDone',
-        oidcServiceMetaDataCheckSessionURI => 'checkSession',
-        oidcServiceMetaDataTokenURI        => 'token',
-        oidcServiceMetaDataUserInfoURI     => 'userInfo',
-        oidcServiceMetaDataJWKSURI         => 'jwks',
-        oidcServiceMetaDataRegistrationURI => 'registration',
+        oidcServiceMetaDataEndSessionURI    => 'endSessionDone',
+        oidcServiceMetaDataCheckSessionURI  => 'checkSession',
+        oidcServiceMetaDataTokenURI         => 'token',
+        oidcServiceMetaDataUserInfoURI      => 'userInfo',
+        oidcServiceMetaDataJWKSURI          => 'jwks',
+        oidcServiceMetaDataRegistrationURI  => 'registration',
+        oidcServiceMetaDataIntrospectionURI => 'introspection',
     );
 
     # Manage user requests
     $self->addRouteFromConf(
         'Auth',
-        oidcServiceMetaDataCheckSessionURI => 'checkSession',
-        oidcServiceMetaDataTokenURI        => 'badAuthRequest',
-        oidcServiceMetaDataUserInfoURI     => 'badAuthRequest',
-        oidcServiceMetaDataJWKSURI         => 'badAuthRequest',
-        oidcServiceMetaDataRegistrationURI => 'badAuthRequest',
+        oidcServiceMetaDataCheckSessionURI  => 'checkSession',
+        oidcServiceMetaDataTokenURI         => 'badAuthRequest',
+        oidcServiceMetaDataUserInfoURI      => 'badAuthRequest',
+        oidcServiceMetaDataJWKSURI          => 'badAuthRequest',
+        oidcServiceMetaDataRegistrationURI  => 'badAuthRequest',
+        oidcServiceMetaDataIntrospectionURI => 'badAuthRequest',
     );
 
     # Metadata (.well-known/openid-configuration)
@@ -244,10 +255,14 @@ sub run {
                 unless ( $rule->( $req, $req->sessionInfo ) ) {
                     $self->userLogger->warn( 'User '
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                          . "was not authorized to access to $rp" );
+                          . " is not authorized to access to $rp" );
                     return PE_UNAUTHORIZEDPARTNER;
                 }
             }
+
+            $self->userLogger->notice( 'User '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                  . " is authorized to access to $rp" );
 
             # Check redirect_uri
             my $redirect_uri  = $oidc_request->{'redirect_uri'};
@@ -597,13 +612,13 @@ sub run {
             if ( $flow eq "authorizationcode" ) {
 
                 # Store data in session
-                my $codeSession = $self->getOpenIDConnectSession(
-                    undef,
+                my $codeSession = $self->newAuthorizationCode(
+                    $rp,
                     {
                         redirect_uri    => $oidc_request->{'redirect_uri'},
                         scope           => $oidc_request->{'scope'},
+                        client_id       => $client_id,
                         user_session_id => $req->id,
-                        _utime          => time,
                         nonce           => $oidc_request->{'nonce'},
                         code_challenge  => $oidc_request->{'code_challenge'},
                         code_challenge_method =>
@@ -639,13 +654,12 @@ sub run {
 
                     # Store data in access token
                     # Generate access_token
-                    my $accessTokenSession = $self->getOpenIDConnectSession(
-                        undef,
+                    my $accessTokenSession = $self->newAccessToken(
+                        $rp,
                         {
                             scope           => $oidc_request->{'scope'},
                             rp              => $rp,
                             user_session_id => $req->id,
-                            _utime          => time,
                         }
                     );
 
@@ -667,7 +681,8 @@ sub run {
                     my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
                       ->{oidcRPMetaDataOptionsIDTokenSignAlg};
                     my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
-                    $at_hash = $self->createHash( $access_token, $hash_level );
+                    $at_hash = $self->createHash( $access_token, $hash_level )
+                      if $hash_level;
                 }
 
                 # ID token payload
@@ -696,8 +711,7 @@ sub run {
                 my $user_id = $req->{sessionInfo}->{$user_id_attribute};
 
                 my $id_token_payload_hash = {
-                    iss => $self->conf->{oidcServiceMetaDataIssuer}
-                    ,    # Issuer Identifier
+                    iss => $self->iss,       # Issuer Identifier
                     sub => $user_id,         # Subject Identifier
                     aud => [$client_id],     # Audience
                     exp => $id_token_exp,    # expiration
@@ -710,8 +724,22 @@ sub run {
                 };
 
                 $id_token_payload_hash->{'at_hash'} = $at_hash if $at_hash;
-                $id_token_payload_hash->{'acr'} = $id_token_acr
+                $id_token_payload_hash->{'acr'}     = $id_token_acr
                   if $id_token_acr;
+
+                if ( $response_type !~ /\btoken\b/ ) {
+
+                    # No access_token
+                    # Claims must be set in id_token
+                    my $claims =
+                      $self->buildUserInfoResponse( $oidc_request->{'scope'},
+                        $rp, $req->id );
+
+                    foreach ( keys %$claims ) {
+                        $id_token_payload_hash->{$_} = $claims->{$_}
+                          unless ( $_ eq "sub" );
+                    }
+                }
 
                 # Create ID Token
                 my $id_token =
@@ -751,13 +779,13 @@ sub run {
                 my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
 
                 # Store data in session
-                my $codeSession = $self->getOpenIDConnectSession(
-                    undef,
+                my $codeSession = $self->newAuthorizationCode(
+                    $rp,
                     {
                         redirect_uri    => $oidc_request->{'redirect_uri'},
+                        client_id       => $client_id,
                         scope           => $oidc_request->{'scope'},
                         user_session_id => $req->id,
-                        _utime          => time,
                         nonce           => $oidc_request->{'nonce'},
                     }
                 );
@@ -768,18 +796,18 @@ sub run {
                 $self->logger->debug("Generated code: $code");
 
                 # Compute hash to store in c_hash
-                $c_hash = $self->createHash( $code, $hash_level );
+                $c_hash = $self->createHash( $code, $hash_level )
+                  if $hash_level;
 
                 if ( $response_type =~ /\btoken\b/ ) {
 
                     # Generate access_token
-                    my $accessTokenSession = $self->getOpenIDConnectSession(
-                        undef,
+                    my $accessTokenSession = $self->newAccessToken(
+                        $rp,
                         {
                             scope           => $oidc_request->{'scope'},
                             rp              => $rp,
                             user_session_id => $req->id,
-                            _utime          => time,
                         }
                     );
 
@@ -798,7 +826,8 @@ sub run {
                         "Generated access token: $access_token");
 
                     # Compute hash to store in at_hash
-                    $at_hash = $self->createHash( $access_token, $hash_level );
+                    $at_hash = $self->createHash( $access_token, $hash_level )
+                      if $hash_level;
                 }
 
                 if ( $response_type =~ /\bid_token\b/ ) {
@@ -819,8 +848,7 @@ sub run {
                     my $user_id = $req->{sessionInfo}->{$user_id_attribute};
 
                     my $id_token_payload_hash = {
-                        iss => $self->conf->{oidcServiceMetaDataIssuer}
-                        ,    # Issuer Identifier
+                        iss => $self->iss,       # Issuer Identifier
                         sub => $user_id,         # Subject Identifier
                         aud => [$client_id],     # Audience
                         exp => $id_token_exp,    # expiration
@@ -836,6 +864,20 @@ sub run {
 
                     $id_token_payload_hash->{'at_hash'} = $at_hash if $at_hash;
                     $id_token_payload_hash->{'c_hash'}  = $c_hash  if $c_hash;
+
+                    if ( $response_type !~ /\btoken\b/ ) {
+
+                        # No access_token
+                        # Claims must be set in id_token
+                        my $claims = $self->buildUserInfoResponse(
+                            $oidc_request->{'scope'},
+                            $rp, $req->id );
+
+                        foreach ( keys %$claims ) {
+                            $id_token_payload_hash->{$_} = $claims->{$_}
+                              unless ( $_ eq "sub" );
+                        }
+                    }
 
                     # Create ID Token
                     $id_token =
@@ -962,50 +1004,13 @@ sub token {
     my ( $self, $req ) = @_;
     $self->logger->debug("URL detected as an OpenID Connect TOKEN URL");
 
-    # Check authentication
-    my ( $client_id, $client_secret ) =
-      $self->getEndPointAuthenticationCredentials($req);
-
-    unless ($client_id) {
-        $self->logger->error(
-"No authentication provided to get token, or authentication type not supported"
-        );
-        return $self->p->sendError( $req, 'invalid_request', 400 );
-    }
-
-    # Verify that client_id is registered in configuration
-    my $rp = $self->getRP($client_id);
+    my $rp = $self->checkEndPointAuthenticationCredentials($req);
 
     unless ($rp) {
-        $self->userLogger->error(
-            "No registered Relying Party found with client_id $client_id");
         return $self->p->sendError( $req, 'invalid_request', 400 );
     }
-    else {
-        $self->logger->debug("Client id $client_id match Relying Party $rp");
-    }
 
-    # Check client_secret
-    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
-        ->{oidcRPMetaDataOptionsPublic} )
-    {
-        $self->logger->debug(
-            "Relying Party $rp is public, do not check client secret");
-    }
-    else {
-        unless ($client_secret) {
-            $self->logger->error(
-"Relying Party $rp is confidential but no client secret was provided to authenticate on token endpoint"
-            );
-            return $self->p->sendError( $req, 'invalid_request', 400 );
-        }
-        unless ( $client_secret eq $self->conf->{oidcRPMetaDataOptions}->{$rp}
-            ->{oidcRPMetaDataOptionsClientSecret} )
-        {
-            $self->logger->error("Wrong credentials for $rp");
-            return $self->p->sendError( $req, 'invalid_request', 400 );
-        }
-    }
+    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
 
     # Get code session
     my $code = $req->param('code');
@@ -1017,7 +1022,7 @@ sub token {
 
     $self->logger->debug("OpenID Connect Code: $code");
 
-    my $codeSession = $self->getOpenIDConnectSession($code);
+    my $codeSession = $self->getAuthorizationCode($code);
 
     unless ($codeSession) {
         $self->logger->error("Unable to find OIDC session $code");
@@ -1038,6 +1043,13 @@ sub token {
         {
             return $self->p->sendError( $req, 'invalid_grant', 400 );
         }
+    }
+
+    # Check we have the same client_id value
+    unless ( $client_id eq $codeSession->data->{client_id} ) {
+        $self->userLogger->error( "Provided client_id does not match "
+              . $codeSession->data->{client_id} );
+        return $self->p->sendError( $req, 'invalid_grant', 400 );
     }
 
     # Check we have the same redirect_uri value
@@ -1069,13 +1081,12 @@ sub token {
     $self->logger->debug("Found corresponding user: $user_id");
 
     # Generate access_token
-    my $accessTokenSession = $self->getOpenIDConnectSession(
-        undef,
+    my $accessTokenSession = $self->newAccessToken(
+        $rp,
         {
             scope           => $codeSession->data->{scope},
             rp              => $rp,
             user_session_id => $apacheSession->id,
-            _utime          => time,
         }
     );
 
@@ -1094,7 +1105,8 @@ sub token {
     my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
       ->{oidcRPMetaDataOptionsIDTokenSignAlg};
     my ($hash_level) = ( $alg =~ /(?:\w{2})(\d{3})/ );
-    my $at_hash = $self->createHash( $access_token, $hash_level );
+    my $at_hash = $self->createHash( $access_token, $hash_level )
+      if $hash_level;
 
     # ID token payload
     my $id_token_exp = $self->conf->{oidcRPMetaDataOptions}->{$rp}
@@ -1104,11 +1116,11 @@ sub token {
     my $id_token_acr = "loa-" . $apacheSession->data->{authenticationLevel};
 
     my $id_token_payload_hash = {
-        iss => $self->conf->{oidcServiceMetaDataIssuer},    # Issuer Identifier
-        sub => $user_id,                                    # Subject Identifier
-        aud => [$client_id],                                # Audience
-        exp => $id_token_exp,                               # expiration
-        iat => time,                                        # Issued time
+        iss       => $self->iss,
+        sub       => $user_id,                              # Subject Identifier
+        aud       => [$client_id],                          # Audience
+        exp       => $id_token_exp,                         # expiration
+        iat       => time,                                  # Issued time
         auth_time => $apacheSession->data->{_lastAuthnUTime}
         ,    # Authentication time
         acr => $id_token_acr,    # Authentication Context Class Reference
@@ -1117,7 +1129,7 @@ sub token {
     };
 
     my $nonce = $codeSession->data->{nonce};
-    $id_token_payload_hash->{nonce} = $nonce if defined $nonce;
+    $id_token_payload_hash->{nonce}     = $nonce   if defined $nonce;
     $id_token_payload_hash->{'at_hash'} = $at_hash if $at_hash;
 
     # Create ID Token
@@ -1148,7 +1160,7 @@ sub token {
     return $self->p->sendJSONresponse( $req, $token_response );
 }
 
-# Handle uerinfo endpoint
+# Handle userinfo endpoint
 sub userInfo {
     my ( $self, $req ) = @_;
     $self->logger->debug("URL detected as an OpenID Connect USERINFO URL");
@@ -1163,7 +1175,7 @@ sub userInfo {
 
     $self->logger->debug("Received Access Token $access_token");
 
-    my $accessTokenSession = $self->getOpenIDConnectSession($access_token);
+    my $accessTokenSession = $self->getAccessToken($access_token);
 
     unless ($accessTokenSession) {
         $self->userLogger->error(
@@ -1203,6 +1215,66 @@ sub userInfo {
             [$userinfo_jwt]
         ];
     }
+}
+
+sub introspection {
+    my ( $self, $req ) = @_;
+    $self->logger->debug("URL detected as an OpenID Connect INTROSPECTION URL");
+
+    my $rp = $self->checkEndPointAuthenticationCredentials($req);
+
+    unless ($rp) {
+        return $self->p->sendError( $req, 'invalid_request', 400 );
+    }
+
+    if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
+        ->{oidcRPMetaDataOptionsPublic} )
+    {
+        $self->logger->error(
+            "Public clients are not allowed to acces the introspection endpoint"
+        );
+        return $self->p->sendError( $req, 'unauthorized_client', 401 );
+    }
+
+    my $token = $req->param('token');
+    unless ($token) {
+        return $self->p->sendError( $req, 'invalid_request', 400 );
+    }
+
+    my $response    = { active => JSON::false };
+    my $oidcSession = $self->getOpenIDConnectSession($token);
+    if ($oidcSession) {
+        if ( my $user_session_id = $oidcSession->{data}->{user_session_id} ) {
+
+            # Get user identifier
+            my $apacheSession = $self->p->getApacheSession($user_session_id);
+            if ($apacheSession) {
+
+                $response->{active} = JSON::true;
+
+        # The ID attribute we choose is the one of the calling webservice,
+        # which might be different from the OIDC client the token was issued to.
+                my $user_id_attribute =
+                  $self->conf->{oidcRPMetaDataOptions}->{$rp}
+                  ->{oidcRPMetaDataOptionsUserIDAttr}
+                  || $self->conf->{whatToTrace};
+                $response->{sub}   = $apacheSession->data->{$user_id_attribute};
+                $response->{scope} = $oidcSession->{data}->{scope}
+                  if $oidcSession->{data}->{scope};
+                $response->{client_id} =
+                  $self->oidcRPList->{ $oidcSession->{data}->{rp} }
+                  ->{oidcRPMetaDataOptionsClientID}
+                  if $oidcSession->{data}->{rp};
+                $response->{exp} =
+                  $oidcSession->{data}->{_utime} + $self->conf->{timeout};
+            }
+        }
+        else {
+            $self->logger->error(
+                "Could not find user session ID in access token object");
+        }
+    }
+    return $self->p->sendJSONresponse( $req, $response );
 }
 
 # Handle jwks endpoint
@@ -1420,10 +1492,9 @@ sub logout {
                           ->{oidcRPMetaDataOptionsUserIDAttr}
                           || $self->conf->{whatToTrace};
                         my $user_id = $req->{sessionInfo}->{$user_id_attribute};
-                        my $iss     = $self->conf->{oidcServiceMetaDataIssuer};
                         $url .= ( $url =~ /\?/ ? '&' : '?' )
                           . build_urlencoded(
-                            iss => $iss,
+                            iss => $self->iss,
                             sid => $user_id
                           );
                     }
@@ -1444,22 +1515,39 @@ sub logout {
 sub metadata {
     my ( $self, $req ) = @_;
     my $issuerDBOpenIDConnectPath = $self->conf->{issuerDBOpenIDConnectPath};
-    my $authorize_uri    = $self->conf->{oidcServiceMetaDataAuthorizeURI};
-    my $token_uri        = $self->conf->{oidcServiceMetaDataTokenURI};
-    my $userinfo_uri     = $self->conf->{oidcServiceMetaDataUserInfoURI};
-    my $jwks_uri         = $self->conf->{oidcServiceMetaDataJWKSURI};
-    my $registration_uri = $self->conf->{oidcServiceMetaDataRegistrationURI};
-    my $endsession_uri   = $self->conf->{oidcServiceMetaDataEndSessionURI};
-    my $checksession_uri = $self->conf->{oidcServiceMetaDataCheckSessionURI};
+    my $authorize_uri     = $self->conf->{oidcServiceMetaDataAuthorizeURI};
+    my $token_uri         = $self->conf->{oidcServiceMetaDataTokenURI};
+    my $userinfo_uri      = $self->conf->{oidcServiceMetaDataUserInfoURI};
+    my $jwks_uri          = $self->conf->{oidcServiceMetaDataJWKSURI};
+    my $registration_uri  = $self->conf->{oidcServiceMetaDataRegistrationURI};
+    my $endsession_uri    = $self->conf->{oidcServiceMetaDataEndSessionURI};
+    my $checksession_uri  = $self->conf->{oidcServiceMetaDataCheckSessionURI};
+    my $introspection_uri = $self->conf->{oidcServiceMetaDataIntrospectionURI};
 
     my $path   = $self->path . '/';
-    my $issuer = $self->conf->{oidcServiceMetaDataIssuer};
+    my $issuer = $self->iss;
     $path = "/" . $path unless ( $issuer =~ /\/$/ );
     my $baseUrl = $issuer . $path;
 
     my @acr = keys %{ $self->conf->{oidcServiceMetaDataAuthnContext} };
 
-    # Add a slash to path value if issuer has no trailing slash
+    # List response types depending on allowed flows
+    my $response_types = [];
+    my $grant_types    = [];
+    if ( $self->conf->{oidcServiceAllowAuthorizationCodeFlow} ) {
+        push( @$response_types, "code" );
+        push( @$grant_types,    "authorization_code" );
+    }
+    if ( $self->conf->{oidcServiceAllowImplicitFlow} ) {
+        push( @$response_types, "id_token", "id_token token" );
+        push( @$grant_types, "implicit" );
+    }
+    if ( $self->conf->{oidcServiceAllowHybridFlow} ) {
+        push( @$response_types,
+            "code id_token",
+            "code token", "code id_token token" );
+        push( @$grant_types, "hybrid" );
+    }
 
     # Create OpenID configuration hash;
     return $self->p->sendJSONresponse(
@@ -1474,6 +1562,7 @@ sub metadata {
             authorization_endpoint => $baseUrl . $authorize_uri,
             end_session_endpoint   => $baseUrl . $endsession_uri,
             check_session_iframe   => $baseUrl . $checksession_uri,
+            introspection_endpoint => $baseUrl . $introspection_uri,
 
             # Logout capabilities
             backchannel_logout_supported          => JSON::true,
@@ -1488,18 +1577,13 @@ sub metadata {
 
             # Scopes
             scopes_supported => [qw/openid profile email address phone/],
-            response_types_supported => [
-                "code",
-                "id_token",
-                "id_token token",
-                "code id_token",
-                "code token",
-                "code id_token token"
-            ],
-            grant_types_supported   => [qw/authorization_code implicit hybrid/],
-            acr_values_supported    => \@acr,
-            subject_types_supported => ["public"],
+            response_types_supported => $response_types,
+            grant_types_supported    => $grant_types,
+            acr_values_supported     => \@acr,
+            subject_types_supported  => ["public"],
             token_endpoint_auth_methods_supported =>
+              [qw/client_secret_post client_secret_basic/],
+            introspection_endpoint_auth_methods_supported =>
               [qw/client_secret_post client_secret_basic/],
             claims_supported                 => [qw/sub iss auth_time acr/],
             request_parameter_supported      => JSON::true,

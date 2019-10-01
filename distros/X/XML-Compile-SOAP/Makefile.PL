@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '3.24';
+my $version = '3.25';
 
 my $prereq =
    { XML::Compile         => '1.58'
@@ -13,7 +13,7 @@ my $prereq =
    , LWP               => 6.08
    , Net::HTTP         => 6.16  # older versions contain nasty bugs
    , Time::HiRes       => 0
-   , File::Slurp::Tiny => 0
+   , File::Slurper     => 0
 
    , Test::More        => 0.54
    };
@@ -75,7 +75,7 @@ WriteMakefile
 ### used by oodist during production of distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
-EXTENDS		= ../XML-Compile:../../perl/XMLDaemon:../../perl/XMLTester:../XML-Compile-Cache:../../perl/XMLWSDL:../../perl/XMLSOAP12:../../perl/XMLSOAPEv:../../perl/XMLWSA
+EXTENDS		= ../XML-Compile:../XML-Compile-SOAP-Daemon:../XML-Compile-Tester:../XML-Compile-Cache:../XML-Compile-WSDL11:../XML-Compile-SOAP12:../../perl/XMLSOAPEv:../../perl/XMLWSA
 
 # for DIST
 RAWDIR          = ../public_html/xml-compile-soap/raw

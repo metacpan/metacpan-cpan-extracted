@@ -26,7 +26,7 @@ config_withtryable() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

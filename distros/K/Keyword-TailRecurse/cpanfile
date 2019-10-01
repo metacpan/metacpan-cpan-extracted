@@ -1,0 +1,9 @@
+requires 'perl', '5.014';
+requires 'Keyword::Declare', '0.001014';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+    requires 'Test::Deep', '0.106';
+    requires 'Test::Exception', '0.26';
+};
+

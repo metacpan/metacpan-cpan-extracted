@@ -6,7 +6,6 @@ use strict;
 
 use lib 'lib','t';
 use TestTools;
-use Test::Deep   qw/cmp_deeply/;
 
 # use Log::Report mode => 3;  # debugging
 
@@ -109,7 +108,7 @@ compare_xml($xml1, $msg1_soap);
 my $xml1a = XML::LibXML->new->parse_string($xml1->toString(1));
 my $struct = $soap->messageStructure($xml1a);
 ok(defined $struct, 'got message structure');
-cmp_deeply($struct, { body   => [ '{http://test-types}GetLastTradePrice' ],
+is_deeply($struct, { body   => [ '{http://test-types}GetLastTradePrice' ],
                     , header => [ '{http://test-types}Transaction' ]
                     , wsa_action => undef
                     });
@@ -125,4 +124,4 @@ is(ref $server1, 'CODE', 'compiled a server');
 my $hash1 = $server1->($msg1_soap);
 is(ref $hash1, 'HASH', 'produced HASH');
 
-cmp_deeply($hash1, $msg1_data, "server parsed input");
+is_deeply($hash1, $msg1_data, "server parsed input");

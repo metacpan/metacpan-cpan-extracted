@@ -125,8 +125,7 @@ sub verify {
 
         unless ( $session->{__ch} and $session->{__ch} eq $challenge ) {
             $self->userLogger->error(
-"U2F challenge changes by user !!! $session->{__ch} / $challenge"
-            );
+                "U2F challenge changed by user: $session->{__ch} / $challenge");
             $req->error(PE_BADCREDENTIALS);
             return $self->fail($req);
         }

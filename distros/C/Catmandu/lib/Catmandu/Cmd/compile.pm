@@ -2,7 +2,7 @@ package Catmandu::Cmd::compile;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2006';
+our $VERSION = '1.2007';
 
 use parent 'Catmandu::Cmd';
 use Catmandu;
@@ -13,7 +13,7 @@ sub command_opt_spec {
     (
         ["var=s%",        ""],
         ["preprocess|pp", ""],
-        ["fix|fix=s@", "", {hidden => 1}],
+        ["fix|fix=s@",    "", {hidden => 1}],
     );
 }
 

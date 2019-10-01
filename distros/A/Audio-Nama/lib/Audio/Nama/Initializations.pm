@@ -1,4 +1,4 @@
-# ----------- Initialize --------
+# ----------- Initializations --------
 #
 #
 #  These routines are executed once on program startup
@@ -58,13 +58,14 @@ sub definitions {
 	@edit_data
 	@inserts_data
 	@effects_data
-	$project->{save_file_version_number}
+	$project->{nama_version}
+	$project->{sample_rate}
 	$fx->{applied}
 	$fx->{params}
 	$fx->{params_log}
 );
 @persistent_vars = qw(
-	$project->{save_file_version_number}
+	$project->{nama_version}
 	$project->{timebase}
 	$project->{command_buffer}
 	$project->{track_version_comments}
@@ -74,14 +75,15 @@ sub definitions {
 	$project->{current_param}
 	$project->{current_stepsize}
 	$project->{playback_position}
+	$project->{sample_rate}
+	$project->{waveform}
 	@project_effect_chain_data
 	$fx->{id_counter}
 	$setup->{loop_endpoints}
 	$mode->{loop_enable}
 	$mode->{mastering}
 	$mode->{preview}
-	$mode->{midish_terminal}
-	$mode->{midish_transport_sync}
+	$mode->{midi_transport_sync}
 	$gui->{_seek_unit}
 	$text->{command_history}
 	$this_track_name
@@ -103,18 +105,14 @@ sub definitions {
 	# the sole instance of their class.
 	
 	$project = bless {}, 'Audio::Nama::Project';
-	$mode = bless {}, 'Audio::Nama::Mode';
+	our $mode = bless {}, 'Audio::Nama::Mode';
 	{ package Audio::Nama::Mode; 
 		sub mastering 	{ $Audio::Nama::tn{Eq} and ! $Audio::Nama::tn{Eq}->{hide} } 
-		no warnings 'uninitialized';
-		sub eager 		{ $Audio::Nama::mode->{eager} 					}
-		sub doodle 		{ 
-			#my $set = shift;
-			#if (defined $set){ $Audio::Nama::mode->{preview} = $set ? 'doodle' : 0 }
-			$Audio::Nama::mode->{preview} eq 'doodle' 	}
-		sub preview 	{ $Audio::Nama::mode->{preview} eq 'preview' 	}
-		sub song 		{ $Audio::Nama::mode->eager and $Audio::Nama::mode->preview }
-		sub live		{ $Audio::Nama::mode->eager and $Audio::Nama::mode->doodle  }
+		sub eager 		{ $mode->{eager} 					}
+		sub doodle 		{ $mode->{doodle} 				}
+		sub preview 	{ $mode->{preview}				}
+		sub song 		{ $mode->eager and $mode->preview }
+		sub live		{ $mode->eager and $mode->doodle  }
 	}
 	# for example, $file belongs to class Audio::Nama::File, and uses
 	# AUTOLOAD to generate methods to provide full path
@@ -153,6 +151,8 @@ sub definitions {
 		global_effect_chains  	=> ['global_effect_chains', \&project_root],
 		old_effect_chains  		=> ['effect_chains', 		\&project_root],
 		_logfile				=> ['nama.log',				\&project_root],
+		midi_store				=> ['midi.msh',				\&project_dir ],
+		aux_midi_commands		=> ['aux_midi_commands', 	\&project_root],
 
 
 	}, 'Audio::Nama::File';
@@ -160,7 +160,6 @@ sub definitions {
 	$gui->{_save_id} = "State";
 	$gui->{_seek_unit} = 1;
 	$gui->{marks} = {};
-
 
 # 
 # use this section to specify 
@@ -189,23 +188,28 @@ sub definitions {
 		use_git							=> 1,
 		autosave						=> 'undo',
 		volume_control_operator 		=> 'ea', # default to linear scale
-		sync_mixdown_and_monitor_version_numbers => 1, # not implemented yet
+		sync_mixdown_and_playback_version_numbers => 1, # not implemented yet
 		engine_tcp_port					=> 2868, # 'default' engine
 		engine_fade_length_on_start_stop => 0.18,# when starting/stopping transport
 		engine_fade_default_length 		=> 0.5, # for fade-in, fade-out
 		engine_base_jack_seek_delay 	=> 0.1, # seconds
-		engine_command_output_buffer_size => 2**22, # 4 MB
+		jack_transport_mode				=> 'send',
+		ecasound_engine_name			=> 'ecasound',
+		ecasound_jack_client_name		=> 'nama',
+		midi_engine_name				=> 'midish',
+		engine_command_output_buffer_size => 2**26, # 64 MB
 		edit_playback_end_margin 		=> 3,
-		edit_crossfade_time 			=> 0.03,
-		fade_down_fraction 				=> 0.75,
-		fade_time1_fraction 			=> 0.9,
-		fade_time2_fraction 			=> 0.1,
+
+		edit_crossfade_time             => 0.03,
+		engine_muting_time              => 0.03,
+		fade_down_fraction              => 0.75,
+		fade_time1_fraction             => 0.9,
+		fade_time2_fraction             => 0.1,
+		fade_resolution                 => 100, # steps per second
 		fader_op 						=> 'ea',
-		mute_level 						=> {ea => 0, 	eadb => -96}, 
-		fade_out_level 					=> {ea => 0, 	eadb => -40},
-		unity_level 					=> {ea => 100, 	eadb => 0}, 
-		fade_resolution 				=> 100, # steps per second
-		engine_muting_time				=> 0.03,
+		mute_level                      => {ea => 0,    eadb => -96},
+		fade_out_level                  => {ea => 0,    eadb => -40},
+		unity_level                     => {ea => 100,  eadb => 0},
 		enforce_channel_bounds			=> 1,
 
 		serialize_formats               => 'json',		# for save_system_state()
@@ -221,6 +225,14 @@ sub definitions {
 		hotkey_beep					=> 'beep -f 250 -l 200',
 	#	this causes beeping during make test
 	#	beep_command					=> 'beep -f 350 -l 700',
+		midi_record_buffer => 'midi_record',
+		midi_default_input_channel => 'keyboard',
+		ecasound_channel_ops 		=> {map{$_,1} qw(chcopy chmove chorder chmix chmute)},
+		waveform_height				=> 200,
+		waveform_canvas_x			=> 2400,
+		waveform_canvas_y			=> 4800,
+		waveform_pixels_per_second  => 10,
+		loop_chain_channel_width     => 16,
 
 	}, 'Audio::Nama::Config';
 
@@ -244,8 +256,8 @@ sub definitions {
  	}
 	sub globals_realtime {
 		Audio::Nama::ChainSetup::setup_requires_realtime()
-			? $config->{engine_globals}->{realtime}
-			: $config->{engine_globals}->{nonrealtime}
+			? $config->{ecasound_globals}->{realtime}
+			: $config->{ecasound_globals}->{nonrealtime}
 	}
 	} # end Audio::Nama::Config package
 
@@ -293,10 +305,13 @@ sub initialize_interfaces {
 	logpkg(__FILE__,__LINE__,'debug', sub{"Command line options\n".  json_out($config->{opts})});
 
 	read_config(global_config());  # from .namarc if we have one
+	# set sample rate is needed for prepare_static_effects_data() and initialize_project_data()
+	$config->{sample_rate} = $config->{opts}->{z} if $config->{opts}->{z};
 
 	logpkg(__FILE__,__LINE__,'debug',sub{"Config data\n".Dumper $config});
 	
-	select_ecasound_interface();
+	Audio::Nama::MidiEngine->new(name => $config->{midi_engine_name}) if $config->{use_midi}; 
+	initialize_ecasound_engine();
 		
 	start_osc_listener($config->{osc_listener_port}) 
 		if $config->{osc_listener_port} 
@@ -322,6 +337,7 @@ sub initialize_interfaces {
 
 	get_ecasound_iam_keywords();
 	load_keywords(); # for autocompletion
+	parse_midi_help();
 
 	chdir $config->{root_dir} # for filename autocompletion
 		or warn "$config->{root_dir}: chdir failed: $!\n";
@@ -340,15 +356,13 @@ sub initialize_interfaces {
 
 	# periodically check if JACK is running, and get client/port/latency list
 
-	poll_jack() unless $config->{opts}->{J} or $config->{opts}->{A};
-
 	sleeper(0.2); # allow time for first polling
 
-	# we will start jack.plumbing only when we need it
+	# we will start jack-plumbing only when we need it
 	
 	if(		$config->{use_jack_plumbing} 
 	and $jack->{jackd_running} 
-	and process_is_running('jack.plumbing')
+	and process_is_running('jack-plumbing')
 	){
 
 		pager_newline(<<PLUMB);
@@ -356,20 +370,20 @@ Jack.plumbing daemon detected!
 
 Attempting to stop it...  
 
-(This may break other software that depends in jack.plumbing.)
+(This may break other software that depends in jack-plumbing.)
 
 Nama will restart it as needed for Nama's use only.
 PLUMB
 
 		kill_jack_plumbing();
 		sleeper(0.2);
-		if( process_is_running('jack.plumbing') )
+		if( process_is_running('jack-plumbing') )
 		{
-		throw(q(Unable to stop jack.plumbing daemon.
+		throw(q(Unable to stop jack-plumbing daemon.
 
 Please do one of the following, then restart Nama:
 
- - kill the jack.plumbing daemon ("killall jack.plumbing")
+ - kill the jack-plumbing daemon ("killall jack-plumbing")
  - set "use_jack_plumbing: 0" in .namarc
 
 ....Exiting.) );
@@ -378,8 +392,6 @@ exit;
 		else { pager_newline("Stopped.") }
 	}
 		
-	start_midish() if $config->{use_midish};
-
 	initialize_terminal() unless $config->{opts}->{T};
 
 	1;	
@@ -419,7 +431,7 @@ sub process_remote_command {
     };
     $@ and throw("caught error: $@, resetting..."), reset_remote_control_socket(), revise_prompt(), return;
     logpkg(__FILE__,__LINE__,'debug',"Got remote control socketput: $input");
-	process_command($input);
+	nama_cmd($input);
 	my $out;
 	{ no warnings 'uninitialized';
 		$out = $text->{eval_result} . "\n";
@@ -462,11 +474,11 @@ sub process_osc_command {
 	$path =~ s(^/)();
 	$path =~ s(/$)();
 	my ($trackname, $fx, $param) = split '/', $path;
-	process_command($trackname);
-	process_command("$command @vals") if $command;
-	process_command("show_effect $fx") if $fx; # select
-	process_command("show_track") if $trackname and not $fx;
-	process_command("show_tracks") if ! $trackname;
+	nama_cmd($trackname);
+	nama_cmd("$command @vals") if $command;
+	nama_cmd("show_effect $fx") if $fx; # select
+	nama_cmd("show_track") if $trackname and not $fx;
+	nama_cmd("show_tracks") if ! $trackname;
 	say "got OSC: ", Dumper $p;
 	say "got args: @args";
  	my $osc_out = IO::Socket::INET->new(
@@ -486,15 +498,14 @@ sub sanitize_remote_input {
 	throw($error_msg) if $error_msg;
 	$input
 }
-sub select_ecasound_interface {
+sub initialize_ecasound_engine {
 	my %args;
 	my $class;
 	if ($config->{opts}->{A} or $config->{opts}->{E})
 	{
 		pager_newline("Starting dummy engine only"); 
 		%args = (
-			name => 'Nama', 
-			jack_transport_mode => 'send',
+			name => $config->{ecasound_engine_name}
 		);
 		$class = 'Audio::Nama::Engine';
 	}
@@ -504,16 +515,14 @@ sub select_ecasound_interface {
 		and say("loaded Audio::Ecasound")
 	){  
 		%args = (
-			name => 'Nama', 
-			jack_transport_mode => 'send',
+			name => $config->{ecasound_engine_name}, 
 		);
 		$class = 'Audio::Nama::LibEngine';
 	}
 	else { 
 		%args = (
-			name => 'Nama', 
+			name => $config->{ecasound_engine_name}, 
 			port => $config->{engine_tcp_port},
-			jack_transport_mode => 'send',
 		);
 		$class = 'Audio::Nama::NetEngine';
 	}
@@ -557,29 +566,7 @@ sub munge_category {
 sub start_logging { 
 	$config->{want_logging} = initialize_logger($config->{opts}->{L})
 }
-sub eval_iam { $this_engine and $this_engine->eval_iam(@_) }
-
-sub initialize_mixer {
-		Audio::Nama::SimpleTrack->new( 
-			group => 'Master', 
-			name => 'Master',
-			send_type => 'soundcard',
-			send_id => 1,
-			width => 2,
-			rw => MON,
-			source_type => undef,
-			source_id => undef); 
-
-		my $mixdown = Audio::Nama::MixDownTrack->new( 
-			group => 'Mixdown', 
-			name => 'Mixdown', 
-			width => 2,
-			rw => OFF,
-			source_type => undef,
-			source_id => undef); 
-	$ui->create_master_and_mix_tracks();
-}
-
+sub ecasound_iam{ $en{$Audio::Nama::config->{ecasound_engine_name}} and $en{$Audio::Nama::config->{ecasound_engine_name}}->ecasound_iam(@_) }
 
 1;
 __END__

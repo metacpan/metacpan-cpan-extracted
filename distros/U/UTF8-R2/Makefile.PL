@@ -1,9 +1,10 @@
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{UTF8::R2},
-    'VERSION'   => q{0.05},
+    'VERSION'   => q{0.06},
     'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use or LTS},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -19,7 +20,7 @@ WriteMakefile(
         'strict' => '1.01',
         'vars' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
+    'AUTHOR'    => q{ina <ina@cpan.org>},
 );
 
 __END__

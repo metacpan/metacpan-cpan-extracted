@@ -4,7 +4,7 @@ use lib './inc';
 use IO::Catch;
 use Test::HTTP::LocalServer;
 
-use vars qw($_STDOUT_ $_STDERR_);
+our ($_STDOUT_, $_STDERR_);
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
 

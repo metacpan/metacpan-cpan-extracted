@@ -1,4 +1,4 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP11;
 use vars '$VERSION';
-$VERSION = '3.24';
+$VERSION = '3.25';
   #!!!
 
 use warnings;
@@ -17,6 +17,7 @@ use strict;
 use Log::Report    'xml-compile-soap';
 
 use List::Util     qw/first/;
+use Scalar::Util   qw/reftype/;
 use XML::Compile::Util
    qw/odd_elements SCHEMA2001 SCHEMA2001i pack_type unpack_type type_of_node/;
 use XML::Compile::SOAP::Util qw/:soap11 WSDL11/;
@@ -411,15 +412,15 @@ foreach my $d (@$data)
     my $root_type = @roots ? $roots[0]->{_TYPE} : undef;
 
     # address parameters by name
-    # On the top-level, we can strip on level.  Some elements may appear
+    # On the top-level, we can strip on level. Some elements may appear
     # more than once.
     my %h;
     foreach my $param (@roots ? @roots : @$data)
     {   delete $param->{_TYPE};
         my ($k, $v) = %$param;
-           if(!$h{$k})    { $h{$k} = $v }
-        elsif(ref $h{$k}) { push @{$h{$k}}, $v }
-        else              { $h{$k} = [ $h{$k}, $v ] }
+        if(! exists $h{$k}) { $h{$k} = $v }
+        elsif(reftype $h{$k} eq 'ARRAY') { push @{$h{$k}}, $v }
+        else                { $h{$k} = [ $h{$k}, $v ] }
     }
 
     $h{_TYPE} = $root_type
@@ -619,13 +620,14 @@ sub _dec_array_hook($$$$$)
 {   my ($self, $node, $args, $where, $local, $r, $fulltype) = @_;
 
     my $at = $node->getAttributeNS(SOAP11ENC, 'arrayType')
+          || $node->getAttributeNS(WSDL11,    'arrayType')
         or return $node;
 
-    $at =~ m/^(.*) \s* \[ ([\d,]+) \] $/x
+    $at =~ m/^(.*) \s* \[ ([\d,]+)? \] $/x
         or return $node;
 
     my ($preftype, $dims) = ($1, $2);
-    my @dims = split /\,/, $dims;
+    my @dims = defined $dims ? split /\,/, $dims : ();
    
     my $basetype;
     if(index($preftype, ':') >= 0)
@@ -637,7 +639,7 @@ sub _dec_array_hook($$$$$)
     }
 
     my $table;
-    if(@dims==1)
+    if(@dims < 2)
     {   $table = $self->_dec_array_one($node, $basetype, $dims[0]);
     }
     else
@@ -650,7 +652,7 @@ sub _dec_array_hook($$$$$)
     (type_of_node($node) => $table);
 }
 
-sub _dec_array_one($$$)
+sub _dec_array_one($$;$)
 {   my ($self, $node, $basetype, $size) = @_;
 
     my $off    = $node->getAttributeNS(SOAP11ENC, 'offset') || '[0]';
@@ -659,7 +661,7 @@ sub _dec_array_one($$$)
     my $offset = $1;
     my @childs = grep $_->isa('XML::LibXML::Element'), $node->childNodes;
     my $array  = $self->_dec(\@childs, $basetype, $offset, 1);
-    $#$array   = $size -1;   # resize array to specified size
+    $#$array   = $size -1 if $size;   # resize array to specified size
     $array;
 }
 

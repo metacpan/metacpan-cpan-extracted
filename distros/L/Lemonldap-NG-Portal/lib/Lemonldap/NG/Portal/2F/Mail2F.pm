@@ -11,14 +11,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MUSTHAVEMAIL
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor',
   'Lemonldap::NG::Portal::Lib::SMTP';
 
 # INITIALIZATION
 
-has prefix => ( is => 'ro', default => 'mail' );
+has prefix => ( is => 'rw', default => 'mail' );
 has random => (
     is      => 'rw',
     default => sub {
@@ -45,8 +45,8 @@ sub init {
         $self->error("Missing 'mailSessionKey' parameter, aborting");
         return 0;
     }
-    $self->logo( $self->conf->{mail2fLogo} )
-      if ( $self->conf->{mail2fLogo} );
+    $self->prefix( $self->conf->{sfPrefix} )
+      if ( $self->conf->{sfPrefix} );
     return $self->SUPER::init();
 }
 
@@ -85,7 +85,7 @@ sub run {
     else {
 
         # Use HTML template
-        $body = $self->loadTemplate(
+        $body = $self->loadMailTemplate(
             $req,
             'mail_2fcode',
             filter => $tr,
@@ -109,10 +109,15 @@ sub run {
         $req,
         'ext2fcheck',
         params => {
-            MAIN_LOGO   => $self->conf->{portalMainLogo},
-            SKIN        => $self->p->getSkin($req),
-            TOKEN       => $token,
-            TARGET      => '/' . $self->prefix . '2fcheck',
+            MAIN_LOGO => $self->conf->{portalMainLogo},
+            SKIN      => $self->p->getSkin($req),
+            TOKEN     => $token,
+            PREFIX    => $self->prefix,
+            TARGET    => '/'
+              . $self->prefix
+              . '2fcheck?skin='
+              . $self->p->getSkin($req),
+            LEGEND      => 'enterMail2fCode',
             CHECKLOGINS => $checkLogins
         }
     );

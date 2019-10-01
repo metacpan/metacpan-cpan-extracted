@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -108,7 +108,7 @@ sub run {
             MAIN_LOGO   => $self->conf->{portalMainLogo},
             SKIN        => $self->p->getSkin($req),
             TOKEN       => $token,
-            TARGET      => '/yubikey2fcheck',
+            TARGET      => '/yubikey2fcheck?skin=' . $self->p->getSkin($req),
             INPUTLOGO   => 'yubikey.png',
             LEGEND      => 'clickOnYubikey',
             CHECKLOGINS => $checkLogins

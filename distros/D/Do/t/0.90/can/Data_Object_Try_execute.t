@@ -59,7 +59,7 @@ my $callback;
 my $event;
 
 $event = Event->new;
-$try = Data::Object::Try->new(invocant => $event);
-is_deeply $try->execute(sub{['always', @_]},1,2,3), ['always', $event, 1..3];
+$try = Data::Object::Try->new(invocant => $event, arguments => [0]);
+is_deeply $try->execute(sub{['always', @_]},1,2,3), ['always', $event, 0..3];
 
 ok 1 and done_testing;

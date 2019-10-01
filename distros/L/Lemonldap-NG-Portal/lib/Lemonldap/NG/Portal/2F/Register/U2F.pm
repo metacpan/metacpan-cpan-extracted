@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::U2F';
@@ -61,7 +61,7 @@ sub run {
         my $maxSize = $self->conf->{max2FDevices};
         $self->logger->debug("Registered 2F Device(s) : $size / $maxSize");
         if ( $size >= $maxSize ) {
-            $self->userLogger->error("Max number of 2F devices is reached !!!");
+            $self->userLogger->warn("Max number of 2F devices is reached");
             return $self->p->sendError( $req, 'maxNumberof2FDevicesReached',
                 400 );
         }
@@ -288,12 +288,18 @@ sub run {
         }
 
         # Delete U2F device
+        my $keyName;
+        foreach (@$_2fDevices) {
+            $keyName = $_->{name} if $_->{epoch} eq $epoch;
+        }
         @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
         $self->logger->debug(
-            "Delete 2F Device : { type => 'U2F', epoch => $epoch }");
+"Delete 2F Device : { type => 'U2F', epoch => $epoch, name => $keyName }"
+        );
         $self->p->updatePersistentSession( $req,
             { _2fDevices => to_json($_2fDevices) } );
-        $self->userLogger->notice('U2F key unregistration succeed');
+        $self->userLogger->notice(
+            "U2F key $keyName unregistration succeeds for $user");
         return [
             200,
             [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],

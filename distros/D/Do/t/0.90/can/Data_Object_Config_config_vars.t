@@ -26,7 +26,7 @@ config_vars() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

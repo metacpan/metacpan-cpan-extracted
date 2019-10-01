@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -19,7 +19,7 @@ has rules => ( is => 'rw', default => sub { {} } );
 sub init {
     my ($self) = @_;
     my $hd = $self->p->HANDLER;
-    foreach ( keys %{ $self->conf->{grantSessionRules} } ) {
+    foreach ( keys %{ $self->conf->{grantSessionRules} // {} } ) {
         $self->logger->debug("GrantRule key -> $_");
         $self->logger->debug(
             "GrantRule value -> " . $self->conf->{grantSessionRules}->{$_} );

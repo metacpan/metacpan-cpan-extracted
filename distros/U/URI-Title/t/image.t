@@ -18,4 +18,4 @@ if ($s) {
   exit;
 }
 
-is( title('http://st.pimg.net/perlweb/images/camel_head.v25e738a.png'), "png (60 x 65)"  );
+is( title('http://st.pimg.net/perlweb/images/camel_head.v25e738a.png'), "camel_head.v25e738a.png (png 60x65)"  );

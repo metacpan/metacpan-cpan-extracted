@@ -1,0 +1,23 @@
+From: William White <bwhite@frogomatic.org>
+Subject: Re: question and bug report on XAO Perl modules
+To: am@xao.com (Andrew Maltsev)
+Date: Wed, 24 Apr 2002 19:23:33 -0400 (EDT)
+In-Reply-To: <20020424112923.A27582@am.xao.com> from "Andrew Maltsev" at Apr 24, 2002 11:29:23 AM
+X-Mailer: ELM [version 2.5 PL3]
+
+> You will also need XAO-Catalogs
+
+That did it.  CPAN search was negative, incidentally (and XAO::Catalogs
+isn't in the dep list for XAO::Commerce, tho you probably already knew
+that).  Thanks.
+
+Oh, and when I forgot to crease the test database I got this exception,
+dunno if this is expected or if XAO::Errors isn't getting along with
+Test::Unit::HarnessUnit (which I just upgraded):
+
+ta/Catalogs....DBI->connect(test1) failed: Unknown database 'test1' at /usr/lib/perl5/site_perl/5.6.1/XAO/DO/FS/Glue/MySQL_DBI.pm line 73
+Can't locate object method "to_string" via package "XAO::E::Objects" (perhaps you forgot to load "XAO::E::Objects"?) at /usr/lib/perl5/site_perl/5.6.1/Test/Unit/HarnessUnit.pm line 41.
+
+I'm not particularly motivated to investigate right now but if I find out
+anything more I'll let you know.
+

@@ -2,7 +2,7 @@ package Catmandu::Importer::CSV;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2006';
+our $VERSION = '1.2007';
 
 use Text::CSV;
 use List::Util qw(reduce);
@@ -31,7 +31,7 @@ has fields              => (
     coerce => sub {
         my $fields = $_[0];
         if (ref $fields eq 'ARRAY') {return $fields}
-        if (ref $fields eq 'HASH') {return [sort keys %$fields]}
+        if (ref $fields eq 'HASH')  {return [sort keys %$fields]}
         return [split ',', $fields];
     },
 );

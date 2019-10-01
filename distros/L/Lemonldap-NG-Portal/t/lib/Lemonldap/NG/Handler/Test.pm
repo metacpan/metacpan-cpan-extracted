@@ -31,6 +31,12 @@ sub init {
                 type    => 'File',
                 dirName => 't',
             },
+            globalStorageOptions => {
+                Directory     => $LLNG::TMPDIR,
+                LockDirectory => "$LLNG::TMPDIR/lock",
+                generateModule =>
+                  'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+            },
             localSessionStorage        => 'Cache::FileCache',
             localSessionStorageOptions => {
                 namespace   => 'lemonldap-ng-session',

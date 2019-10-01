@@ -2,7 +2,7 @@ package Catmandu::Exporter::Text;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2006';
+our $VERSION = '1.2007';
 
 use Moo;
 use Catmandu::Util;
@@ -18,7 +18,7 @@ _define_backslash_escapes(
     (map {$_ => $_} ('\\', '"', '$', '@')),
     ('r' => "\r", 'n' => "\n", 't' => "\t"),
     (map {'x' . unpack('H2', chr($_)) => chr($_)} (0 .. 255)),
-    (map {sprintf('%03o', $_) => chr($_)} (0 .. 255)),
+    (map {sprintf('%03o', $_)         => chr($_)} (0 .. 255)),
 );
 
 sub _define_backslash_escapes {

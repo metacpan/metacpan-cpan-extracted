@@ -9,6 +9,7 @@ lib/Lemonldap/NG/Handler/ApacheMP2/AuthBasic.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/CDA.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/DevOps.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/DevOpsST.pm
+lib/Lemonldap/NG/Handler/ApacheMP2/Fail.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/FCGIClient.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/Main.pm
 lib/Lemonldap/NG/Handler/ApacheMP2/Menu.pm
@@ -20,6 +21,7 @@ lib/Lemonldap/NG/Handler/ApacheMP2/ZimbraPreAuth.pm
 lib/Lemonldap/NG/Handler/Lib/AuthBasic.pm
 lib/Lemonldap/NG/Handler/Lib/CDA.pm
 lib/Lemonldap/NG/Handler/Lib/DevOps.pm
+lib/Lemonldap/NG/Handler/Lib/Fail.pm
 lib/Lemonldap/NG/Handler/Lib/OAuth2.pm
 lib/Lemonldap/NG/Handler/Lib/PSGI.pm
 lib/Lemonldap/NG/Handler/Lib/SecureToken.pm
@@ -35,6 +37,7 @@ lib/Lemonldap/NG/Handler/Main/SharedVariables.pm
 lib/Lemonldap/NG/Handler/PSGI.pm
 lib/Lemonldap/NG/Handler/PSGI/AuthBasic.pm
 lib/Lemonldap/NG/Handler/PSGI/CDA.pm
+lib/Lemonldap/NG/Handler/PSGI/Fail.pm
 lib/Lemonldap/NG/Handler/PSGI/Main.pm
 lib/Lemonldap/NG/Handler/PSGI/OAuth2.pm
 lib/Lemonldap/NG/Handler/PSGI/Router.pm
@@ -45,6 +48,7 @@ lib/Lemonldap/NG/Handler/Server/AuthBasic.pm
 lib/Lemonldap/NG/Handler/Server/CDA.pm
 lib/Lemonldap/NG/Handler/Server/DevOps.pm
 lib/Lemonldap/NG/Handler/Server/DevOpsST.pm
+lib/Lemonldap/NG/Handler/Server/Fail.pm
 lib/Lemonldap/NG/Handler/Server/Main.pm
 lib/Lemonldap/NG/Handler/Server/Nginx.pm
 lib/Lemonldap/NG/Handler/Server/OAuth2.pm

@@ -345,7 +345,7 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
     #   { uid => 'foo.bar', session => <sessionId> }
     elsif ( my $f = $req->params('orderBy') ) {
         my @fields = split /,/, $f;
-        my @r = map {
+        my @r      = map {
             my $tmp = { session => $_ };
             foreach my $f (@fields) {
                 my $s = $f;

@@ -35,16 +35,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Cwd" => 0,
-    "Exporter" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "lib" => 0
+    "Test::Output" => 0
   },
-  "VERSION" => "1.22",
+  "VERSION" => "1.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,8 +50,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Cwd" => 0,
-  "Exporter" => 0,
   "File::Basename" => 0,
   "File::Copy" => 0,
   "File::Copy::Recursive" => 0,
@@ -68,9 +64,9 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
+  "Test::Output" => 0,
   "Text::Diff" => 0,
   "Try::Tiny" => 0,
-  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

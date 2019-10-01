@@ -25,6 +25,7 @@ t/01-diag.t
 t/cpan-repo.t
 t/helpers.t
 tidyall.ini
+xt/author/gh-open.t
 xt/author/pod-coverage.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t

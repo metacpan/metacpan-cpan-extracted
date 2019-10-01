@@ -1,4 +1,25 @@
 package IO::Pager::Perl;
+our $VERSION = 0.43;
+
+use strict;
+use base qw( IO::Pager::Unbuffered );
+
+BEGIN{
+  my $PAGER;
+  #local $ENV{PATHEXT} .= ";.PL"
+  foreach my $lib ( @INC ){
+    $PAGER = File::Spec->catfile($lib, 'IO', 'Pager', 'tp');
+    if( -e $PAGER ){
+      $ENV{PAGER} = $^X.' '.$PAGER;
+      last;
+    }
+  }
+}
+
+1;
+
+__DATA__
+package IO::Pager::Perl;
 our $VERSION = 0.42;
 
 use strict;
@@ -108,17 +129,24 @@ __END__
 
 =head1 NAME
 
-IO::Pager::Perl - Pipe output to PAGER if destination is a TTY with Perl
+IO::Pager::Perl - Pipe output to PAGER with Perl if destination is a TTY
 
 =head1 SYNOPSIS
 
-  #Required if you want unbuffered output
+=cut
+
+  #!!! CURRENT IMPLEMENTATION REQUIRES Term::ReadKey
+  ##Required if you want unbuffered output
   use Term::ReadKey;
 
   {
+    #!!! NOT AVAILABLE WITH CURRENT IMPLEMENTATION
     #Configure extra shortcuts, add an embedded shell
     %IO::Pager::Perl::CFG = ( '!' => sub{ "REPL implementation" } );
 
+=pod
+
+  {
     #Can be instantiated functionally or OO, same as other sub-classes.
     my $token = new IO::Pager::Perl;
 
@@ -129,12 +157,18 @@ IO::Pager::Perl - Pipe output to PAGER if destination is a TTY with Perl
 
 IO::Pager::Perl is a simple, extensible, perl-based pager.
 
+=cut
+
 If you want behavior similar to IO::Pager::Buffer do not load Term::ReadKey,
 and output will be buffered between keypresses.
 
+=pod
+
 See L<IO::Pager> for method details.
 
-=head1 CONFIGURATION
+=cut
+
+= head1 CONFIGURATION
 
 I<%IO::Pager::Perl::CFG> elements are passed to Term::Pager's add_func method.
 The hash keys are single key shortcut definitions, and values a callback to be
@@ -149,11 +183,15 @@ invoked when said key is pressed e.g;
 Because IO::Pager::Perl forks, the callback functions must exist prior to
 instantiation of the IO::Pager object to work properly.
 
+=pod
+
 =head1 METHODS
 
 All methods are inherited from IO::Pager; except for instantiation and print.
 
-=head1 CAVEATS
+=cut
+
+= head1 CAVEATS
 
 You probably want to do something with SIGPIPE eg;
 
@@ -167,6 +205,8 @@ You probably want to do something with SIGPIPE eg;
   }
 
   # Do something else
+
+=pod
 
 =head1 SEE ALSO
 

@@ -70,7 +70,7 @@
    "provides" : {
       "Sweat" : {
          "file" : "lib/Sweat.pm",
-         "version" : "201909171"
+         "version" : "201909240"
       },
       "Sweat::Article" : {
          "file" : "lib/Sweat/Article.pm"
@@ -93,7 +93,7 @@
          "web" : "https://github.com/jmacdotorg/sweat"
       }
    },
-   "version" : "201909171",
+   "version" : "201909240",
    "x_authority" : "cpan:JMAC",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

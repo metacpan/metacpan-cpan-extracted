@@ -29,7 +29,7 @@ count(4);
 # Authentified queries
 # --------------------
 
-# Authorizated query
+# Authorized query
 ok( $res = $client->_get( '/', undef, undef, "lemonldap=$sessionId" ),
     'Authentified query' );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );

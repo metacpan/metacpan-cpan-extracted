@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,7 @@ requires:
   Moose: '1'
   MooseX::Role::Parameterized: '0.18'
   Path::Class: '0.26'
+  SQL::SplitStatement: '1.00020'
   SQL::Translator: '0.11005'
   Sub::Exporter::Progressive: '0'
   Text::Brew: '0.02'
@@ -40,5 +41,6 @@ resources:
   bugtracker: https://github.com/frioux/DBIx-Class-DeploymentHandler/issues
   homepage: https://github.com/frioux/DBIx-Class-DeploymentHandler
   repository: https://github.com/frioux/DBIx-Class-DeploymentHandler.git
-version: '0.002232'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.002233'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

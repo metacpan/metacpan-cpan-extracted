@@ -27,7 +27,7 @@ diag 'warnings propagated to original handler: ', explain \@warnings;
 
 SKIP: {
     skip 'PadWalker required for this test', 1
-        if not eval 'require PadWalker';
+        if not eval { require PadWalker; 1 };
     is(
         ${ PadWalker::closed_over(\&Test::Warnings::had_no_warnings)->{'$forbidden_warnings_found'} },
         1,

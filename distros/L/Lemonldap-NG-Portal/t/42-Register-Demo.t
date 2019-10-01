@@ -13,7 +13,7 @@ my $maintests = 9;
 my ( $res, $user, $pwd );
 
 SKIP: {
-    eval 'require Email::Sender::Simple';
+    eval 'require Email::Sender::Simple; use Text::Unidecode';
     if ($@) {
         skip 'Missing dependencies', $maintests;
     }

@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   strict: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +27,7 @@ requires:
   namespace::clean: '0'
   perl: '5.014000'
   strict: '0'
-version: '0.08'
-x_homepageresources:
-  repository:
-    type: git
-    url: git://github.com/thrig/Lingua-Awkwords.git
-    web: https://github.com/thrig/Lingua-Awkwords
+resources:
+  repository: git://github.com/thrig/Lingua-Awkwords.git
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

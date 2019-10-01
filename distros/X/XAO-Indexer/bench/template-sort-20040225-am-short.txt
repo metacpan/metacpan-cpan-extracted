@@ -1,0 +1,40 @@
+============= /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 8
+model name	: Pentium III (Coppermine)
+stepping	: 3
+cpu MHz		: 851.949
+cache size	: 256 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 mmx fxsr sse
+bogomips	: 1697.38
+
+============= uname -a
+Linux am.xao.com 2.4.20-20.7 #1 Mon Aug 18 14:56:30 EDT 2003 i686 unknown
+============= args
+bench-template-sort.pl --with-perl --block-count 50 --run-count 10 yes
+full-count 500000
+part-count 2000
+block-count 50
+run-count 10
+============= date
+Wed Feb 25 17:58:38 2004
+============= benchmark
+Benchmark: timing 10 iterations of t1_null, t2_perl1, t2_perl2, t3_i_null, t3_is_direct, t3_is_normal, t3_is_perl...
+   t1_null:  0 wallclock secs ( 0.00 usr +  0.00 sys =  0.00 CPU)
+            (warning: too few iterations for a reliable count)
+  t2_perl1: 243 wallclock secs (235.26 usr +  0.12 sys = 235.38 CPU) @  0.04/s (n=10)
+  t2_perl2: 65 wallclock secs (64.56 usr +  0.19 sys = 64.75 CPU) @  0.15/s (n=10)
+ t3_i_null:  5 wallclock secs ( 4.08 usr +  0.16 sys =  4.24 CPU) @  2.36/s (n=10)
+t3_is_direct:  8 wallclock secs ( 8.32 usr +  0.16 sys =  8.48 CPU) @  1.18/s (n=10)
+t3_is_normal:  9 wallclock secs ( 8.21 usr +  0.16 sys =  8.37 CPU) @  1.19/s (n=10)
+t3_is_perl: 15 wallclock secs (15.21 usr +  0.01 sys = 15.22 CPU) @  0.66/s (n=10)

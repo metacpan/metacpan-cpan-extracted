@@ -8,7 +8,7 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_PP_PASSWORD_EXPIRED PE_PP_CHANGE_AFTER_RESET);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Auth::LDAP';
 
@@ -19,7 +19,7 @@ has adPwdMaxAge => (
     lazy    => 1,
     builder => sub {
         my $conf = $_[0]->{conf};
-        my $res = $conf->{ADPwdMaxAge} || 0;
+        my $res  = $conf->{ADPwdMaxAge} || 0;
         return $res * 10000000;   # padding with '0' to obtain 0.1 micro-seconds
     }
 );
@@ -29,7 +29,7 @@ has adPwdExpireWarning => (
     lazy    => 1,
     builder => sub {
         my $conf = $_[0]->{conf};
-        my $res = $conf->{ADPwdExpireWarning} || 0;
+        my $res  = $conf->{ADPwdExpireWarning} || 0;
         return $res * 10000000;   # padding with '0' to obtain 0.1 micro-seconds
     }
 );
@@ -66,11 +66,11 @@ sub authenticate {
     my ( $self, $req ) = @_;
     my $res = $self->SUPER::authenticate($req);
 
-    my $pls = $self->ldap->getLdapValue( $req->data->{entry}, 'pwdLastSet' );
-    my $computed = $self->ldap->getLdapValue( $req->data->{entry},
+    my $pls = $self->ldap->getLdapValue( $req->data->{ldapentry}, 'pwdLastSet' );
+    my $computed = $self->ldap->getLdapValue( $req->data->{ldapentry},
         'msDS-User-Account-Control-Computed' );
     my $_adUac =
-      $self->ldap->getLdapValue( $req->data->{entry}, 'userAccountControl' )
+      $self->ldap->getLdapValue( $req->data->{ldapentry}, 'userAccountControl' )
       || 0;
 
     unless ( $res == PE_OK ) {

@@ -14,14 +14,14 @@ use Lingua::Awkwords::OneOf;
 use Lingua::Awkwords::String;
 use Lingua::Awkwords::Subpattern;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub parse {
     my $self = shift;
     my $unit = $self->_parse_unit;
 
     my $filters =
-      $self->sequence_of( sub { $self->expect('^'); $self->_parse_filter } );
+      $self->sequence_of(sub { $self->expect('^'); $self->_parse_filter });
     $unit->add_filters(@$filters) if @$filters;
 
     return $unit;
@@ -36,11 +36,11 @@ sub _parse_filter {
     1 while $self->any_of(
         # NOTE code for these duplicted from the unit parse
         sub {
-            $filter .= ( $self->expect(qr/"([^"]*)"/) )[-1];
+            $filter .= ($self->expect(qr/"([^"]*)"/))[-1];
             1;
         },
         sub {
-            $filter .= $self->generic_token( 'other', qr{[^ "A-Z\(\)\[\]/\*\^]+} );
+            $filter .= $self->generic_token('other', qr{[^ "A-Z\(\)\[\]/\*\^]+});
             1;
         },
         sub {
@@ -56,7 +56,7 @@ sub _parse_filter {
 sub _parse_unit {
     my $self = shift;
 
-    my ( $oneof, $weight );
+    my ($oneof, $weight);
     my @terms = '';
 
     1 while $self->any_of(
@@ -80,10 +80,9 @@ sub _parse_unit {
 
             for my $term (@terms) {
                 # TODO cache these strings so only one obj instance per str?
-                $term = Lingua::Awkwords::String->new( string => $term ) if !ref $term;
+                $term = Lingua::Awkwords::String->new(string => $term) if !ref $term;
             }
-            $oneof->add_choice( Lingua::Awkwords::ListOf->new( terms => [@terms] ),
-                $weight );
+            $oneof->add_choice(Lingua::Awkwords::ListOf->new(terms => [@terms]), $weight);
 
             # empty string here is so [a/] parses correctly as a choice
             # between a and nothing instead of dropping out of the unit
@@ -97,8 +96,8 @@ sub _parse_unit {
             my $delim = $self->expect(qr/[ \[\( ]/x);
             $delim =~ tr/[(/])/;
 
-            my $ret = $self->scope_of( undef, \&_parse_unit, $delim );
-            if ( $terms[-1] eq '' ) {
+            my $ret = $self->scope_of(undef, \&_parse_unit, $delim);
+            if ($terms[-1] eq '') {
                 $terms[-1] = $ret;
             } else {
                 push @terms, $ret;
@@ -106,18 +105,18 @@ sub _parse_unit {
 
             # () needs additional code as (a) is equivalent to [a/] so
             # we must add an empty string to what must become a oneof
-            if ( $delim eq ')' ) {
+            if ($delim eq ')') {
                 my $newof;
-                unless ( $terms[-1]->can('add_choice') ) {
+                unless ($terms[-1]->can('add_choice')) {
                     $newof = Lingua::Awkwords::OneOf->new;
-                    $newof->add_choice( $terms[-1] );
+                    $newof->add_choice($terms[-1]);
                     $terms[-1] = $newof;
                 } else {
                     $newof = $terms[-1];
                 }
 
                 # TODO cache this string in a hash so only one obj?
-                $newof->add_choice( Lingua::Awkwords::String->new( string => '' ) );
+                $newof->add_choice(Lingua::Awkwords::String->new(string => ''));
             }
 
             # filters in [VV]^aa form (as opposed to the top-level
@@ -126,19 +125,19 @@ sub _parse_unit {
             $self->maybe(
                 sub {
                     my $filters =
-                      $self->sequence_of( sub { $self->expect('^'); $self->_parse_filter } );
+                      $self->sequence_of(sub { $self->expect('^'); $self->_parse_filter });
                     $terms[-1]->add_filters(@$filters) if @$filters;
                 }
             );
             1;
         },
         sub {
-            my $pat = $self->generic_token( 'subpattern', qr{[A-Z]} );
+            my $pat = $self->generic_token('subpattern', qr{[A-Z]});
             $self->fail("not a defined pattern")
               if !Lingua::Awkwords::Subpattern->is_pattern($pat);
 
-            my $ret = Lingua::Awkwords::Subpattern->new( pattern => $pat );
-            if ( $terms[-1] eq '' ) {
+            my $ret = Lingua::Awkwords::Subpattern->new(pattern => $pat);
+            if ($terms[-1] eq '') {
                 $terms[-1] = $ret;
             } else {
                 push @terms, $ret;
@@ -147,8 +146,8 @@ sub _parse_unit {
         },
         # NOTE code from these two also used in _parse_filter
         sub {
-            my $ret = ( $self->expect(qr/"([^"]*)"/) )[-1];
-            if ( ref $terms[-1] ) {
+            my $ret = ($self->expect(qr/"([^"]*)"/))[-1];
+            if (ref $terms[-1]) {
                 push @terms, $ret;
             } else {
                 $terms[-1] .= $ret;
@@ -156,8 +155,8 @@ sub _parse_unit {
             1;
         },
         sub {
-            my $ret = $self->generic_token( 'other', qr{[^ "A-Z\(\)\[\]/\*\^]+} );
-            if ( ref $terms[-1] ) {
+            my $ret = $self->generic_token('other', qr{[^ "A-Z\(\)\[\]/\*\^]+});
+            if (ref $terms[-1]) {
                 push @terms, $ret;
             } else {
                 $terms[-1] .= $ret;
@@ -171,15 +170,14 @@ sub _parse_unit {
 
     for my $term (@terms) {
         # TODO cache these strings so only one obj instance per str?
-        $term = Lingua::Awkwords::String->new( string => $term ) if !ref $term;
+        $term = Lingua::Awkwords::String->new(string => $term) if !ref $term;
     }
 
-    if ( defined $oneof ) {
-        $oneof->add_choice( Lingua::Awkwords::ListOf->new( terms => [@terms] ),
-            $weight );
+    if (defined $oneof) {
+        $oneof->add_choice(Lingua::Awkwords::ListOf->new(terms => [@terms]), $weight);
         return $oneof;
     } else {
-        return Lingua::Awkwords::ListOf->new( terms => \@terms );
+        return Lingua::Awkwords::ListOf->new(terms => \@terms);
     }
 }
 

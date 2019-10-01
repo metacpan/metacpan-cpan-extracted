@@ -1,0 +1,258 @@
+/**** memory-cautios random value distribution implementation. Slower
+ **** for the kind of data we have to deal with.
+ ****/
+
+/* Fast sorting and merging for XAO::Indexer
+ *
+ * Andrew Maltsev, <am@xao.com>, 2004
+*/
+#define PERL_NO_GET_CONTEXT
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+/* If that version of perl does not have pTHX_ macros then defining them here
+*/
+#ifndef	pTHX_
+#define	pTHX_
+#endif
+#ifndef	aTHX_
+#define	aTHX_
+#endif
+
+/************************************************************************/
+
+/* These parameters (5/4096) are optimal for more or less sequentially
+ * assigned IDs in the sorted template. If IDs are more random it would
+ * probably make sense to allocate less at a time - something like (4/512)
+ * or similar.
+ *
+ * TREE_DEPTH can't be less then 4 due to data types used!
+*/
+#define TREE_DEPTH  (6)
+#define CHUNK_SIZE  (256)
+
+struct data_node {
+    U16 value;
+    U32 pos;
+};
+union tree_node {
+    union tree_node *nodes;
+    struct data_node *data;
+};
+static union tree_node tree_root[16];
+
+/************************************************************************/
+
+static
+void
+tree_print(union tree_node *branch, U8 level) {
+    U8 spnum=(level+1)*2;
+    U8 i;
+    for(i=0; i<16; ++i) {
+        if(!branch[i].nodes) continue;
+        fprintf(stderr,"%*s:idx=%x level=%u\n",spnum,".",i,level);
+        if(level<TREE_DEPTH-1) {
+            tree_print(branch[i].nodes,level+1);
+        }
+        else {
+            struct data_node *d=branch[i].data;
+            U16 qty=d->pos;
+            U16 allocated=d->value;
+            U16 j;
+            fprintf(stderr,"%*s::qty=%u allocated=%u\n",spnum,".",qty,allocated);
+            for(j=0; j<qty; ++j) {
+                fprintf(stderr,"%*s:::pos=%5lu value=%04x\n",spnum,".",d[j+1].pos,d[j+1].value);
+            }
+        }
+    }
+}
+
+static
+void
+tree_store(union tree_node *branch, U32 pos, U32 value, U8 level) {
+    U8 idx=((level ? value<<(level*4) : value) >> 28) & 0xf;
+    union tree_node *node=branch+idx;
+
+    //printf("pos=%lu value=%08lx level=%u idx=%u\n",pos,value,level,idx);
+
+    if(level<TREE_DEPTH-1) {
+        if(!node->nodes) {
+            node->nodes=(typeof(node->nodes))malloc(16*sizeof(union tree_node));
+            bzero(node->nodes,16*sizeof(union tree_node));
+        }
+        tree_store(node->nodes,pos,value,level+1);
+    }
+    else {
+        struct data_node *d;
+        if(!node->data) {
+            node->data=(typeof(node->data))malloc((1+CHUNK_SIZE)*sizeof(struct data_node));
+            node->data->value=CHUNK_SIZE;
+            node->data->pos=0;
+        }
+        else if(node->data->pos >= node->data->value) {
+            U16 sz=node->data->value;
+            node->data=(typeof(node->data))realloc(node->data,
+                                                   (1+CHUNK_SIZE+sz)*sizeof(struct data_node));
+            node->data->value+=CHUNK_SIZE;
+        }
+        d=node->data+node->data->pos+1;
+        d->pos=pos;
+        d->value=value&0xffff;
+        ++(node->data->pos);
+    }
+}
+
+/* Only clears data blocks without even freeing their memory, since if
+ * we're going to re-use the index -- it will most likely contain the same
+ * ID's, only re-ordered.
+*/
+static
+void
+tree_clear(union tree_node *branch, U8 level) {
+    U8 i;
+    for(i=0; i<16; ++i) {
+        if(level<TREE_DEPTH-1) {
+            union tree_node *nodes=branch[i].nodes;
+            if(nodes) {
+                //printf("Clearing level=%x, i=%x\n",level,i);
+                tree_clear(nodes,level+1);
+            }
+        }
+        else {
+            struct data_node *data=branch[i].data;
+            if(data) {
+                //printf("Clearing level=%x, i=%x, pos=%lu\n",level,i,data->pos);
+                data->pos=0;
+            }
+        }
+    }
+}
+
+/* Populating tree with data
+*/
+static
+void
+tree_init(U32 *data, U32 size) {
+    U32 i;
+
+    tree_clear(tree_root,0);
+
+    for(i=0; i<size; ++i, ++data) {
+        U32 value=*data;
+        tree_store(tree_root,i,value,0);
+    }
+}
+
+static
+U32
+tree_lookup(U32 value) {
+    union tree_node *node=tree_root;
+    struct data_node *data;
+    U8 i;
+    U16 vrem;
+    U16 qty;
+
+    //printf("Looking up %08lx (%lu)\n",value,value);
+
+    for(i=0; i<TREE_DEPTH; ++i) {
+        
+        U8 idx=((i ? value<<(i*4) : value) >> 28) & 0xf;
+        if(!node) {
+            return 0xffffffff;
+        }
+        if(i==TREE_DEPTH-1) {
+            data=node[idx].data;
+            //printf("i=%u idx=%u data=%p\n",i,idx,data);
+        }
+        else {
+            node=node[idx].nodes;
+            //printf("i=%u idx=%u node=%p\n",i,idx,node);
+        }
+    }
+
+    if(!data)
+        return 0xffffffff;
+
+    vrem=value&0xffff;
+    qty=data->pos;
+
+    while(qty--) {
+        ++data;
+        if(data->value == vrem) {
+            return data->pos;
+        }
+    }
+
+    return 0xffffffff;
+}
+
+static
+void
+tree_free(union tree_node *branch, U8 level) {
+    U8 i;
+
+    if(level==0)
+        //printf("Freeing branch %p, level %u\n",branch,level);
+
+    for(i=0; i<16; ++i) {
+        //printf("Freeing level=%x, i=%x\n",level,i);
+        if(level<TREE_DEPTH-1) {
+            union tree_node *nodes=branch[i].nodes;
+            if(nodes) {
+                tree_free(nodes,level+1);
+                free(nodes);
+                branch[i].nodes=NULL;
+            }
+        }
+        else {
+            struct data_node *data=branch[i].data;
+            if(data) {
+                free(data);
+                branch[i].data=NULL;
+            }
+        }
+    }
+}
+
+static
+int
+tree_compare(U32 *a, U32 *b) {
+    return (tree_lookup(*a) - tree_lookup(*b));
+}
+
+/************************************************************************/
+
+MODULE = XAO::IndexerSupport		PACKAGE = XAO::IndexerSupport
+
+ # Gets sorted array that is to be used in templated sorting of its
+ # subsets later on.
+ #
+
+void
+template_sort_prepare(full_sv)
+    PROTOTYPE: $
+    INIT:
+        STRLEN full_strlen;
+        I32 *full=(I32 *)SvPV(ST(0),full_strlen);
+        I32 full_len=full_strlen/4;
+	CODE:
+        //fprintf(stderr,"template_sort_prepare: full_len=%lu\n",full_len);
+        tree_init(full,full_len);
+        # tree_print(tree_root,0);
+
+void
+template_sort(part_sv)
+    PROTOTYPE: $
+    INIT:
+        STRLEN part_strlen;
+        I32 *part=(I32 *)SvPV(ST(0),part_strlen);
+        I32 part_len=part_strlen/4;
+	CODE:
+        //fprintf(stderr,"template_sort: part_len=%lu\n",part_len);
+        qsort(part,part_len,sizeof(*part),
+              (int (*)(const void *,const void *))tree_compare);

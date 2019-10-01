@@ -7,11 +7,10 @@ BEGIN { # OPTMIZATION
 my @wav_functions = qw(
 	get_versions 
 	candidates 
-	targets 
-	versions 
-	last 
+	_targets 
+	_versions 
 );
-my @track_functions = qw(
+my @track_methods = qw(
 	dir 
 	basename 
 	full_path 
@@ -19,22 +18,23 @@ my @track_functions = qw(
 	last 
 	current_wav 
 	current_version 
-	monitor_version 
-	maybe_monitor 
+	playback_version 
+	maybe_playback
 	rec_status 
 	region_start_time 
 	region_end_time 
 	playat_time 
-	fancy_ops 
+	user_ops 
 	input_path 
+	waveform
 );
 sub track_memoize { # before generate_setup
 	return unless $config->{memoize};
-	map{package Audio::Nama::Track; memoize($_) } @track_functions;
+	map{package Audio::Nama::Track; memoize($_) } @track_methods;
 }
 sub track_unmemoize { # after generate_setup
 	return unless $config->{memoize};
-	map{package Audio::Nama::Track; unmemoize ($_)} @track_functions;
+	map{package Audio::Nama::Track; unmemoize ($_)} @track_methods;
 }
 sub restart_wav_memoize {
 	return unless $config->{memoize};

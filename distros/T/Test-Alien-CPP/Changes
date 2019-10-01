@@ -1,5 +1,10 @@
 Revision history for Test-Alien-CPP
 
+1.02      2019-09-25 12:17:10 -0600
+  - Handle newer versions of ExtUtils::CppGuess which can
+    override $Config{cc} (gh#3, gh#4, gh#5)
+  - Require Alien::Build 1.21.
+
 1.01      2019-05-20 14:51:27 -0400
   - Bump required version of ExtUtils::CBuilder for C++ compat
   - Moved to Perl5-Alien GitHub org

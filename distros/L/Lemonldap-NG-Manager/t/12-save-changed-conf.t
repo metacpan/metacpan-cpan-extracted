@@ -6,7 +6,7 @@ use strict;
 use JSON;
 require 't/test-lib.pm';
 
-my $struct = 't/jsonfiles/12-modified.json';
+my $struct    = 't/jsonfiles/12-modified.json';
 my $confFiles = [ 't/conf/lmConf-1.json', 't/conf/lmConf-2.json' ];
 
 sub body {
@@ -20,7 +20,7 @@ mkdir 't/sessions';
 my ( $res, $resBody );
 ok( $res = &client->_post( '/confs/', 'cfgNum=1', &body, 'application/json' ),
     "Request succeed" );
-ok( $res->[0] == 200, "Result code is 200" );
+ok( $res->[0] == 200,                       "Result code is 200" );
 ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 ok( $resBody->{result} == 1, "JSON response contains \"result:1\"" )
   or print STDERR Dumper($resBody);
@@ -38,7 +38,7 @@ foreach my $i ( 0 .. 1 ) {
 }
 
 ok(
-    @{ $resBody->{details}->{__changes__} } == 22,
+    @{ $resBody->{details}->{__changes__} } == 23,
     'JSON response contains 22 changes'
 ) or print STDERR Dumper($resBody);
 
@@ -54,24 +54,24 @@ while ( my $c = shift @{ $resBody->{details}->{__changes__} } ) {
     my $cmp1 = @changes;
     my $cmp2 = @cmsg;
 
-    my @d1 = grep { $_->{key} eq $c->{key} } @changes;
-    my @d2 = grep { $_->{key} eq $c->{key} } @cmsg;
-    @changes = grep { $_->{key} ne $c->{key} } @changes;
-    @cmsg    = grep { $_->{key} ne $c->{key} } @cmsg;
-    if ( $c->{key} eq 'applicationList' ) {
+    @changes = grep { ( $_->{key} || '' ) ne ( $c->{key} || '' ) } @changes;
+    @cmsg    = grep { ( $_->{key} || '' ) ne ( $c->{key} || '' ) } @cmsg;
+    if ( $c->{key} and $c->{key} eq 'applicationList' ) {
         pass qq("$c->{key}" found);
+        count(1);
     }
-    else {
+    elsif ( $c->{key} ) {
         ok( ( $cmp1 - @changes ) == ( $cmp2 - @cmsg ), qq("$c->{key}" found) )
           or print STDERR 'Expect: '
           . ( $cmp1 - @changes )
           . ', got: '
           . ( $cmp2 - @cmsg )
-          . "\nExpect: "
-          . Dumper( \@d1 ) . "Got: "
-          . Dumper( \@d2 );
+          . "\nChanges "
+          . Dumper( \@changes )
+          . "Cmsg: "
+          . Dumper( \@cmsg );
+        count(1);
     }
-    count(1);
 }
 ok( !@changes, 'All changes detected' ) or $bug = 1;
 
@@ -81,8 +81,6 @@ if ($bug) {
       . 'Changes announced and not found: '
       . Dumper( \@cmsg );
 }
-
-#print STDERR Dumper(\@changes,\@cmsg);
 
 count(6);
 
@@ -98,6 +96,11 @@ ok( @c2 == 14, '14 keys changed or created in conf 2' )
 
 count(5);
 
+ok( $res = &client->jsonResponse('/confs/latest'),
+    'Get last config metadata' );
+ok( $res->{prev} == 1, ' Get previous configuration' );
+count(2);
+
 unlink $confFiles->[1];
 
 #eval { rmdir 't/sessions'; };
@@ -107,7 +110,8 @@ done_testing( count() );
 `rm -rf t/sessions`;
 
 sub changes {
-    return [ {
+    return [
+        {
             'key' => 'portal',
             'new' => 'http://auth2.example.com/',
             'old' => 'http://auth.example.com/'
@@ -224,6 +228,10 @@ sub changes {
         {
             'key' => 'virtualHosts',
             'old' => 'test2.example.com'
+        },
+        {
+            'confCompacted' => '1',
+            'removedKeys'   => 'some; keys'
         }
     ];
 }

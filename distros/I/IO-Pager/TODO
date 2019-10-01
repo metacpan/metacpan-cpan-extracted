@@ -1,24 +1,37 @@
 Important things here and in code flagged with XXX
 
+0.43
+	If modernization of Term::Pager does not happen,
+	can we reasonably have a forking IO::Pager::Perl,
+	rather than opening IO::Pager::Perl-Term?
+
+	Current forking design yields:
+
+		Failed to create PAGER FH at 16-PurePerl_interactive.t line 16
+		stty: standard input: Inappropriate ioctl for device
+		stty: standard input: Inappropriate ioctl for device
+		print() on unopened filehandle STDOUT at Term/Pager.pm line 330
+		print() on unopened filehandle STDOUT at Term/Pager.pm line 395
+		print() on unopened filehandle STDOUT at Term/Pager.pm line 396
+		print() on unopened filehandle STDOUT at Term/Pager.pm line 397
+		print() on unopened filehandle STDOUT at Term/Pager.pm line 398
+		print() on unopened filehandle STDOUT at Term/Pager.pm line 399
+
+	Fix IO::Pager and IO::Pager::Perl PODs (remove cuts)
+
 0.40
 	Push previous versions to github
 
 	Functional fork for Term::Pager
-		working interface
-		continue after quit
-		extensibility (add_func)
-
 		Test functionality w/|w/o Term::ReadKey
 			As expicit and implicit PAGER
 
-		make pipes
-		make pager object
+		make pipes & pager object
 		parent
-			event loop/interfact
+			event loop/interact
 		child
 			worker
 0.35
-
 	Odd failure of test 11 under tcsh and win-bash because
 	*reference* has extra trailing newline.
 

@@ -67,6 +67,12 @@
                 <span trspan="sfaManager">sfaManager</span>
               </a></li>
             </TMPL_IF>
+            <TMPL_IF NAME="contextSwitching">
+              <li class="dropdown-item"><a href="/switchcontext" class="nav-link">
+                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/switchcontext_<TMPL_VAR NAME="contextSwitching">.png" width="20" height="20" alt="refresh" />
+                <span trspan="contextSwitching_<TMPL_VAR NAME="contextSwitching">">contextSwitching_<TMPL_VAR NAME="contextSwitching"></span>
+              </a></li>
+            </TMPL_IF>
             <li class="dropdown-item"><a href="/refresh" class="nav-link">
               <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/arrow_refresh.png" width="16" height="16" alt="refresh" />
               <span trspan="refreshrights">Refresh</span>

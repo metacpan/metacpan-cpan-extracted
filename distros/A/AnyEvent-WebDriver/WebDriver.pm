@@ -51,11 +51,7 @@ can be found L<here|https://www.w3.org/TR/webdriver1/>:
 
 Mozilla's C<geckodriver> has had webdriver for a long time, while
 C<chromedriver> only has basic and mostly undocumented webdriver support
-since release 77.
-
-In debian GNU/Linux, you can install the C<firefoxdriver> or
-C<chromium-driver> packages to get the firefox/chromium webdrivers,
-respectively.
+as of release 77.
 
 =head2 CONVENTIONS
 
@@ -72,7 +68,7 @@ use Carp ();
 use AnyEvent ();
 use AnyEvent::HTTP ();
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 our $WEB_ELEMENT_IDENTIFIER = "element-6066-11e4-a52e-4f735466cecf";
 our $WEB_WINDOW_IDENTIFIER  =  "window-fcc6-11e5-b4f8-330a88ab9d7f";
@@ -189,15 +185,21 @@ specify a value of C<default>.
 =item autodelete => $boolean
 
 If true (the default), then automatically execute C<delete_session> when
-the WebDriver object is destroyed with an active session. IF set to a
+the WebDriver object is destroyed with an active session. If set to a
 false value, then the session will continue to exist.
+
+Note that due to bugs in perl that are unlikely to get fixed,
+C<autodelete> is likely ineffective during global destruction and might
+even crash your process, so you should ensure objects go out of scope
+before that, or explicitly call C<delete_session>, if you want the session
+to be cleaned up.
 
 =item timeout => $seconds
 
-The HTTP timeout, in (fractional) seconds (default: C<300>, but this will
-likely drastically reduce). This timeout is reset on any activity, so it
-is not an overall request timeout. Also, individual requests might extend
-this timeout if they are known to take longer.
+The HTTP timeout, in (fractional) seconds (default: C<300>). This timeout
+is reset on any activity, so it is not an overall request timeout. Also,
+individual requests might extend this timeout if they are known to take
+longer.
 
 =item persistent => C<1> | C<undef>
 
@@ -230,7 +232,7 @@ sub DESTROY {
    my ($self) = @_;
 
    $self->delete_session
-      if exists $self->{sid};
+      if exists $self->{sid} && $self->{autodelete};
 }
 
 =item $al = $wd->actions
@@ -386,8 +388,9 @@ Firefox-specific capability documentation can be found L<on
 MDN|https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities>,
 Chrome-specific capability documentation might be found
 L<here|http://chromedriver.chromium.org/capabilities>, but the latest
-release at the time of this writing (chromedriver 77) has essentially no
-webdriver documentation about chrome capabilities.
+release at the time of this writing (chromedriver 77) has essentially
+no documentation about webdriver capabilities (even MDN has better
+documentation about chromwedriver!)
 
 If you have URLs for Safari/IE/Edge etc. capabilities, feel free to tell
 me about them.
@@ -416,14 +419,22 @@ sub new_session_ {
 =item $wd->delete_session
 
 Deletes the session - the WebDriver object must not be used after this
-call.
+call (except for calling this method).
+
+This method is always safe to call and will not do anything if there is no
+active session.
 
 =cut
 
 sub delete_session_ {
    my ($self, $cb) = @_;
 
-   local $self->{_ep} = "$self->{endpoint}/session/$self->{sid}";
+   my $sid = delete $self->{sid};
+   delete $self->{capoabilities};
+
+   return unless defined $sid;
+
+   local $self->{_ep} = "$self->{endpoint}/session/$sid";
    $self->delete_ ("" => $cb);
 }
 
@@ -1555,7 +1566,7 @@ Since building large action lists can take nontrivial amounts of time,
 it can make sense to build an action list only once and then perform it
 multiple times.
 
-Actions must not be added after compiling a list.
+No additional actions must be added after compiling an action list.
 
 =cut
 

@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 sub cTrees {
     return {
@@ -250,7 +250,9 @@ sub cTrees {
                 ]
             },
         ],
-        casAppMetaDataNode => [ {
+        casAppMetaDataNode => [
+            'casAppMetaDataExportedVars',
+            {
                 title => 'casAppMetaDataOptions',
                 form  => 'simpleInputContainer',
                 nodes => [
@@ -259,7 +261,6 @@ sub cTrees {
                     'casAppMetaDataOptionsRule'
                 ]
             },
-            'casAppMetaDataExportedVars',
         ],
     };
 }

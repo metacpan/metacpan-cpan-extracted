@@ -18,15 +18,5 @@ if ($s) {
   exit;
 }
 
-#is(
-#  title('http://jerakeen.org/test/uri-title.html'),
-#  "URI::Title test",
-#  "got title for jerakeen.org");
+is( title('http://perdu.com/'), 'Vous Etes Perdu ?', "got perdu.com title" );
 
-ok(
-  title('http://www.theregister.co.uk/2003/12/16/warning_lack_of_technology_may/') =~ /lack of technology may harm your prospects/,
-  "got register title");
-
-# ok(
-#   title('http://twitter.com/al3x/status/1039647490') eq 'twitter - Arianna Huffington: not a good saleswoman for blogging.',
-#   "got Twitter status");

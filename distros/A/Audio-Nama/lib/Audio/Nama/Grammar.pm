@@ -35,10 +35,18 @@ sub setup_grammar {
 
 	# Midish command keywords
 	
-	$midi->{keywords} = 
+	# prepend 'm' to all midish commands
+	# suppress midi record, play, stop commands - Nama will handle them
+	# also suppress ct tnew tdel tren
+	my %skip = map{$_, 1} qw(r p s ct tnew tdel tren);
+
+	$text->{midi_cmd} = 
 	{
-			map{ $_, 1} split " ", get_data_section("midish_commands")
+		map{ 'm'.$_, 1} grep{ !$skip{$_} } split " ", get_data_section("midi_commands")
 	};
+	for (keys %{$text->{midi_cmd}}){
+		say "$_: midi command same as Nama command" if $text->{commands}->{$_}
+	}
 
 }
 sub process_line {
@@ -54,14 +62,8 @@ sub process_line {
 		$text->{term}->addhistory($user_input) 
 			unless $user_input eq $text->{previous_cmd} or ! $text->{term};
 		$text->{previous_cmd} = $user_input;
-		if ($mode->{midish_terminal}){
-				$user_input =~ /^\s*(midish_mode_off|mmx)/ 
-					?  process_command($user_input)
-					:  midish_command($user_input);	
-		}
-		else {
 			my $context = context();
-			my $success = process_command( $user_input );
+			my $success = nama_cmd( $user_input );
 			my $command_stamp = { context => $context, 
 								  command => $user_input };
 			push(@{$project->{command_buffer}}, $command_stamp);
@@ -70,29 +72,28 @@ sub process_line {
 					and $config->{use_git} 
 					and $project->{name}
 					and $project->{repo}
-					and ! engine_running() 
+					and ! $this_engine->started() 
 			){
 				local $quiet = 1;
 				Audio::Nama::ChainSetup::remove_temporary_tracks();
 				autosave() unless $config->{opts}->{R};
-				reconfigure_engine(); # quietly, avoiding noisy reconfig below
+				reconfigure_engine();
 			}
 			reconfigure_engine();
-		}
-		# reset current track to Master if it is
+		# reset current track to Main if it is
 		# undefined, or the track has been removed
 		# from the index
-		$this_track = $tn{Master} if ! $this_track or
+		$this_track = $tn{Main} if ! $this_track or
 			(ref $this_track and ! $tn{$this_track->name});
 		setup_hotkeys() if $config->{hotkeys_always};
 	}
-	if (! engine_running() ){
+	if (! $this_engine->started() ){
 		my $result = check_fx_consistency();
 		logpkg(__FILE__,__LINE__,'logcluck',"Inconsistency found in effects data",
 			Dumper ($result)) if $result->{is_error};
 	}
-	revise_prompt( $mode->{midish_terminal} and "Midish > " );
 	my $output = delete $text->{output_buffer};
+	revise_prompt();
 }
 sub context {
 	my $context = {};
@@ -101,9 +102,8 @@ sub context {
 	$context->{op}    = $this_track->op;
 	$context
 }
-sub process_command {
-	my $input = shift;
-	my $input_was = $input;
+sub nama_cmd {
+	my $input_was = my $input = shift;
 
 	# parse repeatedly until all input is consumed
 	# return true on complete success
@@ -131,12 +131,14 @@ sub process_command {
 	# select chain operator if appropriate
 	# and there is a current track
 
-
+	$this_engine->valid_setup() or return;
 	if ($this_track){
 		my $FX = fxn($this_track->op);
 		if ($FX and $this_track->n eq $FX->chain){
-			eval_iam("c-select ".$this_track->n);
-			eval_iam("cop-select ".  $FX->ecasound_effect_index);
+			$this_engine->current_chain($this_track->n);
+			$FX->is_controller 
+				? $this_engine->current_controller($FX->ecasound_controller_index)
+				: $this_engine->current_chain_operator($FX->ecasound_effect_index);
 		}
 	}
 
@@ -170,6 +172,7 @@ sub do_script {
 	my @lines = split "\n",$script;
 	my $old_opt_r = $config->{opts}->{R};
 	$config->{opts}->{R} = 1; # turn off auto reconfigure
+	map{ s/#.*$// } @lines;
 	for my $input (@lines) { process_line($input) unless $input =~ /^\s*#/};
 	$config->{opts}->{R} = $old_opt_r;
 }
@@ -183,17 +186,15 @@ sub dump_all {
 }
 
 
-sub user_set_current_track {
+sub set_current_track {
 	my $cmd = shift;
 	if( my $track = $tn{$cmd} || $ti{$cmd} ){
 		logpkg(__FILE__,__LINE__,'debug',"Selecting track ",$track->name);
-		$this_track = $track;
-		set_current_bus();
-		ecasound_select_chain( $this_track->n );
-		1;
+		$track->select_track;
+		1
 	}
-		
 }
+
 
 ### allow commands to abbreviate Audio::Nama::Class as ::Class # SKIP_PREPROC
 
@@ -259,7 +260,7 @@ sub show_version_comment {
 	$text and "Version comment: $text\n";
 }
 sub show_send { "Send: ". $this_track->send_id. $/ 
-					if $this_track->rec_status ne OFF
+					if ! $this_track->off
 						and $this_track->send_id
 }
 
@@ -293,25 +294,11 @@ sub show_effect {
 	my @pnames = @{$fx_cache->{registry}->[ $i ]->{params}};
 	{
 	no warnings 'uninitialized';
-	map { push @lines, parameter_info_padded($op_id, $_) } (0..scalar @pnames - 1) 
+	push @lines, parameter_info_padded($op_id, $_) for 0..scalar @pnames - 1;
 	}
-	map
-	{ 	push @lines, parameter_info_padded($op_id, $_) 
-	 	
-	} (scalar @pnames .. (scalar @{$FX->params} - 1)  )
-		if scalar @{$FX->params} - scalar @pnames - 1; 
+	scalar @{$FX->params} - scalar @pnames - 1 
+		and push @lines, parameter_info_padded($op_id, $_) for scalar @pnames .. (scalar @{$FX->params} - 1);
 	@lines
-}
-sub extended_name {
-	no warnings 'uninitialized';
-	my $op_id = shift;
-	my $FX = fxn($op_id);
-	return unless $FX;
-	my $name = $FX->name;
-	my $ladspa_id = $fx_cache->{ladspa_label_to_unique_id}->{$FX->type};
-	$name .= " ($ladspa_id)" if $ladspa_id;
-	$name .= " (bypassed)" if $FX->bypassed;
-	$name;
 }
 sub parameter_info {
 	no warnings 'uninitialized';
@@ -337,7 +324,7 @@ sub show_modifiers {
 }
 sub show_region {
 	my $t = $Audio::Nama::this_track;
-	return unless $t->rec_status eq PLAY;
+	return unless $t->play;
 	my @lines;
 	push @lines,join " ",
 		"Length:",time2($t->shifted_length),"\n";
@@ -361,14 +348,15 @@ sub show_status {
 	package Audio::Nama;
 	my @output;
 	my @modes;
-	push @modes, $mode->{preview} if $mode->{preview};
+	push @modes, 'preview' if $mode->{preview};
+	push @modes, 'doodle' if $mode->{doodle};
 	push @modes, "master" if $mode->mastering;
 	push @modes, "edit"   if Audio::Nama::edit_mode();
 	push @modes, "offset run" if Audio::Nama::is_offset_run_mode();
 	push @output, "Modes settings:   ", join(", ", @modes), $/ if @modes;
 	my @actions;
 	push @actions, "record" if grep{ ! /Mixdown/ } Audio::Nama::ChainSetup::really_recording();
-	push @actions, "playback" if grep { $_->rec_status eq PLAY } 
+	push @actions, "playback" if grep { $_->play } 
 		map{ $tn{$_} } $bn{Main}->tracks, q(Mixdown);
 
 	# We only check Main bus for playback. 
@@ -377,12 +365,13 @@ sub show_status {
 	# tracks are set to REC (with rec-to-file disabled)
 	
 	
-	push @actions, "mixdown" if $tn{Mixdown}->rec_status eq REC;
+	push @actions, "mixdown" if $tn{Mixdown}->rec;
 	push @output, "Pending actions:  ", join(", ", @actions), $/ if @actions;
 	push @output, "Main bus version: ",$bn{Main}->version, $/ if $bn{Main}->version;
 	push @output, "Setup length is:  ", Audio::Nama::heuristic_time($setup->{audio_length}), $/; 
 	push @output, "Run time limit:   ", Audio::Nama::heuristic_time($setup->{runtime_limit}), $/
       if $setup->{runtime_limit};
+	@output
 }
 sub placeholder { 
 	my $val = shift;
@@ -458,8 +447,8 @@ sub showlist {
 
 	my @sections;
 
-		push @sections, [undef,undef, map $tn{$_},qw(Master Mixdown)];
-		push @sections, [$tn{Master},$bn{Main},map $tn{$_},$bn{Main}->tracks ];
+		push @sections, [undef,undef, map $tn{$_},qw(Main Mixdown)];
+		push @sections, [$tn{Main},$bn{Main},map $tn{$_},$bn{Main}->tracks ];
 
 	if( $mode->mastering ){
 
@@ -478,21 +467,21 @@ sub showlist {
 
 sub t_load_project {
 	package Audio::Nama;
-	return if engine_running() and Audio::Nama::ChainSetup::really_recording();
+	return if $this_engine->started() and Audio::Nama::ChainSetup::really_recording();
 	my $name = shift;
 	my %args = @_;
 	pager("input name: $name\n");
 	$name = sanitize($name);
 	throw("Project $name does not exist\n"), return
 		unless -d join_path(project_root(), $name) or $args{create};
-	stop_transport() if engine_running(); 
+	stop_transport() if $this_engine->started(); 
 	save_state();
 	load_project( name => $name, %args );
 	pager("loaded project: $project->{name}\n") unless $args{create};
 	{no warnings 'uninitialized';
 	logpkg(__FILE__,__LINE__,'debug',"load hook: $config->{execute_on_project_load}");
 	}
-	Audio::Nama::process_command($config->{execute_on_project_load});
+	Audio::Nama::nama_cmd($config->{execute_on_project_load});
 }
 sub sanitize {
 	my $name = shift;
@@ -510,18 +499,17 @@ sub t_create_project {
 sub mixdown {
 	pager_newline("Enabling mixdown to file") if ! $quiet;
 	$tn{Mixdown}->set(rw => REC); 
+	$tn{Main}->set(rw => MON); 
 }
 sub mixplay { 
 	pager_newline("Setting mixdown playback mode.") if ! $quiet;
 	$tn{Mixdown}->set(rw => PLAY);
-	$tn{Master}->set(rw => OFF); 
-	$bn{Main}->set(rw => OFF);
+	$tn{Main}->set(rw => OFF); 
 }
 sub mixoff { 
 	pager_newline("Leaving mixdown mode.") if ! $quiet;
 	$tn{Mixdown}->set(rw => OFF);
-	$tn{Master}->set(rw => MON); 
-	$bn{Main}->set(rw => MON);
+	$tn{Main}->set(rw => MON); 
 }
 sub remove_fade {
 	my $i = shift;
@@ -543,7 +531,7 @@ sub import_audio {
 }
 sub destroy_current_wav {
 	carp($this_track->name.": must be set to PLAY."), return
-		unless $this_track->rec_status eq PLAY;
+		unless $this_track->play;
 	$this_track->current_version or
 		throw($this_track->name, 
 			": No current version (track set to OFF?) Skipping."), return;
@@ -580,10 +568,10 @@ sub remove_track_cmd {
 	
 	# avoid having ownerless SlaveTracks.  
  	Audio::Nama::ChainSetup::remove_temporary_tracks();
-		$quiet or pager( "Removing track /",$track->name,"/.  All WAV files will be kept.");
+		$quiet or pager( "Removing track /$track->name/.  All WAV files will be kept. Other data will be lost.");
 		remove_submix_helper_tracks($track->name);
 		$track->remove;
-		$this_track = $tn{Master};
+		$this_track = $tn{Main};
 		1
 }
 sub unity {
@@ -621,4 +609,29 @@ sub pan_back {
 		);
 		$track->set(old_pan_level => undef);
 	}
+}
+
+sub get_sample_rate {
+	pager("project $project->{name}: audio engine sample rate is ",$project->{sample_rate} );
+	$project->{sample_rate}
+}
+
+sub set_sample_rate {
+	my ($srate) = @_;
+	my @allowable = qw{ 96000 88200 64000 48000 44100 32000 24000 22050 16000 11025 8000 };
+	my %allowable = map{$_ => 1} @allowable; 
+	if ( $allowable{$srate} ){
+		$project->{sample_rate} = $srate;
+		pager("project $project->{name}: setting audio engine sample rate to $srate Hz for future runs." );
+		$srate
+	}
+	else {
+		get_sample_rate();
+		pager qq(The value "$srate" is not an allowable sample rate.);
+		pager("Use one of: @allowable");
+	}
+}
+sub list_buses {
+	Audio::Nama::pager(map{ $_->list } Audio::Nama::Bus::all())
+
 }

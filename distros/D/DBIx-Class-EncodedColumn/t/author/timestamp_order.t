@@ -8,9 +8,15 @@ use File::Temp 'tempdir';
 use lib File::Spec->catdir(__DIR__, '..', 'lib');
 use DigestTest::Schema;
 
-unless( eval 'require DBIx::Class::TimeStamp' ) {
-  plan skip_all => 'DBIx::Class::TimeStamp not available';
-  exit;
+BEGIN {
+  unless ($ENV{AUTHOR_TESTING}) {
+    plan skip_all => 'These are for testing by the author';
+    exit;
+  }
+  unless( eval 'require DBIx::Class::TimeStamp' ) {
+    plan skip_all => 'DBIx::Class::TimeStamp not available';
+    exit;
+  }
 }
 
 DigestTest::Schema->load_classes(qw/WithTimeStampChild WithTimeStampChildWrongOrder/);

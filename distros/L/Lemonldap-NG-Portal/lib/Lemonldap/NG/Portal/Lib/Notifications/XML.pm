@@ -5,7 +5,7 @@ use Mouse;
 use XML::LibXML;
 use XML::LibXSLT;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # Lemonldap::NG::Portal::Main::Plugin provides addAuthRoute() and
 # addUnauthRoute() methods in addition of Lemonldap::NG::Common::Module.
@@ -141,18 +141,35 @@ sub checkForNotifications {
 sub getNotifBack {
     my ( $self, $req, $name ) = @_;
 
-    # Look if all notifications have been accepted. If not, redirects to
-    # portal
-
     # Search for Lemonldap::NG cookie (ciphered)
     my $id;
     unless ( $id = $req->cookies->{ $self->{conf}->{cookieName} } ) {
         return $self->p->sendError( $req, 'No cookie found', 401 );
     }
+
+    if ( $req->param('cancel') ) {
+        $self->logger->debug('Cancel called -> remove ciphered cookie');
+        $req->addCookie(
+            $self->p->cookie(
+                name    => $self->conf->{cookieName},
+                value   => 0,
+                domain  => $self->conf->{domain},
+                secure  => 0,
+                expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
+            )
+        );
+        $req->mustRedirect(1);
+        return $self->p->do( $req, [] );
+    }
+
+    # Look if all notifications have been accepted. If not, redirect to
+    # portal
+
+    # Try to decrypt Lemonldap::NG ciphered cookie
     $id = $self->p->HANDLER->tsv->{cipher}->decrypt($id)
       or return $self->sendError( $req, 'Unable to decrypt', 500 );
 
-    # Verify that session exists
+    # Check that session exists
     $req->userData( $self->p->HANDLER->retrieveSession( $req, $id ) )
       or return $self->sendError( $req, 'Unknown session', 401 );
 
@@ -243,7 +260,7 @@ sub getNotifBack {
         # launch 'controlUrl' to restore "urldc" using do()
         $self->logger->debug('All pending notifications have been accepted');
         $self->p->rebuildCookies($req);
-        return $self->p->do( $req, ['controlUrl'] );
+        return $self->p->do( $req, ['controlUrl', @{ $self->p->endAuth }] );
     }
     else {
         # No notifications checked here, this entry point must not be called.
@@ -255,7 +272,7 @@ sub getNotifBack {
 }
 
 has imported => ( is => 'rw', default => 0 );
-has server => ( is => 'rw' );
+has server   => ( is => 'rw' );
 
 sub notificationServer {
     my ( $self, $req ) = @_;

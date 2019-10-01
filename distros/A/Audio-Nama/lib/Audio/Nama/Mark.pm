@@ -37,7 +37,7 @@ sub new {
 	#croak  "name already in use: $vals{name}\n"
 	#	 if $by_name{$vals{name}}; # null name returns false
 	
-	my $object = bless { 
+	my $self = bless { 
 
 		## 		defaults ##
 
@@ -46,14 +46,14 @@ sub new {
 
 					@_ 			}, $class;
 
-	#print "object class: $class, object type: ", ref $object, $/;
-	if ($object->name) {
-		$by_name{ $object->name } = $object;
+	#print "self class: $class, self type: ", ref $self, $/;
+	if ($self->name) {
+		$by_name{ $self->name } = $self;
 	}
-	push @all, $object;
-	$Audio::Nama::this_mark = $object;
+	push @all, $self;
+	$Audio::Nama::this_mark = $self;
 	
-	$object;
+	$self;
 	
 }
 
@@ -168,7 +168,7 @@ use Audio::Nama::Globals qw(:all);
 sub drop_mark {
 	logsub("&drop_mark");
 	my $name = shift;
-	my $here = eval_iam("getpos");
+	my $here = ecasound_iam("getpos");
 
 	if( my $mark = $Audio::Nama::Mark::by_name{$name}){
 		pager("$name: a mark with this name exists already at: ", 
@@ -204,7 +204,7 @@ sub next_mark {
 	logsub("&next_mark");
 	my $jumps = shift || 0;
 	$jumps and $jumps--;
-	my $here = eval_iam("cs-get-position");
+	my $here = ecasound_iam("cs-get-position");
 	my @marks = Audio::Nama::Mark::all();
 	for my $i ( 0..$#marks ){
 		if ($marks[$i]->time - $here > 0.001 ){
@@ -219,7 +219,7 @@ sub previous_mark {
 	logsub("&previous_mark");
 	my $jumps = shift || 0;
 	$jumps and $jumps--;
-	my $here = eval_iam("getpos");
+	my $here = ecasound_iam("getpos");
 	my @marks = Audio::Nama::Mark::all();
 	for my $i ( reverse 0..$#marks ){
 		if ($marks[$i]->time < $here ){
@@ -242,14 +242,14 @@ sub to_end {
 	logsub("&to_end");
 	# ten seconds shy of end
 	return if Audio::Nama::ChainSetup::really_recording();
-	my $end = eval_iam('cs-get-length') - 10 ;  
+	my $end = ecasound_iam('cs-get-length') - 10 ;  
 	set_position( $end);
 } 
 sub jump {
 	return if Audio::Nama::ChainSetup::really_recording();
 	my $delta = shift;
 	logsub("&jump");
-	my $here = eval_iam('getpos');
+	my $here = ecasound_iam('getpos');
 	logpkg(__FILE__,__LINE__,'debug', "delta: $delta, here: $here, unit: $gui->{_seek_unit}");
 	my $new_pos = $here + $delta * $gui->{_seek_unit};
 	if ( $setup->{audio_length} )
@@ -268,7 +268,7 @@ sub _set_position {
     return if Audio::Nama::ChainSetup::really_recording(); # don't allow seek while recording
 
     my $seconds = shift;
-    my $coderef = sub{ eval_iam("setpos $seconds") };
+    my $coderef = sub{ ecasound_iam("setpos $seconds") };
 
 	$jack->{jackd_running} 
 		?  Audio::Nama::stop_do_start( $coderef, $jack->{seek_delay} )
@@ -279,7 +279,7 @@ sub _set_position {
 
 sub forward {
 	my $delta = shift;
-	my $here = eval_iam('getpos');
+	my $here = ecasound_iam('getpos');
 	my $new = $here + $delta;
 	set_position( $new );
 }
@@ -300,7 +300,7 @@ sub jump_backward { jump_forward( - shift()) }
 our @ISA = 'Audio::Nama::Mark';
 our $last_time;
 sub name { 'Here' }
-sub time { Audio::Nama::eval_iam('cs-connected') ? ($last_time = Audio::Nama::eval_iam('getpos')) : $last_time } 
+sub time { Audio::Nama::ecasound_iam('cs-connected') ? ($last_time = Audio::Nama::ecasound_iam('getpos')) : $last_time } 
 }
 
 { package Audio::Nama::ClipMark;

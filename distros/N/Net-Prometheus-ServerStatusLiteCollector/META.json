@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "A Net::Prometheus Collector that works in tandem with Plack::Middleware::ServerStatus::Lite",
    "author" : [
       "Steven Leung <stvleung@gmail.com>"
    ],
@@ -60,11 +60,24 @@
    "provides" : {
       "Net::Prometheus::ServerStatusLiteCollector" : {
          "file" : "lib/Net/Prometheus/ServerStatusLiteCollector.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector/issues"
+      },
+      "homepage" : "https://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector",
+      "repository" : {
+         "url" : "git://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector.git",
+         "web" : "https://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Steven Leung <sleung@turnitin.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

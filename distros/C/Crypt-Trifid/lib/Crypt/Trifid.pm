@@ -1,6 +1,6 @@
 package Crypt::Trifid;
 
-$Crypt::Trifid::VERSION   = '0.10';
+$Crypt::Trifid::VERSION   = '0.11';
 $Crypt::Trifid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Trifid - Interface to the Trifid cipher.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

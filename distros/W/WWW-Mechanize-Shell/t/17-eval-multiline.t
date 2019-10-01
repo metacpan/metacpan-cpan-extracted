@@ -4,7 +4,7 @@ use lib './inc';
 use IO::Catch;
 
 use File::Temp qw( tempfile );
-use vars qw($_STDOUT_ $_STDERR_);
+our ($_STDOUT_, $_STDERR_);
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;

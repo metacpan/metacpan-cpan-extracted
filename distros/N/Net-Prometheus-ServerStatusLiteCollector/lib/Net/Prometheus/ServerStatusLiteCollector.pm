@@ -1,4 +1,7 @@
 package Net::Prometheus::ServerStatusLiteCollector;
+
+# ABSTRACT: A Net::Prometheus Collector that works in tandem with Plack::Middleware::ServerStatus::Lite
+
 use 5.008001;
 use strict;
 use warnings;
@@ -9,7 +12,7 @@ use JSON;
 use Net::Prometheus::Types qw(MetricSamples Sample);
 use Parallel::Scoreboard;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 my $JSON = JSON->new->utf8(0);
 my $dt_formatter = DateTime::Format::ISO8601::Format->new(second_precision => 3);
@@ -84,18 +87,13 @@ sub collect {
     my $self = shift;
 
     # Ripped from https://metacpan.org/source/KAZEBURO/Plack-Middleware-ServerStatus-Lite-0.36/bin/server-status
-    # Check readability and permissions for scoreboard directory
-    if (opendir(my $dir, $self->scoreboard)) {
-        undef $dir;
-    } else {
-        $self->error("Could not open scoreboard directory: $!");
-    }
 
-    # Read in scoreboard files
-    my $scoreboard = Parallel::Scoreboard->new(
-        base_dir => $self->scoreboard,
-    );
-    my $stats = $scoreboard->read_all();
+    my $stats = {};
+    # Must use an already open instance of Parallel::Scoreboard since
+    # initializing new will clear out scoreboard directory
+    if ($self->scoreboard && ref $self->scoreboard eq 'Parallel::Scoreboard') {
+        $stats = $self->scoreboard->read_all();
+    }
     if (! scalar %$stats) {
         $self->warn("There is no status file in scoreboard directory. Maybe all processes are idle state and do not serve any request yet.");
         return ();
@@ -219,10 +217,6 @@ __END__
 
 =encoding utf-8
 
-=head1 NAME
-
-Net::Prometheus::ServerStatusLiteCollector - It's new $module
-
 =head1 SYNOPSIS
 
     use Net::Prometheus::ServerStatusLiteCollector;
@@ -230,13 +224,6 @@ Net::Prometheus::ServerStatusLiteCollector - It's new $module
 =head1 DESCRIPTION
 
 Net::Prometheus::ServerStatusLiteCollector is ...
-
-=head1 LICENSE
-
-Copyright (C) Steven Leung.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =head1 AUTHOR
 

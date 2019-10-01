@@ -1,5 +1,5 @@
 ---
-abstract: "It's new $module"
+abstract: 'A Net::Prometheus Collector that works in tandem with Plack::Middleware::ServerStatus::Lite'
 author:
   - 'Steven Leung <stvleung@gmail.com>'
 build_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Net::Prometheus::ServerStatusLiteCollector:
     file: lib/Net/Prometheus/ServerStatusLiteCollector.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   DateTime: '0'
   DateTime::Format::ISO8601::Format: '0.003'
@@ -35,6 +35,12 @@ requires:
   Parallel::Scoreboard: '0.08'
   Plack::Middleware::ServerStatus::Lite: '0.36'
   perl: '5.008001'
-version: '0.01'
+resources:
+  bugtracker: https://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector/issues
+  homepage: https://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector
+  repository: git://github.com/stvleung/Net-Prometheus-ServerStatusLiteCollector.git
+version: '0.02'
+x_contributors:
+  - 'Steven Leung <sleung@turnitin.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

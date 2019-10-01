@@ -121,7 +121,6 @@ while ( defined( my $url = shift(@tests) ) ) {
             '/',
             query  => "url=$url",
             cookie => "lemonldap=$id",
-
             accept => 'text/html'
         ),
         $detail

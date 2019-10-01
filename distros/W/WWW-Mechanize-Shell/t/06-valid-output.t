@@ -1,12 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
 
-use lib './inc';
-use IO::Catch;
-use Test::More ();
-
+use Test::More;
 use File::Temp qw( tempfile );
 use WWW::Mechanize::Link;
+use lib './inc';
+use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
@@ -18,10 +17,7 @@ BEGIN {
   $ENV{PERL_RL} = 0;
 };
 
-use vars qw( %tests );
-
-BEGIN {
-  %tests = (
+our %tests = (
       'autofill' => 'autofill test Fixed value',
       'back' => 'back',
       'click' => 'click',
@@ -45,19 +41,20 @@ BEGIN {
       'ua' => 'ua foo/1.1',
       'untick' => 'untick key value',
       'untick_all' => 'untick key',
-  );
+);
 
-  eval {
+eval {
     require HTML::TableExtract;
     $HTML::TableExtract::VERSION >= 2
         or die "Need HTML::TableExtract version >= 2";
     $tests{table} = 'table';
     $tests{'table params'} = 'table foo bar';
-  };
 };
 
-use Test::More tests => scalar (keys %tests)*2 +1;
-BEGIN {   use_ok('WWW::Mechanize::Shell'); };
+plan tests => scalar (keys %tests)*2;
+
+use WWW::Mechanize::Shell;
+
 SKIP: {
 
 eval {

@@ -5,7 +5,7 @@ package PDL::Algorithm::Center::Failure;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use custom::failures();
 
@@ -53,23 +53,16 @@ PDL::Algorithm::Center::Failure - Exception classes for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
-or by email to
-L<bug-PDL-Algorithm-Center@rt.cpan.org|mailto:bug-PDL-Algorithm-Center@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/djerius/pdl-algorithm-center>
-and may be cloned from L<git://github.com/djerius/pdl-algorithm-center.git>
 
 =head1 SEE ALSO
 

@@ -1,0 +1,8 @@
+Revision history for Math-Polynomial-ModInt
+
+0.002   2019-09-28
+        - extracted to separate distribution
+
+0.001   2013-12-13
+        - initial version within Math-GaloisField
+

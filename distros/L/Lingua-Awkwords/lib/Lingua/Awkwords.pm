@@ -16,16 +16,16 @@ use Lingua::Awkwords::Parser;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 has pattern => (
     is      => 'rw',
     trigger => sub {
-        my ( $self, $pat ) = @_;
-        $self->_set_tree( Lingua::Awkwords::Parser->new->from_string($pat) );
+        my ($self, $pat) = @_;
+        $self->_set_tree(Lingua::Awkwords::Parser->new->from_string($pat));
     },
 );
-has tree => ( is => 'rwp' );
+has tree => (is => 'rwp');
 
 ########################################################################
 #
@@ -39,12 +39,12 @@ sub percentize {
     my ($href) = @_;
     my $sum    = 0;
     my $min    = ~0;
-    for my $v ( values %$href ) {
+    for my $v (values %$href) {
         $sum += $v;
         $min = $v if $v < $min;
     }
     croak "sum of values cannot be 0" if $sum == 0;
-    for my $v ( values %$href ) {
+    for my $v (values %$href) {
         $v = $v / $sum * 100;
     }
 }
@@ -61,7 +61,7 @@ sub set_filter {
 sub weights2str {
     my ($hr) = @_;
     return join '/',
-      map { $hr->{$_} == 1 ? $_ : join( '*', $_, $hr->{$_} ) } sort keys %$hr;
+      map { $hr->{$_} == 1 ? $_ : join('*', $_, $hr->{$_}) } sort keys %$hr;
 }
 
 sub weights_from {
@@ -70,17 +70,17 @@ sub weights_from {
     my $type = ref $input;
     my $fh;
 
-    if ( $type eq '' ) {
+    if ($type eq '') {
         open $fh, '<', \$input;
-    } elsif ( $type eq 'GLOB' ) {
+    } elsif ($type eq 'GLOB') {
         $fh = $input;
     } else {
         croak "unknown input type";
     }
 
-    my ( %first, %mid, %last, %all );
+    my (%first, %mid, %last, %all);
 
-    while ( readline $fh ) {
+    while (readline $fh) {
         chomp;
       LOOP: {
             redo LOOP if /\G\s+/cg;
@@ -116,7 +116,7 @@ sub weights_from {
 #   ... = Lingua::Awkwords::Parser->new->from_string(q{ ...
 # in the calling code
 sub parse_string {
-    my ( $self_or_class, $str ) = @_;
+    my ($self_or_class, $str) = @_;
     return Lingua::Awkwords::Parser->new->from_string($str);
 }
 
@@ -128,7 +128,7 @@ sub render {
 }
 
 sub walk {
-    my ( $self, $callback ) = @_;
+    my ($self, $callback) = @_;
     my $tree = $self->tree;
     croak "no pattern supplied" if !defined $tree;
     $tree->walk($callback);

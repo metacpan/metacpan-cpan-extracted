@@ -9,7 +9,7 @@ use Moo;
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.85'; # VERSION
+our $VERSION = '1.87'; # VERSION
 
 # BUILD
 
@@ -91,7 +91,7 @@ sub item {
   my ($self, $name) = @_;
 
   for my $item (@{$self->{data}}) {
-    return $item if $item->{name} eq $name;
+    return $item if !$item->{list} && $item->{name} eq $name;
   }
 
   return;
@@ -109,6 +109,15 @@ sub list {
   }
 
   return [sort { $a->{index} <=> $b->{index} } @list];
+}
+
+sub list_item {
+  my ($self, $list, $name) = @_;
+
+  my $items = $self->list($list) or return;
+  my $data = [grep { $_->{name} eq $name } @$items];
+
+  return $data;
 }
 
 sub pluck {
@@ -144,9 +153,12 @@ sub content {
 }
 
 sub contents {
-  my ($self, $name) = @_;
+  my ($self, $name, $seek) = @_;
 
   my $items = $self->list($name) or return;
+
+  @$items = grep { $_->{name} eq $seek } @$items if $seek;
+
   my $data = [map { $_->{data} } @$items];
 
   return $data;
@@ -320,11 +332,12 @@ given string.
 
 =head2 contents
 
-  contents(Str $arg1) : ArrayRef
+  contents(Str $arg1, Str $arg2) : ArrayRef
 
 The contents method returns all pod-like sections that start with the given
 string, e.g. C<pod> matches C<=pod foo>. This method returns an arrayref of
-data for the matched sections.
+data for the matched sections. Optionally, you can filter the results by name
+by providing an additional argument.
 
 =over 4
 
@@ -339,6 +352,10 @@ data for the matched sections.
   # given $data
 
   $data->contents('pod');
+
+  # [,...]
+
+  $data->contents('pod' , 'help');
 
   # [,...]
 
@@ -484,6 +501,39 @@ given string.
 
 =cut
 
+=head2 list_item
+
+  list_item(Str $arg1, Str $arg2) : ArrayRef[ArrayRef]
+
+The list_item method returns metadata for the pod-like sections that matches
+the given list name and argument.
+
+=over 4
+
+=item list_item example
+
+  =pod attribute
+
+  Attribute #1 content
+
+  =cut
+
+  =pod attribute
+
+  Attribute #2 content
+
+  =cut
+
+  # given $data
+
+  $data->list_item('pod', 'attribute');
+
+  # [,...]
+
+=back
+
+=cut
+
 =head2 parser
 
   parser(Str $arg1) : ArrayRef
@@ -534,7 +584,7 @@ matches the given list or item by name.
 
 =head1 CREDITS
 
-Al Newkirk, C<+309>
+Al Newkirk, C<+317>
 
 Anthony Brummett, C<+10>
 
@@ -552,8 +602,9 @@ Al Newkirk, C<awncorp@cpan.org>
 
 Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated here,
+https://github.com/iamalnewkirk/do/blob/master/LICENSE.
 
 =head1 PROJECT
 

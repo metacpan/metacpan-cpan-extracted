@@ -1,0 +1,41 @@
+============= /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 15
+model		: 2
+model name	: Intel(R) Pentium(R) 4 CPU 2.40GHz
+stepping	: 9
+cpu MHz		: 2400.165
+cache size	: 512 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm
+bogomips	: 4784.12
+
+============= uname -a
+Linux ape.ejelta.com 2.4.20-20.9 #1 Mon Aug 18 11:45:58 EDT 2003 i686 i686 i386 GNU/Linux
+============= uptime
+ 11:05:35  up 11 days, 22:45,  2 users,  load average: 0.85, 0.86, 0.67
+============= args
+./bench-sorted-intersection.pl --with-perl yes
+full-count 10000
+part-count 5000
+word-count 5
+run-count 300
+============= date
+Mon Mar  1 11:05:35 2004
+============= preparing
+Final set includes 184 elements (c)
+Final set includes 184 elements (perl)
+============= benchmarking
+timethis 300: 16 wallclock secs ( 4.66 usr +  0.09 sys =  4.75 CPU) @ 63.16/s (n=300)
+timethis 30: 233 wallclock secs (174.10 usr +  0.11 sys = 174.21 CPU) @  0.17/s (n=30)
+         s/iter   perl normal
+perl       5.81     --  -100%
+normal 1.58e-02 36576%     --

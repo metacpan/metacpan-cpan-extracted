@@ -1,5 +1,8 @@
 Revision history for Crypt::Hill
 
+0.12  Wed Sep 25 16:40:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.11  Mon Nov 06 18:15:00 2017
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
       - Replaced namespace:clean with namespace::autoclean.

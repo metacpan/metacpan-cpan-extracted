@@ -1,6 +1,6 @@
 package App::optex::textconv::msdoc;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ our @CONVERTER = (
     );
 
 sub extract_text {
-    local *_ = shift;
+    local $_ = shift;
     my $type = shift;
     my $xml_re = qr/<\?xml\b[^>]*\?>\s*/;
     return $_ unless /$xml_re/;
@@ -53,34 +53,17 @@ sub _xml2text {
     join '', @p;
 }
 
-sub retrieve_contents {
-    my $file = shift;
-    my $suffix = shift;
-    my @command = do {
-	if ($suffix eq 'docx') {
-	    map { "unzip -p \"$file\" word/$_.xml" }
-	    qw(document endnotes footnotes);
-	}
-	elsif ($suffix eq 'xlsx') {
-	    map { "unzip -p \"$file\" xl/$_.xml" }
-	    qw(sharedStrings);
-	}
-	elsif ($suffix eq 'pptx') {
-	    map  { "unzip -p \"$file\" $_" }
-	    map  { $_->[0] }
-	    sort { $a->[1] <=> $b->[1] }
-	    map  { m{(ppt/slides/slide(\d+)\.xml)} ? [ $1, $2 ] : () }
-	    `unzip -l \"$file\" ppt/slides/slide*`;
-	}
-    };
-    join '', map `$_`, @command;
-}
+use App::optex::textconv::Zip;
 
 sub to_text {
-    my $file = shift;
-    my $type = ($file =~ /\.(docx|xlsx|pptx)$/)[0] or return;
-    my $text = retrieve_contents $file, $type;
-    extract_text \$text, $type;
+    my $zipfile = shift;
+    my $zip = new App::optex::textconv::Zip $zipfile;
+    my $type = $zip->suffix or return;
+    join "\n", map {
+	my $text = extract_text $zip->extract($_), $type;
+	$text ne "" ? ("[ $_ ]\n", $text) : ();
+    }
+    $zip->list;
 }
 
 1;

@@ -1,5 +1,15 @@
 Revision history for Perl extension XML::Parser.
 
+2.46 2019-09-24 (by Todd Rinaldo)
+    - use foreach not for for loops
+    - produce README.md so travis will show up on github
+    - remove use vars and switch to our.
+    - travis-ci testing from 5.8..5.28
+    - Convert XML::Parser to use 3 arg opens with no barewords.
+    - Migrate tracker to github
+    - Switch to XSLoader
+    - Fix a buffer overwrite in parse_stream()
+
 2.44 2015-01-12 (by Todd Rinaldo)
     - RT 99098 - Revert "Add more useful error message on parse to Expat". It breaks
       XML::Twig. Calling code will need to do this if it's needed.

@@ -50,7 +50,7 @@
 <table class="announce">
 %my $rows = 1;
 %foreach my $ticket ( @tickets ){
-  <tr><td class="announce_subject">
+  <tr><td class="announce_subject announce_cell">
 % if( $show_ticket_links{$ticket->Id} ){
   <a class="announce_subject"
      href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">
@@ -59,7 +59,7 @@
   <% $ticket->Subject %>
 % }
   </td>
-  <td>
+  <td class="announce_cell">
 <%perl>
   my $txns = $ticket->Transactions;
   for my $type ( qw(Create Correspond) ){
@@ -67,7 +67,11 @@
   }
   $txns->OrderBy( FIELD => 'Created', ORDER => 'DESC' );
   $txns->RowsPerPage(1);
-  my $content = $txns->First->Content(Type => 'text/plain');
+
+  my $show_html = RT::Config->Get('RTAnnounceAllowHTML') || 0;
+  my $advanced_mode = RT::Config->Get('RTAnnounceAdvancedMode') || 0;
+  my $content = $show_html ? $txns->First->Content(Type => 'text/html') : $txns->First->Content(Type => 'text/plain');
+
   if( length $content > $MaxMessageLength ){
     $content = substr($content, 0, $MaxMessageLength);
     # Try to break at a word boundary.
@@ -76,12 +80,18 @@
     $content .= chr(8230); # Ellipsis character
   }
 </%perl>
-<% $content %>
+<div id="RTAnnounceScrollable" class="RTAnnounceScrollable">
+% if ( $show_html ) {
+  <% $content |n %>
+% } else {
+  <% $content %>
+% }
+</div>
 %if( $show_ticket_links{$ticket->Id} ){
  (<a class="announcements_detail" href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">more</a>)
 %}
 </td>
-<td class="date">
+<td class="date announce_cell">
 <% $ticket->LastUpdatedObj->AsString %>
 </td>
 </tr>

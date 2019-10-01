@@ -2,9 +2,11 @@
 ## failures 0
 ## cut
 
+use lib::relative;
 use Cpanel::JSON::XS;
 use Dancer2;
 use DBIx::Class;
+use Dir::Self;
 use Exception::Class;
 use File::Slurp::Tiny;
 use IO::Async::Loop;
@@ -33,7 +35,7 @@ use XML::TreeBuilder;
 use XML::Twig;
 
 ## name BadModules
-## failures 14
+## failures 15
 ## cut
 
 use Any::Moose;
@@ -43,6 +45,7 @@ use CGI;
 use Coro;
 use Error;
 use File::Slurp;
+use FindBin;
 use HTML::Template;
 use IO::Socket::INET6;
 use JSON::Any;

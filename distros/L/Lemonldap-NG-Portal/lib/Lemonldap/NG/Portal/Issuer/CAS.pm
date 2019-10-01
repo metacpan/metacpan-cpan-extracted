@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -187,10 +187,10 @@ sub run {
                 if ( $rule->( $req, $req->sessionInfo ) ) {
                     $self->logger->debug("CAS service $service access allowed");
                 }
-
                 else {
-                    $self->userLogger->error(
-                        "CAS service $service access not allowed");
+                    $self->userLogger->warn( 'User '
+                          . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                          . " is not authorized to access to $service" );
 
                     if ( $casAccessControlPolicy =~ /^(error)$/i ) {
                         $self->logger->debug(
@@ -208,11 +208,15 @@ sub run {
             }
         }
 
+        $self->userLogger->notice( 'User '
+              . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+              . " is authorized to access to $service" );
+
         unless ($casServiceTicket) {
 
             # Check last authentication time to decide if
             # the authentication is recent or not
-            my $casRenewFlag = 0;
+            my $casRenewFlag     = 0;
             my $last_authn_utime = $req->{sessionInfo}->{_lastAuthnUTime} || 0;
             if (
                 time() - $last_authn_utime <

@@ -6,7 +6,7 @@ use base 'Test2::Require';
 use ExtUtils::CBuilder 0.27;
 
 # ABSTRACT: Skip a test file unless a C++ compiler is available
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 
 sub skip
@@ -28,7 +28,7 @@ Test::Alien::CanCompileCpp - Skip a test file unless a C++ compiler is available
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

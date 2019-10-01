@@ -14,7 +14,7 @@ use strict;
 use Cache::Memcached;
 use Apache::Session::Generate::MD5;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # Shared variables
 our $secureTokenMemcachedConnection;
@@ -33,7 +33,7 @@ BEGIN {
 sub run {
     my $class = shift;
     my $r     = $_[0];
-    my $ret   = $class->Lemonldap::NG::Handler::Main::run($r);
+    my ( $ret, $session ) = $class->Lemonldap::NG::Handler::Main::run($r);
 
     # Continue only if user is authorized
     return $ret unless ( $ret == $class->OK );
@@ -107,7 +107,7 @@ sub run {
     eval 'use Apache2::Filter' unless ( $INC{"Apache2/Filter.pm"} );
 
     if ( $INC{"Apache2/Filter.pm"} ) {
-        $r->add_output_filter(
+        $r->{env}->{'psgi.r'}->add_output_filter(
             sub {
                 my $f = shift;
                 while ( $f->read( my $buffer, 1024 ) ) {
@@ -158,7 +158,7 @@ sub _setToken {
         $secureTokenExpiration );
 
     unless ($res) {
-        $class->( "Unable to store secure token $key", 'error' );
+        $class->logger->error("Unable to store secure token $key");
         return;
     }
 
@@ -177,7 +177,7 @@ sub _deleteToken {
     my $res = $secureTokenMemcachedConnection->delete($key);
 
     unless ($res) {
-        $class->( "Unable to delete secure token $key", 'error' );
+        $class->logger->error("Unable to delete secure token $key");
     }
     else {
         $class->logger->info("Token $key deleted");
@@ -201,15 +201,14 @@ sub _isAlive {
         my $total_c = $stats->{'total'}->{'connection_structures'};
         my $total_i = $stats->{'total'}->{'total_items'};
 
-        $class->(
-"Memcached connection is alive ($total_c connections / $total_i items)",
-            'debug'
+        $class->logger->debug->(
+"Memcached connection is alive ($total_c connections / $total_i items)"
         );
 
         return 1;
     }
 
-    $class->( "Memcached connection is not alive", 'error' );
+    $class->logger->error("Memcached connection is not alive");
 
     return 0;
 }
@@ -222,7 +221,7 @@ sub _returnError {
     my ( $class, $r, $secureTokenAllowOnError ) = @_;
 
     if ($secureTokenAllowOnError) {
-        $class->( "Allow request without secure token", 'debug' );
+        $class->logger->debug("Allow request without secure token");
         return $class->OK;
     }
 

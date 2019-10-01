@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -30,6 +30,7 @@ has ott => (
     }
 );
 has idRule => ( is => 'rw', default => sub { 1 } );
+has sorted => ( is => 'rw', default => sub { 0 } );
 
 sub hAttr {
     $_[0]->{conf}->{checkUserHiddenAttributes} . ' '
@@ -53,7 +54,8 @@ sub init {
         return 0;
     }
     $self->idRule($rule);
-
+    $self->sorted( $self->conf->{impersonationRule}
+          || $self->conf->{contextSwitchingRule} );
     return 1;
 }
 
@@ -62,7 +64,9 @@ sub init {
 sub check {
     my ( $self, $req ) = @_;
     my ( $attrs, $array_attrs, $array_hdrs ) = ( {}, [], [] );
-    my $msg = my $auth = my $compute = '';
+    my $msg       = my $auth = my $compute = '';
+    my $authLevel = $req->userData->{authenticationLevel};
+    my $authMode  = $req->userData->{_auth};
 
     # Check token
     if ( $self->ottRule->( $req, {} ) ) {
@@ -82,6 +86,7 @@ sub check {
         my $params = {
             PORTAL    => $self->conf->{portal},
             MAIN_LOGO => $self->conf->{portalMainLogo},
+            SKIN      => $self->p->getSkin($req),
             LANGS     => $self->conf->{showLanguages},
             MSG       => "PE$msg",
             ALERTE    => 'alert-warning',
@@ -110,6 +115,7 @@ sub check {
             params => {
                 PORTAL    => $self->conf->{portal},
                 MAIN_LOGO => $self->conf->{portalMainLogo},
+                SKIN      => $self->p->getSkin($req),
                 LANGS     => $self->conf->{showLanguages},
                 MSG       => 'PE' . PE_MALFORMEDUSER,
                 ALERTE    => 'alert-warning',
@@ -123,25 +129,31 @@ sub check {
         );
     }
 
-    if ( $user eq $req->{user} or !$user ) {
-        $self->logger->debug("checkUser requested for myself");
-        $self->userLogger->notice("Return userData...");
-        $self->userLogger->warn("Using spoofed SSO groups if exist!!!")
+    if ( !$user or $user eq $req->{user} ) {
+        $self->userLogger->info("checkUser requested for himself");
+        $self->userLogger->info("Using spoofed SSO groups if exist")
           if ( $self->conf->{impersonationRule} );
         $attrs = $req->userData;
         $user  = $req->{user};
     }
     else {
-        $self->logger->debug("checkUser requested for $user");
+        $self->userLogger->info("checkUser requested for $user");
 
         # Try to retrieve session from sessions DB
-        $self->userLogger->notice('Try to retrieve session from DB...');
         $self->logger->debug('Try to retrieve session from DB...');
         my $moduleOptions = $self->conf->{globalStorageOptions} || {};
         $moduleOptions->{backend} = $self->conf->{globalStorage};
-        my $sessions =
-          $self->module->searchOn( $moduleOptions, $self->conf->{whatToTrace},
-            $user );
+
+        my $sessions    = {};
+        my $searchAttrs = $self->conf->{checkUserSearchAttributes}
+          || $self->conf->{whatToTrace};
+
+        foreach ( split /\s+/, $searchAttrs ) {
+            $self->logger->debug("Searching with: $_ = $user");
+            $sessions = $self->module->searchOn( $moduleOptions, $_, $user );
+            last if (keys %$sessions);
+        }
+
         my $age = '1';
         foreach my $id ( keys %$sessions ) {
             my $session = $self->p->getApacheSession($id) or next;
@@ -153,9 +165,8 @@ sub check {
         }
         unless ( defined $attrs->{_session_id} ) {
             $req->{user} = $user;
-            $self->userLogger->notice(
-                "NO session found in DB. Compute userData...");
-            $self->logger->debug("NO session found in DB. Compute userData...");
+            $self->userLogger->info(
+                "No session found in DB. Compute userData...");
             $attrs   = $self->_userData($req);
             $compute = 1;
         }
@@ -171,7 +182,19 @@ sub check {
           $self->{conf}->{impersonationMergeSSOgroups} eq 1
           ? 'checkUserMerged'
           : 'checkUser';
-        $msg = 'checkUserComputeSession' if $compute;
+        if ($compute) {
+            $msg                          = 'checkUserComputeSession';
+            $attrs->{authenticationLevel} = $authLevel;
+            $attrs->{_auth}               = $authMode;
+
+            if ( $self->conf->{impersonationRule} ) {
+                $self->logger->debug("Map real attributes...");
+                my %realAttrs = map {
+                    ( "$self->{conf}->{impersonationPrefix}$_" => $attrs->{$_} )
+                } keys %$attrs;
+                $attrs = { %$attrs, %realAttrs };
+            }
+        }
 
         # Create an array of hashes for template loop
         $self->logger->debug("Delete hidden or empty attributes");
@@ -209,18 +232,16 @@ sub check {
         $auth = $self->_authorization( $req, $url, $attrs );
         if ( $auth >= 0 ) {
             $auth = $auth ? "allowed" : "forbidden";
-            $self->userLogger->notice(
-                    "checkUser -> $attrs->{ $self->{conf}->{whatToTrace} } is "
-                  . uc($auth)
-                  . " to access: $url" );
+            $self->logger->debug(
+                    "checkUser: $attrs->{ $self->{conf}->{whatToTrace} } is "
+                  . "$auth to access to $url" );
 
             # Return VirtualHost headers
             $array_hdrs = $self->_headers( $req, $url, $attrs );
         }
         else {
             $auth = 'VHnotFound';
-            $self->userLogger->notice(
-                "checkUser -> URL: $url has no configuration");
+            $self->userLogger->info("checkUser: $url has no configuration");
         }
     }
 
@@ -232,6 +253,7 @@ sub check {
     my $params = {
         PORTAL    => $self->conf->{portal},
         MAIN_LOGO => $self->conf->{portalMainLogo},
+        SKIN      => $self->p->getSkin($req),
         LANGS     => $self->conf->{showLanguages},
         MSG       => $msg,
         ALERTE    => ( $msg eq 'checkUser' ? 'alert-info' : 'alert-warning' ),
@@ -262,8 +284,7 @@ sub display {
     my ( $attrs, $array_attrs ) = ( {}, [] );
 
     $self->logger->debug("Display current session data...");
-    $self->userLogger->notice("Retrieve session from Sessions database");
-    $self->userLogger->warn("Using spoofed SSO groups if exist!!!")
+    $self->userLogger->info("Using spoofed SSO groups if exist")
       if ( $self->conf->{impersonationRule} );
     $attrs = $req->userData;
 
@@ -293,6 +314,7 @@ sub display {
     my $params = {
         PORTAL    => $self->conf->{portal},
         MAIN_LOGO => $self->conf->{portalMainLogo},
+        SKIN      => $self->p->getSkin($req),
         LANGS     => $self->conf->{showLanguages},
         MSG       => (
             $self->{conf}->{impersonationMergeSSOgroups} ? 'checkUserMerged'
@@ -302,7 +324,7 @@ sub display {
             $self->{conf}->{impersonationMergeSSOgroups} ? 'alert-warning'
             : 'alert-info'
         ),
-        LOGIN      => $req->{userData}->{uid},
+        LOGIN      => $req->{userData}->{ $self->conf->{whatToTrace} },
         ATTRIBUTES => $array_attrs->[2],
         MACROS     => $array_attrs->[1],
         GROUPS     => $array_attrs->[0],
@@ -408,13 +430,13 @@ sub _splitAttributes {
     $self->logger->debug("Dispatching attributes...");
     while (@$attrs) {
         my $element = shift @$attrs;
-        $self->logger->debug(
-            'Processing element: ' . Data::Dumper::Dumper($element) );
+        $self->logger->debug( "Processing element: $element->{key} => "
+              . ( $element->{value} // '' ) );
         my $ok = 0;
         if ( $element->{key} eq 'groups' ) {
             $self->logger->debug('Key "groups" found');
             my $separator = $self->{conf}->{multiValuesSeparator};
-            my @tmp = split /\Q$separator/, $element->{value};
+            my @tmp       = split /\Q$separator/, $element->{value};
             $grps = [ map { { value => $_ } } sort @tmp ];
             next;
         }
@@ -432,21 +454,22 @@ sub _splitAttributes {
     }
 
     # Sort real and spoofed attributes if required
-    if ( $self->conf->{impersonationRule} ) {
+    if ( $self->sorted ) {
         $self->logger->debug('Dispatching real and spoofed attributes...');
         my ( $realAttrs, $spoofedAttrs ) = ( [], [] );
         my $prefix = "$self->{conf}->{impersonationPrefix}";
         while (@$others) {
             my $element = shift @$others;
-            $self->logger->debug(
-                'Processing attribute: ' . Data::Dumper::Dumper($element) );
+            $self->logger->debug( "Processing attribute $element->{key} => "
+                  . ( $element->{value} // '' ) );
             if ( $element->{key} =~ /^$prefix.+$/ ) {
                 push @$realAttrs, $element;
                 $self->logger->debug(' -> Real attribute');
             }
             else {
                 push @$spoofedAttrs, $element;
-                $self->logger->debug(' -> Spoofed attribute');
+
+                #$self->logger->debug(' -> Spoofed attribute');
             }
         }
         @$others = ( @$spoofedAttrs, @$realAttrs );

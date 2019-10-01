@@ -32,7 +32,7 @@ count(4);
 # Authentified queries
 # --------------------
 
-# Authorizated query
+# Authorized query
 ok(
     $res =
       $client->_get( '/', undef, 'test.example.org', "lemonldap=$sessionId" ),

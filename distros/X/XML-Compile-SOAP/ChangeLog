@@ -1,6 +1,14 @@
 
 === version history of distribution XML-Compile-SOAP
 
+version 3.25: Wed 25 Sep 13:16:53 CEST 2019
+
+	Improvements:
+	- handle wsdl:arrayType
+	- #1 File::Slurp::Tiny is discouraged in favor of File::Slurper
+	  [James Raspass]
+	- remove dependency to Test::Deep again. rt.cpan.org#130096 [Kent Fredric]
+
 version 3.24: Tue  6 Mar 08:12:19 CET 2018
 
 	Fixes:

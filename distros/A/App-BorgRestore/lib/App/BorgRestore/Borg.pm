@@ -2,7 +2,7 @@ package App::BorgRestore::Borg;
 use v5.14;
 use strictures 2;
 
-use App::BorgRestore::Helper;
+use App::BorgRestore::Helper qw(untaint);
 
 use autodie;
 use Date::Parse;
@@ -116,6 +116,7 @@ method borg_list_time() {
 
 method restore($components_to_strip, $archive_name, $path) {
 	$log->debugf("Restoring '%s' from archive %s, stripping %d components of the path", $path, $archive_name, $components_to_strip);
+	$archive_name = untaint($archive_name, qr(.*));
 	system(qw(borg extract -v --strip-components), $components_to_strip, $self->{borg_repo}."::".$archive_name, $path);
 }
 

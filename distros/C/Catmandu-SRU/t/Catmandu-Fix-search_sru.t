@@ -16,7 +16,7 @@ require_ok $pkg;
 {
     my $server
         = Test::HTTP::LocalServer->spawn(file => 't/files/sru_oai_dc.xml');
-    my $url    = 'http://localhost:' . $server->port;
+    my $url    = $server->url;
     my $search = $pkg->new('key', $url)->fix({key => 'value'});
     ok defined $search->{key}, 'default parser';
     is scalar @{$search->{key}}, 2, 'got records';
@@ -31,7 +31,7 @@ require_ok $pkg;
 
 {
     my $server = Test::HTTP::LocalServer->spawn(file => 't/files/21.xml');
-    my $url    = 'http://localhost:' . $server->port;
+    my $url    = $server->url;
     my $search
         = $pkg->new('key', $url, parser => 'marcxml')->fix({key => 'value'});
     ok defined $search->{key}, 'marcxml parser';

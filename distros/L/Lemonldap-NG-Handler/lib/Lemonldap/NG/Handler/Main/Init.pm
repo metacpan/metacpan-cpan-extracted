@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Init;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -66,7 +66,15 @@ sub logLevelInit {
     $logger = $class->localConfig->{userLogger} || $logger;
     eval "require $logger";
     die $@ if ($@);
-    $class->userLogger( $logger->new( $class->localConfig, user => 1 ) );
+    require Lemonldap::NG::Common::Logger::_Duplicate;
+    $class->userLogger(
+        Lemonldap::NG::Common::Logger::_Duplicate->new(
+            $class->localConfig,
+            user   => 1,
+            logger => $logger,
+            dup    => $class->logger
+        )
+    );
     $class->logger->debug("User logger $logger loaded");
 }
 

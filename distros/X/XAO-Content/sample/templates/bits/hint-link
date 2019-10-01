@@ -1,0 +1,2 @@
+(<A HREF="/hints/<%NAME/q%>.html" TARGET="xaohint"
+    onClick="window.open('/hints/<%NAME/q%>.html','xaohint','dependent,scrollbars,resizable,width=300,height=400')">?</A>)<%End%>

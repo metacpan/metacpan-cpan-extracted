@@ -7,7 +7,7 @@ use Path::Tiny ();
 use File::Temp ();
 
 # ABSTRACT: Temp Dir support for Alien::Build
-our $VERSION = '1.86'; # VERSION
+our $VERSION = '1.89'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -79,7 +79,7 @@ Alien::Build::Temp - Temp Dir support for Alien::Build
 
 =head1 VERSION
 
-version 1.86
+version 1.89
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 package My::TestScript;
 
 use 5.006;

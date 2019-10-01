@@ -1,3 +1,6 @@
+5.8.2
+- Updating the deserializer to handle one more case.
+
 5.8.1
 - Updating unit tests to support new version of Perl.
 

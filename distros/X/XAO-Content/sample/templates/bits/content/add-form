@@ -1,0 +1,63 @@
+Please fill out the following form to create a new content.
+<STRONG>Note:</STRONG> Normally you only need to create new dynamic
+content element at the same time you create support for it somewhere in
+the templates of the site.
+<P>
+
+<FORM METHOD="POST" ACTION="<%Utility mode="current-url"%>">
+<INPUT TYPE="HIDDEN" NAME="add" VALUE="1">
+
+<TABLE BORDER="0">
+
+<TR>
+<TD><SPAN CLASS="bold"><%NAME.TEXT%></SPAN>
+<%Page path="/bits/hint-link" NAME="content-name"%>:</TD>
+<TD><%NAME.HTML%></TD>
+<TD CLASS="form_err"><%NAME.ERRSTR%></TD>
+</TR>
+
+<TR>
+<TD><SPAN CLASS="bold"><%DESCRIPTION.TEXT%></SPAN>
+<%Page path="/bits/hint-link" NAME="content-description"%>:</TD>
+<TD><%DESCRIPTION.HTML%></TD>
+<TD CLASS="form_err"><%DESCRIPTION.ERRSTR%></TD>
+</TR>
+
+<TR VALIGN="TOP">
+<TD><%INSTRUCTION.TEXT%>
+<%Page path="/bits/hint-link" NAME="content-instruction"%>:</TD>
+<TD><TEXTAREA NAME="<%INSTRUCTION.NAME/f%>" COLS="60" ROWS="6" MAXLENGTH="<%INSTRUCTION.MAXLENGTH/f%>" WRAP="VIRTUAL"><%INSTRUCTION.VALUE/h%></TEXTAREA></TD>
+<TD CLASS="form_err"><%INSTRUCTION.ERRSTR%></TD>
+</TR>
+
+<TR>
+<TD><%PREVIEW_URL.TEXT%>
+<%Page path="/bits/hint-link" NAME="content-preview-url"%>:</TD>
+<TD><%PREVIEW_URL.HTML%></TD>
+<TD CLASS="form_err"><%PREVIEW_URL.ERRSTR%></TD>
+</TR>
+
+<TR>
+<TD><%COMMENT.TEXT%>:</TD>
+<TD><%COMMENT.HTML%></TD>
+<TD CLASS="form_err"><%COMMENT.ERRSTR%></TD>
+</TR>
+
+<TR VALIGN="TOP">
+<TD><%TEXT.TEXT%>:</TD>
+<TD><TEXTAREA NAME="<%TEXT.NAME/f%>" COLS="60" ROWS="6" MAXLENGTH="<%TEXT.MAXLENGTH/f%>" WRAP="VIRTUAL"><%TEXT.VALUE/h%></TEXTAREA></TD>
+<TD CLASS="form_err"><%TEXT.ERRSTR%></TD>
+</TR>
+
+<!--TR VALIGN="TOP">
+<TD><%MIME_TYPE.TEXT%>:</TD>
+<TD><%MIME_TYPE.HTML%></TD>
+<TD CLASS="form_err"><%MIME_TYPE.ERRSTR%></TD>
+</TR-->
+
+</TABLE>
+<P>
+
+<INPUT TYPE="SUBMIT" VALUE="  Create New Content  ">
+
+</FORM>

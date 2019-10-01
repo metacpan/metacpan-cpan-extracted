@@ -1,0 +1,6 @@
+requires 'Mojo::Base';
+requires 'DBIx::MultiStatementDo';
+requires 'File::Basename';
+requires 'File::Slurp';
+
+test_requires 'Test::More';

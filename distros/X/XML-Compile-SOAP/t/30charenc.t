@@ -6,7 +6,6 @@ use strict;
 
 use lib 'lib','t';
 use TestTools;
-use Test::Deep   qw/cmp_deeply/;
 
 use Data::Dumper;
 $Data::Dumper::Indent = 1;

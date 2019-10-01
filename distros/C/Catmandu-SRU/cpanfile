@@ -10,7 +10,7 @@ on 'test', sub {
 requires 'Catmandu', '>=1.20';
 requires 'Catmandu::MODS','0.31';
 requires 'Cpanel::JSON::XS', '3.0213';
-requires 'Furl', '0.41';
+requires 'HTTP::Tiny', '0.076';
 requires 'Moo', '1.005000';
 requires 'URI::Escape' , '1.60';
 requires 'XML::LibXML::Simple', '0.91';

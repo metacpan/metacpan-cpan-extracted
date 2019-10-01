@@ -1,106 +1,180 @@
-use strict;
-use warnings;
-
 use Test::Most;
-use File::Path 'mkpath';
-use lib 't';
-use TestLib qw( t_module t_startup t_teardown t_capture t_action_files );
+use File::Basename 'dirname';
+use File::Path 'rmtree';
+use Test::Output;
+use File::Copy::Recursive 'dircopy';
+use File::Copy 'move';
+use Try::Tiny;
 
-exit main();
+use_ok('App::Dest');
 
-sub main {
-    require_ok( t_module() );
+sub set_state {
+    chdir( dirname($0) . '/deploy' );
+    rmtree($_) for ( '.dest', 'actions' );
 
-    t_startup();
-    t_action_files('adt/state');
-    t_module->init;
-    t_module->add('adt');
+    open( my $log, '>', 'log' );
+    print $log "# log\n";
+    close $log;
+}
+set_state();
 
-    deploy();
-
-    t_teardown();
-    done_testing();
-    return 0;
+my $log;
+sub read_log {
+    open( my $log, '<', 'log' );
+    return join( '', <$log> );
 }
 
-sub deploy {
-    is (
-        ( t_capture( sub { t_module->verify } ) )[0],
-        "not ok - verify: adt/state\n",
-        'verify all existing actions returns false',
-    );
-    is (
-        ( t_capture( sub { t_module->verify('adt/state') } ) )[0],
-        "not ok - verify: adt/state\n",
-        'verify undeployed action returns false',
-    );
+dircopy( 'source', 'actions' );
 
+stderr_is(
+    sub { App::Dest->init },
+    "Created new watch list based on dest.watch file:\n" .
+        "  actions\n",
+    'init succeeds',
+);
 
-    is (
-        ( t_capture( sub { t_module->deploy } ) )[2],
-        "File to deploy required; usage: dest deploy file\n",
-        'deploy without action fails',
-    );
-    is (
-        ( t_capture( sub { t_module->deploy('adt/state') } ) )[0],
-        join( "\n",
-           'begin - deploy: adt/state',
-           'ok - deploy: adt/state',
-           'ok - verify: adt/state',
-        ) . "\n",
-       'deploy with action succeeds',
-    );
+move(    'actions/005', '.dest/actions/005' );
+dircopy( 'actions/001', '.dest/actions/001' );
+dircopy( 'actions/002', '.dest/actions/002' );
 
-    is (
-        ( t_capture( sub { t_module->verify } ) )[0],
-        "ok - verify: adt/state\n",
-        'verify all existing actions returns true',
-    );
-    is (
-        ( t_capture( sub { t_module->verify('adt/state') } ) )[0],
-        "ok - verify: adt/state\n",
-        'verify undeployed action returns true',
-    );
+open( my $out, '>>', 'actions/002/deploy' );
+print $out "changed\n";
+close $out;
 
-    is (
-        ( t_capture( sub { t_module->revert } ) )[2],
-        "File to revert required; usage: dest revert file\n",
-        'revert without action throws error',
-    );
-    is (
-        ( t_capture( sub { t_module->revert('adt/state') } ) )[0],
-        join( "\n",
-            'begin - revert: adt/state',
-            'ok - revert: adt/state',
-        ) . "\n",
-        'revert with action succeeds',
-    );
+stdout_is(
+    sub { App::Dest->list },
+    "actions actions:\n" .
+        "  actions/001\n" .
+        "  actions/002\n" .
+        "  actions/003\n" .
+        "  actions/004\n",
+    'list',
+);
 
-    t_capture( sub { t_module->deploy('adt/state') } );
-    is (
-       ( t_capture( sub { t_module->redeploy('adt/state') } ) )[0],
-        join( "\n",
-           'begin - deploy: adt/state',
-           'ok - deploy: adt/state',
-           'ok - verify: adt/state',
-        ) . "\n",
-       'redeploy with action succeeds',
-    );
+stdout_is(
+    sub { App::Dest->status },
+    "diff - actions\n" .
+        "  actions/002\n" .
+        "    M actions/002/deploy\n" .
+        "  + actions/003\n" .
+        "  + actions/004\n" .
+        "  - actions/005\n",
+    'status',
+);
 
-    my $state_file;
-    ok( open( $state_file, '<', 'state_adt_state.txt' ) || 0, 'open state_adt_state.txt file' );
-    my @lines = <$state_file>;
-    is( scalar( grep { /^adt\/state$/ } @lines ), 2, 'redeploy state check passes' );
+stdout_is(
+    sub { App::Dest->verify('actions/002') },
+    "ok - verify: actions/002\n",
+    'verify',
+);
+$log .= "# log\n" .
+    "actions/002/verify\n" .
+    "002 verify\n";
+is( &read_log, $log, 'log correct after verify' );
 
-    is (
-        ( t_capture( sub { t_module->revdeploy('adt/state') } ) )[0],
-        join( "\n",
-            'begin - revert: adt/state',
-            'ok - revert: adt/state',
-            'begin - deploy: adt/state',
-            'ok - deploy: adt/state',
-            'ok - verify: adt/state',
-        ) . "\n",
-        'revdeploy with action succeeds',
-    );
-}
+stdout_is(
+    sub { App::Dest->deploy( 'actions/004', '-d' ) },
+    "actions/dest.wrap actions/004/deploy\n" .
+        "actions/dest.wrap actions/004/verify\n",
+    'deploy dry run',
+);
+
+stdout_is(
+    sub { App::Dest->deploy('actions/004') },
+    "begin - deploy: actions/004\n" .
+        "ok - deploy: actions/004\n" .
+        "ok - verify: actions/004\n",
+    'deploy',
+);
+$log .= "actions/004/deploy\n" .
+    "004 deploy\n" .
+    "actions/004/verify\n" .
+    "004 verify\n";
+is( &read_log, $log, 'log correct after deploy' );
+
+stderr_is( sub {
+    try {
+        App::Dest->deploy('actions/004');
+    }
+    catch {
+        warn $_;
+    };
+}, "Action already deployed\n", 'deploy again fails' );
+
+stdout_is(
+    sub { App::Dest->redeploy('actions/004') },
+    "begin - deploy: actions/004\n" .
+        "ok - deploy: actions/004\n" .
+        "ok - verify: actions/004\n",
+    'redeploy',
+);
+$log .= "actions/004/deploy\n" .
+    "004 deploy\n" .
+    "actions/004/verify\n" .
+    "004 verify\n";
+is( &read_log, $log, 'log correct after deploy' );
+
+stdout_is(
+    sub { App::Dest->revdeploy('actions/004') },
+    "begin - revert: actions/004\n" .
+        "ok - revert: actions/004\n" .
+        "begin - deploy: actions/004\n" .
+        "ok - deploy: actions/004\n" .
+        "ok - verify: actions/004\n",
+    'redeploy',
+);
+$log .= ".dest/actions/004/revert\n" .
+    "004 revert\n" .
+    "actions/004/deploy\n" .
+    "004 deploy\n" .
+    "actions/004/verify\n" .
+    "004 verify\n";
+is( &read_log, $log, 'log correct after revdeploy' );
+
+stdout_is(
+    sub { App::Dest->revert('actions/004') },
+    "begin - revert: actions/004\n" .
+        "ok - revert: actions/004\n",
+    'revert',
+);
+$log .= ".dest/actions/004/revert\n" .
+    "004 revert\n";
+is( &read_log, $log, 'log correct after deploy' );
+
+stdout_is(
+    sub { App::Dest->update('actions') },
+    "begin - revert: actions/002\nok - revert: actions/002\n" .
+        "begin - deploy: actions/002\n" .
+        "ok - deploy: actions/002\n" .
+        "ok - verify: actions/002\n" .
+        "begin - deploy: actions/003\n" .
+        "ok - deploy: actions/003\n" .
+        "ok - verify: actions/003\n" .
+        "begin - deploy: actions/004\n" .
+        "ok - deploy: actions/004\n" .
+        "ok - verify: actions/004\n" .
+        "begin - revert: actions/005\n" .
+        "ok - revert: actions/005\n",
+    'update',
+);
+$log .= ".dest/actions/002/revert\n" .
+    "002 revert\n" .
+    "actions/002/deploy\n" .
+    "002 deploy\n" .
+    "changed\n" .
+    "actions/002/verify\n" .
+    "002 verify\n" .
+    "actions/003/deploy\n" .
+    "003 deploy\n" .
+    "actions/003/verify\n" .
+    "003 verify\n" .
+    "actions/004/deploy\n" .
+    "004 deploy\n" .
+    "actions/004/verify\n" .
+    "004 verify\n" .
+    ".dest/actions/005/revert\n" .
+    "005 revert\n";
+is( &read_log, $log, 'log correct after update' );
+
+set_state();
+done_testing();

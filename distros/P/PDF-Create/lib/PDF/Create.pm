@@ -1,6 +1,6 @@
 package PDF::Create;
 
-our $VERSION = '1.43';
+our $VERSION = '1.46';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ PDF::Create - Create PDF files.
 
 =head1 VERSION
 
-Version 1.43
+Version 1.46
 
 =cut
 
@@ -88,6 +88,17 @@ of methods available on a page):
     # Draw some lines
     $page2->line(0, 0,   592, 840);
     $page2->line(0, 840, 592, 0);
+
+    $page2->string($font, 20, 50, 400, "default á é í ó ú ñ  Á É Í Ó Ú Ñ ¿ ¡ a e i o u n'");
+    $page2->string_underline($font, 20, 50, 400, "default á é í ó ú ñ  Á É Í Ó Ú Ñ ¿ ¡ a e i o u n'");
+
+    use utf8;
+    $page2->string($font, 20, 50, 350, "use utf8 á é í ó ú ñ  Á É Í Ó Ú Ñ ¿ ¡ a e i o u n'");
+    $page2->string_underline($font, 20, 50, 350, "use utf8 á é í ó ú ñ  Á É Í Ó Ú Ñ ¿ ¡ a e i o u n'");
+
+    no utf8;
+    $page2->string($font, 20, 50, 300, "no utf8 á é í ó ú ñ  Á É Í Ó Ú Ñ ¿ ¡ a e i o u n'");
+    $page2->string_underline($font, 20, 50, 300, "no utf8 á é í ó ú ñ  Á É Í Ó Ú Ñ ¿ ¡ a e i o u n'");
 
     $toc->new_outline('Title' => 'Second Page', 'Destination' => $page2);
 
@@ -648,7 +659,7 @@ define the click-sensitive area and the destination URI.
 
 Example:
 
-    # Draw a string and undeline it to show it is a link
+    # Draw a string and underline it to show it is a link
     $pdf->string($f1, 10, 450, 200, 'http://www.cpan.org');
 
     my $line = $pdf->string_underline($f1, 10, 450, 200, 'http://www.cpan.org');
@@ -668,7 +679,7 @@ The point (x, y) is  the  bottom  left corner of the rectangle containing hotspo
 rectangle, (w, h) are  the  width and height of the hotspot rectangle. The Border
 describes the thickness of the border surrounding the rectangle hotspot.
 
-The function C<string_undeline> returns the width of the string, this can be used
+The function C<string_underline> returns the width of the string, this can be used
 directly for the width of the hotspot rectangle.
 
 =cut
@@ -785,9 +796,9 @@ sub image {
 
         $self->{'xobjects'}{$num}->{'ColorSpace'} = $self->array( $self->name('Indexed'), $self->name( $image->{colorspace} ),
                                                                   $self->number(255),     $self->indirect_ref(@$colorspace) );
-	} else {
-            $self->{'xobjects'}{$num}->{'ColorSpace'} = $self->array( $self->name( $image->{colorspace} ) );
-	}
+    } else {
+        $self->{'xobjects'}{$num}->{'ColorSpace'} = $self->array( $self->name( $image->{colorspace} ) );
+    }
 
     # Set Filter
     $#a = -1;

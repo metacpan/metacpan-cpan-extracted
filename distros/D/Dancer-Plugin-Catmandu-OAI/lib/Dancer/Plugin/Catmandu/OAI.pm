@@ -6,13 +6,14 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
+use Catmandu::Serializer::messagepack;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
@@ -27,34 +28,84 @@ my $VERBS = {
         valid    => {metadataPrefix => 1, identifier => 1},
         required => [qw(metadataPrefix identifier)],
     },
-    Identify => {
-        valid    => {},
-        required => [],
-    },
+    Identify        => {valid => {}, required => [],},
     ListIdentifiers => {
-        valid    => {metadataPrefix => 1, from => 1, until => 1, set => 1, resumptionToken => 1},
+        valid => {
+            metadataPrefix  => 1,
+            from            => 1,
+            until           => 1,
+            set             => 1,
+            resumptionToken => 1
+        },
         required => [qw(metadataPrefix)],
     },
-    ListMetadataFormats => {
-        valid    => {identifier => 1, resumptionToken => 1},
-        required => [],
-    },
+    ListMetadataFormats =>
+        {valid => {identifier => 1, resumptionToken => 1}, required => [],},
     ListRecords => {
-        valid    => {metadataPrefix => 1, from => 1, until => 1, set => 1, resumptionToken => 1},
+        valid => {
+            metadataPrefix  => 1,
+            from            => 1,
+            until           => 1,
+            set             => 1,
+            resumptionToken => 1
+        },
         required => [qw(metadataPrefix)],
     },
-    ListSets => {
-        valid    => {resumptionToken => 1},
-        required => [],
-    },
+    ListSets => {valid => {resumptionToken => 1}, required => [],},
 };
+
+sub _serializer {
+    state $serializer = Catmandu::Serializer::messagepack->new;
+}
+
+sub _new_token {
+    my ($settings, $hits) = @_;
+
+    my $strategy = $settings->{search_strategy};
+
+    if ($strategy eq 'paginate' && $hits->more) {
+        return _add_token_values(@_, {start => $hits->start + $hits->limit});
+    }
+    elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
+        return _add_token_values(@_, {scroll_id => $hits->{scroll_id}});
+    }
+    return;
+}
+
+sub _add_token_values {
+    my ($settings, $hits, $params, $from, $until, $token) = @_;
+    $token->{_s} = $params->{set} if defined $params->{set};
+    $token->{_m} = $params->{metadataPrefix}
+        if defined $params->{metadataPrefix};
+    $token->{_f} = $from if defined $from;
+    $token->{_u} = $from if defined $until;
+    $token;
+}
+
+sub _search {
+    my ($settings, $bag, $q, $token) = @_;
+    my %args = (
+        %{$settings->{default_search_params}},
+        limit     => $settings->{limit} // $DEFAULT_LIMIT,
+        cql_query => $q,
+    );
+    if ($token) {
+        for my $key (qw(token start)) {
+            next unless exists $token->{$key};
+            $args{$key} = $token->{$key};
+            last;
+        }
+    }
+    $bag->search(%args);
+}
 
 sub oai_provider {
     my ($path, %opts) = @_;
 
     my $setting = clone(plugin_setting);
 
-    my $bag = Catmandu->store($opts{store} || $setting->{store})->bag($opts{bag} || $setting->{bag});
+    my $bag = Catmandu->store($opts{store} || $setting->{store})
+        ->bag($opts{bag} || $setting->{bag});
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
@@ -65,6 +116,14 @@ sub oai_provider {
 
     $setting->{default_search_params} ||= {};
 
+    $setting->{search_strategy} //= 'paginate';
+
+    # TODO expire scroll_id if finished
+    # TODO set resumptionToken expirationDate
+    if ($setting->{search_strategy} eq 'es.scroll') {
+        $setting->{default_search_params}{scroll} //= '2m';
+    }
+
     my $datestamp_parser;
     if ($setting->{datestamp_pattern}) {
         $datestamp_parser = DateTime::Format::Strptime->new(
@@ -73,13 +132,15 @@ sub oai_provider {
         );
     }
 
-    my $format_datestamp = $datestamp_parser ? sub {
-        $datestamp_parser->parse_datetime($_[0])->iso8601.'Z';
-    } : sub {
+    my $format_datestamp = $datestamp_parser
+        ? sub {
+        $datestamp_parser->parse_datetime($_[0])->iso8601 . 'Z';
+        }
+        : sub {
         $_[0];
-    };
+        };
 
-    $setting->{get_record_cql_pattern} ||= $bag->id_key.' exact "%s"';
+    $setting->{get_record_cql_pattern} ||= $bag->id_key . ' exact "%s"';
 
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
@@ -103,7 +164,8 @@ sub oai_provider {
                 $hash->{$key} = $set;
             }
             $hash;
-        } else {
+        }
+        else {
             +{};
         }
     };
@@ -134,7 +196,8 @@ TT
 
     my $xsl_stylesheet = "";
     if (my $xsl_path = $setting->{xsl_stylesheet}) {
-        $xsl_stylesheet = "<?xml-stylesheet type='text/xsl' href='$xsl_path' ?>";
+        $xsl_stylesheet
+            = "<?xml-stylesheet type='text/xsl' href='$xsl_path' ?>";
     }
 
     my $template_header = <<TT;
@@ -190,13 +253,15 @@ TT
 
     my $admin_email = $setting->{adminEmail} // [];
     $admin_email = [$admin_email] unless is_array_ref($admin_email);
-    $admin_email = join('', map { "<adminEmail>$_</adminEmail>" } @$admin_email);
+    $admin_email
+        = join('', map {"<adminEmail>$_</adminEmail>"} @$admin_email);
 
     my @identify_extra_fields;
-    for my $i_field (qw(description compression)){
+    for my $i_field (qw(description compression)) {
         my $i_value = $setting->{$i_field} // [];
         $i_value = [$i_value] unless is_array_ref($i_value);
-        push @identify_extra_fields, join('', map { "<$i_field>$_</$i_field>" } @$i_value);
+        push @identify_extra_fields,
+            join('', map {"<$i_field>$_</$i_field>"} @$i_value);
     }
 
     my $template_identify = <<TT;
@@ -232,9 +297,9 @@ $template_header
 $template_record_header
 [%- END %]
 [%- IF token %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]">[% token %]</resumptionToken>
+<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
 [%- ELSE %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]"/>
+<resumptionToken completeListSize="[% total %]"/>
 [%- END %]
 </ListIdentifiers>
 $template_footer
@@ -254,9 +319,9 @@ $template_record_header
 </record>
 [%- END %]
 [%- IF token %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]">[% token %]</resumptionToken>
+<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
 [%- ELSE %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]"/>
+<resumptionToken completeListSize="[% total %]"/>
 [%- END %]
 </ListRecords>
 $template_footer
@@ -292,11 +357,13 @@ TT
     <setName>$set->{setName}</setName>
 TT
 
-    my $set_descriptions = $set->{setDescription} // [];
-    $set_descriptions = [$set_descriptions] unless is_array_ref($set_descriptions);
-    $template_list_sets .= "<setDescription>$_</setDescription>" for @$set_descriptions;
+        my $set_descriptions = $set->{setDescription} // [];
+        $set_descriptions = [$set_descriptions]
+            unless is_array_ref($set_descriptions);
+        $template_list_sets .= "<setDescription>$_</setDescription>"
+            for @$set_descriptions;
 
-    $template_list_sets .= <<TT;
+        $template_list_sets .= <<TT;
 </set>
 TT
     }
@@ -309,58 +376,71 @@ TT
     if ($fix) {
         $fix = Catmandu::Fix->new(fixes => $fix);
     }
-    my $sub_deleted = $opts{deleted} || sub { 0 };
-    my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
+    my $sub_deleted       = $opts{deleted}       || sub {0};
+    my $sub_set_specs_for = $opts{set_specs_for} || sub {[]};
 
     my $template_options = $setting->{template_options} || {};
 
     my $render = sub {
         my ($tmpl, $data) = @_;
         content_type 'xml';
-        my $out = "";
-        my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
+        my $out      = "";
+        my $exporter = Catmandu::Exporter::Template->new(
+            template => $tmpl,
+            file     => \$out
+        );
         $exporter->add($data);
         $exporter->commit;
         $out;
     };
 
     any ['get', 'post'] => $path => sub {
-        my $uri_base = $setting->{uri_base} // request->uri_for(request->path_info);
-        my $response_date = DateTime->now->iso8601.'Z';
+        my $uri_base = $setting->{uri_base}
+            // request->uri_for(request->path_info);
+        my $response_date = DateTime->now->iso8601 . 'Z';
         my $params = request->is_get ? params('query') : params('body');
         my $errors = [];
         my $format;
         my $set;
         my $verb = $params->{verb};
         my $vars = {
-            uri_base => $uri_base,
-            request_uri => $uri_base . $path,
+            uri_base      => $uri_base,
+            request_uri   => $uri_base . $path,
             response_date => $response_date,
-            errors => $errors,
+            errors        => $errors,
         };
 
         if ($verb and my $spec = $VERBS->{$verb}) {
-            my $valid = $spec->{valid};
+            my $valid    = $spec->{valid};
             my $required = $spec->{required};
 
-            if ($valid->{resumptionToken} and exists $params->{resumptionToken}) {
+            if ($valid->{resumptionToken}
+                and exists $params->{resumptionToken})
+            {
                 if (keys(%$params) > 2) {
-                    push @$errors, [badArgument => "resumptionToken cannot be combined with other parameters"];
+                    push @$errors,
+                        [badArgument =>
+                            "resumptionToken cannot be combined with other parameters"
+                        ];
                 }
-            } else {
+            }
+            else {
                 for my $key (keys %$params) {
                     next if $key eq 'verb';
                     unless ($valid->{$key}) {
-                        push @$errors, [badArgument => "parameter $key is illegal"];
+                        push @$errors,
+                            [badArgument => "parameter $key is illegal"];
                     }
                 }
                 for my $key (@$required) {
                     unless (exists $params->{$key}) {
-                        push @$errors, [badArgument => "parameter $key is missing"];
+                        push @$errors,
+                            [badArgument => "parameter $key is missing"];
                     }
                 }
             }
-        } else {
+        }
+        else {
             push @$errors, [badVerb => "illegal OAI verb"];
         }
 
@@ -372,23 +452,33 @@ TT
 
         if ($params->{resumptionToken}) {
             unless (is_string($params->{resumptionToken})) {
-                push @$errors, [badResumptionToken => "resumptionToken is not in the correct format"];
+                push @$errors,
+                    [badResumptionToken =>
+                        "resumptionToken is not in the correct format"
+                    ];
             }
 
             if ($verb eq 'ListSets') {
-                push @$errors, [badResumptionToken => "resumptionToken isn't necessary"];
-            } else {
-                my @parts = split '!', $params->{resumptionToken};
-
-                unless (@parts == 5) {
-                    push @$errors, [badResumptionToken => "resumptionToken is not in the correct format"];
+                push @$errors,
+                    [badResumptionToken => "resumptionToken isn't necessary"];
+            }
+            else {
+                try {
+                    my $token = _serializer->deserialize(
+                        $params->{resumptionToken});
+                    $params->{set}            = $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m};
+                    $params->{from}           = $token->{_f};
+                    $params->{until}          = $token->{_u};
+                    $vars->{token}            = $token;
                 }
+                catch {
+                    push @$errors,
+                        [badResumptionToken =>
+                            "resumptionToken is not in the correct format"
+                        ];
+                };
 
-                $params->{set}            = $parts[0];
-                $params->{from}           = $parts[1];
-                $params->{until}          = $parts[2];
-                $params->{metadataPrefix} = $parts[3];
-                $vars->{start}            = $parts[4];
             }
         }
 
@@ -403,7 +493,10 @@ TT
 
         if (my $prefix = $params->{metadataPrefix}) {
             unless ($format = $metadata_formats->{$prefix}) {
-                push @$errors, [cannotDisseminateFormat => "metadataPrefix $prefix is not supported"];
+                push @$errors,
+                    [cannotDisseminateFormat =>
+                        "metadataPrefix $prefix is not supported"
+                    ];
             }
         }
 
@@ -411,13 +504,12 @@ TT
             return $render->(\$template_error, $vars);
         }
 
-
         if ($verb eq 'GetRecord') {
             my $id = $params->{identifier};
             $id =~ s/^$ns//;
 
             my $rec = $bag->search(
-                %{ $setting->{default_search_params} },
+                %{$setting->{default_search_params}},
                 cql_query => sprintf($setting->{get_record_cql_pattern}, $id),
                 start     => 0,
                 limit     => 1,
@@ -428,15 +520,16 @@ TT
                     $rec = $fix->fix($rec);
                 }
 
-                $vars->{id} = $id;
-                $vars->{datestamp} = $format_datestamp->($rec->{$setting->{datestamp_field}});
+                $vars->{id}        = $id;
+                $vars->{datestamp} = $format_datestamp->(
+                    $rec->{$setting->{datestamp_field}});
                 $vars->{deleted} = $sub_deleted->($rec);
                 $vars->{setSpec} = $sub_set_specs_for->($rec);
                 my $metadata = "";
                 my $exporter = Catmandu::Exporter::Template->new(
                     %$template_options,
                     template => $format->{template},
-                    file => \$metadata,
+                    file     => \$metadata,
                 );
                 if ($format->{fix}) {
                     $rec = $format->{fix}->fix($rec);
@@ -444,50 +537,66 @@ TT
                 $exporter->add($rec);
                 $exporter->commit;
                 $vars->{metadata} = $metadata;
-                unless ($vars->{deleted} and $setting->{deletedRecord} eq 'no') {
+                unless ($vars->{deleted}
+                    and $setting->{deletedRecord} eq 'no')
+                {
                     return $render->(\$template_get_record, $vars);
                 }
             }
-            push @$errors, [idDoesNotExist => "identifier $params->{identifier} is unknown or illegal"];
+            push @$errors,
+                [idDoesNotExist =>
+                    "identifier $params->{identifier} is unknown or illegal"
+                ];
             return $render->(\$template_error, $vars);
 
-        } elsif ($verb eq 'Identify') {
-            $vars->{earliest_datestamp} = $setting->{earliestDatestamp} || do {
+        }
+        elsif ($verb eq 'Identify') {
+            $vars->{earliest_datestamp}
+                = $setting->{earliestDatestamp} || do {
                 my $hits = $bag->search(
-                    %{ $setting->{default_search_params} },
-                    cql_query    => $setting->{cql_filter} || 'cql.allRecords',
-                    limit        => 1,
+                    %{$setting->{default_search_params}},
+                    cql_query => $setting->{cql_filter} || 'cql.allRecords',
+                    limit     => 1,
                     sru_sortkeys => $setting->{datestamp_field},
                 );
                 if (my $rec = $hits->first) {
                     $format_datestamp->($rec->{$setting->{datestamp_field}});
-                } else {
+                }
+                else {
                     '1970-01-01T00:00:01Z';
                 }
-            };
+                };
             return $render->(\$template_identify, $vars);
 
-        } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
-            my $limit = $setting->{limit} // $DEFAULT_LIMIT;
-            my $start = $vars->{start} //= 0;
+        }
+        elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
             my $from  = $params->{from};
             my $until = $params->{until};
 
             for my $datestamp (($from, $until)) {
                 $datestamp || next;
-                if ($datestamp !~ /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}Z)?$/) {
-                    push @$errors, [badArgument => "datestamps must have the format YYYY-MM-DD or YYYY-MM-DDThh:mm:ssZ"];
+                if ($datestamp
+                    !~ /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}Z)?$/)
+                {
+                    push @$errors,
+                        [badArgument =>
+                            "datestamps must have the format YYYY-MM-DD or YYYY-MM-DDThh:mm:ssZ"
+                        ];
                     return $render->(\$template_error, $vars);
-                };
+                }
             }
 
             if ($from && $until && length($from) != length($until)) {
-                push @$errors, [badArgument => "datestamps must have the same granularity"];
+                push @$errors,
+                    [
+                    badArgument => "datestamps must have the same granularity"
+                    ];
                 return $render->(\$template_error, $vars);
             }
 
             if ($from && $until && $from gt $until) {
-                push @$errors, [badArgument => "from is more recent than until"];
+                push @$errors,
+                    [badArgument => "from is more recent than until"];
                 return $render->(\$template_error, $vars);
             }
 
@@ -502,110 +611,130 @@ TT
             my $cql_from  = $from;
             my $cql_until = $until;
             if (my $pattern = $setting->{datestamp_pattern}) {
-                $cql_from = DateTime::Format::ISO8601->parse_datetime($from)->strftime($pattern) if $cql_from;
-                $cql_until = DateTime::Format::ISO8601->parse_datetime($until)->strftime($pattern) if $cql_until;
+                $cql_from
+                    = DateTime::Format::ISO8601->parse_datetime($from)
+                    ->strftime($pattern)
+                    if $cql_from;
+                $cql_until
+                    = DateTime::Format::ISO8601->parse_datetime($until)
+                    ->strftime($pattern)
+                    if $cql_until;
             }
 
             push @cql, qq|($setting->{cql_filter})| if $setting->{cql_filter};
-            push @cql, qq|($format->{cql})| if $format->{cql};
-            push @cql, qq|($set->{cql})| if $set && $set->{cql};
-            push @cql, qq|($setting->{datestamp_field} >= "$cql_from")| if $cql_from;
-            push @cql, qq|($setting->{datestamp_field} <= "$cql_until")| if $cql_until;
+            push @cql, qq|($format->{cql})|         if $format->{cql};
+            push @cql, qq|($set->{cql})|            if $set && $set->{cql};
+            push @cql, qq|($setting->{datestamp_field} >= "$cql_from")|
+                if $cql_from;
+            push @cql, qq|($setting->{datestamp_field} <= "$cql_until")|
+                if $cql_until;
             unless (@cql) {
                 push @cql, "(cql.allRecords)";
             }
 
-            my $search = $bag->search(
-                %{ $setting->{default_search_params} },
-                cql_query => join(' and ', @cql),
-                limit     => $limit,
-                start     => $start,
-            );
+            my $search = _search($setting, $bag, join(' and ', @cql),
+                $vars->{token});
 
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
                 return $render->(\$template_error, $vars);
             }
 
-            if ($start + $limit < $search->total) {
-                $vars->{token} = join '!',
-                    $params->{set} || '',
-                    $from ? $from : '',
-                    $until ? $until : '',
-                    $params->{metadataPrefix},
-                    $start + $limit;
+            if (
+                defined(
+                    my $token
+                        = _new_token($setting, $search, $params, $from,
+                        $until)
+                )
+                )
+            {
+                $vars->{token} = _serializer->serialize($token);
             }
 
             $vars->{total} = $search->total;
 
             if ($verb eq 'ListIdentifiers') {
-                $vars->{records} = [map {
-                    my $rec = $_;
-                    my $id  = $rec->{$bag->id_key};
+                $vars->{records} = [
+                    map {
+                        my $rec = $_;
+                        my $id  = $rec->{$bag->id_key};
 
-                    if ($fix) {
-                        $rec = $fix->fix($rec);
-                    }
-
-                    {
-                        id        => $id,
-                        datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
-                        deleted   => $sub_deleted->($rec),
-                        setSpec   => $sub_set_specs_for->($rec),
-                    };
-                } @{$search->hits}];
-                return $render->(\$template_list_identifiers, $vars);
-            } else {
-                $vars->{records} = [map {
-                    my $rec = $_;
-                    my $id  = $rec->{$bag->id_key};
-
-                    if ($fix) {
-                        $rec = $fix->fix($rec);
-                    }
-
-                    my $deleted = $sub_deleted->($rec);
-
-                    my $rec_vars = {
-                        id        => $id,
-                        datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
-                        deleted   => $deleted,
-                        setSpec   => $sub_set_specs_for->($rec),
-                    };
-                    unless ($deleted) {
-                        my $metadata = "";
-                        my $exporter = Catmandu::Exporter::Template->new(
-                            %$template_options,
-                            template => $format->{template},
-                            file     => \$metadata,
-                        );
-                        if ($format->{fix}) {
-                            $rec = $format->{fix}->fix($rec);
+                        if ($fix) {
+                            $rec = $fix->fix($rec);
                         }
-                        $exporter->add($rec);
-                        $exporter->commit;
-                        $rec_vars->{metadata} = $metadata;
-                    }
-                    $rec_vars;
-                } @{$search->hits}];
+
+                        {
+                            id        => $id,
+                            datestamp => $format_datestamp->(
+                                $rec->{$setting->{datestamp_field}}
+                            ),
+                            deleted => $sub_deleted->($rec),
+                            setSpec => $sub_set_specs_for->($rec),
+                        };
+                    } @{$search->hits}
+                ];
+                return $render->(\$template_list_identifiers, $vars);
+            }
+            else {
+                $vars->{records} = [
+                    map {
+                        my $rec = $_;
+                        my $id  = $rec->{$bag->id_key};
+
+                        if ($fix) {
+                            $rec = $fix->fix($rec);
+                        }
+
+                        my $deleted = $sub_deleted->($rec);
+
+                        my $rec_vars = {
+                            id        => $id,
+                            datestamp => $format_datestamp->(
+                                $rec->{$setting->{datestamp_field}}
+                            ),
+                            deleted => $deleted,
+                            setSpec => $sub_set_specs_for->($rec),
+                        };
+                        unless ($deleted) {
+                            my $metadata = "";
+                            my $exporter = Catmandu::Exporter::Template->new(
+                                %$template_options,
+                                template => $format->{template},
+                                file     => \$metadata,
+                            );
+                            if ($format->{fix}) {
+                                $rec = $format->{fix}->fix($rec);
+                            }
+                            $exporter->add($rec);
+                            $exporter->commit;
+                            $rec_vars->{metadata} = $metadata;
+                        }
+                        $rec_vars;
+                    } @{$search->hits}
+                ];
                 return $render->(\$template_list_records, $vars);
             }
 
-        } elsif ($verb eq 'ListMetadataFormats') {
+        }
+        elsif ($verb eq 'ListMetadataFormats') {
             if (my $id = $params->{identifier}) {
                 $id =~ s/^$ns//;
                 unless ($bag->get($id)) {
-                    push @$errors, [idDoesNotExist => "identifier $params->{identifier} is unknown or illegal"];
+                    push @$errors,
+                        [idDoesNotExist =>
+                            "identifier $params->{identifier} is unknown or illegal"
+                        ];
                     return $render->(\$template_error, $vars);
                 }
             }
             return $render->(\$template_list_metadata_formats, $vars);
 
-        } elsif ($verb eq 'ListSets') {
+        }
+        elsif ($verb eq 'ListSets') {
             return $render->(\$template_list_sets, $vars);
         }
     }
-};
+}
 
 register oai_provider => \&oai_provider;
 
@@ -733,6 +862,8 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
     * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
     * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH
+    * default_search_params - set default arguments that get passed to every call to the bag's search method
+    * search_strategy - default is C<paginate>, set to C<es.scroll> to avoid deep paging (Elasticsearch only)
     * limit - The maximum number of records to be returned in each OAI-PMH request
     * delimiter - Delimiters used in prefixing a record identifier with a repositoryIdentifier (use: ':' as default)
     * sampleIdentifier - A sample identifier

@@ -120,7 +120,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2006",
+   "version" : "1.2007",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -145,7 +145,7 @@
       "Upasana Shukla <me@upasana.me>",
       "Vitali Peil <vpeil@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
+   "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 0
 }

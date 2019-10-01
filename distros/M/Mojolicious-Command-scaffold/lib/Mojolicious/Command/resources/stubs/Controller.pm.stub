@@ -1,0 +1,11 @@
+package Application::Controller::Stub;
+use Mojo::Base 'Mojolicious::Controller';
+
+
+sub action {
+    return shift->render('template/action',
+        name => 'value',
+    );
+}
+
+1;

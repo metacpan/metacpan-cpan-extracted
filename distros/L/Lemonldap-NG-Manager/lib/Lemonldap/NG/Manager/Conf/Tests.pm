@@ -4,7 +4,7 @@ use utf8;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -594,13 +594,25 @@ sub tests {
             return 1;
         },
 
-        # Warn if XSRF token TTL is higher than 10s
+        # Warn if XSRF token TTL is higher than 30s
         formTimeout => sub {
             return 1 unless ( defined $conf->{formTimeout} );
             return ( 0, "XSRF form token TTL must be higher than 30s" )
               unless ( $conf->{formTimeout} > 30 );
             return ( 1, "XSRF form token TTL should not be higher than 2mn" )
               if ( $conf->{formTimeout} > 120 );
+
+            # Return
+            return 1;
+        },
+
+        # Warn if issuers token TTL is higher than 30s
+        issuersTimeout => sub {
+            return 1 unless ( defined $conf->{issuerTimeout} );
+            return ( 0, "Issuers token TTL must be higher than 30s" )
+              unless ( $conf->{issuerTimeout} > 30 );
+            return ( 1, "Issuers token TTL should not be higher than 2mn" )
+              if ( $conf->{issuerTimeout} > 120 );
 
             # Return
             return 1;
@@ -634,7 +646,7 @@ sub tests {
         checkMailResetSecurity => sub {
             return 1 unless ( $conf->{portalDisplayResetPassword} );
             return ( -1,
-'"passwordMailReset" plugin is enabled without CSRF Token neither Captcha required !!!'
+'"passwordMailReset" plugin is enabled without CSRF Token neither Captcha required'
               )
               unless ( $conf->{requireToken}
                 or $conf->{captcha_mail_enabled} );
@@ -643,16 +655,42 @@ sub tests {
             return 1;
         },
 
-        # Warn if Impersonation is enabled without prefix
-        impersonationPrefix => sub {
-            return 1 unless ( $conf->{impersonationRule} );
+        # Warn if Impersonation and ContextSwitching are simultaneously enabled
+        impersonation => sub {
             return ( 1,
-                "Impersonation is enabled without real attributes prefix" )
-              unless ( $conf->{impersonationPrefix} );
+                "Impersonation and ContextSwitching are simultaneously enabled"
+              )
+              if ( $conf->{impersonationRule}
+                && $conf->{contextSwitchingRule} );
 
             # Return
             return 1;
         },
+
+# Warn if persistent storage is disabled with 2FA, History, OIDCConsents, Notifications or BruteForce protection
+        persistentStorage => sub {
+            return 1 unless ( $conf->{disablePersistentStorage} );
+            return ( 1, "2FA enabled WITHOUT persistent session storage" )
+              if ( $conf->{totp2fActivation}
+                || $conf->{yubikey2fActivation}
+                || $conf->{u2fActivation}
+                || $conf->{utotp2fActivation} );
+            return ( 1, "History enabled WITHOUT persistent session storage" )
+              if ( $conf->{loginHistoryEnabled} );
+            return ( 1,
+                "OIDC consents enabled WITHOUT persistent session storage" )
+              if ( $conf->{portalDisplayOidcConsents} );
+            return ( 1,
+                "Notifications enabled WITHOUT persistent session storage" )
+              if ( $conf->{notification} );
+            return ( 1,
+                "BruteForceProtection plugin enabled WITHOUT persistent session storage" )
+              if ( $conf->{bruteForceProtection} );
+
+            # Return
+            return 1;
+        },
+
     };
 }
 

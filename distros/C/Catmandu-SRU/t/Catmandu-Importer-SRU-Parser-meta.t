@@ -5,7 +5,7 @@ use Test::Exception;
 use Catmandu::Importer::SRU;
 use utf8;
 use lib 't/lib';
-use MockFurl;
+use MockHTTPClient;
 
 my $pkg;
 
@@ -17,10 +17,10 @@ BEGIN {
 require_ok $pkg;
 
 my $importer = Catmandu::Importer::SRU->new(
-    base   => 'http://example.org/',
-    query  => 'meta.xml',
-    furl   => MockFurl->new,
-    parser => 'meta',
+    base        => 'http://example.org/',
+    query       => 'meta.xml',
+    http_client => MockHTTPClient->new,
+    parser      => 'meta',
 );
 
 is_deeply {

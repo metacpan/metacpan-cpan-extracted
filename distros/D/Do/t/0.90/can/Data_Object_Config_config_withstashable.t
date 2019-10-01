@@ -26,7 +26,7 @@ config_withstashable() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

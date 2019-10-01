@@ -1,5 +1,8 @@
 Revision history for Mojo-PDF
 
+1.005001  2019-09-27
+  - Implement adjustable page size [#10]
+
 1.004002  2015-09-29
   - "text" now respects "\n" and renders on several lines
     (applies to Table primitive as well)

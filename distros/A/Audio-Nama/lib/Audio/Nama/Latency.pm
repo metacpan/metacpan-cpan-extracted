@@ -95,7 +95,7 @@ sub latency_of {
 sub track_ops_latency {
 	my $track = shift;
 	my $total = 0;;
-	map { $total += op_latency($_) } $track->fancy_ops;
+	map { $total += op_latency($_) } $track->user_ops;
 	Audio::Nama::Lat->new($total,$total);
 }
 sub op_latency {
@@ -373,15 +373,16 @@ sub get_live_param { # for effect, not controller
 	my $FX = fxn($op);
 	my $n = $FX->chain;
 	my $i = $FX->ecasound_effect_index;
-	eval_iam("c-select $n");
-	eval_iam("cop-select $i");
-	eval_iam("copp-select $param");
-	eval_iam("copp-get")
+	die "convert these direct IAM calls to cache";
+	ecasound_iam("c-select $n");
+	ecasound_iam("cop-select $i");
+	ecasound_iam("copp-select $param"); 
+	ecasound_iam("copp-get")
 }
 
 sub frames_to_secs { # One time conversion for delay op
 	my $frames = shift;
-	$frames / $config->{sample_rate};
+	$frames / $project->{sample_rate};
 }
 sub start_latency_watcher {
 	$jack->{watcher} ||= 

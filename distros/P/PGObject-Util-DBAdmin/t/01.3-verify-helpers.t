@@ -4,8 +4,12 @@ use strict;
 use Test::More;
 use PGObject::Util::DBAdmin;
 
-plan tests => 3;
-
+if (not $ENV{AUTHOR_TESTING}) {
+    plan skip_all => 'Test only applicable when AUTHOR_TESTING';
+}
+else {
+    plan tests => 3;
+}
 
 is_deeply( PGObject::Util::DBAdmin->verify_helpers,
            {

@@ -10,6 +10,15 @@ TODO:
 
 Version - YYYY/MM/DD
 --------------------
+0.42 2019/09/30 08:30:00
+  - Changed the copyright from 2018 to 2019 in all files.
+  - Removed L<http://search.cpan.org/~cleach/Net-FTPSSL-0.42/FTPSSL.pm> link
+    from the POD since that link seems to be in the process of being depreciated
+    on CPAN after its re-design in 2018. (Link gets redirected to a new URL.)
+  - Added BUILD_REQUIRES option to Makefile.PL
+  - Bug ID 130578 - Special thanks to Edward Sabol for asking for the new
+    aliases "ls" & "dir"  (alias to nlst and list)
+
 0.41 2018/12/20 08:30:00
   - Fixed supported() to say HELP isn't supported if OverriedHELP was used.
     Wasn't doing this in 100% of the logic paths.
@@ -47,6 +56,7 @@ Version - YYYY/MM/DD
   - Modified is_dir() & is_file() to be able to use MLST as the prefered way
     to do these tests.  Falls back on original tests if MLST isn't supported
     or doesn't have the TYPE feature enabled.
+
   - Redesigned all the test cases from scratch!  Rather than choose one of 3
     huge scripts to run, everything has been replaced by a lot of smaller test
     cases.  Makes it much simpler to verify everything is working without the

@@ -1,5 +1,8 @@
 Revision history for Parse-Distname
 
+0.05 2019/09/29
+  - fixed is_perl6
+
 0.04 2019/08/09
   - fixed a case that contains SSL3
 

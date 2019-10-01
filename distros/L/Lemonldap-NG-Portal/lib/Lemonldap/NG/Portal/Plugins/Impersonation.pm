@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Portal::Main::Constants
   qw( PE_OK PE_BADCREDENTIALS PE_IMPERSONATION_SERVICE_NOT_ALLOWED PE_MALFORMEDUSER );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -37,13 +37,13 @@ sub init {
     $self->rule($rule);
 
     # Parse identity rule
-    $self->logger->debug( "Impersonation identity rule -> "
+    $self->logger->debug( "Impersonation identities rule -> "
           . $self->conf->{impersonationIdRule} );
     $rule =
       $hd->buildSub( $hd->substitute( $self->conf->{impersonationIdRule} ) );
     unless ($rule) {
         $self->error(
-            "Bad impersonation identity rule -> " . $hd->tsv->{jail}->error );
+            "Bad impersonation identities rule -> " . $hd->tsv->{jail}->error );
         return 0;
     }
     $self->idRule($rule);
@@ -71,7 +71,7 @@ sub run {
       if ( $spoofId eq $req->{user} );
 
     unless ( $spoofId =~ /$self->{conf}->{userControl}/o ) {
-        $self->userLogger->error('Malformed spoofed Id');
+        $self->userLogger->warn('Malformed spoofed Id');
         $self->logger->debug("Impersonation tried with spoofed Id: $spoofId");
         $spoofId = $req->{user};
         $statut  = PE_MALFORMEDUSER;
@@ -81,7 +81,7 @@ sub run {
     if ( $spoofId ne $req->{user} ) {
         $self->logger->debug("Spoof Id: $spoofId / Real Id: $req->{user}");
         unless ( $self->rule->( $req, $req->sessionInfo ) ) {
-            $self->userLogger->error('Impersonation service not authorized');
+            $self->userLogger->warn('Impersonation service not authorized');
             $spoofId = $req->{user};
             $statut  = PE_IMPERSONATION_SERVICE_NOT_ALLOWED;
         }
@@ -90,12 +90,11 @@ sub run {
     # Fill spoof session
     my ( $realSession, $spoofSession ) = ( {}, {} );
     $self->logger->debug("Rename real attributes...");
-    my $spk = '';
     foreach my $k ( keys %{ $req->{sessionInfo} } ) {
         if ( $self->{conf}->{impersonationSkipEmptyValues} ) {
             next unless defined $req->{sessionInfo}->{$k};
         }
-        $spk = "$self->{conf}->{impersonationPrefix}$k";
+        my $spk = "$self->{conf}->{impersonationPrefix}$k";
         unless ( $self->hAttr =~ /\b$k\b/
             || $k =~ /^(?:_imp|token|_type)\w*\b/ )
         {
@@ -120,8 +119,7 @@ sub run {
     $self->logger->debug("Populating spoof session...");
     foreach (qw (_auth _userDB)) {
         $self->logger->debug("Processing $_...");
-        $spk = "$self->{conf}->{impersonationPrefix}$_";
-        $spoofSession->{$_} = $realSession->{$spk};
+        $spoofSession->{$_} = $realSession->{"$self->{conf}->{impersonationPrefix}$_"};
     }
 
     # Merging SSO Groups and hGroups & dedup
@@ -134,6 +132,7 @@ sub run {
         my $separator = $self->{conf}->{multiValuesSeparator};
 
         ## GROUPS
+        $realSession->{$spg} ||= '';
         my @spoofGrps = split /\Q$separator/, $spoofSession->{groups};
         my @realGrps  = split /\Q$separator/, $realSession->{$spg};
 
@@ -217,7 +216,7 @@ sub _userData {
                     'Impersonation requested for an unvalid user ('
                   . $req->{user}
                   . ")" );
-            $self->logger->debug('Identity not authorized');
+            $self->logger->debug('Identity NOT authorized');
             $raz = 1;
         }
     }

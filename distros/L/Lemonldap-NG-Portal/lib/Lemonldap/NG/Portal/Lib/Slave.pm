@@ -10,7 +10,7 @@ use base qw(Exporter);
 use strict;
 
 our @EXPORT  = qw(checkIP checkHeader);
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # RUNNING METHODS
 
@@ -34,8 +34,15 @@ sub checkHeader {
     return 1
       unless ( $self->conf->{slaveHeaderName}
         and $self->conf->{slaveHeaderContent} );
-    my $headerContent = $req->{ $self->conf->{slaveHeaderName} };
-    return 1 if ( $self->conf->{slaveHeaderContent} =~ /\b$headerContent\b/ );
+
+    my $slave_header = 'HTTP_' . uc( $self->{conf}->{slaveHeaderName} );
+    $slave_header =~ s/\-/_/g;
+    my $headerContent = $req->env->{$slave_header};
+    $self->logger->debug("Required Slave header => $self->{conf}->{slaveHeaderName}");
+    $self->logger->debug("Received Slave header content => $headerContent");
+    return 1
+      if (  $headerContent
+        and $self->conf->{slaveHeaderContent} =~ /\b$headerContent\b/ );
 
     $self->userLogger->warn('Matching header not found for Slave module ');
     return 0;

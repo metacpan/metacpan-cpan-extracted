@@ -1,0 +1,46 @@
+{
+   "abstract" : "capitalize strings (\"to WORK AS titles\" becomes \"To Work as Titles\")",
+   "author" : [
+      "Joseph Brenner <doom@kzsu.stanford.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Capitalize",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Env" : "1",
+            "FindBin" : "1.04",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Capitalize" : {
+         "file" : "lib/Text/Capitalize.pm",
+         "version" : "1.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.5",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

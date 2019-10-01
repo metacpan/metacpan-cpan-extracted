@@ -3,4 +3,4 @@ badges = ["travis-ci.com", "metacpan"]
 authority="cpan:WORTHMINE"
 
 module_maker="ModuleBuildTiny"
-
+license="perl_5"

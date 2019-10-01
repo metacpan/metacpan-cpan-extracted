@@ -126,7 +126,7 @@ m#iframe src="http://auth.sp.com(/saml/proxySingleLogout)\?(SAMLRequest=.*?)"#,
     my $query = $2;
     ok(
         getHeader( $res, 'Content-Security-Policy' ) =~ /child-src auth.sp.com/,
-        'Frame is authorizated'
+        'Frame is authorized'
       )
       or explain( $res->[1],
         'Content-Security-Policy => ...child-src auth.idp.com' );

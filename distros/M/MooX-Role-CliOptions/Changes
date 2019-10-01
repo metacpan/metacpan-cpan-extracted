@@ -1,5 +1,27 @@
 Revision history for MooX-Role-CliOptions
 
+0.05    2019-09-24 19:00:00
+        Promoted test version 0.04.1_004 to release version 0.05
+
+0.04.1_004 2019-09-23 22:35:00
+        Added non-modulino style script to examples to verify it works
+        from package 'main'. Tweaked POD. Added POD spell-check.
+
+0.04.1_003 2019-09-23 11:11:00
+        Set plan to 'skip_all' if it appears that the spawned child process
+        fails to run the example script properly. This appears to happen on
+        several test platforms even though required modules are specified in
+        Makefile.PL.
+
+0.04.1_002 2019-09-22 23:45:00
+        Added TEST_REQUIRES to Makefile.PL after see test failures indicating
+        that Moo was not available.
+
+0.04.1_001 2019-09-22 23:40:00
+        Re-instated tests for moodulino.pl back after adding additional tests
+        to help diagnose why they fail on some platforms. Do NOT merge this
+        branch to master until that is solved.
+
 0.04    2019-09-21 21:53:00
         Removed tests for moodulino.pl since they do not test the Role
         itself and system() behaves erratically on some systems.

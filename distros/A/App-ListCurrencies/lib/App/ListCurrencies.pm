@@ -1,7 +1,7 @@
 package App::ListCurrencies;
 
-our $DATE = '2019-07-19'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-07-28'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -73,7 +73,7 @@ App::ListCurrencies - List currencies
 
 =head1 VERSION
 
-This document describes version 0.002 of App::ListCurrencies (from Perl distribution App-ListCurrencies), released on 2019-07-19.
+This document describes version 0.003 of App::ListCurrencies (from Perl distribution App-ListCurrencies), released on 2019-07-28.
 
 =head1 SYNOPSIS
 

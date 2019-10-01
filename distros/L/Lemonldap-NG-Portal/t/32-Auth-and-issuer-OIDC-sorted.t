@@ -241,8 +241,9 @@ sub rp {
                 },
                 oidcOPMetaDataOptions => {
                     op => {
-                        oidcOPMetaDataOptionsJWKSTimeout  => 0,
-                        oidcOPMetaDataOptionsClientSecret => "rpsecret",
+                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
+                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
+                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",
@@ -253,8 +254,9 @@ sub rp {
                           "https://auth.op.com/.well-known/openid-configuration"
                     },
                     op2 => {
-                        oidcOPMetaDataOptionsJWKSTimeout  => 0,
-                        oidcOPMetaDataOptionsClientSecret => "rpsecret",
+                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
+                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
+                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",
@@ -264,8 +266,9 @@ sub rp {
                           "https://auth.op.com/.well-known/openid-configuration"
                     },
                     op3 => {
-                        oidcOPMetaDataOptionsJWKSTimeout  => 0,
-                        oidcOPMetaDataOptionsClientSecret => "rpsecret",
+                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
+                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
+                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
                         oidcOPMetaDataOptionsDisplay      => "",

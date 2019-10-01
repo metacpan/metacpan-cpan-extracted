@@ -6,7 +6,7 @@ Date::Time2fmtstr - Functions to format Perl time integers to strings based on a
 
 Jim Turner
 
-(c) 2015, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
+(c) 2015-2019, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
 
 =head1 SYNOPSIS
 
@@ -95,11 +95,17 @@ B<H1> - Hour in 24-hour format, 1 or 2 digits, as needed, ie. 0-23.
 
 B<Mon> - Three letter abbreviation of the month, capitalized, ie. "Jan" for January. 
 
-B<MON> - Three letter abbreviation of the month all capitalized, ie. "JAN". 
+B<MON> - Three letter abbreviation of the month all capitalized, ie. "JAN" for January. 
 
 B<m1> - Number of month (1 or 2 digits, as needed), ie. "1" for January. 
 
-B<sssss> - Seconds since start of day. 
+B<sssss> - Seconds since start of day (00000-86399). 
+
+B<ssss0> - Seconds since start of day (0-86399). 
+
+B<mmmm> - Minutes since start of day (0000-3599. 
+
+B<mmm0> - Minutes since start of day (0-3599. 
 
 B<ss> - Seconds since start of last minute (2 digits), ie. 00-59. 
 
@@ -115,7 +121,9 @@ B<rm> - Roman numeral for the month (i-xii) in lower case.
 
 B<RM> - Roman numeral for the month (I-XII) in upper case. 
 
-B<ww> - Number of week of the year (00-51). 
+B<w> - Number of week of the month (1-5). 
+
+B<ww> - Number of week of the year (1-51). 
 
 B<q> - Number of the quarter of the year - (1-4).
 
@@ -123,9 +131,97 @@ B<q> - Number of the quarter of the year - (1-4).
 
 =back
 
+=head1 DEPENDENCIES
+
+Perl 5
+
+=head1 RECCOMENDS
+
+L<Date::Fmtstr2time>, L<String::PictureFormat>
+
+wget
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Date-Time2fmtstr at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Time2fmtstr>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Date::Time2fmtstr
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Time2fmtstr>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Date-Time2fmtstr>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Date-Time2fmtstr>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Date-Time2fmtstr/>
+
+=back
+
+=head1 SEE ALSO
+
+L<Date::Fmtstr2time>
+
 =head1 KEYWORDS
 
 L<Date::Fmtstr2time>, L<String::PictureFormat>, formatting, picture_clause, strings
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2015-2019 Jim Turner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
@@ -134,7 +230,7 @@ package Date::Time2fmtstr;
 use strict;
 #use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 require Exporter;
 
@@ -165,8 +261,8 @@ OUTER1:	for (my $i=0;$i<=$#fmts;$i++)
 MIDDLE1:		while ($fmts[$i] =~ /\w/o)
 		{
 			foreach my $f (qw(month Month MONTH dayofweek Dayofweek DAYOFWEEK day Day DAY
-					ddd dd d1 d0 yyyymmdd yyyy yy hh24 hh HH H1 h1 mi mm mon 
-					Mon MON m1 sssss ss am pm AM PM a p A P rm RM rr d ww q))
+					ddd dd d1 d0 yyyymmdd yyyy yy hh24 hh HH H1 h1 mi mmm0 mmmm mm mon 
+					Mon MON m1 ssss0 sssss ss am pm AM PM a p A P rm RM rr d ww w q))
 			{
 				if ($fmts[$i] =~ s/^$f//)
 				{
@@ -383,9 +479,25 @@ sub _toc_mi       #MINUTES (00-59)
 	return $inputs[1];
 }
 
+sub _toc_ssss0    #SECONDS OF THE DAY (0-86399)
+{
+	return ($inputs[2]*3600)+($inputs[1]*60)+$inputs[0];
+}
+
 sub _toc_sssss    #SECONDS OF THE DAY (0-86399)
 {
-	return sprintf('%5.5d', (($inputs[2]*3600)+($inputs[1]*60)+$inputs[0]));
+	return sprintf('%5.5d', &_toc_ssss0);
+}
+
+sub _toc_mmm0    #MINUTES OF THE DAY (0-3599)
+{
+print "--INPUTS(2)=$inputs[2]= 1=$inputs[1]= 0=$inputs[0]=\n";
+	return ($inputs[2]*60)+$inputs[1];
+}
+
+sub _toc_mmmm    #MINUTES OF THE DAY (0-3599)
+{
+	return sprintf('%4.4d', &_toc_mmm0);
 }
 
 sub _toc_ss       #SECONDS
@@ -444,9 +556,14 @@ sub _toc_DAYOFWEEK
 	return "\U$myday\E";
 }
 
-sub _toc_ww    #WEEK OF YEAR (0-51)
+sub _toc_w    #WEEK OF MONTH (1-5)
 {
-	return &_toc_ddd % 7;
+	return int(&_toc_dd / 7) + 1;
+}
+
+sub _toc_ww    #WEEK OF YEAR (1-52)
+{
+	return int(&_toc_ddd / 7) + 1;
 }
 
 sub _toc_q     #QUARTER (1-4):

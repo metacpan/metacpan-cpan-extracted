@@ -1,6 +1,6 @@
 package Sweat;
 
-our $VERSION = 201909171;
+our $VERSION = 201909240;
 
 use v5.10;
 
@@ -145,6 +145,12 @@ has 'country' => (
     default => 'us',
 );
 
+has 'language' => (
+    is => 'rw',
+    isa => Str,
+    default => 'en',
+);
+
 has 'articles' => (
     is => 'lazy',
     isa => ArrayRef,
@@ -215,9 +221,14 @@ sub BUILD {
         $self->newsapi_key( undef );
     }
 
+    $Sweat::Article::language = $self->language;
+    $Sweat::Article::mw->{config}->{api_url} =
+        "https://"
+        . $self->language
+        . ".wikipedia.org/w/api.php";
+
     $self->_check_resources;
     $self->_load_entertainment;
-
 }
 
 sub _check_resources {
@@ -252,7 +263,7 @@ sub _load_entertainment {
     my $self = shift;
     if ( $self->entertainment ) {
         local $| = 1;
-        say "Loading entertainment...";
+        say "Loading entertainment, please wait...";
         $self->articles;
         $self->weather;
         say "...done.";

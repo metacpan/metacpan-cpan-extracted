@@ -64,7 +64,7 @@
 </div>
 
 <div class="buttons">
-  <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1" class="btn btn-primary" role="button">
+  <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1&skin=<TMPL_VAR NAME="SKIN">" class="btn btn-primary" role="button">
     <span class="fa fa-home"></span>
     <span trspan="goToPortal">Go to portal</span>
   </a>

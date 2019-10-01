@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -83,8 +83,11 @@ sub checkType {
     my ( $class, $req ) = @_;
 
     if ( time() - $class->lastCheck > $class->checkTime ) {
-        die("$class: No configuration found")
-          unless ( $class->checkConf );
+        unless ( $class->checkConf ) {
+            $class->logger->error("$class: No configuration found");
+            $req->data->{noTry} = 1;
+            return 'Fail';
+        }
     }
     my $vhost = $class->resolveAlias($req);
     return ( defined $class->tsv->{type}->{$vhost} )
@@ -147,6 +150,9 @@ sub run {
 
         # ACCOUNTING (1. Inform web server)
         $class->set_user( $req, $session->{ $class->tsv->{whatToTrace} } );
+        $class->set_custom( $req, $session->{ $class->tsv->{customToTrace} } )
+          if $class->tsv->{customToTrace}
+          and $session->{ $class->tsv->{customToTrace} };
 
         # AUTHORIZATION
         return ( $class->forbidden( $req, $session ), $session )
@@ -408,7 +414,7 @@ sub fetchId {
     my $value =
       $lookForHttpCookie
       ? ( $t =~ /${cn}http=([^,; ]+)/o ? $1 : 0 )
-      : ( $t =~ /$cn=([^,; ]+)/o ? $1 : 0 );
+      : ( $t =~ /$cn=([^,; ]+)/o       ? $1 : 0 );
 
     if ( $value && $lookForHttpCookie && $class->tsv->{securedCookie} == 3 ) {
         $value = $class->tsv->{cipher}->decryptHex( $value, "http" );
@@ -417,7 +423,7 @@ sub fetchId {
         $value = $class->tsv->{cipher}->decrypt($value);
         unless ( $value =~ s/^(.*)? (.*)$/$1/ and $2 eq $vhost ) {
             $class->userLogger->error(
-                "Bad CDA cookie: available for $2 instead od $vhost");
+                "Bad CDA cookie: available for $2 instead of $vhost");
             return undef;
         }
     }

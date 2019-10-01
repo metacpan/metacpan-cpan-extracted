@@ -1,5 +1,5 @@
 package Jacode4e;
-$VERSION = '2.13.6.15';
+$VERSION = '2.13.6.16';
 ######################################################################
 #
 # Jacode4e - jacode.pl-like program for enterprise
@@ -85,7 +85,7 @@ $VERSION = '2.13.6.15';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   use Jacode4e;
-#   Jacode4e::VERSION('2.13.6.12');
+#   Jacode4e::VERSION('2.13.6.16');
 #
 #   while (<>) {
 #       $return =
@@ -751,35 +751,50 @@ END
         'get_ctype' => sub { m!^[\x00-\x7F\xFE\xFF]! ? 'SBCS' : m!^[^\x00-\x7F\xFE\xFF]! ? 'DBCS' : undef },
         'set_ctype' => sub { q!! },
         'getoct'    => sub { s!^(
-            [\x00-\x7F]               |
-            \xC3\xA6\xCC\x80          | # U+00E6+0300
-            \xC9\x94\xCC\x80          | # U+0254+0300
-            \xC9\x94\xCC\x81          | # U+0254+0301
-            \xC9\x99\xCC\x80          | # U+0259+0300
-            \xC9\x99\xCC\x81          | # U+0259+0301
-            \xC9\x9A\xCC\x80          | # U+025A+0300
-            \xC9\x9A\xCC\x81          | # U+025A+0301
-            \xCA\x8C\xCC\x80          | # U+028C+0300
-            \xCA\x8C\xCC\x81          | # U+028C+0301
-            \xCB\xA5\xCB\xA9          | # U+02E5+02E9
-            \xCB\xA9\xCB\xA5          | # U+02E9+02E5
-            \xE3\x81\x8B\xE3\x82\x9A  | # U+304B+309A
-            \xE3\x81\x8D\xE3\x82\x9A  | # U+304D+309A
-            \xE3\x81\x8F\xE3\x82\x9A  | # U+304F+309A
-            \xE3\x81\x91\xE3\x82\x9A  | # U+3051+309A
-            \xE3\x81\x93\xE3\x82\x9A  | # U+3053+309A
-            \xE3\x82\xAB\xE3\x82\x9A  | # U+30AB+309A
-            \xE3\x82\xAD\xE3\x82\x9A  | # U+30AD+309A
-            \xE3\x82\xAF\xE3\x82\x9A  | # U+30AF+309A
-            \xE3\x82\xB1\xE3\x82\x9A  | # U+30B1+309A
-            \xE3\x82\xB3\xE3\x82\x9A  | # U+30B3+309A
-            \xE3\x82\xBB\xE3\x82\x9A  | # U+30BB+309A
-            \xE3\x83\x84\xE3\x82\x9A  | # U+30C4+309A
-            \xE3\x83\x88\xE3\x82\x9A  | # U+30C8+309A
-            \xE3\x87\xB7\xE3\x82\x9A  | # U+31F7+309A
-            [\xC2-\xDF][\x80-\xBF]{1} |
-            [\xE0-\xEF][\x80-\xBF]{2} |
-            [\xF0-\xF7][\x80-\xBF]{3} |
+            [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF] |
+            [\xE0-\xE2\xE4-\xEF][\x80-\xBF]{2}     |
+            \xE3(?:
+                \x81\x8B\xE3\x82\x9A               | # U+304B+309A
+                \x81\x8D\xE3\x82\x9A               | # U+304D+309A
+                \x81\x8F\xE3\x82\x9A               | # U+304F+309A
+                \x81\x91\xE3\x82\x9A               | # U+3051+309A
+                \x81\x93\xE3\x82\x9A               | # U+3053+309A
+                \x82\xAB\xE3\x82\x9A               | # U+30AB+309A
+                \x82\xAD\xE3\x82\x9A               | # U+30AD+309A
+                \x82\xAF\xE3\x82\x9A               | # U+30AF+309A
+                \x82\xB1\xE3\x82\x9A               | # U+30B1+309A
+                \x82\xB3\xE3\x82\x9A               | # U+30B3+309A
+                \x82\xBB\xE3\x82\x9A               | # U+30BB+309A
+                \x83\x84\xE3\x82\x9A               | # U+30C4+309A
+                \x83\x88\xE3\x82\x9A               | # U+30C8+309A
+                \x87\xB7\xE3\x82\x9A               | # U+31F7+309A
+                [\x80-\xBF]{2}
+            )                                      |
+            [\xC2\xC4-\xC8\xCC-\xDF][\x80-\xBF]    |
+            \xC3(?:
+                \xA6\xCC\x80                       | # U+00E6+0300
+                [\x80-\xBF]
+            )                                      |
+            \xC9(?:
+                \x94\xCC\x80                       | # U+0254+0300
+                \x94\xCC\x81                       | # U+0254+0301
+                \x99\xCC\x80                       | # U+0259+0300
+                \x99\xCC\x81                       | # U+0259+0301
+                \x9A\xCC\x80                       | # U+025A+0300
+                \x9A\xCC\x81                       | # U+025A+0301
+                [\x80-\xBF]
+            )                                      |
+            \xCA(?:
+                \x8C\xCC\x80                       | # U+028C+0300
+                \x8C\xCC\x81                       | # U+028C+0301
+                [\x80-\xBF]
+            )                                      |
+            \xCB(?:
+                \xA5\xCB\xA9                       | # U+02E5+02E9
+                \xA9\xCB\xA5                       | # U+02E9+02E5
+                [\x80-\xBF]
+            )                                      |
+            [\xF0-\xF4][\x80-\xBF]{3}              |
             [\x00-\xFF]
         )!!xs; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'utf8'}{$_[0]} },
@@ -789,35 +804,50 @@ END
         'get_ctype' => sub { m!^[\x00-\x7F\xFE\xFF]! ? 'SBCS' : m!^[^\x00-\x7F\xFE\xFF]! ? 'DBCS' : undef },
         'set_ctype' => sub { q!! },
         'getoct'    => sub { s!^(
-            [\x00-\x7F]               |
-            \xC3\xA6\xCC\x80          | # U+00E6+0300
-            \xC9\x94\xCC\x80          | # U+0254+0300
-            \xC9\x94\xCC\x81          | # U+0254+0301
-            \xC9\x99\xCC\x80          | # U+0259+0300
-            \xC9\x99\xCC\x81          | # U+0259+0301
-            \xC9\x9A\xCC\x80          | # U+025A+0300
-            \xC9\x9A\xCC\x81          | # U+025A+0301
-            \xCA\x8C\xCC\x80          | # U+028C+0300
-            \xCA\x8C\xCC\x81          | # U+028C+0301
-            \xCB\xA5\xCB\xA9          | # U+02E5+02E9
-            \xCB\xA9\xCB\xA5          | # U+02E9+02E5
-            \xE3\x81\x8B\xE3\x82\x9A  | # U+304B+309A
-            \xE3\x81\x8D\xE3\x82\x9A  | # U+304D+309A
-            \xE3\x81\x8F\xE3\x82\x9A  | # U+304F+309A
-            \xE3\x81\x91\xE3\x82\x9A  | # U+3051+309A
-            \xE3\x81\x93\xE3\x82\x9A  | # U+3053+309A
-            \xE3\x82\xAB\xE3\x82\x9A  | # U+30AB+309A
-            \xE3\x82\xAD\xE3\x82\x9A  | # U+30AD+309A
-            \xE3\x82\xAF\xE3\x82\x9A  | # U+30AF+309A
-            \xE3\x82\xB1\xE3\x82\x9A  | # U+30B1+309A
-            \xE3\x82\xB3\xE3\x82\x9A  | # U+30B3+309A
-            \xE3\x82\xBB\xE3\x82\x9A  | # U+30BB+309A
-            \xE3\x83\x84\xE3\x82\x9A  | # U+30C4+309A
-            \xE3\x83\x88\xE3\x82\x9A  | # U+30C8+309A
-            \xE3\x87\xB7\xE3\x82\x9A  | # U+31F7+309A
-            [\xC2-\xDF][\x80-\xBF]{1} |
-            [\xE0-\xEF][\x80-\xBF]{2} |
-            [\xF0-\xF7][\x80-\xBF]{3} |
+            [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF] |
+            [\xE0-\xE2\xE4-\xEF][\x80-\xBF]{2}     |
+            \xE3(?:
+                \x81\x8B\xE3\x82\x9A               | # U+304B+309A
+                \x81\x8D\xE3\x82\x9A               | # U+304D+309A
+                \x81\x8F\xE3\x82\x9A               | # U+304F+309A
+                \x81\x91\xE3\x82\x9A               | # U+3051+309A
+                \x81\x93\xE3\x82\x9A               | # U+3053+309A
+                \x82\xAB\xE3\x82\x9A               | # U+30AB+309A
+                \x82\xAD\xE3\x82\x9A               | # U+30AD+309A
+                \x82\xAF\xE3\x82\x9A               | # U+30AF+309A
+                \x82\xB1\xE3\x82\x9A               | # U+30B1+309A
+                \x82\xB3\xE3\x82\x9A               | # U+30B3+309A
+                \x82\xBB\xE3\x82\x9A               | # U+30BB+309A
+                \x83\x84\xE3\x82\x9A               | # U+30C4+309A
+                \x83\x88\xE3\x82\x9A               | # U+30C8+309A
+                \x87\xB7\xE3\x82\x9A               | # U+31F7+309A
+                [\x80-\xBF]{2}
+            )                                      |
+            [\xC2\xC4-\xC8\xCC-\xDF][\x80-\xBF]    |
+            \xC3(?:
+                \xA6\xCC\x80                       | # U+00E6+0300
+                [\x80-\xBF]
+            )                                      |
+            \xC9(?:
+                \x94\xCC\x80                       | # U+0254+0300
+                \x94\xCC\x81                       | # U+0254+0301
+                \x99\xCC\x80                       | # U+0259+0300
+                \x99\xCC\x81                       | # U+0259+0301
+                \x9A\xCC\x80                       | # U+025A+0300
+                \x9A\xCC\x81                       | # U+025A+0301
+                [\x80-\xBF]
+            )                                      |
+            \xCA(?:
+                \x8C\xCC\x80                       | # U+028C+0300
+                \x8C\xCC\x81                       | # U+028C+0301
+                [\x80-\xBF]
+            )                                      |
+            \xCB(?:
+                \xA5\xCB\xA9                       | # U+02E5+02E9
+                \xA9\xCB\xA5                       | # U+02E9+02E5
+                [\x80-\xBF]
+            )                                      |
+            [\xF0-\xF4][\x80-\xBF]{3}              |
             [\x00-\xFF]
         )!!xs; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'utf8.1'}{$_[0]} },
@@ -1017,7 +1047,7 @@ Jacode4e - jacode.pl-like program for enterprise
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.12');
+  Jacode4e::VERSION('2.13.6.16');
   
   while (<>) {
       $return =

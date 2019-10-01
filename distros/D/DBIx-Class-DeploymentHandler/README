@@ -63,6 +63,49 @@ DESCRIPTION
     That's really just a taste of some of the differences. Check out each
     role for all the details.
 
+ATTRIBUTES
+    This is just a "stub" section to make clear that the bulk of
+    implementation is documented somewhere else.
+
+  Attributes passed to DBIx::Class::DeploymentHandler::HandlesDeploy
+    *   "ignore_ddl" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+    *   "databases" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+    *   "script_directory" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+    *   "sql_translator_args" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+    *   "force_overwrite" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+    *   "txn_prep" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+    *   "txn_wrap" in
+        DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator
+
+  Attributes passed to DBIx::Class::DeploymentHandler::HandlesVersioning
+    *   initial_version
+
+    *   "schema_version" in DBIx::Class::DeploymentHandler::Dad
+
+    *   "to_version" in DBIx::Class::DeploymentHandler::Dad
+
+  Attributes passed to DBIx::Class::DeploymentHandler::HandlesVersionStorage
+    *   version_source
+
+    *   version_class
+
+  Attributes Inherited from Parent Class
+    See "ATTRIBUTES" in DBIx::Class::DeploymentHandler::Dad and "ORTHODOX
+    METHODS" in DBIx::Class::DeploymentHandler::Dad for the remaining
+    available attributes to pass to "new".
+
 WHERE IS ALL THE DOC?!
     To get up and running fast, your best place to start is
     DBIx::Class::DeploymentHandler::Manual::Intro and then
@@ -180,8 +223,8 @@ METHODS
     implementation is documented in DBIx::Class::DeploymentHandler::Dad.
     Since that is implemented using Moose class, see "ATTRIBUTES" in
     DBIx::Class::DeploymentHandler::Dad and "ORTHODOX METHODS" in
-    DBIx::Class::DeploymentHandler::Dad for available attributes to pass to
-    "new", and methods callable on the resulting object.
+    DBIx::Class::DeploymentHandler::Dad for methods callable on the
+    resulting object.
 
   new
       my $s = My::Schema->connect(...);
@@ -190,10 +233,6 @@ METHODS
         databases           => 'SQLite',
         sql_translator_args => { add_drop_table => 0 },
       });
-
-    See "ATTRIBUTES" in DBIx::Class::DeploymentHandler::Dad and "ORTHODOX
-    METHODS" in DBIx::Class::DeploymentHandler::Dad for available attributes
-    to pass to "new".
 
   prepare_version_storage_install
      $dh->prepare_version_storage_install

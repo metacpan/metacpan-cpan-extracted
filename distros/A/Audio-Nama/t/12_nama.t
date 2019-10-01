@@ -1,6 +1,6 @@
 package Audio::Nama; 
 use Audio::Nama;
-use Test::More tests => 126;
+use Test2::Bundle::More;
 use File::Path qw(make_path remove_tree);
 use File::Slurp;
 use Cwd;
@@ -48,20 +48,12 @@ my @id_to_type = (
 	bus						=> 'bus',
 	null					=> 'null',
 	"loop,16"				=> 'loop',
-	"loop,Master"			=> 'loop',
+	"loop,Main"			=> 'loop',
 );
 
 while( my($dest,$type) = splice @id_to_type, 0,2){
 	is( dest_type($dest), $type, "$dest => $type");
 }
-
-
-# SKIP: { 
-# my $cs_got = eval_iam('cs');
-# my $cs_want = q(### Chain status (chainsetup 'command-line-setup') ###
-# Chain "default" [selected] );
-# is( $cs_got, $cs_want, "Evaluate Ecasound 'cs' command");
-# }
 
 my $test_project = 'test';
 
@@ -101,9 +93,9 @@ my $yaml = q(---
   args:
     playat_output: playat,5
     select_output: select,1,4
-    modifiers: []
+    modifiers:
     full_path: test_dir/sax_1.wav
-  ecs_string: /-i:playat,5,select,1,4,.+sax_\d+.wav/
+  ecs_string: -i:playat,5,select,1,4,test_dir/sax_1.wav
 -
   class: from_loop
   args:
@@ -186,17 +178,13 @@ for (@test) {
 	my $class = "Audio::Nama::IO::$t{class}";
 	my $io = $class->new(%{$t{args}});
 	my @keys = sort grep{ $_ ne 'class'} keys %t;
-	if( $t{ecs_string} =~ m(^/)){
-		like( $io->ecs_string, $t{ecs_string}, "$t{class} ecs_string");
-	}else{
-		is(   $io->ecs_string, $t{ecs_string}, "$t{class} ecs_string");
-	}
+	is( $io->ecs_string, $t{ecs_string}, "$t{class} ecs_string");
 }
 	
 
 force_alsa();
 
-process_command('add sax');
+nama_cmd('add sax');
 
 like(ref $this_track, qr/Track/, "track creation"); 
 
@@ -206,43 +194,43 @@ my ($vol_id) = $this_track->vol;
 
 ok(   (defined $vol_id and $Audio::Nama::Effect::by_id{$vol_id}) , "apply volume control");
 
-process_command('add_effect time_reverb3');
+nama_cmd('add_effect time_reverb3');
 
 like( this_op_o()->code, qr/time_reverb3/, "apply preset");
 
 is (this_op_o()->track_effect_index, 0, "positioned before vol/pan faders");
 
-process_command('add_effect decimator 1 2');
+nama_cmd('add_effect decimator 1 2');
 
 like( this_op_o()->code, qr/decimator/, "apply LADSPA effect");
 
 is( this_op_o()->track_effect_index, 1, "position before faders, after other effects");
 
-process_command('vol -2');
+nama_cmd('vol -2');
 
 is( $this_track->vol_o->params->[0], -2, "modify effect" );
 
-process_command(join " ", 'position_effect', this_op_o()->id, 'ZZZ');
+nama_cmd(join " ", 'position_effect', this_op_o()->id, 'ZZZ');
 
 is( $this_track->ops->[-1], this_op_o()->id, 
 	'position effect at end, using ZZZ pseudo-id');
 
-process_command(join " ", 'position_effect', this_op_o()->id, $vol_id);
+nama_cmd(join " ", 'position_effect', this_op_o()->id, $vol_id);
 
 is( $this_track->ops->[this_op_o()->track_effect_index + 1], $vol_id, 
 	"position effect before another effect");
 
 my $op_id = this_op_o()->id;
-process_command("remove_effect $op_id");
+nama_cmd("remove_effect $op_id");
 
 ok( (not grep { $_ eq $op_id } @{$this_track->ops}), 'remove effect');
 
-process_command('source 2');
+nama_cmd('source 2');
 
 is( $this_track->source_type, 'soundcard', "set soundcard input");
 is( $this_track->source_id,  2, "set input channel");
 
-process_command('send 5');
+nama_cmd('send 5');
 
 # track sax, source 2, send 5
 
@@ -284,21 +272,21 @@ $io = Audio::Nama::IO::to_null->new(track => 'sax', device_id => 'alsa,default')
 
 is($io->device_id, 'alsa,default', 'value overrides method call');
 
-process_command("sax; source Horgand; gen");
+nama_cmd("sax; source Horgand; gen");
 like( Audio::Nama::ChainSetup::ecasound_chain_setup(), qr/Horgand/, 'set JACK client as input');
-process_command("sax; source jack; gen");
+nama_cmd("sax; source jack; gen");
 like( Audio::Nama::ChainSetup::ecasound_chain_setup(), qr/jack,,sax_in/, 'set JACK port for manual input');
 
-process_command("sax; rec; source 2");
+nama_cmd("sax; rec; source 2");
 
 
 force_alsa();
 
-process_command('3; nosend; gen');
+nama_cmd('3; nosend; gen');
 
 $expected_setup_lines = <<EXPECTED;
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3,R3 -i:alsa,default
 
 # post-input processing
@@ -309,19 +297,19 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:alsa,default
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 -a:R3 -f:s16_le,1,44100,i -o:/tmp/nama-test/test/.wav/sax_1.wav
 EXPECTED
 
 check_setup('ALSA basic setup' );
 
 force_jack();
-process_command('gen');
+nama_cmd('gen');
 $expected_setup_lines = <<EXPECTED;
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3,R3 -i:jack_multi,system:capture_2
 
 # post-input processing
@@ -331,17 +319,17 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 -a:R3 -f:s16_le,1,44100,i -o:/tmp/nama-test/test/.wav/sax_1.wav
 
 EXPECTED
 
 check_setup('JACK basic setup' );
 
-process_command('3; mon; gen');
+nama_cmd('3; mon; gen');
 $expected_setup_lines = <<EXPECTED;
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:jack_multi,system:capture_2
 
 # post-input processing
@@ -351,15 +339,15 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 EXPECTED
 
 check_setup('JACK mon setup' );
 
-force_alsa(); process_command('gen');
+force_alsa(); nama_cmd('gen');
 $expected_setup_lines = <<EXPECTED;
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:alsa,default
 
 # post-input processing
@@ -369,16 +357,16 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:alsa,default
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 
 EXPECTED
 
 check_setup('ALSA mon setup' );
-process_command('Master; send 5;gen');
+nama_cmd('Main; send 5;gen');
 
 $expected_setup_lines = <<EXPECTED;
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:alsa,default
 
 # post-input processing
@@ -392,14 +380,14 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:alsa,default
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 EXPECTED
 
-check_setup('ALSA send-Master-to-alternate-channel setup' );
-force_jack(); process_command('gen');
+check_setup('ALSA send-Main-to-alternate-channel setup' );
+force_jack(); nama_cmd('gen');
 
 $expected_setup_lines = <<EXPECTED;
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:jack_multi,system:capture_2
 
 # post-input processing
@@ -409,124 +397,17 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:jack_multi,system:playback_5,system:playback_6
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 EXPECTED
-check_setup('JACK send-Master-to-alternate-channel setup' );
+check_setup('JACK send-Main-to-alternate-channel setup' );
 
-=comment
-process_command('Mixdown; rec; gen');
-$expected_setup_lines = <<EXPECTED;
-
--a:1 -i:loop,Master_in
--a:3 -i:jack_multi,system:capture_2
--a:Mixdown,J1 -i:loop,Master_out
-
-# post-input processing
-
--a:3 -chcopy:1,2
-
-# audio outputs
-
--a:1 -o:loop,Master_out
--a:3 -o:loop,Master_in
--a:J1 -o:jack_multi,system:playback_5,system:playback_6
--a:Mixdown -f:s16_le,2,44100,i -o:/tmp/nama-test/test/.wav/Mixdown_1.wav
-EXPECTED
-
-check_setup('JACK mixdown setup with main out' );
-gen_alsa();
-
-$expected_setup_lines = <<EXPECTED;
--a:1 -i:loop,Master_in
--a:3 -i:alsa,default
--a:Mixdown,J1 -i:loop,Master_out
-
-# post-input processing
-
--a:3 -chmove:2,1 -chcopy:1,2
-
-# pre-output processing
-
--a:J1  -chmove:2,6 -chmove:1,5
-
-# audio outputs
-
--a:1 -o:loop,Master_out
--a:3 -o:loop,Master_in
--a:J1 -o:alsa,default
--a:Mixdown -f:s16_le,2,44100,i -o:/tmp/nama-test/test/.wav/Mixdown_1.wav
-EXPECTED
-
-check_setup('ALSA mixdown setup with main out' );
-
-process_command('master_on');
-$expected_setup_lines = <<EXPECTED;
--a:1 -i:loop,Master_in
--a:3 -i:alsa,default
--a:4 -i:loop,Master_out
--a:5,6,7 -i:loop,Eq_out
--a:8 -i:loop,Boost_in
--a:Mixdown,J8 -i:loop,Boost_out
-
-# post-input processing
-
--a:3 -chmove:2,1 -chcopy:1,2
-
-# pre-output processing
-
--a:J8  -chmove:2,6 -chmove:1,5
-
-# audio outputs
-
--a:1 -o:loop,Master_out
--a:3 -o:loop,Master_in
--a:4 -o:loop,Eq_out
--a:5,6,7 -o:loop,Boost_in
--a:8 -o:loop,Boost_out
--a:J8 -o:alsa,default
--a:Mixdown -f:s16_le,2,44100,i -o:/tmp/nama-test/test/.wav/Mixdown_1.wav
-EXPECTED
-gen_alsa();
-check_setup('Mixdown in mastering mode - ALSA');
-
-
-process_command('Master; stereo'); # normal output width
+nama_cmd('for 4 5 6 7 8; remove_track quiet');
+nama_cmd('Main; send 1');
+nama_cmd('add_bus Horns; sax move_to_bus Horns; sax stereo');
 
 $expected_setup_lines = <<EXPECTED;
 
--a:1 -i:loop,Master_in
--a:3 -i:jack_multi,system:capture_2
--a:4 -i:loop,Master_out
--a:5,6,7 -i:loop,Eq_out
--a:8 -i:loop,Boost_in
--a:Mixdown,J8 -i:loop,Boost_out
-
-# post-input processing
-
--a:3 -chcopy:1,2
-
-# audio outputs
-
--a:1 -o:loop,Master_out
--a:3 -o:loop,Master_in
--a:4 -o:loop,Eq_out
--a:5,6,7 -o:loop,Boost_in
--a:8 -o:loop,Boost_out
--a:J8 -o:jack_multi,system:playback_5,system:playback_6
--a:Mixdown -f:s16_le,2,44100,i -o:/tmp/nama-test/test/.wav/Mixdown_1.wav
-EXPECTED
-gen_jack();
-check_setup('Mixdown in mastering mode - JACK');
-=cut
-
-process_command('mixoff; master_off');
-process_command('for 4 5 6 7 8; remove_track quiet');
-process_command('Master; send 1');
-process_command('add_bus Horns; sax move_to_bus Horns; sax stereo');
-
-$expected_setup_lines = <<EXPECTED;
-
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:alsa,default
 -a:4 -i:loop,sax_out
 
@@ -538,14 +419,14 @@ $expected_setup_lines = <<EXPECTED;
 
 -a:1 -o:alsa,default
 -a:3 -o:loop,sax_out
--a:4 -o:loop,Master_in
+-a:4 -o:loop,Main_in
 EXPECTED
 gen_alsa();
 check_setup('Bus - ALSA');
 gen_jack();
 
 $expected_setup_lines = <<EXPECTED;
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:jack_multi,system:capture_2,system:capture_3
 -a:4 -i:loop,sax_out
 
@@ -553,12 +434,12 @@ $expected_setup_lines = <<EXPECTED;
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
 -a:3 -o:loop,sax_out
--a:4 -o:loop,Master_in
+-a:4 -o:loop,Main_in
 EXPECTED
 check_setup('Bus - JACK');
 
-process_command('remove_bus Horns');
-process_command('add_submix_cooked Vo 5');
+nama_cmd('remove_bus Horns');
+nama_cmd('add_submix_cooked Vo 5');
 $expected_setup_lines = <<EXPECTED;
 
 -a:1,4 -i:loop,sax_out
@@ -572,8 +453,8 @@ $expected_setup_lines = <<EXPECTED;
 EXPECTED
 gen_jack();
 check_setup('Create submix with output at soundcard - JACK');
-process_command('remove_bus Vo');
-process_command('sax mono');
+nama_cmd('remove_bus Vo');
+nama_cmd('sax mono');
 
 ###### Timeline tests
 #
@@ -647,7 +528,7 @@ foreach(@tests){
 
 
 
-load_project(name => "$test_project-convert51", create => 1);
+load_project(name => "test_project-convert51", create => 1);
 
 my $script = <<CONVERT51;
 # Patrick Shirkey's stereo-to-5.1 converter script implemented in Nama
@@ -665,35 +546,35 @@ my $script = <<CONVERT51;
 
 # create tracks
 #            3       4       5      6       7          8        9   10  11     12
-add_tracks Stereo L_front R_front Center Subwoofer L_inverted Right R-L L_rear R_rear
-add_bunch all Stereo L_front R_front Center Subwoofer L_inverted Right R-L L_rear R_rear
+add-tracks Stereo L_front R_front Center Subwoofer L_inverted Right R-L L_rear R_rear
+add-bunch all Stereo L_front R_front Center Subwoofer L_inverted Right R-L L_rear R_rear
 
 Stereo stereo
 
 # create a bus for summing (inverted L) + R
-add_bus R-L
+add-bus R-L
 
 # we'll do our own routing for these tracks
 
-Stereo move_to_bus null
-R-L    move_to_bus null
+Stereo move-to-bus Aux
+R-L    move-to-bus Aux
 
 # no recording to disk, remove volume and pan controls
 
-for all; mon; remove_fader_effect vol; remove_fader_effect pan
+for all; mon; remove-fader-effect vol; remove-fader-effect pan
 
 # feed six tracks the stereo source
 
 for L_front R_front Center Subwoofer L_inverted Right; source track Stereo
 
-# prepare sources for R-L ('afx' is an abbreviation for # 'add_effect')
+# prepare sources for R-L ('afx' is an abbreviation for # 'add-effect')
 
 L_inverted afx chmute 2; afx ea -100
 Right afx chmute 1
 
 # feed these two tracks to R-L
 
-for L_inverted Right; move_to_bus R-L
+for L_inverted Right; move-to-bus R-L
 
 # sum R-L source channels to mono
 
@@ -742,16 +623,15 @@ CONVERT51
 
 do_script($script);
 $expected_setup_lines = <<EXPECTED;
-
 # ecasound chainsetup file
 
 # general
 
--z:mixmode,sum -G:jack,Nama,send -b 256 -z:db,100000 -z:nointbuf
+-z:mixmode,sum -G:jack,Nama,send -G:jack,NamaEcasound, -b 256 -z:db,100000 -z:nointbuf
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:10 -i:loop,R-L_in
 -a:11,12 -i:loop,R-L_out
 -a:3 -i:alsa,default
@@ -760,19 +640,137 @@ $expected_setup_lines = <<EXPECTED;
 # post-input processing
 
 -a:3
+-a:6 -chmix:3
+-a:7 -chmix:4
+-a:8 -chmute:2
+-a:9 -chmute:1
+-a:10 -chmix:1
+-a:11 -chmove:1,5
+
+# pre-output processing
+
+-a:12 -chmove:1,6
 
 # audio outputs
 
 -a:1 -o:alsa,default
 -a:10 -o:loop,R-L_out
 -a:3 -o:loop,Stereo_out
--a:4,5,6,7,11,12 -o:loop,Master_in
+-a:4,5,6,7,11,12 -o:loop,Main_in
 -a:8,9 -o:loop,R-L_in
+
 EXPECTED
 
 force_alsa();
-process_command('gen');
+nama_cmd('gen');
 check_setup('Stereo to 5.1 converter script' );
+
+load_project(name => "test_project-crossover", create => 1);
+$script = <<CROSSOVER;
+#create crossover_3chan_piano_cs
+
+# Input is 5-channel audio from Pianoteq keyboard
+# Output is 10 channels divided in pairs in the following order:
+# woofer, mid, tweeter, center, rear.
+# Center is a mono output, others are stereo.
+# Soundcard channel 8 is unused.
+
+# The following setup script will run correctly
+# under ALSA and also with jackd controlling the
+# soundcard.
+
+# initialize tracks  
+
+add-tracks pre1 pre2 woofer center rear mid tweeter
+for        pre1 pre2 woofer center rear mid tweeter; move-to-bus Aux
+
+pre1 set-track width 5 
+
+for pre2 woofer center rear; source track pre1
+
+select-track woofer 
+add-effect chmove 3 2
+stereo
+send 1 # send output to soundcard starting at channel 1
+
+for mid tweeter; source track pre2
+
+select-track mid
+stereo
+send 3 # send output to soundcard starting at channel 3
+
+tweeter # trackname appearing alone or prepended to a command implies select-track
+stereo
+send 5
+
+center mono
+add-effect chmove 3 1 
+send 7
+
+rear
+stereo
+afx chmove 4 1 # 'afx' is a shortcut for 'add-effect'
+afx chmove 5 2
+send 9
+
+for Aux; remove-fader-effect pan; remove-fader-effect vol 
+Main off; rffx vol; rffx pan
+
+
+# -n:crossover_3chan_piano_cs \
+#           -a:pre1    -pf:./pre1.ecp  -f:f32_le,5,48000 -i:jack -o:loop,1 \
+#           -a:pre2,woofer,center,rear -f:f32_le,5,48000 -i:loop,1 \
+#           -a:pre2    -pf:./pre2.ecp  -o:loop,2 \
+#           -a:mid,tweeter             -f:f32_le,5,48000 -i:loop,2 \
+#           -a:woofer  -pf:./woofer.ecp    -chorder:1,3,0,0,0,0,0,0,0,0 \
+#           -a:mid     -pf:./mid.ecp       -chorder:0,0,1,2,0,0,0,0,0,0 \
+#           -a:tweeter -pf:./tweeter.ecp   -chorder:0,0,0,0,1,2,0,0,0,0 \
+#           -a:center  -pf:./center_nodelay.ecp  -chorder:0,0,0,0,0,0,3,0,0,0  \
+#           -a:rear    -pf:./rear.ecp      -chorder:0,0,0,0,0,0,0,0,4,5 \
+#           -a:woofer,mid,tweeter,center,rear -f:f32_le,10,48000 -o:jack \
+#           -a:all -z:mixmode,sum -z:nodb -B:rtlowlatency -b:64
+
+CROSSOVER
+
+do_script($script);
+$expected_setup_lines = <<EXPECTED;
+# ecasound chainsetup file
+
+# general
+
+-z:mixmode,sum -G:jack,Nama,send -G:jack,NamaEcasound, -b 256 -z:db,100000 -z:nointbuf
+
+# audio inputs
+
+-a:3 -i:alsa,default
+-a:4,5,6,7 -i:loop,pre1_out
+-a:8,9 -i:loop,pre2_out
+
+# post-input processing
+
+-a:3
+-a:5 -chmove:3,2
+-a:6 -chmove:3,1
+-a:7 -chmove:4,1 -chmove:5,2
+
+# pre-output processing
+
+-a:6  -chmove:1,7
+-a:7  -chmove:2,10 -chmove:1,9
+-a:8  -chmove:2,4 -chmove:1,3
+-a:9  -chmove:2,6 -chmove:1,5
+
+# audio outputs
+
+-a:3 -o:loop,pre1_out
+-a:4 -o:loop,pre2_out
+-a:5,6,7,8,9 -o:alsa,default
+
+EXPECTED
+force_alsa();
+nama_cmd('gen');
+check_setup('pianoteq feeding crossover network' );
+
 
 load_project(name => "$test_project-sendbus-cooked", create => 1);
 
@@ -784,7 +782,7 @@ do_script(' add mic
 $expected_setup_lines = <<EXPECTED;
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf
 
 # audio inputs
 
@@ -809,16 +807,16 @@ $expected_setup_lines = <<EXPECTED;
 -a:4 -o:loop,guitar_out
 EXPECTED
 force_alsa();
-process_command('gen');
+nama_cmd('gen');
 check_setup('Submix - ALSA');
 
 force_jack();
-process_command('gen');
+nama_cmd('gen');
 
 $expected_setup_lines = <<EXPECTED;
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
 
 # audio inputs
 
@@ -842,17 +840,17 @@ check_setup('Submix, AKA add_submix_cooked - JACK');
 
 load_project(name => "add_submix_raw", create => 1);
 
-process_command("add_tracks mic guitar; for 3 4; mon;; 4 source 2; stereo; add_submix_raw raw-user 7"); 
+nama_cmd("add_tracks mic guitar; for 3 4; mon;; 4 source 2; stereo; add_submix_raw raw-user 7"); 
 $expected_setup_lines = <<EXPECTED;
 
 
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3,5 -i:jack_multi,system:capture_1
 -a:4,6 -i:jack_multi,system:capture_2,system:capture_3
 
@@ -864,20 +862,20 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
--a:3,4 -o:loop,Master_in
+-a:3,4 -o:loop,Main_in
 -a:5,6 -o:jack_multi,system:playback_7,system:playback_8
 EXPECTED
 
 force_jack();
-process_command('gen');
+nama_cmd('gen');
 check_setup('Submix, raw - JACK');
 
 force_alsa();
-process_command('gen');
+nama_cmd('gen');
 $expected_setup_lines = <<EXPECTED;
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3,4,5,6 -i:alsa,default
 
 # post-input processing
@@ -895,26 +893,26 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1,5,6 -o:alsa,default
--a:3,4 -o:loop,Master_in
+-a:3,4 -o:loop,Main_in
 EXPECTED
 check_setup('Send Bus, Raw - ALSA');
 
 force_jack();
 load_project(name => "$test_project-add_insert_post", create => 1);
 
-process_command("add sax; mon; gen");
-process_command("add_insert post jconvolver; gen");
+nama_cmd("add sax; mon; gen");
+nama_cmd("add_insert post jconvolver; gen");
 $expected_setup_lines = <<EXPECTED;
 
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 8192 -z:nodb -z:intbuf -f:f32_le,2,44100
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 8192 -z:nodb -z:intbuf -f:f32_le,2,44100
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:jack_multi,system:capture_1
--a:4 -i:jack,jconvolver
+-a:4 -i:jack_multi,jconvolver:out_1,jconvolver:out_2
 -a:J3,5 -i:loop,sax_insert_post
 
 # post-input processing
@@ -925,40 +923,41 @@ $expected_setup_lines = <<EXPECTED;
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
 -a:3 -o:loop,sax_insert_post
--a:4,5 -o:loop,Master_in
--a:J3 -o:jack,jconvolver
+-a:4,5 -o:loop,Main_in
+-a:J3 -o:jack_multi,jconvolver:in_1,jconvolver:in_2
 EXPECTED
 
 check_setup('JACK client as postfader insert');
 
 load_project(name => "add_insert_pre", create => 1);
-process_command("add sax; mon; add_insert pre jconvolver; gen");
+nama_cmd("add sax; mon; add_insert pre jconvolver; gen");
 $expected_setup_lines = <<EXPECTED;
 
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:loop,sax_insert_pre
--a:4 -i:jack,jconvolver
+-a:4 -i:jack_multi,jconvolver:out_1
 -a:5,6 -i:jack_multi,system:capture_1
 
 # audio outputs
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 -a:4,5 -o:loop,sax_insert_pre
--a:6 -o:jack,jconvolver
+-a:6 -chcopy:1,2
+-a:6 -o:jack_multi,jconvolver:in_1
 EXPECTED
 check_setup('JACK client as pre-fader insert');
 
 load_project(name => "add_insert_via_soundcard-postfader", create => 1);
-process_command("add sax; mon; source 2; add_insert post 5; gen");
+nama_cmd("add sax; mon; source 2; add_insert post 5; gen");
 $expected_setup_lines = <<EXPECTED;
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:jack_multi,system:capture_2
 -a:4 -i:jack_multi,system:capture_7,system:capture_8
 -a:J3,5 -i:loop,sax_insert_post
@@ -971,23 +970,23 @@ $expected_setup_lines = <<EXPECTED;
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
 -a:3 -o:loop,sax_insert_post
--a:4,5 -o:loop,Master_in
+-a:4,5 -o:loop,Main_in
 -a:J3 -o:jack_multi,system:playback_5,system:playback_6
 
 EXPECTED
 check_setup('Insert via soundcard, postfader - JACK');
 
 force_alsa();
-process_command("gen");
+nama_cmd("gen");
 $expected_setup_lines = <<EXPECTED;
 
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3,4 -i:alsa,default
 -a:J3,5 -i:loop,sax_insert_post
 
@@ -1004,21 +1003,21 @@ $expected_setup_lines = <<EXPECTED;
 
 -a:1,J3 -o:alsa,default
 -a:3 -o:loop,sax_insert_post
--a:4,5 -o:loop,Master_in
+-a:4,5 -o:loop,Main_in
 EXPECTED
 check_setup('Insert via soundcard, postfader - ALSA');
 
 load_project(name => "add_insert_via_soundcard_pre", create => 1);
-process_command("add sax; mon; source 2; add_insert pre 5; gen");
+nama_cmd("add sax; mon; source 2; add_insert pre 5; gen");
 $expected_setup_lines = <<EXPECTED;
 
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:loop,sax_insert_pre
 -a:4,5,6 -i:alsa,default
 
@@ -1026,7 +1025,7 @@ $expected_setup_lines = <<EXPECTED;
 
 -a:4 -chmove:7,1 
 -a:5 -chmove:2,1 
--a:6 -chmove:2,1 
+-a:6 -chmove:2,1 -chcopy:1,2
 
 # pre-output processing
 
@@ -1035,7 +1034,7 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1,6 -o:alsa,default
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 -a:4,5 -o:loop,sax_insert_pre
 EXPECTED
 check_setup('Hardware insert via soundcard, prefader  - ALSA');
@@ -1043,11 +1042,11 @@ gen_jack();
 $expected_setup_lines = <<EXPECTED;
 # general
 
--z:mixmode,sum -G:jack,Nama,send -G:jack,Nama,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
+-z:mixmode,sum -G:jack,NamaEcasound,send -b 1024 -z:nodb -z:intbuf -f:f32_le,2,44100
 
 # audio inputs
 
--a:1 -i:loop,Master_in
+-a:1 -i:loop,Main_in
 -a:3 -i:loop,sax_insert_pre
 -a:4 -i:jack_multi,system:capture_7
 -a:5,6 -i:jack_multi,system:capture_2
@@ -1055,14 +1054,18 @@ $expected_setup_lines = <<EXPECTED;
 # audio outputs
 
 -a:1 -o:jack_multi,system:playback_1,system:playback_2
--a:3 -o:loop,Master_in
+-a:3 -o:loop,Main_in
 -a:4,5 -o:loop,sax_insert_pre
+-a:6 -chcopy:1,2
 -a:6 -o:jack_multi,system:playback_5
 EXPECTED
 check_setup('Hardware insert via soundcard, prefader  - JACK');
 
-sub gen_alsa { force_alsa(); process_command('gen')}
-sub gen_jack { force_jack(); process_command('gen')}
+#load_project(name => "midi", create => 1);
+#add_midi_track('synth');
+
+sub gen_alsa { force_alsa(); nama_cmd('gen')}
+sub gen_jack { force_jack(); nama_cmd('gen')}
 sub force_alsa { $config->{opts}->{A} = 1; $config->{opts}->{J} = 0; $jack->{jackd_running} = 0; }
 sub force_jack{ $config->{opts}->{A} = 0; $config->{opts}->{J} = 1; $jack->{jackd_running} = 1; }
 sub setup_content {
@@ -1084,5 +1087,5 @@ sub check_setup {
 
 
 cleanup_dirs();
-1;
+done_testing();
 __END__

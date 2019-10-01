@@ -1,5 +1,11 @@
 Revision history for Perl extension Sub-Multi-Tiny
 
+0.000012 2019-09-24T01:52:46Z
+
+    - Internal improvements for robustness.  
+    - S::M::T::Util::_complete_dispatcher now adds strict and warnings
+      to the top of the generated dispatcher.
+
 0.000011 2019-09-20T21:41:16Z
 
     - Fix POD typo (thanks to MANWAR)

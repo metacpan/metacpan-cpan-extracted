@@ -8,6 +8,10 @@ use File::Temp 'tempdir';
 use lib File::Spec->catdir(__DIR__, '../', 'lib');
 
 BEGIN {
+  unless ($ENV{AUTHOR_TESTING}) {
+    plan skip_all => 'These are for testing by the author';
+    exit;
+  }
   if( eval 'require Crypt::Eksblowfish::Bcrypt' ){
     unless( eval 'require DBIx::Class::TimeStamp' ) {
       plan skip_all => 'DBIx::Class::TimeStamp not available';

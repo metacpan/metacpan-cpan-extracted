@@ -5,7 +5,7 @@ use IO::String;
 require 't/test-lib.pm';
 
 my $res;
-my $file = 't/20160530_dwho_dGVzdHJlZg==.json';
+my $file = "$main::tmpDir/20160530_dwho_dGVzdHJlZg==.json";
 
 open F, "> $file" or die($!);
 print F '[
@@ -27,14 +27,60 @@ my $client = LLNG::Manager::Test->new( {
             useSafeJail                => 1,
             notification               => 1,
             notificationStorage        => 'File',
-            notificationStorageOptions => { dirName => 't' },
+            notificationStorageOptions => { dirName => $main::tmpDir },
             oldNotifFormat             => 0,
             portalMainLogo             => 'common/logos/logo_llng_old.png',
         }
     }
 );
 
-# Try yo authenticate
+# Try to authenticate
+# -------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new(
+            'user=dwho&password=dwho&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='),
+        accept => 'text/html',
+        length => 64,
+    ),
+    'Auth query'
+);
+count(1);
+expectOK($res);
+my $id = expectCookie($res);
+expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
+
+# Verify that cookie is ciphered (session unvalid)
+ok(
+    $res = $client->_get(
+        '/',
+        query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==',
+        cookie => "lemonldap=$id",
+    ),
+    'Test cookie received'
+);
+count(1);
+expectReject($res);
+
+# Try to cancel notification
+ok(
+    $res = $client->_get(
+        '/notifback',
+        query  => "cancel=1",
+        cookie => "lemonldap=$id",
+        length => 64,
+        accept => 'text/html',
+    ),
+    "Cancel notification"
+);
+
+my $c = getCookies($res);
+ok( not( $c->{'lemonldap'} ), 'Cookie expired' ) or print STDERR Dumper($c);
+count(2);
+expectRedirection( $res, 'http://auth.example.com/' );
+
+# Try to authenticate
 # -------------------
 ok(
     $res = $client->_post(

@@ -1,6 +1,7 @@
 use Test::More;
 use JSON;
 use MIME::Base64;
+use Data::Dumper;
 
 require 't/test-psgi-lib.pm';
 
@@ -29,7 +30,7 @@ count(4);
 # Authentified queries
 # --------------------
 
-# Authorizated query
+# Authorized query
 ok( $res = $client->_get( '/', undef, undef, "lemonldap=$sessionId" ),
     'Authentified query' );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );

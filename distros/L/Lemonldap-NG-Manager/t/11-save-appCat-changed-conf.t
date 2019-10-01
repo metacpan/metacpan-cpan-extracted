@@ -38,7 +38,7 @@ while ( my $body = &body() ) {
 
     #print STDERR Dumper($resBody);
     ok( $resBody->{result} == 1, "$desc: JSON response contains \"result:1\"" );
-    ok( @{ $resBody->{details}->{__changes__} } eq 1,
+    ok( @{ $resBody->{details}->{__changes__} } eq 2,
         "$desc: conf has changed" )
       or print STDERR Dumper($resBody);
     ok(

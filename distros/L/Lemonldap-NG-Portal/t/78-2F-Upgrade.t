@@ -8,6 +8,7 @@ require 't/smtp.pm';
 
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
+my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
@@ -34,7 +35,7 @@ my $client = LLNG::Manager::Test->new( {
 # Try to authenticate
 # -------------------
 ok(
-    my $res = $client->_post(
+    $res = $client->_post(
         '/',
         IO::String->new('user=dwho&password=dwho&lmAuth=weak'),
         length => 35,
@@ -51,7 +52,7 @@ my $id = expectCookie($res);
 # --------------------------------------------
 
 ok(
-    my $res = $client->_get(
+    $res = $client->_get(
         '/upgradesession',
         query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29t',
         accept => 'text/html',
@@ -68,7 +69,7 @@ my ( $host, $url, $query ) =
 # ----------------------
 
 ok(
-    my $res = $client->_post(
+    $res = $client->_post(
         '/upgradesession',
         IO::String->new($query),
         length => length($query),
@@ -81,7 +82,7 @@ count(1);
 
 my $pdata = expectCookie( $res, 'lemonldappdata' );
 
-my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'upgrading', 'url' );
+( $host, $url, $query ) = expectForm( $res, '#', undef, 'upgrading', 'url' );
 
 $query = $query . "&user=dwho&password=dwho&lmAuth=strong";
 
@@ -90,7 +91,7 @@ $query = $query . "&user=dwho&password=dwho&lmAuth=strong";
 # -------------------------------------------
 
 ok(
-    my $res = $client->_post(
+    $res = $client->_post(
         '/upgradesession',
         IO::String->new($query),
         length => length($query),
@@ -101,10 +102,10 @@ ok(
 );
 count(1);
 
-my $pdata = expectCookie( $res, 'lemonldappdata' );
+$pdata = expectCookie( $res, 'lemonldappdata' );
 
 ( $host, $url, $query ) =
-  expectForm( $res, undef, '/mail2fcheck', 'token', 'code' );
+  expectForm( $res, undef, '/mail2fcheck?skin=bootstrap', 'token', 'code' );
 
 ok(
     $res->[2]->[0] =~
@@ -136,13 +137,13 @@ ok(
 count(1);
 
 $pdata = expectCookie( $res, 'lemonldappdata' );
-$id = expectCookie($res);
+$id    = expectCookie($res);
 
 expectRedirection( $res, 'http://test1.example.com' );
 
 # Make pdata was cleared and we aren't being redirected
 ok(
-    my $res = $client->_get(
+    $res = $client->_get(
         '/',
         accept => 'text/html',
         cookie => "lemonldap=$id;lemonldappdata=$pdata",

@@ -1,0 +1,16 @@
+<%Page path="/admin/bits/header" PAGENAME="content"%>
+
+<%Styler text="Content Editing -- Publishing" style="page-title"%>
+
+<%Condition
+  a.cgiparam="confirm"
+  a.path="/bits/content/publish-name"
+  default.template={<%Content
+                      mode="content-show"
+                      preview="1"
+                      name={<%CgiParam name="name"%>}
+                      path="/bits/content/publish-name-ask"
+                    %>}
+%>
+
+<%Page path="/admin/bits/footer"%>

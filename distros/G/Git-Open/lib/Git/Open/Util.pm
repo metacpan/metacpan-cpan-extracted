@@ -91,7 +91,7 @@ Git::Open::Util
 
 =head1 VERSION
 
-version 0.1.9
+version 0.1.11
 
 =head1 AUTHOR
 

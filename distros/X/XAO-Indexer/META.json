@@ -1,0 +1,53 @@
+{
+   "abstract" : "Full text search indexer for XAO::FS",
+   "author" : [
+      "Andrew Maltsev, http://ejelta.com/xao/"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XAO-Indexer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Error" : "0.14",
+            "Pod::Usage" : "1.12",
+            "Test::Unit" : "0.14",
+            "XAO::Base" : "1.04",
+            "XAO::FS" : "1.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/amaltsev/XAO-Indexer.git",
+         "web" : "https://github.com/amaltsev/XAO-Indexer"
+      }
+   },
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -9,7 +9,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 3;
+my $maintests = 4;
 my $debug     = 'error';
 my $client;
 
@@ -43,10 +43,15 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-eval { unlink 't/20160530_dwho_dGVzdHJlZg==.xml' };
-
 my $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <root><notification uid="dwho" date="2016-05-30" reference="testref">
+<title>Test title</title>
+<subtitle>Test subtitle</subtitle>
+<text>This is a test text</text>
+</notification></root>';
+
+my $xml2 = '<?xml version="1.0" encoding="UTF-8"?>
+<root><notification uid="dwho" date="2016-05-31" reference="testref">
 <title>Test title</title>
 <subtitle>Test subtitle</subtitle>
 <text>This is a test text</text>
@@ -66,7 +71,7 @@ SKIP: {
                 notificationServer         => 1,
                 notificationStorage        => 'File',
                 notificationStorageOptions => {
-                    dirName => 't'
+                    dirName => $main::tmpDir
                 },
                 oldNotifFormat => 1,
             }
@@ -79,10 +84,17 @@ SKIP: {
         'SOAP client'
     );
     $soap->default_ns('urn:Lemonldap/NG/Common/PSGI/SOAPService');
-    ok( $soap->call( 'newNotification', $xml )->result() == 1,
-        ' SOAP call returns 1' );
+    ok(
+        $soap->call( 'newNotification', $xml )->result() == 1,
+        ' Append a notification -> SOAP call returns 1'
+    );
+    $soap->default_ns('urn:Lemonldap/NG/Common/PSGI/SOAPService');
+    ok(
+        $soap->call( 'newNotification', $xml2 )->result() == 0,
+        ' Append the same notification twice -> SOAP call returns 0'
+    );
 
-    # Try yo authenticate
+    # Try to authenticate
     # -------------------
     my $res;
     ok(
@@ -101,8 +113,6 @@ SKIP: {
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
 }
-
-eval { unlink 't/20160530_dwho_dGVzdHJlZg==.xml' };
 
 count($maintests);
 clean_sessions();

@@ -3,20 +3,22 @@ package Lemonldap::NG::Handler::PSGI::Try;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Handler::PSGI::Router';
 
 has 'authRoutes' => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { { GET => {}, POST => {}, PUT => {}, DELETE => {} } }
+    is  => 'rw',
+    isa => 'HashRef',
+    default =>
+      sub { { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } }
 );
 
 has 'unAuthRoutes' => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { { GET => {}, POST => {}, PUT => {}, DELETE => {} } }
+    is  => 'rw',
+    isa => 'HashRef',
+    default =>
+      sub { { GET => {}, POST => {}, PUT => {}, DELETE => {}, OPTIONS => {} } }
 );
 
 sub addRoute {
@@ -47,7 +49,7 @@ sub addAuthRouteWithRedirect {
 sub _auth_and_redirect {
     my ( $self, $req ) = @_;
     $self->api->goToPortal( $req, $req->{env}->{REQUEST_URI} );
-    return [ 302, $req->respHeaders, [] ];
+    return [ 302, [$req->spliceHdrs], [] ];
 }
 
 sub defaultAuthRoute {
@@ -71,8 +73,9 @@ sub _run {
         if ( $res->[0] < 300 ) {
             $self->routes( $self->authRoutes );
             $req->userData( $self->api->data );
+            $req->respHeaders($res->[1]);
         }
-        elsif ( $res->[0] != 403 ) {
+        elsif ( $res->[0] != 403 and not $req->data->{noTry} ) {
 
             # Unset headers (handler adds a Location header)
             $self->logger->debug(
@@ -85,15 +88,7 @@ sub _run {
             return $res;
         }
         $res = $self->handler($req);
-
-        # Insert respHeaders in response only if not already set
-        my %hdr1 = @{ $res->[1] };
-        my %hdr2 = @{ $req->{respHeaders} };
-        foreach ( keys %hdr2 ) {
-            unless ( $hdr1{$_} and $hdr2{$_} eq $hdr1{$_} ) {
-                push @{ $res->[1] }, ( $_ => $hdr2{$_} );
-            }
-        }
+        push @{ $res->[1] }, $req->spliceHdrs;
         return $res;
     };
 }

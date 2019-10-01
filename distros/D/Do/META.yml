@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/do/issues
   homepage: http://metacpan.org/release/Do/
   repository: git://github.com/iamalnewkirk/do.git
-version: '1.85'
+version: '1.87'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Adam Hopkins <violapiratejunky@gmail.com>'

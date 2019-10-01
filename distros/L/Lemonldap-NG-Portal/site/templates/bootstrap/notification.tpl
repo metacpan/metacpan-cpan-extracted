@@ -22,7 +22,7 @@
     </div>
 
     <div class="buttons">
-      <a id="goback" href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1" class="btn btn-primary" role="button">
+      <a id="goback" href="<TMPL_VAR NAME="PORTAL_URL">notifback?cancel=1" class="btn btn-primary" role="button">
         <span class="fa fa-home"></span>
         <span trspan="cancel">Cancel</span>
       </a>

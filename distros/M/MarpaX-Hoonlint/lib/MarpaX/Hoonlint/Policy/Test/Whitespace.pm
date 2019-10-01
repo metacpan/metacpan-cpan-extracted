@@ -626,7 +626,6 @@ sub pseudojoinColumn {
         return -1 if $commentOffset != $commentColumn;
     # say STDERR join ' ', __FILE__, __LINE__;
     }
-    # say STDERR join ' ', __FILE__, __LINE__;
     return $commentColumn;
 }
 
@@ -1137,6 +1136,7 @@ sub checkPseudojoin {
     }
 
     return if not $isPseudojoin;
+
     return [] if $nextLexemeColumn == $pseudojoinColumn;
 
     # If here, it is a problematic pseudojoin

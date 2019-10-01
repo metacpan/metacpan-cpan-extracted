@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util qw[ blessed reftype ];
 use Digest::MD5;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -262,7 +262,7 @@ sub can {
     ## no critic (ProhibitNoStrict)
     no strict 'refs';
     return *{$method}{CODE}
-      || Hash::Wrap::_generate_accessor( q[<<CLASS>>], $self, $method, $key );
+      || Hash::Wrap::_generate_accessor( q[<<CLASS>>], $class, $key );
 }
 
 1;
@@ -455,7 +455,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

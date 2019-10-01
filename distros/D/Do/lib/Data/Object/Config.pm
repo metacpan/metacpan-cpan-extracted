@@ -9,7 +9,7 @@ use Carp ();
 
 use Import::Into;
 
-our $VERSION = '1.85'; # VERSION
+our $VERSION = '1.87'; # VERSION
 
 # BUILD
 
@@ -242,6 +242,7 @@ sub process_add {
 
   my ($action, $package, $name) = @$plan;
 
+  no strict 'refs';
   no warnings 'redefine', 'prototype';
 
   *{"${target}::${name}"} = $package->can($name);
@@ -998,12 +999,22 @@ of the C<%ENV> variable. Read more at L<Data::Object::Vars>.
   use Data::Object::Config 'Class';
   use Data::Object::Config 'WithStashable';
 
+  # e.g.
+  # use Data::Object::Config 'WithDumpable';
+  # use Data::Object::Config 'WithImmutable
+  # use Data::Object::Config 'WithProxyable
+  # use Data::Object::Config 'WithStashable
+  # use Data::Object::Config 'WithThrowable
+  # use Data::Object::Config 'WithTryable
+
   1;
 
 The with configuration configures the calling package to consume the core role
 denoted in the name, e.g. the name C<WithStashable> configures the package to
 consume the core role L<Data::Object::Role::Stashable>. Using roles requires
-that the package have previously been declared a class or role itself.
+that the package have previously been declared a class or role itself. This
+pattern for including core roles works with any core role and can be used by
+simplyt prefixing the role name with the term C<With> (with no spaces).
 
 =cut
 
@@ -1049,6 +1060,23 @@ L<Data::Object> setup.
 =item config example
 
   my $plans = config;
+
+=back
+
+=cut
+
+=head2 config_args
+
+  config_args() : ArrayRef
+
+The config_args function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Args>.
+
+=over 4
+
+=item config_args example
+
+  my $plans = config_args;
 
 =back
 
@@ -1134,6 +1162,40 @@ L<Data::Object::Class> which extends L<Data::Object::Code>.
 =item config_code example
 
   my $plans = config_code;
+
+=back
+
+=cut
+
+=head2 config_core
+
+  config_core() : ArrayRef
+
+The config_core function returns plans for configuring the package to have the
+L<Data::Object> framework default configuration.
+
+=over 4
+
+=item config_core example
+
+  my $plans = config_core;
+
+=back
+
+=cut
+
+=head2 config_data
+
+  config_data() : ArrayRef
+
+The config_data function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Data>.
+
+=over 4
+
+=item config_data example
+
+  my $plans = config_data;
 
 =back
 
@@ -1242,6 +1304,23 @@ L<Data::Object::Class> which extends L<Data::Object::Number>.
 
 =cut
 
+=head2 config_opts
+
+  config_opts() : ArrayRef
+
+The config_opts function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Opts>.
+
+=over 4
+
+=item config_opts example
+
+  my $plans = config_opts;
+
+=back
+
+=cut
+
 =head2 config_regexp
 
   config_regexp() : ArrayRef
@@ -1344,6 +1423,23 @@ L<Data::Object::Class> which extends L<Data::Object::Search>.
 
 =cut
 
+=head2 config_space
+
+  config_space() : ArrayRef
+
+The config_space function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Space>.
+
+=over 4
+
+=item config_space example
+
+  my $plans = config_space;
+
+=back
+
+=cut
+
 =head2 config_state
 
   config_state() : ArrayRef
@@ -1378,6 +1474,23 @@ L<Data::Object::Class> which extends L<Data::Object::String>.
 
 =cut
 
+=head2 config_struct
+
+  config_struct() : ArrayRef
+
+The config_struct function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Struct>.
+
+=over 4
+
+=item config_struct example
+
+  my $plans = config_struct;
+
+=back
+
+=cut
+
 =head2 config_type
 
   config_type() : ArrayRef
@@ -1407,6 +1520,125 @@ L<Data::Object::Class> which extends L<Data::Object::Undef>.
 =item config_undef example
 
   my $plans = config_undef;
+
+=back
+
+=cut
+
+=head2 config_vars
+
+  config_vars() : ArrayRef
+
+The config_vars function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Vars>.
+
+=over 4
+
+=item config_vars example
+
+  my $plans = config_vars;
+
+=back
+
+=cut
+
+=head2 config_withdumpable
+
+  config_withdumpable() : ArrayRef
+
+The config_withdumpable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Dumbable> role.
+
+=over 4
+
+=item config_withdumpable example
+
+  my $plans = config_withdumpable;
+
+=back
+
+=cut
+
+=head2 config_withimmutable
+
+  config_withimmutable() : ArrayRef
+
+The config_withimmutable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Immutable> role.
+
+=over 4
+
+=item config_withimmutable example
+
+  my $plans = config_withimmutable;
+
+=back
+
+=cut
+
+=head2 config_withproxyable
+
+  config_withproxyable() : ArrayRef
+
+The config_withproxyable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Proxyable> role.
+
+=over 4
+
+=item config_withproxyable example
+
+  my $plans = config_withproxyable;
+
+=back
+
+=cut
+
+=head2 config_withstashable
+
+  config_withstashable() : ArrayRef
+
+The config_withstashable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Stashable> role.
+
+=over 4
+
+=item config_withstashable example
+
+  my $plans = config_withstashable;
+
+=back
+
+=cut
+
+=head2 config_withthrowable
+
+  config_withthrowable() : ArrayRef
+
+The config_withthrowable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Throwable> role.
+
+=over 4
+
+=item config_withthrowable example
+
+  my $plans = config_withthrowable;
+
+=back
+
+=cut
+
+=head2 config_withtryable
+
+  config_withtryable() : ArrayRef
+
+The config_withtryable function returns plans for configuring the package to
+consume the L<Data::Object::Role::Tryable> role.
+
+=over 4
+
+=item config_withtryable example
+
+  my $plans = config_withtryable;
 
 =back
 
@@ -1589,236 +1821,9 @@ The subject function returns truthy if both arguments match alphanumerically
 
 =cut
 
-=head1 METHODS
-
-This package implements the following methods.
-
-=cut
-
-=head2 config_args
-
-  config_args() : ArrayRef
-
-The config_args function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Args>.
-
-=over 4
-
-=item config_args example
-
-  my $plans = config_args;
-
-=back
-
-=cut
-
-=head2 config_core
-
-  config_core() : ArrayRef
-
-The config_core function returns plans for configuring the package to have the
-L<Data::Object> framework default configuration.
-
-=over 4
-
-=item config_core example
-
-  my $plans = config_core;
-
-=back
-
-=cut
-
-=head2 config_data
-
-  config_data() : ArrayRef
-
-The config_data function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Data>.
-
-=over 4
-
-=item config_data example
-
-  my $plans = config_data;
-
-=back
-
-=cut
-
-=head2 config_opts
-
-  config_opts() : ArrayRef
-
-The config_opts function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Opts>.
-
-=over 4
-
-=item config_opts example
-
-  my $plans = config_opts;
-
-=back
-
-=cut
-
-=head2 config_space
-
-  config_space() : ArrayRef
-
-The config_space function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Space>.
-
-=over 4
-
-=item config_space example
-
-  my $plans = config_space;
-
-=back
-
-=cut
-
-=head2 config_struct
-
-  config_struct() : ArrayRef
-
-The config_struct function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Struct>.
-
-=over 4
-
-=item config_struct example
-
-  my $plans = config_struct;
-
-=back
-
-=cut
-
-=head2 config_vars
-
-  config_vars() : ArrayRef
-
-The config_vars function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Vars>.
-
-=over 4
-
-=item config_vars example
-
-  my $plans = config_vars;
-
-=back
-
-=cut
-
-=head2 config_withdumpable
-
-  config_withdumpable() : ArrayRef
-
-The config_withdumpable function returns plans for configuring the package to
-consume the L<Data::Object::Role::Dumbable> role.
-
-=over 4
-
-=item config_withdumpable example
-
-  my $plans = config_withdumpable;
-
-=back
-
-=cut
-
-=head2 config_withimmutable
-
-  config_withimmutable() : ArrayRef
-
-The config_withimmutable function returns plans for configuring the package to
-consume the L<Data::Object::Role::Immutable> role.
-
-=over 4
-
-=item config_withimmutable example
-
-  my $plans = config_withimmutable;
-
-=back
-
-=cut
-
-=head2 config_withproxyable
-
-  config_withproxyable() : ArrayRef
-
-The config_withproxyable function returns plans for configuring the package to
-consume the L<Data::Object::Role::Proxyable> role.
-
-=over 4
-
-=item config_withproxyable example
-
-  my $plans = config_withproxyable;
-
-=back
-
-=cut
-
-=head2 config_withstashable
-
-  config_withstashable() : ArrayRef
-
-The config_withstashable function returns plans for configuring the package to
-consume the L<Data::Object::Role::Stashable> role.
-
-=over 4
-
-=item config_withstashable example
-
-  my $plans = config_withstashable;
-
-=back
-
-=cut
-
-=head2 config_withthrowable
-
-  config_withthrowable() : ArrayRef
-
-The config_withthrowable function returns plans for configuring the package to
-consume the L<Data::Object::Role::Throwable> role.
-
-=over 4
-
-=item config_withthrowable example
-
-  my $plans = config_withthrowable;
-
-=back
-
-=cut
-
-=head2 config_withtryable
-
-  config_withtryable() : ArrayRef
-
-The config_withtryable function returns plans for configuring the package to
-consume the L<Data::Object::Role::Tryable> role.
-
-=over 4
-
-=item config_withtryable example
-
-  my $plans = config_withtryable;
-
-=back
-
-=cut
-
 =head1 CREDITS
 
-Al Newkirk, C<+309>
+Al Newkirk, C<+317>
 
 Anthony Brummett, C<+10>
 
@@ -1836,8 +1841,9 @@ Al Newkirk, C<awncorp@cpan.org>
 
 Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated here,
+https://github.com/iamalnewkirk/do/blob/master/LICENSE.
 
 =head1 PROJECT
 

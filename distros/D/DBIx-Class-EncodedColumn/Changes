@@ -1,5 +1,7 @@
 Revision history for Message-Passing-Fluentd
 
+0.00020 2019-09-25
+        - Skip author tests unless AUTHOR_TESTING is set
 0.00019 2019-09-19
         - Skip author tests unless DBIC::TimeStamp is avail 
 0.00018 2019-09-16 08:00:00

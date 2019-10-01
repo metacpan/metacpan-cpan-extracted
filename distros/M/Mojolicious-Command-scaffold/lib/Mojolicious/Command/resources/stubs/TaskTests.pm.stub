@@ -1,0 +1,18 @@
+package TestCase::Application::Tasks::Stub;
+use base qw(Test::Class);
+
+use Test::Most;
+
+use Application::Tasks::Stub;
+
+sub should_compile: Test(no_plan) {
+    use_ok('Application::Tasks::Stub');
+}
+
+sub can_be_instantiated: Test(no_plan) {
+    my $task = new_ok('Application::Tasks::Stub');
+    
+    can_ok($task, (qw/start/));
+}
+
+1;

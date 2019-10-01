@@ -8,11 +8,12 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel            => 'error',
-            useSafeJail         => 1,
-            'corsAllow_Origin'  => '',
-            'corsAllow_Methods' => 'POST',
-            'cspFormAction'     => '*'
+            logLevel          => 'error',
+            useSafeJail       => 1,
+            corsAllow_Origin  => '',
+            corsAllow_Methods => 'POST',
+            cspFormAction     => '*',
+            customToTrace     => 'mail'
         }
     }
 );
@@ -23,6 +24,10 @@ ok( $res = $client->_get('/'), 'Unauth JSON request' );
 count(1);
 expectReject($res);
 
+ok( $res = $client->_get('/ping'), 'Unauth JSON request' );
+count(1);
+checkCorsPolicy($res);
+
 # Test "first access" with good url
 ok(
     $res =
@@ -32,49 +37,27 @@ ok(
 count(1);
 expectReject($res);
 
+ok( $res = $client->_options( '/', accept => 'text/html' ), 'Get Menu' );
+count(1);
+
+checkCorsPolicy($res);
+
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu' );
 ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
-# CORS
-ok( $res->[1]->[12] eq 'Access-Control-Allow-Origin', ' CORS origin found' )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[13] eq '', " CORS origin ''" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[14] eq 'Access-Control-Allow-Credentials',
-    ' CORS credentials found' )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[15] eq 'true', " CORS credentials 'true'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[16] eq 'Access-Control-Allow-Headers', " CORS headers found" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[17] eq '*', " CORS headers '*'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[18] eq 'Access-Control-Allow-Methods', " CORS methods found" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[19] eq 'POST', " CORS methods 'POST'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[20] eq 'Access-Control-Expose-Headers',
-    " CORS expose-headers found" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[21] eq '*', " CORS expose-headers '*'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[22] eq 'Access-Control-Max-Age', ' CORS max-age found' )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[23] == 86400, ' CORS max-age 86400' )
-  or print STDERR Dumper( $res->[1] );
-count(12);
+checkCorsPolicy($res);
+
+my %headers = @{ $res->[1] };
 
 #CSP
-ok( $res->[1]->[26] eq 'Content-Security-Policy', ' CSP found' )
-  or print STDERR Dumper( $res->[1] );
 ok(
-    $res->[1]->[27] =~
+    $headers{'Content-Security-Policy'} =~
 /default-src 'self';img-src 'self' data:;style-src 'self';font-src 'self';connect-src 'self';script-src 'self';form-action \*;frame-ancestors 'none'/,
-    ' CSP headers found'
+    'CSP header value found'
 ) or print STDERR Dumper( $res->[1] );
-count(2);
+count(1);
 
 # Try to authenticate with good password
 # --------------------------------------
@@ -115,39 +98,44 @@ ok(
 );
 count(1);
 
-ok( $res->[1]->[14] eq 'Access-Control-Allow-Origin', ' CORS origin found' )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[15] eq '', " CORS origin ''" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[16] eq 'Access-Control-Allow-Credentials',
-    ' CORS credentials found' )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[17] eq 'true', " CORS credentials 'true'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[18] eq 'Access-Control-Allow-Headers', " CORS headers found" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[19] eq '*', " CORS headers '*'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[20] eq 'Access-Control-Allow-Methods', " CORS methods found" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[21] eq 'POST', " CORS methods 'POST'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[22] eq 'Access-Control-Expose-Headers',
-    " CORS expose-headers found" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[23] eq '*', " CORS expose-headers '*'" )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[24] eq 'Access-Control-Max-Age', ' CORS max-age found' )
-  or print STDERR Dumper( $res->[1] );
-ok( $res->[1]->[25] == 86400, ' CORS max-age 86400' )
-  or print STDERR Dumper( $res->[1] );
-count(12);
+%headers = @{ $res->[1] };
 
-# Test logout
+# Lm-Remote headers
+ok( $headers{'Lm-Remote-User'} eq 'dwho', "Lm-Remote-User found" )
+  or print STDERR Dumper( $res->[1] );
+ok( $headers{'Lm-Remote-Custom'} eq 'dwho@badwolf.org',
+    "Lm-Remote-Custom found" )
+  or print STDERR Dumper( $res->[1] );
+count(2);
+
+checkCorsPolicy($res);
+
 $client->logout($id);
-
-#print STDERR Dumper($res);
 
 clean_sessions();
 
 done_testing( count() );
+
+sub checkCorsPolicy {
+    my ($res) = @_;
+    my %headers = @{ $res->[1] };
+
+    ok( $headers{'Access-Control-Allow-Origin'} eq '', "CORS origin '' found" )
+      or print STDERR Dumper( $res->[1] );
+    ok( $headers{'Access-Control-Allow-Credentials'} eq 'true',
+        "CORS credentials 'true' found" )
+      or print STDERR Dumper( $res->[1] );
+    ok( $headers{'Access-Control-Allow-Headers'} eq '*',
+        "CORS headers '*' found" )
+      or print STDERR Dumper( $res->[1] );
+    ok( $headers{'Access-Control-Allow-Methods'} eq 'POST',
+        "CORS methods 'POST' found" )
+      or print STDERR Dumper( $res->[1] );
+    ok( $headers{'Access-Control-Expose-Headers'} eq '*',
+        "CORS expose-headers '*' found" )
+      or print STDERR Dumper( $res->[1] );
+    ok( $headers{'Access-Control-Max-Age'} eq '86400',
+        "CORS max-age '86400' found" )
+      or print STDERR Dumper( $res->[1] );
+    count(6);
+}

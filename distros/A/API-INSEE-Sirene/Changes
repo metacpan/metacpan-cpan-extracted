@@ -1,5 +1,8 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+3.504
+        - Updated documentation
+
 3.503  Mon Sep  23 10:59:44 2019
         - Decreased $HARD_MAX_RESULTS value from 10000 to 1000 according to new the specifications applicable from 2019-10-01
         - Updated documentation

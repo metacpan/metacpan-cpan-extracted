@@ -1,5 +1,8 @@
 Revision history for RT-Extension-Announce
 
+1.02 2019-09-30
+ - Allow HTML content as announce banner
+
 1.01 2016-10-21
  - Update documentation
 

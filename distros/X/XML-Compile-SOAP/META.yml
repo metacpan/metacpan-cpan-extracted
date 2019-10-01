@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  File::Slurp::Tiny: '0'
+  File::Slurper: '0'
   LWP: '6.08'
   Log::Report: '1.05'
   Net::HTTP: '6.16'
@@ -31,5 +31,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-XML-Compile-SOAP.git
-version: '3.24'
+version: '3.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

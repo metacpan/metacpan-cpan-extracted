@@ -58,9 +58,9 @@ LWP::Protocol::PSGI->register(
 );
 
 SKIP: {
-    eval "use Lasso";
+    eval "use Lasso;use XML::Simple";
     if ($@) {
-        skip 'Lasso not found', $maintests;
+        skip 'Lasso or XML::Simple not found', $maintests;
     }
 
     # Initialization

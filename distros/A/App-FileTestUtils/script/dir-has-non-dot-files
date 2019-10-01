@@ -1,0 +1,84 @@
+#!perl
+
+our $DATE = '2019-08-17'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use File::MoreUtil 'dir_has_non_dot_files';
+
+unless (@ARGV == 1) {
+    die "Usage: dir-has-non-dot-files <path>\n";
+}
+
+exit(dir_has_non_dot_files($ARGV[0]) ? 0:1);
+
+# ABSTRACT: Test that a directory has non-dot files
+# PODNAME: dir-has-non-dot-files
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dir-has-non-dot-files - Test that a directory has non-dot files
+
+=head1 VERSION
+
+This document describes version 0.001 of dir-has-non-dot-files (from Perl distribution App-FileTestUtils), released on 2019-08-17.
+
+=head1 SYNOPSIS
+
+On the command-line:
+
+ % dir-has-non-dot-files "foo" && echo "foo/ has non-dot files"
+
+=head1 DESCRIPTION
+
+This is a simple CLI for L<File::MoreUtil>'s
+L<dir_has_non_dot_files|File::MoreUtils/dir_has_non_dot_files>. It will exit 0
+if argument is a directory and has plain, non-dot (a.k.a. non-hidden) files. A
+plain file is a regular/non-special file. A symlink to a plain file counts as a
+plain file. Non-plain files include named pipes, Unix sockets, and
+block/character special files.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FileTestUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FileTestUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileTestUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<File::MoreUtil>
+
+L<dir-has-files>
+
+L<dir-has-dot-files>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

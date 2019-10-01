@@ -19,7 +19,7 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Common::Conf::RESTServer';
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -69,7 +69,7 @@ sub addRoutes {
                 qw(virtualHosts samlIDPMetaDataNodes samlSPMetaDataNodes
                   applicationList oidcOPMetaDataNodes oidcRPMetaDataNodes
                   casSrvMetaDataNodes casAppMetaDataNodes
-                  authChoiceModules grantSessionRules combModules
+                  authChoiceModules grantSessionRules combModules sfExtra
                   openIdIDPList)
             ]
         },
@@ -341,7 +341,7 @@ sub newRawConf {
             $self->userLogger->notice(
                 'Raw saving attempt rejected, asking for confirmation to '
                   . $self->userId($req) );
-            $res->{result} = 0;
+            $res->{result}      = 0;
             $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
             $res->{message} .= '__needConfirmation__';
         }

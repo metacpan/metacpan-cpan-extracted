@@ -9,12 +9,15 @@ use MIME::Base64;
 BEGIN {
     require 't/test-lib.pm';
 }
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 my $maintests = 23;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
+
+eval { require XML::Simple };
+plan skip_all => "Missing dependencies: $@" if ($@);
 
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
@@ -64,7 +67,7 @@ SKIP: {
     }
 
     # Build SQL DB
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do(
 'CREATE TABLE users (user text,password text,name text,uid text,cn text,mail text)'
     );
@@ -259,7 +262,7 @@ SKIP: {
     ok(
         getHeader( $res, 'Content-Security-Policy' ) =~
           /child-src auth.idp.com/,
-        'Frame is authorizated'
+        'Frame is authorized'
       )
       or explain( $res->[1],
         'Content-Security-Policy => ...child-src auth.idp.com' );
@@ -298,7 +301,6 @@ SKIP: {
 }
 
 count($maintests);
-eval { unlink 't/userdb.db' };
 done_testing( count() );
 
 sub switch {
@@ -322,7 +324,7 @@ sub issuer {
                     demo => 'Demo;Demo;Demo',
                     sql  => 'DBI;DBI;DBI',
                 },
-                dbiAuthChain             => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain             => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser              => '',
                 dbiAuthPassword          => '',
                 dbiAuthTable             => 'users',

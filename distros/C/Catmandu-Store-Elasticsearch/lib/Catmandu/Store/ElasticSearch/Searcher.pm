@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Moo;
 use namespace::clean;
@@ -78,7 +78,6 @@ sub generator {
             my %args = (
                 index => $bag->index,
                 type  => $bag->type,
-                from  => $self->start,
                 size  => $bag->buffer_size,  # TODO divide by number of shards
                 body  => $body,
             );

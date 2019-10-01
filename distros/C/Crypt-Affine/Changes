@@ -1,5 +1,8 @@
 Revision history for Crypt::Affine
 
+0.15  2019-09-24T17:40:00+01:00
+      - Moved author test scripts to xt/ subfolder.
+
 0.14  2018-09-05T19:25:00+01:00
       - Used namespace::autoclean instead namespace::clean.
 

@@ -1,12 +1,13 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use MIME::Base64;
 use POSIX qw(strftime);
+use Lemonldap::NG::Portal::Main::Constants qw(portalConsts);
 
 # Main method
 # -----------
@@ -38,7 +39,9 @@ sub process {
             }
         }
     }
-    $self->logger->debug("Returned error: $err") if ($err);
+    $self->logger->debug(
+        "Returned error: $err (" . portalConsts->{$err} . ")" )
+      if ($err);
     return $err;
 }
 
@@ -77,7 +80,7 @@ sub controlUrl {
                 $req->set_param( 'confirm', $c );
             }
             else {
-                $self->logger->notice('Confirmation to old, refused');
+                $self->logger->notice('Confirmation too old, refused');
                 $req->set_param( 'confirm', 0 );
             }
         }
@@ -93,7 +96,7 @@ sub controlUrl {
         else {
             if ( $url =~ m#[^A-Za-z0-9\+/=]# ) {
                 $self->userLogger->error(
-                    "Value must be in BASE64 (param: url | value: $url)");
+                    "Value must be BASE64 encoded (param: url | value: $url)");
                 return PE_BADURL;
             }
             $req->{urldc} = decode_base64($url);
@@ -506,6 +509,9 @@ sub buildCookie {
             );
         }
     }
+    $self->userLogger->notice(
+"User $req->{user} successfully authenticated at level $req->{sessionInfo}->{authenticationLevel}"
+    );
     PE_OK;
 }
 

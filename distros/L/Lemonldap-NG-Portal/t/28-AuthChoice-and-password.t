@@ -7,7 +7,7 @@ require 't/test-lib.pm';
 my $res;
 my $maintests = 10;
 
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 SKIP: {
     eval { require DBI; require DBD::SQLite; };
@@ -16,7 +16,7 @@ SKIP: {
     }
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
 
@@ -36,7 +36,7 @@ SKIP: {
                     slave => 'Slave;LDAP;LDAP',
                 },
 
-                dbiAuthChain        => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain        => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser         => '',
                 dbiAuthPassword     => '',
                 dbiAuthTable        => 'users',
@@ -68,7 +68,7 @@ SKIP: {
         # -------------------
         ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get menu' );
         my @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );
-        ok( @form == 3, 'Display 3 choices' ) or explain(scalar(@form),3);
+        ok( @form == 3, 'Display 3 choices' ) or explain( scalar(@form), 3 );
         foreach (@form) {
             expectForm( [ $res->[0], $res->[1], [$_] ], undef, undef, 'test' );
         }
@@ -114,7 +114,6 @@ SKIP: {
     clean_sessions();
 }
 count($maintests);
-eval { unlink 't/userdb.db' };
 stopLdapServer() if $ENV{LLNGTESTLDAP};
 clean_sessions();
 done_testing( count() );

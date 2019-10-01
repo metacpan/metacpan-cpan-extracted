@@ -18,7 +18,7 @@ my %module_build_args = (
     "Wouter Willaert, C<< <wouterw\@inuits.eu> >>"
   ],
   "dist_name" => "Catmandu-SRU",
-  "dist_version" => "0.426",
+  "dist_version" => "0.427",
   "license" => "perl",
   "module_name" => "Catmandu::SRU",
   "recursive_test_files" => 1,
@@ -26,7 +26,7 @@ my %module_build_args = (
     "Catmandu" => "1.20",
     "Catmandu::MODS" => "0.31",
     "Cpanel::JSON::XS" => "3.0213",
-    "Furl" => "0.41",
+    "HTTP::Tiny" => "0.076",
     "Moo" => "1.005000",
     "URI::Escape" => "1.60",
     "XML::LibXML::Simple" => "0.91",

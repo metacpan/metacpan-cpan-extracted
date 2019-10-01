@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,25 +23,25 @@ name: Google-Ads-AdWords-Client
 provides:
   Google::Ads::AdWords::Client:
     file: lib/Google/Ads/AdWords/Client.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Constants:
     file: lib/Google/Ads/AdWords/Constants.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Deserializer:
     file: lib/Google/Ads/AdWords/Deserializer.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::FaultDetail:
     file: lib/Google/Ads/AdWords/FaultDetail.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Logging:
     file: lib/Google/Ads/AdWords/Logging.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/AdWords/OAuth2ApplicationsHandler.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::OAuth2ServiceAccountsHandler:
     file: lib/Google/Ads/AdWords/OAuth2ServiceAccountsHandler.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Reports::DateRange:
     file: lib/Google/Ads/AdWords/Reports/DateRange.pm
   Google::Ads::AdWords::Reports::DateRangeType:
@@ -62,7 +62,7 @@ provides:
     file: lib/Google/Ads/AdWords/Reports/ReportType.pm
   Google::Ads::AdWords::Reports::ReportingConfiguration:
     file: lib/Google/Ads/AdWords/Reports/ReportingConfiguration.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Reports::Selector:
     file: lib/Google/Ads/AdWords/Reports/Selector.pm
   Google::Ads::AdWords::Reports::SortOrder:
@@ -71,7 +71,7 @@ provides:
     file: lib/Google/Ads/AdWords/RequestStats.pm
   Google::Ads::AdWords::Serializer:
     file: lib/Google/Ads/AdWords/Serializer.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Utilities::BatchJobHandler:
     file: lib/Google/Ads/AdWords/Utilities/BatchJobHandler.pm
     version: v3.6.0
@@ -83,19 +83,19 @@ provides:
     version: v3.6.0
   Google::Ads::AdWords::Utilities::PageProcessor:
     file: lib/Google/Ads/AdWords/Utilities/PageProcessor.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Utilities::QueryBuilder:
     file: lib/Google/Ads/AdWords/Utilities/QueryBuilder.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Utilities::QueryBuilder::WhereBuilder:
     file: lib/Google/Ads/AdWords/Utilities/QueryBuilder.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Utilities::ReportQueryBuilder:
     file: lib/Google/Ads/AdWords/Utilities/ReportQueryBuilder.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::Utilities::ServiceQueryBuilder:
     file: lib/Google/Ads/AdWords/Utilities/ServiceQueryBuilder.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::AdWords::v201809::AccessReason:
     file: lib/Google/Ads/AdWords/v201809/AccessReason.pm
   Google::Ads::AdWords::v201809::AccessRole:
@@ -3236,13 +3236,13 @@ provides:
     version: v3.6.0
   Google::Ads::Common::ReportDownloadHandler:
     file: lib/Google/Ads/Common/ReportDownloadHandler.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::Common::ReportUtils:
     file: lib/Google/Ads/Common/ReportUtils.pm
     version: v3.6.0
   Google::Ads::Common::Utilities::AdsUtilityRegistry:
     file: lib/Google/Ads/Common/Utilities/AdsUtilityRegistry.pm
-    version: v5.8.1
+    version: v5.8.2
   Google::Ads::Common::XPathSAXParser:
     file: lib/Google/Ads/Common/XPathSAXParser.pm
     version: v3.6.0
@@ -3287,5 +3287,5 @@ requires:
   perl: v5.14.0
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v5.8.1
+version: v5.8.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

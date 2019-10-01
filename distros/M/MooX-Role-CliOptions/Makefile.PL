@@ -25,6 +25,7 @@ WriteMakefile(
         'Data::Dumper'            => 0,
     },
     PREREQ_PM => {
+        'Moo'             => 0,
         'Moo::Role'       => 0,
         'Getopt::Long'    => '2.36',
         'Pod::Usage'      => 0,

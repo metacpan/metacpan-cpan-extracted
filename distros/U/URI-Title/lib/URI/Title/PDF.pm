@@ -1,5 +1,5 @@
 package URI::Title::PDF;
-$URI::Title::PDF::VERSION = '1.901';
+$URI::Title::PDF::VERSION = '1.902';
 use warnings;
 use strict;
 
@@ -43,5 +43,9 @@ __END__
 =head1 NAME
 
 URI::Title::PDF - get titles of PDF files
+
+=head1 VERSION
+
+version 1.902
 
 =cut

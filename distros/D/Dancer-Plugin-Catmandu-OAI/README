@@ -131,6 +131,8 @@ DANCER CONFIGURATION
         * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
         * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
         * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH
+        * default_search_params - set default arguments that get passed to every call to the bag's search method
+        * search_strategy - default is C<paginate>, set to C<es.scroll> to avoid deep paging (Elasticsearch only)
         * limit - The maximum number of records to be returned in each OAI-PMH request
         * delimiter - Delimiters used in prefixing a record identifier with a repositoryIdentifier (use: ':' as default)
         * sampleIdentifier - A sample identifier

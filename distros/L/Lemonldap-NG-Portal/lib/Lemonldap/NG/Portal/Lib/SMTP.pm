@@ -14,7 +14,7 @@ use Email::Sender::Transport::SMTP qw();
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 our $transport;
 
@@ -81,15 +81,30 @@ has transport => (
     },
 );
 
+sub loadMailTemplate {
+    my ( $self, $req, $name, %prm ) = @_;
+
+    # HTML::Template cache interferes with email translation (#1897)
+    $prm{cache} = 0 unless defined $prm{cache};
+    $prm{params}->{STATIC_PREFIX} = $self->p->staticPrefix;
+    my %extra =
+        $self->p->can('tplParams')
+      ? $self->p->tplParams($req)
+      : ();
+    $prm{params}->{$_} = $extra{$_} for keys %extra;
+
+    return $self->loadTemplate( $req, $name, %prm );
+}
+
 sub translate {
     my ( $self, $req ) = @_;
 
     # Get language using llnglanguage cookie
     my $lang_code = $req->cookies->{llnglanguage} || 'en';
-    my $json = $self->conf->{templateDir} . "/common/mail/$lang_code.json";
+    my $json      = $self->conf->{templateDir} . "/common/mail/$lang_code.json";
     $json = $self->conf->{templateDir} . '/common/mail/en.json'
       unless ( -f $json );
-    open F, $json
+    open F, '<', $json
       or die 'Installation error: '
       . $!
       . " ($self->{conf}->{templateDir}/$lang_code.json or $self->{conf}->{templateDir}/common/mail/en.json)";
@@ -100,7 +115,7 @@ sub translate {
 
     if ($langOver) {
         for my $k ( keys %{ $langOver->{all} || {} } ) {
-            $lang->{$k} = $langOver->{$lang_code}->{$k};
+            $lang->{$k} = $langOver->{all}->{$k};
         }
         for my $k ( keys %{ $langOver->{$lang_code} || {} } ) {
             $lang->{$k} = $langOver->{$lang_code}->{$k};

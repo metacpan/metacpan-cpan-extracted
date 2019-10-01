@@ -5,12 +5,12 @@ use Catmandu::Importer::SRU::Parser;
 use Catmandu::Util qw(:is :check);
 use URI::Escape;
 use Moo;
-use Furl;
+use HTTP::Tiny;
 use Carp;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 
-our $VERSION = '0.426';
+our $VERSION = '0.427';
 
 with 'Catmandu::Importer';
 
@@ -21,11 +21,11 @@ has version      => (is => 'ro', default  => sub {'1.1'});
 has operation    => (is => 'ro', default  => sub {'searchRetrieve'});
 has recordSchema => (is => 'ro', default  => sub {'dc'});
 has userAgent    => (is => 'ro', default  => sub {'Mozilla/5.0'});
-has furl => (
+has http_client => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
-        Furl->new(agent => $_[0]->userAgent);
+        HTTP::Tiny->new(agent => $_[0]->userAgent);
     }
 );
 
@@ -82,8 +82,9 @@ sub _coerce_parser {
 sub _request {
     my ($self, $url) = @_;
 
-    my $res = $self->furl->get($url);
-    die $res->status_line unless $res->is_success;
+    my $res = $self->http_client->get($url);
+    die join(" ", grep defined, $res->{status}, $res->{reason})
+        unless $res->{success};
 
     return $res;
 }
@@ -408,9 +409,9 @@ Set to C<1.1> by default
 
 HTTP user agent, set to C<Mozilla/5.0> by default.
 
-=item furl
+=item http_client
 
-Instance of L<Furl> or compatible class to fetch URLs with.
+Instance of L<HTTP::Tiny> or compatible class to fetch URLs with.
 
 =item parser
 

@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Crypt::URandom;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -34,7 +34,7 @@ has cache => (
             }
             else {
                 $_[0]->{p}->logger->error(
-'Local storage not defined, token will be store in global storage'
+'Local storage not defined, token will be stored into global storage'
                 );
                 return undef;
             }

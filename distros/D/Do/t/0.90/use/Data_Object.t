@@ -33,9 +33,9 @@ foundational set of types, functions, classes, patterns, and interfaces for
 jump-starting application development. This package inherits all behavior from
 L<Data::Object::Config>, and offers the same functionality as the L<Do>
 package. Please see that documentation to learn more, or get started quickly by
-reviewing the L<"basic usage"|/convention> and L<"configurations"|/framework>,
-or the L<overview|https://github.com/iamalnewkirk/do/blob/master/OVERVIEW.md>
-and project L<wiki|https://github.com/iamalnewkirk/do/wiki>.
+reviewing L<basic usage|/CONVENTION>, L<configurations|/FRAMEWORK>, the
+L<overview|https://github.com/iamalnewkirk/do/blob/master/OVERVIEW.md>, and
+the project L<wiki|https://github.com/iamalnewkirk/do/wiki>.
 
 =headers
 
@@ -544,7 +544,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add C<Do> to the list of dependencies in C<cpanfile>:
 
-  requires "Do" => "1.80"; # 1.80 or newer
+  requires "Do" => "1.87"; # 1.87 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your

@@ -2,7 +2,7 @@ package App::BorgRestore::Settings;
 use v5.14;
 use strictures 2;
 
-use App::BorgRestore::Helper;
+use App::BorgRestore::Helper qw(untaint);
 
 use autodie;
 use Function::Parameters;
@@ -158,7 +158,7 @@ method new_no_defaults($class: $deps = {}) {
 		."the path in the config file or ensure that the variables are set.";
 	}
 
-	$cache_path_base = App::BorgRestore::Helper::untaint($cache_path_base, qr/.*/);
+	$cache_path_base = untaint($cache_path_base, qr/.*/);
 
 	return $self;
 }
@@ -188,7 +188,7 @@ fun load_config_files() {
 	push @configfiles, "/etc/borg-restore.cfg";
 
 	for my $configfile (@configfiles) {
-		$configfile = App::BorgRestore::Helper::untaint($configfile, qr/.*/);
+		$configfile = untaint($configfile, qr/.*/);
 		if (-e $configfile) {
 			unless (my $return = do $configfile) {
 				die "couldn't parse $configfile: $@" if $@;

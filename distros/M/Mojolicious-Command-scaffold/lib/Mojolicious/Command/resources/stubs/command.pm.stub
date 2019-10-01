@@ -1,0 +1,32 @@
+package Application::Command::Stub;
+use Mojo::Base 'Mojo::Console';
+
+use Getopt::Long;
+
+# Short description
+has 'description' => <<EOF;
+A useful description.
+EOF
+
+has 'options' => sub {
+    my %options;
+    GetOptions(\%options,
+        'input=s',
+        'boolean',
+    );
+
+    return \%options;
+};
+
+# Short usage message
+has 'usage' => <<EOF;
+Usage:  mojo Stub
+EOF
+
+sub run {
+    my ($self, @args) = @_
+
+    $self->info("Write something nice.");
+}
+
+1;

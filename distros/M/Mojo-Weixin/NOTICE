@@ -1,6 +1,4 @@
 以下是最新公告：
 
-    2018-06-29 Mojo::Weixin v1.4.1
-    1）XiaoiceReplay 插件完善
-    2）dockfile更新 解决docker镜像无法制作问题
-    3）更新依赖关系，解决 IO::Socket::SSL 2.009+ required for TLS support 问题
+    2019-09-29 Mojo::Weixin v1.4.6
+    修复Openwx插件错误Can't locate object method "context" via package "Mojo::Weixin::Log"

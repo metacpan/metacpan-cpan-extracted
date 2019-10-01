@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -38,7 +38,7 @@ has _groups     => ( is => 'rw' );
 has _jsRedirect => ( is => 'rw' );
 
 # TrustedDomain regexp
-has trustedDomainsRe => ( is => 'rw' );
+has trustedDomainsRe         => ( is => 'rw' );
 has additionalTrustedDomains => ( is => 'rw', default => sub { [] } );
 
 # Lists to store plugins entry-points
@@ -157,6 +157,9 @@ sub init {
       # Refresh session
       ->addAuthRoute( refresh => 'refresh', ['GET'] )
 
+      ->addAuthRoute( '*' => 'corsPreflight', ['OPTIONS'] )
+      ->addUnauthRoute( '*' => 'corsPreflight', ['OPTIONS'] )
+
       # Logout
       ->addAuthRoute( logout => 'logout', ['GET'] );
 
@@ -201,7 +204,7 @@ sub reloadConf {
         my $header = $_;
         my $prm    = $self->conf->{ 'cors' . $_ };
         $header =~ s/_/-/;
-        $prm =~ s/\s+//;
+        $prm    =~ s/\s+//;
         $cors .= "Access-Control-$header;$prm;";
     }
     $self->cors($cors);
@@ -356,6 +359,8 @@ sub reloadConf {
         unless ( $_[0]->pdata->{keepPdata} ) {
             $self->logger->debug('Cleaning pdata');
             $_[0]->pdata( {} );
+            $self->userLogger->notice( $_[0]->user . ' connected' )
+              if $_[0]->user;
         }
         return PE_OK;
     };
@@ -434,7 +439,7 @@ sub findEP {
         }
         else {
             foreach my $ep ( keys %$h ) {
-                my $callback = $h->{$ep};
+                my $callback    = $h->{$ep};
                 my $previousSub = $self->aroundSub->{$ep} ||= sub {
                     $self->logger->debug(
                         "$ep launched inside ${plugin}::$callback");

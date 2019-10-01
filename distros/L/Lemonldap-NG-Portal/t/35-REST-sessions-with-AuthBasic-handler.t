@@ -1,5 +1,6 @@
 use lib 'inc';
 use strict;
+use File::Temp 'tempdir';
 use IO::String;
 use JSON;
 use MIME::Base64;
@@ -8,6 +9,8 @@ use Test::More;
 our $debug = 'error';
 my ( $p, $res, $spId );
 $| = 1;
+
+$LLNG::TMPDIR = tempdir( 'tmpSessionXXXXX', DIR => 't/sessions', CLEANUP => 1 );
 
 require 't/separate-handler.pm';
 

@@ -8,14 +8,14 @@ my $res;
 my $maintests = 0;
 my $client;
 
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 SKIP: {
     eval { require DBI; require DBD::SQLite; };
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dvador','dvador','Test user 1')");
     $dbh->do("INSERT INTO users VALUES ('rtyler','rtyler','Test user 1')");
@@ -26,7 +26,7 @@ SKIP: {
 
     $client = iniCmb('[Dm] and [DB]');
     expectCookie( try('rtyler') );
-    expectReject( try('dwho'), 5 );
+    expectReject( try('dwho'), 401, 5 );
 
     $client = iniCmb('if($env->{HTTP_X} eq "dwho") then [Dm] else [DB]');
     expectCookie( try('dwho') );
@@ -37,18 +37,17 @@ SKIP: {
     );
     expectCookie( try('rtyler') );
     expectCookie( try('dvador') );
-    expectReject( try('dwho'), 5 );
+    expectReject( try('dwho'), 401, 5 );
 }
 count($maintests);
 clean_sessions();
-eval { unlink 't/userdb.db' };
 done_testing( count() );
 
 sub try {
     my $user = shift;
     my $res;
 
-    # Gat token
+    # Get token
     ok( $res = $client->_get( '/', accept => 'text/html' ), 'Unauth request' );
     count(1);
     my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
@@ -89,7 +88,7 @@ sub iniCmb {
                         },
                     },
 
-                    dbiAuthChain        => 'dbi:SQLite:dbname=t/userdb.db',
+                    dbiAuthChain        => "dbi:SQLite:dbname=$userdb",
                     dbiAuthUser         => '',
                     dbiAuthPassword     => '',
                     dbiAuthTable        => 'users',

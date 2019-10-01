@@ -9,7 +9,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,18 +27,19 @@ no_index:
 provides:
   Acme::Text::Viceversa:
     file: lib/Acme/Text/Viceversa.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/worthmine/Acme-Text-Viceversa/issues
   homepage: https://github.com/worthmine/Acme-Text-Viceversa
   repository: git://github.com/worthmine/Acme-Text-Viceversa.git
-version: '0.06'
+version: '0.07'
 x_authority: cpan:WORTHMINE
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Yuki Yoshida <worthmine@gmail.com>'
   - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
   - 'worthmine <worthmine@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

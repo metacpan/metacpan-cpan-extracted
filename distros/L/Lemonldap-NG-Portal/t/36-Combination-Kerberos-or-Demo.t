@@ -41,7 +41,8 @@ SKIP: {
         }
     );
     ok( $res = $client->_get( '/', accept => 'text/html' ), 'Simple access' );
-    ok( $res->[2]->[0] =~ /script.*kerberos\.js/s, 'Found Kerberos JS' );
+    ok( $res->[2]->[0] =~ /script.*kerberos\.js/s, 'Found Kerberos JS' )
+      or explain( $res->[2]->[0], 'script.*kerberos.js' );
     my ( $host, $url, $query ) = expectForm( $res, '#' );
 
     # TODO

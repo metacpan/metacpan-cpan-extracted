@@ -1,0 +1,29 @@
+<%Condition
+  a.cgiparam="revert_to"
+  a.path="/bits/content/revert-all"
+  default.template={
+To revert to a previously published content please select a date from
+the list below. Once reverted you will be able to edit and review
+changes before publishing them.
+<P>
+
+Reverting to the most recent date will cancel all current changes.
+<P>
+
+<FORM METHOD="GET" ACTION="<%Utility mode="current-url"%>">
+<INPUT TYPE="HIDDEN" NAME="revert" VALUE="1">
+
+<SELECT NAME="revert_to">
+<OPTION VALUE="" SELECTED>Please Select</OPTION>
+<%Content
+  mode="content-show-dates"
+  path="/bits/content/revert-option"
+%>
+</SELECT>
+<P>
+
+<INPUT TYPE="SUBMIT" VALUE="  Revert  ">
+
+</FORM>
+}
+%>

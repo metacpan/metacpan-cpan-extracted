@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_FORBIDDENIP PE_USERNOTFOUND);
 use Lemonldap::NG::Portal::Lib::Slave;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -22,6 +22,11 @@ sub extractFormInfo {
     my ( $self, $req ) = @_;
     return PE_FORBIDDENIP
       unless ( $self->checkIP($req) and $self->checkHeader($req) );
+
+    unless ( $self->conf->{slaveUserHeader} ) {
+        $self->logger->debug('slaveUserHeader is undefined');
+        return PE_USERNOTFOUND;
+    }
 
     my $user_header = $self->conf->{slaveUserHeader};
     $user_header = 'HTTP_' . uc($user_header);
@@ -44,6 +49,11 @@ sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{slaveAuthnLevel};
     PE_OK;
+}
+
+sub getDisplayType {
+    my ($self) = @_;
+    return ( $self->{conf}->{slaveDisplayLogo} ? "logo" : "_none_" );
 }
 
 sub authLogout {

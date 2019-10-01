@@ -9,7 +9,7 @@ require 5.010000;
 
 use feature 'state';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
 
@@ -24,7 +24,7 @@ use Hash::Wrap ( { -as => '_wrap_hash' } );
 use PDL::Algorithm::Center::Failure ':all';
 
 use PDL::Algorithm::Center::Types -all;
-use Types::Standard -types;
+use Types::Standard qw[ Optional ArrayRef Undef CodeRef Num ];
 use Types::Common::Numeric -types;
 use Type::Params qw[ compile_named ];
 
@@ -34,6 +34,9 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw[ sigma_clip iterate ];
 
+# as of Types::Standard 1.003_003, Bool coerces any value into a boolean,
+# which we don't want.
+use constant Bool => Types::Standard::Bool->no_coercions();
 
 sub _weighted_mean_center {
     my ( $coords, $mask, $weight, $total_weight ) = @_;
@@ -1308,7 +1311,7 @@ PDL::Algorithm::Center - Various methods of finding the center of a sample
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -2176,17 +2179,10 @@ The objects stringify to a failure message.
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center>
-or by email to
-L<bug-PDL-Algorithm-Center@rt.cpan.org|mailto:bug-PDL-Algorithm-Center@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/djerius/pdl-algorithm-center>
-and may be cloned from L<git://github.com/djerius/pdl-algorithm-center.git>
 
 =head1 AUTHOR
 

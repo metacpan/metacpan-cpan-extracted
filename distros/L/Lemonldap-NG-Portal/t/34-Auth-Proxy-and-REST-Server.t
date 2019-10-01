@@ -195,11 +195,18 @@ if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
 }
 count(3);
 
-ok($res=Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions( {baseUrl => 'http://auth.idp.com/sessions/global/'},sub{return 'a'}),'Search all sessions with a code');
+ok(
+    $res =
+      Lemonldap::NG::Common::Apache::Session::REST->get_key_from_all_sessions(
+        { baseUrl => 'http://auth.idp.com/sessions/global/' },
+        sub { return 'a' }
+      ),
+    'Search all sessions with a code'
+);
 
 if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
     my $tmp = 1;
-    my $c = 0;
+    my $c   = 0;
     foreach ( keys %$res ) {
         $c++;
         unless ( $res->{$_} eq 'a' ) {
@@ -207,7 +214,7 @@ if ( ok( ref($res) eq 'HASH', ' Result is an hash' ) ) {
             diag "Bad session:\n" . Dumper( $res->{$_} );
         }
     }
-    ok( $c == $c1, " Found the same count") or explain($c,$c1);
+    ok( $c == $c1, " Found the same count" ) or explain( $c, $c1 );
     ok( $tmp, ' All sessions are valid' );
     count(2);
 }

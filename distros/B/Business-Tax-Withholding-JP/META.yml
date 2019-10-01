@@ -1,7 +1,7 @@
 ---
 abstract: 'auto calculation for Japanese tax and withholding'
 author:
-  - 'worthmine <worthmine@cpan.org>'
+  - 'Yuki Yoshida <worthmine@gmail.com>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Business::Tax::Withholding::JP:
     file: lib/Business/Tax/Withholding/JP.pm
-    version: '0.05'
+    version: '0.08'
 requires:
   Moose: '0'
   Time::Piece: '0'
@@ -35,7 +35,9 @@ resources:
   bugtracker: https://github.com/worthmine/Business-Tax-Withholding-JP/issues
   homepage: https://github.com/worthmine/Business-Tax-Withholding-JP
   repository: git://github.com/worthmine/Business-Tax-Withholding-JP.git
-version: '0.05'
+version: '0.08'
 x_authority: cpan:WORTHMINE
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_contributors:
+  - 'worthmine <worthmine@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -19,15 +19,58 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Display" : "0",
+            "HTML::TokeParser::Simple" : "2",
+            "HTTP::Cookies" : "0",
+            "Hook::LexWrap" : "0.2",
+            "LWP" : "5.69",
+            "LWP::UserAgent" : "0",
+            "Term::Shell" : "0.02",
+            "Test::Harness" : "2.3",
+            "URI::URL" : "0",
+            "WWW::Mechanize" : "1.2",
+            "WWW::Mechanize::FormFiller" : "0.05",
+            "WWW::Mechanize::Link" : "1.2",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CGI" : "0",
+            "File::Temp" : "0",
+            "Test::HTTP::LocalServer" : "0.68",
+            "Test::More" : "0",
+            "Test::Without::Module" : "0",
+            "URI" : "0"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/Corion/WWW-Mechanize-Shell.git",
          "web" : "https://github.com/Corion/WWW-Mechanize-Shell"
       }
    },
-   "version" : "0.57",
-   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "version" : "0.58",
+   "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

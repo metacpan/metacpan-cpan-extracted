@@ -2,8 +2,8 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.328 of Complete::Bash (from Perl
-    distribution Complete-Bash), released on 2019-07-30.
+    This document describes version 0.330 of Complete::Bash (from Perl
+    distribution Complete-Bash), released on 2019-08-20.
 
 DESCRIPTION
     This module provides routines related to tab completion in bash shell.

@@ -29,7 +29,7 @@ use constant AUTH_REQUIRED     => Apache2::Const::AUTH_REQUIRED;
 use constant MAINTENANCE       => Apache2::Const::HTTP_SERVICE_UNAVAILABLE;
 use constant BUFF_LEN          => 8192;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # Set default logger
 use constant defaultLogger => 'Lemonldap::NG::Common::Logger::Apache2';
@@ -81,12 +81,22 @@ sub set_user {
     $request->env->{'psgi.r'}->user($user);
 }
 
+## @method void set_custom(string custom)
+# sets remote_custom
+# @param custom string custom_header
+sub set_custom {
+    my ( $class, $request, $custom ) = @_;
+    $request->env->{'psgi.r'}->subprocess_env( REMOTE_CUSTOM => $custom )
+      if defined $custom;
+}
+
 ## @method void set_header_in(hash headers)
 # sets or modifies request headers
 # @param headers hash containing header names => header value
 sub set_header_in {
     my ( $class, $request, %headers ) = @_;
     while ( my ( $h, $v ) = each %headers ) {
+        utf8::downgrade($v);
         $request->env->{'psgi.r'}->headers_in->set( $h => $v );
     }
 }
@@ -186,7 +196,7 @@ sub addToHtmlHead {
             #unless ($ctx) {
             #    $f->r->headers_out->unset('Content-Length');
             #}
-            my $done = 0;
+            my $done   = 0;
             my $buffer = $ctx->{data} ? $ctx->{data} : '';
             my ( $bdata, $seen_eos ) = flatten_bb($bb);
             unless ($done) {

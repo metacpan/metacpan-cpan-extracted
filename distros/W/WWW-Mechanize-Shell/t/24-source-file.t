@@ -4,11 +4,11 @@ use lib './inc';
 use IO::Catch;
 use Test::HTTP::LocalServer;
 
-use vars qw($_STDOUT_ $_STDERR_);
+our ( $_STDOUT_, $_STDERR_);
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 # Disable all ReadLine functionality
 $ENV{PERL_RL} = 0;
@@ -18,7 +18,7 @@ $ENV{PERL_HTML_DISPLAY_CLASS}="HTML::Display::Dump";
 
 delete @ENV{qw(HTTP_PROXY http_proxy CGI_HTTP_PROXY)};
 
-use_ok('WWW::Mechanize::Shell');
+require WWW::Mechanize::Shell;
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 
 # Now test

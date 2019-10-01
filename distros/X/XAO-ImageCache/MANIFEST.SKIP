@@ -1,0 +1,13 @@
+^Makefile$
+.*\.(c|o|bs|old|swp)$
+MYMETA.json
+MYMETA.yml
+\.config
+\.gitignore
+^\.git/
+^blib/.*
+^sample/bin/build-structure$
+^sample/objects/Config.pm$
+^t/.*\.pl
+^t/.*\.xt
+pm_to_blib

@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir ) = @_;
@@ -108,7 +108,7 @@ sub zeroConf {
         },
         'macros' => {
             '_whatToTrace' =>
-'$_auth eq \'SAML\' ? "$_user\\@$_idpConfKey" : $_auth eq \'OpenIDConnect\' ? "$_user\\@$_oidcConnectedRP" : "$_user"',
+'$_auth eq \'SAML\' ? lc($_user.\'@\'.$_idpConfKey) : $_auth eq \'OpenIDConnect\' ? lc($_user.\'@\'.$_oidcConnectedRP) : lc($_user)',
             'UA' => '$ENV{HTTP_USER_AGENT}'
         },
         'notificationStorageOptions' => {
@@ -162,10 +162,11 @@ sub zeroConf {
             },
             "manager.$domain" => {
                 'default' => '$uid eq "dwho" or $uid eq "rtyler"',
-                '(?#Configuration)^/(manager\.html|confs|$)' =>
-                  '$uid eq "dwho"',
-                '(?#Sessions)/sessions' => '$uid eq "dwho" or $uid eq "rtyler"',
-                '(?#Notifications)/notifications' =>
+'(?#Configuration)^/(.*?\.(fcgi|psgi)/)?(manager\.html|confs/|$)'
+                  => '$uid eq "dwho"',
+                '(?#Sessions)/(.*?\.(fcgi|psgi)/)?sessions' =>
+                  '$uid eq "dwho" or $uid eq "rtyler"',
+                '(?#Notifications)/(.*?\.(fcgi|psgi)/)?notifications' =>
                   '$uid eq "dwho" or $uid eq "rtyler"',
             }
         },

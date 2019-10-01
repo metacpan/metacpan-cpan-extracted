@@ -29,12 +29,14 @@
 #                                                  n° <cfgNum>
 #   * GET /config/<latest|cfgNum>/<key>           : get conf key value
 #   * GET /config/<latest|cfgNum>?full            : get the full configuration
-#   where <type> is the session type ("global" for SSO session)
+#   where <type> is the session type ("global" for SSO session or "persistent")
+#   * GET /error/<lang>/<errNum>                  : get <errNum> message reference and errors file <lang>.json
+#   Return 'en' error file if no <lang> specified
 #
 # - Authorizations for connected users (always):
 #   * GET /mysession/?whoami                               : get "my" uid
 #   * GET /mysession/?authorizationfor=<base64-encoded-url>: ask if url is
-#                                                            authorizated
+#                                                            authorized
 #   * PUT /mysession/<type>                                : update some
 #                                                            persistent data
 #                                                            (restricted)
@@ -50,7 +52,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -75,7 +77,7 @@ has exportedAttr => (
                 'authenticationLevel', 'groups',
                 'ipAddr',              '_startTime',
                 '_utime',              '_lastSeen',
-                '_session_id',
+                '_session_id',         '_session_kind',
             );
             if ( my $exportedAttr = $conf->{exportedAttr} ) {
                 $exportedAttr =~ s/^\s*\+\s+//;
@@ -124,11 +126,14 @@ sub init {
                 ]
             },
             ['GET'],
-        );
-        $self->addUnauthRoute(
+          )
+
+          ->addUnauthRoute(
             config => { ':cfgNum' => { '*' => 'getKey' } },
             ['GET']
-        );
+          )
+
+          ->addUnauthRoute( error => { '*' => 'getError' }, ['GET'] );
     }
     if ( $self->conf->{restSessionServer} ) {
         push @parents, 'Lemonldap::NG::Common::Session::REST';
@@ -144,44 +149,48 @@ sub init {
                 )
             },
             ['GET']
-        );
-        $self->addUnauthRoute(
+          )
+
+          ->addUnauthRoute(
             sessions => { ':sessionType' => 'newSession' },
             ['POST']
-        );
+          )
 
-        # Methods written below
-        $self->addUnauthRoute(
+          # Methods written below
+          ->addUnauthRoute(
             sessions => { ':sessionType' => 'updateSession' },
             ['PUT']
-        );
-        $self->addUnauthRoute(
+          )
+
+          ->addUnauthRoute(
             sessions => { ':sessionType' => 'delSession' },
             ['DELETE']
-        );
+          )
 
-        $self->addAuthRoute(
+          ->addAuthRoute(
             session => { my => { ':sessionType' => 'getMyKey' } },
             [ 'GET', 'POST' ]
-        );
+          );
     }
 
     # Methods always available
     $self->addAuthRoute(
         mysession => { '*' => 'mysession' },
         [ 'GET', 'POST' ]
-    );
-    $self->addAuthRoute(
+      )
+
+      ->addAuthRoute(
         mysession => {
             ':sessionType' =>
               { ':key' => 'delKeyInMySession', '*' => 'delMySession' }
         },
         ['DELETE']
-    );
-    $self->addAuthRoute(
+      )
+
+      ->addAuthRoute(
         mysession => { ':sessionType' => 'updateMySession' },
         ['PUT']
-    );
+      );
     extends @parents if ($add);
     $self->setTypes( $self->conf ) if ( $self->conf->{restSessionServer} );
     return 1;
@@ -204,8 +213,8 @@ sub newSession {
         my $t;
         if ( $t =
                 $self->conf->{cipher}->decrypt($s)
-            and $t <= time
-            and $t > time - 15 )
+            and $t <= time + $self->conf->{restClockTolerance}
+            and $t > time - $self->conf->{restClockTolerance} )
         {
             $force = 1;
         }
@@ -264,7 +273,7 @@ sub newAuthSession {
     $req->data->{password} = $req->param('password');
     $req->steps( [
             @{ $self->p->beforeAuth },
-            qw(getUser authenticate setAuthSessionInfo),
+            qw(getUser extractFormInfo authenticate setAuthSessionInfo),
             @{ $self->p->betweenAuthAndData },
             $self->p->sessionData,
             @{ $self->p->afterData },
@@ -299,8 +308,8 @@ sub updateSession {
         my $t;
         if ( $t =
                 $self->conf->{cipher}->decrypt($s)
-            and $t <= time
-            and $t > time - 30 )
+            and $t <= time + $self->conf->{restClockTolerance}
+            and $t > time - $self->conf->{restClockTolerance} )
         {
             $force = 1;
         }
@@ -521,6 +530,26 @@ sub delKeyInMySession {
     }
     return $self->p->sendJSONresponse( $req,
         { result => 1, count => $res, modifiedKeys => $dkey } );
+}
+
+sub getError {
+    my ( $self, $req, $lang, $errNum ) = @_;
+    $lang ||= 'en';
+    $errNum
+      ? $self->logger->debug("Send $lang error file path with error: $errNum")
+      : $self->logger->debug("Send $lang error file path");
+
+    return $self->p->sendJSONresponse(
+        $req,
+        {
+            result   => 1,
+            lang     => $lang,
+            errorNum => $errNum ? $errNum : 'all',
+            errorsFileURL =>
+              "$self->{conf}->{staticPrefix}/languages/$lang.json",
+            ( $errNum ? ( errorMsgRef => "PE$errNum" ) : () ),
+        }
+    );
 }
 
 1;

@@ -7,6 +7,7 @@ use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use XML::Simple;
+use HTML::Entities qw(decode_entities);
 use MIME::Base64;
 use HTTP::Request;         # SOAP call
 use POSIX qw(strftime);    # Convert SAML2 date into timestamp
@@ -19,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 # PROPERTIES
 
@@ -254,6 +255,11 @@ sub loadIDPs {
         }
 
         # Add this IDP to Lasso::Server
+        # TODO: when Lasso issue #35061 is fixed in all distros,
+        # we could load the metadata into a new LassoProvider, extract the
+        # parsed-and-decoded entityID from this Provider, and then add the
+        # Provider into the server with $server->add_provider2, instead of
+        # decoding HTML entities ourselves below
         my $result = $self->addIDP( $self->lassoServer, $idp_metadata );
 
         unless ($result) {
@@ -264,6 +270,11 @@ sub loadIDPs {
         # Store IDP entityID and Organization Name
         my ( $tmp, $entityID ) =
           ( $idp_metadata =~ /entityID=(['"])(.+?)\1/si );
+
+        # Decode HTML entities from entityID
+        # TODO: see Lasso comment above
+        decode_entities($entityID);
+
         my $name = $self->getOrganizationName( $self->lassoServer, $entityID )
           || ucfirst($_);
         $self->idpList->{$entityID}->{confKey} = $_;
@@ -351,6 +362,11 @@ sub loadSPs {
         }
 
         # Add this SP to Lasso::Server
+        # TODO: when Lasso issue #35061 is fixed in all distros,
+        # we could load the metadata into a new LassoProvider, extract the
+        # parsed-and-decoded entityID from this Provider, and then add the
+        # Provider into the server with $server->add_provider2, instead of
+        # decoding HTML entities ourselves below
         my $result = $self->addSP( $self->lassoServer, $sp_metadata );
 
         unless ($result) {
@@ -360,6 +376,11 @@ sub loadSPs {
 
         # Store SP entityID and Organization Name
         my ( $tmp, $entityID ) = ( $sp_metadata =~ /entityID=(['"])(.+?)\1/si );
+
+        # Decode HTML entities from entityID
+        # TODO: see Lasso comment above
+        decode_entities($entityID);
+
         my $name = $self->getOrganizationName( $self->lassoServer, $entityID )
           || ucfirst($_);
         $self->spList->{$entityID}->{confKey} = $_;
@@ -447,7 +468,7 @@ sub checkMessage {
             $self->logger->debug("HTTP-REDIRECT: SAML Artifact $artifact");
 
             # Resolve Artifact
-            $method = Lasso::Constants::HTTP_METHOD_ARTIFACT_GET;
+            $method  = Lasso::Constants::HTTP_METHOD_ARTIFACT_GET;
             $message = $self->resolveArtifact( $profile, $artifact, $method );
 
             # Request or response ?
@@ -2195,6 +2216,7 @@ sub getNameIDFormat {
 sub getHttpMethod {
     my ( $self, $method ) = @_;
 
+    $method ||= '';
     return Lasso::Constants::HTTP_METHOD_POST
       if ( $method =~ /^(http)?[-_]?post$/i );
     return Lasso::Constants::HTTP_METHOD_REDIRECT
@@ -2351,7 +2373,7 @@ sub getAuthnContext {
 sub timestamp2samldate {
     my ( $self, $timestamp ) = @_;
 
-    my @t = gmtime($timestamp);
+    my @t        = gmtime($timestamp);
     my $samldate = strftime( "%Y-%m-%dT%TZ", @t );
 
     $self->logger->debug(
@@ -2872,7 +2894,7 @@ sub createAttribute {
 
     # Default values
     $friendly_name ||= $name;
-    $format ||= Lasso::Constants::SAML2_ATTRIBUTE_NAME_FORMAT_BASIC;
+    $format        ||= Lasso::Constants::SAML2_ATTRIBUTE_NAME_FORMAT_BASIC;
 
     # Set attribute properties
     $attribute->Name($name);

@@ -2,8 +2,8 @@ NAME
     App::ListLanguages - List languages
 
 VERSION
-    This document describes version 0.003 of App::ListLanguages (from Perl
-    distribution App-ListLanguages), released on 2019-07-19.
+    This document describes version 0.004 of App::ListLanguages (from Perl
+    distribution App-ListLanguages), released on 2019-07-28.
 
 SYNOPSIS
      # Use via list-languages CLI script

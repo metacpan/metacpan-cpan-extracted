@@ -1,9 +1,9 @@
-use Test::More tests => 3;
+use Test2::Bundle::More;
 use strict;
 
-BEGIN { use_ok(qw(Audio::Nama::Globals) ) };
-
 use Audio::Nama::Globals qw($ui);
+use Audio::Nama::Log;
+Audio::Nama::Log::initialize_logger();
 
 is($ui, 'bullwinkle', 'global variable import');
 
@@ -13,12 +13,12 @@ use Audio::Nama::Globals qw(:all);
 
 main::is($ui, 'bullwinkle', 'global variable-all-tag import');
 
-1;
-__END__
+package main;
+
 use Audio::Nama::Assign qw(:all);
 # `make test'. After `make install' it should work as `perl 1.t'
 
-diag ("TESTING $0\n");
+#diag ("TESTING $0\n");
 
 my @test_classes = qw( :: main:: main); # SKIP_PREPROC
 use vars qw( $foo  @face $name %dict);
@@ -36,30 +36,27 @@ my $struct = {
 	dict => {fruit => 'melon'}
 };	
 for my $c (@test_classes) {
-	diag ("testing for class $c");
+	#diag ("testing for class $c");
 
 	assign (data => $struct, class => $c, vars => \@var_list);
-	#assign($struct, @var_list);
-		#print json_out(\%dict); 
-		#print json_out($struct);
 		my $serialized = serialize( class => $c, vars => \@var_list);  
-		# store_vars output as string
 
 	my $expected = <<WANT;
----
-dict:
-  fruit: melon
-face:
-  - 1
-  - 5
-  - 7
-  - 12
-foo: 2
-name: John
-...
+{
+   "dict" : {
+      "fruit" : "melon"
+   },
+   "face" : [
+      1,
+      5,
+      7,
+      12
+   ],
+   "foo" : 2,
+   "name" : "John"
+}
 WANT
 
-	diag("Serializing, storing and recalling data");
 	is( $foo, 2, "Scalar number assignment");
 	is( $name, 'John', "Scalar string assignment");
 	my $sum;
@@ -74,11 +71,11 @@ WANT
 		face => [],
 		dict => {},
 	};	
-	diag("scalar array: ",scalar @face, " scalar hash: ", scalar %dict); 
+	#diag("scalar array: ",scalar @face, " scalar hash: ", scalar %dict); 
 	assign (data => $nulls, class => 'main', vars => \@var_list);
 	is( scalar @face, 0, "Null array assignment");
 	is( scalar %dict, 0, "Null hash assignment");
 	
 
-1;
+done_testing();
 __END__

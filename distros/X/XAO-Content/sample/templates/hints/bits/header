@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML><HEAD><TITLE>Hint Window</TITLE>
+<STYLE TYPE="text/css">
+<!--
+.hint {
+    font-size: small;
+    font-family: sans-serif;
+}
+.hint_title {
+    font-size: medium;
+    font-weight: bold;
+}
+-->
+</STYLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFEE" CLASS="hint">
+
+<CENTER><A HREF="#" onClick="window.close()">Close this window</A></CENTER>
+<HR>

@@ -90,7 +90,7 @@ sub remove {
 
 	if ( defined $mix_track ){
 	 
-		$mix_track->unbusify;
+		$mix_track->set(rw => OFF);
 	
 		# remove mix track unless it has some WAV files
 
@@ -113,10 +113,10 @@ sub new_clip {
 	);
 	my $clip = Audio::Nama::Clip->new(
 		target => $track->basename,
-		name => $self->unique_clip_name($track->name, $track->monitor_version),
+		name => $self->unique_clip_name($track->name, $track->playback_version),
 		rw => PLAY,
 		group => $self->name,
-		version => $track->monitor_version,
+		version => $track->playback_version,
 		hide => 1,
 		%region_args,
 		%args
@@ -153,11 +153,12 @@ sub new_sequence {
 	my @tracks = defined $args{tracks} ? @{ $args{tracks} } : ();
 	my $group = $args{group} || 'Main';
 	my $mix_track = $tn{$name} || add_track($name, group => $group);
-	$mix_track->set( rw 			=> MON);
+	$mix_track->set( rw => MON,
+					 source_type => 'bus',
+					 source_id	 => $name,
+					);
 	my $sequence = Audio::Nama::Sequence->new(
 		name => $name,
-		send_type => 'track',
-		send_id	 => $name,
 	);
 ;
 	map{ $sequence->append_item($_) }

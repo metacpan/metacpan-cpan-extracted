@@ -1,5 +1,5 @@
-BEGIN {print "1..3\n";}
-END {print "not ok 1\n" unless $loaded;}
+BEGIN { print "1..3\n"; }
+END { print "not ok 1\n" unless $loaded; }
 use XML::Parser;
 $loaded = 1;
 print "ok 1\n";
@@ -8,27 +8,30 @@ my $cnt = 0;
 my $str;
 
 sub tmpchar {
-  my ($xp, $data) = @_;
+    my ( $xp, $data ) = @_;
 
-  if ($xp->current_element eq 'day') {
-    $str = $xp->original_string;
-    $xp->setHandlers(Char => 0);
-  }
+    if ( $xp->current_element eq 'day' ) {
+        $str = $xp->original_string;
+        $xp->setHandlers( Char => 0 );
+    }
 }
-      
-my $p = new XML::Parser(Handlers => {Comment => sub {$cnt++;},
-				     Char    => \&tmpchar
-				    });
+
+my $p = new XML::Parser(
+    Handlers => {
+        Comment => sub { $cnt++; },
+        Char => \&tmpchar
+    }
+);
 
 my $xpnb = $p->parse_start;
 
-open(REC, 'samples/REC-xml-19980210.xml');
+open( my $rec, '<', 'samples/REC-xml-19980210.xml' );
 
-while (<REC>) {
-  $xpnb->parse_more($_);
+while (<$rec>) {
+    $xpnb->parse_more($_);
 }
 
-close(REC);
+close($rec);
 
 $xpnb->parse_done;
 

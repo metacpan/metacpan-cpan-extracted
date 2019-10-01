@@ -9,6 +9,7 @@ Makefile.PL
 README
 README.md
 bin/fqc
+bin/fqlen.pl
 data/bad.fastq
 data/comments.fasta
 data/comments.fastq
@@ -20,6 +21,7 @@ data/test.fasta
 data/test.fastq
 data/test2.fastq
 dist.ini
+latest.tar.gz
 lib/FASTX/Reader.pm
 scripts/Counter.pl
 scripts/FastqReader.pl

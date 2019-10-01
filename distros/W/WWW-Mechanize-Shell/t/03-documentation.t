@@ -1,7 +1,7 @@
 use strict;
 use FindBin;
 
-use vars qw( @methods );
+our @methods;
 BEGIN {
   my $module = "$FindBin::Bin/../lib/WWW/Mechanize/Shell.pm";
   open MODULE, "< $module"

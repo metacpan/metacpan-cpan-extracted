@@ -10,7 +10,7 @@ use Test::Deep;
 use Test::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.004';
 
 sub http_read_unauthenticated : Test : Plan(4) {
   my ($self, $args) = @_;

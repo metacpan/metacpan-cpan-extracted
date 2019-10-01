@@ -2,11 +2,12 @@ use Test::More;
 use strict;
 use IO::String;
 
+my $userdb;
 BEGIN {
     eval {
-        unlink 't/userdb.db';
         require 't/test-lib.pm';
         require 't/smtp.pm';
+        $userdb = tempdb();
     };
 }
 
@@ -26,7 +27,7 @@ SKIP: {
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do(
         'CREATE TABLE users (user text,password text,name text, mail text)');
     $dbh->do(
@@ -43,7 +44,7 @@ SKIP: {
                 passwordDB                  => 'DBI',
                 captcha_mail_enabled        => 0,
                 portalDisplayResetPassword  => 1,
-                dbiAuthChain                => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain                => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser                 => '',
                 dbiAuthPassword             => '',
                 dbiAuthTable                => 'users',
@@ -168,7 +169,6 @@ SKIP: {
     #print STDERR Dumper($query);
 }
 
-eval { unlink 't/userdb.db' };
 count($maintests);
 clean_sessions();
 done_testing( count() );

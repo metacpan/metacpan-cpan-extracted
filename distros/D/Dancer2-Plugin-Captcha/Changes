@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Captcha
 
+0.12  Fri Sep 27 18:05:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.11  Mon Apr 24 14:50:00 2017
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

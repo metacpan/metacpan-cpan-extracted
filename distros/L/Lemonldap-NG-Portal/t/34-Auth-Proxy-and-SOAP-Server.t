@@ -23,7 +23,7 @@ LWP::Protocol::PSGI->register(
         my $host = $1;
         my $url  = $2;
         my $res;
-        my $s = $req->content;
+        my $s      = $req->content;
         my $client = ( $host eq 'idp' ? $issuer : $sp );
         switch ( $host eq 'idp' ? 'issuer' : 'sp' );
         ok(

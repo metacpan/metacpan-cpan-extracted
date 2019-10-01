@@ -6,7 +6,7 @@ use strict;
 use JSON;
 require 't/test-lib.pm';
 
-my $struct = 't/jsonfiles/11-modified-with-confirmation.json';
+my $struct    = 't/jsonfiles/11-modified-with-confirmation.json';
 my $confFiles = [ 't/conf/lmConf-1.json', 't/conf/lmConf-2.json' ];
 
 sub body {
@@ -54,8 +54,8 @@ ok(
 ) or print STDERR Dumper($resBody);
 
 ok(
-    @{ $resBody->{details}->{__changes__} } == 22,
-    'JSON response contains 24 changes'
+    @{ $resBody->{details}->{__changes__} } == 23,
+    'JSON response contains 23 changes'
 ) or print STDERR Dumper($resBody);
 
 #print STDERR Dumper($resBody);
@@ -76,24 +76,24 @@ while ( my $c = shift @{ $resBody->{details}->{__changes__} } ) {
     my $cmp1 = @changes;
     my $cmp2 = @cmsg;
 
-    my @d1 = grep { $_->{key} eq $c->{key} } @changes;
-    my @d2 = grep { $_->{key} eq $c->{key} } @cmsg;
-    @changes = grep { $_->{key} ne $c->{key} } @changes;
-    @cmsg    = grep { $_->{key} ne $c->{key} } @cmsg;
-    if ( $c->{key} eq 'applicationList' ) {
+    @changes = grep { ( $_->{key} || '' ) ne ( $c->{key} || '' ) } @changes;
+    @cmsg    = grep { ( $_->{key} || '' ) ne ( $c->{key} || '' ) } @cmsg;
+    if ( $c->{key} and $c->{key} eq 'applicationList' ) {
         pass qq("$c->{key}" found);
+        count(1);
     }
-    else {
+    elsif ( $c->{key} ) {
         ok( ( $cmp1 - @changes ) == ( $cmp2 - @cmsg ), qq("$c->{key}" found) )
           or print STDERR 'Expect: '
           . ( $cmp1 - @changes )
           . ', got: '
           . ( $cmp2 - @cmsg )
-          . "\nExpect: "
-          . Dumper( \@d1 ) . "Got: "
-          . Dumper( \@d2 );
+          . "\nChanges "
+          . Dumper( \@changes )
+          . "Cmsg: "
+          . Dumper( \@cmsg );
+        count(1);
     }
-    count(1);
 }
 ok( !@changes, 'All changes detected' ) or $bug = 1;
 
@@ -113,11 +113,10 @@ ok( $res = &client->jsonResponse('/diff/1/2'), 'Diff called' );
 my ( @c1, @c2 );
 ok( ( @c1 = sort keys %{ $res->[0] } ), 'diff() detects changes in conf 1' );
 ok( ( @c2 = sort keys %{ $res->[1] } ), 'diff() detects changes in conf 2' );
-ok( @c1 == 12, '11 keys changed in conf 1' )
+ok( @c1 == 12, '12 keys changed in conf 1' )
   or print STDERR "Expect: 12 keys, get: " . join( ', ', @c1 ) . "\n";
-ok( @c2 == 16, '14 keys changed or created in conf 2' )
+ok( @c2 == 16, '16 keys changed or created in conf 2' )
   or print STDERR "Expect: 16 keys, get: " . join( ',', @c2 ) . "\n";
-
 count(5);
 
 unlink $confFiles->[1];
@@ -246,6 +245,10 @@ sub changes {
             'new' => 0,
             'key' => 'captcha_mail_enabled',
             'old' => '1'
+        },
+        {
+            'confCompacted' => '1',
+            'removedKeys' => 'some; keys'
         }
     ];
 }

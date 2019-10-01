@@ -20,7 +20,6 @@ inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/unicore/Name.pm
 inc/YAML/Tiny.pm
 lib/RT/CustomFieldValues/AnnounceGroups.pm
 lib/RT/Extension/Announce.pm
@@ -33,3 +32,4 @@ README
 static/css/announce.css
 static/js/announce.js
 xt/basic.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

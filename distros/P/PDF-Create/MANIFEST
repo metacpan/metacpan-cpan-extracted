@@ -48,10 +48,10 @@ t/51-memory-leak.t
 t/99-wifi-parabola.t
 t/pdf-logo.gif
 t/pdf-logo.jpg
-t/pod.t
-t/manifest.t
-t/changes.t
-t/meta-json.t
-t/meta-yml.t
+xt/pod.t
+xt/manifest.t
+xt/changes.t
+xt/meta-json.t
+xt/meta-yml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

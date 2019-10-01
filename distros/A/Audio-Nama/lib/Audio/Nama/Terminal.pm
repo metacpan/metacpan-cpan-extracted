@@ -198,16 +198,23 @@ sub detect_spacebar {
 	
 	$project->{events}->{stdin} = AE::io(*STDIN, 0, sub {
 		&{$text->{term_attribs}->{'callback_read_char'}}();
-		if ( $config->{press_space_to_start} and 
-			$text->{term_attribs}->{line_buffer} eq " " 
+		my $buffer = $text->{term_attribs}->{line_buffer};
+		my $trigger = ' ';
+		if ( $config->{press_space_to_start} 
+				and ($buffer eq $trigger)
 				and ! ($mode->song or $mode->live) )
 		{ 	
 			toggle_transport();	
+
+			# reset command line, read next char
+			
 			$text->{term_attribs}->{line_buffer} = q();
 			$text->{term_attribs}->{point} 		= 0;
 			$text->{term_attribs}->{end}   		= 0;
 			$text->{term}->stuff_char(10);
 			&{$text->{term_attribs}->{'callback_read_char'}}();
+
+			
 		}
 		elsif (  $text->{term_attribs}->{line_buffer} eq "#" ){
 			setup_hotkeys();
@@ -218,64 +225,72 @@ sub throw {
 	logsub("&throw");
 	pager_newline(@_)
 }
-sub pagers {
-	logsub("&pagers");
-	my $output = join "", @_; 
-	chomp $output;
-	pager($output, $/)
-}
+sub pagers { &pager_newline(join "",@_) } # pass arguments along
+
 sub pager_newline { 
-	my @lines = map { my $s = $_; chomp $s; $s .="\n"; $s } @_;
+
+	# Add a newline if necessary to each line
+	# push them onto the output buffer
+	# print them to the screen
+	
+	my @lines = @_;
+	for (@lines){ $_ .= "\n" if  ! /\n$/ }
 	push @{$text->{output_buffer}}, @lines;
-	print @lines;
+	print(@lines);
+}
+
+sub paging_allowed {
+
+		# The pager interferes with GUI and testing
+		# so do not use the pager in these conditions
+		# or if use_pager config variable is not set.
+		
+		$config->{use_pager} 
+		and ! $config->{opts}->{T}
 }
 sub pager {
+
+	# push array onto output buffer, add two newlines
+	# and print on terminal or view in pager
+	# as appropriate
+	
 	logsub("&pager");
 	my @output = @_;
-
-	# this buffer is used to return results of OSC commands 
-	# the OSC client clears it after sending
-	
-	$text->{output_buffer} //= [];
-	push @{$text->{output_buffer}}, @output, "\n\n";
-
-	my $line_count = 0;
-	map{ $line_count += $_ =~ tr(\n)(\n) } @output;
-	if 
-	( 
-		(ref $ui) =~ /Text/  # pager interferes with GUI
-		and $config->{use_pager} 
-		and ! $config->{opts}->{T}
-		and $line_count > $text->{screen_lines} - 2
-	) { 
-		my $fh = File::Temp->new();
-		my $fname = $fh->filename;
-		print $fh @output;
-		file_pager($fname);
-	} else {
-		print @output;
-	}
-	print "\n\n";
+	@output or return;
+	chomp $output[-1];
+	$output[-1] .= "\n\n";
+	push @{$text->{output_buffer}}, @output;
+	page_or_print(@output);
+	1
 }
 
-sub mandatory_pager {
-	logsub("&mandatory_pager");
+sub init_output_buffer { $text->{output_buffer} //= [] };
+
+sub linecount {
 	my @output = @_;
-	if 
-	( 
-		(ref $ui) =~ /Text/  # pager interferes with GUI
-		and $config->{use_pager} 
-	) { 
-		my $fh = File::Temp->new();
-		my $fname = $fh->filename;
-		print $fh @output;
-		file_pager($fname);
-	} else {
-		print @output;
-	}
-	print "\n\n";
-} 
+	my $linecount = 0;
+	for (@output){ $linecount += $_ =~ tr(\n)(\n) }
+	$linecount
+}
+
+sub page_or_print {
+	my (@output) = @_;
+	@output = map{"$_\n"} map{ split "\n"} @output;
+	return unless scalar @output;
+	print(@output), return if !paging_allowed() or scalar(@output) <= $text->{screen_lines} - 2;
+	write_to_temp_file_and_view(@output)
+}
+sub write_to_temp_file_and_view {
+	my @output = @_;
+	my $fh = File::Temp->new();
+	my $fname = $fh->filename;
+	print $fh @output;
+	file_pager($fname);
+}
 sub file_pager {
+
+	# given a filename, run the pager on it
+	
 	logsub("&file_pager");
 	my $fname = shift;
 	if (! -e $fname or ! -r $fname ){
@@ -310,7 +325,7 @@ sub get_ecasound_iam_keywords {
 									?	);
 	
 	%{$text->{iam}} = map{$_,1 } 
-				grep{ ! $reserved{$_} } split /[\s,]/, eval_iam('int-cmd-list');
+				grep{ ! $reserved{$_} } split /[\s,]/, ecasound_iam('int-cmd-list');
 }
 sub load_keywords {
 	my @keywords = keys %{$text->{commands}};
@@ -321,7 +336,7 @@ sub load_keywords {
 	push @keywords, grep{$_} map{split " ", $text->{commands}->{$_}->{short}} @keywords;
 	push @keywords, keys %{$text->{iam}};
 	push @keywords, keys %{$fx_cache->{partial_label_to_full}};
-	push @keywords, keys %{$midi->{keywords}} if $config->{use_midish};
+	push @keywords, keys %{$text->{midi_cmd}} if $config->{use_midi};
 	push @keywords, "Audio::Nama::";
 	@{$text->{keywords}} = @keywords
 }

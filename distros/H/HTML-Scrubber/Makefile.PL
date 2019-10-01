@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "HTML::Entities" => 0,
     "HTML::Parser" => "3.47",
-    "List::Util" => 0,
+    "List::Util" => "1.33",
     "Scalar::Util" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "utf8" => 0
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "HTML::Entities" => 0,
   "HTML::Parser" => "3.47",
-  "List::Util" => 0,
+  "List::Util" => "1.33",
   "Scalar::Util" => 0,
   "Test" => 0,
   "Test::Differences" => 0,

@@ -1,5 +1,5 @@
 package IO::Pager;
-our $VERSION = "0.42"; #Untouched since 0.42
+our $VERSION = "0.43"; #Untouched since 0.43
 
 use 5.008; #At least, for decent perlio, and other modernisms
 use strict;
@@ -12,13 +12,15 @@ use Symbol;
 use overload '+' => "PID", bool=> "PID";
 
 our $SIGPIPE;
+our $oldPAGER = $PAGER;
 
 sub find_pager {
   # Return the name (or path) of a pager that IO::Pager can use
   my $io_pager;
 
   #Permit explicit use of pure perl pager
-  return $_[0] if $_[0] eq 'Term::Pager';
+  local $_ = 'Term::Pager';
+  return $_ if $_[0] eq $_ or $PAGER eq $_;
 
   # Use File::Which if available (strongly recommended)
   my $which = eval { require File::Which };
@@ -44,7 +46,7 @@ sub find_pager {
     $io_pager = _check_pagers(\@pagers, $which );
   }
 
-  # If all else fails, default to more
+  # If all else fails, default to more (actually Term::Pager first)
   $io_pager ||= 'more';
 
   return $io_pager;
@@ -77,10 +79,14 @@ sub _check_pagers {
 BEGIN { # Set the $ENV{PAGER} to something reasonable
   $PAGER = find_pager();
 
-  #Do we have modern Term::Pager? If so, use it instead of hopeful more
-  if( $PAGER eq 'more' ){
-      eval "use Term::Pager";
-      $PAGER = 'Term::Pager' unless $@;
+  #We have a hack to get modern Term::Pager for now
+  ##Do we have modern Term::Pager? If so, use it instead of hopeful more
+  if( ($PAGER =~ 'more' and $oldPAGER ne 'more') or $PAGER eq 'Term::Pager' ){
+      my $io_pager = $PAGER;
+      eval "use IO::Pager::Perl";
+      $PAGER = $io_pager if $@ or not defined $PAGER;
+  #    eval "use Term::Pager 1.5";
+  #    $PAGER = 'Term::Pager' unless $@;
   }
 }
 
@@ -510,6 +516,8 @@ executable.
 
 =item /usr/bin/less
 
+=item tp via L<IO::Pager::Perl>
+
 =item /usr/bin/more
 
 =back
@@ -536,10 +544,15 @@ Try the standard, hardcoded paths in L</FILES>.
 If File::Which is available, use the first pager possible amongst
 C<less>, C<most>, C<w3m>, C<lv>, C<pg> and L<more>.
 
-=item 4. Term::Pager
+=item 4. Term::Pager via IO::Pager::Perl
+
+=cut
 
 If instantiating an IO::Pager object and Term::Pager version 1.5 or greater is
-available, L<IO::Pager::Perl> will be used. You may also set $ENV{PAGER} to
+available, L<IO::Pager::Perl> will be used.
+
+=pod
+You may also set $ENV{PAGER} to
 Term::Pager to select this extensible, pure perl pager for display.
 
 =item 5. more
@@ -580,7 +593,7 @@ This module was inspired by Monte Mitzelfelt's IO::Page 0.02
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2018 Jerrad Pierce
+Copyright (C) 2003-2019 Jerrad Pierce
 
 =over
 

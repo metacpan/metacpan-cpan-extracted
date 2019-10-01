@@ -1,0 +1,10 @@
+1.00 - 13-Jan-2005
+    * Initial public release
+      (though the code has been working fine since 2001)
+
+0.02  Tue Apr  2 15:58:52 PST 2002
+    * changed the way thumbnails are handled
+
+0.01  Sat Dec 29 22:50:28 2001
+	* original version; created by h2xs 1.20 with options
+		-XA -n XAO::ImageCache

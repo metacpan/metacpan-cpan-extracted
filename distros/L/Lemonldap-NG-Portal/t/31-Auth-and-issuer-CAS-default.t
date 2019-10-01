@@ -14,6 +14,9 @@ my $debug = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
 
+eval { require XML::Simple };
+plan skip_all => "Missing dependencies: $@" if ($@);
+
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
     sub {
@@ -174,7 +177,7 @@ count(1);
 my $url = $1;
 $query = $2;
 ok( getHeader( $res, 'Content-Security-Policy' ) =~ /child-src auth.idp.com/,
-    'Frame is authorizated' )
+    'Frame is authorized' )
   or
   explain( $res->[1], 'Content-Security-Policy => ...child-src auth.idp.com' );
 count(1);

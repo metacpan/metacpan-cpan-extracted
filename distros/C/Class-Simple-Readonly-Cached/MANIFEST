@@ -5,13 +5,15 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 t/carp.t
-t/class.t
+t/chi.t
+t/hash.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t
 t/port.t
+t/spelling.t
 t/unused.t
 t/used.t
 t/vars.t

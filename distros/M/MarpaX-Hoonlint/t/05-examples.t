@@ -6,11 +6,17 @@ use warnings;
 
 use Data::Dumper;
 use English qw( -no_match_vars );
+use IPC::Cmd qw[run_forked];
+use Test::More ( import => [] );
 
-use Test::More tests => 12;
+if (IPC::Cmd->can_use_run_forked()) {
+    Test::More::plan tests => 12;
+}
+else {
+    Test::More::plan skip_all => 'Cannot call run_forked()';
+}
 
 use Test::Differences;
-use IPC::Cmd qw[run_forked];
 
 sub slurp {
     my ($fileName) = @_;

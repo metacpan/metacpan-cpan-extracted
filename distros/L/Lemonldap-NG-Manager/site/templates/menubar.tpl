@@ -21,7 +21,7 @@
           <!-- Last buttons, available languages -->
         </div>
         <ul class="hidden-xs nav navbar-nav" role="grid">
-          <li ng-repeat="l in links" id="l in links"><a href="{{l.target}}" role="row" ng-mouseup="clickStyle={color: '#ffb84d'}"><strong><i ng-if="activeModule == l.title" ng-style="myStyle" class="glyphicon glyphicon-{{l.icon}}"></i><i ng-if="activeModule != l.title" class="glyphicon glyphicon-{{l.icon}}" ng-style="clickStyle"></i> <span ng-if="activeModule == l.title" ng-style="myStyle" ng-bind="translate(l.title)"></span><span ng-if="activeModule != l.title" ng-bind="translate(l.title)" ng-style="clickStyle"></span></strong></a></li>
+          <li ng-repeat="l in links" id="l in links"><a href="{{l.target}}" role="row"><strong><i ng-if="activeModule == l.title" ng-style="myStyle" class="glyphicon glyphicon-{{l.icon}}"></i><i ng-if="activeModule != l.title" class="glyphicon glyphicon-{{l.icon}}" ng-style="clickStyle"></i> <span ng-if="activeModule == l.title" ng-style="myStyle" ng-bind="translate(l.title)"></span><span ng-if="activeModule != l.title" ng-bind="translate(l.title)" ng-style="clickStyle"></span></strong></a></li>
         </ul>
         <ul class="hidden-xs nav navbar-nav navbar-right">
           <li uib-dropdown>

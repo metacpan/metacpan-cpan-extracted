@@ -11,7 +11,7 @@ use Carp qw(confess croak);
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # these defaults set from what the online version does at
 # http://akana.conlang.org/tools/awkwords/
@@ -24,12 +24,12 @@ my %patterns = (
 has pattern => (
     is      => 'rw',
     trigger => sub {
-        my ( $self, $pat ) = @_;
+        my ($self, $pat) = @_;
         die "subpattern $pat does not exist" unless exists $patterns{$pat};
-        $self->_set_target( $patterns{$pat} );
+        $self->_set_target($patterns{$pat});
     },
 );
-has target => ( is => 'rwp', );
+has target => (is => 'rwp',);
 
 ########################################################################
 #
@@ -40,7 +40,7 @@ sub get_patterns {
 }
 
 sub is_pattern {
-    my ( undef, $pat ) = @_;
+    my (undef, $pat) = @_;
     return exists $patterns{$pat};
 }
 
@@ -56,10 +56,10 @@ sub render {
     # create loops where a ->render points to itself (don't do that))
     #
     # NOTE walk sub must be kept in sync with this logic
-    if ( !$type ) {
+    if (!$type) {
         $ret = $target;
     } else {
-        if ( $type eq 'ARRAY' ) {
+        if ($type eq 'ARRAY') {
             # do not need Math::Random::Discrete here as the weights are
             # always equal; for weighted instead write that unit out
             # manually via [a*2/e/i/o/u] or such
@@ -75,7 +75,7 @@ sub set_patterns {
     my $class_or_self = shift;
     # TODO error checking here may be beneficial if callers are in the
     # habit of passing in data that blows up on ->render or ->walk
-    %patterns = ( %patterns, @_ );
+    %patterns = (%patterns, @_);
     return $class_or_self;
 }
 
@@ -98,7 +98,7 @@ sub update_pattern {
 }
 
 sub walk {
-    my ( $self, $callback ) = @_;
+    my ($self, $callback) = @_;
 
     $callback->($self);
 
@@ -106,7 +106,7 @@ sub walk {
     my $type   = ref $target;
 
     # NOTE this logic must be kept in sync with render sub
-    if ( $type and $type ne 'ARRAY' ) {
+    if ($type and $type ne 'ARRAY') {
         $target->walk($callback);
     }
     return;

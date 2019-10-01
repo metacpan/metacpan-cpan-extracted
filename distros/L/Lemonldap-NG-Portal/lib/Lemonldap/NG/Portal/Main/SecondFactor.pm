@@ -10,9 +10,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Auth::_WebForm
+);
 
 # INITIALIZATION
 
@@ -27,14 +30,22 @@ has ott => (
     }
 );
 
-has prefix => ( is => 'rw' );
-
-has logo => ( is => 'rw', default => '2f.png' );
-
+has prefix  => ( is => 'rw' );
+has logo    => ( is => 'rw', default => '2f.png' );
+has label   => ( is => 'rw' );
 has noRoute => ( is => 'ro' );
 
 sub init {
     my ($self) = @_;
+
+    # Set logo if overriden
+    $self->logo( $self->conf->{ $self->prefix . "2fLogo" } )
+      if ( $self->conf->{ $self->prefix . "2fLogo" } );
+
+    # Set label if provided, translation files will be used otherwise
+    $self->label( $self->conf->{ $self->prefix . "2fLabel" } )
+      if ( $self->conf->{ $self->prefix . "2fLabel" } );
+
     unless ( $self->noRoute ) {
         $self->logger->debug( 'Adding ' . $self->prefix . '2fcheck routes' );
         $self->addAuthRoute(
@@ -75,6 +86,7 @@ sub _verify {
     my $token;
     unless ( $token = $req->param('token') ) {
         $self->userLogger->error( $self->prefix . ' 2F access without token' );
+        eval { $self->setSecurity($req) };
         $req->mustRedirect(1);
         return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
     }
@@ -82,6 +94,7 @@ sub _verify {
     my $session;
     unless ( $session = $self->ott->getToken($token) ) {
         $self->userLogger->info('Token expired');
+        $self->setSecurity($req);
         return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
     }
 

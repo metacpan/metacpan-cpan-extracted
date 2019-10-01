@@ -6,7 +6,6 @@ use strict;
 
 use lib 'lib','t';
 use TestTools;
-use Test::Deep   qw/cmp_deeply/;
 use MIME::Base64;
 use XML::LibXML;
 
@@ -87,7 +86,7 @@ compare_xml($xml1a, $msg1_soap);
 my $hash1 = $receiver->($msg1_soap);
 is(ref $hash1, 'HASH', 'produced HASH');
 
-cmp_deeply($hash1, $msg1_data, "server parsed input");
+is_deeply($hash1, $msg1_data, "server parsed input");
 
 ###
 ### Now with a XOP::Include
@@ -165,5 +164,5 @@ my $exp2 = { request =>
   , second => "Hello, World!\n"
   }};
 
-cmp_deeply($hash2, $exp2 , "server parsed input");
+is_deeply($hash2, $exp2 , "server parsed input");
 

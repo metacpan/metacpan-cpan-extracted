@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::Combination::Parser;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_FIRSTACCESS);
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 # TODO: See Lib::Wrapper
 extends 'Lemonldap::NG::Portal::Main::Auth';
@@ -98,55 +98,76 @@ sub init {
 
 # Each first method must call getStack() to get the auth scheme available for
 # the current user
-sub extractFormInfo {
-    my ( $self, $req ) = @_;
-    return $self->try( 0, 'extractFormInfo', $req );
-}
 
-# Note that UserDB::Combination uses the same object.
-sub getUser {
-    return $_[0]->try( 1, 'getUser', $_[1] );
+## Auth steps
+#############
+sub extractFormInfo {
+    my $self = shift;
+    return $self->try( 0, 'extractFormInfo', @_ );
 }
 
 sub authenticate {
-    return $_[0]->try( 0, 'authenticate', $_[1] );
+    my $self = shift;
+    return $self->try( 0, 'authenticate', @_ );
 }
 
 sub setAuthSessionInfo {
-    return $_[0]->try( 0, 'setAuthSessionInfo', $_[1] );
-}
-
-sub setSessionInfo {
-    return $_[0]->try( 1, 'setSessionInfo', $_[1] );
-}
-
-sub setGroups {
-    return $_[0]->try( 1, 'setGroups', $_[1] );
+    my $self = shift;
+    return $self->try( 0, 'setAuthSessionInfo', @_ );
 }
 
 sub getDisplayType {
-    my ( $self, $req ) = @_;
+    my $self = shift;
+    my ($req) = @_;
     return $self->conf->{combinationForms}
       if ( $self->conf->{combinationForms} );
+
     my ( $nb, $stack ) = (
         $req->data->{dataKeep}->{combinationTry},
         $req->data->{combinationStack}
     );
-    my ( $res, $name ) = $stack->[$nb]->[0]->( 'getDisplayType', $req );
+    my ( $res, $name ) = $stack->[$nb]->[0]->( 'getDisplayType', @_ );
     return $res;
 }
 
 sub authLogout {
-    my ( $self, $req ) = @_;
+    my $self = shift;
+    my ($req) = @_;
     $self->getStack( $req, 'extractFormInfo' ) or return PE_ERROR;
 
     # Avoid warning msg at first access
-    $req->userData->{_combinationTry} ||= '';
+    $req->userData->{_combinationTry} ||= 0;
     my ( $res, $name ) =
       $req->data->{combinationStack}->[ $req->userData->{_combinationTry} ]
-      ->[0]->( 'authLogout', $req );
+      ->[0]->( 'authLogout', @_ );
     $self->logger->debug(qq'User disconnected using scheme "$name"');
     return $res;
+}
+
+sub authFinish {
+    PE_OK;
+}
+
+sub authForce {
+    return 0;
+}
+
+## UserDB steps
+###############
+# Note that UserDB::Combination uses the same object.
+sub getUser {
+    my $self = shift;
+    return $self->try( 1, 'getUser', @_ );
+}
+
+sub setSessionInfo {
+    my $self = shift;
+    return $self->try( 1, 'setSessionInfo', @_ );
+}
+
+sub setGroups {
+    my $self = shift;
+    return $self->try( 1, 'setGroups', @_ );
 }
 
 sub getStack {
@@ -164,7 +185,7 @@ sub getStack {
 
 # Main running method: launch the next scheme if the current fails
 sub try {
-    my ( $self, $type, $subname, $req ) = @_;
+    my ( $self, $type, $subname, $req, @args ) = @_;
 
     # Get available authentication schemes for this user if not done
     unless ( defined $req->data->{combinationStack} ) {
@@ -177,10 +198,11 @@ sub try {
 
     # If more than 1 scheme is available
     my ( $res, $name );
+
     if ( $nb < @$stack - 1 ) {
 
         # TODO: change logLevel for userLog()
-        ( $res, $name ) = $stack->[$nb]->[$type]->( $subname, $req );
+        ( $res, $name ) = $stack->[$nb]->[$type]->( $subname, $req, @args );
 
         # On error, restart authentication with next scheme
         if ( $res > PE_OK ) {
@@ -192,7 +214,7 @@ sub try {
         }
     }
     else {
-        ( $res, $name ) = $stack->[$nb]->[$type]->( $subname, $req );
+        ( $res, $name ) = $stack->[$nb]->[$type]->( $subname, $req, @args );
     }
     $req->sessionInfo->{ [ '_auth', '_userDB' ]->[$type] } = $name;
     $req->sessionInfo->{_combinationTry} =
@@ -216,7 +238,6 @@ sub name {
 package Lemonldap::NG::Portal::Lib::Combination::UserLogger;
 
 # This logger rewrite "warn" to "notice"
-
 sub new {
     my ( $class, $realLogger ) = @_;
     return bless { logger => $realLogger }, $class;

@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -156,11 +156,19 @@ sub set {
         -f $path ? %{ $self->_parse_content( $path->slurp ) } : (),
         %$params,
     );
-    my $content = $self->_deparse_content( \%item );
-    #; say "Set to $path:\n$content";
+
+    if ( $params->{path} ) {
+      my $new_path = $self->path->child( $self->_id_to_path( $params->{path} ) );
+      if ( -f $path and $new_path ne $path ) {
+         $path->remove;
+      }
+      $path = $new_path;
+    }
     if ( !-d $path->dirname ) {
         $path->dirname->make_path;
     }
+    my $content = $self->_deparse_content( \%item );
+    #; say "Set to $path:\n$content";
     $path->spurt( $content );
     return 1;
 }
@@ -255,6 +263,14 @@ sub _parse_content {
         # Before the marker is YAML
         eval {
             %item = %{ YAML::Load( join "\n", splice( @lines, 0, $i ), "" ) };
+            %item = map {$_ => do {
+              # YAML.pm 1.29 doesn't parse 'true', 'false' as booleans
+              # like the schema suggests: https://yaml.org/spec/1.2/spec.html#id2803629
+              my $v = $item{$_};
+              $v = JSON::PP::false if $v eq 'false';
+              $v = JSON::PP::true if $v eq 'true';
+              $v
+            }} keys %item;
         };
         if ( $@ ) {
             die qq{Error parsing YAML\n$@};
@@ -297,7 +313,10 @@ sub _parse_content {
 sub _deparse_content {
     my ( $self, $item ) = @_;
     my %data =
-        map { $_ => $item->{ $_ } }
+        map { $_ => do {
+        my $v = $item->{ $_ };
+          JSON::PP::is_bool($v) ? $v ? 'true' : 'false' : $v
+        }}
         grep { !/^(?:markdown|html|path)$/ }
         keys %$item;
     return YAML::Dump( \%data ) . "---\n". $item->{markdown};
@@ -315,7 +334,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

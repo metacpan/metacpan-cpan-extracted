@@ -138,5 +138,20 @@ subtest 'cache + create class' => sub {
 
 };
 
+use Hash::Wrap ({
+    -as     => 'test_can',
+    -class  => 'My::TestCan',
+  });
+
+
+subtest 'can() on existing attribute without constructed accessor' => sub {
+
+    my $obj = test_can { a => 1 };
+
+    ok(  lives { $obj->can('a') },
+         'constructs accessor' );
+
+};
+
 
 done_testing;

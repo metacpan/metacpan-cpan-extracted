@@ -1,57 +1,69 @@
-use strict;
-use warnings;
-
 use Test::Most;
-use File::Path qw( mkpath rmtree );
-use lib 't';
-use TestLib qw( t_module t_startup t_teardown t_capture );
+use File::Basename 'dirname';
+use File::Path 'rmtree';
+use Test::Output;
+use Try::Tiny;
 
-exit main();
-
-sub main {
-    require_ok( t_module() );
-
-    basic();
-    watch_file();
-
-    done_testing();
-    return 0;
+sub set_state {
+    chdir( dirname($0) . '/init' );
+    rmtree('.dest');
+    open( my $out, '>', 'dest.watch' );
+    print $out "actions\n";
+    close $out;
 }
+set_state();
 
-sub basic {
-    t_startup();
+use_ok('App::Dest');
 
-    eval{ t_module->init };
-    ok( !$@, 'init' );
+stderr_is(
+    sub { App::Dest->init },
+    "Created new watch list based on dest.watch file:\n  actions\n",
+    'init succeeds',
+);
 
-    ok( -d '.dest', 'init() += directory' );
-    ok( -f '.dest/watch', 'init() += watch file' );
+ok( -d '.dest', '.dest created' );
+ok( -f '.dest/watch', '.dest/watch created' );
 
-    throws_ok( sub { t_module->init }, qr/Project already initialized/, 'project already initialized' );
-
-    t_teardown();
-}
-
-sub watch_file {
-    t_startup();
-
-    my $dest_watch;
-    ok( open( $dest_watch, '>', 'dest.watch' ) || 0, 'open dest.watch file for write' );
-
-    for ( qw( a b c ) ) {
-        mkpath($_);
-        print $dest_watch $_, "\n";
+stderr_is( sub {
+    try {
+        App::Dest->init;
     }
-    close $dest_watch;
+    catch {
+        warn $_;
+    };
+}, "Project already initialized\n", 'init again fails' );
 
-    is(
-        ( t_capture( sub { t_module->init } ) )[1],
-        "Created new watch list based on dest.watch file:\n  a\n  b\n  c\n",
-        'init with dest.watch',
-    );
+stderr_is( sub {
+    try {
+        App::Dest->add('actions');
+    }
+    catch {
+        warn $_;
+    };
+}, "Directory actions already added\n", 'no re-add actions' );
 
-    ok( -f '.dest/watch', 'init() += watch file with dest.watch' );
-    ok( -d '.dest', 'init() += directory with dest.watch' );
+lives_ok( sub { App::Dest->rm('actions') }, 'rm actions' );
+stdout_is( sub { App::Dest->watches }, '', 'watches (no results)' );
+lives_ok( sub { App::Dest->add('actions') }, 'add actions' );
 
-    t_teardown();
-}
+stderr_is( sub {
+    try {
+        App::Dest->add('not_exists');
+    }
+    catch {
+        warn $_;
+    };
+}, "Directory specified does not exist\n", 'no add not exists' );
+
+stdout_is( sub { App::Dest->watches }, "actions\n", 'watches (results)' );
+lives_ok( sub { App::Dest->putwatch('dest.watch2') }, 'putwatch' );
+stdout_is( sub { App::Dest->watches }, "actions\nactions2\n", 'watches (results) 2' );
+lives_ok( sub { App::Dest->writewatch }, 'writewatch' );
+
+open( my $in, '<', 'dest.watch' );
+is( join( '', <$in> ), "actions\nactions2\n", 'new dest.watch is correct' );
+
+stdout_like( sub { App::Dest->version }, qr/^dest version [\d\.]+$/, 'version' );
+
+set_state();
+done_testing();

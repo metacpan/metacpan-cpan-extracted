@@ -6,6 +6,9 @@ use Alien::Foo;
 use Alien::libfoo1;
 use Env qw( @PATH );
 use ExtUtils::CBuilder;
+use Alien::Build::Util qw( _dump );
+use List::Util 1.33 qw( any );
+use Config;
 
 sub _reset
 {
@@ -659,6 +662,78 @@ EOF
     my($mod) = @_;
     is($mod->answer, 42);
   };
+
+  my $cbuilder_config;
+
+  no warnings 'once';
+  local *ExtUtils::CBuilder::new = do {
+    my $orig = ExtUtils::CBuilder->can('new');
+    sub {
+      my $class = shift;
+      my %args = @_;
+      $cbuilder_config = $args{config};
+      $class->$orig(@_);
+    };
+  };
+
+  xs_ok { xs => $xs, cbuilder_config => { foo => 'bar' } };
+
+  is
+    $cbuilder_config,
+    hash {
+      field 'foo' => 'bar';
+      etc;
+    }
+  ;
+
+};
+
+subtest 'with_subtest SEGV' => sub {
+
+  # it may be possible to catch a segmentation fault,
+  # but not with signal handlers apparently.  See:
+  # https://feepingcreature.github.io/handling.html
+  skip_all 'Catching SEGV not currently supported on Windows' if $^O eq 'MSWin32';
+
+  skip_all 'Test requires platforms with SEGV signal' if ! any { $_ eq 'SEGV' } split /\s+/, $Config{sig_name};
+
+  our $kill_line;
+
+  my $st = with_subtest {
+    note 'one';
+    kill 'SEGV', $$; BEGIN { $kill_line = __LINE__ };
+    note 'two';
+  };
+
+  my $e;
+
+  is(
+    $e = intercept {
+      $st->();
+    },
+    array {
+      event Note => sub {
+        call message => 'one';
+      };
+      event Bail => sub {
+        call reason => 'Segmentation fault';
+        call facet_data => hash {
+          field trace => hash {
+            field frame => array {
+              item 'main';
+              item __FILE__;
+              item $kill_line;
+              etc;
+            };
+            etc;
+          };
+          etc;
+        };
+        etc;
+      };
+      end;
+    },
+  ) or diag _dump($e);
 
 };
 

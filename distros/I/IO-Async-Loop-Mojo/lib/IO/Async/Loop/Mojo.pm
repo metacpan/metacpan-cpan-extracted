@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Mojo;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -84,10 +84,10 @@ sub watch_io
       $reactor->io( $handle => sub {
          my ( $reactor, $writable ) = @_;
          if( $writable ) {
-            $cbs->[1]->();
+            $cbs->[1]->() if $cbs->[1];
          }
          else {
-            $cbs->[0]->();
+            $cbs->[0]->() if $cbs->[0];
          }
       } );
 

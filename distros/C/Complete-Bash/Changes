@@ -1,3 +1,14 @@
+0.330   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoid perl undef warning (Term::Size::chars() can return undef).
+
+
+0.329   2019-08-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] When fzf is not available, fallback to returning completion
+	  entries as usual instead of displaying a message.
+
+
 0.328   2019-07-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix the use of Term::Size::chars().

@@ -23,23 +23,25 @@ sub save_state {
 									: join_path(project_dir(),$filename) 
 	}
 	my $path = $filename || $file->state_store();
-	$project->{save_file_version_number} = $VERSION;
+	$project->{nama_version} = $VERSION;
 
 	# store playback position, if possible
-	$project->{playback_position} = eval_iam("getpos") if valid_engine_setup();
+	$project->{playback_position} = ecasound_iam("getpos") if $this_engine->valid_setup();
 
 	# some stuff get saved independently of our state file
 	
 	logpkg(__FILE__,__LINE__,'debug', "saving palette");
 	$ui->save_palette;
 
-	# do nothing more if only Master and Mixdown
+	# do nothing more if only Main and Mixdown
 	
 	#user_tracks_present() or throw("No user tracks, skipping..."), return;
 	
 	logpkg(__FILE__,__LINE__,'debug',"Saving state as ", $path);
 	save_system_state($path);
 	save_global_effect_chains();
+
+	save_midish();
 
 	# store alsa settings
 
@@ -276,67 +278,7 @@ sub restore_state_from_file {
 
 	####### Backward Compatibility ########
 
-	if ( $project->{save_file_version_number} < 1.100){ 
-		map{ Audio::Nama::EffectChain::move_attributes($_) } 
-			(@project_effect_chain_data, @global_effect_chain_data)
-	}
-	if ( $project->{save_file_version_number} < 1.105){ 
-		map{ $_->{class} = 'Audio::Nama::BoostTrack' } 
-		grep{ $_->{name} eq 'Boost' } @tracks_data;
-	}
-	if ( $project->{save_file_version_number} < 1.109){ 
-		map
-		{ 	if ($_->{class} eq 'Audio::Nama::MixTrack') { 
-				$_->{is_mix_track}++;
-				$_->{class} = $_->{was_class};
-				$_->{class} = 'Audio::Nama::Track';
-		  	}
-		  	delete $_->{was_class};
-		} @tracks_data;
-		map
-		{    if($_->{class} eq 'Audio::Nama::MasterBus') {
-				$_->{class} = 'Audio::Nama::SubBus';
-			 }
-		} @bus_data;
-
-	}
-	if ( $project->{save_file_version_number} < 1.111){ 
-		map
-		{
-			convert_rw($_);
-			delete $_->{effect_chain_stack} ;
-            delete $_->{rec_defeat};
-            delete $_->{was_class};
-			delete $_->{is_mix_track};
-			$_->{rw} = MON if $_->{name} eq 'Master';
-		} @tracks_data;
-		map
-		{
-			$_->{rw} = MON if $_->{rw} eq 'REC'
-		} @bus_data;
-	}
-
-	# convert effect object format
-	
-	if ( $project->{save_file_version_number} < 1.200 )
-	{
-		@effects_data = 
-			map{ my $hashref = $fx->{applied}->{$_}; 
-					$hashref->{params} = $fx->{params}->{$_}; 
-					$hashref->{class} = 'Audio::Nama::Effect';
-					$hashref->{owns} ||= [];
-					$hashref }
-			grep { defined $_ } 
-			keys %{$fx->{applied}};
-		#say "effects data: ", json_out \@effects_data;
-		delete $fx->{applied};
-		delete $fx->{params};
-	}
-	if ( $project->{save_file_version_number} <= 1.201 )
-	{
-		map{ $_->{owns} ||= [] } @effects_data;
-	}
-
+	if ( $project->{nama_version}  < 1.214 )  { }
 
 	# restore effects, no change to track objects needed
 	
@@ -350,8 +292,7 @@ sub restore_state_from_file {
 		
 	Audio::Nama::Bus::initialize();	
 	map{ my $class = $_->{class}; $class->new( %$_ ) } @bus_data;
-	create_system_buses();  # needed to avoid missing bus error
-							# shouldn't they be saved?
+	create_system_buses();
 
 	# temporary turn on mastering mode to enable
 	# recreating mastering tracksk
@@ -441,7 +382,11 @@ sub restore_state_from_file {
 	%Audio::Nama::EffectChain::by_index = ();
 	#say "Project Effect Chain Data\n", json_out( \@project_effect_chain_data);
  	map { my $fx_chain = Audio::Nama::EffectChain->new(%$_) } 
-		(@project_effect_chain_data, @global_effect_chain_data)
+		(@project_effect_chain_data, @global_effect_chain_data);
+
+	my $fname = $file->midi_store;
+	midish_cmd(qq<load "$fname">);
+	
 } 
 sub convert_rw {
 	my $h = shift;

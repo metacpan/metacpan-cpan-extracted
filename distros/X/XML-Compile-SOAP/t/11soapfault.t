@@ -6,7 +6,6 @@ use strict;
 
 use lib 'lib','t';
 use TestTools;
-use Test::Deep   qw/cmp_deeply/;
 
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -93,7 +92,7 @@ compare_xml($xml1b, $msg1_soap);
 my $hash1 = $receiver->($msg1_soap);
 is(ref $hash1, 'HASH', 'produced HASH');
 
-cmp_deeply($hash1, {request => 3}, "server parsed input");
+is_deeply($hash1, {request => 3}, "server parsed input");
 
 #
 # Message 2 is fault1

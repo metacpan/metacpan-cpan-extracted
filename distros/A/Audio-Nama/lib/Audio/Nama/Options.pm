@@ -32,6 +32,8 @@ sub process_command_line_options {
 		log=s                       L
 		no-latency                  O
 		latency                     Q
+		sample-rate=s				z
+   
 );
 
 	map{$config->{opts}->{$_} = ''} values %options;
@@ -66,12 +68,13 @@ USAGE: nama [options] [project_name]
 --save-alsa, -a                  Save/restore alsa state with project data
 --help, -h                       This help display
 --regenerate-effects-cache, -r   Regenerate the effects data cache
+--sample-rate, -z                use this sample rate, and set as default for session
 
 Debugging options:
 
 --no-state, -M                   Don't load project state
 --no-static-effects-data, -S     Don't load effects data
---no-static-effects-cache, -C    Bypass effects data cache
+--no-static-effects-cache, -C    Don't load effects data cache
 --no-reconfigure-engine, -R      Don't autosave, autoreconfigure or git snapshot
 --fake-jack, -J                  Simulate JACK environment
 --fake-alsa, -A                  Simulate ALSA environment

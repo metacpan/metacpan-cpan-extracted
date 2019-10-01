@@ -5,17 +5,17 @@ use Modern::Perl;
 
 sub mute {
 	return if $config->{opts}->{F};
-	return if $tn{Master}->rw eq OFF or Audio::Nama::ChainSetup::really_recording();
-	$tn{Master}->mute;
+	return if $tn{Main}->rw eq OFF or Audio::Nama::ChainSetup::really_recording();
+	$tn{Main}->mute;
 }
 sub unmute {
 	return if $config->{opts}->{F};
-	return if $tn{Master}->rw eq OFF or Audio::Nama::ChainSetup::really_recording();
-	$tn{Master}->unmute;
+	return if $tn{Main}->rw eq OFF or Audio::Nama::ChainSetup::really_recording();
+	$tn{Main}->unmute;
 }
 sub fade_around {
 	my ($coderef, @args) = @_;
-	if( engine_running() )
+	if( $this_engine->started() )
 	{
 		mute();
 		$coderef->(@args);

@@ -7,7 +7,7 @@ use IO::Catch;
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
-use vars qw( @history_invariant @history_add );
+our( @history_invariant, @history_add );
 
 BEGIN {
   # Disable all ReadLine functionality
@@ -90,7 +90,7 @@ sub disable {
     shift;
     push @history, join "", @_;
   };
-  
+
   *WWW::Mechanize::links = sub {()};
 };
 

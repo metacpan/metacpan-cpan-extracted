@@ -11,7 +11,7 @@ A class:
     use warnings;
 
     # Generate 3 accessors
-    use Object::HashBase qw/foo -bar ^baz/;
+    use Object::HashBase qw/foo -bar ^baz <bat >ban +boo/;
 
     # Chance to initialize defaults
     sub init {
@@ -19,10 +19,13 @@ A class:
         $self->{+FOO} ||= "foo";
         $self->{+BAR} ||= "bar";
         $self->{+BAZ} ||= "baz";
+        $self->{+BAT} ||= "bat";
+        $self->{+BAN} ||= "ban";
+        $self->{+BOO} ||= "boo";
     }
 
     sub print {
-        print join ", " => map { $self->{$_} } FOO, BAR, BAZ;
+        print join ", " => map { $self->{$_} } FOO, BAR, BAZ, BAT, BAN, BOO;
     }
 
 Subclass it
@@ -33,14 +36,14 @@ Subclass it
 
     # Note, you should subclass before loading HashBase.
     use base 'My::Class';
-    use Object::HashBase qw/bat/;
+    use Object::HashBase qw/bub/;
 
     sub init {
         my $self = shift;
 
         # We get the constants from the base class for free.
         $self->{+FOO} ||= 'SubFoo';
-        $self->{+BAT} ||= 'bat';
+        $self->{+BUB} ||= 'bub';
 
         $self->SUPER::init();
     }
@@ -57,10 +60,13 @@ use it:
     my $two   = My::Class->new({foo => 'MyFoo', bar => 'MyBar'});
     my $three = My::Class->new(['MyFoo', 'MyBar']);
 
-    # Accessors!
+    # Readers!
     my $foo = $one->foo;    # 'MyFoo'
     my $bar = $one->bar;    # 'MyBar'
     my $baz = $one->baz;    # Defaulted to: 'baz'
+    my $bat = $one->bat;    # Defaulted to: 'bat'
+    # '>ban' means setter only, no reader
+    # '+boo' means no setter or reader, just the BOO constant
 
     # Setters!
     $one->set_foo('A Foo');
@@ -71,6 +77,9 @@ use it:
     # '^baz' means deprecated setter, this will warn about the setter being
     # deprecated.
     $one->set_baz('A Baz');
+
+    # '<bat' means no setter defined at all
+    # '+boo' means no setter or reader, just the BOO constant
 
     $one->{+FOO} = 'xxx';
 
@@ -205,6 +214,24 @@ This will generate the following subs in your namespace:
 
     This will set the value, but it will also warn you that the method is
     deprecated.
+
+## NO SETTER
+
+    use Object::HashBase qw/<foo/;
+
+Only gives you a reader, no `set_foo` method is defined at all.
+
+## NO READER
+
+    use Object::HashBase qw/>foo/;
+
+Only gives you a write (`set_foo`), no `foo` method is defined at all.
+
+## CONSTANT ONLY
+
+    use Object::HashBase qw/+foo/;
+
+This does not create any methods for you, it just adds the `FOO` constant.
 
 # SUBCLASSING
 

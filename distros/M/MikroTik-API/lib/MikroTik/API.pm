@@ -10,11 +10,13 @@ MikroTik::API - Client to MikroTik RouterOS API
 
 =head1 VERSION
 
-Version 1.1.0
+Version 2.0.1
+
+B<CAUTION:> Dependencies change with version 2.0.0. MikroTik::API now relies on Moo instead of Moose. Please be sure, dependencies are met before upgrading.
 
 =cut
 
-our $VERSION = '1.1.0';
+our $VERSION = '2.0.1';
 
 
 =head1 SYNOPSIS
@@ -37,13 +39,17 @@ our $VERSION = '1.1.0';
 
 =cut
 
-use Moose;
+use Carp qw(croak);
+use Digest::MD5;
+use IO::Socket::IP;
+use IO::Socket::SSL;
+use Moo;
+use MooX::Types::MooseLike::Base qw(Bool CodeRef Int Str);
+use Time::Out qw{ timeout };
+use Try::Tiny;
+use Type::Tiny;
 use namespace::autoclean;
 
-use Digest::MD5;
-use IO::Socket::INET;
-use IO::Socket::SSL;
-use Time::Out qw{ timeout };
 
 =head1 PUBLIC METHODS
 
@@ -94,33 +100,56 @@ sub connect {
     my ( $self ) = @_;
 
     if ( ! $self->get_host() ) {
-        die 'host must be set before connect()'
+        croak 'host must be set before connect()'
     }
 
-    if ( $self->get_use_ssl() ) {
-        $self->set_socket(
-            IO::Socket::SSL->new(
-                PeerAddr => $self->get_host(),
-                PeerPort => $self->get_port(),
-                Proto => 'tcp',
-                SSL_cipher_list => 'HIGH',
-                SSL_verify_mode => $self->get_ssl_verify(),
-                Timeout => $self->get_timeout(),
-            ) or die "failed connect or ssl handshake ($!: ". IO::Socket::SSL::errstr() .')'
-        );
+    if ( $self->get_use_ssl ) {
+        my $socket
+            = try {
+                IO::Socket::SSL->new(
+                    PeerHost        => $self->get_host,
+                    PeerPort        => $self->get_port,
+                    Proto           => 'tcp',
+                    SSL_cipher_list => 'HIGH',
+                    SSL_verify_mode => $self->get_ssl_verify(),
+                    Timeout         => $self->get_timeout,
+                );
+            }
+            catch {
+                croak sprintf
+                    'failed connect %s:%s or ssl handshake (%s: %s)',
+                    $self->get_host,
+                    $self->get_port,
+                    $_,
+                    IO::Socket::SSL::errstr();
+            };
+        # obsolete?
+        $socket
+            or croak sprintf
+                'failed connect %s:%s or ssl handshake (%s: %s)',
+                $self->get_host,
+                $self->get_port,
+                $!,
+                IO::Socket::SSL::errstr();
+        $self->set_socket($socket);
     }
     else {
         $self->set_socket(
-            IO::Socket::INET->new(
-                PeerAddr => $self->get_host(),
-                PeerPort => $self->get_port(),
-                Proto   => 'tcp',
-                Timeout => $self->get_timeout(),
-            ) or die "failed connect ($!)"
+            IO::Socket::IP->new(
+                PeerHost => $self->get_host,
+                PeerPort => $self->get_port,
+                Proto    => 'tcp',
+                Timeout  => $self->get_timeout,
+            )
+            or croak sprintf
+                'failed connect %s:%s (%s)',
+                $self->get_host,
+                $self->get_port,
+                $@,
         );
     }
-    if ( ! $self->get_socket() ) {
-        die "socket creation failed ($!)";
+    if ( ! $self->get_socket ) {
+        croak "socket creation failed ($!)";
     }
     $self->get_socket()->sockopt(SO_KEEPALIVE,1);
     $self->get_socket()->sockopt(SO_RCVTIMEO,$self->get_timeout());
@@ -145,7 +174,7 @@ sub login {
     my ( $self ) = @_;
 
     if ( ! $self->get_username() && defined( $self->get_password() ) ) {
-        die 'username and password must be set before connect()';
+        croak 'username and password must be set before connect()';
     }
     if ( ! $self->get_socket() ) {
         $self->connect();
@@ -156,9 +185,9 @@ sub login {
     push( @command, '=name=' . $self->get_username() );
     push( @command, '=password=' . $self->get_password() );
     my ( $retval, @results ) = $self->talk( \@command );
-    die 'disconnected while logging in' if !defined $retval;
+    croak 'disconnected while logging in' if !defined $retval;
     if ( $retval > 1 ) {
-        die 'error during establishing login: ' . $results[0]{'message'};
+        croak 'error during establishing login: ' . $results[0]{'message'};
     }
 
     # if we got "=ret=" in response - then assuming this is old style AUTH
@@ -174,9 +203,9 @@ sub login {
         push( @command, '=response=00' . $md5->hexdigest() );
         ( $retval, @results ) = $self->talk( \@command );
     }
-    die 'disconnected while logging in' if !defined $retval;
+    croak 'disconnected while logging in' if !defined $retval;
     if ( $retval > 1 ) {
-            die 'error during establishing login: ' . $results[0]{'message'};
+        croak 'error during establishing login: ' . $results[0]{'message'};
     }
 
     if ( $self->get_debug() > 0 ) {
@@ -233,6 +262,7 @@ sub cmd {
         }
     }
     my ( $retval, @results ) = $self->talk( \@command );
+
     return ( $retval, @results );
 }
 
@@ -287,6 +317,7 @@ sub query {
         }
     }
     my ( $retval, @results ) = $self->talk( \@command );
+
     return ( $retval, @results );
 }
 
@@ -303,9 +334,9 @@ sub get_by_key {
     my @command = ($cmd);
     my %ids;
     my ( $retval, @results ) = $self->talk( \@command );
-    die 'disconnected' if !defined $retval;
+    croak 'disconnected' if !defined $retval;
     if ($retval > 1) {
-        die $results[0]{'message'};
+        croak $results[0]{'message'};
     }
     foreach my $attrs ( @results ) {
         my $key = '';
@@ -328,37 +359,37 @@ sub get_by_key {
 
 =cut
 
-has 'host' => ( is => 'rw', reader => 'get_host', writer => 'set_host', isa => 'Str' );
+has 'host' => ( is => 'rw', reader => 'get_host', writer => 'set_host', isa => Str );
 
 =head2 $api->get_port(), $api->set_port( $portnumber )
 
 =cut
 
-has 'port' => ( is => 'ro', reader => '_get_port', writer => 'set_port', isa => 'Int' );
+has 'port' => ( is => 'ro', reader => '_get_port', writer => 'set_port', isa => Int );
 
 =head2 $api->get_username(), $api->set_username( $username )
 
 =cut
 
-has 'username' => ( is => 'rw', reader => 'get_username', writer => 'set_username', isa => 'Str' );
+has 'username' => ( is => 'rw', reader => 'get_username', writer => 'set_username', isa => Str );
 
 =head2 $api->get_password(), $api->set_password( $password )
 
 =cut
 
-has 'password' => ( is => 'rw', reader => 'get_password', writer => 'set_password', isa => 'Str' );
+has 'password' => ( is => 'rw', reader => 'get_password', writer => 'set_password', isa => Str );
 
 =head2 $api->get_use_ssl(), $api->set_use_ssl( $zero_or_one )
 
 =cut
 
-has 'use_ssl'    => ( is => 'rw', reader => 'get_use_ssl', writer => 'set_use_ssl', isa => 'Bool' );
+has 'use_ssl'    => ( is => 'rw', reader => 'get_use_ssl', writer => 'set_use_ssl', isa => Bool );
 
 =head2 $api->get_ssl_verify(), $api->set_ssl_verify( $zero_or_one )
 
 =cut
 
-has 'ssl_verify' => ( is => 'rw', reader => 'get_ssl_verify', writer => 'set_ssl_verify', isa => 'Int', default => 1 );
+has 'ssl_verify' => ( is => 'rw', reader => 'get_ssl_verify', writer => 'set_ssl_verify', isa => Int, default => 1 );
 
 =head2 $api->get_new_auth_method(), $api->set_new_auth_method( $zero_or_one )
 
@@ -367,13 +398,13 @@ Auth method changed in RouterOS v6.43+ (https://wiki.mikrotik.com/wiki/Manual:AP
 
 =cut
 
-has 'new_auth_method' => ( is => 'rw', reader => 'get_new_auth_method', writer => 'set_new_auth_method', isa => 'Bool', default => 0 );
+has 'new_auth_method' => ( is => 'rw', reader => 'get_new_auth_method', writer => 'set_new_auth_method', isa => Bool, default => 0 );
 
 =head2 $api->get_autoconnect(), $api->set_autoconnect( $zero_or_one )
 
 =cut
 
-has 'autoconnect' => ( is => 'rw', reader => 'get_autoconnect', writer => 'set_autoconnect', isa => 'Bool', default => 1 );
+has 'autoconnect' => ( is => 'rw', reader => 'get_autoconnect', writer => 'set_autoconnect', isa => Bool, default => 1 );
 
 =head2 $api->get_socket(), $api->set_socket( $io_socket )
 
@@ -384,7 +415,14 @@ If you need to use an existing socket for the API connection.
 
 =cut
 
-has 'socket' => ( is => 'rw', reader => 'get_socket', writer => 'set_socket', isa => 'Maybe[IO::Socket]' );
+sub _MaybeIOSocket {
+    return Type::Tiny->new(
+        name       => '_MaybeIOSocket',
+        constraint => sub { defined $_ ? $_->isa('IO::Socket') : 1 },
+        message    => sub { "$_ ain't an IO::Socket or undef" },
+    );
+}
+has 'socket' => ( is => 'rw', reader => 'get_socket', writer => 'set_socket', isa => _MaybeIOSocket );
 
 =head2 $api->get_debug(), $api->set_debug( $int )
 
@@ -393,7 +431,7 @@ has 'socket' => ( is => 'rw', reader => 'get_socket', writer => 'set_socket', is
 
 =cut
 
-has 'debug' => ( is => 'rw', reader => 'get_debug', writer => 'set_debug', isa => 'Int', default => 0 );
+has 'debug' => ( is => 'rw', reader => 'get_debug', writer => 'set_debug', isa => Int, default => 0 );
 
 =head2 $api->get_timeout(), $api->set_timeout( $seconds )
 
@@ -401,7 +439,7 @@ Abort connect after $seconds of no reply from MikroTik. This _will not_ affect l
 
 =cut
 
-has 'timeout' => ( is => 'rw', reader => 'get_timeout', writer => 'set_timeout', isa => 'Int', default => 5 );
+has 'timeout' => ( is => 'rw', reader => 'get_timeout', writer => 'set_timeout', isa => Int, default => 5 );
 
 =head2 $api->get_probe_before_talk(), $api->set_probe_before_talk( $seconds )
 
@@ -415,7 +453,7 @@ commands are still possible. Set this to 0 if you use many consequent commands a
 
 =cut
 
-has 'probe_before_talk' => ( is => 'rw', reader => 'get_probe_before_talk', writer => 'set_probe_before_talk', isa => 'Int', default => 0 );
+has 'probe_before_talk' => ( is => 'rw', reader => 'get_probe_before_talk', writer => 'set_probe_before_talk', isa => Int, default => 0 );
 
 =head2 $api->get_reconnect_after_failed_probe(), $api->set_reconnect_after_failed_probe( $zero_or_one )
 
@@ -423,7 +461,7 @@ If connection is recognized as broken then either reconnect or die otherwise.
 
 =cut
 
-has 'reconnect_after_failed_probe' => ( is => 'rw', reader => 'get_reconnect_after_failed_probe', writer => 'set_reconnect_after_failed_probe', isa => 'Bool', default => 1 );
+has 'reconnect_after_failed_probe' => ( is => 'rw', reader => 'get_reconnect_after_failed_probe', writer => 'set_reconnect_after_failed_probe', isa => Bool, default => 1 );
 
 =head1 SEMI-PUBLIC METHODS
 
@@ -598,7 +636,7 @@ sub _read_sentence {
     my $word = $self->_read_word();
     return if (!$word);
 
-    die "Protocol error (sentence word does being with \"!\"\n" if ($word !~ /^!/);
+    croak "Protocol error (sentence word does being with \"!\"\n" if ($word !~ /^!/);
 
     do {
         push( @reply, $word );
@@ -692,7 +730,7 @@ sub _read_byte{
     my ( $self ) = @_;
     my $line = '';
     $self->get_socket()->read( $line, 1 );
-    die 'EOF' if !defined($line) || length($line) != 1;
+    croak 'EOF' if !defined($line) || length($line) != 1;
     return ord($line);
 }
 
@@ -716,6 +754,10 @@ added C<timeout parameter> and fixes by elcamlost: https://github.com/elcamlost/
 
 SSL support by akschu: https://github.com/akschu/MikroTikPerl/commit/9b689a7d7511a1639ffa2118c8e549b5cec1290d
 
+=item *
+
+upgrade to v2.0.0 by Steffen Winkler
+
 =back
 
 =head2 Design decisions
@@ -724,15 +766,15 @@ SSL support by akschu: https://github.com/akschu/MikroTikPerl/commit/9b689a7d751
 
 =item *
 
-Use of Moose for OO
+Use of Moo for OO
 
 =item *
 
-higher compilation time of Moose based lib negligible because of slow I/O operations
+higher compilation time of Moo based lib negligible because of slow I/O operations
 
 =item *
 
-Moose is more common than Moo or similar
+Change from Moose to Moo with version 2.0.0 because of XS dependencies of Moose
 
 =back
 
@@ -752,11 +794,7 @@ automatically be notified of progress on your bug as I make changes.
 
 =item *
 
-Quite high compile time because of using Moose. Use of a persistent running framework recommended.
-
-=item *
-
-Login to RouterOS v6.43rc* not possible because of a changed auth method using plaintext passwords
+Quite high compile time because of using Moo. Use of a persistent running framework recommended.
 
 =back
 

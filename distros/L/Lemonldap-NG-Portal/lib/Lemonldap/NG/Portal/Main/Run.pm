@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -55,6 +55,21 @@ sub handler {
     }
     my $res = $self->Lemonldap::NG::Common::PSGI::Router::handler($req);
 
+    # Avoid permanent loop 'Portal <-> _url' if pdata cookie is not removed
+    my $url64 = encode_base64( $req->userData->{_url}, '' )
+      if $req->userData->{_url};
+    if (    $url64
+        and !$req->pdata->{keepPdata}
+        and $req->userData->{_session_id}
+        and $req->{env}->{HTTP_COOKIE}
+        and $req->{env}->{HTTP_COOKIE} =~ /$url64/ )
+    {
+        $self->logger->debug("Force cleaning pdata");
+        $self->logger->warn("pdata cookie domain must be set")
+          unless ( $self->conf->{pdataDomain} );
+        $req->pdata( {} );
+    }
+
     # Save pdata
     if ( $sp or %{ $req->pdata } ) {
         my %v = (
@@ -62,11 +77,13 @@ sub handler {
             (
                 %{ $req->pdata }
                 ? ( value => uri_escape( JSON::to_json( $req->pdata ) ) )
-                : (
-                    value   => '',
-                    expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
-                )
-            )
+                : ( value => '', expires => 'Wed, 21 Oct 2015 00:00:00 GMT' )
+            ),
+            (
+                $self->conf->{pdataDomain}
+                ? ( domain => $self->conf->{pdataDomain}, )
+                : ()
+            ),
         );
         push @{ $res->[1] }, 'Set-Cookie', $self->cookie(%v);
     }
@@ -246,7 +263,12 @@ sub do {
                 {
                     result => 1,
                     error  => $err,
-                    id     => $req->id
+                    id     => $req->id,
+                    (
+                        $req->sessionInfo->{_httpSession}
+                        ? ( id_http => $req->sessionInfo->{_httpSession} )
+                        : ()
+                    )
                 }
             );
         }
@@ -323,8 +345,7 @@ sub autoRedirect {
             $req->data->{redirectFormMethod} = "get";
         }
         else {
-            return [ 302,
-                [ Location => $req->{urldc}, @{ $req->respHeaders } ], [] ];
+            return [ 302, [ Location => $req->{urldc}, $req->spliceHdrs ], [] ];
         }
     }
     my ( $tpl, $prms ) = $self->display($req);
@@ -404,7 +425,7 @@ sub getApacheSession {
 sub getPersistentSession {
     my ( $self, $uid, $info ) = @_;
 
-    return unless defined $uid;
+    return unless ( defined $uid and !$self->conf->{disablePersistentStorage} );
 
     # Compute persistent identifier
     my $pid = $self->_md5hash($uid);
@@ -451,7 +472,11 @@ sub updatePersistentSession {
     my ( $self, $req, $infos, $uid, $id ) = @_;
 
     # Return if no infos to update
-    return () unless ( ref $infos eq 'HASH' and %$infos );
+    return ()
+      unless ( ref $infos eq 'HASH'
+        and %$infos
+        and !$self->conf->{disablePersistentStorage} );
+
     $uid ||= $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
       || $req->userData->{ $self->conf->{whatToTrace} };
     $self->logger->debug("Found 'whatToTrace' -> $uid");
@@ -738,10 +763,12 @@ sub cookie {
 
 sub _dump {
     my ( $self, $variable ) = @_;
-    require Data::Dumper;
-    $Data::Dumper::Indent  = 0;
-    $Data::Dumper::Useperl = 1;
-    $self->logger->debug( "Dump: " . Data::Dumper::Dumper($variable) );
+    if ( $self->conf->{logLevel} eq 'debug' ) {
+        require Data::Dumper;
+        $Data::Dumper::Indent  = 0;
+        $Data::Dumper::Useperl = 1;
+        $self->logger->debug( "Dump: " . Data::Dumper::Dumper($variable) );
+    }
     return;
 }
 
@@ -793,11 +820,11 @@ sub sendHtml {
       'Pragma'        => 'no-cache',                               # HTTP 1.0
       'Expires'       => '0';                                      # Proxies
 
-    my @cors = split /;/, $self->cors;
     if ( $self->conf->{corsEnabled} ) {
+        my @cors = split /;/, $self->cors;
         push @{ $res->[1] }, @cors;
-        $self->logger->debug(
-            "Apply following CORS policy : " . Data::Dumper::Dumper( \@cors ) );
+        $self->logger->debug('Apply following CORS policy :');
+        $self->logger->debug(" $_") for @cors;
     }
 
     # Set authorized URL for POST
@@ -1022,6 +1049,30 @@ sub _sumUpSession {
     return $res;
 }
 
+sub corsPreflight {
+    my ( $self, $req ) = @_;
+    my @headers;
+    if ( $self->conf->{corsEnabled} ) {
+        my @cors = split /;/, $self->cors;
+        push @headers, @cors;
+        $self->logger->debug('Apply following CORS policy :');
+        $self->logger->debug(" $_") for @cors;
+    }
+    return [ 204, \@headers, [] ];
+}
+
+sub sendJSONresponse {
+    my ( $self, $req, $j, %args ) = @_;
+    my $res = Lemonldap::NG::Common::PSGI::sendJSONresponse(@_);
+    if ( $self->conf->{corsEnabled} ) {
+        my @cors = split /;/, $self->cors;
+        push @{ $res->[1] }, @cors;
+        $self->logger->debug('Apply following CORS policy :');
+        $self->logger->debug(" $_") for @cors;
+    }
+    return $res;
+}
+
 # Temlate loader
 sub loadTemplate {
     my ( $self, $req, $name, %prm ) = @_;
@@ -1036,7 +1087,7 @@ sub loadTemplate {
         search_path_on_include => 1,
         die_on_bad_params      => 0,
         die_on_missing_include => 1,
-        cache                  => 1,
+        cache                  => ( defined $prm{cache} ? $prm{cache} : 1 ),
         global_vars            => 0,
         ( $prm{filter} ? ( filter => $prm{filter} ) : () ),
     );

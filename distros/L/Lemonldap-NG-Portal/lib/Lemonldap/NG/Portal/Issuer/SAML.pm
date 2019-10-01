@@ -11,12 +11,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SIGNATURE_ERROR
   PE_SAML_SLO_ERROR
   PE_SAML_SSO_ERROR
+  PE_ISSUERMISSINGREQATTR
   PE_SAML_UNKNOWN_ENTITY
   PE_SAML_SERVICE_NOT_ALLOWED
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -387,10 +388,14 @@ sub run {
                 unless ( $rule->( $req, $req->sessionInfo ) ) {
                     $self->userLogger->warn( 'User '
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                          . "was not authorizated to access to $sp" );
+                          . " is not authorized to access to $sp" );
                     return PE_UNAUTHORIZEDPARTNER;
                 }
             }
+
+            $self->userLogger->notice( 'User '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                  . " is authorized to access to $sp" );
 
             # Do we check signature?
             my $checkSSOMessageSignature =
@@ -612,7 +617,7 @@ sub run {
                         $self->logger->error(
 "Session key $_ is required to set SAML $name attribute"
                         );
-                        return PE_SAML_SSO_ERROR;
+                        return PE_ISSUERMISSINGREQATTR;
                     }
                     else {
                         $self->logger->debug(
@@ -1473,7 +1478,7 @@ sub sloRelayTerm {
     my $session = $logout->get_session();
 
     unless ($session) {
-        $self->lmLog( "Could not get session from logout", 'error' );
+        $self->logger->error( "Could not get session from logout" );
         return PE_SAML_SLO_ERROR;
     }
 
@@ -1694,7 +1699,7 @@ sub sloServer {
 
         # Create SLO status session and get ID
         my $sloStatusSessionInfo = $self->getSamlSession( undef, $sloInfos );
-        my $relayID = $sloStatusSessionInfo->id;
+        my $relayID              = $sloStatusSessionInfo->id;
 
         $self->logger->debug("Create relay session $relayID");
 

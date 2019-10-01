@@ -46,10 +46,10 @@
             "HTTP::Daemon" : "6.05",
             "HTTP::Request::AsCGI" : "0",
             "HTTP::Response" : "0",
+            "HTTP::Tiny" : "0",
             "IO::Socket::INET" : "0",
-            "LWP" : "6.36",
-            "LWP::Simple" : "0",
             "Socket" : "0",
+            "Time::HiRes" : "0",
             "URI" : "0",
             "URI::URL" : "0",
             "perl" : "5.008"
@@ -72,7 +72,7 @@
          "web" : "https://github.com/Corion/Test-HTTP-LocalServer"
       }
    },
-   "version" : "0.66",
+   "version" : "0.68",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

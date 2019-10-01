@@ -42,7 +42,7 @@ my %params = (
 
     META_MERGE => {
         'meta-spec'         => { version => 2 },
-        'homepageresources' => {
+        'resources' => {
             repository => {
                 url  => 'git://github.com/thrig/File-ReplaceBytes.git',
                 web  => 'https://github.com/thrig/File-ReplaceBytes',

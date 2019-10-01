@@ -166,7 +166,6 @@ SKIP: {
     expectAuthenticatedAs( $res, 'davros@badguy.org@idp' );
 
     # Simple SP access
-    my $res;
     ok(
         $res = $sp->_get(
             '/', accept => 'text/html',
@@ -179,7 +178,7 @@ SKIP: {
         $res->[1],
 'Set-Cookie => lemonldapidp=http://auth.idp.com/saml/metadata; domain=.sp.com; path=/'
       );
-    my ( $host, $url, $s ) =
+    ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
         'SAMLRequest' );
 
@@ -195,7 +194,7 @@ SKIP: {
         'Post SAML request to IdP'
     );
     expectOK($res);
-    my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
     # Try to authenticate with an authorized user to IdP
     $s = "user=french&password=french&$s";
@@ -254,7 +253,8 @@ SKIP: {
         ),
         'CheckUser form',
     );
-    my ( $host, $url, $query ) =
+    my $query;
+    ( $host, $url, $query ) =
       expectForm( $res, undef, '/checkuser', 'user', 'url' );
     ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%,
         'Found trspan="checkUser"' )
@@ -263,10 +263,18 @@ SKIP: {
       or explain( $res->[2]->[0], 'Attribute uid' );
     ok( $res->[2]->[0] =~ m%<td scope="row">french</td>%, 'Found value french' )
       or explain( $res->[2]->[0], 'Value french' );
-    count(4);
+    ok( $res->[2]->[0] =~ m%<td scope="row">_lassoSessionDump</td>%,
+        'Found attribute _lassoSessionDump' )
+      or explain( $res->[2]->[0], 'Attribute _lassoSessionDump' );
+    ok(
+        $res->[2]->[0] =~
+          m%ProviderID="http://auth.idp.com/saml/metadata" AssertionID=%,
+        'Found  ProviderID & AssertionID values'
+    ) or explain( $res->[2]->[0], 'Provider & Assertion Ids' );
+    count(6);
 
     # CheckUser request with an unknown user
-    $query =~ s/user=french/user=rtyler/;
+    $query =~ s/user=fa%40badwolf.org%40idp/user=rtyler/;
     ok(
         $res = $sp->_post(
             '/checkuser',
@@ -297,7 +305,7 @@ m%<div class="message message-positive alert"><span trspan="PE5"></span></div>%,
         'POST checkuser'
     );
 
-    my ( $host, $url, $query ) =
+    ( $host, $url, $query ) =
       expectForm( $res, undef, '/checkuser', 'user', 'url' );
     ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%,
         'Found trspan="checkUser"' )

@@ -8,7 +8,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_REDIRECT);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -50,7 +50,16 @@ has linkedInPeopleEndpoint => (
     lazy    => 1,
     default => sub {
         $_[0]->conf->{linkedInPeopleEndpoint}
-          || 'https://api.linkedin.com/v1/people/';
+          || 'https://api.linkedin.com/v2/me';
+    }
+);
+
+has linkedInEmailEndpoint => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{linkedInEmailEndpoint}
+          || 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))';
     }
 );
 
@@ -123,13 +132,11 @@ sub extractFormInfo {
 
         $self->logger->debug("Get access token $access_token from LinkedIn");
 
-        # Build People EndPoint URI
-        my $linkedInPeopleEndpoint =
-            $self->linkedInPeopleEndpoint . "~:("
-          . $self->conf->{linkedInFields}
-          . ")?format=json";
+        # Call People EndPoint URI
+        $self->logger->debug(
+            "Call LinkedIn People Endpoint " . $self->linkedInPeopleEndpoint );
 
-        my $people_response = $self->ua->get( $linkedInPeopleEndpoint,
+        my $people_response = $self->ua->get( $self->linkedInPeopleEndpoint,
             "Authorization" => "Bearer $access_token" );
 
         if ( $people_response->is_error ) {
@@ -141,6 +148,9 @@ sub extractFormInfo {
 
         my $people_content = $people_response->decoded_content;
 
+        $self->logger->debug(
+            "Response from LinkedIn People API: $people_content");
+
         eval {
             $json_hash = from_json( $people_content, { allow_nonref => 1 } );
         };
@@ -151,6 +161,39 @@ sub extractFormInfo {
 
         foreach ( keys %$json_hash ) {
             $req->data->{linkedInData}->{$_} = $json_hash->{$_};
+        }
+
+        # Call Email EndPoint URI
+        if ( $self->conf->{linkedInScope} =~ /r_emailaddress/ ) {
+
+            $self->logger->debug( "Call LinkedIn Email Endpoint "
+                  . $self->linkedInEmailEndpoint );
+
+            my $email_response = $self->ua->get( $self->linkedInEmailEndpoint,
+                "Authorization" => "Bearer $access_token" );
+
+            if ( $email_response->is_error ) {
+                $self->logger->error(
+                    "Bad authorization response: " . $email_response->message );
+                $self->logger->debug( $email_response->content );
+                return PE_ERROR;
+            }
+
+            my $email_content = $email_response->decoded_content;
+
+            $self->logger->debug(
+                "Response from LinkedIn Email API: $email_content");
+
+            eval {
+                $json_hash = from_json( $email_content, { allow_nonref => 1 } );
+            };
+            if ($@) {
+                $self->logger->error("Unable to decode JSON $email_content");
+                return PE_ERROR;
+            }
+
+            $req->data->{linkedInData}->{"emailAddress"} =
+              $json_hash->{"elements"}->[0]{"handle~"}->{"emailAddress"};
         }
 
         $req->user(

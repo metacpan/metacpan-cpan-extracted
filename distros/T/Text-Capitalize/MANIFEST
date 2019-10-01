@@ -14,8 +14,8 @@ t/008-random_case.t
 t/009-scramble_case.t
 t/lib/Test/Locale/Utils.pm
 t/lib/Test/Locale/t/000-all_true-Test-Locale-Utils-private.t
-t/pod-coverage.t
-t/pod.t
-t/boilerplate.t
 Makefile.PL
 META.yml
+
+
+META.json

@@ -43,7 +43,7 @@ foreach my $i ( 0 .. 1 ) {
 count(2);
 
 # Test that Conf key value is sent
-my $res = $client2->jsonResponse('/view/2/portalDisplayOidcConsents');
+$res = $client2->jsonResponse('/view/2/portalDisplayOidcConsents');
 ok( $res->{value} eq '$_oidcConnectedRP', 'Key found' )
   or print STDERR Dumper($res);
 count(1);
@@ -55,7 +55,7 @@ ok( $res->{value} eq '_Hidden_', 'Key is hidden' )
 count(1);
 
 # Browse confs is forbidden
-my $res = $client2->jsonResponse('/view/2');
+$res = $client2->jsonResponse('/view/2');
 ok( $res->{value} eq '_Hidden_', 'Key is hidden' )
   or print STDERR Dumper($res);
 count(1);

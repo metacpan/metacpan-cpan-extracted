@@ -10,7 +10,10 @@ use inc::Module::Install;
 	        'audio',
 	        'recording',
 	        'mixing',
-	        'daw';
+	        'digital',
+			'workstation',
+			'effects',
+			'editing';
 	 repository
 	        'https://github.com/bolangi/nama';
 
@@ -43,8 +46,10 @@ use inc::Module::Install;
 			Modern::Perl  0
 			Module::Load::Conditional  0 
 			Parse::RecDescent  0
+			Role::Tiny 0
 			SUPER 0
 			Term::ReadLine::Gnu  0
+			Test2::Bundle::More 0
 			Text::Diff  0
 			Text::Format  0
 			Text::Template 0

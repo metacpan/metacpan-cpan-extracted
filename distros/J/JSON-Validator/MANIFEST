@@ -106,6 +106,7 @@ t/spec/more-bundle2.yaml
 t/spec/person.json
 t/spec/petstore.json
 't/spec/space bundle.json'
+t/spec/test-definitions-key.json
 t/spec/with-deep-mixed-ref.json
 t/spec/with-relative-ref.json
 t/stack/Some.pm

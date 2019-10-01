@@ -45,11 +45,11 @@
    "provides" : {
       "Dancer2::Plugin::Chain" : {
          "file" : "lib/Dancer2/Plugin/Chain.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Dancer2::Plugin::Chain::Router" : {
          "file" : "lib/Dancer2/Plugin/Chain/Router.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/manwar/Dancer2-Plugin-Chain"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

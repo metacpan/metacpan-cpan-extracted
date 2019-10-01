@@ -1,0 +1,11 @@
+<%Page path="/admin/bits/header" PAGENAME="content"%>
+
+<%Styler text="Content Editing" style="page-title"%>
+
+<%Condition
+  a.cgiparam="revert_to"
+  a.path="/bits/content/revert-go"
+  default.path="/bits/content/revert-show"
+%>
+
+<%Page path="/admin/bits/footer"%>

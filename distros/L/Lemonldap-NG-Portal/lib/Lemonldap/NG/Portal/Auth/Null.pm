@@ -28,7 +28,7 @@ sub authenticate {
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
-    $req->{sessionInfo}->{'_user'} = 'anonymous';
+    $req->{sessionInfo}->{'_user'}             = 'anonymous';
     $req->{sessionInfo}->{authenticationLevel} = $self->conf->{nullAuthnLevel};
     PE_OK;
 }

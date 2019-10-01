@@ -1,0 +1,39 @@
+============= /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 8
+model name	: Pentium III (Coppermine)
+stepping	: 3
+cpu MHz		: 851.949
+cache size	: 256 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 mmx fxsr sse
+bogomips	: 1697.38
+
+============= uname -a
+Linux am.xao.com 2.4.20-20.7 #1 Mon Aug 18 14:56:30 EDT 2003 i686 unknown
+============= args
+./bench-sorted-intersection.pl --with-perl yes
+full-count 10000
+part-count 5000
+word-count 5
+run-count 100
+============= date
+Fri Feb 27 19:22:32 2004
+============= preparing
+Final set includes 184 elements (c)
+Final set includes 184 elements (perl)
+============= benchmarking
+timethis 100:  4 wallclock secs ( 3.55 usr +  0.00 sys =  3.55 CPU) @ 28.17/s (n=100)
+timethis 10: 129 wallclock secs (124.03 usr +  0.06 sys = 124.09 CPU) @  0.08/s (n=10)
+         s/iter   perl normal
+perl       12.4     --  -100%
+normal 3.55e-02 34855%     --

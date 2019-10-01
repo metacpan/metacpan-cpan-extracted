@@ -44,7 +44,7 @@ $support_jcode_package_too = 1;
 #
 #   ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
 #
-$VERSION = '2.13.4.22';
+$VERSION = '2.13.4.23';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -644,7 +644,7 @@ sub init {
     $esc_asc  = "\e(B";
     $esc_kana = "\e(I";
 
-    $re_ascii    = '[\x07-\x7e]';
+    $re_ascii     = '[\x07-\x7e]';
 
     $re_sjis_c    = '[\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc]';
     $re_sjis_kana = '[\xa1-\xdf]';
@@ -671,7 +671,18 @@ sub init {
       . '|[\xf1-\xf3][\x80-\xbf][\x80-\xbf][\x80-\xbf]'
       . '|[\xf4-\xf4][\x80-\x8f][\x80-\xbf][\x80-\xbf]';
 
-    $re_utf8_c    = $re_utf8_rfc3629_c;
+    # optimized RFC 3629 for ja_JP
+    $re_utf8_rfc3629_c_ja_JP =
+        '[\xe1-\xec][\x80-\xbf][\x80-\xbf]'
+      . '|[\xc2-\xdf][\x80-\xbf]'
+      . '|[\xee-\xef][\x80-\xbf][\x80-\xbf]'
+      . '|[\xf0-\xf0][\x90-\xbf][\x80-\xbf][\x80-\xbf]'
+      . '|[\xe0-\xe0][\xa0-\xbf][\x80-\xbf]'
+      . '|[\xed-\xed][\x80-\x9f][\x80-\xbf]'
+      . '|[\xf1-\xf3][\x80-\xbf][\x80-\xbf][\x80-\xbf]'
+      . '|[\xf4-\xf4][\x80-\x8f][\x80-\xbf][\x80-\xbf]';
+
+    $re_utf8_c    = $re_utf8_rfc3629_c_ja_JP;
     $re_utf8_kana = '\xef\xbd[\xa1-\xbf]|\xef\xbe[\x80-\x9f]';
     $re_utf8_voiced_kana =
         '(\xef\xbd[\xb3\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf]'

@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::CDA;
 
 use strict;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;
@@ -26,7 +26,7 @@ sub run {
                 return $class->FORBIDDEN;
             }
 
-            my $redirectUrl = $class->_buildUrl( $req, $uri );
+            my $redirectUrl   = $class->_buildUrl( $req, $uri );
             my $redirectHttps = ( $redirectUrl =~ m/^https/ );
             $class->set_header_out(
                 $req,
@@ -44,6 +44,7 @@ sub run {
                     : ""
                   )
             );
+            $req->data->{'noTry'} = 1;
             return $class->REDIRECT;
         }
     }

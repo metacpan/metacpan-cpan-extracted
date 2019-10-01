@@ -1,5 +1,10 @@
 Revision history for IO-Async-Loop-Mojo
 
+0.06    2019-09-25 23:00:51
+        [BUGFIXES]
+         * Fix for spurious activations of wrapper callback if no read- or
+           write-ready callback was defined
+
 0.05    2013/11/20 09:58:14
         [BUGFIXES]
          * Workaround for Mojo::Reactor classes that can't handle nested

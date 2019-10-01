@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -34,7 +34,7 @@ sub onReload {
 sub checkConf {
     my ( $class, $force ) = @_;
     $class->logger->debug("Check configuration for $class");
-    my $prm = { local => !$force, localPrm => $class->localConfig };
+    my $prm  = { local => !$force, localPrm => $class->localConfig };
     my $conf = $class->confAcc->getConf($prm);
     chomp $Lemonldap::NG::Common::Conf::msg;
 
@@ -197,7 +197,8 @@ sub defaultValuesInit {
         securedCookie           timeout            timeoutActivity
         timeoutActivityInterval useRedirectOnError useRedirectOnForbidden
         useSafeJail             whatToTrace        handlerInternalCache
-        handlerServiceTokenTTL
+        handlerServiceTokenTTL  customToTrace      lwpOpts lwpSslOpts
+        authChoiceParam         authChoiceAuthBasic
         )
     );
 
@@ -302,7 +303,7 @@ sub locationRulesInit {
 
         # Default policy set to 'accept'
         unless ( $class->tsv->{defaultCondition}->{$vhost} ) {
-            $class->tsv->{defaultCondition}->{$vhost} = sub { 1 };
+            $class->tsv->{defaultCondition}->{$vhost}  = sub { 1 };
             $class->tsv->{defaultProtection}->{$vhost} = 0;
         }
     }
@@ -348,16 +349,18 @@ sub sessionStorageInit {
         if ( $conf->{status} ) {
             my $params = "";
             if ( $class->tsv->{sessionCacheModule} ) {
-                require Data::Dumper;
-                $params = ' '
-                  . $class->tsv->{sessionCacheModule} . ','
-                  . Data::Dumper->new( [ $class->tsv->{sessionCacheOptions} ] )
-                  ->Terse(1)->Indent(0)->Dump;    # To send params on one line
+                $params = ' ' . join(
+                    ',',
+                    $class->tsv->{sessionCacheModule} . map {
+                        "$_ => "
+                          . $class->tsv->{sessionCacheOptions}->{$_}
+                    } keys %{ $class->tsv->{sessionCacheOptions} // {} }
+                );
             }
             $class->tsv->{statusPipe}->print("RELOADCACHE $params\n");
         }
     }
-    return 1;
+return 1;
 }
 
 ## @imethod void headersInit(hashRef args)
@@ -378,7 +381,8 @@ sub headersInit {
         $class->tsv->{headerList}->{$vhost} = [ keys %headers ];
         my $sub = '';
         foreach ( keys %headers ) {
-            my $val = $class->substitute( $headers{$_} ) . " || ''";
+            $headers{$_} ||= "''";
+            my $val = $class->substitute( $headers{$_} ) . " // ''";
             $sub .= "('$_' => $val),";
         }
 
@@ -568,7 +572,7 @@ sub substitute {
     $expr =~ s/\$ip\b/\$ENV{REMOTE_ADDR}/sg;
 
     # substitute vars with session data, excepts special vars $_ and $\d+
-    $expr =~ s/\$(?!(?:ENV|env)\b)([_a-zA-Z]\w*)/\$s->{$1}/sg;
+    $expr =~ s/\$(?!(?:ENV|env)\b)(_\w+|[a-zA-Z]\w*)/\$s->{$1}/sg;
     $expr =~ s/\$ENV\{/\$r->{env}->\{/g;
     $expr =~ s/\$env->\{/\$r->{env}->\{/g;
 

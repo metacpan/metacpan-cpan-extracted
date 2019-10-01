@@ -2,7 +2,7 @@ package Catmandu::Fix::vacuum;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2006';
+our $VERSION = '1.2007';
 
 use Catmandu::Util qw(is_value is_hash_ref is_array_ref);
 use Scalar::Util qw(refaddr);
@@ -19,7 +19,7 @@ sub _visit {
 sub _empty {
     my ($self, $v) = @_;
     !defined($v)
-        || (is_value($v) && $v !~ /\S/)
+        || (is_value($v)     && $v !~ /\S/)
         || (is_hash_ref($v)  && !%$v)
         || (is_array_ref($v) && !@$v);
 }
@@ -66,7 +66,7 @@ sub fix {
                 my @vals;
                 for my $v (@$d) {
                     next if $self->_empty($v);
-                    push @vals, $v;
+                    push @vals,  $v;
                     push @stack, $v if $self->_visit($v);
                 }
                 splice @$d, 0, @$d, @vals;

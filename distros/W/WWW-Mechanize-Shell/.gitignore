@@ -2,11 +2,15 @@ Makefile
 Makefile.old
 *.tar.gz
 *.bak
+*.swp
 pm_to_blib
 blib/
 WWW-Mechanize-Shell-*
 WWW-Mechanize-Shell-*/
-.releaserc
 .lwpcookies
-CVS
+.releaserc
 MYMETA.*
+*.pl
+.prove
+.patch
+CVS/

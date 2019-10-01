@@ -1,0 +1,29 @@
+<TABLE BORDER="0" CELLSPACING="0">
+<TR>
+<TD>
+<STRONG>Name:</STRONG>
+<%NAME/h%>
+</TD>
+<TD>&nbsp;&nbsp;</TD>
+<TD>
+<STRONG>Description:</STRONG>
+<%DESCRIPTION/h%>
+</TD>
+</TR>
+
+<TR>
+<TD>
+<STRONG>Last Published:</STRONG>
+<%Date/f style="short" gmtime="<%EFFECTIVE_TIME/f%>"%>
+</TD>
+<TD>&nbsp;&nbsp;</TD>
+<TD>
+<STRONG>Last Modified:</STRONG>
+<%Condition/h
+  a.arg="PREVIEW_ID"
+  a.template={<%Date/f style="short" gmtime="<%MOD_TIME/f%>"%>}
+  default.template="Unmodified"
+%>
+</TD>
+</TR>
+</TABLE>

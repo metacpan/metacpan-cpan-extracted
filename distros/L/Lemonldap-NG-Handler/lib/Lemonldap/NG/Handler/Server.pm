@@ -7,7 +7,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Handler::Server::Main;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Handler::PSGI';
 
@@ -26,7 +26,7 @@ sub _run {
     return sub {
         my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
         my $res = $self->_authAndTrace($req);
-        push @{ $res->[1] }, @{ $req->respHeaders },
+        push @{ $res->[1] }, $req->spliceHdrs,
           Cookie => ( $req->{Cookie} // '' );
         return $res;
     };

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Jacode4e
-version: 2.13.6.15
+version: 2.13.6.16
 abstract: jacode.pl-like program for enterprise
 author:
   - ina <ina@cpan.org>

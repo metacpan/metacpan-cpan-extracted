@@ -1,7 +1,7 @@
 package Complete::Bash;
 
-our $DATE = '2019-07-30'; # DATE
-our $VERSION = '0.328'; # VERSION
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.330'; # VERSION
 
 use 5.010001;
 use strict;
@@ -401,7 +401,7 @@ sub _terminal_width {
     # XXX need to cache?
     if (eval { require Term::Size; 1 }) {
         my ($cols, undef) = Term::Size::chars(*STDOUT{IO});
-        $cols;
+        $cols // 80;
     } else {
         $ENV{COLUMNS} // 80;
     }
@@ -699,8 +699,8 @@ sub format_completion {
 
         require File::Which;
         unless (File::Which::which("fzf")) {
-            @res = $code_return_message->("Cannot find fzf to filter ".
-                                              scalar(@words)." items");
+            #@res = $code_return_message->("Cannot find fzf to filter ".
+            #                                  scalar(@words)." items");
             goto RETURN_RES;
         }
 
@@ -755,7 +755,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.328 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-07-30.
+This document describes version 0.330 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-08-20.
 
 =head1 DESCRIPTION
 

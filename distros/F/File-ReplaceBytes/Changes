@@ -1,5 +1,8 @@
 See also the git repository.
 
+1.02    September 2019
+        * Fix repo metadata
+
 1.01    May 2018
         * test tied scalars
         * relicense under BSD license

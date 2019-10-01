@@ -5,7 +5,7 @@
   <link rel="prefetch" href="<TMPL_VAR NAME="STATIC_PREFIX">struct.json" />
 </head>
 
-<body ng-app="llngManager" ng-controller="TreeCtrl" ng-csp>
+<body ng-app="llngViewer" ng-controller="TreeCtrl" ng-csp>
 
   <TMPL_INCLUDE NAME="menubar.tpl">
 
@@ -98,89 +98,6 @@
     <ol ui-tree-nodes="btn btn-sm" ng-model="node.nodes_cond" ng-class="{hidden: collapsed}">
       <li ng-repeat="(name,node) in node.nodes_cond track by node.id" ng-if="node.show" ui-tree-node ng-include="'nodes_renderer.html'" collapsed="true"></li>
     </ol>
-  </script>
-
-  <!-- Prompt -->
-  <script type="text/ng-template" id="prompt.html">
-  <div role="alertdialog" aria-labelledby="ptitle" aria-describedby="ptitle">
-    <div class="modal-header">
-      <h3 id="ptitle" class="modal-title" trspan="{{elem('message').title}}" />
-    </div>
-    <div class="modal-body">
-      <div class="input-group maxw">
-        <label class="input-group-addon" id="promptlabel" for="promptinput" trspan="{{elem('message').field}}"/>
-        <input id="promptinput" class="form-control" ng-model="result" aria-describedby="promptlabel"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" id="promptok" ng-click="ok()" trspan="ok" role="button"></button>
-      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel" role="button"></button>
-    </div>
-  </div>
-  </script>
-
-  <!-- Message display -->
-  <script type="text/ng-template" id="message.html">
-  <div role="alertdialog" aria-labelledby="mtitle" aria-describedby="mbody">
-    <div class="modal-header">
-      <h3 id="mtitle" class="modal-title" trspan="{{elem('message').title}}" />
-    </div>
-    <div id="mbody" class="modal-body">
-      <div class="modal-p">{{translateP(elem('message').message)}}</div>
-      <ul class="main-modal-ul" ng-model="elem('message').items">
-        <li ng-repeat="item in elem('message').items" ng-include="'messageitem.html'"/>
-      </ul>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" id="messageok" ng-click="ok()" trspan="ok" role="button"></button>
-      <button class="btn btn-warning" ng-click="cancel()" ng-if="elem('message').displayCancel" trspan="cancel" role="button"></button>
-    </div>
-  </div>
-  </script>
-
-  <script type="text/ng-template" id="messageitem.html">
-    <div class="modal-p">{{translateP(item.message)}}</div>
-    <ul class="modal-ul" ng-model="item.items">
-      <li ng-repeat="item in item.items" ng-include="'messageitem.html'"/>
-    </ul>
-  </script>
-
-  <!-- Password question -->
-  <script type="text/ng-template" id="password.html">
-  <div role="alertdialog" aria-labelledby="pwtitle" aria-describedby="pwtitle">
-    <div class="modal-header">
-      <h3 id="pwtitle" class="modal-title" trspan="enterPassword" />
-    </div>
-    <div class="modal-body">
-      <div class="input-group maxw">
-        <label class="input-group-addon" id="mlabel" for="mdPwd" trspan="password"/>
-        <input id="mdPwd" class="form-control" ng-model="result" aria-describedby="mlabel"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" id="passwordok" ng-click="ok()" trspan="ok" role="button"></button>
-      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel" role="button"></button>
-    </div>
-  </div>
-  </script>
-
-  <!-- Save confirm -->
-  <script type="text/ng-template" id="save.html">
-  <div role="alertdialog" aria-labelledby="stitle" aria-describedby="sbody">
-    <div class="modal-header">
-      <h3 id="stitle" class="modal-title" trspan="savingConfirmation" />
-    </div>
-    <div id="sbody" class="modal-body">
-      <div class="input-group maxw">
-        <label id="slabel" class="input-group-addon" for="longtextinput" trspan="cfgLog"/>
-        <textarea id="longtextinput" rows="5" class="form-control" ng-model="result" aria-describedby="slabel" />
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" id="saveok" ng-click="ok()" trspan="ok" role="button"></button>
-      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel" role="button"></button>
-    </div>
-  </div>
   </script>
 
   <TMPL_INCLUDE NAME="scripts.tpl">

@@ -1,8 +1,13 @@
 Revision history for Date::Time2fmtstr
 
 1.00    2016-01-09
-        First version, released on an unsuspecting world.
+        - First version, released on an unsuspecting world.
 1.01    2016-01-19
-        Fix bug in processing 2-digit years.
+        - Fix bug in processing 2-digit years.
 1.02    2016-01-21
-        Fix another bug in processing 2-digit years.
+        - Fix another bug in processing 2-digit years.
+1.03    2019-09-25
+        - ADD "Seconds since start of day" (sssss - zero-padded, ssss0 - not)
+        - ADD "Minutes since start of day" (mmmm and mmm0)
+        - ADD "Number of week of the month" (m)
+        - Fix "Number of week of the year" - wasn't working correctly.

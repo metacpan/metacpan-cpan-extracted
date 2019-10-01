@@ -13,7 +13,6 @@ my $builder = Module::Build->new(
                        'lib'            => 0,
                        'Env'            => 1.00,
                        'Data::Dumper'   => 0,
-                       'PerlIO::locale' => 0,
                       },
     build => {
               'strict'   => 0,

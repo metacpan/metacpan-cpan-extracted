@@ -7,7 +7,7 @@ use warnings;
 
 use Data::Object::Utility;
 
-our $VERSION = '1.85'; # VERSION
+our $VERSION = '1.87'; # VERSION
 
 sub import {
   my ($class, @args) = @_;
@@ -36,6 +36,7 @@ sub _formulate_opts {
   # name-only support
   %opts = (is => 'ro', isa => 'Any') unless %opts;
 
+  %opts = (%opts, _formulate_new($info, $name, %opts)) if $opts{new};
   %opts = (%opts, _formulate_bld($info, $name, %opts)) if $opts{bld};
   %opts = (%opts, _formulate_clr($info, $name, %opts)) if $opts{clr};
   %opts = (%opts, _formulate_crc($info, $name, %opts)) if $opts{crc};
@@ -51,9 +52,20 @@ sub _formulate_opts {
   %opts = (%opts, _formulate_wkr($info, $name, %opts)) if $opts{wkr};
   %opts = (%opts, _formulate_wrt($info, $name, %opts)) if $opts{wrt};
 
-  $name = "+$name" if $opts{mod};
+  $name = "+$name" if $opts{mod} || $opts{modify};
 
   return ($name, %opts);
+}
+
+sub _formulate_new {
+  my ($info, $name, %opts) = @_;
+
+  if (delete $opts{new}) {
+    $opts{builder} = "new_${name}";
+    $opts{lazy} = 1;
+  }
+
+  return (%opts);
 }
 
 sub _formulate_bld {
@@ -336,6 +348,17 @@ The C<default> directive expects a coderef and is used to build a default value
 if one is not provided to the constructor. See the L<Moo> documentation for
 more details.
 
+=item mod|modify
+
+  # modify definition
+
+  mod => 1
+  modify => 1
+
+The C<modify> directive denotes whether a pre-existing attribute's definition
+is being modified. This ability is not supported by the L<Moo> object
+superclass.
+
 =item hnd|handles
 
   # dispatch to value
@@ -356,6 +379,17 @@ documentation for more details.
 
 The C<lazy> directive denotes whether the attribute will be constructed
 on-demand, or on-construction. See the L<Moo> documentation for more details.
+
+=item new
+
+  # lazy attribute
+  # create new_${attribute}
+
+  new => 1
+
+The C<new> directive, if truthy, denotes the the attribute will be constructed
+on-demand, i.e. is lazy, with a builder named C<new_{attribute}>. This ability
+is not supported by the L<Moo> object superclass.
 
 =item pre|predicate
 
@@ -413,7 +447,7 @@ details.
 
 =head1 CREDITS
 
-Al Newkirk, C<+309>
+Al Newkirk, C<+317>
 
 Anthony Brummett, C<+10>
 
@@ -431,8 +465,9 @@ Al Newkirk, C<awncorp@cpan.org>
 
 Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated here,
+https://github.com/iamalnewkirk/do/blob/master/LICENSE.
 
 =head1 PROJECT
 

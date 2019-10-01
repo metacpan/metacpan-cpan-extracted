@@ -11,7 +11,7 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Manager::Conf';
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -29,7 +29,7 @@ sub addRoutes {
     my @enabledKeys = ();
     my @keys        = qw(virtualHosts samlIDPMetaDataNodes samlSPMetaDataNodes
       applicationList oidcOPMetaDataNodes oidcRPMetaDataNodes
-      casSrvMetaDataNodes casAppMetaDataNodes
+      casSrvMetaDataNodes casAppMetaDataNodes sfExtra
       authChoiceModules grantSessionRules combModules
       openIdIDPList);
 
@@ -80,7 +80,7 @@ sub viewDiff {
     # Check Diff activation rule
     unless ( $self->diffRule->( $req, $req->{userData} ) ) {
         my $user = $req->{userData}->{_whatToTrace} || 'anonymous';
-        $self->userLogger->warn("$user tried to compare configurations!!!");
+        $self->userLogger->warn("$user is not authorized to compare configurations");
         return $self->sendJSONresponse( $req, { 'value' => '_Hidden_' } );
     }
 
@@ -144,7 +144,7 @@ sub viewKey {
             $self->logger->debug(
                 " $req->{env}->{REQUEST_URI} -> URI FORBIDDEN");
             my $user = $req->{userData}->{_whatToTrace} || 'anonymous';
-            $self->userLogger->warn("$user tried to browse configurations!!!");
+            $self->userLogger->warn("$user is not authorized to browse configurations");
             $self->rejectKey( $req, @args );
         }
     }

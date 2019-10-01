@@ -8,14 +8,14 @@ my $res;
 my $maintests = 0;
 my $client;
 
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 SKIP: {
     eval { require DBI; require DBD::SQLite; };
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dvador','dvador','Test user 1')");
     $dbh->do("INSERT INTO users VALUES ('rtyler','rtyler','Test user 1')");
@@ -43,7 +43,6 @@ SKIP: {
 }
 count($maintests);
 clean_sessions();
-eval { unlink 't/userdb.db' };
 done_testing( count() );
 
 sub try {
@@ -86,7 +85,7 @@ sub iniCmb {
                         },
                     },
 
-                    dbiAuthChain        => 'dbi:SQLite:dbname=t/userdb.db',
+                    dbiAuthChain        => "dbi:SQLite:dbname=$userdb",
                     dbiAuthUser         => '',
                     dbiAuthPassword     => '',
                     dbiAuthTable        => 'users',

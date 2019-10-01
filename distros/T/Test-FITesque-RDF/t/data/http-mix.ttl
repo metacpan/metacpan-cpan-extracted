@@ -15,20 +15,24 @@
     test:param_base <http://example.org/my-parameters#> ;
     test:params [
         my:user "alice" ;
-        test:requests ( <#public-writeread-unauthn-alt-get-req> ) ;
-        test:responses ( <#public-writeread-unauthn-alt-get-res> ) 
-                ] .
-                
+        test:steps (
+            [
+                test:request <#public-writeread-unauthn-alt-get-req> ;
+                test:response_assertion <#public-writeread-unauthn-alt-get-res>
+            ]
+        )
+    ] .
+
 
 <#public-writeread-unauthn-alt-get-req> a http:RequestMessage ;
     http:method "GET" ;
     http:requestURI </public/foobar.ttl> .
-            
+
 <#public-writeread-unauthn-alt-get-res> a http:ResponseMessage ;
-            httph:accept_post  "text/turtle", "application/ld+json" ;
-            httph:content_type "text/turtle" .
-            
+    httph:accept_post  "text/turtle", "application/ld+json" ;
+    httph:content_type "text/turtle" .
+
 
 <http://example.org/httplist#http_req_res_list_unauthenticated> a nfo:SoftwareItem ;
-            deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
-            nfo:definesFunction "http_req_res_list_unauthenticated" .
+    deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
+    nfo:definesFunction "http_req_res_list_unauthenticated" .

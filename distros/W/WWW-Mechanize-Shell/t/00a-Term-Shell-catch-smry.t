@@ -14,7 +14,7 @@ TODO: {
   # Now check that the Term::Shell summary calls catch_smry
 
   require Term::Shell;
-  use vars qw( $called );
+  our $called;
   {
     package Term::Shell::Test;
     use base 'Term::Shell';

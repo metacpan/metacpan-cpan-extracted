@@ -23,9 +23,10 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.18';
+$VERSIONE = '0.22';
 $VERSIONE = $VERSIONE;
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use FindBin;
 use File::Path;
 use File::Copy;
@@ -43,6 +44,7 @@ C:\> pmake xtest
 C:\> pmake install
 C:\> pmake dist
 C:\> pmake ptar
+C:\> pmake xzvf
 C:\> pmake pwget
 END
     }
@@ -57,6 +59,7 @@ $ ./pmake.bat xtest
 $ ./pmake.bat install
 $ ./pmake.bat dist
 $ ./pmake.bat ptar
+$ ./pmake.bat xzvf
 $ ./pmake.bat pwget
 
 END
@@ -64,9 +67,11 @@ END
 }
 
 # get file list
-open(FH_MANIFEST, 'MANIFEST');
-chomp(my @file = <FH_MANIFEST>);
-close FH_MANIFEST;
+my @file = ();
+if (open(FH_MANIFEST, 'MANIFEST')) {
+    chomp(@file = <FH_MANIFEST>);
+    close FH_MANIFEST;
+}
 
 for my $target (@ARGV) {
 
@@ -137,6 +142,9 @@ for my $target (@ARGV) {
     # make dist
     elsif ($target eq 'dist') {
 
+        # your PAUSE ID here
+        my $author = q{ina <ina@cpan.org>};
+
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
         chomp(my $name_as_filesystem = <FH_MANIFEST>);
@@ -199,13 +207,13 @@ for my $target (@ARGV) {
             File::Copy           2.02
             File::Path           1.0401
             FindBin              1.42
-            IOas::CP932          0.04
-            IOas::CP932IBM       0.04
-            IOas::CP932NEC       0.04
-            IOas::CP932X         0.04
-            IOas::SJIS2004       0.04
-            Jacode4e::RoundTrip  2.13.81.7
-            UTF8::R2             0.03
+            IOas::CP932          0.06
+            IOas::CP932IBM       0.06
+            IOas::CP932NEC       0.06
+            IOas::CP932X         0.06
+            IOas::SJIS2004       0.06
+            Jacode4e::RoundTrip  2.13.81.8
+            UTF8::R2             0.05
             strict               1.01
         ));
         my %requires = (qw(
@@ -250,8 +258,9 @@ for my $target (@ARGV) {
         # write Makefile.PL
         open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
         binmode FH_MAKEFILEPL;
-        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl);
+        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author);
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -261,7 +270,7 @@ WriteMakefile(
     'PREREQ_PM' => {
 %s
     },
-    'AUTHOR'    => q{ina <ina@cpan.org> in a CPAN},
+    'AUTHOR'    => q{%s},
 );
 
 __END__
@@ -294,7 +303,7 @@ END
 
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $requires_as_yml, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $requires_as_yml, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -303,7 +312,7 @@ name: %s
 version: %s
 abstract: %s
 author:
-  - ina <ina@cpan.org>
+  - %s
 license: perl
 generated_by: pmake.bat
 requires:
@@ -343,13 +352,13 @@ END
 
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json);
 {
     "name" : "%s",
     "version" : "%s",
     "abstract" : "%s",
     "author" : [
-        "ina <ina@cpan.org>"
+        "%s"
     ],
     "dynamic_config" : 1,
     "generated_by" : "pmake.bat",
@@ -941,6 +950,7 @@ LICENSING
 ######################################################################
 
 use strict;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
 
 if ($ARGV[0] ne 'xzvf') {
     die <<END;
@@ -1027,6 +1037,45 @@ END
             close FH_TARBAT;
             chmod 0755, 'ptar';
         }
+    }
+
+    # unzip and untar *.tar.gz
+    elsif ($target =~ /^xzvf$/) {
+        for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
+
+            if ($^O =~ /(?:solaris|linux)/i) {
+                system(qq{gzip -cd $gzfile | tar -xvf -});
+            }
+            else {
+                eval q{
+                    use Compress::Zlib;
+                    use Archive::Tar;
+                };
+
+                my $gz = gzopen($gzfile, 'rb');
+                (my $tarfile = $gzfile) =~ s/\.gz$//xmsi;
+                open(FH_TAR, ">$tarfile") || die "Can't open file: $tarfile\n";
+                binmode FH_TAR;
+                while ($gz->gzreadline(my $line)) {
+                    print FH_TAR $line;
+                }
+                $gz->gzclose;
+                close FH_TAR;
+
+                my $tar = Archive::Tar->new($tarfile,1);
+                for my $file ($tar->list_files){
+                    if (-e $file) {
+                        print STDERR "skip $file is already exists.\n";
+                    }
+                    else {
+                        print STDERR "x $file\n";
+                        $tar->extract($file);
+                    }
+                }
+                unlink $tarfile;
+            }
+        }
+        last;
     }
 
     # make pwget
@@ -1168,12 +1217,15 @@ sub _runtests {
     #   Consult the user's guide for more details about POSIX paths: #'
     #     http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
 
-    if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
-        $ENV{'CYGWIN'} = join(' ', $ENV{'CYGWIN'}, 'nodosfilewarning');
+    if (exists $ENV{'CYGWIN'}) {
+        if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
+            $ENV{'CYGWIN'} = join(' ', $ENV{'CYGWIN'}, 'nodosfilewarning');
+        }
     }
 
     my $scriptno = 0;
     for my $script (@script) {
+        next if not -e $script;
         my @result = qx{$^X $script};
         my($tests) = shift(@result) =~ /^1..([0-9]+)/;
 
@@ -1283,17 +1335,6 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-=head1 SEE ALSO
-
- CPAN Directory INABA Hitoshi
- http://search.cpan.org/~ina/
-
- BackPAN
- http://backpan.perl.org/authors/id/I/IN/INA/
-
- Recent Perl packages by "INABA Hitoshi"
- http://code.activestate.com/ppm/author:INABA-Hitoshi/
 
 =cut
 

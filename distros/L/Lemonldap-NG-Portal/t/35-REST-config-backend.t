@@ -127,8 +127,60 @@ ok( $res->{_session_id} eq $spId, ' Good ID' )
   or explain( $res, "_session_id => $spId" );
 ok( $res->{uid} eq 'french', ' Uid is french' )
   or explain( $res, 'uid => french' );
-ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' );
+ok( $res->{cn} eq 'Frédéric Accents', ' UTF-8 values' );
 count(5);
+
+# Retrieve error messages
+ok(
+    $res = $issuer->_get("/error/fr/9"),
+    'Retrieve error message: 9 from lang: fr'
+);
+expectOK($res);
+ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+  or print STDERR $@;
+ok( $res->{lang} eq 'fr', ' Good lang' )
+  or explain( $res, 'lang => fr' );
+ok( $res->{errorNum} eq '9', ' Good errorNum' )
+  or explain( $res, 'errorNum => 9' );
+ok( $res->{errorMsgRef} eq 'PE9', ' Good errorMsgName' )
+  or explain( $res, 'errorMsgName => PE9' );
+ok( $res->{errorsFileURL} eq '/static/languages/fr.json', ' Good file URL' )
+  or explain( $res, 'URL' );
+ok( $res->{result} eq '1', ' Good result' )
+  or explain( $res, 'result => 1' );
+count(7);
+
+ok(
+    $res = $issuer->_get("/error/es"),
+    'Retrieve ALL error messages from lang: es'
+);
+expectOK($res);
+ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+  or print STDERR $@;
+ok( $res->{lang} eq 'es', ' Good lang' )
+  or explain( $res, 'lang => es' );
+ok( $res->{errorNum} eq 'all', ' Good errorNum' )
+  or explain( $res, 'errorNum => all' );
+ok( $res->{errorsFileURL} eq '/static/languages/es.json', ' Good file URL' )
+  or explain( $res, 'URL' );
+ok( $res->{result} eq '1', ' Good result' )
+  or explain( $res, 'result => 1' );
+count(6);
+
+ok( $res = $issuer->_get("/error"),
+    'Retrieve ALL error messages from lang: en (default)' );
+expectOK($res);
+ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+  or print STDERR $@;
+ok( $res->{lang} eq 'en', ' Good lang' )
+  or explain( $res, 'lang => en' );
+ok( $res->{errorNum} eq 'all', ' Good errorNum' )
+  or explain( $res, 'errorNum => all' );
+ok( $res->{errorsFileURL} eq '/static/languages/en.json', ' Good file URL' )
+  or explain( $res, 'URL' );
+ok( $res->{result} eq '1', ' Good result' )
+  or explain( $res, 'result => 1' );
+count(6);
 
 # Logout
 switch ('sp');
@@ -174,6 +226,8 @@ sub issuer {
                 userDB            => 'Same',
                 restSessionServer => 1,
                 restConfigServer  => 1,
+                templateDir       => 'site/templates',
+                staticPrefix      => '/static',
             }
         }
     );

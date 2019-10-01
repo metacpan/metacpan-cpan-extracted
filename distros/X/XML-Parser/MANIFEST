@@ -20,6 +20,7 @@ Parser/Encodings/iso-8859-5.enc ISO-8859-5 binary encoding map
 Parser/Encodings/iso-8859-7.enc ISO-8859-7 binary encoding map
 Parser/Encodings/iso-8859-8.enc ISO-8859-8 binary encoding map
 Parser/Encodings/iso-8859-9.enc ISO-8859-9 binary encoding map
+Parser/Encodings/iso-8859-15.enc ISO-8859-15 binary encoding map
 Parser/Encodings/windows-1250.enc cp1250-WinLatin2 binary encoding map
 Parser/Encodings/windows-1251.enc cp1251-Russian binary encoding map
 Parser/Encodings/windows-1252.enc cp1252-WinLatin1 binary encoding map

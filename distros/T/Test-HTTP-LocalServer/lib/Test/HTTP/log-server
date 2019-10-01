@@ -6,7 +6,7 @@ use CGI;
 use HTTP::Request::AsCGI;
 use Getopt::Long;
 use Socket();
-our $VERSION = '0.63';
+our $VERSION = '0.68';
 
 $|++;
 
@@ -56,6 +56,39 @@ sub debug($) {
 };
 
 my $multi_param = eval { CGI->can('multi_param') } ? 'multi_param' : 'param';
+
+sub respond_200 {
+    my( $location, $r ) = @_;
+    my $context = HTTP::Request::AsCGI->new( $r )->setup;
+    my $q = CGI->new();
+
+    # Make sticky form fields
+    my ($filename, $filetype, $filecontent, $query,$botcheck_query,$query2,$session,%cat);
+    $query = defined $q->param('query') ? $q->param('query') : "(empty)";
+    $botcheck_query = defined $q->param('botcheck_query') ? $q->param('botcheck_query') : "(empty)";
+    $query2 = defined $q->param('query2') ? $q->param('query2') : "(empty)";
+    $session = defined $q->param('session') ? $q->param('session') : 1;
+    my @cats = $q->$multi_param('cat');
+    %cat = map { $_ => 1 } ( @cats ? @cats : qw( cat_foo cat_bar ));
+    my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
+    my $headers = CGI::escapeHTML( $r->headers->as_string );
+    my $rbody = sprintf $body,$headers, $location,
+                     $filename, $filetype, $filecontent,
+                     $session,$query,$botcheck_query,$query2,@categories,
+                     ;
+    my $res = HTTP::Response->new(200, "OK", [
+          'Set-Cookie' => $q->cookie(-name => 'log-server-httponly',-value=>'supersecret', -discard => 1, -httponly=>1),
+          'Set-Cookie' => $q->cookie(-name => 'log-server',-value=>'shazam2', -discard=>1,),
+          'Cache-Control' => 'no-cache',
+          'Pragma' => 'no-cache',
+          'Max-Age' => 0,
+          'Connection' => 'close',
+          'Content-Length' => length($rbody),
+      ], $rbody);
+    $res->content_type('text/html; charset=ISO-8859-1');
+    debug "Request " . ($r->uri->path || "/");
+    $res
+}
 
 SERVERLOOP: {
   my $quitserver;
@@ -139,7 +172,7 @@ SERVERLOOP: {
                 Content_Type => "application/xml",
                 Content_Encoding => 'bzip2,bzip2,bzip2', # say my name three times
             );
-            # 16M bzip triple-encoded, see gen-bzipbomb.pl
+            # 16M bzip thrice-encoded, see gen-bzipbomb.pl
             $body = join "",
                 "BZh11AY&SY\tPFN\0\0'\177\377\355\e\177v\363\267|\344?\226]pVbW\25\313|F",
                 "]h0\30\303\305i\272CF9fS\260\0\271\b\32\32h\323\32414\304ddbh4\304h4\304z\231\6h",
@@ -160,7 +193,7 @@ SERVERLOOP: {
                 Content_Type => "application/xml",
                 Content_Encoding => 'gzip,gzip,gzip', # say my name three times
             );
-            # 16M bzip triple-encoded, see gen-gzipbomb.pl
+            # 16M bzip thrice-encoded, see gen-gzipbomb.pl
             $body = join "",
                 "\37\213\b\0\0\0\0\0\0\377\223\357\346`\0\203\377o/l\344mr`h}h\235\321\341",
                 "- T^\300^\225-\276p\307\221Km\242>/b\31\237%\260>\346\220S7\2760\243&\376\363",
@@ -182,34 +215,22 @@ SERVERLOOP: {
                 ;
             $res = HTTP::Response->new(200, "OK", $headers, $body);
 
-        } else {
-            my $context = HTTP::Request::AsCGI->new( $r )->setup;
-            my $q = CGI->new();
+        } elsif ($location =~ m!^/basic_auth/([^/]+)/([^/]+)$!) {
+            my ($user, $pass) = $r->authorization_basic;
+            my( $ex_user, $ex_pass ) = ($1,$2);
+            if(     $user eq $ex_user
+                and $pass eq $ex_pass) {
+                $res = respond_200( $location, $r );
 
-            # Make sticky form fields
-            my ($filename, $filetype, $filecontent, $query,$botcheck_query,$query2,$session,%cat);
-            $query = defined $q->param('query') ? $q->param('query') : "(empty)";
-            $botcheck_query = defined $q->param('botcheck_query') ? $q->param('botcheck_query') : "(empty)";
-            $query2 = defined $q->param('query2') ? $q->param('query2') : "(empty)";
-            $session = defined $q->param('session') ? $q->param('session') : 1;
-            my @cats = $q->$multi_param('cat');
-            %cat = map { $_ => 1 } ( @cats ? @cats : qw( cat_foo cat_bar ));
-            my @categories = map { $cat{$_} ? "checked" : "" } qw( cat_foo cat_bar cat_baz );
-            my $headers = CGI::escapeHTML( $r->headers->as_string );
-            my $rbody = sprintf $body,$headers, $location,
-            $filename, $filetype, $filecontent,
-			                          $session,$query,$botcheck_query,$query2,@categories;
-            $res = HTTP::Response->new(200, "OK", [
-                  'Set-Cookie' => $q->cookie(-name => 'log-server-httponly',-value=>'supersecret', -discard => 1, -httponly=>1),
-                  'Set-Cookie' => $q->cookie(-name => 'log-server',-value=>'shazam2', -discard=>1,),
-                  'Cache-Control' => 'no-cache',
-                  'Pragma' => 'no-cache',
-                  'Max-Age' => 0,
-                  'Connection' => 'close',
-                  'Content-Length' => length($rbody),
-              ], $rbody);
-            $res->content_type('text/html; charset=ISO-8859-1');
-            debug "Request " . ($r->uri->path || "/");
+            } else {
+                debug "# User : '$user' Password : '$pass'\n";
+                $res = HTTP::Response->new(401, "Auth Required", undef,
+                                            "auth required ($user/$pass)");
+                $res->www_authenticate("Basic realm=\"testing realm\"");
+            };
+
+        } else {
+            $res = respond_200( $location, $r );
         };
       };
       debug "Response:\n" . $res->as_string

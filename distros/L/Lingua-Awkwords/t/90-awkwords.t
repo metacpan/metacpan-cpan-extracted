@@ -18,9 +18,9 @@ dies_ok { $la->render };
 dies_ok { $la->walk };
 
 $la->pattern(q{ aaa });
-is( $la->render, 'aaa' );
+is($la->render, 'aaa');
 
-$la = Lingua::Awkwords->new( pattern => q{ V/catC } );
+$la = Lingua::Awkwords->new(pattern => q{ V/catC });
 my @findings;
 $la->walk(
     sub {
@@ -46,25 +46,25 @@ $deeply->(
     );
 
     my $subtree1 = Lingua::Awkwords->parse_string(q{ OP^xa });
-    isa_ok( $subtree1, 'Lingua::Awkwords::ListOf' );
+    isa_ok($subtree1, 'Lingua::Awkwords::ListOf');
 
     my $subtree2 = Lingua::Awkwords->parse_string(q{ y/b^y^b });
-    isa_ok( $subtree2, 'Lingua::Awkwords::OneOf' );
+    isa_ok($subtree2, 'Lingua::Awkwords::OneOf');
 
-    $subtree1->walk( Lingua::Awkwords::set_filter('xxx') );
-    is( $subtree1->render, 'xxx' );
+    $subtree1->walk(Lingua::Awkwords::set_filter('xxx'));
+    is($subtree1->render, 'xxx');
 
-    $subtree2->walk( Lingua::Awkwords::set_filter('yyy') );
-    is( $subtree2->render, 'yyy' );
+    $subtree2->walk(Lingua::Awkwords::set_filter('yyy'));
+    is($subtree2->render, 'yyy');
 
-    Lingua::Awkwords::Subpattern->update_pattern( J => $subtree1 );
-    Lingua::Awkwords::Subpattern->update_pattern( K => $subtree2 );
+    Lingua::Awkwords::Subpattern->update_pattern(J => $subtree1);
+    Lingua::Awkwords::Subpattern->update_pattern(K => $subtree2);
 
     $la->pattern(q{ JK });
-    $la->walk( Lingua::Awkwords::set_filter('z') );
+    $la->walk(Lingua::Awkwords::set_filter('z'));
 
     # OP -> z and y|b also now -> z
-    is( $la->render, 'zz' );
+    is($la->render, 'zz');
 }
 
 # corpus to weight utility routines
@@ -99,23 +99,23 @@ $deeply->(
         }
     ];
 
-    my ( $first, $mid, $last, $all ) =
+    my ($first, $mid, $last, $all) =
       Lingua::Awkwords::weights_from("do mutce bo barda gerku bo kavbu");
-    $deeply->( [ $first, $mid, $last, $all ], $expected );
+    $deeply->([ $first, $mid, $last, $all ], $expected);
 
     open my $fh, '<', 't/phrase' or die "t/phrase not found: $!\n";
-    ( $first, $mid, $last, $all ) = Lingua::Awkwords::weights_from($fh);
-    $deeply->( [ $first, $mid, $last, $all ], $expected );
+    ($first, $mid, $last, $all) = Lingua::Awkwords::weights_from($fh);
+    $deeply->([ $first, $mid, $last, $all ], $expected);
 
     Lingua::Awkwords::percentize($last);
     # tape over any floating point differences between platforms
-    for my $v ( values %$last ) {
+    for my $v (values %$last) {
         $v = sprintf "%.1f", $v;
     }
-    $deeply->( $last, { a => 14.3, e => 14.3, o => 42.9, u => 28.6 } );
+    $deeply->($last, { a => 14.3, e => 14.3, o => 42.9, u => 28.6 });
 
-    is( weights2str( ( weights_from("toki sin li toki pona") )[-1] ),
-        'a/i*4/k*2/l/n*2/o*3/p/s/t*2' );
+    is(weights2str((weights_from("toki sin li toki pona"))[-1]),
+        'a/i*4/k*2/l/n*2/o*3/p/s/t*2');
 }
 
 plan tests => 13;

@@ -40,6 +40,8 @@
 
     </TMPL_IF>
 
+    <TMPL_IF NAME="DISPLAY_PPOLICY"><TMPL_INCLUDE NAME="passwordpolicy.tpl"></TMPL_IF>
+
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-lock"></i></span>

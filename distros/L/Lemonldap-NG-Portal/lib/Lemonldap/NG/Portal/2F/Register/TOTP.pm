@@ -5,7 +5,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin', 'Lemonldap::NG::Common::TOTP';
 
@@ -156,7 +156,7 @@ sub run {
         my $maxSize = $self->conf->{max2FDevices};
         $self->logger->debug("Nbr 2FDevices = $size / $maxSize");
         if ( $size >= $maxSize ) {
-            $self->userLogger->error("Max number of 2F devices is reached !!!");
+            $self->userLogger->warn("Max number of 2F devices is reached");
             return $self->p->sendError( $req, 'maxNumberof2FDevicesReached',
                 400 );
         }
@@ -301,12 +301,18 @@ sub run {
         }
 
         # Delete TOTP 2F device
+        my $TOTPName;
+        foreach (@$_2fDevices) {
+            $TOTPName = $_->{name} if $_->{epoch} eq $epoch;
+        }
         @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
         $self->logger->debug(
-            "Delete 2F Device : { type => 'TOTP', epoch => $epoch }");
+"Delete 2F Device : { type => 'TOTP', epoch => $epoch, name => $TOTPName }"
+        );
         $self->p->updatePersistentSession( $req,
             { _2fDevices => to_json($_2fDevices) } );
-        $self->userLogger->notice('TOTP deletion succeed');
+        $self->userLogger->notice(
+            "TOTP $TOTPName unregistration succeeds for $user");
         return [
             200,
             [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],

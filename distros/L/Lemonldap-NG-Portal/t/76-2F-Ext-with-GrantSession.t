@@ -38,7 +38,7 @@ ok(
 count(1);
 
 my ( $host, $url, $query ) =
-  expectForm( $res, undef, '/ext2fcheck', 'token', 'code' );
+  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code' );
 
 ok(
     $res->[2]->[0] =~

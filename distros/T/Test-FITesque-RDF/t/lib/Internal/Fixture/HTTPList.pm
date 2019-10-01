@@ -6,17 +6,17 @@ use parent 'Test::FITesque::Fixture';
 use Test::More ;
 use Test::Deep ;
 
-sub http_req_res_list_unauthenticated : Test : Plan(7) {
+sub http_req_res_list_unauthenticated : Test : Plan(6) {
   my ($self, $args) = @_;
   note($args->{'-special'}->{description});
   # TODO: Doesn't seem that hard to use Test::Deep for this after all
-  is(scalar @{$args->{'-special'}->{'http-requests'}}, 2, 'There are two requests');
-  is(${$args->{'-special'}->{'http-requests'}}[0]->method, 'PUT', 'First method is PUT');
-  is(${$args->{'-special'}->{'http-requests'}}[1]->method, 'GET', 'Second method is GET');
-  is(scalar @{$args->{'-special'}->{'http-responses'}}, 2, 'There are two responses');
-  is(${$args->{'-special'}->{'http-responses'}}[0]->code, '201', 'First code is 201');
-  is(${$args->{'-special'}->{'http-responses'}}[1]->content_type, 'text/turtle', 'Second ctype is turtle');
-  cmp_deeply([${$args->{'-special'}->{'http-responses'}}[1]->header('Accept-Post')], bag("text/turtle", "application/ld+json"), 'Response header field value bag comparison');
+  my @pairs = @{$args->{'-special'}->{'http-pairs'}};
+  is(scalar @pairs, 2, 'There are two request-response pairs');
+  is($pairs[0]->{request}->method, 'PUT', 'First method is PUT');
+  is($pairs[1]->{request}->method, 'GET', 'Second method is GET');
+  is($pairs[0]->{response}->code, '201', 'First code is 201');
+  is($pairs[1]->{response}->content_type, 'text/turtle', 'Second ctype is turtle');
+  cmp_deeply([$pairs[1]->{response}->header('Accept-Post')], bag("text/turtle", "application/ld+json"), 'Response header field value bag comparison');
 
 }
 

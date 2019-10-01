@@ -1,0 +1,21 @@
+</TABLE>
+<P>
+
+<FORM METHOD="GET" ACTION="content.html">
+
+<%Condition
+  a.cookie="preview_mode"
+  a.template={
+<INPUT TYPE="SUBMIT" NAME="preview" VALUE="  Preview Site  " DISABLED>
+<INPUT TYPE="SUBMIT" NAME="preview_stop" VALUE="  Stop Preview  ">
+}
+  default.template={
+<INPUT TYPE="SUBMIT" NAME="preview" VALUE="  Preview Site  ">
+<INPUT TYPE="SUBMIT" NAME="preview_stop" VALUE="  Stop Preview  " DISABLED>
+}
+%>
+
+<INPUT TYPE="SUBMIT" NAME="publish" VALUE="  Publish  ">
+<INPUT TYPE="SUBMIT" NAME="revert" VALUE="  Revert To ...  ">
+<INPUT TYPE="SUBMIT" NAME="add" VALUE="  Add New  ">
+</FORM>

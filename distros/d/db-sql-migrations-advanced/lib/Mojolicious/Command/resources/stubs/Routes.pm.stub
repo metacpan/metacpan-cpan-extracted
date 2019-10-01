@@ -1,0 +1,19 @@
+package Application::Routes::Stub;
+use Mojo::Base "Application::Routes";
+
+
+has 'router' => sub {
+    return shift->r
+        ->route('/path')
+        ->to(controller => 'Stub')
+        ->over(middleware => ['roles:privilege']);
+};
+
+has 'routes' => sub {
+    my $self = shift;
+
+    $self->router->get('/')
+        ->to(action => 'action');
+};
+
+1;

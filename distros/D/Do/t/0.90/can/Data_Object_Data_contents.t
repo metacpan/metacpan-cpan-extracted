@@ -25,15 +25,20 @@ contents
 
   # [,...]
 
+  $data->contents('pod' , 'help');
+
+  # [,...]
+
 =description
 
 The contents method returns all pod-like sections that start with the given
 string, e.g. C<pod> matches C<=pod foo>. This method returns an arrayref of
-data for the matched sections.
+data for the matched sections. Optionally, you can filter the results by name
+by providing an additional argument.
 
 =signature
 
-contents(Str $arg1) : ArrayRef
+contents(Str $arg1, Str $arg2) : ArrayRef
 
 =type
 

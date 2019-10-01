@@ -56,6 +56,14 @@ td.announce_subject {
   font-weight: bold;
 }
 
+td.date {
+  width: 15%;
+}
+
+td.announce_cell {
+  padding: 1em;
+}
+
 a.announce_subject:link, span.announce_subject {
   color: red;
   font-weight: bold;
@@ -81,4 +89,23 @@ ul.menu a.announce {
 table.announce td.date {
   font-size: smaller;
   color: #777;
+}
+
+.RTAnnounceBannerOverflow {
+  height: 0px;
+  white-space: nowrap;
+}
+
+.RTAnnounceScrollable {
+  overflow: auto;
+  -ms-overflow-style: none; /* IE 11 */
+  scrollbar-width: none; /* Firefox 64 */
+}
+
+/* Chrome */
+/* Leave these as an optional note. It looks better, but the scroll behavior is very
+   difficult to discover without the visual queue of the scroll bar. */
+.RTAnnounceScrollable::-webkit-scrollbar {
+/*  width: 0px;  */ /* Remove scrollbar space */
+/*  background: #fcc;  */ /* Optional: just make scrollbar invisible */
 }

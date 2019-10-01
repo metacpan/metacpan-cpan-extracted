@@ -9,11 +9,36 @@ use warnings;
 use Browser::Open qw( open_browser );
 use Getopt::Long qw( GetOptions );
 use Git::Helpers qw( https_remote_url );
+use Pod::Usage qw(pod2usage);
 
 my $branch;
-GetOptions ( 'branch' => \$branch );
+my $echo;
+my $help;
+my $version;
 
-open_browser( https_remote_url( shift @ARGV, $branch ));
+GetOptions(
+    branch  => \$branch, echo => \$echo, help => \$help,
+    version => \$version,
+);
+
+if ($help) {
+    pod2usage(1);
+    exit(0);
+}
+
+if ($version) {
+    print $Git::Helpers::VERSION, "\n";
+    exit(0);
+}
+
+# https_remote_url( $remote_name, $use_current_branch )
+my $url = https_remote_url( shift @ARGV, $branch );
+if ($echo) {
+    print $url, "\n";
+}
+else {
+    open_browser($url);
+}
 exit;
 
 __END__
@@ -28,19 +53,31 @@ gh-open - Open a browser window with the GitHub URL of the repository which you 
 
 =head1 VERSION
 
-version 0.000018
+version 0.000020
 
 =head1 SYNOPSIS
 
-    # open repo for "origin" on GitHub using your default browser
+    # open repo for remote "origin" on GitHub using your default browser
     gh-open
 
-    # open repo for "upstream" on GitHub using your default browser
+    # open repo for remote "upstream" on GitHub using your default browser
     gh-open upstream
 
     # open repo to your current branch
     gh-open -b
-    gh-open -b upstream
+    gh-open --branch upstream
+
+    # print (echo) URL to screen rather than opening it
+    gh-open -e
+    gh-open --echo -b
+    gh-open -e -b upstream
+
+    # get current version
+    gh-open -v
+
+    # display usage help
+    gh-open -h
+    gh-open --help
 
 =head1 AUTHOR
 
@@ -48,7 +85,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Olaf Alders.
+This software is copyright (c) 2015-2019 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

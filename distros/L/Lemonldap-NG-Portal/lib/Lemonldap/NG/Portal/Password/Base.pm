@@ -9,11 +9,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORD_OK
   PE_PASSWORD_MISMATCH
   PE_PP_MUST_SUPPLY_OLD_PASSWORD
+  PE_PP_PASSWORD_TOO_SHORT
+  PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # INITIALIZATION
 
@@ -52,6 +54,9 @@ sub _modifyPassword {
           unless ( $self->confirm( $req, $req->data->{oldpassword} ) );
     }
 
+    my $cpq = $self->checkPasswordQuality( $req->data->{newpassword} );
+    return $cpq unless ( $cpq == PE_OK );
+
     # Call password package
     my $res = $self->modifyPassword( $req, $req->data->{newpassword} );
     if ( $res == PE_PASSWORD_OK ) {
@@ -83,6 +88,50 @@ sub _modifyPassword {
         return PE_PASSWORD_OK;
     }
     return $res;
+}
+
+sub checkPasswordQuality {
+    my ( $self, $password ) = @_;
+
+    # Min size
+    if ( $self->conf->{passwordPolicyMinSize}
+        and length($password) < $self->conf->{passwordPolicyMinSize} )
+    {
+        $self->logger->error("Password too short");
+        return PE_PP_PASSWORD_TOO_SHORT;
+    }
+
+    # Min lower
+    if ( $self->conf->{passwordPolicyMinLower} ) {
+        my $lower = 0;
+        $lower++ while ( $password =~ m/\p{lowercase}/g );
+        if ( $lower < $self->conf->{passwordPolicyMinLower} ) {
+            $self->logger->error("Password has not enough lower characters");
+            return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
+        }
+    }
+
+    # Min upper
+    if ( $self->conf->{passwordPolicyMinUpper} ) {
+        my $upper = 0;
+        $upper++ while ( $password =~ m/\p{uppercase}/g );
+        if ( $upper < $self->conf->{passwordPolicyMinUpper} ) {
+            $self->logger->error("Password has not enough upper characters");
+            return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
+        }
+    }
+
+    # Min digit
+    if ( $self->conf->{passwordPolicyMinDigit} ) {
+        my $digit = 0;
+        $digit++ while ( $password =~ m/\d/g );
+        if ( $digit < $self->conf->{passwordPolicyMinDigit} ) {
+            $self->logger->error("Password has not enough digit characters");
+            return PE_PP_INSUFFICIENT_PASSWORD_QUALITY;
+        }
+    }
+
+    return PE_OK;
 }
 
 1;

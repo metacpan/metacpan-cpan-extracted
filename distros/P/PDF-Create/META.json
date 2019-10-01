@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDF-Create",
    "no_index" : {
@@ -53,27 +53,27 @@
    "provides" : {
       "PDF::Create" : {
          "file" : "lib/PDF/Create.pm",
-         "version" : "1.43"
+         "version" : "1.46"
       },
       "PDF::Create::Outline" : {
          "file" : "lib/PDF/Create/Outline.pm",
-         "version" : "1.43"
+         "version" : "1.46"
       },
       "PDF::Create::Page" : {
          "file" : "lib/PDF/Create/Page.pm",
-         "version" : "1.43"
+         "version" : "1.46"
       },
       "PDF::Font" : {
          "file" : "lib/PDF/Font.pm",
-         "version" : "1.43"
+         "version" : "1.46"
       },
       "PDF::Image::GIF" : {
          "file" : "lib/PDF/Image/GIF.pm",
-         "version" : "1.43"
+         "version" : "1.46"
       },
       "PDF::Image::JPEG" : {
          "file" : "lib/PDF/Image/JPEG.pm",
-         "version" : "1.43"
+         "version" : "1.46"
       }
    },
    "release_status" : "stable",
@@ -84,6 +84,6 @@
          "web" : "http://github.com/manwar/pdf-create"
       }
    },
-   "version" : "1.43",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.46",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

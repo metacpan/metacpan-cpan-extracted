@@ -3,10 +3,12 @@ use strict;
 use IO::String;
 
 my $res;
-my $file      = 't/notifications.db';
-my $maintests = 6;
-eval { unlink $file };
+my $maintests = 8;
+
+#my $maintests = 9;
+
 require 't/test-lib.pm';
+my $file = tempdb();
 
 SKIP: {
     eval {
@@ -32,6 +34,15 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
 <check>Accept test</check>
 </notification></root>',null,null)}
     );
+    $dbh->do(
+qq{INSERT INTO notifications VALUES ('dwho','testref2','2016-05-30 00:00:00','<?xml version="1.0" encoding="UTF-8"?>
+<root><notification uid="dwho" date="2016-05-30" reference="testref2">
+<title>Test2 title</title>
+<subtitle>Test2 subtitle</subtitle>
+<text>This is a second test text</text>
+<check>Accept test</check>
+</notification></root>',null,null)}
+    );
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
@@ -47,7 +58,7 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
         }
     );
 
-    # Try yo authenticate
+    # Try to authenticate
     # -------------------
     ok(
         $res = $client->_post(
@@ -61,7 +72,18 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
         'Auth query'
     );
     expectOK($res);
-    my $id = expectCookie($res);
+    my $id   = expectCookie($res);
+    my @refs = ( $res->[2]->[0] =~
+          /<input type="hidden" name="reference[\dx]+" value="(\w+?)">/gs );
+    ok( @refs == 2, 'Two notification references found' )
+      or print STDERR Dumper( $res->[2]->[0] );
+
+    ### TO BE FIXED
+    # ok( $refs[0] eq 'testref2', '1st reference found is "testref2"' )
+    #   or print STDERR Dumper( $res->[2]->[0] );
+    # ok( $refs[1] eq 'testref', '2nd reference found is "testref"' )
+    #   or print STDERR Dumper( $res->[2]->[0] );
+
     ok( $res->[2]->[0] =~ /1x1x1/, ' Found ref' );
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
@@ -90,9 +112,9 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
     );
     expectOK($res);
 
-    # Try to validate notification
+    # Try to validate notifications
     $str =
-'reference1x1=testref&check1x1x1=accepted&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==';
+'reference1x1=testref&check1x1x1=accepted&reference1x2=testref2&check1x2x1=accepted&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==';
     ok(
         $res = $client->_post(
             '/notifback',
@@ -101,9 +123,14 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
             accept => 'text/html',
             length => length($str),
         ),
-        "Accept notification"
+        "Accept notifications"
     );
     expectRedirection( $res, 'http://test1.example.com/' );
+    my $cookies = getCookies($res);
+    ok(
+        !defined( $cookies->{lemonldappdata} ),
+        " Make sure no pdata is returned"
+    );
 
     # Verify that notification was tagged as 'done'
     my $sth =
@@ -111,12 +138,9 @@ qq{INSERT INTO notifications VALUES ('dwho','testref','2016-05-30 00:00:00','<?x
     $sth->execute;
     my $i = 0;
     while ( $sth->fetchrow_hashref ) { $i++ }
-    ok( $i == 1, 'Notification was deleted' );
+    ok( $i == 2, 'Notification was deleted' );
 
     clean_sessions();
-
-    eval { unlink $file };
-
 }
 
 count($maintests);

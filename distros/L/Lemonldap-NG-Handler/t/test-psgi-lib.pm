@@ -3,6 +3,7 @@
 use strict;
 use 5.10.0;
 use POSIX 'strftime';
+use Data::Dumper;
 use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');
 
 our $client;
@@ -42,7 +43,7 @@ sub init {
     open F, ">$file"
       or die $!;
     my $now = time;
-    my $ts = strftime "%Y%m%d%H%M%S", localtime;
+    my $ts  = strftime "%Y%m%d%H%M%S", localtime;
 
     print F '{"_updateTime":"'
       . $ts

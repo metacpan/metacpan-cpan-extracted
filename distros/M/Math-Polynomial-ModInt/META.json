@@ -1,0 +1,83 @@
+{
+   "abstract" : "univariate polynomials over modular integers",
+   "author" : [
+      "Martin Becker <becker-cpan-mp (at) cozap.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Polynomial-ModInt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Math::BigInt" : "0",
+            "Math::ModInt" : "0.011",
+            "Math::Polynomial" : "1.015",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::BigInt" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Polynomial::ModInt" : {
+         "file" : "lib/Math/Polynomial/ModInt.pm",
+         "version" : "0.002"
+      },
+      "Math::Polynomial::ModInt::Order" : {
+         "file" : "lib/Math/Polynomial/ModInt/Order.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_prereqs" : {
+         "runtime" : {
+            "recommends" : {
+               "Math::BigInt::GMP" : 0
+            }
+         }
+      },
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-ModInt"
+      },
+      "license" : [
+         "https://www.perlfoundation.org/artistic-license-20.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mhasch/perl-Math-Polynomial-ModInt.git",
+         "web" : "https://github.com/mhasch/perl-Math-Polynomial-ModInt"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

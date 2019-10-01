@@ -13,7 +13,7 @@ use Math::Random::Discrete;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $DEFAULT_WEIGHT = 1;
 
@@ -29,7 +29,7 @@ has terms => (
     is      => 'rwp',
     default => sub { [] },
 );
-has picker => ( is => 'rwp', clearer => 1 );
+has picker  => (is => 'rwp', clearer => 1);
 has weights => (
     is      => 'rwp',
     default => sub { [] },
@@ -41,8 +41,8 @@ has weights => (
 
 sub add_choice {
     croak "add_choice requires a value" if @_ < 2;
-    my ( $self, $value, $weight ) = @_;
-    push @{ $self->terms }, $value;
+    my ($self, $value, $weight) = @_;
+    push @{ $self->terms },   $value;
     push @{ $self->weights }, $weight // $DEFAULT_WEIGHT;
     $self->clear_picker;
     return $self;
@@ -55,23 +55,23 @@ sub render {
     my $str;
 
     my $terms = $self->terms;
-    if ( !@$terms ) {
+    if (!@$terms) {
         # in theory this shouldn't happen. could also instead set the
         # empty string here...
         confess "no choices to pick from";
-    } elsif ( @$terms == 1 ) {
+    } elsif (@$terms == 1) {
         $str = $terms->[0]->render;
     } else {
         my $picker = $self->picker;
-        if ( !defined $picker ) {
-            $picker = Math::Random::Discrete->new( $self->weights, $terms );
+        if (!defined $picker) {
+            $picker = Math::Random::Discrete->new($self->weights, $terms);
             $self->_set_picker($picker);
         }
         $str = $picker->rand->render;
     }
 
     my $filter_with = $self->filter_with // '';
-    for my $filter ( @{ $self->filters } ) {
+    for my $filter (@{ $self->filters }) {
         $str =~ s/\Q$filter/$filter_with/g;
     }
     return $str;
@@ -80,7 +80,7 @@ sub render {
 sub walk {
     my ($self, $callback) = @_;
     $callback->($self);
-    for my $term ( @{ $self->terms } ) {
+    for my $term (@{ $self->terms }) {
         $term->walk($callback);
     }
     return;

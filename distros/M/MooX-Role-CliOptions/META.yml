@@ -27,9 +27,10 @@ no_index:
 requires:
   Carp: '0'
   Getopt::Long: '2.36'
+  Moo: '0'
   Moo::Role: '0'
   Pod::Usage: '0'
   Types::Standard: '0'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

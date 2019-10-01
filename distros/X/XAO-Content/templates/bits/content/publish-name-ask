@@ -1,0 +1,15 @@
+<%Condition
+  default.path="/bits/content/content-info"
+  default.pass
+%>
+<P>
+
+Usually it is better to publish all changes at once. Are you sure you
+want to publish this page individually?
+<P>
+
+<FORM ACTION="<%Utility mode="current-url"%>" METHOD="GET">
+<%Utility mode="pass-cgi-params" result="form" params="name"%>
+<INPUT TYPE="SUBMIT" NAME="confirm" VALUE="  Confirm  ">
+</FORM>
+<P>

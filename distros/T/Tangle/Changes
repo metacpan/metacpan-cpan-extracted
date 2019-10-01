@@ -1,0 +1,5 @@
+Revision history for Perl extension Tangle.pm and CayleyDickson.pm
+
+0.01  Fri Sept 13 01:36:09 2019
+	- original version; created based on https://en.wikipedia.org/wiki/Cayley-Dickson_construction
+

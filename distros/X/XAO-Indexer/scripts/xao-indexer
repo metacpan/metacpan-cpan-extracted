@@ -1,0 +1,233 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use XAO::Utils;
+use XAO::Web;
+use Getopt::Long;
+use Data::Dumper;
+
+my $all;
+my $create;
+my $drop;
+my $project;
+my $search;
+my $update;
+my $complete;
+my $compression=0;
+my $dictionary;
+my $spelling_server;
+my $alternatives;
+my $no_results;
+my $gorc=GetOptions(
+    'all'           => \$all,
+    'create'        => \$create,
+    'debug'         => sub { XAO::Utils::set_debug(1) },
+    'drop'          => \$drop,
+    'project=s'     => \$project,
+    'search'        => \$search,
+    'update'        => \$update,
+    'complete'      => \$complete,
+    'compression=i' => \$compression,
+    'dictionary'    => \$dictionary,
+    'spelling-server' => \$spelling_server,
+    'alternatives'  => \$alternatives,
+    'no_results'    => \$no_results,
+);
+
+if(!$gorc ||
+   !$project ||
+   ($all && @ARGV) ||
+   ($create && @ARGV!=2) ||
+   ($drop && @ARGV!=1) ||
+   ($search && @ARGV<3) ||
+   ($update && !$all && !@ARGV)) {
+    print <<EOT;
+Usage: $0 [--debug] \\
+    --project PROJ \\
+    [--complete] \\
+    [--dictionary] \\
+    --update [ --all | index1 index2 ... ]
+
+Updates given indexes in the database. Adding a --dictionary option
+makes it rebuild the spellchecker dictionary if spellchecker is
+configured for the index. Using --all makes it update all available
+indexes. Using --complete makes incrementally updated indexes do a
+complete update by cycling as many times as needed.
+
+
+Usage: $0 [--debug] \\
+    [--compression LEVEL] \\
+    --project PROJ --create index Indexer::IndexName
+
+Creates a new index with given name and using given class name to handle
+it. Does not build index data, only prepares data structures.
+
+
+Usage: $0 [--debug] --project PROJ --drop index
+
+Drops the given existing index.
+
+
+Usage: $0 [--debug] --project PROJ --search index ordering 'search string'
+
+Performes a search on the given index and returns found unique IDs one
+per line on standard output. Mostly useful for testing. Provide
+--alternatives to see spell-corrected variants.
+
+
+Usage: $0 [--debug] --project PROJ --spelling-server
+
+Runs the project's spelling server, accepting queries from clients.
+Does not go into background and does not return.
+
+EOT
+    exit 1;
+}
+
+my $site=XAO::Web->new(sitename => $project);
+$site->set_current();
+my $config=$site->config;
+my $odb=$config->odb();
+
+##
+# Loading top level. Name is hard-coded.
+#
+if(!$odb->fetch('/')->exists('Indexes')) {
+    die "No '/Indexes' in the project's database\n";
+}
+my $index_list=$odb->fetch('/Indexes');
+
+##
+# Searching
+#
+if($search) {
+    my $i_name=shift @ARGV;
+    my $ordering=shift @ARGV;
+    my $index=$index_list->get($i_name);
+
+    foreach my $str (@ARGV) {
+        dprint "Searching '$i_name' for '$str'";
+        my %rcdata;
+        my $sr=$index->search_by_string($ordering,$str,\%rcdata);
+        if($alternatives) {
+            $index->suggest_alternative($ordering,$str,\%rcdata);
+        }
+        dprint Dumper(\%rcdata);
+        unless($no_results) {
+            print join("\n",@$sr),"\n";
+        }
+    }
+
+    exit 0;
+}
+
+##
+# Creating new index structure
+#
+elsif($create) {
+    my ($i_name,$i_class)=@ARGV;
+
+    my $i_obj=XAO::Objects->new(objname => $i_class);
+    $i_obj->can('get_orderings') ||
+        die "Indexer object '$i_class' has no 'get_orderings' method\n";
+
+    $index_list->check_name($i_name) ||
+        die "Bad name for an index '$i_name'\n";
+
+    $odb->transact_begin;
+
+    $index_list->exists($i_name) &&
+        die "Index with such name ($i_name) already exists\n";
+
+    dprint "Storing new index object";
+    my $ni=$index_list->get_new;
+    $ni->put(
+        indexer_objname => $i_class,
+        compression     => $compression,
+    );
+    $index_list->put($i_name => $ni);
+
+    dprint "Done";
+    $odb->transact_commit;
+    exit 0;
+}
+
+##
+# Drops an index
+#
+elsif($drop) {
+    my $i_name=$ARGV[0];
+    dprint "Dropping index '$i_name'";
+    $odb->transact_begin;
+    $index_list->delete($i_name) if $index_list->exists($i_name);
+    $odb->transact_commit;
+    exit 0;
+}
+
+##
+# Updating existing indexes
+#
+elsif($update) {
+    dprint "Updating indexes";
+    foreach my $index_id ($all ? $index_list->keys : @ARGV) {
+        dprint "Updating index '$index_id'";
+        my ($ucount,$is_partial);
+        my $index_obj=$index_list->get($index_id);
+        do {
+            ($ucount,$is_partial)=$index_obj->update;
+            dprint ".updated $ucount IDs";
+        } while($complete && $ucount && $is_partial);
+
+        if($dictionary) {
+            dprint "Updating spelling dictionary for '$index_id'";
+            $index_obj->build_dictionary;
+        }
+    }
+    exit 0;
+}
+
+##
+# Building dictionaries without updating indexes.
+#
+elsif($dictionary) {
+    foreach my $index_id ($all ? $index_list->keys : @ARGV) {
+        dprint "Updating spelling dictionary for '$index_id'";
+        my $index_obj=$index_list->get($index_id);
+        $index_obj->build_dictionary;
+    }
+    exit 0;
+}
+
+##
+# Starting a spelling server
+#
+elsif($spelling_server) {
+    my $objname=$config->get('/indexer/default/spellchecker/objname') ||
+                'SpellChecker::Aspell';
+
+    my $server=XAO::Objects->new(
+        objname         => $objname,
+    );
+
+    $server->server_run;
+
+    die "Spelling server finished. It should not have.\n";
+}
+
+##
+# Unknown
+#
+else {
+    die "Unknown mode of operation, run without arguments to see usage info\n";
+}
+
+exit 0;
+
+###############################################################################
+
+sub END {
+    if($odb && $odb->transact_active) {
+        eprint "Rolling back transaction..";
+        $odb->transact_rollback;
+    }
+}

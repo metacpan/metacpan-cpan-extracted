@@ -1,0 +1,15 @@
+<%Condition
+  a.cgiparam="confirm"
+  a.path="/bits/content/publish-all"
+  default.template={
+Are you sure you want to publish all changes you made to all content
+elements? Once you publish them all site visitors will be able to see
+the changes.
+<P>
+
+<FORM ACTION="<%Utility mode="current-url"%>" METHOD="GET">
+<INPUT TYPE="HIDDEN" NAME="publish" VALUE="1">
+<INPUT TYPE="SUBMIT" NAME="confirm" VALUE="  Confirm  ">
+</FORM>
+}
+%>

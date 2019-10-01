@@ -1,5 +1,14 @@
 Revision history for Perl extension Business-Tax-Withholding-JP
 
+0.08 2019-09-30T16:03:49Z
+    - some tests were old. so fixed
+
+0.07 2019-09-27T10:49:07Z
+    - just fixed the POD
+
+0.06 2019-09-27T10:22:51Z
+    - upgrade for 10% consumption tax
+
 0.05 2019-06-24T02:58:23Z
     - fixed the bug of net()
 

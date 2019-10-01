@@ -1,3 +1,15 @@
+0.68 2019-09-30
+    * Add ->basic_auth endpoint
+
+0.67 2019-09-29
+    * More aggressively watch for startup of the web server to reduce idle
+      times. Also speed up the test suite by polling instead of sleep()ing.
+    * Added ->server_url() as a half-documented way of changing the URL
+      the server is accessed at. This is self-service and if things break, you
+      get to keep all the parts.
+    * LWP::UserAgent is no more a (test) prerequisite. We do the tests from
+      HTTP::Tiny (core since 5.14, runs on 5.6+).
+
 0.66 2019-09-10
     * Make detection of IPv4 localhost vs. IPv6 localhost
       much more resilient. Backported from WWW::Mechanize, implemented by

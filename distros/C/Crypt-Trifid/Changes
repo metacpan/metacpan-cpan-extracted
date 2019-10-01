@@ -1,5 +1,8 @@
 Revision history for Crypt-Trifid
 
+0.11  Mon Sep 23 19:10:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.10  Thu Sep 06 18:30:00 2018
       - Used namespace::autoclean instead of namespace::clean.
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Session::MongoDB.
 
+0.20  Thu Sep 26 21:23:35 2019
+    - Fix serchOn return value. Thanks to Maxime Besson. Closes: #8
+
 0.19  Thu Apr 26 08:36:07 2019
     - Replace deprecated MongoDB function (insert => insert_one,
       remove => delete_one). Closes: #5

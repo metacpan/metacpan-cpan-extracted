@@ -10,13 +10,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.4';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
 # INITIALIZATION
 
-has prefix => ( is => 'ro', default => 'ext' );
+has prefix => ( is => 'rw', default => 'ext' );
 has random => ( is => 'rw' );
 
 sub init {
@@ -28,8 +28,8 @@ sub init {
                 return 0;
             }
         }
-        $self->logo( $self->conf->{ext2fLogo} )
-          if ( $self->conf->{ext2fLogo} );
+        $self->prefix( $self->conf->{sfPrefix} )
+          if ( $self->conf->{sfPrefix} );
         return $self->SUPER::init();
     }
     if ( $self->conf->{ext2fCodeActivation} ) {
@@ -38,8 +38,8 @@ sub init {
             return 0;
         }
         $self->random( Lemonldap::NG::Common::Crypto::srandom() );
-        $self->logo( $self->conf->{ext2fLogo} )
-          if ( $self->conf->{ext2fLogo} );
+        $self->prefix( $self->conf->{sfPrefix} )
+          if ( $self->conf->{sfPrefix} );
         return $self->SUPER::init();
     }
     return 0;
@@ -79,9 +79,14 @@ sub run {
         $req,
         'ext2fcheck',
         params => {
-            MAIN_LOGO   => $self->conf->{portalMainLogo},
-            SKIN        => $self->p->getSkin($req),
-            TOKEN       => $token,
+            MAIN_LOGO => $self->conf->{portalMainLogo},
+            SKIN      => $self->p->getSkin($req),
+            TOKEN     => $token,
+            PREFIX    => $self->prefix,
+            TARGET    => '/'
+              . $self->prefix
+              . '2fcheck?skin='
+              . $self->p->getSkin($req),
             CHECKLOGINS => $checkLogins
         }
     );

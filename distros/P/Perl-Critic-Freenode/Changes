@@ -1,3 +1,7 @@
+0.031     2019-09-25 19:00:39 EDT
+  - Add FindBin to DiscouragedModules policy (#31)
+  - Add MultidimensionalArrayEmulation policy (#35)
+
 0.030     2019-08-26 11:27:15 EDT
   - Allow signature_enablers to be configured for Prototypes policy (#34)
 

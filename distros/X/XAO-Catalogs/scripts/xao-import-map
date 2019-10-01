@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+#
+# Controlling script for all import maps.
+#
+use warnings;
+use strict;
+use XAO::Utils;
+use XAO::Web;
+
+if(@ARGV && $ARGV[0] eq '--debug') {
+    XAO::Utils::set_debug(1);
+    dprint "Debugging enabled";
+    shift @ARGV;
+}
+
+if (@ARGV < 2) {
+    print <<EOT;
+Usage: $0 source_name [--debug] site_name source_name ...
+EOT
+    exit(1);
+}
+
+##
+# Connecting to the database
+#
+my $sitename=shift(@ARGV);
+my $site=XAO::Web->new(sitename => $sitename);
+$site->set_current();
+my $odb=$site->config->odb();
+
+foreach my $name (@ARGV) {
+    dprint "=== Processing $name";
+
+    if($name !~ /^\w+$/) {
+        eprint "Bad source name '$name'";
+        next;
+    }
+
+    my $catalog=$odb->fetch("/Catalogs/$name");
+    my $products=$odb->fetch("/Products");
+    my $categories=$odb->fetch("/Categories");
+
+    $catalog->import_catalog(categories => $categories,
+                             products => $products);
+}

@@ -6,18 +6,13 @@ no warnings 'uninitialized';
 
 # general functions
 
-sub poll_jack { 
-		jack_update(); # first time
-		# then repeat
-		$project->{events}->{poll_jack} = AE::timer(0,5,\&jack_update) 
-}
-
-sub jack_update {
-	#logsub("&jack_update");
+sub update_jack_client_list {
+	state $warn_count;
+	#logsub("&update_jack_client_list");
 	# cache current JACK status
 	
 	# skip if Ecasound is busy
-	return if engine_running();
+	return if $this_engine->started();
 
 	if( $jack->{jackd_running} = process_is_running('jackd') ){
 		# reset our clients data 
@@ -30,7 +25,16 @@ sub jack_update {
 
 		my ($bufsize) = qx(jack_bufsize);
 		($jack->{periodsize}) = $bufsize =~ /(\d+)/;
-
+		my ($sample_rate) = qx(jack_samplerate);
+		chomp $sample_rate;
+		$project->{name} 
+			and $sample_rate != $project->{sample_rate} 
+			and ($warn_count == 1 or $warn_count % 8 == 0) # warn less often
+		    and Audio::Nama::throw(qq(
+JACK audio daemon sample rate is $sample_rate but sample rate for project "$project->{name}" is $project->{sample_rate}.
+Please fix this problem before continuing (maybe restart jackd with --rate $project->{sample_rate}?))),
+			print prompt();
+		$warn_count++;
 	} else {  }
 }
 
@@ -123,7 +127,7 @@ sub parse_port_connections {
 }
 sub jack_port_to_nama {
 	my $jack_port = shift;
-	grep{ /Nama/ and $jack->{is_own_port}->{$_} } @{ $jack->{connections}->{$jack_port} };
+	grep{ /$config->{ecasound_jack_client_name}/ and $jack->{is_own_port}->{$_} } @{ $jack->{connections}->{$jack_port} };
 }
 	
 sub parse_port_latency {
@@ -206,7 +210,7 @@ sub parse_ports_list {
 	# default to output of jack_lsp -p
 	
 	logsub("&parse_ports_list");
-	my $j = shift || qx(jack_lsp -p 2> /dev/null); 
+	my $j = shift || qx(jack_lsp -tp 2> /dev/null); 
 	logpkg(__FILE__,__LINE__,'debug', "input: $j");
 
 	# convert to single lines
@@ -237,34 +241,19 @@ sub parse_ports_list {
 
 	} 
 	grep{ ! /^jack:/i } # skip spurious jackd diagnostic messages
+	grep{ ! /8 bit raw midi/ }
 	split "\n",$j;
 }
 
-# connect jack ports via jack.plumbing or jack_connect
+# connect jack ports via jack-plumbing or jack_connect
 
 sub jack_plumbing_conf {
-	join_path( $ENV{HOME} , '.jack.plumbing' )
+	join_path( $ENV{HOME} , '.jack-plumbing' )
 }
 
-{ 
-  my $fh;
-  my $plumbing_tag = q(BEGIN NAMA CONNECTIONS LIST);
-  my $plumbing_header = qq(;### $plumbing_tag
-;## The following lines are automatically generated.
-;## DO NOT place any connection data below this line!!
-;
-); 
-sub initialize_jack_plumbing_conf {  # remove nama lines
+sub initialize_jack_plumbing_conf {  }
 
-		return unless -f -r jack_plumbing_conf();
-
-		my $user_plumbing = read_file(jack_plumbing_conf());
-
-		# keep user data, deleting below tag
-		$user_plumbing =~ s/;[# ]*$plumbing_tag.*//gs;
-
-		write_file(jack_plumbing_conf(), $user_plumbing);
-}
+{ my $fh;
 
 my $jack_plumbing_code = sub 
 	{
@@ -288,7 +277,7 @@ sub connect_jack_ports_list {
 
 	my @source_tracks = 
 		grep{ 	$_->source_type eq 'jack_ports_list' and
-	  	  		$_->rec_status  eq REC 
+	  	  		$_->rec
 			} Audio::Nama::ChainSetup::engine_tracks();
 
 	my @send_tracks = 
@@ -305,20 +294,16 @@ sub connect_jack_ports_list {
 	if( $config->{use_jack_plumbing} )
 	{
 
-		# write config file
-		initialize_jack_plumbing_conf();
-		open($fh, ">>", jack_plumbing_conf())
-			or die("can't open ".jack_plumbing_conf()." for append: $!");
-		print $fh $plumbing_header;
+		open($fh, ">", jack_plumbing_conf())
+			or die("can't open ".jack_plumbing_conf()." for write: $!");
 		make_connections($jack_plumbing_code, \@source_tracks, 'in' );
 		make_connections($jack_plumbing_code, \@send_tracks,   'out');
 		close $fh; 
 
-		# run jack.plumbing
+		# run jack-plumbing
 		start_jack_plumbing();
-		sleeper(3); # time for jack.plumbing to launch and poll
+		sleeper(3); # time for jack-plumbing to launch and poll
 		kill_jack_plumbing();
-		initialize_jack_plumbing_conf();
 	}
 	else 
 	{
@@ -335,7 +320,7 @@ sub make_connections {
 	map{  
 		my $track = $_; 
  		my $name = $track->name;
- 		my $ecasound_port = "Nama:$name\_$direction\_";
+ 		my $ecasound_port = $config->{ecasound_jack_client_name}.":$name\_$direction\_";
 		my $file = join_path(project_root(), $track->$ports_list);
 		throw($track->name, 
 			": JACK ports file $file not found. No sources connected."), 
@@ -372,7 +357,7 @@ sub make_connections {
  	 } @$tracks
 }
 sub kill_jack_plumbing {
-	qx(killall jack.plumbing >/dev/null 2>&1)
+	qx(killall jack-plumbing >/dev/null 2>&1)
 	unless $config->{opts}->{A} or $config->{opts}->{J};
 }
 sub start_jack_plumbing {
@@ -380,14 +365,9 @@ sub start_jack_plumbing {
 	if ( 	$config->{use_jack_plumbing}				# not disabled in namarc
 			and ! ($config->{opts}->{J} or $config->{opts}->{A})	# we are not testing   
 
-	){ system('jack.plumbing >/dev/null 2>&1 &') == 0 
-			or die "can't run jack.plumbing: $?"
+	){ system('jack-plumbing >/dev/null 2>&1 &') == 0 
+			or die "can't run jack-plumbing: $?"
 	}
-}
-sub jack_client : lvalue {
-	my $name = shift;
-	logit(__LINE__,'Audio::Nama::Jack','info',"$name: non-existent JACK client") if not $jack->{clients}->{$name} ;
-	$jack->{clients}->{$name}
 }
 sub port_mapping {
 	my $jack_port = shift;
@@ -407,7 +387,7 @@ sub register_own_ports { # distinct from other Nama instances
 	{ 
 		map{chomp; $_ => 1}
 		grep{ ! $jack->{is_other_port}->{$_} }
-		grep{ /^Nama/ } 
+		grep{ /^$config->{ecasound_jack_client_name}/ } 
 		qx(jack_lsp)
 	} 
 }

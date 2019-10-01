@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Moo';
 
-our $VERSION = '1.85'; # VERSION
+our $VERSION = '1.87'; # VERSION
 
 1;
 
@@ -121,7 +121,7 @@ class. See L<Moo> for more information.
 
 =head1 CREDITS
 
-Al Newkirk, C<+309>
+Al Newkirk, C<+317>
 
 Anthony Brummett, C<+10>
 
@@ -139,8 +139,9 @@ Al Newkirk, C<awncorp@cpan.org>
 
 Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated here,
+https://github.com/iamalnewkirk/do/blob/master/LICENSE.
 
 =head1 PROJECT
 

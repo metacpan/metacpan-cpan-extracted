@@ -26,7 +26,7 @@ config_withimmutable() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

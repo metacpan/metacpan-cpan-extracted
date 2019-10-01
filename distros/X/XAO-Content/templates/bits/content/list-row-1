@@ -1,0 +1,26 @@
+<TR>
+<TD><%NAME/h%></TD>
+<TD><%DESCRIPTION/h%></TD>
+<TD><%COMMENT/s%></TD>
+<TD WIDTH="1%"><NOBR>
+<A HREF="content-edit.html?name=<%NAME/q%>">Edit</A>
+|
+<%Condition
+  a.arg="PREVIEW_URL"
+  a.template={<%Condition
+                a.arg="PREVIEW_ID"
+                a.template={<A HREF="<%PREVIEW_URL%>?preview_mode=1">Preview</A>}
+                default.template={Preview}
+              %>}
+  default.template={Preview}
+%>
+|
+<%Condition
+  a.arg="PREVIEW_ID"
+  a.template={<A HREF="content-publish.html?name=<%NAME/q%>">Publish</A>}
+  default.template={Publish}
+%>
+|
+<A HREF="content-revert.html?name=<%NAME/q%>">Revert</A>
+</NOBR></TD>
+</TR>

@@ -4,7 +4,7 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -48,13 +48,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
-   "x_homepageresources" : {
+   "resources" : {
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/thrig/Lingua-Awkwords.git",
          "web" : "https://github.com/thrig/Lingua-Awkwords"
       }
    },
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

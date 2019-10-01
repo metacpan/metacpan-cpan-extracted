@@ -1,7 +1,7 @@
 package Audio::Nama;
-require 5.10.0;
+require 5.14.4;
 use vars qw($VERSION);
-$VERSION = "1.208";
+$VERSION = "1.216";
 use Modern::Perl;
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -64,7 +64,7 @@ use Audio::Nama::Graphical;
 # They are descendents of a base class we define in the root namespace
 
 our @ISA; # no ancestors
-use Audio::Nama::Object qw(mode); # based on Object::Tiny
+use Audio::Nama::Object qw(); # based on Object::Tiny
 
 sub hello {"superclass hello"}
 
@@ -94,13 +94,17 @@ use Audio::Nama::Bus;
 use Audio::Nama::Sequence;
 use Audio::Nama::Mark;
 use Audio::Nama::IO;
-use Audio::Nama::Wav;
 use Audio::Nama::Insert;
 use Audio::Nama::Fade;
 use Audio::Nama::Edit;
 use Audio::Nama::EffectChain;
 use Audio::Nama::Lat;
 use Audio::Nama::Engine;
+use Audio::Nama::Waveform;
+
+####### Nama Roles - loaded by another class
+
+# use Audio::Nama::Wav;
 
 ####### Nama subroutines ######
 #
@@ -127,9 +131,8 @@ use Audio::Nama::Modes ();
 use Audio::Nama::Mix ();
 use Audio::Nama::Memoize ();
 
+use Audio::Nama::StatusSnapshot ();
 use Audio::Nama::EngineSetup ();
-use Audio::Nama::EngineRun ();
-use Audio::Nama::EngineCleanup ();
 use Audio::Nama::EffectsRegistry ();
 use Audio::Nama::Effect q(:all);
 use Audio::Nama::MuteSoloFade ();
@@ -142,14 +145,15 @@ use Audio::Nama::Wavinfo ();
 use Audio::Nama::Midi ();
 use Audio::Nama::Latency ();
 use Audio::Nama::Log qw(logit loggit logpkg logsub initialize_logger);
+use Audio::Nama::TrackUtils ();
 
 sub main { 
 	say eval join(get_data_section('banner'), qw(" "));
 	bootstrap_environment() ;
 	load_project();
-	process_command($config->{execute_on_project_load});
+	nama_cmd($config->{execute_on_project_load});
 	reconfigure_engine();
-	process_command($config->{opts}->{X});
+	nama_cmd($config->{opts}->{X});
 	$ui->loop();
 }
 
@@ -161,6 +165,17 @@ sub bootstrap_environment {
 	setup_hotkey_grammar();
 	initialize_interfaces();
 }
+sub kill_and_reap {
+	my @pids = @_;
+	map{ my $pid = $_; 
+		 map{ my $signal = $_; 
+			  kill $signal, $pid; 
+			  sleeper(0.2);
+			} (15,9);
+		 waitpid $pid, 1;
+	} @pids;
+}
+	
 sub cleanup_exit {
 	logsub("&cleanup_exit");
  	remove_riff_header_stubs();
@@ -172,19 +187,7 @@ sub cleanup_exit {
 	# - allow time to close down
 	# - SIGKILL
 	delete $project->{events};
-	close_midish() if $config->{use_midish};
-	my @engines = values %Audio::Nama::Engine::by_name;
-	for (@engines){
-		if( @{$_->{pids}}){
-			map{ my $pid = $_; 
-				 map{ my $signal = $_; 
-					  kill $signal, $pid; 
-					  sleeper(0.2);
-					} (15,9);
-				 waitpid $pid, 1;
-			} @{$_->{pids}};
-		}
-	}
+	Audio::Nama::Engine::sync_action('kill_and_reap');
 	$text->{term}->rl_deprep_terminal() if defined $text->{term};
 	exit;
 }
@@ -202,16 +205,16 @@ help:
   example: |
     help marks # display the help category marks and all commands containing marks
     help 6 # display help on the effects category
-    help mfx # display help on modify_effect - shortcut mfx
+    help mfx # display help on modify-effect - shortcut mfx
 help_effect:
   type: help
   what: Display detailed help on LADSPA or LV2 effects.
   short: hfx he
   parameters: <string:label> | <integer:unique_id>
   example: |
-    help_effect 1970 
+    help-effect 1970 
     ! display help on Fons Adriaensen's parametric EQ (LADSPA)
-    help_effect etd 
+    help-effect etd 
     ! prints a short message to consult Ecasound manpage, 
     ! where the etd chain operator is documented.
     hfx lv2-vocProc 
@@ -222,7 +225,7 @@ find_effect:
   short: ffx fe
   parameters: <string:keyword1> [ <string:keyword2>... ]
   example: |
-    find_effect compressor 
+    find-effect compressor 
     ! List all effects containing "compressor" in their name or parameters
     fe feedback 
     ! List all effects matching "feedback" 
@@ -234,10 +237,7 @@ exit:
   parameters: none
 memoize:
   type: general
-  what: |
-    Enable WAV directory caching, so Nama won't have to scan
-    the entire project folder for new files after every run.
-    (default)
+  what: Cache WAV directory contents (default)
   parameters: none
 unmemoize:
   type: general
@@ -324,7 +324,7 @@ preview:
     preview # Enter the preview mode.
     start   # Playback begins. You can play live, adjust effects, 
     !       # forward, rewind, etc.
-    stop    # Stop the engine/transport.
+    stop    # Stop processing audio.
     arm     # Restore to normal recording/playback mode.
 doodle:
   type: transport
@@ -336,10 +336,10 @@ doodle:
   parameters: none
   example: |
     doodle # Switch into doodle mode.
-    start  # start the engine/transport running.
+    start  # start the audio engine.
     (fool around)
-    stop   # Stop the engine.
-    arm    # Return to normal mode, allowing play and record to disk
+    stop   # Stop processing audio.
+    arm    # Return to normal mode, allowing playback and record to disk
 mixdown:
   type: mix
   what: |
@@ -386,7 +386,7 @@ master_on:
     Turn on the mastering mode, adding tracks Eq, Low, Mid, High
     and Boost, if necessary. The mastering setup allows for one
     EQ and a three-band multiband compression and a final
-    boosting stage. Using "master_off" to leave the mastering mode. 
+    boosting stage. Using "master-off" to leave the mastering mode. 
   short: mr
   parameters: none
   example: |
@@ -405,30 +405,32 @@ add_track:
   short: add new
   parameters: <string:name>
   example: |
-    add_track clarinet 
+    add-track clarinet 
     ! create a mono track called clarinet with input 
     ! from soundcard channel 1.
+add_midi_track:
+  type: track
+  what: Create a new midi track.
+  short: amt
+  parameters: <string:name>
+  example: |
+    add-midi-track clarinet 
 add_tracks:
   type: track
   what: Create one or more new tracks in one go.
   parameters: <string:name1> [ <string:name2>... ]
-  example: add_tracks violin viola contra_bass
-add_midi_track:
-  type: track
-  what: Create a new MIDI track.
-  short: amt
-  parameters: <string:name>
+  example: add-tracks violin viola contra_bass
 link_track:
   type: track
   what: Create a read-only track, that uses audio files from another track.
   short: link
-  parameters: [<string:project_name>] <string:track_name> <string:link_name>
+  parameters: [<string:project-name>] <string:track_name> <string:link_name>
   example: |
     link my_song_part1 Mixdown part_1  
     ! Create a read-only track "part_1" in the current project
     ! using files from track "Mixdown" in project "my_song_part_1".
     !
-    link_track compressed_piano piano
+    link-track compressed_piano piano
     ! Create a read-only track "compressed_piano" using files from
     ! track "piano". This is one way to provide wet and dry
     ! (processed and unprocessed) versions of same source.
@@ -446,6 +448,16 @@ import_audio:
     ! import the file bells.flac to the current track
     import /home/music/song.mp3 44100 
     ! import song.mp3, specifying the frequency
+import_midi:
+  type: midi
+  what: Import a MIDI song file (MIDI tracks only)
+  short: im
+  parameters: <string:full_path_to_file>
+route_track:
+  type: track
+  short: route rt
+  what: set source and send for a track (see 'source' and 'send' commands)
+  parameters: <string:source_id> <string:send_id>
 set_track:
   type: track
   what: Directly set current track parameters (use with care!).
@@ -505,13 +517,19 @@ source:
     source null 
     ! Track's input is silence. This is useful for when an effect such 
     ! as a metronome or signal generator provides a source.
+    !
+    source bus Strings
+    ! set the Strings bus as source
+    ! 
+    source track trumpet
+    ! set the track trumpet as source
     ! 
     source LinuxSampler 
-    ! Record input from the JACK client named LinuxSampler.
+    ! set the JACK client named LinuxSampler as source
     ! 
     source synth:output_3 
-    ! record from the JACK client synth, using the 
-    ! port output_3 (see he jackd and jack_lsp manpages
+    ! use the signal from the JACK client synth, using the 
+    ! port output_3 (see the jackd and jack_lsp manpages
     ! for more information).
     !
     source jack 
@@ -527,7 +545,7 @@ source:
     ! whose outputs use one JACK port per voice.
 send:
   type: track
-  what: Set an aux send for the current track. Remove sends with remove_send .
+  what: Set an aux send for the current track. Remove sends with remove-send .
   short: aux
   parameters: <integer:soundcard_channel> | <string:jack_client_name> | <string:loop_id>
   example: |
@@ -573,7 +591,7 @@ list_versions:
   short: lver
   parameters: none
   example: |
-    list_versions # May print something like: 1 2 5 7 9
+    list-versions # May print something like: 1 2 5 7 9
     !             # The other versions might have been deleted earlier by you.
 vol:
   type: track
@@ -655,28 +673,28 @@ pan_right:
   type: track
   what: |
     Pan the current track hard right. this is a synonym for pan 100. 
-    Can be reversed with pan_back.
+    Can be reversed with pan-back.
   short: pr
   parameters: none
 pan_left:
   type: track
   what: |
     Pan the current track hard left. This is a synonym for pan 0. 
-    Can be reversed with pan_back.
+    Can be reversed with pan-back.
   short: pl
   parameters: none
 pan_center:
   type: track
   what: |
     Pan the current track to the centre. This is a synonym for pan 50.
-    Can be reversed with pan_back.
+    Can be reversed with pan-back.
   short: pc
   parameters: none
 pan_back:
   type: track
   what: |
-    Restore the current track's pan position prior to pan_left, 
-    pan_right or pan_center commands.
+    Restore the current track's pan position prior to pan-left, 
+    pan-right or pan-center commands.
   short: pb
   parameters: none
 show_tracks:
@@ -688,14 +706,14 @@ show_tracks:
   parameters: none
 show_tracks_all:
   type: track
-  what: Like show_tracks, but includes hidden tracks as well. Useful for debugging.
+  what: Like show-tracks, but includes hidden tracks as well. Useful for debugging.
   short: sha showa
   parameters: none
-show_bus_tracks:
-  type: track 
-  what: Show a list of tracks in the current bus.
-  short: ltb showb
-  parameters: none
+show_bus:
+  type: bus
+  what: list tracks in current or named bus
+  short: shb
+  parameters: [ <string:busname> ]
 show_track:
   type: track
   what: |
@@ -725,7 +743,7 @@ set_region:
   type: track
   what: |
     Specify a playback region for the current track using marks. 
-    Can be reversed with remove_region.
+    Can be reversed with remove-region.
   short: srg
   parameters: <string:start_mark_name> <string:end_mark_name>
   example: |
@@ -734,7 +752,7 @@ set_region:
     mark sax_start # Create a mark
     sp 120.5       # Move playhead to 120.5 seconds.
     mark sax_end   # Create another mark
-    set_region sax_start sax_end 
+    set-region sax_start sax_end 
     !  Play only the audio from 2.5 to 120.5 seconds.
 add_region:
   type: track
@@ -744,7 +762,7 @@ add_region:
   parameters: <string:start_mark_name> | <float:start_time> <string:end_mark_name> | <float:end_time> [ <string:region_name> ]
   example: |
     sax # Select "sax" as the current track.
-    add_region sax_start 66.7 trimmed_sax 
+    add-region sax_start 66.7 trimmed_sax 
     ! Create "trimmed_sax", a copy of "sax" with a region defined
     ! from mark "sax_start" to 66.7 seconds. 
 remove_region:
@@ -758,7 +776,7 @@ shift_track:
   type: track
   what: |
     Choose an initial delay before playing a track or region.
-    Can be reversed by unshift_track.
+    Can be reversed by unshift-track.
   short: shift playat pat
   parameters: <string:start_mark_name> | <integer:start_mark_index | <float:start_seconds>
   example: |
@@ -813,30 +831,24 @@ remove_track:
     Remove the current track with its effects, inserts, etc.
     Audio files are unchanged. 
   parameters: none
-bus_mon:
-  type: bus
-  what: Set the current bus mix_track to monitor (the default behaviour).
-  short: bmon
-  parameters: none
-bus_off:
-  type: bus
-  what: |
-    Set current bus mixtrack to OFF. Can be reversed
-    with bus_rec or bus_mon.
-  short: boff
-  parameters: none
 bus_version:
   type: group
   what: Set the default monitoring version for tracks in the current bus.
   short: bver gver
   parameters: none
+bus_on:
+  type: group
+  what: restore tracks belonging to bus after bus-off
+bus_off:
+  type: group
+  what: turn off tracks belonging to current bus
 add_bunch:
   type: group
   what: 
   short: abn
   parameters: <string:bunch_name> [ <string:track_name_1> | <integer:track_index_1> ] ...
   example: |
-    add_bunch strings violin cello bass
+    add-bunch strings violin cello bass
     ! Create a bunch "strings" with tracks violin, cello and bass.
     for strings; mute # Mute all tracks in the strings bunch.
     for strings; vol * 0.8 
@@ -860,11 +872,11 @@ add_to_bunch:
   short: atbn
   parameters: <string:bunch_name> <string:track1> [ <string:track2> ] ...
   example: |
-    add_to_bunch woodwind oboe sax flute 
+    add-to-bunch woodwind oboe sax flute 
 commit:
   type: project
   what: commit Nama's current state
-  short: ci
+  short: cm
   parameters: <string:message>
 tag:
   type: project
@@ -883,7 +895,7 @@ new_branch:
   type: project
   what: create a new branch
   short: nbr
-  parameters: <string:new_branch_name> [<string:existing_branch_name>]
+  parameters: <string:new-branch_name> [<string:existing_branch_name>]
 save_state:
   type: project
   what: Save the project settings as file or git snapshot
@@ -903,16 +915,16 @@ new_project:
   type: project
   what: Create or open a new empty Nama project.
   short: create
-  parameters: <string:new_project_name>
+  parameters: <string:new-project-name>
   example: |
     create jam 
     # creates empty project call "jam".
     # Now you can start adding your tracks, editing them and mixing them.
 load_project:
   type: project
-  what: Load an existing project. This will load the project from the default project state file. If you wish to load a project state saved to a user specific file, load the project and then use get_state.
+  what: Load an existing project. This will load the project from the default project state file. If you wish to load a project state saved to a user specific file, load the project and then use get-state.
   short: load
-  parameters: <string:existing_project_name>
+  parameters: <string:existing_project-name>
   example: load my_old_song # Will load my_old_song just as you left it.
 project_name:
   type: project
@@ -925,7 +937,7 @@ new_project_template:
   short: npt
   parameters: <string:template_name> [ <string:template_description> ]
   example: |
-    new_project_template my_band_setup "tracks and busses for bass, drums and me"
+    new-project_template my_band_setup "tracks and busses for bass, drums and me"
 use_project_template:
   type: project
   what: Use a template to create tracks in a newly created, empty project.
@@ -978,7 +990,7 @@ loop:
   parameters: <string:start_mark_name> | <integer:start_mark_index> | <float:start_time_in_secs> <string:end_mark_name> | <integer:end_mark_index> | <float:end_time_in_secs>
   example: |
     loop 1.5 10.0 # Loop between 1.5 and 10.0 seconds.
-    loop 1 5 # Loop between marks with indeices 1 and 5, see list_marks.
+    loop 1 5 # Loop between marks with indices 1 and 5, see list-marks.
     loop sax_start 12.6 # Loop between mark sax_start and 12.6 seconds.
 noloop:
   type: setup
@@ -991,7 +1003,7 @@ add_controller:
   short: acl
   parameters: [ <string:operator_id> ] <string:effect_code> [ <float:param1> <float:param2> ] ...
   example: |
-    add_effect etd 100 2 2 50 50 # Add a stero delay of 100ms.
+    add-effect etd 100 2 2 50 50 # Add a stero delay of 100ms.
     ! the delay will get the effect ID E .
     ! Now we want to slowly change the delay to 200ms.
     acl E klg 1 100 200 2 0 100 15 200 # Change the delay time linearly (klg)
@@ -1006,7 +1018,7 @@ add_effect:
     "before", "first" and "last" can be abbreviated "b", "f" and "l", respectively.
   example: |
     We want to add the decimator effect (a LADSPA plugin).
-    help_effect decimator # Print help about its paramters/controls.
+    help-effect decimator # Print help about its paramters/controls.
     !                     # We see two input controls: bitrate and samplerate
     afx decimator 12 22050  #  prints "Added GO (Decimator)"
     ! We have added the decimator with 12bits and a sample rate of 22050Hz.
@@ -1024,7 +1036,7 @@ add_effect_first:
 add_effect_before:
   type: effect
   what: same as add-effect before
-  short: afxb
+  short: afxb insert_effect ifx 
   parameters: <fx_alias> <fx_alias> [ <float:param1> <float:param2>... ]
 modify_effect:
   type: effect
@@ -1062,15 +1074,15 @@ position_effect:
   short: pfx
   parameters: <string:id_to_move> <string:position_id>
   example: |
-    position_effect G F # Move effecit with unique ID G before F.
+    position-effect G F # Move effect with unique ID G immediately before effect F
 show_effect:
   type: effect
-  what: Show information about an effect. Default is to print information on the current effect.
+  what: Show information about an effect, defaulting to current effect
   short: sfx
   parameters: [ <string:effect_id1> ] [ <string:effect_id2> ] ...
   example: |
-    sfx # Print name, unique ID and parameters/controls of the current effect.
-    sfx H # Print out all information about effect with unique ID H.
+    sfx # Display name, unique ID and parameters/controls of the current effect.
+    sfx H # Display info on effect with unique ID H. H becomes the current effect.
 dump_effect:
   type: effect
   what: Dump all data of current effect object
@@ -1110,10 +1122,10 @@ add_insert:
       External: ( pre | post ) <string:send_id> [ <string:return_id> ]
       Local wet/dry: local
   example: |
-    add_insert pre jconvolver 
+    add-insert pre jconvolver 
     ! Add a prefader insert. The current track signal is sent 
     ! to jconvolver and returned to the vol/pan controls.
-    add_insert post jconvolver csound 
+    add-insert post jconvolver csound 
     ! Send the current track postfader signal (after vol/pan
     ! controls) to jconvolver, getting the return from csound.
     guitar # Select the guitar track
@@ -1138,7 +1150,7 @@ remove_insert:
   parameters: [ pre | post ]
   example: |
     rin # If there is only one insert on the current track, remove it.
-    remove_insert post # Remove the postfader insert from the current track.
+    remove-insert post # Remove the postfader insert from the current track.
 ctrl_register:
   type: effect
   what: List all Ecasound controllers. Controllers include linear controllers and oscillators.
@@ -1165,7 +1177,7 @@ to_mark:
   short: tmk tom
   parameters: <string:mark_name> | <integer:mark_index>
   example: |
-    to_mark sax_start # Jump to the position marked by sax_mark.
+    to-mark sax_start # Jump to the position marked by sax_mark.
     tmk 2 # Move to the mark with the index 2.
 add_mark:
   type: mark
@@ -1180,7 +1192,7 @@ remove_mark:
   short: rmk
   parameters: [ <string:mark_name> | <integer:mark_index> ]
   example: |
-    remove_mark start # remove the mark named start
+    remove-mark start # remove the mark named start
     rmk 16 # Remove the mark with the index 16.
     rmk    # Remove the current mark
 next_mark:
@@ -1241,7 +1253,7 @@ add_submix_cooked:
   short: 
   parameters: <string:name> <destination>
   example: |
-    add_submix_cooked front_of_house 7
+    add-submix-cooked front_of_house 7
     ! send a custom mix named "front_of_house"
     ! to soundcard channels 7/8
 add_submix_raw:
@@ -1254,7 +1266,7 @@ add_submix_raw:
                       # going to the JACK client jconv .
 add_bus:
   type: bus
-  what: Add a sub bus. This is a bus, as known from other DAWs. The default output goes to a mix track and that is routed to the mixer (the Master track). All busses begin with a capital letter!
+  what: Add a sub bus. This is a bus, as known from other DAWs. The default output goes to a mix track and that is routed to the mixer (the Main track). All busses begin with a capital letter!
   short: abs
   parameters: <string:name> [ <string:track_name> | <string:jack_client> | <integer:soundcard_channel> ]
   example: |
@@ -1265,7 +1277,7 @@ update_submix:
   what: Include tracks added since the submix was created.
   short: usm
   parameters: <string:name>
-  example: update_submix Reverb # Include new tracks in the Reverb submix
+  example: update-submix Reverb # Include new tracks in the Reverb submix
 remove_bus:
   type: bus
   what: Remove a bus or submix
@@ -1286,7 +1298,7 @@ overwrite_effect_chain:
     Create a new effect chain, overwriting an existing one
     of the same name.
   short: oec
-  parameters: Same as for new_effect_chain
+  parameters: Same as for new-effect-chain
 new_effect_chain:
   type: effect
   what: | 
@@ -1296,7 +1308,7 @@ new_effect_chain:
   short: nec
   parameters: <string:name> [ <effect_id_1> <effect_id_2>... ] 
   example: |
-    new_effect_chain my_piano 
+    new-effect-chain my_piano 
     ! Create a new effect chain, "my_piano", storing all 
     ! effects and their settings from the current track
     ! except the fader (vol/pan) settings.
@@ -1313,15 +1325,15 @@ delete_effect_chain:
   parameters: <string:effect_chain_name>
 find_effect_chains:
   type: effect
-  what: Dump effect chains, matching key/value pairs if provided
-  short: fec
+  what: Dump effect chains, filtering on key pairs (if provided)
+  short: fec lec
   parameters: [ <string:key_1> <string:value_1> ] ...
   example: |
     fec # List all effect chains with their effects.
 find_user_effect_chains:
   type: effect
   what: List all *user* created effect chains, matching key/value pairs, if provided.
-  short: fuec
+  short: fuec leca
   parameters: [ <string:key_1> <string:value_1> ] ...
 bypass_effects:
   type: effect
@@ -1339,14 +1351,14 @@ bring_back_effects:
   example: |
     bbfx                   # Restore the current effect.
     restore_effect AF      # Restore the effect with the unique ID AF.
-    bring_back_effects all # Restore all effects.
+    bring-back-effects all # Restore all effects.
 new_effect_profile:
   type: effect
   what: Create a new effect profile. An effect profile is a named group of effect chains for multiple tracks. Useful for storing a basic template of standard effects for a group of instruments, like a drum kit.
   short: nep
   parameters: <string:bunch_name> [ <string:effect_profile_name> ]
   example: |
-    add_bunch Drums snare toms kick # Create a buch called Drums.
+    add-bunch Drums snare toms kick # Create a buch called Drums.
     nep Drums my_drum_effects # Create an effect profile, call my_drum_effects
                               # containing all effects from snare toms and kick.
 apply_effect_profile:
@@ -1387,8 +1399,8 @@ cache_track:
     definition are removed and stored. 
 
     To go back to the original track state, use the
-    uncache_track command.  The show_track display appends a "c"
-    to version numbers created by cache_track (and therefore
+    uncache-track command.  The show-track display appends a "c"
+    to version numbers created by cache-track (and therefore
     reversible by uncache) 
     
   short: cache ct bounce freeze
@@ -1429,7 +1441,7 @@ remove_fade:
   short: rfd
   parameters: <integer:fade_index_1> [ <integer:fade_index_2> ] ...
   example: |
-    list_fade # Print a list of all fades and their tracks.
+    list-fade # Print a list of all fades and their tracks.
     rfd 2     # Remove the fade with the index (n) 2.
 list_fade:
   type: effect
@@ -1478,33 +1490,11 @@ show_version_comments_all:
   what: Show all version comments for the current track.
   short: svca
   parameters: none
-set_system_version_comment:
+add_system_version_comment:
   type: track
   what: Set a system version comment. Useful for testing and diagnostics.
-  short: ssvc
+  short: asvc
   parameters: <string:comment>
-midish_command:
-  type: midi
-  what: Send the command text to the midish MIDI sequencer. Midish must be installed and enabled in namarc. See the midish manpage and fullonline documentation for more.
-  short: m
-  parameters: <string:command_text>
-  example: m tracknew my_midi_track # create a new MIDI track in midish.
-midish_mode_on:
-  type: midi
-  what: all users commands sent to midish, until
-  short: mmo
-midish_mode_off:
-  what: exit midish mode, restore default Nama command mode, no midish sync
-  type: midi
-  short: mmx
-midish_mode_off_ready_to_play:
-  what: exit midish mode, sync midish start (p) with Ecasound
-  type: midi
-  short: mmxrp
-midish_mode_off_ready_to_record:
-  what: exit midish mode, sync midish start (r) with Ecasound
-  type: midi
-  short: mmxrr
 new_edit:
   type: edit
   what: Create an edit for the current track and version.
@@ -1591,22 +1581,24 @@ rec_end_mark:
   parameters: none
 set_play_start_mark:
   type: edit
-  what: Set play_start_mark to the current playback position.
+  what: Set play-start-mark to the current playback position.
   short: spsm
   parameters: none
 set_rec_start_mark:
   type: edit
-  what: Set rec_start_mark to the current playback position.
+  what: Set rec-start-mark to the current playback position.
   short: srsm
   parameters: none
 set_rec_end_mark:
   type: edit
-  what: Set rec_end_mark to current playback position.
+  what: Set rec-end-mark to current playback position.
   short: srem
   parameters: none
 disable_edits:
   type: edit
-  what: Turn off the edits for the current track and playback the original. This will exclude the edit sub bus.
+  what: |
+    Turn off the edits for the current track and playback 
+    the original WAV file. This will remove the edit bus.
   short: ded
   parameters: none
 merge_edits:
@@ -1620,7 +1612,7 @@ explode_track:
   parameters: none
 move_to_bus:
   type: track
-  what: Move the current track to another bus. A new track is always in the Main bus. So to reverse this action use move_to_bus Main .
+  what: Move the current track to another bus. A new track is always in the Main bus. So to reverse this action use move-to-bus Main .
   short: mtb
   parameters: <string:bus_name>
   example: |
@@ -1639,7 +1631,7 @@ read_user_customizations:
   parameters: none
 limit_run_time:
   type: setup
-  what: Stop recording after the last audio file finishes playing. Can be turned off with limit_run_time_off.
+  what: Stop recording after the last audio file finishes playing. Can be turned off with limit-run-time_off.
   short: lr
   parameters: [ <float:additional_seconds> ]
 limit_run_time_off:
@@ -1767,7 +1759,7 @@ convert_to_sequence:
 merge_sequence:
   type: sequence
   short: msq
-  what: cache and MON the current sequence mix track, disable the sequence
+  what: cache the current sequence mix track, and set it to PLAY
   parameters: none
 snip:
   type: sequence
@@ -1844,7 +1836,7 @@ trim_submix:
   short: trim tsm
   example: |
     ! reduce vol of current track in in_ear_monitor by 3dB
-    select_submix in_ear_monitor
+    select-submix in_ear_monitor
     trim vol - 3 
 nickname_effect:
   type: effect
@@ -1852,7 +1844,7 @@ nickname_effect:
   what: Add a nickname to the current effect (and create an alias)
   parameters: <lower_case_string:nickname>
   example: |
-    add_track guitar
+    add-track guitar
     afx Plate
     nick reverb        # current effect gets name "reverb1"
                        # "reverb" becomes an alias for "Plate"
@@ -1915,17 +1907,28 @@ select_track:
     set a particular track as the current, or default track
     against which track-related commands are executed.
   parameters: <string:track-name> | <integer:track-number>
+set_tempo:
+  short: tempo tp
+  type: midi
+  what: set MIDI tempo (bpm)
+  parameters: <integer:tempo-setting>
+set_sample_rate:
+  type: general
+  short: ssr
+  what: configure the sample rate for the current project or report sample rate if no parameter
+  parameters: <integer:sample-rate>
 ...
 
 @@ grammar
 
 command: _a_test { print "aaa-test" }
 _a_test: /something_else\b/ | /a-test\b/
-meta: midish_cmd 
-midish_cmd: /[a-z]+/ predicate { 
-	return unless $Audio::Nama::midi->{keywords}->{$item[1]};
+meta: midi_cmd 
+midi_cmd: /[a-z]+/ predicate { 
+	return unless $Audio::Nama::this_track->engine_group =~ /midi/  and $Audio::Nama::text->{midi_cmd}->{$item[1]};
 	my $line = "$item[1] $item{predicate}";
-	Audio::Nama::midish_command($line);
+	$line =~ s/^m//; 
+	Audio::Nama::pager(Audio::Nama::midish_cmd($line));
 	1;
 }
 meta: bang shellcode stopper {
@@ -1951,7 +1954,7 @@ meta: for bunch_spec ';' namacode stopper {
  	Audio::Nama::logit(__LINE__,'Grammar','debug',"namacode: $item{namacode}");
  	my @tracks = Audio::Nama::bunch_tracks($item{bunch_spec});
  	for my $t(@tracks) {
- 		Audio::Nama::user_set_current_track($t);
+ 		Audio::Nama::set_current_track($t);
 		$Audio::Nama::text->{parser}->meta($item{namacode});
 	}
 	1;
@@ -1967,7 +1970,7 @@ do_part: track_spec end
 predicate: nonsemi end { $item{nonsemi}}
 predicate: /$/
 iam_cmd: ident { $item{ident} if $Audio::Nama::text->{iam}->{$item{ident}} }
-track_spec: ident { Audio::Nama::user_set_current_track($item{ident}) }
+track_spec: ident { Audio::Nama::set_current_track($item{ident}) }
 bang: '!'
 eval: 'eval'
 for: 'for'
@@ -1981,8 +1984,8 @@ semistop: /;|$/
 command: iam_cmd predicate { 
 	my $user_input = "$item{iam_cmd} $item{predicate}"; 
 	Audio::Nama::logit(__LINE__,'Audio::Nama::Grammar','debug',"Found Ecasound IAM command: $user_input");
-	my $result = Audio::Nama::eval_iam($user_input);
-	Audio::Nama::pager( $result );  
+	my $result = Audio::Nama::ecasound_iam($user_input);
+	Audio::Nama::pager( "$result\n" );  
 	1 }
 command: user_command predicate {
 	Audio::Nama::do_user_command(split " ",$item{predicate});
@@ -2019,11 +2022,12 @@ ident: /[-\w]+/
 save_target: /[-:\w.]+/
 decimal_seconds: /\d+(\.\d+)?/ 
 marktime: /\d+\.\d+/ 
-markname: /[A-Za-z]\w*/ { 
+markname: alphafirst { 
 	Audio::Nama::throw("$item[1]: non-existent mark name. Skipping"), return undef 
 		unless $Audio::Nama::Mark::by_name{$item[1]};
 	$item[1];
 }
+alphafirst: /[A-Za-z][\w_-]*/
 path: shellish
 modifier: 'audioloop' | 'select' | 'reverse' | 'playat' | value
 end: /[;\s]*$/ 		
@@ -2031,7 +2035,7 @@ help_effect: _help_effect effect { Audio::Nama::help_effect($item{effect}) ; 1}
 find_effect: _find_effect anytag(s) { 
 	Audio::Nama::find_effect(@{$item{"anytag(s)"}}); 1}
 help: _help anytag  { Audio::Nama::help($item{anytag}) ; 1}
-help: _help { Audio::Nama::pager( $Audio::Nama::help->{screen} ); 1}
+help: _help { print( $Audio::Nama::help->{screen} ); 1}
 project_name: _project_name { 
 	Audio::Nama::pager( "project name: ", $Audio::Nama::project->{name}); 1}
 new_project: _new_project project_id { 
@@ -2079,6 +2083,7 @@ new_branch: _new_branch branchname branchfrom(?) {
 	Audio::Nama::throw("$name: branch already exists. Doing nothing."), return 1
 		if Audio::Nama::git_branch_exists($name);
 	Audio::Nama::git_create_branch($name, $from);
+	1
 }
 tagname: ident
 branchname: ident
@@ -2112,7 +2117,7 @@ get_state: _get_state save_target {
  		settings => $item{save_target}
  		); 1}
 getpos: _getpos {  
-	Audio::Nama::pager( Audio::Nama::d1( Audio::Nama::eval_iam q(getpos) )); 1}
+	Audio::Nama::pager( Audio::Nama::d1( Audio::Nama::ecasound_iam('getpos'))); 1}
 setpos: _setpos timevalue {
 	Audio::Nama::set_position($item{timevalue}); 1}
 forward: _forward timevalue {
@@ -2124,7 +2129,7 @@ seconds: samples
 seconds: /\d+/
 samples: /\d+sa/ {
 	my ($samples) = $item[1] =~ /(\d+)/;
- 	$return = $samples/$Audio::Nama::config->{sample_rate}
+ 	$return = $samples/$Audio::Nama::project->{sample_rate}
 }
 min_sec: /\d+/ ':' /\d+/ { $item[1] * 60 + $item[3] }
 to_start: _to_start { Audio::Nama::to_start(); 1 }
@@ -2134,7 +2139,7 @@ add_track: _add_track new_track_name {
     1
 }
 add_midi_track: _add_midi_track new_track_name {
-	Audio::Nama::MidiTrack->new(name => $item{new_track_name}, group => 'Midi');
+	Audio::Nama::add_midi_track($item{new_track_name});
 	Audio::Nama::pager_newline(qq(creating MIDI track "$item{new_track_name}"));
 	1
 }
@@ -2159,7 +2164,8 @@ new_track_name: anytag  {
 ;
 $proposed
 } 
-track_name: ident
+track_name: alphafirst
+bus_name: alphafirst
 existing_track_name: track_name { 
 	my $track_name = $item{track_name};
 	if ($Audio::Nama::tn{$track_name}){
@@ -2167,6 +2173,16 @@ existing_track_name: track_name {
 	}
 	else {	
 		Audio::Nama::throw("$track_name: track does not exist.\n");
+		undef
+	}
+}
+existing_bus_name: bus_name { 
+	my $bus_name = $item{bus_name};
+	if ($Audio::Nama::bn{$bus_name}){
+		$bus_name;
+	}
+	else {	
+		Audio::Nama::throw("$bus_name: bus does not exist.\n");
 		undef
 	}
 }
@@ -2238,8 +2254,7 @@ shift_track: _shift_track start_position {
 	0;
 	}
 }
-start_position:  float | samples | mark_name
-mark_name: ident
+start_position:  float | samples | markname
 unshift_track: _unshift_track {
 	$Audio::Nama::this_track->set(playat => undef)
 }
@@ -2250,11 +2265,11 @@ arm: _arm { Audio::Nama::arm(); 1}
 arm_start: _arm_start { Audio::Nama::arm(); Audio::Nama::start_transport(); 1 }
 connect: _connect { Audio::Nama::connect_transport(); 1}
 disconnect: _disconnect { Audio::Nama::disconnect_transport(); 1}
-engine_status: _engine_status { Audio::Nama::pager(Audio::Nama::eval_iam q(engine-status)); 1}
+engine_status: _engine_status { Audio::Nama::pager(Audio::Nama::ecasound_iam('engine-status')); 1}
 start: _start { Audio::Nama::start_transport(); 1}
 stop: _stop { Audio::Nama::stop_transport(); 1}
-ecasound_start: _ecasound_start { Audio::Nama::eval_iam('start'); 1}
-ecasound_stop: _ecasound_stop  { Audio::Nama::eval_iam('stop'); 1}
+ecasound_start: _ecasound_start { Audio::Nama::ecasound_iam('start'); 1}
+ecasound_stop: _ecasound_stop  { Audio::Nama::ecasound_iam('stop'); 1}
 restart_ecasound: _restart_ecasound { Audio::Nama::restart_ecasound(); 1 }
 show_tracks: _show_tracks { 	
 	Audio::Nama::pager( Audio::Nama::show_tracks(Audio::Nama::showlist()));
@@ -2265,7 +2280,13 @@ show_tracks_all: _show_tracks_all {
 	Audio::Nama::pager(Audio::Nama::show_tracks($list));
 	1;
 }
-show_bus_tracks: _show_bus_tracks { 	
+show_bus: _show_bus existing_bus_name { 	
+	my $bus = $Audio::Nama::bn{$item{existing_bus_name}};
+	my $list = $bus->trackslist;
+	Audio::Nama::pager(Audio::Nama::show_tracks($list));
+	1;
+}
+show_bus: _show_bus { 	
 	my $bus = $Audio::Nama::bn{$Audio::Nama::this_bus};
 	my $list = $bus->trackslist;
 	Audio::Nama::pager(Audio::Nama::show_tracks($list));
@@ -2303,29 +2324,16 @@ show_track: _show_track dd {
 	$Audio::Nama::ti{$item{dd}};
 	1;}
 show_mode: _show_mode { Audio::Nama::pager( Audio::Nama::show_status()); 1}
-bus_mon: _bus_mon {
-	my $bus = $Audio::Nama::bn{$Audio::Nama::this_bus}; 
-	$bus->set(rw => 'MON');
-	$Audio::Nama::tn{$bus->send_id}->busify
-		if $bus->send_type eq 'track' and $Audio::Nama::tn{$bus->send_id};
-	Audio::Nama::pager( "Setting MON mode for $Audio::Nama::this_bus bus.");
-	1; }
-bus_off: _bus_off {
-	my $bus = $Audio::Nama::bn{$Audio::Nama::this_bus}; 
-	$bus->set(rw => Audio::Nama::OFF);
-	if($bus->send_type eq 'track' and my $mix = $Audio::Nama::tn{$bus->send_id})
-	{ $mix->set(rw => Audio::Nama::OFF) }
-	Audio::Nama::pager( "Setting OFF mode for " , $Audio::Nama::this_bus, " bus. Member tracks disabled."); 1  
-}
 bus_version: _bus_version dd { 
 	my $n = $item{dd};
-	Audio::Nama::process_command("for $Audio::Nama::this_bus; version $n");
+	Audio::Nama::nama_cmd("for $Audio::Nama::this_bus; version $n");
 }
+mixdown: _mixdown additional_time { $Audio::Nama::setup->{extra_run_time} = $item{additional_time}; Audio::Nama::mixdown(); 1}
 mixdown: _mixdown { Audio::Nama::mixdown(); 1}
 mixplay: _mixplay { Audio::Nama::mixplay(); 1}
 mixoff:  _mixoff  { Audio::Nama::mixoff(); 1}
 automix: _automix { Audio::Nama::automix(); 1 }
-autofix_tracks: _autofix_tracks { Audio::Nama::process_command("for mon; fixdc; normalize"); 1 }
+autofix_tracks: _autofix_tracks { Audio::Nama::nama_cmd("for mon; fixdc; normalize"); 1 }
 master_on: _master_on { Audio::Nama::master_on(); 1 }
 master_off: _master_off { Audio::Nama::master_off(); 1 }
 exit: _exit {   
@@ -2337,14 +2345,16 @@ source: _source ('track'|'t') trackname {
 	$Audio::Nama::this_track->set_source($item{trackname}, 'track'); 1
 } 
 trackname: existing_track_name
+source: _source 'bus' existing_bus_name {
+		$Audio::Nama::this_track->set(source_id => $item{existing_bus_name}, source_type => 'bus')
+		}
 source: _source source_id { $Audio::Nama::this_track->set_source($item{source_id}); 1 }
 source_id: shellish
 source: _source { 
 	my $status = $Audio::Nama::this_track->rec_status;
-	Audio::Nama::pager_newline($Audio::Nama::this_track->name, ": input set to ", $Audio::Nama::this_track->input_object_text, "\n",
-	"however track status is ", $status)
-		if $status ne Audio::Nama::REC and $status ne Audio::Nama::MON;
-	1;
+	my $source = join ": input set to ",$Audio::Nama::this_track->name,  $Audio::Nama::this_track->input_object_text;
+	$source .= " however track is $status" if $status ne Audio::Nama::REC and $status ne Audio::Nama::MON;
+	Audio::Nama::pager_newline($source);
 }
 send: _send ('track'|'t') trackname { 
 	$Audio::Nama::this_track->set_send($item{trackname}, 'track'); 1
@@ -2370,15 +2380,13 @@ record: 'dummy'
 mon: 'dummy'
 play: 'dummy'
 command: mono
-command: rw
+command: rw 
 rw_setting:   'REC ' | 'rec' 
 			| 'PLAY' | 'play'
 			| 'MON'  | 'mon'
 			| 'OFF'  | 'off' { $return = $item[1] }
 rw: rw_setting {
-	$Audio::Nama::this_track->is_system_track 
-		? $Audio::Nama::this_track->set(rw => uc $item{rw_setting}) 
-		: Audio::Nama::rw_set($Audio::Nama::Bus::by_name{$Audio::Nama::this_bus},$Audio::Nama::this_track,$item{rw_setting}); 
+		 $Audio::Nama::this_track->set(rw => uc $item{rw_setting}) ;
 	1
 }
 set_version: _set_version dd { $Audio::Nama::this_track->set_version($item{dd}); 1}
@@ -2455,7 +2463,7 @@ list_marks: _list_marks {
 	,join " ", $i++, sprintf("%.1f", $_->{time}), $_->name, "\n")  } 
 		  @Audio::Nama::Mark::all;
 	my $start = my $end = "undefined";
-	push @lines, "now at ". sprintf("%.1f", Audio::Nama::eval_iam "getpos"). "\n";
+	push @lines, "now at ". sprintf("%.1f\n", Audio::Nama::ecasound_iam("getpos"));
 	Audio::Nama::pager(@lines);
 	1;}
 to_mark: _to_mark dd {
@@ -2531,7 +2539,7 @@ add_controller: _add_controller effect value(s?) {
 	my $values = $item{"value(s?)"};
 	my $cmd = "add_controller $parent $code @$values";
 	print "command: $cmd\n";
-	Audio::Nama::process_command($cmd);
+	Audio::Nama::nama_cmd($cmd);
 	1
 }
 existing_effect_chain: ident { $item{ident} if Audio::Nama::is_effect_chain($item{ident}) }
@@ -2604,7 +2612,7 @@ add_effect: _add_effect ('first'  | 'f')  add_target value(s?) {
 		$item{add_target},
 		@{$item{'value(s?)'}},
 		$Audio::Nama::this_track->{ops}->[0];
-	Audio::Nama::process_command($command)
+	Audio::Nama::nama_cmd($command)
 }
 add_effect: _add_effect ('last'   | 'l')  add_target value(s?) { 
 	my $command = join " ", 
@@ -2612,7 +2620,7 @@ add_effect: _add_effect ('last'   | 'l')  add_target value(s?) {
 		$item{add_target},
 		@{$item{'value(s?)'}},
 		qw(ZZZ);
-	Audio::Nama::process_command($command)
+	Audio::Nama::nama_cmd($command)
 }
 add_effect: _add_effect ('before' | 'b')  before add_target value(s?) {
 	my $command = join " ", 
@@ -2620,7 +2628,7 @@ add_effect: _add_effect ('before' | 'b')  before add_target value(s?) {
 		$item{add_target},
 		@{$item{'value(s?)'}},
 		$item{before};
-	Audio::Nama::process_command($command)
+	Audio::Nama::nama_cmd($command)
 }
 add_effect_first: _add_effect_first add_target value(s?) {
 	my $command = join " ", 
@@ -2628,7 +2636,7 @@ add_effect_first: _add_effect_first add_target value(s?) {
 		"last",
 		$item{add_target},
 		@{$item{'value(s?)'}};
-	Audio::Nama::process_command($command)
+	Audio::Nama::nama_cmd($command)
 }
 add_effect_last: _add_effect_last add_target value(s?) {
 	my $command = join " ", 
@@ -2636,7 +2644,7 @@ add_effect_last: _add_effect_last add_target value(s?) {
 		"last",
 		$item{add_target},
 		@{$item{'value(s?)'}};
-	Audio::Nama::process_command($command)
+	Audio::Nama::nama_cmd($command)
 }
 add_effect_before: _add_effect_before before add_target value(s?) {
 	my $command = join " ", 
@@ -2645,16 +2653,16 @@ add_effect_before: _add_effect_before before add_target value(s?) {
 		$item{before},		
 		$item{add_target},
 		@{$item{'value(s?)'}};
-	Audio::Nama::process_command($command)
+	Audio::Nama::nama_cmd($command)
 }
 parent: op_id
 modify_effect: _modify_effect fx_alias(s /,/) parameter(s /,/) value {
 	Audio::Nama::modify_multiple_effects( @item{qw(fx_alias(s) parameter(s) sign value)});
-	Audio::Nama::pager(Audio::Nama::show_effect(@{ $item{'fx_alias(s)'} }))
+	Audio::Nama::pager(Audio::Nama::show_effect(@{ $item{'fx_alias(s)'} })); 1
 }
 modify_effect: _modify_effect fx_alias(s /,/) parameter(s /,/) sign value {
 	Audio::Nama::modify_multiple_effects( @item{qw(fx_alias(s) parameter(s) sign value)});
-	Audio::Nama::pager(Audio::Nama::show_effect(@{ $item{'fx_alias(s)'} }));
+	Audio::Nama::pager(Audio::Nama::show_effect(@{ $item{'fx_alias(s)'} })); 1
 }
 modify_effect: _modify_effect parameter(s /,/) value {
 	Audio::Nama::throw("current effect is undefined, skipping"), return 1 if ! Audio::Nama::this_op();
@@ -2663,17 +2671,17 @@ modify_effect: _modify_effect parameter(s /,/) value {
 		$item{'parameter(s)'},
 		undef,
 		$item{value});
-	Audio::Nama::pager( Audio::Nama::show_effect(Audio::Nama::this_op(), "with track affiliation"))
+	Audio::Nama::pager( Audio::Nama::show_effect(Audio::Nama::this_op(), "with track affiliation")); 1
 }
 modify_effect: _modify_effect parameter(s /,/) sign value {
 	Audio::Nama::throw("current effect is undefined, skipping"), return 1 if ! Audio::Nama::this_op();
 	Audio::Nama::modify_multiple_effects( [Audio::Nama::this_op()], @item{qw(parameter(s) sign value)});
-	Audio::Nama::pager( Audio::Nama::show_effect(Audio::Nama::this_op()));
+	Audio::Nama::pager( Audio::Nama::show_effect(Audio::Nama::this_op())); 1
 }
 fx_alias3: ident { 
 	join " ", 
 	map{ $_->id } 
-	grep { $_->surname eq $item{ident} } $Audio::Nama::this_track->fancy_ops_o;
+	grep { $_->surname eq $item{ident} } $Audio::Nama::this_track->user_ops_o;
 }
 remove_target: existing_op_id | fx_pos | fx_surname | fx_name
 	{ $item[-1] or print("no effect object found\n"), return 0}
@@ -2722,13 +2730,13 @@ remove_bunch: _remove_bunch ident(s) {
  	map{ delete $Audio::Nama::project->{bunch}->{$_} } @{$item{'ident(s)'}}; 1}
 add_to_bunch: _add_to_bunch ident(s) { Audio::Nama::add_to_bunch( @{$item{'ident(s)'}});1 }
 list_versions: _list_versions { 
-	Audio::Nama::pager( join " ", @{$Audio::Nama::this_track->versions}); 1}
+	Audio::Nama::pagers( join " ", @{$Audio::Nama::this_track->versions}); 1}
 ladspa_register: _ladspa_register { 
-	Audio::Nama::pager( Audio::Nama::eval_iam("ladspa-register")); 1}
+	Audio::Nama::pager( Audio::Nama::ecasound_iam("ladspa-register")); 1}
 preset_register: _preset_register { 
-	Audio::Nama::pager( Audio::Nama::eval_iam("preset-register")); 1}
+	Audio::Nama::pagers( Audio::Nama::ecasound_iam("preset-register")); 1}
 ctrl_register: _ctrl_register { 
-	Audio::Nama::pager( Audio::Nama::eval_iam("ctrl-register")); 1}
+	Audio::Nama::pager( Audio::Nama::ecasound_iam("ctrl-register")); 1}
 preview: _preview { Audio::Nama::set_preview_mode(); 1}
 doodle: _doodle { Audio::Nama::set_doodle_mode(); 1 }
 normalize: _normalize { $Audio::Nama::this_track->normalize; 1}
@@ -2746,6 +2754,11 @@ unmemoize: _unmemoize {
 }
 import_audio: _import_audio path frequency {
 	Audio::Nama::import_audio($Audio::Nama::this_track, $item{path}, $item{frequency}); 1;
+}
+import_midi: _import_midi path { 
+	my $fname = $item{path};
+	$fname = qq("$fname") unless $fname =~ /"/; 
+	Audio::Nama::midish_cmd("import $fname"); 1
 }
 import_audio: _import_audio path {
 	Audio::Nama::import_audio($Audio::Nama::this_track, $item{path}); 1;
@@ -2784,7 +2797,7 @@ update_submix: _update_submix existing_bus_name {
  	1;
 }
 set_bus: _set_bus key someval { $Audio::Nama::bn{$Audio::Nama::this_bus}->set($item{key} => $item{someval}); 1 }
-list_buses: _list_buses { Audio::Nama::pager(map{ $_->dump } Audio::Nama::Bus::all()) ; 1}
+list_buses: _list_buses { Audio::Nama::list_buses() ; 1}
 add_insert: _add_insert 'local' {
 	Audio::Nama::Insert::add_insert( $Audio::Nama::this_track,'postfader_insert');
 	1;
@@ -2810,7 +2823,7 @@ set_insert_wetness: _set_insert_wetness prepost(?) parameter {
 	Audio::Nama::throw("track '",$Audio::Nama::this_track->n, "' has no insert.  Skipping."),
 		return 1 unless $i;
 	$i->set_wetness($p);
-	1;
+	 Audio::Nama::pager( "The insert is ", $i->wetness, "% wet, ", (100 - $i->wetness), "% dry.");
 }
 set_insert_wetness: _set_insert_wetness prepost(?) {
 	my $prepost = $item{'prepost(?)'}->[0];
@@ -2839,13 +2852,13 @@ new_effect_chain: (_new_effect_chain | _overwrite_effect_chain ) ident op_id(s?)
 	my @existing = Audio::Nama::EffectChain::find(user => 1, name => $name);
 	if ( scalar @existing ){
 		$item[1] eq 'overwrite_effect_chain'
- 			? Audio::Nama::process_command("delete_effect_chain $name")
+ 			? Audio::Nama::nama_cmd("delete_effect_chain $name")
  			: Audio::Nama::throw(qq/$name: effect chain with this name is already defined. 
 Use a different name, or use "overwrite_effect_chain"/) && return;
 	}
 	my $ops = scalar @{$item{'op_id(s?)'}}
 				?  $item{'op_id(s?)'} 
-				: [ $Audio::Nama::this_track->fancy_ops ];
+				: [ $Audio::Nama::this_track->user_ops ];
 	my @options;
 	Audio::Nama::EffectChain->new(
 		user   => 1,
@@ -2868,6 +2881,7 @@ find_effect_chains: _find_effect_chains ident(s?)
 	my @args;
 	push @args, @{ $item{'ident(s?)'} } if $item{'ident(s?)'};
 	Audio::Nama::pager(map{$_->dump} Audio::Nama::EffectChain::find(@args));
+	1
 }
 find_user_effect_chains: _find_user_effect_chains ident(s?)
 {
@@ -2890,8 +2904,8 @@ bypass_effects:   _bypass_effects op_id(s) {
 }
 bypass_effects: _bypass_effects 'all' { 
 	Audio::Nama::pager( "track ",$Audio::Nama::this_track->name,", bypassing all effects (except vol/pan)");
-	Audio::Nama::bypass_effects($Audio::Nama::this_track, $Audio::Nama::this_track->fancy_ops)
-		if $Audio::Nama::this_track->fancy_ops;
+	Audio::Nama::bypass_effects($Audio::Nama::this_track, $Audio::Nama::this_track->user_ops)
+		if $Audio::Nama::this_track->user_ops;
 	1; 
 }
 bypass_effects: _bypass_effects { 
@@ -2919,7 +2933,7 @@ bring_back_effects:   _bring_back_effects op_id(s) {
 }
 bring_back_effects:   _bring_back_effects 'all' { 
 	Audio::Nama::pager( "restoring all effects");
-	Audio::Nama::restore_effects( $Audio::Nama::this_track, $Audio::Nama::this_track->fancy_ops);
+	Audio::Nama::restore_effects( $Audio::Nama::this_track, $Audio::Nama::this_track->user_ops);
 }
 fxc_val: shellish
 this_track_op_id: op_id(s) { 
@@ -3043,11 +3057,12 @@ remove_fade: _remove_fade fade_index(s) {
 	1
 }
 fade_index: dd 
-list_fade: _list_fade {  Audio::Nama::pager(join "\n",
+list_fade: _list_fade { Audio::Nama::pager(join "\n",
 		map{ s/^---//; s/...\s$//; $_} map{$_->dump}
-		sort{$a->n <=> $b->n} values %Audio::Nama::Fade::by_index) }
+		sort{$a->n <=> $b->n} values %Audio::Nama::Fade::by_index); 
+	1 } 
 add_comment: _add_comment text { 
- 	Audio::Nama::pager( $Audio::Nama::this_track->name, ": comment: $item{text}"); 
+ 	Audio::Nama::pagers( $Audio::Nama::this_track->name. ": comment: $item{text}"); 
  	$Audio::Nama::project->{track_comments}->{$Audio::Nama::this_track->name} = $item{text};
  	1;
 }
@@ -3057,64 +3072,50 @@ remove_comment: _remove_comment {
  	1;
 }
 show_comment: _show_comment {
-	map{ Audio::Nama::pager( "(",$_->group,") ", $_->name, ": ", $_->comment) } $Audio::Nama::this_track;
+	Audio::Nama::pager( map{ $_->name. ": ". $_->comment } $Audio::Nama::this_track );
 	1;
 }
 show_comments: _show_comments {
-	map{ Audio::Nama::pager( "(",$_->group,") ", $_->name, ": ", $_->comment) } Audio::Nama::all_tracks();
+	Audio::Nama::pager( map{ $_->name. ": ". $_->comment } grep{ $_->comment } Audio::Nama::all_tracks() );
 	1;
 }
 add_version_comment: _add_version_comment dd(?) text {
 	my $t = $Audio::Nama::this_track;
-	my $v = $item{'dd(?)'}->[0] // $t->monitor_version // return 1;
+	my $v = $item{'dd(?)'}->[0] // $t->playback_version // return 1;
 	Audio::Nama::pager( $t->add_version_comment($v,$item{text})); 
 }	
 remove_version_comment: _remove_version_comment dd {
 	my $t = $Audio::Nama::this_track;
 	Audio::Nama::pager( $t->remove_version_comment($item{dd})); 1
 }
-show_version_comment: _show_version_comment dd(s?) {
+remove_version_comment: _remove_version_comment {
 	my $t = $Audio::Nama::this_track;
-	my @v = @{$item{'dd(s?)'}};
-	if(!@v){ @v = $t->monitor_version}
+	Audio::Nama::pager( $t->remove_version_comment($t->version)); 1
+}
+show_version_comment: _show_version_comment dd(s) {
+	my $t = $Audio::Nama::this_track;
+	my @v = @{$item{'dd(s)'}};
+	if(!@v){ @v = $t->playback_version}
 	@v or return 1;
 	$t->show_version_comments(@v);
 	 1;
 }
-show_version_comments_all: _show_version_comments_all {
+show_version_comment: _show_version_comment {
 	my $t = $Audio::Nama::this_track;
 	my @v = @{$t->versions};
 	$t->show_version_comments(@v); 1;
 }
-set_system_version_comment: _set_system_version_comment dd text {
-	Audio::Nama::pager( Audio::Nama::set_system_version_comment($Audio::Nama::this_track,@item{qw(dd text)}));1;
-}
-midish_command: _midish_command text {
-	Audio::Nama::midish_command( $item{text} ); 1
-}
-midish_mode_on: _midish_mode_on { 
-	Audio::Nama::pager("Setting midish terminal mode!! Return with 'midish_mode_off'.");
-	$Audio::Nama::mode->{midish_terminal}++;
-}
-midish_mode_off: _midish_mode_off { 
-	Audio::Nama::pager("Releasing midish terminal mode. Sync is not enabled.");
-	undef $Audio::Nama::mode->{midish_terminal};
-	undef $Audio::Nama::mode->{midish_transport_sync};
+show_version_comments_all: _show_version_comments_all {
+	map 
+	{
+		my $t = $_;
+		my @v = @{$t->versions};
+		$t->show_version_comments(@v); 
+	} Audio::Nama::all_tracks();
 	1;
 }
-midish_mode_off_ready_to_play: _midish_mode_off_ready_to_play { 
-	Audio::Nama::pager("Releasing midish terminal mode.
-Will sync playback with Ecasound."); 
-	undef $Audio::Nama::mode->{midish_terminal} ;
-	$Audio::Nama::mode->{midish_transport_sync} = 'play';
-	1;
-}
-midish_mode_off_ready_to_record: _midish_mode_off_ready_to_record { 
-	Audio::Nama::pager("Releasing midish terminal mode. 
-Will sync record with Ecasound.");
-	undef $Audio::Nama::mode->{midish_terminal} ;
-	$Audio::Nama::mode->{midish_transport_sync} = 'record';
-	1;
+add_system_version_comment: _add_system_version_comment dd text {
+	Audio::Nama::pagers( $Audio::Nama::this_track->add_system_version_comment(@item{qw(dd text)}));1;
 }
 new_edit: _new_edit {
 	Audio::Nama::new_edit();
@@ -3147,11 +3148,11 @@ rec_end_mark: _rec_end_mark {
 	$Audio::Nama::this_edit->rec_end_mark->jump_here; 1;
 }
 set_play_start_mark: _set_play_start_mark {
-	$Audio::Nama::setup->{edit_points}->[0] = Audio::Nama::eval_iam('getpos'); 1}
+	$Audio::Nama::setup->{edit_points}->[0] = Audio::Nama::ecasound_iam('getpos'); 1}
 set_rec_start_mark: _set_rec_start_mark {
-	$Audio::Nama::setup->{edit_points}->[1] = Audio::Nama::eval_iam('getpos'); 1}
+	$Audio::Nama::setup->{edit_points}->[1] = Audio::Nama::ecasound_iam('getpos'); 1}
 set_rec_end_mark: _set_rec_end_mark {
-	$Audio::Nama::setup->{edit_points}->[2] = Audio::Nama::eval_iam('getpos'); 1}
+	$Audio::Nama::setup->{edit_points}->[2] = Audio::Nama::ecasound_iam('getpos'); 1}
 end_edit_mode: _end_edit_mode { Audio::Nama::end_edit_mode(); 1;}
 disable_edits: _disable_edits { Audio::Nama::disable_edits();1 }
 merge_edits: _merge_edits { Audio::Nama::merge_edits(); 1; }
@@ -3272,7 +3273,7 @@ existing_sequence_name: ident {
 }
 convert_to_sequence: _convert_to_sequence {
 	my $sequence_name = $Audio::Nama::this_track->name;
-	Audio::Nama::process_command("nsq $sequence_name");
+	Audio::Nama::nama_cmd("nsq $sequence_name");
 	$Audio::Nama::this_sequence->new_clip($Audio::Nama::this_track);
 	1
 }
@@ -3299,7 +3300,7 @@ track_identifier: tid {
 tid: ident
 list_sequences: _list_sequences { 
 	Audio::Nama::pager( map {Audio::Nama::json_out($_->as_hash)} 
-			grep {$_->{class} =~ /Sequence/} Audio::Nama::Bus::all() );
+			grep {$_->{class} =~ /Sequence/} Audio::Nama::Bus::all() ); 1
 }
 show_sequence: _show_sequence { Audio::Nama::pager($Audio::Nama::this_sequence->list_output) }
 append_to_sequence: _append_to_sequence track_identifier(s?) { 
@@ -3406,6 +3407,28 @@ remove_effect_name: _remove_effect_name { Audio::Nama::this_op_o->set_name(); 1 
 set_effect_surname: _set_effect_surname ident { Audio::Nama::this_op_o->set_surname($item{ident}); 1}
 remove_effect_surname: _remove_effect_surname { Audio::Nama::this_op_o()->set_surname(); 1} 
 select_track: _select_track track_spec
+set_tempo: _set_tempo dd {Audio::Nama::midish_cmd("t $item{dd}")}
+route_track: _route_track source_id send_id { 
+	Audio::Nama::nama_cmd("source $item{source_id}");
+	Audio::Nama::nama_cmd("send $item{send_id}");
+	1
+}
+set_sample_rate: _set_sample_rate dd {Audio::Nama::set_sample_rate($item{dd})}
+set_sample_rate: _set_sample_rate {Audio::Nama::get_sample_rate()}
+bus_on: _bus_on 
+{ 
+	Audio::Nama::pagers('turning bus on'); 
+	my $bus_name = $Audio::Nama::this_track->source_type eq 'bus' ? $Audio::Nama::this_track->source_id : $Audio::Nama::this_bus;
+	print "bus_name: $bus_name\n";
+	$Audio::Nama::bn{$bus_name}->tracks_on
+}
+bus_off: _bus_off 
+{ 
+	Audio::Nama::pagers('turning bus off'); 
+	my $bus_name = $Audio::Nama::this_track->source_type eq 'bus' ? $Audio::Nama::this_track->source_id : $Audio::Nama::this_bus;
+	print "bus_name: $bus_name\n";
+	$Audio::Nama::bn{$bus_name}->tracks_off 
+}
 
 command: help
 command: help_effect
@@ -3433,10 +3456,12 @@ command: automix
 command: master_on
 command: master_off
 command: add_track
-command: add_tracks
 command: add_midi_track
+command: add_tracks
 command: link_track
 command: import_audio
+command: import_midi
+command: route_track
 command: set_track
 command: record
 command: play
@@ -3464,7 +3489,7 @@ command: pan_center
 command: pan_back
 command: show_tracks
 command: show_tracks_all
-command: show_bus_tracks
+command: show_bus
 command: show_track
 command: show_mode
 command: show_track_latency
@@ -3480,9 +3505,9 @@ command: normalize
 command: fixdc
 command: autofix_tracks
 command: remove_track
-command: bus_mon
-command: bus_off
 command: bus_version
+command: bus_on
+command: bus_off
 command: add_bunch
 command: list_bunches
 command: remove_bunch
@@ -3580,12 +3605,7 @@ command: add_version_comment
 command: remove_version_comment
 command: show_version_comment
 command: show_version_comments_all
-command: set_system_version_comment
-command: midish_command
-command: midish_mode_on
-command: midish_mode_off
-command: midish_mode_off_ready_to_play
-command: midish_mode_off_ready_to_record
+command: add_system_version_comment
 command: new_edit
 command: set_edit_points
 command: list_edits
@@ -3658,6 +3678,8 @@ command: set_effect_surname
 command: remove_effect_name
 command: remove_effect_surname
 command: select_track
+command: set_tempo
+command: set_sample_rate
 _help: /help\b/ | /h\b/ { "help" } 
 _help_effect: /help_effect\b/ | /hfx\b/ | /he\b/ { "help_effect" } 
 _find_effect: /find_effect\b/ | /ffx\b/ | /fe\b/ { "find_effect" } 
@@ -3684,10 +3706,12 @@ _automix: /automix\b/ { "automix" }
 _master_on: /master_on\b/ | /mr\b/ { "master_on" } 
 _master_off: /master_off\b/ | /mro\b/ { "master_off" } 
 _add_track: /add_track\b/ | /add\b/ | /new\b/ { "add_track" } 
-_add_tracks: /add_tracks\b/ { "add_tracks" } 
 _add_midi_track: /add_midi_track\b/ | /amt\b/ { "add_midi_track" } 
+_add_tracks: /add_tracks\b/ { "add_tracks" } 
 _link_track: /link_track\b/ | /link\b/ { "link_track" } 
 _import_audio: /import_audio\b/ | /import\b/ { "import_audio" } 
+_import_midi: /import_midi\b/ | /im\b/ { "import_midi" } 
+_route_track: /route_track\b/ | /route\b/ | /rt\b/ { "route_track" } 
 _set_track: /set_track\b/ { "set_track" } 
 _record: /record\b/ | /rec\b/ { "record" } 
 _play: /play\b/ { "play" } 
@@ -3715,7 +3739,7 @@ _pan_center: /pan_center\b/ | /pc\b/ { "pan_center" }
 _pan_back: /pan_back\b/ | /pb\b/ { "pan_back" } 
 _show_tracks: /show_tracks\b/ | /lt\b/ | /show\b/ { "show_tracks" } 
 _show_tracks_all: /show_tracks_all\b/ | /sha\b/ | /showa\b/ { "show_tracks_all" } 
-_show_bus_tracks: /show_bus_tracks\b/ | /ltb\b/ | /showb\b/ { "show_bus_tracks" } 
+_show_bus: /show_bus\b/ | /shb\b/ { "show_bus" } 
 _show_track: /show_track\b/ | /sh\b/ | /-fart\b/ { "show_track" } 
 _show_mode: /show_mode\b/ | /shm\b/ { "show_mode" } 
 _show_track_latency: /show_track_latency\b/ | /shl\b/ { "show_track_latency" } 
@@ -3731,14 +3755,14 @@ _normalize: /normalize\b/ | /ecanormalize\b/ { "normalize" }
 _fixdc: /fixdc\b/ | /ecafixdc\b/ { "fixdc" } 
 _autofix_tracks: /autofix_tracks\b/ | /autofix\b/ { "autofix_tracks" } 
 _remove_track: /remove_track\b/ { "remove_track" } 
-_bus_mon: /bus_mon\b/ | /bmon\b/ { "bus_mon" } 
-_bus_off: /bus_off\b/ | /boff\b/ { "bus_off" } 
 _bus_version: /bus_version\b/ | /bver\b/ | /gver\b/ { "bus_version" } 
+_bus_on: /bus_on\b/ { "bus_on" } 
+_bus_off: /bus_off\b/ { "bus_off" } 
 _add_bunch: /add_bunch\b/ | /abn\b/ { "add_bunch" } 
 _list_bunches: /list_bunches\b/ | /lbn\b/ { "list_bunches" } 
 _remove_bunch: /remove_bunch\b/ | /rbn\b/ { "remove_bunch" } 
 _add_to_bunch: /add_to_bunch\b/ | /atbn\b/ { "add_to_bunch" } 
-_commit: /commit\b/ | /ci\b/ { "commit" } 
+_commit: /commit\b/ | /cm\b/ { "commit" } 
 _tag: /tag\b/ { "tag" } 
 _branch: /branch\b/ | /br\b/ { "branch" } 
 _list_branches: /list_branches\b/ | /lb\b/ | /lbr\b/ { "list_branches" } 
@@ -3765,7 +3789,7 @@ _add_controller: /add_controller\b/ | /acl\b/ { "add_controller" }
 _add_effect: /add_effect\b/ | /afx\b/ { "add_effect" } 
 _add_effect_last: /add_effect_last\b/ | /afxl\b/ { "add_effect_last" } 
 _add_effect_first: /add_effect_first\b/ | /afxf\b/ { "add_effect_first" } 
-_add_effect_before: /add_effect_before\b/ | /afxb\b/ { "add_effect_before" } 
+_add_effect_before: /add_effect_before\b/ | /afxb\b/ | /insert_effect\b/ | /ifx\b/ { "add_effect_before" } 
 _modify_effect: /modify_effect\b/ | /mfx\b/ { "modify_effect" } 
 _remove_effect: /remove_effect\b/ | /rfx\b/ { "remove_effect" } 
 _position_effect: /position_effect\b/ | /pfx\b/ { "position_effect" } 
@@ -3806,8 +3830,8 @@ _set_bus: /set_bus\b/ | /sbs\b/ { "set_bus" }
 _overwrite_effect_chain: /overwrite_effect_chain\b/ | /oec\b/ { "overwrite_effect_chain" } 
 _new_effect_chain: /new_effect_chain\b/ | /nec\b/ { "new_effect_chain" } 
 _delete_effect_chain: /delete_effect_chain\b/ | /dec\b/ | /destroy_effect_chain\b/ { "delete_effect_chain" } 
-_find_effect_chains: /find_effect_chains\b/ | /fec\b/ { "find_effect_chains" } 
-_find_user_effect_chains: /find_user_effect_chains\b/ | /fuec\b/ { "find_user_effect_chains" } 
+_find_effect_chains: /find_effect_chains\b/ | /fec\b/ | /lec\b/ { "find_effect_chains" } 
+_find_user_effect_chains: /find_user_effect_chains\b/ | /fuec\b/ | /leca\b/ { "find_user_effect_chains" } 
 _bypass_effects: /bypass_effects\b/ | /bypass\b/ | /bfx\b/ { "bypass_effects" } 
 _bring_back_effects: /bring_back_effects\b/ | /restore_effects\b/ | /bbfx\b/ { "bring_back_effects" } 
 _new_effect_profile: /new_effect_profile\b/ | /nep\b/ { "new_effect_profile" } 
@@ -3831,12 +3855,7 @@ _add_version_comment: /add_version_comment\b/ | /avc\b/ { "add_version_comment" 
 _remove_version_comment: /remove_version_comment\b/ | /rvc\b/ { "remove_version_comment" } 
 _show_version_comment: /show_version_comment\b/ | /svc\b/ { "show_version_comment" } 
 _show_version_comments_all: /show_version_comments_all\b/ | /svca\b/ { "show_version_comments_all" } 
-_set_system_version_comment: /set_system_version_comment\b/ | /ssvc\b/ { "set_system_version_comment" } 
-_midish_command: /midish_command\b/ | /m\b/ { "midish_command" } 
-_midish_mode_on: /midish_mode_on\b/ | /mmo\b/ { "midish_mode_on" } 
-_midish_mode_off: /midish_mode_off\b/ | /mmx\b/ { "midish_mode_off" } 
-_midish_mode_off_ready_to_play: /midish_mode_off_ready_to_play\b/ | /mmxrp\b/ { "midish_mode_off_ready_to_play" } 
-_midish_mode_off_ready_to_record: /midish_mode_off_ready_to_record\b/ | /mmxrr\b/ { "midish_mode_off_ready_to_record" } 
+_add_system_version_comment: /add_system_version_comment\b/ | /asvc\b/ { "add_system_version_comment" } 
 _new_edit: /new_edit\b/ | /ned\b/ { "new_edit" } 
 _set_edit_points: /set_edit_points\b/ | /sep\b/ { "set_edit_points" } 
 _list_edits: /list_edits\b/ | /led\b/ { "list_edits" } 
@@ -3909,6 +3928,8 @@ _set_effect_surname: /set_effect_surname\b/ | /ses\b/ { "set_effect_surname" }
 _remove_effect_name: /remove_effect_name\b/ | /ren\b/ { "remove_effect_name" } 
 _remove_effect_surname: /remove_effect_surname\b/ | /res\b/ { "remove_effect_surname" } 
 _select_track: /select_track\b/ { "select_track" } 
+_set_tempo: /set_tempo\b/ | /tempo\b/ | /tp\b/ { "set_tempo" } 
+_set_sample_rate: /set_sample_rate\b/ | /ssr\b/ { "set_sample_rate" } 
 @@ hotkey_grammar
 command: set_current_effect
 command: set_stepsize
@@ -4492,7 +4513,7 @@ alsa_capture_device: consumer       # for ALSA/OSS
 alsa_playback_device: consumer      # for ALSA/OSS
 mixer_out_format: cd-stereo         # for ALSA/OSS
 
-# soundcard_channels: 10            # input/output channel selection range (GUI)
+# soundcard_channels: 10            # GUI input/output channel selection range
 
 # audio file format templates
 
@@ -4513,11 +4534,22 @@ ecasound_buffersize:
   nonrealtime:
     default: 1024
 ecasound_globals:
-  common: -z:mixmode,sum -G:jack,Nama,send
-  realtime: -z:db,100000 -z:nointbuf 
+  common: -z:mixmode,sum
+  realtime: -z:db,100000 -z:nointbuf
   nonrealtime: -z:nodb -z:intbuf
 
+waveform_height: 200
+
 # ecasound_tcp_port: 2868  
+
+# default without midi, till it is sorted out
+use_midi: 0
+
+# cheap version tracking for our projects, makes possible
+# undo/redo and branching
+
+use_git: 1
+
 
 # WAVs recorded at the same time get the same numeric suffix
 
@@ -4588,6 +4620,7 @@ alias:
     djp: disable_jack_polling
   effect:
     reverb: gverb
+
 # end
 
 @@ custom_pl
@@ -4623,7 +4656,7 @@ commands =>
 		disable_jack_polling => sub{ $project->{events}->{poll_jack} = undef },
 
 		promote_current_version => sub {
-				my $v = $this_track->monitor_version;
+				my $v = $this_track->playback_version;
 				promote_version_to_track($this_track, $v);
 		},
 
@@ -4706,9 +4739,9 @@ fluidsynth:left
 	properties: output,
 fluidsynth:right
 	properties: output,
-ecasound:out_1
+NamaEcasound:out_1
 	properties: output,
-ecasound:out_2
+NamaEcasound:out_2
 	properties: output,
 jconvolver:out_1
 	properties: output,
@@ -5155,136 +5188,141 @@ LinuxSampler:playback_2
         port playback latency = [ 2048 2048 ] frames
         port capture latency = [ 512 512 ] frames
 
-@@ midish_commands
-tracklist
-tracknew
-trackdelete
-trackrename
-trackexists
-trackaddev
-tracksetcurfilt
-trackgetcurfilt
-trackcheck
-trackcut
-trackblank
-trackinsert
-trackcopy
-trackquant
-tracktransp
-trackmerge
-tracksetmute
-trackgetmute
-trackchanlist
-trackinfo
-channew
-chanset
-chandelete
-chanrename
-chanexists
-changetch
-changetdev
-chanconfev
-chanunconfev
-chaninfo
-chansetcurinput
-changetcurinput
-filtnew
-filtdelete
-filtrename
-filtexists
-filtreset
-filtinfo
-filtsetcurchan
-filtgetcurchan
-filtchgich
-filtchgidev
-filtswapich
-filtswapidev
-filtchgoch
-filtchgodev
-filtswapoch
-filtswapodev
-filtdevdrop
-filtnodevdrop
-filtdevmap
-filtnodevmap
-filtchandrop
-filtnochandrop
-filtchanmap
-filtnochanmap
-filtctldrop
-filtnoctldrop
-filtctlmap
-filtnoctlmap
-filtkeydrop
-filtnokeydrop
-filtkeymap
-filtnokeymap
-sysexnew
-sysexdelete
-sysexrename
-sysexexists
-sysexclear
-sysexsetunit
-sysexadd
-sysexinfo
-songidle
-songplay
-songrecord
-sendraw
-songsetcurquant
-songgetcurquant
-songsetcurpos
-songgetcurpos
-songsetcurlen
-songgetcurlen
-songsetcurtrack
-songgetcurtrack
-songsetcurfilt
-songgetcurfilt
-songsetcursysex
-songgetcursysex
-songsetcurchan
-songgetcurchan
-songsetcurinput
-changetcurinput
-songsetunit
-songgetunit
-songsetfactor
-songgetfactor
-songsettempo
-songtimeins
-songtimerm
-songtimeinfo
-songinfo
-songsave
-songload
-songreset
-songexportsmf
-songimportsmf
-devlist
-devattach
-devdetach
-devsetmaster
-devgetmaster
-devsendrt
-devticrate
-devinfo
-devixctl
-devoxctl
-ctlconf
-ctlconfx
-ctlconf
-ctlinfo
-metroswitch
-metroconf
-info
+@@ midi_commands
 print
+err
+h
 exec
 debug
 panic
-let
-proc
+info
+getunit
+setunit
+getfac
+fac
+getpos
+g
+getlen
+sel
+getq
+setq
+ev
+gett
+getf
+cf
+getx
+cx
+geti
+ci
+geto
+co
+mute
+unmute
+getmute
+ls
+save
+load
+reset
+export
+import
+i
+p
+r
+s
+t
+mins
+mcut
+mdup
+minfo
+mtempo
+msig
+mend
+ctlconf
+ctlconfx
+ctlunconf
+ctlinfo
+m
+metrocf
+tlist
+# ct
+# tnew
+# tdel
+# tren
+texists
+taddev
+tsetf
+tgetf
+tcheck
+tcut
+tclr
+tpaste
+tcopy
+tins
+tmerge
+tquant
+ttransp
+tevmap
+tclist
+tinfo
+ilist
+iexists
+iset
+inew
+idel
+iren
+iinfo
+igetc
+igetd
+iaddev
+irmev
+olist
+oexists
+oset
+onew
+odel
+oren
+oinfo
+ogetc
+ogetd
+oaddev
+ormev
+flist
+fexists
+fnew
+fdel
+fren
+finfo
+freset
+fmap
+funmap
+ftransp
+fvcurve
+fchgin
+fchgout
+fswapin
+fswapout
+xlist
+xexists
+xnew
+xdel
+xren
+xinfo
+xrm
+xsetd
+xadd
+shut
+proclist
+builtinlist
+dnew
+ddel
+dmtcrx
+dmmctx
+dclktx
+dclkrx
+dclkrate
+dinfo
+dixctl
+doxctl
 
 @@ default_palette_json
 {
@@ -5327,10 +5365,1772 @@ proc
 @@ banner
       ////////////////////////////////////////////////////////////////////
      /                                                                  /
-    /    Nama multitrack recorder v. $VERSION (c)2008-2014 Joel Roth      /
+    /    Nama multitrack recorder v. $VERSION (c)2008-2019 Joel Roth      /
    /                                                                  /
   /    Audio processing by Ecasound, courtesy of Kai Vehmanen        /
  /                                                                  /
 ////////////////////////////////////////////////////////////////////
 
 Starting...
+
+@@ midi_help
+tlist
+    return the list of names of the tracks in the song example: print [tlist]
+tnew trackname
+    create an empty track named ``trackname'' 
+tdel
+    delete the current track. 
+tren newname
+    change the name of the current track to ``newname'' 
+texists trackname
+    return 1 if ``trackname'' is a track, 0 otherwise 
+taddev measure beat tick ev
+    put the event ``ev'' on the current track at the position given by ``measure'', ``beat'' and ``tick''
+tsetf filtname
+    set the default filter (for recording) of the current track to ``filtname''. It will be used in performace mode if there is no current filter. 
+tgetf
+    return the default filter (for recording) of the current track, returns ``nil'' if none 
+tcheck
+    check the current track for orphaned notes, nested notes and other anomalies; also removes multiple controllers in the same tick 
+tcut
+    cut the current selection of the current track. 
+tclr
+    clear the current selection of the current track. only events matching the current event selection (see ev function) are removed. 
+tins amount
+    insert ``amount'' empty measures in the current track, at the current position. 
+tpaste
+    copy the hidden temporary track (filled by tcopy) on the current position of the current track. the current event selection (see ev function) are copied 
+tcopy
+    copy the current selection of the current track into a hidden temporary track. Only events matching the current event selection (see ev function) are copied 
+tquant rate
+    quantize the current selection of the current track using the current quantization step (see setq function). Note positions are rounded to the nearest tick multiple of the quantization step; Rate must be between 0 and 100: 0 means no quantization and 100 means full quantization. 
+ttransp halftones
+    transpose note events of current selection of the current track, by ``halftones'' half tones. Only events matching the current event selection (see ev function) are transposed. 
+tevmap evspec1 evspec2
+    convert events matching evspec1 (source) into events matching evspec2 (destination) in the current selection of the current track. Both evspec1 and evspec2 must have the same number of devices, channels, notes, controllers etc.. 
+trackmerge sourcetrack
+    merge the ``sourcetrack'' into the current track 
+mute trackname
+    Mute the given track, i.e. events from ``trackname'' will not be played during record/playback. 
+unmute trackname
+    Unmute the given track, i.e. events from ``trackname'' will be played during record/playback. 
+getmute trackname
+    Return 1 if the given track is muted and 0 otherwise. 
+tclist
+    Return the list of channels used by events stored in the current track. 
+tinfo
+    scan the current selection of the current track, an for each measure display the number of events that match the current event selection 
+inew channelname {dev midichan}
+    create an new channel named ``channelname'' and assigned the given device and MIDI channel. 
+iset {dev midichan}
+    set the device/channel pair of the current channel. All filters are updated to use the new channel setting as if the appropriate fchin function was invoked for each filter. 
+idel
+    delete current channel. 
+iren newname
+    rename the current channel to ``newname'' 
+iexists channelname
+    return 1 if ``channelname'' is a channel, 0 otherwise 
+igetc
+    return the MIDI channel number of the current channel 
+igetd channelname
+    return the device number of the current channel 
+iaddev event
+    add the event to the configuration of the current channel, it's not used yet. 
+irmev evspec
+    remove all events matching ``evspec'' (see event ranges) from the configuration of the current channel 
+iinfo
+    print all events on the config of the current channel. 
+onew channelname {dev midichan}
+    create an new channel named ``channelname'' and assigned the given device and MIDI channel. Output channels contain a built-in filter having the same name; by defaut it maps all inputs to the newly created output channel. 
+oset {dev midichan}
+    set the device/channel pair of the current channel. All filters are updated to use the new channel setting as if the appropriate fchout function was invoked for each filter. 
+odel
+    delete current channel. 
+oren newname
+    rename the current channel to ``newname'' 
+iexists channelname
+    return 1 if ``channelname'' is a channel, 0 otherwise 
+ogetc
+    return the MIDI channel number of the current channel 
+ogetd channelname
+    return the device number of the current channel 
+oaddev event
+    add the event to the configuration of the current channel, it's not used yet. 
+ormev evspec
+    remove all events matching ``evspec'' (see event ranges) from the configuration of the current channel 
+oinfo
+    print all events on the config of the current channel. 
+fnew filtname
+    create an new filter named ``filtname'' 
+fdel filtname
+    delete the current filter. 
+fren newname
+    rename the current filter to ``newname'' 
+fexists filtname
+    return 1 if ``filtname'' is a filter, 0 otherwise 
+freset
+    remove all rules from the current filter. 
+finfo
+    list all fitering rules of the current filter 
+fchgin old_evspec new_evspec
+    rewrite all filtering rules of the current filter to consume ``new_evspec'' events instead of ``old_evspec'' events. This means that each rule that would consume ``old_evspec'' on the input will start consuming ``new_evspec'' instead. 
+fswapin evspec1 evspec2
+    Similar to fchgin but swap ``evspec1'' and ``evspec2'' in the source events set of each rule. 
+fchgout old_evspec new_evspec
+    rewrite all filtering rules of the current filter to produce ``new_evspec'' events instead of ``old_evspec'' events. This means that each rule that would produce ``old_evspec'' on the output will start producing ``new_evspec'' instead. 
+fswapout evspec1 evspec2
+    Similar to fchgout but swap ``evspec1'' and ``evspec2'' in the destination events set of each rule. 
+fmap evspec1 evspec2
+    add a new rule to the current filter, to make it convert events matching evspec1 (source) into events matching evspec2 (destination). Both evspec1 and evspec2 must have the same number of devices, channels, notes, controllers etc.. 
+funmap evspec1 evspec2
+    remove event maps from the current filter. Any mapping with source included in evspec1 and destination inluded in evspec2 is deleted. 
+ftransp evspec halftones
+    transpose events generated by the filter and matching ``evspec'' by the give number of halftones 
+fvcurve evspec weight
+    adjusts velocity of note events produced by the filter, using the given ``weight'' in the -63..63 range. If ``weight'' is:
+
+        negative - sensitivity is decreased
+        positive - sensitivity is increased
+        zero - the velocity is unchanged 
+xnew sysexname
+    create a new bank of sysex messages named ``sysexname'' 
+xdel
+    delete the current bank of sysex messages. 
+xren newname
+    rename the current sysex bank to ``newname'' 
+xexists sysexname
+    return 1 if ``sysexname'' is a sysex bank, 0 otherwise 
+xrm pattern
+    remove all sysex messages starting with ``pattern'' from the current sysex bank. The given pattern is a list of bytes; an empty pattern matches any sysex message. 
+xsetd newdev pattern
+    set device number to ``newdev'' on all sysex messages starting with ``pattern'' in the current sysex bank. The given pattern is a list of bytes; an empty pattern matches any sysex message. 
+xadd devnum data
+    add to the current sysex bank a new sysex message. ``data'' is a list containing the MIDI system exclusive message and ``devname'' is the device number to which the message will be sent when performance mode is entered 
+xinfo
+    print all sysex messages of the current sysex bank. Messages that are too long to be desplayed on a single line are truncated and the ``...'' string is displayed. 
+ximport devnum path
+    replace contents of the current sysex bank by contents of the given .syx file; messages are assigned to ``devnum'' device number. 
+xexport path
+    store contents of the current sysex bank in the given .syx file 
+    enter ``idle'' performance mode. Start processing MIDI input and generating MIDI output. data passes through the current filter (if any) or through the current track's filter (if any). 
+p
+    play the song from the current position. Input passes through the current filter (if any) or through the current track's filter (if any). 
+r
+    play the song and record the input. Input passes through the current filter (if any) or through the current track's filter (if any). On startup, this function play one measure of countdown before the data start being recorded. 
+s
+    stop performance and release MIDI devices. I.e. stop the effect ``i'', ``p'' or ``r'' functions; 
+sendraw device arrayofbytes
+    send raw MIDI data to device number ``device'', for debugging purposes only. 
+ev evspec
+    set the current event selection. Most track editing functions will act only on events matching "evspec", ignoring all other events. 
+setq step
+    set the current quantization step to the given note value, as follow:
+
+        4 - quarter note
+        6 - quarter note triplet
+        8 - eighth note
+        12 - eighth note triplet
+        16 - sixteenth note
+        24 - sixteenth note triplet
+        etc... 
+
+    The quantization step will be used by tquant function and also by all editing functions to optimize event selection. If the special ``nil'' value is specified as quantization step, then quatization is disabled. 
+getq
+    return the current quatization step 
+g measure
+    set the current song position pointer to the given measure number. Record and playback will start a that position. This also defines the beginning of the current selection used by most track editing functions. 
+getpos
+    return the current song position pointer which is also the start position of the current selection. 
+sel length
+    set the length of the current selection to ``length'' measures. The current selection start at the current position set with the ``g'' function. 
+getlen
+    return the length (in measures) of the current selection. 
+ct trackname
+    set the current track. The current track is the one that will be recorded. Most track editing functions act on it. 
+gett
+    return the current track (if any) or ``nil'' 
+cf filtname
+    set the current filter to ``filtname''. The current filter is the one used to process input MIDI events in performance mode. It's also the one affected by all filter editing functions. 
+getf
+    return the current filter or ``nil'' if none 
+cx sysexname
+    set the current sysex bank, i.e. the one that will be recorded. The current sysex back is the one affected by all sysex editing functions. 
+getx
+    return the current sysex bank or ``nil'' if none 
+ci channame
+    set the current (named) input channel. All input channel editing functions will act on it. 
+geti
+    return the name of the current input channel or ``nil'' if none 
+co channame
+    set the current (named) output channel. All output channel editing functions will act on it. 
+geto
+    return the name of the current output channel or ``nil'' if none 
+setunit ticks_per_unit
+    set the time resolution of the sequencer to ``tpu'' ticks in a whole note (1 unit note = 4 quarter notes). The default is 96 ticks, which is the default of the MIDI standard. 
+getunit
+    return the number of ticks in a whole note 
+fac tempo_factor
+    set the tempo factor for play and record to the given integer value. The tempo factor must be between 50 (play half of the real tempo) and 200 (play at twice the real tempo). 
+getfac
+    return the current tempo factor 
+t beats_per_minute
+    set the tempo at the current song position 
+mins amount {num denom}
+    insert ``amount'' blank measures at the current song position. The time signature used is num/denom. If the time signature is an empty list (i.e. ``{}'') then the time signature at the current position is used. 
+mcut
+    cut the current selection of all tracks, including the time structure. 
+mdup where
+    duplicate the current selection inserting a copy of it at the position given by the ``where'' parameter. The target position is a measure number relative to the current selection to be copied. If ``where'' is positive it's relative to the end of the current selection; if it's negative it's relative to the beginning of the current selection. 
+minfo
+    print the meta-track (tempo changes, time signature changes. 
+mtempo
+    Return the tempo at the current song position. The unit is beats per minute. 
+msig
+    Return the time signature at the current song position. The result is a two number list: numerator and denominator. 
+mend
+    Return the ending measure of the song (i.e. its size in measures). 
+ls
+    list all tracks, channels, filters and various default values 
+save filename
+    save the song into the given file. The ``filename'' is a quoted string. 
+load filename
+    load the song from a file named ``filename''. the current song is destroyed, even if the load command fails. 
+reset
+    destroy completely the song, useful to start a new song without restarting the program 
+export filename
+    save the song into a standard MIDI file, ``filename'' is a quoted string. 
+import filename
+    load the song from a standard MIDI file, ``filename'' is a quoted string. Only MIDI file ``type 1'' and ``type 0'' are supported. 
+dlist
+    return the list of attached devices (list of numbers) 
+dnew devnum filename mode
+    attach MIDI device ``filename'' as device number ``devnum''; ``filename'' is a quoted string. The ``mode'' argument is the name of the mode, it can be on if the following:
+
+        ``ro'' - read-only, for input only devices
+        ``wo'' - write-only, for output only devices
+        ``rw'' - read and write. 
+
+    If midish is configured to use ALSA (default on Linux systems) then ``filename'' should contain the ALSA sequencer port, as listed by ``aseqdump -l'', (eg. ``28:0'', ``FLUID Synth (qsynth)''). If ``nil'' is given instead of the path, then the port is not connected to any existing port; this allows other ALSA sequencer clients to subscribe to it and to provide events to midish or to consume events midish sends to it. 
+ddel devnum
+    detach device number ``devnum'' 
+dmtcrx devnum
+    use device number ``devnum'' as MTC source. In this case, midish will relocate, start and stop according to incoming MTC messages. Midish will generate its clock ticks from MTC, meaning that it will run at the same speed as the MTC device. This is useful to synchronize midish to an audio multi-tracker or any MTC capable audio application. If ``devnum'' is ``nil'', then MTC messages are ignored and the internal timer will be used instead. 
+dmmctx { devnum1 devnum2 ... }
+    Configure the given devices to transmit MMC start, stop and relocate messages. Useful to control MMC-capable audio applications from midish. By default, devices transmit MMC. 
+dclktx { devnum1 devnum2 ... }
+    Configure the given devices to transmit MIDI clock information (MIDI ticks, MIDI start and MIDI stop events). Useful to synchronize an external sequencer to midish. 
+dclkrx devnum
+    set device number ``devnum'' to be the master MIDI clock source. It will give midish MIDI ticks, MIDI start and MIDI stop events. This useful to synchronize midish to an external sequencer. If ``devnum'' is ``nil'', then the internal clock will be used and midish will act as master device. 
+dclkrate devnum ticrate
+    set the number of ticks in a whole note that are transmitted to the MIDI device (if dclktx was called for it). Default value is 96 ticks. This is the standard MIDI value and its not recommended to change it. 
+dinfo devnum
+    Print some information about the MIDI device. 
+dixctl devnum list
+    Setup the list of controllers that are expected to be received as 14-bit numbers (i.e. both coarse and fine MIDI controller messages will be expected). By default only coarse values are used, if unsure let this list empty. 
+devoxctl devnum list
+    Setup the list of controllers that will be transmitted as 14-bit numbers (both coarse and fine MIDI controller messages). 
+diev devnum list
+    Configure the device to process as a single event the following patterns of input MIDI messages.
+
+        ``xpc'' - group bank select controllers (0 and 32) with program changes into a signle ``xpc'' event.
+        ``nrpn'' - group NRPN controllers (98 and 99) with data entry controllers (6 and 38) into a single ``nrpn'' event.
+        ``rpn'' - same as ``nrpn'', but for RPN controllers (100 and 101). 
+
+    By default all of the above are enabled, which allows banks, NRPNs and RPNs to be handled by midish the standard way. It makes sense to disable grouping of above messages on rare hardware that maps above-mentioned controller numbers (0, 6, 32, 38, 98, 99, 100, 101) to other parameters than bank number and NRPN/RPN. 
+doev devnum list
+    Same as diev but for output MIDI messages. 
+ctlconf ctlname ctlnumber defval
+    Configure controller number ``ctlnumber'' with name ``ctlname'', and default value ``defval''. If defval is ``nil'' then there is no default value and corresponding controller events are not grouped into frames. See sec. Controller frames. 
+ctlconfx ctlname ctlnumber defval
+    Same as ctlconf function, but for 14-bit controllers. Thus defval is in the range 0..16383. 
+ctlconf ctlname
+    Unconfigure the given controller. ``ctlname'' is the identifier that was used with ctlconf 
+ctlinfo
+    Print the list of configured controllers 
+evpat name sysex_pattern
+    Define a new event type corresponding to the given system exclusive message pattern. The pattern is a list of bytes or event parameter identifiers (aka atoms). The following atoms are supported: v0, v0_lo, v0_hi, v1, v1_lo, v1_hi. They correspond to the full 7-bit value (coarse parameter), the low 7-bit nibble and the high 7-bit nibble (fine grained parameters) of the first and second parameters respectively. Example:
+
+    evpat master {0xf0 0x7f 0x7f 0x04 0x01 v0_lo v0_hi 0xf7}
+
+    defines a new event type for the standard master volume system exclusive message. 
+evinfo
+    Print the list of event patterns. 
+m mode
+    Set the mode of the metronome. The following modes are available:
+
+        ``on'' - turned on for both playback and record
+        ``rec'' - turned on for record only
+        ``off'' - turned off 
+
+metrocf eventhi eventlo
+    select the notes that the metronome plays. The pair of events must be note-ons 
+info
+    display the list of built-in and user-defined procedures and global variables 
+print expression
+    display the value of the expression 
+err string
+    display the given string and abort the statement being executed. 
+h funcname
+    display list of arguments function ``funcname'' 
+exec filename
+    read and executes the script from a file, ``filename'' is a quoted string. The execution of the script is aborted on error. If the script executes an exit statement, only the script is terminated. 
+debug flag val
+    set debug-flag ``flag'' to (integer) value ``val''. It's a developer knob. If ``val=0'' the corresponding debug-info are turned off. ``flag'' can be:
+
+        ``filt'' - show events passing through the current filter
+        ``mididev'' - show raw MIDI traffic on stderr
+        ``mixout'' - show conflicts in the output MIDI merger
+        ``norm'' - show events in the input normalizer
+        ``pool'' - show pool usage on exit
+        ``song'' - show start/stop events
+        ``timo'' - show timer internal errors
+        ``mem'' - show memory usage 
+
+version
+    Display midish version. 
+panic
+    Cause the sequencer to core-dump, useful to developpers. 
+proclist
+    Return the list of all user defined procs. 
+builtinlist
+    Return a list of all builtin commands. 
+
+@@ aux_midi_commands
+# This is a Midish configuration file written by F. Silvain.
+# Get Midish from:
+# http://www.midish.org/
+# This file is GPL version 3 or later.
+# These commands should help you in your sequencing and editing workflow.
+#---------------------------------------
+
+# If appropriate commands return a positive number on success and 0 or nil
+# otherwise. In case of errors commands will also print an error message.
+# To get the most out of these commands define name input and output channels
+# for your devices.
+
+# List of Midish commands:
+# fw measures
+# 	Forward measures from curent position.
+# rw measures
+# 	Rewind measures from current position or if new position would be less than
+# 	0, go to 0.
+# show
+# 	Display all tracks with additional information.
+# sh
+# 	Display information about the current track.
+# cclrm start_position clear_measures
+# 	Remove clear_measure from the current track, starting at start_position.
+# cclr start_position end_position
+# 	Remove everything between start_position and end_position from current track.
+# clrm track start_position clear_measures
+# 	Remove clear_measures from track, starting at start_position.
+# clr track start_position end_position
+# 	Remove everything from track starting at start_position and ending at
+# 	end_position.
+# cmute
+#  Mute the current track
+# cunmute
+#  Unmute the current track.
+# csolo
+# 	Mute all but the current track.
+# solo track
+# 	Mute all tracks, with the exception of track.
+# nosolo
+# 	Unmute all tracks.
+# cquantm start_position quantise_measures quantise_note precision
+# 	Quantise the current track.
+# cquant start_position end_position quantise_note precision
+# 	Quantise the current track.
+# quantm track start_position quantise_measures quantise_note precision
+# 	Quantise another track.
+# quant track start_position end_position quantise_note precision
+# 	Quantise another track.
+# ccopym start_position copy_measures dest_track dest_position
+# 	copy copy_measures from current track at start_position to dest_track
+# 	at dest_position.
+# icopym start_position copy_measures dest_position
+#  Copy copy_measures from current track at start_position to dest_position
+#  on the current track. No overlap between copy intervals is allowed.
+# ccopy start_position end_position dest_track dest_position
+# 	Copy from current track between start_position and end_position to
+# 	dest_track at dest_position.
+# icopy start_position end_position dest_position
+#  Copy from current track between start_position and end_position to
+#  dest_position on the current track. No overlaps of copy intervals is allowed.
+# copym src-track start_position copy_measures dest_track dest_position
+# 	Copy copy_measures from src_track starting at start_position to dest_track
+# 	at dest_position.
+# copy src_track start_position end_position dest_track dest_position
+# 	Copy from src_track between start_position and end_position to dest_track
+# 	at dest_position.
+# chmap source_track start_position end_position dest_track
+#  map/copy all events from source track default channel, from start_position
+#  to end_position, to dest_track on its default channel.
+# chmapm source_track start_position copy_measures dest_track
+#  (see chmap and copy commands above)
+# cchmap start_position end_position dest_track
+#  (see chmap and copy commands above)
+# cchmapm start_position copy_measures dest_track
+#  (see chmap and copy commands above)
+# rnew intputchannel outputchannel
+# 	Route inputchannel to outputchannel for the current track and create
+# 	a filter of the same name as the current track.
+# radd intput output
+# 	Add a routing from intput to output on the current track.
+# rsplit input left right splitpoint
+# 	Create a split for the current track, splitting input to left and right
+# 	with splitpoint the highest note of left region.
+# cchdup source_channel dest_track
+# 	Copy everything recorded on current track on source_channel to dest_track.
+# chdup source_track source_channel dest_track
+# 	Copy everything from source_track on source_channel to dest_track
+# gnew
+#  print the command to create a group
+# gshow group
+# 	Display all tracks from group with additional information.
+# gmute group
+# 	Mute all tracks in group.
+# gunmute group
+# 	Unmute all tracks in group.
+# gsolo group
+# 	Mute all tracks, with the exception of those in group.
+# gclrm group start_position clear_measures
+# 	Remove clear_measures, starting at start_position from all tracks in group.
+# gclr group start_position end_position
+# 	Remove everything from start_position to end_position in all tracks
+# 	from group.
+# gquantm group start_position quantise_measures quantise_note precision
+# 	Quantise all tracks in a group.
+# gquant group start_position end_position quantise_note precision
+# 	Quantise all tracks in a group.
+# gcopym group start_position copy_measures dest_position
+#  copy everything starting at start_position for copy_measures measures
+#  from every group track to every group track at dest_position.
+# gcopy group start_position end_position dest_position
+#  copy everything from start_position to end_position from every group track
+#  to every group track at dest_position
+# pgrid denomination
+#  Set the step size of the pattern/step sequencing grid
+# plen note_length
+#  set note length for the pattern/step sequencing commands (legato).
+# ppenv bar step denomination note velocity
+#  add MIDI note "note" to the current track on the current output channel
+#  at bar, at step on a grid of denomination notes with velocity.
+# ppen bar step denomination note
+#  add MIDI note "note" to the current track on teh current output channel
+#  at step position on a grid of denomination notes at full velocity (127).
+# pstepv bar step note velocity
+#  add MIDI-note note to bar at grid position step with velocity.
+# pstep bar step note
+#  add MIDI-note note to bar at grid position step.
+# prepeatv bar step note velocity repeat_count note_length
+#  Add repeat_count MIDI-notes "note" at velocity and note_length to bar at
+#  grid position step.
+# prepeatv bar step note velocity repeat_count note_length
+#  Add repeat_count MIDI-notes "note" of note_length to bar at grid position
+#  step at velocity.
+# prepeat bar step note repeat_count note_length
+#  add repeat_count MIDI-notes "note" to bar at grid position step and of length
+#  note_length.
+# snew synth name
+# 	Add new softsynth with portname synth and midish name name.
+# sdel my_name
+# 	Delete softsynth with midish name name.
+# hnew synth name
+# 	Add new hardware synth with portname synth and midish name name.
+# hdel name
+# 	Delete hardware synth with midish name name.
+# ionew name new_name channelnumber
+# 	Add new input and output channels for synth with midish name name and
+# 	channel number channelnumber. The new channels will be called new_name.
+
+#---------------------------------------
+## Auxiliary procedures
+
+# subscription operator, indexing starts at 0
+proc lsub my_list my_index {
+	let tmp_ind = 0;
+	for i in $my_list {
+		if $tmp_ind != $my_index {
+			let tmp_ind = $tmp_ind + 1;
+		} else {
+			return $i;
+		}
+	}
+	print {"The list doesn't have" ($my_index+1) "elements."};
+	return nil;
+}
+
+# Count the number of elements in a list.
+proc lcount my_list {
+	let cur_count = 0;
+	for i in $my_list {
+		let cur_count = $cur_count + 1;
+	}
+	return $cur_count;
+}
+
+# Test if input channel exists and print an error message otherwise.
+proc eval_inc my_name {
+	if ![iexists $my_name] {
+		print {"Input channel" $my_name "des not exists. Check your spelling."};
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+# Test if output channel exists, print an error message otherwise.
+proc eval_outc my_name {
+	if ![oexists $my_name] {
+		print {"Output channel" $my_name "does exists. Check your spelling."};
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+# Evaluate the mute status of the current track
+proc eval_mute_status {
+	if [gett] != nil {
+		let mute_status = "Play";
+		if [getmute [gett]] {
+			let mute_status = "Off";
+		}
+		return $mute_status;
+	} else {
+		return nil;
+	}
+}
+
+# Print the header for the show procedures
+proc show_header {
+	print "Trackname Mute-status Filter Channels";
+}
+
+# Print the show output for one track
+proc tshow my_track {
+	if [texists $my_track] {
+		ct $my_track;
+		let mute_status = [eval_mute_status];
+		print {[gett] $mute_status [tgetf] [tclist]};
+	}
+}
+
+# Evaluate position from keyword or number
+proc eval_pos my_pos {
+	if $my_pos == start {
+		return 0;
+	}
+	if $my_pos == end {
+		return [mend];
+	}
+	if $my_pos == now {
+		return [getpos];
+	}
+	return $my_pos;
+}
+
+# Evaluate if second argument is greater than first argument
+# (for position ranges)
+proc eval_positive my_start my_end {
+	if $my_start >= $my_end {
+		print "Start must be less or equal to end.";
+		print {"start is:" $my_start};
+		print {"End is:" $my_end};
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+# Check if a track is currently selected and return it.
+# If no track is selected return nil and print an error message.
+proc eval_cur_track {
+	if [gett] {
+		return 1;
+	} else {
+		print "No track selected."
+		return 0;
+	}
+}
+
+# Check if a trackname corresponds to a valid track.
+proc eval_track my_track {
+	if ![texists $my_track] {
+		print {$my_track "is not a track. Check your spelling."};
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+# Call ct with check to prevent error messages.
+proc sec_ct my_track {
+	if $my_track != nil {
+		ct $my_track;
+		return 1;
+	} else {
+		print "A trackname must be specified for this command.";
+		return 0;
+	}
+}
+
+# Check if track exists and create it, if it doesn't.
+proc eval_dest_track my_track {
+	if ![texists $my_track] {
+		let cur_track = [gett];
+		tnew $my_track;
+		ct $cur_track;
+	}
+}
+
+#---------------------------------------
+# User commands
+#---------------------------------------
+## Transport functions
+
+# Forward forward_measures from the current position
+# Example:
+# 	fw 8
+proc fw forward_measures {
+	let new_pos = [getpos] + $forward_measures;
+	g $new_pos;
+}
+
+# Rewind rewind_measures from current position or go to 0 if resulting
+# position would be below 0.
+# Example:
+# 	g 8
+# 	rw 3 # now position 5
+# 	rw 8 # now position 0, because 5 - 8 = -3
+proc rw rewind_measures {
+	let new_pos = [getpos] - $rewind_measures;
+	if $new_pos < 0 {
+		let new_pos = 0;
+		print {"Unable to rewind" $rewind_measures "from" [getpos] "going to 0."};
+		return 0;
+	}
+	g $new_pos;
+	return 1;
+}
+
+#---------------------------------------
+## Track commands
+
+# Print a list of all tracks with additional information
+proc show {
+	let cur_track = [gett];
+	show_header;
+	for i in [tlist] {
+		tshow $i;
+	}
+	sec_ct $cur_track;
+}
+
+# Print information about the current track
+proc sh {
+	if [eval_cur_track] {
+		let mute_status = [eval_mute_status];
+		print {"Current track:" [gett]};
+		print {"Used channels:" [tclist]};
+		print {"Used filter:" [tgetf]};
+		print {"Play status:" $mute_status};
+		return 1;
+	} else {
+		print "No track selected.";
+		return 0;
+	}
+}
+
+# Clear clear_measures of  current track starting at start_position
+# Example:
+# 	cclr 2 8 # clear 8 measures starting at measure 2
+proc cclrm start_position clear_measures {
+	if [eval_cur_track] {
+		let cur_pos = [getpos];
+		let start_pos = [eval_pos $start_position];
+		g $start_pos;
+		sel $clear_measures;
+		tclr;
+		g $cur_pos;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Clear clear_measures from the track starting at start_position.
+# Exampe:
+# 	clr piano now 8 # remove 8 measures starting at current position
+proc clrm my_track start_position clear_measures {
+	if [eval_track $my_track] {
+		let cur_track = [gett];
+		ct $my_track;
+		cclrm $start_position $clear_measures;
+		sec_ct $cur_track;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Clear current track starting at start_position upto end_position
+# Example:
+# 	cclr 6 end # clear from measure 6 to the end of the song
+proc cclr start_position end_position {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let clear_measures = $end_pos - $start_pos;
+		return [cclrm $start_pos $clear_measures];
+	} else {
+		return 0;
+	}
+}
+
+# Clear a track starting at start_position upto end_position.
+# Example:
+# 	clr piano 0 end 16 100
+proc clr my_track start_position end_position {
+	if [eval_track $my_track] {
+		let cur_track = [gett];
+		ct $my_track;
+		return [cclr $start_position $end_position];
+		sec_ct $cur_track;
+	} else {
+		return 0;
+	}
+}
+
+# Mute the current track
+proc cmute {
+	if [eval_cur_track] {
+		mute [gett];
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Unmute the current track
+proc cunmute {
+	if [eval_cur_track] {
+		unmute [gett];
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Mute all tracks but the current.
+proc csolo {
+	if [eval_cur_track] {
+		let cur_track = [gett];
+		for i in [tlist] {
+			mute $i;
+		}
+		unmute $cur_track;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Mute all tracks, except the given one.
+proc solo my_track {
+	if [eval_track $my_track] {
+		let cur_track = [gett];
+		ct $my_track;
+		let cur_return_value = [csolo];
+		sec_ct $cur_track;
+		return $cur_return_value;
+	} else {
+		return 0;
+	}
+}
+
+# Unmute all tracks
+proc nosolo {
+	for i in [tlist] {
+		unmute $i;
+	}
+}
+
+# Quantise current track to the nearest quantise_note denomination with a
+# precision of precision percent starting at start_position for
+# quantise_measures measures.
+# Example:
+# 	cquantm now 12 16 100 # quantise the next 8 measures to 16th notes with
+# 	                     # 100% precision
+proc cquantm start_position quantise_measures quantise_note precision {
+	if [eval_cur_track] {
+		let cur_pos = [getpos];
+		let start_pos = [eval_pos $start_position];
+		g $start_pos;
+		if [getq] {
+			let cur_quant = [getq];
+		} else {
+			let cur_quant = 8;
+		}
+		setq $quantise_note;
+		sel $quantise_measures;
+		tquant $precision;
+		g $cur_pos;
+		setq $cur_quant;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Quantise a track to the nearest quantise_note denomination with a
+# precision of precision percent starting at start_position for
+# quantise_measures measures.
+# Example:
+# 	quantm piano 0 10 8 75 # quantise piano from beginning to 10 measures
+# 	                      # to 8th notes with 75% precision
+proc quantm my_track start_position quantise_measures quantise_note precision {
+	if [eval_track $my_track] {
+		let cur_track = [gett];
+		ct $my_track;
+		let cur_return_value = [cquant $start_position $quantise_measures $quantise_note $precision];
+		sec_ct $cur_track;
+		return $cur_return_value;
+	} else {
+		return 0;
+	}
+}
+
+# Quantise the current track to the nearest quantise_note with a
+# precision of precision percent starting at start_position upto
+# end_position.
+# Example:
+# cquant 0 end 16 95
+proc cquant start_position end_position quantise_note precision {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let quantise_measures = $end_pos - $start_pos;
+		return [cquantm $start_pos $quantise_measures $quantise_note $precision];
+	} else {
+		return 0;
+	}
+}
+
+# Quantise the track to the nearest quantise_note denomination with a
+# precision of precision percent starting at start_position upto
+# end_position.
+# Example:
+# 	quant piano 2 end 16 100
+proc quant my_track start_position end_position quantise_note precision {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let quantise_measures = $end_pos - $start_pos;
+		return [quantm $my_track $start_pos $quantise_measures $quantise_note $precision];
+	} else {
+		return 0;
+	}
+}
+
+# Copy copy_measures from current track starting at start_position to
+# dest_track at dest_position
+# example:
+# 	ccopym now 8 piano 16 # copy 8 measures starting now to piano at
+# 	                      # measure 16
+proc ccopym start_position copy_measures dest_track dest_position {
+	if [eval_cur_track] {
+		eval_dest_track $dest_track;
+		let cur_track = [gett];
+		let cur_pos = [getpos];
+		let start_pos = [eval_pos $start_position];
+		g $start_pos
+		sel $copy_measures;
+		tcopy;
+		ct $dest_track;
+		g $dest_position;
+		tpaste;
+		ct $cur_track;
+		g $cur_pos;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Copy copy_measures from start_position on the current track to dest_position
+# on the current track.
+# No action is taken if the two areas overlap.
+# example:
+#  icopym now 8 52 # copy 16 measures from current position to measure 52
+proc icopym start_position copy_measures dest_position {
+	if [eval_cur_track] {
+		let cur_track = [gett];
+		let start_pos = [eval_pos $start_position];
+		let end_pos = $start_pos + $copy_measures;
+		if [eval_positive $end_pos $dest_position] {
+			return [ccopym $start_position $copy_measures $cur_track $dest_position];
+		} else {
+			print "Copy interval will overlap.";
+			print "Too many measures to copy or destination position too early.";
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+}
+
+# Copy everything between start_position and end_position from current track
+# to dest_track at measure dest_position.
+# Example:
+# 	ccopy 2 end piano 17 # copy from measure 2 to end of song to piano
+# 	                     # at measure 17
+proc ccopy start_position end_position dest_track dest_position {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let copy_measures = $end_pos - $start_pos;
+		return [ccopym $start_pos $copy_measures $dest_track $dest_position];
+	} else {
+		return 0;
+	}
+}
+
+# Copy everything from start_position to end_position on the current track to
+# destination position on the current track.
+# If the intervals overlap, nothing will happen.
+# example:
+# 	icopy 2 10 24 # copy measures 2 to 10 to measure 24 on the current track
+proc icopy start_position end_position dest_position {
+	if [eval_cur_track] {
+		let cur_track = [gett];
+		let end_pos = [eval_pos $end_position];
+		if [eval_positive $end_position $dest_position] {
+			return [ccopy $start_position $end_position $cur_track $dest_position];
+		} else {
+			print "Copy intervals overlap.";
+			print "Copy interval is too long or";
+			print "destination position is too early.";
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+}
+# Copy copy_measures from src_track starting at start_position to
+# dest_track at dest_position.
+# Example:
+# 	copym piano now 8 clav 16
+proc copym src_track start_position copy_measures dest_track dest_position {
+	if [eval_track $src_track] {
+		let cur_track = [gett];
+		ct $src_track;
+		let cur_return_value = [ccopym $start_position $copy_measures $dest_track $dest_position];
+		sec_ct $cur_track;
+		return $cur_return_value;
+	} else {
+		return 0;
+	}
+}
+
+# Copy everything between start_position and end_position from src_track to
+# dest_track at dest_position.
+# Example:
+# 	copy piano 6 end clav now
+proc copy src_track start_position end_position dest_track dest_position {
+	if [eval_track $src_track] {
+		let cur_track = [gett];
+		ct $src_track;
+		let cur_return_value = [ccopy $start_position $end_position $dest_track $dest_position];
+		sec_ct $cur_track;
+		return $cur_return_value;
+	} else {
+		return 0;
+	}
+}
+
+# Copy everything recorded on the current track on channel channelnumber to
+# dest_track
+# Example:
+# 	tnew manual
+# 	tnew pedals
+# 	tnew organ
+# 	r # record on organ
+# 	s
+# 	cchdup 0 manual
+# 	cchdup 1 pedals
+proc cchdup channelnumber dest_track {
+	if [eval_cur_track] {
+		eval_dest_track $dest_track;
+		let cur_track = [gett];
+		let cur_pos = [getpos];
+		g 0;
+		ev {any $channelnumber};
+		sel [mend];
+		tcopy;
+		ct $dest_track;
+		tpaste;
+		ct $cur_track;
+		g $cur_pos;
+		ev {any};
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Copy everything recorded on track on channel channelnumber to dest_track.
+# Example:
+# 	chdup organ 2 pedals
+proc chdup my_track channelnumber dest_track {
+	if [eval_track $my_track] {
+		if [eval_cur_track] {
+			let cur_track = [gett];
+		} else {
+			let cur_track = $my_track;
+		}
+		ct $my_track;
+		let cur_return_value = [cchdup $channelnumber $dest_track];
+		ct $cur_track;
+		return $cur_return_value;
+	} else {
+		return 0;
+	}
+}
+
+# Copy all events from measure start_position to endPosition from source_track
+# and its default output channel to the same start_position on dest_track
+# and its default output channel.
+# example:
+#  chmap synth1 0 8 synth2 # copy all events from track synth1 and its
+#                          # output channel to the track synth2 and
+#                          # its output channel, from measure 0 to 8.
+proc chmap source_track start_position end_position dest_track {
+	if [eval_track $source_track] {
+		let src_track = $source_track;
+	} else {
+		print {"The source track" $source_track "does not exist."};
+		return 0;
+	}
+	if [eval_track $dest_track] {
+		let d_track = $dest_track;
+	} else {
+		print {"The destination track" $dest_track "does not exist."};
+		return 0;
+	}
+	if [eval_cur_track] {
+		let cur_track = [gett];
+	} else {
+		let cur_track = $src_track;
+	}
+	ct $src_track;
+	let ichan = [tclist];
+	let ichan_count = [lcount $ichan];
+	ct $dest_track;
+	let ochan = [tclist];
+	let ochan_count = [lcount $ochan];
+	if $ichan_count > 1 {
+		print "Too many source channels.";
+		print "Will only copy tracks with one channel.";
+		return 0;
+	}
+	if $ochan_count > 1 {
+		print "Too many destination channels.";
+		print "Will only copy to tracks with one channel.";
+		return 0;
+	}
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	let cur_return = [copy $src_track $start_position $end_position $dest_track $start_position];
+	if $cur_return == 0 {
+		return 0;
+	}
+	ct $dest_track;
+	let cur_pos = [getpos];
+	let cur_ochan = [lsub $ochan 0];
+	let cur_ichan = [lsub $ichan 0];
+	let map_measures = $end_pos - $start_pos;
+	g $start_pos;
+	sel $map_measures;
+	tevmap {any $cur_ichan} {any $cur_ochan}; ct $cur_track;
+	g $cur_pos;
+	ct $cur_track;
+	return $cur_return;
+}
+
+# Copy all events from source track starting at measure start_position for
+# copy_measures and the default output channel to dest_track at the same
+# start_position and its default output channel.
+# example:
+#  chmapm piano 2 8 bass # Copy 8 measures from track piano, starting at
+#                        # measure 2, on the default output channel to
+#                        # track bass at measure 2 and its default output
+#                        # channel.
+proc chmapm source_track start_position copy_measures dest_track {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = $start_pos + $copy_measures;
+	return [chmap $source_track $start_pos $end_pos $dest_track];
+}
+
+# Copy all events between start_position and end_position from the current
+# track and its default output channel to dest_track and on its default
+# output channel at the same start_position.
+# example:
+#  ct piano
+#  cchamp now end bass # copy everything from the current track's output
+#                      # channel, between now and the end to the track
+#                      # bass on its default output channel.
+proc cchmap start_position end_position  dest_track {
+	if [eval_cur_track] {
+		let src_track = [gett];
+		return [chmap $src_track $start_position $end_position $dest_track];
+	} else {
+		return 0;
+	}
+}
+
+# Copy all events, starting at measure start_position for copy_measures
+# measures from the current track and its default output channel to dest_track
+# on its default output channel.
+# example:
+#  ct piano
+#  cchmapm 7 12 bass # Copy 12 measures, starting at measure 7 from the
+#                    # current track - piano - and its default output
+#                    # channel to track bass at measure 7 on its default
+#                    # output channel
+proc cchmapm start_position copy_measures dest_track {
+	if [eval_cur_track] {
+		let src_track = [gett];
+		return [chmapm $src_track $start_position $copy_measures $dest_track];
+	} else {
+		return 0;
+	}
+}
+
+# Set input and output channel for the current track.
+# Example:
+# 	rnew keyboard module # accept input from keyboard and pass to module
+proc rnew inputchannel outputchannel {
+	if [eval_cur_track] {
+		let cur_track = [gett];
+		if [eval_inc $inputchannel] {
+			if [eval_outc $outputchannel] {
+				let fname = [gett];
+				if [fexists $fname] {
+					print "A routing filter of that name already exists, stopping...";
+					return 0;
+				} else {
+					fnew $fname;
+					fmap {any $inputchannel} {any $outputchannel};
+					taddev 0 0 0 {kat $outputchannel 0 0};
+					tsetf $fname;
+				}
+			} else {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+	return 1;
+}
+
+# Add more channel routing to a track
+# Examle:
+# 	radd keyboard module2
+proc radd inputchannel outputchannel {
+	if [eval_cur_track] {
+		let fname = [gett];
+		if [fexists $fname] {
+			if [eval_inc $inputchannel] {
+				if [eval_outc $outputchannel] {
+					cf $fname;
+					fmap {any $inputchannel} {any $outputchannel};
+				} else {
+					return 0;
+				}
+			} else {
+				return 0;
+			}
+		} else {
+			print "Routing filter doesn't exist. Use rnew. Stopping...";
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+	return 1;
+}
+
+# Create a split on the current track.
+# Example:
+# 	rsplit keyboard bass_module lead_synth 60 # split keyboard into two
+# 	   # regions, note 0-60 for the bass module and 61-127 for the lead synth.
+proc rsplit inputchannel leftout rightout splitpoint {
+	if [eval_cur_track] {
+		let fname = [gett];
+		if [fexists $fname] {
+			fmap {any $inputchannel} {any $leftout};
+			fmap {any $inputchannel} {any $rightout};
+			fmap {note $inputchannel 0..$splitpoint} {note $leftout 0..$splitpoint};
+			fmap {note $inputchannel ($splitpoint+1)..127} {note $rightout ($splitpoint+1)..127};
+		} else {
+			print "The current track has no filter yet. Use rnew to create one, stopping...";
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+	return 1;
+}
+
+#---------------------------------------
+## Group commands
+
+# Explain how to create a group
+proc gnew {
+	print "A group is simply a list of tracks. Create it like this:";
+	print "tnew cello";
+	print "tnew violin";
+	print "tnew viola";
+	print "let strings = {violin cello viola}";
+}
+
+# Mute a group of tracks
+# Example:
+#	tnew piano
+#	tnew bass
+#	let band = {piano bass}
+#		gmute $band
+proc gmute my_group {
+	for i in $my_group {
+		mute $i;
+	}
+	return 1;
+}
+
+# Unmute a group of tracks
+# Example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gunmute $band
+proc gunmute my_group {
+	for i in $my_group {
+		unmute $i;
+	}
+	return 1;
+}
+
+# Solo a group of tracks (mute everything but the group)
+# Example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gsolo $band
+proc gsolo my_group {
+	for i in [tlist] {
+		mute $i;
+	}
+	for i in $my_group {
+		unmute $i;
+	}
+	return 1;
+}
+
+# Show list of tracks in my_group with additional information
+# Example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gshow $band
+proc gshow my_group {
+	let cur_track = [gett];
+	show_header;
+	for i in $my_group {
+		tshow $i;
+	}
+	sec_ct $cur_track;
+}
+
+# Clear clear_measures from all tracks in the group starting at start_position
+# Example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gclrm $band now 8 # clear 8 measures, starting at measure 6
+proc gclrm my_group start_position clear_measures {
+	let cur_return_value = 1;
+	for i in $my_group {
+		let tmp_return_value = [clrm $i];
+		if ($tmp_return_value == 0) {
+			let cur_return_value = 0;
+		}
+	}
+	return $cur_return_value;
+}
+
+# Clear all tracks in the group starting at start_position to end_position
+# Example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gclr $band 2 end
+proc gclr my_group start_position end_position {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let cur_return_value = 1;
+		let clear_measures = $end_pos - $start_pos;
+		for i in $my_group {
+			let tmp_return_value = [clrm $i $start_pos $clear_measures];
+			if ($tmp_return_value == 0) {
+				let cur_return_value = 0;
+			}
+		}
+		return $cur_return_value;
+	} else {
+		return 0;
+	}
+}
+
+# Quantise all track in the group to the nearest quantise_notes with a
+# precision of precision percent, starting at start_position for
+# quantise_measures measures.
+# example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gquantm $band now 10 16 100
+proc gquantm my_group start_position quantise_measures quantise_note precision {
+	let cur_return_value = 1;
+	for i in $my_group {
+		let tmp_return_value = [quantm $i $start_position $quantise_measures $quantise_note $precision];
+		if ($tmp_return_value == 0) {
+			let cur_return_value = 0;
+		}
+	}
+	return $cur_return_value;
+}
+
+# Quantise all tracks in the group to the nearest quantise_note with a
+# precision of precision percent starting at start_position upto
+# end_position.
+# Example:
+# 	tnew piano
+# 	tnew bass
+# 	let band = {piano bass}
+# 	gquant $band 0 now 8 75 # quantise from start to current position to 8th
+# 	                        # with 100% precision
+proc gquant my_group start_position end_position quantise_note precision {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let quantise_measures = $end_pos - $start_pos;
+		return [gquantm $my_group $start_pos $quantise_measures $quantise_note $precision];
+	} else {
+		return 0;
+	}
+}
+
+# Copy each track from the group to itself starting at start_position for
+# copy_measure measures and put it all at dest_position.
+proc gcopym my_group start_position copy_measures dest_position {
+	let my_return_value = 1;
+	for i in $my_group {
+		let cur_return_value = [copym $i $start_position $copy_measures $i $dest_position];
+		if ($cur_return_value == 0) {
+			let my_return_value = 0;
+		}
+	}
+	return $my_return_value;
+}
+
+# Copy the contents of each track in the group from start_position to
+# end_position to itself at dest_position
+# Example:
+# 	gcopy $mystrings 2 9 10 # copy the group mystrings from measure 2 to measure
+# 	                        # to measure 9 to measure 10
+proc gcopy my_group start_position end_position dest_position {
+	let start_pos = [eval_pos $start_position];
+	let end_pos = [eval_pos $end_position];
+	if [eval_positive $start_pos $end_pos] {
+		let copy_measures = $end_pos - $start_pos;
+		return [gcopym $my_group $start_pos $copy_measures $dest_position];
+	} else {
+		return 0;
+	}
+}
+
+#---------------------------------------
+## Device commands
+# Add new synthesizers to your Midish setup
+
+# Create new soft synthesizer with portname my_synth and midish name my_name
+# Example:
+# 	snew "LinuxSampler" ls
+proc snew my_synth my_name {
+	if ![oexists $my_name] {
+		let cur_ochan = [geto];
+		let index = 0
+		for i in [dlist] {
+			let index=$index+1;
+		}
+		if ($index == 6) {
+			let index=$index+1;
+		}
+		dnew $index $my_synth wo
+		onew $my_name {$index 0}
+		dclktx [dlist]
+		co $cur_ochan;
+		return $index;
+	} else {
+		print {$my_name "is already the name of an output channel."};
+		return nil;
+	}
+}
+
+# Delete soft synthesizer my_name from midish
+# Example:
+# 	sdel ls # remove ls with its channel and midish device.
+proc sdel my_name {
+	if [eval_outc $my_name] {
+		let cur_ochan = [geto];
+		co $my_name;
+		let devnum = [ogetd $my_name];
+		odel;
+		ddel $devnum;
+		dclktx [dlist];
+		co $cur_ochan;
+		return $devnum;
+	} else {
+		return nil;
+	}
+}
+
+# Create a hardware syntheiszer with portname my_synth and midish name my_name
+# Example:
+# 	hnew "MIDI Cable" xv50
+proc hnew my_synth my_name {
+	if ![iexists $my_name] {
+		let cur_ichan = [geti];
+		let devnum = [snew $my_synth $my_name];
+		if $devnum != nil {
+			inew $my_name {$devnum 0};
+			ci $cur_ichan;
+			return 1;
+		} else {
+			print "The device number must be between 0 and 15.";
+			return 0;
+		}
+	} else {
+		print {$my_name "is already the name of an input channel."};
+		return 0;
+	}
+}
+
+# Delete a hardware synth with its name and channel
+# Example:
+# 	hdel ls
+proc hdel my_name {
+	if [eval_inc $my_name] {
+		let devnum = [sdel $my_name];
+		if $devnum != nil {
+			let cur_ichan = [geti];
+			ci $my_name;
+			iddel;
+			ci $cur_i_chan;
+			return 1;
+		} else {
+			print "The device number must be between 0 and 15.";
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+}
+
+# Add new i/o channel channelnumber for synth with midish name my_name and call
+# them new_name.
+# Example:
+# 	hnew "MIDI Cable" roland_xv
+# 	ionew roland_xv xv_drums 10
+proc ionew my_name new_name channelnumber {
+	if [eval_inc $my_name] {
+		if ![iexists $new_name] && ![oexists $new_name] {
+			let cur_ichan = [geti];
+			let cur_ochan = [geto];
+			ci $my_name;
+			let devnum = [igetd];
+			inew $new_name {$devnum $channelnumber };
+			onew $new_name {$devnum $channelnumber };
+			ci $cur_ichan;
+			co $cur_ochan;
+			return 1;
+		} else {
+			print {$new_name "is already used for an input or output channel."};
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+}
+
+#---------------------------------------
+## Pattern/Step sequencer commands.
+
+# Pattern note length (how much legato/staccato)
+let pattern_note_length = 16;
+# Patter grid, the length of a step
+let pattern_grid = 16;
+
+# Set pattern note length
+# Example:
+# plen 16 # set pattern note length to 16th.
+proc plen my_note_length {
+	if ([eval_denom $my_note_length] && $my_note_length >=2) {
+		let pattern_note_length = $my_note_length;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Set pattern grid, the length of a step
+# Example:
+# pgrid 8 # set the grid to 8th notes
+proc pgrid my_grid {
+	if [eval_denom $my_grid] {
+		let pattern_grid = $my_grid;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Check if the denomination for the pattern/step sequencer is valid.
+proc eval_denom my_denom {
+	if ($my_denom == 0) {
+		print "The note denomination may not be 0...";
+		return 0;
+	} else {
+		if ([getunit] % $my_denom) {
+			print "The note denomination must be compatible to the ticks per bar.";
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+}
+
+# Get basic info for the pattern/step sequencer commands. Return a list of
+# beats per bar, denomination of beats, ticks per bar and ticks per beat.
+proc get_step_info {
+	let cur_beats = ([lsub [msig] 0]);
+	let cur_denom = ([lsub [msig] 1]);
+	let cur_ticks_per_bar = ([getunit] * $cur_beats / $cur_denom);
+	let cur_ticks_per_beat = $cur_ticks_per_bar / $cur_denom;
+	return {$cur_beats $cur_denom $cur_ticks_per_bar $cur_ticks_per_beat};
+}
+
+# Check if a step position is inside the current bar.
+proc eval_step_in_bar my_step my_denom my_ticks_per_bar {
+	if ([getunit] * $my_step / $my_denom) > $my_ticks_per_bar {
+		print "The position you have specified is outside this bar.";
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+# Convert a step position to start and stop position in taddev format.
+proc step_to_addev my_bar my_step my_denom my_step_info {
+	let cur_beats = [lsub $my_step_info 0];
+	let cur_denom = [lsub $my_step_info 1];
+	let cur_ticks_per_bar = [lsub $my_step_info 2];
+	let cur_ticks_per_beat = [lsub $my_step_info 3];
+	let my_beat = (([getunit] * $my_step / $my_denom) / $cur_ticks_per_beat);
+	let my_tick = (([getunit] * $my_step / $my_denom) % $cur_ticks_per_beat);
+	let my_length = ([step_to_ticks 1 $pattern_note_length] -1);
+	let my_stop = [add_note_position_addev $my_bar $my_step $my_denom $my_length 96];
+	return {$my_beat $my_tick [lsub $my_stop 0] [lsub $my_stop 1] [lsub $my_stop 2]};
+}
+
+# Convert a note length and position to ticks.
+proc step_to_ticks my_step my_denom {
+	return ([getunit] * $my_step / $my_denom);
+}
+
+# Convert ticks to bar_shift step denomination.
+proc ticks_to_step my_bar my_ticks my_step_info {
+	let cur_beats = [lsub $my_step_info 0];
+	let cur_denom = [lsub $my_step_info 1];
+	let cur_ticks_per_bar = [lsub $my_step_info 2];
+	let cur_ticks_per_beat = [lsub $my_step_info 3];
+	let out_bar = $my_bar;
+	if ($my_ticks > $cur_ticks_per_bar) {
+		let my_ticks = $my_ticks - $cur_ticks_per_bar;
+		let out_bar = $out_bar + 1;
+		let cur_pos = [getpos];
+		g $out_bar;
+		let new_step_info = [get_step_info];
+		g $cur_pos;
+		return [ticks_to_step $out_bar $my_ticks $new_step_info];
+	} else {
+		return {$out_bar $my_ticks 96};
+	}
+}
+
+# Convert ticks to a position in taddev format.
+proc ticks_to_addev my_bar my_ticks my_step_info {
+	let cur_beats = [lsub $my_step_info 0];
+	let cur_denom = [lsub $my_step_info 1];
+	let cur_ticks_per_bar = [lsub $my_step_info 2];
+	let cur_ticks_per_beat = [lsub $my_step_info 3];
+	let out_bar = $my_bar;
+	if ($my_ticks > $cur_ticks_per_bar) {
+		let my_ticks = $my_ticks - $cur_ticks_per_bar;
+		let out_bar = $out_bar + 1;
+		let cur_pos = [getpos];
+		g $out_bar;
+		let new_step_info = [get_step_info];
+		g $cur_pos;
+		return [ticks_to_step $out_bar $my_ticks $new_step_info];
+	} else {
+		let out_beat = ($my_ticks / $cur_ticks_per_beat);
+		let out_tick = ($my_ticks % $cur_ticks_per_beat);
+		return {$out_bar $out_beat $out_tick};
+	}
+}
+
+# Add a note value to a position in format bar step denom and
+# return a position in bar step denom format.
+proc add_note_position my_lhs_bar my_lhs_step my_lhs_denom my_rhs_step my_rhs_denom {
+	let full_ticks = [step_to_ticks $my_lhs_step $my_lhs_denom] + [step_to_ticks $my_rhs_step $my_rhs_denom];
+	let cur_pos = [getpos];
+	g $my_lhs_bar;
+	let my_step_info = [get_step_info];
+	g $cur_pos;
+	return [ticks_to_step $my_lhs_bar $full_ticks $my_step_info];
+}
+
+# Add a note value to a position in format bar step denom and return a position
+# in format bar beat ticks
+proc add_note_position_addev my_lhs_bar my_lhs_step my_lhs_denom my_rhs_step my_rhs_denom {
+	let full_ticks = [step_to_ticks $my_lhs_step $my_lhs_denom] + [step_to_ticks $my_rhs_step $my_rhs_denom];
+	let cur_pos = [getpos];
+	g $my_lhs_bar;
+	let my_step_info = [get_step_info];
+	g $cur_pos;
+	return [ticks_to_addev $my_lhs_bar $full_ticks $my_step_info];
+}
+
+# Add MIDI-note "note" to the current track, on the current output channel, at
+# measure my_bar and position my_step on a grid of my_denom notes, with
+# my_velocity.
+# Example:
+# ppenv 1 3 8 60 100 # add MIDI-note 60 at velocity 100 to bar 1 (second bar),
+#                     # on the fourth eighth note (we count from 0)!
+proc ppenv my_bar my_step my_denom my_note my_velocity {
+	if [eval_cur_track] {
+		if [eval_denom $my_denom] {
+			if ([eval_denom $pattern_note_length]) {
+				let cur_pos = [getpos];
+				g $my_bar;
+				let my_step_info = [get_step_info];
+				let cur_beats = [lsub $my_step_info 0];
+				let cur_denom = [lsub $my_step_info 1];
+				let cur_ticks_per_bar = [lsub $my_step_info 2];
+				let cur_ticks_per_beat = [lsub $my_step_info 3];
+				if [eval_step_in_bar $my_step $my_denom $cur_ticks_per_bar] {
+					let my_notes = [step_to_addev $my_bar $my_step $my_denom $my_step_info];
+					for i in [tclist] {
+						taddev $my_bar [lsub $my_notes 0] [lsub $my_notes 1] {non $i $my_note $my_velocity};
+						taddev [lsub $my_notes 2] [lsub $my_notes 3] [lsub $my_notes 4] {noff $i $my_note $my_velocity};
+					}
+					g $cur_pos;;
+					return 1;
+				} else {
+					g $cur_pos;
+					return 0;
+				}
+			} else {
+				g $cur_pos;
+				return 0;
+			}
+		} else {
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+}
+
+# Add MIDI-note "note" to the current track, on the current output channel, at
+# measure my_bar and position my_step on a grid of my_denomination notes.
+# Velocity is fixed to 127.
+proc ppen my_bar my_step my_denom my_note {
+	return [ppenv $my_bar $my_step $my_denom $my_note 127];
+}
+
+# Add MIDI-note "note" to the bar my_bar at grid position my_step with velocity
+# my_velocity.
+# Example:
+# pstepv 1 5 60 100 # add MIDI-note 60 at velocity 100 to bar 1 (second bar)
+#                   # at step 5 (6th step) on the current grid
+proc pstepv my_bar my_step my_note my_velocity {
+	return [ppenv $my_bar $my_step $pattern_grid $my_note $my_velocity];
+}
+
+# Add MIDI-note "note" at full velocity (127) to my_bar at grid position my_step
+proc pstep my_bar my_step my_note {
+	return [ppenv $my_bar $my_step $pattern_grid $my_note 127];
+}
+
+# Add MIDI-note note at velocity my_velocity to bar my_bar starting at position
+# my_step on the grid repeated my_repeat times as my_denom note values.
+# Example:
+# prepeat 2 6 60 100 8 16 # repeat MIDI-note 60 at velocity 100 8 times as
+#                         # 16th notes to bar 2 step 6 on the grid
+proc prepeatv my_bar my_step my_note my_velocity my_repeat my_denom {
+	# Notes must be at least 48th or they will have 0 length
+	if ($my_denom >=2) {
+		let cur_note_length = $pattern_note_length;
+		if ($pattern_note_length < $my_denom) {
+			plen $my_denom;
+		}
+		let cur_count = $my_repeat;
+		let cur_note = {$my_bar $my_step $my_denom};
+		for i in [builtinlist] {
+			ppenv [lsub $cur_note 0] [lsub $cur_note 1] [lsub $cur_note 2] $my_note $my_velocity;
+			let cur_note = [add_note_position [lsub $cur_note 0] [lsub $cur_note 1] [lsub $cur_note 2] 1 $my_denom];
+			let cur_count = $cur_count -1;
+			if !($cur_count) {
+				plen $cur_note_length;
+				return 1;
+			}
+		}
+	} else {
+		print "Notes must be at least 48th notes.";
+		return 0;
+	}
+	print "You wanted too many repetitions.";
+	return 0;
+}
+
+# Add MIDI-note note at velocity 127 to bar my_bar starting on position my_step
+# on the grid, repeated my_repeat times as my_denom note length.
+# Example:
+# prepeat 1 2 60 12 6 # put in 6 12th MIDI-notes 60 starting on bar 1 at
+#                     # position 2 on the grid.
+proc prepeat my_bar my_step my_note my_repeat my_denom {
+	return [prepeatv $my_bar $my_step $my_note 127 $my_repeat $my_denom];
+}
+
+print "FS Midish Extram Commands, version 1.5";
+print "For patterns to work correctly use the rnew function for your tracks";
+print {"The current pattern grid size is" $pattern_grid};
+print {"The current note length (denomination) for pattern commands is" $pattern_note_length};

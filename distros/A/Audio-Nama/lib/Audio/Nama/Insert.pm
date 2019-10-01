@@ -139,7 +139,7 @@ sub get_id {
 	
 	# 
 	my ($track, $prepost) = @_;
-	my @inserts = get_inserts($track->name);
+	my @inserts = $track->get_inserts;
 	my ($prefader) = (map{$_->n} 
 					grep{$_->class =~ /pre/i} 
 					@inserts);
@@ -151,11 +151,6 @@ sub get_id {
 		if (! $prepost and ! $id{pre} != ! $id{post} );
 	$id{$prepost};;
 }
-sub get_inserts {
-	my $trackname = shift;
-	grep{ $_-> track eq $trackname } values %by_index;
-}
-
 
 sub is_local_effects_host { ! $_[0]->send_id }
 
@@ -300,6 +295,13 @@ sub new {
 				hide => 1,
 				rw => REC
 	);
+	if ($wet_send->width == 1){
+		Audio::Nama::add_effect({
+			track  => $wet_send, 
+			type   => 'chcopy',
+			params => [1,2]
+		});
+	}
 	map{ Audio::Nama::remove_effect($_)} $wet_send->vol, $wet_send->pan;
 	map{ my $track = $_;  map{ delete $track->{$_} } qw(vol pan) } $wet_send;
 	$self

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -39,6 +39,25 @@ PROPERTIES
  github_repo
 
     The GitHub repository name. This property is required.
+
+ include_assets
+
+    Defaulting to false, this option designates whether to include the
+    assets of releases in the list of candidates for download. This should
+    be one of three types of values:
+
+    true value
+
+      The full list of assets will be included in the list of candidates.
+
+    false value
+
+      No assets will be included in the list of candidates.
+
+    regular expression
+
+      If a regular expression is provided, this will include assets that
+      match by name.
 
  version
 
@@ -77,6 +96,10 @@ CAVEATS
 AUTHOR
 
     Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Roy Storey (KIWIROY)
 
 COPYRIGHT AND LICENSE
 

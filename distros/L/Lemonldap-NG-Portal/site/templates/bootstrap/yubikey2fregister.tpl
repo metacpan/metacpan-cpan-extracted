@@ -20,9 +20,9 @@
           </div>
           <div class="form-group">
             <label for="otp"><span trspan="id">Id</span></label>
-            <input type="text" class="form-control" id="otp" name="otp" trplaceholder="Id" autocomplete="off" />
+            <input type="text" class="form-control" id="otp" name="otp" trplaceholder="Id" autocomplete="off" autofocus/>
           </div>
-          <input class="d-none" type="submit" value="Submit" />
+          <input class="custom-control-input" type="submit" value="Submit" />
         </div>
 
       </div>

@@ -361,12 +361,22 @@ of the C<%ENV> variable. Read more at L<Data::Object::Vars>.
   use Data::Object::Config 'Class';
   use Data::Object::Config 'WithStashable';
 
+  # e.g.
+  # use Data::Object::Config 'WithDumpable';
+  # use Data::Object::Config 'WithImmutable
+  # use Data::Object::Config 'WithProxyable
+  # use Data::Object::Config 'WithStashable
+  # use Data::Object::Config 'WithThrowable
+  # use Data::Object::Config 'WithTryable
+
   1;
 
 The with configuration configures the calling package to consume the core role
 denoted in the name, e.g. the name C<WithStashable> configures the package to
 consume the core role L<Data::Object::Role::Stashable>. Using roles requires
-that the package have previously been declared a class or role itself.
+that the package have previously been declared a class or role itself. This
+pattern for including core roles works with any core role and can be used by
+simplyt prefixing the role name with the term C<With> (with no spaces).
 
 =cut
 

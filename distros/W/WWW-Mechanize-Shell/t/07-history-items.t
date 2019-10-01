@@ -1,21 +1,21 @@
 #!/usr/bin/perl -w
 use strict;
 
-use lib './inc';
-use IO::Catch;
+use Test::More;
 use File::Temp qw( tempfile );
 use WWW::Mechanize::Link;
+use lib './inc';
+use IO::Catch;
 
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
-use vars qw( %tests );
-
 BEGIN {
   # Disable all ReadLine functionality
   $ENV{PERL_RL} = 0;
+};
 
-  %tests = (
+our %tests = (
       'autofill' => 'autofill test Fixed value',
       'back' => 'back',
       'click' => 'click',
@@ -47,9 +47,8 @@ BEGIN {
     $tests{table params} = 'table foo bar';
     ;
   };
-};
 
-use Test::More tests => scalar (keys %tests) +1;
+plan tests => scalar (keys %tests) +1;
 SKIP: {
 
 eval {

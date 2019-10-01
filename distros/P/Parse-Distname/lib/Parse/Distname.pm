@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Exporter 5.57 'import';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT_OK = qw/parse_distname/;
 
 our $SUFFRE = qr/\.(?:tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z|zip)$/;
@@ -235,7 +235,7 @@ sub properties {
 
 # extra accessors
 
-sub is_perl6       { shift->{is_perl6} }
+sub is_perl6       { shift->{perl6} }
 sub version_number { shift->{version_number} }
 
 1;

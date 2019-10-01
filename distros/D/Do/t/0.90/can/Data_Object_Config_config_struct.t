@@ -26,7 +26,7 @@ config_struct() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

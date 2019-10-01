@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.81.10 2019-09-30 00:00:00
+  - supports optimized RFC3629 for ja_JP
+  - created by INABA Hitoshi
+
 2.13.81.9 2019-09-20 00:00:00
   - 0015_option_override_mapping.t supports U+32FF SQUARE ERA NAME REIWA
   - created by INABA Hitoshi

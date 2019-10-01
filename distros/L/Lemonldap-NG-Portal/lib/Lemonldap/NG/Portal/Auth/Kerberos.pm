@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -30,7 +30,7 @@ sub init {
     my $self = shift;
     my $file;
     unless ( $file = $self->conf->{krbKeytab} ) {
-        $self->error('Keytab not defined');
+        $self->logger->error('Keytab not defined');
         return 0;
     }
     $self->keytab("FILE:$file");
@@ -156,6 +156,9 @@ sub extractFormInfo {
     );
     unless ($status) {
         $self->logger->error('Unable to accept security context');
+        foreach ( $status->generic_message(), $status->specific_message() ) {
+            $self->logger->error($_);
+        }
         return PE_ERROR;
     }
     my $client_name;

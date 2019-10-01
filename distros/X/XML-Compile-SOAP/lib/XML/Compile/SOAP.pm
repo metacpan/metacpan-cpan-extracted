@@ -1,4 +1,4 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP;
 use vars '$VERSION';
-$VERSION = '3.24';
+$VERSION = '3.25';
 
 
 use warnings;
@@ -34,7 +34,7 @@ sub _xop_enabled() { exists $INC{'XML/Compile/XOP.pm'} }
 sub new($@)
 {   my $class = shift;
 
-    error __x"you can only instantiate sub-classes of {class}"
+    error __x"you can only instantiate sub-classes of {class}", class => $class
         if $class eq __PACKAGE__;
 
     (bless {}, $class)->init( {@_} );

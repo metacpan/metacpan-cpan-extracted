@@ -14,7 +14,7 @@ isa_ok $s, 'WWW::Mechanize::Shell';
 
 my $have_tableextract = eval {
     require HTML::TableExtract;
-    die "Need at least HTML::TableExtract v2, found '$HTML::TableExtract::VERSION'" 
+    die "Need at least HTML::TableExtract v2, found '$HTML::TableExtract::VERSION'"
         unless $HTML::TableExtract::VERSION > 2;
     1
 };
@@ -30,7 +30,7 @@ SKIP: {
         my @output;
         local *WWW::Mechanize::Shell::print_paged = sub {
             shift @_;
-            push @output, grep { /\S/ } @_; 
+            push @output, grep { /\S/ } @_;
         };
         $s->agent->{base} = 'http://example.com';
         $s->agent->update_html(<<HTML);

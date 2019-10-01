@@ -2,6 +2,7 @@ use Test::More;
 use JSON;
 use MIME::Base64;
 use LWP::UserAgent;
+use Data::Dumper;
 
 BEGIN {
     require 't/test-psgi-lib.pm';
@@ -11,14 +12,14 @@ init('Lemonldap::NG::Handler::Server');
 
 my $res;
 
-# Authorizated queries
+# Authorized queries
 ok(
     $res = $client->_get(
         '/',                 undef,
         'test3.example.com', "lemonldap=$sessionId",
         VHOSTTYPE => 'DevOps'
     ),
-    'Authorizated query'
+    'Authorized query'
 );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);
@@ -29,7 +30,7 @@ ok(
         'test3.example.com', "lemonldap=$sessionId",
         VHOSTTYPE => 'DevOps'
     ),
-    'Authorizated query'
+    'Authorized query'
 );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
 count(2);

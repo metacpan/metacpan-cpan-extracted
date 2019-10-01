@@ -1,3 +1,8 @@
+0.003   2019-07-28  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Simplify CLI scripts by not reading config & env vars.
+
+
 0.002   2019-07-19  Released-By: PERLANCAR; Urgency: high
 
 	- [removed] Remove numeric code because it is not the same as ISO

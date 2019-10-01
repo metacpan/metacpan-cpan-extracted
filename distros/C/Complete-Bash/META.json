@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Bash"
       }
    },
-   "version" : "0.328",
+   "version" : "0.330",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

@@ -1,4 +1,4 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::XOP::Include;
 use vars '$VERSION';
-$VERSION = '3.24';
+$VERSION = '3.25';
 
 
 use warnings;
@@ -17,7 +17,7 @@ use strict;
 use Log::Report       'xml-compile-soap';
 use XML::Compile::SOAP::Util qw/:xop10/;
 use HTTP::Message     ();
-use File::Slurp::Tiny qw/read_file write_file/;
+use File::Slurper     qw/read_binary write_binary/;
 use Encode            qw/decode FB_CROAK/;
 
 
@@ -59,7 +59,7 @@ sub content(;$)
 {   my ($self, $byref) = @_;
     unless($self->{bytes})
     {   my $f     = $self->{file};
-        my $bytes = try { read_file $f, binmode => ':raw' };
+        my $bytes = try { read_binary $f };
         fault "failed reading XOP file {fn}", fn => $f if $@;
         $self->{bytes} = \$bytes;
     }
@@ -108,7 +108,7 @@ sub mimePart(;$)
 
 sub write($)
 {   my ($self, $file) = @_;
-    write_file $file, {binmode => ':raw'}, $self->content(1);
+    write_binary $file, $self->content(1);
 }
 
 1;

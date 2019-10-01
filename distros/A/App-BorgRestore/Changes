@@ -1,5 +1,9 @@
 Revision history for Perl extension App-BorgRestore
 
+3.4.0 2019-09-28T13:28:49Z
+	- Remove archive name untaint restrictions (remove untaint_archive_name
+	  function)
+
 3.3.0 2019-02-07T16:18:41Z
 	- Support borg list's --prefix option via $borg_prefix setting
 	- Properly handle cases where the DB is empty after removal of archive

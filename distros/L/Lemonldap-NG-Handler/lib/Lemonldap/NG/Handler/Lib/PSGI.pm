@@ -5,7 +5,7 @@ use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );
@@ -21,7 +21,7 @@ sub init {
         return 0;
     }
     unless ( $self->api->checkConf($self)
-        or $self->{protection} eq 'none' )
+        or ( $self->{protection} and $self->{protection} eq 'none' ) )
     {
         $self->error(
             "Unable to protect this server ($Lemonldap::NG::Common::Conf::msg)"
@@ -69,7 +69,7 @@ sub _run {
         return sub {
             my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
             my $res = $self->handler($req);
-            push @{ $res->[1] }, @{ $req->{respHeaders} };
+            push @{ $res->[1] }, $req->spliceHdrs;
             return $res;
         };
     }
@@ -89,7 +89,7 @@ sub status {
     return sub {
         my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
         $self->api->status($req);
-        return [ 200, [ @{ $req->{respHeaders} } ], [ $req->{respBody} ] ];
+        return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
     };
 }
 
@@ -107,7 +107,7 @@ sub reload {
     return sub {
         my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
         $self->api->reload($req);
-        return [ 200, [ @{ $req->{respHeaders} } ], [ $req->{respBody} ] ];
+        return [ 200, [ $req->spliceHdrs ], [ $req->{respBody} ] ];
     };
 }
 
@@ -128,43 +128,41 @@ sub _authAndTrace {
     eval "require $type";
     die $@ if ($@);
     my ( $res, $session ) = $type->run( $req, $self->{rule} );
-    $self->portal( $type->tsv->{portal}->() );
+    eval { $self->portal( $type->tsv->{portal}->() ) };
+    $self->logger->warn($@)  if $@;
     $req->userData($session) if ($session);
 
     if ( $res < 300 ) {
         if ($noCall) {
-            return [ $res, $req->{respHeaders}, [] ];
+            return [ $res, [ $req->spliceHdrs ], [] ];
         }
         else {
             $self->logger->debug('User authenticated, calling handler()');
             $res = $self->handler($req);
-
-            # Insert respHeaders in response only if not already set
-            my %hdr1 = @{ $res->[1] };
-            my %hdr2 = @{ $req->{respHeaders} };
-            foreach ( keys %hdr2 ) {
-                unless ( $hdr1{$_} and $hdr2{$_} eq $hdr1{$_} ) {
-                    push @{ $res->[1] }, ( $_ => $hdr2{$_} );
-                }
-            }
+            push @{ $res->[1] }, $req->spliceHdrs;
+            return $res;
         }
-        return $res;
     }
     elsif ( $res < 400 ) {
-        return [ $res, $req->{respHeaders}, [] ];
+        return [ $res, [ $req->spliceHdrs ], [] ];
     }
     else {
-        my %h = $req->{respHeaders} ? @{ $req->{respHeaders} } : ();
-        my $s = $type->tsv->{portal}->() . "/lmerror/$res";
+        my $s = ( $self->portal ? $self->portal . "/lmerror/$res" : '' );
         $s =
             '<html><head><title>Redirection</title></head><body>'
           . qq{<script type="text/javascript">window.location='$s'</script>}
           . '<h1>Please wait</h1>'
           . qq{<p>An error occurs, you're going to be redirected to <a href="$s">$s</a>.</p>}
           . '</body></html>';
-        $h{'Content-Type'}   = 'text/html';
-        $h{'Content-Length'} = length $s;
-        return [ $res, [%h], [$s] ];
+        return [
+            $res,
+            [
+                $req->spliceHdrs,
+                'Content-Type'   => 'text/html',
+                'Content-Length' => length $s
+            ],
+            [$s]
+        ];
     }
 }
 
@@ -175,6 +173,13 @@ sub user {
     return $req->userData
       || { $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
           || _whatToTrace => 'anonymous' };
+}
+
+## @method hashRef custom()
+# @return hash of custom data
+sub custom {
+    my ( $self, $req ) = @_;
+    return { $Lemonldap::NG::Handler::Main::tsv->{customToTrace} };
 }
 
 ## @method string userId()
@@ -196,7 +201,7 @@ sub group {
 }
 
 ## @method PSGI::Response sendError($req,$err,$code)
-# Add user di to $err before calling Lemonldap::NG::Common::PSGI::sendError()
+# Add user id to $err before calling Lemonldap::NG::Common::PSGI::sendError()
 # @param $req Lemonldap::NG::Common::PSGI::Request
 # @param $err String to push
 # @code int HTTP error code (default to 500)

@@ -10,3 +10,4 @@ Test-HTTP-LocalServer-*/
 .releaserc
 cover_db
 MYMETA.*
+.prove

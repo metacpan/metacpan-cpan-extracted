@@ -1,0 +1,39 @@
+Changes
+CONTRIBUTING.md
+lib/App/GitFind.pm
+lib/App/GitFind/Actions.pm
+lib/App/GitFind/Base.pm
+lib/App/GitFind/Class.pm
+lib/App/GitFind/cmdline.pm
+lib/App/GitFind/Entry.pm
+lib/App/GitFind/Entry/GitIndex.pm
+lib/App/GitFind/Entry/OnDisk.pm
+lib/App/GitFind/Entry/PathClass.pm
+lib/App/GitFind/FileProcessor.pm
+lib/App/GitFind/FileStatLs.pm
+lib/App/GitFind/PathClassMicro.pm
+lib/App/GitFind/Searcher.pm
+lib/App/GitFind/Searcher/FileSystem.pm
+lib/App/GitFind/Searcher/Git.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+script/git-find
+support/cmdline.yp
+support/readme.pl
+t/00-load.t
+t/01-script.t
+t/02-qwc.t
+t/11-lexer-rev.t
+t/20-parser-basic.t
+t/TestKit.pm
+xt/boilerplate.t
+xt/check-prereqs.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -26,7 +26,7 @@ config_withproxyable() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

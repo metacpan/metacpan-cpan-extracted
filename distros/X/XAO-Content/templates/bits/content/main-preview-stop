@@ -1,0 +1,7 @@
+<%Cookie
+  name="preview_mode"
+  value="0"
+  expires="-1s"
+  path="/"
+%>
+<%Redirect url={<%Utility/f mode="current-url"%>}%>

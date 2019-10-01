@@ -1,5 +1,16 @@
 Revision history for MikroTik-API
 
+2.0.1 20190926
+    -fixed wrong dependecies in Makefile
+    - added internal SO_* to also_private for POD-coverage test
+    - renamed internal sub
+
+2.0.0 20190926
+    - use Moo instead of Moose
+    - replaced die with croak
+    - some more error handling
+    - replaced IO::Socket::INET with IO::Socket::IP (hostname lookup, IPv6)
+
 1.1.0 20190725
     - use return values instead of die() at some places (CAUTION: could break old scripts)
     - new MikroTik Login method as default with auto fallback to old method (pre 6.43)

@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object';
 
-our $VERSION = '1.85'; # VERSION
+our $VERSION = '1.87'; # VERSION
 
 1;
 
@@ -64,7 +64,7 @@ If you don't have cpanm, get it! It takes less than a minute, otherwise:
 
 Add C<Do> to the list of dependencies in C<cpanfile>:
 
-  requires "Do" => "1.80"; # 1.80 or newer
+  requires "Do" => "1.87"; # 1.87 or newer
 
 If cpanm doesn't have permission to install modules in the current Perl
 installation, it will automatically set up and install to a local::lib in your
@@ -77,7 +77,7 @@ completely isolated Perl installations.
 
 =head1 CREDITS
 
-Al Newkirk, C<+309>
+Al Newkirk, C<+317>
 
 Anthony Brummett, C<+10>
 
@@ -95,8 +95,9 @@ Al Newkirk, C<awncorp@cpan.org>
 
 Copyright (C) 2011-2019, Al Newkirk, et al.
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated here,
+https://github.com/iamalnewkirk/do/blob/master/LICENSE.
 
 =head1 PROJECT
 

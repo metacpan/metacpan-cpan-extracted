@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm',
   'Lemonldap::NG::Portal::Lib::REST';
@@ -34,10 +34,18 @@ sub authenticate {
             { user => $req->user, password => $req->data->{password} } );
     };
     if ($@) {
-        $self->logger("Auth error: $@");
+        $self->logger->error("Auth error: $@");
         $self->setSecurity($req);
         return PE_ERROR;
     }
+    $self->logger->debug( "REST result:" . ( $res->{result} || 'undef' ) );
+    if ( $res->{info} ) {
+        eval {
+            $self->logger->debug(" $_ => $res->{info}->{$_}")
+              foreach ( keys %{ $res->{info} } );
+        };
+    }
+    $self->logger->error( 'No "info": ' . $@ ) if ($@);
     unless ( $res->{result} ) {
         $self->userLogger->warn(
             "Bad credentials for " . $req->user . ' (' . $req->address . ')' );

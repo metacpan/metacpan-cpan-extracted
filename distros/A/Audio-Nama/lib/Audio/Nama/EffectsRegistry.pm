@@ -17,7 +17,7 @@ sub prepare_static_effects_data{
 		logpkg(__FILE__,__LINE__,'debug', join "\n", "newplugins:", new_plugins());
 		if (! $source and ($config->{opts}->{r} or new_plugins())){ 
 
-			unlink $file->effects_cache;
+			rename $file->effects_cache, $file->effects_cache . ".bak";
 			print "Regenerating effects data cache\n";
 		}
 	}
@@ -53,7 +53,6 @@ sub prepare_static_effects_data{
 		integrate_ladspa_hints();
 		integrate_cop_hints();
 		sort_ladspa_effects();
-		prepare_effects_help();
 		logpkg(__FILE__,__LINE__,'debug', "updating effects cache on disk: ",$file->effects_cache);
 		serialize (
 			file => $file->effects_cache, 
@@ -62,7 +61,7 @@ sub prepare_static_effects_data{
 			format => 'json') unless is_test_script();
 				
 	}
-	prepare_effect_index();
+	generate_mappings_for_shortcuts();
 }
 
 sub ladspa_plugin_list {
@@ -120,22 +119,39 @@ sub modified_stamp {
 sub initialize_effect_index {
 	$fx_cache->{partial_label_to_full} = {};
 }
-sub prepare_effect_index {
-	logsub("&prepare_effect_index");
+sub generate_mappings_for_shortcuts {
+	logsub("&generate_mappings_for_shortcuts");
 	map{ 
 		my $code = $_;
+ 		
+		# abbrevations for lv2: lv2-foo for elv2:http://something.com/other/foo
+		if ( my ($suffix) = $code =~ /(?:elv2:).*?([^\/]+)$/ )
+		{
+			$fx_cache->{partial_label_to_full}->{"lv2-$suffix"} = $code;
+		}
+		else {
 		my ($short) = $code =~ /:([-\w]+)/;
 		if ( $short ) { 
 			if ($fx_cache->{partial_label_to_full}->{$short}) { warn "name collision: $_\n" }
 			else { $fx_cache->{partial_label_to_full}->{$short} = $code }
 		}
+		}
 		$fx_cache->{partial_label_to_full}->{$code} = $code;
-	} grep{ !/^elv2:/ }keys %{$fx_cache->{full_label_to_index}};
+	} keys %{$fx_cache->{full_label_to_index}};
 	#print json_out $fx_cache->{partial_label_to_full};
 }
+{ my %dispatch =
+		(
+			ctrl 	=> \&generate_help,
+			lv2	 	=> \&generate_lv2_help,
+			ladspa 	=> \&generate_ladspa_help,
+			cop		=> \&generate_help,
+			preset	=> \&generate_help,
+		);
+		
 sub extract_effects_data {
 	logsub("&extract_effects_data");
-	my ($lower, $upper, $regex, $separator, @lines) = @_;
+	my ($plugin_type, $lower, $upper, $regex, $separator, @lines) = @_;
 	carp ("incorrect number of lines ", join ' ',$upper-$lower,scalar @lines)
 		if $lower + @lines - 1 != $upper;
 	logpkg(__FILE__,__LINE__,'debug',"lower: $lower upper: $upper  separator: $separator");
@@ -160,29 +176,13 @@ sub extract_effects_data {
 		$fx_cache->{registry}->[$j]->{count} = scalar @p_names;
 		$fx_cache->{registry}->[$j]->{params} = [];
 		$fx_cache->{registry}->[$j]->{display} = qq(field);
+		$fx_cache->{registry}->[$j]->{plugin_type} = $plugin_type;
+		$fx_cache->{user_help}->[$j] = $dispatch{$plugin_type}->($line);
 		map{ push @{$fx_cache->{registry}->[$j]->{params}}, {name => $_} } @p_names
 			if @p_names;
- 		# abbrevations for lv2: lv2-foo for elv2:http://something.com/other/foo
- 		if ($id =~ /elv2:/){
-
- 			my ($suffix) = $id =~ /(?:elv2:).*?([^\/]+)$/;
-			my $trimmed = $line;
-			$trimmed =~ s/^\d+\.\s*//;
-			$trimmed =~ s/\t/ /g;
-			$trimmed =~ s/'//g;
-			$trimmed =~ s/,/, /g;
-			$trimmed = "LV2 $trimmed";
- 			$fx_cache->{partial_label_to_full}->{"lv2-$suffix"} = $id;
-			$line = $trimmed;
- 		}
-		# remove Ecasound registry index No., if present
-		$line =~ s/^\d+\.\s*//;
-		push @{$fx_cache->{user_help}}, $line;
-
-		# abbreviate index takes full names as well
-		$fx_cache->{partial_label_to_full}->{$id} = $id;
 	}
 
+}
 }
 sub sort_ladspa_effects {
 	logsub("&sort_ladspa_effects");
@@ -195,6 +195,22 @@ sub sort_ladspa_effects {
 		 sort { $fx_cache->{registry}->[$a]->{name} cmp $fx_cache->{registry}->[$b]->{name} } ($aa .. $zz) ;
 	logpkg(__FILE__,__LINE__,'debug', "sorted array length: ". scalar @{$fx_cache->{ladspa_sorted}});
 }		
+sub run_external_ecasound_cmd {
+	my $cmd = shift;
+	my $output = qx(sh -c 'echo $cmd | ecasound -c '); 
+	trim_output($output)
+}
+sub trim_output {
+	my $output = shift;
+	$output =~ s/\n\.{3} //g;
+	$output =~ s/\r//;
+	$output =~ s/^.+?Registered \w+ plugins:\s*//s; # XXX HARDCODED for plugins only
+	$output =~ s/^ecasound .+?\Z//ms;
+	my @output = split "\n",$output;
+	#splice @output, 0,8;
+	#splice @output, -3,3;
+	join "\n",@output;
+}
 sub read_in_effects_data {
 	
 	logsub("&read_in_effects_data");
@@ -202,21 +218,25 @@ sub read_in_effects_data {
 
 	#### LADSPA
 
-	my $lr = eval_iam("ladspa-register");
+	my $lr = $config->{use_effects_bugfix} 
+					?  run_external_ecasound_cmd('ladspa-register') 
+					:  ecasound_iam('ladspa-register');
+
 	logpkg(__FILE__,__LINE__,'debug',"ladpsa-register output:\n",$lr);
 
-	#print $lr; 
-	
 	my @ladspa =  split "\n", $lr;
 	
 	# join the two lines of each entry
 	my @lad = map { join " ", splice(@ladspa,0,2) } 1..@ladspa/2; 
 	#logpkg(__FILE__,__LINE__,'debug',join "\n","ladpsa-register processed output:",@lad);
-
+	generate_ladspa_help($_) for @lad;
 
 	#### LV2
 
-	my $lv2 = eval_iam('lv2-register'); # TODO test fake lv2-register
+	my $lv2 = $config->{use_effects_bugfix} 
+					?  run_external_ecasound_cmd('lv2-register') 
+					:  ecasound_iam('lv2-register');
+										# TODO test fake lv2-register
 										# get_data_section('fake_lv2_register');
 	logpkg(__FILE__,__LINE__,'debug',"lv2-register output:\n",$lv2);
 
@@ -227,21 +247,26 @@ sub read_in_effects_data {
 	
 	# split on newlines
 	my @lv2 = split /\n/,$lv2;
+	generate_lv2_help($_) for @lv2;
 
 #	logpkg(__FILE__,__LINE__,'debug',sub{ json_out(\@lv2) });
 
 	logpkg(__FILE__,__LINE__,'trace',sub{ json_out(\@lv2) });
 
-	my $preset = eval_iam("preset-register");
+	my $preset = ecasound_iam("preset-register");
 	my @preset = grep {! /^\s*$/ } split "\n", $preset;
+	generate_help($_) for @preset;
 	logpkg(__FILE__,__LINE__,'debug',"preset-register output:\n",$preset);
 
-	my $ctrl = 	eval_iam("ctrl-register");
+	my $ctrl = 	ecasound_iam("ctrl-register");
 	my @ctrl  = grep {! /^\s*$/ } split "\n", $ctrl;
 	logpkg(__FILE__,__LINE__,'debug',"ctrl-register output:\n",$ctrl);
+	generate_help($_) for @ctrl;
 
-	my $cop = eval_iam("cop-register");
+	my $cop = ecasound_iam("cop-register");
 	my @cop = grep {! /^\s*$/ } split "\n", $cop;
+	generate_help($_) for @cop;
+
 	logpkg(__FILE__,__LINE__,'debug',"cop-register output:\n",$cop);
 
 	logpkg(__FILE__,__LINE__,'debug', "found ", scalar @cop, " Ecasound chain operators");
@@ -323,6 +348,7 @@ sub read_in_effects_data {
 	/x;
 
 	extract_effects_data(
+		'cop',
 		$fx_cache->{split}->{cop}{a},
 		$fx_cache->{split}->{cop}{z},
 		$cop_re,
@@ -330,6 +356,7 @@ sub read_in_effects_data {
 		@cop,
 	);
 	extract_effects_data(
+		'ladspa',
 		$fx_cache->{split}->{ladspa}{a},
 		$fx_cache->{split}->{ladspa}{z},
 		$ladspa_re,
@@ -337,6 +364,7 @@ sub read_in_effects_data {
 		@lad,
 	);
 	extract_effects_data(
+		'lv2',
 		$fx_cache->{split}->{lv2}{a},
 		$fx_cache->{split}->{lv2}{z},
 		$lv2_re,
@@ -345,6 +373,7 @@ sub read_in_effects_data {
 	);
 
 	extract_effects_data(
+		'preset',
 		$fx_cache->{split}->{preset}{a},
 		$fx_cache->{split}->{preset}{z},
 		$preset_re,
@@ -352,6 +381,7 @@ sub read_in_effects_data {
 		@preset,
 	);
 	extract_effects_data(
+		'ctrl',
 		$fx_cache->{split}->{ctrl}{a},
 		$fx_cache->{split}->{ctrl}{z},
 		$ctrl_re,
@@ -466,7 +496,14 @@ sub get_ladspa_hints{
 		}	#	pager( join "\n======\n", @stanzas);
 		#last if ++$i > 10;
 	}
-
+		
+	for (1..scalar @{ $fx_cache->{user_help}} )
+	{
+		next if $fx_cache->{registry}->[$_]->{plugin_type} ne 'ladspa';
+		my $code = $fx_cache->{registry}->[$_]->{code};
+		my $id = $fx_cache->{ladspa_label_to_unique_id}->{$code};
+		$fx_cache->{user_help}->[$_] =~ s/^\d+/$id/;
+	}
 	logpkg(__FILE__,__LINE__,'debug', sub{json_out($fx_cache->{ladspa})});
 }
 
@@ -553,43 +590,43 @@ logpkg(__FILE__,__LINE__,'debug', sub{join "\n", grep {/el:/} sort keys %{$fx_ca
 
 }
 
-## generate effects help data
 
-sub prepare_effects_help {
+sub generate_help {
+	my $line = shift;
+	$line =~ s/^.*? //; 				# remove initial number
+	$line .= "\n";						# add newline
+	s/,/, /g;							# to help line breaks
+	$line;
+}
 
-	# presets
-	map{	s/^.*? //; 				# remove initial number
-					$_ .= "\n";				# add newline
-					my ($id) = /(pn:\w+)/; 	# find id
-					s/,/, /g;				# to help line breaks
-					push @{$fx_cache->{user_help}},    $_;  #store help
 
-				}  split "\n",eval_iam("preset-register");
+sub generate_lv2_help {
 
-	# LADSPA
-	my $label;
-	map{ 
+		my $line = shift;
+ 		if ($line =~ /elv2:/){
 
-		if (  my ($_label) = /-(el:[-\w]+)/  ){
-				$label = $_label;
-				s/^\s+/ /;				 # trim spaces 
-				s/'//g;     			 # remove apostrophes
-				$_ .="\n";               # add newline
-				push @{$fx_cache->{user_help}}, $_;  # store help
+			my $trimmed = $line;
+			$trimmed =~ s/^\d+\.\s*//;
+			$trimmed =~ s/\t/ /g;
+			$trimmed =~ s/'//g;
+			$trimmed =~ s/,/, /g;
+			$trimmed = "LV2 $trimmed";
+			$line = $trimmed;
+ 		}
+		# remove Ecasound registry index No., if present
+		$line =~ s/^\d+\.\s*//;
+		$line
 
-		} else { 
-				# replace leading number with LADSPA Unique ID
-				s/^\d+/$fx_cache->{ladspa_label_to_unique_id}->{$label}/;
-
-				s/\s+$/ /;  			# remove trailing spaces
-				substr($fx_cache->{user_help}->[-1],0,0) = $_; # join lines
-				$fx_cache->{user_help}->[-1] =~ s/,/, /g; # 
-				$fx_cache->{user_help}->[-1] =~ s/,\s+$//;
-				
-		}
-
-	} reverse split "\n",eval_iam("ladspa-register");
-
+}
+sub generate_ladspa_help {
+	my $line = shift;
+		my ($label) = $line =~ /-(el:[-\w]+)/;
+		$line =~ s/^\s{2,} //g;			 # trim spaces 
+		$line =~ s/\t/ /g; 				# convert tabs to spaces
+		$line =~ s/'//g;     			 # remove apostrophes
+		$line =~ s/,/, /g; 				# for nice linebreaks
+		$line =~ s/\s+$/ /;  			 # remove trailing spaces
+		$line .="\n";               	 # add newline
 }
 
 1;

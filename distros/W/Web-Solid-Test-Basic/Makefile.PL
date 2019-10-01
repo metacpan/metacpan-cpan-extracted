@@ -32,15 +32,15 @@ my $meta = {
                                            "IO::Socket::SSL"       => 0,
                                            "LWP::UserAgent::https" => 0,
                                            "Test::Deep"            => 0,
-                                           "Test::FITesque::RDF"   => 0.012,
+                                           "Test::FITesque::RDF"   => 0.014,
                                            "Test::More"            => 0.96,
                                            "Test::RDF"             => 0,
                                          },
                                        },
                         },
   "provides"         => {
-                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.002 },
-                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.002 },
+                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.004 },
+                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.004 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -56,7 +56,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project",
                         },
-  "version"          => 0.002,
+  "version"          => 0.004,
   "x_static_install" => 1,
 };
 

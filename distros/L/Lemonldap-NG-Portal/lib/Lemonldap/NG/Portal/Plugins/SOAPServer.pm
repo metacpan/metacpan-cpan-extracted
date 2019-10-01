@@ -15,7 +15,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_FORMEMPTY);
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Common::Conf::AccessLib';
@@ -43,7 +43,7 @@ has exportedAttr => (
                 'authenticationLevel', 'groups',
                 'ipAddr',              '_startTime',
                 '_utime',              '_lastSeen',
-                '_session_id',
+                '_session_id',         '_session_kind',
             );
             if ( my $exportedAttr = $conf->{exportedAttr} ) {
                 $exportedAttr =~ s/^\s*\+\s+//;

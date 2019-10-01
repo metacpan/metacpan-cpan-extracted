@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 270 2019-06-19 18:56:25Z minus $
+package CTK; # $Id: CTK.pm 272 2019-09-26 08:45:46Z minus $
 use strict;
 use utf8;
 
@@ -10,11 +10,11 @@ CTK - Command-line ToolKit library (CTKlib)
 
 =head1 VERSION
 
-Version 2.01
+Version 2.02
 
 =head1 NOTE
 
-The 2.00 version of this library is not compatible with earlier versions
+The 2.00+ versions of this library is not compatible with earlier versions
 
 =head1 SYNOPSIS
 
@@ -510,7 +510,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION %PLUGIN_ALIAS_MAP %EXPORT_TAGS @EXPORT_OK /;
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 use base qw/Exporter/;
 
@@ -578,7 +578,7 @@ sub new {
         origin      => {%args},
         created     => time(),
         hitime      => gettimeofday() * 1,
-        revision    => q/$Revision: 270 $/,
+        revision    => q/$Revision: 272 $/,
         options     => $options,
         plugins     => {},
 

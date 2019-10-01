@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -32,7 +32,6 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::AutoMetaResources" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::CPANFile" : "0",
@@ -46,6 +45,7 @@
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
@@ -97,7 +97,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Hash::Wrap" : "0.08",
+            "Hash::Wrap" : "0.10",
             "PDL" : "0",
             "PDL::Image2D" : "0",
             "PDL::Lite" : "0",
@@ -114,6 +114,7 @@
             "Types::Common::Numeric" : "0",
             "Types::PDL" : "0",
             "Types::Standard" : "0",
+            "constant" : "0",
             "custom::failures" : "0",
             "feature" : "0",
             "latest" : "0",
@@ -147,30 +148,29 @@
    "provides" : {
       "PDL::Algorithm::Center" : {
          "file" : "lib/PDL/Algorithm/Center.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "PDL::Algorithm::Center::Failure" : {
          "file" : "lib/PDL/Algorithm/Center/Failure.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "PDL::Algorithm::Center::Types" : {
          "file" : "lib/PDL/Algorithm/Center/Types.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-PDL-Algorithm-Center@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Algorithm-Center"
       },
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/djerius/pdl-algorithm-center.git",
-         "web" : "https://github.com/djerius/pdl-algorithm-center"
+         "url" : "https://gitlab.com/djerius/pdl-algorithm-center.git",
+         "web" : "https://gitlab.com/djerius/pdl-algorithm-center"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.10",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

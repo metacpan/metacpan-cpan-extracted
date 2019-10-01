@@ -4,21 +4,22 @@ use warnings;
 
 # PODNAME: dest
 # ABSTRACT: Deployment State Manager
-our $VERSION = '1.22'; # VERSION
+our $VERSION = '1.23'; # VERSION
 
 use Pod::Usage 'pod2usage';
 use App::Dest;
 
 my @commands = qw(
-    init add rm watches putwatch writewatch
-    make expand list status diff clean preinstall
+    init add rm
+    watches putwatch writewatch
+    make expand list prereqs
+    status diff clean preinstall
     deploy redeploy revdeploy verify revert update
     man version
 );
 
 my ( $command, @args ) = @ARGV;
-$command = lc( $command || 'undef' );
-
+( $command = lc( $command || 'undef' ) ) =~ s/^\-+//;
 my @command = grep { index( $_, $command ) == 0 } @commands;
 ($command) = @command;
 
@@ -34,11 +35,6 @@ sub usage {
 usage(1) if ( not @command or @command > 1 );
 usage(2) if ( $command eq 'man' );
 
-if ( $command eq 'version' ) {
-    print $App::Dest::VERSION || 0, "\n";
-    exit;
-}
-
 exit App::Dest->$command(@args);
 
 __END__
@@ -53,7 +49,7 @@ dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 AUTHOR
 

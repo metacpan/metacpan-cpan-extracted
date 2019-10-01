@@ -10,20 +10,21 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                       => 'error',
-            authentication                 => 'Demo',
-            userDB                         => 'Same',
-            loginHistoryEnabled            => 0,
-            brutForceProtection            => 0,
-            portalMainLogo                 => 'common/logos/logo_llng_old.png',
-            checkUser                      => 1,
-            requireToken                   => 0,
-            checkUserIdRule                => '$uid ne "msmith"',
+            logLevel                  => 'error',
+            authentication            => 'Demo',
+            userDB                    => 'Same',
+            loginHistoryEnabled       => 0,
+            brutForceProtection       => 0,
+            checkUser                 => 1,
+            requireToken              => 0,
+            checkUserIdRule           => '$uid ne "msmith"',
+            checkUserSearchAttributes => 'employee_nbr  test1 _user test2 mail',
             checkUserDisplayPersistentInfo => 1,
             checkUserDisplayEmptyValues    => 1,
             totp2fSelfRegistration         => 1,
             totp2fActivation               => 1,
             totp2fDigits                   => 6,
+            impersonationRule              => 1,
 
             #hiddenAttributes               => 'test',
         }
@@ -197,7 +198,7 @@ ok(
 );
 count(3);
 
-my ( $host, $url, $query ) =
+( $host, $url, $query ) =
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
 ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
   or explain( $res->[2]->[0], 'trspan="checkUser"' );
@@ -239,8 +240,40 @@ ok( $res->[2]->[0] =~ m%<td scope="row">dwho</td>%, 'Found dwho' )
   or explain( $res->[2]->[0], 'Macro Value dwho' );
 count(3);
 
+# Request with mail
+$query =~ s/user=dwho/user=dwho%40badwolf.org/;
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST checkuser'
+);
+count(1);
+
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url' );
+ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
+  or explain( $res->[2]->[0], 'trspan="checkUser"' );
+ok( $res->[2]->[0] =~ m%value="dwho\@badwolf.org" trplaceholder="user"%, 'Found trplaceholder with mail' )
+  or explain( $res->[2]->[0], 'trplaceholder with mail' );
+count(3);
+ok( $res->[2]->[0] =~ m%Auth-User: %, 'Found Auth-User' )
+  or explain( $res->[2]->[0], 'Header Key: Auth-User' );
+ok( $res->[2]->[0] =~ m%: dwho<br/>%, 'Found dwho' )
+  or explain( $res->[2]->[0], 'Header Value: dwho' );
+ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
+    'Found _whatToTrace' )
+  or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
+ok( $res->[2]->[0] =~ m%<td scope="row">dwho</td>%, 'Found dwho' )
+  or explain( $res->[2]->[0], 'Macro Value dwho' );
+count(3);
+
 # Request with bad VH
-$query =~ s/user=dwho/user=rtyler/;
+$query =~ s/user=dwho%40badwolf.org/user=rtyler/;
 $query =~
   s/url=http%3A%2F%2Ftest1.example.com/url=http%3A%2F%2Ftry.example.com/;
 ok(
@@ -338,7 +371,8 @@ ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
 count(11);
 
 my @c = ( $res->[2]->[0] =~ /<td scope="row">rtyler<\/td>/gs );
-ok( @c == 3, ' -> Three entries found' );
+ok( @c == 6, ' -> Six entries found' )
+  or explain( $res->[2]->[0] );
 count(1);
 
 # Request with short VH url & user
@@ -456,4 +490,53 @@ count(2);
 $client->logout($id);
 clean_sessions();
 
+## Try to authenticate
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=dwho'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    'Auth query'
+);
+count(1);
+
+$id = expectCookie($res);
+expectRedirection( $res, 'http://auth.example.com/' );
+
+# CheckUser form -> granted
+# ------------------------
+ok(
+    $res = $client->_get(
+        '/checkuser',
+        cookie => "lemonldap=$id",
+        accept => 'text/html'
+    ),
+    'CheckUser form',
+);
+
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url' );
+
+# Request a user without SSO session
+$query =~ s/user=dwho/user=rtyler/;
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST checkuser'
+);
+ok( $res->[2]->[0] =~ m%<td scope="row">uid</td>%, 'Found uid' )
+  or explain( $res->[2]->[0], 'Attribute Value uid' );
+ok( $res->[2]->[0] =~ m%<td scope="row">real_uid</td>%, 'Found real_uid' )
+  or explain( $res->[2]->[0], 'Attribute Value real_uid' );
+count(4);
+
+$client->logout($id);
+clean_sessions();
 done_testing( count() );

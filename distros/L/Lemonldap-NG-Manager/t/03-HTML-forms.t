@@ -62,7 +62,7 @@ done_testing($count);
 
 sub getTypes {
     my @trees = @_;
-    my $res = { 'text' => 1 };
+    my $res   = { 'text' => 1 };
     foreach my $t (@trees) {
         if ( ref($t) eq 'HASH' ) {
             foreach my $a ( values %$t ) {

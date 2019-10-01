@@ -1,7 +1,5 @@
-use Test::More tests => 18;
+use Test2::Bundle::More;
 use strict;
-
-BEGIN { use_ok('Audio::Nama::Assign') };
 
 use Audio::Nama::Assign qw(:all);
 use Audio::Nama::Log;
@@ -34,7 +32,6 @@ for my $c (@test_classes) {
 		#print json_out(\%dict); 
 		#print json_out($struct);
 		my $serialized = serialize( class => $c, vars => \@var_list);  
-		# store_vars output as string
 
 	my $expected = <<WANT;
 {
@@ -72,5 +69,5 @@ WANT
 	is( scalar %dict, 0, "Null hash assignment");
 	
 
-1;
+done_testing();
 __END__

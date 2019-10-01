@@ -53,14 +53,12 @@
       },
       "test" : {
          "requires" : {
-            "Cwd" : "0",
-            "Exporter" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
-            "lib" : "0",
+            "Test::Output" : "0",
             "perl" : "5.016_003"
          }
       }
@@ -77,7 +75,7 @@
          "web" : "https://github.com/gryphonshafer/dest"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

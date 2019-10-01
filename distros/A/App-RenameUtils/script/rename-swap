@@ -48,7 +48,7 @@ rename-swap - Swap filenames
 
 =head1 VERSION
 
-This document describes version 0.001 of rename-swap (from Perl distribution App-RenameUtils), released on 2019-01-15.
+This document describes version 0.002 of rename-swap (from Perl distribution App-RenameUtils), released on 2019-07-23.
 
 =head1 SYNOPSIS
 

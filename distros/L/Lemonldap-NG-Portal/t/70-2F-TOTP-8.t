@@ -3,7 +3,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 18;
+my $maintests = 27;
 
 SKIP: {
     eval { require Convert::Base32 };
@@ -23,6 +23,8 @@ SKIP: {
                 totp2fActivation       => 1,
                 totp2fDigits           => 8,
                 totp2fTTL              => -1,
+                formTimeout            => 2,
+                requireToken           => 1,
             }
         }
     );
@@ -30,15 +32,23 @@ SKIP: {
 
     # Try to authenticate
     # -------------------
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    my ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password', 'token' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
     ok(
         $res = $client->_post(
             '/',
-            IO::String->new('user=dwho&password=dwho'),
-            length => 23
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
         ),
         'Auth query'
     );
     my $id = expectCookie($res);
+    expectRedirection( $res, 'http://auth.example.com/' );
 
     # TOTP form
     ok(
@@ -99,16 +109,23 @@ SKIP: {
 
     # Try to sign-in
     $client->logout($id);
+
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password', 'token' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
     ok(
         $res = $client->_post(
             '/',
-            IO::String->new('user=dwho&password=dwho'),
-            length => 23,
+            IO::String->new($query),
+            length => length($query),
             accept => 'text/html',
         ),
         'Auth query'
     );
-    my ( $host, $url, $query ) =
+    ( $host, $url, $query ) =
       expectForm( $res, undef, '/totp2fcheck', 'token' );
 
     # Generate TOTP with LLNG
@@ -132,6 +149,65 @@ SKIP: {
     );
     $id = expectCookie($res);
     $client->logout($id);
+
+    # Try to sign-in with an expired OTT
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password', 'token' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/totp2fcheck', 'token' );
+
+    # Generate TOTP with LLNG
+    ok( $totp = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 8 ),
+        'LLNG Code' );
+    $query =~ s/code=/code=$code/;
+
+    diag 'Waiting';
+    sleep 3;
+
+    ok(
+        $res = $client->_post(
+            '/totp2fcheck', IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Post code'
+    );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password', 'token' );
+    ok( $res->[2]->[0] =~ /<span trmsg="82"><\/span>/, 'Token expired' )
+      or print STDERR Dumper( $res->[2]->[0] );
+
+    # Try to sign-in
+    ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu', );
+    ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password', 'token' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/totp2fcheck', 'token' );
 }
 count($maintests);
 

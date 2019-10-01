@@ -1,0 +1,793 @@
+#!/bin/env perl
+use strict;
+#use Term::Pager;
+use Term::ReadKey;
+
+my $t = Term::Pager->new();
+
+my($PIPE, @F);
+if( -t STDIN ){
+  @F = <ARGV> }
+else{
+  #Separate piped input from keyboard input
+  open($PIPE, '<&=STDIN' ) or die $!;
+  close(STDIN);
+  open(STDIN, '<', '/dev/tty') or die $!;
+}
+
+eval{
+  while( $t->more(RT=>.05) ){
+    my $X;
+    defined($PIPE) ?
+	do{ $t->add_text($X) if sysread($PIPE, $X, 1024) } :
+	$t->add_text( splice(@F, 0, $t->{L}) );
+  }
+};
+
+package Term::Pager;
+my $foo = \&less; $foo = \&page;
+
+# -*- perl -*-
+
+# Copyright (c) 2004 by Jeff Weisberg
+# Authors: Jeff Weisberg <jaw @ tcp4me.com>, Jerrad Pierce <jpierce@cpan.org>
+# Created: 2004-Jun-03 10:24 (EDT)
+# Function: pager like more/less
+#
+# $Id: Pager.pm,v 1.5 2019/09/06 $
+
+=pod
+
+This is a shim to get the features of a modernized Term::Pager into IO::Pager,
+providing a self-contained executable pure perl pager. It will die if
+Term::Pager is ever updated, or the shim can be reworked into a forking branch
+of IO::Pager::Perl; early attempts of which are in __DATA__ of that module.
+
+=head1 NAME
+
+Term::Pager - Page through text, a screenful at a time, like more or less
+
+=head1 SYNOPSIS
+
+    use Term:ReadKey; #Optional, but recommended
+    use Term::Pager;
+
+    my $t = Term::Pager->new( rows => 25, cols => 80 );
+    $t->add_text( $text );
+    $t->more();
+
+=head1 DESCRIPTION
+
+This is a module for paging through text one screenful at a time.
+It supports the features you expect, including backwards movement
+and searching. It uses the keys you expect.
+
+=head1 USAGE
+
+=head2 Create the Pager
+
+    $t = Term::Pager->new( option => value, ... );
+
+If no options are specified, sensible default values will be used.
+The following options are recognized:
+
+=over 4
+
+=item I<rows>
+
+The number of rows on your terminal.  The terminal is queried directly
+with Term::ReadKey if loaded or C<stty>, and if these fail it defaults to 25.
+
+=item I<cols>
+
+The number of columns on your terminal. The terminal is queried directly
+with Term::ReadKey if loaded or C<stty>, and if these fail it defaults to 80.
+
+=item I<speed>
+
+The speed (baud rate) of your terminal. The terminal is queried directly
+with Term::ReadKey if loaded or C<stty>, and if these fail it defaults to a
+sensible value.
+
+=back
+
+=head2 Adding Text
+
+You will need some text to page through. You can specify text as
+as a parameter to the constructor:
+
+    text => $text
+
+Or add text later:
+
+    $t->add_text( $text );
+
+To continuously add text to the pager, you must setup your own event loop,
+and indicate to C<more> that it should relinquish control e.g;
+
+    eval{
+        while( $t->more(RT=>.05) ){
+          ...
+          $t->add_text("More text to page");
+        }
+    };
+
+The eval block captures the exception thrown upon termination of the pager
+so that your own program may continue. The I<RT> parameter indicates that
+you wish to provide content in real time. This value is also passed to
+L<Term::ReadKey/ReadKey> as the maximum blocking time per keypress and
+should be between 0 and 1, with larger values trading greater interface
+responsiveness for slight delays in output. A value of -1 may also be used
+to request non-blocking polls, but likely will not behave as you would hope.
+
+NOTE: If Term::ReadKey is not loaded but RT is true, screen updates will only
+occur on keypress.
+
+=head2 Adding Functionality and Internationalization (I18N)
+
+It is possible to extend the features of Term::Pager by supplying the add_func
+method with a hash of character keys and callback values to be invoked upon
+matching keypress; where \c? represents Control-? and \e? represents Alt-?
+The existing pairings are:
+
+	"\n"=> \&downline, #also "\e[B"
+	' ' => \&downpage, #also "\cv"
+	'd' => \&downhalf,
+	'q' => \&done,
+	'b' => \&uppage,   #also "\ev"
+	'y' => \&upline,   #also "\e[A"
+	'u' => \&uphalf,
+	'r' => \&refresh,  #also "\cl"
+	'h' => \&help,
+	'g' => \&to_top,   #also '<'
+	'G' => \&to_bott,  #also '>'
+	'/' => \&search,
+	'?' => \&hcraes,   #reverse search
+	'n' => \&next_match,#also 'P'
+	'p' => \&prev_match,#also 'N'
+	"\e[D" => \&move_left,
+	"\e[C" => \&move_right,
+
+And a special sequence of a number followed by enter analogous to:
+
+	'/(\d+)/'   => \&jump(\1)        
+
+if the value for that key is true.
+
+The C<dialog> method may be particularly useful when enhancing the pager.
+It accepts a string to display, and an optional timeout to sleep for
+before the dialog is cleared. If the timeout is missing or 0, the dialog
+remains until a key is pressed.
+
+    my $t = Term::Pager->new();
+    $t->add_text("Text to display");
+    $t->add_func('!'=>\&boo);
+    $t->more();
+
+    sub boo{ my $self = shift; $self->dialog("BOO!", 1); }
+
+Should you add additional functionality to your pager, you will likely want
+to change the contents of the help dialog or possibly the status line. Use the
+C<I18N> method to replace the default text or save text for your own interface.
+
+    #Get the default help text
+    my $help = $t->I18N('help');
+
+    #Minimal status line
+    $t->I18N('status', "<h> help");
+
+Current text elements available for customization are:
+
+    404    - search text not found dialog
+    status - displayed at the bottom of the screen
+    top    - status line start of file indicator
+    bottom - status line end of file indicator
+    help   - help dialog text, a list of keys and their functions
+
+=cut
+
+
+package Term::Pager;
+our $VERSION = '1.50';
+
+use Term::Cap;
+use strict;
+use warnings;
+
+#Signal handling, only needs to be set once, and does not have access to object
+my($SP, $RT) = $|;
+local $SIG{INT} = local $SIG{QUIT} = \&done; 
+
+
+#Stubs for ReadKey functions that we fill in with code refs if it's not loaded
+sub ReadMode;
+sub ReadKey;
+
+sub new {
+    my $class = shift;
+    my %param = @_;
+    local $ENV{TERM} = $ENV{TERM};
+    
+    my %dims = (cols => 80, rows => 25);
+    if( defined($Term::ReadKey::VERSION) ){
+	Term::ReadKey->import();
+	local $SIG{__WARN__} = sub{};
+	my @Tsize = Term::ReadKey::GetTerminalSize(*STDOUT);
+	@dims{'rows','cols'} = @Tsize[1,0];
+	$param{speed} ||= (Term::ReadKey::GetSpeed())[1];
+    }
+    else{
+	*ReadMode = sub{
+	    if( $_[0] == 3 ){
+		system('stty -icanon -echo min 1'); }
+	    elsif( $_[0] == 0 ){
+		system('stty icanon echo'); }
+	};
+	*ReadKey = sub{ getc() };
+
+	#Can we get better defaults?
+	if( `stty` =~ /speed/ ){
+	    #XXX tput rows cols
+	    @dims{'rows','cols'} = ($1,$2) if `stty size` =~ /^(\d+)\s+(\d+)$/;
+	    $param{speed} = $1 if `stty speed` =~ /^(\d+)$/;
+	}
+	else{
+	    $dims{rows} = `tput lines` || $dims{rows};
+	    $dims{cols} = `tput cols` || $dims{cols};
+	}
+    }
+
+    #screen is vt100 compatible but does not list sf?!
+    #No matter, it's only used for workaround mode.
+    if( $ENV{TERM} eq 'screen' && $ENV{TERMCAP} !~ /sf/ ){
+	$ENV{TERM} = 'vt100';
+    }
+
+#cm=>cup, ce=>el, cl=>clear, sf=>ind, sr=>ri
+#md=>bold, me=>sgr0, mr=>rev, us=>smul
+
+    #Speed is mostly useless except Term::Cap expects it?
+    my $t = Term::Cap->Tgetent({ OSPEED => ($param{speed} || 38400) });
+    eval{
+	$t->Trequire(qw/cm ce cl sf sr/);
+    };
+    my $dumbp = $@ ? 1 : 0;
+
+
+    my $me = bless {
+	# default values
+	term  => $t,
+	dumbp => $dumbp,
+	%dims,
+	start => 0,
+	end => 0,
+	left => 0,
+	search => '',
+
+	# if the termcap entries don't exist, nothing bad will happen
+	HI    => $t->Tputs('md') . $t->Tputs('us'),	# search hilight
+	SE    => $t->Tputs('md') . $t->Tputs('us'),	# search entry
+	MN    => $t->Tputs('md') . $t->Tputs('mr'),	# popup menus
+	ML    => $t->Tputs('mr'),			# mode line
+	NO    => $t->Tputs('me'),			# normal
+
+	# user supplied values override
+	%param,
+    }, $class;
+
+    $me->{_txt}={
+		 msg=>'',
+		 404=>'Not Found',
+		 top=>'Top',
+		 bottom=>'Bottom',
+		 status => "<space>=down <b>=back <h>=help <q>=quit",
+		 help => <<EOH
+ q         quit                    h      help
+ r C-l     refresh
+ /         search                  ?      search backwards
+ n P       next match              p N    previous match
+ space C-v page down               b M-v  page up
+ enter     line down               y      line up
+ d         half page down          u      half page up
+ g <       goto top                G >    goto bottom
+   <-      scroll left              ->    scroll right
+
+ Enter a line number followed by Enter to jump to that line
+
+           press any key to continue
+EOH
+};
+    $me->{_fnc} = {
+	'q' => \&done,		'h' => \&help,
+	'/' => \&search,	'?' => \&hcraes,
+	'n' => \&next_match,	'P' => \&prev_match,
+	'p' => \&prev_match,	'N' => \&prev_match,
+	'r' => \&refresh,	"\cl" => \&refresh,
+	"\n"=> \&downline,	"\e[B" => \&downline,
+	'd' => \&downhalf,	' ' => \&downpage,	"\cv" => \&downpage,
+	'y' => \&upline,	"\e[A" => \&upline,
+	'u' => \&uphalf,	'b' => \&uppage,	"\ev" => \&uppage,
+	'<' => \&to_top,	'>' => \&to_bott,	'$' => \&to_bott,
+	"\e[D" => \&move_left,	"\e[C" => \&move_right,	
+	'/(\d+)/'=>1 #jump to line
+    };
+
+    $me->{end} = ($me->{L} = $me->{rows} - 1) - 1;
+
+    $me;
+}
+
+sub add_text {
+    return unless defined($_[1]);
+    my $me = shift;
+
+    #Stringify
+    local $_ = join('', @_);
+
+    #Terminated?
+    my $LF = do{ chomp(local $_=$_) };
+
+    #Split on new lines, preserving internal blanks
+    my @F = split(/\n/, $_, -1);
+
+    #Remove the extra record from the trailing new line
+    pop @F if $LF;
+
+    #Handle partial lines in case sysread is used further up the stack
+    push(@F, undef) unless $LF;
+    if( $me->{nl} && !defined($me->{l}->[-1]) ){
+        pop @{$me->{l}};
+        $me->{l}->[-1] .= shift @F;
+    }
+
+    push @{$me->{l}}, @F;
+    $me->{nl} = @{ $me->{l} };
+    $me->refresh();
+}
+
+sub add_func {
+    my $me = shift;
+    my %param = @_;
+    while( my($k, $v) = each %param ){
+      $me->{_fnc}{$k} = $v;
+    }
+}
+
+sub I18N {
+  my($me, $msg, $text) = @_;
+  $me->{_txt}{$msg} = $text if defined($text);
+  $me->{_txt}{$msg};
+}
+
+sub more {
+    my $me = shift;
+    my %param = @_;
+    $RT = $me->{RT} = $param{RT};
+    my $t = $me->{term};
+
+    ReadMode 3; #cbreak
+    $| = 1;
+
+    if( $me->{dumbp} ){
+	$me->dumb_mode();
+    }else{
+	print $me->{NO};
+	if( defined($me->{text}) ){
+	    $me->add_text( $me->{text} );
+	    undef( $me->{text} );
+	}
+
+
+	while( 1 ){
+	    $me->prompt();				# status line
+
+	    my $exit;
+	    my $q = ReadKey($param{RT});
+	    # Catch arrow keys. NOTE: Escape would enter this too
+	    #...requiring an extra input if no ReadKey
+	    if( defined($q) and ord($q) == 27 ){
+	      # and defined($Term::ReadKey::VERSION) ){
+		$q.=ReadKey(0);
+		$q.=ReadKey(0) if $q eq "\e[";
+	    }
+	    if( defined($q) and $q =~ /\d/ and $me->{_fnc}->{'/(\d+)/'} ){
+		$me->{_txt}{msg} = $q;
+		$me->prompt();
+		while( defined($_ = ReadKey(0)) ){
+		    last unless /\d/;
+		    $q .= $_;
+		    $me->{_txt}{msg} = $q;
+		    $me->prompt();
+		}
+		#Commit on enter, anything else aborts
+		if( $_ eq "\n" ){
+		    $q<$me->{nl} ? $me->jump($q) : $me->to_bott();
+		}
+	        $me->{_txt}{msg} = '';
+		next;
+	    }
+
+	    if( defined $q ){
+		my $f = $me->{_fnc}->{$q} || \&beep;
+#	        $me->{_txt}{msg} = $q; #input debugging
+		$exit = ref($f->($me));
+	    }
+
+	    return 1 if $param{RT} or $exit;
+	}
+    }
+    $me->done();
+}
+
+*less = \&more;
+*page = \&more;
+
+sub beep { print "\a"; #$_[0]->{term}->Tputs('vb')
+         }
+
+# display a prompt, etc
+sub prompt {
+    my $me = shift;
+    $me->{nl} ||= 0;
+
+    my $pct = $me->{nl} > $me->{end} ? $me->{end}/($me->{nl}-1) : 1;
+    my $pos = $me->{start} ?
+		($pct==1 ? $me->{_txt}{bottom} : 'L'.$me->{start}) :
+		$me->{_txt}{top};
+    my $p = sprintf "[tp] %d%% %s %s", 100*$pct, $pos, $me->{_txt}{msg};
+    $p .= ' ' x ( $me->{cols} - 3 - length($p) - length($me->{_txt}{status}) );
+
+    print $me->{term}->Tgoto('cm', 0, $me->{L});	# bottom left
+    print $me->{term}->Tputs('ce');			# clear line
+    print $me->{ML};					# reverse video
+    print $p,"  ",$me->{_txt}{status};			# status line
+    print $me->{NO};					# normal video
+}
+
+sub done {
+    ReadMode 0;
+    print "\n";
+    $| = $SP || 0;
+    #Did we exit via signal or prompt?
+    $RT ? die : return \"foo";
+}
+
+# provide help to user
+sub help {
+    my $me = shift;
+    $me->dialog( $me->{_txt}{help} );
+}
+
+sub dialog {
+    my($me, $msg, $timeout) = @_;
+    $msg = defined($msg) ? $msg : '';
+    $timeout = defined($timeout) ? $timeout : 0;
+    $me->disp_menu( $me->box_text($msg) );
+    $timeout ? sleep($timeout) : getc();
+    $me->remove_menu();
+}
+
+# put a box around some text
+sub box_text {
+    my $me  = shift;
+    my $txt = shift;
+    my $l = 0;
+
+    my @l = split /\n/, $txt;
+    #Get max width
+    foreach (@l){ $l = length($_) if length($_) > $l };
+    my $b = '+' . '=' x ($l + 2) . '+';
+    my $o = join('', map { "| $_" . (' 'x($l-length($_))) ." |\n" } @l);
+
+    "$b\n$o$b\n";
+}
+
+# display a popup menu (or other text)
+sub disp_menu {
+    my $me = shift;
+    my $menu = shift;
+    my $t = $me->{term};
+
+    my $nl = @{[split /\n/, $menu]};
+    $me->{menu_nl} = $nl;
+
+    print $t->Tgoto('cm', 0, $me->{L} - $nl);		# move
+    print $me->{MN};					# set color
+
+    my $x = $t->Tgoto('RI', 0,4);			# 4 transparent spaces
+    $menu =~ s/^\s*/$x/gm;
+    print $menu;
+    print $me->{NO};					# normal color
+}
+
+# remove popup and repaint
+sub remove_menu {
+    my $me = shift;
+    my $t  = $me->{term};
+
+    my $s = $me->{end} - $me->{menu_nl} + 1;
+    foreach my $n ($s .. $me->{end}){
+	print $t->Tgoto('cm', 0, $n - $me->{start});	# move
+	print $t->Tputs('ce');				# clear
+	$me->line($n);
+    }
+}
+
+# refresh screen
+sub refresh {
+    my $me = shift;
+    my $t  = $me->{term};
+
+    print $t->Tputs('cl');				# home, clear
+    for my $n ($me->{start} .. $me->{end}){
+	print $t->Tgoto('cm', 0, $n - $me->{start});	# move
+	print $t->Tputs('ce');				# clear line
+	$me->line($n);
+    }
+}
+
+sub prline {
+    my $me = shift;
+    my $line = shift||'';
+
+    my $len = length($line);
+    $line = substr($line, $me->{left}, $me->{cols});
+    if( $len - $me->{left} > $me->{cols} ){
+	substr($line, -1, 1, "\$");
+    }
+
+    if( $me->{search} ne '' ){
+	my $s = $me->{HI};
+	my $e = $me->{NO};
+	$line =~ s/($me->{search})/$s$1$e/g;
+    }
+    print $line;
+}
+
+sub line {
+    my $me = shift;
+    my $n  = shift;
+
+    $me->prline( $me->{l}[$n] );
+}
+
+sub down_lines {
+    my $me = shift;
+    my $n  = shift;
+    my $t  = $me->{term};
+
+    for (1 .. $n){
+	if( $me->{end} >= $me->{nl}-1 ){
+	    &beep;
+	    last;
+	}else{
+            # why? because some terminals have bugs...
+            print $t->Tgoto('cm', 0, $me->{L} );	# move
+            print $t->Tputs('sf');			# scroll
+            print $t->Tgoto('cm', 0, $me->{L} - 1);	# move
+            print $t->Tputs('ce');			# clear line
+
+	    $me->line( ++$me->{end} );
+	    $me->{start} ++;
+	}
+    }
+}
+
+sub downhalf {
+    my $me = shift;
+    $me->down_lines( $me->{L} / 2 );
+}
+
+sub downpage {
+    my $me = shift;
+    $me->down_lines( $me->{L} );
+}
+
+sub downline {
+    my $me = shift;
+    $me->down_lines( 1 );
+}
+
+sub up_lines {
+    my $me = shift;
+    my $n  = shift;
+    my $t  = $me->{term};
+
+    for (1 .. $n){
+	if( $me->{start} <= 0 ){
+	    &beep;
+	    last;
+	}else{
+	    print $t->Tgoto('cm',0,0);			# move
+	    print $t->Tputs('sr');			# scroll back
+	    $me->line( --$me->{start} );
+	    $me->{end} --;
+	}
+    }
+
+    print $t->Tgoto('cm',0,$me->{L});		# goto bottom
+}
+
+sub uppage {
+    my $me = shift;
+    $me->up_lines( $me->{L} );
+}
+
+sub upline {
+    my $me = shift;
+    $me->up_lines( 1 );
+}
+
+sub uphalf {
+    my $me = shift;
+    $me->up_lines( $me->{L} / 2 );
+}
+
+sub to_top {
+    $_[0]->jump(0);
+}
+
+sub to_bott {
+    my $me = shift;
+    $me->jump( $me->{L}>$me->{nl} ? 0 : $me->{nl}-$me->{L} );
+}
+
+sub jump {
+    my $me = shift;
+
+    $me->{start} = shift;
+    $me->{end}   = $me->{start} + $me->{L} - 1;
+    $me->refresh();
+}
+
+sub move_right {
+    my $me = shift;
+
+    $me->{left} += 8;
+    $me->refresh();
+}
+
+sub move_left {
+    my $me = shift;
+
+    $me->{left} -= 8;
+    $me->{left} = 0 if $me->{left} < 0;
+    $me->refresh();
+}
+
+sub hcraes{
+    $_[0]->search(1);
+}
+
+sub search {
+    my $me = shift;
+    my $t  = $me->{term};
+    $me->{hcraes} = shift || 0;
+
+    # get pattern
+    (my($prev), $me->{search}) = ($me->{search}, '');
+
+    print $t->Tgoto('cm', 0, $me->{L});			# move bottom
+    print $t->Tputs('ce');				# clear line
+    print $me->{SE};					# set color
+    print $me->{hcraes} ? '?' : '/';
+
+    while(1){
+	my $l = ReadKey();
+	last if $l eq "\n" || $l eq "\r";
+	if( $l eq "\e" || !defined($l) ){
+	    $me->{search} = '';
+	    last;
+	}
+	if( $l eq "\b" || $l eq "\177" ){ #Why not octothorpe? || $l eq '#' ){
+	    print "\b \b" if $me->{search} ne '';
+	    substr($me->{search}, -1, 1, '');
+	    next;
+	}
+	print $l;
+	$me->{search} .= $l;
+    }
+    print $me->{NO};					# normal color
+    print $t->Tgoto('cm', 0, $me->{L});			# move bottom
+    print $t->Tputs('ce');				# clear line
+    return if $me->{search} eq '';
+
+    $me->{search} = '(?i)'.$me->{search} unless
+	$me->{search} ne lc($me->{search});
+
+    $me->{search} = $prev if $me->{search} eq '/' && $prev;
+
+    for my $n ( $me->{start} .. $me->{nl}-1 ){
+	next unless $me->{l}[$n] =~ /$me->{search}/i;
+
+	$me->{start} = $n;
+	$me->{start} = 0 if $me->{nl} < $me->{L} - 1;
+	$me->{end}   = $me->{start} + $me->{L} - 1;
+
+	if( $me->{end} > $me->{nl} - 1 && $me->{start} ){
+	    my $x = $me->{end} - $me->{nl} + 1;
+	    $x = $me->{start} if $x > $me->{start};
+	    $me->{start} -= $x;
+	    $me->{end}   -= $x;
+	}
+
+	$me->refresh();
+	return;
+    }
+    # not found
+    &beep;
+    $me->dialog($me->{_txt}{404}, 1);
+
+    return;
+}
+
+sub prev_match{
+    $_[0]->next_match('anti');
+}
+
+sub next_match{
+    my $me = shift;
+    return unless defined($me->{nl}) and defined($me->{search});
+
+    my $mode=shift;
+    if( defined($mode) and $mode ='anti' ){
+      $mode = not $me->{hcraes};
+    }
+    else{
+      $mode = $me->{hcraes};
+    }
+
+    my $i = $mode ? ($me->{start}||0)-1 : ($me->{start})+1;
+    my $matched=0;
+    for( ;
+	 $mode ? $i>0 : $i< $me->{nl};
+	 $mode ? $i-- : $i++ ){
+      $matched = $me->{l}[$i] =~ /$me->{search}/;
+      last if $matched;
+    }
+    $matched ? $me->jump($i) : &beep;
+}
+
+sub dumb_mode {
+    my $me = shift;
+    my $end = 0;
+
+    while(1){
+	for my $i (1 .. $me->{rows} - 1){
+	    last if $end >= $me->{nl};
+	    print $me->{l}[$end++], "\n";
+	}
+
+	print "--more [dumb]-- <q> quit";
+	my $a = getc();
+	print "\b \b"x15;
+
+	return if $a eq 'q';
+	return if $end >= $me->{nl};
+    }
+}
+
+
+=head1 CAVEATS
+
+This module uses Termcap, which has been deprecated the Open Group,
+and may not be supported by your operating system for much longer.
+
+If the termcap entry for your ancient esoteric terminal is wrong or
+incomplete, this module may either fill your screen with unintelligible
+gibberish, or drop back to a feature-free mode.
+
+=head1 SEE ALSO
+
+    Term::Cap, Term::ReadKey, termcap(5), stty(1), more(1), less(1)
+    Yellowstone National Park
+
+=head1 AUTHORS
+
+    Jeff Weisberg - http://www.tcp4me.com
+
+    Jerrad Pierce
+
+=cut
+
+1;

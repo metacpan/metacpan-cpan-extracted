@@ -65,6 +65,7 @@ sub read_config {
 	my $yml = $config_file // get_data_section("default_namarc");
 	strip_all( $yml );
 	my %cfg = %{  yaml_in($yml) };
+	logpkg(__FILE__,__LINE__,'debug', "config file:", Dumper \%cfg);
 	*subst = \%{$cfg{abbreviations}}; # alias
 	walk_tree(\%cfg);
 	walk_tree(\%cfg); # second pass completes substitutions
@@ -189,7 +190,6 @@ PROJECT_ROOT
 		$config->{root_dir} = $default_project_root; 
 		# needed for $file->user_customization() to resolve in next line
 		write_file($file->user_customization(), get_data_section('custom_pl'));
-		
 	} else {
 		print <<OTHER;
 Please make sure to set the project_root directory in
@@ -206,6 +206,5 @@ OTHER
 	exit;	
 	}
 }
-
 1;
 __END__

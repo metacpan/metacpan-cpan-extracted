@@ -16,7 +16,9 @@ t/00-report-prereqs.t
 t/backend.t
 t/share/site/about/index.markdown
 t/share/site/index.markdown
+t/share/site/not-a-draft.markdown
 t/share/site/public/style.css
+t/share/site/templates/is-draft.html.ep
 t/share/site/templates/layouts/default.html.ep
 t/share/site/templates/page.html.ep
 t/site.t

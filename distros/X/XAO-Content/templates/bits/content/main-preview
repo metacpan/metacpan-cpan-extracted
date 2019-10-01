@@ -1,0 +1,9 @@
+<%Page path="/bits/content/set-preview-cookie"%>
+
+Preview mode has been turned on. Feel free to browse the site and review
+all your changes as they would look once you publish them.
+<P>
+
+<STRONG>Note:</STRONG> The changes are not visible to
+normal site visitors.
+<P>

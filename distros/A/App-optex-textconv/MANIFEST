@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/App/optex/textconv.pm
 lib/App/optex/textconv/Converter.pm
+lib/App/optex/textconv/Zip.pm
 lib/App/optex/textconv/default.pm
 lib/App/optex/textconv/msdoc.pm
 lib/App/optex/textconv/pdf.pm

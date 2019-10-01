@@ -15,24 +15,17 @@ use MooX::StrictConstructor;
 
 my $cli = 0;
 
-=pod
-has debug => (
-    is => 'rw',
-    default => 0,
-);
-=cut
-
 has custom_opt => ( is => 'ro', );
 
 has internal_attr => (
-    is => 'rw',
-
-    #init_arg => undef,
+    is       => 'rw',
+    init_arg => undef,
 );
 
 has cli => (
-    is      => 'lazy',
-    default => sub { return $cli; },
+    is       => 'lazy',
+    init_arg => undef,
+    default  => sub { return $cli; },
 );
 
 # all attributes and package variable MUST be declared before this!
@@ -50,6 +43,8 @@ do {
     exit $app->run;
 } unless caller();
 
+# executable code like this should not be used in actual scripts, this
+# is only here to provide data for the tests.
 print "command line flag not set\n" if !$cli;
 print "exit was not called\n";
 
@@ -58,14 +53,16 @@ print "exit was not called\n";
 sub BUILD {
     my $self = shift;
 
-    print "cli: $cli\n" if $self->verbose;
+    # this will trigger the lazy default
+    print "running from command line\n" if $self->cli && $self->verbose;
+
+    return;
 }
 
 sub run {
     my $self = shift;
 
-    print "running from command line\n" if $self->cli;
-    print 'custom_opt: ' . $self->custom_opt . "\n" if $self->custom_opt;
+    printf( "custom_opt: %s\n", $self->custom_opt ) if $self->custom_opt;
 
     print Dumper($self) if $self->debug;
 
@@ -79,11 +76,11 @@ __END__
 
 =head1 NAME
  
-moodulino - eample showing how to use MooX::Role::CliOptions
+moodulino.pl - eample showing how to use MooX::Role::CliOptions
  
 =head1 SYNOPSIS
  
-moodulino [options]
+moodulino.pl [options]
  
  Options:
    --debug    add diagnostic messages and/or disable database writes
@@ -110,6 +107,11 @@ Prints the manual page and exits.
 This script demonstrates how to use C<MooX::Role::CliOptions>. With no
 options will print a message and the contents of C<custom_opt>, if any.
  
+=head1 SEE ALSO
+
+C<examples/myscript.pl> in this distribution for a normal script using
+C<MooX::Role::CliOptions> in the C<main> namespace.
+
 =head1 AUTHOR
 
 Jim Bacon, C<< <boftx at cpan.org> >>

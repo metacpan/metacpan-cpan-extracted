@@ -17,7 +17,6 @@ EXTERN_C
 INT2PTR
 MUTABLE_PTR
 NVTYPE
-PERL_GCC_BRACE_GROUPS_FORBIDDEN
 PERLIO_FUNCS_CAST
 PERLIO_FUNCS_DECL
 PERL_UNUSED_ARG
@@ -32,7 +31,6 @@ START_EXTERN_C
 STMT_END
 STMT_START
 SvRX
-UTF8_MAXBYTES
 WIDEST_UTYPE
 XSRETURN
 
@@ -52,26 +50,7 @@ __UNDEFINED__ __ASSERT_(statement)  assert(statement),
 __UNDEFINED__ __ASSERT_(statement)
 #endif
 
-#ifndef SvRX
-#if { NEED SvRX }
-
-void *
-SvRX(pTHX_ SV *rv)
-{
-	if (SvROK(rv)) {
-		SV *sv = SvRV(rv);
-		if (SvMAGICAL(sv)) {
-			MAGIC *mg = mg_find(sv, PERL_MAGIC_qr);
-			if (mg && mg->mg_obj) {
-				return mg->mg_obj;
-			}
-		}
-	}
-	return 0;
-}
-#endif
-#endif
-
+__UNDEFINED__ SvRX(rv) (SvROK((rv)) ? (SvMAGICAL(SvRV((rv))) ? (mg_find(SvRV((rv)), PERL_MAGIC_qr) ? mg_find(SvRV((rv)), PERL_MAGIC_qr)->mg_obj : NULL) : NULL) : NULL)
 __UNDEFINED__ SvRXOK(sv) (!!SvRX(sv))
 
 #ifndef PERL_UNUSED_DECL
@@ -168,9 +147,9 @@ __UNDEFINED__  PTR2NV(p)       NUM2PTR(NV,p)
 #  define EXTERN_C extern
 #endif
 
-#if defined(PERL_GCC_PEDANTIC)
+#if { VERSION < 5.004 } || defined(PERL_GCC_PEDANTIC)
 #  ifndef PERL_GCC_BRACE_GROUPS_FORBIDDEN
-#    define PERL_GCC_BRACE_GROUPS_FORBIDDEN
+__UNDEF_NOT_PROVIDED__  PERL_GCC_BRACE_GROUPS_FORBIDDEN
 #  endif
 #endif
 
@@ -258,8 +237,6 @@ __UNDEFINED__  dVAR            dNOOP
 
 __UNDEFINED__  SVf             "_"
 
-__UNDEFINED__  UTF8_MAXBYTES   UTF8_MAXLEN
-
 __UNDEFINED__  CPERLscope(x)   x
 
 __UNDEFINED__  PERL_HASH(hash,str,len) \
@@ -307,52 +284,89 @@ typedef OP* (CPERLscope(*Perl_check_t)) (pTHX_ OP*);
 # endif
 #endif
 
+/* On versions without this, only ASCII is supported */
+#ifdef NATIVE_TO_ASCII
+__UNDEFINED__ NATIVE_TO_LATIN1(c) NATIVE_TO_ASCII(c)
+#else
+__UNDEFINED__ NATIVE_TO_LATIN1(c) (c)
+#endif
+
+#ifdef ASCII_TO_NATIVE
+__UNDEFINED__ LATIN1_TO_NATIVE(c) ASCII_TO_NATIVE(c)
+#else
+__UNDEFINED__ LATIN1_TO_NATIVE(c) (c)
+#endif
+
+/* Warning: LATIN1_TO_NATIVE, NATIVE_TO_LATIN1
+   EBCDIC is not supported on versions earlier than 5.7.1
+ */
+
 #ifdef EBCDIC
 
-/* This is the first version where these macros are fully correct.  Relying on
- * the C library functions, as earlier releases did, causes problems with
- * locales */
+/* This is the first version where these macros are fully correct on EBCDIC
+ * platforms.  Relying on * the C library functions, as earlier releases did,
+ * causes problems with * locales */
 # if { VERSION < 5.22.0 }
 #  undef isALNUM
 #  undef isALNUM_A
+#  undef isALNUM_L1
 #  undef isALNUMC
 #  undef isALNUMC_A
+#  undef isALNUMC_L1
 #  undef isALPHA
 #  undef isALPHA_A
+#  undef isALPHA_L1
 #  undef isALPHANUMERIC
 #  undef isALPHANUMERIC_A
+#  undef isALPHANUMERIC_L1
 #  undef isASCII
 #  undef isASCII_A
+#  undef isASCII_L1
 #  undef isBLANK
 #  undef isBLANK_A
+#  undef isBLANK_L1
 #  undef isCNTRL
 #  undef isCNTRL_A
+#  undef isCNTRL_L1
 #  undef isDIGIT
 #  undef isDIGIT_A
+#  undef isDIGIT_L1
 #  undef isGRAPH
 #  undef isGRAPH_A
+#  undef isGRAPH_L1
 #  undef isIDCONT
 #  undef isIDCONT_A
+#  undef isIDCONT_L1
 #  undef isIDFIRST
 #  undef isIDFIRST_A
+#  undef isIDFIRST_L1
 #  undef isLOWER
 #  undef isLOWER_A
+#  undef isLOWER_L1
 #  undef isOCTAL
 #  undef isOCTAL_A
+#  undef isOCTAL_L1
 #  undef isPRINT
 #  undef isPRINT_A
+#  undef isPRINT_L1
 #  undef isPSXSPC
 #  undef isPSXSPC_A
+#  undef isPSXSPC_L1
 #  undef isPUNCT
 #  undef isPUNCT_A
+#  undef isPUNCT_L1
 #  undef isSPACE
 #  undef isSPACE_A
+#  undef isSPACE_L1
 #  undef isUPPER
 #  undef isUPPER_A
+#  undef isUPPER_L1
 #  undef isWORDCHAR
 #  undef isWORDCHAR_A
+#  undef isWORDCHAR_L1
 #  undef isXDIGIT
 #  undef isXDIGIT_A
+#  undef isXDIGIT_L1
 # endif
 
 __UNDEFINED__ isASCII(c)    (isCNTRL(c) || isPRINT(c))
@@ -378,6 +392,17 @@ __UNDEFINED__ isCNTRL(c)    (    (c) == '\0' || (c) == '\a' || (c) == '\b'      
                              ||  (c) == 0x3C /* U+14 DC4 */                     \
                              ||  (c) == 0x3D /* U+15 NAK */                     \
                              ||  (c) == 0x3F /* U+1A SUB */                     \
+                            )
+
+#if '^' == 106    /* EBCDIC POSIX-BC */
+#  define D_PPP_OUTLIER_CONTROL 0x5F
+#else   /* EBCDIC 1047 037 */
+#  define D_PPP_OUTLIER_CONTROL 0xFF
+#endif
+
+/* The controls are everything below blank, plus one outlier */
+__UNDEFINED__ isCNTRL_L1(c) ((WIDEST_UTYPE) (c) < ' '                           \
+                          || (WIDEST_UTYPE) (c) == D_PPP_OUTLIER_CONTROL)
                             )
 /* The ordering of the tests in this and isUPPER are to exclude most characters
  * early */
@@ -409,94 +434,139 @@ __UNDEFINED__ isUPPER(c)    (        (c) >= 'A' && (c) <= 'Z'                   
 #  undef isUPPER_A
 # endif
 
-# if { VERSION < 5.8.0 }
-/* Hint: isCNTRL
- * Earlier perls omitted DEL */
+# if { VERSION < 5.8.0 } /* earlier perls omitted DEL */
 #  undef isCNTRL
 # endif
 
 # if { VERSION < 5.10.0 }
-/* Hint: isPRINT
- * The implementation in older perl versions includes all of the
- * isSPACE() characters, which is wrong. The version provided by
- * Devel::PPPort always overrides a present buggy version.
- */
+/* earlier perls included all of the isSPACE() characters, which is wrong. The
+ * version provided by Devel::PPPort always overrides an existing buggy
+ * version. */
 #  undef isPRINT
 #  undef isPRINT_A
 # endif
 
 # if { VERSION < 5.14.0 }
-/* Hint: isASCII
- * The implementation in older perl versions always returned true if the
- * parameter was a signed char
- */
+/* earlier perls always returned true if the parameter was a signed char */
 #  undef isASCII
 #  undef isASCII_A
 # endif
 
-# if { VERSION < 5.20.0 }
-/* Hint: isSPACE
- * The implementation in older perl versions didn't include \v */
+# if { VERSION < 5.17.8 } /* earlier perls didn't include PILCROW, SECTION SIGN */
+#  undef isPUNCT_L1
+# endif
+
+# if { VERSION < 5.13.7 } /* khw didn't investigate why this failed */
+#  undef isALNUMC_L1
+#endif
+
+# if { VERSION < 5.20.0 } /* earlier perls didn't include \v */
 #  undef isSPACE
 #  undef isSPACE_A
+#  undef isSPACE_L1
+
 # endif
 
 __UNDEFINED__ isASCII(c)        ((WIDEST_UTYPE) (c) <= 127)
 __UNDEFINED__ isCNTRL(c)        ((WIDEST_UTYPE) (c) < ' ' || (c) == 127)
+__UNDEFINED__ isCNTRL_L1(c)     (isCNTRL(c) || (   (WIDEST_UTYPE) (c) <= 0x9F  \
+                                                && (WIDEST_UTYPE) (c) >= 0x80))
 __UNDEFINED__ isLOWER(c)        ((c) >= 'a' && (c) <= 'z')
 __UNDEFINED__ isUPPER(c)        ((c) <= 'Z' && (c) >= 'A')
+
 #endif /* Below are definitions common to EBCDIC and ASCII */
 
+__UNDEFINED__ isASCII_L1(c)     isASCII(c)
 __UNDEFINED__ isALNUM(c)        isWORDCHAR(c)
 __UNDEFINED__ isALNUMC(c)       isALPHANUMERIC(c)
+__UNDEFINED__ isALNUMC_L1(c)    isALPHANUMERIC_L1(c)
 __UNDEFINED__ isALPHA(c)        (isUPPER(c) || isLOWER(c))
+__UNDEFINED__ isALPHA_L1(c)     (isUPPER_L1(c) || isLOWER_L1(c))
 __UNDEFINED__ isALPHANUMERIC(c) (isALPHA(c) || isDIGIT(c))
+__UNDEFINED__ isALPHANUMERIC_L1(c) (isALPHA_L1(c) || isDIGIT(c))
 __UNDEFINED__ isBLANK(c)        ((c) == ' ' || (c) == '\t')
+__UNDEFINED__ isBLANK_L1(c) (    isBLANK(c)                                    \
+                             || (   (WIDEST_UTYPE) (c) < 256                   \
+                                 && NATIVE_TO_LATIN1((U8) c) == 0xA0))
 __UNDEFINED__ isDIGIT(c)        ((c) <= '9' && (c) >= '0')
+__UNDEFINED__ isDIGIT_L1(c)     isDIGIT(c)
 __UNDEFINED__ isGRAPH(c)        (isWORDCHAR(c) || isPUNCT(c))
+__UNDEFINED__ isGRAPH_L1(c)     (isPRINT_L1(c) && (c) != ' ')
 __UNDEFINED__ isIDCONT(c)       isWORDCHAR(c)
+__UNDEFINED__ isIDCONT_L1(c)	isWORDCHAR_L1(c)
 __UNDEFINED__ isIDFIRST(c)      (isALPHA(c) || (c) == '_')
+__UNDEFINED__ isIDFIRST_L1(c)   (isALPHA_L1(c) || NATIVE_TO_LATIN1(c) == '_')
+__UNDEFINED__ isLOWER_L1(c) (    isLOWER(c)                                    \
+                             || (   (WIDEST_UTYPE) (c) < 256                   \
+                                 && (  (   NATIVE_TO_LATIN1((U8) c) >= 0xDF    \
+                                        && NATIVE_TO_LATIN1((U8) c) != 0xF7)   \
+                                     || NATIVE_TO_LATIN1((U8) c) == 0xAA       \
+                                     || NATIVE_TO_LATIN1((U8) c) == 0xBA       \
+                                     || NATIVE_TO_LATIN1((U8) c) == 0xB5)))
 __UNDEFINED__ isOCTAL(c)        (((WIDEST_UTYPE)((c)) & ~7) == '0')
+__UNDEFINED__ isOCTAL_L1(c)     isOCTAL(c)
 __UNDEFINED__ isPRINT(c)        (isGRAPH(c) || (c) == ' ')
+__UNDEFINED__ isPRINT_L1(c)     ((WIDEST_UTYPE) (c) < 256 && ! isCNTRL_L1(c))
 __UNDEFINED__ isPSXSPC(c)       isSPACE(c)
-__UNDEFINED__ isPUNCT(c)    (   (c) == '-' || (c) == '!' || (c) == '"'          \
-                             || (c) == '#' || (c) == '$' || (c) == '%'          \
-                             || (c) == '&' || (c) == '\'' || (c) == '('         \
-                             || (c) == ')' || (c) == '*' || (c) == '+'          \
-                             || (c) == ',' || (c) == '.' || (c) == '/'          \
-                             || (c) == ':' || (c) == ';' || (c) == '<'          \
-                             || (c) == '=' || (c) == '>' || (c) == '?'          \
-                             || (c) == '@' || (c) == '[' || (c) == '\\'         \
-                             || (c) == ']' || (c) == '^' || (c) == '_'          \
-                             || (c) == '`' || (c) == '{' || (c) == '|'          \
+__UNDEFINED__ isPSXSPC_L1(c)    isSPACE_L1(c)
+__UNDEFINED__ isPUNCT(c)    (   (c) == '-' || (c) == '!' || (c) == '"'         \
+                             || (c) == '#' || (c) == '$' || (c) == '%'         \
+                             || (c) == '&' || (c) == '\'' || (c) == '('        \
+                             || (c) == ')' || (c) == '*' || (c) == '+'         \
+                             || (c) == ',' || (c) == '.' || (c) == '/'         \
+                             || (c) == ':' || (c) == ';' || (c) == '<'         \
+                             || (c) == '=' || (c) == '>' || (c) == '?'         \
+                             || (c) == '@' || (c) == '[' || (c) == '\\'        \
+                             || (c) == ']' || (c) == '^' || (c) == '_'         \
+                             || (c) == '`' || (c) == '{' || (c) == '|'         \
                              || (c) == '}' || (c) == '~')
-__UNDEFINED__ isSPACE(c)        (   isBLANK(c) || (c) == '\n' || (c) == '\r'    \
+__UNDEFINED__ isPUNCT_L1(c)  (    isPUNCT(c)                                   \
+                              || (   (WIDEST_UTYPE) (c) < 256                  \
+                                  && (   NATIVE_TO_LATIN1((U8) c) == 0xA1      \
+                                      || NATIVE_TO_LATIN1((U8) c) == 0xA7      \
+                                      || NATIVE_TO_LATIN1((U8) c) == 0xAB      \
+                                      || NATIVE_TO_LATIN1((U8) c) == 0xB6      \
+                                      || NATIVE_TO_LATIN1((U8) c) == 0xB7      \
+                                      || NATIVE_TO_LATIN1((U8) c) == 0xBB      \
+                                      || NATIVE_TO_LATIN1((U8) c) == 0xBF)))
+__UNDEFINED__ isSPACE(c)        (   isBLANK(c) || (c) == '\n' || (c) == '\r'   \
                                  || (c) == '\v' || (c) == '\f')
+__UNDEFINED__ isSPACE_L1(c) (    isSPACE(c)                                    \
+                             || (   (WIDEST_UTYPE) (c) < 256                   \
+                                 && (   NATIVE_TO_LATIN1((U8) c) == 0x85       \
+                                     || NATIVE_TO_LATIN1((U8) c) == 0xA0)))
+__UNDEFINED__ isUPPER_L1(c) (   isUPPER(c)                                     \
+                             || (   (WIDEST_UTYPE) (c) < 256                   \
+                                 && (   NATIVE_TO_LATIN1((U8) c) >= 0xC0       \
+                                     && NATIVE_TO_LATIN1((U8) c) <= 0xDE       \
+                                     && NATIVE_TO_LATIN1((U8) c) != 0xD7)))
 __UNDEFINED__ isWORDCHAR(c)     (isALPHANUMERIC(c) || (c) == '_')
-__UNDEFINED__ isXDIGIT(c)       (   isDIGIT(c)                                  \
-                                 || ((c) >= 'a' && (c) <= 'f')                  \
+__UNDEFINED__ isWORDCHAR_L1(c)  (isIDFIRST_L1(c) || isDIGIT(c))
+__UNDEFINED__ isXDIGIT(c)       (   isDIGIT(c)                                 \
+                                 || ((c) >= 'a' && (c) <= 'f')                 \
                                  || ((c) >= 'A' && (c) <= 'F'))
+__UNDEFINED__ isXDIGIT_L1(c)    isXDIGIT(c)
 
-__UNDEFINED__ isALNUM_A         isALNUM
-__UNDEFINED__ isALNUMC_A        isALNUMC
-__UNDEFINED__ isALPHA_A         isALPHA
-__UNDEFINED__ isALPHANUMERIC_A  isALPHANUMERIC
-__UNDEFINED__ isASCII_A         isASCII
-__UNDEFINED__ isBLANK_A         isBLANK
-__UNDEFINED__ isCNTRL_A         isCNTRL
-__UNDEFINED__ isDIGIT_A         isDIGIT
-__UNDEFINED__ isGRAPH_A         isGRAPH
-__UNDEFINED__ isIDCONT_A        isIDCONT
-__UNDEFINED__ isIDFIRST_A       isIDFIRST
-__UNDEFINED__ isLOWER_A         isLOWER
-__UNDEFINED__ isOCTAL_A         isOCTAL
-__UNDEFINED__ isPRINT_A         isPRINT
-__UNDEFINED__ isPSXSPC_A        isPSXSPC
-__UNDEFINED__ isPUNCT_A         isPUNCT
-__UNDEFINED__ isSPACE_A         isSPACE
-__UNDEFINED__ isUPPER_A         isUPPER
-__UNDEFINED__ isWORDCHAR_A	isWORDCHAR
-__UNDEFINED__ isXDIGIT_A	isXDIGIT
+__UNDEFINED__ isALNUM_A(c)         isALNUM(c)
+__UNDEFINED__ isALNUMC_A(c)        isALNUMC(c)
+__UNDEFINED__ isALPHA_A(c)         isALPHA(c)
+__UNDEFINED__ isALPHANUMERIC_A(c)  isALPHANUMERIC(c)
+__UNDEFINED__ isASCII_A(c)         isASCII(c)
+__UNDEFINED__ isBLANK_A(c)         isBLANK(c)
+__UNDEFINED__ isCNTRL_A(c)         isCNTRL(c)
+__UNDEFINED__ isDIGIT_A(c)         isDIGIT(c)
+__UNDEFINED__ isGRAPH_A(c)         isGRAPH(c)
+__UNDEFINED__ isIDCONT_A(c)        isIDCONT(c)
+__UNDEFINED__ isIDFIRST_A(c)       isIDFIRST(c)
+__UNDEFINED__ isLOWER_A(c)         isLOWER(c)
+__UNDEFINED__ isOCTAL_A(c)         isOCTAL(c)
+__UNDEFINED__ isPRINT_A(c)         isPRINT(c)
+__UNDEFINED__ isPSXSPC_A(c)        isPSXSPC(c)
+__UNDEFINED__ isPUNCT_A(c)         isPUNCT(c)
+__UNDEFINED__ isSPACE_A(c)         isSPACE(c)
+__UNDEFINED__ isUPPER_A(c)         isUPPER(c)
+__UNDEFINED__ isWORDCHAR_A(c)	   isWORDCHAR(c)
+__UNDEFINED__ isXDIGIT_A(c)	   isXDIGIT(c)
 
 /* Until we figure out how to support this in older perls... */
 #if { VERSION >= 5.8.0 }
@@ -512,8 +582,6 @@ __UNDEFINED__ C_ARRAY_END(a)		((a) + C_ARRAY_LENGTH(a))
 
 __UNDEFINED__ LIKELY(x) (x)
 __UNDEFINED__ UNLIKELY(x) (x)
-
-__UNDEFINED__ UNICODE_REPLACEMENT  0xFFFD
 
 #ifndef MUTABLE_PTR
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
@@ -558,10 +626,6 @@ XS(XS_Devel__PPPort_dAXMARK)
   mPUSHi(iv);
   XSRETURN(1);
 }
-
-=xsinit
-
-#define NEED_SvRX
 
 =xsboot
 
@@ -768,7 +832,7 @@ DEFSV_modify()
 int
 ERRSV()
         CODE:
-                RETVAL = SvTRUE(ERRSV);
+                RETVAL = SvTRUEx(ERRSV);
         OUTPUT:
                 RETVAL
 
@@ -855,288 +919,478 @@ check_c_array()
                 mXPUSHi(*(C_ARRAY_END(x)-1)); /* 13 */
 
 bool
-test_isBLANK(UV ord)
+isBLANK(ord)
+    UV ord
     CODE:
         RETVAL = isBLANK(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isBLANK_A(UV ord)
+isBLANK_A(ord)
+    UV ord
     CODE:
         RETVAL = isBLANK_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isUPPER(UV ord)
+isBLANK_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isBLANK_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isUPPER(ord)
+    UV ord
     CODE:
         RETVAL = isUPPER(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isUPPER_A(UV ord)
+isUPPER_A(ord)
+    UV ord
     CODE:
         RETVAL = isUPPER_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isLOWER(UV ord)
+isUPPER_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isUPPER_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isLOWER(ord)
+    UV ord
     CODE:
         RETVAL = isLOWER(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isLOWER_A(UV ord)
+isLOWER_A(ord)
+    UV ord
     CODE:
         RETVAL = isLOWER_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isALPHA(UV ord)
+isLOWER_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isLOWER_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isALPHA(ord)
+    UV ord
     CODE:
         RETVAL = isALPHA(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isALPHA_A(UV ord)
+isALPHA_A(ord)
+    UV ord
     CODE:
         RETVAL = isALPHA_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isWORDCHAR(UV ord)
+isALPHA_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isALPHA_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isWORDCHAR(ord)
+    UV ord
     CODE:
         RETVAL = isWORDCHAR(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isWORDCHAR_A(UV ord)
+isWORDCHAR_A(ord)
+    UV ord
     CODE:
         RETVAL = isWORDCHAR_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isALPHANUMERIC(UV ord)
+isWORDCHAR_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isWORDCHAR_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isALPHANUMERIC(ord)
+    UV ord
     CODE:
         RETVAL = isALPHANUMERIC(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isALPHANUMERIC_A(UV ord)
+isALPHANUMERIC_A(ord)
+    UV ord
     CODE:
         RETVAL = isALPHANUMERIC_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isALNUM(UV ord)
+isALNUM(ord)
+    UV ord
     CODE:
         RETVAL = isALNUM(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isALNUM_A(UV ord)
+isALNUM_A(ord)
+    UV ord
     CODE:
         RETVAL = isALNUM_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isDIGIT(UV ord)
+isDIGIT(ord)
+    UV ord
     CODE:
         RETVAL = isDIGIT(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isDIGIT_A(UV ord)
+isDIGIT_A(ord)
+    UV ord
     CODE:
         RETVAL = isDIGIT_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isOCTAL(UV ord)
+isOCTAL(ord)
+    UV ord
     CODE:
         RETVAL = isOCTAL(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isOCTAL_A(UV ord)
+isOCTAL_A(ord)
+    UV ord
     CODE:
         RETVAL = isOCTAL_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isIDFIRST(UV ord)
+isIDFIRST(ord)
+    UV ord
     CODE:
         RETVAL = isIDFIRST(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isIDFIRST_A(UV ord)
+isIDFIRST_A(ord)
+    UV ord
     CODE:
         RETVAL = isIDFIRST_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isIDCONT(UV ord)
+isIDCONT(ord)
+    UV ord
     CODE:
         RETVAL = isIDCONT(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isIDCONT_A(UV ord)
+isIDCONT_A(ord)
+    UV ord
     CODE:
         RETVAL = isIDCONT_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isSPACE(UV ord)
+isSPACE(ord)
+    UV ord
     CODE:
         RETVAL = isSPACE(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isSPACE_A(UV ord)
+isSPACE_A(ord)
+    UV ord
     CODE:
         RETVAL = isSPACE_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isASCII(UV ord)
+isASCII(ord)
+    UV ord
     CODE:
         RETVAL = isASCII(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isASCII_A(UV ord)
+isASCII_A(ord)
+    UV ord
     CODE:
         RETVAL = isASCII_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isCNTRL(UV ord)
+isCNTRL(ord)
+    UV ord
     CODE:
         RETVAL = isCNTRL(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isCNTRL_A(UV ord)
+isCNTRL_A(ord)
+    UV ord
     CODE:
         RETVAL = isCNTRL_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isPRINT(UV ord)
+isPRINT(ord)
+    UV ord
     CODE:
         RETVAL = isPRINT(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isPRINT_A(UV ord)
+isPRINT_A(ord)
+    UV ord
     CODE:
         RETVAL = isPRINT_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isGRAPH(UV ord)
+isGRAPH(ord)
+    UV ord
     CODE:
         RETVAL = isGRAPH(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isGRAPH_A(UV ord)
+isGRAPH_A(ord)
+    UV ord
     CODE:
         RETVAL = isGRAPH_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isPUNCT(UV ord)
+isPUNCT(ord)
+    UV ord
     CODE:
         RETVAL = isPUNCT(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isPUNCT_A(UV ord)
+isPUNCT_A(ord)
+    UV ord
     CODE:
         RETVAL = isPUNCT_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isXDIGIT(UV ord)
+isXDIGIT(ord)
+    UV ord
     CODE:
         RETVAL = isXDIGIT(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isXDIGIT_A(UV ord)
+isXDIGIT_A(ord)
+    UV ord
     CODE:
         RETVAL = isXDIGIT_A(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isPSXSPC(UV ord)
+isPSXSPC(ord)
+    UV ord
     CODE:
         RETVAL = isPSXSPC(ord);
     OUTPUT:
         RETVAL
 
 bool
-test_isPSXSPC_A(UV ord)
+isPSXSPC_A(ord)
+    UV ord
     CODE:
         RETVAL = isPSXSPC_A(ord);
     OUTPUT:
         RETVAL
 
+bool
+isALPHANUMERIC_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isALPHANUMERIC_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isALNUMC_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isALNUMC_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isDIGIT_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isDIGIT_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isOCTAL_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isOCTAL_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isIDFIRST_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isIDFIRST_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isIDCONT_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isIDCONT_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isSPACE_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isSPACE_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isASCII_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isASCII_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isCNTRL_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isCNTRL_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isPRINT_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isPRINT_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isGRAPH_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isGRAPH_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isPUNCT_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isPUNCT_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isXDIGIT_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isXDIGIT_L1(ord);
+    OUTPUT:
+        RETVAL
+
+bool
+isPSXSPC_L1(ord)
+    UV ord
+    CODE:
+        RETVAL = isPSXSPC_L1(ord);
+    OUTPUT:
+        RETVAL
+
 STRLEN
 av_tindex(av)
-        AV *av
+        SV *av
         CODE:
-                RETVAL = av_tindex(av);
+                RETVAL = av_tindex((AV*)SvRV(av));
         OUTPUT:
                 RETVAL
 
 STRLEN
 av_top_index(av)
-        AV *av
+        SV *av
         CODE:
-                RETVAL = av_top_index(av);
+                RETVAL = av_top_index((AV*)SvRV(av));
         OUTPUT:
                 RETVAL
 
-=tests plan => 128
+=tests plan => 176
 
 use vars qw($my_sv @my_av %my_hv);
 
@@ -1245,131 +1499,205 @@ if ("$]" < 5.005) {
         ok(Devel::PPPort::SvRXOK(bless $qr, "Surprise"));
 }
 
-ok(  Devel::PPPort::test_isBLANK(ord(" ")));
-ok(! Devel::PPPort::test_isBLANK(ord("\n")));
+ok(  Devel::PPPort::isBLANK(ord(" ")));
+ok(! Devel::PPPort::isBLANK(ord("\n")));
 
-ok(  Devel::PPPort::test_isBLANK_A(ord("\t")));
-ok(! Devel::PPPort::test_isBLANK_A(ord("\r")));
+ok(  Devel::PPPort::isBLANK_A(ord("\t")));
+ok(! Devel::PPPort::isBLANK_A(ord("\r")));
 
-ok(  Devel::PPPort::test_isUPPER(ord("A")));
-ok(! Devel::PPPort::test_isUPPER(ord("a")));
+ok(  Devel::PPPort::isBLANK_L1(ord("\t")));
+ok(! Devel::PPPort::isBLANK_L1(ord("\r")));
 
-ok(  Devel::PPPort::test_isUPPER_A(ord("Z")));
+ok(  Devel::PPPort::isUPPER(ord("A")));
+ok(! Devel::PPPort::isUPPER(ord("a")));
+
+ok(  Devel::PPPort::isUPPER_A(ord("Z")));
 
 # One of these two is uppercase in EBCDIC; the other in Latin1, but neither are
 # ASCII uppercase.
-ok(! Devel::PPPort::test_isUPPER_A(ord(0xDC)));
-ok(! Devel::PPPort::test_isUPPER_A(ord(0xFC)));
+ok(! Devel::PPPort::isUPPER_A(0xDC));
+ok(! Devel::PPPort::isUPPER_A(0xFC));
 
-ok(  Devel::PPPort::test_isLOWER(ord("b")));
-ok(! Devel::PPPort::test_isLOWER(ord("B")));
+ok(Devel::PPPort::isUPPER_L1(0xDC) || Devel::PPPort::isUPPER_L1(0xFC));
+ok(! (Devel::PPPort::isUPPER_L1(0xDC) && Devel::PPPort::isUPPER_L1(0xFC)));
 
-ok(  Devel::PPPort::test_isLOWER_A(ord("y")));
+ok(  Devel::PPPort::isLOWER(ord("b")));
+ok(! Devel::PPPort::isLOWER(ord("B")));
+
+ok(  Devel::PPPort::isLOWER_A(ord("y")));
 
 # One of these two is lowercase in EBCDIC; the other in Latin1, but neither are
 # ASCII lowercase.
-ok(! Devel::PPPort::test_isLOWER_A(ord(0xDC)));
-ok(! Devel::PPPort::test_isLOWER_A(ord(0xFC)));
+ok(! Devel::PPPort::isLOWER_A(0xDC));
+ok(! Devel::PPPort::isLOWER_A(0xFC));
 
-ok(  Devel::PPPort::test_isALPHA(ord("C")));
-ok(! Devel::PPPort::test_isALPHA(ord("1")));
+ok(Devel::PPPort::isLOWER_L1(0xDC) || Devel::PPPort::isLOWER_L1(0xFC));
+ok(! Devel::PPPort::isLOWER_L1(0xDC) && Devel::PPPort::isLOWER_L1(0xFC));
 
-ok(  Devel::PPPort::test_isALPHA_A(ord("x")));
-ok(! Devel::PPPort::test_isALPHA_A(0xDC));
+ok(  Devel::PPPort::isALPHA(ord("C")));
+ok(! Devel::PPPort::isALPHA(ord("1")));
 
-ok(  Devel::PPPort::test_isWORDCHAR(ord("_")));
-ok(! Devel::PPPort::test_isWORDCHAR(ord("@")));
+ok(  Devel::PPPort::isALPHA_A(ord("x")));
+ok(! Devel::PPPort::isALPHA_A(0xDC));
 
-ok(  Devel::PPPort::test_isWORDCHAR_A(ord("2")));
-ok(! Devel::PPPort::test_isWORDCHAR_A(0xFC));
+ok(  Devel::PPPort::isALPHA_L1(ord("y")));
+ok(  Devel::PPPort::isALPHA_L1(0xDC));
+ok(! Devel::PPPort::isALPHA_L1(0xB6));
 
-ok(  Devel::PPPort::test_isALPHANUMERIC(ord("4")));
-ok(! Devel::PPPort::test_isALPHANUMERIC(ord("_")));
+ok(  Devel::PPPort::isWORDCHAR(ord("_")));
+ok(! Devel::PPPort::isWORDCHAR(ord("@")));
 
-ok(  Devel::PPPort::test_isALPHANUMERIC_A(ord("l")));
-ok(! Devel::PPPort::test_isALPHANUMERIC_A(0xDC));
+ok(  Devel::PPPort::isWORDCHAR_A(ord("2")));
+ok(! Devel::PPPort::isWORDCHAR_A(0xFC));
 
-ok(  Devel::PPPort::test_isALNUM(ord("c")));
-ok(! Devel::PPPort::test_isALNUM(ord("}")));
+ok(  Devel::PPPort::isWORDCHAR_L1(ord("2")));
+ok(  Devel::PPPort::isWORDCHAR_L1(0xFC));
+ok(! Devel::PPPort::isWORDCHAR_L1(0xB6));
 
-ok(  Devel::PPPort::test_isALNUM_A(ord("5")));
-ok(! Devel::PPPort::test_isALNUM_A(0xFC));
+ok(  Devel::PPPort::isALPHANUMERIC(ord("4")));
+ok(! Devel::PPPort::isALPHANUMERIC(ord("_")));
 
-ok(  Devel::PPPort::test_isDIGIT(ord("6")));
-ok(! Devel::PPPort::test_isDIGIT(ord("_")));
+ok(  Devel::PPPort::isALPHANUMERIC_A(ord("l")));
+ok(! Devel::PPPort::isALPHANUMERIC_A(0xDC));
 
-ok(  Devel::PPPort::test_isDIGIT_A(ord("7")));
-ok(! Devel::PPPort::test_isDIGIT_A(0xDC));
+ok(  Devel::PPPort::isALPHANUMERIC_L1(ord("l")));
+ok(  Devel::PPPort::isALPHANUMERIC_L1(0xDC));
+ok(! Devel::PPPort::isALPHANUMERIC_L1(0xB6));
 
-ok(  Devel::PPPort::test_isOCTAL(ord("7")));
-ok(! Devel::PPPort::test_isOCTAL(ord("8")));
+ok(  Devel::PPPort::isALNUM(ord("c")));
+ok(! Devel::PPPort::isALNUM(ord("}")));
 
-ok(  Devel::PPPort::test_isOCTAL_A(ord("0")));
-ok(! Devel::PPPort::test_isOCTAL_A(ord("9")));
+ok(  Devel::PPPort::isALNUM_A(ord("5")));
+ok(! Devel::PPPort::isALNUM_A(0xFC));
 
-ok(  Devel::PPPort::test_isIDFIRST(ord("D")));
-ok(! Devel::PPPort::test_isIDFIRST(ord("1")));
+ok(  Devel::PPPort::isALNUMC_L1(ord("5")));
+ok(  Devel::PPPort::isALNUMC_L1(0xFC));
+ok(! Devel::PPPort::isALNUMC_L1(0xB6));
 
-ok(  Devel::PPPort::test_isIDFIRST_A(ord("_")));
-ok(! Devel::PPPort::test_isIDFIRST_A(0xFC));
+ok(  Devel::PPPort::isDIGIT(ord("6")));
+ok(! Devel::PPPort::isDIGIT(ord("_")));
 
-ok(  Devel::PPPort::test_isIDCONT(ord("e")));
-ok(! Devel::PPPort::test_isIDCONT(ord("@")));
+ok(  Devel::PPPort::isDIGIT_A(ord("7")));
+ok(! Devel::PPPort::isDIGIT_A(0xDC));
 
-ok(  Devel::PPPort::test_isIDCONT_A(ord("2")));
-ok(! Devel::PPPort::test_isIDCONT_A(0xDC));
+ok(  Devel::PPPort::isDIGIT_L1(ord("5")));
+ok(! Devel::PPPort::isDIGIT_L1(0xDC));
 
-ok(  Devel::PPPort::test_isSPACE(ord(" ")));
-ok(! Devel::PPPort::test_isSPACE(ord("_")));
+ok(  Devel::PPPort::isOCTAL(ord("7")));
+ok(! Devel::PPPort::isOCTAL(ord("8")));
 
-ok(  Devel::PPPort::test_isSPACE_A(ord("\cK")));
-ok(! Devel::PPPort::test_isSPACE_A(ord("F")));
+ok(  Devel::PPPort::isOCTAL_A(ord("0")));
+ok(! Devel::PPPort::isOCTAL_A(ord("9")));
+
+ok(  Devel::PPPort::isOCTAL_L1(ord("2")));
+ok(! Devel::PPPort::isOCTAL_L1(ord("8")));
+
+ok(  Devel::PPPort::isIDFIRST(ord("D")));
+ok(! Devel::PPPort::isIDFIRST(ord("1")));
+
+ok(  Devel::PPPort::isIDFIRST_A(ord("_")));
+ok(! Devel::PPPort::isIDFIRST_A(0xFC));
+
+ok(  Devel::PPPort::isIDFIRST_L1(ord("_")));
+ok(  Devel::PPPort::isIDFIRST_L1(0xFC));
+ok(! Devel::PPPort::isIDFIRST_L1(0xB6));
+
+ok(  Devel::PPPort::isIDCONT(ord("e")));
+ok(! Devel::PPPort::isIDCONT(ord("@")));
+
+ok(  Devel::PPPort::isIDCONT_A(ord("2")));
+ok(! Devel::PPPort::isIDCONT_A(0xDC));
+
+ok(  Devel::PPPort::isIDCONT_L1(ord("4")));
+ok(  Devel::PPPort::isIDCONT_L1(0xDC));
+ok(! Devel::PPPort::isIDCONT_L1(0xB6));
+
+ok(  Devel::PPPort::isSPACE(ord(" ")));
+ok(! Devel::PPPort::isSPACE(ord("_")));
+
+ok(  Devel::PPPort::isSPACE_A(ord("\cK")));
+ok(! Devel::PPPort::isSPACE_A(ord("F")));
+
+ok(  Devel::PPPort::isSPACE_L1(ord("\cK")));
+ok(! Devel::PPPort::isSPACE_L1(ord("g")));
 
 # This stresses the edge for ASCII machines, but happens to work on EBCDIC as
 # well
-ok(  Devel::PPPort::test_isASCII(0x7F));
-ok(! Devel::PPPort::test_isASCII(0x80));
+ok(  Devel::PPPort::isASCII(0x7F));
+ok(! Devel::PPPort::isASCII(0x80));
 
-ok(  Devel::PPPort::test_isASCII_A(ord("9")));
+ok(  Devel::PPPort::isASCII_A(ord("9")));
+ok(  Devel::PPPort::isASCII_L1(ord("9")));
 
 # B6 is the PARAGRAPH SIGN in ASCII and EBCDIC
-ok(! Devel::PPPort::test_isASCII_A(0xB6));
+ok(! Devel::PPPort::isASCII_A(0xB6));
+ok(! Devel::PPPort::isASCII_L1(0xB6));
 
-ok(  Devel::PPPort::test_isCNTRL(ord("\e")));
-ok(! Devel::PPPort::test_isCNTRL(ord(" ")));
+ok(  Devel::PPPort::isCNTRL(ord("\e")));
+ok(! Devel::PPPort::isCNTRL(ord(" ")));
 
-ok(  Devel::PPPort::test_isCNTRL_A(ord("\a")));
-ok(! Devel::PPPort::test_isCNTRL_A(0xB6));
+ok(  Devel::PPPort::isCNTRL_A(ord("\a")));
+ok(! Devel::PPPort::isCNTRL_A(0xB6));
 
-ok(  Devel::PPPort::test_isPRINT(ord(" ")));
-ok(! Devel::PPPort::test_isPRINT(ord("\n")));
+ok(  Devel::PPPort::isCNTRL_L1(ord("\a")));
+ok(  Devel::PPPort::isCNTRL_L1(ord(" ") - 1));
+ok(! Devel::PPPort::isCNTRL_L1(0xB6));
+if (ord('A') == 65) {
+    ok(Devel::PPPort::isCNTRL_L1(0x80));
+}
+elsif (ord('^') == 106) {
+    ok(Devel::PPPort::isCNTRL_L1(0x5F));
+}
+else {
+    ok(Devel::PPPort::isCNTRL_L1(0xFF));
+}
 
-ok(  Devel::PPPort::test_isPRINT_A(ord("G")));
-ok(! Devel::PPPort::test_isPRINT_A(0xB6));
+ok(  Devel::PPPort::isPRINT(ord(" ")));
+ok(! Devel::PPPort::isPRINT(ord("\n")));
 
-ok(  Devel::PPPort::test_isGRAPH(ord("h")));
-ok(! Devel::PPPort::test_isGRAPH(ord(" ")));
+ok(  Devel::PPPort::isPRINT_A(ord("G")));
+ok(! Devel::PPPort::isPRINT_A(0xB6));
 
-ok(  Devel::PPPort::test_isGRAPH_A(ord("i")));
-ok(! Devel::PPPort::test_isGRAPH_A(0xB6));
+ok(  Devel::PPPort::isPRINT_L1(ord("~")));
+ok(  Devel::PPPort::isPRINT_L1(0xB6));
+ok(! Devel::PPPort::isPRINT_L1(ord("\r")));
 
-ok(  Devel::PPPort::test_isPUNCT(ord("#")));
-ok(! Devel::PPPort::test_isPUNCT(ord(" ")));
+ok(  Devel::PPPort::isGRAPH(ord("h")));
+ok(! Devel::PPPort::isGRAPH(ord(" ")));
 
-ok(  Devel::PPPort::test_isPUNCT_A(ord("*")));
-ok(! Devel::PPPort::test_isPUNCT_A(0xB6));
+ok(  Devel::PPPort::isGRAPH_A(ord("i")));
+ok(! Devel::PPPort::isGRAPH_A(0xB6));
 
-ok(  Devel::PPPort::test_isXDIGIT(ord("A")));
-ok(! Devel::PPPort::test_isXDIGIT(ord("_")));
+ok(  Devel::PPPort::isGRAPH_L1(ord("j")));
+ok(  Devel::PPPort::isGRAPH_L1(0xB6));
+ok(! Devel::PPPort::isGRAPH_L1(4));
 
-ok(  Devel::PPPort::test_isXDIGIT_A(ord("9")));
-ok(! Devel::PPPort::test_isXDIGIT_A(0xDC));
+ok(  Devel::PPPort::isPUNCT(ord("#")));
+ok(! Devel::PPPort::isPUNCT(ord(" ")));
 
-ok(  Devel::PPPort::test_isPSXSPC(ord(" ")));
-ok(! Devel::PPPort::test_isPSXSPC(ord("k")));
+ok(  Devel::PPPort::isPUNCT_A(ord("*")));
+ok(! Devel::PPPort::isPUNCT_A(0xB6));
 
-ok(  Devel::PPPort::test_isPSXSPC_A(ord("\cK")));
-ok(! Devel::PPPort::test_isPSXSPC_A(0xFC));
+ok(  Devel::PPPort::isPUNCT_L1(ord("+")));
+ok(  Devel::PPPort::isPUNCT_L1(0xB6));
+
+ok(  Devel::PPPort::isXDIGIT(ord("A")));
+ok(! Devel::PPPort::isXDIGIT(ord("_")));
+
+ok(  Devel::PPPort::isXDIGIT_A(ord("9")));
+ok(! Devel::PPPort::isXDIGIT_A(0xDC));
+
+ok(  Devel::PPPort::isXDIGIT_L1(ord("9")));
+ok(! Devel::PPPort::isXDIGIT_L1(0xFF));
+
+ok(  Devel::PPPort::isPSXSPC(ord(" ")));
+ok(! Devel::PPPort::isPSXSPC(ord("k")));
+
+ok(  Devel::PPPort::isPSXSPC_A(ord("\cK")));
+ok(! Devel::PPPort::isPSXSPC_A(0xFC));
+
+ok(  Devel::PPPort::isPSXSPC_L1(ord("\cK")));
+ok(! Devel::PPPort::isPSXSPC_L1(0xFC));
 
 ok(&Devel::PPPort::av_top_index([1,2,3]), 2);
 ok(&Devel::PPPort::av_tindex([1,2,3,4]), 3);

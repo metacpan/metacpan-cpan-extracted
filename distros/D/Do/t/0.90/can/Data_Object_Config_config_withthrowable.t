@@ -26,7 +26,7 @@ config_withthrowable() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

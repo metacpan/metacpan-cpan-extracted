@@ -12,6 +12,7 @@
     <input type="hidden" id="verify-challenge" name="challenge" value="">
     <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">">
     <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">">
+    <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
   </form>
   <script type="application/init">
   <TMPL_VAR NAME="DATA">
@@ -28,7 +29,7 @@
 </div>
 
 <div class="buttons">
-  <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1" class="btn btn-primary" role="button">
+  <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1&skin=<TMPL_VAR NAME="SKIN">" class="btn btn-primary" role="button">
     <span class="fa fa-home"></span>
     <span trspan="cancel">Cancel</span>
   </a>

@@ -6,7 +6,6 @@ use strict;
 
 use lib 'lib','t';
 use TestTools;
-use Test::Deep   qw/cmp_deeply/;
 
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
@@ -76,7 +75,7 @@ compare_xml($xml1b, $msg1_soap);
 my $hash1 = $receiver->($msg1_soap);
 is(ref $hash1, 'HASH', 'produced HASH');
 
-cmp_deeply($hash1, {count => 3}, "server parsed input");
+is_deeply($hash1, {count => 3}, "server parsed input");
 
 ###
 ### Now, the receiver does not understand the count header

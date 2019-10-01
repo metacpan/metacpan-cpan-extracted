@@ -1,5 +1,15 @@
 Changelog for Yancy-Backend-Static
 
+0.008     2019-09-24 20:42:09-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed changing the "path" field in the item. Previously it would
+      do nothing. Now it correctly moves the file to the new path.
+      Thanks @wbazant! [Github #5]
+    - Fixed issue where YAML.pm would save JSON::PP booleans as a Perl
+      object and not the YAML 'false'. Thanks @wbazant! [Github #4]
+
 0.007     2019-09-13 23:09:59-05:00 America/Chicago
 
     [Fixed]

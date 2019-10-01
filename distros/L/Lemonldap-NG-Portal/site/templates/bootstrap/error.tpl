@@ -47,12 +47,12 @@
 
     <div class="buttons">
       <TMPL_IF RAW_ERROR>
-        <a href="<TMPL_VAR NAME="PORTAL_URL">2fregisters" class="btn btn-info" role="button">
+        <a href="<TMPL_VAR NAME="PORTAL_URL">2fregisters?skin=<TMPL_VAR NAME="SKIN">" class="btn btn-info" role="button">
           <span class="fa fa-shield"></span>
           <span trspan="sfaManager">sfaManager</span>
         </a>
       </TMPL_IF>
-      <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1<TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="btn btn-primary" role="button">
+      <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1&skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="btn btn-primary" role="button">
         <span class="fa fa-home"></span>
         <span trspan="goToPortal">Go to portal</span>
       </a>

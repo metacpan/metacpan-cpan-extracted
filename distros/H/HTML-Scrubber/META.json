@@ -52,7 +52,7 @@
          "requires" : {
             "HTML::Entities" : "0",
             "HTML::Parser" : "3.47",
-            "List::Util" : "0",
+            "List::Util" : "1.33",
             "Scalar::Util" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -78,7 +78,7 @@
    "provides" : {
       "HTML::Scrubber" : {
          "file" : "lib/HTML/Scrubber.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/nigelm/html-scrubber"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -174,7 +174,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release/0.18",
+                  "tag" : "release/0.19",
                   "tag_format" : "release/%v",
                   "tag_message" : "%v"
                },

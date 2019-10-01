@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "FASTX-Reader",
   "EXE_FILES" => [
-    "bin/fqc"
+    "bin/fqc",
+    "bin/fqlen.pl"
   ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.014",
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.1",
     "FindBin" => "1.3"
   },
-  "VERSION" => "0.60",
+  "VERSION" => "0.61",
   "test" => {
     "TESTS" => "t/*.t"
   }

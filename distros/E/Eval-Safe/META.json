@@ -1,0 +1,67 @@
+{
+   "abstract" : "Simplified safe evaluation of Perl code",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Eval-Safe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "namespace" : [
+         "Eval::Safe"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "Safe" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0"
+         },
+         "suggests" : {
+            "Test::Pod" : "1.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/perl-eval-safe/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/perl-eval-safe"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

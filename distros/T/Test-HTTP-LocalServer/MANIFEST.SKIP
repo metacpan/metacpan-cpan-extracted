@@ -1,6 +1,8 @@
+^\.appveyor.yml$
 .cvsignore$
 .git/
 ^.lwpcookies
+^.prove
 ^.releaserc
 ^.travis.yml
 ^blib/
@@ -19,3 +21,4 @@ CVS/
 ^ppd/
 t/70-real-status-timeout.t
 ^MYMETA.*
+^.*\.log$

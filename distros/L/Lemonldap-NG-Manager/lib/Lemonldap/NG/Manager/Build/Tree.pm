@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 # TODO: Missing:
 #  * activeTimer
@@ -76,7 +76,12 @@ sub tree {
                                     nodes => [
                                         'portalRequireOldPassword',
                                         'hideOldPassword',
-                                        'mailOnPasswordChange'
+                                        'mailOnPasswordChange',
+                                        'passwordPolicyMinSize',
+                                        'passwordPolicyMinLower',
+                                        'passwordPolicyMinUpper',
+                                        'passwordPolicyMinDigit',
+                                        'portalDisplayPasswordPolicy',
                                     ]
                                 },
                                 {
@@ -125,7 +130,10 @@ sub tree {
                         {
                             title => 'choiceParams',
                             help  => 'authchoice.html',
-                            nodes => [ 'authChoiceParam', 'authChoiceModules' ]
+                            nodes => [
+                                'authChoiceParam', 'authChoiceModules',
+                                'authChoiceAuthBasic'
+                            ]
                         },
                         {
                             title => 'apacheParams',
@@ -277,7 +285,8 @@ sub tree {
                                         'ldapUsePasswordResetAttribute',
                                         'ldapPasswordResetAttribute',
                                         'ldapPasswordResetAttributeValue',
-                                        'ldapAllowResetExpiredPassword'
+                                        'ldapAllowResetExpiredPassword',
+                                        'ldapITDS'
                                     ]
                                 },
                             ]
@@ -376,9 +385,10 @@ sub tree {
                             title => 'slaveParams',
                             help  => 'authslave.html',
                             nodes => [
-                                'slaveAuthnLevel', 'slaveExportedVars',
-                                'slaveUserHeader', 'slaveMasterIP',
-                                'slaveHeaderName', 'slaveHeaderContent'
+                                'slaveAuthnLevel',    'slaveUserHeader',
+                                'slaveMasterIP',      'slaveHeaderName',
+                                'slaveHeaderContent', 'slaveDisplayLogo',
+                                'slaveExportedVars',
                             ]
                         },
                         {
@@ -493,13 +503,20 @@ sub tree {
                                 'issuerDBGetParameters'
                             ]
                         },
+                        {
+                            title => 'issuerOptions',
+                            help  => 'start.html#options',
+                            form  => 'simpleInputContainer',
+                            nodes => ['issuersTimeout']
+                        },
                     ]
                 },
                 {
                     title => 'logParams',
                     help  => 'logs.html',
                     form  => 'simpleInputContainer',
-                    nodes => [ 'whatToTrace', 'hiddenAttributes' ]
+                    nodes =>
+                      [ 'whatToTrace', 'customToTrace', 'hiddenAttributes' ]
                 },
                 {
                     title => 'cookieParams',
@@ -542,15 +559,18 @@ sub tree {
                         {
                             title => 'persistentSessions',
                             nodes => [
-                                'persistentStorage', 'persistentStorageOptions'
+                                'disablePersistentStorage',
+                                'persistentStorage',
+                                'persistentStorageOptions'
                             ]
-                        }
+                        },
                     ]
                 },
                 {
                     title => 'reloadParams',
                     help  => 'configlocation.html#configuration_reload',
-                    nodes => [ 'reloadUrls', 'reloadTimeout', ]
+                    nodes =>
+                      [ 'reloadUrls', 'reloadTimeout', 'dontCompactConf' ]
                 },
                 {
                     title => 'plugins',
@@ -565,9 +585,9 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'wsdlServer',           'restSessionServer',
-                                'restExportSecretKeys', 'restConfigServer',
-                                'soapSessionServer',    'soapConfigServer',
-                                'exportedAttr',
+                                'restExportSecretKeys', 'restClockTolerance',
+                                'restConfigServer',     'soapSessionServer',
+                                'soapConfigServer',     'exportedAttr',
                             ]
                         },
                         {
@@ -585,12 +605,29 @@ sub tree {
                             help  => 'notifications.html',
                             nodes => [
                                 'notification',
-                                'notificationServer',
                                 'oldNotifFormat',
                                 'notificationStorage',
                                 'notificationStorageOptions',
                                 'notificationWildcard',
-                                'notificationXSLTfile'
+                                'notificationXSLTfile',
+                                {
+                                    title => 'serverNotification',
+                                    help  => 'notifications.html#server',
+                                    nodes => [
+                                        'notificationServer',
+                                        'notificationServerSentAttributes',
+                                        {
+                                            title =>
+                                              'notificationServerMethods',
+                                            form  => 'simpleInputContainer',
+                                            nodes => [
+                                                'notificationServerPOST',
+                                                'notificationServerGET',
+                                                'notificationServerDELETE',
+                                            ]
+                                        },
+                                    ]
+                                },
                             ]
                         },
                         {
@@ -610,7 +647,9 @@ sub tree {
                                     title => 'mailOther',
                                     form  => 'simpleInputContainer',
                                     nodes => [
-                                        'mailUrl', 'mailTimeout',
+                                        'mailUrl',
+                                        'mailTimeout',
+                                        'portalDisplayGeneratePassword',
                                         'randomPasswordRegexp',
                                     ]
                                 }
@@ -646,6 +685,7 @@ sub tree {
                                 'checkUser',
                                 'checkUserIdRule',
                                 'checkUserHiddenAttributes',
+                                'checkUserSearchAttributes',
                                 'checkUserDisplayPersistentInfo',
                                 'checkUserDisplayEmptyValues',
                             ]
@@ -657,10 +697,19 @@ sub tree {
                             nodes => [
                                 'impersonationRule',
                                 'impersonationIdRule',
-                                'impersonationPrefix',
                                 'impersonationHiddenAttributes',
                                 'impersonationSkipEmptyValues',
                                 'impersonationMergeSSOgroups',
+                            ]
+                        },
+                        {
+                            title => 'contextSwitching',
+                            help  => 'contextswitching.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'contextSwitchingRule',
+                                'contextSwitchingIdRule',
+                                'contextSwitchingStopWithLogout',
                             ]
                         },
                     ]
@@ -672,17 +721,18 @@ sub tree {
                             title => 'utotp2f',
                             help  => 'utotp2f.html',
                             form  => 'simpleInputContainer',
-                            nodes =>
-                              [ 'utotp2fActivation', 'utotp2fAuthnLevel' ]
+                            nodes => [
+                                'utotp2fActivation', 'utotp2fAuthnLevel',
+                                'utotp2fLabel',      'utotp2fLogo'
+                            ]
                         },
                         {
-                            title => 'totp',
+                            title => 'totp2f',
                             help  => 'totp2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'totp2fActivation',
                                 'totp2fSelfRegistration',
-                                'totp2fAuthnLevel',
                                 'totp2fIssuer',
                                 'totp2fInterval',
                                 'totp2fRange',
@@ -691,6 +741,9 @@ sub tree {
                                 'totp2fUserCanChangeKey',
                                 'totp2fUserCanRemoveKey',
                                 'totp2fTTL',
+                                'totp2fAuthnLevel',
+                                'totp2fLabel',
+                                'totp2fLogo',
                             ]
                         },
                         {
@@ -698,9 +751,10 @@ sub tree {
                             help  => 'u2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'u2fActivation', 'u2fSelfRegistration',
-                                'u2fAuthnLevel', 'u2fUserCanRemoveKey',
-                                'u2fTTL',
+                                'u2fActivation',       'u2fSelfRegistration',
+                                'u2fUserCanRemoveKey', 'u2fTTL',
+                                'u2fAuthnLevel',       'u2fLabel',
+                                'u2fLogo',
                             ]
                         },
                         {
@@ -711,17 +765,33 @@ sub tree {
                                 'mail2fActivation', 'mail2fCodeRegex',
                                 'mail2fTimeout',    'mail2fSubject',
                                 'mail2fBody',       'mail2fAuthnLevel',
-                                'mail2fLogo',
+                                'mail2fLabel',      'mail2fLogo',
                             ]
                         },
                         {
-                            title => 'external2f',
+                            title => 'ext2f',
                             help  => 'external2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'ext2fActivation',  'ext2fCodeActivation',
                                 'ext2FSendCommand', 'ext2FValidateCommand',
-                                'ext2fAuthnLevel',  'ext2fLogo',
+                                'ext2fAuthnLevel',  'ext2fLabel',
+                                'ext2fLogo',
+                            ]
+                        },
+                        {
+                            title => 'radius2f',
+                            help  => 'radius2f.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'radius2fActivation',
+                                'radius2fServer',
+                                'radius2fSecret',
+                                'radius2fUsernameSessionKey',
+                                'radius2fTimeout',
+                                'radius2fAuthnLevel',
+                                'radius2fLogo',
+                                'radius2fLabel',
                             ]
                         },
                         {
@@ -731,7 +801,7 @@ sub tree {
                                 'rest2fActivation', 'rest2fInitUrl',
                                 'rest2fInitArgs',   'rest2fVerifyUrl',
                                 'rest2fVerifyArgs', 'rest2fAuthnLevel',
-                                'rest2fLogo',
+                                'rest2fLabel',      'rest2fLogo',
                             ]
                         },
                         {
@@ -741,7 +811,6 @@ sub tree {
                             nodes => [
                                 'yubikey2fActivation',
                                 'yubikey2fSelfRegistration',
-                                'yubikey2fAuthnLevel',
                                 'yubikey2fClientID',
                                 'yubikey2fSecretKey',
                                 'yubikey2fNonce',
@@ -749,8 +818,12 @@ sub tree {
                                 'yubikey2fPublicIDSize',
                                 'yubikey2fUserCanRemoveKey',
                                 'yubikey2fTTL',
+                                'yubikey2fAuthnLevel',
+                                'yubikey2fLabel',
+                                'yubikey2fLogo',
                             ],
                         },
+                        'sfExtra',
                         {
                             title => 'sfRemovedNotification',
                             help  => 'secondfactor.html',
@@ -796,6 +869,7 @@ sub tree {
                             help => 'security.html#configure_security_settings',
                             nodes => [
                                 'userControl',
+                                'browsersDontStorePassword',
                                 'portalForceAuthn',
                                 'portalForceAuthnInterval',
                                 'key',
@@ -1061,6 +1135,7 @@ sub tree {
                         'oidcServiceMetaDataUserInfoURI',
                         'oidcServiceMetaDataJWKSURI',
                         'oidcServiceMetaDataRegistrationURI',
+                        'oidcServiceMetaDataIntrospectionURI',
                         'oidcServiceMetaDataEndSessionURI',
                         'oidcServiceMetaDataCheckSessionURI',
                         'oidcServiceMetaDataFrontChannelURI',

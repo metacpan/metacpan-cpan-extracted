@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 sub supported_parameters { () }
 sub default_severity { $SEVERITY_HIGH }
@@ -21,6 +21,7 @@ my %modules = (
 	'Coro' => 'Coro no longer works on perl 5.22, you need to use the author\'s forked version of Perl. Avoid at all costs.',
 	'Error' => 'Error.pm is overly magical and discouraged by its maintainers. Try Throwable for exception classes in Moo/Moose, or Exception::Class otherwise. Try::Tiny or Try are recommended for the try/catch syntax.',
 	'File::Slurp' => 'File::Slurp gets file encodings all wrong, line endings on win32 are messed up, and it was written before layers were properly added. Use File::Slurper, Path::Tiny, Data::Munge, or Mojo::File.',
+	'FindBin' => 'FindBin depends on the sometimes vague definition of "initial script" and can\'t be updated to fix bugs in old Perls. Use Dir::Self or lib::relative to work with the absolute path of the current source file instead.',
 	'HTML::Template' => 'HTML::Template is an old and buggy module, try Template Toolkit, HTML::Zoom, or Text::Template instead, or HTML::Template::Pro if you must use the same syntax.',
 	'IO::Socket::INET6' => 'IO::Socket::INET6 is an old attempt at an IPv6 compatible version of IO::Socket::INET, but has numerous issues and is discouraged by the maintainer in favor of IO::Socket::IP, which transparently creates IPv4 and IPv6 sockets.',
 	'JSON::Any' => 'JSON::Any is deprecated. Use JSON::MaybeXS instead.',
@@ -94,6 +95,18 @@ L<Error>.pm is overly magical and discouraged by its maintainers. Try
 L<Throwable> for exception classes in L<Moo>/L<Moose>, or L<Exception::Class>
 otherwise. L<Try::Tiny> or L<Try> are recommended for the C<try>/C<catch>
 syntax.
+
+=head2 FindBin
+
+L<FindBin> is often used to retrieve the absolute path to the directory
+containing the initially executed script, a mechanism which is not always
+logically clear. Additionally, it has serious bugs on old Perls and can't be
+updated from CPAN to fix them. The L<Dir::Self> module provides a
+straightforward C<__DIR__> constant for the absolute path to the directory
+containing the current source file. The L<lib::relative> module resolves passed
+relative paths to the current source file for the common case of adding local
+module include directories, and documents an example of achieving the same
+behavior with core modules.
 
 =head2 File::Slurp
 

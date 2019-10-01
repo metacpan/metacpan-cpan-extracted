@@ -14,7 +14,7 @@ All code ripped from pod2test by M. Schwern
 =head1 SYNOPSIS
 
   # pre-5.8.0's warns aren't caught by a tied STDERR.
-  use vars qw($_STDOUT_, $_STDERR_);
+  our ($_STDOUT_, $_STDERR_);
   tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
   tie *STDERR, 'IO::Catch', '_STDERR_' or die $!;
 
@@ -23,9 +23,7 @@ All code ripped from pod2test by M. Schwern
 
 =cut
 
-use vars qw($VERSION);
-
-$VERSION = '0.02';
+our $VERSION = '0.02';
 
 sub TIEHANDLE {
     my($class, $var) = @_;

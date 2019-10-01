@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Chain
 
+0.11  Thu Sep 26 21:05:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.10  Mon Apr 01 18:40:00 2019
       - Updated Dancer2::Plugin::Chain::Router to use namespace::autoclean.
 

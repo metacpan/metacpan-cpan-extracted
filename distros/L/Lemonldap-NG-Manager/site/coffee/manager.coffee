@@ -328,6 +328,25 @@ llapp.controller 'TreeCtrl', [
 					over: []
 			$scope.execFilters $scope._findScopeByKey 'authParams'
 
+		$scope.newSfExtra = ->
+			node = $scope._findContainer()
+			node.nodes.push
+				id: "#{node.id}/n#{id++}"
+				title: 'new'
+				type: 'sfExtra'
+				data:
+					type: ''
+					rule: ''
+					logo: ''
+					label: ''
+					over: []
+
+
+		$scope.newSfOver = ->
+			d = $scope.currentNode.data
+			d.over = [] unless d.over
+			d.over.push ["new#{id++}", '']
+
 		$scope.newCmbOver = ->
 			d = $scope.currentNode.data
 			d.over = [] unless d.over
@@ -624,16 +643,17 @@ llapp.controller 'TreeCtrl', [
 			node = scope.$modelValue
 			# regexp-assemble of:
 			#  authChoice
-			#  keyText
 			#  cmbModule
-			#  virtualHost
-			#  rule
-			#  menuCat
+			#  keyText
 			#  menuApp
+			#  menuCat
+			#  rule
 			#  samlAttribute
 			#  samlIDPMetaDataNode
 			#  samlSPMetaDataNode
-			return if node.type and node.type.match /^(?:(?:saml(?:(?:ID|S)PMetaDataNod|Attribut)|(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/ then true else false
+			#  sfExtra
+			#  virtualHost
+			return if node.type and node.type.match /^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/ then true else false
 
 		# RSA keys generation
 		$scope.newRSAKey = ->

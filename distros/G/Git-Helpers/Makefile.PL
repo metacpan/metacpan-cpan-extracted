@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "MetaCPAN::Client" => 0,
     "Moo" => 0,
     "MooX::Options" => 0,
+    "Pod::Usage" => 0,
     "String::Trim" => 0,
     "Sub::Exporter" => 0,
     "Term::Choose" => 0,
@@ -58,7 +59,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => "1.005",
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "0.000018",
+  "VERSION" => "0.000020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -81,6 +82,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "MooX::Options" => 0,
   "Path::Tiny" => 0,
+  "Pod::Usage" => 0,
   "String::Trim" => 0,
   "Sub::Exporter" => 0,
   "Term::Choose" => 0,

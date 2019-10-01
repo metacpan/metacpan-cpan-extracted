@@ -2,7 +2,7 @@ package App::cpm;
 use strict;
 use warnings;
 
-our $VERSION = '0.983';
+our $VERSION = '0.985';
 our ($GIT_DESCRIBE, $GIT_URL);
 
 1;
@@ -94,20 +94,6 @@ Copyright 2015 Shoichi Kaji E<lt>skaji@cpan.orgE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=head1 COMMUNITY
-
-=over 4
-
-=item L<https://github.com/skaji/cpm>
-
-Code repository and issue tracker
-
-=item L<https://gitter.im/skaji/cpm>
-
-Chat room. I would like to hear your thoughts about CPAN clients (not necessary about cpm)
-
-=back
 
 =head1 SEE ALSO
 

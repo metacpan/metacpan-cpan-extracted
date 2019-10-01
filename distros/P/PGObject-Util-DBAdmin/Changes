@@ -1,11 +1,16 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.0.3   2019-09-29
+        Run 'verify_helpers' test only in AUTHOR_TESTING mode as it
+        requires the Pg client applications to be installed on testers
+        (including cpantesters, which don't all have those)
+
 1.0.2   2019-09-20
         Fix the MANIFEST listing non-existing files
 
 1.0.1   2019-07-09
         Fix: the 'verify_helpers' API bleeds output through to the
-        STDERR and STDOUT streams. 
+        STDERR and STDOUT streams.
 
 1.0.0   2019-07-08
         Extend API with 'verify_helpers' class method to allow users to

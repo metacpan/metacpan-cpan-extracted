@@ -53,18 +53,19 @@ sub new {
 
 	my $name = $self->host_track;
 	my $host = $Audio::Nama::tn{$name};
-	confess( Audio::Nama::project_dir().": missing host_track".  $Audio::Nama::this_track->dump. $self->dump. Audio::Nama::process_command("dumpa")) if !$host;
+	confess( Audio::Nama::project_dir().": missing host_track".  $Audio::Nama::this_track->dump. $self->dump. Audio::Nama::nama_cmd("dumpa")) if !$host;
+
 
 # Routing:
 #
-#    sax-v5-original --+
+#    sax-v5-original --+ #  version_bus/version_mix   host_bus/host
 #                      |
 #    sax-v5-edit1 -----+--- sax-v5 (bus/track) --- sax (bus/track) ----- 
 
 
 	# prepare top-level bus and mix track
 	
-	$host->busify;     # i.e. sax (bus/track)
+	$host->activate_bus;     # i.e. sax (bus/track)
 	
 	# create the version-level bus and mix track
 	# i.e. sax-v5 (bus/track)
@@ -74,14 +75,14 @@ sub new {
 	my $version_mix = Audio::Nama::Track->new(
 
 		name 		=> $self->edit_root_name, # i.e. sax-v5
-	#	rw			=> REC,                 # set by ->busify
+	#	rw			=> REC,                 # set by ->activate_bus
 		source_type => 'bus',
 		source_id 	=> 'bus',
 		width		=> 2,                     # default to stereo 
 		group   	=> $self->host_track,     # i.e. sax
 		hide		=> 1,
 	); 
-	$version_mix->busify;
+	$version_mix->activate_bus;
 
 	# create host track alias if necessary
 
@@ -94,7 +95,7 @@ sub new {
 	my $host_track_alias = $Audio::Nama::tn{$self->host_alias} // 
 		Audio::Nama::VersionTrack->new(
 			name 	=> $self->host_alias,
-			version => $host->monitor_version, # static
+			version => $host->playback_version, # static
 			target  => $host->name,
 			rw		=> PLAY,                  # do not REC
 			group   => $self->edit_root_name,  # i.e. sax-v5
@@ -289,7 +290,7 @@ sub initialize_edit_points {
 sub abort_set_edit_points {
 	Audio::Nama::throw("...Aborting!");
 	reset_input_line();
-	eval_iam('stop');
+	ecasound_iam('stop');
 	initialize_edit_points();
 	detect_spacebar();
 }
@@ -297,7 +298,7 @@ sub abort_set_edit_points {
 sub get_edit_mark {
 	$p++;
 	if($p <= 3){  # record mark
-		my $pos = eval_iam('getpos');
+		my $pos = ecasound_iam('getpos');
 		push @_edit_points, $pos;
 		Audio::Nama::pager(" got $names[$p] position ".d1($pos));
 		reset_input_line();
@@ -310,7 +311,7 @@ sub get_edit_mark {
 }
 sub complete_edit_points {
 	@{$setup->{edit_points}} = @_edit_points; # save to global
-	eval_iam('stop');
+	ecasound_iam('stop');
 	Audio::Nama::pager("\nEngine is stopped\n");
 	detect_spacebar();
 	print prompt(), " ";
@@ -321,7 +322,7 @@ sub set_edit_points {
 	Audio::Nama::throw("You must use a playback-only mode to setup edit marks. Aborting"), 
 		return 1 if Audio::Nama::ChainSetup::really_recording();
 	Audio::Nama::throw("You need stop the engine first. Aborting"), 
-		return 1 if engine_running();
+		return 1 if $this_engine->started();
 	Audio::Nama::pager("Ready to set edit points!");
 	sleeper(0.2);
 	Audio::Nama::pager(q(Press the "P" key three times to mark positions for:
@@ -337,7 +338,7 @@ Engine will start in 2 seconds.));
 	sub {
 		reset_input_line();
 		detect_keystroke_p();
-		eval_iam('start');
+		ecasound_iam('start');
 		Audio::Nama::pager("\n\nEngine is running\n");
 		print prompt();
 	});
@@ -398,13 +399,13 @@ sub new_edit {
 		return if $name =~ /-v\d+-edit\d+/;
 	Audio::Nama::throw("$name: must be in PLAY mode.
 Edits will be applied against current version"), 
-		return unless $this_track->rec_status eq PLAY 
-			or $this_track->rec_status eq REC and
+		return unless $this_track->play 
+			or $this_track->rec and
 			grep{ /$editre/ } keys %Audio::Nama::Track::by_name;
 
 	# create edit
 	
-	my $v = $this_track->monitor_version;
+	my $v = $this_track->playback_version;
 	Audio::Nama::pager("$name: creating new edit against version $v");
 	my $edit = Audio::Nama::Edit->new(
 		host_track 		=> $this_track->name,
@@ -484,13 +485,13 @@ sub edit_mode		{ $mode->{offset_run} and defined $this_edit}
 sub edit_mode_conditions {        
 	defined $this_edit or Audio::Nama::throw('No edit is defined'), return;
 	defined $this_edit->play_start_time or Audio::Nama::throw('No edit points defined'), return;
-	$this_edit->host_alias_track->rec_status eq PLAY
+	$this_edit->host_alias_track->play
 		or Audio::Nama::throw('host alias track : ',$this_edit->host_alias,
 				" status must be PLAY"), return;
 
 	# the following conditions should never be triggered 
 	
-	$this_edit->host_alias_track->monitor_version == $this_edit->host_version
+	$this_edit->host_alias_track->playback_version == $this_edit->host_version
 		or die('host alias track: ',$this_edit->host_alias,
 				" must be set to version ",$this_edit->host_version), return
 	1;
@@ -694,7 +695,7 @@ sub explode_track {
 	# quit if I am already a mix track
 
 	Audio::Nama::throw($track->name,": I am already a mix track. I cannot explode!"),return
-		if $track->is_mix_track;
+		if $track->is_mixing; # XX should not be allowed to explode if track is set to PLAY
 
 	my @versions = @{ $track->versions };
 
@@ -703,7 +704,7 @@ sub explode_track {
 	Audio::Nama::throw($track->name,": Only one version. Skipping."), return
 		if scalar @versions == 1;
 
-	$track->busify;
+	$track->activate_bus;
 
 	my $host = $track->name;
 	my @names = map{ "$host-v$_"} @versions;
@@ -741,9 +742,9 @@ sub select_edit {
  	Audio::Nama::throw( qq(Edit $n applies to track "), $edit->host_track, 
  		 qq(" version ), $edit->host_version, ".
 This does does not match the current monitor version (",
-$edit->host->monitor_version,"). 
+$edit->host->playback_version,"). 
 Set the correct version and try again."), return
-	if $edit->host->monitor_version != $edit->host_version;
+	if $edit->host->playback_version != $edit->host_version;
 
 	# select edit
 	
@@ -751,21 +752,16 @@ Set the correct version and try again."), return
 
 	# turn on top-level bus and mix track
 	
-	$edit->host_bus->set(rw => REC);
-
-	$edit->host->busify;
+	$edit->host->activate_bus;
 
 	# turn off all version level buses/mix_tracks
 	
 	map{ $tn{$_}->set(rw => OFF);  # version mix tracks
-	      $bn{$_}->set(rw => OFF); # version buses
 	} $this_edit->host_bus->tracks;  # use same name for track/bus
 
 	# turn on what we want
 	
-	$edit->version_bus->set(rw => REC);
-
-	$edit->version_mix->busify;
+	$edit->version_mix->activate_bus;
 
 	$edit->host_alias_track->set(rw => PLAY);
 
@@ -779,13 +775,10 @@ sub disable_edits {
 		unless defined $this_edit;
 	my $edit = $this_edit;
 
-	$edit->host_bus->set( rw => OFF);
+	$edit->host->set(rw => OFF); # XXX or what it was before??
 
-	$edit->version_bus->set( rw => OFF);
+	$edit->version_mix->set( rw => OFF);
 
-	# reset host track
-	
-	$edit->host->unbusify;
 	
 }
 sub merge_edits {
@@ -793,16 +786,16 @@ sub merge_edits {
 	Audio::Nama::throw("Please select an edit and try again."), return
 		unless defined $edit;
 	Audio::Nama::throw($edit->host_alias, ": track must be PLAY status.  Aborting."), return
-		unless $edit->host_alias_track->rec_status eq PLAY;
+		unless $edit->host_alias_track->play;
 	Audio::Nama::throw("Use exit_edit_mode and try again."), return if edit_mode();
 
 	# create merge message
 	my $v = $edit->host_version;
 	my %edits = 
 		map{ my ($edit) = $tn{$_}->name =~ /edit(\d+)$/;
-			 my $ver  = $tn{$_}->monitor_version;
+			 my $ver  = $tn{$_}->playback_version;
 			 $edit => $ver
-		} grep{ $tn{$_}->name =~ /edit\d+$/ and $tn{$_}->rec_status eq PLAY} 
+		} grep{ $tn{$_}->name =~ /edit\d+$/ and $tn{$_}->play} 
 		$edit->version_bus->tracks; 
 	my $msg = "merges ".$edit->host_track."_$v.wav w/edits ".
 		join " ",map{$_."v$edits{$_}"} sort{$a<=>$b} keys %edits;
@@ -839,7 +832,7 @@ sub merge_edits {
 sub setup_length {
 	my $setup_length;
 	map{  my $l = $_->shifted_length; $setup_length = $l if $l > $setup_length }
-	grep{ $_-> rec_status eq PLAY }
+	grep{ $_-> play }
 	Audio::Nama::ChainSetup::engine_tracks();
 	$setup_length
 }
@@ -875,7 +868,7 @@ sub select_edit_track {
 	Audio::Nama::throw("You need to select an edit first (list_edits, select_edit)\n"),
 		return unless defined $this_edit;
 	$this_track = $this_edit->$track_selector_method; 
-	process_command('show_track');
+	nama_cmd('show_track');
 }
 
 } # end package

@@ -26,7 +26,7 @@ config_space() : ArrayRef
 
 =type
 
-method
+function
 
 =cut
 

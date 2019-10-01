@@ -2,13 +2,12 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
 use Mouse;
 use JSON;
-use Data::Dumper;
 
 has skinRules => ( is => 'rw' );
 
@@ -126,8 +125,9 @@ sub display {
     # 1.3 There is a message to display
     elsif ( my $info = $req->info ) {
         $self->logger->debug('Display: info detected');
-        $self->logger->debug(
-            'Hidden values -> ' . Dumper( $req->{portalHiddenFormValues} ) );
+        $self->logger->debug('Hidden values :');
+        $self->logger->debug( " $_: " . $req->{portalHiddenFormValues}->{$_} )
+          for keys %{ $req->{portalHiddenFormValues} // {} };
         $skinfile       = 'info';
         %templateParams = (
             MAIN_LOGO       => $self->conf->{portalMainLogo},
@@ -180,6 +180,7 @@ sub display {
     elsif ( $req->{error} == PE_REDIRECT ) {
         $skinfile       = "redirect";
         %templateParams = (
+            MAIN_LOGO     => $self->conf->{portalMainLogo},
             URL           => $req->{urldc},
             HIDDEN_INPUTS => $self->buildHiddenForm($req),
             FORM_METHOD   => $req->data->{redirectFormMethod} || 'get',
@@ -206,6 +207,11 @@ sub display {
             PING                => $self->conf->{portalPingInterval},
             REQUIRE_OLDPASSWORD => $self->conf->{portalRequireOldPassword},
             HIDE_OLDPASSWORD    => 0,
+            DISPLAY_PPOLICY     => $self->conf->{portalDisplayPasswordPolicy},
+            PPOLICY_MINSIZE     => $self->conf->{passwordPolicyMinSize},
+            PPOLICY_MINLOWER    => $self->conf->{passwordPolicyMinLower},
+            PPOLICY_MINUPPER    => $self->conf->{passwordPolicyMinUpper},
+            PPOLICY_MINDIGIT    => $self->conf->{passwordPolicyMinDigit},
             $self->menu->params($req),
             (
                 $req->data->{customScript}
@@ -255,6 +261,13 @@ sub display {
         or (    not $req->data->{noerror}
             and $req->userData
             and %{ $req->userData } )
+
+        # Avoid issue 1867
+        or (    $self->conf->{authentication} eq 'Combination'
+            and $req->{error} > PE_OK
+            and $req->{error} != PE_FIRSTACCESS )
+
+       # and ( $req->{error} == PE_TOKENEXPIRED or $req->{error} == PE_NOTOKEN )
       )
     {
         $skinfile       = 'error';
@@ -275,7 +288,12 @@ sub display {
     else {
         $skinfile = 'login';
         my $login = $self->userId($req);
-        $login = '' if ( $login eq 'anonymous' );
+        if ( $login eq 'anonymous' ) {
+            $login = '';
+        }
+        elsif ( $req->user ) {
+            $login = $req->{user};
+        }
         %templateParams = (
             MAIN_LOGO             => $self->conf->{portalMainLogo},
             LANGS                 => $self->conf->{showLanguages},
@@ -283,6 +301,7 @@ sub display {
             AUTH_ERROR_TYPE       => $req->error_type,
             AUTH_URL              => $req->{data}->{_url},
             LOGIN                 => $login,
+            DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
             ASK_LOGINS            => $req->param('checkLogins') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
@@ -344,6 +363,11 @@ sub display {
                 ? ""
                 : $req->data->{oldpassword},
                 HIDE_OLDPASSWORD => $self->conf->{hideOldPassword},
+                DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
+                PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
+                PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
+                PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
+                PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
             );
         }
 

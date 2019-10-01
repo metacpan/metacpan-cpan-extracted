@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 7d6252cbae1a47d35209d04fb5e02748bb771c3ab197a51d95bbe7b0049cb8a0 Changes
+SHA256 a3b047d14a40e0a60db181077e84cdcfeacceb2a95475c13faf6590164edabfd MANIFEST
+SHA256 5938c2f60ac1e9e01382d6c549e5c34b7689cf5a7b86e9627dba19acf3286099 META.yml
+SHA256 2983de959cb51935457d3e30506e7c611c202da1ad9461643e9defe3a25170a2 Makefile.PL
+SHA256 69362ffa615f88dc88980b0a730db64aeb1ee014e8bd518ecb0f8506e07cd04c README
+SHA256 66c5cb24e0a025edc211d9d747c5bf68750f7bf9b67715e9a0d467921dffe0a5 doc/images/announce-screenshot.png
+SHA256 b204b6a653d4879c670b46596632b3f48c66de05910dd1d46babcc07ac476cdf etc/initialdata
+SHA256 0682e21d8f270a5a18db8d7d4dcc465c3ede08dd9754ea603a7f81ac95de2933 html/Callbacks/RT-Extension-Announce/Elements/PageLayout/BeforeBody
+SHA256 5106d39e6b57f431cc768efa21a574c84b0359403a06ec6915ba1019ddf941c8 html/Callbacks/RT-Extension-Announce/Ticket/Create.html/AfterOwner
+SHA256 e1ae56445a770e68c32fabf62745e7473e2093a6e1e338a3bd66cf21e7440364 html/Callbacks/RT-Extension-Announce/m/_elements/menu/MassageMenu
+SHA256 8e43d5d183420fab28ab94ebd202a1c6c84a02f4c61ace822ee7c3a99b8f2439 html/NoAuth/css/announce.css
+SHA256 032659280abab81eaa8af39c93121579e1b2ababd2746b8f7aa0773e6b7c34b7 html/NoAuth/js/announce.js
+SHA256 cc0fd39fe9919e7b998be4cf5f650bb23a64f550de87c00efb243fd5907e682b html/m/announcements
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 82b4425807ec3774f36958effd62d88c167b95c6da08c0749d7ae9e6c2af25a2 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 8e064eb49b091e69092ed618f064b8908ad4b11e74af5c9f9cca22bad5002f88 lib/RT/CustomFieldValues/AnnounceGroups.pm
+SHA256 52a8b08630970cd6789659022a381e50f1f5ab2a4a68788e0a99e9d5e5e0345a lib/RT/Extension/Announce.pm
+SHA256 097a3172cdca22ed4b23bf9f5c5a900e3e2771bd8cbb257b1b01acc3ff1ddd42 lib/RT/Extension/Announce/Test.pm
+SHA256 631376e841c19f44d3aae3be97ab47617835c133f5b8690f1e949409b30a9193 lib/RT/Extension/Announce/Test.pm.in
+SHA256 3c4e70a252553b9d6a7897098aa1b8922e0a04e01b73414c333fab3b24cebeeb static/css/announce.css
+SHA256 032659280abab81eaa8af39c93121579e1b2ababd2746b8f7aa0773e6b7c34b7 static/js/announce.js
+SHA256 ef4fac95a00ef09158f66a1ad5db4434876aabcd436fdb8d5039855e4ba78537 xt/basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJdkjmQAAoJEA3wooP+rICyqJ0H/RaDrXlTGV/kicD9A4u+KYpC
+Yc4l0EEpUZi7KAtJTlTt2WWi4aKcMKASFP7GLOHWysxCgHxLVP8JmrvkoMUaMKQL
+MFt9oEBJ7Z7pflpcrO+XU3R8RrlVeYWpIovWIpmvOpOZHlN2KVX2aSdMaSSDLsXh
+ubCbDbvhv/EZUnya6+TztA3J/7FhThGvFTCt7a8f5ipyyliWogrLIIyeiSfr5COn
+xtsvPUTtyF34VwwwDVhYNElRpKzNQu2XYomQwPB5j5h+dfl3LZbpgTlZbt/ZfoQj
+zPqBxeoxgQ6LmUFymhmtv+roYpHcdpkw1eqs5d8g6g5IeID66PFmzKQEUryCWBs=
+=LNkU
+-----END PGP SIGNATURE-----

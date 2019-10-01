@@ -5,8 +5,8 @@ use Test::Exception;
 use Catmandu::Importer::SRU;
 use utf8;
 use lib 't/lib';
-use MockFurl;
-use MockFurlMany;
+use MockHTTPClient;
+use MockHTTPClientMany;
 
 my $pkg;
 
@@ -21,7 +21,7 @@ my %attrs = (
     base         => 'http://www.unicat.be/sru',
     query        => 'marcxml.xml',
     recordSchema => 'marcxml',
-    furl         => MockFurl->new,
+    http_client  => MockHTTPClient->new,
 );
 
 my $importer = Catmandu::Importer::SRU->new(%attrs);
@@ -51,7 +51,7 @@ note("Testing many response");
         base         => 'http://www.unicat.be/sru',
         query        => 'test',
         recordSchema => 'marcxml',
-        furl         => MockFurlMany->new,
+        http_client  => MockHTTPClientMany->new,
     );
 
     my $importer = Catmandu::Importer::SRU->new(%attrs);
@@ -67,7 +67,7 @@ note("Testing namespace");
         query        => 'marcxml_ns.xml',
         recordSchema => 'marcxml',
         parser       => 'marcxml',
-        furl         => MockFurl->new,
+        http_client  => MockHTTPClient->new,
     );
 
     my $importer = Catmandu::Importer::SRU->new(%attrs);
@@ -104,7 +104,7 @@ note("Testing namespace prefix");
         query        => 'marcxml_ns_prefix.xml',
         recordSchema => 'marcxml',
         parser       => 'marcxml',
-        furl         => MockFurl->new,
+        http_client  => MockHTTPClient->new,
     );
 
     my $importer = Catmandu::Importer::SRU->new(%attrs);

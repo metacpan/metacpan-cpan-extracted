@@ -55,6 +55,7 @@ C<LLNG::Manager::Test::_post()> call I<(see below)>.
 
 use strict;
 use Data::Dumper;
+use File::Find;
 use LWP::UserAgent;
 use URI::Escape;
 use Lemonldap::NG::Common::FormEncode;
@@ -72,6 +73,13 @@ $Data::Dumper::Deparse  = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Useperl  = 1;
 my $ini;
+
+use File::Temp 'tempfile', 'tempdir';
+our $tmpDir = $LLNG::TMPDIR
+  || tempdir( 'tmpSessionXXXXX', DIR => 't/sessions', CLEANUP => 1 );
+mkdir "$tmpDir/lock";
+mkdir "$tmpDir/saml";
+mkdir "$tmpDir/saml/lock";
 
 =head4 count($inc)
 
@@ -107,10 +115,7 @@ Clean sessions created during tests
 =cut
 
 sub clean_sessions {
-    opendir D, 't/sessions' or die $!;
-    foreach ( grep { /^[^\.]/ } readdir(D) ) {
-        unlink "t/sessions/$_", "t/sessions/lock/Apache-Session-$_.lock";
-    }
+    find( sub { unlink if -f }, $tmpDir );
     foreach my $dir (qw(t/sessions/lock t/sessions/saml/lock t/sessions/saml)) {
         if ( -d $dir ) {
             opendir D, $dir or die $!;
@@ -119,13 +124,11 @@ sub clean_sessions {
             }
         }
     }
-    my $cache = getCache();
-    $cache->clear;
 }
 
 sub count_sessions {
     my $dir = shift;
-    $dir ||= 't/sessions';
+    $dir ||= $tmpDir;
     my $nbr = 0;
 
     opendir D, $dir or die $!;
@@ -137,9 +140,10 @@ sub count_sessions {
 
 sub getCache {
     require Cache::FileCache;
-    return Cache::FileCache->new( {
+    return Cache::FileCache->new(
+        {
             namespace   => 'lemonldap-ng-session',
-            cache_root  => 't/',
+            cache_root  => $tmpDir,
             cache_depth => 0,
         }
     );
@@ -341,14 +345,14 @@ Note that it works only for Ajax request (see below).
 =cut
 
 sub expectReject {
-    my ( $res, $code ) = @_;
-    ok( $res->[0] == 401, ' Response is 401' ) or explain( $res->[0], 401 );
+    my ( $res, $status, $code ) = @_;
+    $status ||= 401;
+    cmp_ok( $res->[0], '==', $status, " Response status is $status" );
     eval { $res = JSON::from_json( $res->[2]->[0] ) };
-    ok( not($@), 'Content is JSON' )
+    ok( not($@), ' Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
     if ( defined $code ) {
-        ok( $res->{error} == $code, "Error code is $code" )
-          or explain( $res->{error}, $code );
+        is( $res->{error}, $code, " Error code is $code" );
     }
     else {
         pass("Error code is $res->{error}");
@@ -465,6 +469,16 @@ sub getUser {
     return getHeader( $resp, 'Lm-Remote-User' );
 }
 
+=head4 tempdb
+
+Return a temporary file named XXXX.db
+
+=cut
+
+sub tempdb {
+    return "$tmpDir/userdb.db";
+}
+
 =head2 LLNG::Manager::Test Class
 
 =cut
@@ -484,16 +498,40 @@ our $defaultIni = {
     localSessionStorage        => 'Cache::FileCache',
     localSessionStorageOptions => {
         namespace   => 'lemonldap-ng-session',
-        cache_root  => 't/',
+        cache_root  => $tmpDir,
         cache_depth => 0,
     },
-    logLevel      => 'error',
-    cookieName    => 'lemonldap',
-    domain        => 'example.com',
-    templateDir   => 'site/templates',
-    staticPrefix  => '/static',
-    securedCookie => 0,
-    https         => 0,
+    logLevel             => 'error',
+    cookieName           => 'lemonldap',
+    domain               => 'example.com',
+    templateDir          => 'site/templates',
+    staticPrefix         => '/static',
+    securedCookie        => 0,
+    https                => 0,
+    globalStorageOptions => {
+        Directory     => $tmpDir,
+        LockDirectory => "$tmpDir/lock",
+        generateModule =>
+          'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+    },
+    casStorageOptions => {
+        Directory     => "$tmpDir/saml",
+        LockDirectory => "$tmpDir/saml/lock",
+        generateModule =>
+          'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+    },
+    samlStorageOptions => {
+        Directory     => "$tmpDir/saml",
+        LockDirectory => "$tmpDir/saml/lock",
+        generateModule =>
+          'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+    },
+    oidcStorageOptions => {
+        Directory     => "$tmpDir/saml",
+        LockDirectory => "$tmpDir/saml/lock",
+        generateModule =>
+          'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+    },
 };
 
 =head3 Accessors
@@ -525,6 +563,8 @@ has p => ( is => 'rw' );
 
 =cut
 
+has confFailure => ( is => 'rw' );
+
 has ini => (
     is      => 'rw',
     lazy    => 1,
@@ -536,27 +576,30 @@ has ini => (
         }
         $self->{ini} = $ini;
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
-        main::ok( $self->{p}->init($ini), 'Init' );
-        main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
-        main::count(3);
-        no warnings 'redefine';
-        eval
+        main::count(1);
+        unless ( $self->confFailure ) {
+            main::ok( $self->{p}->init($ini),           'Init' );
+            main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
+            main::count(2);
+            no warnings 'redefine';
+            eval
 'sub Lemonldap::NG::Common::Logger::Std::error {return $_[0]->warn($_[1])}';
-        $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french} = {
-            uid  => 'french',
-            cn   => 'Frédéric Accents',
-            mail => 'fa@badwolf.org',
-        };
-        $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{davros} = {
-            uid  => 'davros',
-            cn   => 'Bad Guy',
-            mail => 'davros@badguy.org',
-        };
-        $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{russian} = {
-            uid  => 'russian',
-            cn   => 'Русский',
-            mail => 'ru@badwolf.org',
-        };
+            $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french} = {
+                uid  => 'french',
+                cn   => 'Frédéric Accents',
+                mail => 'fa@badwolf.org',
+            };
+            $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{davros} = {
+                uid  => 'davros',
+                cn   => 'Bad Guy',
+                mail => 'davros@badguy.org',
+            };
+            $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{russian} = {
+                uid  => 'russian',
+                cn   => 'Русский',
+                mail => 'ru@badwolf.org',
+            };
+        }
         $self;
     }
 );
@@ -640,7 +683,8 @@ to test content I<(to launch a C<expectForm()> for example)>.
 
 sub _get {
     my ( $self, $path, %args ) = @_;
-    my $res = $self->app->( {
+    my $res = $self->app->(
+        {
             'HTTP_ACCEPT' => $args{accept}
               || 'application/json, text/plain, */*',
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
@@ -692,7 +736,8 @@ sub _post {
     my ( $self, $path, $body, %args ) = @_;
     die "$body must be a IO::Handle"
       unless ( ref($body) and $body->can('read') );
-    my $res = $self->app->( {
+    my $res = $self->app->(
+        {
             'HTTP_ACCEPT' => $args{accept}
               || 'application/json, text/plain, */*',
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
@@ -736,7 +781,19 @@ Call C<_get()> with method set to DELETE.
 sub _delete {
     my ( $self, $path, %args ) = @_;
     $args{method} = 'DELETE';
-    return $self->_get( $path, %args );
+    $self->_get( $path, %args );
+}
+
+=head4 _options( $path, %args )
+
+Call C<_get()> with method set to OPTIONS.
+
+=cut
+
+sub _options {
+    my ( $self, $path, %args ) = @_;
+    $args{method} = 'OPTIONS';
+    $self->_get( $path, %args );
 }
 
 =head4 _put( $path, $body, %args )

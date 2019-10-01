@@ -10,14 +10,14 @@ BEGIN {
 my $res;
 my $maintests = 21;
 
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 SKIP: {
     eval { require DBI; require DBD::SQLite; require GSSAPI; };
     if ($@) {
         skip 'Missing dependencies', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
 
@@ -42,7 +42,7 @@ SKIP: {
                     '7_Kerberos'   => 'Kerberos;Null;Null',
                 },
 
-                dbiAuthChain        => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain        => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser         => '',
                 dbiAuthPassword     => '',
                 dbiAuthTable        => 'users',
@@ -69,53 +69,62 @@ SKIP: {
     ok( $res->[2]->[0] =~ /7_Kerberos/,   '7_Kerberos displayed' );
     ok( $res->[2]->[0] =~ qr%<img src="/static/common/modules/SSL.png"%,
         'Found 5_ssl Logo' )
-      or print STDERR Dumper( $res->[2]->[0] );
+      or explain( $res->[2]->[0], '<img src="/static/common/modules/SSL.png' );
     ok( $res->[2]->[0] =~ qr%img src="/static/common/modules/Apache.png"%,
         'Found 6_FakeCustom Logo' )
-      or print STDERR Dumper( $res->[2]->[0] );
+      or
+      explain( $res->[2]->[0], '<img src="/static/common/modules/Apache.png' );
     ok( $res->[2]->[0] =~ qr%<img src="/static/common/modules/Kerberos.png"%,
         'Found 7_Kerberos Logo' )
-      or print STDERR Dumper( $res->[2]->[0] );
+      or explain( $res->[2]->[0],
+        '<img src="/static/common/modules/Kerberos.png' );
     ok(
         $res->[2]->[0] =~
           m%<form id="lformDemo" action="https://test.example.com"%,
         ' Redirect URL found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+      )
+      or explain( $res->[2]->[0],
+        '<form id="lformDemo" action="https://test.example.com"' );
     ok(
         $res->[2]->[0] =~
-m%<script type="application/init">\{"sslHost":"https://authssl.example.com:19876"\}</script>%,
+m%<script type="application/init">\s*\{"sslHost":"https://authssl.example.com:19876"\}\s*</script>%s,
         ' SSL AJAX URL found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+      )
+      or
+      explain( $res->[2]->[0], '<script type="application/init">\{"sslHost"' );
     expectForm( $res, '#', undef, 'kerberos' );
     ok(
         $res->[2]->[0] =~ m%<input type="hidden" name="kerberos" value="0" />%,
         'Found hidden attribut "kerberos" with value="0"'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+    ) or explain( $res->[2]->[0], '<input type="hidden" name="kerberos"' );
     ok( $res->[2]->[0] =~ /kerberosChoice\.(?:min\.)?js/,
         'Get Kerberos javascript' )
-      or print STDERR Dumper( $res->[2]->[0] );
+      or explain( $res->[2]->[0], 'kerberosChoice.(min.)?js' );
     ok(
         $res->[2]->[0] =~
 m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
         ' Redirect URL found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+    ) or explain( $res->[2]->[0], '<form id="lformKerberos"' );
     ok( $res->[2]->[0] =~ /sslChoice\.(?:min\.)?js/,
         'Get sslChoice javascript' )
-      or print STDERR Dumper( $res->[2]->[0] );
+      or explain( $res->[2]->[0], 'sslChoice.(min.)?js' );
     ok(
         $res->[2]->[0] =~
           m%<form id="lformSSL" action="#" method="post" class="login SSL">%,
         ' Action # found'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+    ) or explain( $res->[2]->[0], '<form id="lformSSL"' );
     my $header = getHeader( $res, 'Content-Security-Policy' );
     ok( $header =~ m%;form-action \'self\'  https://test.example.com;%,
         ' CSP URL found' )
-      or print STDERR Dumper( $res->[1] );
+      or
+      explain( $res->[1], 'form-action \'self\'  https://test.example.com;' );
     ok( $res->[2]->[0] !~ /4_demo/, '4_Demo not displayed' );
     ok(
         $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
         'Found custom Main Logo'
-    ) or print STDERR Dumper( $res->[2]->[0] );
+      )
+      or explain( $res->[2]->[0],
+        '<img src="/static/common/logos/logo_llng_old.png"' );
 
     # Test SQL
     my $postString = 'user=dwho&password=dwho&test=2_sql';
@@ -135,6 +144,5 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
     clean_sessions();
 }
 count($maintests);
-eval { unlink 't/userdb.db' };
 clean_sessions();
 done_testing( count() );

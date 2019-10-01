@@ -1,50 +1,53 @@
-BEGIN {print "1..3\n";}
-END {print "not ok 1\n" unless $loaded;}
+BEGIN { print "1..3\n"; }
+END { print "not ok 1\n" unless $loaded; }
 use XML::Parser;
 $loaded = 1;
 print "ok 1\n";
 
-my $delim = '------------123453As23lkjlklz877';
-my $file = 'samples/REC-xml-19980210.xml';
+my $delim   = '------------123453As23lkjlklz877';
+my $file    = 'samples/REC-xml-19980210.xml';
 my $tmpfile = 'stream.tmp';
 
 my $cnt = 0;
 
+open( my $out_fh, '>', $tmpfile ) or die "Couldn't open $tmpfile for output";
+open( my $in_fh,  '<', $file )    or die "Couldn't open $file for input";
 
-open(OUT, ">$tmpfile") or die "Couldn't open $tmpfile for output";
-open(IN, $file) or die "Couldn't open $file for input";
-
-while (<IN>) {
-  print OUT;
+while (<$in_fh>) {
+    print $out_fh $_;
 }
 
-close(IN);
-print OUT "$delim\n";
+close($in_fh);
+print $out_fh "$delim\n";
 
-open(IN, $file);
-while (<IN>) {
-  print OUT;
+open( $in_fh, $file );
+while (<$in_fh>) {
+    print $out_fh $_;
 }
 
-close(IN);
-close(OUT);
+close($in_fh);
+close($out_fh);
 
-my $parser = new XML::Parser(Stream_Delimiter => $delim,
-			     Handlers => {Comment => sub {$cnt++;}});
+my $parser = new XML::Parser(
+    Stream_Delimiter => $delim,
+    Handlers         => {
+        Comment => sub { $cnt++; }
+    }
+);
 
-open(FOO, $tmpfile);
+open( my $fh, $tmpfile );
 
-$parser->parse(*FOO);
+$parser->parse($fh);
 
-print "not " if ($cnt != 37);
+print "not " if ( $cnt != 37 );
 print "ok 2\n";
 
 $cnt = 0;
 
-$parser->parse(*FOO);
+$parser->parse($fh);
 
-print "not " if ($cnt != 37);
+print "not " if ( $cnt != 37 );
 print "ok 3\n";
 
-close(FOO);
+close($fh);
 unlink($tmpfile);

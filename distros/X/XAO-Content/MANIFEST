@@ -1,0 +1,74 @@
+CHANGES
+LICENSE
+README
+ -----------------------------------------
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+test.pl
+ -----------------------------------------
+Content.pm
+lib/XAO/DO/Data/Content.pm
+lib/XAO/DO/Data/ContentData.pm
+ -----------------------------------------
+t/testcases/Content/base.pm
+t/testcases/Content/WebContent.pm
+t/xao/projects/test/objects/Config.pm
+ -----------------------------------------
+templates/bits/content/add-form
+templates/bits/content/add-success
+templates/bits/content/content-info
+templates/bits/content/edit-form
+templates/bits/content/edit-form-instruction
+templates/bits/content/edit-show
+templates/bits/content/edit-store
+templates/bits/content/edit-store-success
+templates/bits/content/list-footer
+templates/bits/content/list-header
+templates/bits/content/list-row
+templates/bits/content/list-row-1
+templates/bits/content/main-add
+templates/bits/content/main-list
+templates/bits/content/main-preview
+templates/bits/content/main-preview-stop
+templates/bits/content/main-publish
+templates/bits/content/main-revert
+templates/bits/content/publish-all
+templates/bits/content/publish-name
+templates/bits/content/publish-name-ask
+templates/bits/content/publish-success
+templates/bits/content/revert-all
+templates/bits/content/revert-form
+templates/bits/content/revert-go
+templates/bits/content/revert-option
+templates/bits/content/revert-show
+templates/bits/content/revert-success
+templates/bits/content/set-preview
+templates/bits/content/set-preview-cookie
+templates/bits/content/set-preview-enable
+ -----------------------------------------
+sample/bin/build-structure.proto
+sample/configure.pl
+sample/objects/Config.pm.proto
+sample/templates/aboutus.html
+sample/templates/admin/bits/footer
+sample/templates/admin/bits/header
+sample/templates/admin/content-edit.html
+sample/templates/admin/content.html
+sample/templates/admin/content-publish.html
+sample/templates/admin/content-revert.html
+sample/templates/bits/about-us
+sample/templates/bits/content/add-form
+sample/templates/bits/footer
+sample/templates/bits/header
+sample/templates/bits/hint-link
+sample/templates/bits/styler/hint-title
+sample/templates/hints/bits/footer
+sample/templates/hints/bits/header
+sample/templates/hints/content-description.html
+sample/templates/hints/content-instruction.html
+sample/templates/hints/content-name.html
+sample/templates/hints/content-preview-url.html
+sample/templates/index.html
+META.json                                Module JSON meta-data (added by MakeMaker)

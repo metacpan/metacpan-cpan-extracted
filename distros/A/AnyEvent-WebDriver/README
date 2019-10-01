@@ -49,11 +49,7 @@ DESCRIPTION
 
     Mozilla's "geckodriver" has had webdriver for a long time, while
     "chromedriver" only has basic and mostly undocumented webdriver support
-    since release 77.
-
-    In debian GNU/Linux, you can install the "firefoxdriver" or
-    "chromium-driver" packages to get the firefox/chromium webdrivers,
-    respectively.
+    as of release 77.
 
   CONVENTIONS
     Unless otherwise stated, all delays and time differences in this module
@@ -81,15 +77,20 @@ DESCRIPTION
         autodelete => $boolean
             If true (the default), then automatically execute
             "delete_session" when the WebDriver object is destroyed with an
-            active session. IF set to a false value, then the session will
+            active session. If set to a false value, then the session will
             continue to exist.
 
+            Note that due to bugs in perl that are unlikely to get fixed,
+            "autodelete" is likely ineffective during global destruction and
+            might even crash your process, so you should ensure objects go
+            out of scope before that, or explicitly call "delete_session",
+            if you want the session to be cleaned up.
+
         timeout => $seconds
-            The HTTP timeout, in (fractional) seconds (default: 300, but
-            this will likely drastically reduce). This timeout is reset on
-            any activity, so it is not an overall request timeout. Also,
-            individual requests might extend this timeout if they are known
-            to take longer.
+            The HTTP timeout, in (fractional) seconds (default: 300). This
+            timeout is reset on any activity, so it is not an overall
+            request timeout. Also, individual requests might extend this
+            timeout if they are known to take longer.
 
         persistent => 1 | "undef"
             If true (the default) then persistent connections will be used
@@ -208,14 +209,18 @@ DESCRIPTION
         >, Chrome-specific capability documentation might be found here
         <http://chromedriver.chromium.org/capabilities>, but the latest
         release at the time of this writing (chromedriver 77) has
-        essentially no webdriver documentation about chrome capabilities.
+        essentially no documentation about webdriver capabilities (even MDN
+        has better documentation about chromwedriver!)
 
         If you have URLs for Safari/IE/Edge etc. capabilities, feel free to
         tell me about them.
 
     $wd->delete_session
         Deletes the session - the WebDriver object must not be used after
-        this call.
+        this call (except for calling this method).
+
+        This method is always safe to call and will not do anything if there
+        is no active session.
 
     $timeouts = $wd->get_timeouts
         Get the current timeouts, e.g.:
@@ -659,7 +664,7 @@ DESCRIPTION
         time, it can make sense to build an action list only once and then
         perform it multiple times.
 
-        Actions must not be added after compiling a list.
+        No additional actions must be added after compiling an action list.
 
   EVENT BASED API
     This module wouldn't be a good AnyEvent citizen if it didn't have a true

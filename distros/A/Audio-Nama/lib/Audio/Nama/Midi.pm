@@ -2,86 +2,183 @@
 
 package Audio::Nama;
 use Modern::Perl;
+#use Audio::Nama::Log qw(logpkg);
 use Carp;
 
 {
-
-my($error,$answer)=('','');
 my ($pid, $sel);
-my @handles = my ($fh_midish_write, $fh_midish_read, $fh_midish_error) = map{ IO::Handle->new() } 1..3;
+my @handles = my ($fh_midi_write, $fh_midi_read, $fh_midi_error) = map{ IO::Handle->new() } 1..3;
 map{ $_->autoflush(1) } @handles;
 
-sub start_midish {
+sub start_midish_process {
+	logsub('&start_midish_process');
 	my $executable = qx(which midish);
 	chomp $executable;
 	$executable or say("Midish not found!"), return;
-	$pid = open3($fh_midish_write, $fh_midish_read, $fh_midish_error,"$executable -v")
+	$pid = open3($fh_midi_write, $fh_midi_read, $fh_midi_error,"$executable -v")
 		or warn "Midish failed to start!";
 
 	$sel = IO::Select->new();
-	$sel->add($fh_midish_read);
-	$sel->add($fh_midish_error);
-	midish_command( qq(print "Midish is ready.") );
+	$sel->add($fh_midi_read);
+	$sel->add($fh_midi_error);
+	midish_cmd( qq(print "Midish is ready.") );
+	write_aux_midi_commands();
+	midish_cmd( q(exec ").$file->aux_midi_commands.q(") );
+	$pid
 }
-sub start_midish_transport {
-	my $sync = $mode->{midish_transport_sync};
-	my $start_command;
-	$start_command = 'p' if $sync eq 'play';
-	$start_command = 'r' if $sync eq 'record';
-	defined $start_command 
-		or die "$mode->{midish_transport_sync}: illegal midish_transport_sync mode";
-	midish_command($start_command);
-}
-sub stop_midish_transport { midish_command('s') }
-
-sub midish_command {
-	my $query = shift;
-	print "\n";
-	#$config->{use_midish} or say( qq($query: cannot execute Midish command 
-#unless you set "midish_enable: 1" in .namarc)), return;
-	#$query eq 'exit' and say("Will exit Midish on closing Nama."), return;
-
-	#send query to midish
-	print $fh_midish_write "$query\n";
+sub midish_cmd {
+	my $command = shift;
+	logsub('&midish');
+	return unless $config->{use_midi};
+	
+	print $fh_midi_write "$command\n";
+	#say "applied midish command: $command";
+	$project->{midi_history} //=[];
+	push  @{ $project->{midi_history} },$command;
 
 	my $length = 2**16;
 	sleeper(0.05);
+	my @result;
 	foreach my $h ($sel->can_read) 
 	{
 		my $buf = '';
-		if ($h eq $fh_midish_error)
+		if ($h eq $fh_midi_error)
 		{
-			sysread($fh_midish_error,$buf,$length);
+			sysread($fh_midi_error,$buf,$length);
 			if($buf){print "MIDISH ERR-> $buf\n"}
 		}
 		else
 		{
-			sysread($fh_midish_read,$buf,$length);
-			if($buf){map{say} grep{ !/\+ready/ } split "\n", $buf}
+			sysread($fh_midi_read,$buf,$length);
+			if($buf){push @result, grep{ !/\+ready/ } split "\n", $buf}
 		}
 	}
-	print "\n";
+	join "\n", @result;
 }
 
 sub close_midish {
-	my $save_file = join_path(project_dir(), "$project->{name}.msh");
-	say "saving midish as $save_file";
-	midish_command("save $save_file");
-	#my $fh;
-	#$_->close for $fh_midish_read, $fh_midish_write, $fh_midish_error;
-	#sleeper(0.2);
-	#say "exiting midish";
-	#midish_command("exit"); # isn't necessary, triggers a warning 
-	#$_->flush for @handles; # doesn't help warning
-# 	sleeper(0.1);
-# 	kill 15,$pid;
-# 	sleeper(0.1);
-# 	kill 9,$pid;
-# 	sleeper(0.1);
-# 	waitpid($pid, 1);
-# It is important to waitpid on your child process,  
-# otherwise zombies could be created. 
+	save_midish();
+	say "reaping midish";
+	kill_and_reap($pid);
 }	
+sub save_midish {
+	my $fname = $file->midi_store;
+	midish_cmd( qq<save "$fname">);
 }
+
+sub reconfigure_midi {
+	add_midi_track($config->{midi_record_buffer}, n => 999, hide => 1) 
+		if not $tn{$config->{midi_record_buffer}}
+		and $this_track->current_midi
+		and $this_track->rec;
+
+	my $midi_rec = $tn{$config->{midi_record_buffer}};
+
+	# mute all
+
+	my @all = $bn{Midi}->track_o;
+
+	$_->mute for @all; # same as setting OFF for MidiTracks
+
+	# unmute audible
+
+	my @audible = grep{ $_->play } @all;
+	$_->unmute for @audible;
+
+	# unset filters
+
+	do { $_->select_track; midish_cmd("fdel ".$_->name) } for @all;
+
+	# set filters for PLAY and MON tracks
+
+	do { $_->select_track; midish_cmd(join ' ', 'rnew', $_->source_id, $_->send_id) } for @audible;
+
+	my ($rec) = my @rec = $en{midish}->rec_tracks;
+
+	# maybe we're done?
+	
+	return unless @rec;
+ 	throw("more than one midi REC track ", join " ", map{$_->name} @rec),
+		return if @rec > 1;
+
+	# mute the actual track since we'll record using the special-purpose track
+	
+	$rec->mute;
+	$midi_rec->select_track;
+
+	# use routing of target track on $midi_rec track
+
+	my $cmd = 'rnew';
+	$cmd = join ' ', $cmd, $rec->source_id, $rec->send_id;
+	midish_cmd($cmd);
+}
+sub start_midi_transport {
+	my $start_command = $en{midish}->rec_tracks ? 'r' : 'p';
+	midish_cmd($start_command);
+	$setup->{midish_running}++;
+}
+sub stop_midi_transport {
+	return unless midish_running();
+	midish_cmd('s'); 
+	delete $setup->{midish_running};
+}
+sub midi_rec_cleanup {
+	my ($track) = $en{midish}->rec_tracks; 
+	# midish allows one recording track 
+	defined $track or return;
+	my $length = midish_cmd('print [mend]');
+	$length > 0 or return;
+
+	my $version = $track->current_version;
+	$track->set_version($version);
+		push @{$track->midi_versions}, $version;
+		$track->set(rw => PLAY);
+		my $cmd = join ' ', 'chdup', $config->{midi_record_buffer}, $track->source_id, $track->midi_version;
+		say "cmd: $cmd";
+		midish_cmd($cmd);
+		midish_cmd("clr $config->{midi_record_buffer} $length");
+		$track->unmute();
+		save_midish();
+}
+}
+sub write_aux_midi_commands {
+	write_file($file->aux_midi_commands,  get_data_section('aux_midi_commands'))
+		unless -e $file->aux_midi_commands
+}
+sub add_midi_track {
+	my ($name, @args) = @_;
+	my $track = Audio::Nama::add_track( 
+		$name, 
+		class => 'Audio::Nama::MidiTrack',
+		group => 'Midi', 
+		source_id => 'midi', 
+		source_type => 'midi',
+		midi_versions => [],
+		novol => 1,
+		engine_group => $config->{midi_engine_name},
+		nopan => 1,
+		@args,
+	);
+}
+sub user_midi_tracks { grep { $_->class =~ /Midi/ } grep { !  $_->hide } all_tracks()  }
+
+	
+=comment
+chdup aux_recorder dx7 piano 
+		
+tnew synth                                                                                               
+rnew nord nord # play the nord keyboard sound with the nord keyboard                                     
+tnew piano                                                                                               
+rnew tr dx7 # route the tr keyboard to the dx7 synth sound engine                                        
+tnew aux_recorder                                                                                        
+rnew nord nord                                                                                           
+radd tr dx7 # not sure if this works, must recheck my code                                               
+r                                                                                                        
+s                                                                                                        
+
+let complete_length = [mend];                                                                            
+2. clear the auxiliary track                                                                             
+clr aux_recorder $complete_length  
+=cut
 1;
 __END__

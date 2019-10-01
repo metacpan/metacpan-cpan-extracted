@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 # PROPERTIES
 
@@ -35,7 +35,8 @@ has _ott => (
     lazy    => 1,
     default => sub {
         my $ott = $_[0]->{p}->loadModule('::Lib::OneTimeToken');
-        $ott->timeout( $_[0]->{conf}->{formTimeout} );
+        my $timeout = $_[0]->{conf}->{issuersTimeout} // $_[0]->{conf}->{formTimeout};
+        $ott->timeout( $timeout );
         return $ott;
     }
 );

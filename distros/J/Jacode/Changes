@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.4.23 2019-09-28 00:00:00
+  - supports optimized RFC3629 for ja_JP
+  - created by INABA Hitoshi
+
 2.13.4.22 2019-08-23 00:00:00
   - remake test script
   - avoid Use of uninitialized value at ...

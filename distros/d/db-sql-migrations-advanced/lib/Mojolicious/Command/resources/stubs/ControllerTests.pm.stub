@@ -1,0 +1,20 @@
+package TestCase::Application::Controller::Stub;
+use base qw(TestCase::Application::Controller);
+
+use Test::Deep;
+use Test::Most;
+
+use Test::MockObject::Chain;
+
+use Application::Controller::Stub;
+
+sub instantiate_controller : Test(setup => 1) {
+    my $self = shift;
+    $self->setup_controller("Application::Controller::Stub");
+}
+
+sub test_action: Test(no_plan) {
+    is('true', 'false');
+}
+
+1;

@@ -6,7 +6,7 @@ use MooX::Options prefer_commandline => 1;
 use IO::All;
 use Bioinfo::PBS::Queue;
 
-our $VERSION = '0.1.14'; # VERSION: 
+our $VERSION = '0.1.15'; # VERSION: 
 # ABSTRACT: submit blast after splitting a fasta file into multiple files;
 
 
@@ -199,6 +199,9 @@ sub submit_pbs {
 sub local_blast {
   my $self = shift;
   my ($input, $outdir, $cpu, $db) = ($self->input, $self->outdir, $self->cpu, $self->db);
+  my $max_target_seqs = $self->max_target_seqs;
+  my $evalue = $self->evalue;
+  my $outfmt = $self->outfmt;
   my @io_fas = io("$outdir")->filter( sub {
       $_->filename =~/\.fa/;
     }
@@ -213,12 +216,12 @@ sub local_blast {
   for my $fa (@io_fas) {
     my $pid = $pm->start and next LOOP_DATA;
     my $fa_name = $fa->filename;
-    my $cmd = "blastp -query $fa_name -out $fa.xml -db $db -outfmt 5 -evalue 1e-5 -num_threads $cpu -max_target_seqs 10";
+    my $cmd = "blastp -query $fa_name -out $fa_name.blast -db $db -outfmt $outfmt -evalue $evalue -num_threads $cpu -max_target_seqs $max_target_seqs";
     system($cmd);
     $pm->finish;
   }
   $pm->wait_all_chilren;
-  system("cat *.blast >$in_name.xml");
+  system("cat *.blast >$in_name.blast");
   say "finished all";
 }
 
@@ -236,7 +239,7 @@ Bioinfo::App::Cmd::Blast::Cmd::SplitSubmit - submit blast after splitting a fast
 
 =head1 VERSION
 
-version 0.1.14
+version 0.1.15
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,15 @@
+<!-- On the real site there should be a check of authorization,
+     something like:
+
+<%IdentifyUser
+  mode="check"
+  type="admin"
+  identified.path="/admin/bits/admin-verify-redirect"
+  anonymous.path="/admin/bits/admin-verify-redirect"
+  stop
+%>
+
+     But for the sample content management we do not check anything
+-->
+
+<%Page path="/bits/header"%>

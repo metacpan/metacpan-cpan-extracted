@@ -1,0 +1,42 @@
+<%Page path="/bits/header"%>
+
+Please go to 'Content Editor' and create a new content element named
+'about_us'. Once you do that you should be able to see that element
+content below and on a separate page. You can then experiment with
+preview mode, reverting and publishing.
+
+<DL>
+<DT><A HREF="/admin/content.html">Content Editor</A>
+<DD>This is a set of templates that should be copied to the admin area
+of the real site (probably with some minor modifications).
+<P>
+
+<DT><A HREF="/aboutus.html">'about_us' content</A>
+<DD>Separate page with "about_us" content.
+<P>
+
+</DL>
+
+<HR>
+'about_us' visible as source just to show more ways to use it:
+<TABLE BORDER="1">
+<TR><TD><%Content/h name="about_us" default.path="/bits/about-us"%></TD></TR>
+</TABLE>
+
+<HR>
+
+A couple of more content pieces to make editing more interesting:
+<UL>
+<LI>data_1=<%Content/h name="data_1" default.template="Not defined"%>
+<LI>data_2=<%Content/h name="data_2" default.template="Not defined"%>
+<LI>data_3=<%Content/h name="data_3" default.template="Not defined"%>
+<LI>parsed=<%Content/h name="parsed" parse="1" default.template="Not defined"%>
+</UL>
+
+<HR>
+Source of index page:
+<TABLE BORDER="1">
+<TR><TD><PRE><%Page/h path="/index.html" unparsed%></PRE></TD></TR>
+</TABLE>
+
+<%Page path="/bits/footer"%>

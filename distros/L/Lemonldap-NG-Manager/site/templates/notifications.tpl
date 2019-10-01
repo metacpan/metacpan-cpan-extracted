@@ -109,7 +109,7 @@
             <td><input type="text" class="form-control" ng-model="form.condition"/></td>
           </tr>
           <tr>
-            <th><span trspan="XMLcontent" /></th>
+            <th><span trspan="content" /></th>
             <td>
               <textarea rows=5 class="form-control" ng-model="form.xml"></textarea>
               <div class="alert alert-info">

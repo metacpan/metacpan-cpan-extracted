@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::AuthBasic;
 
 use strict;
 use Exporter;
-use Digest::MD5;
+use Digest::SHA qw(sha256_hex);
 use MIME::Base64;
 use HTTP::Headers;
 
@@ -11,7 +11,7 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::Session;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 our @ISA     = ('Exporter');
 our @EXPORT  = qw(fetchId retrieveSession createSession hideCookie goToPortal);
 our @EXPORT_OK = @EXPORT;
@@ -29,7 +29,7 @@ sub fetchId {
         $creds =~ s/^Basic\s+//;
         my @date = localtime;
         my $day  = $date[5] * 366 + $date[7];
-        return Digest::MD5::md5_hex( $creds . $day );
+        return Digest::SHA::sha256_hex( $creds . $day );
     }
     else {
         return 0;
@@ -94,7 +94,13 @@ sub createSession {
         build_urlencoded(
             user     => $user,
             password => $pwd,
-            secret   => $class->tsv->{cipher}->encrypt(time)
+            secret   => $class->tsv->{cipher}->encrypt(time),
+            (
+                $class->tsv->{authChoiceAuthBasic}
+                ? ( $class->tsv->{authChoiceParam} =>
+                      $class->tsv->{authChoiceAuthBasic} )
+                : ()
+            )
         )
     );
     my $resp = $class->ua->request($get);
@@ -162,8 +168,8 @@ sub ua {
     my ($class) = @_;
     return $_ua if ($_ua);
     $_ua = Lemonldap::NG::Common::UserAgent->new( {
-            lwpOpts    => $class->localConfig->{lwpOpts},
-            lwpSslOpts => $class->localConfig->{lwpSslOpts}
+            lwpOpts    => $class->tsv->{lwpOpts},
+            lwpSslOpts => $class->tsv->{lwpSslOpts}
         }
     );
 

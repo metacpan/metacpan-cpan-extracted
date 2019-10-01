@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,22 +24,22 @@ no_index:
 provides:
   PDF::Create:
     file: lib/PDF/Create.pm
-    version: '1.43'
+    version: '1.46'
   PDF::Create::Outline:
     file: lib/PDF/Create/Outline.pm
-    version: '1.43'
+    version: '1.46'
   PDF::Create::Page:
     file: lib/PDF/Create/Page.pm
-    version: '1.43'
+    version: '1.46'
   PDF::Font:
     file: lib/PDF/Font.pm
-    version: '1.43'
+    version: '1.46'
   PDF::Image::GIF:
     file: lib/PDF/Image/GIF.pm
-    version: '1.43'
+    version: '1.46'
   PDF::Image::JPEG:
     file: lib/PDF/Image/JPEG.pm
-    version: '1.43'
+    version: '1.46'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -50,5 +50,5 @@ requires:
   perl: '5.006'
 resources:
   repository: http://github.com/manwar/pdf-create.git
-version: '1.43'
+version: '1.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

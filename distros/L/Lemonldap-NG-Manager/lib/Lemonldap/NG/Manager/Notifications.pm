@@ -15,7 +15,7 @@ use feature 'state';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 has notifAccess => ( is => 'rw' );
 
@@ -283,7 +283,7 @@ sub newNotification {
 
     # Check if posted date > today
     unless ( $json->{date} ge $dDate ) {
-        $self->logger->debug("Posted Date < today !!! ");
+        $self->logger->debug("Posted Date < today");
         $json->{date} = $dDate;
     }
     $self->logger->debug("Notification Date = $json->{date}");

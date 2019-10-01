@@ -1,5 +1,5 @@
 package URI::Title::Image;
-$URI::Title::Image::VERSION = '1.901';
+$URI::Title::Image::VERSION = '1.902';
 use warnings;
 use strict;
 
@@ -15,12 +15,14 @@ sub types {(
 
 sub title {
   my ($class, $url, $data, $type) = @_;
+  my $name = ( split m{/}, $url )[-1];
 
   my ($x, $y) = imgsize(\$data);
   $type =~ s!^[^/]*/!!;
   $type =~ s!^x-!!;
-  return $type unless $x && $y;
-  return "$type ($x x $y)";
+  return $x && $y
+    ? "$name ($type ${x}x${y})"
+    : "$name ($type)";
 }
 
 1;
@@ -32,5 +34,9 @@ __END__
 =head1 NAME
 
 URI::Title::Image - get titles of images
+
+=head1 VERSION
+
+version 1.902
 
 =cut

@@ -18,10 +18,19 @@ my $client = LLNG::Manager::Test->new( {
     }
 );
 
-ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu' );
+ok(
+    $res = $client->_get(
+        '/',
+        query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==',
+        accept => 'text/html'
+    ),
+    'Get Menu'
+);
+my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
 ok(
     $res->[2]->[0] =~
-m%<script type="application/init">\{"sslHost":"https://authssl.example.com:19876"\}</script>%,
+m%<script type="application/init">\s*\{"sslHost":"https://authssl.example.com:19876"\}\s*</script>%s,
     ' SSL AJAX URL found'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ qr%<img src="/static/common/modules/SSL.png"%,
@@ -32,12 +41,19 @@ ok( $res->[2]->[0] =~ /ssl\.(?:min\.)?js/, 'Get sslChoice javascript' )
 count(4);
 
 ok(
-    $res = $client->_get( '/', custom => { SSL_CLIENT_S_DN_Custom => 'dwho' } ),
+    $res = $client->_get(
+        '/',
+        cookie => $pdata,
+        accept => 'text/html',
+        custom => { SSL_CLIENT_S_DN_Custom => 'dwho' }
+    ),
     'Auth query'
 );
-expectOK($res);
 expectCookie($res);
-count(1);
+expectRedirection( $res, 'http://test1.example.com/' );
+$pdata = expectCookie( $res, 'lemonldappdata' );
+ok( $pdata eq '', 'pdata is empty' );
+count(2);
 
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 $client = LLNG::Manager::Test->new( {

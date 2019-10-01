@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Warnings; # git description: v0.025-4-g6413c0f
+package Test::Warnings; # git description: v0.026-14-g4e3ad06
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Test for warnings and the lack of them
 # KEYWORDS: testing tests warnings
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use parent 'Exporter';
 use Test::Builder;
@@ -21,14 +21,20 @@ my $warnings_allowed;
 my $forbidden_warnings_found;
 my $done_testing_called;
 my $no_end_test;
+my $fail_on_warning;
 
 sub import
 {
-    # END block will check for this status
-    my @symbols = grep { $_ ne ':no_end_test' } @_;
-    $no_end_test = (@symbols != @_);
+    my $class = shift @_;
 
-    __PACKAGE__->export_to_level(1, @symbols);
+    my %names; @names{@_} = ();
+    # END block will check for this status
+    $no_end_test = exists $names{':no_end_test'};
+    # __WARN__ handler will check for this status
+    $fail_on_warning = exists $names{':fail_on_warning'};
+
+    delete @names{qw(:no_end_test :fail_on_warning)};
+    __PACKAGE__->export_to_level(1, $class, keys %names);
 }
 
 # for testing this module only!
@@ -67,6 +73,7 @@ $SIG{__WARN__} = sub {
             require Carp;
             Carp::carp($_[0]);
         }
+        _builder->ok(0, 'unexpected warning') if $fail_on_warning;
     }
 };
 
@@ -154,7 +161,7 @@ Test::Warnings - Test for warnings and the lack of them
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -329,6 +336,16 @@ Imports all functions listed above
 Disables the addition of a C<had_no_warnings> test
 via C<END> or C<done_testing>
 
+=head2 C<:fail_on_warning>
+
+=for stopwords unexempted
+
+When used, fail immediately when an unexempted warning is generated (as opposed to waiting until
+L</had_no_warnings> or C<done_testing> is called).
+
+I recommend you only turn this option on when debugging a test, to see where a surprise warning is coming from,
+and rely on the end-of-tests check otherwise.
+
 =head1 CAVEATS
 
 =for stopwords smartmatch TODO irc
@@ -405,9 +422,7 @@ L<blogs.perl.org: YANWT (Yet Another No-Warnings Tester)|http://blogs.perl.org/u
 
 =item *
 
-L<strictures> - which makes all warnings fatal in tests, hence lessening
-
-the need for special warning testing
+L<strictures> - which makes all warnings fatal in tests, hence lessening the need for special warning testing
 
 =item *
 
@@ -428,7 +443,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/perl-qa.html>.
 
 There is also an irc channel available for users of this distribution, at
-L<irc://irc.perl.org/#perl-qa>.
+L<C<#perl> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
@@ -436,11 +451,25 @@ I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords A. Sinan Unur
+=for stopwords A. Sinan Unur Graham Knop Leon Timmermans
+
+=over 4
+
+=item *
 
 A. Sinan Unur <nanis@cpan.org>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Leon Timmermans <fawaka@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENCE
 

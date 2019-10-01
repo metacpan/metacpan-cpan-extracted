@@ -2,8 +2,8 @@ NAME
     App::ListCurrencies - List currencies
 
 VERSION
-    This document describes version 0.002 of App::ListCurrencies (from Perl
-    distribution App-ListCurrencies), released on 2019-07-19.
+    This document describes version 0.003 of App::ListCurrencies (from Perl
+    distribution App-ListCurrencies), released on 2019-07-28.
 
 SYNOPSIS
      # Use via list-currencies CLI script

@@ -1,13 +1,11 @@
 package URI::Title;
-
+$URI::Title::VERSION = '1.902';
 use 5.006;
 use warnings;
 use strict;
 
 use base qw(Exporter);
 our @EXPORT_OK = qw( title );
-
-our $VERSION;
 
 use Module::Pluggable (search_path => ['URI::Title'], require => 1 );
 use File::Type;
@@ -19,7 +17,7 @@ use HTTP::Response;
 
 sub _ua {
   my $ua = LWP::UserAgent->new;
-  $ua->agent("URI::Title/$VERSION");
+  $ua->agent("URI::Title/$URI::Title::VERSION");
   $ua->timeout(20);
   $ua->default_header('Accept-Encoding' => 'gzip');
   return $ua;
@@ -163,9 +161,6 @@ sub title {
         $data = 1; # we don't need it, fake it.
 
       } else {
-        # special case for spotify
-        $url =~ s{^(?:http://open.spotify.com/|spotify:)(\w+)[:/]}{http://spotify.url.fi/$1/};
-        
         $url =~ s{#!}{?_escaped_fragment_=};
 
         ($data, $cset) = _get_limited($url);
@@ -195,6 +190,10 @@ __END__
 =head1 NAME
 
 URI::Title - get the titles of things on the web in a sensible way
+
+=head1 VERSION
+
+version 1.902
 
 =head1 SYNOPSIS
 

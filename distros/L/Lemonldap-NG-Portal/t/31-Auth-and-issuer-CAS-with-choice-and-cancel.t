@@ -9,12 +9,15 @@ use MIME::Base64;
 BEGIN {
     require 't/test-lib.pm';
 }
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 my $maintests = 14;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
+
+eval { require XML::Simple };
+plan skip_all => "Missing dependencies: $@" if ($@);
 
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
@@ -64,7 +67,7 @@ SKIP: {
     }
 
     # Build SQL DB
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do(
 'CREATE TABLE users (user text,password text,name text,uid text,cn text,mail text)'
     );
@@ -143,7 +146,6 @@ qr%<img src="http://auth.sp.com/static/common/icons/sfa_manager.png" class="mr-2
 
 clean_sessions();
 count($maintests);
-eval { unlink 't/userdb.db' };
 done_testing( count() );
 
 sub switch {
@@ -187,7 +189,7 @@ sub sp {
                     cas => 'CAS;CAS;Null',
                     sql => 'DBI;DBI;DBI',
                 },
-                dbiAuthChain               => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain               => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser                => '',
                 dbiAuthPassword            => '',
                 dbiAuthTable               => 'users',

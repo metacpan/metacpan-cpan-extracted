@@ -2,7 +2,7 @@ package App::BorgRestore::DB;
 use v5.14;
 use strictures 2;
 
-use App::BorgRestore::Helper;
+use App::BorgRestore::Helper qw(untaint);
 
 use autodie;
 use DBI;
@@ -29,13 +29,11 @@ method new($class: $db_path, $cache_size) {
 
 	if ($db_path =~ /^:/) {
 		$self->_open_db($db_path);
-		$self->initialize_db();
 	} elsif (! -f $db_path) {
 		# ensure the cache directory exists
 		path($db_path)->parent->mkpath({mode => oct(700)});
 
 		$self->_open_db($db_path);
-		$self->initialize_db();
 	} else {
 		$self->_open_db($db_path);
 	}
@@ -48,16 +46,64 @@ method _open_db($dbfile) {
 	$log->debugf("Opening database at %s", $dbfile);
 	$self->{dbh} = DBI->connect("dbi:SQLite:dbname=$dbfile","","", {RaiseError => 1, Taint => 1});
 	$self->{dbh}->do("PRAGMA strict=ON");
+
+	$self->_migrate();
 }
 
 method set_cache_size() {
 	$self->{dbh}->do("PRAGMA cache_size=-".$self->{cache_size});
 }
 
-method initialize_db() {
-	$log->debug("Creating initial database");
-	$self->{dbh}->do('create table `files` (`path` text, primary key (`path`)) without rowid;');
-	$self->{dbh}->do('create table `archives` (`archive_name` text unique);');
+method _migrate() {
+	my $version = $self->_get_db_version();
+	$log->debugf("Current database schema version: %s", $version);
+
+	my $schema = {
+		1 => sub {
+			$self->{dbh}->do('create table if not exists `files` (`path` text, primary key (`path`)) without rowid;');
+			$self->{dbh}->do('create table if not exists `archives` (`archive_name` text unique);');
+		},
+		2 => sub {
+			$self->{dbh}->do('alter table `archives` rename to `archives_old`');
+			$self->{dbh}->do('create table `archives` (`id` integer primary key autoincrement, `archive_name` text unique);');
+			$self->{dbh}->do('insert into `archives` select null, * from `archives_old`');
+			$self->{dbh}->do('drop table `archives_old`');
+
+			my $st = $self->{dbh}->prepare("select `archive_name` from `archives`;");
+			$st->execute();
+			while (my $result = $st->fetchrow_hashref) {
+				my $archive = $result->{archive_name};
+				# We trust all values here since they have already been
+				# sucessfully put into the DB previously. Thus they must be
+				# safe to deal with.
+				$archive = untaint($archive, qr(.*));
+				my $archive_id = $self->get_archive_id($archive);
+				$self->{dbh}->do("alter table `files` rename column `timestamp-$archive` to `$archive_id`");
+			}
+},
+	};
+
+	for my $target_version (sort { $a <=> $b } keys %$schema) {
+		if ($version < $target_version) {
+			$log->debugf("Migrating to schema version %s", $target_version);
+			$self->{dbh}->begin_work();
+			$schema->{$target_version}->();
+			$self->_set_db_version($target_version);
+			$self->{dbh}->commit();
+			$log->debugf("Schema upgrade to version %s complete", $target_version);
+		}
+	}
+}
+
+method _get_db_version() {
+	my $st = $self->{dbh}->prepare("pragma user_version");
+	$st->execute();
+	return ($st->fetchrow_array)[0];
+}
+
+method _set_db_version($version) {
+	die 'Invalid version number' unless $version =~ m/^\d+$/;
+	my $st = $self->{dbh}->do("pragma user_version=$version");
 }
 
 method get_archive_names() {
@@ -79,22 +125,18 @@ method get_archive_row_count() {
 }
 
 method add_archive_name($archive) {
-	$archive = App::BorgRestore::Helper::untaint_archive_name($archive);
-
 	my $st = $self->{dbh}->prepare('insert into `archives` (`archive_name`) values (?);');
-	$st->execute($archive);
+	$st->execute(untaint($archive, qr(.*)));
 
 	$self->_add_column_to_table("files", $archive);
 }
 
 method _add_column_to_table($table, $column) {
-	my $st = $self->{dbh}->prepare('alter table `'.$table.'` add column `'._prefix_archive_id($column).'` integer;');
+	my $st = $self->{dbh}->prepare('alter table `'.$table.'` add column `'.$self->get_archive_id($column).'` integer;');
 	$st->execute();
 }
 
 method remove_archive($archive) {
-	$archive = App::BorgRestore::Helper::untaint_archive_name($archive);
-
 	my $archive_id = $self->get_archive_id($archive);
 
 	my @keep_archives = grep {$_ ne $archive;} @{$self->get_archive_names()};
@@ -104,7 +146,7 @@ method remove_archive($archive) {
 		$self->_add_column_to_table("files_new", $archive);
 	}
 
-	my @columns_to_copy = map {'`'._prefix_archive_id($_).'`'} @keep_archives;
+	my @columns_to_copy = map {'`'.$self->get_archive_id($_).'`'} @keep_archives;
 	my @timestamp_columns_to_copy = @columns_to_copy;
 	@columns_to_copy = ('`path`', @columns_to_copy);
 
@@ -126,22 +168,20 @@ method remove_archive($archive) {
 	}
 
 	my $st = $self->{dbh}->prepare('delete from `archives` where `archive_name` = ?;');
-	$st->execute($archive);
-}
-
-fun _prefix_archive_id($archive) {
-	$archive = App::BorgRestore::Helper::untaint_archive_name($archive);
-
-	return 'timestamp-'.$archive;
+	$st->execute(untaint($archive, qr(.*)));
 }
 
 method get_archive_id($archive) {
-	return _prefix_archive_id($archive);
+	my $st = $self->{dbh}->prepare("select `id` from `archives` where `archive_name` = ?;");
+	$archive = untaint($archive, qr(.*));
+	$st->execute($archive);
+	my $result = $st->fetchrow_hashref;
+	return untaint($result->{id}, qr(.*));
 }
 
 method get_archives_for_path($path) {
 	my $st = $self->{dbh}->prepare('select * from `files` where `path` = ?;');
-	$st->execute(App::BorgRestore::Helper::untaint($path, qr(.*)));
+	$st->execute(untaint($path, qr(.*)));
 
 	my @ret;
 

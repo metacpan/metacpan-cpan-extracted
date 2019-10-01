@@ -1,6 +1,10 @@
 Revision history for Text::Template
 
+1.58  2019-09-27
+   - Remove hard coded (old) version number from README
+
 1.57  2019-09-09
+    - Fix several doc typos (Thanks Antoine Cœur)
 
 1.56  2019-07-09
     - Fix typos in Changes

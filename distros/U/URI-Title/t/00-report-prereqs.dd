@@ -45,7 +45,6 @@ do { my $x = {
                                    'IO::Socket' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'lib' => '0'
                                  }
                  }

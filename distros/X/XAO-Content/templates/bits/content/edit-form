@@ -1,0 +1,28 @@
+<%Condition
+  default.path="/bits/content/content-info"
+  default.pass
+%>
+
+<%Condition
+  a.arg="INSTRUCTION"
+  a.path="/bits/content/edit-form-instruction"
+  a.pass
+%>
+
+<FORM METHOD="POST" ACTION="<%Utility mode="current-url"%>">
+<%Utility mode="pass-cgi-params" result="form" params="name"%>
+
+<STRONG>Comment for that specific release of the content (optional):</STRONG><BR>
+<INPUT TYPE="TEXT" CLASS="text" NAME="comment" VALUE="<%COMMENT/f%>" SIZE="50" MAXLENGTH="100">
+<P>
+
+<STRONG>Text:</STRONG><BR>
+<TEXTAREA NAME="text" CLASS="text" COLS="60" ROWS="10" MAXLENGTH="100000" WRAP="VIRTUAL"><%TEXT/h%></TEXTAREA>
+<P>
+
+<INPUT TYPE="SUBMIT" NAME="store" VALUE="  Store  ">
+
+</FORM>
+<P>
+
+<%End%>

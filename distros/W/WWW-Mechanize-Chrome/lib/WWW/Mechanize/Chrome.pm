@@ -22,7 +22,7 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -384,15 +384,20 @@ sub build_command_line {
 
     $options->{ launch_arg } ||= [];
 
-    $options->{port} ||= 9222
-        if ! exists $options->{port};
+    if( $options->{pipe}) {
+        push @{ $options->{ launch_arg }}, "--remote-debugging-pipe";
+    } else {
 
-    if ($options->{port}) {
-        push @{ $options->{ launch_arg }}, "--remote-debugging-port=$options->{ port }";
-    };
+        $options->{port} ||= 9222
+            if ! exists $options->{port};
 
-    if ($options->{listen_host}) {
-        push @{ $options->{ launch_arg }}, "--remote-debugging-address==$options->{ listen_host }";
+        if ($options->{port}) {
+            push @{ $options->{ launch_arg }}, "--remote-debugging-port=$options->{ port }";
+        };
+
+        if ($options->{listen_host}) {
+            push @{ $options->{ launch_arg }}, "--remote-debugging-address==$options->{ listen_host }";
+        };
     };
 
     if ($options->{incognito}) {
@@ -431,6 +436,12 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--hide-scrollbars";
     };
 
+    # Yes, that name is horrible
+    if( $options->{safebrowsing_auto_update}) {
+	} else {
+        push @{ $options->{ launch_arg }}, "--safebrowsing-disable-auto-update";
+    };
+
     if( exists $options->{disable_prompt_on_repost}) {
         carp "Option 'disable_prompt_on_repost' is deprecated, use prompt_on_repost instead";
         $options->{prompt_on_repost} = !$options->{disable_prompt_on_repost};
@@ -438,11 +449,13 @@ sub build_command_line {
 
     for my $option (qw(
         background_networking
+		breakpad
         client_side_phishing_detection
         component_update
         hang_monitor
         prompt_on_repost
         sync
+		translate
         web_resources
         default_apps
         infobars
@@ -618,18 +631,40 @@ sub _wait_for_socket_connection( $class, $host, $port, $timeout=20 ) {
     $res
 };
 
-sub spawn_child_win32( $self, @cmd ) {
+sub spawn_child_win32( $self, $method, @cmd ) {
+    croak "Only socket communication is supported on $^O"
+        if $method ne 'socket';
     system(1, @cmd)
 }
 
-sub spawn_child_posix( $self, @cmd ) {
+sub spawn_child_posix( $self, $method, @cmd ) {
     require POSIX;
     POSIX->import("setsid");
+
+    my (%child, %parent);
+    if( $method eq 'pipe' ) {
+        # Now, we want to have file handles with fileno=3 and fileno=4
+        # to talk to Chrome v72+
+
+        # Just open some filehandles to push the filenos above 4 for sure:
+        open my $dummy_fh, '>', '/dev/null';
+        open my $dummy_fh2, '>', '/dev/null';
+
+        pipe $child{read}, $parent{write};
+        pipe $parent{read}, $child{write};
+
+        close $dummy_fh;
+        close $dummy_fh2;
+    };
 
     # daemonize
     defined(my $pid = fork())   || die "can't fork: $!";
     if( $pid ) {    # non-zero now means I am the parent
-        return $pid;
+        if( $method eq 'pipe' ) {
+            close $child{read};
+            close $child{write};
+        };
+        return $pid, $parent{write}, $parent{read};
     };
 
     # We are the child, close about everything, then exec
@@ -638,20 +673,34 @@ sub spawn_child_posix( $self, @cmd ) {
     open(STDERR, ">&STDOUT")    || die "can't dup stdout: $!";
     open(STDIN,  "< /dev/null") || die "can't read /dev/null: $!";
     open(STDOUT, "> /dev/null") || die "can't write to /dev/null: $!";
+
+    my ($from_chrome, $to_chrome);
+    if( $method eq 'pipe' ) {
+        # Those two handles belong to the parent
+        close $parent{read};
+        close $parent{write};
+
+        # We want handles 0,1,2,3,4 to be inherited by Chrome
+        $^F = 4;
+
+        # Set up FD 3 and 4 for Chrome to read/write
+        open($from_chrome, '<&', $child{read})|| die "can't open reader pipe: $!";
+        open($to_chrome, '>&', $child{write})  || die "can't open writer pipe: $!";
+    };
     exec @cmd;
     exit 1;
 }
 
-sub spawn_child( $self, @cmd ) {
-    my ($pid);
+sub spawn_child( $self, $method, @cmd ) {
+    my ($pid, $to_chrome, $from_chrome);
     if( $^O =~ /mswin/i ) {
-        $pid = $self->spawn_child_win32(@cmd)
+        $pid = $self->spawn_child_win32($method, @cmd)
     } else {
-        $pid = $self->spawn_child_posix(@cmd)
+        ($pid,$to_chrome,$from_chrome) = $self->spawn_child_posix($method, @cmd)
     };
     $self->log('debug', "Spawned child as $pid");
 
-    return $pid
+    return ($pid,$to_chrome,$from_chrome)
 }
 
 sub _build_log( $self ) {
@@ -711,9 +760,19 @@ sub new($class, %options) {
         $options{ tab } = 0; # use tab at index 0
     };
 
+    my $method = 'socket';
+    #if( ! $options{ port } and ! $options{ pid } and ! $options{ reuse }) {
+    if( $options{ pipe }) {
+        #$options{ pipe } = 1;
+        $method = 'pipe';
+    };
+
+    $options{ cleanup_signal } ||= $^O =~ /mswin32/i ? 'SIGKILL' : 'SIGTERM';
+
     my $self= bless \%options => $class;
     $self->{log} ||= $self->_build_log;
 
+    my( $to_chrome, $from_chrome );
     unless ($options{pid} or $options{reuse}) {
         unless ( defined $options{ port } ) {
             # Find free port for Chrome to listen on
@@ -722,13 +781,18 @@ sub new($class, %options) {
 
         my @cmd= $class->build_command_line( \%options );
         $self->log('debug', "Spawning", \@cmd);
-        $self->{pid} = $self->spawn_child( @cmd );
+        (my( $pid ), $to_chrome, $from_chrome ) = $self->spawn_child( $method, @cmd );
+        $options{ writer_fh } = $to_chrome;
+        $options{ reader_fh } = $from_chrome;
+        $self->{pid} = $pid;
         $self->{ kill_pid } = 1;
 
-        # Just to give Chrome time to start up, make sure it accepts connections
-        my $ok = $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
-        if( ! $ok) {
-            die "Timeout while connecting to $host:$self->{port}. Do you maybe have a non-debug instance of Chrome already running?";
+        if( ! $options{ pipe } ) {
+            # Just to give Chrome time to start up, make sure it accepts connections
+            my $ok = $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
+            if( ! $ok) {
+                die "Timeout while connecting to $host:$self->{port}. Do you maybe have a non-debug instance of Chrome already running?";
+            };
         };
     } else {
 
@@ -736,10 +800,22 @@ sub new($class, %options) {
         $options{ port } //= 9222;
     };
 
-    # Connect to it
+    my @connection;
+    if( $options{ pipe }) {
+        @connection = (
+            writer_fh => $options{ writer_fh },
+            reader_fh => $options{ reader_fh },
+        );
+    } else {
+        @connection = (
+            port => $options{ port },
+            host => $host,
+        );
+    };
+
+    # Connect to it via TCP or local pipe
     $options{ driver } ||= Chrome::DevToolsProtocol->new(
-        'port' => $options{ port },
-        host => $host,
+        @connection,
         auto_close => 0,
         error_handler => sub {
             #warn ref$_[0];
@@ -764,6 +840,8 @@ sub _setup_driver_future( $self, %options ) {
     $self->driver->connect(
         new_tab => !$options{ reuse },
         tab     => $options{ tab },
+        writer_fh => $options{ writer_fh },
+        reader_fh => $options{ reader_fh },
     )->catch( sub(@args) {
         my $err = $args[0];
         if( ref $args[1] eq 'HASH') {
@@ -787,7 +865,7 @@ sub _connect( $self, %options ) {
     if ( $err ) {
         if( $self->{ kill_pid } and my $pid = delete $self->{ pid }) {
             local $SIG{CHLD} = 'IGNORE';
-            kill 'SIGKILL' => $pid;
+            kill $_[0]->{cleanup_signal} => $pid;
             waitpid $pid, 0;
         };
         croak $err;
@@ -864,15 +942,15 @@ needs launching the browser and asking for the version via the network.
 
 sub chrome_version_from_stdout( $self ) {
     # We can try to get at the version through the --version command line:
-    my @cmd = $self->build_command_line({ launch_arg => ['--version'], headless => 1, port => undef });
-
-    $self->log('trace', "Retrieving version via [@cmd]" );
+    my @cmd = $self->build_command_line({ launch_arg => ['--version'], headless => 0, enable_automation => 0, port => undef });
+    #$self->log('trace', "Retrieving version via [@cmd]" );
     if ($^O =~ /darwin/) {
       s/ /\\ /g for @cmd;
     }
     my $v = readpipe(join " ", @cmd);
 
     # Chromium 58.0.3029.96 Built on Ubuntu , running on Ubuntu 14.04
+    # Chromium 76.0.4809.100 built on Debian 10.0, running on Debian 10.0
     $v =~ /^(\S+)\s+([\d\.]+)\s/
         or return; # we didn't find anything
     return "$1/$2"
@@ -1410,7 +1488,7 @@ sub DESTROY {
 
     if( $pid ) {
         local $SIG{CHLD} = 'IGNORE';
-        kill 'SIGKILL' => $pid;
+        kill $_[0]->{cleanup_signal} => $pid;
         waitpid $pid, 0;
     };
     %{ $_[0] }= (); # clean out all other held references
@@ -4648,7 +4726,7 @@ sub fetchResources_future( $self, %options ) {
             next if $res->{url} !~ /^https?:/i;
             my $fetch = $s->getResourceContent_future( $res );
             if( $save ) {
-                warn "Will save $res->{url}";
+                #warn "Will save $res->{url}";
                 $fetch = $fetch->then( $save );
             };
             push @requested, $fetch;

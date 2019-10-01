@@ -12,13 +12,14 @@ sub set_preview_mode {
 	# do nothing if already in 'preview' mode
 	
 	return if $mode->preview;
-
-	$mode->{preview} = "preview";
+	disable_preview_modes();
+	{
+	no warnings 'uninitialized';
+	$mode->{preview}++;
+	}
 
 	pager( <<'MSG');
-Setting preview mode.
-Using both REC and PLAY inputs.
-WAV recording is DISABLED.
+Setting preview mode. Recording of audio files is disabled.
 
 Type 'arm' to enable recording.
 MSG
@@ -27,28 +28,34 @@ MSG
 sub set_doodle_mode {
 
 	logsub("&doodle");
-	return if engine_running() and Audio::Nama::ChainSetup::really_recording();
-	$mode->{preview} = "doodle";
+	return if $this_engine->started() and Audio::Nama::ChainSetup::really_recording();
+	disable_preview_modes();
+	{
+	no warnings 'uninitialized';
+	$mode->{doodle}++;
+	}
 
 	$tn{Mixdown}->set(rw => OFF);
 	
 	# reconfigure_engine will generate setup and start transport
 	
 pager( <<'MSG' );
-Setting doodle mode.
-Using live inputs only, no duplicate inputs
+Setting doodle mode. Using live inputs only. Duplicate
+inputs are excluded. Recording of audio files is disabled.
+
 Exit using 'preview' or 'arm' commands
 MSG
-
 }
-sub exit_preview_mode { # exit preview and doodle modes
-
-		logsub("&exit_preview_mode");
-		return unless $mode->{preview};
-		stop_transport() if engine_running();
+sub exit_preview_modes {
+		logsub("&exit_preview_modes");
+		return unless $mode->{preview} or $mode->{doodle};
+		disable_preview_modes();
+		stop_transport();
 		pager("Exiting preview/doodle mode");
-		$mode->{preview} = 0;
-
+}
+sub disable_preview_modes {
+	undef $mode->{preview};
+	undef $mode->{doodle}; 
 }
 
 sub master_on {
@@ -56,6 +63,9 @@ sub master_on {
 	return if $mode->mastering;
 	
 	# create mastering tracks if needed
+	
+	# we use hiding/unhiding status of Eq track to indicate
+	# mastering mode, so no explicity use of $mode->{mastering}
 	
 	if ( ! $tn{Eq} ){  
 	
@@ -73,7 +83,7 @@ sub master_off {
 	hide_mastering_tracks();
 	map{ $ui->remove_track_gui($tn{$_}->n) 
 		} @{$mastering->{track_names}};
-	$this_track = $tn{Master} if grep{ $this_track->name eq $_} @{$mastering->{track_names}};
+	$this_track = $tn{Main} if grep{ $this_track->name eq $_} @{$mastering->{track_names}};
 ;
 }
 
@@ -89,10 +99,12 @@ sub add_mastering_tracks {
 
  	} grep{ $_ ne 'Boost' } @{$mastering->{track_names}};
 	my $track = Audio::Nama::BoostTrack->new(
-		name => 'Boost', 
-		rw => MON,
-		group => 'Mastering', 
-		target => 'Master',
+		name 		=> 'Boost', 
+		rw 			=> MON,
+		group 		=> 'Mastering', 
+		width		=> 2,
+		source_type => undef,
+		source_id	=> undef,
 	);
 	$ui->track_gui( $track->n );
 
@@ -104,37 +116,37 @@ sub add_mastering_effects {
 	
 	$this_track = $tn{Eq};
 
-	process_command("add_effect $mastering->{fx_eq}");
+	nama_cmd("add_effect $mastering->{fx_eq}");
 
 	$this_track = $tn{Low};
 
-	process_command("add_effect $mastering->{fx_low_pass}");
-	process_command("add_effect $mastering->{fx_compressor}");
-	process_command("add_effect $mastering->{fx_spatialiser}");
+	nama_cmd("add_effect $mastering->{fx_low_pass}");
+	nama_cmd("add_effect $mastering->{fx_compressor}");
+	nama_cmd("add_effect $mastering->{fx_spatialiser}");
 
 	$this_track = $tn{Mid};
 
-	process_command("add_effect $mastering->{fx_mid_pass}");
-	process_command("add_effect $mastering->{fx_compressor}");
-	process_command("add_effect $mastering->{fx_spatialiser}");
+	nama_cmd("add_effect $mastering->{fx_mid_pass}");
+	nama_cmd("add_effect $mastering->{fx_compressor}");
+	nama_cmd("add_effect $mastering->{fx_spatialiser}");
 
 	$this_track = $tn{High};
 
-	process_command("add_effect $mastering->{fx_high_pass}");
-	process_command("add_effect $mastering->{fx_compressor}");
-	process_command("add_effect $mastering->{fx_spatialiser}");
+	nama_cmd("add_effect $mastering->{fx_high_pass}");
+	nama_cmd("add_effect $mastering->{fx_compressor}");
+	nama_cmd("add_effect $mastering->{fx_spatialiser}");
 
 	$this_track = $tn{Boost};
 	
-	process_command("add_effect $mastering->{fx_limiter}"); # insert after vol
+	nama_cmd("add_effect $mastering->{fx_limiter}"); # insert after vol
 }
 
 sub unhide_mastering_tracks {
-	process_command("for Mastering; set_track hide 0 rw MON");
+	nama_cmd("for Mastering; set_track hide 0 rw MON");
 }
 
 sub hide_mastering_tracks {
-	process_command("for Mastering; set_track hide 1 rw OFF");
+	nama_cmd("for Mastering; set_track hide 1 rw OFF");
  }
 }
 		

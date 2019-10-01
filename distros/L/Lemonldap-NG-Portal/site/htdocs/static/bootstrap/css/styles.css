@@ -163,3 +163,15 @@ div.oidc_consent_message > ul {
 .progress-bar-animated {
   width: 100%;
 }
+
+input.key {
+  font-family: 'password';
+  width: 100px;  
+}
+
+@font-face {
+  font-family: 'password';
+  /*font-style: normal;*/
+  /*font-weight: 400;*/
+  src: url(/static/common/fonts/password.ttf);
+}

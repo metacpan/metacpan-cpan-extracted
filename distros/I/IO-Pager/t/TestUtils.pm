@@ -13,6 +13,7 @@ BEGIN {
       skip_interactive
       skip_old_perl
       skip_no_file_which
+      skip_no_tty
       skip_not_in_path
       is_no
       is_yes
@@ -32,6 +33,11 @@ sub skip_old_perl {
 
 sub skip_no_file_which {
   skip "This test requires File::Which.", 1 if not eval { require File::Which };
+}
+
+sub skip_no_tty {
+  skip "/dev/tty cannot be opened.", 1 if not open(my $fh, '<', '/dev/tty');
+  close $fh;
 }
 
 sub skip_not_in_path {

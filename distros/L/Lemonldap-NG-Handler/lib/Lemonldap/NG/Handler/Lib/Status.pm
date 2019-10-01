@@ -9,6 +9,8 @@ use JSON qw(to_json);
 use IO::Select;
 use IO::Socket::INET;
 
+use Lemonldap::NG::Handler::Lib::StatusConstants qw(portalConsts);
+
 our $VERSION = '2.0.2';
 
 our $status   = {};
@@ -17,97 +19,6 @@ our $start    = int( time / 60 );
 use constant MN_COUNT => 5;
 
 our $page_title = 'Lemonldap::NG statistics';
-
-## @fn private hashRef portalTab()
-# @return Constant hash used to convert error codes into string.
-sub portalTab {
-    return {
-        -5 => 'PORTAL_IDPCHOICE',
-        -4 => 'PORTAL_SENDRESPONSE',
-        -3 => 'PORTAL_INFO',
-        -2 => 'PORTAL_REDIRECT',
-        -1 => 'PORTAL_DONE',
-        0  => 'PORTAL_OK',
-        1  => 'PORTAL_SESSIONEXPIRED',
-        2  => 'PORTAL_FORMEMPTY',
-        3  => 'PORTAL_WRONGMANAGERACCOUNT',
-        4  => 'PORTAL_USERNOTFOUND',
-        5  => 'PORTAL_BADCREDENTIALS',
-        6  => 'PORTAL_LDAPCONNECTFAILED',
-        7  => 'PORTAL_LDAPERROR',
-        8  => 'PORTAL_APACHESESSIONERROR',
-        9  => 'PORTAL_FIRSTACCESS',
-        10 => 'PORTAL_BADCERTIFICATE',
-        21 => 'PORTAL_PP_ACCOUNT_LOCKED',
-        22 => 'PORTAL_PP_PASSWORD_EXPIRED',
-        23 => 'PORTAL_CERTIFICATEREQUIRED',
-        24 => 'PORTAL_ERROR',
-        25 => 'PORTAL_PP_CHANGE_AFTER_RESET',
-        26 => 'PORTAL_PP_PASSWORD_MOD_NOT_ALLOWED',
-        27 => 'PORTAL_PP_MUST_SUPPLY_OLD_PASSWORD',
-        28 => 'PORTAL_PP_INSUFFICIENT_PASSWORD_QUALITY',
-        29 => 'PORTAL_PP_PASSWORD_TOO_SHORT',
-        30 => 'PORTAL_PP_PASSWORD_TOO_YOUNG',
-        31 => 'PORTAL_PP_PASSWORD_IN_HISTORY',
-        32 => 'PORTAL_PP_GRACE',
-        33 => 'PORTAL_PP_EXP_WARNING',
-        34 => 'PORTAL_PASSWORD_MISMATCH',
-        35 => 'PORTAL_PASSWORD_OK',
-        36 => 'PORTAL_NOTIFICATION',
-        37 => 'PORTAL_BADURL',
-        38 => 'PORTAL_NOSCHEME',
-        39 => 'PORTAL_BADOLDPASSWORD',
-        40 => 'PORTAL_MALFORMEDUSER',
-        41 => 'PORTAL_SESSIONNOTGRANTED',
-        42 => 'PORTAL_CONFIRM',
-        43 => 'PORTAL_MAILFORMEMPTY',
-        44 => 'PORTAL_BADMAILTOKEN',
-        45 => 'PORTAL_MAILERROR',
-        46 => 'PORTAL_MAILOK',
-        47 => 'PORTAL_LOGOUT_OK',
-        48 => 'PORTAL_SAML_ERROR',
-        49 => 'PORTAL_SAML_LOAD_SERVICE_ERROR',
-        50 => 'PORTAL_SAML_LOAD_IDP_ERROR',
-        51 => 'PORTAL_SAML_SSO_ERROR',
-        52 => 'PORTAL_SAML_UNKNOWN_ENTITY',
-        53 => 'PORTAL_SAML_DESTINATION_ERROR',
-        54 => 'PORTAL_SAML_CONDITIONS_ERROR',
-        55 => 'PORTAL_SAML_IDPSSOINITIATED_NOTALLOWED',
-        56 => 'PORTAL_SAML_SLO_ERROR',
-        57 => 'PORTAL_SAML_SIGNATURE_ERROR',
-        58 => 'PORTAL_SAML_ART_ERROR',
-        59 => 'PORTAL_SAML_SESSION_ERROR',
-        60 => 'PORTAL_SAML_LOAD_SP_ERROR',
-        61 => 'PORTAL_SAML_ATTR_ERROR',
-        62 => 'PORTAL_OPENID_EMPTY',
-        63 => 'PORTAL_OPENID_BADID',
-        64 => 'PORTAL_MISSINGREQATTR',
-        65 => 'PORTAL_BADPARTNER',
-        66 => 'PORTAL_MAILCONFIRMATION_ALREADY_SENT',
-        67 => 'PORTAL_PASSWORDFORMEMPTY',
-        68 => 'PORTAL_CAS_SERVICE_NOT_ALLOWED',
-        69 => 'PORTAL_MAILFIRSTACCESS',
-        70 => 'PORTAL_MAILNOTFOUND',
-        71 => 'PORTAL_PASSWORDFIRSTACCESS',
-        72 => 'PORTAL_MAILCONFIRMOK',
-        73 => 'PORTAL_RADIUSCONNECTFAILED',
-        74 => 'PORTAL_MUST_SUPPLY_OLD_PASSWORD',
-        75 => 'PORTAL_FORBIDDENIP',
-        76 => 'PORTAL_CAPTCHAERROR',
-        77 => 'PORTAL_CAPTCHAEMPTY',
-        78 => 'PORTAL_REGISTERFIRSTACCESS',
-        79 => 'PORTAL_REGISTERFORMEMPTY',
-        80 => 'PORTAL_REGISTERALREADYEXISTS',
-        81 => 'PE_NOTOKEN',
-        82 => 'PE_TOKENEXPIRED',
-        83 => 'PE_U2FFAILED',
-        84 => 'PE_UNAUTHORIZEDPARTNER',
-        85 => 'PE_RENEWSESSION',
-        86 => 'PE_WAIT',
-        87 => 'PE_MUSTAUTHN',
-        88 => 'PE_MUSTHAVEMAIL',
-    };
-}
 
 eval {
     setgid( ( getgrnam( $ENV{APACHE_RUN_GROUP} ) )[2] );
@@ -126,7 +37,7 @@ sub run {
     while ( my $opt = shift @ARGV ) {
         if ( $opt eq '--udp' ) {
             my $hp = shift @ARGV;
-            my $s = IO::Socket::INET->new( Proto => 'udp', LocalAddr => $hp );
+            my $s  = IO::Socket::INET->new( Proto => 'udp', LocalAddr => $hp );
             $sel->add($s);
         }
         else {
@@ -138,7 +49,7 @@ sub run {
             if ( $fh == \*STDIN and $fh->eof ) {
                 exit;
             }
-            $_ = $fh->getline or next;
+            $_  = $fh->getline or next;
             $mn = int( time / 60 ) - $start + 1;
 
             # Cleaning activity array
@@ -158,7 +69,7 @@ sub run {
                 my ( $user, $uri, $code ) = ( $1, $2, $3 );
 
                 # Portal error translation
-                $code = portalTab->{$code} || $code if ( $code =~ /^\-?\d+$/ );
+                $code = portalConsts->{$code} || $code if ( $code =~ /^\-?\d+$/ );
 
                 # Per user activity
                 $status->{user}->{$user}->{$code}++;

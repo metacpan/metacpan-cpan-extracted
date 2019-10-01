@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 use strict;
@@ -21,16 +21,19 @@ use Symbol ();
 
 my %utf8_codepoint = (
 #
+    # only as memories in old men
+    # https://www.ietf.org/rfc/rfc2279.txt
     'RFC2279' => qr{(?>
-        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
         [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
     )}x,
 #
+    # https://tools.ietf.org/rfc/rfc3629.txt
     'RFC3629' => qr{(?>
-        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
         [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
@@ -41,13 +44,29 @@ my %utf8_codepoint = (
         [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
     )}x,
+#
+    # optimized RFC3629 for ja_JP
+    'RFC3629.ja_JP' => qr{(?>
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
+        [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xEE-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xED-\xED][\x80-\x9F][\x80-\xBF]            |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    )}x,
 );
 
-# /./ [\b] \d \h \s \v \w
+# supports /./
 my $x =
     ($^X =~ /jperl(\.exe)?\z/i) && (`$^X -v` =~ /SJIS version/) ?
     q{(?>[\x81-\x9F\xE0-\xFC][\x40-\x7E\x80-\xFC]|[\x00-\xFF])} : # debug tool using JPerl(SJIS version)
     $utf8_codepoint{'RFC3629'};
+
+# supports [\b] \d \h \s \v \w
 my $bare_b = '\x08';
 my $bare_d = '0123456789';
 my $bare_h = '\x09\x20';
@@ -272,7 +291,7 @@ sub UTF8::R2::qr ($) {
         elsif ($before_subregex eq '\s') { push @after_subregex, "[$bare_s]"                                                   }
         elsif ($before_subregex eq '\v') { push @after_subregex, "[$bare_v]"                                                   }
         elsif ($before_subregex eq '\w') { push @after_subregex, "[$bare_w]"                                                   }
-
+#
         # quantifiers ? + * {n} {n,} {n,m}
         elsif ($before_subregex =~ /\A[?+*{]\z/) {
             if    (0)                                                      { }
@@ -285,7 +304,7 @@ sub UTF8::R2::qr ($) {
             }
             push @after_subregex, $before_subregex;
         }
-
+#
         # else
         else { push @after_subregex, $before_subregex }
     }
@@ -588,10 +607,11 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
 =head1 SYNOPSIS
 
   use UTF8::R2;
-  use UTF8::R2 ver.sion;      # match or die
-  use UTF8::R2 qw( RFC3629 ); # m/./ matches RFC3629 codepoint (default)
-  use UTF8::R2 qw( RFC2279 ); # m/./ matches RFC2279 codepoint
-  use UTF8::R2 qw( %mb );     # multibyte regex by %mb
+  use UTF8::R2 ver.sion;            # match or die
+  use UTF8::R2 qw( RFC3629 );       # m/./ matches RFC3629 codepoint (default)
+  use UTF8::R2 qw( RFC2279 );       # m/./ matches RFC2279 codepoint
+  use UTF8::R2 qw( RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
+  use UTF8::R2 qw( %mb );           # multibyte regex by %mb
 
     $result = UTF8::R2::chop(@_)
     $result = UTF8::R2::chr($_)
@@ -769,8 +789,9 @@ Ideally, We'd like to achieve these five Goals:
 Old byte-oriented programs should not spontaneously break on the old
 byte-oriented data they used to work on.
 
-This goal was achieved by new Perl language and new perl interpreter are keeping
-compatibility to their old versions.
+This goal has been achieved by that this software is additional code
+for perl like utf8 pragma. Perl should work same as past Perl if added
+nothing.
 
 =item * Goal #2:
 

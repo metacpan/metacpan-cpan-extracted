@@ -3,7 +3,11 @@
   document.onreadystatechange = function() {
     var redirect;
     if (document.readyState === "complete") {
-      redirect = document.getElementById('redirect').textContent.replace(/\s/g, '');
+      try {
+        redirect = document.getElementById('redirect').textContent.replace(/\s/g, '');
+      } catch (error) {
+        redirect = document.getElementById('redirect').innerHTML.replace(/\s/g, '');
+      }
       if (redirect) {
         if (redirect === 'form') {
           return document.getElementById('form').submit();

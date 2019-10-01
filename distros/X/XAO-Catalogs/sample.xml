@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<catalog id="test" generator="super ERP">
+ <categories>
+  <catdesc id="0" name="foos" thumbnail="xxx.jpg"/>
+  <catdesc id="10" name="bars" description="bars go here"/>
+  <catdesc id="100" name="non-alcoholic" parent_id="10"
+           image="zzz.jpg"/>
+ </categories>
+ <products>
+  <product id="fubar" name="heavy duty fubar" price="0.12">
+   <category id="0"/>
+   <category id="10"/>
+   <specification name="drinks-equivalent" value="123"/>
+   <specification name="tastes-like" value="chicken"/>
+  </product>
+  <product id="fubeer" name="non-alcoholic drink"
+           description="fake long description of fubeer"
+           image="fubeer.jpg"
+           thumbnail="fubeer_tn.jpg"
+           price="23.23">
+   <category id="0"/>
+   <category id="100"/>
+   <specification name="weight" value="12" seq="0"/>
+   <specification name="color" value="blue" seq="12"/>
+   <specification name="manufacturer" value="odessa" seq="23"/>
+  </product>
+ </products>
+</catalog>

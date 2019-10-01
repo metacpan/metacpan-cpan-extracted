@@ -14,7 +14,7 @@ my $maintests = 17;
 my $mailSend  = 0;
 
 my $mail2 = 0;
-unlink 't/userdb.db';
+my $userdb = tempdb();
 
 SKIP: {
     eval
@@ -26,7 +26,7 @@ SKIP: {
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do(
         'CREATE TABLE users (user text,password text,name text, mail text)');
     $dbh->do(
@@ -47,7 +47,7 @@ SKIP: {
                 passwordDB                 => 'Choice',
                 captcha_mail_enabled       => 0,
                 portalDisplayResetPassword => 1,
-                dbiAuthChain               => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain               => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser                => '',
                 dbiAuthPassword            => '',
                 dbiAuthTable               => 'users',
@@ -146,7 +146,6 @@ SKIP: {
 
 }
 
-eval { unlink 't/userdb.db' };
 count($maintests);
 clean_sessions();
 done_testing( count() );

@@ -1,0 +1,1 @@
+<OPTION VALUE="<%EFFECTIVE_TIME/f%>"><%Date style="short" gmtime="<%EFFECTIVE_TIME/f%>"%> - <%COMMENT/h%></OPTION>

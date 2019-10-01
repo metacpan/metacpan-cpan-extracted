@@ -9,9 +9,9 @@ use warnings;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
-has string => ( is => 'ro' );
+has string => (is => 'ro');
 
 sub render { $_[0]->string // '' }
 

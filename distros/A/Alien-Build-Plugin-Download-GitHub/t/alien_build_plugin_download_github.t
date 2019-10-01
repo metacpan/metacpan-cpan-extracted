@@ -234,6 +234,105 @@ subtest 'basic load' => sub {
     alien_install_type_is 'share';
   };
 
+
+  subtest 'assets' => sub {
+
+    @mock_calls = ();
+    local $mock_response{content} = encode_json([
+      {
+        tag_name => 'v1.01',
+        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01',
+        assets => [
+          {
+              url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/123456',
+              name => 'alien-dontpanic-v1.01.tar.xz',
+              browser_download_url => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz',
+          },
+          {
+              url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/654321',
+              name => 'dontpanic-the-aliens.tar.xz',
+              browser_download_url => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/dontpanic-the-aliens.tar.xz',
+          },
+        ]
+      },
+      {
+        tag_name => '1.00',
+        tarball_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',
+      },
+    ]);
+
+    my $build = alienfile q{
+
+      use alienfile;
+
+      probe sub { 'share' };
+
+      share {
+        plugin 'Download::GitHub' => (
+          github_user => 'Perl5-Alien',
+          github_repo => 'dontpanic',
+          include_assets => qr/^alien/,
+        );
+      };
+
+    };
+
+    alienfile_skip_if_missing_prereqs;
+
+    is $build->fetch,
+      {
+        type => 'list',
+        list => [
+        { filename => 'v1.01', url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01', version => '1.01' },
+        {
+          filename  => 'alien-dontpanic-v1.01.tar.xz',
+          asset_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/123456',
+          version   => '1.01',
+          url       => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz'
+        },
+        { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
+        ]
+      }, 'correct list of assests included';
+
+    $build = alienfile q{
+
+      use alienfile;
+
+      probe sub { 'share' };
+
+      share {
+        plugin 'Download::GitHub' => (
+          github_user => 'Perl5-Alien',
+          github_repo => 'dontpanic',
+          include_assets => 1,
+        );
+      };
+
+    };
+
+    alienfile_skip_if_missing_prereqs;
+
+    is $build->fetch,
+      {
+        type => 'list',
+        list => [
+        { filename => 'v1.01', url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/v1.01', version => '1.01' },
+        {
+          filename  => 'alien-dontpanic-v1.01.tar.xz',
+          asset_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/123456',
+          version   => '1.01',
+          url       => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/alien-dontpanic-v1.01.tar.xz'
+        },
+        {
+          filename  => 'dontpanic-the-aliens.tar.xz',
+          asset_url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/releases/assets/654321',
+          version   => '1.01',
+          url       => 'https://github.com/repos/Perl5-Alien/dontpanic/releases/download/dontpanic-v1.01/dontpanic-the-aliens.tar.xz'
+        },
+        { filename => '1.00',  url => 'https://api.github.com/repos/Perl5-Alien/dontpanic/tarball/1.00',  version => '1.00' },
+        ]
+      }, 'correct list of assests included';
+  };
 };
 
 subtest 'live tests' => sub {

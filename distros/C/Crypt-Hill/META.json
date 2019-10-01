@@ -4,13 +4,13 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-Hill",
    "no_index" : {
@@ -41,11 +41,11 @@
    "provides" : {
       "Crypt::Hill" : {
          "file" : "lib/Crypt/Hill.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Crypt::Hill::Utils" : {
          "file" : "lib/Crypt/Hill/Utils.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Crypt-Hill"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

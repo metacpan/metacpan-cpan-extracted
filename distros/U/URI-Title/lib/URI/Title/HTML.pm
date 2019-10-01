@@ -1,5 +1,5 @@
 package URI::Title::HTML;
-$URI::Title::HTML::VERSION = '1.901';
+$URI::Title::HTML::VERSION = '1.902';
 use warnings;
 use strict;
 use HTML::Entities;
@@ -68,8 +68,6 @@ sub title {
       # google can be used as a calculator. Try to find the result.
       $special_case = 'calc_img.*<td nowrap>(.+?)</td';
 
-    } elsif ($url =~ /spotify\.url\.fi/) {
-      $special_case = '<title>\s*(.+?)\s+&mdash;\s+Decode\s+Spotify\s+URIs\s*</title>';
 
     }
   }
@@ -114,5 +112,9 @@ __END__
 =head1 NAME
 
 URI::Title::HTML - get titles of html files
+
+=head1 VERSION
+
+version 1.902
 
 =cut

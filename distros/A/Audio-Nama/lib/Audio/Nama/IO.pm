@@ -53,9 +53,11 @@ our %io_class = qw(
 	jack_ports_list_out		Audio::Nama::IO::to_jack_port
 	jack_multi_in			Audio::Nama::IO::from_jack_multi
 	jack_multi_out			Audio::Nama::IO::to_jack_multi
-	jack_client_in			Audio::Nama::IO::from_jack_client
-	jack_client_out			Audio::Nama::IO::to_jack_client
+	jack_client_in			Audio::Nama::IO::from_jack_multi
+	jack_client_out			Audio::Nama::IO::to_jack_multi
+	bus_in					Audio::Nama::IO::from_bus
 	);
+    #bus_out					Audio::Nama::IO::to_bus # 
 
 ### class descriptions
 
@@ -174,11 +176,9 @@ sub ports {
 							$client_direction,
 							$self->target_channel,
 							$self->width, 
-							Audio::Nama::try{$self->name} 
+							try{$self->name} 
 	) if $self->client
 }
-
-
 
 sub ecs_string {
 	my $self = shift;
@@ -217,10 +217,12 @@ sub AUTOLOAD {
 	return $self->$method if $self->can($method);
 	{ no warnings 'uninitialized'; 
 	if ( my $track = $tn{$self->{track_}} ){
-		return $track->$call if $track->can($call) 
+		return $track->$call if $track->can($call)
 		# ->can is reliable here because Track has no AUTOLOAD
 	}
-	# suppress error XXX
+	# XX Suppress exceptions on objects that don't have an
+	# associated track 
+	return undef if $call eq 'channel_ops';
 	return undef if $call eq 'name' or $call eq 'surname';
 	}
 	my $msg = "Autoload fell through. Object type: ". (ref $self). " illegal method call: $call\n";
@@ -381,8 +383,9 @@ sub device_id {
 	push @modifiers, $self->full_path;
 	join(q[,],@modifiers);
 }
+sub _format { $Audio::Nama::setup->{wav_info}->{$_[0]->full_path}->{format} };
 sub ecs_extra { $_[0]->mono_to_stereo}
-sub client { 'system' if $jack->{jackd_running} } # since we share latency value
+sub client { 'system' if $jack->{jackd_running} } 
 sub ports { 'system:capture_1' }
 }
 {
@@ -400,7 +403,12 @@ sub new {
 	my %vals = @_;
 	$class->SUPER::new( %vals, device_id => "loop,$vals{endpoint}");
 }
-sub format {}
+sub _format { 
+	my $self = shift;
+	return if $Audio::Nama::config->{opts}->{T}; # XX don't break tests
+	Audio::Nama::signal_format($self->format_template, $config->{loop_chain_channel_width});
+}
+sub _format_template { $config->{cache_to_disk_format} } 
 }
 {
 package Audio::Nama::IO::to_loop;
@@ -451,8 +459,7 @@ package Audio::Nama::IO::to_jack_port;
 use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
 sub format_template { $config->{devices}->{jack}->{signal_format} }
 sub device_id { 'jack,,'.$_[0]->port_name.'_out' }
-sub ports { "Nama:".$_[0]->port_name. '_out_1' } # at least this one port
-	# HARDCODED port name
+sub ports { $config->{ecasound_jack_client_name}. ":".$_[0]->port_name. '_out_1' } # at least this one port
 }
 
 {
@@ -460,8 +467,7 @@ package Audio::Nama::IO::from_jack_port;
 use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO::to_jack_port';
 sub device_id { 'jack,,'.$_[0]->port_name.'_in' }
 sub ecs_extra { $_[0]->mono_to_stereo }
-sub ports { "Nama:".$_[0]->port_name. '_in_1' } # at least this one port
-	# HARDCODED port name
+sub ports { $config->{ecasound_jack_client_name}.":".$_[0]->port_name. '_in_1' } # at least this one port
 }
 
 {
@@ -520,6 +526,16 @@ sub route {
 		$route .= " -chmove:$c," . ( $c + $offset);
 	}
 	$route;
+}
+}
+{
+package Audio::Nama::IO::from_bus;
+use Modern::Perl; use vars qw(@ISA); @ISA = 'Audio::Nama::IO';
+sub new {
+	my $class = shift;
+	my %vals = @_;
+	print "from_bus: ", Audio::Nama::Dumper \%vals;
+	#$class->SUPER::new( %vals, device_id => "loop,$vals{endpoint}");
 }
 }
 {

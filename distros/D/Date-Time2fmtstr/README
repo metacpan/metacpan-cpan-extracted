@@ -1,85 +1,226 @@
-Date-Time2fmtstr
+NAME
+    Date::Time2fmtstr - Functions to format Perl time integers to strings
+    based on a "Picture" format string.
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+AUTHOR
+    Jim Turner
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+    (c) 2015-2019, Jim Turner under the same license that Perl 5 itself is.
+    All rights reserved.
 
+SYNOPSIS
+    use Date::Time2fmtstr;
 
-INSTALLATION
+    print time2str(time, 'mm-dd-yyyy hh:mi PM');
 
-To install this module, run the following commands:
+DESCRIPTION
+    Date::Time2fmtstr provides a single function time2str that accepts a
+    standard Perl (Unix) "time" value (a large integer equivalent to the
+    number of seconds since 1980) and converts it to a string value based on
+    a *format-string* consisting of special substrings which represent the
+    various parts of a date and time value. It returns a string that is
+    essentially the same as the original *format-string* with each of these
+    special substrings replaced with the corresponding date/time value.
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+METHODS
+    <$string> = time2str(*time*, *format-string*);
+        Returns a string corresponding to the specified *format-string* with
+        each special substring replaced with the corresponding date/time
+        data field. For example:
 
-SUPPORT AND DOCUMENTATION
+        $s = time2str(1452324044, 'mm-dd-yyyy hh:mi PM (Day) (Month)');
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        would set $s to '01-09-2016 01:20 AM (Sat) (January)'.
 
-    perldoc Date::Time2fmtstr
+    Special Formatting Substrings
+        There are numerous choices of special format substrings which can be
+        used in an infinite number of combinations to produce the desired
+        results. They are listed below:
 
-You can also look for information at:
+            month - The Full name of the month in all lower case, ie.
+            "january".
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Time2fmtstr
+            Month - The Full name of the month capitalized, ie. "January".
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Date-Time2fmtstr
+            MONTH - The Full name of the month all capitalized, ie.
+            "JANUARY".
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Date-Time2fmtstr
+            dayofweek - Day of the week in all lower case, ie. "sunday".
 
-    Search CPAN
-        http://search.cpan.org/dist/Date-Time2fmtstr/
+            Dayofweek - Day of the week capitalized, ie. "Sunday".
 
+            DAYOFWEEK - Day of the week all capitalized, ie. "SUNDAY".
+
+            day - Three letter abbreviation of the day of the week in all
+            lower case, ie. "sun".
+
+            Day - Three letter abbreviation of the day of the week
+            capitalized, ie. "Sun".
+
+            DAY - Three letter abbreviation of the day of the week all
+            capitalized, ie. "SUN".
+
+            ddd - Num. of days since beginning of year.
+
+            dd - Day of month (2 digits, left padded with a zero if needed),
+            ie. "01".
+
+            d1 - Day of month (1 or 2 digits, as needed), ie. "1".
+
+            d0, d - Numeric day of the week zero-based (Sunday=0, Monday=1,
+            ... Saturday=6).
+
+            d1 - Numeric day of the week one-based (Sunday=1, Monday=2, ...
+            Saturday=7).
+
+            yyyymmdd - Numeric date in 8 digits, ie. "20150107" for January
+            7, 2015.
+
+            yyyy, rrrr - Year in 4 digits.
+
+            yy, rr - Year in last 2 digits.
+
+            hh24 - Military time (hours and minutes: 24 hours, no colon).
+
+            hh - Hour in common format, ie. 01-12.
+
+            h1 - Hour in common format, 1 or 2 digits, as needed, ie. 1-12.
+
+            mi - Minute, ie. 00-59.
+
+            mm - Number of month (2 digits, left padded with a zero if
+            needed), ie. "01" for January.
+
+            mon - Three letter abbreviation of the month, in lower case, ie.
+            "jan" for January.
+
+            HH - Hour in 24-hour format, 2 digits, left padded with a zero
+            if needed, ie. 00-23.
+
+            H1 - Hour in 24-hour format, 1 or 2 digits, as needed, ie. 0-23.
+
+            Mon - Three letter abbreviation of the month, capitalized, ie.
+            "Jan" for January.
+
+            MON - Three letter abbreviation of the month all capitalized,
+            ie. "JAN" for January.
+
+            m1 - Number of month (1 or 2 digits, as needed), ie. "1" for
+            January.
+
+            sssss - Seconds since start of day (00000-86399).
+
+            ssss0 - Seconds since start of day (0-86399).
+
+            mmmm - Minutes since start of day (0000-3599.
+
+            mmm0 - Minutes since start of day (0-3599.
+
+            ss - Seconds since start of last minute (2 digits), ie. 00-59.
+
+            am, pm - display "am" if between Midnight and Noon, "pm"
+            otherwise (both specifiers are identical).
+
+            AM, PM - display "AM" if between Midnight and Noon, "PM"
+            otherwise (both specifiers are identical).
+
+            a, p - display "a" if between Midnight and Noon, "p" otherwise
+            (both specifiers are identical).
+
+            A, P - display "A" if between Midnight and Noon, "P" otherwise
+            (both specifiers are identical).
+
+            rm - Roman numeral for the month (i-xii) in lower case.
+
+            RM - Roman numeral for the month (I-XII) in upper case.
+
+            w - Number of week of the month (1-5).
+
+            ww - Number of week of the year (1-51).
+
+            q - Number of the quarter of the year - (1-4).
+
+DEPENDENCIES
+    Perl 5
+
+RECCOMENDS
+    Date::Fmtstr2time, String::PictureFormat
+
+    wget
+
+BUGS
+    Please report any bugs or feature requests to "bug-Date-Time2fmtstr at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Time2fmtstr>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Date::Time2fmtstr
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Time2fmtstr>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Date-Time2fmtstr>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Date-Time2fmtstr>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Date-Time2fmtstr/>
+
+SEE ALSO
+    Date::Fmtstr2time
+
+KEYWORDS
+    Date::Fmtstr2time, String::PictureFormat, formatting, picture_clause,
+    strings
 
 LICENSE AND COPYRIGHT
+    Copyright (C) 2015-2019 Jim Turner
 
-Copyright (C) 2016 Jim Turner
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+    <http://www.perlfoundation.org/artistic_license_2_0>
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 

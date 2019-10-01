@@ -1,37 +1,17 @@
 ==================================================
-Changes from 2017-11-21 00:00:00 +0000 to present.
+Changes from 2019-07-26 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version 0.1.14 at 2018-01-20 05:39:38 +0000
+version 0.1.15 at 2019-09-24 02:43:24 +0000
 -------------------------------------------
 
-  Change: 3dec0576bc8702d31b4ec5cdd3c5e780e2ebcabb
+  Change: 88d8b7d260706fe45deaa2abd11ea0c55931a055
   Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2018-01-20 13:39:04 +0000
+  Date : 2019-09-24 10:41:58 +0000
 
-    Added queue name parameter to Bioinfo::PBS 
-
--------------------------------------------
-version 0.1.13 at 2017-12-17 15:50:49 +0000
--------------------------------------------
-
-  Change: fdf2fc3808a6633a2b20da82ee9a631125bc491e
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-12-17 23:50:29 +0000
-
-    Added evalue and outfmt parameters 
-
--------------------------------------------
-version 0.1.12 at 2017-12-17 15:20:48 +0000
--------------------------------------------
-
-  Change: 31f4d47b035967b809332fea8534407db8c8b185
-  Author: Yan Xueqing <yanxueqing621@163.com>
-  Date : 2017-12-17 23:20:15 +0000
-
-    Added max_target_seq parameters 
+    Fixed local parallel mode:thread, evalue and outfmt parameter failure 
 
 =================================================
-Plus 14 releases after 2017-11-21 00:00:00 +0000.
+Plus 17 releases after 2019-07-26 00:00:00 +0000.
 =================================================

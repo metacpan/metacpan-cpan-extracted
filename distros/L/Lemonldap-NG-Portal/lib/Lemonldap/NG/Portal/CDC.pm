@@ -10,7 +10,7 @@ use Mouse;
 use MIME::Base64;
 use Lemonldap::NG::Common::FormEncode;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
@@ -35,7 +35,7 @@ sub init {
         return 0;
     }
     my $lconf = $tmp->getLocalConf('portal') // {};
-    my $conf = $tmp->getConf();
+    my $conf  = $tmp->getConf();
     unless ( ref($conf) ) {
         $self->error(
             "Unable to load configuration: $Lemonldap::NG::Common::Conf::msg");
@@ -69,7 +69,7 @@ sub handler {
 
     # Request parameter
     my $action = $req->param('action') || "";    # What we do
-    my $idp = $req->param('idp');                # IDP ID in write mode
+    my $idp    = $req->param('idp');             # IDP ID in write mode
 
     # TODO: Control URL
     #my $control_url = $self->_sub('controlUrlOrigin');
@@ -163,7 +163,7 @@ sub handler {
         );
 
         # Redirect
-        return [ 302, [ Location => $urldc, @{ $req->respHeaders } ], [] ];
+        return [ 302, [ Location => $urldc, $req->spliceHdrs ], [] ];
 
     }
 
@@ -180,7 +180,7 @@ sub handler {
         [
             'Content-Type'   => 'text/plain',
             'Content-Length' => 2,
-            @{ $req->respHeaders }
+            $req->spliceHdrs,
         ],
         ['OK']
     ];

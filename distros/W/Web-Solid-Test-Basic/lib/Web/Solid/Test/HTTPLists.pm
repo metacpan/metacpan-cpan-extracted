@@ -11,29 +11,27 @@ use Test::RDF;
 use Data::Dumper;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.004';
 
 my $bearer_predicate = 'http://example.org/httplist/param#bearer'; # TODO: Define proper URI
 
-sub http_req_res_list_location : Test : Plan(1)  {
+sub http_req_res_list_regex_reuser : Test : Plan(1)  {
   my ($self, $args) = @_;
-  my @requests = @{$args->{'-special'}->{'http-requests'}}; # Unpack for readability
-  my @expected_responses = @{$args->{'-special'}->{'http-responses'}};
-  my @regex_fields = @{$args->{'-special'}->{'regex-fields'}};
+  my @pairs = @{$args->{'-special'}->{'http-pairs'}}; # Unpack for readability
   my @matches;
   subtest $args->{'-special'}->{description} => sub {
-	 plan tests => scalar @requests;
+	 plan tests => scalar @pairs;
 	 my $ua = LWP::UserAgent->new;
 	 subtest "First request" => sub {
 		my $request_no = 0;
-		my $request = $requests[$request_no];
+		my $request = $pairs[$request_no]->{request};
 		if ($args->{$bearer_predicate}) {
 		  $request->header( 'Authorization' => _create_authorization_field($args->{$bearer_predicate}, $request->uri));
 		}
 
 		my $response = $ua->request( $request );
-		my $expected_response = $expected_responses[$request_no];
-		my $regex_fields = $regex_fields[$request_no];
+		my $expected_response = $pairs[$request_no]->{response};
+		my $regex_fields = $pairs[$request_no]->{'regex-fields'};
 		my @expected_header_fields = $expected_response->header_field_names;
 		foreach my $expected_header_field (@expected_header_fields) { # TODO: Date-fields may fail if expectation is dynamic
 		  if ($regex_fields->{$expected_header_field}) { # Then, we have a regular expression from the RDF to match
@@ -44,27 +42,26 @@ sub http_req_res_list_location : Test : Plan(1)  {
 			 $expected_response->remove_header($expected_header_field); # So that we can test the rest with reusable components
 		  }
 		}
-		
-		#		subtest "Request-response #" . ($i+1) =>
+
 		_subtest_compare_req_res($request, $response, $expected_response);
-		# }
+
 	 };
 
 	 subtest "Second request" => sub {
 		my $request_no = 1;
-		my $request = $requests[$request_no];
+		my $request = $pairs[$request_no]->{request};
 		unless (defined($request->uri)) {
 		  # ASSUME: RequestURI was not given, it has to be derived from the previous request through a match
 		  # ASSUME: The first match of the previous request is the relative URI to be used for the this request
 		  # ASSUME: The base URI is the RequestURI for the previous request
-		  my $uri = URI->new_abs($matches[$request_no-1]->[0], $requests[$request_no-1]->uri);
+		  my $uri = URI->new_abs($matches[$request_no-1]->[0], $pairs[$request_no-1]->{request}->uri);
 		  $request->uri($uri);
 		}
 		if ($args->{$bearer_predicate}) {
 		  $request->header( 'Authorization' => _create_authorization_field($args->{$bearer_predicate}, $request->uri));
 		}
 		my $response = $ua->request($request);
-		my $expected_response = $expected_responses[$request_no];
+		my $expected_response = $pairs[$request_no]->{response};
 		_subtest_compare_req_res($request, $response, $expected_response);
 	 };
   };
@@ -72,19 +69,21 @@ sub http_req_res_list_location : Test : Plan(1)  {
 
 sub http_req_res_list : Test : Plan(1)  {
   my ($self, $args) = @_;
-  my @requests = @{$args->{'-special'}->{'http-requests'}}; # Unpack for readability
+  my @pairs = @{$args->{'-special'}->{'http-pairs'}}; # Unpack for readability
   my $ua = LWP::UserAgent->new;
   subtest $args->{'-special'}->{description} => sub {
-	 plan tests => scalar @requests;
-	 for (my $i=0; $i <= $#requests; $i++) {
-		my $request = $requests[$i];
+	 plan tests => scalar @pairs;
+	 my $counter = 1;
+	 foreach my $pair (@pairs) {
+		my $request = $pair->{request};
+		_check_origin($request);
 		if ($args->{$bearer_predicate}) {
 		  $request->header( 'Authorization' => _create_authorization_field($args->{$bearer_predicate}, $request->uri));
 		}
 		my $response = $ua->request( $request );
-		my $expected_response = ${$args->{'-special'}->{'http-responses'}}[$i];
-		subtest "Request-response #" . ($i+1) =>
-		  \&_subtest_compare_req_res, $request, $response, $expected_response; #Callback syntax isn't pretty, admittedly
+		subtest "Request-response #" . ($counter) =>
+		  \&_subtest_compare_req_res, $request, $response, $pair->{response}; #Callback syntax isn't pretty, admittedly
+		$counter++;
 	 }
   };
 }
@@ -95,7 +94,7 @@ sub _subtest_compare_req_res {
   isa_ok($response, 'HTTP::Response');
   if ($expected_response->code) {
 	 is($response->code, $expected_response->code, "Response code is " . $expected_response->code)
-		|| note 'Returned content: ' . $response->as_string;
+		|| note "Returned content:\n" . $response->as_string;
   }
   my @expected_header_fields = $expected_response->header_field_names;
   if (scalar @expected_header_fields) {
@@ -154,7 +153,20 @@ sub _create_authorization_field {
   return "Bearer $object";
 }
  
-
+sub _check_origin {
+  my $request = shift;
+  if ($request->header('Origin')) {
+	 my $origin = URI->new($request->header('Origin'));
+	 if ($origin->path) {
+		note('Origin had path "' . $origin->path . '". Probably unproblematic. Using only scheme and authority');
+		my $new_origin = URI->new;
+		$new_origin->scheme($origin->scheme);
+		$new_origin->authority($origin->authority);
+		$request->header('Origin' => $new_origin->as_string);
+	 }
+  }
+  return $request;
+}
 
 1;
 
@@ -193,20 +205,19 @@ tables to L<Test::FITesque>.
 
 =head1 IMPLEMENTED TESTS
 
+Apart from some author tests in this module, examples of actual tests
+can be found in the L<Solid Test Suite|https://github.com/solid/test-suite>.
+
+
 =head2 Test scripts
 
-This package provides C<tests/httplists.t> which runs tests over the
-fixture table in C<tests/data/http-list.ttl>. The test script requires the
-environment variable C<SOLID_REMOTE_BASE> to be set to the base URL
-that any relative URLs in the fixture tables will be resolved
-against. Thus, the fixture tables themselves are independent of the
-host that will run them.
+In general, tests are formulated in RDF fixture tables, which
+parameterizes the test cases. This parameterization is then given to
+the test scripts. It is intended therefore that only a small number of
+fairly general test scripts will be needed to provide an extensive
+test suite.
 
-To run the test script in the clone of this package, invoke it like this:
-
-  SOLID_REMOTE_BASE="https://kjetiltest4.dev.inrupt.net/" prove -l tests/basic.t
-
-
+These are the test scripts implemented in this module:
 
 
 =head2 C<< http_req_res_list >>
@@ -217,13 +228,21 @@ Runs a list of HTTP request response pairs, checking response against the respon
 
 =over
 
-=item * C<test:requests>
+=item * C<test:steps>
+
+A list of request-response pairs, declared using:
+
+=over
+
+=item * C<test:request>
 
 An RDF list of requests that will be executed towards the server in C<SOLID_REMOTE_BASE>.
 
-=item * C<test:responses>
+=item * C<test:response_assertion>
 
 An RDF list of responses that will be used as corresponding expected responses in the tests.
+
+=back
 
 =item * C<http://example.org/httplist/param#bearer>
 
@@ -231,7 +250,6 @@ A bearer token that if present will be used to authenticate the
 requests given by the above list. The object of this predicate can
 either be a literal bearer token, or a URL, in which case, it will be
 dereferenced and the content will be used as the bearer token.
-
 
 =back
 
@@ -247,16 +265,61 @@ None
 
 =item 2. That the response code matches the expected one if given.
 
-=item 3. That all headers given in the expected response matches a header in the actual response.
+=item 3. That all headers given in the asserted response matches a
+header in the actual response.
 
 =back
 
 
-=head2 C<< http_req_res_list_location >>
+=head2 C<< http_req_res_list_regex_reuser >>
 
 Runs a list of two HTTP request response pairs, using a regular
 expression from the first request to set the request URL of the
-second. To be detailed.
+second.
+
+=head3 Parameters
+
+Uses C<test:steps> like above.
+
+Additionally, the first request may have a regular expression that can
+be used to parse data for the next request. To examine the Link
+header, a response message can be formulated like (note, it practice
+it would be more complex):
+
+ :check_acl_location_res a http:ResponseMessage ;
+    httph:link '<(.*?)>;\\s+rel="acl"'^^dqm:regex ;
+    http:status 200 .
+
+The resulting match is placed in an array that will be used to set the
+Request URI of the next request.
+
+
+=head3 Environment
+
+None
+
+=head3 Implements
+
+=over
+
+=item 1. That the regular expression in the first request matches.
+
+=item 2. That responses are L<HTTP::Response> objects.
+
+=item 3. That the response code matches the expected one if given.
+
+=item 4. That headers that are not matched as regular expression but
+given in the asserted response matches a header in the actual
+response.
+
+=back
+
+
+=head3 Assumptions
+
+See the source for details.
+
+
 
 
 =head1 NOTE
@@ -281,8 +344,6 @@ will be changed before an 1.0 release of the system.
 
 Please report any bugs to
 L<https://github.com/kjetilk/p5-web-solid-test-basic/issues>.
-
-=head1 SEE ALSO
 
 =head1 AUTHOR
 

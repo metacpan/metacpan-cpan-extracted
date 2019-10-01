@@ -14,7 +14,7 @@ use vars::i [
 ];
 use vars::i '%EXPORT_TAGS' => { all => [@EXPORT, @EXPORT_OK] };
 
-our $VERSION = '0.000011'; # TRIAL
+our $VERSION = '0.000012'; # TRIAL
 
 
 # Documentation {{{1
@@ -186,6 +186,9 @@ which C<$code> can access.
 
 =back
 
+C<$code> is run under L<strict> and L<warnings> by default.  If you don't
+want those, you need to expressly turn them off.
+
 =cut
 
 sub _complete_dispatcher {
@@ -198,6 +201,8 @@ sub _complete_dispatcher {
 
     # Make the dispatcher
     my $code = _line_mark_string <<EOT;
+        use strict;
+        use warnings;
         sub {
             # Find the candidate
             my (\$candidate, \$copier);
@@ -253,6 +258,8 @@ positional parameters.  Usage:
 
     my $coderef = _make_positional_copier($defined_in, $impl_hashref);
 
+The copier is run under L<strict> and L<warnings>, for what it's worth.
+
 =cut
 
 our $_positional_copier_invocation_number = 0;  # DEBUG
@@ -266,6 +273,8 @@ sub _make_positional_copier {
         Data::Dumper->Dump($argref,[qw(mpc_defined_in mpc_impl)]) } 2;
 
     my $code = _line_mark_string <<'EOT';
+use strict;
+use warnings;
 sub {
 EOT
 
@@ -274,9 +283,9 @@ EOT
     if( $] lt '5.018' || $VERBOSE > 1) {
         require Data::Dumper;
         require Test::More;
-        Test::More::diag sprintf("Positional copier invocation %d:\n%s",
+        Test::More::diag(sprintf("Positional copier invocation %d:\n%s",
             ++$Sub::Multi::Tiny::Util::_positional_copier_invocation_number,
-            Data::Dumper->Dump([\@_],['copier_args']));
+            Data::Dumper->Dump([\@_],['copier_args'])));
     }
 EOT
 
@@ -297,18 +306,20 @@ EOT
     ) = @_;
 
     if( $] lt '5.018' || $VERBOSE > 1) {
-        Test::More::diag sprintf("After positional copier invocation %d:",
-            $Sub::Multi::Tiny::Util::_positional_copier_invocation_number);
-        Test::More::diag join "\n", map {
+        Test::More::diag(sprintf("After positional copier invocation %d:",
+            $Sub::Multi::Tiny::Util::_positional_copier_invocation_number));
+        Test::More::diag(join "\n", map {
             sprintf("%s = %s", $_, eval($_))
-        } @vars;
+        } @vars);
     }
 
 } #copier
 EOT
 
     _hlog { "Copier for $impl->{candidate_name}\():\n", $code } 2;
-    return eval $code;
+    my $sub = eval $code;
+    die "Could not create copier for $impl->{candidate_name}: $@" if $@;
+    return $sub;
 } #_make_positional_copier
 
 1;

@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "$1" >> log
+/bin/grep -v '#' $1 >> log
+echo 1

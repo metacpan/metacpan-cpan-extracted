@@ -1,0 +1,75 @@
+{
+   "abstract" : "Enables true tail recursion",
+   "author" : [
+      "Jason Cooper <JLCOOPER@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.6",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Keyword-TailRecurse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Keyword::Declare" : "0.001014",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.106",
+            "Test::Exception" : "0.26",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Keyword::TailRecurse" : {
+         "file" : "lib/Keyword/TailRecurse.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://gitlab.com/scrapheap/keyword_tailRecurse",
+      "repository" : {
+         "url" : "git://gitlab.com/scrapheap/keyword_tailRecurse.git",
+         "web" : "https://gitlab.com/scrapheap/keyword_tailRecurse"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:JLCOOPER",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

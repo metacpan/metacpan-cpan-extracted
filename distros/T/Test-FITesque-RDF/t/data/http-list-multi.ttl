@@ -14,48 +14,60 @@
     test:purpose "More elaborate HTTP vocab for PUT then GET test"@en ;
     test:test_script <http://example.org/httplist#http_req_res_list_unauthenticated> ;
     test:params [
-        test:requests ( <#public-writeread-unauthn-alt-put-req> <#public-writeread-unauthn-alt-get-req> ) ;
-        test:responses ( <#public-writeread-unauthn-alt-put-res> <#public-writeread-unauthn-alt-get-res> ) 
-                ] .
-                
+        test:steps (
+            [
+                test:request <#public-writeread-unauthn-alt-put-req> ;
+                test:response_assertion <#public-writeread-unauthn-alt-put-res>
+            ]
+            [
+                test:request <#public-writeread-unauthn-alt-get-req> ;
+                test:response_assertion <#public-writeread-unauthn-alt-get-res>
+            ]
+        )
+    ] .
+
 
 <#public-writeread-unauthn-alt-put-req> a http:RequestMessage ;
-            http:method "PUT" ;
-            httph:content_type "text/turtle" ;
-            http:content "</public/foobar.ttl#dahut> a <http://example.org/Cryptid> ." ;
-            http:requestURI </public/foobar.ttl> .
-          
+    http:method "PUT" ;
+    httph:content_type "text/turtle" ;
+    http:content "</public/foobar.ttl#dahut> a <http://example.org/Cryptid> ." ;
+    http:requestURI </public/foobar.ttl> .
+
 <#public-writeread-unauthn-alt-put-res> a http:ResponseMessage ;
     http:status 201 .
 
 <#public-writeread-unauthn-alt-get-req> a http:RequestMessage ;
     http:method "GET" ;
     http:requestURI </public/foobar.ttl> .
-            
+
 <#public-writeread-unauthn-alt-get-res> a http:ResponseMessage ;
     httph:content_type "text/turtle" .
-            
+
 
 
 <#public-cors-origin-set> a test:AutomatedTest  ;
     test:purpose "Testing CORS header when Origin is supplied by client"@en ;
     test:test_script <http://example.org/httplist#http_req_res_list_unauthenticated> ;
     test:params [
-        test:requests ( <#public-cors-origin-set-req> ) ;
-        test:responses ( <#public-cors-origin-set-res> ) 
-                ] .
-                
+        test:steps (
+            [
+                test:request <#public-cors-origin-set-req> ;
+                test:response_assertion <#public-cors-origin-set-res>
+            ]
+        )
+    ] .
+
 <#public-cors-origin-set-req> a http:RequestMessage ;
-                    http:method "GET" ;
-                    httph:origin <https://app.example> ;
-                    http:requestURI </public/verypublic/foobar.ttl> .
-            
+    http:method "GET" ;
+    httph:origin <https://app.example> ;
+    http:requestURI </public/verypublic/foobar.ttl> .
+
 <#public-cors-origin-set-res> a http:ResponseMessage ;
-                    http:status 200 ;    
-                    httph:access_control_allow_origin <https://app.example> ;
-                    httph:content_type "text/turtle" .
-            
+    http:status 200 ;
+    httph:access_control_allow_origin <https://app.example> ;
+    httph:content_type "text/turtle" .
+
 
 <http://example.org/httplist#http_req_res_list_unauthenticated> a nfo:SoftwareItem ;
-            deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
-            nfo:definesFunction "http_req_res_list_unauthenticated" .
+    deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
+    nfo:definesFunction "http_req_res_list_unauthenticated" .

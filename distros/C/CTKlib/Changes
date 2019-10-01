@@ -149,3 +149,8 @@
     * CTK::Command::crlf: Bug fixed - added -z condition
     * Status method has been extended: now You can use this method as setter
     * The methods tms and error has been modified
+
+2.02 Thu 26 Sep 06:49:43 MSK 2019
+    * CTK::DBI: Bug fixed - undef value returns in list-context
+    - CTK::DBI: Has been removed deprecated functions
+    + CTK::DBI: Added error() method

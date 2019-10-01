@@ -26,6 +26,7 @@ my $client = LLNG::Manager::Test->new( {
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,
             impersonationMergeSSOgroups    => 0,
+            checkUserHiddenAttributes      => '_loginHistory hGroups',
             macros                         => {
                 test_impersonation => '"$testPrefix__user/$_user"',
                 _whatToTrace =>
@@ -138,7 +139,7 @@ ok(
 );
 count(1);
 
-my $id = expectCookie($res);
+my $id  = expectCookie($res);
 my $id2 = expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 

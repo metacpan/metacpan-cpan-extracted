@@ -1526,7 +1526,7 @@ sub getIDP {
         else {
             foreach ( keys %{ $self->idpList } ) {
                 my $idpConfKey = $self->idpList->{$_}->{confKey};
-                my $cond = $self->idpRules->{$idpConfKey} or next;
+                my $cond       = $self->idpRules->{$idpConfKey} or next;
                 if ( $cond->( $req, $req->sessionInfo ) ) {
                     $self->logger->debug(
                         "IDP $idpConfKey resolution rule match");

@@ -21,7 +21,7 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "Attean"            => 0.023,
+                                           "Attean"            => 0.024,
                                            "HTTP::Message"     => 0,
                                            "LWP::UserAgent"    => 0,
                                            "Moo"               => "1.006000",
@@ -47,7 +47,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.012 },
+                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.014 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -62,7 +62,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.012,
+  "version"          => 0.014,
   "x_static_install" => 1,
 };
 

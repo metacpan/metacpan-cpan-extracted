@@ -1,0 +1,15 @@
+CHANGES
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+test.pl
+ ------------------------- code
+ImageCache.pm
+img_cache.pl
+ ------------------------- tests
+t/testcases/ImageCache/base.pm
+t/testcases/ImageCache/ImageCache.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

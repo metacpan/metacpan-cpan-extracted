@@ -21,6 +21,20 @@ $t->app->plugin( Yancy => {
     backend => 'static:' . $SHARE_DIR->child( 'site' ),
     read_schema => 1,
 } );
+
+$t->app->routes->get( '/not-a-draft' )->to(
+    'yancy#get',
+    schema => 'pages',
+    id => 'not-a-draft',
+    template => 'is-draft',
+    layout => 'default',
+);
+
+$t->get_ok( '/not-a-draft.html' )
+    ->status_is( 200 )
+    ->content_type_like( qr{^text/html} )
+    ->content_like( qr{Not a draft} );
+
 $t->app->routes->get( '/*id' )->to(
     'yancy#get',
     schema => 'pages',
@@ -69,8 +83,7 @@ my @items = $t->app->yancy->list( 'pages' );
 is_deeply
     [ sort map { $_->{path} } @items ],
     [
-        'about/index', 'index',
+        'about/index', 'index', 'not-a-draft'
     ],
     'list is complete and correct';
-
 done_testing;

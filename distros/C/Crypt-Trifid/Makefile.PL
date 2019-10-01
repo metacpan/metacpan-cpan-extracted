@@ -27,8 +27,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Crypt::Trifid'        => { file => 'lib/Crypt/Trifid.pm'      , version => '0.10' },
-            'Crypt::Trifid::Utils' => { file => 'lib/Crypt/Trifid/Utils.pm', version => '0.10' },
+            'Crypt::Trifid'        => { file => 'lib/Crypt/Trifid.pm'      , version => '0.11' },
+            'Crypt::Trifid::Utils' => { file => 'lib/Crypt/Trifid/Utils.pm', version => '0.11' },
         },
         resources => {
             repository => {

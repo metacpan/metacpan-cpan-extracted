@@ -19,7 +19,6 @@ our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
 
-	rw_set
 	freq
 	channels
 	input_node
@@ -46,6 +45,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	expand_tilde
 	resolve_path
 	dumper
+	route_output_channels
 
 ) ] );
 
@@ -53,107 +53,6 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = ();
 
-
-## rw_set() for managing bus-level REC/MON/OFF settings commands
-{
-my %bus_logic = ( 
-	mix_track =>
-	{
-
-	# setting mix track to REC
-	
-		REC => sub
-		{
-			my ($bus, $track) = @_;
-			$track->set_rec;
-		},
-
-	# setting a mix track to PLAY
-	
-		PLAY => sub
-		{
-			my ($bus, $track) = @_;
-			$track->set_play;
-		},
-
-	# setting a mix track to MON
-	
-		MON => sub
-		{
-			my ($bus, $track) = @_;
-			$track->set_mon;
-		},
-
-	# setting mix track to OFF
-	
-		OFF => sub
-		{
-			my ($bus, $track) = @_;
-
-			$track->set_off;
-
-			# with the mix track off, 
-			# the member tracks get pruned 
-			# from the graph 
-		}
-	},
-	member_track =>
-	{
-
-	# setting member track to REC
-	
-		REC => sub 
-		{ 
-			my ($bus, $track) = @_;
-
-			$track->set_rec() or return;
-
-			$bus->set(rw => MON);
-			$tn{$bus->send_id}->busify 
-				if $bus->send_type eq 'track' and $tn{$bus->send_id};
-			
-		},
-
-	# setting member track to MON 
-	
-		MON => sub
-		{ 
-			my ($bus, $track) = @_;
-			$bus->set(rw => MON) if $bus->rw eq 'OFF';
-			$track->set_mon;
-		},
-
-	# setting member track to PLAY
-	
-		PLAY => sub
-		{ 
-			my ($bus, $track) = @_;
-			$bus->set(rw => MON) if $bus->rw eq 'OFF';
-			$track->set_play;
-
-		},
-	# setting member track to OFF 
-
-		OFF => sub
-		{
-			my ($bus, $track) = @_;
-			$track->set_off;
-		},
-	},
-);
-# for track commands 'rec', 'mon','off' we 
-# may toggle rw state of the bus as well
-#
-
-sub rw_set {
-	logsub("&rw_set");
-	my ($bus,$track,$rw) = @_;
-	my $type = $track->is_mix_track
-		? 'mix_track'
-		: 'member_track';
-	$bus_logic{$type}{uc $rw}->($bus,$track);
-}
-}
 
 sub freq { [split ',', $_[0] ]->[2] }  # e.g. s16_le,2,44100
 
@@ -227,19 +126,16 @@ sub dest_type {
 	my $dest = shift;
 	if($dest eq undef )			{ undef			}
 
-	# non JACK related
-
-	if($dest eq 'bus')		 	{ 'bus'			}
+	elsif($dest eq 'bus')		 	{ 'bus'			}
 	elsif($dest eq 'null')	 	{ 'null'		}
 	elsif($dest eq 'rtnull')	{ 'rtnull'		}
 	elsif($dest =~ /^loop,/)	{ 'loop'		}
 	elsif($dest !~ /\D/)		{ 'soundcard'	} # digits only
 
-	# JACK related
-
 	elsif($dest =~ /^man/)		{ 'jack_manual'	}
 	elsif($dest eq 'jack')		{ 'jack_manual'	}
-	elsif($dest =~  /(^\w+\.)?ports/)	{ 'jack_ports_list' }
+	elsif($dest =~  /\.ports$/)	{ 'jack_ports_list' }
+	elsif( $tn{$dest} )			{ 'track' 		}
 	else 						{ 'jack_client'	} 
 }
 sub dest_string {
@@ -248,7 +144,7 @@ sub dest_string {
 		my $ch = $id;
 		my @channels;
 		push @channels, $_ for $ch .. ($ch + $width - 1);
-		join '/', @channels
+		'CH '.join '/', @channels
 	}
 	else { $id }
 }
@@ -342,6 +238,20 @@ sub dumper {
 	or ! (ref $_) and $_ 
 	#or (ref $_) =~ /HASH|ARRAY/ and Audio::Nama::json_out($_)
 	or ref $_ and Dumper($_)
+}
+sub route_output_channels {
+	# routes signals (1..$width) to ($dest..$dest+$width-1 )
+	# returns pairs as arguments to chmove
+		
+	my ($width, $dest) = @_;
+	return '' if ! $dest or $dest == 1;
+	# print "route: width: $width, destination: $dest\n\n";
+	my $offset = $dest - 1;
+	my @route;
+	for my $channel ( map{$width - $_ + 1} 1..$width ) {
+		push @route,[$channel,($channel + $offset)];
+	}
+	@route;
 }
 
 1;

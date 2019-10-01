@@ -1,0 +1,6 @@
+<%Content
+  mode="content-show"
+  preview="1"
+  name={<%CgiParam/f name="name"%>}
+  path="/bits/content/revert-form"
+%>

@@ -1,0 +1,6 @@
+In no particular order:
+
+- cnot gate does not work properly. I believe the output data needs to be attached to the input leads for binary gates. I believe there is a pattern.
+- gates are transformations which are represented in code as Cayley Dickson numbers. These may need to be expanded in a simple manner in order to work with higher dimensions. Or maybe they already work. Testing is required.
+- testing quality is low. I am comparing strings instead of numbers which might lead to errors on other systems. The problem is that some common values like 1/sqrt(2) is truncated according to system architecture. I need to compare output to expect values, but I can not guarantee where rounding will occur and what amount of deviation is acceptible.
+

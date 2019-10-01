@@ -7,11 +7,11 @@ use File::Temp qw( tempfile );
 # pre-5.8.0's warns aren't caught by a tied STDERR.
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 # Disable all ReadLine functionality
-$ENV{PERL_RL} = 0;
+BEGIN { $ENV{PERL_RL} = 0; };
 
-use_ok('WWW::Mechanize::Shell');
+use WWW::Mechanize::Shell;
 
 my $s = WWW::Mechanize::Shell->new( 'test', rcfile => undef, warnings => undef );
 

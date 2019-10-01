@@ -13,13 +13,14 @@ package Lemonldap::NG::Portal::Plugins::Notifications;
 
 use strict;
 use Mouse;
+use MIME::Base64;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
   PE_NOTIFICATION
   PE_OK
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -41,15 +42,27 @@ sub init {
     my ($self) = @_;
 
     # Declare new route
-    $self->addUnauthRoute( 'notifback' => 'getNotifBack', ['POST'] );
+    $self->addUnauthRoute( 'notifback' => 'getNotifBack', [ 'POST', 'GET' ] );
     $self->addAuthRoute( 'notifback' => 'getNotifBack', ['POST'] );
 
     if ( $self->conf->{notificationServer} ) {
         $self->logger->debug('Notification server enable');
+
         $self->addUnauthRoute(
-            'notifications' => 'notificationServer',
+            notifications => 'notificationServer',
             ['POST']
-        );
+        ) if ( $self->conf->{notificationServerPOST} // 1 );
+
+        $self->addUnauthRoute(
+            notifications => { '*' => 'notificationServer' },
+            ['GET']
+        ) if ( $self->conf->{notificationServerGET} );
+
+        $self->addUnauthRoute(
+            notifications =>
+              { ':uid' => { ':reference' => 'notificationServer' } },
+            ['DELETE']
+        ) if ( $self->conf->{notificationServerDELETE} );
     }
 
     # Search for configuration options
@@ -70,7 +83,6 @@ sub init {
     $type->import( $self->conf->{oldNotifFormat} ? 'XML' : 'JSON' );
 
     # TODO: use conf database?
-
     my $prms = {
         %{ $self->conf->{notificationStorageOptions} },
         p    => $self->p,
@@ -121,6 +133,11 @@ sub checkNotifDuringAuth {
         # Cipher id
         $req->id( $self->p->HANDLER->tsv->{cipher}->encrypt( $req->id ) );
         $self->p->rebuildCookies($req);
+        if ( not $req->data->{_url} and $req->env->{PATH_INFO} ne '/' ) {
+            $req->data->{_url} =
+              encode_base64( $self->conf->{portal} . $req->env->{PATH_INFO},
+                '' );
+        }
 
         # Restore and cipher cookies
         return PE_NOTIFICATION;
@@ -136,8 +153,8 @@ sub getNotifBack {
 }
 
 sub notificationServer {
-    my ( $self, $req ) = @_;
-    return $self->module->notificationServer($req);
+    my ( $self, $req, @args ) = @_;
+    return $self->module->notificationServer( $req, @args );
 }
 
 1;

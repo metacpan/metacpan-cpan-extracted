@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use 5.008001;
 use ExtUtils::CppGuess;
-use Test::Alien 1.00 ();
+use Test::Alien 1.88 ();
 use Text::ParseWords qw( shellwords );
 use base qw( Exporter );
 
 # ABSTRACT: Testing tools for Alien modules for projects that use C++
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 
 our @EXPORT = @Test::Alien::EXPORT;
@@ -51,6 +51,10 @@ sub xs_ok
     };
     $xs->{$stage{$name}}->{$name} = [@old, @new];
   }
+
+  $xs->{cbuilder_config} = delete $cppguess{config} if defined $cppguess{config};
+  $xs->{cbuilder_check} = 'have_cplusplus';
+
   warn "extra Module::Build option: $_" for keys %cppguess;
 
   $cb ? Test::Alien::xs_ok($xs, $message, $cb) : Test::Alien::xs_ok($xs, $message);
@@ -70,7 +74,7 @@ Test::Alien::CPP - Testing tools for Alien modules for projects that use C++
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

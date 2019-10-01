@@ -3,7 +3,7 @@ use strict;
 use lib './inc';
 use IO::Catch;
 
-use vars qw($_STDOUT_);
+our $_STDOUT_;
 tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
 # Disable all ReadLine functionality

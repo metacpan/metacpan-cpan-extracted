@@ -5,7 +5,7 @@ use Test::Exception;
 use Catmandu::Importer::SRU;
 use Catmandu::Importer::SRU::Parser::marcxml;
 use lib 't/lib';
-use MockFurl;
+use MockHTTPClient;
 
 my $pkg;
 
@@ -17,10 +17,10 @@ BEGIN {
 require_ok $pkg;
 
 my %options = (
-    base   => 'http://example.org/',
-    query  => 'sru_oai_dc.xml',
-    furl   => MockFurl->new,
-    parser => 'struct',
+    base        => 'http://example.org/',
+    query       => 'sru_oai_dc.xml',
+    http_client => MockHTTPClient->new,
+    parser      => 'struct',
 );
 
 ok my $importer = Catmandu::Importer::SRU->new(%options);

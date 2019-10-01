@@ -9,7 +9,7 @@ require 't/test-lib.pm';
 my $res;
 my $maintests = 6;
 
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 SKIP: {
     eval
@@ -90,7 +90,7 @@ SKIP: {
     }
 `;
 
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
 
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
 
@@ -112,7 +112,7 @@ SKIP: {
                 useSafeJail                => 1,
                 authentication             => 'DBI',
                 userDB                     => 'Same',
-                dbiAuthChain               => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain               => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser                => '',
                 dbiAuthPassword            => '',
                 dbiAuthTable               => 'users',
@@ -200,6 +200,5 @@ SKIP: {
 
     clean_sessions();
 }
-eval { unlink 't/userdb.db' };
 count($maintests);
 done_testing( count() );

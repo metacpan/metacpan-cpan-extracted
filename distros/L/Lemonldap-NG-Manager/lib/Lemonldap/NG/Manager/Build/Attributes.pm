@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -14,8 +14,13 @@ sub perlExpr {
     my ( $val, $conf ) = @_;
     my $cpt = new Safe;
     $cpt->share_from( 'MIME::Base64', ['&encode_base64'] );
-    $cpt->share_from( 'Lemonldap::NG::Handler::Main::Jail',
-        [ '&encrypt', '&token' ] );
+    $cpt->share_from(
+        'Lemonldap::NG::Handler::Main::Jail',
+        [
+            '&encrypt', '&token',
+            @Lemonldap::NG::Handler::Main::Jail::builtCustomFunctions
+        ]
+    );
     $cpt->share_from( 'Lemonldap::NG::Common::Safelib',
         $Lemonldap::NG::Common::Safelib::functions );
     $cpt->reval("BEGIN { 'warnings'->unimport; } $val");
@@ -146,7 +151,7 @@ sub types {
             test => sub {
                 return (
                     $_[0] =~
-/^(?:(?:\-+\s*BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+\r?\n)?(?:Proc-Type:.*\r?\nDEK-Info:.*\r?\n[\r\n]*)?[a-zA-Z0-9\/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+(?:RSA\s+)PRIVATE\s+KEY\s*\-+)?[\r\n]*)?$/s
+/^(?:(?:\-+\s*BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+\r?\n)?(?:Proc-Type:.*\r?\nDEK-Info:.*\r?\n[\r\n]*)?[a-zA-Z0-9\/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+)?[\r\n]*)?$/s
                     ? (1)
                     : ( 1, '__badPemEncoding__' )
                 );
@@ -385,6 +390,11 @@ sub attributes {
             msgFail       => '__badUrl__',
             documentation => 'URL to call on reload',
         },
+        dontCompactConf => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Don t compact configuration',
+        },
         portalMainLogo => {
             type          => 'text',
             default       => 'common/logos/logo_llng_400px.png',
@@ -435,8 +445,13 @@ sub attributes {
         },
         checkUserHiddenAttributes => {
             type          => 'text',
-            default       => '_loginHistory hGroups',
+            default       => '_loginHistory _session_id hGroups',
             documentation => 'Attributes to hide in CheckUser plugin',
+            flags         => 'p',
+        },
+        checkUserSearchAttributes => {
+            type          => 'text',
+            documentation => 'Attributes used for retrieving sessions in user DataBase',
             flags         => 'p',
         },
         checkUserDisplayPersistentInfo => {
@@ -467,12 +482,14 @@ sub attributes {
             type          => 'boolOrExpr',
             default       => 0,
             documentation => 'Impersonation activation rule',
+            flags         => 'p',
         },
         impersonationIdRule => {
             type          => 'text',
             test          => sub { return perlExpr(@_) },
             default       => 1,
             documentation => 'Impersonation identities rule',
+            flags         => 'p',
         },
         impersonationHiddenAttributes => {
             type          => 'text',
@@ -484,6 +501,25 @@ sub attributes {
             default       => 1,
             type          => 'bool',
             documentation => 'Skip session empty values',
+            flags         => 'p',
+        },
+        contextSwitchingRule => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Context switching activation rule',
+            flags         => 'p',
+        },
+        contextSwitchingIdRule => {
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
+            default       => 1,
+            documentation => 'Context switching identities rule',
+            flags         => 'p',
+        },
+        contextSwitchingStopWithLogout => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Stop context switching by logout',
             flags         => 'p',
         },
         skipRenewConfirmation => {
@@ -638,6 +674,11 @@ sub attributes {
             type          => 'int',
             documentation => 'Token timeout for forms',
         },
+        issuersTimeout => {
+            default       => 120,
+            type          => 'int',
+            documentation => 'Token timeout for issuers',
+        },
         requireToken => {
             default       => 1,
             type          => 'boolOrExpr',
@@ -701,6 +742,7 @@ sub attributes {
             keyTest       => sub { return perlExpr(@_) },
             test          => sub { 1 },
             documentation => 'Rules to grant sessions',
+            default       => {},
         },
         hiddenAttributes => {
             type          => 'text',
@@ -833,6 +875,11 @@ sub attributes {
             default       => '^[\w\.\-@]+$',
             documentation => 'Regular expression to validate login',
         },
+        browsersDontStorePassword => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Avoid browsers to store users password',
+        },
         useRedirectOnError => {
             type          => 'bool',
             default       => 1,
@@ -855,6 +902,11 @@ sub attributes {
             type          => 'lmAttrOrMacro',
             default       => 'uid',
             documentation => 'Session parameter used to fill REMOTE_USER',
+            flags         => 'hp',
+        },
+        customToTrace => {
+            type          => 'lmAttrOrMacro',
+            documentation => 'Session parameter used to fill REMOTE_CUSTOM',
             flags         => 'hp',
         },
         lwpOpts => {
@@ -924,6 +976,12 @@ sub attributes {
             default       => '$_oidcConnectedRP',
             documentation => 'Display OIDC consent tab in portal',
         },
+        portalDisplayGeneratePassword => {
+            default => 1,
+            type    => 'bool',
+            documentation =>
+              'Display password generate box in reset password form',
+        },
 
         # Cookies
         cookieExpiration => {
@@ -945,6 +1003,14 @@ sub attributes {
             msgFail       => '__badDomainName__',
             default       => 'example.com',
             documentation => 'DNS domain',
+            flags         => 'hp',
+        },
+        pdataDomain => {
+            type          => 'text',
+            test          => qr/^(?:$Regexp::Common::URI::RFC2396::hostname)?$/,
+            msgFail       => '__badDomainName__',
+            default       => '',
+            documentation => 'pdata cookie DNS domain',
             flags         => 'hp',
         },
         httpOnly => {
@@ -1008,6 +1074,28 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Notification server activation',
+        },
+        notificationServerGET => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Notification server activation',
+        },
+        notificationServerPOST => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Notification server activation',
+        },
+        notificationServerDELETE => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Notification server activation',
+        },
+        notificationServerSentAttributes => {
+            type    => 'text',
+            default => 'uid reference date title subtitle text check',
+            documentation =>
+              'Prameters to send with notification server GET method',
+            flags => 'p',
         },
         notificationStorage => {
             type          => 'PerlModule',
@@ -1122,6 +1210,11 @@ sub attributes {
             keyMsgFail    => '__invalidSessionData__',
             documentation => 'Data to remember in login history',
         },
+        disablePersistentStorage => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enabled persistent storage',
+        },
 
         # SAML issuer
         issuerDBSAMLActivation => {
@@ -1212,6 +1305,31 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Hide old password in portal',
+        },
+        passwordPolicyMinSize => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Password policy: minimal size',
+        },
+        passwordPolicyMinLower => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Password policy: minimal lower characters',
+        },
+        passwordPolicyMinUpper => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Password policy: minimal upper characters',
+        },
+        passwordPolicyMinDigit => {
+            default       => 0,
+            type          => 'int',
+            documentation => 'Password policy: minimal digit characters',
+        },
+        portalDisplayPasswordPolicy => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Display policy in password form',
         },
 
         # SMTP server
@@ -1334,6 +1452,11 @@ sub attributes {
             default       => 1,
             documentation => 'Upgrade session activation',
         },
+        forceGlobalStorageUpgradeOTT => {
+            type => 'bool',
+            documentation =>
+              'Force upgrade tokens be stored into Global Storage',
+        },
 
         # 2F
         max2FDevices => {
@@ -1363,6 +1486,14 @@ sub attributes {
             documentation =>
               'Authentication level for users authentified by password+U2F'
         },
+        u2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for U2F'
+        },
+        u2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for U2F',
+        },
         u2fUserCanRemoveKey => {
             type          => 'bool',
             default       => 1,
@@ -1388,6 +1519,14 @@ sub attributes {
             type => 'int',
             documentation =>
               'Authentication level for users authentified by password+TOTP'
+        },
+        totp2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for TOTP 2F'
+        },
+        totp2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for TOTP 2F',
         },
         totp2fIssuer => {
             type          => 'text',
@@ -1440,6 +1579,14 @@ sub attributes {
             documentation =>
 'Authentication level for users authentified by password+(U2F or TOTP)'
         },
+        utotp2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for U2F+TOTP'
+        },
+        utotp2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for U2F+TOTP',
+        },
 
         # Mail second factor
         mail2fActivation => {
@@ -1468,6 +1615,10 @@ sub attributes {
             type => 'int',
             documentation =>
 'Authentication level for users authenticated by Mail second factor'
+        },
+        mail2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for Mail second factor'
         },
         mail2fLogo => {
             type          => 'text',
@@ -1498,9 +1649,44 @@ sub attributes {
             documentation =>
 'Authentication level for users authentified by External second factor'
         },
+        ext2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for External second factor'
+        },
         ext2fLogo => {
             type          => 'text',
             documentation => 'Custom logo for External 2F',
+        },
+
+        # Radius second factor
+        radius2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Radius second factor activation',
+        },
+        radius2fSecret             => { type => 'text', },
+        radius2fServer             => { type => 'text', },
+        radius2fUsernameSessionKey => {
+            type          => 'text',
+            documentation => 'Session key used as Radius login'
+        },
+        radius2fTimeout => {
+            type          => 'int',
+            default       => 20,
+            documentation => 'Radius 2f verification timeout',
+        },
+        radius2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+'Authentication level for users authenticated by Radius second factor'
+        },
+        radius2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for Radius 2F',
+        },
+        radius2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for Radius 2F'
         },
 
         #  REST External second factor
@@ -1538,6 +1724,10 @@ sub attributes {
             documentation =>
 'Authentication level for users authentified by REST second factor'
         },
+        rest2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for REST second factor'
+        },
         rest2fLogo => {
             type          => 'text',
             documentation => 'Custom logo for REST 2F',
@@ -1558,6 +1748,14 @@ sub attributes {
             type => 'int',
             documentation =>
 'Authentication level for users authentified by Yubikey second factor'
+        },
+        yubikey2fLabel => {
+            type          => 'text',
+            documentation => 'Portal label for Yubikey second factor'
+        },
+        yubikey2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for Yubikey 2F',
         },
         yubikey2fClientID => {
             type          => 'text',
@@ -1633,6 +1831,12 @@ sub attributes {
             type    => 'bool',
             documentation =>
               'Allow to export secret keys in REST session server',
+        },
+        restClockTolerance => {
+            default => 15,
+            type    => 'int',
+            documentation =>
+              'How tolerant the REST session server will be to clock dift',
         },
         restConfigServer => {
             default       => 0,
@@ -1752,7 +1956,7 @@ sub attributes {
             type    => 'int',
             default => -1,
         },
-        vhostAliases => { type => 'text', },
+        vhostAliases => { type => 'text', default => '' },
         vhostType    => {
             type   => 'select',
             select => [
@@ -1769,7 +1973,7 @@ sub attributes {
             default       => 'Main',
             documentation => 'Handler type',
         },
-        vhostAuthnLevel => { type => 'int', },
+        vhostAuthnLevel => { type => 'int' },
 
         # SecureToken parameters
         secureTokenAllowOnError => {
@@ -2608,7 +2812,7 @@ sub attributes {
         },
         available2F => {
             type          => 'text',
-            default       => 'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,Yubikey',
+            default       => 'UTOTP,TOTP,U2F,REST,Mail2F,Ext2F,Yubikey,Radius',
             documentation => 'Available second factor modules',
         },
         available2FSelfRegistration => {
@@ -2805,6 +3009,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             type          => 'bool',
             documentation => 'Allow a user to reset his expired password',
+        },
+        ldapITDS => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Support for IBM Tivoli Directory Server',
         },
 
         # SSL
@@ -3014,7 +3223,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         linkedInUserField => { type => 'text', default => 'emailAddress' },
         linkedInScope =>
-          { type => 'text', default => 'r_basicprofile r_emailaddress' },
+          { type => 'text', default => 'r_liteprofile r_emailaddress' },
 
         # WebID
         webIDAuthnLevel => {
@@ -3131,12 +3340,21 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         slaveHeaderName    => { type => 'text', },
         slaveHeaderContent => { type => 'text', },
+        slaveDisplayLogo   => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Display Slave authentication logo',
+        },
 
         # Choice
         authChoiceParam => {
             type          => 'text',
             default       => 'lmAuth',
             documentation => 'Applications list',
+        },
+        authChoiceAuthBasic => {
+            type          => 'text',
+            documentation => 'Auth module used by AuthBasic handler',
         },
         authChoiceModules => {
             type       => 'authChoiceContainer',
@@ -3243,6 +3461,18 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 { k => 'Custom',        v => 'customModule' },
             ],
         },
+        sfExtra => {
+            type          => 'sfExtraContainer',
+            keyTest       => qr/^\w+$/,
+            test          => sub { 1 },
+            documentation => 'Extra second factors',
+            select        => [
+                { k => 'Mail2F', v => 'E-Mail' },
+                { k => 'REST',   v => 'REST' },
+                { k => 'Ext2F',  v => 'External' },
+                { k => 'Radius', v => 'Radius' },
+            ],
+        },
 
         # Custom auth modules
         customAuth => {
@@ -3286,7 +3516,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         # OpenID Connect service
         oidcServiceMetaDataIssuer => {
             type          => 'text',
-            default       => 'http://auth.example.com',
             documentation => 'OpenID Connect issuer',
         },
         oidcServiceMetaDataAuthorizeURI => {
@@ -3313,6 +3542,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'text',
             default       => 'register',
             documentation => 'OpenID Connect registration endpoint',
+        },
+        oidcServiceMetaDataIntrospectionURI => {
+            type          => 'text',
+            default       => 'introspect',
+            documentation => 'OpenID Connect introspection endpoint',
         },
         oidcServiceMetaDataEndSessionURI => {
             type          => 'text',

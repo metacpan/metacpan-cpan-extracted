@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/DCIT/perl-Crypt-JWT/issues
   repository: https://github.com/DCIT/perl-Crypt-JWT
-version: '0.024'
+version: '0.025'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

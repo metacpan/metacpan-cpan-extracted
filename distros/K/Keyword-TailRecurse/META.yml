@@ -1,0 +1,41 @@
+---
+abstract: 'Enables true tail recursion'
+author:
+  - 'Jason Cooper <JLCOOPER@cpan.org>'
+build_requires:
+  Test::Deep: '0.106'
+  Test::Exception: '0.26'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Keyword-TailRecurse
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Keyword::TailRecurse:
+    file: lib/Keyword/TailRecurse.pm
+    version: '0.01'
+requires:
+  Keyword::Declare: '0.001014'
+  perl: '5.014'
+resources:
+  homepage: https://gitlab.com/scrapheap/keyword_tailRecurse
+  repository: git://gitlab.com/scrapheap/keyword_tailRecurse.git
+version: '0.01'
+x_authority: cpan:JLCOOPER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

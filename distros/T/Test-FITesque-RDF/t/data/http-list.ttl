@@ -14,8 +14,16 @@
     test:purpose "More elaborate HTTP vocab for PUT then GET test"@en ;
     test:test_script <http://example.org/httplist#http_req_res_list_unauthenticated> ;
     test:params [
-        test:requests ( :public_writeread_unauthn_alt_put_req :public_writeread_unauthn_alt_get_req ) ;
-        test:responses ( :public_writeread_unauthn_alt_put_res :public_writeread_unauthn_alt_get_res ) 
+        test:steps (
+            [
+                test:request :public_writeread_unauthn_alt_put_req ;
+                test:response_assertion :public_writeread_unauthn_alt_put_res
+            ]
+            [
+                test:request :public_writeread_unauthn_alt_get_req ;
+                test:response_assertion :public_writeread_unauthn_alt_get_res
+            ]
+        )
     ] .
 
 

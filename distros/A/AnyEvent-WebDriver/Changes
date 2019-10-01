@@ -3,6 +3,11 @@ Revision history for AnyEvent::WebDriver
 TODO: investigate modifer key usage/special key usage in send_element_keys
 TODO: geckodriver/chromedriver autostart classes
 
+1.01 Fri Sep 27 05:30:40 CEST 2019
+	- autodelete property was ignored.
+        - document that perl bugs prevent autodelete when exiting.
+        - make delete_session idempotent and safe to always call.
+
 1.0  Fri Sep 20 22:15:07 CEST 2019
 	- small protocol fixes.
         - chromdriver 77 can finally create sessions, but might still not

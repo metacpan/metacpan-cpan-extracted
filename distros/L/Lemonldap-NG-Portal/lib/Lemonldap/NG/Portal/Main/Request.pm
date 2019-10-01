@@ -78,7 +78,7 @@ has token => ( is => 'rw' );
 
 # Error type
 sub error_type {
-    my $req = shift;
+    my $req  = shift;
     my $code = shift || $req->error;
 
     # Positive errors

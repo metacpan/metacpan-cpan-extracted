@@ -141,6 +141,15 @@ sub _initialize {
 
         $_class = $typemap->{join("/", @{$path})};
 
+        # PATCH Checking and retreating if the path is not in the typemap.
+        if (!defined $_class) {
+          $name =~ s/\[.+\]//;
+          $path->[-1] = $name;
+
+          $_class = $typemap->{join("/", @{$path})};
+        }
+        # END PATCH
+
         if (!defined($_class) and $self->{strict}) {
           die "Cannot resolve class for " . $name . " path " .
             join("/", @{$path}) . " via " . $self->{class_resolver};

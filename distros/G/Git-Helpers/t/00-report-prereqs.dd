@@ -40,6 +40,7 @@ do { my $x = {
                                       'MetaCPAN::Client' => '0',
                                       'Moo' => '0',
                                       'MooX::Options' => '0',
+                                      'Pod::Usage' => '0',
                                       'String::Trim' => '0',
                                       'Sub::Exporter' => '0',
                                       'Term::Choose' => '0',

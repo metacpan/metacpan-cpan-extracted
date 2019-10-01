@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ListCurrencies/list_currencies
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-19'; # DATE
+our $DATE = '2019-07-28'; # DATE
 our $DIST = 'App-ListCurrencies'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +16,8 @@ use Perinci::CmdLine::Any;
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListCurrencies/list_currencies",
     program_name => "list-currencies",
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -35,7 +37,7 @@ list-currencies - List currencies
 
 =head1 VERSION
 
-This document describes version 0.002 of list-currencies (from Perl distribution App-ListCurrencies), released on 2019-07-19.
+This document describes version 0.003 of list-currencies (from Perl distribution App-ListCurrencies), released on 2019-07-28.
 
 =head1 SYNOPSIS
 
@@ -51,34 +53,6 @@ have a relatively recent version of the module.
 =head1 OPTIONS
 
 C<*> marks required options.
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<s>, B<-c>
-
-Set path to configuration file.
-
-=item B<--config-profile>=I<s>, B<-P>
-
-Set configuration profile to use.
-
-=item B<--no-config>, B<-C>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
-
-=back
 
 =head2 Field selection options
 
@@ -386,71 +360,6 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
-
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/list-currencies.conf>, F<~/list-currencies.conf>, or F</etc/list-currencies.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- alpha (see --alpha)
- alpha.contains (see --alpha-contains)
- alpha.in (see --alpha-in)
- alpha.is (see --alpha-is)
- alpha.isnt (see --alpha-isnt)
- alpha.max (see --alpha-max)
- alpha.min (see --alpha-min)
- alpha.not_contains (see --alpha-not-contains)
- alpha.not_in (see --alpha-not-in)
- alpha.xmax (see --alpha-xmax)
- alpha.xmin (see --alpha-xmin)
- detail (see --detail)
- en_name (see --en-name)
- en_name.contains (see --en-name-contains)
- en_name.in (see --en-name-in)
- en_name.is (see --en-name-is)
- en_name.isnt (see --en-name-isnt)
- en_name.max (see --en-name-max)
- en_name.min (see --en-name-min)
- en_name.not_contains (see --en-name-not-contains)
- en_name.not_in (see --en-name-not-in)
- en_name.xmax (see --en-name-xmax)
- en_name.xmin (see --en-name-xmin)
- fields (see --field)
- format (see --format)
- naked_res (see --naked-res)
- query (see --query)
- random (see --random)
- result_limit (see --result-limit)
- result_start (see --result-start)
- sort (see --sort)
- with_field_names (see --with-field-names)
-
-=head1 ENVIRONMENT
-
-=head2 LIST_CURRENCIES_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/list-currencies.conf>
-
-F<~/list-currencies.conf>
-
-F</etc/list-currencies.conf>
 
 =head1 HOMEPAGE
 

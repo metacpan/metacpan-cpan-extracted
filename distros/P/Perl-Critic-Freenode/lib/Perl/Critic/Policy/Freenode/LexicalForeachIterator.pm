@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy::Variables::RequireLexicalLoopIterators';
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 sub default_severity { $SEVERITY_HIGH }
 sub default_themes { 'freenode' }

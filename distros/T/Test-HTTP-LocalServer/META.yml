@@ -33,16 +33,16 @@ requires:
   HTTP::Daemon: '6.05'
   HTTP::Request::AsCGI: '0'
   HTTP::Response: '0'
+  HTTP::Tiny: '0'
   IO::Socket::INET: '0'
-  LWP: '6.36'
-  LWP::Simple: '0'
   Socket: '0'
+  Time::HiRes: '0'
   URI: '0'
   URI::URL: '0'
   perl: '5.008'
 resources:
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Test-HTTP-LocalServer.git
-version: '0.66'
+version: '0.68'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

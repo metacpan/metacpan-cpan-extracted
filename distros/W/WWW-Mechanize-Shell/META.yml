@@ -2,9 +2,18 @@
 abstract: 'An interactive shell for WWW::Mechanize'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
+build_requires:
+  CGI: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::HTTP::LocalServer: '0.68'
+  Test::More: '0'
+  Test::Without::Module: '0'
+  URI: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,8 +23,24 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  HTML::Display: '0'
+  HTML::TokeParser::Simple: '2'
+  HTTP::Cookies: '0'
+  Hook::LexWrap: '0.2'
+  LWP: '5.69'
+  LWP::UserAgent: '0'
+  Term::Shell: '0.02'
+  Test::Harness: '2.3'
+  URI::URL: '0'
+  WWW::Mechanize: '1.2'
+  WWW::Mechanize::FormFiller: '0.05'
+  WWW::Mechanize::Link: '1.2'
+  parent: '0'
+  perl: '5.006'
 resources:
+  license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/WWW-Mechanize-Shell.git
-version: '0.57'
+version: '0.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -22,7 +22,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
@@ -309,7 +309,7 @@ sub _register {
         my $html = 1;
 
         # Use HTML template
-        $body = $self->loadTemplate(
+        $body = $self->loadMailTemplate(
             $req,
             'mail_register_confirm',
             filter => $tr,
@@ -369,7 +369,7 @@ sub _register {
     my $html = 1;
 
     # Use HTML template
-    $body = $self->loadTemplate(
+    $body = $self->loadMailTemplate(
         $req,
         'mail_register_done',
         filter => $tr,
@@ -455,7 +455,7 @@ sub display {
 
     # Display captcha if it's enabled
     if ( $req->captcha ) {
-        $templateParams{CAPTCHA_SRC} = $req->captcha;
+        $templateParams{CAPTCHA_SRC}  = $req->captcha;
         $templateParams{CAPTCHA_SIZE} = $self->conf->{captcha_size} || 6;
     }
     if ( $req->token ) {

@@ -15,7 +15,6 @@ my $client = LLNG::Manager::Test->new( {
             userDB                         => 'Same',
             loginHistoryEnabled            => 0,
             brutForceProtection            => 0,
-            portalMainLogo                 => 'common/logos/logo_llng_old.png',
             checkUser                      => 1,
             requireToken                   => 1,
             tokenUseGlobalStorage          => 1,

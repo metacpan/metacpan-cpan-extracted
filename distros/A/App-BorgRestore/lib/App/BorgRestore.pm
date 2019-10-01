@@ -2,11 +2,11 @@ package App::BorgRestore;
 use v5.14;
 use strictures 2;
 
-our $VERSION = "3.3.0";
+our $VERSION = "3.4.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
-use App::BorgRestore::Helper;
+use App::BorgRestore::Helper qw(untaint);
 use App::BorgRestore::PathTimeTable::DB;
 use App::BorgRestore::PathTimeTable::Memory;
 use App::BorgRestore::Settings;
@@ -327,9 +327,8 @@ process during method execution since this is required by C<`borg extract`>.
 =cut
 
 method restore($path, $archive, $destination) {
-	$destination = App::BorgRestore::Helper::untaint($destination, qr(.*));
-	$path = App::BorgRestore::Helper::untaint($path, qr(.*));
-	my $archive_name = App::BorgRestore::Helper::untaint_archive_name($archive->{archive});
+	$destination = untaint($destination, qr(.*));
+	$path = untaint($path, qr(.*));
 
 	$log->infof("Restoring %s to %s from archive %s", $path, $destination, $archive->{archive});
 
@@ -343,10 +342,10 @@ method restore($path, $archive, $destination) {
 		my $workdir = pushd($destination, {untaint_pattern => qr{^(.*)$}});
 
 		my $final_destination = abs_path($basename);
-		$final_destination = App::BorgRestore::Helper::untaint($final_destination, qr(.*));
+		$final_destination = untaint($final_destination, qr(.*));
 		$log->debugf("Removing %s", $final_destination);
 		File::Path::remove_tree($final_destination);
-		$self->{deps}->{borg}->restore($components_to_strip, $archive_name, $path);
+		$self->{deps}->{borg}->restore($components_to_strip, $archive->{archive}, $path);
 	}
 	$log->debugf("CWD is %s", getcwd());
 }

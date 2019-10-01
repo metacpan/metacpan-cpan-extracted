@@ -31,7 +31,7 @@ for my $bad (
     q{"meh},      q{["foo/bar]}, q{)},     q{]},
     q{(},         q{[},          q{(a/b/}, q{a*-1},
     q{[a*10*20]}, q{Z}
-  ) {
+) {
     $test_counter++;
     dies_ok { $parser->from_string($bad) } "pattern >>>$bad<<< should fail";
 }
@@ -41,31 +41,31 @@ my $ret;
 # "abc" and just abc should be equivalent string parses
 {
     $ret = $parser->from_string(q{"abc"});
-    isa_ok( $ret, 'Lingua::Awkwords::ListOf' );
-    is( $ret->render, "abc" );
+    isa_ok($ret, 'Lingua::Awkwords::ListOf');
+    is($ret->render, "abc");
 
     $ret = $parser->from_string(q{bcd});
-    is( $ret->render, "bcd" );
+    is($ret->render, "bcd");
 
     # filters! (this form is incompatible with the online version)
     $ret = $parser->from_string(q{cde^e});
-    is( $ret->render, "cd" );
+    is($ret->render, "cd");
 
     $ret = $parser->from_string(q{cde^e^c});
-    is( $ret->render, "d" );
+    is($ret->render, "d");
 }
 
 # this form should be the same as the previous, explicit [] instead of
 # the implication of such
 {
     $ret = $parser->from_string(q{[def]});
-    is( $ret->render, "def" );
+    is($ret->render, "def");
 
     $ret = $parser->from_string(q{[efg]^f});
-    is( $ret->render, "eg" );
+    is($ret->render, "eg");
 
     $ret = $parser->from_string(q{[fgh]^h^g^f});
-    is( $ret->render, "" );
+    is($ret->render, "");
 }
 
 # whitespace only preserved within "quoted strings", including leading
@@ -73,23 +73,23 @@ my $ret;
 # Parser::MGC to get right
 {
     $ret = $parser->from_string(q{ ghi });
-    is( $ret->render, "ghi" );
+    is($ret->render, "ghi");
 
     $ret = $parser->from_string(q{ ghi "or not " });
-    is( $ret->render, "ghior not " );
+    is($ret->render, "ghior not ");
 
     $ret = $parser->from_string(q{ ghi " also this" });
-    is( $ret->render, "ghi also this" );
+    is($ret->render, "ghi also this");
 }
 
 # subpatterns
 {
-    Lingua::Awkwords::Subpattern->update_pattern( Q => ['q'] );
+    Lingua::Awkwords::Subpattern->update_pattern(Q => ['q']);
     $ret = $parser->from_string(q{ QQQ });
-    is( $ret->render, 'qqq' );
+    is($ret->render, 'qqq');
 
     $ret = $parser->from_string(q{ Q o Q });
-    is( $ret->render, 'qoq' );    # qoq is Klingon for robot, by the way
+    is($ret->render, 'qoq');    # qoq is Klingon for robot, by the way
 }
 
 # (a) vs [a/] must produce the same results
@@ -101,14 +101,14 @@ my $ret;
 
     my %uniq;
     @uniq{@curl} = ();
-    $deeply->( \%uniq, { '' => undef, 'a' => undef } );
+    $deeply->(\%uniq, { '' => undef, 'a' => undef });
 
     $ret = $parser->from_string(q{ [a/] });
 
     srand 640;
     my @sqrb = map { $ret->render } 1 .. 10;
 
-    $deeply->( \@curl, \@sqrb );
+    $deeply->(\@curl, \@sqrb);
 }
 
 # multiple alternatives
@@ -123,18 +123,18 @@ my $ret;
     # widespread than old stuff running windows
     srand 640;
     my @alts = map { $ret->render } 1 .. 5;
-    $deeply->( \@alts, [qw/b c c d a/] );
+    $deeply->(\@alts, [qw/b c c d a/]);
 }
 
 # recursion
 {
     $ret = $parser->from_string(q{ [[a[b]][["c"]"d"]] });
-    is( $ret->render, 'abcd' );
+    is($ret->render, 'abcd');
 
     $ret = $parser->from_string(q{ x[a/b]/y[c/d] });
     srand 640;
     my @recs = map { $ret->render } 1 .. 4;
-    $deeply->( \@recs, [qw/xb yd xa yc/] );
+    $deeply->(\@recs, [qw/xb yd xa yc/]);
 }
 
 plan tests => $test_counter + 18;

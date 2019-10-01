@@ -7,14 +7,14 @@ require 't/test-lib.pm';
 my $res;
 my $maintests = 3;
 
-eval { unlink 't/userdb.db' };
+my $userdb = tempdb();
 
 SKIP: {
     eval { require DBI; require DBD::SQLite; };
     if ($@) {
         skip 'DBD::SQLite not found', $maintests;
     }
-    my $dbh = DBI->connect("dbi:SQLite:dbname=t/userdb.db");
+    my $dbh = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
     my $client = LLNG::Manager::Test->new( {
@@ -23,7 +23,7 @@ SKIP: {
                 useSafeJail              => 1,
                 authentication           => 'DBI',
                 userDB                   => 'Same',
-                dbiAuthChain             => 'dbi:SQLite:dbname=t/userdb.db',
+                dbiAuthChain             => "dbi:SQLite:dbname=$userdb",
                 dbiAuthUser              => '',
                 dbiAuthPassword          => '',
                 dbiAuthTable             => 'users',
@@ -78,6 +78,5 @@ SKIP: {
     $client->logout($id);
     clean_sessions();
 }
-eval { unlink 't/userdb.db' };
 count($maintests);
 done_testing( count() );

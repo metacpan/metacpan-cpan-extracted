@@ -1,6 +1,6 @@
 package Crypt::Affine;
 
-$Crypt::Affine::VERSION   = '0.14';
+$Crypt::Affine::VERSION   = '0.15';
 $Crypt::Affine::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Affine - Interface to the Affine cipher.
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

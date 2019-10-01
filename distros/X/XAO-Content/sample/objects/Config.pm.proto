@@ -1,0 +1,44 @@
+package XAO::DO::Config;
+use strict;
+use XAO::Utils;
+use XAO::Objects;
+use base XAO::Objects->load(objname => 'Config', baseobj => 1);
+
+my %data = (
+);
+
+###############################################################################
+sub init {
+    my $self=shift;
+
+    $self->embedded('hash')->fill(\%data);
+
+    my $fsconfig=XAO::Objects->new(
+        objname     => 'FS::Config',
+        odb_args    => {
+            dsn       => '<%ODB_DSN%>',
+            user      => '<%ODB_USER%>',
+            password  => '<%ODB_PASSWORD%>',
+        },
+    );
+
+    $self->embed(fs => $fsconfig);
+
+    $self->SUPER::init();
+}
+
+###############################################################################
+sub build_structure ($) {
+    my $self=shift;
+
+    my $cobj=XAO::Objects->new(objname => 'Web::Content');
+    $cobj->build_structure;
+
+##
+# Or as an alternative:
+#
+#    $self->odb->fetch('/')->build_structure($cobj->data_structure);
+}
+
+###############################################################################
+1;

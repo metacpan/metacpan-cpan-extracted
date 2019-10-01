@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use utf8;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 sub new {
     my $class = shift;

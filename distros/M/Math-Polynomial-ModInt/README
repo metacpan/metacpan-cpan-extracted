@@ -1,0 +1,52 @@
+Math-Polynomial-ModInt
+======================
+
+Math::Polynomial::ModInt is a subclass of Math::Polynomial for modular
+integer coefficient spaces.  It adds domain-specific methods and
+stringification options to the base class.  Notably, it implements a
+bijection from unsigned integers to polynomials for a given modulus.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This library requires these other modules and libraries at run-time:
+
+   Math::ModInt
+   Math::Polynomial
+
+To build and install, it also needs:
+
+   ExtUtils::MakeMaker
+   File::Spec
+   Test::More
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this library with the
+perldoc command.
+
+    perldoc Math::Polynomial::ModInt
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Polynomial-ModInt
+
+    Search CPAN
+        https://metacpan.org/release/Math-Polynomial-ModInt
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2013-2019 by Martin Becker.
+
+This is free software, licensed under
+L<The Artistic_License 2.0 (GPL Compatible)|https://www.perlfoundation.org/artistic-license-20.html>.
+

@@ -7,7 +7,11 @@ my $maintests = 20;
 my $file      = '20190616_dwho_Tm90aWZpY2F0aW9uX1NG.json';
 
 SKIP: {
-    eval { require Convert::Base32 };
+    eval {
+        require Convert::Base32;
+        require XML::LibXML;
+        require XML::LibXSLT;
+    };
     if ($@) {
         skip 'Convert::Base32 is missing', $maintests;
     }

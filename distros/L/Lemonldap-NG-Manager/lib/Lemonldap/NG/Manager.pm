@@ -17,7 +17,7 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.6';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Handler::PSGI::Router';
@@ -87,7 +87,14 @@ sub init {
         "default-src 'self' $portal;frame-ancestors 'none';form-action 'self';"
     );
 
-    $self->defaultRoute( $working[0]->defaultRoute );
+    # Avoid restricted users to access configuration by default route
+    my $defaultMod       = $self->{defaultModule} || 'conf';
+    $self->logger->debug("Default module -> $defaultMod");
+    my ($index) =
+      grep { $working[$_] =~ /::$defaultMod$/i } ( 0 .. $#working );
+    $index //= $#working;
+    $self->logger->debug("Default index -> $index");
+    $self->defaultRoute( $working[$index]->defaultRoute );
 
 # Find out more glyphicones at https://www.w3schools.com/icons/bootstrap_icons_glyphicons.asp
     my $linksIcons = {

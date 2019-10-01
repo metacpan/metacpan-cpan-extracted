@@ -1,0 +1,54 @@
+NAME
+    App::FileTestUtils - More CLIs for file testing
+
+VERSION
+    This document describes version 0.001 of App::FileTestUtils (from Perl
+    distribution App-FileTestUtils), released on 2019-08-17.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities which
+    are related to file testing:
+
+    *   dir-empty
+
+    *   dir-has-dot-files
+
+    *   dir-has-dot-subdirs
+
+    *   dir-has-files
+
+    *   dir-has-non-dot-files
+
+    *   dir-has-non-dot-subdirs
+
+    *   dir-has-subdirs
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FileTestUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FileTestUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileTestUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    The file testing operators in perlfunc, e.g. "-s", "-x", "-r", etc.
+
+    File::MoreUtil
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

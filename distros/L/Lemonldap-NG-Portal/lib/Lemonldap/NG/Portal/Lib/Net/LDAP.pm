@@ -12,7 +12,7 @@ use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
 use utf8;
 
-our $VERSION  = '2.0.3';
+our $VERSION  = '2.0.6';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -379,14 +379,29 @@ sub userModifyPassword {
         }
         $self->{portal}
           ->logger->debug( 'Modification return code: ' . $mesg->code );
+        $self->{portal}
+          ->logger->debug( 'Modification return error: ' . $mesg->error );
+
+        # Manage specific errors for IBM Tivoli DS
+        if ( $self->{conf}->{ldapITDS} ) {
+            my $itds_code = $self->getITDSError($mesg);
+            return $itds_code unless ( $itds_code == PE_PASSWORD_OK );
+        }
+
+        # Manage specific errors for Active Directory
+        if ($ad) {
+            return PE_PP_INSUFFICIENT_PASSWORD_QUALITY
+              if ( $mesg->code == 53 );
+            return PE_PP_PASSWORD_MOD_NOT_ALLOWED
+              if ( $mesg->code == 19 );
+        }
+
+        # Standard errors
         return PE_WRONGMANAGERACCOUNT
           if ( $mesg->code == 50 || $mesg->code == 8 );
-        return PE_PP_INSUFFICIENT_PASSWORD_QUALITY
-          if ( $mesg->code == 53 && $ad );
-        return PE_PP_PASSWORD_MOD_NOT_ALLOWED
-          if ( $mesg->code == 19 && $ad );
         return PE_LDAPERROR unless ( $mesg->code == 0 );
-        $self->{portal}->userLogger->notice("Password changed $dn");
+
+        $self->{portal}->userLogger->notice("Password changed for $dn");
 
         # Rebind as manager for next LDAP operations if we were bound as user
         $self->bind() if $asUser;
@@ -723,6 +738,32 @@ sub convertSec {
 
     # Return the date
     return ( $day, $hrs, $min, $sec );
+}
+
+## @method int getITDSError(Net::LDAP::Message mesg)
+# Check error message to return according error code
+# @param mesg Modification return message
+# @return portal error code
+sub getITDSError {
+    my ( $self, $mesg ) = @_;
+
+    return PE_PP_MUST_SUPPLY_OLD_PASSWORD
+      if ( $mesg->code == 53 && $mesg->error =~ /Must supply old password/i );
+    return PE_PP_CHANGE_AFTER_RESET
+      if ( $mesg->code == 53
+        && $mesg->error =~ /Password must be changed after reset/i );
+    return PE_PP_PASSWORD_MOD_NOT_ALLOWED
+      if ( $mesg->code == 53
+        && $mesg->error =~ /Password may not be modified/i );
+    return PE_PP_PASSWORD_TOO_YOUNG
+      if ( $mesg->code == 19 && $mesg->error =~ /Password too young/i );
+    return PE_PP_PASSWORD_TOO_SHORT
+      if ( $mesg->code == 19 && $mesg->error =~ /Password too short/i );
+    return PE_PP_PASSWORD_IN_HISTORY
+      if ( $mesg->code == 19 && $mesg->error =~ /Password in History/i );
+    return PE_PP_INSUFFICIENT_PASSWORD_QUALITY if ( $mesg->code == 19 );
+
+    return PE_PASSWORD_OK;
 }
 
 1;

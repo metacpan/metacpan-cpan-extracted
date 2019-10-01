@@ -3,21 +3,22 @@
 package Audio::Nama::Graphical;  ## gui routines
 use Modern::Perl; use Carp;
 our $VERSION = 1.071;
-use Audio::Nama::Globals qw($text);
+use Audio::Nama::Globals qw($text $prompt);
 
 use Module::Load::Conditional qw(can_load);
 use Audio::Nama::Assign qw(:all);
 use Audio::Nama::Util qw(colonize);
 no warnings 'uninitialized';
 
-our @ISA = 'Audio::Nama';      ## default to root class
+our @ISA = 'Audio::Nama';      ## default to root namespace, e.g.  Refresh_subs, Graphical_subs
+						# actually this doesn't seem like a
+						# good idea
 # widgets
 
 ## The following methods belong to the Graphical interface class
 
 sub hello {"make a window";}
 sub loop {
-	package Audio::Nama;
 	$text->{term_attribs}->{already_prompted} = 0;
 	$text->{term}->tkRunning(1);
   	while (1) {
@@ -26,7 +27,11 @@ sub loop {
   	}
 }
 
-sub initialize_tk { can_load( modules => { Tk => undef } ) }
+sub initialize_tk { 
+	my $result1 = can_load( modules => { Tk => undef } ) ;
+	my $result2 = can_load( modules => { 'Tk::PNG' => undef } );
+	$result1
+}
 
 # the following graphical methods are placed in the root namespace
 # allowing access to root namespace variables 
@@ -65,6 +70,18 @@ sub init_gui {
 	$gui->{ew}->deiconify; 
 #	$gui->{ew}->withdraw;
 
+
+	### init waveform window
+
+	if ($config->{display_waveform})
+	{
+		$gui->{ww} = $gui->{mw}->Toplevel;
+		$gui->{ww}->title("Waveform Window");
+		$gui->{ww}->deiconify; 
+		$gui->{ww}->bind('<Control-Key-c>' => sub { exit } );
+		$gui->{ww}->bind('<Control-Key- >' => \&toggle_transport); 
+	}
+
 	### Exit via Ctrl-C 
 
 	$gui->{mw}->bind('<Control-Key-c>' => sub { exit } ); 
@@ -75,14 +92,18 @@ sub init_gui {
 	$gui->{mw}->bind('<Control-Key- >' => \&toggle_transport); 
 	$gui->{ew}->bind('<Control-Key- >' => \&toggle_transport); 
 	
-	$gui->{canvas} = $gui->{ew}->Scrolled('Canvas')->pack;
-	$gui->{canvas}->configure(
-		scrollregion =>[2,2,10000,10000],
-		-width => 1200,
-		-height => 700,	
-		);
-	$gui->{fx_frame} = $gui->{canvas}->Frame;
-	my $id = $gui->{canvas}->createWindow(30,30, -window => $gui->{fx_frame},
+	if ($config->{display_waveform})
+	{
+		$gui->{wwcanvas} = $gui->{ww}->Scrolled('Canvas')->pack;
+		configure_waveform_window();
+	}
+
+
+	$gui->{fx_canvas} = $gui->{ew}->Scrolled('Canvas')->pack;
+	configure_effects_window();
+
+	$gui->{fx_frame} = $gui->{fx_canvas}->Frame;
+	my $id = $gui->{fx_canvas}->createWindow(30,30, -window => $gui->{fx_frame},
 											-anchor => 'nw');
 
 	$gui->{project_head} = $gui->{mw}->Label->pack(-fill => 'both');
@@ -104,15 +125,11 @@ sub init_gui {
 	# $oid_frame = $gui->{mw}->Frame->pack(-side => 'bottom', -fill => 'both');
 	$gui->{clock_frame} = $gui->{mw}->Frame->pack(-side => 'bottom', -fill => 'both');
 	#$gui->{group_frame} = $gui->{mw}->Frame->pack(-side => 'bottom', -fill => 'both');
- 	my $track_canvas = $gui->{mw}->Scrolled('Canvas')->pack(-side => 'bottom', -fill => 'both');
- 	$track_canvas->configure(
- 		-scrollregion =>[2,2,400,9600],
- 		-width => 400,
- 		-height => 400,	
- 		);
-	$gui->{track_frame} = $track_canvas->Frame; # ->pack(-fill => 'both');
+ 	$gui->{track_canvas}= $gui->{mw}->Scrolled('Canvas')->pack(-side => 'bottom', -fill => 'both');
+	configure_track_canvas();
+	$gui->{track_frame} = $gui->{track_canvas}->Frame; # ->pack(-fill => 'both');
 	#$gui->{track_frame} = $gui->{mw}->Frame;
- 	my $id2 = $track_canvas->createWindow(0,0,
+ 	my $id2 = $gui->{track_canvas}->createWindow(0,0,
 		-window => $gui->{track_frame}, 
 		-anchor => 'nw');
  	#$gui->{group_label} = $gui->{group_frame}->Menubutton(-text => "GROUP",
@@ -185,13 +202,13 @@ sub init_gui {
 				);
 	$gui->{quit}->configure(-text => "Quit",
 		 -command => sub { 
-				return if transport_running();
+				stop_transport() if $this_engine->started;
 				save_state($gui->{_save_id});
 				pager("Exiting... \n");
 				#$text->{term}->tkRunning(0);
 				#$gui->{ew}->destroy;
 				#$gui->{mw}->destroy;
-				#Audio::Nama::process_command('quit');
+				#Audio::Nama::nama_cmd('quit');
 				exit;
 				 });
 	$gui->{palette}->configure(
@@ -223,7 +240,7 @@ $gui->{palette}->AddItems( @color_items);
 			-command => sub { 
 								return if $gui->{_track_name} =~ /^\s*$/;	
 								add_track(remove_spaces($gui->{_track_name}));
-								process_command('stereo');
+								nama_cmd('stereo');
 	});
 
 	my @labels = 
@@ -233,6 +250,39 @@ $gui->{palette}->AddItems( @color_items);
 	$widgets[0]->grid(@widgets[1..$#widgets]);
 
 
+}
+sub configure_waveform_window {
+	my ($width, $height) = @_;
+	return if not $config->{display_waveform};
+
+	$gui->{wwcanvas}->configure(
+		-scrollregion =>[0,0,$width//$config->{waveform_canvas_x},$height//$config->{waveform_canvas_y}],
+		-width => $width//$config->{waveform_canvas_x},
+		-height => $height//$config->{waveform_canvas_y},
+		);
+
+}
+sub configure_effects_window {
+	$gui->{fx_canvas}->configure(
+		scrollregion =>[2,2,10000,10000],
+		-width => 1200,
+		-height => 700,	
+		);
+}
+sub configure_track_canvas {
+ 	$gui->{track_canvas}->configure(
+ 		-scrollregion =>[2,2,400,9600],
+ 		-width => 400,
+ 		-height => 400,	
+ 		);
+}
+sub wwgeometry { wh($gui->{wwcanvas}) }
+sub wh {
+	my $widget = shift;
+	$widget->update;
+	my ($width,$height,$sign1,$xpos,$sign2,$ypos) 
+		= $widget->geometry =~ /(\d+)x(\d+)([+-])(\d+)([+-])(\d+)/;
+	$width,$height
 }
 
 sub transport_gui {
@@ -254,7 +304,7 @@ sub transport_gui {
 	$gui->{engine_start}->configure(
 		-text => "Start",
 		-command => sub { 
-		return if transport_running();
+		return if $this_engine->started;
 		my $color = engine_mode_color();
 		$ui->project_label_configure(-background => $color);
 		start_transport();
@@ -369,17 +419,17 @@ sub engine_mode_color {
 				$gui->{_nama_palette}->{RecBackground} # live recording 
 		} elsif ( Audio::Nama::ChainSetup::really_recording() ){ 
 				$gui->{_nama_palette}->{Mixdown}	# mixdown only 
-		} elsif ( user_mon_tracks() ){  
+		} elsif ( user_play_tracks() ){  
 				$gui->{_nama_palette}->{Play}; 	# just playback
 		} else { $gui->{_old_bg} } 
 }
 sub user_rec_tracks { some_user_tracks(REC) }
-sub user_mon_tracks { some_user_tracks(PLAY) }
+sub user_play_tracks { some_user_tracks(PLAY) }
 
 sub some_user_tracks {
 	my $which = shift;
 	my @user_tracks = Audio::Nama::audio_tracks();
-	splice @user_tracks, 0, 2; # drop Master and Mixdown tracks
+	splice @user_tracks, 0, 2; # drop Main and Mixdown tracks
 	return unless @user_tracks;
 	my @selected_user_tracks = grep { $_->rec_status eq $which } @user_tracks;
 	return unless @selected_user_tracks;
@@ -392,6 +442,7 @@ sub flash_ready {
 	logpkg(__FILE__,__LINE__,'debug', "flash color: $color");
 	$ui->length_display(-background => $color);
 	$ui->project_label_configure(-background => $color) unless $mode->{preview};
+	# TODO update for preview mode
  	$project->{events}->{heartbeat} = AE::timer(5, 0, \&reset_engine_mode_color_display);
 }
 sub reset_engine_mode_color_display { $ui->project_label_configure(
@@ -427,7 +478,7 @@ sub group_gui {
 			'command' => MON,
 			-background => $gui->{_old_bg},
 			-command => sub { 
-				return if Audio::Nama::eval_iam("engine-status") eq 'running';
+				return if $this_engine->started();
 				$group->set(rw => MON);
 				$gui->{group_rw}->configure(-text => MON);
 				refresh();
@@ -437,7 +488,7 @@ sub group_gui {
 			'command' => OFF,
 			-background => $gui->{_old_bg},
 			-command => sub { 
-				return if Audio::Nama::eval_iam("engine-status") eq 'running';
+				return if $this_engine->started();
 				$group->set(rw => OFF);
 				$gui->{group_rw}->configure(-text => OFF);
 				refresh();
@@ -505,7 +556,7 @@ sub track_gui {
 			[ 'command' => "REC",
 				-foreground => 'red',
 				-command  => sub { 
-					return if Audio::Nama::eval_iam("engine-status") eq 'running';
+					return if $this_engine->started();
 					$ti{$n}->set(rw => "REC");
 					
 					$ui->refresh_track($n);
@@ -514,7 +565,7 @@ sub track_gui {
 			}],
 			[ 'command' => "PLAY",
 				-command  => sub { 
-					return if Audio::Nama::eval_iam("engine-status") eq 'running';
+					return if $this_engine->started();
 					$ti{$n}->set(rw => "PLAY");
 					$ui->refresh_track($n);
 					#refresh_group();
@@ -523,7 +574,7 @@ sub track_gui {
 			[ 'command' => "MON",
 				-foreground => 'red',
 				-command  => sub { 
-					return if Audio::Nama::eval_iam("engine-status") eq 'running';
+					return if $this_engine->started();
 					$ti{$n}->set(rw => "MON");
 					
 					$ui->refresh_track($n);
@@ -532,7 +583,7 @@ sub track_gui {
 			}],
 			[ 'command' => "OFF", 
 				-command  => sub { 
-					return if Audio::Nama::eval_iam("engine-status") eq 'running';
+					return if $this_engine->started();
 					$ti{$n}->set(rw => "OFF");
 					$ui->refresh_track($n);
 					#refresh_group();
@@ -566,7 +617,7 @@ sub track_gui {
 						-command => 
 		sub { 
 			$ti{$n}->set( version => $v );
-			return if $ti{$n}->rec_status eq "REC";
+			return if $ti{$n}->rec;
 			$version->configure( -text=> $ti{$n}->current_version );
 			Audio::Nama::reconfigure_engine();
 			}
@@ -578,14 +629,14 @@ sub track_gui {
 					-tearoff => 0,
 				);
 	my @range;
-	push @range, 1..$config->{soundcard_channels} if $n > 2; # exclude Master/Mixdown
+	push @range, 1..$config->{soundcard_channels} if $n > 2; # exclude Main/Mixdown
 	
 	for my $v (@range) {
 		$ch_r->radiobutton(
 			-label => $v,
 			-value => $v,
 			-command => sub { 
-				return if Audio::Nama::eval_iam("engine-status") eq 'running';
+				return if $this_engine->started();
 			#	$ti{$n}->set(rw => REC);
 				$ti{$n}->source($v);
 				$ui->refresh_track($n) }
@@ -605,10 +656,10 @@ sub track_gui {
 						-label => $v,
 						-value => $v,
 						-command => sub { 
-							return if Audio::Nama::eval_iam("engine-status") eq 'running';
+							return if $this_engine->started();
 							local $this_track = $ti{$n};
 							if( $v eq 'off' )
-								 { process_command('nosend') }
+								 { nama_cmd('nosend') }
 							else { $this_track->set_send($v) }
 							$ui->refresh_track($n);
 							Audio::Nama::reconfigure_engine();
@@ -807,19 +858,19 @@ sub create_master_and_mix_tracks {
 	my @rw_items = (
 			[ 'command' => "MON",
 				-command  => sub { 
-						return if Audio::Nama::eval_iam("engine-status") eq 'running';
-						$tn{Master}->set(rw => "MON");
-						$ui->refresh_track($tn{Master}->n);
+						return if $this_engine->started();
+						$tn{Main}->set(rw => "MON");
+						$ui->refresh_track($tn{Main}->n);
 			}],
 			[ 'command' => "OFF", 
 				-command  => sub { 
-						return if Audio::Nama::eval_iam("engine-status") eq 'running';
-						$tn{Master}->set(rw => "OFF");
-						$ui->refresh_track($tn{Master}->n);
+						return if $this_engine->started();
+						$tn{Main}->set(rw => "OFF");
+						$ui->refresh_track($tn{Main}->n);
 			}],
 		);
 
-	$ui->track_gui( $tn{Master}->n, @rw_items );
+	$ui->track_gui( $tn{Main}->n, @rw_items );
 
 	$ui->track_gui( $tn{Mixdown}->n); 
 
@@ -836,7 +887,7 @@ sub update_version_button {
 						-value => $v,
 						-command => 
 		sub { $gui->{tracks}->{$n}->{version}->configure(-text=>$v) 
-				unless $ti{$n}->rec_status eq "REC" }
+				unless $ti{$n}->rec }
 					);
 }
 
@@ -1062,7 +1113,7 @@ sub make_scale {
 			-resolution => resolution($i, $p),
 		  -width => 12,
 		  -length => $p{length} ? $p{length} : 100,
-		  -command => sub { Audio::Nama::_update_effect($id, $p, $FX->params->[$p]) },
+		  -command => sub { Audio::Nama::update_ecasound_effect($id, $p, $FX->params->[$p]) },
 			-state => $FX->is_read_only($p) ? 'disabled' : 'normal',
 		  );
 
@@ -1078,7 +1129,7 @@ sub make_scale {
 				-variable => \$FX->{params_log}->[$p],
 		  		-command => sub { 
 					$FX->params->[$p] = exp $FX->params_log->[$p];
-					Audio::Nama::_update_effect($id, $p, $FX->params->[$p]);
+					Audio::Nama::update_ecasound_effect($id, $p, $FX->params->[$p]);
 					$log_display->configure(
 						-text => 
 						$fx_cache->{registry}->[$i]->{params}->[$p]->{name} =~ /hz|frequency/i
@@ -1102,7 +1153,7 @@ sub make_scale {
 		return ${ $p{parent} }->Entry(
 			-textvariable =>\$FX->params->[$p],
 			-width => 6,
-	#		-command => sub { Audio::Nama::_update_effect($id, $p, $FX->params->[$p]) },
+	#		-command => sub { Audio::Nama::update_ecasound_effect($id, $p, $FX->params->[$p]) },
 			# doesn't work with Entry widget
 			);	
 
@@ -1158,6 +1209,22 @@ sub destroy_marker {
 	$gui->{marks}->{$pos}->destroy; 
 }
 
+sub setup_playback_indicator {
+	my $ui = shift;
+	$project->{events}->{update_playback_position_display} = AE::timer(0, 0.1, \&update_indicator);
+} 	
+sub update_indicator {
+	$gui->{wwcanvas}->delete('playback-indicator');
+	my $pos = Audio::Nama::ecasound_iam("getpos");
+	my $xpos = int( $pos * $config->{waveform_pixels_per_second} );
+	$gui->{wwcanvas}->createLine(
+			$xpos,0,
+			$xpos,$config->{waveform_canvas_y},
+			-fill => 'red',
+			-width => 1,
+			-tags => 'playback-indicator'
+	);
+}
 
 sub get_saved_colors {
 	logsub("&get_saved_colors");
@@ -1172,7 +1239,7 @@ sub get_saved_colors {
 
 	my $pal = $file->gui_palette;
 	$pal .= '.json' unless $pal =~ /\.json$/;
-	pager("pal $pal");
+	logpkg(__FILE__,__LINE__,'debug',"pal $pal");
 	$pal = -f $pal 
 			? scalar read_file($pal)
 			: get_data_section('default_palette_json');
@@ -1305,6 +1372,44 @@ sub save_palette {
 
 ## refresh functions
 
+sub refresh_waveform_window {
+	$gui->{wwcanvas}->delete('waveform',$_->name) for all_tracks();
+ 	my @playable = grep{ $_->play} user_tracks();
+	map{ $_->waveform->display() } @playable;
+	configure_waveform_window();
+	generate_timeline(
+			widget => $gui->{wwcanvas}, 
+			y_pos => 600,
+	);
+}
+sub height { $_[0] % 5 ? 5 : 10 }
+sub generate_timeline {
+	my %args = @_;
+	my $length = ecasound_iam('cs-get-length');
+	$length = int($length + 5.5);
+	$args{seconds} = $length;
+	my $pps = 10; # HARDCODED
+	for (0..$args{seconds})
+	{
+		my $xpos = $_ * $pps;
+		if ($_ % 10 == 0)
+		{
+			$args{widget}->createText( 
+							$xpos, $args{y_pos} - 20, 
+							-font => 'lucidasanstypewriter-bold-14', 
+							-text => $_,
+							);
+		}
+		$args{widget}->createLine(
+			$xpos, $args{y_pos} - height($_),
+			$xpos, $args{y_pos},
+			-fill => 'black',
+			-width => 1,
+			-tags => 'timelime'
+		);
+	}
+
+}
 sub set_widget_color {
 	my ($widget, $status) = @_;
 	my %rw_foreground = (	REC  => $gui->{_nama_palette}->{RecForeground},
@@ -1327,13 +1432,13 @@ sub refresh_group {
 	
 	
 		my $status;
-		if ( 	grep{ $_->rec_status eq REC} 
+		if ( 	grep{ $_->rec} 
 				map{ $tn{$_} }
 				$bn{Main}->tracks ){
 
 			$status = REC
 
-		}elsif(	grep{ $_->rec_status eq PLAY} 
+		}elsif(	grep{ $_->play} 
 				map{ $tn{$_} }
 				$bn{Main}->tracks ){
 
@@ -1387,7 +1492,7 @@ sub refresh_track {
  								: OFF);
 	
 	set_widget_color( $gui->{tracks}->{$n}->{ch_m},
-							$rec_status eq OFF 
+							$rec_status eq OFF
 								? OFF
 								: $ti{$n}->send 
 									? MON
@@ -1396,10 +1501,8 @@ sub refresh_track {
 
 sub refresh {  
 	Audio::Nama::remove_riff_header_stubs();
- 	#$ui->refresh_group(); 
-	#map{ $ui->refresh_track($_) } map{$_->n} grep{!  $_->hide} Audio::Nama::audio_tracks();
-	#map{ $ui->refresh_track($_) } grep{$remove_track_widget{$_} map{$_->n}  Audio::Nama::audio_tracks();
 	map{ $ui->refresh_track($_) } map{$_->n}  Audio::Nama::audio_tracks();
+	refresh_waveform_window() if $gui->{wwcanvas};
 }
 ### end
 

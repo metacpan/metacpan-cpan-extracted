@@ -3,6 +3,8 @@ use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+# Or follow this link:
+##        https://metacpan.org/pod/CPAN::Meta::Spec
 
 my $value = "N";
 eval {
@@ -15,23 +17,27 @@ if ($@) {
 }
 
 # My list of required modules for Net::FTPSSL ...
-my %req = ( IO::Socket::SSL => 1.26,  IO::Socket::INET => 0.0,
-            Net::SSLeay => 0.0,       Net::SSLeay::Handle => 0.0,
-            File::Basename => 0.0,    File::Copy => 0.0,
-            Time::Local => 0.0,       Sys::Hostname => 0.0 );
+my %req = ( IO::Socket::SSL => 1.26,  IO::Socket::INET    => 0,
+            Net::SSLeay     =>    0,  Net::SSLeay::Handle => 0,
+            File::Basename  =>    0,  File::Copy          => 0,
+            Time::Local     =>    0,  Sys::Hostname       => 0 );
 
 # Also required if you need to go through a proxy tunnel ... (the question)
 if ($value eq "Y" || $value eq "y") {
-   $req{"Net::HTTPTunnel"} = 0.50;
+   $req{Net::HTTPTunnel} = "0.50";     # So we get 0.50, not 0.5
 }
 
 # These additional modules are required to run the test scripts ...
-$req{"Test::More"} = 0.88;
-$req{"File::Spec"} = 0.0;
+# Support for this added in $ExtUtils::MakeMaker::VERSION >= 6.55_03.
+my %build = ( ExtUtils::MakeMaker => 0,
+              File::Spec          => 0,
+              Test::More          => 0.88
+            );
 
-my %params = ( NAME         => 'Net::FTPSSL',
-               VERSION_FROM => 'FTPSSL.pm',      # Finds $VERSION
-               PREREQ_PM    => \%req );          # e.g., Module::Name => 1.1
+my %params = ( NAME           => 'Net::FTPSSL',
+               VERSION_FROM   => 'FTPSSL.pm',      # Finds $VERSION
+               PREREQ_PM      => \%req,            # e.g., Module::Name => 1.1
+               BUILD_REQUIRES => \%build );        # e.g., Module::Name => 1.1
 
 ## Add these new keywords supported since 5.005
 if ( $] >= 5.005 ) {

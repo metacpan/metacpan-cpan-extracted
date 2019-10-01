@@ -10,7 +10,7 @@ use Guard;
 use Sub::Multi::Tiny::Util qw(_hlog _line_mark_string _make_positional_copier
                                 _complete_dispatcher);
 
-our $VERSION = '0.000011'; # TRIAL
+our $VERSION = '0.000012'; # TRIAL
 
 # Documentation {{{1
 

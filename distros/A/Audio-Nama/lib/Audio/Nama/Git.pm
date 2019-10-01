@@ -18,9 +18,10 @@ sub initialize_project_git_repository {
 	$project->{repo} = Git::Repository->new( work_tree => project_dir() );
 	write_file($file->git_state_store, "{}\n") if ! -e $file->git_state_store;
 	git( add => $file->git_state_store );
+	write_file($file->midi_store, ""), git( add => $file->midi_store )
+			if ! -e $file->midi_store;
 	git( commit => '--quiet', '--message', "initialize project");
 }
-
 sub git_tag_exists {
 	logsub('&git_tag_exists');
 	my $tag = shift;
@@ -182,7 +183,7 @@ sub list_branches {
 
 sub autosave {
 		logsub("&autosave");
-		engine_running() ? return : git_snapshot();
+		$this_engine->started() ? return : git_snapshot();
 }
 sub redo {
 	if ($project->{redo}){
