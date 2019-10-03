@@ -14,7 +14,7 @@ use List::MoreUtils qw( all uniq );
 use Encode::Locale  qw();
 
 use Term::Choose         qw();
-use Term::Choose::Screen qw( clear_screen );
+use Term::Choose::Screen qw( clear_screen show_cursor hide_cursor );
 use Term::Choose::Util   qw();
 use Term::Form           qw();
 
@@ -175,6 +175,7 @@ sub from_copy_and_paste {
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
     $ax->print_sql( $sql );
+    print show_cursor();
     print "Multi row:\n";
     my $file_fs = $sf->{i}{f_copy_paste};
     if ( ! eval {
@@ -186,10 +187,12 @@ sub from_copy_and_paste {
         close $fh_in;
         1 }
     ) {
+        print hide_cursor();
         $ax->print_error_message( $@, join ', ', @{$sf->{i}{stmt_types}}, 'copy & paste' );
         unlink $file_fs or warn $!;
         return;
     }
+    print hide_cursor();
     if ( ! -s $file_fs ) {
         $sql->{insert_into_args} = [];
         return;

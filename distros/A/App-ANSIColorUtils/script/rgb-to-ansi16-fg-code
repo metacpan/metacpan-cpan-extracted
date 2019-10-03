@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Color/ANSI/Util/rgb_to_ansi16_fg_code
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-02-13'; # DATE
+our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ rgb-to-ansi16-fg-code - Convert RGB to ANSI-16 color escape sequence to change f
 
 =head1 VERSION
 
-This document describes version 0.004 of rgb-to-ansi16-fg-code (from Perl distribution App-ANSIColorUtils), released on 2019-02-13.
+This document describes version 0.005 of rgb-to-ansi16-fg-code (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /XTerm/Util/term_bgcolor_is_dark
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-12'; # DATE
+our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-XTermUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ term-bgcolor-is-dark - Check if terminal background color is dark
 
 =head1 VERSION
 
-This document describes version 0.004 of term-bgcolor-is-dark (from Perl distribution App-XTermUtils), released on 2019-07-12.
+This document describes version 0.005 of term-bgcolor-is-dark (from Perl distribution App-XTermUtils), released on 2019-08-20.
 
 =head1 SYNOPSIS
 

@@ -107,7 +107,7 @@ $loop->add ($event);
 $loop->run();
 is $fallback, 0;
 
-ok ($count > 5);
+ok ($count >= 5);
 is $loop->poller->size, 0;
 is $then, 5;
 

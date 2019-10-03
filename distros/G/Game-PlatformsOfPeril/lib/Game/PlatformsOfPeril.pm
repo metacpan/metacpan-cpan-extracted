@@ -28,11 +28,11 @@
 
 package Game::PlatformsOfPeril;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use 5.24.0;
 use warnings;
-use File::Spec          ();
+use File::Spec::Functions qw(catfile);
 use List::PriorityQueue ();
 use List::Util qw(first);
 use List::UtilsBy 0.06 qw(nsort_by rev_nsort_by);
@@ -148,7 +148,7 @@ our %Examine_Offsets = (
 our $Level = 0;
 our $Level_Path;
 
-# plosive practice. these must pluralize properly (or please patch)
+# plosive practice. these must pluralize properly
 our @Menagerie = (
     'Palace Peacock',
     'Peckish Packrat',
@@ -159,6 +159,9 @@ our @Menagerie = (
     'Priggish Python',
     'Prurient Pachyderm',
     'Purposeful Plant',
+    # and some not-plosives for reasons lost in the mists of time
+    'Gruesome Goose',
+    'Sinister Swan',
 );
 $Monst_Name = $Menagerie[ rand @Menagerie ];
 
@@ -213,7 +216,9 @@ our %Interact_With = (
         my ($mover, $target) = @_;
         game_over_monster() if $mover->[WHAT] == HERO;
         if ($mover->[WHAT] == BOMB) {
-            explode($mover, $target);
+            my @cells = map { kill_animate($_, 1); $_->[LMC][WHERE] } $mover, $target;
+            redraw_ref(\@cells);
+            explode($target);
         } elsif ($mover->[WHAT] == GEM) {
             grab_gem($target, $mover);
         }
@@ -223,7 +228,9 @@ our %Interact_With = (
         my ($mover, $target) = @_;
         game_over_bomb() if $mover->[WHAT] == HERO;
         if ($mover->[WHAT] == MONST) {
-            explode($mover, $target);
+            my @cells = map { kill_animate($_, 1); $_->[LMC][WHERE] } $mover, $target;
+            redraw_ref(\@cells);
+            explode($mover);
         }
     },
     GEM,
@@ -401,20 +408,19 @@ sub draw_level {
 }
 
 sub explode {
-    my ($mover, $target) = @_;
-    my $pos    = $target->[LMC][WHERE];
-    my @colors = ("\e[31m", "\e[33m");
-    for (1 .. 4) {
+    my ($something) = @_;
+    my $lmc         = $something->[LMC];
+    my $pos         = $lmc->[WHERE];
+    my @colors      = ("\e[31m", "\e[33m");
+    for (1 .. 7) {
         print at(map { MAP_DISP_OFF + $_ } $pos->@*), $colors[ rand @colors ], '*',
           term_norm;
         sleep($Redraw_Delay);
     }
     post_message('ka-boom!');
-    for my $ent (@_) {
-        # HEROIC DESTRUCTION
-        $ent->[LMC][GROUND] = $Things{ FLOOR, } if $ent->[LMC][GROUND][TYPE] == STATUE;
-        kill_animate($ent);
-    }
+    # HEROIC DESTRUCTION
+    $lmc->[GROUND] = $Things{ FLOOR, } if $lmc->[GROUND][TYPE] == STATUE;
+    push @RedrawA, $pos;
 }
 
 # cribbed from some A* article on https://www.redblobgames.com/
@@ -478,7 +484,7 @@ sub game_loop {
       draw_level;
     post_message('The Platforms of Peril');
     post_message('');
-    post_message('Your constant foes, the ' . $Monst_Name . 's');
+    post_message('Your constant foes, the ' . properly_plural($Monst_Name));
     post_message('seek to destroy your way of life!');
     post_help();
     post_message('');
@@ -645,8 +651,8 @@ sub interact {
 }
 
 sub kill_animate {
-    my ($ent) = @_;
-    push @RedrawA, $ent->[LMC][WHERE];
+    my ($ent, $no_draw) = @_;
+    push @RedrawA, $ent->[LMC][WHERE] unless defined $no_draw;
     $ent->[BLACK_SPOT] = 1;
     # NOTE this only works for TYPE of ANI or ITEM, may need to rethink
     # how STATUE and STAIRS are handled if there are GROUND checks on
@@ -655,7 +661,7 @@ sub kill_animate {
 }
 
 sub load_level {
-    my $file = File::Spec->catfile($Level_Path, 'level' . $Level++);
+    my $file = catfile($Level_Path, 'level' . $Level++);
     game_over('No more levels.', 0) unless -e $file;
 
     open(my $fh, '<', $file) or game_over("Failed to open '$file': $!");
@@ -726,10 +732,11 @@ sub make_item {
 sub make_monster {
     my ($point) = @_;
     my $monst;
+    my $ch = substr $Monst_Name, 0, 1;
     # STASH replicates that of the HERO for simpler GEM handling code
     # though the BOMB_STASH is instead used for GEM_ODDS
     $monst->@[ WHAT, DISP, TYPE, STASH, UPDATE, LMC ] = (
-        MONST, "\e[1;33mP\e[0m", ANI, [ 0, 0.0 ],
+        MONST, "\e[1;33m$ch\e[0m", ANI, [ 0, 0.0 ],
         \&update_monst, $LMap->[ $point->[PROW] ][ $point->[PCOL] ]
     );
     push @Animates, $monst;
@@ -805,8 +812,10 @@ sub move_player {
 }
 
 sub post_help {
+    my $ch = substr $Monst_Name, 0, 1;
     post_message('');
-    post_message(' ' . $Animates[HERO][DISP] . ' - You   P - a ' . $Monst_Name);
+    post_message(
+        ' ' . $Animates[HERO][DISP] . ' - You   ' . $ch . ' - a ' . $Monst_Name);
     post_message(
         ' ' . $Things{ STATUE, }[DISP] . ' - a large granite statue done in the');
     post_message('     ' . $Style . ' style');
@@ -853,6 +862,12 @@ sub post_help {
     }
 }
 
+# fsvo properly... damnit Jim I'm a sysadmin not a linguist
+sub properly_plural {
+    my ($name) = @_;
+    $name =~ s/oo/ee/ ? $name : $name . 's';
+}
+
 sub redraw_level { print clear_screen, draw_level; show_messages() }
 
 sub redraw_movers {
@@ -866,9 +881,9 @@ sub redraw_movers {
 sub redraw_ref {
   CELL: for my $point ($_[0]->@*) {
         for my $i (ANI, ITEM) {
-            my $target = $LMap->[ $point->[PROW] ][ $point->[PCOL] ][$i];
-            if (defined $target) {
-                print at(map { MAP_DISP_OFF + $_ } $point->@*), $target->[DISP];
+            my $ent = $LMap->[ $point->[PROW] ][ $point->[PCOL] ][$i];
+            if (defined $ent and !$ent->[BLACK_SPOT]) {
+                print at(map { MAP_DISP_OFF + $_ } $point->@*), $ent->[DISP];
                 next CELL;
             }
         }

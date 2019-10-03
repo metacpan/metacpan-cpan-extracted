@@ -70,6 +70,30 @@ running (self)
 
 		XSRETURN_NO;
 
+int
+interval (self, ...)
+	SV *self
+
+	PREINIT:
+		int interval;
+		zmq_raw_timer *timer;
+
+	CODE:
+		timer = ZMQ_SV_TO_PTR (Timer, self);
+
+		if (items > 1)
+		{
+			if (!SvIOK (ST (1)) || SvIV (ST (1)) <= 0)
+				croak_usage ("interval should be greater than zero");
+
+			interval = SvIV (ST (1));
+			zmq_raw_timer_set_interval (timer, interval);
+		}
+
+		RETVAL = zmq_raw_timer_get_interval (timer);
+
+	OUTPUT: RETVAL
+
 void
 _cancel (self)
 	SV *self

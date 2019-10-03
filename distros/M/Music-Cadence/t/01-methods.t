@@ -16,8 +16,7 @@ is $mc->scale, 'major', 'default scale';
 is $mc->octave, 0, 'default octave';
 is $mc->format, 'isobase', 'default format';
 
-throws_ok { $mc->cadence( key => 'X' ) }
-    qr/unknown chord/, 'unknown key';
+dies_ok { $mc->cadence( key => 'X' ) } 'unknown key';
 
 throws_ok { $mc->cadence( type => 'foo' ) }
     qr/unknown cadence/, 'unknown cadence';

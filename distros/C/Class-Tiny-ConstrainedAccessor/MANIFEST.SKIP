@@ -1,6 +1,7 @@
 # Files used only for development
 ^\.editorconfig
 ^\.[^\\\/]*\.yml
+^\.mailmap
 
 # Miscellaneous
 \bfoo\b.*

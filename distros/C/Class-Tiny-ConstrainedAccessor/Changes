@@ -1,5 +1,9 @@
 Revision history for Class-Tiny-ConstrainedAccessor
 
+0.000013    2019-10-02
+        - Arguments can now be provided in a hashref (#7).
+          Thanks to FISHBONE for code.
+
 0.000012    2019-09-20
         - Production release of 0.000011
 
@@ -31,16 +35,16 @@ Revision history for Class-Tiny-ConstrainedAccessor
         - Fix tests to run on <5.010
 
 0.000004    2019-03-22
-        - Check constructor parameters (GH-4)
-        - Add option to suppress BUILD generation (GH-5)
+        - Check constructor parameters (#4)
+        - Add option to suppress BUILD generation (#5)
 
 0.000003    2019-03-19
         - Updated documentation.  First non-TRIAL release.
 
 0.000002    2019-03-17 (TRIAL VERSION)
-        - Support other type systems (GH-1).  Thanks to TOBYINK for code.
-        - Constraint-check default values (GH-3).
-        - Run as far back as 5.006 (GH-2).
+        - Support other type systems (#1).  Thanks to TOBYINK for code.
+        - Constraint-check default values (#3).
+        - Run as far back as 5.006 (#2).
 
 0.000001    2019-03-12 (TRIAL VERSION)
         - First version, released on an unsuspecting world.

@@ -6,14 +6,15 @@ on 'test', sub {
   requires 'Test::More', '1.001003';
   requires 'Test::Pod', 0;
   requires 'Log::Any::Test', '1.03';
-  requires 'Test::LWP::UserAgent', '0';
+  requires 'Test::LWP::UserAgent', '0.033';
 
 };
 
-requires 'JSON', 0;
-requires 'Moo', 0;
+requires 'Module::Build::Tiny'; 
+requires 'JSON';
+requires 'Moo';
 requires 'Scalar::Util';
-requires 'Catmandu', '>=1.2002';
+requires 'Catmandu', '>=1.10';
 requires 'Business::ISSN', '0.91';
 requires 'Business::ISBN', '2.010';
 requires 'Data::UUID::MT', '>=1.001';

@@ -40,6 +40,7 @@ deps/libzmq/installer.ico
 deps/libzmq/Makefile.am
 deps/libzmq/version.sh
 deps/libzmq/ZeroMQConfig.cmake.in
+deps/libzmq/unittests
 cover_db/
 .*\.gcda
 .*\.gcno

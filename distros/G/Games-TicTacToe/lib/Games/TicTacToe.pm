@@ -1,6 +1,6 @@
 package Games::TicTacToe;
 
-$Games::TicTacToe::VERSION = '0.25';
+$Games::TicTacToe::VERSION = '0.26';
 $Games::TicTacToe::AUTHOR  = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::TicTacToe - Interface to the TicTacToe (nxn) game.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

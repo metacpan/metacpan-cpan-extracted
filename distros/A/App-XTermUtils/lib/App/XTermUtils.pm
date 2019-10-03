@@ -1,7 +1,7 @@
 package App::XTermUtils;
 
-our $DATE = '2019-07-12'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to XTerm
@@ -18,7 +18,7 @@ App::XTermUtils - Utilities related to XTerm
 
 =head1 VERSION
 
-This document describes version 0.004 of App::XTermUtils (from Perl distribution App-XTermUtils), released on 2019-07-12.
+This document describes version 0.005 of App::XTermUtils (from Perl distribution App-XTermUtils), released on 2019-08-20.
 
 =head1 DESCRIPTION
 
@@ -53,6 +53,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::TermAttrUtils>
 
 =head1 AUTHOR
 

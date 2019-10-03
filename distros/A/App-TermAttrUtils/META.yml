@@ -19,8 +19,10 @@ name: App-TermAttrUtils
 requires:
   Data::Dump: '0'
   Moo: '0'
+  Perinci::CmdLine::Any: '0'
   Term::App::Role::Attrs: '0.02'
   Term::Detect::Software: '0'
+  Term::Terminfo: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -28,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-TermAttrUtils
   homepage: https://metacpan.org/release/App-TermAttrUtils
   repository: git://github.com/perlancar/perl-App-TermAttrUtils.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -375,6 +377,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

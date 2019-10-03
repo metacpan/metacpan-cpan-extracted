@@ -19,6 +19,8 @@ int zmq_raw_timer_is_running (zmq_raw_timer *timer);
 
 void zmq_raw_timer_set_sv (zmq_raw_timer *timer, void *sv);
 void *zmq_raw_timer_get_sv (zmq_raw_timer *timer);
+void zmq_raw_timer_set_interval (zmq_raw_timer *timer, int interval);
+int zmq_raw_timer_get_interval (zmq_raw_timer *timer);
 
 #endif
 

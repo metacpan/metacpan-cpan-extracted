@@ -31,7 +31,7 @@
 #define __ZMQ_WS_LISTENER_HPP_INCLUDED__
 
 #include "fd.hpp"
-#include "tcp_address.hpp"
+#include "ws_address.hpp"
 #include "stream_listener_base.hpp"
 
 namespace zmq
@@ -63,7 +63,7 @@ class ws_listener_t : public stream_listener_base_t
     int create_socket (const char *addr_);
 
     //  Address to listen on.
-    tcp_address_t _address;
+    ws_address_t _address;
 
     ws_listener_t (const ws_listener_t &);
     const ws_listener_t &operator= (const ws_listener_t &);

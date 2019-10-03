@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ provides:
     file: lib/Net/EmptyPort.pm
   Test::TCP:
     file: lib/Test/TCP.pm
-    version: '2.20'
+    version: '2.21'
   Test::TCP::CheckPort:
     file: lib/Test/TCP/CheckPort.pm
 requires:
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Test-TCP/issues
   homepage: https://github.com/tokuhirom/Test-TCP
   repository: git://github.com/tokuhirom/Test-TCP.git
-version: '2.20'
+version: '2.21'
 x_contributors:
   - 'Alex Vandiver <alex@chmrr.net>'
   - 'Andrii Melnykov <andy.melnikov@gmail.com>'
@@ -75,4 +75,5 @@ x_contributors:
   - 'richard.leach <richard.leach@nccgroup.com>'
   - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
   - '奥 一穂 <kazuho@EM114-48-138-123.pool.e-mobile.ne.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

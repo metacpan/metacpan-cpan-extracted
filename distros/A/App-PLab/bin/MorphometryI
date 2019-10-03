@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Prima;
 use Prima::Application name => "Morphometry I";
+use App::PLab;
 use App::PLab::ImageApp;
 use App::PLab::Calibrations;
 use Prima::Edit;
@@ -2598,7 +2599,7 @@ my $w = MorphoWindow-> create(
       $wedt,
       App::PLab::ImageAppWindow::winmenu_view(),
       [],["~Help" => [
-         [ HelpAbout =>  "~About" => sub {Prima::MsgBox::message("PLab application series, Morphometry I, version 1.00", mb::OK|mb::Information)}],
+         [ HelpAbout =>  "~About" => sub {Prima::MsgBox::message("PLab application series, Morphometry I, version $App::PLab::VERSION", mb::OK|mb::Information)}],
          [ HelpPlabApps => "~PLab Apps" => sub { $_[0]-> open_help(); }],
          [ HelpContents => "~Contents" => sub { $_[0]-> open_help("MorphometryI"); }],
       ]],

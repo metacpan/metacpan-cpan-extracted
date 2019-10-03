@@ -34,6 +34,7 @@
 #include "address.hpp"
 #include "msg.hpp"
 #include "stream_engine_base.hpp"
+#include "ws_address.hpp"
 
 
 #define WS_BUFFER_SIZE 8192
@@ -130,6 +131,7 @@ class ws_engine_t : public stream_engine_base_t
     ws_engine_t (fd_t fd_,
                  const options_t &options_,
                  const endpoint_uri_pair_t &endpoint_uri_pair_,
+                 ws_address_t &address_,
                  bool client_);
     ~ws_engine_t ();
 
@@ -145,6 +147,7 @@ class ws_engine_t : public stream_engine_base_t
     bool server_handshake ();
 
     bool _client;
+    ws_address_t _address;
 
     ws_client_handshake_state_t _client_handshake_state;
     ws_server_handshake_state_t _server_handshake_state;
@@ -158,7 +161,7 @@ class ws_engine_t : public stream_engine_base_t
 
     bool _header_upgrade_websocket;
     bool _header_connection_upgrade;
-    bool _websocket_protocol;
+    char _websocket_protocol[256];
     char _websocket_key[MAX_HEADER_VALUE_LENGTH + 1];
     char _websocket_accept[MAX_HEADER_VALUE_LENGTH + 1];
 };

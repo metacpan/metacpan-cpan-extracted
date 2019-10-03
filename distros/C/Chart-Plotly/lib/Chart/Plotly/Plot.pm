@@ -6,7 +6,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.027';    # VERSION
+our $VERSION = '0.028';    # VERSION
 
 use Chart::Plotly;
 
@@ -90,7 +90,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,18 @@ Configuration options for the plot. See L<https://plot.ly/javascript/configurati
 Returns the html corresponding to the plot
 
 =head3 Parameters
+
+=over 4
+
+=item div_id
+
+=item load_plotly_using_script_tag
+
+Add the script tag neccesary for loading plotly.js. Default 1.
+
+If plotly.js is going to be loaded in another place or some other way (e.g.: via RequireJS) is better to set to 0
+
+=back
 
 =head2 TO_JSON
 

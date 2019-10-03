@@ -2,8 +2,8 @@ NAME
     App::ANSIColorUtils - Utilities related to ANSI color
 
 VERSION
-    This document describes version 0.004 of App::ANSIColorUtils (from Perl
-    distribution App-ANSIColorUtils), released on 2019-02-13.
+    This document describes version 0.005 of App::ANSIColorUtils (from Perl
+    distribution App-ANSIColorUtils), released on 2019-08-20.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -35,6 +35,8 @@ DESCRIPTION
     *   show-ansi-color-table
 
     *   show-assigned-rgb-colors
+
+    *   show-text-using-color-gradation
 
 FUNCTIONS
   show_ansi_color_table
@@ -78,6 +80,45 @@ FUNCTIONS
     *   strings* => *array[str]*
 
     *   tone => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  show_text_using_color_gradation
+    Usage:
+
+     show_text_using_color_gradation(%args) -> [status, msg, payload, meta]
+
+    Print text using gradation between two colors.
+
+    Examples:
+
+    *   Example #1:
+
+         show_text_using_color_gradation(text => "Hello, world", color2 => "pink", color => "blue"); # -> undef
+
+    This can be used to demonstrate 24bit color support in terminal
+    emulators.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   color1 => *color::rgb24*
+
+    *   color2 => *color::rgb24*
+
+    *   text => *str*
+
+        If unspecified, will show a bar of '=' across the terminal.
 
     Returns an enveloped result (an array).
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1307';
+our $VERSION = '0.1309';
 
 use Moo;
 use Music::Chord::Note;
@@ -260,7 +260,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1307
+version 0.1309
 
 =head1 SYNOPSIS
 

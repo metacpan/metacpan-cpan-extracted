@@ -1,20 +1,25 @@
-0.004   2019-02-13 (PERLANCAR)
+0.005   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: show-text-using-gradation.
+
+
+0.004   2019-02-13  Released-By: PERLANCAR
 
 	- show-assigned-rgb-colors: Add option --tone.
 
 
-0.003   2019-02-13 (PERLANCAR)
+0.003   2019-02-13  Released-By: PERLANCAR
 
 	- Add utility: show-assigned-rgb-colors.
 
 
-0.002   2019-02-13 (PERLANCAR)
+0.002   2019-02-13  Released-By: PERLANCAR
 
 	- Add utility: show-ansi-color-table.
 
 	- [ux] Simplify CLIs (no need to read config & env).
 
 
-0.001   2017-12-03 (PERLANCAR)
+0.001   2017-12-03  Released-By: PERLANCAR
 
         - First release.

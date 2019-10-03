@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: RapidApp-powered blog
 
-use RapidApp 1.3106;
+use RapidApp 1.3108;
 
 use Moose;
 extends 'RapidApp::Builder';
@@ -22,7 +22,7 @@ use YAML::XS 0.64 'LoadFile';
 use Rapi::Blog::Scaffold;
 use Rapi::Blog::Scaffold::Set;
 
-our $VERSION = 1.1002;
+our $VERSION = 1.1004;
 our $TITLE = "Rapi::Blog v" . $VERSION;
 
 has 'site_path',        is => 'ro', required => 1;

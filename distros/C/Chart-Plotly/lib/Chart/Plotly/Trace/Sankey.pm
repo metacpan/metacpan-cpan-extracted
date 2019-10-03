@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Sankey::Node;
 use Chart::Plotly::Trace::Sankey::Stream;
 use Chart::Plotly::Trace::Sankey::Textfont;
 
-our $VERSION = '0.027';    # VERSION
+our $VERSION = '0.028';    # VERSION
 
 # ABSTRACT: Sankey plots for network flow data analysis. The nodes are specified in `nodes` and the links between sources and targets in `links`. The colors are set in `nodes[i].color` and `links[i].color`, otherwise defaults are used.
 
@@ -152,7 +152,7 @@ has valueformat => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "Sets the value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-format/blob/master/README.md#locale_format",
+      "Sets the value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format",
 );
 
 has valuesuffix => (
@@ -183,7 +183,7 @@ Chart::Plotly::Trace::Sankey - Sankey plots for network flow data analysis. The 
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -320,7 +320,7 @@ Controls persistence of some user-driven changes to the trace: `constraintrange`
 
 =item * valueformat
 
-Sets the value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-format/blob/master/README.md#locale_format
+Sets the value formatting rule using d3 formatting mini-language which is similar to those of Python. See https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format
 
 =item * valuesuffix
 

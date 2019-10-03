@@ -56,63 +56,63 @@
    "provides" : {
       "ZMQ::Raw" : {
          "file" : "lib/ZMQ/Raw.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Context" : {
          "file" : "lib/ZMQ/Raw/Context.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Curve" : {
          "file" : "lib/ZMQ/Raw/Curve.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Error" : {
          "file" : "lib/ZMQ/Raw/Error.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Loop" : {
          "file" : "lib/ZMQ/Raw/Loop.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Loop::Event" : {
          "file" : "lib/ZMQ/Raw/Loop/Event.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Loop::Handle" : {
          "file" : "lib/ZMQ/Raw/Loop/Handle.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Loop::Promise" : {
          "file" : "lib/ZMQ/Raw/Loop/Promise.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Loop::Timer" : {
          "file" : "lib/ZMQ/Raw/Loop/Timer.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Message" : {
          "file" : "lib/ZMQ/Raw/Message.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Poller" : {
          "file" : "lib/ZMQ/Raw/Poller.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Proxy" : {
          "file" : "lib/ZMQ/Raw/Proxy.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Socket" : {
          "file" : "lib/ZMQ/Raw/Socket.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Timer" : {
          "file" : "lib/ZMQ/Raw/Timer.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "ZMQ::Raw::Z85" : {
          "file" : "lib/ZMQ/Raw/Z85.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       }
    },
    "release_status" : "stable",
@@ -126,7 +126,7 @@
          "web" : "https://github.com/jacquesg/p5-ZMQ-Raw"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026003"
@@ -227,12 +227,12 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.22.0",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::ALEXBIO/Git::NextVersion",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
@@ -307,7 +307,7 @@
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "v%V%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -318,7 +318,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.22.0",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -326,7 +326,7 @@
                }
             },
             "name" : "@Author::ALEXBIO/Git::Commit",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -335,12 +335,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.36",
-                  "tag_format" : "v%v",
+                  "tag" : "v0.37",
+                  "tag_format" : "v%V",
                   "tag_message" : "%N %v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.22.0",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -348,7 +348,7 @@
                }
             },
             "name" : "@Author::ALEXBIO/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -360,12 +360,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.22.0",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::ALEXBIO/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
@@ -444,7 +444,7 @@
                   "version" : "6.012"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
-                  "version" : "0.47"
+                  "version" : "0.48"
                },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 1,
@@ -524,6 +524,6 @@
       }
    },
    "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

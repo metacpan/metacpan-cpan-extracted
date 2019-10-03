@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Cadence
   repository: https://github.com/ology/Music-Cadence.git
-version: '0.1307'
+version: '0.1309'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

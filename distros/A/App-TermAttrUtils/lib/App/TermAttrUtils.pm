@@ -1,7 +1,7 @@
 package App::TermAttrUtils;
 
 our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to querying terminal attributes
@@ -18,7 +18,7 @@ App::TermAttrUtils - CLI utilities related to querying terminal attributes
 
 =head1 VERSION
 
-This document describes version 0.001 of App::TermAttrUtils (from Perl distribution App-TermAttrUtils), released on 2019-08-20.
+This document describes version 0.003 of App::TermAttrUtils (from Perl distribution App-TermAttrUtils), released on 2019-08-20.
 
 =head1 DESCRIPTION
 
@@ -30,6 +30,8 @@ querying terminal attributes (color support, size, other capabilities):
 =item * L<term-attrs>
 
 =item * L<term-detect-software>
+
+=item * L<term-terminfo>
 
 =back
 
@@ -51,7 +53,7 @@ feature.
 
 =head1 SEE ALSO
 
-B<terminfo>, L<Term::Terminfo>
+L<App::XTermUtils>
 
 =head1 AUTHOR
 

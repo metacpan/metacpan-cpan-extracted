@@ -10,7 +10,7 @@ use Doodle::Column;
 use Doodle::Index;
 use Doodle::Relation;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 has name => (
   is => 'ro',
@@ -33,29 +33,25 @@ has schema => (
 has columns => (
   is => 'ro',
   isa => 'Columns',
-  bld => 'new_columns',
-  lzy => 1
+  new => 1
 );
 
 has indices => (
   is => 'ro',
   isa => 'Indices',
-  bld => 'new_indices',
-  lzy => 1
+  new => 1
 );
 
 has relations => (
   is => 'ro',
   isa => 'Relations',
-  bld => 'new_relations',
-  lzy => 1
+  new => 1
 );
 
 has data => (
   is => 'ro',
   isa => 'Data',
-  bld => 'new_data',
-  lzy => 1
+  new => 1
 );
 
 has engine => (
@@ -76,19 +72,19 @@ has collation => (
 # BUILD
 
 fun new_data($self) {
-  return do('hash', {});
+  return {};
 }
 
 fun new_columns($self) {
-  return do('array', []);
+  return [];
 }
 
 fun new_indices($self) {
-  return do('array', []);
+  return [];
 }
 
 fun new_relations($self) {
-  return do('array', []);
+  return [];
 }
 
 # METHODS
@@ -183,24 +179,129 @@ Doodle Table Class
 
 =head1 SYNOPSIS
 
+  use Doodle;
   use Doodle::Table;
 
+  my $ddl = Doodle->new;
+
   my $self = Doodle::Table->new(
-    name => 'users'
+    name => 'users',
+    doodle => $ddl
   );
 
 =cut
 
 =head1 DESCRIPTION
 
-Database table representation. This class consumes the
-L<Doodle::Table::Helpers> role.
+This package provides database table representation.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Doodle::Table::Helpers>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 charset
+
+  charset(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 collation
+
+  collation(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 columns
+
+  columns(Columns)
+
+This attribute is read-only, accepts C<(Columns)> values, and is optional.
+
+=cut
+
+=head2 data
+
+  data(Data)
+
+This attribute is read-only, accepts C<(Data)> values, and is optional.
+
+=cut
+
+=head2 doodle
+
+  doodle(Doodle)
+
+This attribute is read-only, accepts C<(Doodle)> values, and is required.
+
+=cut
+
+=head2 engine
+
+  engine(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 indices
+
+  indices(Indices)
+
+This attribute is read-only, accepts C<(Indices)> values, and is optional.
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is required.
+
+=cut
+
+=head2 relations
+
+  relations(Relations)
+
+This attribute is read-only, accepts C<(Relations)> values, and is optional.
+
+=cut
+
+=head2 schema
+
+  schema(Schema)
+
+This attribute is read-only, accepts C<(Schema)> values, and is optional.
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -212,9 +313,11 @@ Returns a new Column object.
 
 =over 4
 
-=item column example
+=item column example #1
 
-  my $column = $self->column;
+  # given: synopsis
+
+  my $column = $self->column('id');
 
 =back
 
@@ -228,7 +331,9 @@ Registers a table create and returns the Command object.
 
 =over 4
 
-=item create example
+=item create example #1
+
+  # given: synopsis
 
   my $create = $self->create;
 
@@ -244,9 +349,29 @@ Registers a table delete and returns the Command object.
 
 =over 4
 
-=item delete example
+=item delete example #1
+
+  # given: synopsis
 
   my $delete = $self->delete;
+
+=back
+
+=cut
+
+=head2 doodle
+
+  doodle() : Doodle
+
+Returns the associated Doodle object.
+
+=over 4
+
+=item doodle example #1
+
+  # given: synopsis
+
+  my $doodle = $self->doodle;
 
 =back
 
@@ -260,7 +385,9 @@ Returns a new Index object.
 
 =over 4
 
-=item index example
+=item index example #1
+
+  # given: synopsis
 
   my $index = $self->index(columns => ['email', 'password']);
 
@@ -276,7 +403,9 @@ Returns a new Relation object.
 
 =over 4
 
-=item relation example
+=item relation example #1
+
+  # given: synopsis
 
   my $relation = $self->relation('profile_id', 'profiles', 'id');
 
@@ -292,10 +421,40 @@ Registers a table rename and returns the Command object.
 
 =over 4
 
-=item rename example
+=item rename example #1
 
-  my $rename = $self->rename;
+  # given: synopsis
+
+  my $rename = $self->rename('people');
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

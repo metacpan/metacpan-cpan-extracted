@@ -3,6 +3,7 @@ abstract: 'Deployment State Manager'
 author:
   - 'Gryphon Shafer <gryphon@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -39,6 +40,6 @@ resources:
   bugtracker: https://github.com/gryphonshafer/dest/issues
   homepage: https://github.com/gryphonshafer/dest
   repository: https://github.com/gryphonshafer/dest.git
-version: '1.23'
+version: '1.25'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

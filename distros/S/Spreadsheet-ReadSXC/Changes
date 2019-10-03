@@ -1,6 +1,27 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
-0.20  Fri Jun 17 2005
+0.23  2019-10-03
+    - Add a test and fix for files with text in annotations - these caused
+      a crash
+
+0.22  2019-10-03
+    - Lower Perl version requirement back to 5.8
+      There is no current reason to require more.
+    - API Change:
+      Formatting or read errors in the compressed input or the XML are now
+      fatal errors. Before, they returned the half-parsed data structure.
+    - read_sxc() and read_xml_file can now also return a fatal error when the
+      file is not found or not readable instead of returning undef. Pass a true
+      value to the the StrictError option.
+    - Bugfix/behaviour change: Cells with leading/trailing newlines now
+      return those leading/trailing newlines in their values
+
+0.21  2019-10-02
+    - Add 'StandardCurrency' option to get at unformatted number values
+    - Support unformatted values for ODS files
+    - New maintainer Max Maischein (corion@corion.net)
+
+0.20  2005-06-17 (Fri Jun 17 2005)
 	- almost completely rewritten to use XML::Parser's event style (instead of its tree
 	  style), resulting in more readable and (hopefully) maintainable code
 	- this version allows for multiple open files by returning an anonymous data structure
@@ -8,14 +29,14 @@ Revision history for Perl extension Spreadsheet::ReadSXC.
 	- new option to return an array of hashes instead of a hash of arrays
 	- new option to return time cells as time value
 
-0.12  Sun May 8 2005
+0.12  2005-05-08 (Sun May 8 2005)
 	- comments no longer appear in cells (have to find a cleaner way of returning annotations)
 
-0.11  Sun May 8 2005
+0.11  2005-05-08 (Sun May 8 2005)
 	- eliminated a bug with 'DropHiddenColumns' which would populate an empty table
 	- edited documentation
 
-0.10  Fri May 6 2005
+0.10  2005-05-06 (Fri May 6 2005)
 	- almost completely rewritten to use XML::Parser instead of XML::Parser::Lite::Tree
 	- new options to include/drop hidden rows/col, covered cells etc.
 	- optionally truncate empty rows and columns
@@ -23,13 +44,13 @@ Revision history for Perl extension Spreadsheet::ReadSXC.
 	- new subroutines for reading unpacked XML data from SXC files
 	- option to return date cells as standard date value
 
-0.03  Tue May 3 2005
+0.03  2005-05-03 (Tue May 3 2005)
 	- more prerequisites in Makefile.PL
 	- minor corrections in documentation
 
-0.02  Mon May 1 2005
+0.02  2005-05-01 (Mon May 1 2005)
 	- fixed prerequisites in Makefile.PL
 
-0.01  Sat Apr 30 2005
+0.01  2005-04-30 (Sat Apr 30 2005)
 	- original version; created by h2xs 1.22 with options
 		-XAn Spreadsheet::ReadSXC

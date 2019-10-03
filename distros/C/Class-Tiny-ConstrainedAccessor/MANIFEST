@@ -19,6 +19,7 @@ t/08-custom-constraint.t
 t/10-moox-types-mooselike.t
 t/11-mousex-types.t
 t/12-specio.t
+t/13-type-tiny-hashref.t
 t/MY/Class/CustomConstraint.pm
 t/MY/Class/MooseXTypes.pm
 t/MY/Class/MooXTypesMooseLike.pm
@@ -27,6 +28,7 @@ t/MY/Class/Specio.pm
 t/MY/Class/TypeTiny.pm
 t/MY/Class/TypeTinyBadDefaults.pm
 t/MY/Class/TypeTinyBUILD.pm
+t/MY/Class/TypeTinyHashref.pm
 t/MY/Class/TypeTinyNOBUILD.pm
 t/MY/Class/ValueIsValid.pm
 t/MY/Helpers.pm

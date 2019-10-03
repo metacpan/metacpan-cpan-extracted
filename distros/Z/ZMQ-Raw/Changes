@@ -1,5 +1,10 @@
 Revision history for ZMQ-Raw
 
+0.37      2019-10-03 10:37:10+01:00 Europe/London
+
+ - Update to libzmq 2e9b2f8843
+ - Timer intervals may now be changed post creation
+
 0.36      2019-07-30 16:57:21+01:00 Europe/London
 
  - Update to libzmq 9dcbdd1b09

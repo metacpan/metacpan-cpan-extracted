@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::is_archived_web_uri;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Catmandu::Sane;
 use Moo;

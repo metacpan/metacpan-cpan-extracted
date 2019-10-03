@@ -2,8 +2,8 @@ NAME
     App::XTermUtils - Utilities related to XTerm
 
 VERSION
-    This document describes version 0.004 of App::XTermUtils (from Perl
-    distribution App-XTermUtils), released on 2019-07-12.
+    This document describes version 0.005 of App::XTermUtils (from Perl
+    distribution App-XTermUtils), released on 2019-08-20.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -32,6 +32,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    App::TermAttrUtils
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

@@ -24,7 +24,8 @@ my $plot = Chart::Plotly::Plot->new( traces => [$scattermapbox],
                                      layout => { autosize  => 'True',
                                                  hovermode => 'closest',
                                                  mapbox    => {
-                                                             accesstoken => $mapbox_access_token,
+                                                             style       => 'open-street-map',
+                                                             #accesstoken => $mapbox_access_token,
                                                              bearing     => 0,
                                                              center      => {
                                                                          lat => 38.92,

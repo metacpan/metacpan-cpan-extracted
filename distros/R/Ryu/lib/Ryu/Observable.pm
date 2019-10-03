@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.007'; # VERSION
 
 =encoding utf8
 

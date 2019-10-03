@@ -57,7 +57,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::GitHubREADME::Badge" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm",
-         "version" : "0.28"
+         "version" : "0.29"
       }
    },
    "release_status" : "stable",
@@ -72,13 +72,14 @@
          "web" : "https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
       "Chase Whitener <cwhitener@gmail.com>",
       "Nikolay Mishin <mi@ya.ru>",
       "Paul Cochrane <paul@liekut.de>",
       "Randy Stauner <randy@magnificent-tears.com>",
+      "Shoichi Kaji <skaji@cpan.org>",
       "Stephan Loyd <stephanloyd9@gmail.com>",
       "Thorsten Klein <grobie@perlwizard.de>",
       "Thorsten Klein <thorsten@kleinhq.org>",

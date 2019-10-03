@@ -51,9 +51,9 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-webpack"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHubREADME::Badge;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
@@ -122,6 +122,8 @@ sub add_badges {
             push @badges, "[![Docker Automated Build](https://img.shields.io/docker/automated/\L$user_name/$repository_name\E.svg)](https://github.com/$user_name/$repository_name)";
         } elsif ($badge eq 'docker_build') {
             push @badges, "[![Docker Build Status](https://img.shields.io/docker/build/\L$user_name/$repository_name\E.svg)](https://hub.docker.com/r/\L$user_name/$repository_name\E/)";
+        } elsif ($badge =~ m{^github_actions/(.+)}) {
+            push @badges, "[![Actions Status](https://github.com/$user_name/$repository_name/workflows/$1/badge.svg)](https://github.com/$user_name/$repository_name/actions)";
         }
     }
 
@@ -174,6 +176,7 @@ Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to github RE
     badges = gitlab_cover
     badges = docker_automated
     badges = docker_build
+    badges = github_actions/test
     place = bottom
     phase = release
 

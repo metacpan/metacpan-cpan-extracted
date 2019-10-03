@@ -1,3 +1,7 @@
+0.028 2019-10-01 19:00:00+0000  
+  - Update to plotly.js 1.49.4
+  - Add new trace type: indicator, choroplethmapbox, densitymapbox
+0.027 2019-06-22 20:30:00+0000
   - Update to plotly.js 1.48.3
   - Add method Chart::Plotly::Plot->from_json to deserialize from json dumps
   - Now using Plotly.react instead of Plotly.plot

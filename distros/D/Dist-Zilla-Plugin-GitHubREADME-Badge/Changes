@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.29  2019-10-03 22:11:47 CST
+        - add github actions badge (skaji)
+
 0.28  2019-06-10 10:33:35 CST
         - Fix phase.t on Windows. (genio)
 

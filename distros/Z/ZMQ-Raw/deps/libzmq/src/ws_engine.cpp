@@ -29,6 +29,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "precompiled.hpp"
 
+#ifdef ZMQ_USE_NSS
+#include <secoid.h>
+#include <sechash.h>
+#define SHA_DIGEST_LENGTH 20
+#else
+#include "../external/sha1/sha1.h"
+#endif
+
 #if !defined ZMQ_HAVE_WINDOWS
 #include <sys/types.h>
 #include <unistd.h>
@@ -46,7 +54,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "err.hpp"
 #include "ip.hpp"
 #include "random.hpp"
-#include "../external/sha1/sha1.h"
 #include "ws_decoder.hpp"
 #include "ws_encoder.hpp"
 
@@ -66,22 +73,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static int
 encode_base64 (const unsigned char *in, int in_len, char *out, int out_len);
 
+static void compute_accept_key (char *key,
+                                unsigned char output[SHA_DIGEST_LENGTH]);
+
 zmq::ws_engine_t::ws_engine_t (fd_t fd_,
                                const options_t &options_,
                                const endpoint_uri_pair_t &endpoint_uri_pair_,
+                               ws_address_t &address_,
                                bool client_) :
     stream_engine_base_t (fd_, options_, endpoint_uri_pair_),
     _client (client_),
+    _address (address_),
     _client_handshake_state (client_handshake_initial),
     _server_handshake_state (handshake_initial),
     _header_name_position (0),
     _header_value_position (0),
     _header_upgrade_websocket (false),
-    _header_connection_upgrade (false),
-    _websocket_protocol (false)
+    _header_connection_upgrade (false)
 {
     memset (_websocket_key, 0, MAX_HEADER_VALUE_LENGTH + 1);
     memset (_websocket_accept, 0, MAX_HEADER_VALUE_LENGTH + 1);
+    memset (_websocket_protocol, 0, MAX_HEADER_VALUE_LENGTH + 1);
 
     _next_msg = static_cast<int (stream_engine_base_t::*) (msg_t *)> (
       &ws_engine_t::routing_id_msg);
@@ -109,16 +121,15 @@ void zmq::ws_engine_t::plug_internal ()
           encode_base64 (nonce, 16, _websocket_key, MAX_HEADER_VALUE_LENGTH);
         assert (size > 0);
 
-        size = snprintf (
-          (char *) _write_buffer, WS_BUFFER_SIZE,
-          "GET / HTTP/1.1\r\n"
-          "Host: server.example.com\r\n" // TODO: we need the address here
-          "Upgrade: websocket\r\n"
-          "Connection: Upgrade\r\n"
-          "Sec-WebSocket-Key: %s\r\n"
-          "Sec-WebSocket-Protocol: ZWS2.0\r\n"
-          "Sec-WebSocket-Version: 13\r\n\r\n",
-          _websocket_key);
+        size = snprintf ((char *) _write_buffer, WS_BUFFER_SIZE,
+                         "GET %s HTTP/1.1\r\n"
+                         "Host: %s\r\n"
+                         "Upgrade: websocket\r\n"
+                         "Connection: Upgrade\r\n"
+                         "Sec-WebSocket-Key: %s\r\n"
+                         "Sec-WebSocket-Protocol: ZWS2.0\r\n"
+                         "Sec-WebSocket-Version: 13\r\n\r\n",
+                         _address.path (), _address.host (), _websocket_key);
         assert (size > 0 && size < WS_BUFFER_SIZE);
         _outpos = _write_buffer;
         _outsize = size;
@@ -364,9 +375,25 @@ bool zmq::ws_engine_t::server_handshake ()
                              == 0)
                         strcpy (_websocket_key, _header_value);
                     else if (strcasecmp ("Sec-WebSocket-Protocol", _header_name)
-                             == 0)
-                        _websocket_protocol =
-                          true; // TODO: check if the value is ZWS2.0
+                             == 0) {
+                        // Currently only the ZWS2.0 is supported
+                        // Sec-WebSocket-Protocol can appear multiple times or be a comma separated list
+                        // if _websocket_protocol is already set we skip the check
+                        if (_websocket_protocol[0] == '\0') {
+                            char *p = strtok (_header_value, ",");
+                            while (p != NULL) {
+                                if (*p == ' ')
+                                    p++;
+
+                                if (strcmp ("ZWS2.0", p) == 0) {
+                                    strcpy (_websocket_protocol, p);
+                                    break;
+                                }
+
+                                p = strtok (NULL, ",");
+                            }
+                        }
+                    }
 
                     _server_handshake_state = header_field_cr;
                 } else if (_header_value_position + 1 > MAX_HEADER_VALUE_LENGTH)
@@ -386,24 +413,12 @@ bool zmq::ws_engine_t::server_handshake ()
             case handshake_end_line_cr:
                 if (c == '\n') {
                     if (_header_connection_upgrade && _header_upgrade_websocket
-                        && _websocket_protocol && _websocket_key[0] != '\0') {
+                        && _websocket_protocol[0] != '\0'
+                        && _websocket_key[0] != '\0') {
                         _server_handshake_state = handshake_complete;
 
-                        const char *magic_string =
-                          "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-                        char plain[MAX_HEADER_VALUE_LENGTH + 36 + 1];
-                        strcpy (plain, _websocket_key);
-                        strcat (plain, magic_string);
-
-                        sha1_ctxt ctx;
-                        SHA1_Init (&ctx);
-                        SHA1_Update (&ctx, (unsigned char *) _websocket_key,
-                                     strlen (_websocket_key));
-                        SHA1_Update (&ctx, (unsigned char *) magic_string,
-                                     strlen (magic_string));
-
                         unsigned char hash[SHA_DIGEST_LENGTH];
-                        SHA1_Final (hash, &ctx);
+                        compute_accept_key (_websocket_key, hash);
 
                         int accept_key_len = encode_base64 (
                           hash, SHA_DIGEST_LENGTH, _websocket_accept,
@@ -417,9 +432,9 @@ bool zmq::ws_engine_t::server_handshake ()
                                     "Upgrade: websocket\r\n"
                                     "Connection: Upgrade\r\n"
                                     "Sec-WebSocket-Accept: %s\r\n"
-                                    "Sec-WebSocket-Protocol: ZWS2.0\r\n"
+                                    "Sec-WebSocket-Protocol: %s\r\n"
                                     "\r\n",
-                                    _websocket_accept);
+                                    _websocket_accept, _websocket_protocol);
                         assert (written >= 0 && written < WS_BUFFER_SIZE);
                         _outpos = _write_buffer;
                         _outsize = written;
@@ -743,9 +758,10 @@ bool zmq::ws_engine_t::client_handshake ()
                              == 0)
                         strcpy (_websocket_accept, _header_value);
                     else if (strcasecmp ("Sec-WebSocket-Protocol", _header_name)
-                             == 0)
-                        _websocket_protocol = true; // TODO: check if ZWS2.0
-
+                             == 0) {
+                        if (strcmp ("ZWS2.0", _header_value) == 0)
+                            strcpy (_websocket_protocol, _header_value);
+                    }
                     _client_handshake_state = client_header_field_cr;
                 } else if (_header_value_position + 1 > MAX_HEADER_VALUE_LENGTH)
                     _client_handshake_state = client_handshake_error;
@@ -764,7 +780,7 @@ bool zmq::ws_engine_t::client_handshake ()
             case client_handshake_end_line_cr:
                 if (c == '\n') {
                     if (_header_connection_upgrade && _header_upgrade_websocket
-                        && _websocket_protocol
+                        && _websocket_protocol[0] != '\0'
                         && _websocket_accept[0] != '\0') {
                         _client_handshake_state = client_handshake_complete;
 
@@ -835,4 +851,29 @@ encode_base64 (const unsigned char *in, int in_len, char *out, int out_len)
         return -1; /* no room for null terminator */
     out[io] = 0;
     return io;
+}
+
+static void compute_accept_key (char *key, unsigned char *hash)
+{
+    const char *magic_string = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+#ifdef ZMQ_USE_NSS
+    unsigned int len;
+    HASH_HashType type = HASH_GetHashTypeByOidTag (SEC_OID_SHA1);
+    HASHContext *ctx = HASH_Create (type);
+    assert (ctx);
+
+    HASH_Begin (ctx);
+    HASH_Update (ctx, (unsigned char *) key, (unsigned int) strlen (key));
+    HASH_Update (ctx, (unsigned char *) magic_string,
+                 (unsigned int) strlen (magic_string));
+    HASH_End (ctx, hash, &len, SHA_DIGEST_LENGTH);
+    HASH_Destroy (ctx);
+#else
+    sha1_ctxt ctx;
+    SHA1_Init (&ctx);
+    SHA1_Update (&ctx, (unsigned char *) key, strlen (key));
+    SHA1_Update (&ctx, (unsigned char *) magic_string, strlen (magic_string));
+
+    SHA1_Final (hash, &ctx);
+#endif
 }

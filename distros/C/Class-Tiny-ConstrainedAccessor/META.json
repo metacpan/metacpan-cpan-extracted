@@ -73,7 +73,7 @@
    "provides" : {
       "Class::Tiny::ConstrainedAccessor" : {
          "file" : "lib/Class/Tiny/ConstrainedAccessor.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       }
    },
    "release_status" : "stable",
@@ -86,9 +86,10 @@
          "web" : "https://github.com/cxw42/Class-Tiny-ConstrainedAccessor"
       }
    },
-   "version" : "0.000012",
+   "version" : "0.000013",
    "x_contributors" : [
       "Christopher White <cxw@cpan.org>",
+      "Ivan Butorin <fishbone@cpan.org>",
       "Toby Inkster <tobyink@cpan.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"

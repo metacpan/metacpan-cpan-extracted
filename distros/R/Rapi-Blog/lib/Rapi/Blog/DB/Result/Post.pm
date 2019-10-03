@@ -544,7 +544,7 @@ Read-only.
 Custom summary for the Post. Setting any nonzero-length value will populate as the C<summary>, while
 an empty string will cause C<summary> to be auto-generated.
 
-=body
+=head2 body
 
 The main content body of the Post in HTML/Markdown format.
 

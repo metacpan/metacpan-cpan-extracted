@@ -1,5 +1,5 @@
 package ZMQ::Raw::Poller;
-$ZMQ::Raw::Poller::VERSION = '0.36';
+$ZMQ::Raw::Poller::VERSION = '0.37';
 use strict;
 use warnings;
 use ZMQ::Raw;
@@ -12,7 +12,7 @@ ZMQ::Raw::Poller - ZeroMQ Poller class
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 

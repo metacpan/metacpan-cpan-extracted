@@ -79,6 +79,8 @@ my $timer = ZMQ::Raw::Loop::Timer->new (
 	{
 		my ($timer) = @_;
 
+		$timer->timer->interval (150);
+
 		if (++$count == 5)
 		{
 			$timer->cancel();
@@ -93,6 +95,7 @@ ok (!eval {ZMQ::Raw::Loop->Timer->new (timer => ZMQ::Raw::Timer->new ($ctx, afte
 $loop->add ($timer);
 $loop->run;
 is $count, 5;
+is $timer->timer->interval(), 150;
 
 my $size = $loop->poller->size;
 is $size, 0;

@@ -30,13 +30,13 @@ WriteMakefile(
         no_index       => {directory => ['t']},
         resources => {
             bugtracker => {
-                web => 'https://github.com/crlcu/mojo-debugbar/issues'
+                web => 'https://gitlab.com/AuroraSoftware/mojo-debugbar/issues'
             },
             license    => ['https://opensource.org/licenses/MIT'],
             repository => {
                 type => 'git',
-                url  => 'https://github.com/crlcu/mojo-debugbar.git',
-                web  => 'https://github.com/crlcu/mojo-debugbar',
+                url  => 'https://gitlab.com/AuroraSoftware/mojo-debugbar.git',
+                web  => 'https://gitlab.com/AuroraSoftware/mojo-debugbar',
             },
         },
     },

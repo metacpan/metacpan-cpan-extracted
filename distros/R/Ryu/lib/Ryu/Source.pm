@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.007'; # VERSION
 
 =head1 NAME
 
@@ -1032,7 +1032,8 @@ sub ordered_futures {
         $all_finished = 1;
         $src->completed->done unless %pending or $src->completed->is_ready;
     });
-    $self->each_while_source(sub {
+
+    $self->each(sub {
         my $k = Scalar::Util::refaddr $_;
         $pending{$k} = 1;
         $log->tracef('Ordered futures has %d pending', 0 + keys %pending);
@@ -1045,7 +1046,8 @@ sub ordered_futures {
               $src->completed->done if $all_finished and not $src->completed->is_ready;
           })
           ->retain
-    }, $src);
+    });
+    return $src;
 }
 
 *resolve = *ordered_futures;

@@ -5,7 +5,7 @@ use Carp qw/croak/;
 use List::Util qw(any none);
 use Validate::Tiny;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 
 sub register {
@@ -40,7 +40,7 @@ sub register {
             $params->{ $_->name } ||= $_ for (@{ $c->req->uploads });
 
             #Latest mojolicious has an issue in that it doesn't include route supplied parameters so we need to hack that in.
-            $params = { %{$params},  %{$c->flash('mojo.captures') || {}} };
+            $params = { %{$params},  %{$c->stash('mojo.captures') || {}} };
 
             # Autofill fields
             if ( $conf->{autofields} ) {

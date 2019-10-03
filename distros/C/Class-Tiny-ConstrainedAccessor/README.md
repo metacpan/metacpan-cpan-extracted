@@ -60,11 +60,19 @@ for optimization than general-purpose type systems.
 
 ## import
 
-Creates the accessors you have requested.  Basic usage:
+Creates the accessors you have requested.  Constraints can be passed as a list
+or hashref of variable/constraint pairs.  Basic usage:
 
+    # Constraints are passed as a list of pairs
     use Class::Tiny::ConstrainedAccessor
         name => constraint
-        [, name => constraint ...]; # ... any number of name=>constraint pairs
+        [, name2 => constraint ...]; # ... any number of name=>constraint pairs
+
+    # Constraints are passed as a hashref
+    use Class::Tiny::ConstrainedAccessor {
+        name => constraint,
+        [, name2 => constraint ...]; # ... any number of name=>constraint pairs
+    };
 
 This also creates a [BUILD()](https://metacpan.org/pod/Class::Tiny#BUILD) subroutine to check the
 constructor parameters, if a `BUILD()` doesn't already exist.
@@ -77,8 +85,8 @@ own `BUILD()` if you want to.
 # OPTIONS
 
 To specify options, pass an **arrayref** as the first argument on the \`use\`
-line.  This is to leave room for someday carrying attributes and constraints in
-a hashref.  For example:
+line.  This is because a hashref carries attributes and constraints.
+For example:
 
     use Class::Tiny::ConstrainedAccessor [ OPTION=>value ],
         name => constraint ...;
@@ -100,7 +108,7 @@ Valid options are:
 # AUTHORS
 
 Created by Christopher White, `<cxwembedded at gmail.com>`.  Thanks to
-Toby Inkster for code contributions.
+Toby Inkster (TOBYINK) and Ivan Butorin (FISHBONE) for code contributions.
 
 # BUGS
 
@@ -121,13 +129,13 @@ You can also look for information at:
 
     [https://github.com/cxw42/Class-Tiny-ConstrainedAccessor](https://github.com/cxw42/Class-Tiny-ConstrainedAccessor)
 
-- Search CPAN
+- MetaCPAN
 
-    [https://metacpan.org/release/Class-Tiny-ConstrainedAccessor](https://metacpan.org/release/Class-Tiny-ConstrainedAccessor)
+    [https://metacpan.org/pod/Class::Tiny::ConstrainedAccessor](https://metacpan.org/pod/Class::Tiny::ConstrainedAccessor)
 
 # LICENSE
 
-Copyright 2019 Christopher White.
+Copyright 2019 Christopher White and contributors.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Apache License (2.0). You may obtain a

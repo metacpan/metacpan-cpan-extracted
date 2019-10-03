@@ -15,7 +15,8 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-TermAttrUtils",
   "EXE_FILES" => [
     "script/term-attrs",
-    "script/term-detect-software"
+    "script/term-detect-software",
+    "script/term-terminfo"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -23,8 +24,10 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dump" => 0,
     "Moo" => 0,
+    "Perinci::CmdLine::Any" => 0,
     "Term::App::Role::Attrs" => "0.02",
     "Term::Detect::Software" => 0,
+    "Term::Terminfo" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,8 +50,10 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moo" => 0,
+  "Perinci::CmdLine::Any" => 0,
   "Term::App::Role::Attrs" => "0.02",
   "Term::Detect::Software" => 0,
+  "Term::Terminfo" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

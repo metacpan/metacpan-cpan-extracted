@@ -61,7 +61,7 @@ requires:
   Plack::Middleware::ConditionalGET: 0
   Pod::Find: 0
   Pod::Usage: 0
-  RapidApp: 1.3106
+  RapidApp: 1.3108
   RapidApp::Builder: 0
   RapidApp::Module::DbicPropPage: 0
   RapidApp::Module::DbicRowDV: 0
@@ -90,4 +90,4 @@ resources:
   bugtracker: https://github.com/vanstyn/Rapi-Blog/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/Rapi-Blog.git
-version: 1.1002
+version: 1.1004

@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::MockObject.
 
+1.20191002 2019-10-02 09:32:54-07:00 America/Los_Angeles
+    - replace non-core CGI dependency with core CPAN dependency
+      (Yanick Champoux, GH PR #16)
+
 1.20180705 2018-07-05 16:47:18-07:00 America/Los_Angeles
     - added destructor to clear counters (choroboa PR #15, RT #71831)
 

@@ -16,8 +16,8 @@ $tme    = $module->new( 'Test::Builder' );
 ok( $tme->isa( 'Test::Builder' ),
 	'passing a class name to new() should set inheritance properly' );
 
-$tme      = $module->new( 'CGI' );
-ok( $INC{'CGI.pm'},
+$tme      = $module->new( 'CPAN' );
+ok( $INC{'CPAN.pm'},
 	'new() should load parent module unless already loaded' );
 
 package Some::Class;
@@ -213,5 +213,5 @@ is( $called_fooNA,          1, '... calling the method'          );
 is( $called_autoloadNA,     0, '... not touching AUTOLOAD()'     );
 
 # Call a non-existent method
-dies_ok (sub{ $mock->bar()},     
+dies_ok (sub{ $mock->bar()},
     '... should die if calling a non-mocked and non-AUTOLOADED method' );

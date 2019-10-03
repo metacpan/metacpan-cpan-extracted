@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Role', 'Doodle::Library';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # METHODS
 
@@ -158,21 +158,31 @@ Doodle Command Helpers
 
   use Doodle;
 
+  # consumes Doodle::Helpers
+
   my $self = Doodle->new;
 
-  my $command = $self->create_schema(%args);
+  my $command = $self->schema_create;
 
 =cut
 
 =head1 DESCRIPTION
 
-Helpers for configuring Commands (command objects).
+Helpers for configuring Commands.
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -184,9 +194,13 @@ Registers a column create and returns the Command object.
 
 =over 4
 
-=item column_create example
+=item column_create example #1
 
-  my $command = $self->column_create(%args);
+  # given: synopsis
+
+  my %args; # (..., column => $column)
+
+  $command = $self->column_create(%args);
 
 =back
 
@@ -200,9 +214,13 @@ Registers a column delete and returns the Command object.
 
 =over 4
 
-=item column_delete example
+=item column_delete example #1
 
-  my $command = $self->column_delete(%args);
+  # given: synopsis
+
+  my %args; # (..., column => $column)
+
+  $command = $self->column_delete(%args);
 
 =back
 
@@ -216,9 +234,13 @@ Registers a column rename and returns the Command object.
 
 =over 4
 
-=item column_rename example
+=item column_rename example #1
 
-  my $command = $self->column_rename(%args);
+  # given: synopsis
+
+  my %args; # (..., column => $column)
+
+  $command = $self->column_rename(%args);
 
 =back
 
@@ -232,9 +254,13 @@ Registers a column update and returns the Command object.
 
 =over 4
 
-=item column_update example
+=item column_update example #1
 
-  my $command = $self->column_update(%args);
+  # given: synopsis
+
+  my %args; # (..., column => $column)
+
+  $command = $self->column_update(%args);
 
 =back
 
@@ -248,9 +274,13 @@ Registers a index create and returns the Command object.
 
 =over 4
 
-=item index_create example
+=item index_create example #1
 
-  my $command = $self->index_create(%args);
+  # given: synopsis
+
+  my %args; # (..., index => $index)
+
+  $command = $self->index_create(%args);
 
 =back
 
@@ -264,9 +294,13 @@ Register and return an index_delete command.
 
 =over 4
 
-=item index_delete example
+=item index_delete example #1
 
-  my $command = $self->index_delete(%args);
+  # given: synopsis
+
+  my %args; # (..., index => $index)
+
+  $command = $self->index_delete(%args);
 
 =back
 
@@ -280,9 +314,13 @@ Registers a relation create and returns the Command object.
 
 =over 4
 
-=item relation_create example
+=item relation_create example #1
 
-  my $command = $self->relation_create(%args);
+  # given: synopsis
+
+  my %args; # (..., relation => $relation)
+
+  $command = $self->relation_create(%args);
 
 =back
 
@@ -296,9 +334,13 @@ Registers a relation delete and returns the Command object.
 
 =over 4
 
-=item relation_delete example
+=item relation_delete example #1
 
-  my $command = $self->relation_delete(%args);
+  # given: synopsis
+
+  my %args; # (..., relation => $relation)
+
+  $command = $self->relation_delete(%args);
 
 =back
 
@@ -312,9 +354,13 @@ Registers a schema create and returns the Command object.
 
 =over 4
 
-=item schema_create example
+=item schema_create example #1
 
-  my $command = $self->schema_create(%args);
+  # given: synopsis
+
+  my %args; # (..., schema => $schema)
+
+  $command = $self->schema_create(%args);
 
 =back
 
@@ -328,9 +374,13 @@ Registers a schema delete and returns the Command object.
 
 =over 4
 
-=item schema_delete example
+=item schema_delete example #1
 
-  my $command = $self->schema_delete(%args);
+  # given: synopsis
+
+  my %args; # (..., schema => $schema)
+
+  $command = $self->schema_delete(%args);
 
 =back
 
@@ -344,9 +394,13 @@ Registers a table create and returns the Command object.
 
 =over 4
 
-=item table_create example
+=item table_create example #1
 
-  my $command = $self->table_create(%args);
+  # given: synopsis
+
+  my %args; # (..., table => $table)
+
+  $command = $self->table_create(%args);
 
 =back
 
@@ -360,9 +414,13 @@ Registers a table delete and returns the Command object.
 
 =over 4
 
-=item table_delete example
+=item table_delete example #1
 
-  my $command = $self->table_delete(%args);
+  # given: synopsis
+
+  my %args; # (..., table => $table)
+
+  $command = $self->table_delete(%args);
 
 =back
 
@@ -376,10 +434,42 @@ Registers a table rename and returns the Command object.
 
 =over 4
 
-=item table_rename example
+=item table_rename example #1
 
-  my $command = $self->table_rename(%args);
+  # given: synopsis
+
+  my %args; # (..., table => $table)
+
+  $command = $self->table_rename(%args);
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

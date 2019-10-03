@@ -1,12 +1,35 @@
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Spreadsheet-ReadSXC
-version:      0.20
-version_from: ReadSXC.pm
-installdirs:  site
+---
+abstract: 'Extract OpenOffice 1.x spreadsheet data'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-ReadSXC
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Archive::Zip:                  0
-    Test::More:                    0
-    XML::Parser:                   0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.12
+  Archive::Zip: '1.34'
+  Carp: '0'
+  PerlIO::gzip: '0'
+  XML::Parser: '0'
+  perl: '5.008'
+resources:
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Spreadsheet-ReadSXC.git
+version: '0.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

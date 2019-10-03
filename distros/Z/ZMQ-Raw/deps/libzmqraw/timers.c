@@ -306,6 +306,27 @@ void *zmq_raw_timer_get_sv (zmq_raw_timer *timer)
 	return timer->recv_sv;
 }
 
+void zmq_raw_timer_set_interval (zmq_raw_timer *timer, int interval)
+{
+	assert (timer);
+	assert (interval > 0);
+
+	zmq_raw_mutex_lock (timer->timers->mutex);
+	timer->interval = interval;
+	zmq_raw_mutex_unlock (timer->timers->mutex);
+}
+
+int zmq_raw_timer_get_interval (zmq_raw_timer *timer)
+{
+	int interval;
+	assert (timer);
+
+	zmq_raw_mutex_lock (timer->timers->mutex);
+	interval = timer->interval;
+	zmq_raw_mutex_unlock (timer->timers->mutex);
+
+	return interval;
+}
 
 void timer_thread (void *arg)
 {

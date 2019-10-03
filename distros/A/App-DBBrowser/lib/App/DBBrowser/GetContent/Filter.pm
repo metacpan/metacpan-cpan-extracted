@@ -34,7 +34,7 @@ sub input_filter {
     my $input_cols       = 'Choose_Cols';
     my $input_rows       = 'Choose_Rows';
     my $input_rows_range = 'Range_Rows';
-    my $add_col          = 'Add_Col';
+    my $add_col          = 'Add_Col'; # append_empty_col
     my $empty_to_null    = 'Empty2NULL';
     my $merge_rows       = 'Merge_Rows ';
     my $split_table      = 'Split_Table';
@@ -168,7 +168,6 @@ sub __prepare_header_and_mark {
     }
     return $header, $mark;
 }
-
 
 
 sub __choose_columns {

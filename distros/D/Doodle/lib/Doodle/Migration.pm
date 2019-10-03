@@ -8,7 +8,7 @@ use Carp;
 use Data::Object::Space;
 use Doodle;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # METHODS
 
@@ -109,17 +109,19 @@ Database Migration Class
 
 =head1 SYNOPSIS
 
-  # in lib/My/Migration.pm
+  # in lib/Migration.pm
 
-  package My::Migration;
+  package Migration;
 
   use parent 'Doodle::Migration';
 
   # in lib/My/Migration/Step1.pm
 
-  package My::Migration::Step1;
+  package Migration::Step1;
 
   use parent 'Doodle::Migration';
+
+  no warnings 'redefine';
 
   sub up {
     my ($self, $doodle) = @_;
@@ -144,9 +146,11 @@ Database Migration Class
 
   # in lib/My/Migration/Step2.pm
 
-  package My::Migration::Step2;
+  package Migration::Step2;
 
   use parent 'Doodle::Migration';
+
+  no warnings 'redefine';
 
   sub up {
     my ($self, $doodle) = @_;
@@ -168,13 +172,13 @@ Database Migration Class
     return $doodle;
   }
 
-  # in script
+  # elsewhere
 
   package main;
 
-  my $migrator = My::Migration->new;
+  my $self = Migration->new;
 
-  my $results = $migrator->migrate('up', 'sqlite', sub {
+  my $results = $self->migrate('up', 'sqlite', sub {
     my ($sql) = @_;
 
     # e.g. $dbi->do($_) for @$sql;
@@ -195,9 +199,17 @@ current class) and returns the class names as an array-reference.
 
 =cut
 
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -210,7 +222,11 @@ L<Doodle::Migrator>.
 
 =over 4
 
-=item down example
+=item down example #1
+
+  # given: synopsis
+
+  my $doodle = Doodle->new;
 
   $doodle = $self->down($doodle);
 
@@ -220,7 +236,7 @@ L<Doodle::Migrator>.
 
 =head2 migrate
 
-  migrate(Str $updn, Str $grammar, CodeRef $callback) : [Any]
+  migrate(Str $updn, Str $grammar, CodeRef $callback) : Any
 
 The migrate method collects all processed statements and iterates over the "UP"
 or "DOWN" SQL statements, passing the set of SQL statements to the supplied
@@ -228,7 +244,9 @@ callback with each iteration.
 
 =over 4
 
-=item migrate example
+=item migrate example #1
+
+  # given: synopsis
 
   my $migrate = $self->migrate('up', 'sqlite', sub {
     my ($sql) = @_;
@@ -244,7 +262,7 @@ callback with each iteration.
 
 =head2 migrations
 
-  migrations() : [Str]
+  migrations() : ArrayRef[Str]
 
 The migrations method finds and loads child objects under the C<namespace> and
 returns an array-reference which contains class names that have subclassed the
@@ -252,7 +270,11 @@ L<Doodle::Migration> base class.
 
 =over 4
 
-=item migrations example
+=item migrations example #1
+
+  # given: synopsis
+
+  my $doodle = Doodle->new;
 
   my $migrations = $self->migrations;
 
@@ -269,9 +291,11 @@ L<Doodle::Migration> classes can be found.
 
 =over 4
 
-=item namespace example
+=item namespace example #1
 
-  my $namespace = $self->namespace();
+  # given: synopsis
+
+  my $namespace = $self->namespace;
 
 =back
 
@@ -279,7 +303,7 @@ L<Doodle::Migration> classes can be found.
 
 =head2 statements
 
-  statements(Str $grammar) : [[[Str],[Str]]]
+  statements(Str $grammar) : ArrayRef[Tuple[ArrayRef[Str], ArrayRef[Str]]]
 
 The statements method loads and processes the migrations using the grammar
 specified. This method returns a set of migrations, each containing a set of
@@ -287,7 +311,9 @@ specified. This method returns a set of migrations, each containing a set of
 
 =over 4
 
-=item statements example
+=item statements example #1
+
+  # given: synopsis
 
   my $statements = $self->statements('sqlite');
 
@@ -304,10 +330,42 @@ L<Doodle::Migrator>.
 
 =over 4
 
-=item up example
+=item up example #1
+
+  # given: synopsis
+
+  my $doodle = Doodle->new;
 
   $doodle = $self->up($doodle);
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

@@ -7,7 +7,7 @@ use Data::Object 'Class', 'Doodle::Library';
 use Carp;
 use Doodle::Statement;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 has name => (
   is => 'ro',
@@ -16,6 +16,10 @@ has name => (
 );
 
 # METHODS
+
+method wrap(Str $arg) {
+  return $arg;
+}
 
 method exception(Str $msg) {
   my $engine = ucfirst $self->name;
@@ -367,20 +371,42 @@ Doodle Grammar Base Class
 
   use Doodle::Grammar;
 
-  my $self = Doodle::Grammar->new(%args);
+  my $self = Doodle::Grammar->new;
 
 =cut
 
 =head1 DESCRIPTION
 
-Doodle::Grammar determines how Command classes should be interpreted to produce the correct DDL
-statements.
+This package determines how command objects should be interpreted to produce
+the correct DDL statements.
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -392,9 +418,17 @@ Generate SQL statement for column-create Command.
 
 =over 4
 
-=item create_column example
+=item create_column example #1
 
-  my $create_column = $self->create_column;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('id');
+  my $command = $column->create;
+
+  my $create_column = $self->create_column($command);
 
 =back
 
@@ -408,11 +442,17 @@ Returns the SQL statement for the create constraint command.
 
 =over 4
 
-=item create_constraint example
+=item create_constraint example #1
 
-  $self->create_constraint($column);
+  # given: synopsis
 
-  # 
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $relation = $ddl->table('emails')->relation('user_id', 'users', 'id');
+  my $command = $relation->create;
+
+  $self->create_constraint($command);
 
 =back
 
@@ -426,9 +466,17 @@ Generate SQL statement for index-create Command.
 
 =over 4
 
-=item create_index example
+=item create_index example #1
 
-  my $create_index = $self->create_index;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $index = $ddl->table('users')->index(columns => ['is_admin']);
+  my $command = $index->create;
+
+  my $create_index = $self->create_index($command);
 
 =back
 
@@ -442,9 +490,17 @@ Generate SQL statement for schema-create Command.
 
 =over 4
 
-=item create_schema example
+=item create_schema example #1
 
-  my $create_schema = $self->create_schema;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $schema = $ddl->schema('app');
+  my $command = $schema->create;
+
+  my $create_schema = $self->create_schema($command);
 
 =back
 
@@ -458,9 +514,17 @@ Generate SQL statement for table-create Command.
 
 =over 4
 
-=item create_table example
+=item create_table example #1
 
-  my $create_table = $self->create_table;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $table = $ddl->table('users');
+  my $command = $table->create;
+
+  my $create_table = $self->create_table($command);
 
 =back
 
@@ -474,9 +538,17 @@ Generate SQL statement for column-delete Command.
 
 =over 4
 
-=item delete_column example
+=item delete_column example #1
 
-  my $delete_column = $self->delete_column;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('id');
+  my $command = $column->delete;
+
+  my $delete_column = $self->delete_column($command);
 
 =back
 
@@ -490,11 +562,17 @@ Returns the SQL statement for the delete constraint command.
 
 =over 4
 
-=item delete_constraint example
+=item delete_constraint example #1
 
-  $self->delete_constraint($column);
+  # given: synopsis
 
-  # 
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $relation = $ddl->table('emails')->relation('user_id', 'users', 'id');
+  my $command = $relation->delete;
+
+  $self->delete_constraint($command);
 
 =back
 
@@ -508,9 +586,17 @@ Generate SQL statement for index-delete Command.
 
 =over 4
 
-=item delete_index example
+=item delete_index example #1
 
-  my $delete_index = $self->delete_index;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $index = $ddl->table('users')->index(columns => ['is_admin']);
+  my $command = $index->delete;
+
+  my $delete_index = $self->delete_index($command);
 
 =back
 
@@ -524,9 +610,15 @@ Generate SQL statement for schema-delete Command.
 
 =over 4
 
-=item delete_schema example
+=item delete_schema example #1
 
-  my $delete_schema = $self->delete_schema;
+  # given: synopsis
+
+  my $ddl = Doodle->new;
+  my $schema = $ddl->schema('app');
+  my $command = $schema->delete;
+
+  my $delete_schema = $self->delete_schema($command);
 
 =back
 
@@ -540,9 +632,17 @@ Generate SQL statement for table-delete Command.
 
 =over 4
 
-=item delete_table example
+=item delete_table example #1
 
-  my $delete_table = $self->delete_table;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $table = $ddl->table('users');
+  my $command = $table->delete;
+
+  my $delete_table = $self->delete_table($command);
 
 =back
 
@@ -550,15 +650,17 @@ Generate SQL statement for table-delete Command.
 
 =head2 exception
 
-  exception(Str $message) : ()
+  exception(Str $message) : Any
 
 Throws an exception using L<Carp> confess.
 
 =over 4
 
-=item exception example
+=item exception example #1
 
-  $self->exception($message);
+  # given: synopsis
+
+  $self->exception('Oops');
 
 =back
 
@@ -572,7 +674,15 @@ Processed the Command and returns a Statement object.
 
 =over 4
 
-=item execute example
+=item execute example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('id');
+  my $command = $column->create;
 
   my $statement = $self->execute($command);
 
@@ -588,9 +698,17 @@ Generate SQL statement for column-rename Command.
 
 =over 4
 
-=item rename_column example
+=item rename_column example #1
 
-  my $rename_column = $self->rename_column;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('id');
+  my $command = $column->rename('uuid');
+
+  my $rename_column = $self->rename_column($command);
 
 =back
 
@@ -604,9 +722,17 @@ Generate SQL statement for table-rename Command.
 
 =over 4
 
-=item rename_table example
+=item rename_table example #1
 
-  my $rename_table = $self->rename_table;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $table = $ddl->table('users');
+  my $command = $table->rename('people');
+
+  my $rename_table = $self->rename_table($command);
 
 =back
 
@@ -620,9 +746,18 @@ Returns the SQL statement for the given Command.
 
 =over 4
 
-=item render example
+=item render example #1
 
-  my $sql = $self->render($command);
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $schema = $ddl->schema('app');
+  my $command = $schema->create;
+  my $template = 'create schema {schema_name}';
+
+  my $sql = $self->render($template, $command);
 
 =back
 
@@ -630,16 +765,52 @@ Returns the SQL statement for the given Command.
 
 =head2 update_column
 
-  update_column(Any @args) : Object
+  update_column(Any @args) : Str
 
 Generate SQL statement for column-update Command.
 
 =over 4
 
-=item update_column example
+=item update_column example #1
 
-  my $update_column = $self->update_column;
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('id')->integer_small;
+  my $command = $column->update;
+
+  my $update_column = $self->update_column($command);
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

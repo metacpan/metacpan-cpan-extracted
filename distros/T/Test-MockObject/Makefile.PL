@@ -27,7 +27,6 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "CGI" => "4.15",
     "Test::Exception" => "0.31",
     "Test::More" => "0.98",
     "Test::Warn" => "0.23",
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "overload" => 0,
     "vars" => 0
   },
-  "VERSION" => "1.20180705",
+  "VERSION" => "1.20191002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +43,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "CGI" => "4.15",
   "Carp" => 0,
   "Devel::Peek" => 0,
   "Scalar::Util" => 0,

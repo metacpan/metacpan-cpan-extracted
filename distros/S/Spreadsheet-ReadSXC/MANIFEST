@@ -1,8 +1,30 @@
 Changes
+lib/Spreadsheet/ReadSXC.pm
+LICENSE
 Makefile.PL
 MANIFEST
-ReadSXC.pm
+MANIFEST.SKIP
+META.json
+META.yml			Module meta-data (added by MakeMaker)
 README
-t.sxc
+t/00-load.t
+t/02-read-fh.t
+t/02-read-xml-file.t
+t/03-error-handling.t
+t/04-text-outside-xml.t
 t/1.t
-META.yml                                Module meta-data (added by MakeMaker)
+t/t-date.ods
+t/t-multiline.ods
+t/t.sxc
+t/text-outside-cell.xml
+xt/99-changes.t
+xt/99-compile.t
+xt/99-manifest.t
+xt/99-minimumversion.t
+xt/99-pod.t
+xt/99-synopsis.t
+xt/99-test-prerequisites.t
+xt/99-todo.t
+xt/99-unix-text.t
+xt/99-versions.t
+xt/meta-lint.t

@@ -12,7 +12,7 @@ use Time::HiRes 'usleep';
 
 use constant DEBUG => $ENV{MOJO_REACTOR_EPOLL_DEBUG} || 0;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 sub again {
 	my ($self, $id) = @_;
@@ -29,13 +29,6 @@ sub io {
 }
 
 sub is_running { !!shift->{running} }
-
-sub new {
-	my $class = shift;
-	my $self = $class->SUPER::new(@_);
-	$self->{epoll} = Linux::Epoll->new;
-	return $self;
-}
 
 sub next_tick {
 	my ($self, $cb) = @_;
@@ -67,7 +60,9 @@ sub one_tick {
 			my $maxevents = int $watched/2;
 			$maxevents = 10 if $maxevents < 10;
 			
-			my $count = $self->{epoll}->wait($maxevents, $timeout);
+			my $epoll = $self->{epoll} // $self->_create_epoll;
+
+			my $count = $epoll->wait($maxevents, $timeout);
 			$i += $count if defined $count;
 		}
 		
@@ -110,8 +105,7 @@ sub remove {
 
 sub reset {
 	my $self = shift;
-	delete @{$self}{qw(epoll io next_tick next_timer timers)};
-	$self->{epoll} = Linux::Epoll->new;
+	delete @{$self}{qw(epoll io next_tick next_timer pending_watch timers)};
 }
 
 sub start {
@@ -129,6 +123,12 @@ sub watch {
 	
 	my $fd = fileno $handle;
 	croak 'I/O watcher not active' unless my $io = $self->{io}{$fd};
+
+	my $epoll = $self->{epoll};
+	unless (defined $epoll) {
+		push @{$self->{pending_watch}}, [$handle, $read, $write];
+		return $self;
+	}
 	
 	my @events;
 	push @events, 'in', 'prio' if $read;
@@ -148,12 +148,19 @@ sub watch {
 			$self->_try('I/O watcher', $self->{io}{$fd}{cb}, 1);
 		}
 	};
-	$self->{epoll}->$op($handle, \@events, $cb);
+	$epoll->$op($handle, \@events, $cb);
 	
 	# Cache callback for future modify operations, after successfully added to epoll
 	$io->{epoll_cb} //= $cb;
 	
 	return $self;
+}
+
+sub _create_epoll {
+	my $self = shift;
+	$self->{epoll} = Linux::Epoll->new;
+	$self->watch(@$_) for @{delete $self->{pending_watch} // []};
+	return $self->{epoll};
 }
 
 sub _id {
@@ -189,6 +196,8 @@ sub _try {
 	my ($self, $what, $cb) = (shift, shift, shift);
 	eval { $self->$cb(@_); 1 } or $self->emit(error => "$what failed: $@");
 }
+
+1;
 
 =head1 NAME
 
@@ -359,6 +368,14 @@ this method requires an active I/O watcher.
   # Pause watching for events
   $reactor->watch($handle, 0, 0);
 
+=head1 CAVEATS
+
+The epoll notification facility is exclusive to Linux systems.
+
+The epoll handle is not usable across forks, and this is not currently managed
+for you, though it is not created until the loop is started to allow for
+preforking deployments such as L<hypnotoad>.
+
 =head1 BUGS
 
 Report any issues on the public bugtracker.
@@ -377,7 +394,3 @@ the terms of the Artistic License version 2.0.
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojo::IOLoop>, L<Linux::Epoll>
-
-=cut
-
-1;

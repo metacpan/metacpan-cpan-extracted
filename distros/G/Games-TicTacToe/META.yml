@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,19 +21,19 @@ no_index:
 provides:
   Games::TicTacToe:
     file: lib/Games/TicTacToe.pm
-    version: '0.25'
+    version: '0.26'
   Games::TicTacToe::Board:
     file: lib/Games/TicTacToe/Board.pm
-    version: '0.25'
+    version: '0.26'
   Games::TicTacToe::Move:
     file: lib/Games/TicTacToe/Move.pm
-    version: '0.25'
+    version: '0.26'
   Games::TicTacToe::Params:
     file: lib/Games/TicTacToe/Params.pm
-    version: '0.25'
+    version: '0.26'
   Games::TicTacToe::Player:
     file: lib/Games/TicTacToe/Player.pm
-    version: '0.25'
+    version: '0.26'
 requires:
   Moo: '2.000000'
   MooX::Options: '4.023'
@@ -43,5 +43,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Games-TicTacToe.git
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

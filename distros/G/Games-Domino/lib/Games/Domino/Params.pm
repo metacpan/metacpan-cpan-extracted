@@ -1,6 +1,6 @@
 package Games::Domino::Params;
 
-$Games::Domino::Params::VERSION   = '0.31';
+$Games::Domino::Params::VERSION   = '0.32';
 $Games::Domino::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::Domino::Params - Placeholder for parameters for Games::Domino.
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 

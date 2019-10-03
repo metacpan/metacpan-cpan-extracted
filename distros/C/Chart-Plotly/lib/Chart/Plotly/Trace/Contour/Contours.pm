@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Contour::Contours::ImpliedEdits;
 use Chart::Plotly::Trace::Contour::Contours::Labelfont;
 
-our $VERSION = '0.027';    # VERSION
+our $VERSION = '0.028';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace contour.
 
@@ -58,7 +58,7 @@ has labelformat => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "Sets the contour label formatting rule using d3 formatting mini-language which is very similar to Python, see: https://github.com/d3/d3-format/blob/master/README.md#locale_format.",
+      "Sets the contour label formatting rule using d3 formatting mini-language which is very similar to Python, see: https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format",
 );
 
 has operation => (
@@ -112,7 +112,7 @@ Chart::Plotly::Trace::Contour::Contours - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ Sets the end contour level value. Must be more than `contours.start`
 
 =item * labelformat
 
-Sets the contour label formatting rule using d3 formatting mini-language which is very similar to Python, see: https://github.com/d3/d3-format/blob/master/README.md#locale_format.
+Sets the contour label formatting rule using d3 formatting mini-language which is very similar to Python, see: https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format
 
 =item * operation
 

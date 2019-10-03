@@ -1,5 +1,8 @@
 Revision history for Games::TicTacToe
 
+0.26    Thu Oct 03 18:00:00 2019
+        - Moved author test scripts to xt/ subfolder.
+
 0.25    Sun May 28 10:20:00 2017
         - Updated pod document with regard to the game script.
 

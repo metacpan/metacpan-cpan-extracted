@@ -1,7 +1,7 @@
 package App::ANSIColorUtils;
 
-our $DATE = '2019-02-13'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-08-20'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -95,6 +95,66 @@ sub show_assigned_rgb_colors {
     [200, "OK", \@rows, {"table.fields" => [qw/number string color light?/]}];
 }
 
+$SPEC{show_text_using_color_gradation} = {
+    v => 1.1,
+    summary => 'Print text using gradation between two colors',
+    description => <<'_',
+
+This can be used to demonstrate 24bit color support in terminal emulators.
+
+_
+    args => {
+        text => {
+            schema => ['str*', min_len=>1],
+            pos => 0,
+            description => <<'_',
+
+If unspecified, will show a bar of '=' across the terminal.
+
+_
+        },
+        color1 => {
+            schema => 'color::rgb24*',
+        },
+        color2 => {
+            schema => 'color::rgb24*',
+        },
+    },
+    examples => [
+        {
+            args => {color=>'blue', color2=>'pink', text=>'Hello, world'},
+            test => 0,
+            'x.doc_show_result'=>0,
+        },
+    ],
+};
+sub show_text_using_color_gradation {
+    require Color::ANSI::Util;
+    require Color::RGB::Util;
+    require Term::Size;
+
+    my %args = @_;
+
+    my $color1 = $args{color1} // 'ffff00';
+    my $color2 = $args{color2} // '0000ff';
+
+    my $text = $args{text};
+    $text //= do {
+        my $width = $ENV{COLUMNS} // (Term::Size::chars(*STDOUT{IO}))[0] // 80;
+        "X" x $width;
+    };
+    my $len = length $text;
+    my $i = 0;
+    for my $c (split //, $text) {
+        $i++;
+        my $color = Color::RGB::Util::mix_2_rgb_colors($color1, $color2, $i/$len);
+        print Color::ANSI::Util::ansifg($color), $c;
+    }
+    print "\n\e[0m";
+
+    [200];
+}
+
 1;
 # ABSTRACT: Utilities related to ANSI color
 
@@ -110,7 +170,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.004 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2019-02-13.
+This document describes version 0.005 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 DESCRIPTION
 
@@ -145,6 +205,8 @@ This distributions provides the following command-line utilities:
 =item * L<show-ansi-color-table>
 
 =item * L<show-assigned-rgb-colors>
+
+=item * L<show-text-using-color-gradation>
 
 =back
 
@@ -181,6 +243,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 show_assigned_rgb_colors
 
 Usage:
@@ -201,6 +264,55 @@ Arguments ('*' denotes required arguments):
 =item * B<strings>* => I<array[str]>
 
 =item * B<tone> => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 show_text_using_color_gradation
+
+Usage:
+
+ show_text_using_color_gradation(%args) -> [status, msg, payload, meta]
+
+Print text using gradation between two colors.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ show_text_using_color_gradation(text => "Hello, world", color2 => "pink", color => "blue"); # -> undef
+
+=back
+
+This can be used to demonstrate 24bit color support in terminal emulators.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<color1> => I<color::rgb24>
+
+=item * B<color2> => I<color::rgb24>
+
+=item * B<text> => I<str>
+
+If unspecified, will show a bar of '=' across the terminal.
 
 =back
 

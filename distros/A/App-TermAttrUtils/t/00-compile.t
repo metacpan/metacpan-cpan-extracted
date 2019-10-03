@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/TermAttrUtils.pm'
@@ -14,7 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/term-attrs',
-    'script/term-detect-software'
+    'script/term-detect-software',
+    'script/term-terminfo'
 );
 
 # no fake home requested

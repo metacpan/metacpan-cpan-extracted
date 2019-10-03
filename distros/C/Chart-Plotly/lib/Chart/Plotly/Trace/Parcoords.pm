@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Parcoords::Stream;
 use Chart::Plotly::Trace::Parcoords::Tickfont;
 use Chart::Plotly::Trace::Parcoords::Transform;
 
-our $VERSION = '0.027';    # VERSION
+our $VERSION = '0.028';    # VERSION
 
 # ABSTRACT: Parallel coordinates for multidimensional exploratory data analysis. The samples are specified in `dimensions`. The colors are set in `line.color`.
 
@@ -81,8 +81,21 @@ has idssrc => ( is            => "rw",
                 documentation => "Sets the source reference on plot.ly for  ids .",
 );
 
+has labelangle => (
+    is => "rw",
+    documentation =>
+      "Sets the angle of the labels with respect to the horizontal. For example, a `tickangle` of -90 draws the labels vertically. Tilted labels with *labelangle* may be positioned better inside margins when `labelposition` is set to *bottom*.",
+);
+
 has labelfont => ( is  => "rw",
                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Labelfont", );
+
+has labelside => (
+    is  => "rw",
+    isa => enum( [ "top", "bottom" ] ),
+    documentation =>
+      "Specifies the location of the `label`. *top* positions labels above, next to the title *bottom* positions labels below the graph Tilted labels with *labelangle* may be positioned better inside margins when `labelposition` is set to *bottom*.",
+);
 
 has line => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Line", );
@@ -151,7 +164,7 @@ Chart::Plotly::Trace::Parcoords - Parallel coordinates for multidimensional expl
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -250,7 +263,15 @@ Assigns id labels to each datum. These ids for object constancy of data points d
 
 Sets the source reference on plot.ly for  ids .
 
+=item * labelangle
+
+Sets the angle of the labels with respect to the horizontal. For example, a `tickangle` of -90 draws the labels vertically. Tilted labels with *labelangle* may be positioned better inside margins when `labelposition` is set to *bottom*.
+
 =item * labelfont
+
+=item * labelside
+
+Specifies the location of the `label`. *top* positions labels above, next to the title *bottom* positions labels below the graph Tilted labels with *labelangle* may be positioned better inside margins when `labelposition` is set to *bottom*.
 
 =item * line
 

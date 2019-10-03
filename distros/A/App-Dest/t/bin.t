@@ -4,11 +4,12 @@ use IPC::Run 'run';
 
 chdir( dirname($0) . '/../bin' );
 my ( $out, $err );
+my @dest = ( $^X, '-I../lib', 'dest' );
 
-run( [ qw( /usr/bin/env perl dest help ) ], \undef, \$out, \$err );
+run( [ @dest, 'help' ], \undef, \$out, \$err );
 like( $out, qr/Usage:\s+dest COMMAND \[OPTIONS\]/, 'help' );
 
-run( [ qw( /usr/bin/env perl dest version ) ], \undef, \$out, \$err );
+run( [ @dest, 'version' ], \undef, \$out, \$err );
 like( $out, qr/^dest version [\d\.]+$/, 'version' );
 
 done_testing();

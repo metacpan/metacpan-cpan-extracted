@@ -1,5 +1,13 @@
 Revision history for Ryu
 
+1.007     2019-10-03 00:25:56+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - ->ordered_futures was terminating too early due to previous changes, now
+    only finishes after all items are complete.
+
 1.006     2019-10-01 12:48:37+08:00 Asia/Kuala_Lumpur
     No new features.
 

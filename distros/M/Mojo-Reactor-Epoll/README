@@ -169,6 +169,14 @@ METHODS
       # Pause watching for events
       $reactor->watch($handle, 0, 0);
 
+CAVEATS
+
+    The epoll notification facility is exclusive to Linux systems.
+
+    The epoll handle is not usable across forks, and this is not currently
+    managed for you, though it is not created until the loop is started to
+    allow for preforking deployments such as hypnotoad.
+
 BUGS
 
     Report any issues on the public bugtracker.

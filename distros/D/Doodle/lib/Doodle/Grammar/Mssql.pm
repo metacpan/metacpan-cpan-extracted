@@ -6,7 +6,7 @@ use Data::Object 'Class', 'Doodle::Library';
 
 extends 'Doodle::Grammar';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 has name => (
   def => 'mssql',
@@ -315,20 +315,36 @@ Doodle Grammar For MSSQL
 
   use Doodle::Grammar::Mssql;
 
-  my $self = Doodle::Grammar::Mssql->new(%args);
+  my $self = Doodle::Grammar::Mssql->new;
 
 =cut
 
 =head1 DESCRIPTION
 
-Doodle::Grammar::Mssql determines how Command classes should be interpreted to
-produce the correct DDL statements.
+This provide determines how command classes should be interpreted to produce
+the correct DDL statements for Mssql.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Doodle::Grammar>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -340,7 +356,9 @@ Returns the SQL statement for the create column command.
 
 =over 4
 
-=item create_column example
+=item create_column example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -366,7 +384,9 @@ Returns the SQL statement for the create index command.
 
 =over 4
 
-=item create_index example
+=item create_index example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -392,7 +412,9 @@ Returns the SQL statement for the create relation command.
 
 =over 4
 
-=item create_relation example
+=item create_relation example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -419,7 +441,9 @@ Returns the SQL statement for the create schema command.
 
 =over 4
 
-=item create_schema example
+=item create_schema example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -444,7 +468,9 @@ Returns the SQL statement for the create table command.
 
 =over 4
 
-=item create_table example
+=item create_table example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -470,7 +496,9 @@ Returns the SQL statement for the delete column command.
 
 =over 4
 
-=item delete_column example
+=item delete_column example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -496,7 +524,9 @@ Returns the SQL statement for the delete index command.
 
 =over 4
 
-=item delete_index example
+=item delete_index example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -522,7 +552,9 @@ Returns the SQL statement for the delete relation command.
 
 =over 4
 
-=item delete_relation example
+=item delete_relation example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -548,7 +580,9 @@ Returns the SQL statement for the create schema command.
 
 =over 4
 
-=item delete_schema example
+=item delete_schema example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -573,7 +607,9 @@ Returns the SQL statement for the delete table command.
 
 =over 4
 
-=item delete_table example
+=item delete_table example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -599,7 +635,9 @@ Returns the SQL statement for the rename table command.
 
 =over 4
 
-=item rename_table example
+=item rename_table example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -625,7 +663,14 @@ Returns the type expression for a binary column.
 
 =over 4
 
-=item type_binary example
+=item type_binary example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('binary');
 
   $self->type_binary($column);
 
@@ -643,7 +688,14 @@ Returns the type expression for a boolean column.
 
 =over 4
 
-=item type_boolean example
+=item type_boolean example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('boolean');
 
   $self->type_boolean($column);
 
@@ -661,13 +713,33 @@ Returns the type expression for a char column.
 
 =over 4
 
-=item type_char example
+=item type_char example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('char');
 
   $self->type_char($column);
 
   # nchar(1)
 
-  $self->type_char($column, size => 10);
+=back
+
+=over 4
+
+=item type_char example #2
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('char', size => 10);
+
+  $self->type_char($column);
 
   # nchar(10)
 
@@ -683,7 +755,14 @@ Returns the type expression for a date column.
 
 =over 4
 
-=item type_date example
+=item type_date example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('date');
 
   $self->type_date($column);
 
@@ -701,7 +780,14 @@ Returns the type expression for a datetime column.
 
 =over 4
 
-=item type_datetime example
+=item type_datetime example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('datetime');
 
   $self->type_datetime($column);
 
@@ -719,7 +805,14 @@ Returns the type expression for a datetime_tz column.
 
 =over 4
 
-=item type_datetime_tz example
+=item type_datetime_tz example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('datetime_tz');
 
   $self->type_datetime_tz($column);
 
@@ -737,7 +830,14 @@ Returns the type expression for a decimal column.
 
 =over 4
 
-=item type_decimal example
+=item type_decimal example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('decimal');
 
   $self->type_decimal($column);
 
@@ -755,7 +855,14 @@ Returns the type expression for a double column.
 
 =over 4
 
-=item type_double example
+=item type_double example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('double');
 
   $self->type_double($column);
 
@@ -773,7 +880,14 @@ Returns the type expression for a enum column.
 
 =over 4
 
-=item type_enum example
+=item type_enum example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('enum');
 
   $self->type_enum($column);
 
@@ -791,7 +905,14 @@ Returns the type expression for a float column.
 
 =over 4
 
-=item type_float example
+=item type_float example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('float');
 
   $self->type_float($column);
 
@@ -809,7 +930,14 @@ Returns the type expression for a integer column.
 
 =over 4
 
-=item type_integer example
+=item type_integer example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer');
 
   $self->type_integer($column);
 
@@ -827,7 +955,14 @@ Returns the type expression for a integer_big column.
 
 =over 4
 
-=item type_integer_big example
+=item type_integer_big example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_big');
 
   $self->type_integer_big($column);
 
@@ -845,7 +980,14 @@ Returns the type expression for a integer_big_unsigned column.
 
 =over 4
 
-=item type_integer_big_unsigned example
+=item type_integer_big_unsigned example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_big_unsigned');
 
   $self->type_integer_big_unsigned($column);
 
@@ -863,7 +1005,14 @@ Returns the type expression for a integer_medium column.
 
 =over 4
 
-=item type_integer_medium example
+=item type_integer_medium example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_medium');
 
   $self->type_integer_medium($column);
 
@@ -881,7 +1030,14 @@ Returns the type expression for a integer_medium_unsigned column.
 
 =over 4
 
-=item type_integer_medium_unsigned example
+=item type_integer_medium_unsigned example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_medium_unsigned');
 
   $self->type_integer_medium_unsigned($column);
 
@@ -899,7 +1055,14 @@ Returns the type expression for a integer_small column.
 
 =over 4
 
-=item type_integer_small example
+=item type_integer_small example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_small');
 
   $self->type_integer_small($column);
 
@@ -917,7 +1080,14 @@ Returns the type expression for a integer_small_unsigned column.
 
 =over 4
 
-=item type_integer_small_unsigned example
+=item type_integer_small_unsigned example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_small_unsigned');
 
   $self->type_integer_small_unsigned($column);
 
@@ -935,7 +1105,14 @@ Returns the type expression for a integer_tiny column.
 
 =over 4
 
-=item type_integer_tiny example
+=item type_integer_tiny example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_tiny');
 
   $self->type_integer_tiny($column);
 
@@ -953,7 +1130,14 @@ Returns the type expression for a integer_tiny_unsigned column.
 
 =over 4
 
-=item type_integer_tiny_unsigned example
+=item type_integer_tiny_unsigned example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_tiny_unsigned');
 
   $self->type_integer_tiny_unsigned($column);
 
@@ -971,7 +1155,14 @@ Returns the type expression for a integer_unsigned column.
 
 =over 4
 
-=item type_integer_unsigned example
+=item type_integer_unsigned example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('integer_unsigned');
 
   $self->type_integer_unsigned($column);
 
@@ -989,7 +1180,14 @@ Returns the type expression for a json column.
 
 =over 4
 
-=item type_json example
+=item type_json example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('json');
 
   $self->type_json($column);
 
@@ -1007,7 +1205,14 @@ Returns the type expression for a string column.
 
 =over 4
 
-=item type_string example
+=item type_string example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('string');
 
   $self->type_string($column);
 
@@ -1025,7 +1230,14 @@ Returns the type expression for a text column.
 
 =over 4
 
-=item type_text example
+=item type_text example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('text');
 
   $self->type_text($column);
 
@@ -1043,7 +1255,14 @@ Returns the type expression for a text_long column.
 
 =over 4
 
-=item type_text_long example
+=item type_text_long example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('text_long');
 
   $self->type_text_long($column);
 
@@ -1061,7 +1280,14 @@ Returns the type expression for a text_medium column.
 
 =over 4
 
-=item type_text_medium example
+=item type_text_medium example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('text_medium');
 
   $self->type_text_medium($column);
 
@@ -1079,7 +1305,14 @@ Returns the type expression for a time column.
 
 =over 4
 
-=item type_time example
+=item type_time example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('time');
 
   $self->type_time($column);
 
@@ -1097,7 +1330,14 @@ Returns the type expression for a time_tz column.
 
 =over 4
 
-=item type_time_tz example
+=item type_time_tz example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('time_tz');
 
   $self->type_time_tz($column);
 
@@ -1115,7 +1355,14 @@ Returns the type expression for a timestamp column.
 
 =over 4
 
-=item type_timestamp example
+=item type_timestamp example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('timestamp');
 
   $self->type_timestamp($column);
 
@@ -1127,13 +1374,20 @@ Returns the type expression for a timestamp column.
 
 =head2 type_timestamp_tz
 
-  type_timestamp_tz(Column $column) :
+  type_timestamp_tz(Column $column) : Str
 
 Returns the type expression for a timestamp_tz column.
 
 =over 4
 
-=item type_timestamp_tz example
+=item type_timestamp_tz example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('timestamp_tz');
 
   $self->type_timestamp_tz($column);
 
@@ -1151,7 +1405,14 @@ Returns the type expression for a uuid column.
 
 =over 4
 
-=item type_uuid example
+=item type_uuid example #1
+
+  # given: synopsis
+
+  use Doodle;
+
+  my $ddl = Doodle->new;
+  my $column = $ddl->table('users')->column('uuid');
 
   $self->type_uuid($column);
 
@@ -1163,13 +1424,15 @@ Returns the type expression for a uuid column.
 
 =head2 update_column
 
-  update_column(Command $command) : Command
+  update_column(Command $command) : Str
 
 Returns the SQL statement for the update column command.
 
 =over 4
 
-=item update_column example
+=item update_column example #1
+
+  # given: synopsis
 
   use Doodle;
 
@@ -1201,12 +1464,42 @@ Returns a wrapped SQL identifier.
 
 =over 4
 
-=item wrap example
+=item wrap example #1
+
+  # given: synopsis
 
   my $wrapped = $self->wrap('data');
 
   # [data]
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

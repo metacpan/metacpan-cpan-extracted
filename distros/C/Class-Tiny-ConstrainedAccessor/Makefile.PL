@@ -202,7 +202,9 @@ my %opts = (
 
         x_contributors => [
             # Use CPAN emails so MetaCPAN will pick them up.
+            # In alphabetical order, except for the original author.
             'Christopher White <cxw@cpan.org>',
+            'Ivan Butorin <fishbone@cpan.org>',
             'Toby Inkster <tobyink@cpan.org>',
         ],
 

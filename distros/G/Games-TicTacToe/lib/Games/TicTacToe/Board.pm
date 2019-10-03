@@ -1,6 +1,6 @@
 package Games::TicTacToe::Board;
 
-$Games::TicTacToe::Board::VERSION   = '0.25';
+$Games::TicTacToe::Board::VERSION   = '0.26';
 $Games::TicTacToe::Board::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::TicTacToe::Board - Interface to the TicTacToe game's board.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

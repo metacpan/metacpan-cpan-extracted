@@ -1,5 +1,5 @@
 package ZMQ::Raw::Timer;
-$ZMQ::Raw::Timer::VERSION = '0.36';
+$ZMQ::Raw::Timer::VERSION = '0.37';
 use strict;
 use warnings;
 use Carp;
@@ -13,7 +13,7 @@ ZMQ::Raw::Timer - ZeroMQ Timer class
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -94,6 +94,11 @@ when the timer has elapsed.
 =head2 running( )
 
 Check if the timer is running.
+
+=head2 interval( [$interval] )
+
+Get and/or adjust the timer's interval. C<$interval> should be greater
+than zero.
 
 =head1 AUTHOR
 

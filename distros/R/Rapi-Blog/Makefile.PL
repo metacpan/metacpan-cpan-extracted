@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "Plack::Middleware::ConditionalGET" => 0,
     "Pod::Find" => 0,
     "Pod::Usage" => 0,
-    "RapidApp" => "1.3106",
+    "RapidApp" => "1.3108",
     "RapidApp::Builder" => 0,
     "RapidApp::Module::DbicPropPage" => 0,
     "RapidApp::Module::DbicRowDV" => 0,
@@ -101,7 +101,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.1002",
+  "VERSION" => "1.1004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -157,7 +157,7 @@ my %FallbackPrereqs = (
   "Plack::Middleware::ConditionalGET" => 0,
   "Pod::Find" => 0,
   "Pod::Usage" => 0,
-  "RapidApp" => "1.3106",
+  "RapidApp" => "1.3108",
   "RapidApp::Builder" => 0,
   "RapidApp::Module::DbicPropPage" => 0,
   "RapidApp::Module::DbicRowDV" => 0,

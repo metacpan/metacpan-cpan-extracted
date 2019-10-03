@@ -9,7 +9,7 @@ use Mojo::Util;
 
 use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub assets_dir { shift->{assets_dir} }
 sub out_dir    { shift->{out_dir} }
@@ -165,8 +165,8 @@ C<mojo webpack>, which is an alternative to C<morbo>:
   $ mojo webpack -h
   $ mojo webpack ./myapp.pl
 
-However if you want to use another daemon and make C<webpack> run, you need to
-set the C<MOJO_WEBPACK_BUILD> environment variable to "1". Example:
+However if you want to use another daemon and force C<webpack> to run, you need
+to set the C<MOJO_WEBPACK_BUILD> environment variable to "1". Example:
 
   MOJO_WEBPACK_BUILD=1 ./myapp.pl daemon
 

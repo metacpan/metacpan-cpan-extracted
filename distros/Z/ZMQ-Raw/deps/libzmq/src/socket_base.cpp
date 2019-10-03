@@ -54,6 +54,7 @@
 #include "ipc_listener.hpp"
 #include "tipc_listener.hpp"
 #include "tcp_connecter.hpp"
+#include "ws_address.hpp"
 #include "io_thread.hpp"
 #include "session_base.hpp"
 #include "config.hpp"
@@ -334,7 +335,9 @@ int zmq::socket_base_t::check_protocol (const std::string &protocol_) const
         && protocol_ != protocol_name::ipc
 #endif
         && protocol_ != protocol_name::tcp
+#ifdef ZMQ_HAVE_WS
         && protocol_ != protocol_name::ws
+#endif
 #if defined ZMQ_HAVE_OPENPGM
         //  pgm/epgm transports only available if 0MQ is compiled with OpenPGM.
         && protocol_ != "pgm"
@@ -631,6 +634,7 @@ int zmq::socket_base_t::bind (const char *endpoint_uri_)
         return 0;
     }
 
+#ifdef ZMQ_HAVE_WS
     if (protocol == protocol_name::ws) {
         ws_listener_t *listener =
           new (std::nothrow) ws_listener_t (io_thread, this, options);
@@ -651,6 +655,7 @@ int zmq::socket_base_t::bind (const char *endpoint_uri_)
         options.connected = true;
         return 0;
     }
+#endif
 
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
@@ -888,48 +893,20 @@ int zmq::socket_base_t::connect (const char *endpoint_uri_)
         }
         //  Defer resolution until a socket is opened
         paddr->resolved.tcp_addr = NULL;
-    } else if (protocol == protocol_name::ws) {
-        //  Do some basic sanity checks on ws:// address syntax
-        //  - hostname starts with digit or letter, with embedded '-' or '.'
-        //  - IPv6 address may contain hex chars and colons.
-        //  - IPv6 link local address may contain % followed by interface name / zone_id
-        //    (Reference: https://tools.ietf.org/html/rfc4007)
-        //  - IPv4 address may contain decimal digits and dots.
-        //  - Address must end in ":port" where port is *, or numeric
-        //  - Address may contain two parts separated by ':'
-        //  Following code is quick and dirty check to catch obvious errors,
-        //  without trying to be fully accurate.
-        const char *check = address.c_str ();
-        if (isalnum (*check) || isxdigit (*check) || *check == '['
-            || *check == ':') {
-            check++;
-            while (isalnum (*check) || isxdigit (*check) || *check == '.'
-                   || *check == '-' || *check == ':' || *check == '%'
-                   || *check == ';' || *check == '[' || *check == ']'
-                   || *check == '_' || *check == '*') {
-                check++;
-            }
-        }
-        //  Assume the worst, now look for success
-        rc = -1;
-        //  Did we reach the end of the address safely?
-        if (*check == 0) {
-            //  Do we have a valid port string? (cannot be '*' in connect
-            check = strrchr (address.c_str (), ':');
-            if (check) {
-                check++;
-                if (*check && (isdigit (*check)))
-                    rc = 0; //  Valid
-            }
-        }
-        if (rc == -1) {
-            errno = EINVAL;
+    }
+#ifdef ZMQ_HAVE_WS
+    else if (protocol == protocol_name::ws) {
+        paddr->resolved.ws_addr = new (std::nothrow) ws_address_t ();
+        alloc_assert (paddr->resolved.ws_addr);
+        rc = paddr->resolved.ws_addr->resolve (address.c_str (), false,
+                                               options.ipv6);
+        if (rc != 0) {
             LIBZMQ_DELETE (paddr);
             return -1;
         }
-        //  Defer resolution until a socket is opened
-        paddr->resolved.tcp_addr = NULL;
     }
+#endif
+
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
     else if (protocol == protocol_name::ipc) {

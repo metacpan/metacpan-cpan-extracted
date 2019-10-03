@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Role', 'Doodle::Library';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # METHODS
 
@@ -360,10 +360,14 @@ Doodle Table Helpers
 
 =head1 SYNOPSIS
 
+  use Doodle;
   use Doodle::Table;
 
+  my $ddl = Doodle->new;
+
   my $self = Doodle::Table->new(
-    name => 'users'
+    name => 'users',
+    doodle => $ddl
   );
 
 =cut
@@ -374,9 +378,17 @@ Helpers for configuring Table classes.
 
 =cut
 
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -388,7 +400,9 @@ Registers a binary column and returns the Command object set.
 
 =over 4
 
-=item binary example
+=item binary example #1
+
+  # given: synopsis
 
   my $binary = $self->binary('resume');
 
@@ -404,7 +418,9 @@ Registers a boolean column and returns the Command object set.
 
 =over 4
 
-=item boolean example
+=item boolean example #1
+
+  # given: synopsis
 
   my $boolean = $self->boolean('verified');
 
@@ -420,7 +436,9 @@ Registers a char column and returns the Command object set.
 
 =over 4
 
-=item char example
+=item char example #1
+
+  # given: synopsis
 
   my $char = $self->char('level', size => 2);
 
@@ -436,7 +454,9 @@ Registers a date column and returns the Command object set.
 
 =over 4
 
-=item date example
+=item date example #1
+
+  # given: synopsis
 
   my $date = $self->date('start_date');
 
@@ -452,7 +472,9 @@ Registers a datetime column and returns the Command object set.
 
 =over 4
 
-=item datetime example
+=item datetime example #1
+
+  # given: synopsis
 
   my $datetime = $self->datetime('published_at');
 
@@ -468,7 +490,9 @@ Registers a datetime column with timezone and returns the Command object set.
 
 =over 4
 
-=item datetime_tz example
+=item datetime_tz example #1
+
+  # given: synopsis
 
   my $datetime_tz = $self->datetime_tz('published_at');
 
@@ -484,7 +508,9 @@ Registers a decimal column and returns the Command object set.
 
 =over 4
 
-=item decimal example
+=item decimal example #1
+
+  # given: synopsis
 
   my $decimal = $self->decimal('point');
 
@@ -500,7 +526,9 @@ Registers a double column and returns the Command object set.
 
 =over 4
 
-=item double example
+=item double example #1
+
+  # given: synopsis
 
   my $double = $self->double('amount');
 
@@ -516,7 +544,9 @@ Registers an enum column and returns the Command object set.
 
 =over 4
 
-=item enum example
+=item enum example #1
+
+  # given: synopsis
 
   my $enum = $self->enum('colors', options => [
     'red', 'blue', 'green'
@@ -534,7 +564,9 @@ Registers a float column and returns the Command object set.
 
 =over 4
 
-=item float example
+=item float example #1
+
+  # given: synopsis
 
   my $float = $self->float('amount');
 
@@ -551,7 +583,9 @@ if it already exists.
 
 =over 4
 
-=item if_exists example
+=item if_exists example #1
+
+  # given: synopsis
 
   $self->if_exists;
 
@@ -568,7 +602,9 @@ if it doesn't already exist.
 
 =over 4
 
-=item if_not_exists example
+=item if_not_exists example #1
+
+  # given: synopsis
 
   $self->if_not_exists;
 
@@ -584,7 +620,9 @@ Registers an auto-incrementing big integer (8-byte) column and returns the Comma
 
 =over 4
 
-=item increments_big example
+=item increments_big example #1
+
+  # given: synopsis
 
   my $increments_big = $self->increments_big('number');
 
@@ -600,7 +638,9 @@ Registers an auto-incrementing medium integer (3-byte) column and returns the Co
 
 =over 4
 
-=item increments_medium example
+=item increments_medium example #1
+
+  # given: synopsis
 
   my $increments_medium = $self->increments_medium('number');
 
@@ -616,7 +656,9 @@ Registers an auto-incrementing small integer (2-byte) column and returns the Com
 
 =over 4
 
-=item increments_small example
+=item increments_small example #1
+
+  # given: synopsis
 
   my $increments_small = $self->increments_small('number');
 
@@ -632,7 +674,9 @@ Registers an integer (4-byte) column and returns the Command object set.
 
 =over 4
 
-=item integer example
+=item integer example #1
+
+  # given: synopsis
 
   my $integer = $self->integer('number');
 
@@ -648,7 +692,9 @@ Registers a big integer (8-byte) column and returns the Command object set.
 
 =over 4
 
-=item integer_big example
+=item integer_big example #1
+
+  # given: synopsis
 
   my $integer_big = $self->integer_big('number');
 
@@ -664,7 +710,9 @@ Registers an unsigned big integer (8-byte) column and returns the Command object
 
 =over 4
 
-=item integer_big_unsigned example
+=item integer_big_unsigned example #1
+
+  # given: synopsis
 
   my $integer_big_unsigned = $self->integer_big_unsigned('number');
 
@@ -680,7 +728,9 @@ Registers a medium integer (3-byte) column and returns the Command object set.
 
 =over 4
 
-=item integer_medium example
+=item integer_medium example #1
+
+  # given: synopsis
 
   my $integer_medium = $self->integer_medium('number');
 
@@ -696,7 +746,9 @@ Registers an unsigned medium integer (3-byte) column and returns the Command obj
 
 =over 4
 
-=item integer_medium_unsigned example
+=item integer_medium_unsigned example #1
+
+  # given: synopsis
 
   my $integer_medium_unsigned = $self->integer_medium_unsigned('number');
 
@@ -712,7 +764,9 @@ Registers a small integer (2-byte) column and returns the Command object set.
 
 =over 4
 
-=item integer_small example
+=item integer_small example #1
+
+  # given: synopsis
 
   my $integer_small = $self->integer_small('number');
 
@@ -728,7 +782,9 @@ Registers an unsigned small integer (2-byte) column and returns the Command obje
 
 =over 4
 
-=item integer_small_unsigned example
+=item integer_small_unsigned example #1
+
+  # given: synopsis
 
   my $integer_small_unsigned = $self->integer_small_unsigned('number');
 
@@ -744,7 +800,9 @@ Registers a tiny integer (1-byte) column and returns the Command object set.
 
 =over 4
 
-=item integer_tiny example
+=item integer_tiny example #1
+
+  # given: synopsis
 
   my $integer_tiny = $self->integer_tiny('number');
 
@@ -760,7 +818,9 @@ Registers an unsigned tiny integer (1-byte) column and returns the Command objec
 
 =over 4
 
-=item integer_tiny_unsigned example
+=item integer_tiny_unsigned example #1
+
+  # given: synopsis
 
   my $integer_tiny_unsigned = $self->integer_tiny_unsigned('number');
 
@@ -776,7 +836,9 @@ Registers an unsigned integer (4-byte) column and returns the Command object set
 
 =over 4
 
-=item integer_unsigned example
+=item integer_unsigned example #1
+
+  # given: synopsis
 
   my $integer_unsigned = $self->integer_unsigned('number');
 
@@ -792,7 +854,9 @@ Registers a JSON column and returns the Command object set.
 
 =over 4
 
-=item json example
+=item json example #1
+
+  # given: synopsis
 
   my $json = $self->json('metadata');
 
@@ -802,13 +866,15 @@ Registers a JSON column and returns the Command object set.
 
 =head2 morphs
 
-  morphs(Str $name) : [Column]
+  morphs(Str $name) : ArrayRef[Column]
 
 Registers columns neccessary for polymorphism and returns the Column object set.
 
 =over 4
 
-=item morphs example
+=item morphs example #1
+
+  # given: synopsis
 
   my $morphs = $self->morphs('parent');
 
@@ -818,14 +884,16 @@ Registers columns neccessary for polymorphism and returns the Column object set.
 
 =head2 no_morphs
 
-  no_morphs(Str $name) : [Command]
+  no_morphs(Str $name) : ArrayRef[Command]
 
 Registers a drop for C<{name}_fkey> and C<{name}_type> polymorphic columns and
 returns the Command object set.
 
 =over 4
 
-=item no_morphs example
+=item no_morphs example #1
+
+  # given: synopsis
 
   my $no_morphs = $self->no_morphs('profile');
 
@@ -835,14 +903,16 @@ returns the Command object set.
 
 =head2 no_timestamps
 
-  no_timestamps() : [Command]
+  no_timestamps() : ArrayRef[Command]
 
 Registers a drop for C<created_at>, C<updated_at> and C<deleted_at> columns and
 returns the Command object set.
 
 =over 4
 
-=item no_timestamps example
+=item no_timestamps example #1
+
+  # given: synopsis
 
   my $no_timestamps = $self->no_timestamps;
 
@@ -858,7 +928,9 @@ Registers primary key(s) and returns the Command object set.
 
 =over 4
 
-=item primary example
+=item primary example #1
+
+  # given: synopsis
 
   my $primary = $self->primary('id');
 
@@ -874,7 +946,9 @@ Registers a string column and returns the Command object set.
 
 =over 4
 
-=item string example
+=item string example #1
+
+  # given: synopsis
 
   my $string = $self->string('fname');
 
@@ -890,7 +964,9 @@ Denotes that the table created should be a temporary one.
 
 =over 4
 
-=item temporary example
+=item temporary example #1
+
+  # given: synopsis
 
   my $temporary = $self->temporary;
 
@@ -906,7 +982,9 @@ Registers a text column and returns the Command object set.
 
 =over 4
 
-=item text example
+=item text example #1
+
+  # given: synopsis
 
   my $text = $self->text('biography');
 
@@ -922,7 +1000,9 @@ Registers a long text column and returns the Command object set.
 
 =over 4
 
-=item text_long example
+=item text_long example #1
+
+  # given: synopsis
 
   my $text_long = $self->text_long('biography');
 
@@ -938,7 +1018,9 @@ Registers a medium text column and returns the Command object set.
 
 =over 4
 
-=item text_medium example
+=item text_medium example #1
+
+  # given: synopsis
 
   my $text_medium = $self->text_medium('biography');
 
@@ -954,7 +1036,9 @@ Registers a time column and returns the Command object set.
 
 =over 4
 
-=item time example
+=item time example #1
+
+  # given: synopsis
 
   my $time = $self->time('clock_in');
 
@@ -970,7 +1054,9 @@ Registers a time column with timezone and returns the Command object set.
 
 =over 4
 
-=item time_tz example
+=item time_tz example #1
+
+  # given: synopsis
 
   my $time_tz = $self->time_tz('clock_in');
 
@@ -986,7 +1072,9 @@ Registers a timestamp column and returns the Command object set.
 
 =over 4
 
-=item timestamp example
+=item timestamp example #1
+
+  # given: synopsis
 
   my $timestamp = $self->timestamp('verified');
 
@@ -1002,7 +1090,9 @@ Registers a timestamp_tz column and returns the Command object set.
 
 =over 4
 
-=item timestamp_tz example
+=item timestamp_tz example #1
+
+  # given: synopsis
 
   my $timestamp_tz = $self->timestamp_tz('verified');
 
@@ -1012,14 +1102,16 @@ Registers a timestamp_tz column and returns the Command object set.
 
 =head2 timestamps
 
-  timestamps() : [Column]
+  timestamps() : ArrayRef[Column]
 
 Registers C<created_at>, C<updated_at> and C<deleted_at> columns and returns
 the Command object set.
 
 =over 4
 
-=item timestamps example
+=item timestamps example #1
+
+  # given: synopsis
 
   my $timestamps = $self->timestamps;
 
@@ -1029,14 +1121,16 @@ the Command object set.
 
 =head2 timestamps_tz
 
-  timestamps_tz() : [Column]
+  timestamps_tz() : ArrayRef[Column]
 
 Registers C<created_at>, C<updated_at> and C<deleted_at> columns with timezone
 and returns the Command object set.
 
 =over 4
 
-=item timestamps_tz example
+=item timestamps_tz example #1
+
+  # given: synopsis
 
   my $timestamps_tz = $self->timestamps_tz;
 
@@ -1052,10 +1146,40 @@ Registers a uuid column and returns the Command object set.
 
 =over 4
 
-=item uuid example
+=item uuid example #1
+
+  # given: synopsis
 
   my $uuid = $self->uuid('reference');
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

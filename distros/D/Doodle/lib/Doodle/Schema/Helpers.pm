@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Role', 'Doodle::Library';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # METHODS
 
@@ -38,10 +38,14 @@ Doodle Schema Helpers
 
 =head1 SYNOPSIS
 
+  use Doodle;
   use Doodle::Schema;
 
+  my $ddl = Doodle->new;
+
   my $self = Doodle::Schema->new(
-    name => 'app'
+    name => 'app',
+    doodle => $ddl
   );
 
 =cut
@@ -52,9 +56,17 @@ Helpers for configuring Schema classes.
 
 =cut
 
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -67,7 +79,9 @@ if it already exists.
 
 =over 4
 
-=item if_exists example
+=item if_exists example #1
+
+  # given: synopsis
 
   $self->if_exists;
 
@@ -84,10 +98,40 @@ if it already exists.
 
 =over 4
 
-=item if_not_exists example
+=item if_not_exists example #1
+
+  # given: synopsis
 
   $self->if_not_exists;
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

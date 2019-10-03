@@ -36,6 +36,7 @@
 #include "udp_address.hpp"
 #include "ipc_address.hpp"
 #include "tipc_address.hpp"
+#include "ws_address.hpp"
 
 #if defined ZMQ_HAVE_VMCI
 #include "vmci_address.hpp"
@@ -56,11 +57,17 @@ zmq::address_t::address_t (const std::string &protocol_,
 
 zmq::address_t::~address_t ()
 {
-    if (protocol == protocol_name::tcp || protocol == protocol_name::ws) {
+    if (protocol == protocol_name::tcp) {
         LIBZMQ_DELETE (resolved.tcp_addr);
     } else if (protocol == protocol_name::udp) {
         LIBZMQ_DELETE (resolved.udp_addr);
     }
+#ifdef ZMQ_HAVE_WS
+    else if (protocol == protocol_name::ws) {
+        LIBZMQ_DELETE (resolved.ws_addr);
+    }
+#endif
+
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
     else if (protocol == protocol_name::ipc) {
@@ -85,6 +92,10 @@ int zmq::address_t::to_string (std::string &addr_) const
         return resolved.tcp_addr->to_string (addr_);
     if (protocol == protocol_name::udp && resolved.udp_addr)
         return resolved.udp_addr->to_string (addr_);
+#ifdef ZMQ_HAVE_WS
+    if (protocol == protocol_name::ws && resolved.ws_addr)
+        return resolved.ws_addr->to_string (addr_);
+#endif
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
     if (protocol == protocol_name::ipc && resolved.ipc_addr)

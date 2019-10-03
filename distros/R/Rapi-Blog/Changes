@@ -1,5 +1,14 @@
 Revision history for Rapi::Blog
 
+1.1004 2019-10-02
+    - Require RapidApp 1.3108 (VANSTYN)
+    - Added a few missing default TableSpec configs (VANSTYN)
+
+1.1003 2019-10-02
+    - Require RapidApp 1.3107 (VANSTYN)
+    - Fix bug in database fresh deploy (VANSTYN)
+    - POD fix - merged PR #4 (mohammad.anwar@yahoo.com)
+
 1.1002 2019-10-01
     - Added new template directive 'accessed_site' (VANSTYN)
     - Added baked-in reCAPTCHA v2 support (experimental) (VANSTYN)

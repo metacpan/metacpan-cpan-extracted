@@ -1,9 +1,9 @@
 This archive contains the distribution Test-MockObject,
-version 1.20180705:
+version 1.20191002:
 
   Perl extension for emulating troublesome interfaces
 
-This software is copyright (c) 2018 by chromatic@wgz.org.
+This software is copyright (c) 2019 by chromatic@wgz.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

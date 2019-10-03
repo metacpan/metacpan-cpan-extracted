@@ -1,0 +1,16 @@
+Revision history for Perl extension MySQL-Dump-Parser-XS
+
+0.03 2019-10-02T14:37:14Z
+
+    - Fixed Changes (this file) format.
+
+0.02 2019-10-02T14:31:47Z
+
+    - Fixed repository url
+    - Add docs
+    - Supports quoted strings (lemzwerg)
+
+0.01 2014-11-25T07:03:59Z
+
+    - original version
+

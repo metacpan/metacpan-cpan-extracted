@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.6");
+use version; our $VERSION = version->declare("v3.1.7");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -256,7 +256,7 @@ See L<CPAN::Meta::Spec>.
 
 =item badges
 
-    badges = ['travis-ci.com', 'travis-ci.org', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter', 'metacpan', 'kritika']
+    badges = ['travis-ci.com', 'travis-ci.org', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter', 'metacpan', 'kritika', 'github-actions/$workflow_name']
 
 Embed badges image (e.g. Travis-CI) to README.md. It ought to be array and each elements must be service name. Now, supported services are 'travis-ci.com', 'travis-ci.org', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter', 'metacpan' and 'kritika'.
 

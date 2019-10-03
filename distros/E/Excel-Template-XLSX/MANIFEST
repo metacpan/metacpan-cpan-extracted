@@ -17,6 +17,8 @@ t/06-cell.t
 t/07-two_templates.t
 t/08-open_output.t
 t/09-template_callback.t
+t/10-array_formulas.t
+t/11-formulas.t
 t/99-todo.t
 t/boilerplate.t
 t/manifest.t

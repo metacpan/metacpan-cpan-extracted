@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Role', 'Doodle::Library';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # BUILD
 # METHODS
@@ -224,6 +224,12 @@ method not_null(Any %args) {
   return $self;
 }
 
+method references(Str $ftable, Str @args) {
+  my $table = $self->table;
+
+  return $table->relation($self->name, $ftable, @args);
+}
+
 method string(Any %args) {
   $self->type('string');
 
@@ -316,7 +322,22 @@ Doodle Column Helpers
 
   use Doodle::Column;
 
-  my $self = Doodle::Column->new(%args);
+  use Doodle;
+  use Doodle::Column;
+  use Doodle::Table;
+
+  my $ddl = Doodle->new;
+
+  my $table = Doodle::Table->new(
+    name => 'users',
+    doodle => $ddl
+  );
+
+  my $self = Doodle::Column->new(
+    name => 'id',
+    table => $table,
+    doodle => $ddl
+  );
 
 =cut
 
@@ -326,9 +347,17 @@ Helpers for configuring Column classes.
 
 =cut
 
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -340,7 +369,9 @@ Configures a binary column and returns itself.
 
 =over 4
 
-=item binary example
+=item binary example #1
+
+  # given: synopsis
 
   my $binary = $self->binary;
 
@@ -356,7 +387,9 @@ Configures a boolean column and returns itself.
 
 =over 4
 
-=item boolean example
+=item boolean example #1
+
+  # given: synopsis
 
   my $boolean = $self->boolean;
 
@@ -372,7 +405,9 @@ Configures a char column and returns itself.
 
 =over 4
 
-=item char example
+=item char example #1
+
+  # given: synopsis
 
   my $char = $self->char;
 
@@ -388,7 +423,9 @@ Configures a date column and returns itself.
 
 =over 4
 
-=item date example
+=item date example #1
+
+  # given: synopsis
 
   my $date = $self->date;
 
@@ -404,7 +441,9 @@ Configures a datetime column and returns itself.
 
 =over 4
 
-=item datetime example
+=item datetime example #1
+
+  # given: synopsis
 
   my $datetime = $self->datetime;
 
@@ -420,7 +459,9 @@ Configures a datetime column with timezone and returns itself.
 
 =over 4
 
-=item datetime_tz example
+=item datetime_tz example #1
+
+  # given: synopsis
 
   my $datetime_tz = $self->datetime_tz;
 
@@ -436,7 +477,9 @@ Configures a decimal column and returns itself.
 
 =over 4
 
-=item decimal example
+=item decimal example #1
+
+  # given: synopsis
 
   my $decimal = $self->decimal;
 
@@ -452,7 +495,9 @@ Configures a double column and returns itself.
 
 =over 4
 
-=item double example
+=item double example #1
+
+  # given: synopsis
 
   my $double = $self->double;
 
@@ -468,7 +513,9 @@ Configures an enum column and returns itself.
 
 =over 4
 
-=item enum example
+=item enum example #1
+
+  # given: synopsis
 
   my $enum = $self->enum(options => [
     'red', 'blue', 'green'
@@ -486,7 +533,9 @@ Configures a float column and returns itself.
 
 =over 4
 
-=item float example
+=item float example #1
+
+  # given: synopsis
 
   my $float = $self->float;
 
@@ -502,7 +551,9 @@ Denotes that the column auto-increments and returns the Column object.
 
 =over 4
 
-=item increments example
+=item increments example #1
+
+  # given: synopsis
 
   my $increments = $self->increments;
 
@@ -518,7 +569,9 @@ Configures an auto-incrementing big integer (8-byte) column and returns itself.
 
 =over 4
 
-=item increments_big example
+=item increments_big example #1
+
+  # given: synopsis
 
   my $increments_big = $self->increments_big;
 
@@ -534,7 +587,9 @@ Configures an auto-incrementing medium integer (3-byte) column and returns itsel
 
 =over 4
 
-=item increments_medium example
+=item increments_medium example #1
+
+  # given: synopsis
 
   my $increments_medium = $self->increments_medium;
 
@@ -550,7 +605,9 @@ Configures an auto-incrementing small integer (2-byte) column and returns itself
 
 =over 4
 
-=item increments_small example
+=item increments_small example #1
+
+  # given: synopsis
 
   my $increments_small = $self->increments_small;
 
@@ -566,7 +623,9 @@ Configures an integer (4-byte) column and returns itself.
 
 =over 4
 
-=item integer example
+=item integer example #1
+
+  # given: synopsis
 
   my $integer = $self->integer;
 
@@ -582,7 +641,9 @@ Configures a big integer (8-byte) column and returns itself.
 
 =over 4
 
-=item integer_big example
+=item integer_big example #1
+
+  # given: synopsis
 
   my $integer_big = $self->integer_big;
 
@@ -598,7 +659,9 @@ Configures an unsigned big integer (8-byte) column and returns itself.
 
 =over 4
 
-=item integer_big_unsigned example
+=item integer_big_unsigned example #1
+
+  # given: synopsis
 
   my $integer_big_unsigned = $self->integer_big_unsigned;
 
@@ -614,9 +677,11 @@ Configures a medium integer (3-byte) column and returns itself.
 
 =over 4
 
-=item integer_medium example
+=item integer_medium example #1
 
-  my $integer_medium = $self->integer_medium('number');
+  # given: synopsis
+
+  my $integer_medium = $self->integer_medium;
 
 =back
 
@@ -630,9 +695,11 @@ Configures an unsigned medium integer (3-byte) column and returns itself.
 
 =over 4
 
-=item integer_medium_unsigned example
+=item integer_medium_unsigned example #1
 
-  my $integer_medium_unsigned = $self->integer_medium_unsigned('number');
+  # given: synopsis
+
+  my $integer_medium_unsigned = $self->integer_medium_unsigned;
 
 =back
 
@@ -646,7 +713,9 @@ Configures a small integer (2-byte) column and returns itself.
 
 =over 4
 
-=item integer_small example
+=item integer_small example #1
+
+  # given: synopsis
 
   my $integer_small = $self->integer_small;
 
@@ -662,7 +731,9 @@ Configures an unsigned small integer (2-byte) column and returns itself.
 
 =over 4
 
-=item integer_small_unsigned example
+=item integer_small_unsigned example #1
+
+  # given: synopsis
 
   my $integer_small_unsigned = $self->integer_small_unsigned;
 
@@ -678,7 +749,9 @@ Configures a tiny integer (1-byte) column and returns itself.
 
 =over 4
 
-=item integer_tiny example
+=item integer_tiny example #1
+
+  # given: synopsis
 
   my $integer_tiny = $self->integer_tiny;
 
@@ -694,7 +767,9 @@ Configures an unsigned tiny integer (1-byte) column and returns itself.
 
 =over 4
 
-=item integer_tiny_unsigned example
+=item integer_tiny_unsigned example #1
+
+  # given: synopsis
 
   my $integer_tiny_unsigned = $self->integer_tiny_unsigned;
 
@@ -710,7 +785,9 @@ Configures an unsigned integer (4-byte) column and returns itself.
 
 =over 4
 
-=item integer_unsigned example
+=item integer_unsigned example #1
+
+  # given: synopsis
 
   my $integer_unsigned = $self->integer_unsigned;
 
@@ -726,7 +803,9 @@ Configures a JSON column and returns itself.
 
 =over 4
 
-=item json example
+=item json example #1
+
+  # given: synopsis
 
   my $json = $self->json;
 
@@ -742,7 +821,9 @@ Denotes that the Column is not nullable and returns itself.
 
 =over 4
 
-=item not_null example
+=item not_null example #1
+
+  # given: synopsis
 
   my $not_null = $self->not_null;
 
@@ -758,7 +839,9 @@ Denotes that the Column is nullable and returns itself.
 
 =over 4
 
-=item null example
+=item null example #1
+
+  # given: synopsis
 
   my $null = $self->null;
 
@@ -774,9 +857,39 @@ Denotes that the column is the primary key and returns the Column object.
 
 =over 4
 
-=item primary example
+=item primary example #1
+
+  # given: synopsis
 
   my $primary = $self->primary('id');
+
+=back
+
+=cut
+
+=head2 references
+
+  references(Str $table, Str $column) : Relation
+
+Configures a relation and returns the Relation object.
+
+=over 4
+
+=item references example #1
+
+  # given: synopsis
+
+  my $references = $self->references('entities');
+
+=back
+
+=over 4
+
+=item references example #2
+
+  # given: synopsis
+
+  my $references = $self->references('entities', 'uuid');
 
 =back
 
@@ -790,7 +903,9 @@ Configures a string column and returns itself.
 
 =over 4
 
-=item string example
+=item string example #1
+
+  # given: synopsis
 
   my $string = $self->string;
 
@@ -806,7 +921,9 @@ Configures a text column and returns itself.
 
 =over 4
 
-=item text example
+=item text example #1
+
+  # given: synopsis
 
   my $text = $self->text;
 
@@ -822,7 +939,9 @@ Configures a long text column and returns itself.
 
 =over 4
 
-=item text_long example
+=item text_long example #1
+
+  # given: synopsis
 
   my $text_long = $self->text_long;
 
@@ -838,7 +957,9 @@ Configures a medium text column and returns itself.
 
 =over 4
 
-=item text_medium example
+=item text_medium example #1
+
+  # given: synopsis
 
   my $text_medium = $self->text_medium;
 
@@ -854,7 +975,9 @@ Configures a time column and returns itself.
 
 =over 4
 
-=item time example
+=item time example #1
+
+  # given: synopsis
 
   my $time = $self->time;
 
@@ -870,7 +993,9 @@ Configures a time column with timezone and returns itself.
 
 =over 4
 
-=item time_tz example
+=item time_tz example #1
+
+  # given: synopsis
 
   my $time_tz = $self->time_tz;
 
@@ -886,7 +1011,9 @@ Configures a timestamp column and returns itself.
 
 =over 4
 
-=item timestamp example
+=item timestamp example #1
+
+  # given: synopsis
 
   my $timestamp = $self->timestamp;
 
@@ -902,7 +1029,9 @@ Configures a timestamp_tz column and returns itself.
 
 =over 4
 
-=item timestamp_tz example
+=item timestamp_tz example #1
+
+  # given: synopsis
 
   my $timestamp_tz = $self->timestamp_tz;
 
@@ -918,10 +1047,40 @@ Configures a uuid column and returns itself.
 
 =over 4
 
-=item uuid example
+=item uuid example #1
+
+  # given: synopsis
 
   my $uuid = $self->uuid;
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

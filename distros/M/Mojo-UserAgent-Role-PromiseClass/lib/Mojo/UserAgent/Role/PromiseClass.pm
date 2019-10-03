@@ -4,7 +4,7 @@ package Mojo::UserAgent::Role::PromiseClass;
 
 use Mojo::Base -role;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 has promise_class => sub { 'Mojo::Promise' };
 
@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-Mojo::UserAgent::Role::PromiseClass -
+Mojo::UserAgent::Role::PromiseClass - Choose the Promise class used by Mojo::UserAgent
 
 =head1 SYNOPSIS
 

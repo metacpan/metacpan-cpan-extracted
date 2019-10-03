@@ -10,3 +10,6 @@ Revision history for Perl extension App::PLab.
 
 0.04  Oct 5 2017 
         - hidef fixes
+
+0.05  Oct 2 2019
+	- minor fixes

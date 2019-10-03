@@ -1,5 +1,11 @@
 Revision history for Music-Cadence
 
+0.1309 2019-10-02 10:04:07
+    - Just check that we die, instead of the M::TR error message. thrig++
+
+0.1308 2019-10-02 09:53:19
+    - Correct expected error message from the latest Music::ToRoman.
+
 0.1307 2019-09-04 11:57:54
     - Improve documentation.
 

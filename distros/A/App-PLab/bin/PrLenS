@@ -6,6 +6,7 @@ use Prima;
 use Prima::Application name => "PrLenS";
 use Prima::Edit;
 use Prima::ExtLists;
+use App::PLab;
 use App::PLab::ImageApp;
 use App::PLab::Calibrations;
 use Prima::IPA qw/Local Misc Point Global Morphology Region/;
@@ -1790,7 +1791,7 @@ sub opt_propcreate
        origin => [ 190, 220],
        width  => 120,
        min    => 4,
-       max    => 20,
+       max    => 120,
        name   => 'PointSize',
        hint   => 'Size of point used for cell markings',
    ], [ Label => 
@@ -2011,7 +2012,7 @@ my $w = LenWindow-> create(
       $wedt,
       App::PLab::ImageAppWindow::winmenu_view(),
       [],["~Help" => [
-         [ HelpAbout =>  "~About" => sub {Prima::MsgBox::message("PLab application series, Process Lengths, version 2.00", mb::OK|mb::Information)}],
+         [ HelpAbout =>  "~About" => sub {Prima::MsgBox::message("PLab application series, Process Lengths, version $App::PLab::VERSION", mb::OK|mb::Information)}],
          [ HelpPlabApps => "~PLab Apps" => sub { $_[0]-> open_help(); }],
       ]],
    ],

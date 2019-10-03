@@ -38,3 +38,6 @@ Revision history for Mojolicious::Plugin::ValidateTiny
 
 1.0.1
         Replace smartmatch
+
+1.0.2
+        Take mojo.captures from stash

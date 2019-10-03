@@ -39,6 +39,7 @@ test_badges
       license
       version
       docker_build
+      github_actions/test
     )],
   },
   'non default badges';

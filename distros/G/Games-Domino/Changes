@@ -1,5 +1,8 @@
 Revision history for Games::Domino
 
+0.32    Wed Oct 02 17:50:00 2019
+        - Moved author test scripts to xt/ subfolder.
+
 0.31    Mon Aug 27 07:40:00 2018
         - Replaced namespace::clean with namespace::autoclean.
 

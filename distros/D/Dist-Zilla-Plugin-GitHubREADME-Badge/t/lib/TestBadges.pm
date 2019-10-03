@@ -33,6 +33,7 @@ sub badge_patterns {
     gitlab_cover => qr{//github.com/$ur/badges/master/coverage.svg},
     docker_automated=> qr{//img.shields.io/docker/automated/\L$ur\E\.},
     docker_build    => qr{//img.shields.io/docker/build/\L$ur\E\.},
+    'github_actions/test' => qr{//github.com/$ur/workflows/test/badge.svg},
   };
 }
 

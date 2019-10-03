@@ -1,5 +1,5 @@
 package Test::MockObject;
-$Test::MockObject::VERSION = '1.20180705';
+$Test::MockObject::VERSION = '1.20191002';
 use strict;
 use warnings;
 

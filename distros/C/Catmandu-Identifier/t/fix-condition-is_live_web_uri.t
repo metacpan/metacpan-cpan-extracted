@@ -18,8 +18,8 @@ $cond->pass_fixes([Catmandu::Fix::set_field->new('test', 'pass')]);
 $cond->fail_fixes([Catmandu::Fix::set_field->new('test', 'fail')]);
 
 is_deeply
-    $cond->fix({uri => "http://librecat.org"}),
-    {uri =>  "http://librecat.org", test => 'pass'},
+    $cond->fix({uri => "https://librecat.org"}),
+    {uri =>  "https://librecat.org", test => 'pass'},
     "is valid";
 
 is_deeply

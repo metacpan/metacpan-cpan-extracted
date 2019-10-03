@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.027';    # VERSION
+our $VERSION = '0.028';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattermapbox.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Scattermapbox::Textfont - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,8 @@ version 0.027
                                       layout => { autosize  => 'True',
                                                   hovermode => 'closest',
                                                   mapbox    => {
-                                                              accesstoken => $mapbox_access_token,
+                                                              style       => 'open-street-map',
+                                                              #accesstoken => $mapbox_access_token,
                                                               bearing     => 0,
                                                               center      => {
                                                                           lat => 38.92,

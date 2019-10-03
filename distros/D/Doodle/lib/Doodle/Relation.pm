@@ -6,11 +6,11 @@ use Data::Object 'Class', 'Doodle::Library';
 
 with 'Doodle::Relation::Helpers';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 has name => (
   is => 'ro',
-  isa => 'Any',
+  isa => 'Str',
   bld => 'new_name',
   lzy => 1
 );
@@ -49,7 +49,7 @@ has data => (
 # BUILD
 
 fun new_data($self) {
-  return do('hash', {});
+  return {};
 }
 
 fun new_name($self) {
@@ -115,21 +115,105 @@ Doodle Relation Class
 
 =head1 SYNOPSIS
 
+  use Doodle;
   use Doodle::Relation;
+  use Doodle::Table;
 
-  my $self = Doodle::Relation->new(%args);
+  my $ddl = Doodle->new;
+
+  my $table = Doodle::Table->new(
+    name => 'users',
+    doodle => $ddl
+  );
+
+  my $self = Doodle::Relation->new(
+    table => $table,
+    column => 'person_id',
+    foreign_table => 'persons',
+    foreign_column => 'id'
+  );
 
 =cut
 
 =head1 DESCRIPTION
 
-Table relation representation.
+This package provides a representation of a table relation.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Doodle::Relation::Helpers>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 column
+
+  column(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is required.
+
+=cut
+
+=head2 data
+
+  data(Data)
+
+This attribute is read-only, accepts C<(Data)> values, and is optional.
+
+=cut
+
+=head2 foreign_column
+
+  foreign_column(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is required.
+
+=cut
+
+=head2 foreign_table
+
+  foreign_table(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is required.
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 table
+
+  table(Table)
+
+This attribute is read-only, accepts C<(Table)> values, and is required.
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
@@ -141,7 +225,9 @@ Registers a relation create and returns the Command object.
 
 =over 4
 
-=item create example
+=item create example #1
+
+  # given: synopsis
 
   my $create = $self->create;
 
@@ -157,7 +243,9 @@ Registers a relation update and returns the Command object.
 
 =over 4
 
-=item delete example
+=item delete example #1
+
+  # given: synopsis
 
   my $delete = $self->delete;
 
@@ -173,10 +261,40 @@ Returns the associated Doodle object.
 
 =over 4
 
-=item doodle example
+=item doodle example #1
+
+  # given: synopsis
 
   my $doodle = $self->doodle;
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

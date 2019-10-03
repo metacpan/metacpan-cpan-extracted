@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Prima;
 use Prima::Application name => "ManCen";
+use App::PLab;
 use App::PLab::ImageApp;
 use App::PLab::Calibrations;
 
@@ -890,7 +891,7 @@ my $w = CenWindow-> create(
       $wedt,
       App::PLab::ImageAppWindow::winmenu_view(),
       [],[ "~Help" => [
-         [ HelpAbout    => "~About" => sub {Prima::MsgBox::message("PLab application series, ManCen, version 1.00", mb::OK|mb::Information)}],
+         [ HelpAbout    => "~About" => sub {Prima::MsgBox::message("PLab application series, ManCen, version $App::PLab::VERSION", mb::OK|mb::Information)}],
          [ HelpPlabApps => "~PLab Apps" => sub { $_[0]-> open_help(); }],
          [ HelpContents => "~Contents" => sub { $_[0]-> open_help("ManCen"); }],
       ]],

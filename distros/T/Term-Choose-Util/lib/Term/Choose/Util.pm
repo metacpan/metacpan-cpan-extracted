@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width unicode_sprintf
@@ -745,8 +745,9 @@ sub choose_a_subset {
             if ( ! @$new_idx && $opt->{all_by_default} ) {
                 $new_idx = [ 0 .. $#{$available} ];
             }
+            my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
             $self->__restore_defaults();
-            return $self->{index} ? $new_idx : [ @{$available}[@$new_idx] ];
+            return $return_indexes ? $new_idx : [ @{$available}[@$new_idx] ];
         }
     }
 }
@@ -919,7 +920,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.101
+Version 0.102
 
 =cut
 

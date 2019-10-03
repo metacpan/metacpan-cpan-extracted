@@ -4,7 +4,7 @@
       "Dmitry Karasik <dk@plab.ku.dk>, Anton Berezin <tobez@plab.ku.dk>, Vadim Belman <voland@plab.ku.dk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -39,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON version 2.94"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON version 2.97001"
 }

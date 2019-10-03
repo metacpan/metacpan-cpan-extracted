@@ -71,7 +71,6 @@ extern "C" {
 #error You need at least Windows XP target
 #endif
 #endif
-#include <winsock2.h>
 #endif
 
 /*  Handle DSO symbol visibility                                             */
@@ -498,7 +497,12 @@ ZMQ_EXPORT int zmq_socket_monitor (void *s_, const char *addr_, int events_);
 /******************************************************************************/
 
 #if defined _WIN32
-typedef SOCKET zmq_fd_t;
+// Windows uses a pointer-sized unsigned integer to store the socket fd.
+#if defined _WIN64
+typedef unsigned __int64 zmq_fd_t;
+#else
+typedef unsigned int zmq_fd_t;
+#endif
 #else
 typedef int zmq_fd_t;
 #endif
@@ -669,6 +673,16 @@ ZMQ_EXPORT void zmq_threadclose (void *thread_);
 
 /*  DRAFT Context options                                                     */
 #define ZMQ_ZERO_COPY_RECV 10
+
+/*  DRAFT Context methods.                                                    */
+ZMQ_EXPORT int zmq_ctx_set_ext (void *context_,
+                                int option_,
+                                const void *optval_,
+                                size_t optvallen_);
+ZMQ_EXPORT int zmq_ctx_get_ext (void *context_,
+                                int option_,
+                                void *optval_,
+                                size_t *optvallen_);
 
 /*  DRAFT Socket methods.                                                     */
 ZMQ_EXPORT int zmq_join (void *s, const char *group);

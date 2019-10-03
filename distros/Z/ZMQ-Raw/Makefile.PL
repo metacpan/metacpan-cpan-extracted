@@ -66,6 +66,7 @@ if ($is_windows)
 
 # generate the platform.hpp file
 my @opts = (
+	'ZMQ_HAVE_WS',
 	'ZMQ_HAVE_SO_KEEPALIVE',
 	'ZMQ_HAVE_CURVE',
 	'ZMQ_USE_TWEETNACL',
@@ -305,7 +306,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.36",
+  "VERSION" => "0.37",
   "test" => {
     "TESTS" => "t/*.t"
   }

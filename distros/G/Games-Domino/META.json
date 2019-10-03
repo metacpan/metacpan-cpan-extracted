@@ -4,13 +4,13 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Games-Domino",
    "no_index" : {
@@ -49,19 +49,19 @@
    "provides" : {
       "Games::Domino" : {
          "file" : "lib/Games/Domino.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "Games::Domino::Params" : {
          "file" : "lib/Games/Domino/Params.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "Games::Domino::Player" : {
          "file" : "lib/Games/Domino/Player.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "Games::Domino::Tile" : {
          "file" : "lib/Games/Domino/Tile.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/manwar/Games-Domino"
       }
    },
-   "version" : "0.31",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.32",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

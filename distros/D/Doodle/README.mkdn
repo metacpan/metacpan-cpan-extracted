@@ -10,20 +10,20 @@ Database DDL (= Data Definition Language) Statement Builder
 
     use Doodle;
 
-    my $d = Doodle->new;
-    my $t = $d->table('users');
+    my $self = Doodle->new;
+    my $table = $self->table('users');
 
-    $t->primary('id');
-    $t->uuid('arid');
-    $t->column('name');
-    $t->string('email');
-    $t->json('metadata');
+    $table->primary('id');
+    $table->uuid('arid');
+    $table->column('name');
+    $table->string('email');
+    $table->json('metadata');
 
-    my $x = $t->create;
-    my $g = $d->grammar('sqlite');
-    my $s = $g->execute($x);
+    my $command = $table->create;
+    my $grammar = $self->grammar('sqlite');
+    my $statement = $grammar->execute($command);
 
-    say $s->sql;
+    # say $statement->sql;
 
     # create table "users" (
     #   "id" integer primary key,
@@ -41,17 +41,41 @@ statement builder and provides an object-oriented
 abstraction for performing schema changes in various datastores.
 This class consumes the [Doodle::Helpers](https://metacpan.org/pod/Doodle::Helpers) roles.
 
+# INTEGRATES
+
+This package integrates behaviors from:
+
+[Doodle::Helpers](https://metacpan.org/pod/Doodle::Helpers)
+
+# LIBRARIES
+
+This package uses type constraints from:
+
+[Doodle::Library](https://metacpan.org/pod/Doodle::Library)
+
+# ATTRIBUTES
+
+This package has the following attributes:
+
+## commands
+
+    commands(Commands)
+
+This attribute is read-only, accepts `(Commands)` values, and is optional.
+
 # METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 ## build
 
-    build(Grammar $grammar, CodeRef $callback) : ()
+    build(Grammar $grammar, CodeRef $callback) : Any
 
 Execute a given callback for each generated SQL statement.
 
-- build example
+- build example #1
+
+        # given: synopsis
 
         $self->build($grammar, sub {
           my $statement = shift;
@@ -65,9 +89,13 @@ Execute a given callback for each generated SQL statement.
 
 Returns a new Grammar object.
 
-- grammar example
+- grammar example #1
 
-        my $grammar = $self->grammar('sqlite');
+        # given: synopsis
+
+        my $type = 'sqlite';
+
+        $grammar = $self->grammar($type);
 
 ## schema
 
@@ -75,17 +103,23 @@ Returns a new Grammar object.
 
 Returns a new Schema object.
 
-- schema example
+- schema example #1
+
+        # given: synopsis
+
+        my $name = 'app';
 
         my $schema = $self->schema($name);
 
 ## statements
 
-    statements(Grammar $g) : [Statement]
+    statements(Grammar $g) : Statements
 
 Returns a set of Statement objects for the given grammar.
 
-- statements example
+- statements example #1
+
+        # given: synopsis
 
         my $statements = $self->statements($grammar);
 
@@ -95,6 +129,36 @@ Returns a set of Statement objects for the given grammar.
 
 Return a new Table object.
 
-- table example
+- table example #1
 
-        my $table = $self->table('users');
+        # given: synopsis
+
+        my $name = 'users';
+
+        $table = $self->table($name);
+
+# AUTHOR
+
+Al Newkirk, `awncorp@cpan.org`
+
+# LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the ["license
+file"](https://github.com/iamalnewkirk/doodle/blob/master/LICENSE).
+
+# PROJECT
+
+[Wiki](https://github.com/iamalnewkirk/doodle/wiki)
+
+[Project](https://github.com/iamalnewkirk/doodle)
+
+[Initiatives](https://github.com/iamalnewkirk/doodle/projects)
+
+[Milestones](https://github.com/iamalnewkirk/doodle/milestones)
+
+[Contributing](https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md)
+
+[Issues](https://github.com/iamalnewkirk/doodle/issues)

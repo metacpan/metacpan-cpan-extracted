@@ -3,7 +3,7 @@ NAME
     attributes
 
 VERSION
-    This document describes version 0.001 of App::TermAttrUtils (from Perl
+    This document describes version 0.003 of App::TermAttrUtils (from Perl
     distribution App-TermAttrUtils), released on 2019-08-20.
 
 DESCRIPTION
@@ -14,6 +14,8 @@ DESCRIPTION
     *   term-attrs
 
     *   term-detect-software
+
+    *   term-terminfo
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -31,7 +33,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    terminfo, Term::Terminfo
+    App::XTermUtils
 
 AUTHOR
     perlancar <perlancar@cpan.org>

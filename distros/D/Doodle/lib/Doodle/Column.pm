@@ -6,11 +6,11 @@ use Data::Object 'Class', 'Doodle::Library';
 
 with 'Doodle::Column::Helpers';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 has name => (
   is => 'ro',
-  isa => 'Any',
+  isa => 'Str',
   req => 1
 );
 
@@ -29,17 +29,24 @@ has type => (
 has data => (
   is => 'ro',
   isa => 'Data',
-  bld => 'new_data',
-  lzy => 1
+  new => 1
 );
 
 # BUILD
 
 fun new_data($self) {
-  return do('hash', {});
+  return {};
 }
 
 # METHODS
+
+method BUILD($args) {
+  for my $key (keys %$args) {
+    $self->{data}{$key} = $args->{$key} if !$self->can($key);
+  }
+
+  return $self;
+}
 
 method doodle() {
   my $doodle = $self->table->doodle;
@@ -52,7 +59,7 @@ method create(Any %args) {
 
   $args{table} = $table;
   $args{schema} = $table->schema if $table->schema;
-  $args{columns} = do('array', [$self]);
+  $args{columns} = [$self];
 
   my $command = $self->doodle->column_create(%args);
 
@@ -64,7 +71,7 @@ method update(Any %args) {
 
   $args{table} = $table;
   $args{schema} = $table->schema if $table->schema;
-  $args{columns} = do('array', [$self]);
+  $args{columns} = [$self];
 
   $self->data->set(drop => delete $args{drop}) if $args{drop};
   $self->data->set(set => delete $args{set}) if $args{set};
@@ -79,7 +86,7 @@ method delete(Any %args) {
 
   $args{table} = $table;
   $args{schema} = $table->schema if $table->schema;
-  $args{columns} = do('array', [$self]);
+  $args{columns} = [$self];
 
   my $command = $self->doodle->column_delete(%args);
 
@@ -91,7 +98,7 @@ method rename(Str $name, Any %args) {
 
   $args{table} = $table;
   $args{schema} = $table->schema if $table->schema;
-  $args{columns} = do('array', [$self]);
+  $args{columns} = [$self];
 
   $self->data->{to} = $name;
 
@@ -118,36 +125,102 @@ Doodle Column Class
 
 =head1 SYNOPSIS
 
+  use Doodle;
   use Doodle::Column;
+  use Doodle::Table;
+
+  my $ddl = Doodle->new;
+
+  my $table = Doodle::Table->new(
+    name => 'users',
+    doodle => $ddl
+  );
 
   my $self = Doodle::Column->new(
-    name => 'id'
+    name => 'id',
+    table => $table,
+    doodle => $ddl
   );
 
 =cut
 
 =head1 DESCRIPTION
 
-Table column representation. This class consumes the L<Doodle::Column::Helpers>
-role.
+This package provides table column representation.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Doodle::Column::Helpers>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 data
+
+  data(Data)
+
+This attribute is read-only, accepts C<(Data)> values, and is optional.
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is required.
+
+=cut
+
+=head2 table
+
+  table(Table)
+
+This attribute is read-only, accepts C<(Table)> values, and is required.
+
+=cut
+
+=head2 type
+
+  type(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 create
 
-  create(Any %args) : Column
+  create(Any %args) : Command
 
 Registers a column create and returns the Command object.
 
 =over 4
 
-=item create example
+=item create example #1
+
+  # given: synopsis
 
   my $create = $self->create;
 
@@ -157,13 +230,15 @@ Registers a column create and returns the Command object.
 
 =head2 delete
 
-  delete(Any %args) : Column
+  delete(Any %args) : Command
 
 Registers a column delete and returns the Command object.
 
 =over 4
 
-=item delete example
+=item delete example #1
+
+  # given: synopsis
 
   my $delete = $self->delete;
 
@@ -179,7 +254,9 @@ Returns the associated Doodle object.
 
 =over 4
 
-=item doodle example
+=item doodle example #1
+
+  # given: synopsis
 
   my $doodle = $self->doodle;
 
@@ -195,9 +272,11 @@ Registers a column rename and returns the Command object.
 
 =over 4
 
-=item rename example
+=item rename example #1
 
-  my $rename = $self->rename;
+  # given: synopsis
+
+  my $rename = $self->rename('uuid');
 
 =back
 
@@ -211,10 +290,40 @@ Registers a column update and returns the Command object.
 
 =over 4
 
-=item update example
+=item update example #1
+
+  # given: synopsis
 
   my $update = $self->update;
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

@@ -1,5 +1,5 @@
 package ZMQ::Raw;
-$ZMQ::Raw::VERSION = '0.36';
+$ZMQ::Raw::VERSION = '0.37';
 use strict;
 use warnings;
 use Carp;
@@ -37,8 +37,8 @@ sub AUTOLOAD
 }
 
 =for HTML
-<a href="https://travis-ci.org/jacquesg/p5-ZMQ-Raw">
-	<img src="https://travis-ci.org/jacquesg/p5-ZMQ-Raw.svg?branch=master" alt="Build Status: Travis" align="right" />
+<a href="https://dev.azure.com/jacquesgermishuys/p5-ZMQ-Raw/_build<Paste>">
+	<img src="https://dev.azure.com/jacquesgermishuys/p5-ZMQ-Raw/_apis/build/status/jacquesg.p5-ZMQ-Raw?branchName=master" alt="Build Status: Azure" align="right" />
 </a>
 <a href="https://ci.appveyor.com/project/jacquesg/p5-zmq-raw">
 	<img src="https://ci.appveyor.com/api/projects/status/ye43ehtq4tabkp32/branch/master?svg=true" alt="Build Status: AppVeyor" align="right" />
@@ -54,7 +54,7 @@ ZMQ::Raw - Perl bindings to the ZeroMQ library
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 

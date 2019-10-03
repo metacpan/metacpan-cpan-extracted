@@ -77,6 +77,7 @@ if ($is_windows)
 
 # generate the platform.hpp file
 my @opts = (
+	'ZMQ_HAVE_WS',
 	'ZMQ_HAVE_SO_KEEPALIVE',
 	'ZMQ_HAVE_CURVE',
 	'ZMQ_USE_TWEETNACL',

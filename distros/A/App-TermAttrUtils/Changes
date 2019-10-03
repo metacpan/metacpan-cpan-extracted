@@ -1,3 +1,15 @@
+0.003   2019-08-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: term-terminfo.
+
+
+0.002   2019-08-20  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::XTermUtils.
+
+
 0.001   2019-08-20  Released-By: PERLANCAR
 
         - First release.

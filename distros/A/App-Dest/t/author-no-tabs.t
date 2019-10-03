@@ -67,7 +67,26 @@ my @files = (
     't/make/actions/002/revert',
     't/make/actions/002/verify',
     't/make/dest.watch',
-    't/release-kwalitee.t'
+    't/release-kwalitee.t',
+    't/revert.t',
+    't/revert/dest.watch',
+    't/revert/log',
+    't/revert/source/001/deploy',
+    't/revert/source/001/revert',
+    't/revert/source/001/verify',
+    't/revert/source/002/deploy',
+    't/revert/source/002/revert',
+    't/revert/source/002/verify',
+    't/revert/source/003/deploy',
+    't/revert/source/003/revert',
+    't/revert/source/003/verify',
+    't/revert/source/004/deploy',
+    't/revert/source/004/revert',
+    't/revert/source/004/verify',
+    't/revert/source/005/deploy',
+    't/revert/source/005/revert',
+    't/revert/source/005/verify',
+    't/revert/source/dest.wrap'
 );
 
 notabs_ok($_) foreach @files;

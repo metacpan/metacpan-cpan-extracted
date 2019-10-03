@@ -53,7 +53,7 @@ $poller->remove ($s2);
 is $poller->size, 0;
 
 my $timer3 = ZMQ::Raw::Timer->new ($ctx,
-	after => 200
+	after => 500
 );
 
 my $s3 = $timer3->socket;
@@ -68,13 +68,13 @@ is 0, $poller->wait (100);
 $timer3->reset;
 is 0, $poller->wait (100);
 $timer3->reset;
-is $poller->wait (600), 1;
+is $poller->wait (1000), 1;
 
 $poller->remove ($s3);
 is $poller->size, 0;
 
 my $timer4 = ZMQ::Raw::Timer->new ($ctx,
-	after => 200
+	after => 500
 );
 
 my $s4 = $timer4->socket;
@@ -86,6 +86,14 @@ $timer4->cancel;
 is 0, $poller->wait (200);
 
 $poller->remove ($s4);
+
+my $timer4 = ZMQ::Raw::Timer->new ($ctx,
+	after => 200,
+	interval => 200,
+);
+
+is 200, $timer4->interval();
+is 300, $timer4->interval (300);
 
 done_testing;
 

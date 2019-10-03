@@ -3,8 +3,9 @@ package Excel::Template::XLSX;
 use strict;
 use warnings;
 use base 'Excel::Writer::XLSX';
+use Excel::Writer::XLSX::Utility;
 
-use version; our $VERSION = version->declare("v1.0.7");
+use version; our $VERSION = version->declare("v1.0.8");
 
 use Archive::Zip;
 use Graphics::ColorUtils 'rgb2hls', 'hls2rgb';
@@ -292,11 +293,14 @@ properties.  Properties in subsequent workbooks are ignored.
 
          foreach my $range ( @{ $self->{PRINT_TITLES}{$name} } ) {
 
-            # Row Range like $1:$1
-            $sheet->repeat_rows($range) if $range =~ m/\d/;
-
-            # Column Range like $A:$A
-            $sheet->repeat_columns($range) if $range =~ m/[A-Za-z]/;
+            if ($range =~ m/[A-Za-z]/) { # Column Range like $A:$A
+              $sheet->repeat_columns( $range ) 
+            } else {
+              # Row Range like $1:$1
+              $range =~ s/\$//g;
+              my ($first, $last) = split('\:', $range);
+              $sheet->repeat_rows( --$first, --$last );
+           }
          }
 
          # Parse the contents of the sheet
@@ -1123,9 +1127,8 @@ font, and number formats.
                   my $is_array = $form_child->att('t');
                   my $ref      = $form_child->att('ref');
                   my $formula  = $form_child->text() // q[="No Formula Found"];
-                  if ($is_array) {
-                     $sheet->write_array_formula( $ref, "=${formula}",
-                        $format, $val );
+                  if ($is_array and $ref) {
+                     $sheet->write_array_formula( $ref, "=${formula}", $format, $val );
                   }
                   else {
                      if ( my $ref = $self->{MERGED_RANGES}{$a1} ) {

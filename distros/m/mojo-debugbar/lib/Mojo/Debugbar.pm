@@ -5,7 +5,7 @@ use Mojo::Debugbar::Monitors;
 use Mojo::Loader qw(load_class);
 use Mojo::Server;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 has 'app' => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') }, weak => 1;
 has 'config' => sub {{

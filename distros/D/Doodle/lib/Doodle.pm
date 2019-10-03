@@ -12,19 +12,18 @@ use Doodle::Command;
 use Doodle::Schema;
 use Doodle::Table;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 has commands => (
   is => 'ro',
   isa => 'Commands',
-  bld => 'new_commands',
-  lzy => 1
+  new => 1
 );
 
 # BUILD
 
 fun new_commands($self) {
-  return do('array', []);
+  return [];
 }
 
 # METHODS
@@ -46,7 +45,7 @@ method schema(Str $name, Any %args) {
 }
 
 method statements(Grammar $grammar) {
-  my $statements = do('array', []);
+  my $statements = [];
 
   for my $command ($self->commands->list) {
     $statements->push($grammar->execute($command));
@@ -95,20 +94,20 @@ Database DDL (= Data Definition Language) Statement Builder
 
   use Doodle;
 
-  my $d = Doodle->new;
-  my $t = $d->table('users');
+  my $self = Doodle->new;
+  my $table = $self->table('users');
 
-  $t->primary('id');
-  $t->uuid('arid');
-  $t->column('name');
-  $t->string('email');
-  $t->json('metadata');
+  $table->primary('id');
+  $table->uuid('arid');
+  $table->column('name');
+  $table->string('email');
+  $table->json('metadata');
 
-  my $x = $t->create;
-  my $g = $d->grammar('sqlite');
-  my $s = $g->execute($x);
+  my $command = $table->create;
+  my $grammar = $self->grammar('sqlite');
+  my $statement = $grammar->execute($command);
 
-  say $s->sql;
+  # say $statement->sql;
 
   # create table "users" (
   #   "id" integer primary key,
@@ -130,21 +129,53 @@ This class consumes the L<Doodle::Helpers> roles.
 
 =cut
 
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Doodle::Helpers>
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Doodle::Library>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 commands
+
+  commands(Commands)
+
+This attribute is read-only, accepts C<(Commands)> values, and is optional.
+
+=cut
+
 =head1 METHODS
 
-This package implements the following methods.
+This package implements the following methods:
 
 =cut
 
 =head2 build
 
-  build(Grammar $grammar, CodeRef $callback) : ()
+  build(Grammar $grammar, CodeRef $callback) : Any
 
 Execute a given callback for each generated SQL statement.
 
 =over 4
 
-=item build example
+=item build example #1
+
+  # given: synopsis
 
   $self->build($grammar, sub {
     my $statement = shift;
@@ -164,9 +195,13 @@ Returns a new Grammar object.
 
 =over 4
 
-=item grammar example
+=item grammar example #1
 
-  my $grammar = $self->grammar('sqlite');
+  # given: synopsis
+
+  my $type = 'sqlite';
+
+  $grammar = $self->grammar($type);
 
 =back
 
@@ -180,7 +215,11 @@ Returns a new Schema object.
 
 =over 4
 
-=item schema example
+=item schema example #1
+
+  # given: synopsis
+
+  my $name = 'app';
 
   my $schema = $self->schema($name);
 
@@ -190,13 +229,15 @@ Returns a new Schema object.
 
 =head2 statements
 
-  statements(Grammar $g) : [Statement]
+  statements(Grammar $g) : Statements
 
 Returns a set of Statement objects for the given grammar.
 
 =over 4
 
-=item statements example
+=item statements example #1
+
+  # given: synopsis
 
   my $statements = $self->statements($grammar);
 
@@ -212,10 +253,42 @@ Return a new Table object.
 
 =over 4
 
-=item table example
+=item table example #1
 
-  my $table = $self->table('users');
+  # given: synopsis
+
+  my $name = 'users';
+
+  $table = $self->table($name);
 
 =back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/iamalnewkirk/doodle/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/iamalnewkirk/doodle/wiki>
+
+L<Project|https://github.com/iamalnewkirk/doodle>
+
+L<Initiatives|https://github.com/iamalnewkirk/doodle/projects>
+
+L<Milestones|https://github.com/iamalnewkirk/doodle/milestones>
+
+L<Contributing|https://github.com/iamalnewkirk/doodle/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/iamalnewkirk/doodle/issues>
 
 =cut

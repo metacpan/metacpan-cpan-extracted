@@ -26,26 +26,26 @@ no_index:
 provides:
   Mojo::SQLite:
     file: lib/Mojo/SQLite.pm
-    version: '3.002'
+    version: '3.003'
   Mojo::SQLite::Database:
     file: lib/Mojo/SQLite/Database.pm
-    version: '3.002'
+    version: '3.003'
   Mojo::SQLite::Migrations:
     file: lib/Mojo/SQLite/Migrations.pm
-    version: '3.002'
+    version: '3.003'
   Mojo::SQLite::PubSub:
     file: lib/Mojo/SQLite/PubSub.pm
-    version: '3.002'
+    version: '3.003'
     x_deprecated: 1
   Mojo::SQLite::Results:
     file: lib/Mojo/SQLite/Results.pm
-    version: '3.002'
+    version: '3.003'
   Mojo::SQLite::Transaction:
     file: lib/Mojo/SQLite/Transaction.pm
-    version: '3.002'
+    version: '3.003'
 requires:
   Carp: '0'
-  DBD::SQLite: '1.54'
+  DBD::SQLite: '1.64'
   DBI: '1.627'
   File::Spec::Functions: '0'
   File::Temp: '0'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-SQLite/issues
   homepage: https://github.com/Grinnz/Mojo-SQLite
   repository: https://github.com/Grinnz/Mojo-SQLite.git
-version: '3.002'
+version: '3.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -101,7 +101,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::DBOOK/MetaProvides::Package'
       version: '2.004003'
@@ -211,7 +211,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '3.002'
+          tag: '3.003'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -383,7 +383,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::DBOOK/InstallGuide'
       version: '1.200013'
