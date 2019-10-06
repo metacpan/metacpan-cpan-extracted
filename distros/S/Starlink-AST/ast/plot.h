@@ -37,12 +37,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -299,6 +299,7 @@ typedef struct AstPlot {
    int mintick[ 3 ];
    int numlab[ 3 ];
    int style[ AST__NPID ];
+   int textgaptype;
    int textlab[ 3 ];
    int tickall;
    int forceexterior;
@@ -376,6 +377,7 @@ typedef struct AstPlotVtab {
    void (* Mark)( AstPlot *, int, int, int, const double *, int, int * );
    void (* Mirror)( AstPlot *, int, int * );
    void (* PolyCurve)( AstPlot *, int, int, int, const double *, int * );
+   void (* RegionOutline)( AstPlot *, AstRegion *, int * );
    void (* SetTickValues)( AstPlot *, int, int, double *, int, double *, int * );
    void (* Text)( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
@@ -468,6 +470,11 @@ typedef struct AstPlotVtab {
    int (* TestLabelling)( AstPlot *, int * );
    void (* SetLabelling)( AstPlot *, int, int * );
    void (* ClearLabelling)( AstPlot *, int * );
+
+   int (* GetTextGapType)( AstPlot *, int * );
+   int (* TestTextGapType)( AstPlot *, int * );
+   void (* SetTextGapType)( AstPlot *, int, int * );
+   void (* ClearTextGapType)( AstPlot *, int * );
 
    double (* GetMajTickLen)( AstPlot *, int, int * );
    int (* TestMajTickLen)( AstPlot *, int, int * );
@@ -732,6 +739,7 @@ void astInitPlotGlobals_( AstPlotGlobals * );
    void astGrid_( AstPlot *, int * );
    void astMark_( AstPlot *, int, int, int, const double *, int, int * );
    void astPolyCurve_( AstPlot *, int, int, int, const double *, int * );
+   void astRegionOutline_( AstPlot *, AstRegion *, int * );
    void astText_( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
    void astGrfWrapper_( AstPlot *, const char *, AstGrfWrap, int * );
@@ -855,6 +863,11 @@ void astInitPlotGlobals_( AstPlotGlobals * );
    int astTestLabelling_( AstPlot *, int * );
    void astSetLabelling_( AstPlot *, int, int * );
    void astClearLabelling_( AstPlot *, int * );
+
+   int astGetTextGapType_( AstPlot *, int * );
+   int astTestTextGapType_( AstPlot *, int * );
+   void astSetTextGapType_( AstPlot *, int, int * );
+   void astClearTextGapType_( AstPlot *, int * );
 
    double astGetMajTickLen_( AstPlot *, int, int * );
    int astTestMajTickLen_( AstPlot *, int, int * );
@@ -1014,6 +1027,9 @@ astINVOKE(V,astGenCurve_(astCheckPlot(this),astCheckMapping(map),STATUS_PTR))
 
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
 astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in,STATUS_PTR))
+
+#define astRegionOutline(this,region) \
+astINVOKE(V,astRegionOutline_(astCheckPlot(this),astCheckRegion(region),STATUS_PTR))
 
 #define astGrfSet(this,name,fun) \
 astINVOKE(V,astGrfSet_(astCheckPlot(this),name,fun,STATUS_PTR))
@@ -1277,6 +1293,15 @@ astINVOKE(V,astGetLabelling_(astCheckPlot(this),STATUS_PTR))
 astINVOKE(V,astSetLabelling_(astCheckPlot(this),labelling,STATUS_PTR))
 #define astTestLabelling(this) \
 astINVOKE(V,astTestLabelling_(astCheckPlot(this),STATUS_PTR))
+
+#define astClearTextGapType(this) \
+astINVOKE(V,astClearTextGapType_(astCheckPlot(this),STATUS_PTR))
+#define astGetTextGapType(this) \
+astINVOKE(V,astGetTextGapType_(astCheckPlot(this),STATUS_PTR))
+#define astSetTextGapType(this,textgaptype) \
+astINVOKE(V,astSetTextGapType_(astCheckPlot(this),textgaptype,STATUS_PTR))
+#define astTestTextGapType(this) \
+astINVOKE(V,astTestTextGapType_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearEdge(this,axis) \
 astINVOKE(V,astClearEdge_(astCheckPlot(this),axis,STATUS_PTR))

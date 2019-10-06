@@ -8,7 +8,10 @@
 #include "perl.h"
 #include "XSUB.h"
 #define NEED_sv_2pv_flags
+#define NEED_newSVpvn_flags
 #define NEED_gv_fetchpvn_flags
+#define NEED_sv_catpvn_flags
+#define NEED_croak_xs_usage
 #include "ppport.h"
 
 static MGVTBL subname_vtbl;
@@ -23,6 +26,34 @@ static MGVTBL subname_vtbl;
 
 #ifndef Newxz
 #define Newxz(ptr, num, type)	Newz(0, ptr, num, type)
+#endif
+
+#ifndef HvNAMELEN_get
+#define HvNAMELEN_get(stash) strlen(HvNAME(stash))
+#endif
+
+#ifndef HvNAMEUTF8
+#define HvNAMEUTF8(stash) 0
+#endif
+
+#ifndef GvNAMEUTF8
+#ifdef GvNAME_HEK
+#define GvNAMEUTF8(gv) HEK_UTF8(GvNAME_HEK(gv))
+#else
+#define GvNAMEUTF8(gv) 0
+#endif
+#endif
+
+#ifndef SV_CATUTF8
+#define SV_CATUTF8 0
+#endif
+
+#ifndef SV_CATBYTES
+#define SV_CATBYTES 0
+#endif
+
+#ifndef sv_catpvn_flags
+#define sv_catpvn_flags(b,n,l,f) sv_catpvn(b,n,l)
 #endif
 
 MODULE = Sub::Name  PACKAGE = Sub::Name
@@ -42,7 +73,8 @@ subname(name, sub)
 	STRLEN namelen;
 	const char* nameptr = SvPV(name, namelen);
 	int utf8flag = SvUTF8(name);
-	int seen_quote = 0, need_subst = 0;
+	int quotes_seen = 0;
+	bool need_subst = FALSE;
     PPCODE:
 	if (!SvROK(sub) && SvGMAGICAL(sub))
 		mg_get(sub);
@@ -66,24 +98,24 @@ subname(name, sub)
 		if (s > nameptr && *s == ':' && s[-1] == ':') {
 			end = s - 1;
 			begin = ++s;
-			if (seen_quote)
-				need_subst++;
+			if (quotes_seen)
+				need_subst = TRUE;
 		}
 		else if (s > nameptr && *s != '\0' && s[-1] == '\'') {
 			end = s - 1;
 			begin = s;
-			if (seen_quote++)
-				need_subst++;
+			if (quotes_seen++)
+				need_subst = TRUE;
 		}
 	}
 	s--;
 	if (end) {
 		SV* tmp;
 		if (need_subst) {
-			STRLEN length = end - nameptr + seen_quote - (*end == '\'' ? 1 : 0);
+			STRLEN length = end - nameptr + quotes_seen - (*end == '\'' ? 1 : 0);
 			char* left;
 			int i, j;
-			tmp = newSV(length);
+			tmp = sv_2mortal(newSV(length));
 			left = SvPVX(tmp);
 			for (i = 0, j = 0; j < end - nameptr; ++i, ++j) {
 				if (nameptr[j] == '\'') {
@@ -95,7 +127,6 @@ subname(name, sub)
 				}
 			}
 			stash = gv_stashpvn(left, length, GV_ADD | utf8flag);
-			SvREFCNT_dec(tmp);
 		}
 		else
 			stash = gv_stashpvn(nameptr, end - nameptr, GV_ADD | utf8flag);
@@ -103,41 +134,28 @@ subname(name, sub)
 		namelen -= begin - nameptr;
 	}
 
-	#ifdef PERL_VERSION < 10
 	/* under debugger, provide information about sub location */
 	if (PL_DBsub && CvGV(cv)) {
-		HV *hv = GvHV(PL_DBsub);
-		SV** old_data;
+		HV* DBsub = GvHV(PL_DBsub);
+		HE* old_data;
 
-		char* new_pkg = HvNAME(stash);
+		GV* oldgv = CvGV(cv);
+		HV* oldhv = GvSTASH(oldgv);
+		SV* old_full_name = sv_2mortal(newSVpvn_flags(HvNAME(oldhv), HvNAMELEN_get(oldhv), HvNAMEUTF8(oldhv) ? SVf_UTF8 : 0));
+		sv_catpvn(old_full_name, "::", 2);
+		sv_catpvn_flags(old_full_name, GvNAME(oldgv), GvNAMELEN(oldgv), GvNAMEUTF8(oldgv) ? SV_CATUTF8 : SV_CATBYTES);
 
-		char* old_name = GvNAME( CvGV(cv) );
-		char* old_pkg = HvNAME( GvSTASH(CvGV(cv)) );
+		old_data = hv_fetch_ent(DBsub, old_full_name, 0, 0);
 
-		int old_len = strlen(old_name) + strlen(old_pkg);
-		int new_len = namelen + strlen(new_pkg);
-
-		char* full_name;
-		Newxz(full_name, (old_len > new_len ? old_len : new_len) + 3, char);
-
-		strcat(full_name, old_pkg);
-		strcat(full_name, "::");
-		strcat(full_name, old_name);
-
-		old_data = hv_fetch(hv, full_name, strlen(full_name), 0);
-
-		if (old_data) {
-			strcpy(full_name, new_pkg);
-			strcat(full_name, "::");
-			strcat(full_name, nameptr);
-
-			SvREFCNT_inc(*old_data);
-			if (!hv_store(hv, full_name, strlen(full_name), *old_data, 0))
-				SvREFCNT_dec(*old_data);
+		if (old_data && HeVAL(old_data)) {
+			SV* new_full_name = sv_2mortal(newSVpvn_flags(HvNAME(stash), HvNAMELEN_get(stash), HvNAMEUTF8(stash) ? SVf_UTF8 : 0));
+			sv_catpvn(new_full_name, "::", 2);
+			sv_catpvn_flags(new_full_name, nameptr, s - nameptr, utf8flag ? SV_CATUTF8 : SV_CATBYTES);
+			SvREFCNT_inc(HeVAL(old_data));
+			if (hv_store_ent(DBsub, new_full_name, HeVAL(old_data), 0) != NULL)
+				SvREFCNT_inc(HeVAL(old_data));
 		}
-		Safefree(full_name);
 	}
-	#endif
 
 	gv = (GV *) newSV(0);
 	gv_init_pvn(gv, stash, nameptr, s - nameptr, GV_ADDMULTI | utf8flag);

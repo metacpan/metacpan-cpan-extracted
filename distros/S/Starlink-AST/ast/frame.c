@@ -41,15 +41,17 @@ f     AST_FRAME
 *     - Digits/Digits(axis): Number of digits of precision
 *     - Direction(axis): Display axis in conventional direction?
 *     - Domain: Coordinate system domain
+*     - Dtai: Difference between the TAI and UTC timescale
 *     - Dut1: Difference between the UT1 and UTC timescale
 *     - Epoch: Epoch of observation
 *     - Format(axis): Format specification for axis values
+*     - InternalUnit(axis): Physical units for unformated axis values
 *     - Label(axis): Axis label
 *     - MatchEnd: Match trailing axes?
 *     - MaxAxes: Maximum number of Frame axes to match
 *     - MinAxes: Minimum number of Frame axes to match
 *     - Naxes: Number of Frame axes
-*     - NormUnit(axis): Normalised axis physical units
+*     - NormUnit(axis): Normalised physical units for formatted axis values
 *     - ObsAlt: Geodetic altitude of observer
 *     - ObsLat: Geodetic latitude of observer
 *     - ObsLon: Geodetic longitude of observer
@@ -59,7 +61,7 @@ f     AST_FRAME
 *     - System: Coordinate system used to describe the domain
 *     - Title: Frame title
 *     - Top(axis): Highest axis value to display
-*     - Unit(axis): Axis physical units
+*     - Unit(axis): Physical units for formatted axis values
 
 *  Functions:
 c     In addition to those functions applicable to all Mappings, the
@@ -70,6 +72,7 @@ f     following routines may also be applied to all Frames:
 c     - astAngle: Calculate the angle subtended by two points at a third point
 c     - astAxAngle: Find the angle from an axis, to a line through two points
 c     - astAxDistance: Calculate the distance between two axis values
+c     - astAxNorm: Normalises an array of axis values
 c     - astAxOffset: Calculate an offset along an axis
 c     - astConvert: Determine how to convert between two coordinate systems
 c     - astDistance: Calculate the distance between two points in a Frame
@@ -89,6 +92,7 @@ c     - astUnformat: Read a formatted coordinate value for a Frame axis
 f     - AST_ANGLE: Find the angle subtended by two points at a third point
 f     - AST_AXANGLE: Find the angle from an axis, to a line through two points
 f     - AST_AXDISTANCE: Calculate the distance between two axis values
+f     - AST_AXNORM: Normalises an array of axis values
 f     - AST_AXOFFSET: Calculate an offset along an axis
 f     - AST_CONVERT: Determine how to convert between two coordinate systems
 f     - AST_DISTANCE: Calculate the distance between two points in a Frame
@@ -122,12 +126,12 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -271,11 +275,23 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     29-APR-2013 (DSB):
 *        Added protected methods astSetFrameVariants and astGetFrameVariants.
 *     1-MAY-2013 (DSB):
-*        Override the astDoNotSimplify method to indicate that Frames should 
-*        always be simplified. This is mainly because the STC class uses the 
-*        Ident attribute with Frames, and preventing such frames from 
+*        Override the astDoNotSimplify method to indicate that Frames should
+*        always be simplified. This is mainly because the STC class uses the
+*        Ident attribute with Frames, and preventing such frames from
 *        simplifying (which is what the parent astDoNotSimplify method does)
 *        causes the STC tester in the ast_tester directory to fail.
+*     10-FEB-2015 (DSB):
+*        When checking attribute settings for attribute names that end with
+*        an axis index, stop looking for the axis index when the first equals
+*        sign is encountered.
+*     17-APR-2015 (DSB):
+*        Added astCentre.
+*     27-APR-2015 (DSB):
+*        Added read-only attribute InternalUnit.
+*     26-OCT-2016 (DSB):
+*        Added method astAxNorm.
+*     11-JAN-2017 (GSB):
+*        Add Dtai attribute.
 *class--
 */
 
@@ -718,7 +734,7 @@ static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_cleanattribs)( AstObject *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -817,6 +833,7 @@ static const char *GetDefaultSymbol( AstFrame *, int, int * );
 static const char *GetDefaultTitle( AstFrame *, int * );
 static const char *GetDomain( AstFrame *, int * );
 static const char *GetFormat( AstFrame *, int, int * );
+static const char *GetInternalUnit( AstFrame *, int, int * );
 static const char *GetLabel( AstFrame *, int, int * );
 static const char *GetNormUnit( AstFrame *, int, int * );
 static const char *GetSymbol( AstFrame *, int, int * );
@@ -828,6 +845,7 @@ static double AxAngle( AstFrame *, const double[], const double[], int, int * );
 static double AxDistance( AstFrame *, int, double, double, int * );
 static double AxOffset( AstFrame *, int, double, double, int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
 static int AxIn( AstFrame *, int, double, double, double, int, int * );
@@ -843,8 +861,9 @@ static int GetDirection( AstFrame *, int, int * );
 static int GetIsLinear( AstMapping *, int * );
 static int GetIsSimple( AstMapping *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
-static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
-static int GetObjSize( AstObject *, int * );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
+static size_t GetObjSize( AstObject *, int * );
+static void AxNorm( AstFrame *, int, int, int, double *, int * );
 static void CleanAttribs( AstObject *, int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 
@@ -887,6 +906,11 @@ static double GetObsAlt( AstFrame *, int * );
 static int TestObsAlt( AstFrame *, int * );
 static void ClearObsAlt( AstFrame *, int * );
 static void SetObsAlt( AstFrame *, double, int * );
+
+static double GetDtai( AstFrame *, int * );
+static int TestDtai( AstFrame *, int * );
+static void ClearDtai( AstFrame *, int * );
+static void SetDtai( AstFrame *, double, int * );
 
 static double GetDut1( AstFrame *, int * );
 static int TestDut1( AstFrame *, int * );
@@ -1524,6 +1548,117 @@ f     invoked with STATUS set to an error value, or if it should fail for
 
 }
 
+static void AxNorm( AstFrame *this, int axis, int oper, int nval,
+                      double *values, int *status ){
+/*
+*++
+*  Name:
+c     astAxNorm
+f     AST_AXNORM
+
+*  Purpose:
+*     Normalise an array of axis values.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     void astAxNorm( AstFrame *this, int axis, int oper, int nval,
+c                     double *values, int *status )
+f     CALL AST_AXNORM( THIS, AXIS, OPER, NVAL, VALUES, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function
+f     This routine
+*     modifies a supplied array of axis values so that they are normalised
+*     in the manner indicated by
+c     parameter "oper".
+f     argument OPER.
+*
+*     No normalisation is possible for a simple Frame and so the supplied
+*     values are returned unchanged. However, this may not be the case for
+*     specialised sub-classes of Frame. For instance, a SkyFrame has a
+*     discontinuity at zero longitude and so a longitude value can be
+*     expressed in the range [-Pi,+PI] or the range [0,2*PI]. See the
+*     "Applicability:" section below for details.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     axis
+f     AXIS = INTEGER (Given)
+*        The index of the axis to which the supplied values refer. The
+*        first axis has index 1.
+c     oper
+f     OPER = INTEGER (Given)
+*        Indicates the type of normalisation to be applied. If zero is
+*        supplied, the normalisation will be the same as that performed by
+c        function astNorm.
+f        routine AST_NORM.
+*        If 1 is supplied, the normalisation will be chosen automatically
+*        so that the resulting list has the smallest range.
+c     nval
+f     NVAL = INTEGER (Given)
+*        The number of points in the values array.
+c     values
+f     VALUES( NVAL ) = DOUBLE PRECISION (Given and Returned)
+*        On entry, the axis values to be normalised. Modified on exit to
+*        hold the normalised values.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Applicability:
+*     SkyFrame
+c        If "oper"
+f        If OPER
+*        is 0, longitude values are returned in the range [0,2*PI].
+c        If "oper"
+f        If OPER
+*        is 1, longitude values are returned in either the range
+*        [0,2*PI] or [-PI,PI]. The choice is made so that that the
+*        resulting list has the smallest range. Latitude values are
+*        always returned in the range [-PI,PI].
+*     All other classes of Frame
+*        The supplied axis values are returned unchanged.
+
+*--
+
+*  Implementation Deficiencies;
+*     - The protected interface for this function uses 1-based axis
+*     numbering (like the public interface), rather than the more usual
+*     zero-based system used by all other protected interfaces. There is
+*     no real reason for this, and it should be changed at some time.
+
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Validate the axis index and obtain a pointer to the required Axis. */
+   (void) astValidateAxis( this, axis - 1, 1, "astAxNorm" );
+   ax = astGetAxis( this, axis - 1 );
+
+/* Validate ther "oper" value. */
+   if( ( oper < 0 || oper > 1 ) && astOK ) {
+      astError( AST__OPRIN, "astAxNorm(%s): Invalid operation %d.", status,
+                astGetClass( this ), oper );
+   }
+
+/* Use the AxisNormValues method associated with the Axis. */
+   if( astOK ) astAxisNormValues( ax, oper, nval, values );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+}
+
 static int AxIn( AstFrame *this, int axis, double lo, double hi, double val,
                  int closed, int *status ){
 /*
@@ -1682,6 +1817,76 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Return the result. */
    return result;
 
+}
+
+static double Centre( AstFrame *this, int axis, double value, double gap, int *status ) {
+/*
+*+
+*  Name:
+*     astCentre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating Axis values.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     double astCentre( AstFrame *this, int axis, double value, double gap )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a gap is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   double result;                /* The nice central value */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Validate the axis index and obtain a pointer to the required
+   Axis. */
+   (void) astValidateAxis( this, axis, 1, "astCentre" );
+   ax = astGetAxis( this, axis );
+
+/* Find the nice central value. */
+   result = astAxisCentre( ax, value, gap );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
 }
 
 static void CheckPerm( AstFrame *this, const int *perm, const char *method, int *status ) {
@@ -2130,6 +2335,11 @@ L1:
    } else if ( !strcmp( attrib, "obsalt" ) ) {
       astClearObsAlt( this );
 
+/* Dtai */
+/* --- */
+   } else if ( !strcmp( attrib, "dtai" ) ) {
+      astClearDtai( this );
+
 /* Dut1 */
 /* --- */
    } else if ( !strcmp( attrib, "dut1" ) ) {
@@ -2140,7 +2350,8 @@ L1:
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then report an error. */
    } else if ( !strcmp( attrib, "naxes" ) ||
-               !strncmp( attrib, "normunit", 8 ) ) {
+               !strncmp( attrib, "normunit", 8 ) ||
+               !strncmp( attrib, "internalunit", 12 ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", status, attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -4018,7 +4229,7 @@ const char *astFmtDecimalYr_( double year, int digits, int *status ) {
    astGET_GLOBALS(NULL);
 
 /* Limit the precision to what is meaningful. */
-   digits = ( digits > DBL_DIG ) ? DBL_DIG : digits;
+   digits = ( digits > AST__DBL_DIG ) ? AST__DBL_DIG : digits;
 
 /* Format the year value. Use "g" format to avoid buffer overflow and
    to get useful diagnostic output if a silly value is given. */
@@ -4685,7 +4896,7 @@ L1:
 /* Format the Epoch as decimal years. Use a Besselian epoch if it will
    be less than 1984.0, otherwise use a Julian epoch. */
          result = astFmtDecimalYr( ( epoch < palEpj2d( 1984.0 ) ) ?
-                                   palEpb( epoch ) : palEpj( epoch ), DBL_DIG );
+                                   palEpb( epoch ) : palEpj( epoch ), AST__DBL_DIG );
       }
 
 /* Top(axis). */
@@ -4695,7 +4906,7 @@ L1:
                && ( nc >= len ) ) {
       dval = astGetTop( this, axis -1 );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -4706,7 +4917,7 @@ L1:
                && ( nc >= len ) ) {
       dval = astGetBottom( this, axis -1 );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -4840,6 +5051,13 @@ L1:
                && ( nc >= len ) ) {
       result = astGetNormUnit( this, axis - 1 );
 
+/* InternalUnit(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "internalunit(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astGetInternalUnit( this, axis - 1 );
+
 /* ObsLat. */
 /* ------- */
    } else if ( !strcmp( attrib, "obslat" ) ) {
@@ -4895,7 +5113,16 @@ L1:
    } else if ( !strcmp( attrib, "obsalt" ) ) {
       dval = astGetObsAlt( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
+         result = getattrib_buff;
+      }
+
+/* Dtai. */
+/* ---- */
+   } else if ( !strcmp( attrib, "dtai" ) ) {
+      dval = astGetDtai( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -4904,7 +5131,7 @@ L1:
    } else if ( !strcmp( attrib, "dut1" ) ) {
       dval = astGetDut1( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -5539,7 +5766,7 @@ static int GetNout( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -5552,7 +5779,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "frame.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     Frame member function (over-rides the astGetObjSize protected
@@ -5579,7 +5806,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 /* Local Variables: */
    AstFrame *this;            /* Pointer to Frame structure */
    int axis;                  /* Axis index */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -5812,6 +6039,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->MatchAxes = MatchAxes;
    vtab->MatchAxesX = MatchAxesX;
    vtab->Format = Format;
+   vtab->Centre = Centre;
    vtab->Gap = Gap;
    vtab->GetAxis = GetAxis;
    vtab->GetDigits = GetDigits;
@@ -5829,6 +6057,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->GetSymbol = GetSymbol;
    vtab->GetTitle = GetTitle;
    vtab->GetUnit = GetUnit;
+   vtab->GetInternalUnit = GetInternalUnit;
    vtab->GetNormUnit = GetNormUnit;
    vtab->Intersect = Intersect;
    vtab->IsUnitFrame = IsUnitFrame;
@@ -5836,6 +6065,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->Norm = Norm;
    vtab->NormBox = NormBox;
    vtab->AxDistance = AxDistance;
+   vtab->AxNorm = AxNorm;
    vtab->AxOffset = AxOffset;
    vtab->AxIn = AxIn;
    vtab->AxAngle = AxAngle;
@@ -5936,6 +6166,11 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->TestObsAlt = TestObsAlt;
    vtab->GetObsAlt = GetObsAlt;
    vtab->SetObsAlt = SetObsAlt;
+
+   vtab->ClearDtai = ClearDtai;
+   vtab->GetDtai = GetDtai;
+   vtab->SetDtai = SetDtai;
+   vtab->TestDtai = TestDtai;
 
    vtab->ClearDut1 = ClearDut1;
    vtab->GetDut1 = GetDut1;
@@ -6307,7 +6542,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, 
 }
 
 static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
-                         double **cross, int *status ) {
+                         double cross[5], int *status ) {
 /*
 *+
 *  Name:
@@ -6322,7 +6557,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 *  Synopsis:
 *     #include "frame.h"
 *     int astLineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
-*                          double **cross )
+*                          double cross[5] )
 
 *  Class Membership:
 *     Frame method.
@@ -6342,18 +6577,15 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 *     l2
 *        Pointer to the structure defining the second line.
 *     cross
-*        Pointer to a location at which to put a pointer to a dynamically
-*        alocated array containing the axis values at the crossing. If
-*        NULL is supplied no such array is returned. Otherwise, the returned
-*        array should be freed using astFree when no longer needed. If the
+*        Pointer to an array in which to return the axis values at the
+*        crossing. If NULL is supplied the axis values are not returned. If the
 *        lines are parallel (i.e. do not cross) then AST__BAD is returned for
 *        all axis values. Note usable axis values are returned even if the
 *        lines cross outside the segment defined by the start and end points
 *        of the lines. The order of axes in the returned array will take
 *        account of the current axis permutation array if appropriate. Note,
 *        sub-classes such as SkyFrame may append extra values to the end
-*        of the basic frame axis values. A NULL pointer is returned if an
-*        error occurs.
+*        of the basic frame axis values.
 
 *  Returned Value:
 *     A non-zero value is returned if the lines cross at a point which is
@@ -6376,7 +6608,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 */
 
 /* Local Variables: */
-   double *crossing;          /* Returned array */
+   double crossing[5];        /* Local array to use if no array supplied */
    double den;                /* Denominator */
    double dx;                 /* Offset in start X values */
    double dy;                 /* Offset in start Y values */
@@ -6389,7 +6621,9 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 
 /* Initialise. */
    result = 0;
-   crossing = astMalloc( sizeof(double)*2 );
+
+/* Use a local array for storage if no array was supplied. */
+   if( !cross ) cross = crossing;
 
 /* Check that both lines refer to the supplied Frame. */
    if( l1->frame != this ) {
@@ -6402,7 +6636,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
                 "not relate to the supplied %s (AST internal programming "
                 "error).", status, astGetClass( this ), astGetClass( this ) );
 
-   } else if( crossing ){
+   } else {
 
 /* Each of the lines can be represented as "p = start + t.v" where start is
    the start position, v is the unit vector pointing from start to end,
@@ -6418,11 +6652,11 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 
 /* Store the crossing point, using the smaller t value to redue error. */
          if( fabs( t1 ) < fabs( t2 ) ) {
-            crossing[ 0 ] = l1->start[ 0 ] + t1*l1->dir[ 0 ];
-            crossing[ 1 ] = l1->start[ 1 ] + t1*l1->dir[ 1 ];
+            cross[ 0 ] = l1->start[ 0 ] + t1*l1->dir[ 0 ];
+            cross[ 1 ] = l1->start[ 1 ] + t1*l1->dir[ 1 ];
          } else {
-            crossing[ 0 ] = l2->start[ 0 ] + t2*l2->dir[ 0 ];
-            crossing[ 1 ] = l2->start[ 1 ] + t2*l2->dir[ 1 ];
+            cross[ 0 ] = l2->start[ 0 ] + t2*l2->dir[ 0 ];
+            cross[ 1 ] = l2->start[ 1 ] + t2*l2->dir[ 1 ];
          }
 
 /* See if the intersection is within the length of both lines (excluding
@@ -6435,23 +6669,13 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
              t2 >= 0.0 && t2 < l2->length ) result = 1;
 
       } else {
-         crossing[ 0 ] = AST__BAD;
-         crossing[ 1 ] = AST__BAD;
+         cross[ 0 ] = AST__BAD;
+         cross[ 1 ] = AST__BAD;
       }
    }
 
 /* Return zero if an error occurred. */
-   if( !astOK ) {
-      crossing = astFree( crossing );
-      result = 0;
-   }
-
-/* Return the crossing pointer. */
-   if( cross ) {
-      *cross = crossing;
-   } else if( crossing ){
-      crossing = astFree( crossing );
-   }
+   if( !astOK ) result = 0;
 
 /* Return a pointer to the output structure. */
    return result;
@@ -7880,7 +8104,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *        axis, the corresponding element of this array should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *-
@@ -7906,6 +8130,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    }
 
 /* Use the macro to transfer each Frame attribute in turn. */
+   OVERLAY(Dtai);
    OVERLAY(Dut1);
    OVERLAY(Digits);
    OVERLAY(Domain);
@@ -8614,7 +8839,7 @@ double astReadDateTime_( const char *value, int *status ) {
                astError( AST__DTERR, "Month value (%d) is invalid.", status, month );
                break;
             case 3:
-               astError( AST__DTERR, "Day value (%.*g) is invalid.", status, DBL_DIG,
+               astError( AST__DTERR, "Day value (%.*g) is invalid.", status, AST__DBL_DIG,
                          day );
                break;
 
@@ -8639,7 +8864,7 @@ double astReadDateTime_( const char *value, int *status ) {
                   break;
                case 3:
                   astError( AST__DTERR, "Seconds value (%.*g) is invalid.", status,
-                            DBL_DIG, sec );
+                            AST__DBL_DIG, sec );
                   break;
 
 /* Add the fraction of a day derived from hours, minutes and seconds fields to
@@ -9755,6 +9980,13 @@ L1:
         && ( nc >= len ) ) {
       astSetObsAlt( this, dval );
 
+/* Dtai. */
+/* ---- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "dtai= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetDtai( this, dval );
+
 /* Dut1. */
 /* ---- */
    } else if ( nc = 0,
@@ -9774,7 +10006,8 @@ L1:
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
    } else if ( MATCH( "naxes" ) ||
-               !strncmp( setting, "normunit", 8 ) ) {
+               !strncmp( setting, "normunit", 8 ) ||
+               !strncmp( setting, "internalunit", 12 ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -9785,7 +10018,7 @@ L1:
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
    } else if ( !free_axis_setting && ( nc = 0,
-               ( 1 == astSscanf( setting, "%*[^()]%n(%d)%n=%*[^\n]%n",
+               ( 1 == astSscanf( setting, "%*[^()=]%n(%d)%n=%*[^\n]%n",
                                        &axis_nc, &axis, &axis_value, &nc ) )
                && ( nc >= len ) ) ) {
 
@@ -10899,6 +11132,11 @@ L1:
    } else if ( !strcmp( attrib, "obsalt" ) ) {
       result = astTestObsAlt( this );
 
+/* Dtai. */
+/* ---- */
+   } else if ( !strcmp( attrib, "dtai" ) ) {
+      result = astTestDtai( this );
+
 /* Dut1. */
 /* ---- */
    } else if ( !strcmp( attrib, "dut1" ) ) {
@@ -10909,7 +11147,8 @@ L1:
 /* Test if the attribute name matches any of the read-only attributes
    of this class. If it does, then return zero. */
    } else if ( !strcmp( attrib, "naxes" ) ||
-               !strncmp( attrib, "normunit", 8 ) ) {
+               !strncmp( attrib, "normunit", 8 ) ||
+               !strncmp( attrib, "internalunit", 12 ) ) {
       result = 0;
 
 /* Other axis attributes. */
@@ -11672,6 +11911,43 @@ MAKE_TEST(Direction)
 /*
 *att++
 *  Name:
+*     Dtai
+
+*  Purpose:
+*     The TAI-UTC correction.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute specifies the difference between TAI and UTC (i.e.
+*     the number of leap seconds) at the moment corresponding to the
+*     Frame's Epoch value. The default value of AST__BAD causes the
+*     number of leap seconds to be determined from an internal look-up
+*     table, which is kept up-to-date manually by the AST development team.
+*     Therefore it is only necessary to assign a value to this attribute
+*     if the version of AST in use is so old that it does not include all
+*     leap seconds that occurred prior to the time represented by the
+*     Frame's Epoch value.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+
+*att--
+*/
+/* The TAI-UTC correction, in seconds. Has a value of AST__BAD when not set. */
+astMAKE_CLEAR(Frame,Dtai,dtai,AST__BAD)
+astMAKE_GET(Frame,Dtai,double,AST__BAD,(this->dtai))
+astMAKE_SET(Frame,Dtai,double,dtai,value)
+astMAKE_TEST(Frame,Dtai,( this->dtai != AST__BAD ))
+
+/*
+*att++
+*  Name:
 *     Dut1
 
 *  Purpose:
@@ -11808,7 +12084,7 @@ astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
 *        The Epoch attribute of a FrameSet is the same as that of its current
 *        Frame (as specified by the Current attribute).
 *     SkyFrame
-*        The coordinates of sources within a SkyFrame can changed with time
+*        The coordinates of sources within a SkyFrame can change with time
 *        for various reasons, including: (i) changing aberration of light
 *        caused by the observer's velocity (e.g. due to the Earth's motion
 *        around the Sun), (ii) changing gravitational deflection by the Sun
@@ -11841,9 +12117,6 @@ astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
 *        will be the TDB equivalent of the current value of the TimeFrame's
 *        TimeOrigin attribute. If no value has been set for TimeOrigin,
 *        then the default Epoch value is J2000.0.
-
-
-The coordinates of sources within a SkyFrame can changed with time
 *att--
 */
 /* Clear the Epoch value by setting it to AST__BAD. */
@@ -12234,7 +12507,7 @@ MAKE_TEST(Symbol)
 *     Unit(axis)
 
 *  Purpose:
-*     Axis physical units.
+*     Physical units for formatted axis values
 
 *  Type:
 *     Public attribute.
@@ -12244,9 +12517,10 @@ MAKE_TEST(Symbol)
 
 *  Description:
 *     This attribute contains a textual representation of the physical
-*     units used to represent coordinate values on a particular axis
-c     of a Frame. The astSetActiveUnit function controls how the Unit values
-f     of a Frame. The AST_SETACTIVEUNIT routine controls how the Unit values
+*     units used to represent formatted coordinate values on a particular
+*     axis of a Frame.
+c     The astSetActiveUnit function controls how the Unit values
+f     The AST_SETACTIVEUNIT routine controls how the Unit values
 *     are used.
 
 *  Applicability:
@@ -12272,6 +12546,15 @@ f        the AST_FORMAT function when formatting coordinate values.
 *        its current Frame (as specified by the Current attribute).
 
 *  Notes:
+*     - This attribute described the units used when an axis value is
+*     formatted into a string using
+c     astFormat.
+f     AST_FORMAT.
+*     In some cases these units may be different to those used to represent
+*     floating point axis values within application code (for instance a
+*     SkyFrame always uses radians to represent floating point axis values).
+*     The InternalUnit attribute described the units used for floating
+*     point values.
 *     - When specifying this attribute by name, it should be
 *     subscripted with the number of the Frame axis to which it
 *     applies.
@@ -12288,7 +12571,7 @@ MAKE_TEST(Unit)
 *     NormUnit(axis)
 
 *  Purpose:
-*     Normalised Axis physical units.
+*     Normalised physical units for formatted axis values
 
 *  Type:
 *     Public attribute.
@@ -12315,8 +12598,48 @@ MAKE_TEST(Unit)
 *att--
 */
 /* This simply provides an interface to the Axis methods for accessing
-   the Unit string. */
+   the NormUnit string. */
 MAKE_GET(NormUnit,const char *,NULL,0,0)
+
+/*
+*att++
+*  Name:
+*     InternalUnit(axis)
+
+*  Purpose:
+*     Physical units for unformated axis values
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String, read-only.
+
+*  Description:
+*     This read-only attribute contains a textual representation of the
+*     physical units used to represent unformatted (i.e. floating point)
+*     values on a particular axis of a Frame, typically handled internally
+*     within application code. In most cases, the value of the InternalUnit
+*     attribute will be the same as Unit attribute (i.e. formatted and
+*     unformatted axis values will normally use the same system of units).
+*     The main exception to this is the SkyFrame class, which represents
+*     unformatted axis values in radians, regardless of the current
+*     setting of the Unit attribute.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+
+*  Notes:
+*     - When specifying this attribute by name, it should be
+*     subscripted with the number of the Frame axis to which it
+*     applies.
+*att--
+*/
+/* If the Axis structure provides a value for InternalUnit, then use
+   that value. Otherwise, use a default equal to the value of the Unit
+   attribute for the axis. */
+MAKE_GET(InternalUnit,const char *,NULL,1,astGetUnit(this,axis))
 
 /* Implement member functions to access the attributes associated with
    the Frame as a whole using the macros defined for this purpose in
@@ -13189,7 +13512,7 @@ astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
 *     Public attribute.
 
 *  Synopsis:
-*     String.
+*     Floating point.
 
 *  Description:
 *     This attribute specifies the geodetic altitude of the observer, in
@@ -13841,6 +14164,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    dval = set ? GetObsAlt( this, status ) : astGetObsAlt( this );
    astWriteDouble( channel, "ObsAlt", set, 0, dval, "Observers geodetic altitude (metres)" );
 
+/* Dtai*/
+/* ---- */
+   set = TestDtai( this, status );
+   dval = set ? GetDtai( this, status ) : astGetDtai( this );
+   astWriteDouble( channel, "Dtai", set, 0, dval, "TAI-UTC in seconds" );
+
 /* Dut1*/
 /* ---- */
    set = TestDut1( this, status );
@@ -14140,6 +14469,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->obsalt = AST__BAD;
          new->obslat = AST__BAD;
          new->obslon = AST__BAD;
+         new->dtai = AST__BAD;
          new->dut1 = AST__BAD;
          new->flags = 0;
          new->variants = NULL;
@@ -14498,6 +14828,11 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
          new->obsalt = astReadDouble( channel, "obsalt", AST__BAD );
          if ( TestObsAlt( new, status ) ) SetObsAlt( new, new->obsalt, status );
 
+/* Dtai. */
+/* ---- */
+         new->dtai = astReadDouble( channel, "dtai", AST__BAD );
+         if ( TestDtai( new, status ) ) SetDtai( new, new->dtai, status );
+
 /* Dut1. */
 /* ---- */
          new->dut1 = astReadDouble( channel, "dut1", AST__BAD );
@@ -14609,7 +14944,7 @@ AstLineDef *astLineDef_( AstFrame *this, const double start[2],
    return (**astMEMBER(this,Frame,LineDef))( this, start, end, status );
 }
 int astLineCrossing_( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
-                      double **cross, int *status ) {
+                      double cross[5], int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,LineCrossing))( this, l1, l2, cross, status );
 }
@@ -14670,6 +15005,10 @@ void astMatchAxesX_( AstFrame *frm2, AstFrame *frm1, int *axes, int *status ) {
 const char *astFormat_( AstFrame *this, int axis, double value, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,Format))( this, axis, value, status );
+}
+double astCentre_( AstFrame *this, int axis, double value, double gap, int *status ) {
+   if ( !astOK ) return 0.0;
+   return (**astMEMBER(this,Frame,Centre))( this, axis, value, gap, status );
 }
 double astGap_( AstFrame *this, int axis, double gap, int *ntick, int *status ) {
    if ( !astOK ) return 0.0;
@@ -14759,6 +15098,11 @@ void astNormBox_( AstFrame *this, double lbnd[], double ubnd[], AstMapping *reg,
 double astAxDistance_( AstFrame *this, int axis, double v1, double v2, int *status ) {
    if ( !astOK ) return AST__BAD;
    return (**astMEMBER(this,Frame,AxDistance))( this, axis, v1, v2, status );
+}
+void astAxNorm_( AstFrame *this, int axis, int oper, int nval, double *values,
+                 int *status ){
+   if ( !astOK ) return;
+   return (**astMEMBER(this,Frame,AxNorm))( this, axis, oper, nval, values, status );
 }
 double astAxOffset_( AstFrame *this, int axis, double v1, double dist, int *status ) {
    if ( !astOK ) return AST__BAD;

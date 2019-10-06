@@ -20,7 +20,7 @@ use File::Copy;
 # over our test file.
 #
 
-my $empty = File::Spec->catfile($folderdir, 'empty');
+my $empty = File::Spec->catfile($workdir, 'empty');
 
 copy $src, $cpy
     or die "Cannot create test folder $cpy: $!\n";
@@ -37,7 +37,7 @@ my @fopts =
 
 my $folder = $mgr->open
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , @fopts
   );
 
@@ -94,7 +94,7 @@ ok($old_size != -s $cpy);
 
 $folder = $mgr->open
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , @fopts
   , access    => 'rw'
   );
@@ -104,7 +104,7 @@ cmp_ok($folder->messages, "==", 47);
 
 my $sec = $mgr->open
   ( folder    => '=empty'
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , @fopts
   , create    => 1
   );

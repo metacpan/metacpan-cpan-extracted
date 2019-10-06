@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '1.039'; # VERSION
+our $DATE = '2019-10-05'; # DATE
+our $VERSION = '1.041'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1211,7 +1211,7 @@ sub _update_files {
         "-r", $remote_url,
     );
     my $env = {};
-    $env->{PERL5OPT} = "-MLWP::UserAgent::Patch::FilterLcpan=".join(",", @filter_args)
+    $env->{PERL5OPT} = "-MLWP::Protocol::Patch::CountBytesIn -MEnd::PrintBytesIn -MLWP::UserAgent::Patch::FilterLcpan=".join(",", @filter_args)
         if @filter_args;
 
     IPC::System::Options::system(
@@ -4141,7 +4141,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.039 of App::lcpan (from Perl distribution App-lcpan), released on 2019-09-19.
+This document describes version 1.041 of App::lcpan (from Perl distribution App-lcpan), released on 2019-10-05.
 
 =head1 SYNOPSIS
 
@@ -4320,7 +4320,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4518,7 +4518,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4686,7 +4686,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.28.2")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 

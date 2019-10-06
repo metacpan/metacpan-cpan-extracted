@@ -22,12 +22,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -66,6 +66,10 @@
 *        Added astReplaceNan.
 *     2-OCT-2012 (DSB):
 *        Check for Infs as well as NaNs.
+*     24-MAY-2016 (DSB):
+*        Added astShowPoints.
+*     25-SEP-2019 (DSB):
+*        Convert to use 8 byte "npoint" values.
 */
 
 /* Module Macros. */
@@ -493,7 +497,7 @@ static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
@@ -537,7 +541,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstPointSet *astPointSetId_( int, int, const char *, int *, ...);
+AstPointSet *astPointSetId_( AstDim, int, const char *, int *, ...);
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -545,8 +549,8 @@ static const char *GetAttrib( AstObject *, const char *, int * );
 static double **GetPoints( AstPointSet *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetNcoord( const AstPointSet *, int * );
-static int GetNpoint( const AstPointSet *, int * );
-static int GetObjSize( AstObject *, int * );
+static AstDim GetNpoint( const AstPointSet *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int ReplaceNaN( AstPointSet *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static AstPointSet *AppendPoints( AstPointSet *, AstPointSet *, int * );
@@ -558,9 +562,10 @@ static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void PermPoints( AstPointSet *, int, const int[], int * );
 static void SetAttrib( AstObject *, const char *, int * );
+static void SetNpoint( AstPointSet *, AstDim, int * );
 static void SetPoints( AstPointSet *, double **, int * );
-static void SetNpoint( AstPointSet *, int, int * );
-static void SetSubPoints( AstPointSet *, int, int, AstPointSet *, int * );
+static void SetSubPoints( AstPointSet *, AstDim, int, AstPointSet *, int * );
+static void ShowPoints( AstPointSet *, int * );
 
 static double GetPointAccuracy( AstPointSet *, int, int * );
 static int TestPointAccuracy( AstPointSet *, int, int * );
@@ -1179,11 +1184,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   AstDim npoint;                /* Npoint attribute value */
    AstPointSet *this;            /* Pointer to the PointSet structure */
    const char *result;           /* Pointer value to return */
    int ncoord;                   /* Ncoord attribute value */
-   int npoint;                   /* Npoint attribute value */
 
 /* Initialise. */
    result = NULL;
@@ -1216,7 +1221,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "npoint" ) ) {
       npoint = astGetNpoint( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%d", npoint );
+         (void) sprintf( getattrib_buff, "%" AST__DIMFMT , npoint );
          result = getattrib_buff;
       }
 
@@ -1230,7 +1235,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1243,7 +1248,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     PointSet member function (over-rides the astGetObjSize protected
@@ -1269,7 +1274,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstPointSet *this;         /* Pointer to PointSet structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -1339,7 +1344,7 @@ static int GetNcoord( const AstPointSet *this, int *status ) {
    return this->ncoord;
 }
 
-static int GetNpoint( const AstPointSet *this, int *status ) {
+static AstDim GetNpoint( const AstPointSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1353,7 +1358,7 @@ static int GetNpoint( const AstPointSet *this, int *status ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int astGetNpoint( const AstPointSet *this )
+*     AstDim astGetNpoint( const AstPointSet *this )
 
 *  Class Membership:
 *     PointSet method.
@@ -1437,8 +1442,8 @@ static double **GetPoints( AstPointSet *this, int *status ) {
 */
 
 /* Local Variables: */
-   int i;                        /* Loop counter for coordinates */
-   int nval;                     /* Number of values to be stored */
+   AstDim i;                     /* Loop counter */
+   AstDim nval;                  /* Number of values to be stored */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -1481,7 +1486,7 @@ static double **GetPoints( AstPointSet *this, int *status ) {
 
 /* Check for bad values */
       if( this->values ) {
-         int i, j;
+         AstDim i, j;
          for( i = 0; astOK && i < this->ncoord; i++ ) {
             for( j = 0; j < this->npoint; j++ ) {
                if( !finite( (this->ptr)[ i ][ j ] ) ) {
@@ -1574,6 +1579,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
    vtab->SetPoints = SetPoints;
    vtab->SetNpoint = SetNpoint;
    vtab->SetSubPoints = SetSubPoints;
+   vtab->ShowPoints = ShowPoints;
 
    vtab->GetPointAccuracy = GetPointAccuracy;
    vtab->SetPointAccuracy = SetPointAccuracy;
@@ -1854,7 +1860,7 @@ static int ReplaceNaN( AstPointSet *this, int *status ) {
    double *p;
    int ic;
    int nc;
-   int np;
+   AstDim np;
    int result;
 
 /* Initialise */
@@ -1980,7 +1986,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 #undef MATCH
 }
 
-static void SetNpoint( AstPointSet *this, int npoint, int *status ) {
+static void SetNpoint( AstPointSet *this, AstDim npoint, int *status ) {
 /*
 *+
 *  Name:
@@ -1994,7 +2000,7 @@ static void SetNpoint( AstPointSet *this, int npoint, int *status ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     void astSetNpoint( AstPointSet *this, int npoint )
+*     void astSetNpoint( AstPointSet *this, AstDim npoint )
 
 *  Class Membership:
 *     PointSet method.
@@ -2018,9 +2024,11 @@ static void SetNpoint( AstPointSet *this, int npoint, int *status ) {
 
 /* Check the new size is valid. */
    if( npoint < 1 || npoint > this->npoint ) {
-      astError( AST__NPTIN, "astSetNpoint(%s): Number of points (%d) is "
-                "not valid.", status, astGetClass( this ), npoint );
-      astError( AST__NPTIN, "Should be in the range 1 to %d.", status, this->npoint );
+      astError( AST__NPTIN, "astSetNpoint(%s): Number of points (%"
+                AST__DIMFMT ") is not valid.", status, astGetClass( this ),
+                npoint );
+      astError( AST__NPTIN, "Should be in the range 1 to %" AST__DIMFMT ".",
+                status, this->npoint );
 
 /* Store the new size. */
    } else {
@@ -2136,7 +2144,7 @@ static void SetPoints( AstPointSet *this, double **ptr, int *status ) {
    }
 }
 
-static void SetSubPoints( AstPointSet *point1, int point, int coord,
+static void SetSubPoints( AstPointSet *point1, AstDim point, int coord,
                           AstPointSet *point2, int *status ) {
 /*
 *+
@@ -2151,7 +2159,7 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
 
 *  Synopsis:
 *     #include "pointset.h"
-*     void astSetSubPoints( AstPointSet *point1, int point, int coord,
+*     void astSetSubPoints( AstPointSet *point1, AstDim point, int coord,
 *                           AstPointSet *point2 )
 
 *  Class Membership:
@@ -2201,8 +2209,8 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
    int i;                        /* Loop counter for coordinates */
    int ncoord1;                  /* Number of coordinates in first PointSet */
    int ncoord2;                  /* Number of coordinates in second PointSet */
-   int npoint1;                  /* Number of points in first PointSet */
-   int npoint2;                  /* Number of points in second PointSet */
+   AstDim npoint1;               /* Number of points in first PointSet */
+   AstDim npoint2;               /* Number of points in second PointSet */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2218,10 +2226,10 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
    if ( astOK ) {
       if ( ( point < 0 ) || ( point + npoint2 > npoint1 ) ) {
          astError( AST__PTRNG, "astSetSubPoints(%s): Range of points in "
-                   "output %s (%d to %d) lies outside the input %s extent "
-                   "(0 to %d).", status,
-                   astGetClass( point1 ), astGetClass( point2 ), point,
-                   point + npoint2, astGetClass( point1 ), npoint1 );
+                   "output %s (%" AST__DIMFMT " to %" AST__DIMFMT ") lies "
+                   "outside the input %s extent (0 to %" AST__DIMFMT ").",
+                   status, astGetClass( point1 ), astGetClass( point2 ),
+                   point, point + npoint2, astGetClass( point1 ), npoint1 );
 
 /* Similarly check that the range of coordinates is valid. */
       } else if ( ( coord < 0 ) || ( coord + ncoord2 > ncoord1 ) ) {
@@ -2255,6 +2263,79 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
 
 /* Free the temporary pointer arry. */
          ptr2 = (double **) astFree( (void * ) ptr2 );
+      }
+   }
+}
+
+static void ShowPoints( AstPointSet *this, int *status ) {
+/*
+*+
+*  Name:
+*     astShowPoints
+
+*  Purpose:
+*     Display the contents of a PointSet on standard output as a table
+*     in TOPCAT ASCII format.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     void astShowPoints( AstPointSet *this )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     This function displays the contents of the supplied PointSet on
+*     standard output as a table in TOPCAT "ascii" format. The first row
+*     is a comment that defines the column (axis) names as AXIS1, AXIS2,
+*     etc. Each subsequent row contains the axis values for one point.
+*     Bad axis values are represented by the string "null".
+
+*  Parameters:
+*     this
+*        Pointer to the first PointSet.
+*-
+*/
+
+/* Local Variables: */
+   AstDim ip;
+   AstDim np;
+   double **ptr;
+   int ic;
+   int nc;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get pointers to the PointSet data, the number of axes and the number
+   of points. */
+   ptr = astGetPoints( this );
+   nc = astGetNcoord( this );
+   np = astGetNpoint( this );
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Display the header. */
+      printf("# ");
+      for( ic = 0; ic < nc; ic++ ) {
+         printf("Axis%d ", ic + 1 );
+      }
+      printf("\n");
+
+/* Display each row. */
+      for( ip = 0; ip < np; ip++ ) {
+         for( ic = 0; ic < nc; ic++ ) {
+            if( ptr[ic][ip] != AST__BAD ) {
+               printf("%.*g ", AST__DBL_DIG, ptr[ic][ip] );
+            } else {
+               printf("%*s ", -AST__DBL_DIG, "null");
+            }
+         }
+         printf("\n");
       }
    }
 }
@@ -2301,7 +2382,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 */
 
 /* Local Variables: */
-   AstPointSet *this;            /* Pointer to the PointSet structure */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -2309,9 +2389,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-
-/* Obtain a pointer to the PointSet structure. */
-   this = (AstPointSet *) this_object;
 
 /* Check the attribute name and test the appropriate attribute. */
 
@@ -2405,7 +2482,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    AstPointSet *in;              /* Pointer to input PointSet */
    AstPointSet *out;             /* Pointer to output PointSet */
    int i;                        /* Loop counter for coordinates */
-   int nval;                     /* Number of values to store */
+   AstDim nval;                  /* Number of values to store */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2560,7 +2637,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    int i;                        /* Counter for coordinate values */
    int ival;                     /* Integer value */
    int makeComment;              /* Include a comment? */
-   int point;                    /* Loop counter for points */
+   AstDim point;                 /* Loop counter for points */
    int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
@@ -2587,8 +2664,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Npoint. */
 /* ------- */
-   astWriteInt( channel, "Npoint", 1, 1, this->npoint,
-                "Number of points" );
+   if( (int) this->npoint == this->npoint ) {
+      astWriteInt( channel, "Npoint", 1, 1, this->npoint,
+                   "Number of points" );
+   } else if( astOK ) {
+      astError( AST__TOOBG, "astDump(PointSet): PointSet is too large to"
+                " dump.", status );
+   }
 
 /* Ncoord. */
 /* ------- */
@@ -2617,7 +2699,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* If it contains data, create a suitable keyword for each coordinate
    value in turn. */
-   if ( this->ptr ) {
+   if ( astOK && this->ptr ) {
       makeComment = 1;
       i = 0;
       for ( point = 0; point < this->npoint; point++ ) {
@@ -2646,7 +2728,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(PointSet,Object)
 astMAKE_CHECK(PointSet)
 
-AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *status, ...) {
+AstPointSet *astPointSet_( AstDim npoint, int ncoord, const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -2660,7 +2742,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *sta
 
 *  Synopsis:
 *     #include "pointset.h"
-*     AstPointSet *astPointSet( int npoint, int ncoord,
+*     AstPointSet *astPointSet( AstDim npoint, int ncoord,
 *                               const char *options, ..., int *status )
 
 *  Class Membership:
@@ -2738,7 +2820,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *sta
    return new;
 }
 
-AstPointSet *astPointSetId_( int npoint, int ncoord,
+AstPointSet *astPointSetId_( AstDim npoint, int ncoord,
                              const char *options, int *status, ...) {
 /*
 *  Name:
@@ -2752,7 +2834,7 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
 
 *  Synopsis:
 *     #include "pointset.h"
-*     AstPointSet *astPointSetId_( int npoint, int ncoord,
+*     AstPointSet *astPointSetId_( AstDim npoint, int ncoord,
 *                                  const char *options, ... )
 
 *  Class Membership:
@@ -2816,7 +2898,7 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
 
 AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
                                AstPointSetVtab *vtab, const char *name,
-                               int npoint, int ncoord, int *status ) {
+                               AstDim npoint, int ncoord, int *status ) {
 /*
 *+
 *  Name:
@@ -2832,7 +2914,7 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
 *     #include "pointset.h"
 *     AstPointSet *astInitPointSet( void *mem, size_t size, int init,
 *                                   AstPointSetVtab *vtab, const char *name,
-*                                   int npoint, int ncoord )
+*                                   AstDim npoint, int ncoord )
 
 *  Class Membership:
 *     PointSet initialiser.
@@ -2901,8 +2983,8 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
 /* Check the initialisation values for validity, reporting an error if
    necessary. */
    if ( npoint < 1 ) {
-      astError( AST__NPTIN, "astInitPointSet(%s): Number of points (%d) is "
-                "not valid.", status, name, npoint );
+      astError( AST__NPTIN, "astInitPointSet(%s): Number of points (%"
+                AST__DIMFMT ") is not valid.", status, name, npoint );
    } else if ( ncoord < 1 ) {
       astError( AST__NCOIN, "astInitPointSet(%s): Number of coordinates per "
                 "point (%d) is not valid.", status, name, ncoord );
@@ -3017,7 +3099,7 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
    int coord;                    /* Loop counter for coordinates */
    int empty;                    /* PointSet empty? */
    int i;                        /* Counter for coordinate values */
-   int point;                    /* Loop counter for points */
+   AstDim point;                 /* Loop counter for points */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(channel);
@@ -3072,7 +3154,7 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 
 /* Npoint. */
 /* ------- */
-      new->npoint = astReadInt( channel, "npoint", 1 );
+      new->npoint = (AstDim) astReadInt( channel, "npoint", 1 );
       if ( new->npoint < 1 ) new->npoint = 1;
 
 /* Ncoord. */
@@ -3158,7 +3240,7 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-int astGetNpoint_( const AstPointSet *this, int *status ) {
+AstDim astGetNpoint_( const AstPointSet *this, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,PointSet,GetNpoint))( this, status );
 }
@@ -3178,11 +3260,11 @@ void astSetPoints_( AstPointSet *this, double **ptr, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,PointSet,SetPoints))( this, ptr, status );
 }
-void astSetNpoint_( AstPointSet *this, int npoint, int *status ) {
+void astSetNpoint_( AstPointSet *this, AstDim npoint, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,PointSet,SetNpoint))( this, npoint, status );
 }
-void astSetSubPoints_( AstPointSet *point1, int point, int coord,
+void astSetSubPoints_( AstPointSet *point1, AstDim point, int coord,
                        AstPointSet *point2, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(point1,PointSet,SetSubPoints))( point1, point, coord, point2, status );
@@ -3199,6 +3281,10 @@ void astBndPoints_( AstPointSet *this, double *lbnd, double *ubnd, int *status )
 int astReplaceNaN_( AstPointSet *this, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,PointSet,ReplaceNaN))( this, status );
+}
+void astShowPoints_( AstPointSet *this, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,PointSet,ShowPoints))( this, status );
 }
 
 

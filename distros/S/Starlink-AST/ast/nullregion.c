@@ -41,12 +41,12 @@ f     The NullRegion class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -629,9 +629,6 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
    int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
    int msz_this;             /* Original MeshSize for "this" */
    int msz_this_set;         /* Was MeshSize originally set for "this"? */
-   int nax;                  /* Number of axes in "result" */
-   int nax_reg;              /* Number of axes in "reg" */
-   int nax_this;             /* Number of axes in "this" */
    int neg_reg;              /* Negated attribute value for other supplied Region */
    int neg_this;             /* Negated attribute value for supplied NullRegion  */
 
@@ -651,14 +648,6 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 /* Get the Nagated attributes of the two Regions. */
       neg_this = astGetNegated( this );
       neg_reg = astGetNegated( reg );
-
-/* Get the number of axes in the two supplied Regions. */
-      nax_reg = astGetNaxes( reg );
-      nax_this = astGetNaxes( this );
-
-/* If the Regions can be combined, get the number of axes the
-   combination will have. */
-      nax = nax_reg + nax_this;
 
 /* Get the base Frames from the two Region FrameSets, and combine them
    into a single CmpFrame that will be used to create any new Region. */
@@ -1014,15 +1003,11 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 */
 
 /* Local Variables: */
-   AstNullRegion *this;          /* Pointer to NullRegion structure */
    int i;                        /* Axis index */
    int nc;                       /* No. of axes in base Frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Get a pointer to the NullRegion structure */
-   this = (AstNullRegion *) this_region;
 
 /* Get the number of base Frame axes. */
    nc = astGetNin( this_region->frameset );
@@ -1260,15 +1245,11 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd,
 */
 
 /* Local Variables: */
-   AstNullRegion *this;          /* Pointer to NullRegion structure */
    int i;                        /* Axis index */
    int nc;                       /* No. of axes in base Frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Get a pointer to the NullRegion structure */
-   this = (AstNullRegion *) this_region;
 
 /* Get the number of base Frame axes. */
    nc = astGetNin( this_region->frameset );
@@ -1579,30 +1560,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
-/* Local Variables: */
-   AstNullRegion *this;                 /* Pointer to the NullRegion structure */
-
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Obtain a pointer to the NullRegion structure. */
-   this = (AstNullRegion *) this_object;
-
-/* Write out values representing the instance variables for the
-   NullRegion class.  Accompany these with appropriate comment strings,
-   possibly depending on the values being written.*/
-
-/* In the case of attributes, we first use the appropriate (private)
-   Test...  member function to see if they are set. If so, we then use
-   the (private) Get... function to obtain the value to be written
-   out.
-
-   For attributes which are not set, we use the astGet... method to
-   obtain the value instead. This will supply a default value
-   (possibly provided by a derived class which over-rides this method)
-   which is more useful to a human reader as it corresponds to the
-   actual default attribute value.  Since "set" will be zero, these
-   values are for information only and will not be read back. */
 
 /* There are no values to write, so return without further action. */
 }
@@ -1667,7 +1626,7 @@ f     UNC = INTEGER (Given)
 *        or be a Prism containing centro-symetric component Regions. A deep
 *        copy of the supplied Region will be taken, so subsequent changes to
 *        the uncertainty Region using the supplied pointer will have no
-*        effect on the created Box. Alternatively,
+*        effect on the created NullRegion. Alternatively,
 f        a null Object pointer (AST__NULL)
 c        a NULL Object pointer
 *        may be supplied, in which case a default uncertainty of zero is
@@ -1808,7 +1767,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */
-   unc = unc_void ? astCheckRegion( astMakePointer( unc_void ) ) : NULL;
+   unc = unc_void ? astVerifyRegion( astMakePointer( unc_void ) ) : NULL;
 
 /* Initialise the NullRegion, allocating memory and initialising the
    virtual function table as well if necessary. */

@@ -46,17 +46,6 @@ finddepth(sub {
     push @scripts, "$File::Find::dir/$1";
 }, '.');
 
-my $has_mp;
-eval { require mod_perl2 };
-if ($@) {
-    eval { require mod_perl };
-    if (!$@) {
-        $has_mp = 1;
-    }
-} else {
-    $has_mp = 2;
-} 
-
 for (@scripts) {
     Apache::TestMM::generate_script($_);
 }
@@ -73,6 +62,11 @@ my %prereq = (
     'File::Spec' => '0.8',
     'Cwd'        => '2.06',
 );
+
+# Apache::TestServer uses Win32::Process on Windows.
+if ($^O =~ /MSWin32/i) {
+    $prereq{'Win32::Process'} = '0'
+}
 
 # Apache-Test/META.yml is excluded from mp2 distro to make PAUSE
 # indexer happy, but then perl Makefile.PL complains about a missing
@@ -158,12 +152,13 @@ no warnings 'redefine';
 sub MY::postamble {
     my $self = shift;
 
+    my $q = ($^O =~ /MSWin32/i ? '"' : "'");
+
     my $string = $self->MM::postamble;
 
-    $string .= <<'EOF';
+    $string .= <<"EOF";
 tag :
-	svn copy https://svn.apache.org/repos/asf/perl/Apache-Test/trunk https://svn.apache.org/repos/asf/perl/Apache-Test/tags/$(VERSION_SYM)
-	@echo update lib/Apache/Test.pm VERSION now
+	svn copy -m $q\$(VERSION_SYM) tag$q https://svn.apache.org/repos/asf/perl/Apache-Test/trunk https://svn.apache.org/repos/asf/perl/Apache-Test/tags/\$(VERSION_SYM)
 EOF
 
     return $string;

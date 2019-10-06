@@ -30,6 +30,7 @@ David
 Denaxas
 FWILES
 Father
+Fiegehenn
 Finch
 Form
 Froehlich
@@ -47,11 +48,13 @@ Hedlund
 Hukins
 Ian
 Jacob
+Julien
 Kapranoff
 Karaban
 Kennedy
 Kilgore
 Koenig
+Lance
 Lipcon
 Lukas
 MARKSTOS
@@ -86,6 +89,7 @@ Toru
 Tourbin
 Ville
 Wheeler
+Wicks
 Yamaguchi
 Yuri
 Zefram
@@ -115,6 +119,7 @@ jefflee
 john9art
 ka
 lib
+lw
 mai
 mark
 mschilli
@@ -129,6 +134,7 @@ ruff
 sasao
 sburke
 shaohua
+simbabque
 slaven
 sprout
 srezic

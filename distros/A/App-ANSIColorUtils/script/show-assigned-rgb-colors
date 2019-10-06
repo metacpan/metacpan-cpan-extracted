@@ -5,7 +5,7 @@
 
 our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ show-assigned-rgb-colors - Take arguments, pass them through assign_rgb_color(),
 
 =head1 VERSION
 
-This document describes version 0.005 of show-assigned-rgb-colors (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
+This document describes version 0.006 of show-assigned-rgb-colors (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::UserAgentProvider::EnvUserAgentProvider;
-$Web::Authenticate::UserAgentProvider::EnvUserAgentProvider::VERSION = '0.011';
+$Web::Authenticate::UserAgentProvider::EnvUserAgentProvider::VERSION = '0.012';
 use Mouse;
 #ABSTRACT: Implementation of Web::Authentication::UserAgentProvider::Role that users environment variables.
 
@@ -23,7 +23,7 @@ Web::Authenticate::UserAgentProvider::EnvUserAgentProvider - Implementation of W
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

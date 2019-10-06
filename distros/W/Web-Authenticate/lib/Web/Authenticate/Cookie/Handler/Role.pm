@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Cookie::Handler::Role;
-$Web::Authenticate::Cookie::Handler::Role::VERSION = '0.011';
+$Web::Authenticate::Cookie::Handler::Role::VERSION = '0.012';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::Cookie::Handler object should contain.
 
@@ -27,7 +27,7 @@ Web::Authenticate::Cookie::Handler::Role - A Mouse::Role that defines what metho
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

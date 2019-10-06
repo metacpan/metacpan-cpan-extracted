@@ -25,7 +25,7 @@ copy $src, $cpy
 
 my $folder = new Mail::Box::Mbox
   ( folder       => "=$cpyfn"
-  , folderdir    => $folderdir
+  , folderdir    => $workdir
   , lock_type    => 'NONE'
   , extract      => 'ALWAYS'
   , access       => 'rw'
@@ -55,7 +55,7 @@ ok($folder->write(policy => 'REPLACE'));
 
 my $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   );

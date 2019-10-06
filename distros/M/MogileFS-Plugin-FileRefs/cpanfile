@@ -1,0 +1,14 @@
+requires "MogileFS::Store" => "0";
+requires "MogileFS::Worker::Query" => "0";
+
+on 'test' => sub {
+  requires "MogileFS::Server" => "0";
+  requires "MogileFS::Test" => "0";
+  requires "Test::Exception" => "0";
+  requires "Test::More" => "0";
+  requires "Time::HiRes" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

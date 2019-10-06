@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.158';
+our $VERSION = '1.159';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -1358,7 +1358,7 @@ sub sql {
         if ((my $exists = $p->exists($cacheFile)) &&
                 ($cache == 0 || CORE::time-$p->mtime($cacheFile) < $cache)) {
             # Cachedatei existiert und ist noch gültig (0 = ewige
-            # Gültigkeit), d.h. wir lesen die Datensätze aud dem Cache.
+            # Gültigkeit), d.h. wir lesen die Datensätze aus dem Cache.
             $cacheOp = 'r';
         }
         else {
@@ -4903,7 +4903,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.158
+1.159
 
 =head1 AUTHOR
 

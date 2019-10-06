@@ -2,7 +2,7 @@ use Test::More;
 use DateTime::Ordinal;
 
 sub yawn {
-	my ($meth, $data, $expected, $expected_ordinal) = @_;
+	my ($meth, $data, $expected, $expected_ordinal, $expected_cardinal_text, $expected_ordinal_text) = @_;
 	my %default_date = (
 		year       => 2000,
 		month      => 1,
@@ -16,14 +16,17 @@ sub yawn {
 	%default_date = (%default_date, %{$data});
 	my $dt = DateTime::Ordinal->new(%default_date);
 	is ($dt->$meth(), $expected, "cardinal: $expected");
-	is ($dt->$meth(1), $expected_ordinal, "ordinal: $expected_ordinal");
+	is ($dt->$meth('o'), $expected_ordinal, "ordinal: $expected_ordinal");
+	is ($dt->$meth('f'), $expected_cardinal_text, "cardinal text: $expected_cardinal_text");
+	is ($dt->$meth('of'), $expected_ordinal_text, "ordinal text: $expected_ordinal_text");
+
 }
 
 for my $test (
-	[1, '1st'],
-	[2, '2nd'],
-	[3, '3rd'],
-	[4, '4th']
+	[1, '1st', 'one', 'first'],
+	[2, '2nd', 'two', 'second'],
+	[3, '3rd', 'three', 'third'],
+	[4, '4th', 'four', 'fourth']
 ) {
 	yawn('month', {month => $test->[0]}, @{$test});
 	yawn('mon', {month => $test->[0]}, @{$test});
@@ -66,28 +69,28 @@ for my $test (
 	yawn('week_of_month', { day => $test->[0] * 7 }, @{$test});
 }
 
-yawn('leap_seconds', {}, '22', '22nd');
+yawn('leap_seconds', {}, '22', '22nd', 'twenty-two', 'twenty-second');
 
 for my $test (
-	[1, 1, '1st'],
-	[8, 2, '2nd'],
-	[15, 3, '3rd'],
-	[22, 4, '4th']
+	[1, 1, '1st', 'one', 'first'],
+	[8, 2, '2nd', 'two', 'second'],
+	[15, 3, '3rd', 'three', 'third'],
+	[22, 4, '4th', 'four', 'fourth']
 ) {
-	yawn('weekday_of_month', {day => $test->[0]}, $test->[1], $test->[2]);	
+	yawn('weekday_of_month', {day => $test->[0]}, $test->[1], $test->[2], $test->[3], $test->[4]);	
 }
 
 
 for my $test (
-	[1, 1, '1st'],
-	[4, 2, '2nd'],
-	[7, 3, '3rd'],
-	[10, 4, '4th']
+	[1, 1, '1st', 'one', 'first'],
+	[4, 2, '2nd', 'two', 'second'],
+	[7, 3, '3rd', 'three', 'third'],
+	[10, 4, '4th', 'four', 'fourth']
 ) {
-	yawn('quarter', {month => $test->[0]}, $test->[1], $test->[2]);	
+	yawn('quarter', {month => $test->[0]}, $test->[1], $test->[2], $test->[3], $test->[4]);	
 	my $month = $test->[0] + 3;
 	$month = $month > 12 ? 1 : $month;
-	yawn('quarter_0', {month => $month}, $test->[1], $test->[2]);	
+	yawn('quarter_0', {month => $month}, $test->[1], $test->[2], $test->[3], $test->[4]);	
 }
 
 done_testing();

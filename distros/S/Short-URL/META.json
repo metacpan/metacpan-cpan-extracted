@@ -48,16 +48,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/srchulo/Short--URL/issues"
+         "web" : "https://github.com/srchulo/Short-URL/issues"
       },
-      "homepage" : "https://github.com/srchulo/Short--URL",
+      "homepage" : "https://github.com/srchulo/Short-URL",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/srchulo/Short--URL.git",
-         "web" : "https://github.com/srchulo/Short--URL"
+         "url" : "https://github.com/srchulo/Short-URL.git",
+         "web" : "https://github.com/srchulo/Short-URL"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_contributors" : [
       "Adam Hopkins <SirChickenHair@srchulo-aire.local>",
       "Adam Hopkins <srchulo@Adams-MacBook-Pro.local>",
@@ -65,8 +65,8 @@
       "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

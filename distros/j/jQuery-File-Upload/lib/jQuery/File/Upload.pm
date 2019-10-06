@@ -17,7 +17,7 @@ use Data::GUID;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -2413,8 +2413,8 @@ of duplicate filenames. Default is nothing.
 
   $j_fu->copy_file(undef);
 
-Performs a copy instead of a link from the temporary directory to the upload directory. 
-This might be useful if you are using Windows share that can't handle links. 
+Performs a copy instead of a link from the temporary directory to the upload directory.
+This might be useful if you are using Windows share that can't handle links.
 The default is undef and thus L<jQuery::File::Upload> will use links.
 
 =head3 tmp_dir

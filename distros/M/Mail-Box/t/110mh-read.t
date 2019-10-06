@@ -15,7 +15,7 @@ use Test::More tests => 27;
 use File::Compare;
 use File::Copy;
 
-my $mhsrc = File::Spec->catfile($folderdir, 'mh.src');
+my $mhsrc = File::Spec->catfile($workdir, 'mh.src');
 
 unpack_mbox2mh($src, $mhsrc);
 

@@ -24,7 +24,6 @@ BEGIN {
 
 my $mdsrc = File::Spec->catfile($folderdir, 'maildir.src');
 
-clean_dir $mdsrc;
 unpack_mbox2maildir($src, $mdsrc);
 
 my $folder = Mail::Box::Maildir->new
@@ -121,4 +120,3 @@ $folder->message(-1)->accept;
 ok($folder->message(-1)->label('accepted'));
 
 $folder->close;
-clean_dir $mdsrc;

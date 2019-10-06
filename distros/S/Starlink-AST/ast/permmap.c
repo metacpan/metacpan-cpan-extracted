@@ -42,12 +42,12 @@ f     The PermMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -85,8 +85,14 @@ f     The PermMap class does not define any new routines beyond those
 *     22-NOV-2012 (DSB):
 *        When using a default inperm array (as indicated by a NULL pointer
 *        for inperm), ensure the array is padded with "-1" values if the
-*        number of inputs exceeds the number of outputs. Also do the 
+*        number of inputs exceeds the number of outputs. Also do the
 *        equivalent for default outperm arrays.
+*     26-MAY-2016 (DSB):
+*        Allow the PermSplit attribute to be changed at any time. This is 
+*        because it does not directly affect either the forward or inverse
+*        transformation of the PermMap. The FitsCHan class needs to be able
+*        to change it to determine when checking if the -TAB algorithm can
+*        be used.
 *class--
 */
 
@@ -2025,6 +2031,10 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 *     constant value for the input), or if more than one of the selected
 *     inputs are fed (by the inverse transformation) by the same output,
 *     then the PermMap cannot be split.
+*
+*     Note, unlike most Mapping attributes, the value of this attribute
+*     may be changed at any time. This is because it does not change the
+*     nature of either the forward or inverse transformation of the Mapping.
 
 *  Applicability:
 *     PermMap

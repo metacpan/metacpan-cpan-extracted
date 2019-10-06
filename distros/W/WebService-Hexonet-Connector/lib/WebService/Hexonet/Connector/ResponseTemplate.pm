@@ -5,14 +5,14 @@ use strict;
 use warnings;
 use WebService::Hexonet::Connector::ResponseParser;
 
-use version 0.9917; our $VERSION = version->declare('v2.2.4');
+use version 0.9917; our $VERSION = version->declare('v2.2.5');
 
 
 sub new {
     my ( $class, $raw ) = @_;
     my $self = {};
     if ( !defined $raw || length $raw == 0 ) {
-        $raw = "[RESPONSE]\r\nCODE=423\r\nDESCRIPTION=Empty API response\r\nEOF\r\n";
+        $raw = "[RESPONSE]\r\nCODE=423\r\nDESCRIPTION=Empty API response. Probably unreachable API end point\r\nEOF\r\n";
     }
     $self->{raw}  = $raw;
     $self->{hash} = WebService::Hexonet::Connector::ResponseParser::parse($raw);

@@ -107,7 +107,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="not(preceding-sibling::*) and (following-sibling::*) and not(parent::fb:cite[parent::fb:section[ancestor::fb:body[@name='notes']]]/preceding-sibling::*) and not(following-sibling::fb:subtitle) and not(parent::fb:annotation)">
+          <xsl:when test="not(preceding-sibling::*) and (following-sibling::*[local-name()!='text-author']) and not(parent::fb:cite[parent::fb:section[ancestor::fb:body[@name='notes']]]/preceding-sibling::*) and not(following-sibling::fb:subtitle) and not(parent::fb:annotation)">
             <title>
               <p><xsl:apply-templates/></p>
             </title>
@@ -450,7 +450,7 @@
   <xsl:template match="fb:body[@name='notes']">
     <xsl:variable name="root_sections_count" select="count(fb:section[fb:section])"/>
     <xsl:choose>
-      <xsl:when test="root_sections_count >= 2 and not(fb:section[@id])">
+      <xsl:when test="$root_sections_count >= 2 and not(fb:section[@id])">
         <!-- two (or more) root sections structure. First root section is for
           footnotes and others - for endnotes -->
 
@@ -458,7 +458,7 @@
         <xsl:variable name="footnotes" select="fb:section[1]/fb:section[@id]"/>
         <xsl:if test="$footnotes">
           <notes show="0">
-            <xsl:apply-templates select="$footnotes/../fb:title"/>
+            <xsl:apply-templates select="$footnotes[1]/../fb:title[1]"/>
             <xsl:apply-templates select="$footnotes"/>
           </notes>
         </xsl:if>
@@ -468,7 +468,7 @@
           select="fb:section[preceding-sibling::fb:section]/fb:section"/>
         <xsl:if test="$endnotes">
           <notes show="1">
-            <xsl:apply-templates select="$endnotes/../fb:title"/>
+            <xsl:apply-templates select="$endnotes[1]/../fb:title[1]"/>
             <xsl:apply-templates select="$endnotes"/>
           </notes>
         </xsl:if>

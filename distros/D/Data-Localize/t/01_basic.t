@@ -1,4 +1,8 @@
 use strict;
+use Cwd ();
+BEGIN {
+   unshift @INC, Cwd::abs_path()
+}
 use Test::More;
 use t::Data::Localize::Test;
 

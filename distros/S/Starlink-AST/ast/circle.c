@@ -28,7 +28,7 @@ f     In addition to those routines applicable to all Regions, the
 f     following routines may also be applied to all Circles:
 *
 c     - astCirclePars: Get the geometric parameters of the Circle
-c     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
+f     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -42,12 +42,12 @@ c     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -71,15 +71,6 @@ c     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS Circle
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -387,7 +378,9 @@ static void Cache( AstCircle *this, int *status ){
 
 /* Free resources */
       frm = astAnnul( frm );
-      if( centre ) centre = astFree( centre );
+      centre = astFree( centre );
+      lb = astFree( lb );
+      ub = astFree( ub );
 
 /* Indicate cached information is up to date. */
       this->stale = 0;
@@ -1541,7 +1534,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* If an error has occurred, return zero. */
    if( !astOK ) {
       result = 0;
-      if( mask ) *mask = astAnnul( *mask );
+      if( mask ) *mask = astFree( *mask );
    }
 
 /* Return the result. */
@@ -2257,30 +2250,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
-/* Local Variables: */
-   AstCircle *this;                 /* Pointer to the Circle structure */
-
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Obtain a pointer to the Circle structure. */
-   this = (AstCircle *) this_object;
-
-/* Write out values representing the instance variables for the
-   Circle class.  Accompany these with appropriate comment strings,
-   possibly depending on the values being written.*/
-
-/* In the case of attributes, we first use the appropriate (private)
-   Test...  member function to see if they are set. If so, we then use
-   the (private) Get... function to obtain the value to be written
-   out.
-
-   For attributes which are not set, we use the astGet... method to
-   obtain the value instead. This will supply a default value
-   (possibly provided by a derived class which over-rides this method)
-   which is more useful to a human reader as it corresponds to the
-   actual default attribute value.  Since "set" will be zero, these
-   values are for information only and will not be read back. */
 
 /* There are no values to write, so return without further action. */
 }
@@ -2441,7 +2412,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Initialise the Circle, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitCircle( NULL, sizeof( AstCircle ), !class_init, &class_vtab,
-                     "Circle", frame, form, centre, point, unc );
+                        "Circle", frame, form, centre, point, unc );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -2528,7 +2499,7 @@ AstCircle *astCircleId_( void *frame_void, int form, const double centre[],
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */
-   unc = unc_void ? astCheckRegion( astMakePointer( unc_void ) ) : NULL;
+   unc = unc_void ? astVerifyRegion( astMakePointer( unc_void ) ) : NULL;
 
 /* Initialise the Circle, allocating memory and initialising the
    virtual function table as well if necessary. */

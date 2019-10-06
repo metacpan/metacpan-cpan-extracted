@@ -52,9 +52,9 @@ f     Mapping, a FrameSet may also be inverted (see AST_INVERT), which
 *     hence of reversing the Mapping between them.
 *
 *     Regions may be added into a FrameSet (since a Region is a type of
-*     Frame), either explicitly or as components within CmpFrames. In this
-*     case the Mapping between a pair of Frames within a FrameSet will
-*     include the effects of the clipping produced by any Regions included
+*     Frame), either explicitly or as components within CmpFrames. In
+*     this case the Mapping between a pair of Frames within a FrameSet
+*     will include the masking effects produced by any Regions included
 *     in the path between the Frames.
 
 *  Inheritance:
@@ -64,7 +64,7 @@ f     Mapping, a FrameSet may also be inverted (see AST_INVERT), which
 *     In addition to those attributes common to all Frames, every
 *     FrameSet also has the following attributes:
 *
-*     - AllVariants: List of all variant mappings store with current Frame
+*     - AllVariants: List of all variant mappings stored with current Frame
 *     - Base: FrameSet base Frame index
 *     - Current: FrameSet current Frame index
 *     - Nframe: Number of Frames in a FrameSet
@@ -112,12 +112,12 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -254,6 +254,26 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     29-APR-2013 (DSB):
 *        Added attributes AllVariants and Variant. Also added methods
 *        astAddVariant and astMirrorVariants.
+*     25-SEP-2014 (DSB):
+*        Allow Base and Current attributes to be specified by giving a
+*        Domain name.
+*     17-APR-2015 (DSB):
+*        Added Centre.
+*     28-APR-2015 (DSB):
+*        astAdFrame now takes deep copies of the supplied mapping and
+*        frame, rather than just cloning their pointers. So the modified
+*        FrameSet is now independent of the supplied Mapping and Frame
+*        objects.
+*     26-OCT-2016 (DSB):
+*        Override the AxNorm method.
+*     07-APR-2017 (GSB):
+*        Override Dtai and Dut1 accessor methods.
+*     07-NOV-2017 (GSB):
+*        In AddFrame, check to see if a FrameSet is supplied in place of
+*        a Mapping and if so, use the FrameSet's base -> current Mapping
+*        instead.
+*     11-DEC-2017 (DSB):
+*        Added method astGetNode.
 *class--
 */
 
@@ -782,7 +802,7 @@ static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static void (* parent_clear)( AstObject *, const char *, int * );
 static int (* parent_getusedefs)( AstObject *, int * );
 static void (* parent_vset)( AstObject *, const char *, char **, va_list, int * );
@@ -877,6 +897,7 @@ static double AxAngle( AstFrame *, const double[], const double[], int, int * );
 static double AxDistance( AstFrame *, int, double, double, int * );
 static double AxOffset( AstFrame *, int, double, double, int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
 static double Rate( AstMapping *, double *, int, int, int * );
@@ -896,8 +917,9 @@ static int GetMinAxes( AstFrame *, int * );
 static int GetNaxes( AstFrame *, int * );
 static int GetNframe( AstFrameSet *, int * );
 static int GetNin( AstMapping *, int * );
+static int GetNode( AstFrameSet *, int, int *, int *, AstMapping **, int *, int * );
 static int GetNout( AstMapping *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int GetPermute( AstFrame *, int * );
 static int GetPreserveAxes( AstFrame *, int * );
 static int GetTranForward( AstMapping *, int * );
@@ -905,7 +927,7 @@ static int GetTranInverse( AstMapping *, int * );
 static int GetVarFrm( AstFrameSet *, int, int * );
 static int IsUnitFrame( AstFrame *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
-static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
 static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Span( AstFrameSet *, AstFrame **, int, int, int, AstMapping **, int *, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
@@ -931,6 +953,7 @@ static int ValidateAxis( AstFrame *, int, int, const char *, int * );
 static int ValidateFrameIndex( AstFrameSet *, int, const char *, int * );
 static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
 static void AppendAxes( AstFrameSet *, AstFrame *, int * );
+static void AxNorm( AstFrame *, int, int, int, double *, int * );
 static void CheckPerm( AstFrame *, const int *, const char *, int * );
 static void Clear( AstObject *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
@@ -1007,6 +1030,16 @@ static double GetEpoch( AstFrame *, int * );
 static int TestEpoch( AstFrame *, int * );
 static void ClearEpoch( AstFrame *, int * );
 static void SetEpoch( AstFrame *, double, int * );
+
+static double GetDtai( AstFrame *, int * );
+static int TestDtai( AstFrame *, int * );
+static void ClearDtai( AstFrame *, int * );
+static void SetDtai( AstFrame *, double, int * );
+
+static double GetDut1( AstFrame *, int * );
+static int TestDut1( AstFrame *, int * );
+static void ClearDut1( AstFrame *, int * );
+static void SetDut1( AstFrame *, double, int * );
 
 static double GetObsAlt( AstFrame *, int * );
 static int TestObsAlt( AstFrame *, int * );
@@ -1141,7 +1174,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
    return result;
 }
 
-static void AddFrame( AstFrameSet *this, int iframe, AstMapping *map,
+static void AddFrame( AstFrameSet *this, int iframe, AstMapping *map0,
                       AstFrame *frame, int *status ) {
 /*
 *++
@@ -1215,6 +1248,12 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
+*     - Deep copies of the supplied
+c     "mapping" and "frame"
+f     MAPPING and FRAME
+*     objects are stored within the modified FrameSet. So any changes made
+*     to the FrameSet after calling this method will have no effect on the
+*     supplied Mapping and Frame objects.
 *     - A value of AST__BASE or AST__CURRENT may be given for the
 c     "iframe" parameter to specify the base Frame or the current
 f     IFRAME argument to specify the base Frame or the current
@@ -1263,8 +1302,6 @@ c     astSimplify
 f     AST_SIMPLIFY
 *     before being stored in the FrameSet.
 
-
-
 *--
 */
 
@@ -1272,6 +1309,7 @@ f     AST_SIMPLIFY
    AstFrame *fr;                 /* Pointer to Frame identified by "iframe" */
    AstFrameSet *frameset;        /* Pointer to new FrameSet (if given) */
    AstMapping *inode_map;        /* Temporarily saved Mapping pointer */
+   AstMapping *map;              /* The supplied Mapping */
    AstMapping *next_map;         /* Temporarily saved Mapping pointer */
    int current;                  /* Current Frame index in merged FrameSet */
    int current_node;             /* Node number for current Frame */
@@ -1307,6 +1345,14 @@ f     AST_SIMPLIFY
    next = 0;
    next_invert = 0;
    next_link = 0;
+
+/* If a FrameSet was supplied instead of a Mapping, use the Mapping from
+   its base Frame to its current Frame. */
+   if( astIsAFrameSet( map0 ) ) {
+      map = astGetMapping( map0, AST__BASE, AST__CURRENT );
+   } else {
+      map = astClone( map0 );
+   }
 
 /* Validate and translate the Frame index supplied. */
    iframe = astValidateFrameIndex( this, iframe, "astAddFrame" );
@@ -1367,10 +1413,10 @@ f     AST_SIMPLIFY
       this->invert = astGrow( this->invert, this->nnode, sizeof( int ) );
       if ( astOK ) {
 
-/* Clone pointers to the Frame and Mapping supplied and store these pointers
+/* Copy pointers to the Frame and Mapping supplied and store these pointers
    in the FrameSet arrays. */
-         this->frame[ this->nframe ] = astClone( frame );
-         this->map[ this->nnode - 1 ] = astClone( map );
+         this->frame[ this->nframe ] = astCopy( frame );
+         this->map[ this->nnode - 1 ] = astCopy( map );
 
 /* Indicate the Frame does not reflect the variant Mappings of any other
    Frame. */
@@ -1394,7 +1440,7 @@ f     AST_SIMPLIFY
             astSetCurrent( this, this->nframe );
 
 /* If an error occurred while filling the FrameSet's arrays, clear any values
-   that may have been added, annulling any cloned pointers. */
+   that may have been added, annulling any copied pointers. */
          } else {
             this->frame[ this->nframe ] =
                   astAnnul( this->frame[ this->nframe ] );
@@ -1435,7 +1481,7 @@ f     AST_SIMPLIFY
       if ( astOK ) {
          for ( ifr = 1; ifr <= frameset->nframe; ifr++ ) {
             this->frame[ this->nframe + ifr - 1 ] =
-               astClone( frameset->frame[ ifr - 1 ] );
+               astCopy( frameset->frame[ ifr - 1 ] );
             this->node[ this->nframe + ifr - 1 ] =
                frameset->node[ ifr - 1 ] + this->nnode;
             if( frameset->varfrm[ ifr - 1 ] > 0 ) {
@@ -1451,7 +1497,7 @@ f     AST_SIMPLIFY
    numbering. */
          for ( inode = 1; inode < frameset->nnode; inode++ ) {
             this->map[ this->nnode + inode - 1 ] =
-               astClone( frameset->map[ inode - 1 ] );
+               astCopy( frameset->map[ inode - 1 ] );
             this->link[ this->nnode + inode - 1 ] =
                frameset->link[ inode - 1 ] + this->nnode;
             this->invert[ this->nnode + inode - 1 ] =
@@ -1558,7 +1604,7 @@ f     AST_SIMPLIFY
 
 /* Once the necessary links have been re-structured, establish the new
    link that inter-relates the Frames from the two FrameSets. */
-            this->map[ current_node - 1 ] = astClone( map );
+            this->map[ current_node - 1 ] = astCopy( map );
             this->link[ current_node - 1 ] = this->node[ iframe - 1 ];
             this->invert[ current_node - 1 ] = astGetInvert( map );
          }
@@ -1589,6 +1635,9 @@ f     AST_SIMPLIFY
          }
       }
    }
+
+/* Annul the local pointer to the supplied Mapping. */
+   map = astAnnul( map );
 }
 
 static void AddVariant( AstFrameSet *this, AstMapping *map,
@@ -1608,7 +1657,7 @@ f     AST_ADDVARIANT
 *  Synopsis:
 c     #include "frameset.h"
 c     void astAddVariant( AstFrameSet *this, AstMapping *map,
-c                         const char *name, int *status )
+c                         const char *name )
 f     CALL AST_ADDVARIANT( THIS, MAP, NAME, STATUS )
 
 *  Class Membership:
@@ -2153,6 +2202,80 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2, 
    return result;
 }
 
+static void AxNorm( AstFrame *this_frame, int axis, int oper, int nval,
+                    double *values, int *status ){
+/*
+*  Name:
+*     AxNorm
+
+*  Purpose:
+*     Normalise an array of axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void AxNorm( AstFrame *this, int axis, int oper, int nval,
+*                  double *values, int *status )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astAxNorm
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function modifies a supplied array of axis values so that
+*     they are normalised in the manner indicated by parameter "oper".
+*
+*     No normalisation is possible for a simple Frame and so the supplied
+*     values are returned unchanged. However, this may not be the case for
+*     specialised sub-classes of Frame. For instance, a SkyFrame has a
+*     discontinuity at zero longitude and so a longitude value can be
+*     expressed in the range [-Pi,+PI] or the range [0,2*PI].
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The index of the axis to which the supplied values refer. The
+*        first axis has index 1.
+*     oper
+*        Indicates the type of normalisation to be applied. If zero is
+*        supplied, the normalisation will be the same as that performed by
+*        function astNorm. If 1 is supplied, the normalisation will be
+*        chosen automatically so that the resulting list has the smallest
+*        range.
+*     nval
+*        The number of points in the values array.
+*     values
+*        On entry, the axis values to be normalised. Modified on exit to
+*        hold the normalised values.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis - 1, 1, "astAxNorm" );
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astAxNorm method for this Frame. Annul the Frame pointer
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   astAxNorm( fr, axis, oper, nval, values );
+   fr = astAnnul( fr );
+}
+
 static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist, int *status ) {
 /*
 *  Name:
@@ -2318,6 +2441,80 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
 
 /* Return the new pointer. */
    return new;
+}
+
+static double Centre( AstFrame *this_frame, int axis, double value, double gap, int *status ) {
+/*
+*  Name:
+*     Centre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating Frame axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     double  Centre( AstFrame *this_frame, int axis, double value,
+*                     double gap, int *status )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astCentre method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a central value
+*        is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0.0;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, 1, "astCentre" );
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astCentre method to obtain the required value. Annul the
+   Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astCentre( fr, axis, value, gap );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
 }
 
 static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method, int *status ) {
@@ -4153,7 +4350,113 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static int GetNode( AstFrameSet *this, int inode, int *nnodes,
+                    int *iframe, AstMapping **map, int *parent,
+                    int *status ) {
+/*
+*+
+*  Name:
+*     astGetNode
+
+*  Purpose:
+*     Get information about a single node in a FrameSet tree.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int astGetNode( AstFrameSet *this, int inode, int *nnodes,
+*                     int *iframe, AstMapping **map, int *parent )
+
+*  Class Membership:
+*     FrameSet method.
+
+*  Description:
+*     This function returns information about a specified node in a
+*     FrameSet. It is documented as protected, because it should not
+*     be used in general purpose software since it depends on the internal
+*     details of the FrameSet class.  However, it is in fact public so that
+*     it can be used in external software that needs to know about the
+*     internal structure of a FrameSet (for instance, a graphical FrameSet
+*     visualisation system).
+
+*  Parameters:
+*     this
+*        Pointer to the FrameSet.
+*     inode
+*        The zero-based index of the required node.
+*     nnodes
+*        Address of an int returned holding the number of nodes defined
+*        in the FrameSet.
+*     iframe
+*        Address of an int returned holding the one-based index of the
+*        Frame associated with the node. AST__NOFRAME is returned if the
+*        node has no Frame.
+*     map
+*        Address of a Mapping pointer returned holding a pointer to a
+*        deep copy of the Mapping, if any, from the parent node to the
+*        requested node. NULL is returned if the node has no parent.
+*     parent
+*        Address of an int returned holding the zero-based index of the
+*        node from which the requested node is derived. -1 is returned if
+*        the requested node has no parent (i.e. is the root of the tree).
+
+*  Returned Value:
+*     A non-zero value is returned if the "inode" value is within bounds.
+*     Otherwise, zero is returned.
+
+*-
+*/
+
+/* Local Variables: */
+   int jframe;
+   int result;
+
+/* Initialise returned values. */
+   *nnodes = 0;
+   *iframe = AST__NOFRAME;
+   *map = NULL;
+   *parent = -1;
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Return the number of nodes. */
+   *nnodes = this->nnode;
+
+/* Check the index of the requested node. */
+   if( inode >= 0 && inode < this->nnode ) {
+
+/* Get the index of the Frame - if any - associated with the node. */
+      for( jframe = 0; jframe < this->nframe; jframe++ ) {
+         if( this->node[ jframe ] == inode ) {
+            *iframe = jframe + 1;
+            break;
+         }
+      }
+
+/* Get the Mapping - if any - associated with the node. The root node -
+   node zero - has no mapping or parent node. */
+      if( inode > 0 ) {
+         *map = astCopy( this->map[ inode - 1 ] );
+         if( astGetInvert( *map ) !=  this->invert[ inode - 1 ] ) {
+            astSetInvert( *map,  this->invert[ inode - 1 ] );
+         }
+
+/* The index of the parent node. */
+         *parent = this->link[ inode - 1 ];
+      }
+
+/* Indicate success. */
+      result = 1;
+   }
+
+   return result;
+}
+
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -4166,7 +4469,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetObjSize protected
@@ -4192,7 +4495,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstFrameSet *this;         /* Pointer to FrameSet structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
    int iframe;                /* Loop counter for Frames */
    int inode;                 /* Loop counter for nodes */
 
@@ -4849,8 +5152,8 @@ f     AST_GETMAPPING = INTEGER
 
 *  Notes:
 *     - The returned Mapping will include the clipping effect of any
-*     Regions which occur on the path between the two supplied Frames
-*     (this includes the two supplied Frames themselves).
+*     Regions which occur on the path between the two supplied
+*     Frames (this includes the two supplied Frames themselves).
 c     - The values given for the "iframe1" and "iframe2" parameters
 f     - The values given for the IFRAME1 and IFRAME2 arguments
 *     should lie in the range from 1 to the number of Frames in the
@@ -4935,12 +5238,12 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* If the conversion path is of zero length (i.e. the two Frames are
    the same) then we will return a Mapping which is equivalent to the
-   Frame. Most classes of Frame are equivalent to a UnitMap. However, we do
-   not hard-wire this equivalence since some classes of Frame (e.g. Regions
-   or CmpFrames containing Regions) do not correspond to a UnitMap. Instead
-   we use the astIsUnitFrame method on the Frame to determine if the
-   Frame is equivalent to a UnitMap.Is os, create a suitable UnitMap. If
-   not, return the Frame itself (a form of Mapping). */
+   Frame. Most classes of Frame are equivalent to a UnitMap. However,
+   we do not hard-wire this equivalence since some classes of Frame (e.g.
+   Regions, and CmpFrames containing Regions) do not correspond to a
+   UnitMap. Instead we use the astIsUnitFrame method on the Frame to determine
+   if the Frame is equivalent to a UnitMap. If so, create a suitable UnitMap.
+   If not, return the Frame itself (a form of Mapping). */
       } else if ( npath == 0 ) {
          fr = astGetFrame( this, iframe1 );
          if( astIsUnitFrame( fr ) ){
@@ -5707,6 +6010,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    vtab->GetFrame = GetFrame;
    vtab->GetMapping = GetMapping;
    vtab->GetNframe = GetNframe;
+   vtab->GetNode = GetNode;
    vtab->GetAllVariants = GetAllVariants;
    vtab->MirrorVariants = MirrorVariants;
    vtab->RemapFrame = RemapFrame;
@@ -5772,6 +6076,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->Angle = Angle;
    frame->AxAngle = AxAngle;
    frame->AxDistance = AxDistance;
+   frame->AxNorm = AxNorm;
    frame->AxOffset = AxOffset;
    frame->CheckPerm = CheckPerm;
    frame->ClearDigits = ClearDigits;
@@ -5794,6 +6099,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->FindFrame = FindFrame;
    frame->Format = Format;
    frame->FrameGrid = FrameGrid;
+   frame->Centre = Centre;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;
    frame->GetDigits = GetDigits;
@@ -5883,6 +6189,16 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->SetEpoch = SetEpoch;
    frame->TestEpoch = TestEpoch;
    frame->ClearEpoch = ClearEpoch;
+
+   frame->GetDtai = GetDtai;
+   frame->SetDtai = SetDtai;
+   frame->TestDtai = TestDtai;
+   frame->ClearDtai = ClearDtai;
+
+   frame->GetDut1 = GetDut1;
+   frame->SetDut1 = SetDut1;
+   frame->TestDut1 = TestDut1;
+   frame->ClearDut1 = ClearDut1;
 
    frame->GetSystem = GetSystem;
    frame->SetSystem = SetSystem;
@@ -6149,7 +6465,7 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 }
 
 static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
-                         double **cross, int *status ) {
+                         double cross[5], int *status ) {
 /*
 *  Name:
 *     LineCrossing
@@ -6163,7 +6479,7 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *  Synopsis:
 *     #include "frameset.h"
 *     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
-*                       double **cross, int *status )
+*                       double cross[5], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astLineCrossing
@@ -6184,18 +6500,15 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *     l2
 *        Pointer to the structure defining the second line.
 *     cross
-*        Pointer to a location at which to put a pointer to a dynamically
-*        alocated array containing the axis values at the crossing. If
-*        NULL is supplied no such array is returned. Otherwise, the returned
-*        array should be freed using astFree when no longer needed. If the
+*        Pointer to an array in which to return the axis values at the
+*        crossing. If NULL is supplied the axis values are not returned. If the
 *        lines are parallel (i.e. do not cross) then AST__BAD is returned for
 *        all axis values. Note usable axis values are returned even if the
 *        lines cross outside the segment defined by the start and end points
 *        of the lines. The order of axes in the returned array will take
 *        account of the current axis permutation array if appropriate. Note,
 *        sub-classes such as SkyFrame may append extra values to the end
-*        of the basic frame axis values. A NULL pointer is returned if an
-*        error occurs.
+*        of the basic frame axis values.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -6977,7 +7290,7 @@ f     AST_MIRRORVARIANTS
 
 *  Synopsis:
 c     #include "frameset.h"
-c     void astMirrorVariants( AstFrameSet *this, int iframe, int *status )
+c     void astMirrorVariants( AstFrameSet *this, int iframe )
 f     CALL AST_MIRRORVARIANTS( THIS, IFRAME, STATUS )
 
 *  Class Membership:
@@ -7428,7 +7741,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -8169,7 +8482,7 @@ f     IFRAME argument to specify the base Frame or the current
          RemoveMirrors( this, iframe, status );
 
 /* Any Frames that are mirroring variants in Frames higher than the
-   removed Frame need to have their mirror frame indicies decremented. */
+   removed Frame need to have their mirror frame indices decremented. */
          for ( ifr = 1; ifr <= this->nframe; ifr++ ) {
             if( this->varfrm[ ifr - 1 ] > iframe ) this->varfrm[ ifr - 1 ]--;
          }
@@ -8915,9 +9228,10 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Declare the thread specific global data */
-   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrame *fr;                 /* Pointer to a Frame within the FrameSet */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
+   const char *dom;              /* Pointer to Domain string */
    int base;                     /* Base attribute value */
    int base_off;                 /* Offset of Base value string */
    int current;                  /* Current attribute value */
@@ -8926,6 +9240,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    int invert;                   /* Invert attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
+   int nfrm;                     /* Number of Frames in FrameSet */
    int report;                   /* Report attribute value */
    int variant;                  /* Offset of Variant string */
 
@@ -8973,11 +9288,26 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       } else if ( astChrMatch( "AST__BASE", setting + base_off ) ||
                   astChrMatch( "Base", setting + base_off ) ) {
 
-/* Report an error if the value wasn't recognised. */
+/* If the FrameSet contains a Frame with the given Domain name, make it
+   the base Frame. */
       } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
-                   "Base Frame \"%s\".", status,
-                   astGetClass( this ),  setting + base_off );
+         nfrm = astGetNframe( this );
+         for( base = 1; base <= nfrm; base++ ) {
+            fr = astGetFrame( this, base );
+            dom = astGetDomain( fr );
+            fr = astAnnul( fr );
+            if( astChrMatch( dom, setting + base_off ) ) break;
+         }
+
+         if( base <= nfrm ) {
+            astSetBase( this, base );
+
+/* Report an error if the value wasn't recognised. */
+         } else {
+            astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
+                      "Base Frame \"%s\".", status,
+                      astGetClass( this ),  setting + base_off );
+         }
       }
 
 /* Current. */
@@ -9012,11 +9342,28 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       } else if ( astChrMatch( "AST__CURRENT", setting + current_off ) ||
                   astChrMatch( "Current", setting + current_off ) ) {
 
-/* Report an error if the value wasn't recognised. */
+/* If the FrameSet contains a Frame with the given Domain name, make it
+   the current Frame. */
       } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
-                   "Current Frame \"%s\".", status,
-                   astGetClass( this ),  setting + current_off );
+         nfrm = astGetNframe( this );
+         for( current = 1; current <= nfrm; current++ ) {
+            fr = astGetFrame( this, current );
+            dom = astGetDomain( fr );
+            fr = astAnnul( fr );
+            if( astChrMatch( dom, setting + current_off ) ) break;
+         }
+
+         if( current <= nfrm ) {
+            RestoreIntegrity( this, status );
+            astSetCurrent( this, current );
+            RecordIntegrity( this, status );
+
+/* Report an error if the value wasn't recognised. */
+         } else {
+            astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
+                      "Current Frame \"%s\".", status,
+                      astGetClass( this ),  setting + current_off );
+         }
       }
 
 /* ID. */
@@ -9686,15 +10033,15 @@ static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2,
 *     possible to find a path between the two nodes.
 
 *  Notes:
-*     - If a node has an associated Frame, the Frame usually represents a
-*     UnitMap and so can be ignored. The exception is if the Frame is
-*     actually a Region (or a CmpFrame containing a Region), in which case
-*     it represents a Mapping which returns bad values if the input position
-*     is outside the region. This form of Mapping should not be ignored, and
-*     so the returned list of Mappings includes the effect of any Frames
-*     along the path which are not equivalent to a UnitMap. This
-*     equivalence is determined by invoking the astSimplify method on the
-*     Frame.
+*     - If a node has an associated Frame, the Frame usually represents
+*     a UnitMap and so can be ignored. The exception is if the Frame is
+*     actually a Region (or a CmpFrame containing a Region), in which
+*     case it represents a Mapping which returns bad values if the
+*     input position is outside the Region. This form of Mapping should
+*     not be ignored, and so the returned list of Mappings includes the
+*     effect of any Frames along the path which are not equivalent to a
+*     UnitMap. This equivalence is determined by invoking the astSimplify
+*     method on the Frame.
 *     - A value of zero will be returned if this function is invoked
 *     with the global status set, or if it should fail for any reason.
 *     - On the assumption that the FrameSet has been consistently
@@ -9723,9 +10070,9 @@ static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2,
 
 /* If so, we need to consider the Mapping represented by any Frame
    associated with the node. Most classes of Frames are equivalent to a
-   UnitMap and so can be ignored. But some (e.g. the Region class) are not
-   equivalent to a UnitMap and so needs to be included in the returned
-   Mapping list. */
+   UnitMap and so can be ignored. But some (e.g. the Region class)
+   are not equivalent to a UnitMap and so needs to be included in the
+   returned Mapping list. */
    if( result ) {
       result = 1;
 
@@ -11318,7 +11665,7 @@ static void VSet( AstObject *this_object, const char *settings,
 *     String, read-only.
 
 *  Description:
-*     This attrbute gives a space separated list of the names of all the
+*     This attribute gives a space separated list of the names of all the
 *     variant Mappings associated with the current Frame (see attribute
 *     "Variant"). If the current Frame has no variant Mappings, then the
 *     list will hold a single entry equal to the Domain name of the
@@ -11349,6 +11696,13 @@ static void VSet( AstObject *this_object, const char *settings,
 *     regarded as the "base" Frame within a FrameSet. The default is
 *     the first Frame added to the FrameSet when it is created (this
 *     Frame always has an index of 1).
+*
+*     When setting a new value for this attribute, a string may be
+*     supplied instead of an integer index. In this case a search
+*     is made within the FrameSet for a Frame that has its Domain
+*     attribute value equal to the supplied string (the comparison is
+*     case-insensitive). If found, the Frame is made the base Frame.
+*     Otherwise an error is reported.
 
 *  Applicability:
 *     FrameSet
@@ -11381,6 +11735,13 @@ f     Invert attribute, with the AST_INVERT routine for example) will
 *     regarded as the "current" Frame within a FrameSet. The default
 *     is the most recent Frame added to the FrameSet (this Frame
 *     always has an index equal to the FrameSet's Nframe attribute).
+*
+*     When setting a new value for this attribute, a string may be
+*     supplied instead of an integer index. In this case a search
+*     is made within the FrameSet for a Frame that has its Domain
+*     attribute value equal to the supplied string (the comparison is
+*     case-insensitive). If found, the Frame is made the current Frame.
+*     Otherwise an error is reported.
 
 *  Applicability:
 *     FrameSet
@@ -11409,7 +11770,7 @@ f     Invert attribute, with the AST_INVERT routine for example) will
 *     Integer, read-only.
 
 *  Description:
-*     This attrbute gives the number of Frames in a FrameSet. This
+*     This attribute gives the number of Frames in a FrameSet. This
 *     value will change as Frames are added or removed, but will
 *     always be at least one.
 
@@ -11453,7 +11814,7 @@ f     AST_REMAPFRAME
 *     each of the two co-added images. There is nothing to prevent a
 *     FrameSet containing two explicit SkyFrames, but the problem then arises
 *     of how to distinguish between them. The two primary characteristics of
-*     a Frame that distinguishes it from other Frames ar eits class and its
+*     a Frame that distinguishes it from other Frames are its class and its
 *     Domain attribute value. The class of a Frame cannot be changed, but we
 *     could in principle use two different Domain values to distinguish the
 *     two SkyFrames. However, in practice it is not uncommon for application
@@ -11478,8 +11839,8 @@ c     astAddVariant
 f     AST_ADDVARIANT
 *     method should then be called specifying the required name and a NULL
 *     Mapping. The
-c     astAddFrame
-f     AST_ADDFRAME
+c     astAddVariant
+f     AST_ADDVARIANT
 *     method should then be called repeatedly to add each required extra
 *     Mapping to the current Frame, supplying a unique name for each one.
 *
@@ -11594,6 +11955,16 @@ MAKE_GET(Epoch,double)
 MAKE_SET(Epoch,double)
 MAKE_TEST(Epoch)
 MAKE_CLEAR(Epoch)
+
+MAKE_GET(Dtai,double)
+MAKE_SET(Dtai,double)
+MAKE_TEST(Dtai)
+MAKE_CLEAR(Dtai)
+
+MAKE_GET(Dut1,double)
+MAKE_SET(Dut1,double)
+MAKE_TEST(Dut1)
+MAKE_CLEAR(Dut1)
 
 MAKE_GET(ObsLon,double)
 MAKE_SET(ObsLon,double)
@@ -12661,6 +13032,13 @@ const char *astGetAllVariants_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,FrameSet,GetAllVariants))( this, status );
 }
+int astGetNode_( AstFrameSet *this, int inode, int *nnodes,
+                 int *iframe, AstMapping **map, int *parent,
+                 int *status ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,FrameSet,GetNode))( this, inode, nnodes,
+                                                iframe, map, parent, status );
+}
 
 /* Special public interface functions. */
 /* =================================== */
@@ -12676,6 +13054,7 @@ const char *astGetAllVariants_( AstFrameSet *this, int *status ) {
    protected prototypes), so we must provide local prototypes for use
    within this module. */
 AstFrameSet *astFrameSetId_( void *, const char *, ... );
+int astGetNodeId_( AstFrameSet *, int, int *, int *, AstMapping **, int *, int *);
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
@@ -12874,5 +13253,82 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 }
 
+int astGetNodeId_( AstFrameSet *this, int inode, int *nnodes,
+                   int *iframe, AstMapping **map, int *parent,
+                   int *status ) {
+/*
+*+
+*  Name:
+*     astGetNode
+
+*  Purpose:
+*     Get information about a single node in a FrameSet tree.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int astGetNode( AstFrameSet *this, int inode, int *nnodes,
+*                     int *iframe, AstMapping **map, int *parent )
+
+*  Class Membership:
+*     FrameSet method.
+
+*  Description:
+*     This function returns information about a specified node in a
+*     FrameSet. It is documented as protected, because it should not
+*     be used in general purpose software since it depends on the internal
+*     details of the FrameSet class.  However, it is in fact public so that
+*     it can be used in external software that needs to know about the
+*     internal structure of a FrameSet (for instance, a graphical FrameSet
+*     visualisation system).
+
+*  Parameters:
+*     this
+*        Pointer to the FrameSet.
+*     inode
+*        The zero-based index of the required node.
+*     nnodes
+*        Address of an int returned holding the number of nodes defined
+*        in the FrameSet.
+*     frame
+*        Address of a Frame pointer returned holding a pointer to a deep
+*        copy of the Frame, if any, associated with the node. NULL
+*        is returned if the node has no Frame.
+*     map
+*        Address of a Mapping pointer returned holding a pointer to a
+*        deep copy of the Mapping, if any, from the parent node to the
+*        requested node. NULL is returned if the node has no parent.
+*     parent
+*        Address of an int returned holding the zero-based index of the
+*        node from which the requested node is derived. -1 is returned if
+*        the requested node has no parent (i.e. is the root of the tree).
+
+*  Returned Value:
+*     A non-zero value is returned if the "inode" value is within bounds.
+*     Otherwise, zero is returned.
+
+*-
+*/
+
+/* Local Variables: */
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the normal astGetNode_ function. */
+   result = astGetNode_( this, inode, nnodes, iframe, map, parent, status );
+
+/* Return an ID value for the Mapping. */
+   *map = astMakeId( *map );
+
+/* Return the result. */
+   return result;
+}
 
 

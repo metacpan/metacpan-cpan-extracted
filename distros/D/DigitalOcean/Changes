@@ -1,5 +1,8 @@
 Revision history for DigitalOcean
 
+0.17    October 4, 2019
+        Auto generate META.json using the plugin [MetaJSON]. (@manwar)
+
 0.16    April 13, 2016
         Removed test.pl so tests won't fail and removed debug messages from _request.
 
@@ -45,5 +48,5 @@ Revision history for DigitalOcean
 0.02    November 1, 2013
         added Object::Tiny::RW::XS and Object::Tiny::XS to preqreqs
 
-0.01    
+0.01
         First version, released on an unsuspecting world. Beta release.

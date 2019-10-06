@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,22 +20,22 @@ no_index:
 provides:
   IP::Info:
     file: lib/IP/Info.pm
-    version: '0.17'
+    version: '0.18'
   IP::Info::Response:
     file: lib/IP/Info/Response.pm
-    version: '0.17'
+    version: '0.18'
   IP::Info::Response::Location:
     file: lib/IP/Info/Response/Location.pm
-    version: '0.17'
+    version: '0.18'
   IP::Info::Response::Network:
     file: lib/IP/Info/Response/Network.pm
-    version: '0.17'
+    version: '0.18'
   IP::Info::UserAgent:
     file: lib/IP/Info/UserAgent.pm
-    version: '0.17'
+    version: '0.18'
   IP::Info::UserAgent::Exception:
     file: lib/IP/Info/UserAgent/Exception.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Data::Validate::IP: '0.10'
   Digest::MD5: '2.36'
@@ -47,5 +47,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/IP-Info.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

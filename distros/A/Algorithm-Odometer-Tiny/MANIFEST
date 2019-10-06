@@ -1,0 +1,13 @@
+Changes
+lib/Algorithm/Odometer/Gray.pm
+lib/Algorithm/Odometer/Tiny.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/algorithm_odometer_tiny.t
+t/Algorithm_Odometer_Tiny_Testlib.pm
+t/author.t
+t/perlcriticrc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

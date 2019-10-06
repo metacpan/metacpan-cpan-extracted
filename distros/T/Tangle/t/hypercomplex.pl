@@ -123,12 +123,13 @@ And math on this already works since it is recursive...
 
 END
 
-## object dumping tool ...
-#sub d {
-#my %a = @_;
-#my @k = keys %a;
-#my $d = Data::Dumper->new([@a{@k}],[@k]); $d->Purity(1)->Deepcopy(1); print $d->Dump;
-#}
+# object dumping tool ...
+# sample usage: d(Quaternion => CayleyDickson->new(1,2,3,4));
+sub d {
+   my %a = @_;
+   my @k = keys %a;
+   my $d = Data::Dumper->new([@a{@k}],[@k]); $d->Purity(1)->Deepcopy(1); print $d->Dump;
+}
 
 1;
 

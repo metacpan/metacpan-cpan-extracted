@@ -43,6 +43,7 @@ $grep1->search($folder);
 $fh->close;
 select $oldfh;
 
+$output =~ s!\Q$workdir\E!t/folders!g;
 $output =~ s#\\#/#g;  # windows
 
 is($output, <<'EXPECTED',                       'search for However');
@@ -86,6 +87,7 @@ foreach (@m2)
 # messages are reversed ordered here, but in order returned: looking
 # backwards in the folder file.
 
+$output =~ s!\Q$workdir\E!t/folders!g;
 $output =~ s#\\#/#g;  # windows
 
 is($output, <<'EXPECTED',                       'search result atcmp in head');
@@ -254,6 +256,7 @@ my @msgs  = $start->threadMessages;
 cmp_ok(@msgs, "==", 2,                           'messages in thread');
 ok($grep10->search($start),                      'found in thread');
 
+$output =~ s!\Q$workdir\E!t/folders!g;
 $output =~ s#\\#/#g;  # windows
 
 is($output, <<'EXPECTED',                        'result search in thread');
@@ -292,6 +295,7 @@ cmp_ok(@m11, "==", 1,                            'do not search multiparts');
 $fh->close;
 select $oldfh;
 
+$output =~ s!\Q$workdir\E!t/folders!g;
 $output =~ s#\\#/#g;  # windows
 
 is($output, <<'EXPECTED',                        'not in multipart');
@@ -325,6 +329,7 @@ cmp_ok(@m12, "==", 1,                            'search binaries');
 $fh->close;
 select $oldfh;
 
+$output =~ s!\Q$workdir\E!t/folders!g;
 $output =~ s#\\#/#g;  # windows
 
 is($output, <<'EXPECTED',                        'found in encoded text');

@@ -1,5 +1,8 @@
 Revision history for Food::ECodes
 
+0.18  Fri Oct 04 21:50:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.17  Thu Apr 13 18:45:00 2017
       - Added $AUTHORITY to each packages.
       - Enabled strict/warnings checks in the t/00-load.t script.

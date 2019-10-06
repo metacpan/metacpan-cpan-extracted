@@ -23,7 +23,6 @@ static int S_get_fd(pTHX_ SV* fh) {
 	if (magic) {
 		int ret = -1;
 		dSP;
-		SAVETMPS;
 		PUSHMARK(SP);
 		PUSHs(magic->mg_obj);
 		PUTBACK;
@@ -31,7 +30,6 @@ static int S_get_fd(pTHX_ SV* fh) {
 		SPAGAIN;
 		ret = POPi;
 		PUTBACK;
-		FREETMPS;
 		return ret;
 	}
 	else

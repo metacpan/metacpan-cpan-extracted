@@ -81,7 +81,7 @@ f     The Prism class does not define any new routines beyond those
 *     14-AUG-2014 (DSB):
 *        Over-ride the astGetRegionBounds method.
 *     9-SEP-2014 (DSB):
-*        Record the pointer to the Prism implementation of RegBaseMesh 
+*        Record the pointer to the Prism implementation of RegBaseMesh
 *        within the class virtual function table.
 *class--
 */
@@ -92,15 +92,6 @@ f     The Prism class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS Prism
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==(bb))?1:(((aa)==AST__BAD||(bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -148,7 +139,7 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 static AstRegion *(* parent_getdefunc)( AstRegion *, int * );
 static double (*parent_getfillfactor)( AstRegion *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int (* parent_overlapx)( AstRegion *, AstRegion *, int * );
 static void (* parent_clearclosed)( AstRegion *, int * );
@@ -209,7 +200,7 @@ static double *RegCentre( AstRegion *this, double *, double **, int, int, int * 
 static double GetFillFactor( AstRegion *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
@@ -300,7 +291,6 @@ AstRegion *astConvertToPrism_( AstRegion *this, int *status ) {
    int i;                        /* Loop index */
    int mask;                     /* Integer with a set bit at current axis */
    int nax;                      /* Number of selected axes */
-   int nin;                      /* No. of base Frame axes (Mapping inputs) */
    int nout;                     /* No. of current Frame axes (Mapping outputs) */
    int topmask;                  /* Integer that selects all axes */
 
@@ -313,8 +303,7 @@ AstRegion *astConvertToPrism_( AstRegion *this, int *status ) {
 /* Get the Mapping from base to current Frame. */
    map = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
 
-/* Get the number of inputs and outputs for the Mapping. */
-   nin = astGetNin( map );
+/* Get the number of outputs for the Mapping. */
    nout = astGetNout( map );
 
 /* Allocate memory to hold the indices of the current Frame axes in the
@@ -721,7 +710,7 @@ MAKE_CLEAR(Closed,closed)
 /* Undefine the macro. */
 #undef MAKE_CLEAR
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -734,7 +723,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astGetObjSize protected
@@ -760,7 +749,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstPrism *this;         /* Pointer to Prism structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -1012,7 +1001,6 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd,
    AstFrame *cfrm1;             /* Frame spanning current axes for 1st component Region */
    AstFrame *cfrm2;             /* Frame spanning current axes for 2nd component Region */
    AstFrame *cfrm;              /* Current Frame for total Prism */
-   AstMapping *fsmap;           /* Base->Current Mapping */
    AstMapping *map1;            /* Base->Current Mapping for axes of 1st component Region */
    AstMapping *map2;            /* Base->Current Mapping for axes of 2nd component Region */
    AstMapping *map;             /* Case->Current mapping for total Prism */
@@ -1305,7 +1293,6 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
-   AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
@@ -1339,7 +1326,6 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
    region = (AstRegionVtab *) vtab;
-   frame = (AstFrameVtab *) vtab;
 
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
@@ -2102,7 +2088,6 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    int msz;                       /* Original MeshSize */
    int mszp;                      /* MeshSize value for Prism */
    int nax1;                      /* Number of axes in region1 */
-   int nax2;                      /* Number of axes in region2 */
    int nax;                       /* Number of axes in Prism */
 
 /* Initialise */
@@ -2200,9 +2185,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
             astSetMeshSize( reg1, msz );
          }
 
-/* Note the number of axes in the two component Regions. */
+/* Note the number of axes in the first component Region. */
          nax1 = astGetNcoord( mesh1 );
-         nax2 = astGetNcoord( mesh2 );
 
 /* The above mesh and grid sizes are only approximate. Find the values
    actually used. */
@@ -2847,7 +2831,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* If an error has occurred, return zero. */
    if( !astOK ) {
       result = 0;
-      if( mask ) *mask = astAnnul( *mask );
+      if( mask ) *mask = astFree( *mask );
    }
 
 /* Return the result. */

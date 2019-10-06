@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Compare::Directory' => { file => 'lib/Compare/Directory.pm', version => '1.25' },
+            'Compare::Directory' => { file => 'lib/Compare/Directory.pm', version => '1.26' },
         },
         resources => {
             repository => {

@@ -3,6 +3,9 @@
 /* use external PAL and ERFA libraries */
 #undef EXTERNAL_PAL
 
+/* Variable holding current function name. */
+#undef FUNCTION_NAME
+
 /* Define to 1 if you have the `backtrace' function. */
 #undef HAVE_BACKTRACE
 
@@ -85,6 +88,9 @@
 
 /* Define to 1 if you have the <varargs.h> header file. */
 #undef HAVE_VARARGS_H
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */

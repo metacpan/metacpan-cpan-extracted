@@ -1,5 +1,8 @@
 Revision history for Short::URL
 
+0.015  2019-10-04 14:31:17 CDT
+    - Fixed typo in documentation to Carp (@manwar).
+
 0.014  2019-01-13 15:04:32 CST
     - Switched to using Dist::Milla for releases
     - Switched to Moo

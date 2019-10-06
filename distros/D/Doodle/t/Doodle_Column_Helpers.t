@@ -27,6 +27,10 @@ method: date
 method: datetime
 method: datetime_tz
 method: decimal
+method: default
+method: default_current_date
+method: default_current_time
+method: default_current_datetime
 method: double
 method: enum
 method: float
@@ -233,6 +237,112 @@ decimal(Any %args) : Column
   # given: synopsis
 
   my $decimal = $self->decimal;
+
+=cut
+
+=method default
+
+Configures a default value and returns itself.
+
+=cut
+
+=signature default
+
+default(Str @args) : Column
+
+=cut
+
+=example-1 default
+
+  # given: synopsis
+
+  my $default = $self->default(123);
+
+  # produces, default 123
+
+=example-2 default
+
+  # given: synopsis
+
+  my $default = $self->default(string => 123);
+
+  # produces, default '123'
+
+=example-3 default
+
+  # given: synopsis
+
+  my $default = $self->default(integer => 123);
+
+  # produces, default 123
+
+=example-4 default
+
+  # given: synopsis
+
+  my $default = $self->default(function => 'current_timestamp');
+
+  # produces, default CURRENT_TIMESTAMP
+
+=cut
+
+=method default_current_date
+
+Configures a C<CURRENT_DATE> default value and returns itself.
+
+=cut
+
+=signature default_current_date
+
+default_current_date() : Column
+
+=cut
+
+=example-1 default_current_date
+
+  # given: synopsis
+
+  my $default = $self->default_current_date;
+
+=cut
+
+=method default_current_time
+
+Configures a C<CURRENT_TIME> default value and returns itself.
+
+=cut
+
+=signature default_current_time
+
+default_current_time() : Column
+
+=cut
+
+=example-1 default_current_time
+
+  # given: synopsis
+
+  my $default = $self->default_current_time;
+
+=cut
+
+=method default_current_datetime
+
+Configures a C<CURRENT_TIMESTAMP> default value and returns itself.
+
+=cut
+
+=signature default_current_datetime
+
+default_current_datetime() : Column
+
+=cut
+
+=example-1 default_current_datetime
+
+  # given: synopsis
+
+  my $default = $self->default_current_datetime;
 
 =cut
 
@@ -909,6 +1019,52 @@ $subtests->example(-1, 'datetime_tz', 'method', fun($tryable) {
 });
 
 $subtests->example(-1, 'decimal', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+
+  $result;
+});
+
+$subtests->example(-1, 'default', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+  is_deeply $result->data->{default}, ['deduce', 123], 'metadata ok';
+
+  $result;
+});
+
+$subtests->example(-2, 'default', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+  is_deeply $result->data->{default}, ['string', 123], 'metadata ok';
+
+  $result;
+});
+
+$subtests->example(-3, 'default', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+  is_deeply $result->data->{default}, ['integer', 123], 'metadata ok';
+
+  $result;
+});
+
+$subtests->example(-4, 'default', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+  is_deeply $result->data->{default}, ['function', 'current_timestamp'], 'metadata ok';
+
+  $result;
+});
+
+$subtests->example(-1, 'default_current_date', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+
+  $result;
+});
+
+$subtests->example(-1, 'default_current_time', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+
+  $result;
+});
+
+$subtests->example(-1, 'default_current_datetime', 'method', fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
 
   $result;

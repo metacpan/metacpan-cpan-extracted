@@ -51,6 +51,7 @@ use Text::Abbrev;
 use Text::ParseWords ();	# Used only for {level1} stuff.
 
 use constant ASTRO_SPACETRACK_VERSION => 0.105;
+use constant DEFAULT_STDOUT_LAYERS	=> ':encoding(utf-8)';
 
 BEGIN {
     eval {
@@ -74,7 +75,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -273,12 +274,13 @@ my %mutator = (
     height => \&_set_distance_meters,
     horizon => \&_set_angle,
     illum	=> \&_set_illum_class,
-    latitude => \&_set_angle,
+    latitude => \&_set_angle_or_undef,
     local_coord => \&_set_formatter_attribute,
     location => \&_set_unmodified,
-    longitude => \&_set_angle,
+    longitude => \&_set_angle_or_undef,
     model => \&_set_model,
     max_mirror_angle => \&_set_angle,
+    output_layers	=> \&_set_output_layers,
     pass_threshold => \&_set_angle_or_undef,
     pass_variant	=> \&_set_pass_variant,
     perltime => \&_set_time_parser_attribute,
@@ -393,6 +395,7 @@ my %static = (
     singleton => 0,
 #   spacetrack => undef,	# Astro::SpaceTrack object set when accessed
 #   stdout => undef,		# Set to stdout in new().
+    output_layers	=> DEFAULT_STDOUT_LAYERS,
     time_parser => 'Astro::App::Satpass2::ParseTime',	# Time parser class.
     twilight => 'civil',
     tz => $ENV{TZ},
@@ -761,10 +764,14 @@ sub execute {
 	$self->{execute_filter}->( $self, $args ) or next;
 	@{ $args } or next;
 	if ($redirect->{'>'}) {
-	    my ($mode, $name) = map {$redirect->{'>'}{$_}} qw{mode name};
-	    my $fh = IO::File->new($name, $mode)
-		or $self->wail("Unable to open $name: $!");
-	    $stdout = $fh;
+	    my ( $mode, $name ) = map { $redirect->{'>'}{$_} } qw{ mode name };
+	    my $fh;
+	    $stdout = sub {
+		my ( $output ) = @_;
+		$fh ||= $self->_file_opener( $name, $mode );
+		$fh->print( $output );
+		return;
+	    };
 	}
 
 	# {localout} is the output to be used for this command. It goes
@@ -1605,7 +1612,7 @@ sub _macro_list : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
     return $output;
 }
 
-sub _macro_load : Verb( lib=s ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+sub _macro_load : Verb( lib=s verbose! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, $opt, $name, @args ) = __arguments( @_ );
     my $output;
     defined $name
@@ -1624,8 +1631,14 @@ sub _macro_load : Verb( lib=s ) {	## no critic (ProhibitUnusedPrivateSubroutines
 	$obj->implements( $mn, required => 1 )
 	    and $self->{macro}{$mn} = $obj;
     }
+    if ( $opt->{verbose} ) {
+	( my $fn = "$name.pm" ) =~ s| :: |/|smxg;
+	$output .= "Macro $name\n    loaded from $INC{$fn}\n";
+	$output .= "    implements:\n";
+	$output .= "        $_\n" for sort $obj->implements();
+    }
     $obj->implements( 'after_load', required => 0 )
-	and $output = $self->dispatch( after_load => $opt, $name, @args );
+	and $output .= $self->dispatch( after_load => $opt, $name, @args );
     return $output;
 }
 
@@ -1988,7 +2001,7 @@ sub pwd : Verb() {
 
 	# Put all the I/O into UTF-8 mode.
 	binmode STDIN, ':encoding(UTF-8)';
-	binmode STDOUT, ':encoding(UTF-8)';
+	binmode STDOUT, DEFAULT_STDOUT_LAYERS;
 	binmode STDERR, ':encoding(UTF-8)';
 
 	# If the undocumented first option is a code reference, use it to
@@ -2202,18 +2215,40 @@ sub set : Verb() {
 
 sub _set_almanac_horizon {
     my ( $self, $name, $value ) = @_;
-    my $eci = Astro::Coord::ECI->new();
     my $parsed = $self->__parse_angle( { accept => 1 }, $value );
-    $eci->set( almanac_horizon => $parsed );	# To validate.
     my $internal = looks_like_number( $parsed ) ? deg2rad( $parsed ) :
-    $parsed;
+	$parsed;
+    my $eci = Astro::Coord::ECI->new();
+    $eci->set( $name => $internal );	# To validate.
     $self->{"_$name"} = $internal;
     return( $self->{$name} = $parsed );
 }
 
-sub _set_angle {
-    my ( $self, $name, $value ) = @_;
-    return ( $self->{$name} = $self->__parse_angle( $value ) );
+{
+    my $plus_or_minus_90 = sub { $_[0] >= -90 && $_[0] <= 90 };
+    my %validate = (
+	horizon		=> $plus_or_minus_90,
+	latitude	=> $plus_or_minus_90,
+	longitude	=> sub {
+	    $_[0] > 360
+		and return 0;
+	    $_[0] > 180
+		and $_[0] -= 360;
+	    $_[0] >= -180 && $_[0] <= 180;
+	},
+    );
+    sub _set_angle {
+	my ( $self, $name, $value ) = @_;
+	my $angle = $self->__parse_angle( $value );
+	if ( my $code = $validate{$name} ) {
+	    defined $angle or $self->weep(
+		"$name angle is undef for value ", defined $value ? $value : 'undef' );
+	    $code->( $angle )
+		or $self->wail( "Value $value is invalid for $name" );
+	}
+	$self->{"_$name"} = deg2rad( $angle );
+	return ( $self->{$name} = $angle );
+    }
 }
 
 sub _set_angle_or_undef {
@@ -2362,6 +2397,17 @@ sub _set_model {
 	"'$val' is not a valid Astro::Coord::ECI::TLE model" );
     foreach my $body ( @{ $self->{bodies} } ) {
 	$body->set( model => $val );
+    }
+    return ( $self->{$name} = $val );
+}
+
+sub _set_output_layers {
+    my ( $self, $name, $val ) = @_;
+
+    if ( defined $val && '' ne $val ) {
+	open my $fh, ">$val", File::Spec->devnull()
+	    or $self->wail( "Invalid $name value '$val'" );
+	close $fh;
     }
     return ( $self->{$name} = $val );
 }
@@ -3066,7 +3112,7 @@ sub station {
 
     return Astro::Coord::ECI->new (
 	    almanac_horizon	=> $self->{_almanac_horizon},
-	    horizon	=> $self->get( 'horizon' ),
+	    horizon	=> deg2rad( $self->get( 'horizon' ) ),
 	    id		=> 'station',
 	    name	=> $self->{location} || '',
 	    refraction	=> 1,
@@ -3554,6 +3600,31 @@ sub _drop_from_sky {
     defined( my $inx = $self->_find_in_sky( $name ) )
 	or return;
     return splice @{ $self->{sky} }, $inx, 1;
+}
+
+#	$fh = $self->_file_opener( $name, $mode );
+#
+#	This method opens the given file, returning the handle. If the
+#	mode is output, the current value of output_layers is appended.
+#	An exception is thrown if the file can not be opened.
+
+sub _file_opener {
+    my ( $self, $name, $mode ) = @_;
+
+    my $fh = IO::File->new( $name, $mode )
+	or $self->wail( "Unable to open $name: $!" );
+
+    if ( $mode =~ m/ \A (?: [+>] | [|] - ) /smx ) {
+
+	my $layers = $self->get( 'output_layers' );
+	if ( defined $layers && '' ne $layers ) {
+	    binmode $fh, $layers
+		or $self->wail(
+		"Unable to set '$layers' on $name: $!" );
+	}
+    }
+
+    return $fh;
 }
 
 #	$code = $self->_file_reader( $file, \%opt );
@@ -6512,9 +6583,30 @@ Subsequent arguments, if any, are the names of macros to load from the
 module. If no subsequent arguments are given, all macros defined by the
 macro are loaded.
 
-By default, the F<lib/> subdirectory of the user's configuration
-directory is added to C<@INC> before the code macro is loaded. The
-C<-lib> option can be used to specify a different directory.
+The following options are supported:
+
+=over
+
+=item -lib
+
+ -lib ~/lib
+
+This option specifies a directory from which to load macro modules. The
+value is added to C<@INC> before the code macro is loaded.
+
+The default is the F<lib/> subdirectory of the user's configuration
+directory.
+
+=item -verbose
+
+This option specifies that extra output be generated if the load is
+successful. This output will appear before any output from the
+C<after_load> macro if any.
+
+This option is intended as a debugging aid, and the output generated by
+it may change without notice.
+
+=back
 
 Code macros are experimental. See
 L<Astro::App::Satpass2::TUTORIAL|Astro::App::Satpass2::TUTORIAL> for how
@@ -7646,8 +7738,7 @@ used for what it does.
 
 This string attribute specifies the format used to display
 dates. Documentation of the C<strftime (3)> subroutine may be found at
-L<http://www.openbsd.org/cgi-bin/man.cgi?query=strftime&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html>,
-among other places.
+L<https://linux.die.net/man/3/strftime> among other places.
 
 The above is a long URL, and may be split across multiple lines. More
 than that, the formatter may have inserted a hyphen at the break, which
@@ -8123,6 +8214,24 @@ F<satpass2> script.
 
 The default is the C<STDOUT> file handle.
 
+=head2 output_layers
+
+This attribute determines which PerlIO layers (formerly known as
+"disciplines") are to be applied to newly-opened output files.
+Already-open files are not affected.
+
+Note that in the case of redirections, the file is opened when the first
+output is done. This means that you can redirect the output of a macro
+or source file and specify the output layers in that macro or source
+file, provided you do so before any output is done.
+
+Having this setting apply to already-opened files was rejected because
+when you do multiple C<binmode()> calls, the specified layers simply
+accumulate, and there appears to be no good way to clean up unwanted
+ones.
+
+The default is C<':encoding(utf-8)'>.
+
 =head2 time_format
 
 This string attribute is deprecated. It is provided for backward
@@ -8142,8 +8251,7 @@ interpret the value of this attribute as a C<strftime(3)> format.
 
 This string attribute specifies the strftime(3) format used to display
 times.  Documentation of the C<strftime(3)> subroutine may be found at
-L<http://www.openbsd.org/cgi-bin/man.cgi?query=strftime&apropos=0&sektion=0&manpath=OpenBSD+Current&arch=i386&format=html>,
-among  other places.
+L<https://linux.die.net/man/3/strftime> among other places.
 
 The above is a long URL, and may be split across multiple lines. More
 than that, the formatter may have inserted a hyphen at the break, which
@@ -8516,6 +8624,10 @@ least not in the sense of making data appear on standard in. The first
 is replaced by the contents of the given file or URL. The second works
 like a Perl here document, and interpolates unless the here document
 terminator is enclosed in single quotes.
+
+B<Note> that in the case of output redirections, the file is not
+actually opened until output to it is done. See the documentation on the
+L<output_layers|/output_layers> attribute for the rationale for this.
 
 B<Caveat:> redirection tests fail under MSWin32 -- or at least they did
 until I bypassed them under that operating system. I do not know if this

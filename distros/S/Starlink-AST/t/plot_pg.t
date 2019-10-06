@@ -126,6 +126,14 @@ print "# Plotting at $ra2, $dec2\n";
 
 $plot->Mark(24, [$ra1, $ra2],[$dec1,$dec2]);
 
+# Plot a region outline
+my $moc = new Starlink::AST::Moc('');
+$moc->AddMocString(
+    Starlink::AST::Region::AST__OR(), 0, -1,
+    '7/10494,10495,10833,10836 ' .
+    '8/41963,41965-41967,42633,42664,42666,42667,43329,43331,43348-43350,43352,43354,44032');
+$plot->RegionOutline($moc);
+
 # Done!
 sleep(2);
 exit;

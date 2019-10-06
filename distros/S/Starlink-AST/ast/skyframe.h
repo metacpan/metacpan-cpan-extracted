@@ -52,12 +52,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -103,6 +103,8 @@
 *        Added Dut1 accessor methods.
 *     14-OCT-2006 (DSB):
 *        Moved dut1 to the Frame class.
+*     6-APR-2017 (GSB):
+*        Added dtai to AstSkyLastTable.
 *-
 */
 
@@ -164,13 +166,14 @@
 /* Cached LAST look-up table. */
 /* -------------------------- */
 /* Holds a list of epoch values and the corresponding Local Apparent
-   Sidereal Time values. Also holds the observatory position and DUT1
+   Sidereal Time values. Also holds the observatory position, DUT1 and DTAI
    value used when calculating the LAST values. */
 typedef struct AstSkyLastTable {
    double obslat;         /* ObsLat at which LAST values were calculated */
    double obslon;         /* ObsLon at which LAST values were calculated */
    double obsalt;         /* ObsAlt at which LAST values were calculated */
    double dut1;           /* Dut1 values at which LAST values were calculated */
+   double dtai;           /* Dtai values at which LAST values were calculated */
    int nentry;            /* Number of entries in the epoch and last arrays */
    double *epoch;         /* Array of epoch values */
    double *last;          /* Array of LAST values */
@@ -189,6 +192,7 @@ typedef struct AstSkyFrame {
    char *projection;             /* Description of sky projection */
    double equinox;               /* Modified Julian Date of mean equinox */
    int neglon;                   /* Display negative longitude values? */
+   double skytol;                /* Smallest significant distance */
    int alignoffset;              /* Align SkyFrame in offset coords? */
    int skyrefis;                 /* Nature of offset coord system */
    double skyref[ 2 ];           /* Origin or pole of offset coord system */
@@ -239,6 +243,11 @@ typedef struct AstSkyFrameVtab {
    int (* TestSkyRefIs)( AstSkyFrame *, int * );
    void (* ClearSkyRefIs)( AstSkyFrame *, int * );
    void (* SetSkyRefIs)( AstSkyFrame *, int, int * );
+
+   double (* GetSkyTol)( AstSkyFrame *, int * );
+   int (* TestSkyTol)( AstSkyFrame *, int * );
+   void (* ClearSkyTol)( AstSkyFrame *, int * );
+   void (* SetSkyTol)( AstSkyFrame *, double, int * );
 
    double (* GetSkyRef)( AstSkyFrame *, int, int * );
    int (* TestSkyRef)( AstSkyFrame *, int, int * );
@@ -363,6 +372,10 @@ int astTestSkyRefP_( AstSkyFrame *, int, int * );
 void astClearSkyRefP_( AstSkyFrame *, int, int * );
 void astSetSkyRefP_( AstSkyFrame *, int, double, int * );
 
+double astGetSkyTol_( AstSkyFrame *, int * );
+int astTestSkyTol_( AstSkyFrame *, int * );
+void astClearSkyTol_( AstSkyFrame *, int * );
+void astSetSkyTol_( AstSkyFrame *, double, int * );
 
 #endif
 
@@ -480,6 +493,11 @@ astINVOKE(V,astTestProjection_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetSkyRefP(this,axis) astINVOKE(V,astGetSkyRefP_(astCheckSkyFrame(this),axis,STATUS_PTR))
 #define astSetSkyRefP(this,axis,value) astINVOKE(V,astSetSkyRefP_(astCheckSkyFrame(this),axis,value,STATUS_PTR))
 #define astTestSkyRefP(this,axis) astINVOKE(V,astTestSkyRefP_(astCheckSkyFrame(this),axis,STATUS_PTR))
+
+#define astClearSkyTol(this) astINVOKE(V,astClearSkyTol_(astCheckSkyFrame(this),STATUS_PTR))
+#define astGetSkyTol(this) astINVOKE(V,astGetSkyTol_(astCheckSkyFrame(this),STATUS_PTR))
+#define astSetSkyTol(this,value) astINVOKE(V,astSetSkyTol_(astCheckSkyFrame(this),value,STATUS_PTR))
+#define astTestSkyTol(this) astINVOKE(V,astTestSkyTol_(astCheckSkyFrame(this),STATUS_PTR))
 
 #endif
 #endif

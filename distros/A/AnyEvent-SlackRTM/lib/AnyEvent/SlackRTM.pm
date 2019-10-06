@@ -1,5 +1,5 @@
 package AnyEvent::SlackRTM;
-$AnyEvent::SlackRTM::VERSION = '1.0';
+$AnyEvent::SlackRTM::VERSION = '1.1';
 use v5.14;
 
 # ABSTRACT: AnyEvent module for interacting with the Slack RTM API
@@ -15,9 +15,17 @@ our $START_URL = 'https://slack.com/api/rtm.start';
 
 
 sub new {
-    my ($class, $token) = @_;
+    my ($class, $token, $client_opts) = @_;
 
-    my $client = AnyEvent::WebSocket::Client->new;
+    $client_opts //= {};
+    croak "Client options must be passed as a HashRef" unless ref $client_opts eq 'HASH';
+
+    my $client;
+    try {
+        $client = AnyEvent::WebSocket::Client->new(%$client_opts);
+    } catch {
+        croak "Can't create client object: $_";
+    };
 
     return bless {
         token    => $token,
@@ -236,7 +244,7 @@ AnyEvent::SlackRTM - AnyEvent module for interacting with the Slack RTM API
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -293,7 +301,7 @@ B<Disclaimer:> Note also that this API is subject to rate limits and any service
 
 =head2 new
 
-    method new($token)
+    method new($token, $client_opts)
 
 Constructs a L<AnyEvent::SlackRTM> object and returns it.
 
@@ -310,6 +318,8 @@ L<User Token|https://api.slack.com/tokens>. This is a token to perform actions o
 L<Bot Token|https://slack.com/services/new/bot>. If you configure a bot integration, you may use the access token on the bot configuration page to use this library to act on behalf of the bot account. Bot accounts may not have the same features as a user account, so please be sure to read the Slack documentation to understand any differences or limitations.
 
 =back
+
+The C<$client_opts> is an optional HashRef of L<AnyEvent::WebSocket::Client>'s configuration options, e.g. C<env_proxy>, C<max_payload_size>, C<timeout>, etc.
 
 =head2 start
 
@@ -393,7 +403,7 @@ Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Qubling Software LLC.
+This software is copyright (c) 2019 by Qubling Software LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

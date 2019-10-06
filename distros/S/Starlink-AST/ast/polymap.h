@@ -96,12 +96,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -164,13 +164,27 @@ typedef struct AstPolyMap {
    int niterinverse;          /* Max number of iterations for iterative inverse */
    double tolinverse;         /* Target relative error for iterative inverse */
    struct AstPolyMap **jacobian;/* PolyMaps defining Jacobian of forward transformation */
+   AstMapping *lintrunc;      /* A linear truncation of the PolyMap */
 } AstPolyMap;
 
 /* Virtual function table. */
 /* ----------------------- */
-/* This table contains all information that is the same for all
-   objects in the class (e.g. pointers to its virtual functions). */
 #if defined(astCLASS)            /* Protected */
+
+/* Structure used to pass data to the Levenberg - Marquardt non-linear
+   minimization algorithm. */
+typedef struct AstMinPackData {
+   int order;      /* Max power of X1 or X2, plus one. */
+   int nsamp;      /* No. of polynomial samples to fit */
+   int init_jac;   /* Has the constant Jacobian been found yet? */
+   double *xp1;    /* Pointer to powers of X1 (1st poly i/p) at all samples */
+   double *xp2;    /* Pointer to powers of X2 (2nd poly i/p) at all samples */
+   double *y[ 2 ]; /* Pointers to Y1 and Y2 values at all samples */
+} AstMinPackData;
+
+
+/* This structure contains all information that is the same for all
+   objects in the class (e.g. pointers to its virtual functions). */
 typedef struct AstPolyMapVtab {
 
 /* Properties (e.g. methods) inherited from the parent class. */
@@ -181,6 +195,11 @@ typedef struct AstPolyMapVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    AstPolyMap *(* PolyTran)( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
+   void (* PolyPowers)( AstPolyMap *, double **, int, const int *, double **, int, int, int * );
+   void (* PolyCoeffs)( AstPolyMap *, int, int, double *, int *, int *);
+   void (* FitPoly1DInit)( AstPolyMap *, int, double **, AstMinPackData *, double *, int *);
+   void (* FitPoly2DInit)( AstPolyMap *, int, double **, AstMinPackData *, double *, int *);
+
    int (*GetIterInverse)( AstPolyMap *, int * );
    int (* TestIterInverse)( AstPolyMap *, int * );
    void (* ClearIterInverse)( AstPolyMap *, int * );
@@ -248,8 +267,13 @@ AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 AstPolyMap *astPolyTran_( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
+void astPolyCoeffs_( AstPolyMap *, int, int, double *, int *, int *);
 
 # if defined(astCLASS)           /* Protected */
+   void astPolyPowers_( AstPolyMap *, double **, int, const int *, double **, int, int, int * );
+   void astFitPoly1DInit_( AstPolyMap *, int, double **, AstMinPackData *, double *, int *);
+   void astFitPoly2DInit_( AstPolyMap *, int, double **, AstMinPackData *, double *, int *);
+
    int astGetIterInverse_( AstPolyMap *, int * );
    int astTestIterInverse_( AstPolyMap *, int * );
    void astClearIterInverse_( AstPolyMap *, int * );
@@ -316,8 +340,17 @@ astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #define astPolyTran(this,forward,acc,maxacc,maxorder,lbnd,ubnd) \
 astINVOKE(O,astPolyTran_(astCheckPolyMap(this),forward,acc,maxacc,maxorder,lbnd,ubnd,STATUS_PTR))
 
+#define astPolyCoeffs(this,forward,nel,coeffs,ncoeff) \
+astINVOKE(V,astPolyCoeffs_(astCheckPolyMap(this),forward,nel,coeffs,ncoeff,STATUS_PTR))
+
 #if defined(astCLASS)            /* Protected */
 
+#define astPolyPowers(this,work,ncoord,mxpow,ptr,offset,fwd) \
+        astINVOKE(V,astPolyPowers_(astCheckPolyMap(this),work,ncoord,mxpow,ptr,point,fwd,STATUS_PTR))
+#define astFitPoly1DInit(this,forward,table,data,scales) \
+        astINVOKE(V,astFitPoly1DInit_(astCheckPolyMap(this),forward,table,data,scales,STATUS_PTR))
+#define astFitPoly2DInit(this,forward,table,data,scales) \
+        astINVOKE(V,astFitPoly2DInit_(astCheckPolyMap(this),forward,table,data,scales,STATUS_PTR))
 #define astClearIterInverse(this) \
         astINVOKE(V,astClearIterInverse_(astCheckPolyMap(this),STATUS_PTR))
 #define astGetIterInverse(this) \

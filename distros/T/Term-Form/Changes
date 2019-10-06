@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.521   2019-10-05
+        - Refactored functional interface.
+        - Added option 'color'.
+
 0.520   2019-09-05
         - Adapt the code to the updated Term::Choose.
 

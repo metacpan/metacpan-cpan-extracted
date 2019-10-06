@@ -1,5 +1,10 @@
 Revision history for JSON-Slurper
 
+0.09  2019-10-03 21:20:39 CDT
+        - Use Exporter::Shiny instead of Exporter. Fixes #4. Thanks @dbook and @tobyink.
+        - Add -std, -std_auto, -slurp_auto, and -spurt_auto tags.
+        - Add documentation about importing via Exporter::Shiny.
+
 0.08  2019-09-27 13:04:10 CDT
         - Documentation fixes.
 

@@ -11,3 +11,10 @@ Revision history for Date::Time2fmtstr
         - ADD "Minutes since start of day" (mmmm and mmm0)
         - ADD "Number of week of the month" (m)
         - Fix "Number of week of the year" - wasn't working correctly.
+1.10    2019-10-02
+        - Added several new format strings
+        - Cleaned up the docs quite a bit.
+        - Removed extranious debug print stmt.
+        - Removed "wget" from docs.RECCOMENDS section (oops!)
+1.11    2019-10-05
+        - Some doc. cleanups / polishing.

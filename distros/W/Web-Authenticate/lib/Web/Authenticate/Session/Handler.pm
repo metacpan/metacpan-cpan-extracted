@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Session::Handler;
-$Web::Authenticate::Session::Handler::VERSION = '0.011';
+$Web::Authenticate::Session::Handler::VERSION = '0.012';
 use Mouse;
 use Carp;
 use DateTime;
@@ -145,7 +145,7 @@ Web::Authenticate::Session::Handler - The default implementation of Web::Authent
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

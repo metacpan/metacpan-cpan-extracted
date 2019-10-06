@@ -6,7 +6,7 @@ use Carp ();
 use Encode ();
 
 use vars qw($VERSION);
-our $VERSION = '6.04';
+our $VERSION = '6.05';
 
 my %form_tags = map {$_ => 1} qw(input textarea button select option);
 
@@ -325,6 +325,22 @@ sub new {
     $self;
 }
 
+=item $form->push_input( $type, \%attr, $verbose )
+
+This method adds additional inputs to the form.
+The first argument is the type of input (e.g. hidden, option, etc.).
+The second argument is a reference to a hash of the input attributes.
+The third argument is optional, and will issue warnings about unknown input types.
+
+Example:
+
+    push_input( 'hidden', {
+        name  => 'NewFormElement',
+        id    => 'NewFormElementId',
+        value => 'some value',
+    });
+
+=cut
 
 sub push_input
 {

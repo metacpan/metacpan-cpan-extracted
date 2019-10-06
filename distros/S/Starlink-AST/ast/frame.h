@@ -290,6 +290,8 @@
 *           Determine how to convert between two coordinate systems.
 *        astFields
 *           Identify the fields within a formatted Frame axis value.
+*        astCentre
+*           Find a "nice" central value for tabulating Frame axis values.
 *        astGap
 *           Find a "nice" gap for tabulating Frame axis values.
 *        astGetAxis
@@ -475,12 +477,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -534,6 +536,14 @@
 *        Added astIntersect method.
 *     18-JUN-2009 (DSB):
 *        Added ObsAlt attribute.
+*     17-APR-2015 (DSB):
+*        Added astCentre.
+*     27-APR-2015 (DSB):
+*        Added InternalUnit attribute.
+*     26-OCT-2016 (DSB):
+*        Added method astAxNorm.
+*     11-JAN-2017 (GSB):
+*        Add Dtai attribute.
 *-
 */
 
@@ -609,6 +619,7 @@ typedef struct AstFrame {
    double obslat;                /* Geodetic latitude of observer */
    double obslon;                /* Geodetic longitude of observer */
    double obsalt;                /* Height above reference spheroid (geodetic, metres) */
+   double dtai;                  /* TAI-UTC in seconds */
    double dut1;                  /* UT1-UTC in seconds */
    int *perm;                    /* Pointer to axis permutation array */
    int digits;                   /* Default digits of precision */
@@ -673,14 +684,17 @@ typedef struct AstFrameVtab {
    const char *(* GetLabel)( AstFrame *, int, int * );
    const char *(* GetSymbol)( AstFrame *, int, int * );
    const char *(* GetTitle)( AstFrame *, int * );
+   const char *(* GetInternalUnit)( AstFrame *, int, int * );
    const char *(* GetNormUnit)( AstFrame *, int, int * );
    const char *(* GetUnit)( AstFrame *, int, int * );
    const int *(* GetPerm)( AstFrame *, int * );
    double (* Angle)( AstFrame *, const double[], const double[], const double[], int * );
    double (* Distance)( AstFrame *, const double[], const double[], int * );
+   double (* Centre)( AstFrame *, int, double, double, int * );
    double (* Gap)( AstFrame *, int, double, int *, int * );
    int (* Fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
    double (* AxDistance)( AstFrame *, int, double, double, int * );
+   void (* AxNorm)( AstFrame *, int, int, int, double *, int * );
    double (* AxOffset)( AstFrame *, int, double, double, int * );
    int (* AxIn)( AstFrame *, int, double, double, double, int, int * );
    int (* GetDigits)( AstFrame *, int * );
@@ -692,7 +706,7 @@ typedef struct AstFrameVtab {
    int (* GetPermute)( AstFrame *, int * );
    int (* GetPreserveAxes)( AstFrame *, int * );
    int (* IsUnitFrame)( AstFrame *, int * );
-   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
    int (* LineContains)( AstFrame *, AstLineDef *, int, double *, int * );
    int (* Match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
    int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
@@ -807,6 +821,11 @@ typedef struct AstFrameVtab {
    void (* ClearObsAlt)( AstFrame *, int * );
    void (* SetObsAlt)( AstFrame *, double, int * );
 
+   double (* GetDtai)( AstFrame *, int * );
+   int (* TestDtai)( AstFrame *, int * );
+   void (* ClearDtai)( AstFrame *, int * );
+   void (* SetDtai)( AstFrame *, double, int * );
+
    double (* GetDut1)( AstFrame *, int * );
    int (* TestDut1)( AstFrame *, int * );
    void (* ClearDut1)( AstFrame *, int * );
@@ -893,6 +912,7 @@ double astAxOffset_( AstFrame *, int, double, double, int * );
 double astDistance_( AstFrame *, const double[], const double[], int * );
 double astOffset2_( AstFrame *, const double[2], double, double, double[2], int * );
 int astGetActiveUnit_( AstFrame *, int * );
+void astAxNorm_( AstFrame *, int, int, int, double *, int * );
 void astIntersect_( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 void astMatchAxes_( AstFrame *, AstFrame *, int[], int * );
 void astNorm_( AstFrame *, double[], int * );
@@ -929,8 +949,10 @@ const char *astGetLabel_( AstFrame *, int, int * );
 const char *astGetSymbol_( AstFrame *, int, int * );
 const char *astGetTitle_( AstFrame *, int * );
 const char *astGetUnit_( AstFrame *, int, int * );
+const char *astGetInternalUnit_( AstFrame *, int, int * );
 const char *astGetNormUnit_( AstFrame *, int, int * );
 const int *astGetPerm_( AstFrame *, int * );
+double astCentre_( AstFrame *, int, double, double, int * );
 double astGap_( AstFrame *, int, double, int *, int * );
 int astFields_( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 int astGetDigits_( AstFrame *, int * );
@@ -942,7 +964,7 @@ int astGetNaxes_( AstFrame *, int * );
 int astGetPermute_( AstFrame *, int * );
 int astGetPreserveAxes_( AstFrame *, int * );
 int astIsUnitFrame_( AstFrame *, int * );
-int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
 int astLineContains_( AstFrame *, AstLineDef *, int, double *, int * );
 int astMatch_( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
@@ -1039,6 +1061,11 @@ int astTestObsAlt_( AstFrame *, int * );
 void astClearObsAlt_( AstFrame *, int * );
 void astSetObsAlt_( AstFrame *, double, int * );
 
+double astGetDtai_( AstFrame *, int * );
+int astTestDtai_( AstFrame *, int * );
+void astClearDtai_( AstFrame *, int * );
+void astSetDtai_( AstFrame *, double, int * );
+
 double astGetDut1_( AstFrame *, int * );
 int astTestDut1_( AstFrame *, int * );
 void astClearDut1_( AstFrame *, int * );
@@ -1109,6 +1136,8 @@ astINVOKE(V,astMatchAxes_(astCheckFrame(frm1),astCheckFrame(frm2),axes,STATUS_PT
 astINVOKE(V,astNorm_(astCheckFrame(this),value,STATUS_PTR))
 #define astAxDistance(this,axis,v1,v2) \
 astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2,STATUS_PTR))
+#define astAxNorm(this,axis,oper,nval,values) \
+astINVOKE(V,astAxNorm_(astCheckFrame(this),axis,oper,nval,values,STATUS_PTR))
 #define astAxOffset(this,axis,v1,dist) \
 astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist,STATUS_PTR))
 #define astOffset(this,point1,point2,offset,point3) \
@@ -1201,6 +1230,8 @@ astINVOKE(V,astClearTitle_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astClearUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astConvertX(to,from,domainlist) \
 astINVOKE(O,astConvertX_(astCheckFrame(to),astCheckFrame(from),domainlist,STATUS_PTR))
+#define astCentre(this,axis,value,gap) \
+astINVOKE(V,astCentre_(astCheckFrame(this),axis,value,gap,STATUS_PTR))
 #define astGap(this,axis,gap,ntick) \
 astINVOKE(V,astGap_(astCheckFrame(this),axis,gap,ntick,STATUS_PTR))
 #define astGetAxis(this,axis) \
@@ -1237,6 +1268,8 @@ astINVOKE(V,astGetTitle_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astGetUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetNormUnit(this,axis) \
 astINVOKE(V,astGetNormUnit_(astCheckFrame(this),axis,STATUS_PTR))
+#define astGetInternalUnit(this,axis) \
+astINVOKE(V,astGetInternalUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astMatch(template,target,matchsub,template_axes,target_axes,map,result) \
 astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),matchsub,template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result),STATUS_PTR))
 #define astIsUnitFrame(this) \
@@ -1390,6 +1423,15 @@ astINVOKE(V,astTestObsAlt_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astClearObsAlt_(astCheckFrame(this),STATUS_PTR))
 #define astSetObsAlt(this,value) \
 astINVOKE(V,astSetObsAlt_(astCheckFrame(this),value,STATUS_PTR))
+
+#define astClearDtai(this) \
+astINVOKE(V,astClearDtai_(astCheckFrame(this),STATUS_PTR))
+#define astGetDtai(this) \
+astINVOKE(V,astGetDtai_(astCheckFrame(this),STATUS_PTR))
+#define astSetDtai(this,value) \
+astINVOKE(V,astSetDtai_(astCheckFrame(this),value,STATUS_PTR))
+#define astTestDtai(this) \
+astINVOKE(V,astTestDtai_(astCheckFrame(this),STATUS_PTR))
 
 #define astClearDut1(this) \
 astINVOKE(V,astClearDut1_(astCheckFrame(this),STATUS_PTR))

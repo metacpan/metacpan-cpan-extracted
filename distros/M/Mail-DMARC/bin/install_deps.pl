@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-our $VERSION = '1.20190831'; # VERSION 1.10
+our $VERSION = '1.20191004'; # VERSION 1.10
 
 use strict;
 use warnings;
@@ -476,7 +476,7 @@ install_deps.pl - install dependencies with package manager or CPAN
 
 =head1 VERSION
 
-version 1.20190831
+version 1.20191004
 
 =head1 AUTHORS
 

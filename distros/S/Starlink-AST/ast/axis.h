@@ -103,6 +103,8 @@
 *           Find the distance between two axis values.
 *        astAxisFields
 *           Identify the fields within a formatted SkyAxis value.
+*        astAxisCentre
+*           Find a "nice" central axis value.
 *        astAxisGap
 *           Find a "nice" gap for tabulating Axis values.
 *        astAxisOffset
@@ -209,12 +211,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -240,6 +242,8 @@
 *        Added Top and Bottom.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitAxisVtab method.
+*     17-APR-2015 (DSB):
+*        Added astAxisCentre.
 *-
 */
 
@@ -310,7 +314,9 @@ typedef struct AstAxisVtab {
    const char *(* GetAxisLabel)( AstAxis *, int * );
    const char *(* GetAxisSymbol)( AstAxis *, int * );
    const char *(* GetAxisUnit)( AstAxis *, int * );
+   const char *(* GetAxisInternalUnit)( AstAxis *, int * );
    const char *(* GetAxisNormUnit)( AstAxis *, int * );
+   double (* AxisCentre)( AstAxis *, double, double, int * );
    double (* AxisGap)( AstAxis *, double, int *, int * );
    double (* AxisDistance)( AstAxis *, double, double, int * );
    double (* AxisOffset)( AstAxis *, double, double, int * );
@@ -325,8 +331,10 @@ typedef struct AstAxisVtab {
    int (* TestAxisLabel)( AstAxis *, int * );
    int (* TestAxisSymbol)( AstAxis *, int * );
    int (* TestAxisUnit)( AstAxis *, int * );
+   int (* TestAxisInternalUnit)( AstAxis *, int * );
    int (* TestAxisNormUnit)( AstAxis *, int * );
    void (* AxisNorm)( AstAxis *, double *, int * );
+   void (* AxisNormValues)( AstAxis *, int, int, double *, int * );
    void (* AxisOverlay)( AstAxis *, AstAxis *, int * );
    void (* ClearAxisDigits)( AstAxis *, int * );
    void (* ClearAxisDirection)( AstAxis *, int * );
@@ -410,6 +418,7 @@ void astInitAxisGlobals_( AstAxisGlobals * );
 const char *astAxisFormat_( AstAxis *, double, int * );
 int astAxisUnformat_( AstAxis *, const char *, double *, int * );
 void astAxisNorm_( AstAxis *, double *, int * );
+void astAxisNormValues_( AstAxis *, int, int, double *, int * );
 
 #if defined(astCLASS)            /* Protected */
 const char *astAxisAbbrev_( AstAxis *, const char *, const char *, const char *, int * );
@@ -418,6 +427,8 @@ const char *astGetAxisLabel_( AstAxis *, int * );
 const char *astGetAxisSymbol_( AstAxis *, int * );
 const char *astGetAxisUnit_( AstAxis *, int * );
 const char *astGetAxisNormUnit_( AstAxis *, int * );
+const char *astGetAxisInternalUnit_( AstAxis *, int * );
+double astAxisCentre_( AstAxis *, double, double, int * );
 double astAxisGap_( AstAxis *, double, int *, int * );
 double astAxisDistance_( AstAxis *, double, double, int * );
 double astAxisOffset_( AstAxis *, double, double, int * );
@@ -432,6 +443,7 @@ int astTestAxisLabel_( AstAxis *, int * );
 int astTestAxisSymbol_( AstAxis *, int * );
 int astTestAxisUnit_( AstAxis *, int * );
 int astTestAxisNormUnit_( AstAxis *, int * );
+int astTestAxisInternalUnit_( AstAxis *, int * );
 void astAxisOverlay_( AstAxis *, AstAxis *, int * );
 void astClearAxisDigits_( AstAxis *, int * );
 void astClearAxisDirection_( AstAxis *, int * );
@@ -507,12 +519,16 @@ astINVOKE(O,astLoadAxis_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR)
 astINVOKE(V,astAxisFormat_(astCheckAxis(this),value,STATUS_PTR))
 #define astAxisNorm(this,value) \
 astINVOKE(V,astAxisNorm_(astCheckAxis(this),value,STATUS_PTR))
+#define astAxisNormValues(this,oper,nval,values) \
+astINVOKE(V,astAxisNormValues_(astCheckAxis(this),oper,nval,values,STATUS_PTR))
 #define astAxisUnformat(this,string,value) \
 astINVOKE(V,astAxisUnformat_(astCheckAxis(this),string,value,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astAxisAbbrev(this,fmt,str1,str2) \
 astINVOKE(V,astAxisAbbrev_(astCheckAxis(this),fmt,str1,str2,STATUS_PTR))
+#define astAxisCentre(this,value,gap) \
+astINVOKE(V,astAxisCentre_(astCheckAxis(this),value,gap,STATUS_PTR))
 #define astAxisGap(this,gap,ntick) \
 astINVOKE(V,astAxisGap_(astCheckAxis(this),gap,ntick,STATUS_PTR))
 #define astAxisFields(this,fmt,str,maxfld,fields,nc,val) \
@@ -550,7 +566,9 @@ astINVOKE(V,astGetAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisUnit(this) \
 astINVOKE(V,astGetAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisNormUnit(this) \
-astINVOKE(V,astGetAxisNormUnit_(astCheckAxis(this),STATUS_PTR))
+astINVOKE(V,astGetAxisInternalUnit_(astCheckAxis(this),STATUS_PTR))
+#define astGetAxisInternalUnit(this) \
+astINVOKE(V,astGetAxisInternalUnit_(astCheckAxis(this),STATUS_PTR))
 #define astSetAxisDigits(this,digits) \
 astINVOKE(V,astSetAxisDigits_(astCheckAxis(this),digits,STATUS_PTR))
 #define astSetAxisDirection(this,direction) \
@@ -577,6 +595,8 @@ astINVOKE(V,astTestAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 astINVOKE(V,astTestAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisNormUnit(this) \
 astINVOKE(V,astTestAxisNormUnit_(astCheckAxis(this),STATUS_PTR))
+#define astTestAxisInternalUnit(this) \
+astINVOKE(V,astTestAxisInternalUnit_(astCheckAxis(this),STATUS_PTR))
 
 #define astClearAxisTop(this) \
 astINVOKE(V,astClearAxisTop_(astCheckAxis(this),STATUS_PTR))

@@ -57,12 +57,12 @@ f     The MathMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -209,7 +209,7 @@ typedef AstMathMapRandContext_ Rcontext;
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
@@ -226,7 +226,7 @@ typedef enum {
 
 /* System constants. */
    OP_LDBAD,                     /* Load bad value (AST__BAD) */
-   OP_LDDIG,                     /* Load # decimal digits (DBL_DIG) */
+   OP_LDDIG,                     /* Load # decimal digits (AST__DBL_DIG) */
    OP_LDEPS,                     /* Load relative precision (DBL_EPSILON) */
    OP_LDMAX,                     /* Load largest value (DBL_MAX) */
    OP_LDMAX10E,                  /* Max. decimal exponent (DBL_MAX_10_EXP) */
@@ -591,7 +591,7 @@ AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[], c
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
 static double Gauss( Rcontext *, int * );
 static double LogGamma( double, int * );
@@ -2553,7 +2553,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 
 /* The following load constants associated with the (double) floating
    point representation into the top of stack element. */
-            ARG_0( OP_LDDIG,    ;, *y = (double) DBL_DIG )
+            ARG_0( OP_LDDIG,    ;, *y = (double) AST__DBL_DIG )
             ARG_0( OP_LDEPS,    ;, *y = DBL_EPSILON )
             ARG_0( OP_LDMAX,    ;, *y = DBL_MAX )
             ARG_0( OP_LDMAX10E, ;, *y = (double) DBL_MAX_10_EXP )
@@ -3466,7 +3466,7 @@ static double Gauss( Rcontext *context, int *status ) {
    return x;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -3479,7 +3479,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the astGetObjSize protected
@@ -3505,7 +3505,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstMathMap *this;         /* Pointer to MathMap structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;

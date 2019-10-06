@@ -159,10 +159,10 @@ sub _options_copy_and_paste {
         { name => 'group_insert', text => '' }
     ];
     my $options = [
-        { name => '_parse_copy',   text => "- Parse Tool",     section => 'insert' },
-        { name => '_split_config', text => "- split settings", section => 'split'  },
-        { name => '_csv_char',     text => "- CSV settings-a", section => 'csv'    },
-        { name => '_csv_options',  text => "- CSV settings-b", section => 'csv'    },
+        { name => '_parse_copy',   text => "- Choose Parse Tool", section => 'insert' },
+        { name => '_split_config', text => "- Settings 'split'",  section => 'split'  },
+        { name => '_csv_char',     text => "- Settings 'CSV-a'",  section => 'csv'    },
+        { name => '_csv_options',  text => "- Settings 'CSV-b'",  section => 'csv'    },
     ];
     return $groups, $options;
 }
@@ -247,12 +247,12 @@ sub _options_file {
         { name => 'group_insert', text => '' }
     ];
     my $options = [
-        { name => '_parse_file',    text => "- Parse Tool",     section => 'insert' },
-        { name => '_split_config',  text => "- split settings", section => 'split'  },
-        { name => '_csv_char',      text => "- CSV settings-a", section => 'csv'    },
-        { name => '_csv_options',   text => "- CSV settings-b", section => 'csv'    },
-        { name => '_file_encoding', text => "- File Encoding",  section => 'insert' },
-        { name => 'history_dirs',   text => "- Dir History",    section => 'insert' },
+        { name => '_parse_file',    text => "- Choose Parse Tool", section => 'insert' },
+        { name => '_split_config',  text => "- Settings 'split'",  section => 'split'  },
+        { name => '_csv_char',      text => "- Settings 'CSV-a'",  section => 'csv'    },
+        { name => '_csv_options',   text => "- Settings 'CSV-b'",  section => 'csv'    },
+        { name => '_file_encoding', text => "- File Encoding",     section => 'insert' },
+        { name => 'history_dirs',   text => "- Dir History",       section => 'insert' },
     ];
     if ( ! $all ) {
         splice @$options, -2;

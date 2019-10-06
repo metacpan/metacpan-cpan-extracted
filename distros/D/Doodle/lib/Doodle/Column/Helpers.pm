@@ -4,7 +4,7 @@ use 5.014;
 
 use Data::Object 'Role', 'Doodle::Library';
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # BUILD
 # METHODS
@@ -61,6 +61,32 @@ method decimal(Any %args) {
   $self->type('decimal');
 
   $self->data->set(%args) if %args;
+
+  return $self;
+}
+
+method default(Str @args) {
+  unshift @args, 'deduce' if @args == 1;
+
+  $self->data->set(default => [@args]);
+
+  return $self;
+}
+
+method default_current_date() {
+  $self->default(function => 'CURRENT_DATE');
+
+  return $self;
+}
+
+method default_current_time() {
+  $self->default(function => 'CURRENT_TIME');
+
+  return $self;
+}
+
+method default_current_datetime() {
+  $self->default(function => 'CURRENT_TIMESTAMP');
 
   return $self;
 }
@@ -482,6 +508,116 @@ Configures a decimal column and returns itself.
   # given: synopsis
 
   my $decimal = $self->decimal;
+
+=back
+
+=cut
+
+=head2 default
+
+  default(Str @args) : Column
+
+Configures a default value and returns itself.
+
+=over 4
+
+=item default example #1
+
+  # given: synopsis
+
+  my $default = $self->default(123);
+
+  # produces, default 123
+
+=back
+
+=over 4
+
+=item default example #2
+
+  # given: synopsis
+
+  my $default = $self->default(string => 123);
+
+  # produces, default '123'
+
+=back
+
+=over 4
+
+=item default example #3
+
+  # given: synopsis
+
+  my $default = $self->default(integer => 123);
+
+  # produces, default 123
+
+=back
+
+=over 4
+
+=item default example #4
+
+  # given: synopsis
+
+  my $default = $self->default(function => 'current_timestamp');
+
+  # produces, default CURRENT_TIMESTAMP
+
+=back
+
+=cut
+
+=head2 default_current_date
+
+  default_current_date() : Column
+
+Configures a C<CURRENT_DATE> default value and returns itself.
+
+=over 4
+
+=item default_current_date example #1
+
+  # given: synopsis
+
+  my $default = $self->default_current_date;
+
+=back
+
+=cut
+
+=head2 default_current_datetime
+
+  default_current_datetime() : Column
+
+Configures a C<CURRENT_TIMESTAMP> default value and returns itself.
+
+=over 4
+
+=item default_current_datetime example #1
+
+  # given: synopsis
+
+  my $default = $self->default_current_datetime;
+
+=back
+
+=cut
+
+=head2 default_current_time
+
+  default_current_time() : Column
+
+Configures a C<CURRENT_TIME> default value and returns itself.
+
+=over 4
+
+=item default_current_time example #1
+
+  # given: synopsis
+
+  my $default = $self->default_current_time;
 
 =back
 

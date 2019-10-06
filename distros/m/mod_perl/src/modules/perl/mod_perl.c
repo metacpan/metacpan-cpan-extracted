@@ -861,7 +861,7 @@ void modperl_register_hooks(apr_pool_t *p)
 
     /* for <IfDefine MODPERL2> and Apache2->define("MODPERL2") */
     *(char **)apr_array_push(ap_server_config_defines) =
-        apr_pstrdup(p, "MODPERL2");
+        apr_pstrdup(ap_server_config_defines->pool, "MODPERL2");
 
     ap_hook_pre_config(modperl_hook_pre_config,
                        NULL, NULL, APR_HOOK_MIDDLE);
@@ -939,18 +939,18 @@ static const command_rec modperl_cmds[] = {
     MP_CMD_DIR_ITERATE2("PerlAddVar", add_var, "PerlAddVar"),
     MP_CMD_DIR_TAKE2("PerlSetEnv", set_env, "PerlSetEnv"),
     MP_CMD_SRV_TAKE1("PerlPassEnv", pass_env, "PerlPassEnv"),
-    MP_CMD_DIR_RAW_ARGS_ON_READ("<Perl", perl, "Perl Code"),
-    MP_CMD_DIR_RAW_ARGS("Perl", perldo, "Perl Code"),
+    MP_CMD_SRV_RAW_ARGS_ON_READ("<Perl", perl, "Perl Code"),
+    MP_CMD_SRV_RAW_ARGS("Perl", perldo, "Perl Code"),
 
     MP_CMD_DIR_TAKE1("PerlSetInputFilter", set_input_filter,
                      "filter[;filter]"),
     MP_CMD_DIR_TAKE1("PerlSetOutputFilter", set_output_filter,
                      "filter[;filter]"),
 
-    MP_CMD_DIR_RAW_ARGS_ON_READ("=pod", pod, "Start of POD"),
-    MP_CMD_DIR_RAW_ARGS_ON_READ("=back", pod, "End of =over"),
-    MP_CMD_DIR_RAW_ARGS_ON_READ("=cut", pod_cut, "End of POD"),
-    MP_CMD_DIR_RAW_ARGS_ON_READ("__END__", END, "Stop reading config"),
+    MP_CMD_SRV_RAW_ARGS_ON_READ("=pod", pod, "Start of POD"),
+    MP_CMD_SRV_RAW_ARGS_ON_READ("=back", pod, "End of =over"),
+    MP_CMD_SRV_RAW_ARGS_ON_READ("=cut", pod_cut, "End of POD"),
+    MP_CMD_SRV_RAW_ARGS_ON_READ("__END__", END, "Stop reading config"),
 
     MP_CMD_SRV_RAW_ARGS("PerlLoadModule", load_module, "A Perl module"),
 #ifdef MP_TRACE

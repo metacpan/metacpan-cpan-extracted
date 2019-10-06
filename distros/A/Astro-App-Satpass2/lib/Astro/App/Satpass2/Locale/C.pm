@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';

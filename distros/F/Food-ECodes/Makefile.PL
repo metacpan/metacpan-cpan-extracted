@@ -31,8 +31,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Food::ECodes'           => { file => 'lib/Food/ECodes.pm'         , version => '0.17' },
-            'Food::ECodes::Additive' => { file => 'lib/Food/ECodes/Additive.pm', version => '0.17' },
+            'Food::ECodes'           => { file => 'lib/Food/ECodes.pm'         , version => '0.18' },
+            'Food::ECodes::Additive' => { file => 'lib/Food/ECodes/Additive.pm', version => '0.18' },
         },
         resources => {
             repository => {

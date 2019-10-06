@@ -39,4 +39,12 @@ $loc->add_localizer(
     is( $loc->localize( 'nonexistent.hello_world' ), 'nonexistent.hello_world' );
 }
 
+{
+    $loc->set_languages('en');
+    is( $loc->localize( 'multi_greet.hello', { man => 'John Doe', woman => 'Jane Roe' } ), 'Hello, Mr. John Doe and  Ms. Jane Roe', "multi_greet.hello (en)" );
+    is( $loc->localize( 'multi_greet.morning', { man => 'John Doe', woman => 'Jane Roe' } ), 'Good morning, Mr. John Doe and Ms. Jane Roe', "multi_greet.morning (en)" );
+    is( $loc->localize( 'multi_greet.afternoon', { man => 'John Doe', woman => 'Jane Roe' } ), 'Good afternoon, Mr. John Doe and Ms. Jane Roe', "multi_greet.afternoon (en)" );
+    is( $loc->localize( 'multi_greet.evening', { man => 'John Doe', woman => 'Jane Roe' } ), 'Good evening, Mr. John Doe and Ms. Jane Roe', "multi_greet.evening (en)" );
+}
+
 done_testing;

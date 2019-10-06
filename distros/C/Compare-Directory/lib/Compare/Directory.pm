@@ -1,6 +1,6 @@
 package Compare::Directory;
 
-$Compare::Directory::VERSION   = '1.25';
+$Compare::Directory::VERSION   = '1.26';
 $Compare::Directory::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Compare::Directory - Interface to compare directories.
 
 =head1 VERSION
 
-Version 1.25
+Version 1.26
 
 =cut
 

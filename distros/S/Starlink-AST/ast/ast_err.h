@@ -474,4 +474,47 @@ enum { AST__MIRRO           	= 233934386 };	/* messid=454 */
 /* Error in cminpack Levenberg-Marquardt code */
 enum { AST__MNPCK           	= 233934394 };	/* messid=455 */
 
+/* Supplied array has too many pixels */
+enum { AST__EXSPIX          	= 233934402 };	/* messid=456 */
+
+/* No mapping found between coordinate systems */
+enum { AST__NOCNV           	= 233934410 };	/* messid=457 */
+
+/* Attempt to change an immutable attribute */
+enum { AST__IMMUT           	= 233934418 };	/* messid=458 */
+
+/* No bounding box available */
+enum { AST__NOBOX           	= 233934426 };	/* messid=459 */
+
+/* Supplied Frame has no sky coordinate axes */
+enum { AST__NOSKY           	= 233934434 };	/* messid=460 */
+
+/* Sky axes cannot be separated from other axes */
+enum { AST__BDSKY           	= 233934442 };	/* messid=461 */
+
+/* Wrong class of object supplied */
+enum { AST__BDCLS           	= 233934450 };	/* messid=462 */
+
+/* Class does not implement the invoked method */
+enum { AST__NOIMP           	= 233934458 };	/* messid=463 */
+
+/* Normalised MOC is too big */
+enum { AST__BGMOC           	= 233934466 };	/* messid=464 */
+
+/* Invalid argument value supplied to an AST method */
+enum { AST__INVAR           	= 233934474 };	/* messid=465 */
+
+/* Invalid string-encoded MOC */
+enum { AST__INMOC           	= 233934482 };	/* messid=466 */
+
+/* Supplied buffer too small */
+enum { AST__SMBUF           	= 233934490 };	/* messid=467 */
+
+/* Word is too long */
+enum { AST__BGWRD           	= 233934498 };	/* messid=468 */
+
+/* Array is too big */
+enum { AST__TOOBG           	= 233934506 };	/* messid=469 */
+
+
 #endif	/* AST_ERROR_DEFINED */

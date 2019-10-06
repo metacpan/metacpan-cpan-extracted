@@ -1,0 +1,10 @@
+requires "Encode" => "0";
+recommends "RTF::Writer" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

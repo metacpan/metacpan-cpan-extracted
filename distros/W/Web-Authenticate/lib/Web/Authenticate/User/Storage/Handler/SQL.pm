@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::User::Storage::Handler::SQL;
-$Web::Authenticate::User::Storage::Handler::SQL::VERSION = '0.011';
+$Web::Authenticate::User::Storage::Handler::SQL::VERSION = '0.012';
 use Mouse;
 use Carp;
 use DBIx::Raw;
@@ -180,7 +180,7 @@ Web::Authenticate::User::Storage::Handler::SQL - Implementation of Web::Authenti
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 

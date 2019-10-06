@@ -63,12 +63,12 @@ f     The CmpFrame class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -181,6 +181,14 @@ f     The CmpFrame class does not define any new routines beyond those
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     10-FEB-2015 (DSB):
+*        When checking attribute settings for attribute names that end with
+*        an axis index, stop looking for the axis index when the first equals
+*        sign is encountered.
+*     26-MAR-2015 (DSB):
+*        Increase size of "buf2" buffer in SetAttrib, and trap buffer overflow.
+*     11-JAN-2017 (GSB):
+*        Override astSetDtai, astGetDtai and astClearDtai.
 *class--
 */
 
@@ -583,6 +591,7 @@ static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static const char *(* parent_getdomain)( AstFrame *, int * );
 static const char *(* parent_gettitle)( AstFrame *, int * );
 static double (* parent_angle)( AstFrame *, const double[], const double[], const double[], int * );
+static double (* parent_getdtai)( AstFrame *, int * );
 static double (* parent_getdut1)( AstFrame *, int * );
 static double (* parent_getepoch)( AstFrame *, int * );
 static double (* parent_getobsalt)( AstFrame *, int * );
@@ -591,11 +600,12 @@ static double (* parent_getobslon)( AstFrame *, int * );
 static int (* parent_getactiveunit)( AstFrame *, int * );
 static int (* parent_getmaxaxes)( AstFrame *, int * );
 static int (* parent_getminaxes)( AstFrame *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_getusedefs)( AstObject *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearalignsystem)( AstFrame *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_cleardtai)( AstFrame *, int * );
 static void (* parent_cleardut1)( AstFrame *, int * );
 static void (* parent_clearepoch)( AstFrame *, int * );
 static void (* parent_clearobsalt)( AstFrame *, int * );
@@ -604,6 +614,7 @@ static void (* parent_clearobslon)( AstFrame *, int * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
 static void (* parent_setactiveunit)( AstFrame *, int, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
+static void (* parent_setdtai)( AstFrame *, double, int * );
 static void (* parent_setdut1)( AstFrame *, double, int * );
 static void (* parent_setepoch)( AstFrame *, double, int * );
 static void (* parent_setframeflags)( AstFrame *, int, int * );
@@ -701,6 +712,7 @@ static const char *SystemString( AstFrame *, AstSystemType, int * );
 static const int *GetPerm( AstFrame *, int * );
 static double Angle( AstFrame *, const double[], const double[], const double[], int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
+static double Centre( AstFrame *, int, double, double, int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static int ComponentMatch( AstCmpFrame *, AstFrame *, int, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
@@ -710,7 +722,7 @@ static int GetDirection( AstFrame *, int, int * );
 static int GetMaxAxes( AstFrame *, int * );
 static int GetMinAxes( AstFrame *, int * );
 static int GetNaxes( AstFrame *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int GetUseDefs( AstObject *, int * );
 static int GoodPerm( int, const int [], int, const int [], int * );
 static int IsUnitFrame( AstFrame *, int * );
@@ -761,6 +773,10 @@ static void SetAttrib( AstObject *, const char *, int * );
 static double GetEpoch( AstFrame *, int * );
 static void ClearEpoch( AstFrame *, int * );
 static void SetEpoch( AstFrame *, double, int * );
+
+static double GetDtai( AstFrame *, int * );
+static void ClearDtai( AstFrame *, int * );
+static void SetDtai( AstFrame *, double, int * );
 
 static double GetDut1( AstFrame *, int * );
 static void ClearDut1( AstFrame *, int * );
@@ -1331,6 +1347,107 @@ static AstObject *Cast( AstObject *this_object, AstObject *obj, int *status ) {
    return new;
 }
 
+static double Centre( AstFrame *this_frame, int axis, double value, double gap, int *status ) {
+/*
+*  Name:
+*     Centre
+
+*  Purpose:
+*     Find a "nice" central value for tabulating CmpFrame axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double  Centre( AstFrame *this_frame, int axis, double value,
+*                     double gap, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astCentre method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns an axis value which produces a nice formatted
+*     value suitable for a major tick mark on a plot axis, close to the
+*     supplied axis value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which a central value
+*        is to be found.
+*     value
+*        An arbitrary axis value in the section that is being plotted.
+*     gap
+*        The gap size.
+
+*  Returned Value:
+*     The nice central axis value.
+
+*  Notes:
+*     - A value of zero is returned if the supplied gap size is zero.
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   AstFrame *frame;              /* Pointer to Frame containing axis */
+   double result;                /* Result value to return */
+   int naxes1;                   /* Number of axes in frame1 */
+   int set1;                     /* Digits attribute set? */
+   int set2;                     /* Format attribute set? */
+
+/* Initialise. */
+   result = 0.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Validate and permute the axis index supplied. */
+   axis = astValidateAxis( this, axis, 1, "astCentre" );
+
+/* Determine the number of axes in the first component Frame. */
+   naxes1 = astGetNaxes( this->frame1 );
+   if ( astOK ) {
+
+/* Decide which component Frame contains the axis and adjust the axis
+   index if necessary. */
+      frame = ( axis < naxes1 ) ? this->frame1 : this->frame2;
+      axis = ( axis < naxes1 ) ? axis : axis - naxes1;
+
+/* Since the component Frame is "managed" by the enclosing CmpFrame,
+   we next test if any Frame attributes which may affect the result
+   are undefined (i.e. have not been explicitly set). If so, we
+   over-ride them, giving them temporary values dictated by the
+   CmpFrame. Only the Digits and Format attributes are relevant here. */
+      set1 = astTestDigits( frame );
+      if ( !set1 ) astSetDigits( frame, astGetDigits( this ) );
+
+      set2 = astTestFormat( frame, axis );
+      if ( !set2 ) astSetFormat( frame, axis, astGetFormat( this, axis ) );
+
+/* Invoke the Frame's astCentre method to find the central value. */
+      result = astCentre( frame, axis, value, gap );
+
+/* Clear Frame attributes which were temporarily over-ridden. */
+      if ( !set1 ) astClearDigits( frame );
+      if ( !set2 ) astClearFormat( frame, axis );
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
+}
+
 static void ClearAlignSystem( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
@@ -1555,6 +1672,54 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
                 "called \"%s\".", status, astGetClass( this ), attrib );
    }
 
+}
+
+static void ClearDtai( AstFrame *this_frame, int *status ) {
+/*
+*  Name:
+*     ClearDtai
+
+*  Purpose:
+*     Clear the value of the Dtai attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearDtai( AstFrame *this, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearDtai method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Dtai value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame Dtai value. */
+   (*parent_cleardtai)( this_frame, status );
+
+/* Now clear the Dtai attribute in the two component Frames. */
+   astClearDtai( this->frame1 );
+   astClearDtai( this->frame2 );
 }
 
 static void ClearDut1( AstFrame *this_frame, int *status ) {
@@ -2091,7 +2256,7 @@ static int ComponentMatch( AstCmpFrame *template, AstFrame *target, int matchsub
    the axes in the full result Frame in terms of the external template axis
    numbering. This involves shifting the indices for the second component
    Frame to leave room for the axes of the first component Frame, and
-   also permuting the axis indicies from internal to external order. */
+   also permuting the axis indices from internal to external order. */
             if( icomp ) {
                for( axis = 0; axis < nax1; axis++ ) {
                   (*template_axes)[ axis ] = operm[ axis ];
@@ -2881,7 +3046,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -2894,7 +3059,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     CmpFrame member function (over-rides the astGetObjSize protected
@@ -2920,7 +3085,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstCmpFrame *this;         /* Pointer to CmpFrame structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -3584,6 +3749,82 @@ static int GetMinAxes( AstFrame *this_frame, int *status ) {
       result = (*parent_getminaxes)( this_frame, status );
    } else {
       result = 0;
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static double GetDtai( AstFrame *this_frame, int *status ) {
+/*
+*  Name:
+*     GetDtai
+
+*  Purpose:
+*     Get a value for the Dtai attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double GetDtai( AstFrame *this, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetDtai method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the Dtai attribute of a
+*     CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The Dtai attribute value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   double result;                /* Result value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If an Dtai attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestDtai( this ) ) {
+      result = (*parent_getdtai)( this_frame, status );
+
+/* Otherwise, if the Dtai value is set in the first component Frame,
+   return it. */
+   } else if( astTestDtai( this->frame1 ) ){
+      result = astGetDtai( this->frame1 );
+
+/* Otherwise, if the Dtai value is set in the second component Frame,
+   return it. */
+   } else if( astTestDtai( this->frame2 ) ){
+      result = astGetDtai( this->frame2 );
+
+/* Otherwise, return the default Dtai value from the first component
+   Frame. */
+   } else {
+      result = astGetDtai( this->frame1 );
    }
 
 /* Return the result. */
@@ -4512,6 +4753,15 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    parent_clearepoch = frame->ClearEpoch;
    frame->ClearEpoch = ClearEpoch;
 
+   parent_getdtai = frame->GetDtai;
+   frame->GetDtai = GetDtai;
+
+   parent_setdtai = frame->SetDtai;
+   frame->SetDtai = SetDtai;
+
+   parent_cleardtai = frame->ClearDtai;
+   frame->ClearDtai = ClearDtai;
+
    parent_getdut1 = frame->GetDut1;
    frame->GetDut1 = GetDut1;
 
@@ -4592,6 +4842,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    frame->Fields = Fields;
    frame->Format = Format;
    frame->FrameGrid = FrameGrid;
+   frame->Centre = Centre;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;
    frame->GetDirection = GetDirection;
@@ -5776,7 +6027,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -7977,11 +8228,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 *     method and makes additional attributes accessible to it.
 */
 
+#define BUF_LEN 1024
+
 /* Local Vaiables: */
    AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
-   char buf1[80];                /* For for un-indexed attribute name */
-   char buf2[80];                /* For for indexed attribute name */
+   char buf1[BUF_LEN];           /* For for un-indexed attribute name */
+   char buf2[BUF_LEN];           /* For for indexed attribute name */
    int axis;                     /* Supplied (1-base) axis index */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
@@ -8036,7 +8289,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* If the attribute is qualified by an axis index, try accessing it as an
    attribute of the primary Frame containing the specified index. */
          if ( nc = 0,
-             ( 2 == astSscanf( setting, "%[^(](%d)= %n%*s %n", buf1, &axis,
+             ( 2 == astSscanf( setting, "%[^(=](%d)= %n%*s %n", buf1, &axis,
                                &value, &nc ) ) && ( nc >= len ) ) {
 
 /* Find the primary Frame containing the specified axis. */
@@ -8052,27 +8305,36 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Create a new setting with the same name but with the axis index
    appropriate to the primary Frame. */
-               sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, setting+value );
+               nc = sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1,
+                             setting+value );
+               if( nc < BUF_LEN ) {
 
 /* Attempt to access the attribute. */
-               astSetAttrib( pfrm, buf2 );
-
-/* Indicate success. */
-               if( astOK ) {
-                  ok = 1;
-
-/* Otherwise clear the status value, and try again without any axis index. */
-               } else {
-                  astClearStatus;
-                  sprintf( buf2, "%s=%s", buf1, setting+value );
                   astSetAttrib( pfrm, buf2 );
 
-/* Indicate success, or clear the status value. */
+/* Indicate success. */
                   if( astOK ) {
                      ok = 1;
+
+/* Otherwise clear the status value, and try again without any axis index. */
                   } else {
                      astClearStatus;
+                     sprintf( buf2, "%s=%s", buf1, setting+value );
+                     astSetAttrib( pfrm, buf2 );
+
+/* Indicate success, or clear the status value. */
+                     if( astOK ) {
+                        ok = 1;
+                     } else {
+                        astClearStatus;
+                     }
                   }
+
+/* Buffer overflow */
+               } else if( astOK ) {
+                  astError( AST__INTER, "SetAttrib(CmpFrame): Buffer "
+                            "over-flow (internal AST programming error).",
+                            status );
                }
 
 /* Free the primary frame pointer. */
@@ -8115,6 +8377,8 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       astError( AST__BADAT, "astSet: The attribute setting \"%s\" is invalid "
                "for the given %s.", status, setting, astGetClass( this ) );
    }
+
+#undef BUF_LEN
 }
 
 static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *status ) {
@@ -8180,6 +8444,56 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *stat
          astSetAxis( this->frame2, axis - naxes1, newaxis );
       }
    }
+}
+
+static void SetDtai( AstFrame *this_frame, double val, int *status ) {
+/*
+*  Name:
+*     SetDtai
+
+*  Purpose:
+*     Set the value of the Dtai attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetDtai( AstFrame *this, double val, int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetDtai method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the Dtai value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     val
+*        New Dtai value.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to set the CmpFrame Dtai value. */
+   (*parent_setdtai)( this_frame, val, status );
+
+/* Now set the Dtai attribute in the two component Frames. */
+   astSetDtai( this->frame1, val );
+   astSetDtai( this->frame2, val );
 }
 
 static void SetDut1( AstFrame *this_frame, double val, int *status ) {

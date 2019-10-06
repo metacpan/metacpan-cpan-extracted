@@ -1,6 +1,15 @@
 
 ===== ChangeLog of distribution Mail-Box version 3.*
 
+version 3.008: Fri  4 Oct 08:34:32 CEST 2019
+
+	Fixes:
+	- MH reading message did not unlock after processing.
+	  rt.cpan.org#130193 [Sergey Poznyakoff]
+
+	Improvements:
+	- test suite can now run in parallel [Corion, Max Maischein]
+
 version 3.007: Fri  3 May 09:38:17 CEST 2019
 
 	Improvements:
@@ -20,7 +29,7 @@ version 3.005: Sun Mar  4 21:48:38 CET 2018
 	- code trusted on "perl -w", but now added many "use warnings".
 
 	Improvements:
-	- spell fixes rt.cpan.org #12400 [Damyan Ivanov] (Debian)
+	- spell fixes rt.cpan.org #124004 [Damyan Ivanov] (Debian)
 	- remove license file: now in README.md
 	  rt.cpan.org#124057 [Petr Pisar]
 	- remove Mail/Box-Shorts.pod: already consumed somewhere else

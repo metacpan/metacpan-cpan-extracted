@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -29,7 +29,6 @@ BEGIN {
 
 
 sub new {
-    # 'print_table' as a function uses its own implicit new
     my $class = shift;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
     my ( $opt ) = @_;
@@ -120,8 +119,10 @@ sub __reset {
 
 
 sub print_table {
-    if ( ref $_[0] ne 'Term::TablePrint' ) {
-        return print_table( bless( { %{ _defaults() } }, 'Term::TablePrint' ), @_ );
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->print_table( @_ );
     }
     my $self = shift;
     my ( $table_ref, $opt ) = @_;
@@ -724,7 +725,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.117
+Version 0.118
 
 =cut
 

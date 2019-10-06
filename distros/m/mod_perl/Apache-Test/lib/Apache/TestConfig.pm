@@ -63,6 +63,7 @@ use vars qw(%Usage);
    t_dir           => 'the t/ test directory (default is $top_dir/t)',
    t_conf          => 'the conf/ test directory (default is $t_dir/conf)',
    t_logs          => 'the logs/ test directory (default is $t_dir/logs)',
+   t_state         => 'the state/ test directory (default is $t_dir/state)',
    t_pid_file      => 'location of the pid file (default is $t_logs/httpd.pid)',
    t_conf_file     => 'test httpd.conf file (default is $t_conf/httpd.conf)',
    src_dir         => 'source directory to look for mod_foos.so',
@@ -82,17 +83,19 @@ use vars qw(%Usage);
    httpd_conf_extra=> 'inherit additional config from this file',
    minclients      => 'minimum number of concurrent clients (default is 1)',
    maxclients      => 'maximum number of concurrent clients (default is minclients+1)',
+   threadsperchild => 'number of threads per child when using threaded MPMs (default is 10)',
    perlpod         => 'location of perl pod documents (for testing downloads)',
    proxyssl_url    => 'url for testing ProxyPass / https (default is localhost)',
    sslca           => 'location of SSL CA (default is $t_conf/ssl/ca)',
    sslcaorg        => 'SSL CA organization to use for tests (default is asf)',
+   sslproto        => 'SSL/TLS protocol version(s) to test',
    libmodperl      => 'path to mod_perl\'s .so (full or relative to LIBEXECDIR)',
    defines         => 'values to add as -D defines (for example, "VAR1 VAR2")',
    (map { $_ . '_module_name', "$_ module name"} qw(cgi ssl thread access auth php)),
 );
 
 my %filepath_conf_opts = map { $_ => 1 }
-    qw(top_dir t_dir t_conf t_logs t_pid_file t_conf_file src_dir serverroot
+    qw(top_dir t_dir t_conf t_logs t_state t_pid_file t_conf_file src_dir serverroot
        documentroot bindir sbindir httpd apxs httpd_conf httpd_conf_extra
        perlpod sslca libmodperl);
 
@@ -296,7 +299,16 @@ sub new {
     $vars->{t_conf}       ||= catfile $vars->{serverroot}, 'conf';
     $vars->{sslca}        ||= catfile $vars->{t_conf}, 'ssl', 'ca';
     $vars->{sslcaorg}     ||= 'asf';
+
+    if (!defined($vars->{sslproto}) and eval { require Apache::TestSSLCA; 1; }) {
+        $vars->{sslproto} = Apache::TestSSLCA::sslproto();
+    }
+    else {
+        $vars->{sslproto} ||= 'all';
+    }
+
     $vars->{t_logs}       ||= catfile $vars->{serverroot}, 'logs';
+    $vars->{t_state}      ||= catfile $vars->{serverroot}, 'state';
     $vars->{t_conf_file}  ||= catfile $vars->{t_conf},   'httpd.conf';
     $vars->{t_pid_file}   ||= catfile $vars->{t_logs},   'httpd.pid';
 
@@ -315,6 +327,7 @@ sub new {
     $vars->{group}        ||= $self->default_group;
     $vars->{serveradmin}  ||= $self->default_serveradmin;
 
+    $vars->{threadsperchild} ||= 10;
     $vars->{minclients}   ||= 1;
     $vars->{maxclients_preset} = $vars->{maxclients} || 0;
     # if maxclients wasn't explicitly passed try to
@@ -327,13 +340,33 @@ sub new {
         $vars->{maxclients_preset} < $vars->{minclients}) {
         $vars->{minclients} = $vars->{maxclients_preset};
     }
+    if ($vars->{minclients} < 2) {
+        $vars->{maxspare} = 2;
+    } else {
+        $vars->{maxspare} = $vars->{minclients};
+    }
+    if ($vars->{maxclients} < $vars->{maxspare} + 1) {
+        $vars->{maxclients} = $vars->{maxspare} + 1;
+    }
 
-    # for threaded mpms MaxClients must be a multiple of
-    # ThreadsPerChild (i.e. maxclients % minclients == 0)
-    # so unless -maxclients was explicitly specified use a double of
-    # minclients
-    $vars->{maxclientsthreadedmpm} =
-        $vars->{maxclients_preset} || $vars->{minclients} * 2;
+    # for threaded mpms MinClients and MaxClients must be a
+    # multiple of ThreadsPerChild
+    {
+        use integer;
+        $vars->{minclientsthreadedmpm} = ($vars->{minclients} + $vars->{threadsperchild} - 1) /
+            $vars->{threadsperchild} * $vars->{threadsperchild};
+        $vars->{maxclientsthreadedmpm} = ($vars->{maxclients} + $vars->{threadsperchild} - 1) /
+            $vars->{threadsperchild} * $vars->{threadsperchild};
+        $vars->{maxsparethreadedmpm} = ($vars->{maxspare} + $vars->{threadsperchild} - 1) /
+            $vars->{threadsperchild} * $vars->{threadsperchild};
+        $vars->{startserversthreadedmpm} = $vars->{minclientsthreadedmpm} / $vars->{threadsperchild};
+    }
+    if ($vars->{maxsparethreadedmpm} < 2 * $vars->{threadsperchild}) {
+        $vars->{maxsparethreadedmpm} = 2 * $vars->{threadsperchild};
+    }
+    if ($vars->{maxclientsthreadedmpm} < $vars->{maxsparethreadedmpm} + $vars->{threadsperchild}) {
+        $vars->{maxclientsthreadedmpm} = $vars->{maxsparethreadedmpm} + $vars->{threadsperchild};
+    }
 
     $vars->{proxy}        ||= 'off';
     $vars->{proxyssl_url} ||= '';
@@ -513,6 +546,15 @@ sub configure_proxy {
         unless ($vars->{maxclients_preset}) {
             $vars->{minclients}++;
             $vars->{maxclients}++;
+            $vars->{maxspare}++;
+            $vars->{startserversthreadedmpm} ++;
+            $vars->{minclientsthreadedmpm} += $vars->{threadsperchild};
+            $vars->{maxclientsthreadedmpm} += $vars->{threadsperchild};
+            $vars->{maxsparethreadedmpm} += $vars->{threadsperchild};
+            #In addition allow for some backend processes
+            #in keep-alive state. For threaded MPMs we
+            #already should be fine.
+            $vars->{maxclients} += 3;
         }
         $vars->{proxy} = $self->{vhosts}->{'mod_proxy'}->{hostport};
         return $vars->{proxy};
@@ -1027,6 +1069,8 @@ sub perlscript_header {
         push @dirs, $dir if -d $dir;
     }
 
+    push @dirs, canonpath $FindBin::Bin;
+    
     my $dirs = join("\n    ", '', @dirs) . "\n";;
 
     return <<"EOF";
@@ -1396,6 +1440,15 @@ sub check_vars {
             unless ($vars->{maxclients_preset}) {
                 $vars->{minclients}++;
                 $vars->{maxclients}++;
+                $vars->{maxspare}++;
+                $vars->{startserversthreadedmpm} ++;
+                $vars->{minclientsthreadedmpm} += $vars->{threadsperchild};
+                $vars->{maxclientsthreadedmpm} += $vars->{threadsperchild};
+                $vars->{maxsparethreadedmpm} += $vars->{threadsperchild};
+                #In addition allow for some backend processes
+                #in keep-alive state. For threaded MPMs we
+                #already should be fine.
+                $vars->{maxclients} += 3;
             }
         }
     }
@@ -1558,6 +1611,7 @@ sub generate_httpd_conf {
     $self->generate_index_html;
 
     $self->gendir($vars->{t_logs});
+    $self->gendir($vars->{t_state});
     $self->gendir($vars->{t_conf});
 
     my @very_last_postamble = ();
@@ -2151,6 +2205,12 @@ LogLevel    debug
 <IfModule mod_version.c>
 <IfVersion > 2.4.1>
     DefaultRunTimeDir "@t_logs@"
+    LogLevel trace8
+</IfVersion>
+<IfVersion > 2.4.34>
+<IfDirective DefaultStateDir>
+    DefaultStateDir "@t_state@"
+</IfDirective>
 </IfVersion>
 </IfModule>
 
@@ -2180,10 +2240,10 @@ HostnameLookups Off
     LockFile             @t_logs@/accept.lock
 </IfVersion>
 </IfModule>
-    StartServers         1
-    MinSpareThreads      @MinClients@
-    MaxSpareThreads      @MinClients@
-    ThreadsPerChild      @MinClients@
+    StartServers         @StartServersThreadedMPM@
+    MinSpareThreads      @ThreadsPerChild@
+    MaxSpareThreads      @MaxSpareThreadedMPM@
+    ThreadsPerChild      @ThreadsPerChild@
     MaxClients           @MaxClientsThreadedMPM@
     MaxRequestsPerChild  0
 </IfModule>
@@ -2196,8 +2256,8 @@ HostnameLookups Off
 </IfModule>
     NumServers           1
     StartThreads         @MinClients@
-    MinSpareThreads      @MinClients@
-    MaxSpareThreads      @MinClients@
+    MinSpareThreads      1
+    MaxSpareThreads      @MaxSpare@
     MaxThreadsPerChild   @MaxClients@
     MaxRequestsPerChild  0
 </IfModule>
@@ -2209,8 +2269,8 @@ HostnameLookups Off
 </IfVersion>
 </IfModule>
     StartServers         @MinClients@
-    MinSpareServers      @MinClients@
-    MaxSpareServers      @MinClients@
+    MinSpareServers      1
+    MaxSpareServers      @MaxSpare@
     MaxClients           @MaxClients@
     MaxRequestsPerChild  0
 </IfModule>
@@ -2218,8 +2278,8 @@ HostnameLookups Off
 <IfDefine APACHE1>
     LockFile             @t_logs@/accept.lock
     StartServers         @MinClients@
-    MinSpareServers      @MinClients@
-    MaxSpareServers      @MinClients@
+    MinSpareServers      1
+    MaxSpareServers      @MaxSpare@
     MaxClients           @MaxClients@
     MaxRequestsPerChild  0
 </IfDefine>

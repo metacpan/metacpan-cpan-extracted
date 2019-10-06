@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Mail-Box>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Mail-Box/>
-    and <https://metacpan.org/release/Mail-Box>
+  * Indexed from CPAN: <https://metacpan.org/release/Mail-Box>
 
 The MailBox suite is large, and contains various (partially optional)
 modules.  This component organizing email message *storage*.  All the

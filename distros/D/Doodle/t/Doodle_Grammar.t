@@ -487,7 +487,7 @@ $subtests->example(-1, 'create_column', 'method', fun($tryable) {
   like $result, qr/not support the create_column behaviour/,
     'create_column not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'create_constraint', 'method', fun($tryable) {
@@ -498,7 +498,7 @@ $subtests->example(-1, 'create_constraint', 'method', fun($tryable) {
   like $result, qr/not support the create_constraint behaviour/,
     'create_constraint not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'create_index', 'method', fun($tryable) {
@@ -509,7 +509,7 @@ $subtests->example(-1, 'create_index', 'method', fun($tryable) {
   like $result, qr/not support the create_index behaviour/,
     'create_index not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'create_schema', 'method', fun($tryable) {
@@ -520,7 +520,7 @@ $subtests->example(-1, 'create_schema', 'method', fun($tryable) {
   like $result, qr/not support the create_schema behaviour/,
     'create_schema not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'create_table', 'method', fun($tryable) {
@@ -531,7 +531,7 @@ $subtests->example(-1, 'create_table', 'method', fun($tryable) {
   like $result, qr/not support the create_table behaviour/,
     'create_table not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'delete_column', 'method', fun($tryable) {
@@ -542,7 +542,7 @@ $subtests->example(-1, 'delete_column', 'method', fun($tryable) {
   like $result, qr/not support the delete_column behaviour/,
     'delete_column not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'delete_constraint', 'method', fun($tryable) {
@@ -553,7 +553,7 @@ $subtests->example(-1, 'delete_constraint', 'method', fun($tryable) {
   like $result, qr/not support the delete_constraint behaviour/,
     'delete_constraint not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'delete_index', 'method', fun($tryable) {
@@ -564,7 +564,7 @@ $subtests->example(-1, 'delete_index', 'method', fun($tryable) {
   like $result, qr/not support the delete_index behaviour/,
     'delete_index not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'delete_schema', 'method', fun($tryable) {
@@ -575,7 +575,7 @@ $subtests->example(-1, 'delete_schema', 'method', fun($tryable) {
   like $result, qr/not support the delete_schema behaviour/,
     'delete_schema not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'delete_table', 'method', fun($tryable) {
@@ -586,7 +586,7 @@ $subtests->example(-1, 'delete_table', 'method', fun($tryable) {
   like $result, qr/not support the delete_table behaviour/,
     'delete_table not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'exception', 'method', fun($tryable) {
@@ -596,7 +596,7 @@ $subtests->example(-1, 'exception', 'method', fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
   like $result, qr/Oops/, 'exception thrown';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'execute', 'method', fun($tryable) {
@@ -630,7 +630,7 @@ $subtests->example(-1, 'rename_column', 'method', fun($tryable) {
   like $result, qr/not support the rename_column behaviour/,
     'rename_column not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'rename_table', 'method', fun($tryable) {
@@ -641,14 +641,14 @@ $subtests->example(-1, 'rename_table', 'method', fun($tryable) {
   like $result, qr/not support the rename_table behaviour/,
     'rename_table not supported';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'render', 'method', fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
   like $result, qr/create schema app/, 'rendered ok';
 
-  $result;
+  "$result";
 });
 
 $subtests->example(-1, 'update_column', 'method', fun($tryable) {
@@ -659,7 +659,7 @@ $subtests->example(-1, 'update_column', 'method', fun($tryable) {
   like $result, qr/not support the update_column behaviour/,
     'update_column not supported';
 
-  $result;
+  "$result";
 });
 
 ok 1 and done_testing;

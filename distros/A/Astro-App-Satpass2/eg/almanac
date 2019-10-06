@@ -7,7 +7,7 @@ use Astro::App::Satpass2;
 use Getopt::Long 2.33;
 use Pod::Usage;
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 my %opt;
 GetOptions(\%opt,

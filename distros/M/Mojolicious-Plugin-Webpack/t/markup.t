@@ -1,6 +1,8 @@
 use lib '.';
 use t::Helper;
 
+$ENV{MOJO_MODE} = 'production';
+
 my $cwd = t::Helper->cwd;
 my $t   = t::Helper->t;
 my $c   = $t->app->build_controller;

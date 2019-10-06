@@ -47,7 +47,7 @@ ok !!$t->tx->res->headers->every_header('Content-Encoding'), 'content-encoding h
 ok !!$t->tx->res->headers->every_header('Vary'),             'vary header is not set';
 
 app->static->should_serve_asset('0' => {'Accept-Encoding' => 'br, gzip'});
-$t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'br, gzip'})->status_is(200)
+$t->get_ok('/goodbye.txt' => {'Accept-Encoding'           => 'br, gzip'})->status_is(200)
     ->content_type_is('text/plain;charset=UTF-8')->header_is(ETag => $goodbye_etag)
     ->header_is('Last-Modified' => $goodbye_last_modified)
     ->content_is("Goodbye Mojo from a static file!\n");

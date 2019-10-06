@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 require_ok("Starlink::AST");
 
@@ -20,3 +20,8 @@ is( $specframe->GetC("Unit"), 'micron', "Unit attribute after setting units to m
 $specframe->Set("System" => 'FREQ');
 is( $specframe->GetC("Unit"), 'GHz', "Unit attribute after setting system to frequency");
 
+my $specframe2 = new Starlink::AST::SpecFrame('');
+isa_ok($specframe2, 'Starlink::AST::SpecFrame');
+
+my $axes = Starlink::AST::Frame::MatchAxes($specframe, $specframe2);
+is_deeply($axes, [1]);

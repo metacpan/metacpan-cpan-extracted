@@ -1,3 +1,14 @@
+1.041   2019-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Typo in variable package name, causing shown total
+	  downloaded data to be 0.
+
+
+1.040   2019-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Show total downloaded data after mirroring.
+
+
 1.039   2019-09-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Make %rdeps_level_args available from another package.

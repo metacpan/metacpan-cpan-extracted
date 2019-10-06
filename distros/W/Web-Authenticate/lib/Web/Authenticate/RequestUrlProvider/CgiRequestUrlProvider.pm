@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::RequestUrlProvider::CgiRequestUrlProvider;
-$Web::Authenticate::RequestUrlProvider::CgiRequestUrlProvider::VERSION = '0.011';
+$Web::Authenticate::RequestUrlProvider::CgiRequestUrlProvider::VERSION = '0.012';
 use Mouse;
 use CGI;
 #ABSTRACT: The default implementation of Web::Authentication::RequestUrlProvider.
@@ -25,7 +25,7 @@ Web::Authenticate::RequestUrlProvider::CgiRequestUrlProvider - The default imple
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

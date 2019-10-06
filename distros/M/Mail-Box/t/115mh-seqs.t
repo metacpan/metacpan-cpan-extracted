@@ -13,10 +13,9 @@ use Mail::Box::Manager;
 use Test::More tests => 11;
 use File::Spec;
 
-my $mhsrc = File::Spec->catfile($folderdir, 'mh.src');
+my $mhsrc = File::Spec->catfile($workdir, 'mh.src');
 my $seq   = File::Spec->catfile($mhsrc, '.mh_sequences');
 
-clean_dir $mhsrc;
 unpack_mbox2mh($src, $mhsrc);
 
 # Create a sequences file.
@@ -67,5 +66,3 @@ my ($cur)    = grep /^cur\: /, @seq;
 is($cur, "cur: 2\n");
 my ($unseen) = grep /^unseen\: /, @seq;
 is($unseen, "unseen: 3 12-15 33 35\n");
-
-clean_dir $mhsrc;

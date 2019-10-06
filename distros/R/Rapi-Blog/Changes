@@ -1,5 +1,13 @@
 Revision history for Rapi::Blog
 
+1.1100 2019-10-05
+    - Require RapidApp 1.3200 (VANSTYN)
+    - Fix bugs in changing usernames while logged in (VANSTYN)
+    - Extensive tightening of what non-priv users can access (VANSTYN)
+    - Polished up admin area nav tree and menu points (VANSTYN)
+    - Cleaned up column headers with unpolished text (VANSTYN)
+    - Fixed bug in hostname detection in sending system emails (VANSTYN)
+
 1.1004 2019-10-02
     - Require RapidApp 1.3108 (VANSTYN)
     - Added a few missing default TableSpec configs (VANSTYN)

@@ -268,3 +268,24 @@ GRF__ESPSH()
  OUTPUT:
   RETVAL
 
+int
+GRF__ESH()
+ CODE:
+#ifdef GRF__ESH
+    RETVAL = GRF__ESH;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESH not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
+GRF__ESG()
+ CODE:
+#ifdef GRF__ESG
+    RETVAL = GRF__ESG;
+#else
+    Perl_croak(aTHX_ "Constant GRF__ESG not defined\n");
+#endif
+ OUTPUT:
+  RETVAL

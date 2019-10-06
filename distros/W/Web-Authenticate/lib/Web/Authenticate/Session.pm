@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Session;
-$Web::Authenticate::Session::VERSION = '0.011';
+$Web::Authenticate::Session::VERSION = '0.012';
 use Mouse;
 use Session::Token;
 #ABSTRACT: The default implementation of Web::Authenticate::Session::Role.
@@ -49,7 +49,7 @@ Web::Authenticate::Session - The default implementation of Web::Authenticate::Se
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

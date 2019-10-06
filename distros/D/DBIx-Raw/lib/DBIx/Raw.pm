@@ -1,7 +1,7 @@
 package DBIx::Raw;
 
 use 5.008_005;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use strictures 2;
 use Moo;
@@ -19,29 +19,29 @@ has 'user' => is => 'rw';
 has 'password' => is => 'rw';
 has 'conf' => is => 'rw';
 has 'prev_conf' => (
-    is => 'rw', 
-    isa => Str, 
+    is => 'rw',
+    isa => Str,
     default => '',
 );
 
-has 'crypt' => ( 
-	is => 'ro', 
+has 'crypt' => (
+	is => 'ro',
 	isa => InstanceOf['Crypt::Mode::CBC::Easy'],
 	lazy => 1,
-	builder => sub { 
+	builder => sub {
 		my ($self) = @_;
 		return Crypt::Mode::CBC::Easy->new(key => $self->crypt_key);
 	},
 );
 
 has 'crypt_key' => (
-    is => 'rw', 
-    isa => Str, 
+    is => 'rw',
+    isa => Str,
     lazy => 1,
     builder => sub {
         my $crypt_key_hex = 'aea77496999d37bf47aedff9c0d44fdf2d2bbfa848ee6652abe9891b43e0f331';
         return pack "H*", $crypt_key_hex;
-    }, 
+    },
 );
 
 has 'use_old_crypt' => (
@@ -50,17 +50,17 @@ has 'use_old_crypt' => (
 );
 
 has 'old_crypt_key' => (
-    is => 'rw', 
-    isa => Str, 
+    is => 'rw',
+    isa => Str,
     lazy => 1,
     default => '6883868834006296591264051568595813693328016796531185824375212916576042669669556288781800326542091901603033335703884439231366552922364658270813734165084102xfasdfa8823423sfasdfalkj!@#$$CCCFFF!09xxxxlai3847lol13234408!!@#$_+-083dxje380-=0'
 );
 
-has 'old_crypt' => ( 
-	is => 'ro', 
-	isa => InstanceOf['DBIx::Raw::Crypt'], 
+has 'old_crypt' => (
+	is => 'ro',
+	isa => InstanceOf['DBIx::Raw::Crypt'],
 	lazy => 1,
-	builder => sub { 
+	builder => sub {
 		my ($self) = @_;
 		return DBIx::Raw::Crypt->new( { secret => $self->old_crypt_key });
 	},
@@ -70,14 +70,14 @@ has 'old_crypt' => (
 has 'sth' => is => 'rw';
 
 #find out what DBH is specifically
-has 'dbh' => ( 
-	is => 'rw', 
-	lazy => 1, 
+has 'dbh' => (
+	is => 'rw',
+	lazy => 1,
 	default => sub { shift->connect }
 );
 
 has 'keys' => (
-	is => 'ro', 
+	is => 'ro',
 	isa => HashRef[Str],
 	default => sub { {
 		query => 1,
@@ -119,7 +119,7 @@ DBIx::Raw allows you to have complete control over your SQL, while still providi
 
     #get multiple values in list context
     my ($name, $age) = $db->raw("SELECT name, age FROM people WHERE id=1");
-	
+
     #or
     my @person = $db->raw("SELECT name, age FROM people WHERE id=1");
 
@@ -150,13 +150,13 @@ DBIx::Raw allows you to have complete control over your SQL, while still providi
 
     #get multiple records as an array of hashes
     my $people = $db->aoh("SELECT name, age FROM people");
-    
-    for my $person (@$people) { 
+
+    for my $person (@$people) {
         print "$person->{name} is $person->{age} years old\n";
     }
 
     #update a record easily with a hash
-    my %update = ( 
+    my %update = (
         name => 'Joe',
         age => 34,
     );
@@ -209,9 +209,9 @@ Below is an example configuration file in perl format:
 
 =head2 conf.pl
 
-    { 
+    {
         dsn => 'dbi:mysql:test:localhost:3306',
-        user => 'root', 
+        user => 'root',
         password => 'password',
         crypt_key => 'lxsafadsfadskl23239210453453802xxx02-487900-=+1!:)',
     }
@@ -224,7 +224,7 @@ Below is an example configuration file in perl format:
     password: 'password'
     crypt_key: 'lxsafadsfadskl23239210453453802xxx02-487900-=+1!:)'
 
-Note that you do not need to include L</crypt_key> if you just if you just want to use the file for configuration settings.
+Note that you do not need to include L</crypt_key> if you just want to use the file for configuration settings.
 
 =head1 SYNTAXES
 
@@ -245,7 +245,7 @@ Below are some examples:
     my $num_rows_updated = $db->raw("UPDATE people SET name='Fred'");
 
     my $name = $db->raw("SELECT name FROM people WHERE id=1");
-	
+
 DBIx::Raw also supports L<DBI/"Placeholders and Bind Values"> for L<DBI>. These can be useful to help prevent SQL injection. Below are
 some examples of how to use placeholders and bind values with L</"SIMPLE SYNTAX">.
 
@@ -254,7 +254,7 @@ some examples of how to use placeholders and bind values with L</"SIMPLE SYNTAX"
     my $name = $db->raw("SELECT name FROM people WHERE id=?", 1);
 
     $db->raw("INSERT INTO people (name, age) VALUES (?, ?)", 'Frank', 44);
-    
+
 Note that L</"SIMPLE SYNTAX"> cannot be used for L</hoh>, L</hoaoh>, L</hash>, or L</update> because of the extra parameters that they require.
 
 =head2 ADVANCED SYNTAX
@@ -290,7 +290,7 @@ You can use L<DBIx::Raw> to encrypt values when putting them into the database a
 Note that in order to store an encrypted value in the database, you should have the field be of type C<VARCHAR(255)> or some type of character
 or text field where the encryption will fit. In order to encrypt and decrypt your values, L<DBIx::Raw> requires a L</crypt_key>. It contains a default
 key, but it is recommended that you change it either by having a different one in your L</conf> file, or passing it in on creation with C<new> or setting it using the
-L</crypt_key> method. It is recommended that you use a module like L<Crypt::Random> to generate a secure key. 
+L</crypt_key> method. It is recommended that you use a module like L<Crypt::Random> to generate a secure key.
 One thing to note is that both L</encrypt> and L</decrypt> require L</"ADVANCED SYNTAX">.
 
 =head2 encrypt
@@ -312,7 +312,7 @@ The only exception to the L</encrypt> syntax that is a little different is for L
 
 When decrypting values, there are two possible different syntaxes.
 
-=head3 DECRYPT LIST CONTEXT 
+=head3 DECRYPT LIST CONTEXT
 
 If your query is returning a single value or values in a list context, then the array reference that you pass in for decrypt will contain the indices for the
 order that the columns were listed in. For instance:
@@ -321,7 +321,7 @@ order that the columns were listed in. For instance:
 
     my ($name, $age) = $db->raw(query => "SELECT name, age FROM people WHERE id=1", decrypt => [0,1]);
 
-=head3 DECRYPT HASH CONTEXT 
+=head3 DECRYPT HASH CONTEXT
 
 When your query has L<DBIx::Raw> return your values in a hash context, then the columns that you want decrypted must be listed by name in the array reference:
 
@@ -376,7 +376,7 @@ L</raw> can be called in a scalar context to only return one value, or in a unde
 
     #update with number of rows updated returned
     my $num_rows_updated = $db->raw("UPDATE people SET name=? WHERE id=1", 'Frank');
- 
+
     #update in undef context, nothing returned.
     $db->raw("UPDATE people SET name=? WHERE id=1", 'Frank');
 
@@ -428,17 +428,17 @@ sub raw {
 
 	$self->_query($params);
 
-	if(not defined wantarray) { 
+	if(not defined wantarray) {
 		$self->sth->finish or $self->_perish($params);
 		return;
 	}
-	elsif(wantarray) { 
-		$return_type = 'array';	
+	elsif(wantarray) {
+		$return_type = 'array';
 	}
-	else { 
-		$return_type = 'scalar';	
+	else {
+		$return_type = 'scalar';
 
-		if($params->{query} =~ /SELECT\s+(.*?)\s+FROM/i) { 
+		if($params->{query} =~ /SELECT\s+(.*?)\s+FROM/i) {
 			my $match = $1;
 			my $num_commas=()= $match =~ /,/g;
 			my $num_stars=()= $match =~ /\*/g;
@@ -470,7 +470,7 @@ sub raw {
 					$self->_crypt_decrypt($params);
 				}
 			}
-		} 
+		}
 	}
 
 	$self->sth->finish or $self->_perish($params);
@@ -489,7 +489,7 @@ L</aoh> can be used to select multiple rows from the database. It returns an arr
 
     my $people = $db->aoh("SELECT * FROM people");
 
-    for my $person (@$people) { 
+    for my $person (@$people) {
         print "$person->{name} is $person->{age} years old\n";
     }
 
@@ -510,7 +510,7 @@ sub aoh {
   			push @a, $href;
 		}
 	}
-	else { 
+	else {
 		while($href=$self->sth->fetchrow_hashref){
   			push @a, $href;
 		}
@@ -525,7 +525,7 @@ L</aoa> can be used to select multiple rows from the database. It returns an arr
 
     my $people = $db->aoa("SELECT name,age FROM people");
 
-    for my $person (@$people) { 
+    for my $person (@$people) {
         my $name = $person->[0];
         my $age = $person->[1];
         print "$name is $age years old\n";
@@ -548,7 +548,7 @@ sub aoa {
   			push @return_values, \@a;
 		}
 	}
-	else { 
+	else {
 		while(my @a=$self->sth->fetchrow_array){
   			push @return_values, \@a;
 		}
@@ -563,15 +563,15 @@ sub aoa {
 
 =over
 
-=item 
+=item
 
 B<query (required)> - the query
 
-=item 
+=item
 
 B<key (required)> - the name of the column that will serve as the key to access each row
 
-=item 
+=item
 
 B<href (optional)> - the hash reference that you would like to have the results added to
 
@@ -582,13 +582,13 @@ this subroutine can be useful if you would like to be able to access rows by the
 
     my $people = $db->hoh(query => "SELECT id, name, age FROM people", key => "id");
 
-    for my $key(keys %$people) { 
+    for my $key(keys %$people) {
         my $person = $people->{$key};
         print "$person->{name} is $person->{age} years old\n";
     }
 
     #or
-    while(my ($key, $person) = each %$people) { 
+    while(my ($key, $person) = each %$people) {
         print "$person->{name} is $person->{age} years old\n";
     }
 
@@ -625,32 +625,32 @@ sub hoh {
 			$hoh->{$href->{$params->{key}}} = $href;
 		}
 	}
-	else { 
+	else {
 		while($href=$self->sth->fetchrow_hashref){
 			$hoh->{$href->{$params->{key}}} = $href;
 		}
 	}
 
 	return $hoh;
-} 
+}
 
 =head2 hoa (hash_of_arrays)
 
 =over
 
-=item 
+=item
 
 B<query (required)> - the query
 
-=item 
+=item
 
 B<key (required)> - the name of the column that will serve as the key to store the values behind
 
-=item 
+=item
 
 B<val (required)> - the name of the column whose values you want to be stored behind key
 
-=item 
+=item
 
 B<href (optional)> - the hash reference that you would like to have the results added to
 
@@ -661,11 +661,11 @@ say that you wanted the id's of all people who have the same name grouped togeth
 
     my $hoa = $db->hoa(query => "SELECT id, name FROM people", key => "name", val => "id");
 
-    for my $name (%$hoa) { 
+    for my $name (%$hoa) {
         my $ids = $hoa->{$name};
 
         print "$name has ids ";
-        for my $id (@$ids) { 
+        for my $id (@$ids) {
             print " $id,";
         }
 
@@ -695,7 +695,7 @@ sub hoa {
 			push @{$hash->{$href->{$params->{key}}}}, $href->{$params->{val}};
 		}
 	}
-	else { 
+	else {
 		while($href=$self->sth->fetchrow_hashref){
 			push @{$hash->{$href->{$params->{key}}}}, $href->{$params->{val}};
 		}
@@ -708,15 +708,15 @@ sub hoa {
 
 =over
 
-=item 
+=item
 
 B<query (required)> - the query
 
-=item 
+=item
 
 B<key (required)> - the name of the column that will serve as the key to store the array of hashes behind
 
-=item 
+=item
 
 B<href (optional)> - the hash reference that you would like to have the results added to
 
@@ -728,11 +728,11 @@ done like so:
 
     my $hoaoh = $db->hoaoh(query => "SELECT id, name, age FROM people", key => "name");
 
-    for my $name (keys %$hoaoh) { 
+    for my $name (keys %$hoaoh) {
         my $people = $hoaoh->{$name};
 
         print "People named $name: ";
-        for my $person (@$people) { 
+        for my $person (@$people) {
             print "  $person->{name} is $person->{age} years old\n";
         }
 
@@ -768,7 +768,7 @@ sub hoaoh {
 			push @{$hoa->{$href->{$params->{key}}}},$href;
 		}
 	}
-	else { 
+	else {
 		while($href=$self->sth->fetchrow_hashref){
 			push @{$hoa->{$href->{$params->{key}}}},$href;
 		}
@@ -785,7 +785,7 @@ We could do that like so:
     my $ids = $db->array("SELECT id FROM people WHERE name='Susie'");
 
     print "Susie ids: \n";
-    for my $id (@$ids) { 
+    for my $id (@$ids) {
         print "$id\n";
     }
 
@@ -800,12 +800,12 @@ sub array {
 
 	# Get the Array of results:
 	$self->_query($params);
-	if($params->{decrypt}) { 
+	if($params->{decrypt}) {
 		while(($r) = $self->sth->fetchrow_array()){
 	  		$r = $self->_decrypt($r);
 			push @a, $r;
 		}
-	} 	
+	}
 	else {
 		while(($r) = $self->sth->fetchrow_array()){
 			push @a, $r;
@@ -819,19 +819,19 @@ sub array {
 
 =over
 
-=item 
+=item
 
 B<query (required)> - the query
 
-=item 
+=item
 
-B<key (required)> - the name of the column that will serve as the key 
+B<key (required)> - the name of the column that will serve as the key
 
-=item 
+=item
 
 B<val (required)> - the name of the column that will be stored behind the key
 
-=item 
+=item
 
 B<href (optional)> - the hash reference that you would like to have the results added to
 
@@ -874,7 +874,7 @@ sub hash {
 			$hash->{$href->{$params->{key}}} = $href->{$params->{val}};
 		}
 	}
-	else { 
+	else {
 		while($href=$self->sth->fetchrow_hashref){
 			$hash->{$href->{$params->{key}}} = $href->{$params->{val}};
 		}
@@ -887,11 +887,11 @@ sub hash {
 
 =over
 
-=item 
+=item
 
 B<href (required)> - the hash reference that will be used to insert the row, with the columns as the keys and the new values as the values
 
-=item 
+=item
 
 B<table (required)> - the name of the table that the row will be inserted into
 
@@ -901,7 +901,7 @@ L</insert> can be used to insert a single row with a hash. This can be useful if
 to insert the row with in a hash, where the keys are the column names and the values are the new values. This function
 might be useful for submitting forms easily.
 
-    my %person_to_insert = ( 
+    my %person_to_insert = (
         name => 'Billy',
         age => '32',
         favorite_color => 'blue',
@@ -943,10 +943,10 @@ And this is what we want.
 
 =head3 insert encrypt
 
-When encrypting for insert, because a hash is passed in you need to have the encrypt array reference contain the names of the columns that you want to encrypt 
+When encrypting for insert, because a hash is passed in you need to have the encrypt array reference contain the names of the columns that you want to encrypt
 instead of the indices for the order in which the columns are listed:
 
-    my %person_to_insert = ( 
+    my %person_to_insert = (
         name => 'Billy',
         age => '32',
         favorite_color => 'blue',
@@ -969,12 +969,12 @@ sub insert {
 	my $column_names = '';
 	my $values_string = '';
     my @encrypt;
-	while(my ($key,$val) = each %{$params->{href}}) { 
+	while(my ($key,$val) = each %{$params->{href}}) {
 		my $append = '?';
 		if (ref $val eq 'SCALAR') {
 			$append = $$val;
 		}
-		else { 
+		else {
             if ($params->{encrypt} and first { $_ eq $key } @{$params->{encrypt}}) {
                 push @encrypt, scalar(@vals);
             }
@@ -985,7 +985,7 @@ sub insert {
         $column_names .= "$key,";
         $values_string .= "$append,";
 	}
-	
+
 	$column_names = substr $column_names, 0, -1;
 	$values_string = substr $values_string, 0, -1;
 
@@ -998,29 +998,29 @@ sub insert {
     }
 
 	$self->_query($params);
-} 
+}
 
 =head2 update
 
 =over
 
-=item 
+=item
 
 B<href (required)> - the hash reference that will be used to update the row, with the columns as the keys and the new values as the values
 
-=item 
+=item
 
 B<table (required)> - the name of the table that the updated row is in
 
-=item 
+=item
 
 B<id (optional)> - specifies the id of the item that we are updating (note, column must be called "id"). Should not be used if C<pk> is used
 
-=item 
+=item
 
 B<pk (optional)> - A hash reference of the form C<{name =E<gt> 'column_name', val =E<gt> 'unique_val'}>. Can be used instead of C<id>. Should not be used if C<id> is used
 
-=item 
+=item
 
 B<where (optional)> - A where clause to help decide what row to update. Any bind values can be passed in with C<vals>
 
@@ -1030,7 +1030,7 @@ L</update> can be used to update a single row with a hash, and returns the numbe
 to update the row with in a hash, where the keys are the column names and the values are the new values. This function
 might be useful for submitting forms easily.
 
-    my %updated_person = ( 
+    my %updated_person = (
         name => 'Billy',
         age => '32',
         favorite_color => 'blue',
@@ -1049,7 +1049,7 @@ identifying column that is named something different than id, then you can use t
 If you need to specify more constraints for the row that you are updating instead of just the id, you can pass in a where clause:
 
     my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61]);
-    
+
 Note that any bind values used in a where clause can just be passed into the C<vals> as usual. It is possible to use a where clause and an id or pk together:
 
     my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61], id => 1);
@@ -1090,10 +1090,10 @@ And this is what we want.
 
 =head3 update encrypt
 
-When encrypting for update, because a hash is passed in you need to have the encrypt array reference contain the names of the columns that you want to encrypt 
+When encrypting for update, because a hash is passed in you need to have the encrypt array reference contain the names of the columns that you want to encrypt
 instead of the indices for the order in which the columns are listed:
 
-    my %updated_person = ( 
+    my %updated_person = (
         name => 'Billy',
         age => '32',
         favorite_color => 'blue',
@@ -1114,14 +1114,14 @@ sub update {
 	my @vals;
 	my $string = '';
     my @encrypt;
-	while(my ($key,$val) = each %{$params->{href}}) { 
+	while(my ($key,$val) = each %{$params->{href}}) {
 		my $append = '?';
 		if (ref $val eq 'SCALAR') {
 			$append = $$val;
 		}
-		else { 
+		else {
             # TODO: write update encrypt tests
-            if ((defined $params->{encrypt} and $params->{encrypt} eq '*') 
+            if ((defined $params->{encrypt} and $params->{encrypt} eq '*')
                     or ($params->{encrypt} and first { $_ eq $key } @{$params->{encrypt}})) {
                 push @encrypt, scalar(@vals);
             }
@@ -1131,33 +1131,33 @@ sub update {
 
 		$string .= "$key=$append,";
 	}
-	
+
 	$string = substr $string, 0, -1;
 
 	$params->{vals} = [] unless $params->{vals};
 	my $where = '';
-	if($params->{where}) { 
-		$where = " WHERE $params->{where}";	
+	if($params->{where}) {
+		$where = " WHERE $params->{where}";
 		push @vals, @{$params->{vals}};
 	}
 
-	if($params->{id}) { 
-		if($where eq '') { 
-			$where = " WHERE id=? ";	
-		}	
-		else { 
+	if($params->{id}) {
+		if($where eq '') {
+			$where = " WHERE id=? ";
+		}
+		else {
 			$where .= " AND id=? ";
 		}
 
 		push @vals, $params->{id};
 	}
-	elsif($params->{pk}) { 
+	elsif($params->{pk}) {
 		my $name = $params->{pk}->{name};
 		my $val = $params->{pk}->{val};
-		if($where eq '') { 
-			$where = " WHERE $name=? ";	
-		}	
-		else { 
+		if($where eq '') {
+			$where = " WHERE $name=? ";
+		}
+		else {
 			$where .= " AND $name=? ";
 		}
 
@@ -1176,21 +1176,21 @@ sub update {
 
     return unless defined wantarray;
     return wantarray ? ($self->sth->rows()) : $self->sth->rows();
-} 
+}
 
 =head2 insert_multiple
 
 =over
 
-=item 
+=item
 
 B<rows (required)> - the array reference of array references, where each inner array reference holds the values to be inserted for one row
 
-=item 
+=item
 
 B<table (required)> - the name of the table that the rows are to be inserted into
 
-=item 
+=item
 
 B<columns (required)> - The names of the columns that values are being inserted for
 
@@ -1226,7 +1226,7 @@ sub insert_multiple {
 	my $self = shift;
 	my $params = $self->_params(@_);
 
-	while(my ($key, $val) = each %$params) { 
+	while(my ($key, $val) = each %$params) {
 		print "$key=$val\n";
 	}
 
@@ -1239,9 +1239,9 @@ sub insert_multiple {
 	my $row_string = '?,' x @{$params->{columns}};
 	$row_string = substr $row_string, 0, -1;
 
-	for my $row (@{$params->{rows}}) { 
+	for my $row (@{$params->{rows}}) {
 		push @vals, @$row;
-		$values_string .= "($row_string),";		
+		$values_string .= "($row_string),";
 	}
 
 	$values_string = substr $values_string, 0, -1;
@@ -1251,7 +1251,7 @@ sub insert_multiple {
 	$params->{vals} = \@vals;
 
 	$self->_query($params);
-} 
+}
 
 =head2 sth
 
@@ -1339,7 +1339,7 @@ L</connect> can be used to keep the same L<DBIx::Raw> object, but get a new L</d
     #now there is a new dbh with the same DBIx::Raw object using the same settings
     $db->connect;
 
-Or you can change the connect info. 
+Or you can change the connect info.
 For example, if you update C<dsn>, C<user>, C<password>:
 
     $db->dsn('new_dsn');
@@ -1352,13 +1352,13 @@ For example, if you update C<dsn>, C<user>, C<password>:
 Or if you update the conf file:
 
     $db->conf('/path/to/new_conf.pl');
-    
+
     #get new dbh but keep same DBIx::Raw object
     $db->connect;
 
 =cut
 
-sub connect { 
+sub connect {
 	my ($self) = @_;
 
 	$self->_parse_conf;
@@ -1366,7 +1366,7 @@ sub connect {
 	return $self->dbh(DBI->connect($self->dsn, $self->user, $self->password) or croak($DBI::errstr));
 }
 
-sub _params { 
+sub _params {
 	my $self = shift;
 
 	my %params;
@@ -1374,7 +1374,7 @@ sub _params {
 		$params{query} = shift;
 		$params{vals} = [@_];
 	}
-	else { 
+	else {
 		%params = @_;
 	}
 
@@ -1394,52 +1394,52 @@ sub _query {
 	}
 }
 
-sub _perish { 
+sub _perish {
 	my ($self, $params) = @_;
 	croak "ERROR: Can't prepare query.\n\n$DBI::errstr\n\nquery='" . $params->{query} . "'\n";
 }
 
-sub _crypt_decrypt { 
+sub _crypt_decrypt {
 	my ($self, $params) = @_;
 	my @keys;
-	if($params->{decrypt} eq '*') { 
-		if($params->{href}) { 
+	if($params->{decrypt} eq '*') {
+		if($params->{href}) {
 			@keys = keys %{$params->{href}};
 		}
-		else { 
+		else {
 			@keys = 0..$#{$params->{return_values}};
 		}
 	}
-	else { 
+	else {
 		@keys = @{$params->{decrypt}};
 	}
 
 	if($params->{href}) {
 		for my $key (@keys) {
 			$params->{href}->{$key} = $self->_decrypt($params->{href}->{$key}) if $params->{href}->{$key};
-		} 	
+		}
 	}
-	else { 
+	else {
 		for my $index (@keys) {
 			$params->{return_values}->[$index] = $self->_decrypt( $params->{return_values}->[$index] ) if $params->{return_values}->[$index];
 		}
 	}
 }
 
-sub _crypt_encrypt { 
+sub _crypt_encrypt {
 	my ($self, $params) = @_;
-	my @indices; 
+	my @indices;
 
-	if($params->{encrypt} eq '*') { 
+	if($params->{encrypt} eq '*') {
 		my $num_question_marks = 0;
 		#don't want to encrypt where conditions! Might be buggy...should look into this more
-		if($params->{query} =~ /WHERE\s+(.*)/i) { 
+		if($params->{query} =~ /WHERE\s+(.*)/i) {
 			$num_question_marks =()= $1 =~ /=\s*?\?/g;
 		}
 
 		@indices = 0..($#{$params->{vals}} - $num_question_marks);
 	}
-	else { 
+	else {
 		@indices = @{$params->{encrypt}};
 	}
 
@@ -1448,41 +1448,41 @@ sub _crypt_encrypt {
 	}
 }
 
-sub _encrypt { 
+sub _encrypt {
 	my ($self, $text) = @_;
 
     if ($self->use_old_crypt) {
         return $self->old_crypt->encrypt($text);
     }
 
-    return $self->crypt->encrypt($text); 
+    return $self->crypt->encrypt($text);
 }
 
-sub _decrypt { 
+sub _decrypt {
 	my ($self, $text) = @_;
-    
+
     if ($self->use_old_crypt) {
         return $self->old_crypt->decrypt($text);
     }
 
-	return $self->crypt->decrypt($text); 
+	return $self->crypt->decrypt($text);
 }
 
-sub _parse_conf { 
+sub _parse_conf {
 	my ($self) = @_;
 
 	#load in configuration if it exists
-	if($self->conf) { 
+	if($self->conf) {
 
 		#no need to read in settings again if conf hasn't changed, unless dsn, user, or password is unset
 		return if $self->conf eq $self->prev_conf and $self->dsn and $self->user and $self->password;
 
-		my $config = Config::Any->load_files({files =>[$self->conf],use_ext => 1  }); 
+		my $config = Config::Any->load_files({files =>[$self->conf],use_ext => 1  });
 
 		for my $c (@$config){
   			for my $file (keys %$c){
      			for my $attribute (keys %{$c->{$file}}){
-					if($self->can($attribute)) { 
+					if($self->can($attribute)) {
 						$self->$attribute($c->{$file}->{$attribute});
 					}
    				}
@@ -1493,9 +1493,9 @@ sub _parse_conf {
 	}
 }
 
-sub _validate_connect_info { 
+sub _validate_connect_info {
 	my ($self) = @_;
-	croak "Need to specify 'dsn', 'user', and 'password' either when you create the object or by passing in a configuration file in 'conf'! Or, pass in an existing dbh" 
+	croak "Need to specify 'dsn', 'user', and 'password' either when you create the object or by passing in a configuration file in 'conf'! Or, pass in an existing dbh"
 		unless (defined $self->dsn and defined $self->user and defined $self->password) or defined $self->dbh;
 }
 

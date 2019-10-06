@@ -24,7 +24,7 @@ BEGIN {
    plan tests => 14;
 }
 
-my $mdsrc = File::Spec->catfile($folderdir, 'maildir.src');
+my $mdsrc = File::Spec->catfile($workdir, 'maildir.src');
 unpack_mbox2maildir($src, $mdsrc);
 
 my $mgr = Mail::Box::Manager->new;
@@ -89,4 +89,4 @@ $mgr->appendMessage($mdsrc, $msg
   , access    => 'rw'
   );
 
-clean_dir $mdsrc;
+#clean_dir $mdsrc;

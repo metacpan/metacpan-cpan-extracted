@@ -143,11 +143,21 @@ sub email_login :Local :Args(0) {
     "please contact your system administrator"
   );
   
+  # WTF. HTTP_ORIGIN has suddenly vanished.
+  my ($url_base, $host_port);
+  if (my $ref = $c->req->env->{HTTP_REFERER}) {
+    my ($proto,$remaining) = split(/\:\/\//,$ref,2);
+    ($host_port) = split(/\//,$remaining);
+    $url_base = join('://',$proto,$host_port);
+  } 
+  
   # This is almost the same as $c->req->uri->host, but it includes the port if present:
-  my $host_friendly = (split(/\:\/\//,$c->req->env->{HTTP_ORIGIN},2))[1];
+  #my $host_friendly = (split(/\:\/\//,$c->req->env->{HTTP_ORIGIN},2))[1];
+  my $host_friendly = $host_port;
 
   my $link_url = join('/',
-    $c->req->env->{HTTP_ORIGIN},
+    #$c->req->env->{HTTP_ORIGIN},
+    $url_base,
     $c->mount_url||(),'remote', 'preauth_action', $key
   );
   

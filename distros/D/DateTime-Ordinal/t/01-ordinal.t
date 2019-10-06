@@ -14,4 +14,3 @@ sub test {
 	my ($test, $expected) = @_;
 	is(DateTime::Ordinal::_ordinal($test), $expected, "$test -> $expected"); 
 }
-

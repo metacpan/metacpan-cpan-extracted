@@ -1,0 +1,8 @@
+---
+# This test suite can be run fully in parallel, but we want the diagnostic
+# output of 001_use.t at the top
+seq:
+    - seq: t/001*.t
+    - par:
+        - t/*.t
+        - xt/*.t

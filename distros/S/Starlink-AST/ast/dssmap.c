@@ -53,12 +53,12 @@ f     The DssMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -109,10 +109,6 @@ f     The DssMap class does not define any new routines beyond those
    value. */
 #define NINT(x) (int)((x)+(((x)>0.0)?0.5:-0.5))
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -151,7 +147,7 @@ f     The DssMap class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 
 
@@ -200,7 +196,7 @@ static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -319,7 +315,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -332,7 +328,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     DssMap member function (over-rides the astGetObjSize protected
@@ -358,7 +354,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstDssMap *this;         /* Pointer to DssMap structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -1117,7 +1113,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Decrement the Mapping count and return the index of the first
    modified element. */
                      ( *nmap )--;
-                     result = MIN( wmi, where );
+                     result = astMIN( wmi, where );
 
                   }
 

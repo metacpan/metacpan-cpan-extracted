@@ -11,7 +11,7 @@ use Astro::App::Satpass2::Utils qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 sub __class_name {
     return __PACKAGE__;

@@ -8,7 +8,7 @@
 
 package Mail::Box::MH;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base 'Mail::Box::Dir';
 
@@ -363,6 +363,7 @@ sub readMessages(@)
     }
 
     $self->{MBM_highest_msgnr}  = $msgnrs[-1];
+    $locker->unlock;
     $self;
 }
  

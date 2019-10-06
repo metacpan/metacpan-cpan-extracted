@@ -1,51 +1,74 @@
 TYPEMAP
-AstFitsChan *	T_ASTOBJ
-AstObject *	T_ASTOBJ
+AstAxis *	T_ASTOBJ
+AstBox *	T_ASTOBJ
 AstChannel * 	T_ASTOBJ
-AstFrame *	T_ASTOBJ
+AstChebyMap *	T_ASTOBJ
+AstCircle *	T_ASTOBJ
 AstCmpFrame *	T_ASTOBJ
-AstMapping *	T_ASTOBJ
 AstCmpMap *	T_ASTOBJ
+AstCmpRegion *	T_ASTOBJ
+AstDssMap *	T_ASTOBJ
+AstDSBSpecFrame *	T_ASTOBJ
+AstEllipse *	T_ASTOBJ
+AstFitsChan *	T_ASTOBJ
+AstFitsTable *	T_ASTOBJ
+AstFluxFrame *	T_ASTOBJ
+AstFrame *	T_ASTOBJ
 AstFrameSet *	T_ASTOBJ
 AstGrismMap *	T_ASTOBJ
+AstInterval *	T_ASTOBJ
 AstIntraMap *	T_ASTOBJ
+AstKeyMap *	T_ASTOBJ
 AstLutMap *	T_ASTOBJ
-const char *	T_PV
+AstMapping *	T_ASTOBJ
 AstMathMap *	T_ASTOBJ
 AstMatrixMap *	T_ASTOBJ
-AstPlot *	T_ASTOBJ
+AstMoc *	T_ASTOBJ
+AstMocChan *	T_ASTOBJ
+AstNormMap *	T_ASTOBJ
+AstNullRegion *	T_ASTOBJ
+AstObject *	T_ASTOBJ
 AstPcdMap *	T_ASTOBJ
 AstPermMap *	T_ASTOBJ
+AstPlot *	T_ASTOBJ
+AstPlot3D *	T_ASTOBJ
+AstPointList *	T_ASTOBJ
 AstPolyMap *	T_ASTOBJ
+AstPolygon *	T_ASTOBJ
+AstPrism *	T_ASTOBJ
+AstRateMap *	T_ASTOBJ
+AstRegion *	T_ASTOBJ
+AstSelectorMap *	T_ASTOBJ
 AstShiftMap *	T_ASTOBJ
+AstSkyAxis *	T_ASTOBJ
 AstSkyFrame *	T_ASTOBJ
 AstSlaMap *	T_ASTOBJ
-AstSphMap *	T_ASTOBJ
+AstSpecFluxFrame *	T_ASTOBJ
 AstSpecFrame *	T_ASTOBJ
-AstDSBSpecFrame *	T_ASTOBJ
+AstSpecMap *	T_ASTOBJ
+AstSphMap *	T_ASTOBJ
+AstStc *	T_ASTOBJ
+AstStcCatalogEntryLocation *	T_ASTOBJ
+AstStcObsDataLocation *	T_ASTOBJ
+AstStcResourceProfile *	T_ASTOBJ
+AstStcSearchLocation *	T_ASTOBJ
+AstStcsChan *	T_ASTOBJ
+AstSwitchMap *	T_ASTOBJ
+AstTable *	T_ASTOBJ
 AstTimeFrame *	T_ASTOBJ
 AstTimeMap *	T_ASTOBJ
-AstSpecMap *	T_ASTOBJ
 AstTranMap *	T_ASTOBJ
 AstUnitMap *	T_ASTOBJ
+AstUnitNormMap *	T_ASTOBJ
 AstWcsMap *	T_ASTOBJ
 AstWinMap *	T_ASTOBJ
 AstXmlChan *	T_ASTOBJ
+AstXphMap *	T_ASTOBJ
 AstZoomMap *	T_ASTOBJ
-StatusType      T_STATUSINT
-WcsMapType      T_WCSMAPINT
-AstKeyMap *	T_ASTOBJ
-AstRegion *	T_ASTOBJ
-AstEllipse *	T_ASTOBJ
-AstBox *	T_ASTOBJ
-AstPolygon *	T_ASTOBJ
-AstCircle *	T_ASTOBJ
-AstRateMap *	T_ASTOBJ
-AstFluxFrame *	T_ASTOBJ
-AstSpecFluxFrame *	T_ASTOBJ
-AstCmpRegion *	T_ASTOBJ
-AstNullRegion *	T_ASTOBJ
-AstInterval *		T_ASTOBJ
+StatusType	T_STATUSINT
+WcsMapType	T_WCSMAPINT
+const char *	T_PV
+int64_t	T_IV
 
 INPUT
 

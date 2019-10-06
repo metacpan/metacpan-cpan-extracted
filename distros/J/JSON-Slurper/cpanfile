@@ -1,7 +1,7 @@
 requires 'perl', '5.008005';
 
 requires 'Carp';
-requires 'Exporter';
+requires 'Exporter::Shiny';
 requires 'File::Basename';
 requires 'File::Slurper';
 requires 'JSON::PP';

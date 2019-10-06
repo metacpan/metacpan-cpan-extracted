@@ -15,9 +15,7 @@ use Test::More tests => 28;
 use File::Copy;
 use File::Spec;
 
-my $top  = File::Spec->catdir($folderdir, 'Mail');
-
-clean_dir $top;
+my $top  = File::Spec->catdir($workdir, 'Mail');
 
 #
 # Create a nice structure which looks like a set of mbox folders.

@@ -9,7 +9,7 @@ use Mojo::Util;
 
 use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 sub assets_dir { shift->{assets_dir} }
 sub out_dir    { shift->{out_dir} }
@@ -84,8 +84,9 @@ sub _helper {
 
 sub _register_assets {
   my $self           = shift;
+  my $is_dev         = $self->node_env ne 'production' ? 1 : 0;
   my $path_to_markup = $self->out_dir->child(sprintf 'webpack.%s.html',
-    $ENV{WEBPACK_CUSTOM_NAME} || ($self->node_env ne 'production' ? 'development' : 'production'));
+    $ENV{WEBPACK_CUSTOM_NAME} || ($is_dev ? 'development' : 'production'));
 
   unless (-e $path_to_markup) {
     warn "[Webpack] Could not find $path_to_markup. Sure webpack has been run?"
@@ -97,13 +98,15 @@ sub _register_assets {
   my $name_re = qr{(.*)\.\w+\.(css|js)$}i;
 
   $markup->find('link')->each(sub {
-    my $name = shift->{href} // '';
-    $self->{assets}{"$1.$2"} = [stylesheet => {name => $name}] if $name =~ $name_re;
+    my $name        = shift->{href} // '';
+    my $file_is_dev = $name =~ m!development! ? 1 : 0;
+    $self->{assets}{"$1.$2"} = [stylesheet => {name => $name}] if $is_dev == $file_is_dev and $name =~ $name_re;
   });
 
   $markup->find('script')->each(sub {
-    my $name = shift->{src} // '';
-    $self->{assets}{"$1.$2"} = [javascript => {name => $name}] if $name =~ $name_re;
+    my $name        = shift->{src} // '';
+    my $file_is_dev = $name =~ m!development! ? 1 : 0;
+    $self->{assets}{"$1.$2"} = [javascript => {name => $name}] if $is_dev == $file_is_dev and $name =~ $name_re;
   });
 }
 

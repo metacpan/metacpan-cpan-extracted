@@ -5,8 +5,8 @@
 GRP_C_ROUTINES = \
     axis.c \
     box.c \
-    c2f77.c \
     channel.c \
+    chebymap.c \
     circle.c \
     cmpframe.c \
     cmpmap.c \
@@ -15,64 +15,11 @@ GRP_C_ROUTINES = \
     dssmap.c \
     ellipse.c \
     error.c \
-    fbox.c \
-    fchannel.c \
-    fcircle.c \
-    fcmpframe.c \
-    fcmpmap.c \
-    fcmpregion.c \
-    fdsbspecframe.c \
-    fdssmap.c \
-    fellipse.c \
-    ferror.c \
-    ffitschan.c \
-    ffluxframe.c \
-    fframe.c \
-    fframeset.c \
-    fgrismmap.c \
-    finterval.c \
-    fintramap.c \
     fitschan.c \
-    fkeymap.c \
-    flutmap.c \
+    fitstable.c \
     fluxframe.c \
-    fmapping.c \
-    fmathmap.c \
-    fmatrixmap.c \
-    fnullregion.c \
-    fobject.c \
-    fpcdmap.c \
-    fpermmap.c \
-    fplot.c \
-    fplot3d.c \
-    fpointlist.c \
-    fpolygon.c \
-    fpolymap.c \
-    fprism.c \
     frame.c \
     frameset.c \
-    fratemap.c \
-    fnormmap.c \
-    fregion.c \
-    fshiftmap.c \
-    fskyframe.c \
-    fslamap.c \
-    fspecfluxframe.c \
-    fspecframe.c \
-    fspecmap.c \
-    ftimeframe.c \
-    ftimemap.c \
-    fsphmap.c \
-    ffitstable.c \
-    ftable.c \
-    ftranmap.c \
-    fselectormap.c \
-    fswitchmap.c \
-    funitmap.c \
-    fwcsmap.c \
-    fwinmap.c \
-    fxmlchan.c \
-    fzoommap.c \
     globals.c \
     grismmap.c \
     interval.c \
@@ -84,6 +31,9 @@ GRP_C_ROUTINES = \
     mathmap.c \
     matrixmap.c \
     memory.c \
+    moc.c \
+    mocchan.c \
+    normmap.c \
     nullregion.c \
     object.c \
     pcdmap.c \
@@ -95,9 +45,9 @@ GRP_C_ROUTINES = \
     polygon.c \
     polymap.c \
     prism.c \
-    normmap.c \
     ratemap.c \
     region.c \
+    selectormap.c \
     shiftmap.c \
     skyaxis.c \
     skyframe.c \
@@ -107,31 +57,98 @@ GRP_C_ROUTINES = \
     specmap.c \
     sphmap.c \
     stc.c \
-    stcresourceprofile.c \
-    stcsearchlocation.c \
     stccatalogentrylocation.c \
     stcobsdatalocation.c \
+    stcresourceprofile.c \
     stcschan.c \
-    fstc.c \
-    fstcresourceprofile.c \
-    fstcsearchlocation.c \
-    fstccatalogentrylocation.c \
-    fstcobsdatalocation.c \
-    fstcschan.c \
-    fitstable.c \
+    stcsearchlocation.c \
+    switchmap.c \
     table.c \
     timeframe.c \
     timemap.c \
     tranmap.c \
-    selectormap.c \
-    switchmap.c \
     unit.c \
     unitmap.c \
+    unitnormmap.c \
     wcsmap.c \
     winmap.c \
     xml.c \
     xmlchan.c \
+    xphmap.c \
     zoommap.c
+
+
+# The C source files required for the Fortran interface
+if !NOFORTRAN
+F_C_ROUTINES = \
+    c2f77.c \
+    fbox.c \
+    fchannel.c \
+    fchebymap.c \
+    fcircle.c \
+    fcmpframe.c \
+    fcmpmap.c \
+    fcmpregion.c \
+    fdsbspecframe.c \
+    fdssmap.c \
+    fellipse.c \
+    ferror.c \
+    ffitschan.c \
+    ffitstable.c \
+    ffluxframe.c \
+    fframe.c \
+    fframeset.c \
+    fgrismmap.c \
+    finterval.c \
+    fintramap.c \
+    fkeymap.c \
+    flutmap.c \
+    fmapping.c \
+    fmathmap.c \
+    fmatrixmap.c \
+    fmoc.c \
+    fmocchan.c \
+    fnormmap.c \
+    fnullregion.c \
+    fobject.c \
+    fpcdmap.c \
+    fpermmap.c \
+    fplot.c \
+    fplot3d.c \
+    fpointlist.c \
+    fpolygon.c \
+    fpolymap.c \
+    fprism.c \
+    fratemap.c \
+    fregion.c \
+    fselectormap.c \
+    fshiftmap.c \
+    fskyframe.c \
+    fslamap.c \
+    fspecfluxframe.c \
+    fspecframe.c \
+    fspecmap.c \
+    fsphmap.c \
+    fstc.c \
+    fstccatalogentrylocation.c \
+    fstcobsdatalocation.c \
+    fstcresourceprofile.c \
+    fstcschan.c \
+    fstcsearchlocation.c \
+    fswitchmap.c \
+    ftable.c \
+    ftimeframe.c \
+    ftimemap.c \
+    ftranmap.c \
+    funitmap.c \
+    funitnormmap.c \
+    fwcsmap.c \
+    fwinmap.c \
+    fxmlchan.c \
+    fzoommap.c
+else
+F_C_ROUTINES =
+endif
 
 # Header files which contribute to the "ast.h" file, organised to correspond
 # with the class hierarchy.
@@ -163,6 +180,7 @@ AST_H_FILES = \
           pcdmap.h \
           permmap.h \
           polymap.h \
+             chebymap.h \
           ratemap.h \
           normmap.h \
           shiftmap.h \
@@ -174,8 +192,10 @@ AST_H_FILES = \
           switchmap.h \
           tranmap.h \
           unitmap.h \
+          unitnormmap.h \
           wcsmap.h \
           winmap.h \
+          xphmap.h \
           zoommap.h \
           frame.h \
              cmpframe.h \
@@ -193,6 +213,7 @@ AST_H_FILES = \
                 cmpregion.h \
                 ellipse.h \
                 interval.h \
+                moc.h \
                 nullregion.h \
                 pointlist.h \
                 polygon.h \
@@ -205,13 +226,13 @@ AST_H_FILES = \
              timeframe.h \
        channel.h \
           fitschan.h \
+          mocchan.h \
           stcschan.h \
           xmlchan.h
 
 # All the (C) include files required to build the library.
 GRP_C_INCLUDE_FILES = \
     $(AST_H_FILES) \
-    c2f77.h \
     ems.h \
     err.h \
     Ers.h \
@@ -232,12 +253,39 @@ GRP_C_INCLUDE_FILES = \
     wcstrig.h \
     xmlchan.h
 
+if !NOFORTRAN
+F_C_INCLUDE_FILES = \
+    c2f77.h
+
 # The following list should include AST_PAR, but that must not be
 # distributed, and so it is listed separately in
 # nodist_libast_la_SOURCES below.
 GRP_F_INCLUDE_FILES = \
     GRF_PAR \
     AST_ERR
+
+else
+F_C_INCLUDE_FILES =
+GRP_F_INCLUDE_FILES =
+endif
+
+# If we have no Fortran we are not building f77.h and we probably
+# do not want a Fortran runtime. This requires that PGPLOT is disabled.
+# We replace it with the stub GRF interface. An alternative would
+# be to have the PGPLOT wrappers use a preprocessor symbol to build
+# the pgplot to always error if used.
+if !NOFORTRAN
+GRF_PGPLOT_SOURCES = \
+    grf_pgplot.c
+GRF3D_PGPLOT_SOURCES = \
+    grf3d_pgplot.c
+else
+GRF_PGPLOT_SOURCES = \
+    grf_5.6.c
+GRF3D_PGPLOT_SOURCES = \
+    grf3d.c
+endif
+
 
 ## Following declaration isn't used
 ## LATEX_DOCUMENTATION_FILES = \
@@ -515,7 +563,7 @@ ERFA_FILES = \
     erfa/zr.c
 
 PAL_FILES = \
-    pal.c \
+    palwrap.c \
     pal.h \
     erfa.h \
     erfam.h
@@ -544,10 +592,20 @@ dist_noinst_SCRIPTS = makeh
 
 # Headers required by library users.  Both of the following lines
 # indicate headers which are installed.
-include_HEADERS = GRF_PAR grf.h grf3d.h
+cincludedir = $(includedir)/star
+cinclude_HEADERS = GRF_PAR grf.h grf3d.h
 # Following are generated, so should not be distributed.
-nodist_include_HEADERS = ast.h AST_PAR
+nodist_cinclude_HEADERS = ast.h AST_PAR
 include_MESSAGES = AST_ERR ast_err.h
+
+# Also install headers in main include directory for the benefit of
+# legacy code that does '#include "ast.h"' instead of '#include
+# "star/ast.h"'. Note, currently _MESSAGES files must be installed in
+# the main include directory.
+if TOPINCLUDE
+include_HEADERS = GRF_PAR grf.h grf3d.h
+nodist_include_HEADERS = ast.h AST_PAR
+endif
 
 if EXTERNAL_PAL
 PAL_LIB =
@@ -607,7 +665,9 @@ endif
 #  The module containing the main AST classes
 libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \
+    $(F_C_ROUTINES) \
     $(GRP_C_INCLUDE_FILES) \
+    $(F_C_INCLUDE_FILES) \
     $(GRP_F_INCLUDE_FILES) \
     $(CMINPACK_FILES) \
     $(WCSLIB_FILES) \
@@ -655,10 +715,10 @@ libast_grf_3_2_la_SOURCES = grf_3.2.c
 libast_grf_5_6_la_SOURCES = grf_5.6.c
 
 #  The graphics module that uses PGPLOT for 2D graphical output.
-libast_pgplot_la_SOURCES = grf_pgplot.c
+libast_pgplot_la_SOURCES = $(GRF_PGPLOT_SOURCES)
 
 #  The graphics module that uses PGPLOT for 3D graphical output.
-libast_pgplot3d_la_SOURCES = grf3d_pgplot.c
+libast_pgplot3d_la_SOURCES = $(GRF3D_PGPLOT_SOURCES)
 
 #  Positional astronomy libraries.
 libast_pal_la_SOURCES = $(PAL_FILES)
@@ -688,7 +748,7 @@ AST_PAR: ast_par.source astbad
 # configure.ac, and so is not distributed automatically.
 #
 # makeh is required in order to build ast.h after distribution (see below).
-EXTRA_DIST = ast_par.source sun210_figures/ sun211_figures/ pal/ erfa/ cminpack/
+EXTRA_DIST = ast_par.source sun210_figures sun211_figures pal erfa cminpack
 
 # ast.h depends on the error-facility files.  ast.h _could_ be made
 # before distribution, but since it's generated from other distributed
@@ -744,7 +804,9 @@ install-exec-hook: libast.la
 @PREDIST@    -e 's,@PACKAGE_VERSION_MAJOR\@,$(PACKAGE_VERSION_MAJOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_MINOR\@,$(PACKAGE_VERSION_MINOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
-@PREDIST@    -e 's,@PERL\@,$(PERL),'
+@PREDIST@    -e 's,@PERL\@,$(PERL),' \
+@PREDIST@    -e 's,@STARLINK\@,$(STARLINK),'
+
 @PREDIST@version.h: version.h.in configure.ac
 @PREDIST@	rm -f $@; $(predist_subs) version.h.in >$@
 @PREDIST@builddocs: builddocs.in configure.ac
@@ -767,6 +829,18 @@ TESTS = ast_test
 check_PROGRAMS = ast_test
 ast_test_SOURCES = ast_test.c
 
+test: install
+	cd ast_tester && STARLINK=@STARLINK@ PGPLOT_DIR=@STARLINK@/bin ./ast_tester -nd
+
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
 ast_test_LDADD = @LIBPAL@ libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
+
+#  Need to include latex support files in the distribution tar ball so
+#  that the docs can be built from the tex source files. Requires environment
+#  variable STARLATEXSUPPORT to be deined. Is there a better way to do this?
+dist-hook:
+	cp -p $(STARLATEXSUPPORT)/starlink.cls $(distdir)/
+	cp -p $(STARLATEXSUPPORT)/starabbrev.sty $(distdir)/
+	cp -p $(STARLATEXSUPPORT)/starstyle.sty $(distdir)/
+	cp -p $(STARLATEXSUPPORT)/sst.sty $(distdir)/

@@ -1,17 +1,1 @@
 Changelog for Moodle
-
-0.03 2019-08-21T19:29:32
- - Updated documentation
- - Refactored to use new Doodle::Migration class
-
-0.02 2019-08-21T07:05:59
- - Built release version 0.02
- - Updated documentation
- - Cosmetic changes
-
-0.01 2019-08-20T15:01:23
- - Built release version 0.01
- - Updated documentation
- - Disabling Travis targets < 5.22
- - Initial implementation
- - Initial commit

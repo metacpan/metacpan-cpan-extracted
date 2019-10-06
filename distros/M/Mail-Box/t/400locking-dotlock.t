@@ -14,7 +14,7 @@ use Test::More tests => 7;
 use File::Spec;
 
 my $fakefolder = bless {MB_foldername=> 'this'}, 'Mail::Box';
-my $lockfile   = File::Spec->catfile($folderdir, 'lockfiletest');
+my $lockfile   = File::Spec->catfile($workdir, 'lockfiletest');
 
 unlink $lockfile;
 

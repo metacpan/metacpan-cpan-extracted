@@ -16,8 +16,9 @@ f     AST_POLYMAP
 *     all the input coordinates. The coefficients are specified separately
 *     for each output coordinate. The forward and inverse transformations
 *     are defined independantly by separate sets of coefficients. If no
-*     inverse transformation is supplied, an iterative method can be used
-*     to evaluate the inverse based only on the forward transformation.
+*     inverse transformation is supplied, the default behaviour is to use
+*     an iterative method to evaluate the inverse based only on the forward
+*     transformation (see attribute IterInverse).
 
 *  Inheritance:
 *     The PolyMap class inherits from the Mapping class.
@@ -36,10 +37,13 @@ c     following functions may also be applied to all Mappings:
 f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all Mappings:
 *
+c     - astPolyCoeffs: Retrieve the coefficients of a PolyMap transformation
 c     - astPolyTran: Fit a PolyMap inverse or forward transformation
+f     - AST_POLYCOEFFS: Retrieve the coefficients of a PolyMap transformation
 f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 
 *  Copyright:
+*     Copyright (C) 2017 East Asian Observatory.
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -51,12 +55,12 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -88,6 +92,53 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 *        Improve argument checking and error reporting in PolyTran
 *     8-MAY-2014 (DSB):
 *        Move to using CMinPack for minimisations.
+*     11-NOV-2016 (DSB):
+*        - Fix bug in MapMerge that could cause a seg fault. It did not
+*        check that the PolyMap had a defined transformation before accessing
+*        the transformation's coefficient array.
+*        - Fix similar bugs in Equal that could cause seg faults.
+*     15-MAR-2017 (DSB):
+*        - Change the GetTranForward and GetTranInverse functions so that they
+*        take into account the state of the Invert attribute.
+*        - Improve docs for the IterInverse attribute to explain that the
+*        inverse transformation replaced is always the original inverse
+*        transformation, as defined by the arguments supplied to the PolyMap
+*        constructor, regardless of the state of the Invert attribute.
+*     17-MAR-2017 (DSB):
+*        - Add the astPolyCoeffs method.
+*     30-MAR-2017 (DSB):
+*        Modify the astPolyTran method so that it can be used by the
+*        ChebyMap class to determine new transformations implemented as
+*        Chebyshev polynomials.
+*     27-JUN-2017 (DSB):
+*        In SamplePoly1D/2D ensure the final sample on each axis does not
+*        go above the supplied upper bound. This can happen due to rounding
+*        error. This is important for ChebyMaps since points outside the
+*        bounds are set bad when transformed using a ChebyMap, causing NaNs
+*        to be generated in lmder1 (cminpack minimisation function).
+*     3-JUL-2017 (DSB):
+*        Within FitPoly1D and FitPoly2D, use an initial guess that represents
+*        a unit mapping between normalised input and output values, rather
+*        than unnormalised PolyMap values. This is in case the PolyMap being
+*        fitted includes a change of scale (e.g. the PolyMap input is in "mm"
+*        but the output is in "rads" and includes some large scaling factor
+*        to do the conversion).
+*     9-JAN-2018 (DSB):
+*        Correct Transform to take account of AST__BAD coeffs correctly.
+*        Previously bad coeffs could generate NaN output values.
+*     27-APR-2018 (DSB):
+*        When calculating the iterative inverse, use an initial guess based
+*        on the linear truncation of the PolyMap rather than a UnitMap.
+*     3-MAY-2018 (DSB):
+*        Clear the IterInverse attribute in the PolyMap returned by
+*        astPolyTran (why would you want to use the iterative inverse if
+*        you have just created an inverse fit?).
+*     4-MAY-2018 (DSB):
+*        Fix various places where there was confusion over whether the
+*        "forward transformation" refers to the forward transformation
+*        of the original uninverted PolyMap, or the current forward
+*        transformation of the PolyMap (i.e. taking the "Invert" flag into
+*        account).
 *class--
 */
 
@@ -97,15 +148,6 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS PolyMap
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-compare bad values directory because of the danger of floating point
-exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -117,6 +159,8 @@ exceptions, so bad values are dealt with explicitly. */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
+#include "matrixmap.h"           /* Matrix multiplication mappings */
+#include "shiftmap.h"            /* Shift of origin mappings */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "cmpmap.h"              /* Compound mappings */
 #include "polymap.h"             /* Interface definition for this class */
@@ -151,7 +195,7 @@ static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -187,21 +231,6 @@ static int class_init = 0;       /* Virtual function table initialised? */
 #endif
 
 
-/* Type Definitions */
-/* ================ */
-
-/* Structure used to pass data to the Levenberg - Marquardt non-linear
-   minimization algorithm. */
-typedef struct MinPackData {
-   int order;      /* Max power of X1 or X2, plus one. */
-   int nsamp;      /* No. of polynomial samples to fit */
-   int init_jac;   /* Has the constant Jacobian been found yet? */
-   double *xp1;    /* Pointer to powers of X1 (1st poly i/p) at all samples */
-   double *xp2;    /* Pointer to powers of X2 (2nd poly i/p) at all samples */
-   double *y[ 2 ]; /* Pointers to Y1 and Y2 values at all samples */
-} MinPackData;
-
-
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -213,15 +242,16 @@ AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], c
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstMapping *LinearGuess( AstPolyMap *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstPolyMap **GetJacobian( AstPolyMap *, int * );
 static AstPolyMap *PolyTran( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
 static double **SamplePoly1D( AstPolyMap *, int, double **, double, double, int, int *, double[2], int * );
 static double **SamplePoly2D( AstPolyMap *, int, double **, const double *, const double *, int, int *, double[4], int * );
-static double *FitPoly1D( int, double, int, double **, double[2], int *, double *, int * );
-static double *FitPoly2D( int, double, int, double **, double[4], int *, double *, int * );
+static double *FitPoly1D( AstPolyMap *, int, int, double, int, double **, double[2], int *, double *, int * );
+static double *FitPoly2D( AstPolyMap *, int, int, double, int, double **, double[4], int *, double *, int * );
 static int Equal( AstObject *, AstObject *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
 static int MPFunc1D( void *, int, int, const double *, double *, double *, int, int );
@@ -231,12 +261,16 @@ static int ReplaceTransformation( AstPolyMap *, int, double, double, int, const 
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void FitPoly1DInit( AstPolyMap *, int, double **, AstMinPackData *, double *, int *);
+static void FitPoly2DInit( AstPolyMap *, int, double **, AstMinPackData *, double *, int *);
 static void FreeArrays( AstPolyMap *, int, int * );
 static void IterInverse( AstPolyMap *, AstPointSet *, AstPointSet *, int * );
 static void LMFunc1D(  const double *, double *, int, int, void * );
 static void LMFunc2D(  const double *, double *, int, int, void * );
 static void LMJacob1D( const double *, double *, int, int, void * );
 static void LMJacob2D( const double *, double *, int, int, void * );
+static void PolyCoeffs( AstPolyMap *, int, int, double *, int *, int * );
+static void PolyPowers( AstPolyMap *, double **, int, const int *, double **, int, int, int * );
 static void StoreArrays( AstPolyMap *, int, int, const double *, int * );
 
 #if defined(THREAD_SAFE)
@@ -380,6 +414,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    int nin;
    int nout;
    int result;
+   int tmp;
 
 /* Initialise. */
    result = 0;
@@ -407,70 +442,116 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    must be identical. */
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
+/* Assume they are the same until we find a difference. */
             result = 1;
 
-            for( i = 0; i < nout && result; i++ ) {
-               if( this->ncoeff_f[ i ] != that->ncoeff_f[ i ] ||
-                   this->mxpow_i[ i ] != that->mxpow_i[ i ] ) {
-                  result = 0;
-               }
+/* The "_f" and "_i" suffixes in the PolyMap structure array names refer
+   to the forward and inverse transformations of the original uninverted
+   PolyMap. So we need to ensure the "nout" and "nin" values also refer
+   to the uninverted values. So if the PolyMaps are inverted, swap nout
+   and nin. */
+            if(  astGetInvert( this ) ) {
+               tmp = nin;
+               nin = nout;
+               nout = tmp;
             }
 
+/* Check properties of the forward transformation. */
+            if( this->ncoeff_f && that->ncoeff_f ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  if( this->ncoeff_f[ i ] != that->ncoeff_f[ i ] ){
+                     result = 0;
+                  }
+               }
+            } else if( this->ncoeff_f || that->ncoeff_f ) {
+               result = 0;
+            }
+
+            if( this->mxpow_f && that->mxpow_f ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  if( this->mxpow_f[ i ] != that->mxpow_f[ i ] ){
+                     result = 0;
+                  }
+               }
+            } else if( this->mxpow_f || that->mxpow_f ) {
+               result = 0;
+            }
 
             if( this->coeff_f && that->coeff_f ) {
                for( i = 0; i < nout && result; i++ ) {
                   for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
-                     if( !EQUAL( this->coeff_f[ i ][ j ],
-                                 that->coeff_f[ i ][ j ] ) ) {
+                     if( !astEQUAL( this->coeff_f[ i ][ j ],
+                                    that->coeff_f[ i ][ j ] ) ) {
                         result = 0;
                      }
                   }
                }
+            } else if( this->coeff_f || that->coeff_f ) {
+               result = 0;
             }
 
             if( this->power_f && that->power_f ) {
                for( i = 0; i < nout && result; i++ ) {
                   for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
                      for( k = 0; k < nin && result; k++ ) {
-                        if( !EQUAL( this->power_f[ i ][ j ][ k ],
-                                    that->power_f[ i ][ j ][ k ] ) ) {
+                        if( this->power_f[ i ][ j ][ k ] !=
+                            that->power_f[ i ][ j ][ k ] ) {
                            result = 0;
                         }
                      }
                   }
                }
+            } else if( this->power_f || that->power_f ) {
+               result = 0;
             }
 
-            for( i = 0; i < nin && result; i++ ) {
-               if( this->ncoeff_i[ i ] != that->ncoeff_i[ i ] ||
-                   this->mxpow_f[ i ] != that->mxpow_f[ i ] ) {
-                  result = 0;
+/* Check properties of the inverse transformation. */
+            if( this->ncoeff_i && that->ncoeff_i ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  if( this->ncoeff_i[ i ] != that->ncoeff_i[ i ] ){
+                     result = 0;
+                  }
                }
+            } else if( this->ncoeff_i || that->ncoeff_i ) {
+               result = 0;
             }
 
+            if( this->mxpow_i && that->mxpow_i ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  if( this->mxpow_i[ i ] != that->mxpow_i[ i ] ){
+                     result = 0;
+                  }
+               }
+            } else if( this->mxpow_i || that->mxpow_i ) {
+               result = 0;
+            }
 
-            if( this->coeff_i && that->coeff_i ) {
-               for( i = 0; i < nin && result; i++ ) {
-                  for( j = 0; j < this->ncoeff_i[ i ] && result; j++ ) {
-                     if( !EQUAL( this->coeff_i[ i ][ j ],
-                                 that->coeff_i[ i ][ j ] ) ) {
+            if( this->coeff_f && that->coeff_f ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
+                     if( !astEQUAL( this->coeff_f[ i ][ j ],
+                                    that->coeff_f[ i ][ j ] ) ) {
                         result = 0;
                      }
                   }
                }
+            } else if( this->coeff_f || that->coeff_f ) {
+               result = 0;
             }
 
-            if( this->power_i && that->power_i ) {
-               for( i = 0; i < nin && result; i++ ) {
-                  for( j = 0; j < this->ncoeff_i[ i ] && result; j++ ) {
-                     for( k = 0; k < nout && result; k++ ) {
-                        if( !EQUAL( this->power_i[ i ][ j ][ k ],
-                                    that->power_i[ i ][ j ][ k ] ) ) {
+            if( this->power_f && that->power_f ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
+                     for( k = 0; k < nin && result; k++ ) {
+                        if( this->power_f[ i ][ j ][ k ] !=
+                            that->power_f[ i ][ j ][ k ] ) {
                            result = 0;
                         }
                      }
                   }
                }
+            } else if( this->power_f || that->power_f ) {
+               result = 0;
             }
 
 /* If the Invert flags for the two PolyMaps differ, the attributes of the two
@@ -491,9 +572,9 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static double *FitPoly1D( int nsamp, double acc, int order, double **table,
-                          double scales[2], int *ncoeff, double *racc,
-                          int *status ){
+static double *FitPoly1D( AstPolyMap *this, int forward, int nsamp, double acc,
+                          int order, double **table, double scales[2], int *ncoeff,
+                          double *racc, int *status ){
 /*
 *  Name:
 *     FitPoly1D
@@ -505,37 +586,46 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 *     Private function.
 
 *  Synopsis:
-*     double *FitPoly1D( int nsamp, double acc, int order, double **table,
-*                        double scales[2], int *ncoeff, double *racc,
-*                        int *status )
+*     double *FitPoly1D( AstPolyMap *this, int forward, int nsamp, double acc,
+*                        int order, double **table, double scales[2], int *ncoeff,
+*                        double *racc, int *status )
 
 *  Description:
 *     This function fits a least squares 1D polynomial curve to the
-*     positions in a supplied table. For the purposes of this function,
-*     the polynomial input is refered to as x1 and the output as y1. So
-*     the polynomial is:
+*     positions in a supplied table, and returns the coefficients of a
+*     PolyMap to describe the fit. For the purposes of this function,
+*     the input to the fit is refered to as x1 and the output as y1. So
+*     the returned coefficients describe a PolyMap with forward
+*     transformation:
 *
 *     y1 = P1( x1 )
 
 *  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     forward
+*        Non-zero if the forward transformation of "this" is being
+*        replaced. Zero if the inverse transformation of "this" is being
+*        replaced.
 *     nsamp
 *        The number of (x1,y1) positions in the supplied table.
 *     acc
-*        The required accuracy, expressed as an offset within the polynomials
-*        output space.
+*        The required accuracy, expressed as a geodesic distance within
+*        the polynomials output space (not the normalised tabular space).
 *     order
 *        The maximum power (plus one) of x1 within P1. So for instance, a
 *        value of 3 refers to a quadratic polynomial.
 *     table
 *        Pointer to an array of 2 pointers. Each of these pointers points
-*        to an array of "nsamp" doubles, being the scaled and sampled values
-*        for x1 and y1 in that order.
+*        to an array of "nsamp" doubles, being the normalised and sampled
+*        values for x1 and y1 in that order.
 *     scales
-*        Array holding the scaling factors for the two columns of the table.
-*        Multiplying the table values by the scale factor produces PolyMap
-*        input or output axis values.
+*        Array holding the scaling factors used to produced the normalised
+*        values in the two columns of the table. Multiplying the normalised
+*        table values by the scale factor produces input or output axis
+*        values for the returned PolyMap
 *     ncoeff
-*        Pointer to an ant in which to return the number of coefficients
+*        Pointer to an int in which to return the number of coefficients
 *        described by the returned array.
 *     racc
 *        Pointer to a double in which to return the achieved accuracy
@@ -553,11 +643,10 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 */
 
 /* Local Variables: */
-   MinPackData data;
+   AstMinPackData data;
    double *coeffs;
    double *pc;
    double *pr;
-   double *px1;
    double *pxp1;
    double *result;
    double *work1;
@@ -568,7 +657,6 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
    double maxterm;
    double term;
    double tv;
-   double x1;
    int *work3;
    int info;
    int k;
@@ -605,31 +693,19 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
    work4 = astMalloc( (5*ncof+nsamp)*sizeof( double ) );
    if( astOK ) {
 
-/* Get pointers to the supplied x1 values. */
-      px1 = table[ 0 ];
-
-/* Get pointers to the location for the next power of x1. */
-      pxp1 = data.xp1;
-
-/* Loop round all samples. */
-      for( k = 0; k < nsamp; k++ ) {
-
-/* Get the current x1 value. */
-         x1 = *(px1++);
-
 /* Find all the required powers of x1 and store them in the "xp1"
-   component of the data structure. */
-         tv = 1.0;
-         for( w1 = 0; w1 < order; w1++ ) {
-            *(pxp1++) = tv;
-            tv *= x1;
-         }
-      }
+   component of the data structure. The required initialisation is done
+   differently for different subclasses of PolyMap, so we need to wrap
+   it up in a virtual function. */
+      astFitPoly1DInit( this, forward, table, &data, scales );
 
 /* The initial guess at the coefficient values represents a unit
-   transformation in PolyMap axis values. */
+   transformation in (normalised) tabulated (x,y) values. Using normalised
+   values means that we are, effectively, including a guess at the linear
+   scaling factor between input and output of the PolyMap (e.g. the PolyMap
+   may have inputs in mm and outputs in radians). */
       for( k = 0; k < ncof; k++ ) coeffs[ k ] = 0.0;
-      coeffs[ 1 ] = scales[ 0 ]/scales[ 1 ];
+      coeffs[ 1 ] = 1.0;
 
 /* Find the best coefficients */
       info = lmder1( MPFunc1D, &data, nsamp, ncof, coeffs, work1, work2, nsamp,
@@ -637,7 +713,8 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
       if( info == 0 ) astError( AST__MNPCK, "astPolyMap(PolyTran): Minpack error "
                                 "detected (possible programming error).", status );
 
-/* Return the achieved accuracy. */
+/* Return the achieved accuracy. The "work1" array holds the normalised Y
+   residuals at each tabulated point. */
       pr = work1;
       tv = 0.0;
       for( k = 0; k < nsamp; k++,pr++ ) tv += (*pr)*(*pr);
@@ -724,9 +801,88 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 
 }
 
-static double *FitPoly2D( int nsamp, double acc, int order, double **table,
-                          double scales[4], int *ncoeff, double *racc,
-                          int *status ){
+static void FitPoly1DInit( AstPolyMap *this, int forward, double **table,
+                           AstMinPackData *data, double *scales, int *status ){
+/*
+*+
+*  Name:
+*     astFitPoly1DInit
+
+*  Purpose:
+*     Perform initialisation needed for FitPoly1D
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     void astFitPoly1DInit( AstPolyMap *this, int forward, double **table,
+*                            AstMinPackData *data, double *scales,
+*                            int *status )
+
+*  Class Membership:
+*     PolyMap virtual function.
+
+*  Description:
+*     This function performs initialisation needed for FitPoly1D.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     forward
+*        Non-zero if the forward transformation of "this" is being
+*        replaced. Zero if the inverse transformation of "this" is being
+*        replaced.
+*     table
+*        Pointer to an array of 2 pointers. Each of these pointers points
+*        to an array of "nsamp" doubles, being the scaled and sampled values
+*        for x1 and y1 in that order.
+*     data
+*        Pointer to a structure holding information to pass the the
+*        service function invoked by the minimisation function.
+*     scales
+*        Array holding the scaling factors for the two columns of the table.
+*        Multiplying the table values by the scale factor produces PolyMap
+*        input or output axis values.
+*-
+*/
+
+/* Local Variables; */
+   double *px1;
+   double *pxp1;
+   double tv;
+   double x1;
+   int k;
+   int w1;
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* Get pointers to the supplied x1 values. */
+   px1 = table[ 0 ];
+
+/* Get pointers to the location for the next power of x1. */
+   pxp1 = data->xp1;
+
+/* Loop round all samples. */
+   for( k = 0; k < data->nsamp; k++ ) {
+
+/* Get the current x1 value. */
+      x1 = *(px1++);
+
+/* Find all the required powers of x1 and store them in the "xp1"
+   component of the data structure. */
+      tv = 1.0;
+      for( w1 = 0; w1 < data->order; w1++ ) {
+         *(pxp1++) = tv;
+         tv *= x1;
+      }
+   }
+}
+
+static double *FitPoly2D( AstPolyMap *this, int forward, int nsamp, double acc,
+                          int order, double **table, double scales[4],
+                          int *ncoeff, double *racc, int *status ){
 /*
 *  Name:
 *     FitPoly2D
@@ -738,15 +894,17 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 *     Private function.
 
 *  Synopsis:
-*     double *FitPoly2D( int nsamp, double acc, int order, double **table,
-*                        double scales[4], int *ncoeff, double *racc,
-*                        int *status )
+*     double *FitPoly2D( AstPolyMap *this, int forward, int nsamp, double acc,
+*                        int order, double **table, double scales[4],
+*                        int *ncoeff, double *racc, int *status )
 
 *  Description:
 *     This function fits a pair of least squares 2D polynomial surfaces
-*     to the positions in a supplied table. For the purposes of this
-*     function, the polynomial inputs are refered to as (x1,x2) and the
-*     outputs as (y1,y2). So the two polynomials are:
+*     to the positions in a supplied table, and returns the coefficients
+*     of a PolyMap to describe the fit. For the purposes of this function,
+*     the inputs to the fit is refered to as (x1,x2) and the output as
+*     (y1,y2). So the returned coefficients describe a PolyMap with forward
+*     transformations:
 *
 *     y1 = P1( x1, x2 )
 *     y2 = P2( x1, x2 )
@@ -755,11 +913,17 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 *     the "order" parameter).
 
 *  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     forward
+*        Non-zero if the forward transformation of "this" is being
+*        replaced. Zero if the inverse transformation of "this" is being
+*        replaced.
 *     nsamp
 *        The number of (x1,x2,y1,y2) positions in the supplied table.
 *     acc
 *        The required accuracy, expressed as a geodesic distance within
-*        the polynomials output space.
+*        the polynomials output space (not the normalised tabular space).
 *     order
 *        The maximum power (plus one) of x1 or x2 within P1 and P2. So for
 *        instance, a value of 3 refers to a quadratic polynomial. Note, cross
@@ -768,12 +932,13 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 *        polynomial is order*(order+1)/2.
 *     table
 *        Pointer to an array of 4 pointers. Each of these pointers points
-*        to an array of "nsamp" doubles, being the scaled and sampled values
-*        for x1, x2, y1 or y2 in that order.
+*        to an array of "nsamp" doubles, being the normalised and sampled
+*        values for x1, x2, y1 or y2 in that order.
 *     scales
-*        Array holding the scaling factors for the four columns of the table.
-*        Multiplying the table values by the scale factor produces PolyMap
-*        input or output axis values.
+*        Array holding the scaling factors used to produced the normalised
+*        values in the four columns of the table. Multiplying the normalised
+*        table values by the scale factor produces input or output axis
+*        values for the returned PolyMap
 *     ncoeff
 *        Pointer to an ant in which to return the number of coefficients
 *        described by the returned array.
@@ -793,12 +958,10 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 */
 
 /* Local Variables: */
-   MinPackData data;
+   AstMinPackData data;
    double *coeffs;
    double *pc;
    double *pr;
-   double *px1;
-   double *px2;
    double *pxp1;
    double *pxp2;
    double *result;
@@ -813,8 +976,6 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
    double maxterm;
    double term;
    double tv;
-   double x1;
-   double x2;
    int *work3;
    int info;
    int iout;
@@ -854,43 +1015,20 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
    work4 = astMalloc( 2*(5*ncof+nsamp)*sizeof( double ) );
    if( astOK ) {
 
-/* Get pointers to the supplied x1 and x2 values. */
-      px1 = table[ 0 ];
-      px2 = table[ 1 ];
-
-/* Get pointers to the location for the next power of x1 and x2. */
-      pxp1 = data.xp1;
-      pxp2 = data.xp2;
-
-/* Loop round all samples. */
-      for( k = 0; k < nsamp; k++ ) {
-
-/* Get the current x1 and x2 values. */
-         x1 = *(px1++);
-         x2 = *(px2++);
-
-/* Find all the required powers of x1 and store them in the "xp1"
-   component of the data structure. */
-         tv = 1.0;
-         for( w1 = 0; w1 < order; w1++ ) {
-            *(pxp1++) = tv;
-            tv *= x1;
-         }
-
-/* Find all the required powers of x2 and store them in the "xp2"
-   comonent of the data structure. */
-         tv = 1.0;
-         for( w2 = 0; w2 < order; w2++ ) {
-            *(pxp2++) = tv;
-            tv *= x2;
-         }
-      }
+/* Find all the required powers of x1 and x2 and store them in the "xp1"
+   and "xp2" components of the data structure. The required initialisation
+   is done differently for different subclasses of PolyMap, so we need to
+   wrap it up in a virtual function. */
+      astFitPoly2DInit( this, forward, table, &data, scales );
 
 /* The initial guess at the coefficient values represents a unit
-   transformation in PolyMap axis values. */
+   transformation in (normalised) tabulated (x,y) values. Using normalised
+   values means that we are, effectively, including a guess at the linear
+   scaling factor between input and output of the PolyMap (e.g. the PolyMap
+   may have inputs in mm and outputs in radians). */
       for( k = 0; k < 2*ncof; k++ ) coeffs[ k ] = 0.0;
-      coeffs[ 1 ] = scales[ 0 ]/scales[ 2 ];
-      coeffs[ 5 ] = scales[ 1 ]/scales[ 3 ];
+      coeffs[ 1 ] = 1.0;
+      coeffs[ 5 ] = 1.0;
 
 /* Find the best coefficients */
       info = lmder1( MPFunc2D, &data, 2*nsamp, 2*ncof, coeffs, work1, work2,
@@ -1009,6 +1147,100 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 
 }
 
+static void FitPoly2DInit( AstPolyMap *this, int forward, double **table,
+                           AstMinPackData *data, double *scales, int *status ){
+/*
+*+
+*  Name:
+*     astFitPoly2DInit
+
+*  Purpose:
+*     Perform initialisation needed for FitPoly2D
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     void astFitPoly2DInit( AstPolyMap *this, int forward, double **table,
+*                            AstMinPackData *data, double *scales,
+*                            int *status )
+
+*  Class Membership:
+*     PolyMap virtual function.
+
+*  Description:
+*     This function performs initialisation needed for FitPoly2D.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     forward
+*        Non-zero if the forward transformation of "this" is being
+*        replaced. Zero if the inverse transformation of "this" is being
+*        replaced.
+*     table
+*        Pointer to an array of 4 pointers. Each of these pointers points
+*        to an array of "nsamp" doubles, being the scaled and sampled values
+*        for x1, x2, y1 or y2 in that order.
+*     data
+*        Pointer to a structure holding information to pass the the
+*        service function invoked by the minimisation function.
+*     scales
+*        Array holding the scaling factors for the four columns of the table.
+*        Multiplying the table values by the scale factor produces PolyMap
+*        input or output axis values.
+*-
+*/
+
+/* Local Variables; */
+   double *px1;
+   double *px2;
+   double *pxp1;
+   double *pxp2;
+   double tv;
+   double x1;
+   double x2;
+   int k;
+   int w1;
+   int w2;
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* Get pointers to the supplied x1 and x2 values. */
+   px1 = table[ 0 ];
+   px2 = table[ 1 ];
+
+/* Get pointers to the location for the next power of x1 and x2. */
+   pxp1 = data->xp1;
+   pxp2 = data->xp2;
+
+/* Loop round all samples. */
+   for( k = 0; k < data->nsamp; k++ ) {
+
+/* Get the current x1 and x2 values. */
+      x1 = *(px1++);
+      x2 = *(px2++);
+
+/* Find all the required powers of x1 and store them in the "xp1"
+   component of the data structure. */
+      tv = 1.0;
+      for( w1 = 0; w1 < data->order; w1++ ) {
+         *(pxp1++) = tv;
+         tv *= x1;
+      }
+
+/* Find all the required powers of x2 and store them in the "xp2"
+   comonent of the data structure. */
+      tv = 1.0;
+      for( w2 = 0; w2 < data->order; w2++ ) {
+         *(pxp2++) = tv;
+         tv *= x2;
+      }
+   }
+}
+
 static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
 /*
 *  Name:
@@ -1055,7 +1287,7 @@ static void FreeArrays( AstPolyMap *this, int forward, int *status ) {
    nout = ( (AstMapping *) this )->nout;
 
 /* Free the dynamic arrays for the forward transformation. */
-   if( forward ) {
+   if( forward != astGetInvert( this ) ) {
 
       if( this->coeff_f ) {
          for( i = 0; i < nout; i++ ) {
@@ -1202,7 +1434,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "tolinverse" ) ) {
       dval = astGetTolInverse( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -1223,8 +1455,8 @@ static AstPolyMap **GetJacobian( AstPolyMap *this, int *status ){
 *     GetJacobian
 
 *  Purpose:
-*     Get a description of a Jacobian matrix for the fwd transformation
-*     of a PolyMap.
+*     Get a description of a Jacobian matrix for the original
+*     fwd transformation of a PolyMap.
 
 *  Type:
 *     Private function.
@@ -1234,10 +1466,11 @@ static AstPolyMap **GetJacobian( AstPolyMap *this, int *status ){
 
 *  Description:
 *     This function returns a set of PolyMaps which define the Jacobian
-*     matrix of the forward transformation of the supplied PolyMap.
+*     matrix of the original forward transformation of the supplied PolyMap
+*     (i.e. the Negated attribute is assumed to be zero).
 *
 *     The Jacobian matrix has "nout" rows and "nin" columns, where "nin"
-*     and "nout" are the number of inputs and outputs of the supplied PolyMap.
+*     and "nout" are the number of inputs and outputs of the original PolyMap.
 *     Row "i", column "j" of the matrix holds the rate of change of the
 *     i'th PolyMap output with respect to the j'th PolyMap input.
 *
@@ -1285,9 +1518,15 @@ static AstPolyMap **GetJacobian( AstPolyMap *this, int *status ){
 /* Ensure there is a Jacobian stored in the PolyMap. */
    if( !this->jacobian ) {
 
-/* Get the number of inputs and outputs. */
-      nin = astGetNin( this );
-      nout = astGetNout( this );
+/* Get the number of inputs and outputs of the original forward
+   transformation. */
+      if( astGetInvert( this ) ){
+         nout = astGetNin( this );
+         nin = astGetNout( this );
+      } else {
+         nin = astGetNin( this );
+         nout = astGetNout( this );
+      }
 
 /* Allocate memory to hold pointers to the PolyMaps used to describe the
    Jacobian matrix. */
@@ -1369,7 +1608,7 @@ static AstPolyMap **GetJacobian( AstPolyMap *this, int *status ){
    return this->jacobian;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1382,7 +1621,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "polymap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     PolyMap member function (over-rides the astGetObjSize protected
@@ -1410,7 +1649,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    AstPolyMap *this;
    int ic;
    int nc;
-   int result;
+   size_t result;
 
 /* Initialise. */
    result = 0;
@@ -1482,6 +1721,7 @@ static int GetTranForward( AstMapping *this, int *status ) {
 
 /* Local Variables: */
    AstPolyMap *map;            /* Pointer to PolyMap to be queried */
+   int result;                 /* The returned value */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -1489,8 +1729,27 @@ static int GetTranForward( AstMapping *this, int *status ) {
 /* Obtain a pointer to the PolyMap. */
    map = (AstPolyMap *) this;
 
+/* First deal with cases where the PolyMap has not been inverted. */
+   if( !astGetInvert( this ) ) {
+
+/* The PolyMap has a defined forward transformation if one or more
+   coefficients values were supplied for the original forward
+   transformation. It is not possible to replace the original forward
+   transformation with an iterative algorithm. */
+      result = map->ncoeff_f ? 1 : 0;
+
+/* Now deal with cases where the PolyMap has been inverted. */
+   } else {
+
+/* The PolyMap has a defined forward transformation if one or more
+   coefficients values were supplied for the original inverse
+   transformation, or if the original inverse transformation is being
+   approximated using an iterative algorithm. */
+      result = ( map->ncoeff_i || astGetIterInverse( map ) ) ? 1 : 0;
+   }
+
 /* Return the result. */
-   return map->ncoeff_f ? 1 : 0;
+   return result;
 }
 
 static int GetTranInverse( AstMapping *this, int *status ) {
@@ -1534,6 +1793,7 @@ static int GetTranInverse( AstMapping *this, int *status ) {
 
 /* Local Variables: */
    AstPolyMap *map;            /* Pointer to PolyMap to be queried */
+   int result;                 /* The returned value */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -1541,8 +1801,27 @@ static int GetTranInverse( AstMapping *this, int *status ) {
 /* Obtain a pointer to the PolyMap. */
    map = (AstPolyMap *) this;
 
+/* First deal with cases where the PolyMap has not been inverted. */
+   if( !astGetInvert( this ) ) {
+
+/* The PolyMap has a defined inverse transformation if one or more
+   coefficients values were supplied for the original inverse
+   transformation, or if the original inverse transformation is being
+   approximated using an iterative algorithm. */
+      result = ( map->ncoeff_i || astGetIterInverse( map ) ) ? 1 : 0;
+
+/* Now deal with cases where the PolyMap has been inverted. */
+   } else {
+
+/* The PolyMap has a defined inverse transformation if one or more
+   coefficients values were supplied for the original forward
+   transformation. It is not possible to replace the original forward
+   transformation with an iterative algorithm. */
+      result = map->ncoeff_f ? 1 : 0;
+   }
+
 /* Return the result. */
-   return ( map->ncoeff_i || astGetIterInverse( map ) ) ? 1 : 0;
+   return result;
 }
 
 void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status ) {
@@ -1608,7 +1887,11 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->PolyPowers = PolyPowers;
+   vtab->FitPoly1DInit = FitPoly1DInit;
+   vtab->FitPoly2DInit = FitPoly2DInit;
    vtab->PolyTran = PolyTran;
+   vtab->PolyCoeffs = PolyCoeffs;
 
    vtab->ClearIterInverse = ClearIterInverse;
    vtab->GetIterInverse = GetIterInverse;
@@ -1680,8 +1963,8 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 *     IterInverse
 
 *  Purpose:
-*     Use an iterative method to evaluate the inverse transformation of a
-*     PolyMap at a set of output positions.
+*     Use an iterative method to evaluate the original inverse transformation
+*     of a PolyMap at a set of (original) output positions.
 
 *  Type:
 *     Private function.
@@ -1691,26 +1974,30 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 *                       int *status )
 
 *  Description:
-*     This function transforms a set of PolyMap output positions using
-*     the inverse transformation of the PolyMap, to generate the corresponding
-*     input positions. An iterative Newton-Raphson method is used which
-*     only required the forward transformation of the PolyMap to be deifned.
+*     This function transforms a set of PolyMap positions using the original
+*     inverse transformation of the PolyMap (i.e. the Negated attribute
+*     is assumed to be zero). An iterative Newton-Raphson method is used
+*     which only required the original forward transformation of the PolyMap
+*     to be defined.
 
 *  Parameters:
 *     this
 *        The PolyMap.
 *     out
-*        A PointSet holding the PolyMap output positions that are to be
-*        transformed using the inverse transformation.
+*        A PointSet holding the positions that are to be transformed using
+*        the original inverse transformation. These corresponds to
+*        outputs of the original (i.e. uninverted) PolyMap
 *     result
-*        A PointSet into which the generated PolyMap input positions are to be
-*        stored.
+*        A PointSet into which the transformed positions are to be stored.
+*        These corresponds to inputs of the original (i.e. uninverted) PolyMap
+
 *     status
 *        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
+   AstMapping *lintrunc;
    AstPointSet *work;
    AstPointSet **ps_jac;
    AstPolyMap **jacob;
@@ -1770,7 +2057,7 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 /* Get another PointSet to hold intermediate results. */
    work = astPointSet( npoint, ncoord, " ", status );
 
-/* See if the PolyMap has been inverted. */
+/* See if the PolyMap has been inverted.*/
    fwd = !astGetInvert( this );
 
 /* Get pointers to the data arrays for all PointSets. Note, here "in" and
@@ -1808,13 +2095,13 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 /* Check pointers can be used safely. */
    if( astOK ) {
 
-/* Store the initial guess at the required input positions. We assume initially
-   that the inverse transformation is a unit mapping, and so we just copy
-   the supplied outputs positions to the results PointSet holding the
-   corresponding input positions. */
-      for( icoord = 0; icoord < ncoord; icoord++ ) {
-         memcpy( ptr_in[ icoord ], ptr_out[ icoord ], sizeof( double )*npoint );
-      }
+/* Store the initial guess at the required input positions. These are
+   determined by transforming the supplied output positions using the
+   inverse of a linear truncation of the PolyMap's forward
+   transformation. */
+      lintrunc = LinearGuess( this, status );
+      (void) astTransform( lintrunc, out, 0, result );
+      lintrunc = astAnnul( lintrunc );
 
 /* Get the maximum number of iterations to perform. */
       maxiter = astGetNiterInverse( this );
@@ -1833,9 +2120,9 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
    maximum number of iterations have been performed. */
       for( iter = 0; iter < maxiter && nconv < npoint && astOK; iter++ ) {
 
-/* Use the forward transformation of the supplied PolyMap to transform
-   the current guesses at the required input positions into the
-   corresponding output positions. Store the results in the "work"
+/* Use the original forward transformation of the supplied PolyMap to
+   transform the current guesses at the required input positions into
+   the corresponding output positions. Store the results in the "work"
    PointSet. */
          (void) astTransform( this, result, fwd, work );
 
@@ -1911,7 +2198,7 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
                   }
 
 /* Check for convergence. */
-                  if( vlensq < maxerr*xlensq ) {
+                  if( vlensq <= maxerr*xlensq ) {
                      flags[ ipoint ] = 1;
                      nconv++;
                   }
@@ -1936,6 +2223,197 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
    }
 
    ptr_jac = astFree( ptr_jac );
+
+}
+
+static AstMapping *LinearGuess( AstPolyMap *this, int *status ){
+/*
+*  Name:
+*     LinearTruncation
+
+*  Purpose:
+*     Get a Mapping representing a linear approximation of a PolyMap
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     AstMapping *LinearGuess( AstPolyMap *this, int *status )
+
+*  Description:
+*     This function returns a linear Mapping approximating the original
+*     forward transformation of the supplied PolyMap (i.e. the Invert
+*     flag is assume to be zero). The linear and constant terms in the
+*     supplied PolyMap are used for all outputs that have such terms. Any
+*     other outputs are assumed to be equal to the corresponding inputs.
+*     If the forward transformation of the PolyMap is defined, then it is
+*     used to determine the returned Mapping. Otherwise, the inverse
+*     transformation of the PolyMap is used. The forward transformation of
+*     the returned Mapping always represents the forward transformation of
+*     the original (i.e. uninverted) PolyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The returned linear Mapping, or NULL if an error occurs.
+
+*/
+
+/* Local Variables: */
+   AstMapping *result;           /* Pointer to returned Mapping */
+   AstMapping *mm;               /* MatrixMap representing linear terms */
+   AstMapping *sm;               /* ShiftMap representing offset terms */
+   double **coeff;               /* Pointer to coefficient value arrays */
+   double *matrix;               /* Linear scaling matrix */
+   double *vector;               /* Offset vector */
+   int ***power;                 /* Pointer to coefficient power arrays */
+   int *ncoeff;                  /* Pointer to no. of coefficients */
+   int flag;                     /* Indicates nature of current coeff */
+   int ico;                      /* Coefficient index */
+   int iin;                      /* Index of transformation input */
+   int inverse;                  /* PolyMap inverse transformation selected? */
+   int iout;                     /* Index of transformation output */
+   int jin;                      /* Transformation input for current coeff */
+   int nin;                      /* No. of i/ps for selected transformation */
+   int nout;                     /* No. of o/ps for selected transformation */
+   int ok;                       /* Current output is defined? */
+   int pow;                      /* Power for current coeff and input */
+
+/* Initialise returned value */
+   result = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* If the required Mapping has already been determined, return a pointer
+   to it. */
+   if( this->lintrunc ) return astClone( this->lintrunc );
+
+/* Get pointers to the arrays holding the required coefficient
+   values and powers. Use the forward transformation of the original
+   (uninverted) PolyMap if it is defined and the inverse transformation
+   otherwise. */
+   if ( this->ncoeff_f ){
+      ncoeff = this->ncoeff_f;
+      coeff = this->coeff_f;
+      power = this->power_f;
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      inverse = 0;
+
+   } else {
+      ncoeff = this->ncoeff_i;
+      coeff = this->coeff_i;
+      power = this->power_i;
+      nout = astGetNin( this );
+      nin = astGetNout( this );
+      inverse = 1;
+   }
+
+/* Allocate memory to hold a matrix holding the linear terms of the
+   PolyMap transformation selected above. Initialise it to hold zeros. */
+   matrix = astCalloc( nin*nout, sizeof( double * ) );
+
+/* Allocate memory to hold a vector holding the offset terms of the
+   PolyMap transformation selected above. Initialise it to hold zeros. */
+   vector = astCalloc( nout, sizeof( double * ) );
+   if( astOK ){
+
+/* Loop round all the outputs of the transformation selected above. */
+
+      for( iout = 0; iout < nout; iout++ ){
+
+/* Loop round all the coefficients for the current transformation output. */
+         for( ico = 0; ico < ncoeff[iout]; ico++ ){
+
+/* Initialise a tristate flag that indicates if the current coefficient is
+   constant (0), linear (1) or something else (2). */
+            flag = 0;
+
+/* Look for the first input axis for which the current coeff uses a
+   non-zero power. If the power is not one, the current coeff is neither
+   linear nor constant, and so we can pass on to the next coeff. If any
+   subsequent non-zero power is found, the coeff is not linear. */
+            jin = 0;
+            for( iin = 0; iin < nin; iin++ ){
+               pow = power[iout][ico][iin];
+               if( pow ) {
+                  if( pow != 1 ) {
+                     flag = 2;
+                     break;
+                  } else if( flag == 1 ) {
+                     flag = 2;
+                     break;
+                  } else {
+                     flag = 1;
+                     jin = iin;
+                  }
+               }
+            }
+
+/* If the coeff is a constant term, insert it into the offset vector. */
+            if( flag == 0 ) {
+               vector[ iout ] = coeff[ iout ][ ico ];
+
+/* If the coeff is a linear term, insert it into the matrix. */
+            } else if( flag == 1 ) {
+               matrix[ jin + iout*nin ] = coeff[ iout ][ ico ];
+            }
+         }
+      }
+
+/* If any PolyMap output has no linear terms, the matrix will not be
+   invertable. So insert a 1.0 value on the diagonal of such rows. */
+      for( iout = 0; iout < nout; iout++ ){
+         ok = 0;
+         for( iin = 0; iin < nin; iin++ ) {
+            if( matrix[ iin + iout*nin ] != 0.0 ) {
+               ok = 1;
+               break;
+            }
+         }
+         if( ! ok ) matrix[ iout + iout*nin ] = 1.0;
+      }
+
+/* Create a MatrixMap to represent the matrix. */
+      mm = (AstMapping *) astMatrixMap( nin, nout, 0, matrix, " ", status );
+
+/* If the MatrixMap cannot be inverted, use a unit map instead. */
+      if( !astGetTranInverse( mm ) ) {
+         mm = astAnnul( mm );
+         mm = (AstMapping *) astUnitMap( nin, " ", status );
+      }
+
+/* Create a ShiftMap to represent the offset. */
+      sm = (AstMapping *) astShiftMap( nout, vector, " ", status );
+
+/* Combine them in series into a single compound Mapping. */
+      result = (AstMapping *) astCmpMap( mm, sm, 1, " ", status );
+
+/* If this CmpMap represents the inverse transformation of the original
+   (i.e. uninverted) PolyMap, invert it so that it represents the forward
+   transformation. */
+      if( inverse ) astInvert( result );
+
+/* Free resources */
+      mm = astAnnul( mm );
+      sm = astAnnul( sm );
+
+/* Store the Mapping in the PolyMap structure so we do not need to
+   recalculate it every time it is needed. */
+      if( astOK ) this->lintrunc = astClone( result );
+   }
+
+/* Free resources */
+   matrix = astFree( matrix );
+   vector = astFree( vector );
+
+/* Return the required Mapping. */
+   return result;
 
 }
 
@@ -1979,7 +2457,7 @@ static void LMFunc1D( const double *p, double *hx, int m, int n, void *adata ){
 */
 
 /* Local Variables: */
-   MinPackData *data;
+   AstMinPackData *data;
    double *px1;
    double *py;
    const double *vp;
@@ -1989,7 +2467,7 @@ static void LMFunc1D( const double *p, double *hx, int m, int n, void *adata ){
    int w1;
 
 /* Get a pointer to the data structure. */
-   data = (MinPackData *) adata;
+   data = (AstMinPackData *) adata;
 
 /* Initialise a pointer to the current returned residual value. */
    vr = hx;
@@ -2072,7 +2550,7 @@ static void LMFunc2D( const double *p, double *hx, int m, int n, void *adata ){
 */
 
 /* Local Variables: */
-   MinPackData *data;
+   AstMinPackData *data;
    const double *vp0;
    const double *vp;
    double *py;
@@ -2088,12 +2566,12 @@ static void LMFunc2D( const double *p, double *hx, int m, int n, void *adata ){
    int w2;
 
 /* Get a pointer to the data structure. */
-   data = (MinPackData *) adata;
+   data = (AstMinPackData *) adata;
 
 /* Initialise a pointer to the current returned residual value. */
    vr = hx;
 
-/* Initilise a pointer to the first coefficient (the  constant term) for the
+/* Initialise a pointer to the first coefficient (the  constant term) for the
    current (i.e. first) polynomial output  coordinate. */
    vp0 = p;
 
@@ -2131,7 +2609,7 @@ static void LMFunc2D( const double *p, double *hx, int m, int n, void *adata ){
             px1 = px10++;
             px2 = px20;
 
-/* Loop over powers of x2. The corresponding power of x1 is "w12-x2", but
+/* Loop over powers of x2. The corresponding power of x1 is "w12-w2", but
    is not explicitly needed here. So x1 moves down from w12 to zero, as
    w2 moves up from zero to w12. */
             for( w2 = 0; w2 <= w12; w2++ ) {
@@ -2205,12 +2683,12 @@ static void LMJacob1D( const double *p, double *jac, int m, int n, void *adata )
 */
 
 /* Local Variables: */
-   MinPackData *data;
+   AstMinPackData *data;
    int k;
    int w1;
 
 /* Get a pointer to the data structure. */
-   data = (MinPackData *) adata;
+   data = (AstMinPackData *) adata;
 
 /* The Jacobian of the residuals with respect to the polynomial
    coefficients is constant (i.e. does not depend on the values of the
@@ -2286,7 +2764,7 @@ static void LMJacob2D( const double *p, double *jac, int m, int n, void *adata )
 */
 
 /* Local Variables: */
-   MinPackData *data;
+   AstMinPackData *data;
    int iout;
    int k;
    int ncof;
@@ -2297,7 +2775,7 @@ static void LMJacob2D( const double *p, double *jac, int m, int n, void *adata )
    int w2;
 
 /* Get a pointer to the data structure. */
-   data = (MinPackData *) adata;
+   data = (AstMinPackData *) adata;
 
 /* The Jacobian of the residuals with respect to the polynomial
    coefficients is constant (i.e. does not depend on the values of the
@@ -2583,18 +3061,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstPolyMap *pmap0;    /* Nominated PolyMap */
    AstPolyMap *pmap1;    /* Neighbouring PolyMap */
    int i;                /* Index of neighbour */
-   int iax_in;           /* Index of input coordinate */
-   int iax_out;          /* Index of output coordinate */
-   int ico;              /* Index of coefficient */
-   int inv0;             /* Supplied Invert flag for nominated PolyMap */
-   int inv1;             /* Supplied Invert flag for neighbouring PolyMap */
-   int nc;               /* Number of coefficients */
    int nin;              /* Number of input coordinates for nominated PolyMap */
    int nout;             /* Number of output coordinates for nominated PolyMap */
    int ok;               /* Are PolyMaps equivalent? */
+   int oldinv0;          /* Original Invert value in pmap0 */
+   int oldinv1;          /* Original Invert value in pmap1 */
    int result;           /* Result value to return */
-   int swap0;            /* Swap inputs and outputs for nominated PolyMap? */
-   int swap1;            /* Swap inputs and outputs for neighbouring PolyMap? */
 
 /* Initialise. */
    result = -1;
@@ -2611,14 +3083,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    time does not currently allow these to be coded. */
    if( series ) {
 
-/* Set a flag indicating if "input" and "output" needs to be swapped for
-   the nominated PolyMap. */
-      inv0 = ( *invert_list )[ where ];
-      swap0 = ( inv0 != astGetInvert( pmap0 ) );
+/* Temporarily set the Invert flag of the nominated PolyMap to the
+   required value, first saving the original value so that it can be
+   re-instated later. */
+      oldinv0 = astGetInvert( pmap0 );
+      astSetInvert( pmap0, ( *invert_list )[ where ] );
 
 /* Get the number of inputs and outputs to the nominated PolyMap. */
-      nin = !swap0 ? astGetNin( pmap0 ) : astGetNout( pmap0 );
-      nout = !swap0 ? astGetNout( pmap0 ) : astGetNin( pmap0 );
+      nin = astGetNin( pmap0 );
+      nout = astGetNout( pmap0 );
 
 /* Check each neighbour. */
       for( i = where - 1; i <= where + 1; i += 2 ) {
@@ -2627,7 +3100,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          if( i < 0 || i >= *nmap ) continue;
 
 /* Continue with the next pass if this neighbour is not a PermMap. */
-         if( strcmp( "PolyMap", astGetClass( ( *map_list )[ i ] ) ) ) continue;
+         if( ! astIsAPolyMap( ( *map_list )[ i ] ) ) continue;
 
 /* Get a pointer to it. */
          pmap1 = (AstPolyMap *) ( *map_list )[ i ];
@@ -2635,64 +3108,31 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Check it is used in the opposite direction to the nominated PolyMap. */
          if( ( *invert_list )[ i ] == ( *invert_list )[ where ] ) continue;
 
-/* Set a flag indicating if "input" and "output" needs to be swapped for
-   the neighbouring PolyMap. */
-         inv1 = ( *invert_list )[ i ];
-         swap1 = ( inv1 != astGetInvert( pmap1 ) );
+/* We use the astEqual method to check that the two PolyMaps are equal.
+   But at the moment they may not be equal because they may have
+   different Invert flags. Therefore, temporarily set the invert flag
+   of the neighbour so that it is the same as the nominated PolyMap,
+   first saving the original value so that it can be re-instated later.
+   Note, we have already checked that the two PolyMaps are used in opposite
+   directions within the CmpMap. */
+         oldinv1 = astGetInvert( pmap1 );
+         astSetInvert( pmap1, ( *invert_list )[ where ] );
 
-/* Check the number of inputs and outputs are equal to the nominated
-   PolyMap. */
-         if( astGetNin( pmap1 ) != (!swap1 ? nin : nout ) &&
-             astGetNout( pmap1 ) != (!swap1 ? nout : nin ) ) continue;
+/* Use astEqual to check that the coefficients etc are equal in the two
+   PolyMaps. */
+         ok = astEqual( pmap0, pmap1 );
 
-/* Check the forward coefficients are equal. */
-         ok = 1;
-         for( iax_out = 0; iax_out < nout && ok; iax_out++ ) {
-            nc = pmap1->ncoeff_f[ iax_out ];
-            if( nc != pmap0->ncoeff_f[ iax_out ] ) continue;
+/* Re-instate the original value of the Invert flag in the neighbour. */
+         astSetInvert( pmap1, oldinv1 );
 
-            for( ico = 0; ico < nc && ok; ico++ ) {
-
-               if( !EQUAL( pmap1->coeff_f[ iax_out ][ ico ],
-                           pmap0->coeff_f[ iax_out ][ ico ] ) ){
-                  ok = 0;
-
-               } else {
-                  for( iax_in = 0; iax_in < nin && ok; iax_in++ ) {
-                     ok = ( pmap1->power_f[ iax_out ][ ico ][ iax_in ] ==
-                            pmap0->power_f[ iax_out ][ ico ][ iax_in ] );
-                  }
-               }
-            }
-         }
-         if( !ok ) continue;
-
-/* Check the inverse coefficients are equal. */
-         ok = 1;
-         for( iax_in = 0; iax_in < nin && ok; iax_in++ ) {
-            nc = pmap1->ncoeff_i[ iax_in ];
-            if( nc != pmap0->ncoeff_i[ iax_in ] ) continue;
-
-            for( ico = 0; ico < nc && ok; ico++ ) {
-
-               if( !EQUAL( pmap1->coeff_i[ iax_in ][ ico ],
-                           pmap0->coeff_i[ iax_in ][ ico ] ) ){
-                  ok = 0;
-
-               } else {
-                  for( iax_out = 0; iax_out < nout && ok; iax_out++ ) {
-                     ok = ( pmap1->power_i[ iax_in ][ ico ][ iax_out ] ==
-                            pmap0->power_i[ iax_in ][ ico ][ iax_out ] );
-                  }
-               }
-            }
-         }
+/* Pass on to the next neighbour if the current neighbour differs from
+   the nominated PolyMap. */
          if( !ok ) continue;
 
 /* If we get this far, then the nominated PolyMap and the current
    neighbour cancel each other out, so replace each by a UnitMap. */
-         (void) astAnnul( pmap0 );
-         (void) astAnnul( pmap1 );
+         pmap0 = astAnnul( pmap0 );
+         pmap1 = astAnnul( pmap1 );
          if( i < where ) {
             ( *map_list )[ where ] = (AstMapping *) astUnitMap( nout, "", status );
             ( *map_list )[ i ] = (AstMapping *) astUnitMap( nout, "", status );
@@ -2710,6 +3150,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Leave the loop. */
          break;
       }
+
+/* If the nominated PolyMap was not replaced by a UnitMap, then
+   re-instate its original value for the Invert flag. */
+      if( pmap0 ) astSetInvert( pmap0, oldinv0 );
    }
 
 /* Return the result. */
@@ -2835,6 +3279,261 @@ static int MPFunc2D( void *p, int m, int n, const double *x, double *fvec,
    return 0;
 }
 
+static void PolyCoeffs( AstPolyMap *this, int forward, int nel, double *coeffs,
+                        int *ncoeff, int *status ){
+/*
+*++
+*  Name:
+c     astPolyCoeffs
+f     AST_POLYCOEFFS
+
+*  Purpose:
+*     Retrieve the coefficient values used by a PolyMap.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "polymap.h"
+c     void astPolyCoeffs( AstPolyMap *this, int forward, int nel, double *coeffs,
+c                         int *ncoeff )
+f     CALL AST_POLYCOEFFS( THIS, FORWARD, NEL, COEFFS, NCOEFF, STATUS )
+
+*  Class Membership:
+*     PolyMap method.
+
+*  Description:
+*     This function returns the coefficient values used by either the
+*     forward or inverse transformation of a PolyMap, in the same form
+*     that they are supplied to the PolyMap constructor.
+*
+*     Usually, you should call this method first with
+c     "nel"
+f     NEL
+*     set to zero to determine the number of coefficients used by the
+*     PolyMap. This allows you to allocate an array of the correct size to
+*     hold all coefficient data. You should then call this method a
+*     second time to get the coefficient data.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the original Mapping.
+c     forward
+f     FORWARD = LOGICAL (Given)
+c        If non-zero,
+f        If .TRUE.,
+*        the coefficients of the forward PolyMap transformation are
+*        returned. Otherwise the inverse transformation coefficients are
+*        returned.
+c     nel
+f     NEL = INTEGER (Given)
+*        The length of the supplied
+c        "coeffs"
+f        COEFFS
+*        array. It should be at least "ncoeff*( nin + 2 )" if
+c        "foward" is non-zero,
+f        FORWARD is .TRUE.,
+*        and "ncoeff*( nout + 2 )" otherwise, where "ncoeff" is the
+*        number of coefficients to be returned. If a value of zero
+*        is supplied, no coefficient values are returned, but the
+*        number of coefficients used by the transformation is still
+*        returned in
+c        "ncoeff".
+f        NCOEFF.
+c     coeffs
+f     COEFFS( NEL ) = DOUBLE PRECISION (Returned)
+*        An array in which to return the coefficients used by the
+*        requested transformation of the PolyMap. Ignored if
+c        "nel" is zero.
+f        NEL is zero.
+*        The coefficient data is returned in the form in which it is
+*        supplied to the PolyMap constructor. That is, each group of
+*        "2 + nin" or "2 + nout" adjacent elements describe a single
+*        coefficient of the forward or inverse transformation. See the
+*        PolyMap constructor documentation for further details.
+*
+*        If the supplied array is too short to hold all the coefficients,
+*        trailing coefficients are excluded. If the supplied array is
+*        longer than needed to hold all the coefficients, trailing
+*        elements are filled with zeros.
+c     ncoeff
+f     NCOEFF = INTEGER (Returned)
+*        The number of coefficients used by the requested transformation.
+*        A value of zero is returned if the transformation does not
+*        have any defining polynomials. A value is returned for this argument
+*        even if
+c        "nel" is zero.
+f        NEL is zero.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   double **coeff;
+   int ***power;
+   int *nco;
+   int *pp;
+   int iax;
+   int icoeff;
+   int iel;
+   int ipoly;
+   int nax;
+   int npoly;
+
+/* Initialise */
+   *ncoeff = 0;
+
+/* Check the inherited status. */
+   if ( !astOK ) return;
+
+/* Fill any supplied array with zeros. */
+   if( nel ) memset( coeffs, 0, nel*sizeof( *coeffs ) );
+
+/* Get the values to use, taking account of whether the PolyMap has been
+   inverted or not. */
+   if( forward != astGetInvert( this ) ){
+      nco = this->ncoeff_f;
+      power = this->power_f;
+      coeff = this->coeff_f;
+      npoly = astGetNout( this );
+      nax = astGetNin( this );
+   } else {
+      nco = this->ncoeff_i;
+      power = this->power_i;
+      coeff = this->coeff_i;
+      npoly = astGetNin( this );
+      nax = astGetNout( this );
+   }
+
+/* Notheg to do if there are no coeffs. */
+   if( nco && power && coeff ) {
+
+/* Initialise index of next value to store in returned array. */
+      iel = 0;
+
+/* Loop round each 1D polynomial. */
+      for( ipoly = 0; ipoly < npoly; ipoly++ ){
+
+/* Loop round coefficients. */
+         for( icoeff = 0; icoeff < nco[ ipoly ]; icoeff++ ) {
+
+/* Store the coefficient value in the next element of the returned array,
+   if the array is not already full. Increment the pointer to the next
+   element. */
+            if( iel < nel ) coeffs[ iel++ ] = coeff[ipoly][icoeff];
+
+/* Next store the integer index of the PolyMap input or output which uses
+   the coefficient within its defining polynomial (the first axis has
+   index 1). */
+            if( iel < nel ) coeffs[ iel++ ] = ipoly + 1;
+
+/* The remaining elements of the group give the integer powers to use
+   with each input or output coordinate value. */
+            pp = power[ipoly][icoeff];
+            for( iax = 0; iax < nax; iax++,pp++ ) {
+               if( iel < nel ) coeffs[ iel++ ] = *pp;
+            }
+         }
+
+/* Increment the total number of coefficients used by the transformation. */
+         *ncoeff += nco[ ipoly ];
+      }
+   }
+}
+
+static void PolyPowers( AstPolyMap *this, double **work, int ncoord,
+                        const int *mxpow, double **ptr, int point,
+                        int fwd, int *status ){
+/*
+*+
+*  Name:
+*     astPolyPowers
+
+*  Purpose:
+*     Find the required powers of the input axis values.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     void astPolyPowers( AstPolyMap *this, double **work, int ncoord,
+*                         const int *mxpow, double **ptr, int point,
+*                         int fwd )
+
+*  Class Membership:
+*     PolyMap virtual function.
+
+*  Description:
+*     This function is used by astTransform to calculate the powers of
+*     the axis values for a single input position. In the case of
+*     sub-classes, the powers may not be simply powers of the supplied
+*     axis values but may be more complex quantities such as a Chebyshev
+*     polynomial of the required degree evaluated at the input axis values.
+
+*  Parameters:
+*     this
+*        Pointer to the PolyMap.
+*     work
+*        An array of "ncoord" pointers, each pointing to an array of
+*        length "max(2,mxpow)". The required values are placed in this
+*        array on exit.
+*     ncoord
+*        The number of axes.
+*     mxpow
+*        Pointer to an array holding the maximum power required of each
+*        axis value. Should have "ncoord" elements.
+*     ptr
+*        An array of "ncoord" pointers, each pointing to an array holding
+*        the axis values. Each of these arrays of axis values must have
+*        at least "point+1" elements.
+*     point
+*        The zero based index of the point within "ptr" that holds the
+*        axis values to be exponentiated.
+*     fwd
+*        Do the supplied coefficients define the foward transformation of
+*        the PolyMap?
+*-
+*/
+
+/* Local Variables; */
+   double *pwork;
+   double x;
+   int coord;
+   int ip;
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* For the base PolyMap class, this method simply raises each input axis
+   value to the required power. Loop over all input axes. */
+   for( coord = 0; coord < ncoord; coord++ ) {
+
+/* Get a pointer to the array in which the powers of the current axis
+   value are to be returned. */
+      pwork = work[ coord ];
+
+/* Anything to the power zero is 1.0. */
+      pwork[ 0 ] = 1.0;
+
+/* Get the input axis value. If it is bad, store bad values for all
+   remaining powers. */
+      x = ptr[ coord ][ point ];
+      if( x == AST__BAD ) {
+         for( ip = 1; ip <= mxpow[ coord ]; ip++ ) pwork[ ip ] = AST__BAD;
+
+/* Otherwise, form and store the required powers of the input axis value. */
+      } else {
+         for( ip = 1; ip <= mxpow[ coord ]; ip++ ) {
+            pwork[ ip ] = pwork[ ip - 1 ]*x;
+         }
+      }
+   }
+}
+
 static AstPolyMap *PolyTran( AstPolyMap *this, int forward, double acc,
                              double maxacc, int maxorder, const double *lbnd,
                              const double *ubnd, int *status ){
@@ -2914,7 +3613,7 @@ f     If FORWARD is .FALSE. (probably the most likely case),
 *     long as its accuracy is better than
 c     "maxacc".
 f     MAXACC.
-*     If it is not, an error is reported.
+*     If it is not, a NULL pointer is returned but no error is reported.
 
 *  Parameters:
 c     this
@@ -2992,7 +3691,23 @@ c        "maxacc",
 f        MAXACC,
 *        but no error will be reported.
 
+*  Applicability:
+*     PolyMap
+*        All PolyMaps have this method.
+*     ChebyMap
+c        The ChebyMap implementation of this method allows
+c        NULL pointers to be supplied for "lbnd" and/or "ubnd",
+c        in which case the corresponding bounds supplied when the ChebyMap
+c        was created are used.
+*        The returned PolyMap will be a ChebyMap, and the new transformation
+*        will be defined as a weighted sum of Chebyshev functions of the
+*        first kind.
+
 *  Notes:
+*     - The IterInverse attribute is always cleared in the returned PolyMap.
+*     This means that the returned PolyMap will always use the new fit by
+*     default, rather than the iterative inverse, regardless of the setting
+*     of IterInverse in the supplied PolyMap.
 *     - This function can only be used on 1D or 2D PolyMaps which have
 *     the same number of inputs and outputs.
 *     - A null Object pointer (AST__NULL) will be returned if this
@@ -3021,7 +3736,14 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* If an error occurred, or the fit was not good enough, annul the returned
    PolyMap. */
-   if ( !ok || !astOK ) result = astAnnul( result );
+   if ( !ok || !astOK ) {
+      result = astAnnul( result );
+
+/* Otherwise, ensure the new fit is used in preference to the iterative
+   inverse by clearing the IterInverse attribute. */
+   } else {
+      astClearIterInverse( result );
+   }
 
 /* Return the result. */
    return result;
@@ -3177,7 +3899,10 @@ static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
    }
 
 /* Check the bounds can be used. */
-   if( lbnd[ 0 ] >= ubnd[ 0 ] && astOK ) {
+   if( !lbnd || !ubnd ) {
+      astError( AST__NODEF, "astPolyTran(%s): No upper and/or lower bounds "
+                "supplied.", status, astGetClass( this ) );
+   } else if( lbnd[ 0 ] >= ubnd[ 0 ] && astOK ) {
       astError( AST__NODEF, "astPolyTran(%s): Supplied upper "
                 "bound for the first axis (%g) is less than or equal to the "
                 "supplied lower bound (%g).", status, astGetClass( this ),
@@ -3203,23 +3928,22 @@ static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
 
 /* Sample the requested polynomial transformation at a grid of points. This
    grid covers the user-supplied region, using 2*order points on each
-   axis. If the PolyMap is 1D, then it will be treated as a 2D polynomial
-   in which the second output is a unit transformation. */
+   axis. */
          table = SamplePoly2D( this, !forward, table, lbnd, ubnd, 2*order,
                                &nsamp, scales, status );
 
 /* Fit the polynomial. Always fit a linear polynomial ("order" 2) to any
    dummy second axis. If successfull, replace the PolyMap transformation
    and break out of the order loop. */
-         cofs = FitPoly2D( nsamp, acc, order, table, scales, &ncof, &racc,
-                           status );
+         cofs = FitPoly2D( this, forward,  nsamp, acc, order, table, scales,
+                           &ncof, &racc, status );
 
 /* Now do 1D PolyMaps. */
       } else {
          table = SamplePoly1D( this, !forward, table, lbnd[ 0 ], ubnd[ 0 ],
                                2*order, &nsamp, scales, status );
-         cofs = FitPoly1D( nsamp, acc, order, table, scales, &ncof, &racc,
-                           status );
+         cofs = FitPoly1D( this, forward, nsamp, acc, order, table, scales,
+                           &ncof, &racc, status );
       }
 
 /* If the fit was succesful, replace the PolyMap transformation and break
@@ -3357,13 +4081,17 @@ static double **SamplePoly1D( AstPolyMap *this, int forward, double **table,
    if( astOK ) {
 
 /* Calculate the grid of input positions and store in the PointSet and
-   therefore also in the returned table. */
+   therefore also in the returned table. Rounding error may cause the
+   final point to be just over the upper bound, so we leave the final
+   point out of the loop and set it explicitly to the upper bound
+   afterwards. */
       val0 = lbnd;
       p0 = ptr1[ 0 ];
-      for( i = 0; i < npoint; i++ ) {
+      for( i = 0; i < npoint-1; i++ ) {
          *(p0++) = val0;
          val0 += delta0;
       }
+      *p0 = ubnd;
 
 /* Transform the input grid to get the output grid. */
       (void) astTransform( this, ps1, forward, ps2 );
@@ -3522,24 +4250,40 @@ static double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
    if( astOK ) {
 
 /* Calculate the grid of input positions and store in the PointSet and
-   therefore also in the returned table. */
+   therefore also in the returned table. Rounding error may cause the
+   final point on each axis to be just over the upper bound, so we leave
+   the final point out of the loop and set it explicitly to the upper bound
+   afterwards. */
       val0 = lbnd[ 0 ];
       p0 = ptr1[ 0 ];
       p1 = ptr1[ 1 ];
-      for( i = 0; i < npoint; i++ ) {
+      for( i = 0; i < npoint - 1; i++ ) {
          val1 = lbnd[ 1 ];
-         for( j = 0; j < npoint; j++ ) {
+         for( j = 0; j < npoint-1; j++ ) {
              *(p0++) = val0;
              *(p1++) = val1;
              val1 += delta1;
          }
+         *(p0++) = val0;
+         *(p1++) = ubnd[ 1 ];
          val0 += delta0;
       }
+
+
+      val1 = lbnd[ 1 ];
+      for( j = 0; j < npoint-1; j++ ) {
+          *(p0++) = ubnd[ 0 ];
+          *(p1++) = val1;
+          val1 += delta1;
+      }
+      *(p0++) = ubnd[ 0 ];
+      *(p1++) = ubnd[ 1 ];
+
 
 /* Transform the input grid to get the output grid. */
       (void) astTransform( this, ps1, forward, ps2 );
 
-/* Scale each pair of columns in turn. Use the ssame scale factor for
+/* Scale each pair of columns in turn. Use the same scale factor for
    each axis in order to ensure an isotropic metric. */
       for( icol = 0; icol < 4; icol += 2 ) {
 
@@ -3729,21 +4473,28 @@ static void StoreArrays( AstPolyMap *this, int forward, int ncoeff,
    int iin;                      /* Input index extracted from coeff. description */
    int iout;                     /* Output index extracted from coeff. description */
    int j;                        /* Loop count */
-   int nin;                      /* Number of inputs */
-   int nout;                     /* Number of outputs */
+   int nin;                      /* Number of orignal inputs */
+   int nout;                     /* Number of original outputs */
    int pow;                      /* Power extracted from coeff. description */
 
 /* Check the global status. */
    if ( !astOK ) return;
 
-/* Get the number of inputs and outputs. */
-   nin = astGetNin( this );
-   nout = astGetNout( this );
-
 /* First Free any existing arrays. */
    FreeArrays( this, forward, status );
 
-/* Now initialise the forward transformation, if required. */
+/* Get the number of inputs and outputs of the original uninverted PolyMap.
+   Swap the transformation to be set if the PolyMap has been inverted. */
+   if( astGetInvert( this ) ) {
+      nout = astGetNin( this );
+      nin = astGetNout( this );
+      forward = !forward;
+   } else {
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+   }
+
+/* Now initialise the original forward transformation, if required. */
    if( forward && ncoeff > 0 ) {
 
 /* Create the arrays decribing the forward transformation. */
@@ -3798,7 +4549,7 @@ static void StoreArrays( AstPolyMap *this, int forward, int ncoeff,
 /* Allocate the arrays to store the input powers associated with each
    coefficient, and the coefficient values. Reset the coefficient count
    for each axis to zero afterwards so that we can use the array as an index
-   to the next vacant slot withint he following loop. */
+   to the next vacant slot within the following loop. */
          for( i = 0; i < nout; i++ ) {
             this->power_f[ i ] = astMalloc( sizeof( int * )*
                                            (size_t) this->ncoeff_f[ i ] );
@@ -3829,7 +4580,7 @@ static void StoreArrays( AstPolyMap *this, int forward, int ncoeff,
       }
    }
 
-/* Now initialise the inverse transformation, if required. */
+/* Now initialise the original inverse transformation, if required. */
    if( !forward && ncoeff > 0 ) {
 
 /* Create the arrays decribing the inverse transformation. */
@@ -4062,10 +4813,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double **ptr_out;             /* Pointer to output coordinate data */
    double **work;                /* Pointer to exponentiated axis values */
    double *outcof;               /* Pointer to next coefficient value */
-   double *pwork;                /* Pointer to exponentiated axis values */
    double outval;                /* Output axis value */
    double term;                  /* Term to be added to output value */
-   double x;                     /* Input axis value */
    double xp;                    /* Exponentiated input axis value */
    int ***power;                 /* Pointer to coefficient power arrays */
    int **outpow;                 /* Pointer to next set of axis powers */
@@ -4073,7 +4822,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int *ncoeff;                  /* Pointer to no. of coefficients */
    int in_coord;                 /* Index of output coordinate */
    int ico;                      /* Coefficient index */
-   int ip;                       /* Axis power */
    int nc;                       /* No. of coefficients in polynomial */
    int ncoord_in;                /* Number of coordinates per input point */
    int ncoord_out;               /* Number of coordinates per output point */
@@ -4094,14 +4842,15 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    actually transform any coordinate values. */
    result = (*parent_transform)( this, in, forward, out, status );
 
-/* Determine whether to apply the forward or inverse mapping, according to the
-   direction specified and whether the mapping has been inverted. */
+/* Determine whether to apply the original forward or inverse mapping,
+   according to the direction specified and whether the mapping has been
+   inverted. */
    if ( astGetInvert( map ) ) forward = !forward;
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
 
-/* If we are using the inverse transformatiom, and the IterInverse
+/* If we are using the original inverse transformatiom, and the IterInverse
    attribute is non-zero, use an iterative inverse algorithm rather than any
    inverse transformation defined within the PolyMap. */
    if( !forward && astGetIterInverse(map) ) {
@@ -4134,7 +4883,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Allocate memory to hold the required powers of the input axis values. */
       work = astMalloc( sizeof( double * )*(size_t) ncoord_in );
       for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
-         work[ in_coord ] = astMalloc( sizeof( double )*(size_t) ( mxpow[ in_coord ] + 1 ) );
+         work[ in_coord ] = astMalloc( sizeof( double )*
+                           (size_t) ( astMAX( 2, mxpow[in_coord]+1 ) ) );
       }
 
 /* Perform coordinate arithmetic. */
@@ -4144,20 +4894,33 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Loop to apply the polynomial to each point in turn.*/
          for ( point = 0; point < npoint; point++ ) {
 
-/* Find the required powers of the input axis values and store them in
-   the work array. */
-            for( in_coord = 0; in_coord < ncoord_in; in_coord++ ) {
-               pwork = work[ in_coord ];
-               pwork[ 0 ] = 1.0;
-               x = ptr_in[ in_coord ][ point ];
-               if( x == AST__BAD ) {
-                  for( ip = 1; ip <= mxpow[ in_coord ]; ip++ ) pwork[ ip ] = AST__BAD;
-               } else {
-                  for( ip = 1; ip <= mxpow[ in_coord ]; ip++ ) {
-                     pwork[ ip ] = pwork[ ip - 1 ]*x;
-                  }
-               }
-            }
+/* Find the required powers of the input axis values and store them
+   in the work array. Note, using a virtual method here slows the PolyMap
+   Transform function down by about 5%, compared to doing the equivalent
+   calculations in-line. But we need some way to allow the ChebyMap class
+   to over-ride the calculation of the powers, so we must do something
+   like this. If the 5% slow-down is too much, it can be reduced down to
+   about 2% by replacing the invocation of the astPolyPowers_ interface
+   function with a direct call to the implementation function itself.
+   This involves replacing the astPolyPowers call below with this:
+
+   (**astMEMBER(this,PolyMap,PolyPowers))( (AstPolyMap *) this, work, ncoord_in,
+                                           mxpow, ptr_in, point, forward, status );
+
+   The above could be wrapped up in an alternative implementation of the
+   astPolyPowers macro, so that it looks the same as the existing code.
+   In fact, this scheme could be more widely used to speed up invocation
+   of virtual functions within AST. The disadvantage is that the interface
+   functions for some virtual methods includes some extra processing,
+   over and above simply invoking the implementation function.
+
+   Of course the other way to get rid of the 5% slow down, is to
+   revert to using in-line code below, and then replicate this entire
+   function in the ChebyMap class, making suitable changes to use
+   Chebyshev functions in place of simple powers. But that is bad
+   structuring... */
+            astPolyPowers( this, work, ncoord_in, mxpow, ptr_in, point,
+                           forward );
 
 /* Loop round each output. */
             for( out_coord = 0; out_coord < ncoord_out; out_coord++ ) {
@@ -4206,7 +4969,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   }
 
 /* Increment the output value by the current term of the polynomial. */
-                  outval += term;
+                  if( outval != AST__BAD ) outval += term;
 
                }
 
@@ -4250,22 +5013,57 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *     Integer (boolean).
 
 *  Description:
-*     This attribute indicates whether the inverse transformation of
-*     the PolyMap should be implemented via an iterative Newton-Raphson
+*     This attribute indicates whether the original inverse transformation
+*     of the PolyMap should be implemented via an iterative Newton-Raphson
 *     approximation that uses the forward transformation to transform
 *     candidate input positions until an output position is found which
 *     is close to the required output position. By default, an iterative
 *     inverse is provided if, and only if, no inverse polynomial was supplied
 *     when the PolyMap was constructed.
 *
+*     Note, the term "inverse transformation" here refers to the inverse
+*     transformation of the original PolyMap, ignoring any subsequent
+*     inversions. Also, "input" and "output" refer to the inputs and
+*     outputs of the original PolyMap.
+
 *     The NiterInverse and TolInverse attributes provide parameters that
-*     control the behaviour of the inverse approcimation method.
+*     control the behaviour of the inverse approximation method.
+*
+*     The iterative inverse returns AST__BAD axis values at positions
+*     for which the inverse transformation is undefined. For instance,
+*     if the forward transformation is y = x*x, the iterative inverse
+*     will return x = AST__BAD at y = -1. If the inverse transformation
+*     is multiply defined, the position returned by the iterative inverse
+*     will be the position of the solution that is closest to the
+*     supplied position. For instance, using the above example, y = x*x,
+*     the iterative inverse will return x = +2 at y = 4, because x = +2
+*     is the closest solution to 4 (the other solution is x = -2).
 
 *  Applicability:
 *     PolyMap
 *        All PolyMaps have this attribute.
+*     ChebyMap
+*        The ChebyMap class does not currently provide an option for an
+*        iterative inverse, and so the IterInverse value is always zero.
+*        Setting or clearing the IterInverse attribute of a ChebyMap has
+*        no effect.
 
 *  Notes:
+*     - The transformation replaced by the iterative algorithm is the
+*     transformation from the original PolyMap output space to the
+*     original PolyMap input space (i.e. the input and output spaces as
+*     defined by the arguments of the PolyMap constructor). This is still
+*     the case even if the PolyMap has subsequently been inverted. In
+*     other words if a PolyMap is created and then inverted, setting
+*     the IterInverse to a non-zero value will replace the forward
+*     transformation of the inverted PolyMap (i.e. the inverse
+*     transformation of the original PolyMap). It is not possible to
+*     replace the other transformation (i.e. from the original PolyMap
+*     input space to the original PolyMap output space) with an iterative
+*     algorithm.
+*     - If a PolyMap that has an iterative inverse transformation is
+*     subsequently inverted, the inverted PolyMap will have an iterative
+*     forward transformation.
 *     - An iterative inverse can only be used if the PolyMap has equal
 *     numbers of inputs and outputs, as given by the Nin and Nout
 *     attributes. An error will be reported if IterInverse is set non-zero
@@ -4337,7 +5135,7 @@ astMAKE_TEST(PolyMap,NiterInverse,( this->niterinverse != -INT_MAX ))
 *     This attribute controls the iterative inverse transformation
 *     used if the IterInverse attribute is non-zero.
 *
-*     Its value gives the target relative error in teh axis values of
+*     Its value gives the target relative error in the axis values of
 *     each transformed position. Further iterations will be performed
 *     until the target relative error is reached, or the maximum number
 *     of iterations given by attribute NiterInverse is reached.
@@ -4421,13 +5219,14 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->mxpow_i = NULL;
 
    out->jacobian = NULL;
+   out->lintrunc = NULL;
 
 /* Get the number of inputs and outputs of the uninverted Mapping. */
    nin = ( (AstMapping *) in )->nin;
    nout = ( (AstMapping *) in )->nout;
 
-/* Copy the number of coefficients associated with each output of the forward
-   transformation. */
+/* Copy the number of coefficients associated with each output of the
+   forward transformation of the uninverted Mapping. */
    if( in->ncoeff_f ) {
       out->ncoeff_f = (int *) astStore( NULL, (void *) in->ncoeff_f,
                                         sizeof( int )*(size_t) nout );
@@ -4500,7 +5299,10 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
       }
    }
 
-/* If an error has occurred, free al the resources allocated above. */
+/* Copy the linear truncation of the PolyMap - if it has been found. */
+   if( in->lintrunc ) out->lintrunc = astCopy( in->lintrunc );
+
+/* If an error has occurred, free all the resources allocated above. */
    if( !astOK ) {
       FreeArrays( out, 1, status );
       FreeArrays( out, 0, status );
@@ -4578,6 +5380,9 @@ static void Delete( AstObject *obj, int *status ) {
       }
       this->jacobian = astFree( this->jacobian );
    }
+
+/* Free the linear truncation. */
+   if( this->lintrunc ) this->lintrunc = astAnnul( this->lintrunc );
 }
 
 /* Dump function. */
@@ -4792,8 +5597,9 @@ f                           OPTIONS, STATUS )
 *     all the input coordinates. The coefficients are specified separately
 *     for each output coordinate. The forward and inverse transformations
 *     are defined independantly by separate sets of coefficients. If no
-*     inverse transformation is supplied, an iterative method can be used
-*     to evaluate the inverse based only on the forward transformation.
+*     inverse transformation is supplied, the default behaviour is to use
+*     an iterative method to evaluate the inverse based only on the forward
+*     transformation (see attribute IterInverse).
 
 *  Parameters:
 c     nin
@@ -4842,7 +5648,9 @@ c     ncoeff_i
 f     NCOEFF_I = INTEGER (Given)
 *        The number of non-zero coefficients necessary to define the
 *        inverse transformation of the PolyMap. If zero is supplied, the
-*        inverse transformation will be undefined.
+*        default behaviour is to use an iterative method to evaluate the
+*        inverse based only on the forward transformation (see attribute
+*        IterInverse).
 c     coeff_i
 f     COEFF_I( * ) = DOUBLE PRECISION (Given)
 *        An array containing
@@ -5161,6 +5969,7 @@ AstPolyMap *astInitPolyMap_( void *mem, size_t size, int init,
       new->niterinverse = -INT_MAX;
       new->tolinverse = AST__BAD;
       new->jacobian = NULL;
+      new->lintrunc = NULL;
 
 /* If an error occurred, clean up by deleting the new PolyMap. */
       if ( !astOK ) new = astDelete( new );
@@ -5478,6 +6287,9 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
    found. */
       new->jacobian = NULL;
 
+/* The linear truncation of the PolyMap has not yet been found. */
+      new->lintrunc = NULL;
+
 /* If an error occurred, clean up by deleting the new PolyMap. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -5501,6 +6313,14 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
+void astPolyPowers_( AstPolyMap *this, double **work, int ncoord,
+                     const int *mxpow, double **ptr, int point, int fwd,
+                     int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,PolyMap,PolyPowers))( this, work, ncoord, mxpow, ptr,
+                                           point, fwd, status );
+}
+
 AstPolyMap *astPolyTran_( AstPolyMap *this, int forward, double acc,
                           double maxacc, int maxorder, const double *lbnd,
                           const double *ubnd, int *status ){
@@ -5508,6 +6328,30 @@ AstPolyMap *astPolyTran_( AstPolyMap *this, int forward, double acc,
    return (**astMEMBER(this,PolyMap,PolyTran))( this, forward, acc,
                                                 maxacc, maxorder, lbnd,
                                                 ubnd, status );
+}
+
+void astPolyCoeffs_( AstPolyMap *this, int forward, int nel, double *array,
+                     int *ncoeff, int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,PolyMap,PolyCoeffs))( this, forward, nel,
+                                           array, ncoeff, status );
+}
+
+void astFitPoly1DInit_( AstPolyMap *this, int forward, double **table,
+                        AstMinPackData *data, double *scales,
+                        int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,PolyMap,FitPoly1DInit))( this, forward, table, data, scales,
+                                              status );
+}
+
+
+void astFitPoly2DInit_( AstPolyMap *this, int forward, double **table,
+                        AstMinPackData *data, double *scales,
+                        int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,PolyMap,FitPoly2DInit))( this, forward, table, data, scales,
+                                              status );
 }
 
 

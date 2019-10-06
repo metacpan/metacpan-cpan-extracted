@@ -1,5 +1,8 @@
 Revision history for IP::Info
 
+0.18  2019-10-05T05:55:00+01:00
+      - Moved author test scripts to xt/ subfolder.
+
 0.17  2017-04-30T04:45:00+01:00
       - Addressed issue RT #121444 with regard to broken link.
       - Updated base url as service provider has changed.

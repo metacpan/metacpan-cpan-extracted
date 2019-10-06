@@ -1,10 +1,11 @@
-requires "Data::Object" => "0.99";
-requires "Doodle" => "0.05";
+requires "Do" => "1.87";
+requires "Doodle" => "0.06";
 requires "perl" => "5.014";
 
 on 'test' => sub {
-  requires "Data::Object" => "0.99";
-  requires "Doodle" => "0.05";
+  requires "Do" => "1.87";
+  requires "Doodle" => "0.06";
+  requires "Test::Auto" => "0.03";
   requires "perl" => "5.014";
 };
 

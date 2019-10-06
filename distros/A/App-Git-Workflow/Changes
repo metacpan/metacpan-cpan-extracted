@@ -1,5 +1,22 @@
 Revision history for git-workflow-tools
 
+1.1.6   2019-10-04
+        Updating for release of version 1.1.6
+        Fixing critic issues (Ivan Wills)
+        Removing unsupported Travis perl versions (Ivan Wills)
+        Brigging tag-grep along for content searching (Ivan Wills)
+        Fixing up documentation (Ivan Wills)
+        Adding the ability to search within all branches (Ivan Wills)
+        Adding the ability to limit the number of branches shown (Ivan Wills)
+        Adding the ability to only list the ages of unmerged branches (Ivan Wills)
+
+1.1.5   2019-07-21
+        Updating for release of version 1.1.5
+        Adding new commands to boilerplate (Ivan Wills)
+        Fixing 00-load test (Ivan Wills)
+        New command to simplify resetting branches to somewhere in the past (Ivan Wills)
+        Fixing branch-age parameters (Ivan Wills)
+
 1.1.4   2019-07-13
         Updating for release of version 1.1.4
         Adding new files to manifest (Ivan Wills)

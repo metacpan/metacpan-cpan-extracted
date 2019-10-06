@@ -61,12 +61,12 @@ f     The XmlChan class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -610,7 +610,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    IVOAScan *scan;
    char *decset;
    char *raset;
-   char buff[ DBL_DIG + 30 ];
+   char buff[ AST__DBL_WIDTH + 30 ];
    char setting[ 100 ];
    const char *dom;
    const char *id;
@@ -903,7 +903,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
    formatting and unformatting steps. */
                fr = astCopy( space_frame );
                astClear( fr, "Format(1),Format(2),Digits(1),Digits(2)" );
-               astSet( fr, "digits=%d,system=FK5,equinox=J2000", status, DBL_DIG);
+               astSet( fr, "digits=%d,system=FK5,equinox=J2000", status, AST__DBL_DIG);
                fs = astConvert( space_frame, fr, "" );
                fr = astAnnul( fr );
                if( fs ) {
@@ -984,7 +984,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
                }
                fr = astAnnul( fr );
 
-               sprintf( buff, "epoch= MJD %.*g", DBL_DIG, time_val );
+               sprintf( buff, "epoch= MJD %.*g", AST__DBL_DIG, time_val );
 
                if( !space_frame || !astTestEpoch( space_frame ) ) {
                   for( ispace = 0; ispace < nspace; ispace++ ) {
@@ -1025,7 +1025,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             if( spec_val != AST__BAD && nred > 0 ) {
 
                text = astGetUnit( spec_frame, 0 );
-               if( text ) sprintf( buff, "restfreq= %.*g %s", DBL_DIG,
+               if( text ) sprintf( buff, "restfreq= %.*g %s", AST__DBL_DIG,
                                    spec_val, text );
 
                if( !red_frame || !astTestRestFreq( red_frame ) ) {
@@ -1171,7 +1171,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Ensure the Epoch is set correctly in the Region */
             if( time_val != AST__BAD ) {
-               sprintf( buff, "epoch= MJD %.*g", DBL_DIG, time_val );
+               sprintf( buff, "epoch= MJD %.*g", AST__DBL_DIG, time_val );
                astRegSetAttrib( new, buff, NULL );
             }
 
@@ -1403,7 +1403,6 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
             if( panc && astMapGet0C( panc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
                anames[ axis + 1 ] = astStore( NULL, nam, strlen( nam ) + 1 );
-               nam = astFree( (void *) nam );
             }
          }
 
@@ -1450,7 +1449,6 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    store it in the "names" array. */
             if( tanc && astMapGet0C( tanc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
-               nam = astFree( (void *) nam );
             }
          }
 
@@ -1491,7 +1489,6 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    store it in the "names" array. */
             if( sanc && astMapGet0C( sanc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
-               nam = astFree( (void *) nam );
             }
          }
 
@@ -1524,7 +1521,6 @@ static int AstroCoordsReader( AstXmlChan *this, AstXmlElement *elem,
    store it in the "names" array. */
             if( ranc && astMapGet0C( ranc, AST__STCNAME, &nam ) ) {
                anames[ axis ] = astStore( NULL, nam, strlen( nam ) + 1 );
-               nam = astFree( (void *) nam );
             }
          }
 
@@ -1928,6 +1924,8 @@ static double AstronTimeReader( AstXmlChan *this, AstXmlElement *elem,
 
 /* Initialise. */
    offset = 0.0;
+   result = AST__BAD;
+   val = AST__BAD;
 
 /* Check the global error status. */
    if ( !astOK ) return offset;
@@ -5576,7 +5574,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
          if( scan->count[ 2 ] > 0 ) {
             ElemListD( this, scan->el[ 2 ][ 0 ], 3, pos, status );
             el = astXmlAddElement( new, "Value2", NULL );
-            sprintf( buff, "%.*g %.*g", DBL_DIG, pos[0], DBL_DIG, pos[1] );
+            sprintf( buff, "%.*g %.*g", AST__DBL_DIG, pos[0], AST__DBL_DIG, pos[1] );
             astXmlAddCharData( el, 0, buff );
          }
 
@@ -5585,7 +5583,7 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
          if( scan->count[ 1 ] > 0 ) {
             ElemListD( this, scan->el[ 1 ][ 0 ], 3, pos, status );
             el = astXmlAddElement( new, "Error2", NULL );
-            sprintf( buff, "%.*g %.*g", DBL_DIG, pos[0], DBL_DIG, pos[1] );
+            sprintf( buff, "%.*g %.*g", AST__DBL_DIG, pos[0], AST__DBL_DIG, pos[1] );
             astXmlAddCharData( el, 0, buff );
          }
 
@@ -5937,14 +5935,14 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
          for( i = 0; i < nax; i++ ) {
             astPrimaryFrame( obs_frm, i, &pfrm, &paxis );
             if( astIsASpecFrame( pfrm ) ) {
-               sprintf( setting, "ObsLon(%d)=%.*g", i + 1, DBL_DIG, lambda*AST__DR2D );
+               sprintf( setting, "ObsLon(%d)=%.*g", i + 1, AST__DBL_DIG, lambda*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
-               sprintf( setting, "ObsLat(%d)=%.*g", i + 1, DBL_DIG, phi*AST__DR2D );
+               sprintf( setting, "ObsLat(%d)=%.*g", i + 1, AST__DBL_DIG, phi*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
             } else if( astIsATimeFrame( pfrm ) ) {
-               sprintf( setting, "ObsLon(%d)=%.*g", i + 1, DBL_DIG, lambda*AST__DR2D );
+               sprintf( setting, "ObsLon(%d)=%.*g", i + 1, AST__DBL_DIG, lambda*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
-               sprintf( setting, "ObsLat(%d)=%.*g", i + 1, DBL_DIG, phi*AST__DR2D );
+               sprintf( setting, "ObsLat(%d)=%.*g", i + 1, AST__DBL_DIG, phi*AST__DR2D );
                astRegSetAttrib( obs, setting, NULL );
             }
             pfrm = astAnnul( pfrm );
@@ -7809,7 +7807,7 @@ static void ReCentreAnc( AstRegion *region, int nanc, AstKeyMap **ancs, int *sta
 /* Get the Region Epoch. */
       if( astTestEpoch( frm ) ){
          epoch = astGetEpoch( frm );
-         sprintf( setting, "Epoch=MJD %.*g", DBL_DIG, epoch );
+         sprintf( setting, "Epoch=MJD %.*g", AST__DBL_DIG, epoch );
       } else {
          setting[ 0 ] = 0;
          epoch = AST__BAD;
@@ -12177,7 +12175,7 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
    Make sure "-0" isn't produced. Use a magic string to represent bad
    values. */
          if( value != AST__BAD ) {
-            (void) sprintf( buff, "%.*g", DBL_DIG, value );
+            (void) sprintf( buff, "%.*g", AST__DBL_DIG, value );
             if ( !strcmp( buff, "-0" ) ) {
                buff[ 0 ] = '0';
                buff[ 1 ] = '\0';
@@ -13251,7 +13249,6 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Local Variables: */
    AstXmlChan *this;            /* Pointer to the XmlChan structure */
-   const char *class;           /* Class name */
    const char *sval;            /* String attribute value */
    int ival;                    /* Integer attribute value */
    int set;                     /* Has the attribute got a set value? */
@@ -13261,9 +13258,6 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_object;
-
-/* Store the object class. */
-   class = astGetClass( this );
 
 /* Write out values representing the instance variables for the
    XmlChan class.  Accompany these with appropriate comment strings,

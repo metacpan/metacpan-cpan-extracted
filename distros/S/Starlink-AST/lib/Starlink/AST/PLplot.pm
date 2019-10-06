@@ -10,7 +10,7 @@ use Graphics::PLplot 0.03 qw/:all/;
 use Starlink::AST;
 use Carp;
 
-$VERSION = '2.00';
+$VERSION = '3.00';
 
 =head1 NAME
 

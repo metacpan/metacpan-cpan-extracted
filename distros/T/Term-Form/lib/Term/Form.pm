@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.520';
+our $VERSION = '0.521';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -60,6 +60,7 @@ sub _valid_options {
         return {
             clear_screen     => '[ 0 1 ]',
             codepage_mapping => '[ 0 1 ]',
+            color            => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
             auto_up          => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
@@ -76,6 +77,7 @@ sub _valid_options {
         return {
             clear_screen     => '[ 0 1 ]',
             codepage_mapping => '[ 0 1 ]',
+            color            => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
@@ -87,6 +89,7 @@ sub _valid_options {
         return {
             clear_screen     => '[ 0 1 ]',
             codepage_mapping => '[ 0 1 ]',
+            color            => '[ 0 1 ]',
             auto_up          => '[ 0 1 2 ]',
             hide_cursor      => '[ 0 1 2 ]',
             read_only        => 'ARRAY',
@@ -105,6 +108,7 @@ sub _defaults {
         back             => '   BACK',
         clear_screen     => 0,
         codepage_mapping => 0,
+        color            => 0,
         confirm          => 'CONFIRM',
         default          => '',
         hide_cursor      => 1,
@@ -196,7 +200,7 @@ sub __calculate_threshold {
 
 sub __before_readline {
     my ( $self, $m ) = @_;
-    my @info = split /\n/, line_fold( $self->{info}, $self->{i}{term_w} ), -1;
+    my @info = split /\n/, line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color} } ), -1;
     if ( $self->{show_context} ) {
         my @before_lines;
         if ( $m->{diff} ) {
@@ -215,12 +219,12 @@ sub __before_readline {
             my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
             if ( $total_first_line_w <= $self->{i}{term_w} ) {
                 my $empty_w = $self->{i}{term_w} - $total_first_line_w;
-                unshift @before_lines, $self->{i}{prompt} . ( ' ' x $empty_w ) . $line;
+                unshift @before_lines, $self->__get_prompt() . ( ' ' x $empty_w ) . $line;
             }
             else {
                 my $empty_w = $self->{i}{term_w} - $line_w;
                 unshift @before_lines, ' ' x $empty_w . $line;
-                unshift @before_lines, $self->{i}{prompt};
+                unshift @before_lines, $self->__get_prompt();
             }
             $self->{i}{keys}[0] = '';
         }
@@ -230,7 +234,7 @@ sub __before_readline {
             }
             else {
                 if ( length $self->{i}{prompt} ) { #
-                    unshift @before_lines, $self->{i}{prompt};
+                    unshift @before_lines, $self->__get_prompt();
                 }
                 $self->{i}{keys}[0] = '';
             }
@@ -238,13 +242,24 @@ sub __before_readline {
         $self->{i}{pre_text} = join "\n", @info, @before_lines;
     }
     else {
-        $self->{i}{keys}[0] = $self->{i}{prompt};
+        $self->{i}{keys}[0] = $self->__get_prompt();
         $self->{i}{pre_text} = join "\n", @info;
     }
     $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
     if ( length $self->{i}{pre_text} ) {
         ++$self->{i}{pre_text_row_count};
     }
+}
+
+sub __get_prompt {
+    my ( $self ) = @_;
+    my $prompt = $self->{i}{prompt};
+    if ( exists $self->{i}{prompt_colors} && @{$self->{i}{prompt_colors}} ) {
+        my @color = @{$self->{i}{prompt_colors}};
+        $prompt =~ s/\x{feff}/shift @color/ge;
+        $prompt .= normal();
+    }
+    return $prompt;
 }
 
 
@@ -285,12 +300,20 @@ sub __init_readline {
     $self->{i}{term_w} = $term_w;
     $self->{i}{seps}[0] = ''; # in __readline
     $self->{i}{curr_row} = 0; # in __readlline and __string_and_pos
+    if ( $self->{color} ) {
+        my @color;
+        $prompt =~ s/\x{feff}//g;
+        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+        $self->{i}{prompt_colors} = [ @color ];
+    }
     $prompt = _sanitized_string( $prompt );
-    $self->{i}{prompt} = $prompt;
     $self->{i}{max_key_w} = print_columns( $prompt );
     if ( $self->{i}{max_key_w} > $term_w / 3 ) {
         $self->{i}{max_key_w} = int( $term_w / 3 );
         $self->{i}{prompt} = $self->__unicode_trim( $prompt, $self->{i}{max_key_w} );
+    }
+    else {
+        $self->{i}{prompt} = $prompt;
     }
     if ( $self->{show_context} ) {
         $self->{i}{arrow_left}  = '';
@@ -314,7 +337,12 @@ sub __init_readline {
 
 
 sub read_line {
-    return Term::Form::readline( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::Form' ), @_ );
+    if ( ref $_[0] eq __PACKAGE__ ) {
+        croak "\"read_line\" is a function. The method is called \"readline\"";
+    }
+    my $ob = __PACKAGE__->new();
+    delete $ob->{backup_instance_defaults};
+    return $ob->readline( @_ );
 }
 
 
@@ -778,7 +806,7 @@ sub __prepare_hight {
     my ( $self, $list, $term_w, $term_h ) = @_;
     $self->{i}{avail_h} = $term_h;
     if ( length $self->{i}{pre_text} ) {
-        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $term_w ); # term_w
+        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $term_w, { color => $self->{color} } );
         $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
         $self->{i}{pre_text_row_count} += 1;
         $self->{i}{avail_h} -= $self->{i}{pre_text_row_count};
@@ -847,6 +875,11 @@ sub __get_row {
     else {
         $val = '';
     }
+    if ( exists $self->{i}{key_colors} && @{$self->{i}{key_colors}[$idx]} ) {
+        my @key_colors = @{$self->{i}{key_colors}[$idx]};
+        $self->{i}{keys}[$idx] =~ s/\x{feff}/shift @key_colors/ge;
+        $self->{i}{keys}[$idx] .= normal();
+    }
     return $self->{i}{keys}[$idx] . $self->{i}{seps}[$idx] . $val;
 }
 
@@ -902,10 +935,35 @@ sub __write_first_screen {
     $self->__write_screen( $list );
 }
 
+sub __prepare_meta_menu_elements {
+    my ( $self, $term_w ) = @_;
+    my @meta_menu_elements = ( 'back', 'confirm' );
+    for my $meta_menu_element ( @meta_menu_elements ) {
+        my @color;
+        my $tmp = $self->{i}{$meta_menu_element . '_orig'};
+        if ( $self->{color} ) {
+            $tmp =~ s/\x{feff}//g;
+            $tmp =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+        }
+        $tmp = _sanitized_string( $tmp );
+        if ( print_columns( $tmp ) > $term_w ) {
+            $tmp = cut_to_printwidth( $tmp, $term_w, 0 );
+        }
+        if ( @color ) {
+            $tmp =~ s/\x{feff}/shift @color/ge;
+            $tmp .= normal();
+        }
+        $self->{$meta_menu_element} = $tmp;
+    }
+    $self->{i}{pre} = [ [ $self->{back}, ], [ $self->{confirm}, ] ];
+}
+
 
 sub fill_form {
-    if ( ref $_[0] ne 'Term::Form' ) {
-        return fill_form( bless( { %{ _defaults() }, plugin => $Plugin->new() }, 'Term::Form' ), @_ );
+    if ( ref $_[0] ne __PACKAGE__ ) {
+        my $ob = __PACKAGE__->new();
+        delete $ob->{backup_instance_defaults};
+        return $ob->fill_form( @_ );
     }
     my ( $self, $orig_list, $opt ) = @_;
     croak "'fill_form' called with no argument." if ! defined $orig_list;
@@ -932,16 +990,6 @@ sub fill_form {
     $self->{i}{arrow_left}  = '<';
     $self->{i}{arrow_right} = '>';
     $self->{i}{arrow_w} = 1;
-    $self->{i}{pre} = [ [ $self->{confirm}, ] ];
-    if ( length $self->{back} ) {
-        unshift @{$self->{i}{pre}}, [ $self->{back}, ];
-    }
-    $self->{i}{read_only} = [];
-    if ( @{$self->{read_only}} ) {
-        $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{read_only}} ];
-    }
-    my $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
-    my $auto_up = $self->{auto_up};
     local $| = 1;
     local $SIG{INT} = sub {
         $self->__reset_term();
@@ -950,6 +998,30 @@ sub fill_form {
     };
     $self->__init_term();
     my ( $term_w, $term_h ) = get_term_size();
+    $self->{i}{back_orig}    = $self->{back};
+    $self->{i}{confirm_orig} = $self->{confirm};
+    $self->__prepare_meta_menu_elements( $term_w );
+    $self->{i}{read_only} = [];
+    if ( @{$self->{read_only}} ) {
+        $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{read_only}} ];
+    }
+    my $list;
+    if ( $self->{color} ) {
+        $list = [ @{$self->{i}{pre}} ];
+        my $count = @{$self->{i}{pre}};
+        for my $entry ( @$orig_list ) {
+            my ( $key, $value ) = @$entry;
+            my @color;
+            $key =~ s/\x{feff}//g;
+            $key =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+            $self->{i}{key_colors}[$count++] = [ @color ];
+            push @$list, [ _sanitized_string( $key ), $value ];
+        }
+    }
+    else {
+        $list = [ @{$self->{i}{pre}}, map { [ _sanitized_string( $_->[0] ), $_->[1] ] } @$orig_list ];
+    }
+    my $auto_up = $self->{auto_up};
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
@@ -984,6 +1056,7 @@ sub fill_form {
         if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
             print up( $self->{i}{curr_row} + $self->{i}{pre_text_row_count} );
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
+            $self->__prepare_meta_menu_elements( $term_w );
             $self->__length_longest_key( $list );
             $self->__prepare_width( $term_w );
             $self->__prepare_hight( $list, $term_w, $term_h );
@@ -1246,7 +1319,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.520
+Version 0.521
 
 =cut
 
@@ -1347,7 +1420,23 @@ clear_screen
 
 If enabled, the screen is cleared before the output.
 
-default: disabled
+0 - off
+
+1 - on
+
+default: C<0>
+
+=item
+
+color
+
+Enables the support for color and text formatting escape sequences for the prompt string and the I<info> text.
+
+0 - off
+
+1 - on
+
+default: C<0>
 
 =item
 
@@ -1435,7 +1524,24 @@ clear_screen
 
 If enabled, the screen is cleared before the output.
 
-default: disabled
+0 - off
+
+1 - on
+
+default: C<0>
+
+=item
+
+color
+
+Enables the support for color and text formatting escape sequences for the form-keys, the "back"-string, the
+"confirm"-string, the I<info> text and the I<prompt> text.
+
+0 - off
+
+1 - on
+
+default: C<0>
 
 =item
 

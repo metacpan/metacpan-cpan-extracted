@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.118   2019-10-05
+        - Refactored functional interface.
+
 0.117   2019-09-05
         - Adapt the code to the updated Term::Choose.
 

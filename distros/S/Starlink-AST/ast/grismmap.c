@@ -59,12 +59,12 @@ f     The GrismMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -147,8 +147,18 @@ static void Clear##attribute( Ast##class *this, int *status ) { \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
-/* Assign the "clear" value. */ \
-   this->component = (assign); \
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astClear(%s): The " #attribute "attribute of " \
+                "the supplied %s cannot be cleared because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
+\
+/* Otherwise, assign the "clear" value in the structure component. */ \
+   } else { \
+      this->component = (assign); \
+   } \
 \
 /* Update the derived constants. */ \
    UpdateConstants( this, status ); \
@@ -226,8 +236,18 @@ static void Set##attribute( Ast##class *this, type value, int *status ) { \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
-/* Store the new value in the structure component. */ \
-   this->component = (assign); \
+/* Report an error if the object has been cloned (i.e. has a reference \
+   count that is greater than one). */ \
+   if( astGetRefCount( this ) > 1 ) { \
+      astError( AST__IMMUT, "astSet(%s): The " #attribute "attribute of " \
+                "the supplied %s cannot be changed because the %s has " \
+                "been cloned (programming error).", status, \
+                astGetClass(this), astGetClass(this), astGetClass(this) ); \
+\
+/* Otherwise, store the new value in the structure component. */ \
+   } else { \
+      this->component = (assign); \
+   } \
 \
 /* Update the derived constants. */ \
    UpdateConstants( this, status ); \
@@ -282,11 +302,6 @@ void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 /* Macros which return the maximum and minimum of two values. */
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macros to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Module Variables. */
 /* ================= */
@@ -476,14 +491,14 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
          gmap2 = (AstGrismMap *) map2;
 
 /* Check that the two GrismMaps have the same attribute values. */
-         if( EQUAL( astGetGrismNR( gmap ), astGetGrismNR( gmap2 )) &&
-             EQUAL( astGetGrismNRP( gmap ), astGetGrismNRP( gmap2 )) &&
-             EQUAL( astGetGrismWaveR( gmap ), astGetGrismWaveR( gmap2 )) &&
-             EQUAL( astGetGrismAlpha( gmap ), astGetGrismAlpha( gmap2 )) &&
-             EQUAL( astGetGrismG( gmap ), astGetGrismG( gmap2 )) &&
-             EQUAL( astGetGrismM( gmap ), astGetGrismM( gmap2 )) &&
-             EQUAL( astGetGrismEps( gmap ), astGetGrismEps( gmap2 )) &&
-             EQUAL( astGetGrismTheta( gmap ), astGetGrismTheta( gmap2 )) ){
+         if( astEQUAL( astGetGrismNR( gmap ), astGetGrismNR( gmap2 )) &&
+             astEQUAL( astGetGrismNRP( gmap ), astGetGrismNRP( gmap2 )) &&
+             astEQUAL( astGetGrismWaveR( gmap ), astGetGrismWaveR( gmap2 )) &&
+             astEQUAL( astGetGrismAlpha( gmap ), astGetGrismAlpha( gmap2 )) &&
+             astEQUAL( astGetGrismG( gmap ), astGetGrismG( gmap2 )) &&
+             astGetGrismM( gmap ) != astGetGrismM( gmap2 ) &&
+             astEQUAL( astGetGrismEps( gmap ), astGetGrismEps( gmap2 )) &&
+             astEQUAL( astGetGrismTheta( gmap ), astGetGrismTheta( gmap2 )) ){
 
 /* If so, check that the GrismMaps are applied in opposite senses. If so
    we can cancel the two GrismMaps, so return a UnitMap. */
@@ -730,7 +745,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                 astEQUAL( this->waver, that->waver ) &&
                 astEQUAL( this->alpha, that->alpha ) &&
                 astEQUAL( this->g, that->g ) &&
-                astEQUAL( this->m, that->m ) &&
+                this->m == that->m &&
                 astEQUAL( this->eps, that->eps ) &&
                 astEQUAL( this->theta, that->theta ) &&
                 astEQUAL( this->k1, that->k1 ) &&
@@ -833,56 +848,56 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    if ( !strcmp( attrib, "grismnr" ) ) {
       dval = astGetGrismNR( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismnrp" ) ) {
       dval = astGetGrismNRP( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismwaver" ) ) {
       dval = astGetGrismWaveR( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismalpha" ) ) {
       dval = astGetGrismAlpha( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismg" ) ) {
       dval = astGetGrismG( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismm" ) ) {
       dval = astGetGrismM( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismeps" ) ) {
       dval = astGetGrismEps( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismtheta" ) ) {
       dval = astGetGrismTheta( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -1168,9 +1183,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Local Variables: */
    AstMapping *merged_map; /* Merger of two Mappings */
-   AstMapping *neighbour;  /* Pointer to neighbouring Mapping */
-   const char *class1;     /* Pointer to first Mapping class string */
-   const char *class2;     /* Pointer to second Mapping class string */
    int i1;                 /* Lower index of the two GrismMaps being merged */
    int i2;                 /* Upper index of the two GrismMaps being merged */
    int i;                  /* Mapping index */
@@ -1192,10 +1204,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ===================================================================== */
    if( series ) {
 
-/* Store the classes of the neighbouring Mappings in the list. */
-      class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
-      class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
-
 /* Set a flag indicating that we have not yet found a neighbour with which
    the GrismMap can be merged. */
       merged_map = NULL;
@@ -1204,7 +1212,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if( where > 0 ) {
          i1 = where - 1;
          i2 = where;
-         neighbour = ( *map_list )[ i1 ];
          merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
                                 ( *map_list )[ i2 ], (* invert_list)[ i2 ], status );
       }
@@ -1214,7 +1221,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if( !merged_map && where < *nmap - 1 ) {
          i1 = where;
          i2 = where + 1;
-         neighbour = ( *map_list )[ i2 ];
          merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
                                 ( *map_list )[ i2 ], (* invert_list)[ i2 ], status );
       }
@@ -1702,6 +1708,14 @@ static void UpdateConstants( AstGrismMap *this, int *status ){
 *     This attribute holds refractive index of the grism material at the
 *     reference wavelength (given by attribute GrismWaveR). The default
 *     value is 1.0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1736,6 +1750,14 @@ astMAKE_TEST(GrismMap,GrismNR,( this->nr != AST__BAD ))
 *     appropriate value for a pure grating disperser with no prism). The
 *     units of this attribute should be consistent with those of attributes
 *     GrismWaveR and GrismG.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1767,6 +1789,14 @@ astMAKE_TEST(GrismMap,GrismNRP,( this->nrp != AST__BAD ))
 *     This attribute holds reference wavelength. The default value is
 *     5000 (Angstrom). The units of this attribute should be consistent with
 *     those of attributes GrismNRP and GrismG.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1797,6 +1827,14 @@ astMAKE_TEST(GrismMap,GrismWaveR,( this->waver != AST__BAD ))
 *  Description:
 *     This attribute holds the angle between the incoming light and the
 *     normal to the grating surface, in radians. The default value is 0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1829,6 +1867,14 @@ astMAKE_TEST(GrismMap,GrismAlpha,( this->alpha != AST__BAD ))
 *     The unit of length used should be consistent with the units used
 *     for attributes GrismWaveR and GrismNRP. The default value is 0.0.
 *     (the appropriate value for a pure prism disperser with no grating).
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1859,6 +1905,14 @@ astMAKE_TEST(GrismMap,GrismG,( this->g != AST__BAD ))
 *  Description:
 *     This attribute holds the interference order being considered.
 *     The default value is 0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1891,6 +1945,14 @@ astMAKE_TEST(GrismMap,GrismM,( this->m != INT_MAX ))
 *     the grating or exit prism face, and the dispersion plane. The
 *     dispersion plane is the plane spanned by the incoming and outgoing
 *     ray. The default value is 0.0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap
@@ -1924,6 +1986,14 @@ astMAKE_TEST(GrismMap,GrismEps,( this->eps != AST__BAD ))
 *     detector. Specifically, it holds the angle (in radians) between
 *     the normal to the detector plane and an incident ray at the reference
 *     wavelength. The default value is 0.0.
+*
+*     Note, the value of this attribute may changed only if the GrismMap
+*     has no more than one reference. That is, an error is reported if the
+*     GrismMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     GrismMap

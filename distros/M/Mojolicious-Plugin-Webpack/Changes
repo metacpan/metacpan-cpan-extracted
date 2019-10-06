@@ -1,5 +1,11 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+0.12 2019-10-07T07:02:11+0900
+ - Renamed every ".dev." file to ".development." #2
+
+0.11 2019-10-05T22:12:07+0900
+ - Will skip entries in generated HTML file that does not match current mode.
+
 0.10 2019-10-02T15:35:43+0900
  - Add support for custom "npm" binary
  - Need to look in "devDependencies" as well to skip install of node module

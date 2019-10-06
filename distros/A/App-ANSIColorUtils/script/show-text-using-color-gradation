@@ -5,7 +5,7 @@
 
 our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ show-text-using-color-gradation - Print text using gradation between two colors
 
 =head1 VERSION
 
-This document describes version 0.005 of show-text-using-color-gradation (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
+This document describes version 0.006 of show-text-using-color-gradation (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,8 @@ Usage:
 
 Examples:
 
- % show-text-using-color-gradation 'Hello, world' --color blue --color2 pink
- ERROR 400: Unknown argument 'color'
+ % show-text-using-color-gradation 'Hello, world' --color1 blue --color2 pink
+ ERROR : 0000ff
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,15 @@ C<*> marks required options.
 
 =item B<--color1>=I<s>
 
+Default value:
+
+ "ffff00"
+
 =item B<--color2>=I<s>
+
+Default value:
+
+ "0000ff"
 
 =item B<--text>=I<s>
 

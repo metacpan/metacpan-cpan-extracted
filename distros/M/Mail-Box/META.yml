@@ -29,6 +29,7 @@ requires:
   File::Copy: '0'
   File::Remove: '0.2'
   File::Spec: '0.7'
+  File::Temp: '0'
   IO::Scalar: '0'
   Mail::Message: '3.008'
   Mail::Transport: '3.003'
@@ -41,5 +42,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Mail-Box.git
-version: '3.007'
+version: '3.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

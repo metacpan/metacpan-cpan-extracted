@@ -128,8 +128,11 @@ f     encodings), then write operations using AST_WRITE will
 *     - Iwc: Add a Frame describing Intermediate World Coords?
 *     - Ncard: Number of FITS header cards in a FitsChan
 *     - Nkey: Number of unique keywords in a FitsChan
-*     - TabOK: Should the FITS "-TAB" algorithm be recognised?
 *     - PolyTan: Use PVi_m keywords to define distorted TAN projection?
+*     - SipReplace: Replace SIP inverse transformation?
+*     - SipOK: Use Spitzer Space Telescope keywords to define distortion?
+*     - SipReplace: Replace SIP inverse transformation?
+*     - TabOK: Should the FITS "-TAB" algorithm be recognised?
 *     - Warnings: Produces warnings about selected conditions
 
 *  Functions:
@@ -614,7 +617,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        with constant values (such as produced by a PermMap) are treated
 *        as a valid sky coordinate Mapping.
 *        - AddFrame modified so that WCS Frames with a different number
-*        of axes ot the pixel Frame can be added into the FrameSet.
+*        of axes to the pixel Frame can be added into the FrameSet.
 *        - IRAFFromStore and AIPSFromStore modified so that they do not
 *        create any output keywords if the number of WCS axes is different
 *        to the number of pixel axes.
@@ -1112,6 +1115,114 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     9-SEP-2014 (DSB):
 *        Modify Split so that any non-printing characters such as
 *        newlines at the end of the string are ignored.
+*     30-SEP-2014 (DSB):
+*        Modify CnvType to indicate that comment cards cannot be
+*        converted to any other data type. For instance, this causes
+*        a warning to be issued if an equals sign is misplaced in a
+*        WCS-related card (causing it to be treated as a comment card).
+*     24-MAR-2015 (DSB):
+*        Modify SpecTrans to avoid modifying the CRPIC value for CAR
+*        projections when they do not need to be modified. The princiuple
+*        is that the bulk of the array should be witin the native longitude
+*        range [-180,+180]. Prompted by bug report from Bill Joye "yet
+*        another CAR issue" on 24-MAR-2015 (file CHIPASS_Equ.head in
+*        ast_tester).
+*     27-APR-2015 (DSB):
+*        Modify MakeFitsFrameSet so that isolated SkyAxes (e.g.
+*        individual axes that have been oicked from a SkyFrame) are
+*        re-mapped into degrees before being used.
+*     20-APR-2015 (DSB):
+*        In MakeIntWorld, relax tolerance for checking that each FITS-WCS IWC
+*        axis is linear, from 0.01 of a pixel to 0.1 of a pixel.
+*     6-JUL-2015 (DSB):
+*        When checking a sub-string, ensure the whole string is at least as
+*        long as the offset to the start of the sub-string. Without this, you
+*        can get erroneous sub-string matches by chance, depending on what
+*        characters happen to be present in memory after the end of the string.
+*     11-AUG-2015 (DSB):
+*        - Fix bug in CheckFitsName that prevented an error from being reported
+*        if the FITS keyword name contained any illegal printable characters.
+*        - Add new Warning "badkeyname", and issue such a warning instead
+*        of an error if illegal characters are found in a keyword name.
+*     31-AUG-2015 (DSB):
+*        In FitLine, use the whole axis rather than 0.1 of the axis (if "dim"
+*        is supplied). This is because non-linearity can become greater at
+*        further distances along the axis. In practice, it meant that SIP
+*        distortion were being treated as linear because the test did not
+*        explore a large enough region of pixel space.
+*     12-OCT-2015 (DSB):
+*        Only add sky axes to a SpecFrame if the WCS Frame contains no
+*        other axes other than the SpecFrame (MakeFitsFrameSet).
+*     17-OCT-2015 (DSB):
+*        - Add new Warning "badkeyvalue", and issue such a warning instead
+*        of an error if the Split function cannot determine the keyword value.
+*        - Move the check for PLTRAH (i.e. DSS encoding) higher up in GetEncoding.
+*        This is because some DSS file slaos have CD and/or PC keywords.
+*     5-NOV-2015 (DSB):
+*        Fix bug in MakeFitsFrameSet that could cause an inappropriate
+*        RefRA and RefDec values to be used when writing out a SpecFrame
+*        using FITS-WCS. This bug was caused by the assumption that
+*        changing the current Frame of a FRameSet also changes the Frame
+*        that was added into the FRameSet. This used to be the  case as
+*        astAddFrame took a clone of the supplied Frame pointer, but it
+*        now takes a deep copy, so the original Frame and the FrameSet's
+*        current Frame are now independent of each other.
+*     28-JUN-2016 ((DSB):
+*        IsAipsSpectral: Trailing spaces in CTYPE values are insignificant.
+*     17-MAR-2017 (DSB):
+*        Fix memory leak in MakeFitsFrameSet.
+*     25-APR-2017 (DSB):
+*        When reading foreign WCS, retain the TIMESYS keyword by default.
+*     28-APR-2017 (DSB):
+*        When reading a JCMT or UKIRT foreign header that contains a
+*        DTAI keyword, use it to set the Dtai attribute in the WCS Frame.
+*     11-SEP-2017 (DSB):
+*        Allow a NULL keyword name to be supplied to astTestFits to
+*        indicate that the current card should be used (as is also done in
+*        astGetFits).
+*     25-OCT-2017 (DSB):
+*        Added attribute FitsTol.
+*     27-OCT-2017 (DSB):
+*        In RoundFString, only right justift the final string if a
+*        minimum field width is given. Otherwise, leave the unchanged
+*        characters in their original positions. Right justifying ccould
+*        cause very long strings to be returned.
+*     6-NOV-2017 (DSB):
+*        In CelestialAxes, simplify the base->current mapping before
+*        attempting to split it. This can cause multiple WcsMaps to cancel out,
+*        which could otherwise prevent SplitMap from splitting the Mapping
+*        successfully.
+*     7-NOV-2017 (DSB):
+*        If an IWC Frame is included in the FrameSet returned by astRead,
+*        ensure it comes between the pixel and sky frames in the mapping chain.
+*        Previously the order was PIXEL->SKY->IWC, Now it is PIXEL->IWC->SKY.
+*        The inter-Frame Mappings required by the new arrangment are simpler
+*        than for the old arrangement.
+*     20-NOV-2017 (DSB)
+*        Added SipReplace attribute.
+*     20-NOV-2017 (DSB)
+*        Added SipReplace attribute.
+*     30-DEC-2017 (DSB):
+*        Add the SipOK attribute, and support for writing SIP headers.
+*     14-FEB-2018 (DSB):
+*        In SipIntWorld, check linearity of mappings numerically rather
+*        than on the basis of their class. This is because some linear
+*        combinations contain non-linear mappings (eg. a spherical
+*        rotation projected using a TAN projection).
+*     2-NOV-2018 (DSB):
+*        In SpecTrans, when renaming QV to PV, ensure the data type of
+*        the FITS card is used rather than assuming AST__FLOAT. The previous
+*        behaviour could cause spurious PV values for QV values that have no
+*        decimal point.
+*     27-FEB-2019 (DSB):
+*        In GetEncoding, do not require CRPIX CRVAL and CTYPE all to be
+*        present for the header to be considered FITS-WCS of some
+*        flavour. These keywords have defined default values in FITS-WCS
+*        paper 1 and so can be missing in a valid FITS-WCS header.
+*     10-MAY-2019 (DSB):
+*        Cater for reading FITS-WCS headers that have alternate axis
+*        descriptions but do not have any primary axis descriptions
+*        (see email from Bill Joye on 9/5/2019).
 *class--
 */
 
@@ -1128,9 +1239,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
    as equivalent to upper case letter. */
 #define isFits(a) ( islower(a) || isupper(a) || isdigit(a) || (a)=='-' || (a)=='_' )
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
+/* A amacro to test if a Frame is a SkyFrame, and is used to describe the
+   sky (skyframes could be used for other purposes - eg a POLANAL Frame). */
+#define IsASkyFrame(frame) (astIsASkyFrame(frame)&&!strcmp("SKY",astGetDomain(frame)))
 
 /* Macro which takes a pointer to a FitsCard and returns non-zero if the
    card has been used and so should be ignored. */
@@ -1150,16 +1261,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 /* A tolerance for equality between angular values in radians. */
 #define TOL2 1.0E-10
 
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Macro to check for equality of floating point angular values. We cannot
    compare bad values directory because of the danger of floating point
    exceptions, so bad values are dealt with explicitly. The smallest
    significant angle is assumed to be 1E-9 radians (0.0002 arc-seconds).*/
-#define EQUALANG(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=MAX(1.0E5*(fabs(aa)+fabs(bb))*DBL_EPSILON,1.0E-9))))
+#define EQUALANG(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=astMAX(1.0E5*(fabs(aa)+fabs(bb))*DBL_EPSILON,1.0E-9))))
 
 /* Macro to compare an angle in radians with zero, allowing some tolerance. */
 #define ZEROANG(aa) (fabs(aa)<1.0E-9)
@@ -1218,7 +1324,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv badkeyname badkeyvalue "
 #define NPFIT             10
 #define SPD               86400.0
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
@@ -1305,6 +1411,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #include "dsbspecframe.h"
 #include "specmap.h"
 #include "sphmap.h"
+#include "unit.h"
 #include "unitmap.h"
 #include "polymap.h"
 #include "wcsmap.h"
@@ -1368,6 +1475,7 @@ typedef struct FitsStore {
    double ***latpole;
    double ***lonpole;
    double ***mjdobs;
+   double ***dtai;
    double ***dut1;
    double ***mjdavg;
    double ***pv;
@@ -1401,7 +1509,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
 static void (* parent_setsourcefile)( AstChannel *, const char *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_getfull)( AstChannel *, int * );
 static int (* parent_getskip)( AstChannel *, int * );
@@ -1510,7 +1618,7 @@ static pthread_mutex_t mutex4 = PTHREAD_MUTEX_INITIALIZER;
 static char getattrib_buff[ AST__FITSCHAN_GETATTRIB_BUFF_LEN + 1 ];
 
 /* Buffer for returned text string in CnvType */
-static char cnvtype_text[ AST__FITSCHAN_FITSCARDLEN + 1 ];
+static char cnvtype_text[ 2*AST__FITSCHAN_FITSCARDLEN + 3 ];
 
 /* Buffer for real value in CnvType */
 static char cnvtype_text0[ AST__FITSCHAN_FITSCARDLEN + 1 ];
@@ -1606,7 +1714,7 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static void ClearCard( AstFitsChan *, int * );
 static int GetCard( AstFitsChan *, int * );
 static int TestCard( AstFitsChan *, int * );
@@ -1639,10 +1747,18 @@ static void ClearCarLin( AstFitsChan *, int * );
 static int GetCarLin( AstFitsChan *, int * );
 static int TestCarLin( AstFitsChan *, int * );
 static void SetCarLin( AstFitsChan *, int, int * );
+static void ClearSipReplace( AstFitsChan *, int * );
+static int GetSipReplace( AstFitsChan *, int * );
+static int TestSipReplace( AstFitsChan *, int * );
+static void SetSipReplace( AstFitsChan *, int, int * );
 static void ClearPolyTan( AstFitsChan *, int * );
 static int GetPolyTan( AstFitsChan *, int * );
 static int TestPolyTan( AstFitsChan *, int * );
 static void SetPolyTan( AstFitsChan *, int, int * );
+static void ClearSipOK( AstFitsChan *, int * );
+static int GetSipOK( AstFitsChan *, int * );
+static int TestSipOK( AstFitsChan *, int * );
+static void SetSipOK( AstFitsChan *, int, int * );
 static void ClearIwc( AstFitsChan *, int * );
 static int GetIwc( AstFitsChan *, int * );
 static int TestIwc( AstFitsChan *, int * );
@@ -1655,6 +1771,11 @@ static void ClearWarnings( AstFitsChan *, int * );
 static const char *GetWarnings( AstFitsChan *, int * );
 static int TestWarnings( AstFitsChan *, int * );
 static void SetWarnings( AstFitsChan *, const char *, int * );
+static double GetFitsTol( AstFitsChan *, int * );
+static int TestFitsTol( AstFitsChan *, int * );
+static void ClearFitsTol( AstFitsChan *, int * );
+static void SetFitsTol( AstFitsChan *, double, int * );
+
 
 static AstFitsChan *SpecTrans( AstFitsChan *, int, const char *, const char *, int * );
 static AstFitsTable *GetNamedTable( AstFitsChan *, const char *, int, int, int, const char *, int * );
@@ -1672,7 +1793,8 @@ static AstMapping *LogWcs( FitsStore *, int, char, const char *, const char *, i
 static AstMapping *MakeColumnMap( AstFitsTable *, const char *, int, int, const char *, const char *, int * );
 static AstMapping *NonLinSpecWcs( AstFitsChan *, char *, FitsStore *, int, char, AstSpecFrame *, const char *, const char *, int * );
 static AstMapping *OtherAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
-static AstMapping *SIPMapping( double *, FitsStore *, char, int, const char *, const char *, int * );
+static AstMapping *SIPIntWorld( AstMapping *, double, int, int, char, FitsStore *, double *, int[2], double[2], double[4], const char *, const char *, int * );
+static AstMapping *SIPMapping( AstFitsChan *, double *, FitsStore *, char, int, const char *, const char *, int * );
 static AstMapping *SpectralAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
 static AstMapping *TabMapping( AstFitsChan *, FitsStore *, char, int **, const char *, const char *, int *);
 static AstMapping *WcsCelestial( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, double *, double *, AstSkyFrame **, AstMapping **, int *, const char *, const char *, int * );
@@ -1724,7 +1846,7 @@ static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, co
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, int, int, const char *, const char *, int * );
 static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, double *, const char *, const char *, int * );
 static int CardType( AstFitsChan *, int * );
-static int CheckFitsName( const char *, const char *, const char *, int * );
+static int CheckFitsName( AstFitsChan *, const char *, const char *, const char *, int * );
 static int ChrLen( const char *, int * );
 static int CnvType( int, void *, size_t, int, int, void *, const char *, const char *, const char *, int * );
 static int CnvValue( AstFitsChan *, int , int, void *, const char *, int * );
@@ -1774,7 +1896,7 @@ static int IsSkyOff( AstFrameSet *, int, int * );
 static int KeyFields( AstFitsChan *, const char *, int, int *, int *, int * );
 static int LooksLikeClass( AstFitsChan *, const char *, const char *, int * );
 static int MakeBasisVectors( AstMapping *, int, int, double *, AstPointSet *, AstPointSet *, int * );
-static int MakeIntWorld( AstMapping *, AstFrame *, int *, char, FitsStore *, double *, const char *, const char *, int * );
+static int MakeIntWorld( AstMapping *, AstFrame *, int *, char, FitsStore *, double *, double, int, const char *, const char *, int * );
 static int Match( const char *, const char *, int, int *, int *, const char *, const char *, int * );
 static int MatchChar( char, char, const char *, const char *, const char *, int * );
 static int MatchFront( const char *, const char *, char *, int *, int *, int *, const char *, const char *, const char *, int * );
@@ -1785,7 +1907,7 @@ static int SearchCard( AstFitsChan *, const char *, const char *, const char *, 
 static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int, int * );
 static int Similar( const char *, const char *, int * );
 static int SkySys( AstFitsChan *, AstSkyFrame *, int, int, FitsStore *, int, int, char c, int, const char *, const char *, int * );
-static int Split( const char *, char **, char **, char **, const char *, const char *, int * );
+static int Split( AstFitsChan *, const char *, char **, char **, char **, const char *, const char *, int * );
 static int SplitMap( AstMapping *, int, int, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
 static int SplitMap2( AstMapping *, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
 static int SplitMat( int , double *, double *, int * );
@@ -2162,7 +2284,7 @@ static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding,
          astPrimaryFrame( cfrm, i, &pfrm, &paxis );
          if( astIsASpecFrame( pfrm ) ) {
             if( !specfrm ) specfrm = astCopy( pfrm );
-         } else if( astIsASkyFrame( pfrm ) ) {
+         } else if( IsASkyFrame( pfrm ) ) {
             if( !skyfrm ) skyfrm = astCopy( pfrm );
          }
          pfrm = astAnnul( pfrm );
@@ -2307,6 +2429,7 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
    int *inperm;                /* Pointer to input axis permutation array */
    int *outperm;               /* Pointer to output axis permutation array */
    int i;                      /* Axis index */
+   int nf;                     /* Number of Frames originally in fset */
    int nwcs;                   /* Number of wcs axes */
 
 /* Check the inherited status. */
@@ -2344,7 +2467,18 @@ static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel,
          inperm = astFree( inperm );
          outperm = astFree( outperm );
       }
+
+/* Record the original number of Frames in the FrameSet. */
+      nf = astGetNframe( fset );
+
+/* Add in the Frame (which may be a FrameSet). */
       astAddFrame( fset, pixel, mapping, frame );
+
+/* Ensure the WCS Frame is the current Frame within fset (it may not be if
+   the frame returned by WcsMapFrm is actually a FrameSet containing a IWC
+   Frame as well as a WCS Frame). The WCS Frame is always the first frame
+   in the frame/frameset returned by WcsMapFrm. */
+      astSetCurrent( fset, nf + 1 );
 
 /* Annul temporary resources. */
       mapping = astAnnul( mapping );
@@ -2356,7 +2490,6 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
                        FitsStore *store, double *dim, char s, int encoding,
                        int isoff, const char *method, const char *class,
                        int *status ){
-
 /*
 *  Name:
 *     AddVersion
@@ -2441,6 +2574,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    double cdelt;            /* CDELT value for axis */
    double crpix;            /* CRPIX value for axis */
    double crval;            /* CRVAL value for axis */
+   double fitstol;          /* Max departure from linearity, in pixels */
    double pc;               /* Element of the PC array */
    int *axis_done;          /* Flags indicating which axes have been done */
    int *wperm;              /* FITS axis for each Mapping output (Frame axis) */
@@ -2450,6 +2584,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    int icurr;               /* Index of current Frame */
    int nwcs;                /* No. of axes in WCS frame */
    int ret;                 /* Returned value */
+   int sipok;               /* Should SIP headers be produced? */
 
 /* Initialise */
    ret = 0;
@@ -2519,7 +2654,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 /* We now need to choose the "FITS WCS axis" (i.e. the number that is included
    in FITS keywords such as CRVAL2) for each axis of the output Frame.
    Allocate memory to store these indices. */
-   nwcs= astGetNout( mapping );
+   nwcs = astGetNout( mapping );
    wperm = astMalloc( sizeof(int)*(size_t) nwcs );
 
 /* Attempt to use the FitsAxisOrder attribute to determine the order. If
@@ -2550,12 +2685,11 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    identify any corresponding axes within the WCS Frame and add
    descriptions of them to the FitsStore. These descriptions are in terms
    of the FITS keywords defined in the corresponding FITS-WCS paper. Note,
-   the keywords which descirbed the pixel->IWC mapping (CRPIX, CD, PC,
+   the keywords which describe the pixel->IWC mapping (CRPIX, CD, PC,
    CDELT) are not stored by these functions, instead each function
-   returns a Mapping from WCS to IWC coords (these Mappings
-   pass on axes of the wrong class without change). These Mappings are
-   combined in series to get the final WCS->IWC Mapping. First do
-   celestial axes. */
+   returns a Mapping from WCS to IWC coords (these Mappings pass on axes
+   of the wrong class without change). These Mappings are combined in
+   series to get the final WCS->IWC Mapping. First do celestial axes. */
    iwcmap = CelestialAxes( this, fset, dim, wperm, s, store, axis_done,
                            isoff, method, class, status );
 
@@ -2583,11 +2717,19 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    mapping = astAnnul( mapping );
    iwcmap = astAnnul( iwcmap );
 
+/* Get the maximum departure from linearity, in pixels, for the pixiwcmap
+   mapping to be considered linear. */
+   fitstol = astGetFitsTol( this );
+
+/* See if SIP headers are to be produced. */
+   sipok = astGetSipOK( this );
+
 /* Now attempt to store values for the keywords describing the pixel->IWC
    Mapping (CRPIX, CD, PC, CDELT). This tests that the iwcmap is linear.
-   Zero is returned if the test fails. */
-   ret = MakeIntWorld( pixiwcmap, wcsfrm, wperm, s, store, dim, method, class,
-                       status );
+   It can also include keywords describing distortion in the form of SIP
+   headers, if appropriate. Zero is returned if the test fails. */
+   ret = MakeIntWorld( pixiwcmap, wcsfrm, wperm, s, store, dim, fitstol,
+                       sipok, method, class, status );
 
 /* If succesfull... */
    if( ret ) {
@@ -2602,6 +2744,11 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    (as used by JACH). */
       if( astTestDut1( wcsfrm ) && s == ' ' ) {
          SetItem( &(store->dut1), 0, 0, ' ', astGetDut1( wcsfrm )/SPD, status );
+      }
+
+/* Store the TAI-UTC correction, if set. */
+      if( astTestDtai( wcsfrm ) && s == ' ' ) {
+         SetItem( &(store->dtai), 0, 0, ' ', astGetDtai( wcsfrm ), status );
       }
 
 /* Set CRVAL values which are very small compared to the pixel size to
@@ -2767,7 +2914,6 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 *     FitsStore into the supplied FitsChan, using FITS-AIPS encoding.
 *
 *     AIPS encoding is like FITS-WCS encoding but with the following
-
 *     restrictions:
 *
 *     1) The celestial projection must not have any projection parameters
@@ -3212,7 +3358,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          }
-         if( cval && strcmp( cval + 4, "-TAB" ) ) {
+         if( cval && ( strlen(cval) < 5 || strcmp( cval + 4, "-TAB" ) ) ) {
             comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
             if( !comm ) {
                sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -3332,7 +3478,6 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 *     FitsStore into the supplied FitsChan, using FITS-AIPS++ encoding.
 *
 *     AIPS++ encoding is like FITS-WCS encoding but with the following
-
 *     restrictions:
 *
 *     1) The celestial axes must be RA/DEC, galactic or ecliptic.
@@ -3717,7 +3862,7 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          }
-         if( cval && strcmp( cval + 4, "-TAB" ) ) {
+         if( cval && ( strlen(cval) < 5 || strcmp( cval + 4, "-TAB" ) ) ) {
             comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
             if( !comm ) {
                sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -4147,7 +4292,6 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 *                                int *wperm, char s, FitsStore *store, int *axis_done,
 *                                int isoff, const char *method, const char *class, int *status )
@@ -4224,9 +4368,10 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    AstFitsTable *table;    /* Pointer to structure holding -TAB table info */
    AstFrame *pframe;       /* Primary Frame containing current WCS axis*/
    AstFrame *wcsfrm;       /* WCS Frame within FrameSet */
+   AstMapping *map0;       /* Unsimplified Pixel -> WCS mapping */
    AstMapping *map1;       /* Pointer to pre-WcsMap Mapping */
    AstMapping *map3;       /* Pointer to post-WcsMap Mapping */
-   AstMapping *map;        /* Pixel -> WCS mapping */
+   AstMapping *map;        /* Simplified Pixel -> WCS mapping */
    AstMapping *ret;        /* Returned Mapping */
    AstMapping *tmap0;      /* A temporary Mapping */
    AstMapping *tmap1;      /* A temporary Mapping */
@@ -4305,7 +4450,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    axis. Keep a pointer to it, and note the indices of the celestial axes
    within the complete WCS Frame. The MakeFitsFrameSet function will have
    ensured that the WCS Frame only contains at most a single SkyFrame. */
-      if( astIsASkyFrame( pframe ) ) {
+      if( IsASkyFrame( pframe ) ) {
          if( !skyfrm ) skyfrm = astClone( pframe );
          if( paxis == 0 ) {
             ilon = iax;
@@ -4333,7 +4478,9 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
       ppcfid = (double *) astMalloc( sizeof( double )*nwcs );
 
 /* Get the pixel->wcs Mapping. */
-      map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      map0 = astGetMapping( fs, AST__BASE, AST__CURRENT );
+      map = astSimplify( map0 );
+      map0 = astAnnul( map0 );
 
 /* Get the table version number to use if we end up using the -TAB
    algorithm. This is the set value of the TabOK attribute (if positive). */
@@ -5088,8 +5235,8 @@ static double *Cheb2Poly( double *c, int nx, int ny, double xmin, double xmax,
    return d;
 }
 
-static int CheckFitsName( const char *name, const char *method,
-                          const char *class, int *status ){
+static int CheckFitsName( AstFitsChan *this, const char *name,
+                          const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     CheckFitsName
@@ -5102,7 +5249,7 @@ static int CheckFitsName( const char *name, const char *method,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int CheckFitsName( const char *name, const char *method,
+*     int CheckFitsName( AstFitsChan *this, const char *name, const char *method,
 *                        const char *class, int *status )
 
 *  Class Membership:
@@ -5114,8 +5261,15 @@ static int CheckFitsName( const char *name, const char *method,
 *     an underscore, or a hyphen. Leading, trailing or embedded white space
 *     is not allowed, with the exception of totally blank or null keyword
 *     names.
+*
+*     If the supplied keyword name is invalid, either a warning is issued
+*     (for violations that can be handled - such as illegal characters in
+*     keywords), or an error is reported (for more major violations such
+*     as the keyname containing an equals sign).
 
 *  Parameters:
+*     this
+*        Pointer to the FitsChan.
 *     name
 *        Pointer to a string holding the name to check.
 *     method
@@ -5137,6 +5291,7 @@ static int CheckFitsName( const char *name, const char *method,
 */
 
 /* Local Variables: */
+   char buf[100];     /* Buffer for warning text */
    const char *c;     /* Pointer to next character in name */
    size_t n;          /* No. of characters in supplied name */
    int ret;           /* Returned value */
@@ -5188,15 +5343,18 @@ static int CheckFitsName( const char *name, const char *method,
                      astError( AST__BDFTS, "%s(%s): An equals sign ('=') was found "
                                "before column %d within a FITS keyword name or header "
                                "card.", status, method, class, FITSNAMLEN + 1 );
+
                   } else if( *c < ' ' ) {
-                     astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
-                               "name ('%s') contains an illegal non-printing "
-                               "character (ascii value %d).", status, method, class,
-                               name, *c );
-                  } else if( *c < ' ' ) {
-                     astError( AST__BDFTS, "%s(%s): The supplied FITS keyword "
-                               "name ('%s') contains an illegal character ('%c').",
-                               status, method, class, name, *c );
+                     sprintf( buf, "The FITS keyword name ('%s') contains an "
+                              "illegal non-printing character (ascii value "
+                              "%d).", name, *c );
+                     Warn( this, "badkeyname", buf, method, class, status );
+
+
+                  } else if( *c > ' ' ) {
+                     sprintf( buf, "The FITS keyword name ('%s') contains an "
+                              "illegal character ('%c').", name, *c );
+                     Warn( this, "badkeyname", buf, method, class, status );
                   }
                   break;
                }
@@ -5207,9 +5365,9 @@ static int CheckFitsName( const char *name, const char *method,
 
 /* Report an error if no pointer was supplied. */
    } else if( astOK ){
-      astError( AST__INTER, "CheckFitsName(fitschan): AST internal "
-                "error; a NULL pointer was supplied for the keyword name. ",
-                status );
+      astError( AST__INTER, "CheckFitsName(%s): AST internal error; a NULL "
+                "pointer was supplied for the keyword name. ", status,
+                astGetClass( this ) );
    }
 
 /* If an error has occurred, return 0. */
@@ -5993,7 +6151,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          }
-         if( cval && strcmp( cval + 4, "-TAB" ) ) {
+         if( cval && ( strlen(cval) < 5 || strcmp( cval + 4, "-TAB" ) ) ) {
             comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
             if( !comm ) {
                sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -6286,7 +6444,7 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
    keyname = FormatKey( "CTYPE", axlon + 1, -1, ' ', status );
    if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method,
                   class, status ) ){
-      if( !strncmp( "    ", cval + 4, 4 ) ) {
+      if( strlen(cval) > 4 && !strncmp( "    ", cval + 4, 4 ) ) {
          strncpy( newtype, cval, 4 );
          strcpy( newtype + 4, "-GLS" );
          cval = newtype;
@@ -6296,7 +6454,7 @@ static void ClassTrans( AstFitsChan *this, AstFitsChan *ret, int axlat,
    keyname = FormatKey( "CTYPE", axlat + 1, -1, ' ', status );
    if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method,
                   class, status ) ){
-      if( !strncmp( "    ", cval + 4, 4 ) ) {
+      if( strlen(cval) > 4 && !strncmp( "    ", cval + 4, 4 ) ) {
          strncpy( newtype, cval, 4 );
          strcpy( newtype + 4, "-GLS" );
          cval = newtype;
@@ -6425,10 +6583,25 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "carlin" ) ) {
       astClearCarLin( this );
 
+/* SipReplace */
+/* ---------- */
+   } else if ( !strcmp( attrib, "sipreplace" ) ) {
+      astClearSipReplace( this );
+
+/* FitsTol */
+/* ------- */
+   } else if ( !strcmp( attrib, "fitstol" ) ) {
+      astClearFitsTol( this );
+
 /* PolyTan */
 /* ------- */
    } else if ( !strcmp( attrib, "polytan" ) ) {
       astClearPolyTan( this );
+
+/* SipOK */
+/* ------- */
+   } else if ( !strcmp( attrib, "sipok" ) ) {
+      astClearSipOK( this );
 
 /* Iwc */
 /* --- */
@@ -6748,11 +6921,14 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
               ( !odata && otype != AST__COMMENT ) ) {
       ret = 0;
 
-/* If there is no data (and therefore this is a comment card), leave the
-   supplied buffers unchanged. */
-   } else if( odata ) {
+/* If there is no data value (and therefore this is a comment card),
+   conversion is only possible if the output type is also a comment. */
+   } else if( !odata ) {
+      if( type != AST__COMMENT ) ret = 0;
 
-/* Do each possible combination of supplied and stored data types... */
+/* Otherwise we have a data value, so do each possible combination of
+   supplied and stored data types... */
+   } else {
 
 /* Convert a AST__FLOAT data value to ... */
       if( otype == AST__FLOAT ){
@@ -6761,7 +6937,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
             (void) memcpy( buff, odata, osize );
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
             if( odouble != AST__BAD ) {
-               (void) sprintf( cnvtype_text, "%.*g", DBL_DIG, odouble );
+               (void) sprintf( cnvtype_text, "%.*g", AST__DBL_DIG, odouble );
                CheckZero( cnvtype_text, odouble, 0, status );
             } else {
                strcpy( cnvtype_text, BAD_STRING );
@@ -6915,9 +7091,9 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
          if( type == AST__FLOAT ){
             *( (double *) buff ) = odouble;
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
-            (void) sprintf( cnvtype_text0, "%.*g", DBL_DIG, ( (double *) odata )[ 0 ] );
+            (void) sprintf( cnvtype_text0, "%.*g", AST__DBL_DIG, ( (double *) odata )[ 0 ] );
             CheckZero( cnvtype_text0, ( (double *) odata )[ 0 ], 0, status );
-            (void) sprintf( cnvtype_text1, "%.*g", DBL_DIG, ( (double *) odata )[ 1 ] );
+            (void) sprintf( cnvtype_text1, "%.*g", AST__DBL_DIG, ( (double *) odata )[ 1 ] );
             CheckZero( cnvtype_text1, ( (double *) odata )[ 1 ], 0, status );
             (void) sprintf( cnvtype_text, "%s %s", cnvtype_text0, cnvtype_text1 );
             *( (char **) buff ) = cnvtype_text;
@@ -7925,7 +8101,7 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 /* Create a Mapping describing the distortion (other axes are passed
    unchanged by this Mapping), and add it in series with the returned map2
    (Spitzer distortion is applied to the translated pixel coordinates). */
-                  tmap1 = SIPMapping( dim, store, s, naxes, method, class, status );
+                  tmap1 = SIPMapping( this, dim, store, s, naxes, method, class, status );
                   if( ! *map2 ) {
                      *map2 = tmap1;
                   } else {
@@ -8354,10 +8530,10 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
    if( pvx[ 20 ] != 0.0 || pvy[ 20 ] != 0.0 ) return ret;
 
 /* Check that other projection parameters are related correctly. */
-   if( !EQUAL( 2*pvx[ 17 ], pvx[ 19 ] ) ) return ret;
-   if( !EQUAL( pvx[ 17 ], pvx[ 21 ] ) ) return ret;
-   if( !EQUAL( 2*pvy[ 17 ], pvy[ 19 ] ) ) return ret;
-   if( !EQUAL( pvy[ 17 ], pvy[ 21 ] ) ) return ret;
+   if( !astEQUAL( 2*pvx[ 17 ], pvx[ 19 ] ) ) return ret;
+   if( !astEQUAL( pvx[ 17 ], pvx[ 21 ] ) ) return ret;
+   if( !astEQUAL( 2*pvy[ 17 ], pvy[ 19 ] ) ) return ret;
+   if( !astEQUAL( pvy[ 17 ], pvy[ 21 ] ) ) return ret;
 
 /* Initialise all polynomial co-efficients to zero. */
    for( m = 0; m < 20; m++ ){
@@ -10472,6 +10648,9 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
 /* Local Variables: */
    AstFitsChan *trans;
    FitsStore *ret;
+   char s;
+   char smax;
+   int naxis;
 
 /* Initialise */
    ret = NULL;
@@ -10500,6 +10679,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->mjdobs = NULL;
       ret->mjdavg = NULL;
       ret->dut1 = NULL;
+      ret->dtai = NULL;
       ret->pv = NULL;
       ret->specsys = NULL;
       ret->ssyssrc = NULL;
@@ -10545,8 +10725,13 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       if( trans ) trans = (AstFitsChan *) astDelete( trans );
 
 /* Store the number of pixel axes. This is taken as the highest index used
-   in any primary CRPIX keyword. */
+   in any primary or alternate CRPIX keyword. */
       ret->naxis = GetMaxJM( &(ret->crpix), ' ', status ) + 1;
+      smax = GetMaxS( &(ret->crval), status );
+      for( s = 'A'; s <= smax && astOK; s++ ){
+         naxis = GetMaxJM( &(ret->crpix), s, status ) + 1;
+         if( naxis > ret->naxis ) ret->naxis = naxis;
+      }
    }
 
 /* If an error has occurred, free the returned FitsStore, and return a null
@@ -10811,6 +10996,7 @@ static FitsStore *FreeStore( FitsStore *store, int *status ){
    FreeItem( &(store->lonpole), status );
    FreeItem( &(store->mjdobs), status );
    FreeItem( &(store->dut1), status );
+   FreeItem( &(store->dtai), status );
    FreeItem( &(store->mjdavg), status );
    FreeItem( &(store->pv), status );
    FreeItem( &(store->wcsaxes), status );
@@ -11049,8 +11235,11 @@ static AstObject *FsetFromStore( AstFitsChan *this, FitsStore *store,
       pixel = astGetCurrent( ret );
 
 /* Produce the Frame describing the primary axis descriptions, and add it
-   into the FrameSet. */
-      AddFrame( this, ret, pixel, store->naxis, store, ' ', method, class, status );
+   into the FrameSet. Only do this if there are some primary axis
+   descriptions. */
+      if( GetMaxJM( &(store->crpix), ' ', status ) >= 0 ) {
+         AddFrame( this, ret, pixel, store->naxis, store, ' ', method, class, status );
+      }
 
 /* Get the index of the primary physical co-ordinate Frame in the FrameSet. */
       physical = astGetCurrent( ret );
@@ -11207,6 +11396,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->latpole = NULL;
       ret->lonpole = NULL;
       ret->dut1 = NULL;
+      ret->dtai = NULL;
       ret->mjdobs = NULL;
       ret->mjdavg = NULL;
       ret->pv = NULL;
@@ -11395,7 +11585,7 @@ static int GetClean( AstFitsChan *this, int *status ) {
    return ( this->clean == -1 ) ? 0 : (this->clean ? 1 : 0 );
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -11408,7 +11598,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     FitsChan member function (over-rides the astGetObjSize protected
@@ -11435,7 +11625,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 /* Local Variables: */
    AstFitsChan *this;         /* Pointer to FitsChan structure */
    FitsCard *card;            /* Pointer to next FitsCard */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -11589,11 +11779,8 @@ static int GetEncoding( AstFitsChan *this, int *status ){
 *     11) If none of the above keywords are found, Native encoding is assumed.
 *
 *     For cases 2) to 9), a check is also made that the header contains
-*     at least one of each keyword CTYPE, CRPIX and CRVAL. If not, then
-*     the checking process continues to the next case. This goes some way
-*     towards ensuring that the critical keywords used to determine the
-*     encoding are part of a genuine WCS description and have not just been
-*     left in the header by accident.
+*     at least one of the keywords CTYPE, CRPIX and CRVAL. If not, then
+*     the checking process continues to the next case.
 
 *  Parameters:
 *     this
@@ -11626,16 +11813,19 @@ static int GetEncoding( AstFitsChan *this, int *status ){
 /* Otherwise, check for the existence of certain critcal keywords... */
    } else {
 
-/* See if the header contains some CTYPE, CRPIX and CRVAL keywords. */
-      haswcs = astKeyFields( this, "CTYPE%d", 0, NULL, NULL ) &&
-               astKeyFields( this, "CRPIX%d", 0, NULL, NULL ) &&
-               astKeyFields( this, "CRVAL%d", 0, NULL, NULL );
+/* See if the header contains some CTYPE, CRPIX or CRVAL keywords. Note,
+   the FITS-WCS standard provides defaults for these keywords and so we
+   cannot rely on them all being present. Check alternate axis descriptions
+   as well as primary axis descriptions. */
+      haswcs = astKeyFields( this, "CTYPE%d%0c", 0, NULL, NULL ) ||
+               astKeyFields( this, "CRPIX%d%0c", 0, NULL, NULL ) ||
+               astKeyFields( this, "CRVAL%d%0c", 0, NULL, NULL );
 
 /* See if there are any CDi_j keywords. */
-      hascd = astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL );
+      hascd = astKeyFields( this, "CD%1d_%1d%0c", 0, NULL, NULL );
 
 /* See if there are any PCi_j keywords. */
-      haspc = astKeyFields( this, "PC%1d_%1d", 0, NULL, NULL );
+      haspc = astKeyFields( this, "PC%1d_%1d%0c", 0, NULL, NULL );
 
 /* Save the current card index, and rewind the FitsChan. */
       icard = astGetCard( this );
@@ -11661,6 +11851,11 @@ static int GetEncoding( AstFitsChan *this, int *status ){
          } else {
             ret = FITSAIPS_ENCODING;
          }
+
+/* Otherwise, if the FitsChan contains the "PLTRAH" keywords, use "DSS"
+   encoding. */
+      } else if( astKeyFields( this, "PLTRAH", 0, NULL, NULL ) ){
+         ret = DSS_ENCODING;
 
 /* Otherwise, if the FitsChan contains any keywords with the format
    "PCiiijjj" then return "FITS-PC" encoding. */
@@ -11705,13 +11900,8 @@ static int GetEncoding( AstFitsChan *this, int *status ){
 
 /* Otherwise, if the FitsChan contains any keywords with the format
    "CRVALi" then return "FITS-WCS" encoding. */
-      } else if( haswcs && astKeyFields( this, "CRVAL%d", 0, NULL, NULL ) ){
+      } else if( haswcs && astKeyFields( this, "CRVAL%d%0c", 0, NULL, NULL ) ){
          ret = FITSWCS_ENCODING;
-
-/* Otherwise, if the FitsChan contains the "PLTRAH" keywords, use "DSS"
-   encoding. */
-      } else if( astKeyFields( this, "PLTRAH", 0, NULL, NULL ) ){
-         ret = DSS_ENCODING;
 
 /* If none of these conditions is met, assume Native encoding. */
       } else {
@@ -12806,7 +12996,7 @@ static AstFitsTable *GetNamedTable( AstFitsChan *this, const char *extname,
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
-/* Fitrst attempt to read the required table from the external FITS file.
+/* First attempt to read the required table from the external FITS file.
    Only proceed if table source function and wrapper have been supplied
    using astTableSource. */
    if( this->tabsource && this->tabsource_wrap ){
@@ -14024,10 +14214,10 @@ static double *FitLine( AstMapping *map, double *g, double *g0, double *w0,
    }
 
 /* We use NP points in the fit. If a value for "dim" has been supplied,
-   we use points evenly distributed over one tenth of this size, If
-   not, we use a gap of 1.0 (corresponds to an axis length of 100 pixels).
+   we use points evenly distributed over the whole axis. If not, we use
+   a gap of 1.0 (corresponds to an axis length of 100 pixels).
    Choose the gap. */
-   gap = ( dim != AST__BAD ) ? 0.1*dim/NP : 1.0;
+   gap = ( dim != AST__BAD ) ? dim/NP : 1.0;
 
 /* Create PointSets to hold the input and output positions. */
    pset1 = astPointSet( NP, nin, "", status );
@@ -14422,7 +14612,7 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
 \
 /* Extract the keyword name from the supplied string. */ \
    if( name ) { \
-      (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); \
+      (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status ); \
    } else { \
       lname = NULL; \
       lvalue = NULL; \
@@ -14588,7 +14778,7 @@ static int FitsGetCom( AstFitsChan *this, const char *name,
 
 /* Extract the keyword name from the supplied string (if supplied). */
    if( name ){
-      (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+      (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
    } else {
       lname = NULL;
       lcom = NULL;
@@ -14721,7 +14911,7 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
          if( overwrite && CnvValue( this, type, 0, &edval, "SetFits",
                                     status ) &&
              CardComm( this, status ) ) {
-            if( EQUAL( edval, dval ) ) comment = NULL;
+            if( astEQUAL( edval, dval ) ) comment = NULL;
          }
          astSetFitsF( this, keyname, dval, comment, overwrite );
       } else {
@@ -14771,8 +14961,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
          if( overwrite && CnvValue( this, type, 0, ecdval, "SetFits",
                                     status ) &&
              CardComm( this, status ) ) {
-            if( EQUAL( ecdval[ 0 ], ( (double *) value )[ 0 ] ) &&
-                EQUAL( ecdval[ 1 ], ( (double *) value )[ 1 ] ) ) comment = NULL;
+            if( astEQUAL( ecdval[ 0 ], ( (double *) value )[ 0 ] ) &&
+                astEQUAL( ecdval[ 1 ], ( (double *) value )[ 1 ] ) ) comment = NULL;
          }
          astSetFitsCF( this, keyname, (double *) value, comment, overwrite );
       } else {
@@ -14968,7 +15158,7 @@ static void SetFits##code( AstFitsChan *this, const char *name, ctype value, con
    method = "astSetFits"#code; \
 \
 /* Extract the keyword name from the supplied string. */ \
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); \
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status ); \
 \
 /* Initialise a pointer to the comment to be stored. If the supplied \
    comment is blank, use the comment given with "name". */ \
@@ -15114,7 +15304,7 @@ f        The global status.
    method = "astSetFitsU";
 
 /* Extract the keyword name from the supplied string. */
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
 
 /* Initialise a pointer to the comment to be stored. If the supplied
    comment is blank, use the comment given with "name". */
@@ -15311,7 +15501,7 @@ static void SetFitsCom( AstFitsChan *this, const char *name,
    class = astGetClass( this );
 
 /* Extract the keyword name, etc, from the supplied string. */
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+   (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
 
 /* If a blank comment has been supplied, use NULL instead. */
    com = ChrLen( comment, status )? comment : NULL;
@@ -15942,6 +16132,7 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
    astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    const char *result;           /* Pointer value to return */
+   double dval;                  /* Double attribute value */
    int ival;                     /* Integer attribute value */
 
 /* Initialise. */
@@ -16046,10 +16237,37 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* SipReplace */
+/* ---------- */
+   } else if ( !strcmp( attrib, "sipreplace" ) ) {
+      ival = astGetSipReplace( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* FitsTol. */
+/* -------- */
+   } else if ( !strcmp( attrib, "fitstol" ) ) {
+      dval = astGetFitsTol( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
+         result = getattrib_buff;
+      }
+
 /* PolyTan */
 /* ------- */
    } else if ( !strcmp( attrib, "polytan" ) ) {
       ival = astGetPolyTan( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* SipOK */
+/* ------- */
+   } else if ( !strcmp( attrib, "sipok" ) ) {
+      ival = astGetSipOK( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", ival );
          result = getattrib_buff;
@@ -17016,7 +17234,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
 /* If the value is a double, format it and store the result in a
    dynamically allocated string. */
             case AST__FLOAT:
-               (void) sprintf( buff, "%.*g", DBL_DIG, *( (double *) data ) );
+               (void) sprintf( buff, "%.*g", AST__DBL_DIG, *( (double *) data ) );
                CheckZero( buff,  *( (double *) data ), 0, status );
                *val = astString( buff, (int) strlen( buff ) );
                break;
@@ -17579,10 +17797,22 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->TestCarLin = TestCarLin;
    vtab->SetCarLin = SetCarLin;
    vtab->GetCarLin = GetCarLin;
+   vtab->ClearSipReplace = ClearSipReplace;
+   vtab->TestSipReplace = TestSipReplace;
+   vtab->SetSipReplace = SetSipReplace;
+   vtab->GetSipReplace = GetSipReplace;
+   vtab->ClearFitsTol = ClearFitsTol;
+   vtab->TestFitsTol = TestFitsTol;
+   vtab->SetFitsTol = SetFitsTol;
+   vtab->GetFitsTol = GetFitsTol;
    vtab->ClearPolyTan = ClearPolyTan;
    vtab->TestPolyTan = TestPolyTan;
    vtab->SetPolyTan = SetPolyTan;
    vtab->GetPolyTan = GetPolyTan;
+   vtab->ClearSipOK = ClearSipOK;
+   vtab->TestSipOK = TestSipOK;
+   vtab->SetSipOK = SetSipOK;
+   vtab->GetSipOK = GetSipOK;
    vtab->ClearIwc = ClearIwc;
    vtab->TestIwc = TestIwc;
    vtab->SetIwc = SetIwc;
@@ -17790,7 +18020,6 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
 *     FitsStore into the supplied FitsChan, using FITS-IRAF encoding.
 *
 *     IRAF encoding is like FITS-WCS encoding but with the following
-
 *     restrictions:
 *
 *     1) The celestial projection must not have any projection parameters
@@ -17999,7 +18228,7 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
          cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
          if( !cval ) return ret;
       }
-      if( !strcmp( cval + 4, "-TAB" ) ) return ret;
+      if( strlen(cval) > 4 && !strcmp( cval + 4, "-TAB" ) ) return ret;
       comm = GetItemC( &(store->ctype_com), i, 0, s, NULL, method, class, status );
       if( !comm ) {
          sprintf( combuf, "Type of co-ordinate on axis %d", i + 1 );
@@ -18246,7 +18475,7 @@ static int IsMapLinear( AstMapping *smap, const double lbnd_in[],
    If so we cannot use them. In this case create new bounds. */
          } else {
             boxok = 1;
-            if( EQUAL( lbnd_out, ubnd_out ) ) {
+            if( astEQUAL( lbnd_out, ubnd_out ) ) {
                m = 0.5*( lbnd_out + ubnd_out );
                if( fabs( m ) > 1.0E-15 ) {
                   lbnd_out = 0.9*m;
@@ -18330,7 +18559,7 @@ static int IsMapLinear( AstMapping *smap, const double lbnd_in[],
             }
 
 /* Ignore input axes which are independant of the output axis. */
-            if( !EQUAL( in_lbnd, in_ubnd ) ) {
+            if( !astEQUAL( in_lbnd, in_ubnd ) ) {
 
 /* Calculate the constants "input coord = m*output coord + c" */
                d = ss*ss - sn*ss2;
@@ -18956,8 +19185,8 @@ static AstMapping *IsMapTab2D( AstMapping *map, double scale, const char *unit,
    AstMapping *ret;        /* Returned WCS axis Mapping */
    AstMapping *tmap;
    AstPermMap *pm;
-   int *pix_axes;          /* Zero-based indicies of corresponding pixel axes */
-   int wcs_axes[ 2 ];      /* Zero-based indicies of selected WCS axes */
+   int *pix_axes;          /* Zero-based indices of corresponding pixel axes */
+   int wcs_axes[ 2 ];      /* Zero-based indices of selected WCS axes */
    int inperm[ 1 ];
    int outperm[ 2 ];
 
@@ -19113,8 +19342,8 @@ static int IsAIPSSpectral( const char *ctype, char **wctype, char **wspecsys, in
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
-/* If the length of the string is not 8, then it is not an AIPS spectral axis. */
-   if( strlen( ctype ) == 8 ) {
+/* If the used length of the string is not 8, then it is not an AIPS spectral axis. */
+   if( astChrLen( ctype ) == 8 ) {
 
 /* Translate AIPS spectral CTYPE values to FITS-WCS paper III equivalents.
    These are of the form AAAA-BBB, where "AAAA" can be "FREQ", "VELO" (=VRAD!)
@@ -19129,19 +19358,17 @@ static int IsAIPSSpectral( const char *ctype, char **wctype, char **wspecsys, in
       } else if( !strncmp( ctype, "WAVELENG", 8 ) ){
          *wctype = "WAVE    ";
       }
-      if( !strcmp( ctype + 4, "-LSR" ) ){
+      if( !strncmp( ctype + 4, "-LSR", 4 ) ){
          *wspecsys = "LSRK";
-      } else if( !strcmp( ctype + 4, "LSRK" ) ){
+      } else if( !strncmp( ctype + 4, "LSRK", 4 ) ){
          *wspecsys = "LSRK";
-      } else if( !strcmp( ctype + 4, "-LSRK" ) ){
-         *wspecsys = "LSRK";
-      } else if( !strcmp( ctype + 4, "-LSD" ) ){
+      } else if( !strncmp( ctype + 4, "-LSD", 4 ) ){
          *wspecsys = "LSRD";
-      } else if( !strcmp( ctype + 4, "-HEL" ) ){
+      } else if( !strncmp( ctype + 4, "-HEL", 4 ) ){
          *wspecsys = "BARYCENT";
-      } else if( !strcmp( ctype + 4, "-EAR" ) || !strcmp( ctype + 4, "-GEO" ) ){
+      } else if( !strncmp( ctype + 4, "-EAR", 4 ) || !strncmp( ctype + 4, "-GEO", 4 ) ){
          *wspecsys = "GEOCENTR";
-      } else if( !strcmp( ctype + 4, "-OBS" ) || !strcmp( ctype + 4, "-TOP" ) ){
+      } else if( !strncmp( ctype + 4, "-OBS", 4 ) || !strncmp( ctype + 4, "-TOP", 4 ) ){
          *wspecsys = "TOPOCENT";
       }
       if( *wctype && *wspecsys ) {
@@ -19617,8 +19844,8 @@ static AstMapping *LogWcs( FitsStore *store, int i, char s,
 
 /* Local Variables: */
    AstMapping *ret;
-   char forexp[ 12 + DBL_DIG*2 ];
-   char invexp[ 12 + DBL_DIG*2 ];
+   char forexp[ 12 + AST__DBL_WIDTH*2 ];
+   char invexp[ 12 + AST__DBL_WIDTH*2 ];
    const char *fexps[ 1 ];
    const char *iexps[ 1 ];
    double crv;
@@ -19633,8 +19860,8 @@ static AstMapping *LogWcs( FitsStore *store, int i, char s,
 
 /* Create the MathMap, if possible. */
    if( crv != 0.0 ) {
-      sprintf( forexp, "s=%.*g*exp(w/%.*g)", DBL_DIG, crv, DBL_DIG, crv );
-      sprintf( invexp, "w=%.*g*log(s/%.*g)", DBL_DIG, crv, DBL_DIG, crv );
+      sprintf( forexp, "s=%.*g*exp(w/%.*g)", AST__DBL_DIG, crv, AST__DBL_DIG, crv );
+      sprintf( invexp, "w=%.*g*log(s/%.*g)", AST__DBL_DIG, crv, AST__DBL_DIG, crv );
       fexps[ 0 ] = forexp;
       iexps[ 0 ] = invexp;
       ret = (AstMapping *) astMathMap( 1, 1, 1, fexps, 1, iexps, "simpfi=1,simpif=1", status );
@@ -20049,7 +20276,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 
 *     Currently, this function does the following:
 *
-*     - if the WCS Frame contains a spectral axis with a defined celestial
+*     - if the WCS Frame contains a 1D spectral Frame with a defined celestial
 *     reference position (SpecFrame attributes RefRA and RefDec), then
 *     it ensures that the WCS Frame also contains a pair of celestial
 *     axes (such axes are added if they do not already exist within the
@@ -20065,6 +20292,9 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 *
 *     - NULL is returned if the WCS Frame contains more than one pair of
 *     celestial axes.
+*
+*     - Any isolated sky axes (i.e. not contained within a SkyFrame) are
+*     re-mapped from radians into degrees.
 
 *  Parameters:
 *     this
@@ -20106,10 +20336,13 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
    AstMapping *map1;       /* Pointer to pre-WcsMap Mapping */
    AstMapping *map3;       /* Pointer to post-WcsMap Mapping */
    AstMapping *map;        /* Pointer to the pixel->wcs Mapping */
+   AstMapping *remap;      /* Total Mapping from internal to external units */
+   AstMapping *smap;       /* Simplified Mapping */
    AstMapping *tmap0;      /* Pointer to a temporary Mapping */
    AstMapping *tmap1;      /* Pointer to a temporary Mapping */
    AstMapping *tmap2;      /* Pointer to a temporary Mapping */
    AstMapping *tmap;       /* Pointer to a temporary Mapping */
+   AstMapping *umap;       /* 1D Mapping from internal to external units */
    AstSpecFrame *skyfrm;   /* Pointer to the SkyFrame within WCS Frame */
    AstSpecFrame *specfrm;  /* Pointer to the SpecFrame within WCS Frame */
    AstWcsMap *map2;        /* Pointer to WcsMap */
@@ -20117,6 +20350,8 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
    char equinox_attr[ 13 ];/* Name of Equinox attribute for sky axes */
    char system_attr[ 12 ]; /* Name of System attribute for sky axes */
    const char *eqn;        /* Pointer to original sky Equinox value */
+   const char *extunit;    /* External units string */
+   const char *intunit;    /* Internal units string */
    const char *skysys;     /* Pointer to original sky System value */
    double con;             /* Constant axis value */
    double reflat;          /* Celestial latitude at reference point */
@@ -20130,6 +20365,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
    int nwcs;               /* Number of WCS axes */
    int ok;                 /* Is the supplied FrameSet usable? */
    int paxis;              /* Axis index within the primary Frame */
+   int rep;                /* Was error reporting switched on? */
 
 /* Initialise */
    ret = NULL;
@@ -20153,6 +20389,8 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
    nwcs = astGetNaxes( wcsfrm );
 
 /* Search the WCS Frame for SkyFrames and SpecFrames. */
+   umap = NULL;
+   remap = NULL;
    specfrm = NULL;
    skyfrm = NULL;
    ok = 1;
@@ -20174,7 +20412,7 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 
 /* If the current axis is a SkyFrame, save a pointer to it, and its WCS
    index. If we have already found a different SkyFrame, abort. */
-      } else if( astIsASkyFrame( pframe ) ) {
+      } else if( IsASkyFrame( pframe ) ) {
          if( skyfrm ) {
             if( pframe != (AstFrame *) skyfrm ) {
                ok = 0;
@@ -20188,11 +20426,72 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
          } else {
             ilat = iax;
          }
+
+/* If the internal and external units differ, attempt to remap the axis
+   into its external units. */
+      } else {
+
+/* Get the string describing the external units (the "Unit" attribute). */
+         extunit = astGetUnit( pframe, paxis );
+
+/* Get the string describing the internal units (the "InternalUnit"
+   attribute). */
+         intunit = astGetInternalUnit( pframe, paxis );
+
+/* If they are the same, we do not need to modify this axis. */
+         if( astOK && strcmp( extunit, intunit ) ){
+
+/* Otherwise, get the mapping from the internal units to the external
+   units, if possible. Ignore any error reported by unitmapper. */
+            rep = astReporting( 0 );
+            umap = astUnitMapper( intunit, extunit, NULL, NULL );
+            if( !astOK ) astClearStatus;
+            astReporting( rep );
+
+            if( !umap ) {
+
+/* If the above failed, ensure that the external units are the same as
+   the internal units (except that internal radians are converted to
+   external degrees). */
+               if( !strcmp( intunit, "rad" ) ) {
+                  umap = (AstMapping *) astZoomMap( 1, AST__DR2D, " ", status );
+                  extunit = "deg";
+               } else {
+                  extunit = intunit;
+               }
+
+               astSetUnit( wcsfrm, iax, extunit );
+            }
+         }
+      }
+
+/* If no change is needed for the mapping for this axis, use a UnitMap. */
+      if( !umap ) umap = (AstMapping *) astUnitMap( 1, " ", status );
+
+/* Extend the parallel CmpMap to encompass the current axis. */
+      if( remap ) {
+         tmap = (AstMapping *) astCmpMap( remap, umap, 0, " ", status );
+         (void) astAnnul( remap );
+         remap = tmap;
+      } else {
+         remap = astClone( umap );
       }
 
 /* Free resources. */
+      umap = astAnnul( umap );
       pframe = astAnnul( pframe );
    }
+
+/* See if the pixel->wcs mapping needs to be modified to take account of
+   any changes to axis units. */
+   smap = astSimplify( remap );
+   if( ! astIsAUnitMap( smap ) ) {
+      tmap = (AstMapping *) astCmpMap( map, remap, 1, " ", status );
+      (void) astAnnul( map );
+      map = tmap;
+   }
+   remap = astAnnul( remap );
+   smap = astAnnul( smap );
 
 /* If the supplied FrameSet is usable... */
    if( ok ) {
@@ -20208,8 +20507,12 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 
 /* Check that both the RefRA and RefDec attributes of the SpecFrame are set.
    If not, return a FrameSet made from the base and current Frames in the
-   supplied FrameSet.*/
-         if( !astTestRefRA( specfrm ) || !astTestRefDec( specfrm ) ) {
+   supplied FrameSet. Also do this if the original WCS Frame contains 3
+   or more axes (since it is almost always inappropriate to add extra sky
+   axes in such circumestances). But if the other axes form a skyfram,
+   then we need to make sure they use the right refrence point. */
+         if( !astTestRefRA( specfrm ) || !astTestRefDec( specfrm ) ||
+             ( nwcs > 2 && !skyfrm ) ) {
             ret = astFrameSet( pixfrm, "", status );
             astAddFrame( ret, AST__BASE, map, wcsfrm );
 
@@ -20232,13 +20535,13 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
                astPutFits( fc, "CTYPE2  = 'DEC--TAN'", 0 );
                astPutFits( fc, "RADESYS = 'FK5'", 0 );
                astPutFits( fc, "EQUINOX = 2000.0", 0 );
-               sprintf( card, "CRVAL1  = %.*g", DBL_DIG,
+               sprintf( card, "CRVAL1  = %.*g", AST__DBL_DIG,
                         AST__DR2D*astGetRefRA( specfrm ) );
                astPutFits( fc, card, 0 );
-               sprintf( card, "CRVAL2  = %.*g", DBL_DIG,
+               sprintf( card, "CRVAL2  = %.*g", AST__DBL_DIG,
                         AST__DR2D*astGetRefDec( specfrm ) );
                astPutFits( fc, card, 0 );
-               sprintf( card, "MJD-OBS = %.*g", DBL_DIG,
+               sprintf( card, "MJD-OBS = %.*g", AST__DBL_DIG,
                         TDBConv( astGetEpoch( specfrm ), AST__UTC, 1,
                                  "astWrite", "FitsChan", status ) );
                astPutFits( fc, card, 0 );
@@ -20337,9 +20640,12 @@ static AstFrameSet *MakeFitsFrameSet( AstFitsChan *this, AstFrameSet *fset,
 /* Use reflon and reflat (which represent FK5 J2000 RA and Dec) to set
    the values of the SpecFrame RefRA and RefDec attributes. Format the
    values first so that we can use the FrameSet astSetC method, and so
-   maintain the FrameSet integrity. */
-                     astSetC( tfs, "RefRA", astFormat( wcsfrm, ilon, reflon ) );
-                     astSetC( tfs, "RefDec", astFormat( wcsfrm, ilat, reflat ) );
+   maintain the FrameSet integrity. Use "tfs" rather than "wcsfrm" when
+   calling astFormat, as "wcsfrm" is not affected by the above change
+   to the current frame of "tfs" (i.e. astAddFrame takes a deep copy of the
+   supplied Frame). */
+                     astSetC( tfs, "RefRA", astFormat( tfs, ilon, reflon ) );
+                     astSetC( tfs, "RefDec", astFormat( tfs, ilat, reflat ) );
 
 /* If succesfull, return a pointer to the FrameSet. */
                      if( astOK ) ret = astClone( tfs );
@@ -20545,8 +20851,9 @@ static void MakeIntoComment( AstFitsChan *this, const char *method,
 }
 
 static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
-                         FitsStore *store, double *dim,
-                         const char *method, const char *class, int *status ){
+                         FitsStore *store, double *dim, double fitstol,
+                         int sipok, const char *method, const char *class,
+                         int *status ){
 /*
 *  Name:
 *     MakeIntWorld
@@ -20561,8 +20868,9 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
 *  Synopsis:
 *     #include "fitschan.h"
 *     int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
-*                       FitsStore *store, double *dim,
-*                       const char *method, const char *class, int *status )
+*                       FitsStore *store, double *dim, double fitstol,
+*                       int sipok, const char *method, const char *class,
+*                       int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -20572,8 +20880,11 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
 *     the transformation from grid (pixel) coords to intermediate world
 *     coords. The values added to the FitsStore correspond to the CRPIXj,
 *     PCi_j, CDELTi and WCSAXES keywords, and are determined by examining the
-*     suppliedMapping, which must be linear with an optional shift of
-*     origin (otherwise a value of zero is returned).
+*     supplied Mapping, which must be linear with an optional shift of
+*     origin, otherwise a value of zero is returned. The exception to
+*     this rule is that if the Mapping contains a PolyMap, and the "sipok"
+*     argument is non-zero, an attempt is made to create a set of SIP
+*     headers to describe the non-linear transformation.
 *
 *     Much of the complication in the algorithm arises from the need to
 *     support cases where the supplied Mapping has more outputs than
@@ -20608,6 +20919,13 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
 *     dim
 *        An array holding the image dimensions in pixels. AST__BAD can be
 *        supplied for any unknwon dimensions.
+*     fitstol
+*        The maximum departure from linearity that can be introduced by
+*        "cmap" on any axis for it to be considered linear. Expressed as
+*        a fraction of a grid pixel.
+*     sipok
+*        Flag indicating if SIP headers should be produced if there is
+*        a suitable PolyMap in the Mapping chain.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -20629,49 +20947,56 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    AstFrame *pfrm;
    AstFrame *sfrm;
    AstMapping *map;
-   AstPointSet *psetw;
+   AstMapping *sipmap;
    AstPointSet *psetg;
+   AstPointSet *psetw;
    double **fullmat;
    double **partmat;
-   double **ptrg;
    double **ptrw;
+   double **ptrg;
    double *c;
    double *cdelt;
    double *cdmat;
    double *colvec;
    double *d;
-   double *g;
    double *g0;
+   double *g;
    double *m;
    double *mat;
    double *tol;
    double *w0;
    double *y;
    double cd;
+   double cd_sip[4];
    double crp;
+   double crpix_sip[2];
    double crv;
    double cv;
    double det;
    double err;
    double k;
    double mxcv;
-   double skydiag1;
    double skydiag0;
+   double skydiag1;
    double val;
    int *iw;
    int *lin;
    int *pperm;
    int *skycol;
+   int havesip;
    int i;
    int ii;
    int j;
    int jax;
    int jj;
+   int lonax;
+   int latax;
    int nin;
    int nout;
    int nwcs;
    int paxis;
    int ret;
+   int sipax[2];
    int sing;
    int skycol0;
    int skycol1;
@@ -20682,15 +21007,53 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
+/* Get the number of inputs and outputs for the Mapping. Return if the
+   number of outputs is smaller than the number of inputs. */
+   nin = astGetNin( cmap );
+   nout = astGetNout( cmap );
+   if( nout < nin ) return ret;
+
 /* Simplify the supplied Mapping to reduce rounding errors when
    transforming points. */
    map = astSimplify( cmap );
 
-/* Get the number of inputs and outputs for the Mapping. Return if the
-   number of outputs is smaller than the number of inputs. */
-   nin = astGetNin( map );
-   nout = astGetNout( map );
-   if( nout < nin ) return ret;
+/* See if the WCS Frame contains a SkyFrame, and if so get the indices of
+   the Mapping outputs that correspond to the longitude and latitude
+   axes. */
+   lonax = -1;
+   latax = -1;
+   for( i = 0; i < nout; i++ ) {
+      astPrimaryFrame( fr, i, &pfrm, &paxis );
+      if( astIsASkyFrame( pfrm ) ) {
+         if( paxis == 0 ) {
+            lonax = i;
+         } else {
+            latax = i;
+         }
+      }
+      pfrm = astAnnul( pfrm );
+   }
+
+/* If there is a pair of celestial axes in the WCS Frame, and if the
+   celestial axes can be described using SIP distortion, then put the
+   headers describing the SIP distortion into the FitsStore. This also
+   returns the CRPIX and CD values to use with the celestial axes. */
+   havesip = 0;
+   if( sipok && lonax != -1 ){
+      sipmap = SIPIntWorld( map, fitstol, lonax, latax, s, store, dim, sipax,
+                            crpix_sip, cd_sip, method, class, status );
+
+/* If SIP headers were stored successfully, use the modified mapping from
+   now on. This is the same as "map" but does not include the PolyMap
+   from which the SIP headers were determined. This is done so that he
+   PolyMap does not break the linearity test performed below in order to
+   determine CRPIX and CD values for any other non-celestial axes. */
+      if( sipmap ) {
+         (void) astAnnul( map );
+         map = sipmap;
+         havesip = 1;
+      }
+   }
 
 /* Note the number of final World Coordinate axes (not necessarily the
    same as "nout", since some intermediate axes may be discarded by a
@@ -20745,15 +21108,15 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
       for( j = 0; j < nout; j++ ) {
          w0[ j ] = ptrw[ j ][ 0 ];
 
-/* Find the tolerance for positions on the j'th IWC axis. This is one
-   hundredth of the largest change in the j'th IWC axis value caused by
-   moving out 1 pixel along any grid axis. */
+/* Find the tolerance for positions on the j'th IWC axis. This is a
+   fraction "fitstol" of the largest change in the j'th IWC axis value
+   caused by moving out 1 pixel along any grid axis. */
          tol[ j ] = 0.0;
          for( i = 0; i < nin; i++ ) {
             err = fabs( ptrw[ j ][ i + 1 ] - w0[ j ] );
             if( err > tol[ j ] ) tol[ j ] = err;
          }
-         tol[ j ] *= 0.01;
+         tol[ j ] *= fitstol;
 
 /* If the tolerance is zero (e.g. as is produced for degenerate axes),
    then use a tolerance equal to a very small fraction of hte degenerate
@@ -20791,6 +21154,15 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          }
       }
 
+/* If we are using SIP distortion, replace the values for the celestial
+   axes found above with the values found by SIPIntWorld. */
+      if( havesip ) {
+         partmat[ sipax[0] ][ lonax ] = cd_sip[ 0 ];
+         partmat[ sipax[1] ][ lonax ] = cd_sip[ 1 ];
+         partmat[ sipax[0] ][ latax ] = cd_sip[ 2 ];
+         partmat[ sipax[1] ][ latax ] = cd_sip[ 3 ];
+      }
+
 /* If the number of outputs for "map" is larger than the number of inputs,
    then we will still be missing some column vectors for the CDi_j matrix
    (which has to be square). We invent these such that the they are
@@ -20824,7 +21196,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          for( i = 0; i < nout; i++ ) {
             pperm[ wperm[ i ] ] = i;
             astPrimaryFrame( fr, i, &pfrm, &paxis );
-            if( astIsASkyFrame( pfrm ) ) {
+            if( IsASkyFrame( pfrm ) ) {
                skycol[ wperm[ i ] ] = paxis + 1;
                lin[ i ] = 0;
                if( !sfrm ) {
@@ -20876,9 +21248,18 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
             colvec = fullmat[ j ];
 
 /* Get the CRPIX values from the "y" vector created above by palDmat.
-   First deal with axes for which there are Mapping inputs. */
+   First deal with axes for which there are Mapping inputs. If we are
+   using SIP distortion, replace the crpix values for the celestial
+   axes found above with the values found by SIPIntWorld. */
             if( j < nin ) {
                crp = g0[ j ] - y[ j ];
+               if( havesip ) {
+                  if( j == sipax[0] ){
+                     crp = crpix_sip[0];
+                  } else if( j == sipax[1] ){
+                     crp = crpix_sip[1];
+                  }
+               }
 
 /* If this is a grid axis which has been created to represent a "missing"
    input to the mapping, we need to add on 1.0 to the crpix value found
@@ -20894,7 +21275,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    converted later to the corresponding PC and CDELT values. */
             if( j < nin || crp == 0.0 ) {
                for( i = 0; i < nout; i++ ) {
-                  cdmat[ wperm[ i ]*nout+j ] = colvec[ i ] ;
+                  cdmat[ wperm[ i ]*nout+j ] = colvec[ i ];
                }
                SetItem( &(store->crpix), 0, j, s, crp, status );
 
@@ -20945,7 +21326,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
                      jj = wperm[ i ];
                      if( jj < nin ) {
                         cv = fullmat[ jj ][ ii ];
-                        if( !EQUAL( colvec[ i ], 0.0 ) && fabs( cv ) > mxcv ) {
+                        if( !astEQUAL( colvec[ i ], 0.0 ) && fabs( cv ) > mxcv ) {
                            mxcv = fabs( cv );
                            k = -cv/colvec[ i ];
                         }
@@ -20994,7 +21375,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    and find which one it is. */
                jax = -1;
                for( j = 0; j < nout; j++ ) {
-                  if( !EQUAL( fullmat[ j ][ i ], 0.0 ) ) {
+                  if( !astEQUAL( fullmat[ j ][ i ], 0.0 ) ) {
                      if( jax == -1 ) {
                         jax = j;
                      } else {
@@ -21011,7 +21392,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    currently being considered. */
                   for( ii = 0; ii < nout; ii++ ) {
                      if( ii != i ) {
-                        if( !EQUAL( fullmat[ jax ][ ii ], 0.0 ) ) {
+                        if( !astEQUAL( fullmat[ jax ][ ii ], 0.0 ) ) {
                            jax = -1;
                            break;
                         }
@@ -21053,9 +21434,9 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          for( j = 0; j < nout; j++ ){
             val = *(c++);
             if( i == j ){
-               if( EQUAL( val, 1.0 ) ) val = AST__BAD;
+               if( astEQUAL( val, 1.0 ) ) val = AST__BAD;
             } else {
-               if( EQUAL( val, 0.0 ) ) val = AST__BAD;
+               if( astEQUAL( val, 0.0 ) ) val = AST__BAD;
             }
             if( val != AST__BAD ) SetItem( &(store->pc), i, j, s, val, status );
          }
@@ -21973,7 +22354,7 @@ static double NearestPix( AstMapping *map, double val, int axis, int *status ){
    double **ptr1;          /* Pointer to data in pset1 */
    double **ptr2;          /* Pointer to data in pset2 */
    double result;          /* Returned value */
-   int *ins;               /* Array holding input axis indicies */
+   int *ins;               /* Array holding input axis indices */
    int i;                  /* Loop count */
    int nin;                /* Number of Mapping inputs */
    int nout;               /* Number of Mapping outputs */
@@ -23001,6 +23382,7 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 
 /* See if the axis is linear. If so, create a ShiftMap which subtracts off
    the CRVAL value. */
+
             if( IsMapLinear( map, lbnd_p, ubnd_p, iax, status ) ) {
                crval = -crval;
                tmap0 = (AstMapping *) astShiftMap( 1, &crval, "", status );
@@ -23275,6 +23657,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    int m;              /* Parameter index */
    int maxm;           /* Upper limit on m */
    int naxis;          /* No. of axes */
+   int nc;             /* Length of string */
    int ok;             /* Frame written out succesfully? */
    int prj;            /* Projection type */
    int ret;            /* Returned value. */
@@ -23348,9 +23731,9 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 /* Set the element bad if it takes its default value. */
                   val = *(c++);
                   if( i == j ){
-                     if( EQUAL( val, 1.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 1.0 ) ) val = AST__BAD;
                   } else {
-                     if( EQUAL( val, 0.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 0.0 ) ) val = AST__BAD;
                   }
 
 /* Only store elements which do not take their default values. */
@@ -23371,7 +23754,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
                d = primpc;
                for( i = 0; i < naxis; i++ ){
                   for( j = 0; j < naxis; j++ ){
-                     if( !EQUAL( *c, *d ) ){
+                     if( !astEQUAL( *c, *d ) ){
                         ok = 0;
                      } else {
                         c++;
@@ -23443,7 +23826,8 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    ------ */
       for( i = 0; i < naxis; i++ ){
          cval = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
-         if( !cval || !strcmp( cval + 4, "-TAB" ) ) {
+         nc = strlen( cval );
+         if( !cval || ( nc > 4 && !strcmp( cval + 4, "-TAB" ) ) ) {
             ok = 0;
             goto next;
          }
@@ -23460,9 +23844,9 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 
 /* FITS-PC cannot handle celestial axes of type "xxLT" or "xxLN".
    Neither can it handle the "-TAB". */
-         if( !strncmp( cval + 2, "LT-", 3 ) ||
-             !strncmp( cval + 2, "LN-", 3 ) ||
-             !strncmp( cval + 4, "-TAB", 4 ) ){
+         if( ( nc > 2 && !strncmp( cval + 2, "LT-", 3 ) ) ||
+             ( nc > 2 && !strncmp( cval + 2, "LN-", 3 ) ) ||
+             ( nc > 4 && !strncmp( cval + 4, "-TAB", 4 ) ) ){
             ok = 0;
             goto next;
          }
@@ -23529,7 +23913,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
          primeq = val;
          if( val != AST__BAD ) SetValue( this, "EQUINOX", &val, AST__FLOAT,
                                          "Epoch of reference equinox", status );
-      } else if( !EQUAL( val, primeq ) ){
+      } else if( !astEQUAL( val, primeq ) ){
          ok = 0;
          goto next;
       }
@@ -23594,7 +23978,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
             SetValue( this, "DATE-OBS", &cval, AST__STRING,
                       "Date of observation", status );
          }
-      } else if( !EQUAL( val, primdt ) ){
+      } else if( !astEQUAL( val, primdt ) ){
          ok = 0;
          goto next;
       }
@@ -23636,7 +24020,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
                      if( i == axlat && m < 10 ) primpv[m] = val;
                   } else {
                      if( ( ( i != axlat || m >= 10 ) && val != AST__BAD ) ||
-                         ( i == axlat && m < 10 && !EQUAL( val, primpv[m] ) ) ){
+                         ( i == axlat && m < 10 && !astEQUAL( val, primpv[m] ) ) ){
                         ok = 0;
                         goto next;
                      }
@@ -24088,7 +24472,7 @@ f        The global status.
 /* Split the supplied card up into name, value and commment strings, and
    get pointers to local copies of them. The data type associated with the
    keyword is returned. */
-   type = Split( card, &name, &value, &comment, method, class, status );
+   type = Split( this, card, &name, &value, &comment, method, class, status );
 
 /* Check that the pointers can be used. */
    if( astOK ){
@@ -25298,12 +25682,15 @@ static void RoundFString( char *text, int width, int *status ){
       }
    }
 
-/* Right justify the returned string in the original field width. */
-   end = text + len;
-   c = text + strlen( text );
-   if( c != end ) {
-      while( c >= text ) *(end--) = *(c--);
-      while( end >= text ) *(end--) = ' ';
+/* If a minimum field width has been given, right justify the returned
+   string in the original field width. */
+   if( width ) {
+      end = text + len;
+      c = text + strlen( text );
+      if( c != end ) {
+         while( c >= text ) *(end--) = *(c--);
+         while( end >= text ) *(end--) = ' ';
+      }
    }
 
 /* If a minimum field width was given, shunt the text to the left in
@@ -25780,6 +26167,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* Local Variables: */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    const char *class;            /* Object class */
+   double dval;                  /* Double attribute value */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
@@ -25887,12 +26275,33 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         && ( nc >= len ) ) {
       astSetCarLin( this, ival );
 
+/* SipReplace */
+/* ---------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "sipreplace= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSipReplace( this, ival );
+
+/* FitsTol. */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "fitstol= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetFitsTol( this, dval );
+
 /* PolyTan */
 /* ------- */
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "polytan= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetPolyTan( this, ival );
+
+/* SipOK */
+/* ------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "sipok= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSipOK( this, ival );
 
 /* Iwc */
 /* --- */
@@ -26964,8 +27373,556 @@ static void SinkWrap( void (* sink)( const char * ), const char *line, int *stat
    ( *sink )( line );
 }
 
-static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
-                               int naxes, const char *method,
+static AstMapping *SIPIntWorld( AstMapping *map, double tol, int lonax,
+                                int latax, char s, FitsStore *store, double *dim,
+                                int inaxes[2], double crpix[2], double cd[4],
+                                const char *method, const char *class,
+                                int *status ){
+/*
+*  Name:
+*     SIPIntWorld
+
+*  Purpose:
+*     Create FITS header values which map grid into intermediate world
+*     coords for celestial axes that include SIP distortion.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     AstMapping *SIPIntWorld( AstMapping *map, double tol, int lonax,
+*                              int latax, char s, FitsStore *store, double *dim,
+*                              int inaxes[2], double crpix[2], double cd[4],
+*                              const char *method, const char *class,
+*                              int *status )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function finds and returns values for the CRPIX and CDi_j
+*     keywords for sky axes that can be described using the SIP
+*     distortion scheme. These values are determined by examining the
+*     supplied pixel->IWCS Mapping. Values for SIP headers are also stored
+*     in the supplied FitsSTore.
+*
+*     The celestial axes are first identified and the supplied Mapping
+*     split to create a (2-in,2-out) Mapping that describes them. This
+*     Mapping is then searched for a PolyMap. If found, the Mapping prior
+*     to the PolyMap is checked to ensure it is a simple shift of origin.
+*     The Mapping following the PolyMap is checked to ensure it is a
+*     linear transformation with no shift of origin. The PolyMap itself
+*     is checked to see if it conforms to the requirements of the SIP
+*     conventions. If any of these conditions are not met, NULL is
+*     returned as the function value. Otherwise, CRPIX values are created
+*     from the Mapping prior to the PolyMap, and CDi_j values from the
+*     Mapping following the PolyMap. The keywords describing the SIP
+*     distortion itself (the PolyMap) are stored in the supplied FitsStore.
+*     A Mapping is retuned that is identical to the supplied Mapping but
+*     without the PolyMap.
+
+*  Parameters:
+*     map
+*        A pointer to a Mapping which transforms grid coordinates into
+*        intermediate world coordinates.
+*     tol
+*        The tolerance, in pixels, used to determine if the pre-PolyMap and
+*        post-PolyMap Mappings are sufficiently linear.
+*     lonax
+*        The zero-based index of the output of "map" corresponding to
+*        celestial longitude.
+*     latax
+*        The zero-based index of the output of "map" corresponding to
+*        celestial latitude.
+*     s
+*        The co-ordinate version character. A space means the primary
+*        axis descriptions. Otherwise the supplied character should be
+*        an upper case alphabetical character ('A' to 'Z').
+*     store
+*        A pointer to the FitsStore into which the calculated SIP headers
+*        are stored.
+*     dim
+*        An array holding the image dimensions in pixels. AST__BAD can be
+*        supplied for any unknown dimensions, in which case a default
+*        value of 1000 pixel is used..
+*     inaxes
+*        Returned holding the indices of the two Mapping inputs that generate
+*        the returned "crpix" and "cd" values.
+*     crpix
+*        If SIP headers are stored successfully in the FitsStore, then
+*        this array is returned holding the CRPIX values. The first
+*        element refers to the Mapping input given by the first element
+*        of "inaxes". The second element refers to the Mapping input given
+*        by the second element of "inaxes".
+*     cd
+*        If SIP headers are stored successfully in the FitsStore, then
+*        this array is returned holding the CD values in the order
+*        (CDlonax_j1,CDlonax_j2,CDlatax_j1,CDlatax_j2). Where "lonax" and
+*        "latax" are the indices of the lon and lat Mapping outputs
+*        (note, these may be different to the corresponding FITS "i" axis
+*        indices), and "j1" and "j2" are the indices of the Mapping inputs
+*        returned in "inaxes" (i.e. j1 = inaxes[0] and j2 = inaxes[1]).
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A Mapping is returned if SIP headers have been stored in the
+*     FitsStore successfully. NULL is returned otherwise. The returned
+*     Mapping is a copy of the supplied mapping "map", but without the
+*     PolyMap.
+
+*  Notes:
+*     -  NULL is returned if an error occurs.
+*/
+
+/* Local Variables: */
+   AstMapping **map_list;
+   AstMapping *map_upper;
+   AstMapping *map_lower;
+   AstMapping *result;
+   AstMapping *smap;
+   AstMapping *tmap;
+   AstMapping *tmap2;
+   AstMapping *tmap1;
+   AstPolyMap *polymap;
+   AstPermMap *pm;
+   const char *cval;
+   char buf[30];
+   double ****item;
+   double *coeffs;
+   double *pc;
+   double fit[ 6 ];
+   double iwcxin;
+   double iwcyin;
+   double lbnd[ 2 ];
+   double ubnd[ 2 ];
+   double val;
+   int *inax1;
+   int *inax2;
+   int *inperm1;
+   int *inperm2;
+   int *invert_list;
+   int *outperm1;
+   int *outperm2;
+   int *outrem;
+   int fwd;
+   int i;
+   int icoeff;
+   int iin;
+   int imap;
+   int imap_pm;
+   int iout;
+   int ioutrem;
+   int jm;
+   int ncoeff;
+   int nin;
+   int nmap;
+   int nout;
+   int noutrem;
+   int ok;
+   int old_invert;
+   int outax[ 2 ];
+   int aimax;
+   int ajmmax;
+   int bimax;
+   int bjmmax;
+
+/* Initialise */
+   result = NULL;
+
+/* Check the inherited status. */
+   if( !astOK ) return result;
+
+/* Get the number of inputs and outputs for the Mapping. */
+   nin = astGetNin( map );
+   nout = astGetNin( map );
+
+/* Check both transformations are defined in the supplied Mapping. */
+   if( astGetTranForward( map ) && astGetTranInverse( map ) ) {
+
+/* Attempt to split the supplied Mapping to generate a (2-input,2-output)
+   Mapping that goes from grid coords to celestial longitude and latitude.
+   Since we want to specify the retained output, we need to invert the
+   Mapping, because astMapSplit only allows us to specify the retained
+   inputs. */
+      astInvert( map );
+      outax[ 0 ] = lonax;
+      outax[ 1 ] = latax;
+      inax1 = astMapSplit( map, 2, outax, &tmap1 );
+      astInvert( map );
+
+/* Check the Mapping could be split, and that the mapping that generates
+   lonax/latax has exactly two inputs (use the NBout attribute since
+   "tmap1" is inverted). Then invert "tmap1" so that it is in the same
+   direction as the supplied mapping. */
+      if( inax1 && tmap1 && astGetNout( tmap1 ) == 2 ) {
+         astInvert( tmap1 );
+         inaxes[ 0 ] = inax1[ 0 ];
+         inaxes[ 1 ] = inax1[ 1 ];
+
+/* Search this list of Mappings for a PolyMap. First simplify it, then
+   expand it as a list of Mappings in series. Then look through the list
+   for a PolyMap. */
+         polymap = NULL;
+         smap = astSimplify( tmap1 );
+         nmap = 0;
+         map_list = NULL;
+         invert_list = NULL;
+         (void) astMapList( smap, 1, astGetInvert(smap), &nmap, &map_list,
+                            &invert_list );
+         for( imap = 0; imap < nmap; imap++ ) {
+            if( astIsAPolyMap( map_list[ imap ] ) ) {
+               imap_pm = imap;
+               polymap = astCopy( map_list[ imap ] );
+               astSetInvert( polymap, invert_list[ imap ] );
+               break;
+            }
+         }
+
+/* If a PolyMap is found, check it conforms to the requirements of the
+   SIP convention. */
+         if( polymap ){
+            if( astGetNin( polymap ) == 2 && astGetNout( polymap ) == 2 ){
+
+/* Accumulate each Mapping before the PolyMap into a single CmpMap. */
+               map_lower = NULL;
+               for( imap = 0; imap < imap_pm; imap++ ) {
+                  old_invert = astGetInvert(  map_list[ imap ] );
+                  astSetInvert(  map_list[ imap ], invert_list[ imap ] );
+
+                  if( map_lower ) {
+                     tmap = (AstMapping *) astCmpMap( map_lower, map_list[ imap ], 1, " ", status );
+                     (void) astAnnul( map_lower );
+                     map_lower = tmap;
+                  } else {
+                     map_lower = astCopy( map_list[ imap ] );
+                  }
+
+                  astSetInvert(  map_list[ imap ], old_invert );
+               }
+
+/* Accumulate each Mapping after the PolyMap into a single CmpMap. */
+               map_upper = NULL;
+               for( imap = imap_pm + 1; imap < nmap; imap++ ) {
+                  old_invert = astGetInvert(  map_list[ imap ] );
+                  astSetInvert(  map_list[ imap ], invert_list[ imap ] );
+
+                  if( map_upper ) {
+                     tmap = (AstMapping *) astCmpMap( map_upper, map_list[ imap ], 1, " ", status );
+                     (void) astAnnul( map_upper );
+                     map_upper = tmap;
+                  } else {
+                     map_upper = astCopy( map_list[ imap ] );
+                  }
+
+                  astSetInvert(  map_list[ imap ], old_invert );
+               }
+
+/* Use UnitMaps if no Mappings were found. */
+               if( !map_lower ) map_lower = (AstMapping *) astUnitMap( 2, " ", status );
+               if( !map_upper ) map_upper = (AstMapping *) astUnitMap( 2, " ", status );
+
+/* Check that both Mappings have 2 inputs and 2 outputs */
+               ok = ( astGetNin( map_lower ) == 2 &&
+                      astGetNout( map_lower ) == 2 &&
+                      astGetNin( map_upper ) == 2 &&
+                      astGetNout( map_upper ) == 2 );
+
+/* Check that the lower Mapping is a shift of origin with no scaling or
+   rotation. */
+               if( ok ) {
+                  lbnd[ 0 ] = 0.0;
+                  lbnd[ 1 ] = 0.0;
+                  ubnd[ 0 ] = dim[ 0 ];
+                  ubnd[ 1 ] = dim[ 1 ];
+                  if( ubnd[ 0 ] == AST__BAD ) ubnd[ 0 ] = 1000.0;
+                  if( ubnd[ 1 ] == AST__BAD ) ubnd[ 1 ] = 1000.0;
+                  ok = astLinearApprox( map_lower, lbnd, ubnd, tol, fit );
+                  if( fabs( fit[ 2 ] - 1.0 ) > 1.0E-7  ||
+                      fabs( fit[ 3 ] ) > 1.0E-7 ||
+                      fabs( fit[ 4 ] ) > 1.0E-7 ||
+                      fabs( fit[ 5 ] - 1.0 ) > 1.0E-7  ) ok = 0;
+               }
+
+/* Check that the upper Mapping is a linear Mapping with no shift of origin.
+   Retain the fit coefficients for later use. */
+               if( ok ) {
+                  lbnd[ 0 ] = -ubnd[ 0 ];
+                  lbnd[ 1 ] = -ubnd[ 1 ];
+                  ok = astLinearApprox( map_upper, lbnd, ubnd, tol, fit );
+                  if( fabs( fit[ 0 ] ) > 1.0E-7 ||
+                      fabs( fit[ 1 ] ) > 1.0E-7 ) ok = 0;
+               }
+
+/* Split the supplied Mapping to generate the Mapping that gives
+   any remaining non-celestial output axes. We only need to do this if
+   the supplied Mapping has any surplus inputs or outputs. */
+               inax2 = NULL;
+               tmap2 = NULL;
+               outrem = NULL;
+
+               if( nout > 2 && ok ) {
+                  noutrem = nout - 2;
+                  outrem = astMalloc( noutrem*sizeof(int) );
+                  if( astOK ) {
+                     ioutrem = 0;
+                     for( iout = 0; iout < nout; iout++ ) {
+                        if( iout != lonax && iout != latax ) outrem[ ioutrem++ ] = iout;
+                     }
+
+                     astInvert( map );
+                     inax2 = astMapSplit( map, noutrem, outrem, &tmap2 );
+                     astInvert( map );
+                     if( tmap2 ) {
+                        astInvert( tmap2 );
+                     } else {
+                        ok = 0;
+                     }
+                  }
+
+               } else if( nout != 2 || nin != 2 ) {
+                  ok = 0;
+               }
+
+/* If the above tests were passed, transform the origin of IWC (the total map
+   output space) into grid coords. This gives CRPIX. */
+               if( ok ) {
+                  iwcxin = 0.0;
+                  iwcyin = 0.0;
+                  astTran2( smap, 1, &iwcxin, &iwcyin, 0, crpix, crpix + 1 );
+
+/* The "fit" array currently contains the coefficients of a linear
+   approximation to the upper Mapping. These give us the CD matrix.
+   Store the matrix elements in the required order. */
+                  cd[ 0 ] = fit[ 2 ];
+                  cd[ 1 ] = fit[ 3 ];
+                  cd[ 2 ] = fit[ 4 ];
+                  cd[ 3 ] = fit[ 5 ];
+
+/* Store SIP headers describing first the forward then the inverse
+   transformation of the PolyMap in the FitsStore. Note, the axis indices
+   returned by astPolyCoeffs are 1-based. */
+                  for( fwd = 1; fwd >= 0; fwd-- ) {
+                     if( ( fwd && astGetTranForward( polymap ) ) ||
+                         ( !fwd && astGetTranInverse( polymap ) ) ) {
+                        astPolyCoeffs( polymap, fwd, 0, NULL, &ncoeff );
+                        coeffs = astMalloc( 4*ncoeff*sizeof(*coeffs) );
+                        if( astOK ) {
+                           astPolyCoeffs( polymap, fwd, 4*ncoeff, coeffs, &ncoeff );
+
+/* Find the maximum used power on each input axis. */
+                           aimax = 0;
+                           ajmmax = 0;
+                           bimax = 0;
+                           bjmmax = 0;
+                           pc = coeffs;
+                           for( icoeff = 0; icoeff < ncoeff; icoeff++ ) {
+                              if( inaxes[ 0 ] < inaxes [ 1 ] ) {
+                                 i = (int) ( pc[ 2 ] + 0.5 );
+                                 jm = (int) ( pc[ 3 ] + 0.5 );
+                                 if( pc[ 1 ] == 1 ) {
+                                    if( i > aimax ) aimax = i;
+                                    if( jm > ajmmax ) ajmmax = jm;
+                                 } else {
+                                    if( i > bimax ) bimax = i;
+                                    if( jm > bjmmax ) bjmmax = jm;
+                                 }
+                              } else {
+                                 i = (int) ( pc[ 3 ] + 0.5 );
+                                 jm = (int) ( pc[ 2 ] + 0.5 );
+                                 if( pc[ 1 ] == 1 ) {
+                                    if( i > bimax ) bimax = i;
+                                    if( jm > bjmmax ) bjmmax = jm;
+                                 } else {
+                                    if( i > aimax ) aimax = i;
+                                    if( jm > ajmmax ) ajmmax = jm;
+                                 }
+                              }
+                              pc += 4;
+                           }
+
+/* Initialise the arrays with bad values so that unused powers are not
+   included in the header. */
+
+                           for( i = 0; i <= aimax; i++ ){
+                              for( jm = 0; jm <= ajmmax; jm++ ){
+                                 SetItem( fwd? &(store->asip) : &(store->apsip),
+                                          i, jm, s, AST__BAD, status );
+                              }
+                           }
+
+                           for( i = 0; i <= bimax; i++ ){
+                              for( jm = 0; jm <= bjmmax; jm++ ){
+                                 SetItem( fwd? &(store->bsip) : &(store->bpsip),
+                                          i, jm, s, AST__BAD, status );
+                              }
+                           }
+
+/* Over-write the bad values with real values for the powers that are
+   actually used. Reduce the coefficients of the linear terms by 1.0
+   since the SIP distortion is an additive correction, rather than a direct
+   transformation. */
+                           pc = coeffs;
+                           for( icoeff = 0; icoeff < ncoeff; icoeff++ ) {
+                              if( inaxes[ 0 ] < inaxes [ 1 ] ) {
+                                 if( pc[ 1 ] == 1 ) {
+                                    item = fwd ? &(store->asip) : &(store->apsip);
+                                 } else {
+                                    item = fwd ? &(store->bsip) : &(store->bpsip);
+                                 }
+                                 i = (int) ( pc[ 2 ] + 0.5 );
+                                 jm = (int) ( pc[ 3 ] + 0.5 );
+                              } else {
+                                 if( pc[ 1 ] == 1 ) {
+                                    item = fwd ? &(store->bsip) : &(store->bpsip);
+                                 } else {
+                                    item = fwd ? &(store->asip) : &(store->apsip);
+                                 }
+                                 i = (int) ( pc[ 3 ] + 0.5 );
+                                 jm = (int) ( pc[ 2 ] + 0.5 );
+                              }
+
+                              val = pc[ 0 ];
+                              if( ( pc[ 1 ] == 1 && i == 1 && jm == 0 ) ||
+                                  ( pc[ 1 ] == 2 && i == 0 && jm == 1 ) ){
+                                 val -= 1.0;
+                              }
+                              if( val != 0.0 && val != AST__BAD ) {
+                                 SetItem( item, i, jm, s, val, status );
+                              }
+                              pc += 4;
+                           }
+                        }
+                        coeffs = astFree( coeffs );
+                     }
+                  }
+
+/* Change the CTYPE value to indicate SIP distortion is in use. */
+                  cval = GetItemC( &(store->ctype), latax, 0, s, NULL, method,
+                                   class, status );
+                  if( cval ){
+                     strcpy( buf, cval );
+                     strcpy( buf + 8, "-SIP" );
+                     SetItemC( &(store->ctype), latax, 0, s, buf, status );
+                  }
+
+                  cval = GetItemC( &(store->ctype), lonax, 0, s, NULL, method,
+                                   class, status );
+                  if( cval ){
+                     strcpy( buf, cval );
+                     strcpy( buf + 8, "-SIP" );
+                     SetItemC( &(store->ctype), lonax, 0, s, buf, status );
+                  }
+
+/* Construct the returned Mapping. This is equivalent to the supplied
+   Mapping, but without the PolyMap. Use PermMaps at beginning and end to
+   take account of any axis permutations introduced by the operation of
+   astMapSplit. First put the 2D Mapping preceding the PolyMap in series
+   with the 2D Mapping following the PolyMap. */
+                  result = (AstMapping *) astCmpMap( map_lower, map_upper, 1, " ", status );
+
+/* Now put the above Mapping in parallel with the mMapping that
+   transforms any additional axes. */
+                  if( tmap2 ) {
+                     tmap = (AstMapping *) astCmpMap( result, tmap2, 0, " ", status );
+                     (void) astAnnul( result );
+                     result = tmap;
+                  }
+
+/* Create a PermMap that permutes the outputs of the above Mapping back
+   into their original order. */
+                  inperm1 = astMalloc( nout*sizeof(int) );
+                  outperm1 = astMalloc( nout*sizeof(int) );
+                  inperm2 = astMalloc( nin*sizeof(int) );
+                  outperm2 = astMalloc( nin*sizeof(int) );
+                  if( astOK ) {
+                     inperm1[ 0 ] = lonax;
+                     inperm1[ 1 ] = latax;
+                     outperm1[ lonax ] = 0;
+                     outperm1[ latax ] = 1;
+                     if( tmap2 ) {
+                        for( iout = 0; iout < noutrem; iout++ ) {
+                           inperm1[ iout + 2 ] = outrem[ iout ];
+                           outperm1[ outrem[ iout ] ] = iout + 2;
+                        }
+                     }
+                     pm = astPermMap( nout, inperm1, nout, outperm1,
+                                      NULL, " ", status );
+
+/* Put this PermMap in series with (following) the main Mapping created
+   above. */
+                     tmap = (AstMapping *) astCmpMap( result, pm, 1, " ", status );
+                     (void) astAnnul( result );
+                     pm = astAnnul( pm );
+                     result = tmap;
+
+/* Create a PermMap that permutes the inputs of the above Mapping back
+   into their original order. */
+                     outperm2[ 0 ] = inax1[ 0 ];
+                     outperm2[ 1 ] = inax1[ 1 ];
+                     inperm2[ inax1[ 0 ] ] = 0;
+                     inperm2[ inax1[ 1 ] ] = 1;
+
+                     if( tmap2 ) {
+                        for( iin = 0; iin < nin - 2; iin++ ) {
+                           outperm2[ iin + 2 ] = inax2[ iin ];
+                           inperm2[ inax2[ iin ] ] = iin + 2;
+                        }
+                     }
+
+                     pm = astPermMap( nin, inperm2, nin, outperm2,
+                                      NULL, " ", status );
+
+/* Put this PermMap in series with (preceding) the main Mapping created
+   above. */
+                     tmap = (AstMapping *) astCmpMap( pm, result, 1, " ", status );
+                     (void) astAnnul( result );
+                     pm = astAnnul( pm );
+                     result = tmap;
+                  }
+
+/* Free resources. */
+                  inperm1 = astFree( inperm1 );
+                  inperm2 = astFree( inperm2 );
+                  outperm1 = astFree( outperm1 );
+                  outperm2 = astFree( outperm2 );
+               }
+
+               inax2 = astFree( inax2 );
+               outrem = astFree( outrem );
+               if( tmap2 ) tmap2 = astAnnul( tmap2 );
+               if( map_lower ) map_lower = astAnnul( map_lower );
+               if( map_upper ) map_upper = astAnnul( map_upper );
+            }
+
+            polymap = astAnnul( polymap );
+         }
+
+         for( imap = 0; imap < nmap; imap++ ) {
+            map_list[ imap ] = astAnnul( map_list[ imap ] );
+         }
+
+         invert_list = astFree( invert_list );
+         map_list = astFree( map_list );
+         smap = astAnnul( smap );
+      }
+      inax1 = astFree( inax1 );
+      if( tmap1 ) tmap1 = astAnnul( tmap1 );
+   }
+
+/* Return the Mapping. */
+   return result;
+}
+
+static AstMapping *SIPMapping( AstFitsChan *this, double *dim,  FitsStore *store,
+                               char s, int naxes, const char *method,
                                const char *class, int *status ){
 /*
 *  Name:
@@ -26978,8 +27935,9 @@ static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
 *     Private function.
 
 *  Synopsis:
-*     AstMapping *SIPMapping( double *dim, FitsStore *store, char s, int naxes,
-*                             const char *method, const char *class, int *status )
+*     AstMapping *SIPMapping( AstFitsChan *this, double *dim, FitsStore *store,
+*                             char s, int naxes, const char *method,
+*                             const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan
@@ -26996,6 +27954,8 @@ static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
 *     passed unchanged by the returned Mapping.
 
 *  Parameters:
+*     this
+*        The FitsChan.
 *     dim
 *        The dimensions of the array in pixels. AST__BAD is stored for
 *        each value if dimensions are not known.
@@ -27219,19 +28179,22 @@ static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
    the fit fails to reach 0.01 pixel accuracy, forget it and rely on the
    (slower) iterative inverse provided by the PolyMap class. Do the fit
    over an area three times the size of the image to provide accurate
-   values outside the image.*/
-      lbnd[ 0 ] = ( dim[ 0 ] != AST__BAD ) ? -dim[ 0 ] : -1000.0;
-      lbnd[ 1 ] = ( dim[ 1 ] != AST__BAD ) ? -dim[ 1 ] : -1000.0;
-      ubnd[ 0 ] = ( dim[ 0 ] != AST__BAD ) ? 2*dim[ 0 ] : 2000.0;
-      ubnd[ 1 ] = ( dim[ 1 ] != AST__BAD ) ? 2*dim[ 1 ] : 2000.0;
-      pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.0001, 0.01, 7, lbnd,
-                           ubnd );
-      if( pmap2 ) {
-         (void) astAnnul( pmap );
-         pmap = pmap2;
-      } else {
-         astSet( pmap, "IterInverse=1,NiterInverse=6,TolInverse=1.0E-8",
-                 status );
+   values outside the image. Only do this if it has not been disabled
+   using attribute SipReplace. */
+      if( astGetSipReplace( this ) ) {
+         lbnd[ 0 ] = ( dim[ 0 ] != AST__BAD ) ? -dim[ 0 ] : -1000.0;
+         lbnd[ 1 ] = ( dim[ 1 ] != AST__BAD ) ? -dim[ 1 ] : -1000.0;
+         ubnd[ 0 ] = ( dim[ 0 ] != AST__BAD ) ? 2*dim[ 0 ] : 2000.0;
+         ubnd[ 1 ] = ( dim[ 1 ] != AST__BAD ) ? 2*dim[ 1 ] : 2000.0;
+         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.0001, 0.01, 7, lbnd,
+                              ubnd );
+         if( pmap2 ) {
+            (void) astAnnul( pmap );
+            pmap = pmap2;
+         } else {
+            astSet( pmap, "IterInverse=1,NiterInverse=6,TolInverse=1.0E-8",
+                    status );
+         }
       }
 
 /* Add the above Mapping in parallel with a UnitMap which passes any
@@ -27561,7 +28524,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
    astGET_GLOBALS(this);
 
 /* Check we have a SkyFrame. */
-   if( !astIsASkyFrame( skyfrm ) ) return 0;
+   if( !IsASkyFrame( skyfrm ) ) return 0;
 
 /* Initialise */
    ret = 1;
@@ -27606,7 +28569,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
    producing FITS headers which say unlikely things like
    DATE-OBS = "01/01/50". Set a flag indicating if MJD-OBS and DATE-OBS
    can be defaulted. */
-   defdate = EQUAL( ep_utc, eq );
+   defdate = astEQUAL( ep_utc, eq );
 
 /* Convert the equinox to a Julian or Besselian epoch. Also get the
    reference frame and standard system. */
@@ -28667,7 +29630,6 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 
 static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                                const char *method, const char *class, int *status ){
-
 /*
 *  Name:
 *     SpecTrans
@@ -28844,6 +29806,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
    int diag;                      /* Sign of diagonal CDi_j element */
+   int dim;                       /* Length of pixel axis */
    int gotpcij;                   /* Does FitsChan contain any PCi_j keywords? */
    int i,j;                       /* Indices */
    int iaxis;                     /* Axis index */
@@ -28854,6 +29817,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    int lbnd[ 2 ];                 /* Lower index bounds */
    int m;                         /* Co-ordinate version index */
    int naxis;                     /* Number of axes */
+   int nc;                        /* Length of string */
    int ncoeff;                    /* Number of PVi_m values */
    int ok;                        /* Can projection be represented in FITS-WCS?*/
    int shifted;                   /* Non-zero if there is an origin shift */
@@ -28901,18 +29865,19 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          if( GetValue2( ret, this, FormatKey( "CTYPE", j + 1, -1, s, status ),
                        AST__STRING, (void *) &cval, 0, method,
                        class, status ) ){
+            nc = strlen( cval );
             if( !strncmp( cval, "RA--", 4 ) ||
                 !strncmp( cval, "AZ--", 4 ) ||
-                !strncmp( cval + 1, "LON", 3 ) ||
-                !strncmp( cval + 2, "LN", 2 ) ) {
+                ( nc > 1 && !strncmp( cval + 1, "LON", 3 ) ) ||
+                ( nc > 2 && !strncmp( cval + 2, "LN", 2 ) ) ) {
                axlon = j;
                strncpy( prj, cval + 4, 4 );
                strncpy( lontype, cval, 10 );
                prj[ 4 ] = 0;
             } else if( !strncmp( cval, "DEC-", 4 ) ||
                 !strncmp( cval, "EL--", 4 ) ||
-                !strncmp( cval + 1, "LAT", 3 ) ||
-                !strncmp( cval + 2, "LT", 2 ) ) {
+                ( nc > 1 && !strncmp( cval + 1, "LAT", 3 ) ) ||
+                ( nc > 2 && !strncmp( cval + 2, "LT", 2 ) ) ) {
                axlat = j;
                strncpy( prj, cval + 4, 4 );
                strncpy( lattype, cval, 10 );
@@ -28921,11 +29886,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Check for spectral algorithms from early drafts of paper III */
             } else {
                sprj[ 0 ] = '-';
-               if( !strncmp( cval + 4, "-WAV", 4 ) ) {
+               if( ( nc > 4 && !strncmp( cval + 4, "-WAV", 4 ) ) ) {
                   sprj[ 1 ] = 'W';
-               } else if( !strncmp( cval + 4, "-FRQ", 4 ) ) {
+               } else if( ( nc > 4 && !strncmp( cval + 4, "-FRQ", 4 ) ) ) {
                   sprj[ 1 ] = 'F';
-               } else if( !strncmp( cval + 4, "-VEL", 4 ) ) {
+               } else if( ( nc > 4 && !strncmp( cval + 4, "-VEL", 4 ) ) ) {
                   sprj[ 1 ] = 'V';
                } else {
                   sprj[ 0 ] = 0;
@@ -29651,8 +30616,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    FitsChan. */
          if( !GetValue2( ret, this, keyname, AST__FLOAT, (void *) &cval, 0,
                         method, class, status ) ){
-            SetValue( ret, keyname, CardData( this, &size, status ), AST__FLOAT,
-                      CardComm( this, status ), status );
+            SetValue( ret, keyname, CardData( this, &size, status ),
+                      CardType( this, status ), CardComm( this, status ),
+                      status );
          }
 
 /* Move on to the next card. */
@@ -29777,21 +30743,30 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* MSX CAR projections.
    ------------------- */
-      if( !Ustrcmp( prj, "-CAR", status ) ) {
+      if( !Ustrcmp( prj, "-CAR", status ) && !astGetCarLin( this ) ) {
 
-/* If the projection is a CAR projection, check that the CRPIX value for
-   the longitude axis corresponds to a projection plane point which has
-   valid native longitude. The CAR projection has valid projection plane
-   points only for native longitudes in the range [-180,+180, so we
-   modify the CRPIX value if necessary by the number of pixels corresponding
-   to 360 degres of longitude in order to bring the refernce pixel into
-   the valid domain of the projection. */
+/* The CAR projection has valid projection plane points only for native
+   longitudes in the range [-180,+180]. The reference pixel (CRPIX) is at
+   native longitude zero.  We need to check that the reference point is not
+   so far outside the image that the entire image lies outside the range
+   [-180,+180]. If it is, we modify the CRPIX value by the number of
+   pixels corresponding to 360 degres of longitude in order to bring the
+   array into the valid domain ([-180,+180]) of the projection. */
          if( GetValue2( ret, this, FormatKey( "CDELT", axlon + 1, -1, s, status ),
                         AST__FLOAT, (void *) &cdelti, 1, method, class, status ) &&
              GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                         AST__FLOAT, (void *) &dval, 0, method, class, status ) ) {
+
+/* We check if the mid point of the array is in the valiud longitude range. Use the
+   bottom left corner as a fallback if the image size is unknown. */
+            if( !GetValue( this, FormatKey( "NAXIS", axlon + 1, -1, ' ', status ),
+                           AST__INT, &dim, 0, 0, method, class, status ) ) {
+               dim = 0;
+            }
+
             if( cdelti != 0.0 ) {
-               dval = 0.5 + AST__DR2D*palDrange( AST__DD2R*( dval - 0.5 )*cdelti )/cdelti;
+               double offset = 0.5*( dim + 1 );
+               dval = offset + AST__DR2D*palDrange( AST__DD2R*( dval - offset )*cdelti )/cdelti;
                SetValue( ret, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                          (void *) &dval, AST__FLOAT, CardComm( this, status ), status );
             }
@@ -29928,7 +30903,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    return ret;
 }
 
-int Split( const char *card, char **name, char **value,
+int Split( AstFitsChan *this, const char *card, char **name, char **value,
            char **comment, const char *method, const char *class, int *status ){
 /*
 *  Name:
@@ -29942,7 +30917,7 @@ int Split( const char *card, char **name, char **value,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int Split( const char *card, char **name, char **value,
+*     int Split( AstFitsChan *this, const char *card, char **name, char **value,
 *                char **comment, const char *method, const char *class, int *status  )
 
 *  Class Membership:
@@ -29953,6 +30928,8 @@ int Split( const char *card, char **name, char **value,
 *     supplied card text and returned.
 
 *  Parameters:
+*     this
+*        Pointer to the FitsCHan.
 *     card
 *        Pointer to a string holding the FITS header card.
 *     name
@@ -29997,16 +30974,18 @@ int Split( const char *card, char **name, char **value,
    char *dd;                  /* Pointer to intermediate character */
    char *slash;               /* Pointer to comment character */
    char *v;                   /* Pointer to returned value string */
+   char buf[255];             /* Buffer for warning text */
    const char *d;             /* Pointer to first comment character */
    const char *v0;            /* Pointer to first non-blank value character */
    double fi, fr;             /* Values read from value string */
+   int badval;                /* Is the keyword value illegal? */
    int blank_name;            /* Is keyword name blank? */
    int cont;                  /* Is this a continuation card? */
    int i;                     /* Character index */
    int ii, ir;                /* Values read from value string */
    int iopt;                  /* Index of option within list */
-   int lq;                    /* Was previous character an escaping quote? */
    int len;                   /* Used length of value string */
+   int lq;                    /* Was previous character an escaping quote? */
    int nch;                   /* No. of characters used */
    int ndig;                  /* No. of digits in the formatted integer */
    int type;                  /* Keyword data type */
@@ -30022,6 +31001,9 @@ int Split( const char *card, char **name, char **value,
 
 /* Check the global status. */
    if( !astOK ) return type;
+
+/* Assume initially that the keyword value is legal. */
+   badval = 0;
 
 /* Store the number of characters to be read from the supplied card. This
    is not allowed to be more than the length of a FITS header card. */
@@ -30061,7 +31043,7 @@ int Split( const char *card, char **name, char **value,
       }
 
 /* Check the keyword name is legal. */
-      CheckFitsName( *name, method, class, status );
+      CheckFitsName( this, *name, method, class, status );
 
 /* Allocate memory to hold the keyword value and comment strings. */
       *value = (char *) astMalloc( sizeof(char)*( 2 + nc ) );
@@ -30171,8 +31153,10 @@ int Split( const char *card, char **name, char **value,
 /* The end of the value field is marked by the first "/". Find the number
    of characters in the value field. Pointer "d" is left pointing to the
    first character in the comment (if any). Only use "/" characters which
-   occur within the first nc characters. */
-               d = strchr( card, '/' );
+   occur within the first nc characters, and do not occur wiuthin the
+   keyword name (not strictly legal, but a warning will have been issued
+   by CheckFitsName in such cases). */
+               d = strchr( card + FITSNAMLEN, '/' );
                if( !d || ( d - card ) >= nc ){
                   ncv = nc - FITSNAMLEN - 1;
                   d = NULL;
@@ -30279,10 +31263,13 @@ int Split( const char *card, char **name, char **value,
                   }
                }
 
-/* If the value type could not be determined report an error. */
+/* If the value type could not be determined, indicate that a warning
+   should be issued. */
                if( type == AST__COMMENT && astOK ) {
-                  astError( AST__BDFTS, "%s(%s): Illegal keyword value "
-                            "supplied.", status, method, class );
+                  badval = 1;
+                  (*value)[ 0 ] = 0;
+                  (*comment)[ 0 ] = 0;
+                  d = NULL;
                }
             }
 
@@ -30340,15 +31327,23 @@ int Split( const char *card, char **name, char **value,
       if( ndig >= int_dig ) type = AST__FLOAT;
    }
 
-/* If an error occurred, free the returned strings and issue a context
-   message. */
+/* If an error occurred, free the returned strings and issue a context message. */
    if( !astOK ){
       *name = (char *) astFree( (void *) *name );
       *value = (char *) astFree( (void *) *value );
       *comment = (char *) astFree( (void *) *comment );
       type = AST__COMMENT;
       astError( astStatus, "%s(%s): Unable to store the following FITS "
-                "header card:\n%s\n", status, method, class, card );
+                "header card:\n%.*s\n", status, method, class,
+                AST__FITSCHAN_FITSCARDLEN, card );
+
+/* If a bad keyword value was encountered, issue a warning. Remember that
+   "card" may not be null terminated, so ensure that only one header is
+   included from "card". */
+   } else if( badval ){
+      snprintf( buf, sizeof(buf), "The keyword value is illegal in "
+                "'%.*s'", AST__FITSCHAN_FITSCARDLEN, card );
+      Warn( this, "badkeyvalue", buf, method, class, status );
    }
 
 /* Return the data type. */
@@ -30577,9 +31572,9 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
                }
                astPutFits( fc, card, 0 );
                if( i == ilon ) {
-                  sprintf( card, "CRVAL%d  = %.*g", i + 1, DBL_DIG, AST__DR2D*ptr2[ ilon ][ 0 ] );
+                  sprintf( card, "CRVAL%d  = %.*g", i + 1, AST__DBL_DIG, AST__DR2D*ptr2[ ilon ][ 0 ] );
                } else if( i == ilat ) {
-                  sprintf( card, "CRVAL%d  = %.*g", i + 1, DBL_DIG, AST__DR2D*ptr2[ ilat ][ 0 ] );
+                  sprintf( card, "CRVAL%d  = %.*g", i + 1, AST__DBL_DIG, AST__DR2D*ptr2[ ilat ][ 0 ] );
                } else {
                   sprintf( card, "CRVAL%d  = 0.0", i + 1 );
                }
@@ -31004,7 +31999,7 @@ static int SplitMat( int naxis, double *matrix, double *cdelt, int *status ){
          a++;
       }
       if( !ok ) break;
-      cdlt = sqrt( MAX( 0.0, s2 ) );
+      cdlt = sqrt( astMAX( 0.0, s2 ) );
 
 /* If the diagonal term for this row of the matrix is negative, make
    the CDELT value negative instead. This means that the diagonal term in
@@ -31105,8 +32100,8 @@ f        The table source routine to use.
 *        the third is the integer FITS "EXTVER" header value for the
 *        required extension, the fourth is the integer FITS "EXTLEVEL"
 *        header value for the required extension, and the fifth is
-c        a pointer to
-*        the inherited integer status value.
+c        a pointer to an integer status value.
+f        the usual inherited status value.
 *
 *        The call-back should read the entire contents (header and data)
 *        of the binary table in the named extension of the external FITS
@@ -31116,8 +32111,10 @@ c        astPutTables or astPutTable
 f        AST_PUTTABLES or AST_PUTTABLE
 *        method, and finally annull its local copy of the FitsTable pointer.
 *        If the table cannot be read for any reason, or if any other
-*        error occurs, it should return a non-zero integer for the final
-*        (third) argument.
+*        error occurs, it should return
+c        zero for the final (third) argument (otherwise any non-zero integer
+f        a non-zero integer for the final (third) argument (otherwise zero
+*        should be returned).
 *
 c        If "tabsource" is NULL,
 f        If TABSOURCE is AST_NULL,
@@ -31304,7 +32301,7 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 /* See if this WCS axis uses the -TAB algorithm. */
                ctype = GetItemC( &(store->ctype), iaxis, 0, s, NULL, method,
                                  class, status );
-               if( ctype && !strncmp( ctype + 4, "-TAB", 4 ) ) {
+               if( ctype && strlen(ctype) > 4 && !strncmp( ctype + 4, "-TAB", 4 ) ) {
 
 /* Get the name of the FITS binary table extension holding the coordinate
    info. No default, so report an error if not present. */
@@ -31853,10 +32850,25 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "carlin" ) ) {
       result = astTestCarLin( this );
 
+/* SipReplace. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "sipreplace" ) ) {
+      result = astTestSipReplace( this );
+
+/* FitsTol. */
+/* -------- */
+   } else if ( !strcmp( attrib, "fitstol" ) ) {
+      result = astTestFitsTol( this );
+
 /* PolyTan */
 /* ------- */
    } else if ( !strcmp( attrib, "polytan" ) ) {
       result = astTestPolyTan( this );
+
+/* SipOK */
+/* ----- */
+   } else if ( !strcmp( attrib, "sipok" ) ) {
+      result = astTestSipOK( this );
 
 /* Iwc. */
 /* ---- */
@@ -32000,7 +33012,10 @@ c        Pointer to a null-terminated character string
 f        A character string
 *        containing the FITS keyword name. This may be a complete FITS
 *        header card, in which case the keyword to use is extracted from
-*        it. No more than 80 characters are read from this string.
+*        it. No more than 80 characters are read from this string. If
+c        NULL
+f        a single dot '.'
+*        is supplied, the current card is tested.
 c     there
 f     THERE = LOGICAL (Returned)
 c        Pointer to an integer which will be returned holding a non-zero
@@ -32050,6 +33065,7 @@ f     -  .FALSE.
    char *lvalue;          /* Supplied keyword value */
    int icard;             /* Current card index on entry */
    int ret;               /* The returned value */
+   int type;              /* The card's type */
 
 /* Initialise */
    if( there ) *there = 0;
@@ -32068,20 +33084,34 @@ f     -  .FALSE.
    ret = 0;
 
 /* Extract the keyword name from the supplied string. */
-   (void) Split( name, &lname, &lvalue, &lcom, method, class, status );
+   if( name ) {
+      (void) Split( this, name, &lname, &lvalue, &lcom, method, class, status );
+   } else {
+      lname = NULL;
+      lvalue = NULL;
+      lcom = NULL;
+   }
 
 /* Store the current card index. */
    icard = astGetCard( this );
 
 /* Attempt to find a card in the FitsChan refering to this keyword,
-   and make it the current card. Only proceed if a card was found. */
-   if( SearchCard( this, lname, method, class, status ) ){
+   and make it the current card. Only proceed if a card was found. No
+   need to do the search if the value of the current card is required. */
+   if( !lname || SearchCard( this, lname, method, class, status ) ){
+
+/* Get the card type. */
+      type = CardType( this, status );
+
+/* Check the card exists. */
+      if( type != AST__NOTYPE ) {
+
+/* If the cards data type is not undefined, return 1. */
+         if( CardType( this, status ) != AST__UNDEF ) ret = 1;
 
 /* Indicate the card has been found. */
-      if( there ) *there = 1;
-
-/* If the cards data type is no undefined, return 1. */
-      if( CardType( this, status ) != AST__UNDEF ) ret = 1;
+         if( there ) *there = 1;
+      }
    }
 
 /* Re-instate the original current card index. */
@@ -32169,7 +33199,7 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
       nax = astGetNaxes( frm );
       for( iax = 0; iax < nax; iax++ ) {
          astPrimaryFrame( frm, iax, &pfrm, &pax );
-         if( astIsASkyFrame( pfrm ) ) {
+         if( IsASkyFrame( pfrm ) ) {
             dom = astGetDomain( pfrm );
             if( dom ) {
                if( !strcmp( dom, "SKY_OFFSETS" ) ){
@@ -32212,7 +33242,7 @@ static void TidyOffsets( AstFrameSet *fset, int *status ) {
          nax = astGetNaxes( frm );
          for( iax = 0; iax < nax; iax++ ) {
             astPrimaryFrame( frm, iax, &pfrm, &pax );
-            if( astIsASkyFrame( pfrm ) ) {
+            if( IsASkyFrame( pfrm ) ) {
                dom = astGetDomain( pfrm );
                if( dom ) {
                   if( !strcmp( dom, "SKY_OFFSETS" ) ){
@@ -32653,7 +33683,6 @@ static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 
 static void Warn( AstFitsChan *this, const char *condition, const char *text,
                   const char*method, const char *class, int *status ){
-
 /*
 *  Name:
 *     Warn
@@ -32666,7 +33695,6 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int Warn( AstFitsChan *this, const char *condition, const char *text,
 *               const char*method, const char *class, int *status );
 
@@ -33312,6 +34340,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    int mxpar_lat;            /* Max. projection parameter index on lat axis */
    int mxpar_lon;            /* Max. projection parameter index on lon axis */
    int naxes;                /* Number of axes */
+   int nc;                   /* String length */
    int np;                   /* Max parameter index */
    int prj;                  /* Projection type identifier */
 
@@ -33369,6 +34398,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    are "RA--" or "xLON" or "yzLN" ). If so, store the value of "x" or "yz"
    (or "EQU" for equatorial coordinates) in variable "type" to indicate which
    coordinate system is being used. */
+         nc = strlen( ctype );
          gotax = 0;
          if( !strcmp( ctype, "RA" ) || !strncmp( ctype, "RA--", 4 ) ){
             strcpy( wcscelestial_type, "EQU" );
@@ -33376,11 +34406,13 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
          } else if( !strcmp( ctype, "AZ" ) || !strncmp( ctype, "AZ--", 4 ) ){
             strcpy( wcscelestial_type, "AZL" );
             gotax = 1;
-         } else if( !strcmp( ctype + 1, "LON" ) || !strncmp( ctype + 1, "LON-", 4 ) ){
+         } else if( nc > 1 && ( !strcmp( ctype + 1, "LON" ) ||
+                                !strncmp( ctype + 1, "LON-", 4 ) ) ){
             wcscelestial_type[ 0 ] = ctype[ 0 ];
             wcscelestial_type[ 1 ] = 0;
             gotax = 1;
-         } else if( !strcmp( ctype + 2, "LN" ) || !strncmp( ctype + 2, "LN-", 3 ) ){
+         } else if( nc > 2 && ( !strcmp( ctype + 2, "LN" ) ||
+                                !strncmp( ctype + 2, "LN-", 3 ) ) ){
             wcscelestial_type[ 0 ] = ctype[ 0 ];
             wcscelestial_type[ 1 ] = ctype[ 1 ];
             wcscelestial_type[ 2 ] = 0;
@@ -33942,6 +34974,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
    char *cval;        /* String keyword value */
    char *keynam;      /* Pointer to current keyword name */
    char s;            /* Co-ordinate version character */
+   char *telescop;    /* Pointer to TELESCOP keyword value */
    double dval;       /* Floating point keyword value */
    int fld[2];        /* Integer field values from keyword name */
    int jm;            /* Pixel axis or projection parameter index */
@@ -34220,6 +35253,20 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = ' ';
 
+/* Is this a primary DTAI keyword? Only handle if the telescope is JCMT
+   or UKIRT, since other telescopes may use DTAI for different purposes. */
+      } else if( Match( keynam, "DTAI", 0, fld, &nfld, method, class, status ) ){
+         if( GetValue( fc, "TELESCOP", AST__STRING, &telescop, 0, 0, method,
+                       class, status ) && ( !strncmp( telescop, "JCMT", 4)
+                                         || !strncmp( telescop, "UKIRT", 5 ) ) ){
+            mark = 0;
+            item = &(store->dtai);
+            type = AST__FLOAT;
+            i = 0;
+            jm = 0;
+            s = ' ';
+         }
+
 /* Is this a primary MJD-OBS keyword? */
       } else if( Match( keynam, "MJD-OBS", 0, fld, &nfld, method, class, status ) ){
          mark = 0;
@@ -34453,6 +35500,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a TIMESYS keyword? */
       } else if( Match( keynam, "TIMESYS", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->timesys);
          type = AST__STRING;
          i = 0;
@@ -34621,12 +35669,14 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 /* Local Variables: */
    char *comm;         /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
-   char parprefix[3];  /* Prefix for projection parameter keywords */
    char combuf[80];    /* Buffer for FITS card comment */
+   char parprefix[4];  /* Prefix for projection parameter keywords */
    char s;             /* Co-ordinate version character */
    char sign[2];       /* Fraction's sign character */
    char sup;           /* Upper limit on s */
    char type[MXCTYPELEN];/* Buffer for CTYPE value */
+   const char *order_kwd; /* Name for SIP max order keyword */
+   double ****item;    /* Address of FitsStore item to use */
    double cdl;         /* CDELT value */
    double fd;          /* Fraction of a day */
    double mjd99;       /* MJD at start of 1999 */
@@ -34643,7 +35693,12 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
    int nc;             /* Length of STYPE string */
    int nwcs;           /* No. of WCS axes */
    int ok;             /* Frame created succesfully? */
+   int order;          /* Max SIP polynomial order */
+   int p;              /* Power of u or U */
+   int pmax;           /* Max power of u or U */
    int prj;            /* Projection type */
+   int q;              /* Power of v or V */
+   int qmax;           /* Max power of v or V */
    int ret;            /* Returned value */
 
 /* Initialise */
@@ -34841,9 +35896,9 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
                val = GetItem( &(store->pc), i, j, s, NULL, method, class, status );
                if( val != AST__BAD ) {
                   if( i == j ) {
-                     if( EQUAL( val, 1.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 1.0 ) ) val = AST__BAD;
                   } else {
-                     if( EQUAL( val, 0.0 ) ) val = AST__BAD;
+                     if( astEQUAL( val, 0.0 ) ) val = AST__BAD;
                   }
                }
                if( val != AST__BAD ) {
@@ -35068,6 +36123,85 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
          if( val != AST__BAD ) SetValue( this, "OBSGEO-Z", &val, AST__FLOAT, "[m] Observatory geocentric Z", status );
       }
 
+
+/* Forward SIP distortion keywords. Loop over the two spatial axes. My reading
+   of the SIP paper is that the SIP distortion *must* be attached to the first
+   two pixel axes defined by the FITS header. */
+      for( i = 0; i < 2; i++ ) {
+
+/* Get a pointer to the FitsStore item holding the values defining this
+   output. */
+         if( i == 0 ) {
+            item = &(store->asip);
+            strcpy( parprefix, "A_" );
+            order_kwd = "A_ORDER";
+         } else {
+            item = &(store->bsip);
+            strcpy( parprefix, "B_" );
+            order_kwd = "B_ORDER";
+         }
+
+/* Get the largest powers used of u and v. */
+         pmax = GetMaxI( item, s, status );
+         qmax = GetMaxJM( item, s, status );
+
+/* Loop round all combination of powers. */
+         order = 0;
+         for( p = 0; p <= pmax; p++ ){
+            for( q = 0; q <= qmax; q++ ){
+
+/* Get the polynomial coefficient for this combination of powers. If it
+   is good, format the keyword name and store it in the header. */
+               val = GetItem( item, p, q, s, NULL, method, class, status );
+               if( val != AST__BAD ) {
+                  SetValue( this, FormatKey( parprefix, p, q, s, status ), &val,
+                            AST__FLOAT, "SIP forward distortion coeff", status );
+                  if( p + q > order ) order = p + q;
+               }
+            }
+         }
+         if( order > 0 ) SetValue( this, order_kwd, &order, AST__INT,
+                                   "SIP max order", status );
+      }
+
+/* Inverse SIP distortion keywords. Loop over the two spatial axes. */
+      for( i = 0; i < 2; i++ ) {
+
+/* Get a pointer to the FitsStore item holding the values defining this
+   output. */
+         if( i == 0 ) {
+            item = &(store->apsip);
+            strcpy( parprefix, "AP_" );
+            order_kwd = "AP_ORDER";
+         } else {
+            item = &(store->bpsip);
+            strcpy( parprefix, "BP_" );
+            order_kwd = "BP_ORDER";
+         }
+
+/* Get the largest powers used of u and v. */
+         pmax = GetMaxI( item, s, status );
+         qmax = GetMaxJM( item, s, status );
+
+/* Loop round all combination of powers. */
+         order = 0;
+         for( p = 0; p <= pmax; p++ ){
+            for( q = 0; q <= qmax; q++ ){
+
+/* Get the polynomial coefficient for this combination of powers. If it
+   is good, format the keyword name and store it in the header. */
+               val = GetItem( item, p, q, s, NULL, method, class, status );
+               if( val != AST__BAD ) {
+                  SetValue( this, FormatKey( parprefix, p, q, s, status ), &val,
+                            AST__FLOAT, "SIP inverse distortion coeff", status );
+                  if( p + q > order ) order = p + q;
+               }
+            }
+         }
+         if( order > 0 ) SetValue( this, order_kwd, &order, AST__INT,
+                                   "SIP inverse max order", status );
+      }
+
 /* See if a Frame was sucessfully written to the FitsChan. */
 next:
       ok = ok && astOK;
@@ -35105,7 +36239,6 @@ next:
 
 static AstMapping *WcsIntWorld( AstFitsChan *this, FitsStore *store, char s,
                                 int naxes, const char *method, const char *class, int *status ){
-
 /*
 *  Name:
 *     WcsIntWorld
@@ -35117,7 +36250,6 @@ static AstMapping *WcsIntWorld( AstFitsChan *this, FitsStore *store, char s,
 *     Private function.
 
 *  Synopsis:
-
 *     AstMapping *WcsIntWorld( AstFitsChan *this, FitsStore *store, char s,
 *                              int naxes, const char *method, const char *class, int *status )
 
@@ -35252,7 +36384,6 @@ static AstMapping *WcsIntWorld( AstFitsChan *this, FitsStore *store, char s,
 static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
                               AstFrame **frm, const char *method,
                               const char *class, int *status ){
-
 /*
 *  Name:
 *     WcsMapFrm
@@ -35265,7 +36396,6 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 *     Private function.
 
 *  Synopsis:
-
 *     AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 *                            AstFrame **frm, const char *method,
 *                            const char *class, int *status )
@@ -35293,9 +36423,9 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 *     frm
 *        The address of a location at which to store a pointer to the
 *        Frame describing the world coordinate axes. If the Iwc attribute
-*        is non-zero, then this is actually a FrameSet in which the current
-*        Frame is the required WCS system. The FrameSet also contains one
-*        other Frame which defines the FITS IWC system.
+*        is non-zero, then this is actually a FrameSet in which Frame 1
+*        is the base Frame and describes the required WCS system. Frame
+*        2 is the current Frame and describes the FITS IWC system.
 *     method
 *        A pointer to a string holding the name of the calling method.
 *        This is used only in the construction of error messages.
@@ -35306,7 +36436,9 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     A pointer to the Mapping.
+*     A pointer to the Mapping. If the Iwc attribute is non-zero, this
+*     will be the Mapping from pixel to IWC coordinates. Otherwise it
+*     will be the mapping from pixel to WCS coordinates.
 */
 
 /* Local Variables: */
@@ -35328,6 +36460,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    char id[2];               /* ID string for returned Frame */
    char iwc[5];              /* Domain name for IWC Frame */
    const char *cc;           /* Pointer to Domain */
+   double dtai;              /* TAI-UTC correction in seconds */
    double dut1;              /* UT1-UTC correction in days */
    double dval;              /* Temporary double value */
    double reflat;            /* Reference celestial latitude */
@@ -35439,17 +36572,21 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    dut1 = GetItem( &(store->dut1), 0, 0, s, NULL, method, class, status );
    if( dut1 != AST__BAD ) astSetDut1( *frm, dut1*SPD );
 
-/* The returned Frame is actually a FrameSet in which the current Frame
+/* Set the DTAI value. */
+   dtai = GetItem( &(store->dtai), 0, 0, s, NULL, method, class, status );
+   if( dtai != AST__BAD ) astSetDtai( *frm, dtai );
+
+/* The returned Frame is actually a FrameSet in which the base (first) Frame
    is the required WCS Frame. The FrameSet contains one other Frame,
-   which is the Frame representing IWC. Create a FrameSet containing these
-   two Frames. */
+   which is the Frame representing IWC and is always frame 2, the current
+   Frame. Create a FrameSet containing these two Frames. */
    if( astGetIwc( this ) ) {
-      fs = astFrameSet( iwcfrm, "", status );
-      astInvert( map1 );
-      map9 = (AstMapping *) astCmpMap( map1, ret, 1, "", status );
-      astInvert( map1 );
+      fs = astFrameSet( *frm, "", status );
+      astInvert( ret );
+      map9 = (AstMapping *) astCmpMap( ret, map1, 1, "", status );
+      astInvert( ret );
       map10 = astSimplify( map9 );
-      astAddFrame( fs, AST__BASE, map10, *frm );
+      astAddFrame( fs, AST__BASE, map10, iwcfrm );
 
 /* Return this FrameSet instead of the Frame. */
       *frm = astAnnul( *frm );
@@ -35458,6 +36595,11 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 /* Free resources */
       map9 = astAnnul( map9 );
       map10 = astAnnul( map10 );
+
+/* Also modify the returned mapping so that it goes from pixel to iwc
+   instead of to wcs. */
+      ret = astAnnul( ret );
+      ret = astClone( map1 );
    }
 
 /* Annull temporary resources. */
@@ -35588,7 +36730,6 @@ static AstMatrixMap *WcsPCMatrix( FitsStore *store, char s, int naxes,
 static AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
                               AstWcsMap *wcsmap, int fits_ilon, int fits_ilat,
                               const char *method, const char *class, int *status ){
-
 /*
 *  Name:
 *     WcsNative
@@ -35601,7 +36742,6 @@ static AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
 *     Private function.
 
 *  Synopsis:
-
 *     AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
 *                            AstWcsMap *wcsmap, int fits_ilon, int fits_ilat,
 *                            const char *method, const char *class, int *status )
@@ -35799,7 +36939,7 @@ static AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
       if( alphap != delta0 ) {
          sprintf( buf, "The original FITS header specified a fiducial "
                   "point with latitude %.*g. A value of %.*g is being used "
-                  "instead. ", DBL_DIG, alphap*AST__DR2D, DBL_DIG,
+                  "instead. ", AST__DBL_DIG, alphap*AST__DR2D, AST__DBL_DIG,
                   delta0*AST__DR2D );
          Warn( this, "badlat", buf, method, class, status );
       }
@@ -36101,14 +37241,14 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
    point. Tests for equality include some tolerance to allow for rounding
    errors. */
    sin_theta0 = sin( theta0 );
-   if( EQUAL( sin_theta0, 1.0 ) ){
+   if( astEQUAL( sin_theta0, 1.0 ) ){
       *alphap = alpha0;
       *deltap = delta0;
 
 /* If the fiducial point is concident with the Native South Pole, then the
    Native North Pole must have the coordinates of the point diametrically
    opposite the fiducial point. */
-   } else if( EQUAL( sin_theta0, -1.0 ) ){
+   } else if( astEQUAL( sin_theta0, -1.0 ) ){
       *alphap = alpha0 + AST__DPI;
       *deltap = -delta0;
 
@@ -36299,7 +37439,7 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
    AstMapping *map2;         /* Pointer to a Mapping */
    AstMapping *ret;          /* The returned Mapping */
    char **comms;             /* Pointer to array of CTYPE commments */
-   char buf[ 100 ];          /* Buffer for textual attribute value */
+   char buf[ 101 ];          /* Buffer for textual attribute value */
    char buf2[ 100 ];         /* Buffer for textual attribute value */
    char buf3[ 20 ];          /* Buffer for default CTYPE value */
    char *newdom;             /* Pointer to new Domain value */
@@ -37620,7 +38760,7 @@ static int WorldAxes( AstFitsChan *this, AstMapping *cmap, double *dim, int *per
                         wtmax = *nwt;
                         imin = i;
                         jmin = j;
-                     } else if( EQUAL( *ntn, tnmin ) && *nwt > wtmax ) {
+                     } else if( astEQUAL( *ntn, tnmin ) && *nwt > wtmax ) {
                         wtmax = *nwt;
                         imin = i;
                         jmin = j;
@@ -39208,8 +40348,42 @@ static AstMapping *ZPXMapping( AstFitsChan *this, FitsStore *store, char s,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
-/* Card. */
-/* ===== */
+/*
+*att++
+*  Name:
+*     FitsTol
+
+*  Purpose:
+*     Maximum non-linearity allowed when exporting to FITS-WCS.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute is used when attempting to write a FrameSet to a
+*     FitsChan using a foreign encoding. It specifies the maximum
+*     departure from linearity allowed on any axis within the mapping
+*     from pixel coordinates to Intermediate World Coordinates. It is
+*     expressed in units of pixels. If an axis of the Mapping is found
+*     to deviate from linearity by more than this amount, the write
+*     operation fails. If the linearity test succeeds, a linear
+*     approximation to the mapping is used to determine the FITS keyword
+*     values to be placed in the FitsChan.
+*
+*     The default value is one tenth of a pixel.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,FitsTol,fitstol,-1.0)
+astMAKE_GET(FitsChan,FitsTol,double,1,(this->fitstol==-1.0?0.1:this->fitstol))
+astMAKE_SET(FitsChan,FitsTol,double,fitstol,(astMAX(value,0.0)))
+astMAKE_TEST(FitsChan,FitsTol,(this->fitstol!=-1.0))
 
 /*
 *att++
@@ -40009,6 +41183,49 @@ astMAKE_GET(FitsChan,CarLin,int,1,(this->carlin == -1 ? 0 : this->carlin))
 astMAKE_SET(FitsChan,CarLin,int,carlin,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,CarLin,( this->carlin != -1 ))
 
+/* SipReplace */
+/* ========== */
+
+/*
+*att++
+*  Name:
+*     SipReplace
+
+*  Purpose:
+*     Replace SIP inverse transformation?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which specifies how SIP keywords
+*     should be handled when reading a FITS-WCS encoded header using the
+c     astRead
+f     AST_READ
+*     function. See
+*     http://irsa.ipac.caltech.edu/data/SPITZER/docs/files/spitzer/shupeADASS.pdf
+*     for more information about SIP headers. If SipReplace is non-zero,
+*     then any SIP keywords describing the inverse transformation (i.e. from
+*     WCS to pixel coordinates) are ignored. Instead a new inverse
+*     transformation is found by performing a fit to the forward
+*     transformation. The SipReplace attribute can be set to zero to prevent
+*     this happening. If SipReplace is zero, any SIP keywords describing the
+*     inverse transformation are used as supplied, rather than being
+*     replaced using a new fit. The default value is 1.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,SipReplace,sipreplace,-1)
+astMAKE_GET(FitsChan,SipReplace,int,1,(this->sipreplace == -1 ? 1 : this->sipreplace))
+astMAKE_SET(FitsChan,SipReplace,int,sipreplace,( value ? 1 : 0 ))
+astMAKE_TEST(FitsChan,SipReplace,( this->sipreplace != -1 ))
+
 /* PolyTan */
 /* ======= */
 
@@ -40039,9 +41256,12 @@ astMAKE_TEST(FitsChan,CarLin,( this->carlin != -1 ))
 *     does not form part of the standard. Indeed, it is incompatible with
 *     the published standard because it re-defines the meaning of the
 *     first five PVi_m keywords on the longitude axis, which are reserved
-*     by the published standard for other purposes. However, headers that
-*     use this convention are still to be found, for instance the SCAMP
-*     utility (http://www.astromatic.net/software/scamp) creates them.
+*     by the published standard for other purposes. However, this
+*     scheme has now been added to the registry of FITS conventions
+*     (http://fits.gsfc.nasa.gov/registry/tpvwcs.html) and headers
+*     that use this convention are created by the SCAMP utility
+*     (http://www.astromatic.net/software/scamp) and the Dark Energy
+*     Camera at NOAO.
 *
 *     The default value for the PolyTan attribute is -1. A negative
 *     values causes the used convention to depend on the contents
@@ -40059,6 +41279,72 @@ astMAKE_CLEAR(FitsChan,PolyTan,polytan,-INT_MAX)
 astMAKE_SET(FitsChan,PolyTan,int,polytan,value)
 astMAKE_TEST(FitsChan,PolyTan,( this->polytan != -INT_MAX ))
 astMAKE_GET(FitsChan,PolyTan,int,-1,(this->polytan == -INT_MAX ? -1 : this->polytan))
+
+/* SipOK */
+/* ===== */
+
+/*
+*att++
+*  Name:
+*     SipOK
+
+*  Purpose:
+*     Use Spitzer Space Telescope keywords to define distortion?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which specifies whether to include
+*     support for the "SIP" scheme, which can be used to add distortion to
+*     basic FITS-WCS projections. This scheme was first defined by the
+*     Spitzer Space Telescope and is described in the following document:
+*     http://irsa.ipac.caltech.edu/data/SPITZER/docs/files/spitzer/shupeADASS.pdf
+*     The default for SipOK is 1.
+*
+*     When using
+c     astRead
+f     AST_READ
+*     to read a FITS-WCS encoded header, a suitable PolyMap will always be
+*     included in the returned FrameSet if the header contains SIP
+*     keywords, regardless of the value of the SipOK attribute. The PolyMap
+*     will be immediately before the MatrixMap that corresponds to the FITS-WCS
+*     PC or CD matrix.
+*
+*     When using
+c     astWrite
+f     AST_WRITE
+*     to write a FrameSet to a FITS-WCS encoded header, suitable SIP
+*     keywords will be included in the header if the FrameSet contains a
+*     PolyMap immediately before the MatrixMap that corresponds to the
+*     FITS-WCS PC or CD matrix, but only if the SipOK attribute is non-zero.
+*     If the FrameSet contains a PolyMap but SipOK is zero, then an attempt
+*     will be made to write out the FrameSet without SIP keywords using a
+*     linear approximation to the pixel-to-IWC mapping. If this fails
+*     because the Mapping exceeds the linearity requirement specified by
+*     attribute FitsTol,
+c     astWrite
+f     AST_WRITE
+*     will return zero, indicating that the FrameSet could not be written
+*     out. Note, SIP headers can only be produced for axes that form part
+*     of a SkyFrame.
+*
+*     Note, the SIP distortion scheme is independent of the TPV/TPN
+*     distortion schemes (see attribute PolyTan). A FITS-WCS header could
+*     in principle, contain keywords for both schemes although this is unlikely.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,SipOK,sipok,-INT_MAX)
+astMAKE_SET(FitsChan,SipOK,int,sipok,value)
+astMAKE_TEST(FitsChan,SipOK,( this->sipok != -INT_MAX ))
+astMAKE_GET(FitsChan,SipOK,int,1,(this->sipok == -INT_MAX ? 1 : this->sipok))
 
 /* Iwc */
 /* === */
@@ -40309,10 +41595,10 @@ f     AST_FINDFITS or by the action of the FitsChan's sink routine
 *        All FitsChans have this attribute.
 *att--
 */
-astMAKE_CLEAR(FitsChan,FitsDigits,fitsdigits,DBL_DIG)
-astMAKE_GET(FitsChan,FitsDigits,int,DBL_DIG,this->fitsdigits)
+astMAKE_CLEAR(FitsChan,FitsDigits,fitsdigits,AST__DBL_DIG)
+astMAKE_GET(FitsChan,FitsDigits,int,AST__DBL_DIG,this->fitsdigits)
 astMAKE_SET(FitsChan,FitsDigits,int,fitsdigits,value)
-astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
+astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != AST__DBL_DIG ))
 
 /* CardComm */
 /* ======== */
@@ -40481,7 +41767,8 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     consist of a space separated list of condition names (see the
 *     AllWarnings attribute for a list of the currently defined names).
 *     Each name indicates a condition which should be reported. The default
-*     value for Warnings is the string "Tnx Zpx BadCel BadMat BadPV BadCTYPE".
+*     value for Warnings is the string "BadKeyName BadKeyValue Tnx Zpx
+*     BadCel BadMat BadPV BadCTYPE".
 *
 *     The text of any warning will be stored within the FitsChan in the
 *     form of one or more new header cards with keyword ASTWARN. If
@@ -40514,9 +41801,9 @@ f     AST_WARNINGS
 astMAKE_CLEAR(FitsChan,Warnings,warnings,astFree( this->warnings ))
 
 /* If the Warnings value is not set, supply a default in the form of a
-   pointer to the constant string "Tnx Zpx BadCel BadMat BadCTYPE". */
+   pointer to the constant string "BadKeyName BadKeyValue Tnx Zpx BadCel BadMat BadCTYPE". */
 astMAKE_GET(FitsChan,Warnings,const char *,NULL,( this->warnings ? this->warnings :
-                                                            "Tnx Zpx BadPV BadCel BadMat BadCTYPE" ))
+                                                            "BadKeyName BadKeyValue Tnx Zpx BadPV BadCel BadMat BadCTYPE" ))
 
 /* Set a Warnings value by freeing any previously allocated memory, allocating
    new memory, storing the string and saving the pointer to the copy.
@@ -40554,7 +41841,6 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 
 *  Conditions:
 *     The following conditions are currently recognised (all are
-
 *     case-insensitive):
 *
 *     - "BadCel": This condition arises when reading a FrameSet from a
@@ -40565,6 +41851,13 @@ astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 *     non-Native encoded FitsChan if an illegal algorithm code is specified
 *     by a CTYPE keyword, and the illegal code can be converted to an
 *     equivalent legal code.
+*
+*     - "BadKeyName": This condition arises if a FITS keyword name is
+*     encountered that contains an illegal character (i.e. one not allowed
+*     by the FITS standard).
+*
+*     - "BadKeyValue": This condition arises if the value of a FITS keyword
+*     cannot be determined from the content of the header card.
 *
 *     - "BadLat": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if the latitude of the reference point
@@ -40850,6 +42143,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    const char *class;            /* Object class */
    const char *sval;             /* Pointer to string value */
+   double dval;                  /* Double value */
    int cardtype;                 /* Keyword data type */
    int flags;                    /* Keyword flags */
    int icard;                    /* Index of current card */
@@ -40929,11 +42223,30 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    ival = set ? GetCarLin( this, status ) : astGetCarLin( this );
    astWriteInt( channel, "CarLin", set, 1, ival, (ival ? "Use simple linear CAR projections": "Use full FITS-WCS CAR projections") );
 
+/* SipReplace */
+/* ------ */
+   set = TestSipReplace( this, status );
+   ival = set ? GetSipReplace( this, status ) : astGetSipReplace( this );
+   astWriteInt( channel, "SipReplace", set, 1, ival, "Replace SIP inverse coefficients?" );
+
+/* FitsTol */
+/* ------- */
+   set = TestFitsTol( this, status );
+   dval = set ? GetFitsTol( this, status ) : astGetFitsTol( this );
+   astWriteDouble( channel, "FitsTol", set, 1, dval, "[pixel] Max allowed "
+                   "departure from linearity");
+
 /* PolyTan */
 /* ------- */
    set = TestPolyTan( this, status );
    ival = set ? GetPolyTan( this, status ) : astGetPolyTan( this );
    astWriteInt( channel, "PolyTan", set, 0, ival, (ival ? "Use distorted TAN convention": "Use standard TAN convention") );
+
+/* SipOK */
+/* ----- */
+   set = TestSipOK( this, status );
+   ival = set ? GetSipOK( this, status ) : astGetSipOK( this );
+   astWriteInt( channel, "SipOK", set, 0, ival, (ival ? "Use SIP distortion convention": "Ignore SIP keywords") );
 
 /* Iwc */
 /* --- */
@@ -41772,10 +43085,13 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->tabok = -INT_MAX;
       new->cdmatrix = -1;
       new->carlin = -1;
+      new->sipreplace = -1;
+      new->fitstol = -1.0;
       new->polytan = -INT_MAX;
+      new->sipok = -INT_MAX;
       new->iwc = -1;
       new->clean = -1;
-      new->fitsdigits = DBL_DIG;
+      new->fitsdigits = AST__DBL_DIG;
       new->fitsaxisorder = NULL;
       new->encoding = UNKNOWN_ENCODING;
       new->warnings = NULL;
@@ -41972,7 +43288,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 
 /* FitsDigits. */
 /* ----------- */
-      new->fitsdigits = astReadInt( channel, "fitsdg", DBL_DIG );
+      new->fitsdigits = astReadInt( channel, "fitsdg", AST__DBL_DIG );
       if ( TestFitsDigits( new, status ) ) SetFitsDigits( new, new->fitsdigits, status );
 
 /* DefB1950 */
@@ -41995,10 +43311,25 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
       new->carlin = astReadInt( channel, "carlin", -1 );
       if ( TestCarLin( new, status ) ) SetCarLin( new, new->carlin, status );
 
+/* SipReplace */
+/* ---------- */
+      new->sipreplace = astReadInt( channel, "sipreplace", -1 );
+      if ( TestSipReplace( new, status ) ) SetSipReplace( new, new->sipreplace, status );
+
+/* FitsTol */
+/* ------- */
+      new->fitstol = astReadDouble( channel, "fitstol", -1.0 );
+      if ( TestFitsTol( new, status ) ) SetFitsTol( new, new->fitstol, status );
+
 /* PolyTan */
 /* ------- */
       new->polytan = astReadInt( channel, "polytan", -1 );
       if ( TestPolyTan( new, status ) ) SetPolyTan( new, new->polytan, status );
+
+/* SipOK */
+/* ----- */
+      new->sipok = astReadInt( channel, "sipok", -1 );
+      if ( TestSipOK( new, status ) ) SetSipOK( new, new->sipok, status );
 
 /* Iwc */
 /* --- */
@@ -42431,6 +43762,10 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
    this->card = cardo;
 }
 */
+
+
+
+
 
 
 

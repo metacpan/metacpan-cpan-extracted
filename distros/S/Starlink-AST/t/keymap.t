@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use constant NTESTS => 80;
+use constant NTESTS => 86;
 use Test::More tests => NTESTS;
 use Test::Number::Delta;
 
@@ -110,3 +110,18 @@ ok( ! $map->MapHasKey( "DOUBLE"), "DOUBLE no longer in map");
 # Test bad type
 is( $map->MapType( "gurgle"), Starlink::AST::KeyMap::AST__BADTYPE(),
     "Confirm bad type");
+
+# Try copying the map.
+my $map2 = new Starlink::AST::KeyMap('');
+$map2->MapCopy($map);
+is($map2->MapSize(), scalar( keys %TESTS ) - 1, 'Check copied map size');
+
+# Rename a key.
+ok($map2->MapHasKey('SHORT'), 'SHORT in copied map');
+$map2->MapRename('SHORT', 'SHRT');
+ok(! $map2->MapHasKey('SHORT'), 'SHORT renamed from copied map');
+ok($map2->MapHasKey('SHRT'), 'SHRT as renamed in copied map');
+
+# Test MapGetC and MapLenC.
+is($map2->MapGetC('STRARR'), '(hello,goodbye,yo)');
+is($map2->MapLenC('STRARR'), 7);

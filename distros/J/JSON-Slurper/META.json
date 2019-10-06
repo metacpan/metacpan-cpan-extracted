@@ -41,7 +41,7 @@
          },
          "requires" : {
             "Carp" : "0",
-            "Exporter" : "0",
+            "Exporter::Shiny" : "0",
             "File::Basename" : "0",
             "File::Slurper" : "0",
             "JSON::PP" : "0",
@@ -73,12 +73,12 @@
          "web" : "https://github.com/srchulo/JSON-Slurper"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "Adam Hopkins <violapiratejunky@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

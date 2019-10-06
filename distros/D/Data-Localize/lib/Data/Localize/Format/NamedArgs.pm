@@ -8,7 +8,7 @@ sub format {
 
     return $value unless ref $args eq 'HASH';
 
-    $value =~ s/\{\{([^}]+)\}\}/ $args->{ $1 } || '' /ex;
+    $value =~ s/\{\{([^}]+)\}\}/ $args->{ $1 } || '' /gex;
     return $value;
 }
 

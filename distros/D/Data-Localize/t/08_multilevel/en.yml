@@ -5,3 +5,9 @@ en:
         morning: 'Good morning, {{name}}'
         afternoon: 'Good afternoon, {{name}}'
         evening: 'Good evening, {{name}}'
+    multi_greet:
+        hello: 'Hello, Mr. {{man}} and  Ms. {{woman}}'
+        morning: 'Good morning, Mr. {{man}} and Ms. {{woman}}'
+        afternoon: 'Good afternoon, Mr. {{man}} and Ms. {{woman}}'
+        evening: 'Good evening, Mr. {{man}} and Ms. {{woman}}'
+

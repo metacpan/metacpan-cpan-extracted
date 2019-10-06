@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.212    2019-10-06
+        - New input filter: "Remove_Cell", "Insert_Cell", "Row_Groups".
+
 2.211    2019-10-02
         - Input Copy and Paste: show the cursor.
         - Required the fixed "Term::Choose::Util" version.

@@ -6,7 +6,7 @@ use warnings;
 use WebService::Hexonet::Connector::ResponseTemplate;
 use WebService::Hexonet::Connector::ResponseParser;
 
-use version 0.9917; our $VERSION = version->declare('v2.2.4');
+use version 0.9917; our $VERSION = version->declare('v2.2.5');
 
 my $instance = undef;
 
@@ -17,7 +17,7 @@ sub getInstance {
         $instance = bless $self, shift;
         $instance->addTemplate( '404',          $instance->generateTemplate( '421', 'Page not found' ) );
         $instance->addTemplate( '500',          $instance->generateTemplate( '500', 'Internal server error' ) );
-        $instance->addTemplate( 'empty',        $instance->generateTemplate( '423', 'Empty API response' ) );
+        $instance->addTemplate( 'empty',        $instance->generateTemplate( '423', 'Empty API response. Probably unreachable API end point' ) );
         $instance->addTemplate( 'error',        $instance->generateTemplate( '421', 'Command failed due to server error. Client should try again' ) );
         $instance->addTemplate( 'expired',      $instance->generateTemplate( '530', 'SESSION NOT FOUND' ) );
         $instance->addTemplate( 'httperror',    $instance->generateTemplate( '421', 'Command failed due to HTTP communication error' ) );

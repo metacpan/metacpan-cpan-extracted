@@ -17,23 +17,25 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Moodle",
   "PREREQ_PM" => {
-    "Data::Object" => "0.99",
-    "Doodle" => "0.05"
+    "Do" => "1.87",
+    "Doodle" => "0.06"
   },
   "TEST_REQUIRES" => {
-    "Data::Object" => "0.99",
-    "Doodle" => "0.05"
+    "Do" => "1.87",
+    "Doodle" => "0.06",
+    "Test::Auto" => "0.03"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
-    "TESTS" => "t/*.t t/can/*.t t/use/*.t"
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Data::Object" => "0.99",
-  "Doodle" => "0.05"
+  "Do" => "1.87",
+  "Doodle" => "0.06",
+  "Test::Auto" => "0.03"
 );
 
 

@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Session::Storage::Handler::SQL;
-$Web::Authenticate::Session::Storage::Handler::SQL::VERSION = '0.011';
+$Web::Authenticate::Session::Storage::Handler::SQL::VERSION = '0.012';
 use Mouse;
 use Carp;
 use DateTime;
@@ -298,7 +298,7 @@ Web::Authenticate::Session::Storage::Handler::SQL - Implementation of Web::Authe
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@
 
 our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ rgb-to-ansi24b-fg-code - Convert RGB to ANSI 24bit-color escape sequence to chan
 
 =head1 VERSION
 
-This document describes version 0.005 of rgb-to-ansi24b-fg-code (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
+This document describes version 0.006 of rgb-to-ansi24b-fg-code (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 SYNOPSIS
 

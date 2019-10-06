@@ -84,6 +84,7 @@ require Exporter;
 
 my $UA;
 my $REDIR = $have_lwp ? undef : 1;
+my $conn_opts = {};
 
 sub module {
     my $module = shift;
@@ -165,8 +166,8 @@ sub user_agent {
         my $vars = Apache::Test::vars();
         my $cafile = "$vars->{sslca}/$vars->{sslcaorg}/certs/ca.crt";
         $args->{ssl_opts}->{SSL_ca_file} = $cafile;
-        # Net:SSL compatibility (legacy)
-        $ENV{HTTPS_CA_FILE} = $cafile;
+        # IO::Socket:SSL raw socket compatibility
+        $conn_opts->{SSL_ca_file} = $cafile;
     }
 
     eval { $UA ||= __PACKAGE__->new(%$args); };
@@ -291,10 +292,11 @@ sub vhost_socket {
     my($host, $port) = split ':', $hostport;
     my(%args) = (PeerAddr => $host, PeerPort => $port);
 
-    if ($module and $module =~ /ssl/) {
-        require Net::SSL;
-        local $ENV{https_proxy} ||= ""; #else uninitialized value in Net/SSL.pm
-        return Net::SSL->new(%args, Timeout => UA_TIMEOUT);
+    if ($module and ($module =~ /ssl/ || $module eq 'h2')) {
+        require IO::Socket::SSL;
+        # Add all conn_opts to args
+        map {$args{$_} = $conn_opts->{$_}} keys %{$conn_opts};
+        return IO::Socket::SSL->new(%args, Timeout => UA_TIMEOUT);
     }
     else {
         require IO::Socket;
@@ -302,19 +304,36 @@ sub vhost_socket {
     }
 }
 
-#Net::SSL::getline is nothing like IO::Handle::getline
-#could care less about performance here, just need a getline()
-#that returns the same results with or without ssl
+#IO::Socket::SSL::getline does not correctly handle OpenSSL *_WANT_*.
+#Could care less about performance here, just need a getline()
+#that returns the same results with or without ssl.
+#Inspired from Net::SSLeay::ssl_read_all().
 my %getline = (
-    'Net::SSL' => sub {
+    'IO::Socket::SSL' => sub {
         my $self = shift;
-        my $buf = '';
-        my $c = '';
-        do {
-            $self->read($c, 1);
-            $buf .= $c;
-        } until ($c eq "\n" || $c eq "");
-        $buf;
+        # _get_ssl_object in IO::Socket::SSL only meant for internal use!
+        # But we need to compensate for unsufficient getline impl there.
+        my $ssl = $self->_get_ssl_object;
+        my ($got, $rv, $errs);
+        my $reply = '';
+    
+        while (1) {
+            ($got, $rv) = Net::SSLeay::read($ssl, 1);
+            if (! defined $got) {
+                my $err = Net::SSLeay::get_error($ssl, $rv);
+                if ($err != Net::SSLeay::ERROR_WANT_READ() and
+                    $err != Net::SSLeay::ERROR_WANT_WRITE()) {
+                    $errs = Net::SSLeay::print_errs('SSL_read');
+                    last;
+                }
+                next;
+            }
+            last if $got eq '';  # EOF
+            $reply .= $got;
+            last if $got eq "\n";
+        }
+
+        wantarray ? ($reply, $errs) : $reply;
     },
 );
 
@@ -629,7 +648,9 @@ sub set_client_cert {
 
     if ($name) {
         my ($cert, $key) = ("$dir/certs/$name.crt", "$dir/keys/$name.pem");
-        @ENV{qw/HTTPS_CERT_FILE HTTPS_KEY_FILE/} = ($cert, $key);
+        # IO::Socket:SSL raw socket compatibility
+        $conn_opts->{SSL_cert_file} = $cert;
+        $conn_opts->{SSL_key_file} = $key;
         if ($LWP::VERSION >= 6.0) {
             # IO::Socket:SSL doesn't look at environment variables
             if ($UA) {
@@ -642,14 +663,23 @@ sub set_client_cert {
         }
     }
     else {
-        for (qw(CERT KEY)) {
-            delete $ENV{"HTTPS_${_}_FILE"};
-        }
+        # IO::Socket:SSL raw socket compatibility
+        $conn_opts->{SSL_cert_file} = undef;
+        $conn_opts->{SSL_key_file} = undef;
         if ($LWP::VERSION >= 6.0 and $UA) {
             $UA->ssl_opts(SSL_cert_file => undef);
             $UA->ssl_opts(SSL_key_file  => undef);
         }
     }
+}
+
+# Only for IO::Socket:SSL raw socket compatibility,
+# when using user_agent() already done in its
+# constructor.
+sub set_ca_cert {
+    my $vars = Apache::Test::vars();
+    my $cafile = "$vars->{sslca}/$vars->{sslcaorg}/certs/ca.crt";
+    $conn_opts->{SSL_ca_file} = $cafile;
 }
 
 #want news: urls to work with the LWP shortcuts

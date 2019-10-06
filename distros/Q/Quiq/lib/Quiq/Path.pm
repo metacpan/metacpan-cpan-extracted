@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.158';
+our $VERSION = '1.159';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -1275,7 +1275,7 @@ eine Referenz auf die Liste.
 
 Ermittele die Einträge des Verzeichnisses $dir und liefere diese
 als Liste zurück. Die Liste umfasst alle Verzeichniseinträge
-außer C<.> und C<..>.
+außer "." und "..".
 
 =cut
 
@@ -1875,7 +1875,7 @@ sub rmdir {
 
 =head4 Synopsis
 
-  $dir = $this->tempDir(@opt);
+  $dir = $this->tempDir;
 
 =head4 Returns
 
@@ -2652,6 +2652,97 @@ sub rename {
 
 # -----------------------------------------------------------------------------
 
+=head3 numberPaths() - Nummeriere Pfade
+
+=head4 Synopsis
+
+  $this->numberPaths(\@paths,$width,$step);
+
+=head4 Arguments
+
+=over 4
+
+=item @path
+
+Die Pfade, die zu nummerieren sind.
+
+=item $width
+
+Die Breite (Anzahl der Stellen) der Nummer.
+
+=item $step
+
+Die Schrittweite der Nummerierung.
+
+=back
+
+=head4 Description
+
+Nummeriere die Pfade @paths, gemäß ihrer gegebenen Reihenfolge.
+Der Basisname der jeweiligen Datei/des Directory aus @paths wird
+hierbei durch eine Nummer der Breite $width ersetzt. Die Extension
+(sofern vorhanden) bleibt erhalten. Die Nummerierung erfolgt mit
+Schrittweite $width.
+
+=head4 Example
+
+Der Aufruf
+
+  $ perl -MQuiq::Path -E '$p = Quiq::Path->new; $p->numberPaths([$p->glob("*")],5,10)'
+
+benennt alle Dateien, gleichgültig wie sie heißen, im aktuellen
+Verzeichnis um in
+
+  00010.EXT
+  00020.EXT
+  00030.EXT
+  ...
+
+wobei EXT die Extension ist, die die Datei vorher hatte, d.h. diese
+bleibt als einziges vom ursprünglichen Dateinamen erhalten.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub numberPaths {
+    my ($this,$pathA,$width,$step) = splice @_,0,4;
+
+    # Nummeriere Dateien mit Endung .tmp
+
+    my $n = $step;
+    my @tmpPath;
+    for my $path (@$pathA) {
+        my ($dir,undef,$base,$ext) = $this->split($path);
+
+        my $tmpPath;
+        if ($dir ne '') {
+            $tmpPath = "$dir/";
+        }
+        $tmpPath .= sprintf '%0*d',$width,$n;
+        if ($ext ne '') {
+            $tmpPath .= ".$ext";
+        }
+        $tmpPath .= '.tmp';
+        push @tmpPath,$tmpPath;
+
+        $this->rename($path,$tmpPath,-overwrite=>0);
+
+        $n += $step;
+    }
+
+    # Entferne Endung .tmp
+
+    for my $tmpPath (@tmpPath) {
+        (my $newPath = $tmpPath) =~ s/\.tmp$//;
+        $this->rename($tmpPath,$newPath,-overwrite=>0);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 split() - Zerlege Pfad in seine Komponenten
 
 =head4 Synopsis
@@ -2978,7 +3069,7 @@ sub uid {
 
 =head1 VERSION
 
-1.158
+1.159
 
 =head1 AUTHOR
 

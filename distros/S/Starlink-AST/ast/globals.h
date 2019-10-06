@@ -11,6 +11,7 @@
 #include "axis.h"
 #include "box.h"
 #include "channel.h"
+#include "chebymap.h"
 #include "circle.h"
 #include "cmpframe.h"
 #include "cmpmap.h"
@@ -33,6 +34,8 @@
 #include "mathmap.h"
 #include "matrixmap.h"
 #include "memory.h"
+#include "moc.h"
+#include "mocchan.h"
 #include "normmap.h"
 #include "nullregion.h"
 #include "object.h"
@@ -68,10 +71,12 @@
 #include "timemap.h"
 #include "tranmap.h"
 #include "unitmap.h"
+#include "unitnormmap.h"
 #include "wcsmap.h"
 #include "winmap.h"
 #include "xml.h"
 #include "xmlchan.h"
+#include "xphmap.h"
 #include "zoommap.h"
 
 
@@ -176,6 +181,7 @@ typedef struct AstGlobals {
    AstRegionGlobals Region;
    AstBoxGlobals Box;
    AstXmlGlobals Xml;
+   AstXphMapGlobals XphMap;
    AstXmlChanGlobals XmlChan;
    AstCircleGlobals Circle;
    AstCmpRegionGlobals CmpRegion;
@@ -183,11 +189,14 @@ typedef struct AstGlobals {
    AstEllipseGlobals Ellipse;
    AstIntervalGlobals Interval;
    AstMatrixMapGlobals MatrixMap;
+   AstMocGlobals Moc;
+   AstMocChanGlobals MocChan;
    AstNormMapGlobals NormMap;
    AstNullRegionGlobals NullRegion;
    AstPermMapGlobals PermMap;
    AstPointListGlobals PointList;
    AstPolyMapGlobals PolyMap;
+   AstChebyMapGlobals ChebyMap;
    AstPolygonGlobals Polygon;
    AstPrismGlobals Prism;
    AstRateMapGlobals RateMap;
@@ -202,6 +211,7 @@ typedef struct AstGlobals {
    AstTimeMapGlobals TimeMap;
    AstTranMapGlobals TranMap;
    AstUnitMapGlobals UnitMap;
+   AstUnitNormMapGlobals UnitNormMap;
    AstWinMapGlobals WinMap;
    AstStcResourceProfileGlobals	StcResourceProfile;
    AstStcSearchLocationGlobals StcSearchLocation;

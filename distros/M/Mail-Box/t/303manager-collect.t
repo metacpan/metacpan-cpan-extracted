@@ -28,8 +28,7 @@ my @boxes =
 
 # Create the directory hierarchy
 
-my $top = 'collect-test.tmp';
-clean_dir($top);
+my $top = File::Spec->catdir($workdir,'collect-test.tmp');
 mkdir $top or die "$top: $!";
 
 foreach my $box (@boxes)
@@ -189,6 +188,3 @@ is($y->parent->parent->name, 'a3');
 is($y->fullname, '=/a3/b8');
 is($y->fullname('#'), '=#a3#b8');
 is($y->location, "$top/a3/b8");
-
-
-clean_dir($top);

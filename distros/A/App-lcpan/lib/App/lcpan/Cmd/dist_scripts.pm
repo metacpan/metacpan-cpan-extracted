@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dist_scripts;
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '1.039'; # VERSION
+our $DATE = '2019-10-05'; # DATE
+our $VERSION = '1.041'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ App::lcpan::Cmd::dist_scripts - List scripts in a distribution
 
 =head1 VERSION
 
-This document describes version 1.039 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2019-09-19.
+This document describes version 1.041 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2019-10-05.
 
 =head1 FUNCTIONS
 

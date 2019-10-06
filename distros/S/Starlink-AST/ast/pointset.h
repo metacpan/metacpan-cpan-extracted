@@ -145,12 +145,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -168,6 +168,8 @@
 *        Added protected astInitPointSetVtab method.
 *     2-NOV-2004 (DSB):
 *        Added PointAccuracy attribute.
+*     25-SEP-2019 (DSB):
+*        Use 8-byte "npoint" values.
 *-
 */
 
@@ -507,7 +509,7 @@ typedef struct AstPointSet {
    double **ptr;                 /* Pointer to array of pointers to values */
    double *values;               /* Pointer to array of coordinate values */
    int ncoord;                   /* Number of coordinate values per point */
-   int npoint;                   /* Number of points */
+   AstDim npoint;                /* Number of points */
    double *acc;                  /* Axis accuracies */
 } AstPointSet;
 
@@ -528,12 +530,13 @@ typedef struct AstPointSetVtab {
    AstPointSet *(* AppendPoints)( AstPointSet *, AstPointSet *, int * );
    double **(* GetPoints)( AstPointSet *, int * );
    int (* GetNcoord)( const AstPointSet *, int * );
-   int (* GetNpoint)( const AstPointSet *, int * );
+   AstDim (* GetNpoint)( const AstPointSet *, int * );
    void (* BndPoints)( AstPointSet *, double *, double *, int * );
    void (* PermPoints)( AstPointSet *, int, const int[], int * );
-   void (* SetNpoint)( AstPointSet *, int, int * );
+   void (* SetNpoint)( AstPointSet *, AstDim, int * );
    void (* SetPoints)( AstPointSet *, double **, int * );
-   void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet *, int * );
+   void (* SetSubPoints)( AstPointSet *, AstDim, int, AstPointSet *, int * );
+   void (* ShowPoints)( AstPointSet *, int * );
    int (* ReplaceNaN)( AstPointSet *, int * );
 
    double (* GetPointAccuracy)( AstPointSet *, int, int * );
@@ -566,16 +569,16 @@ astPROTO_ISA(PointSet)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPointSet *astPointSet_( int, int, const char *, int *, ...);
+AstPointSet *astPointSet_( AstDim, int, const char *, int *, ...);
 #else
-AstPointSet *astPointSetId_( int, int, const char *, ... )__attribute__((format(printf,3,4)));
+AstPointSet *astPointSetId_( AstDim, int, const char *, ... )__attribute__((format(printf,3,4)));
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstPointSet *astInitPointSet_( void *, size_t, int, AstPointSetVtab *,
-                               const char *, int, int, int * );
+                               const char *, AstDim, int, int * );
 
 /* Vtab initialiser. */
 void astInitPointSetVtab_( AstPointSetVtab *, const char *, int * );
@@ -596,15 +599,16 @@ void astInitPointSetGlobals_( AstPointSetGlobals * );
 double **astGetPoints_( AstPointSet *, int * );
 void astPermPoints_( AstPointSet *, int, const int[], int * );
 void astSetPoints_( AstPointSet *, double **, int * );
-void astSetNpoint_( AstPointSet *, int, int * );
-void astSetSubPoints_( AstPointSet *, int, int, AstPointSet *, int * );
+void astSetNpoint_( AstPointSet *, AstDim, int * );
+void astSetSubPoints_( AstPointSet *, AstDim, int, AstPointSet *, int * );
 AstPointSet *astAppendPoints_( AstPointSet *, AstPointSet *, int * );
 void astBndPoints_( AstPointSet *, double *, double *, int * );
 int astReplaceNaN_( AstPointSet *, int * );
+void astShowPoints_( AstPointSet *, int * );
 
 # if defined(astCLASS)           /* Protected */
 int astGetNcoord_( const AstPointSet *, int * );
-int astGetNpoint_( const AstPointSet *, int * );
+AstDim astGetNpoint_( const AstPointSet *, int * );
 
 double astGetPointAccuracy_( AstPointSet *, int, int * );
 int astTestPointAccuracy_( AstPointSet *, int, int * );
@@ -678,6 +682,8 @@ astINVOKE(O,astAppendPoints_(astCheckPointSet(this),astCheckPointSet(that),STATU
 astINVOKE(V,astBndPoints_(astCheckPointSet(this),lbnd,ubnd,STATUS_PTR))
 #define astReplaceNaN(this) \
 astINVOKE(V,astReplaceNaN_(astCheckPointSet(this),STATUS_PTR))
+#define astShowPoints(this) \
+astINVOKE(V,astShowPoints_(astCheckPointSet(this),STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astGetNpoint(this) \

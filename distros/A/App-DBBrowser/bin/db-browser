@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.211';
+our $VERSION = '2.212';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.211
+Version 2.212
 
 =head1 SYNOPSIS
 
@@ -403,18 +403,27 @@ If a column is not empty, but has no header name the header is named temporarily
 
 Use only selected rows of the imported data.
 
-If the input has rows with different numbers of columns, this filter sorts the rows in groups with the same number of
-columns. The user can then select the group of rows which should be used.
-
 =item Range Rows
 
 Use only a range of rows.
 
-=item Add Col
+=item Row Groups
 
-Add an empty column: adds a column to the header row and adjusts the remaining rows to the length of the header row.
+If the input has rows with different numbers of columns, one can choose a group of rows with the same number of columns.
 
-If the input has rows with different numbers of columns, use first I<Choose Rows> to select the rows to use.
+=item Remove Cell
+
+Remove a cell from a chosen row.
+
+=item Insert Cell
+
+Insert a cell in a chosen row. The new cell is inserted in front of a chosen cell.
+
+=item Append Col
+
+Append an empty column. Appends a header element to the header row and adjusts the remaining rows to the length of the
+header row. If the input has rows with different numbers of cells, use the L<Row Group> filter first to select the right
+row-group.
 
 =item Empty to NULL
 

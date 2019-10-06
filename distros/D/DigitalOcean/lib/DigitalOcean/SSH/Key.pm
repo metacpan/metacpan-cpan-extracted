@@ -4,8 +4,6 @@ use Mouse;
 
 #ABSTRACT: Represents a SSH Key object in the DigitalOcean API
 
-our $VERSION = '0.03';
-
 has DigitalOcean => (
     is => 'rw',
     isa => 'DigitalOcean',
@@ -78,7 +76,7 @@ DigitalOcean::SSH::Key - Represents a SSH Key object in the DigitalOcean API
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -138,7 +136,7 @@ Adam Hopkins <srchulo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Adam Hopkins.
+This software is copyright (c) 2019 by Adam Hopkins.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

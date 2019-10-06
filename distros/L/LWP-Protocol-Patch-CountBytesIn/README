@@ -1,0 +1,44 @@
+NAME
+    LWP::Protocol::Patch::CountBytesIn - Count bytes in
+
+VERSION
+    This document describes version 0.001 of
+    LWP::Protocol::Patch::CountBytesIn (from Perl distribution
+    LWP-Protocol-Patch-CountBytesIn), released on 2019-10-05.
+
+SYNOPSIS
+     use LWP::Protocol::Patch::CountBytesIn;
+
+     # ... use LWP
+
+     printf "Total downloaded : %9d bytes\n", $LWP::Protocol::Patch::CountBytesIn::bytes_in;
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-Protocol-Patch-CountBytesIn>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-Protocol-Patch-CountBytes>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-Protocol-Patch-Co
+    untBytesIn>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    IO::Socket::ByteCounter
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -170,7 +170,7 @@ sub configure_php_ini {
     my $dir  = catfile $self->{vars}->{serverroot}, 'conf';
     my $file = catfile $dir, 'php.ini';
 
-    return if -e $file
+    return if -e $file;
 
     my $log  = catfile $self->{vars}->{t_logs}, 'error_log';
 

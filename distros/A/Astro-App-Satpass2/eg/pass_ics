@@ -1,0 +1,91 @@
+# Astro::App::Satpass2 source file. Invoke as (e.g.)
+# satpass2> source eg/pass_vcalendar
+#
+# Do satellite pass calculations, displaying the results in vCalendar
+# format. The output may be redirected to a .vcal file. The start and
+# end dates for the pass calculation can be passed as arguments to the
+# 'source' statement, and default to 'today noon' and '+8' respectively.
+# This whole thing (less the comments) could be wrapped up as a macro
+# if desired.
+
+#	CAVEAT: My ancient Palm desktop software appears not to properly
+#	handle the switch between normal and daylight-saving  time
+#	(a.k.a. summer time), in that predictions made before the switch
+#	for events after the switch get assigned the wrong time, even
+#	though the UT event time is correct in the emitted file. I have
+#	not changed the event times to local time eg/flare_vcalendar
+#	because the vcalendar standard specifies UT.
+
+localize formatter
+# localize output_layers
+
+# An iCal file is supposed to have <cr><lf> line breaks
+
+# set output_layers :encoding(utf-8):crlf
+
+# We intend to use date(units='z') to format the event begin and end,
+# and the alert times.
+
+formatter date_format %Y%m%dT%H%M%SZ
+
+# We intend to use time() to format the individual event times.
+
+formatter time_format %I:%M:%S
+
+# The individual pass events get concatenated to the description, with
+# no newline between.
+
+formatter template pass <<'EOD'
+[% UNLESS data %]
+    [%- SET data = sp.pass( arg ) %]
+[%- END -%]
+BEGIN:VCALENDAR
+VERSION:2.0
+[%- FOR pass IN data %]
+[%- events = pass.events %]
+[%- CALL events.fixed_width( 0 ) %]
+[%- first = events.first %]
+[%- punct = '' %]
+BEGIN:VEVENT
+DTSTART:[% first.date( units = 'zulu' ) %]
+DALARM:[% first.date( delta = -300, units = 'zulu' ) %]
+DALARM:[% first.date( units = 'zulu' ) %]
+SUMMARY:[% first.name %]
+DESCRIPTION:
+    [%- FOREACH evt IN events %][% punct %]
+	[%- evt_name = evt.event %]
+	[%- end_date = evt.date( units = 'z' ) %]
+	[%- evt_name %]
+	[%- IF 'apls' == evt_name %]
+            [%- appulse = evt.appulse %]
+            [%= appulse.angle %]
+	    [%= appulse.name %]
+	[%- END %]
+	[%= evt.time %] Az
+	[%= evt.azimuth( places = 0, bearing = 2 ) %]
+	[%- IF 'rise' != evt_name and 'set' != evt_name %] Ele
+	    [%= evt.elevation( places = 0 ) %]
+	[%- END %]
+	[%- IF '' != evt.magnitude %] Mag
+	    [%= evt.magnitude %]
+	[%- END %]
+        [%- punct = '\n' %]
+    [%- END %]
+DTEND:[% end_date %]
+END:VEVENT
+[%- END %]
+END:VCALENDAR
+EOD
+
+# Do the pass calculation. I do not know that the vcal format requires
+# the data to be chronological, but ...
+
+# TODO: The iCal spec (RFC 5545 section 3.1) says that content lines
+# SHOULD NOT be longer than 75 octets (NOT characters) excluding the
+# line break, and longer lines SHOULD be broken.
+
+# NOTE that at least under macOS (as they spell it these days) this must
+# be saved as a .ics file to be successfully imported into the calendar
+# application.
+
+pass -chronological "${1:-today noon}" "${2:-+8}"

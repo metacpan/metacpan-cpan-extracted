@@ -5,7 +5,7 @@ eg/almanac
 eg/es.pm
 eg/flare_vcalendar
 eg/My/Macros.pm
-eg/pass_vcalendar
+eg/pass_ics
 eg/quarters_vcalendar
 eg/README
 eg/tle_celestia.tt

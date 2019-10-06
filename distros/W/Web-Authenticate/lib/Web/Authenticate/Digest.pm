@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Digest;
-$Web::Authenticate::Digest::VERSION = '0.011';
+$Web::Authenticate::Digest::VERSION = '0.012';
 use Mouse;
 use Mouse::Util::TypeConstraints;
 use Crypt::PBKDF2;
@@ -51,7 +51,7 @@ Web::Authenticate::Digest - The default implementation of Web::Authenticate::Dig
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

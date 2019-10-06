@@ -1,3 +1,24 @@
+1.159 2019-10-05
+================
+[Quiq::ChartJs::TimeSeries]
+* Klasse hinzugefügt
+
+[Quiq::Html::Tag]
+* Element <canvas> hinzugefügt
+
+[Quiq::Object]
+* Doku korrigiert
+
+[Quiq::Path]
+* numberPaths() hinzugefügt
+* Doku korrigiert
+
+[Quiq::PostgreSql::Catalog]
+* Klasse hinzugefügt
+
+[Quiq::TempFile]
+* Option -dir korrigiert
+
 1.158 2019-09-21
 ================
 [Quiq::Cascm]
@@ -5,7 +26,7 @@
 * putFiles() - Transportpackage eingeführt
 
 [Makefile.PL]
-* Excpect zu PREREQ_PM hinzugefügt
+* Expect zu PREREQ_PM hinzugefügt
 
 1.157 2019-09-15
 ================

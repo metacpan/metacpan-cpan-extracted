@@ -24,7 +24,7 @@ copy $src, $cpy
 
 my $folder = Mail::Box::Mbox->new
   ( folder       => "=$cpyfn"
-  , folderdir    => $folderdir
+  , folderdir    => $workdir
   , lock_type    => 'NONE'
   , extract      => 'LAZY'
   , access       => 'rw'
@@ -78,7 +78,7 @@ cmp_ok($oldsize, "==",  -s $folder->filename,      "expected size");
 
 my $copy = new Mail::Box::Mbox
   ( folder       => "=$cpyfn"
-  , folderdir    => $folderdir
+  , folderdir    => $workdir
   , lock_type    => 'NONE'
   , extract      => 'LAZY'
   );

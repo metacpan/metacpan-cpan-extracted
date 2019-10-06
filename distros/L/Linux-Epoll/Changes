@@ -1,5 +1,8 @@
 Revision history for Linux-Epoll
 
+0.017     2019-10-04 16:57:07+02:00 Europe/Amsterdam
+          - Eliminate superfluous SAVETMPS
+
 0.016     2018-09-17 23:26:13+02:00 Europe/Amsterdam
           - Revert swallowing exceptions
           - Fix memory management regression

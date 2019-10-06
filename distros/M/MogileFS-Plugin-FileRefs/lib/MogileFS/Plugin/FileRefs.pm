@@ -8,7 +8,7 @@ use MogileFS::Worker::Query;
 
 use constant LOCK_TIMEOUT => 5;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 MogileFS::Store->add_extra_tables("file_ref");
 
 sub load {
@@ -23,19 +23,19 @@ sub load {
 
 # By virtue of DBI, this returns true if the connection worked.
 sub _claim_lock {
-    my ($rv) = Mgd::get_dbh->selectrow_array("SELECT GET_LOCK(?,?)", {}, "mogile-filerefs-".$_[1]->{domain}."-".$_[1]->{arg1}, LOCK_TIMEOUT());
-    return $rv;
+    my ($rv) = Mgd::validate_dbh->selectrow_array("SELECT GET_LOCK(?,?)", {}, "mogile-filerefs-".$_[1]->{domain}."-".$_[1]->{arg1}, LOCK_TIMEOUT());
+    return $rv==1;
 }
 
 sub _free_lock {
-    eval { Mgd::get_dbh->do("SELECT RELEASE_LOCK(?)", {}, "mogile-filerefs-".$_[1]->{domain}."-".$_[1]->{arg1}) or warn "could not free lock: $DBI::errstr"; };
+    eval { Mgd::validate_dbh->do("SELECT RELEASE_LOCK(?)", {}, "mogile-filerefs-".$_[1]->{domain}."-".$_[1]->{arg1}) or warn "could not free lock: $DBI::errstr"; };
     return;
 }
 
 sub add_file_ref {
     my ($query, $args) = @_;
-    my $dmid = $query->check_domain($args) or return $query->err_line('domain_not_found');
-    my $dbh = Mgd::get_dbh();
+    my $dmid = $query->check_domain($args) or return;
+    my $dbh = Mgd::validate_dbh();
     _claim_lock($query, $args) or return $query->err_line("get_key_lock_fail");
     local $@;
     my $updated = eval { $dbh->do("INSERT INTO file_ref (dmid, dkey, ref) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE ref=ref", {}, $dmid, $args->{arg1}, $args->{arg2}); };
@@ -49,8 +49,8 @@ sub add_file_ref {
 
 sub del_file_ref {
     my ($query, $args) = @_;
-    my $dbh = Mgd::get_dbh();
-    my $dmid = $query->check_domain($args) or return $query->err_line('domain_not_found');
+    my $dbh = Mgd::validate_dbh();
+    my $dmid = $query->check_domain($args) or return;
     local $@;
     my $deleted = eval { $dbh->do("DELETE FROM file_ref WHERE dmid = ? AND dkey = ? AND ref = ?", {}, $dmid, $args->{arg1}, $args->{arg2}) };
     if ($@ || $dbh->err) {
@@ -63,9 +63,9 @@ sub del_file_ref {
 
 sub rename_if_no_refs {
     my ($query, $args) = @_;
-    my $dbh = Mgd::get_dbh();
+    my $dbh = Mgd::validate_dbh();
 
-    my $dmid = $query->check_domain($args) or return $query->err_line('domain_not_found');
+    my $dmid = $query->check_domain($args) or return;
 
     _claim_lock($query, $args) or return $query->err_line("get_key_lock_fail");
 
@@ -92,8 +92,8 @@ sub rename_if_no_refs {
 
 sub list_refs_for_dkey {
     my ($query, $args) = @_;
-    my $dmid = $query->check_domain($args) or return $query->err_line('domain_not_found');
-    my $dbh = Mgd::get_dbh();
+    my $dmid = $query->check_domain($args) or return;
+    my $dbh = Mgd::validate_dbh();
     my $result = eval {
         $dbh->selectcol_arrayref("SELECT ref FROM file_ref WHERE dmid = ? AND dkey = ?", {}, $dmid, $args->{arg1});
     };
@@ -117,18 +117,16 @@ sub update_schema {
     return;
 }
 
-{
-    package MogileFS::Store;
-
-    sub TABLE_file_ref {
+BEGIN {
+    *MogileFS::Store::TABLE_file_ref = sub {
         q{CREATE TABLE `file_ref` (
       `dmid` SMALLINT UNSIGNED NOT NULL,
       `dkey` varchar(255) DEFAULT NULL,
       `ref`  varchar(255) DEFAULT NULL,
       UNIQUE KEY `i_unique` (`dmid`,`dkey`,`ref`)
     );
-        };
-    }
+    };
+    };
 }
 
 1;
@@ -193,7 +191,7 @@ L<MogileFS::Server>
 
 =head1 AUTHOR
 
-Dave Lambley, E<lt>davel@state51.co.ukE<gt>
+Dave Lambley, E<lt>davel@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

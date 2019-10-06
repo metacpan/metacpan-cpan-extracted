@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.00028 2019-10-04T11:06:08Z
+  * Merge #9 to fix named args
+  * Update travis CI tests
+
 0.00027 2014-10-18T23:14:16Z
   * Fix tests and dependency (andk issues #5, #6)
   * Update travis tests

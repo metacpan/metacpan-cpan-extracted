@@ -18,7 +18,7 @@ meta-spec:
 name: App-ANSIColorUtils
 requires:
   Color::ANSI::Util: '0.161'
-  Color::RGB::Util: '0.596'
+  Color::RGB::Util: '0.599'
   Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils
   homepage: https://metacpan.org/release/App-ANSIColorUtils
   repository: git://github.com/perlancar/perl-App-ANSIColorUtils.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

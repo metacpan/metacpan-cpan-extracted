@@ -1,7 +1,7 @@
 use strict;
 package Crypt::Mode::CBC::Easy;
 #ABSTRACT: Encrypts/decrypts text and verifies decrypted text with a checksum and a random initialization vector.
-$Crypt::Mode::CBC::Easy::VERSION = '0.004';
+$Crypt::Mode::CBC::Easy::VERSION = '0.006';
 use Mouse;
 use Crypt::CBC;
 use Digest::SHA;
@@ -126,7 +126,7 @@ Crypt::Mode::CBC::Easy - Encrypts/decrypts text and verifies decrypted text with
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

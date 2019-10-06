@@ -40,6 +40,7 @@ c     - astBegin: Begin a new AST context
 c     - astClear: Clear attribute values for an Object
 c     - astClone: Clone a pointer to an Object
 c     - astCopy: Copy an Object
+c     - astCreatedAt: Returns information about where an object was created
 c     - astDelete: Delete an Object
 c     - astEnd: End an AST context
 c     - astEscapes: Control whether graphical escape sequences are removed
@@ -98,12 +99,12 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -223,6 +224,18 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        owning the object itself.
 *     6-JAN-2014 (DSB):
 *        Added method astEnvSet.
+*     9-APR-2015 (DSB):
+*        Modify VSet to handle "%s" setting strings (i.e. where the whole
+*        list of settings is provided as a single variable argument).
+*        This is needed because supplying the while settings string in
+*        place of "%s" is considered a security issue by many compilers.
+*     4-JUL-2017 (DSB):
+*        Within astLockId, perform the correct check that the supplied
+*        object handle is not locked by another thread.
+*     17-SEP-2017 (DSB):
+*        Add function astCreatedAt. This increases the size of a Handle
+*        structure by 20 bytes. If this turns out to be problematic
+*        this facility could be controlled using a configure option.
 *class--
 */
 
@@ -254,6 +267,7 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "channel.h"             /* I/O channels */
+#include "keymap.h"              /* Hash tables */
 #include "object.h"              /* Interface definition for this class */
 #include "plot.h"                /* Plot class (for astStripEscapes) */
 #include "globals.h"             /* Thread-safe global data access */
@@ -434,7 +448,7 @@ static const char *GetIdent( AstObject *, int * );
 static const char *Get( AstObject *, const char *, int * );
 static const char *FromStringSource( void );
 static int Equal( AstObject *, AstObject *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int HasAttribute( AstObject *, const char *, int * );
 static int Same( AstObject *, AstObject *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -2089,7 +2103,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib, int *status )
    astDECLARE_GLOBALS            /* Thread-specific global data */
    const char *result;           /* Pointer value to return */
    int nobject;                  /* Nobject attribute value */
-   int objsize;                  /* ObjSize attribute value */
+   size_t objsize;               /* ObjSize attribute value */
    int ref_count;                /* RefCount attribute value */
    int usedefs;                  /* UseDefs attribute value */
 
@@ -2145,7 +2159,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "objsize" ) ) {
       objsize = astGetObjSize( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%d", objsize );
+         (void) sprintf( getattrib_buff, "%zu", objsize );
          result = getattrib_buff;
       }
 
@@ -2277,7 +2291,7 @@ int astGetNobject_( const AstObject *this, int *status ) {
    return this->vtab->nobject;
 }
 
-static int GetObjSize( AstObject *this, int *status ) {
+static size_t GetObjSize( AstObject *this, int *status ) {
 /*
 *+
 *  Name:
@@ -2291,7 +2305,7 @@ static int GetObjSize( AstObject *this, int *status ) {
 
 *  Synopsis:
 *     #include "object.h"
-*     int astGetObjSize( AstObject *this )
+*     size_t astGetObjSize( AstObject *this )
 
 *  Class Membership:
 *     Object method.
@@ -2604,6 +2618,9 @@ const char *astGetC_( AstObject *this, const char *attrib, int *status ) {
 /* Obtain a pointer to the required attribute value, formatted as a
    character string. */
    value = Get( this, attrib, status );
+
+/* Use a null string if a NULL pointer was returned by Get. */
+   if( !value ) value = "";
 
 /* If OK, store a copy of the resulting string in dynamically
    allocated memory, putting a pointer to the copy into the next
@@ -3836,7 +3853,7 @@ void astSet##code##_( AstObject *this, const char *attrib, type value, int *stat
 }
 
 /* Use this macro to create all the SetX_ private member functions. */
-MAKE_SETX(D,double,"%.*g",4,DBL_DIG)
+MAKE_SETX(D,double,"%.*g",4,AST__DBL_DIG)
 MAKE_SETX(F,float,"%.*g",4,FLT_DIG)
 MAKE_SETX(I,int,"%.*d",4,1)
 MAKE_SETX(L,long,"%.*ld",5,1)
@@ -4646,12 +4663,13 @@ static void VSet( AstObject *this, const char *settings, char **text,
 *-
 */
 
-/* Local Constants: */
-   const int min_buff_len = 1024; /* Minimum size of formatting buffer */
+#define MIN_BUFF_LEN 1024
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   char setting_buf[ MIN_BUFF_LEN ]; /* Expanded "%s" settting string */
+   char *dyn_buf;                /* Pointer to dynamic buffer for expanded setting */
    char *errstat;                /* Pointer to error message */
    char *assign;                 /* Pointer to assigment substring */
    char *assign_end;             /* Pointer to null at end of assignment */
@@ -4660,6 +4678,7 @@ static void VSet( AstObject *this, const char *settings, char **text,
    char *buff3;                  /* Pointer to temporary string buffer */
    char *eq1;                    /* Pointer to 1st equals sign */
    int buff_len;                 /* Length of temporary buffer */
+   int expanded;                 /* Has the Settings string been expanded yet? */
    int i;                        /* Loop counter for characters */
    int j;                        /* Offset for revised assignment character */
    int len;                      /* Length of settings string */
@@ -4679,6 +4698,41 @@ static void VSet( AstObject *this, const char *settings, char **text,
    zero. If it is, there is nothing more to do. */
    len = (int) strlen( settings );
    if ( len != 0 ) {
+
+/* If the setting string is just "%s" (with optional trailing and leading
+   white space) then the variable argument potentially contains more than
+   one attribute setting, in which case we expand the setting string now
+   and use the expanded string in place of the supplied string in the rest
+   of this function. */
+      nc = 0;
+      sscanf( settings, " %%s %n", &nc );
+      if( nc == len ) {
+
+/* Expand the supplied string using a fixed-length buffer. This writes at
+   most MIN_BUFF_LEN characters to "buf", but returns the number of
+   characters that would have been needed to write the whole string. */
+         len =  vsnprintf( setting_buf, sizeof(setting_buf), settings, args );
+
+/* If the fixed-length buffer is too short, use a dynamically allocated
+   buffer instead. */
+         if( len + 1 > MIN_BUFF_LEN ) {
+            dyn_buf = astMalloc( len + 1 );
+            if( astOK ) {
+               len =  vsnprintf( dyn_buf, len + 1, settings, args );
+               settings = dyn_buf;
+            }
+         } else {
+            dyn_buf = NULL;
+            settings = setting_buf;
+         }
+
+/* Indicate that "settings" has been expanded. */
+         expanded = 1;
+
+      } else {
+         expanded = 0;
+         dyn_buf = NULL;
+      }
 
 /* Allocate memory and store a copy of the string. */
       buff1 = astStore( NULL, settings, (size_t) ( len + 1 ) );
@@ -4710,15 +4764,21 @@ static void VSet( AstObject *this, const char *settings, char **text,
    one.  Ensure it is not less than a minimum size and then allocate
    this buffer. */
          buff_len = 2 * len;
-         if ( buff_len < min_buff_len ) buff_len = min_buff_len;
+         if ( buff_len < MIN_BUFF_LEN ) buff_len = MIN_BUFF_LEN;
          buff2 = astMalloc( (size_t) ( buff_len + 1 ) );
          if ( astOK ) {
 
 /* Use "vsprintf" to substitute values for any format specifiers in
    the "settings" string, writing the resulting string into the second
-   buffer. */
+   buffer. If the "settings" string has already been expanded, then just
+   copy it. */
             errno = 0;
-            nc = vsprintf( buff2, buff1, args );
+            if( !expanded ) {
+               nc = vsprintf( buff2, buff1, args );
+            } else {
+               strcpy( buff2, buff1 );
+               nc = strlen( buff1 );
+            }
 
 /* Get a copy of the expanded string to return as the function value and
    convert newlines back to commas. */
@@ -4868,11 +4928,13 @@ static void VSet( AstObject *this, const char *settings, char **text,
 
 /* Free the memory allocated for string buffers. */
          buff2 = astFree( buff2 );
+         dyn_buf = astFree( dyn_buf );
       }
       buff1 = astFree( buff1 );
    }
 }
 #undef ERRBUF_LEN
+#undef MIN_BUFF_LEN
 
 /* Attribute access functions. */
 /* --------------------------- */
@@ -5813,6 +5875,7 @@ int astManageLock_( AstObject *this, int mode, int extra, AstObject **fail,
 int astEqual_( AstObject *this, AstObject *that, int *status ) {
    if ( !astOK ) return 0;
    if( this == that ) return 1;
+   if( !this || !that ) return 0;
    return (**astMEMBER(this,Object,Equal))( this, that, status );
 }
 const char *astGetAttrib_( AstObject *this, const char *attrib, int *status ) {
@@ -5839,7 +5902,7 @@ void astVSet_( AstObject *this, const char *settings, char **text, va_list args,
    if ( !astOK ) return;
    (**astMEMBER(this,Object,VSet))( this, settings, text, args, status );
 }
-int astGetObjSize_( AstObject *this, int *status ) {
+size_t astGetObjSize_( AstObject *this, int *status ) {
    if ( !astOK || !this ) return 0;
    return (**astMEMBER(this,Object,GetObjSize))( this, status );
 }
@@ -5899,6 +5962,12 @@ typedef struct Handle {
    than through pointers. */
    int flink;                    /* Backward link to previous Handle */
    int blink;                    /* Forward link to next Handle */
+
+/* Information that records where the Handle was created. */
+   const char *routine;          /* Routine name */
+   const char *file;             /* File name */
+   int line;                     /* Line number */
+
 } Handle;
 
 /* Define a union with an overlapping int and AstObject*. This is used
@@ -5938,6 +6007,7 @@ static int unowned_handles = -1; /* Offset to head of unowned Handle
 static int Watched_Handle = -1; /* A handle index to be watched. Activity
                                    on this handle is reported using
                                    astHandleUse and astHandleAlarm. */
+static int Watched_Pointer = -1; /* A pointer ID value to be watched. */
 #endif
 
 
@@ -5981,6 +6051,174 @@ void astUnlockId_( AstObject *, int, int * );
 
 /* External Interface Functions. */
 /* ----------------------------- */
+AstKeyMap *astActiveObjects_( const char *class, int subclass, int current,
+                              int *status ) {
+/*
+c++
+*  Name:
+*     astActiveObjects
+
+*  Purpose:
+*     Return pointers for all active Objects.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstKeyMap *astActiveObjects( const char *class, int subclass,
+*                                  int current )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns a KeyMap holding currently active AST Object
+*     pointers. Each entry in the KeyMap will have a key that is an AST
+*     class name such as "FrameSet", "SkyFrame", "ZoomMap", etc. The
+*     value of the entry will be a 1-dimensional list of pointers for
+*     objects of the same class. Note, the returned pointers should NOT
+*     be annulled when they are no longer needed.
+*
+*     The pointers to return in the KeyMap may be restricted either by
+*     class or by context level using the function arguments.
+
+*  Parameters:
+*     class
+*        If NULL, then the returned KeyMap will contain pointers ofr
+*        Objects of all classes. If not NULL, then "class" should be a
+*        pointer to a null-terminated string holding the name of an AST
+*        class. The returned KeyMap will contain pointers only for the
+*        specified class. See also "subclass".
+*     subclass
+*        A Boolean flag indicating if all subclasses of the class
+*        specified by "class" should be included in the returned KeyMap.
+*        If zero, then subclass objects are not returned. Otherwise they
+*        are returned. The supplied "subclass" value is ignored if
+*        "class" is NULL.
+*     current
+*        A Boolean flag indicating if the returned list of pointers
+*        should be restricted to pointers issued within the current AST
+*        object context (see astBegin and astEnd).
+
+*  Returned Value:
+*     astActiveObjects()
+*        A pointer to a new KeyMap holding the required object pointers.
+*        They KeyMap pointer should be annulled when it is no longer
+*        needed, but the object pointers within the KeyMap should not be
+*        annulled. A NULL pointer is returned if an error has occurred
+*        prior to calling this function.
+*
+*        The values stored in the KeyMap should be accessed as generic C
+*        pointers using the KeyMap "P" data type (e.g. using function
+*        astMapGetlemP etc).
+
+*  Notes:
+*     - This function will only return objects locked by the currently
+*     executing thread.
+*     - The KeyMap pointer returned by this function is not included in the
+*     list of active objects stored in the KeyMap.
+*     - Objects that were created using the Fortran interface will have a
+*     null "file" value and will have a routine name equal to the upper case
+*     Fortran routine that issued the pointer (e.g. "AST_CLONE", "AST_FRAME",
+*     etc).
+
+c--
+*/
+
+/* Local Variables: */
+   AstKeyMap *result;         /* Returned KeyMap */
+   astDECLARE_GLOBALS         /* Thread-specific global data */
+   int i;                     /* Loop count */
+   int ihandle;               /* Offset of Handle to be annulled */
+   AstObjectVtab *req_vtab;   /* Vtab for requested class */
+   Handle *handle;            /* Pointer to current Handle */
+   int generation_gap;        /* Hereditary relationshp between two classes */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Get a pointer to Thread-specific global data. */
+   astGET_GLOBALS(NULL);
+
+/* Create an empty KeyMap to hold the results. */
+   result = astKeyMap( " ", status );
+
+/* If we will need to check if each object is a subclass of a specified
+   class, we need a pointer to the VTAB descriibing the specified class. */
+   req_vtab = NULL;
+   if( class && subclass ) {
+
+/* Loop round the vtab structures created by the currently executing thread. */
+      for( i = 0; i < nvtab; i++ ) {
+
+/* If the current vtab is for a class that matches the requested class,
+   store a pointer to the vtab. */
+         if( !strcmp( class, known_vtabs[ i ]->class ) ) {
+            req_vtab = known_vtabs[ i ];
+            break;
+         }
+      }
+   }
+
+/* Get exclusive access to the handles array. */
+   LOCK_MUTEX2;
+
+/* Get the index of the first Handle to check. If we are checking only the
+   current context level, then get this index from the appropriate element
+   of the active_handles array. Otherwise, we check the whole of the
+   handles array, starting at element zero. */
+   if( current && active_handles ) {
+      ihandle = active_handles[ context_level ];
+   } else {
+      ihandle = 0;
+   }
+
+/* Loop over the Handles array, starting from the above element. */
+   handle = handles + ihandle;
+   for( ; ihandle < nhandles; ihandle++,handle++ ) {
+
+/* Skip Handles that have no associated object. */
+      if( !handle->ptr ) continue;
+
+/* Skip handles that are in an unrequired context. */
+      if( current && handle->context != context_level ) continue;
+
+#if defined(THREAD_SAFE)
+/* Skip handles that are not locked for use by the current thread. */
+      if( handle->thread != AST__THREAD_ID ) continue;
+#endif
+
+/* If required, check that the current handle is for an object of the
+   specified class. */
+      if( class ) {
+
+/* Skip the handle if no VTAB was found for the requested class. */
+         if( !req_vtab ) continue;
+
+/* Get the generation gap between the current handle's object and the
+   specified class. */
+         generation_gap = astClassCompare( astVTAB( handle->ptr ), req_vtab );
+
+/* Skip the handle if it is not for the specified class or a subclass. */
+         if( generation_gap < 0 || generation_gap == AST__COUSIN ||
+                           ( generation_gap > 0 && !subclass ) ) continue;
+      }
+
+/* Get the integer identifier associated with the handle, convert it to a
+   pointer and append to the end of the KeyMap entry describing the handle's
+   class. */
+      astMapPutElemP( result, astGetClass( handle->ptr ), -1,
+                      astI2P( handle->check ) );
+   }
+
+/* Relinquish access to the handles array. */
+   UNLOCK_MUTEX2;
+
+/* Return the KeyMap. */
+   return result;
+}
+
 MYSTATIC void AnnulHandle( int ihandle, int *status ) {
 /*
 *  Name:
@@ -6512,6 +6750,102 @@ MYSTATIC int CheckId( AstObject *this_id, int lock_check, int *status ) {
 
 /* Return the result. */
    return ihandle;
+}
+
+void astCreatedAtId_( AstObject *this_id, const char **routine,
+                      const char **file, int *line, int *status ){
+/*
+c++
+*  Name:
+*     astCreatedAt
+
+*  Purpose:
+*     Return the routine, file and line number at which an Object was
+*     created.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void astCreatedAt( AstObject *this, const char **routine,
+*                        const char **file, int *line )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns pointers to two strings containing the
+*     name of the routine or function within which the object was created
+*     and the name of the source file containing that routine. It also
+*     returns the number of the line within the file at which the object
+*     was created. It is intended for use in debugging memory leaks etc.
+*
+*     Precisely, the information returned identifies the point at which
+*     the Object's public identifier (i.e. the supplied pointer) was
+*     first issued. This may not correspond to the actual creation of the
+*     Object if the object is contained within some higher level Object.
+*     For instance, if the astGetFrame method is used to get a pointer to
+*     a Frame within a FrameSet, the information returned by this
+*     function if supplied with the Frame pointer would identify the call
+*     to astGetFrame, rather than the line at which the FrameSet created
+*     its internal copy of the Frame. Likewise, if this function is used
+*     to get information from an Object pointer returned by astClone, the
+*     information will describe the call to astClone, not the call that
+*     created the original Object.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     routine
+*        Address of a pointer to a null terminated C string in which to
+*        return the routine name (the string will reside in static memory).
+*        The pointer will be set to NULL on exit if no routine name is
+*        available.
+*     file
+*        Address of a pointer to a null terminated C string in which to
+*        return the file name (the string will reside in static memory).
+*        The pointer will be set to NULL on exit if no file name is
+*        available.
+*     line
+*        Address of an int in which to store the line number in the file.
+*        A line number of zero is returned if no line number is available.
+
+*  Notes:
+*     - NULL pointers and a line number of zero are returned if an error
+*     has already occurred prior to calling this function.
+
+c--
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
+   int ihandle;                  /* Result to return */
+
+/* Initialise */
+   *routine = NULL;
+   *file = NULL;
+   *line = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Gain exclusive access to the handles array. */
+   LOCK_MUTEX2;
+
+/* Obtain the Handle offset for this Object. */
+   ihandle = CheckId( this_id, 1, status );
+   if ( ihandle != -1 ) {
+
+/* Copy the required pointers etc to the supplied addresses. */
+      *routine = handles[ ihandle ].routine;
+      *file = handles[ ihandle ].file;
+      *line = handles[ ihandle ].line;
+   }
+
+/* Unlock the mutex that guards access to the handles array */
+   UNLOCK_MUTEX2;
+
 }
 
 AstObject *astDeleteId_( AstObject *this_id, int *status ) {
@@ -7154,7 +7488,7 @@ c--
    reported if the handle is not curently associated with a thread.
    However, an error is reported if the Handle is associated with any
    thread other than the running thread. */
-   ihandle = CheckId( this_id, 0, status );
+   ihandle = CheckId( this_id, 1, status );
 
 /* We've finished with the handles arrays, for the moment. */
    UNLOCK_MUTEX2;
@@ -7299,8 +7633,10 @@ c--
 /* Ensure the Handles arrays have been initialised. */
    if ( !active_handles ) InitContext( status );
 
-/* Get the Handle index for the supplied object identifier. Report an error
-   if the handle is not curently associated with the running thread. */
+/* Get the Handle index for the supplied object identifier. Report an
+   error if the handle is associated with a different thread (no error
+   if the handle has no associated thread or is associated with the
+   current thread). */
    ihandle = CheckId( this_id, 1, status );
 
 /* Break the associated of the handle with the current thread so that the
@@ -7659,6 +7995,9 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
                handles[ ihandle ].check = 0;
                handles[ ihandle ].flink = -1;
                handles[ ihandle ].blink = -1;
+               handles[ ihandle ].line = 0;
+               handles[ ihandle ].file = NULL;
+               handles[ ihandle ].routine = NULL;
 #if defined(THREAD_SAFE)
                handles[ ihandle ].thread = 0;
 #endif
@@ -7684,12 +8023,20 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
                handles[ ihandle ].thread = AST__THREAD_ID;
 #endif
 
+/* Store information that records where the Handle is created - routine
+   name, file name and line number. */
+               astGetAt( &handles[ ihandle ].routine,
+                         &handles[ ihandle ].file,
+                         &handles[ ihandle ].line );
+
 /* Store extra debugging information in the handle if enabled */
 #if defined(MEM_DEBUG)
                handles[ ihandle ].id = astMemoryId( this );
                handles[ ihandle ].vtab = this->vtab;
-               astHandleUse( ihandle, "associated with a %s (id %d)",
-                              astGetClass( this ), astMemoryId( this ));
+               if( Watched_Pointer == -1 ) {
+                  astHandleUse( ihandle, "associated with a %s (id %d)",
+                                 astGetClass( this ), astMemoryId( this ));
+               }
 #endif
 
 /* Insert the Handle into the active Handles list for the current
@@ -7698,6 +8045,17 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
 
 /* Associate an identifier value with the Handle. */
                id = AssocId( ihandle, status );
+
+#if defined(MEM_DEBUG)
+               int iid = astP2I( id );
+               if( iid == Watched_Pointer ) {
+                  Watched_Handle = ihandle;
+                  printf( "astHandleAlarm: Watched AST pointer (value %d) has been "
+                          "issued for Object handle index %d\n", iid, ihandle );
+                  astHandleUse( ihandle, "associated with a %s (id %d)",
+                                astGetClass( this ), astMemoryId( this ));
+               }
+#endif
 
 /* If an error occurred, clean up by annulling the Handle. This
    ensures that the Object pointer is annulled and returns the unused
@@ -8517,13 +8875,27 @@ int CheckThread( int ihandle, int *head, int *status ) {
    return result;
 }
 
+void astWatchPointer_( int ptr_id ){
+   Watched_Pointer = ptr_id;
+   Watched_Handle = -1;
+}
+
 void astWatchHandle_( int handle ){
    Watched_Handle = handle;
+   Watched_Pointer = -1;
 }
 
 void astHandleUse_( int handle, const char *verb, ... ){
+   const char *routine;
+   const char *file;
+   int line;
    va_list args;
    if( handle == Watched_Handle ) {
+      astGetAt( &routine, &file, &line );
+      if( routine && file ) {
+         printf( "astHandleAlarm: In function %s (%s line %d)\n",
+                 routine, file, line );
+      }
       va_start( args, verb );
       astHandleAlarm( verb, args );
       va_end( args );

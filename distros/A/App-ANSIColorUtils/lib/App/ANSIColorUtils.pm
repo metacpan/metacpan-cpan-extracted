@@ -1,7 +1,7 @@
 package App::ANSIColorUtils;
 
 our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -115,14 +115,16 @@ _
         },
         color1 => {
             schema => 'color::rgb24*',
+            default => 'ffff00',
         },
         color2 => {
             schema => 'color::rgb24*',
+            default => '0000ff',
         },
     },
     examples => [
         {
-            args => {color=>'blue', color2=>'pink', text=>'Hello, world'},
+            args => {color1=>'blue', color2=>'pink', text=>'Hello, world'},
             test => 0,
             'x.doc_show_result'=>0,
         },
@@ -135,8 +137,8 @@ sub show_text_using_color_gradation {
 
     my %args = @_;
 
-    my $color1 = $args{color1} // 'ffff00';
-    my $color2 = $args{color2} // '0000ff';
+    my $color1 = $args{color1};
+    my $color2 = $args{color2};
 
     my $text = $args{text};
     $text //= do {
@@ -170,7 +172,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.005 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
+This document describes version 0.006 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 DESCRIPTION
 
@@ -294,7 +296,7 @@ Examples:
 
 =item * Example #1:
 
- show_text_using_color_gradation(text => "Hello, world", color2 => "pink", color => "blue"); # -> undef
+ show_text_using_color_gradation(text => "Hello, world", color1 => "blue", color2 => "pink"); # -> undef
 
 =back
 
@@ -306,9 +308,9 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<color1> => I<color::rgb24>
+=item * B<color1> => I<color::rgb24> (default: "ffff00")
 
-=item * B<color2> => I<color::rgb24>
+=item * B<color2> => I<color::rgb24> (default: "0000ff")
 
 =item * B<text> => I<str>
 

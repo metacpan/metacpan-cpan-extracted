@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.158';
+our $VERSION = '1.159';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -525,6 +525,7 @@ my %Element = (
     br => 'e',         # Zeilenumbruch
     button => 'v',     # Schaltfläche
     caption => 'v',    # Beschriftung zu einer Tabelle
+    canvas => 'm',     # HTML 5, Fläche zum Zeichnen
     cite => 'i',       # Text ist Hinweis auf Literaturstelle
     code => 'i',       # Codebeispiel
     col => 'e',        # Eigenschaften einer Tabellenspalte
@@ -2174,7 +2175,7 @@ sub import {
 
 =head1 VERSION
 
-1.158
+1.159
 
 =head1 AUTHOR
 

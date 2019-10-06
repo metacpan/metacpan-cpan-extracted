@@ -1298,3 +1298,552 @@ AST__MPIND()
  OUTPUT:
   RETVAL
 
+StatusType
+AST__KYCIR()
+ CODE:
+#ifdef AST__KYCIR
+    RETVAL = AST__KYCIR;
+#else
+    Perl_croak(aTHX_ "Constant AST__KYCIR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__REGCN()
+ CODE:
+#ifdef AST__REGCN
+    RETVAL = AST__REGCN;
+#else
+    Perl_croak(aTHX_ "Constant AST__REGCN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOVAL()
+ CODE:
+#ifdef AST__NOVAL
+    RETVAL = AST__NOVAL;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOVAL not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__INCTS()
+ CODE:
+#ifdef AST__INCTS
+    RETVAL = AST__INCTS;
+#else
+    Perl_croak(aTHX_ "Constant AST__INCTS not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__TIMIN()
+ CODE:
+#ifdef AST__TIMIN
+    RETVAL = AST__TIMIN;
+#else
+    Perl_croak(aTHX_ "Constant AST__TIMIN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__STCKEY()
+ CODE:
+#ifdef AST__STCKEY
+    RETVAL = AST__STCKEY;
+#else
+    Perl_croak(aTHX_ "Constant AST__STCKEY not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__STCIND()
+ CODE:
+#ifdef AST__STCIND
+    RETVAL = AST__STCIND;
+#else
+    Perl_croak(aTHX_ "Constant AST__STCIND not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__CNFLX()
+ CODE:
+#ifdef AST__CNFLX
+    RETVAL = AST__CNFLX;
+#else
+    Perl_croak(aTHX_ "Constant AST__CNFLX not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__TUNAM()
+ CODE:
+#ifdef AST__TUNAM
+    RETVAL = AST__TUNAM;
+#else
+    Perl_croak(aTHX_ "Constant AST__TUNAM not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BDPAR()
+ CODE:
+#ifdef AST__BDPAR
+    RETVAL = AST__BDPAR;
+#else
+    Perl_croak(aTHX_ "Constant AST__BDPAR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__3DFSET()
+ CODE:
+#ifdef AST__3DFSET
+    RETVAL = AST__3DFSET;
+#else
+    Perl_croak(aTHX_ "Constant AST__3DFSET not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__PXFRRM()
+ CODE:
+#ifdef AST__PXFRRM
+    RETVAL = AST__PXFRRM;
+#else
+    Perl_croak(aTHX_ "Constant AST__PXFRRM not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADSUB()
+ CODE:
+#ifdef AST__BADSUB
+    RETVAL = AST__BADSUB;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADSUB not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADFLG()
+ CODE:
+#ifdef AST__BADFLG
+    RETVAL = AST__BADFLG;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADFLG not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__LCKERR()
+ CODE:
+#ifdef AST__LCKERR
+    RETVAL = AST__LCKERR;
+#else
+    Perl_croak(aTHX_ "Constant AST__LCKERR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__FUNDEF()
+ CODE:
+#ifdef AST__FUNDEF
+    RETVAL = AST__FUNDEF;
+#else
+    Perl_croak(aTHX_ "Constant AST__FUNDEF not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MPVIN()
+ CODE:
+#ifdef AST__MPVIN
+    RETVAL = AST__MPVIN;
+#else
+    Perl_croak(aTHX_ "Constant AST__MPVIN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__OPRIN()
+ CODE:
+#ifdef AST__OPRIN
+    RETVAL = AST__OPRIN;
+#else
+    Perl_croak(aTHX_ "Constant AST__OPRIN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NONIN()
+ CODE:
+#ifdef AST__NONIN
+    RETVAL = AST__NONIN;
+#else
+    Perl_croak(aTHX_ "Constant AST__NONIN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MPKER()
+ CODE:
+#ifdef AST__MPKER
+    RETVAL = AST__MPKER;
+#else
+    Perl_croak(aTHX_ "Constant AST__MPKER not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MPPER()
+ CODE:
+#ifdef AST__MPPER
+    RETVAL = AST__MPPER;
+#else
+    Perl_croak(aTHX_ "Constant AST__MPPER not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADKEY()
+ CODE:
+#ifdef AST__BADKEY
+    RETVAL = AST__BADKEY;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADKEY not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADTYP()
+ CODE:
+#ifdef AST__BADTYP
+    RETVAL = AST__BADTYP;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADTYP not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__OLDCOL()
+ CODE:
+#ifdef AST__OLDCOL
+    RETVAL = AST__OLDCOL;
+#else
+    Perl_croak(aTHX_ "Constant AST__OLDCOL not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADNULL()
+ CODE:
+#ifdef AST__BADNULL
+    RETVAL = AST__BADNULL;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADNULL not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BIGKEY()
+ CODE:
+#ifdef AST__BIGKEY
+    RETVAL = AST__BIGKEY;
+#else
+    Perl_croak(aTHX_ "Constant AST__BIGKEY not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADCOL()
+ CODE:
+#ifdef AST__BADCOL
+    RETVAL = AST__BADCOL;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADCOL not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BIGTAB()
+ CODE:
+#ifdef AST__BIGTAB
+    RETVAL = AST__BIGTAB;
+#else
+    Perl_croak(aTHX_ "Constant AST__BIGTAB not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADSIZ()
+ CODE:
+#ifdef AST__BADSIZ
+    RETVAL = AST__BADSIZ;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADSIZ not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADTAB()
+ CODE:
+#ifdef AST__BADTAB
+    RETVAL = AST__BADTAB;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADTAB not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOTAB()
+ CODE:
+#ifdef AST__NOTAB
+    RETVAL = AST__NOTAB;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOTAB not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__LEVMAR()
+ CODE:
+#ifdef AST__LEVMAR
+    RETVAL = AST__LEVMAR;
+#else
+    Perl_croak(aTHX_ "Constant AST__LEVMAR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOFIT()
+ CODE:
+#ifdef AST__NOFIT
+    RETVAL = AST__NOFIT;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOFIT not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__ISNAN()
+ CODE:
+#ifdef AST__ISNAN
+    RETVAL = AST__ISNAN;
+#else
+    Perl_croak(aTHX_ "Constant AST__ISNAN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__WRERR()
+ CODE:
+#ifdef AST__WRERR
+    RETVAL = AST__WRERR;
+#else
+    Perl_croak(aTHX_ "Constant AST__WRERR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BDVNM()
+ CODE:
+#ifdef AST__BDVNM
+    RETVAL = AST__BDVNM;
+#else
+    Perl_croak(aTHX_ "Constant AST__BDVNM not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MIRRO()
+ CODE:
+#ifdef AST__MIRRO
+    RETVAL = AST__MIRRO;
+#else
+    Perl_croak(aTHX_ "Constant AST__MIRRO not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MNPCK()
+ CODE:
+#ifdef AST__MNPCK
+    RETVAL = AST__MNPCK;
+#else
+    Perl_croak(aTHX_ "Constant AST__MNPCK not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__EXSPIX()
+ CODE:
+#ifdef AST__EXSPIX
+    RETVAL = AST__EXSPIX;
+#else
+    Perl_croak(aTHX_ "Constant AST__EXSPIX not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOCNV()
+ CODE:
+#ifdef AST__NOCNV
+    RETVAL = AST__NOCNV;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOCNV not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__IMMUT()
+ CODE:
+#ifdef AST__IMMUT
+    RETVAL = AST__IMMUT;
+#else
+    Perl_croak(aTHX_ "Constant AST__IMMUT not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOBOX()
+ CODE:
+#ifdef AST__NOBOX
+    RETVAL = AST__NOBOX;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOBOX not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOSKY()
+ CODE:
+#ifdef AST__NOSKY
+    RETVAL = AST__NOSKY;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOSKY not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BDSKY()
+ CODE:
+#ifdef AST__BDSKY
+    RETVAL = AST__BDSKY;
+#else
+    Perl_croak(aTHX_ "Constant AST__BDSKY not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BDCLS()
+ CODE:
+#ifdef AST__BDCLS
+    RETVAL = AST__BDCLS;
+#else
+    Perl_croak(aTHX_ "Constant AST__BDCLS not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__NOIMP()
+ CODE:
+#ifdef AST__NOIMP
+    RETVAL = AST__NOIMP;
+#else
+    Perl_croak(aTHX_ "Constant AST__NOIMP not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BGMOC()
+ CODE:
+#ifdef AST__BGMOC
+    RETVAL = AST__BGMOC;
+#else
+    Perl_croak(aTHX_ "Constant AST__BGMOC not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__INVAR()
+ CODE:
+#ifdef AST__INVAR
+    RETVAL = AST__INVAR;
+#else
+    Perl_croak(aTHX_ "Constant AST__INVAR not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__INMOC()
+ CODE:
+#ifdef AST__INMOC
+    RETVAL = AST__INMOC;
+#else
+    Perl_croak(aTHX_ "Constant AST__INMOC not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__SMBUF()
+ CODE:
+#ifdef AST__SMBUF
+    RETVAL = AST__SMBUF;
+#else
+    Perl_croak(aTHX_ "Constant AST__SMBUF not defined\n");
+#endif
+ OUTPUT:
+  RETVAL

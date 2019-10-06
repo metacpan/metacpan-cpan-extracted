@@ -95,12 +95,12 @@ f     The SwitchMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -161,7 +161,7 @@ f     The SwitchMap class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 
 #if defined(THREAD_SAFE)
@@ -209,7 +209,7 @@ static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static int Equal( AstObject *, AstObject *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
@@ -351,7 +351,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -364,7 +364,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astGetObjSize protected
@@ -391,7 +391,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 /* Local Variables: */
    AstSwitchMap *this;
    int i;
-   int result;
+   size_t result;
 
 /* Initialise. */
    result = 0;
@@ -2437,8 +2437,8 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain and validate pointers to the Mapping structures provided. */
    if( astOK ) {
-      fsmap = fsmap_void ? astCheckMapping( astMakePointer(fsmap_void) ) : NULL;
-      ismap = ismap_void ? astCheckMapping( astMakePointer(ismap_void) ) : NULL;
+      fsmap = fsmap_void ? astVerifyMapping( astMakePointer(fsmap_void) ) : NULL;
+      ismap = ismap_void ? astVerifyMapping( astMakePointer(ismap_void) ) : NULL;
       for( i = 0; i < nroute; i++ ) {
          routemaps[ i ] = astVerifyMapping( astMakePointer(routemaps_void[ i ]) );
       }

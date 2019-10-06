@@ -6,6 +6,7 @@ lib/Quiq/Array.pm
 lib/Quiq/AsciiTable.pm
 lib/Quiq/Assert.pm
 lib/Quiq/Cascm.pm
+lib/Quiq/ChartJs/TimeSeries.pm
 lib/Quiq/ClassConfig.pm
 lib/Quiq/ClassLoader.pm
 lib/Quiq/Color.pm
@@ -129,6 +130,7 @@ lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
 lib/Quiq/Pod/Generator.pm
+lib/Quiq/PostgreSql/Catalog.pm
 lib/Quiq/PostgreSql/CopyFormat.pm
 lib/Quiq/PostgreSql/Psql.pm
 lib/Quiq/Process.pm
@@ -188,6 +190,7 @@ t/bin/Quiq/Array.t
 t/bin/Quiq/AsciiTable.t
 t/bin/Quiq/Assert.t
 t/bin/Quiq/Cascm.t
+t/bin/Quiq/ChartJs/TimeSeries.t
 t/bin/Quiq/ClassConfig.t
 t/bin/Quiq/ClassLoader.t
 t/bin/Quiq/Color.t
@@ -311,6 +314,7 @@ t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
 t/bin/Quiq/Pod/Generator.t
+t/bin/Quiq/PostgreSql/Catalog.t
 t/bin/Quiq/PostgreSql/CopyFormat.t
 t/bin/Quiq/PostgreSql/Psql.t
 t/bin/Quiq/Process.t

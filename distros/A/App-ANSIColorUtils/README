@@ -2,7 +2,7 @@ NAME
     App::ANSIColorUtils - Utilities related to ANSI color
 
 VERSION
-    This document describes version 0.005 of App::ANSIColorUtils (from Perl
+    This document describes version 0.006 of App::ANSIColorUtils (from Perl
     distribution App-ANSIColorUtils), released on 2019-08-20.
 
 DESCRIPTION
@@ -103,7 +103,7 @@ FUNCTIONS
 
     *   Example #1:
 
-         show_text_using_color_gradation(text => "Hello, world", color2 => "pink", color => "blue"); # -> undef
+         show_text_using_color_gradation(text => "Hello, world", color1 => "blue", color2 => "pink"); # -> undef
 
     This can be used to demonstrate 24bit color support in terminal
     emulators.
@@ -112,9 +112,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   color1 => *color::rgb24*
+    *   color1 => *color::rgb24* (default: "ffff00")
 
-    *   color2 => *color::rgb24*
+    *   color2 => *color::rgb24* (default: "0000ff")
 
     *   text => *str*
 

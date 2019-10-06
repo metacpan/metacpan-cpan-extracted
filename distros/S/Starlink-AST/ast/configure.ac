@@ -7,7 +7,7 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT([ast],[8.0.0],[starlink@jiscmail.ac.uk])
+AC_INIT([ast],[9.0.0],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl   Require autoconf-2.50 at least
@@ -20,6 +20,22 @@ AC_CONFIG_SRCDIR([ast_link.in])
 
 #   Include defaults for Starlink configurations
 STAR_DEFAULTS
+
+#   See if the --without-topinclude option has been provided. This sets the
+#   automake conditional TOPINCLUDE. By default header files are installed
+#   into both includedir and includedir/star. If --without-topinclude is
+#   specified when running configure, then the header files are only
+#   installed into includedir/star.
+AC_ARG_WITH(
+      [topinclude],
+      AS_HELP_STRING([--without-topinclude],[install headers only in includedir/star - not includedir]),
+      if test "$withval" = "yes"; then
+         topinclude="1"
+      else
+         topinclude="0"
+      fi,
+      topinclude="1")
+AM_CONDITIONAL(TOPINCLUDE, test x$topinclude = x1)
 
 #   See if the --with-starmem option has been provided. This sets the
 #   preprocesor macro HAVE_STAR_MEM_H.
@@ -94,6 +110,9 @@ AC_CHECK_FUNCS([backtrace])
 # Do we have reentrant strerror and strtok?
 AC_CHECK_FUNCS([strerror_r strtok_r])
 
+# Do we have vsnprintf?
+AC_CHECK_FUNCS([vsnprintf])
+
 #  See if we have long doubles (used by the Mapping and Region classes)
 AC_CHECK_TYPES([long double])
 
@@ -104,10 +123,53 @@ AC_CHECK_TYPES([int64_t, uint64_t])
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
 
+
+# Decide how to get the name of the curently executing function.
+# -------------------------------------------------------------
+AC_DEFUN([CIT_FUNCTIONSTRING], [
+  set_function_name=no
+
+
+
+  AC_MSG_CHECKING([whether C compiler defines __func__])
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]], [[const char* name = __func__;]])],
+    [AC_MSG_RESULT(yes)
+     set_function_name=yes
+     AC_DEFINE([FUNCTION_NAME], [__func__], [Variable holding current function name.])],
+    [AC_MSG_RESULT(no)])
+  if test "$set_function_name" == no; then
+    AC_MSG_CHECKING([whether C compiler defines __FUNCTION__])
+    AC_COMPILE_IFELSE(
+      [AC_LANG_PROGRAM([[]], [[const char* name = __FUNCTION__;]])],
+      [AC_MSG_RESULT(yes)
+       set_function_name=yes
+       AC_DEFINE([FUNCTION_NAME], [__FUNCTION__], [Variable holding current function name.])],
+      [AC_MSG_RESULT(no)])
+  fi
+])
+
+CIT_FUNCTIONSTRING
+
+#  Conditional defining whether we want to support Fortran libraries
+#  (e.g. pgplot) and applications.
+AC_ARG_WITH([fortran],
+            [ --without-fortran   Build package without Fortran support],
+        if test "$withval" = "yes"; then
+           use_fortran="1"
+        else
+           use_fortran="0"
+        fi,
+        use_fortran="1")
+AM_CONDITIONAL(NOFORTRAN, test x$use_fortran = x0)
+AC_SUBST(FORTRAN, $use_fortran)
+
 #   ast_link needs to be able to link against the Fortran runtime if
 #   necessary
+if test "$use_fortran" = "1"; then
 AC_PROG_FC
 AC_FC_LIBRARY_LDFLAGS
+fi
 
 #   Find an absolute path to the Perl binary, augmenting the path with the
 #   location of the Starlink Perl build.  If this fails, then set @PERL@
@@ -127,10 +189,12 @@ STAR_DECLARE_DEPENDENCIES(sourceset, [sst htx])
 #  Perform the check that configures f77.h.in for the return type of REAL
 #  Fortran functions. On 64-bit g77 with f2c compatibility this is double
 #  not float.
+if test "$use_fortran" = "1"; then
 STAR_CNF_F2C_COMPATIBLE
 
 # Determine the type of Fortran character string lengths.
 STAR_CNF_TRAIL_TYPE
+fi
 
 #   Declare the message file.
 STAR_MESSGEN(ast_err.msg)
@@ -182,7 +246,11 @@ STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
 
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml ast_link ast_link_adam object.h f77.h)
+AC_CONFIG_FILES(Makefile component.xml ast_link ast_link_adam object.h)
+if test "$use_fortran" = "1"; then
+AC_CONFIG_FILES(f77.h)
+fi
+
 AC_CONFIG_FILES([ast_cpp], [chmod +x ast_cpp])
 #   Following are files which are substituted by the Makefile at
 #   distribution time, rather than by configure.  They are not distributed.

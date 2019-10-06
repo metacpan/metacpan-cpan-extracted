@@ -11,7 +11,7 @@ use Astro::App::Satpass2::Utils qw{ __arguments };
 use Astro::Coord::ECI::Utils 0.059 qw{ rad2deg };
 use Scalar::Util 1.26 qw{ refaddr };
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 {
     my %operands;
@@ -200,8 +200,8 @@ successfully loaded, and passed the processed arguments of the
 C<macro load> command. That is, the first argument (after the invocant)
 will be the option hash, followed by the non-option arguments in order.
 
-This subroutine returns the options (if any) one per line, followed by
-the arguments, also one per line.
+This subroutine returns a scalar containing the options (if any) one per
+line, followed by the arguments, also one per line.
 
 =head2 angle
 

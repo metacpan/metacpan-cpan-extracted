@@ -1,7 +1,7 @@
 package Short::URL;
 
 use 5.008_005;
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use strictures 2;
 use Moo;
@@ -291,7 +291,7 @@ respected. L<Short::URL> will just use a clean version of the shuffled alphabet 
 
 =head2 croak_on_error
 
-This method sets whether you want L<Short::URL> to L<Carp|/"croak"> on an error. 
+This method sets whether you want L<Short::URL> to L<"croak"|Carp> on an error.
 
     #enable
     $su->croak_on_error(1);

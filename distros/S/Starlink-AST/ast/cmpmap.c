@@ -47,12 +47,12 @@ f     The CmpMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -147,8 +147,18 @@ f     The CmpMap class does not define any new routines beyond those
 *        Take account of Invert flags when combining parallel CmpMaps in
 *        series.
 *     29-APR-2013 (DSB):
-*        In MapList, use the astDoNotSimplify method to check that it is 
+*        In MapList, use the astDoNotSimplify method to check that it is
 *        OK to expand the CmpMap.
+*     23-APR-2015 (DSB):
+*        In Simplify, prevent mappings that are known to cause infinite
+*        loops from being nominated for simplification.
+*     5-DEC-2018 (DSB):
+*        In Simplify, ensure that the Mapping pointers in the list passed to
+*        the subclass MapMerge methods are all independent of each other by
+*        taking deep copies if necessary. This is needed because some subclasses
+*        (e.g. MatrixMap) make temporary modifications to the Mappings in the
+*        list causing unpredictable behaviour since changing one Mapping may
+*        cause other Mappings to change.
 *class--
 */
 
@@ -195,7 +205,7 @@ f     The CmpMap class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, int * );
@@ -266,7 +276,8 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static int GetObjSize( AstObject *, int * );
+static void SeparateMappings( AstMapping **, int, int * );
+static size_t GetObjSize( AstObject *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -344,7 +355,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    if( astIsACmpMap( that ) ) {
 
 /* Check they are both either parallel or series. */
-      if( that->series == that->series ) {
+      if( this->series == that->series ) {
 
 /* Decompose the first CmpMap into a sequence of Mappings to be applied in
    series or parallel, as appropriate, and an associated list of
@@ -446,7 +457,7 @@ static int GetIsLinear( AstMapping *this_mapping, int *status ){
    return astGetIsLinear( this->map1 ) && astGetIsLinear( this->map2 );
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -459,7 +470,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the astGetObjSize protected
@@ -485,7 +496,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstCmpMap *this;         /* Pointer to CmpMap structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -989,7 +1000,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 #endif
 
 static int MapList( AstMapping *this_mapping, int series, int invert,
-                     int *nmap, AstMapping ***map_list, int **invert_list, int *status ) {
+                    int *nmap, AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapList
@@ -1624,6 +1635,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                                      &nmap1, &map_list1, &invert_list1 );
                   (void) astMapList( (AstMapping *) cmpmap2, 0, invert2,
                                      &nmap2, &map_list2, &invert_list2 );
+
+/* Ensure that the mappings in these list are independent of each other, so
+   that modifying one does not modify any of the others. This is needed
+   because some Mapping classes make temporary changes to the Mappings. */
+                  SeparateMappings( map_list1, nmap1, status );
+                  SeparateMappings( map_list2, nmap2, status );
 
 /* We want to divide each of these lists into N sub-lists so that the
    outputs of the Mappings in the i'th sub-list from cmpmap1 can feed
@@ -2653,7 +2670,7 @@ static int *MapSplit0( AstMapping *this_mapping, int nin, const int *in,
    the current component Mapping. */
                itop += astGetNin( map_list[ imap ] );
 
-/* Get the zero-based indicies of the required inputs that feed the current
+/* Get the zero-based indices of the required inputs that feed the current
    component Mapping. */
                ncin = 0;
                while( iin < nin && inp[ iin ] <= itop ) {
@@ -3296,6 +3313,70 @@ static AstMapping *RemoveRegions( AstMapping *this_mapping, int *status ) {
    return result;
 }
 
+static void SeparateMappings( AstMapping **map_list, int nmap, int *status ) {
+/*
+*  Name:
+*     MapMerge
+
+*  Purpose:
+*     Ensure all supplied Mappings are indepenent of each other.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SeparateMappings( AstMapping **map_list, int nmap, int *status )
+
+*  Class Membership:
+*     CmpMap member function.
+
+*  Description:
+*     This function checks the supplied array of Mapping pointers,
+*     looking for pointers to the same Mapping. If any are found, the
+*     second and subsequent occurrences of the Mapping pointer are replaced by
+*     deep copies of hte Mapping.
+
+*  Parameters:
+*     map_list
+*        A pointer to a dynamically allocated array of Mapping pointers.
+*     nmap
+*        The number of Mapping pointers supplied in the "map_list" array.
+*     status
+*        Inherited status pointer.
+
+*/
+
+/* Local Variables: */
+   AstMapping **p1;
+   AstMapping **p2;
+   int i;
+   int j;
+
+/* Check the inherited status. */
+   if ( !astOK ) return;
+
+/* p1 pointers to the reference Mapping. Loop round each Mapping in the
+   list using it as the reference Mapping. */
+   p1 = map_list;
+   for( i = 0; i < nmap; i++,p1++ ) {
+
+/* p2 pointers to the comparison Mapping. Loop round each remaining Mapping
+   in the list using it as the comparison Mapping. */
+      p2 = p1 + 1;
+      for( j = i + 1; j < nmap; j++,p2++ ) {
+
+/* If the reference and comparison Mappings are one and the same, replace
+   the comparison pointer with a pointer to a deep copy, annulling the
+   original pointer first. */
+         if( *p2 == *p1 ) {
+            *p2 = astAnnul( *p2 );
+            *p2 = astCopy( *p1 );
+         }
+      }
+   }
+}
+
 static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
@@ -3417,6 +3498,21 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    simpler = astMapList( this_mapping, this->series, astGetInvert( this ), &nmap,
                          &map_list, &invert_list );
 
+/* Ensure that the mappings in the list are independent of each other, so
+   that modifying one does not modify any of the others. This is needed
+   because some Mapping classes make temporary changes to the Mappings. */
+   SeparateMappings( map_list, nmap, status );
+
+/* Each Mapping has a flag that indicates if the mapping is frozen (i.e. cannot
+   be nominated for simplification). Mappings become frozen if nominating them
+   would create an infinite loop in which neighbouring mappings argue as to
+   their form. Freezing a mapping prevents the frozen mapping contributing any
+   further to the argument, so the other Mapping "wins" the argument.
+   Ensure no Mappings are frozen to begin with. */
+   for( i = 0; i < nmap; i++ ) {
+      map_list[ i ]->flags &= ~AST__FROZEN_FLAG;
+   }
+
 /* Initialise pointers to memory used to hold lists of the modified
    Mapping index and the number of mappings after each call of
    astMapMerge. */
@@ -3433,6 +3529,14 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       nominated = 0;
       while ( astOK && ( nominated < nmap ) ) {
 
+/* If the current nominated mapping has been frozen, then we do not allow
+   it to suggest changes to the mapping sequence. Instead, just increment
+   the index of the next mapping to be checked and continue on to the next
+   pass round the while loop. */
+         if( map_list[ nominated ]->flags & AST__FROZEN_FLAG ) {
+            nominated++;
+            continue;
+         }
 
 /* Clone a pointer to the nominated Mapping and attempt to merge it
    with its neighbours. Annul the cloned pointer afterwards. */
@@ -3445,7 +3549,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          nominated++;
 
 /* Note if any simplification occurred above. */
-         if( modified >= 0 ) {
+         if( modified >= 0 && astOK ) {
 
 /* Append the index of the first modified Mapping in the list and and check
    that there is no repreating pattern in the list. If there is, we are
@@ -3470,8 +3574,14 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                if( ( wlen2 % wlen1 ) != 0 ) wlen1 = 0;
             }
 
-/* Ignore the simplication if a repeating pattern is occurring. */
-            if( wlen1 == 0 ) {
+/* If a repeating pattern is occurring, set the frozen flag in order to
+   prevent the modified mapping from being modified any more. */
+            if( wlen1 > 0 ) {
+               map_list[ modified ]->flags |= AST__FROZEN_FLAG;
+
+/* Otherwise, indicate we have improved the mapping and go round to test
+   the next nominated mapping. */
+            } else {
                improved = 1;
                simpler = 1;
 
@@ -3485,8 +3595,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    }
 
 /* Free resources */
-   if( mlist ) mlist = astFree( mlist );
-   if( nlist ) nlist = astFree( nlist );
+   mlist = astFree( mlist );
+   nlist = astFree( nlist );
 
 /* Construct the output Mapping. */
 /* ============================= */
@@ -3688,7 +3798,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int npoint;                   /* Number of points to be transformed */
 
 /* Local Constants: */
-   const int nbatch = 2048;      /* Maximum points in a batch */
+   const int nbatch = 8192;      /* Maximum points in a batch */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;

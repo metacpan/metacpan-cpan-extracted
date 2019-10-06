@@ -1,7 +1,7 @@
 package Data::Transmute;
 
 our $DATE = '2019-08-23'; # DATE
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -252,7 +252,7 @@ Data::Transmute - Transmute (transform) data structure using rules data
 
 =head1 VERSION
 
-This document describes version 0.034 of Data::Transmute (from Perl distribution Data-Transmute), released on 2019-08-23.
+This document describes version 0.035 of Data::Transmute (from Perl distribution Data-Transmute), released on 2019-08-23.
 
 =head1 SYNOPSIS
 
@@ -534,7 +534,27 @@ Usage:
 
  my $reverse_rules = reverse_rules(rules => [...]);
 
-Create a reverse rules, die on failure.
+Create a reverse of rules, die on failure. For example, this set of rules:
+
+ [
+   [create_hash_key => {name=>'a', value=>1}],
+   [rename_hash_key => {from=>'c', to=>'d'}],
+ ]
+
+when reversed will become:
+
+ [
+   [rename_hash_key => {from=>'d', to=>'c'}],
+   [delete_hash_key => {name=>'a'}],
+ ]
+
+Some rules cannot be reversed, e.g. L</delete_hash_key> so when given rules that
+contain that, the function will die. A rule can only be reversed for a subset of
+arguments, e.g. L</rename_hash_key> with C<ignore> set to true or C<replace> set
+to true cannot be reversed.
+
+The reverse of a set of rules can be used to reverse back a transmuted data back
+to the original.
 
 Known arguments (C<*> means required):
 

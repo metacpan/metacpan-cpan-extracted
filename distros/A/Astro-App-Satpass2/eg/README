@@ -44,12 +44,14 @@ My/Macros.pm - A module that implements the following code macros
 	@INC, remembering that the lib/ directory in your configuration
 	directory is added to @INC before your module is loaded.
 
-pass_vcalendar - A source file, to be executed by, for example,
+pass_ics - A source file, to be executed by, for example,
 	satpass2> source eg/pass_vcalendar
 	This makes pass calculations for any satellites that have been
-	loaded, and displays the results in vCalendar format.
+	loaded, and displays the results in iCal format.
 
-	CAVEAT: The same as for flare_vcalendar.
+	CAVEAT: Under macOS (at least), this needs to be redirected to a
+	file named something.ics for the escaped characters to be
+	properly interpreted.
 
 quarters_vcalendar - A source file, to be executed by, for example,
         satpass2> source eg/quarters_vcalendar

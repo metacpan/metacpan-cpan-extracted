@@ -3,6 +3,8 @@ use t::Helper;
 
 plan skip_all => 'TEST_NODE_MODULES=1' unless $ENV{TEST_NODE_MODULES} or $ENV{TEST_ALL};
 
+$ENV{MOJO_WEBPACK_REINSTALL} = 1;
+
 my $cwd = t::Helper->cwd('install-deps');
 
 $ENV{MOJO_WEBPACK_BUILD} = $ENV{MOJO_WEBPACK_TEST_INTERNAL} = 1;

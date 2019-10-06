@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Color::ANSI::Util" : "0.161",
-            "Color::RGB::Util" : "0.596",
+            "Color::RGB::Util" : "0.599",
             "Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::int" : "0",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-App-ANSIColorUtils"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

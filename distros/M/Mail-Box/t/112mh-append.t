@@ -14,9 +14,8 @@ use Test::More tests => 10;
 use File::Compare;
 use File::Copy;
 
-my $mhsrc = File::Spec->catfile($folderdir, 'mh.src');
+my $mhsrc = File::Spec->catfile($workdir, 'mh.src');
 
-clean_dir $mhsrc;
 unpack_mbox2mh($src, $mhsrc);
 
 my $mgr = Mail::Box::Manager->new;
@@ -78,5 +77,3 @@ $mgr->appendMessage($mhsrc, $msg
   );
 
 ok(-f File::Spec->catfile($mhsrc, "47"));  # skipped 13, so new is 46+1
-
-clean_dir $mhsrc;

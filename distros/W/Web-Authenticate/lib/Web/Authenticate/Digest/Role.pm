@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Digest::Role;
-$Web::Authenticate::Digest::Role::VERSION = '0.011';
+$Web::Authenticate::Digest::Role::VERSION = '0.012';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::Digest object should contain.
 
@@ -24,7 +24,7 @@ Web::Authenticate::Digest::Role - A Mouse::Role that defines what methods a Web:
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

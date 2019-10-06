@@ -48,12 +48,12 @@ f     The Interval class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -73,8 +73,8 @@ f     The Interval class does not define any new routines beyond those
 *     26-JAN-2009 (DSB):
 *        Over-ride astMapMerge.
 *     4-NOV42-2013 (DSB):
-*        - Change RegCentre so that it does not report an error for an unbounded 
-*        Interval if the centre is merely being inquired rather than set. This is 
+*        - Change RegCentre so that it does not report an error for an unbounded
+*        Interval if the centre is merely being inquired rather than set. This is
 *        the documented behaviour of the astRegCentre method.
 *        - Modify RegPins so that it can handle uncertainty regions that straddle
 *        a discontinuity. Previously, such uncertainty Regions could have a huge
@@ -88,15 +88,6 @@ f     The Interval class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS Interval
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==(bb))?1:(((aa)==AST__BAD||(bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -1892,7 +1883,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
    the two Regions can be represented using a finite mesh of points on the
    boundary which is not the case with Intervals. The implementation in this
    class sees if the Mapping between the base Frames of the Intervals allows
-   the axis limits to be transferred from one Frame ot the other. */
+   the axis limits to be transferred from one Frame to the other. */
    if( astIsAInterval( this ) && astIsAInterval( that ) ) {
 
 /* Get a FrameSet which connects the Frame represented by the second Interval
@@ -2036,7 +2027,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 
 /* Are the lower limits from the two Intervals effectively equal? Take care
    about DBL_MAX values causing overflow. */
-                  lb_equal = EQUAL( lb_this, lb_that );
+                  lb_equal = astEQUALS( lb_this, lb_that, 1.0E9 );
 
                   if( !lb_equal && fabs(lb_this) != DBL_MAX &&
                                    fabs(lb_that) != DBL_MAX ) {
@@ -2044,7 +2035,7 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
                   }
 
 /* Are the upper limits from the two Intervals effectively equal? */
-                  ub_equal = EQUAL( ub_this, ub_that );
+                  ub_equal = astEQUALS( ub_this, ub_that, 1.0E9 );
                   if( !ub_equal && fabs(ub_this) != DBL_MAX &&
                                    fabs(ub_that) != DBL_MAX ) {
                      ub_equal = ( fabs( ub_this - ub_that) <= err );
@@ -2886,7 +2877,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* If an error has occurred, return zero. */
    if( !astOK ) {
       result = 0;
-      if( mask ) *mask = astAnnul( *mask );
+      if( mask ) *mask = astFree( *mask );
    }
 
 /* Return the result. */
@@ -3336,8 +3327,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                if( lbnd[ ic ] == 0.0 && ubnd[ ic ] == 0.0 ) {
                   ubnd[ ic ] = 1.0;
 
-               } else if( EQUAL( lbnd[ ic ], ubnd[ ic ] ) ) {
-                  ubnd[ ic ] = MAX( ubnd[ ic ], lbnd[ ic ] )*( 1.0E6*DBL_EPSILON );
+               } else if( astEQUALS( lbnd[ ic ], ubnd[ ic ], 1.0E9 ) ) {
+                  ubnd[ ic ] = astMAX( ubnd[ ic ], lbnd[ ic ] )*( 1.0E6*DBL_EPSILON );
                }
             }
 
@@ -3599,7 +3590,6 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    AstPointSet *result;          /* Pointer to output PointSet */
    AstRegion *reg;               /* Pointer to Region structure */
    AstRegion *unc;               /* Uncertainty Region */
-   double **ptr_lims;            /* Pointer to limits array */
    double **ptr_out;             /* Pointer to output coordinate data */
    double **ptr_tmp;             /* Pointer to base Frame coordinate data */
    double *lbnd_unc;             /* Lower bounds of uncertainty Region */
@@ -3660,9 +3650,6 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
       ptr_tmp = astGetPoints( pset_tmp );
       ncoord_out = astGetNcoord( result );
       ptr_out = astGetPoints( result );
-
-/* Get a pointer to the array of axis limits */
-      ptr_lims = astGetPoints( reg->points );
 
 /* See if the Region is negated. */
       neg = astGetNegated( reg );
@@ -4065,30 +4052,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
-/* Local Variables: */
-   AstInterval *this;                 /* Pointer to the Interval structure */
-
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Obtain a pointer to the Interval structure. */
-   this = (AstInterval *) this_object;
-
-/* Write out values representing the instance variables for the
-   Interval class.  Accompany these with appropriate comment strings,
-   possibly depending on the values being written.*/
-
-/* In the case of attributes, we first use the appropriate (private)
-   Test...  member function to see if they are set. If so, we then use
-   the (private) Get... function to obtain the value to be written
-   out.
-
-   For attributes which are not set, we use the astGet... method to
-   obtain the value instead. This will supply a default value
-   (possibly provided by a derived class which over-rides this method)
-   which is more useful to a human reader as it corresponds to the
-   actual default attribute value.  Since "set" will be zero, these
-   values are for information only and will not be read back. */
 
 /* There are no values to write, so return without further action. */
 }
@@ -4170,8 +4135,8 @@ f        An array with one element for each Frame axis
 c     unc
 f     UNC = INTEGER (Given)
 *        An optional pointer to an existing Region which specifies the
-*        uncertainties associated with the boundary of the Box being created.
-*        The uncertainty in any point on the boundary of the Box is found by
+*        uncertainties associated with the boundary of the Interval being created.
+*        The uncertainty in any point on the boundary of the Interval is found by
 *        shifting the supplied "uncertainty" Region so that it is centred at
 *        the boundary point being considered. The area covered by the
 *        shifted uncertainty Region then represents the uncertainty in the
@@ -4183,11 +4148,11 @@ f     UNC = INTEGER (Given)
 *        or be a Prism containing centro-symetric component Regions. A deep
 *        copy of the supplied Region will be taken, so subsequent changes to
 *        the uncertainty Region using the supplied pointer will have no
-*        effect on the created Box. Alternatively,
+*        effect on the created Interval. Alternatively,
 f        a null Object pointer (AST__NULL)
 c        a NULL Object pointer
 *        may be supplied, in which case a default uncertainty is used
-*        equivalent to a box 1.0E-6 of the size of the Box being created.
+*        equivalent to a box 1.0E-6 of the size of the Interval being created.
 *
 *        The uncertainty Region has two uses: 1) when the
 c        astOverlap
@@ -4346,7 +4311,7 @@ AstInterval *astIntervalId_( void *frame_void, const double lbnd[],
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */
-   unc = unc_void ? astCheckRegion( astMakePointer( unc_void ) ) : NULL;
+   unc = unc_void ? astVerifyRegion( astMakePointer( unc_void ) ) : NULL;
 
 /* Initialise the Interval, allocating memory and initialising the
    virtual function table as well if necessary. */

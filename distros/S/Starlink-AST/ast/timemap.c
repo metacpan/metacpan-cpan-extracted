@@ -56,12 +56,12 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -94,6 +94,16 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *     18-JUN-2009 (DSB):
 *        Add OBSALT to argument list for TTTOTDB and TDBTOTT. Change
 *        CLOCKLAT/LON to OBSLAT/LON for consistency with other classes.
+*     1-SEP-2016 (DSB):
+*        Add 2017 January 1 leap second.
+*     11-NOV-2016 (DSB):
+*        Add argument "narg" to astTimeAdd method.
+*     5-APR-2017 (GSB):
+*        Add DTAI argument for TAITOUTC and UTCTOTAI.
+*     28-APR-2017 (DSB):
+*        - Fix bug in MapMerge that prevented adjacent TAITOUTC and UTCTOTAI
+*        conversions cancelling out.
+*        - Add DTAI argument for TTTOTDB and TDBTOTT.
 *class--
 */
 
@@ -135,7 +145,7 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define AST__UTCTOLT    27       /* UTC to Local Time */
 
 /* Maximum number of arguments required by a conversion. */
-#define MAX_ARGS 6
+#define MAX_ARGS 7
 
 /* The alphabet (used for generating keywords for arguments). */
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
@@ -153,15 +163,6 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define LB 1.55051976772E-8
 #define P0 6.55E-5
 #define TTOFF 32.184
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Include files. */
 /* ============== */
@@ -199,7 +200,7 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double (* parent_rate)( AstMapping *, double *, int, int, int * );
 
@@ -241,7 +242,7 @@ AstTimeMap *astTimeMapId_( int, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static const char *CvtString( int, const char **, int *, int *, const char *[ MAX_ARGS ], int * );
+static const char *CvtString( int, const char **, int *, int *, const char *[ MAX_ARGS ], int **order, int * );
 static double Gmsta( double, double, int, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static double Rcc( double, double, double, double, double, int * );
@@ -249,13 +250,13 @@ static int Equal( AstObject *, AstObject *, int * );
 static int CvtCode( const char *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void AddArgs( int, double *, int * );
-static void AddTimeCvt( AstTimeMap *, int, const double *, int * );
+static void AddTimeCvt( AstTimeMap *, int, int, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void TimeAdd( AstTimeMap *, const char *, const double[], int * );
+static void TimeAdd( AstTimeMap *, const char *, int, const double[], int * );
 
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
 
@@ -341,7 +342,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
                   if( this->cvttype[ i ] != that->cvttype[ i ] ) {
                      result = 0;
                   } else {
-                     CvtString( this->cvttype[ i ], &comment, &nargs, &szargs, argdesc, status );
+                     CvtString( this->cvttype[ i ], &comment, &nargs,
+                                &szargs, argdesc, NULL, status );
                      for( j = 0; j < nargs; j++ ) {
                         if( !astEQUAL( this->cvtargs[ i ][ j ],
                                        that->cvtargs[ i ][ j ] ) ){
@@ -371,7 +373,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -384,7 +386,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     TimeMap member function (over-rides the astGetObjSize protected
@@ -410,7 +412,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstTimeMap *this;         /* Pointer to TimeMap structure */
-   int result;               /* Result value to return */
+   size_t result;            /* Result value to return */
    int cvt;                  /* Loop counter for coordinate conversions */
 
 /* Initialise. */
@@ -519,14 +521,14 @@ static void AddArgs( int cvttype, double *cvtargs, int *status ) {
 
    case AST__TTTOTDB:
       palGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );
-      cvtargs[ 4 ] = 0.001*r*AST__AU;
-      cvtargs[ 5 ] = 0.001*z*AST__AU;
+      cvtargs[ 5 ] = 0.001*r*AST__AU;
+      cvtargs[ 6 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTT:
       palGeoc( cvtargs[ 2 ], cvtargs[ 3 ], &r, &z );
-      cvtargs[ 4 ] = 0.001*r*AST__AU;
-      cvtargs[ 5 ] = 0.001*z*AST__AU;
+      cvtargs[ 5 ] = 0.001*r*AST__AU;
+      cvtargs[ 6 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTCB:
@@ -550,7 +552,8 @@ static void AddArgs( int cvttype, double *cvtargs, int *status ) {
    }
 }
 
-static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *status ) {
+static void AddTimeCvt( AstTimeMap *this, int cvttype, int narg,
+                        const double *args, int *status ) {
 /*
 *  Name:
 *     AddTimeCvt
@@ -563,7 +566,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 
 *  Synopsis:
 *     #include "timemap.h"
-*     void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args )
+*     void AddTimeCvt( AstTimeMap *this, int cvttype, int narg, const
+*                      double *args )
 
 *  Class Membership:
 *     TimeMap member function.
@@ -586,6 +590,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *        A code to identify which time coordinate conversion is to be
 *        appended.  See the "Coordinate Conversions" section for details
 *        of those available.
+*     narg
+*        The number of argument values supplied in "args".
 *     args
 *        Pointer to an array of double containing the argument values
 *        required to fully specify the required coordinate
@@ -618,17 +624,17 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *           Convert Modified Julian Date to Julian epoch.
 *        AST__JEPTOMJD( JEPOFF, MJDOFF )
 *           Convert Julian epoch to Modified Julian Date.
-*        AST__TAITOUTC( MJDOFF )
+*        AST__TAITOUTC( MJDOFF, DTAI )
 *           Convert a TAI MJD to a UTC MJD.
-*        AST__UTCTOTAI( MJDOFF )
+*        AST__UTCTOTAI( MJDOFF, DTAI )
 *           Convert a UTC MJD to a TAI MJD.
 *        AST__TAITOTT( MJDOFF )
 *           Convert a TAI MJD to a TT MJD.
 *        AST__TTTOTAI( MJDOFF )
 *           Convert a TT MJD to a TAI MJD.
-*        AST__TTTOTDB( MJDOFF, OBSLON, OBSLAT, OBSALT )
+*        AST__TTTOTDB( MJDOFF, OBSLON, OBSLAT, OBSALT, DTAI )
 *           Convert a TT MJD to a TDB MJD.
-*        AST__TDBTOTT( MJDOFF, OBSLON, OBSLAT, OBSALT )
+*        AST__TDBTOTT( MJDOFF, OBSLON, OBSLAT, OBSALT, DTAI )
 *           Convert a TDB MJD to a TT MJD.
 *        AST__TTTOTCG( MJDOFF )
 *           Convert a TT MJD to a TCG MJD.
@@ -675,6 +681,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 *     - OBSLON: Observer's longitude in radians (+ve westwards)
 *     - OBSLAT: Observer's geodetic latitude in radians (+ve northwards)
 *     - OBSALT: Observer's geodetic altitude in metres.
+*     - DTAI: The value of TAI-UTC (the value returned by astDat is used if
+*     DTAI is AST__BAD).
 *     - DUT1: The value of UT1-UTC
 *     - LTOFF: The offset between Local Time and UTC (in hours, positive
 *     for time zones east of Greenwich).
@@ -702,7 +710,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
    required user-supplied arguments, and the size of the array in which
    to put the user-supplied arguments (the array may leave room after
    the user-supplied arguments for various useful pre-calculated values). */
-   cvt_string = CvtString( cvttype, &comment, &nargs, &szargs, argdesc, status );
+   cvt_string = CvtString( cvttype, &comment, &nargs, &szargs, argdesc,
+                           NULL, status );
 
 /* If the coordinate conversion type was not valid, then report an
    error. */
@@ -710,6 +719,13 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
       astError( AST__TIMIN, "AddTimeCvt(%s): Invalid time coordinate "
                 "conversion type (%d).", status, astGetClass( this ),
                 (int) cvttype );
+   }
+
+/* If the number of supplied arguments is incorrect, then report an error. */
+   if ( astOK && nargs != narg ) {
+      astError( AST__TIMIN, "AddTimeCvt(%s): Invalid no. of arguments for time "
+                "coordinate conversion type %d - %d supplied, %d required.",
+                status, astGetClass( this ), (int) cvttype, narg, nargs );
    }
 
 /* Note the number of coordinate conversions already stored in the TimeMap. */
@@ -887,7 +903,8 @@ static int CvtCode( const char *cvt_string, int *status ) {
 
 static const char *CvtString( int cvt_code, const char **comment,
                               int *nargs, int *szargs,
-                              const char *arg[ MAX_ARGS ], int *status ) {
+                              const char *arg[ MAX_ARGS ],
+                              int **order, int *status ) {
 /*
 *  Name:
 *     CvtString
@@ -901,7 +918,8 @@ static const char *CvtString( int cvt_code, const char **comment,
 *  Synopsis:
 *     #include "timemap.h"
 *     const char *CvtString( int cvt_code, const char **comment, int *nargs,
-*                            int *szargs, const char *arg[ MAX_ARGS ], int *status )
+*                            int *szargs, const char *arg[ MAX_ARGS ],
+*                            int **order, int *status )
 
 *  Class Membership:
 *     TimeMap member function.
@@ -935,6 +953,18 @@ static const char *CvtString( int cvt_code, const char **comment,
 *        null-terminated string for each argument (above) containing a
 *        description of what each argument represents. This includes both
 *        user-supplied arguments and pre-calculated values.
+*     order
+*        Ignored if NULL. If not NULL, it should be an address at which
+*        to return a pointer to a dynamically allocated int array (the
+*        returned array should be freed using astFree when no longer
+*        needed). The returned array will have "*szargs" elements. The
+*        index into the array is the index of the argument within the
+*        external representation of a TimeMap as produced by the Dump
+*        function. The value stored in each element is the index of
+*        the argument within the internal argument list. If there is
+*        no difference between the internal and external order of the
+*        arguments, a NULL pointer will be returned instead of a pointer
+*        to an int array.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -956,6 +986,7 @@ static const char *CvtString( int cvt_code, const char **comment,
    *comment = NULL;
    *nargs = 0;
    result = NULL;
+   if( order ) *order = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -1041,17 +1072,19 @@ static const char *CvtString( int cvt_code, const char **comment,
    case AST__TAITOUTC:
       *comment = "Convert TAI to UTC";
       result = "TAITOUTC";
-      *nargs = 1;
-      *szargs = 1;
+      *nargs = 2;
+      *szargs = 2;
       arg[ 0 ] = "MJD offset";
+      arg[ 1 ] = "DTAI";
       break;
 
    case AST__UTCTOTAI:
       *comment = "Convert UTC to TAI";
       result = "UTCTOTAI";
-      *nargs = 1;
-      *szargs = 1;
+      *nargs = 2;
+      *szargs = 2;
       arg[ 0 ] = "MJD offset";
+      arg[ 1 ] = "DTAI";
       break;
 
    case AST__TAITOTT:
@@ -1073,27 +1106,63 @@ static const char *CvtString( int cvt_code, const char **comment,
    case AST__TTTOTDB:
       *comment = "Convert TT to TDB";
       result = "TTTOTDB";
-      *nargs = 4;
-      *szargs = 6;
+      *nargs = 5;
+      *szargs = 7;
       arg[ 0 ] = "MJD offset";
       arg[ 1 ] = "Observer longitude";
       arg[ 2 ] = "Observer latitude";
       arg[ 3 ] = "Observer altitude";
-      arg[ 4 ] = "Distance from earth spin axis";
-      arg[ 5 ] = "Distance north of equatorial plane";
+      arg[ 4 ] = "DTAI";
+      arg[ 5 ] = "Distance from earth spin axis";
+      arg[ 6 ] = "Distance north of equatorial plane";
+
+/* For backward compatibility, the order of arguments in the external
+   representation is different to the internal order. This became
+   necessary when the DTAI user-supplied argument was added. New user
+   supplied arguments need to be before the calculated arguments in
+   the internal list, but need to be added to the end of the external
+   argument list. This means new TimeMaps read by old software will ignore
+   the new user supplied argument. It also means that old TimeMaps read by
+   new software will use default values for the missing user supplied
+   argument. */
+      if( order ) {
+         *order = astMalloc( 7*sizeof( **order ) );
+         if( astOK ) {
+            (*order)[ 0 ] = 0;
+            (*order)[ 1 ] = 1;
+            (*order)[ 2 ] = 2;
+            (*order)[ 3 ] = 3;
+            (*order)[ 4 ] = 5;
+            (*order)[ 5 ] = 6;
+            (*order)[ 6 ] = 4;
+         }
+      }
       break;
 
    case AST__TDBTOTT:
       *comment = "Convert TDB to TT";
       result = "TDBTOTT";
-      *nargs = 4;
-      *szargs = 6;
+      *nargs = 5;
+      *szargs = 7;
       arg[ 0 ] = "MJD offset";
       arg[ 1 ] = "Observer longitude";
       arg[ 2 ] = "Observer latitude";
       arg[ 3 ] = "Observer altitude";
-      arg[ 4 ] = "Distance from earth spin axis";
-      arg[ 5 ] = "Distance north of equatorial plane";
+      arg[ 4 ] = "DTAI";
+      arg[ 5 ] = "Distance from earth spin axis";
+      arg[ 6 ] = "Distance north of equatorial plane";
+      if( order ) {
+         *order = astMalloc( 7*sizeof( **order ) );
+         if( astOK ) {
+            (*order)[ 0 ] = 0;
+            (*order)[ 1 ] = 1;
+            (*order)[ 2 ] = 2;
+            (*order)[ 3 ] = 3;
+            (*order)[ 4 ] = 5;
+            (*order)[ 5 ] = 6;
+            (*order)[ 6 ] = 4;
+         }
+      }
       break;
 
    case AST__TTTOTCG:
@@ -1279,7 +1348,7 @@ double astDat_( double in, int forward, int *status ){
 *     - This function is based on SLA_DAT by P.T.Wallace.
 *     - This routine must be updated on each occasion that a leap second is
 *     announced
-*     - Latest leap second:  2009 January 1
+*     - Latest leap second:  2017 January 1
 
 *-
 */
@@ -1294,8 +1363,16 @@ double astDat_( double in, int forward, int *status ){
    ------------------------------- */
    if( forward ) {
 
+/* 2017 January 1 */
+      if ( in >= 57754.0 ) {
+         result = 37.0;
+
+/* 2015 July 1 */
+      } else if ( in >= 57204.0 ) {
+         result = 36.0;
+
 /* 2012 July 1 */
-      if ( in >= 56109.0 ) {
+      } else if ( in >= 56109.0 ) {
          result = 35.0;
 
 /* 2009 January 1 */
@@ -1460,8 +1537,16 @@ double astDat_( double in, int forward, int *status ){
    } else {
 
 
+/* 2017 January 1 */
+      if ( in >= 57754.0 + 37.0/SPD ) {
+         result = -37.0;
+
+/* 2015 July 1 */
+      } else if ( in >= 57204.0 + 36.0/SPD ) {
+         result = -36.0;
+
 /* 2012 July 1 */
-      if( in >= 56109.0 + 35.0/SPD ) {
+      } else if( in >= 56109.0 + 35.0/SPD ) {
          result = -35.0;
 
 /* 2009 January 1 */
@@ -1983,7 +2068,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    double (*cvtargs)[ MAX_ARGS ]; /* Pointer to argument arrays */
    double tmp;                   /* Temporary storage */
    int *cvttype;                 /* Pointer to transformation type codes */
-   int *szarg;                   /* Pointer to argument count array */
+   int *narg;                    /* Pointer to argument count */
+   int *szarg;                   /* Pointer to argument array size */
    int done;                     /* Finished (no further simplification)? */
    int iarg;                     /* Loop counter for arguments */
    int icvt1;                    /* Loop initial value */
@@ -1997,7 +2083,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int invert;                   /* TimeMap applied in inverse direction? */
    int istep;                    /* Loop counter for transformation steps */
    int keep;                     /* Keep transformation step? */
-   int narg;                     /* Number of user-supplied arguments */
    int ngone;                    /* Number of Mappings eliminated */
    int nstep0;                   /* Original number of transformation steps */
    int nstep;                    /* Total number of transformation steps */
@@ -2048,6 +2133,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       cvttype = astMalloc( sizeof( int ) * (size_t) nstep );
       cvtargs = astMalloc( sizeof( double[ MAX_ARGS ] ) * (size_t) nstep );
       szarg = astMalloc( sizeof( int ) * (size_t) nstep );
+      narg = astMalloc( sizeof( int ) * (size_t) nstep );
 
 /* Loop to obtain the transformation data for each TimeMap being merged. */
       nstep = 0;
@@ -2072,7 +2158,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the associated number of arguments. Then store these arguments. */
             cvttype[ nstep ] = timemap->cvttype[ icvt ];
             (void) CvtString( cvttype[ nstep ], &comment,
-                              &narg, szarg + nstep, argdesc, status );
+                              narg + nstep, szarg + nstep, argdesc,
+                              NULL, status );
             if ( !astOK ) break;
             for ( iarg = 0; iarg < szarg[ nstep ]; iarg++ ) {
                cvtargs[ nstep ][ iarg ] = timemap->cvtargs[ icvt ][ iarg ];
@@ -2186,28 +2273,37 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    values are unchanged (we do not need to test values stored in the
    argument array which were not supplied by the user), we can eliminate them.
    First check for conversions which have a single user-supplied argument. */
-               if( ( PAIR_CVT2( AST__TAITOUTC, AST__UTCTOTAI ) ||
-                     PAIR_CVT2( AST__TAITOTT, AST__TTTOTAI ) ||
+               if( ( PAIR_CVT2( AST__TAITOTT, AST__TTTOTAI ) ||
                      PAIR_CVT2( AST__UTTOGMST, AST__GMSTTOUT ) ||
                      PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) ||
                      PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) ||
                      PAIR_CVT2( AST__UTTOUTC, AST__UTCTOUT ) ||
                      PAIR_CVT2( AST__LTTOUTC, AST__UTCTOLT ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
 
 /* Now check for conversions which have two user-supplied arguments
-   (test they are swapped). */
+   that are swapped by inversion. */
                } else if( ( PAIR_CVT2( AST__MJDTOJD, AST__JDTOMJD ) ||
                             PAIR_CVT2( AST__MJDTOMJD, AST__MJDTOMJD ) ||
                             PAIR_CVT2( AST__MJDTOBEP, AST__BEPTOMJD ) ||
                             PAIR_CVT2( AST__MJDTOJEP, AST__JEPTOMJD ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
+                  istep++;
+                  keep = 0;
+
+/* Now check for conversions which have two user-supplied arguments
+   that are NOT swapped by inversion. */
+               } else if( ( PAIR_CVT2( AST__TAITOUTC, AST__UTCTOTAI ) ) &&
+                          astEQUAL( cvtargs[ istep ][ 0 ],
+                                 cvtargs[ istep + 1 ][ 0 ] ) &&
+                          astEQUAL( cvtargs[ istep ][ 1 ],
+                                 cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
 
@@ -2215,25 +2311,27 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if( ( PAIR_CVT2( AST__TDBTOTCB, AST__TCBTOTDB ) ||
                             PAIR_CVT2( AST__GMSTTOLMST, AST__LMSTTOGMST ) ||
                             PAIR_CVT2( AST__LASTTOLMST, AST__LMSTTOLAST ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) ) {
                   istep++;
                   keep = 0;
 
-/* Now check for conversions which have four user-supplied arguments. */
+/* Now check for conversions which have five user-supplied arguments. */
                } else if( ( PAIR_CVT2( AST__TTTOTDB, AST__TDBTOTT ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 3 ],
-                                 cvtargs[ istep + 1 ][ 3 ] ) ) {
+                          astEQUAL( cvtargs[ istep ][ 3 ],
+                                 cvtargs[ istep + 1 ][ 3 ] ) &&
+                          astEQUAL( cvtargs[ istep ][ 4 ],
+                                 cvtargs[ istep + 1 ][ 4 ] ) ) {
                   istep++;
                   keep = 0;
                }
@@ -2257,6 +2355,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      cvtargs[ ikeep ][ iarg ] = cvtargs[ istep ][ iarg ];
                   }
                   szarg[ ikeep ] = szarg[ istep ];
+                  narg[ ikeep ] = narg[ istep ];
                }
             }
          }
@@ -2303,7 +2402,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                new = (AstMapping *) astTimeMap( 0, "", status );
                for ( istep = 0; istep < nstep; istep++ ) {
                   AddTimeCvt( (AstTimeMap *) new, cvttype[ istep ],
-                             cvtargs[ istep ], status );
+                             narg[ istep ], cvtargs[ istep ], status );
                }
             }
 
@@ -2345,6 +2444,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       cvttype = astFree( cvttype );
       cvtargs = astFree( cvtargs );
       szarg = astFree( szarg );
+      narg = astFree( narg );
    }
 
 /* If an error occurred, clear the returned value. */
@@ -3495,7 +3595,8 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v, int *s
 
 }
 
-static void TimeAdd( AstTimeMap *this, const char *cvt, const double args[], int *status ) {
+static void TimeAdd( AstTimeMap *this, const char *cvt, int narg,
+                     const double args[], int *status ) {
 /*
 *++
 *  Name:
@@ -3510,8 +3611,9 @@ f     AST_TIMEADD
 
 *  Synopsis:
 c     #include "timemap.h"
-c     void astTimeAdd( AstTimeMap *this, const char *cvt, const double args[] )
-f     CALL AST_TIMEADD( THIS, CVT, ARGS, STATUS )
+c     void astTimeAdd( AstTimeMap *this, const char *cvt, int narg,
+c                      const double args[] )
+f     CALL AST_TIMEADD( THIS, CVT, NARG, ARGS, STATUS )
 
 *  Class Membership:
 *     TimeMap method.
@@ -3556,6 +3658,11 @@ f        A character string which identifies the
 *        time coordinate conversion to be added to the
 *        TimeMap. See the "Available Conversions" section for details of
 *        those available.
+c     narg
+f     NARG = INTEGER (Given)
+*        The number of argument values supplied in the
+c        "args" array.
+f        ARGS array.
 c     args
 f     ARGS( * ) = DOUBLE PRECISION (Given)
 *        An array containing argument values for the time
@@ -3600,22 +3707,22 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "BEPTOMJD" (BEPOFF,MJDOFF): Convert Besselian epoch to MJD.
 *     - "MJDTOJEP" (MJDOFF,JEPOFF): Convert MJD to Julian epoch.
 *     - "JEPTOMJD" (JEPOFF,MJDOFF): Convert Julian epoch to MJD.
-*     - "TAITOUTC" (MJDOFF): Convert a TAI MJD to a UTC MJD.
-*     - "UTCTOTAI" (MJDOFF): Convert a UTC MJD to a TAI MJD.
+*     - "TAITOUTC" (MJDOFF,DTAI): Convert a TAI MJD to a UTC MJD.
+*     - "UTCTOTAI" (MJDOFF,DTAI): Convert a UTC MJD to a TAI MJD.
 *     - "TAITOTT"  (MJDOFF): Convert a TAI MJD to a TT MJD.
 *     - "TTTOTAI"  (MJDOFF): Convert a TT MJD to a TAI MJD.
-*     - "TTTOTDB"  (MJDOFF, OBSLON, OBSLAT, OBSALT): Convert a TT MJD to a TDB MJD.
-*     - "TDBTOTT"  (MJDOFF, OBSLON, OBSLAT, OBSALT): Convert a TDB MJD to a TT MJD.
+*     - "TTTOTDB"  (MJDOFF,OBSLON,OBSLAT,OBSALT,DTAI): Convert a TT MJD to a TDB MJD.
+*     - "TDBTOTT"  (MJDOFF,OBSLON,OBSLAT,OBSALT,DTAI): Convert a TDB MJD to a TT MJD.
 *     - "TTTOTCG"  (MJDOFF): Convert a TT MJD to a TCG MJD.
 *     - "TCGTOTT"  (MJDOFF): Convert a TCG MJD to a TT MJD.
 *     - "TDBTOTCB" (MJDOFF): Convert a TDB MJD to a TCB MJD.
 *     - "TCBTOTDB" (MJDOFF): Convert a TCB MJD to a TDB MJD.
 *     - "UTTOGMST" (MJDOFF): Convert a UT MJD to a GMST MJD.
 *     - "GMSTTOUT" (MJDOFF): Convert a GMST MJD to a UT MJD.
-*     - "GMSTTOLMST" (MJDOFF, OBSLON, OBSLAT): Convert a GMST MJD to a LMST MJD.
-*     - "LMSTTOGMST" (MJDOFF, OBSLON, OBSLAT): Convert a LMST MJD to a GMST MJD.
-*     - "LASTTOLMST" (MJDOFF, OBSLON, OBSLAT): Convert a GMST MJD to a LMST MJD.
-*     - "LMSTTOLAST" (MJDOFF, OBSLON, OBSLAT): Convert a LMST MJD to a GMST MJD.
+*     - "GMSTTOLMST" (MJDOFF,OBSLON,OBSLAT): Convert a GMST MJD to a LMST MJD.
+*     - "LMSTTOGMST" (MJDOFF,OBSLON,OBSLAT): Convert a LMST MJD to a GMST MJD.
+*     - "LASTTOLMST" (MJDOFF,OBSLON,OBSLAT): Convert a GMST MJD to a LMST MJD.
+*     - "LMSTTOLAST" (MJDOFF,OBSLON,OBSLAT): Convert a LMST MJD to a GMST MJD.
 *     - "UTTOUTC" (DUT1): Convert a UT1 MJD to a UTC MJD.
 *     - "UTCTOUT" (DUT1): Convert a UTC MJD to a UT1 MJD.
 *     - "LTTOUTC" (LTOFF): Convert a Local Time MJD to a UTC MJD.
@@ -3645,6 +3752,8 @@ f     AST_TRANSFORM
 *     - OBSLON: Observer longitude in radians (+ve westwards).
 *     - OBSLAT: Observer geodetic latitude (IAU 1975) in radians (+ve northwards).
 *     - OBSALT: Observer geodetic altitude (IAU 1975) in metres.
+*     - DTAI: The value of TAI-UTC (the value returned by astDat is used if
+*     DTAI is AST__BAD).
 *     - DUT1: The UT1-UTC value to use.
 *     - LTOFF: The offset between Local Time and UTC (in hours, positive
 *     for time zones east of Greenwich).
@@ -3669,7 +3778,7 @@ f     AST_TRANSFORM
    }
 
 /* Add the new conversion to the TimeMap. */
-   AddTimeCvt( this, cvttype, args, status );
+   AddTimeCvt( this, cvttype, narg, args, status );
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
@@ -3744,7 +3853,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int cvt;                      /* Loop counter for conversions */
    int end;                      /* Termination index for conversion loop */
    int inc;                      /* Increment for conversion loop */
-   int ncoord_in;                /* Number of coordinates per input point */
    int npoint;                   /* Number of points */
    int point;                    /* Loop counter for points */
    int start;                    /* Starting index for conversion loop */
@@ -3767,7 +3875,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Determine the numbers of points and coordinates per point from the input
    PointSet and obtain pointers for accessing the input and output coordinate
    values. */
-   ncoord_in = astGetNcoord( in );
    npoint = astGetNpoint( in );
    ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
@@ -3937,15 +4044,17 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] +
-                                              args[ 0 ], 0 )/SPD;
+                        time[ point ] += ( (args[ 1 ] == AST__BAD)
+                            ? astDat( time[ point ] + args[ 0 ], 0 )
+                            : - args[ 1 ] )/SPD;
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] +
-                                              args[ 0 ], 1 )/SPD;
+                        time[ point ] += ( (args[ 1 ] == AST__BAD)
+                            ? astDat( time[ point ] + args[ 0 ], 1 )
+                            : args[ 1 ] )/SPD;
                      }
                   }
                }
@@ -3957,15 +4066,17 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] +
-                                              args[ 0 ], 1 )/SPD;
+                        time[ point ] += ( (args[ 1 ] == AST__BAD)
+                            ? astDat( time[ point ] + args[ 0 ], 1 )
+                            : args[ 1 ] )/SPD;
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] += astDat( time[ point ] +
-                                              args[ 0 ], 0 )/SPD;
+                        time[ point ] += ( (args[ 1 ] == AST__BAD)
+                            ? astDat( time[ point ] + args[ 0 ], 0 )
+                            : - args[ 1 ] )/SPD;
                      }
                   }
                }
@@ -4010,16 +4121,20 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* TT to TDB. */
 /* ---------- */
 /* For the purpose of estimating TDB-TT, we assume UTC is a good approximation
-   to UT1, and that TT is a good approximation to TDB. */
+   to UT1, and that TT is a good approximation to TDB. In fact, TAI is
+   probably a good enough approximation to UTC for the vast majority of
+   cases, but for completeness we handle the difference between TAI and
+   UTC (i.e. leap seconds) here. */
             case AST__TTTOTDB:
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
-                        utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 4 ],
-                                              args[ 5 ], status )/SPD;
+                        utc = tai + ( (args[ 4 ] == AST__BAD) ? astDat( tai, 0 )
+                                                              : -args[ 4 ] )/SPD;
+                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 5 ],
+                                              args[ 6 ], status )/SPD;
                      }
                   }
                } else {
@@ -4027,9 +4142,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      if ( time[ point ] != AST__BAD ) {
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
-                        utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 4 ],
-                                                args[ 5 ], status )/SPD;
+                        utc = tai + ( (args[ 4 ] == AST__BAD) ? astDat( tai, 0 )
+                                                              : -args[ 4 ] )/SPD;
+                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 5 ],
+                                              args[ 6 ], status )/SPD;
                      }
                   }
                }
@@ -4038,16 +4154,20 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* TDB to TT. */
 /* ---------- */
 /* For the purpose of estimating TDB-TT, we assume UTC is a good approximation
-   to UT1, and that TT is a good approximation to TDB. */
+   to UT1, and that TT is a good approximation to TDB. In fact, TAI is
+   probably a good enough approximation to UTC for the vast majority of
+   cases, but for completeness we handle the difference between TAI and
+   UTC (i.e. leap seconds) here. */
             case AST__TDBTOTT:
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) {
                      if ( time[ point ] != AST__BAD ) {
                         tdb = time[ point ] + args[ 0 ];
                         tai = tdb - (TTOFF/SPD);
-                        utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 4 ],
-                                                args[ 5 ], status )/SPD;
+                        utc = tai + ( (args[ 4 ] == AST__BAD) ? astDat( tai, 0 )
+                                                              : -args[ 4 ] )/SPD;
+                        time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 5 ],
+                                              args[ 6 ], status )/SPD;
                      }
                   }
                } else {
@@ -4055,9 +4175,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      if ( time[ point ] != AST__BAD ) {
                         tt = time[ point ] + args[ 0 ];
                         tai = tt - (TTOFF/SPD);
-                        utc = tai + astDat( tai, 0 )/SPD;
-                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 4 ],
-                                              args[ 5 ], status )/SPD;
+                        utc = tai + ( (args[ 4 ] == AST__BAD) ? astDat( tai, 0 )
+                                                              : -args[ 4 ] )/SPD;
+                        time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 5 ],
+                                              args[ 6 ], status )/SPD;
                      }
                   }
                }
@@ -4539,10 +4660,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    const char *argdesc[ MAX_ARGS ]; /* Pointers to argument descriptions */
    const char *comment;          /* Pointer to comment string */
    const char *sval;             /* Pointer to string value */
-   int iarg;                     /* Loop counter for arguments */
+   int iarg;                     /* Internal index of argument */
    int icvt;                     /* Loop counter for conversion steps */
    int ival;                     /* Integer value */
+   int jarg;                     /* External index of argument */
    int nargs;                    /* Number of user-supplied arguments */
+   int *order;                   /* Order in which to store arguments */
    int szargs;                   /* Number of stored arguments */
    int set;                      /* Attribute value set? */
 
@@ -4585,7 +4708,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    was not recognised, report an error and give up. */
       if ( astOK ) {
          sval = CvtString( this->cvttype[ icvt ], &comment,
-                           &nargs, &szargs, argdesc, status );
+                           &nargs, &szargs, argdesc, &order, status );
          if ( astOK && !sval ) {
             astError( AST__TIMIN,
                       "astWrite(%s): Corrupt %s contains invalid TimeMap "
@@ -4603,16 +4726,24 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Write out data for each conversion argument... */
          for ( iarg = 0; iarg < szargs; iarg++ ) {
 
+/* The "iarg" value is the index of the argument within the external
+   argument list. Get the index of the argument within the internal
+   argument list. */
+            jarg = order ? order[ iarg ] : iarg;
+
 /* Arguments. */
 /* ---------- */
 /* Create an appropriate keyword and write out the argument value,
    accompanied by the descriptive comment obtained above. */
-            if( this->cvtargs[ icvt ][ iarg ] != AST__BAD ) {
+            if( this->cvtargs[ icvt ][ jarg ] != AST__BAD ) {
                (void) sprintf( key, "Time%d%c", icvt + 1, ALPHABET[ iarg ] );
-               astWriteDouble( channel, key, 1, 1, this->cvtargs[ icvt ][ iarg ],
-                               argdesc[ iarg ] );
+               astWriteDouble( channel, key, 1, 1, this->cvtargs[ icvt ][ jarg ],
+                               argdesc[ jarg ] );
             }
          }
+
+/* Free the order array. */
+         order = astFree( order );
 
 /* Quit looping if an error occurs. */
          if ( !astOK ) break;
@@ -4938,8 +5069,8 @@ AstTimeMap *astInitTimeMap_( void *mem, size_t size, int init,
 }
 
 AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
-                           AstTimeMapVtab *vtab, const char *name,
-                           AstChannel *channel, int *status ) {
+                             AstTimeMapVtab *vtab, const char *name,
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -4954,8 +5085,8 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
 *  Synopsis:
 *     #include "timemap.h"
 *     AstTimeMap *astLoadTimeMap( void *mem, size_t size,
-*                               AstTimeMapVtab *vtab, const char *name,
-*                               AstChannel *channel )
+*                                 AstTimeMapVtab *vtab, const char *name,
+*                                 AstChannel *channel )
 
 *  Class Membership:
 *     TimeMap loader.
@@ -5023,8 +5154,10 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
    const char *argdesc[ MAX_ARGS ]; /* Pointers to argument descriptions */
    const char *comment;          /* Pointer to comment string */
-   int iarg;                     /* Loop counter for arguments */
+   int iarg;                     /* Internal index of argument */
    int icvt;                     /* Loop counter for conversion steps */
+   int jarg;                     /* External index of argument */
+   int *order;                   /* Order in which to store arguments */
    int nargs;                    /* Number of user-supplied arguments */
    int szargs;                   /* Number of stored arguments */
 
@@ -5134,7 +5267,7 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
 /* Obtain the number of arguments associated with the conversion and
    allocate memory to hold them. */
             (void) CvtString( new->cvttype[ icvt ], &comment,
-                              &nargs, &szargs, argdesc, status );
+                              &nargs, &szargs, argdesc, &order, status );
             new->cvtargs[ icvt ] = astMalloc( sizeof( double ) *
                                               (size_t) szargs );
 
@@ -5142,14 +5275,22 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
             if ( astOK ) {
                for ( iarg = 0; iarg < szargs; iarg++ ) {
 
+/* The "iarg" value is the index of the argument within the external
+   argument list. Get the index of the argument within the internal
+   argument list. */
+                  jarg = order ? order[ iarg ] : iarg;
+
 /* Arguments. */
 /* ---------- */
 /* Create an appropriate keyword and read each argument value. */
                   (void) sprintf( key, "time%d%c", icvt + 1, ALPHABET[ iarg ] );
-                  new->cvtargs[ icvt ][ iarg ] = astReadDouble( channel, key,
+                  new->cvtargs[ icvt ][ jarg ] = astReadDouble( channel, key,
                                                                 AST__BAD );
                }
             }
+
+/* Free the order array. */
+            order = astFree( order );
 
 /* Quit looping if an error occurs. */
             if ( !astOK ) break;
@@ -5178,9 +5319,10 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-void astTimeAdd_( AstTimeMap *this, const char *cvt, const double args[], int *status ) {
+void astTimeAdd_( AstTimeMap *this, const char *cvt, int narg, const double args[],
+                  int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,TimeMap,TimeAdd))( this, cvt, args, status );
+   (**astMEMBER(this,TimeMap,TimeAdd))( this, cvt, narg, args, status );
 }
 
 

@@ -7,6 +7,9 @@ t/00-load.t
 t/01-ordinal.t
 t/02-yawn.t
 t/03-strftime.t
+t/04-num2text.t
+t/05-language.t
+t/06-strptime.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -24,7 +24,7 @@ BEGIN {
    plan tests => 7;
 }
 
-my $lockfile  = File::Spec->catfile($folderdir, 'lockfiletest');
+my $lockfile  = File::Spec->catfile($workdir, 'lockfiletest');
 unlink $lockfile;
 
 my $locker = Mail::Box::Locker->new

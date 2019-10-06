@@ -14,9 +14,8 @@ use Test::More tests => 54;
 use File::Compare;
 use File::Copy;
 
-my $mhsrc = File::Spec->catfile($folderdir, 'mh.src');
+my $mhsrc = File::Spec->catfile($workdir, 'mh.src');
 
-clean_dir $mhsrc;
 unpack_mbox2mh($src, $mhsrc);
 
 my $folder = new Mail::Box::MH
@@ -68,5 +67,3 @@ cmp_ok($folder->messages, "==", 43);
 foreach ($folder->messages) { ok(! $_->deleted) }
 
 $folder->close;
-
-clean_dir $mhsrc;

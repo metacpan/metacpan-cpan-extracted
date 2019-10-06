@@ -26,6 +26,7 @@
             "Catalyst::Controller" : "0",
             "Catalyst::Model" : "0",
             "Catalyst::Model::DBIC::Schema" : "0",
+            "Catalyst::Plugin::RapidApp::NavCore::NavTree" : "0",
             "Catalyst::Plugin::RapidApp::RapidDbic::TableBase" : "0",
             "DBIx::Class::Core" : "0",
             "DBIx::Class::Helpers" : "2.033003",
@@ -68,7 +69,7 @@
             "Plack::Middleware::ConditionalGET" : "0",
             "Pod::Find" : "0",
             "Pod::Usage" : "0",
-            "RapidApp" : "1.3108",
+            "RapidApp" : "1.3200",
             "RapidApp::Builder" : "0",
             "RapidApp::Module::DbicPropPage" : "0",
             "RapidApp::Module::DbicRowDV" : "0",
@@ -113,6 +114,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#rapidapp"
    },
-   "version" : "1.1004"
+   "version" : "1.1100"
 }
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.158';
+our $VERSION = '1.159';
 
 use Quiq::Database::Row::Array;
 use Quiq::Database::Row::Object;
@@ -537,6 +537,7 @@ sub fetch {
 
                 my $p = Quiq::Path->new;
                 my $cacheFile = $self->{'cacheFile'};
+
                 my ($dir) = $p->split($cacheFile);
                 my $newCacheFile = $dir.'/'.
                     Quiq::Digest->md5($self->{'stmt'});
@@ -660,7 +661,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.158
+1.159
 
 =head1 AUTHOR
 

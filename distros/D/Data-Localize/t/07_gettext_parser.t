@@ -1,4 +1,8 @@
 use strict;
+use Cwd ();
+BEGIN {
+    unshift @INC, Cwd::abs_path()
+}
 use utf8;
 use t::Data::Localize::Test qw(write_po);
 use Test::More tests => 7;

@@ -1,3 +1,10 @@
+0.09
+    - Tweak to avoid upsetting CPAN indexer.
+
+0.08
+    - Update to build against modern MogileFS::Server.
+    - Switch to Dist::Zilla.
+
 0.07
     - Add resources to distribution metadata.
 

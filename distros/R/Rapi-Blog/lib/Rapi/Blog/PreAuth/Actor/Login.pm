@@ -24,7 +24,9 @@ sub execute {
   
   my $uObj = $c->find_user({ username => $user }) or die "Failed to get Catalyst Auth user object";
   
-  $c->set_authenticated( $uObj ) or die "->set_authenticated(): unknown error occured";
+  $c->set_authenticated( $uObj );
+
+  $c->user or die "->set_authenticated(): unknown error occured";
 
   # -----
   # This comes directly from Auth::do_login

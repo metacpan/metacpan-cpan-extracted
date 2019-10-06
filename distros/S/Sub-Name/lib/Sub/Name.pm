@@ -1,4 +1,4 @@
-package Sub::Name; # git description: v0.20-2-gc0a0e62
+package Sub::Name; # git description: v0.25-7-gdb146e5
 # ABSTRACT: (Re)name a sub
 # KEYWORDS: subroutine function utility name rename symbol
 
@@ -54,9 +54,10 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.26';
 
-use Exporter 5.57 'import';
+use Exporter ();
+*import = \&Exporter::import;
 
 our @EXPORT = qw(subname);
 our @EXPORT_OK = @EXPORT;
@@ -81,7 +82,7 @@ Sub::Name - (Re)name a sub
 
 =head1 VERSION
 
-version 0.21
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -140,7 +141,7 @@ Matthijs van Duin <xmath@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leon Timmermans Florian Ragwitz Reini Urban Matthijs van Duin gfx Dagfinn Ilmari Mannsåker Aristotle Pagaltzis J.R. Mash Alexander Bluhm
+=for stopwords Karen Etheridge Graham Knop Leon Timmermans Reini Urban Florian Ragwitz Matthijs van Duin Dagfinn Ilmari Mannsåker gfx Aristotle Pagaltzis J.R. Mash Alexander Bluhm
 
 =over 4
 
@@ -150,7 +151,15 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Leon Timmermans <fawaka@gmail.com>
+
+=item *
+
+Reini Urban <rurban@cpan.org>
 
 =item *
 
@@ -158,19 +167,15 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Reini Urban <rurban@cpanel.net>
-
-=item *
-
 Matthijs van Duin <xmath-no-spam@nospam.cpan.org>
 
 =item *
 
-gfx <gfuji@cpan.org>
+Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 =item *
 
-Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+gfx <gfuji@cpan.org>
 
 =item *
 

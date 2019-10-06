@@ -31,12 +31,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -111,6 +111,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *        an exponent.
 *     13-OCT-2011 (DSB):
 *        Use tuning parameters to store graphical delimiters.
+*     27-APR-2015 (DSB):
+*        Added InternalUNit attribute..
+*     26-OCT-2016 (DSB):
+*        Override astAxisNormValues.
+*     7-NOV-2016 (DSB):
+*        Ensure astAxisNormValues ignores bad axis values.
 *class--
 */
 
@@ -157,7 +163,7 @@ f     only within textual output (e.g. from AST_WRITE).
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static const char *(* parent_getaxislabel)( AstAxis *, int * );
 static const char *(* parent_getaxissymbol)( AstAxis *, int * );
@@ -237,9 +243,10 @@ AstSkyAxis *astSkyAxisId_( const char *, ... );
 /* ======================================== */
 static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char *, int * );
 static const char *AxisFormat( AstAxis *, double, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetAxisFormat( AstAxis *, int * );
+static const char *GetAxisInternalUnit( AstAxis *, int * );
 static const char *GetAxisLabel( AstAxis *, int * );
 static const char *GetAxisSymbol( AstAxis *, int * );
 static const char *GetAxisUnit( AstAxis *, int * );
@@ -261,9 +268,11 @@ static int GetAxisCentreZero( AstSkyAxis *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static int TestAxisAsTime( AstSkyAxis *, int * );
 static int TestAxisFormat( AstAxis *, int * );
+static int TestAxisInternalUnit( AstAxis *, int * );
 static int TestAxisIsLatitude( AstSkyAxis *, int * );
 static int TestAxisCentreZero( AstSkyAxis *, int * );
 static void AxisNorm( AstAxis *, double *, int * );
+static void AxisNormValues( AstAxis *, int, int, double *, int * );
 static void AxisOverlay( AstAxis *, AstAxis *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearAxisAsTime( AstSkyAxis *, int * );
@@ -1097,6 +1106,188 @@ static void AxisNorm( AstAxis *this_axis, double *value, int *status ) {
       if ( astOK ) *value = centrezero ? palDrange( *value ) :
                                          palDranrm( *value );
    }
+}
+
+static void AxisNormValues( AstAxis *this_axis, int oper, int nval,
+                            double *values, int *status ){
+/*
+*  Name:
+*     astAxisNormValues
+
+*  Purpose:
+*     Normalise an array of axis coordinate values.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     void astAxisNormValues( AstAxis *this, int oper, int nval,
+*                             double *values )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astAxisNormValues method
+*     inherited from the Axis class).
+
+*  Description:
+*     This function modifies a supplied array of axis values so that
+*     they are normalised in the manner indicated by parameter "oper".
+*
+*     For a SkyAxis, if "oper" is 0, longitude values are returned in
+*     the range [0,2*PI]. If "oper" is 1, longitude values are returned
+*     in either the range [0,2*PI] or [-PI,PI]. The choice is made so
+*     that the resulting list has the smallest range. Latitude values
+*     are always returned in the range [-PI,PI].
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     oper
+*        Indicates the type of normalisation to be applied. If zero is
+*        supplied, the normalisation will be the same as that performed by
+*        function astAxisNorm. If 1 is supplied, the normalisation will be
+*        chosen automatically so that the resulting list has the smallest
+*        range.
+*     nval
+*        The number of points in the values array.
+*     values
+*        On entry, the axis values to be normalised. Modified on exit to
+*        hold the normalised values.
+
+*  Notes:
+*     - Bad axis values, and axis values outside the range -1E6 to +1E6
+*     radians (such as DBL_MAX and DBL_MIN) are returned unchanged.
+
+*/
+
+/* Local macros */
+#define VAL_OK(v) ((v)!=AST__BAD&&fabs(v)<1.0E6)
+
+/* Local Variables: */
+   AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
+   double *pv;                   /* Pointer to next axis value */
+   double hi;                    /* Max axis value after normalisation */
+   double lo;                    /* Min axis value after normalisation */
+   double mn1;                   /* Min value in range [-pi,0] */
+   double mn2;                   /* Min value in range [0,pi] */
+   double mn3;                   /* Min value in range [pi,2pi] */
+   double mx1;                   /* Max value in range [-pi,0] */
+   double mx2;                   /* Max value in range [0,pi] */
+   double mx3;                   /* Max value in range [pi,2pi] */
+   double range1;                /* Range after normalising to [0,2*pi] */
+   double range2;                /* Range after normalising to [-pi,pi] */
+   double twopi;                 /* Two PI */
+   int centrezero;               /* SkyAxis range centred on zero? */
+   int i;                        /* Index of next axis value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyAxis structure. */
+   this = (AstSkyAxis *) this_axis;
+
+/* Oper 0 - always normalise according to the value of the CentreZero
+   attribute (i.e. mimic AxisNorm). */
+   if( oper == 0 ) {
+
+/* Determine if the SkyAxis range is centred on zero or PI. */
+      centrezero = astGetAxisCentreZero( this );
+
+/* Loop over axis values. */
+      pv = values;
+      for( i = 0; i < nval; i++,pv++ ) {
+
+/* If the coordinate value is bad, or unusually large, then return it
+   unchanged. Otherwise, wrap the value into the appropriate range. */
+         if( VAL_OK(*pv) ) *pv = centrezero ? palDrange( *pv ) :
+                                              palDranrm( *pv );
+      }
+
+/* Oper 1 - choose a range that leaves most values unchanged. */
+   } else if( oper == 1 ) {
+
+/* Normalise latitude axes into [-PI,+PI]. */
+      if( astGetAxisIsLatitude( this ) ) {
+         pv = values;
+         for( i = 0; i < nval; i++,pv++ ) {
+            if( VAL_OK(*pv) ) *pv = palDrange( *pv );
+         }
+
+/* Now deal with longitude axes. */
+      } else {
+
+/* First ensure all values are in the range [-PI,2*PI] and find the max
+   and min value in each of the three ranges [-PI,0], [0,PI], [PI, 2PI]. */
+         twopi = 2*AST__DPI;
+         mx1 = -DBL_MAX;
+         mn1 = DBL_MAX;
+         mx2 = -DBL_MAX;
+         mn2 = DBL_MAX;
+         mx3 = -DBL_MAX;
+         mn3 = DBL_MAX;
+
+         pv = values;
+         for( i = 0; i < nval; i++,pv++ ) {
+            if( VAL_OK(*pv) ) {
+               while( *pv > twopi ) *pv -= twopi;
+               while( *pv < -AST__DPIBY2 ) *pv += twopi;
+
+               if( *pv > AST__DPI ) {
+                  mx3 = astMAX( mx3, *pv );
+                  mn3 = astMIN( mn3, *pv );
+               } else if( *pv > 0 ) {
+                  mx2 = astMAX( mx2, *pv );
+                  mn2 = astMIN( mn2, *pv );
+               } else {
+                  mx1 = astMAX( mx1, *pv );
+                  mn1 = astMIN( mn1, *pv );
+               }
+            }
+         }
+
+/* What would the range be if we normalised into [0,2.PI] ? */
+         if( mx1 != -DBL_MAX ) {
+            hi = astMAX( mx2, astMAX( mx1 + twopi, mx3) );
+            lo = astMIN( mn2, astMIN( mn1 + twopi, mn3) );
+         } else {
+            hi = astMAX( mx2, mx3 );
+            lo = astMIN( mn2, mn3 );
+         }
+         range1 = hi - lo;
+
+/* What would the range be if we normalised into [-PI,PI] ? */
+         if( mn3 != -DBL_MAX ) {
+            hi = astMAX( mx2, astMAX( mx3 - twopi, mx1) );
+            lo = astMIN( mn2, astMIN( mn3 - twopi, mn1) );
+         } else {
+            hi = astMAX( mx2, mx1 );
+            lo = astMIN( mn2, mn1 );
+         }
+         range2 = hi - lo;
+
+/* If [-PI,PI] produces the smaller range, normalise into [-PI,PI]. */
+         if( range2 < range1 ) {
+            pv = values;
+            for( i = 0; i < nval; i++,pv++ ) {
+               if( VAL_OK(*pv) ) *pv = palDrange( *pv );
+            }
+
+/* Otherwise, normalise all into the range [0,2PI]. */
+         } else {
+            pv = values;
+            for( i = 0; i < nval; i++,pv++ ) {
+               if( VAL_OK(*pv) ) *pv = palDranrm( *pv );
+            }
+         }
+      }
+
+/* Report an error if the supplied operation is invalid. */
+   } else if( astOK ) {
+      astError( AST__INTER, "astAxisNormValues: Invalid oper value %d "
+                "supplied (internal AST programming error).", status, oper );
+   }
+
+#undef VAL_OK
 }
 
 static double AxisOffset( AstAxis *this_axis, double v1, double dist, int *status ) {
@@ -2254,7 +2445,7 @@ static const char *DHmsUnit( const char *fmt, int digs, int output, int *status 
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -2267,7 +2458,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetObjSize protected
@@ -2293,7 +2484,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstSkyAxis *this;         /* Pointer to SkyAxis structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -2491,6 +2682,49 @@ static double GetAxisBottom( AstAxis *this_axis, int *status ) {
 
 /* Return the result. */
    return result;
+}
+
+static const char *GetAxisInternalUnit( AstAxis *this, int *status ){
+/*
+*  Name:
+*     GetAxisInternalUnit
+
+*  Purpose:
+*     Return the unit string for unformatted Axis values
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     const char *GetAxisInternalUnit( AstAxis *this )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astGetAxisInternalUnit method
+*     inherited from the Axis class).
+
+*  Description:
+*     This function returns the axis InternalUnit attribute. For sky
+*     axes, the InternalUnit is always "rad" (radians).
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the internal
+*     unit string.
+
+*  Notes:
+*     - The returned pointer points to a static memory buffer. The
+*     contents of this buffer will be over-written on each invocation of
+*     this function. A copy of the returned string should therefore be
+*     taken if it will be needed later.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+   return "rad";
 }
 
 static double GetAxisTop( AstAxis *this_axis, int *status ) {
@@ -3137,10 +3371,13 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
    axis->AxisDistance = AxisDistance;
    axis->AxisOffset = AxisOffset;
    axis->AxisNorm = AxisNorm;
+   axis->AxisNormValues = AxisNormValues;
    axis->ClearAxisFormat = ClearAxisFormat;
    axis->GetAxisFormat = GetAxisFormat;
    axis->SetAxisFormat = SetAxisFormat;
    axis->TestAxisFormat = TestAxisFormat;
+   axis->GetAxisInternalUnit = GetAxisInternalUnit;
+   axis->TestAxisInternalUnit = TestAxisInternalUnit;
 
 /* Declare the destructor, copy constructor and dump function. */
    astSetDelete( vtab, Delete );
@@ -3652,6 +3889,48 @@ static int TestAxisFormat( AstAxis *this_axis, int *status ) {
 
 /* Return the result. */
    return result;
+}
+
+static int TestAxisInternalUnit( AstAxis *this, int *status ){
+/*
+*  Name:
+*     TestAxisInternalUnit
+
+*  Purpose:
+*     Test if a InternalUnit attribute value is set for an Axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int TestAxisInternalUnit( AstAxis *this, int *status )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astTestAxisInternalUnit
+*     protected method inherited from the Axis class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate
+*     whether a value has been set for the InternalUnit string.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Tell the world that we know what value to use for InternalUnit (i.e.
+   "rad"). */
+   return 1;
 }
 
 static int AxisUnformat( AstAxis *this_axis, const char *string,

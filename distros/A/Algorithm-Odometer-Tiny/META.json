@@ -1,0 +1,78 @@
+{
+   "abstract" : "Generate \"base-N odometer\" permutations",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Algorithm-Odometer-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : []
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006000"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "File::Glob" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "List::Util" : "0",
+            "Test::More" : "1.302096",
+            "constant" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::Odometer::Gray" : {
+         "file" : "lib/Algorithm/Odometer/Gray.pm",
+         "version" : "0.02"
+      },
+      "Algorithm::Odometer::Tiny" : {
+         "file" : "lib/Algorithm/Odometer/Tiny.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haukex/Algorithm-Odometer-Tiny/issues"
+      },
+      "homepage" : "https://github.com/haukex/Algorithm-Odometer-Tiny",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haukex/Algorithm-Odometer-Tiny.git",
+         "web" : "https://github.com/haukex/Algorithm-Odometer-Tiny"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -4,7 +4,7 @@ use Mojo::Util   ();
 use Carp         ();
 use Scalar::Util ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $served_compressed_asset;
 my @compression_types = (
@@ -289,7 +289,7 @@ states that ETags should be content-coding aware.
 =head2 compression_types
 
   $app->static
-      ->with_roles('+Compressed)
+      ->with_roles('+Compressed')
       ->compression_types(['br', {ext => 'gz', encoding => 'gzip'}]); # This is the default
 
 Compression types accepts an arrayref made up of strings and/or hashrefs.
@@ -326,12 +326,12 @@ C<ext> and C<encoding> must be unique across different compression types.
 =head2 should_serve_asset
 
   $app->static
-      ->with_roles('+Compressed)
+      ->with_roles('+Compressed')
       ->should_serve_asset(sub { $_->path !~ /\.(pdf|jpe?g|gif|png|webp)$/i }); # This is the default
 
   # subroutine returning 1 means try to serve compressed versions of all assets.
   $app->static
-      ->with_roles('+Compressed)
+      ->with_roles('+Compressed')
       ->should_serve_asset(sub { 1 });
 
   # using 1 directly also tries to serve compressed versions of all assets and is slightly faster
@@ -353,7 +353,7 @@ To look for compressed versions of all assets, set L</should_serve_asset> to a
 subroutine that always returns C<1>:
 
   $app->static
-      ->with_roles('+Compressed)
+      ->with_roles('+Compressed')
       ->should_serve_asset(sub { 1 });
 
 Or you can set L</should_serve_asset> to 1, which is slightly faster:

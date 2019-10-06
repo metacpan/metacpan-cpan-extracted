@@ -21,4 +21,4 @@ no_index:
 requires:
   DateTime: '0'
   perl: '5.006'
-version: '0.01'
+version: '0.03'

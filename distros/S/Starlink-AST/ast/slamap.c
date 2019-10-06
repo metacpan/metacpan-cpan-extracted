@@ -58,12 +58,12 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -115,6 +115,10 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        Fix bug in merging of adjacent AMP and MAP conversions (MapMerge
 *        did not take account of the fact that the arguments for these
 *        two conversions are stored in swapped order).
+*     6-JUL-2015 (DSB):
+*        Added method astSlaIsEmpty.
+*     30-NOV-2016 (DSB):
+*        Added a "narg" argumeent to astSlaAdd.
 
 *class--
 */
@@ -170,15 +174,6 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #define R2D (180.0/PI)
 #define AS2R (PI/648000.0)
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -215,7 +210,7 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 
 
@@ -272,14 +267,15 @@ static const char *CvtString( int, const char **, int *, const char *[ MAX_SLA_A
 static int CvtCode( const char *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
-static void AddSlaCvt( AstSlaMap *, int, const double *, int * );
+static int SlaIsEmpty( AstSlaMap *, int * );
+static void AddSlaCvt( AstSlaMap *, int, int, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void De2h( double, double, double, double, double *, double *, int * );
 static void Dh2e( double, double, double, double, double *, double *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void Earth( double, double[3], int * );
-static void SlaAdd( AstSlaMap *, const char *, const double[], int * );
+static void SlaAdd( AstSlaMap *, const char *, int, const double[], int * );
 static void SolarPole( double, double[3], int * );
 static void Hpcc( double, double[3], double[3][3], double[3], int * );
 static void Hprc( double, double[3], double[3][3], double[3], int * );
@@ -290,7 +286,7 @@ static void Gsec( double, double[3][3], double[3], int * );
 static void STPConv( double, int, int, int, double[3], double *[3], int, double[3], double *[3], int * );
 static void J2000H( int, int, double *, double *, int * );
 
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 
 /* Member functions. */
 /* ================= */
@@ -537,7 +533,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 }
 
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -550,7 +546,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "slamap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SlaMap member function (over-rides the astGetObjSize protected
@@ -576,7 +572,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstSlaMap *this;         /* Pointer to SlaMap structure */
-   int result;              /* Result value to return */
+   size_t result;           /* Result value to return */
    int cvt;                 /* Loop counter for coordinate conversions */
 
 /* Initialise. */
@@ -608,7 +604,8 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    return result;
 }
 
-static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *status ) {
+static void AddSlaCvt( AstSlaMap *this, int cvttype, int narg,
+                       const double *args, int *status ) {
 /*
 *  Name:
 *     AddSlaCvt
@@ -621,7 +618,8 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *st
 
 *  Synopsis:
 *     #include "slamap.h"
-*     void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args )
+*     void AddSlaCvt( AstSlaMap *this, int cvttype, int narg,
+*                     const double *args )
 
 *  Class Membership:
 *     SlaMap member function.
@@ -645,6 +643,8 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *st
 *        A code to identify which sky coordinate conversion is to be
 *        appended.  See the "SLALIB Coordinate Conversions" section
 *        for details of those available.
+*     narg
+*        The number of argument values supplied in "args".
 *     args
 *        Pointer to an array of double containing the argument values
 *        required to fully specify the required coordinate
@@ -763,6 +763,13 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *st
       astError( AST__SLAIN, "AddSlaCvt(%s): Invalid SLALIB sky coordinate "
                 "conversion type (%d).", status, astGetClass( this ),
                 (int) cvttype );
+   }
+
+/* If the number of supplied arguments is incorrect, then report an error. */
+   if ( astOK && nargs != narg ) {
+      astError( AST__TIMIN, "AddSlaCvt(%s): Invalid no. of arguments for SLALIB "
+                "coordinate conversion type %d - %d supplied, %d required.",
+                status, astGetClass( this ), (int) cvttype, narg, nargs );
    }
 
 /* Note the number of coordinate conversions already stored in the SlaMap. */
@@ -2492,6 +2499,7 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name, int *status ) {
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
    vtab->SlaAdd = SlaAdd;
+   vtab->SlaIsEmpty = SlaIsEmpty;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2665,7 +2673,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    const char *comment;          /* Pointer to comment string (junk) */
    double (*cvtargs)[ MAX_SLA_ARGS ]; /* Pointer to argument arrays */
    int *cvttype;                 /* Pointer to transformation type codes */
-   int *narg;                    /* Pointer to argument count array */
+   int *narg;                    /* Pointer to argument count */
    int done;                     /* Finished (no further simplification)? */
    int iarg;                     /* Loop counter for arguments */
    int icvt1;                    /* Loop initial value */
@@ -2899,7 +2907,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    note that it should not be kept. */
             if ( ( ( cvttype[ istep ] == AST__SLA_PREBN ) ||
                    ( cvttype[ istep ] == AST__SLA_PREC ) ) &&
-                 EQUAL( cvtargs[ istep ][ 0 ], cvtargs[ istep ][ 1 ] ) ) {
+                 astEQUAL( cvtargs[ istep ][ 0 ], cvtargs[ istep ][ 1 ] ) ) {
                keep = 0;
 
 /* The remaining simplifications act to combine adjacent
@@ -2920,7 +2928,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    by eliminating the common equinox. */
                if ( ( PAIR_CVT( AST__SLA_PREBN, AST__SLA_PREBN ) ||
                       PAIR_CVT( AST__SLA_PREC, AST__SLA_PREC ) ) &&
-                    EQUAL( cvtargs[ istep ][ 1 ], cvtargs[ istep + 1 ][ 0 ] ) ) {
+                    astEQUAL( cvtargs[ istep ][ 1 ], cvtargs[ istep + 1 ][ 0 ] ) ) {
 
 /* Retain the second correction, changing its first argument, and
    eliminate the first correction. */
@@ -2934,7 +2942,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    they will cancel, so eliminate them both. */
                } else if ( ( PAIR_CVT( AST__SLA_SUBET, AST__SLA_ADDET ) ||
                              PAIR_CVT( AST__SLA_ADDET, AST__SLA_SUBET ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2945,7 +2953,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_FK45Z, AST__SLA_FK54Z ) ||
                              PAIR_CVT( AST__SLA_FK54Z, AST__SLA_FK45Z ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2956,7 +2964,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_HFK5Z, AST__SLA_FK5HZ ) ||
                              PAIR_CVT( AST__SLA_FK5HZ, AST__SLA_HFK5Z ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2968,9 +2976,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    directions) and eliminate them if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_AMP, AST__SLA_MAP ) ||
                              PAIR_CVT( AST__SLA_MAP, AST__SLA_AMP ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 1 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2980,7 +2988,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* This is handled in the same way as the FK4/FK5 case. */
                } else if ( ( PAIR_CVT( AST__SLA_ECLEQ, AST__SLA_EQECL ) ||
                              PAIR_CVT( AST__SLA_EQECL, AST__SLA_ECLEQ ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2989,9 +2997,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ------------------------------------------------ */
                } else if ( ( PAIR_CVT( AST__SLA_DH2E, AST__SLA_DE2H ) ||
                              PAIR_CVT( AST__SLA_DE2H, AST__SLA_DH2E ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                                   cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3017,13 +3025,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* --------------------------------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__HPCEQ, AST__EQHPC ) ||
                              PAIR_CVT( AST__EQHPC, AST__HPCEQ ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                              cvtargs[ istep + 1 ][ 0 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                              cvtargs[ istep + 1 ][ 1 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 2 ],
+                           astEQUAL( cvtargs[ istep ][ 2 ],
                              cvtargs[ istep + 1 ][ 2 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 3 ],
+                           astEQUAL( cvtargs[ istep ][ 3 ],
                              cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3032,13 +3040,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* --------------------------------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__HPREQ, AST__EQHPR ) ||
                              PAIR_CVT( AST__EQHPR, AST__HPREQ ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                              cvtargs[ istep + 1 ][ 0 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 1 ],
+                           astEQUAL( cvtargs[ istep ][ 1 ],
                              cvtargs[ istep + 1 ][ 1 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 2 ],
+                           astEQUAL( cvtargs[ istep ][ 2 ],
                              cvtargs[ istep + 1 ][ 2 ] ) &&
-                           EQUAL( cvtargs[ istep ][ 3 ],
+                           astEQUAL( cvtargs[ istep ][ 3 ],
                              cvtargs[ istep + 1 ][ 3 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3047,7 +3055,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ---------------------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__EQHE, AST__HEEQ ) ||
                              PAIR_CVT( AST__HEEQ, AST__EQHE ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3063,7 +3071,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ------------------------------------------- */
                } else if ( ( PAIR_CVT( AST__R2H, AST__H2R ) ||
                              PAIR_CVT( AST__H2R, AST__R2H ) ) &&
-                           EQUAL( cvtargs[ istep ][ 0 ],
+                           astEQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -3134,7 +3142,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                new = (AstMapping *) astSlaMap( 0, "", status );
                for ( istep = 0; istep < nstep; istep++ ) {
                   AddSlaCvt( (AstSlaMap *) new, cvttype[ istep ],
-                             cvtargs[ istep ], status );
+                             narg[ istep ], cvtargs[ istep ], status );
                }
             }
 
@@ -3185,7 +3193,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static void SlaAdd( AstSlaMap *this, const char *cvt, const double args[], int *status ) {
+static void SlaAdd( AstSlaMap *this, const char *cvt, int narg,
+                    const double args[], int *status ) {
 /*
 *++
 *  Name:
@@ -3200,8 +3209,9 @@ f     AST_SLAADD
 
 *  Synopsis:
 c     #include "slamap.h"
-c     void astSlaAdd( AstSlaMap *this, const char *cvt, const double args[] )
-f     CALL AST_SLAADD( THIS, CVT, ARGS, STATUS )
+c     void astSlaAdd( AstSlaMap *this, const char *cvt, int narg,
+c                     const double args[] )
+f     CALL AST_SLAADD( THIS, CVT, NARG, ARGS, STATUS )
 
 *  Class Membership:
 *     SlaMap method.
@@ -3247,6 +3257,11 @@ f        A character string which identifies the
 *        celestial coordinate conversion to be added to the
 *        SlaMap. See the "SLALIB Conversions" section for details of
 *        those available.
+c     narg
+f     NARG = INTEGER (Given)
+*        The number of argument values supplied in the
+c        "args" array.
+f        ARGS array.
 c     args
 f     ARGS( * ) = DOUBLE PRECISION (Given)
 *        An array containing argument values for the celestial
@@ -3367,8 +3382,41 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
    }
 
 /* Add the new conversion to the SlaMap. */
-   AddSlaCvt( this, cvttype, args, status );
+   AddSlaCvt( this, cvttype, narg, args, status );
 }
+
+static int SlaIsEmpty( AstSlaMap *this, int *status ){
+/*
+*+
+*  Name:
+*     astSlaIsEmpty
+
+*  Purpose:
+*     Indicates if a SlaMap is empty (i.e. has no conversions).
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "slamap.h"
+*     result = astSlaIsEmpty( AstSlaMap *this )
+
+*  Class Membership:
+*     SlaMap method.
+
+*  Description:
+*     This function returns a flag indicating if the SlaMap is empty
+*     (i.e. has not yet had any conversions added to it using astSlaAdd).
+
+*  Parameters:
+*     this
+*        The SlaMap.
+*-
+*/
+   if( !astOK ) return 1;
+   return ( this->ncvt == 0 );
+}
+
 
 static void SolarPole( double mjd, double pole[3], int *status ) {
 /*
@@ -3527,7 +3575,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int ct;                       /* Conversion type */
    int end;                      /* Termination index for conversion loop */
    int inc;                      /* Increment for conversion loop */
-   int ncoord_in;                /* Number of coordinates per input point */
    int npoint;                   /* Number of points */
    int point;                    /* Loop counter for points */
    int start;                    /* Starting index for conversion loop */
@@ -3554,7 +3601,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Determine the numbers of points and coordinates per point from the input
    PointSet and obtain pointers for accessing the input and output coordinate
    values. */
-   ncoord_in = astGetNcoord( in );
    npoint = astGetNpoint( in );
    ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
@@ -4969,12 +5015,13 @@ AstSlaMap *astLoadSlaMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-void astSlaAdd_( AstSlaMap *this, const char *cvt, const double args[], int *status ) {
+void astSlaAdd_( AstSlaMap *this, const char *cvt, int narg, const double args[], int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,SlaMap,SlaAdd))( this, cvt, args, status );
+   (**astMEMBER(this,SlaMap,SlaAdd))( this, cvt, narg, args, status );
 }
 
-
-
-
+int astSlaIsEmpty_( AstSlaMap *this, int *status ) {
+   if ( !astOK ) return 1;
+   return (**astMEMBER(this,SlaMap,SlaIsEmpty))( this, status );
+}
 

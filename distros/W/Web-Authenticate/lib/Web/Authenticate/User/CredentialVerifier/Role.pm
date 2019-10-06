@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::User::CredentialVerifier::Role;
-$Web::Authenticate::User::CredentialVerifier::Role::VERSION = '0.011';
+$Web::Authenticate::User::CredentialVerifier::Role::VERSION = '0.012';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::User::CredentialVerifier object should contain.
 
@@ -27,7 +27,7 @@ Web::Authenticate::User::CredentialVerifier::Role - A Mouse::Role that defines w
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

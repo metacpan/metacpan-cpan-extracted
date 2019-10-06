@@ -1,0 +1,13 @@
+Revision history for Mojolicious-Plugin-ModeHelpers
+
+0.04  2019-10-05 16:02:20 CDT
+        - Fix Test::POD requirement to Test::Pod.
+
+0.03  2019-10-05 15:34:43 CDT
+        - Require Test::POD for older failing perls.
+
+0.02  2019-10-05 15:31:10 CDT
+        - Fix indentation in documentation.
+
+0.01  2019-10-05 15:22:34 CDT
+        - Initial release

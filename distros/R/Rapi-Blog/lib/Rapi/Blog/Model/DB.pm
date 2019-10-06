@@ -482,6 +482,7 @@ __PACKAGE__->config(
     # The grid_class is used to automatically setup a module for each source in the
     # navtree with the grid_params for each source supplied as its options.
     grid_class  => 'Rapi::Blog::Module::GridBase',
+    menu_require_role => 'administrator',
     grid_params => {
       # The special '*defaults' key applies to all sources at once
       '*defaults' => {
@@ -507,7 +508,12 @@ __PACKAGE__->config(
       Hit => {
         updatable_colspec => undef,
         creatable_colspec => undef,
-      }
+        require_role => 'administrator'
+      },
+      PreauthAction      => { require_role => 'administrator' },
+      PreauthActionEvent => { require_role => 'administrator' },
+      PreauthActionType  => { require_role => 'administrator' },
+      PreauthEventType   => { require_role => 'administrator' },
     },
 
     # TableSpecs define extra RapidApp-specific metadata for each source
@@ -527,7 +533,7 @@ __PACKAGE__->config(
             #profiles => [],
           },
           post_tags => {
-            header => 'Tag/Post Links',
+            header => 'Posts with Tag',
             width  => 170,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
@@ -631,7 +637,7 @@ __PACKAGE__->config(
           },
           post_tags => {
             header       => 'Post/Tag Links',
-            width        => 170,
+            width        => 160,
             documentaton => join( '',
 'Multi-rel which links this post to 0 or more Tags. These links are automatically created ',
 'and destroyed according to #hashtag values found (or not found) in the body text on create/update.'
@@ -725,7 +731,7 @@ __PACKAGE__->config(
           },
           comments => {
             header        => 'Comments',
-            width         => 140,
+            width         => 135,
             documentation => 'Comments on this post, including comments on comments.',
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
@@ -806,7 +812,7 @@ __PACKAGE__->config(
           },
           section => {
             header => 'Section',
-            width  => 150,
+            width  => 140,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -841,14 +847,14 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           tag_name => {
-            header => 'Tag Name',
-            width  => 120,
+            header => 'Tag',
+            width  => 160,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           post => {
             header => 'Post',
-            width  => 200,
+            width  => 350,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -856,27 +862,27 @@ __PACKAGE__->config(
       },
       User => {
         display_column => 'username',
-        title          => 'Blog User',
-        title_multi    => 'Blog Users',
+        title          => 'User Account',
+        title_multi    => 'User Accounts',
         iconCls        => 'icon-user',
         multiIconCls   => 'icon-users',
         columns        => {
           id => {
             allow_add => 0,
             header    => 'Id',
-            width     => 65,
+            width     => 45,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           username => {
-            header => 'username',
+            header => 'Username',
             width  => 120,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           full_name => {
             header => 'Full Name',
-            width  => 160,
+            width  => 150,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -922,6 +928,7 @@ __PACKAGE__->config(
           set_pw => {
             header   => 'Set Password*',
             width    => 130,
+            hidden   => 1,
             editor   => { xtype => 'ra-change-password-field' },
             renderer => 'Ext.ux.RapidApp.renderSetPwValue'
           },
@@ -940,8 +947,8 @@ __PACKAGE__->config(
             #profiles => [],
           },
           email => {
-            header => 'email',
-            #width => 100,
+            header => 'E-Mail',
+            width => 180,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -952,7 +959,8 @@ __PACKAGE__->config(
             #profiles => [],
           },
           preauth_actions => {
-            header => 'preauth_actions',
+            header => 'Pre Authorizations',
+            hidden => 1
             #width => 100,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
@@ -970,7 +978,7 @@ __PACKAGE__->config(
           id => {
             allow_add => 0,
             header    => 'Id',
-            width     => 80,
+            width     => 65,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1138,19 +1146,19 @@ __PACKAGE__->config(
         multiIconCls   => 'icon-images',
         columns        => {
           name => {
-            header => 'name',
+            header => 'Name',
             width  => 140,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           description => {
-            header => 'description',
+            header => 'Description',
             width  => 280,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           post_categories => {
-            header => 'post_categories',
+            header => 'Posts in Category',
             width  => 190,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
@@ -1167,7 +1175,7 @@ __PACKAGE__->config(
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
+            header    => 'Id',
             width     => 45,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
@@ -1179,14 +1187,14 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           category_name => {
-            header => 'category_name',
-            #width => 100,
+            header => 'Category',
+            width => 180,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [ 'hidden' ],
           },
           post => {
-            header => 'post',
-            #width => 100,
+            header => 'Post',
+            width => 350,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1201,8 +1209,9 @@ __PACKAGE__->config(
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
-            #width => 100,
+            header    => 'Id',
+            width     => 45,
+            hidden    => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1213,54 +1222,54 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           name => {
-            header => 'name',
-            width  => 150,
+            header => 'Name',
+            width  => 180,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           description => {
-            header => 'description',
+            header => 'Description',
             width  => 280,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           parent => {
-            header => 'parent',
+            header => 'Parent Section',
             width  => 160,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           posts => {
-            header => 'posts',
-            width  => 140,
+            header => 'Posts',
+            width  => 120,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           sections => {
-            header => 'sections',
-            width  => 140,
+            header => 'Sub-sections (one-level)',
+            width  => 150,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           trk_section_posts => {
-            header => 'trk_section_posts',
-            #width => 100,
+            header => 'Posts in Section/Sub-sections',
+            width => 180,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           trk_section_sections_sections => {
-            header => 'trk_section_sections_sections',
-            #width => 100,
+            header => 'Sub-sections (deep)',
+            width => 200,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           trk_section_sections_subsections => {
-            header => 'trk_section_sections_subsections',
-            #width => 100,
+            header => 'All Parent Sections',
+            width => 200,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
@@ -1269,15 +1278,16 @@ __PACKAGE__->config(
       },
       TrkSectionPost => {
         display_column => 'id',
-        title          => 'Track Section-Post',
-        title_multi    => 'Track Section-Posts',
+        title          => 'Section-Post Link',
+        title_multi    => 'Section-Post Links',
         iconCls        => 'icon-table-relationship',
         multiIconCls   => 'icon-table-relationship',
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
-            #width => 100,
+            header    => 'Id',
+            width     => 45,
+            hidden    => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1294,20 +1304,20 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           depth => {
-            header => 'depth',
+            header => 'Depth',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           post => {
-            header => 'post',
-            #width => 100,
+            header => 'Post',
+            width => 300,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           section => {
-            header => 'section',
-            #width => 100,
+            header => 'Section',
+            width => 150,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1315,15 +1325,16 @@ __PACKAGE__->config(
       },
       TrkSectionSection => {
         display_column => 'id',
-        title          => 'Track Section-Section',
-        title_multi    => 'Track Section-Sections',
+        title          => 'Section-Subsection Link',
+        title_multi    => 'Section-Subsection Links',
         iconCls        => 'icon-table-relationship',
         multiIconCls   => 'icon-table-relationship',
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
-            #width => 100,
+            header    => 'Id',
+            width     => 45,
+            hidden    => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1340,20 +1351,20 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           depth => {
-            header => 'depth',
+            header => 'Depth',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           section => {
-            header => 'section',
-            #width => 100,
+            header => 'Section',
+            width => 180,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           subsection => {
-            header => 'subsection',
-            #width => 100,
+            header => 'Sub-section',
+            width => 180,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1368,37 +1379,37 @@ __PACKAGE__->config(
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
-            #width => 100,
+            header    => 'Id',
+            width     => 55,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           type => {
-            header => 'type',
+            header => 'Type',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           active => {
-            header => 'active',
+            header => 'Active?',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           sealed => {
-            header => 'sealed',
+            header => 'Sealed?',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           create_ts => {
-            header => 'create_ts',
+            header => 'Created',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           expire_ts => {
-            header => 'expire_ts',
+            header => 'Expires at',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
@@ -1410,25 +1421,27 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           auth_key => {
-            header => 'auth_key',
-            #width => 100,
+            header => 'Auth Key',
+            width => 250,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           json_data => {
-            header => 'json_data',
-            #width => 100,
+            header => 'JSON Data',
+            width => 300,
+            hidden => 1,
+            profiles => ['monotext'],
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           user => {
-            header => 'user',
+            header => 'User',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           preauth_action_events => {
-            header => 'Pre-Auth Events',
+            header => 'Events',
             #width => 100,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
@@ -1444,14 +1457,14 @@ __PACKAGE__->config(
         multiIconCls   => 'icon-preauth-action-types',
         columns        => {
           name => {
-            header => 'name',
-            #width => 100,
+            header => 'Name',
+            width => 150,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           description => {
-            header => 'description',
-            #width => 100,
+            header => 'Description',
+            width => 300,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1473,13 +1486,13 @@ __PACKAGE__->config(
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
-            #width => 100,
+            header    => 'Id',
+            width => 55,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           ts => {
-            header => 'ts',
+            header => 'Timestamp',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
@@ -1503,26 +1516,27 @@ __PACKAGE__->config(
             profiles => ['hidden'],
           },
           info => {
-            header => 'info',
-            #width => 100,
+            header => 'Info',
+            width => 380,
+            profiles => ['monotext']
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           action => {
-            header => 'action',
+            header => 'Action',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           hit => {
-            header => 'hit',
+            header => 'Hit',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           type => {
-            header => 'type',
-            #width => 100,
+            header => 'Event Type',
+            width => 120,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
@@ -1537,26 +1551,27 @@ __PACKAGE__->config(
         columns        => {
           id => {
             allow_add => 0,
-            header    => 'id',
-            #width => 100,
+            header    => 'Id',
+            width     => 40,
+            hidden => 1
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           name => {
-            header => 'name',
+            header => 'Name',
             #width => 100,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           description => {
-            header => 'description',
-            #width => 100,
+            header => 'Description',
+            width => 380,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],
           },
           preauth_action_events => {
-            header => 'Pre-Auth Events',
-            #width => 100,
+            header => 'Events',
+            width => 160,
             #sortable => 1,
             #renderer => 'RA.ux.App.someJsFunc',
             #profiles => [],

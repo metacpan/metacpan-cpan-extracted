@@ -50,6 +50,8 @@
 *           Convert a string to upper or lower case.
 *        astChrLen
 *           Returns length of a string without trailing white space, etc.
+*        astChrTrunc
+*           Terminate a string to exclude trailing spaces.
 *        astSscanf
 *           Like sscanf, but fixes certain platform-specific bugs in the
 *           native sscanf implementation.
@@ -66,12 +68,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -113,6 +115,8 @@
 *        Added astChrSub.
 *     19-MAY-2010 (DSB):
 *        Added astStringCase.
+*     26-MAR-2015 (DSB):
+*        Added astChrTrunc.
 
 *-
 */
@@ -200,6 +204,8 @@ void astInitMemoryGlobals_( AstMemoryGlobals * );
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
 int astMemCaching_( int, int * );
+void astChrClean_( char * );
+void astChrRemoveBlanks_( char * );
 void astChrCase_( const char *, char *, int, int, int * );
 char **astChrSplit_( const char *, int *, int * );
 char **astChrSplitRE_( const char *, const char *, int *, const char **, int * );
@@ -224,7 +230,11 @@ size_t astChrLen_( const char *, int * );
 double astChr2Double_( const char *, int * );
 void astRemoveLeadingBlanks_( char *, int * );
 char *astAppendString_( char *, int *, const char *, int * );
+char *astAppendStringf_( char *, int *, const char *, ... )__attribute__((format(printf,3,4)));
 char *astChrSub_( const char *, const char *, const char *[], int, int * );
+void astChrTrunc_( char *, int * );
+int astBrackets_( const char *, size_t, size_t, char, char, int, size_t *, size_t *, char **, char **, char **, int * );
+void astFandl_( const char *, size_t, size_t, size_t *, size_t *, int * );
 
 #ifdef MEM_PROFILE
 void astStartTimer_( const char *, int, const char *, int * );
@@ -268,15 +278,21 @@ void astEndPM_( int * );
 #define astIsDynamic(ptr) astERROR_INVOKE(astIsDynamic_(ptr,STATUS_PTR))
 #define astTSizeOf(ptr) astERROR_INVOKE(astTSizeOf_(ptr,STATUS_PTR))
 #define astStore(ptr,data,size) astERROR_INVOKE(astStore_(ptr,data,size,STATUS_PTR))
-#define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text,STATUS_PTR))
+#define astAppendString(str1,nc,str2) astERROR_INVOKE(astAppendString_(str1,nc,str2,STATUS_PTR))
+#define astAppendStringf astAppendStringf_
 #define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars,STATUS_PTR))
 #define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len,STATUS_PTR))
 #define astStringCase(string,toupper) astERROR_INVOKE(astStringCase_(string,toupper,STATUS_PTR))
+#define astChrClean(string) astERROR_INVOKE(astChrClean_(string))
+#define astChrRemoveBlanks(string) astERROR_INVOKE(astChrRemoveBlanks_(string))
 #define astChrLen(string) astERROR_INVOKE(astChrLen_(string,STATUS_PTR))
+#define astChrTrunc(string) astERROR_INVOKE(astChrTrunc_(string,STATUS_PTR))
 #define astChr2Double(string) astERROR_INVOKE(astChr2Double_(string,STATUS_PTR))
 #define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string,STATUS_PTR))
 #define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub,STATUS_PTR))
 #define astChrCase(in,out,upper,blen) astERROR_INVOKE(astChrCase_(in,out,upper,blen,STATUS_PTR))
+#define astBrackets(text,start,end,opchar,clchar,strip,openat,closeat,before,in,after) astERROR_INVOKE(astBrackets_(text,start,end,opchar,clchar,strip,openat,closeat,before,in,after,STATUS_PTR))
+#define astFandl(text,start,end,f,l) astERROR_INVOKE(astFandl_(text,start,end,f,l,STATUS_PTR))
 
 #if defined(astCLASS) /* Protected */
 #define astMallocInit(size) astMalloc_(size,1,STATUS_PTR)

@@ -8,7 +8,7 @@
 
 package Mail::Box::Locker::FcntlLock;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base 'Mail::Box::Locker';
 

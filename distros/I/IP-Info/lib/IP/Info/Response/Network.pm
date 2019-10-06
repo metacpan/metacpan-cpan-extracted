@@ -1,6 +1,6 @@
 package IP::Info::Response::Network;
 
-$IP::Info::Response::Network::VERSION   = '0.17';
+$IP::Info::Response::Network::VERSION   = '0.18';
 $IP::Info::Response::Network::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ IP::Info::Response::Network - Placeholder for Network for the module L<IP::Info:
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

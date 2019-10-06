@@ -180,7 +180,7 @@ METHODS
 
  croak_on_error
 
-    This method sets whether you want Short::URL to Carp on an error.
+    This method sets whether you want Short::URL to "croak" on an error.
 
         #enable
         $su->croak_on_error(1);

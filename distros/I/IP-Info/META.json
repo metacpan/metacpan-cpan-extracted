@@ -4,13 +4,13 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IP-Info",
    "no_index" : {
@@ -46,27 +46,27 @@
    "provides" : {
       "IP::Info" : {
          "file" : "lib/IP/Info.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "IP::Info::Response" : {
          "file" : "lib/IP/Info/Response.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "IP::Info::Response::Location" : {
          "file" : "lib/IP/Info/Response/Location.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "IP::Info::Response::Network" : {
          "file" : "lib/IP/Info/Response/Network.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "IP::Info::UserAgent" : {
          "file" : "lib/IP/Info/UserAgent.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "IP::Info::UserAgent::Exception" : {
          "file" : "lib/IP/Info/UserAgent/Exception.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "web" : "https://github.com/manwar/IP-Info"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

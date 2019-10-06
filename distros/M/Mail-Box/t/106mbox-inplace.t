@@ -25,7 +25,7 @@ copy $src, $cpy
 
 my $folder = Mail::Box::Mbox->new
   ( folder       => "=$cpyfn"
-  , folderdir    => $folderdir
+  , folderdir    => $workdir
   , lock_type    => 'NONE'
   , extract      => 'LAZY'
   , access       => 'rw'
@@ -98,7 +98,7 @@ $folder->close;
 
 my $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   );
@@ -123,7 +123,7 @@ ok(!@folder_subjects);
 
 $copy = new Mail::Box::Mbox
   ( folder       => "=$cpyfn"
-  , folderdir    => $folderdir
+  , folderdir    => $workdir
   , lock_type    => 'NONE'
   , extract      => 'LAZY'
   , access       => 'rw'
@@ -141,7 +141,7 @@ ok($copy->write(policy => 'INPLACE'), "write folder with fewer messsages");
 
 $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   );
@@ -158,7 +158,7 @@ ok(! defined $copy,                             "Folder is really closed");
 
 $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   , access    => 'rw'
@@ -173,7 +173,7 @@ ok($copy->write(policy => 'INPLACE'), "write folder with fewer messsages");
 
 $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   );
@@ -190,7 +190,7 @@ ok(! defined $copy,                             "Folder is really closed");
 
 $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   , access    => 'rw'
@@ -205,7 +205,7 @@ ok($copy->write(policy => 'INPLACE'), "write folder with fewer messsages");
 
 $copy = new Mail::Box::Mbox
   ( folder    => "=$cpyfn"
-  , folderdir => $folderdir
+  , folderdir => $workdir
   , lock_type => 'NONE'
   , extract   => 'ALWAYS'
   );

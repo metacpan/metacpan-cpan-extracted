@@ -1,0 +1,44 @@
+---
+abstract: 'Generate "base-N odometer" permutations'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  List::Util: '0'
+  Test::More: '1.302096'
+  constant: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Odometer-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+  file: []
+provides:
+  Algorithm::Odometer::Gray:
+    file: lib/Algorithm/Odometer/Gray.pm
+    version: '0.02'
+  Algorithm::Odometer::Tiny:
+    file: lib/Algorithm/Odometer/Tiny.pm
+    version: '0.02'
+recommends: {}
+requires:
+  Carp: '0'
+  perl: '5.006000'
+resources:
+  bugtracker: https://github.com/haukex/Algorithm-Odometer-Tiny/issues
+  homepage: https://github.com/haukex/Algorithm-Odometer-Tiny
+  repository: https://github.com/haukex/Algorithm-Odometer-Tiny.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

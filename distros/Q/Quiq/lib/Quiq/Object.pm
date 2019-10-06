@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.158';
+our $VERSION = '1.159';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -170,7 +170,7 @@ wenn der Methodenaufruf ohne Optionen erfolgt, kehrt parameters(),
 wie bereits gesagt, sofort zurück. Beispiel:
 
   sub myMethod {
-      my ($this,$arg1,$arg2,$arg3) = splice @_,0,3;
+      my ($this,$arg1,$arg2,$arg3) = splice @_,0,4;
   
       # Optionen
   
@@ -587,7 +587,7 @@ sub this {
 
 =head1 VERSION
 
-1.158
+1.159
 
 =head1 AUTHOR
 

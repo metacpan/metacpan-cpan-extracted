@@ -217,6 +217,10 @@ f     The WcsMap class does not define any new routines beyond those
 *        no less useful (and no more useful) than a fixed value of zero.
 *     12-JUN-2014 (DSB):
 *        Added XPH projection.
+*     30-DEC-2017 (DSB):
+*        Improve merging of WcsMaps and PermMaps.
+*     9-NOV=2018 (DSB):
+*        Add protected LonCheck attribute.
 *class--
 */
 
@@ -663,7 +667,7 @@ typedef struct PrjData {
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
@@ -749,7 +753,7 @@ AstWcsMap *astWcsMapId_( int, int, int, int, const char *options, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static double GetPV( AstWcsMap *, int, int, int * );
 static int TestPV( AstWcsMap *, int, int, int * );
 static void ClearPV( AstWcsMap *, int, int, int * );
@@ -771,11 +775,16 @@ static int TestTPNTan( AstWcsMap *, int * );
 static void ClearTPNTan( AstWcsMap *, int * );
 static void SetTPNTan( AstWcsMap *, int, int * );
 
+static int GetLonCheck( AstWcsMap *, int * );
+static int TestLonCheck( AstWcsMap *, int * );
+static void ClearLonCheck( AstWcsMap *, int * );
+static void SetLonCheck( AstWcsMap *, int, int * );
+
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const PrjData *FindPrjData( int, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
 static int CanMerge( AstMapping *, int, AstMapping *, int, int * );
-static int CanSwap( AstMapping *, AstMapping *, int, int, int *, int * );
+static int CanSwap( AstMapping *, AstMapping *, int, int, int *, AstWcsMap **, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetNP( AstWcsMap *, int, int * );
 static int IsZenithal( AstWcsMap *, int * );
@@ -908,7 +917,7 @@ static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2, int
 }
 
 static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
-                    int *simpler, int *status ){
+                    int *simpler, AstWcsMap **newwcsmap, int *status ){
 /*
 *  Name:
 
@@ -923,7 +932,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 *  Synopsis:
 *     #include "wcsmap.h"
 *     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
-*                  int *simpler )
+*                  int *simpler, AstWcsMap **newwcssmap )
 
 *  Class Membership:
 *     WcsMap member function
@@ -950,6 +959,10 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 *        Addresss of a location at which to return a flag indicating if
 *        the swapped Mappings would be intrinsically simpler than the
 *        original Mappings.
+*     newwcsmap
+*        Addresss of a location at which to return a pointer to the
+*        WcsMap that would be produced if the two Mappings were swapped.
+*        Returned holding NULL if the supplied Mappings cannot be swapped.
 
 *  Returned Value:
 *     1 if the Mappings could be swapped, 0 otherwise.
@@ -963,6 +976,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 */
 
 /* Local Variables: */
+   AstMapping *maps[2];      /* Pointer to Mappign list */
    AstMapping *nowcs;        /* Pointer to non-WcsMap Mapping */
    AstWcsMap  *wcs;          /* Pointer to WcsMap Mapping */
    const char *class1;       /* Pointer to map1 class string */
@@ -973,18 +987,20 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    int *outperm;             /* Pointer to output axis permutation array */
    int i;                    /* Loop count */
    int invert[ 2 ];          /* Original invert flags */
+   int iwm;                  /* Index of WcsMap within "maps" */
    int latax;                /* Index of latitude axis in WcsMap */
    int lonax;                /* Index of longitude axis in WcsMap */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */
    int ret;                  /* Returned flag */
 
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
 /* Initialise */
    ret = 0;
    *simpler = 0;
+   *newwcsmap = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return ret;
 
 /* Temporarily set the Invert attributes of both Mappings to the supplied
    values. */
@@ -1001,10 +1017,12 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 
 /* Get a pointer to the non-WcsMap Mapping. */
       if( !strcmp( class1, "WcsMap" ) ){
+         iwm = 0;
          wcs = (AstWcsMap *) map1;
          nowcs = map2;
          nowcs_class = class2;
       } else {
+         iwm = 1;
          nowcs = map1;
          wcs = (AstWcsMap *) map2;
          nowcs_class = class1;
@@ -1102,6 +1120,22 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    supplied MatrixMaps. */
    astSetInvert( map1, invert[ 0 ] );
    astSetInvert( map2, invert[ 1 ] );
+
+/* If the Mappings can swap, get the equivalent swapped mappings. */
+   if( ret ) {
+      maps[ 0 ] = astClone( map1 );
+      maps[ 1 ] = astClone( map2 );
+      invert[ 0 ] = inv1;
+      invert[ 1 ] = inv2;
+      WcsPerm( maps, invert, iwm, status );
+
+/* Return a pointer to the swapped WcsMap. */
+      *newwcsmap = astClone( maps[ 1 - iwm ] );
+
+/* Free resources */
+      maps[ 0 ] = astAnnul( maps[ 0 ] );
+      maps[ 1 ] = astAnnul( maps[ 1 ] );
+   }
 
 /* Return the answer. */
    return astOK ? ret : 0;
@@ -1230,8 +1264,16 @@ static void ClearPV( AstWcsMap *this, int i, int m, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Report an error if the object has been cloned (i.e. has a reference
+   count that is greater than one). */
+   if( astGetRefCount( this ) > 1 ) {
+      astError( AST__IMMUT, "astClear(%s): Projection parameter values "
+                "within the supplied %s cannot be cleared because the %s has "
+                "been cloned (programming error).", status,
+                astGetClass(this), astGetClass(this), astGetClass(this) );
+
 /* Validate the axis index. */
-   if( i < 0 || i >= astGetNin( this ) ){
+   } else if( i < 0 || i >= astGetNin( this ) ){
       astError( AST__AXIIN, "astClearPV(%s): Axis index (%d) is invalid in "
                 "attribute PV%d_%d  - it should be in the range 1 to %d.",
                 status, astGetClass( this ), i + 1, i + 1, m,
@@ -1619,7 +1661,7 @@ static void FreePV( AstWcsMap *this, int *status ) {
 
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1632,7 +1674,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     WcsMap member function (over-rides the astGetObjSize protected
@@ -1658,7 +1700,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstWcsMap *this;         /* Pointer to WcsMap structure */
-   int result;              /* Result value to return */
+   size_t result;           /* Result value to return */
    int i;                   /* Axis index */
 
 /* Initialise. */
@@ -1779,7 +1821,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
                   && ( nc >= len ) ) {
       dval = astGetPV( this, astGetWcsAxis( this, 1 ), m );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -1789,7 +1831,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
                   && ( nc >= len ) ) {
       dval = astGetPV( this, i - 1, m );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -1817,7 +1859,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "natlat" ) ) {
       dval = astGetNatLat( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -1826,7 +1868,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "natlon" ) ) {
       dval = astGetNatLon( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -2412,6 +2454,11 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name, int *status ) {
    vtab->GetTPNTan = GetTPNTan;
    vtab->SetTPNTan = SetTPNTan;
 
+   vtab->ClearLonCheck = ClearLonCheck;
+   vtab->TestLonCheck = TestLonCheck;
+   vtab->GetLonCheck = GetLonCheck;
+   vtab->SetLonCheck = SetLonCheck;
+
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
@@ -2707,6 +2754,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    double x;                     /* X Cartesian coordinate in degrees */
    double y;                     /* Y Cartesian coordinate in degrees */
    int cyclic;                   /* Is sky->xy transformation cyclic? */
+   int docheck;                  /* Set out-of-bounds longitude values bad? */
    int i;                        /* Loop count */
    int plen;                     /* Length of proj par array */
    int point;                    /* Loop counter for points */
@@ -2740,8 +2788,11 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
       if( ( params->p)[ i ] == AST__BAD ) return 400+i;
    }
 
-/* If we are doing a reverse mapping, get the acceptable range of longitude
-   values. */
+/* See if longitude range checking is required. */
+   docheck = astGetLonCheck( this );
+
+/* If we are doing a reverse mapping, get the acceptable range of
+   longitude values and see if the projection is cyclic. */
    cyclic = forward ? 0 : LongRange( prjdata, params, &longhi, &longlo,
                                      status );
 
@@ -2820,8 +2871,8 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    latitude ranges. This avoids (x,y) points outside the physical domain
    of the mapping being assigned valid (long,lat) values. */
             if( wcs_status == 0 ){
-               if( ( cyclic || ( longitude < longhi &&
-                                 longitude >= longlo ) ) &&
+               if( ( !docheck || cyclic || ( longitude < longhi &&
+                                             longitude >= longlo ) ) &&
                    fabs( latitude ) <= 90.0 ){
 
                   out0[ point ] = (AST__DD2R/factor)*longitude;
@@ -2992,6 +3043,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstMapping *smc0;     /* Simplied Mapping */
    AstMapping *smc1;     /* Simplied Mapping */
+   AstWcsMap *newwcsmap; /* The WcsMap after swapping */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
@@ -3120,10 +3172,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             swaphi = CanSwap(  ( *map_list )[ where ],
                                ( *map_list )[ where + 1 ],
                                ( *invert_list )[ where ],
-                               ( *invert_list )[ where + 1 ], &do2, status );
+                               ( *invert_list )[ where + 1 ], &do2,
+                               &newwcsmap, status );
          } else {
             do2 = 0;
             swaphi = 0;
+            newwcsmap = NULL;
          }
 
 /* If so, step through each of the Mappings which follow the WcsMap,
@@ -3139,7 +3193,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* See if we can merge with this Mapping. If so, note the number of steps
    between the two Mappings and leave the loop. */
                if( CanMerge( ( *map_list )[ i2 ], ( *invert_list )[ i2 ],
-                             ( *map_list )[ where ], ( *invert_list )[ where ], status ) ) {
+                             (AstMapping *) newwcsmap, astGetInvert(newwcsmap), status ) ) {
                   nstep2 = i2 - where - 1;
                   break;
                }
@@ -3151,10 +3205,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                if( strcmp( nclass, "PermMap" ) ) {
                   break;
                }
-
             }
-
          }
+
+         if( newwcsmap ) newwcsmap = astAnnul( newwcsmap );
 
 /* Do the same working forward from the WcsMap towards the start of the map
    list. */
@@ -3162,10 +3216,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             swaplo = CanSwap(  ( *map_list )[ where - 1 ],
                                ( *map_list )[ where ],
                                ( *invert_list )[ where - 1 ],
-                               ( *invert_list )[ where ], &do1, status );
+                               ( *invert_list )[ where ], &do1,
+                               &newwcsmap, status );
          } else {
             do1 = 0;
             swaplo = 0;
+            newwcsmap = NULL;
          }
 
          nstep1 = -1;
@@ -3173,7 +3229,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             for( i1 = where - 1; i1 >= 0; i1-- ){
 
                if( CanMerge( ( *map_list )[ i1 ], ( *invert_list )[ i1 ],
-                             ( *map_list )[ where ], ( *invert_list )[ where ], status ) ) {
+                               (AstMapping *) newwcsmap, astGetInvert(newwcsmap), status ) ) {
                   nstep1 = where - 1 - i1;
                   break;
                }
@@ -3182,10 +3238,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                if( strcmp( nclass, "PermMap" ) ) {
                   break;
                }
-
             }
-
          }
+
+         if( newwcsmap ) newwcsmap = astAnnul( newwcsmap );
 
 /* Choose which neighbour to swap with so that the WcsMap moves towards the
    nearest Mapping with which it can merge. */
@@ -3206,7 +3262,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    merge, replace the supplied Mappings with swapped Mappings to bring a
    WcsMap closer to the target Mapping. */
          if( nclass ){
-
             WcsPerm( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
 
 /* Store the index of the first modified Mapping. */
@@ -3805,8 +3860,16 @@ static void SetPV( AstWcsMap *this, int i, int m, double val, int *status ) {
 /* Find the number of axes in the WcsMap. */
    naxis = astGetNin( this );
 
+/* Report an error if the object has been cloned (i.e. has a reference
+   count that is greater than one). */
+   if( astGetRefCount( this ) > 1 ) {
+      astError( AST__IMMUT, "astSet(%s): Projection parameter values "
+                "within the supplied %s cannot be changed because the %s has "
+                "been cloned (programming error).", status,
+                astGetClass(this), astGetClass(this), astGetClass(this) );
+
 /* Validate the axis index. */
-   if( i < 0 || i >= naxis ){
+   } else if( i < 0 || i >= naxis ){
       astError( AST__AXIIN, "astSetPV(%s): Axis index (%d) is invalid in "
                 "attribute PV%d_%d  - it should be in the range 1 to %d.",
                 status, astGetClass( this ), i + 1, i + 1, m, naxis );
@@ -4657,10 +4720,10 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm, int *status ){
 *     that is to be  converted into a set of FITS headers using the
 c     astWrite funtion,
 f     AST_WRITE routine,
-*     the WcsMap will be used to define the projection code appeneded to
+*     the WcsMap will be used to define the projection code appended to
 *     the FITS "CTYPEi" keywords if, and only if, the FITSProj attribute
 *     is set non-zero in the WcsMap. In order for the conversion to be
-*     successful, the compoound Mapping connecting the base and current
+*     successful, the compound Mapping connecting the base and current
 *     Frames in the FrameSet must contained one (and only one) WcsMap
 *     that has a non-zero value for its FITSProj attribute.
 *
@@ -4713,6 +4776,45 @@ astMAKE_GET(WcsMap,TPNTan,int,1,( ( this->tpn_tan != -INT_MAX ) ?
                                        this->tpn_tan : 1 ))
 astMAKE_TEST(WcsMap,TPNTan,( this->tpn_tan != -INT_MAX ))
 
+/*
+*att+
+*  Name:
+*     LonCheck
+
+*  Purpose:
+*     Should returned out-of-bounds longitude values be set bad?
+
+*  Type:
+*     Protected attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls how the inverse transformation of a
+*     WcsMap handles returned longitude values that are outside the
+*     primary longitude range for the projection. If the LonCheck values
+*     is non-zero (the default), such longitude values are set bad
+*     before being returned. Otherwise, they are returned unchanged.
+*
+*     This attribute has no effect if the projection is cyclic (i.e.
+*     [long,lat]=[0,0] gets mapped to the same place as [long,lat]=[360,0]).
+*     The longitude values returned by such projections are always
+*     returned unchanged. However, for non-cyclic projections (ARC, AIT,
+*     ZPN, HPX, etc), it will be used to determine how to handle returned
+*     positions outside the projection's primary longitude range.
+
+*  Applicability:
+*     WcsMap
+*        All Frames have this attribute.
+*att-
+*/
+astMAKE_CLEAR(WcsMap,LonCheck,loncheck,-INT_MAX)
+astMAKE_GET(WcsMap,LonCheck,int,1,( ( this->loncheck != -INT_MAX ) ?
+                                       this->loncheck : 1 ))
+astMAKE_SET(WcsMap,LonCheck,int,loncheck,( value != 0 ))
+astMAKE_TEST(WcsMap,LonCheck,( this->loncheck != -INT_MAX ))
+
 /* ProjP. */
 /* ------ */
 /*
@@ -4740,6 +4842,14 @@ astMAKE_TEST(WcsMap,TPNTan,( this->tpn_tan != -INT_MAX ))
 *     to PV<axlat>_9, where <axlat> is replaced by the index of the
 *     latitude axis (given by attribute WcsAxis(2)). See PV for further
 *     details.
+*
+*     Note, the value of this attribute may changed only if the WcsMap
+*     has no more than one reference. That is, an error is reported if the
+*     WcsMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 
 *  Applicability:
 *     WcsMap
@@ -4819,6 +4929,13 @@ f     done using the OPTIONS argument of AST_WCSMAP (q.v.) when a WcsMap
 *        All WcsMaps have this attribute.
 
 *  Notes:
+*     - The value of this attribute may changed only if the WcsMap
+*     has no more than one reference. That is, an error is reported if the
+*     WcsMap has been cloned, either by including it within another object
+*     such as a CmpMap or FrameSet or by calling the
+c     astClone
+f     AST_CLONE
+*     function.
 *     - If the projection parameter values given for a WcsMap do not
 *     satisfy all the required constraints (as defined in the FITS-WCS
 *     paper), then an error will result when the WcsMap is used to
@@ -5211,6 +5328,14 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    astWriteInt( channel, "FitsPrj", set, 0, ival,
                 ival ? "Defines the FITS-WCS projection" :
                        "Does not define the FITS-WCS projection" );
+
+/* LonCheck */
+/* -------- */
+   set = TestLonCheck( this, status );
+   ival = set ? GetLonCheck( this, status ) : astGetLonCheck( this );
+   astWriteInt( channel, "LonChk", set, 0, ival,
+                ival ? "Check returned lon values" :
+                       "Do not check returned lon values" );
 
 /* TPNTan */
 /* ------ */
@@ -5713,6 +5838,9 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
 /* Store the "use as FITS-WCS projection" flag. */
          new->fits_proj = -INT_MAX;
 
+/* Store the "check returned longitude values" flag. */
+         new->loncheck = -INT_MAX;
+
 /* Store the "include TAN component in TPN Mapping" flag. */
          new->tpn_tan = -INT_MAX;
 
@@ -5884,6 +6012,13 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
       new->fits_proj = astReadInt( channel, "fitsprj", -INT_MAX );
       if ( TestFITSProj( new, status ) ) {
          SetFITSProj( new, new->fits_proj, status );
+      }
+
+/* LonCheck */
+/* -------- */
+      new->loncheck = astReadInt( channel, "lonchk", -INT_MAX );
+      if ( TestLonCheck( new, status ) ) {
+         SetLonCheck( new, new->loncheck, status );
       }
 
 /* TPNTan */

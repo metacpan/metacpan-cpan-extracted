@@ -1,3 +1,10 @@
+0.035   2019-08-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add more documentation to reverse_rules().
+
+
 0.034   2019-08-23  Released-By: PERLANCAR; Urgency: medium
 
 	[ENHANCEMENTS]

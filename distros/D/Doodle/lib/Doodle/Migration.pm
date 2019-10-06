@@ -8,7 +8,7 @@ use Carp;
 use Data::Object::Space;
 use Doodle;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # METHODS
 

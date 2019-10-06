@@ -4,10 +4,11 @@ use 5.014;
 
 use Data::Object 'Class', 'Doodle::Library';
 
-use Carp;
 use Doodle::Statement;
 
-our $VERSION = '0.06'; # VERSION
+use Scalar::Util ();
+
+our $VERSION = '0.07'; # VERSION
 
 has name => (
   is => 'ro',
@@ -24,7 +25,7 @@ method wrap(Str $arg) {
 method exception(Str $msg) {
   my $engine = ucfirst $self->name;
 
-  confess sprintf "[%s] %s", $engine, ucfirst $msg;
+  raise sprintf "[%s] %s", $engine, ucfirst $msg;
 }
 
 method execute(Command $cmd) {
@@ -247,6 +248,7 @@ method render_column(Column $col) {
   my @renders = (
     'render_type',
     'render_nullable',
+    'render_default',
     'render_increments',
     'render_primary'
   );
@@ -262,6 +264,43 @@ method render_constraint(Relation $rel) {
   my $fcolumn = $self->wrap($rel->foreign_column);
 
   return "foreign key ($column) references $ftable ($fcolumn)";
+}
+
+method render_default(Column $col) {
+  # render column default value
+
+  my $data = $col->data;
+
+  return () if !exists $data->{default};
+
+  my $default = $data->{default};
+
+  my $type = $default->[0];
+  my $value = $default->[1];
+
+  if ($type eq 'function') {
+    $value = uc $value;
+    return "default $value";
+  }
+
+  if ($type eq 'string') {
+    return "default '$value'";
+  }
+
+  if ($type eq 'integer') {
+    return "default $value";
+  }
+
+  if ($type eq 'deduce') {
+    if (Scalar::Util::looks_like_number($value)) {
+      return "default $value";
+    }
+    else {
+      return "default '$value'";
+    }
+  }
+
+  return ();
 }
 
 method render_nullable(Column $col) {

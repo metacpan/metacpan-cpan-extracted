@@ -24,7 +24,7 @@ Data::Transmute::Rules::Example - Example rules module
 
 =head1 VERSION
 
-This document describes version 0.034 of Data::Transmute::Rules::Example (from Perl distribution Data-Transmute), released on 2019-08-23.
+This document describes version 0.035 of Data::Transmute::Rules::Example (from Perl distribution Data-Transmute), released on 2019-08-23.
 
 =head1 HOMEPAGE
 

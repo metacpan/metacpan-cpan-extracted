@@ -32,7 +32,7 @@ ok !!$t->tx->res->headers->every_header('Vary'),             'vary header is not
 $t->get_ok('/goodbye.txt' => {'Accept-Encoding' => 'br, gzip', 'If-None-Match' => $goodbye_etag_br})
     ->status_is(304)->content_type_is('text/plain;charset=UTF-8')
     ->header_is('Content-Encoding' => 'br')->header_is(ETag => $goodbye_etag_br)
-    ->header_is('Last-Modified' => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
+    ->header_is('Last-Modified'    => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
     ->content_is('');
 
 # using gzip etag returns 304
@@ -40,7 +40,7 @@ $t->get_ok(
     '/goodbye.txt' => {'Accept-Encoding' => 'br, gzip', 'If-None-Match' => $goodbye_etag_gzip})
     ->status_is(304)->content_type_is('text/plain;charset=UTF-8')
     ->header_is('Content-Encoding' => 'gzip')->header_is(ETag => $goodbye_etag_gzip)
-    ->header_is('Last-Modified' => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
+    ->header_is('Last-Modified'    => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
     ->content_is('');
 
 # larger_compressed.txt returns 304 for compressed assets that are larger
@@ -51,15 +51,15 @@ $t->get_ok('/larger_compressed.txt' =>
         {'Accept-Encoding' => 'br, gzip', 'If-None-Match' => $larger_compressed_etag_br})
     ->status_is(304)->content_type_is('text/plain;charset=UTF-8')
     ->header_is('Content-Encoding' => 'br')->header_is(ETag => $larger_compressed_etag_br)
-    ->header_is('Last-Modified' => $larger_compressed_last_modified)
-    ->header_is(Vary            => 'Accept-Encoding')->content_is('');
+    ->header_is('Last-Modified'    => $larger_compressed_last_modified)
+    ->header_is(Vary               => 'Accept-Encoding')->content_is('');
 
 $t->get_ok('/larger_compressed.txt' =>
         {'Accept-Encoding' => 'br, gzip', 'If-None-Match' => $larger_compressed_etag_gzip})
     ->status_is(304)->content_type_is('text/plain;charset=UTF-8')
     ->header_is('Content-Encoding' => 'gzip')->header_is(ETag => $larger_compressed_etag_gzip)
-    ->header_is('Last-Modified' => $larger_compressed_last_modified)
-    ->header_is(Vary            => 'Accept-Encoding')->content_is('');
+    ->header_is('Last-Modified'    => $larger_compressed_last_modified)
+    ->header_is(Vary               => 'Accept-Encoding')->content_is('');
 
 # test invalid compression type falls back to br
 warning_like {
@@ -206,7 +206,7 @@ $t->get_ok(
     }
 )->status_is(304)->content_type_is('text/plain;charset=UTF-8')
     ->header_is('Content-Encoding' => 'br')->header_is(ETag => $goodbye_etag_br)
-    ->header_is('Last-Modified' => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
+    ->header_is('Last-Modified'    => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
     ->content_is('');
 
 # using gzip etag returns 304
@@ -217,7 +217,7 @@ $t->get_ok(
     }
 )->status_is(304)->content_type_is('text/plain;charset=UTF-8')
     ->header_is('Content-Encoding' => 'gzip')->header_is(ETag => $goodbye_etag_gzip)
-    ->header_is('Last-Modified' => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
+    ->header_is('Last-Modified'    => $goodbye_last_modified)->header_is(Vary => 'Accept-Encoding')
     ->content_is('');
 
 # test that non-existent encodings and non-existent files fall back to legitemate compressed file
@@ -233,7 +233,7 @@ warnings_like {
         }
     )->status_is(304)->content_type_is('text/plain;charset=UTF-8')
         ->header_is('Content-Encoding' => 'br')->header_is(ETag => $hola_etag_br)
-        ->header_is('Last-Modified' => $hola_last_modified)->header_is(Vary => 'Accept-Encoding')
+        ->header_is('Last-Modified'    => $hola_last_modified)->header_is(Vary => 'Accept-Encoding')
         ->content_is('');
 }
 [   qr/Found expected compression encoding of 'deflate' in If-None-Match '$hola_etag_deflate' for asset '.*?hola.txt', but encoding does not exist\./,
@@ -259,7 +259,7 @@ warnings_like {
         }
     )->status_is(304)->content_type_is('text/plain;charset=UTF-8')
         ->header_is('Content-Encoding' => 'br')->header_is(ETag => $hola_etag_br)
-        ->header_is('Last-Modified' => $hola_last_modified)->header_is(Vary => 'Accept-Encoding')
+        ->header_is('Last-Modified'    => $hola_last_modified)->header_is(Vary => 'Accept-Encoding')
         ->content_is('');
 }
 [   qr/Found expected compression encoding of 'deflate' in If-None-Match '$hola_etag_deflate' for asset '.*?hola.txt', but encoding does not exist\./,

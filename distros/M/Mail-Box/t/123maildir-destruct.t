@@ -23,7 +23,7 @@ BEGIN {
    plan tests => 9;
 }
 
-my $mdsrc = File::Spec->catfile($folderdir, 'maildir.src');
+my $mdsrc = File::Spec->catfile($workdir, 'maildir.src');
 
 unpack_mbox2maildir($src, $mdsrc);
 

@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'api.ispapi.net' => 80 );
 
-use version 0.9917; our $VERSION = version->declare('v2.2.4');
+use version 0.9917; our $VERSION = version->declare('v2.2.5');
 
 # T1-4: test import modules
 use_ok('Config');
@@ -107,30 +107,30 @@ is( %{$d}, 0, 'SocketConfig: Check initial POST data' );
 # - T17 ~> constructor test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new(q{});
 is( $tpl->getCode(),        $TMP_ERR_423,         'ResponseTemplate: Check response code of template `empty` #1' );
-is( $tpl->getDescription(), 'Empty API response', 'ResponseTemplate: Check response description of template `empty` #1' );
+is( $tpl->getDescription(), 'Empty API response. Probably unreachable API end point', 'ResponseTemplate: Check response description of template `empty` #1' );
 
 # - T19 ~> getHash method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 $h   = $tpl->getHash();
 is( $h->{CODE},        $TMP_ERR_423,         'ResponseTemplate: Check response code of template `empty` #2' );
-is( $h->{DESCRIPTION}, 'Empty API response', 'ResponseTemplate: Check response description of template `empty` #2' );
+is( $h->{DESCRIPTION}, 'Empty API response. Probably unreachable API end point', 'ResponseTemplate: Check response description of template `empty` #2' );
 
 # - T21 ~> getQueuetime method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->getQueuetime(), 0, 'ResponseTemplate: Check response queuetime of template `empty`' );
-$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response\r\nqueuetime=0\r\nEOF\r\n");
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point\r\nqueuetime=0\r\nEOF\r\n");
 is( $tpl->getQueuetime(), 0, 'ResponseTemplate: Check response queuetime' );
 
 # - T23 ~> getRuntime method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->getRuntime(), 0, 'ResponseTemplate: Check response runtime of template `empty`' );
-$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response\r\nruntime=0.12\r\nEOF\r\n");
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point\r\nruntime=0.12\r\nEOF\r\n");
 is( $tpl->getRuntime(), $RES_RUNTIME, 'ResponseTemplate: Check response runtime' );
 
 # ~> isPending method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->isPending(), 0, 'ResponseTemplate: Check response pending value of template `empty`' );
-$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response\r\npending=1\r\nEOF\r\n");
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response. Probably unreachable API end point\r\npending=1\r\nEOF\r\n");
 is( $tpl->isPending(), 1, 'ResponseTemplate: Check response pending value' );
 
 # ---- Module "ResponseTemplateManager" ---- #

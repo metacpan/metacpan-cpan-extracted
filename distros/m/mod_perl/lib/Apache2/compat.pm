@@ -62,7 +62,9 @@ use mod_perl2 ();
 use Symbol ();
 use File::Spec ();
 
-use APR::Const -compile => qw(FINFO_NORM);
+use APR::Const -compile => qw(FINFO_NORM FINFO_PROT);
+
+use constant WIN32 => ($^O eq "MSWin32");
 
 BEGIN {
     $INC{'Apache.pm'} = __FILE__;
@@ -92,7 +94,11 @@ my %overridable_mp2_api = (
         if (defined $newfile) {
             $old_filename = $r->$orig_sub($newfile);
             die "'$newfile' doesn't exist" unless -e $newfile;
-            $r->finfo(APR::Finfo::stat($newfile, APR::Const::FINFO_NORM, $r->pool));
+            my $wanted = APR::Const::FINFO_NORM;
+            if (WIN32) {
+                $wanted &= ~APR::Const::FINFO_PROT;
+            }
+            $r->finfo(APR::Finfo::stat($newfile, $wanted, $r->pool));
         }
         else {
             $old_filename = $r->$orig_sub();
@@ -252,6 +258,9 @@ sub override_mp2_api {
             next;
         }
         $overridden_mp2_api{$sub} = eval $overridable_mp2_api{$sub};
+        if ($@) {
+            die "error overriding $sub : $@";
+        }
         unless (exists $overridden_mp2_api{$sub} &&
                 ref($overridden_mp2_api{$sub}) eq 'CODE') {
             die "overriding $sub didn't return a CODE ref";

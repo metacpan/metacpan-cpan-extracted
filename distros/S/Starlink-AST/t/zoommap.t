@@ -1,7 +1,8 @@
 #!perl
 
 use strict;
-use Test::More tests => 25;
+use Test::More tests => 29;
+use Test::Number::Delta;
 
 require_ok("Starlink::AST");
 {
@@ -37,4 +38,12 @@ for my $i ( 0 .. $#xin ) {
   is( $yin2->[$i], $yin[$i], "Compare inverted zoommap X[$i]");
 }
 
+my ($fit, $rms) = $zoommap->QuadApprox([-10, -10], [10, 10], 5, 5);
+my @fit = @$fit;
+delta_ok([@fit[0..5]], [0, 5, 0, 0, 0, 0]);
+delta_ok([@fit[6..11]], [0, 0, 5, 0, 0, 0]);
+delta_ok($rms, 0.0);
+
+my $noreg = $zoommap->RemoveRegions();
+isa_ok($noreg, 'Starlink::AST::Mapping');
 }

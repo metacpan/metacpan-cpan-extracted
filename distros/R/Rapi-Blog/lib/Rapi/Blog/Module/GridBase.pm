@@ -216,6 +216,10 @@ sub apply_permissions {
       $self->apply_extconfig( store_exclude_api => [qw(create update destroy)] );
     }  
   }
+  elsif($source_name eq 'User') {
+    my @deny_columns = qw/email admin author comment disabled set_pw preauth_actions/;
+    $self->apply_colspec_columns(\@deny_columns, no_column => 1);
+  }
   else {
     # deny all changes unless otherwise specified:
     $self->apply_extconfig( store_exclude_api => [qw(create update destroy)] );

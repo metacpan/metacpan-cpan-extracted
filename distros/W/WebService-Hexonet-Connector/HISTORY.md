@@ -1,3 +1,10 @@
+## [2.2.5](https://github.com/hexonet/perl-sdk/compare/v2.2.4...v2.2.5) (2019-10-04)
+
+
+### Bug Fixes
+
+* **responsetemplate/mgr:** improve description for `423 Empty API response` ([b81621e](https://github.com/hexonet/perl-sdk/commit/b81621e))
+
 ## [2.2.4](https://github.com/hexonet/perl-sdk/compare/v2.2.3...v2.2.4) (2019-09-20)
 
 

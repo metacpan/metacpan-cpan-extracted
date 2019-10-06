@@ -41,12 +41,12 @@ f     The PointList class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -135,7 +135,7 @@ static int class_check;
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
@@ -199,7 +199,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, 
 static AstRegion *RegBasePick( AstRegion *, int, const int *, int * );
 static int GetClosed( AstRegion *, int * );
 static int GetListSize( AstPointList *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void PointListPoints( AstPointList *, AstPointSet **, int *);
@@ -463,7 +463,7 @@ static int GetListSize( AstPointList *this, int *status ) {
    return astGetNpoint( ((AstRegion *) this)->points );
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -476,7 +476,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astGetObjSize protected
@@ -502,7 +502,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstPointList *this;         /* Pointer to PointList structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -1927,7 +1927,6 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    AstPointSet *pset3;          /* This PointList masked by supplied points */
    double **ptr2;               /* Pointer to axis values in "pset2" */
    double **ptr3;               /* Pointer to axis values in "pset3" */
-   double **ptr;                /* Pointer to axis values in "this" */
    double *p;                   /* Pointer to next axis value to read */
    int ic;                      /* Axis index */
    int icurr;                   /* Index of original current Frame in "this" */
@@ -1954,9 +1953,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    icurr = astGetCurrent( this_region->frameset );
    astSetCurrent( this_region->frameset, AST__BASE );
 
-/* Get pointer to the supplied axis values, the number of points and the
-   number of axis values per point. */
-   ptr = astGetPoints( pset );
+/* Get the number of points and the number of axis values per point. */
    np = astGetNpoint( pset );
    nc = astGetNcoord( pset );
 
@@ -2066,7 +2063,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* If an error has occurred, return zero. */
    if( !astOK ) {
       result = 0;
-      if( mask ) *mask = astAnnul( *mask );
+      if( mask ) *mask = astFree( *mask );
    }
 
 /* Return the result. */
@@ -2212,7 +2209,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstRegion *new;               /* Pointer to simplified Region */
    AstRegion *this;              /* Pointer to original Region structure */
    AstRegion *unc;               /* Pointer to new uncertainty Region */
-   double **ptr2;                /* Pointer to current Frame points */
    int simpler;                  /* Has some simplication taken place? */
 
 /* Initialise. */
@@ -2249,7 +2245,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* Transform the PointSet using this Mapping. */
       pset2 = astTransform( map, pset1, 1, NULL );
-      ptr2 = astGetPoints( pset2 );
 
 /* Get the Region describing the positional uncertainty within the
    supplied PointList, in its current Frame. */
@@ -2333,7 +2328,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib,
 */
 
 /* Local Variables: */
-   AstPointList *this;            /* Pointer to the PointList structure */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -2341,9 +2335,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-
-/* Obtain a pointer to the PointList structure. */
-   this = (AstPointList *) this_object;
 
 /* Check the attribute name and test the appropriate attribute. */
 
@@ -2753,30 +2744,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
-/* Local Variables: */
-   AstPointList *this;                 /* Pointer to the PointList structure */
-
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Obtain a pointer to the PointList structure. */
-   this = (AstPointList *) this_object;
-
-/* Write out values representing the instance variables for the
-   PointList class.  Accompany these with appropriate comment strings,
-   possibly depending on the values being written.*/
-
-/* In the case of attributes, we first use the appropriate (private)
-   Test...  member function to see if they are set. If so, we then use
-   the (private) Get... function to obtain the value to be written
-   out.
-
-   For attributes which are not set, we use the astGet... method to
-   obtain the value instead. This will supply a default value
-   (possibly provided by a derived class which over-rides this method)
-   which is more useful to a human reader as it corresponds to the
-   actual default attribute value.  Since "set" will be zero, these
-   values are for information only and will not be read back. */
 
 }
 
@@ -3089,7 +3058,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */
-   unc = unc_void ? astCheckRegion( astMakePointer( unc_void ) ) : NULL;
+   unc = unc_void ? astVerifyRegion( astMakePointer( unc_void ) ) : NULL;
 
 /* Initialise the PointList, allocating memory and initialising the
    virtual function table as well if necessary. */

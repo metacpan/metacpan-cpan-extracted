@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Aggregate;
-our $VERSION = '1.20190831'; # VERSION
+our $VERSION = '1.20191004'; # VERSION
 use strict;
 use warnings;
 
@@ -93,10 +93,16 @@ sub get_identifiers_as_xml {
     my ( $self, $rec ) = @_;
     my $id = "\t\t<identifiers>\n";
     foreach my $f (qw/ envelope_to envelope_from header_from /) {
-        if ( $f eq 'header_from' && ! $rec->{identifiers}{$f} ) {
-            croak "missing header_from!";
+        if ( $f eq 'header_from' ) {        # min occurs = 1
+            croak "missing header_from!" if ! $rec->{identifiers}{$f};
+        }
+        elsif ( $f eq 'envelope_from') {    # min occurs = 1
+            $rec->{identifiers}{$f} = '' if ! $rec->{identifiers}{$f};
+        }
+        elsif ( $f eq 'envelope_to' ) {     # min occurs = 0
+            next if ! $rec->{identifiers}{$f};
         };
-        next if !$rec->{identifiers}{$f};
+
         my $val = XML::LibXML::Text->new( $rec->{identifiers}{$f} )->toString();
         $id .= "\t\t\t<$f>$val</$f>\n";
     }
@@ -191,7 +197,7 @@ Mail::DMARC::Report::Aggregate - aggregate report object
 
 =head1 VERSION
 
-version 1.20190831
+version 1.20191004
 
 =head1 DESCRIPTION
 

@@ -102,7 +102,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.109';
+our $VERSION = '0.110';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -2751,7 +2751,7 @@ sub set {
 					# speed.
     flattening => \&_set_custom_ellipsoid,
     frequency => \&_set_value,
-    horizon => \&_set_value,
+    horizon => \&_set_elevation,
     id => \&_set_id,
     inertial => undef,
     name => \&_set_value,
@@ -2760,7 +2760,7 @@ sub set {
     semimajor => \&_set_custom_ellipsoid,
     station => \&_set_station,
     sun	=> \&_set_sun,
-    twilight => \&_set_twilight,
+    twilight => \&_set_elevation,
 );
 
 {
@@ -2777,7 +2777,10 @@ sub set {
 	    or $value = 0;	# Default
 	if ( $special{$value} ) {
 	    $hash->{"_$attr"} = $special{$value};
-	} elsif ( looks_like_number( $value ) ) {
+	} elsif ( looks_like_number( $value )
+	    && $value >= -PIOVER2
+	    && $value <= PIOVER2
+	) {
 	    $hash->{"_$attr"} = sub { return $_[0]->get( $attr ) };
 	} else {
 	    croak "'$value' is an invalid value for '$attr'";
@@ -2801,6 +2804,25 @@ sub _set_custom_ellipsoid {
     $_[0]->{ellipsoid} = undef;
     $_[0]->{$_[1]} = $_[2];
     return SET_ACTION_RESET;
+}
+
+{
+    my %dflt = (
+	twilight	=> CIVIL_TWILIGHT,
+    );
+
+    # Any attribute specified as angle above or below the horizon.
+    sub _set_elevation {
+	my ( $self, $name, $value ) = @_;
+	defined $value
+	    or $value = ( $dflt{$name} || 0 );	# Default
+	looks_like_number( $value )
+	    and $value >= -PIOVER2
+	    and $value <= PIOVER2
+	    or croak "'$value' is an invalid value for '$name'";
+	$self->{$name} = $value;
+	return SET_ACTION_NONE;
+    }
 }
 
 sub _set_station {
@@ -2855,18 +2877,6 @@ eod
     $self->{flattening} = $known_ellipsoid{$value}{flattening};
     $self->{$name} = $value;
     return SET_ACTION_RESET;
-}
-
-sub _set_twilight {
-    my ( $self, $name, $value ) = @_;
-    defined $value
-	or $value = CIVIL_TWILIGHT;	# Default
-    looks_like_number( $value )
-	and $value >= -PIOVER2
-	and $value <= PIOVER2
-	or croak "'$value' is an invalid value for '$name'";
-    $self->{$name} = $value;
-    return SET_ACTION_NONE;
 }
 
 #	If this is a vanilla setting, just do it.

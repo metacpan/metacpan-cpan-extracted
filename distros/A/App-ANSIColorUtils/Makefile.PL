@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::ANSIColorUtils",
   "PREREQ_PM" => {
     "Color::ANSI::Util" => "0.161",
-    "Color::RGB::Util" => "0.596",
+    "Color::RGB::Util" => "0.599",
     "Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Color::ANSI::Util" => "0.161",
-  "Color::RGB::Util" => "0.596",
+  "Color::RGB::Util" => "0.599",
   "Data::Sah::Coerce::perl::str::str_rgb24_from_colorname_X_or_code" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,

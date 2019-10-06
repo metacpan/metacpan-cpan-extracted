@@ -1,5 +1,8 @@
 Revision history for DBIx-Raw
 
+0.23  2019-10-05 15:55:37 CDT
+        - Pod documenation fixes (@manwar).
+
 0.22  2019-01-14 21:22:51 CST
         - Try to fix failing test for Windows
 
@@ -31,24 +34,24 @@ Revision history for DBIx-Raw
         Added List::Util to deps.
 
 0.13    January 3, 00:23 San Jose, CA
-        Fixed encrypt documentation. Added insert/insert encrypt method. Fixed update encrypt method. 
+        Fixed encrypt documentation. Added insert/insert encrypt method. Fixed update encrypt method.
 
-0.12    July 10, 10:00 PM Seattle, WA 
+0.12    July 10, 10:00 PM Seattle, WA
         removed prints
 
-0.11    July 10, 9:00 PM Seattle, WA 
+0.11    July 10, 9:00 PM Seattle, WA
         Added insert_multiple, and fixed aoa documentation
 
-0.10    June 28, 11:00 PM Seattle, WA 
+0.10    June 28, 11:00 PM Seattle, WA
         Added crypt_key to documentation and added aoa
 
-0.09    May 17, 7:20 PM Seattle, WA 
+0.09    May 17, 7:20 PM Seattle, WA
         Added prev_conf so we don't reread in conf if it has not changed
 
-0.08    May 17, 7:05 PM Seattle, WA 
+0.08    May 17, 7:05 PM Seattle, WA
         Added documentation for connect
 
-0.07    May 17, 7:00 PM Seattle, WA 
+0.07    May 17, 7:00 PM Seattle, WA
         Added DBIx::Raw::Connect
 
 0.06    April 20, 3:05 PM

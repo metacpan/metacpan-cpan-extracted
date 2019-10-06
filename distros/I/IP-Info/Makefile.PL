@@ -30,12 +30,12 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'IP::Info'                       => { file => 'lib/IP/Info.pm'                    , version => '0.17' },
-            'IP::Info::Response'             => { file => 'lib/IP/Info/Response.pm'           , version => '0.17' },
-            'IP::Info::Response::Network'    => { file => 'lib/IP/Info/Response/Network.pm'   , version => '0.17' },
-            'IP::Info::Response::Location'   => { file => 'lib/IP/Info/Response/Location.pm'  , version => '0.17' },
-            'IP::Info::UserAgent'            => { file => 'lib/IP/Info/UserAgent.pm'          , version => '0.17' },
-            'IP::Info::UserAgent::Exception' => { file => 'lib/IP/Info/UserAgent/Exception.pm', version => '0.17' },
+            'IP::Info'                       => { file => 'lib/IP/Info.pm'                    , version => '0.18' },
+            'IP::Info::Response'             => { file => 'lib/IP/Info/Response.pm'           , version => '0.18' },
+            'IP::Info::Response::Network'    => { file => 'lib/IP/Info/Response/Network.pm'   , version => '0.18' },
+            'IP::Info::Response::Location'   => { file => 'lib/IP/Info/Response/Location.pm'  , version => '0.18' },
+            'IP::Info::UserAgent'            => { file => 'lib/IP/Info/UserAgent.pm'          , version => '0.18' },
+            'IP::Info::UserAgent::Exception' => { file => 'lib/IP/Info/UserAgent/Exception.pm', version => '0.18' },
         },
         resources => {
             repository => {

@@ -113,6 +113,7 @@ void* pack1D ( SV* arg, char packtype ) {
    double dscalar;
    short sscalar;
    unsigned char uscalar;
+   int64_t qscalar;
    AV* array;
    I32 i,n;
    SV* work;
@@ -124,7 +125,7 @@ void* pack1D ( SV* arg, char packtype ) {
       return (void*) SvPV(SvRV(arg), len);
 
    if (packtype!='f' && packtype!='i' && packtype!='d' && packtype!='s'
-       && packtype != 'u')
+       && packtype != 'u' && packtype != 'q')
        croak("Programming error: invalid type conversion specified to pack1D");
 
    /*
@@ -159,6 +160,10 @@ void* pack1D ( SV* arg, char packtype ) {
       if (packtype=='u') {
           uscalar = (unsigned char) SvNV(arg);	/*Get the scalar value */
 	  sv_setpvn(work, (char *) &uscalar, sizeof(char)); /* Pack it in */
+        }
+      if (packtype=='q') {
+          qscalar = (int64_t) SvNV(arg);	/*Get the scalar value */
+	  sv_setpvn(work, (char *) &qscalar, sizeof(int64_t)); /* Pack it in */
       }
       return (void *) SvPV(work, PL_na);        /* Return the pointer */
    }
@@ -185,6 +190,8 @@ void* pack1D ( SV* arg, char packtype ) {
           SvGROW( work, sizeof(short)*(n+1) );
       if (packtype=='u')
 	  SvGROW( work, sizeof(char)*(n+1) );
+      if (packtype=='q')
+	  SvGROW( work, sizeof(int64_t)*(n+1) );
 
 
       /* Pack array into string */
@@ -220,6 +227,11 @@ void* pack1D ( SV* arg, char packtype ) {
 	        uscalar = (unsigned char) nval;
 	        sv_catpvn( work, (char *) &uscalar, sizeof(char));
 	    }
+	    if (packtype=='q') {
+	        qscalar = (int64_t) nval;
+	        sv_catpvn( work, (char *) &qscalar, sizeof(int64_t));
+	    }
+
       }
 
       /* Return a pointer to the byte array */
@@ -549,6 +561,7 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
    double* dvar;
    short* svar;
    unsigned char* uvar;
+   int64_t* qvar;
    double foo;
    SV* work;
    AV* array;
@@ -560,7 +573,7 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
        return;
 
    if (packtype!='f' && packtype!='i' && packtype!= 'd' &&
-       packtype!='u' && packtype!='s')
+       packtype!='u' && packtype!='s' && packtype!= 'q')
        croak("Programming error: invalid type conversion specified to unpack1D");
 
    m=n;  array = coerce1D( arg, m );   /* Get array ref and coerce */
@@ -578,6 +591,8 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
      uvar = (unsigned char *) var;
    if (packtype=='s')
      svar = (short *) var;
+   if (packtype=='q')
+     qvar = (int64_t *) var;
 
    /* Unpack into the array */
 
@@ -592,6 +607,8 @@ void unpack1D ( SV* arg, void * var, char packtype, int n ) {
          av_store( array, i, newSViv( (IV)uvar[i] ) );
       if (packtype=='s')
          av_store( array, i, newSViv( (IV)svar[i] ) );
+      if (packtype=='q')
+         av_store( array, i, newSViv( (IV)qvar[i] ) );
    }
 
    return;

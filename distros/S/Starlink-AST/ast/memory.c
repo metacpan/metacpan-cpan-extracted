@@ -25,12 +25,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -152,6 +152,17 @@
 *     16-JAN-2014 (DSB):
 *        Dump details of all active memory blocks if the total memory allocation
 *        specified by astMemoryWarning is exceeded.
+*     23-SEP-2014 (DSB):
+*        Modify astAppendString to allow printf conversion specifications to
+*        be included in the appended string.
+*     20-OCT-2014 (DSB):
+*        Revert the change to astAppendString made on 23-SEP-2014 as it is
+*        insecure. Instead add new function astAppendStringf.
+*     26-MAR-2015 (DSB):
+*        Added astChrTrunc.
+*     17-MAR-2017 (DSB):
+*        Remove unnecessary checks that supplied size_t  argument values
+*        are not less than zero - size_t is unsigned and so is never negative.
 */
 
 /* Configuration results. */
@@ -590,6 +601,7 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 *--
 */
 
+
 /* Local Variables: */
    char *result;                 /* Pointer value to return */
    int len;                      /* Length of new string */
@@ -621,6 +633,371 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
    }
 
 /* Return the result pointer. */
+   return result;
+}
+
+char *astAppendStringf_( char *str1, int *nc, const char *str2, ... ) {
+/*
+*++
+*  Name:
+*     astAppendStringf
+
+*  Purpose:
+*     Append a string to another string, allowing printf format specifiers.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     char *astAppendStringf( char *str1, int *nc, const char *str2, ... )
+
+*  Description:
+*     This function appends one string to another dynamically
+*     allocated string, extending the dynamic string as necessary to
+*     accommodate the new characters (plus the final null). It is the
+*     same as astAppendString, except that the "str2" string ay include
+*     printf format specifiers.
+
+*  Parameters:
+*     str1
+*        Pointer to the null-terminated dynamic string, whose memory
+*        has been allocated using an AST memory allocation function.
+*        If no space has yet been allocated for this string, a NULL
+*        pointer may be given and fresh space will be allocated by this
+*        function.
+*     nc
+*        Pointer to an integer containing the number of characters in
+*        the dynamic string (excluding the final null). This is used
+*        to save repeated searching of this string to determine its
+*        length and it defines the point where the new string will be
+*        appended. Its value is updated by this function to include
+*        the extra characters appended.
+*
+*        If "str1" is NULL, the initial value supplied for "*nc" will
+*        be ignored and zero will be used.
+*     str2
+*        Pointer to a constant null-terminated string, a copy of which
+*        is to be appended to "str1". It may contain format
+*        specifications such as used with the C "printf" family of
+*        functions.
+*     ...
+*        Additional optional arguments (as used by e.g. "printf")
+*        which specify values which are to be substituted into the "str2"
+*        string in place of any format specifications.
+
+*  Returned Value:
+*     astAppendString()
+*        A possibly new pointer to the dynamic string with the new string
+*        appended (its location in memory may have to change if it has to
+*        be extended, in which case the original memory is automatically
+*        freed by this function). When the string is no longer required,
+*        its memory should be freed using astFree.
+
+*  Notes:
+*     - If this function is invoked with the global error status set
+*     or if it should fail for any reason, then the returned pointer
+*     will be equal to "str1" and the dynamic string contents will be
+*     unchanged.
+*--
+*/
+
+/* Local Variables: */
+   char *pbuf;                   /* Pointer to buffer for expanded "str2" */
+   char *result;                 /* Pointer value to return */
+   char buf[1000];               /* A large buffer for the expanded "str2" */
+   int *status;                  /* Pointer to inherited status variable */
+   int buf_size;                 /* Size of buffer for expanded "str2" */
+   int len;                      /* Length of new string */
+   int nexp;                     /* Number of characters written to "pbuf". */
+   va_list args;                 /* Variable argument list pointer */
+
+/* Initialise. */
+   result = str1;
+
+/* If the first string pointer is NULL, also initialise the character
+   count to zero. */
+   if( !str1 ) *nc = 0;
+
+/* Get a pointer to the integer holding the inherited status value. This
+   function cannot have a "status" argument like most other functions
+   because of the variable argument list. */
+   status = astGetStatusPtr;
+
+/* Check the global error status. */
+   if ( !astOK || !str2 ) return result;
+
+/* If available use vsnprintf to determine the amount of memory needed to
+   hold the expanded version of "str2". Then allocate the required memory. */
+#if HAVE_VSNPRINTF
+   va_start( args, str2 );
+   buf_size = vsnprintf( buf, sizeof( buf ), str2, args ) + 1;
+   va_end( args );
+   pbuf = astMalloc( buf_size );
+
+/* Otherwise, all we can do is use a big buffer and hope for the best. */
+#else
+   buf_size = sizeof( buf );
+   pbuf = buf;
+#endif
+
+/* Expand any conversion specifications in "str2". */
+   va_start( args, str2 );
+   nexp = vsprintf( pbuf, str2, args );
+   va_end( args );
+
+/* Check that the result buffer did not overflow (should only be
+   possible if vsnprintf is not available). If it did, memory may
+   have been corrupted. Report the error and abort. */
+   if( nexp >= buf_size ) {
+      if( astOK ) astError( AST__ATSER, "astAppendString: Internal buffer "
+                            "overflow while appending a string - the "
+                            "result exceeds %d characters.", status,
+                            buf_size - 1 );
+   }
+
+/* Calculate the total string length once the two strings have been
+   concatenated. */
+   len = *nc + nexp;
+
+/* Extend the first (dynamic) string to the required length, including
+   a final null. Save the resulting pointer, which will be
+   returned. */
+   result = astGrow( str1, len + 1, sizeof( char ) );
+
+/* If OK, append the second string and update the total character
+   count. */
+   if ( astOK ) {
+      (void) strcpy( result + *nc, pbuf );
+      *nc = len;
+   }
+
+/* If required, free the buffer holding the expanded version of "str2". */
+#if HAVE_VSNPRINTF
+   pbuf = astFree( pbuf );
+#endif
+
+/* Return the result pointer. */
+   return result;
+}
+
+int astBrackets_( const char *text, size_t start, size_t end,
+                  char opchar, char clchar, int strip,
+                  size_t *openat, size_t *closeat, char **before,
+                  char **in, char **after, int *status ){
+/*
+*++
+*  Name:
+*     astBrackets
+
+*  Purpose:
+*     Identify a bracketed sub-string.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astBrackets( const char *text, size_t start, size_t end,
+*                      char opchar, char clchar, int strip,
+*                      size_t *openat, size_t *closeat, char **before,
+*                      char **in, char **after )
+
+*  Description:
+*     This function searches a specified section of the supplied text
+*     string for the first sub-string that is delimited by opening and
+*     closing brackets. If found, the positions of the opening and closing
+*     brackets are returned. Optionally, null-terminated copies of the
+*     strings, before, in and after the brackets can be returned. The
+*     characters to be used as the opening and closing brackets can be
+*     specified.
+
+*  Parameters:
+*     text
+*        The text string to be seached.
+*     start
+*        The zero-based index of the first character to be checked within
+*        "text". The whole string is used if "start" is greater than "end".
+*     end
+*        The zero-based index of the last character to be checked within
+*        "text". The whole string is used if "start" is greater than "end".
+*        The last character is used if "end" is greater than the length
+*        of the string.
+*     opchar
+*        The character to be used as the opening bracket (e.g. '[').
+*     clchar
+*        The character to be used as the closing bracket (e.g. ']').
+*     strip
+*        If non-zero, leading and trailing spaces are removed from the
+*        returned "before", "in" and "after" strings.
+*     openat
+*        Returned holding the zero-based index of the opening bracket.
+*        Ignored if NULL.
+*     closeat
+*        Returned holding the zero-based index of the closing bracket.
+*        Ignored if NULL.
+*     before
+*        Address at which to return a pointer to a null-terminated copy
+*        of the string that came before the opening bracket. This will be
+*        a null string "" if the opening bracket is the first character
+*        in the search. The returned pointer should be freed using astFree
+*        when no longer needed. Ignored if "before" is NULL.
+*     in
+*        Address at which to return a pointer to a null-terminated copy
+*        of the string that came between the opening and closing bracket.
+*        This will be a null string "" if the bracket was empty. The
+*        returned pointer should be freed using astFree when no longer
+*        needed. Ignored if "in" is NULL.
+*     after
+*        Address at which to return a pointer to a null-terminated copy
+*        of the string that came after the opening bracket. This will be
+*        a null string "" if the closing bracket is the last character
+*        in the search. The returned pointer should be freed using astFree
+*        when no longer needed. Ignored if "after" is NULL.
+
+*  Returned Value:
+*     astBrackets()
+*        A value of 1 is returned if a correctly bracketed sub-string was
+*        found. A value of 0 is returned if no bracketed sub-string was
+*        found. A value of -1 is returned if too many closing brackets
+*        were found. A value of -2 is returned if too many opening
+*        brackets were found.
+
+*  Notes:
+*     - Any nested brackets within a top-level bracketed sub-string are
+*     skipped. Any inbalance in brackets is indicated by the function
+*     return value.
+*     - If no bracketed sub-string is found, all the returned pointers
+*     will be NULL, "closeat" will be 0 and "openat" will be 1.
+*--
+*/
+/* Local Variables: */
+   int result;
+   size_t nc;
+   size_t nct;
+   size_t opat;
+   size_t clat;
+   int depth;
+   const char *p;
+   const char *pend;
+
+/* Initialise. */
+   result = 0;
+   if( openat ) *openat = 1;
+   if( closeat ) *closeat = 0;
+   if( before ) *before = NULL;
+   if( in ) *in = NULL;
+   if( after ) *after = NULL;
+
+/* Check the global error status. Also check a text string was supplied. */
+   if ( !astOK || !text ) return result;
+
+/* Get the total length of the supplied string, including any trailing blanks
+   but excluding the terminating null. */
+   nct = strlen( text );
+
+/* Get the actual start and end positions to use. */
+   if( start > end ) {
+      start = 0;
+      end = nct - 1;
+   } else if( end >= nct ) {
+      end = nct - 1;
+   }
+
+/* Check there is some text to search. */
+   if( start <= end ) {
+
+/* Initialise the indices of the opening and closing brackets to indicate
+   that no brackets have yet been found ( opat > clat). */
+      opat = 1;
+      clat = 0;
+
+/* Initialise the current depth of nesting within brackets. */
+      depth = 0;
+
+/* Loop through all characters in the section of the string to be
+   searched. */
+      p = text + start - 1;
+      pend = text + end;
+      while( ++p <= pend ) {
+
+/* If this is an opening bracket, increment the nesting depth. If it is
+   the first opening bracket (original depth zero), record its position. */
+         if( *p == opchar ) {
+            if( depth++ == 0 ) opat = p - text;
+
+/* If this is a closing bracket, record its position and decrement the
+   nesting depth. If the depth reaches zero, break out of the loop. If
+   a closing bracket is found before any opening bracket, the depth will
+   go negative, so check for this too. */
+         } else if( *p == clchar ) {
+            clat = p - text;
+            if( --depth <= 0 ) break;
+         }
+      }
+
+/* If the final depth is positive, we have to0 many opening brackets.
+   So return -2. */
+      if( depth > 0 ) {
+         result = -2;
+
+/* If the final is negative, we found a closing bracket before finding an
+   opening bracket, so return -1. */
+      } else if( depth < 0 ) {
+         result = -1;
+
+/* If brackets were balanced correctly, check we actually found some
+   brackets. If so, return 1. */
+      } else if( opat <= clat ) {
+         result = 1;
+
+/* Return the index of the opening and closing brackets. */
+         if( openat ) *openat = opat;
+         if( closeat ) *closeat = clat;
+
+/* If required, extract the string that occurs before the opening bracket,
+   and terminate it. */
+         if( before ) {
+            nc = opat;
+            *before = astStore( NULL, text, nc + 1 );
+            (*before)[ nc ] = 0;
+
+/* If required, strip trailing and leading spaces. */
+            if( strip ) {
+               astChrTrunc( *before );
+               astRemoveLeadingBlanks( *before );
+            }
+         }
+
+/* If required, extract the string that occurs within the brackets,
+   and terminate it. Strip spaces if required. */
+         if( in ) {
+            nc = clat - opat - 1;
+            *in = astStore( NULL, text + opat + 1, nc + 1 );
+            (*in)[ nc ] = 0;
+
+            if( strip ) {
+               astChrTrunc( *in );
+               astRemoveLeadingBlanks( *in );
+            }
+         }
+
+/* If required, extract the string that occurs after the brackets,
+   and terminate it. Strip spaces if required. */
+         if( after ) {
+            nc = nct - clat - 1;
+            *after = astStore( NULL, text + clat + 1, nc + 1 );
+            (*after)[ nc ] = 0;
+
+            if( strip ) {
+               astChrTrunc( *after );
+               astRemoveLeadingBlanks( *after );
+            }
+         }
+      }
+   }
+
+/* Return the result. */
    return result;
 }
 
@@ -1093,6 +1470,45 @@ void astChrCase_( const char *in, char *out, int upper, int blen, int *status ) 
    }
 }
 
+void astChrClean_( char *text ) {
+/*
+*++
+*  Name:
+*     astChrClean
+
+*  Purpose:
+*     Replace unprintable characters in a string with spaces.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astChrClean( char *text )
+
+*  Description:
+*     This function replaces all unprintable characters in the given
+*     string with spaces. It is assumed that the string contains only
+*     ASCII characters.
+
+*  Parameters:
+*     text
+*        Pointer to the null terminated string to be modified.
+
+*--
+*/
+
+/* Local Variables: */
+   char *pr;
+
+   if( !text ) return;
+
+   pr = text - 1;
+   while( *(++pr) ) {
+      if( *pr < ' ' || *pr > '~' ) *pr = ' ';
+   }
+}
+
 int astChrMatch_( const char *str1, const char *str2, int *status ) {
 /*
 *++
@@ -1232,6 +1648,48 @@ int astChrMatchN_( const char *str1, const char *str2, size_t n, int *status ) {
    return match;
 }
 
+void astChrRemoveBlanks_( char *text ) {
+/*
+*++
+*  Name:
+*     astChrRemoveBlanks
+
+*  Purpose:
+*     Remove all spaces from a string.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astChrClean( char *text )
+
+*  Description:
+*     This function removes all spaces form the supplied string by moving
+*     non-space characters to the left. The string is terminated to
+*     remove any trailing spaces.
+
+*  Parameters:
+*     text
+*        Pointer to the null terminated string to be modified.
+
+*--
+*/
+
+/* Local Variables: */
+   char *pr;
+   char *pw;
+
+   if( !text ) return;
+
+   pw = text;
+   pr = text - 1;
+   while( *(++pr) ) {
+      if( *pr != ' ' ) *(pw++) = *pr;
+   }
+   *pw = 0;
+}
+
 char **astChrSplit_( const char *str, int *n, int *status ) {
 /*
 *++
@@ -1246,7 +1704,7 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     char **astChrSplit_( const char *str, int *n )
+*     char **astChrSplit( const char *str, int *n )
 
 *  Description:
 *     This function extracts all space-separated words form the supplied
@@ -1897,6 +2355,141 @@ c     the supplied test string does not match the template.
    return ChrSuber( test, pattern, subs, nsub, 0, NULL, NULL, NULL, status );
 }
 
+void astChrTrunc_( char *text, int *status ){
+/*
+*++
+*  Name:
+*     astChrTrunc
+
+*  Purpose:
+*     Terminate a string to exclude trailing spaces.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astChrTrunc( char *text )
+
+*  Description:
+*     This function pokes a null character into the supplied string to
+*     remove any trailing spaces.
+
+*  Parameters:
+*     text
+*        The string to be truncated.
+
+*--
+*/
+   if( !text ) return;
+   text[ astChrLen( text ) ] = 0;
+}
+
+void astFandl_( const char *text, size_t start, size_t end,
+                size_t *f, size_t *l, int *status ){
+/*
+*++
+*  Name:
+*     astFandl
+
+*  Purpose:
+*     Identify the used section of a string.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astFandl_( const char *text, size_t start, size_t end,
+*                     size_t *f, size_t *l )
+
+*  Description:
+*     This function searches a specified section of the supplied text
+*     for non-space characters, returning the indices of the first and
+*     last.
+
+*  Parameters:
+*     text
+*        The text string to be seached.
+*     start
+*        The zero-based index of the first character to be checked within
+*        "text". The whole string is used if "start" is greater than "end".
+*     end
+*        The zero-based index of the last character to be checked within
+*        "text". The whole string is used if "start" is greater than "end".
+*        The last character is used if "end" is greater than the length
+*        of the string.
+*     f
+*        Returned holding the zero-based index of the first non-space
+*        character. Ignored if NULL.
+*     l
+*        Returned holding the zero-based index of the last non-space
+*        character. Ignored if NULL.
+
+*  Notes:
+*     - "f" is returned greater than "l" if the specified section of the
+*     string is entirely blank.
+*--
+*/
+/* Local Variables: */
+   size_t nct;
+   const char *pstart;
+   const char *pend;
+
+/* Initialise. */
+   if( f ) *f = 1;
+   if( l ) *l = 0;
+
+/* Check the global error status. Also check a text string was supplied. */
+   if ( !astOK || !text ) return;
+
+/* Get the total length of the supplied string, including any trailing blanks
+   but excluding the terminating null. */
+   nct = strlen( text );
+
+/* Get the actual start and end positions to use. */
+   if( start > end ) {
+      start = 0;
+      end = nct - 1;
+   } else if( end >= nct ) {
+      end = nct - 1;
+   }
+
+/* Check there is some text to search. */
+   if( start <= end ) {
+
+/* If we want the position of the first non-space... */
+      if( f ) {
+
+/* Move forward through all the characters in the substring to be searched.
+   Break when the first non-space is found. */
+         pend = text + end;
+         pstart = text + start - 1;
+         while( ++pstart <= pend ){
+            if( *pstart != ' ' ) {
+               *f = pstart - text;
+               break;
+            }
+         }
+      }
+
+/* If we want the position of the last non-space... */
+      if( l ) {
+
+/* Move backwards through all the characters in the substring to be
+   searched. Break when the first non-space is found. */
+         pend = text + end + 1;
+         pstart = text + start;
+         while( --pend >= pstart ) {
+            if( *pend != ' ' ) {
+               *l = pend - text;
+               break;
+            }
+         }
+      }
+   }
+}
+
 void *astFree_( void *ptr, int *status ) {
 /*
 *++
@@ -2182,7 +2775,7 @@ int astIsDynamic_( const void *ptr, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     int astIsDynamic_( const void *ptr )
+*     int astIsDynamic( const void *ptr )
 
 *  Description:
 *     This function takes a pointer to a region of memory and tests if
@@ -2297,17 +2890,10 @@ void *astMalloc_( size_t size, int init, int *status ) {
 /* If needed, get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
-/* Check that the size requested is not negative and report an error
-   if it is. */
-   if ( size < (size_t) 0 ) {
-      astError( AST__MEMIN,
-                "Invalid attempt to allocate %lu bytes of memory.", status,
-                (unsigned long) size );
-
-/* Otherwise, if the size is greater than zero, either get a previously
+/* If the size is greater than zero, either get a previously
    allocated memory block from the cache, or attempt to use malloc
    to allocate the memory, including space for the header structure. */
-   } else if ( size != (size_t ) 0 ) {
+   if ( size > (size_t ) 0 ) {
 
 /* If the cache is being used and a cached memory block of the required size
    is available, remove it from the cache array and use it. */
@@ -3104,82 +3690,73 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
       IS_DYNAMIC( ptr, isdynamic );
       if ( isdynamic ) {
 
-/* Check that a negative size has not been given and report an error
-   if necessary. */
-         if ( size < (size_t) 0 ) {
-            astError( AST__MEMIN,
-               "Invalid attempt to reallocate a block of memory to %ld bytes.", status,
-                      (long) size );
-
-/* If OK, obtain a pointer to the memory header. */
-         } else {
-            mem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
+/* Obtain a pointer to the memory header. */
+         mem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
 
 /* If the new size is zero, free the old memory and set a NULL return
    pointer value. */
-            if ( size == (size_t) 0 ) {
-               astFree( ptr );
-               result = NULL;
+         if ( size == (size_t) 0 ) {
+            astFree( ptr );
+            result = NULL;
 
 /* Otherwise, reallocate the memory. */
-            } else {
+         } else {
 
 /* If the cache is being used, for small memory blocks, do the equivalent of
                mem = REALLOC( mem, SIZEOF_MEMORY + size );
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
-               if( use_cache && ( mem->size <= MXCSIZE || size <= MXCSIZE ) ) {
-                  result = astMalloc( size );
-                  if( result ) {
-                     if( mem->size < size ) {
-                        memcpy( result, ptr, mem->size );
-                     } else {
-                        memcpy( result, ptr, size );
-                     }
-                     astFree( ptr );
-
+            if( use_cache && ( mem->size <= MXCSIZE || size <= MXCSIZE ) ) {
+               result = astMalloc( size );
+               if( result ) {
+                  if( mem->size < size ) {
+                     memcpy( result, ptr, mem->size );
                   } else {
-                     result = ptr;
+                     memcpy( result, ptr, size );
                   }
+                  astFree( ptr );
+
+               } else {
+                  result = ptr;
+               }
 
 /* For other memory blocks simply use realloc. */
-               } else {
+            } else {
 
 #ifdef MEM_DEBUG
-                  DeIssue( mem, status );
+               DeIssue( mem, status );
 #endif
 
-                  mem = REALLOC( mem, SIZEOF_MEMORY + size );
+               mem = REALLOC( mem, SIZEOF_MEMORY + size );
 
 /* If this failed, report an error and return the original pointer
    value. */
-                  if ( !mem ) {
+               if ( !mem ) {
 #if HAVE_STRERROR_R
-                     strerror_r( errno, errbuf, ERRBUF_LEN );
-                     errstat = errbuf;
+                  strerror_r( errno, errbuf, ERRBUF_LEN );
+                  errstat = errbuf;
 #else
-                     errstat = strerror( errno );
+                  errstat = strerror( errno );
 #endif
-                     astError( AST__NOMEM, "realloc: %s", status, errstat );
-                     astError( AST__NOMEM, "Failed to reallocate a block of "
-                               "memory to %ld bytes.", status, (long) size );
+                  astError( AST__NOMEM, "realloc: %s", status, errstat );
+                  astError( AST__NOMEM, "Failed to reallocate a block of "
+                            "memory to %ld bytes.", status, (long) size );
 
 /* If successful, set the new "magic" value and size in the memory
    header and obtain a pointer to the start of the region of memory to
    be used by the caller. */
-                  } else {
-                     mem->magic = MAGIC( mem, size );
-                     mem->size = size;
-                     mem->next = NULL;
+               } else {
+                  mem->magic = MAGIC( mem, size );
+                  mem->size = size;
+                  mem->next = NULL;
 #ifdef MEM_DEBUG
-                     mem->id = -1;
-                     mem->prev = NULL;
-                     Issue( mem, status );
+                  mem->id = -1;
+                  mem->prev = NULL;
+                  Issue( mem, status );
 #endif
-                     result = mem;
-                     result = (char *) result + SIZEOF_MEMORY;
-                  }
+                  result = mem;
+                  result = (char *) result + SIZEOF_MEMORY;
                }
             }
          }

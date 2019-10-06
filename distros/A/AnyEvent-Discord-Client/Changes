@@ -1,0 +1,8 @@
+Revision history for AnyEvent-Discord-Client
+
+0.0.2   2019-10-04
+        Minor tweaks to documentation.
+
+0.0.1   2019-10-04
+        Initial version of AnyEvent::Discord::Client with the basic features
+        needed to build a Discord bot.

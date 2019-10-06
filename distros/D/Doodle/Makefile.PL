@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Do" => "1.87",
     "Test::Auto" => "0.03"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }

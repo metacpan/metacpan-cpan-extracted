@@ -1,5 +1,9 @@
 Change history for HTML-Form
 
+6.05      2019-10-04 20:28:20Z
+    - Update pod as requested in [RT#87689] (GH#16) (Lance Wicks and Julien
+      Fiegehenn)
+
 6.04      2019-03-25 18:22:51Z
     - Convert to Dist::Zilla
     - Add an autocomplete method (GH #13) (Olaf Alders)

@@ -8,7 +8,7 @@
 
 package Mail::Box::Collection;
 use vars '$VERSION';
-$VERSION = '3.007';
+$VERSION = '3.008';
 
 use base qw/User::Identity::Collection Mail::Reporter/;
 

@@ -5,7 +5,7 @@
 
 our $DATE = '2019-08-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ ansi256-to-rgb - Convert ANSI-256 color to RGB
 
 =head1 VERSION
 
-This document describes version 0.005 of ansi256-to-rgb (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
+This document describes version 0.006 of ansi256-to-rgb (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
 
 =head1 SYNOPSIS
 

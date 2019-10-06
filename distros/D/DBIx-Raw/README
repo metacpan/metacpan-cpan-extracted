@@ -20,7 +20,7 @@ SYNOPSIS
     
         #get multiple values in list context
         my ($name, $age) = $db->raw("SELECT name, age FROM people WHERE id=1");
-            
+    
         #or
         my @person = $db->raw("SELECT name, age FROM people WHERE id=1");
     
@@ -51,13 +51,13 @@ SYNOPSIS
     
         #get multiple records as an array of hashes
         my $people = $db->aoh("SELECT name, age FROM people");
-        
-        for my $person (@$people) { 
+    
+        for my $person (@$people) {
             print "$person->{name} is $person->{age} years old\n";
         }
     
         #update a record easily with a hash
-        my %update = ( 
+        my %update = (
             name => 'Joe',
             age => 34,
         );
@@ -115,9 +115,9 @@ CONFIGURATION FILE
 
  conf.pl
 
-        { 
+        {
             dsn => 'dbi:mysql:test:localhost:3306',
-            user => 'root', 
+            user => 'root',
             password => 'password',
             crypt_key => 'lxsafadsfadskl23239210453453802xxx02-487900-=+1!:)',
         }
@@ -130,8 +130,8 @@ CONFIGURATION FILE
         password: 'password'
         crypt_key: 'lxsafadsfadskl23239210453453802xxx02-487900-=+1!:)'
 
-    Note that you do not need to include "crypt_key" if you just if you
-    just want to use the file for configuration settings.
+    Note that you do not need to include "crypt_key" if you just want to
+    use the file for configuration settings.
 
 SYNTAXES
 
@@ -153,7 +153,6 @@ SYNTAXES
         my $num_rows_updated = $db->raw("UPDATE people SET name='Fred'");
     
         my $name = $db->raw("SELECT name FROM people WHERE id=1");
-            
 
     DBIx::Raw also supports "Placeholders and Bind Values" in DBI for DBI.
     These can be useful to help prevent SQL injection. Below are some
@@ -165,7 +164,6 @@ SYNTAXES
         my $name = $db->raw("SELECT name FROM people WHERE id=?", 1);
     
         $db->raw("INSERT INTO people (name, age) VALUES (?, ?)", 'Frank', 44);
-        
 
     Note that "SIMPLE SYNTAX" cannot be used for "hoh", "hoaoh", "hash", or
     "update" because of the extra parameters that they require.
@@ -314,7 +312,7 @@ SUBROUTINES/METHODS
     
         #update with number of rows updated returned
         my $num_rows_updated = $db->raw("UPDATE people SET name=? WHERE id=1", 'Frank');
-     
+    
         #update in undef context, nothing returned.
         $db->raw("UPDATE people SET name=? WHERE id=1", 'Frank');
     
@@ -362,7 +360,7 @@ SUBROUTINES/METHODS
 
         my $people = $db->aoh("SELECT * FROM people");
     
-        for my $person (@$people) { 
+        for my $person (@$people) {
             print "$person->{name} is $person->{age} years old\n";
         }
 
@@ -376,7 +374,7 @@ SUBROUTINES/METHODS
 
         my $people = $db->aoa("SELECT name,age FROM people");
     
-        for my $person (@$people) { 
+        for my $person (@$people) {
             my $name = $person->[0];
             my $age = $person->[1];
             print "$name is $age years old\n";
@@ -402,13 +400,13 @@ SUBROUTINES/METHODS
 
         my $people = $db->hoh(query => "SELECT id, name, age FROM people", key => "id");
     
-        for my $key(keys %$people) { 
+        for my $key(keys %$people) {
             my $person = $people->{$key};
             print "$person->{name} is $person->{age} years old\n";
         }
     
         #or
-        while(my ($key, $person) = each %$people) { 
+        while(my ($key, $person) = each %$people) {
             print "$person->{name} is $person->{age} years old\n";
         }
 
@@ -452,11 +450,11 @@ SUBROUTINES/METHODS
 
         my $hoa = $db->hoa(query => "SELECT id, name FROM people", key => "name", val => "id");
     
-        for my $name (%$hoa) { 
+        for my $name (%$hoa) {
             my $ids = $hoa->{$name};
     
             print "$name has ids ";
-            for my $id (@$ids) { 
+            for my $id (@$ids) {
                 print " $id,";
             }
     
@@ -484,11 +482,11 @@ SUBROUTINES/METHODS
 
         my $hoaoh = $db->hoaoh(query => "SELECT id, name, age FROM people", key => "name");
     
-        for my $name (keys %$hoaoh) { 
+        for my $name (keys %$hoaoh) {
             my $people = $hoaoh->{$name};
     
             print "People named $name: ";
-            for my $person (@$people) { 
+            for my $person (@$people) {
                 print "  $person->{name} is $person->{age} years old\n";
             }
     
@@ -515,7 +513,7 @@ SUBROUTINES/METHODS
         my $ids = $db->array("SELECT id FROM people WHERE name='Susie'");
     
         print "Susie ids: \n";
-        for my $id (@$ids) { 
+        for my $id (@$ids) {
             print "$id\n";
         }
 
@@ -564,7 +562,7 @@ SUBROUTINES/METHODS
     in a hash, where the keys are the column names and the values are the
     new values. This function might be useful for submitting forms easily.
 
-        my %person_to_insert = ( 
+        my %person_to_insert = (
             name => 'Billy',
             age => '32',
             favorite_color => 'blue',
@@ -612,7 +610,7 @@ SUBROUTINES/METHODS
     you want to encrypt instead of the indices for the order in which the
     columns are listed:
 
-        my %person_to_insert = ( 
+        my %person_to_insert = (
             name => 'Billy',
             age => '32',
             favorite_color => 'blue',
@@ -647,7 +645,7 @@ SUBROUTINES/METHODS
     the column names and the values are the new values. This function might
     be useful for submitting forms easily.
 
-        my %updated_person = ( 
+        my %updated_person = (
             name => 'Billy',
             age => '32',
             favorite_color => 'blue',
@@ -668,7 +666,6 @@ SUBROUTINES/METHODS
     updating instead of just the id, you can pass in a where clause:
 
         my $num_rows_updated = $db->update(href => \%updated_person, table => 'people', where => 'name=? AND favorite_color=? AND age=?', vals => ['Joe', 'green', 61]);
-        
 
     Note that any bind values used in a where clause can just be passed
     into the vals as usual. It is possible to use a where clause and an id
@@ -718,7 +715,7 @@ SUBROUTINES/METHODS
     you want to encrypt instead of the indices for the order in which the
     columns are listed:
 
-        my %updated_person = ( 
+        my %updated_person = (
             name => 'Billy',
             age => '32',
             favorite_color => 'blue',
@@ -857,7 +854,7 @@ SUBROUTINES/METHODS
     Or if you update the conf file:
 
         $db->conf('/path/to/new_conf.pl');
-        
+    
         #get new dbh but keep same DBIx::Raw object
         $db->connect;
 

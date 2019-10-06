@@ -46,12 +46,12 @@ f     The FluxFrame class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -96,15 +96,6 @@ f     The FluxFrame class does not define any new routines beyond those
 /* Define the first and last acceptable System values. */
 #define FIRST_SYSTEM AST__FLUXDEN
 #define LAST_SYSTEM AST__SBRIGHTW
-
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E8*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* Define other numerical constants for use in this module. */
 #define GETATTRIB_BUFF_LEN 50
@@ -152,7 +143,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are used or extended by this
    class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstSystemType (* parent_getalignsystem)( AstFrame *, int * );
 static AstSystemType (* parent_getsystem)( AstFrame *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
@@ -220,7 +211,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static AstSpecFrame *GetSpecFrame( AstFluxFrame *, int * );
 static AstSystemType DensitySystem( AstSystemType, int * );
 static AstSystemType GetAlignSystem( AstFrame *, int * );
@@ -748,7 +739,7 @@ static const char *FluxSystemString( AstSystemType system, int *status ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -761,7 +752,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "fluxframe.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     FluxFrame member function (over-rides the astGetObjSize protected
@@ -787,7 +778,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstFluxFrame *this;         /* Pointer to FluxFrame structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
    int i;
 
 /* Initialise. */
@@ -940,7 +931,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
       dval = astGetSpecVal( this );
       if ( astOK ) {
          if( dval != AST__BAD ) {
-            (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+            (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
             result = getattrib_buff;
          } else {
             result = "<bad>";
@@ -2212,7 +2203,7 @@ static int MakeFluxMapping( AstFluxFrame *target, AstFluxFrame *result,
          astTran1( smap_out, 1, &specval, 1, &specval_out );
 
 /* Check they are equal and good. */
-         if( EQUAL( specval_in, specval_out ) && specval_in != AST__BAD ) {
+         if( astEQUALS( specval_in, specval_out, 1.0E8 ) && specval_in != AST__BAD ) {
 
 /* If the siSimplified Mapping is a UnitMap the required rate of change
    factor is 1.0. If it resuts in a ZoomMap, the required factor is
@@ -2529,7 +2520,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *        axis, the corresponding element of this array should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -4452,7 +4443,7 @@ f     function is invoked with STATUS set to an error value, or if it
    if ( !astOK ) return NULL;
 
 /* Obtain and validate a pointer to the SpecFrame structures provided. */
-   sfrm = specfrm_void ? astCheckSpecFrame( astMakePointer( specfrm_void ) ) : NULL;
+   sfrm = specfrm_void ? astVerifySpecFrame( astMakePointer( specfrm_void ) ) : NULL;
 
 /* Initialise the FluxFrame, allocating memory and initialising the virtual
    function table as well if necessary. */

@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.92';
+our $VERSION = '1.93';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -581,10 +581,10 @@ sub _match_any_image_parms {
     # No conditions, anything matches
     return 1 unless keys %$p;
 
-    return if defined $p->{url}           && !($image->url eq $p->{url} );
-    return if defined $p->{url_regex}     && !($image->url =~ $p->{url_regex} );
-    return if defined $p->{url_abs}       && !($image->url_abs eq $p->{url_abs} );
-    return if defined $p->{url_abs_regex} && !($image->url_abs =~ $p->{url_abs_regex} );
+    return if defined $p->{url}           && !(defined($image->url) && $image->url eq $p->{url} );
+    return if defined $p->{url_regex}     && !(defined($image->url) && $image->url =~ $p->{url_regex} );
+    return if defined $p->{url_abs}       && !(defined($image->url_abs) && $image->url_abs eq $p->{url_abs} );
+    return if defined $p->{url_abs_regex} && !(defined($image->url_abs) && $image->url_abs =~ $p->{url_abs_regex} );
     return if defined $p->{alt}           && !(defined($image->alt) && $image->alt eq $p->{alt} );
     return if defined $p->{alt_regex}     && !(defined($image->alt) && $image->alt =~ $p->{alt_regex} );
     return if defined $p->{tag}           && !($image->tag && $image->tag eq $p->{tag} );
@@ -1687,7 +1687,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 SYNOPSIS
 
@@ -1914,7 +1914,7 @@ strict and verbose mode for form handling, which is done with L<HTML::Form>.
 Globally sets the HTML::Form strict flag which causes form submission to
 croak if any of the passed fields don't exist in the form, and/or a value
 doesn't exist in a select element. This can still be disabled in individual
-calls to L<C<< submit_form()|"$mech->submit_form( ... )" >>>.
+calls to C<L<< submit_form()|"$mech->submit_form( ... )" >>>.
 
 Default is off.
 
@@ -2820,7 +2820,7 @@ C<L<< form_name()|"$mech->form_name( $name )" >>>)
 =item * C<< form_id => ID >>
 
 Selects the form with ID I<ID> (calls
-C<L<< form_id()|"$mech->form_id( $name )" >>>)>>)
+C<L<< form_id()|"$mech->form_id( $name )" >>>)
 
 =item * C<< button => button >>
 
@@ -2971,6 +2971,9 @@ Prints a dump of the images on the current page to I<$fh>.  If I<$fh>
 is not specified or is undef, it dumps to STDOUT.
 
 If I<$absolute> is true, links displayed are absolute, not relative.
+
+The output will include empty lines for images that have no C<src> attribute
+and therefore no C<<->url>>.
 
 =head2 $mech->dump_forms( [$fh] )
 

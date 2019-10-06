@@ -6,7 +6,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 cpanfile
 dist.ini
 lib/HTML/Form.pm

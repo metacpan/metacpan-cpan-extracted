@@ -330,3 +330,24 @@ AST__WCSBAD()
  OUTPUT:
   RETVAL
 
+StatusType
+AST__HPX()
+ CODE:
+#ifdef AST__HPX
+    RETVAL = AST__HPX;
+#else
+    Perl_croak(aTHX_ "Constant AST__HPX not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__XPH()
+ CODE:
+#ifdef AST__XPH
+    RETVAL = AST__XPH;
+#else
+    Perl_croak(aTHX_ "Constant AST__XPH not defined\n");
+#endif
+ OUTPUT:
+  RETVAL

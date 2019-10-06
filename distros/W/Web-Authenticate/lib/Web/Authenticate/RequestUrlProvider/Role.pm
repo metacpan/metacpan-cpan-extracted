@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::RequestUrlProvider::Role;
-$Web::Authenticate::RequestUrlProvider::Role::VERSION = '0.011';
+$Web::Authenticate::RequestUrlProvider::Role::VERSION = '0.012';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::RequestUrlProvider::Role object should contain.
 
@@ -19,7 +19,7 @@ Web::Authenticate::RequestUrlProvider::Role - A Mouse::Role that defines what me
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

@@ -27,16 +27,16 @@ requires:
   perl: '5.008'
   strictures: '0'
 resources:
-  bugtracker: https://github.com/srchulo/Short--URL/issues
-  homepage: https://github.com/srchulo/Short--URL
-  repository: https://github.com/srchulo/Short--URL.git
-version: '0.014'
+  bugtracker: https://github.com/srchulo/Short-URL/issues
+  homepage: https://github.com/srchulo/Short-URL
+  repository: https://github.com/srchulo/Short-URL.git
+version: '0.015'
 x_contributors:
   - 'Adam Hopkins <SirChickenHair@srchulo-aire.local>'
   - 'Adam Hopkins <srchulo@Adams-MacBook-Pro.local>'
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
   - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

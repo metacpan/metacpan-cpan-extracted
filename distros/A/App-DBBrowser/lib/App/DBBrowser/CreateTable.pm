@@ -418,11 +418,11 @@ sub __header_row {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $header_row;
-    my ( $first_row, $user_input ) = ( '- First row', '- Add row' );
+    my ( $first_row, $user_input ) = ( '- First row', '- Set temp column names' ); # '- Add row'
     # Choose
     my $choice = $tc->choose(
         [ undef, $first_row, $user_input ],
-        { %{$sf->{i}{lyt_v}}, prompt => 'Header:' }
+        { %{$sf->{i}{lyt_v}}, prompt => 'Column names:' } # 'Header:'
     );
     if ( ! defined $choice ) {
         return;

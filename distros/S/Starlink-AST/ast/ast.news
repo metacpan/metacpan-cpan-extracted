@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V8.0.1) of the Starlink AST (astrometry) library is
+   A new release (V9.0.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -13,10 +13,354 @@ software which needs to manipulate coordinate system data, especially
 celestial coordinate systems. AST is portable and
 environment-independent.
 
+
+
 Main Changes in this Version
 ----------------------------
 
+- Functions such as astResample and astMask that handle grids of data
+values now have alternative interfaces that can handle grids that contain
+more pixels than can be represented in a 4-byte integer. This is achieved
+by using 8-byte integer arguments in place of 4-byte arguments. The names
+of these "8-byte" interfaces are the same as the 4-byte interfaces but
+have the digit "8" appended to the function name (before any trailing data
+type code). These new interfaces are documented in an extra paragraph
+entitled "Handling of Huge Pixel Arrays" attached to the reference
+documentation for each such function.
+
+Note, all C or C++ code that uses AST should be recompiled to pick up
+changes made to the header file ast.h. This should be done even if you do
+not intend to use the new 8-byte interfaces.
+
+
+Main Changes in V8.7.2
+----------------------
+
+- By default, the AST header file "ast.h" is now installed into both
+$STARLINK_DIR/include and $STARLINK_DIR/include/star. The new configure
+option "--without-topinclude" can be used to prevent the header file
+being installed into $STARLINK_DIR/include.
+
+
+Main Changes in V8.7.1
+----------------------
+
+- The Moc class now supports version 1.1 of the the MOC recommendation.
+This includes new support for string and JSON encoded MOCs. See methods
+astGetMocString and astAddMocString in the Moc class, and also the new
+MocChan class.
+
+- The FitsChan class will now read FITS-WCS headers that have
+alternate axis descriptions but no primary axis descriptions.
+
+Main Changes in V8.7.0
+----------------------
+
+-  A new subclass of Region called "Moc" has been added. A Moc
+describes an arbitrary region of the sky in the form of a set of HEALPix
+cells using the IVOA Multi-Order Coverage scheme..
+
+-  The Region class has a new method called astGetRegionDisc, which
+returns the centre and radius of a disc that just encloses a
+2-dimensional Region.
+
+- The Bounded attribute defined by the Region class is now always
+non-zero for Regions defined within a SkyFrame, regardless of whether the
+Region has been negated. Previously, it was non-zero only if the Region
+had not been negated. Note, this change only affects Regions defined
+within SkyFrames.
+
+Main Changes in V8.6.3
+----------------------
+
+- Small memory leaks in Region  and FitsChan classes have been fixed.
+
+-  A bug that could cause an internal buffer overrun within the FitsChan
+class when writing out a FITS-WCS spectral axis with the "-LOG" algorithm
+has been fixed.
+
+- The test that a Mapping conforms to the requirements of the SIP FITS
+distortion scheme has been improved.
+
+- The astRebinSeq method of the Mapping class can now use a different
+weight when pasting each separate input data array into the output mosaic.
+
+Main Changes in V8.6.2
+----------------------
+
+- The astWrite method of the FitsChan class can now create FITS-WCS headers
+that include keyords describing focal plane distortion using the
+conventions of the Spitzer SIP scheme. This is however only possible if
+the SipOK attribute of the FitsChan is set to a non-zero value (which is
+the default), and the FrameSet being written out contains an appropriate
+PolyMap that conforms to the requirements of the SIP convention.
+
+- The behaviour of the astLinearApprox method of the Mapping class has
+been changed in cases where the Mapping being approximated generates bad
+(AST__BAD) values for one or more of its outputs. Previously, any such
+Mapping would be deemed non-linear and no fit would be returned. Now, a
+fit is returned, provided the other outputs of the Mapping are linear,
+but the fit contains AST__BAD values for the coefficients describing the
+bad Mapping output.
+
+- The astRebinSeq<X> functions accepts a new flag, AST__PARWGT, which
+allows the initial weight to be given for the data being pasted into the
+output arrays (the initial weight to use should be include in the "params"
+array). This initial weight defaults to 1.0 if the AST__PARWGT flag is not
+given.
+
+Main Changes in V8.6.1
+----------------------
+
+- A new function call astCreatedAt is now available that returns the function
+name, file path and line number at which an AST object was first created.
+
+- The number of digits used to format floating point values has been
+increased in order to avoid loss of precision when converting from binary
+to string and back to binary. This could cause very small changes in numerical
+values returned by AST functions.
+
+- If a FrameSet is supplied as the "Map" argument to astAddFrame, it now
+extracts and stores the base->current Mapping from the supplied FrameSet.
+Previously, the entire FrameSet was stored as the Mapping.
+
+
+Main Changes in V8.5.1
+----------------------
+
+- A new class of Mapping called ChebyMap has been added. This is a
+Mapping that implements Chebyshev polynomial transformations.
+
+- If the function that delivers error messages to the user (astPutErr) is
+re-implemented, the new version can now be registered at run-time using
+the new astSetPutErr function. Previously, the new version needed to be
+linked into the application at build time.
+
+- A bug has been fixed in the PolyMap class that caused incorrect values
+to be returned for the TranForward and TranInverse attributes if the PolyMap
+has been inverted.
+
+- The KeyMap class has a new method called astMapGetC (AST_MAPGETC) which
+returns a named entry as a single string. If the entry is a vector the
+returned string is a comma-separated list of its elements, enclosed in
+parentheses.
+
+- The Frame class now has a new attribute caled DTAI, which can be used
+to specify the number of leap seconds at the moment represented by the
+Frame's Epoch attribute. By default, the internal look-up table of leap
+seconds contained within AST is used. The DTAI attribute allows old
+versions of AST, which may not include the most recent leap seconds, to
+be used with new data.
+
+- The TimeMap class has been changed so that some conversions now require
+a "Dtai" value (i.e. the number of leap seconds) to be supplied by the
+caller. If AST__BAD is supplied for "Dtai", the internal look-up table of
+leap seconds contained withn AST will be used. The conversions affected
+are those between TAI and UTC, and those between TT and TDB.
+
+Main Changes in V8.3.0
+----------------------
+
+- The PAL library files included in the AST distribution have been updated
+to PAL version 0.9.7.
+
+- Multiple identical NormMaps in series will now be simplified to a
+single NormMap.
+
+- A NormMap that encapsulates a basic Frame will now be simplified to a
+UnitMap.
+
+- The astTimeAdd (AST_TIMEADD) method of the TimeMap class now include an
+extra argument that gives the number of values supplied in the arguments
+array. Note, any existing code that uses this method will need to be
+changed.
+
+- The astSlaAdd (AST_SLAADD) method of the SlaMap class now include an
+extra argument that gives the number of values supplied in the arguments
+array. Note, any existing code that uses this method will need to be
+changed.
+
+- The astSpecAdd (AST_SPECADD) method of the SpecMap class now include an
+extra argument that gives the number of values supplied in the arguments
+array. Note, any existing code that uses this method will need to be
+changed.
+
+- If the astMapRegion (AST_MAPREGION) method is used to map a Region into
+a new Frame that has fewer axes than the original Region, and if the
+inverse transformation of the supplied Mapping does not specify a value
+for the missing axes, then those axes are removed entirely from the
+Region. Previously they were retained, but supplied with bad values. This
+affects the number of mesh points per axes for such Regions, and so
+affects the accuracy of overlap determination.
+
+
+Main Changes in V8.3.0
+----------------------
+
+- A new method called astAxNorm has been added to the Frame class that
+normalises an array of axis values. When used with SkyFrames, it allows
+longitude values to be normalised into the shortest range.
+
+- A bug has been fixed in the Fortran include file AST_PAR that caused constants
+related to PI to be defined as single rather than double precision.
+
+- A bug has been fixed in the astGetRegionBounds method that could
+cause the wrong bounds to be returned for regions spanning a longitude =
+zero singularity.
+
+Main Changes in V8.2.0
+----------------------
+
+- A new class of Mapping called UnitNormMap has been added that converts a
+vector to a unit vector relative to a specified centre, plus length. A
+UnitNormMap has N inputs and N+1 outputs.The lower N output coordinates
+represent a unit vector parallel to the supplied input vector, and the
+(N+1)'th output coordinate is the length of the input vector.
+
+- The restriction that Mappings are immutable has been extended to all
+Mapping classes. This means that attributes representing parameters of
+a Mapping's forward or inverse transformation cannot be changed after
+the Mapping has been created. In order to minimise the risk to existing
+software, this rule does not apply to Mappings that have not yet been
+included in other objects such as CmpMaps or FrameSets, or which have not
+yet been cloned. In other words, an error is reported if an attempt is
+made to change the nature of a Mapping's transformation, but only if the
+reference count of the Mapping is greater than one. The Mapping classes
+affected include: GrismMap, LutMap, PcdMap, SphMap, WcsMap and ZoomMap.
+
+
+Main Changes in V8.1.0
+----------------------
+
+- The configure script has a new option "--without-fortran" that allows
+AST to be built in situations where no Fortran compiler is available. The
+resulting library has no Fortran interface and so cannot be used within
+Fortran applications. Also, the link scripts do not attempt to include the
+fortran runtime libraries.
+
+Main Changes in V8.0.7
+----------------------
+
+- A bug in FitsChan has been fixed which could cause a small shift in
+  spectral axis value when writing out a spectral cube to FITS-WCS headers,
+  This shift occurred only if the celestial axes in the cube were not FK5
+  (RA,Dec).
+
+- Avoid some more compiler warnings.
+
+- A "BadKeyValue" warning is now issued by the FitsChan class if an illegal
+FITS keyword value is encountered. See attribute "Warnings" and function
+"astWarnings".
+
+Main Changes in V8.0.6
+----------------------
+
+- Fix bug in FitsChan that caused SIP headers to be treated as linear
+when creating a FrameSet from the headers.
+
+- Fix bug in LutMap that incorrectly allowed an inverse lutmap to be used
+even if the original LutMap was not monotonic.
+
+- Allow attributes to be set for each plane of a Plot3D.
+
+- Avoid some compiler warnings.
+
+Main Changes in V8.0.5
+----------------------
+
+- The SkyFrame class has a new attribute called SkyTol, which specifies
+the smallest significant distance within the SkyFrame. It is used to
+decide if the Mapping between two SkyFrames can be considered a unit
+transformation. The default value is 0.001 arc-seconds.
+
+- A bug has been fixed in the FitsChan class that prevented illegal
+characters within FITS keyword names (i.e. characters not allowed by the
+FITS standard) being detected. This bug could under some circumstances
+cause a subsequent segmentation violation to occur.
+
+- A "BadKeyName" warning is now issued by the FitsChan class if a FITS
+keyword name is encountered that contains any illegal characters. See
+attribute "Warnings" and function "astWarnings".
+
+Main Changes in V8.0.4
+----------------------
+
+- The behaviour of the astAddFrame method has been changed slightly.
+Previously, astAddFrame modified the FrameSet by storing references to
+the supplied Mapping and Frame objects within the FrameSet. This meant
+that any subsequent changes to the current Frame of the modified FrameSet
+also affected the supplied Frame object. Now, astAddFrame stores deep
+copies of the Mapping and Frame objects (rather than references) within
+the modified FrameSet. This means that subsequent changes to the modified
+FrameSet will now have no effect on the supplied Frame.
+
+- The choice of default tick-mark for time axes has been improved, to avoid
+previous issues which could result in no suitable gap being found, or
+inappropriate tick marks when using formatted dates.
+
+- A new method called astRegionOutline has been added to the Plot class.
+It draws the outline of a supplied AST Region.
+
+- A bug has been fixed that could cause astSimplfy to enter an infinite loop.
+
+- Some improvements have been made to the Mapping simplification process
+that allow more Mappings to be simplified.
+
+- The Frame class has a new read-only attribute called "InternalUnit",
+which gives the units used for the unformatted (i.e. floating-point) axis
+values used internally by application code. For most Frames, the
+InternalUnit value is just the same as the Unit value (i.e. formatted and
+unformatted axis values use the same units). However, the SkyFrame class
+always returns "rad" for InternalUnit, regardless of the value of Unit,
+indicating that floating-point SkyFrame axis values are always in units
+of radians.
+
+- The LutMap class has a new attribute called LutEpsilon, which specifies
+the relative error of the values in the table. It is used to decide if
+the LutMap can be simplified to a straight line.
+
+
+Main Changes in V8.0.3
+----------------------
+
+- Methods astRebin, astRebinSeq, astResample and astTranGrid now report an
+error if an array is specified that has more pixels than can be counted by
+a 32 bit integer.
+
+- The hypertext documentation is now generated using Tex4HT rather
+than latex2html. The format of the hypertext docs has changed
+significantly.
+
+- Another bug fix associated with reading CAR projections from FITS-WCS headers.
+
+- Constructor options strings of the form "..., "%s", text );" can now be
+supplied. This avoids a security issue associated with the alternative
+form "..., text );".
+
+
+Main Changes in V8.0.2
+----------------------
+
+- For security reasons, the change introduced to astAppendString in
+  V8.0.1 has been moved to a new function called astAppendStringf, and
+  astAppendString itself has been reverted to its V8.0.0 version.
+
+
+Main Changes in V8.0.1
+----------------------
+
+- The macro used to invoke the astAppendString utility function has
+  changed to allow printf-style converstions to be included in the
+  supplied text. Any code that uses this macro must be re-compiled.
+
+- The astRebin and astRebinSeq family of functions now include support
+  for arrays with char (byte) and unsigned char (unsigned byte) data types.
+
+- The Base and Current attributes of a FrameSet may now be set using the
+  Domain name or the index of the required Frame.
+
 - The FITS XPH projection is now supported.
+
 - The order of WCS axes within new FITS-WCS headers created by astWrite
   can now be controlled using a new attribute called FitsAxisOrder.
 

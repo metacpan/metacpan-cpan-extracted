@@ -2,4 +2,12 @@ Revision history for Date::Fmtstr2time
 
 1.00    2016-01-09
         First version, released on an unsuspecting world.
-
+1.10    2019-10-02
+        - Added several new format strings.
+        - Fixed several major and minor bugs / issues.
+        - Greatly improved data validation and error messages / handling.
+        - Partial date specifications should now return a valid default 
+        date/time values based on the current date/time.
+        - Cleaned up the docs quite a bit.
+1.11    2019-10-05
+        - Some doc. cleanups / polishing.

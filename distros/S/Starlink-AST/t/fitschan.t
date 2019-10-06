@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 12;
+use Test::More tests => 22;
 
 require_ok("Starlink::AST");
 
@@ -24,9 +24,21 @@ is( $fchan->Get( "Encoding" ), "FITS-WCS",
 # number of cards in the FitsChan
 is ( $fchan->Get( "Ncard" ), 38, "Number of cards in FitsChan" );
 
+my ($found, $there) = $fchan->TestFits('NAXIS');
+ok($found);
+ok($there);
+($found, $there) = $fchan->TestFits('NAXIS999');
+ok(! $found);
+ok(! $there);
+
 # Get FrameSet
 my $wcsinfo = $fchan->Read();
 isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
+
+is ( $fchan->Get( "Ncard" ), 30, "Number of cards remaining after read" );
+$fchan->EmptyFits();
+is ( $fchan->Get( "Ncard" ), 0, "Number of cards remaining after empty" );
+$fchan->PurgeWCS();
 
 # Mappings
 # --------
@@ -60,6 +72,23 @@ is( $$xworld[0], 0, "Reverse mapping of lower bound X co-ordinate" );
 is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" );
 is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
+
+# Test handling of tables.
+$fchan = new Starlink::AST::FitsChan();
+my $ftable = new Starlink::AST::FitsTable(undef, '');
+
+$fchan->PutTable($ftable, 'MYTABLE');
+my $tables = $fchan->GetTables();
+isa_ok($tables, 'Starlink::AST::KeyMap');
+ok($tables->MapHasKey('MYTABLE'));
+$fchan->RemoveTables('MYTABLE');
+
+$fchan->SetFitsU('XXYYZZ', '', 0);
+($found, $there) = $fchan->TestFits('XXYYZZ');
+ok(! $found);
+ok($there);
+$fchan->RetainFits();
+$fchan->SetFitsCM('A comment', 0);
 
 # Done!
 exit;

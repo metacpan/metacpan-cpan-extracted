@@ -48,11 +48,17 @@ sub apply_permissions {
         allow_add => 0,
         allow_edit => 0
       );
+      
+      
     
     }
     else {
       # Deny all changes except to the user's own account:
       $self->_perm_deny_all_changes;
+      
+      # And deny 
+      my @deny_columns = qw/email admin author comment disabled set_pw preauth_actions/;
+      $self->apply_colspec_columns(\@deny_columns, no_column => 1);
     }
   }
   else {

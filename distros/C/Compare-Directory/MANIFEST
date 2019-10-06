@@ -6,10 +6,10 @@ Changes
 README
 lib/Compare/Directory.pm
 t/00-load.t
-t/manifest.t
-t/pod.t
-t/meta-json.t
-t/meta-yml.t
+xt/manifest.t
+xt/pod.t
+xt/meta-json.t
+xt/meta-yml.t
 t/unit-test-01.t
 t/exp-1/CSV.csv
 t/exp-1/PDF.pdf

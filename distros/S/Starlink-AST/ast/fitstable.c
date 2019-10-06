@@ -64,12 +64,12 @@ f     - AST_PUTTABLEHEADER: Store FITS headers within a FitsTable
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -130,7 +130,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
 static int (* parent_equal)( AstObject *, AstObject *, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static void (* parent_addcolumn)( AstTable *, const char *, int, int, int *, const char *, int * );
 
 #if defined(THREAD_SAFE)
@@ -177,7 +177,7 @@ static AstFitsChan *GetTableHeader( AstFitsTable *, int * );
 static char *MakeKey( const char *, int, char *, int, int * );
 static int ColumnNull( AstFitsTable *, const char *, int, int, int *, int *, int * );
 static int Equal( AstObject *, AstObject *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static size_t ColumnSize( AstFitsTable *, const char *, int * );
 static void AddColumn( AstTable *, const char *, int, int, int *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -1415,7 +1415,7 @@ f     AST_COLUMNNULL functiom.
    *nelem = nel*nrow;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1428,7 +1428,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "fitstable.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     FitsTable member function (over-rides the astGetObjSize protected
@@ -1454,7 +1454,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstFitsTable *this;            /* Pointer to FitsTable structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
 
 /* Initialise. */
    result = 0;
@@ -2682,7 +2682,7 @@ AstFitsTable *astFitsTableId_( void *header_void, const char *options, ... ) {
 
 /* Obtain a FitsChan pointer from any ID supplied and validate the
    pointer to ensure it identifies a valid FitsChan. */
-   header = header_void ? astCheckFitsChan( astMakePointer( header_void ) ) : NULL;
+   header = header_void ? astVerifyFitsChan( astMakePointer( header_void ) ) : NULL;
 
 /* Initialise the FitsTable, allocating memory and initialising the
    virtual function table as well if necessary. */

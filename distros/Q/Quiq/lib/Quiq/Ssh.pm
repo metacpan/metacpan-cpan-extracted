@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.158';
+our $VERSION = '1.159';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -244,7 +244,7 @@ sub exec {
 
 =head1 VERSION
 
-1.158
+1.159
 
 =head1 AUTHOR
 

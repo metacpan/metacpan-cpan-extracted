@@ -241,7 +241,7 @@ execute 'show latitude', 'set latitude 51.4772', 'Latitude value';
 execute 'set longitude 18:51:50', undef,
     'Longitude in right ascension notation, just to test parse';
 
-execute 'show longitude', 'set longitude 282.958',
+execute 'show longitude', 'set longitude -77.042',
     'Confirm results of right ascenscion parse';
 
 execute 'set longitude 0', undef, 'Set longitude';

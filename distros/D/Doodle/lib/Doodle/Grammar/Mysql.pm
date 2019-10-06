@@ -6,7 +6,7 @@ use Data::Object 'Class', 'Doodle::Library';
 
 extends 'Doodle::Grammar';
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 has name => (
   def => 'mysql',

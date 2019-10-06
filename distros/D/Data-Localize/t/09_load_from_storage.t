@@ -1,7 +1,9 @@
 use strict;
 use utf8;
 use Test::More;
+use Cwd ();
 BEGIN {
+    unshift @INC, Cwd::abs_path();
     eval {
         require BerkeleyDB;
         require Config::Any;

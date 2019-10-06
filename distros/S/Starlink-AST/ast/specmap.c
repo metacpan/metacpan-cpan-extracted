@@ -70,12 +70,12 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -105,6 +105,9 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *        classes.
 *     2-OCT-2012 (DSB):
 *        Check for Infs as well as NaNs.
+*     1-DEC-2016 (DSB):
+*        Added a "narg" argumeent to astSpecAdd.
+
 *class--
 */
 
@@ -164,15 +167,6 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 #define D2R (PI/180.0)
 #define R2D (180.0/PI)
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -208,7 +202,7 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double (* parent_rate)( AstMapping *, double *, int, int, int * );
 
@@ -283,13 +277,13 @@ static int Equal( AstObject *, AstObject *, int * );
 static int FrameChange( int, int, double *, double *, double *, double *, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int SystemChange( int, int, double *, double *, int, int * );
-static void AddSpecCvt( AstSpecMap *, int, const double *, int * );
+static void AddSpecCvt( AstSpecMap *, int, int, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void SpecAdd( AstSpecMap *, const char *, const double[], int * );
+static void SpecAdd( AstSpecMap *, const char *, int, const double[], int * );
 
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -407,7 +401,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -420,7 +414,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "specmap.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SpecMap member function (over-rides the astGetObjSize protected
@@ -446,7 +440,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstSpecMap *this;         /* Pointer to SpecMap structure */
-   int result;               /* Result value to return */
+   size_t result;            /* Result value to return */
    int cvt;                  /* Loop counter for coordinate conversions */
 
 /* Initialise. */
@@ -477,7 +471,8 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    return result;
 }
 
-static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *status ) {
+static void AddSpecCvt( AstSpecMap *this, int cvttype, int narg,
+                        const double *args, int *status ) {
 /*
 *  Name:
 *     AddSpecCvt
@@ -490,7 +485,8 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *
 
 *  Synopsis:
 *     #include "specmap.h"
-*     void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args )
+*     void AddSpecCvt( AstSpecMap *this, int cvttype, int narg,
+*                      const double *args )
 
 *  Class Membership:
 *     SpecMap member function.
@@ -513,6 +509,8 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *
 *        A code to identify which spectral coordinate conversion is to be
 *        appended.  See the "Coordinate Conversions" section for details
 *        of those available.
+*     narg
+*        The number of argument values supplied in "args".
 *     args
 *        Pointer to an array of double containing the argument values
 *        required to fully specify the required coordinate
@@ -666,6 +664,13 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *
       astError( AST__SPCIN, "AddSpecCvt(%s): Invalid spectral coordinate "
                 "conversion type (%d).", status, astGetClass( this ),
                 (int) cvttype );
+   }
+
+/* If the number of supplied arguments is incorrect, then report an error. */
+   if ( astOK && nargs != narg ) {
+      astError( AST__TIMIN, "AddSpecCvt(%s): Invalid no. of arguments for spectral "
+                "coordinate conversion type %d - %d supplied, %d required.",
+                status, astGetClass( this ), (int) cvttype, narg, nargs );
    }
 
 /* Note the number of coordinate conversions already stored in the SpecMap. */
@@ -2217,7 +2222,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    double (*cvtargs)[ MAX_ARGS ]; /* Pointer to argument arrays */
    double tmp;                   /* Temporary storage */
    int *cvttype;                 /* Pointer to transformation type codes */
-   int *szarg;                   /* Pointer to argument count array */
+   int *narg;                    /* Pointer to argument count */
+   int *szarg;                   /* Pointer to argument array size */
    int argdec;                   /* Index of DEC argument */
    int argra;                    /* Index of RA argument */
    int done;                     /* Finished (no further simplification)? */
@@ -2233,7 +2239,6 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int invert;                   /* SpecMap applied in inverse direction? */
    int istep;                    /* Loop counter for transformation steps */
    int keep;                     /* Keep transformation step? */
-   int narg;                     /* Number of user-supplied arguments */
    int ngone;                    /* Number of Mappings eliminated */
    int nin;                      /* Numbr of axes for SpecMaps being merged */
    int nstep0;                   /* Original number of transformation steps */
@@ -2290,6 +2295,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       cvttype = astMalloc( sizeof( int ) * (size_t) nstep );
       cvtargs = astMalloc( sizeof( double[ MAX_ARGS ] ) * (size_t) nstep );
       szarg = astMalloc( sizeof( int ) * (size_t) nstep );
+      narg = astMalloc( sizeof( int ) * (size_t) nstep );
 
 /* Loop to obtain the transformation data for each SpecMap being merged. */
       nstep = 0;
@@ -2314,7 +2320,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the associated number of arguments. Then store these arguments. */
             cvttype[ nstep ] = specmap->cvttype[ icvt ];
             (void) CvtString( cvttype[ nstep ], &comment, &argra, &argdec,
-                              &narg, szarg + nstep, argdesc, status );
+                              narg + nstep, szarg + nstep, argdesc, status );
             if ( !astOK ) break;
             for ( iarg = 0; iarg < szarg[ nstep ]; iarg++ ) {
                cvtargs[ nstep ][ iarg ] = specmap->cvtargs[ icvt ][ iarg ];
@@ -2457,7 +2463,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Now check for conversions which have a single user-supplied argument. */
                } else if( PAIR_CVT2( AST__FRTOVL, AST__VLTOFR ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2467,9 +2473,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                             PAIR_CVT2( AST__LDF2HL, AST__HLF2LD ) ||
                             PAIR_CVT2( AST__LGF2HL, AST__HLF2LG ) ||
                             PAIR_CVT2( AST__GLF2HL, AST__HLF2GL ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2478,11 +2484,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if( ( PAIR_CVT2( AST__GEF2HL, AST__HLF2GE ) ||
                             PAIR_CVT2( AST__BYF2HL, AST__HLF2BY ) ||
                             PAIR_CVT2( AST__USF2HL, AST__HLF2US ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2490,17 +2496,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Now check for conversions which have six user-supplied arguments (currently
    no conversions have four or five user-supplied arguments). */
                } else if( ( PAIR_CVT2( AST__TPF2HL, AST__HLF2TP ) ) &&
-                          EQUAL( cvtargs[ istep ][ 0 ],
+                          astEQUAL( cvtargs[ istep ][ 0 ],
                                  cvtargs[ istep + 1 ][ 0 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 1 ],
+                          astEQUAL( cvtargs[ istep ][ 1 ],
                                  cvtargs[ istep + 1 ][ 1 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 2 ],
+                          astEQUAL( cvtargs[ istep ][ 2 ],
                                  cvtargs[ istep + 1 ][ 2 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 3 ],
+                          astEQUAL( cvtargs[ istep ][ 3 ],
                                  cvtargs[ istep + 1 ][ 3 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 4 ],
+                          astEQUAL( cvtargs[ istep ][ 4 ],
                                  cvtargs[ istep + 1 ][ 4 ] ) &&
-                          EQUAL( cvtargs[ istep ][ 5 ],
+                          astEQUAL( cvtargs[ istep ][ 5 ],
                                  cvtargs[ istep + 1 ][ 5 ] ) ) {
                   istep++;
                   keep = 0;
@@ -2526,6 +2532,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      cvtargs[ ikeep ][ iarg ] = cvtargs[ istep ][ iarg ];
                   }
                   szarg[ ikeep ] = szarg[ istep ];
+                  narg[ ikeep ] = narg[ istep ];
                }
             }
          }
@@ -2572,7 +2579,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                new = (AstMapping *) astSpecMap( nin, 0, "", status );
                for ( istep = 0; istep < nstep; istep++ ) {
                   AddSpecCvt( (AstSpecMap *) new, cvttype[ istep ],
-                             cvtargs[ istep ], status );
+                             narg[ istep ], cvtargs[ istep ], status );
                }
             }
 
@@ -2614,6 +2621,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       cvttype = astFree( cvttype );
       cvtargs = astFree( cvtargs );
       szarg = astFree( szarg );
+      narg = astFree( narg );
    }
 
 /* If an error occurred, clear the returned value. */
@@ -2834,7 +2842,8 @@ static double Rverot( double phi, double h, double ra, double da,
    return -palDvdv( v, pv + 3 )*149.597870E6;
 }
 
-static void SpecAdd( AstSpecMap *this, const char *cvt, const double args[], int *status ) {
+static void SpecAdd( AstSpecMap *this, const char *cvt, int narg,
+                     const double args[], int *status ) {
 /*
 *++
 *  Name:
@@ -2849,8 +2858,9 @@ f     AST_SPECADD
 
 *  Synopsis:
 c     #include "specmap.h"
-c     void astSpecAdd( AstSpecMap *this, const char *cvt, const double args[] )
-f     CALL AST_SPECADD( THIS, CVT, ARGS, STATUS )
+c     void astSpecAdd( AstSpecMap *this, const char *cvt, int narg,
+c                      const double args[] )
+f     CALL AST_SPECADD( THIS, CVT, NARG, ARGS, STATUS )
 
 *  Class Membership:
 *     SpecMap method.
@@ -2895,6 +2905,11 @@ f        A character string which identifies the
 *        spectral coordinate conversion to be added to the
 *        SpecMap. See the "Available Conversions" section for details of
 *        those available.
+c     narg
+f     NARG = INTEGER (Given)
+*        The number of argument values supplied in the
+c        "args" array.
+f        ARGS array.
 c     args
 f     ARGS( * ) = DOUBLE PRECISION (Given)
 *        An array containing argument values for the spectral
@@ -3038,7 +3053,7 @@ f     these arguments should be given, via the ARGS array, in the
    }
 
 /* Add the new conversion to the SpecMap. */
-   AddSpecCvt( this, cvttype, args, status );
+   AddSpecCvt( this, cvttype, narg, args, status );
 }
 
 static int SystemChange( int cvt_code, int np, double *values, double *args,
@@ -4670,9 +4685,10 @@ AstSpecMap *astLoadSpecMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-void astSpecAdd_( AstSpecMap *this, const char *cvt, const double args[], int *status ) {
+void astSpecAdd_( AstSpecMap *this, const char *cvt, int narg,
+                  const double args[], int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,SpecMap,SpecAdd))( this, cvt, args, status );
+   (**astMEMBER(this,SpecMap,SpecAdd))( this, cvt, narg, args, status );
 }
 
 

@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.040';
+our $VERSION = '0.041';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -560,10 +560,10 @@ The supported values are:
 
 =item complaint
 
-This specifies how to report errors if C<load_package()> is called as a
-method. Valid values are C<'whinge'>, C<'wail'>, and C<'weep'>. An
-invalid value is equivalent to C<'weep'>, which is the default. If not
-called as a method, this option is ignored and a call to
+This specifies how to report invalid module names if C<load_package()>
+is called as a method. Valid values are C<'whinge'>, C<'wail'>, and
+C<'weep'>. An invalid value is equivalent to C<'weep'>, which is the
+default. If not called as a method, this option is ignored and a call to
 C<Carp::confess()> is done.
 
 =item fatal

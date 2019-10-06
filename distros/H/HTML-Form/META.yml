@@ -26,31 +26,31 @@ no_index:
 provides:
   HTML::Form:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::FileInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::IgnoreInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::ImageInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::Input:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::KeygenInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::ListInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::SubmitInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
   HTML::Form::TextInput:
     file: lib/HTML/Form.pm
-    version: '6.04'
+    version: '6.05'
 requires:
   Carp: '0'
   Encode: '2'
@@ -64,10 +64,10 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#lwp
   MailingList: mailto:libwww@perl.org
-  bugtracker: https://github.com/libwww-perl/html-form/issues
-  homepage: https://github.com/libwww-perl/html-form
-  repository: https://github.com/libwww-perl/html-form.git
-version: '6.04'
+  bugtracker: https://github.com/libwww-perl/HTML-Form/issues
+  homepage: https://github.com/libwww-perl/HTML-Form
+  repository: https://github.com/libwww-perl/HTML-Form.git
+version: '6.05'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -112,8 +112,8 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
-          version: '0.004'
+          Module::Metadata: '1.000036'
+          version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
     -
@@ -136,7 +136,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.20.1
+          git_version: 2.23.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -161,8 +161,12 @@ x_Dist_Zilla:
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
       name: InstallGuide
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
@@ -253,8 +257,11 @@ x_Dist_Zilla:
       version: '0.006'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
+      config:
+        Dist::Zilla::Plugin::Test::MinimumVersion:
+          max_target_perl: ~
       name: Test::MinimumVersion
-      version: '2.000008'
+      version: '2.000010'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
@@ -291,7 +298,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.23.0
           repo_root: .
       name: Git::Check
       version: '2.046'
@@ -391,7 +398,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -404,11 +411,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.04
+          tag: v6.05
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -445,7 +452,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -459,7 +466,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.23.0
           repo_root: .
       name: Git::Push
       version: '2.046'
@@ -545,6 +552,8 @@ x_contributors:
   - 'Jacob J <waif@chaos2.org>'
   - 'jefflee <shaohua@gmail.com>'
   - 'john9art <john9art@yahoo.com>'
+  - 'Julien Fiegehenn <simbabque@cpan.org>'
+  - 'Lance Wicks <lw@judocoach.com>'
   - 'Lukas Mai <l.mai@web.de>'
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Mark Stosberg <MARKSTOS@cpan.org>'
@@ -574,4 +583,4 @@ x_contributors:
   - 'Yuri Karaban <tech@askold.net>'
   - 'Zefram <zefram@fysh.org>'
 x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

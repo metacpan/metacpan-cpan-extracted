@@ -6,9 +6,9 @@ use warnings;
 
 use base 'DateTime';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
-our %strftime_patterns;
+our (%strftime_patterns, %sub_format, @ORDINALS, @NTT);
 BEGIN {
 	for my $sub (qw/
 		month
@@ -57,7 +57,7 @@ BEGIN {
 		week_of_month
 	/) {
 		no strict 'refs';
-				*{"${sub}"} = sub {
+		*{"${sub}"} = sub {
 			_sub($sub, @_);
 		};
 	}
@@ -129,11 +129,70 @@ BEGIN {
 		'Z' => sub { $_[0]->{tz}->short_name_for_datetime( $_[0] ) },
 		'%' => sub {'%'},
 	);
-
 	$strftime_patterns{h} = $strftime_patterns{b};
+	@ORDINALS = qw/th st nd rd/;
+	@NTT = (
+		[
+			'',
+			['one', 'first'],
+			['two', 'second'],
+			['three', 'third'],
+			['four', 'fourth'],
+			['five', 'fifth'],
+			['six', 'sixth'],
+			['seven', 'seventh'],
+			['eight', 'eighth'],
+			['nine', 'ninth'],
+			['ten', 'tenth'],
+			['eleven', 'eleventh'],
+			['twelve', 'twelfth'],
+			['thirteen', 'thirteenth'],
+			['fourteen', 'fourteenth'],
+			['fifthteen', 'fifthteenth'],
+			['sixteen', 'sixteenth'],
+			['seventeen', 'seventeenth'],
+			['eighteen', 'eighteenth'],
+			['nineteen', 'nineteenth'],
+		],
+		[
+			'',
+			'',
+			['twenty', 'twentieth'],
+			['thirty', 'thirtieth'],
+			['forty', 'fortieth'],
+			['fifty', 'fiftieth'],
+			['sixty', 'sixtieth'],
+			['seventy', 'seventieth'],
+			['eighty', 'eightieth'],
+			['ninety', 'nintieth']
+		],
+		'hundred',
+		'thousand',
+		'million',
+		'billion',
+		'trillion',
+		'quadrillion',
+		'quintillion',
+		'sextillion',
+		'septillion',
+		'octillion'
+	);
+	%sub_format = (
+		f => sub { _num2text(shift) },
+		o => sub { _ordinal(shift) },
+		of => sub { _num2text(shift, 1) },
+		oe => sub { _ordinal(shift, 1) }
+	);
 }
 
 sub quarter_0 { _sub('quarter_0', $_[0], $_[1], 4); }
+
+sub import {
+	my ($package, %args) = @_;
+	set_sub_format($args{sub_format}) if ($args{sub_format});
+}
+
+sub set_sub_format { %sub_format = (%sub_format, %{$_[0]}); }
 
 sub strftime {
 	my $self = shift;
@@ -167,15 +226,68 @@ sub strftime {
 	return @r;
 }
 
+sub strptime {
+	require DateTime::Format::Strptime;
+	DateTime::Ordinal->from_object(object => DateTime::Format::Strptime->new(
+		on_error => 'croak',
+		pattern => $_[1],
+		($_[3] ? %{$_[3]} : ())
+	)->parse_datetime($_[2])); 
+}
+
 sub _sub {
 	my ($orig, $self, $ordinal, $default) = @_;
 	$orig = "SUPER::$orig";
 	my $val = $self->$orig || $default || 0;
-	return $ordinal && $val ? _ordinal($val) : $val;
+	return $sub_format{$ordinal || ''} && $val ? $sub_format{$ordinal}->($val, $self) : $val;
 }
 
 sub _ordinal {
-	return $_[1] ? '' : $_[0] . [qw/th st nd rd/]->[$_[0] =~ m{(?<!1)([123])$} ? $1 : 0];
+	return $_[1] ? '' : $_[0] . $ORDINALS[$_[0] =~ m{(?<!1)([123])$} ? $1 : 0];
+}
+
+sub _num2text {
+	my ($ns, $l, $o, @n2t) = ('', 3, ($_[1] ? -1 : 0), reverse(split('', $_[0])));
+	my $hundred = sub {
+		my ($string, $ord, @trip) = ('', @_, 0, 0, 0);
+		if ($trip[1] > 1) {
+			for (0, 1) {
+				$string = sprintf(
+					"%s%s",
+					$NTT[$_][$trip[$_]][$string ? 0 : $ord],
+					($string ? '-' . $string : '')
+				) if $trip[$_];
+			}
+		} elsif ($trip[0] || $trip[1]) { $string = $NTT[0][$trip[1] . $trip[0]][$ord]; }
+		$string = sprintf(
+			"%s %s%s",
+			$NTT[0][$trip[2]][0],
+			$NTT[2],
+			($string ? ' and ' . $string : ($ord != 0 ? 'th' : ''))
+		) if $trip[2];
+		return $string;
+	};
+	$ns = $hundred->($o, splice(@n2t, 0, 3));
+	while (@n2t) {
+		my $h = $hundred->(0, splice(@n2t, 0, 3));
+		$ns = sprintf(
+			"%s %s%s",
+			$h,
+			$NTT[$l],
+			($ns
+				? ($ns =~ m/and/
+					? ', '
+					: ' and '
+				) . $ns
+				: ($o == 0
+					? ''
+					:'th'
+				)
+			)
+		) if $h;
+		$l++;
+	}
+	return $ns;
 }
 
 1; # End of DateTime::Ordinal
@@ -188,7 +300,7 @@ DateTime::Ordinal - The great new DateTime::Ordinal!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -199,28 +311,59 @@ Quick summary of what the module does.
 	use DateTime::Ordinal;
 
 	my $dt = DateTime::Ordinal->new(
-		year       => 3000,
-		month      => 4,
-		day        => 1,
-		hour       => 2,
-		minute     => 3,
-		second     => 4,
+		year	=> 3000,
+		month 	=> 4,
+		day	=> 1,
+		hour	=> 2,
+		minute	=> 3,
+		second	=> 4,
 	);
 
-	$dt->day	# 1
-	$dt->day(1)	# 1st
+	$dt->day		# 1
+	$dt->day('o')		# 1st
+	$dt->day('f')		# one
+	$dt->day('of')		# first
 
-	$dt->hour	# 2
-	$dt->hour(1)	# 2nd
+	$dt->hour		# 2
+	$dt->hour('o')		# 2nd
+	$dt->hour('f')  	# two
+	$dt->hour('of') 	# second
 
-	$dt->minute	# 3
-	$dt->minute(1)	# 3rd
+	$dt->minute		# 3
+	$dt->minute('o')	# 3rd
+	$dt->minute('f')	# three
+	$dt->minute('of')	# third
 
-	$dt->second	# 4
-	$dt->second(1) 	# 4th
+	$dt->second		# 4
+	$dt->second('o')	# 4th
+	$dt->second('f')	# four
+	$dt->second('of')	# fourth
 
-	$dt->strftime("It's the %M(o) minute of the %H(o) hour on the %j(o) day into the %m(0) month within the %Y(o) year");
-	# "It's the 3rd minute of the 2nd hour on the 1st day into the 4th month within the 3000th year");
+	$dt->strftime("It's the %M(of) minute of the %H(o) hour on day %d(f) in the %m(of) month within the year %Y(f)");
+	# "It's the third minute of the 2nd hour on day one in the fourth month within the year three thousand");
+
+	...
+
+	use Lingua::ITA::Numbers
+	use DateTime::Ordinal (
+		sub_format => {
+			f => sub {
+				my $number = Lingua::ITA::Numbers->new(shift);
+				return $number->get_string;
+			}
+		}
+	);
+
+	my $dt = DateTime::Ordinal->new(
+		hour	=> 1,
+		minute	=> 2,
+		second	=> 3,
+		locale  => 'it'
+	);
+
+	$dt->hour('f')  	# uno
+	$dt->minute('f')	# due
+	$dt->second('f')	# tre
 
 =head1 SUBROUTINES/METHODS
 
@@ -403,6 +546,10 @@ Quick summary of what the module does.
 =cut
 
 =head2 week_of_month
+
+=cut
+
+=head2 strptime
 
 =cut
 

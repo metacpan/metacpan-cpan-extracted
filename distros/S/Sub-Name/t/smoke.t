@@ -3,7 +3,7 @@ use warnings;
 
 BEGIN { $^P |= 0x210 }
 
-use Test::More 0.88;
+use Test::More tests => 10;
 use Sub::Name;
 
 my $x = subname foo => sub { (caller 0)[3] };
@@ -40,5 +40,4 @@ for ("Blork:: Bar!", "Foo::Bar::Baz") {
     ::is($DB::sub{$_}, $anon);
 }
 
-::done_testing;
 # vim: ft=perl

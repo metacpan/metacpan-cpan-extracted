@@ -1,4 +1,8 @@
 use strict;
+use Cwd ();
+BEGIN {
+    unshift @INC, Cwd::abs_path()
+}
 use utf8;
 use Test::More tests => 12;
 use File::Spec;

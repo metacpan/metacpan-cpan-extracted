@@ -625,3 +625,59 @@
       INTEGER AST__MNPCK
       PARAMETER ( AST__MNPCK = 233934394 )
 
+*     Supplied array has too many pixels
+      INTEGER AST__EXSPIX
+      PARAMETER ( AST__EXSPIX = 233934402 )
+
+*     No mapping found between coordinate systems
+      INTEGER AST__NOCNV
+      PARAMETER ( AST__NOCNV = 233934410 )
+
+*     Attempt to change an immutable attribute
+      INTEGER AST__IMMUT
+      PARAMETER ( AST__IMMUT = 233934418 )
+
+*     No bounding box available
+      INTEGER AST__NOBOX
+      PARAMETER ( AST__NOBOX = 233934426 )
+
+*     Supplied Frame has no sky coordinate axes
+      INTEGER AST__NOSKY
+      PARAMETER ( AST__NOSKY = 233934434 )
+
+*     Sky axes cannot be separated from other axes
+      INTEGER AST__BDSKY
+      PARAMETER ( AST__BDSKY = 233934442 )
+
+*     Wrong class of object supplied
+      INTEGER AST__BDCLS
+      PARAMETER ( AST__BDCLS = 233934450 )
+
+*     Class does not implement the invoked method
+      INTEGER AST__NOIMP
+      PARAMETER ( AST__NOIMP = 233934458 )
+
+*     Normalised MOC is too big
+      INTEGER AST__BGMOC
+      PARAMETER ( AST__BGMOC = 233934466 )
+
+*     Invalid argument value supplied to an AST method
+      INTEGER AST__INVAR
+      PARAMETER ( AST__INVAR = 233934474 )
+
+*     Invalid string-encoded MOC
+      INTEGER AST__INMOC
+      PARAMETER ( AST__INMOC = 233934482 )
+
+*     Supplied buffer too small
+      INTEGER AST__SMBUF
+      PARAMETER ( AST__SMBUF = 233934490 )
+
+*     Word is too long
+      INTEGER AST__BGWRD
+      PARAMETER ( AST__BGWRD = 233934498 )
+
+*     Array is too big
+      INTEGER AST__TOOBG
+      PARAMETER ( AST__TOOBG = 233934506 )
+

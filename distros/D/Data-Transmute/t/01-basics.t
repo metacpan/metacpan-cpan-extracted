@@ -112,7 +112,6 @@ subtest transmute_data => sub {
             [create_hash_key => {name=>'foo', value=>10}], #3
         ],
         result => {foo=>10, baz=>1},
-        test_reverse => 0, # because reverse of #3 will delete foo
     );
     test_transmute_data(
         name   => "rules_module",

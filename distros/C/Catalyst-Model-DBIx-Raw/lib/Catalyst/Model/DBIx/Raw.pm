@@ -33,7 +33,7 @@ sub _create_raw {
 		Carp::croak("Must provide either dbix_class_model, or (dsn, user, password), or conf") unless $self->{dbix_class_model}
 					or ($self->{dsn} and $self->{user} and $self->{password}) or $self->{conf};
 		%options =	(
-						dns => $self->{dsn},
+						dsn => $self->{dsn},
 						user => $self->{user},
 						password => $self->{password},
 						conf => $self->{conf},
@@ -88,7 +88,7 @@ Catalyst::Model::DBIx::Raw - A Catalyst Model for DBIx::Raw
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

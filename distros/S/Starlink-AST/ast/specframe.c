@@ -69,12 +69,12 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -189,15 +189,6 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
           sys == AST__AIRWAVE || \
           sys == AST__FREQ ) ? 1 : 0 )
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Define other numerical constants for use in this module. */
 #define GETATTRIB_BUFF_LEN 50
 #define GETLABEL_BUFF_LEN 200
@@ -248,7 +239,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are used or extended by this
    class. */
-static int (* parent_getobjsize)( AstObject *, int * );
+static size_t (* parent_getobjsize)( AstObject *, int * );
 static AstSystemType (* parent_getalignsystem)( AstFrame *, int * );
 static AstSystemType (* parent_getsystem)( AstFrame *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
@@ -331,7 +322,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstStdOfRestType StdOfRestCode( const char *, int * );
-static int GetObjSize( AstObject *, int * );
+static size_t GetObjSize( AstObject *, int * );
 static AstSystemType GetAlignSystem( AstFrame *, int * );
 static AstSystemType SystemCode( AstFrame *, const char *, int * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char *, int * );
@@ -841,22 +832,22 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType newsor,
 /* Add a conversion from the spectral system in which the SourceVEl value
    is stored, to relativistic velocity. */
       if( sys == AST__VRADIO ) {
-         astSpecAdd( specmap, "VRTOVL", NULL );
+         astSpecAdd( specmap, "VRTOVL", 0, NULL );
 
       } else if( sys == AST__VOPTICAL ) {
-         astSpecAdd( specmap, "VOTOVL", NULL );
+         astSpecAdd( specmap, "VOTOVL", 0, NULL );
 
       } else if( sys == AST__REDSHIFT ) {
-         astSpecAdd( specmap, "ZOTOVL", NULL );
+         astSpecAdd( specmap, "ZOTOVL", 0, NULL );
 
       } else if( sys == AST__BETA ) {
-         astSpecAdd( specmap, "BTTOVL", NULL );
+         astSpecAdd( specmap, "BTTOVL", 0, NULL );
       }
 
 /* Add a conversion from velocity to frequency since SorConvert converts
    frequencies. */
       rf = astGetRestFreq( this );
-      astSpecAdd( specmap, "VLTOFR", &rf );
+      astSpecAdd( specmap, "VLTOFR", 1, &rf );
 
 /* Now add a conversion from frequency in the SourveVRF standard of rest to
    frequency in the required rest frame. */
@@ -864,21 +855,21 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType newsor,
 
 /* Add a conversion from frequency back to velocity. Note, the value of the
    rest frequency does not affect the overall conversion. */
-      astSpecAdd( specmap, "FRTOVL", &rf );
+      astSpecAdd( specmap, "FRTOVL", 1, &rf );
 
 /* Add a conversion from relativistic velocity to the required spectral
    system, if needed. */
       if( newsys == AST__VRADIO ) {
-         astSpecAdd( specmap, "VLTOVR", NULL );
+         astSpecAdd( specmap, "VLTOVR", 0, NULL );
 
       } else if( newsys == AST__VOPTICAL ) {
-         astSpecAdd( specmap, "VLTOVO", NULL );
+         astSpecAdd( specmap, "VLTOVO",0, NULL );
 
       } else if( newsys == AST__REDSHIFT ) {
-         astSpecAdd( specmap, "VLTOZO", NULL );
+         astSpecAdd( specmap, "VLTOZO",0, NULL );
 
       } else if( newsys == AST__BETA ) {
-         astSpecAdd( specmap, "VLTOBT", NULL );
+         astSpecAdd( specmap, "VLTOBT",0, NULL );
       }
 
 /* Use the SpecMap to convert the source velocity in the SourceVRF
@@ -1045,14 +1036,14 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int *status ) {
    } else {
 
 /* The reference RA and Dec need to be equal */
-      if( !EQUAL( astGetRefRA( this ), astGetRefRA( that ) ) ||
-          !EQUAL( astGetRefDec( this ), astGetRefDec( that ) ) ) {
+      if( !astEQUAL( astGetRefRA( this ), astGetRefRA( that ) ) ||
+          !astEQUAL( astGetRefDec( this ), astGetRefDec( that ) ) ) {
          result = 0;
 
 /* For source rest frame, the source velocities, rest frames and systems must
    be equal */
       } else if( sor == AST__SCSOR ){
-         if( !EQUAL( astGetSourceVel( this ), astGetSourceVel( that ) ) ||
+         if( !astEQUAL( astGetSourceVel( this ), astGetSourceVel( that ) ) ||
                      astGetSourceVRF( this ) != astGetSourceVRF( that ) ||
                      astGetSourceSys( this ) != astGetSourceSys( that ) ) {
             result = 0;
@@ -1061,15 +1052,15 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int *status ) {
 /* For geocentric, barycentric and heliocentric rest frames, the epochs must
    be the same */
       } else if( sor == AST__GESOR || sor == AST__BYSOR || sor == AST__HLSOR ){
-         if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
+         if( !astEQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ) result = 0;
 
 /* For topocentric rest frame, the epoch and position of the observer must be
    the same */
       } else if( sor == AST__TPSOR ){
-         if( !EQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
-             !EQUAL( astGetObsAlt( this ), astGetObsAlt( that ) ) ||
-             !EQUAL( astGetObsLon( this ), astGetObsLon( that ) ) ||
-             !EQUAL( astGetObsLat( this ), astGetObsLat( that ) ) ) result = 0;
+         if( !astEQUAL( astGetEpoch( this ), astGetEpoch( that ) ) ||
+             !astEQUAL( astGetObsAlt( this ), astGetObsAlt( that ) ) ||
+             !astEQUAL( astGetObsLon( this ), astGetObsLon( that ) ) ||
+             !astEQUAL( astGetObsLat( this ), astGetObsLat( that ) ) ) result = 0;
 
       } else if( sor != AST__LKSOR && sor != AST__LDSOR &&
                  sor != AST__GLSOR && sor != AST__LGSOR && astOK ) {
@@ -1083,7 +1074,7 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that, int *status ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object, int *status ) {
+static size_t GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1096,7 +1087,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 *  Synopsis:
 *     #include "specframe.h"
-*     int GetObjSize( AstObject *this, int *status )
+*     size_t GetObjSize( AstObject *this, int *status )
 
 *  Class Membership:
 *     SpecFrame member function (over-rides the astGetObjSize protected
@@ -1122,7 +1113,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
 /* Local Variables: */
    AstSpecFrame *this;         /* Pointer to SpecFrame structure */
-   int result;                /* Result value to return */
+   size_t result;             /* Result value to return */
    int i;
 
 /* Initialise. */
@@ -1362,7 +1353,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "restfreq" ) ) {
       dval = astGetRestFreq( this );
       if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval*1.0E-9 );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval*1.0E-9 );
          result = getattrib_buff;
       }
 
@@ -1378,7 +1369,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
              astGetSourceSys( this ) == AST__VOPTICAL ) dval *= 1.0E-3;
 
 /* Format */
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
 
       }
@@ -1388,7 +1379,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    } else if ( !strcmp( attrib, "specorigin" ) ) {
       dval = GetSpecOriginCur( this, status );
       if( astOK ) {
-         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         (void) sprintf( getattrib_buff, "%.*g", AST__DBL_DIG, dval );
          result = getattrib_buff;
       }
 
@@ -2621,11 +2612,11 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    astSpecAdd. The macros differ in the number of additional argument
    values. */
 #define TRANSFORM_0(cvt) \
-        astSpecAdd( specmap, cvt, NULL );
+        astSpecAdd( specmap, cvt, 0, NULL );
 
 #define TRANSFORM_1(cvt,arg0) \
         args[ 0 ] = arg0; \
-        astSpecAdd( specmap, cvt, args );
+        astSpecAdd( specmap, cvt, 1, args );
 
 /* Get all the necessary attributes from the result, target and alignment
    Frames. */
@@ -3434,7 +3425,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *        axis, the corresponding element of this array should be set to -1.
 *
 *        If a NULL pointer is supplied, the template and result axis
-*        indicies are assumed to be identical.
+*        indices are assumed to be identical.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
 *     status
@@ -3775,6 +3766,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "restfreq= %lg %n%*s %n", &dval, &off, &nc ) )
         && ( nc >= len ) ) {
+      dtemp = AST__BAD;
 
 /* Is there a Mapping from the supplied units to Hz? If so, use the
    Mapping to convert the supplied value to Hz. */
@@ -4313,13 +4305,13 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
 #define TRANSFORM_2(cvt,arg0,arg1) \
         args[ 0 ] = arg0; \
         args[ 1 ] = arg1; \
-        astSpecAdd( specmap, cvt, args );
+        astSpecAdd( specmap, cvt, 2, args );
 
 #define TRANSFORM_3(cvt,arg0,arg1,arg2) \
         args[ 0 ] = arg0; \
         args[ 1 ] = arg1; \
         args[ 2 ] = arg2; \
-        astSpecAdd( specmap, cvt, args );
+        astSpecAdd( specmap, cvt, 3, args );
 
 #define TRANSFORM_6(cvt,arg0,arg1,arg2,arg3,arg4,arg5) \
         args[ 0 ] = arg0; \
@@ -4328,7 +4320,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecFrame *that,
         args[ 3 ] = arg3; \
         args[ 4 ] = arg4; \
         args[ 5 ] = arg5; \
-        astSpecAdd( specmap, cvt, args );
+        astSpecAdd( specmap, cvt, 6, args );
 
 /* A string for use in error messages. */
       vmess = "convert between different standards of rest";
@@ -6122,7 +6114,9 @@ astMAKE_GET(SpecFrame,SourceVRF,AstStdOfRestType,AST__BADSOR,(
 /* When clearing SourceVRF, convert the SourceVel value to heliocentric
   (but only if set)*/
 astMAKE_CLEAR(SpecFrame,SourceVRF,sourcevrf,((astTestSourceVel( this )?
-astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR, astGetSourceSys( this ), status ) ),NULL:NULL),AST__BADSOR))
+             (void)(astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR,
+                    astGetSourceSys( this ), status ) ),NULL):
+             NULL),AST__BADSOR))
 
 /* Validate the SourceVRF value being set and report an error if necessary.
    If OK, convert the stored SourceVel value into the new rest frame (but
@@ -6130,8 +6124,8 @@ only if set)*/
 astMAKE_SET(SpecFrame,SourceVRF,AstStdOfRestType,sourcevrf,(
             ( ( value >= FIRST_SOR ) && ( value <= LAST_SOR ) && value != AST__SCSOR ) ?
                  (astTestSourceVel( this )?
-                 astSetSourceVel( this, ConvertSourceVel( this, value, astGetSourceSys( this ), status )),NULL:NULL), value:
-                 ( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
+                 (void)(astSetSourceVel( this,ConvertSourceVel(this,value,astGetSourceSys( this ), status )),NULL):
+                 NULL), value:( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
                              "given for SourceVRF attribute.", status,
                              "astSetSourceVRF", astGetClass( this ), (int) value ),
 
@@ -6188,8 +6182,8 @@ astMAKE_GET(SpecFrame,SourceSys,AstSystemType,AST__BADSYSTEM,(
 /* When clearing SourceSys, convert the SourceVel value to relativistic
    velocity (but only if set) */
 astMAKE_CLEAR(SpecFrame,SourceSys,sourcesys,((astTestSourceVel( this )?
-astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
-                                         AST__VREL, status ) ),NULL:NULL),AST__BADSYSTEM))
+(void)(astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
+                                         AST__VREL, status ) ),NULL):NULL),AST__BADSYSTEM))
 
 /* Validate the SourceSys value being set and report an error if necessary.
    If OK, convert the stored SourceVel value into the new rest frame (but
@@ -6199,8 +6193,8 @@ astMAKE_SET(SpecFrame,SourceSys,AstSystemType,sourcesys,(
               ( value == AST__VRADIO ) || ( value == AST__REDSHIFT ) ||
               ( value == AST__VOPTICAL ) ) ?
               (astTestSourceVel( this )?
-               astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
-                                                        value, status )),NULL:NULL),
+               (void)(astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
+                                                        value, status )),NULL):NULL),
                                                         value:
                  ( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
                              "given for SourceSys attribute.", status,

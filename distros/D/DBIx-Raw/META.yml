@@ -1,7 +1,7 @@
 ---
-abstract: 'Maintain control of SQL queries while still having a layer of abstraction above DBI'
+abstract: 'Maintain control of SQL queries while still having a layer of abstraction above DBI '
 author:
-  - 'Adam Hopkins, C<< <srchulo at cpan.org> >>'
+  - "Adam Hopkins, C<< <srchulo at cpan.org> >>\r"
 build_requires:
   Cwd: '0'
   DBD::SQLite: '0'
@@ -43,9 +43,11 @@ resources:
   bugtracker: https://github.com/srchulo/DBIx-Raw/issues
   homepage: https://github.com/srchulo/DBIx-Raw
   repository: https://github.com/srchulo/DBIx-Raw.git
-version: '0.22'
+version: '0.23'
 x_contributors:
+  - 'Adam Hopkins <SirChickenHair@srchulo-aire.local>'
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
-x_generated_by_perl: v5.28.1
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

@@ -1,6 +1,6 @@
 package IP::Info;
 
-$IP::Info::VERSION = '0.17';
+$IP::Info::VERSION = '0.18';
 $IP::Info::AUTHOR  = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ IP::Info - Interface to IP geographic and network data.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

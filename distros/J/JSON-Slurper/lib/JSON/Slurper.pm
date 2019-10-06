@@ -1,21 +1,24 @@
 package JSON::Slurper;
 use strict;
 use warnings;
-use Carp           ();
-use Exporter       ();
+use Carp ();
+use Exporter::Shiny qw(slurp_json spurt_json);
 use File::Basename ();
 use File::Slurper  ();
 use Scalar::Util   ();
 
-our $VERSION   = '0.08';
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(slurp_json spurt_json);
+our $VERSION     = '0.09';
+our %EXPORT_TAGS = (
+    std      => [qw(slurp_json spurt_json)],
+    std_auto => [qw(-auto_ext slurp_json spurt_json)],
+    slurp_auto => [qw(-auto_ext slurp_json)],
+    spurt_auto => [qw(-auto_ext spurt_json)],
+);
 
-use constant JSON_XS => $ENV{JSON_SLURPER_NO_JSON_XS}                                           ? do { require JSON::PP; undef }
-                      : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } ? 1
-                      : do { require JSON::PP; undef };
+use constant JSON_XS => $ENV{JSON_SLURPER_NO_JSON_XS}                                          ? do { require JSON::PP; undef }
+                     : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } ? 1
+                     : do { require JSON::PP; undef };
 my $DEFAULT_ENCODER;
-my %AUTO_EXT;
 
 sub new {
     my ($class, %args) = @_;
@@ -40,47 +43,45 @@ sub new {
     bless [$encoder, $auto_ext], $class;
 }
 
-sub import {
-    my @args_without_flags = grep { $_ ne '-auto_ext' } @_;
-    $AUTO_EXT{+caller} = @_ != @args_without_flags;
+sub _generate_slurp_json {
+    my $auto_ext = exists $_[3]->{auto_ext};
 
-    $_[0]->export_to_level(1, @args_without_flags);
-}
+    return sub ($;@) {
+        my ($filename, $encoder) = @_;
 
-sub slurp_json ($;@) {
-    my ($filename, $encoder) = @_;
+        if (defined $encoder) {
+            Carp::croak 'invalid encoder'
+              unless Scalar::Util::blessed($encoder)
+              && $encoder->can('encode')
+              && $encoder->can('decode');
+        } else {
+            $encoder = $DEFAULT_ENCODER ||=
+              JSON_XS
+              ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed
+              ->escape_slash
+              ->stringify_infnan
+              : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+        }
 
-    if (defined $encoder) {
-        Carp::croak 'invalid encoder'
-          unless Scalar::Util::blessed($encoder)
-          && $encoder->can('encode')
-          && $encoder->can('decode');
-    } else {
-        $encoder = $DEFAULT_ENCODER ||=
-          JSON_XS
-          ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash
-          ->stringify_infnan
-          : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+        my $wantarray = wantarray;
+        unless (defined wantarray) {
+            Carp::carp 'slurp_json requested without a used return value. Returning from slurp_json';
+            return;
+        }
+
+        if ($auto_ext and not ((File::Basename::fileparse($filename, qr/\.[^.]*/xm))[2])) {
+            $filename = "$filename.json";
+        }
+
+        my $slurped = $encoder->decode(File::Slurper::read_binary($filename));
+
+        if ($wantarray and my $ref = ref $slurped) {
+            return @$slurped if $ref eq 'ARRAY';
+            return %$slurped if $ref eq 'HASH';
+        }
+
+        return $slurped;
     }
-
-    my $wantarray = wantarray;
-    unless (defined wantarray) {
-        Carp::carp 'slurp_json requested without a used return value. Returning from slurp_json';
-        return;
-    }
-
-    if ($AUTO_EXT{+caller} and not ((File::Basename::fileparse($filename, qr/\.[^.]*/xm))[2])) {
-        $filename = "$filename.json";
-    }
-
-    my $slurped = $encoder->decode(File::Slurper::read_binary($filename));
-
-    if ($wantarray and my $ref = ref $slurped) {
-        return @$slurped if $ref eq 'ARRAY';
-        return %$slurped if $ref eq 'HASH';
-    }
-
-    return $slurped;
 }
 
 sub slurp {
@@ -105,31 +106,36 @@ sub slurp {
     return $slurped;
 }
 
-sub spurt_json (\[@$%]$;@) {
-    my ($data, $filename, $encoder) = @_;
+sub _generate_spurt_json {
+    my $auto_ext = exists $_[3]->{auto_ext};
 
-    if (defined $encoder) {
-        Carp::croak 'invalid encoder'
-          unless Scalar::Util::blessed($encoder)
-          && $encoder->can('encode')
-          && $encoder->can('decode');
-    } else {
-        $encoder = $DEFAULT_ENCODER ||=
-          JSON_XS
-          ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash
-          ->stringify_infnan
-          : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+    return sub (\[@$%]$;@) {
+        my ($data, $filename, $encoder) = @_;
+
+        if (defined $encoder) {
+            Carp::croak 'invalid encoder'
+              unless Scalar::Util::blessed($encoder)
+              && $encoder->can('encode')
+              && $encoder->can('decode');
+        } else {
+            $encoder = $DEFAULT_ENCODER ||=
+              JSON_XS
+              ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed
+              ->escape_slash
+              ->stringify_infnan
+              : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+        }
+
+        if (ref $data eq 'REF' or ref $data eq 'SCALAR') {
+            $data = $$data;
+        }
+
+        if ($auto_ext and not ((File::Basename::fileparse($filename, qr/\.[^.]*/xm))[2])) {
+            $filename = "$filename.json";
+        }
+
+        File::Slurper::write_binary($filename, $encoder->encode($data));
     }
-
-    if (ref $data eq 'REF' or ref $data eq 'SCALAR') {
-        $data = $$data;
-    }
-
-    if ($AUTO_EXT{+caller} and not ((File::Basename::fileparse($filename, qr/\.[^.]*/xm))[2])) {
-        $filename = "$filename.json";
-    }
-
-    File::Slurper::write_binary($filename, $encoder->encode($data));
 }
 
 sub spurt {
@@ -158,6 +164,8 @@ JSON::Slurper - Convenient file slurping and spurting of data using JSON
 =head1 SYNOPSIS
 
   use JSON::Slurper qw(slurp_json spurt_json);
+  # or
+  use JSON::Slurper -std;
 
   my @people = (
     {
@@ -192,6 +200,8 @@ JSON::Slurper - Convenient file slurping and spurting of data using JSON
   # use the -auto_ext flag so that ".json" is added as the
   # file extension if no file extension is present.
   use JSON::Slurper qw(-auto_ext slurp_json spurt_json);
+  # or
+  use JSON::Slurper -std_auto;
 
   # This saves to people.json
   spurt_json @people, 'people';
@@ -244,6 +254,10 @@ If you are using L<JSON::PP>, this is the default used:
 Passing the C<-auto_ext> flag with the imports causes C<.json> to be added to filenames when they have no extension.
 
   use JSON::Slurper qw(-auto_ext slurp_json spurt_json);
+
+  # or
+
+  use JSON::Slurper -std_auto;
 
   # Reads from "ref.json";
   my $ref = slurp_json 'ref';
@@ -301,6 +315,62 @@ and has C<encode> and C<decode> methods.
 This reads in JSON from a file and returns it as a Perl data structure (a reference, an array, or a hash).
 You can pass in your own JSON encoder/decoder as an optional argument, as long as it is blessed
 and has C<encode> and C<decode> methods.
+
+=head2 Export Tags
+
+=head3 -std
+
+This tag is the same as explicitly importing L</slurp_json> and L</spurt_json>:
+
+  use JSON::Slurper -std;
+
+  # same as
+
+  use JSON::Slurper qw(slurp_json spurt_json);
+
+=head3 -std_auto
+
+This tag is the same as explicitly importing L</slurp_json> and L</spurt_json> and including the L</-auto_ext> flag:
+
+  use JSON::Slurper -std_auto;
+
+  # same as
+
+  use JSON::Slurper qw(-auto_ext slurp_json spurt_json);
+
+=head3 -slurp_auto
+
+This tag is the same as explicitly importing L</slurp_json> and including the L</-auto_ext> flag:
+
+  use JSON::Slurper -slurp_auto;
+
+  # same as
+
+  use JSON::Slurper qw(-auto_ext slurp_json);
+
+=head3 -spurt_auto
+
+This tag is the same as explicitly importing L</spurt_json> and including the L</-auto_ext> flag:
+
+  use JSON::Slurper -spurt_auto;
+
+  # same as
+
+  use JSON::Slurper qw(-auto_ext spurt_json);
+
+=head2 Shiny Importing
+
+L<JSON::Slurper> uses L<Exporter::Shiny> for its exporting of subroutines. This allows for fancy importing, such as
+renaming imported subroutines:
+
+  use JSON::Slurper
+    'slurp_json' => { -as => 'slurp_plz' },
+    'spurt_json' => { -as => 'spurt_plz' };
+
+  spurt_plz $ref, 'ref.json';
+  my $ref_from_file = slurp_plz 'ref.json';
+
+See L<Exporter::Tiny::Manual::Importing> for much more.
 
 =head1 OBJECT-ORIENTED INTERFACE
 
@@ -399,6 +469,8 @@ it under the same terms as Perl itself.
 =item * L<JSON::PP>
 
 =item * L<Cpanel::JSON::XS>
+
+=item * L<Exporter::Tiny::Manual::Importing>
 
 =back
 
