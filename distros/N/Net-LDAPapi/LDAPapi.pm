@@ -232,7 +232,7 @@ require AutoLoader;
        LDAP_TAG_IM_RES_VALUE
        LDAP_TAG_SASL_RES_CREDS
        );
-$VERSION = '3.0.5';
+$VERSION = '3.0.7';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -886,6 +886,7 @@ sub next_changed_entries {
                     # save the cookie
 										save_cookie($cookie, $self->{"cookie"});
                 }
+                ldap_control_free($ctrl);
             }
 
         } elsif( $msgtype eq $self->LDAP_RES_INTERMEDIATE ) {

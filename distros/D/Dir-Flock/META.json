@@ -1,0 +1,45 @@
+{
+   "abstract" : "advisory locking of a dedicated directory",
+   "author" : [
+      "Marty O'Brien <mob@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dir-Flock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "1.92",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,10 +1,51 @@
 Important things here and in code flagged with XXX
 
-0.43
-	If modernization of Term::Pager does not happen,
-	can we reasonably have a forking IO::Pager::Perl,
-	rather than opening IO::Pager::Perl-Term?
+1.01
+IPP	Add windows support via Win32::Console and Term::Size::Win32?
 
+1.00
+IPP	Togglable wrap?  ...with reflow
+IPP		remap left & right scroll to beep? iff unchanged lineNo
+IPP	Squeeze
+IPP		Proper logical line numbering?
+IPP		Togglable? ...with reflow
+
+IPP	#Consolidate _cursor+{rows} and _end??
+IPP	_end
+IPP	!!	line		=$n		pause ... then what?!
+IPP		down_lines
+IPP				_cursor+rows	!!detect EOF!!
+IPP	!!			if {pause} and _end < {rows}-1	skip
+IPP				line(_cursor++ +{rows})
+
+IPP		up_lines	{end}--		NOOP, just keeping up
+IPP		jump		_cursor+{rows}	NOOP, just keeping up
+IPP		search		_cursor+{rows}	NOOP, just keeping up
+IPP				_cursor+{rows}	NOOP, just keeping up
+
+IPP	Pause bugs
+IPP		extra scroll forwards required after backed up over pauses
+
+IPP		Left/right when paused causes vertical scrolling
+IPP		(horiz. scroll trigeering a form forward, how to prevent?!)
+
+IPP		We get an extra chunk of output after menu closing
+
+IPP	Add mark ability?
+IPP		m _mark{getc()} = _cursor
+IPP		' jump(_mark{getc()}) #special I<^> and I<$>, I<'>?
+
+IPP	Add more IO::Pager::Perl involved tests, scripted interaction?
+IPP		read from pipe, file
+IPP		navigation
+IPP		search
+
+IPP	$0 as name in status line?
+
+IPP	Wrap up tp for PerlTools?
+
+0.43
+	Can we make Pager::less into a self-contained forking implementation?
 	Current forking design yields:
 
 		Failed to create PAGER FH at 16-PurePerl_interactive.t line 16
@@ -17,14 +58,14 @@ Important things here and in code flagged with XXX
 		print() on unopened filehandle STDOUT at Term/Pager.pm line 398
 		print() on unopened filehandle STDOUT at Term/Pager.pm line 399
 
-	Fix IO::Pager and IO::Pager::Perl PODs (remove cuts)
+	Fix IO::Pager and IO::Pager::less PODs (remove cuts)
 
 0.40
 	Push previous versions to github
 
 	Functional fork for Term::Pager
 		Test functionality w/|w/o Term::ReadKey
-			As expicit and implicit PAGER
+			As explicit and implicit PAGER
 
 		make pipes & pager object
 		parent
@@ -34,10 +75,6 @@ Important things here and in code flagged with XXX
 0.35
 	Odd failure of test 11 under tcsh and win-bash because
 	*reference* has extra trailing newline.
-
-0.30
-	XXX Complete the ::less subclass to lump all non-interactive
-	fallback behavior together? (See pagerless branch in git)
 
 0.20
 	"Fix" multi-pseudo-STDOUT disabled in 09-open.t implementation?

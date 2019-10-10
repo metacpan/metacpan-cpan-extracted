@@ -367,6 +367,7 @@ my @files = (
     'lib/DateTime/Locale/fy.pod',
     'lib/DateTime/Locale/fy_NL.pod',
     'lib/DateTime/Locale/ga.pod',
+    'lib/DateTime/Locale/ga_GB.pod',
     'lib/DateTime/Locale/ga_IE.pod',
     'lib/DateTime/Locale/gd.pod',
     'lib/DateTime/Locale/gd_GB.pod',

@@ -1,14 +1,16 @@
+Build.PL
 Changes
 LICENSE
 MANIFEST
-Makefile.PL
 README
 eg/walls-and-water
 lib/Game/TextPatterns.pm
+lib/Game/TextPatterns/Util.pm
 t/00-load.t
+t/Game-TextPatterns-Util.t
 t/Game-TextPatterns.t
 t/pod-coverage.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
-SIGNATURE                                Public-key signature (added by MakeMaker)
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has items => (
@@ -17,7 +19,7 @@ has items => (
   default => sub {
     [];
   }
-); 
+);
 sub op { 'item-data' }
 
 sub parse {
@@ -37,6 +39,6 @@ sub parse {
     items => \@items,
     content_ref => $str_ref
   );
-} 
+}
 
 1;

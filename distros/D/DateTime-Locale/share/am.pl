@@ -50,6 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
+    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "am",
@@ -267,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 35,
+  version => 36,
 }

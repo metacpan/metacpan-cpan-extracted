@@ -11,7 +11,7 @@ use Data::Dumper;
 my $doc_number = '000000444';
 
 sub alephx {
-  state $a = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+  state $a = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 }
 sub get_doc {
   alephx()->find_doc(

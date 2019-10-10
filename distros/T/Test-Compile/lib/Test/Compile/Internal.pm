@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.2.2");
+use version; our $VERSION = qv("v2.3.0");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -49,11 +49,12 @@ sub new {
 
 =item C<all_files_ok(@dirs)>
 
-Checks all the perl files it can find for compilation errors.
+Looks for perl files and tests them all for compilation errors.
 
-If C<@dirs> is defined then it is taken as an array of directories to
-be searched for perl files, otherwise it searches some default locations
-- see L</all_pm_files(@dirs)> and L</all_pl_files(@dirs)>.
+If C<@dirs> is defined then it is taken as an array of files or directories to be 
+searched for perl files, otherwise it searches the default locations you'd expect to find
+perl files in a perl module - see L</all_pm_files(@dirs)> and L</all_pl_files(@dirs)> 
+for details.
 
 =cut
 sub all_files_ok {
@@ -112,7 +113,7 @@ An accessor to get/set the verbosity.  The default value (undef) will suppress o
 unless the compilation fails.  This is probably what you want.
 
 If C<verbose> is set to true, you'll get the output from 'perl -c'. If it's set to
-false, all diagnostic output is supressed.
+false, all diagnostic output is suppressed.
 
 =cut
 
@@ -128,14 +129,20 @@ sub verbose {
 
 =item C<all_pm_files(@dirs)>
 
-Returns a list of all the perl module files - that is any files ending in F<.pm>
-in C<@dirs> and in directories below. If C<@dirs> is undefined, it
-searches F<blib> if F<blib> exists, or else F<lib>.
+Searches for and returns a list of perl module files - that is, files with a F<.pm>
+extension.
 
-Skips any files in C<CVS>,  C<.svn>, or C<.git> directories.
+If you provide a list of C<@dirs>, it'll use that as a list of files to process, or
+directories to search for perl modules.
+
+If you don't provide C<dirs>, it'll search for perl modules in the F<blib> directory,
+unless that directory doesn't exist, in which case it'll search the F<lib> directory.
+
+Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
+
 =cut
 
 sub all_pm_files {
@@ -145,22 +152,24 @@ sub all_pm_files {
 
     my @pm;
     for my $file ( $self->_find_files(@dirs) ) {
-        if (-f $file) {
-            push @pm, $file if $file =~ /\.pm$/;
-        }
+        push @pm, $file if $file =~ /\.pm$/;
     }
     return @pm;
 }
 
 =item C<all_pl_files(@dirs)>
 
-Returns a list of all the perl script files - that is, any files in C<@dirs> that
-either have a F<.pl> extension, or have no extension and have a perl shebang line.
+Searches for and returns a list of perl script files - that is, any files that either
+have a F<.pl> extension, or have no extension but have a perl shebang line.
 
-If C<@dirs> is undefined, it searches F<script> if F<script> exists, or else
-F<bin> if F<bin> exists.
+If you provide a list of C<@dirs>, it'll use that as a list of files to process, or
+directories to search for perl scripts.
 
-Skips any files in C<CVS>,  C<.svn>, or C<.git> directories.
+If you don't provide C<dirs>, it'll search for perl scripts in the F<blib/script/> 
+directory, or if that doesn't exist, the F<script/> directory, or if that doesn't exist,
+the F<bin/> directory.
+
+Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -174,17 +183,15 @@ sub all_pl_files {
 
     my @pl;
     for my $file ( $self->_find_files(@dirs) ) {
-        if (defined($file) && -f $file) {
-            if ( $file =~ /\.pl$/ ) {
-                # Files with a .pl extension are perl scripts
+        if ( $file =~ /\.pl$/ ) {
+            # Files with a .pl extension are perl scripts
+            push @pl, $file;
+        }
+        elsif ( $file =~ /(?:^[^.]+$)/ ) {
+            # Files with no extension, but a perl shebang are perl scripts
+            my $shebang = $self->_read_shebang($file);
+            if ( $shebang =~ m/perl/ ) {
                 push @pl, $file;
-            }
-            elsif ( $file =~ /(?:^[^.]+$)/ ) {
-                # Files with no extension, but a perl shebang are perl scripts
-                my $shebang = $self->_read_shebang($file);
-                if ( $shebang =~ m/perl/ ) {
-                    push @pl, $file;
-                }
             }
         }
     }
@@ -379,6 +386,7 @@ sub _pm_starting_points {
 
 # Where do we expect to find perl programs?
 sub _pl_starting_points {
+    return 'blib/script' if -e 'blib/script';
     return 'script' if -e 'script';
     return 'bin'    if -e 'bin';
 }

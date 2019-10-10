@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has z30 => (
@@ -15,7 +17,7 @@ has z30 => (
     {};
   }
 );
-sub op { 'read-item' } 
+sub op { 'read-item' }
 
 sub parse {
   my($class,$str_ref) = @_;
@@ -27,7 +29,7 @@ sub parse {
 
   for my $z($xpath->find("/$op/z30")->get_nodelist()){
     push @z30,get_children($z,1);
-  }    
+  }
 
   __PACKAGE__->new(
     session_id => $xpath->findvalue("/$op/session-id"),

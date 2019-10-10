@@ -1,5 +1,11 @@
 Revision history for Perl extension Pod-Markdown
 
+3.200     2019-10-09T16:36:15Z
+
+  - Allow local_module_url_prefix to be '' [rt-129865].
+  - URI Escape the module name in external pod links
+    (introduces dependency on URI::Escape).
+
 3.101     2018-08-06T14:32:38Z
 
   - Ensure local_module_url_prefix defaults to current perldoc_url_prefix.

@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use 5.008001;
 
-our $VERSION = '0.60';
+our $VERSION = '0.62';
 
 use Carp qw(croak);
 use URI ();
 use LWP::UserAgent;
-use JSON;
+use JSON::MaybeXS 'JSON';
 use HTML::Entities qw/decode_entities/;
 use HTTP::Request;
 
@@ -75,6 +75,7 @@ sub download {
     $args->{cb} = $self->_default_cb({
         filename  => $filename,
         verbose   => $args->{verbose},
+        progress  => $args->{progress},
         overwrite => defined $args->{overwrite} ? $args->{overwrite} : 1,
     }) unless ref $args->{cb} eq 'CODE';
 
@@ -95,9 +96,24 @@ sub _is_supported_fmt {
     defined($data->{video_url_map}{$fmt}{url}) ? 1 : 0;
 }
 
+sub _progress {
+    my ($self, $args, $total) = @_;
+
+    if (not defined $args->{_progress}) {
+        eval "require Term::ProgressBar" or return;    ## no critic
+        $args->{_progress} = Term::ProgressBar->new( { count => $total, ETA => 'linear', remove => 0, fh => \*STDOUT } );
+        $args->{_progress}->minor( $total > 50_000_000 ? 1 : 0 );
+        $args->{_progress}->max_update_rate(1);
+
+        $args->{_progress}->message("Total $total");
+    }
+
+    return $args->{_progress};
+}
+
 sub _default_cb {
     my ($self, $args) = @_;
-    my ($file, $verbose, $overwrite) = @$args{qw/filename verbose overwrite/};
+    my ($file, $verbose, $overwrite, $progress) = @$args{qw/filename verbose overwrite progress/};
 
     croak "file exists! $file" if -f $file and !$overwrite;
     open my $wfh, '>', $file or croak $file, " $!";
@@ -111,6 +127,18 @@ sub _default_cb {
         if ($verbose || $self->{verbose}) {
             my $size = tell $wfh;
             my $total = $res->header('Content-Length');
+
+            if ($progress) {
+                if (my $p = $self->_progress($args, $total)){
+                    $p->update($size);
+                    return;
+                }
+                else{
+                    print "(You need Term::ProgressBar module to show progress bar with -P switch)\n";
+                    $progress = 0;
+                }
+            }
+
             printf "%d/%d (%.2f%%)\r", $size, $total, $size / $total * 100;
             print "\n" if $total == $size;
         }
@@ -369,11 +397,18 @@ sub user_id {
 }
 
 1;
-__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-WWW::YouTube::Download - Very simple YouTube video download interface
+WWW::YouTube::Download - WWW::YouTube::Download - Very simple YouTube video download interface
+
+=head1 VERSION
+
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -454,7 +489,6 @@ set the format to download. Defaults to the best video quality
 (inferred by the available resolutions).
 
 =back
-
 
 =item B<playback_url($video_id, [, \%args])>
 
@@ -566,17 +600,13 @@ Parses given URL and returns YouTube username.
 
 =back
 
-=head1 AUTHOR
-
-xaicron E<lt>xaicron {@} cpan.orgE<gt>
-
 =head1 CONTRIBUTORS
 
 yusukebe
 
 =head1 BUG REPORTING
 
-Plese use github issues: L<< https://github.com/xaicron/p5-www-youtube-download/issues >>.
+Please use github issues: L<< https://github.com/xaicron/p5-www-youtube-download/issues >>.
 
 =head1 SEE ALSO
 
@@ -584,9 +614,20 @@ L<WWW::YouTube::Info> and L<WWW::YouTube::Info::Simple>.
 L<WWW::NicoVideo::Download>
 L<http://rg3.github.io/youtube-dl/>
 
-=head1 LICENSE
+=head1 AUTHOR
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+xaicron <xaicron {@} cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 - 2019 by Yuji Shimada.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+# ABSTRACT: WWW::YouTube::Download - Very simple YouTube video download interface
+

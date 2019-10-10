@@ -5,7 +5,7 @@ use Log::Log4perl;
 use warnings;
 use strict;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 has history          => sub { [] };
 has max_history_size => 10;
@@ -25,6 +25,14 @@ sub format {
         warn 'format() is not properly implemented in MojoX::Log::Log4perl. Please use appenders.';
     }
     return sub { '[' . localtime(shift) . '] [' . shift() . '] ' . join("\n", @_, '') };
+}
+
+# development notes: Mojo::Log provides 'context'
+# Mojo::Log (Mojolicious 8.23) was updated to add method context which 
+# needs to exist here or we die
+sub context {
+    my ($self) = @_;
+    return $self;
 }
 
 sub new {
@@ -438,7 +446,7 @@ L<< Log::Log4perl >>, L<< Mojo::Log >>, L<< Mojo >>, L<< Mojolicious >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2016 Breno G. de Oliveira, all rights reserved.
+Copyright 2009-2019 Breno G. de Oliveira, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

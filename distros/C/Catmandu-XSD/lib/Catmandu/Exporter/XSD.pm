@@ -2,7 +2,7 @@ package Catmandu::Exporter::XSD;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Moo;
 use Catmandu;
@@ -236,5 +236,17 @@ inherited.
 =head1 SEE ALSO
 
 L<Catmandu::Exporter>, L<Catmandu::XSD> , L<Template>
+
+=head1 AUTHOR
+
+Patrick Hochstenbach , C<< patrick.hochstenbach at ugent.be >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut

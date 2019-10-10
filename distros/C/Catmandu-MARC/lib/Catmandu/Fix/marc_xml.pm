@@ -2,7 +2,7 @@ package Catmandu::Fix::marc_xml;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.251';
+our $VERSION = '1.252';
 
 use Moo;
 use namespace::clean;

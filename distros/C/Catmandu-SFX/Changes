@@ -1,4 +1,7 @@
 Revision history for Catmandu-SFX
 
+0.02  2019-10-10 20:46:37 CEST
+    - Fixing dependencies
+    
 0.01  2015-02-03 11:15:39 CET
-        - Initial release
+    - Initial release

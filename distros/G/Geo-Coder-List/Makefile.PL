@@ -34,6 +34,7 @@ if($online_tests) {
 	# $test_requires->{'Geo::Coder::Google::V3'} = 0.10;
 	$test_requires->{'Geo::Coder::OSM'} = 0;
 	$test_requires->{'Geo::Coder::CA'} = 0;
+	$test_requires->{'Geo::Coder::OpenCage'} = 0;
 	$test_requires->{'Geo::Coder::GeocodeFarm'} = 0;
 	$test_requires->{'Geo::Coder::Ovi'} = 0;
 	$test_requires->{'Geo::Coder::Postcodes'} = 0;
@@ -85,7 +86,7 @@ WriteMakefile(
 sub are_online
 {
 	my $s = IO::Socket::INET->new(
-		PeerAddr => 'geocode.xyz:443',
+		PeerAddr => 'openstreetmap.org:443',
 		Timeout => 10
 	);
 	if($s) {

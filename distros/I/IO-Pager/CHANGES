@@ -1,5 +1,19 @@
 Revision history for Perl extension IO::Pager.
 
+1.01	Tue Oct 08 2019
+	Add less.pm to MANIFEST
+
+	Fix interactive test 16
+
+1.00	Mon Oct 07 2019
+	Fork Term::Pager to IO::Pager::Perl, with many new features.
+	NOTE: This is a breaking change from 0.43 & 0.44. What was
+	IO::Pager::Perl in those versions is now IO::Pager::less i.e;
+	a shim for pager-less systems to use the pure perl pager
+	implementation in IO::Pager::Perl.
+
+	Update bloody version number transclusions. RT#130643
+
 0.44	Mon Sep 30 2019
 	Remove debugging calls mistakenly left in code. RT#130595
 

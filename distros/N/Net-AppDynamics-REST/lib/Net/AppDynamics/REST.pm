@@ -13,10 +13,10 @@ use HTTP::Request;
 use HTTP::Headers;
 use Ref::Util qw(is_plain_arrayref);
 use namespace::clean;
-BEGIN { 
+
+BEGIN {
   with 'HTTP::MultiGet::Role';
 }
- 
 
 =head1 NAME
 
@@ -75,84 +75,82 @@ This module makes use of the following roles:  L<HTTP::MultiGet::Role>, L<Log::L
 
 =cut
 
-our $VERSION="1.005";
+our $VERSION = "1.006";
 
-has USER=>(
-  is=>'ro',
-  isa=>Str,
-  required=>1,
+has USER => (
+  is       => 'ro',
+  isa      => Str,
+  required => 1,
 );
 
-has cache_check=>(
-  is=>'rw',
-  isa=>Bool
-  default=>0,
+has cache_check => (
+  is  => 'rw',
+  isa => Bool default => 0,
 );
 
-has CUSTOMER=>(
-  required=>1,
-  is=>'ro',
-  isa=>Str,
-  default=>'customer1',
+has CUSTOMER => (
+  required => 1,
+  is       => 'ro',
+  isa      => Str,
+  default  => 'customer1',
 );
 
-has PASS=>(
-  is=>'ro',
-  isa=>Str,
-  required=>1,
+has PASS => (
+  is       => 'ro',
+  isa      => Str,
+  required => 1,
 );
 
-has SERVER=>(
-  is=>'ro',
-  isa=>Str,
-  required=>1,
+has SERVER => (
+  is       => 'ro',
+  isa      => Str,
+  required => 1,
 );
 
-has PORT=>(
-  is=>'ro',
-  isa=>Int,
-  default=>8090,
-  required=>1,
+has PORT => (
+  is       => 'ro',
+  isa      => Int,
+  default  => 8090,
+  required => 1,
 );
 
-has PROTO=>(
-  is=>'rw',
-  isa=>Str,
-  default=>'http',
-  required=>1,
+has PROTO => (
+  is       => 'rw',
+  isa      => Str,
+  default  => 'http',
+  required => 1,
 );
 
-has data_cache=>(
-  is=>'rw',
-  isa=>HashRef,
-  required=>1,
-  lazy=>1,
-  default=>sub { {created_on=>0} },
+has data_cache => (
+  is       => 'rw',
+  isa      => HashRef,
+  required => 1,
+  lazy     => 1,
+  default  => sub { { created_on => 0 } },
 );
 
-has cache_max_age =>(
-  is=>'ro',
-  isa=>Num,
-  lazy=>1,
-  required=>1,
-  default=>3600,
+has cache_max_age => (
+  is       => 'ro',
+  isa      => Num,
+  lazy     => 1,
+  required => 1,
+  default  => 3600,
 );
 
 # This method runs after the new constructor
 sub BUILD {
-  my ($self)=@_;
-  my $auth='Basic '.MIME::Base64::encode_base64($self->{USER} . '@' . $self->{CUSTOMER} . ':' . $self->{PASS});
-  $auth=~ s/\s*$//s;
-  $self->{header}=[ Authorization=>$auth ];
+  my ($self) = @_;
+  my $auth = 'Basic ' . MIME::Base64::encode_base64( $self->{USER} . '@' . $self->{CUSTOMER} . ':' . $self->{PASS} );
+  $auth =~ s/\s*$//s;
+  $self->{header} = [ Authorization => $auth ];
 }
 
 # this method runs before the new constructor, and can be used to change the arguments passed to the module
 around BUILDARGS => sub {
-  my ($org,$class,@args)=@_;
-  
+  my ( $org, $class, @args ) = @_;
+
   return $class->$org(@args);
 };
-
 
 =head1 NonBlocking interfaces
 
@@ -210,10 +208,10 @@ Example Callback:
 =cut
 
 sub que_list_applications {
-  my ($self,$cb)=@_;
-  my $path='/controller/rest/applications';
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb ) = @_;
+  my $path = '/controller/rest/applications';
+  my $req  = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -246,11 +244,11 @@ Example Callback:
 =cut
 
 sub que_list_tiers {
-  my ($self,$cb,$app)=@_;
-  my $path=sprintf '/controller/rest/applications/%s/tiers',uri_escape($app);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/tiers', uri_escape($app);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -281,11 +279,11 @@ Example Callback:
 =cut
 
 sub que_list_tier {
-  my ($self,$cb,$app,$tier)=@_;
-  my $path=sprintf '/controller/rest/applications/%s/tiers/%s',uri_escape($app),uri_escape($tier);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app, $tier ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/tiers/%s', uri_escape($app), uri_escape($tier);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -316,11 +314,11 @@ Example Callback:
 =cut
 
 sub que_list_business_transactions {
-  my ($self,$cb,$app)=@_;
-  my $path=sprintf '/controller/rest/applications/%s/business-transactions',uri_escape($app);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/business-transactions', uri_escape($app);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -353,11 +351,48 @@ Example Callback:
 =cut
 
 sub que_list_nodes {
-  my ($self,$cb,$app)=@_;
-  my $path=sprintf '/controller/rest/applications/%s/nodes',uri_escape($app);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/nodes', uri_escape($app);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
+}
+
+=back
+
+=head3 List Tier Nodes
+
+Each Application Tier will contain many nodes
+
+=over 4
+
+=item * Blocking context my $result=$self->list_nodes($application,$tier)
+
+Returns a Data::Result object, when true it contains the list of nodes.
+
+=item * Non Blocking context my $id=$self->que_list_nodes($cb,$application,$tier)
+
+Ques a request to all the nodes in a given application
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
+
+=cut
+
+sub que_list_tier_nodes {
+  my ( $self, $cb, $app,$tier ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/tiers/%s/nodes', uri_escape($app),uri_escape($tier);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -388,11 +423,11 @@ Example Callback:
 =cut
 
 sub que_list_node {
-  my ($self,$cb,$app,$node)=@_;
-  my $path=sprintf '/controller/rest/applications/%s/nodes/%s',uri_escape($app),uri_escape($node);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app, $node ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/nodes/%s', uri_escape($app), uri_escape($node);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -425,11 +460,11 @@ Example Callback:
 =cut
 
 sub que_list_backends {
-  my ($self,$cb,$app)=@_;
-  my $path=sprintf '/controller/rest/applications/%s/backends',uri_escape($app);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app ) = @_;
+  my $path = sprintf '/controller/rest/applications/%s/backends', uri_escape($app);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -473,67 +508,69 @@ Queues a request to walk everything.. $cb arguments are different in this caes, 
 =cut
 
 sub que_walk_all {
-  my ($self,$cb)=@_;
+  my ( $self, $cb ) = @_;
 
-  my $state=1;
-  my $data={};
-  my $total=0;
+  my $state = 1;
+  my $data  = {};
+  my $total = 0;
   my @ids;
 
-  my $app_cb=sub {
-    my ($self,$id,$result,$request,$response)=@_;
+  my $app_cb = sub {
+    my ( $self, $id, $result, $request, $response ) = @_;
 
-    if($result) {
-      foreach my $obj (@{$result->get_data}) {
-        $data->{ids}->{$obj->{id}}=$obj;
-        $obj->{applicationId}=$obj->{id};
-        $obj->{applicationName}=$obj->{name};
-	my $app_id=$obj->{id};
-	$obj->{our_type}='applications';
-	my $name=lc($obj->{name});
-	$data->{applications}->{lc($obj->{name})}=[] unless exists $data->{applications}->{$obj->{name}};
-        push @{$data->{applications}->{$name}},$obj->{id};
+    if ($result) {
+      foreach my $obj ( @{ $result->get_data } ) {
+        $data->{ids}->{ $obj->{id} } = $obj;
+        $obj->{applicationId}        = $obj->{id};
+        $obj->{applicationName}      = $obj->{name};
+        my $app_id = $obj->{id};
+        $obj->{our_type} = 'applications';
+        my $name = lc( $obj->{name} );
+        $data->{applications}->{ lc( $obj->{name} ) } = [] unless exists $data->{applications}->{ $obj->{name} };
+        push @{ $data->{applications}->{$name} }, $obj->{id};
+
         foreach my $method (qw(que_list_nodes que_list_tiers que_list_business_transactions )) {
-	  ++$total;
-	  my $code=sub {
-            my ($self,undef,$result,$request,$response)=@_;
+          ++$total;
+          my $code = sub {
+            my ( $self, undef, $result, $request, $response ) = @_;
             return unless $state;
-            return ($cb->($self,$id,$result,$request,$response,$method,$obj),$state=0) unless $result;
-	    --$total;
-	    foreach my $sub_obj (@{$result->get_data}) {
-	      my $target=$method;
-	      $target=~ s/^que_list_//;
+            return ( $cb->( $self, $id, $result, $request, $response, $method, $obj ), $state = 0 ) unless $result;
+            --$total;
+            foreach my $sub_obj ( @{ $result->get_data } ) {
+              my $target = $method;
+              $target =~ s/^que_list_//;
 
-	      foreach my $field (qw(name machineName)) {
-	        next unless exists $sub_obj->{$field};
-		my $name=lc($sub_obj->{$field});
-	        $data->{$target}->{$name}=[] unless exists $data->{$target}->{$name};
-	        push @{$data->{$target}->{$name}},$sub_obj->{id};
-	      }
-              $sub_obj->{applicationId}=$obj->{id};
-              $sub_obj->{applicationName}=$obj->{name};
-	      $sub_obj->{our_type}=$target;
-	      $data->{ids}->{$sub_obj->{id}}=$sub_obj;
-	      if(exists $sub_obj->{machineId}) {
-	        $data->{ids}->{$sub_obj->{machineId}}=$sub_obj;
-	        $data->{id_map}->{$app_id}->{$sub_obj->{machineId}}++;
-	      }
-	      $data->{id_map}->{$app_id}->{$sub_obj->{id}}++;
-	      if(exists $sub_obj->{tierId}) {
-	        $data->{id_map}->{$sub_obj->{tierId}}->{$sub_obj->{id}}++;
-	        $data->{id_map}->{$sub_obj->{tierId}}->{$sub_obj->{machineId}}++ if exists $sub_obj->{machineId};
-	      }
-	    }
+              foreach my $field (qw(name machineName)) {
+                next unless exists $sub_obj->{$field};
+                my $name = lc( $sub_obj->{$field} );
+                $data->{$target}->{$name} = [] unless exists $data->{$target}->{$name};
+                push @{ $data->{$target}->{$name} }, $sub_obj->{id};
+              }
+              $sub_obj->{applicationId}        = $obj->{id};
+              $sub_obj->{applicationName}      = $obj->{name};
+              $sub_obj->{our_type}             = $target;
+              $data->{ids}->{ $sub_obj->{id} } = $sub_obj;
+              if ( exists $sub_obj->{machineId} ) {
+                $data->{ids}->{ $sub_obj->{machineId} } = $sub_obj;
+                $data->{id_map}->{$app_id}->{ $sub_obj->{machineId} }++;
+              }
+              $data->{id_map}->{$app_id}->{ $sub_obj->{id} }++;
+              if ( exists $sub_obj->{tierId} ) {
+                $data->{id_map}->{ $sub_obj->{tierId} }->{ $sub_obj->{id} }++;
+                $data->{id_map}->{ $sub_obj->{tierId} }->{ $sub_obj->{machineId} }++ if exists $sub_obj->{machineId};
+              }
+            }
 
-	    if($total==0) {
-              return ($cb->($self,$id,$self->new_true($data),$request,$response,'que_walk_all',$obj),$state=0) 
-	    }
-	  };
-	  push @ids,$self->$method($code,$obj->{id});
-	}
+            if ( $total == 0 ) {
+              return ( $cb->( $self, $id, $self->new_true($data), $request, $response, 'que_walk_all', $obj ),
+                $state = 0 );
+            }
+          };
+          push @ids, $self->$method( $code, $obj->{id} );
+        }
       }
     } else {
-      return $cb->($self,$id,$result,$request,$response,'que_list_applications',undef);
+      return $cb->( $self, $id, $result, $request, $response, 'que_list_applications', undef );
     }
     $self->add_ids_for_blocking(@ids);
     $self->agent->run_next;
@@ -578,15 +615,15 @@ Example Callback:
 =cut
 
 sub que_health_rule_violations {
-  my ($self,$cb,$app,%args)=@_;
-  $app="PRODUCTION" unless defined($app);
-  my $path=sprintf '/controller/rest/applications/%s/problems/healthrule-violations',uri_escape($app);
-  if(keys %args==0) {
-    %args=('time-range-type'=>'BEFORE_NOW','duration-in-mins'=>15);
+  my ( $self, $cb, $app, %args ) = @_;
+  $app = "PRODUCTION" unless defined($app);
+  my $path = sprintf '/controller/rest/applications/%s/problems/healthrule-violations', uri_escape($app);
+  if ( keys %args == 0 ) {
+    %args = ( 'time-range-type' => 'BEFORE_NOW', 'duration-in-mins' => 15 );
   }
-  
-  my $req=$self->create_get($path,%args);
-  return $self->queue_request($req,$cb);
+
+  my $req = $self->create_get( $path, %args );
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -617,11 +654,11 @@ Example Callback:
 =cut
 
 sub que_export_policies {
-  my ($self,$cb,$app)=@_;
-  my $path=sprintf '/controller/policies/%s',uri_escape($app);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+  my ( $self, $cb, $app ) = @_;
+  my $path = sprintf '/controller/policies/%s', uri_escape($app);
+
+  my $req = $self->create_get($path);
+  return $self->queue_request( $req, $cb );
 }
 
 =back
@@ -641,93 +678,93 @@ Returns a Data::Result Object, when true the result will cointain health rules o
 =cut
 
 sub que_find_health_rule_violations {
-  my ($self,$cb,$type,$name)=@_;
+  my ( $self, $cb, $type, $name ) = @_;
 
   my $id;
-  my $code=sub {
-    my ($self,undef,$result,$request,$response)=@_;
+  my $code = sub {
+    my ( $self, undef, $result, $request, $response ) = @_;
     return $cb->(@_) unless $result;
-    my @resolved=@{$result->get_data};
+    my @resolved = @{ $result->get_data };
 
     my @ids;
-    my $resolved={};
-    my $state=1;
-    my $alerts=[];
-    my $total=0;
-    my $apps={};
+    my $resolved = {};
+    my $state    = 1;
+    my $alerts   = [];
+    my $total    = 0;
+    my $apps     = {};
 
     # safe to use here, since we know it is current
-    my $cache=$self->data_cache;
+    my $cache = $self->data_cache;
 
-    my $sub_cb=sub {
-      my ($self,undef,$result,$request,$response)=@_;
+    my $sub_cb = sub {
+      my ( $self, undef, $result, $request, $response ) = @_;
       return unless $state;
-      unless($result) {
+      unless ($result) {
         $cb->(@_);
-	$state=0;
-	return;
+        $state = 0;
+        return;
       }
-      LOOK_UP: foreach my $event (@{$result->get_data}) {
-        my $entity_id=$event->{affectedEntityDefinition}->{entityId};
+    LOOK_UP: foreach my $event ( @{ $result->get_data } ) {
+        my $entity_id = $event->{affectedEntityDefinition}->{entityId};
 
         next unless exists $resolved->{$entity_id};
-	my $target=$cache->{ids}->{$entity_id};
-	foreach my $obj (@resolved) {
-	  my $type=$obj->{our_type};
-	  if($type eq 'tiers') {
-	    my $tier_id=$obj->{id};
-	    next unless exists $target->{tierId};
-	    next unless $target->{tierId}==$tier_id;
-	    push @{$alerts},$event;
-	  } elsif($type eq 'applications') {
-	    my $app_id=$obj->{id};
-	    next unless $target->{applicationId}==$app_id;
-	    push @{$alerts},$event;
-	  } elsif($type eq 'business_transactions') {
-	    my $id=$obj->{id};
-	    next unless $target->{id}==$id;
-	    push @{$alerts},$event;
-	  } elsif($type eq 'nodes') {
-	    foreach my $key (qw(id machineId)) {
-	      next unless exists $obj->{$key};
-	      next unless exists $target->{$key};
-	      next unless $obj->{$key}==$target->{$key};
-	      push @{$alerts},$event;
-	      next LOOK_UP;
-	    }
-	  }
-	}
+        my $target = $cache->{ids}->{$entity_id};
+        foreach my $obj (@resolved) {
+          my $type = $obj->{our_type};
+          if ( $type eq 'tiers' ) {
+            my $tier_id = $obj->{id};
+            next unless exists $target->{tierId};
+            next unless $target->{tierId} == $tier_id;
+            push @{$alerts}, $event;
+          } elsif ( $type eq 'applications' ) {
+            my $app_id = $obj->{id};
+            next unless $target->{applicationId} == $app_id;
+            push @{$alerts}, $event;
+          } elsif ( $type eq 'business_transactions' ) {
+            my $id = $obj->{id};
+            next unless $target->{id} == $id;
+            push @{$alerts}, $event;
+          } elsif ( $type eq 'nodes' ) {
+            foreach my $key (qw(id machineId)) {
+              next unless exists $obj->{$key};
+              next unless exists $target->{$key};
+              next unless $obj->{$key} == $target->{$key};
+              push @{$alerts}, $event;
+              next LOOK_UP;
+            }
+          }
+        }
       }
-      
-      return unless --$total==0;
-      $cb->($self,$id,$self->new_true($alerts),undef,undef);
+
+      return unless --$total == 0;
+      $cb->( $self, $id, $self->new_true($alerts), undef, undef );
     };
-    foreach my $obj (@{$result->get_data}) {
-      $apps->{$obj->{applicationId}}++;
+    foreach my $obj ( @{ $result->get_data } ) {
+      $apps->{ $obj->{applicationId} }++;
 
       foreach my $key (qw(id applicationId tierId machineId)) {
         next unless exists $obj->{$key};
-        $resolved->{$obj->{$key}}++;
-	my $id=$obj->{$key};
-	if(exists $cache->{id_map}->{$id}) {
-	  my @keys=keys %{$cache->{id_map}->{$id}};
-	  @{$resolved}{@keys}=@{$cache->{id_map}->{$id}}{@keys};
-	}
+        $resolved->{ $obj->{$key} }++;
+        my $id = $obj->{$key};
+        if ( exists $cache->{id_map}->{$id} ) {
+          my @keys = keys %{ $cache->{id_map}->{$id} };
+          @{$resolved}{@keys} = @{ $cache->{id_map}->{$id} }{@keys};
+        }
       }
       ++$total;
 
-      my $app_id=$obj->{applicationId};
-      push @ids,$self->que_health_rule_violations($sub_cb,$app_id);
+      my $app_id = $obj->{applicationId};
+      push @ids, $self->que_health_rule_violations( $sub_cb, $app_id );
     }
     $self->add_ids_for_blocking(@ids);
     $self->agent->run_next;
   };
 
-  $id=$self->que_resolve($code,$type,$name);
+  $id = $self->que_resolve( $code, $type, $name );
   return $id;
 }
 
-=back 
+=back
 
 =head1 Listing Metrics
 
@@ -754,17 +791,18 @@ Example Callback:
 
 In a blocking context, $result contains the results when true and why it failed when false.
 
+=back 
+
 =cut
 
 sub que_get_application_metric {
-  my ($self,$cb,$app,@args)=@_;
+  my ( $self, $cb, $app, @args ) = @_;
 
-  my $path='/controller/rest/applications/'.$app.'/metric-data';
-  my $get=$self->create_get($path,@args);
-  return $self->queue_request($get,$cb);
+  my $path = '/controller/rest/applications/' . $app . '/metric-data';
+  my $get  = $self->create_get( $path, @args );
+  return $self->queue_request( $get, $cb );
 }
 
-=back
 
 =head1 Resolving Objects
 
@@ -798,35 +836,35 @@ Example Callback:
 =cut
 
 sub que_resolve {
-  my ($self,$cb,$type,$name)=@_;
+  my ( $self, $cb, $type, $name ) = @_;
 
-  my $code=sub {
-    my ($self,$id,$result,$request,$response)=@_;
+  my $code = sub {
+    my ( $self, $id, $result, $request, $response ) = @_;
     return $cb->(@_) unless $result;
 
-
-    foreach my $key ($type,$name) {
-      $key=lc($key);
-      $key=~ s/(?:^\s+|\s+$)//sg;
+    foreach my $key ( $type, $name ) {
+      $key = lc($key);
+      $key =~ s/(?:^\s+|\s+$)//sg;
     }
 
-    my $cache=$result->get_data;
-    if(exists $cache->{$type}) {
-      if(exists($cache->{$type}->{$name})) {
-	my $data=[];
-	foreach my $target (@{$cache->{$type}->{$name}}) {
-	  push @{$data},$cache->{ids}->{$target};
-	}
-	return $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef) if $#{$data}==-1;
-        $cb->($self,$id,$self->new_true($data),$request,$response);
+    my $cache = $result->get_data;
+    if ( exists $cache->{$type} ) {
+      if ( exists( $cache->{$type}->{$name} ) ) {
+        my $data = [];
+        foreach my $target ( @{ $cache->{$type}->{$name} } ) {
+          push @{$data}, $cache->{ids}->{$target};
+        }
+        return $cb->( $self, $id, $self->new_false("Type: [$type] Name: [$name] Not Found"), undef, undef )
+          if $#{$data} == -1;
+        $cb->( $self, $id, $self->new_true($data), $request, $response );
       } else {
-        $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef);
+        $cb->( $self, $id, $self->new_false("Type: [$type] Name: [$name] Not Found"), undef, undef );
       }
     } else {
-      $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef);
+      $cb->( $self, $id, $self->new_false("Type: [$type] Name: [$name] Not Found"), undef, undef );
     }
   };
-  my $id=$self->que_check_cache($code);
+  my $id = $self->que_check_cache($code);
   return $id;
 }
 
@@ -860,21 +898,23 @@ Example Callback:
 =cut
 
 sub que_check_cache {
-  my ($self,$cb,$force)=@_;
+  my ( $self, $cb, $force ) = @_;
 
-  my $max=time - $self->cache_max_age;
-  if(!$force and  $self->data_cache->{created_on} > $max) {
-    return $self->queue_result($cb,$self->new_true($self->data_cache));
+  my $max = time - $self->cache_max_age;
+  if ( !$force and $self->data_cache->{created_on} > $max ) {
+    return $self->queue_result( $cb, $self->new_true( $self->data_cache ) );
   } else {
     $self->cache_check(1);
-    return $self->que_walk_all(sub {
-      my ($self,$id,$result,@list)=@_;
-      $self->cache_check(0);
-      return $cb->(@_) unless $result;
-      $self->data_cache($result->get_data);
-      $self->data_cache->{created_on}=time;
-      return $cb->($self,$id,$result,@list);
-    });
+    return $self->que_walk_all(
+      sub {
+        my ( $self, $id, $result, @list ) = @_;
+        $self->cache_check(0);
+        return $cb->(@_) unless $result;
+        $self->data_cache( $result->get_data );
+        $self->data_cache->{created_on} = time;
+        return $cb->( $self, $id, $result, @list );
+      }
+    );
   }
 }
 
@@ -891,8 +931,8 @@ Creates the base url for a request.
 =cut
 
 sub base_url {
-  my ($self)=@_;
-  my $url=$self->PROTO.'://'.$self->SERVER.':'.$self->PORT;
+  my ($self) = @_;
+  my $url = $self->PROTO . '://' . $self->SERVER . ':' . $self->PORT;
   return $url;
 }
 
@@ -903,22 +943,22 @@ Create a request object for $path with the required arguments
 =cut
 
 sub create_get {
-  my ($self,$path,@args)=@_;
+  my ( $self, $path, @args ) = @_;
 
-  my $str =$self->base_url.$path.'?';
-  push @args,'output','JSON';
+  my $str = $self->base_url . $path . '?';
+  push @args, 'output', 'JSON';
 
-  my $count=0;
-  while(my ($key,$value)=splice @args,0,2) {
-    if($count++ ==0) {
-      $str .="$key=".uri_escape($value);
+  my $count = 0;
+  while ( my ( $key, $value ) = splice @args, 0, 2 ) {
+    if ( $count++ == 0 ) {
+      $str .= "$key=" . uri_escape($value);
     } else {
-      $str .="\&$key=".uri_escape($value);
+      $str .= "\&$key=" . uri_escape($value);
     }
   }
 
-  my $headers=HTTP::Headers->new(@{$self->{header}});
-  my $request=HTTP::Request->new(GET=>$str,$headers);
+  my $headers = HTTP::Headers->new( @{ $self->{header} } );
+  my $request = HTTP::Request->new( GET => $str, $headers );
 
   return $request;
 }

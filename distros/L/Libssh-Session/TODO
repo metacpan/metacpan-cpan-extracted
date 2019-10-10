@@ -1,5 +1,4 @@
 Some ideas:
-- add some other auth method: ssh_userauth_agent, keyboard-interactive authentication method
 - working on waitfor and write on a channel (without a shell)
 - multiple execution with multiple sessions
 - try to do events working

@@ -5,7 +5,7 @@ use warnings;
 use base 'Excel::Writer::XLSX';
 use Excel::Writer::XLSX::Utility;
 
-use version; our $VERSION = version->declare("v1.0.8");
+use version; our $VERSION = version->declare("v1.0.9");
 
 use Archive::Zip;
 use Graphics::ColorUtils 'rgb2hls', 'hls2rgb';
@@ -1001,7 +1001,7 @@ heights, Sheet selection, and Tab Color)
             # Merged Ranges/Areas: save the address for pass 2.
             # cells within the merged range will be processed with 
             # merge_range_type(), instead of write()
-            $self->{MERGED_RANGES}{$topleft} = $ref;
+            $self->{MERGED_RANGES}{$sheet->{_index}}{$topleft} = $ref;
          }
          $twig->purge;
       },
@@ -1070,6 +1070,7 @@ font, and number formats.
    return {
       'sheetData/row' => sub {
          my ( $twig, $row_elt ) = @_;
+         my $sheet_idx = $sheet->{_index};
          for my $cell ( $row_elt->children('c') ) {
             my $string_index = 0;
             my $a1           = $cell->att('r');           # Cell Address
@@ -1096,8 +1097,8 @@ font, and number formats.
 
                my $is_array = ref($val) eq 'ARRAY';
                my @aval = $is_array ? @$val : ($val);
-               if ( my $ref = $self->{MERGED_RANGES}{$a1} ) {
-                 my $type = $is_array ? 'rich_string' : 'string';
+               if ( my $ref = $self->{MERGED_RANGES}{$sheet_idx}{$a1} ) {
+                   my $type = $is_array ? 'rich_string' : 'string';
                  $sheet->merge_range_type($type, $ref, @aval, $format );
                  next;
                }
@@ -1131,7 +1132,8 @@ font, and number formats.
                      $sheet->write_array_formula( $ref, "=${formula}", $format, $val );
                   }
                   else {
-                     if ( my $ref = $self->{MERGED_RANGES}{$a1} ) {
+                     #if ( my $ref = $self->{MERGED_RANGES}{$a1} ) {
+                     if ( my $ref = $self->{MERGED_RANGES}{$sheet_idx}{$a1} ) {
                        $sheet->merge_range_type('formula', $ref, "=${formula}", $format, $val);
                      } else {
                         $sheet->write_formula( $a1, "=${formula}", $format,

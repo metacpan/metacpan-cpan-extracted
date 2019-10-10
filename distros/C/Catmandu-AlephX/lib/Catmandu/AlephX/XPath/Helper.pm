@@ -7,6 +7,8 @@ use Exporter qw(import);
 our @EXPORT_OK=qw(get_children xpath);
 our %EXPORT_TAGS = (all=>[@EXPORT_OK]);
 
+our $VERSION = "1.071";
+
 sub get_children {
   my($xpath,$is_hash) = @_;
 
@@ -27,6 +29,7 @@ sub get_children {
 
   $hash;
 }
+
 sub xpath {
   my $str = $_[0];
   my $xpath;

@@ -1,4 +1,10 @@
 
+4.17  2019-10-07
+  - Reverted connection cache optimization from 4.14, because it caused problems
+    with some connections closed by the PostgreSQL server.
+  - Updated mojo_migrations table created by Mojo::Pg::Migrations to use a
+    primary key.
+
 4.16  2019-09-04
   - Updated DBD::Pg requirement to 3.7.4 due to certain JSON features not
     working with older versions.

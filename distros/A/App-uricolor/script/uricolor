@@ -4,12 +4,10 @@
 #
 # uricolor is a Perl script to colorize URIs with ANSI colors.
 # It reads files sequentially, and writes them to STDOUT,
-# with all URIs colored (underline blue). If file is a dash "-"
-# or if no file is given, uricolor reads from STDIN.
-# 
-# Current limitations :
-# - hardcoded style (underline blue)
+# with all URIs colored. If file is a dash "-" or if no file
+# is given as argument, uricolor reads from STDIN.
 #
+# 2019.10.10 v0.15 jul : fixed META data
 # 2019.08.05 v0.14 jul : added -c (color)
 # 2019.07.09 v0.13 jul : added -s (schemeless), use 5.010, better doc
 # 2019.06.18 v0.12 jul : dropped file extension, added pod
@@ -26,7 +24,7 @@ use URI::Find;
 use URI::Find::Schemeless;
 use Term::ANSIColor qw(colored colorvalid);
 
-our $VERSION    = '0.14';
+our $VERSION    = '0.15';
 my $program     = basename($0);
 my $usage       = <<EOF;
 
@@ -102,18 +100,17 @@ uricolor - Colorize URIs with ANSI colors.
 
 uricolor is a Perl script to colorize URIs with ANSI colors.
 It reads files sequentially, and writes them to STDOUT,
-with all URIs colored (underline blue). If file is a dash "-"
-or if no file is given, uricolor reads from STDIN.
+with all URIs colored. If file is a dash "-" or if no file
+is given as argument, uricolor reads from STDIN.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-app-uricolor at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-uricolor>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<kaldor@cpan.org>, or through
+the web interface at L<https://github.com/kal247/App-uricolor/issues>.
 
 =head1 AUTHOR
 
-jul, C<< <kal247 at gmail.com> >>
+jul, C<kaldor@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

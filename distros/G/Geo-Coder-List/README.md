@@ -10,7 +10,7 @@ Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.25
+Version 0.26
 
 # SYNOPSIS
 
@@ -127,9 +127,9 @@ reverse\_geocode() should support [Geo::Location::Point](https://metacpan.org/po
 
 # SEE ALSO
 
-[Geo::Coder::Many](https://metacpan.org/pod/Geo::Coder::Many)
 [Geo::Coder::All](https://metacpan.org/pod/Geo::Coder::All)
 [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces)
+[Geo::Coder::Many](https://metacpan.org/pod/Geo::Coder::Many)
 
 # SUPPORT
 
@@ -143,10 +143,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/Geo-Coder-List](http://annocpan.org/dist/Geo-Coder-List)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/Geo-Coder-List](http://cpanratings.perl.org/d/Geo-Coder-List)
@@ -159,4 +155,4 @@ You can also look for information at:
 
 Copyright 2016-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

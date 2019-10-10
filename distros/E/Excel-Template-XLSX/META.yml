@@ -19,7 +19,7 @@ name: Excel-Template-XLSX
 provides:
   Excel::Template::XLSX:
     file: lib/Excel/Template/XLSX.pm
-    version: v1.0.8
+    version: v1.0.9
 requires:
   Archive::Zip: '0'
   Excel::Writer::XLSX: '0.9'
@@ -29,5 +29,5 @@ requires:
   perl: v5.12.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v1.0.8
+version: v1.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

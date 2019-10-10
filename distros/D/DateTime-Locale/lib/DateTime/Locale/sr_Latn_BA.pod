@@ -156,13 +156,13 @@ Serbian Bosnia & Herzegovina Latin locale.
 
   jan
   feb
-  mart
+  mar
   apr
   maj
   jun
   jul
   avg
-  sept
+  sep
   okt
   nov
   dec
@@ -463,7 +463,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
    2008-02-05T18:30:30 = feb
    1995-12-22T09:05:02 = dec
-  -0010-09-15T04:44:23 = sept
+  -0010-09-15T04:44:23 = sep
 
 =head3 MMMEd (E d. MMM)
 

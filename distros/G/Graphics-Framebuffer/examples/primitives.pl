@@ -15,7 +15,6 @@ use Data::Dumper;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
-our $VERSION = '6.31';
 our $F;
 
 my $new_x;

@@ -1,6 +1,7 @@
 requires "Carp" => "0";
 requires "IO::File" => "0";
 requires "IO::Handle" => "0";
+requires "Sub::Util" => "0";
 requires "Try::Tiny" => "0";
 requires "feature" => "0";
 requires "mro" => "0";

@@ -5,7 +5,7 @@ use 5.010001;
 
 our %RECOMMENDED = ( DBI => 0, 'DBD::SQLite' => 0);
 our %REQUIRED = ( JSON => '2.0', 'Time::HiRes' => 0, 'File::Temp' => 0 );
-our @NO_INDEX = ();
+our @NO_INDEX = ( 'Dir::Flock' );
 
 our %META_MERGE
     = (recommends => \%RECOMMENDED);

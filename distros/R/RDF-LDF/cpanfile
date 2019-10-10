@@ -17,6 +17,7 @@ requires 'HTTP::Message', 0;
 requires 'JSON', 0;
 requires 'Log::Any', 0;
 requires 'Moo', 0;
+requires 'LWP::UserAgent', 0;
 
 requires 'RDF::NS', '20150725';
 

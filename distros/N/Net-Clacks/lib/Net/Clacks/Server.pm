@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 6.1;
+our $VERSION = 7;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -111,6 +111,14 @@ sub init {
         $self->{persistance} = 0;
     }
 
+    if(!defined($self->{config}->{interclacksreconnecttimeout})) {
+        $self->{config}->{interclacksreconnecttimeout} = 30;
+    }
+
+    if(!defined($self->{config}->{authtimeout})) {
+        $self->{config}->{authtimeout} = 15;
+    }
+
     my @tcpsockets;
 
     foreach my $ip (@{$config->{ip}}) {
@@ -157,6 +165,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     my $shutdowntime;
     my $selector = IO::Select->new();
     my $interclackslock = 0;
+    my $nextinterclackscheck = 0;
 
     my $keepRunning = 1;
     $SIG{INT} = sub { $keepRunning = 0; };
@@ -209,7 +218,9 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         if(defined($self->{config}->{master})) {
             # We are in client mode. We need to add an interclacks link
             my $mcid = $self->{config}->{master}->{ip}->[0] . ':' . $self->{config}->{master}->{port};
-            if(!defined($clients{$mcid})) {
+            if(!defined($clients{$mcid}) && $nextinterclackscheck < time) {
+                $nextinterclackscheck = time + $self->{config}->{interclacksreconnecttimeout} + int(rand(10));
+
                 print "Connect to master\n";
                 my $msocket = IO::Socket::IP->new(
                     PeerHost => $self->{config}->{master}->{ip}->[0],
@@ -249,6 +260,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         interclacksclient => 1,
                         lastinterclacksping => time,
                         lastmessage => time,
+                        authtimeout => time + $self->{config}->{authtimeout},
                         authok => 0,
                     );
                     $clients{$mcid} = \%tmp;
@@ -313,6 +325,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     interclacksclient => 0,
                     lastinterclacksping => 0,
                     lastmessage => time,
+                    authtimeout => time + $self->{config}->{authtimeout},
                     authok => 0,
                 );
                 if(0 && $self->{isDebugging}) {
@@ -339,17 +352,24 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                 if($clients{$cid}->{lastping} > 0 && $clients{$cid}->{lastping} < $pingtime) {
                     syswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
                     push @toremove, $cid;
+                    next;
                 }
             } else {
                 if($clients{$cid}->{lastping} < $interclackspingtime) {
                     syswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
                     push @toremove, $cid;
+                    next;
                 }
             }
 
             if($clients{$cid}->{interclacks} && $clients{$cid}->{lastinterclacksping} < $interclackspinginterval) {
                 $clients{$cid}->{lastinterclacksping} = time;
                 $clients{$cid}->{outbuffer} .= "PING\r\n";
+            }
+
+            if(!$clients{$cid}->{authok} && $clients{$cid}->{authtimeout} < time) {
+                # Authentication timeout!
+                push @toremove, $cid;
             }
         }
 
@@ -378,7 +398,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
         if(!(scalar keys %clients)) {
             # No clients to handle, let's sleep and try again later
-            sleep(0.2);
+            sleep(0.1);
             next;
         }
 
@@ -466,6 +486,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                             } else {
                                 $clients{$cid}->{authok} = 0;
                                 $clients{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
+                                push @toremove, $cid; # Disconnect the client
                             }
                         }
 
@@ -479,8 +500,11 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                             if($value) {
                                 print "Interclacks sync lock ON.\n";
                                 $interclackslock = 1;
-                                
-                                # Send server our keys to the server
+                            } else {
+                                print "Interclacks sync lock OFF.\n";
+                                $interclackslock = 0;
+
+                                # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
                                 foreach my $ckey (sort keys %clackscache) {
                                     $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
                                 }
@@ -488,10 +512,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                                     next if(defined($clackscache{$ckey}));
                                     $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
                                 }
-
-                            } else {
-                                print "Interclacks sync lock OFF.\n";
-                                $interclackslock = 0;
                             }
                             $parsedflags{forward_message} = 0; # Don't forward
                             $newflags{return_to_sender} = 0; # Don't return to sender
@@ -598,7 +618,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     }
 
 
-                    if($clients{$cid}->{buffer} =~ /^OVERHEAD\ /) {
+                    if($clients{$cid}->{buffer} =~ /^OVERHEAD\ /) { ## no critic (ControlStructures::ProhibitCascadingIfElse)
                         # Already handled
                     } elsif($clients{$cid}->{buffer} =~ /^LISTEN\ (.*)/) {
                         $clients{$cid}->{listening}->{$1} = 1;
@@ -935,6 +955,18 @@ for a master/client server architecture.
 =head2 new
 
 Create a new instance.
+
+=head2 init
+
+Initialize server instance (required before running)
+
+=head2 run
+
+Run the server instance
+
+=head2 deref
+
+Internal function
 
 =head1 IMPORTANT NOTE
 

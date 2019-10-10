@@ -6,7 +6,7 @@ use Catmandu::AlephX;
 use Data::Dumper;
 use open qw(:std :utf8);
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my($base,$doc_number)=("rug01","001484477");
 my $item_data = $aleph->item_data_multi(base => $base,doc_number => $doc_number);

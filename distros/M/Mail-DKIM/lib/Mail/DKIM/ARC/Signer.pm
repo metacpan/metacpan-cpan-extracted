@@ -159,7 +159,7 @@ The list of headers signed by default is as follows
 package Mail::DKIM::ARC::Signer;
 use base 'Mail::DKIM::Common';
 use Carp;
-our $VERSION = 0.56;
+our $VERSION = 0.57;
 
 # PROPERTIES
 #
@@ -196,7 +196,7 @@ our $VERSION = 0.56;
 # $signer->{result}
 #   result of the signing policy: "signed" or "skipped"
 #
-# $signer->{result_reason}
+# $signer->{details}
 #   why we skipped this signature
 #
 # $signer->{signature}
@@ -276,13 +276,13 @@ sub finish_header {
             if ( $header =~ m/^ARC-/ ) {
                 if ( !$ar ) {
                     $self->{result} = 'skipped';
-                    $self->{result_reason} =
+                    $self->{details} =
                       'ARC header seen before Authentication-Results';
                     return;
                 }
                 if ( $self->{Chain} eq 'ar' ) {
                     $self->{result} = 'skipped';
-                    $self->{result_reason} =
+                    $self->{details} =
                       'No ARC result found in Authentication-Results';
                     return;
                 }
@@ -294,7 +294,7 @@ sub finish_header {
                 my $i    = $seal->instance;
                 if ( $as[$i] ) {
                     $self->{result}        = 'skipped';
-                    $self->{result_reason} = "Duplicate ARC-Seal $i";
+                    $self->{details} = "Duplicate ARC-Seal $i";
                     return;
                 }
                 $as[$i] = $seal;
@@ -304,7 +304,7 @@ sub finish_header {
                 my $i   = $sig->instance;
                 if ( $ams[$i] ) {
                     $self->{result} = 'skipped';
-                    $self->{result_reason} =
+                    $self->{details} =
                       "Duplicate ARC-Message-Signature $i";
                     return;
                 }
@@ -314,7 +314,7 @@ sub finish_header {
                 my $i = $1;
                 if ( $aar[$i] ) {
                     $self->{result} = 'skipped';
-                    $self->{result_reason} =
+                    $self->{details} =
                       "Duplicate ARC-Authentication-Results $i";
                     return;
                 }
@@ -326,30 +326,30 @@ sub finish_header {
 
     unless ($ar) {
         $self->{result}        = 'skipped';
-        $self->{result_reason} = 'No authentication results seen';
+        $self->{details} = 'No authentication results seen';
         return;
     }
 
     if ( $#ams > $#as ) {
         $self->{result}        = 'skipped';
-        $self->{result_reason} = 'More message signatures than seals';
+        $self->{details} = 'More message signatures than seals';
         return;
     }
     if ( $#aar > $#as ) {
         $self->{result}        = 'skipped';
-        $self->{result_reason} = 'More authentication results than seals';
+        $self->{details} = 'More authentication results than seals';
         return;
     }
 
     foreach my $i ( 1 .. $#as ) {
         unless ( $as[$i] ) {
             $self->{result}        = 'skipped';
-            $self->{result_reason} = "Missing ARC-Seal $i";
+            $self->{details} = "Missing ARC-Seal $i";
             return;
         }
         unless ( $ams[$i] ) {
             $self->{result}        = 'skipped';
-            $self->{result_reason} = "Missing Arc-Message-Signature $i";
+            $self->{details} = "Missing Arc-Message-Signature $i";
             return;
         }
 

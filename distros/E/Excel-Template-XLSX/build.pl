@@ -22,6 +22,9 @@ sub ACTION_all {
 	print `perl build.pl`;
 # SET RELEASE_TESTING=1 & build test
 	print map {`build $_`} qw(test distcheck dist git);
+
+  print 'git push (using GitGui)';
+  print 'cpan upload (pause.perl.org)';
 }
 
 sub ACTION_CPAN {
@@ -48,8 +51,7 @@ sub ACTION_git {
 
 END_SUBS
 
-my $class
-    = Module::Build->subclass( class => 'Build_with_Zip', code => $sub );
+my $class = Module::Build->subclass( class => 'Build_with_Zip', code => $sub );
 
 my $builder = $class->new(
    module_name       => 'Excel::Template::XLSX',

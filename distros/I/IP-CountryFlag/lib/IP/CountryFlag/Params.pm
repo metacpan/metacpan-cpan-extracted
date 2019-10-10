@@ -1,6 +1,6 @@
 package IP::CountryFlag::Params;
 
-$IP::CountryFlag::Params::VERSION   = '0.12';
+$IP::CountryFlag::Params::VERSION   = '0.14';
 $IP::CountryFlag::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,12 @@ IP::CountryFlag::Params - Placeholder for parameters for IP::CountryFlag.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
 use 5.006;
 use strict; use warnings;
-use Data::Dumper;
 use Data::Validate::IP qw(is_ipv4 is_ipv6);
 use parent 'Exporter';
 

@@ -42,20 +42,23 @@ my @dates_maybe = ([2018, 4,  1], [2021, 4,  4]);
 
 my @hours       = ([0, 0, 0, 0], [12, 0, 0, 0], [23, 59, 59, 999_999_999]);
 
-plan(tests => 2 * @hours * (@dates_in + @dates_out + @dates_maybe));
+plan(tests => 3 * @hours * (@dates_in + @dates_out + @dates_maybe));
 
 my $event_easter_sunday = DateTime::Event::Easter->new(
         day => 'easter sunday',
         as  => 'span',
 );
 
-my @exclusive = $event_easter_sunday->as_list(from => $begin, to => $end);
-my @inclusive = $event_easter_sunday->as_list(from => $begin, to => $end, inclusive => 1);
+my @exclusive1 = $event_easter_sunday->as_list(from => $begin, to => $end);
+my @exclusive2 = $event_easter_sunday->as_list(from => $begin, to => $end, inclusive => 0);
+my @inclusive  = $event_easter_sunday->as_list(from => $begin, to => $end, inclusive => 1);
 
-check( \@exclusive, [ @dates_in                ], 1,  " within span of exclusive list" );
-check( \@exclusive, [ @dates_out, @dates_maybe ], 0, " outside span of exclusive list");
-check( \@inclusive, [ @dates_in,  @dates_maybe ], 1,  " within span of inclusive list" );
-check( \@inclusive, [ @dates_out               ], 0, " outside span of inclusive list");
+check( \@exclusive1, [ @dates_in                ], 1,  " within span of implied exclusive list" );
+check( \@exclusive1, [ @dates_out, @dates_maybe ], 0, " outside span of implied exclusive list");
+check( \@exclusive2, [ @dates_in                ], 1,  " within span of explicitly exclusive list" );
+check( \@exclusive2, [ @dates_out, @dates_maybe ], 0, " outside span of explicitly exclusive list");
+check( \@inclusive , [ @dates_in,  @dates_maybe ], 1,  " within span of inclusive list" );
+check( \@inclusive , [ @dates_out               ], 0, " outside span of inclusive list");
 
 sub check {
   my ($ref_list, $ref_dates, $expected, $msg) = @_;

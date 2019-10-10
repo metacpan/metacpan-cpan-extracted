@@ -2,6 +2,7 @@ Changes
 DiscID.xs
 examples/discid.pl
 lib/MusicBrainz/DiscID.pm
+LICENSE.md
 Makefile.PL
 MANIFEST
 README.md

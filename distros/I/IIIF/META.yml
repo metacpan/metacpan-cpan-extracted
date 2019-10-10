@@ -1,0 +1,53 @@
+---
+abstract: 'IIIF Image API implementation'
+author:
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IIIF
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  IIIF:
+    file: lib/IIIF.pm
+    version: '0.04'
+  IIIF::ImageAPI:
+    file: lib/IIIF/ImageAPI.pm
+    version: '0.04'
+  IIIF::Magick:
+    file: lib/IIIF/Magick.pm
+    version: '0.04'
+  IIIF::Request:
+    file: lib/IIIF/Request.pm
+    version: '0.04'
+requires:
+  HTTP::Date: '0'
+  Plack: '1.0'
+  Try::Tiny: '0'
+  perl: '5.014001'
+resources:
+  bugtracker: https://github.com/nichtich/IIIF/issues
+  homepage: https://github.com/nichtich/IIIF
+  repository: git://github.com/nichtich/IIIF.git
+version: '0.04'
+x_contributors:
+  - 'Jakob Voß <jakob.voss@gbv.de>'
+  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
+x_static_install: 1

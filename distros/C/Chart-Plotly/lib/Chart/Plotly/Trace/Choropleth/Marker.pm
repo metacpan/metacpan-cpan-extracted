@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Choropleth::Marker::Line;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace choropleth.
 
@@ -63,7 +63,7 @@ Chart::Plotly::Trace::Choropleth::Marker - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

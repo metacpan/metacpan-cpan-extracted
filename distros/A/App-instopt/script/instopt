@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-07'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-10-09'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010;
 use strict;
@@ -58,7 +58,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.010 of instopt (from Perl distribution App-instopt), released on 2019-08-07.
+This document describes version 0.012 of instopt (from Perl distribution App-instopt), released on 2019-10-09.
 
 =head1 SYNOPSIS
 
@@ -422,6 +422,34 @@ See C<--software-or-pattern>.
 
 =item B<--no-download>
 
+Do not download latest version from URL, just find from download dir.
+
+=item B<--no-make-latest-dir-as-symlink>
+
+Do not use symlink to create latest version directory, but hard-copy instead.
+
+The default is to use symlink. This will create a symlink to the latest version
+directory, e.g.:
+
+    firefox -> firefox-69.0.2
+
+Then the program will be symlinked from this directory, e.g.:
+
+    /usr/local/bin/firefox -> /opt/firefox/firefox
+
+Another alternative (when this option is set to false) is to use hardlink. A
+directory (`firefox`) will be copied from the latest version directory (e.g.
+`firefox-69.0.2`). Then a file (`firefox/instopt.version`) will be written to
+contain the version number (`69.0.2`). Then, as usual, the program will be
+symlinked from this directory, e.g.:
+
+    /usr/local/bin/firefox -> /opt/firefox/firefox
+
+Currently hardlinking is performed using the `cp` command (with the option
+`-la`), so you need to have this on your system (normally present on all Unix
+systems).
+
+
 =item B<--software-or-pattern>=I<s@>*
 
 Can be specified multiple times.
@@ -443,6 +471,34 @@ See C<--no-download>.
 =over
 
 =item B<--no-download>
+
+Do not download latest version from URL, just find from download dir.
+
+=item B<--no-make-latest-dir-as-symlink>
+
+Do not use symlink to create latest version directory, but hard-copy instead.
+
+The default is to use symlink. This will create a symlink to the latest version
+directory, e.g.:
+
+    firefox -> firefox-69.0.2
+
+Then the program will be symlinked from this directory, e.g.:
+
+    /usr/local/bin/firefox -> /opt/firefox/firefox
+
+Another alternative (when this option is set to false) is to use hardlink. A
+directory (`firefox`) will be copied from the latest version directory (e.g.
+`firefox-69.0.2`). Then a file (`firefox/instopt.version`) will be written to
+contain the version number (`69.0.2`). Then, as usual, the program will be
+symlinked from this directory, e.g.:
+
+    /usr/local/bin/firefox -> /opt/firefox/firefox
+
+Currently hardlinking is performed using the `cp` command (with the option
+`-la`), so you need to have this on your system (normally present on all Unix
+systems).
+
 
 =item B<-D>
 
@@ -553,11 +609,13 @@ List of available configuration parameters:
 =head2 Configuration for subcommand update
 
  download (see --no-download)
+ make_latest_dir_as_symlink (see --no-make-latest-dir-as-symlink)
  softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand update-all
 
  download (see --no-download)
+ make_latest_dir_as_symlink (see --no-make-latest-dir-as-symlink)
 
 =head1 ENVIRONMENT
 

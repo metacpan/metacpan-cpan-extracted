@@ -8,7 +8,7 @@ use Module::Build 0.28;
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.4229"
   },
   "configure_requires" => {
     "Module::Build" => "0.28"
@@ -18,7 +18,7 @@ my %module_build_args = (
     "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-MARC",
-  "dist_version" => "1.251",
+  "dist_version" => "1.252",
   "license" => "perl",
   "module_name" => "Catmandu::MARC",
   "recursive_test_files" => 1,
@@ -36,6 +36,7 @@ my %module_build_args = (
     "MARC::Schema" => "0.07",
     "MARC::Spec" => "v2.0.3",
     "Memoize" => 0,
+    "Module::Build" => "0.4229",
     "Moo" => "1.0",
     "MooX::Singleton" => 0,
     "YAML::XS" => "0.34",
@@ -56,7 +57,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Module::Build" => "0.28",
+  "Module::Build" => "0.4229",
   "Pod::Simple::HTML" => "3.23",
   "Test::Deep" => 0,
   "Test::Exception" => 0,

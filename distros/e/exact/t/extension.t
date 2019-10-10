@@ -17,7 +17,6 @@ SKIP: {
                 no strict 'refs';
                 *{ $caller . '::thx' } = \&thx;
             }
-            exact->autoclean( -except => [ qw( thx lives_ok is done_testing ) ] );
         }
 
         sub thx {

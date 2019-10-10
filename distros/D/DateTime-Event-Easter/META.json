@@ -5,13 +5,13 @@
       "Jean Forget <JFORGET@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DateTime-Event-Easter",
    "no_index" : {
@@ -43,12 +43,17 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Fatal" : "0"
+         }
       }
    },
    "provides" : {
       "DateTime::Event::Easter" : {
          "file" : "lib/DateTime/Event/Easter.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -59,6 +64,6 @@
          "web" : "https://github.com/jforget/DateTime-Event-Easter"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

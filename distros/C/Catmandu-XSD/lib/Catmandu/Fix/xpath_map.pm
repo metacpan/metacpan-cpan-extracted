@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Base';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has old_path   => (fix_arg => 1);
 has xpath      => (fix_arg => 1);
@@ -135,5 +135,17 @@ Map an XML field at C<xml_field> to C<new_field> using an XPath expresssion C<xp
 =head1 SEE ALSO
 
 L<Catmandu::Fix>
+
+=head1 AUTHOR
+
+Patrick Hochstenbach , C<< patrick.hochstenbach at ugent.be >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut

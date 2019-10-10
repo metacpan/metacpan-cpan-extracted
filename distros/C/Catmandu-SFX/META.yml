@@ -3,11 +3,14 @@ abstract: 'Catmandu modules for parsing SFX data'
 author:
   - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'
 build_requires:
-  Test::More: '0.96'
+  JSON: '2.90'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.5, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,17 +18,21 @@ meta-spec:
 name: Catmandu-SFX
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Catmandu: '0.9210'
+  Catmandu: '1.2001'
+  Moo: '0'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-SFX/issues
   homepage: https://github.com/LibreCat/Catmandu-SFX
   repository: https://github.com/LibreCat/Catmandu-SFX.git
-version: '0.01'
+version: '0.02'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

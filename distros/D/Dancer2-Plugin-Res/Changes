@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Res
 
+0.09  Thu Oct 10 18:25:00 2019
+      - Moved author test scripts to xt/ subfolder.
+
 0.08  Fri Dec 15 19:05:00 2017
       - Fixed the typo in the code in SYNOPSIS section.
 

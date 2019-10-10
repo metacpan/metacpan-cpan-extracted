@@ -41,7 +41,7 @@ while (my $impl = tq::IMPL()) {
                     $r->enqueue($ii);
                 }
                 pass("Thread $ii exiting");
-                                            });
+            });
         }
 
         # Make sure there's nothing in the queue and threads are blocking

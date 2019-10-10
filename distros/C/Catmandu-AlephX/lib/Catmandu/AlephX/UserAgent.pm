@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check);
 use Moo::Role;
 
+our $VERSION = "1.071";
+
 has url => (
   is => 'ro',
   isa => sub { $_[0] =~ /^https?:\/\//o or die("url must be a valid web url\n"); },

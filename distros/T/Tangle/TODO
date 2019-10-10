@@ -3,4 +3,5 @@ In no particular order:
 - cnot gate does not work properly. I believe the output data needs to be attached to the input leads for binary gates. I believe there is a pattern.
 - gates are transformations which are represented in code as Cayley Dickson numbers. These may need to be expanded in a simple manner in order to work with higher dimensions. Or maybe they already work. Testing is required.
 - testing should be expanded and compared with a 2nd source to confirm and record the confirmation sources in the comments.
+- SWAP function should use a rotation matrix.
 

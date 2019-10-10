@@ -1,3 +1,28 @@
+0.394   2019-09-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Warn when user calls new() without customizing option;
+	  recommend her to use get_cleanser() instead.
+
+
+0.393   2019-09-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [Incompatible change] No longer convert JSON::PP::Boolean objects to
+	  1/0 when cleaning for JSON output, as they are properly converted to
+	  JSON booleans.
+
+        - [Incompatible change] No longer handle JSON::XS::Boolean or
+	  Cpanel::JSON::XS::Boolean objects, as these are normally not produced.
+
+	- [Bugfix] FromJSON: Fix converting JSON boolean objects. Boolean check
+	  on JSON::PP::Boolean objects only works when JSON::PP or JSON::XS etc
+	  has been loaded to provide the overloading; otherwise, all
+	  JSON::PP::Boolean objects will be converted to 1. We now compare the
+	  scalar-deref of them first so regardless of whether any of the
+	  abovmentioned moduls has been loaded.
+
+
 0.392   2019-08-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename module Data::Clean::JSON -> Data::Clean::ForJSON to be clearer.

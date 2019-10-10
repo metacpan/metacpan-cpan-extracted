@@ -1,7 +1,7 @@
 {
    "abstract" : "Colorize URIs with ANSI colors.",
    "author" : [
-      "jul <kal247@gmail.com>"
+      "jul <kaldor@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
@@ -45,6 +45,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.14",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kal247/App-uricolor/issues"
+      },
+      "homepage" : "https://github.com/kal247/App-uricolor",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kal247/App-uricolor.git",
+         "web" : "https://github.com/kal247/App-uricolor"
+      }
+   },
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,0 +1,17 @@
+Revision history for Perl extension IIIF
+
+0.04 2019-10-10T14:58:56Z
+    - add option magick_args
+
+0.03 2019-10-10T12:50:26Z
+    - implement canonical requests
+    - add base URI parameter
+    - improve test coverage
+
+0.02 2019-10-09T15:24:04Z
+    - extend documentation and error handling
+    - implement size parameter
+
+0.01 2019-10-09T11:40:02Z
+    - initial version
+

@@ -2,7 +2,7 @@ package Role::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '2.001001';
+our $VERSION = '2.001003';
 $VERSION =~ tr/_//d;
 
 our %INFO;
@@ -19,6 +19,7 @@ BEGIN {
     = "$]" < 5.011 && !("$]" >= 5.009004 && "$]" < 5.010001)
       ? sub(){1} : sub(){0};
   *_MRO_MODULE = "$]" < 5.010 ? sub(){"MRO/Compat.pm"} : sub(){"mro.pm"};
+  *_CONSTANTS_DEFLATE = "$]" >= 5.012 && "$]" < 5.020 ? sub(){1} : sub(){0};
 }
 
 sub _getglob { no strict 'refs'; \*{$_[0]} }
@@ -57,7 +58,17 @@ sub _all_subs {
   my ($me, $package) = @_;
   my $stash = _getstash($package);
   return {
-    map +($_ => \&{"${package}::${_}"}),
+    map {;
+      no strict 'refs';
+      # this is an ugly hack to populate the scalar slot of any globs, to
+      # prevent perl from converting constants back into scalar refs in the
+      # stash when they are used (perl 5.12 - 5.18). scalar slots on their own
+      # aren't detectable through pure perl, so this seems like an acceptable
+      # compromise.
+      ${"${package}::${_}"} = ${"${package}::${_}"}
+        if _CONSTANTS_DEFLATE;
+      $_ => \&{"${package}::${_}"}
+    }
     grep exists &{"${package}::${_}"},
     grep !/::\z/,
     keys %$stash
@@ -419,21 +430,21 @@ sub methods_provided_by {
 sub _install_methods {
   my ($me, $to, $role) = @_;
 
-  my $info = $INFO{$role};
-
   my $methods = $me->_concrete_methods_of($role);
 
-  # grab target symbol table
-  my $stash = _getstash($to);
+  my %existing_methods;
+  for my $package ($to, grep $_ ne $role, keys %{$APPLIED_TO{$to}}) {
+    @existing_methods{keys %{ $me->_concrete_methods_of($package) }} = ();;
+  }
+
+  # _concrete_methods_of caches its result on roles.  that cache needs to be
+  # invalidated after applying roles
+  delete $INFO{$to}{methods} if $INFO{$to};
+
 
   foreach my $i (keys %$methods) {
-    my $target = $stash->{$i};
-
-    no warnings 'once';
-    no strict 'refs';
-
     next
-      if exists &{"${to}::${i}"};
+      if exists $existing_methods{$i};
 
     my $glob = _getglob "${to}::${i}";
     *$glob = $methods->{$i};

@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has reply => (
@@ -13,7 +15,7 @@ has reply => (
   }
 );
 
-sub op { 'hold-req' } 
+sub op { 'hold-req' }
 
 sub parse {
   my($class,$str_ref) = @_;
@@ -27,7 +29,7 @@ sub parse {
     $args{$key} = $xpath->findvalue("/$op/$_");
   }
 
-  $args{errors} = $class->parse_errors($xpath); 
+  $args{errors} = $class->parse_errors($xpath);
   $args{content_ref} = $str_ref;
 
   __PACKAGE__->new(%args);

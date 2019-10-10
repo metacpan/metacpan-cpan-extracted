@@ -31,17 +31,17 @@ Somali locale.
 =head3 Wide (format)
 
   Isniin
-  Salaasa
-  Arbaca
+  Talaado
+  Arbaco
   Khamiis
-  Jimce
+  Jimco
   Sabti
   Axad
 
 =head3 Abbreviated (format)
 
   Isn
-  Slsa
+  Tldo
   Arbc
   Khms
   Jmc
@@ -51,7 +51,7 @@ Somali locale.
 =head3 Narrow (format)
 
   I
-  S
+  T
   A
   Kh
   J
@@ -62,17 +62,17 @@ Somali locale.
 =head3 Wide (stand-alone)
 
   Isniin
-  Salaasa
-  Arbaca
+  Talaado
+  Arbaco
   Khamiis
-  Jimce
+  Jimco
   Sabti
   Axad
 
 =head3 Abbreviated (stand-alone)
 
   Isn
-  Slsa
+  Tldo
   Arbc
   Khms
   Jmc
@@ -82,7 +82,7 @@ Somali locale.
 =head3 Narrow (stand-alone)
 
   I
-  S
+  T
   A
   Kh
   J
@@ -248,8 +248,8 @@ Somali locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Salaasa, Bisha Labaad 05, 2008
-   1995-12-22T09:05:02 = Jimce, Bisha Laba iyo Tobnaad 22, 1995
+   2008-02-05T18:30:30 = Talaado, Bisha Labaad 05, 2008
+   1995-12-22T09:05:02 = Jimco, Bisha Laba iyo Tobnaad 22, 1995
   -0010-09-15T04:44:23 = Sabti, Bisha Sagaalaad 15, -10
 
 =head3 Long
@@ -302,8 +302,8 @@ Somali locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Salaasa, Bisha Labaad 05, 2008 6:30:30 GD UTC
-   1995-12-22T09:05:02 = Jimce, Bisha Laba iyo Tobnaad 22, 1995 9:05:02 GH UTC
+   2008-02-05T18:30:30 = Talaado, Bisha Labaad 05, 2008 6:30:30 GD UTC
+   1995-12-22T09:05:02 = Jimco, Bisha Laba iyo Tobnaad 22, 1995 9:05:02 GH UTC
   -0010-09-15T04:44:23 = Sabti, Bisha Sagaalaad 15, -10 4:44:23 GH UTC
 
 =head3 Long
@@ -347,49 +347,49 @@ Somali locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = Slsa
+   2008-02-05T18:30:30 = Tldo
    1995-12-22T09:05:02 = Jmc
   -0010-09-15T04:44:23 = Sbti
 
 =head3 EBhm (E h:mm B)
 
-   2008-02-05T18:30:30 = Slsa 6:30 B
+   2008-02-05T18:30:30 = Tldo 6:30 B
    1995-12-22T09:05:02 = Jmc 9:05 B
   -0010-09-15T04:44:23 = Sbti 4:44 B
 
 =head3 EBhms (E h:mm:ss B)
 
-   2008-02-05T18:30:30 = Slsa 6:30:30 B
+   2008-02-05T18:30:30 = Tldo 6:30:30 B
    1995-12-22T09:05:02 = Jmc 9:05:02 B
   -0010-09-15T04:44:23 = Sbti 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
-   2008-02-05T18:30:30 = Slsa 18:30
+   2008-02-05T18:30:30 = Tldo 18:30
    1995-12-22T09:05:02 = Jmc 09:05
   -0010-09-15T04:44:23 = Sbti 04:44
 
 =head3 EHms (E HH:mm:ss)
 
-   2008-02-05T18:30:30 = Slsa 18:30:30
+   2008-02-05T18:30:30 = Tldo 18:30:30
    1995-12-22T09:05:02 = Jmc 09:05:02
   -0010-09-15T04:44:23 = Sbti 04:44:23
 
 =head3 Ed (d, E)
 
-   2008-02-05T18:30:30 = 5, Slsa
+   2008-02-05T18:30:30 = 5, Tldo
    1995-12-22T09:05:02 = 22, Jmc
   -0010-09-15T04:44:23 = 15, Sbti
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = Slsa 6:30 GD
+   2008-02-05T18:30:30 = Tldo 6:30 GD
    1995-12-22T09:05:02 = Jmc 9:05 GH
   -0010-09-15T04:44:23 = Sbti 4:44 GH
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = Slsa 6:30:30 GD
+   2008-02-05T18:30:30 = Tldo 6:30:30 GD
    1995-12-22T09:05:02 = Jmc 9:05:02 GH
   -0010-09-15T04:44:23 = Sbti 4:44:23 GH
 
@@ -407,7 +407,7 @@ Somali locale.
 
 =head3 GyMMMEd (E, MMM d, y G)
 
-   2008-02-05T18:30:30 = Slsa, Feb 5, 2008 CD
+   2008-02-05T18:30:30 = Tldo, Feb 5, 2008 CD
    1995-12-22T09:05:02 = Jmc, Dis 22, 1995 CD
   -0010-09-15T04:44:23 = Sbti, Seb 15, -10 CH
 
@@ -455,7 +455,7 @@ Somali locale.
 
 =head3 MEd (E, M/d)
 
-   2008-02-05T18:30:30 = Slsa, 2/5
+   2008-02-05T18:30:30 = Tldo, 2/5
    1995-12-22T09:05:02 = Jmc, 12/22
   -0010-09-15T04:44:23 = Sbti, 9/15
 
@@ -467,13 +467,13 @@ Somali locale.
 
 =head3 MMMEd (E, MMM d)
 
-   2008-02-05T18:30:30 = Slsa, Feb 5
+   2008-02-05T18:30:30 = Tldo, Feb 5
    1995-12-22T09:05:02 = Jmc, Dis 22
   -0010-09-15T04:44:23 = Sbti, Seb 15
 
 =head3 MMMMEd (E, MMMM d)
 
-   2008-02-05T18:30:30 = Slsa, Bisha Labaad 5
+   2008-02-05T18:30:30 = Tldo, Bisha Labaad 5
    1995-12-22T09:05:02 = Jmc, Bisha Laba iyo Tobnaad 22
   -0010-09-15T04:44:23 = Sbti, Bisha Sagaalaad 15
 
@@ -563,7 +563,7 @@ Somali locale.
 
 =head3 yMEd (E, M/d/y)
 
-   2008-02-05T18:30:30 = Slsa, 2/5/2008
+   2008-02-05T18:30:30 = Tldo, 2/5/2008
    1995-12-22T09:05:02 = Jmc, 12/22/1995
   -0010-09-15T04:44:23 = Sbti, 9/15/-10
 
@@ -575,7 +575,7 @@ Somali locale.
 
 =head3 yMMMEd (E, MMM d, y)
 
-   2008-02-05T18:30:30 = Slsa, Feb 5, 2008
+   2008-02-05T18:30:30 = Tldo, Feb 5, 2008
    1995-12-22T09:05:02 = Jmc, Dis 22, 1995
   -0010-09-15T04:44:23 = Sbti, Seb 15, -10
 

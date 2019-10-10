@@ -27,7 +27,8 @@ my $res = $ua->get(q(http://0.42.42.42/));
 ok($res->is_error, q(bad address 1));
 like($res->message, qr/(
     couldn't\s+connect\s+to\s+server |
-    internal\s+error\s+-\s+server\s+connection\s+terminated
+    internal\s+error\s+-\s+server\s+connection\s+terminated |
+    Timeout\s+was\s+reached
 )/ix, q(bad address 2));
 
 done_testing(3);

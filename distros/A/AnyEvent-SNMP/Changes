@@ -1,5 +1,12 @@
 Revision history for AnyEvent::SNMP
 
+6.02 Wed Oct  9 20:20:10 CEST 2019
+        - work around a bug in Net::SNMP, where a failure during SNMPv3
+          handshaking would cause Net::SNMP to freeze/never invoke the
+          callback.  Since this module copied the code, it also has the
+          bug, so using Net::SNMP without this module will still trigger
+          it.
+
 6.0  Sun Apr 15 12:21:38 CEST 2012
 	- compatibility with 6.0.1 restored.
         - provide msg_handle_alloc method, as required by 6.0.

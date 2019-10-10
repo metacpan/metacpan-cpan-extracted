@@ -14,7 +14,7 @@ use Clone qw(clone);
 use XML::Simple;
 
 sub alephx {
-  state $a = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+  state $a = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 }
 
 my $item_barcode = '32044044980076';

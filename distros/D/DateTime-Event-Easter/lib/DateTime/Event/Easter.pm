@@ -23,8 +23,9 @@ require Exporter;
 
 @ISA = qw(Exporter);
 
-@EXPORT_OK = qw(easter);
-$VERSION = '1.06';
+@EXPORT_OK = qw(easter golden_number western_epact western_sunday_letter western_sunday_number
+                                     eastern_epact eastern_sunday_letter eastern_sunday_number);
+$VERSION = '1.07';
 
 sub new {
     my $class = shift;
@@ -64,14 +65,12 @@ sub new {
         $offset = -3;
     } elsif ($args{day} =~ /^\-?\d+$/i) {
         $offset = $args{day};
-        if ($offset < -80 || $offset > 250) {
-          croak "The number of days must be between -80 and 250";
-        }
     } else {
         $offset = 0;
     }
     $self{offset} = DateTime::Duration->new(days=>$offset);
     $self{easter} = lc $args{easter};
+    $self{day}    = $args{day};
    
     if ($self{easter} eq 'eastern') {
         require DateTime::Calendar::Julian;
@@ -82,75 +81,128 @@ sub new {
     $self{as} = lc $1;
 
     return bless \%self, $class;
-    
 }
 
-
 sub following {
-    my $self = shift;
-    my $dt = shift;
+  my $self   = shift;
+  my $dt     = shift;
+  croak ("Dates need to be datetime objects")
+    unless $dt->can('utc_rd_values');
+  my $result = $self->_following_point($dt);
+  return ($self->{as} eq 'span') 
+      ? _tospan($result)
+      : $result;
+}
 
-    my $class = ref($dt);
-    if ($self->{easter} eq 'eastern' && $class ne 'DateTime::Calendar::Julian') {
-        croak ("Dates need to be datetime objects") unless ($dt->can('utc_rd_values'));
-        $dt = DateTime::Calendar::Julian->from_object(object=>$dt);
-    } elsif ($class ne 'DateTime') {
-        croak ("Dates need to be datetime objects") unless ($dt->can('utc_rd_values'));
-        $dt = DateTime->from_object(object=>$dt);
-    }
+sub _following_point {
+  my ($self, $event_start_dt) = @_;
 
-    my $easter_this_year = $self->_easter($dt->year)+$self->{offset};
+  # How does _following_point work with a long offset?
+  # 
+  # Let us suppose that the $self objet has an offset of 1000 days (about 2 years
+  # and 9 months) and the event starting point $event_start_dt is 2018-10-03.
+  # 
+  # The following point will be in late 2018 or early 2019, which corresponds to an
+  # Easter sunday in 2016. So we compute a starting point for Easter sunday by
+  # subtracting the offset from the event starting point. 2018-10-03 - 1000 days
+  # gives $easter_start_dt = 2016-01-07.
+  # 
+  # Next, we extract the year value and we compute the Easter sunday date.  This
+  # gives $easter_sunday = 2016-03-27.
+  # 
+  # Then we add back the offset, which gives the final result 2018-12-22.
+  # 
+  # Now, suppose that the event starting point $event_start_dt is 2019-01-10. The Easter sunday
+  # starting point $easter_start_dt is 2016-04-15.
+  # 
+  # Extracting the year value gives 2016, for an Easter sunday $easter_sunday = 2016-03-27, which is
+  # before the Easter starting point 2016-04-15. So we try the next year, 2017,
+  # for an Easter sunday $easter_sunday = 2017-04-16 and an event 1000 days later $event = 2020-01-11.
+  # 
+  # Lastly, suppose that the event starting point $event_start_dt is 2019-09-01. The Easter sunday
+  # starting point $easter_start_dt is 2016-12-05. Since Easter cannot occur after 04-25 in any
+  # year, so we do not bother to compute Easter for 2016, we directly compute the 2017 Easter sunday.
+  # As above, we obtain an Easter sunday $easter_sunday = 2017-04-16 and an event 1000 days later 
+  # $event = 2020-01-11.
 
-    my $easter = ($easter_this_year > $dt) 
-        ? $easter_this_year
-        : $self->_easter($dt->year+1)+$self->{offset};
+  my $class = ref($event_start_dt);
+  if ($self->{easter} eq 'eastern' && $class ne 'DateTime::Calendar::Julian') {
+    $event_start_dt = DateTime::Calendar::Julian->from_object(object => $event_start_dt);
+  }
+  elsif ($class ne 'DateTime') {
+    $event_start_dt = DateTime->from_object(object => $event_start_dt);
+  }
 
-    $easter = $class->from_object(object=>$easter) if (ref($easter) ne $class);
-    return ($self->{as} eq 'span') 
-        ? _tospan($easter)
-        : $easter;
+  my $easter_start_dt = $event_start_dt - $self->{offset};
+  my $start_mmdd  = $easter_start_dt->strftime("%m-%d");
+  my $latest_mmdd = '04-25';
+  my $easter_sunday;
+  if ($start_mmdd le $latest_mmdd) {
+    $easter_sunday = $self->_easter($easter_start_dt->year);
+  }
+  if ($start_mmdd gt $latest_mmdd or $easter_sunday <= $easter_start_dt) {
+    #     2016-03-27 is not good for 2016-04-15, so let us switch to 2017-04-16
+    # or: 2016-03-27 has not been calculated for 2016-12-05, so let us choose 2017-04-16
+    $easter_sunday = $self->_easter($easter_start_dt->year + 1);
+  }
+
+  my $event = $easter_sunday + $self->{offset};
+
+  $event = $class->from_object(object => $event) if (ref($event) ne $class);
+  return $event;
 }
 
 sub previous {
-    my $self = shift;
-    my $dt = shift;
-   
-    my $class = ref($dt);
-    if ($self->{easter} eq 'eastern' && $class ne 'DateTime::Calendar::Julian') {
-        croak ("Dates need to be datetime objects") unless ($dt->can('utc_rd_values'));
-        $dt = DateTime::Calendar::Julian->from_object(object=>$dt);
-    } elsif ($class ne 'DateTime') {
-        croak ("Dates need to be datetime objects") unless ($dt->can('utc_rd_values'));
-        $dt = DateTime->from_object(object=>$dt);
-    }
+  my $self   = shift;
+  my $dt     = shift;
+  croak ("Dates need to be datetime objects")
+    unless $dt->can('utc_rd_values');
+  my $result = $self->_previous_point($dt);
+  return ($self->{as} eq 'span') 
+      ? _tospan($result)
+      : $result;
+}
 
-    my $easter_this_year = $self->_easter($dt->year)+$self->{offset};
+sub _previous_point {
+  my ($self, $event_start_dt) = @_;
 
-    my $easter = ($easter_this_year->ymd lt $dt->ymd)
-       ? $easter_this_year
-       : $self->_easter($dt->year-1)+$self->{offset};
+  my $class = ref($event_start_dt);
+  if ($self->{easter} eq 'eastern' && $class ne 'DateTime::Calendar::Julian') {
+    $event_start_dt = DateTime::Calendar::Julian->from_object(object => $event_start_dt);
+  }
+  elsif ($class ne 'DateTime') {
+    $event_start_dt = DateTime->from_object(object => $event_start_dt);
+  }
 
+  my $easter_start_dt = $event_start_dt - $self->{offset};
+  my $start_mmdd    = $easter_start_dt->strftime("%m-%d");
+  my $earliest_mmdd = '03-21';
+  my $easter_sunday;
+  if ($start_mmdd ge $earliest_mmdd) {
+    $easter_sunday = $self->_easter($easter_start_dt->year);
+  }
+  if ($start_mmdd lt $earliest_mmdd or $easter_sunday >= $easter_start_dt) {
+    $easter_sunday = $self->_easter($easter_start_dt->year - 1);
+  }
 
-    $easter = $class->from_object(object=>$easter) if (ref($easter) ne $class);
-    return ($self->{as} eq 'span') 
-        ? _tospan($easter)
-        : $easter;
+  my $event = $easter_sunday + $self->{offset};
+
+  $event = $class->from_object(object => $event) if (ref($event) ne $class);
+  return $event;
 }
 
 sub closest {
-    my $self = shift;
-    my $dt = shift;
+  my $self = shift;
+  my $dt   = shift;
+  croak ("Dates need to be datetime objects")
+    unless $dt->can('utc_rd_values');
 
-    my $class = ref($dt);
-    if ($class ne 'DateTime') {
-        croak ("Dates need to be datetime objects") unless ($dt->can('utc_rd_values'));
-        $dt = DateTime->from_object(object=>$dt);
-    }
+  my $class = ref($dt);
 
     if ($self->is($dt)) {
-                my $easter = $dt->clone->truncate(to=>'day');
-            $easter = $class->from_object(object=>$easter) if (ref($easter) ne $class);
-                return ($self->{as} eq 'span') 
+      my $easter = $dt->clone->truncate(to=>'day');
+      $easter    = $class->from_object(object=>$easter) if (ref($easter) ne $class);
+      return ($self->{as} eq 'span') 
                         ? _tospan($easter)
                         : $easter;
     }
@@ -168,22 +220,22 @@ sub closest {
 }
 
 sub is {
-    my $self = shift;
-    my $dt = shift;
+  my ($self, $dt) = @_;
+  croak ("Dates need to be datetime objects")
+    unless $dt->can('utc_rd_values');
 
-    my $class = ref($dt);
-    if ($class ne 'DateTime') {
-        croak ("Dates need to be datetime objects") unless ($dt->can('utc_rd_values'));
-        $dt = DateTime->from_object(object=>$dt);
-    }
+  my $class = ref($dt);
+  if ($self->{easter} eq 'western' && $class ne 'DateTime') {
+    $dt = DateTime->from_object(object => $dt);
+  }
+  if ($self->{easter} eq 'eastern' && $class ne 'DateTime::Calendar::Julian') {
+    $dt = DateTime::Calendar::Julian->from_object(object => $dt)   
+  }
 
-    if ($self->{easter} eq 'eastern') {
-        $dt = DateTime::Calendar::Julian->from_object(object=>$dt)   
-    }
+  my $easter_start     = $dt - $self->{offset};
+  my $easter_this_year = $self->_easter($easter_start->year) + $self->{offset};
 
-    my $easter_this_year = $self->_easter($dt->year)+$self->{offset};
-
-    return ($easter_this_year->ymd eq $dt->ymd) ? 1 : 0;
+  return ($easter_this_year->ymd eq $dt->ymd) ? 1 : 0;
 }
 
 sub as_list {
@@ -261,15 +313,19 @@ sub as_set {
           }
         }
         if ($self->{as} eq 'span') {
-          $args_1{from} = delete $args_1{after}  if exists $args_1{after};
-          $args_1{to}   = delete $args_1{before} if exists $args_1{before};
-          my @list = $self->as_list(%args_1);
-          return DateTime::SpanSet->from_spans( spans => [ @list ] ); 
+          # Should be ... // 'easter sunday', but that would lose the compatibility with 5.6.1 and 5.8.x
+          # Anyhow, the only problem occurs with a "day => 0" parameter and actually, "day => 0"
+          # and "day => 'easter sunday' are synonymous. So the problem is not a problem.
+          my $easter_point = DateTime::Event::Easter->new(day    => $self->{day}    || 'easter sunday'
+                                                        , easter => $self->{easter} || 'western'
+                                                        , as     => 'point');
+          my $set_of_points = $easter_point->as_set(%args_1);
+          return DateTime::SpanSet->from_set_and_duration(set => $set_of_points, hours => 24);
         }
         else {
           return DateTime::Set->from_recurrence( 
-                  next      => sub { return $_[0] if $_[0]->is_infinite; $self->following( $_[0] ) },
-                  previous  => sub { return $_[0] if $_[0]->is_infinite; $self->previous(  $_[0] ) },
+                  next      => sub { return $_[0] if $_[0]->is_infinite; $self->_following_point( $_[0] ) },
+                  previous  => sub { return $_[0] if $_[0]->is_infinite; $self->_previous_point(  $_[0] ) },
                   %args
                   );
         }
@@ -303,40 +359,138 @@ sub _easter {
 }
 
 sub western_easter {
-    my $year = shift;
-    croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
     
-    my $golden_number = $year % 19;
-    #quasicentury is so named because its a century, only its 
-    # the number of full centuries rather than the current century
-    my $quasicentury = int($year / 100);
-    my $epact = ($quasicentury - int($quasicentury/4) - int(($quasicentury * 8 + 13)/25) + ($golden_number*19) + 15) % 30;
-    my $interval = $epact - int($epact/28)*(1 - int(29/($epact+1)) * int((21 - $golden_number)/11) );
-    my $weekday = ($year + int($year/4) + $interval + 2 - $quasicentury + int($quasicentury/4)) % 7;
+  my $epact_1 = western_epact($year);
+  my $epact_2 = $epact_1;
+  if ($epact_1 eq '25*') {
+    # ajustement 25* → 26
+    $epact_2 = 26;
+  }
+  elsif ($epact_1 == 24) {
+    # ajustement 24 → 25
+    $epact_2 = 25;
+  }
+  if ($epact_2 > 24) {
+    $epact_2 -= 30;
+  }
+  my $day   = 45 - $epact_2 + ($epact_2 + western_sunday_number($year) + 1) % 7;
+  my $month = 3;
+  if ($day > 31) {
+    $day  -= 31;
+    $month = 4;
+  }
     
-    my $offset = $interval - $weekday;
-    my $month = 3 + int(($offset+40)/44);
-    my $day = $offset + 28 - 31* int($month/4);
-    
-    return DateTime->new(year=>$year, month=>$month, day=>$day);
+  return DateTime->new(year => $year, month => $month, day => $day);
 }
 *easter = \&western_easter; #alias so people can call 'easter($year)' externally
 
 sub eastern_easter {
-    my $year = shift;
-    croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  my $year = shift;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
     
-    my $golden_number = $year % 19;
+  my $epact_1 = eastern_epact($year);
+  my $epact_2;
 
-    my $interval = ($golden_number * 19 + 15) % 30;
-    my $weekday = ($year + int($year/4) + $interval) % 7;
-   
-    my $offset = $interval - $weekday;
-    my $month = 3 + int(($offset+40)/44);
-    my $day = $offset + 28 - 31* int($month/4);
+  $epact_2 = $epact_1;
+  if ($epact_2 >= 24) {
+    $epact_2 -= 30;
+  }
 
-    return DateTime::Calendar::Julian->new(year=>$year, month=>$month, day=>$day);
+  my $day   = 45 - $epact_2 + ($epact_2 + eastern_sunday_number($year) + 1) % 7;
+  my $month = 3;
+  if ($day > 31) {
+    $day -= 31;
+    $month = 4;
+  }
+
+  return DateTime::Calendar::Julian->new(year=>$year, month=>$month, day=>$day);
 }
+
+sub golden_number {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  return $year % 19 + 1;
+}
+
+#
+# La saga des calendriers page 145 (and page 142)
+#
+sub western_epact {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  # centu is not the century, but nearly so
+  my $centu      = int($year / 100);
+  my $metemptose = $centu - int($centu / 4);
+  my $proemptose = int((8 * $centu + 13) / 25);
+  my $epact      = (11 * golden_number($year) - 3 - $metemptose + $proemptose) % 30;
+  if ($epact == 25 && golden_number($year) > 11) {
+    $epact = '25*';
+  }
+  return $epact;
+}
+
+#
+# La saga des calendriers page 146
+#
+sub western_sunday_letter {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  my $prec = $year - 1;
+  my $n1 = 7 - ($year + int($prec / 4) - int($prec / 100) + int($prec / 400) + 6) % 7;
+  my $n2 = 7 - ($year + int($year / 4) - int($year / 100) + int($year / 400) + 6) % 7;
+  my $ref = '#ABCDEFG';
+  my $c1  = substr($ref, $n1, 1);
+  my $c2  = substr($ref, $n2, 1);
+  if ($c1 eq $c2) {
+    return $c1;
+  }
+  else {
+    return "$c1$c2";
+  }
+}
+sub western_sunday_number {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  return 7 - ($year + int($year / 4) - int($year / 100) + int($year / 400) + 6) % 7;
+}
+
+#
+# La saga des calendriers page 138
+# Erratum for page 136 : for a golden number 19, epact is 26, not 6
+#
+sub eastern_epact {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  return (11 * golden_number($year) + 27) % 30;
+}
+
+#
+# La saga des calendriers pages 137-138
+#
+sub eastern_sunday_letter {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  my $prec = $year - 1;
+  my $n1 = 7 - ($year + int($prec / 4) - 3) % 7;
+  my $n2 = 7 - ($year + int($year / 4) - 3) % 7;
+  my $ref = '#ABCDEFG';
+  my $c1  = substr($ref, $n1, 1);
+  my $c2  = substr($ref, $n2, 1);
+  if ($c1 eq $c2) {
+    return $c1;
+  }
+  else {
+    return "$c1$c2";
+  }
+}
+sub eastern_sunday_number {
+  my ($year) = @_;
+  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  return 7 - ($year + int($year / 4) - 3) % 7;
+}
+
 
 # Ending a module with an unspecified number, which could be zero, is wrong.
 # Therefore the custom of ending a module with a boring "1".
@@ -395,7 +549,7 @@ DateTime::Event::Easter - Returns Easter events for DateTime objects
   # Sun, 09 Apr 2006 00:00:00 UTC
   
   $datetime_set = $palm_sunday->as_set;
-  # A set of every Palm Sunday ever. See C<DateTime::Set> for more information.
+  # A set of every Palm Sunday ever. See DateTime::Set for more information.
 
 =head1 DESCRIPTION
 
@@ -409,7 +563,6 @@ Thursday, Good Friday, Black Saturday, Easter Sunday, Ascension,
 Pentecost and Trinity Sunday. If that's not enough, the module will
 also accept an offset so you can get the date for Quasimodo (the next
 sunday after Easter Sunday) by passing 7.
-
 
 =head1 BACKGROUND
 
@@ -428,7 +581,9 @@ churches.
 
 =head1 CONSTRUCTOR
 
-This class accepts the following options to its 'new' constructor:
+=head2 C<new> constructor
+
+This class accepts the following options to its C<new> constructor:
 
 =over 4
 
@@ -481,9 +636,9 @@ methods below>
 
 =head1 METHODS
 
-For all these methods, unless otherwise noted, $dt is a plain vanila
+For all these methods, unless otherwise noted, C<$dt> is a plain vanilla
 DateTime object or a DateTime object from any DateTime::Calendar module
-that can handle calls to from_object and utc_rd_values (which should be
+that can handle calls to C<from_object> and C<utc_rd_values> (which should be
 all of them, but there's nothing stopping someone making a bad egg).
 
 This class offers the following methods.
@@ -492,22 +647,22 @@ This class offers the following methods.
 
 =item * following($dt)
 
-Returns the DateTime object for the Easter Event after $dt. This will
-not return $dt.
+Returns the DateTime object for the Easter Event after C<$dt>. This will
+not return C<$dt>.
 
 =item * previous($dt)
 
-Returns the DateTime object for the Easter Event before $dt. This will
-not return $dt.
+Returns the DateTime object for the Easter Event before C<$dt>. This will
+not return C<$dt>.
 
 =item * closest($dt)
 
-Returns the DateTime object for the Easter Event closest to $dt. This
-will return midnight of $dt if $dt is the Easter Event.
+Returns the DateTime object for the Easter Event closest to C<$dt>. This
+will return midnight of C<$dt> if C<$dt> is the Easter Event.
 
 =item * is($dt)
 
-Return positive (1) if $dt is the Easter Event, otherwise returns false
+Return positive (1) if C<$dt> is the Easter Event, otherwise returns false
 (0)
 
 =item * as_list(from => $dt, to => $dt2, inclusive => I<([0]|1)>)
@@ -548,23 +703,112 @@ chaining.
 
 =back
 
-=head1 EXPORTS
+=head1 SUBROUTINES
 
-This class does not export any methods by default, however the following
-exports are supported.
+The  module provides  a few  subroutines giving  the elements  used to
+compute the Easter date.
+
+These  elements can  be found  in various  sources, including  what is
+known in France as I<l'Almanach  du Facteur> (the postman's almanach).
+These values are printed at the bottom of the February frame, which is
+a  convenient way  to ensure  this frame  has the  same height  as the
+frames for 31-day months.
+
+These subroutines are not exported by default.
 
 =over 4
 
+=item * golden_number($year)
+
+Gives the position of  the year in the Metonic cycle.  This is a 1..19
+number.  We   do  not  use   the  0..18  arithmetic   modulo,  because
+traditionally, the Golden Number is in the 1..19 interval.
+
+This subroutine applies to both western and eastern computs.
+
+=item * western_epact($year)
+
+In the  Gregorian comput, the epact  is the age of  the ecclesiastical
+Moon on the 1st January of the  given year. The C<western> part of the
+subroutine  name  accounts for  the  fact  that Gregorian  and  Julian
+calendars do not use the same formula.
+
+The epact  is a 0..29 number.  The "0" value  is shown as "*"  in some
+sources. This  subroutine does not convert  "0" to "*", the  result is
+always a pure number.
+
+Actually,  the western  epact  is  a little  more  than  a number.  As
+explained by Paul Couderc (page 86)  and Jean Lefort (page 142), there
+is a  special case for 25,  which should be considered  as two values,
+"basic 25" and "alternate 25". "Basic 25" is printed as a plain number
+C<25>, while "alternate 25" is printed  in a way that distinguishes it
+from the other  numbers. Jean Lefort mentions C<XXV>  or using italics
+or bold  digits, such as  B<C<25>>. This module prints  the "alternate
+25" as "C<25*>".
+
+=item * eastern_epact($year)
+
+In the Julian comput, the epact  is the age of the ecclesiastical Moon
+on 22nd March. The C<eastern> part of the subroutine name accounts for
+the  fact that  Gregorian and  Julian calendars  do not  use the  same
+formula.
+
+The epact  is a 0..29 number.  The "0" value  is shown as "*"  in some
+sources. This  subroutine does not convert  "0" to "*", the  result is
+always a pure  number. There is no  other special case, for  25 as for
+any other number.
+
+The formula given by Reingold and  Dershowitz is a "shifted epact" and
+gives  different  results from  the  values  printed in  Lefort's  and
+Couderc's books. The module follows Couderc and Lefort.
+
+=item * western_sunday_letter($year), eastern_sunday_letter($year)
+
+On normal years (that is, excluding  leap years), the Sunday letter is
+determined by tagging 1st January with  "A", 2nd January with "B", and
+so on and looking at the first sunday of the year. The letter found at
+this sunday if the sunday letter for the year.
+
+The  sunday   letter  governs  all   conversions  from  (mm,   dd)  to
+day-of-week. For example, if the letter is "F", then 1st January, 12th
+February, 2nd July and 1st  October, among others, are tuesdays, while
+6th January, 24th February, 14th July and 6th October are sundays.
+
+On  leap  years, there  are  two  sunday  letters.  The first  one  is
+determined  as above,  the second  one  is determined  by tagging  2nd
+January,  not 1st,  with  "A".  The first  sunday  letter governs  all
+conversions  from (mm,  dd) to  day-of-week for  January and  February
+only, while the second sunday letter governs the conversions from (mm,
+dd) to day-of-week for March and after.
+
+So, if the sunday letters are  "FE", 1st January and 12th February are
+still tuesdays,  but 2nd July and  1st October are wednesdays.  At the
+same time, 6th January and 24th February are still sundays, while 14th
+July and 6th October are mondays.
+
+C<western_sunday_letter>  applies  only   to  Gregorian  years,  while
+C<eastern_sunday_letter> applies only to Julian years.
+
+=item * western_sunday_number($year), eastern_sunday_number($year)
+
+Letters  (standalone or  in pairs)  are not  convenient for  numerical
+calculations.  So  the   I<xxx>C<_sunday_number>  subroutine  is  used
+instead of I<xxx>C<_sunday_letter>.
+
+In case  of leap  years, the I<xxx>C<_sunday_number>  subroutine gives
+the numerical value for the second sunday letter, because Easter never
+falls in January or February.
+
 =item * easter($year)
 
-Given a Gregorian year, this method will return a DateTime object for
+Given a Gregorian year, this method  will return a DateTime object for
 Western Easter Sunday in that year.
 
 =back
 
 =head1 BUGS AND PROBLEMS FOR SPANS
 
-=head2 Inclusion and exclusion of <from> and C<to> dates in lists and sets
+=head2 Inclusion and exclusion of C<from> and C<to> dates in lists and sets
 
 If you build a list or a set of spans and if the C<from> or C<to> limits
 coincide with the requested Easter event, the result may be different
@@ -617,11 +861,6 @@ Also, since you can use a numeric C<day> offset up to 250, you can reach
 the Northern "fall backwards" and the Southern "spring forward" days, where
 the same problem will happen in reverse.
 
-=head2 Building a spanset
-
-For the moment, when building a set with the C<< as => 'set' >> option,
-the C<from> and C<to> dates are required and thus the set must be a finite set.
-
 =head1 THE SMALL PRINT
 
 =head2 REFERENCES
@@ -640,9 +879,11 @@ L<http://www.calendarists.com>
 or L<https://www.cambridge.org/us/academic/subjects/computer-science/computing-general-interest/calendrical-calculations-ultimate-edition-4th-edition?format=PB&isbn=9781107683167>,
 ISBN 978-0-521-70238-6 for the third edition.
 
-=item * I<La saga des calendriers>, by Jean Lefort, published by I<Pour la Science>, ISBN 2-90929-003-5
+=item * I<La saga des calendriers>, by Jean Lefort, published by I<Belin> (I<Pour la Science>), ISBN 2-90929-003-5
+See L<https://www.belin-editeur.com/la-saga-des-calendriers>
 
 =item * I<Le Calendrier>, by Paul Couderc, published by I<Presses universitaires de France> (I<Que sais-je ?>), ISBN 2-13-036266-4
+See L<https://catalogue.bnf.fr/ark:/12148/cb329699661>.
 
 =back
 
@@ -650,8 +891,13 @@ ISBN 978-0-521-70238-6 for the third edition.
 
 Support for this module, and for all DateTime modules will be given
 through the DateTime mailing list - datetime@perl.org.
+See L<https://lists.perl.org/list/datetime.html>.
 
-Bugs should be reported through rt.cpan.org.
+Bugs should be reported through rt.cpan.org. See
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Event-Easter>.
+
+Or you can try to submit a pull request to
+L<https://github.com/jforget/DateTime-Event-Easter>.
 
 =head2 AUTHOR
 
@@ -709,4 +955,4 @@ L<DateTime>, L<DateTime::Calendar::Julian>, perl(1)
 
 L<https://metacpan.org/search?q=easter> which gives L<Date::Easter>, L<Date::Calc> and L<Date::Pcalc>
 
-https://github.com/houseabsolute/DateTime.pm/wiki
+L<https://github.com/houseabsolute/DateTime.pm/wiki>

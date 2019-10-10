@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 
@@ -136,8 +136,8 @@ The available locales are:
  ccp-IN           Chakma India                                𑄌𑄋𑄴𑄟𑄳𑄦 𑄞𑄢𑄧𑄖𑄴
  ce               Chechen                                     нохчийн
  ce-RU            Chechen Russia                              нохчийн Росси
- ceb              Cebuano                                     Cebuano
- ceb-PH           Cebuano Philippines                         Cebuano Pilipinas
+ ceb              Cebuano                                     Binisaya
+ ceb-PH           Cebuano Philippines                         Binisaya Pilipinas
  cgg              Chiga                                       Rukiga
  cgg-UG           Chiga Uganda                                Rukiga Uganda
  chr              Cherokee                                    ᏣᎳᎩ
@@ -232,9 +232,9 @@ The available locales are:
  en-JM            English Jamaica                             English Jamaica
  en-KE            English Kenya                               English Kenya
  en-KI            English Kiribati                            English Kiribati
- en-KN            English St. Kitts & Nevis                   English St. Kitts & Nevis
+ en-KN            English St. Kitts & Nevis                   English St Kitts & Nevis
  en-KY            English Cayman Islands                      English Cayman Islands
- en-LC            English St. Lucia                           English St. Lucia
+ en-LC            English St. Lucia                           English St Lucia
  en-LR            English Liberia                             English Liberia
  en-LS            English Lesotho                             English Lesotho
  en-MG            English Madagascar                          English Madagascar
@@ -265,7 +265,7 @@ The available locales are:
  en-SD            English Sudan                               English Sudan
  en-SE            English Sweden                              English Sweden
  en-SG            English Singapore                           English Singapore
- en-SH            English St. Helena                          English St. Helena
+ en-SH            English St. Helena                          English St Helena
  en-SI            English Slovenia                            English Slovenia
  en-SL            English Sierra Leone                        English Sierra Leone
  en-SS            English South Sudan                         English South Sudan
@@ -281,7 +281,7 @@ The available locales are:
  en-UM            English U.S. Outlying Islands               English U.S. Outlying Islands
  en-US            English United States                       English United States
  en-US-POSIX      English United States Computer              English United States Computer
- en-VC            English St. Vincent & Grenadines            English St. Vincent & Grenadines
+ en-VC            English St. Vincent & Grenadines            English St Vincent & Grenadines
  en-VG            English British Virgin Islands              English British Virgin Islands
  en-VI            English U.S. Virgin Islands                 English U.S. Virgin Islands
  en-VU            English Vanuatu                             English Vanuatu
@@ -402,6 +402,7 @@ The available locales are:
  fy               Western Frisian                             Frysk
  fy-NL            Western Frisian Netherlands                 Frysk Nederlân
  ga               Irish                                       Gaeilge
+ ga-GB            Irish United Kingdom                        Gaeilge an Ríocht Aontaithe
  ga-IE            Irish Ireland                               Gaeilge Éire
  gd               Scottish Gaelic                             Gàidhlig
  gd-GB            Scottish Gaelic United Kingdom              Gàidhlig An Rìoghachd Aonaichte

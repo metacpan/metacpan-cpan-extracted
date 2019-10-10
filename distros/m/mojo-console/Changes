@@ -20,3 +20,6 @@ Revision history for Mojo::Console
 
 0.0.7   2019-09-19
         Add missing dependency
+
+0.0.8   2019-09-19
+        Add `arg` sub - will extract the value of an argument

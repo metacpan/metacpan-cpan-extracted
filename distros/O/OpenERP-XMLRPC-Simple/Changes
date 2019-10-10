@@ -1,5 +1,10 @@
 Revision history for OpenERP-XMLRPC-Simple
 
+0.25      2019-10-07 13:25:10+01:00 Europe/London
+
+  * Fix bug in which an integer was sent to Odoo when dbname was all-numeric (e.g. a datestamp like 20191007)
+  * Update dist.ini to fix problems with dzil build
+
 0.24      2016-09-03 14:29:51+01:00 Europe/London
 
   * Fix issue #2: tests hang on Windows.

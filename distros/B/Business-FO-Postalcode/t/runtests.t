@@ -1,7 +1,8 @@
-#!/usr/bin/env/perl -T
+## no critic (RequireExplicitPackage RequireVersionVar RequireEndWithOne)
 
 use strict;
 use warnings;
+use Test::Class;
 
 use lib qw(t);
 

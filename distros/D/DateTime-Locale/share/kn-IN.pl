@@ -28,6 +28,7 @@
     MEd => "d/M, E",
     MMM => "LLL",
     MMMEd => "E, d MMM",
+    "MMMMW-count-one" => "'week' W 'of' MMMM",
     "MMMMW-count-other" => "'week' W 'of' MMMM",
     MMMMd => "d MMMM",
     MMMd => "MMM d",
@@ -51,6 +52,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
+    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kn-IN",
@@ -268,5 +270,5 @@
   time_format_medium => "hh:mm:ss a",
   time_format_short => "hh:mm a",
   variant => undef,
-  version => 35,
+  version => 36,
 }

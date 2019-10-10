@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Streamtube::Colorbar::Title::Font;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace streamtube.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Streamtube::Colorbar::Title - This attribute is one of the
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

@@ -1,26 +1,28 @@
 ---
 abstract: 'generate patterns of text'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
   Algorithm::Diff: '0'
   Test::More: '0.88'
   Test::Most: '0'
-  lib: '0'
+  constant: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
-  strict: '0'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Game-TextPatterns
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Game::TextPatterns:
+    file: lib/Game/TextPatterns.pm
+    version: '1.47'
+  Game::TextPatterns::Util:
+    file: lib/Game/TextPatterns/Util.pm
+    version: '1.47'
 requires:
   Carp: '0'
   List::Util: '0'
@@ -28,9 +30,10 @@ requires:
   MooX::Rebuild: '0'
   Scalar::Util: '0'
   namespace::clean: '0'
-  perl: '5.024000'
+  perl: v5.24.0
   strict: '0'
 resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/thrig/Game-TextPatterns
-version: '1.24'
+version: '1.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

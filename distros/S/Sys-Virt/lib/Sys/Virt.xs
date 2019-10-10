@@ -2701,6 +2701,64 @@ set_node_memory_parameters(conn, newparams, flags=0)
 
 
 void
+set_identity(conn, newident, flags=0)
+      virConnectPtr conn;
+      HV *newident;
+      unsigned int flags;
+  PREINIT:
+      virTypedParameterPtr ident;
+      int nident;
+    PPCODE:
+      nident = 9;
+      Newx(ident, nident, virTypedParameter);
+
+      strncpy(ident[0].field, VIR_CONNECT_IDENTITY_USER_NAME,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[0].type = VIR_TYPED_PARAM_STRING;
+
+      strncpy(ident[1].field, VIR_CONNECT_IDENTITY_UNIX_USER_ID,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[1].type = VIR_TYPED_PARAM_ULLONG;
+
+      strncpy(ident[2].field, VIR_CONNECT_IDENTITY_GROUP_NAME,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[2].type = VIR_TYPED_PARAM_STRING;
+
+      strncpy(ident[3].field, VIR_CONNECT_IDENTITY_UNIX_GROUP_ID,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[3].type = VIR_TYPED_PARAM_ULLONG;
+
+      strncpy(ident[4].field, VIR_CONNECT_IDENTITY_PROCESS_ID,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[4].type = VIR_TYPED_PARAM_LLONG;
+
+      strncpy(ident[5].field, VIR_CONNECT_IDENTITY_PROCESS_TIME,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[5].type = VIR_TYPED_PARAM_ULLONG;
+
+      strncpy(ident[6].field, VIR_CONNECT_IDENTITY_SASL_USER_NAME,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[6].type = VIR_TYPED_PARAM_INT;
+
+      strncpy(ident[7].field, VIR_CONNECT_IDENTITY_X509_DISTINGUISHED_NAME,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[7].type = VIR_TYPED_PARAM_STRING;
+
+      strncpy(ident[8].field, VIR_CONNECT_IDENTITY_SELINUX_CONTEXT,
+              VIR_TYPED_PARAM_FIELD_LENGTH);
+      ident[8].type = VIR_TYPED_PARAM_STRING;
+
+      nident = vir_typed_param_from_hv(newident, ident, nident);
+
+      if (virConnectSetIdentity(conn, ident, nident, flags) < 0) {
+          vir_typed_param_safe_free(ident, nident);
+          _croak_error();
+      }
+      vir_typed_param_safe_free(ident, nident);
+
+
+
+void
 node_suspend_for_duration(conn, target, duration, flags=0)
       virConnectPtr conn;
       unsigned int target;
@@ -8955,6 +9013,15 @@ BOOT:
       REGISTER_CONSTANT(VIR_CRED_REALM, CRED_REALM);
       REGISTER_CONSTANT(VIR_CRED_EXTERNAL, CRED_EXTERNAL);
 
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_USER_NAME, IDENTITY_USER_NAME);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_UNIX_USER_ID, IDENTITY_UNIX_USER_ID);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_GROUP_NAME, IDENTITY_GROUP_NAME);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_UNIX_GROUP_ID, IDENTITY_UNIX_GROUP_ID);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_PROCESS_ID, IDENTITY_PROCESS_ID);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_PROCESS_TIME, IDENTITY_PROCESS_TIME);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_SASL_USER_NAME, IDENTITY_SASL_USER_NAME);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_X509_DISTINGUISHED_NAME, IDENTITY_X509_DISTINGUISHED_NAME);
+      REGISTER_CONSTANT_STR(VIR_CONNECT_IDENTITY_SELINUX_CONTEXT, IDENTITY_SELINUX_CONTEXT);
 
       /* Don't bother with VIR_CPU_COMPARE_ERROR since we die in that case */
       REGISTER_CONSTANT(VIR_CPU_COMPARE_INCOMPATIBLE, CPU_COMPARE_INCOMPATIBLE);

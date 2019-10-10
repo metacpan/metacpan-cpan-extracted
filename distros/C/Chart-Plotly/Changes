@@ -1,3 +1,6 @@
+0.029 2019-10-09 19:00:00+0000  
+  - Update to plotly.js 1.50.0
+  - Add new trace type: treemap
 0.028 2019-10-01 19:00:00+0000  
   - Update to plotly.js 1.49.4
   - Add new trace type: indicator, choroplethmapbox, densitymapbox

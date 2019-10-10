@@ -411,11 +411,11 @@ Galician locale.
    1995-12-22T09:05:02 = ven., 22 de dec. de 1995 d.C.
   -0010-09-15T04:44:23 = sáb., 15 de set. de -10 a.C.
 
-=head3 GyMMMd (d 'de' MMMM 'de' y G)
+=head3 GyMMMd (d 'de' MMM 'de' y G)
 
-   2008-02-05T18:30:30 = 5 de febreiro de 2008 d.C.
-   1995-12-22T09:05:02 = 22 de decembro de 1995 d.C.
-  -0010-09-15T04:44:23 = 15 de setembro de -10 a.C.
+   2008-02-05T18:30:30 = 5 de feb. de 2008 d.C.
+   1995-12-22T09:05:02 = 22 de dec. de 1995 d.C.
+  -0010-09-15T04:44:23 = 15 de set. de -10 a.C.
 
 =head3 H (HH)
 
@@ -585,11 +585,11 @@ Galician locale.
    1995-12-22T09:05:02 = dec. de 1995
   -0010-09-15T04:44:23 = set. de -10
 
-=head3 yMMMEd (EEE, d/MM/y)
+=head3 yMMMEd (E, d 'de' MMM 'de' y)
 
-   2008-02-05T18:30:30 = mar., 5/02/2008
-   1995-12-22T09:05:02 = ven., 22/12/1995
-  -0010-09-15T04:44:23 = sáb., 15/09/-10
+   2008-02-05T18:30:30 = mar., 5 de feb. de 2008
+   1995-12-22T09:05:02 = ven., 22 de dec. de 1995
+  -0010-09-15T04:44:23 = sáb., 15 de set. de -10
 
 =head3 yMMMM (MMMM 'de' y)
 
@@ -597,11 +597,11 @@ Galician locale.
    1995-12-22T09:05:02 = decembro de 1995
   -0010-09-15T04:44:23 = setembro de -10
 
-=head3 yMMMd (d/MM/y)
+=head3 yMMMd (d 'de' MMM 'de' y)
 
-   2008-02-05T18:30:30 = 5/02/2008
-   1995-12-22T09:05:02 = 22/12/1995
-  -0010-09-15T04:44:23 = 15/09/-10
+   2008-02-05T18:30:30 = 5 de feb. de 2008
+   1995-12-22T09:05:02 = 22 de dec. de 1995
+  -0010-09-15T04:44:23 = 15 de set. de -10
 
 =head3 yMd (d/M/y)
 

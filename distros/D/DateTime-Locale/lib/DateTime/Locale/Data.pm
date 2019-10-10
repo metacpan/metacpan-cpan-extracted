@@ -20,11 +20,11 @@ use namespace::autoclean;
 
 use File::ShareDir qw( dist_file );
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 35;
+our $CLDRVersion = 36;
 ### :end CLDRVersion:
 #>>>
 
@@ -384,6 +384,7 @@ our %Codes = (
   fy => 1,
   "fy-NL" => 1,
   ga => 1,
+  "ga-GB" => 1,
   "ga-IE" => 1,
   gd => 1,
   "gd-GB" => 1,
@@ -1177,6 +1178,7 @@ our %Names = (
   "Interlingua World" => "ia-001",
   Irish => "ga",
   "Irish Ireland" => "ga-IE",
+  "Irish United Kingdom" => "ga-GB",
   Italian => "it",
   "Italian Italy" => "it-IT",
   "Italian San Marino" => "it-SM",
@@ -1570,8 +1572,8 @@ our %NativeNames = (
   "Akan Gaana" => "ak-GH",
   "As\N{U+1ee5}s\N{U+1ee5} Igbo" => "ig",
   "As\N{U+1ee5}s\N{U+1ee5} Igbo Na\N{U+1ecb}j\N{U+1ecb}r\N{U+1ecb}a" => "ig-NG",
-  Cebuano => "ceb",
-  "Cebuano Pilipinas" => "ceb-PH",
+  Binisaya => "ceb",
+  "Binisaya Pilipinas" => "ceb-PH",
   Chimakonde => "kde",
   "Chimakonde Tanzania" => "kde-TZ",
   Cymraeg => "cy",
@@ -1671,10 +1673,10 @@ our %NativeNames = (
   "English Solomon Islands" => "en-SB",
   "English South Africa" => "en-ZA",
   "English South Sudan" => "en-SS",
-  "English St. Helena" => "en-SH",
-  "English St. Kitts & Nevis" => "en-KN",
-  "English St. Lucia" => "en-LC",
-  "English St. Vincent & Grenadines" => "en-VC",
+  "English St Helena" => "en-SH",
+  "English St Kitts & Nevis" => "en-KN",
+  "English St Lucia" => "en-LC",
+  "English St Vincent & Grenadines" => "en-VC",
   "English Sudan" => "en-SD",
   "English Sweden" => "en-SE",
   "English Switzerland" => "en-CH",
@@ -1703,6 +1705,7 @@ our %NativeNames = (
   Frysk => "fy",
   "Frysk Nederl\N{U+00e2}n" => "fy-NL",
   Gaeilge => "ga",
+  "Gaeilge an R\N{U+00ed}ocht Aontaithe" => "ga-GB",
   "Gaeilge \N{U+00c9}ire" => "ga-IE",
   Gaelg => "gv",
   "Gaelg Ellan Vannin" => "gv-IM",
@@ -2627,6 +2630,7 @@ our %ISO639Aliases = (
   gla => "gd",
   "gla-GB" => "gd-GB",
   gle => "ga",
+  "gle-GB" => "ga-GB",
   "gle-IE" => "ga-IE",
   glg => "gl",
   "glg-ES" => "gl-ES",
@@ -3202,7 +3206,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   en => {
     am_pm_abbreviated => [
@@ -3474,7 +3478,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "en-CA" => {
     am_pm_abbreviated => [
@@ -3753,7 +3757,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "en-US" => {
     am_pm_abbreviated => [
@@ -4025,7 +4029,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   es => {
     am_pm_abbreviated => [
@@ -4308,7 +4312,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
@@ -4580,7 +4584,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   hi => {
     am_pm_abbreviated => [
@@ -4856,7 +4860,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
@@ -5133,7 +5137,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
@@ -5205,13 +5209,13 @@ my %LocaleData = (
     datetime_format_medium => "{1} {0}",
     datetime_format_short => "{1} {0}",
     day_format_abbreviated => [
-      "seg",
-      "ter",
-      "qua",
-      "qui",
-      "sex",
-      "s\N{U+00e1}b",
-      "dom",
+      "seg.",
+      "ter.",
+      "qua.",
+      "qui.",
+      "sex.",
+      "s\N{U+00e1}b.",
+      "dom.",
     ],
     day_format_narrow => [
       "S",
@@ -5232,13 +5236,13 @@ my %LocaleData = (
       "domingo",
     ],
     day_stand_alone_abbreviated => [
-      "seg",
-      "ter",
-      "qua",
-      "qui",
-      "sex",
-      "s\N{U+00e1}b",
-      "dom",
+      "seg.",
+      "ter.",
+      "qua.",
+      "qui.",
+      "sex.",
+      "s\N{U+00e1}b.",
+      "dom.",
     ],
     day_stand_alone_narrow => [
       "S",
@@ -5278,18 +5282,18 @@ my %LocaleData = (
     glibc_time_format => "%T",
     language => "Portuguese",
     month_format_abbreviated => [
-      "jan",
-      "fev",
-      "mar",
-      "abr",
-      "mai",
-      "jun",
-      "jul",
-      "ago",
-      "set",
-      "out",
-      "nov",
-      "dez",
+      "jan.",
+      "fev.",
+      "mar.",
+      "abr.",
+      "mai.",
+      "jun.",
+      "jul.",
+      "ago.",
+      "set.",
+      "out.",
+      "nov.",
+      "dez.",
     ],
     month_format_narrow => [
       "J",
@@ -5320,18 +5324,18 @@ my %LocaleData = (
       "dezembro",
     ],
     month_stand_alone_abbreviated => [
-      "jan",
-      "fev",
-      "mar",
-      "abr",
-      "mai",
-      "jun",
-      "jul",
-      "ago",
-      "set",
-      "out",
-      "nov",
-      "dez",
+      "jan.",
+      "fev.",
+      "mar.",
+      "abr.",
+      "mai.",
+      "jun.",
+      "jul.",
+      "ago.",
+      "set.",
+      "out.",
+      "nov.",
+      "dez.",
     ],
     month_stand_alone_narrow => [
       "J",
@@ -5410,7 +5414,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
@@ -5682,7 +5686,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 35,
+    version => 36,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
@@ -5954,7 +5958,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 35,
+    version => 36,
   },
 );
 ### :end LocaleData:
@@ -6013,7 +6017,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 

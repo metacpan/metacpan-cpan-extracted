@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Indicator::Gauge::Bar;
 use Chart::Plotly::Trace::Indicator::Gauge::Step;
 use Chart::Plotly::Trace::Indicator::Gauge::Threshold;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace indicator.
 
@@ -88,7 +88,7 @@ Chart::Plotly::Trace::Indicator::Gauge - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

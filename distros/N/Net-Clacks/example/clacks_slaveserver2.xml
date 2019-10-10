@@ -1,0 +1,21 @@
+<clacks>
+    <appname>Clacks Master</appname>
+    <ip>127.0.0.1</ip>
+    <port>18887</port>
+    <pingtimeout>600</pingtimeout>
+    <interclackspingtimeout>10</interclackspingtimeout>
+    <ssl>
+        <cert>exampleserver.crt</cert>
+        <key>exampleserver.key</key>
+    </ssl>
+    <username>exampleuser</username>
+    <password>unsafepassword</password>
+    <throttle>
+        <maxsleep>5000</maxsleep>
+        <step>1</step>
+    </throttle>
+    <master>
+        <ip>127.0.0.1</ip>
+        <port>18888</port>
+    </master>
+</clacks>

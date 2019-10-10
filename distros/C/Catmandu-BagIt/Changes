@@ -1,5 +1,8 @@
 Revision history for Catmandu-BagIt
 
+0.237  2019-10-08 10:14:09 CEST
+    - Fixing dependencies [manwar]
+    
 0.236  2019-09-03 14:32:41 CEST
     - Fixing undeclared dependency on Data::UUID
 

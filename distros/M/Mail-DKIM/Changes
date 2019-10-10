@@ -1,6 +1,11 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.57
+
+ * Correct the $self->{result_reason} variable name for $self->{details} that is
+   used by the parent class in Mail::DKIM::ARC::Signer
+
 Version 0.56
 
  * Properly verify the domain, not the instance, of an ARC signature.

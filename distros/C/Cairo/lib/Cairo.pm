@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
@@ -337,6 +337,24 @@ C<$cr-E<gt>restore> to restore to the saved state.
 =item $x: double
 
 =item $y: double
+
+=back
+
+=item $cr->tag_begin($name, $atts) [1.16]
+
+=over
+
+=item $name: string
+
+=item $atts: string
+
+=back
+
+=item $cr->tag_end($name) [1.16]
+
+=over
+
+=item $name: string
 
 =back
 
@@ -1488,6 +1506,16 @@ For hysterical reasons, you can also use the following syntax:
 =over
 
 =item $version: I<Cairo::PdfVersion>
+
+=back
+
+=item $surface->set_metadata($name, $value) [1.16]
+
+=over
+
+=item $name: string
+
+=item $value: string
 
 =back
 

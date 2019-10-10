@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Base';
 
-our $VERSION = '1.251';
+our $VERSION = '1.252';
 
 has marc_path      => (fix_arg => 1);
 has path           => (fix_arg => 1);
@@ -139,17 +139,17 @@ Copy the value(s) of the data found at a MARC_PATH to a JSON_PATH.
 
 The MARC_PATH can point to a MARC field. For instance:
 
-    marc_path('245',title)
-    marc_path('020',isbn)
+    marc_map('245',title)
+    marc_map('020',isbn)
 
 The MARC_PATH can point to one or more MARC subfields. For instamce:
 
-    marc_path('245a',title)
-    marc_path('245ac',title)
+    marc_map('245a',title)
+    marc_map('245ac',title)
 
 You can also use dollar signs to indicate subfields
 
-    marc_path('245$a$c',title)
+    marc_map('245$a$c',title)
 
 Wildcards are allowed in the field names:
 

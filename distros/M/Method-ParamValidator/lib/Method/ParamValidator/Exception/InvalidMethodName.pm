@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception::InvalidMethodName;
 
-$Method::ParamValidator::Exception::InvalidMethodName::VERSION   = '0.15';
+$Method::ParamValidator::Exception::InvalidMethodName::VERSION   = '0.16';
 $Method::ParamValidator::Exception::InvalidMethodName::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception::InvalidMethodName - Handles 'invalid method n
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

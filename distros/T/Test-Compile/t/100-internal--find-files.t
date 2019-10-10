@@ -16,6 +16,9 @@ is(scalar @files, 0, 'Found no files in the empty list');
 @files = sort $internal->_find_files('IDoNotExist/');
 is(scalar @files, 0 ,'Found no files in non existant directory');
 
+@files = sort $internal->_find_files('IDoNotExist.pm');
+is(scalar @files, 0 ,"Didn't find non existent file");
+
 @files = sort $internal->_find_files('t/scripts/');
 is(scalar @files, 11 ,'Found all the files in the scripts dir');
 

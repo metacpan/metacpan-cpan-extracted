@@ -1,8 +1,11 @@
 Revision history for Catmandu-FileStore
 
+1.15  2019-10-08 09:55:11 CEST
+    - Adding mising dependencies [manwar]
+    
 1.14  2019-08-20 09:56:05 CEST
     - Removing Data::UUID dependency
-    
+
 1.13  2018-10-18 14:09:14 CEST
     - Fixing EAGAIN bug
 

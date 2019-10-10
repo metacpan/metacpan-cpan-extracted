@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "AM",
-    "PM",
+    "BN",
+    "PN",
   ],
   available_formats => {
     Bh => "h B",
@@ -236,10 +236,10 @@
     4,
   ],
   quarter_format_wide => [
-    "Q1",
-    "Q2",
-    "Q3",
-    "Q4",
+    "\N{U+00c7}ar\N{U+00ea}ka 1em",
+    "\N{U+00c7}ar\N{U+00ea}ka 2em",
+    "\N{U+00c7}ar\N{U+00ea}ka 3em",
+    "\N{U+00c7}ar\N{U+00ea}ka 4em",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+00c7}1",
@@ -254,10 +254,10 @@
     4,
   ],
   quarter_stand_alone_wide => [
-    "Q1",
-    "Q2",
-    "Q3",
-    "Q4",
+    "\N{U+00c7}ar\N{U+00ea}ka 1em",
+    "\N{U+00c7}ar\N{U+00ea}ka 2em",
+    "\N{U+00c7}ar\N{U+00ea}ka 3em",
+    "\N{U+00c7}ar\N{U+00ea}ka 4em",
   ],
   script => undef,
   territory => undef,
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

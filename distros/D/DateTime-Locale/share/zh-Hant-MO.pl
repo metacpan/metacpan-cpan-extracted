@@ -12,7 +12,7 @@
     EBhms => "E Bh:mm:ss",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
-    Ed => "d\N{U+65e5}E",
+    Ed => "d E",
     Ehm => "E ah:mm",
     Ehms => "E ah:mm:ss",
     Gy => "Gy\N{U+5e74}",
@@ -268,5 +268,5 @@
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

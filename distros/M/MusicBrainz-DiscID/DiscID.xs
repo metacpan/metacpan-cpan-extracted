@@ -73,13 +73,6 @@ discid_get_submission_url( disc )
   DiscId *disc
 
 ##
-## Return an URL for retrieving CD information from MusicBrainz' web service.
-##
-char*
-discid_get_webservice_url( disc )
-  DiscId *disc
-
-##
 ## Return the number of the first track on this disc.
 ##
 int

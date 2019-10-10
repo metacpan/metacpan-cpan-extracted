@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojolicious-Plugin-ErrorTracking-Sentry
 
+1.1.0 2019-10-07T05:13:34Z
+    - add "capture_message" helper and request context
+
 1.0.0 2017-12-12T03:41:39Z
 
     - original version

@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 6.1;
+our $VERSION = 7;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -50,6 +50,7 @@ sub new {
 
     $self->{needreconnect} = 1;
     $self->{inlines} = [];
+    $self->{firstconnect} = 1;
 
     $self->{memcached_compatibility} = 0;
 
@@ -72,6 +73,17 @@ sub reconnect {
         delete $self->{socket};
     }
 
+    if($self->{firstconnect}) {
+        $self->{firstconnect} = 0;
+    } else {
+        # Not our first connection (=real reconnect).
+        # wait a short random time before reconnecting. In case all
+        # clients got disconnected, we want to avoid having all clients reconnect
+        # at the exact same time
+        my $waittime = rand(4000)/1000;
+        sleep($waittime);
+    }
+
     my $socket = IO::Socket::IP->new(
         PeerHost => $self->{server},
         PeerPort => $self->{port},
@@ -92,6 +104,8 @@ sub reconnect {
     $self->{outbuffer} = '';
     $self->{serverinfo} = 'UNKNOWN';
     $self->{needreconnect} = 0;
+    $self->{firstline} = 1;
+    $self->{headertimeout} = time + 15;
 
     # Do *not* nuke "inlines" array, since it may hold "QUIT" messages that the client wants to handle, for example, to re-issue
     # "LISTEN" commands.
@@ -100,12 +114,8 @@ sub reconnect {
     # Startup "handshake". As everything else, this is asyncronous, both server and
     # client send their respective version strings and then wait to recieve their counterparts
     # Also, this part is REQUIRED, just to make sure we actually speek to CLACKS protocol
-    #
-    # In this implementation, we wait until we recieve the server header. If we don't recieve it within
-    # 20 seconds, we time out and fail.
     $self->{outbuffer} .= 'CLACKS ' . $self->{clientname} . "\r\n";
     $self->{outbuffer} .= 'OVERHEAD A ' . $self->{authtoken} . "\r\n";
-    my $timeout = time + 20;
 
     return;
 }
@@ -199,15 +209,33 @@ sub doNetwork {
         if($char eq "\r") {
             next;
         } elsif($char eq "\n") {
-            if($self->{inbuffer} ne 'NOP') { # Just drop "No OPerations" packets, only used by server to
+            if($self->{inbuffer} eq 'NOP') { # Just drop "No OPerations" packets, only used by server to
                                              # verify that the connection is still active
-                #print STDERR "GOT ", $self->{inbuffer}, "\n";
-                push @{$self->{inlines}}, $self->{inbuffer};
+                #$self->{firstline}
+                $self->{inbuffer} = '';
+                next;
             }
+
+            if($self->{firstline}) {
+                if($self->{inbuffer} !~ /^CLACKS\ /) {
+                    # Whoops, not a clacks server or something gone wrong with the protocol
+                    $self->{needreconnect} = 1;
+                    return 0;
+                } else {
+                    $self->{firstline} = 0;
+                }
+            }
+
+            push @{$self->{inlines}}, $self->{inbuffer};
             $self->{inbuffer} = '';
         } else {
             $self->{inbuffer} .= $char;
         }
+    }
+
+    if($self->{firstline} && $self->{headertimeout} < time) {
+        $self->{needreconnect} = 1;
+        return 0;
     }
 
     return $workCount;
@@ -963,7 +991,11 @@ Reconnect to the CLACKS server when something went wrong.
 
 =head2 doNetwork
 
-Process incoming and outpoing messages.
+Process incoming and outpoing messages. L<doNetwork> tries to send as much as possible. But due to network congestion it might not be able to send everything in one go and it will try not to hold up the caller for too long. Thats why it's important to call doNetwork from the cyclic loop of your programm at least every few seconds or so (depending on what you are trying to do).
+
+=head2 flush
+
+Send everything in the client out queue to the server and wait for a confirmation from the server it has recieved everything. This is a syncronous operation and will hold up the calling program.
 
 =head2 ping
 
@@ -989,6 +1021,40 @@ LISTEN to specific NOTIFY and SET events.
 
 Stop listening to specific NOTIFY and SET events.
 
+=head2 store
+
+STORE a value in clacks for later retrieval.
+
+=head2 retrieve
+
+RETRIEVE a values from clacks that has been stored earlier.
+
+=head2 increment
+
+INCREMENT a stored value by one. Takes an optional argument to say how much to increment.
+
+=head2 decrement
+
+DECREMENT a stored value by one. Takes an optional argument to say how much to decrement.
+
+=head2 remove
+
+REMOVE/DELETE a stored key from clacks
+
+=head2 keylist
+
+Get a list of all keys stored in clacks.
+
+=head2 clearcache
+
+Remove all keys stored in clacks.
+
+=head2 setAndStore
+
+Meta-function that both calls set() and store() internally with a single library call.
+Useful in some circumstances when you both want to remember the variable and also 
+tell everyone interested immediately that it has changed.
+
 =head2 setMonitormode
 
 Enable/Disable monitor mode. When enabled, the server sends all events it sees as DEBUG events (events LISTENed to also get send the normal way).
@@ -1001,11 +1067,22 @@ Get server name and version.
 
 Get the next incoming event in the queue.
 
-=head2 setAndStore
+=head2 clientlist
 
-Meta-function that both calls set() and store() internally with a single library call.
-Useful in some circumstances when you both want to remember the variable and also 
-tell everyone interested immediately that it has changed.
+Get a list of all clients connected to the server. If the server is using interclacks (multiple servers in a pool), it will only list the clients connected to the server you are connected to.
+
+=head2 sendRawCommand
+
+Adds whatever you want to the out queue, to be send to the server. This is mostly useful when debugging and/or enhancing your server or if you want to implement a command line shell to your clacks server-
+
+=head2 activate_memcached_compat
+
+This activates a sort of memcached compatibility setup. Don't use this directly, it's an internal wonky
+workaround. Use L<Net::Clacks::ClacksCache> instead.
+
+=head2 autohandle_messages
+
+This is also part of the internal memcached compatibility setup. Don't use this directly.
 
 =head2 DESTROY
 

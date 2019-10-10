@@ -1,6 +1,4 @@
 
-# $Id$
-
 severity = 1
 
 #------------------------------------------------------------------------------
@@ -11,8 +9,7 @@ severity = 1
 lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR
 script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR
 
-[Miscellanea::RequireRcsKeywords]
-keywords = Id
-
 [CodeLayout::ProhibitHardTabs]
 allow_leading_tabs = 1
+
+[-Documentation::RequirePodLinksIncludeText]

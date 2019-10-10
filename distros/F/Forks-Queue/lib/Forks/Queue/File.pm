@@ -8,7 +8,7 @@ use Time::HiRes;
 use base 'Forks::Queue';
 use 5.010;    #  sorry, v5.08. I love the // //=  operators too much
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -31,50 +31,84 @@ sub dejsonize {
 use constant EOL => "\x{0a}";
 # Anything that can't be a valid JSON substring is ok to use here
 
+sub _lock {
+    # a file based queue generally lends itself to file based
+    # advisory locking, though it doesn't work on Solaris with threads.
+    # The generic _lock and _unlock functions can support other
+    # schemes.
+
+    
+    my $self = shift;
+    if ($self->{_locked}) {
+        Carp::cluck "$$ acquiring lock but already have lock";
+        return;
+    }
+    my $_DEBUG = $self->{debug} // $DEBUG;
+
+    local $! = 0;
+    if ($self->{_lockdir}) {
+        my $z = Dir::Flock::lock($self->{_lockdir});
+        $_DEBUG && print STDERR ">> flock_dir lock by ".
+            _PID() . " z=$z \!$=$!\n";
+        if (!$z) {
+            carp "Forks::Queue: lock queue by flock_dir failed: $!";
+        }
+    } elsif ($self->{lock}) {
+        # file-based advisory file locking with flock
+        # Doesn't work across threads in Solaris, since fcntl implementation
+        # passes the process id but not the thread id to the locking
+        # functions.
+        
+        open my $lockfh, ">>", $self->{lock};
+        my $z = flock $lockfh, 2;
+        while (!$z && $Forks::Queue::NOTIFY_OK && $!{EINTR}) {
+            # SIGIO can interrupt flock
+            $z = flock $lockfh, 2;
+        }
+        $self->{lockfh} = $lockfh;
+        $_DEBUG && print STDERR ">> flock lock by " . _PID() . "\n";
+    }
+    $self->{_locked} = 1;
+}
+
+sub _unlock {
+    my $self = shift;
+    $self->{_locked} = 0;
+    my $_DEBUG = $self->{debug} // $DEBUG;
+    local $! = 0;
+    if ($self->{_lockdir}) {
+        my $z = Dir::Flock::unlock($self->{_lockdir});
+        $_DEBUG && print STDERR "<< flock_dir unlock by " . _PID() . " z=$z\n";
+    } elsif ($self->{lockfh}) {
+        my $z = close delete $self->{lockfh};
+        $_DEBUG && print STDERR "<< flock unlock by " . _PID() . " z=$z\n";
+    }
+    return;
+}
+
+
+
+
+# execute a block of code in a way where only one
+# thread/process can be executing code for this queue
 sub _SYNC (&$) {
     my ($block,$self) = @_;
     return if Forks::Queue::__inGD();
+    my $_DEBUG = $self->{debug} // $DEBUG;
 
-    my $lock;
-    local $! = 0;
-    if ($self->{_locked}) {
-        Carp::cluck "$$ acquiring lock but already have lock";
-    }
-    open $lock, '>>', $self->{lock};
-    my $z = flock $lock, 2;
-    while (!$z && $Forks::Queue::NOTIFY_OK && $!{EINTR}) {
-        # SIGIO can interrupt flock
-        $z = flock $lock, 2;
-    }
-    $self->{_locked} = 1;
-
-    $DEBUG and print STDERR "$$ Locked $self->{lock} z=$z\n";
-
+    $self->_lock;
     my $result = $block->($self);
-
-    $self->{_locked} = 0;
-    close $lock;
-    $DEBUG and print STDERR "$$ Unlocked\n";
+    $self->_unlock;
     return $result;
 }
 
 sub _SYNCWA (&$) {    # wantarray version of _SYNC
     my ($block,$self) = @_;
+    my $_DEBUG = $self->{debug} // $DEBUG;
 
-    if ($self->{_locked}) {
-        Carp::cluck "$$ acquiring lock but already have lock";
-    }
-    open my $lock, '>>', $self->{lock};
-    my $z = flock $lock, 2;
-    $self->{_locked} = 1;
-
-    $DEBUG and print STDERR "$$ Locked $self->{lock} z=$z\n";
-
+    $self->_lock;
     my @result = $block->($self);
-
-    $self->{_locked} = 0;
-    close $lock;
-    $DEBUG and print STDERR "$$ Unlocked\n";
+    $self->_unlock;
     return @result;
 }
 
@@ -86,6 +120,7 @@ sub new {
     my $class = shift;
     my %opts = (%Forks::Queue::OPTS, @_);
 
+    ${^_nfs} = 0;
     $opts{file} //= _impute_file();
     $opts{lock} = $opts{file} . ".lock";
     my $list = delete $opts{list};
@@ -100,15 +135,41 @@ sub new {
     $opts{_count} = 0;          # index of next item to be appended
     $opts{_pids} = { _PID() => 'P' };
     $opts{_version} = $Forks::Queue::VERSION;
+    $opts{_qid} = Forks::Queue::Util::QID();
 
     # how often to refactor the queue file. use small values to keep file
     # sizes small and large values to improve performance
     $opts{_maintenance_freq} //= 128;
 
+
+    
+
     open $fh, '>>', $opts{lock} or die;
     close $fh or die;
 
     my $self = bless { %opts }, $class;
+
+    # Normal flock can not be used with multi-threaded solaris,
+    # and may be flaky with files on NFS directories.
+    if ($^O eq 'solaris') {
+        $opts{dflock} //= 1;
+    } elsif (${^_nfs}) {
+        $opts{dflock} //= 1;
+    } elsif (Forks::Queue::Util::__is_nfs( $opts{file} )) {
+        $opts{dflock} //= 1;
+    }
+
+    if ($opts{dflock}) {
+        # Dir::Flock (included in this distribution) provides a safer
+        # (if more cumbersome) advisory locking method to synchronize
+        # the queue.
+        no warnings 'numeric';
+        require Dir::Flock;
+        $self->{_lockdir} = Dir::Flock::getDir( $opts{lock} );
+        $Dir::Flock::HEARTBEAT_CHECK = 5;
+        $Dir::Flock::PAUSE_LENGTH = 0.01;
+    }
+
 
     if ($opts{join} && -f $opts{file}) {
         $DB::single = 1;
@@ -150,33 +211,60 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
+    my $pid = _PID();
+    my $_DEBUG = $self->{debug} // $DEBUG;
+    $_DEBUG && print STDERR "$pid DESTROY called\n";
     $self->{_DESTROY}++;
-    eval {
-    _SYNC {
-        if ($self->_read_header) {
-            $DEBUG and print STDERR "$$ DESTROY: pids at destruction: ",
-                                join(" ",keys %{$self->{_pids}}),"\n";
-            delete $self->{_pids}{_PID()};
-            $self->_write_header;
-        } else {
-            $DEBUG and print STDERR "$$ DESTROY: header not available\n";
+    if (Forks::Queue::__inGD()) {
+        $self->{_locked} = -1;
+        if (my $h = $self->_read_header) {
+            $_DEBUG && print STDERR "$pid DESTROY header at GD: $h\n";
+            my $role = delete $self->{_pids}{$pid};
+            if ($role && $role eq 'P') {
+                $self->{_pids} = {};
+                $_DEBUG && print STDERR "$pid DESTROY role=P\n";
+                $self->_write_header;
+            }
         }
-    } $self;
-    };
-    if ($@) {
-        if ($@ !~ /malformed JSON ...* at character offset 0/) {
-            use Data::Dumper;
-            print STDERR Dumper($@,$self);
+        delete $self->{_locked};
+    } else {
+        eval {
+            _SYNC {
+                if ($self->_read_header) {
+                    $_DEBUG and print STDERR
+                        "$pid DESTROY: pids at destruction: ",
+                        join(" ",keys %{$self->{_pids}}),"\n";
+                    delete $self->{_pids}{$pid};
+                    $self->_write_header;
+                    $_DEBUG and print STDERR "$pid DESTROY header updated.\n";
+                } else {
+                    $_DEBUG and print STDERR
+                        "$$ DESTROY: header not available\n";
+                }
+            } $self;
+            $_DEBUG && print STDERR
+                "$pid DESTROY final header read complete\n";
+        };
+        if ($@) {
+            if ($@ !~ /malformed JSON ...* at character offset 0/) {
+                use Data::Dumper;
+                print STDERR Dumper($@,$self);
+            } elsif ($_DEBUG) {
+                print STDERR "$pid DESTROY error reading header: $@";
+            }
         }
     }
     $self->{_fh} && close $self->{_fh};
-    $DEBUG and print STDERR "$$ DESTROY: remaining pids: ",
+    $_DEBUG and print STDERR "$pid DESTROY: remaining pids: ",
                                 join(" ",keys %{$self->{_pids}}),"\n";
     if ($self->{_pids} && 0 == keys %{$self->{_pids}}) {
-        $DEBUG and print STDERR "$$ Unlinking files from here\n";
-        unlink $self->{lock};
-        unlink $self->{file} unless $self->{persist};
-        $DEBUG and print STDERR
+        $_DEBUG and print STDERR "$$ Unlinking files from here\n";
+        my $u2 = -1;
+        my $u1 = unlink $self->{lock};
+        $u2 = unlink $self->{file} unless $self->{persist};
+        $_DEBUG and print STDERR
+            "$$ DESTROY unlink results $u1/$u2 $self->{lock} $self->{file}\n";
+        $_DEBUG and print STDERR
             "$$ DESTROY: unlink time " . Time::HiRes::time . "\n";
     }
 }
@@ -192,11 +280,14 @@ sub _read_header {
     my ($self) = @_;
     Carp::cluck "unsafe _read_header" unless $self->{_locked};
     local $/ = EOL;
+    my $_DEBUG = $self->_debug;
     my $h = "";
     if ($self->{_DESTROY}) {
         no warnings 'closed';
         seek $self->{_fh}, 0, 0;
         $h = readline($self->{_fh}) // "";
+        $_DEBUG && print STDERR
+            "$$ Read ",length($h)," bytes from header during DESTROY\n";
     } else {
         local $! = 0;
         if (seek $self->{_fh}, 0, 0) {
@@ -208,6 +299,7 @@ sub _read_header {
     }
     if (!$h) {
         if ($self->{_DESTROY}) {
+            $_DEBUG && print STDERR "$$ in DESTROY and header not found\n";
             return;
         }
         Carp::cluck "_read_header: header not found";
@@ -222,9 +314,10 @@ sub _read_header {
     $self->{_maintenance_freq} = $h->{maintFreq};
     $self->{_version} = $h->{version};
     $self->{_pids} = $h->{pids};
+    $self->{_lockdir} = $h->{lockdir} || undef;
     $self->{limit} = $h->{limit} if $h->{limit};
 
-    $DEBUG && print STDERR "$$ read header\n";
+    $_DEBUG && print STDERR "$$ read header\n";
 
     $h->{avail} = $self->{_avail} = $h->{count} - $h->{index};  # not written
     return $h;
@@ -233,12 +326,15 @@ sub _read_header {
 sub _write_header {
     my ($self) = @_;
     Carp::cluck "unsafe _write_header" unless $self->{_locked};
+    my $_DEBUG = $self->{debug} // $DEBUG;
     my $header = { index => $self->{_pos}, end => $self->{_end},
                    tell => $self->{_tell}, count => $self->{_count},
                    limit => $self->{limit},
                    pids => $self->{_pids},
+                   qid => $self->{_qid},
                    headerSize => $self->{_header_size},
                    maintFreq => $self->{_maintenance_freq},
+                   ($self->{_lockdir} ? (lockdir => $self->{_lockdir}) : ()),
                    version => $self->{_version}  };
 
     my $headerstr = jsonize($header);
@@ -252,7 +348,7 @@ sub _write_header {
         no warnings;
         seek $self->{_fh}, 0, 0;
         print {$self->{_fh}} $headerstr,EOL;
-        $DEBUG && print STDERR "$$ updated header $headerstr\n";
+        $_DEBUG && print STDERR "$$ updated header $headerstr\n";
     };
 }
 
@@ -260,11 +356,12 @@ sub _notify {
     return unless $Forks::Queue::NOTIFY_OK;
 
     my $self = shift;
+    my $_DEBUG = $self->{debug} // $DEBUG;
     _SYNC { $self->_read_header } $self;
     my @ids = keys %{$self->{_pids}};
     my (@pids,@tids);
     my $me = _PID();
-    $DEBUG && print STDERR "_notify \$me=$me  \@ids=@ids\n";
+    $_DEBUG && print STDERR "$$ _notify \$me=$me  \@ids=@ids\n";
     foreach my $id (@ids) {
         my ($p,$t) = split /-/,$id;
         if (!$p) {
@@ -277,13 +374,14 @@ sub _notify {
         }
     }
     if (@tids) {
-        $DEBUG && print STDERR "$$ notify: tid @tids\n";
+        $_DEBUG && print STDERR "$$ notify: tid @tids\n";
         foreach my $tid (@tids) {
             my $thr = threads->object($tid);
             if ($thr) {
                 my $z7;
                 $thr && ($z7 = $thr->kill('IO')) &&
-                    $DEBUG && print STDERR "_notify to tid $$-$tid \$z7=$z7\n";
+                    $_DEBUG && print STDERR
+                        "$$ _notify to tid $$-$tid \$z7=$z7\n";
                 if ($tid ne $tids[-1]) {
                     #Time::HiRes::sleep 0.25;
                 }
@@ -291,15 +389,16 @@ sub _notify {
                 # $thr->kill is not reliable?
                 
             } elsif ($tid == 0) {
-                $DEBUG && print STDERR "_notify SIGIO to tid main\n";
+                $_DEBUG && print STDERR "$$ _notify SIGIO to tid main\n";
                 kill 'IO', $$;
             } else {
-                $DEBUG && print STDERR "_notify failed to SIGIO tid $tid\n";
+                $_DEBUG && print STDERR
+                    "$$ _notify failed to SIGIO tid $tid\n";
             }
         }
     }
     if (@pids) {
-        $DEBUG && print STDERR "_notify to pids @pids\n";
+        $_DEBUG && print STDERR "$$ _notify to pids @pids\n";
         kill 'IO', @pids;
     }
 }
@@ -351,6 +450,7 @@ sub status {
 
 sub _check_pid {
     my ($self) = @_;
+    my $_DEBUG = $self->{debug} // $DEBUG;
     if (!defined $self->{_pids}{_PID()}) {
         if ($Forks::Queue::NOTIFY_OK) {
             if (_PID() =~ /.-[1-9]/) {
@@ -363,22 +463,22 @@ sub _check_pid {
         my $ostatus = open $self->{_fh}, '+<', $self->{file};
         for (1..5) {
             last if $ostatus;
-            sleep 1;
+            sleep int(sqrt($_));
             $ostatus = open $self->{_fh}, '+<', $self->{file};            
         }
         if (!$ostatus) {
             Carp::confess("Forks::Queue::check_pid: ",
-                          "Could not open $self->{file} after 5 tries");
+                          "Could not open $self->{file} after 5 tries: $!");
             return;
         }
         if ($self->{_locked}) {
-            $DEBUG && print STDERR
+            $_DEBUG && print STDERR
                 "Forks::Queue: $$ new pid update header\n";
             $self->{_pids}{_PID()} = 'C';
             $self->_write_header;
             return;
         } else {
-            $DEBUG and print STDERR "Forks::Queue: $$ new pid sync\n";
+            $_DEBUG and print STDERR "Forks::Queue: $$ new pid sync\n";
             _SYNC {
                 $self->_read_header;
                 $self->{_pids}{_PID()} = 'C';
@@ -467,12 +567,12 @@ sub push {
             $self->{_count}++;
             $self->{_avail}++;
             $pushed++;
-            $DEBUG && print STDERR
+            $self->_debug && print STDERR
                 "$$ put item [$json] $pushed/",0+@items,"\n";
         }
         $self->_write_header;
     } $self;
-    if ($pushed && $DEBUG) {
+    if ($pushed && $self->_debug) {
         print STDERR "_notify from push(\$pushed=$pushed)\n";
     }
     $self->_notify if $pushed;
@@ -482,10 +582,10 @@ sub push {
             carp "Forks::Queue: queue buffer is full ",
                  "and $failed_items items were not added";
         } else {
-            $DEBUG && print STDERR
+            $self->_debug && print STDERR
                 "$$ $failed_items on put. Waiting for capacity\n";
             $self->_wait_for_capacity;
-            $DEBUG && print STDERR "$$ got some capacity\n";
+            $self->_debug && print STDERR "$$ got some capacity\n";
             $pushed += $self->push(@deferred_items);        }
     }
     return $pushed;
@@ -892,7 +992,7 @@ sub insert {
                 $self->{_count}++;
                 $self->{_avail}++;
                 $inserted++;
-                $DEBUG && print STDERR
+                $self->_debug && print STDERR
                     "$$ insert item $inserted/",0+@items,"\n";
             }
             $self->_write_header;
@@ -914,7 +1014,7 @@ sub insert {
             $self->{_count}++;
             $self->{_avail}++;
             $inserted++;
-            $DEBUG && print STDERR
+            $self->_debug && print STDERR
                 "$$ insert item $inserted/",0+@items,"\n";
         }
         print {$self->{_fh}} @buffer;
@@ -925,10 +1025,10 @@ sub insert {
             carp "Forks::Queue: queue buffer is full ",
                  "and $failed_items items were not inserted";
         } else {
-            $DEBUG && print STDERR
+            $self->_debug && print STDERR
                 "$$ $failed_items on insert. Waiting for capacity\n";
             $self->_wait_for_capacity;
-            $DEBUG && print STDERR "$$ got some capacity\n";
+            $self->_debug && print STDERR "$$ got some capacity\n";
             $inserted += $self->insert($pos+$inserted, @deferred_items);
         }
     }
@@ -1058,6 +1158,10 @@ sub Forks::Queue::File::MagicLimit::STORE {
 
 sub limit :lvalue {
     my $self = shift;
+    if (! eval { $self->_check_pid; 1 } ) {
+        carp "Forke::Queue::limit operation failed: $@";
+        return;
+    }
     if (!$self->{_limit_magic}) {
         tie $self->{_limit_magic},'Forks::Queue::File::MagicLimit', $self;
     }
@@ -1070,6 +1174,10 @@ sub limit :lvalue {
         _SYNC { $self->_write_header } $self;
     }
     return $self->{_limit_magic};
+}
+
+sub _debug {
+    shift->{debug} // $Forks::Queue::DEBUG;
 }
 
 sub _DUMP {
@@ -1103,10 +1211,12 @@ sub _impute_file {
         if (-d $candidate && -w _ && -x _) {
             $file //= "$candidate/.fq-$$-$id-base";
             next if Forks::Queue::Util::__is_nfs($candidate);
+            ${^_nfs} = 0;
             return "$candidate/.fq-$$-$id-$base";
         }
     }
 
+    ${^_nfs} = 1;
     carp "Forks::Queue::File: queue file $file might be on an NFS filesystem!";
     return $file;
 }
@@ -1119,7 +1229,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 SYNOPSIS
 
@@ -1174,6 +1284,18 @@ with synchronizing files across processes.
 =item * persist
 
 See L<Forks::Queue/"new"> for descriptions of these options.
+
+=item * debug
+
+Boolean value to enable or disable debugging on this queue,
+overriding the value in C<$Forks::Queue::DEBUG>.
+
+=item * dflock
+
+Boolean value to enable directory-based alternative to flock
+for synchronization of the queue across processeses. The module
+will generally be able to guess whether this flag should be
+set by default.
 
 =back
 

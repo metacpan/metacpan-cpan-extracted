@@ -99,11 +99,11 @@ and add the following line:
 
 'reciva_ssl_opts' => {verify_hostname => 0, SSL_version => 'TLSv1'}
 
-I'm NOT making that the default, since, they could FIX this at ANY TIME, 
-breaking StreamFinder::Reciva!  These options will ONLY be applied to reciva.com 
-URLs, NOT the streams, etc. that are on other sites.  To specify opts for 
-all URLs accessed by StreamFinder::Reciva, use 'ssl_opts' instead of 
-'reciva_ssl_opts'.
+(See also L<CONFIGURATION FILES> below).  I'm NOT making that the default, 
+since, they could FIX this at ANY TIME, breaking StreamFinder::Reciva!  
+These options will ONLY be applied to reciva.com URLs, NOT the streams, 
+etc. that are on other sites.  To specify opts for all URLs accessed by 
+StreamFinder::Reciva, use 'ssl_opts' instead of 'reciva_ssl_opts'.
 
 =head1 SUBROUTINES/METHODS
 
@@ -404,6 +404,7 @@ sub new
 		my $stationID = $self->{'id'};
 		$self->{'iconurl'} = ($html =~ m#stationid\=\"\d+\"\s+href\=\"\/station\/${stationID}\"\>\s*\<img\s+src\=\"([^\"]*)#s) ? $1 : '';
 		$self->{'imageurl'} = $self->{'iconurl'};
+		$html =~ s/\\\"/\&quot\;/gs;
 		$self->{'title'} = ($html =~ m#\<th\s+class\=\"stationName\s+spec\"\s+>\s*([^\<]+)#) ? $1 : '';
 		my $genreDiv = ($html =~ m#\<div\s+class\=\"genre\"\>(.+?)\<\/#s) ? $1 : '';
 		$genreDiv =~ s#^\s*\<[^\>]*\>?##s;
@@ -431,6 +432,7 @@ sub new
 
 	my @streams;
 	$self->{'cnt'} = 0;
+	$html =~ s/\\\"/\&quot\;/gs;
 	$self->{'title'} = $1  if (!$self->{'title'} && $html =~ m#Playing:\s*([^\<]+)#);
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});

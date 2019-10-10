@@ -3,13 +3,14 @@ abstract: 'a CHI backed caching store'
 author:
   - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
 build_requires:
-  Module::Build: '0.3601'
+  Module::Build: '0.28'
+  Test::Exception: '0'
   Test::More: '1.001003'
   Test::Simple: '1.001003'
 configure_requires:
-  Module::Build: '0.3601'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,19 +18,23 @@ meta-spec:
 name: Catmandu-Store-CHI
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   CHI: '0.58'
-  Catmandu: '0.9202'
+  Catmandu: '1.2001'
   Moo: '1.0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Store-CHI/issues
   homepage: https://github.com/LibreCat/Catmandu-Store-CHI
   repository: https://github.com/LibreCat/Catmandu-Store-CHI.git
-version: '0.02'
+version: '0.04'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

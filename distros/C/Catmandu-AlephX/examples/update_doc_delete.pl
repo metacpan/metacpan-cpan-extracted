@@ -7,7 +7,7 @@ use open qw(:std :utf8);
 use Data::Dumper;
 
 sub alephx {
-  state $a = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+  state $a = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 }
 
 my $doc_number = shift;

@@ -8,7 +8,7 @@ use DateTime::Locale::Util qw( parse_locale_code );
 use Params::ValidationCompiler 0.13 qw( validation_for );
 use Specio::Declare;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 my @FormatLengths;
 
@@ -288,7 +288,7 @@ DateTime::Locale::FromData - Class for locale objects instantiated from pre-defi
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 

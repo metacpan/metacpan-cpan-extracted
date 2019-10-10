@@ -88,9 +88,8 @@ sub exercise_forks {
             print STDERR $@ if $@;
         }
         my $gcpid = wait;
-        sleep 2;
-        sleep 3; # RT#127933
-        sleep 5 if $^O =~ /freebsd/i;   # RT#127933
+        uninterruptable_sleep 5;  # give parent time for its put calls
+        uninterruptable_sleep 5 if $^O =~ /freebsd/i; #& give freebsd more time
         $q->end;
         exit;
     }
@@ -100,16 +99,20 @@ sub exercise_forks {
     }
 
     my $s = $q->status;
-    my $t = time;
+    sleep 5 if $^O =~ /freebsd/i;
+    my $t = Time::HiRes::time;
     until ($s->{end}) {
         sleep 1;
         $s = $q->status;
-        if ($t - time > 15) {
+        if (time - $t > 15) {
             die "Took too long for queue to become available";
         }
     }
-    ok($t - time < 5,
-       'forks: simultaneous queue access from 3 procs not too slow');
+    if ($^O !~ /freebsd/i) {
+        ok(Time::HiRes::time - $t < 10,
+           'forks: simultaneous queue access from 3 procs not too slow')
+            or diag Time::HiRes::time-$t,"s";
+    }
     ok($q->pending == 30, 'forks: 30 items on queue')
         or diag $q->pending;
     my @g = $q->get(30);
@@ -297,12 +300,25 @@ sub exercise_blocking {
 
     my $t0 = Time::HiRes::time;
     my $pid = fork();
+    if (!defined($pid)) {
+        diag "fork call failed $!. Expect trouble";
+        $pid = $$;
+    }
     if ($pid == 0) {
         sleep 5;
         my @items = map [ ($_) x $_ ], 1..10;
-        $q->put(@items);
-        diag "put time=",Time::HiRes::time-$t0,"s";
+        my $putcount = eval { $q->put(@items) };
+        if ($putcount != 10) {
+            diag "$$ put $putcount items on queue, not 10. Expect trouble.";
+            diag "$$ \$\@ is $@";
+            diag "$$ queue file is ", $q->{file};
+            diag "$$ -f => ", -f $q->{file};
+            diag "$$ -r => ", -r $q->{file};
+            diag "$$ -w => ", -w $q->{file};
+            diag "$$ -s => ", -s $q->{file};
+        }
         $q->end;
+        diag "put time=",Time::HiRes::time-$t0,"s";
         exit;
     }
 
@@ -311,7 +327,7 @@ sub exercise_blocking {
     my $t1 = $t;
     my ($x1,$x2,$x3) = (1,2,3);
 
-    alarm 10;
+    alarm 15;
     eval {
         $x1 = $q->get_nb;
         $x2 = $q->shift_nb;
@@ -326,10 +342,11 @@ sub exercise_blocking {
     ok(!defined($x2), 'block: shift_nb returns undef') or diagdump $x2;
     ok(!defined($x3), 'block: pop_nb returns undef') or diagdump $x3;
 
-    alarm 10;
+    alarm 15;
     $t = Time::HiRes::time;
     eval {
         $x3 = $q->pop;
+        sleep 1;
         $x2 = $q->shift;
         $x1 = $q->get;
     };
@@ -342,7 +359,7 @@ sub exercise_blocking {
     ok(!$@, 'block: get,pop,shift did not timeout')
         or diag "wait time was ${t}s";
     ok($x3 && ref($x3) eq 'ARRAY' && @$x3==10,
-       'block: blocking pop got last element') or diagdump($x3,$t1-$t0,$t-$t0);
+       'block: blocking pop got last element') or diagdump($x3,$t1-$t0,$t);
     # t1-t0 is "start up time", time to recover after starting the child process
     # check that it is not large compared to "put time" reported by child
     # "put time" should also be a lot shorter than t-t0
@@ -379,7 +396,7 @@ sub exercise_join {
         my $qq = Forks::Queue->new(%opts, persist => 1);
         my $sum = 0;
         $qq->put( map { my $z=int(137*rand); $sum+=$z; [$_,$z] } 0..213 );
-        open RESULT,">$file.result";
+        open RESULT, ">", "$file.result";
         print RESULT $sum;
         close RESULT;
         $qq->end;
@@ -480,7 +497,7 @@ sub TEMP_DIR {
     if (defined &Forks::Queue::Util::__is_nfs &&
         Forks::Queue::Util::__is_nfs($TEMP)) {
         diag "Warning: working directory '$TEMP' is an NFS directory";
-        diag "Synchronization is more difficult with NFS files";
+        diag "Synchronization is more difficult with NFS filesystems";
     }
     return $TEMP;
 }
@@ -494,6 +511,7 @@ sub PREP {
     } elsif ($impl eq 'shmem') {
         use_ok('Forks::Queue::Shmem');
         if (! -d $Forks::Queue::Shmem::DEV_SHM) {
+            Test::More::diag("shared memory virtual filesystem not found");
             ok(1, "# skip - shared memory virtual filesystem not found");
             done_testing;
             exit;
@@ -501,6 +519,7 @@ sub PREP {
         $Forks::Queue::OPTS{impl} = 'Shmem';
     } elsif ($impl eq 'sqlite') {
         if (!eval "use DBD::SQLite;1") {
+            Test::More::diag("DBD::SQLite not installed");
             ok(1, "# skip - DBD::SQLite required for Forks::Queue::SQLite");
             done_testing;
             exit;

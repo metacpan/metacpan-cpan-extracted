@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.2.2");
+use version; our $VERSION = qv("v2.3.0");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;
@@ -18,19 +18,14 @@ Test::Compile - Check whether Perl files compile correctly.
 
     use Test::Compile;
 
-    # The OO way (recommended)
     my $test = Test::Compile->new();
     $test->all_files_ok();
     $test->done_testing();
 
-    # The procedural way (deprecated)
-    use Test::Compile qw( all_pm_files_ok );
-    all_pm_files_ok();
-
 =head1 DESCRIPTION
 
 C<Test::Compile> lets you check the whether your perl modules and scripts
-compile properly, and report its results in standard C<Test::Simple> fashion.
+compile properly, results are reported in standard C<Test::Simple> fashion.
 
 The basic usage - as shown above, will locate your perl files and test that they
 all compile.
@@ -78,8 +73,9 @@ our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 
 =item C<new()>
 
-A basic constructor, nothing special except that it returns a
-L<Test::Compile::Internal> object.
+The constructor, which actually returns a
+L<Test::Compile::Internal> object.  This gives you access to all the methods provided by
+C<Test::Compile::Internal>, including those listed below.
 
 =cut
 
@@ -90,44 +86,9 @@ sub new {
 
 =item C<all_files_ok(@dirs)>
 
-Checks all the perl files it can find for compilation errors.
+Looks for perl files and tests them all for compilation errors.
 
-If C<@dirs> is defined then it is taken as an array of directories to
-be searched for perl files, otherwise it searches some default locations
-- see L</all_pm_files(@dirs)> and L</all_pl_files(@dirs)>.
-
-=item C<all_pm_files(@dirs)>
-
-Returns a list of all the perl module files - that is any files ending in F<.pm>
-in C<@dirs> and in directories below. If C<@dirs> is undefined, it
-searches F<blib> if F<blib> exists, or else F<lib>.
-
-Skips any files in C<CVS>, C<.svn>, or C<.git> directories.
-
-The order of the files returned is machine-dependent. If you want them
-sorted, you'll have to sort them yourself.
-
-=item C<all_pl_files(@dirs)>
-
-Returns a list of all the perl script files - that is, any files in C<@dirs> that
-either have a F<.pl> extension, or have no extension and have a perl shebang line.
-
-If C<@dirs> is undefined, it searches F<script> if F<script> exists, or else
-F<bin> if F<bin> exists.
-
-Skips any files in C<CVS>, C<.svn>, or C<.git> directories.
-
-The order of the files returned is machine-dependent. If you want them
-sorted, you'll have to sort them yourself.
-
-=back
-
-=head2 Test Methods
-
-C<Test::Compile::Internal> encapsulates a C<Test::Builder> object, and provides
-access to some of its methods.
-
-=over 4
+See L<Test::Compile::Internal/all_files_ok(@dirs)> for the full documentation.
 
 =item C<done_testing()>
 
@@ -161,12 +122,16 @@ Even then, you really should use the object oriented methods as they provide
 a more consistent interface.  For example: C<all_pm_files_ok()> calls the
 C<plan()> function - so you can't call multiple test functions in the same test file.
 
-You should definately use the object oriented interface described in the L</SYNOPSIS>
+You should definitely use the object oriented interface described in the L</SYNOPSIS>
 and in L<Test::Compile::Internal> instead of calling these functions.
 
 =over 4
 
 =item C<all_pm_files_ok(@files)>
+
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_pm_files_ok(@dirs)> instead.  It's pretty much the
+same, except it doesn't call the C<plan()> function.
 
 Checks all the perl module files it can find for compilation errors.
 
@@ -184,14 +149,14 @@ Returns true if all Perl module files are ok, or false if any fail.
 sub all_pm_files_ok {
     my @files = @_ ? @_ : all_pm_files();
     $Test->plan(tests => scalar @files);
-    my $ok = 1;
-    for (@files) {
-        pm_file_ok($_) or undef $ok;
-    }
-    $ok;
+    return $Test->all_pm_files_ok(@files);
 }
 
 =item C<all_pl_files_ok(@files)>
+
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_pl_files_ok(@dirs)> instead.  It's pretty much the
+same, except it doesn't call the C<plan()> function.
 
 Checks all the perl script files it can find for compilation errors.
 
@@ -204,35 +169,21 @@ you should really be using the object oriented interface.
 
 Returns true if all Perl script files are ok, or false if any fail.
 
-Module authors can include the following in a F<t/00_compile_scripts.t> file
-and have C<Test::Compile> automatically find and check all Perl script files
-in a module distribution:
-
-    #!perl -w
-    use strict;
-    use warnings;
-    use Test::More;
-    eval "use Test::Compile";
-    plan skip_all => "Test::Compile required for testing compilation"
-      if $@;
-    my $test = Test::Compile->new();
-    $test->all_pl_files_ok();
-    $test->done_testing();
-
 =cut
 
 sub all_pl_files_ok {
     my @files = @_ ? @_ : all_pl_files();
     $Test->skip_all("no pl files found") unless @files;
     $Test->plan(tests => scalar @files);
-    my $ok = 1;
-    for (@files) {
-        pl_file_ok($_) or undef $ok;
-    }
-    $ok;
+    $Test->all_pl_files_ok(@files);
 }
 
 =item C<pm_file_ok($filename, $testname)>
+
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_pm_files_ok(@dirs)> instead.  It's pretty much the
+same, except you can't specify a test name, and it can handle more than one file at a
+time.
 
 C<pm_file_ok()> will okay the test if $filename compiles as a perl module.
 
@@ -254,6 +205,11 @@ sub pm_file_ok {
 }
 
 =item C<pl_file_ok($filename, $testname)>
+
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_pl_files_ok(@dirs)> instead.  It's pretty much the
+same, except you can't specify a test name, and it can handle more than one file at a
+time.
 
 C<pl_file_ok()> will okay the test if $filename compiles as a perl script. You
 need to give the path to the script relative to this distribution's base
@@ -293,10 +249,13 @@ sub pl_file_ok {
 
 =item C<all_pm_files(@dirs)>
 
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_pm_files(@dirs)> instead.
+
 Returns a list of all the perl module files - that is, files ending in F<.pm>
 - in I<@dirs> and in directories below. If no directories are passed, it
 defaults to F<blib> if F<blib> exists, or else F<lib> if not. Skips any files
-in C<CVS>, C<.svn>, or C<.git> directories.
+in F<CVS>, F<.svn>, or F<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -309,13 +268,16 @@ sub all_pm_files {
 
 =item C<all_pl_files(@dirs)>
 
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_pl_files(@dirs)> instead.
+
 Returns a list of all the perl script files - that is, any files in C<@dirs> that
 either have a F<.pl> extension, or have no extension and have a perl shebang line.
 
 If C<@dirs> is undefined, it searches F<script> if F<script> exists, or else
 F<bin> if F<bin> exists.
 
-Skips any files in C<CVS> or C<.svn> directories.
+Skips any files in F<CVS>, F<.svn>, or F<.git> directories.
 
 The order of the files returned is machine-dependent. If you want them
 sorted, you'll have to sort them yourself.
@@ -327,6 +289,9 @@ sub all_pl_files {
 }
 
 =item C<all_files_ok(@dirs)>
+
+B<This function is deprecated>.  Please use
+L<Test::Compile::Internal/all_files_ok(@dirs)> instead.
 
 Checks all the perl files it can find for compilation errors.
 

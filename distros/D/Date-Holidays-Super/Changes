@@ -1,6 +1,11 @@
 Changes file for Date-Holidays-Super
 
-0.04 2014.08.20, maintenance release update not required
+0.05 2019-10-07 maintenance release update not required
+
+- Corrected some distribution meta-data
+
+
+0.04 2014-08-20 maintenance release update not required
 
 - Bumped up license to Artistic 2.0
 
@@ -9,7 +14,7 @@ Changes file for Date-Holidays-Super
 - Added Perl requirement, landed at Perl 5.6.0 according to Perl::Critic
 
 
-0.03 - Released Thu Mar 15 2007
+0.03 2007-03-15 maintenance release, update not required
 
 - Updated MANIFEST.SKIP to a more contemporary version
 
@@ -30,11 +35,11 @@ Changes file for Date-Holidays-Super
 - Added t/kwalitee.t see Test::Kwalitee
 
 
-0.02 - Released 31st. of May 2004 (update not necessary)
+0.02 2004-05-31 maintenance release, update not required
 
 - Indented code in POD after tip from RJBS
 
 
-0.01 - Released 29th. of May 2004
+0.01 2004-05-29
 
 - Initial revision

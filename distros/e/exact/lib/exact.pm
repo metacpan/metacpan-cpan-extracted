@@ -6,8 +6,9 @@ use strict;
 use warnings;
 use namespace::autoclean;
 use Try::Tiny;
+use Sub::Util 'set_subname';
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -42,14 +43,14 @@ my @function_list = qw(
 my @feature_list   = map { @$_ } values %features, values %deprecated, values %experiments;
 my ($perl_version) = $^V =~ /^v5\.(\d+)/;
 
-my @autoclean_parameters;
+my ( $no_parent, $late_parent );
 
 sub import {
-    shift;
-    my ( @bundles, @functions, @features, @subclasses );
+    my ( $self, $caller ) = ( shift, caller() );
+    my ( @bundles, @functions, @features, @classes );
+
     for (@_) {
-        my $opt = lc $_;
-        $opt =~ s/^\-//;
+        ( my $opt = $_ ) =~ s/^\-//;
 
         if ( grep { $_ eq $opt } @feature_list ) {
             push( @features, $opt );
@@ -61,7 +62,7 @@ sub import {
             push( @bundles, $1 );
         }
         else {
-            push( @subclasses, $opt );
+            push( @classes, $opt );
         }
     }
 
@@ -73,7 +74,7 @@ sub import {
         binmode( $_, ':utf8' ) for ( *STDIN, *STDERR, *STDOUT );
     }
 
-    mro::set_mro( scalar caller(), 'c3' ) unless ( grep { $_ eq 'noc3' } @functions );
+    mro::set_mro( $caller, 'c3' ) unless ( grep { $_ eq 'noc3' } @functions );
 
     if (@bundles) {
         my ($bundle) = sort { $b <=> $a } @bundles;
@@ -94,17 +95,8 @@ sub import {
         croak("$err via use of exact");
     };
 
-    warnings->unimport('experimental')
-        unless ( $perl_version < 18 or grep { $_ eq 'noskipexperimentalwarnings' } @functions );
-
-    my $caller = caller();
-    unless ( grep { $_ eq 'nocarp' } @functions ) {
-        no strict 'refs';
-        *{ $caller . '::croak' }   = \&croak;
-        *{ $caller . '::carp' }    = \&carp;
-        *{ $caller . '::confess' } = \&confess;
-        *{ $caller . '::cluck' }   = \&crcluck;
-    }
+    monkey_patch( $self, $caller, ( map { $_ => \&$_ } qw( croak carp confess cluck ) ) )
+        unless ( grep { $_ eq 'nocarp' } @functions );
 
     eval qq{
         package $caller {
@@ -112,40 +104,96 @@ sub import {
         };
     } unless ( grep { $_ eq 'notry' } @functions );
 
-    for my $opt (@subclasses) {
-        my $params = ( $opt =~ s/\(([^\)]+)\)// ) ? [$1] : [];
+    my @late_parents = ();
 
-        ( my $pm = $opt ) =~ s{::|'}{/}g;
-        require "exact/$pm.pm";
+    my $use = sub {
+        my ( $class, $pm, $caller, $params ) = @_;
 
-        if ( my $e = lcfirst($@) ) {
-            my $v = __PACKAGE__->VERSION;
-            croak(
-                qq{Either "$opt" not supported by exact} .
-                ( ($v) ? ' ' . $v : '' ) .
-                qq{ or $e}
-            );
+        my $failed_require;
+        try {
+            require "$pm" unless ( do {
+                no strict 'refs';
+                no warnings 'once';
+                ${"${caller}::INC"}{$pm};
+            } );
+        }
+        catch {
+            croak($_) unless ( index( $_, q{Can't locate } ) == 0 );
+            $failed_require = 1;
+        };
+        return 0 if $failed_require;
+
+        ( $no_parent, $late_parent ) = ( undef, undef );
+
+        "$class"->import( $caller, @$params ) if ( "$class"->can('import') );
+
+        if ($late_parent) {
+            push( @late_parents, [ $class, $caller ] );
+        }
+        elsif ( not $no_parent and index( $class, 'exact::' ) != 0 ) {
+            $self->add_isa( $class, $caller );
         }
 
-        "exact::$opt"->import( scalar caller(), @$params ) if ( "exact::$opt"->can('import') );
+        return 1;
+    };
+
+    for my $class (@classes) {
+        my $params = ( $class =~ s/\(([^\)]+)\)// ) ? [$1] : [];
+        ( my $pm = $class ) =~ s{::|'}{/}g;
+        $pm .= '.pm';
+
+        $use->(
+            'exact::' . $class,
+            'exact/' . $pm,
+            $caller,
+            $params,
+        ) or $use->(
+            $class,
+            $pm,
+            $caller,
+            $params,
+        ) or croak(
+            "Can't locate exact/$pm or $pm in \@INC " .
+            "(you may need to install the exact::$class or $class module)" .
+            '(@INC contains: ' . join( ' ', @INC ) . ')'
+        );
     }
 
-    namespace::autoclean->import( -cleanee => scalar caller(), @autoclean_parameters )
-        unless ( grep { $_ eq 'noautoclean' } @functions ) ;
+    $self->add_isa(@$_) for @late_parents;
+
+    warnings->unimport('experimental')
+        unless ( $perl_version < 18 or grep { $_ eq 'noskipexperimentalwarnings' } @functions );
+
+    namespace::autoclean->import( -cleanee => $caller ) unless ( grep { $_ eq 'noautoclean' } @functions );
 }
 
-sub autoclean {
-    my $self = shift;
-
-    my $i = 0;
-    my $caller;
-    while (1) {
-        $caller = caller($i);
-        last if ( not $caller or $caller !~ /^exact\b/ );
-        $i++;
+sub monkey_patch {
+    my ( $self, $class, %patch ) = @_;
+    {
+        no strict 'refs';
+        no warnings 'redefine';
+        *{"${class}::$_"} = set_subname( "${class}::$_", $patch{$_} ) for ( keys %patch );
     }
+    return;
+}
 
-    @autoclean_parameters = @_;
+sub add_isa {
+    my ( $self, $parent, $child ) = @_;
+    {
+        no strict 'refs';
+        push( @{"${child}::ISA"}, $parent );
+    }
+    return;
+}
+
+sub no_parent {
+    $no_parent = 1;
+    return;
+}
+
+sub late_parent {
+    $late_parent = 1;
+    return;
 }
 
 1;
@@ -162,7 +210,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)
@@ -201,8 +249,9 @@ Or for finer control, add some trailing modifiers like a line of the following:
 =head1 DESCRIPTION
 
 L<exact> is a Perl pseudo pragma to enable strict, warnings, features, mro,
-and filehandle methods. The goal is to reduce header boilerplate, assuming
-defaults that seem to make sense but allowing overrides easily.
+and filehandle methods along with a lot of other things, plus allow for easy
+extension via C<exact::*> classes. The goal is to reduce header boilerplate,
+assuming defaults that seem to make sense but allowing overrides easily.
 
 By default, L<exact> will:
 
@@ -238,7 +287,7 @@ import L<Carp>'s 4 methods
 
 =item *
 
-import (kinda) L<Try::Tiny>
+import L<Try::Tiny> (kinda)
 
 =back
 
@@ -321,18 +370,6 @@ v5.26
 
 =back
 
-=head1 METHODS
-
-=head2 C<autoclean>
-
-Normally, unless you include the C<noautoclean> flag, L<namespace::autoclean>
-will automatically clean your namespace. You can pass flags to autoclean via:
-
-    exact->autoclean( -except => [ qw( method_a method_b) ] );
-
-Note that for this to have any effect, it needs to be called from within your
-module's C<import> method.
-
 =head1 EXTENSIONS
 
 It's possible to write extensions or plugins for L<exact> to provide
@@ -344,7 +381,7 @@ parameter to the C<use> of L<exact>.
     use exact -class;
 
     # will load "exact" and "exact::role" and turn off UTF8 features;
-    use exact role, noutf8;
+    use exact -role, -noutf8;
 
 It's possible to provide parameters to the C<import> method of the extension.
 
@@ -362,11 +399,7 @@ of L<exact>, and any parameters passed.
 
     sub import {
         my ( $self, $caller, $params ) = @_;
-        {
-            no strict 'refs';
-            *{ $caller . '::example' } = \&example;
-        }
-        exact->autoclean( -except => ['example'] );
+        exact->monkey_patch( $caller, 'example' => \&example );
     }
 
     sub example {
@@ -374,6 +407,61 @@ of L<exact>, and any parameters passed.
     }
 
     1;
+
+=head1 PARENTS
+
+You can use C<exact> to setup inheritance as follows:
+
+    use exact 'SomeModule', 'SomeOtherModule';
+
+This is roughly equivalent to:
+
+    use exact;
+    use parent 'SomeModule', 'SomeOtherModule';
+
+See also the C<no_parent> method.
+
+=head1 METHODS
+
+=head2 C<monkey_patch>
+
+Monkey patch functions into a given package.
+
+    exact->monkey_patch( 'PackageName', add => sub { return $_[0] + $_[1] } );
+    exact->monkey_patch(
+        'PackageName',
+        one   => sub { return 1 },
+        two   => sub { return 2 },
+        three => sub { return 3 },
+    );
+
+=head2 C<add_isa>
+
+This method will add a given parent to the @ISA of a given child.
+
+    exact->add_isa( 'SuperClassParent', 'SubClassChild' );
+
+=head2 C<no_parent>
+
+Normally, if you specify a parent, it'll be added as a parent by inclusion in
+C<@INC>. If you don't want to skip C<@INC> inclusion, you can call C<no_parent>
+in the C<import> of the module being specified as a parent.
+
+    sub import {
+        exact->no_parent;
+    }
+
+=head2 C<late_parent>
+
+There may be a situation where you need an included parent to be listed last in
+C<@INC> (at least relative to other parents). Normally, you'd do this by putting
+the name last in the list of modules. However, if for some reason you can't do
+that, you can call C<late_parent> from the C<import> of the parent that should
+be delayed in C<@INC> inclusion.
+
+    sub import {
+        exact->late_parent;
+    }
 
 =head1 SEE ALSO
 

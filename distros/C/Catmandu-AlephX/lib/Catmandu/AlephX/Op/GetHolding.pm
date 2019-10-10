@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has cdl_holdings => (
@@ -15,7 +17,7 @@ has cdl_holdings => (
     [];
   }
 );
-sub op { 'get-holding' } 
+sub op { 'get-holding' }
 
 sub parse {
   my($class,$str_ref) = @_;
@@ -27,8 +29,8 @@ sub parse {
 
   for my $ch($xpath->find("/$op/cdl-holdings")->get_nodelist()){
     push @cdl_holdings,get_children($ch,1);
-  }    
-  
+  }
+
   __PACKAGE__->new(
     cdl_holdings => \@cdl_holdings,
     session_id => $xpath->findvalue("/$op/session-id"),

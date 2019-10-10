@@ -74,9 +74,9 @@ span.sup        { font-size: 0.8em; font-weight: normal; position: relative; top
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-11.50.tar.gz">
-Download        Version 11.50</a> (4.4 MB) -
-<a href="history.html">June 11, 2019</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-11.70.tar.gz">
+Download        Version 11.70</a> (4.4 MB) -
+<a href="history.html">Oct. 10, 2019</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -128,8 +128,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-11.50.zip">
-         exiftool-11.50.zip</a> (6.1 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-11.70.zip">
+         exiftool-11.70.zip</a> (6.1 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -138,20 +138,26 @@ drag-and-drop files and folders to view meta information, or rename to
 "<code>exiftool.exe</code>" for command-line use.  Runs on all versions
 of Windows.</p>
 
+<p><i>(Note: Oliver Betz provides an
+<a href="https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows">alternate ExifTool Windows installer</a>
+that avoids some problems of the self-extracting archive version above.  Please post
+<a href="http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,10128.0.html">here</a>
+if you have any problems/comments with this version.)</i></p>
+
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="ExifTool-11.50.dmg">
-         ExifTool-11.50.dmg</a> (2.8 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-11.70.dmg">
+         ExifTool-11.70.dmg</a> (2.8 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
-libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in
-a Terminal window to run exiftool and read the application documentation.</p>
+libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
+Terminal window to run exiftool and read the application documentation.</p>
 
 <p>Read the <b><a href="install.html">installation instructions</a></b> for help
 installing ExifTool on Windows, MacOS and Unix systems.</p>
 
 <ul>
-<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/checksums.txt">Click here
+<li><a href="https://owl.phy.queensu.ca/~phil/exiftool/checksums.txt">Click here
 for the SHA1 and MD5 checksums to verify these distribution packages</a>.</li>
 <li>The version number of the latest ExifTool release may be found
 <a href="http://owl.phy.queensu.ca/~phil/exiftool/ver.txt">here</a>.</li>
@@ -336,7 +342,7 @@ for each file format.</p>
 <tr><td>IDML</td><td>R</td><td>Adobe InDesign Markup Language (ZIP/XML-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R XML <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/PhaseOne.html">IIQ</a></td><td>R/W</td><td>Phase One Intelligent Image Quality RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/PhaseOne.html">PhaseOne</a></td></tr>
 <tr><td>IND, INDD, INDT</td><td>R/W</td><td>Adobe InDesign Document/Template</td><td>-</td><td>-</td><td>R/W/C</td><td>-</td><td>-</td></tr>
-<tr><td>INSV</td><td>R</td><td>Insta 360 Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>-</td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
+<tr><td>INSV</td><td>R</td><td>Insta360 Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>-</td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
 <tr><td>INX</td><td>R</td><td>Adobe InDesign Interchange (XML-based)</td><td>-</td><td>-</td><td>R</td><td>-</td><td>-</td></tr>
 <tr><td><a href="TagNames/ISO.html">ISO</a></td><td>R</td><td>ISO 9660 disk image</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/ISO.html">ISO</a></td></tr>
 <tr><td><a href="TagNames/ITC.html">ITC</a></td><td>R</td><td>iTunes Cover Flow artwork</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/ITC.html">ITC</a></td></tr>
@@ -399,6 +405,7 @@ for each file format.</p>
 <tr><td>PPM, PBM, PGM</td><td>R/W</td><td>Portable Pixel/Bit/Gray Map</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R PPM, R/W/C Comment</td></tr>
 <tr><td>PPT, PPS, POT</td><td>R</td><td>PowerPoint Presentation/Slideshow/Template (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>R</td><td>R</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
 <tr><td><a href="TagNames/OOXML.html">POTX, POTM</a></td><td>R</td><td>Office Open XML Presentation Template [Macro-enabled]</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
+<tr><td><a href="TagNames/OOXML.html">PPAX, PPAM</a></td><td>R</td><td>Office Open XML Presentation Addin [Macro-enabled]</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/OOXML.html">PPSX, PPSM</a></td><td>R</td><td>Office Open XML Presentation Slideshow [Macro-enabled]</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/OOXML.html">PPTX, PPTM</a></td><td>R</td><td>Office Open XML Presentation [Macro-enabled]</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/Photoshop.html">PSD, PSB, PSDT</a></td><td>R/W</td><td>PhotoShop Document / Large Document / Template</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R <a href="TagNames/Photoshop.html">Photoshop</a></td></tr>
@@ -467,6 +474,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP1 - <a href="TagNames/XMP.html">XMP</a></td><td>R/W/C</td><td>Extensible Metadata Platform (multi-segment)</td></tr>
 <tr><td>APP1 - <a href="TagNames/Casio.html#QVCI">QVCI</a></td><td>R</td><td>Casio QV-7000SX QVCI information</td></tr>
 <tr><td>APP1 - <a href="TagNames/FLIR.html#FFF">FLIR</a></td><td>R</td><td>FLIR thermal imaging data (multi-segment)</td></tr>
+<tr><td>APP1 - RawThermalImage</td><td>R</td><td>Thermal image from Parrot Bebop-Pro Thermal drone</td></tr>
 <tr><td>APP2 - <a href="TagNames/ICC_Profile.html">ICC</a></td><td>R/W/C</td><td>International Color Consortium (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/MPF.html">MPF</a></td><td>R</td><td>Multi-Picture Format</td></tr>
@@ -486,6 +494,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP6 - <a href="TagNames/GoPro.html#GPMF">GoPro</a></td><td>R</td><td>GoPro Metadata Format (GPMF) information</td></tr>
 <tr><td>APP7 - <a href="TagNames/Pentax.html">Pentax</a></td><td>R</td><td>Pentax APP7 maker notes</td></tr>
 <tr><td>APP7 - <a href="TagNames/Qualcomm.html">Qualcomm</a></td><td>R</td><td>Qualcomm Camera Attributes</td></tr>
+<tr><td>APP7 - Huawei</td><td>R</td><td>Huawei APP7 maker notes (extract with Unknown option)</td></tr>
 <tr><td>APP8 - <a href="TagNames/JPEG.html#SPIFF">SPIFF</a></td><td>R</td><td>Still Picture Interchange File Format</td></tr>
 <tr><td>APP9 - <a href="TagNames/JPEG.html#MediaJukebox">Media Jukebox</a></td><td>R</td><td>Media Jukebox XML information</td></tr>
 <tr><td>APP10 - Comment</td><td>R</td><td>PhotoStudio Unicode Comment</td></tr>
@@ -507,7 +516,8 @@ of meta information in JPEG images:</p>
 <tr><td><a href="TagNames/MIE.html">MIE trailer</a></td><td>R/W</td><td><a href="MIE1.1-20070121.pdf">Meta Information Encapsulation</a></td></tr>
 <tr><td><a href="TagNames/Samsung.html#Trailer">Samsung trailer</a></td><td>R</td><td>Samsung Galaxy trailer</td></tr>
 <tr><td>PreviewImage trailer</td><td>R/W/C</td><td>(preview image written after JPEG EOI)</td></tr>
-</table><span class=sm><span class=sup>1</span> All trailers except Samsung and PreviewImage also have R/W support in TIFF images.</span></blockquote>
+<tr><td>EmbeddedVideo trailer</td><td>R</td><td>(extracted only with ExtractEmbedded option)</td></tr>
+</table><span class=sm><span class=sup>1</span> All trailers except Samsung, PreviewImage and EmbeddedVideo also have R/W support in TIFF images.</span></blockquote>
 
 <h2><a name="system">System Requirements</a></h2>
 
@@ -653,8 +663,8 @@ more information:  Right-click on the window's title bar then select
 <tr><td>Objektiv</td><td>18.0 - 55.0 mm</td></tr>
 <tr><td>Brennweite</td><td>34.0 mm</td></tr>
 <tr><td>Bildgr&ouml;&szlig;e</td><td>8x8</td></tr>
-<tr><td>Bildqualit&auml;t</td><td>RAW</td></tr>
-<tr><td>Blitz</td><td>Blitz wurde nicht ausgel&ouml;st</td></tr>
+<tr><td>Qualit&auml;t</td><td>RAW</td></tr>
+<tr><td>Blitzmodus</td><td>Blitz wurde nicht ausgel&ouml;st</td></tr>
 <tr><td>Wei&szlig;abgleich</td><td>Automatisch</td></tr>
 <tr><td>Fokus-Modus</td><td>Manueller Fokus (3)</td></tr>
 <tr><td>Kontrast</td><td>+1</td></tr>
@@ -751,8 +761,8 @@ with a '<code>.</code>' in the Windows GUI, but it can be done with the
 
 <h2><a name="groups">Tag Groups</a></h2>
 
-<p>ExifTool classifies tags into groups in five different families.
-These groups are:</p>
+<p>ExifTool classifies tags into groups in various families.  Here is a list
+of the group names in each family:</p>
 
 <blockquote><table class=norm>
 <tr><th>Family</th><th>Group Names</th></tr>
@@ -817,12 +827,21 @@ Preview, Printing, Time, Unknown, Video
 <tr><td><b>4&nbsp;(Instance&nbsp;Number)</b></td>
 <td>Copy#
 </td></tr>
+<tr><td><b>5&nbsp;(Metadata&nbsp;Path)</b></td>
+<td><i>[experimental]</i> eg. JPEG-APP1-IFD0-ExifIFD
+</td></tr>
+<tr><td><b>6&nbsp;(EXIF/TIFF&nbsp;Format)</b></td>
+<td>int8u, string, int16u, int32u, rational64u, int8s, undef, int16s, int32s,
+rational64s, float, double, ifd, unicode, complex, int64u, int64s, ifd64</td></tr>
 </table></blockquote>
 
 <p>The exiftool output can be organized based on these groups using the
-<code>-g</code> or <code>-G</code> option.  See the
-<a href="ExifTool.html#GetGroup">GetGroup</a> function in the ExifTool library
-for a description of the group families.</p>
+<code>-g</code> or <code>-G</code> option (ie. <code>-g1</code> to see family 1
+groups, or <code>-g3:1</code> to see both family 3 and family 1 group names in
+the output.  See the <code>-g</code> option in the exiftool application
+documentation for more details, and the <a href="ExifTool.html#GetGroup">GetGroup</a>
+function in the ExifTool library for a description of the group families. Note
+that when writing, only family 0, 1 and 2 group names may be used.</p>
 
 <h2><a name="writing">Writing Meta Information</a></h2>
 
@@ -940,7 +959,7 @@ for proper rendering of the image.</li>
 <ul>
 <li><span class=grn>[2019-05-29]</span>
 <b>Canon Digital Photo Professional 4</b> (DPP4) will destroy a <b>CR3</b> image
-when editing if it had previousy been edited by DPP4 followed by ExifTool.
+when editing if it had previously been edited by DPP4 followed by ExifTool.
 <i class=grn>[ExifTool 11.45 fixes this by structuring the CR3 to make it safe
 for editing with DPP4, and may be used to restructure files written by older
 ExifTool versions.]</i></li>
@@ -977,9 +996,10 @@ CC (version 14.0) <b>ignore XMP in PNG images</b> if it comes after the image
 data, which is where ExifTool adds new XMP. This should be considered as a bug
 in the Apple and Adobe software since XMP is allowed to exist after the image
 data according to the XMP and PNG specifications. <i class=grn>[ExifTool 9.40
-provides the <a href="ExifTool.html#PNGEarlyXMP">PNGEarlyXMP API option</a> to
-allow writing XMP before the IDAT chunk, but there are caveats associated with
-its use]</i></li>
+provides the PNGEarlyXMP API option to allow writing XMP before the IDAT chunk,
+but there are caveats associated with its use.  ExifTool 11.58 and later remove
+this option and always write XMP before IDAT, and 11.63 and later write all
+text chunks before IDAT.]</i></li>
 <li><span class=red>[2013-04-21]</span>
 Memory available to ExifTool in the <b>Windows EXE version</b> is limited to
 a few hundred MB.  This limitation has been known to cause <b>unreasonably long
@@ -1002,15 +1022,16 @@ with these images. <i class=grn>[This bug is fixed in OS X 10.5.4]</i></li>
 
 <h2><font color='#cc6600'><a name="security">Security Issues</a></font></h2>
 <p>Some ExifTool options (<code>-config</code>, <code>-if</code>,
-<code>-p</code>, <code>-api filter</code> and copying arguments like
-<code>"-DSTTAG&lt;STR"</code>) have the ability to execute Perl code from
-external files or within command-line arguments.  This may be a security problem
-if ExifTool is executed from another application that blindly passes untrusted
-file names on the command line (since they may be interpreted as ExifTool
-options if they begin with a dash).  To be secure, the calling application must
-ensure that input file names do not start with a dash (U+002D) or a Unicode
-minus sign (U+2212).  The easiest way to accomplish this is to prefix input file
-names with a known directory name, eg.) <code>"./FILENAME"</code>.</p>
+<code>-p</code>, <code>-api filter</code>,  <code>-api filterw</code> and
+copying arguments like <code>"-DSTTAG&lt;STR"</code>) have the ability to
+execute Perl code from external files or within command-line arguments.  This
+may be a security problem if ExifTool is executed from another application that
+blindly passes untrusted file names on the command line (since they may be
+interpreted as ExifTool options if they begin with a dash).  To be secure, the
+calling application must ensure that input file names do not start with a dash
+(U+002D) or a Unicode minus sign (U+2212).  The easiest way to accomplish this
+is to prefix input file names with a known directory name, eg.)
+<code>"./FILENAME"</code>.</p>
 
 <h2><a name="shift">Date/Time Shift Feature</a></h2>
 
@@ -1191,6 +1212,7 @@ binary data.  The simple script above does not handle this case.</p>
 
 <p><b><a name="related_win">Windows</a></b></p>
 <ul>
+<li><a href="https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows">Alternate ExifTool Windows Installer and Portable Package</a> by Oliver Betz</li>
 <li><a href="http://u88.n24.queensu.ca/~bogdan/">ExifTool GUI for Windows</a>: GUI for viewing meta information with some editing features</li>
 <li><a href="https://www.logipole.com/metadata++-en.htm">Metadata++</a>: View, edit, extract, copy metadata metadata</li>
 <!-- dead <li><a href="http://www.thezeal.com/software/?Exif_Stats_Utility">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li> -->
@@ -1238,6 +1260,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://www.theoneandonlysepp.com/gnt/">GeoNamesTagger</a>: Docklet to easily update image metadata with location specific information</li>
 <li><a href="http://marc.vos.net/downloads/setexifdata/">SetEXIFData</a>: Add/modify EXIF data in images</li>
 <li><a href="https://itunes.apple.com/us/app/geotagster/id1180435565">GeoTagster</a>: Geotagging from GPX files ($0.99 paid app)</li>
+<li><a href="http://www.exifphotoworker.com/">Exif Photoworker</a>: Smart rename and organize your photos and videos in a few clicks</li>
 </ul>
 
 <p><b><a name="related_linux">Linux</a></b></p>
@@ -1400,9 +1423,8 @@ $<input name="amount" value="0.00" size="6">
 </tr>
 </table>
 </blockquote>
-<p><i class=lt>(Your generous donations have provided the funds used to purchase a backup
-<a href="http://u88.n24.queensu.ca/exiftool/forum/">ExifTool Forum</a> server,
-allowing support to be maintained while the other machine was down for repairs.)</i></p>
+<p><i class=lt>(Your generous donations have provided the funds used to purchase the
+<a href="http://u88.n24.queensu.ca/exiftool/forum/">ExifTool Forum</a> server.)</i></p>
 
 <h2><a name="contact">Contact Me</a></h2>
 

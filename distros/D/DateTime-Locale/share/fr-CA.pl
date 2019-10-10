@@ -60,7 +60,7 @@
   date_format_full => "EEEE d MMMM y",
   date_format_long => "d MMMM y",
   date_format_medium => "d MMM y",
-  date_format_short => "yy-MM-dd",
+  date_format_short => "y-MM-dd",
   datetime_format_full => "{1} '\N{U+00e0}' {0}",
   datetime_format_long => "{1} '\N{U+00e0}' {0}",
   datetime_format_medium => "{1} {0}",
@@ -271,5 +271,5 @@
   time_format_medium => "HH 'h' mm 'min' ss 's'",
   time_format_short => "HH 'h' mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

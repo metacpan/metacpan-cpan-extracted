@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-AppDynamics-REST",
    "no_index" : {
@@ -65,6 +65,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.005",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.006",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

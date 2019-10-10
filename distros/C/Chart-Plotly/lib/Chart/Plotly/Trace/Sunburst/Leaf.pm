@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace sunburst.
 
@@ -33,9 +33,11 @@ sub TO_JSON {
     return \%hash;
 }
 
-has opacity => ( is            => "rw",
-                 isa           => "Num",
-                 documentation => "Sets the opacity of the leaves.",
+has opacity => (
+             is  => "rw",
+             isa => "Num",
+             documentation =>
+               "Sets the opacity of the leaves. With colorscale it is defaulted to 1; otherwise it is defaulted to 0.7",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -53,7 +55,7 @@ Chart::Plotly::Trace::Sunburst::Leaf - This attribute is one of the possible opt
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -109,7 +111,7 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * opacity
 
-Sets the opacity of the leaves.
+Sets the opacity of the leaves. With colorscale it is defaulted to 1; otherwise it is defaulted to 0.7
 
 =back
 

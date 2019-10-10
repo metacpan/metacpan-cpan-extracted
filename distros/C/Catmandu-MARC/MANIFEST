@@ -38,6 +38,7 @@ lib/Catmandu/Fix/marc_paste.pm
 lib/Catmandu/Fix/marc_remove.pm
 lib/Catmandu/Fix/marc_replace_all.pm
 lib/Catmandu/Fix/marc_set.pm
+lib/Catmandu/Fix/marc_sort.pm
 lib/Catmandu/Fix/marc_spec.pm
 lib/Catmandu/Fix/marc_xml.pm
 lib/Catmandu/Importer/MARC.pm
@@ -83,6 +84,7 @@ t/Catmandu/Fix/marc_paste.t
 t/Catmandu/Fix/marc_remove.t
 t/Catmandu/Fix/marc_replace_all.t
 t/Catmandu/Fix/marc_set.t
+t/Catmandu/Fix/marc_sort.t
 t/Catmandu/Fix/marc_spec.t
 t/Catmandu/Fix/marc_xml.t
 t/Catmandu/Importer/MARC.t

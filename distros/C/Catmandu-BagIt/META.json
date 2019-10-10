@@ -45,14 +45,21 @@
             "Catmandu::FileStore" : "1.12",
             "File::Copy" : "0",
             "IO" : "0",
+            "IO::String" : "0",
             "LWP::Simple" : "6.00",
+            "List::MoreUtils" : "0",
+            "Module::Build" : "0.4229",
+            "Moo" : "0",
             "Path::Iterator::Rule" : "1.0",
             "Path::Tiny" : "0.1",
+            "URI::Escape" : "0",
+            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       },
       "test" : {
          "requires" : {
+            "IO::Callback" : "0",
             "Test::Deep" : "0.112",
             "Test::Exception" : "0.32",
             "Test::LWP::UserAgent" : "0",
@@ -73,11 +80,12 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.236",
+   "version" : "0.237",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

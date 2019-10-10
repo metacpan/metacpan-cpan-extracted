@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our $DEV_SHM = "/dev/shm";
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
@@ -40,7 +40,9 @@ sub new {
     $opts{_tell} = $opts{_header_size};        # file position of cursor
 
     $opts{_count} = 0;          # index of next item to be appended
-    $opts{_pids} = { $$ => 'P' };
+    $opts{_pids} = { Forks::Queue::File::_PID() => 'P' };
+#   $opts{_pids} = { $$ => 'P' };
+    $opts{_qid} = Forks::Queue::Util::QID();
 
     # how often to refactor the queue file. use small values to keep file
     # sizes small and large values to improve performance
@@ -64,10 +66,13 @@ sub new {
             carp "Forks::Queue: Queue file $opts{file} already exists. ",
                  "Expect trouble if another process created this file.";
         }
-        open $fh, '>>', $opts{file} or die;
-        close $fh or die;
+        open $fh, '>>', $opts{file} or croak(
+            "Forks::Queue: could not create queue file $opts{file}: $!");
+        close $fh or croak(
+            "Forks::Queue: bizarre error closing queue file $opts{file} $!");
 
-        open $fh, '+<', $opts{file} or die;
+        open $fh, '+<', $opts{file} or croak(
+            "Forks::Queue: error re-opening queue file $opts{file} $!");
 
         my $fx = select $fh;
         $| = 1;
@@ -119,7 +124,7 @@ Forks::Queue::Shmem - Forks::Queue implementation using shared memory
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 DESCRIPTION
 
@@ -160,6 +165,11 @@ will reside under the shared memory virtual filesystem
 =item * persist
 
 See L<Forks::Queue/"new"> for descriptions of these options.
+
+=item * debug
+
+Boolean value to enable or disable debugging on this queue,
+overriding the value in C<$Forks::Queue::DEBUG>.
 
 =back
 

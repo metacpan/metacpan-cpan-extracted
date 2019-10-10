@@ -93,30 +93,30 @@ Kalaallisut Greenland locale.
 
 =head3 Wide (format)
 
-  januari
-  februari
-  martsi
-  aprili
-  maji
-  juni
-  juli
-  augustusi
-  septemberi
-  oktoberi
-  novemberi
-  decemberi
+  januaarip
+  februaarip
+  marsip
+  apriilip
+  maajip
+  juunip
+  juulip
+  aggustip
+  septembarip
+  oktobarip
+  novembarip
+  decembarip
 
 =head3 Abbreviated (format)
 
   jan
-  feb
+  febr
   mar
   apr
   maj
   jun
   jul
   aug
-  sep
+  sept
   okt
   nov
   dec
@@ -139,30 +139,30 @@ Kalaallisut Greenland locale.
 
 =head3 Wide (stand-alone)
 
-  januari
-  februari
-  martsi
-  aprili
-  maji
-  juni
-  juli
-  augustusi
-  septemberi
-  oktoberi
-  novemberi
-  decemberi
+  januaari
+  februaari
+  marsi
+  apriili
+  maaji
+  juuni
+  juuli
+  aggusti
+  septembari
+  oktobari
+  novembari
+  decembari
 
 =head3 Abbreviated (stand-alone)
 
   jan
-  feb
+  febr
   mar
   apr
   maj
   jun
   jul
   aug
-  sep
+  sept
   okt
   nov
   dec
@@ -248,21 +248,21 @@ Kalaallisut Greenland locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 februari 5, marlunngorneq
-   1995-12-22T09:05:02 = 1995 decemberi 22, tallimanngorneq
-  -0010-09-15T04:44:23 = -10 septemberi 15, arfininngorneq
+   2008-02-05T18:30:30 = 2008 februaarip 5, marlunngorneq
+   1995-12-22T09:05:02 = 1995 decembarip 22, tallimanngorneq
+  -0010-09-15T04:44:23 = -10 septembarip 15, arfininngorneq
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 februari 5
-   1995-12-22T09:05:02 = 1995 decemberi 22
-  -0010-09-15T04:44:23 = -10 septemberi 15
+   2008-02-05T18:30:30 = 2008 februaarip 5
+   1995-12-22T09:05:02 = 1995 decembarip 22
+  -0010-09-15T04:44:23 = -10 septembarip 15
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 feb 5
+   2008-02-05T18:30:30 = 2008 febr 5
    1995-12-22T09:05:02 = 1995 dec 22
-  -0010-09-15T04:44:23 = -10 sep 15
+  -0010-09-15T04:44:23 = -10 sept 15
 
 =head3 Short
 
@@ -302,21 +302,21 @@ Kalaallisut Greenland locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 februari 5, marlunngorneq 18.30.30 UTC
-   1995-12-22T09:05:02 = 1995 decemberi 22, tallimanngorneq 09.05.02 UTC
-  -0010-09-15T04:44:23 = -10 septemberi 15, arfininngorneq 04.44.23 UTC
+   2008-02-05T18:30:30 = 2008 februaarip 5, marlunngorneq 18.30.30 UTC
+   1995-12-22T09:05:02 = 1995 decembarip 22, tallimanngorneq 09.05.02 UTC
+  -0010-09-15T04:44:23 = -10 septembarip 15, arfininngorneq 04.44.23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 februari 5 18.30.30 UTC
-   1995-12-22T09:05:02 = 1995 decemberi 22 09.05.02 UTC
-  -0010-09-15T04:44:23 = -10 septemberi 15 04.44.23 UTC
+   2008-02-05T18:30:30 = 2008 februaarip 5 18.30.30 UTC
+   1995-12-22T09:05:02 = 1995 decembarip 22 09.05.02 UTC
+  -0010-09-15T04:44:23 = -10 septembarip 15 04.44.23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 feb 5 18.30.30
+   2008-02-05T18:30:30 = 2008 febr 5 18.30.30
    1995-12-22T09:05:02 = 1995 dec 22 09.05.02
-  -0010-09-15T04:44:23 = -10 sep 15 04.44.23
+  -0010-09-15T04:44:23 = -10 sept 15 04.44.23
 
 =head3 Short
 
@@ -401,21 +401,21 @@ Kalaallisut Greenland locale.
 
 =head3 GyMMM (G y MMM)
 
-   2008-02-05T18:30:30 = CE 2008 feb
+   2008-02-05T18:30:30 = CE 2008 febr
    1995-12-22T09:05:02 = CE 1995 dec
-  -0010-09-15T04:44:23 = BCE -10 sep
+  -0010-09-15T04:44:23 = BCE -10 sept
 
 =head3 GyMMMEd (G y MMM d, E)
 
-   2008-02-05T18:30:30 = CE 2008 feb 5, mar
+   2008-02-05T18:30:30 = CE 2008 febr 5, mar
    1995-12-22T09:05:02 = CE 1995 dec 22, tal
-  -0010-09-15T04:44:23 = BCE -10 sep 15, arf
+  -0010-09-15T04:44:23 = BCE -10 sept 15, arf
 
 =head3 GyMMMd (G y MMM d)
 
-   2008-02-05T18:30:30 = CE 2008 feb 5
+   2008-02-05T18:30:30 = CE 2008 febr 5
    1995-12-22T09:05:02 = CE 1995 dec 22
-  -0010-09-15T04:44:23 = BCE -10 sep 15
+  -0010-09-15T04:44:23 = BCE -10 sept 15
 
 =head3 H (HH)
 
@@ -461,33 +461,33 @@ Kalaallisut Greenland locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = feb
+   2008-02-05T18:30:30 = febr
    1995-12-22T09:05:02 = dec
-  -0010-09-15T04:44:23 = sep
+  -0010-09-15T04:44:23 = sept
 
 =head3 MMMEd (MMM d, E)
 
-   2008-02-05T18:30:30 = feb 5, mar
+   2008-02-05T18:30:30 = febr 5, mar
    1995-12-22T09:05:02 = dec 22, tal
-  -0010-09-15T04:44:23 = sep 15, arf
+  -0010-09-15T04:44:23 = sept 15, arf
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of februari
-   1995-12-22T09:05:02 = week 3 of decemberi
-  -0010-09-15T04:44:23 = week 2 of septemberi
+   2008-02-05T18:30:30 = week 1 of februaarip
+   1995-12-22T09:05:02 = week 3 of decembarip
+  -0010-09-15T04:44:23 = week 2 of septembarip
 
 =head3 MMMMd (MMMM d)
 
-   2008-02-05T18:30:30 = februari 5
-   1995-12-22T09:05:02 = decemberi 22
-  -0010-09-15T04:44:23 = septemberi 15
+   2008-02-05T18:30:30 = februaarip 5
+   1995-12-22T09:05:02 = decembarip 22
+  -0010-09-15T04:44:23 = septembarip 15
 
 =head3 MMMd (MMM d)
 
-   2008-02-05T18:30:30 = feb 5
+   2008-02-05T18:30:30 = febr 5
    1995-12-22T09:05:02 = dec 22
-  -0010-09-15T04:44:23 = sep 15
+  -0010-09-15T04:44:23 = sept 15
 
 =head3 Md (MM-dd)
 
@@ -557,27 +557,27 @@ Kalaallisut Greenland locale.
 
 =head3 yMMM (y MMM)
 
-   2008-02-05T18:30:30 = 2008 feb
+   2008-02-05T18:30:30 = 2008 febr
    1995-12-22T09:05:02 = 1995 dec
-  -0010-09-15T04:44:23 = -10 sep
+  -0010-09-15T04:44:23 = -10 sept
 
 =head3 yMMMEd (y MMM d, E)
 
-   2008-02-05T18:30:30 = 2008 feb 5, mar
+   2008-02-05T18:30:30 = 2008 febr 5, mar
    1995-12-22T09:05:02 = 1995 dec 22, tal
-  -0010-09-15T04:44:23 = -10 sep 15, arf
+  -0010-09-15T04:44:23 = -10 sept 15, arf
 
 =head3 yMMMM (y MMMM)
 
-   2008-02-05T18:30:30 = 2008 februari
-   1995-12-22T09:05:02 = 1995 decemberi
-  -0010-09-15T04:44:23 = -10 septemberi
+   2008-02-05T18:30:30 = 2008 februaarip
+   1995-12-22T09:05:02 = 1995 decembarip
+  -0010-09-15T04:44:23 = -10 septembarip
 
 =head3 yMMMd (y MMM d)
 
-   2008-02-05T18:30:30 = 2008 feb 5
+   2008-02-05T18:30:30 = 2008 febr 5
    1995-12-22T09:05:02 = 1995 dec 22
-  -0010-09-15T04:44:23 = -10 sep 15
+  -0010-09-15T04:44:23 = -10 sept 15
 
 =head3 yMd (y-MM-dd)
 

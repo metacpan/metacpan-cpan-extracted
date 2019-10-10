@@ -1,8 +1,11 @@
 Revision history for RDF::LDF
 
+0.25  2019-10-08 10:06:15 CEST
+  - Adding missing dependencies [manwar]
+  
 0.24  2018-05-30 13:00:57 CEST
   - Release 0.24
-  
+
 0.23_01  2018-05-28 14:59:17 CEST
   - Update to use hydra:template rather than VoID
 

@@ -4,13 +4,13 @@
       "Joel Berger"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tie-Array-CSV",
    "no_index" : {
@@ -36,19 +36,16 @@
    "provides" : {
       "Tie::Array::CSV" : {
          "file" : "lib/Tie/Array/CSV.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Tie::Array::CSV::HoldRow" : {
-         "file" : "lib/Tie/Array/CSV/HoldRow.pm",
-         "version" : 0
+         "file" : "lib/Tie/Array/CSV/HoldRow.pm"
       },
       "Tie::Array::CSV::HoldRow::Row" : {
-         "file" : "lib/Tie/Array/CSV/HoldRow.pm",
-         "version" : 0
+         "file" : "lib/Tie/Array/CSV/HoldRow.pm"
       },
       "Tie::Array::CSV::Row" : {
-         "file" : "lib/Tie/Array/CSV.pm",
-         "version" : 0
+         "file" : "lib/Tie/Array/CSV.pm"
       }
    },
    "release_status" : "stable",
@@ -63,5 +60,6 @@
          "url" : "http://github.com/jberger/Tie-Array-CSV"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

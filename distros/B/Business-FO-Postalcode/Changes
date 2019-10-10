@@ -1,5 +1,12 @@
 Changes file for Business::FO::Postalcode
 
+0.04 2019-10-07 Bug fix release, update not required
+
+- Updated Dist::Zilla configuration
+
+- Tweaked data no additions or removals, region flag was just wrong casing
+
+
 0.03 2015-08-17 Maintenance release, update not required
 
 - Migrated from Module::Build to Dist::Zilla

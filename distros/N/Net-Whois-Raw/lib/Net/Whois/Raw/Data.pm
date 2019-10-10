@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99022';
+$Net::Whois::Raw::Data::VERSION = '2.99024';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -901,6 +901,8 @@ our %servers = qw(
     BIZ.NS      whois.biz
     NAME.NS     whois.nic.name
     COM.TR      whois.nic.tr
+    ORG.HN      whois.nic.hn
+    NET.HN      whois.nic.hn
     COM.HN      whois.nic.hn
     VIP         whois.nic.vip
     PROMO       whois.nic.promo
@@ -1995,6 +1997,166 @@ our %servers = qw(
     WORK                    whois.nic.work
 
     YOGA                    whois.nic.yoga
+
+    AX                      whois.ax
+
+    XN--90AIS               whois.cctld.by
+
+    GF                      whois.mediaserv.net
+
+    AMSTERDAM               whois.nic.amsterdam
+
+    ARAB                    whois.nic.arab
+
+    AUDIBLE                 whois.nic.audible
+
+    AUTHOR                  whois.nic.author
+
+    AWS                     whois.nic.aws
+
+    BIBLE                   whois.nic.bible
+
+    BOOK                    whois.nic.book
+
+    BOT                     whois.nic.bot
+
+    CALL                    whois.nic.call
+
+    CATHOLIC                whois.nic.catholic
+
+    CHARITY                 whois.nic.charity
+
+    CIRCLE                  whois.nic.circle
+
+    CPA                     whois.nic.cpa
+
+    DATA                    whois.nic.data
+
+    DEAL                    whois.nic.deal
+
+    DNP                     whois.nic.dnp
+
+    DO                      whois.nic.do
+
+    FAST                    whois.nic.fast
+
+    FIRE                    whois.nic.fire
+
+    FOX                     whois.nic.fox
+
+    FREE                    whois.nic.free
+
+    GAY                     whois.nic.gay
+
+    GE                      whois.nic.ge
+
+    GOT                     whois.nic.got
+
+    HOT                     whois.nic.hot
+
+    IMDB                    whois.nic.imdb
+
+    INC                     whois.nic.inc
+
+    JOT                     whois.nic.jot
+
+    JOY                     whois.nic.joy
+
+    KINDLE                  whois.nic.kindle
+
+    LIKE                    whois.nic.like
+
+    LS                      whois.nic.ls
+
+    MOBILE                  whois.nic.mobile
+
+    MOI                     whois.nic.moi
+
+    MR                      whois.nic.mr
+
+    MW                      whois.nic.mw
+
+    NHK                     whois.nic.nhk
+
+    NOW                     whois.nic.now
+
+    OKINAWA                 whois.nic.okinawa
+
+    OTSUKA                  whois.nic.otsuka
+
+    PAY                     whois.nic.pay
+
+    PHARMACY                whois.nic.pharmacy
+
+    PHONE                   whois.nic.phone
+
+    PIN                     whois.nic.pin
+
+    PRIME                   whois.nic.prime
+
+    READ                    whois.nic.read
+
+    RMIT                    whois.nic.rmit
+
+    ROOM                    whois.nic.room
+
+    RUGBY                   whois.nic.rugby
+
+    RYUKYU                  whois.nic.ryukyu
+
+    SAFE                    whois.nic.safe
+
+    SAFETY                  whois.nic.safety
+
+    SAVE                    whois.nic.save
+
+    SECURE                  whois.nic.secure
+
+    SILK                    whois.nic.silk
+
+    SMILE                   whois.nic.smile
+
+    SPORT                   whois.nic.sport
+
+    SPOT                    whois.nic.spot
+
+    SS                      whois.nic.ss
+
+    SUZUKI                  whois.nic.suzuki
+
+    TALK                    whois.nic.talk
+
+    TD                      whois.nic.td
+
+    TUNES                   whois.nic.tunes
+
+    TUSHU                   whois.nic.tushu
+
+    UNICOM                  whois.nic.unicom
+
+    WANGGOU                 whois.nic.wanggou
+
+    WOW                     whois.nic.wow
+
+    XN--80AQECDR1A          whois.nic.xn--80aqecdr1a
+
+    XN--8Y0A063A            whois.nic.xn--8y0a063a
+
+    XN--MGBAB2BD            whois.nic.xn--mgbab2bd
+
+    XN--MGBI4ECEXP          whois.nic.xn--mgbi4ecexp
+
+    XN--NGBRX               whois.nic.xn--ngbrx
+
+    XN--TIQ49XQYJ           whois.nic.xn--tiq49xqyj
+
+    YAMAXUN                 whois.nic.yamaxun
+
+    YOU                     whois.nic.you
+
+    ZAPPOS                  whois.nic.zappos
+
+    XN--2SCRJ9C             whois.registry.in
 );
 
 
@@ -2563,7 +2725,7 @@ our %notfound = (
     'whois.nic.mls'                        => 'No match for "',
     'whois.nic.moe'                        => '^No Data Found',
     'whois.nic.monash'                     => 'No Data Found',
-    'whois.nic.monster'                    =>  '^NOT FOUND',
+    'whois.nic.monster'                    => '^NOT FOUND',
     'whois.nic.mtn'                        => 'No Data Found',
     'whois.nic.mtr'                        => 'The domain has not been registered\.',
     'whois.nic.mz'                         => 'Domain Status: No Object Found',
@@ -2750,6 +2912,86 @@ our %notfound = (
     'whois.nic.wedding'                    => 'This domain name has not been registered',
     'whois.nic.work'                       => 'This domain name has not been registered',
     'whois.nic.yoga'                       => 'This domain name has not been registered',
+    'whois.ax'                             => 'Domain not found',
+    'whois.cctld.by'                       => 'Object does not exist',
+    'whois.mediaserv.net'                  => 'NO OBJECT FOUND!',
+    'whois.nic.amsterdam'                  => 'Domain Status: free',
+    'whois.nic.arab'                       => 'No Data Found',
+    'whois.nic.audible'                    => 'This domain name has not been registered\.',
+    'whois.nic.author'                     => 'This domain name has not been registered\.',
+    'whois.nic.aws'                        => 'This domain name has not been registered\.',
+    'whois.nic.bible'                      => 'No Data Found',
+    'whois.nic.book'                       => 'This domain name has not been registered\.',
+    'whois.nic.bot'                        => 'This domain name has not been registered\.',
+    'whois.nic.call'                       => 'This domain name has not been registered\.',
+    'whois.nic.catholic'                   => 'No Data Found',
+    'whois.nic.charity'                    => 'Domain not found\.',
+    'whois.nic.circle'                     => 'This domain name has not been registered\.',
+    'whois.nic.cpa'                        => 'No Data Found',
+    'whois.nic.data'                       => 'NOT FOUND',
+    'whois.nic.deal'                       => 'This domain name has not been registered\.',
+    'whois.nic.dnp'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.do'                         => 'Domain Status: No Object Found',
+    'whois.nic.fast'                       => 'This domain name has not been registered\.',
+    'whois.nic.fire'                       => 'This domain name has not been registered\.',
+    'whois.nic.fox'                        => 'No Data Found',
+    'whois.nic.free'                       => 'This domain name has not been registered\.',
+    'whois.nic.gay'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.ge'                         => 'No match for "',
+    'whois.nic.got'                        => 'This domain name has not been registered\.',
+    'whois.nic.hot'                        => 'This domain name has not been registered\.',
+    'whois.nic.imdb'                       => 'This domain name has not been registered\.',
+    'whois.nic.inc'                        => 'is available for registration',
+    'whois.nic.jot'                        => 'This domain name has not been registered\.',
+    'whois.nic.joy'                        => 'This domain name has not been registered\.',
+    'whois.nic.kindle'                     => 'This domain name has not been registered\.',
+    'whois.nic.like'                       => 'This domain name has not been registered\.',
+    'whois.nic.ls'                         => 'no entries found',
+    'whois.nic.mobile'                     => 'NOT FOUND',
+    'whois.nic.moi'                        => 'This domain name has not been registered\.',
+    'whois.nic.mr'                         => 'Domain Status: No Object Found',
+    'whois.nic.mw'                         => 'no entries found',
+    'whois.nic.nhk'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.now'                        => 'This domain name has not been registered\.',
+    'whois.nic.okinawa'                    => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.otsuka'                     => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.pay'                        => 'This domain name has not been registered\.',
+    'whois.nic.pharmacy'                   => 'No Data Found',
+    'whois.nic.phone'                      => 'NOT FOUND',
+    'whois.nic.pin'                        => 'This domain name has not been registered\.',
+    'whois.nic.prime'                      => 'This domain name has not been registered\.',
+    'whois.nic.read'                       => 'This domain name has not been registered\.',
+    'whois.nic.rmit'                       => 'No Data Found',
+    'whois.nic.room'                       => 'This domain name has not been registered\.',
+    'whois.nic.rugby'                      => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.ryukyu'                     => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.safe'                       => 'This domain name has not been registered\.',
+    'whois.nic.safety'                     => 'No Data Found',
+    'whois.nic.save'                       => 'This domain name has not been registered\.',
+    'whois.nic.secure'                     => 'This domain name has not been registered\.',
+    'whois.nic.silk'                       => 'This domain name has not been registered\.',
+    'whois.nic.smile'                      => 'This domain name has not been registered\.',
+    'whois.nic.sport'                      => 'The queried object does not exist: no matching objects found',
+    'whois.nic.spot'                       => 'This domain name has not been registered\.',
+    'whois.nic.ss'                         => 'Domain Status: No Object Found',
+    'whois.nic.suzuki'                     => 'The queried object does not exist: DOMAIN NOT FOUND',
+    'whois.nic.talk'                       => 'This domain name has not been registered\.',
+    'whois.nic.td'                         => 'Domain Status: No Object Found',
+    'whois.nic.tunes'                      => 'This domain name has not been registered\.',
+    'whois.nic.tushu'                      => 'This domain name has not been registered\.',
+    'whois.nic.unicom'                     => 'The queried object does not exist',
+    'whois.nic.wanggou'                    => 'This domain name has not been registered\.',
+    'whois.nic.wow'                        => 'This domain name has not been registered\.',
+    'whois.nic.xn--80aqecdr1a'             => 'No Data Found',
+    'whois.nic.xn--8y0a063a'               => 'The queried object does not exist',
+    'whois.nic.xn--mgbab2bd'               => 'The queried object does not exist: no matching objects found',
+    'whois.nic.xn--mgbi4ecexp'             => 'No Data Found',
+    'whois.nic.xn--ngbrx'                  => 'No Data Found',
+    'whois.nic.xn--tiq49xqyj'              => 'No Data Found',
+    'whois.nic.yamaxun'                    => 'This domain name has not been registered\.',
+    'whois.nic.you'                        => 'This domain name has not been registered\.',
+    'whois.nic.zappos'                     => 'This domain name has not been registered\.',
+    'whois.registry.in'                    => 'No Data Found',
 );
 
 # Common whois stripping REs
@@ -4342,7 +4584,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99022
+version 2.99024
 
 =head1 AUTHOR
 

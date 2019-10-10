@@ -1,7 +1,7 @@
 package App::riap::Commands;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.37'; # VERSION
+our $DATE = '2019-08-21'; # DATE
+our $VERSION = '0.380'; # VERSION
 
 use 5.010;
 use strict;
@@ -170,7 +170,7 @@ sub ls {
             };
             $resmeta = {
                 "table.fields"   => $ff,
-            },
+            };
         } else {
             $res = $shell->riap_request(list => $uri);
             return $res unless $res->[0] == 200;
@@ -550,7 +550,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.37
+version 0.380
 
 =for Pod::Coverage .+
 
@@ -560,7 +560,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

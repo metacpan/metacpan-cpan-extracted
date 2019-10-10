@@ -5,11 +5,11 @@
   ],
   available_formats => {
     Bh => "h B",
-    Bhm => "h:mm B",
-    Bhms => "h:mm:ss B",
+    Bhm => "hh:mm B",
+    Bhms => "hh:mm:ss B",
     E => "ccc",
-    EBhm => "E h:mm B",
-    EBhms => "E h:mm:ss B",
+    EBhm => "E hh:mm B",
+    EBhms => "E hh:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 35,
+  version => 36,
 }

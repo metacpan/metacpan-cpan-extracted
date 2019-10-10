@@ -231,8 +231,8 @@ Kabuverdianu locale.
 
 =head3 Wide (format)
 
-  Antis di Kristu
-  Dispos di Kristu
+  antis di Kristu
+  dispos di Kristu
 
 =head3 Abbreviated (format)
 
@@ -266,9 +266,9 @@ Kabuverdianu locale.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 5/2/2008
+   2008-02-05T18:30:30 = 05/02/2008
    1995-12-22T09:05:02 = 22/12/1995
-  -0010-09-15T04:44:23 = 15/9/-10
+  -0010-09-15T04:44:23 = 15/09/-10
 
 
 =head2 Time Formats
@@ -302,27 +302,27 @@ Kabuverdianu locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = tersa-fera, 5 di Febreru di 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = sesta-fera, 22 di Dizenbru di 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = sabadu, 15 di Setenbru di -10 04:44:23 UTC
+   2008-02-05T18:30:30 = tersa-fera, 5 di Febreru di 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = sesta-fera, 22 di Dizenbru di 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = sabadu, 15 di Setenbru di -10, 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 di Febreru di 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 di Dizenbru di 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 di Setenbru di -10 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 di Febreru di 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 di Dizenbru di 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 di Setenbru di -10, 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 Feb 2008 18:30:30
-   1995-12-22T09:05:02 = 22 Diz 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 Set -10 04:44:23
+   2008-02-05T18:30:30 = 5 Feb 2008, 18:30:30
+   1995-12-22T09:05:02 = 22 Diz 1995, 09:05:02
+  -0010-09-15T04:44:23 = 15 Set -10, 04:44:23
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 5/2/2008 18:30
-   1995-12-22T09:05:02 = 22/12/1995 09:05
-  -0010-09-15T04:44:23 = 15/9/-10 04:44
+   2008-02-05T18:30:30 = 05/02/2008, 18:30
+   1995-12-22T09:05:02 = 22/12/1995, 09:05
+  -0010-09-15T04:44:23 = 15/09/-10, 04:44
 
 
 =head2 Available Formats
@@ -351,17 +351,17 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = ses
   -0010-09-15T04:44:23 = sab
 
-=head3 EBhm (E h:mm B)
+=head3 EBhm (E, h:mm B)
 
-   2008-02-05T18:30:30 = ter 6:30 B
-   1995-12-22T09:05:02 = ses 9:05 B
-  -0010-09-15T04:44:23 = sab 4:44 B
+   2008-02-05T18:30:30 = ter, 6:30 B
+   1995-12-22T09:05:02 = ses, 9:05 B
+  -0010-09-15T04:44:23 = sab, 4:44 B
 
-=head3 EBhms (E h:mm:ss B)
+=head3 EBhms (E, h:mm:ss B)
 
-   2008-02-05T18:30:30 = ter 6:30:30 B
-   1995-12-22T09:05:02 = ses 9:05:02 B
-  -0010-09-15T04:44:23 = sab 4:44:23 B
+   2008-02-05T18:30:30 = ter, 6:30:30 B
+   1995-12-22T09:05:02 = ses, 9:05:02 B
+  -0010-09-15T04:44:23 = sab, 4:44:23 B
 
 =head3 EHm (E, HH:mm)
 
@@ -399,7 +399,7 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = 1995 DK
   -0010-09-15T04:44:23 = -10 AK
 
-=head3 GyMMM (MMM y G)
+=head3 GyMMM (LLL y G)
 
    2008-02-05T18:30:30 = Feb 2008 DK
    1995-12-22T09:05:02 = Diz 1995 DK
@@ -477,11 +477,11 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = ses, 22 di Dizenbru
   -0010-09-15T04:44:23 = sab, 15 di Setenbru
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-other (W'º' 'simana' 'di' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Febreru
-   1995-12-22T09:05:02 = week 3 of Dizenbru
-  -0010-09-15T04:44:23 = week 2 of Setenbru
+   2008-02-05T18:30:30 = 1º simana di Febreru
+   1995-12-22T09:05:02 = 3º simana di Dizenbru
+  -0010-09-15T04:44:23 = 2º simana di Setenbru
 
 =head3 MMMMd (d 'di' MMMM)
 
@@ -561,7 +561,7 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = 1995
   -0010-09-15T04:44:23 = -10
 
-=head3 yM (MM/y)
+=head3 yM (LL/y)
 
    2008-02-05T18:30:30 = 02/2008
    1995-12-22T09:05:02 = 12/1995
@@ -573,13 +573,13 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = ses, 22/12/1995
   -0010-09-15T04:44:23 = sab, 15/09/-10
 
-=head3 yMM (MM/y)
+=head3 yMM (LL/y)
 
    2008-02-05T18:30:30 = 02/2008
    1995-12-22T09:05:02 = 12/1995
   -0010-09-15T04:44:23 = 09/-10
 
-=head3 yMMM (MMM y)
+=head3 yMMM (LLL y)
 
    2008-02-05T18:30:30 = Feb 2008
    1995-12-22T09:05:02 = Diz 1995
@@ -591,7 +591,7 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = ses, 22 Diz 1995
   -0010-09-15T04:44:23 = sab, 15 Set -10
 
-=head3 yMMMM (MMMM 'di' y)
+=head3 yMMMM (LLLL 'di' y)
 
    2008-02-05T18:30:30 = Febreru di 2008
    1995-12-22T09:05:02 = Dizenbru di 1995
@@ -621,11 +621,11 @@ Kabuverdianu locale.
    1995-12-22T09:05:02 = 4º trimestri di 1995
   -0010-09-15T04:44:23 = 3º trimestri di -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-other (w'º' 'simana' 'di' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = 6º simana di 2008
+   1995-12-22T09:05:02 = 51º simana di 1995
+  -0010-09-15T04:44:23 = 37º simana di -10
 
 
 =head2 Miscellaneous

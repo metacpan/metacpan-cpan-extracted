@@ -58,7 +58,7 @@
    "provides" : {
       "LWP::Protocol::Net::Curl" : {
          "file" : "lib/LWP/Protocol/Net/Curl.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
@@ -73,9 +73,10 @@
          "web" : "https://github.com/creaktive/LWP-Protocol-Net-Curl"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_contributors" : [
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>",
+      "Nick Kostyria <kostirya@gmail.com>",
       "Peter Williams <pjwilliams@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.30.0",

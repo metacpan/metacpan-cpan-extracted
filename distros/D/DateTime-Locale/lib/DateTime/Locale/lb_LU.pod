@@ -477,11 +477,11 @@ Luxembourgish Luxembourg locale.
    1995-12-22T09:05:02 = week 3 of Dezember
   -0010-09-15T04:44:23 = week 2 of September
 
-=head3 MMMMd (MMMM d)
+=head3 MMMMd (d. MMMM)
 
-   2008-02-05T18:30:30 = Februar 5
-   1995-12-22T09:05:02 = Dezember 22
-  -0010-09-15T04:44:23 = September 15
+   2008-02-05T18:30:30 = 5. Februar
+   1995-12-22T09:05:02 = 22. Dezember
+  -0010-09-15T04:44:23 = 15. September
 
 =head3 MMMd (d. MMM)
 
@@ -567,11 +567,11 @@ Luxembourgish Luxembourg locale.
    1995-12-22T09:05:02 = Fre., 22. Dez. 1995
   -0010-09-15T04:44:23 = Sam., 15. Sep. -10
 
-=head3 yMMMM (y MMMM)
+=head3 yMMMM (MMMM y)
 
-   2008-02-05T18:30:30 = 2008 Februar
-   1995-12-22T09:05:02 = 1995 Dezember
-  -0010-09-15T04:44:23 = -10 September
+   2008-02-05T18:30:30 = Februar 2008
+   1995-12-22T09:05:02 = Dezember 1995
+  -0010-09-15T04:44:23 = September -10
 
 =head3 yMMMd (d. MMM y)
 

@@ -79,8 +79,8 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::BannedVideo accepts a valid video ID or URL on Banned.Video 
-(Alex Jone's infowars new video site after communist YouTube BANNED his videos) 
-and, at the moment, youtube-dl doesn't convert them (yet?);
+(Alex Jones's infowars' new video site after "communist" YouTube BANNED his 
+videos) and, at the moment, youtube-dl doesn't convert them (yet?);
 and returns the actual title, stream URL(s) and cover art icon for that video.  
 The purpose is that one needs one of these URLs in order to have the option to 
 stream the video in one's own choice of media player software rather than 
@@ -100,14 +100,14 @@ One or more stream URLs can be returned for each video.
 =item B<new>(I<url> [, I<-keep> => "type1,type2?..." | [type1,type2?...] ] | [, I<-debug> [ => 0|1|2 ] ])
 
 Accepts a Banned.Video video ID or URL and creates and returns a new video object, 
-or I<undef> if the URL is not a valid Banned.Video video or no streams are found  
+or I<undef> if the URL is not a valid Banned.Video video or no streams are found.  
 The URL can be the full URL, 
-ie. https://banned.video/watch?id=<video-id>, or just I<video-id>.
+ie. https://banned.video/watch?id=B<video-id>, or just I<video-id>.
 
-The optional I<keep> can be either a comma-separated string or an array reference 
-([...]) of stream types to keep (include) and returned in order specified 
-(type1, type2...).  Each "type" can be one of:  extension (ie. m4a, mp4, etc.), 
-"direct", "stream", or ("any" or "all").
+The optional I<keep> argument can be either a comma-separated string or an array 
+reference ([...]) of stream types to keep (include) and returned in order 
+specified (type1, type2...).  Each "type" can be one of:  extension (ie. 
+m4a, mp4, etc.), "direct", "stream", or ("any" or "all").
 
 DEFAULT keep list is:  'm4a,direct,stream', meaning that all m4a streams followed 
 by all "direct" streams ("directUrl" in page, followed by all remaining 
@@ -398,16 +398,16 @@ sub new
 	my $stindex = 0;
 	my @streams = ();
 	foreach my $streamtype (@okStreams) {
-		while ($html =~ s/\"(?:direct|stream)Url\"\s*\:\s*\"([^\"]+?\.${streamtype}\b[^\"]*)\"//i) {
+		while ($html =~ s/\"(?:direct|stream)Url\"\s*\:\s*\"([^\"]+?\.${streamtype}\b[^\"]*)\"//is) {
 			$streams[$stindex++] = $1;
 		}
 		if ($streamtype =~ /^(direct|stream)$/i) {
 			my $one = $1;
-			while ($html =~ s/\"${one}Url\"\s*\:\s*\"([^\"]+)\"//i) {
+			while ($html =~ s/\"${one}Url\"\s*\:\s*\"([^\"]+)\"//is) {
 				$streams[$stindex++] = $1;
 			}
 		} elsif ($streamtype =~ /^a(?:ny|ll)$/i) {
-			while ($html =~ s/\"(?:direct|stream)Url\"\s*\:\s*\"([^\"]+)\"//i) {
+			while ($html =~ s/\"(?:direct|stream)Url\"\s*\:\s*\"([^\"]+)\"//is) {
 				$streams[$stindex++] = $1;
 			}
 		}
@@ -416,17 +416,18 @@ sub new
 	return undef  unless ($#streams >= 0);
 
 	$self->{'cnt'} = scalar @streams;
-	$self->{'title'} = ($html =~ /\"title\"\s*\:\s*\"([^\"]+)\"/i) ? $1 : '';
-	$self->{'description'} = ($html =~ m#\bname\=\"description\"\s+content\=\"([^\"]+)\"#) ? $1 : $self->{'title'};
+	$html =~ s/\\\"/\&quot\;/gs;
+	$self->{'title'} = ($html =~ /\"title\"\s*\:\s*\"([^\"]+)\"/is) ? $1 : '';
+	$self->{'description'} = ($html =~ m#\bname\=\"description\"\s+content\=\"([^\"]+)\"#s) ? $1 : $self->{'title'};
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'iconurl'} = ($html =~ /\"(?:poster)?ThumbnailUrl\"\s*\:\s*\"([^\"]+)\"/i) ? $1 : '';
-	$self->{'imageurl'} = ($html =~ /\"posterLargeUrl\"\s*\:\s*\"([^\"]+)\"/i) ? $1 : '';
+	$self->{'iconurl'} = ($html =~ /\"(?:poster)?ThumbnailUrl\"\s*\:\s*\"([^\"]+)\"/is) ? $1 : '';
+	$self->{'imageurl'} = ($html =~ /\"posterLargeUrl\"\s*\:\s*\"([^\"]+)\"/is) ? $1 : '';
 	$self->{'imageurl'} ||= $self->{'iconurl'};
-	$self->{'created'} = $1  if ($html =~ /\"createdAt\"\s*\:\s*\"([^\"]+)\"/i);
-	$self->{'updated'} = $1  if ($html =~ /\"updatedAt\"\s*\:\s*\"([^\"]+)\"/i);
+	$self->{'created'} = $1  if ($html =~ /\"createdAt\"\s*\:\s*\"([^\"]+)\"/is);
+	$self->{'updated'} = $1  if ($html =~ /\"updatedAt\"\s*\:\s*\"([^\"]+)\"/is);
 	if (defined $self->{'updated'} && $self->{'updated'} =~ /(\d\d\d\d)/) {
 		$self->{'year'} = $1;
 	} else {

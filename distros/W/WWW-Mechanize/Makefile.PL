@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WWW-Mechanize",
   "EXE_FILES" => [
-    "bin/mech-dump"
+    "script/mech-dump"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006",
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "vars" => 0
   },
-  "VERSION" => "1.93",
+  "VERSION" => "1.94",
   "test" => {
     "TESTS" => "t/*.t t/local/*.t t/mech-dump/*.t"
   }

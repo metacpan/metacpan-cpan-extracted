@@ -187,13 +187,13 @@
   month_stand_alone_abbreviated => [
     "jan",
     "feb",
-    "mart",
+    "mar",
     "apr",
     "maj",
     "jun",
     "jul",
     "avg",
-    "sept",
+    "sep",
     "okt",
     "nov",
     "dec",
@@ -275,5 +275,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.16';
+    $VERSION = '0.17';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -434,10 +434,11 @@ sub parseBlockText()
 sub parseCSV()
 {
     my ( $self, %parameters ) = @_;
-    my $file     = $parameters{ file };
-    my $sep_char = $parameters{ sep_char } // ',';
-    my $encoding = $parameters{ encoding } // 'iso-8859-1';
-    my $retorno  = { rows => undef, error => 0, message => undef, };
+    my $file           = $parameters{ file };
+    my $sep_char       = $parameters{ sep_char } // ',';
+    my $encoding       = $parameters{ encoding } // 'iso-8859-1';
+    my @originalHeader = @{ $parameters{ originalHeader } };
+    my $retorno        = { rows => undef, error => 0, message => undef, };
 
     $log->info( "Começando a parsear o arquivo [ $file ]..." );
 
@@ -489,25 +490,39 @@ sub parseCSV()
         my @rows;
         open my $fh, "<:encoding($encoding)", $file or die "$file->{path}: $!";
 
-        if ( $encoding =~ /utf-8/i )
+        my @header = eval {
+            $csv->header(
+                $fh,
+                {
+                    detect_bom         => ( $encoding =~ /utf-8/i ) ? 1 : 0,
+                    munge_column_names => sub {
+                        uc;
+                    }
+                }
+            );
+        };
+
+        if ( @originalHeader )
         {
-            my @header = $csv->header( $fh, { detect_bom => 1, munge_column_names => "uc" } );
-            $retorno->{ header } = \@header;
-        }
-        else
-        {
-            my @header = eval { $csv->header( $fh, { munge_column_names => "uc" } ); };
-            my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
-            if ( $cde > 0 )
+            if ( !$self->validaHeader( originalHeader => \@originalHeader, header => \@header ) )
             {
-                $rec--;
-                undef @rows;
-                $retorno->{ error }   = $cde;
-                $retorno->{ message } = "$str @ rec $rec, pos $pos, field $fld";
+                my $msg = 'Header do arquivo está diferente do layout...';
+                $retorno->{ error }   = 1;
+                $retorno->{ message } = $msg;
                 return $retorno;
-            } ## end if ( $cde > 0 )
-            $retorno->{ header } = \@header;
-        } ## end else [ if ( $encoding =~ /utf-8/i...)]
+            } ## end if ( !$self->validaHeader...)
+        } ## end if ( @originalHeader )
+
+        my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
+        if ( $cde > 0 )
+        {
+            $rec--;
+            undef @rows;
+            $retorno->{ error }   = $cde;
+            $retorno->{ message } = "$str @ rec $rec, pos $pos, field $fld";
+            return $retorno;
+        } ## end if ( $cde > 0 )
+        $retorno->{ header } = \@header;
 
         while ( my $row = $csv->getline( $fh ) )
         {
@@ -515,7 +530,7 @@ sub parseCSV()
         }
         close $fh;
 
-        my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
+        ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
 
         if ( $cde > 0 && $cde != 2012 )
         {
@@ -532,6 +547,24 @@ sub parseCSV()
 
     return $retorno;
 } ## end sub parseCSV
+
+=head2 C<validaHeader()>
+=cut
+
+sub validaHeader()
+{
+    $log->debug( "validaHeader", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+    my @originalHeader = @{ $parameters{ originalHeader } };
+    my @header         = @{ $parameters{ header } };
+
+    $log->info( "Validando o header do arquivo..." );
+
+    my $originalHeaderString = join( '_&_', @originalHeader );
+    my $headerString         = join( '_&_', @header );
+
+    return ( $originalHeaderString eq $headerString ) ? TRUE : FALSE;
+} ## end sub validaHeader
 
 =head2 C<trim()>
 =cut

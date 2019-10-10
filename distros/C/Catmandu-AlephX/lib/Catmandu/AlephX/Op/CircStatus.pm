@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has item_data => (
@@ -21,7 +23,7 @@ sub parse {
   my @item_data;
 
   for my $i($xpath->find("/$op/item-data")->get_nodelist()){
-    push @item_data,get_children($i,1);   
+    push @item_data,get_children($i,1);
   }
 
   __PACKAGE__->new(
@@ -30,7 +32,7 @@ sub parse {
     errors => $class->parse_errors($xpath),
     content_ref => $str_ref
   );
-  
+
 }
 
 1;

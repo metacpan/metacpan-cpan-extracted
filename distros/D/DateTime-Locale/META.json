@@ -101,27 +101,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       }
    },
    "release_status" : "stable",
@@ -137,7 +137,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.24",
+   "version" : "1.25",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -504,6 +504,7 @@
                      "GF",
                      "GG",
                      "GGGG",
+                     "GGGGG",
                      "GGGGy",
                      "GGGGyMMMMEEEEdd",
                      "GGGGyMd",
@@ -555,6 +556,7 @@
                      "Isniin",
                      "Isnin",
                      "Ituku",
+                     "Izu",
                      "JE",
                      "JM",
                      "Jahres",
@@ -893,10 +895,13 @@
                      "hmsvvvv",
                      "hmv",
                      "hod\u017a",
+                     "hono",
                      "h\u00e9tf\u0151",
                      "h\u00ebn\u00eb",
                      "ika",
                      "im",
+                     "ime",
+                     "ing",
                      "iyax",
                      "jimweri",
                      "jumwa",
@@ -907,6 +912,7 @@
                      "kwamb\u0129l\u0129lya",
                      "kyumwa",
                      "le",
+                     "leta",
                      "lia",
                      "libos\u00f3",
                      "lindi",
@@ -927,6 +933,8 @@
                      "mandag",
                      "mbere",
                      "minggu",
+                     "miz",
+                     "mjesec",
                      "mm'min'ss",
                      "mmss",
                      "moandei",
@@ -964,6 +972,7 @@
                      "p\u00f3nje\u017aele",
                      "roka",
                      "roku",
+                     "sa",
                      "sabaat",
                      "saka",
                      "samedi",
@@ -980,6 +989,7 @@
                      "settimana",
                      "shahuviluha",
                      "sigunda",
+                     "simana",
                      "sizhun",
                      "sjedmica",
                      "sngayan",
@@ -1000,6 +1010,7 @@
                      "t\u00fd\u017ede\u0148",
                      "uMvulo",
                      "uge",
+                     "uike",
                      "uke",
                      "ukp\u00e0",
                      "urteko",
@@ -1418,8 +1429,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@DROLSKY/InstallGuide",
-            "version" : "1.200012"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -1556,7 +1573,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.24",
+                  "tag" : "v1.25",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

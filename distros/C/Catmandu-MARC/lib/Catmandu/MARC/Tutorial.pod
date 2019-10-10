@@ -8,19 +8,28 @@ Catmandu::MARC::Tutorial - A documentation-only module for new users of Catmandu
 
   perldoc Catmandu::MARC::Tutorial
 
-=head1 UTF8
+=head1 UTF-8
 
-=head2 MARC8 and UTF8
+=head2 MARC8 and UTF-8
 
-The current Catmandu MARC tools are targetted for processing UTF8 encoded files.
+The current Catmandu MARC tools are targetted for processing UTF-8 encoded files.
 When you have MARC8 encoded data tools like MarcEdit <https://marcedit.reeset.net/>
 or C<yaz-marcdump> <https://software.indexdata.com/yaz/doc/yaz-marcdump.html> can
-be used to create a UTF8 encoded file:
+be used to create a UTF-8 encoded file:
 
    $ yaz-marcdump -f MARC-8 -t UTF-8 -o marc -l 9=97 marc21.raw > marc21.utf8.raw
 
+=head2 Unicode errors
 
-=head2 Convert a decomposed UTF8 file to a combined UTF8 file and vice versa
+If you process UTF-8 encoded files which contain faulty characters, you will get a fatal error message like:
+
+  utf8 "\xD8" does not map to Unicode at ...
+
+Use the iconv (libc6-dev Linux package) tool, to preprocess the data and discard faulty characters:
+
+  $ iconv -c -f UTF-8 -t UTF-8 marc21.utf8.raw | catmandu convert MARC to JSON
+
+=head2 Convert a decomposed UTF-8 file to a combined UTF-8 file and vice versa
 
 For example, the character ä can be represented as
 

@@ -11,5 +11,5 @@ WriteMakefile(
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Tangle/Tangle.pm', # retrieve abstract from module
-       AUTHOR         => 'Jeffrey B Anderson <peawormsworth@gmail.com>') : ()),
+       AUTHOR         => 'Jeff Anderson <truejeffanderson@gmail.com>') : ()),
 );

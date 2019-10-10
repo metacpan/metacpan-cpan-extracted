@@ -1,5 +1,15 @@
 Revision history for Role-Tiny
 
+2.001003 - 2019-10-09
+  - releasing as stable
+
+2.001_002 - 2019-10-06
+  - fix methods from roles composed via create_class_with_roles being treated
+    differently from roles composed directly (RT#128470)
+  - fix constants being included in the methods provided by a role if they
+    were created before importing Role::Tiny but used after importing
+  - fix prototype handling test on cperl
+
 2.001001 - 2019-10-01
   - added tests for make_role
 

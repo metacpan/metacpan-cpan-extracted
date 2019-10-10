@@ -1,4 +1,8 @@
 Revision history for Perl5 Net::LDAPapi Module.
+3.0.7 Thu Oct 10 10:06:00 PST 2019
+	- Fix undeclared variables introduced in fixes for Issue #51
+3.0.6 Mon Oct 07 10:03:00 PST 2019
+	- Fix memory leaks (Issue #51)
 3.0.5 Fri Dec 01 10:03:00 PST 2017
 	- Fix cookie handling with MMR configuration
 	- Fix ASN1 encoding of sync cookie

@@ -1,34 +1,40 @@
-0.207   2019-05-23 (PERLANCAR)
+0.208   2019-09-03  Released-By: PERLANCAR; Urgency: medium
+
+	- When no_screensaver=1, give lead time of 10 seconds instead of 5
+	  to be surer screensaver is not activating.
+
+
+0.207   2019-05-23  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Forks::Super.
 
 
-0.206   2019-05-23 (PERLANCAR)
+0.206   2019-05-23  Released-By: PERLANCAR
 
 	- Add option: --nice to set nice/priority level.
 
 
-0.205   2019-05-22 (PERLANCAR)
+0.205   2019-05-22  Released-By: PERLANCAR
 
 	- [bugfix] Properly restore original prevent/unprevent sleep on
 	  SIGTERM/SIGINT.
 
 
-0.204   2019-05-22 (PERLANCAR)
+0.204   2019-05-22  Released-By: PERLANCAR
 
 	- Add option: --no-sleep.
 
 
-0.203   2019-05-22 (PERLANCAR)
+0.203   2019-05-22  Released-By: PERLANCAR
 
 	- Fix Rinci metadata.
 
         - Use Log::ger, no longer observing DEBUG environment directly.
 
 
-0.202   2019-05-22 (PERLANCAR)
+0.202   2019-05-22  Released-By: PERLANCAR
 
 	- [ux] Coerce euid from username, egid from groupname.
 
@@ -36,7 +42,7 @@
           'govproc-pericmd'.
 
 
-0.201   2019-04-30 (PERLANCAR)
+0.201   2019-04-30  Released-By: PERLANCAR
 
 	- Add options: euid, egid.
 
@@ -46,26 +52,26 @@
 	- [doc][ux] Show all arguments in Synopsis for ease of use.
 
 
-0.200   2018-01-31 (PERLANCAR)
+0.200   2018-01-31  Released-By: PERLANCAR
 
 	- Require command to be arrayref, because strings now don't seem to
 	  work with IPC::Run [RT#124278].
 
 
-0.19    2017-03-31 (PERLANCAR)
+0.19    2017-03-31  Released-By: PERLANCAR
 
 	- Add option: --no-screensaver to prevent screensaver from
 	  activating.
 
 
-0.18    2016-04-07 (PERLANCAR)
+0.18    2016-04-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Make Proc::Killfam a RuntimeRecommends prereq.
 
 
-0.17    2015-09-04 (PERLANCAR)
+0.17    2015-09-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -74,14 +80,14 @@
 	  requirement.
 
 
-0.16    2015-01-03 (PERLANCAR)
+0.16    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.15    2014-12-12 (PERLANCAR)
+0.15    2014-12-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -89,24 +95,24 @@
 	  currently breaks on newer OSX (Maverick) [RT#100855].
 
 
-0.14    2014-12-11 (PERLANCAR)
+0.14    2014-12-11  Released-By: PERLANCAR
 
 	- Rename dist/module from Process-Govern to Proc-Govern (Proc::*
           namespace is the correct majority).
 
 
-0.13    2014-09-06 (PERLANCAR)
+0.13    2014-09-06  Released-By: PERLANCAR
 
 	- Add option: --killfam.
 
 
-0.12     2014-03-14 (SHARYANTO)
+0.12     2014-03-14  Released-By: SHARYANTO
 
          - bin/govproc: Forgot to add cmdline options for 'show_std{out,err}'
            and 'log_stdout'.
 
 
-0.11     2014-03-14 (SHARYANTO)
+0.11     2014-03-14  Released-By: SHARYANTO
 
          [NEW FEATURES]
 
@@ -117,7 +123,7 @@
            STDOUT output just like STDERR.
 
 
-0.10     2014-03-14 (SHARYANTO)
+0.10     2014-03-14  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -128,24 +134,24 @@
            so it's more usable.
 
 
-0.09     2013-04-24 (SHARYANTO)
+0.09     2013-04-24  Released-By: SHARYANTO
 
          - Add restarting (--restart).
 
 
-0.08     2013-04-19 (SHARYANTO)
+0.08     2013-04-19  Released-By: SHARYANTO
 
          - Add --version.
 
          - Fix POD [RT#84742] (thanks Slaven).
 
 
-0.07     2013-04-18 (SHARYANTO)
+0.07     2013-04-18  Released-By: SHARYANTO
 
          - Add load watching.
 
 
-0.06     2013-04-17 (SHARYANTO)
+0.06     2013-04-17  Released-By: SHARYANTO
 
          - Use exit code 202 to signify 'another instance running'. Document
            exit codes (currently only this and 201).
@@ -154,13 +160,13 @@
            '/path/to/perl /path/to/govproc --opt -- CMD --cmdopts ...'
 
 
-0.05     2013-04-17 (SHARYANTO)
+0.05     2013-04-17  Released-By: SHARYANTO
 
          - (internal) Change pump() loop from using 'sleep 0.1' to using
            timeout(1) object, which is more proper.
 
 
-0.04     2013-04-17 (SHARYANTO)
+0.04     2013-04-17  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -170,7 +176,7 @@
            working (causes busy loop), by using 'sleep 0.1'.
 
 
-0.03     2013-04-17 (SHARYANTO)
+0.03     2013-04-17  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -190,13 +196,13 @@
            error message).
 
 
-0.02     2012-12-28 (SHARYANTO)
+0.02     2012-12-28  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Touch up POD and update dependencies.
 
 
-0.01     2012-12-26 (SHARYANTO)
+0.01     2012-12-26  Released-By: SHARYANTO
 
          - First release.

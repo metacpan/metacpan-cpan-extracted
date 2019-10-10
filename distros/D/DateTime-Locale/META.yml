@@ -34,22 +34,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.24'
+    version: '1.25'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.24'
+    version: '1.25'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.24'
+    version: '1.25'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.24'
+    version: '1.25'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.24'
+    version: '1.25'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.24'
+    version: '1.25'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: http://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.24'
+version: '1.25'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -378,6 +378,7 @@ x_Dist_Zilla:
             - GF
             - GG
             - GGGG
+            - GGGGG
             - GGGGy
             - GGGGyMMMMEEEEdd
             - GGGGyMd
@@ -429,6 +430,7 @@ x_Dist_Zilla:
             - Isniin
             - Isnin
             - Ituku
+            - Izu
             - JE
             - JM
             - Jahres
@@ -767,10 +769,13 @@ x_Dist_Zilla:
             - hmsvvvv
             - hmv
             - hodź
+            - hono
             - hétfő
             - hënë
             - ika
             - im
+            - ime
+            - ing
             - iyax
             - jimweri
             - jumwa
@@ -781,6 +786,7 @@ x_Dist_Zilla:
             - kwambĩlĩlya
             - kyumwa
             - le
+            - leta
             - lia
             - libosó
             - lindi
@@ -801,6 +807,8 @@ x_Dist_Zilla:
             - mandag
             - mbere
             - minggu
+            - miz
+            - mjesec
             - "mm'min'ss"
             - mmss
             - moandei
@@ -838,6 +846,7 @@ x_Dist_Zilla:
             - pónjeźele
             - roka
             - roku
+            - sa
             - sabaat
             - saka
             - samedi
@@ -854,6 +863,7 @@ x_Dist_Zilla:
             - settimana
             - shahuviluha
             - sigunda
+            - simana
             - sizhun
             - sjedmica
             - sngayan
@@ -874,6 +884,7 @@ x_Dist_Zilla:
             - týždeň
             - uMvulo
             - uge
+            - uike
             - uke
             - ukpà
             - urteko
@@ -1209,8 +1220,12 @@ x_Dist_Zilla:
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@DROLSKY/InstallGuide'
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
@@ -1316,7 +1331,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.24
+          tag: v1.25
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

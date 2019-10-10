@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Carpet::Baxis::Tickfont;
 use Chart::Plotly::Trace::Carpet::Baxis::Tickformatstop;
 use Chart::Plotly::Trace::Carpet::Baxis::Title;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace carpet.
 
@@ -329,7 +329,7 @@ Chart::Plotly::Trace::Carpet::Baxis - This attribute is one of the possible opti
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

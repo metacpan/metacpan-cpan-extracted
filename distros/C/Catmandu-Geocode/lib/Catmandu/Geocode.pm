@@ -11,7 +11,7 @@ Catmandu::Geocode - Catmandu modules for the Google Maps geocoding api
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 DESCRIPTION
 

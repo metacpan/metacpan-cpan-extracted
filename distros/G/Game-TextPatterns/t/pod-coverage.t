@@ -1,11 +1,11 @@
-#!perl -T
+#!perl
 use 5.006;
 use strict;
 use warnings;
 use Test::More;
 
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
+unless ($ENV{RELEASE_TESTING}) {
+    plan(skip_all => "Author tests not required for installation");
 }
 
 # Ensure a recent version of Test::Pod::Coverage
@@ -23,4 +23,4 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
   if $@;
 
 # on account of frequent coverage failures on these from CPAN smokers...
-all_pod_coverage_ok( { trustme => [qr/BUILD|new|clone|rebuild/] } );
+all_pod_coverage_ok({ trustme => [qr/BUILD|new|clone|rebuild/] });

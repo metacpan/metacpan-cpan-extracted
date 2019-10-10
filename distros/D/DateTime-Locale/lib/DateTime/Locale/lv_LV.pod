@@ -477,23 +477,23 @@ Latvian Latvia locale.
    1995-12-22T09:05:02 = piektd., 22. decembris
   -0010-09-15T04:44:23 = sestd., 15. septembris
 
-=head3 MMMMW-count-one (MMMM W. 'nedēļa')
+=head3 MMMMW-count-one (MMMM, W. 'nedēļa')
 
-   2008-02-05T18:30:30 = februāris 1. nedēļa
-   1995-12-22T09:05:02 = decembris 3. nedēļa
-  -0010-09-15T04:44:23 = septembris 2. nedēļa
+   2008-02-05T18:30:30 = februāris, 1. nedēļa
+   1995-12-22T09:05:02 = decembris, 3. nedēļa
+  -0010-09-15T04:44:23 = septembris, 2. nedēļa
 
-=head3 MMMMW-count-other (MMMM W. 'nedēļa')
+=head3 MMMMW-count-other (MMMM, W. 'nedēļa')
 
-   2008-02-05T18:30:30 = februāris 1. nedēļa
-   1995-12-22T09:05:02 = decembris 3. nedēļa
-  -0010-09-15T04:44:23 = septembris 2. nedēļa
+   2008-02-05T18:30:30 = februāris, 1. nedēļa
+   1995-12-22T09:05:02 = decembris, 3. nedēļa
+  -0010-09-15T04:44:23 = septembris, 2. nedēļa
 
-=head3 MMMMW-count-zero (MMMM W. 'nedēļa')
+=head3 MMMMW-count-zero (MMMM, W. 'nedēļa')
 
-   2008-02-05T18:30:30 = februāris 1. nedēļa
-   1995-12-22T09:05:02 = decembris 3. nedēļa
-  -0010-09-15T04:44:23 = septembris 2. nedēļa
+   2008-02-05T18:30:30 = februāris, 1. nedēļa
+   1995-12-22T09:05:02 = decembris, 3. nedēļa
+  -0010-09-15T04:44:23 = septembris, 2. nedēļa
 
 =head3 MMMMd (d. MMMM)
 

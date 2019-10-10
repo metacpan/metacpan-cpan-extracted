@@ -187,45 +187,45 @@ Spanish United States locale.
 =head3 Wide (format)
 
   1.er trimestre
-  2.º trimestre
+  2º. trimestre
   3.er trimestre
-  4.º trimestre
+  4o. trimestre
 
 =head3 Abbreviated (format)
 
-  T1
-  T2
-  T3
-  T4
+  1er. trim.
+  2º. trim.
+  3er. trim.
+  4º trim.
 
 =head3 Narrow (format)
 
-  1
-  2
-  3
-  4
+  1T
+  2T
+  3T
+  4T
 
 
 =head3 Wide (stand-alone)
 
   1.er trimestre
-  2.º trimestre
+  2º. trimestre
   3.er trimestre
-  4.º trimestre
+  4º trimestre
 
 =head3 Abbreviated (stand-alone)
 
-  T1
-  T2
-  T3
-  T4
+  1er. trim.
+  2º. trim.
+  3er. trim.
+  4º trim.
 
 =head3 Narrow (stand-alone)
 
-  1
-  2
-  3
-  4
+  1T
+  2T
+  3T
+  4T
 
 =head2 Eras
 
@@ -302,15 +302,15 @@ Spanish United States locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = martes, 5 de febrero de 2008, 6:30:30 p. m. UTC
-   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995, 9:05:02 a. m. UTC
-  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10, 4:44:23 a. m. UTC
+   2008-02-05T18:30:30 = martes, 5 de febrero de 2008 a las 6:30:30 p. m. UTC
+   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995 a las 9:05:02 a. m. UTC
+  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10 a las 4:44:23 a. m. UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 de febrero de 2008, 6:30:30 p. m. UTC
-   1995-12-22T09:05:02 = 22 de diciembre de 1995, 9:05:02 a. m. UTC
-  -0010-09-15T04:44:23 = 15 de septiembre de -10, 4:44:23 a. m. UTC
+   2008-02-05T18:30:30 = 5 de febrero de 2008 a las 6:30:30 p. m. UTC
+   1995-12-22T09:05:02 = 22 de diciembre de 1995 a las 9:05:02 a. m. UTC
+  -0010-09-15T04:44:23 = 15 de septiembre de -10 a las 4:44:23 a. m. UTC
 
 =head3 Medium
 
@@ -665,14 +665,14 @@ Spanish United States locale.
 
 =head3 yQQQ (QQQ y)
 
-   2008-02-05T18:30:30 = T1 2008
-   1995-12-22T09:05:02 = T4 1995
-  -0010-09-15T04:44:23 = T3 -10
+   2008-02-05T18:30:30 = 1er. trim. 2008
+   1995-12-22T09:05:02 = 4º trim. 1995
+  -0010-09-15T04:44:23 = 3er. trim. -10
 
 =head3 yQQQQ (QQQQ 'de' y)
 
    2008-02-05T18:30:30 = 1.er trimestre de 2008
-   1995-12-22T09:05:02 = 4.º trimestre de 1995
+   1995-12-22T09:05:02 = 4o. trimestre de 1995
   -0010-09-15T04:44:23 = 3.er trimestre de -10
 
 =head3 yw-count-one ('semana' w 'de' Y)

@@ -12,7 +12,7 @@ use warnings;
 
 use Config; # for byteorder
 
-use Test::More tests => 88;
+use Test::More tests => 89;
 
 use constant IMG_WIDTH => 256;
 use constant IMG_HEIGHT => 256;
@@ -216,7 +216,7 @@ SKIP: {
 }
 
 SKIP: {
-	skip 'pdf surface', 13
+	skip 'pdf surface', 14
 		unless Cairo::HAS_PDF_SURFACE;
 
 	my $surf = Cairo::PdfSurface->create ('tmp.pdf', IMG_WIDTH, IMG_HEIGHT);
@@ -266,6 +266,16 @@ SKIP: {
 
 		like (Cairo::PdfSurface::version_to_string('1-4'), qr/1\.4/);
 		like (Cairo::PdfSurface->version_to_string('1-4'), qr/1\.4/);
+	}
+
+	SKIP: {
+		skip 'new stuff', 1
+			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 16, 0);
+
+		$surf->set_metadata("title","Testing metadata");
+		$surf->set_metadata("author","Johan Vromans");
+		$surf->set_metadata("subject","cairo_pdf_set_metadata");
+		ok(1);	# No get_metadata, so assume OK if we're still alive
 	}
 
 	unlink 'tmp.pdf';

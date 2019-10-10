@@ -406,7 +406,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.35';
+    our $VERSION   = '6.36';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash Graphics::Framebuffer::Mouse);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -469,7 +469,6 @@ BEGIN {
       PERL
       SOFTWARE
       HARDWARE
-      $VERSION
       @HATCHES
       @COLORORDER
     );
@@ -8977,7 +8976,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.35 (Sept 9, 2019)
+Version 6.36 (Oct 8, 2019)
 
 =head1 THANKS
 

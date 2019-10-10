@@ -117,11 +117,11 @@
   ],
   era_abbreviated => [
     "BCE",
-    "CE",
+    "AD",
   ],
   era_narrow => [
     "BCE",
-    "CE",
+    "AD",
   ],
   era_wide => [
     "Saju Kristi",
@@ -255,10 +255,10 @@
     "K\N{U+025b}r",
   ],
   quarter_stand_alone_wide => [
-    "\N{U+00cc}d\N{U+00e1}m\N{U+025b}\N{U+0301}rin k\N{U+00ed}n\N{U+00ed}",
-    "\N{U+00cc}d\N{U+00e1}m\N{U+025b}\N{U+0301}rin Kej\N{U+00ec}",
+    "\N{U+00cc}d\N{U+00e1}m\N{U+1eb9}\N{U+0301}rin k\N{U+00ed}n\N{U+00ed}",
+    "\N{U+00cc}d\N{U+00e1}m\N{U+1eb9}\N{U+0301}rin Kej\N{U+00ec}",
     "\N{U+00cc}d\N{U+00e1}m\N{U+025b}\N{U+0301}rin K\N{U+025b}ta",
-    "\N{U+00cc}d\N{U+00e1}m\N{U+025b}\N{U+0301}rin K\N{U+025b}rin",
+    "\N{U+00cc}d\N{U+00e1}m\N{U+1eb9}\N{U+0301}rin K\N{U+1eb9}rin",
   ],
   script => undef,
   territory => "Benin",
@@ -267,5 +267,5 @@
   time_format_medium => "H:m:s",
   time_format_short => "H:m",
   variant => undef,
-  version => 35,
+  version => 36,
 }

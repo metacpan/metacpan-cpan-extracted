@@ -5,6 +5,8 @@ use Catmandu::AlephX::Metadata::MARC;
 use Catmandu::AlephX::Record;
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 #<doc> has extra tag in marc array called 'AVA'
@@ -32,7 +34,7 @@ sub parse {
       }
     }),
     content_ref => $str_ref
-  ); 
+  );
 }
 
 1;

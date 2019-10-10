@@ -1,5 +1,50 @@
 package OpenERP::OOM::Link::DBIC;
 
+=head1 NAME
+
+OpenERP::OOM::Link::DBIC
+
+=head1 DESCRIPTION
+
+Class used to link OpenERP data with data in DBIC.  
+
+=head1 PROPERTIES
+
+=head2 dbic_schema
+
+This is the DBIC Schema object.  If you need a generic DBIC schema object
+this is normally the simplest way to access it.
+
+=head1 METHODS
+
+These methods are not normally called directly.
+
+=head2 create
+
+Returns the new ID of a row it creates in a table using DBIC.
+
+    my $id = $link->create({ class => 'RSName' }, $object_data);
+
+=head2 retrieve
+
+This is equivalent to doing a find on a ResultSet.
+
+    my $object = $link->retrieve({ class => 'RSName' }, $id);
+
+=head2 search
+
+This is equivalent to doing a search on a ResultSet and then returning a list
+of all the id fields.
+
+    my @ids = $link->search({ class => 'RSName' }, $search, $options);
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2011 OpusVL
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
 
 use 5.010;
 use Moose;
@@ -61,74 +106,3 @@ sub search {
 #-------------------------------------------------------------------------------
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpenERP::OOM::Link::DBIC
-
-=head1 VERSION
-
-version 0.46
-
-=head1 DESCRIPTION
-
-Class used to link OpenERP data with data in DBIC.  
-
-=head1 NAME
-
-OpenERP::OOM::Link::DBIC
-
-=head1 PROPERTIES
-
-=head2 dbic_schema
-
-This is the DBIC Schema object.  If you need a generic DBIC schema object
-this is normally the simplest way to access it.
-
-=head1 METHODS
-
-These methods are not normally called directly.
-
-=head2 create
-
-Returns the new ID of a row it creates in a table using DBIC.
-
-    my $id = $link->create({ class => 'RSName' }, $object_data);
-
-=head2 retrieve
-
-This is equivalent to doing a find on a ResultSet.
-
-    my $object = $link->retrieve({ class => 'RSName' }, $id);
-
-=head2 search
-
-This is equivalent to doing a search on a ResultSet and then returning a list
-of all the id fields.
-
-    my @ids = $link->search({ class => 'RSName' }, $search, $options);
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (C) 2011 OpusVL
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-Jon Allen (JJ), <jj@opusvl.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011-2016 by OpusVL.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -279,7 +279,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =head1 SYNOPSIS
 

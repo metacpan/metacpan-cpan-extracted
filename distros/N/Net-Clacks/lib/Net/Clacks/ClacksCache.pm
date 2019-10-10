@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 6.1;
+our $VERSION = 7;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -248,7 +248,69 @@ Net::Clacks::ClacksCache - Clacks based Memcached replacement
 
   use Net::Clacks::ClacksCache;
 
+=head2 new
 
+Makes a new instances if ClacksCache
+
+=head2 newFromHandle
+
+Takes a standard clacks instance and turns it into a ClacksCache instance.
+
+=head2 set
+
+Sets a key/value pair
+
+=head2 get
+
+Retrieve a value for the given key
+
+=head2 incr
+
+Increment a value. This behaves mostly according to standard Perl rules regarding scalars. If the value for the key
+doesn't exist or is not numeric, it is assumed to be zero and then incremented.
+
+=head2 decr
+
+Decrement a value. This behaves mostly according to standard Perl rules regarding scalars. If the value for the key
+doesn't exist or is not numeric, it is assumed to be zero and then decremented.
+
+=head2 delete
+
+Delete a key/value pair.
+
+=head2 clacks_keylist
+
+Provides a list of keys stored in ClacksCache.
+
+=head2 clacks_notify
+
+Provides the L<Net::Clacks::Client> notify function.
+
+=head2 clacks_set
+
+Provides the L<Net::Clacks::Client> set function.
+
+=head2 extraInits
+
+If you overload L<Net::Clacks::ClacksCache>, overloading extraInits() gives you a convenient places to add
+your own initialization.
+
+=head2 extraDestroys
+
+If you overload L<Net::Clacks::ClacksCache>, overloading extraDestroys() gives you a convenient places to add
+your own destroy functionality.
+
+=head2 deref
+
+Internal function
+
+=head2 reconnect
+
+Reconnect to the clacks server. This is mostly used internally, but you can call it if you suspect your connection is wonky or broken.
+
+=head2 sanitize_key
+
+Internal function
 
 =head1 DESCRIPTION
 
@@ -256,8 +318,8 @@ This implements the memcached-like client for the CLACKS interprocess messaging 
 
 =head1 IMPORTANT NOTE
 
-Please make sure and read the documentations for L<Net::Clacks> as it contains important information
-pertaining to upgrades and general changes!
+Please make sure and read the documentations for L<Net::Clacks> as well as the L<Changes> file, as they contain
+important information pertaining to upgrades and general changes!
 
 =head1 AUTHOR
 

@@ -33,6 +33,7 @@ my %WriteMakefileArgs = (
     "Pod::Simple" => "3.27",
     "Pod::Simple::Methody" => 0,
     "Pod::Usage" => 0,
+    "URI::Escape" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.101",
+  "VERSION" => "3.200",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "Symbol" => 0,
   "Test::Differences" => 0,
   "Test::More" => "0.88",
+  "URI::Escape" => 0,
   "lib" => 0,
   "parent" => 0,
   "strict" => 0,

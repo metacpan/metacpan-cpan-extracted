@@ -28,3 +28,4 @@ Makefile$
 ^.*\.mkdn$
 ^.*\.patch$
 ^\.prove$
+^t/.*.zip$

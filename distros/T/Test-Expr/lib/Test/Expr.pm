@@ -1,5 +1,5 @@
 package Test::Expr;
-our $VERSION = '0.000009';
+our $VERSION = '0.000010';
 
 use 5.012; use warnings;
 use Keyword::Declare;
@@ -230,7 +230,7 @@ Test::Expr - Test an expression with better error messages
 
 =head1 VERSION
 
-This document describes Test::Expr version 0.000009
+This document describes Test::Expr version 0.000010
 
 
 =head1 SYNOPSIS

@@ -495,29 +495,29 @@ Polish Poland locale.
    1995-12-22T09:05:02 = pt., 22 grudnia
   -0010-09-15T04:44:23 = sob., 15 września
 
-=head3 MMMMW-count-few (MMMM, 'tydz'. W)
+=head3 MMMMW-count-few (LLLL, 'tydz'. W)
 
-   2008-02-05T18:30:30 = lutego, tydz. 1
-   1995-12-22T09:05:02 = grudnia, tydz. 3
-  -0010-09-15T04:44:23 = września, tydz. 2
+   2008-02-05T18:30:30 = luty, tydz. 1
+   1995-12-22T09:05:02 = grudzień, tydz. 3
+  -0010-09-15T04:44:23 = wrzesień, tydz. 2
 
-=head3 MMMMW-count-many (MMMM, 'tydz'. W)
+=head3 MMMMW-count-many (LLLL, 'tydz'. W)
 
-   2008-02-05T18:30:30 = lutego, tydz. 1
-   1995-12-22T09:05:02 = grudnia, tydz. 3
-  -0010-09-15T04:44:23 = września, tydz. 2
+   2008-02-05T18:30:30 = luty, tydz. 1
+   1995-12-22T09:05:02 = grudzień, tydz. 3
+  -0010-09-15T04:44:23 = wrzesień, tydz. 2
 
-=head3 MMMMW-count-one (MMMM, 'tydz'. W)
+=head3 MMMMW-count-one (LLLL, 'tydz'. W)
 
-   2008-02-05T18:30:30 = lutego, tydz. 1
-   1995-12-22T09:05:02 = grudnia, tydz. 3
-  -0010-09-15T04:44:23 = września, tydz. 2
+   2008-02-05T18:30:30 = luty, tydz. 1
+   1995-12-22T09:05:02 = grudzień, tydz. 3
+  -0010-09-15T04:44:23 = wrzesień, tydz. 2
 
-=head3 MMMMW-count-other (MMMM, 'tydz'. W)
+=head3 MMMMW-count-other (LLLL, 'tydz'. W)
 
-   2008-02-05T18:30:30 = lutego, tydz. 1
-   1995-12-22T09:05:02 = grudnia, tydz. 3
-  -0010-09-15T04:44:23 = września, tydz. 2
+   2008-02-05T18:30:30 = luty, tydz. 1
+   1995-12-22T09:05:02 = grudzień, tydz. 3
+  -0010-09-15T04:44:23 = wrzesień, tydz. 2
 
 =head3 MMMMd (d MMMM)
 

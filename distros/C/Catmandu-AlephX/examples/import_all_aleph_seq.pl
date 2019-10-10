@@ -8,7 +8,7 @@ use Catmandu::Exporter::MARC;
 use open qw(:std :utf8);
 
 Catmandu::Importer::AlephX->new(
-  url => 'http://aleph.ugent.be/X',
+  url => 'http://borges1.ugent.be/X',
   base => 'usm01',
   include_items => 1
 )->each(sub{

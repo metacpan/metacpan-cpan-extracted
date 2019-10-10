@@ -20,7 +20,7 @@ use JSON;
 use URI::Template;
 use RDF::LDF::Error;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 has url => (
     is => 'ro' ,

@@ -19,7 +19,8 @@ ok(! -f "$TEMP/$qfile_a", 'queue file does not exist yet');
 ok(! -f "$TEMP/$qfile_b", 'queue file does not exist yet');
 
 my $q1 = Forks::Queue->new( impl => 'File', file => "$TEMP/$qfile_a" );
-my $q2 = Forks::Queue->new( impl => 'File', file => "$TEMP/$qfile_b", persist => 1 );
+my $q2 = Forks::Queue->new( impl => 'File', file => "$TEMP/$qfile_b",
+                            persist => 1 );
 
 ok($q1 && ref($q1) eq 'Forks::Queue::File', 'got queue with correct type');
 

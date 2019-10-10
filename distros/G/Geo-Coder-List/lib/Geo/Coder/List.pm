@@ -18,11 +18,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -306,9 +306,15 @@ sub geocode {
 						$l->{geometry}{location}{lat} = $l->{properties}{geoLatitude};
 						$l->{geometry}{location}{lng} = $l->{properties}{geoLongitude};
 					} elsif($l->{'results'}[0]->{'geometry'}) {
-						# DataScienceToolkit
-						$l->{'geometry'}{'location'}{'lat'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-						$l->{'geometry'}{'location'}{'lng'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+						if($l->{'results'}[0]->{'geometry'}->{'location'}) {
+							# DataScienceToolkit
+							$l->{'geometry'}{'location'}{'lat'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+							$l->{'geometry'}{'location'}{'lng'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+						} else {
+							# OpenCage
+							$l->{'geometry'}{'location'}{'lat'} = $l->{'results'}[0]->{'geometry'}->{'lat'};
+							$l->{'geometry'}{'location'}{'lng'} = $l->{'results'}[0]->{'geometry'}->{'lng'};
+						}
 					} elsif($l->{'RESULTS'}) {
 						# GeoCodeFarm
 						$l->{geometry}{location}{lat} = $l->{'RESULTS'}[0]{'COORDINATES'}{'latitude'};
@@ -347,11 +353,12 @@ sub geocode {
 
 		if(scalar(@rc)) {
 			print 'Number of matches from ', ref($geocoder), ': ', scalar(@rc), "\n" if(DEBUG);
-			if(wantarray) {
-				$self->_cache($location, \@rc);
-				return @rc;
-			}
-			if(scalar($rc[0])) {	# check it's not an empty hash
+			print Data::Dumper->new([\@rc])->Dump() if(DEBUG >= 2);
+			if(defined($rc[0])) {	# check it's not an empty hash
+				if(wantarray) {
+					$self->_cache($location, \@rc);
+					return @rc;
+				}
 				$self->_cache($location, $rc[0]);
 				return $rc[0];
 			}
@@ -410,12 +417,12 @@ Similar to geocode except it expects a latitude/longitude parameter.
 
 sub reverse_geocode {
 	my $self = shift;
-	my %params = @_;
+	my %params;
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location)');
+		Carp::croak('Usage: reverse_geocode(location => $location)');
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
 	} else {
@@ -542,7 +549,7 @@ sub reverse_geocode {
 						$name .= $city;
 					}
 					if(my $state = $rc->{'prov'}) {
-						$state .= ', ' if($name);
+						$state = ", $state" if($name);
 						return $self->_cache($latlng, "$name $state");
 					}
 				}
@@ -590,13 +597,15 @@ sub _cache {
 			if(ref($value) eq 'ARRAY') {
 				foreach my $item(@{$value}) {
 					if(ref($item) eq 'HASH') {
-						foreach my $key(keys(%{$item})) {
-							delete $item->{$key} unless ($key eq 'geometry');
+						# foreach my $key(keys(%{$item})) {
+						while(my($key, $value) = each %{$item}) {
+							delete $item->{$key} unless($key eq 'geometry');
 						}
 					}
 				}
 			} elsif(ref($value) eq 'HASH') {
-				foreach my $key(keys(%{$value})) {
+				# foreach my $key(keys(%{$value})) {
+				while(my($key, $value) = each %{$value}) {
 					delete $value->{$key} unless ($key eq 'geometry');
 				}
 			}
@@ -630,9 +639,9 @@ reverse_geocode() should support L<Geo::Location::Point> objects.
 
 =head1 SEE ALSO
 
-L<Geo::Coder::Many>
 L<Geo::Coder::All>
 L<Geo::Coder::GooglePlaces>
+L<Geo::Coder::Many>
 
 =head1 SUPPORT
 
@@ -648,10 +657,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Geo-Coder-List>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Geo-Coder-List>
@@ -666,7 +671,7 @@ L<http://search.cpan.org/dist/Geo-Coder-List/>
 
 Copyright 2016-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

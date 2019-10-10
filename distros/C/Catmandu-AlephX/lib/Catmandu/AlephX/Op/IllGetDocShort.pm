@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has z13 => (
@@ -12,7 +14,7 @@ has z13 => (
     check_hash_ref($_[0]);
   },
   default => sub { {}; }
-); 
+);
 sub op { 'ill-get-doc-short' }
 
 sub parse {

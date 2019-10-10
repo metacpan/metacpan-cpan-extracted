@@ -40,12 +40,12 @@ my @inclusive_expect     = qw|1917-04-08 1918-03-31 1919-04-20 1920-04-04
         1921-03-27 1922-04-16 1923-04-01 1924-04-20 1925-04-12 1926-04-04
         1927-04-17 1928-04-08 1929-03-31 1930-04-20 1931-04-05 1932-03-27|;
 
-plan(tests => 3 + @non_inclusive_expect + @inclusive_expect);
+plan(tests => 4 + 2 * @non_inclusive_expect + @inclusive_expect);
 
 my $easter_1901 = DateTime->new(
         year  => 1901,
-        month => 4,
-        day   => 7,
+        month =>    4,
+        day   =>    7,
 );
 
 my $easter_1917 = DateTime->new(
@@ -62,23 +62,39 @@ my $easter_1932 = DateTime->new(
 
 my $event_easter_sunday = DateTime::Event::Easter->new();
 
-my $non_inclusive_set = $event_easter_sunday->as_set(from => $easter_1901, to => $easter_1917);
-my $inclusive_set     = $event_easter_sunday->as_set(from => $easter_1917, to => $easter_1932, inclusive => 1);
+my $exclusive_set1 = $event_easter_sunday->as_set(from => $easter_1901, to => $easter_1917);
+my $exclusive_set2 = $event_easter_sunday->as_set(from => $easter_1901, to => $easter_1917, inclusive => 0);
+my $inclusive_set  = $event_easter_sunday->as_set(from => $easter_1917, to => $easter_1932, inclusive => 1);
 
 # Check new set integration functionality:
 
 my $non_inclusive_new_set = $event_easter_sunday->as_set(after => $easter_1901, before => $easter_1917);
-my @empty_set = $non_inclusive_set->complement($non_inclusive_new_set)->as_list();
+my @empty_set = $exclusive_set1->complement($non_inclusive_new_set)->as_list();
 is (scalar(@empty_set), 0, "Full DateTime::Set integration: Matching Sets");
 
 
-# Check the number of elements in the set
-my @ni_set = $non_inclusive_set->as_list();
-is ($#ni_set, $#non_inclusive_expect, "Non-inclusive: Correct number of results");
+# Check the number of elements in the exclusive set (implied)
+my @ni_set = $exclusive_set1->as_list();
+is ($#ni_set, $#non_inclusive_expect, "Non-inclusive (implied): Correct number of results");
 
 my $i = 0;
-my $non_inclusive_interator = $non_inclusive_set->iterator;
-while ( my $dt = $non_inclusive_interator->next ) {
+my $exclusive_iterator1 = $exclusive_set1->iterator;
+while ( my $dt = $exclusive_iterator1->next ) {
+        is( $dt->ymd,
+            $non_inclusive_expect[$i],
+            "Correct date: $non_inclusive_expect[$i]"
+        );
+        $i++;
+};
+
+
+# Check the number of elements in the exclusive set (explicit)
+@ni_set = $exclusive_set2->as_list();
+is ($#ni_set, $#non_inclusive_expect, "Non-inclusive (explicit): Correct number of results");
+
+my $i = 0;
+my $exclusive_iterator2 = $exclusive_set2->iterator;
+while ( my $dt = $exclusive_iterator2->next ) {
         is( $dt->ymd,
             $non_inclusive_expect[$i],
             "Correct date: $non_inclusive_expect[$i]"
@@ -90,8 +106,8 @@ while ( my $dt = $non_inclusive_interator->next ) {
 my @i_set = $inclusive_set->as_list();
 is ($#i_set, $#inclusive_expect, "Inclusive: Correct number of results");
 $i = 0;
-my $inclusive_interator = $inclusive_set->iterator;
-while ( my $dt = $inclusive_interator->next ) {
+my $inclusive_iterator = $inclusive_set->iterator;
+while ( my $dt = $inclusive_iterator->next ) {
         is( $dt->ymd,
             $inclusive_expect[$i],
             "Correct date: $inclusive_expect[$i]"

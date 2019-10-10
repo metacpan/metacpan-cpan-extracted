@@ -334,11 +334,9 @@ ldap_b2_interact(LDAP *ld, unsigned flags, void *def, void *inter)
     return LDAP_SUCCESS;
 }
 
-static struct timeval *
-sv2timeval(SV *data)
+static void
+sv2timeval(SV *data, struct timeval *tv)
 {
-    struct timeval *tv = NULL;
-
     if (SvPOK(data))
     { 
         /* set the NV flag if it's readable as a double */
@@ -346,13 +344,9 @@ sv2timeval(SV *data)
     }
 
     if (SvIOK(data) || SvNOK(data)) {
-        Newx(tv, 1, struct timeval);
-
         tv->tv_sec = SvIV(data);
         tv->tv_usec = ((SvNV(data) - SvIV(data))*1000000);
     }
-
-    return tv;
 }
 
 static SV *
@@ -415,7 +409,7 @@ ldap_set_option(ld,option,optdata)
     {
        void *optptr = NULL;
 
-       bool must_safefree = 0;
+       struct timeval tv;
 
        int sv_i;
 
@@ -424,8 +418,8 @@ ldap_set_option(ld,option,optdata)
 #ifdef OPENLDAP
           case LDAP_OPT_TIMEOUT:
           case LDAP_OPT_NETWORK_TIMEOUT:
-             optptr = (void *) sv2timeval(optdata);
-             must_safefree = 1;
+             sv2timeval(optdata, &tv);
+             optptr = (void *)&tv;
 
              break;
 #endif
@@ -440,11 +434,6 @@ ldap_set_option(ld,option,optdata)
        }
 
        RETVAL = ldap_set_option(ld,option,optptr);
-
-       if (must_safefree) 
-       {
-          Safefree(optptr);
-       }
     }
     OUTPUT:
     RETVAL
@@ -704,7 +693,7 @@ ldap_search_ext(ld, base, scope, filter, attrs, attrsonly, sctrls, cctrls, timeo
        char **attrs_char;
        SV **current;
        int arraylen,count;
-       struct timeval *tv_timeout = NULL;
+       struct timeval tv_timeout;
 
        if (SvTYPE(SvRV(attrs)) != SVt_PVAV)
        {
@@ -726,12 +715,11 @@ ldap_search_ext(ld, base, scope, filter, attrs, attrsonly, sctrls, cctrls, timeo
           attrs_char[arraylen+1] = NULL;
        }
 
-       tv_timeout = sv2timeval(timeout);
+       sv2timeval(timeout, &tv_timeout);
 
        RETVAL = ldap_search_ext(ld,        base,   scope,  filter,  attrs_char,
-                                attrsonly, sctrls, cctrls, tv_timeout, sizelimit,
+                                attrsonly, sctrls, cctrls, &tv_timeout, sizelimit,
                                 &msgidp);
-       Safefree(tv_timeout);
        Safefree(attrs_char);
     }
     OUTPUT:
@@ -756,7 +744,7 @@ ldap_search_ext_s(ld, base, scope, filter, attrs, attrsonly, sctrls, cctrls, tim
        char **attrs_char;
        SV **current;
        int arraylen,count;
-       struct timeval *tv_timeout = NULL;
+       struct timeval tv_timeout;
 
        if (SvTYPE(SvRV(attrs)) == SVt_PVAV)
        {
@@ -778,11 +766,10 @@ ldap_search_ext_s(ld, base, scope, filter, attrs, attrsonly, sctrls, cctrls, tim
           XSRETURN(1);
        }
 
-       tv_timeout = sv2timeval(timeout);
+       sv2timeval(timeout, &tv_timeout);
 
-       RETVAL = ldap_search_ext_s(ld,base,scope,filter,attrs_char,attrsonly,sctrls,cctrls,tv_timeout,sizelimit,&res);
+       RETVAL = ldap_search_ext_s(ld,base,scope,filter,attrs_char,attrsonly,sctrls,cctrls,&tv_timeout,sizelimit,&res);
 
-       Safefree(tv_timeout);
        Safefree(attrs_char);
     }
     OUTPUT:
@@ -903,12 +890,11 @@ ldap_result(ld, msgid, all, timeout, result)
     LDAPMessage * result = NO_INIT
     CODE:
     {
-        struct timeval *tv_timeout = NULL;
+        struct timeval tv_timeout;
 
-        tv_timeout = sv2timeval(timeout);
+        sv2timeval(timeout, &tv_timeout);
 
-        RETVAL = ldap_result(ld, msgid, all, tv_timeout, &result);
-        Safefree(tv_timeout);
+        RETVAL = ldap_result(ld, msgid, all, &tv_timeout, &result);
     }
     OUTPUT:
     RETVAL
@@ -1046,11 +1032,7 @@ ldap_get_entry_controls(ld, entry, serverctrls_ref)
 
         AV *serverctrls_av = (AV *)SvRV(serverctrls_ref);
 
-        LDAPControl **serverctrls = malloc(sizeof(LDAPControl **));
-        if( serverctrls == NULL ) {
-            croak("In ldap_parse_result(...) failed to allocate memory for serverctrls.");
-            XSRETURN(-1);
-        }
+        LDAPControl **serverctrls = NULL;
 
         RETVAL = ldap_get_entry_controls( ld, entry, &serverctrls);
 
@@ -1072,8 +1054,8 @@ ldap_parse_result(ld, msg, errorcodep, matcheddnp, errmsgp, referrals_ref, serve
     LDAP *        ld
     LDAPMessage * msg
     int           errorcodep  = NO_INIT
-    char *        matcheddnp  = NO_INIT
-    char *        errmsgp     = NO_INIT
+    SV *          matcheddnp
+    SV *          errmsgp
     SV *          referrals_ref
     SV *          serverctrls_ref
     int           freeit
@@ -1095,23 +1077,13 @@ ldap_parse_result(ld, msg, errorcodep, matcheddnp, errmsgp, referrals_ref, serve
 
         AV *serverctrls_av = (AV *)SvRV(serverctrls_ref);
         AV *referrals_av  = (AV *)SvRV(referrals_ref);
-
-        LDAPControl **serverctrls = malloc(sizeof(LDAPControl **));
-        if( serverctrls == NULL ) {
-            croak("In ldap_parse_result(...) failed to allocate memory for serverctrls.");
-            XSRETURN(-1);
-        }
-
-        char **referrals  = malloc(sizeof(char **));
-        if( referrals == NULL ) {
-            croak("In ldap_parse_result(...) failed to allocate memory for referrals.");
-            free(referrals);
-            XSRETURN(-1);
-        }
+        char *matcheddn = NULL, *errmsg = NULL;
+        LDAPControl **serverctrls = NULL;
+        char **referrals = NULL;
 
         RETVAL =
-            ldap_parse_result(ld,       msg,        &errorcodep,  &matcheddnp,
-                              &errmsgp, &referrals, &serverctrls, freeit);
+            ldap_parse_result(ld,       msg,        &errorcodep,  &matcheddn,
+                              &errmsg, &referrals, &serverctrls, freeit);
 
         // transfer returned referrals to the perl code
         if( referrals != NULL ) {
@@ -1125,6 +1097,14 @@ ldap_parse_result(ld, msg, errorcodep, matcheddnp, errmsgp, referrals_ref, serve
                 av_push(serverctrls_av, newSViv((IV)serverctrls[i]));
         }
 
+        if (matcheddn) {
+            sv_setpv(matcheddnp, matcheddn);
+            free(matcheddn);
+        }
+        if (errmsg) {
+            sv_setpv(errmsgp, errmsg);
+            free(errmsg);
+        }
         free(serverctrls);
         free(referrals);
 
@@ -1141,41 +1121,42 @@ int
 ldap_parse_extended_result(ld, msg, retoidp, retdatap, freeit)
     LDAP        * ld
     LDAPMessage * msg
-    char *        retoidp  = NO_INIT
-    char *        retdatap = NO_INIT
+    SV *          retoidp
+    SV *          retdatap
     int           freeit
     CODE:
     {
-       struct berval *retdata;
+       struct berval *retdata = NULL;
+       char *retoid;
       
-       retdata = ber_memalloc(sizeof(struct berval *));
-   
        RETVAL =
-           ldap_parse_extended_result(ld, msg, &retoidp,
+           ldap_parse_extended_result(ld, msg, &retoid,
                                       &retdata, freeit);
 
-       if (retdata != NULL)
-          retdatap = ldap_strdup(retdata->bv_val);
-
-       ber_memfree(retdata);
+       sv_setpv(retoidp, retoid);
+       if (retdata != NULL) {
+          sv_setpvn(retdatap, retdata->bv_val, retdata->bv_len);
+          ber_bvfree(retdata);
+       }
     }
     OUTPUT:
     RETVAL
     retoidp
-   retdatap
+    retdatap
    
 int
 ldap_parse_intermediate(ld, msg, retoidp, retdatap, serverctrls_ref, freeit)
     LDAP        * ld
     LDAPMessage * msg
-    char *        retoidp  = NO_INIT
-    char *        retdatap = NO_INIT
+    SV *          retoidp
+    SV *          retdatap
     SV *          serverctrls_ref
     int           freeit
     CODE:
     {
         int i;
-        struct berval *retdata;
+        struct berval *retdata = NULL;
+        char *retoid;
 
         if (SvTYPE(SvRV(serverctrls_ref)) != SVt_PVAV)
         {
@@ -1185,20 +1166,17 @@ ldap_parse_intermediate(ld, msg, retoidp, retdatap, serverctrls_ref, freeit)
 
         AV *serverctrls_av = (AV *)SvRV(serverctrls_ref);
 
-        LDAPControl **serverctrls = malloc(sizeof(LDAPControl **));
-        if( serverctrls == NULL ) {
-            croak("In ldap_parse_intermediate(...) failed to allocate memory for serverctrls.");
-            XSRETURN(-1);
-        }
-
-        retdata = malloc(sizeof(struct berval *));
+        LDAPControl **serverctrls = NULL;
 
         RETVAL =
-            ldap_parse_intermediate(ld,       msg,          &retoidp,
+            ldap_parse_intermediate(ld,       msg,          &retoid,
                                     &retdata, &serverctrls, freeit);
 
-        if( retdata != NULL )
-            retdatap = ldap_strdup(retdata->bv_val);
+        sv_setpv(retoidp, retoid);
+        if( retdata != NULL ) {
+            sv_setpvn(retdatap, retdata->bv_val, retdata->bv_len);
+            ber_bvfree(retdata);
+        }
 
         // transfer returned controls to the perl code
         if( serverctrls != NULL ) {
@@ -1207,7 +1185,7 @@ ldap_parse_intermediate(ld, msg, retoidp, retdatap, serverctrls_ref, freeit)
         }
 
         free(serverctrls);
-        free(retdata);
+        free(retoid);
 
         SvRV( serverctrls_ref ) = (SV *)serverctrls_av;
     }
@@ -1220,20 +1198,18 @@ int
 ldap_parse_whoami(ld, msg, authzid)
     LDAP        * ld
     LDAPMessage * msg
-    char *        authzid = NO_INIT
+    SV *          authzid
     CODE:
     {
-      struct berval *retdata;
+        struct berval *retdata = NULL;
       
-        retdata = ber_memalloc(sizeof(struct berval *));
-   
         RETVAL =
             ldap_parse_whoami(ld, msg, &retdata);
 
-      if (retdata != NULL)
-         authzid = ldap_strdup(retdata->bv_val);
-
-      ber_memfree(retdata);
+        if (retdata != NULL) {
+            sv_setpvn(authzid, retdata->bv_val, retdata->bv_len);
+            ber_bvfree(retdata);
+        }
     }
     OUTPUT:
     RETVAL
@@ -1676,12 +1652,11 @@ ldap_url_search_st(ld,url,attrsonly,timeout,result)
     LDAPMessage *   result = NO_INIT
     CODE:
     {
-       struct timeval *tv_timeout = NULL;
+       struct timeval tv_timeout;
 
-       tv_timeout = sv2timeval(timeout);
+       sv2timeval(timeout, &tv_timeout);
 
-       RETVAL = ldap_url_search_st(ld,url,attrsonly,tv_timeout,&result);
-       Safefree(tv_timeout);
+       RETVAL = ldap_url_search_st(ld,url,attrsonly,&tv_timeout,&result);
     }
     OUTPUT:
     RETVAL

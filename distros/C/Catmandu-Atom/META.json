@@ -4,23 +4,23 @@
       "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.023, Dist::Milla version v1.0.5, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Catmandu-Atom",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -36,13 +36,16 @@
       },
       "develop" : {
          "requires" : {
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
-            "Catmandu" : "0.9206",
+            "Catmandu" : "1.2001",
+            "Moo" : "0",
             "XML::Atom" : "0.41",
+            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -67,11 +70,14 @@
          "web" : "https://github.com/LibreCat/Catmandu-Atom"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <nicolas.franck@ugent.be>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "vpeil <vitali.peil@uni-bielefeld.de>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

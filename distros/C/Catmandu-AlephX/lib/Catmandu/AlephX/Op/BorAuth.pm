@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has z303 => (
@@ -36,7 +38,7 @@ has z305 => (
   }
 );
 
-sub op { 'bor-auth' } 
+sub op { 'bor-auth' }
 
 sub parse {
   my($class,$str_ref) = @_;
@@ -49,15 +51,15 @@ sub parse {
   for my $key(@keys){
     my($l) = $xpath->find("/$op/$key")->get_nodelist();
     my $data = $l ? get_children($l,1) : {};
-    $args{$key} = $data;    
-  }  
+    $args{$key} = $data;
+  }
 
   __PACKAGE__->new(
     %args,
     session_id => $xpath->findvalue("/$op/session-id"),
     errors => $class->parse_errors($xpath),
     content_ref => $str_ref
-  ); 
+  );
 
 }
 

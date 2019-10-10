@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '5.7.0';
+our $VERSION = '5.8.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -209,6 +209,15 @@ sub new {
     return $self;
 }
 
+=item $conn->set_identity($identity, $flags=0)
+
+Change the identity that is used for access control over the
+connection. Normally the remote daemon will use the identity
+associated with the UNIX domain socket that the app opens.
+Only a privileged client is usually able to override this.
+The C<$identity> should be a hash reference whose keys are
+one of the IDENTITY constants. The C<$flags> parameter is
+currently unused, and defaults to 0 if omitted.
 
 =item my $st = $conn->new_stream($flags)
 
@@ -2016,6 +2025,50 @@ RFC 1766 language code
 =item Sys::Virt::CRED_EXTERNAL
 
 Externally provided credential
+
+=back
+
+=head2 IDENTITY CONSTANTS
+
+The following constants are useful to change the connection identity
+
+=over 4
+
+=item Sys::Virt::IDENTITY_USER_NAME
+
+The process user name
+
+=item Sys::Virt::IDENTITY_UNIX_USER_ID
+
+The process UNIX user ID
+
+=item Sys::Virt::IDENTITY_GROUP_NAME
+
+The process group name
+
+=item Sys::Virt::IDENTITY_UNIX_GROUP_ID
+
+The process UNIX group ID
+
+=item Sys::Virt::IDENTITY_PROCESS_ID
+
+The process ID.
+
+=item Sys::Virt::IDENTITY_PROCESS_TIME
+
+The process start time.
+
+=item Sys::Virt::IDENTITY_SASL_USER_NAME
+
+The SASL authenticated user name
+
+=item Sys::Virt::IDENTITY_X509_DISTINGUISHED_NAME
+
+The X509 certificate distinguished name for the TLS connection
+
+=item Sys::Virt::IDENTITY_SELINUX_CONTEXT
+
+The SELinux process context
 
 =back
 

@@ -107,11 +107,11 @@ and the separate application program:  youtube-dl.
 
 Accepts a brighteon.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Brighteon video or no streams are found.  
-The URL can be the full URL, 
-ie. https://www.brighteon.com/I<video-id>, or just I<video-id>
+The URL can be the full URL, ie. https://www.brighteon.com/B<video-id>, 
+or just I<video-id>.
 
-The optional I<keep> can be either a comma-separated string or an array reference 
-([...]) of stream types to keep (include) and returned in order specified 
+The optional I<keep> argument can be either a comma-separated string or an array 
+reference ([...]) of stream types to keep (include) and returned in order specified 
 (type1, type2...).  Each "type" can be one of:  extension (ie. m4a, mp4, etc.), 
 "playlist", "stream", or ("any" or "all").
 
@@ -122,12 +122,13 @@ control order of search.
 
 NOTE:  I<keep> is ignored if I<youtube> is set to "only".
 
-The optional I<youtube> can be set to "yes" - also include streams youtube-dl finds, 
-"no" - only include streams embedded in the video's brighteon.com page, or 
-"only" - only include streams youtube-dl finds.  Default is "yes".  This is needed 
-because currently the streams on the page: (mpd plays best but is unseekable, and 
-the m3u8 stream doesn't seem to work well).  youtube-dl also returns a "chunky" m3u8 
-stream that is seekable and seems to work ok.
+The optional I<youtube> argument can be set to "yes" - also include streams 
+youtube-dl finds, "no" - only include streams embedded in the video's 
+brighteon.com page, or "only" - only include streams youtube-dl finds.  Default 
+is B<"yes">.  This is needed because currently the streams on the page: (mpd plays 
+best but is unseekable, and the m3u8 (HLS) stream doesn't seem to work well).  
+youtube-dl also returns a "chunky" m3u8 (HLS) stream that is seekable and seems 
+to work ok.
 
 =item $video->B<get>()
 
@@ -202,8 +203,8 @@ Blank lines and lines starting with a "#" sign are ignored.
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
-Among options valid for Brighteon streams is the I<-keep> option 
-described in the B<new()> function.
+Among options valid for Brighteon streams is the I<-keep> and 
+I<-youtube> options described in the B<new()> function.
 
 =item ~/.config/StreamFinder/config
 
@@ -420,6 +421,7 @@ sub new
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 		}
 	}
+	$html =~ s/\\\"/\&quot\;/gs;
 	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
 		my $videotag = $1;
 		my $streams = '';
@@ -538,14 +540,12 @@ RETRYIT:
 		}
 			
 		$self->{'cnt'} = scalar @{$self->{'streams'}};
-		$self->{'cnt'} = scalar @{$self->{'streams'}};
 		unless ($try || $self->{'cnt'} > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 			$try++;
 			$self->{'description'} = $prevDescription;
 			$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
 			goto RETRYIT  if ($1);
 		}
-		$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 		print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 		print STDERR "--SUCCESS: stream url=".$self->{'Url'}."=\n"  if ($DEBUG);
 	}
@@ -560,6 +560,7 @@ RETRYIT:
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
+	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!

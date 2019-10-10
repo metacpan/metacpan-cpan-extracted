@@ -16,6 +16,7 @@ BEGIN {
   our $before_constant_glob = 1;
   use constant before_constant_inflate => 1;
   use constant before_constant_list_inflate => (4, 5);
+  use constant before_constant_deflate => 1;
 
   # subs stored directly in the stash are meant to be supported in perl 5.22+,
   # but until 5.26.1 they have a risk of segfaulting.  perl itself won't ever
@@ -48,6 +49,8 @@ BEGIN {
     \&after_constant_inflate,
     \&after_constant_list_inflate,
   ) {}
+
+  my $deflated = before_constant_deflate;
 
   bless \&before_sub_blessed;
   bless \&after_sub_blessed;

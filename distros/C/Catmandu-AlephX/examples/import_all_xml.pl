@@ -11,7 +11,7 @@ use open qw(:std :utf8);
 my $exporter = Catmandu::Exporter::MARC->new(type => "XML");
 
 Catmandu::Importer::AlephX->new(
-  url => 'http://aleph.ugent.be/X',
+  url => 'http://borges1.ugent.be/X',
   base => 'usm01',
   include_items => 0
 )->each(sub{

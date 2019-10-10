@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Encode" => "1.50",
     "Exporter" => 0,
     "Filter::Simple" => 0,
-    "List::Util" => 0,
     "Math::Complex" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0
@@ -33,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.004",
+  "VERSION" => "1.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +47,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "Filter::Simple" => 0,
-  "List::Util" => 0,
   "Math::Complex" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,

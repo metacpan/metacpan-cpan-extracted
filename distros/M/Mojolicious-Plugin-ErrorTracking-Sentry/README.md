@@ -1,6 +1,6 @@
 # NAME
 
-Mojolicious::Plugin::ErrorTracking::Sentry - error traking plugin for Mojolicious with Sentry
+Mojolicious::Plugin::ErrorTracking::Sentry - error tracking plugin for Mojolicious with Sentry
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ Mojolicious::Plugin::ErrorTracking::Sentry - error traking plugin for Mojoliciou
 
 # DESCRIPTION
 
-Mojolicious::Plugin::ErrorTracking::Sentry is a Mojolicious plugin to send error report at Sentry.
+Mojolicious::Plugin::ErrorTracking::Sentry is a Mojolicious plugin to send error reports to Sentry.
 
 # CONFIG
 
@@ -51,15 +51,17 @@ You can pass custom error context. For example
 
 - [Sentry::Raven](https://metacpan.org/pod/Sentry::Raven)
 
-    This plugin use Sentry::Raven.
+    This plugin uses Sentry::Raven.
 
-# LICENSE
+# AUTHORS
 
-Copyright (C) Akira Osada.
+Akira Osada <osd.akira@gmail.com>
+
+Andrew Pam <apam@infoxchange.org>
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2017, 2019 Akira Osada and Andrew Pam
 
 Released under the MIT license
 http://opensource.org/licenses/mit-license.php
-
-# AUTHOR
-
-Akira Osada <osd.akira@gmail.com>

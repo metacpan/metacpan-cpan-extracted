@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -41,18 +41,9 @@
       },
       "test" : {
          "requires" : {
-            "Geo::Coder::CA" : "0",
-            "Geo::Coder::GeocodeFarm" : "0",
-            "Geo::Coder::OSM" : "0",
-            "Geo::Coder::Ovi" : "0",
-            "Geo::Coder::Postcodes" : "0",
-            "LWP::UserAgent::Throttled" : "0.04",
-            "Test::Carp" : "0",
             "Test::Deep" : "0",
-            "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Number::Delta" : "0"
+            "Test::NoWarnings" : "0"
          }
       }
    },
@@ -68,6 +59,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.25",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

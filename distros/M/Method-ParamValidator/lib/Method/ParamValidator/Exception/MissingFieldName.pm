@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception::MissingFieldName;
 
-$Method::ParamValidator::Exception::MissingFieldName::VERSION   = '0.15';
+$Method::ParamValidator::Exception::MissingFieldName::VERSION   = '0.16';
 $Method::ParamValidator::Exception::MissingFieldName::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception::MissingFieldName - Handles 'missing field nam
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

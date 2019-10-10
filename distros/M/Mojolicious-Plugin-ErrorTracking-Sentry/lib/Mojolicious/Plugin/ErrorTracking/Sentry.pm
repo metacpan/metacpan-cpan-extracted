@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.0';
 
 use Mojo::Base 'Mojolicious::Plugin';
 
@@ -13,65 +13,79 @@ use Devel::StackTrace;
 use Sentry::Raven;
 
 sub register {
-    my ($self, $app, $conf) = @_;
-    my $raven = Sentry::Raven->new(
-        sentry_dsn => $conf->{sentry_dsn},
-        timeout => $conf->{timeout},
-    );
+	my ( $self, $app, $conf ) = @_;
+	my $raven = Sentry::Raven->new(
+		environment => $conf->{environment},
+		release     => $conf->{release},
+		sentry_dsn  => $conf->{sentry_dsn},
+		timeout     => $conf->{timeout},
+	);
 
-    $app->hook(
-        around_dispatch => sub {
-            my ($next, $c) = @_;
+	$app->helper(
+		capture_message => sub {
+			my ( $self, $data, %p ) = @_;
 
-            my $stacktrace;
-            eval {
-                local $SIG{__DIE__} = sub { $stacktrace = Devel::StackTrace->new(skip_frames => 1) };
-                $next->();
-                1;
-            };
+			$p{level} ||= 'info';
+			my $stacktrace = Devel::StackTrace->new( skip_frames => 2 );
+			my $context = _make_context( $raven, $self->req, $stacktrace, \%p );
+			my $event_id = $raven->capture_message( $data, %$context );
+			if ( !defined($event_id) ) {
+				die "failed to submit event to sentry service:\n"
+					. dump( $raven->_construct_message_event( $data, %$context ) );
+			}
+		}
+	);
 
-            my $eval_error = $EVAL_ERROR;
-            if ($eval_error) {
-                my $message = $eval_error;
-                chomp($message);
+	$app->hook(
+		around_dispatch => sub {
+			my ( $next, $c ) = @_;
 
-                my $custom_context = _build_custom_context($conf, $c);
-                my $context = _make_context($raven, $message, $stacktrace, $custom_context);
+			my $stacktrace;
+			return if eval {
+				local $SIG{__DIE__} = sub { $stacktrace = Devel::StackTrace->new( skip_frames => 1 ) };
+				$next->();
+				1;
+			};
 
-                my $event_id = $raven->capture_message($message, %$context);
-                if (!defined($event_id)) {
-                    die "failed to submit event to sentry service:\n"
-                        . CORE::dump($raven->_construct_message_event($message, %$context));
-                }
+			my $message = my $eval_error = $EVAL_ERROR;
+			chomp($message);
 
-                # Raise error for Mojolicious
-                return ref $eval_error ? CORE::die($eval_error) : Mojo::Exception->throw($eval_error);
-            }
-        }
-    );
-}
+			my $custom_context = _build_custom_context( $conf, $c );
+			my $context = _make_context( $raven, $c->req, $stacktrace, $custom_context );
+			my %exception_context = ( type => ( ref $eval_error ) || 'Mojo::Exception' );
+			my $event_id = $raven->capture_exception( $message, %exception_context, %$context );
+			if ( !defined($event_id) ) {
+				die "failed to submit event to sentry service:\n"
+					. dump( $raven->_construct_exception_event( $message, %exception_context, %$context ) );
+			}
+
+			# Raise error for Mojolicious
+			return ref $eval_error ? CORE::die($eval_error) : Mojo::Exception->throw($eval_error);
+		}
+	);
+
+	return 1;
+} ## end sub register
 
 sub _build_custom_context {
-    my ($conf, $c) = @_;
-    return $conf->{on_error}->($c) if ($conf->{on_error} && ref($conf->{on_error}) eq 'CODE');
-    return {};
+	my ( $conf, $c ) = @_;
+	return $conf->{on_error}->($c) if ( $conf->{on_error} && ref( $conf->{on_error} ) eq 'CODE' );
+	return {};
 }
 
 sub _make_context {
-    my ($raven, $message, $stacktrace, $custom_context) = @_;
-    my %stacktrace_context
-        = $stacktrace
-        ? $raven->stacktrace_context($raven->_get_frames_from_devel_stacktrace($stacktrace))
-        : ();
+	my ( $raven, $req, $stacktrace, $custom_context ) = @_;
+	my %request_context = $raven->request_context(
+		$req->url->to_string,
+		method  => $req->method,
+		data    => $req->params->to_hash,
+		headers => { map { $_ => ~~ $req->headers->header($_) } @{ $req->headers->names } },
+	);
+	my %stacktrace_context
+		= $stacktrace ? $raven->stacktrace_context( $raven->_get_frames_from_devel_stacktrace($stacktrace) ) : ();
 
-    my $context = {
-        culprit => $PROGRAM_NAME,
-        %$custom_context,
-        $raven->exception_context($message),
-        %stacktrace_context,
-    };
-    return $context;
-}
+	return { culprit => $PROGRAM_NAME, %$custom_context, %request_context, %stacktrace_context, };
+} ## end sub _make_context
 
 1;
 __END__
@@ -80,7 +94,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::ErrorTracking::Sentry - error traking plugin for Mojolicious with Sentry
+Mojolicious::Plugin::ErrorTracking::Sentry - error tracking plugin for Mojolicious with Sentry
 
 =head1 SYNOPSIS
 
@@ -104,7 +118,7 @@ Mojolicious::Plugin::ErrorTracking::Sentry - error traking plugin for Mojoliciou
 
 =head1 DESCRIPTION
 
-Mojolicious::Plugin::ErrorTracking::Sentry is a Mojolicious plugin to send error report at Sentry.
+Mojolicious::Plugin::ErrorTracking::Sentry is a Mojolicious plugin to send error reports to Sentry.
 
 =head1 CONFIG
 
@@ -133,19 +147,21 @@ You can pass custom error context. For example
 
 =item L<Sentry::Raven>
 
-This plugin use Sentry::Raven.
+This plugin uses Sentry::Raven.
 
 =back
 
-=head1 LICENSE
+=head1 AUTHORS
 
-Copyright (C) Akira Osada.
+Akira Osada E<lt>osd.akira@gmail.comE<gt>
+
+Andrew Pam E<lt>apam@infoxchange.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2017, 2019 Akira Osada and Andrew Pam
 
 Released under the MIT license
 http://opensource.org/licenses/mit-license.php
-
-=head1 AUTHOR
-
-Akira Osada E<lt>osd.akira@gmail.comE<gt>
 
 =cut

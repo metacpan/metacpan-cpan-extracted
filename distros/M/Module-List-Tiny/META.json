@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-Module-List-Tiny"
       }
    },
-   "version" : "0.004001",
+   "version" : "0.004002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"

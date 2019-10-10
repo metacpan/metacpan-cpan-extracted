@@ -104,7 +104,7 @@ One or more streams can be returned for each station.
 Accepts a Radio.net station ID or URL and creates and returns a new station 
 object, or I<undef> if the URL is not a valid Radio.net station or no 
 streams are found.  The URL can be the full URL, 
-ie. https://www.radio.net/s/I<station-id>, or just I<station-id>.
+ie. https://www.radio.net/s/B<station-id>, or just I<station-id>.
 
 =item $station->B<get>()
 
@@ -367,6 +367,7 @@ sub new
 		}
 	}
 	$self->{'imageurl'} ||= $self->{'iconurl'};
+	$html =~ s/\\\"/\&quot\;/gs;
 	$self->{'title'} = ($html =~ m#\"og\:title\"\s+content\=\"([^\"]+)\"#s) ? $1 : '';
 	$self->{'description'} = ($html =~ m#\b(?:name\=\"twitter|property\=\"og)\:description\"\s+content\=\"([^\"]+)\"#s) ? $1 : $self->{'title'};
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});

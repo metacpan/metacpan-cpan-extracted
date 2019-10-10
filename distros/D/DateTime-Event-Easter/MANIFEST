@@ -20,5 +20,11 @@ t/10set_of_spans.t
 t/11list_of_spans_eastern.t
 t/12set_of_spans_eastern.t
 t/13extrema.t
+t/14fatal.t
+t/15infinite_set.t
+t/16comput.t
+t/17long_offset.t
+t/18y35000.t
+t/19y14400.t
 eg/rome_1944
 META.json                                Module JSON meta-data (added by MakeMaker)

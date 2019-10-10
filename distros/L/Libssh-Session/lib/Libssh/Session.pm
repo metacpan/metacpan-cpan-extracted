@@ -7,7 +7,7 @@ use Exporter qw(import);
 use XSLoader;
 use Time::HiRes;
 
-our $VERSION = '0.3';
+our $VERSION = '0.7';
 
 XSLoader::load('Libssh::Session', $VERSION);
 
@@ -16,6 +16,22 @@ use constant SSH_ERROR => -1;
 use constant SSH_AGAIN => -2;
 use constant SSH_EOF => -127;
 
+use constant SSH_KNOWN_HOSTS_ERROR => -2;
+use constant SSH_KNOWN_HOSTS_NOT_FOUND => -1;
+use constant SSH_KNOWN_HOSTS_UNKNOWN => 0;
+use constant SSH_KNOWN_HOSTS_OK => 1;
+use constant SSH_KNOWN_HOSTS_CHANGED => 2;
+use constant SSH_KNOWN_HOSTS_OTHER => 3;
+
+use constant SSH_AUTH_METHOD_UNKNOWN => 0;
+use constant SSH_AUTH_METHOD_NONE => 1;
+use constant SSH_AUTH_METHOD_PASSWORD => 2;
+use constant SSH_AUTH_METHOD_PUBLICKEY => 4;
+use constant SSH_AUTH_METHOD_HOSTBASED => 8;
+use constant SSH_AUTH_METHOD_INTERACTIVE => 16;
+use constant SSH_AUTH_METHOD_GSSAPI_MIC => 32;
+
+# Deprecated
 use constant SSH_SERVER_ERROR => -1;
 use constant SSH_SERVER_NOT_KNOWN => 0;
 use constant SSH_SERVER_KNOWN_OK => 1;
@@ -50,6 +66,8 @@ SSH_OK SSH_ERROR SSH_AGAIN SSH_EOF
 SSH_LOG_NOLOG SSH_LOG_WARNING SSH_LOG_PROTOCOL SSH_LOG_PACKET SSH_LOG_FUNCTIONS
 SSH_AUTH_ERROR SSH_AUTH_SUCCESS SSH_AUTH_DENIED SSH_AUTH_PARTIAL SSH_AUTH_INFO SSH_AUTH_AGAIN
 SSH_NO_ERROR SSH_REQUEST_DENIED SSH_FATAL SSH_EINTR
+SSH_AUTH_METHOD_UNKNOWN SSH_AUTH_METHOD_NONE SSH_AUTH_METHOD_PASSWORD SSH_AUTH_METHOD_PUBLICKEY
+SSH_AUTH_METHOD_HOSTBASED SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_METHOD_GSSAPI_MIC
 );
 our @EXPORT = qw();
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT, @EXPORT_OK ] );
@@ -66,6 +84,18 @@ sub set_err {
     if ($self->{print_error}) {
         warn $err;
     }
+}
+
+sub set_blocking {
+    my ($self, %options) = @_;
+
+    ssh_set_blocking($self->{ssh_session}, $options{blocking});
+}
+
+sub is_blocking {
+    my ($self, %options) = @_;
+
+    ssh_is_blocking($self->{ssh_session});
 }
 
 sub error {
@@ -159,13 +189,13 @@ sub option_stricthostkeycheck {
 sub option_sshdir {
     my ($self, %options) = @_;
     
-    return ssh_options_ssh_dir($self->{ssh_session}, $options{value});
+    return ssh_options_set_ssh_dir($self->{ssh_session}, $options{value});
 }
 
 sub option_knownhosts {
     my ($self, %options) = @_;
     
-    return ssh_options_knownhosts($self->{ssh_session}, $options{value});
+    return ssh_options_set_knownhosts($self->{ssh_session}, $options{value});
 }
 
 sub option_identity {
@@ -199,8 +229,9 @@ sub options {
     my ($self, %options) = @_;
 
     foreach my $key (keys %options) {
-        my $ret;
+        next if (!defined($options{$key}));
 
+        my $ret;
         my $func = $self->can("option_" . lc($key));
         if (defined($func)) {
             $ret = $func->($self, value => $options{$key});
@@ -218,11 +249,19 @@ sub options {
     return SSH_OK;
 }
 
-sub get_server_publickey {
+# Deprecated
+sub get_publickey {
     my ($self, %options) = @_;
     
     $self->{pubkey} = undef;
     return ssh_get_publickey($self->{ssh_session});
+}
+
+sub get_server_publickey {
+    my ($self, %options) = @_;
+    
+    $self->{pubkey} = undef;
+    return ssh_get_server_publickey($self->{ssh_session});
 }
 
 sub get_publickey_hash {
@@ -243,22 +282,36 @@ sub get_hexa {
     return ssh_get_hexa($options{value});
 }
 
+# Deprecated. Use is_known_server
 sub is_server_known {
     my ($self, %options) = @_;
     
     return ssh_is_server_known($self->{ssh_session});
 }
 
+sub is_known_server {
+    my ($self, %options) = @_;
+    
+    return ssh_session_is_known_server($self->{ssh_session});
+}
+
+# Deprecated. Please use update_known_hosts
 sub write_knownhost {
     my ($self, %options) = @_;
     
     return ssh_write_knownhost($self->{ssh_session});
 }
 
+sub update_known_hosts {
+    my ($self, %options) = @_;
+    
+    return ssh_session_update_known_hosts($self->{ssh_session});
+}
+
 sub verify_knownhost {
     my ($self, %options) = @_;
     
-    my $ret = $self->is_server_known();
+    my $ret = $self->is_known_server();
     
     $self->{pubkey} = $self->get_server_publickey();
     if (!defined($self->{pubkey})) {
@@ -273,20 +326,20 @@ sub verify_knownhost {
         return SSH_ERROR;
     }
         
-    if ($ret == SSH_SERVER_KNOWN_OK) {
+    if ($ret == SSH_KNOWN_HOSTS_OK) {
         return SSH_OK;
-    } elsif ($ret == SSH_SERVER_ERROR) {
+    } elsif ($ret == SSH_KNOWN_HOSTS_ERROR) {
         $self->set_err(msg => sprintf("knownhost failed: %s", ssh_get_error_from_session($self->{ssh_session})));
-    } elsif ($ret == SSH_SERVER_FILE_NOT_FOUND || $ret == SSH_SERVER_NOT_KNOWN) {
-        if ($self->write_knownhost() == SSH_OK) {
+    } elsif ($ret == SSH_KNOWN_HOSTS_NOT_FOUND || $ret == SSH_KNOWN_HOSTS_UNKNOWN) {
+        if ($self->update_known_hosts() == SSH_OK) {
             return SSH_OK;
         }
         $self->set_err(msg => sprintf("knownhost write failed: %s", get_strerror()));
-    } elsif ($ret == SSH_SERVER_KNOWN_CHANGED) {
+    } elsif ($ret == SSH_KNOWN_HOSTS_CHANGED) {
         return SSH_OK if (defined($options{SkipKeyProblem}) && $options{SkipKeyProblem});
         $self->set_err(msg => sprintf("knownhost failed: Host key for server changed: it is now: %s", 
                                       $self->get_hexa(value => $pubkey_hash)));
-    } elsif ($ret == SSH_SERVER_FOUND_OTHER) {
+    } elsif ($ret == SSH_KNOWN_HOSTS_OTHER) {
         return SSH_OK if (defined($options{SkipKeyProblem}) && $options{SkipKeyProblem});
         $self->set_err(msg => sprintf("knownhost failed: The host key for this server was not found but an other type of key exists."));
     }
@@ -318,7 +371,7 @@ sub disconnect {
     foreach my $channel_id (keys %{$self->{channels}}) {
         $self->close_channel(channel_id => $channel_id);
     }
-    if (ssh_is_connected($self->{ssh_session}) == 1) {
+    if ($self->is_connected() == 1) {
         ssh_disconnect($self->{ssh_session});
     }
     $self->{authenticated} = 0;
@@ -340,6 +393,12 @@ sub auth_gssapi {
     $self->{authenticated} = 1 if ($ret == SSH_OK);
 
     return $ret;
+}
+
+sub auth_list {
+    my ($self, %options) = @_;
+
+    return ssh_userauth_list($self->{ssh_session});
 }
 
 sub auth_password {
@@ -383,6 +442,63 @@ sub auth_none {
     return $ret;
 }
 
+sub auth_kbdint {
+    my ($self, %options) = @_;
+
+    my $ret = ssh_userauth_kbdint($self->{ssh_session});
+    if ($ret == SSH_AUTH_ERROR) {
+        $self->set_err(msg => sprintf("authentification failed: %s", ssh_get_error_from_session($self->{ssh_session})));
+    }
+    $self->{authenticated} = 1 if ($ret == SSH_OK);
+
+    return $ret;
+}
+
+sub auth_kbdint_getnprmopts {
+    my ($self, %options) = @_;
+
+    my $ret = ssh_userauth_kbdint_getnprompts($self->{ssh_session});
+    if ($ret == SSH_ERROR) {
+        $self->set_err(msg => sprintf("failed to get number of keyboard interactive prompts: %s", ssh_get_error_from_session($self->{ssh_session})));
+    }
+
+    return $ret;
+}
+
+sub auth_kbdint_getname {
+    my ($self, %options) = @_;
+
+    return ssh_userauth_kbdint_getname($self->{ssh_session});
+}
+
+sub auth_kbdint_getinstruction {
+    my ($self, %options) = @_;
+
+    return ssh_userauth_kbdint_getinstruction($self->{ssh_session});
+}
+
+sub auth_kbdint_getprompt {
+    my ($self, %options) = @_;
+
+    my $ret = ssh_userauth_kbdint_getprompt($self->{ssh_session}, $options{index});
+    if (!defined $ret) {
+        $self->set_err(msg => sprintf("failed to get a prompt from a keyboard interactive message block: %s", ssh_get_error_from_session($self->{ssh_session})));
+    }
+
+    return $ret;
+}
+
+sub auth_kbdint_setanswer {
+    my ($self, %options) = @_;
+
+    my $ret = ssh_userauth_kbdint_setanswer($self->{ssh_session}, $options{index}, $options{answer});
+    if ($ret < 0) {
+        $self->set_err(msg => sprintf("failed to set an answer for a question from a keyboard interactive message block: %s", ssh_get_error_from_session($self->{ssh_session})));
+    }
+
+    return $ret;
+}
+
 sub get_fd {
     my ($self, %options) = @_;
     
@@ -411,7 +527,7 @@ sub add_command_internal {
         $options{timeout} : 300;
     my $timeout_nodata = (defined($options{timeout_nodata}) && int($options{timeout_nodata}) > 0) ? 
         $options{timeout_nodata} : 120;
-    
+
     my $channel_id = $self->open_channel();
     if ($channel_id !~ /^\d+\:\d+$/) {
         if (defined($options{command}->{callback})) {
@@ -428,7 +544,7 @@ sub add_command_internal {
     $self->{slots}->{$channel_id}->{stdout} = '';
     $self->{slots}->{$channel_id}->{stderr} = '';
     $self->{slots}->{$channel_id}->{read} = 0;
-    
+
     $self->channel_request_exec(channel => ${$self->{channels}->{$channel_id}},
                                 cmd => $options{command}->{cmd});
     if (defined($options{command}->{input_data})) {
@@ -445,6 +561,13 @@ sub add_command_internal {
         # Force to finish it
         $self->channel_send_eof(channel => ${$self->{channels}->{$channel_id}});
     }
+    return $channel_id;
+}
+
+sub channel_get_exit_status {
+    my ($self, %options) = @_;
+
+    return ssh_channel_get_exit_status($options{channel});
 }
 
 sub execute_read_channel {
@@ -474,7 +597,7 @@ sub execute_read_channel {
     }
     
     if (ssh_channel_is_eof($channel) != 0) {
-        $self->{slots}->{$channel_id}->{exit_code} = ssh_channel_get_exit_status($channel);
+        $self->{slots}->{$channel_id}->{exit_code} = $self->channel_get_exit_status(channel => $channel);
         $self->close_channel(channel_id => $channel_id);
         
         my %callback_options = (
@@ -502,7 +625,6 @@ sub execute_internal {
         $options{parallel} : 4;
     
     $self->{slots} = {};
-    $self->{channels_array} = [];
     while (1) {
         while (scalar(keys %{$self->{slots}}) < $parallel && scalar(@{$self->{commands}}) > 0) {
             $self->add_command_internal(command => shift(@{$self->{commands}}), %options);
@@ -510,14 +632,14 @@ sub execute_internal {
         
         last if (scalar(keys %{$self->{slots}}) == 0);
         
-        my @chanels_array = ();
+        my @channels_array = ();
         foreach (keys %{$self->{slots}}) {
             $self->{slots}->{$_}->{read} = 0;
-            push @chanels_array, ${$self->{channels}->{$_}};
+            push @channels_array, ${$self->{channels}->{$_}};
         }
         
         my $now = Time::HiRes::time();
-        my $ret = ssh_channel_select_read(\@chanels_array, 5);
+        my $ret = ssh_channel_select_read(\@channels_array, 5);
         if ($ret->{code} == SSH_OK) {
             foreach (@{$ret->{channel_ids}}) {
                 my ($session_id, $channel_id) = split /\./;
@@ -605,7 +727,7 @@ sub get_channel {
         return undef;
     }
     
-    return $self->{channels}->{$options{channel_id}};
+    return ${$self->{channels}->{$options{channel_id}}};
 }
 
 sub close_channel {
@@ -682,6 +804,12 @@ sub channel_is_closed {
     my ($self, %options) = @_;
     
     return ssh_channel_is_closed($options{channel});
+}
+
+sub is_connected {
+    my ($self, %options) = @_;
+    
+    return ssh_is_connected($self->{ssh_session});
 }
 
 sub DESTROY {
@@ -778,6 +906,18 @@ C<OPTIONS> are passed in a hash like fashion, using key and value pairs. Possibl
 
 B<passphrase> - passphrase for the private key (if it's needed. Otherwise don't set the option).
 
+=item auth_list ([ OPTIONS ])
+
+Tries to retrieve a list of accepted authentication methods. Returns a bitfield of the following values:
+SSH_AUTH_METHOD_UNKNOWN
+SSH_AUTH_METHOD_NONE
+SSH_AUTH_METHOD_PASSWORD
+SSH_AUTH_METHOD_PUBLICKEY
+SSH_AUTH_METHOD_HOSTBASED
+SSH_AUTH_METHOD_INTERACTIVE
+SSH_AUTH_METHOD_GSSAPI_MIC
+
+The function auth_none() must be called first before the methods are available.
 
 =item auth_password ([ OPTIONS ])
 
@@ -786,6 +926,57 @@ Try to authenticate by password. returns SSH_AUTH_SUCCESS if it succeeds.
 C<OPTIONS> are passed in a hash like fashion, using key and value pairs. Possible options are:
 
 B<password> - passphrase for the private key (if it's needed. Otherwise don't set the option).
+
+
+=item auth_kbdint ([ OPTIONS ])
+
+Try to authenticate through the "keyboard-interactive" method. Returns one of the following:
+SSH_AUTH_ERROR:   A serious error happened\n
+SSH_AUTH_DENIED:  Authentication failed : use another method\n
+SSH_AUTH_PARTIAL: You've been partially authenticated, you still
+                  have to use another method\n
+SSH_AUTH_SUCCESS: Authentication success\n
+SSH_AUTH_INFO:    The server asked some questions. Use
+                  auth_kbdint_getnprmopts() and such to retrieve
+                  and answer them.\n
+SSH_AUTH_AGAIN:   In nonblocking mode, you've got to call this again
+                  later.
+
+=item auth_kbdint_getname ([ OPTIONS ])
+
+Get the "name" of the message block. Returns undef if there isn't one or it couldn't be retrieved.
+
+=item auth_kbdint_getinstruction ([ OPTIONS ])
+
+Get the "instruction" of the message block. Returns undef if there isn't one or it couldn't be retrieved.
+
+=item auth_kbdint_getnprmopts ([ OPTIONS ])
+
+Get the number of authentication questions given by the server. This function can be used once you've called auth_kbdint() and the server responded with SSH_AUTH_INFO.
+
+=item auth_kbdint_getprompt ([ OPTIONS ])
+
+Get a prompt from a message block. This function can be used once you've called auth_kbdint() and the server responded with SSH_AUTH_INFO to retrieve one of the authentication questions. The total number of quesitons can be retrieved with auth_kbdint_getnprmopts(). Returns a reference to a hash table.
+
+C<OPTIONS> are passed in a hash like fashion, using key and value pairs. Possible options are:
+
+B<index> - The number of the prompt you want to retrieve.
+
+The hash table returned has the following attributes:
+
+B<text> - The prompt text.
+
+B<echo> - '0' or '1' bool value whether or not the user's input should be echoed back.
+
+=item auth_kbdint_setanswer ([ OPTIONS ])
+
+Set the answer to a prompt from a message block.
+
+C<OPTIONS> are passed in a hash like fashion, using key and value pairs. Possible options are:
+
+B<index> - The number of the prompt you want to give an answer to.
+
+B<answer> - The answer to the question. If reading ipnut from <STDIN> make sure to chomp() and append a "\0" character, otherwise it doesn't seem to work.
 
 
 =item auth_none ([ OPTIONS ])

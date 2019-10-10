@@ -3,7 +3,7 @@ abstract: 'Catmandu modules for working with MARC data'
 author:
   - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
 build_requires:
-  Module::Build: '0.28'
+  Module::Build: '0.4229'
   Pod::Simple::HTML: '3.23'
   Test::Deep: '0'
   Test::Exception: '0'
@@ -44,6 +44,7 @@ requires:
   MARC::Schema: '0.07'
   MARC::Spec: v2.0.3
   Memoize: '0'
+  Module::Build: '0.4229'
   Moo: '1.0'
   MooX::Singleton: '0'
   YAML::XS: '0.34'
@@ -52,7 +53,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MARC/issues
   homepage: https://github.com/LibreCat/Catmandu-MARC
   repository: https://github.com/LibreCat/Catmandu-MARC.git
-version: '1.251'
+version: '1.252'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

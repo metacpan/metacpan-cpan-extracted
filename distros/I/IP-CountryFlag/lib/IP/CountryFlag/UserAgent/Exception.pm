@@ -1,6 +1,6 @@
 package IP::CountryFlag::UserAgent::Exception;
 
-$IP::CountryFlag::UserAgent::Exception::VERSION   = '0.12';
+$IP::CountryFlag::UserAgent::Exception::VERSION   = '0.14';
 $IP::CountryFlag::UserAgent::Exception::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,12 +9,11 @@ IP::CountryFlag::UserAgent::Exception - Exception handler for the module IP::Cou
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
 use 5.006;
-use Data::Dumper;
 
 use Moo;
 use namespace::clean;

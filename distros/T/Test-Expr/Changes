@@ -54,3 +54,9 @@ Revision history for Test-Expr
 
         Greatly improved extraction of variables from tests
         (thanks, Patrick!)
+
+
+0.000010  Tue Oct  8 06:21:37 2019
+
+        Removed spurious 'use experimentals'
+        (Thanks Andreas!)

@@ -129,3 +129,10 @@ Note on version conventions:
         - Allow building a list of spans or a set of spans
         - Documentation fixes
         - Kwalitee issues: META.yml should include a "provide" entry and a "resource" entry
+
+1.07 Thu 2019-10-10
+        - Fixed POD issues and improve code formatting.
+        - Improve code coverage.
+        - Allow building an infinite (i.e. unbounded) set of spans.
+        - Define separate functions to obtain the computus elements: golden number, epact, sunday letter.
+	- Improve (a little bit) code speed.

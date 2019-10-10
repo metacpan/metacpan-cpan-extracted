@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'App::uricolor',
-    AUTHOR           => q{jul <kal247@gmail.com>},
+    AUTHOR           => 'jul <kaldor@cpan.org>',
     VERSION_FROM     => 'lib/App/uricolor.pm',
     ABSTRACT_FROM    => 'lib/App/uricolor.pm',
     LICENSE          => 'artistic_2',
@@ -24,6 +24,18 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-uricolor-*' },
+    META_MERGE    => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/kal247/App-uricolor.git',
+                 web  => 'https://github.com/kal247/App-uricolor',
+             },
+             bugtracker => {web => 'https://github.com/kal247/App-uricolor/issues'},
+             homepage   => 'https://github.com/kal247/App-uricolor',
+         },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

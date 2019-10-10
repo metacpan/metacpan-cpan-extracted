@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Moo;
 extends qw(Catmandu::AlephX::Metadata);
 
+our $VERSION = "1.071";
+
 #parse marcxml into Catmandu marc array
 
 sub parse {
@@ -26,8 +28,8 @@ sub parse {
     }
     #leader can also be specified in a controlfield??
     elsif($tag eq "LDR"){
-      $leader = $value; 
-      next; 
+      $leader = $value;
+      next;
     }
     push @marc,[$tag,'','','_',$value];
   }
@@ -52,7 +54,7 @@ sub parse {
 
   }
 
-  __PACKAGE__->new(type => 'oai_marc',data => { record => \@marc, _id => $_id }); 
+  __PACKAGE__->new(type => 'oai_marc',data => { record => \@marc, _id => $_id });
 }
 
 1;

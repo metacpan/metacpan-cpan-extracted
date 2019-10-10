@@ -96,7 +96,7 @@ Cebuano Philippines locale.
   Enero
   Pebrero
   Marso
-  April
+  Abril
   Mayo
   Hunyo
   Hulyo
@@ -142,7 +142,7 @@ Cebuano Philippines locale.
   Enero
   Pebrero
   Marso
-  April
+  Abril
   Mayo
   Hunyo
   Hulyo
@@ -186,10 +186,10 @@ Cebuano Philippines locale.
 
 =head3 Wide (format)
 
-  Una sa matag-tulo ka bulan
-  Ikaduha sa matag-tulo ka bulan
-  Ikatulo sa matag-tulo ka bulan
-  Ikaupat sa matag-tulo ka bulan
+  unang quarter
+  ika-2 nga quarter
+  ika-3 nga quarter
+  ika-4 nga quarter
 
 =head3 Abbreviated (format)
 
@@ -208,10 +208,10 @@ Cebuano Philippines locale.
 
 =head3 Wide (stand-alone)
 
-  Una sa matag-tulo ka bulan
-  Ikaduha sa matag-tulo ka bulan
-  Ikatulo sa matag-tulo ka bulan
-  Ikaupat sa matag-tulo ka bulan
+  unang quarter
+  ika-2 nga quarter
+  ika-3 nga quarter
+  ika-4 nga quarter
 
 =head3 Abbreviated (stand-alone)
 
@@ -471,11 +471,17 @@ Cebuano Philippines locale.
    1995-12-22T09:05:02 = Bi, Dis 22
   -0010-09-15T04:44:23 = Sa, Set 15
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-one ('semana' W 'sa' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Pebrero
-   1995-12-22T09:05:02 = week 3 of Disyembre
-  -0010-09-15T04:44:23 = week 2 of Setyembre
+   2008-02-05T18:30:30 = semana 1 sa Pebrero
+   1995-12-22T09:05:02 = semana 3 sa Disyembre
+  -0010-09-15T04:44:23 = semana 2 sa Setyembre
+
+=head3 MMMMW-count-other ('semana' W 'sa' MMMM)
+
+   2008-02-05T18:30:30 = semana 1 sa Pebrero
+   1995-12-22T09:05:02 = semana 3 sa Disyembre
+  -0010-09-15T04:44:23 = semana 2 sa Setyembre
 
 =head3 MMMMd (MMMM d)
 
@@ -593,15 +599,21 @@ Cebuano Philippines locale.
 
 =head3 yQQQQ (QQQQ y)
 
-   2008-02-05T18:30:30 = Una sa matag-tulo ka bulan 2008
-   1995-12-22T09:05:02 = Ikaupat sa matag-tulo ka bulan 1995
-  -0010-09-15T04:44:23 = Ikatulo sa matag-tulo ka bulan -10
+   2008-02-05T18:30:30 = unang quarter 2008
+   1995-12-22T09:05:02 = ika-4 nga quarter 1995
+  -0010-09-15T04:44:23 = ika-3 nga quarter -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-one ('semana' w 'sa' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = semana 6 sa 2008
+   1995-12-22T09:05:02 = semana 51 sa 1995
+  -0010-09-15T04:44:23 = semana 37 sa -10
+
+=head3 yw-count-other ('semana' w 'sa' Y)
+
+   2008-02-05T18:30:30 = semana 6 sa 2008
+   1995-12-22T09:05:02 = semana 51 sa 1995
+  -0010-09-15T04:44:23 = semana 37 sa -10
 
 
 =head2 Miscellaneous

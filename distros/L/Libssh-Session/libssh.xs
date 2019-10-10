@@ -68,7 +68,18 @@ ssh_get_fd(ssh_session session)
     CODE:
         RETVAL = ssh_get_fd(session);
     OUTPUT: RETVAL
-    
+
+NO_OUTPUT void
+ssh_set_blocking(ssh_session session, int blocking)
+    CODE:
+        ssh_set_blocking(session, blocking);
+
+int
+ssh_is_blocking(ssh_session session)
+    CODE:
+        RETVAL = ssh_is_blocking(session);
+    OUTPUT: RETVAL
+
 #
 # ssh_options_set functions
 #
@@ -132,6 +143,12 @@ ssh_options_set_log_verbosity(ssh_session session, int verbosity)
 #
 
 int
+ssh_userauth_list(ssh_session session)
+    CODE:
+        RETVAL = ssh_userauth_list(session, NULL);
+    OUTPUT: RETVAL
+
+int
 ssh_userauth_password(ssh_session session, char *password)
     CODE:
         RETVAL = ssh_userauth_password(session, NULL, password);
@@ -153,6 +170,73 @@ ssh_userauth_none(ssh_session session)
         RETVAL = ssh_userauth_none(session, NULL);
     OUTPUT: RETVAL
 
+## Keyboard-interactive auth
+
+int
+ssh_userauth_kbdint(ssh_session session)
+    CODE:
+        RETVAL = ssh_userauth_kbdint(session, NULL, NULL);
+    OUTPUT: RETVAL
+
+int
+ssh_userauth_kbdint_getnprompts(ssh_session session)
+    CODE:
+        RETVAL = ssh_userauth_kbdint_getnprompts(session);
+    OUTPUT: RETVAL
+
+SV *
+ssh_userauth_kbdint_getname(ssh_session session)
+    CODE:
+        SV *ret;
+        const char *name;
+
+        name = ssh_userauth_kbdint_getname(session);
+        ret = &PL_sv_undef;
+        if (name != NULL && strlen(name) > 0) {
+            ret = newSVpv((char *)name, strlen((char *)name));
+        }
+        RETVAL = ret;
+    OUTPUT: RETVAL
+
+SV *
+ssh_userauth_kbdint_getinstruction(ssh_session session)
+    CODE:
+        SV *ret;
+        const char *instruction;
+
+        instruction = ssh_userauth_kbdint_getinstruction(session);
+        ret = &PL_sv_undef;
+        if (instruction != NULL && strlen(instruction) > 0) {
+            ret = newSVpv((char *)instruction, strlen((char *)instruction));
+        }
+        RETVAL = ret;
+    OUTPUT: RETVAL
+
+HV *
+ssh_userauth_kbdint_getprompt(ssh_session session, unsigned int i)
+    CODE:
+        HV *hv_ret = newHV();
+        const char *prompt;
+        char echo;
+
+        prompt = ssh_userauth_kbdint_getprompt(session, i, &echo);
+        (void)hv_store(hv_ret, "text", 4, newSVpv(prompt, strlen(prompt)), 0);
+        if (echo) {
+            (void)hv_store(hv_ret, "echo", 4, newSViv(1), 0);
+        } else {
+            (void)hv_store(hv_ret, "echo", 4, newSViv(0), 0);
+        }
+        RETVAL = hv_ret;
+    OUTPUT: RETVAL
+
+int
+ssh_userauth_kbdint_setanswer(ssh_session session, unsigned int i, const char *answer)
+    CODE:
+        RETVAL = ssh_userauth_kbdint_setanswer(session, i, answer);
+    OUTPUT: RETVAL
+
+##
+
 int
 ssh_userauth_gssapi(ssh_session session)
     CODE:
@@ -168,11 +252,32 @@ ssh_get_issue_banner(ssh_session session)
 #
 
 int
+ssh_session_is_known_server(ssh_session session)
+    CODE:
+        RETVAL = ssh_session_is_known_server(session);
+    OUTPUT: RETVAL
+
+# Deprecated
+int
 ssh_is_server_known(ssh_session session)
     CODE:
         RETVAL = ssh_is_server_known(session);
     OUTPUT: RETVAL
 
+ssh_key 
+ssh_get_server_publickey(ssh_session session)
+    CODE:
+        ssh_key key;
+        int success;
+        
+        RETVAL = NULL;
+        success = ssh_get_server_publickey(session, &key);
+        if (success == SSH_OK) {
+            RETVAL = key;
+        }
+    OUTPUT: RETVAL
+
+# Deprecated
 ssh_key 
 ssh_get_publickey(ssh_session session)
     CODE:
@@ -218,6 +323,13 @@ ssh_get_hexa(unsigned char *what)
     OUTPUT: RETVAL
 
 int
+ssh_session_update_known_hosts(ssh_session session)
+    CODE:
+        RETVAL = ssh_session_update_known_hosts(session);
+    OUTPUT: RETVAL
+
+# Deprecated
+int
 ssh_write_knownhost(ssh_session session)
     CODE:
         RETVAL = ssh_write_knownhost(session);
@@ -259,6 +371,11 @@ ssh_channel_new(ssh_session session)
     CODE:
         RETVAL = ssh_channel_new(session);
     OUTPUT: RETVAL
+
+NO_OUTPUT void
+ssh_channel_set_blocking(ssh_channel channel, int blocking)
+    CODE:
+        ssh_channel_set_blocking(channel, blocking);
 
 int
 ssh_channel_open_session(ssh_channel channel)
@@ -481,6 +598,24 @@ sftp_closedir(sftp_dir dir)
         RETVAL = sftp_closedir(dir);
     OUTPUT: RETVAL
 
+int
+sftp_mkdir(sftp_session sftp, char *dir, mode_t mode)
+    CODE:
+        RETVAL = sftp_mkdir(sftp, dir, mode);
+    OUTPUT: RETVAL
+
+int
+sftp_rmdir(sftp_session sftp, char *dir)
+    CODE:
+        RETVAL = sftp_rmdir(sftp, dir);
+    OUTPUT: RETVAL
+
+int
+sftp_rename(sftp_session sftp, char *original, char *newname)
+    CODE:
+        RETVAL = sftp_rename(sftp, original, newname);
+    OUTPUT: RETVAL
+
 sftp_file
 sftp_open(sftp_session sftp, char *file, int accesstype, mode_t mode)
     CODE:
@@ -496,6 +631,12 @@ size_t
 sftp_write(sftp_file file, char *buf)
     CODE:
         RETVAL = sftp_write(file, (void *)buf, strlen(buf));
+    OUTPUT: RETVAL
+
+size_t
+sftp_write_len(sftp_file file, char *buf, int length)
+    CODE:
+        RETVAL = sftp_write(file, (void *)buf, length);
     OUTPUT: RETVAL
 
 int

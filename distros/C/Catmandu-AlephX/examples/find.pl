@@ -6,7 +6,7 @@ use Catmandu::AlephX;
 use Data::Dumper;
 use open qw(:std :utf8);
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my $find = $aleph->find(request => 'wrd=(art)',base=>'rug01');
 if($find->is_success){
@@ -16,4 +16,4 @@ if($find->is_success){
   say "session_id: ".$find->session_id;
 }else{
   say STDERR join('',@{$find->errors});
-} 
+}

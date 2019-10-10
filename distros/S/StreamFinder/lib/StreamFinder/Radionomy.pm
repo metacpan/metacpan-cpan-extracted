@@ -100,8 +100,8 @@ One or more streams can be returned for each station.
 Accepts a Radionomy.com ID or URL and creates and returns a new station object, 
 or I<undef> if the URL is not a valid Radionomy station or no streams are found.
 The URL can be the full URL, 
-ie. http://www.radionomy.com/en/radio/I<station-id>/index, 
-http://www.radionomy.com/en/radio/I<station-id>, 
+ie. http://www.radionomy.com/en/radio/B<station-id>/index, 
+http://www.radionomy.com/en/radio/B<station-id>, 
 or just I<station-id>.
 
 =item $station->B<get>()
@@ -359,17 +359,18 @@ sub new
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 	$self->{'cnt'} = 0;
+	$self->{'fccid'} = ($html =~ m#\<p class\=\"radioDesc\"\>([^\<]+)#) ? $1 : '';
+	$self->{'fccid'} = $1  if (defined($self->{'fccid'}) && $self->{'fccid'} =~ /\b([KW]\w{2,3})\b/);
+	$self->{'fccid'} = $1  if (!$self->{'fccid'} && $self->{'title'} =~ /\b([KW]\w{2,3})\b/);
 	$self->{'iconurl'} = ($html =~ m#\"og\:image\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
 	$self->{'imageurl'} = $self->{'iconurl'};
+	$html =~ s/\\\"/\&quot\;/gs;
 	$self->{'title'} = ($html =~ m#\"og\:title\"\s+content\=\"([^\"]+)\"#) ? $1 : '';
 	$self->{'description'} = ($html =~ m#\b(?:name\=\"|property\=\"og\:)description\"\s+content\=\"([^\"]+)\"#) ? $1 : $self->{'title'};
 	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'fccid'} = ($html =~ m#\<p class\=\"radioDesc\"\>([^\<]+)#) ? $1 : '';
-	$self->{'fccid'} = $1  if (defined($self->{'fccid'}) && $self->{'fccid'} =~ /\b([KW]\w{2,3})\b/);
-	$self->{'fccid'} = $1  if (!$self->{'fccid'} && $self->{'title'} =~ /\b([KW]\w{2,3})\b/);
 	print STDERR "-2: icon=".$self->{'iconurl'}."= title=".$self->{'title'}."=\n"  if ($DEBUG);
 	$url2fetch = ($html =~ m#\<a\s+class\=\"download\"\s+href\=\"([^\"]+)#) ? $1 : '';
 	print STDERR "-3: url2=$url2fetch=\n"  if ($DEBUG);

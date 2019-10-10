@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 6.1;
+our $VERSION = 7;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -58,6 +58,16 @@ file.
 
 This change to "smarter" syncing has increased stability of some of my systems using "Net::Clacks", but
 has been in use for only a limited time. You should test with your own software before upgrading.
+
+=head1 VERSION 7 UPGRADE NOTES
+
+Version 7 (and higher) of L<Net::Clacks::Server> and L<Net::Clacks::Client> implement a lot of
+bugfixes and improvements. This includes authentication timeouts, somewhat smarter automatic reconnects
+and stuff like that.
+
+While the protocol in theory is backwards compatible to version 6, it is strongly recommended that you
+upgrade ALL nodes (clients and servers) in your network at the same time. I have done only limited testing
+with backward compatibility and i would not recommending a mix&match approach on critical systems.
 
 =head1 PROTOCOL
 

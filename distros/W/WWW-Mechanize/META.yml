@@ -41,13 +41,13 @@ no_index:
 provides:
   WWW::Mechanize:
     file: lib/WWW/Mechanize.pm
-    version: '1.93'
+    version: '1.94'
   WWW::Mechanize::Image:
     file: lib/WWW/Mechanize/Image.pm
-    version: '1.93'
+    version: '1.94'
   WWW::Mechanize::Link:
     file: lib/WWW/Mechanize/Link.pm
-    version: '1.93'
+    version: '1.94'
 requires:
   Carp: '0'
   Getopt::Long: '0'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/WWW-Mechanize/issues
   homepage: https://github.com/libwww-perl/WWW-Mechanize
   repository: https://github.com/libwww-perl/WWW-Mechanize.git
-version: '1.93'
+version: '1.94'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -360,8 +360,8 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::StaticInstall
       config:
         Dist::Zilla::Plugin::StaticInstall:
-          dry_run: 1
-          mode: auto
+          dry_run: 0
+          mode: on
       name: '@Author::OALDERS/StaticInstall'
       version: '0.012'
     -
@@ -450,7 +450,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.93
+          tag: v1.94
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -635,6 +635,7 @@ x_contributors:
   - 'Jason May <jasonmay@bestpractical.com>'
   - 'Jesse Vincent <jesse@bestpractical.com>'
   - 'John Beppu <john.beppu@gmail.com>'
+  - 'Julien Fiegehenn <simbabque@cpan.org>'
   - 'Karen Etheridge <ether@cpan.org>'
   - "Kirrily 'Skud' Robert <skud@infotrope.net>"
   - 'Kivanc Yazan <kivancyazan@gmail.com>'
@@ -653,7 +654,6 @@ x_contributors:
   - 'Schuyler Langdon <schuyler@velargo.com>'
   - 'Sergey Romanov <sromanov-dev@yandex.ru>'
   - 'Shoichi Kaji <skaji@cpan.org>'
-  - 'simbabque <simbabque@cpan.org>'
   - 'Steve Scaffidi <stephen@scaffidi.net>'
   - 'Stuart Johnston <saj_git@thecommune.net>'
   - 'sunnavy <sunnavy@bestpractical.com>'
@@ -662,3 +662,4 @@ x_contributors:
   - 'Zefram <zefram@fysh.org>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

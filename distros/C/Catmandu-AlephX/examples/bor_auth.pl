@@ -6,7 +6,7 @@ use Catmandu::AlephX;
 use Data::Dumper;
 use open qw(:std :utf8);
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my %args = (
   library => "rug50",
@@ -24,4 +24,4 @@ if($auth->is_success){
 
 }else{
   say STDERR join('',@{$auth->errors});
-} 
+}

@@ -17,6 +17,9 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "package" : [
+         "Dir::Flock"
       ]
    },
    "prereqs" : {
@@ -43,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

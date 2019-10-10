@@ -6,21 +6,23 @@ use File::Basename 'basename';
 use Sys::Syslog qw(:standard :macros);
 use Carp;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new {
     my $class = shift;
     local %_ = @_;
-    my $ident = delete $_{ident} || basename($0);
-    my $facility = delete $_{facility} || LOG_USER;
-    my $level = delete $_{level} || 'debug';
-    my $logopt = delete $_{logopt} || 'ndelay,pid';
-    if (ref($logopt) eq 'ARRAY') {
-	$logopt = join(',', @$logopt);
+
+    $_{level} ||= 'debug';
+    unless ($_{parent}) {
+        my $ident = delete $_{ident} || basename($0);
+        my $facility = delete $_{facility} || LOG_USER;
+        my $logopt = delete $_{logopt} || 'ndelay,pid';
+        if (ref($logopt) eq 'ARRAY') {
+	    $logopt = join(',', @$logopt);
+        }
+        openlog($ident, $logopt, $facility);
     }
-    croak "unrecognized arguments" if keys(%_);
-    openlog($ident, $logopt, $facility);
-    return $class->SUPER::new(level => $level);
+    return $class->SUPER::new(%_);
 }
 
 sub debug { shift->_syslog(debug => LOG_DEBUG => @_) }

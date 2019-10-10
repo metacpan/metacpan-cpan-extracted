@@ -109,12 +109,16 @@ custom all-purpose media player called "fauxdacious" (his custom hacked
 version of the open-source "audacious" audio player).  "fauxdacious" 
 incorporates this module to decode and play streams.  
 
-The currently-supported websites are:  banned.video, brighteon.com, 
-iheartradio.com, podcasts.apple.com, radio.net, radionomy.com, reciva.com, 
-tunein.com, vimeo.com, and (youtube.com, et. al and other sites that 
-youtube-dl supports).  
+The currently-supported websites are:  banned.video 
+(L<StreamFinder::BannedVideo>), brighteon.com (L<StreamFinder::Brighteon>), 
+iheartradio.com (L<StreamFinder::IHeartRadio>), podcasts.apple.com 
+(L<StreamFinder::Apple>), radio.net (L<StreamFinder::RadioNet>), 
+radionomy.com (L<StreamFinder::Radionomy>), reciva.com (L<StreamFinder::Reciva>), 
+tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
+and (youtube.com, et. al and other sites that 
+youtube-dl supports) (L<StreamFinder::Youtube>).  
 
-NOTE:  Facebook (Streamfinder::Facebook) has been eliminated because 
+NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
 logging into Facebook via the call to youtube-dl is now interpreted by 
 Facebook as a "rogue app. login" and will cause them to LOCK your account 
 and FORCE you to change your password the next time you log in 
@@ -137,8 +141,9 @@ title) and an icon image URL ("iconurl" - if found).  Additional information
 that MAY be fetched is a (larger?) banner image ("imageurl"), a (longer?) 
 "description", an "artist" / author, a "genre", and a "year" (podcasts, 
 videos, etc.).  Some sites also provide station's FCC call letters 
-("fccid").  For icon and image URLs, functions exist to fetch the actual 
-binary data and mime type for downloading to local storage.  
+("fccid").  For icon and image URLs, functions exist (getIconData() 
+and getImageData() to fetch the actual binary data and mime type for 
+downloading to local storage for use by your preferred media player.  
 
 If you have another streaming site that is not supported, please file a 
 feature request via email or the CPAN bug system, or (for faster service), 
@@ -184,7 +189,8 @@ first ("best"?) stream is returned.  If I<"random"> is specified, then
 a random one is selected from the list of streams found.  
 If I<"noplaylists"> is specified, and the stream to be returned is a 
 "playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
-in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
+in the playlist is returned.  This is needed by Fauxdacious Mediaplayer 
+since Fauxdacious intentionally does not allow recursive playlists.
 
 =item $station->B<count>()
 
@@ -209,7 +215,9 @@ Returns the URL for the station's "cover art" icon image, if any.
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc. and the actual icon image (binary data), if any.  
+This makes it easy to download the image to local storage for use by 
+your preferred media player.
 
 =item $station->B<getImageURL>()
 
@@ -221,7 +229,9 @@ the "icon image" URL will be returned.
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image (binary data).
+"gif", "jpeg", etc. and the actual station's banner image 
+(binary data).  This makes it easy to download the image to 
+local storage for use by your preferred media player.
 
 NOTE:  If no "banner image" (usually a larger image) is found, 
 the "icon image" data will be returned.
@@ -251,11 +261,12 @@ and the options are loaded into a hash used by all sites
 I<-debug> => [0|1|2], and most of the L<LWP::UserAgent> options.  
 Blank lines and lines starting with a "#" sign are ignored.
 
-=item ~/.config/StreamFinder/B<submodule>/config
+=item ~/.config/StreamFinder/I<submodule>/config
 
 Optional text file for specifying various configuration options 
-for a specific site (submodule).  Each option is specified on a 
-separate line in the format below:
+for a specific site (submodule, ie. "Youtube" for 
+StreamFinder::Youtube).  Each option is specified on a separate 
+line in the format below:
 
 'option' => 'value' [,]
 
@@ -368,7 +379,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 our $DEBUG = 0;
 
 require Exporter;

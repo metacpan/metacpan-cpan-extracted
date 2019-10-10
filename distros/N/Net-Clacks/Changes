@@ -1,5 +1,75 @@
-@  changeset:   65:db93daac2a03
+@  changeset:   79:bad7fa609ea7
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Oct 09 10:21:31 2019 +0200
+|  summary:     Updated documentation in preparation for version 7 release
+|
+o  changeset:   78:4fad979fb01e
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 08 15:27:12 2019 +0200
+|  summary:     Updated POD
+|
+o  changeset:   77:d44cee91d51e
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 08 15:22:25 2019 +0200
+|  summary:     Perl::Critic
+|
+o  changeset:   76:91e7e971a13c
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 08 12:09:36 2019 +0200
+|  summary:     Prepare for release 6.3
+|
+o  changeset:   75:cbbff5e82e9e
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 08 12:06:35 2019 +0200
+|  summary:     Add a small random reconnect delay to the client
+|
+o  changeset:   74:18746767c08c
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 08 11:57:31 2019 +0200
+|  summary:     Be a bit more responsive waiting for the first client
+|
+o  changeset:   73:11b921603766
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 08 11:53:59 2019 +0200
+|  summary:     Add some timeouts and sanity checks
+|
+o  changeset:   72:f605c2ddc186
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Mon Oct 07 11:03:29 2019 +0200
+|  summary:     Update Changes file and release
+|
+o  changeset:   71:9aaed77d066d
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Mon Oct 07 11:02:07 2019 +0200
+|  summary:     Prepare release 6.2
+|
+o  changeset:   70:6895a7fdefcb
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Mon Oct 07 10:55:39 2019 +0200
+|  summary:     MANIFEST
+|
+o  changeset:   69:00b24d558d81
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Mon Oct 07 10:54:39 2019 +0200
+|  summary:     Send KEYSYNC from slave to master AFTER the server has finished its sync (=when the server notifies us with the end of lock_for_sync)
+|
+o  changeset:   68:79cea41b9dd6
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Mon Oct 07 10:38:29 2019 +0200
+|  summary:     Trying to fix a special case where a distconnect from master with multiple slaves will result in KEYSYNC loops. The most likely cause is immediate reconnect of all clients instead of one-by-one.
+|
+o  changeset:   67:5d518147d41f
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Mon Oct 07 10:03:29 2019 +0200
+|  summary:     Wait between reconnect attemmpts to interclacks master
+|
+o  changeset:   66:0c3c5cca6f3e
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Sep 18 11:45:29 2019 +0200
+|  summary:     Release 6.1
+|
+o  changeset:   65:db93daac2a03
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Sep 18 11:43:46 2019 +0200
 |  summary:     Fix substr bugs

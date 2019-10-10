@@ -1,6 +1,6 @@
 package Catmandu::Store::File::Simple::Index;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Catmandu::Sane;
 use Moo;

@@ -2,4 +2,18 @@ Revision history for Perl extension Tangle.pm and CayleyDickson.pm
 
 0.01  Fri Sept 13 01:36:09 2019
 	- original version; created based on https://en.wikipedia.org/wiki/Cayley-Dickson_construction
+0.02  Fri Oct 4 01:29:02 2019
+        - cleaned up code and spacing. Improved variable naming.
+        - improved and expanded tests including CayleyDickson module tests
+        - added pod documentation to Tangle.
+        - improvements on the CNOT gate. Uses a quaternion for initial rotation.
+        - added dimension testing: is_complex, is_quaternion, etc to CayleyDickson.pm
+        - removed the triple references from the Cayley Dickson module, where they are not used.
+        - Triple references moved into Tangle.pm, where they are used.
+        - Changed gamma variable to I_SQUARED to more easily reveal its meaning as i^2 which is usually -1.
+        - the outputs from the cnot are tied back to the inputs shared memory in a different manner.
+0.03  TBD
+        - added the 8 doubling products available. ref: http://jwbales.us/cdproducts.html
+        - compactified the gates for easy diffrentiation by eye.
+        - completed CayleyDickson pod documentation.
 

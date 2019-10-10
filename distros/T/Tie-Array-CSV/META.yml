@@ -4,13 +4,13 @@ author:
   - 'Joel Berger'
 build_requires: {}
 configure_requires:
-  Module::Build: 0.3601
+  Module::Build: '0.3601'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Tie-Array-CSV
 no_index:
   file:
@@ -18,23 +18,21 @@ no_index:
 provides:
   Tie::Array::CSV:
     file: lib/Tie/Array/CSV.pm
-    version: 0.07
+    version: '0.08'
   Tie::Array::CSV::HoldRow:
     file: lib/Tie/Array/CSV/HoldRow.pm
-    version: 0
   Tie::Array::CSV::HoldRow::Row:
     file: lib/Tie/Array/CSV/HoldRow.pm
-    version: 0
   Tie::Array::CSV::Row:
     file: lib/Tie/Array/CSV.pm
-    version: 0
 requires:
-  Scalar::Util: 0
-  Text::CSV: 0
-  Tie::File: 0
-  perl: 5.006001
+  Scalar::Util: '0'
+  Text::CSV: '0'
+  Tie::File: '0'
+  perl: '5.006001'
 resources:
   bugtracker: http://github.com/jberger/Tie-Array-CSV/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Tie-Array-CSV
-version: 0.07
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,3 +12,6 @@ exercise_join( impl => 'SQLite', file1 => "$TEMP/q7s-$$",
                file2 => "$TEMP/q7t-$$" );
 
 done_testing;
+
+unlink "$TEMP/q7s-$$", "$TEMP/q7s-$$.result";
+

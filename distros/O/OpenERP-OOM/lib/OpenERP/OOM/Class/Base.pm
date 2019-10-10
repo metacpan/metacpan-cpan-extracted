@@ -14,6 +14,23 @@ use Time::HiRes qw/usleep/;
 extends 'Moose::Object';
 with 'OpenERP::OOM::DynamicUtils';
 
+=head1 NAME
+
+OpenERP::OOM::Class::Base
+
+=head1 SYNOPSYS
+
+ my $obj = $schema->class('Name')->create(\%args);
+ 
+ foreach my $obj ($schema->class('Name')->search(@query)) {
+    ...
+ }
+
+=head1 DESCRIPTION
+
+Provides a base set of methods for OpenERP::OOM classes (search, create, etc).
+
+=cut
 
 has 'schema' => (
     is => 'ro',
@@ -41,12 +58,91 @@ sub _build_object_class {
 
 #-------------------------------------------------------------------------------
 
+=head2 search
+
+Searches OpenERP and returns a list of objects matching a given query.
+
+    my @list = $schema->class('Name')->search(
+        ['name', 'ilike', 'OpusVL'],
+        ['active', '=', 1],
+    );
+
+The query is formatted as a list of array references, each specifying a
+column name, operator, and value. The objects returned will be those where
+all of these sub-queries match.
+
+Searches can be performed against OpenERP fields, linked objects (e.g. DBIx::Class
+relationships), or a combination of both.
+
+    my @list = $schema->class('Name')->search(
+        ['active', '=', 1],
+        ['details', {status => 'value'}, {}],
+    )
+
+In this example, 'details' is a linked DBIx::Class object with a column called
+'status'.
+
+An optional 'search context' can also be provided at the end of the query list, e.g.
+
+    my @list = $schema->class('Location')->search(
+        ['usage' => '=' => 'internal'],
+        ['active' => '=' => 1],
+        {
+            active_id => $self->id,
+            active_ids => [$self->id],
+            active_model => 'product.product',
+            full => 1,
+            product_id => $self->id,
+            search_default_in_location => 1,
+            section_id => undef,
+            tz => undef,
+        }
+    );
+
+Supplying a context further restricts the search, for example to narrow down a
+'stock by location' query to 'stock of a specific product by location'.
+
+Following the search context, an arrayref of options can be given to return a
+paged set of results:
+
+    {
+        limit  => 10,    # Return max 10 results
+        offset => 20,    # Start at result 20
+    }
+
+=head2 raw_search
+
+This is the same as search but it doesn't turn the results into objects.  This 
+is useful if your search is likely to have returned fields that aren't part of
+the object.  Queries like those used by the Stock By Location report are likely
+to return stock levels as well as the location details for example.
+
+=cut
 
 sub raw_search {
     my $self = shift;
     return $self->_raw_search(0, @_);
 }
 
+=head2 search_limited_fields
+
+This is an alternative version of search that only fills in the required fields
+of the object.
+
+    # avoid pulling the whole attachement down for a search
+    my @a = $attachments->search_limited_fields([
+        qw/res_model res_name type url create_uid create_date
+            datas_fname description name res_id/
+    ], [
+        res_model => '=' => 'product.template',
+        res_id => '=' => 1,
+    ]);
+
+This allows you to avoid pulling down problem fields.  The most obvious example
+is get a list of attachments for an object, without pulling down all the data
+for the attachement.
+
+=cut 
 
 sub search_limited_fields {
     my $self = shift;
@@ -134,6 +230,13 @@ sub search
     }
 }
 
+=head2 is_not_null
+
+Returns search criteria for a not null search.  i.e. equivalend to $field is not null in SQL.
+
+    $self->search($self->is_not_null('x_department'), [ 'other_field', '=', 3 ]);
+
+=cut
 
 sub is_not_null
 {
@@ -142,9 +245,21 @@ sub is_not_null
     return [ $field, '!=', RPC::XML::boolean->new(0) ];
 }
 
+=head2 null
+
+Returns a 'null' for use in OpenERP calls and objects.  (Actually this is a False value).
+
+=cut
 
 sub null { RPC::XML::boolean->new(0) }
 
+=head2 is_null
+
+Returns search criteria for an is null search.  i.e. equivalend to $field is null in SQL.
+
+    $self->search($self->is_null('x_department'), [ 'other_field', '=', 3 ]);
+
+=cut
 
 sub is_null
 {
@@ -155,6 +270,15 @@ sub is_null
 
 #-------------------------------------------------------------------------------
 
+=head2 find
+
+Returns the first object matching a given query.
+
+ my $obj = $schema->class('Name')->find(['id', '=', 32]);
+
+Will return C<undef> if no objects matching the query are found.
+
+=cut
 
 sub find {
     my $self = shift;
@@ -169,6 +293,12 @@ sub find {
 }
 
 
+=head2 get_options
+
+This returns the options for available for a selection field.  It will croak if you
+try to give it a field that isn't an option.
+
+=cut
 
 sub get_options 
 {
@@ -184,6 +314,13 @@ sub get_options
 
 #-------------------------------------------------------------------------------
 
+=head2 retrieve
+
+Returns an object by ID.
+
+ my $obj = $schema->class('Name')->retrieve(32);
+
+=cut
 
 sub retrieve {
     my ($self, $id, @args) = @_;
@@ -256,6 +393,11 @@ sub _parse_datetime {
     return $self->_do_strptime($string, '%Y-%m-%d %H:%M:%S') // $self->_do_strptime($string, '%Y-%m-%d');
 }
 
+=head2 default_values
+
+Returns an instance of the object filled in with the default values suggested by OpenERP.
+
+=cut
 sub default_values
 {
     my $self = shift;
@@ -268,6 +410,27 @@ sub default_values
     return $self->_inflate_object($class, $object);
 }
 
+=head2 create_related_object_for_DBIC
+
+Creates a related DBIC object for an object of this class (before the object
+is created).
+
+It returns a transaction guard alongside the id so that if the corresponding
+object fails to create it can be aborted.  
+
+This can make the link up smoother as you know the id of the object to refer
+to in OpenERP before creating the OpenERP object.  It also allows for failures
+to be dealt with more reliably.
+
+     my ($id, $guard) = $self->create_related_object_for_DBIC('details', $details);
+     # Create the object
+     $object->{x_dbic_link_id} = $id;
+     $object->{default_code} = sprintf("OBJ%06d", $id);
+
+     my $prod = $self->$orig($object);
+     $guard->commit;
+
+=cut
 
 sub create_related_object_for_DBIC
 {
@@ -289,6 +452,13 @@ sub create_related_object_for_DBIC
 }
 #-------------------------------------------------------------------------------
 
+=head2 retrieve_list
+
+Takes a reference to a list of object IDs and returns a list of objects.
+
+ my @list = $schema->class('Name')->retrieve_list([32, 15, 60]);
+
+=cut
 
 sub retrieve_list {
     my $self = shift;
@@ -395,6 +565,20 @@ sub _id
     return $val;
 }
 
+=head2 create
+
+Creates a new instance of an object in OpenERP.
+
+ my $obj = $schema->class('Name')->create({
+     name   => 'OpusVL',
+     active => 1,
+ });
+
+Takes a hashref of object parameters.
+
+Returns the new object or C<undef> if it could not be created.
+
+=cut
 
 sub create {
     my ($self, $object_data, @args) = @_;
@@ -434,6 +618,15 @@ sub _with_retries
 
 #-------------------------------------------------------------------------------
 
+=head2 execute
+
+Performs an execute in OpenERP on the class level.  
+
+    $c->model('OpenERP')->class('Invoice')->execute('build_invoice', $args);
+
+Please look at L<OpenERP::OOM::Object::Base> for more information on C<execute>
+
+=cut
 
 sub execute {
     my $self   = shift;
@@ -451,209 +644,3 @@ sub execute {
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpenERP::OOM::Class::Base
-
-=head1 VERSION
-
-version 0.46
-
-=head1 DESCRIPTION
-
-Provides a base set of methods for OpenERP::OOM classes (search, create, etc).
-
-=head2 search
-
-Searches OpenERP and returns a list of objects matching a given query.
-
-    my @list = $schema->class('Name')->search(
-        ['name', 'ilike', 'OpusVL'],
-        ['active', '=', 1],
-    );
-
-The query is formatted as a list of array references, each specifying a
-column name, operator, and value. The objects returned will be those where
-all of these sub-queries match.
-
-Searches can be performed against OpenERP fields, linked objects (e.g. DBIx::Class
-relationships), or a combination of both.
-
-    my @list = $schema->class('Name')->search(
-        ['active', '=', 1],
-        ['details', {status => 'value'}, {}],
-    )
-
-In this example, 'details' is a linked DBIx::Class object with a column called
-'status'.
-
-An optional 'search context' can also be provided at the end of the query list, e.g.
-
-    my @list = $schema->class('Location')->search(
-        ['usage' => '=' => 'internal'],
-        ['active' => '=' => 1],
-        {
-            active_id => $self->id,
-            active_ids => [$self->id],
-            active_model => 'product.product',
-            full => 1,
-            product_id => $self->id,
-            search_default_in_location => 1,
-            section_id => undef,
-            tz => undef,
-        }
-    );
-
-Supplying a context further restricts the search, for example to narrow down a
-'stock by location' query to 'stock of a specific product by location'.
-
-Following the search context, an arrayref of options can be given to return a
-paged set of results:
-
-    {
-        limit  => 10,    # Return max 10 results
-        offset => 20,    # Start at result 20
-    }
-
-=head2 raw_search
-
-This is the same as search but it doesn't turn the results into objects.  This 
-is useful if your search is likely to have returned fields that aren't part of
-the object.  Queries like those used by the Stock By Location report are likely
-to return stock levels as well as the location details for example.
-
-=head2 search_limited_fields
-
-This is an alternative version of search that only fills in the required fields
-of the object.
-
-    # avoid pulling the whole attachement down for a search
-    my @a = $attachments->search_limited_fields([
-        qw/res_model res_name type url create_uid create_date
-            datas_fname description name res_id/
-    ], [
-        res_model => '=' => 'product.template',
-        res_id => '=' => 1,
-    ]);
-
-This allows you to avoid pulling down problem fields.  The most obvious example
-is get a list of attachments for an object, without pulling down all the data
-for the attachement.
-
-=head2 is_not_null
-
-Returns search criteria for a not null search.  i.e. equivalend to $field is not null in SQL.
-
-    $self->search($self->is_not_null('x_department'), [ 'other_field', '=', 3 ]);
-
-=head2 null
-
-Returns a 'null' for use in OpenERP calls and objects.  (Actually this is a False value).
-
-=head2 is_null
-
-Returns search criteria for an is null search.  i.e. equivalend to $field is null in SQL.
-
-    $self->search($self->is_null('x_department'), [ 'other_field', '=', 3 ]);
-
-=head2 find
-
-Returns the first object matching a given query.
-
- my $obj = $schema->class('Name')->find(['id', '=', 32]);
-
-Will return C<undef> if no objects matching the query are found.
-
-=head2 get_options
-
-This returns the options for available for a selection field.  It will croak if you
-try to give it a field that isn't an option.
-
-=head2 retrieve
-
-Returns an object by ID.
-
- my $obj = $schema->class('Name')->retrieve(32);
-
-=head2 default_values
-
-Returns an instance of the object filled in with the default values suggested by OpenERP.
-
-=head2 create_related_object_for_DBIC
-
-Creates a related DBIC object for an object of this class (before the object
-is created).
-
-It returns a transaction guard alongside the id so that if the corresponding
-object fails to create it can be aborted.  
-
-This can make the link up smoother as you know the id of the object to refer
-to in OpenERP before creating the OpenERP object.  It also allows for failures
-to be dealt with more reliably.
-
-     my ($id, $guard) = $self->create_related_object_for_DBIC('details', $details);
-     # Create the object
-     $object->{x_dbic_link_id} = $id;
-     $object->{default_code} = sprintf("OBJ%06d", $id);
-
-     my $prod = $self->$orig($object);
-     $guard->commit;
-
-=head2 retrieve_list
-
-Takes a reference to a list of object IDs and returns a list of objects.
-
- my @list = $schema->class('Name')->retrieve_list([32, 15, 60]);
-
-=head2 create
-
-Creates a new instance of an object in OpenERP.
-
- my $obj = $schema->class('Name')->create({
-     name   => 'OpusVL',
-     active => 1,
- });
-
-Takes a hashref of object parameters.
-
-Returns the new object or C<undef> if it could not be created.
-
-=head2 execute
-
-Performs an execute in OpenERP on the class level.  
-
-    $c->model('OpenERP')->class('Invoice')->execute('build_invoice', $args);
-
-Please look at L<OpenERP::OOM::Object::Base> for more information on C<execute>
-
-=head1 NAME
-
-OpenERP::OOM::Class::Base
-
-=head1 SYNOPSYS
-
- my $obj = $schema->class('Name')->create(\%args);
- 
- foreach my $obj ($schema->class('Name')->search(@query)) {
-    ...
- }
-
-=head1 AUTHOR
-
-Jon Allen (JJ), <jj@opusvl.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011-2016 by OpusVL.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

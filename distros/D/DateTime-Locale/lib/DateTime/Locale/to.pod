@@ -477,11 +477,11 @@ Tongan locale.
    1995-12-22T09:05:02 = Fal 22 Tīsema
   -0010-09-15T04:44:23 = Tok 15 Sepitema
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-other ('uike' 'hono' W ʻ'o' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Fēpueli
-   1995-12-22T09:05:02 = week 3 of Tīsema
-  -0010-09-15T04:44:23 = week 2 of Sepitema
+   2008-02-05T18:30:30 = uike hono 1 ʻo Fēpueli
+   1995-12-22T09:05:02 = uike hono 3 ʻo Tīsema
+  -0010-09-15T04:44:23 = uike hono 2 ʻo Sepitema
 
 =head3 MMMMd (d MMMM)
 
@@ -609,11 +609,11 @@ Tongan locale.
    1995-12-22T09:05:02 = 1995 kuata fā
   -0010-09-15T04:44:23 = -10 kuata tolu
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-other ('uike' 'hono' w ʻ'o' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = uike hono 6 ʻo 2008
+   1995-12-22T09:05:02 = uike hono 51 ʻo 1995
+  -0010-09-15T04:44:23 = uike hono 37 ʻo -10
 
 
 =head2 Miscellaneous

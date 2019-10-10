@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace surface.
 
@@ -77,7 +77,7 @@ Chart::Plotly::Trace::Surface::Lighting - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 

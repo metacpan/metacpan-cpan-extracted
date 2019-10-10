@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.83  Tue Oct 10 21:48:00 2019
+       Addded proxy host parameter.
+
 0.82  Mon Sep  4 21:15:00 2019
        Fixes for HAR (HTTP Archive) files.
        Added experimental support for adding CAs using certutil.

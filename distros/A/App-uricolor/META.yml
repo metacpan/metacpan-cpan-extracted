@@ -1,7 +1,7 @@
 ---
 abstract: 'Colorize URIs with ANSI colors.'
 author:
-  - 'jul <kal247@gmail.com>'
+  - 'jul <kaldor@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
@@ -23,5 +23,9 @@ requires:
   URI::Find: '0'
   URI::Find::Schemeless: '0'
   perl: '5.010'
-version: '0.14'
+resources:
+  bugtracker: https://github.com/kal247/App-uricolor/issues
+  homepage: https://github.com/kal247/App-uricolor
+  repository: https://github.com/kal247/App-uricolor.git
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

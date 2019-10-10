@@ -1,6 +1,7 @@
 ---
 abstract: 'Perl interface to the cairo 2d vector graphics library'
 author:
+  - unknown
   - 'Cairo Perl Team <gtk-perl-list at gnome dot org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
@@ -9,8 +10,8 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   ExtUtils::PkgConfig: '1'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
-license: lgpl
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -30,4 +31,5 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://www.gnu.org/licenses/lgpl-2.1.html
   repository: git://git.gnome.org/perl-Cairo
-version: '1.106'
+version: '1.107'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

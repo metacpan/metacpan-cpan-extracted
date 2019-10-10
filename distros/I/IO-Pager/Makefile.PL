@@ -21,16 +21,15 @@ WriteMakefile(
        'PerlIO'         => 0,
        'SelectSaver'    => 0,
        'Symbol'         => 0,
-       'Tie::Handle'    => 0,
-       #Since Term::Pager is unmodern
        'Term::ReadKey'  => 0,
+       'Text::Wrap'     => 0,
+       'Tie::Handle'    => 0,
     },
     META_MERGE => {
 		   "meta-spec" => { version => 2 },
 		    runtime => {
 				recommends => {
 #				    #Since Term::Pager is unmodern
-#					       'Term::Pager' => 1.5,
 #					       'Term::ReadKey' => 0,
 					      },
 			       },

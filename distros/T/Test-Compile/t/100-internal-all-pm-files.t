@@ -21,7 +21,7 @@ like($files[0],qr/t.scripts.LethalImport.pm/,'Found module: Module2.pm');
 like($files[1],qr/t.scripts.Module.pm/,'Found module: Module.pm');
 like($files[2],qr/t.scripts.Module2.pm/,'Found module: Module2.pm');
 
-# Try specifying som files rather than directories
+# Try specifying some files rather than directories
 my @search = ('t/scripts/failure.pl', 't/scripts/Module.pm');
 
 @files = sort $internal->all_pm_files($search[0]);

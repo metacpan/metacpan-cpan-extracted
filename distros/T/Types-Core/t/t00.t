@@ -56,6 +56,7 @@ ok( ! (EhV($h, undef)), "EhV testing undef keyname(isfalse)");
 
 ok( !defined( EhV ($h, undef)), "EhV testing undef is !defined");
 
+
 my $h2;
 ok (!defined (EhV ($h2, two)), "EhV test w/undef ref is !defined?");
 
@@ -79,6 +80,31 @@ ok( !defined( ErV ($h, undef)), "ErV testing undef is !defined");
 ok (!defined (ErV ($h2, two)), "ErV test w/undef ref is !defined?");
 
 ok(3 == (ErV ($h, three)), "ErV test that true = val of key");
+
+
+my $bh = bless $h, "myClass";
+ok($v=EhV($bh, two), "EhV test bh->{two}, existing?: true");
+ok($v==2, "EhV test, returns value of two?");
+
+ok(! EhV($bh, four), "EhV test not exist(false)");
+
+ok(! exists $bh->{four}, "EhV testing last false didn't autovivify");
+
+ok( ! (EhV($bh, undef)), "EhV testing undef keyname(isfalse)");
+
+ok( !defined( EhV ($bh, undef)), "EhV testing undef is !defined");
+
+
+ok($v=ErV($bh, two), "ErV test bh->{two}, existing?: true");
+ok($v==2, "ErV test, returns value of two?");
+
+ok(! ErV($bh, four), "ErV test not exist(false)");
+
+ok(! exists $bh->{four}, "ErV testing last false didn't autovivify");
+
+ok( ! (ErV($bh, undef)), "ErV testing undef keyname(isfalse)");
+
+ok( !defined( ErV ($bh, undef)), "ErV testing undef is !defined");
 
 done_testing();
 

@@ -93,7 +93,7 @@
 
 <p>To write or delete metadata, tag values are assigned using -<i>TAG</i>=[<i>VALUE</i>], and/or the <b>-geotag</b>, <b>-csv=</b> or <b>-json=</b> options. To copy or move metadata, the <b>-tagsFromFile</b> feature is used. By default the original files are preserved with <code>_original</code> appended to their names -- be sure to verify that the new files are OK before erasing the originals. Once in write mode, exiftool will ignore any read-specific options.</p>
 
-<p>Note: If <i>FILE</i> is a directory name then only supported file types in the directory are processed (in write mode only writable types are processed). However, files may be specified by name, or the <b>-ext</b> option may be used to force processing of files with any extension. Hidden files in the directory are also processed. Adding the <b>-r</b> option causes subdirectories to be processed recursively, but those with names beginning with &quot;.&quot; are skipped unless <b>-r.</b> is used.</p>
+<p>Note: If <i>FILE</i> is a directory name then only supported file types in the directory are processed (in write mode only writable types are processed). However, files may be specified by name, or the <b>-ext</b> option may be used to force processing of files with any extension. Hidden files in the directory are also processed. Adding the <b>-r</b> option causes subdirectories to be processed recursively, but subdirectories with names beginning with &quot;.&quot; are skipped unless <b>-r.</b> is used.</p>
 
 <p>Below is a list of file types and meta information formats currently supported by ExifTool (r = read, w = write, c = create):</p>
 
@@ -530,7 +530,7 @@
 <dt id="g-NUM-:NUM...--groupHeadings"><b>-g</b>[<i>NUM</i>][:<i>NUM</i>...] (<b>-groupHeadings</b>)</dt>
 <dd>
 
-<p>Organize output by tag group. <i>NUM</i> specifies a group family number, and may be 0 (general location), 1 (specific location), 2 (category), 3 (document number) or 4 (instance number). <b>-g0</b> is assumed if a family number is not specified, and family numbers may be added wherever <b>-g</b> is mentioned in the documentation. Multiple families may be specified by separating them with colons. By default the resulting group name is simplified by removing any leading <code>Main:</code> and collapsing adjacent identical group names, but this can be avoided by placing a colon before the first family number (eg. <b>-g:3:1</b>). Use the <b>-listg</b> option to list group names for a specified family.</p>
+<p>Organize output by tag group. <i>NUM</i> specifies a group family number, and may be 0 (general location), 1 (specific location), 2 (category), 3 (document number), 4 (instance number), 5 (metadata path) or 6 (EXIF/TIFF format). <b>-g0</b> is assumed if a family number is not specified, and family numbers may be added wherever <b>-g</b> is mentioned in the documentation. Multiple families may be specified by separating them with colons. By default the resulting group name is simplified by removing any leading <code>Main:</code> and collapsing adjacent identical group names, but this can be avoided by placing a colon before the first family number (eg. <b>-g:3:1</b>). Use the <b>-listg</b> option to list group names for a specified family. The SavePath and SaveFormat API options are automatically enabled if the respective family 5 or 6 group names are requested. See the <a>API GetGroup documentation</a> for more information.</p>
 
 </dd>
 <dt id="G-NUM-:NUM...--groupNames"><b>-G</b>[<i>NUM</i>][:<i>NUM</i>...] (<b>-groupNames</b>)</dt>
@@ -584,11 +584,35 @@
 
 <p>Set current language for tag descriptions and converted values. <i>LANG</i> is <code>de</code>, <code>fr</code>, <code>ja</code>, etc. Use <b>-lang</b> with no other arguments to get a list of available languages. The default language is <code>en</code> if <b>-lang</b> is not specified. Note that tag/group names are always English, independent of the <b>-lang</b> setting, and translation of warning/error messages has not yet been implemented. May also be combined with <b>-listx</b> to output descriptions in one language only.</p>
 
-<p>By default, ExifTool uses UTF-8 encoding for special characters, but the the <b>-L</b> or <b>-charset</b> option may be used to invoke other encodings.</p>
+<p>By default, ExifTool uses UTF-8 encoding for special characters, but the the <b>-L</b> or <b>-charset</b> option may be used to invoke other encodings. Note that ExifTool uses Unicode::LineBreak if available to help preserve the column alignment of the plain text output for languages with a variable-width character set.</p>
 
-<p>Currently, the language support is not complete, but users are welcome to help improve this by submitting their own translations. To submit a set of translations, first use the <b>-listx</b> option and redirect the output to a file to generate an XML tag database, then add entries for other languages, zip this file, and email it to phil at owl.phy.queensu.ca for inclusion in ExifTool.</p>
+<p>Currently, the language support is not complete, but users are welcome to help improve this by submitting their own translations. To submit a translation, follow these steps (you must have Perl installed for this):</p>
 
-<p>Note: ExifTool uses Unicode::LineBreak if available to help preserve the column alignment of the plain text output for languages with a variable-width character set.</p>
+<p>1. Download and unpack the latest Image-ExifTool full distribution.</p>
+
+<p>2. &#39;cd&#39; into the Image-ExifTool directory.</p>
+
+<p>3. Run this command to make an XML file of the desired tags (eg. EXIF):</p>
+
+<pre><code>   ./exiftool -listx -exif:all &gt; out.xml</code></pre>
+
+<p>4. Copy this text into a file called &#39;import.pl&#39; in the exiftool directory:</p>
+
+<pre><code>    push @INC, &#39;lib&#39;;
+    require Image::ExifTool::TagInfoXML;
+    my $file = shift or die &quot;Expected XML file name\n&quot;;
+    $Image::ExifTool::TagInfoXML::makeMissing = shift;
+    Image::ExifTool::TagInfoXML::BuildLangModules($file,8);</code></pre>
+
+<p>5. Run the &#39;import.pl&#39; script to Import the XML file, generating the &#39;MISSING&#39; entries for your language (eg. Russian):</p>
+
+<pre><code>   perl import.pl out.xml ru</code></pre>
+
+<p>6. Edit the generated language module lib/Image/ExifTool/Lang/ru.pm, and search and replace all &#39;MISSING&#39; strings in the file with your translations.</p>
+
+<p>7. Email the module (&#39;ru.pm&#39; in this example) to phil at owl.phy.queensu.ca</p>
+
+<p>8. Thank you!!</p>
 
 </dd>
 <dt id="listItem-INDEX"><b>-listItem</b> <i>INDEX</i></dt>
@@ -639,7 +663,7 @@
 
 <p>produces output like this:</p>
 
-<pre><code>    -- Generated by ExifTool 11.50 --
+<pre><code>    -- Generated by ExifTool 11.70 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -1053,7 +1077,7 @@
 <dt id="z--zip"><b>-z</b> (<b>-zip</b>)</dt>
 <dd>
 
-<p>When reading, causes information to be extracted from .gz and .bz2 compressed images (only one image per archive; requires gzip and bzip2 to be available). When writing, causes compressed information to be written if supported by the metadata format (eg. compressed textual metadata in PNG), disables the recommended padding in embedded XMP (saving 2424 bytes when writing XMP in a file), and writes XMP in shorthand format -- the equivalent of setting the API Compress, Compact and XMPShorthand options to 1.</p>
+<p>When reading, causes information to be extracted from .gz and .bz2 compressed images (only one image per archive; requires gzip and bzip2 to be available). When writing, causes compressed information to be written if supported by the metadata format (eg. compressed textual metadata in PNG), disables the recommended padding in embedded XMP (saving 2424 bytes when writing XMP in a file), and writes XMP in shorthand format -- the equivalent of setting the API Compress and Compact=&quot;Padding,Shorthand&quot;.</p>
 
 </dd>
 </dl>
@@ -1119,24 +1143,24 @@
 <dt id="geotag-TRKFILE"><b>-geotag</b> <i>TRKFILE</i></dt>
 <dd>
 
-<p>Geotag images from the specified GPS track log file. Using the <b>-geotag</b> option is equivalent to writing a value to the <code>Geotag</code> tag. After the <b>-geotag</b> option has been specified, the value of the <code>Geotime</code> tag is written to define a date/time for the position interpolation. If <code>Geotime</code> is not specified, the value is copied from <code>DateTimeOriginal#</code> (the <code>#</code> is added to copy the unformatted value, avoiding potential conflicts with the <b>-d</b> option). For example, the following two commands are equivalent:</p>
+<p>Geotag images from the specified GPS track log file. Using the <b>-geotag</b> option is equivalent to writing a value to the <code>Geotag</code> tag. The GPS position is interpolated from the track at a time specified by the value written to the <code>Geotime</code> tag. If <code>Geotime</code> is not specified, the value is copied from <code>DateTimeOriginal#</code> (the <code>#</code> is added to copy the unformatted value, avoiding potential conflicts with the <b>-d</b> option). For example, the following two commands are equivalent:</p>
 
 <pre><code>    exiftool -geotag trk.log image.jpg
     exiftool -geotag trk.log &quot;-Geotime&lt;DateTimeOriginal#&quot; image.jpg</code></pre>
 
-<p>When the <code>Geotime</code> value is converted to UTC, the local system timezone is assumed unless the date/time value contains a timezone. Writing <code>Geotime</code> causes the following tags to be written (provided they can be calculated from the track log, and they are supported by the destination metadata format): GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp, GPSTimeStamp, GPSDateTime, GPSTrack, GPSTrackRef, GPSSpeed, GPSSpeedRef, GPSImgDirection, GPSImgDirectionRef, GPSPitch and GPSRoll. By default, tags are created in EXIF, and updated in XMP only if they already exist. However, <code>EXIF:Geotime</code> or <code>XMP:Geotime</code> may be specified to write only EXIF or XMP tags respectively. Note that GPSPitch and GPSRoll are non-standard, and require user-defined tags in order to be written.</p>
+<p>When the <code>Geotime</code> value is converted to UTC, the local system timezone is assumed unless the date/time value contains a timezone. Writing <code>Geotime</code> causes the following tags to be written (provided they can be calculated from the track log, and they are supported by the destination metadata format): GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp, GPSTimeStamp, GPSDateTime, GPSTrack, GPSTrackRef, GPSSpeed, GPSSpeedRef, GPSImgDirection, GPSImgDirectionRef, GPSPitch, GPSRoll and AmbientTemperature. By default, tags are created in EXIF, and updated in XMP only if they already exist. However, <code>EXIF:Geotime</code> or <code>XMP:Geotime</code> may be specified to write only EXIF or XMP tags respectively. Note that GPSPitch and GPSRoll are non-standard, and require user-defined tags in order to be written.</p>
 
 <p>The <code>Geosync</code> tag may be used to specify a time correction which is applied to each <code>Geotime</code> value for synchronization with GPS time. For example, the following command compensates for image times which are 1 minute and 20 seconds behind GPS:</p>
 
 <pre><code>    exiftool -geosync=+1:20 -geotag a.log DIR</code></pre>
 
-<p><code>Geosync</code> must be set before <code>Geotime</code> (if specified) to be effective. Advanced <code>Geosync</code> features allow a linear time drift correction and synchronization from previously geotagged images. See &quot;geotag.html&quot; in the full ExifTool distribution for more information.</p>
+<p>Advanced <code>Geosync</code> features allow a linear time drift correction and synchronization from previously geotagged images. See &quot;geotag.html&quot; in the full ExifTool distribution for more information.</p>
 
 <p>Multiple <b>-geotag</b> options may be used to concatenate GPS track log data. Also, a single <b>-geotag</b> option may be used to load multiple track log files by using wildcards in the <i>TRKFILE</i> name, but note that in this case <i>TRKFILE</i> must be quoted on most systems (with the notable exception of Windows) to prevent filename expansion. For example:</p>
 
 <pre><code>    exiftool -geotag &quot;TRACKDIR/*.log&quot; IMAGEDIR</code></pre>
 
-<p>Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, Honeywell PTNTHPR, Winplus Beacon text, and Bramor gEO log files. See <a href="#GEOTAGGING-EXAMPLES">&quot;GEOTAGGING EXAMPLES&quot;</a> for examples. Also see &quot;geotag.html&quot; in the full ExifTool distribution and the <a>Image::ExifTool Options</a> for more details and for information about geotag configuration options.</p>
+<p>Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, Honeywell PTNTHPR, Bramor gEO, Winplus Beacon TXT, and GPS/IMU CSV files. See <a href="#GEOTAGGING-EXAMPLES">&quot;GEOTAGGING EXAMPLES&quot;</a> for examples. Also see &quot;geotag.html&quot; in the full ExifTool distribution and the <a>Image::ExifTool Options</a> for more details and for information about geotag configuration options.</p>
 
 </dd>
 <dt id="globalTimeShift-SHIFT"><b>-globalTimeShift</b> <i>SHIFT</i></dt>
@@ -1230,7 +1254,7 @@
 
 <pre><code>    exiftool -ext nef -tagsfromfile @ -srcfile %d%f.jpg dir</code></pre>
 
-<p>If than one <b>-srcfile</b> option is specified, the files are tested in order and the first existing source file is processed. If none of the source files already exist, then exiftool uses the first <b>-srcfile</b> specified.</p>
+<p>If more than one <b>-srcfile</b> option is specified, the files are tested in order and the first existing source file is processed. If none of the source files already exist, then exiftool uses the first <b>-srcfile</b> specified.</p>
 
 <p>A <i>FMT</i> of <code>@</code> may be used to represent the original <i>FILE</i>, which may be useful when specifying multiple <b>-srcfile</b> options (eg. to fall back to processing the original <i>FILE</i> if no sidecar exists).</p>
 

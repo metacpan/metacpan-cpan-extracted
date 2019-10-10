@@ -1,5 +1,8 @@
 Revision history for App-uricolor
 
+0.15    2019.10.10 
+        fixed META data
+
 0.14    2019.08.05 
         added -c (color)
 

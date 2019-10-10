@@ -222,9 +222,9 @@
   ],
   name => "English St. Vincent & Grenadines",
   native_language => "English",
-  native_name => "English St. Vincent & Grenadines",
+  native_name => "English St Vincent & Grenadines",
   native_script => undef,
-  native_territory => "St. Vincent & Grenadines",
+  native_territory => "St Vincent & Grenadines",
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 35,
+  version => 36,
 }

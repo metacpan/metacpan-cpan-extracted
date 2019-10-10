@@ -1,3 +1,7 @@
+1.02 2019-10-10
+
+	- Fix to work with Mojolicious 8.25.
+
 1.01 2019-10-01
 
 	- Fix typos: use LOG_ERR instead of LOG_ERROR and LOG_WARNING

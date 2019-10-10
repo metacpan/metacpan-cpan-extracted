@@ -3,12 +3,22 @@ package Firefox::Marionette::Proxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 sub new {
     my ( $class, %parameters ) = @_;
     if ( $parameters{pac} ) {
         $parameters{pac} = "$parameters{pac}";
+    }
+    elsif ( $parameters{host} ) {
+        $parameters{type} = 'manual';
+        my $host = "$parameters{host}";
+        if ( $host !~ /:\d+$/smx ) {
+            $host .= q[:80];
+        }
+        $parameters{ftp}   = $host;
+        $parameters{http}  = $host;
+        $parameters{https} = $host;
     }
     my $element = bless {%parameters}, $class;
     return $element;
@@ -73,7 +83,7 @@ Firefox::Marionette::Proxy - Represents a Proxy used by Firefox Capabilities usi
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =head1 SYNOPSIS
 
@@ -85,6 +95,11 @@ Version 0.82
     foreach my $address ($firefox->capabilities->proxy()->none()) {
         say "Browser will ignore the proxy for $address";
     }
+
+    # OR 
+
+    my $proxy = Firefox::Marionette::Proxy->new( host => 'squid.example.com:3128' );
+    my $firefox = Firefox::Marionette->new( capabilities => Firefox::Marionette::Capabilities->new( proxy => $proxy ) );
 
 =head1 DESCRIPTION
 
@@ -101,6 +116,8 @@ accepts a hash as a parameter.  Allowed keys are below;
 =item * type - indicates the type of proxy configuration.  Must be one of 'pac', 'direct', 'autodetect', 'system', or 'manual'.
 
 =item * pac - defines the L<URI|URI> for a proxy auto-config file if the L<type|Firefox::Marionette::Proxy#type> is equal to 'pac'.
+
+=item * host - defines the host for FTP, HTTP, and HTTPS traffic and sets the L<type|Firefox::Marionette::Proxy#type> to 'manual'.
 
 =item * http - defines the proxy host for HTTP traffic when the L<type|Firefox::Marionette::Proxy#type> is 'manual'.
 

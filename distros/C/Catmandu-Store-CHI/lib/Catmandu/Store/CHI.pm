@@ -29,31 +29,45 @@ Catmandu::Store::CHI - a CHI backed caching store
 Create a new Catmandu::Store::CHI with a $chi_driver and optional parameters. When no driver is given
 then by default the 'Memory' driver will be used. See L<CHI> for more documentation on possible drivers.
 
-=head2 bag($name)
- 
-Create or retieve a bag with name $name. Returns a L<Catmandu::Bag>.
+=head1 INHERITED METHODS
+
+This Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Store>
+
+=back
+
+Each Catmandu::Bag in this Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Bag>
+
+=back
 
 =head1 SEE ALSO
 
-L<CHI>, L<Catmandu> , L<Catmandu::Store> , L<Catmandu::Bag>
+L<CHI>
 
 =head1 AUTHOR
- 
+
 Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>
- 
+
 =head1 LICENSE AND COPYRIGHT
- 
+
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
- 
+
 See http://dev.perl.org/licenses/ for more information.
- 
+
 =cut
 package Catmandu::Store::CHI;
 
 {
-  $Catmandu::Store::CHI::VERSION = '0.02';
+  $Catmandu::Store::CHI::VERSION = '0.04';
 }
 
 use Moo;
@@ -77,4 +91,4 @@ sub BUILD {
     $self->opts($opts);
 }
 
-1; 
+1;

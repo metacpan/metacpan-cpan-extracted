@@ -1,7 +1,7 @@
 package Module::List::Tiny;
 
 our $DATE = '2019-09-02'; # DATE
-our $VERSION = '0.004001'; # VERSION
+our $VERSION = '0.004002'; # VERSION
 
 #IFUNBUILT
 # # use strict 'subs', 'vars';
@@ -104,7 +104,7 @@ Module::List::Tiny - A fork of Module::List that starts faster
 
 =head1 VERSION
 
-This document describes version 0.004001 of Module::List::Tiny (from Perl distribution Module-List-Tiny), released on 2019-09-02.
+This document describes version 0.004002 of Module::List::Tiny (from Perl distribution Module-List-Tiny), released on 2019-09-02.
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ This document describes version 0.004001 of Module::List::Tiny (from Perl distri
 
 This module is a fork of L<Module::List>. It's exactly like Module::List 0.004,
 except with lower startup overhead (see benchmarks in
-L<Bencher::Scenarios::ListingModules::Startup>). To accomplish this, it:
+L<Bencher::Scenario::ListingModules::Startup>). To accomplish this, it:
 
 =over
 

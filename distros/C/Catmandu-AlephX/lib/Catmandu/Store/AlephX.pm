@@ -19,7 +19,7 @@ use Catmandu::Util qw(:is :check);
 use Catmandu::AlephX;
 use Moo;
 
-our $VERSION = "0.01";
+our $VERSION = "1.071";
 
 with 'Catmandu::Store';
 
@@ -64,11 +64,11 @@ with 'Catmandu::Bag';
 with 'Catmandu::Searchable';
 
 #override automatic id generation from Catmandu::Bag
-before add => sub { 
-  check_catmandu_marc($_[1]);    
-  $_[1] = clone($_[1]);  
+before add => sub {
+  check_catmandu_marc($_[1]);
+  $_[1] = clone($_[1]);
   if(is_string($_[1]->{_id})){
-    $_[1]->{_id} =~ /^\d{9}$/o or confess("invalid _id ".$_[1]->{_id});   
+    $_[1]->{_id} =~ /^\d{9}$/o or confess("invalid _id ".$_[1]->{_id});
   }else{
     $_[1]->{_id} = Catmandu::AlephX->format_doc_num(0);
   }
@@ -76,7 +76,7 @@ before add => sub {
 
 sub check_catmandu_marc {
     my $r = $_[0];
-    check_hash_ref($r);  
+    check_hash_ref($r);
     check_array_ref($r->{record});
     check_array_ref($_) for @{ $r->{record} };
 }
@@ -109,7 +109,7 @@ sub get {
     #override user_name to disable user check
     user_name => ""
   );
-  
+
   return undef unless($find_doc->is_success);
 
   my $doc = $find_doc->record->metadata->data;
@@ -127,7 +127,7 @@ containing the Aleph record number. This method with throw an error when an add 
 
 =head3 example
 
-  #add new record. WARNING: Aleph will ignore the 001 field, 
+  #add new record. WARNING: Aleph will ignore the 001 field,
   my $new_record = eval {
     $bag->add({
     record =>  [
@@ -158,9 +158,9 @@ containing the Aleph record number. This method with throw an error when an add 
         '',
         '_',
         '20140212095615.0'
-      ] 
+      ]
       ..
-    ]    
+    ]
   });
 
   };
@@ -183,19 +183,19 @@ sub add {
     doc_number => $data->{_id},
     marc => $data
   );
-  
-  #_id not given: new record explicitely requested 
+
+  #_id not given: new record explicitely requested
   if(int($data->{_id}) == 0){
     if($update_doc->errors()->[-1] =~ /Document: (\d{9}) was updated successfully/i){
-      $data->{_id} = $1;    
+      $data->{_id} = $1;
     }else{
       confess($update_doc->errors()->[-1]);
     }
   }
   #_id given: update when exists, insert when not
   else{
- 
-    #error given, can have several reasons: real error or just warnings + success message   
+
+    #error given, can have several reasons: real error or just warnings + success message
     unless($update_doc->is_success){
 
       #document does not exist (yet)
@@ -210,7 +210,7 @@ sub add {
           doc_action => 'UPDATE',
           doc_number => $new_doc_num,
           marc => $data
-        );  
+        );
 
         if($update_doc->errors()->[-1] =~ /Document: (\d{9}) was updated successfully/i){
 
@@ -246,12 +246,12 @@ sub add {
   }
   #record is ALWAYS changed by Aleph, so fetch it again
   $self->get($data->{_id});
-  
+
 }
 
 =head2 delete($id)
 
-Deletes a record from the Aleph database. Requires a record identifier. Returns a true value when the 
+Deletes a record from the Aleph database. Requires a record identifier. Returns a true value when the
 record is deleted.
 
 =cut
@@ -259,12 +259,12 @@ sub delete {
   my($self,$id)= @_;
 
   $id = Catmandu::AlephX->format_doc_num($id);
-  
+
   my $xml_full_req = <<EOF;
 <?xml version="1.0" encoding="UTF-8" ?>
 <find-doc><record><metadata><oai_marc><fixfield id="001">$id</fixfield></oai_marc></metadata></record></find-doc>
 EOF
-  
+
   #insert/update
   my $update_doc = $self->store->alephx->update_doc(
     library => $self->name,
@@ -274,7 +274,7 @@ EOF
   );
 
   #last error: 'Document: 000050124 was updated successfully.'
-  (scalar(@{ $update_doc->errors() })) && ($update_doc->errors()->[-1] =~ /Document: $id was updated successfully./);  
+  (scalar(@{ $update_doc->errors() })) && ($update_doc->errors()->[-1] =~ /Document: $id was updated successfully./);
 }
 
 =head2 each(callback)
@@ -327,17 +327,17 @@ sub search {
 
   my $alephx = $self->store->alephx;
   my $find = $alephx->find(
-    request => $query,    
+    request => $query,
     base => $self->name,
     user_name => ""
   );
- 
+
   my @results = ();
-     
+
   if ($find->is_success) {
         my $no_records = int($find->no_records);
         my $no_entries = int($find->no_entries);
-    
+
         my $s = Catmandu::AlephX->format_doc_num($start + 1);
         my $l = $start + $limit;
         my $e = Catmandu::AlephX->format_doc_num($l > $no_entries ? $no_entries : $l);
@@ -350,13 +350,13 @@ sub search {
 
   my $total = $find->no_records;
   $total = 0 unless defined $total && $total =~ /\d+/;
- 
+
   Catmandu::Hits->new({
     limit => $limit,
     start => $start,
     total => int($total),
     hits  => \@results,
-  }); 
+  });
 }
 
 =head2 searcher()

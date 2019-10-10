@@ -6,7 +6,7 @@ use Catmandu::AlephX;
 use Data::Dumper;
 use open qw(:std :utf8);
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my $set_number = $aleph->find(request => "wrd=(BIB.AFF)",base => "rug01")->set_number;
 my $present = $aleph->present(
@@ -15,10 +15,10 @@ my $present = $aleph->present(
 );
 if($present->is_success){
   for my $record(@{ $present->records }){
-    say "record_header: ".Dumper($record->{record_header});    
+    say "record_header: ".Dumper($record->{record_header});
     say "\ttype: ".$record->metadata->type;
-    say "\tdata: ".Dumper($record->metadata->data());     
+    say "\tdata: ".Dumper($record->metadata->data());
   }
 }else{
   say STDERR join('',@{$present->errors});
-} 
+}

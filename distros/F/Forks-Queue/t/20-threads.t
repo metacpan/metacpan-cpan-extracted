@@ -12,7 +12,17 @@ if (!eval "use threads;1") {
     exit;
 }
 
-
+sub uninterruptable_sleep ($) {
+    # SIGIO can interrupt CORE::sleep and Time::HiRes::sleep,
+    # and sometimes we don't want that
+    my $expire = Time::HiRes::time + $_[0];
+    my $n = $_[0];
+    while ($n > 0) {
+        Time::HiRes::sleep $n;
+        $n = $expire - Time::HiRes::time;
+    }
+    return $_[0];
+}
 
 for my $impl (IMPL()) {
     my $q = Forks::Queue->new( impl => $impl );
@@ -30,10 +40,11 @@ for my $impl (IMPL()) {
             print STDERR $@ if $@;
         }
         $gkidthd->join;
-        sleep 2;
+        uninterruptable_sleep 5;
+        uninterruptable_sleep 5 if $^O =~ /freebsd/;
         $q->end;
         return;
-                                  } );
+    } );
 
     for my $i (0..9) {
         $q->put("parent$i");
@@ -44,12 +55,14 @@ for my $impl (IMPL()) {
     until ($s->{end}) {
         sleep 1;
         $s = $q->status;
-        if ($t - time > 5) {
+        if (time - $t > 15) {
             die "Took too long for queue to become available";
         }
     }
-    ok($t - time < 5,
-       'threads: simultaneous queue access from 3 procs not too slow');
+    if ($^O !~ /freebsd/) {
+        ok(Time::HiRes::time - $t < 10,
+           'threads: simultaneous queue access from 3 procs not too slow');
+    }
     is($q->pending, 30, 'threads: 30 items on queue');
     my @g = $q->get(30);
     is(scalar @g, 30, 'threads: get(30) retrieved 30 items from queue');

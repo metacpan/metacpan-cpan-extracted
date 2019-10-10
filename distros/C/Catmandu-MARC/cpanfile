@@ -26,5 +26,6 @@ requires 'MARC::Parser::RAW', '0';
 requires 'MARC::Schema', '>=0.07';
 requires 'MARC::Spec', '2.0.3';
 requires 'Memoize', '0';
+requires 'Module::Build', '>=0.4229'; # travis ci
 requires 'Moo', '1.0';
 requires 'MooX::Singleton', '0';

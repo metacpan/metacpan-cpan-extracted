@@ -83,17 +83,16 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::Vimeo accepts a valid full Vimeo video ID or URL on 
-vimeo.com 
-and returns the actual stream URL, title, and cover art icon for that video.  
-The purpose is that one needs this URL in order to have the option to 
-stream the video in one's own choice of media player software rather 
-than using their web browser and accepting any / all flash, ads, 
-javascript, cookies, trackers, web-bugs, and other crapware that can 
-come with that method of playing.  The author uses his own custom all-purpose 
-media player called "fauxdacious" (his custom hacked version of the 
-open-source "audacious" audio player).  "fauxdacious" incorporates this 
-module to decode and play vimeo.com videos.  This is a submodule of the 
-general StreamFinder module.
+vimeo.com and returns the actual stream URL, title, and cover art icon 
+for that video.  The purpose is that one needs this URL in order to have 
+he option to stream the video in one's own choice of media player 
+software rather than using their web browser and accepting any / all 
+flash, ads, javascript, cookies, trackers, web-bugs, and other crapware 
+that can come with that method of playing.  The author uses his own 
+custom all-purpose media player called "fauxdacious" (his custom hacked 
+version of the open-source "audacious" audio player).  "fauxdacious" 
+incorporates this module to decode and play vimeo.com videos.  This is a 
+submodule of the general StreamFinder module.
 
 Depends:  
 
@@ -109,7 +108,7 @@ and the separate application program:  youtube-dl.
 Accepts a vimeo.com ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Vimeo video or no streams are 
 found.  The URL can be the full URL, 
-ie. https://player.vimeo.com/video/I<video-id>, or just I<video-id>.
+ie. https://player.vimeo.com/video/B<video-id>, or just I<video-id>.
 
 The I<"quality"> option, which can be set to a "p number" optionally 
 preceeded by a relational operator ("<", ">", "=") - default: "<".  
@@ -397,6 +396,7 @@ sub new
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$player_url\" 2>/dev/null `;
 		}
 	}
+	$html =~ s/\\\"/\&quot\;/gs;
 	$self->{'title'} = ($html =~ m#\<title\>([^\<]+)#) ? $1 : '';
 	$self->{'imageurl'} = ($html =~ m#background\:\s+url\s*\(([^\)]+)#) ? $1 : '';
 	if ($html =~ m#\"progressive\"\:(\[\{[^\]]+\])#s) {
@@ -425,7 +425,6 @@ sub new
 				$self->{'artist'} = $1  if ($html =~ s#\"owner\"\:\{.*?\"name\"\:\"([^\"]+)\"#STREAMFINDERMARK#s);
 				$self->{'artist'} .= ' - ' . $1  if ($html =~ s#STREAMFINDERMARK.*?\"url\"\:\"([^\"]+)\"##s);
 			}
-			$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 		}
 	}
 
@@ -477,7 +476,6 @@ RETRYIT:
 			goto RETRYIT  if ($1);
 		}
 		$self->{'imageurl'} ||= $self->{'iconurl'};
-		$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 		print STDERR "-count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 		print STDERR "--SUCCESS: stream url=".$self->{'Url'}."=\n"  if ($DEBUG);
 		if ($self->{'description'} =~ /\w/) {
@@ -491,6 +489,7 @@ RETRYIT:
 	$self->{'description'} ||= $self->{'title'};
 	$self->{'iconurl'} ||= $self->{'imageurl'}  if ($self->{'imageurl'});
 	$self->{'total'} = $self->{'cnt'};
+	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!

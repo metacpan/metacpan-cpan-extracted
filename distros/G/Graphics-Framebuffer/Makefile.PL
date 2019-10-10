@@ -96,16 +96,8 @@ my $message = qq{
 primitives.pl          - This script will pretty much demonstrate all of
                          the capabilities of this module.
 
-threaded_primitives.pl - A threaded version of the above.  It can make a mess
-                         of the screen.  Requires Sys::CPU.
-
 slideshow.pl           - This script shows all of the images in a specific
                          path (full screen, if asked).
-
-threaded_slideshow.pl  - This script shows all of the images in a specific
-                         path.  It divides your screen by how many threads,
-                         and dedicates each to show an image.  Requires
-                         Sys::CPU.
 
 viewpic.pl             - This script shows one specific image (or animation).
 
@@ -120,15 +112,27 @@ text_mode.pl           - A rescue script to force the tty into text mode.
 template.pl            - A skeleton single-tasking script shell for you to use
                          as as template.  Do not edit this, but instead copy
                          it.
+=========================== MULTIPROCESSING ==================================
+threaded_primitives.pl - A threaded version of the above.  It can make a mess
+                         of the screen.  Requires Sys::CPU.
+
+threaded_slideshow.pl  - This script shows all of the images in a specific
+                         path.  It divides your screen by how many threads,
+                         and dedicates each to show an image.  Requires
+                         Sys::CPU.
 
 threaded_template.pl   - Like the above, but for threading.  Requires Sys::CPU
+
+get-mce-demos          - Go and grab MCE multiprocessing demos
 };
 
 foreach my $l (split(/\n/,$message)) {
-    if ($l =~ /^(\S+pl)/) {
+    if ($l =~ /^(\S+pl|get-mce-demos)/) {
         my $old = $1;
         my $new = colored(['bold green'],$old);
         $l =~ s/$old/$new/;
+    } elsif ($l =~ /^\=/) {
+        $l = colored(['bold black on_cyan'],$l);
     }
     print "$l\n";
 }

@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram2dcontour.
 
@@ -54,7 +54,7 @@ has smoothing => (
 
 has width => ( is            => "rw",
                isa           => "Num",
-               documentation => "Sets the line width (in px).",
+               documentation => "Sets the contour line width in (in px)",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -72,7 +72,7 @@ Chart::Plotly::Trace::Histogram2dcontour::Line - This attribute is one of the po
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Sets the amount of smoothing for the contour lines, where *0* corresponds to no 
 
 =item * width
 
-Sets the line width (in px).
+Sets the contour line width in (in px)
 
 =back
 

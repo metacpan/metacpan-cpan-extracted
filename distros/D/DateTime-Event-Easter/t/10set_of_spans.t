@@ -71,14 +71,13 @@ my $non_inclusive_new_set = $event_easter_sunday->as_set(after => $easter_1901, 
 my $empty_set = $non_inclusive_set->complement($non_inclusive_new_set);
 ok ($empty_set->is_empty_set, "Full DateTime::Set integration: Matching Sets");
 
-
 # Check the number of elements in the set
 my @ni_set = $non_inclusive_set->as_list();
 is ($#ni_set, $#non_inclusive_expect, "Non-inclusive: Correct number of results");
 
 my $i = 0;
-my $non_inclusive_interator = $non_inclusive_set->iterator;
-while ( my $span = $non_inclusive_interator->next ) {
+my $non_inclusive_iterator = $non_inclusive_set->iterator;
+while ( my $span = $non_inclusive_iterator->next ) {
 
   my ($yyyy, $mm, $dd) = $non_inclusive_expect[$i] =~ /^(\d{4})-(\d\d)-(\d\d)$/;
   my $dt = DateTime->new(year => $yyyy, month => $mm, day => $dd);
@@ -93,8 +92,8 @@ while ( my $span = $non_inclusive_interator->next ) {
 my @i_set = $inclusive_set->as_list();
 is ($#i_set, $#inclusive_expect, "Inclusive: Correct number of results");
 $i = 0;
-my $inclusive_interator = $inclusive_set->iterator;
-while ( my $span = $inclusive_interator->next ) {
+my $inclusive_iterator = $inclusive_set->iterator;
+while ( my $span = $inclusive_iterator->next ) {
 
   my ($yyyy, $mm, $dd) = $inclusive_expect[$i] =~ /^(\d{4})-(\d\d)-(\d\d)$/;
   my $dt = DateTime->new(year => $yyyy, month => $mm, day => $dd);

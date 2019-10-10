@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.025'; # VERSION
+our $VERSION = '0.026'; # VERSION
 
 my %curlopt;
 my $share;
@@ -141,6 +141,20 @@ sub _handle_method {
             });
         },
     );
+
+    if (my $protocol = $request->protocol) {
+        my $v;
+        if ($protocol =~ m/^HTTP\/1\.0$/x) {
+            $v = CURL_HTTP_VERSION_1_0;
+        } elsif ($protocol =~ m/^HTTP\/1\.1$/x) {
+            $v = CURL_HTTP_VERSION_1_1;
+        } elsif ($protocol =~ m/^HTTP\/2/x) {
+            $v =  eval { Net::Curl::Easy::CURL_HTTP_VERSION_2TLS() };
+        } elsif ($protocol =~ m/^HTTP\/3/x) {
+            $v =  eval { Net::Curl::Easy::CURL_HTTP_VERSION_3() };
+        }
+        $easy->setopt(CURLOPT_HTTP_VERSION ,=> $v) if $v;
+    }
 
     my $method_ref = $dispatch{$method};
     if (defined $method_ref) {
@@ -382,7 +396,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -563,13 +577,17 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords José Joaquín Atria Peter Williams
+=for stopwords José Joaquín Atria Nick Kostyria Peter Williams
 
 =over 4
 
 =item *
 
 José Joaquín Atria <jjatria@gmail.com>
+
+=item *
+
+Nick Kostyria <kostirya@gmail.com>
 
 =item *
 

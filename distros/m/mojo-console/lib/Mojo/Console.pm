@@ -1,17 +1,36 @@
 package Mojo::Console;
 use Mojo::Base 'Mojolicious::Command';
 
+use Getopt::Long;
 use List::Util qw(any none);
 
 use Mojo::Console::Input;
 use Mojo::Console::Output;
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.8';
 
+has 'args' => sub {
+    my $self = shift;
+
+    my $args = $self->defaults;
+
+    GetOptions($args, @{ $self->options });
+
+    return $args;
+};
+
+has 'defaults' => sub { {} };
 has 'input' => sub { Mojo::Console::Input->new };
 has 'max_attempts' => 10;
+has 'options' => sub { [] };
 has 'output' => sub { Mojo::Console::Output->new };
 has '_required' => 0;
+
+sub arg {
+    my ($self, $name) = @_;
+
+    return $self->args->{ $name };
+}
 
 sub ask {
     my ($self, $message, $default) = @_;
@@ -168,55 +187,123 @@ L<Mojo::Console> is an extension of L<Mojolicious::Command>
 
 =head1 ATTRIBUTES
 
-L<Mojo::Console> inherits all attributes from L<Mojolicious::Command>.
+L<Mojo::Console> inherits all attributes from L<Mojolicious::Command>and implements the
+following new ones.
+
+=head2 args
+
+    my $args    = $console->args;
+
+Uses Getopt::Long::GetOptions to parse passed args.
+
+=head2 defaults
+
+    my $defaults = $console->defaults;
+    $console = $console->defaults({ arg1 => 'value', verbose => 1 });
+
+Default values for args.
+
+=head2 input
+
+    my $input = $console->input;
+    $console = $console->input(Mojo::Console::Input->new);
+
+Input collector interface.
+
+=head2 max_attempts
+
+    my $max_attempts = $console->max_attempts;
+    $console = $console->max_attempts(5);
+
+How many times to allow a user to enter wrong value.
+
+=head2 options
+
+    my $options = $console->options;
+    $console = $console->options(['arg1=s', 'confirm']);
+
+Args descriptor, see L<GetOpt::Long>, method GetOptions.
+
+=head2 output
+
+    my $output = $console->output;
+    $console = $console->output(Mojo::Console::Output->new);
+
+Output interface.
 
 =head1 METHODS
 
 L<Mojo::Console> inherits all methods from L<Mojolicious::Command> and implements
 the following new ones.
 
+=head2 arg
+
+    my $value = $self->arg('verbose');
+
+Get the value of an argument.
+
 =head2 ask
 
     my $answer = $self->ask('What is your name?');
     my $required_answer = $self->required->ask('What is your name?'); # this will ask for an answer maximum 10 times and will exit in case the answer is empty
+
+Ask a question.
 
 =head2 confirm
 
     my $bool = $self->confirm("Are you sure?");
     my $bool_with_default_answer = $self->confirm("Are you sure?", 'yes');
 
+Ask the user to confirm something.
+
 =head2 choice
 
     my $choice = $self->choice('Are you a male or a female?', ['male', 'female']);
     my $choice_with_default_answer = $self->choice('Are you a male or a female?', ['male', 'female'], 'male');
 
+Ask the user to pick a value.
+
 =head2 error
 
     $self->error("The program will stop here");
+
+Write a message on the output and exit.
 
 =head2 info
 
     $self->info("This is just an info message");
 
+Write an info message to the output.
+
 =head2 line
 
     $self->line("This message will not have a new line at the end");
 
+Write a line to the output.
+
 =head2 newline
 
-    $self->line("This message will have a new line at the end");
+    $self->newline("This message will have a new line at the end");
+
+Write a line to the output, followed by a newline.
 
 =head2 required
 
     $self->required->ask('What is your name?');
 
+Mark the question as being required.
+
 =head2 success
 
     $self->success("This is just a success message");
 
+Write a success message to the output.
+
 =head2 warn
 
     $self->success("This is just a warning message");
+
+Write a warn message to the output.
 
 =head1 SEE ALSO
 

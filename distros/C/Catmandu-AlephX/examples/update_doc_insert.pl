@@ -9,11 +9,11 @@ use Data::Dumper;
 use File::Slurp;
 use open qw(:std :utf8);
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my $importer = Catmandu::Importer::AlephX->new(
-  url => 'http://aleph.ugent.be/X',  
-  base => 'usm01' 
+  url => 'http://borges1.ugent.be/X',
+  base => 'usm01'
 );
 
 my $marc = $importer->first();
@@ -34,4 +34,4 @@ if($info->is_success){
   say "test";
   say "num errors:".scalar(@{ $info->errors() });
   say STDERR join("\n",@{$info->errors});
-} 
+}

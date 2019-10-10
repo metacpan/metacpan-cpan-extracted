@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.93';
+our $VERSION = '1.94';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1687,7 +1687,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.93
+version 1.94
 
 =head1 SYNOPSIS
 
@@ -3056,7 +3056,7 @@ would overload I<update_html> in a subclass thusly:
 
 If you do this, then the mech will use the tidied-up HTML instead of
 the original both when parsing for its own needs, and for returning to
-you through L</content>.
+you through C<L<< content()|"$mech->content(...)" >>>.
 
 Overloading this method is also the recommended way of implementing
 extra validation steps (e.g. link checkers) for every HTML page

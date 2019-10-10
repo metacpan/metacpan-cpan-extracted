@@ -1,3 +1,10 @@
+Overview of changes in Cairo 1.107
+==================================
+
+* Rename DOAP file to appease Gitlab
+* Add bindings for cairo_tag_begin and cairo_tag_end
+* Add a binding for cairo_pdf_surface_set_metadata
+
 Overview of changes in Cairo 1.106
 ==================================
 

@@ -14,7 +14,7 @@ use Encode qw(encode_utf8 decode_utf8);
 use vars qw( $VERSION @ISA );
 
 BEGIN {
-    $VERSION = '1.66';
+    $VERSION = '1.67';
     @ISA     = qw( Archive::Zip );
 }
 
@@ -595,8 +595,8 @@ sub _writeEndOfCentralDirectory {
     my ($self, $fh, $membersZip64) = @_;
 
     my $zip64                                 = 0;
-    my $versionMadeBy                         = 0;
-    my $versionNeededToExtract                = 0;
+    my $versionMadeBy                         = $self->versionMadeBy();
+    my $versionNeededToExtract                = $self->versionNeededToExtract();
     my $diskNumber                            = 0;
     my $diskNumberWithStartOfCentralDirectory = 0;
     my $numberOfCentralDirectoriesOnThisDisk  = $self->numberOfMembers();
@@ -616,9 +616,11 @@ sub _writeEndOfCentralDirectory {
     if (   $membersZip64
         || $eocdDataZip64
         || $self->desiredZip64Mode() == ZIP64_EOCD) {
+        return _zip64NotSupported() unless ZIP64_SUPPORTED;
+
         $zip64                  = 1;
-        $versionMadeBy          = 45;
-        $versionNeededToExtract = 45;
+        $versionMadeBy          = 45 if ($versionMadeBy == 0);
+        $versionNeededToExtract = 45 if ($versionNeededToExtract < 45);
 
         $self->_print($fh, ZIP64_END_OF_CENTRAL_DIRECTORY_RECORD_SIGNATURE_STRING)
           or return _ioError('writing zip64 EOCD record signature');
@@ -846,6 +848,12 @@ sub _readEndOfCentralDirectory {
     # reading the regular EOCD.
   NOZIP64:
     {
+        # Do not even start looking for any zip64 structures if
+        # that would not be supported.
+        if (! ZIP64_SUPPORTED) {
+            last NOZIP64;
+        }
+
         if ($eocdPosition < ZIP64_END_OF_CENTRAL_DIRECTORY_LOCATOR_LENGTH + SIGNATURE_LENGTH) {
             last NOZIP64;
         }
@@ -935,7 +943,7 @@ sub _readEndOfCentralDirectory {
         # zip file comment!
         $fh->seek($eocdPosition, IO::Seekable::SEEK_SET)
           or return _ioError("seeking to EOCD");
-    }    
+    }
 
     # Skip past signature
     $fh->seek(SIGNATURE_LENGTH, IO::Seekable::SEEK_CUR)
@@ -958,6 +966,20 @@ sub _readEndOfCentralDirectory {
             $self->{'centralDirectoryOffsetWRTStartingDiskNumber'},
             $zipfileCommentLength
         ) = unpack(END_OF_CENTRAL_DIRECTORY_FORMAT, $header);
+
+        if (   $self->{'diskNumber'}                                  == 0xffff
+            || $self->{'diskNumberWithStartOfCentralDirectory'}       == 0xffff
+            || $self->{'numberOfCentralDirectoriesOnThisDisk'}        == 0xffff
+            || $self->{'numberOfCentralDirectories'}                  == 0xffff
+            || $self->{'centralDirectorySize'}                        == 0xffffffff
+            || $self->{'centralDirectoryOffsetWRTStartingDiskNumber'} == 0xffffffff) {
+            if (ZIP64_SUPPORTED) {
+                return _formatError("unexpected zip64 marker values in EOCD");
+            }
+            else {
+                return _zip64NotSupported();
+            }
+        }
     }
     else {
         (

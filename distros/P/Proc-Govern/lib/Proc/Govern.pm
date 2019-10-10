@@ -1,7 +1,7 @@
 package Proc::Govern;
 
-our $DATE = '2019-05-23'; # DATE
-our $VERSION = '0.207'; # VERSION
+our $DATE = '2019-09-03'; # DATE
+our $VERSION = '0.208'; # VERSION
 
 use 5.010001;
 use strict;
@@ -583,7 +583,7 @@ sub govern_process {
         {
             last unless $noss;
             last unless !$noss_lastprevent_time ||
-                $noss_lastprevent_time <= ($now-$noss_timeout+5);
+                $noss_lastprevent_time <= ($now-$noss_timeout+10);
             log_debug "[govproc] Preventing screensaver from activating ...";
             if (!$noss_lastprevent_time) {
                 $noss_screensaver = Screensaver::Any::detect_screensaver();
@@ -637,7 +637,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.207 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-05-23.
+This document describes version 0.208 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-09-03.
 
 =head1 SYNOPSIS
 

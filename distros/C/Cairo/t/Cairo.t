@@ -10,7 +10,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 70;
+use Test::More tests => 72;
 
 unless (eval 'use Test::Number::Delta; 1;') {
 	my $reason = 'Test::Number::Delta not available';
@@ -286,3 +286,13 @@ isa_ok ($path, 'ARRAY');
 $cr->append_path ($path);
 
 is ($cr->status, 'success');
+
+SKIP: {
+	skip 'new stuff', 2
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 16, 0);
+
+	$cr->tag_begin("Link","https://www.perl.org");
+	is ($cr->status, 'success');
+	$cr->tag_end("Link");
+	is ($cr->status, 'success');
+}

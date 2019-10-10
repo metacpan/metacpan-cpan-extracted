@@ -1,0 +1,78 @@
+Net-CIDR-Overlap
+
+A utility module for helping make sure a list of CIDRs don't overlap.
+
+    my $nco=Net::CIDR::Overlap->new;
+    
+    # add some subnets
+    eval{
+        $nco->add( '127.0.0.0/24' );
+        $nco->add( '192.168.42.0/24' );
+        $nco->add( '10.10.0.0/16' );
+    }
+    if ( $@ ){
+        warn( $@ );
+    }
+    
+    # this will fail as they have already been added
+    eval{
+        $nco->add( '127.0.0.0/25' );
+        $nco->add( '10.10.10/24' );
+    }
+    if ( $@ ){
+        warn( $@ );
+    }
+    
+    # this will fail this is not a valid CIDR
+    eval{
+        $nco->add( 'foo' );
+    }
+    if ( $@ ){
+        warn( $@ );
+    }
+    
+    # print the subnets we added with out issue
+    my $list=$nco->list;
+    foreach my $cidr ( @${ $list } ){
+        print $cidr."\n";
+    }
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::CIDR::Overlap
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-CIDR-Overlap
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-CIDR-Overlap
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Net-CIDR-Overlap
+
+    Search CPAN
+        https://metacpan.org/release/Net-CIDR-Overlap
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

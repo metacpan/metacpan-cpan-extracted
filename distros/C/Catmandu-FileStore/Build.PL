@@ -18,7 +18,7 @@ my %module_build_args = (
     "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-FileStore",
-  "dist_version" => "1.14",
+  "dist_version" => "1.15",
   "license" => "perl",
   "module_name" => "Catmandu::FileStore",
   "recommends" => {
@@ -28,10 +28,21 @@ my %module_build_args = (
   "recursive_test_files" => 1,
   "requires" => {
     "Catmandu" => "1.06",
+    "Clone" => 0,
+    "Hash::Merge::Simple" => 0,
+    "IO::String" => 0,
     "Module::Build" => "0.4229",
+    "Moo" => 0,
+    "Moo::Role" => 0,
+    "Package::Stash" => 0,
+    "Path::Iterator::Rule" => 0,
+    "Path::Tiny" => 0,
+    "URI::Escape" => 0,
+    "namespace::clean" => 0,
     "perl" => "v5.10.1"
   },
   "test_requires" => {
+    "IO::Callback" => 0,
     "Log::Any::Adapter::Log4perl" => 0,
     "Log::Any::Test" => "1.03",
     "Log::Log4perl" => 0,
@@ -45,6 +56,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "IO::Callback" => 0,
   "Log::Any::Adapter::Log4perl" => 0,
   "Log::Any::Test" => "1.03",
   "Log::Log4perl" => 0,

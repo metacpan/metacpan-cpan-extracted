@@ -1,12 +1,13 @@
 package OpenERP::XMLRPC::Client;
 # ABSTRACT: XMLRPC Client tweaked for OpenERP interaction.
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use 5.010;
 use Moose;
 use MIME::Base64;
 use failures qw/openerp::fault/;
+use RPC::XML qw/RPC_STRING/;
 
 
 has 'username' 	=> ( is  => 'ro', isa => 'Str', default => 'admin');
@@ -45,7 +46,7 @@ sub openerp_login
     my $self = shift;
 
     # call 'login' method to get the uid..
-    my $res = $self->openerp_rpc->send_request('login', $self->dbname, $self->username, \$self->password );
+    my $res = $self->openerp_rpc->send_request('login', RPC_STRING($self->dbname), $self->username, \$self->password );
 
     if ( ! defined $res || ! ref $res )
     {
@@ -119,7 +120,7 @@ sub object_execute
     $self->simple_request
 	(
 		'execute',
-		$self->dbname,
+		RPC_STRING($self->dbname),
 		$self->openerp_uid,
 		\$self->password,
 		$relation,
@@ -143,7 +144,7 @@ sub object_execute_kw
     $self->simple_request
 	(
 		'execute_kw',
-		$self->dbname,
+		RPC_STRING($self->dbname),
 		$self->openerp_uid,
 		\$self->password,
 		$relation,
@@ -167,7 +168,7 @@ sub object_exec_workflow
     $self->simple_request
 	(
 		'exec_workflow',
-		$self->dbname,
+		RPC_STRING($self->dbname),
 		$self->openerp_uid,
 		\$self->password,
 		$relation,
@@ -191,7 +192,7 @@ sub report_report
     return $self->simple_request
 	(
 		'report',
-		$self->dbname,
+		RPC_STRING($self->dbname),
 		$self->openerp_uid,
 		\$self->password,
 		$report_id,
@@ -213,7 +214,7 @@ sub report_report_get
     my $object = $self->simple_request
 	(
 		'report_get',
-		$self->dbname,
+		RPC_STRING($self->dbname),
 		$self->openerp_uid,
 		\$self->password,
 		$report_id,
@@ -231,6 +232,10 @@ sub report_report_get
 sub simple_request
 {
     my $self = shift;
+
+    # I haven't forced dbname to be passed as string in here because it's possible other consumers of this class have
+    # used it in other ways where the dbname wasn't necessarily the second argument.  Therefore I've done it in
+    # each of its callers I know about.
 
     local *RPC::XML::boolean::value = sub {
         my $self = shift;
@@ -363,7 +368,7 @@ OpenERP::XMLRPC::Client - XMLRPC Client tweaked for OpenERP interaction.
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -580,11 +585,15 @@ Colin Newell <colin@opusvl.com>
 
 Jon Allen (JJ) <jj@opusvl.com>
 
+=item *
+
+Nick Booker <nick.booker@opusvl.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Colin Newell.
+This software is copyright (c) 2019 by OpusVL <community@opusvl.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

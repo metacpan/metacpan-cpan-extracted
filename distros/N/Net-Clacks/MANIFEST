@@ -6,10 +6,12 @@ devscripts/setversion.pl
 example/chat.pl
 example/chatbot.pl
 example/clacks_master.xml
-example/clacks_slaveserver.xml
+example/clacks_slaveserver1.xml
+example/clacks_slaveserver2.xml
 example/clock.pl
 example/exampleserver.crt
 example/exampleserver.key
+example/rawclient.pl
 example/README.txt
 example/server.pl
 lib/Net/Clacks.pm

@@ -107,4 +107,34 @@ SKIP: {
     'requires checked properly during create_class_with_roles';
 }
 
+{
+  package SimpleRole1;
+  use Role::Tiny;
+  sub role_method { __PACKAGE__ }
+}
+
+{
+  package SimpleRole2;
+  use Role::Tiny;
+  sub role_method { __PACKAGE__ }
+}
+
+{
+  package SomeEmptyClass;
+  $INC{'SomeEmptyClass.pm'} ||= __FILE__;
+}
+
+{
+  my $create_class = Role::Tiny->create_class_with_roles('SomeEmptyClass', 'SimpleRole1');
+  Role::Tiny->apply_roles_to_package( $create_class, 'SimpleRole2' );
+
+  my $manual_extend = 'ManualExtend';
+  @ManualExtend::ISA = qw(SomeEmptyClass);
+  Role::Tiny->apply_roles_to_package( $manual_extend, 'SimpleRole1' );
+  Role::Tiny->apply_roles_to_package( $manual_extend, 'SimpleRole2' );
+
+  is $create_class->role_method, $manual_extend->role_method,
+    'methods added by create_class_with_roles treated equal to those added with apply_roles_to_package';
+}
+
 done_testing;

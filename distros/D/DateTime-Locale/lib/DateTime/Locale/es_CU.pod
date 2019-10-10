@@ -302,15 +302,15 @@ Spanish Cuba locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = martes, 5 de febrero de 2008, 18:30:30 UTC
-   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995, 09:05:02 UTC
-  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10, 04:44:23 UTC
+   2008-02-05T18:30:30 = martes, 5 de febrero de 2008 a las 18:30:30 UTC
+   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995 a las 09:05:02 UTC
+  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10 a las 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 de febrero de 2008, 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 de diciembre de 1995, 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 de septiembre de -10, 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 de febrero de 2008 a las 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 de diciembre de 1995 a las 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 de septiembre de -10 a las 04:44:23 UTC
 
 =head3 Medium
 

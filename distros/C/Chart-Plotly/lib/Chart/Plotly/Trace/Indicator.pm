@@ -14,9 +14,9 @@ use Chart::Plotly::Trace::Indicator::Stream;
 use Chart::Plotly::Trace::Indicator::Title;
 use Chart::Plotly::Trace::Indicator::Transform;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
-# ABSTRACT: TODO: add description
+# ABSTRACT: An indicator is used to visualize a single `value` along with some contextual information such as `steps` or a `threshold`, using a combination of three visual elements: a number, a delta, and/or a gauge. Deltas are taken with respect to a `reference`. Gauges can be either angular or bullet (aka linear) gauges.
 
 sub TO_JSON {
     my $self       = shift;
@@ -162,11 +162,11 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Trace::Indicator - TODO: add description
+Chart::Plotly::Trace::Indicator - An indicator is used to visualize a single `value` along with some contextual information such as `steps` or a `threshold`, using a combination of three visual elements: a number, a delta, and/or a gauge. Deltas are taken with respect to a `reference`. Gauges can be either angular or bullet (aka linear) gauges.
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ version 0.028
 
 =head1 DESCRIPTION
 
-TODO: add description
+An indicator is used to visualize a single `value` along with some contextual information such as `steps` or a `threshold`, using a combination of three visual elements: a number, a delta, and/or a gauge. Deltas are taken with respect to a `reference`. Gauges can be either angular or bullet (aka linear) gauges.
 
 Screenshot of the above example:
 

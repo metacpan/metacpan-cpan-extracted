@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception;
 
-$Method::ParamValidator::Exception::VERSION   = '0.15';
+$Method::ParamValidator::Exception::VERSION   = '0.16';
 $Method::ParamValidator::Exception::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception - Handles 'exception' for Method::ParamValidat
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

@@ -1,4 +1,4 @@
-# $Id$
+## no critic (RequireExplicitPackage RequireVersionVar RequireEndWithOne)
 
 use strict;
 use warnings;

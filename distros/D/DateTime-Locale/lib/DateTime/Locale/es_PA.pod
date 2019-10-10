@@ -302,15 +302,15 @@ Spanish Panama locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = martes, 5 de febrero de 2008, 6:30:30 p. m. UTC
-   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995, 9:05:02 a. m. UTC
-  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10, 4:44:23 a. m. UTC
+   2008-02-05T18:30:30 = martes, 5 de febrero de 2008 a las 6:30:30 p. m. UTC
+   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995 a las 9:05:02 a. m. UTC
+  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10 a las 4:44:23 a. m. UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 de febrero de 2008, 6:30:30 p. m. UTC
-   1995-12-22T09:05:02 = 22 de diciembre de 1995, 9:05:02 a. m. UTC
-  -0010-09-15T04:44:23 = 15 de septiembre de -10, 4:44:23 a. m. UTC
+   2008-02-05T18:30:30 = 5 de febrero de 2008 a las 6:30:30 p. m. UTC
+   1995-12-22T09:05:02 = 22 de diciembre de 1995 a las 9:05:02 a. m. UTC
+  -0010-09-15T04:44:23 = 15 de septiembre de -10 a las 4:44:23 a. m. UTC
 
 =head3 Medium
 

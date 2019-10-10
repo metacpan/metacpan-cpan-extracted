@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
@@ -149,7 +149,7 @@ sub pending {
     return $s->{avail} ? $s->{avail} : $s->{end} ? undef : 0;
 }
 
-sub _croak {
+sub _unimpl {
     my $func = shift;
     croak "Forks::Queue: $func not implemented in abstract base class";
 }
@@ -175,16 +175,16 @@ sub _validate_input {
     return $value;
 }
 
-sub push       { _croak("push/put") }
-sub peek_front { _croak("peek") }
-sub peek_back  { _croak("peek") }
-sub shift :method { _croak("shift/get") }
-sub unshift    { _croak("unshift") }
-sub pop        { _croak("pop/get") }
-sub shift_nb   { _croak("shift/get") }
-sub pop_nb     { _croak("pop/get") }
-sub status     { _croak("pending/status") }
-sub clear      { _croak("clear") }
+sub push       { _unimpl("push/put") }
+sub peek_front { _unimpl("peek") }
+sub peek_back  { _unimpl("peek") }
+sub shift :method { _unimpl("shift/get") }
+sub unshift    { _unimpl("unshift") }
+sub pop        { _unimpl("pop/get") }
+sub shift_nb   { _unimpl("shift/get") }
+sub pop_nb     { _unimpl("pop/get") }
+sub status     { _unimpl("pending/status") }
+sub clear      { _unimpl("clear") }
 
 
 
@@ -207,6 +207,16 @@ sub Forks::Queue::Util::__is_nfs {
     local $?;
     waitpid $pid,0;
     return $? == 0;
+}
+
+sub Forks::Queue::Util::QID {
+    no warnings 'uninitialized';
+    if ($Forks::Queue::Util::PID != $$) {
+        $Forks::Queue::Util::PID = $$;
+        $Forks::Queue::Util::QID = 0;
+    }
+    $Forks::Queue::Util::QID++;
+    join("-", $Forks::Queue::Util::PID, $Forks::Queue::Util::QID);
 }
 
 
@@ -236,7 +246,7 @@ Forks::Queue - queue that can be shared across processes
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 SYNOPSIS
 
@@ -691,8 +701,9 @@ that the queue does not have a maximum size.
 
 The return value also acts as an lvalue through which the maximum
 queue size can be set, and allows the C<limit> method to be used 
-in the same way as L<Thread::Queue/"limit">. I<< Note: lvalue feature
-may not work with Perl v<5.14. >>
+in the same way as 
+L<< the C<limit> method in Thread::Queue|Thread::Queue/"limit" >>. 
+I<< Note: lvalue feature may not work with Perl v<5.14. >>
 
 If arguments are provided, the first argument is used to set the
 maximum queue size. A non-positive queue size can be specified to
@@ -756,7 +767,8 @@ that may help improve queue performance
 =item * FORKS_QUEUE_DIR
 
 Specifies a directory to use for temporary queue files in the
-L<File|Forks::Queue::File> and L<SQLite|Forks::Queue::SQLite> implementations.
+L<File|Forks::Queue::File> and 
+L<SQLite|Forks::Queue::SQLite> implementations.
 If this directory is not specified, the implementations will try to make
 a reasonable choice based on your platform and other environment settings.
 
@@ -787,10 +799,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Forks-Queue>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Forks-Queue>
 
 =item * CPAN Ratings
 

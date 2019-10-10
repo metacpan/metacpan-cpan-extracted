@@ -1,3 +1,4 @@
+bin/address_lookup
 Changes
 ignore.txt
 lib/Geo/Coder/List.pm
@@ -17,15 +18,20 @@ t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/free.t
 t/geofarm.t
 t/geonames.t
 t/google.t
 t/googleplaces.t
 t/gv.t
 t/kwalitee.t
+t/links.t
 t/list.t
 t/manifest.t
+t/no404s.t
 t/noplan.t
+t/online.enabled
+t/opencage.t
 t/osm.t
 t/ovi.t
 t/pod-cm.t

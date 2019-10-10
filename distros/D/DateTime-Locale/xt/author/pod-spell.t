@@ -128,6 +128,7 @@ Futuna
 GF
 GG
 GGGG
+GGGGG
 GGGGy
 GGGGyMMMMEEEEdd
 GGGGyMd
@@ -179,6 +180,7 @@ Interlingua
 Isniin
 Isnin
 Ituku
+Izu
 JE
 JM
 Jahres
@@ -860,6 +862,7 @@ fur_IT
 fy
 fy_NL
 ga
+ga_GB
 ga_IE
 gd
 gd_GB
@@ -902,6 +905,7 @@ hmsv
 hmsvvvv
 hmv
 hodź
+hono
 hr
 hr_BA
 hr_HR
@@ -923,6 +927,8 @@ ii
 ii_CN
 ika
 im
+ime
+ing
 is
 is_IS
 it
@@ -997,6 +1003,7 @@ lag_TZ
 lb
 lb_LU
 le
+leta
 lg
 lg_UG
 lia
@@ -1057,6 +1064,8 @@ mgo_CM
 mi
 mi_NZ
 minggu
+miz
+mjesec
 mk
 mk_MK
 ml
@@ -1206,6 +1215,7 @@ rw
 rw_RW
 rwk
 rwk_TZ
+sa
 sabaat
 sah
 sah_RU
@@ -1247,6 +1257,7 @@ shi_Tfng_MA
 si
 si_LK
 sigunda
+simana
 sizhun
 sjedmica
 sk
@@ -1336,6 +1347,7 @@ uMvulo
 ug
 ug_CN
 uge
+uike
 uk
 uk_UA
 uke

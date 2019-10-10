@@ -108,18 +108,18 @@ Portuguese Guinea-Bissau locale.
 
 =head3 Abbreviated (format)
 
-  jan
-  fev
-  mar
-  abr
-  mai
-  jun
-  jul
-  ago
-  set
-  out
-  nov
-  dez
+  jan.
+  fev.
+  mar.
+  abr.
+  mai.
+  jun.
+  jul.
+  ago.
+  set.
+  out.
+  nov.
+  dez.
 
 =head3 Narrow (format)
 
@@ -154,18 +154,18 @@ Portuguese Guinea-Bissau locale.
 
 =head3 Abbreviated (stand-alone)
 
-  jan
-  fev
-  mar
-  abr
-  mai
-  jun
-  jul
-  ago
-  set
-  out
-  nov
-  dez
+  jan.
+  fev.
+  mar.
+  abr.
+  mai.
+  jun.
+  jul.
+  ago.
+  set.
+  out.
+  nov.
+  dez.
 
 =head3 Narrow (stand-alone)
 
@@ -401,21 +401,21 @@ Portuguese Guinea-Bissau locale.
 
 =head3 GyMMM (MMM 'de' y G)
 
-   2008-02-05T18:30:30 = fev de 2008 d.C.
-   1995-12-22T09:05:02 = dez de 1995 d.C.
-  -0010-09-15T04:44:23 = set de -10 a.C.
+   2008-02-05T18:30:30 = fev. de 2008 d.C.
+   1995-12-22T09:05:02 = dez. de 1995 d.C.
+  -0010-09-15T04:44:23 = set. de -10 a.C.
 
 =head3 GyMMMEd (E, d 'de' MMM 'de' y G)
 
-   2008-02-05T18:30:30 = terça, 5 de fev de 2008 d.C.
-   1995-12-22T09:05:02 = sexta, 22 de dez de 1995 d.C.
-  -0010-09-15T04:44:23 = sábado, 15 de set de -10 a.C.
+   2008-02-05T18:30:30 = terça, 5 de fev. de 2008 d.C.
+   1995-12-22T09:05:02 = sexta, 22 de dez. de 1995 d.C.
+  -0010-09-15T04:44:23 = sábado, 15 de set. de -10 a.C.
 
 =head3 GyMMMd (d 'de' MMM 'de' y G)
 
-   2008-02-05T18:30:30 = 5 de fev de 2008 d.C.
-   1995-12-22T09:05:02 = 22 de dez de 1995 d.C.
-  -0010-09-15T04:44:23 = 15 de set de -10 a.C.
+   2008-02-05T18:30:30 = 5 de fev. de 2008 d.C.
+   1995-12-22T09:05:02 = 22 de dez. de 1995 d.C.
+  -0010-09-15T04:44:23 = 15 de set. de -10 a.C.
 
 =head3 H (HH)
 
@@ -461,9 +461,9 @@ Portuguese Guinea-Bissau locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = fev
-   1995-12-22T09:05:02 = dez
-  -0010-09-15T04:44:23 = set
+   2008-02-05T18:30:30 = fev.
+   1995-12-22T09:05:02 = dez.
+  -0010-09-15T04:44:23 = set.
 
 =head3 MMMEd (E, d/MM)
 

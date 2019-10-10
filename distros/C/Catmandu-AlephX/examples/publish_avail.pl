@@ -8,7 +8,7 @@ use open qw(:std :utf8);
 use Catmandu::Exporter::MARC;
 use Data::Dumper;
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my $exporter = Catmandu::Exporter::MARC->new(type => 'ALEPHSEQ');
 
@@ -32,4 +32,4 @@ if($publish->is_success){
   }
 }else{
   say STDERR join('',@{$publish->errors});
-} 
+}

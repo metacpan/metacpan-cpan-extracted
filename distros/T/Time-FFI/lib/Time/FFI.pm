@@ -9,9 +9,9 @@ use FFI::Platypus::Buffer;
 use FFI::Platypus::Memory;
 use Time::FFI::tm;
 
-our $VERSION = '0.002';
+our $VERSION = '1.003';
 
-our @EXPORT_OK = qw(asctime ctime gmtime localtime mktime strftime strptime);
+our @EXPORT_OK = qw(asctime ctime gmtime localtime mktime strftime strptime timegm timelocal);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 my $ffi = FFI::Platypus->new(lib => [undef], ignore_not_found => 1);
@@ -116,11 +116,25 @@ $ffi->attach(strftime => ['opaque', 'size_t', 'string', 'tm'] => 'size_t' => sub
 
 $ffi->attach(strptime => ['string', 'string', 'tm'] => 'string' => sub {
   my ($xsub, $str, $format, $tm, $remaining) = @_;
-  $tm = Time::FFI::tm->new unless defined $tm;
+  $tm = Time::FFI::tm->new(tm_mday => 1, tm_isdst => -1) unless defined $tm;
   my $rc = $xsub->($str, $format, $tm);
   croak "strptime: Failed to match input to format string" unless defined $rc;
   $$remaining = $rc if defined $remaining;
   return $tm;
+});
+
+$ffi->attach(timegm => ['tm'] => 'time_t' => sub {
+  my ($xsub, $tm) = @_;
+  my $rc = $xsub->($tm);
+  croak "timegm: $!" if $rc == -1;
+  return $rc;
+});
+
+$ffi->attach(timelocal => ['tm'] => 'time_t' => sub {
+  my ($xsub, $tm) = @_;
+  my $rc = $xsub->($tm);
+  croak "timelocal: $!" if $rc == -1;
+  return $rc;
 });
 
 1;
@@ -136,13 +150,17 @@ Time::FFI - libffi interface to POSIX date and time functions
   my $tm = strptime '1995-01-02 13:15:39', '%Y-%m-%d %H:%M:%S';
   my $epoch = mktime $tm;
   print "$epoch: ", strftime('%I:%M:%S %p on %B %e, %Y', $tm);
-  my $piece = $tm->to_object('Time::Piece', 1);
 
   my $tm = localtime time;
   my $datetime = $tm->to_object('DateTime', 1);
 
   my $tm = gmtime time;
   my $moment = $tm->to_object('Time::Moment', 0);
+
+  use Time::FFI::tm;
+  my $tm = Time::FFI::tm->from_object(DateTime->now, 1);
+  my $epoch = $tm->epoch(1);
+  my $piece = $tm->to_object('Time::Piece', 1);
 
 =head1 DESCRIPTION
 
@@ -205,7 +223,12 @@ L<localtime_r(3)> function is used if available.
   my $epoch = mktime $tm;
 
 Returns the epoch timestamp representing the passed L<Time::FFI::tm> record
-interpreted in the local time zone.
+interpreted in the local time zone. The time is interpreted from the C<tm_sec>,
+C<tm_min>, C<tm_hour>, C<tm_mday>, C<tm_mon>, C<tm_year>, and C<tm_isdst>
+members of the record, ignoring the rest. DST status will be automatically
+determined if C<tm_isdst> is a negative value. The record will also be updated
+to normalize any out-of-range values and populate the C<tm_isdst>, C<tm_wday>,
+and C<tm_yday> values, as well as C<tm_gmtoff> and C<tm_zone> if supported.
 
 =head2 strftime
 
@@ -224,7 +247,9 @@ for available format descriptors.
 
 Returns a L<Time::FFI::tm> record representing the passed string, parsed
 according to the passed format. Consult your system's L<strptime(3)> manual for
-available format descriptors.
+available format descriptors. The C<tm_mday> member will default to 1 if not
+specified by the string, and the C<tm_isdst> member will be set to -1; all
+other unspecified members will default to 0.
 
 A L<Time::FFI::tm> record may be passed as the third argument, in which case it
 will be modified in place to (on most systems) update only the date/time
@@ -233,6 +258,19 @@ reference may be passed as the fourth argument, in which case it will be set to
 the remaining unprocessed characters of the input string if any.
 
 This function is usually not available on Windows.
+
+=head2 timegm
+
+  my $epoch = timegm $tm;
+
+Like L</mktime>, but interprets the passed L<Time::FFI::tm> record as UTC. This
+function is not always available.
+
+=head2 timelocal
+
+  my $epoch = timelocal $tm;
+
+The same as L</mktime>, but not always available.
 
 =head1 BUGS
 

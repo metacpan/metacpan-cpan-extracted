@@ -1,6 +1,6 @@
 =head1 NAME
 
-StreamFinder::Youtube - Fetch actual raw streamable URLs from Youtube and others.
+StreamFinder::Youtube - Fetch actual raw streamable URLs from YouTube and others.
 
 =head1 AUTHOR
 
@@ -82,7 +82,7 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Youtube accepts a valid full Youtube video ID or URL on 
+StreamFinder::Youtube accepts a valid full YouTube video ID or URL on 
 youtube, et. al. that the "youtube-dl" program supports, 
 and returns the actual stream URL, title, and cover art icon for that video.  
 The purpose is that one needs this URL in order to have the option to 
@@ -106,16 +106,17 @@ and the separate application program:  youtube-dl.
 
 =item B<new>(I<url> [, "debug" [ => 0|(1)|2 ]] [, "fast" [ => 0|(1) ]])
 
-Accepts a youtube.com video ID or URL and creates and returns a new video 
-object, or I<undef> if the URL is not a valid Youtube video or no streams 
-are found  The URL can be the full URL, 
-ie. https://www.youtube.com/watch?v=I<video-id>, or just I<video-id> 
-(if the site is www.youtube.com, since Youtube has multiple sites).
+Accepts a youtube.com video ID, or any full URL that youtube-dl supports 
+and creates and returns a new video object, or I<undef> if the URL is 
+not a youtube-supported video URL or no streams are found.  The URL can 
+be the full URL, 
+ie. https://www.youtube.com/watch?v=B<video-id>, or just I<video-id> 
+(if the site is www.youtube.com, since YouTube has multiple sites).
 
 If "fast" or "-fast" is specified (or set to 1), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
-if you know the video is NOT a youtube.com video or you don't care about 
-the artist field.
+if you know the video is NOT a YouTube video or you don't care about 
+the artist (youtube channel's owner) field.
 
 =item $video->B<get>()
 
@@ -139,7 +140,7 @@ Returns the number of streams found for the video.
 
 =item $video->B<getID>()
 
-Returns the video's Youtube ID (numeric).
+Returns the video's YouTube ID (numeric).
 
 =item $video->B<getTitle>(['desc'])
 
@@ -157,7 +158,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 =item $video->B<getImageURL>()
 
 Returns the URL for the video's "cover art" banner image, which for 
-Youtube videoss is always the icon image, as Youtube does not support 
+YouTube videos is always the icon image, as YouTube does not support 
 a separate banner image at this time.
 
 =item $video->B<getImageData>()
@@ -390,6 +391,12 @@ RETRYIT:
 	}
 	print STDERR "--TRY($try of 1): youtube-dl returned=$_= ARGS=$ytdlArgs=\n"  if ($DEBUG);
 	@ytdldata = split /\r?\n/s;
+	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
+		print STDERR "..1:No MP4 streams found, try again for any (audio, etc.)...\n";
+		$try++;
+		$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
+		goto RETRYIT  if ($1);
+	}
 	return undef unless (scalar(@ytdldata) > 0);
 
 	unless ($ytdldata[0] =~ m#^https?\:\/\/#) {
@@ -410,7 +417,8 @@ RETRYIT:
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	$self->{'iconurl'} = pop(@{$self->{'streams'}})  if ($self->{'cnt'} > 1);
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
-	unless ($try || $self->{'cnt'} > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
+	unless ($try || $self->{'cnt'} > 0) {  #IF NO STREAMS FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
+		print STDERR "..2:No MP4 streams found, try again for any (audio, etc.)...\n";
 		$try++;
 		$ytdlArgs =~ s/\-f\s+\"([^\"]+)\"//;
 		goto RETRYIT  if ($1);
@@ -436,6 +444,7 @@ RETRYIT:
 				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 			}
 		}
+		$html =~ s/\\\"/\&quot\;/gs;
 		if ($html =~ s#\]\}\,\"title\"\:\{\"runs\"\:\[\{\"text\"\:\"([^\"]+)\"\,\"navigationEndpoint\"\:([^\}]+)##s) {
 			my $two = $2;
 			$self->{'artist'} = $1;
@@ -444,7 +453,6 @@ RETRYIT:
 		if ($html =~ s#\"videoDetails\"\:\{\"videoId\"\:\"([^\"]+)\"([^\}]+)##s) {
 			my $two = $2;
 			$self->{'id'} = $1;
-			$two =~ s/\\\"/\\u0022/gs;
 			$self->{'title'} = $1  if ($two =~ m#\"title\"\:\"([^\"]+)#);
 			$self->{'iconurl'} = $1  if ($two =~ m#\"thumbnails\"\:\[\{\"url\"\:\"([^\"]+)#);
 			$self->{'iconurl'} =~ s/\?.*$//;

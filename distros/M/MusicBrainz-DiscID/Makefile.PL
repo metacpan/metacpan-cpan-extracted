@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 	ABSTRACT_FROM => 'lib/MusicBrainz/DiscID.pm',
 	VERSION_FROM => 'lib/MusicBrainz/DiscID.pm',
 	AUTHOR => 'Nicholas J. Humfrey',
-	LICENSE => 'gpl_2',
+	LICENSE => 'mit',
 
 	TEST_REQUIRES => {
 		'Test' => '1.00',

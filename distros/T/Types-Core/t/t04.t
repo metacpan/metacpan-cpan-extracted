@@ -51,12 +51,12 @@ use warnings; use strict;
 use Test::More;
 use Types::Core qw(blessed typ);
 
-our ($name, $classname, $typename);
+#our ($name, $classname, $typename);
 
 my $DepFailed="This test is dependent on the previous test working.";	
 
 sub  run_test_with($$$) {
-	($name, $classname, $typename) = @_;
+	my ($name, $classname, $typename) = @_;
 
 	my $ref=$classname->new();
 
@@ -68,7 +68,7 @@ sub  run_test_with($$$) {
 			ok($ref eq blessed $ref, "$name is blessed");
 		};
 
-	ok( $typename eq typ $ref, sprintf("%s should have type %s, not %s",$name, $typename, typ $ref));
+	ok( $typename eq typ $ref, sprintf("%s should have type %s. Got %s.",$name, $typename, typ $ref));
 
 }
 

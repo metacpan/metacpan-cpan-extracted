@@ -898,6 +898,14 @@ void cairo_append_path (cairo_t *cr, cairo_path_t *path);
 
 cairo_status_t cairo_status (cairo_t *cr);
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 16, 0)
+
+void cairo_tag_begin (cairo_t * cr, const char_utf8 * tag_name, const char_utf8 * attributes);
+
+void cairo_tag_end (cairo_t * cr, const char_utf8 * tag_name);
+
+#endif
+
 # --------------------------------------------------------------------------- #
 
 MODULE = Cairo	PACKAGE = Cairo	PREFIX = cairo_

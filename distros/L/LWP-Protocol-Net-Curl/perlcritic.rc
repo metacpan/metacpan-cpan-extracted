@@ -1,5 +1,8 @@
 severity = harsh
 
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 3
+
 [TestingAndDebugging::RequireUseWarnings]
 equivalent_modules = common::sense
 

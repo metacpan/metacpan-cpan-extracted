@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Math::Calc::Parser;
 use Encode ();
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 my ($bignum, $bigrat);
 sub import {
 	my $class = shift;

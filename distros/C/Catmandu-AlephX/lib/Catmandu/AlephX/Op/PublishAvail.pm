@@ -5,6 +5,8 @@ use Catmandu::AlephX::Metadata::MARC;
 use Catmandu::AlephX::Record;
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 #format: [ { _id => <id>, record => <doc>}, .. ]
@@ -31,7 +33,7 @@ sub parse {
     $identifier =~ s/aleph-publish://o;
 
     my($record) = $record->find("./*[local-name()='metadata']/*[local-name() = 'record']")->get_nodelist();
-    if($record){    
+    if($record){
       #remove controlfield with tag 'FMT' and 'LDR' because Catmandu::Importer::MARC cannot handle these
       my $m = Catmandu::AlephX::Metadata::MARC->parse($record);
       $m->{_id} = $identifier;
@@ -50,7 +52,7 @@ sub parse {
     session_id => $xpath->findvalue("/$op/session-id"),
     records => \@records,
     content_ref => $str_ref
-  ); 
+  );
 }
 
 1;

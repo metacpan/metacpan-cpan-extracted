@@ -4,8 +4,10 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use IO::String;
+use IO::Callback;
 use Path::Tiny;
 use Catmandu::Store::File::BagIt;
+use Errno qw/EIO/;
 use utf8;
 
 my $pkg;
@@ -103,6 +105,51 @@ note("get");
         my $str = path($tempfile)->slurp_utf8;
 
         is $str , "钱唐湖春行\n", 'got the correct data';
+    }
+
+    {
+        my $file  = $bag->get("test1.txt");
+
+        my $io    = IO::File->new("> /dev/null");
+
+        $io->binmode(":raw");
+
+        my $bytes = $bag->stream($io, $file);
+
+        $io->close();
+
+        ok $bytes , 'can stream the data to null';
+    }
+
+    {
+        my $file  = $bag->get("test1.txt");
+
+        my $var   = '';
+        my $io    = IO::String->new($var);
+
+        my $bytes = $bag->stream($io, $file);
+
+        $io->close();
+
+        ok $bytes , 'can stream the data to string';
+
+        utf8::decode($var);
+
+        is $var , "钱唐湖春行\n", 'got the correct data';
+    }
+
+    {
+        my $file  = $bag->get("test1.txt");
+
+        my $io    = IO::Callback->new('>', sub {
+            my $data = shift ;
+            $! = EIO;
+            return IO::Callback::Error;
+        });
+
+        throws_ok {  $bag->stream($io, $file); }  'Catmandu::Error' , 'expecting to die with IO error';
+
+        $io->close();
     }
 }
 

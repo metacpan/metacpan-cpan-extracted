@@ -95,11 +95,13 @@ of playing.  The author uses his own custom all-purpose media player called
 audio player).  "fauxdacious" can incorporate this module to decode and play 
 Tunein.com streams.  One or more streams can be returned for each station.  
 
-NOTE:  Tunein uses StreamFinder::Youtube (youtube-dl) to extract the actual 
-stream and only returns a SINGLE valid stream URL for a station based on a 
-boilerplate URL based on the station's ID.  However, youtube-dl does NOT return 
-the metadata, which we're able to extract here.  This may or may NOT work for a 
-given station (particularly non-free / subscription-required stations, ymmv)!
+NOTE:  Tunein uses youtube-dl to extract the actual stream and only returns a 
+SINGLE valid stream URL for a station based on a boilerplate URL based on 
+the station's ID.  However, youtube-dl does NOT return the metadata, which 
+we're able to extract here.  This may or may NOT work for a given station 
+(particularly non-free / subscription-required stations, ymmv)!  For podcasts, 
+and perhaps some stations, we're able to extract a stream without 
+calling youtube-dl.
 
 =head1 SUBROUTINES/METHODS
 
@@ -109,9 +111,9 @@ given station (particularly non-free / subscription-required stations, ymmv)!
 
 Accepts a tunein.com station / podcast ID or URL and creates and returns a new 
 station object, or I<undef> if the URL is not a valid Tunein station or podcast, 
-or no streams are found  The URL can be the full URL, 
-ie. https://tunein.com/radio/I<station-id>, 
-https://tunein.com/podcasts/I<podcast-id>/?topicId=I<episode-id>, 
+or no streams are found.  The URL can be the full URL, 
+ie. https://tunein.com/radio/B<station-id>, 
+https://tunein.com/podcasts/B<podcast-id>/?topicId=B<episode-id>, 
 or just I<station-id> or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, 
 you must also include the I<episode-id>, otherwise, the I<podcast-id> will be 
 interpreted as a I<station-id> and you'll likely get no streams!
@@ -391,6 +393,7 @@ sub new
 		}
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
+	$html =~ s/\\\"/\&quot\;/gs;
 	if ($html) {  #EXTRACT METADATA, IF WE CAN:
 		print STDERR "-1: EXTRACTING METADATA...\n"  if ($DEBUG);
 		my $artist;

@@ -1,5 +1,10 @@
 Revision history for exact
 
+1.10      2019-10-06 16:27:22-07:00 America/Los_Angeles
+        - Add inheritance capability
+        - Add monkey_patch, add_isa, no_parent, and late_parent methods
+        - Remove autoclean method
+
 1.09      2019-08-22 16:20:27-07:00 America/Los_Angeles
         - Changed to use "-" prepending flags for compile check w00t
         - Add back dist.ini components

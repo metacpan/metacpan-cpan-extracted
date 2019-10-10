@@ -3,12 +3,11 @@ package Libssh::Sftp;
 
 use strict;
 use warnings;
+use POSIX;
+use Libssh::Session;
 use Exporter qw(import);
-use XSLoader;
 
-our $VERSION = '0.3';
-
-XSLoader::load('Libssh::Session', $VERSION);
+our $VERSION = '0.7';
 
 use constant SSH_OK => 0;
 use constant SSH_ERROR => -1;
@@ -30,11 +29,19 @@ use constant SSH_FX_FILE_ALREADY_EXISTS => 11;
 use constant SSH_FX_WRITE_PROTECT => 12;
 use constant SSH_FX_NO_MEDIA => 13;
 
+use constant SSH_FILEXFER_TYPE_REGULAR => 1;
+use constant SSH_FILEXFER_TYPE_DIRECTORY => 2;
+use constant SSH_FILEXFER_TYPE_SYMLINK => 3;
+use constant SSH_FILEXFER_TYPE_SPECIAL => 4;
+use constant SSH_FILEXFER_TYPE_UNKNOWN => 5;
+
 our @EXPORT_OK = qw(
 SSH_FX_OK SSH_FX_EOF SSH_FX_NO_SUCH_FILE SSH_FX_PERMISSION_DENIED SSH_FX_FAILURE
 SSH_FX_BAD_MESSAGE SSH_FX_NO_CONNECTION SSH_FX_CONNECTION_LOST SSH_FX_OP_UNSUPPORTED
 SSH_FX_INVALID_HANDLE SSH_FX_NO_SUCH_PATH SSH_FX_FILE_ALREADY_EXISTS
 SSH_FX_WRITE_PROTECT SSH_FX_NO_MEDIA
+SSH_FILEXFER_TYPE_REGULAR SSH_FILEXFER_TYPE_DIRECTORY SSH_FILEXFER_TYPE_SYMLINK
+SSH_FILEXFER_TYPE_SPECIAL SSH_FILEXFER_TYPE_UNKNOWN
 );
 our @EXPORT = qw();
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT, @EXPORT_OK ] );
@@ -63,7 +70,7 @@ sub init {
     my ($self, %options) = @_;
     
     if (!defined($options{session}) || 
-        ref($options{session}) ne 'Libssh::Session') {
+        !$options{session}->isa('Libssh::Session')) {
         $self->set_err(msg => 'error allocating SFTP session: need to set session option');
         return SSH_ERROR;
     }
@@ -207,6 +214,55 @@ sub opendir {
     return sftp_opendir($self->{sftp_session}, $options{dir});
 }
 
+sub mkdir {
+    my ($self, %options) = @_;
+
+    if (!defined($self->{sftp_session})) {
+        $self->set_err(msg => 'error allocating SFTP session: ' . $options{session}->get_error());
+        return undef;
+    }
+
+    my $mode = defined($options{mode}) ? $options{mode} : 0;
+    my $code = sftp_mkdir($self->{sftp_session}, $options{dir}, $mode);
+    if ($code != SSH_OK) {
+        $self->set_err(msg => sprintf("Can't create directory: %s", $self->get_msg_error()));
+    }
+    
+    return $code;
+}
+
+sub rmdir {
+    my ($self, %options) = @_;
+
+    if (!defined($self->{sftp_session})) {
+        $self->set_err(msg => 'error allocating SFTP session: ' . $options{session}->get_error());
+        return undef;
+    }
+
+    my $code = sftp_rmdir($self->{sftp_session}, $options{dir});
+    if ($code != SSH_OK) {
+        $self->set_err(msg => sprintf("Can't remove directory: %s", $self->get_msg_error()));
+    }
+
+    return $code;
+}
+
+sub rename {
+    my ($self, %options) = @_;
+
+    if (!defined($self->{sftp_session})) {
+        $self->set_err(msg => 'error allocating SFTP session: ' . $options{session}->get_error());
+        return undef;
+    }
+
+    my $code = sftp_rename($self->{sftp_session}, $options{original}, $options{newname});
+    if ($code != SSH_OK) {
+        $self->set_err(msg => sprintf("Can't rename '%s' -> '%s': %s", $options{original}, $options{newname}, $self->get_msg_error()));
+    }
+
+    return $code;
+}
+
 sub readdir {
     my ($self, %options) = @_;
     
@@ -233,7 +289,7 @@ sub server_version {
 
 sub open {
     my ($self, %options) = @_;
-    
+
     if (!defined($self->{sftp_session})) {
         $self->set_err(msg => 'error allocating SFTP session: ' . $options{session}->get_error());
         return undef;
@@ -242,7 +298,7 @@ sub open {
         $self->set_err(msg => 'please specify file option');
         return undef;
     }
-    
+
     my $accesstype = defined($options{accesstype}) ? $options{accesstype} : 0;
     my $mode = defined($options{mode}) ? $options{mode} : 0;
     my $file = sftp_open($self->{sftp_session}, $options{file}, $accesstype, $mode);
@@ -250,7 +306,7 @@ sub open {
         $self->set_err(msg => sprintf("Can't open file: %s", $self->get_msg_error()));
         return undef;
     }
-    
+
     return $file;
 }
 
@@ -303,12 +359,58 @@ sub unlink {
     
     my $code = sftp_unlink($self->{sftp_session}, $options{file});
     if ($code != SSH_OK) {
-         $self->set_err(msg => sprintf("Can't unlink file: %s", $self->get_msg_error()));
+        $self->set_err(msg => sprintf("Can't unlink file: %s", $self->get_msg_error()));
     }
     
     return $code;
 }
 
+sub copy_file {
+    my ($self, %options) = @_;
+    my ($fh, $dst, $buffer);
+    require bytes;
+
+    if (!CORE::open($fh, '<', $options{src})) {
+        $self->set_err(msg => sprintf("Can't open file '%s': %s", $options{src}, $!));
+        return -1;
+    }
+    $dst = $self->open(file => $options{dst}, accesstype => O_WRONLY|O_CREAT|O_TRUNC, mode => defined($options{mode}) ? $options{mode} : 0644);
+    if (!defined($dst)) {
+        CORE::close($fh);
+        return -1;
+    }
+
+    my $timeout = defined($options{timeout}) ? $options{timeout} : 60;
+    my $chunk = defined($options{chunk}) ? $options{chunk} : 50000;
+    while (my $nread = sysread($fh, $buffer, $chunk)) {
+        my $nwritten = 0;
+        while ($nwritten < $nread) {
+            my $written;
+            
+            eval {
+                local $SIG{ALRM} = sub { die 'Timeout by signal ALARM'; };
+                alarm($timeout);
+                $written = sftp_write_len($dst, $buffer, $nread);
+                alarm(0);
+            };
+            if ($@ || $written < 0) {
+                $self->set_err(
+                    msg => sprintf("Can't write data to file: %s", defined($written) && $written < 0 ? $self->get_msg_error() : $@)
+                );
+                $self->close(handle_file => $dst);
+                CORE::close($fh);
+                return -1;
+            }
+            
+            $buffer = bytes::substr($buffer, $nwritten);
+            $nwritten += $written;
+        }
+    }
+
+    $self->close(handle_file => $dst);
+    CORE::close($fh);
+    return 0;
+}
 
 sub get_msg_error {
     my ($self, %options) = @_;

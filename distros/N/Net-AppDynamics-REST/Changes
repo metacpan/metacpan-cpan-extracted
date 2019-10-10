@@ -13,3 +13,5 @@
   -- Changed min version of Data::Dumper to 2.161
 1.005
   -- added support for getting application metrics
+1.006
+  -- added support for listing nodes by tiers

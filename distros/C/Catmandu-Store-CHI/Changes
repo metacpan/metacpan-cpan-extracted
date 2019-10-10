@@ -1,8 +1,15 @@
 Revision history for Catmandu-Store-CHI
 
+0.04  2019-10-10 20:37:45 CEST
+  - fixing dependencies
+  
+0.03  2019-10-10 16:33:52 CEST
+  - removing Data::UUID dependency
+  - cosmetic changes
+
 0.02  2014-06-28 08:50:41 CEST
   - adding pod
-  - adding Dist::Milla 
+  - adding Dist::Milla
   - adding tests
 
 0.01    2014-06-28

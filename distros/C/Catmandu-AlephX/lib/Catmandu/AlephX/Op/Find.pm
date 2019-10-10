@@ -2,6 +2,8 @@ package Catmandu::AlephX::Op::Find;
 use Catmandu::Sane;
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 #'set_number' == id waaronder zoekactie wordt opgeslagen door Aleph (kan je later hergebruiken)
@@ -28,7 +30,7 @@ sub parse {
     no_records => $xpath->findvalue("/$op/no_records"),
     no_entries => $xpath->findvalue("/$op/no_entries"),
     content_ref => $str_ref
-  ); 
+  );
 }
 
 1;

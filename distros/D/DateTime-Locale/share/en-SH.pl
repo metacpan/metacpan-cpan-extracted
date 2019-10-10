@@ -222,9 +222,9 @@
   ],
   name => "English St. Helena",
   native_language => "English",
-  native_name => "English St. Helena",
+  native_name => "English St Helena",
   native_script => undef,
-  native_territory => "St. Helena",
+  native_territory => "St Helena",
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

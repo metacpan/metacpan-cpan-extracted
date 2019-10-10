@@ -1,7 +1,7 @@
 package App::riap;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.37'; # VERSION
+our $DATE = '2019-08-21'; # DATE
+our $VERSION = '0.380'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,13 +13,13 @@ use Log::ger;
 use parent qw(Term::Shell);
 
 use Color::ANSI::Util qw(ansifg);
-use Data::Clean::JSON;
+use Data::Clean::ForJSON;
 use Path::Naive qw(concat_path_n);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-my $cleanser = Data::Clean::JSON->get_cleanser;
+my $cleanser = Data::Clean::ForJSON->get_cleanser;
 
 sub new {
     require CHI;
@@ -29,7 +29,7 @@ sub new {
 
     my ($class, %args) = @_;
 
-    binmode(STDOUT, ":utf8");
+    binmode(STDOUT, ":encoding(utf8)");
 
     my %opts;
     my @gospec = (
@@ -81,7 +81,9 @@ EOT
     $self->{_cache} = CHI->new(driver=>'Memory', global=>1);
 
     # determine color support
-    $self->{use_color} //= $ENV{COLOR} //
+    $self->{use_color} //=
+        (defined $ENV{NO_COLOR} ? 0 : undef) //
+        $ENV{COLOR} //
         detect_terminal_cached()->{color};
 
     # override some settings from cmdline args, if defined
@@ -745,7 +747,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.37
+version 0.380
 
 =head1 SYNOPSIS
 
@@ -756,6 +758,12 @@ Use the provided L<riap> script.
 This is the backend/implementation of the C<riap> script.
 
 =for Pod::Coverage ^(.+)$
+
+=head1 ENVIRONMENT
+
+=head2 COLOR
+
+=head2 NO_COLOR
 
 =head1 SEE ALSO
 
@@ -769,7 +777,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

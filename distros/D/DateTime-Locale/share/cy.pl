@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "yb",
-    "yh",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -148,7 +148,7 @@
     "Ion",
     "Chwef",
     "Maw",
-    "Ebrill",
+    "Ebr",
     "Mai",
     "Meh",
     "Gorff",
@@ -277,5 +277,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

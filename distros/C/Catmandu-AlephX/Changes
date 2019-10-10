@@ -1,0 +1,7 @@
+Revision history for Catmandu::AlephX
+
+1.071  2019-10-08 08:55:09 CEST
+   - Added some implicit dependencies, thanks to Mohammad S Anwar
+
+1.07  2018-01-25 14:28:51 CET
+   - Moving to Dist::Milla

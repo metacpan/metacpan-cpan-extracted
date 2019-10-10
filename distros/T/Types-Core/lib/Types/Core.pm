@@ -9,7 +9,7 @@ Types::Core - Core types defined as tests and literals (ease of use)
 
 =head1 VERSION
 
-Version "0.2.6";
+Version "0.2.7";
 
 =cut
 
@@ -19,9 +19,11 @@ Version "0.2.6";
   use strict;
   use warnings;
   use mem;
-  our $VERSION='0.2.6';
+  our $VERSION='0.2.7';
   use constant Self => __PACKAGE__;
 
+# 0.2.7		- EhV didn't properly test a blessed HASH (but ErV did)
+#					- Added tests for both in t00.t and fixed code
 # 0.2.6   -	Removed another spurious ref, this time to Carp::Always.  
 # 0.2.5   -	Removed spurious reference to unneeded module in t/t00.t.
 #						No other source changes.
@@ -376,7 +378,8 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
 
     sub EhV ($*;******************************) { 
       my ($arg, $field) = (shift, shift);
-      while (ref $arg eq 'HASH' and defined($field) and exists $arg->{$field}) {
+      while (defined($arg) && typ $arg eq 'HASH' and 
+							defined($field) && exists $arg->{$field}) {
 				return $arg->{$field} unless @_ > 0;
 				$arg		= $arg->{$field};
 				$field	= shift;
@@ -500,7 +503,8 @@ use constant numRE => qr{^ (
 sub isnum(;$) { 
 	local $_ = @_ ? $_[0] : $_;
 	return undef unless defined $_;
-	m"&numRE" && return $1;
+	my $numRE = numRE;
+	m{$numRE} && return $1;
 	undef;
 }
 

@@ -3,18 +3,20 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has z36 => (
-  is => 'ro', 
+  is => 'ro',
   lazy => 1,
-  isa => sub { check_hash_ref($_[0]); },  
+  isa => sub { check_hash_ref($_[0]); },
   default => sub {
     +{};
   }
 );
 
-sub op { 'ill-loan-info' } 
+sub op { 'ill-loan-info' }
 
 sub parse {
   my($class,$str_ref) = @_;

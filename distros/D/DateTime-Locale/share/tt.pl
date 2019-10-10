@@ -116,11 +116,11 @@
   ],
   era_abbreviated => [
     "\N{U+0431}.\N{U+044d}.\N{U+043a}.",
-    "\N{U+0431}.\N{U+044d}.",
+    "\N{U+043c}\N{U+0438}\N{U+043b}\N{U+0430}\N{U+0434}\N{U+0438}",
   ],
   era_narrow => [
     "\N{U+0431}.\N{U+044d}.\N{U+043a}.",
-    "\N{U+0431}.\N{U+044d}.",
+    "\N{U+043c}\N{U+0438}\N{U+043b}\N{U+0430}\N{U+0434}\N{U+0438}",
   ],
   era_wide => [
     "\N{U+0431}\N{U+0435}\N{U+0437}\N{U+043d}\N{U+0435}\N{U+04a3} \N{U+044d}\N{U+0440}\N{U+0430}\N{U+0433}\N{U+0430} \N{U+043a}\N{U+0430}\N{U+0434}\N{U+04d9}\N{U+0440}",
@@ -266,5 +266,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

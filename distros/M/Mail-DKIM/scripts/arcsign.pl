@@ -90,7 +90,7 @@ print "RESULT IS " . $arc->result() . "\n";
 if( $arc->result eq "sealed") {
 	print join("\n",$arc->as_strings) . "\n";
 } else {
-	print "REASON IS " . $arc->{result_reason} . "\n";
+	print "REASON IS " . $arc->{details} . "\n";
 }
 
 __END__

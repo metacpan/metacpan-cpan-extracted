@@ -6,6 +6,6 @@ use Catmandu::Store::AlephX;
 use Data::Dumper;
 use open qw(:std :utf8);
 
-my $bag = Catmandu::Store::AlephX->new(url => "http://aleph.ugent.be/X")->bag();
+my $bag = Catmandu::Store::AlephX->new(url => "http://borges1.ugent.be/X")->bag();
 
 print Dumper($bag->get(shift));

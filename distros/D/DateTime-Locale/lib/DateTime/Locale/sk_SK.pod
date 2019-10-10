@@ -483,29 +483,29 @@ Slovak Slovakia locale.
    1995-12-22T09:05:02 = pi 22. decembra
   -0010-09-15T04:44:23 = so 15. septembra
 
-=head3 MMMMW-count-few (W. 'týždeň' 'v' MMMM)
+=head3 MMMMW-count-few (W. 'týždeň' MMMM)
 
-   2008-02-05T18:30:30 = 1. týždeň v februára
-   1995-12-22T09:05:02 = 3. týždeň v decembra
-  -0010-09-15T04:44:23 = 2. týždeň v septembra
+   2008-02-05T18:30:30 = 1. týždeň februára
+   1995-12-22T09:05:02 = 3. týždeň decembra
+  -0010-09-15T04:44:23 = 2. týždeň septembra
 
-=head3 MMMMW-count-many (W. 'týždeň' 'v' MMMM)
+=head3 MMMMW-count-many (W. 'týždeň' MMMM)
 
-   2008-02-05T18:30:30 = 1. týždeň v februára
-   1995-12-22T09:05:02 = 3. týždeň v decembra
-  -0010-09-15T04:44:23 = 2. týždeň v septembra
+   2008-02-05T18:30:30 = 1. týždeň februára
+   1995-12-22T09:05:02 = 3. týždeň decembra
+  -0010-09-15T04:44:23 = 2. týždeň septembra
 
-=head3 MMMMW-count-one (W. 'týždeň' 'v' MMMM)
+=head3 MMMMW-count-one (W. 'týždeň' MMMM)
 
-   2008-02-05T18:30:30 = 1. týždeň v februára
-   1995-12-22T09:05:02 = 3. týždeň v decembra
-  -0010-09-15T04:44:23 = 2. týždeň v septembra
+   2008-02-05T18:30:30 = 1. týždeň februára
+   1995-12-22T09:05:02 = 3. týždeň decembra
+  -0010-09-15T04:44:23 = 2. týždeň septembra
 
-=head3 MMMMW-count-other (W. 'týždeň' 'v' MMMM)
+=head3 MMMMW-count-other (W. 'týždeň' MMMM)
 
-   2008-02-05T18:30:30 = 1. týždeň v februára
-   1995-12-22T09:05:02 = 3. týždeň v decembra
-  -0010-09-15T04:44:23 = 2. týždeň v septembra
+   2008-02-05T18:30:30 = 1. týždeň februára
+   1995-12-22T09:05:02 = 3. týždeň decembra
+  -0010-09-15T04:44:23 = 2. týždeň septembra
 
 =head3 MMMMd (d. MMMM)
 

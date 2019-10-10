@@ -1,24 +1,28 @@
-Revision history for Data-Clean-ToStringyNumber
+0.050   2019-09-01  Released-By: PERLANCAR; Urgency: medium
 
-0.04     2016-04-14 (SHARYANTO)
+	- [ux] Warn when user calls new() without customizing option;
+	  recommend her to use get_cleanser() instead.
+
+
+0.04     2016-04-14  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Re-base on Data::Clean.
 
 
-0.03     2014-06-30 (SHARYANTO)
+0.03     2014-06-30  Released-By: SHARYANTO
 
          - Workaround for Scalar::Util 1.39 change to looks_like_number()
            (booleanize the result). Use (temporary?) replacement
            Scalar::Util::LooksLikeNumber.
 
 
-0.02     2013-11-26 (SHARYANTO)
+0.02     2013-11-26  Released-By: SHARYANTO
 
          - No functional changes. Forgot to add $VERSION.
 
 
-0.01     2013-10-31 (SHARYANTO)
+0.01     2013-10-31  Released-By: SHARYANTO
 
          - First release.

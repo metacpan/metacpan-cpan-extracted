@@ -1,4 +1,4 @@
-# $Id: get_all_postalcodes.t,v 1.1 2006-04-23 10:21:24 jonasbn Exp $
+## no critic (RequireExplicitPackage RequireVersionVar RequireEndWithOne)
 
 use strict;
 use warnings;

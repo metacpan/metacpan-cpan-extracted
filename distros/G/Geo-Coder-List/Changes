@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-List
 
+0.26	Wed  9 Oct 17:36:41 EDT 2019
+	Fix reverse_coding of Canada
+	Added support for OpenCage
+
 0.25	Sat 20 Apr 21:24:01 EDT 2019
 	Specify a minimum level of Perl
 
@@ -27,7 +31,7 @@ Revision history for Geo-Coder-List
 0.19	Sun Apr 15 20:42:05 EDT 2018
 	Support Geo::GeoNames
 	Explicit about which loop to finish
-	Fix ununinitialized variable
+	Fix uninitialized variable
 	Fix https://github.com/Humanstate/html-googlemaps-v3/issues/17
 
 0.18	Tue Dec 26 08:18:54 EST 2017

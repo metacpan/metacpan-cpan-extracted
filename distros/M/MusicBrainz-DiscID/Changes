@@ -1,5 +1,8 @@
 Revision history for libdiscid perl bindings
 
+0.06  Mon  7 Oct 2019 23:32:36 BST
+  - Changed license to MIT
+
 0.04  Tue 13 Jun 2017 22:27:29 BST
   - Use ExtUtils::MakeMaker instead of Module::Build
   - Fixed encoding in POD (RT#85212)

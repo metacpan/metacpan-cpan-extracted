@@ -6,7 +6,7 @@ use XML::Compile;
 use XML::Compile::Cache;
 use XML::Compile::Util 'pack_type';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has 'root'      => (is => 'ro' , required => 1);
 has 'schemas'   => (is => 'ro' , required => 1 , coerce => sub {
@@ -300,11 +300,15 @@ This behavious can be changed by setting the 'mixed' flag:
 
 =item L<Catmandu::Importer::XSD>
 
-Parse and validate XML data using an XSD file for structural data
+Parse and validate XML data using an XSD file for structural data.
 
 =item L<Catmandu::Exporter::XSD>
 
-Serialize and validate XML data using an XSD file for structural data
+Serialize and validate XML data using an XSD file for structural data.
+
+=item L<Catmandu::Fix::xpath_map>
+
+Map XML from XSD-any elements into data fields using XPath expressions.
 
 =back
 
@@ -332,10 +336,13 @@ or follow the blog posts at: https://librecatproject.wordpress.com/
 
 Patrick Hochstenbach , C<< patrick.hochstenbach at ugent.be >>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE AND COPYRIGHT
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
 
 =head1 SEE ALSO
 

@@ -29,7 +29,7 @@
     MMM => "LLL",
     MMMEd => "E, d MMM",
     MMMMEd => "E, d MMMM",
-    "MMMMW-count-other" => "'week' W 'of' MMMM",
+    "MMMMW-count-other" => "'Izu' W 'n'\N{U+2018}'ime' MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "d/M",
@@ -50,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' Y",
+    "yw-count-other" => "'Izu' w 'n' 'ime' Y",
   },
   code => "ig",
   date_format_full => "EEEE, d MMMM y",
@@ -67,7 +67,7 @@
     "Wen",
     "T\N{U+1ecd}\N{U+1ecd}",
     "Fra\N{U+1ecb}",
-    "Sat\N{U+1ecd}dee",
+    "Sat",
     "\N{U+1ee4}ka",
   ],
   day_format_narrow => [
@@ -86,7 +86,7 @@
     "T\N{U+1ecd}\N{U+1ecd}zdee",
     "Fra\N{U+1ecb}dee",
     "Sat\N{U+1ecd}dee",
-    "\N{U+1ee4}b\N{U+1ecd}ch\N{U+1ecb} \N{U+1ee4}ka",
+    "S\N{U+1ecd}ndee",
   ],
   day_stand_alone_abbreviated => [
     "M\N{U+1ecd}n",
@@ -94,7 +94,7 @@
     "Wen",
     "T\N{U+1ecd}\N{U+1ecd}",
     "Fra\N{U+1ecb}",
-    "Sat\N{U+1ecd}dee",
+    "Sat",
     "\N{U+1ee4}ka",
   ],
   day_stand_alone_narrow => [
@@ -113,7 +113,7 @@
     "T\N{U+1ecd}\N{U+1ecd}zdee",
     "Fra\N{U+1ecb}dee",
     "Sat\N{U+1ecd}dee",
-    "\N{U+1ee4}b\N{U+1ecd}ch\N{U+1ecb} \N{U+1ee4}ka",
+    "S\N{U+1ecd}ndee",
   ],
   era_abbreviated => [
     "T.K.",
@@ -124,8 +124,8 @@
     "A.K.",
   ],
   era_wide => [
-    "Tupu Kristi",
-    "Af\N{U+1ecd} Kristi",
+    "Tupu Kraist",
+    "Af\N{U+1ecd} Kra\N{U+1ecb}st",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

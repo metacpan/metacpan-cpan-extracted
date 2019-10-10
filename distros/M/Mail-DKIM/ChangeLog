@@ -1,4 +1,11 @@
- -- VERSION 0.56 --
+-- VERSION 0.57 --
+
+2019-10-08: Marc Bradshaw <marc@marcbradshaw.net>
+
+ * Correct the $self->{result_reason} variable name for $self->{details} that is
+   used by the parent class in Mail::DKIM::ARC::Signer
+
+-- VERSION 0.56 --
 
 2019-08-21: Marc Bradshaw <marc@marcbradshaw.net>
 

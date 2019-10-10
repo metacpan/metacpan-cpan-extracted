@@ -3,10 +3,10 @@
 use 5.010;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Data::Clean::ToNonStringyNumber;
 use JSON::XS;
-use Test::More 0.98;
 
 my $c = Data::Clean::ToNonStringyNumber->get_cleanser;
 

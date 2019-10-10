@@ -70,8 +70,8 @@
   date_format_long => "d 'de' MMMM 'de' y",
   date_format_medium => "d MMM y",
   date_format_short => "d/M/yy",
-  datetime_format_full => "{1}, {0}",
-  datetime_format_long => "{1}, {0}",
+  datetime_format_full => "{1} 'a' 'las' {0}",
+  datetime_format_long => "{1} 'a' 'las' {0}",
   datetime_format_medium => "{1} {0}",
   datetime_format_short => "{1} {0}",
   day_format_abbreviated => [
@@ -140,7 +140,7 @@
     "antes de Cristo",
     "despu\N{U+00e9}s de Cristo",
   ],
-  first_day_of_week => 7,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%d/%m/%y",
   glibc_datetime_format => "%a %d %b %Y %T %Z",
@@ -280,5 +280,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

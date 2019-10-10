@@ -1,13 +1,14 @@
 package Data::Clean::ToStringyNumber;
 
-our $DATE = '2016-04-14'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2019-09-01'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use parent qw(Data::Clean);
+use vars qw($creating_singleton);
 
 sub command_replace_with_stringy_number {
     require Scalar::Util::LooksLikeNumber;
@@ -18,12 +19,19 @@ sub command_replace_with_stringy_number {
 
 sub new {
     my ($class, %opts) = @_;
+
+    if (!%opts && !$creating_singleton) {
+        warn "You are creating a new ".__PACKAGE__." object without customizing options. ".
+            "You probably want to call get_cleanser() yet to get a singleton instead?";
+    }
+
     $opts{""} //= ['replace_with_stringy_number'];
     $class->SUPER::new(%opts);
 }
 
 sub get_cleanser {
     my $class = shift;
+    local $creating_singleton = 1;
     state $singleton = $class->new;
     $singleton;
 }
@@ -43,7 +51,7 @@ Data::Clean::ToStringyNumber - Convert non-stringy numbers in data to stringy nu
 
 =head1 VERSION
 
-This document describes version 0.04 of Data::Clean::ToStringyNumber (from Perl distribution Data-Clean-ToStringyNumber), released on 2016-04-14.
+This document describes version 0.050 of Data::Clean::ToStringyNumber (from Perl distribution Data-Clean-ToStringyNumber), released on 2019-09-01.
 
 =head1 SYNOPSIS
 
@@ -78,7 +86,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Clean
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Clean-ToStringyNumber>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Clean-ToStringyNumber>.
 
 =head1 BUGS
 
@@ -98,7 +106,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

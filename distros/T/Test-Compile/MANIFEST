@@ -12,6 +12,7 @@ t/000-compile.t
 t/100-internal--find-files.t
 t/100-internal--is-in-taint-mode.t
 t/100-internal--read-shebang.t
+t/100-internal--skip.t
 t/100-internal--test-methods.t
 t/100-internal-all-pl-files.t
 t/100-internal-all-pm-files.t

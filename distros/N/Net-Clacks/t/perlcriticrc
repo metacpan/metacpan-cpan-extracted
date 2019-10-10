@@ -104,5 +104,9 @@ max_elsif = 20
 # I know that "fixed string matches" as regexp might be a tad slower. But sometimes they are much more readable than a bunch if string compares
 [-RegularExpressions::ProhibitFixedStringMatches]
 
-# Dont force to use "local"
+# I usually use qw[], but sometimes context is clearer (or safer in case of spaces) to actually write out the
+# list with quotes
+[-CodeLayout::ProhibitQuotedWordLists]
+
+# No. just no. This doesn't make sense in many cases
 [-Variables::RequireLocalizedPunctuationVars]

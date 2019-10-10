@@ -2,8 +2,8 @@ NAME
     Data::Clean::ForJSON - Clean data so it is safe to output to JSON
 
 VERSION
-    This document describes version 0.392 of Data::Clean::ForJSON (from Perl
-    distribution Data-Clean-ForJSON), released on 2019-08-08.
+    This document describes version 0.394 of Data::Clean::ForJSON (from Perl
+    distribution Data-Clean-ForJSON), released on 2019-09-01.
 
 SYNOPSIS
      use Data::Clean::ForJSON;
@@ -80,7 +80,7 @@ DESCRIPTION
     loops.
 
     If "LOG_CLEANSER_CODE" environment is set to true, the generated
-    cleanser code will be logged using Log::get at trace level. You can see
+    cleanser code will be logged using Log::ger at trace level. You can see
     it, e.g. using Log::ger::Output::Screen:
 
      % LOG_CLEANSER_CODE=1 perl -MLog::ger::Output=Screen -MLog::ger::Level::trace -MData::Clean::ForJSON \
@@ -160,7 +160,9 @@ FAQ
     using something else like Sereal.
 
 ENVIRONMENT
-    LOG_CLEANSER_CODE
+  LOG_CLEANSER_CODE
+    Bool. Can be set to true to log cleanser code using Log::ger at "trace"
+    level.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -194,8 +196,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
-    2012 by perlancar@cpan.org.
+    This software is copyright (c) 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

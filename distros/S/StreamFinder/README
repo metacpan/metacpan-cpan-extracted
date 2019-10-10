@@ -105,16 +105,19 @@ DESCRIPTION
     custom hacked version of the open-source "audacious" audio player).
     "fauxdacious" incorporates this module to decode and play streams.
 
-    The currently-supported websites are: banned.video, brighteon.com,
-    iheartradio.com, podcasts.apple.com, radio.net, radionomy.com,
-    reciva.com, tunein.com, vimeo.com, and (youtube.com, et. al and other
-    sites that youtube-dl supports).
+    The currently-supported websites are: banned.video
+    (StreamFinder::BannedVideo), brighteon.com (StreamFinder::Brighteon),
+    iheartradio.com (StreamFinder::IHeartRadio), podcasts.apple.com
+    (StreamFinder::Apple), radio.net (StreamFinder::RadioNet), radionomy.com
+    (StreamFinder::Radionomy), reciva.com (StreamFinder::Reciva), tunein.com
+    (StreamFinder::Tunein), vimeo.com (StreamFinder::Vimeo), and
+    (youtube.com, et. al and other sites that youtube-dl supports)
+    (StreamFinder::Youtube).
 
-    NOTE: Facebook (Streamfinder::Facebook) has been eliminated because
-    logging into Facebook via the call to youtube-dl is now interpreted by
-    Facebook as a "rogue app. login" and will cause them to LOCK your
-    account and FORCE you to change your password the next time you log in
-    to Facebook!
+    NOTE: Facebook (Streamfinder::Facebook) has been removed because logging
+    into Facebook via the call to youtube-dl is now interpreted by Facebook
+    as a "rogue app. login" and will cause them to LOCK your account and
+    FORCE you to change your password the next time you log in to Facebook!
 
     NOTE: For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo,
     etc. the "station" object actually refers to a specific video or
@@ -136,8 +139,9 @@ DESCRIPTION
     ("imageurl"), a (longer?) "description", an "artist" / author, a
     "genre", and a "year" (podcasts, videos, etc.). Some sites also provide
     station's FCC call letters ("fccid"). For icon and image URLs, functions
-    exist to fetch the actual binary data and mime type for downloading to
-    local storage.
+    exist (getIconData() and getImageData() to fetch the actual binary data
+    and mime type for downloading to local storage for use by your preferred
+    media player.
 
     If you have another streaming site that is not supported, please file a
     feature request via email or the CPAN bug system, or (for faster
@@ -179,7 +183,8 @@ SUBROUTINES/METHODS
         *"noplaylists"* is specified, and the stream to be returned is a
         "playlist" (.pls or .m3u? extension), it is first fetched and the
         first entry in the playlist is returned. This is needed by
-        Fauxdacious Mediaplayer.
+        Fauxdacious Mediaplayer since Fauxdacious intentionally does not
+        allow recursive playlists.
 
     $station->count()
         Returns the number of streams found for the station.
@@ -200,6 +205,8 @@ SUBROUTINES/METHODS
     $station->getIconData()
         Returns a two-element array consisting of the extension (ie. "png",
         "gif", "jpeg", etc. and the actual icon image (binary data), if any.
+        This makes it easy to download the image to local storage for use by
+        your preferred media player.
 
     $station->getImageURL()
         Returns the URL for the station's "cover art" banner image, if any.
@@ -210,7 +217,8 @@ SUBROUTINES/METHODS
     $station->getImageData()
         Returns a two-element array consisting of the extension (ie. "png",
         "gif", "jpeg", etc. and the actual station's banner image (binary
-        data).
+        data). This makes it easy to download the image to local storage for
+        use by your preferred media player.
 
         NOTE: If no "banner image" (usually a larger image) is found, the
         "icon image" data will be returned.
@@ -233,10 +241,11 @@ CONFIGURATION FILES
         [0|1|2], and most of the LWP::UserAgent options. Blank lines and
         lines starting with a "#" sign are ignored.
 
-    ~/.config/StreamFinder/submodule/config
+    ~/.config/StreamFinder/*submodule*/config
         Optional text file for specifying various configuration options for
-        a specific site (submodule). Each option is specified on a separate
-        line in the format below:
+        a specific site (submodule, ie. "Youtube" for
+        StreamFinder::Youtube). Each option is specified on a separate line
+        in the format below:
 
         'option' => 'value' [,]
 

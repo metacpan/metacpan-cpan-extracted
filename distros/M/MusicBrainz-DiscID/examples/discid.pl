@@ -29,6 +29,5 @@ for ( my $i = $disc->first_track_num;
 }
 
 printf("Submit via    : %s\n", $disc->submission_url());
-printf("WS url        : %s\n", $disc->webservice_url());
 
 undef $disc;

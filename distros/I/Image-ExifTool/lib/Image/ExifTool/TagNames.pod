@@ -12,7 +12,7 @@ meta information extracted from or written to a file.
 =head1 TAG TABLES
 
 The tables listed below give the names of all tags recognized by ExifTool.
-They contain a total of 22568 tags, with 15014 unique tag names.
+They contain a total of 23036 tags, with 15080 unique tag names.
 
 B<Tag ID>, B<Index#> or B<Sequence> is given in the first column of each
 table.  A B<Tag ID> is the computer-readable equivalent of a tag name, and
@@ -20,7 +20,9 @@ is the identifier that is actually stored in the file.  B<Index#> refers to
 the offset of a value when found at a fixed position within a data block
 (B<#> is the multiplier for calculating a byte offset: B<1>, B<2>, B<4> or
 B<8>).  These offsets may have a decimal part which is used only to
-differentiate tags with values stored at the same position.  B<Sequence>
+differentiate tags with values stored at the same position.  (Note that
+writable tags within binary data blocks are not individually deletable,
+and the usual alternative is to set them to a value of zero.)  B<Sequence>
 gives the order of values for a serial data stream.
 
 A B<Tag Name> is the handle by which the information is accessed in
@@ -37,11 +39,11 @@ instead of the descriptions, use C<exiftool -s>.
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but a C<no> in this column means the tag is writable.  A C<yes>
 indicates writable information that is either unformatted or written using
-the existing format.  Other expressions give details about the information
-format, and vary depending on the general type of information.  The format
-name may be followed by a number in square brackets to indicate the number
-of values written, or the number of characters in a fixed-length string
-(including a null terminator which is added if required).
+the existing format.  Other expressions give details about the format of the
+stored value, and vary depending on the general type of information.  The
+format name may be followed by a number in square brackets to indicate the
+number of values written, or the number of characters in a fixed-length
+string (including a null terminator which is added if required).
 
 A plus sign (C<+>) after an entry in the B<Writable> column indicates a
 I<List> tag which supports multiple values and allows individual values to
@@ -60,12 +62,13 @@ writable directly, but is written automatically by ExifTool (often when a
 corresponding L<Composite|Image::ExifTool::TagNames/Composite Tags> or
 L<Extra|Image::ExifTool::TagNames/Extra Tags> tag is written). A colon
 (C<:>) indicates a I<Mandatory> tag which may be added automatically when
-writing.
+writing.  Normally MakerNotes tags may not be deleted individually, but a
+caret (C<^>) indicates a I<Deletable> MakerNotes tag.
 
 The HTML version of these tables also lists possible B<Values> for
 discrete-valued tags, as well as B<Notes> for some tags.  The B<Values> are
-listed as the computer-readable and human-readable values on the left and
-right hand side of an equals sign (C<=>) respectively.  The human-readable
+listed with the computer-readable values on the left of the equals sign
+(C<=>), and the human-readable values on the right.  The human-readable
 values are used by default when reading and writing, but the
 computer-readable values may be accessed by disabling the value conversion
 with the -n option on the command line, by setting the PrintConv option to 0
@@ -105,6 +108,7 @@ L<https://www.w3.org/Graphics/JPEG/jfif3.pdf> for the JPEG specification.
                XMP                              XMP
                QVCI                             Casio QVCI
                FLIR                             FLIR FFF
+               RawThermalImage                  no
   'APP2'       ICC_Profile                      ICC_Profile
                FPXR                             FlashPix
                MPF                              MPF
@@ -123,6 +127,7 @@ L<https://www.w3.org/Graphics/JPEG/jfif3.pdf> for the JPEG specification.
                HP_TDHD                          HP TDHD
                GoPro                            GoPro GPMF
   'APP7'       Pentax                           Pentax
+               Huawei                           Unknown
                Qualcomm                         Qualcomm
   'APP8'       SPIFF                            JPEG SPIFF
   'APP9'       MediaJukebox                     JPEG MediaJukebox
@@ -144,6 +149,7 @@ L<https://www.w3.org/Graphics/JPEG/jfif3.pdf> for the JPEG specification.
                MIE                              MIE
                Samsung                          Samsung Trailer
                PreviewImage                     yes
+               EmbeddedVideo                    no
 
 =head3 JPEG AVI1 Tags
 
@@ -308,11 +314,11 @@ tags remain.
 
 The table below lists all EXIF tags.  Also listed are TIFF, DNG, HDP and
 other tags which are not part of the EXIF specification, but may co-exist
-with EXIF tags in some images.  Tags which are part of the EXIF 2.31
+with EXIF tags in some images.  Tags which are part of the EXIF 2.32
 specification have an underlined B<Tag Name> in the HTML version of this
 documentation.  See
-L<http://www.cipa.jp/std/documents/e/DC-008-Translation-2016-E.pdf> for the
-official EXIF 2.31 specification.
+L<http://www.cipa.jp/std/documents/e/DC-008-Translation-2019-E.pdf> for the
+official EXIF 2.32 specification.
 
   Tag ID   Tag Name                  Group      Writable
   ------   --------                  -----      --------
@@ -539,8 +545,8 @@ official EXIF 2.31 specification.
   0x8781   SharedData                -          no
   0x8782   T88Options                -          no
   0x87ac   ImageLayer                -          no
-  0x87af   GeoTiffDirectory          IFD0       undef
-  0x87b0   GeoTiffDoubleParams       IFD0       undef
+  0x87af   GeoTiffDirectory          IFD0       int16u[0.5]
+  0x87b0   GeoTiffDoubleParams       IFD0       double[0.125]
   0x87b1   GeoTiffAsciiParams        IFD0       string
   0x87be   JBIGOptions               -          no
   0x8822   ExposureProgram           ExifIFD    int16u
@@ -752,6 +758,9 @@ official EXIF 2.31 specification.
   0xa433   LensMake                  ExifIFD    string
   0xa434   LensModel                 ExifIFD    string
   0xa435   LensSerialNumber          ExifIFD    string
+  0xa460   CompositeImage            ExifIFD    int16u
+  0xa461   CompositeImageCount       ExifIFD    int16u[2]
+  0xa462   CompositeImageExposureTimes ExifIFD  undef
   0xa480   GDALMetadata              IFD0       string
   0xa481   GDALNoData                IFD0       string
   0xa500   Gamma                     ExifIFD    rational64u
@@ -761,6 +770,7 @@ official EXIF 2.31 specification.
   0xafc3   ExpandFilterLens          -          no
   0xafc4   ExpandScanner             -          no
   0xafc5   ExpandFlashLamp           -          no
+  0xb4c3   HasselbladRawImage        -          no
   0xbc01   PixelFormat               -          no
   0xbc02   Transformation            -          no
   0xbc03   Uncompressed              -          no
@@ -781,6 +791,7 @@ official EXIF 2.31 specification.
   0xc42a   OceImageLogic             -          no
   0xc44f   Annotations               -          no
   0xc4a5   PrintIM                   IFD0       PrintIM
+  0xc51b   HasselbladExif            -          no
   0xc573   OriginalFileName          -          no
   0xc580   USPTOOriginalContentType  -          no
   0xc5e0   CR2CFAPattern             -          no
@@ -1114,61 +1125,6 @@ IPTC group only in the standard location.
   ------   --------                             --------
   [no tags known]
 
-=head2 DJI Tags
-
-This table lists tags found in the maker notes of images from some DJI
-Phantom drones.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0001   Make                                 string
-  0x0003   SpeedX                               float
-  0x0004   SpeedY                               float
-  0x0005   SpeedZ                               float
-  0x0006   Pitch                                float
-  0x0007   Yaw                                  float
-  0x0008   Roll                                 float
-  0x0009   CameraPitch                          float
-  0x000a   CameraYaw                            float
-  0x000b   CameraRoll                           float
-
-=head3 DJI XMP Tags
-
-XMP tags used by DJI for images from drones.
-
-These tags belong to the ExifTool XMP-drone-dji family 1 group.
-
-  Tag Name                                      Writable
-  --------                                      --------
-  AbsoluteAltitude                              real
-  CalibratedFocalLength                         real
-  CalibratedOpticalCenterX                      real
-  CalibratedOpticalCenterY                      real
-  CamReverse                                    string
-  DewarpData                                    string
-  DewarpFlag                                    string
-  FlightPitchDegree                             real
-  FlightRollDegree                              real
-  FlightXSpeed                                  real
-  FlightYSpeed                                  real
-  FlightYawDegree                               real
-  FlightZSpeed                                  real
-  GPSLatitude                                   real/
-  GPSLongitude                                  real/
-  GPSLongtitude                                 real
-  GimbalPitchDegree                             real
-  GimbalReverse                                 string
-  GimbalRollDegree                              real
-  GimbalYawDegree                               real
-  Latitude                                      real
-  Longitude                                     real
-  RelativeAltitude                              real
-  RtkFlag                                       string
-  RtkStdHgt                                     real
-  RtkStdLat                                     real
-  RtkStdLon                                     real
-  SelfData                                      string
-
 =head2 XMP Tags
 
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
@@ -1259,6 +1215,7 @@ L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
   aux                                           XMP aux
   cc                                            XMP cc
   cell                                          XMP cell
+  crd                                           XMP crd
   creatorAtom                                   XMP creatorAtom
   crs                                           XMP crs
   dc                                            XMP dc
@@ -1477,6 +1434,474 @@ These tags belong to the ExifTool XMP-cell family 1 group.
   MobileCountryCode                             string
   MobileNetworkCode                             string
   CellR                                         string
+
+=head3 XMP crd Tags
+
+Adobe Camera Raw Defaults tags.
+
+These tags belong to the ExifTool XMP-crd family 1 group.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AlreadyApplied                                boolean/
+  AutoBrightness                                boolean/
+  AutoContrast                                  boolean/
+  AutoExposure                                  boolean/
+  AutoLateralCA                                 integer/
+  AutoShadows                                   boolean/
+  AutoTone                                      boolean/
+  AutoWhiteVersion                              integer/
+  Blacks2012                                    integer/
+  BlueHue                                       integer/
+  BlueSaturation                                integer/
+  Brightness                                    integer/
+  CameraProfile                                 string/
+  CameraProfileDigest                           string/
+  ChromaticAberrationB                          integer/
+  ChromaticAberrationR                          integer/
+  CircularGradientBasedCorrections              Correction Struct+
+  CircGradBasedCorrActive                       boolean_
+  CircGradBasedCorrAmount                       real_
+  CircGradBasedCorrMasks                        CorrectionMask Struct_+
+  CircGradBasedCorrMaskAlpha                    real_
+  CircGradBasedCorrMaskAngle                    real_
+  CircGradBasedCorrMaskBottom                   real_
+  CircGradBasedCorrMaskCenterValue              real_
+  CircGradBasedCorrMaskCenterWeight             real_
+  CircGradBasedCorrMaskDabs                     string/_
+  CircGradBasedCorrMaskFeather                  real_
+  CircGradBasedCorrMaskFlipped                  boolean_
+  CircGradBasedCorrMaskFlow                     real_
+  CircGradBasedCorrMaskFullX                    real_
+  CircGradBasedCorrMaskFullY                    real_
+  CircGradBasedCorrMaskLeft                     real_
+  CircGradBasedCorrMaskValue                    real_
+  CircGradBasedCorrMaskMidpoint                 real_
+  CircGradBasedCorrMaskPerimeterValue           real_
+  CircGradBasedCorrMaskRadius                   real_
+  CircGradBasedCorrMaskRight                    real_
+  CircGradBasedCorrMaskRoundness                real_
+  CircGradBasedCorrMaskSizeX                    real_
+  CircGradBasedCorrMaskSizeY                    real_
+  CircGradBasedCorrMaskTop                      real_
+  CircGradBasedCorrMaskVersion                  integer_
+  CircGradBasedCorrMaskWhat                     string_
+  CircGradBasedCorrMaskX                        real_
+  CircGradBasedCorrMaskY                        real_
+  CircGradBasedCorrMaskZeroX                    real_
+  CircGradBasedCorrMaskZeroY                    real_
+  CircGradBasedCorrBrightness                   real_
+  CircGradBasedCorrClarity                      real_
+  CircGradBasedCorrClarity2012                  real_
+  CircGradBasedCorrContrast                     real_
+  CircGradBasedCorrContrast2012                 real_
+  CircGradBasedCorrDefringe                     real_
+  CircGradBasedCorrExposure                     real_
+  CircGradBasedCorrExposure2012                 real_
+  CircGradBasedCorrHighlights2012               real_
+  CircGradBasedCorrLuminanceNoise               real_
+  CircGradBasedCorrMoire                        real_
+  CircGradBasedCorrSaturation                   real_
+  CircGradBasedCorrShadows2012                  real_
+  CircGradBasedCorrSharpness                    real_
+  CircGradBasedCorrTemperature                  real_
+  CircGradBasedCorrTint                         real_
+  CircGradBasedCorrHue                          real_
+  CircGradBasedCorrSaturation                   real_
+  CircGradBasedCorrWhat                         string_
+  Clarity                                       integer/
+  Clarity2012                                   integer/
+  ColorNoiseReduction                           integer/
+  ColorNoiseReductionDetail                     integer/
+  ColorNoiseReductionSmoothness                 integer/
+  Contrast                                      integer/
+  Contrast2012                                  integer/
+  Converter                                     string/
+  ConvertToGrayscale                            boolean/
+  CropAngle                                     real/
+  CropBottom                                    real/
+  CropConstrainToWarp                           integer/
+  CropHeight                                    real/
+  CropLeft                                      real/
+  CropRight                                     real/
+  CropTop                                       real/
+  CropUnit                                      integer/
+  CropUnits                                     integer/
+  CropWidth                                     real/
+  DefaultAutoGray                               boolean/
+  DefaultAutoTone                               boolean/
+  DefaultsSpecificToISO                         boolean/
+  DefaultsSpecificToSerial                      boolean/
+  Defringe                                      integer/
+  DefringeGreenAmount                           integer/
+  DefringeGreenHueHi                            integer/
+  DefringeGreenHueLo                            integer/
+  DefringePurpleAmount                          integer/
+  DefringePurpleHueHi                           integer/
+  DefringePurpleHueLo                           integer/
+  Dehaze                                        real/
+  DNGIgnoreSidecars                             boolean/
+  Exposure                                      real/
+  Exposure2012                                  real/
+  FillLight                                     integer/
+  GradientBasedCorrections                      Correction Struct+
+  GradientBasedCorrActive                       boolean_
+  GradientBasedCorrAmount                       real_
+  GradientBasedCorrMasks                        CorrectionMask Struct_+
+  GradientBasedCorrMaskAlpha                    real_
+  GradientBasedCorrMaskAngle                    real_
+  GradientBasedCorrMaskBottom                   real_
+  GradientBasedCorrMaskCenterValue              real_
+  GradientBasedCorrMaskCenterWeight             real_
+  GradientBasedCorrMaskDabs                     string/_
+  GradientBasedCorrMaskFeather                  real_
+  GradientBasedCorrMaskFlipped                  boolean_
+  GradientBasedCorrMaskFlow                     real_
+  GradientBasedCorrMaskFullX                    real_
+  GradientBasedCorrMaskFullY                    real_
+  GradientBasedCorrMaskLeft                     real_
+  GradientBasedCorrMaskValue                    real_
+  GradientBasedCorrMaskMidpoint                 real_
+  GradientBasedCorrMaskPerimeterValue           real_
+  GradientBasedCorrMaskRadius                   real_
+  GradientBasedCorrMaskRight                    real_
+  GradientBasedCorrMaskRoundness                real_
+  GradientBasedCorrMaskSizeX                    real_
+  GradientBasedCorrMaskSizeY                    real_
+  GradientBasedCorrMaskTop                      real_
+  GradientBasedCorrMaskVersion                  integer_
+  GradientBasedCorrMaskWhat                     string_
+  GradientBasedCorrMaskX                        real_
+  GradientBasedCorrMaskY                        real_
+  GradientBasedCorrMaskZeroX                    real_
+  GradientBasedCorrMaskZeroY                    real_
+  GradientBasedCorrBrightness                   real_
+  GradientBasedCorrClarity                      real_
+  GradientBasedCorrClarity2012                  real_
+  GradientBasedCorrContrast                     real_
+  GradientBasedCorrContrast2012                 real_
+  GradientBasedCorrDefringe                     real_
+  GradientBasedCorrExposure                     real_
+  GradientBasedCorrExposure2012                 real_
+  GradientBasedCorrHighlights2012               real_
+  GradientBasedCorrLuminanceNoise               real_
+  GradientBasedCorrMoire                        real_
+  GradientBasedCorrSaturation                   real_
+  GradientBasedCorrShadows2012                  real_
+  GradientBasedCorrSharpness                    real_
+  GradientBasedCorrTemperature                  real_
+  GradientBasedCorrTint                         real_
+  GradientBasedCorrHue                          real_
+  GradientBasedCorrSaturation                   real_
+  GradientBasedCorrWhat                         string_
+  GrainAmount                                   integer/
+  GrainFrequency                                integer/
+  GrainSize                                     integer/
+  GrayMixerAqua                                 integer/
+  GrayMixerBlue                                 integer/
+  GrayMixerGreen                                integer/
+  GrayMixerMagenta                              integer/
+  GrayMixerOrange                               integer/
+  GrayMixerPurple                               integer/
+  GrayMixerRed                                  integer/
+  GrayMixerYellow                               integer/
+  GreenHue                                      integer/
+  GreenSaturation                               integer/
+  HasCrop                                       boolean/
+  HasSettings                                   boolean/
+  Highlight2012                                 integer/
+  HighlightRecovery                             integer/
+  Highlights2012                                integer/
+  HueAdjustmentAqua                             integer/
+  HueAdjustmentBlue                             integer/
+  HueAdjustmentGreen                            integer/
+  HueAdjustmentMagenta                          integer/
+  HueAdjustmentOrange                           integer/
+  HueAdjustmentPurple                           integer/
+  HueAdjustmentRed                              integer/
+  HueAdjustmentYellow                           integer/
+  IncrementalTemperature                        integer/
+  IncrementalTint                               integer/
+  JPEGHandling                                  string/
+  LensManualDistortionAmount                    integer/
+  LensProfileChromaticAberrationScale           integer/
+  LensProfileDigest                             string/
+  LensProfileDistortionScale                    integer/
+  LensProfileEnable                             integer/
+  LensProfileFilename                           string/
+  LensProfileMatchKeyCameraModelName            string/
+  LensProfileMatchKeyExifMake                   string/
+  LensProfileMatchKeyExifModel                  string/
+  LensProfileMatchKeyIsRaw                      boolean/
+  LensProfileMatchKeyLensID                     string/
+  LensProfileMatchKeyLensInfo                   string/
+  LensProfileMatchKeyLensName                   string/
+  LensProfileMatchKeySensorFormatFactor         real/
+  LensProfileName                               string/
+  LensProfileSetup                              string/
+  LensProfileVignettingScale                    integer/
+  LuminanceAdjustmentAqua                       integer/
+  LuminanceAdjustmentBlue                       integer/
+  LuminanceAdjustmentGreen                      integer/
+  LuminanceAdjustmentMagenta                    integer/
+  LuminanceAdjustmentOrange                     integer/
+  LuminanceAdjustmentPurple                     integer/
+  LuminanceAdjustmentRed                        integer/
+  LuminanceAdjustmentYellow                     integer/
+  LuminanceNoiseReductionContrast               integer/
+  LuminanceNoiseReductionDetail                 integer/
+  LuminanceSmoothing                            integer/
+  MoireFilter                                   string/
+  NegativeCacheLargePreviewSize                 integer/
+  NegativeCacheMaximumSize                      real/
+  NegativeCachePath                             string/
+  PaintBasedCorrections                         Correction Struct+
+  PaintCorrectionActive                         boolean_
+  PaintCorrectionAmount                         real_
+  PaintBasedCorrectionMasks                     CorrectionMask Struct_+
+  PaintCorrectionMaskAlpha                      real_
+  PaintCorrectionMaskAngle                      real_
+  PaintCorrectionMaskBottom                     real_
+  PaintCorrectionMaskCenterValue                real_
+  PaintCorrectionMaskCenterWeight               real_
+  PaintCorrectionMaskDabs                       string/_
+  PaintCorrectionMaskFeather                    real_
+  PaintCorrectionMaskFlipped                    boolean_
+  PaintCorrectionMaskFlow                       real_
+  PaintCorrectionMaskFullX                      real_
+  PaintCorrectionMaskFullY                      real_
+  PaintCorrectionMaskLeft                       real_
+  PaintCorrectionMaskValue                      real_
+  PaintCorrectionMaskMidpoint                   real_
+  PaintCorrectionMaskPerimeterValue             real_
+  PaintCorrectionMaskRadius                     real_
+  PaintCorrectionMaskRight                      real_
+  PaintCorrectionMaskRoundness                  real_
+  PaintCorrectionMaskSizeX                      real_
+  PaintCorrectionMaskSizeY                      real_
+  PaintCorrectionMaskTop                        real_
+  PaintCorrectionMaskVersion                    integer_
+  PaintCorrectionMaskWhat                       string_
+  PaintCorrectionMaskX                          real_
+  PaintCorrectionMaskY                          real_
+  PaintCorrectionMaskZeroX                      real_
+  PaintCorrectionMaskZeroY                      real_
+  PaintCorrectionBrightness                     real_
+  PaintCorrectionClarity                        real_
+  PaintCorrectionClarity2012                    real_
+  PaintCorrectionContrast                       real_
+  PaintCorrectionContrast2012                   real_
+  PaintCorrectionDefringe                       real_
+  PaintCorrectionExposure                       real_
+  PaintCorrectionExposure2012                   real_
+  PaintCorrectionHighlights2012                 real_
+  PaintCorrectionLuminanceNoise                 real_
+  PaintCorrectionMoire                          real_
+  PaintCorrectionSaturation                     real_
+  PaintCorrectionShadows2012                    real_
+  PaintCorrectionSharpness                      real_
+  PaintCorrectionTemperature                    real_
+  PaintCorrectionTint                           real_
+  PaintCorrectionHue                            real_
+  PaintCorrectionSaturation                     real_
+  PaintCorrectionWhat                           string_
+  ParametricDarks                               integer/
+  ParametricHighlights                          integer/
+  ParametricHighlightSplit                      integer/
+  ParametricLights                              integer/
+  ParametricMidtoneSplit                        integer/
+  ParametricShadows                             integer/
+  ParametricShadowSplit                         integer/
+  PerspectiveAspect                             integer/
+  PerspectiveHorizontal                         integer/
+  PerspectiveRotate                             real/
+  PerspectiveScale                              integer/
+  PerspectiveUpright                            integer/
+  PerspectiveVertical                           integer/
+  PerspectiveX                                  real/
+  PerspectiveY                                  real/
+  PostCropVignetteAmount                        integer/
+  PostCropVignetteFeather                       integer/
+  PostCropVignetteHighlightContrast             integer/
+  PostCropVignetteMidpoint                      integer/
+  PostCropVignetteRoundness                     integer/
+  PostCropVignetteStyle                         integer/
+  ProcessVersion                                string/
+  RawFileName                                   string/
+  RedEyeInfo                                    string/+
+  RedHue                                        integer/
+  RedSaturation                                 integer/
+  RetouchAreas                                  RetouchArea Struct+
+  RetouchAreaFeather                            real_
+  RetouchAreaMasks                              CorrectionMask Struct_+
+  RetouchAreaMaskAlpha                          real_
+  RetouchAreaMaskAngle                          real_
+  RetouchAreaMaskBottom                         real_
+  RetouchAreaMaskCenterValue                    real_
+  RetouchAreaMaskCenterWeight                   real_
+  RetouchAreaMaskDabs                           string/_
+  RetouchAreaMaskFeather                        real_
+  RetouchAreaMaskFlipped                        boolean_
+  RetouchAreaMaskFlow                           real_
+  RetouchAreaMaskFullX                          real_
+  RetouchAreaMaskFullY                          real_
+  RetouchAreaMaskLeft                           real_
+  RetouchAreaMaskValue                          real_
+  RetouchAreaMaskMidpoint                       real_
+  RetouchAreaMaskPerimeterValue                 real_
+  RetouchAreaMaskRadius                         real_
+  RetouchAreaMaskRight                          real_
+  RetouchAreaMaskRoundness                      real_
+  RetouchAreaMaskSizeX                          real_
+  RetouchAreaMaskSizeY                          real_
+  RetouchAreaMaskTop                            real_
+  RetouchAreaMaskVersion                        integer_
+  RetouchAreaMaskWhat                           string_
+  RetouchAreaMaskX                              real_
+  RetouchAreaMaskY                              real_
+  RetouchAreaMaskZeroX                          real_
+  RetouchAreaMaskZeroY                          real_
+  RetouchAreaMethod                             string_
+  RetouchAreaOffsetY                            real_
+  RetouchAreaOpacity                            real_
+  RetouchAreaSeed                               integer_
+  RetouchAreaSourceState                        string_
+  RetouchAreaSourceX                            real_
+  RetouchAreaSpotType                           string_
+  RetouchInfo                                   string/+
+  Saturation                                    integer/
+  SaturationAdjustmentAqua                      integer/
+  SaturationAdjustmentBlue                      integer/
+  SaturationAdjustmentGreen                     integer/
+  SaturationAdjustmentMagenta                   integer/
+  SaturationAdjustmentOrange                    integer/
+  SaturationAdjustmentPurple                    integer/
+  SaturationAdjustmentRed                       integer/
+  SaturationAdjustmentYellow                    integer/
+  Shadows                                       integer/
+  Shadows2012                                   integer/
+  ShadowTint                                    integer/
+  SharpenDetail                                 integer/
+  SharpenEdgeMasking                            integer/
+  SharpenRadius                                 real/
+  Sharpness                                     integer/
+  Smoothness                                    integer/
+  SplitToningBalance                            integer/
+  SplitToningHighlightHue                       integer/
+  SplitToningHighlightSaturation                integer/
+  SplitToningShadowHue                          integer/
+  SplitToningShadowSaturation                   integer/
+  ColorTemperature                              integer/
+  Texture                                       integer/
+  TIFFHandling                                  string/
+  Tint                                          integer/
+  ToneCurve                                     string/+
+  ToneCurveBlue                                 string/+
+  ToneCurveGreen                                string/+
+  ToneCurveName                                 string/
+  ToneCurveName2012                             string/
+  ToneCurvePV2012                               string/+
+  ToneCurvePV2012Blue                           string/+
+  ToneCurvePV2012Green                          string/+
+  ToneCurvePV2012Red                            string/+
+  ToneCurveRed                                  string/+
+  ToneMapStrength                               real/
+  UprightCenterMode                             integer/
+  UprightCenterNormX                            real/
+  UprightCenterNormY                            real/
+  UprightDependentDigest                        string/
+  UprightFocalLength35mm                        real/
+  UprightFocalMode                              integer/
+  UprightFourSegmentsCount                      integer/
+  UprightPreview                                boolean/
+  UprightTransform_0                            string/
+  UprightTransform_1                            string/
+  UprightTransform_2                            string/
+  UprightTransform_3                            string/
+  UprightTransform_4                            string/
+  UprightTransform_5                            string/
+  UprightTransformCount                         integer/
+  UprightVersion                                integer/
+  Version                                       string/
+  Vibrance                                      integer/
+  VignetteAmount                                integer/
+  VignetteMidpoint                              integer/
+  What                                          string/
+  WhiteBalance                                  string/
+  Whites2012                                    integer/
+
+=head3 XMP Correction Struct
+
+  Field Name                                    Writable
+  ----------                                    --------
+  CorrectionActive                              boolean
+  CorrectionAmount                              real
+  CorrectionMasks                               CorrectionMask Struct+
+  LocalBrightness                               real
+  LocalClarity                                  real
+  LocalClarity2012                              real
+  LocalContrast                                 real
+  LocalContrast2012                             real
+  LocalDefringe                                 real
+  LocalExposure                                 real
+  LocalExposure2012                             real
+  LocalHighlights2012                           real
+  LocalLuminanceNoise                           real
+  LocalMoire                                    real
+  LocalSaturation                               real
+  LocalShadows2012                              real
+  LocalSharpness                                real
+  LocalTemperature                              real
+  LocalTint                                     real
+  LocalToningHue                                real
+  LocalToningSaturation                         real
+  What                                          string
+
+=head3 XMP CorrectionMask Struct
+
+  Field Name                                    Writable
+  ----------                                    --------
+  Alpha                                         real
+  Angle                                         real
+  Bottom                                        real
+  CenterValue                                   real
+  CenterWeight                                  real
+  Dabs                                          string+
+  Feather                                       real
+  Flipped                                       boolean
+  Flow                                          real
+  FullX                                         real
+  FullY                                         real
+  Left                                          real
+  MaskValue                                     real
+  Midpoint                                      real
+  PerimeterValue                                real
+  Radius                                        real
+  Right                                         real
+  Roundness                                     real
+  SizeX                                         real
+  SizeY                                         real
+  Top                                           real
+  Version                                       integer
+  What                                          string
+  X                                             real
+  Y                                             real
+  ZeroX                                         real
+  ZeroY                                         real
+
+=head3 XMP RetouchArea Struct
+
+  Field Name                                    Writable
+  ----------                                    --------
+  Feather                                       real
+  Masks                                         CorrectionMask Struct+
+  Method                                        string
+  OffsetY                                       real
+  Opacity                                       real
+  Seed                                          integer
+  SourceState                                   string
+  SourceX                                       real
+  SpotType                                      string
 
 =head3 XMP creatorAtom Tags
 
@@ -1702,6 +2127,7 @@ These tags belong to the ExifTool XMP-crs family 1 group.
   GreenSaturation                               integer
   HasCrop                                       boolean
   HasSettings                                   boolean
+  Highlight2012                                 integer
   HighlightRecovery                             integer
   Highlights2012                                integer
   HueAdjustmentAqua                             integer
@@ -1884,6 +2310,7 @@ These tags belong to the ExifTool XMP-crs family 1 group.
   SplitToningShadowHue                          integer
   SplitToningShadowSaturation                   integer
   ColorTemperature                              integer
+  Texture                                       integer
   TIFFHandling                                  string
   Tint                                          integer
   ToneCurve                                     string+
@@ -1920,79 +2347,6 @@ These tags belong to the ExifTool XMP-crs family 1 group.
   What                                          string
   WhiteBalance                                  string/
   Whites2012                                    integer
-
-=head3 XMP Correction Struct
-
-  Field Name                                    Writable
-  ----------                                    --------
-  CorrectionActive                              boolean
-  CorrectionAmount                              real
-  CorrectionMasks                               CorrectionMask Struct+
-  LocalBrightness                               real
-  LocalClarity                                  real
-  LocalClarity2012                              real
-  LocalContrast                                 real
-  LocalContrast2012                             real
-  LocalDefringe                                 real
-  LocalExposure                                 real
-  LocalExposure2012                             real
-  LocalHighlights2012                           real
-  LocalLuminanceNoise                           real
-  LocalMoire                                    real
-  LocalSaturation                               real
-  LocalShadows2012                              real
-  LocalSharpness                                real
-  LocalTemperature                              real
-  LocalTint                                     real
-  LocalToningHue                                real
-  LocalToningSaturation                         real
-  What                                          string
-
-=head3 XMP CorrectionMask Struct
-
-  Field Name                                    Writable
-  ----------                                    --------
-  Alpha                                         real
-  Angle                                         real
-  Bottom                                        real
-  CenterValue                                   real
-  CenterWeight                                  real
-  Dabs                                          string+
-  Feather                                       real
-  Flipped                                       boolean
-  Flow                                          real
-  FullX                                         real
-  FullY                                         real
-  Left                                          real
-  MaskValue                                     real
-  Midpoint                                      real
-  PerimeterValue                                real
-  Radius                                        real
-  Right                                         real
-  Roundness                                     real
-  SizeX                                         real
-  SizeY                                         real
-  Top                                           real
-  Version                                       integer
-  What                                          string
-  X                                             real
-  Y                                             real
-  ZeroX                                         real
-  ZeroY                                         real
-
-=head3 XMP RetouchArea Struct
-
-  Field Name                                    Writable
-  ----------                                    --------
-  Feather                                       real
-  Masks                                         CorrectionMask Struct+
-  Method                                        string
-  OffsetY                                       real
-  Opacity                                       real
-  Seed                                          integer
-  SourceState                                   string
-  SourceX                                       real
-  SpotType                                      string
 
 =head3 XMP dc Tags
 
@@ -2449,7 +2803,8 @@ These tags belong to the ExifTool XMP-GPano family 1 group.
 =head3 XMP GSpherical Tags
 
 Not actually XMP.  These RDF/XML tags are used in Google spherical MP4
-videos.  See
+videos.  These tags are written into the video track of MOV/MP4 files, and
+not at the top level like other XMP tags.  See
 L<https://github.com/google/spatial-media/blob/master/docs/spherical-video-rfc.md>
 for the specification.
 
@@ -5051,6 +5406,7 @@ boot, not including standby time.
   0x4024   FilterInfo                           Canon FilterInfo
   0x4025   HDRInfo                              Canon HDRInfo
   0x4028   AFConfig                             Canon AFConfig
+  0x403f   RawBurstModeRoll                     Canon RawBurstInfo
 
 =head3 Canon CameraSettings Tags
 
@@ -6495,6 +6851,8 @@ These tags are used by many EOS M and PowerShot models.
     255    ColorCalib2?                         Canon ColorCalib2
     264    PerChannelBlackLevel                 int16s[4]
     333    PerChannelBlackLevel                 int16s[4]
+   1385    NormalWhiteLevel                     int16u
+   1386    SpecularWhiteLevel                   int16u
 
 =head3 Canon ColorCoefs2 Tags
 
@@ -6928,9 +7286,11 @@ This information is found in images from newer EOS models.
   ------   --------                             --------
       0    VignettingCorrVersion                no
       2    PeripheralLighting                   int16s
+      3    DistortionCorrection                 int16s
       4    ChromaticAberrationCorr              int16s
       5    ChromaticAberrationCorr              int16s
       6    PeripheralLightingValue              int16s
+      9    DistortionCorrectionValue            int16s
      11    OriginalImageWidth                   int16s
      12    OriginalImageHeight                  int16s
 
@@ -6948,6 +7308,7 @@ Vignetting correction from PowerShot models.
   ------   --------                             --------
       5    PeripheralLightingSetting            int32s
       6    ChromaticAberrationSetting           int32s
+      7    DistortionCorrectionSetting          int32s
 
 =head3 Canon LightingOpt Tags
 
@@ -7029,6 +7390,13 @@ Information about creative filter settings.
      18    AFStatusViewfinder                   int32s
      19    InitialAFPointInServo                int32s
 
+=head3 Canon RawBurstInfo Tags
+
+  Index4   Tag Name                             Writable
+  ------   --------                             --------
+      1    RawBurstImageNum                     int32u
+      2    RawBurstImageCount                   int32u
+
 =head3 Canon CTMD Tags
 
 Canon Timed MetaData tags found in CR3 images.  The ExtractEmbedded option
@@ -7092,8 +7460,8 @@ information.
 
 =head3 Canon CNTH Tags
 
-Canon-specific QuickTime tags found in the CNTH atom of MOV videos from some
-cameras such as the PowerShot S95.
+Canon-specific QuickTime tags found in the CNTH atom of MOV/MP4 videos from
+some cameras.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -8058,6 +8426,61 @@ This information is found in Casio GV-10 AVI videos.
   ------   --------                             --------
       0    Software                             no
 
+=head2 DJI Tags
+
+This table lists tags found in the maker notes of images from some DJI
+Phantom drones.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   Make                                 string
+  0x0003   SpeedX                               float
+  0x0004   SpeedY                               float
+  0x0005   SpeedZ                               float
+  0x0006   Pitch                                float
+  0x0007   Yaw                                  float
+  0x0008   Roll                                 float
+  0x0009   CameraPitch                          float
+  0x000a   CameraYaw                            float
+  0x000b   CameraRoll                           float
+
+=head3 DJI XMP Tags
+
+XMP tags used by DJI for images from drones.
+
+These tags belong to the ExifTool XMP-drone-dji family 1 group.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AbsoluteAltitude                              real
+  CalibratedFocalLength                         real
+  CalibratedOpticalCenterX                      real
+  CalibratedOpticalCenterY                      real
+  CamReverse                                    string
+  DewarpData                                    string
+  DewarpFlag                                    string
+  FlightPitchDegree                             real
+  FlightRollDegree                              real
+  FlightXSpeed                                  real
+  FlightYSpeed                                  real
+  FlightYawDegree                               real
+  FlightZSpeed                                  real
+  GPSLatitude                                   real/
+  GPSLongitude                                  real/
+  GPSLongtitude                                 real
+  GimbalPitchDegree                             real
+  GimbalReverse                                 string
+  GimbalRollDegree                              real
+  GimbalYawDegree                               real
+  Latitude                                      real
+  Longitude                                     real
+  RelativeAltitude                              real
+  RtkFlag                                       string
+  RtkStdHgt                                     real
+  RtkStdLat                                     real
+  RtkStdLon                                     real
+  SelfData                                      string
+
 =head2 FLIR Tags
 
 Information extracted from the maker notes of JPEG images from thermal
@@ -8566,6 +8989,7 @@ Tags extracted from FLIR Public image Format (FPF) files.
   0x3820   FrameRate                            int16u
   0x3821   FrameWidth                           int16u
   0x3822   FrameHeight                          int16u
+  0x3824   FullHDHighSpeedRec                   int32u
   0x4005   FaceElementSelected                  int16u[4]
   0x4100   FacesDetected                        int16u
   0x4103   FacePositions                        int16u[n]
@@ -9684,6 +10108,7 @@ data, however ExifTool will extract information from any tags found here.
   'ISO'                 ISO                     no
   'ISO Speed'           ISO                     no
   'Image Number'        ImageNumber             no
+  'Lens'                Lens                    no
   'Max Aperture'        MaxAperture             no
   'Meter Mode'          MeterMode               no
   'Min Aperture'        MinAperture             no
@@ -10791,6 +11216,8 @@ DiMAGE X and Xt.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  0x5500   BuildNumber                          string
+  0x5501   SerialNumber                         string
   0x665e   Sensor                               string
   0x6705   ManufactureDate                      string
 
@@ -10892,7 +11319,7 @@ DiMAGE X and Xt.
            ShotInfoUnknown                      Nikon ShotInfo
   0x0092   HueAdjustment                        int16s
   0x0093   NEFCompression                       int16u
-  0x0094   Saturation                           int16s
+  0x0094   SaturationAdj                        int16s
   0x0095   NoiseReduction                       string
   0x0096   NEFLinearizationTable                undef!
   0x0097   ColorBalance0100                     Nikon ColorBalance1
@@ -10919,6 +11346,7 @@ DiMAGE X and Xt.
   0x0099   RawImageCenter                       int16u[2]
   0x009a   SensorPixelSize                      rational64u[2]
   0x009c   SceneAssist                          string
+  0x009d   DateStampMode                        int16u
   0x009e   RetouchHistory                       int16u[10]
   0x00a0   SerialNumber                         string
   0x00a2   ImageDataSize                        int32u
@@ -10950,11 +11378,11 @@ DiMAGE X and Xt.
   0x00c3   BarometerInfo                        Nikon BarometerInfo
   0x0e00   PrintIM                              PrintIM
   0x0e01   NikonCaptureData                     NikonCapture
-  0x0e09   NikonCaptureVersion                  string
+  0x0e09   NikonCaptureVersion                  string^
   0x0e0e   NikonCaptureOffsets                  Nikon CaptureOffsets
   0x0e10   NikonScanIFD                         Nikon Scan
   0x0e13   NikonCaptureEditVersions             NikonCapture
-           NikonCaptureEditVersions             undef!
+           NikonCaptureEditVersions             undef!^
   0x0e1d   NikonICCProfile                      ICC_Profile
   0x0e1e   NikonCaptureOutput                   Nikon CaptureOutput
   0x0e22   NEFBitDepth                          int16u[4]!
@@ -11359,7 +11787,7 @@ different for other firmware versions.
     464    SecondarySlotFunction                int8u & 0x03
    5974    AEBracketingSteps                    int8u & 0xff
    5975    WBBracketingSteps                    int8u & 0xff
-   5982    D810MeteringMode                     int8u & 0x03
+   5982    NikonMeteringMode                    int8u & 0x03
    6236    ISOAutoShutterTime                   int8u & 0x3f
    6237    ISOAutoHiLimit                       int8u & 0xff
    6315    CustomSettingsD810                   NikonCustom SettingsD810
@@ -11481,6 +11909,7 @@ These tags are extracted from encrypted data in images from the D5 and D500.
   11300    RollAngle                            fixed32u
   11304    PitchAngle                           fixed32u
   11308    YawAngle                             fixed32u
+  11940    NikonMeteringMode                    int8u & 0x03
 
 =head3 Nikon ShotInfoD610 Tags
 
@@ -11651,9 +12080,11 @@ Tags found in the encrypted LensData from cameras such as the Z6 and Z7.
      18    MaxApertureAtMaxFocal                int8u
      19    MCUVersion                           int8u
      20    EffectiveMaxAperture                 int8u
+     48    LensID                               int16u
      54    MaxAperture                          int16u
      56    FNumber                              int16u
      60    FocalLength                          int16u
+     79    FocusDistance                        int8u
 
 =head3 Nikon LensDataUnknown Tags
 
@@ -14131,6 +14562,8 @@ These tags are used in Panasonic/Leica cameras.
   0x00b9   RedEyeRemoval                        int16u
   0x00bb   VideoBurstMode                       int32u
   0x00bc   DiffractionCorrection                int16u
+  0x00d1   ISO                                  int32u
+  0x00d6   NoiseReductionStrength               rational64s
   0x0e00   PrintIM                              PrintIM
   0x2003   TimeInfo                             Panasonic TimeInfo
   0x8000   MakerNoteVersion                     undef
@@ -15548,23 +15981,65 @@ as the Galaxy S4 and Tab S.
   DepthMapName                                  no
   DualCameraImage                               no
   DualCameraImageName                           no
-  DualShotInfo                                  Samsung DualShotInfo
+  DualShotExtra                                 Samsung DualShotExtra
   EmbeddedAudioFile                             no
   EmbeddedAudioFileName                         no
   EmbeddedImage                                 no
   EmbeddedImageName                             no
   EmbeddedVideoFile                             no
   EmbeddedVideoType                             no
+  SingleShotDepthMap                            no
+  SingleShotMeta                                Samsung SingleShotMeta
   SurroundShotVideo                             no
   SurroundShotVideoName                         no
   TimeStamp                                     no
 
-=head3 Samsung DualShotInfo Tags
+=head3 Samsung DualShotExtra Tags
+
+These tags tested only for DualShotVersion numbers 1, 4 and 5.
 
   Index4   Tag Name                             Writable
   ------   --------                             --------
+      0    DualShotVersion                      no
       9    DepthMapWidth                        no
      10    DepthMapHeight                       no
+     16    DepthMapWidth                        no
+     17    DepthMapHeight                       no
+     18    DepthMapWidth                        no
+     19    DepthMapHeight                       no
+
+=head3 Samsung SingleShotMeta Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'beautyColorLevel'   BeautyColorLevel         no
+  'beautyRetouchLevel' BeautyRetouchLevel       no
+  'blurStrength'       BlurStrength             no
+  'bokehShape'         BokehShape               no
+  'colorpopStrength'   ColorpopStrength         no
+  'depthHWHeight'      DepthHWHeight            no
+  'depthHWWidth'       DepthHWWidth             no
+  'depthSWHeight'      DepthSWHeight            no
+  'depthSWWidth'       DepthSWWidth             no
+  'deviceOrientation'  DeviceOrientation        no
+  'effectStrength'     EffectStrength           no
+  'effectType'         EffectType               no
+  'flipStatus'         FlipStatus               no
+  'inputHeight'        InputHeight              no
+  'inputWidth'         InputWidth               no
+  'isArtBokeh'         IsArtBokeh               no
+  'lensFacing'         LensFacing               no
+  'monoStrength'       MonoStrength             no
+  'objectOrientation'  ObjectOrientation        no
+  'outputHeight'       OutputHeight             no
+  'outputWidth'        OutputWidth              no
+  'perfMode'           PerfMode                 no
+  'segHeight'          SegHeight                no
+  'segWidth'           SegWidth                 no
+  'sidelightStrength'  SidelightStrength        no
+  'spinStrength'       SpinStrength             no
+  'vintageStrength'    VintageStrength          no
+  'zoomStrength'       ZoomStrength             no
 
 =head3 Samsung sec Tags
 
@@ -15666,7 +16141,7 @@ such as the Galaxy S4.
   0x1015   ToningEffect                         int16u
   0x1016   HueAdjust                            int16u
   0x1017   WideAdapter                          int16u
-  0x1018   CropMode35mm                         int16u
+  0x1018   CropMode                             int16u
   0x1019   NDFilter                             int16u
   0x101a   WBBracketShotNumber                  int16u
   0x1200   AFStatus                             int16u
@@ -16554,25 +17029,25 @@ rotation -- the width is always the longer dimension.
 
 Valid for NEX-5N.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x04b0   MeterInfo?                           Sony MeterInfo
-  0x1128   ReleaseMode3                         int8u
-  0x112c   ReleaseMode2                         int8u
-  0x1134   SelfTimer                            int8u
-  0x1138   FlashMode                            int8u
-  0x113e   StopsAboveBaseISO                    int16u
-  0x1140   BrightnessValue                      int16u
-  0x1144   DynamicRangeOptimizer                int8u
-  0x1148   HDRSetting                           int8u
-  0x114c   ExposureCompensation                 int16s
-  0x115e   PictureProfile                       int8u
-  0x115f   PictureProfile                       int8u
-  0x1163   PictureEffect2                       int8u
-  0x1170   Quality2                             int8u
-  0x1174   MeteringMode                         int8u
-  0x1175   ExposureProgram                      int8u
-  0x117c   WB_RGBLevels                         int16u[3]
+   1200    MeterInfo?                           Sony MeterInfo
+   4392    ReleaseMode3                         int8u
+   4396    ReleaseMode2                         int8u
+   4404    SelfTimer                            int8u
+   4408    FlashMode                            int8u
+   4414    StopsAboveBaseISO                    int16u
+   4416    BrightnessValue                      int16u
+   4420    DynamicRangeOptimizer                int8u
+   4424    HDRSetting                           int8u
+   4428    ExposureCompensation                 int16s
+   4446    PictureProfile                       int8u
+   4447    PictureProfile                       int8u
+   4451    PictureEffect2                       int8u
+   4464    Quality2                             int8u
+   4468    MeteringMode                         int8u
+   4469    ExposureProgram                      int8u
+   4476    WB_RGBLevels                         int16u[3]
 
 =head3 Sony MeterInfo Tags
 
@@ -16602,92 +17077,92 @@ option is used.
 
 Valid for SLT-A65/A77, NEX-7/VG20E.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   SequenceImageNumber                  int32u
-  0x0004   SequenceFileNumber                   int32u
-  0x0008   ReleaseMode2                         int32u
-  0x01b6   SonyDateTime                         undef[7]
-  0x0324   DynamicRangeOptimizer                int8u
-  0x04b4   MeterInfo?                           Sony MeterInfo
-  0x1128   ReleaseMode3                         int8u
-  0x112c   ReleaseMode2                         int8u
-  0x1134   SelfTimer                            int8u
-  0x1138   FlashMode                            int8u
-  0x113e   StopsAboveBaseISO                    int16u
-  0x1140   BrightnessValue                      int16u
-  0x1144   DynamicRangeOptimizer                int8u
-  0x1148   HDRSetting                           int8u
-  0x114c   ExposureCompensation                 int16s
-  0x1162   PictureProfile                       int8u
-  0x1163   PictureProfile                       int8u
-  0x1167   PictureEffect2                       int8u
-  0x1174   Quality2                             int8u
-  0x1178   MeteringMode                         int8u
-  0x1179   ExposureProgram                      int8u
-  0x1180   WB_RGBLevels                         int16u[3]
-  0x1218   SonyISO                              int16u
-  0x1a23   DistortionCorrParams                 int16s[16]
+      0    SequenceImageNumber                  int32u
+      4    SequenceFileNumber                   int32u
+      8    ReleaseMode2                         int32u
+    438    SonyDateTime                         undef[7]
+    804    DynamicRangeOptimizer                int8u
+   1204    MeterInfo?                           Sony MeterInfo
+   4392    ReleaseMode3                         int8u
+   4396    ReleaseMode2                         int8u
+   4404    SelfTimer                            int8u
+   4408    FlashMode                            int8u
+   4414    StopsAboveBaseISO                    int16u
+   4416    BrightnessValue                      int16u
+   4420    DynamicRangeOptimizer                int8u
+   4424    HDRSetting                           int8u
+   4428    ExposureCompensation                 int16s
+   4450    PictureProfile                       int8u
+   4451    PictureProfile                       int8u
+   4455    PictureEffect2                       int8u
+   4468    Quality2                             int8u
+   4472    MeteringMode                         int8u
+   4473    ExposureProgram                      int8u
+   4480    WB_RGBLevels                         int16u[3]
+   4632    SonyISO                              int16u
+   6691    DistortionCorrParams                 int16s[16]
 
 =head3 Sony Tag2010c Tags
 
 Valid for SLT-A37/A57 and NEX-F3.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   SequenceImageNumber                  int32u
-  0x0004   SequenceFileNumber                   int32u
-  0x0008   ReleaseMode2                         int32u
-  0x0200   DigitalZoomRatio                     int8u
-  0x0210   SonyDateTime                         undef[7]
-  0x0300   DynamicRangeOptimizer                int8u
-  0x0490   MeterInfo?                           Sony MeterInfo
-  0x1104   ReleaseMode3                         int8u
-  0x1108   ReleaseMode2                         int8u
-  0x1110   SelfTimer                            int8u
-  0x1114   FlashMode                            int8u
-  0x111a   StopsAboveBaseISO                    int16u
-  0x111c   BrightnessValue                      int16u
-  0x1120   DynamicRangeOptimizer                int8u
-  0x1124   HDRSetting                           int8u
-  0x1128   ExposureCompensation                 int16s
-  0x113e   PictureProfile                       int8u
-  0x113f   PictureProfile                       int8u
-  0x1143   PictureEffect2                       int8u
-  0x1150   Quality2                             int8u
-  0x1154   MeteringMode                         int8u
-  0x1155   ExposureProgram                      int8u
-  0x115c   WB_RGBLevels                         int16u[3]
-  0x11f4   SonyISO                              int16u
+      0    SequenceImageNumber                  int32u
+      4    SequenceFileNumber                   int32u
+      8    ReleaseMode2                         int32u
+    512    DigitalZoomRatio                     int8u
+    528    SonyDateTime                         undef[7]
+    768    DynamicRangeOptimizer                int8u
+   1168    MeterInfo?                           Sony MeterInfo
+   4356    ReleaseMode3                         int8u
+   4360    ReleaseMode2                         int8u
+   4368    SelfTimer                            int8u
+   4372    FlashMode                            int8u
+   4378    StopsAboveBaseISO                    int16u
+   4380    BrightnessValue                      int16u
+   4384    DynamicRangeOptimizer                int8u
+   4388    HDRSetting                           int8u
+   4392    ExposureCompensation                 int16s
+   4414    PictureProfile                       int8u
+   4415    PictureProfile                       int8u
+   4419    PictureEffect2                       int8u
+   4432    Quality2                             int8u
+   4436    MeteringMode                         int8u
+   4437    ExposureProgram                      int8u
+   4444    WB_RGBLevels                         int16u[3]
+   4596    SonyISO                              int16u
 
 =head3 Sony Tag2010d Tags
 
 Valid for DSC-HX10V/HX20V/HX200V/TX66/TX200V/TX300V/WX50/WX100/WX150, but
 not valid for panorama images.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   SequenceImageNumber                  int32u
-  0x0004   SequenceFileNumber                   int32u
-  0x0008   ReleaseMode2                         int32u
-  0x01fe   SonyDateTime                         undef[7]
-  0x037c   DynamicRangeOptimizer                int8u
-  0x050c   MeterInfo?                           Sony MeterInfo
-  0x1180   ReleaseMode3                         int8u
-  0x1184   ReleaseMode2                         int8u
-  0x118c   SelfTimer                            int8u
-  0x1190   FlashMode                            int8u
-  0x1196   StopsAboveBaseISO                    int16u
-  0x1198   BrightnessValue                      int16u
-  0x119c   DynamicRangeOptimizer                int8u
-  0x11a0   HDRSetting                           int8u
-  0x11ba   PictureProfile                       int8u
-  0x11bb   PictureProfile                       int8u
-  0x11bf   PictureEffect2                       int8u
-  0x11d0   MeteringMode                         int8u
-  0x11d1   ExposureProgram                      int8u
-  0x11d8   WB_RGBLevels                         int16u[3]
-  0x1270   SonyISO                              int16u
+      0    SequenceImageNumber                  int32u
+      4    SequenceFileNumber                   int32u
+      8    ReleaseMode2                         int32u
+    510    SonyDateTime                         undef[7]
+    892    DynamicRangeOptimizer                int8u
+   1292    MeterInfo?                           Sony MeterInfo
+   4480    ReleaseMode3                         int8u
+   4484    ReleaseMode2                         int8u
+   4492    SelfTimer                            int8u
+   4496    FlashMode                            int8u
+   4502    StopsAboveBaseISO                    int16u
+   4504    BrightnessValue                      int16u
+   4508    DynamicRangeOptimizer                int8u
+   4512    HDRSetting                           int8u
+   4538    PictureProfile                       int8u
+   4539    PictureProfile                       int8u
+   4543    PictureEffect2                       int8u
+   4560    MeteringMode                         int8u
+   4561    ExposureProgram                      int8u
+   4568    WB_RGBLevels                         int16u[3]
+   4720    SonyISO                              int16u
 
 =head3 Sony Tag2010e Tags
 
@@ -16695,188 +17170,188 @@ Valid for SLT-A58/A99, ILCE-3000/3500, NEX-3N/5R/5T/6/VG30E/VG900, DSC-RX100,
 DSC-RX1/RX1R. Also valid for DSC-HX300/HX50V/TX30/WX60/WX200/WX300, but not
 for panorama images.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   SequenceImageNumber                  int32u
-  0x0004   SequenceFileNumber                   int32u
-  0x0008   ReleaseMode2                         int32u
-  0x021c   DigitalZoomRatio                     int8u
-  0x022c   SonyDateTime                         undef[7]
-  0x0328   DynamicRangeOptimizer                int8u
-  0x04b8   MeterInfo?                           Sony MeterInfo
-  0x115c   ReleaseMode3                         int8u
-  0x1160   ReleaseMode2                         int8u
-  0x1168   SelfTimer                            int8u
-  0x116c   FlashMode                            int8u
-  0x1172   StopsAboveBaseISO                    int16u
-  0x1174   BrightnessValue                      int16u
-  0x1178   DynamicRangeOptimizer                int8u
-  0x117c   HDRSetting                           int8u
-  0x1180   ExposureCompensation                 int16s
-  0x1196   PictureProfile                       int8u
-  0x1197   PictureProfile                       int8u
-  0x119b   PictureEffect2                       int8u
-  0x11a8   Quality2                             int8u
-  0x11ac   MeteringMode                         int8u
-  0x11ad   ExposureProgram                      int8u
-  0x11b4   WB_RGBLevels                         int16u[3]
-  0x1254   SonyISO                              int16u
-  0x1258   SonyISO                              int16u
-  0x1278   FocalLength                          int16u
-  0x127a   MinFocalLength                       int16u
-  0x127c   MaxFocalLength                       int16u
-  0x1280   SonyISO                              int16u
-  0x1870   DistortionCorrParams                 int16s[16]
-  0x1891   LensFormat                           int8u
-  0x1892   LensMount                            int8u
-  0x1893   LensType2                            int16u
-  0x1896   LensType                             int16u
-  0x1898   DistortionCorrParamsPresent          int8u
-  0x1899   DistortionCorrParamsNumber           int8u
+      0    SequenceImageNumber                  int32u
+      4    SequenceFileNumber                   int32u
+      8    ReleaseMode2                         int32u
+    540    DigitalZoomRatio                     int8u
+    556    SonyDateTime                         undef[7]
+    808    DynamicRangeOptimizer                int8u
+   1208    MeterInfo?                           Sony MeterInfo
+   4444    ReleaseMode3                         int8u
+   4448    ReleaseMode2                         int8u
+   4456    SelfTimer                            int8u
+   4460    FlashMode                            int8u
+   4466    StopsAboveBaseISO                    int16u
+   4468    BrightnessValue                      int16u
+   4472    DynamicRangeOptimizer                int8u
+   4476    HDRSetting                           int8u
+   4480    ExposureCompensation                 int16s
+   4502    PictureProfile                       int8u
+   4503    PictureProfile                       int8u
+   4507    PictureEffect2                       int8u
+   4520    Quality2                             int8u
+   4524    MeteringMode                         int8u
+   4525    ExposureProgram                      int8u
+   4532    WB_RGBLevels                         int16u[3]
+   4692    SonyISO                              int16u
+   4696    SonyISO                              int16u
+   4728    FocalLength                          int16u
+   4730    MinFocalLength                       int16u
+   4732    MaxFocalLength                       int16u
+   4736    SonyISO                              int16u
+   6256    DistortionCorrParams                 int16s[16]
+   6289    LensFormat                           int8u
+   6290    LensMount                            int8u
+   6291    LensType2                            int16u
+   6294    LensType                             int16u
+   6296    DistortionCorrParamsPresent          int8u
+   6297    DistortionCorrParamsNumber           int8u
 
 =head3 Sony Tag2010f Tags
 
 Valid for DSC-RX100M2, DSC-QX10/QX100.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   ReleaseMode2                         int32u
-  0x0050   DynamicRangeOptimizer                int8u
-  0x01e0   MeterInfo?                           Sony MeterInfo
-  0x1014   ReleaseMode3                         int8u
-  0x1018   ReleaseMode2                         int8u
-  0x1020   SelfTimer                            int8u
-  0x1024   FlashMode                            int8u
-  0x102a   StopsAboveBaseISO                    int16u
-  0x102c   BrightnessValue                      int16u
-  0x1030   DynamicRangeOptimizer                int8u
-  0x1034   HDRSetting                           int8u
-  0x1038   ExposureCompensation                 int16s
-  0x104e   PictureProfile                       int8u
-  0x104f   PictureProfile                       int8u
-  0x1053   PictureEffect2                       int8u
-  0x1060   Quality2                             int8u
-  0x1064   MeteringMode                         int8u
-  0x1065   ExposureProgram                      int8u
-  0x106c   WB_RGBLevels                         int16u[3]
-  0x1134   FocalLength                          int16u
-  0x1136   MinFocalLength                       int16u
-  0x1138   MaxFocalLength                       int16u
-  0x113c   SonyISO                              int16u
+      4    ReleaseMode2                         int32u
+     80    DynamicRangeOptimizer                int8u
+    480    MeterInfo?                           Sony MeterInfo
+   4116    ReleaseMode3                         int8u
+   4120    ReleaseMode2                         int8u
+   4128    SelfTimer                            int8u
+   4132    FlashMode                            int8u
+   4138    StopsAboveBaseISO                    int16u
+   4140    BrightnessValue                      int16u
+   4144    DynamicRangeOptimizer                int8u
+   4148    HDRSetting                           int8u
+   4152    ExposureCompensation                 int16s
+   4174    PictureProfile                       int8u
+   4175    PictureProfile                       int8u
+   4179    PictureEffect2                       int8u
+   4192    Quality2                             int8u
+   4196    MeteringMode                         int8u
+   4197    ExposureProgram                      int8u
+   4204    WB_RGBLevels                         int16u[3]
+   4404    FocalLength                          int16u
+   4406    MinFocalLength                       int16u
+   4408    MaxFocalLength                       int16u
+   4412    SonyISO                              int16u
 
 =head3 Sony Tag2010g Tags
 
 Valid for DSC-HX60V/HX350/HX400V/QX30/RX10/RX100M3/WX220/WX350,
 ILCE-7/7R/7S/7M2/5000/5100/6000/QX1, ILCA-68/77M2.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   ReleaseMode2                         int32u
-  0x0050   DynamicRangeOptimizer                int8u
-  0x020c   ReleaseMode3                         int8u
-  0x0210   ReleaseMode2                         int8u
-  0x0218   SelfTimer                            int8u
-  0x021c   FlashMode                            int8u
-  0x0222   StopsAboveBaseISO                    int16u
-  0x0224   BrightnessValue                      int16u
-  0x0228   DynamicRangeOptimizer                int8u
-  0x022c   HDRSetting                           int8u
-  0x0230   ExposureCompensation                 int16s
-  0x0246   PictureProfile                       int8u
-  0x0247   PictureProfile                       int8u
-  0x024b   PictureEffect2                       int8u
-  0x0258   Quality2                             int8u
-  0x025c   MeteringMode                         int8u
-  0x025d   ExposureProgram                      int8u
-  0x0264   WB_RGBLevels                         int16u[3]
-  0x032c   FocalLength                          int16u
-  0x032e   MinFocalLength                       int16u
-  0x0330   MaxFocalLength                       int16u
-  0x0344   SonyISO                              int16u
-  0x0388   MeterInfo?                           Sony MeterInfo
-  0x189c   DistortionCorrParams                 int16s[16]
-  0x18bd   LensFormat                           int8u
-  0x18be   LensMount                            int8u
-  0x18bf   LensType2                            int16u
-  0x18c2   LensType                             int16u
-  0x18c4   DistortionCorrParamsPresent          int8u
-  0x18c5   DistortionCorrParamsNumber           int8u
+      4    ReleaseMode2                         int32u
+     80    DynamicRangeOptimizer                int8u
+    524    ReleaseMode3                         int8u
+    528    ReleaseMode2                         int8u
+    536    SelfTimer                            int8u
+    540    FlashMode                            int8u
+    546    StopsAboveBaseISO                    int16u
+    548    BrightnessValue                      int16u
+    552    DynamicRangeOptimizer                int8u
+    556    HDRSetting                           int8u
+    560    ExposureCompensation                 int16s
+    582    PictureProfile                       int8u
+    583    PictureProfile                       int8u
+    587    PictureEffect2                       int8u
+    600    Quality2                             int8u
+    604    MeteringMode                         int8u
+    605    ExposureProgram                      int8u
+    612    WB_RGBLevels                         int16u[3]
+    812    FocalLength                          int16u
+    814    MinFocalLength                       int16u
+    816    MaxFocalLength                       int16u
+    836    SonyISO                              int16u
+    904    MeterInfo?                           Sony MeterInfo
+   6300    DistortionCorrParams                 int16s[16]
+   6333    LensFormat                           int8u
+   6334    LensMount                            int8u
+   6335    LensType2                            int16u
+   6338    LensType                             int16u
+   6340    DistortionCorrParamsPresent          int8u
+   6341    DistortionCorrParamsNumber           int8u
 
 =head3 Sony Tag2010h Tags
 
 Valid for DSC-HX80/HX90V/RX0/RX1RM2/RX10M2/RX10M3/RX100M4/RX100M5/WX500,
 ILCE-6300/6500/7RM2/7SM2, ILCA-99M2.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   ReleaseMode2                         int32u
-  0x0050   DynamicRangeOptimizer                int8u
-  0x020c   ReleaseMode3                         int8u
-  0x0210   ReleaseMode2                         int8u
-  0x0218   SelfTimer                            int8u
-  0x021c   FlashMode                            int8u
-  0x0222   StopsAboveBaseISO                    int16u
-  0x0224   BrightnessValue                      int16u
-  0x0228   DynamicRangeOptimizer                int8u
-  0x022c   HDRSetting                           int8u
-  0x0230   ExposureCompensation                 int16s
-  0x0246   PictureProfile                       int8u
-  0x0247   PictureProfile                       int8u
-  0x024b   PictureEffect2                       int8u
-  0x0258   Quality2                             int8u
-  0x025c   MeteringMode                         int8u
-  0x025d   ExposureProgram                      int8u
-  0x0264   WB_RGBLevels                         int16u[3]
-  0x032c   FocalLength                          int16u
-  0x032e   MinFocalLength                       int16u
-  0x0330   MaxFocalLength                       int16u
-  0x0346   SonyISO                              int16u
-  0x0388   MeterInfo?                           Sony MeterInfo
-  0x0398   MeterInfo?                           Sony MeterInfo
-  0x18cc   DistortionCorrParams                 int16s[16]
-  0x18ed   LensFormat                           int8u
-  0x18ee   LensMount                            int8u
-  0x18ef   LensType2                            int16u
-  0x18f2   LensType                             int16u
-  0x18f4   DistortionCorrParamsPresent          int8u
-  0x18f5   DistortionCorrParamsNumber           int8u
+      4    ReleaseMode2                         int32u
+     80    DynamicRangeOptimizer                int8u
+    524    ReleaseMode3                         int8u
+    528    ReleaseMode2                         int8u
+    536    SelfTimer                            int8u
+    540    FlashMode                            int8u
+    546    StopsAboveBaseISO                    int16u
+    548    BrightnessValue                      int16u
+    552    DynamicRangeOptimizer                int8u
+    556    HDRSetting                           int8u
+    560    ExposureCompensation                 int16s
+    582    PictureProfile                       int8u
+    583    PictureProfile                       int8u
+    587    PictureEffect2                       int8u
+    600    Quality2                             int8u
+    604    MeteringMode                         int8u
+    605    ExposureProgram                      int8u
+    612    WB_RGBLevels                         int16u[3]
+    812    FocalLength                          int16u
+    814    MinFocalLength                       int16u
+    816    MaxFocalLength                       int16u
+    838    SonyISO                              int16u
+    904    MeterInfo?                           Sony MeterInfo
+    920    MeterInfo?                           Sony MeterInfo
+   6348    DistortionCorrParams                 int16s[16]
+   6381    LensFormat                           int8u
+   6382    LensMount                            int8u
+   6383    LensType2                            int16u
+   6386    LensType                             int16u
+   6388    DistortionCorrParamsPresent          int8u
+   6389    DistortionCorrParamsNumber           int8u
 
 =head3 Sony Tag2010i Tags
 
-Valid for ILCE-6400/7M3/7RM3/9, DSC-RX10M4/RX100M6/RX100M5A/HX99.
+Valid for ILCE-6100/6400/6600/7M3/7RM3/7RM4/9, DSC-RX0M2/RX10M4/RX100M6/RX100M5A/RX100M7/HX99.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   ReleaseMode2                         int32u
-  0x004e   DynamicRangeOptimizer                int8u
-  0x0204   ReleaseMode3                         int8u
-  0x0208   ReleaseMode2                         int8u
-  0x0210   SelfTimer                            int8u
-  0x0211   FlashMode                            int8u
-  0x0217   StopsAboveBaseISO                    int16u
-  0x0219   BrightnessValue                      int16u
-  0x021b   DynamicRangeOptimizer                int8u
-  0x021f   HDRSetting                           int8u
-  0x0223   ExposureCompensation                 int16s
-  0x0237   PictureProfile                       int8u
-  0x0238   PictureProfile                       int8u
-  0x023c   PictureEffect2                       int8u
-  0x0247   Quality2                             int8u
-  0x024b   MeteringMode                         int8u
-  0x024c   ExposureProgram                      int8u
-  0x0252   WB_RGBLevels                         int16u[3]
-  0x030a   FocalLength                          int16u
-  0x030c   MinFocalLength                       int16u
-  0x030e   MaxFocalLength                       int16u
-  0x0320   SonyISO                              int16u
-  0x036d   MeterInfo?                           Sony MeterInfo9
-  0x17d0   DistortionCorrParams                 int16s[16]
-  0x17f1   LensFormat                           int8u
-  0x17f2   LensMount                            int8u
-  0x17f3   LensType2                            int16u
-  0x17f6   LensType                             int16u
-  0x17f8   DistortionCorrParamsPresent          int8u
-  0x17f9   DistortionCorrParamsNumber           int8u
+      4    ReleaseMode2                         int32u
+     78    DynamicRangeOptimizer                int8u
+    516    ReleaseMode3                         int8u
+    520    ReleaseMode2                         int8u
+    528    SelfTimer                            int8u
+    529    FlashMode                            int8u
+    535    StopsAboveBaseISO                    int16u
+    537    BrightnessValue                      int16u
+    539    DynamicRangeOptimizer                int8u
+    543    HDRSetting                           int8u
+    547    ExposureCompensation                 int16s
+    567    PictureProfile                       int8u
+    568    PictureProfile                       int8u
+    572    PictureEffect2                       int8u
+    583    Quality2                             int8u
+    587    MeteringMode                         int8u
+    588    ExposureProgram                      int8u
+    594    WB_RGBLevels                         int16u[3]
+    778    FocalLength                          int16u
+    780    MinFocalLength                       int16u
+    782    MaxFocalLength                       int16u
+    800    SonyISO                              int16u
+    877    MeterInfo?                           Sony MeterInfo9
+   6096    DistortionCorrParams                 int16s[16]
+   6129    LensFormat                           int8u
+   6130    LensMount                            int8u
+   6131    LensType2                            int16u
+   6134    LensType                             int16u
+   6136    DistortionCorrParamsPresent          int8u
+   6137    DistortionCorrParamsNumber           int8u
 
 =head3 Sony MeterInfo9 Tags
 
@@ -16966,149 +17441,150 @@ option is used.
 
 =head3 Sony Tag900b Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0002   FacesDetected                        no
-  0x00bd   FaceDetection                        no
+      2    FacesDetected                        no
+    189    FaceDetection                        no
 
 =head3 Sony Tag9050a Tags
 
 Data for tags 0x9050, 0x94xx and 0x2010 is encrypted by a simple
 substitution cipher, but the deciphered values are listed below.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   SonyMaxAperture                      int8u
-  0x0001   SonyMinAperture                      int8u
-  0x0020   Shutter                              int16u[3]
-  0x0031   FlashStatus                          int8u
-  0x0032   ShutterCount                         int32u
-  0x003a   SonyExposureTime                     int16u
-  0x003c   SonyFNumber                          int16u
-  0x003f   ReleaseMode2                         int8u
-  0x004c   ShutterCount2                        int32u
-  0x0051   SonyDateTime2                        undef[6]
-  0x0067   ReleaseMode2                         int8u
-  0x007c   InternalSerialNumber                 int8u[4]~
-  0x00f0   InternalSerialNumber                 int8u[5]
-  0x0105   LensMount                            int8u
-  0x0106   LensFormat                           int8u
-  0x0107   LensType2                            int16u
-  0x0109   LensType                             int16u
-  0x010b   DistortionCorrParamsPresent          int8u
-  0x0115   LensSpecFeatures                     undef[2]
-  0x0116   LensSpecFeatures                     undef[2]
-  0x01a0   ShutterCount3                        int32u
-  0x01aa   ShutterCount3                        int32u
-  0x01bd   ShutterCount3                        int32u
+      0    SonyMaxAperture                      int8u
+      1    SonyMinAperture                      int8u
+     32    Shutter                              int16u[3]
+     49    FlashStatus                          int8u
+     50    ShutterCount                         int32u
+     58    SonyExposureTime                     int16u
+     60    SonyFNumber                          int16u
+     63    ReleaseMode2                         int8u
+     76    ShutterCount2                        int32u
+     81    SonyDateTime2                        undef[6]
+    103    ReleaseMode2                         int8u
+    124    InternalSerialNumber                 int8u[4]~
+    240    InternalSerialNumber                 int8u[5]
+    261    LensMount                            int8u
+    262    LensFormat                           int8u
+    263    LensType2                            int16u
+    265    LensType                             int16u
+    267    DistortionCorrParamsPresent          int8u
+    277    LensSpecFeatures                     undef[2]
+    278    LensSpecFeatures                     undef[2]
+    416    ShutterCount3                        int32u
+    426    ShutterCount3                        int32u
+    445    ShutterCount3                        int32u
 
 =head3 Sony Tag9050b Tags
 
-Valid from July 2015 for ILCE-6300/6400/6500/7M3/7RM2/7RM3/7SM2/9,
+Valid from July 2015 for ILCE-6100/6300/6400/6500/6600/7M3/7RM2/7RM3/7RM4/7SM2/9,
 ILCA-99M2.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   SonyMaxAperture                      int8u
-  0x0001   SonyMinAperture                      int8u
-  0x0026   Shutter                              int16u[3]
-  0x0039   FlashStatus                          int8u
-  0x003a   ShutterCount                         int32u
-  0x0046   SonyExposureTime                     int16u
-  0x0048   SonyFNumber                          int16u
-  0x004b   ReleaseMode2                         int8u
-  0x0050   ShutterCount2                        int32u
-  0x0052   ShutterCount2                        int32u
-  0x0058   ShutterCount2                        int32u
-  0x0061   SonyTimeMinSec                       no
-  0x006b   ReleaseMode2                         int8u
-  0x006d   ReleaseMode2                         int8u
-  0x0073   ReleaseMode2                         int8u
-  0x0088   InternalSerialNumber                 int8u[6]~
-  0x0105   LensMount                            int8u
-  0x0106   LensFormat                           int8u
-  0x0107   LensType2                            int16u
-  0x0109   LensType                             int16u
-  0x010b   DistortionCorrParamsPresent          int8u
-  0x0116   LensSpecFeatures                     undef[2]
-  0x019f   ShutterCount3                        int32u
-  0x01cb   ShutterCount3                        int32u
-  0x01cd   ShutterCount3                        int32u
-  0x01ed   LensSpecFeatures                     undef[2]
-  0x01f0   LensSpecFeatures                     undef[2]
-  0x021c   LensSpecFeatures                     undef[2]
-  0x021e   LensSpecFeatures                     undef[2]
+      0    SonyMaxAperture                      int8u
+      1    SonyMinAperture                      int8u
+     38    Shutter                              int16u[3]
+     57    FlashStatus                          int8u
+     58    ShutterCount                         int32u
+     70    SonyExposureTime                     int16u
+     72    SonyFNumber                          int16u
+     75    ReleaseMode2                         int8u
+     80    ShutterCount2                        int32u
+     82    ShutterCount2                        int32u
+     88    ShutterCount2                        int32u
+     97    SonyTimeMinSec                       no
+    107    ReleaseMode2                         int8u
+    109    ReleaseMode2                         int8u
+    115    ReleaseMode2                         int8u
+    136    InternalSerialNumber                 int8u[6]~
+    261    LensMount                            int8u
+    262    LensFormat                           int8u
+    263    LensType2                            int16u
+    265    LensType                             int16u
+    267    DistortionCorrParamsPresent          int8u
+    278    LensSpecFeatures                     undef[2]
+    415    ShutterCount3                        int32u
+    459    ShutterCount3                        int32u
+    461    ShutterCount3                        int32u
+    493    LensSpecFeatures                     undef[2]
+    496    LensSpecFeatures                     undef[2]
+    540    LensSpecFeatures                     undef[2]
+    542    LensSpecFeatures                     undef[2]
 
 =head3 Sony Tag9400a Tags
 
 Valid for many DSC, NEX and SLT models
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0008   SequenceImageNumber                  int32u
-  0x000c   SequenceFileNumber                   int32u
-  0x0010   ReleaseMode2                         int8u
-  0x0012   DigitalZoom                          int8u
-  0x001a   ShotNumberSincePowerUp               int32u
-  0x0022   SequenceLength                       int8u
-  0x0028   CameraOrientation                    int8u
-  0x0029   Quality2                             int8u
-  0x0044   SonyImageHeight                      int16u~
-  0x0052   ModelReleaseYear                     int8u~
+      8    SequenceImageNumber                  int32u
+     12    SequenceFileNumber                   int32u
+     16    ReleaseMode2                         int8u
+     18    DigitalZoom                          int8u
+     26    ShotNumberSincePowerUp               int32u
+     34    SequenceLength                       int8u
+     40    CameraOrientation                    int8u
+     41    Quality2                             int8u
+     68    SonyImageHeight                      int16u~
+     82    ModelReleaseYear                     int8u~
 
 =head3 Sony Tag9400b Tags
 
 Valid for NEX-3N, ILCE-3000/3500, SLT-A58, DSC-WX60, DSC-WX300, DSC-RX100M2,
 DSC-HX50V, DSC-QX10/QX100.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0008   SequenceImageNumber                  int32u
-  0x000c   SequenceFileNumber                   int32u
-  0x0010   ReleaseMode2                         int8u
-  0x0012   DigitalZoom                          int8u
-  0x0016   ShotNumberSincePowerUp               int32u
-  0x001e   SequenceLength                       int8u
-  0x0024   CameraOrientation                    int8u
-  0x0025   Quality2                             int8u
-  0x003f   SonyImageHeight                      int16u~
-  0x0046   ModelReleaseYear                     int8u~
+      8    SequenceImageNumber                  int32u
+     12    SequenceFileNumber                   int32u
+     16    ReleaseMode2                         int8u
+     18    DigitalZoom                          int8u
+     22    ShotNumberSincePowerUp               int32u
+     30    SequenceLength                       int8u
+     36    CameraOrientation                    int8u
+     37    Quality2                             int8u
+     63    SonyImageHeight                      int16u~
+     70    ModelReleaseYear                     int8u~
 
 =head3 Sony Tag9400c Tags
 
 Valid for DSC-HX60V/HX80/HX90V/HX99/HX350/HX400V/QX30/RX0/RX1RM2/RX10/
-RX10M2/RX10M3/RX10M4/RX100M3/RX100M4/RX100M5/RX100M5A/RX100M6/WX220/WX350/
-WX500, ILCE-7/7R/7S/7M2/7M3/7RM2/7RM3/7SM2/9/5000/5100/6000/6300/6400/6500/
-QX1, ILCA-68/77M2/99M2.
+RX10M2/RX10M3/RX10M4/RX100M3/RX100M4/RX100M5/RX100M5A/RX100M6/RX100M7/
+WX220/WX350/WX500, ILCE-7/7R/7S/7M2/7M3/7RM2/7RM3/7RM4/7SM2/9/5000/5100/
+6000/6100/6300/6400/6500/6600/QX1, ILCA-68/77M2/99M2.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0009   ReleaseMode2                         int8u
-  0x000a   ShotNumberSincePowerUp               int8u
+      9    ReleaseMode2                         int8u
+     10    ShotNumberSincePowerUp               int8u
            ShotNumberSincePowerUp               int32u
-  0x0012   SequenceImageNumber                  int32u
-  0x0016   SequenceLength                       int8u
-  0x001a   SequenceFileNumber                   int32u
-  0x001e   SequenceLength                       int8u
-  0x0029   CameraOrientation                    int8u
-  0x002a   Quality2                             int8u
-  0x0047   SonyImageHeight                      int16u~
-  0x0053   ModelReleaseYear                     int8u~
+     18    SequenceImageNumber                  int32u
+     22    SequenceLength                       int8u
+     26    SequenceFileNumber                   int32u
+     30    SequenceLength                       int8u
+     41    CameraOrientation                    int8u
+     42    Quality2                             int8u
+     71    SonyImageHeight                      int16u~
+     83    ModelReleaseYear                     int8u~
 
 =head3 Sony Tag9401 Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0498   ISOInfo                              Sony ISOInfo
-  0x059d   ISOInfo                              Sony ISOInfo
-  0x0634   ISOInfo                              Sony ISOInfo
-  0x0636   ISOInfo                              Sony ISOInfo
-  0x064c   ISOInfo                              Sony ISOInfo
-  0x0653   ISOInfo                              Sony ISOInfo
-  0x0678   ISOInfo                              Sony ISOInfo
-  0x06b8   ISOInfo                              Sony ISOInfo
-  0x06de   ISOInfo                              Sony ISOInfo
-  0x06e7   ISOInfo                              Sony ISOInfo
+   1176    ISOInfo                              Sony ISOInfo
+   1186    ISOInfo                              Sony ISOInfo
+   1437    ISOInfo                              Sony ISOInfo
+   1588    ISOInfo                              Sony ISOInfo
+   1590    ISOInfo                              Sony ISOInfo
+   1612    ISOInfo                              Sony ISOInfo
+   1619    ISOInfo                              Sony ISOInfo
+   1656    ISOInfo                              Sony ISOInfo
+   1720    ISOInfo                              Sony ISOInfo
+   1758    ISOInfo                              Sony ISOInfo
+   1767    ISOInfo                              Sony ISOInfo
 
 =head3 Sony ISOInfo Tags
 
@@ -17120,160 +17596,162 @@ QX1, ILCA-68/77M2/99M2.
 
 =head3 Sony Tag9402 Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   AmbientTemperature                   int8s
-  0x0016   FocusMode                            int8u & 0x7f
-  0x0017   AFAreaMode                           int8u
-  0x002d   FocusPosition2                       int8u
+      4    AmbientTemperature                   int8s
+     22    FocusMode                            int8u & 0x7f
+     23    AFAreaMode                           int8u
+     45    FocusPosition2                       int8u
 
 =head3 Sony Tag9403 Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0005   CameraTemperature                    int8s
+      5    CameraTemperature                    int8s
 
 =head3 Sony Tag9404a Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x000b   ExposureProgram                      int8u
-  0x000d   IntelligentAuto                      int8u
-  0x0019   LensZoomPosition                     int16u
+     11    ExposureProgram                      int8u
+     13    IntelligentAuto                      int8u
+     25    LensZoomPosition                     int16u
 
 =head3 Sony Tag9404b Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x000c   ExposureProgram                      int8u
-  0x000e   IntelligentAuto                      int8u
-  0x001e   LensZoomPosition                     int16u
-  0x0020   FocusPosition2                       int8u
+     12    ExposureProgram                      int8u
+     14    IntelligentAuto                      int8u
+     30    LensZoomPosition                     int16u
+     32    FocusPosition2                       int8u
 
 =head3 Sony Tag9404c Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x000b   ExposureProgram                      int8u
-  0x000d   IntelligentAuto                      int8u
+     11    ExposureProgram                      int8u
+     13    IntelligentAuto                      int8u
 
 =head3 Sony Tag9405a Tags
 
 Valid for SLT, NEX, ILCE-3000/3500 and several DSC models.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0600   DistortionCorrParamsPresent          int8u
-  0x0601   DistortionCorrection                 int8u
-  0x0603   LensFormat                           int8u
-  0x0604   LensMount                            int8u
-  0x0605   LensType2                            int16u
-  0x0608   LensType                             int16u
-  0x064a   VignettingCorrParams                 int16s[16]
-  0x066a   ChromaticAberrationCorrParams        int16s[32]
-  0x06ca   DistortionCorrParams                 int16s[16]
+   1536    DistortionCorrParamsPresent          int8u
+   1537    DistortionCorrection                 int8u
+   1539    LensFormat                           int8u
+   1540    LensMount                            int8u
+   1541    LensType2                            int16u
+   1544    LensType                             int16u
+   1610    VignettingCorrParams                 int16s[16]
+   1642    ChromaticAberrationCorrParams        int16s[32]
+   1738    DistortionCorrParams                 int16s[16]
 
 =head3 Sony Tag9405b Tags
 
 Valid for DSC-HX60V/HX80/HX90V/HX99/HX350/HX400V/QX30/RX0/RX10/RX10M2/
-RX10M3/RX10M4/RX100M3/RX100M4/RX100M5/RX100M5A/RX100M6/WX220/WX350, ILCE-7/
-7M2/7M3/7R/7RM2/7S/7SM2/9/5000/5100/6000/6300/6500/QX1, ILCA-68/77M2/99M2.
+RX10M3/RX10M4/RX100M3/RX100M4/RX100M5/RX100M5A/RX100M6/RX100M7/WX220/WX350,
+ILCE-7/7M2/7M3/7R/7RM2/7RM3/7RM4/7S/7SM2/9/5000/5100/6000/6100/6300/6400/
+6500/6600/QX1, ILCA-68/77M2/99M2.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   SonyISO                              int16u
-  0x0006   BaseISO                              int16u
-  0x000a   StopsAboveBaseISO                    int16u
-  0x000e   SonyExposureTime2                    int16u
-  0x0010   ExposureTime                         rational32u
-  0x0014   SonyFNumber                          int16u
-  0x0016   SonyMaxApertureValue                 int16u
-  0x0024   SequenceImageNumber                  int32u
-  0x0034   ReleaseMode2                         int8u
-  0x003e   SonyImageWidthMax                    int16u
-  0x0040   SonyImageHeightMax                   int16u
-  0x0042   HighISONoiseReduction                int8u
-  0x0044   LongExposureNoiseReduction           int8u
-  0x0046   PictureEffect2                       int8u
-  0x0048   ExposureProgram                      int8u
-  0x004a   CreativeStyle                        int8u
-  0x0052   Sharpness                            int8s
-  0x005a   DistortionCorrParamsPresent          int8u
-  0x005b   DistortionCorrection                 int8u
-  0x005d   LensFormat                           int8u
-  0x005e   LensMount                            int8u
-  0x0060   LensType2                            int16u
-  0x0062   LensType                             int16u
-  0x0064   DistortionCorrParams                 int16s[16]
-  0x0342   LensZoomPosition                     int16u
-  0x034a   VignettingCorrParams                 int16s[16]
-  0x0350   VignettingCorrParams                 int16s[16]
-  0x035a   LensZoomPosition                     int16u
-  0x035c   VignettingCorrParams                 int16s[16]
-  0x0368   VignettingCorrParams                 int16s[16]
-  0x037c   ChromaticAberrationCorrParams        int16s[32]
-  0x0384   ChromaticAberrationCorrParams        int16s[32]
-  0x039c   ChromaticAberrationCorrParams        int16s[32]
-  0x03b0   ChromaticAberrationCorrParams        int16s[32]
-  0x03b8   ChromaticAberrationCorrParams        int16s[32]
+      4    SonyISO                              int16u
+      6    BaseISO                              int16u
+     10    StopsAboveBaseISO                    int16u
+     14    SonyExposureTime2                    int16u
+     16    ExposureTime                         rational32u
+     20    SonyFNumber                          int16u
+     22    SonyMaxApertureValue                 int16u
+     36    SequenceImageNumber                  int32u
+     52    ReleaseMode2                         int8u
+     62    SonyImageWidthMax                    int16u
+     64    SonyImageHeightMax                   int16u
+     66    HighISONoiseReduction                int8u
+     68    LongExposureNoiseReduction           int8u
+     70    PictureEffect2                       int8u
+     72    ExposureProgram                      int8u
+     74    CreativeStyle                        int8u
+     82    Sharpness                            int8s
+     90    DistortionCorrParamsPresent          int8u
+     91    DistortionCorrection                 int8u
+     93    LensFormat                           int8u
+     94    LensMount                            int8u
+     96    LensType2                            int16u
+     98    LensType                             int16u
+    100    DistortionCorrParams                 int16s[16]
+    834    LensZoomPosition                     int16u
+    842    VignettingCorrParams                 int16s[16]
+    846    LensZoomPosition                     int16u
+    848    VignettingCorrParams                 int16s[16]
+    858    LensZoomPosition                     int16u
+    860    VignettingCorrParams                 int16s[16]
+    872    VignettingCorrParams                 int16s[16]
+    892    ChromaticAberrationCorrParams        int16s[32]
+    900    ChromaticAberrationCorrParams        int16s[32]
+    924    ChromaticAberrationCorrParams        int16s[32]
+    944    ChromaticAberrationCorrParams        int16s[32]
+    952    ChromaticAberrationCorrParams        int16s[32]
 
 =head3 Sony Tag9406 Tags
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0005   BatteryTemperature                   int8u
-  0x0006   BatteryLevelGrip1                    int8u
-  0x0007   BatteryLevel                         int8u
-  0x0008   BatteryLevelGrip2                    int8u
+      5    BatteryTemperature                   int8u
+      6    BatteryLevelGrip1                    int8u
+      7    BatteryLevel                         int8u
+      8    BatteryLevelGrip2                    int8u
 
 =head3 Sony Tag940a Tags
 
 These tags are currently extracted for SLT models only.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   AFPointsSelected                     int32u
+      4    AFPointsSelected                     int32u
 
 =head3 Sony Tag940c Tags
 
 NEX and ILCE models only.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0008   LensMount2                           int8u
-  0x0009   LensType3                            int16u
-  0x000b   CameraE-mountVersion                 int16u
-  0x000d   LensE-mountVersion                   int16u
-  0x0014   LensFirmwareVersion                  int16u~
+      8    LensMount2                           int8u
+      9    LensType3                            int16u
+     11    CameraE-mountVersion                 int16u
+     13    LensE-mountVersion                   int16u
+     20    LensFirmwareVersion                  int16u~
 
 =head3 Sony AFInfo Tags
 
 These tags are currently extracted for SLT models only.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x0002   AFType                               int8u
-  0x0004   AFStatusActiveSensor                 int16s
-  0x0005   FocusMode                            int8u
-  0x0007   AFPoint                              int8u
-  0x0008   AFPointInFocus                       int8u
-  0x0009   AFPointAtShutterRelease              int8u
-  0x000a   AFAreaMode                           int8u
-  0x000b   FocusMode                            int8u
-  0x0010   AFPointsUsed                         int8u[10]
-  0x0011   AFStatus15                           Sony AFStatus15
+      2    AFType                               int8u
+      4    AFStatusActiveSensor                 int16s
+      5    FocusMode                            int8u
+      7    AFPoint                              int8u
+      8    AFPointInFocus                       int8u
+      9    AFPointAtShutterRelease              int8u
+     10    AFAreaMode                           int8u
+     11    FocusMode                            int8u
+     16    AFPointsUsed                         int8u[10]
+     17    AFStatus15                           Sony AFStatus15
            AFStatus19                           Sony AFStatus19
-  0x0037   AFPoint                              int8u
-  0x0038   AFPointInFocus                       int8u
-  0x0039   AFPointAtShutterRelease              int8u
-  0x003a   AFAreaMode                           int8u
-  0x003b   AFStatusActiveSensor                 int16s
-  0x0043   ExposureProgram                      int8u
-  0x0050   AFMicroAdj                           int8s
-  0x007d   AFStatus79                           Sony AFStatus79
-  0x016e   AFPointsUsed                         int32u
-  0x017d   AFMicroAdj                           int8s
-  0x017e   ExposureProgram                      int8u
+     55    AFPoint                              int8u
+     56    AFPointInFocus                       int8u
+     57    AFPointAtShutterRelease              int8u
+     58    AFAreaMode                           int8u
+     59    AFStatusActiveSensor                 int16s
+     67    ExposureProgram                      int8u
+     80    AFMicroAdj                           int8s
+    125    AFStatus79                           Sony AFStatus79
+    366    AFPointsUsed                         int32u
+    381    AFMicroAdj                           int8s
+    382    ExposureProgram                      int8u
 
 =head3 Sony AFStatus19 Tags
 
@@ -17418,11 +17896,11 @@ AF Status information for models with 79-point AF.
 
 E-mount models.
 
-  Tag ID   Tag Name                             Writable
+  Index1   Tag Name                             Writable
   ------   --------                             --------
-  0x1a06   TiffMeteringImageWidth               no
-  0x1a07   TiffMeteringImageHeight              no
-  0x1a08   TiffMeteringImage                    no
+   6662    TiffMeteringImageWidth               no
+   6663    TiffMeteringImageHeight              no
+   6664    TiffMeteringImage                    no
 
 =head3 Sony PIC Tags
 
@@ -17870,8 +18348,8 @@ ExifTool is used to write XMP to a CRW image.
   0x1835   DecoderTable                         CanonRaw DecoderTable
   0x183b   SerialNumberFormat                   int32u
   0x2005   RawData                              no
-  0x2007   JpgFromRaw                           resize
-  0x2008   ThumbnailImage                       resize
+  0x2007   JpgFromRaw                           resize^
+  0x2008   ThumbnailImage                       resize^
   0x2804   ImageDescription                     CanonRaw
   0x2807   CameraObject                         CanonRaw
   0x3002   ShootingRecord                       CanonRaw
@@ -18358,7 +18836,8 @@ FPXR segment of JPEG images.  As well, FlashPix information is extracted
 from DOC, PPT, XLS (Microsoft Word, PowerPoint and Excel) documents, VSD
 (Microsoft Visio) drawings, and FLA (Macromedia/Adobe Flash project) files
 since these are based on the same file format as FlashPix (the Windows
-Compound Binary File format).  See
+Compound Binary File format).  Note that ExifTool identifies any
+unrecognized Windows Compound Binary file as a FlashPix (FPX) file.  See
 L<http://graphcomp.com/info/specs/livepicture/fpx.pdf> for the FlashPix
 specification.
 
@@ -18831,6 +19310,7 @@ about this format.
   'DVID'   DeviceID?                            no
   'DVNM'   DeviceName                           no
   'DZOM'   DigitalZoom                          no
+  'EISA'   ElectronicImageStabilization         no
   'EMPT'   Empty?                               no
   'ESCS'   EscapeStatus?                        no
   'FACE'   FaceDetected                         no
@@ -22108,6 +22588,14 @@ it is specifically deleted with C<-Trailer:All=>.  When reading, a minor
 warning is issued if this trailer exists, and ExifTool will attempt to parse
 this data as additional PNG chunks.
 
+Also according to the PNG specification, there is no restriction on the
+location of text-type chunks (tEXt, zTXt and iTXt).  However, certain
+utilities (including some Apple and Adobe utilities) won't read the XMP iTXt
+chunk if it comes after the IDAT chunk, and at least one utility won't read
+other text chunks like this.  For this reason, ExifTool 11.63 and later
+create new text chunks (including XMP) before IDAT, and will move existing
+text chunks up from after IDAT.
+
   Tag ID             Tag Name                   Writable
   ------             --------                   --------
   'IHDR'             ImageHeader                PNG ImageHeader
@@ -23039,6 +23527,7 @@ This is the PDF document catalog.
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
   'Cs1'                Cs1                      PDF Cs1
+  'DefaultCMYK'        DefaultCMYK              PDF DefaultRGB
   'DefaultRGB'         DefaultRGB               PDF DefaultRGB
 
 =head3 PDF Cs1 Tags
@@ -24462,7 +24951,7 @@ API QuickTimeHandler option may be used to include an 'mdir' Handler box.
   'GUID'       GUID                             string
   'VERS'       ProductVersion                   string
   'aART'       AlbumArtist                      string
-  'akID'       AppleStoreAccountType            string
+  'akID'       AppleStoreAccountType            int8u
   'albm'       Album                            string/
   'apID'       AppleStoreAccount                string
   'atID'       AlbumTitleID                     int32u
@@ -24470,7 +24959,7 @@ API QuickTimeHandler option may be used to include an 'mdir' Handler box.
   'catg'       Category                         string
   'cnID'       AppleStoreCatalogID              int32u
   'covr'       CoverArt                         string
-  'cpil'       Compilation                      string
+  'cpil'       Compilation                      int8u
   'cprt'       Copyright                        string
   'desc'       Description                      string/
   'disk'       DiskNumber                       undef
@@ -24485,20 +24974,20 @@ API QuickTimeHandler option may be used to include an 'mdir' Handler box.
   'gssd'       GoogleSourceData                 string
   'gsst'       GoogleStartTime                  string
   'gstd'       GoogleTrackDuration              string
-  'hdvd'       HDVideo                          string
-  'itnu'       iTunesU                          string
+  'hdvd'       HDVideo                          int8u
+  'itnu'       iTunesU                          int8s
   'keyw'       Keyword                          string
   'ldes'       LongDescription                  string
-  'pcst'       Podcast                          string
+  'pcst'       Podcast                          int8u
   'perf'       Performer                        string
-  'pgap'       PlayGap                          string
+  'pgap'       PlayGap                          int8u
   'plID'       PlayListID                       int8u
   'prID'       ProductID                        string
   'purd'       PurchaseDate                     string
   'purl'       PodcastURL                       string
   'rate'       RatingPercent                    string
   'rldt'       ReleaseDate                      string
-  'rtng'       Rating                           string
+  'rtng'       Rating                           int8u
   'sfID'       AppleStoreCountry                int32u
   'soaa'       SortAlbumArtist                  string
   'soal'       SortAlbum                        string
@@ -24506,7 +24995,7 @@ API QuickTimeHandler option may be used to include an 'mdir' Handler box.
   'soco'       SortComposer                     string
   'sonm'       SortName                         string
   'sosn'       SortShow                         string
-  'stik'       MediaType                        string
+  'stik'       MediaType                        int8u
   'titl'       Title                            string/
   'tmpo'       BeatsPerMinute                   int16u
   'trkn'       TrackNumber                      undef
@@ -24597,12 +25086,33 @@ defined in this table.
   'auxC'   AuxiliaryImageType                   no
   'clap'   CleanAperture                        no
   'colr'   ICC_Profile                          ICC_Profile
-  'hvcC'   HEVCConfiguration?                   no
+  'hvcC'   HEVCConfiguration                    QuickTime HEVCConfig
   'irot'   Rotation                             int8u
   'ispe'   ImageSpatialExtent                   no
   'pasp'   PixelAspectRatio                     int32u
   'pixi'   ImagePixelDepth                      no
   'rloc'   RelativeLocation                     no
+
+=head3 QuickTime HEVCConfig Tags
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      0    HEVCConfigurationVersion             no
+      1    GeneralProfileSpace                  no
+    1.1    GeneralTierFlag                      no
+    1.2    GeneralProfileIDC                    no
+      2    GenProfileCompatibilityFlags         no
+      6    ConstraintIndicatorFlags             no
+     12    GeneralLevelIDC                      no
+     13    MinSpatialSegmentationIDC            no
+     15    ParallelismType                      no
+     16    ChromaFormat                         no
+     17    BitDepthLuma                         no
+     18    BitDepthChroma                       no
+     19    AverageFrameRate                     no
+     21    ConstantFrameRate                    no
+   21.1    NumTemporalLayers                    no
+   21.2    TemporalIDNested                     no
 
 =head3 QuickTime ItemRef Tags
 
@@ -25003,6 +25513,7 @@ MP4 metadata sample description.
   ------   --------                             --------
   0x0004   OtherFormat                          no
   'ftab'   FontTable                            no
+  'name'   OtherName                            no
 
 =head3 QuickTime VideoHeader Tags
 
@@ -25055,8 +25566,8 @@ Note when creating new tags,
 L<ItemList|Image::ExifTool::TagNames/QuickTime ItemList Tags> tags are
 preferred over these, so to create the tag when a same-named ItemList tag
 exists, either "UserData" must be specified (eg. C<-UserData:Artist=Monet>
-on the command line), or the PREFERRED level must be changed via the config
-file.
+on the command line), or the PREFERRED level must be changed via
+the config file.
 
   Tag ID       Tag Name                         Writable
   ------       --------                         --------
@@ -25175,6 +25686,7 @@ file.
   'vndr'       Vendor                           string
   'yrrc'       Year                             no
   "\xa9ART"    Artist                           string
+  "\xa9TIM"    StartTimecode                    string
   "\xa9TSC"    StartTimeScale                   string
   "\xa9TSZ"    StartTimeSampleSize              string
   "\xa9alb"    Album                            string
@@ -27792,6 +28304,7 @@ sub-documents, but the Duration is calculated for the full video.
                        PentaxJunk2              Pentax Junk2
                        TextJunk                 no
   'JUNQ'               OldXMP                   no
+  'LIST_INF0'          Info                     RIFF Info
   'LIST_INFO'          Info                     RIFF Info
   'LIST_Tdat'          Tdat                     RIFF Tdat
   'LIST_exif'          Exif                     RIFF Exif
@@ -27806,12 +28319,16 @@ sub-documents, but the Duration is calculated for the full video.
   'VP8X'               VP8X                     RIFF VP8X
   'XMP '               XMP                      XMP
   '_PMX'               XMP                      XMP
+  'aXML'               AXML                     XMP XML
   'afsp'               Afsp                     no
   'bext'               BroadcastExtension       RIFF BroadcastExt
   'cue '               CuePoints                no
   'ds64'               DataSize64               RIFF DS64
   'fact'               NumberOfSamples          no
   'fmt '               AudioFormat              RIFF AudioFormat
+  'gps0'               GPSTrack                 QuickTime Stream
+  'gsen'               GSensor                  QuickTime Stream
+  'iXML'               IXML                     XMP XML
   'labl'               Label                    RIFF Label
   'list'               ListType                 no
   'olym'               Olym                     Olympus WAV
@@ -27845,12 +28362,12 @@ WebP animation frame chunk.
 
 =head3 RIFF CSET Tags
 
-  Tag ID   Tag Name                             Writable
+  Index2   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   CodePage                             no
-  0x0001   CountryCode                          no
-  0x0002   LanguageCode                         no
-  0x0003   Dialect                              no
+      0    CodePage                             no
+      1    CountryCode                          no
+      2    LanguageCode                         no
+      3    Dialect                              no
 
 =head3 RIFF Info Tags
 
@@ -28095,6 +28612,7 @@ L<http://tech.ebu.ch/docs/tech/tech3285.pdf>).
     320    DateTimeOriginal                     no
     338    TimeReference                        no
     346    BWFVersion                           no
+    348    BWF_UMID                             no
     602    CodingHistory                        no
 
 =head3 RIFF DS64 Tags
@@ -32944,12 +33462,13 @@ FileName.
   Tag Name                   Group              Writable
   --------                   -----              --------
   Adobe                      Adobe              yes!
-  CanonDR4                   CanonVRD           yes!
-  CanonVRD                   CanonVRD           yes!
+  CanonDR4                   CanonVRD           yes!^
+  CanonVRD                   CanonVRD           yes!^
   Comment                    File               yes
   CurrentIPTCDigest          File               no
   Directory                  System             yes!
   EXIF                       EXIF               yes!
+  EmbeddedVideo              File               no
   Error                      ExifTool           no
   ExifByteOrder              File               yes
   ExifToolVersion            ExifTool           no
@@ -33081,14 +33600,14 @@ values, may created via the ExifTool configuration file.
                        Canon:DigitalZoom
   DriveMode            ContinuousDrive          no
                        SelfTimer
-  Duration             FLAC:SampleRate          no
-                       FLAC:TotalSamples
-  Duration             Vorbis:NominalBitrate    no
-                       FileSize
+  Duration             AIFF:SampleRate          no
+                       AIFF:NumSampleFrames
   Duration             APE:SampleRate           no
                        APE:TotalFrames
                        APE:BlocksPerFrame
                        APE:FinalFrameBlocks
+  Duration             FLAC:SampleRate          no
+                       FLAC:TotalSamples
   Duration             FileSize                 no
                        ID3Size
                        MPEG:AudioBitrate
@@ -33104,8 +33623,8 @@ values, may created via the ExifTool configuration file.
                        FileSize
                        FrameCount
                        VideoFrameCount
-  Duration             AIFF:SampleRate          no
-                       AIFF:NumSampleFrames
+  Duration             Vorbis:NominalBitrate    no
+                       FileSize
   ExtenderStatus       Olympus:Extender         no
                        Olympus:LensType
                        MaxApertureValue
@@ -33139,20 +33658,20 @@ values, may created via the ExifTool configuration file.
                        GPS:GPSTimeStamp
   GPSDestLatitude      GPS:GPSDestLatitude      no
                        GPS:GPSDestLatitudeRef
-  GPSDestLatitudeRef   XMP:GPSDestLatitude      no
+  GPSDestLatitudeRef   XMP-exif:GPSDestLatitude no
   GPSDestLongitude     GPS:GPSDestLongitude     no
                        GPS:GPSDestLongitudeRef
-  GPSDestLongitudeRef  XMP:GPSDestLongitude     no
+  GPSDestLongitudeRef  XMP-exif:GPSDestLongitude no
   GPSLatitude          GPS:GPSLatitude          no
                        GPS:GPSLatitudeRef
   GPSLatitude          QuickTime:GPSCoordinates no
   GPSLatitude          QuickTime:LocationInformation no
-  GPSLatitudeRef       XMP:GPSLatitude          no
+  GPSLatitudeRef       XMP-exif:GPSLatitude     no
   GPSLongitude         GPS:GPSLongitude         no
                        GPS:GPSLongitudeRef
   GPSLongitude         QuickTime:GPSCoordinates no
   GPSLongitude         QuickTime:LocationInformation no
-  GPSLongitudeRef      XMP:GPSLongitude         no
+  GPSLongitudeRef      XMP-exif:GPSLongitude    no
   GPSPosition          GPSLatitude              no
                        GPSLongitude
   HyperfocalDistance   FocalLength              no
@@ -33163,19 +33682,19 @@ values, may created via the ExifTool configuration file.
   ISO                  Canon:CameraISO          no
                        Canon:BaseISO
                        Canon:AutoISO
-  ImageHeight          Main:PostScript:ImageData no
-                       PostScript:BoundingBox
   ImageHeight          IFD0:SensorTopBorder     no
                        IFD0:SensorBottomBorder
+  ImageHeight          Main:PostScript:ImageData no
+                       PostScript:BoundingBox
   ImageSize            ImageWidth               no
                        ImageHeight
                        ExifImageWidth
                        ExifImageHeight
                        RawImageCroppedSize
-  ImageWidth           Main:PostScript:ImageData no
-                       PostScript:BoundingBox
   ImageWidth           IFD0:SensorLeftBorder    no
                        IFD0:SensorRightBorder
+  ImageWidth           Main:PostScript:ImageData no
+                       PostScript:BoundingBox
   JpgFromRaw           JpgFromRawStart          yes
                        JpgFromRawLength
   Lens                 Canon:MinFocalLength     no
@@ -33196,12 +33715,6 @@ values, may created via the ExifTool configuration file.
                        LensType2
                        LensType3
                        LensFocalLength
-  LensID               XMP-aux:LensID           no
-                       Make
-                       LensInfo
-                       FocalLength
-                       LensModel
-                       MaxApertureValue
   LensID               Nikon:LensIDNumber       no
                        LensFStops
                        MinFocalLength
@@ -33211,6 +33724,12 @@ values, may created via the ExifTool configuration file.
                        MCUVersion
                        Nikon:LensType
   LensID               Ricoh:LensFirmware       no
+  LensID               XMP-aux:LensID           no
+                       Make
+                       LensInfo
+                       FocalLength
+                       LensModel
+                       MaxApertureValue
   LensSpec             Nikon:Lens               no
                        Nikon:LensType
   LightValue           Aperture                 no
@@ -33275,6 +33794,9 @@ values, may created via the ExifTool configuration file.
   ShutterSpeed         ExposureTime             no
                        ShutterSpeedValue
                        BulbDuration
+  SingleShotDepthMapTiff SingleShotDepthMap     no
+                       SegWidth
+                       SegHeight
   SubSecCreateDate     EXIF:CreateDate          yes
                        SubSecTimeDigitized
                        OffsetTimeDigitized

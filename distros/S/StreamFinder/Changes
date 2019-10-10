@@ -43,7 +43,7 @@ Revision history for StreamFinder
         - StreamFinder::IHeartRadio: Depreciated old stream order options, 
         replacing them with new -keep and -skip arguments and configuration 
         file entries.
-        - StreamFinder::RadioNet: (https://www.radion.net/) ADDED
+        - StreamFinder::RadioNet: (https://www.radio.net/) ADDED
         - StreamFinder::Tunein: RESTORED (now uses StreamFinder::Youtube for 
         stream fetching), but adds metadata loading (which youtube-dl does 
         not currently fetch for these streams.
@@ -103,3 +103,7 @@ Revision history for StreamFinder
         - StreamFinder::Tunein: (new()) - Fix mishandled URL if only 
         station-ID specified (non-full URL).
         - StreamFinder::Apple: (new()) - Handle if only podcast-ID specified.
+1.22    2019/10/07
+        - Minor bugfixes, namely handling double-quotes in titles in 
+        some submodules.
+        - Minor doc. improvements.

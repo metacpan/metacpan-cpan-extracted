@@ -1,6 +1,6 @@
 package Method::ParamValidator::Key::Method;
 
-$Method::ParamValidator::Key::Method::VERSION   = '0.15';
+$Method::ParamValidator::Key::Method::VERSION   = '0.16';
 $Method::ParamValidator::Key::Method::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Key::Method - Represents 'parameter key method' for Meth
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

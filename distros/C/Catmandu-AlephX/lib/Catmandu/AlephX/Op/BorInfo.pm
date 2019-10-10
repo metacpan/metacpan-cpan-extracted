@@ -3,11 +3,13 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 extends('Catmandu::AlephX::Op::BorAuth');
 with('Catmandu::AlephX::Response');
 
 has item_l => (
-  is => 'ro', 
+  is => 'ro',
   lazy => 1,
   isa => sub { check_array_ref($_[0]); },
   default => sub {
@@ -15,18 +17,18 @@ has item_l => (
   }
 );
 has item_h => (
-  is => 'ro', 
+  is => 'ro',
   lazy => 1,
-  isa => sub { check_array_ref($_[0]); },  
+  isa => sub { check_array_ref($_[0]); },
   default => sub {
     []
   }
 );
 
-has balance => ( 
+has balance => (
   is => 'ro'
 );
-has sign => ( 
+has sign => (
   is => 'ro'
 );
 has fine => (
@@ -40,7 +42,7 @@ has fine => (
   }
 );
 
-sub op { 'bor-info' } 
+sub op { 'bor-info' }
 
 my $config = {
   fine => [qw(z31 z30 z13)],
@@ -72,7 +74,7 @@ sub parse {
         $item_l->{ $key } = get_children($data,1);
       }
     }
-    
+
     push @{ $args->{'item_l'} },$item_l;
 
   }

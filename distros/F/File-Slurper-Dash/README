@@ -1,0 +1,55 @@
+NAME
+    File::Slurper::Dash - A fork of File::Slurper to grok "-" as
+    stdin/stdout
+
+VERSION
+    This document describes version 0.001 of File::Slurper::Dash (from Perl
+    distribution File-Slurper-Dash), released on 2019-10-06.
+
+SYNOPSIS
+     # use like you would File::Slurper
+     use File::Slurper::Dash 'read_text', 'write_text';
+
+     my $content = read_text("-"); # read from stdin
+
+     write_text('-', $content); # write to stdout
+
+DESCRIPTION
+    This module is a fork of File::Slurper 0.009. It's exactly like
+    File::Slurper, except that it groks "-" to mean read from STDIN, or
+    write to STDOUT.
+
+FUNCTIONS
+  read_text
+  read_binary($filename)
+  read_lines($filename, $encoding, $crlf, $skip_chomp)
+  write_text($filename, $content, $encoding, $crlf)
+  write_binary($filename, $content)
+  read_dir($dirname)
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Slurper-Dash>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Slurper-Dash>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper-Dash>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::Slurp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

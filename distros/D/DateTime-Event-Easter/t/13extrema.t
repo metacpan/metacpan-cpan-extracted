@@ -62,6 +62,8 @@ plan(tests => 3 * @data);
 my $easter      = DateTime::Event::Easter->new();
 my $january_one = DateTime::Event::Easter->new(day =>  -80);
 my $december_31 = DateTime::Event::Easter->new(day =>  250);
+# Actually, -80 and +250 are not longer the extrema for the "day" parameter, now we
+# allow Easter events that cross year boundaries. The test is still interesting.
 
 foreach (@data) {
   my ($y, $jan, $eas, $dec) = @$_;

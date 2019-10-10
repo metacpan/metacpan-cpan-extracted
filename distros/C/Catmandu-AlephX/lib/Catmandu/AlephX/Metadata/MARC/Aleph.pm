@@ -2,12 +2,15 @@ package Catmandu::AlephX::Metadata::MARC::Aleph;
 use Catmandu::Sane;
 use Catmandu::Util qw(:array);
 use Moo;
+
+our $VERSION = "1.071";
+
 extends qw(Catmandu::AlephX::Metadata);
 
 #parse aleph oai marc into catmandu marc array
 sub parse {
   my($class,$xpath)=@_;
- 
+
   my @marc = ();
   my $_id;
 
@@ -39,7 +42,7 @@ sub parse {
 
   }
 
-  __PACKAGE__->new(type => 'oai_marc',data => { record => \@marc, _id => $_id }); 
+  __PACKAGE__->new(type => 'oai_marc',data => { record => \@marc, _id => $_id });
 }
 sub escape_value {
   my $data = $_[0];
@@ -58,11 +61,11 @@ sub to_xml {
     my($tag,$ind1,$ind2,@subfields)= @$field;
 
     if(array_includes([qw(FMT LDR)],$tag) || $tag =~ /^00/o){
-     
+
       push @xml,"<fixfield id=\"$tag\">";
       push @xml,escape_value($subfields[1]);
       push @xml,"</fixfield>";
- 
+
     }else{
 
       push @xml,"<varfield id=\"$tag\" i1=\"$ind1\" i2=\"$ind2\">";

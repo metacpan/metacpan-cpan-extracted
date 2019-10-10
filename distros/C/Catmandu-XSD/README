@@ -178,11 +178,17 @@ MODULES
 
     Catmandu::Importer::XSD
 
-      Parse and validate XML data using an XSD file for structural data
+      Parse and validate XML data using an XSD file for structural data.
 
     Catmandu::Exporter::XSD
 
-      Serialize and validate XML data using an XSD file for structural data
+      Serialize and validate XML data using an XSD file for structural
+      data.
+
+    Catmandu::Fix::xpath_map
+
+      Map XML from XSD-any elements into data fields using XPath
+      expressions.
 
 BUGS, QUESTIONS, HELP
 
@@ -208,10 +214,13 @@ AUTHOR
 
     Patrick Hochstenbach , patrick.hochstenbach at ugent.be
 
-COPYRIGHT AND LICENSE
+LICENSE AND COPYRIGHT
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
 
 SEE ALSO
 

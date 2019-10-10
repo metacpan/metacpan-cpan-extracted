@@ -15,55 +15,62 @@ memoize('compile_marc_path');
 memoize('parse_marc_spec');
 memoize('_get_index_range');
 
-our $VERSION = '1.251';
+our $VERSION = '1.252';
 
 sub marc_map {
-    my $self      = $_[0];
+    my $self = $_[0];
 
     # $_[2] : marc_path
-    my $context        = ref($_[2]) ?
-                            $_[2] :
-                            $self->compile_marc_path($_[2], subfield_wildcard => 1);
+    my $context
+        = ref( $_[2] )
+        ? $_[2]
+        : $self->compile_marc_path( $_[2], subfield_wildcard => 1 );
 
     confess "invalid marc path" unless $context;
 
     # $_[1] : data record
-    my $record         = $_[1]->{'record'};
+    my $record = $_[1]->{'record'};
 
-    return wantarray ? () : undef unless (defined $record && ref($record) eq 'ARRAY');
+    return wantarray ? () : undef
+        unless ( defined $record && ref($record) eq 'ARRAY' );
 
     # $_[3] : opts
-    my $split          = $_[3]->{'-split'} // 0;
-    my $join_char      = $_[3]->{'-join'}  // '';
-    my $pluck          = $_[3]->{'-pluck'} // 0;
-    my $value_set      = $_[3]->{'-value'} // undef;
-    my $nested_arrays  = $_[3]->{'-nested_arrays'} // 0;
-    my $append         = $_[3]->{'-force_array'} // undef;
+    my $split         = $_[3]->{'-split'}         // 0;
+    my $join_char     = $_[3]->{'-join'}          // '';
+    my $pluck         = $_[3]->{'-pluck'}         // 0;
+    my $value_set     = $_[3]->{'-value'}         // undef;
+    my $nested_arrays = $_[3]->{'-nested_arrays'} // 0;
+    my $append        = $_[3]->{'-force_array'}   // undef;
 
-    # Do an implicit split for nested_arrays , except when no-implicit-split is set
-    if ($nested_arrays == 1) {
+# Do an implicit split for nested_arrays , except when no-implicit-split is set
+    if ( $nested_arrays == 1 ) {
         $split = 1 unless $_[3]->{'-no-implicit-split'};
     }
 
     my $vals;
 
     for my $field (@$record) {
-        next if (
-            ($context->{is_regex_field} == 0 && $field->[0] ne $context->{field} )
-            ||
-            (defined $context->{ind1} && (!defined $field->[1] || $field->[1] ne $context->{ind1}))
-            ||
-            (defined $context->{ind2} && (!defined $field->[2] || $field->[2] ne $context->{ind2}))
-            ||
-            ($context->{is_regex_field} == 1 && $field->[0] !~ $context->{field_regex} )
-        );
+        next
+            if (
+            (      $context->{is_regex_field} == 0
+                && $field->[0] ne $context->{field}
+            )
+            || ( defined $context->{ind1}
+                && ( !defined $field->[1] || $field->[1] ne $context->{ind1} )
+            )
+            || ( defined $context->{ind2}
+                && ( !defined $field->[2] || $field->[2] ne $context->{ind2} )
+            )
+            || (   $context->{is_regex_field} == 1
+                && $field->[0] !~ $context->{field_regex} )
+            );
 
         my $v;
 
         if ($value_set) {
-            for (my $i = 3; $i < @{$field}; $i += 2) {
+            for ( my $i = 3; $i < @{$field}; $i += 2 ) {
                 my $subfield_regex = $context->{subfield_regex};
-                if ($field->[$i] =~ $subfield_regex) {
+                if ( $field->[$i] =~ $subfield_regex ) {
                     $v = $value_set;
                     last;
                 }
@@ -73,42 +80,44 @@ sub marc_map {
             $v = [];
 
             if ($pluck) {
+
                 # Treat the subfield as a hash index
                 my $_h = {};
-                for (my $i = $context->{start}; $i < @{$field}; $i += 2) {
-                    push @{ $_h->{ $field->[$i] } } , $field->[$i + 1];
+                for ( my $i = $context->{start}; $i < @{$field}; $i += 2 ) {
+                    push @{ $_h->{ $field->[$i] } }, $field->[ $i + 1 ];
                 }
                 my $subfield = $context->{subfield};
                 $subfield =~ s{[^a-zA-Z0-9]}{}g;
-                for my $c (split('',$subfield)) {
+                for my $c ( split( '', $subfield ) ) {
                     my $val = $_h->{$c} // [undef];
-                    push @$v , @{ $val } ;
+                    push @$v, @{$val};
                 }
             }
             else {
-                for (my $i = $context->{start}; $i < @{$field}; $i += 2) {
+                for ( my $i = $context->{start}; $i < @{$field}; $i += 2 ) {
                     my $subfield_regex = $context->{subfield_regex};
-                    if ($field->[$i] =~ $subfield_regex) {
-                        push(@$v, $field->[$i + 1]);
+                    if ( $field->[$i] =~ $subfield_regex ) {
+                        push( @$v, $field->[ $i + 1 ] );
                     }
                 }
             }
 
             if (@$v) {
-                if (!$split) {
-                    my @defined_values = grep {defined($_)} @$v;
+                if ( !$split ) {
+                    my @defined_values = grep { defined($_) } @$v;
                     $v = join $join_char, @defined_values;
                 }
 
-                if (defined(my $off = $context->{from})) {
-                    if (ref $v eq 'ARRAY') {
-                        my @defined_values = grep {defined($_)} @$v;
+                if ( defined( my $off = $context->{from} ) ) {
+                    if ( ref $v eq 'ARRAY' ) {
+                        my @defined_values = grep { defined($_) } @$v;
                         $v = join $join_char, @defined_values;
                     }
                     my $len = $context->{len};
-                    if (length(${v}) > $off) {
-                        $v = substr($v, $off, $len);
-                    } else {
+                    if ( length( ${v} ) > $off ) {
+                        $v = substr( $v, $off, $len );
+                    }
+                    else {
                         $v = undef;
                     }
                 }
@@ -118,43 +127,45 @@ sub marc_map {
             }
         }
 
-        if (defined $v) {
+        if ( defined $v ) {
             if ($split) {
-                $v = [ $v ] unless (defined($v) && ref($v) eq 'ARRAY');
-                if (defined($vals) && ref($vals) eq 'ARRAY') {
+                $v = [$v] unless ( defined($v) && ref($v) eq 'ARRAY' );
+                if ( defined($vals) && ref($vals) eq 'ARRAY' ) {
+
                     # With the nested arrays option a split will
                     # always return an array of array of values.
                     # This was the old behavior of Inline marc_map functions
-                    if ($nested_arrays == 1) {
-                        push @$vals , $v;
+                    if ( $nested_arrays == 1 ) {
+                        push @$vals, $v;
                     }
                     else {
-                        push @$vals , @$v;
+                        push @$vals, @$v;
                     }
                 }
                 else {
-                    if ($nested_arrays == 1) {
+                    if ( $nested_arrays == 1 ) {
                         $vals = [$v];
                     }
                     else {
-                        $vals = [ @$v ];
+                        $vals = [@$v];
                     }
                 }
             }
             else {
-                push @$vals , $v;
+                push @$vals, $v;
             }
         }
     }
 
-    if ($split && defined $vals) {
-        $vals = [ $vals ];
+    if ( $split && defined $vals ) {
+        $vals = [$vals];
     }
     elsif ($append) {
+
         # we got a $append
     }
-    elsif (defined $vals) {
-        $vals = join $join_char , @$vals;
+    elsif ( defined $vals ) {
+        $vals = join $join_char, @$vals;
     }
     else {
         # no result
@@ -164,47 +175,46 @@ sub marc_map {
 }
 
 sub marc_add {
-    my ($self,$data,$marc_path,@subfields) = @_;
+    my ( $self, $data, $marc_path, @subfields ) = @_;
 
-    my %subfields  = @subfields;
-    my $marc       = $data->{'record'} // [];
+    my %subfields = @subfields;
+    my $marc      = $data->{'record'} // [];
 
-    if ($marc_path =~ /^\w{3}$/) {
+    if ( $marc_path =~ /^\w{3}$/ ) {
         my @field = ();
-        push @field , $marc_path;
-        push @field , $subfields{ind1} // ' ';
-        push @field , $subfields{ind2} // ' ';
+        push @field, $marc_path;
+        push @field, $subfields{ind1} // ' ';
+        push @field, $subfields{ind2} // ' ';
 
-
-        for (my $i = 0 ; $i < @subfields ; $i += 2) {
-            my $code  = $subfields[$i];
+        for ( my $i = 0; $i < @subfields; $i += 2 ) {
+            my $code = $subfields[$i];
             next unless length $code == 1;
-            my $value = $subfields[$i+1];
+            my $value = $subfields[ $i + 1 ];
 
-            if ($value =~ /^\$\.(\S+)$/) {
+            if ( $value =~ /^\$\.(\S+)$/ ) {
                 my $path = $1;
-                $value = Catmandu::Util::data_at($path,$data);
+                $value = Catmandu::Util::data_at( $path, $data );
             }
 
-            if (Catmandu::Util::is_array_ref $value) {
+            if ( Catmandu::Util::is_array_ref $value) {
                 for (@$value) {
-                    push @field , $code;
-                    push @field , $_;
+                    push @field, $code;
+                    push @field, $_;
                 }
             }
-            elsif (Catmandu::Util::is_hash_ref $value) {
-                for (keys %$value) {
-                    push @field , $code;
-                    push @field , $value->{$_};
+            elsif ( Catmandu::Util::is_hash_ref $value) {
+                for ( keys %$value ) {
+                    push @field, $code;
+                    push @field, $value->{$_};
                 }
             }
-            elsif (Catmandu::Util::is_value($value) && length($value) > 0) {
-                push @field , $code;
-                push @field , $value;
+            elsif ( Catmandu::Util::is_value($value) && length($value) > 0 ) {
+                push @field, $code;
+                push @field, $value;
             }
         }
 
-        push @{ $marc } , \@field if @field > 3;
+        push @{$marc}, \@field if @field > 3;
     }
 
     $data->{'record'} = $marc;
@@ -213,22 +223,22 @@ sub marc_add {
 }
 
 sub marc_append {
-    my ($self,$data,$marc_path,$value) = @_;
+    my ( $self, $data, $marc_path, $value ) = @_;
     my $record = $data->{'record'};
 
     return $data unless defined $record;
 
-    if ($value =~ /^\$\.(\S+)/) {
+    if ( $value =~ /^\$\.(\S+)/ ) {
         my $path = $1;
-        $value = Catmandu::Util::data_at($path,$data);
+        $value = Catmandu::Util::data_at( $path, $data );
     }
 
-    if (Catmandu::Util::is_array_ref $value) {
+    if ( Catmandu::Util::is_array_ref $value) {
         $value = $value->[-1];
     }
-    elsif (Catmandu::Util::is_hash_ref $value) {
+    elsif ( Catmandu::Util::is_hash_ref $value) {
         my $last;
-        for (keys %$value) {
+        for ( keys %$value ) {
             $last = $value->{$_};
         }
         $value = $last;
@@ -239,30 +249,30 @@ sub marc_append {
     confess "invalid marc path" unless $context;
 
     for my $field (@$record) {
-        my ($tag, $ind1, $ind2, @subfields) = @$field;
+        my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-        if ($context->{is_regex_field}) {
+        if ( $context->{is_regex_field} ) {
             next unless $tag =~ $context->{field_regex};
         }
         else {
             next unless $tag eq $context->{field};
         }
 
-        if (defined $context->{ind1}) {
-            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+        if ( defined $context->{ind1} ) {
+            if ( !defined $ind1 || $ind1 ne $context->{ind1} ) {
                 next;
             }
         }
-        if (defined $context->{ind2}) {
-            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+        if ( defined $context->{ind2} ) {
+            if ( !defined $ind2 || $ind2 ne $context->{ind2} ) {
                 next;
             }
         }
 
-        if ($context->{subfield}) {
-            for (my $i = 0; $i < @subfields; $i += 2) {
-                if ($subfields[$i] =~ $context->{subfield}) {
-                    $field->[$i + 4] .= $value;
+        if ( $context->{subfield} ) {
+            for ( my $i = 0; $i < @subfields; $i += 2 ) {
+                if ( $subfields[$i] =~ $context->{subfield} ) {
+                    $field->[ $i + 4 ] .= $value;
                 }
             }
         }
@@ -275,56 +285,58 @@ sub marc_append {
 }
 
 sub marc_replace_all {
-    my ($self,$data,$marc_path,$regex,$value) = @_;
+    my ( $self, $data, $marc_path, $regex, $value ) = @_;
     my $record = $data->{'record'};
 
     return $data unless defined $record;
 
-    if ($value =~ /^\$\.(\S+)/) {
+    if ( $value =~ /^\$\.(\S+)/ ) {
         my $path = $1;
-        $value = Catmandu::Util::data_at($path,$data);
+        $value = Catmandu::Util::data_at( $path, $data );
     }
 
-    if (Catmandu::Util::is_array_ref $value) {
+    if ( Catmandu::Util::is_array_ref $value) {
         $value = $value->[-1];
     }
-    elsif (Catmandu::Util::is_hash_ref $value) {
+    elsif ( Catmandu::Util::is_hash_ref $value) {
         my $last;
-        for (keys %$value) {
+        for ( keys %$value ) {
             $last = $value->{$_};
         }
         $value = $last;
     }
 
-    my $context = $self->compile_marc_path($marc_path, subfield_wildcard => 1);
+    my $context
+        = $self->compile_marc_path( $marc_path, subfield_wildcard => 1 );
 
     confess "invalid marc path" unless $context;
 
     for my $field (@$record) {
-        my ($tag, $ind1, $ind2, @subfields) = @$field;
+        my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-        if ($context->{is_regex_field}) {
+        if ( $context->{is_regex_field} ) {
             next unless $tag =~ $context->{field_regex};
         }
         else {
             next unless $tag eq $context->{field};
         }
 
-        if (defined $context->{ind1}) {
-            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+        if ( defined $context->{ind1} ) {
+            if ( !defined $ind1 || $ind1 ne $context->{ind1} ) {
                 next;
             }
         }
-        if (defined $context->{ind2}) {
-            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+        if ( defined $context->{ind2} ) {
+            if ( !defined $ind2 || $ind2 ne $context->{ind2} ) {
                 next;
             }
         }
 
-        for (my $i = 0; $i < @subfields; $i += 2) {
-            if ($subfields[$i] =~ $context->{subfield}) {
+        for ( my $i = 0; $i < @subfields; $i += 2 ) {
+            if ( $subfields[$i] =~ $context->{subfield} ) {
+
                 # Trick to double eval the right hand side
-                $field->[$i + 4] =~ s{$regex}{"\"$value\""}eeg;
+                $field->[ $i + 4 ] =~ s{$regex}{"\"$value\""}eeg;
             }
         }
     }
@@ -333,67 +345,70 @@ sub marc_replace_all {
 }
 
 sub marc_set {
-    my ($self,$data,$marc_path,$value,%opts) = @_;
+    my ( $self, $data, $marc_path, $value, %opts ) = @_;
     my $record = $data->{'record'};
 
     return $data unless defined $record;
 
-    if ($value =~ /^\$\.(\S+)/) {
+    if ( $value =~ /^\$\.(\S+)/ ) {
         my $path = $1;
-        $value = Catmandu::Util::data_at($path,$data);
+        $value = Catmandu::Util::data_at( $path, $data );
     }
 
-    if (Catmandu::Util::is_array_ref $value) {
+    if ( Catmandu::Util::is_array_ref $value) {
         $value = $value->[-1];
     }
-    elsif (Catmandu::Util::is_hash_ref $value) {
+    elsif ( Catmandu::Util::is_hash_ref $value) {
         my $last;
-        for (keys %$value) {
+        for ( keys %$value ) {
             $last = $value->{$_};
         }
         $value = $last;
     }
 
-    my $context = $self->compile_marc_path($marc_path, subfield_default => 1);
+    my $context
+        = $self->compile_marc_path( $marc_path, subfield_default => 1 );
 
     confess "invalid marc path" unless $context;
 
     for my $field (@$record) {
-        my ($tag, $ind1, $ind2, @subfields) = @$field;
+        my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-        if ($context->{is_regex_field}) {
+        if ( $context->{is_regex_field} ) {
             next unless $tag =~ $context->{field_regex};
         }
         else {
             next unless $tag eq $context->{field};
         }
 
-        if (defined $context->{ind1}) {
-            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+        if ( defined $context->{ind1} ) {
+            if ( !defined $ind1 || $ind1 ne $context->{ind1} ) {
                 next;
             }
         }
-        if (defined $context->{ind2}) {
-            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+        if ( defined $context->{ind2} ) {
+            if ( !defined $ind2 || $ind2 ne $context->{ind2} ) {
                 next;
             }
         }
 
         my $found = 0;
-        for (my $i = 0; $i < @subfields; $i += 2) {
-            if ($subfields[$i] =~ $context->{subfield}) {
-                if (defined $context->{from}) {
-                    substr($field->[$i + 4], $context->{from}, $context->{len}) = $value;
+        for ( my $i = 0; $i < @subfields; $i += 2 ) {
+            if ( $subfields[$i] =~ $context->{subfield} ) {
+                if ( defined $context->{from} ) {
+                    substr( $field->[ $i + 4 ],
+                        $context->{from}, $context->{len} )
+                        = $value;
                 }
                 else {
-                    $field->[$i + 4] = $value;
+                    $field->[ $i + 4 ] = $value;
                 }
                 $found = 1;
             }
         }
 
-        if ($found == 0) {
-            push(@$field,$context->{subfield},$value);
+        if ( $found == 0 ) {
+            push( @$field, $context->{subfield}, $value );
         }
     }
 
@@ -401,7 +416,7 @@ sub marc_set {
 }
 
 sub marc_remove {
-    my ($self,$data, $marc_path,%opts) = @_;
+    my ( $self, $data, $marc_path, %opts ) = @_;
     my $record = $data->{'record'};
 
     my $new_record;
@@ -413,47 +428,57 @@ sub marc_remove {
     for my $field (@$record) {
         my $field_size = int(@$field);
 
-        if (
-            ($context->{is_regex_field} == 0 && $field->[0] eq $context->{field})
-            ||
-            ($context->{is_regex_field} == 1 && $field->[0] =~ $context->{field_regex})
-            ) {
+        if ((      $context->{is_regex_field} == 0
+                && $field->[0] eq $context->{field}
+            )
+            || (   $context->{is_regex_field} == 1
+                && $field->[0] =~ $context->{field_regex} )
+            )
+        {
 
             my $ind_match = undef;
 
-            if (defined $context->{ind1} && defined $context->{ind2}) {
-                $ind_match = 1 if (defined $field->[1] && $field->[1] eq $context->{ind1} &&
-                                   defined $field->[2] && $field->[2] eq $context->{ind2});
+            if ( defined $context->{ind1} && defined $context->{ind2} ) {
+                $ind_match = 1
+                    if ( defined $field->[1]
+                    && $field->[1] eq $context->{ind1}
+                    && defined $field->[2]
+                    && $field->[2] eq $context->{ind2} );
             }
-            elsif (defined $context->{ind1}) {
-                $ind_match = 1 if (defined $field->[1] && $field->[1] eq $context->{ind1});
+            elsif ( defined $context->{ind1} ) {
+                $ind_match = 1
+                    if ( defined $field->[1]
+                    && $field->[1] eq $context->{ind1} );
             }
-            elsif (defined $context->{ind2}) {
-                $ind_match = 1 if (defined $field->[2] && $field->[2] eq $context->{ind2});
+            elsif ( defined $context->{ind2} ) {
+                $ind_match = 1
+                    if ( defined $field->[2]
+                    && $field->[2] eq $context->{ind2} );
             }
             else {
                 $ind_match = 1;
             }
 
-            if ($ind_match && ! defined $context->{subfield_regex}) {
+            if ( $ind_match && !defined $context->{subfield_regex} ) {
                 next;
             }
 
-            if (defined $context->{subfield_regex}) {
+            if ( defined $context->{subfield_regex} ) {
                 my $subfield_regex = $context->{subfield_regex};
-                my $new_subf = [];
-                for (my $i = $context->{start}; $i < $field_size; $i += 2) {
-                    unless ($field->[$i] =~ $subfield_regex) {
-                        push @$new_subf , $field->[$i];
-                        push @$new_subf , $field->[$i+1];
+                my $new_subf       = [];
+                for ( my $i = $context->{start}; $i < $field_size; $i += 2 ) {
+                    unless ( $field->[$i] =~ $subfield_regex ) {
+                        push @$new_subf, $field->[$i];
+                        push @$new_subf, $field->[ $i + 1 ];
                     }
                 }
 
-                splice @$field , $context->{start} , int(@$field), @$new_subf if $ind_match;
+                splice @$field, $context->{start}, int(@$field), @$new_subf
+                    if $ind_match;
             }
         }
 
-        push @$new_record , $field;
+        push @$new_record, $field;
     }
 
     $data->{'record'} = $new_record;
@@ -462,34 +487,36 @@ sub marc_remove {
 }
 
 sub marc_spec {
-    my $self      = $_[0];
+    my $self = $_[0];
 
     # $_[1] : data record
-    my $data      = $_[1];
-    my $record    = $data->{'record'};
+    my $data   = $_[1];
+    my $record = $data->{'record'};
 
     # $_[2] : spec
-    my ($ms, $spec);
-    if( ref $_[2] ) {
-        $ms       = $_[2];
-        $spec     = $ms->to_string()
-    } else {
-        $ms       = $self->parse_marc_spec( $_[2] ); # memoized
-        $spec     = $_[2];
+    my ( $ms, $spec );
+    if ( ref $_[2] ) {
+        $ms   = $_[2];
+        $spec = $ms->to_string();
+    }
+    else {
+        $ms   = $self->parse_marc_spec( $_[2] );    # memoized
+        $spec = $_[2];
     }
 
     my $EMPTY = q{};
+
     # $_[3] : opts
-    my $split         = $_[3]->{'-split'} // 0;
-    my $join_char     = $_[3]->{'-join'}  // $EMPTY;
-    my $pluck         = $_[3]->{'-pluck'} // 0;
-    my $value_set     = $_[3]->{'-value'} // undef;
-    my $invert        = $_[3]->{'-invert'} // 0;
+    my $split         = $_[3]->{'-split'}         // 0;
+    my $join_char     = $_[3]->{'-join'}          // $EMPTY;
+    my $pluck         = $_[3]->{'-pluck'}         // 0;
+    my $value_set     = $_[3]->{'-value'}         // undef;
+    my $invert        = $_[3]->{'-invert'}        // 0;
     my $nested_arrays = $_[3]->{'-nested_arrays'} // 0;
-    my $append        = $_[3]->{'-force_array'} // 0;
+    my $append        = $_[3]->{'-force_array'}   // 0;
 
     if ($nested_arrays) {
-        $split = 1
+        $split = 1;
     }
 
     # filter by tag
@@ -497,7 +524,7 @@ sub marc_spec {
     my $field_spec = $ms->field;
     my $tag_spec   = $field_spec->tag;
 
-    @fields = grep { $_->[0] =~ /$tag_spec/ } @{ $record };
+    @fields = grep { $_->[0] =~ /$tag_spec/ } @{$record};
     return unless @fields;
 
     # calculate char start
@@ -505,26 +532,28 @@ sub marc_spec {
         my ($sp) = @_;
         my $char_start;
         if ( $sp->has_char_start ) {
-            $char_start = ( '#' eq $sp->char_start )
-              ? $sp->char_length * -1
-              : $sp->char_start;
+            $char_start
+                = ( '#' eq $sp->char_start )
+                ? $sp->char_length * -1
+                : $sp->char_start;
         }
         return $char_start;
     };
 
     # vars we need only for subfields
-    my (@sf_spec, $invert_level, $codes, $invert_chars);
+    my ( @sf_spec, $invert_level, $codes, $invert_chars );
     if ( $ms->has_subfields ) {
+
         # set the order of subfields
-        @sf_spec = map { $_ } @{ $ms->subfields };
-        unless ( $pluck ) {
+        @sf_spec = map {$_} @{ $ms->subfields };
+        unless ($pluck) {
             @sf_spec = sort { $a->code cmp $b->code } @sf_spec;
         }
 
         # set invert level default
         $invert_level = 4;
-        if ( $invert ) {
-            $codes  = '[^';
+        if ($invert) {
+            $codes = '[^';
             $codes .= join $EMPTY, map { $_->code } @sf_spec;
             $codes .= ']';
         }
@@ -543,26 +572,28 @@ sub marc_spec {
     }
 
     # vars we need for fields and subfields
-    my ($referred, $char_start, $prev_tag, $index_range);
+    my ( $referred, $char_start, $prev_tag, $index_range );
     my $current_tag = $EMPTY;
-    my $tag_index = 0;
+    my $tag_index   = 0;
     my $index_start = $field_spec->index_start;
     my $index_end   = $field_spec->index_end;
 
     my $to_referred = sub {
-        my ( @values ) = @_;
-        if($nested_arrays) {
+        my (@values) = @_;
+        if ($nested_arrays) {
             push @{$referred}, \@values;
-        } elsif($split) {
+        }
+        elsif ($split) {
             push @{$referred}, @values;
-        } else {
+        }
+        else {
             push @{$referred}, join $join_char, @values;
         }
     };
 
-    if(  defined $field_spec->index_start ) {
-        $index_range =
-          _get_index_range( $field_spec->index_start, $field_spec->index_end, $#fields );
+    if ( defined $field_spec->index_start ) {
+        $index_range = _get_index_range( $field_spec->index_start,
+            $field_spec->index_end, $#fields );
     }
 
     # iterate over fields
@@ -570,18 +601,22 @@ sub marc_spec {
         $prev_tag    = $current_tag;
         $current_tag = $field->[0];
 
-        $tag_index   = ( $prev_tag eq $current_tag and defined $tag_index)
+        $tag_index
+            = ( $prev_tag eq $current_tag and defined $tag_index )
             ? ++$tag_index
-            : 0; #: $field_spec->index_start;
+            : 0;    #: $field_spec->index_start;
 
         # filter by index
         if ( defined $index_range ) {
-            next unless ( Catmandu::Util::array_includes( $index_range, $tag_index ) );
+            next
+                unless (
+                Catmandu::Util::array_includes( $index_range, $tag_index ) );
         }
 
         # filter field by subspec
-        if( $field_spec->has_subspecs) {
-            my $valid = $self->_it_subspecs( $data, $current_tag, $field_spec->subspecs, $tag_index );
+        if ( $field_spec->has_subspecs ) {
+            my $valid = $self->_it_subspecs( $data, $current_tag,
+                $field_spec->subspecs, $tag_index );
             next unless $valid;
         }
 
@@ -589,10 +624,13 @@ sub marc_spec {
 
         if ( $ms->has_subfields ) {    # now we dealing with subfields
             for my $sf (@sf_spec) {
+
                 # set invert level
-                if ( $invert && !$sf->has_subspecs) {
+                if ( $invert && !$sf->has_subspecs ) {
                     if ( -1 == $sf->index_length && !$sf->has_char_start ) {
-                        next if ( $invert_level == 3 );    # skip subfield spec it's already covered
+                        next
+                            if ( $invert_level == 3 )
+                            ;    # skip subfield spec it's already covered
                         $invert_level = 3;
                     }
                     elsif ( $sf->has_char_start ) {
@@ -605,19 +643,19 @@ sub marc_spec {
 
                 my @subfield = ();
                 my $code     = ( $invert_level == 3 ) ? $codes : $sf->code;
-                $code        = qr/$code/;
-                for ( my $i = 3 ; $i < @{$field} ; $i += 2 ) {
+                $code = qr/$code/;
+                for ( my $i = 3; $i < @{$field}; $i += 2 ) {
                     if ( $field->[$i] =~ /$code/ ) {
                         push @subfield, $field->[ $i + 1 ];
                     }
                 }
 
-                if ( $invert_level == 3 ) { # no index or charpos
+                if ( $invert_level == 3 ) {    # no index or charpos
                     if (@subfield) {
                         push @subfields, @subfield;
                     }
 
-                    if ( $referred && $value_set ) { # return $value_set ASAP
+                    if ( $referred && $value_set ) {  # return $value_set ASAP
                         return $value_set;
                     }
 
@@ -628,22 +666,20 @@ sub marc_spec {
 
                 # filter by index
                 if ( defined $sf->index_start ) {
-                    my $sf_range =
-                        _get_index_range( $sf->index_start, $sf->index_end, $#subfield );
+                    my $sf_range
+                        = _get_index_range( $sf->index_start, $sf->index_end,
+                        $#subfield );
 
                     if ( $invert_level == 2 ) {    # inverted
                         @subfield = map {
                             Catmandu::Util::array_includes( $sf_range, $_ )
-                              ? ()
-                              : $subfield[$_];
+                                ? ()
+                                : $subfield[$_];
                         } 0 .. $#subfield;
                     }
-                    else {    # without invert
-                        @subfield =
-                          map {
-                            defined $subfield[$_]
-                            ? $subfield[$_]
-                            : ();
+                    else {                         # without invert
+                        @subfield = map {
+                            defined $subfield[$_] ? $subfield[$_] : ();
                         } @{$sf_range};
                     }
                     next unless (@subfield);
@@ -653,8 +689,9 @@ sub marc_spec {
                 return $value_set if $value_set;
 
                 # filter subfield by subspec
-                if( $sf->has_subspecs) {
-                    my $valid = $self->_it_subspecs( $data, $field_spec->tag, $sf->subspecs, $tag_index);
+                if ( $sf->has_subspecs ) {
+                    my $valid = $self->_it_subspecs( $data, $field_spec->tag,
+                        $sf->subspecs, $tag_index );
                     next unless $valid;
                 }
 
@@ -662,54 +699,59 @@ sub marc_spec {
                 $char_start = $chst->($sf);
                 if ( defined $char_start ) {
                     if ( $invert_level == 1 ) {    # inverted
-                        @subfield =
-                          map {
-                            $invert_chars->( $_, $char_start, $sf->char_length );
+                        @subfield = map {
+                            $invert_chars->(
+                                $_, $char_start, $sf->char_length
+                            );
                         } @subfield;
                     }
                     else {
-                        @subfield =
-                          map {
-                            substr $_, $char_start, $sf->char_length;
-                        } @subfield;
+                        @subfield
+                            = map { substr $_, $char_start, $sf->char_length; }
+                            @subfield;
                     }
                 }
                 next unless @subfield;
                 push @subfields, @subfield;
-            } # end of subfield iteration
+            }    # end of subfield iteration
             $to_referred->(@subfields) if @subfields;
-        } # end of subfield handling
-        elsif($ms->has_indicator){
+        }    # end of subfield handling
+        elsif ( $ms->has_indicator ) {
+
             # filter field by subspec
-            if( $ms->indicator->has_subspecs) {
-                my $valid = $self->_it_subspecs( $data, $current_tag, $ms->indicator->subspecs, $tag_index );
+            if ( $ms->indicator->has_subspecs ) {
+                my $valid = $self->_it_subspecs( $data, $current_tag,
+                    $ms->indicator->subspecs, $tag_index );
                 next unless $valid;
             }
             my @indicators = ();
-            push @indicators, $field->[$ms->indicator->position]
-                if defined $field->[$ms->indicator->position];
+            push @indicators, $field->[ $ms->indicator->position ]
+                if defined $field->[ $ms->indicator->position ];
             $to_referred->(@indicators);
         }
-        else { # no particular subfields requested
+        else {    # no particular subfields requested
             my @contents = ();
-            for ( my $i = 4 ; $i < @{$field} ; $i += 2 ) {
+            for ( my $i = 4; $i < @{$field}; $i += 2 ) {
+
                 # get substring
-                $char_start    = $chst->($field_spec);
-                my $content    = ( defined $char_start )
-                    ? substr $field->[$i], $char_start, $field_spec->char_length
+                $char_start = $chst->($field_spec);
+                my $content = ( defined $char_start )
+                    ? substr $field->[$i], $char_start,
+                    $field_spec->char_length
                     : $field->[$i];
                 push @contents, $content;
             }
             next unless (@contents);
             $to_referred->(@contents);
-        } # end of field handling
-    } # end of field iteration
+        }    # end of field handling
+    }    # end of field iteration
     return unless ($referred);
 
     if ($append) {
         return [$referred] if $split;
         return $referred;
-    } elsif ($split) {
+    }
+    elsif ($split) {
         return [$referred];
     }
 
@@ -720,29 +762,32 @@ sub _it_subspecs {
     my ( $self, $data, $tag, $subspecs, $tag_index ) = @_;
 
     my $set_index = sub {
-        my ( $subspec ) = @_;
-        foreach my $side ( ('left', 'right') ) {
+        my ($subspec) = @_;
+        foreach my $side ( ( 'left', 'right' ) ) {
             next if ( ref $subspec->$side eq 'MARC::Spec::Comparisonstring' );
+
             # only set new index if subspec field tag equals spec field tag!!
             my $spec_tag = $subspec->$side->field->tag;
             next unless ( $tag =~ /$spec_tag/ );
-            $subspec->$side->field->set_index_start_end( $tag_index );
+            $subspec->$side->field->set_index_start_end($tag_index);
         }
     };
 
     my $valid = 1;
     foreach my $subspec ( @{$subspecs} ) {
-        if( ref $subspec eq 'ARRAY' ) { # chained subSpecs (OR)
+        if ( ref $subspec eq 'ARRAY' ) {    # chained subSpecs (OR)
             foreach my $or_subspec ( @{$subspec} ) {
-                $set_index->( $or_subspec );
+                $set_index->($or_subspec);
                 $valid = $self->_validate_subspec( $or_subspec, $data, $tag );
+
                 # at least one of them is true (OR)
                 last if $valid;
             }
         }
-        else { # repeated SubSpecs (AND)
-            $set_index->( $subspec );
+        else {                              # repeated SubSpecs (AND)
+            $set_index->($subspec);
             $valid = $self->_validate_subspec( $subspec, $data, $tag );
+
             # all of them have to be true (AND)
             last unless $valid;
         }
@@ -752,17 +797,15 @@ sub _it_subspecs {
 
 sub _validate_subspec {
     my ( $self, $subspec, $data, $tag ) = @_;
-    my ($left_subterm, $right_subterm);
+    my ( $left_subterm, $right_subterm );
 
-    if('!' ne $subspec->operator && '?' ne $subspec->operator) {
+    if ( '!' ne $subspec->operator && '?' ne $subspec->operator ) {
         if ( ref $subspec->left ne 'MARC::Spec::Comparisonstring' ) {
             my $new_spec = $subspec->left->to_string();
             $new_spec =~ s/^\.\.\./$tag/;
-            $left_subterm = $self->marc_spec(
-                    $data,
-                    $new_spec,
-                    { '-split' => 1 }
-                ); # split should result in an array ref
+            $left_subterm
+                = $self->marc_spec( $data, $new_spec, { '-split' => 1 } )
+                ;    # split should result in an array ref
             return 0 unless defined $left_subterm;
         }
         else {
@@ -773,12 +816,10 @@ sub _validate_subspec {
     if ( ref $subspec->right ne 'MARC::Spec::Comparisonstring' ) {
         my $new_spec = $subspec->right->to_string();
         $new_spec =~ s/^\.\.\./$tag/;
-        $right_subterm = $self->marc_spec(
-                $data,
-                $new_spec,
-                { '-split' => 1 }
-            ); # split should result in an array ref
-        unless( defined $right_subterm ) {
+        $right_subterm
+            = $self->marc_spec( $data, $new_spec, { '-split' => 1 } )
+            ;    # split should result in an array ref
+        unless ( defined $right_subterm ) {
             $right_subterm = [];
         }
     }
@@ -786,36 +827,36 @@ sub _validate_subspec {
         push @{$right_subterm}, $subspec->right->comparable;
     }
 
-    if($subspec->operator eq '?') {
-        return (@{$right_subterm}) ? 1 : 0;
+    if ( $subspec->operator eq '?' ) {
+        return ( @{$right_subterm} ) ? 1 : 0;
     }
 
-    if($subspec->operator eq '!') {
-        return (@{$right_subterm}) ? 0 : 1;
+    if ( $subspec->operator eq '!' ) {
+        return ( @{$right_subterm} ) ? 0 : 1;
     }
 
-    if($subspec->operator eq '=') {
-        foreach my $v ( @{$left_subterm->[0]} ) {
-            return 1 if List::Util::any {$v eq $_} @{$right_subterm};
+    if ( $subspec->operator eq '=' ) {
+        foreach my $v ( @{ $left_subterm->[0] } ) {
+            return 1 if List::Util::any { $v eq $_ } @{$right_subterm};
         }
     }
 
-    if($subspec->operator eq '!=') {
-        foreach my $v ( @{$left_subterm->[0]} ) {
-            return 0 if List::Util::any {$v eq $_} @{$right_subterm};
+    if ( $subspec->operator eq '!=' ) {
+        foreach my $v ( @{ $left_subterm->[0] } ) {
+            return 0 if List::Util::any { $v eq $_ } @{$right_subterm};
         }
         return 1;
     }
 
-    if($subspec->operator eq '~') {
-        foreach my $v ( @{$left_subterm->[0]} ) {
-            return 1 if List::Util::any {$v =~ /$_/} @{$right_subterm};
+    if ( $subspec->operator eq '~' ) {
+        foreach my $v ( @{ $left_subterm->[0] } ) {
+            return 1 if List::Util::any { $v =~ /$_/ } @{$right_subterm};
         }
     }
 
-    if($subspec->operator eq '!~') {
-        foreach my $v ( @{$left_subterm->[0]} ) {
-            return 0 if List::Util::any {$v =~ /$_/} @{$right_subterm};
+    if ( $subspec->operator eq '!~' ) {
+        foreach my $v ( @{ $left_subterm->[0] } ) {
+            return 0 if List::Util::any { $v =~ /$_/ } @{$right_subterm};
         }
         return 1;
     }
@@ -825,7 +866,7 @@ sub _validate_subspec {
 
 sub parse_marc_spec {
     my ( $self, $marc_spec ) = @_;
-    return MARC::Spec::Parser->new( $marc_spec )->marcspec;
+    return MARC::Spec::Parser->new($marc_spec)->marcspec;
 }
 
 sub _get_index_range {
@@ -848,22 +889,27 @@ sub _get_index_range {
     }
 
     return ( $index_start <= $index_end )
-      ? [ $index_start .. $index_end ]
-      : [ $index_end .. $index_start ];
+        ? [ $index_start .. $index_end ]
+        : [ $index_end .. $index_start ];
 }
 
 sub marc_xml {
-    my ($self,$data,%opts) = @_;
+    my ( $self, $data, %opts ) = @_;
 
-    if ($opts{reverse}) {
-        my $record = Catmandu->import_from_string($data,'MARC', type=>'XML');
+    if ( $opts{reverse} ) {
+        my $record
+            = Catmandu->import_from_string( $data, 'MARC', type => 'XML' );
         return $record->[0]->{record} if $record;
         return undef;
     }
     else {
         my $xml;
-        my $exporter = Catmandu::Exporter::MARC::XML->new(file => \$xml , xml_declaration => 0 , collection => 0);
-        $exporter->add({record => $data});
+        my $exporter = Catmandu::Exporter::MARC::XML->new(
+            file            => \$xml,
+            xml_declaration => 0,
+            collection      => 0
+        );
+        $exporter->add( { record => $data } );
         $exporter->commit;
 
         return $xml;
@@ -871,30 +917,31 @@ sub marc_xml {
 }
 
 sub marc_record_to_json {
-    my ($self,$data,%opts) = @_;
+    my ( $self, $data, %opts ) = @_;
 
-    if (my $marc = delete $data->{'record'}) {
+    if ( my $marc = delete $data->{'record'} ) {
         for my $field (@$marc) {
-            my ($tag, $ind1, $ind2, @subfields) = @$field;
+            my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-            if ($tag eq 'LDR') {
-               shift @subfields;
-               $data->{leader} = join "", @subfields;
+            if ( $tag eq 'LDR' ) {
+                shift @subfields;
+                $data->{leader} = join "", @subfields;
             }
-            elsif ($tag eq 'FMT' || substr($tag, 0, 2) eq '00') {
-               shift @subfields;
-               push @{$data->{fields} ||= []} , { $tag => join "" , @subfields };
+            elsif ( $tag eq 'FMT' || substr( $tag, 0, 2 ) eq '00' ) {
+                shift @subfields;
+                push @{ $data->{fields} ||= [] },
+                    { $tag => join "", @subfields };
             }
             else {
-               my @sf;
-               my $start = !defined($subfields[0]) || $subfields[0] eq '_' ? 2 : 0;
-               for (my $i = $start; $i < @subfields; $i += 2) {
-                   push @sf, { $subfields[$i] => $subfields[$i+1] };
-               }
-               push @{$data->{fields} ||= []} , { $tag => {
-                   subfields => \@sf,
-                   ind1 => $ind1,
-                   ind2 => $ind2 } };
+                my @sf;
+                my $start = !defined( $subfields[0] )
+                    || $subfields[0] eq '_' ? 2 : 0;
+                for ( my $i = $start; $i < @subfields; $i += 2 ) {
+                    push @sf, { $subfields[$i] => $subfields[ $i + 1 ] };
+                }
+                push @{ $data->{fields} ||= [] },
+                    { $tag =>
+                        { subfields => \@sf, ind1 => $ind1, ind2 => $ind2 } };
             }
         }
     }
@@ -903,66 +950,66 @@ sub marc_record_to_json {
 }
 
 sub marc_json_to_record {
-    my ($self,$data,%opts) = @_;
+    my ( $self, $data, %opts ) = @_;
 
     my $record = [];
 
-    if (Catmandu::Util::is_string($data->{leader})) {
-        push @$record , [ 'LDR', undef, undef, '_', $data->{leader} ],
+    if ( Catmandu::Util::is_string( $data->{leader} ) ) {
+        push @$record, [ 'LDR', undef, undef, '_', $data->{leader} ],;
     }
 
-    if (Catmandu::Util::is_array_ref($data->{fields})) {
-        for my $field (@{$data->{fields}}) {
+    if ( Catmandu::Util::is_array_ref( $data->{fields} ) ) {
+        for my $field ( @{ $data->{fields} } ) {
             next unless Catmandu::Util::is_hash_ref($field);
 
             my ($tag) = keys %$field;
-            my $val   = $field->{$tag};
+            my $val = $field->{$tag};
 
-            if ($tag eq 'FMT' || substr($tag, 0, 2) eq '00') {
-               push @$record , [ $tag, undef, undef, '_', $val ],
+            if ( $tag eq 'FMT' || substr( $tag, 0, 2 ) eq '00' ) {
+                push @$record, [ $tag, undef, undef, '_', $val ],;
             }
-            elsif (Catmandu::Util::is_hash_ref($val)) {
-               my $ind1 = $val->{ind1};
-               my $ind2 = $val->{ind2};
-               next unless Catmandu::Util::is_array_ref($val->{subfields});
+            elsif ( Catmandu::Util::is_hash_ref($val) ) {
+                my $ind1 = $val->{ind1};
+                my $ind2 = $val->{ind2};
+                next unless Catmandu::Util::is_array_ref( $val->{subfields} );
 
-               my $sfs = [ '_' , ''];
-               for my $sf (@{ $val->{subfields} }) {
-                   next unless Catmandu::Util::is_hash_ref($sf);
+                my $sfs = [ '_', '' ];
+                for my $sf ( @{ $val->{subfields} } ) {
+                    next unless Catmandu::Util::is_hash_ref($sf);
 
-                   my ($code) = keys %$sf;
-                   my $sval   = $sf->{$code};
+                    my ($code) = keys %$sf;
+                    my $sval = $sf->{$code};
 
-                   push @$sfs , [ $code , $sval];
-               }
+                    push @$sfs, [ $code, $sval ];
+                }
 
-               push @$record , [ $tag , $ind1 , $ind2 , @$sfs];
+                push @$record, [ $tag, $ind1, $ind2, @$sfs ];
             }
         }
     }
 
-    if (@$record > 0) {
-      delete $data->{fields};
-      delete $data->{leader};
-      $data->{'record'} = $record;
+    if ( @$record > 0 ) {
+        delete $data->{fields};
+        delete $data->{leader};
+        $data->{'record'} = $record;
     }
 
     $data;
 }
 
 sub marc_decode_dollar_subfields {
-    my ($self,$data,%opts) = @_;
+    my ( $self, $data, %opts ) = @_;
     my $old_record = $data->{'record'};
     my $new_record = [];
 
     for my $field (@$old_record) {
-        my ($tag,$ind1,$ind2,@subfields) = @$field;
+        my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-        my $fixed_field = [$tag,$ind1,$ind2];
+        my $fixed_field = [ $tag, $ind1, $ind2 ];
 
-        for (my $i = 0 ; $i < @subfields ; $i += 2) {
+        for ( my $i = 0; $i < @subfields; $i += 2 ) {
             my $code  = $subfields[$i];
-            my $value = $subfields[$i+1];
+            my $value = $subfields[ $i + 1 ];
 
             # If a subfield contains fields coded like: data$xmore$yevenmore
             # chunks = (data,x,y,evenmore)
@@ -970,14 +1017,14 @@ sub marc_decode_dollar_subfields {
 
             my $real_value = shift @chunks;
 
-            push @$fixed_field , ( $code, $real_value);
+            push @$fixed_field, ( $code, $real_value );
 
             while (@chunks) {
-                push  @$fixed_field , ( splice @chunks, 0, 2 );
+                push @$fixed_field, ( splice @chunks, 0, 2 );
             }
         }
 
-        push @$new_record , $fixed_field;
+        push @$new_record, $fixed_field;
     }
 
     $data->{'record'} = $new_record;
@@ -986,44 +1033,48 @@ sub marc_decode_dollar_subfields {
 }
 
 sub compile_marc_path {
-    my ($self,$marc_path,%opts) = @_;
+    my ( $self, $marc_path, %opts ) = @_;
 
-    my ($field,$field_regex,$ind1,$ind2,
-        $subfield,$subfield_regex,$from,$to,$len,$is_regex_field);
+    my ($field,    $field_regex,    $ind1, $ind2,
+        $subfield, $subfield_regex, $from, $to,
+        $len,      $is_regex_field
+    );
 
-    my $MARC_PATH_REGEX = qr/(\S{1,3})(\[([^,])?,?([^,])?\])?([\$_a-z0-9^-]+)?(\/([0-9]+)(-([0-9]+))?)?/;
-    if ($marc_path =~ $MARC_PATH_REGEX) {
-        $field          = $1;
-        $ind1           = $3;
-        $ind2           = $4;
-        $subfield       = $5;
-        $field = "0" x (3 - length($field)) . $field; # fixing 020 treated as 20 bug
-        if (defined($subfield)) {
+    my $MARC_PATH_REGEX
+        = qr/(\S{1,3})(\[([^,])?,?([^,])?\])?([\$_a-z0-9^-]+)?(\/([0-9]+)(-([0-9]+))?)?/;
+    if ( $marc_path =~ $MARC_PATH_REGEX ) {
+        $field    = $1;
+        $ind1     = $3;
+        $ind2     = $4;
+        $subfield = $5;
+        $field    = "0" x ( 3 - length($field) )
+            . $field;    # fixing 020 treated as 20 bug
+        if ( defined($subfield) ) {
             $subfield =~ s{\$}{}g;
-            unless ($subfield =~ /^[a-zA-Z0-9]$/) {
+            unless ( $subfield =~ /^[a-zA-Z0-9]$/ ) {
                 $subfield = "[$subfield]";
             }
         }
-        elsif ($opts{subfield_default}) {
+        elsif ( $opts{subfield_default} ) {
             $subfield = $field =~ /^0|LDR|FMT/ ? '_' : 'a';
         }
-        elsif ($opts{subfield_wildcard}) {
+        elsif ( $opts{subfield_wildcard} ) {
             $subfield = '[a-z0-9_]';
         }
-        if (defined($subfield)) {
+        if ( defined($subfield) ) {
             $subfield_regex = qr/^(?:${subfield})$/;
         }
-        $from           = $7;
-        $to             = $9;
-        $len = defined $to ? $to - $from + 1 : 1;
+        $from = $7;
+        $to   = $9;
+        $len  = defined $to ? $to - $from + 1 : 1;
     }
     else {
         return undef;
     }
 
-    if ($field =~ /[\*\.]/) {
-        $field_regex    = $field;
-        $field_regex    =~ s/[\*\.]/(?:[A-Z0-9])/g;
+    if ( $field =~ /[\*\.]/ ) {
+        $field_regex = $field;
+        $field_regex =~ s/[\*\.]/(?:[A-Z0-9])/g;
         $is_regex_field = 1;
         $field_regex    = qr/^$field_regex$/;
     }
@@ -1032,17 +1083,17 @@ sub compile_marc_path {
     }
 
     return {
-        field           => $field ,
-        field_regex     => $field_regex ,
-        is_regex_field  => $is_regex_field ,
-        subfield        => $subfield ,
-        subfield_regex  => $subfield_regex ,
-        ind1            => $ind1 ,
-        ind2            => $ind2 ,
-        start           => 3,
-        from            => $from ,
-        to              => $to ,
-        len             => $len
+        field          => $field,
+        field_regex    => $field_regex,
+        is_regex_field => $is_regex_field,
+        subfield       => $subfield,
+        subfield_regex => $subfield_regex,
+        ind1           => $ind1,
+        ind2           => $ind2,
+        start          => 3,
+        from           => $from,
+        to             => $to,
+        len            => $len
     };
 }
 
@@ -1054,51 +1105,55 @@ sub marc_copy {
     my $is_cut     = $_[4];
 
     # $_[2] : marc_path
-    my $context = ref($marc_path) ? $marc_path : $self->compile_marc_path($_[2], subfield_wildcard => 0);
+    my $context
+        = ref($marc_path)
+        ? $marc_path
+        : $self->compile_marc_path( $_[2], subfield_wildcard => 0 );
 
     confess "invalid marc path" unless $context;
 
     # $_[1] : data record
-    my $record         = $data->{'record'};
+    my $record = $data->{'record'};
 
-    return wantarray ? () : undef unless (defined $record && ref($record) eq 'ARRAY');
+    return wantarray ? () : undef
+        unless ( defined $record && ref($record) eq 'ARRAY' );
 
-    # When is_cut is on, we need to create a new record containing the remaining fields
+# When is_cut is on, we need to create a new record containing the remaining fields
     my @new_record = ();
 
     my $fields = [];
 
     for my $field (@$record) {
-        my ($tag, $ind1, $ind2, @subfields) = @$field;
+        my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-        if (
-            ($context->{is_regex_field} == 0 && $tag ne $context->{field} )
-            ||
-            ($context->{is_regex_field} == 1 && $tag !~ $context->{field_regex} )
-        ) {
-            push @new_record , $field if $is_cut;
+        if (( $context->{is_regex_field} == 0 && $tag ne $context->{field} )
+            || (   $context->{is_regex_field} == 1
+                && $tag !~ $context->{field_regex} )
+            )
+        {
+            push @new_record, $field if $is_cut;
             next;
         }
 
-        if (defined $context->{ind1}) {
-            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
-                push @new_record , $field if $is_cut;
+        if ( defined $context->{ind1} ) {
+            if ( !defined $ind1 || $ind1 ne $context->{ind1} ) {
+                push @new_record, $field if $is_cut;
                 next;
             }
         }
-        if (defined $context->{ind2}) {
-            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
-                push @new_record , $field if $is_cut;
+        if ( defined $context->{ind2} ) {
+            if ( !defined $ind2 || $ind2 ne $context->{ind2} ) {
+                push @new_record, $field if $is_cut;
                 next;
             }
         }
 
-        if ($context->{subfield}) {
+        if ( $context->{subfield} ) {
             my $found = 0;
-            for (my $i = 0; $i < @subfields; $i += 2) {
-                if ($subfields[$i] =~ $context->{subfield}) {
-                    if (defined($marc_value)) {
-                        $found = 1 if $subfields[$i+1] =~ /$marc_value/;
+            for ( my $i = 0; $i < @subfields; $i += 2 ) {
+                if ( $subfields[$i] =~ $context->{subfield} ) {
+                    if ( defined($marc_value) ) {
+                        $found = 1 if $subfields[ $i + 1 ] =~ /$marc_value/;
                     }
                     else {
                         $found = 1;
@@ -1107,21 +1162,21 @@ sub marc_copy {
             }
 
             unless ($found) {
-                push @new_record , $field if $is_cut;
+                push @new_record, $field if $is_cut;
                 next;
             }
         }
         else {
-            if (defined($marc_value)) {
+            if ( defined($marc_value) ) {
                 my @sf = ();
-                for (my $i = 0; $i < @subfields; $i += 2) {
-                    push @sf , $subfields[$i+1];
+                for ( my $i = 0; $i < @subfields; $i += 2 ) {
+                    push @sf, $subfields[ $i + 1 ];
                 }
 
                 my $string = join "", @sf;
 
-                unless ($string =~ /$marc_value/) {
-                    push @new_record , $field if $is_cut;
+                unless ( $string =~ /$marc_value/ ) {
+                    push @new_record, $field if $is_cut;
                     next;
                 }
             }
@@ -1131,32 +1186,37 @@ sub marc_copy {
         $f->{tag} = $field->[0];
 
         # indicator 1
-        if(defined $field->[1]) {
+        if ( defined $field->[1] ) {
             $f->{ind1} = $field->[1];
-        } else {
+        }
+        else {
             $f->{ind1} = undef;
         }
 
         # indicator 2
-        if(defined $field->[2]) {
+        if ( defined $field->[2] ) {
             $f->{ind2} = $field->[2];
-        } else {
+        }
+        else {
             $f->{ind2} = undef;
         }
 
         # fixed fields
-        if($field->[3] eq '_') {
+        if ( $field->[3] eq '_' ) {
             $f->{content} = $field->[4];
-            push(@$fields, $f);
+            push( @$fields, $f );
             next;
         }
 
         # subfields
-        for (my $i = $context->{start}; $i < @{$field}; $i += 2) {
-            push(@{$f->{subfields}}, { $field->[$i] => $field->[$i + 1] });
+        for ( my $i = $context->{start}; $i < @{$field}; $i += 2 ) {
+            push(
+                @{ $f->{subfields} },
+                { $field->[$i] => $field->[ $i + 1 ] }
+            );
         }
 
-        push(@$fields, $f);
+        push( @$fields, $f );
     }
 
     if ($is_cut) {
@@ -1173,21 +1233,23 @@ sub marc_paste {
     my $marc_path  = $_[3];
     my $marc_value = $_[4];
 
-    my $value = Catmandu::Util::data_at($json_path,$data);
+    my $value = Catmandu::Util::data_at( $json_path, $data );
 
-    return $data unless Catmandu::Util::is_array_ref($value) || Catmandu::Util::is_hash_ref($value);
+    return $data
+        unless Catmandu::Util::is_array_ref($value)
+        || Catmandu::Util::is_hash_ref($value);
 
     $value = [$value] unless Catmandu::Util::is_array_ref($value);
 
     my @new_parts;
 
     for my $part (@$value) {
-        return $data unless
-                    Catmandu::Util::is_hash_ref($part) &&
-                    exists $part->{tag}  &&
-                    exists $part->{ind1} &&
-                    exists $part->{ind2} &&
-                    ( exists $part->{content} || exists $part->{subfields} );
+        return $data
+            unless Catmandu::Util::is_hash_ref($part)
+            && exists $part->{tag}
+            && exists $part->{ind1}
+            && exists $part->{ind2}
+            && ( exists $part->{content} || exists $part->{subfields} );
 
         my $tag       = $part->{tag};
         my $ind1      = $part->{ind1} // ' ';
@@ -1195,19 +1257,21 @@ sub marc_paste {
         my $content   = $part->{content};
         my $subfields = $part->{subfields};
 
-        if (defined($content)) {
-            push @new_parts , [ $tag , $ind1 , $ind2 , '_' , $content ];
+        if ( defined($content) ) {
+            push @new_parts, [ $tag, $ind1, $ind2, '_', $content ];
         }
-        elsif (defined($subfields) && Catmandu::Util::is_array_ref($subfields)) {
-            my @tmp = ( $tag , $ind1 , $ind2 );
+        elsif ( defined($subfields)
+            && Catmandu::Util::is_array_ref($subfields) )
+        {
+            my @tmp = ( $tag, $ind1, $ind2 );
 
             for my $sf (@$subfields) {
-                while (my ($key, $value) = each %$sf) {
-                    push @tmp, $key , $value;
+                while ( my ( $key, $value ) = each %$sf ) {
+                    push @tmp, $key, $value;
                 }
             }
 
-            push @new_parts , [ @tmp ];
+            push @new_parts, [@tmp];
         }
         else {
             # Illegal input
@@ -1215,59 +1279,62 @@ sub marc_paste {
         }
     }
 
-    if (defined($marc_path)) {
-        my $context = $self->compile_marc_path($marc_path, subfield_wildcard => 0);
+    if ( defined($marc_path) ) {
+        my $context
+            = $self->compile_marc_path( $marc_path, subfield_wildcard => 0 );
 
         confess "invalid marc path" unless $context;
 
-        my @record      = @{$data->{record}};
+        my @record      = @{ $data->{record} };
         my $found_match = undef;
 
         my $field_position = -1;
 
         for my $field (@record) {
             $field_position++;
-            my ($tag, $ind1, $ind2, @subfields) = @$field;
+            my ( $tag, $ind1, $ind2, @subfields ) = @$field;
 
-            if ($context->{is_regex_field}) {
+            if ( $context->{is_regex_field} ) {
                 next unless $tag =~ $context->{field_regex};
             }
             else {
                 next unless $tag eq $context->{field};
             }
 
-            if (defined $context->{ind1}) {
-                if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+            if ( defined $context->{ind1} ) {
+                if ( !defined $ind1 || $ind1 ne $context->{ind1} ) {
                     next;
                 }
             }
-            if (defined $context->{ind2}) {
-                if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+            if ( defined $context->{ind2} ) {
+                if ( !defined $ind2 || $ind2 ne $context->{ind2} ) {
                     next;
                 }
             }
 
-            if ($context->{subfield}) {
-                for (my $i = 0; $i < @subfields; $i += 2) {
-                    if ($subfields[$i] =~ $context->{subfield}) {
-                        if (defined($marc_value)) {
-                            $found_match = $field_position if $subfields[$i+1] =~ /$marc_value/;
+            if ( $context->{subfield} ) {
+                for ( my $i = 0; $i < @subfields; $i += 2 ) {
+                    if ( $subfields[$i] =~ $context->{subfield} ) {
+                        if ( defined($marc_value) ) {
+                            $found_match = $field_position
+                                if $subfields[ $i + 1 ] =~ /$marc_value/;
                         }
                         else {
                             $found_match = $field_position;
                         }
                     }
                 }
-            } else {
-                if (defined($marc_value)) {
+            }
+            else {
+                if ( defined($marc_value) ) {
                     my @sf = ();
-                    for (my $i = 0; $i < @subfields; $i += 2) {
-                        push @sf , $subfields[$i+1];
+                    for ( my $i = 0; $i < @subfields; $i += 2 ) {
+                        push @sf, $subfields[ $i + 1 ];
                     }
 
                     my $string = join "", @sf;
 
-                    if ($string =~ /$marc_value/) {
+                    if ( $string =~ /$marc_value/ ) {
                         $found_match = $field_position;
                     }
                     else {
@@ -1280,20 +1347,35 @@ sub marc_paste {
             }
         }
 
-        if (defined $found_match) {
+        if ( defined $found_match ) {
             my @new_record = (
-                @record[0..$found_match] ,
-                @new_parts ,
-                @record[$found_match+1..$#record]
+                @record[ 0 .. $found_match ],
+                @new_parts, @record[ $found_match + 1 .. $#record ]
             );
             $data->{record} = \@new_record;
         }
     }
     else {
-        push @{$data->{record}} , @new_parts;
+        push @{ $data->{record} }, @new_parts;
     }
 
     $data;
+}
+
+sub marc_sort {
+    my ( $self, $data ) = @_;
+    if ( defined $data->{record} ) {
+        my @record = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map {
+            [   $_,
+                $_->[0] =~ m/^FMT$/   ? 0.1
+                : $_->[0] =~ m/^LDR$/ ? 0.2
+                : $_->[0] =~ m/^[A-Z]/ ? 99 . ord( substr( $_->[0], 0 ) )
+                :                        $_->[0]
+            ]
+        } @{ $data->{record} };
+        $data->{record} = \@record;
+    }
+    return $data;
 }
 
 1;
@@ -1345,7 +1427,7 @@ Catmandu::MARC - Catmandu modules for working with MARC data
  my $store    = Catmandu->store('ElasticSearch', index_name => 'catmandu');
 
  $store->add_many(
- 	$fixer->fix($importer)
+    $fixer->fix($importer)
  );
 
 =head1 MODULES
@@ -1383,6 +1465,8 @@ Catmandu::MARC - Catmandu modules for working with MARC data
 =item * L<Catmandu::Fix::marc_cut>
 
 =item * L<Catmandu::Fix::marc_paste>
+
+=item * L<Catmandu::Fix::marc_sort>
 
 =item * L<Catmandu::Fix::Bind::marc_each>
 

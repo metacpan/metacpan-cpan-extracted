@@ -24,7 +24,6 @@ do { my $x = {
                                       'Encode' => '1.50',
                                       'Exporter' => '0',
                                       'Filter::Simple' => '0',
-                                      'List::Util' => '0',
                                       'Math::Complex' => '0',
                                       'POSIX' => '0',
                                       'Scalar::Util' => '0',

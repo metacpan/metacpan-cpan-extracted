@@ -34,14 +34,14 @@ Also, the Net::SNMP scheduler is very inefficient with respect to both CPU
 and memory usage. Most AnyEvent backends (including the pure-perl backend)
 fare much better than the Net::SNMP dispatcher.
 
-Another major added fetaure of this module over Net::SNMP is automatic
+Another major added feature of this module over Net::SNMP is automatic
 rate-adjustments:  Net::SNMP is so slow that firing a few thousand
 requests can cause many timeouts simply because Net::SNMP cannot process
 the replies in time. This module automatically adapts the send rate to
 avoid false timeouts caused by slow reply processing.
 
 A potential disadvantage of this module is that replacing the dispatcher
-is not at all a documented thing to do, so future changes in Net::SNP
+is not at all a documented thing to do, so future changes in Net::SNMP
 might break this module (or the many similar ones).
 
 This module does not export anything and does not require you to do
@@ -71,7 +71,7 @@ the kernel can no longer accept new packets.
 
 To avoid this, you can (and should) limit the number of outstanding
 requests to a number low enough so that parsing time doesn't introduce
-noticable delays.
+noticeable delays.
 
 Unfortunately, this number depends not only on processing speed and load
 of the machine running Net::SNMP, but also on the network latency and the
@@ -82,7 +82,7 @@ downwards.
 
 Increasing C<$MAX_OUTSTANDING> will not automatically use the
 extra request slots. To increase C<$MAX_OUTSTANDING> and make
-C<AnyEvent::SNMP> make use of the extra paralellity, call
+C<AnyEvent::SNMP> make use of the extra parallelity, call
 C<AnyEvent::SNMP::set_max_outstanding> with the new value, e.g.:
 
    AnyEvent::SNMP::set_max_outstanding 500;
@@ -105,10 +105,10 @@ it will reduce $MAX_OUTSTANDING. If it handles less than $MIN_RECVQUEUE,
 it increases $MAX_OUTSTANDING.
 
 This has the result of adjusting the number of outstanding requests so that
-the recv queue is between the minimum and maximu, usually.
+the recv queue is between the minimum and maximum, usually.
 
 This algorithm works reasonably well as long as the responses, response
-latencies and processing times are the same size per packet on average.
+latencies and processing times are the same per packet on average.
 
 =back
 
@@ -154,7 +154,7 @@ sub Net::SNMP::Dispatcher::instance {
 use Net::SNMP ();
 use AnyEvent ();
 
-our $VERSION = '6.0';
+our $VERSION = '6.02';
 
 $Net::SNMP::DISPATCHER = instance Net::SNMP::Dispatcher;
 
@@ -259,7 +259,11 @@ sub _send_pdu {
                $msg->error ($MESSAGE_PROCESSING->error) if $MESSAGE_PROCESSING->error;
 
                # Notify the command generator to process the response.
-               $msg->process_response_pdu; 
+               # Net::SNMP calls process_response_pdu, which simply calls callback_execute,
+               # but some errors cause $msg to be of type Net::SNMP::Message, not Net::SMMP::PDU,
+               # so we call the underlying callback_execute method which exists on both and
+               # seems to do the right thing.
+               $msg->callback_execute;
 
                # Cancel the timeout.
                my $rtimeout_w = $msg->timeout_id;

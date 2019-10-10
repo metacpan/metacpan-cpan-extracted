@@ -7,12 +7,14 @@ use Exporter qw(import);
 our @EXPORT_OK=qw(get_children xpath);
 our %EXPORT_TAGS = (all=>[@EXPORT_OK]);
 
+our $VERSION = "1.071";
+
 =head1 NAME
 
   Catmandu::AlephX::Response - base class for xml-responses from the AlephX-server
 
 =head1 SYNOPSIS
-  
+
   All responses from the AlephX-server share the same functionality and keys:
     - expressed in XML
     - name of the parent element is equal to the parameter 'op', except when
@@ -43,9 +45,9 @@ our %EXPORT_TAGS = (all=>[@EXPORT_OK]);
 =head2 is_success
 
   This method only checks if there was an internal error in the AlephX-response.
-  So it simply tests if the key 'error' was undefined.   
+  So it simply tests if the key 'error' was undefined.
 
-  As said before, other errors are thrown as exceptions  
+  As said before, other errors are thrown as exceptions
 
 =cut
 
@@ -62,8 +64,8 @@ sub error {
   $_[0]->errors()->[-1];
 }
 has session_id => (is => 'rw');
-sub is_success { 
-  return !scalar(@{$_[0]->errors()}); 
+sub is_success {
+  return !scalar(@{$_[0]->errors()});
 }
 has content_ref => (
   is => 'rw'

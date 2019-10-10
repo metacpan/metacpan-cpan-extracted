@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.023, Dist::Milla version v1.0.5, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,22 +19,27 @@ meta-spec:
 name: Catmandu-Atom
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Catmandu: '0.9206'
+  Catmandu: '1.2001'
+  Moo: '0'
   XML::Atom: '0.41'
+  namespace::clean: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Atom/issues
   homepage: https://github.com/LibreCat/Catmandu-Atom
   repository: https://github.com/LibreCat/Catmandu-Atom.git
-version: '0.04'
+version: '0.05'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'vpeil <vitali.peil@uni-bielefeld.de>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

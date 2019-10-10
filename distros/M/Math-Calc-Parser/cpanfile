@@ -3,7 +3,6 @@ requires 'Carp';
 requires 'Encode' => '1.50';
 requires 'Exporter';
 requires 'Filter::Simple';
-requires 'List::Util';
 requires 'Math::Complex';
 requires 'POSIX';
 requires 'Scalar::Util';

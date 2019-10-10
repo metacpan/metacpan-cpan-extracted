@@ -1,6 +1,6 @@
 package Catmandu::Importer::BagIt;
 
-our $VERSION = '0.236';
+our $VERSION = '0.237';
 
 =head1 NAME
 

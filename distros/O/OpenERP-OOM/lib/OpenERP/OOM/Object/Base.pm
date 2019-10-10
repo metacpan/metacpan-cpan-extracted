@@ -13,6 +13,38 @@ use Switch::Plain;
 extends 'Moose::Object';
 with 'OpenERP::OOM::DynamicUtils';
 
+=head1 NAME
+
+OpenERP::OOM::Class::Base
+
+=head1 SYNOPSYS
+
+ my $obj = $schema->class('Name')->create(\%args);
+
+ :say $obj->id;
+
+ $obj->name('New name');
+ $obj->update;
+
+ $obj->delete;
+
+=head1 DESCRIPTION
+
+Provides a base set of properties and methods for OpenERP::OOM objects (update, delete, etc).
+
+=head1 PROPERTIES
+
+=head2 id
+
+Returns the OpenERP ID of an object.
+
+ say $obj->id;
+
+=head2 BUILD
+
+The BUILD method sets up the methods for the links to the attached objects.
+
+=cut
 
 has 'id' => (
     isa => 'Int',
@@ -69,6 +101,24 @@ sub BUILD {
 
 #-------------------------------------------------------------------------------
 
+=head1 METHODS
+
+=head2 update
+
+Updates an object in OpenERP after its properties have been changed.
+
+ $obj->name('New name');
+ $obj->update;
+
+Also allows a hashref to be passed to update multiple properties:
+
+ $obj->update({
+    name  => 'new name',
+    ref   => 'new reference',
+    price => 'new price',
+ });
+
+=cut
 
 sub update {
     my $self = shift;
@@ -119,6 +169,16 @@ sub update {
 
 #-------------------------------------------------------------------------------
 
+=head2 update_single
+
+Updates OpenERP with a single property of an object.
+
+ $obj->name('New name');
+ $obj->status('Active');
+
+ $obj->update_single('name');  # Only the 'name' property is updated
+
+=cut
 
 sub update_single {
     my ($self, $property) = @_;
@@ -148,6 +208,13 @@ sub update_single {
 
 #-------------------------------------------------------------------------------
 
+=head2 refresh
+
+Reloads an object's properties from OpenERP.
+
+ $obj->refresh;
+
+=cut
 
 sub refresh {
     my $self = shift;
@@ -166,6 +233,14 @@ sub refresh {
 
 #-------------------------------------------------------------------------------
 
+=head2 delete
+
+Deletes an object from OpenERP.
+
+ my $obj = $schema->class('Partner')->retrieve(60);
+ $obj->delete;
+
+=cut
 
 sub delete {
     my $self = shift;
@@ -182,6 +257,13 @@ sub _copy
     return $id;
 }
 
+=head2 copy
+
+Clone the current object, returning the new object.
+
+This is equivalent to pressing duplicate in the OpenERP user interface.
+
+=cut
 
 sub copy
 {
@@ -195,6 +277,11 @@ sub copy
 
 #-------------------------------------------------------------------------------
 
+=head2 print
+
+This is a debug method.
+
+=cut
 
 sub print {
     my $self = shift;
@@ -205,6 +292,20 @@ sub print {
 
 #-------------------------------------------------------------------------------
 
+=head2 real_create_related
+
+This actually does the create related via OpenERP.
+
+I'm not sure in what scenarios you should use it versus the scenario's you 
+shouldn't.  Suck it and see.
+
+It will create calls like this,
+
+# DEBUG_RPC:rpc.request:('execute', 'db', 1, '*', ('stock.partial.picking', 'write', [1], {'product_moves_out': [(0, 0, {'prodlot_id': False, 'product_id': 16, 'product_uom': 1, 'quantity': 10.0})]}, {'lang': 'en_GB', 'search_default_available': 1, 'project_id': False, 'tz': False, '__last_update': {'stock.partial.picking,1': False}, 'active_model': 'ir.ui.menu', 'section_id': False, 'contact_display': 'partner_address', 'active_ids': [3], 'active_id': 316}))
+
+Note that it will not return the object created.
+
+=cut
 
 sub real_create_related
 {
@@ -224,6 +325,16 @@ sub real_create_related
     return;
 }
 
+=head2 create_related
+
+Creates a related or linked object.
+
+ $obj->create_related('address',{
+     street   => 'Drury Lane',
+     postcode => 'CV21 3DE',
+ });
+
+=cut
 
 sub create_related {
     my ($self, $relation_name, $object) = @_;
@@ -316,6 +427,21 @@ sub _id
     return ref $val ? $val->id : $val;
 }
 
+=head2 find_related
+
+Finds a property related to the current object.
+
+    my $line = $po->find_related('order_lines', [ 'id', '=', 1 ]);
+
+This only works with relationships to OpenERP objects (i.e. not DBIC) and 
+to one2many relationships where the other side of the relationship has a field
+pointing back to the object you are searching from.
+
+In any other case the method will croak.
+
+If the search criteria return more than one result it will whine.
+
+=cut
 
 sub find_related {
     my ($self) = shift;
@@ -331,6 +457,14 @@ sub find_related {
     }
 }
 
+=head2 relationship_class
+
+Returns the OpenERP::OOM::Class object for the relationship passed in.
+
+Obviously this only works for the OpenERP relationships.  It will croak
+if you ask for a relationship to a DBIC object.
+
+=cut
 
 sub relationship_class
 {
@@ -345,6 +479,19 @@ sub relationship_class
     croak "Unable to find relation $relationship";
 }
 
+=head2 search_related
+
+Searches for objects of a relation associated with this object.
+
+    my @lines = $po->search_related('order_lines', [ 'state', '=', 'draft' ]);
+
+This only works with relationships to OpenERP objects (i.e. not DBIC) and 
+to one2many relationships where the other side of the relationship has a field
+pointing back to the object you are searching from.
+
+In any other case the method will croak.
+
+=cut
 
 sub search_related {
     my ($self, $relation_name, @search) = @_;
@@ -398,6 +545,16 @@ sub search_related {
 
 #-------------------------------------------------------------------------------
 
+=head2 add_related
+
+Adds a related or linked object to a one2many, many2many, or multiple relationship.
+
+ my $partner  = $schema->class('Partner')->find(...);
+ my $category = $schema->class('PartnerCategory')->find(...);
+
+ $partner->add_related('category', $category);
+
+=cut
 
 sub add_related {
     my ($self, $relation_name, $object) = @_;
@@ -425,6 +582,11 @@ sub add_related {
 
 #-------------------------------------------------------------------------------
 
+=head2 set_related
+
+Like the DBIx::Class set_related.  Sets up a link to a related object.
+
+=cut
 
 sub set_related {
     my ($self, $relation_name, $object) = @_;
@@ -460,6 +622,19 @@ sub set_related {
     }
 }
 
+=head2 execute_workflow
+
+Performs an exec_workflow in OpenERP.  
+
+    $self->execute_workflow('purchase_confirm');
+
+Is likely to translate to something like this,
+
+    # DEBUG_RPC:rpc.request:('exec_workflow', 'db', 1, '*', ('purchase.order', 'purchase_confirm', 24))
+
+The 24 is the id of the object.
+
+=cut
 
 sub execute_workflow
 {
@@ -476,6 +651,19 @@ sub execute_workflow
     };
 }
 
+=head2 execute
+
+Performs an execute in OpenERP.  
+
+    $self->execute('action_process');
+
+Is likely to translate to something like this,
+
+    # DEBUG_RPC:rpc.request:('execute', 'gooner', 1, '*', ('stock.picking', 'action_process', [26], {'lang': 'en_GB', 'search_default_available': 1, 'active_ids': [316], 'tz': False, 'active_model': 'ir.ui.menu', 'section_id': False, 'contact_display': 'partner_address', 'project_id': False, 'active_id': 316}))
+
+The 26 is the id of the object.
+
+=cut
 
 sub execute
 {
@@ -491,6 +679,22 @@ sub execute
     return $retval;
 }
 
+=head2 executex
+
+Similar to execute but it allows you to specify any number of parameters.
+
+Primarily created to prevent any compatibility problems with other callers.
+Although I'm not entirely sure if there are any.
+
+    $self->executex('add_invoices_to_payment', [1,2], [3,4]);
+
+Translates roughly to 
+
+    execute_kw(..., 'payment.order', 'add_invoices_to_payment', [5], [1, 2], [3, 4])
+
+Stick a hash on the end of the list of params to pass a context object.
+
+=cut
 
 sub executex
 {
@@ -505,6 +709,15 @@ sub executex
     return $retval;
 }
 
+=head2 get_report
+
+To print a purchase order we need to send a report, then get it, then display it, then print it (and you don't want to know about all the traffic behind the scenes...)
+
+The first step looks like this:
+
+    # DEBUG_RPC:rpc.request:('report', 'aquarius_openerp_jj_staging', 1, '*', (u'purchase.quotation', [1], {'model': u'purchase.order', 'id': 1, 'report_type': u'pdf'}, {'lang': u'en_GB', 'active_ids': [1], 'tz': False, 'active_model': u'purchase.order', 'section_id': False, 'search_default_draft': 1, 'project_id': False, 'active_id': 1}))
+
+=cut
 
 sub get_report
 {
@@ -531,225 +744,3 @@ sub get_report
 
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-OpenERP::OOM::Object::Base
-
-=head1 VERSION
-
-version 0.46
-
-=head1 DESCRIPTION
-
-Provides a base set of properties and methods for OpenERP::OOM objects (update, delete, etc).
-
-=head1 NAME
-
-OpenERP::OOM::Class::Base
-
-=head1 SYNOPSYS
-
- my $obj = $schema->class('Name')->create(\%args);
-
- :say $obj->id;
-
- $obj->name('New name');
- $obj->update;
-
- $obj->delete;
-
-=head1 PROPERTIES
-
-=head2 id
-
-Returns the OpenERP ID of an object.
-
- say $obj->id;
-
-=head2 BUILD
-
-The BUILD method sets up the methods for the links to the attached objects.
-
-=head1 METHODS
-
-=head2 update
-
-Updates an object in OpenERP after its properties have been changed.
-
- $obj->name('New name');
- $obj->update;
-
-Also allows a hashref to be passed to update multiple properties:
-
- $obj->update({
-    name  => 'new name',
-    ref   => 'new reference',
-    price => 'new price',
- });
-
-=head2 update_single
-
-Updates OpenERP with a single property of an object.
-
- $obj->name('New name');
- $obj->status('Active');
-
- $obj->update_single('name');  # Only the 'name' property is updated
-
-=head2 refresh
-
-Reloads an object's properties from OpenERP.
-
- $obj->refresh;
-
-=head2 delete
-
-Deletes an object from OpenERP.
-
- my $obj = $schema->class('Partner')->retrieve(60);
- $obj->delete;
-
-=head2 copy
-
-Clone the current object, returning the new object.
-
-This is equivalent to pressing duplicate in the OpenERP user interface.
-
-=head2 print
-
-This is a debug method.
-
-=head2 real_create_related
-
-This actually does the create related via OpenERP.
-
-I'm not sure in what scenarios you should use it versus the scenario's you 
-shouldn't.  Suck it and see.
-
-It will create calls like this,
-
-# DEBUG_RPC:rpc.request:('execute', 'db', 1, '*', ('stock.partial.picking', 'write', [1], {'product_moves_out': [(0, 0, {'prodlot_id': False, 'product_id': 16, 'product_uom': 1, 'quantity': 10.0})]}, {'lang': 'en_GB', 'search_default_available': 1, 'project_id': False, 'tz': False, '__last_update': {'stock.partial.picking,1': False}, 'active_model': 'ir.ui.menu', 'section_id': False, 'contact_display': 'partner_address', 'active_ids': [3], 'active_id': 316}))
-
-Note that it will not return the object created.
-
-=head2 create_related
-
-Creates a related or linked object.
-
- $obj->create_related('address',{
-     street   => 'Drury Lane',
-     postcode => 'CV21 3DE',
- });
-
-=head2 find_related
-
-Finds a property related to the current object.
-
-    my $line = $po->find_related('order_lines', [ 'id', '=', 1 ]);
-
-This only works with relationships to OpenERP objects (i.e. not DBIC) and 
-to one2many relationships where the other side of the relationship has a field
-pointing back to the object you are searching from.
-
-In any other case the method will croak.
-
-If the search criteria return more than one result it will whine.
-
-=head2 relationship_class
-
-Returns the OpenERP::OOM::Class object for the relationship passed in.
-
-Obviously this only works for the OpenERP relationships.  It will croak
-if you ask for a relationship to a DBIC object.
-
-=head2 search_related
-
-Searches for objects of a relation associated with this object.
-
-    my @lines = $po->search_related('order_lines', [ 'state', '=', 'draft' ]);
-
-This only works with relationships to OpenERP objects (i.e. not DBIC) and 
-to one2many relationships where the other side of the relationship has a field
-pointing back to the object you are searching from.
-
-In any other case the method will croak.
-
-=head2 add_related
-
-Adds a related or linked object to a one2many, many2many, or multiple relationship.
-
- my $partner  = $schema->class('Partner')->find(...);
- my $category = $schema->class('PartnerCategory')->find(...);
-
- $partner->add_related('category', $category);
-
-=head2 set_related
-
-Like the DBIx::Class set_related.  Sets up a link to a related object.
-
-=head2 execute_workflow
-
-Performs an exec_workflow in OpenERP.  
-
-    $self->execute_workflow('purchase_confirm');
-
-Is likely to translate to something like this,
-
-    # DEBUG_RPC:rpc.request:('exec_workflow', 'db', 1, '*', ('purchase.order', 'purchase_confirm', 24))
-
-The 24 is the id of the object.
-
-=head2 execute
-
-Performs an execute in OpenERP.  
-
-    $self->execute('action_process');
-
-Is likely to translate to something like this,
-
-    # DEBUG_RPC:rpc.request:('execute', 'gooner', 1, '*', ('stock.picking', 'action_process', [26], {'lang': 'en_GB', 'search_default_available': 1, 'active_ids': [316], 'tz': False, 'active_model': 'ir.ui.menu', 'section_id': False, 'contact_display': 'partner_address', 'project_id': False, 'active_id': 316}))
-
-The 26 is the id of the object.
-
-=head2 executex
-
-Similar to execute but it allows you to specify any number of parameters.
-
-Primarily created to prevent any compatibility problems with other callers.
-Although I'm not entirely sure if there are any.
-
-    $self->executex('add_invoices_to_payment', [1,2], [3,4]);
-
-Translates roughly to 
-
-    execute_kw(..., 'payment.order', 'add_invoices_to_payment', [5], [1, 2], [3, 4])
-
-Stick a hash on the end of the list of params to pass a context object.
-
-=head2 get_report
-
-To print a purchase order we need to send a report, then get it, then display it, then print it (and you don't want to know about all the traffic behind the scenes...)
-
-The first step looks like this:
-
-    # DEBUG_RPC:rpc.request:('report', 'aquarius_openerp_jj_staging', 1, '*', (u'purchase.quotation', [1], {'model': u'purchase.order', 'id': 1, 'report_type': u'pdf'}, {'lang': u'en_GB', 'active_ids': [1], 'tz': False, 'active_model': u'purchase.order', 'section_id': False, 'search_default_draft': 1, 'project_id': False, 'active_id': 1}))
-
-=head1 AUTHOR
-
-Jon Allen (JJ), <jj@opusvl.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011-2016 by OpusVL.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

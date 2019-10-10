@@ -109,8 +109,8 @@ One or more stream URLs can be returned for each station.
 Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
 new station object, or I<undef> if the URL is not a valid IHeart station or 
 podcast, or no streams are found.  The URL can be the full URL, 
-ie. https://www.iheart.com/live/I<station-id>, 
-https://www.iheart.com/podcast/I<podcast-id>/episode/I<episode-id>, or just 
+ie. https://www.iheart.com/live/B<station-id>, 
+https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, or just 
 I<station-id>, or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, you must 
 include the I<episode-id> if not specifying a full URL, otherwise, the 
 I<podcast-id> will be interpreted as a I<station-id>!

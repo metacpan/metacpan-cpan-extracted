@@ -11,7 +11,7 @@ use Sentry::Raven;
 sub startup {
     my $app = shift;
     $app->plugin("ErrorTracking::Sentry",
-        sentry_dsn => 'http://<publickey>:<secretkey>@app.getsentry.com/<projectid>',
+        sentry_dsn => 'http://<publickey>:<secretkey>@example.com/<projectid>',
         on_error => sub {
             my $c = shift;
             my %user_context = Sentry::Raven->user_context(

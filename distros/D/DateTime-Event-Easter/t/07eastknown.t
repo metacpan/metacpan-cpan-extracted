@@ -28,7 +28,7 @@
 #
 use strict;
 
-use Test::More tests => 250;
+use Test::More;
 
 use DateTime::Event::Easter qw/easter/;
 
@@ -285,10 +285,49 @@ my %known_easter_dates = (
         '2124' => '2124-04-09',
 );
 
+plan(tests => 12 + keys %known_easter_dates);
+
 my $eastern_easter = DateTime::Event::Easter->new(easter=>'eastern');
 
 foreach my $key (sort keys %known_easter_dates) {
-        my $dt = DateTime->new(year=>$key, month=>1, day=>1);
+        my $dt = DateTime->new(year => $key, month => 1, day => 1);
         is ($eastern_easter->following($dt)->ymd, $known_easter_dates{$key}, "$key: Correct Easter date");
 }
 
+# A few more test for a better code coverage
+my ($y, $m, $d) = $known_easter_dates{2019} =~ /^(\d+)-(\d+)-(\d+)$/;
+my $expected_jul = DateTime::Calendar::Julian->from_object(object => DateTime->new(year => $y, month => $m, day => $d));
+
+my $dt = DateTime->new(year  => 2019
+                     , month =>    1
+                     , day   =>    1);
+is($eastern_easter->following($dt)->ymd, $known_easter_dates{2019}, "Correct Easter date following a Gregorian date");
+is($eastern_easter->closest  ($dt)->ymd, $known_easter_dates{2019}, "Correct Easter date closest to a Gregorian date");
+$dt = DateTime->new(year  => 2019
+                  , month =>    6
+                  , day   =>   30);
+is($eastern_easter->previous($dt)->ymd, $known_easter_dates{2019}, "Correct Easter date before a Gregorian date");
+is($eastern_easter->closest ($dt)->ymd, $known_easter_dates{2019}, "Correct Easter date closest to a Gregorian date");
+
+$dt = DateTime::Calendar::Julian->new(year  => 2019
+                                    , month =>    1
+                                    , day   =>    1);
+is($eastern_easter->following($dt)->ymd, $expected_jul->ymd, "Correct Easter date following a Julian date");
+is($eastern_easter->closest  ($dt)->ymd, $expected_jul->ymd, "Correct Easter date closest to a Julian date");
+$dt = DateTime::Calendar::Julian->new(year  => 2019
+                                    , month =>    6
+                                    , day   =>   30);
+is($eastern_easter->previous($dt)->ymd, $expected_jul->ymd, "Correct Easter date before a Julian date");
+is($eastern_easter->closest ($dt)->ymd, $expected_jul->ymd, "Correct Easter date closest to a Julian date");
+
+$dt = DateTime::Calendar::Julian->new(year  => 2019
+                                    , month =>    4
+                                    , day   =>   15);
+ok($eastern_easter->is($dt), "Checking that a Julian date is Easter");
+is($eastern_easter->closest ($dt)->ymd, $expected_jul->ymd, "Correct Easter date closest to a Julian date");
+
+$dt = DateTime->new(year  => 2019
+                  , month =>    4
+                  , day   =>   28);
+ok($eastern_easter->is($dt), "Checking that a Gregorian date is Easter");
+is($eastern_easter->closest ($dt)->ymd, $known_easter_dates{2019}, "Correct Easter date closest to a Gregorian date");

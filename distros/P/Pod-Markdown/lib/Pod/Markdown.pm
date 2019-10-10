@@ -12,14 +12,15 @@ use strict;
 use warnings;
 
 package Pod::Markdown;
-# git description: v3.100-2-g1399a61
+# git description: v3.101-3-g70682ef
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Convert POD to Markdown
-$Pod::Markdown::VERSION = '3.101';
+$Pod::Markdown::VERSION = '3.200';
 use Pod::Simple 3.27 (); # detected_encoding and keep_encoding bug fix
 use parent qw(Pod::Simple::Methody);
 use Encode ();
+use URI::Escape ();
 
 our %URL_PREFIXES = (
   sco      => 'http://search.cpan.org/perldoc?',
@@ -1050,16 +1051,20 @@ sub format_man_url {
 sub format_perldoc_url {
   my ($self, $name, $section) = @_;
 
-  my $url_prefix = defined($name)
+  my $url_prefix = $self->perldoc_url_prefix;
+  if (
+    defined($name)
     && $self->is_local_module($name)
-    && $self->local_module_url_prefix
-    || $self->perldoc_url_prefix;
+    && defined($self->local_module_url_prefix)
+  ) {
+    $url_prefix = $self->local_module_url_prefix;
+  }
 
   my $url = '';
 
   # If the link is to another module (external link).
   if ($name) {
-    $url = $url_prefix . $name;
+    $url = $url_prefix . URI::Escape::uri_escape($name);
   }
 
   # See https://rt.cpan.org/Ticket/Display.html?id=57776
@@ -1197,7 +1202,7 @@ Pod::Markdown - Convert POD to Markdown
 
 =head1 VERSION
 
-version 3.101
+version 3.200
 
 =for test_synopsis my ($pod_string);
 

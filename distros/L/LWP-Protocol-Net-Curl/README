@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.025
+    version 0.026
 
 SYNOPSIS
 
@@ -148,6 +148,8 @@ COPYRIGHT AND LICENSE
 CONTRIBUTORS
 
       * José Joaquín Atria <jjatria@gmail.com>
+
+      * Nick Kostyria <kostirya@gmail.com>
 
       * Peter Williams <pjwilliams@gmail.com>
 

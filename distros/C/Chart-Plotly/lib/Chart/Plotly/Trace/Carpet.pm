@@ -9,10 +9,9 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Carpet::Aaxis;
 use Chart::Plotly::Trace::Carpet::Baxis;
 use Chart::Plotly::Trace::Carpet::Font;
-use Chart::Plotly::Trace::Carpet::Hoverlabel;
 use Chart::Plotly::Trace::Carpet::Stream;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: The data describing carpet axis layout is set in `y` and (optionally) also `x`. If only `y` is present, `x` the plot is interpreted as a cheater plot and is filled in using the `y` values. `x` and `y` may either be 2D arrays matching with each dimension matching that of `a` and `b`, or they may be 1D arrays with total length equal to that of `a` and `b`.
 
@@ -92,7 +91,7 @@ has carpet => (
     is  => "rw",
     isa => "Str",
     documentation =>
-      "An identifier for this carpet, so that `scattercarpet` and `scattercontour` traces can specify a carpet plot on which they lie",
+      "An identifier for this carpet, so that `scattercarpet` and `contourcarpet` traces can specify a carpet plot on which they lie",
 );
 
 has cheaterslope => (
@@ -133,21 +132,6 @@ has db => ( is            => "rw",
 
 has font => ( is  => "rw",
               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Font", );
-
-has hoverinfo => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
-    documentation =>
-      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
-);
-
-has hoverinfosrc => ( is            => "rw",
-                      isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
-);
-
-has hoverlabel => ( is  => "rw",
-                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Hoverlabel", );
 
 has ids => (
     is  => "rw",
@@ -255,7 +239,7 @@ Chart::Plotly::Trace::Carpet - The data describing carpet axis layout is set in 
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -341,7 +325,7 @@ Sets the source reference on plot.ly for  b .
 
 =item * carpet
 
-An identifier for this carpet, so that `scattercarpet` and `scattercontour` traces can specify a carpet plot on which they lie
+An identifier for this carpet, so that `scattercarpet` and `contourcarpet` traces can specify a carpet plot on which they lie
 
 =item * cheaterslope
 
@@ -368,16 +352,6 @@ Sets the a coordinate step. See `a0` for more info.
 Sets the b coordinate step. See `b0` for more info.
 
 =item * font
-
-=item * hoverinfo
-
-Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
-
-=item * hoverinfosrc
-
-Sets the source reference on plot.ly for  hoverinfo .
-
-=item * hoverlabel
 
 =item * ids
 

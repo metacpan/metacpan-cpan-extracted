@@ -1,0 +1,9 @@
+Revision history for Dir-Flock
+
+0.02	2019-10-07
+	Support shared locks.
+	Support scoping semantics.
+	Support block semantics.
+
+0.01	2019-10-02
+	Initial version. Exclusive advisory locks on writeable directories.

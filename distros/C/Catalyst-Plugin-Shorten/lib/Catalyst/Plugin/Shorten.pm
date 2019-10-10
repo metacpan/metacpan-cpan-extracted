@@ -1,5 +1,5 @@
 package Catalyst::Plugin::Shorten;
-use 5.006; use strict; use warnings; our $VERSION = '0.05';
+use 5.006; use strict; use warnings; our $VERSION = '0.06';
 
 use Bijection qw/all/;
 use Scalar::Util qw/reftype/;
@@ -24,7 +24,7 @@ sub setup {
 	$ukey = $config->{map}->{uri} || 'uri';
 	$short = $config->{map}->{s} || 's';
 
-	1;
+	$c->next::method(@_);	
 }
 
 sub shorten {
@@ -133,7 +133,7 @@ Catalyst::Plugin::Shorten - The great ancient URI shortner!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

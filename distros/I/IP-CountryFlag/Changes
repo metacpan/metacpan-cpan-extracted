@@ -1,5 +1,11 @@
 Revision history for IP::CountryFlag
 
+0.14    Tue Oct 08 14:40:00 2019
+        - Merged PR #1, thanks @petr.
+
+0.13    Mon Oct 07 15:50:00 2019
+        - Moved author test scripts to xt/ subfolder.
+
 0.12    Mon Oct 23 11:10:00 2017
         - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

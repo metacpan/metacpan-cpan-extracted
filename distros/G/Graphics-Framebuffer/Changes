@@ -1512,3 +1512,10 @@ Revision history for Graphics-Framebuffer
 6.35  Sept 9, 2019
 
       Yet another adventure in File::Map.  Now using the ":map" tag to import.
+
+6.36  Oct 7, 2019
+
+      $VERSION is no longer exported.  This caused issues with other modules.
+      
+      Multiprocesssing examples now have been moved to their own directory in
+      examples.

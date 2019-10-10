@@ -1,9 +1,9 @@
 # Libssh::Session - Secure Shell protocol interface
 
 Libssh::Session is a perl interface to the libssh library : https://www.libssh.org/
-It supports the authentification on a SSH server and command execution. 
+It supports the authentification on a SSH server, command execution and some sftp capabilities.
 
-It's still in working progress.
+It's still in working progress (but it's functional ;)
 
 ### MODULE DEPENDENCIES
 

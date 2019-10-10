@@ -100,13 +100,13 @@ the open-source "audacious" audio player.  "fauxdacious" incorporates this
 module to decode and play podcasts.apple.com streams.
 
 NOTE:  The URL must be either a podcast site, format:  
-https://podcasts.apple.com/I<country>/podcast/I<podcaster-description>/idI<podcast#>?i=I<episode#> 
+https://podcasts.apple.com/I<country>/podcast/idB<podcast#> 
 (returns stream(s) for all "episodes" for that site, OR a specific podcast / 
 "episode" page site, format:  
-https://podcasts.apple.com/I<country>/podcast/I<podcaster-description>/idI<podcast#> 
+https://podcasts.apple.com/I<country>/podcast/idB<podcast#>?i=B<episode#> 
 (returns a single stream for that specific podcast).  Music samples also 
-seem to work using the format (with or without the ?i=I<song#> part):  
-https://music.apple.com/I<country>/album/I<album-description>/idI<album#>?i=I<song#>
+seem to work using the format (with or without the ?i=B<song#> part):  
+https://music.apple.com/I<country>/album/I<album-description>/idB<album#>?i=B<song#>
 
 =head1 SUBROUTINES/METHODS
 
@@ -118,7 +118,7 @@ Accepts a podcasts.apple.com ID or URL or music.apple.com URL and creates and
 returns a new podcast object, or I<undef> if the URL is not a valid podcast, 
 album, etc. or no streams are found.  The URL can be the full URL, 
 ie. https://podcasts.apple.com/podcast/idI<podcast-id>, 
-https://podcasts.apple.com/podcast/idI<podcast-id>?i=<episode-id>, or just 
+https://podcasts.apple.com/podcast/idB<podcast-id>?i=B<episode-id>, or just 
 I<podcast-id>, or I<podcast-id>/I<episode-id>.  NOTE:  If the ID is an album 
 or song clip, then the full URL must be given, ie. http://music.apple.com/...
 
@@ -350,8 +350,6 @@ sub new
 	}
 	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
 			unless (defined $uops{'agent'});
-#	push (@userAgentOps, 'ssl_opts', {verify_hostname => 0, SSL_version => 'TLSv1'})
-#			unless (defined $uops{'ssl_opts'});  #THIS STUPID SIGHT FORCES USE OF ANCIENT TLSv1?!
 	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
 	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
 

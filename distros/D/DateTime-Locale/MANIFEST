@@ -375,6 +375,7 @@ lib/DateTime/Locale/fur_IT.pod
 lib/DateTime/Locale/fy.pod
 lib/DateTime/Locale/fy_NL.pod
 lib/DateTime/Locale/ga.pod
+lib/DateTime/Locale/ga_GB.pod
 lib/DateTime/Locale/ga_IE.pod
 lib/DateTime/Locale/gd.pod
 lib/DateTime/Locale/gd_GB.pod
@@ -1132,6 +1133,7 @@ share/fur-IT.pl
 share/fur.pl
 share/fy-NL.pl
 share/fy.pl
+share/ga-GB.pl
 share/ga-IE.pl
 share/ga.pl
 share/gd-GB.pl

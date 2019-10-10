@@ -1,5 +1,9 @@
 Revision history for MojoX-Log-Log4perl
 
+0.12    2019-10-07
+    - basic support for Mojo::Log's context(), to prevent
+      the default page from croaking (Adam Schobelock)
+
 0.11    2016-05-30
     - show format() warning only once per run (thanks Chris Foote
       for reporting the issue and Brad Macpherson for the patch)

@@ -6,7 +6,7 @@ use Catmandu::AlephX;
 use JSON qw(to_json);
 use open qw(:std :utf8);
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my $illgetdoc = $aleph->ill_get_doc(doc_number => '001317121',library=>'rug01');
 if($illgetdoc->is_success){
@@ -20,4 +20,4 @@ if($illgetdoc->is_success){
 
 }else{
   say STDERR join('',@{$illgetdoc->errors});
-} 
+}

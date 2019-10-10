@@ -13,7 +13,7 @@ use Catmandu::AlephX::XPath::Helper qw(:all);
 use Clone qw(clone);
 
 sub alephx {
-  state $a = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+  state $a = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 }
 
 my $file = shift;

@@ -49,7 +49,6 @@
             "Encode" : "1.50",
             "Exporter" : "0",
             "Filter::Simple" : "0",
-            "List::Util" : "0",
             "Math::Complex" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
@@ -72,11 +71,11 @@
    "provides" : {
       "Math::Calc::Parser" : {
          "file" : "lib/Math/Calc/Parser.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       },
       "ath" : {
          "file" : "lib/ath.pm",
-         "version" : "1.004"
+         "version" : "1.005"
       }
    },
    "release_status" : "stable",
@@ -91,10 +90,10 @@
          "web" : "https://github.com/Grinnz/Math-Calc-Parser"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028000"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -142,7 +141,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -158,7 +157,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.14.5",
+                  "git_version" : "2.20.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -194,12 +193,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.5",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::DBOOK/Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion",
@@ -263,7 +262,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.5",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -271,7 +270,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::Commit",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -280,12 +279,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.004",
+                  "tag" : "1.005",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.5",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -293,7 +292,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -328,7 +327,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.5",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -336,7 +335,7 @@
                }
             },
             "name" : "@Author::DBOOK/Commit_Version_Bump",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -348,12 +347,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.5",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::DBOOK/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -395,7 +394,7 @@
                }
             },
             "name" : "@Author::DBOOK/Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Regenerate::AfterReleasers",
@@ -485,8 +484,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@Author::DBOOK/InstallGuide",
-            "version" : "1.200012"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
@@ -576,7 +581,7 @@
       "Dan Book <grinnz@gmail.com>",
       "Dan Book <grinnz@grinnz.com>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

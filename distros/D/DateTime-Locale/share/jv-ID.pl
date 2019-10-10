@@ -28,7 +28,7 @@
     MEd => "E dd/MM",
     MMM => "LLL",
     MMMEd => "E, d MMM",
-    "MMMMW-count-other" => "'pekan' W 'saka' MMMM",
+    "MMMMW-count-other" => "'pekan' W 'ing' MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "dd/MM",
@@ -49,7 +49,7 @@
     yMd => "dd-MM-y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'pekan' w 'saka' Y",
+    "yw-count-other" => "'pekan' w 'ing' Y",
   },
   code => "jv-ID",
   date_format_full => "EEEE, d MMMM y",
@@ -67,7 +67,7 @@
     "Kam",
     "Jum",
     "Sab",
-    "Ahd",
+    "Ahad",
   ],
   day_format_narrow => [
     "S",
@@ -94,7 +94,7 @@
     "Kam",
     "Jum",
     "Sab",
-    "Ahd",
+    "Ahad",
   ],
   day_stand_alone_narrow => [
     "S",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 35,
+  version => 36,
 }

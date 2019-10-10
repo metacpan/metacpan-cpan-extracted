@@ -104,8 +104,6 @@ The only options supported at this time are:
 if specified, the canonicalized message for the first signature
 is written to the referenced string or file handle.
 
-=back
-
 =item Strict
 
 If true, rejects sha1 hashes and signing keys shorter than 1024 bits.
@@ -117,7 +115,7 @@ If true, rejects sha1 hashes and signing keys shorter than 1024 bits.
 package Mail::DKIM::Verifier;
 use base 'Mail::DKIM::Common';
 use Carp;
-our $VERSION                   = 0.56;
+our $VERSION                   = 0.57;
 our $MAX_SIGNATURES_TO_PROCESS = 50;
 
 sub init {

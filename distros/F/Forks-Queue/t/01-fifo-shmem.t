@@ -5,7 +5,7 @@ use lib '.';   # 5.26 compat
 require "t/exercises.tt";
 
 PREP('Shmem');
-my $qfile = "$Forks::Queue::Shmem::DEV_SHM/q1m-$$";
+my $qfile = do { no warnings 'once'; "$Forks::Queue::Shmem::DEV_SHM/q1m-$$" };
 
 unlink $qfile;
 ok(! -f $qfile, 'queue file does not exist yet');

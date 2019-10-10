@@ -21,7 +21,7 @@ sub read_password {
     return $password;
 }
 
-my $aleph = Catmandu::AlephX->new(url => "http://aleph.ugent.be/X");
+my $aleph = Catmandu::AlephX->new(url => "http://borges1.ugent.be/X");
 
 my $file;
 my($library,$bor_id,$verification);
@@ -67,8 +67,8 @@ if($info->is_success){
     say sprintf("\t%20s : %s",$key,$val);
   }
 
-  
+
 }else{
   say STDERR "error: ".join('',@{$info->errors});
   exit 1;
-} 
+}

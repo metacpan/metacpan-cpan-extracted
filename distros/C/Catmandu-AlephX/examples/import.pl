@@ -8,7 +8,7 @@ use open qw(:std :utf8);
 
 my $i = 1;
 Catmandu::Importer::AlephX->new(
-  url => 'http://aleph.ugent.be/X',
+  url => 'http://borges1.ugent.be/X',
   query => 'WRD=(all)',
   base => 'usm01',
   include_items => 0,

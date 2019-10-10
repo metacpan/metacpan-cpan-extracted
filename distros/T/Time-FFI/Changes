@@ -1,3 +1,30 @@
+1.003     2019-10-10 17:33:23 EDT
+  - Clarify that mktime may adjust any elements of the passed tm record.
+  - Renamed with_extra method for Time::FFI::tm to normalized and clarify that
+    it also normalizes out-of-range values when interpreting as local time.
+  - Allow epoch and to_object methods for Time::FFI::tm to normalize
+    out-of-range values when interpreting as local time.
+
+1.002     2019-10-10 16:17:27 EDT
+  - Added timelocal and timegm functions where available.
+
+1.001     2019-10-10 13:58:11 EDT
+  - Added from_object constructor for Time::FFI::tm.
+
+1.000     2019-10-10 12:19:57 EDT
+  - Fixed bugs in Time::FFI::tm->to_object where the tm object may be mutated
+    and the results may be incorrect when interpreted in the local time zone.
+  - Documented that the tm_mday and tm_isdst members of a new Time::FFI::tm
+    record should be set explicitly.
+  - Documented that mktime adjusts the tm_isdst, tm_wday, tm_yday, and possibly
+    tm_gmtoff and tm_zone members of the passed tm record.
+  - Initialize tm_mday to 1 and tm_isdst to -1 in the tm record returned by
+    strptime, rather than the defaults of 0.
+  - Added epoch method to Time::FFI::tm to return the associated Unix epoch
+    timestamp.
+  - Added with_extra method to Time::FFI::tm to return a new tm record with
+    extra values populated.
+
 0.002     2019-07-05 12:42:42 EDT
   - Skip strptime tests when the function is not provided by the system
 

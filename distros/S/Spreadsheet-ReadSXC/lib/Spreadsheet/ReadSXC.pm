@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(read_sxc read_sxc_fh read_xml_file read_xml_string);
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Archive::Zip ':ERROR_CODES';
 use XML::Parser;
@@ -139,6 +139,22 @@ sub handle_start {
     elsif ( $element eq "table:table" ) {
 # get name of current table
         $table = $attributes{'table:name'};
+
+# Reset all the internal value-keepers
+        $row = -1;
+        $col = -1;
+        $text_p = -1;
+        @cell = ();
+        $repeat_cells = 1;
+        $repeat_rows = 1;
+        $row_hidden = 0;
+        $date_value = '';
+        $time_value = '';
+        $currency_value = '';
+        $max_datarow = -1;
+        $max_datacol = -1;
+        $col_count = -1;
+        @hidden_cols = ();
     }
 }
 
@@ -146,7 +162,9 @@ sub handle_end {
     my ($expat, $element) = @_;
     if ( $element eq "text:p" ) {
         if( ! $expat->within_element('office:annotation') ) {
-            $cell[ $text_p ] ||= undef;
+            if( ! defined $cell[ $text_p ] ) {
+                $cell[ $text_p ] = undef
+            };
         };
     }
     elsif ( $element eq "table:table") {

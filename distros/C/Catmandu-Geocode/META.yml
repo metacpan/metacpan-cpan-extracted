@@ -3,13 +3,14 @@ abstract: 'Catmandu modules for the Google Maps geocoding api'
 author:
   - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
 build_requires:
-  Test::Exception: '0.32'
-  Test::More: '1.001003'
-  Test::Simple: '1.001003'
+  JSON: '2.90'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,20 +18,23 @@ meta-spec:
 name: Catmandu-Geocode
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Catmandu: '0'
+  Catmandu: '1.2001'
   Geo::Coder::Google: '0'
+  Moo: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Geocode/issues
   homepage: https://github.com/LibreCat/Catmandu-Geocode
   repository: https://github.com/LibreCat/Catmandu-Geocode.git
-version: '0.01'
+version: '0.02'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

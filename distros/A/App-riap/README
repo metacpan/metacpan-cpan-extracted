@@ -2,7 +2,7 @@ NAME
     App::riap - Riap command-line client shell
 
 VERSION
-    version 0.37
+    version 0.380
 
 SYNOPSIS
     Use the provided riap script.
@@ -10,6 +10,9 @@ SYNOPSIS
 DESCRIPTION
     This is the backend/implementation of the "riap" script.
 
+ENVIRONMENT
+  COLOR
+  NO_COLOR
 SEE ALSO
     Perinci::Access
 
@@ -19,7 +22,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

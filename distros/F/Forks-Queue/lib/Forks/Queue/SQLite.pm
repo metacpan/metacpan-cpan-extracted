@@ -9,7 +9,7 @@ use Time::HiRes 'time';
 use base 'Forks::Queue';
 use 5.010;    #  implementation contains  // //=  operators
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
 *XDEBUG = \$Forks::Queue::XDEBUG;
@@ -26,10 +26,10 @@ sub new {
         croak "Forks::Queue::SQLite: db_file opt required with join";
     }
     if ($opts{file} && !$opts{db_file}) {
-        carp "file => passed to FQ::SQLite constructor! ",
+        carp "file => passed to Forks::Queue::SQLite constructor! ",
              "You probably meant db_file => ... !";
     }
-    $opts{db_file} //= _impute_file();
+    $opts{db_file} //= _impute_file();  # $opts{file} = $opts{db_file};
     $opts{limit} //= -1;
     $opts{on_limit} //= 'fail';
     $opts{style} //= 'fifo';
@@ -51,7 +51,7 @@ sub new {
                                "", "");
         $self->{_dbh} = $opts{_dbh} = $dbh;
         if (!eval { $self->_init }) {
-            carp "Forks::Queue::SQLite: db initialization failed";
+            carp __PACKAGE__, ": db initialization failed";
             return;
         }
     } else {
@@ -96,26 +96,26 @@ sub _init {
                            timestamp decimal(27,15), batchid mediumint,
                            item text)");
     if (!$z1) {
-        carp "Forks::Queue::SQLite: error creating init table";
+        carp __PACKAGE__, ": error creating init table";
         return;
     }
 
     my $z2 = $dbh->do("CREATE TABLE pids (pid mediumint,tid mediumint)");
     if (!$z2) {
-        carp "Forks::Queue::SQLite: error creating init table";
+        carp __PACKAGE__, ": error creating init table";
         return;
     }
 
     my $sth = $dbh->prepare("INSERT INTO pids VALUES (?,?)");
     my $z3 = $sth->execute(@{$self->{_pid}});
     if (!$z3) {
-        carp "Forks::Queue::SQLite: error adding process id to tracker";
+        carp __PACKAGE__, ": error adding process id to tracker";
         return;
     }
 
     my $z4 = $dbh->do("CREATE TABLE status(key text,value text)");
     if (!$z4) {
-        carp "Forks::Queue::SQLite: error creating init table";
+        carp __PACKAGE__, ": error creating init table";
         return;
     }
 
@@ -155,6 +155,7 @@ sub _dbh {
 sub DESTROY {
     my $self = shift;
     $self->{_DESTROY}++;
+    my $_DEBUG = $self->{debug} // $DEBUG;
     my $dbh = $self->_dbh;
     my $tid = $self->{_pid} ? $self->{_pid}[1] : TID();
     my $t = [[-1]];
@@ -171,16 +172,16 @@ sub DESTROY {
             my $z2 = $sth->execute;
             $t = $sth->fetchall_arrayref;
         } else {
-            $DEBUG && print STDERR "$$ DESTROY: DELETE FROM pids failed\n";
+            $_DEBUG && print STDERR "$$ DESTROY: DELETE FROM pids failed\n";
             $t = [[-2]];
         }
         $dbh->commit;
-        $DEBUG and print STDERR "$$ DESTROY npids=$t->[0][0]\n";
+        $_DEBUG and print STDERR "$$ DESTROY npids=$t->[0][0]\n";
 	1;
     };
     $dbh && eval { $dbh->disconnect };
     if ($t && $t->[0] && $t->[0][0] == 0) {
-        $DEBUG and print STDERR "$$ Unlinking files from here\n";
+        $_DEBUG and print STDERR "$$ Unlinking files from here\n";
         if (!$self->{persist}) {
             sleep 1;
             unlink $self->{db_file};
@@ -205,8 +206,7 @@ sub _status {
         my $z = _try( 3, sub { $sth->execute($key) } );
 
         if (!$z) {
-            carp "Forks::Queue::SQLite: ",
-                 "lookup on status key '$_[0]' failed";
+            carp __PACKAGE__, ": lookup on status key '$_[0]' failed";
             return;
         }
         my $t = $sth->fetchall_arrayref;
@@ -364,6 +364,7 @@ sub _push {
 
     my (@deferred_items,$failed_items);
     my $pushed = 0;
+    my $_DEBUG = $self->{debug} // $DEBUG;
 
     if ($self->_end) {
         carp "Forks::Queue: put call from process $$ ",
@@ -397,10 +398,10 @@ sub _push {
             carp "Forks::Queue: queue buffer is full ",
                 "and $failed_items items were not added";
         } else {
-            $DEBUG && print STDERR "$$ $failed_items on put. ",
+            $_DEBUG && print STDERR "$$ $failed_items on put. ",
                                    "Waiting for capacity\n";
             $self->_wait_for_capacity;
-            $DEBUG && print STDERR "$$ got some capacity\n";
+            $_DEBUG && print STDERR "$$ got some capacity\n";
             $pushed += $self->_push($tfactor,@deferred_items);
         }
     }
@@ -524,6 +525,7 @@ sub insert {
     my ($self, $pos, @items) = @_;
     Forks::Queue::_validate_input($pos,'index');
     my (@deferred_items);
+    my $_DEBUG = $self->{debug} // $DEBUG;
     my $inserted = 0;
     if ($self->_end) {
         carp "Forks::Queue: insert call from process $$ ",
@@ -610,10 +612,10 @@ sub insert {
             carp "Forks::Queue: queue buffer is full and ",
                 0+@deferred_items," items were not inserted";
         } else {
-            $DEBUG && print STDERR "$$ ",0+@deferred_items, " on insert. ",
+            $_DEBUG && print STDERR "$$ ",0+@deferred_items, " on insert. ",
                                    "Waiting for capacity\n";
             $self->_wait_for_capacity;
-            $DEBUG && print STDERR "$$ got some capacity\n";
+            $_DEBUG && print STDERR "$$ got some capacity\n";
             $inserted += $self->insert($pos+$inserted,@deferred_items);
         }
     }
@@ -645,8 +647,7 @@ sub _retrieve {
     #     zero items have been found
 
     if ($lo > 0 && $block) {
-        carp "Forks::Queue::SQLite::_retrieve: "
-            . "didn't expect block=$block and lo=$lo";
+        carp __PACKAGE__, ": _retrieve() didn't expect block=$block and lo=$lo";
         $block = 0;
     }
 
@@ -805,7 +806,7 @@ sub _notify {
     my $pt = $sth->fetchall_arrayref;
     my @pids = map { $_->[0] } grep { $_->[0] != $$ } @$pt;
     if (@pids) {
-        $DEBUG && print STDERR "$$ notify: @pids\n";
+        ($self->{debug} // $DEBUG) && print STDERR "$$ notify: @pids\n";
         kill 'IO', @pids;
     }
     my @tids = map { $_->[1] } grep { $_->[0] == $$ && $_->[1] != TID() } @$pt;
@@ -839,7 +840,7 @@ sub _impute_file {
         }
     }
     my $file = "./fq-$$-$id-$base.sql3";
-    carp "Forks::Queue::SQLite: queue db file $file might not be a good location!";
+    carp __PACKAGE__, ": queue db file $file might not be a good location!";
     return $file;
 }
 
@@ -879,7 +880,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 SYNOPSIS
 

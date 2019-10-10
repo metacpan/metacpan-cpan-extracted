@@ -1,3 +1,6 @@
+1.005     2019-10-08 17:39:15 EDT
+  - Implement factorial operator lazily to avoid running out of memory (#3)
+
 1.004     2018-12-11 17:07:49 EST
   - Increase Math::BigInt, Math::BigFloat, and Math::BigRat versions required
     to enable bignum and bigrat functionality to avoid incompatibilities.

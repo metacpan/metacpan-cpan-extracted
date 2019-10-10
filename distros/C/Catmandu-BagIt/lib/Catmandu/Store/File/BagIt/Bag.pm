@@ -2,13 +2,14 @@ package Catmandu::Store::File::BagIt::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.236';
+our $VERSION = '0.237';
 
 use Moo;
 use Carp;
 use IO::File;
 use Path::Tiny;
 use File::Spec;
+use Catmandu::Sane;
 use Catmandu::BagIt;
 use Catmandu::Util qw(content_type);
 use URI::Escape;
@@ -97,18 +98,29 @@ sub get {
             Catmandu::Error->throw("no io defined or not writable")
                 unless defined($out);
 
+            Catmandu::Error->throw("$out doesn't support syswrite!")
+                    unless $out->can('syswrite');
+
             while (!$data->eof) {
                 my $buffer;
                 $data->read($buffer, 1024);
 
                 my $n = $out->syswrite($buffer);
 
-                if (!defined($n) && $!{EAGAIN}) {
-        		    # would block
+                if ($!{EAGAIN}) {
+                    # no data read, try later
+                    next;
+                }
+                elsif ($!) {
+                    $self->log->error("filesystem error for $file : $!");
+                    Catmandu::Error->throw("filesystem error for $file : $!");
+                }
+                elsif (!defined($n)) {
         		    $n = 0;
         		}
         		elsif ($n != length $buffer) {
-        		    $self->log->error("incomplete write");
+        		    $self->log->error("incomplete write to $file");
+                    Catmandu::Error->throw("incomplete write to $file");
         		}
         		else {
         		    # all is ok

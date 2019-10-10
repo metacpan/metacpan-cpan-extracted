@@ -8,11 +8,10 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Contourcarpet::Colorbar;
 use Chart::Plotly::Trace::Contourcarpet::Contours;
-use Chart::Plotly::Trace::Contourcarpet::Hoverlabel;
 use Chart::Plotly::Trace::Contourcarpet::Line;
 use Chart::Plotly::Trace::Contourcarpet::Stream;
 
-our $VERSION = '0.028';    # VERSION
+our $VERSION = '0.029';    # VERSION
 
 # ABSTRACT: Plots contours on either the first carpet axis or the carpet axis with a matching `carpet` attribute. Data `z` is interpreted as matching that of the corresponding carpet axis.
 
@@ -161,21 +160,6 @@ has fillcolor => (
     documentation =>
       "Sets the fill color if `contours.type` is *constraint*. Defaults to a half-transparent variant of the line color, marker color, or marker line color, whichever is available.",
 );
-
-has hoverinfo => (
-    is  => "rw",
-    isa => "Str|ArrayRef[Str]",
-    documentation =>
-      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
-);
-
-has hoverinfosrc => ( is            => "rw",
-                      isa           => "Str",
-                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
-);
-
-has hoverlabel => ( is  => "rw",
-                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Contourcarpet::Hoverlabel", );
 
 has hovertext => ( is            => "rw",
                    isa           => "ArrayRef|PDL",
@@ -359,7 +343,7 @@ Chart::Plotly::Trace::Contourcarpet - Plots contours on either the first carpet 
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -525,16 +509,6 @@ Sets the y coordinate step. See `y0` for more info.
 =item * fillcolor
 
 Sets the fill color if `contours.type` is *constraint*. Defaults to a half-transparent variant of the line color, marker color, or marker line color, whichever is available.
-
-=item * hoverinfo
-
-Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
-
-=item * hoverinfosrc
-
-Sets the source reference on plot.ly for  hoverinfo .
-
-=item * hoverlabel
 
 =item * hovertext
 

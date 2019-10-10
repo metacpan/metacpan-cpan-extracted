@@ -4,6 +4,7 @@ lib/Forks/Queue.pm
 lib/Forks/Queue/File.pm
 lib/Forks/Queue/Shmem.pm
 lib/Forks/Queue/SQLite.pm
+lib/Dir/Flock.pm
 Makefile.PL
 MANIFEST
 README
@@ -29,6 +30,7 @@ t/06-peek-sqlite.t
 t/07-join-file.t
 t/07-join-shmem.t
 t/07-join-sqlite.t
+t/08-dflock-file.t
 t/10-eol.t
 t/11-clear.t
 t/12-list.t

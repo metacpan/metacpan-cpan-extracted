@@ -17,8 +17,8 @@ DESCRIPTION
 
 uricolor is a Perl script to colorize URIs with ANSI colors.
 It reads files sequentially, and writes them to STDOUT,
-with all URIs colored (underline blue). If file is a dash "-"
-or if no file is given, uricolor reads from STDIN.
+with all URIs colored. If file is a dash "-" or if no file
+is given as argument, uricolor reads from STDIN.
 
 INSTALLATION
 ------------

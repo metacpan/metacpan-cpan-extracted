@@ -117,11 +117,11 @@
   ],
   era_abbreviated => [
     "BCE",
-    "CE",
+    "AD",
   ],
   era_narrow => [
     "BCE",
-    "CE",
+    "AD",
   ],
   era_wide => [
     "Saju Kristi",
@@ -267,5 +267,5 @@
   time_format_medium => "H:m:s",
   time_format_short => "H:m",
   variant => undef,
-  version => 35,
+  version => 36,
 }

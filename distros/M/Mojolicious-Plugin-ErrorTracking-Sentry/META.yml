@@ -1,5 +1,5 @@
 ---
-abstract: 'error traking plugin for Mojolicious with Sentry'
+abstract: 'error tracking plugin for Mojolicious with Sentry'
 author:
   - 'Akira Osada <osd.akira@gmail.com>'
 build_requires:
@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,15 +27,19 @@ no_index:
 provides:
   Mojolicious::Plugin::ErrorTracking::Sentry:
     file: lib/Mojolicious/Plugin/ErrorTracking/Sentry.pm
-    version: v1.0.0
+    version: v1.1.0
 requires:
   Data::Dump: '1.22'
-  Mojolicious: '== 4.86'
-  Sentry::Raven: '== 1.10'
+  Mojolicious: '4.86'
+  Sentry::Raven: '1.10'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry/issues
-  homepage: https://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry
-  repository: git://github.com/osdakira/Mojolicious-Plugin-ErrorTracking-Sentry.git
-version: 1.0.0
-x_authority: cpan:OSDAKIRA
+  bugtracker: https://github.com/infoxchange/Mojolicious-Plugin-ErrorTracking-Sentry/issues
+  homepage: https://github.com/infoxchange/Mojolicious-Plugin-ErrorTracking-Sentry
+  repository: git://github.com/infoxchange/Mojolicious-Plugin-ErrorTracking-Sentry.git
+version: 1.1.0
+x_authority: cpan:XANNI
+x_contributors:
+  - 'Andrew Pam <apam@infoxchange.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

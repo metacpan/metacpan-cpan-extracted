@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 391;
+use Test::More tests => 402;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -799,6 +799,30 @@ SKIP: {
 }
 
 SKIP: {
+	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'proxy.example.org:3128')));
+	if (!$skip_message) {
+		$at_least_one_success = 1;
+	}
+	if ($skip_message) {
+		skip($skip_message, 7);
+	}
+	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	my $capabilities = $firefox->capabilities();
+	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
+	SKIP: {
+		if (!$capabilities->proxy()) {
+			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 4);
+		}
+		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
+		ok($capabilities->proxy()->https() eq 'proxy.example.org:3128', "\$capabilities->proxy()->https() is 'proxy.example.org:3128'");
+		ok($capabilities->proxy()->http() eq 'proxy.example.org:3128', "\$capabilities->proxy()->http() is 'proxy.example.org:3128'");
+		ok($capabilities->proxy()->ftp() eq 'proxy.example.org:3128', "\$capabilities->proxy()->ftp() is 'proxy.example.org:3128'");
+	}
+	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+}
+
+SKIP: {
 	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -1542,7 +1566,7 @@ SKIP: {
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
 	if (out_of_time()) {
-		skip("Running out of time.  Trying to shutdown tests as fast as possible", 33);
+		skip("Running out of time.  Trying to shutdown tests as fast as possible", 36);
 	}
 	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
@@ -1551,13 +1575,49 @@ SKIP: {
 			skip("Firefox below 45 (at least 24) does not support the getContext method", 5);
 		}
 		if (!$firefox->xvfb()) {
-			if (($major_version == 68)
+			my $min_version = '68.0.2';
+			my ($min_major, $min_minor, $min_patch) = split /[.]/, $min_version;
+			if ((($major_version == $min_major)
 					&& (defined $minor_version)
-					&& ($minor_version == 0)
+					&& ($minor_version == $min_minor)
 					&& (defined $patch_version)
-					&& ($patch_version == 2))
+					&& ($patch_version == $min_patch)) 
+					||
+					(($major_version == $min_major)
+					&& (defined $minor_version)
+					&& ($minor_version > $min_minor))
+					||
+					(($major_version == $min_major)
+					&& (defined $minor_version)
+					&& ($minor_version == $min_minor)
+					&& (defined $patch_version)
+					&& ($patch_version > $min_patch)) 
+					||
+					(($major_version > $min_major)))
 			{
-				skip("Firefox 68.0.2 crashes when downloading without xvfb", 5);
+				my $max_version = '70.0.0'; # force check when the major version gets to 70
+				# $max_version = '69.0.1'; # known bad version
+				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
+				if ((($major_version == $max_major)
+						&& (defined $minor_version)
+						&& ($minor_version == $max_minor)
+						&& (defined $patch_version)
+						&& ($patch_version == $max_patch)) 
+						||
+						(($major_version == $max_major)
+						&& (defined $minor_version)
+						&& ($minor_version < $max_minor))
+						||
+						(($major_version == $max_major)
+						&& (defined $minor_version)
+						&& ($minor_version == $max_minor)
+						&& (defined $patch_version)
+						&& ($patch_version < $max_patch)) 
+						||
+						(($major_version < $max_major)))
+				{
+					skip("Firefox $major_version.$minor_version.$patch_version crashes when downloading without xvfb", 5);
+				}
 			}
 		}
 		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download'); })->click(), "Clicked on the download link");
@@ -1840,12 +1900,13 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
+	my $proxy_host = 'all.example.org';
+	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 28);
+		skip($skip_message, 32);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to different values");
 	my $capabilities = $firefox->capabilities();
@@ -1853,6 +1914,16 @@ SKIP: {
         ok($capabilities->timeouts()->page_load() == 78_901, "\$firefox->capabilities()->timeouts()->page_load() correctly reflects the timeouts shortcut timeout");
         ok($capabilities->timeouts()->script() == 76_543, "\$firefox->capabilities()->timeouts()->script() correctly reflects the timeouts shortcut timeout");
         ok($capabilities->timeouts()->implicit() == 34_567, "\$firefox->capabilities()->timeouts()->implicit() correctly reflects the timeouts shortcut timeout");
+	SKIP: {
+		if (!$capabilities->proxy()) {
+			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 4);
+		}
+		ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
+		ok($capabilities->proxy()->ftp() eq "$proxy_host:80", "\$capabilities->proxy()->ftp() is '$proxy_host:80'");
+		ok($capabilities->proxy()->http() eq "$proxy_host:80", "\$capabilities->proxy()->http() is '$proxy_host:80'");
+		ok($capabilities->proxy()->https() eq "$proxy_host:80", "\$capabilities->proxy()->https() is '$proxy_host:80'");
+	}
 	SKIP: {
 		if (!grep /^page_load_strategy$/, $capabilities->enumerate()) {
 			diag("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version());

@@ -2,7 +2,6 @@
 
 use 5.012;
 use warnings;
-use experimentals;
 
 use Test::Expr;
 

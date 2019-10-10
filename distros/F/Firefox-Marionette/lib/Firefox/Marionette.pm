@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -154,7 +154,7 @@ sub _download_directory {
         $directory = $profile->get_value('browser.download.downloadDir');
     };
     if ( $OSNAME eq 'cygwin' ) {
-        $directory = $self->execute( 'cygpath', '-s', '-m', $directory );
+        $directory = $self->execute( {}, 'cygpath', '-s', '-m', $directory );
     }
     return $directory;
 }
@@ -618,7 +618,7 @@ sub _setup_arguments {
           $self->_setup_new_profile( $parameters{profile} );
         if ( $OSNAME eq 'cygwin' ) {
             $profile_directory =
-              $self->execute( 'cygpath', '-s', '-m', $profile_directory );
+              $self->execute( {}, 'cygpath', '-s', '-m', $profile_directory );
         }
         my $mime_types_content = <<'_RDF_';
 <?xml version="1.0"?>
@@ -717,12 +717,7 @@ sub _add_certificates {
                 '-n' => 'Firefox::Marionette Root CA ' . $self->{_trust_count},
                 '-t' => 'TC,,',
             );
-            if ( $self->_ssh() ) {
-                $self->_execute_via_ssh( {}, $binary, @arguments );
-            }
-            else {
-                $self->execute( $binary, @arguments );
-            }
+            $self->execute( {}, $binary, @arguments );
         }
     }
     return;
@@ -843,64 +838,60 @@ sub _is_auto_listen_okay {
 }
 
 sub execute {
-    my ( $proto, $binary, @arguments ) = @_;
-    my ( $writer, $reader, $error );
-    my $pid;
-    eval {
-        $pid =
-          IPC::Open3::open3( $writer, $reader, $error, $binary, @arguments );
-    } or do {
-        Firefox::Marionette::Exception->throw(
-            "Failed to execute '$binary':$EXTENDED_OS_ERROR");
-    };
-    my ( $result, $output );
-    while ( $result = read $reader, my $buffer, _READ_LENGTH_OF_OPEN3_OUTPUT() )
-    {
-        $output .= $buffer;
-    }
-    defined $result
-      or
-      Firefox::Marionette::Exception->throw( q[Failed to read STDOUT from ']
-          . ( join q[ ], $binary, @arguments )
-          . "':$EXTENDED_OS_ERROR" );
-    if ( defined $output ) {
-        chomp $output;
-    }
-    waitpid $pid, 0;
-    if ( $CHILD_ERROR == 0 ) {
-        return $output;
+    my ( $proto, $parameters, $binary, @arguments ) = @_;
+    if ( ( ref $proto ) && ( $proto->_ssh() ) ) {
+        return $proto->_execute_via_ssh( $parameters, $binary, @arguments );
     }
     else {
-        Firefox::Marionette::Exception->throw( q[Failed to execute ']
-              . ( join q[ ], $binary, @arguments ) . q[':]
-              . $proto->_error_message( $binary, $CHILD_ERROR ) );
+        my ( $writer, $reader, $error );
+        my $pid;
+        eval {
+            $pid =
+              IPC::Open3::open3( $writer, $reader, $error, $binary,
+                @arguments );
+        } or do {
+            Firefox::Marionette::Exception->throw(
+                "Failed to execute '$binary':$EXTENDED_OS_ERROR");
+        };
+        my ( $result, $output );
+        while ( $result = read $reader, my $buffer,
+            _READ_LENGTH_OF_OPEN3_OUTPUT() )
+        {
+            $output .= $buffer;
+        }
+        defined $result
+          or
+          Firefox::Marionette::Exception->throw( q[Failed to read STDOUT from ']
+              . ( join q[ ], $binary, @arguments )
+              . "':$EXTENDED_OS_ERROR" );
+        if ( defined $output ) {
+            chomp $output;
+        }
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR == 0 ) {
+            return $output;
+        }
+        else {
+            Firefox::Marionette::Exception->throw( q[Failed to execute ']
+                  . ( join q[ ], $binary, @arguments ) . q[':]
+                  . $proto->_error_message( $binary, $CHILD_ERROR ) );
+        }
+        return;
     }
-    return;
 }
 
 sub _adb_initialise {
     my ($self) = @_;
-    $self->execute( 'adb', 'connect', $self->_adb()->{host} );
+    $self->execute( {}, 'adb', 'connect', $self->_adb()->{host} );
     my $adb_regex = qr/package:(.*(firefox|fennec).*)/smx;
     my $binary    = 'adb';
     my @arguments = qw(shell pm list packages);
     my $package_name;
-    if ( $self->_ssh() ) {
-        foreach my $line ( split /\r?\n/smx,
-            $self->_execute_via_ssh( {}, $binary, @arguments ) )
-        {
-            if ( $line =~ /^$adb_regex$/smx ) {
-                $package_name = $1;
-            }
-        }
-    }
-    else {
-        foreach
-          my $line ( split /\r?\n/smx, $self->execute( $binary, @arguments ) )
-        {
-            if ( $line =~ /^$adb_regex$/smx ) {
-                $package_name = $1;
-            }
+    foreach
+      my $line ( split /\r?\n/smx, $self->execute( {}, $binary, @arguments ) )
+    {
+        if ( $line =~ /^$adb_regex$/smx ) {
+            $package_name = $1;
         }
     }
     return $package_name;
@@ -1001,17 +992,8 @@ sub _initialise_version {
         my $version_string;
         if ( $self->_adb() ) {
             my $package_name = $self->_adb_initialise();
-            my $dumpsys;
-            if ( $self->_ssh() ) {
-                $dumpsys =
-                  $self->_execute_via_ssh( {}, 'adb', 'shell', 'dumpsys',
-                    'package', $package_name );
-            }
-            else {
-                $dumpsys =
-                  $self->execute( 'adb', 'shell', 'dumpsys', 'package',
-                    $package_name );
-            }
+            my $dumpsys      = $self->execute( { master => 1 },
+                'adb', 'shell', 'dumpsys', 'package', $package_name );
             my $found;
             foreach my $line ( split /\r?\n/smx, $dumpsys ) {
                 if ( $line =~ /^[ ]+versionName=$version_regex\s*$/smx ) {
@@ -1028,13 +1010,8 @@ sub _initialise_version {
             }
         }
         else {
-            if ( $self->_ssh() ) {
-                $version_string = $self->_execute_via_ssh( { master => 1 },
-                    $binary, '--version' );
-            }
-            else {
-                $version_string = $self->execute( $binary, '--version' );
-            }
+            $version_string =
+              $self->execute( { master => 1 }, $binary, '--version' );
             if (
                 $version_string =~ /Mozilla[ ]Firefox[ ]$version_regex\s*$/smx )
 
@@ -1516,7 +1493,7 @@ sub _binary {
             elsif ( -e $windows_firefox_path ) {
                 $binary = $windows_firefox_path;
             }
-            $binary = $self->execute( 'cygpath', '-s', '-m', $binary );
+            $binary = $self->execute( {}, 'cygpath', '-s', '-m', $binary );
         }
     }
     return $binary;
@@ -1902,7 +1879,10 @@ sub _setup_new_profile {
     if ($profile) {
     }
     else {
-        my %parameters = ( download_directory => $self->{_download_directory} );
+        my %parameters = (
+            download_directory => $self->{_download_directory},
+            marionette         => $self
+        );
         $profile = Firefox::Marionette::Profile->new(%parameters);
     }
     my $mime_types = join q[,], $self->mime_types();
@@ -4797,7 +4777,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =head1 SYNOPSIS
 

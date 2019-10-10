@@ -1,4 +1,7 @@
 #!perl
+
+# PODNAME: youtube-playlists.pl
+
 use strict;
 use warnings;
 use URI;
@@ -7,6 +10,13 @@ use XML::TreePP;
 use WWW::YouTube::Download;
 use Getopt::Long qw(GetOptions :config bundling);
 use Pod::Usage qw(pod2usage);
+
+my $EOL = <<'EOF';
+This script uses an End Of Lifed API URL.  Patches to fix this would be most welcome.  See https://github.com/xaicron/p5-www-youtube-download/issues/40
+EOF
+
+print $EOL, "\n";
+exit(1);
 
 my $api_url = 'http://gdata.youtube.com/feeds/api';
 
@@ -116,19 +126,18 @@ sub show_version {
     print "youtube-playlists (WWW::YouTube::Download) version $WWW::YouTube::Download::VERSION\n";
     exit;
 }
-__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-youtube-playlists - Find a YouTube video URLs from playlist(s)
+youtube-playlists.pl - Find a YouTube video URLs from playlist(s)
 
-=head1 DESCRIPTION
+=head1 VERSION
 
-For each given argument B<youtube-playlists> generates list of YouTube
-video URLs. Arguments can be URL to playlist or to favorite list, or
-only IDs of a playlist or a favorite list. Because of current
-implementation number of results is limited to 50 video URLs. Deleted
-videos are represented as empty lines.
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -141,6 +150,20 @@ videos are represented as empty lines.
 
   # with socks proxy
   $ youtube-playlists -p socks://<some IP>:<some port>/ PLB199169FA7413767
+
+=head1 DESCRIPTION
+
+For each given argument B<youtube-playlists> generates list of YouTube
+video URLs. Arguments can be URL to playlist or to favorite list, or
+only IDs of a playlist or a favorite list. Because of current
+implementation number of results is limited to 50 video URLs. Deleted
+videos are represented as empty lines.
+
+=head1 END OF LIFE
+
+This script uses an End Of Lifed API URL, so it is currently broken.  Patches
+to fix this would be most welcome.  See
+https://github.com/xaicron/p5-www-youtube-download/issues/40
 
 =head1 OPTIONS
 
@@ -183,5 +206,18 @@ display version
 
 =head1 AUTHOR
 
-Yuji Shiamda (xaicron)
+xaicron <xaicron {@} cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 - 2019 by Yuji Shimada.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+# ABSTRACT: Find a YouTube video URLs from playlist(s)
 

@@ -325,6 +325,7 @@ my $have_cairo_1_4 = ExtUtils::PkgConfig->atleast_version("cairo", "1.4.0");
 my $have_cairo_1_6 = ExtUtils::PkgConfig->atleast_version("cairo", "1.6.0");
 my $have_cairo_1_8 = ExtUtils::PkgConfig->atleast_version("cairo", "1.8.0");
 my $have_cairo_1_10 = ExtUtils::PkgConfig->atleast_version("cairo", "1.10.0");
+my $have_cairo_1_16 = ExtUtils::PkgConfig->atleast_version("cairo", "1.16.0");
 
 if ($have_cairo_1_2) {
 	add_new_enum_values(
@@ -498,6 +499,21 @@ if ($have_cairo_1_10) {
 } else {
 	$enums{cairo_pdf_version_t} = [];
 	$enums{cairo_region_overlap_t} = [];
+}
+
+if ($have_cairo_1_16) {
+	$enums{cairo_pdf_metadata_t} = [qw/
+		CAIRO_PDF_METADATA_
+		CAIRO_PDF_METADATA_TITLE
+		CAIRO_PDF_METADATA_AUTHOR
+		CAIRO_PDF_METADATA_SUBJECT
+		CAIRO_PDF_METADATA_KEYWORDS
+		CAIRO_PDF_METADATA_CREATOR
+		CAIRO_PDF_METADATA_CREATE_DATE
+		CAIRO_PDF_METADATA_MOD_DATE
+	/];
+} else {
+	$enums{cairo_pdf_metadata_t} = [];
 }
 
 # --------------------------------------------------------------------------- #

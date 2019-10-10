@@ -156,13 +156,13 @@ Serbian Bosnia & Herzegovina Cyrillic locale.
 
   јан
   феб
-  март
+  мар
   апр
   мај
   јун
   јул
   авг
-  септ
+  сеп
   окт
   нов
   дец
@@ -463,7 +463,7 @@ Serbian Bosnia & Herzegovina Cyrillic locale.
 
    2008-02-05T18:30:30 = феб
    1995-12-22T09:05:02 = дец
-  -0010-09-15T04:44:23 = септ
+  -0010-09-15T04:44:23 = сеп
 
 =head3 MMMEd (E d. MMM)
 

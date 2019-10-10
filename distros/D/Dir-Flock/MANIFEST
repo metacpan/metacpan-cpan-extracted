@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Dir/Flock.pm
+t/00-load.t
+t/01-lock.t
+t/02-lock-threads.t
+t/03-ping.t
+t/04-flock.t
+t/05-shared.t
+t/06-shared.t
+t/07-scope.t
+t/08-block.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

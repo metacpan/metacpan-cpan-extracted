@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,16 +20,16 @@ no_index:
 provides:
   IP::CountryFlag:
     file: lib/IP/CountryFlag.pm
-    version: '0.12'
+    version: '0.14'
   IP::CountryFlag::Params:
     file: lib/IP/CountryFlag/Params.pm
-    version: '0.12'
+    version: '0.14'
   IP::CountryFlag::UserAgent:
     file: lib/IP/CountryFlag/UserAgent.pm
-    version: '0.12'
+    version: '0.14'
   IP::CountryFlag::UserAgent::Exception:
     file: lib/IP/CountryFlag/UserAgent/Exception.pm
-    version: '0.12'
+    version: '0.14'
 requires:
   Data::Validate::IP: '0.10'
   File::Spec::Functions: '3.30'
@@ -41,5 +41,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/IP-CountryFlag.git
-version: '0.12'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -46,7 +46,7 @@ Javanese locale.
   Kam
   Jum
   Sab
-  Ahd
+  Ahad
 
 =head3 Narrow (format)
 
@@ -77,7 +77,7 @@ Javanese locale.
   Kam
   Jum
   Sab
-  Ahd
+  Ahad
 
 =head3 Narrow (stand-alone)
 
@@ -471,11 +471,11 @@ Javanese locale.
    1995-12-22T09:05:02 = Jum, 22 Des
   -0010-09-15T04:44:23 = Sab, 15 Sep
 
-=head3 MMMMW-count-other ('pekan' W 'saka' MMMM)
+=head3 MMMMW-count-other ('pekan' W 'ing' MMMM)
 
-   2008-02-05T18:30:30 = pekan 1 saka Februari
-   1995-12-22T09:05:02 = pekan 3 saka Desember
-  -0010-09-15T04:44:23 = pekan 2 saka September
+   2008-02-05T18:30:30 = pekan 1 ing Februari
+   1995-12-22T09:05:02 = pekan 3 ing Desember
+  -0010-09-15T04:44:23 = pekan 2 ing September
 
 =head3 MMMMd (d MMMM)
 
@@ -597,11 +597,11 @@ Javanese locale.
    1995-12-22T09:05:02 = triwulan kaping papat 1995
   -0010-09-15T04:44:23 = triwulan kaping telu -10
 
-=head3 yw-count-other ('pekan' w 'saka' Y)
+=head3 yw-count-other ('pekan' w 'ing' Y)
 
-   2008-02-05T18:30:30 = pekan 6 saka 2008
-   1995-12-22T09:05:02 = pekan 51 saka 1995
-  -0010-09-15T04:44:23 = pekan 37 saka -10
+   2008-02-05T18:30:30 = pekan 6 ing 2008
+   1995-12-22T09:05:02 = pekan 51 ing 1995
+  -0010-09-15T04:44:23 = pekan 37 ing -10
 
 
 =head2 Miscellaneous

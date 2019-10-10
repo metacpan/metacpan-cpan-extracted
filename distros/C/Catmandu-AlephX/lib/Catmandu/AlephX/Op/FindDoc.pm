@@ -5,9 +5,11 @@ use Catmandu::AlephX;
 use Catmandu::AlephX::Metadata::MARC::Aleph;
 use Catmandu::AlephX::Record;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
-has record => ( 
+has record => (
   is => 'ro'
 );
 
@@ -37,7 +39,7 @@ sub parse {
     errors => $class->parse_errors($xpath),
     content_ref => $str_ref
   );
-  
+
 }
 
 1;

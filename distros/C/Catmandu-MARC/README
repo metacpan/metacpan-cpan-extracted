@@ -33,7 +33,7 @@ SYNOPSIS
      my $store    = Catmandu->store('ElasticSearch', index_name => 'catmandu');
     
      $store->add_many(
-            $fixer->fix($importer)
+        $fixer->fix($importer)
      );
 
 MODULES
@@ -69,6 +69,8 @@ MODULES
       * Catmandu::Fix::marc_cut
 
       * Catmandu::Fix::marc_paste
+
+      * Catmandu::Fix::marc_sort
 
       * Catmandu::Fix::Bind::marc_each
 

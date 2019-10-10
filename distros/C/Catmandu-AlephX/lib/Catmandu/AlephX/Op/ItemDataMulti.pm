@@ -3,6 +3,8 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
+our $VERSION = "1.071";
+
 with('Catmandu::AlephX::Response');
 
 has items => (
@@ -17,7 +19,7 @@ has items => (
   default => sub {
     [];
   }
-); 
+);
 has start_point => (is => 'ro');
 
 sub op { 'item-data-multi' }
@@ -27,7 +29,7 @@ sub parse {
   my $xpath = xpath($str_ref);
 
   my $op = op();
-  
+
   my @items;
 
   for my $item($xpath->find("/$op/item")->get_nodelist()){
@@ -41,6 +43,6 @@ sub parse {
     start_point => $xpath->findvalue("/$op/start-point"),
     content_ref => $str_ref
   );
-} 
+}
 
 1;

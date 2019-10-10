@@ -580,6 +580,12 @@ cairo_pdf_surface_version_to_string (...)
 
 #endif
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 16, 0)
+
+void cairo_pdf_surface_set_metadata (cairo_surface_t *surface, cairo_pdf_metadata_t metadata, const char_utf8 * utf8);
+
+#endif
+
 #endif
 
 # --------------------------------------------------------------------------- #

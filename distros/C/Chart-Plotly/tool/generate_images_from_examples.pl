@@ -24,6 +24,7 @@ for my $trace_example ($samples_folder->children(qr/\.pl$/)) {
     
     $driver->get('file://' . $candidate_files[0]);
     my $image_name = $trace_name . ".png";
+    sleep(30);
     $driver->capture_screenshot($samples_folder->child($image_name) . "");
 
     my $html_trace_file = $samples_folder->child($trace_name . ".html");

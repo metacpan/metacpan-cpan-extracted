@@ -15,7 +15,7 @@ sub verbose {
   say STDERR sprintf " (doc %d %f)" ,$count,$speed if ($count % 10 == 0);
 }
 
-my $bag = Catmandu::Store::AlephX->new(url => "http://aleph.ugent.be/X",username=> "test",password => "test")->bag();
+my $bag = Catmandu::Store::AlephX->new(url => "http://borges1.ugent.be/X",username=> "test",password => "test")->bag();
 
 $bag->tap(\&verbose)->each(sub{
   print Dumper(shift);
