@@ -3,7 +3,7 @@ package Mastodon::Entity::Account;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo;
 with 'Mastodon::Role::Entity';
@@ -24,7 +24,7 @@ has following_count => ( is => 'ro', isa => Int, );
 has header          => ( is => 'ro', isa => URI, coerce => 1, );
 has header_static   => ( is => 'ro', isa => URI, coerce => 1, );
 has id              => ( is => 'ro', isa => Int, );
-has locked          => ( is => 'ro', isa => Bool, );
+has locked          => ( is => 'ro', isa => Bool, coerce => 1, );
 has note            => ( is => 'ro', isa => Str, );
 has statuses_count  => ( is => 'ro', isa => Int, );
 has url             => ( is => 'ro', isa => URI, coerce => 1, );

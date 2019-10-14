@@ -3,7 +3,7 @@ package Mastodon::Entity::Relationship;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo;
 with 'Mastodon::Role::Entity';
@@ -11,11 +11,11 @@ with 'Mastodon::Role::Entity';
 use Types::Standard qw( Int Bool );
 
 has id          => ( is => 'ro', isa => Int, );
-has blocking    => ( is => 'ro', isa => Bool, );
-has followed_by => ( is => 'ro', isa => Bool, );
-has following   => ( is => 'ro', isa => Bool, );
-has muting      => ( is => 'ro', isa => Bool, required => 1, );
-has requested   => ( is => 'ro', isa => Bool, );
+has blocking    => ( is => 'ro', isa => Bool, coerce => 1, );
+has followed_by => ( is => 'ro', isa => Bool, coerce => 1, );
+has following   => ( is => 'ro', isa => Bool, coerce => 1, );
+has muting      => ( is => 'ro', isa => Bool, coerce => 1, required => 1, );
+has requested   => ( is => 'ro', isa => Bool, coerce => 1, );
 
 1;
 

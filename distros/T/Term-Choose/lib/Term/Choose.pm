@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.703';
+our $VERSION = '1.704';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -83,6 +83,7 @@ sub _defaults {
         page                => 1,
         #prompt             => undef,
         undef               => '<undef>',
+        #busy_string        => undef,
     };
 }
 
@@ -116,6 +117,7 @@ sub _valid_options {
         info                => 'Str',
         prompt              => 'Str',
         undef               => 'Str',
+        busy_string         => 'Str',
     };
 };
 
@@ -249,6 +251,10 @@ sub __choose {
     local $\ = undef;
     local $, = undef;
     local $| = 1;
+    if ( defined $self->{busy_string} ) {
+        print clear_to_end_of_line();
+        print "\r" . $self->{busy_string};
+    }
     $self->{wantarray} = wantarray;
     if ( ! defined $self->{prompt} ) {
         $self->{prompt} = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
@@ -1165,7 +1171,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.703
+Version 1.704
 
 =cut
 

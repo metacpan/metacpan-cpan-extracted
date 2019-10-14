@@ -20,6 +20,9 @@ Math::BigFloat:
  * finish broot() by using different algorithm
 
 Math::BigInt:
+ * Finite non-integers should be handled consistently. The may appear as input
+   and as a result of a computation. Alternatives are: round, truncate, die,
+   and return NaN.
  * finish 'upgrade'
  * remove rounding overhead when no rounding is done, e.g. no $object has A nor
    P and neither of bround(), bround(), accuracy() or precision() was called

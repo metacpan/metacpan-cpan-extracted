@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.02';
+our $VERSION = '1.0201';
 
 use Catmandu::Hits;
 use Cpanel::JSON::XS qw(encode_json decode_json);
@@ -224,33 +224,35 @@ sub search {
 
     my $id_key = $self->id_key;
 
-    my $start  = delete $args{start};
-    my $limit  = delete $args{limit};
-    my $scroll = delete $args{scroll};
-    my $bag    = delete $args{reify};
-
-    if ($bag) {
-        $args{fields} = [];
-    }
-
-    my %es_args = (
-        index => $self->index,
-        type  => $self->type,
-        body  => {%args, size => $limit,},
-    );
-
-    if (defined $scroll) {
-        $es_args{scroll} = $scroll;
-    }
-    else {
-        $es_args{body}{from} = $start;
-    }
+    my $start     = delete $args{start};
+    my $limit     = delete $args{limit};
+    my $scroll_id = delete $args{scroll_id};
+    my $scroll    = delete $args{scroll};
+    my $bag       = delete $args{reify};
 
     my $res;
-    if ($args{scroll_id}) {
+    if (defined $scroll_id) {
+        my %es_args = (body => {scroll_id => $scroll_id},);
+        if (defined $scroll) {
+            $es_args{scroll} = $scroll;
+        }
         $res = $self->store->es->scroll(%es_args);
     }
     else {
+        my %es_args = (
+            index => $self->index,
+            type  => $self->type,
+            body  => {%args, size => $limit,},
+        );
+        if ($bag) {
+            $es_args{body}{fields} = [];
+        }
+        if (defined $scroll) {
+            $es_args{scroll} = $scroll;
+        }
+        else {
+            $es_args{body}{from} = $start;
+        }
         $res = $self->store->es->search(%es_args);
     }
 

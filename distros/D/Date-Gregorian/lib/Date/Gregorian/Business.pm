@@ -1,16 +1,17 @@
-# Copyright (c) 2005-2007 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: Business.pm,v 1.5 2007/06/18 06:11:56 martin Stab $
+# Copyright (c) 2005-2019 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Date::Gregorian::Business;
 
+use 5.006;
 use strict;
+use warnings;
 use integer;
-use Date::Gregorian;
-use base qw(Date::Gregorian);
-use vars qw($VERSION);
+use Date::Gregorian qw(:weekdays);
+
+our @ISA     = qw(Date::Gregorian);
+our $VERSION = '0.13';
 
 # ----- object definition -----
 
@@ -22,9 +23,19 @@ use constant F_YEAR      => F_OFFSET+2;  # currently initialized year
 use constant F_CALENDAR  => F_OFFSET+3;  # list of: 1 = biz, 0 = holiday
 use constant NFIELDS     => F_OFFSET+4;
 
-# ----- predefined variables -----
+# ----- other constants -----
 
-$VERSION = 0.04;
+# index into calendar definition
+use constant _WEEKLY => 0;              # array of non-biz weekdays
+use constant _YEARLY => 1;              # array of holidays per year
+
+# index into single holiday per year definition
+use constant _D_MONTH => 0;             # month number or 0 for easter
+use constant _D_DAY   => 1;             # day number or easter difference
+use constant _D_DELTA => 2;             # array of deltas per weekday
+use constant _D_YEARS => 3;             # array of first and last year
+
+# ----- predefined variables -----
 
 # elements of default biz calendars
 my $skip_weekend    = [ 0,  0,  0,  0,  0,  2,  1];  # Sat, Sun -> Mon
@@ -33,60 +44,182 @@ my $next_monday     = [ 0,  6,  5,  4,  3,  2,  1];  # set_weekday(Mon, ">=")
 my $prev_monday     = [-7, -1, -2, -3, -4, -5, -6];  # set_weekday(Mon, "<")
 my $next_wednesday  = [ 2,  1,  0,  6,  5,  4,  3];  # set_weekday(Wed, ">=")
 my $next_thursday   = [ 3,  2,  1,  0,  6,  5,  4];  # set_weekday(Thu, ">=")
-my $saturday_sunday = [ 5,  6];
+my $saturday_sunday = [SATURDAY,  SUNDAY];
 
 # some biz calendars known by default
 my %samples = (
     'us' => [
-	$saturday_sunday,
-	[
-	    [ 1,  1, $skip_weekend],	# New Year's day
-	    [ 1, 15, $next_monday],	# Martin Luther King
-	    [ 2, 15, $next_monday],	# President's day
-	    [ 6,  1, $prev_monday],	# Memorial day
-	    [ 7,  4, $avoid_weekend],	# Independence day
-	    [ 9,  1, $next_monday],	# Labor day
-	    [10,  8, $next_monday],	# Columbus day
-	    [11, 11, $avoid_weekend],	# Veteran's day
-	    [11, 22, $next_thursday],	# Thanksgiving day
-	    [12, 25, $skip_weekend],	# Christmas day
-	],
+        $saturday_sunday,
+        [
+            [ 1,  1, $skip_weekend],    # New Year's day
+            [ 1, 15, $next_monday],     # Martin Luther King
+            [ 2, 15, $next_monday],     # President's day
+            [ 6,  1, $prev_monday],     # Memorial day
+            [ 7,  4, $avoid_weekend],   # Independence day
+            [ 9,  1, $next_monday],     # Labor day
+            [10,  8, $next_monday],     # Columbus day
+            [11, 11, $avoid_weekend],   # Veteran's day
+            [11, 22, $next_thursday],   # Thanksgiving day
+            [12, 25, $skip_weekend],    # Christmas day
+        ],
     ],
-    'de' => [
-	$saturday_sunday,
-	[
-	    [ 1,  1],					# New Year's day
-	    [ 0, -2],					# Good Friday
-	    [ 0,  1],					# Easter Monday
-	    [ 5,  1],					# Labour day
-	    [ 0, 50],					# Pentecost Monday
-	    [ 6, 17, undef,           [1954,  1989]],	# German Unity
-	    [10,  3, undef,           [1990, undef]],	# German Unity
-	    [11, 16, $next_wednesday, [undef, 1994]],	# Penitence day
-	    [12, 25],					# Christmas day
-	    [12, 26],					# 2nd day of Christmas
-	],
+    'de' => [                           # Germany
+        $saturday_sunday,
+        [
+            [ 1,  1],                                   # New Year's day
+            [ 0, -2],                                   # Good Friday
+            [ 0,  1],                                   # Easter Monday
+            [ 5,  1],                                   # Labour day
+            [ 0, 39],                                   # Ascension day
+            [ 0, 50],                                   # Pentecost Monday
+            [ 6, 17, undef,           [1954,  1990]],   # German Unity
+            [10,  3, undef,           [1990, undef]],   # German Unity
+            [10, 31, undef,           [2017,  2017]],   # Reformation day
+            [11, 16, $next_wednesday, [undef, 1994]],   # Penitence day
+            [12, 25],                                   # Christmas day
+            [12, 26],                                   # 2nd day of Christmas
+        ],
+    ],
+    'dd' => [                           # Germany, new states
+        $saturday_sunday,
+        [
+            [ 1,  1,                               ],   # New Year's day
+            [ 0, -2,                               ],   # Good Friday
+            [ 0,  1, undef,           [undef, 1967]],   # Easter Monday
+            [ 0,  1, undef,           [1990, undef]],   # Easter Monday
+            [ 5,  1,                               ],   # Labour day
+            [ 5,  8, undef,           [undef, 1967]],   # Liberation day
+            [ 5,  8, undef,           [1985,  1985]],   # Liberation day
+            [ 5,  9, undef,           [1975,  1975]],   # Victory day
+            [ 0, 39, undef,           [undef, 1967]],   # Ascension day
+            [ 0, 39, undef,           [1990, undef]],   # Ascension day
+            [ 0, 50,                               ],   # Pentecost Monday
+            [10,  3, undef,           [1990, undef]],   # German Unity
+            [10,  7, undef,           [undef, 1989]],   # Republic day
+            [10, 31, undef,           [undef, 1966]],   # Reformation day
+            [10, 31, undef,           [1990, undef]],   # Reformation day
+            [11, 16, $next_wednesday, [undef, 1966]],   # Penitence day
+            [11, 16, $next_wednesday, [1990,  1994]],   # Penitence day
+            [12, 25,                               ],   # Christmas day
+            [12, 26,                               ],   # 2nd day of Christmas
+        ],
     ],
 );
-$samples{'de_BW'} = [
+$samples{'de_BW'} = [                   # Baden-Wuerttemberg
     $saturday_sunday,
     [
-	@{$samples{'de'}->[1]}, 
-	[ 1,  6],					# Epiphany
-	[ 0, 39],					# Ascension day
-	[ 0, 60],					# Corpus Christi
-	[11,  1],					# All Saints day
+        @{$samples{'de'}->[_YEARLY]}, 
+        [ 1,  6],                                       # Epiphany
+        [ 0, 60],                                       # Corpus Christi
+        [11,  1],                                       # All Saints day
     ]
 ];
-$samples{'de_BY'} = [
+$samples{'de_BY'} = [                   # Bayern
     $saturday_sunday,
     [
-	@{$samples{'de_BW'}->[1]}, 
-	[ 8, 15],					# Assumption day
+        @{$samples{'de_BW'}->[_YEARLY]}, 
+        [ 8, 15],                                       # Assumption day
     ]
 ];
-$samples{'de_BW2'} = _more_xmas(@{$samples{'de_BW'}});
-$samples{'de_BY2'} = _more_xmas(@{$samples{'de_BY'}});
+$samples{'de_Augsburg'} = [             # Stadt Augsburg
+    $saturday_sunday,
+    [
+        @{$samples{'de_BY'}->[_YEARLY]}, 
+        [ 8,  1],                                       # Peace day
+    ]
+];
+$samples{'de_BE'} = [                   # Berlin
+    $saturday_sunday,
+    [
+        @{$samples{'de'}->[_YEARLY]}, 
+        [ 1,  8, undef, [2019, undef]],                 # Women's day
+    ]
+];
+$samples{'de_BB'} = [                   # Brandenburg
+    $saturday_sunday,
+    [
+        @{$samples{'dd'}->[_YEARLY]}, 
+    ]
+];
+$samples{'de_HB'} = [                   # Bremen
+    $saturday_sunday,
+    [
+        @{$samples{'de'}->[_YEARLY]}, 
+        [10, 31],                                       # Reformation day
+    ]
+];
+$samples{'de_HH'} = [                   # Hamburg
+    $saturday_sunday,
+    [
+        @{$samples{'de_HB'}->[_YEARLY]}, 
+    ]
+];
+$samples{'de_HE'} = [                   # Hessen
+    $saturday_sunday,
+    [
+        @{$samples{'de'}->[_YEARLY]}, 
+        [ 0, 60],                                       # Corpus Christi
+    ]
+];
+$samples{'de_MV'} = [                   # Mecklenburg-Vorpommern
+    $saturday_sunday,
+    [
+        @{$samples{'dd'}->[_YEARLY]}, 
+    ]
+];
+$samples{'de_NI'} = [                   # Niedersachsen
+    $saturday_sunday,
+    [
+        @{$samples{'de_HB'}->[_YEARLY]}, 
+    ]
+];
+$samples{'de_NW'} = [                   # Nordrhein-Westfalen
+    $saturday_sunday,
+    [
+        @{$samples{'de_HE'}->[_YEARLY]}, 
+        [11,  1],                                       # All Saints day
+    ]
+];
+$samples{'de_RP'} = [                   # Rheinland-Pfalz
+    $saturday_sunday,
+    [
+        @{$samples{'de_NW'}->[_YEARLY]}, 
+    ]
+];
+$samples{'de_SL'} = [                   # Saarland
+    $saturday_sunday,
+    [
+        @{$samples{'de_NW'}->[_YEARLY]}, 
+        [ 8, 15],                                       # Assumption day
+    ]
+];
+$samples{'de_SN'} = [                   # Sachsen
+    $saturday_sunday,
+    [
+        @{$samples{'dd'}->[_YEARLY]}, 
+        [11, 16, $next_wednesday, [1995, undef]],       # Penitence day
+    ]
+];
+$samples{'de_ST'} = [                   # Sachsen-Anhalt
+    $saturday_sunday,
+    [
+        @{$samples{'dd'}->[_YEARLY]}, 
+        [ 1,  6, undef,           [1990, undef]],       # Epiphany
+    ]
+];
+$samples{'de_SH'} = [                   # Schleswig-Holstein
+    $saturday_sunday,
+    [
+        @{$samples{'de_HB'}->[_YEARLY]}, 
+    ]
+];
+$samples{'de_TH'} = [                   # Thueringen
+    $saturday_sunday,
+    [
+        @{$samples{'dd'}->[_YEARLY]}, 
+        [ 9, 20, undef,           [2019, undef]],       # Children's day
+    ]
+];
 
 my $default_configuration = 'us';
 
@@ -97,14 +230,14 @@ sub _select_year {
     my ($self, $day, $year) = @_;
     my $selection = $day->[3];
     if (!ref $selection) {
-	return $year == $selection;
+        return $year == $selection;
     }
     if ('CODE' eq ref $selection) {
-	return $selection->($self, $year, @{$day}[0, 1]);
+        return $selection->($self, $year, @{$day}[0, 1]);
     }
     return
-	(!defined($selection->[0]) || $selection->[0] <= $year) &&
-	(!defined($selection->[1]) || $year <= $selection->[1]);
+        (!defined($selection->[0]) || $selection->[0] <= $year) &&
+        (!defined($selection->[1]) || $year <= $selection->[1]);
 }
 
 # make_cal factory, generating a calendar generator enclosing a configuration
@@ -112,47 +245,35 @@ sub _make_make_cal {
     my ($weekly, $yearly) = @_;
 
     return sub {
-	my ($date, $year) = @_;
-	my $firstday = $date->new->set_yd($year, 1, 1);
-	my $first_wd = $firstday->get_weekday;
-	my $someday  = @$yearly && $firstday->new;
-	my $easter   = undef;
-	my $index;
-	my $calendar = $firstday->get_empty_calendar($year, $weekly);
-	foreach my $day (@$yearly) {
-	    if (!defined($day->[3]) || _select_year($someday, $day, $year)) {
-		if ($day->[0]) {
-		    $index =
-			$someday->set_ymd($year, @{$day}[0, 1])
-			->get_days_since($firstday);
-		    $index += $day->[2]->[$someday->get_weekday] if $day->[2];
-		}
-		else {
-		    if (!defined $easter) {
-			$easter =
-			    $someday->set_easter($year)
-			    ->get_days_since($firstday);
-		    }
-		    $index = $easter + $day->[1];
-		    $index += $day->[2]->[(496 + $day->[1]) % 7] if $day->[2];
-		}
-		$calendar->[$index] = 0 if 0 <= $index && $index < @$calendar;
-	    }
-	}
-	return $calendar;
+        my ($date, $year) = @_;
+        my $firstday = $date->new->set_yd($year, 1, 1);
+        my $first_wd = $firstday->get_weekday;
+        my $someday  = @$yearly && $firstday->new;
+        my $easter   = undef;
+        my $index;
+        my $calendar = $firstday->get_empty_calendar($year, $weekly);
+        foreach my $day (@$yearly) {
+            if (!defined($day->[3]) || _select_year($someday, $day, $year)) {
+                if ($day->[0]) {
+                    $index =
+                        $someday->set_ymd($year, @{$day}[0, 1])
+                        ->get_days_since($firstday);
+                    $index += $day->[2]->[$someday->get_weekday] if $day->[2];
+                }
+                else {
+                    if (!defined $easter) {
+                        $easter =
+                            $someday->set_easter($year)
+                            ->get_days_since($firstday);
+                    }
+                    $index = $easter + $day->[1];
+                    $index += $day->[2]->[(496 + $day->[1]) % 7] if $day->[2];
+                }
+                $calendar->[$index] = 0 if 0 <= $index && $index < @$calendar;
+            }
+        }
+        return $calendar;
     };
-}
-
-# experimental feature: half business days on Dec 24 and 31, if not weekend
-sub _more_xmas {
-    my $make_cal = _make_make_cal(@_);
-    return sub {
-	my $calendar = $make_cal->(@_);
-	if (8 <= @$calendar && $calendar->[-1]) {
-	    @{$calendar}[-8, -1] = (0.5, 0.5);
-	}
-	return $calendar;
-    }
 }
 
 # fetch biz calendar for given year, initializing it if necessary
@@ -160,8 +281,8 @@ sub _calendar {
     my ($self, $year) = @_;
 
     if (!defined($self->[F_YEAR]) || $year != $self->[F_YEAR]) {
-	$self->[F_YEAR] = $year;
-	$self->[F_CALENDAR] = $self->[F_MAKE_CAL]->($self, $year);
+        $self->[F_YEAR] = $year;
+        $self->[F_CALENDAR] = $self->[F_MAKE_CAL]->($self, $year);
     }
     return $self->[F_CALENDAR];
 }
@@ -177,7 +298,7 @@ sub get_empty_calendar {
 
     my @week = (1) x 7;
     foreach my $day (@$weekly_nonbiz) {
-	$week[$day] = 0;
+        $week[$day] = 0;
     }
     @week = @week[$first_wd .. 6, 0 .. $first_wd-1] if $first_wd;
 
@@ -190,11 +311,11 @@ sub define_configuration {
     my $type = defined($configuration)? ref($configuration): '!';
 
     if (!$type) {
-	return undef if !exists $samples{$configuration};
-	$configuration = $samples{$configuration};
+        return undef if !exists $samples{$configuration};
+        $configuration = $samples{$configuration};
     }
     elsif ('ARRAY' ne $type && 'CODE' ne $type) {
-	return undef;
+        return undef;
     }
     $samples{$name} = $configuration;
     return $class;
@@ -205,29 +326,29 @@ sub configure_business {
     my $type = defined($configuration)? ref($configuration): '!';
 
     if (!$type) {
-	return undef if !exists $samples{$configuration};
-	$configuration = $samples{$configuration};
-	$type = ref $configuration;
+        return undef if !exists $samples{$configuration};
+        $configuration = $samples{$configuration};
+        $type = ref $configuration;
     }
     if (ref $self) {
-	# instance method: configure this object
-	if ('CODE' eq $type) {
-	    $self->[F_MAKE_CAL] = $configuration;
-	}
-	elsif ('ARRAY' eq $type) {
-	    $self->[F_MAKE_CAL] = _make_make_cal(@$configuration);
-	}
-	else {
-	    return undef;
-	}
-	$self->[F_YEAR] = $self->[F_CALENDAR] = undef;
+        # instance method: configure this object
+        if ('CODE' eq $type) {
+            $self->[F_MAKE_CAL] = $configuration;
+        }
+        elsif ('ARRAY' eq $type) {
+            $self->[F_MAKE_CAL] = _make_make_cal(@$configuration);
+        }
+        else {
+            return undef;
+        }
+        $self->[F_YEAR] = $self->[F_CALENDAR] = undef;
     }
     else {
-	# class method: configure default
-	if ('ARRAY' ne $type && 'CODE' ne $type) {
-	    return undef;
-	}
-	$default_configuration = $configuration;
+        # class method: configure default
+        if ('ARRAY' ne $type && 'CODE' ne $type) {
+            return undef;
+        }
+        $default_configuration = $configuration;
     }
 
     return $self;
@@ -238,13 +359,13 @@ sub new {
     my $self = $class_or_object->SUPER::new;
 
     if (!ref $class_or_object) {
-	$self->[F_ALIGNMENT] = 0;
+        $self->[F_ALIGNMENT] = 0;
     }
     if (defined $configuration) {
-	return $self->configure_business($configuration);
+        return $self->configure_business($configuration);
     }
     elsif (!ref $class_or_object) {
-	return $self->configure_business($default_configuration);
+        return $self->configure_business($default_configuration);
     }
     return $self;
 }
@@ -284,16 +405,16 @@ sub _count_businessdays_up {
 
     --$day if !$self->[F_ALIGNMENT];
     while (0 < $days) {
-	while (@$calendar <= $day) {
-	    $calendar = $self->_calendar(++$year);
-	    $day = 0;
-	}
-	do {
-	    no integer;
-	    $result += $calendar->[$day];
-	};
-	++$day;
-	--$days;
+        while (@$calendar <= $day) {
+            $calendar = $self->_calendar(++$year);
+            $day = 0;
+        }
+        do {
+            no integer;
+            $result += $calendar->[$day];
+        };
+        ++$day;
+        --$days;
     }
     return $result;
 }
@@ -310,16 +431,16 @@ sub _count_businessdays_down {
 
     --$day if !$self->[F_ALIGNMENT];
     while (0 < $days) {
-	--$day;
-	--$days;
-	while ($day < 0) {
-	    $calendar = $self->_calendar(--$year);
-	    $day = $#$calendar;
-	}
-	do {
-	    no integer;
-	    $result += $calendar->[$day];
-	};
+        --$day;
+        --$days;
+        while ($day < 0) {
+            $calendar = $self->_calendar(--$year);
+            $day = $#$calendar;
+        }
+        do {
+            no integer;
+            $result += $calendar->[$day];
+        };
     }
     return $result;
 }
@@ -340,13 +461,13 @@ sub _count_businessdays_down {
 sub get_businessdays_since {
     my ($self, $then) = @_;
     my $delta =
-	$self->get_days_since($then) +
-	$self->[F_ALIGNMENT] - $then->get_alignment;
+        $self->get_days_since($then) +
+        $self->[F_ALIGNMENT] - $then->get_alignment;
     if ($delta > 0) {
-	return $self->_count_businessdays_down($delta);
+        return $self->_count_businessdays_down($delta);
     }
     if ($delta < 0) {
-	return -$self->_count_businessdays_up(-$delta);
+        return -$self->_count_businessdays_up(-$delta);
     }
     return 0;
 }
@@ -354,13 +475,13 @@ sub get_businessdays_since {
 sub get_businessdays_until {
     my ($self, $then) = @_;
     my $delta =
-	$self->get_days_since($then) +
-	$self->[F_ALIGNMENT] - $then->get_alignment;
+        $self->get_days_since($then) +
+        $self->[F_ALIGNMENT] - $then->get_alignment;
     if ($delta > 0) {
-	return -$self->_count_businessdays_down($delta);
+        return -$self->_count_businessdays_down($delta);
     }
     if ($delta < 0) {
-	return $self->_count_businessdays_up(-$delta);
+        return $self->_count_businessdays_up(-$delta);
     }
     return 0;
 }
@@ -373,24 +494,24 @@ sub set_next_businessday {
     --$day;
     return $self if '<' ne $relation && '>' ne $relation && $calendar->[$day];
     if ('<' eq $relation || '<=' eq $relation) {
-	do {
-	    --$day;
-	    while ($day < 0) {
-		$calendar = $self->_calendar(--$year);
-		$day = $#$calendar;
-	    }
-	}
-	while (!$calendar->[$day]);
+        do {
+            --$day;
+            while ($day < 0) {
+                $calendar = $self->_calendar(--$year);
+                $day = $#$calendar;
+            }
+        }
+        while (!$calendar->[$day]);
     }
     else {
-	do {
-	    ++$day;
-	    while (@$calendar <= $day) {
-		$calendar = $self->_calendar(++$year);
-		$day = 0;
-	    }
-	}
-	while (!$calendar->[$day]);
+        do {
+            ++$day;
+            while (@$calendar <= $day) {
+                $calendar = $self->_calendar(++$year);
+                $day = 0;
+            }
+        }
+        while (!$calendar->[$day]);
     }
     return $self->set_yd($year, $day+1);
 }
@@ -400,22 +521,22 @@ sub iterate_businessdays_upto {
     my $days = ($rel eq '<=') - $self->get_days_since($limit);
     my ($year, $day, $calendar);
     if (0 < $days) {
-	($year, $day) = $self->get_yd;
-	--$day;
-	$calendar = $self->_calendar($year);
+        ($year, $day) = $self->get_yd;
+        --$day;
+        $calendar = $self->_calendar($year);
     }
     return sub {
-	while (0 < $days) {
-	    while (@$calendar <= $day) {
-		$calendar = $self->_calendar(++$year);
-		$day = 0;
-	    }
-	    --$days;
-	    if ($calendar->[$day++]) {
-		return $self->set_yd($year, $day);
-	    }
-	}
-	return undef;
+        while (0 < $days) {
+            while (@$calendar <= $day) {
+                $calendar = $self->_calendar(++$year);
+                $day = 0;
+            }
+            --$days;
+            if ($calendar->[$day++]) {
+                return $self->set_yd($year, $day);
+            }
+        }
+        return undef;
     };
 }
 
@@ -424,22 +545,22 @@ sub iterate_businessdays_downto {
     my $days = $self->get_days_since($limit) + ($rel ne '>');
     my ($year, $day, $calendar);
     if (0 < $days) {
-	($year, $day) = $self->get_yd;
-	--$day;
-	$calendar = $self->_calendar($year);
+        ($year, $day) = $self->get_yd;
+        --$day;
+        $calendar = $self->_calendar($year);
     }
     return sub {
-	while (0 < $days) {
-	    while ($day < 0) {
-		$calendar = $self->_calendar(--$year);
-		$day = $#$calendar;
-	    }
-	    --$days;
-	    if ($calendar->[$day--]) {
-		return $self->set_yd($year, $day+2);
-	    }
-	}
-	return undef;
+        while (0 < $days) {
+            while ($day < 0) {
+                $calendar = $self->_calendar(--$year);
+                $day = $#$calendar;
+            }
+            --$days;
+            if ($calendar->[$day--]) {
+                return $self->set_yd($year, $day+2);
+            }
+        }
+        return undef;
     };
 }
 
@@ -457,39 +578,39 @@ sub add_businessdays {
 
     # handle alignment change
     if (defined($new_alignment) && ($alignment xor $new_alignment)) {
-	if ($new_alignment) {
-	    $alignment = $self->[F_ALIGNMENT] = 1;
-	    $days -= $calendar->[$day];
-	}
-	else {
-	    $alignment = $self->[F_ALIGNMENT] = 0;
-	    $days += $calendar->[$day];
-	}
+        if ($new_alignment) {
+            $alignment = $self->[F_ALIGNMENT] = 1;
+            $days -= $calendar->[$day];
+        }
+        else {
+            $alignment = $self->[F_ALIGNMENT] = 0;
+            $days += $calendar->[$day];
+        }
     }
 
     if (0 < $days || !$days && !$alignment) {
-	# move forward in time
-	$days -= $calendar->[$day] if !$alignment;
-	while (0 < $days || !$days && !$alignment) {
-	    ++$day;
-	    while (@$calendar <= $day) {
-		$calendar = $self->_calendar(++$year);
-		$day = 0;
-	    }
-	    $days -= $calendar->[$day];
-	}
+        # move forward in time
+        $days -= $calendar->[$day] if !$alignment;
+        while (0 < $days || !$days && !$alignment) {
+            ++$day;
+            while (@$calendar <= $day) {
+                $calendar = $self->_calendar(++$year);
+                $day = 0;
+            }
+            $days -= $calendar->[$day];
+        }
     }
     else {
-	# move backwards in time
-	$days += $calendar->[$day] if $alignment;
-	while ($days < 0 || !$days && $alignment) {
-	    --$day;
-	    while ($day < 0) {
-		$calendar = $self->_calendar(--$year);
-		$day = $#$calendar;
-	    }
-	    $days += $calendar->[$day];
-	}
+        # move backwards in time
+        $days += $calendar->[$day] if $alignment;
+        while ($days < 0 || !$days && $alignment) {
+            --$day;
+            while ($day < 0) {
+                $calendar = $self->_calendar(--$year);
+                $day = $#$calendar;
+            }
+            $days += $calendar->[$day];
+        }
     }
 
     return $self->set_yd($year, $day+1);
@@ -542,10 +663,10 @@ Date::Gregorian::Business - business days extension for Date::Gregorian
   @my_holidays = (
       [6],                                   # Sundays
       [
-	[11, 22, [3, 2, 1, 0, 6, 5, 4]],     # Thanksgiving
-	[12, 25],                            # December 25
-	[12, 26, undef, [2005, 2010]],       # December 26 in 2005-2010
-	[12, 27, undef, sub { $_[1] & 1 }],  # December 27 in odd years
+        [11, 22, [3, 2, 1, 0, 6, 5, 4]],     # Thanksgiving
+        [12, 25],                            # December 25
+        [12, 26, undef, [2005, 2010]],       # December 26 in 2005-2010
+        [12, 27, undef, sub { $_[1] & 1 }],  # December 27 in odd years
       ]
   );
 
@@ -559,7 +680,7 @@ Date::Gregorian::Business - business days extension for Date::Gregorian
     my $index = $holiday->get_days_since($firstday);
     # Sunday -> next Monday, Saturday -> previous Friday
     if (!$calendar->[$index] && !$calendar->[++$index]) {
-	$index -= 2;
+        $index -= 2;
     }
     $calendar->[$index] = 0;
     # ... and so on for all holidays of year $year.
@@ -869,13 +990,29 @@ and finally returned by said subroutine.
 
 =back
 
-=head1 AUTHOR
+=head1 EXPORTS
 
-Martin Becker <hasch-cpan-dg@cozap.com>, May 2005.
+None.
 
 =head1 SEE ALSO
 
 L<Date::Gregorian>.
 
-=cut
+=head1 AUTHOR
 
+Martin Becker C<< <becker-cpan-mp (at) cozap.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 1999-2019 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,3 +1,10 @@
+0.009   2019-09-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak description & mentions.
+
+
 0.008   2019-09-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add workaround for flushing in older perls, e.g. 5.10.1 which causes

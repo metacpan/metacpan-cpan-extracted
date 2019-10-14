@@ -4,6 +4,7 @@ author:
   - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'
 build_requires:
   IO::Callback: '0'
+  Role::Tiny: '0'
   Test::Deep: '0.112'
   Test::Exception: '0.32'
   Test::LWP::UserAgent: '0'
@@ -48,7 +49,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-BagIt/issues
   homepage: https://github.com/LibreCat/Catmandu-BagIt
   repository: https://github.com/LibreCat/Catmandu-BagIt.git
-version: '0.237'
+version: '0.238'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'

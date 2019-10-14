@@ -1,9 +1,9 @@
 This archive contains the distribution Dancer2-Plugin-Paginator,
-version 2.09:
+version 2.10:
 
   Dancer2 plugin for Paginator::Lite.
 
-This software is copyright (c) 2018 by Blabos de Blebe.
+This software is copyright (c) 2019 by Blabos de Blebe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

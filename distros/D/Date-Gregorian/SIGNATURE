@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 e6f57be628420e6eda9be4b358a3877b162a573c87baafe8d93dae7cff42fc39 CONTRIBUTING
+SHA256 66266a1009f7c9f8c8620f5e201b670f1caba5429fd3145c587cde0b26476375 Changes
+SHA256 c53c6b96081b0a5b9b2fb4d0133d55c20e5e00e4c127ade62f03434ee7b3d2de LICENSE
+SHA256 ed9924653e3017ecd4e5bdb2999341a6ba698f78e06a0fd01a69e82828907744 MANIFEST
+SHA256 ea54701e7b3faf3df8ef5140577dd8bf672d30f4dde3fa6f0e1417dcfc1874f7 META.json
+SHA256 5737311883b7b39d880a5bfbc252e2c219e9961f810df0d90f94d2ffb9c0b716 META.yml
+SHA256 0274ea21d7c83e9371fe62b19a880a03685ebbfcbd8de614061dff9706483778 Makefile.PL
+SHA256 52989bb1aaa8acf4fd402ea1cf6ad8959ea1f6fdf6ea9d217d6bad19fc047307 README
+SHA256 3826f7cf1252cb08ce6a8a347500604fb07668f5218d3d2195b4807f56557622 examples/calendar
+SHA256 d7d9e8f5992b7d2652eb704c620a3924ab8910f08d61ccd564ebb4539a0f2be6 examples/today
+SHA256 45f79694582d42c156fa5a3a4acbc989e585d41a1c0531db9bfc51216f24e8e9 lib/Date/Gregorian.pm
+SHA256 75dc00f43e3c9804d79fcfa160b2b89fd7716dea548cd1898ede74a158cd9098 lib/Date/Gregorian/Business.pm
+SHA256 a5c1c35674e8ee6edb9f9eb380cb6c6c0c671a4267580684d9b860980fa94454 lib/Date/Gregorian/Exact.pm
+SHA256 48763647abd7f90cece52a0510443587341a363729d09a991e85d2373e117e1a t/01_basics.t
+SHA256 e67e6b019bba586498b28ad6cdbf546cc345e052c75e17a7fe71f93cedaaf071 t/02_string.t
+SHA256 f713cecdc6745e852b885e15e6523ec2338cc16e87e13ef20ded8d5bf2ee2606 t/03_localtime.t
+SHA256 859a01555a38e5170606cf8270f06b9e46046421ab132b125c1b515b5bba08d5 t/04_datetime.t
+SHA256 b264a4d465ec078cf50d937dc27db1f03c06f330723233d142852fce1751f61a t/05_business.t
+SHA256 d5f7619bdc50551d47087a4b41c901f68d2a28e6a1a404729326f701df73c2eb t/06_exact.t
+SHA256 71ea425c47729fdc1cedd52afe96c58e6159ff05fdc8313ecef0414fb53b3125 t/90_pod.t
+SHA256 ba9ff91aa70430e76b6cc2d5b1dd217864261b9c088278960f843d9f30b98ce7 t/91_pod-coverage.t
+SHA256 ee0906c6f54c8cabd76aeefc90e6628403f055fe5bfb8464c4a6defd06d780c8 t/95_versions.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEjUydDHaxELVSK+hYp13NmW8fHSUFAl2iHKgACgkQp13NmW8f
+HSWr9QgAlXgGcTTUh3s8BTlX3wNRyD3b8s7V2Jmu0Nsi2GI3XNryQf0A6s91fVs4
+b9DK9+5aQQH6Ir+FsRq2On+isMcHVdvfIjRcD9XKriTOp3LvvlAil0xUV6yZ/K/z
+nFuqyScLq+a/sQg/MkaOagtf0K1xOcA7gqZIvkyq8nqhez2WHI0VL/yYQIcMhIBy
+V4jo23CM45N4KgWFJA1NZ/pHu6vHtBeNB6n32H9++QQ0K13b4OcNGnhu4Kh9q5LO
+qVxkIbAOZViiF6/KgeLbo9DYE5WXspkZYmQCUm8EGPHhDloE0eW+kwtllXMpFzpH
+VgBEtYN//yODGT6RJYSzd+IA8hUDsg==
+=2nMn
+-----END PGP SIGNATURE-----

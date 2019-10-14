@@ -4106,6 +4106,34 @@ OUTPUT:
 
 =for comment
   /* ----------------------------------------------------------------------- */
+  /* MarpaX::ESLIF::Recognizer::discardLast                                  */
+  /* ----------------------------------------------------------------------- */
+=cut
+
+SV *
+discardLast(Perl_MarpaX_ESLIF_Recognizer)
+  MarpaX_ESLIF_Recognizer Perl_MarpaX_ESLIF_Recognizer;
+PREINIT:
+  static const char *funcs = "MarpaX::ESLIF::Recognizer::discardLast";
+CODE:
+  char              *lasts;
+  size_t             lastl;
+  SV                *svp;
+
+  if (!  marpaESLIFRecognizer_discard_lastb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, &lasts, &lastl)) {
+    MARPAESLIFPERL_CROAKF("marpaESLIFRecognizer_discard_lastb failure, %s", strerror(errno));
+  }
+  if ((lasts != NULL) && (lastl > 0)) {
+    svp = MARPAESLIFPERL_NEWSVPVN_UTF8(lasts, lastl);
+  } else {
+    svp = &PL_sv_undef;
+  }
+  RETVAL = svp;
+OUTPUT:
+  RETVAL
+
+=for comment
+  /* ----------------------------------------------------------------------- */
   /* MarpaX::ESLIF::Recognizer::isEof                                        */
   /* ----------------------------------------------------------------------- */
 =cut

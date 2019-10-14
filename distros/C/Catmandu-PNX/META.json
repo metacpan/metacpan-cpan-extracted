@@ -4,7 +4,7 @@
       "Patrick Hochstenbach"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -37,10 +37,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Catmandu" : "1.0",
+            "Catmandu" : "1.2001",
+            "Moo" : "0",
             "XML::Compile" : "0",
             "XML::Compile::Cache" : "0",
             "XML::LibXML" : "0",
+            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -67,10 +69,11 @@
          "web" : "https://github.com/LibreCat/Catmandu-PNX"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

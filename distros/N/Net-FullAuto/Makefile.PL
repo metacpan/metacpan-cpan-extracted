@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000473';
+our $VERSION='1.0000475';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -826,6 +826,7 @@ END
       }
    }
    my $loc="$cwd/dependencies/CPAN";
+   $CPAN::Config->{urllist}="file:$loc";
    $CPAN::Config->{keep_source_where}=$loc;
    $CPAN::Config->{connect_to_internet_ok}=1;
    $CPAN::Config->{index_expire}=1000;
@@ -846,7 +847,7 @@ if ($^O eq 'cygwin') {
    my %need_packages=();
    if ($uname_all=~/x86_64/) {
       foreach my $package ('gcc-core','gcc-g++','make','openssh','openssl',
-                           'openssl-devel','perl','db','libdb-devel',
+                           'libssl-devel','perl','db','libdb-devel',
                            'ncurses','cron','inetutils','procps-ng','vim',
                            'unzip','libmpfr4','libcrypt-devel','nano',
                            'perl-libwww-perl','perl-LWP-Protocol-https',
@@ -861,7 +862,7 @@ if ($^O eq 'cygwin') {
       }
    } else {
       foreach my $package ('gcc-core','gcc-g++','make','openssh','openssl',
-                           'openssl-devel','perl','perl-Win32','db4.8',
+                           'libssl-devel','perl','perl-Win32','db4.8',
                            'libdb4.8-devel','ncurses','cron','inetutils',
                            'procps','vim','unzip','libmpfr4','nano',
                            'wget','git','figlet') {
@@ -2827,8 +2828,8 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
             if ($^O eq 'MSWin64' || msw64bit()) {
                $setup_cmd="$drlet & cd \"$cygwin_root_dir\" & "
                       .'setup-x86_64.exe -P gcc-core,perl-libwww-perl,'
-                      .'gcc-g++,make,openssh,openssl,openssl-devel,perl,'
-                      .'procps-ng,vim,unzip,libmpfr4,figlet,wget,get,'
+                      .'gcc-g++,make,openssh,openssl,libssl-devel,'
+                      .'perl,procps-ng,vim,unzip,libmpfr4,figlet,wget,get,'
                       .'db,libdb-devel,ncurses,cron,inetutils,pkg-config,'
                       .'git,libcrypt-devel,perl-LWP-Protocol-https,nano,'
                       .'autobuild,autoconf,automake,libtool,libxml2-devel,'
@@ -2838,7 +2839,7 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
             } else {
                $setup_cmd="$drlet & cd \"$cygwin_root_dir\" & "
                       .'setup-x86.exe -P gcc-core,nano,'
-                      .'gcc-g++,make,openssh,openssl,openssl-devel,perl,'
+                      .'gcc-g++,make,openssh,openssl,libssl-devel,perl,'
                       .'perl-Win32,db4.8,libdb4.8-devel,ncurses,cron,'
                       .'inetutils,procps,vim,unzip,libmpfr4,figlet,git,'
                       .'wget -X -A -q '."-R $cygwin_root_dir "

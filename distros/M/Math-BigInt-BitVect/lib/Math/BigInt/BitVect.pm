@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 use Carp;
 use Bit::Vector;

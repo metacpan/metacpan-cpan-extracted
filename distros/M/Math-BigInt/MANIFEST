@@ -128,9 +128,9 @@ t/author-lib-convert-string-_to_hex.t
 t/author-lib-convert-string-_to_oct.dat
 t/author-lib-convert-string-_to_oct.t
 t/author-lib-misc-_check.t
-t/author-lib-misc-api_version.t
 t/author-lib-property-_alen.t
 t/author-lib-property-_digit.t
+t/author-lib-property-_digitsum.t
 t/author-lib-property-_len.t
 t/author-lib-property-_zeros.t
 t/author-lib.ini
@@ -138,9 +138,11 @@ t/author-lib.t
 t/author-numify-mbf.t
 t/author-numify-mbi.t
 t/author-relop-mbi-mbf.t
+t/backermann-mbi.t
 t/bare_mbf.t
 t/bare_mbi.t
 t/bare_mif.t
+t/bdigitsum-mbi.t
 t/bdstr-mbf.t
 t/bdstr-mbi.t
 t/bestr-mbf.t
@@ -162,6 +164,7 @@ t/bnstr-mbf.t
 t/bnstr-mbi.t
 t/bsstr-mbf.t
 t/bsstr-mbi.t
+t/buparrow-mbi.t
 t/calling-class-methods.t
 t/calling-instance-methods.t
 t/calling.t
@@ -178,6 +181,7 @@ t/from_bin-mbf.t
 t/from_bin-mbi.t
 t/from_hex-mbf.t
 t/from_hex-mbi.t
+t/from_ieee754-mbf.t
 t/from_oct-mbf.t
 t/from_oct-mbi.t
 t/inf_nan.t
@@ -222,6 +226,7 @@ t/sub_mbf.t
 t/sub_mbi.t
 t/sub_mif.t
 t/to_base-mbi.t
+t/to_ieee754-mbf.t
 t/trap.t
 t/upgrade.inc
 t/upgrade.t

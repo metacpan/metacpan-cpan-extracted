@@ -2,44 +2,20 @@ Proc-Forkmap
 
 This module supplies an easy to use map method that provides built-in forking and IPC.
 
-EXAMPLES:
+EXAMPLE:
+
+    use Proc::Forkmap;
     
     sub foo {
-        my ($x,$n) = (shift,1);
-        $n *= $_ for (@$x);
-        say $n;
+        my $x = shift;
+        my $t = sprintf("%1.0f", $x + 1);
+        sleep $t;
+        print "slept $t seconds\n";
     }
     
-    @x = ([1..99],[100..199],[200..299]);
+    my @x = (rand(), rand(), rand());
     my $p = Proc::Forkmap->new;
-    $p->fmap(\&foo,@x);
-    
-    or,
-    
-    #get stuff from the intertubes
-    
-    sub bar {
-       my $t = shift;
-       my $s = Stock::Price->new;
-       ... get historical stock prices ...
-       ... do some analysis ...
-       baz($t,$sell_price);
-    }
-    
-    #then save stuff to a data store
-    
-    sub baz {
-       my ($t,$price) = @_;
-       my $conn = MongoDB::Connection->new;
-       my $db = $conn->stock;
-       my $bayes = $db->bayes;
-       $bayes->insert({symbol => $t, price => $price});
-       $conn->disconnect;
-    }
-    
-    my $p = Proc::Forkmap->new(max_kids => 4);
-    $p->fmap(\&bar,qw/rht goog ^ixic ^dji yhoo aapl/);
-
+    $p->fmap(\&foo, @x);
 
 INSTALLATION
 
@@ -74,7 +50,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 Andrew Shapiro
+Copyright (C) 2019 Andrew Shapiro
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

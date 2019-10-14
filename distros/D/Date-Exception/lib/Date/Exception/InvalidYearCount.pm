@@ -1,6 +1,6 @@
 package Date::Exception::InvalidYearCount;
 
-$Date::Exception::InvalidYearCount::VERSION   = '0.07';
+$Date::Exception::InvalidYearCount::VERSION   = '0.08';
 $Date::Exception::InvalidYearCount::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Exception::InvalidYearCount - Handles 'invalid year count' exception.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

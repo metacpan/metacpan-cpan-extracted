@@ -10,7 +10,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::More tests => 23777;
+use Test::More tests => 19031;
 
 ###############################################################################
 # Read and load configuration file and backend library.
@@ -50,6 +50,8 @@ can_ok($LIB, '_from_base');
 
 my @data;
 
+my $max = 0x7fffffff;   # 2**31-1 (max value for a 32 bit signed int)
+
 # Small numbers and other simple tests.
 
 for (my $x = 0; $x <= 255 ; ++ $x) {
@@ -59,23 +61,43 @@ for (my $x = 0; $x <= 255 ; ++ $x) {
     push @data, [ sprintf("%X", $x), 16, $x ];
 }
 
-my $collseq = '0123456789' . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                           . 'abcdefghijklmnopqrstuvwxyz';
+my $collseq = '0123456789'                      #  48 ..  57
+            . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'      #  65 ..  90
+            . 'abcdefghijklmnopqrstuvwxyz'      #  97 .. 122
+            . '!"#$%&\'()*+,-./'                #  33 ..  47
+            . ':;<=>?@'                         #  58 ..  64
+            . '[\\]^_`'                         #  91 ..  96
+            . '{|}~';                           # 123 .. 126
 
-for my $base (2 .. 62) {
+for my $base (2 .. 94) {
 
-    # Zero should be converted to zero, regardless of base and collation
-    # sequence.
+    # "0" is converted to zero, regardless of base and collation sequence.
 
     push @data, [ "0", $base,           "0" ];
     push @data, [ "0", $base, $collseq, "0" ];
 
     # Increasing integer powers of the base, with a collation sequence of
-    # "01..."  should give "1", "10", "100", "1000", ...
+    # "01..." gives "1", "10", "100", "1000", ...
 
-    for my $pow (0 .. 5) {
-        push @data, [ '1' . ('0' x $pow), $base,           $base ** $pow ];
-        push @data, [ '1' . ('0' x $pow), $base, $collseq, $base ** $pow ];
+    for (my $pow = 0 ; ; $pow++) {
+        my $x = $base ** $pow;
+        last if $x > $max;
+        push @data, [ '1' . ('0' x $pow), $base,           $x ];
+        push @data, [ '1' . ('0' x $pow), $base, $collseq, $x ];
+    }
+
+    # b^n-1 gives a string containing only one or more of the last character in
+    # the collation sequence. E.g.,
+    #    b =  2, n = 4, 2^4-1 -> "1111"
+    #    b = 10, n = 5, 10^5-1 -> "99999"
+    #    b = 16, n = 6, 10^6-1 -> "FFFFFF"
+
+    for (my $pow = 1 ; ; $pow++) {
+        my $x = $base ** $pow - 1;
+        last if $x > $max;
+        my $chr = substr $collseq, $base - 1, 1;
+        push @data, [ $chr x $pow, $base,           $x ];
+        push @data, [ $chr x $pow, $base, $collseq, $x ];
     }
 }
 
@@ -96,7 +118,8 @@ for my $exp (1 .. 100) {
     my $collseq = '-|';
     for my $base (2 .. 255) {
         for my $pow (0 .. 3) {
-            my $x   = $base ** $pow;
+            my $x = $base ** $pow;
+            last if $x > $max;
             my $str = '|' . ('-' x $pow);
             push @data, [ $str, $base, $collseq, $x ];
         }
@@ -122,6 +145,14 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
 
     my ($x, @got);
 
+    # Collation sequence. Make an escaped version for display purposes.
+
+    my ($cs, $csesc);
+    if (@in == 3) {
+        $cs = $in[2];
+        ($csesc = $cs) =~ s|([\@\$`"\\])|\\$1|g;
+    }
+
     # We test with the base given as a scalar and as a reference. We also
     # accept test data with and without a collation sequence.
 
@@ -129,22 +160,20 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
 
         # To avoid integer overflow, don't test with a large, scalar base.
 
-        next if $base_as_scalar && $in[1] > 1_000_000;
+        next if $base_as_scalar && $in[1] > $max;
 
         my $test;
-        if ($base_as_scalar) {
-            $test .= qq| \$b = $in[1];|;
-        } else {
-            $test .= qq| \$b = $LIB->_new("$in[1]");|;
-        }
-        $test .= qq| \@got = $LIB->_from_base("$in[0]", \$b|;
-        $test .= qq|, "$in[2]"| if @in == 3;    # include collation sequence?
-        $test .= qq|);|;
+        $test .= $base_as_scalar ? qq| \$b = $in[1];|
+                                 : qq| \$b = $LIB->_new("$in[1]");|;
+        $test .= @in == 3 ? qq| \@got = $LIB->_from_base("$in[0]", \$b, "$in[2]");|
+                          : qq| \@got = $LIB->_from_base("$in[0]", \$b);|;
+
+        $b = $base_as_scalar ? $in[1]
+                             : $LIB->_new($in[1]);
+        @got = @in == 3 ? $LIB->_from_base($in[0], $b, $in[2])
+                        : $LIB->_from_base($in[0], $b);
 
         diag("\n$test\n\n") if $ENV{AUTHOR_DEBUGGING};
-
-        eval $test;
-        is($@, "", "'$test' gives emtpy \$\@");
 
         subtest "_from_base() in list context: $test", sub {
             plan tests => 4,
@@ -172,6 +201,14 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
 
     my ($x, $got);
 
+    # Collation sequence. Make an escaped version for display purposes.
+
+    my ($cs, $csesc);
+    if (@in == 3) {
+        $cs = $in[2];
+        ($csesc = $cs) =~ s|([\@\$`"\\])|\\$1|g;
+    }
+
     # We test with the base given as a scalar and as a reference. We also
     # accept test data with and without a collation sequence.
 
@@ -179,22 +216,20 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
 
         # To avoid integer overflow, don't test with a large, scalar base.
 
-        next if $base_as_scalar && $in[1] > 1_000_000;
+        next if $base_as_scalar && $in[1] > $max;
 
         my $test;
-        if ($base_as_scalar) {
-            $test .= qq| \$b = $in[1];|;
-        } else {
-            $test .= qq| \$b = $LIB->_new("$in[1]");|;
-        }
-        $test .= qq|\$got = $LIB->_from_base("$in[0]", \$b|;
-        $test .= qq|, "$in[2]"| if @in == 3;    # include collation sequence?
-        $test .= qq|);|;
+        $test .= $base_as_scalar ? qq| \$b = $in[1];|
+                                 : qq| \$b = $LIB->_new("$in[1]");|;
+        $test .= @in == 3 ? qq| \$got = $LIB->_from_base("$in[0]", \$b, "$in[2]");|
+                          : qq| \$got = $LIB->_from_base("$in[0]", \$b);|;
+
+        $b = $base_as_scalar ? $in[1]
+                             : $LIB->_new($in[1]);
+        $got = @in == 3 ? $LIB->_from_base($in[0], $b, $in[2])
+                        : $LIB->_from_base($in[0], $b);
 
         diag("\n$test\n\n") if $ENV{AUTHOR_DEBUGGING};
-
-        eval $test;
-        is($@, "", "'$test' gives emtpy \$\@");
 
         subtest "_from_base() in scalar context: $test", sub {
             plan tests => 3,

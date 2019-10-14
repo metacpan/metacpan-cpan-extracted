@@ -1,0 +1,30 @@
+---
+abstract: 'Typeable Method and Function Signatures'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires:
+  Function::Parameters: '2.001003'
+  Test::Auto: '0.03'
+  Type::Tiny: '1.004004'
+  perl: '5.014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: routines
+requires:
+  Function::Parameters: '2.001003'
+  Type::Tiny: '1.004004'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/iamalnewkirk/routines/issues
+  homepage: http://metacpan.org/release/routines/
+  repository: git://github.com/iamalnewkirk/routines.git
+version: '0.02'
+x_authority: cpan:AWNCORP
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

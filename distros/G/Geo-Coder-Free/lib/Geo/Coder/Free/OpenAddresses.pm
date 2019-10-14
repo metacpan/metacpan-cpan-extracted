@@ -226,8 +226,11 @@ sub geocode {
 		$location = $1;
 	}
 
-	if($location =~ /^(.+),?\s*Washington\s*DC/i) {
+	if($location =~ /^(.+),?\s*Washington\s*DC$/i) {
 		$location = "$1, Washington, DC, USA";
+	} elsif($location =~ /^(.*),?\s*Saint Louis, (Missouri|MO)(.*)$/) {
+		# createdatabase.PL also maps this
+		$location = "$1, St. Louis, MO$3";
 	}
 
 	if(my $rc = $known_locations{$location}) {

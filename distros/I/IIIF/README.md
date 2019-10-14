@@ -13,6 +13,13 @@ IIIF - IIIF Image API implementation
 Module IIIF provides an implementation of [IIIF ImageAPI](https://iiif.io/api/image/3.0/)
 based on the [ImageMagick](https://www.imagemagick.org/) command line application.
 
+# FEATURES
+
+- Full IIIF Image API 3.0 level 2 compliance.
+- Tested with ImageMagick 6 (Ubuntu) and 7 (Windows)
+- 100% [test coverage](https://coveralls.io/github/nichtich/IIIF) on statement
+level, (>90% on branch level and >70% on condition level).
+
 # MODULES
 
 - [IIIF::Request](https://metacpan.org/pod/IIIF::Request)

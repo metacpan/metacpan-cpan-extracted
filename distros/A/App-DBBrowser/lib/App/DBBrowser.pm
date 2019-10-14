@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.212';
+our $VERSION = '2.214';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -634,6 +634,9 @@ sub __create_drop_or_attach {
                     $ax->print_error_message( $@, 'Drop View' );
                 }
             }
+            if ( defined $sf->{i}{occupied_rows} ) {
+                $sf->{i}{occupied_rows} = undef;
+            }
             $sf->{old_idx_hidden} = $old_idx;
             $sf->{redo_db}     = $sf->{d}{db};
             $sf->{redo_schema} = $sf->{d}{schema};
@@ -715,7 +718,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.212
+Version 2.214
 
 =head1 DESCRIPTION
 

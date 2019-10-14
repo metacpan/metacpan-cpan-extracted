@@ -1,3 +1,7 @@
+1.004     2019-10-10 18:27:29 EDT
+  - Default tm_mday to 0 in strptime for consistency with other fields on
+    Solaris.
+
 1.003     2019-10-10 17:33:23 EDT
   - Clarify that mktime may adjust any elements of the passed tm record.
   - Renamed with_extra method for Time::FFI::tm to normalized and clarify that

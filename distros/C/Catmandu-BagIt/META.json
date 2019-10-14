@@ -60,6 +60,7 @@
       "test" : {
          "requires" : {
             "IO::Callback" : "0",
+            "Role::Tiny" : "0",
             "Test::Deep" : "0.112",
             "Test::Exception" : "0.32",
             "Test::LWP::UserAgent" : "0",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.237",
+   "version" : "0.238",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",

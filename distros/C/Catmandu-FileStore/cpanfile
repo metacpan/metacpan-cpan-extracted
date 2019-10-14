@@ -10,6 +10,9 @@ on 'test', sub {
   requires 'Test::More', '0.99';
   requires 'Test::Pod', 0;
   requires 'IO::Callback', 0;
+  requires 'Role::Tiny', 0;
+  requires 'App::Cmd::Tester::CaptureExternal', 0;
+  requires 'Cpanel::JSON::XS', 0;
 };
 
 requires 'Catmandu', '>=1.06';

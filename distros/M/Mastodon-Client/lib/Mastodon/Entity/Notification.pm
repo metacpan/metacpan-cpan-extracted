@@ -3,13 +3,13 @@ package Mastodon::Entity::Notification;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo;
 with 'Mastodon::Role::Entity';
 
 use Types::Standard qw( Int Enum );
-use Mastodon::Types qw( Status URI DateTime Account Acct );
+use Mastodon::Types qw( Status DateTime Account );
 
 has account    => ( is => 'ro', isa => Account, );
 has created_at => ( is => 'ro', isa => DateTime, );

@@ -39,7 +39,9 @@ my @tests;
 if( @ARGV ) {
     @tests = @ARGV;
 } else {
-    @tests = grep { -f $_ } map { glob $_ } 't/*.t', 'scripts/*'
+    open my $manifest, '<', 'MANIFEST'
+        or die "Couldn't read MANIFEST: $!";
+    @tests = grep { -f $_ } grep { m!^(t/.*\.t|scripts/.*\.pl)$! } map { s!\s*$!!; $_ } <$manifest>
 }
 plan tests => 0+@tests;
 
@@ -80,15 +82,11 @@ for my $test_file (@tests) {
             #diag "$p is not in core for $minimum_perl";
         };
 
-        # Filter::signatures provides a (fake) feature.pm
-        if( $explicit_test_prereqs->{ 'Filter::signatures' }) {
-            delete $missing{ 'feature' };
-        };
-
         # remove explicit (test) prerequisites
         for my $k (keys %$explicit_test_prereqs) {
             delete $missing{ $k };
         };
+        #warn Dumper $explicit_test_prereqs->as_string_hash;
 
         # Remove stuff from our distribution
         for my $k (keys %distribution) {

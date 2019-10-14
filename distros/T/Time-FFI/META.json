@@ -66,11 +66,11 @@
    "provides" : {
       "Time::FFI" : {
          "file" : "lib/Time/FFI.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       },
       "Time::FFI::tm" : {
          "file" : "lib/Time/FFI/tm.pm",
-         "version" : "1.003"
+         "version" : "1.004"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/Grinnz/Time-FFI"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -274,7 +274,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.003",
+                  "tag" : "1.004",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

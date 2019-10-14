@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.212';
+our $VERSION = '2.214';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.212
+Version 2.214
 
 =head1 SYNOPSIS
 
@@ -933,6 +933,29 @@ Advantages:
 =item
 
 The values assigned to the IRS and the IFS are treated as regexps.
+
+=back
+
+=back
+
+=over
+
+=item
+
+Template
+
+Uses C<unpack> to break up input lines.
+
+If the row length is greater than the screen width, make notes of the number of columns and the length of each column
+before using I<Template>.
+
+Advantages:
+
+=over
+
+=item
+
+Good for input with fixed-columns-length.
 
 =back
 

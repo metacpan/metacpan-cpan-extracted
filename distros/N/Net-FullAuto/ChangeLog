@@ -20,6 +20,23 @@
 #######################################################################
 
 
+2019-10-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000475 released
+
+	* Changed openssl-devel to libssl-devel
+	  for Cygwin installs.
+
+
+2019-10-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000474 released
+
+	* Fixed Regex in ls_parse().
+
+	* Fixed Error Handling in cwd().
+
+
 2019-05-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000473 released

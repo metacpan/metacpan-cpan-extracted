@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0503  2019-10-11 12:11:25 CEST
+  - fix resumptionToken handling bugs
+
 0.0502  2019-09-24 15:17:01 CEST
   - add a new search_strategy setting with possible values 'paginate' (the
     default) and 'es.scroll'

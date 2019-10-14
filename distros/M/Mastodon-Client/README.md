@@ -44,6 +44,13 @@ Alternatively, this distribution can be used via the low-level request methods
 (**post**, **get**, etc), which allow direct access to the API endpoints. All
 other methods call one of these at some point.
 
+# VERSION NOTICE
+
+This distribution currently **only supports version 1 of the Mastodon API**.
+
+Help implementing support for any missing features in version 1, and for the
+new features in version 2, would be greatfully appreciated.
+
 # ATTRIBUTES
 
 - **instance**
@@ -63,8 +70,8 @@ other methods call one of these at some point.
 - **user\_agent**
 
     The user agent to use for the requests. Defaults to an instance of
-    [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent). It is expected to have a `request` method that accepts
-    instances of [HTTP::Request](https://metacpan.org/pod/HTTP::Request) objects.
+    [HTTP::Thin](https://metacpan.org/pod/HTTP::Thin). It is expected to have a `request` method that
+    accepts [HTTP::Request](https://metacpan.org/pod/HTTP::Request) objects.
 
 - **coerce\_entities**
 
@@ -189,6 +196,25 @@ The methods facilitating this process are detailed below:
 
     When successful, the method automatically sets the client's **authorized**
     attribute to a true value and caches the **access\_token** for all future calls.
+
+## Error handling
+
+Methods that make requests to the server will `die` whenever an error is
+encountered, or the data that was received from the server is not what is
+expected. The error string will, when possible, come from the response's
+status line, but this will likely not be enough to fully diagnose what
+went wrong.
+
+- **latest\_response**
+
+    To make this easier, the client will cache the server's response after each
+    request has been made, and expose it through the `latest_response` accessor.
+
+    Note that, as its name implies, _this will only store the most recent
+    response_.
+
+    If called before any request has been made, it will return an undefined
+    value.
 
 The remaining methods listed here follow the order of those in the official API
 documentation.
@@ -389,9 +415,26 @@ documentation.
 ## Media
 
 - **upload\_media($file)**
+- **upload\_media($file, $params)**
 
-    Upload a file as an attachment. Takes a single argument with the name of a
-    local file to encode and upload. The argument is mandatory.
+    Upload a file as an attachment. Takes a mandatory argument with the name of a
+    local file to encode and upload, and an optional hash reference with the
+    following additional parameters:
+
+    - **description**
+
+        A plain-text description of the media, for accessibility, as a string.
+
+    - **focus**
+
+        An array reference of two floating point values, to be used as
+        the x and y focus values. These inform clients which point in
+        the image is the most important one to show in a cropped view.
+
+        The value of a coordinate is a real number between -1 and +1,
+        where 0 is the center. x:-1 indicates the left edge of the
+        image, x:1 the right edge. For the y axis, y:1 is the top edge
+        and y:-1 is the bottom.
 
     Depending on the value of `coerce_entities`, returns an
     Mastodon::Entity::Attachment object, or a plain hash reference.

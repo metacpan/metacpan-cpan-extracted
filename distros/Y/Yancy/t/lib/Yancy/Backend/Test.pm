@@ -40,8 +40,6 @@ sub collections;
 sub create {
     my ( $self, $schema_name, $params ) = @_;
     $params = $self->_normalize( $schema_name, $params ); # makes a copy
-    die "No refs allowed in '$schema_name': " . encode_json $params
-        if grep ref, values %$params;
     my $props = $self->schema->{ $schema_name }{properties};
     $params->{ $_ } = $props->{ $_ }{default} // undef
         for grep !exists $params->{ $_ },
@@ -121,8 +119,6 @@ sub set {
     my ( $self, $schema_name, $id, $params ) = @_;
     return if !$DATA{ $schema_name }{ $id };
     $params = $self->_normalize( $schema_name, $params );
-    die "No refs allowed in '$schema_name'($id): " . encode_json $params
-        if grep ref, values %$params;
     my $id_field = $self->schema->{ $schema_name }{ 'x-id-field' } || 'id';
     my $old_item = $DATA{ $schema_name }{ $id };
     if ( !$params->{ $id_field } ) {
@@ -172,5 +168,7 @@ sub read_schema {
     }
     return @table_names ? @$cloned{ @table_names } : $cloned;
 }
+
+sub supports { grep { $_[1] eq $_ } 'complex-type' }
 
 1;

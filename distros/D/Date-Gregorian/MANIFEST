@@ -1,6 +1,7 @@
+CONTRIBUTING
 Changes
+LICENSE
 MANIFEST
-META.yml
 Makefile.PL
 README
 examples/calendar
@@ -8,12 +9,15 @@ examples/today
 lib/Date/Gregorian.pm
 lib/Date/Gregorian/Business.pm
 lib/Date/Gregorian/Exact.pm
-t/basic.t
-t/business.t
-t/datetime.t
-t/exact.t
-t/localtime.t
-t/pod-coverage.t
-t/pod.t
-t/string.t
-t/version_numbers.t
+t/01_basics.t
+t/02_string.t
+t/03_localtime.t
+t/04_datetime.t
+t/05_business.t
+t/06_exact.t
+t/90_pod.t
+t/91_pod-coverage.t
+t/95_versions.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

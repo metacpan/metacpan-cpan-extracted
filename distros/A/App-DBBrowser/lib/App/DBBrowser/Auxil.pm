@@ -12,7 +12,7 @@ use JSON qw( decode_json );
 use Term::Choose            qw();
 use Term::Choose::LineFold  qw( line_fold print_columns );
 use Term::Choose::Screen    qw( clear_screen );
-use Term::Choose::Util      qw( insert_sep get_term_width );
+use Term::Choose::Util      qw( insert_sep get_term_width get_term_height unicode_sprintf);
 use Term::Form              qw();
 
 
@@ -103,38 +103,41 @@ sub get_stmt {
 
 sub insert_into_args_info_format {
     my ( $sf, $sql, $indent ) = @_;
-    my $begin = 5;
-    my $max = 12;
-    my $end = 0;
-    if ( $max < $begin ) {
-        $begin = $max;
+    my $max = get_term_height() - ( $sf->{i}{occupied_rows} // 14 );
+    if ( $max < 5 ) {
+        $max = 5;
     }
-    else {
-        $end = $max - $begin;
-    }
+    my $begin = int( $max / 1.5 );
+    my $end = $max - $begin;
     $begin--;
     $end--;
-    my $list_sep = ', ';
     my $last_i = $#{$sql->{insert_into_args}};
     my $tmp = [];
-    if ( @{$sql->{insert_into_args}} > $max + 3 ) {
+    my $term_w = get_term_width();
+    if ( @{$sql->{insert_into_args}} > $max ) {
         for my $row ( @{$sql->{insert_into_args}}[ 0 .. $begin ] ) {
-            push @$tmp, $indent . join $list_sep, map { $_ // '' } @$row;
+            push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
-        push @$tmp, $indent . '...';
-        push @$tmp, $indent . '...';
+        push @$tmp, $indent . '[...]';
         for my $row ( @{$sql->{insert_into_args}}[ $last_i - $end .. $last_i ] ) {
-            push @$tmp, $indent . join $list_sep, map { $_ // '' } @$row;
+            push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
         my $row_count = scalar( @{$sql->{insert_into_args}} );
         push @$tmp, $indent . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
     }
     else {
         for my $row ( @{$sql->{insert_into_args}} ) {
-            push @$tmp, $indent . join $list_sep, map { $_ // '' } @$row;
+            push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
     }
     return $tmp;
+}
+
+sub _prepare_table_row {
+    my ( $row, $indent, $term_w ) = @_;
+    my $list_sep = ', ';
+    no warnings 'uninitialized';
+    return unicode_sprintf( $indent . join( $list_sep, map { s/\n/[NL]/g; $_ } @$row ), $term_w, 0, 1 );
 }
 
 
@@ -182,7 +185,7 @@ sub print_sql {
         $str = $filled
     }
     $str .= "\n";
-    $str = line_fold( $str, get_term_width() - 2, { init_tab => '', subseq => ' ' x 4 } );
+    $str = line_fold( $str, get_term_width(), { init_tab => '', subseq => ' ' x 4 } );
     if ( defined wantarray ) {
         return $str;
     }

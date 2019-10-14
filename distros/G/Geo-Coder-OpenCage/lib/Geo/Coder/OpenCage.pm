@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.23';
+$Geo::Coder::OpenCage::VERSION = '0.24';
 use strict;
 use warnings;
 
@@ -11,7 +11,8 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.23;
+my $version = 0.24;
+my $ua_string;
 
 sub new {
     my $class = shift;
@@ -21,14 +22,28 @@ sub new {
         croak "api_key is a required parameter for new()";
     }
 
+    $ua_string = $class . ' ' . $version;
+    my $ua = $params{ua} || HTTP::Tiny->new(agent => $ua_string);
     my $self = {
         version => $version,
         api_key => $params{api_key},
-        ua      => HTTP::Tiny->new(agent => 'Geo::Coder::OpenCage ' . $version),
+        ua      => $ua,
         json    => JSON::MaybeXS->new( utf8 => 1 ),
         url     => URI->new('https://api.opencagedata.com/geocode/v1/json/'),
     };
+
+    print Dumper $ua;
     return bless $self, $class;
+}
+
+sub ua {
+    my $self = shift;
+    my $ua   = shift;
+    if (defined($ua)){
+        $ua->agent($ua_string);
+        $self->{ua} = $ua;
+    }    
+    return $self->{ua};
 }
 
 # see list: https://opencagedata.com/api#forward-opt
@@ -128,7 +143,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -151,6 +166,16 @@ It is recommended you read the L<best practices for using the OpenCage geocoder|
     my $Geocoder = Geo::Coder::OpenCage->new(api_key => $my_api_key);
 
 Get your API key from L<https://opencagedata.com>
+
+=head2 ua
+
+    $ua = $geocoder->ua();
+    $ua = $geocoder->ua($ua);
+
+Accessor for the UserAgent object. By default HTTP::Tiny is used. Useful if for
+example you want to specify that something like LWP::UserAgent::Throttled for 
+rate limiting. Even if a new UserAgent is specified the useragent string will 
+be specified as "Geo::Coder::OpenCage $version"
 
 =head2 geocode
 
@@ -241,7 +266,7 @@ Ed Freyfogle
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 OpenCage Data Ltd <cpan@opencagedata.com>
+Copyright 2019 OpenCage GmbH <cpan@opencagedata.com>
 
 Please check out all our open source work over at L<https://github.com/opencagedata> and our developer blog: L<https://blog.opencagedata.com>
 
@@ -257,7 +282,7 @@ edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by OpenCage Data Limited.
+This software is copyright (c) 2019 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

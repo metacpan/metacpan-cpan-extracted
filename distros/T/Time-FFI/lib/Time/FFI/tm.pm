@@ -7,7 +7,7 @@ use FFI::Platypus::Record ();
 use Module::Runtime ();
 use Time::Local ();
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 my @tm_members = qw(tm_sec tm_min tm_hour tm_mday tm_mon tm_year tm_wday tm_yday tm_isdst);
 
@@ -123,7 +123,7 @@ Time::FFI::tm - POSIX tm record structure
     tm_sec   => 59,
     tm_isdst => -1, # allow DST status to be determined by the system
   );
-  $tm->mday($tm->mday + 1); # add a day
+  $tm->tm_mday($tm->tm_mday + 1); # add a day
 
   my $in_local = $tm->normalized(1);
   say $in_local->tm_isdst; # now knows if DST is active
@@ -188,7 +188,7 @@ Day of year [0,365].
 
 =head2 tm_isdst
 
-Daylight Savings flag.
+Daylight Savings flag. (0: off, positive: on, negative: unknown)
 
 =head2 tm_gmtoff
 
@@ -219,6 +219,8 @@ be interpreted as the default of 0, but see L</ATTRIBUTES>.
 =head2 from_object
 
   my $tm = Time::FFI::tm->from_object($obj, $islocal);
+
+I<Since version 1.001>
 
 Construct a new B<Time::FFI::tm> object from the passed datetime object, which
 may be any object that implements an C<epoch> method returning the Unix epoch
@@ -252,6 +254,8 @@ accepted; this is not currently supported for UTC times.
 
   my $epoch = $tm->epoch($islocal);
 
+I<Since version 1.000>
+
 Translate the time structure into a Unix epoch timestamp (seconds since
 1970-01-01 UTC). If a true value is passed, the timestamp will represent the
 time as interpreted in the local time zone; otherwise it will be interpreted as
@@ -263,6 +267,8 @@ accepted; this is not currently supported for UTC times.
 =head2 normalized
 
   my $new = $tm->normalized($islocal);
+
+I<Since version 1.003>
 
 Return a new B<Time::FFI::tm> object representing the same time, but with
 C<tm_wday>, C<tm_yday>, C<tm_isdst>, and (if supported) C<tm_gmtoff> and

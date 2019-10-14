@@ -5,15 +5,18 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Carp;
 use Mastodon::Types qw( Acct Account DateTime Image URI Instance );
 use Moo;
 use Types::Common::String qw( NonEmptyStr );
-use Types::Standard
-  qw( Int Str Optional Bool Maybe Undef HashRef ArrayRef Dict slurpy );
+use Types::Standard qw(
+    Any Int Str Bool Undef HashRef ArrayRef Dict Tuple StrictNum
+    slurpy Maybe Optional
+);
 use Types::Path::Tiny qw( File );
+use Type::Params qw( compile validate );
 
 use Log::Any;
 my $log = Log::Any->get_logger(category => 'Mastodon');
@@ -28,16 +31,17 @@ has coerce_entities => (
 );
 
 has access_token => (
-  is   => 'rw',
-  isa  => NonEmptyStr,
-  lazy => 1,
+  is        => 'rw',
+  isa       => NonEmptyStr,
+  lazy      => 1,
+  predicate => '_has_access_token',
 );
 
 has authorized => (
   is      => 'rw',
   isa     => DateTime|Bool,
   lazy    => 1,
-  default => sub { defined $_[0]->access_token },
+  default => sub { $_[0]->_has_access_token },
   coerce  => 1,
 );
 
@@ -76,7 +80,7 @@ has account => (
 );
 
 has scopes => (
-  is      => 'ro',
+  is      => 'rw',
   isa     => ArrayRef->plus_coercions( Str, sub { [ split / /, $_ ] } ),
   lazy    => 1,
   default => sub { [ 'read' ] },
@@ -84,8 +88,7 @@ has scopes => (
 );
 
 after access_token => sub {
-  my $self = shift;
-  $self->authorized(1);
+  $_[0]->authorized(1) unless $_[0]->authorized;
 };
 
 sub authorize {
@@ -103,9 +106,9 @@ sub authorize {
 
   state $check = compile(
     slurpy Dict [
-      access_code => Str->plus_coercions( Undef, sub {q{}} ),
-      username  => Str->plus_coercions( Undef, sub {q{}} ),
-      password  => Str->plus_coercions( Undef, sub {q{}} ),
+      access_code => Optional [Str],
+      username    => Optional [Str],
+      password    => Optional [Str],
     ],
   );
   my ($params) = $check->(@_);
@@ -122,8 +125,8 @@ sub authorize {
   }
   else {
     $data->{grant_type} = 'password';
-    $data->{username}   = $params->{username};
-    $data->{password}   = $params->{password};
+    $data->{username}   = $params->{username} // '';
+    $data->{password}   = $params->{password} // '';
   }
 
   $data->{scope} = join q{ }, sort @{ $self->scopes };
@@ -266,25 +269,33 @@ sub register {
 
   state $check = compile(
     slurpy Dict [
-      instance => Instance->plus_coercions( Undef, sub { $self->instance } ),
-      redirect_uris =>
-        Str->plus_coercions( Undef, sub { $self->redirect_uri } ),
-      scopes =>
-        ArrayRef->plus_coercions( Undef, sub { $self->scopes } ),
-      website => Str->plus_coercions( Undef, sub { $self->website } ),
+      redirect_uris => Optional [ Str ],
+      scopes        => Optional [ ArrayRef [ Str ] ],
+      website       => Optional [ Str ],
+      instance      => Optional [ Any ],
     ]
   );
   my ($params) = $check->(@_);
 
-  my $response = $self->post('apps' => {
-    client_name   => $self->name,
-    redirect_uris => $params->{redirect_uris},
-    scopes        => join q{ }, sort( @{ $params->{scopes} } ),
-  });
+  # We used to accept instance by mistake, we want to turn it off
+  warn 'Deprecation notice: do not pass an instance parameter to register'
+    if $params->{instance};
+
+  my $website = $params->{website} // $self->website;
+  my $scopes  = $params->{scopes}  // $self->scopes;
+
+  my $response = $self->post(
+    'apps' => {
+      client_name   => $self->name,
+      redirect_uris => $params->{redirect_uris} // $self->redirect_uri,
+      scopes        => join( ' ', sort @{$scopes} ),
+      $website ? ( website => $website ) : (),
+    },
+  );
 
   $self->client_id( $response->{client_id} );
   $self->client_secret( $response->{client_secret} );
-  $self->scopes( $params->{scopes} );
+  $self->scopes($scopes);
 
   return $self;
 }
@@ -441,12 +452,25 @@ sub upload_media {
   my $self = shift;
 
   state $check = compile(
-    File->plus_coercions( Str, sub { Path::Tiny::path($_) } )
+    File->plus_coercions( Str, sub { Path::Tiny::path($_) } ),
+    Optional [ Dict[
+      description => Optional[Str],
+      focus => Optional[Tuple[StrictNum, StrictNum]],
+    ]]
   );
-  my ($file) = $check->(@_);
+  my ($file, $params) = $check->(@_);
+  $params //= {};
 
+  if (exists $params->{focus}) {
+    my ($x,$y) = @{$params->{focus}};
+    if ($x >= -1 && $x <= 1 && $y >= -1 && $y <= 1) {
+      $params->{focus} = "$x,$y";
+    } else {
+      delete $params->{focus};
+    }
+  }
   return $self->post( 'media' =>
-    { file => [ $file, undef ] },
+    { file => [ $file, undef ], %$params },
     headers => { Content_Type => 'form-data' },
   );
 }
@@ -582,6 +606,13 @@ Alternatively, this distribution can be used via the low-level request methods
 (B<post>, B<get>, etc), which allow direct access to the API endpoints. All
 other methods call one of these at some point.
 
+=head1 VERSION NOTICE
+
+This distribution currently B<only supports version 1 of the Mastodon API>.
+
+Help implementing support for any missing features in version 1, and for the
+new features in version 2, would be greatfully appreciated.
+
 =head1 ATTRIBUTES
 
 =over 4
@@ -603,8 +634,8 @@ flow. Defaults to C<urn:ietf:wg:oauth:2.0:oob> (meaning no redirection).
 =item B<user_agent>
 
 The user agent to use for the requests. Defaults to an instance of
-L<LWP::UserAgent>. It is expected to have a C<request> method that accepts
-instances of L<HTTP::Request> objects.
+L<HTTP::Thin>. It is expected to have a C<request> method that
+accepts L<HTTP::Request> objects.
 
 =item B<coerce_entities>
 
@@ -745,6 +776,29 @@ The user's login credentials.
 
 When successful, the method automatically sets the client's B<authorized>
 attribute to a true value and caches the B<access_token> for all future calls.
+
+=back
+
+=head2 Error handling
+
+Methods that make requests to the server will C<die> whenever an error is
+encountered, or the data that was received from the server is not what is
+expected. The error string will, when possible, come from the response's
+status line, but this will likely not be enough to fully diagnose what
+went wrong.
+
+=over 4
+
+=item B<latest_response>
+
+To make this easier, the client will cache the server's response after each
+request has been made, and expose it through the C<latest_response> accessor.
+
+Note that, as its name implies, I<this will only store the most recent
+response>.
+
+If called before any request has been made, it will return an undefined
+value.
 
 =back
 
@@ -1010,8 +1064,30 @@ This method does not require authentication.
 
 =item B<upload_media($file)>
 
-Upload a file as an attachment. Takes a single argument with the name of a
-local file to encode and upload. The argument is mandatory.
+=item B<upload_media($file, $params)>
+
+Upload a file as an attachment. Takes a mandatory argument with the name of a
+local file to encode and upload, and an optional hash reference with the
+following additional parameters:
+
+=over 4
+
+=item B<description>
+
+A plain-text description of the media, for accessibility, as a string.
+
+=item B<focus>
+
+An array reference of two floating point values, to be used as
+the x and y focus values. These inform clients which point in
+the image is the most important one to show in a cropped view.
+
+The value of a coordinate is a real number between -1 and +1,
+where 0 is the center. x:-1 indicates the left edge of the
+image, x:1 the right edge. For the y axis, y:1 is the top edge
+and y:-1 is the bottom.
+
+=back
 
 Depending on the value of C<coerce_entities>, returns an
 Mastodon::Entity::Attachment object, or a plain hash reference.

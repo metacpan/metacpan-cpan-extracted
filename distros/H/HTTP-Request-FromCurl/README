@@ -11,7 +11,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -48,6 +48,9 @@ L<LWP::Protocol::Net::Curl>
 L<LWP::CurlLog>
 
 L<HTTP::Request::AsCurl> - for the inverse function
+
+L<https://github.com/NickCarneiro/curlconverter> - a converter for multiple
+target languages
 
 AUTHOR
 

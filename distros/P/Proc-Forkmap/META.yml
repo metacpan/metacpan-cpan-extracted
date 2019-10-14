@@ -20,4 +20,4 @@ no_index:
 requires:
   Proc::Fork: 0.71
   Test::More: 0
-version: 0.024
+version: 0.2002

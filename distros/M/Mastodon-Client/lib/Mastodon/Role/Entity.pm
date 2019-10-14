@@ -3,7 +3,7 @@ package Mastodon::Role::Entity;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo::Role;
 

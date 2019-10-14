@@ -1,0 +1,12 @@
+.travis.yml
+Changes
+lib/JIP/Spy/Event.pm
+lib/JIP/Spy/Events.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_jip_spy_event.t
+t/01_jip_spy_events.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

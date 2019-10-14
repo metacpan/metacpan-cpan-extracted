@@ -80,7 +80,7 @@ SCANTEXT: {
 						ok(defined($location->{'confidence'}));
 						ok($location->{'state'} eq 'IN');
 						cmp_deeply($location,
-							methods('lat' => num(39.61, 1e-2), 'long' => num(-86.1, 1e-2)));
+							methods('lat' => num(39.61, 1e-2), 'long' => num(-86.11, 1e-2)));
 					}
 				} elsif($city eq 'INDIANAPOLIS') {
 				# } elsif($location->{'location'} =~ /^Indianapolis,/i) {
@@ -98,7 +98,7 @@ SCANTEXT: {
 						ok(defined($location->{'confidence'}));
 						ok($location->{'state'} eq 'IN');
 						cmp_deeply($location,
-							methods('lat' => num(40.05, 1e-2), 'long' => num(-86.01, 1e-2)));
+							methods('lat' => num(40.04, 1e-2), 'long' => num(-86.01, 1e-2)));
 					}
 				}
 			}

@@ -28,7 +28,7 @@ Alternatively to work on the source:
 
 ## COPYRIGHT AND LICENCE
 
-Copyright OpenCage Data Ltd <cpan@opencagedata.com>
+Copyright OpenCage GmbH <cpan@opencagedata.com>
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself,
 either Perl version 5.16 or, at your option, any later version of Perl 5 you may have available.

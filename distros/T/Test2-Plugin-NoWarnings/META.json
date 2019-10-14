@@ -62,7 +62,6 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IPC::Run3" : "0",
@@ -75,18 +74,17 @@
    "provides" : {
       "Test2::Event::Warning" : {
          "file" : "lib/Test2/Event/Warning.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Test2::Plugin::NoWarnings" : {
          "file" : "lib/Test2/Plugin/NoWarnings.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-test2-plugin-nowarnings@rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings"
+         "web" : "https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues"
       },
       "homepage" : "http://metacpan.org/release/Test2-Plugin-NoWarnings",
       "repository" : {
@@ -95,7 +93,7 @@
          "web" : "https://github.com/houseabsolute/Test2-Plugin-NoWarnings"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -829,7 +827,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.07",
+                  "tag" : "v0.08",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

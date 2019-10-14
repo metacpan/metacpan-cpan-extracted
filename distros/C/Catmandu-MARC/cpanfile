@@ -28,4 +28,5 @@ requires 'MARC::Spec', '2.0.3';
 requires 'Memoize', '0';
 requires 'Module::Build', '>=0.4229'; # travis ci
 requires 'Moo', '1.0';
+requires 'namespace::clean', '0';
 requires 'MooX::Singleton', '0';

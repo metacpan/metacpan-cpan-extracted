@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-ElasticSearch
 
+1.0201  2019-10-11 12:07:18 CEST
+  - fix scrolled search bug
+
 1.02  2019-09-24 14:54:32 CEST
   - support scroll/scroll_id in search
 

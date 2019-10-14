@@ -3,6 +3,8 @@ use strict;
 use warnings;
 
 use Test::More tests => 1;
+use LWP::UserAgent;
+use HTTP::Tiny;
 
 require './Makefile.PL';
 my %module = get_module_info();

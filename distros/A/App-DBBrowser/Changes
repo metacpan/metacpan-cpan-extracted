@@ -1,6 +1,18 @@
 Revision history for App-DBBrowser
 
 
+2.214    2019-10-13
+        - Update documentation.
+
+2.213    2019-10-13
+        - New parse mode: "Template".
+        - Update input filter menu.
+        - Update input filter info output.
+        - Bugfix copy & paste: removed 'Spreadsheet::Read' from the menu.
+        - Bugfixes in setting column names.
+        - Bugfix in resetting header row.
+        - Update create table menu.
+
 2.212    2019-10-06
         - New input filter: "Remove_Cell", "Insert_Cell", "Row_Groups".
 

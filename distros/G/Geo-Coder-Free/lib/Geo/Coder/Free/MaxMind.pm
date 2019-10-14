@@ -1,5 +1,10 @@
 package Geo::Coder::Free::MaxMind;
 
+# sqlite3 cities.sql
+#	select * from cities where City like '%north shields%';
+# - note 'J5'
+# grep 'GB.ENG.J5' admin2.db
+
 use strict;
 use warnings;
 
@@ -249,7 +254,7 @@ sub geocode {
 		if(my $twoletterstate = Locale::US->new()->{state2code}{uc($county)}) {
 			$county = $twoletterstate;
 		}
-	} elsif(($country eq 'Canada') && (length($state) > 2)) {
+	} elsif(($country eq 'Canada') && $state && (length($state) > 2)) {
 		# ::diag(__LINE__, ": $county");
 		if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($state)}) {
 			# FIXME:  I can't see that province locations are stored in cities.csv
@@ -536,9 +541,9 @@ sub _prepare {
 
 	if(my $region = $loc->{'Region'}) {
 		my $county;
-		foreach my $c(keys %admin2cache) {
-			if($admin2cache{$c} eq $region) {
-				$county = $c;
+		while(my ($key, $value) = each %admin2cache) {
+			if($value eq $region) {
+				$county = $key;
 				last;
 			}
 		}

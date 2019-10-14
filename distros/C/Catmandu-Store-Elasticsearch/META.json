@@ -70,7 +70,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Store-Elasticsearch"
       }
    },
-   "version" : "1.02",
+   "version" : "1.0201",
    "x_contributors" : [
       "Dave Sherohman <Dave.Sherohman@ub.lu.se>",
       "Mirko Tietgen <mirko@abunchofthings.net>",

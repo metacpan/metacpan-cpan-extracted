@@ -3,7 +3,7 @@ package Test2::Event::Warning;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Test2::Event';
 
@@ -35,7 +35,7 @@ Test2::Event::Warning - A Test2 event for warnings
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ Returns the warning that this event captured.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings> or via email to L<bug-test2-plugin-nowarnings@rt.cpan.org|mailto:bug-test2-plugin-nowarnings@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

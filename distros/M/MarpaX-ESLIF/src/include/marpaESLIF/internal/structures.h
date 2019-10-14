@@ -406,7 +406,7 @@ struct marpaESLIFRecognizer {
   marpaESLIFRecognizerOption_t marpaESLIFRecognizerOptionDiscard;
   marpaESLIFValueOption_t      marpaESLIFValueOptionDiscard;
 
-  /* Embedded lua */
+  /* Embedded lua - c.f. src/bindings/src/marpaESLIFLua.c */
   void                        *marpaESLIFLuaRecognizerContextp;
 
   /* Lexeme input stack is a marpaESLIFValueResult stack */
@@ -420,6 +420,12 @@ struct marpaESLIFRecognizer {
   /* For pristine recognizers, expected terminals are always known in advance */
   size_t                       nSymbolPristinel;
   int                          *symbolArrayPristinep; /* This is shallow pointer! */
+
+  /* Last discard information is NOT available via last_complete because formally there is */
+  /* no token injected in the grammar: discard is a transversal thing. So, we trackb is on */
+  /* the only way to get last discard value is to have an explicit area for it. */
+  size_t                       lastDiscardl;    /* Number of bytes */
+  char                        *lastDiscards;    /* Bytes */
 };
 
 struct marpaESLIF_lexeme_data {

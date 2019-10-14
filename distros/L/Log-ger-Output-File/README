@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::File - Send logs to file
 
 VERSION
-    version 0.008
+    version 0.009
 
 SYNOPSIS
      use Log::ger::Output 'File' => (
@@ -14,8 +14,9 @@ SYNOPSIS
      log_warn "blah ...";
 
 DESCRIPTION
-    This is an output module to file, with some options. File will be opened
-    with append mode. Filehandle will be flushed after each log.
+    This is a plugin to send logs to a file, with some options. File will be
+    opened with append mode. A lock can be requested at every write, or when
+    opening the file. By default, filehandle will be flushed after each log.
 
 CONFIGURATION
   path => filename
@@ -60,9 +61,10 @@ TODO
 SEE ALSO
     Log::ger
 
-    Log::ger::Output::SimpleFile
+    Log::ger::Output::SimpleFile is a simpler output plugin: no locking,
+    autoflush, or lazy options.
 
-    Log::ger::Output::FileWriteRotate
+    Log::ger::Output::FileWriteRotate offers autorotation feature.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -1,16 +1,15 @@
-# Copyright (c) 2007 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: Exact.pm,v 1.7 2007/06/16 11:39:24 martin Stab $
+# Copyright (c) 2007-2019 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Date::Gregorian::Exact;
 
+use 5.006;
 use strict;
+use warnings;
 use Carp qw(croak);
-use vars qw($VERSION);
 
-$VERSION = 0.99;
+our $VERSION = 0.999;
 
 sub import {
     croak(__PACKAGE__ . " is no longer available");
@@ -43,12 +42,25 @@ of local clocks and timezones.
 Please consider using those modules for calculations involving
 date and time.
 
-=head1 AUTHOR
-
-Martin Becker <hasch-cpan-dg@cozap.com>, June 2007.
-
 =head1 SEE ALSO
 
 L<Date::Gregorian>, L<DateTime>.
+
+=head1 AUTHOR
+
+Martin Becker C<< <becker-cpan-mp (at) cozap.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 1999-2019 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
 
 =cut

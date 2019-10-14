@@ -26,7 +26,7 @@ if(version->parse($File::Fetch::VERSION) < 0.56) {
 		print STDERR "UNKNOWN: Needs File::Fetch >= 0.56";
 		exit;
 	}
-	die 'Install File::Fetch >= 0.56 first';
+	die 'Install File::Fetch >= 0.56 first, you have ', $File::Fetch::VERSION;
 }
 
 (-d 'lib/Geo/Coder/Free/GeoNames') || mkdir 'lib/Geo/Coder/Free/GeoNames';
@@ -105,7 +105,7 @@ WriteMakefile(
 		'Config::Auto' => 0,
 		'File::Basename' => 0,
 		'File::Copy' => 0,
-		'File::Open::NoCache::ReadOnly' => 0,
+		'File::Open::NoCache::ReadOnly' => 0.02,
 		'File::Spec' => 0,
 		'autodie' => 0,
 		'Geo::Location::Point' => 0.02,

@@ -1,6 +1,6 @@
 package Date::Exception;
 
-$Date::Exception::VERSION   = '0.07';
+$Date::Exception::VERSION   = '0.08';
 $Date::Exception::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Exception - Base exception package as Moo Role for Date::* packages.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

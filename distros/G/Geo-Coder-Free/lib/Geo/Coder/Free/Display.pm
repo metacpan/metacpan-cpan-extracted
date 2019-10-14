@@ -1,4 +1,4 @@
-package Geo::Coder::Free::Display;
+package VWF::Display;
 
 # Display a page. Certain variables are available to all templates, such as
 # the stuff in the configuration file
@@ -11,7 +11,7 @@ use File::Spec;
 use Template::Filters;
 use Template::Plugin::EnvHash;
 use HTML::SocialMedia;
-use Geo::Coder::Free::Utils;
+use VWF::Utils;
 
 my %blacklist = (
 	'MD' => 1,
@@ -162,6 +162,10 @@ sub new {
 		# _page => $info->param('page'),
 	};
 
+	if(my $key = $info->param('key')) {
+		$self->{'_key'} = $key;
+	}
+
 	if(my $twitter = $config->{'twitter'}) {
 		$smcache ||= ::create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
 		$sm ||= HTML::SocialMedia->new({ twitter => $twitter, cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
@@ -170,7 +174,7 @@ sub new {
 		$smcache = ::create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
 		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
 	}
-	$self->{'_social_media'}->{'facebook_like_button'} = $sm->as_string(facebook_like_button => 1);
+	$self->{'_social_media'}->{'facebook_share_button'} = $sm->as_string(facebook_share_button => 1);
 	$self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
 
 	return bless $self, $class;
@@ -196,10 +200,10 @@ sub get_template_path {
 	# Look in .../en/gb/web, then .../en/web then /web
 	if($self->{_lingua}) {
 		my $lingua = $self->{_lingua};
-		my $candidate;
 
 		$self->_debug({ message => 'Requested language: ' . $lingua->requested_language() });
 
+		my $candidate;
 		if($lingua->sublanguage_code_alpha2()) {
 			$candidate = "$dir/" . $lingua->code_alpha2() . '/' . $lingua->sublanguage_code_alpha2();
 			$self->_debug({ message => "check for directory $candidate" });
@@ -228,7 +232,7 @@ sub get_template_path {
 
 	$self->_debug({ message => "prefix: $prefix" });
 
-        my $modulepath = $args{'modulepath'} || ref($self);
+	my $modulepath = $args{'modulepath'} || ref($self);
 	$modulepath =~ s/::/\//g;
 
 	my $filename = $self->_pfopen($prefix, $modulepath, 'tmpl:tt:html:htm:txt');
@@ -275,18 +279,19 @@ sub http {
 
 	my $filename = $self->get_template_path();
 	if($filename =~ /\.txt$/) {
-		$rc = "Content-type: text/plain\n";
+		$rc = "Content-Type: text/plain\n";
 	} elsif($language eq 'Japanese') {
 		binmode(STDOUT, ':utf8');
 
-		$rc = "Content-type: text/html; charset=UTF-8\n";
+		$rc = "Content-Type: text/html; charset=UTF-8\n";
 	} elsif($language eq 'Polish') {
 		binmode(STDOUT, ':utf8');
 
-		# print "Content-type: text/html; charset=ISO-8859-2\n";
-		$rc = "Content-type: text/html; charset=UTF-8\n";
+		# print "Content-Type: text/html; charset=ISO-8859-2\n";
+		$rc = "Content-Type: text/html; charset=UTF-8\n";
 	} else {
-		$rc = "Content-type: text/html; charset=ISO-8859-1\n";
+		# $rc = "Content-Type: text/html; charset=ISO-8859-1\n";
+		$rc = "Content-Type: text/html; charset=UTF-8\n";
 	}
 
 	# https://www.owasp.org/index.php/Clickjacking_Defense_Cheat_Sheet
@@ -295,7 +300,8 @@ sub http {
 }
 
 sub html {
-	my ($self, $params) = @_;
+	my $self = shift;
+	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $filename = $self->get_template_path();
 	my $rc;
@@ -315,16 +321,16 @@ sub html {
 		# the values in info, then the values in params
 		my $vals;
 		if(defined($self->{_config})) {
-                        if($info->params()) {
-                                $vals = { %{$self->{_config}}, %{$info->params()} };
-                        } else {
-                                $vals = $self->{_config};
-                        }
-			if(defined($params)) {
-				$vals = { %{$vals}, %{$params} };
+			if($info->params()) {
+				$vals = { %{$self->{_config}}, %{$info->params()} };
+			} else {
+				$vals = $self->{_config};
 			}
-		} elsif(defined($params)) {
-			$vals = { %{$info->params()}, %{$params} };
+			if(scalar(keys %params)) {
+				$vals = { %{$vals}, %params };
+			}
+		} elsif(scalar(keys %params)) {
+			$vals = { %{$info->params()}, %params };
 		} else {
 			$vals = $info->params();
 		}
@@ -332,7 +338,9 @@ sub html {
 
 		$vals->{cart} = $info->get_cookie(cookie_name => 'cart');
 		$vals->{lingua} = $self->{_lingua};
+		$vals->{social_media} = $self->{_social_media};
 		$vals->{info} = $info;
+		$vals->{as_string} = $info->as_string();
 
 		$template->process($filename, $vals, \$rc) ||
 			die $template->error();
@@ -383,11 +391,16 @@ sub as_string {
 		}
 	}
 
-	my $html = $self->html($args);
-	unless($html) {
-		return;
+	# my $html = $self->html($args);
+	# unless($html) {
+		# return;
+	# }
+	# return $self->http() . $html;
+	my $rc = $self->http();
+	if($rc =~ /^Location:\s/ms) {
+		return $rc;
 	}
-	return $self->http() . $html;
+	return $rc . $self->html($args);
 }
 
 # my $f = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin' );
@@ -411,6 +424,7 @@ sub _pfopen {
 		return $savedpaths->{$candidate};
 	}
 
+	$self->_debug({ message => "_pfopen: path=$path; prefix = $prefix" });
 	foreach my $dir(split(/:/, $path)) {
 		next unless(-d $dir);
 		if($suffixes) {
@@ -466,12 +480,12 @@ sub _append_browser_type {
 	my $rc;
 
 	if(-d $directory) {
-                if($self->{_info}->is_mobile()) {
-                        $rc = "$directory/mobile:";
-                } elsif($self->{_info}->is_search_engine()) {
-                        $rc = "$directory/search:$directory/web:$directory/robot:";
-                } elsif($self->{_info}->is_robot()) {
-                        $rc = "$directory/robot:";
+		if($self->{_info}->is_search_engine()) {
+			$rc = "$directory/search:$directory/web:$directory/robot:";
+		} elsif($self->{_info}->is_mobile()) {
+			$rc = "$directory/mobile:";
+		} elsif($self->{_info}->is_robot()) {
+			$rc = "$directory/robot:";
 		}
 		$rc .= "$directory/web:";
 

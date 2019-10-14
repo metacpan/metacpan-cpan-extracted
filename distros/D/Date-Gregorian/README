@@ -1,15 +1,14 @@
 Date::Gregorian - Gregorian calendar
 ====================================
 
-Copyright (c) 1999-2007, Martin Becker <hasch-cpan-dg@cozap.com>.
-All rights reserved.
+Copyright (c) 1999-2019, Martin Becker <hasch-cpan-mp (at) cozap.com>.
 
 Version
 -------
 
-This is Version 0.12 of Date::Gregorian.
+This is Version 0.13 of Date::Gregorian.
 
-DSLIP status
+DLSIP status
 ------------
 
 bdpOp (beta, developer, perl, object-oriented, Standard-Perl)
@@ -17,13 +16,12 @@ bdpOp (beta, developer, perl, object-oriented, Standard-Perl)
 License
 -------
 
-This package is free software; you can distribute it and/or modify
-it under the same terms as Perl itself.
+This package is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see LICENSE file).
 
 This package is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-license information that came with your Perl kit for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Description
 -----------
@@ -40,6 +38,22 @@ Y2K compliance
 This package does not use nor permit two-digit abbreviations for
 four-digit year numbers anywhere.  In fact, it is designed to deal
 with dates in many different centuries.
+
+Y2038 compliance
+----------------
+
+This package uses perl builtin functions gmtime and localtime for
+conversions to and from timestamps.  With recent perls, these functions
+can handle timestamps exceeding the 32-bit signed integer range, and
+thus should work well beyond January 19, 2038.
+
+Y6M compliance
+--------------
+
+As this package uses perl integer arithmetic for Julian day numbers,
+perls with an NV size of only 4 will hit an integer overflow at some
+time between 5,800,000 and 5,900,000 CE.  We recommend switching to a
+64-bit integer perl before then.
 
 Prerequisites
 -------------
@@ -81,11 +95,14 @@ comprehensive approach to handling timestamps and localization.
 More samples of business calendars and better ways to define even
 more of them will be added in the future.
 
-Fractional business days are an experimental feature so far.
-Their semantics are subject to further scrutiny.
+Fractional business days are no longer supported.
+They had been an experimental feature up to version 0.12.
 
 Eventually, the essentials of Date::Gregorian::Business might
 be put to work in a proper DateTime extension.
+
+A couple of API additions are scheduled for version 1.00.
+Old code should continue to work, though.
 
 More suggestions are welcome.
 

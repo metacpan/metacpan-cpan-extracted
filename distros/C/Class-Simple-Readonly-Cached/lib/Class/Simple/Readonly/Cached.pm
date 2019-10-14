@@ -13,11 +13,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -69,6 +69,7 @@ sub new {
 
 	if(!$args{'cache'}) {
 		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
+		return;
 	}
 
 	if(!defined($args{'object'})) {
@@ -80,7 +81,7 @@ sub new {
 
 =head2 object
 
-Return the encapsulated objet
+Return the encapsulated object
 
 =cut
 
@@ -112,7 +113,7 @@ sub AUTOLOAD {
 	if($param eq 'DESTROY') {
 		if($cache) {
 			if(ref($cache) eq 'HASH') {
-				foreach my $key(keys %{$cache}) {
+				while(my($key, $value) = each %{$cache}) {
 					delete $cache->{$key};
 				}
 				return;
@@ -144,13 +145,22 @@ sub AUTOLOAD {
 		$rc = $cache->get($key);
 	}
 	if($rc) {
+		die $key if($rc eq 'never');
 		if(ref($rc) eq 'ARRAY') {
-			return @{$rc};
+			my @foo = @{$rc};
+			if(wantarray) {
+				die $key if($foo[0] eq __PACKAGE__ . ">UNDEF<");
+				die $key if($foo[0] eq 'never');
+				return @{$rc};
+			}
+			return pop @foo;
 		}
 		if($rc eq __PACKAGE__ . '>UNDEF<') {
 			return;
 		}
-		return $rc;
+		if(!wantarray) {
+			return $rc;
+		}
 	}
 	if(wantarray) {
 		my @rc = $object->$func(@_);

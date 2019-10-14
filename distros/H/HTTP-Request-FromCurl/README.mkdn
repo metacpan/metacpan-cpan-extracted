@@ -161,6 +161,9 @@ in the raw body content and the `Content-Length` header.
 
 [HTTP::Request::AsCurl](https://metacpan.org/pod/HTTP::Request::AsCurl) - for the inverse function
 
+[https://github.com/NickCarneiro/curlconverter](https://github.com/NickCarneiro/curlconverter) - a converter for multiple
+target languages
+
 # REPOSITORY
 
 The public repository of this module is

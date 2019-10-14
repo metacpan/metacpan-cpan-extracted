@@ -1,0 +1,54 @@
+NAME
+    Data::Clean::FromJSON::Pregen - Clean data from JSON encoder
+
+VERSION
+    This document describes version 0.001 of Data::Clean::FromJSON::Pregen
+    (from Perl distribution Data-Clean-FromJSON-Pregen), released on
+    2019-09-08.
+
+SYNOPSIS
+     use Data::Clean::FromJSON::Pregen qw(clean_from_json_in_place clone_and_clean_from_json);
+
+     clean_from_json_in_place($data);
+     $cleaned = clone_and_clean_from_json($data);
+
+DESCRIPTION
+    This has the same functionality as Data::Clean::FromJSON except that the
+    code to perform the cleaning is pre-generated, so we no longer need
+    Data::Clean or Data::Clean::FromJSON during runtime.
+
+FUNCTIONS
+    None of the functions are exported by default.
+
+  clean_from_json_in_place($data)
+  clone_and_clean_from_json($data) => $cleaned
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Clean-FromJSON-Pregen>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Clean-FromJSON-Pregen>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Clean-FromJSON-P
+    regen>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Clean::FromJSON
+
+    Data::Clean::ForJSON::Pregen
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

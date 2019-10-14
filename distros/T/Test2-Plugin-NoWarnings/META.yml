@@ -3,7 +3,6 @@ abstract: 'Fail if tests warn'
 author:
   - 'Dave Rolsky <autarch@urth.org>'
 build_requires:
-  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IPC::Run3: '0'
@@ -22,10 +21,10 @@ name: Test2-Plugin-NoWarnings
 provides:
   Test2::Event::Warning:
     file: lib/Test2/Event/Warning.pm
-    version: '0.07'
+    version: '0.08'
   Test2::Plugin::NoWarnings:
     file: lib/Test2/Plugin/NoWarnings.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Carp: '0'
   Test2: '1.302096'
@@ -36,10 +35,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings
+  bugtracker: https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues
   homepage: http://metacpan.org/release/Test2-Plugin-NoWarnings
   repository: git://github.com/houseabsolute/Test2-Plugin-NoWarnings.git
-version: '0.07'
+version: '0.08'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -608,7 +607,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.07
+          tag: v0.08
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

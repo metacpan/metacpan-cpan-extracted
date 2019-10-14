@@ -11,6 +11,7 @@ use strict;
 use warnings;
 
 use ExtUtils::testlib;
+use FindBin;
 
 use Cwd        ();
 use File::Temp ();
@@ -21,7 +22,7 @@ use Errno;
 
 use Archive::Tar::Builder ();
 
-use Test::More tests => 73;
+use Test::More tests => 74;
 use Test::Exception;
 
 sub find_tar {
@@ -76,7 +77,7 @@ sub find_unused_ids {
 
 sub build_tree {
     my $tmpdir = File::Temp::tempdir( 'CLEANUP' => 1 );
-    my $file = "$tmpdir/foo/exclude.txt";
+    my $file   = "$tmpdir/foo/exclude.txt";
 
     File::Path::mkpath("$tmpdir/foo/bar/baz/foo/cats");
     File::Path::mkpath("$tmpdir/foo/poop");
@@ -437,7 +438,7 @@ SKIP: {
     skip( 'Test will not work as root', 1 ) unless $<;
 
     my $tmpdir = File::Temp::tempdir( 'CLEANUP' => 1 );
-    my $path = "$tmpdir/foo";
+    my $path   = "$tmpdir/foo";
 
     mkdir( $path, 0 );
 
@@ -457,7 +458,7 @@ SKIP: {
 # Test long filenames, symlinks
 foreach my $ext (qw/gnu posix/) {
     my $tmpdir = File::Temp::tempdir( 'CLEANUP' => 1 );
-    my $path = "$tmpdir/" . ( 'foops/' x 60 );
+    my $path   = "$tmpdir/" . ( 'foops/' x 60 );
 
     File::Path::mkpath($path) or die("Unable to create long path: $!");
 
@@ -583,7 +584,7 @@ SKIP: {
 
     # The specific failure was seen at length 156 and up, but why not test a lot more than that for the heck of it?
     my @test_range = 1 .. 5_000;
-    my @t_in = map { [ '/etc/hosts', ( "X" x $_ ) ] } @test_range;
+    my @t_in       = map { [ '/etc/hosts', ( "X" x $_ ) ] } @test_range;
     my %t_out;
     my @expect_t_out = map { "X" x $_ } @test_range;
 
@@ -747,7 +748,7 @@ for my $test_mode (
 
     if ( $test_mode == TRUNCATED ) {
 
-        my $atb_died          = ( !$ok         && $atb_error );
+        my $atb_died = ( !$ok && $atb_error );
         my $extract_succeeded = ( $status == 0 && $output =~ /example\.txt/ );
 
         # The "truncated" test is satisfied if either:
@@ -882,4 +883,27 @@ for my $test_mode (
         is( $st1[0] => $st2[0], "st_dev of $dest/foo matches $dest/bar" );
         is( $st1[1] => $st2[1], "st_ino of $dest/foo matches $dest/bar" );
     }
+}
+
+#
+# Test for fix to CPANEL-29859; segfaulting when archiving certain numbers of
+# hardlinked files
+#
+{
+    my $tmp = File::Temp::tempdir( 'CLEANUP' => 1 );
+
+    for ( my $i = 1; $i < 200; $i++ ) {
+        my $orig = sprintf "$tmp/orig-%04d", $i;
+        my $link = sprintf "$tmp/link-%04d", $i;
+
+        open my $fh, '>', $orig or die "Unable to open() $orig for writing: $!";
+        close $fh;
+
+        link $orig => $link or die "Unable to link() $orig to $link: $!";
+    }
+
+    my $status = system $^X, "$FindBin::Bin/scripts/CPANEL-29859.pl", $tmp;
+    my $signal = $? & 0x7f;
+
+    is( $signal => 0, "\$builder->archive() exits with no signal when archiving large numbers of hardlinked files" );
 }

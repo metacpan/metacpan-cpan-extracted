@@ -1,41 +1,40 @@
-# Copyright (c) 1999-2007 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: Gregorian.pm,v 1.15 2007/06/19 12:10:58 martin Stab $
+# Copyright (c) 1999-2019 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Date::Gregorian;
 
+use 5.006;
 use strict;
+use warnings;
 use integer;
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 require Exporter;
 
-@ISA = qw(Exporter);
-%EXPORT_TAGS = (
+our @ISA = qw(Exporter);
+our %EXPORT_TAGS = (
     'weekdays' => [qw(
-	    MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY SUNDAY
-	)],
+            MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY SUNDAY
+        )],
     'months' => [qw(
-	    JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY
-	    AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER
-	)],
+            JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY
+            AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER
+        )],
 );
-@EXPORT_OK = map @{$_}, values %EXPORT_TAGS;
+our @EXPORT_OK = map { @{$_} } values %EXPORT_TAGS;
 
-$VERSION = '0.12';
+our $VERSION = '0.13';
 
 # ----- object definition -----
 
 # Date::Gregorian=ARRAY(...)
 
-# .......... index ..........	# .......... value ..........
-use constant F_DAYNO   => 0;	# continuos day number, "March ...th, 1 BC"
-use constant F_TR_DATE => 1;	# first Gregorian date in dayno format
-use constant F_TR_EYR  => 2;	# first Gregorian easter year
-use constant F_YMD     => 3;	# [year, month, day] (on demand, memoized)
-use constant F_YDYW    => 4;	# [yearday, year, week] (on demand, memoized)
-use constant F_SEC_NS  => 5;	# [seconds, nanoseconds] (optional)
+# .......... index ..........   # .......... value ..........
+use constant F_DAYNO   => 0;    # continuos day number, "March ...th, 1 BC"
+use constant F_TR_DATE => 1;    # first Gregorian date in dayno format
+use constant F_TR_EYR  => 2;    # first Gregorian easter year
+use constant F_YMD     => 3;    # [year, month, day] (on demand, memoized)
+use constant F_YDYW    => 4;    # [yearday, year, week] (on demand, memoized)
+use constant F_SEC_NS  => 5;    # [seconds, nanoseconds] (optional)
 use constant NFIELDS   => 6;
 
 # ----- other constants -----
@@ -61,17 +60,19 @@ use constant OCTOBER   => 10;
 use constant NOVEMBER  => 11;
 use constant DECEMBER  => 12;
 
+use constant _HALF_DAY => 12 * 60 * 60;
+
 # ----- predefined private variables -----
 
-my @m2d      = map +($_ * 153 + 2) / 5, (0..11);
-my $epoch    = _ymd2dayno( 1970, 1, 1, 1, 1);
-my @defaults = (
-    $epoch,				# F_DAYNO
-    _ymd2dayno(1582, 10, 15, 1, 1),	# F_TR_DATE
-    1583,				# F_TR_EYR
-    undef,				# F_YMD
-    undef,				# F_YDYW
-    undef,				# F_SEC_NS
+my @M2D      = map { ($_ * 153 + 2) / 5 } (0..11);
+my $EPOCH    = _ymd2dayno( 1970, 1, 1, 1, 1);
+my @DEFAULTS = (
+    $EPOCH,                             # F_DAYNO
+    _ymd2dayno(1582, 10, 15, 1, 1),     # F_TR_DATE
+    1583,                               # F_TR_EYR
+    undef,                              # F_YMD
+    undef,                              # F_YDYW
+    undef,                              # F_SEC_NS
 );
 my ($gmt_epoch, $gmt_correction) = _init_gmt();
 my $datetime_epoch = 307;
@@ -84,7 +85,7 @@ my $localtime_offset = 0;
 # ($div, $mod) = _divmod($numerator, $denominator)
 #
 sub _divmod {
-    no integer;				# use well defined percent operator
+    no integer;                         # use well defined percent operator
     my $mod = $_[0] % $_[1];
     return (($_[0] - $mod) / $_[1], $mod);
 }
@@ -101,10 +102,10 @@ sub _ymd2dayno {
     elsif (-9 <= $m) { $m += 9;      $y --;                            }
     else             { $m = 14 - $m; $y -= $m / 12; $m = 11 - $m % 12; }
 
-    $d += $m2d[$m] + $y * 365 + ($y >> 2) - 1;
+    $d += $M2D[$m] + $y * 365 + ($y >> 2) - 1;
     if (!$fixed && $s <= $d || $fixed && $s) {
-	$y = 0 <= $y? $y / 100: -((99 - $y) / 100);
-	$d -= $y - ($y >> 2) - 2;
+        $y = 0 <= $y? $y / 100: -((99 - $y) / 100);
+        $d -= $y - ($y >> 2) - 2;
     }
     return $d;
 }
@@ -116,19 +117,22 @@ sub _dayno2ymd {
     my ($d, $m, $y);
     my $c;
     if ($s <= $n) {
-	($c, $n) = _divmod($n - 2, 146097);
-	$c *= 400;
-	$n += (($n << 2) + 3) / 146097;
+        ($c, $n) = _divmod($n - 2, 146097);
+        $c *= 400;
+        $n += (($n << 2) + 3) / 146097;
     }
     else {
-	($c, $n) = _divmod($n, 1461);
-	$c <<= 2;
+        ($c, $n) = _divmod($n, 1461);
+        $c <<= 2;
     }
     $y = (($n << 2) + 3) / 1461;
     $n = ($n - $y * 365 - ($y >> 2)) * 5 + 2;
     $m = $n / 153 + 3;
     $d = $n % 153 / 5 + 1;
-    $y ++, $m -= 12 if 12 < $m;
+    if (12 < $m) {
+	$y ++;
+	$m -= 12;
+    }
     return ($c + $y, $m, $d);
 }
 
@@ -140,20 +144,23 @@ sub _easter {
     my $d;
     my $n = $y * 365 + ($y >> 2);
     if ($e <= $y) {
-	my $g = 0 <= $y? $y / 100: -((99 - $y) / 100);
-	$n -= $g - ($g >> 2) - 2;
-	{ no integer; $g %= 3000 };
-	my $h = 15 + $g - (($g << 3) + 13) / 25 - ($g >> 2);
-	$g = do { no integer; $y % 19 };
-	$d = ($g * 19 + $h) % 30;
+        my $g = 0 <= $y? $y / 100: -((99 - $y) / 100);
+        $n -= $g - ($g >> 2) - 2;
+        { no integer; $g %= 3000 };
+        my $h = 15 + $g - (($g << 3) + 13) / 25 - ($g >> 2);
+        $g = do { no integer; $y % 19 };
+        $d = ($g * 19 + $h) % 30;
 	--$d if 28 <= $d && (28 < $d || 11 <= $g);
     }
     else {
-	$d = do { no integer; ($y % 19 * 19 + 15) % 30 };
+        $d = do { no integer; ($y % 19 * 19 + 15) % 30 };
     }
     $d += do { no integer; 28 - ($n + $d) % 7 };
     $n += $d - 1;
-    $d -= 31, $m ++ if 31 < $d;
+    if (31 < $d) {
+	$d -= 31;
+	$m = 4;
+    }
     return ($n, ($s <= $n xor $e <= $y)? undef: [$y, $m, $d]);
 }
 
@@ -165,11 +172,11 @@ sub _dec31dayno {
 
     my $n = 306 + $y * 365 + ($y >> 2) - 1;
     if ($s <= $n) {
-	$y = 0 <= $y? $y / 100: -((99 - $y) / 100);
-	$n -= $y - ($y >> 2) - 2;
-	if ($n < $s) {
-	    return $s-1;
-	}
+        $y = 0 <= $y? $y / 100: -((99 - $y) / 100);
+        $n -= $y - ($y >> 2) - 2;
+        if ($n < $s) {
+            return $s-1;
+        }
     }
     return $n;
 }
@@ -183,17 +190,17 @@ sub _ydyw {
     $base += 4;
     { no integer; $base -= $base % 7 };
     if ($n < $base) {
-	$y --;
-	$base = _dec31dayno($y-1, $s) + 4;
-	{ no integer; $base -= $base % 7 };
+        $y --;
+        $base = _dec31dayno($y-1, $s) + 4;
+        { no integer; $base -= $base % 7 };
     }
     else {
-	my $limit = _dec31dayno($y, $s) + 4;
-	{ no integer; $limit -= $limit % 7 };
-	if ($limit <= $n) {
-	    $base = $limit;
-	    $y ++;
-	}
+        my $limit = _dec31dayno($y, $s) + 4;
+        { no integer; $limit -= $limit % 7 };
+        if ($limit <= $n) {
+            $base = $limit;
+            $y ++;
+        }
     }
     my $yw = ($n - $base) / 7 + 1;
     return [$yd, $y, $yw];
@@ -204,8 +211,8 @@ sub _ydyw {
 sub _init_gmt {
     my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(0);
     return (
-	_ymd2dayno(1900 + $year, 1 + $mon, $mday, 1, 1),
-	($hour*60 + $min)*60 + $sec
+        _ymd2dayno(1900 + $year, 1 + $mon, $mday, 1, 1),
+        ($hour*60 + $min)*60 + $sec
     );
 }
 
@@ -214,11 +221,11 @@ sub _init_gmt {
 sub new {
     my $class = $_[0];
     my Date::Gregorian $self;
-    if (ref $class) {			# called as obj method: clone it
-	$self = bless [@{$class}], ref($class);
+    if (ref $class) {                   # called as obj method: clone it
+        $self = bless [@{$class}], ref($class);
     }
-    else {				# called as class method: create
-	$self = bless [@defaults], $class;
+    else {                              # called as class method: create
+        $self = bless [@DEFAULTS], $class;
     }
     return $self;
 }
@@ -227,7 +234,7 @@ sub configure {
     my Date::Gregorian $self = shift;
     my ($y, $m, $d, $e) = @_;
     @{$self}[F_TR_DATE, F_YMD, F_YDYW] =
-	( _ymd2dayno($y, $m, $d, 1, 1), undef, undef );
+        ( _ymd2dayno($y, $m, $d, 1, 1), undef, undef );
     $self->[F_TR_EYR] = $e if defined $e;
     return $self;
 }
@@ -247,7 +254,7 @@ sub set_ymd {
     my Date::Gregorian $self = shift;
     my ($y, $m, $d) = @_;
     @{$self}[F_DAYNO, F_YMD, F_YDYW] =
-	( _ymd2dayno($y, $m, $d, $self->[F_TR_DATE]), undef, undef );
+        ( _ymd2dayno($y, $m, $d, $self->[F_TR_DATE]), undef, undef );
     return $self;
 }
 
@@ -256,16 +263,16 @@ sub check_ymd {
     my ($y, $m, $d) = @_;
     my ($dayno, $yy, $mm, $dd);
     if (defined($d) && 1 <= $d && $d <= 31 &&
-	defined($m) && 1 <= $m && $m <= 12 &&
-	defined($y) && -1469871 <= $y && $y <= 5879489
+        defined($m) && 1 <= $m && $m <= 12 &&
+        defined($y) && -1469871 <= $y && $y <= 5879489
     ) {
-	$dayno = _ymd2dayno($y, $m, $d, $self->[F_TR_DATE]);
-	($yy, $mm, $dd) = _dayno2ymd($dayno, $self->[F_TR_DATE]);
-	if ($dd == $d && $mm == $m && $yy == $y) {
-	    @{$self}[F_DAYNO, F_YMD, F_YDYW] =
-		( $dayno, [$yy, $mm, $dd], undef );
-	    return $self;
-	}
+        $dayno = _ymd2dayno($y, $m, $d, $self->[F_TR_DATE]);
+        ($yy, $mm, $dd) = _dayno2ymd($dayno, $self->[F_TR_DATE]);
+        if ($dd == $d && $mm == $m && $yy == $y) {
+            @{$self}[F_DAYNO, F_YMD, F_YDYW] =
+                ( $dayno, [$yy, $mm, $dd], undef );
+            return $self;
+        }
     }
     return undef;
 }
@@ -273,7 +280,7 @@ sub check_ymd {
 sub get_ymd {
     my Date::Gregorian $self = $_[0];
     my $ymd = $self->[F_YMD] ||=
-	[ _dayno2ymd($self->[F_DAYNO], $self->[F_TR_DATE]) ];
+        [ _dayno2ymd($self->[F_DAYNO], $self->[F_TR_DATE]) ];
     return @{$ymd};
 }
 
@@ -306,17 +313,17 @@ sub check_ywd {
     my Date::Gregorian $self = shift;
     my ($y, $w, $d) = @_;
     if (defined($d) && 0 <= $d && $d <= 6 &&
-	defined($w) && 1 <= $w && $w <= 53 &&
-	defined($y) && -1469871 <= $y && $y <= 5879489
+        defined($w) && 1 <= $w && $w <= 53 &&
+        defined($y) && -1469871 <= $y && $y <= 5879489
     ) {
-	my $n = _dec31dayno($y-1, $self->[F_TR_DATE]) - 3;
-	$n += $w * 7 + $d - $n % 7;
-	my $ymd = [_dayno2ymd($n, $self->[F_TR_DATE])];
-	my $ydyw = _ydyw($n, $self->[F_TR_DATE], $ymd->[0]);
-	if ($ydyw->[1] == $y && $ydyw->[2] == $w) {
-	    @{$self}[F_DAYNO, F_YMD, F_YDYW] = ($n, $ymd, $ydyw);
-	    return $self;
-	}
+        my $n = _dec31dayno($y-1, $self->[F_TR_DATE]) - 3;
+        $n += $w * 7 + $d - $n % 7;
+        my $ymd = [_dayno2ymd($n, $self->[F_TR_DATE])];
+        my $ydyw = _ydyw($n, $self->[F_TR_DATE], $ymd->[0]);
+        if ($ydyw->[2] == $w) {
+            @{$self}[F_DAYNO, F_YMD, F_YDYW] = ($n, $ymd, $ydyw);
+            return $self;
+        }
     }
     return undef;
 }
@@ -362,7 +369,7 @@ sub compare {
 sub set_easter {
     my Date::Gregorian $self = $_[0];
     @{$self}[F_DAYNO, F_YMD, F_YDYW] =
-	( _easter($_[1], @{$self}[F_TR_DATE, F_TR_EYR]), undef );
+        ( _easter($_[1], @{$self}[F_TR_DATE, F_TR_EYR]), undef );
     return $self;
 }
 
@@ -372,8 +379,8 @@ sub set_gmtime {
     my $time = $_[1] + $gmt_correction;
     $time -= $time % 86400;
     @{$self}[F_DAYNO, F_YMD, F_YDYW] = (
-	$gmt_epoch + $time / 86400,
-	undef, undef,
+        $gmt_epoch + $time / 86400,
+        undef, undef,
     );
     return $self;
 }
@@ -386,45 +393,40 @@ sub get_gmtime {
 }
 
 sub set_today {
-    my Date::Gregorian $self = $_[0];
-    return $self->set_localtime(time);
+    my Date::Gregorian $self = shift;
+    return $self->set_localtime(time, @_);
 }
 
 sub set_localtime {
-    my Date::Gregorian $self = $_[0];
-    my ($d, $m, $y) = (localtime $_[1])[3..5];
+    my Date::Gregorian $self = shift;
+    my ($time) = @_;
+    my ($d, $m, $y) = (localtime $time)[3..5];
     $y += 1900;
     ++ $m;
     # presuming localtime always to return Gregorian dates,
     # while $self might be configured to interpret Julian,
     # we must ignore $self->[F_TR_DATE] here
     @{$self}[F_DAYNO, F_YMD, F_YDYW] =
-	( _ymd2dayno($y, $m, $d, 1, 1), undef, undef );
+        ( _ymd2dayno($y, $m, $d, 1, 1), undef, undef );
     return $self;
 }
 
 sub get_localtime {
     no integer;
-    my Date::Gregorian $self = $_[0];
-
+    my Date::Gregorian $self = shift;
     my $time = $self->get_gmtime - $localtime_offset;
-    foreach my $step (0..3) {
-	my ($S, $M, $H, $d, $m, $y) = localtime $time;
-	my $dd = _ymd2dayno(1900+$y, 1+$m, $d, 1, 1) - $self->[F_DAYNO];
-	return undef if 24855 < abs($dd);
-	my $delta = (($dd * 24 + $H) * 60 + $M) * 60 + $S;
-	if ($delta || $dd) {
-	    if ($dd < 0 && 0 <= $delta) {
-		# hours/minutes/seconds should not cancel out date increase
-		$delta = -1;
-	    }
-	    $time -= $delta;
-	    $localtime_offset += $delta if !$step;
-	    next;
-	}
-	return $time;
-    }
-    return undef;
+    my ($S, $M, $H, $d, $m, $y) = localtime $time;
+    my $dd = _ymd2dayno(1900+$y, 1+$m, $d, 1, 1) - $self->[F_DAYNO];
+    return undef if 24855 < abs($dd);
+    my $delta = (($dd * 24 + $H) * 60 + $M) * 60 + $S;
+    return $time if !$delta;
+
+    $localtime_offset += $delta;
+    $time             -= $delta;
+    ($S, $M, $H, $d, $m, $y) = localtime $time;
+    $dd = _ymd2dayno(1900+$y, 1+$m, $d, 1, 1) - $self->[F_DAYNO];
+    $delta = (($dd * 24 + $H) * 60 + $M) * 60 + $S;
+    return $time - $delta;
 }
 
 sub set_weekday {
@@ -433,12 +435,12 @@ sub set_weekday {
     my ($wd, $rel) = @_;
     my $delta = ($wd - $self->[F_DAYNO]) % 7;
     if (defined($rel) && '>=' ne $rel) {
-	$delta = 7 if !$delta && '>' eq $rel;
-	$delta -= 7 if '<' eq $rel || $delta && '<=' eq $rel;
+        $delta = 7 if !$delta && '>' eq $rel;
+        $delta -= 7 if '<' eq $rel || $delta && '<=' eq $rel;
     }
     if ($delta) {
-	$self->[F_DAYNO] += $delta;
-	@{$self}[F_YMD, F_YDYW] = (undef, undef);
+        $self->[F_DAYNO] += $delta;
+        @{$self}[F_YMD, F_YDYW] = (undef, undef);
     }
     return $self;
 }
@@ -446,8 +448,8 @@ sub set_weekday {
 sub get_days_in_year {
     my ($self, $year) = @_;
     return
-	_dec31dayno($year,   $self->[F_TR_DATE]) -
-	_dec31dayno($year-1, $self->[F_TR_DATE]);
+        _dec31dayno($year,   $self->[F_TR_DATE]) -
+        _dec31dayno($year-1, $self->[F_TR_DATE]);
 }
 
 sub iterate_days_upto {
@@ -456,10 +458,10 @@ sub iterate_days_upto {
     my $final = $limit->[F_DAYNO] - ($rel ne '<=');
     $step = abs($step || 1);
     return sub {
-	return undef if $dayno > $final;
-	@{$self}[F_DAYNO, F_YMD, F_YDYW] = ($dayno, undef, undef);
-	$dayno += $step;
-	return $self;
+        return undef if $dayno > $final;
+        @{$self}[F_DAYNO, F_YMD, F_YDYW] = ($dayno, undef, undef);
+        $dayno += $step;
+        return $self;
     };
 }
 
@@ -469,10 +471,10 @@ sub iterate_days_downto {
     my $final = $limit->[F_DAYNO] + ($rel eq '>');
     $step = abs($step || 1);
     return sub {
-	return undef if $dayno < $final;
-	@{$self}[F_DAYNO, F_YMD, F_YDYW] = ($dayno, undef, undef);
-	$dayno -= $step;
-	return $self;
+        return undef if $dayno < $final;
+        @{$self}[F_DAYNO, F_YMD, F_YDYW] = ($dayno, undef, undef);
+        $dayno -= $step;
+        return $self;
     };
 }
 
@@ -481,7 +483,7 @@ sub iterate_days_downto {
 sub set_datetime {
     my ($self, $datetime) = @_;
     if (!$datetime->time_zone->is_floating) {
-	$datetime = $datetime->clone->set_time_zone('floating');
+        $datetime = $datetime->clone->set_time_zone('floating');
     }
     my ($rd_days, @sec_ns) = $datetime->utc_rd_values;
     @{$self}[F_DAYNO, F_YMD, F_YDYW, F_SEC_NS] =
@@ -492,8 +494,8 @@ sub set_datetime {
 sub utc_rd_values {
     my $self = $_[0];
     return (
-	$self->[F_DAYNO] - $datetime_epoch,
-	@{$self->[F_SEC_NS] || $default_sec_ns}
+        $self->[F_DAYNO] - $datetime_epoch,
+        @{$self->[F_SEC_NS] || $default_sec_ns}
     );
 }
 
@@ -520,11 +522,22 @@ sub get_string {
 
 sub set_string {
     my ($self, $string) = @_;
-    if ($string =~ /^(-?\d+)-(\d+)-(\d+)([JG]?)\z/) {
-	$self->[F_DAYNO] =
-	    _ymd2dayno($1, $2, $3, $4? ($JG{$4}, 1): $self->[F_TR_DATE]);
-	@{$self}[F_YMD, F_YDYW] = (undef, undef);
-	return $self;
+    if ($string =~
+	m{
+            ^           # start of the string
+            (-?\d+)     # signed integer
+            -           # literal dash
+            (\d+)       # unsigned integer
+            -           # literal dash
+            (\d+)       # unsigned integer
+            ([JG]?)     # 'J' or 'G' or nothing
+            \z          # end of the string
+        }x
+    ) {
+        $self->[F_DAYNO] =
+            _ymd2dayno($1, $2, $3, $4? ($JG{$4}, 1): $self->[F_TR_DATE]);
+        @{$self}[F_YMD, F_YDYW] = (undef, undef);
+        return $self;
     }
     return undef;
 }
@@ -535,9 +548,15 @@ sub set_string {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Date::Gregorian - Gregorian calendar
+
+=head1 VERSION
+
+This documentation refers to version 0.13 of Date::Gregorian.
 
 =head1 SYNOPSIS
 
@@ -947,17 +966,80 @@ from that object.  Return value is the object.
 
 =back
 
-=head1 AUTHOR
+=head1 EXPORTS
 
-Martin Becker <hasch-cpan-dg@cozap.com>, November 1999.
+By default, nothing is exported into the caller's namespace.  Optionally,
+uppercase English weekday and month names may be imported individually
+or using the C<:weekdays> and C<:months> tags.  These constants should be
+preferred over their numerical values as documented above for readability
+and in order not to depend on zero or one being the smallest value.
 
-=head1 CAVEATS
+=head1 BUGS AND LIMITATIONS
 
-Does not work with non-integer values.
+This library works with integer arithmetic only.  Do not call methods
+expecting days, months, years, etc. with non-integer values.
+
+Bug reports and suggestions are always welcome
+E<8212> please submit them through the CPAN RT,
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Gregorian>.
+
+=head1 ROADMAP
+
+The author intends to re-factor this library and combine its
+algorithms with a better API, addressing these issues:
+
+=over 4
+
+=item *
+
+Make date objects immutable.
+
+=item *
+
+Add time arguments to gmtime and localtime conversions.
+
+=item *
+
+Add more business calendars.
+
+=item *
+
+Name days and holidays.
+
+=item *
+
+Unify simple date arithmetic and business day arithmetic.
+
+=item *
+
+Comply more strictly with ISO 8601.  Notably, use 1-based weekday numbers.
+
+=back
+
+The new API will live in the Date::Gregorian namespace but use different
+module names.  That way, old and new APIs can co-exist while downstream
+applications prepare for the transition.
 
 =head1 SEE ALSO
 
 The sci.astro Calendar FAQ, L<Date::Calc>, L<Date::Gregorian::Business>,
 L<DateTime>.
+
+=head1 AUTHOR
+
+Martin Becker C<< <becker-cpan-mp (at) cozap.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 1999-2019 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
 
 =cut

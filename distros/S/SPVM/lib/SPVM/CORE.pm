@@ -1,10 +1,233 @@
 =head1 NAME
 
-SPVM::CORE - SPVM Standard Functions
+SPVM::CORE - SPVM core functions
 
-=head1 SPVM Standard Functions
+=head2 DESCRIPTION
 
-=head1 FUNCTIONS
+SPVM::CORE is SPVM core functions.
+
+=head2 SYNOPSYS
+  
+  # Cut a newline
+  {
+    my $ret = chompr("abc\n");
+  }
+  
+  # Create a new float complex array
+  {
+    my $re_values = [1.5f, 2.5f, 3.5f];
+    my $im_values = [5.5f, 6.5f, 7.5f];
+    my $farray = complex_farray($re_values, $im_values);
+  }
+
+  # Create a new double complex array
+  {
+    my $re_values = [1.5, 2.5, 3.5];
+    my $im_values = [5.5, 6.5, 7.5];
+    my $farray = complex_darray($re_values, $im_values);
+  }
+  
+  # Create a new float complex value
+  {
+    my $z = complexf(1.5f, 2.5f);
+  }
+
+  # Create a new double complex value
+  {
+    my $z = complexd(1.5f, 2.5f);
+  }
+  
+  # Copy a byte array
+  {
+    my $nums = [(byte)1, 2, 3];
+    my $nums_copy = copy_barray($nums);
+  }
+
+  # Copy a string
+  {
+    my $str = "abc";
+    my $str_copy = copy_str($str);
+  }
+
+  # Copy a short array
+  {
+    my $nums = [(short)1, 2, 3];
+    my $nums_copy = copy_sarray($nums);
+  }
+
+  # Copy a int array
+  {
+    my $nums = [1, 2, 3];
+    my $nums_copy = copy_iarray($nums);
+  }
+
+  # Copy a long array
+  {
+    my $nums = [(long)1, 2, 3];
+    my $nums_copy = copy_larray($nums);
+  }
+
+  # Copy a float array
+  {
+    my $nums = [1.5f, 2.5f, 3.5f];
+    my $nums_copy = copy_farray($nums);
+  }
+
+  # Copy a double array
+  {
+    my $nums = [1.5, 2.5, 3.5];
+    my $nums_copy = copy_darray($nums);
+  }
+  
+=head1 CLASS METHODS
+
+=head2 chompr
+
+  sub chompr : string ($string : string)
+
+Copy the string and remove the newline "\n" from the end of string and return it.
+
+=head2 complex_farray
+
+  sub complex_farray : SPVM::Complex_2f[] ($re_values : float[], $im_values : float[])
+
+Create a new array of L<SPVM::Complex_2f> with real values and imaginary values.
+
+=head2 complex_darray
+
+  sub complex_darray : SPVM::Complex_2d[] ($re_values : double[], $im_values : double[])
+
+Create a new array of L<SPVM::Complex_2d> with real values and imaginary values.
+
+=head2 complexf
+
+  sub complexf : SPVM::Complex_2f ($re : float, $im : float)
+
+Return a new value of L<SPVM::Complex_2f>.
+
+=head2 complexd
+
+sub complexd : SPVM::Complex_2d ($re : double, $im : double)
+
+Return a new value of L<SPVM::Complex_2d>.
+
+=head2 copy_barray
+
+  sub copy_barray : byte[] ($nums : byte[])
+
+Copy a byte array.
+
+=head2 
+
+  sub copy_str : string ($string : string)
+
+Copy a string.
+
+=head2 
+
+  sub copy_sarray : short[] ($nums : short[])
+
+Copy a short array.
+  
+=head2 
+
+  sub copy_iarray : int[] ($nums : int[])
+
+Copy a int array.
+  
+=head2 
+
+  sub copy_larray : long[] ($nums : long[])
+
+Copy a long array.
+
+=head2 
+
+  sub copy_farray : float[] ($nums : float[])
+
+Copy a float array.
+
+=head2 
+
+  sub copy_darray : double[] ($nums : double[])
+
+Copy a double array.
+
+=head2 
+
+  sub copy_strarray : string[] ($strings : string[])
+
+Copy a string array.
+
+=head2 equals_barray
+
+  sub equals_barray : int ($nums1 : byte[], $nums2 : byte[])
+
+Check equality of two byte arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
+
+=head2 equals_sarray
+
+  sub equals_sarray : int ($nums1 : short[], $nums2 : short[])
+
+Check equality of two short arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
+
+=head2 equals_iarray
+
+  sub equals_iarray : int ($nums1 : int[], $nums2 : int[])
+
+Check equality of two int arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
+
+=head2 equals_farray
+
+  sub equals_larray : int ($nums1 : long[], $nums2 : long[])
+
+Check equality of two long arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
+
+=head2 equals_darray
+
+  sub equals_farray : int ($nums1 : float[], $nums2 : float[])
+
+Check equality of two float arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
+
+=head2 equals_strarray
+
+  sub equals_darray : int ($nums1 : double[], $nums2 : double[])
+
+Check equality of two double arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
+
+=head2 equals_strarray
+
+  sub equals_strarray : int ($strings1 : string[], $strings2 : string[])
+
+Check equality of two string arrays.
+
+$nums1 and $nums2 and $equality_checker must be defined, otherwise a exception occur.
+
+If the length of $nums1 and $nums2 is same and all element is same, Return 1. If not, return 0.
 
 =head2 print
 

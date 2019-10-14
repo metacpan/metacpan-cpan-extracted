@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 3.0.18
+version 3.0.19
 
 =head1 SYNOPSIS
 
@@ -191,6 +191,14 @@ Returns the associated bytes, or C<undef>.
 =head2 $eslifRecognizer->discardLastTry()
 
 Ask the recognizer the end-user data associated to last successful discard try. This data will be an exact copy of the last bytes that matched for a given lexeme, where data is the internal representation of end-user data, meaning that it may be UTF-8 sequence of bytes in case of character stream.
+
+Returns the associated bytes, or C<undef>.
+
+=head2 $eslifRecognizer->discardLast()
+
+Ask the recognizer the end-user data associated to last successful discard. This data will be an exact copy of the last bytes that matched for the latest :discard rule, meaning that it may be UTF-8 sequence of bytes in case of character stream.
+
+For performance reasons, last discard data is available only if the recognizer interface returned a true value for C<isWithTrack()> method I<and> if there is a discard event for the C<:discard> rule that matched.
 
 Returns the associated bytes, or C<undef>.
 

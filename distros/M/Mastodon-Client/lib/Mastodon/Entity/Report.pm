@@ -3,7 +3,7 @@ package Mastodon::Entity::Report;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo;
 with 'Mastodon::Role::Entity';
@@ -11,7 +11,7 @@ with 'Mastodon::Role::Entity';
 use Types::Standard qw( Int Bool );
 
 has id           => ( is => 'ro', isa => Int, );
-has action_taken => ( is => 'ro', isa => Bool, required => 1, );
+has action_taken => ( is => 'ro', isa => Bool, coerce => 1, required => 1, );
 
 1;
 

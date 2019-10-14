@@ -1,47 +1,24 @@
 Revision history for Perl extension Date::Gregorian.
 
-0.01  Mon Nov 29 23:40:56 1999
-	- original version; created by h2xs 1.1.1.1.2.1
+0.13    2019-10-12
+        - fixed and extended German holidays
+        - removed experimental half holidays
+        - fixed sporadic localtime.t test failure
+        - changed license to Artistic 2.0
+        - adapted metadata to more modern toolchain
 
-0.02  Sat Jun 17 12:01:29 2000
-	- revised integer arithmetic to deal with years before AD 1
-
-0.03  Tue Aug  7 08:19:25 2001
-	- extended POD documentation and test suite
-
-0.04  Tue Oct 16 13:13:15 2001
-	- merged set_{first|next|prev|last}_wd methods into set_weekday
-	- added module Date::Gregorian::Exact
-
-0.05  Fri Apr 19 20:05:01 2002
-	- got rid of pseudo-hashes
-
-0.06  Tue May 21 23:06:02 2002
-	- revised POD documentation
-	- added rounding in Date::Gregorian::Exact
-
-0.07  Thu Jan 19 07:38:43 2006
-	- added methods today and get_days_in_year
-	- added module Date::Gregorian::Business
-	- split test.pl into t/*.t
-	- fixed set_yd for years without Jan 1 (which can happen
-	  close to a user-defined calendar reformation date)
-	- portability fix for set/get_gmtime where OS-specific gmtime(0)
-	  is something else than 00:00:00, January 1, 1970.
-
-0.08  Fri Jan 20 13:30:40 2006
-	- added t/pod.t
+0.12    2007-06-19
 	- fixed META.yml
+	- added t/version_numbers.t
+	- added examples/today
 
-0.09  Sat Jan 21 13:26:57 2006
-	- added iterators to Date::Gregorian and Date::Gregorian::Business
-	- fixed check_ywd for pre-gregorian dates
-	- fixed empty and very short years in businessday calculations
-	- fixed detail of holiday definition parsing and related documentation
-	- changed alignment accessor to no longer use isa
-	- added more checks in t/basic.t and t/business.t
+0.11    2007-06-18
+	- bugfix: t/pod-coverage.t crashed when Test::Pod::Coverage was
+	  not installed
+	- perl5lib bug workaround: "use base" would not work in perl 5.9.x
+	  when a constant named "FIELDS" was present
 
-0.10 Thu Jun 15 21:47:00 2007
+0.10    2007-06-15
 	- replaced Date::Gregorian::Exact by a dummy croaking when imported
 	- updated t/exact.t to reflect Date::Gregorian::Exact suspension
 	- added DateTime interoperability
@@ -57,14 +34,44 @@ Revision history for Perl extension Date::Gregorian.
 	- added t/datetime.t, t/localtime.t and t/string.t
 	- added t/pod-coverage.t
 
-0.11 Mon Jun 18 07:26:29 2007
-	- bugfix: t/pod-coverage.t crashed when Test::Pod::Coverage was
-	  not installed
-	- perl5lib bug workaround: "use base" would not work in perl 5.9.x
-	  when a constant named "FIELDS" was present
+0.09    2006-01-21
+	- added iterators to Date::Gregorian and Date::Gregorian::Business
+	- fixed check_ywd for pre-gregorian dates
+	- fixed empty and very short years in businessday calculations
+	- fixed detail of holiday definition parsing and related documentation
+	- changed alignment accessor to no longer use isa
+	- added more checks in t/basic.t and t/business.t
 
-0.12 Tue Jun 19 14:02:53 2007
+0.08    2006-01-20
+	- added t/pod.t
 	- fixed META.yml
-	- added t/version_numbers.t
-	- added examples/today
+
+0.07    2006-01-19
+	- added methods today and get_days_in_year
+	- added module Date::Gregorian::Business
+	- split test.pl into t/*.t
+	- fixed set_yd for years without Jan 1 (which can happen
+	  close to a user-defined calendar reformation date)
+	- portability fix for set/get_gmtime where OS-specific gmtime(0)
+	  is something else than 00:00:00, January 1, 1970.
+
+0.06    2002-05-21
+	- revised POD documentation
+	- added rounding in Date::Gregorian::Exact
+
+0.05    2002-04-19
+	- got rid of pseudo-hashes
+
+0.04    2001-10-16
+	- merged set_{first|next|prev|last}_wd methods into set_weekday
+	- added module Date::Gregorian::Exact
+
+0.03    2001-08-07
+	- extended POD documentation and test suite
+
+0.02    2000-06-17
+	- revised integer arithmetic to deal with years before AD 1
+
+0.01    1999-11-29
+	- original version; created by h2xs 1.1.1.1.2.1
 

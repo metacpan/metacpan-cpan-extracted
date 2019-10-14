@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer;
 use FFI::Platypus::Memory;
 use Time::FFI::tm;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 our @EXPORT_OK = qw(asctime ctime gmtime localtime mktime strftime strptime timegm timelocal);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -116,9 +116,10 @@ $ffi->attach(strftime => ['opaque', 'size_t', 'string', 'tm'] => 'size_t' => sub
 
 $ffi->attach(strptime => ['string', 'string', 'tm'] => 'string' => sub {
   my ($xsub, $str, $format, $tm, $remaining) = @_;
-  $tm = Time::FFI::tm->new(tm_mday => 1, tm_isdst => -1) unless defined $tm;
+  $tm = Time::FFI::tm->new unless defined $tm;
   my $rc = $xsub->($str, $format, $tm);
   croak "strptime: Failed to match input to format string" unless defined $rc;
+  $tm->tm_isdst(-1);
   $$remaining = $rc if defined $remaining;
   return $tm;
 });
@@ -247,9 +248,10 @@ for available format descriptors.
 
 Returns a L<Time::FFI::tm> record representing the passed string, parsed
 according to the passed format. Consult your system's L<strptime(3)> manual for
-available format descriptors. The C<tm_mday> member will default to 1 if not
-specified by the string, and the C<tm_isdst> member will be set to -1; all
-other unspecified members will default to 0.
+available format descriptors. The C<tm_isdst> value will be set to -1; all
+other unspecified values will default to 0. Note that the default C<tm_mday>
+value of 0 is outside of the standard range [1,31] and may cause an error or be
+interpreted as the last day of the previous month.
 
 A L<Time::FFI::tm> record may be passed as the third argument, in which case it
 will be modified in place to (on most systems) update only the date/time
@@ -263,12 +265,16 @@ This function is usually not available on Windows.
 
   my $epoch = timegm $tm;
 
+I<Since version 1.002>
+
 Like L</mktime>, but interprets the passed L<Time::FFI::tm> record as UTC. This
 function is not always available.
 
 =head2 timelocal
 
   my $epoch = timelocal $tm;
+
+I<Since version 1.002>
 
 The same as L</mktime>, but not always available.
 

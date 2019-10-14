@@ -1,5 +1,8 @@
 Revision history for Perl extension IIIF
 
+0.05 2019-10-11T09:42:41Z
+    - major cleanup
+
 0.04 2019-10-10T14:58:56Z
     - add option magick_args
 

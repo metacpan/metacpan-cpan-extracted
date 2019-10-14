@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.103   2019-10-13
+        - Added function 'get_term_height'.
+        - Updated function 'unicode_sprintf'.
+
 0.102   2019-10-02
         - Bugfix: option 'index' in 'choose_a_subset'.
 

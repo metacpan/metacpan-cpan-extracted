@@ -1,10 +1,10 @@
 use Plack::Builder;
 use IIIF::ImageAPI;
 
-my $root = "t/img";
+my $images = "t/img";
 
 builder {
     enable 'CrossOrigin', origins => '*';
-    IIIF::ImageAPI->new(root => $root);
+    IIIF::ImageAPI->new(images => $images);
 }
 

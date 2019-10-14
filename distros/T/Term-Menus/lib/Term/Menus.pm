@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.019';
+our $VERSION = '3.020';
 
 
 use 5.006;
@@ -283,7 +283,18 @@ use vars qw(@EXPORT @EXPORT_OK %term_input %test %Dump %tosspass %b
             %DB_EVENT_FAILCHK_PANIC %DB_EXIT_FAILCHK
             %LOGREC_LONGARG %DB_EVENT_MUTEX_DIED %stdout_capture
             %DB_MUTEX_OWNER_DEAD %DB_STREAM_WRITE %stderr_capture
-            %DB_REPMGR_CONF_PREFMAS_MASTER %DB_EXIT_FILE_EXISTS);
+            %DB_REPMGR_CONF_PREFMAS_MASTER %DB_EXIT_FILE_EXISTS
+            %DB_MEM_EXTFILE_DATABASE %DB_EVENT_REP_AUTOTAKEOVER
+            %DB_FORCESYNCENV %SELECT %DB_REPMGR_CONF_FORWARD_WRITES
+            %DB_REPMGR_CONF_ENABLE_EPOLL %DB2_AM_MPOOL_OPENED
+            %DB_REP_WRITE_FORWARD_TIMEOUT %DB_META_CHKSUM_FAIL
+            %DB_MEM_REP_SITE %DB_LOG_EXT_FILE %DB_OFF_T_MAX
+            %DB_REPMGR_ISELECTABLE %DB_SLICE_CORRUPT
+            %DB_VERB_SLICE %DB_REPMGR_CONF_DISABLE_POLL
+            %DB_TXN_DISPATCH %DB_CONVERT %EPOLL %POLL
+            %DB_SYSTEM_MEM_MISSING %DB_REP_INELECT %DB_SLICED
+            %DB_REGION_MAGIC_RECOVER %DB_NOINTMP %HAVE_EPOLL
+            %DB_MEM_DATABASE %DB_MEM_DATABASE_LENGTH);
  
 @EXPORT = qw(pick Menu get_Menu_map);
 

@@ -1,24 +1,25 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
-#pod         backend => 'static:/home/doug/www/preaction.me',
+#pod         backend => 'static:.',
 #pod         read_schema => 1,
 #pod     };
-#pod     get '/*id',
+#pod     get '/*id', {
 #pod         controller => 'yancy',
 #pod         action => 'get',
-#pod         schema => 'page',
+#pod         schema => 'pages',
 #pod         id => 'index', # Default to index page
-#pod         template => 'page',
-#pod         ;
+#pod         template => 'default', # default.html.ep below
+#pod     };
 #pod     app->start;
 #pod     __DATA__
-#pod     @@ page.html.ep
+#pod     @@ default.html.ep
+#pod     % title $item->{title};
 #pod     <%== $item->{html} %>
 #pod
 #pod =head1 DESCRIPTION
@@ -44,6 +45,113 @@ our $VERSION = '0.008';
 #pod
 #pod This backend could be enhanced to provide schema for static files
 #pod (CSS, JavaScript, etc...) and templates.
+#pod
+#pod =head1 GETTING STARTED
+#pod
+#pod To get started using this backend to make a simple static website, first
+#pod create a file called C<myapp.pl> with the following contents:
+#pod
+#pod     #!/usr/bin/env perl
+#pod     use Mojolicious::Lite;
+#pod     plugin Yancy => {
+#pod         backend => 'static:.',
+#pod         read_schema => 1,
+#pod     };
+#pod     get '/*id', {
+#pod         controller => 'yancy',
+#pod         action => 'get',
+#pod         schema => 'pages',
+#pod         template => 'default',
+#pod         layout => 'default',
+#pod         id => 'index',
+#pod     };
+#pod     app->start;
+#pod     __DATA__
+#pod     @@ default.html.ep
+#pod     % title $item->{title};
+#pod     <%== $item->{html} %>
+#pod     @@ layouts/default.html.ep
+#pod     <!DOCTYPE html>
+#pod     <html>
+#pod     <head>
+#pod         <title><%= title %></title>
+#pod         <link rel="stylesheet" href="/yancy/bootstrap.css">
+#pod     </head>
+#pod     <body>
+#pod         <main class="container">
+#pod             %= content
+#pod         </main>
+#pod         <script src="/yancy/jquery.js"></script>
+#pod         <script src="/yancy/bootstrap.js"></script>
+#pod     </body>
+#pod     </html>
+#pod
+#pod Once this is done, run the development webserver using C<perl myapp.pl
+#pod daemon>:
+#pod
+#pod     $ perl myapp.pl daemon
+#pod     Server available at http://127.0.0.1:3000
+#pod
+#pod Then open C<http://127.0.0.1:3000/yancy> in your web browser to see the
+#pod L<Yancy> editor.
+#pod
+#pod =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-1.png">
+#pod
+#pod You should first create an C<index> page by clicking the "Add Item"
+#pod button to create a new page and giving the page a C<path> of C<index>.
+#pod
+#pod =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-2.png">
+#pod
+#pod Once this page is created, you can visit your new page either by
+#pod clicking the "eye" icon on the left side of the table, or by navigating
+#pod to L<http://127.0.0.1:3000>.
+#pod
+#pod =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-3.png">
+#pod
+#pod =head2 Adding Images and Files
+#pod
+#pod To add other files to your site (images, scripts, stylesheets, etc...),
+#pod create a directory called C<public> and put your file in there.  All the
+#pod files in the C<public> folder are available to use in your website.
+#pod
+#pod To add an image using Markdown, use C<![](path/to/image.jpg)>.
+#pod
+#pod =head2 Customize Template and Layout
+#pod
+#pod The easiest way to customize the look of the site is to edit the layout
+#pod template. Templates in Mojolicious can be in external files in
+#pod a C<templates> directory, or they can be in the C<myapp.pl> script below
+#pod C<__DATA__>.
+#pod
+#pod The layout your site uses currently is called
+#pod C<layouts/default.html.ep>.  The two main things to put in a layout are
+#pod C<< <%= title %> >> for the page's title and C<< <%= content %> >> for
+#pod the page's content. Otherwise, the layout can be used to add design and
+#pod navigation for your site.
+#pod
+#pod =head1 ADVANCED FEATURES
+#pod
+#pod =head2 Custom Metadata Fields
+#pod
+#pod You can add additional metadata fields to your page by adding them to
+#pod your schema, like so:
+#pod
+#pod     plugin Yancy => {
+#pod         backend => 'static:.',
+#pod         read_schema => 1,
+#pod         schema => {
+#pod             pages => {
+#pod                 properties => {
+#pod                     # Add an optional 'author' field
+#pod                     author => { type => [ 'string', 'null' ] },
+#pod                 },
+#pod             },
+#pod         },
+#pod     };
+#pod
+#pod These additional fields can be used in your template through the
+#pod C<$item> hash reference (C<< $item->{author} >>).  See
+#pod L<Yancy::Help::Config> for more information about configuring a schema.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -250,10 +358,9 @@ sub _parse_content {
     my @lines = split /\n/, decode_utf8 $content;
     # YAML frontmatter
     if ( @lines && $lines[0] =~ /^---/ ) {
-        shift @lines;
 
         # The next --- is the end of the YAML frontmatter
-        my ( $i ) = grep { $lines[ $_ ] =~ /^---/ } 0..$#lines;
+        my ( $i ) = grep { $lines[ $_ ] =~ /^---/ } 1..$#lines;
 
         # If we did not find the marker between YAML and Markdown
         if ( !defined $i ) {
@@ -267,8 +374,8 @@ sub _parse_content {
               # YAML.pm 1.29 doesn't parse 'true', 'false' as booleans
               # like the schema suggests: https://yaml.org/spec/1.2/spec.html#id2803629
               my $v = $item{$_};
-              $v = JSON::PP::false if $v eq 'false';
-              $v = JSON::PP::true if $v eq 'true';
+              $v = JSON::PP::false if $v and $v eq 'false';
+              $v = JSON::PP::true if $v and $v eq 'true';
               $v
             }} keys %item;
         };
@@ -319,7 +426,7 @@ sub _deparse_content {
         }}
         grep { !/^(?:markdown|html|path)$/ }
         keys %$item;
-    return YAML::Dump( \%data ) . "---\n". $item->{markdown};
+    return ( %data ? YAML::Dump( \%data ) . "---\n" : "") . ( $item->{markdown} // "" );
 }
 
 1;
@@ -334,25 +441,26 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
     plugin Yancy => {
-        backend => 'static:/home/doug/www/preaction.me',
+        backend => 'static:.',
         read_schema => 1,
     };
-    get '/*id',
+    get '/*id', {
         controller => 'yancy',
         action => 'get',
-        schema => 'page',
+        schema => 'pages',
         id => 'index', # Default to index page
-        template => 'page',
-        ;
+        template => 'default', # default.html.ep below
+    };
     app->start;
     __DATA__
-    @@ page.html.ep
+    @@ default.html.ep
+    % title $item->{title};
     <%== $item->{html} %>
 
 =head1 DESCRIPTION
@@ -379,6 +487,113 @@ some list() queries may not work (please make a pull request).
 This backend could be enhanced to provide schema for static files
 (CSS, JavaScript, etc...) and templates.
 
+=head1 GETTING STARTED
+
+To get started using this backend to make a simple static website, first
+create a file called C<myapp.pl> with the following contents:
+
+    #!/usr/bin/env perl
+    use Mojolicious::Lite;
+    plugin Yancy => {
+        backend => 'static:.',
+        read_schema => 1,
+    };
+    get '/*id', {
+        controller => 'yancy',
+        action => 'get',
+        schema => 'pages',
+        template => 'default',
+        layout => 'default',
+        id => 'index',
+    };
+    app->start;
+    __DATA__
+    @@ default.html.ep
+    % title $item->{title};
+    <%== $item->{html} %>
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/yancy/bootstrap.css">
+    </head>
+    <body>
+        <main class="container">
+            %= content
+        </main>
+        <script src="/yancy/jquery.js"></script>
+        <script src="/yancy/bootstrap.js"></script>
+    </body>
+    </html>
+
+Once this is done, run the development webserver using C<perl myapp.pl
+daemon>:
+
+    $ perl myapp.pl daemon
+    Server available at http://127.0.0.1:3000
+
+Then open C<http://127.0.0.1:3000/yancy> in your web browser to see the
+L<Yancy> editor.
+
+=for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-1.png">
+
+You should first create an C<index> page by clicking the "Add Item"
+button to create a new page and giving the page a C<path> of C<index>.
+
+=for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-2.png">
+
+Once this page is created, you can visit your new page either by
+clicking the "eye" icon on the left side of the table, or by navigating
+to L<http://127.0.0.1:3000>.
+
+=for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-3.png">
+
+=head2 Adding Images and Files
+
+To add other files to your site (images, scripts, stylesheets, etc...),
+create a directory called C<public> and put your file in there.  All the
+files in the C<public> folder are available to use in your website.
+
+To add an image using Markdown, use C<![](path/to/image.jpg)>.
+
+=head2 Customize Template and Layout
+
+The easiest way to customize the look of the site is to edit the layout
+template. Templates in Mojolicious can be in external files in
+a C<templates> directory, or they can be in the C<myapp.pl> script below
+C<__DATA__>.
+
+The layout your site uses currently is called
+C<layouts/default.html.ep>.  The two main things to put in a layout are
+C<< <%= title %> >> for the page's title and C<< <%= content %> >> for
+the page's content. Otherwise, the layout can be used to add design and
+navigation for your site.
+
+=head1 ADVANCED FEATURES
+
+=head2 Custom Metadata Fields
+
+You can add additional metadata fields to your page by adding them to
+your schema, like so:
+
+    plugin Yancy => {
+        backend => 'static:.',
+        read_schema => 1,
+        schema => {
+            pages => {
+                properties => {
+                    # Add an optional 'author' field
+                    author => { type => [ 'string', 'null' ] },
+                },
+            },
+        },
+    };
+
+These additional fields can be used in your template through the
+C<$item> hash reference (C<< $item->{author} >>).  See
+L<Yancy::Help::Config> for more information about configuring a schema.
+
 =head1 SEE ALSO
 
 L<Yancy>, L<Statocles>
@@ -400,10 +615,6 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 =item *
 
 Wojtek Bażant <wojciech.bazant+ebi@gmail.com>
-
-=item *
-
-Wojtek Bażant <wojtek.bazant@sanger.ac.uk>
 
 =back
 

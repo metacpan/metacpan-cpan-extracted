@@ -40,3 +40,5 @@ Revision history for Perl extension MPEG::Audio::Frame.
 	- Trahed README
 	- Now compatible down to at least 5.005_04
 
+0.10 Sa, Oct 12 12:00:00 2019
+	- Now using `binmode` to make the module compatible with Windows

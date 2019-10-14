@@ -1,4 +1,11 @@
-0.002   2017-08-02 (PERLANCAR)
+0.003   2019-09-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak Description.
+
+
+0.002   2017-08-02  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -6,6 +13,6 @@
           LGO:DirWriteRotate.
 
 
-0.001   2017-06-24 (PERLANCAR)
+0.001   2017-06-24  Released-By: PERLANCAR
 
         - First version.

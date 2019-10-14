@@ -1,0 +1,74 @@
+{
+   "abstract" : "Gregorian calendar",
+   "author" : [
+      "Martin Becker <becker-cpan-mp (at) cozap.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date-Gregorian",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DateTime" : "0.1501"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Gregorian" : {
+         "file" : "lib/Date/Gregorian.pm",
+         "version" : "0.13"
+      },
+      "Date::Gregorian::Business" : {
+         "file" : "lib/Date/Gregorian/Business.pm",
+         "version" : "0.13"
+      },
+      "Date::Gregorian::Exact" : {
+         "file" : "lib/Date/Gregorian/Exact.pm",
+         "version" : "0.999"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Gregorian"
+      },
+      "license" : [
+         "https://www.perlfoundation.org/artistic-license-20.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mhasch/perl-Date-Gregorian.git",
+         "web" : "https://github.com/mhasch/perl-Date-Gregorian"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

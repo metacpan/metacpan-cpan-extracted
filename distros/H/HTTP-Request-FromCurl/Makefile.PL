@@ -13,6 +13,7 @@ $eumm_version =~ s/_//;
 my $module = 'HTTP::Request::FromCurl';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
 (my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -28,13 +29,15 @@ my %module = (
                 web => "https://github.com/Corion/$distbase",
                 url => "git://github.com/Corion/$distbase.git",
                 type => 'git',
-            }
+            },
+            bugtracker => "https://rt.cpan.org/Public/Dist/Display.html?Name=$distbase",
+            license    => "https://dev.perl.org/licenses/",
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.008008',
+    MIN_PERL_VERSION => '5.010', # I use // in some places
 
     'LICENSE'=> 'perl',
 
@@ -45,6 +48,7 @@ my %module = (
     },
 
     PREREQ_PM => {
+        'Carp'                     => 0,
         'Getopt::Long'             => '2.39', # for ->getoptionsfromarray
         'Filter::signatures'       => '0.09',
         'Moo'                      => '2',
@@ -58,17 +62,18 @@ my %module = (
         'MIME::Base64'             => 0,
     },
     TEST_REQUIRES => {
-        'Test::More'              => 0,
+        'Test::More'              => '0.88', # for done_testing support
         'Data::Dumper'            => 0,
         'Capture::Tiny'           => 0,
         'Path::Tiny'              => 0,
+        'HTTP::Tiny'              => 0,
         'WWW::Mechanize'          => 0,
         'LWP::UserAgent'          => 0,
         'IO::Socket::SSL'         => 0, # for allowing -k to compile
         #'HTTP::Cookies::Netscape' => 0, # this can't cope with the Netscape cookie files that curl writes :(
         'HTTP::CookieJar'         => 0, # this one doesn't have an adapter to save/load at all :(
         'HTTP::CookieJar::LWP'    => 0, # this one doesn't have an adapter to save/load at all :(
-        'Test::HTTP::LocalServer' => 0.61, # we want the improved IPC
+        'Test::HTTP::LocalServer' => 0.67, # we want ->server_url()
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -86,7 +91,7 @@ sub get_module_info { %module }
 if( ! caller ) {
     # I should maybe use something like Shipwright...
     regen_README($main_file);
-    #regen_EXAMPLES();
+    regen_EXAMPLES() if -d 'examples';
     WriteMakefile1(get_module_info);
 };
 
@@ -138,7 +143,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -172,8 +177,8 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Travis Build Status](https://travis-ci.org/Corion/$distbase.svg?branch=master)](https://travis-ci.org/Corion/$distbase)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distbase?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distbase)
+[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -194,9 +199,9 @@ sub pod_section {
         shift @section if $remove_heading;
 
         pop @section
-            while $section[-1] =~ /^\s*$/;
+            while @section and $section[-1] =~ /^\s*$/;
         shift @section
-            while $section[0] =~ /^\s*$/;
+            while @section and $section[0] =~ /^\s*$/;
     };
 
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
@@ -208,11 +213,12 @@ sub regen_EXAMPLES {
     if ($perl =~/\s/) {
         $perl = qq{"$perl"};
     };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
     my $examples = `$perl -w examples/gen_examples_pod.pl`;
     if ($examples) {
-        warn "(Re)Creating lib/WWW/Mechanize/Chrome/Examples.pm\n";
+        warn "(Re)Creating $example_file\n";
         $examples =~ s/\r\n/\n/g;
-        update_file( 'lib/WWW/Mechanize/Chrome/Examples.pm', $examples );
+        update_file( $example_file, $examples );
     };
 };
 

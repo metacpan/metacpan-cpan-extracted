@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.704   2019-10-13
+    - Added 'busy_string'.
+
 1.703   2019-09-21
     - Update unicode tables.
     - Update functional interface.

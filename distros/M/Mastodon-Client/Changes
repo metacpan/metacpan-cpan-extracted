@@ -1,5 +1,28 @@
 Revision history for Mastodon::Client
 
+0.016     2019-10-13 12:23:24+01:00 Europe/London
+
+  * New:
+    * A new 'latest_response' accessor makes it possible to retrieve the
+      most recent response obtained from the server, to assist in error
+      handling.
+    * Add caption and focus settings support to upload_media
+      (thanks Eric Prestemon!).
+    * We now ship a cpanfile specifying the distribution's dependencies and
+      a Dockerfile (in 't') that can be used to run tests in an isolated
+      environment.
+  * Changes:
+    * The default user agent is now an instance of HTTP::Thin instead of
+      LWP::UserAgent.
+    * When coercing the Image type from a filename, we now use Path::Tiny's
+      'slurp_raw' instead of the plain 'slurp'.
+  * Fixes:
+    * Fixed an issue with parameter validation closures that meant
+      having multiple clients would leak data across them.
+    * Fixed an issue that caused a failure when trying to update the 'scopes'
+      attribute, which is now read-write (thanks Luc Didry!)
+    * Fixed an issue caused by a missing coercion for Bool types.
+
 0.015     2018-04-22 02:36:42+01:00 Europe/London
 
   * New:

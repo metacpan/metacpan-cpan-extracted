@@ -140,6 +140,28 @@ package Net::FullAuto::FA_Core;
 #  www.commandlinefu.com/commands/view/7789/copy-a-file-over-ssh-without-scp
 #  ssh test@example.org "cd mydir && tar cfp - mysubdir" | tar xvfp -
 #
+## Setup Windows Scheduler for FullAuto:
+#
+#  cmd /c "c:\cygwin64\bin\bash -lc 
+#         '/usr/local/bin/fullauto -gc custom_code --log --authorize_connect'"
+#  Place above command in shell file custom_code.bat
+#  Put EXIT after command in custom_code.bat
+#  | General | tab
+#  Inidicate a User Account to use with Task Scheduler
+#  Be sure to select 'Run whether user is logged on or not
+#  Check the box 'Do not store password ...'
+#  Check with highest privileges
+#  | Triggers | tab
+#  Begin the task: On a schedule
+#  One time
+#  Check the box 'Repeat task every: time  for a duration of  indefinitely'
+#  Check the box 'Stop task if it runs longer than xx minutes'
+#  Check the box 'Enabled'
+#  | Actions | tab
+#  Action: Start a program
+#  Program/script:  c:\Windows\System32\cmd.exe
+#  Add arguments:   /c start "" "c:\cygwin64\home\User\custom_code.bat"
+#  
 ## TO DO: Look for way to fix this error:
 #
 #  cd "/cygdrive_funkyPrompt_cd "/cygdrive/c/Users/KB06606-admin" 2>&1
@@ -2936,7 +2958,7 @@ sub ls_parse
    my $rx1=qr/[\d|\.]+[KMG]?\s+\w\w\w\s+\d+\s+\d\d:\d\d\s+.*/;
    my $rx2=qr/[\d|\.]+[KMG]?\s+\w\w\w\s+\d+\s+\d\d\d\d\s+.*/;
    if ($line=~s/^.*\s+($rx1|$rx2)$/$1/) {
-      $line=~/^([\d|\.]+[KMG]?)\s+(\w\w\w)\s+(\d+)\s+(\d\d:\d\d\s+|\d\d\d\d\s+)(.*)$/;
+      $line=~/^([\d|\.]+[KMG]?)\s+(\w\w\w)\s+(\d+)\s+(\d\d:\d\d|\d\d\d\d)\s+(.*)$/;
       $size=$1;$mn=$Net::FullAuto::FA_Core::month{$2};$dy=$3;$time=$4;
       $file=$5;
    }
@@ -20438,8 +20460,10 @@ sub cwd
             $target_dir=$self->{_homedir}.'/'.$target_dir;
          }
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
-            ($output,$stderr)=$self->{_cmd_handle}->
-                  cmd("cd $target_dir");
+            ($output,$stderr)=Rem_Command(
+                  { _cmd_handle=>$self->{_cmd_handle},
+                    _host_label=>[ $hostlabel,'' ] },
+                    "cd $target_dir");
             $stderr=$output if -1<index $output,"Couldn't can";
          } elsif ((exists $self->{_ftp_type}) &&
                $self->{_ftp_type}=~/s*ftp/) {
@@ -26482,60 +26506,12 @@ sub close
       (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self=$_[0];
-   my $kill_arg=($^O eq 'cygwin')?'f':9;
-   if (defined fileno $self->{_cmd_handle}) {
-      my $gone=1;my $was_a_local=0;
-      eval {  # eval is for error trapping. Any errors are
-              # handled by the "if ($@)" block at the bottom
-              # of this routine.
-         CM: while (defined fileno $self->{_cmd_handle}) {
-            $self->{_cmd_handle}->print(' '.
-                           $Net::FullAuto::FA_Core::gbp->('printf').
-                           "printf $funkyprompt");
-            while (my $line=$self->{_cmd_handle}->get) {
-print $Net::FullAuto::FA_Core::LOG "cleanup() LINE_3=$line\n"
-   if $Net::FullAuto::FA_Core::log &&
-   -1<index $Net::FullAuto::FA_Core::LOG,'*';
-               last if $line=~/logout|221\sGoodbye/sx;
-               if ($line=~/_funkyPrompt_$/s) {
-                  my $cfh_ignore='';my $cfh_error='';
-                  ($cfh_ignore,$cfh_error)=
-                     &Net::FullAuto::FA_Core::clean_filehandle(
-                        $self->{_cmd_handle});
-                  $self->{_cmd_handle}->print(' exit');
-               } elsif (($line=~/Killed|_funkyPrompt_/s) ||
-                     ($line=~/[:\$%>#-] ?$/s) ||
-                     ($line=~/sion denied.*[)][.]\s*$/s)) {
-print $Net::FullAuto::FA_Core::LOG "cleanup() SHOULD BE LAST CM=$line\n"
-   if $Net::FullAuto::FA_Core::log &&
-   -1<index $Net::FullAuto::FA_Core::LOG,'*';
-                  $gone=0;last CM;
-               } elsif (-1<index $line,
-                     'Connection to localhost closed') {
-                  $was_a_local=1;
-                  last CM;
-               } elsif ($line=~/Connection.*closed/s) {
-                  last CM;
-               }
-               if ($line=~/^\s*$|^\s*exit\s*$/s) {
-                  last CM if $count++==20;
-               } else { $count=0 }
-               if (-1<index $line,'assword:'
-                  || -1<index $line,'Permission denied') {
-                  $self->{_cmd_handle}->print("\004");
-               }
-            }
-         }
-      };
-      if ($@) {
-         if ((-1<index $@,'read error: Connection aborted')
-               || (-1<index $@,'read timed-out')
-               || (-1<index $@,'filehandle isn')
-               || (-1<index $@,'input or output error')) {
-            $@='';
-         } else { $self->{_cmd_handle}->close();die "$@       $!" }
-      }
-   } $self->{_cmd_handle}->close();
+   my $kill_arg=($^O eq 'cygwin')?'f':15;
+   my ($stdout,$stderr)=('','');
+   ($stdout,$stderr)=&Net::FullAuto::FA_Core::kill(
+      $self->{_shell_pid},$kill_arg) if &Net::FullAuto::FA_Core::testpid(
+      $self->{_shell_pid});
+   $self->{_cmd_handle}->close();
    delete $self->{_cmd_handle};
    return 0;
 

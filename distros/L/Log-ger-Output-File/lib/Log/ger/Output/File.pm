@@ -1,7 +1,7 @@
 package Log::ger::Output::File;
 
 our $DATE = '2019-09-10'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 ## no critic (InputOutput::RequireBriefOpen)
 
@@ -91,7 +91,7 @@ Log::ger::Output::File - Send logs to file
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -105,8 +105,9 @@ version 0.008
 
 =head1 DESCRIPTION
 
-This is an output module to file, with some options. File will be opened with
-append mode. Filehandle will be flushed after each log.
+This is a plugin to send logs to a file, with some options. File will be opened
+with append mode. A lock can be requested at every write, or when opening the
+file. By default, filehandle will be flushed after each log.
 
 =for Pod::Coverage ^(.+)$
 
@@ -161,9 +162,10 @@ released the lock.
 
 L<Log::ger>
 
-L<Log::ger::Output::SimpleFile>
+L<Log::ger::Output::SimpleFile> is a simpler output plugin: no locking,
+autoflush, or lazy options.
 
-L<Log::ger::Output::FileWriteRotate>
+L<Log::ger::Output::FileWriteRotate> offers autorotation feature.
 
 =head1 AUTHOR
 

@@ -66,7 +66,7 @@ sub from_col_by_col {
     if ( ! @$col_names ) {
         $sf->__print_args( $sql );
         # Choose a number
-        my $col_count = $tu->choose_a_number( 3,
+        my $col_count = $tu->choose_a_number( 2,
             { current_selection_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
         );
         if ( ! $col_count ) {
@@ -174,9 +174,9 @@ sub from_copy_and_paste {
     my $pf = App::DBBrowser::GetContent::ParseFile->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
-    $ax->print_sql( $sql );
+    print clear_screen();
     print show_cursor();
-    print "Multi row:\n";
+    print "Paste multi-row:  (then press Ctrl-D)\n";
     my $file_fs = $sf->{i}{f_copy_paste};
     if ( ! eval {
         open my $fh_in, '>', $file_fs or die $!;
@@ -208,9 +208,14 @@ sub from_copy_and_paste {
         elsif ( $parse_mode_idx == 1 ) {
             $parse_ok = $pf->__parse_file_split( $sql, $fh );
         }
+        elsif ( $parse_mode_idx == 2 ) {
+            $parse_ok = $pf->__parse_file_template( $sql, $fh );
+        }
+        #elsif ( $parse_mode_idx == 3 ) {
+        #}
         close $fh;
         if ( ! $parse_ok ) {
-            die "Error __parse_file!";
+            return; ##
         };
         if ( all { @$_ == 0 } @{$sql->{insert_into_args}} ) {
             $sql->{insert_into_args} = [];
@@ -237,7 +242,8 @@ sub __parse_settings_file {
     my ( $sf, $i ) = @_;
     if    ( $i == 0 ) { return '(Text::CSV - sep[' . $sf->{o}{csv}{sep_char}    . '])' }
     elsif ( $i == 1 ) { return '(split - sep['     . $sf->{o}{split}{field_sep} . '])' }
-    elsif ( $i == 2 ) { return '(Spreadsheet::Read)'                                   }
+    elsif ( $i == 2 ) { return '(Template)'                                            }
+    elsif ( $i == 3 ) { return '(Spreadsheet::Read)'                                   }
 }
 
 
@@ -315,7 +321,7 @@ sub from_file {
             my $file_ec = $files_ec[$idx-@pre];
 
             PARSE: while ( 1 ) {
-                if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file_ec ) {
+                if ( $sf->{o}{insert}{file_parse_mode} < 3 && -T $file_ec ) {
                     $sql->{insert_into_args} = [];
                     open my $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file_ec or die $!;
                     my $parse_ok;
@@ -324,6 +330,9 @@ sub from_file {
                     }
                     elsif ( $parse_mode_idx == 1 ) {
                         $parse_ok = $pf->__parse_file_split( $sql, $fh );
+                    }
+                    elsif ( $parse_mode_idx == 2 ) {
+                        $parse_ok = $pf->__parse_file_template( $sql, $fh );
                     }
                     if ( ! $parse_ok ) {
                         next FILE;

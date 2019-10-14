@@ -56,6 +56,9 @@ BEGIN { require_ok('MarpaX::ESLIF') };
 my $base_dsl = q{
 :default ::= action => ::shift
 :start       ::= XXXXXX # Replaced on-the-fly by json or object
+:discard ::= perl_comment event => perl_comment$
+perl_comment ::= /(?:(?:#)(?:[^\\n]*)(?:\\n|\\z))/u
+
 json         ::= object
                | array
 object       ::= LCURLY members RCURLY
@@ -181,7 +184,7 @@ my @inputs = (
            \"id\" : 16010789,
           \"verified\" : false
        }
-     }"
+     } # Last discard is a perl comment"
     );
 
 my $eslif = MarpaX::ESLIF->new($log);
@@ -284,6 +287,13 @@ sub doparse {
     $rc = 0;
 
   done:
+    if ($rc) {
+        #
+        # Get last discarded data
+        #
+        my $discardLast = $marpaESLIFRecognizer->discardLast;
+        $log->infof("[%d] Last discarded data: %s", $recursionLevel, $discardLast);
+    }
     return $rc;
 }
 

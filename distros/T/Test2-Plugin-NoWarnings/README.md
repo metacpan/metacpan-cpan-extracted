@@ -4,7 +4,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 # VERSION
 
-version 0.07
+version 0.08
 
 # SYNOPSIS
 
@@ -32,7 +32,7 @@ you can ask for this with the `echo` import argument:
 
 # SUPPORT
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings](http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings) or via email to [bug-test2-plugin-nowarnings@rt.cpan.org](mailto:bug-test2-plugin-nowarnings@rt.cpan.org).
+Bugs may be submitted at [https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues](https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 

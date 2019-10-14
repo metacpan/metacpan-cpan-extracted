@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.040';
+our $VERSION = '1.041';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -344,6 +344,8 @@ sub _map_type {
     return %conf;
 }
 
+sub supports { 0 }
+
 1;
 
 __END__
@@ -356,7 +358,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.040
+version 1.041
 
 =head1 SYNOPSIS
 

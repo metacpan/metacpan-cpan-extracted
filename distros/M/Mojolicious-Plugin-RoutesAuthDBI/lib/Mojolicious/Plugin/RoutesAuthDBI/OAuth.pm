@@ -360,8 +360,7 @@ sub conf {
 sub oauth_data {
   my $c = shift;
   my $uid = $c->curr_profile && $c->curr_profile->{id};
-  my $ou = $Init->model->oauth_users_by_profile($uid)
-    if $uid;
+  my $ou = $uid && $Init->model->oauth_users_by_profile($uid);
   
   my @data = map {
     my %site = %$_;

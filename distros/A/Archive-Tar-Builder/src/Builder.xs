@@ -38,11 +38,13 @@ static int user_lookup(SV *cache, uid_t uid, gid_t gid, b_string **user, b_strin
     XPUSHs(sv_2mortal(newSViv(gid)));
     PUTBACK;
 
-    if ((retc = call_method("lookup", G_ARRAY)) < 2) {
-        goto error_lookup;
-    }
+    retc = call_method("lookup", G_ARRAY);
 
     SPAGAIN;
+
+    if (retc < 2) {
+        goto error_lookup;
+    }
 
     if (retc == 2) {
         size_t len = 0;
@@ -109,12 +111,13 @@ static b_string *hardlink_lookup(SV *cache, dev_t dev, ino_t ino, b_string *path
     PUTBACK;
 
     path = NULL;
-
-    if ((retc = call_method("lookup", G_ARRAY)) != 1) {
-        goto leave;
-    }
+    retc = call_method("lookup", G_ARRAY);
 
     SPAGAIN;
+
+    if (retc != 1) {
+        goto leave;
+    }
 
     if ((item = POPs) != NULL && SvOK(item)) {
         tmp = SvPV(item, len);
@@ -200,16 +203,25 @@ builder_new(klass, ...)
         /*
          * Call Archive::Tar::Builder::UserCache->new()
          */
+        ENTER;
+        SAVETMPS;
+
         PUSHMARK(SP);
         XPUSHs(sv_2mortal(newSVpvf("Archive::Tar::Builder::UserCache")));
         PUTBACK;
 
-        if ((retc = call_method("new", G_SCALAR)) >= 1) {
+        retc = call_method("new", G_SCALAR);
+
+        SPAGAIN;
+
+        if (retc == 1) {
             cache = POPs;
             SvREFCNT_inc(cache);
         }
 
         PUTBACK;
+        FREETMPS;
+        LEAVE;
 
         b_builder_set_user_lookup(builder, B_USER_LOOKUP(user_lookup), cache); 
 
@@ -217,16 +229,25 @@ builder_new(klass, ...)
             /*
              * Call Archive::Tar::Builder::HardlinkCache->new()
              */
+            ENTER;
+            SAVETMPS;
+
             PUSHMARK(SP);
             XPUSHs(sv_2mortal(newSVpvf("Archive::Tar::Builder::HardlinkCache")));
             PUTBACK;
 
-            if ((retc = call_method("new", G_SCALAR)) == 1) {
+            retc = call_method("new", G_SCALAR);
+
+            SPAGAIN;
+
+            if (retc == 1) {
                 cache = POPs;
                 SvREFCNT_inc(cache);
             }
 
             PUTBACK;
+            FREETMPS;
+            LEAVE;
 
             b_builder_set_hardlink_cache(builder, B_HARDLINK_LOOKUP(hardlink_lookup), cache);
         }

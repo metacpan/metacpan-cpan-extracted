@@ -1,5 +1,8 @@
 Revision history for Proc-Forkmap
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.1     2019-10-12
+        Fixed autoflush
+
+0.2     2019-10-12
+        New flag to set conditional blocking
 

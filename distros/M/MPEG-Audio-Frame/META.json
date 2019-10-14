@@ -1,0 +1,47 @@
+{
+   "abstract" : "a class for weeding out MPEG audio frames out of a file",
+   "author" : [
+      "Yuval Kojman <nothingmuch@altern.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MPEG-Audio-Frame",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.005_04"
+         }
+      }
+   },
+   "provides" : {
+      "MPEG::Audio::Frame" : {
+         "file" : "lib/MPEG/Audio/Frame.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

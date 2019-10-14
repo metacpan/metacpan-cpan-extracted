@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 37;
+use Test::Most tests => 41;
 use Test::NoWarnings;
 use CHI;
 
@@ -12,43 +12,59 @@ BEGIN {
 
 HASH: {
 	my $cache = {};
-	my $l = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => x->new() ]);
+	my $cached = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => x->new() ]);
 
-	ok($l->calls() == 0);
-	ok($l->barney('betty') eq 'betty');
-	ok($l->calls() == 1);
-	ok($l->barney() eq 'betty');
-	ok($l->calls() == 1);
-	ok($l->barney() eq 'betty');
-	ok($l->calls() == 1);
-	my @abc = $l->abc();
+	ok($cached->calls() == 0);
+	ok($cached->barney('betty') eq 'betty');
+	ok($cached->calls() == 1);
+	ok($cached->barney() eq 'betty');
+	ok($cached->calls() == 1);
+	ok($cached->barney() eq 'betty');
+	ok($cached->calls() == 1);
+	my @abc = $cached->abc();
 	ok(scalar(@abc) == 3);
 	ok($abc[0] eq 'a');
 	ok($abc[1] eq 'b');
 	ok($abc[2] eq 'c');
-	@abc = $l->abc();
+	@abc = $cached->abc();
 	ok(scalar(@abc) == 3);
 	ok($abc[0] eq 'a');
 	ok($abc[1] eq 'b');
 	ok($abc[2] eq 'c');
-	my @a = $l->a();
+
+	my $uncached = x->new();
+
+	# Check reading scalar after reading array
+	my $abc = $cached->abc();
+	my $abc2 = $uncached->abc();
+	ok($abc eq $abc2);
+
+	# Check reading array after reading scalar
+	my $def = $cached->def();
+	ok($def eq 'f');
+	my $def2 = $uncached->def();
+	ok($def eq $def2);
+	my @def = $cached->def();
+	ok(scalar(@def) == 3);
+
+	my @a = $cached->a();
 	ok(scalar(@a) == 1);
 	ok($a[0] eq 'a');
-	@a = $l->a();
+	@a = $cached->a();
 	ok(scalar(@a) == 1);
 	ok($a[0] eq 'a');
 
-	ok($l->echo('foo') eq 'foo');
-	ok($l->echo('foo') eq 'foo');
-	ok($l->echo('bar') eq 'bar');
-	ok($l->echo('bar') eq 'bar');
-	ok($l->echo('foo') eq 'foo');
+	ok($cached->echo('foo') eq 'foo');
+	ok($cached->echo('foo') eq 'foo');
+	ok($cached->echo('bar') eq 'bar');
+	ok($cached->echo('bar') eq 'bar');
+	ok($cached->echo('foo') eq 'foo');
 
-	my @empty = $l->empty();
+	my @empty = $cached->empty();
 	ok(scalar(@empty) == 0);
 
-	ok(!defined($l->empty()));
-	ok(!defined($l->empty()));
+	ok(!defined($cached->empty()));
+	ok(!defined($cached->empty()));
 
 	# White box test the cache
 	ok($cache->{'barney::'} eq 'betty');
@@ -57,10 +73,10 @@ HASH: {
 	ok($cache->{'echo::bar'} eq 'bar');
 	my $a = $cache->{'a::'};
 	ok(ref($a) eq 'ARRAY');
-	my $abc = $cache->{'abc::'};
+	$abc = $cache->{'abc::'};
 	ok(ref($abc) eq 'ARRAY');
 
-	ok(ref($l->object()) eq 'x');
+	ok(ref($cached->object()) eq 'x');
 
 	# foreach my $key(sort keys %{$cache}) {
 		# diag($key);
@@ -87,6 +103,10 @@ sub barney {
 
 sub abc {
 	return ('a', 'b', 'c');
+}
+
+sub def {
+	return ('d', 'e', 'f');
 }
 
 sub a {

@@ -10,14 +10,17 @@ use autodie qw(:all);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use Geo::Coder::Free;
+use Geo::Coder::Free::Local;
 
 if(scalar(@ARGV) == 0) {
 	die "Usage: $0 location";
 }
 
 # print join(' ', @ARGV), "\n";
-# if(my $rc = Geo::Coder::Free->new()->geocode(location => join(' ', @ARGV))) {
-if(my $rc = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => join(' ', @ARGV))) {
+if(my $rc = Geo::Coder::Free::Local->new()->geocode(location => join(' ', @ARGV))) {
+	print Data::Dumper->new([$rc])->Dump();
+} elsif($rc = Geo::Coder::Free->new()->geocode(location => join(' ', @ARGV))) {
+# if(my $rc = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => join(' ', @ARGV))) {
 	print Data::Dumper->new([$rc])->Dump();
 } else {
 	exit(1);

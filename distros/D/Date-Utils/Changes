@@ -1,5 +1,8 @@
 Revision history for Date::Utils
 
+0.28  Sat Oct 13 13:10:00 2019
+      - Updated dependency on Date::Exception v0.08.
+
 0.27  Tue Aug 13 11:05:00 2019
       - Moved author test scripts to xt/ subfolder.
 

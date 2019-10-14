@@ -1,24 +1,66 @@
-# Copyright (c) 1999-2007 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
-#
-# $Id: Makefile.PL,v 1.3 2007/06/15 19:54:19 martin Stab $
+# Copyright (c) 1999-2019 by Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+use File::Spec;
 
-my $with_author = 6.0603 <= $ExtUtils::MakeMaker::VERSION;
-my $guard_meta  = 6.1003 <= $ExtUtils::MakeMaker::VERSION;
+my $DN = 'Date-Gregorian';
+my %versions = map {
+    my $module = $_;
+    my @path   = ('lib', split /::/, "$module.pm");
+    my $file   = join '/', @path;
+    my $osfile = File::Spec->catfile(@path);
+    $module => {
+        file    => $file,
+        version => MM->parse_version($osfile),
+    }
+} qw(
+    Date::Gregorian
+    Date::Gregorian::Business
+    Date::Gregorian::Exact
+);
 
 WriteMakefile(
-    'NAME'	   => 'Date::Gregorian',
-    'VERSION_FROM' => 'lib/Date/Gregorian.pm', # finds $VERSION
-    $with_author? (
-	'AUTHOR'   => 'Martin Becker (hasch-cpan-dg@cozap.com)',
-	'ABSTRACT' => 'Gregorian calendar',
-    ): (),
-    $guard_meta? (
-	'NO_META'  => 1,
-    ): (),
+    NAME               => 'Date::Gregorian',
+    VERSION_FROM       => 'lib/Date/Gregorian.pm',
+    ABSTRACT_FROM      => 'lib/Date/Gregorian.pm',
+    AUTHOR             => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
+    LICENSE            => 'artistic_2',
+    MIN_PERL_VERSION   => '5.006',
+    PREREQ_PM          => {
+        'Carp' => '0',
+    },
+    SIGN               => 1,
+    META_MERGE         => {
+        'meta-spec'    => { version => 2 },
+        provides       => \%versions,
+        dynamic_config => 0,
+        resources      => {
+            bugtracker => {
+                web => "https://rt.cpan.org/Public/Dist/Display.html?Name=$DN",
+            },
+            license => [
+                'https://www.perlfoundation.org/artistic-license-20.html',
+            ],
+            repository => {
+                url  => "git://github.com/mhasch/perl-$DN.git",
+                web  => "https://github.com/mhasch/perl-$DN",
+                type => 'git',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends   => {
+                    'DateTime' => '0.1501',
+                },
+            },
+        },
+    },
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '6.64',
+        'File::Spec'          => '0',
+    },
 );

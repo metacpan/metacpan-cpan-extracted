@@ -69,7 +69,7 @@ SKIP: { skip "strptime not available" unless defined &strptime;
   my $tm = strptime('2300', '%Y');
   is $tm->tm_year, 400, 'strptime extract year';
   is $tm->tm_mon, 0, 'strptime default month';
-  is $tm->tm_mday, 1, 'strptime default day of month';
+  is $tm->tm_mday, 0, 'strptime default day of month';
   is $tm->tm_hour, 0, 'strptime default hour';
   is $tm->tm_min, 0, 'strptime default minute';
   is $tm->tm_sec, 0, 'strptime default second';

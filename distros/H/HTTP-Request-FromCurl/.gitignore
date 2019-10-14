@@ -17,3 +17,5 @@ frame-*.png
 curl.exe
 curl-ca-bundle.crt
 libcurl-x64.dll
+.prove
+.patch

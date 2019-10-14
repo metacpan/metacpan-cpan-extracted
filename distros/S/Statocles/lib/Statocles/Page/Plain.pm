@@ -1,5 +1,5 @@
 package Statocles::Page::Plain;
-our $VERSION = '0.094';
+our $VERSION = '0.095';
 # ABSTRACT: A plain page (with templates)
 
 use Statocles::Base 'Class';
@@ -44,7 +44,7 @@ Statocles::Page::Plain - A plain page (with templates)
 
 =head1 VERSION
 
-version 0.094
+version 0.095
 
 =head1 SYNOPSIS
 

@@ -3,13 +3,13 @@ package Mastodon::Entity::Attachment;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo;
 with 'Mastodon::Role::Entity';
 
-use Types::Standard qw( Maybe Enum Int Str Bool );
-use Mastodon::Types qw( Acct URI );
+use Types::Standard qw( Maybe Enum Int );
+use Mastodon::Types qw( URI );
 
 has id          => ( is => 'ro', isa => Int, );
 has preview_url => ( is => 'ro', isa => URI, coerce => 1, required => 1, );

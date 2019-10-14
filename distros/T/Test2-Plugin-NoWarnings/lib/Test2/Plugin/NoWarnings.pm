@@ -3,7 +3,7 @@ package Test2::Plugin::NoWarnings;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Test2 1.302096;
 use Test2::API qw( context_do );
@@ -74,7 +74,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ you can ask for this with the C<echo> import argument:
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings> or via email to L<bug-test2-plugin-nowarnings@rt.cpan.org|mailto:bug-test2-plugin-nowarnings@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 

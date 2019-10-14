@@ -43,6 +43,12 @@ is_deeply $item,
 $item = $be->get( pages => 'NOT_FOUND' );
 is $item, undef, 'get() NOT_FOUND returns undef';
 
+$id = $be->create( pages => {path => 'empty'} );
+is $id, 'empty', 'id is returned';
+ok -z $temp->child( "$id.markdown" ), 'created empty page exists with zero size';
+$be->delete( pages => $id );
+ok ! -e $temp->child( "$id.markdown" ), 'empty page gets deleted';
+
 my %about_page = (
     path => 'about',
     title => 'About',

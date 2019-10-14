@@ -1,18 +1,25 @@
---- #YAML:1.0
-name: MPEG-Audio-Frame
-version: 0.09
+---
+abstract: 'a class for weeding out MPEG audio frames out of a file'
 author:
-  - Yuval Kojman <nothingmuch@altern.org>
-abstract: |-
-  a class for weeding out MPEG audio frames out of a file
-  handle.
-license: perl
-requires:
-  perl: '>= 5.005_04'
+  - 'Yuval Kojman <nothingmuch@altern.org>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MPEG-Audio-Frame
 provides:
   MPEG::Audio::Frame:
     file: lib/MPEG/Audio/Frame.pm
-    version: 0.09
-generated_by: Module::Build version 0.250.0
+    version: '0.10'
+requires:
+  perl: 5.005_04
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

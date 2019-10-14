@@ -103,6 +103,27 @@ my $configure_wordpress=sub {
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
+   ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
+   ($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -m -g www-data www-data');
+   $handle->{_cmd_handle}->print($sudo.'passwd www-data');
+   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   while (1) {
+      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'New password:') {
+         $handle->{_cmd_handle}->print($service_and_cert_password);
+         $output='';
+         next;
+      } elsif (-1<index $output,'Retype new password:') {
+         $handle->{_cmd_handle}->print($service_and_cert_password);
+         $output='';
+         next;
+      }
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf /var/cache/yum',
+      '__display__');
    $handle->cwd('~');
    print "\n";
    my ($ip,$iperr)='';
@@ -175,8 +196,12 @@ if ($do==1) {
          ' libjpeg-turbo-devel libpng-devel.x86_64'.
          ' freetype-devel.x86_64',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd(
+         'yum -y install yum-utils --enablerepo=extras','__display__');
    } else {
       # https://www.digitalocean.com/community/questions/how-to-change-port-80-into-8080-on-my-wordpress
+      # https://opensource.com/article/18/9/linux-iptables-firewalld
+      # https://www.digitalocean.com/community/tutorials/iptables-essentials-common-firewall-rules-and-commands - for JavaPipe
       my $cygcheck=`/bin/cygcheck -c` || die $!;
       my $uname=`/bin/uname` || die $!;
       my $uname_all=`/bin/uname -a` || die $!;
@@ -481,6 +506,7 @@ print "DOING NGINX\n";
    # https://wiki.loadaverage.org/clipbucket/installation_guides/install_like_loadaverage
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
+   # https://www.wpwhitesecurity.com/creating-mysql-wordpress-database/
    ($stdout,$stderr)=$handle->cmd($sudo.
       'rm -rvf /usr/local/nginx','__display__');
    my $nginx='nginx-1.14.0'; # updated from 1.10.0
@@ -549,6 +575,7 @@ print "DOING NGINX\n";
    ($stdout,$stderr)=$handle->cwd("/opt/source");
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
+   # https://www.hrupin.com/2017/07/how-to-automatically-restart-nginx
    ($stdout,$stderr)=$handle->cwd("/opt/source/$nginx");
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -1566,6 +1593,9 @@ END
       if (-1<index $output,'root (enter for none):') {
          $handle->{_cmd_handle}->print();
          next;
+      } elsif (-1<index $output,'so you can safely answer \'n\'') {
+         $handle->{_cmd_handle}->print('n');
+         next;
       } elsif (-1<index $output,'Set root password? [Y/n]') {
          $handle->{_cmd_handle}->print('n');
          next;
@@ -1686,9 +1716,9 @@ END
       $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
       if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'git clone https://gitlab.kitware.com/cmake/cmake',
+            'git clone https://github.com/Kitware/CMake.git',
             '__display__');
-         ($stdout,$stderr)=$handle->cwd('cmake');
+         ($stdout,$stderr)=$handle->cwd('CMake');
          ($stdout,$stderr)=$handle->cmd($sudo.
             './configure','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.

@@ -31,8 +31,8 @@ sub _loader {
   my ($self, $c) = @_;
   my $gid = $c->session($self->session_key);
   
-  my $guest = $self->load($gid)
-    if defined $gid;
+  my $guest = defined($gid) && $self->load($gid);
+    #~ if defined $gid;
 
   if ($guest) {
       $c->stash($self->stash_key => { guest => $guest });
@@ -49,8 +49,7 @@ sub load {
   my $guest = $self->model->get_guest($gid);
   
   if ( $guest && $guest->{id}) {
-    my $json = json_dec(delete $guest->{data})
-      if $guest->{data};
+    my $json = $guest->{data} && json_dec(delete $guest->{data});
   
     @$guest{ keys %$json } = values %$json
       if $json;

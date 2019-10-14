@@ -35,7 +35,7 @@ OPENADDR: {
 				ok(defined($location));
 				if($ENV{'WHOSONFIRST_HOME'}) {
 					cmp_deeply($location,
-						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.16, 1e-2)));
+						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.15, 1e-2)));
 				} else {
 					cmp_deeply($location,
 						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.16, 1e-2)));
@@ -100,7 +100,7 @@ OPENADDR: {
 				ok(defined($location));
 				if($ENV{'WHOSONFIRST_HOME'}) {
 					cmp_deeply($location,
-						methods('lat' => num(53.55, 1e-2), 'long' => num(-113.47, 1e-2)));
+						methods('lat' => num(53.57, 1e-2), 'long' => num(-113.51, 1e-2)));
 				} else {
 					cmp_deeply($location,
 						methods('lat' => num(53.55, 1e-2), 'long' => num(-113.47, 1e-2)));
@@ -180,15 +180,15 @@ OPENADDR: {
 
 				$location = $geo_coder->geocode({ location => 'St. Louis, Missouri, USA' });
 				cmp_deeply($location,
-					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.20, 1e-2)));
+					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.25, 1e-2)));
 
 				$location = $geo_coder->geocode({ location => 'St Louis, Missouri, USA' });
 				cmp_deeply($location,
-					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.20, 1e-2)));
+					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.25, 1e-2)));
 
 				$location = $geo_coder->geocode({ location => 'Saint Louis, Missouri, USA' });
 				cmp_deeply($location,
-					methods('lat' => num(38.64, 1e-2), 'long' => num(-90.44, 1e-2)));
+					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.25, 1e-2)));
 
 				$location = $geo_coder->geocode('716 Yates Street, Victoria, British Columbia, Canada');
 				cmp_deeply($location,
@@ -197,7 +197,7 @@ OPENADDR: {
 				$location = $geo_coder->geocode(location => 'Caboolture, Queensland, Australia');
 				ok(defined($location));
 				cmp_deeply($location,
-					methods('lat' => num(-27.09, 1e-2), 'long' => num(152.96, 1e-2)));
+					methods('lat' => num(-27.06, 1e-2), 'long' => num(152.97, 1e-2)));
 
 				$location = $geo_coder->geocode(location => 'Whitley, Indiana, USA');
 				ok(defined($location));

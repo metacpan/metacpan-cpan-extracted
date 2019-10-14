@@ -62,6 +62,12 @@ $t->get_ok( '/', 'index is default' )
     ->text_is( title => 'Static Site ⚡' )
     ;
 
+$t->get_ok( '/empty', 'no frontmatter or content is fine' )
+    ->status_is( 200 )
+    ->content_type_like( qr{^text/html} )
+    ->text_like("*" => qr{^\s+$})
+    ;
+
 $t->get_ok( '/about/', 'request for directory with trailing slash' )
     ->status_is( 200 )
     ->content_type_like( qr{^text/html} )
@@ -83,7 +89,7 @@ my @items = $t->app->yancy->list( 'pages' );
 is_deeply
     [ sort map { $_->{path} } @items ],
     [
-        'about/index', 'index', 'not-a-draft'
+        'about/index', 'empty', 'index', 'not-a-draft'
     ],
     'list is complete and correct';
 done_testing;

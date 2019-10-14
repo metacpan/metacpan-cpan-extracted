@@ -326,14 +326,14 @@ sub set_options {
             elsif ( $opt eq '_parse_file' ) {
                 my $prompt = 'Parsing "File"';
                 my $sub_menu = [
-                    [ 'file_parse_mode', "- Use:", [ 'Text::CSV', 'split', 'Spreadsheet::Read' ] ],
+                    [ 'file_parse_mode', "- Use:", [ 'Text::CSV', 'split', 'Template', 'Spreadsheet::Read' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_parse_copy' ) {
                 my $prompt = 'Parsing "Copy & Paste"';
                 my $sub_menu = [
-                    [ 'copy_parse_mode', "- Use:", [ 'Text::CSV', 'split', 'Spreadsheet::Read' ] ],
+                    [ 'copy_parse_mode', "- Use:", [ 'Text::CSV', 'split', 'Template' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

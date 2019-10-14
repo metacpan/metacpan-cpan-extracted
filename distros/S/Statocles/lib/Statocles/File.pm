@@ -1,5 +1,5 @@
 package Statocles::File;
-our $VERSION = '0.094';
+our $VERSION = '0.095';
 # ABSTRACT: A wrapper for a file on the filesystem
 
 #pod =head1 SYNOPSIS
@@ -76,7 +76,7 @@ Statocles::File - A wrapper for a file on the filesystem
 
 =head1 VERSION
 
-version 0.094
+version 0.095
 
 =head1 SYNOPSIS
 

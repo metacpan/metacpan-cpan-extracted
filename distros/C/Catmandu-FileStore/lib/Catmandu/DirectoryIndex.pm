@@ -2,7 +2,7 @@ package Catmandu::DirectoryIndex;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.15';
+our $VERSION = '1.151';
 
 use Moo::Role;
 use Cwd;

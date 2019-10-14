@@ -36,5 +36,4 @@ t/20-mpeg1-test01.t
 t/20-mpeg2-22050.t
 t/30-mpeg25-11025.t
 t/lib/Test/FloatNear.pm
-
-SIGNATURE    Added here by Module::Build
+META.json

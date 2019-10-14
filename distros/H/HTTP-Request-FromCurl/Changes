@@ -1,3 +1,12 @@
+0.13 2019-10-11
+    * Support output of HTTP::Tiny code in addition to LWP::UserAgent
+    * Support headers with multiple values
+    * Test suite can now run in parallel, cutting down test time
+    * Test suite is now robust in face of features unsupported by the
+      curl executable. --compress can be unimplemented.
+    * Test suite is now robust in face of IPv6. Curl URL-globbing does not
+      play well with IPv6 URLs.
+
 0.12 2019-02-27
     * Fix the test skip count in the case we encountered an error earlier
       (Reported by SREZIC, addresses RT#128646)

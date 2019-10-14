@@ -18,7 +18,7 @@ my %module_build_args = (
     "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-FileStore",
-  "dist_version" => "1.15",
+  "dist_version" => "1.151",
   "license" => "perl",
   "module_name" => "Catmandu::FileStore",
   "recommends" => {
@@ -42,10 +42,13 @@ my %module_build_args = (
     "perl" => "v5.10.1"
   },
   "test_requires" => {
+    "App::Cmd::Tester::CaptureExternal" => 0,
+    "Cpanel::JSON::XS" => 0,
     "IO::Callback" => 0,
     "Log::Any::Adapter::Log4perl" => 0,
     "Log::Any::Test" => "1.03",
     "Log::Log4perl" => 0,
+    "Role::Tiny" => 0,
     "Test::Deep" => "0.112",
     "Test::Exception" => "0.43",
     "Test::LWP::UserAgent" => 0,
@@ -56,11 +59,14 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "App::Cmd::Tester::CaptureExternal" => 0,
+  "Cpanel::JSON::XS" => 0,
   "IO::Callback" => 0,
   "Log::Any::Adapter::Log4perl" => 0,
   "Log::Any::Test" => "1.03",
   "Log::Log4perl" => 0,
   "Module::Build" => "0.4229",
+  "Role::Tiny" => 0,
   "Test::Deep" => "0.112",
   "Test::Exception" => "0.43",
   "Test::LWP::UserAgent" => 0,

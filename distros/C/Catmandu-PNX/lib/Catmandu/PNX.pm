@@ -76,7 +76,7 @@ use XML::Compile;
 use XML::Compile::Schema;
 use XML::Compile::Util 'pack_type';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has '_reader'    => (is => 'ro');
 has '_writer'    => (is => 'ro');

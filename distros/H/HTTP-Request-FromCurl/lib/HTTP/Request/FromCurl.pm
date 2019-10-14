@@ -15,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -228,6 +228,17 @@ sub squash_uri( $class, $uri ) {
     return $u
 }
 
+sub _add_header( $self, $headers, $h, $value ) {
+    if( exists $headers->{ $h }) {
+        if (!ref( $headers->{ $h })) {
+            $headers->{ $h } = [ $headers->{ $h }];
+        }
+        push @{ $headers->{ $h } }, $value;
+    } else {
+        $headers->{ $h } = $value;
+    }
+}
+
 sub _build_request( $self, $uri, $options, %build_options ) {
     my $body;
 
@@ -246,6 +257,11 @@ sub _build_request( $self, $uri, $options, %build_options ) {
     for my $uri (@uris) {
         $uri = URI->new( $uri );
         $uri = $self->squash_uri( $uri );
+
+        my $host = $uri->can( 'host_port' ) ? $uri->host_port : "$uri";
+
+        # Stuff we use unless nothing else hits
+        my %request_default_headers = %default_headers;
 
         # Sluuuurp
         if( $build_options{ read_files }) {
@@ -275,7 +291,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
                 Content => [ map { /^([^=]+)=(.*)$/ ? ($1 => $2) : () } @form_args ],
             );
             $body = $req->content;
-            unshift @headers, 'Content-Type: ' . join "; ", $req->headers->content_type;
+            $request_default_headers{ 'Content-Type' } = join "; ", $req->headers->content_type;
 
         } elsif( $options->{ get }) {
             $method = 'GET';
@@ -297,14 +313,14 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         } elsif( @post_data ) {
             $method = 'POST';
             $body = join "", @post_data;
-            unshift @headers, 'Content-Type: application/x-www-form-urlencoded';
+            $request_default_headers{ 'Content-Type' } = 'application/x-www-form-urlencoded';
 
         } else {
             $method ||= 'GET';
         };
 
         if( defined $body ) {
-            unshift @headers, sprintf 'Content-Length: %d', length $body;
+            $request_default_headers{ 'Content-Length' } = length $body;
         };
 
         if( $options->{ 'oauth2-bearer' } ) {
@@ -327,15 +343,27 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             }
         };
 
-        my $host = $uri->can( 'host_port' ) ? $uri->host_port : "$uri";
-        my %headers = (
-            %default_headers,
-            'Host' => $host,
-            (map { /^\s*([^:\s]+)\s*:\s*(.*)$/ ? ($1 => $2) : () } @headers),
-        );
+        my %headers;
+        for my $kv (
+            (map { /^\s*([^:\s]+)\s*:\s*(.*)$/ ? [$1 => $2] : () } @headers),) {
+                $self->_add_header( \%headers, @$kv );
+        };
+
+        if( defined $options->{ agent }) {
+            $self->_add_header( \%headers, "User-Agent", $options->{ 'agent' } );
+        };
 
         if( defined $options->{ referrer }) {
-            $headers{ Referer } = $options->{ 'referrer' };
+            $self->_add_header( \%headers, "Referer" => $options->{ 'referrer' } );
+        };
+
+        for my $k (keys %request_default_headers) {
+            if( ! $headers{ $k }) {
+                $self->_add_header( \%headers, $k, $request_default_headers{ $k });
+            };
+        };
+        if( ! $headers{ 'Host' }) {
+            $self->_add_header( \%headers, 'Host' => $host );
         };
 
         if( defined $options->{ 'cookie-jar' }) {
@@ -351,10 +379,6 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             };
         };
 
-        if( defined $options->{ agent }) {
-            $headers{ 'User-Agent' } = $options->{ 'agent' };
-        };
-
         # Curl 7.61.0 ignores these:
         #if( $options->{ keepalive }) {
         #    $headers{ 'Keep-Alive' } = 1;
@@ -364,9 +388,8 @@ sub _build_request( $self, $uri, $options, %build_options ) {
 
         if( $options->{ compressed }) {
             my $compressions = HTTP::Message::decodable();
-            $headers{ 'Accept-Encoding' } = $compressions;
+            $self->_add_header( \%headers, 'Accept-Encoding' => $compressions );
         };
-
         push @res, HTTP::Request::CurlParameters->new({
             method => $method,
             uri    => $uri,
@@ -451,6 +474,9 @@ L<LWP::Protocol::Net::Curl>
 L<LWP::CurlLog>
 
 L<HTTP::Request::AsCurl> - for the inverse function
+
+L<https://github.com/NickCarneiro/curlconverter> - a converter for multiple
+target languages
 
 =head1 REPOSITORY
 

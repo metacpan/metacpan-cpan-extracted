@@ -1,7 +1,7 @@
 package IIIF::Request;
 use 5.014001;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Plack::Util::Accessor qw(region size rotation quality format);
 use Carp qw(croak);
@@ -22,9 +22,11 @@ sub new {
     my $class = shift;
     my $path = shift // "";
 
-    my ( $rotation, $mirror, $degree, $quality, $format );
-    my ( $region, $region_pct, $region_px );
-    my ( $size, $upscale, $size_px, $size_pct, $ratio );
+    my (
+        $rotation, $mirror,     $degree,    $quality, $format,
+        $region,   $region_pct, $region_px, $size,    $upscale,
+        $size_px,  $size_pct,   $ratio
+    );
 
     my @parts = split '/', $path;
 
@@ -185,7 +187,7 @@ sub pct2px {
 sub is_default {
     my ($self) = @_;
 
-    return $self->as_string =~ qr{^full/max/0/default\.};
+    return $self->as_string =~ qr{^full/max/0/default};
 }
 
 sub as_string {

@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0003';
+our $VERSION = '0.0004';
 
 use Math::GMPz qw< :mpz >;
 
@@ -367,6 +367,24 @@ sub _nok {
     return $n;
 }
 
+sub _fib {
+    if (wantarray) {
+        $_[0] -> SUPER::_fib($_[1]);
+    } else {
+        Rmpz_fib_ui($_[1], $_[1]);
+        return $_[1];
+    }
+}
+
+sub _lucas {
+    if (wantarray) {
+        $_[0] -> SUPER::_lucas($_[1]);
+    } else {
+        Rmpz_lucnum_ui($_[1], $_[1]);
+        return $_[1];
+    }
+}
+
 # XXX TODO: calc len in base 2 then appr. in base 10
 sub _alen {
     Rmpz_sizeinbase($_[1], 10);
@@ -525,6 +543,10 @@ The following methods are implemented.
 =item _check()
 
 =item _nok()
+
+=item _fib()
+
+=item _lucas()
 
 =item _alen()
 

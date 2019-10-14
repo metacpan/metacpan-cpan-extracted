@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use v5.14.1;
 use IIIF::Request;
-use IIIF::Magick qw(info convert);
+use IIIF::Magick qw(info convert convert_command);
 use JSON::PP;
 
 if ( !@ARGV ) {
@@ -21,9 +21,7 @@ else {
         exit !convert( $req, @ARGV );
     }
     else {
-        say join ' ', 'convert',
-          map { IIIF::Magick::shell_quote($_) }
-          IIIF::Magick::args( $req, @ARGV );
+        say convert_command($req, @ARGV);
     }
 }
 

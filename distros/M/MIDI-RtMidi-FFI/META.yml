@@ -1,0 +1,38 @@
+---
+abstract: 'Bindings for librtmidi - Realtime MIDI library'
+author:
+  - 'John Barrett <john@jbrt.org>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0.88'
+  Time::HiRes: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  FFI::CheckLib: '0.11'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MIDI-RtMidi-FFI
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  FFI::CheckLib: '0'
+  FFI::Platypus: '0'
+  FFI::Platypus::Buffer: '0'
+  FFI::Platypus::Memory: '0'
+  FFI::Platypus::Record: '0'
+  MIDI::Event: '0'
+resources:
+  bugtracker: https://github.com/jbarrett/MIDI-RtMidi-FFI/issues
+  homepage: https://github.com/jbarrett/MIDI-RtMidi-FFI
+  repository: https://github.com/jbarrett/MIDI-RtMidi-FFI.git
+version: '0.01'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

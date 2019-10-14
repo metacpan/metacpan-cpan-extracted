@@ -28,13 +28,13 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Exception'                    => { file => 'lib/Date/Exception.pm'                  , version => '0.07' },
-            'Date::Exception::InvalidDay'        => { file => 'lib/Date/Exception/InvalidDay.pm'       , version => '0.07' },
-            'Date::Exception::InvalidDayCount'   => { file => 'lib/Date/Exception/InvalidDayCount.pm'  , version => '0.07' },
-            'Date::Exception::InvalidMonth'      => { file => 'lib/Date/Exception/InvalidMonth.pm'     , version => '0.07' },
-            'Date::Exception::InvalidMonthCount' => { file => 'lib/Date/Exception/InvalidMonthCount.pm', version => '0.07' },
-            'Date::Exception::InvalidYear'       => { file => 'lib/Date/Exception/InvalidYear.pm'      , version => '0.07' },
-            'Date::Exception::InvalidYearCount'  => { file => 'lib/Date/Exception/InvalidYearCount.pm' , version => '0.07' },
+            'Date::Exception'                    => { file => 'lib/Date/Exception.pm'                  , version => '0.08' },
+            'Date::Exception::InvalidDay'        => { file => 'lib/Date/Exception/InvalidDay.pm'       , version => '0.08' },
+            'Date::Exception::InvalidDayCount'   => { file => 'lib/Date/Exception/InvalidDayCount.pm'  , version => '0.08' },
+            'Date::Exception::InvalidMonth'      => { file => 'lib/Date/Exception/InvalidMonth.pm'     , version => '0.08' },
+            'Date::Exception::InvalidMonthCount' => { file => 'lib/Date/Exception/InvalidMonthCount.pm', version => '0.08' },
+            'Date::Exception::InvalidYear'       => { file => 'lib/Date/Exception/InvalidYear.pm'      , version => '0.08' },
+            'Date::Exception::InvalidYearCount'  => { file => 'lib/Date/Exception/InvalidYearCount.pm' , version => '0.08' },
         },
         resources => {
             repository => {

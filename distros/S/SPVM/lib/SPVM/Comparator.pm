@@ -6,24 +6,37 @@ use SPVM 'SPVM::Comparator';
 
 =head1 NAME
 
-SPVM::Comparator - a callback class for comparation
+SPVM::Comparator - a callback type for comparation
 
 =head1 SYNOPSYS
   
   use SPVM::Comparator;
   
-  my $comparator : SPVM::Comparator = sub : int ($self : self, $x1 : object, $x2 : object); {
-    return $x1 > $x2;
+  my $comparator : SPVM::Comparator = sub : int ($self : self, $obj1 : object, $obj2 : object); {
+    my $point1 = (SPVM::Point)$obj1;
+    my $point2 = (SPVM::Point)$obj2;
+    
+    if ($point1->x > $point2->x) {
+      return 1;
+    }
+    elsif ($point1->x < $point2->x) {
+      return -1;
+    }
+    else {
+      return 0;
+    }
   };
   
-  my $result = $comparator->compare;
+  my $point1 = SPVM::Point->new(1, 2);
+  my $point2 = SPVM::Point->new(5, 6);
+  my $result = $comparator->($point1, $point2);
 
 =head1 DESCRIPTION
 
-L<SPVM::Comparator> is a callback type to stringify object.
+L<SPVM::Comparator> is a callback type to compare objects.
 
-=head1 INSTANCE METHODS
+=head1 CALLBACK METHOD
 
-=head2 compare
+  sub : int ($self : self, $obj1 : object, $obj2 : object);
 
-  sub compare : int ($self : self, $x1 : object, $x2 : object);
+This method should receive two objects and return 1 if $obj1 is more than $obj2, -1 if $x is lass than $obj2, 0 if $obj1 equals $obj2 in the implementation.

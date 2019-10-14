@@ -1,16 +1,12 @@
 use strict;
 use warnings;
 
-use Capture::Tiny qw( capture );
-
 use Test2::V0;
+use Test2::Require::Module 'IPC::Run3';
 
-my $output = capture {
+use IPC::Run3 qw( run3 );
 
-    # We expect this to exit non-zero since the test will fail.
-
-    ## no critic (InputOutput::RequireCheckedSyscalls)
-    system( $^X, '-e', <<'EOF' );
+my $code = <<'EOF';
 use strict;
 use warnings;
 
@@ -28,7 +24,13 @@ subtest 'subt' => sub {
 done_testing();
 EOF
 
-};
+my ($output);
+run3(
+    [ $^X, '-e', $code ],
+    \undef,
+    \$output,
+    \$output,
+);
 
 like(
     $output,

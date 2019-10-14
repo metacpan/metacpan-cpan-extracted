@@ -7,7 +7,8 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.025';
+
+our $VERSION = '0.2';
 
 
 sub new {
@@ -21,35 +22,44 @@ sub new {
 sub _init {
     my $self = shift;
     $self->{max_kids} //= 4;
-    $self->{ipc} //= 0; #ipc off by default        
-}                          
+    $self->{ipc} //= 0;
+    $self->{non_blocking} //= 1;
+}
 
 
 sub max_kids {
-    my ($self,$n) = @_;
+    my ($self, $n) = @_;
     $n // return $self->{max_kids};
     $self->{max_kids} = $n;
 }
 
 
+sub non_blocking {
+    my ($self, $n) = @_;
+    $n // return $self->{non_blocking};
+    $self->{non_blocking} = $n;
+}
+
+
 sub ipc {
-    my ($self,$n) = @_;
+    my ($self, $n) = @_;
     $n // return $self->{ipc};
     $self->{ipc} = $n;
 }
 
 
 sub fmap {
-    my ($self,$code) = (shift,shift);
+    my ($self, $code) = (shift, shift);
     my %pids = ();
-    my @rs = (); #result set of child return values
+    my @rs = ();  # result set of child return values
     my $max = $self->max_kids;
     my $ipc = $self->ipc;
+    my $non_blocking = $self->non_blocking;
     for my $proc (@_) {
-        my $pipe = $ipc ? IO::Pipe->new : {}; #put this in your pipe, and smoke it
-        #max kids?
+        my $pipe = $ipc ? IO::Pipe->new : {};
+        # max kids?
         while ($max == keys %pids) {
-            #free a spot in queue when a process completes
+            # free a spot in queue when a process completes
             for my $pid (keys %pids) {
                 if (my $kid = waitpid($pid, WNOHANG)) {
                     delete $pids{$kid};
@@ -57,24 +67,28 @@ sub fmap {
                 }
             }
         }
-        
-        run_fork { #processes fork here
+
+        run_fork {  # processes fork here
             parent {
-                $| = 1;
                 my $kid = shift;
                 $pids{$kid}++;
                 if ($ipc) {
                     $pipe->reader();
+                    if ($non_blocking) {
+                        $pipe->blocking(0);
+                    } else {
+                        $pipe->blocking(1);
+                    }
                     while(<$pipe>) {
-                        push @rs,$_;
+                        push @rs, $_;
                     }
                 }
             }
             child {
-                $| = 1;
                 my $rs = $code->($proc);
                 if ($ipc) {
                     $pipe->writer();
+                    $pipe->autoflush;
                     print $pipe $rs if defined $rs;
                 }
                 exit;
@@ -84,77 +98,36 @@ sub fmap {
             }
         };
     }
-    
-    1 while (wait() != -1); #wait for the stragglers to finish
+
+    1 while (wait() != -1);  # wait for the stragglers to finish
     return @rs;
 }
 
 
-
-
 1;
+
 
 __END__
 =head1 NAME
 
-Proc::Forkmap - map with forking and IPC
+Proc::Forkmap - map with forking
 
 =head1 SYNOPSIS
 
-EXAMPLES:
-    
-    sub foo {
-        my ($x,$n) = (shift,1);
-        $n *= $_ for (@$x);
-        say $n;
-    }
-    
-    @x = ([1..99],[100..199],[200..299]);
-    my $p = Proc::Forkmap->new;
-    $p->fmap(\&foo,@x);
-    
-    or,
-    
-    package Foo;
-    
-    sub new { return bless {}, shift};
-    sub bar { #do heavy calc stuff and max a CPU };
-    
-    package main;
-    
-    my $foo = Foo->new;
-    my @rs = Proc::Forkmap->new(max_kids => 4, ipc=> 1)->fmap(
-        sub { $foo->bar(@_) }, @x,
-    );
-    
-    or,
-    
-    my @rs = $p->fmap(sub { $_[0] ** $_[0] }, @x);
-    
-    or,
-    
-    #get stuff from the intertubes
-    
-    sub bar {
-       my $t = shift;
-       my $s = Stock::Price->new;
-       ... get historical stock prices ...
-       ... do some analysis ...
-       baz($t,$sell_price);
-    }
-    
-    #then save stuff to a data store
-    
-    sub baz {
-       my ($t,$price) = @_;
-       my $conn = MongoDB::Connection->new;
-       my $bayes = $conn->stock->bayes;
-       $bayes->insert({symbol => $t, price => $price});
-       $conn->disconnect;
-    }
-    
-    my $p = Proc::Forkmap->new(max_kids => 4);
-    $p->fmap(\&bar,qw/rht goog ^ixic ^dji yhoo aapl/);
+EXAMPLE:
+
+  use Proc::Forkmap;
+
+  sub foo {
+    my $x = shift;
+    my $t = sprintf("%1.0f", $x + 1);
+    sleep $t;
+    print "slept $t seconds\n";
+  }
+
+  my @x = (rand(), rand(), rand());
+  my $p = Proc::Forkmap->new;
+  $p->fmap(\&foo, @x);
 
 =head1 DESCRIPTION
 
@@ -164,7 +137,7 @@ This module supplies an easy to use map method that provides built-in forking an
 
 =head2 new
 
-    my $p = Proc::Forkmap->new(max_kids => 4, ipc => 1);
+    my $p = Proc::Forkmap->new(max_kids => 4)
 
 =over 4
 
@@ -174,11 +147,15 @@ Maximum number of kids allowed in the pool. The default is 4.
 
 =item B<ipc>
 
-Set IPC on (blocking)/off state. IPC is off by default.
+Set IPC on/off state. IPC is off by default.
+
+=item B<non_blocking>
+
+Defaults to 1, and falsy to block.
 
 =back
 
-=head2 icp
+=head2 ipc
 
     $p->ipc(1)
 
@@ -190,14 +167,21 @@ Turn on/off inter-process communication.
 
 max_kids setter/getter.
 
+=head2 non_blocking
+
+    $p->non_blocking(1)
+
+If IPC is on, then set IO::Handle blocking state. This might be useful for conditional parallelism.
+
 =head2 fmap
 
-    my @rs = $p->fmap(\&foo,@x);
+    $p->fmap(\&foo, @x);
 
-This method takes a coderef and an array. If IPC is turned on, it will return,
-via IO::Pipe, a result set. Otherwise, it will continue on its merry way until
-either an error occurs that prevents a fork or all the subprocesses complete
-their tasks.
+This method takes a coderef and an array. If IPC is blocking, then it will return a result set. Otherwise, it will continue, waiting for child processes to complete their tasks.
+
+=head1 TODO
+
+1. Timeouts
 
 =head1 SEE ALSO
 
@@ -216,7 +200,7 @@ bug as I make changes.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Andrew Shapiro.
+Copyright 2019 Andrew Shapiro.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

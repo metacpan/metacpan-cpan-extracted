@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.17';
+    $VERSION = '0.18';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -437,7 +437,7 @@ sub parseCSV()
     my $file           = $parameters{ file };
     my $sep_char       = $parameters{ sep_char } // ',';
     my $encoding       = $parameters{ encoding } // 'iso-8859-1';
-    my @originalHeader = @{ $parameters{ originalHeader } };
+    my $originalHeader = $parameters{ originalHeader };
     my $retorno        = { rows => undef, error => 0, message => undef, };
 
     $log->info( "Começando a parsear o arquivo [ $file ]..." );
@@ -502,16 +502,20 @@ sub parseCSV()
             );
         };
 
-        if ( @originalHeader )
+        if ( $originalHeader )
         {
-            if ( !$self->validaHeader( originalHeader => \@originalHeader, header => \@header ) )
+            if ( !$self->validaHeader( originalHeader => $originalHeader, header => \@header ) )
             {
                 my $msg = 'Header do arquivo está diferente do layout...';
                 $retorno->{ error }   = 1;
                 $retorno->{ message } = $msg;
                 return $retorno;
             } ## end if ( !$self->validaHeader...)
-        } ## end if ( @originalHeader )
+            else
+            {
+                $log->info( "*** Header validado com sucesso ***" );
+            }
+        } ## end if ( $originalHeader )
 
         my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
         if ( $cde > 0 )

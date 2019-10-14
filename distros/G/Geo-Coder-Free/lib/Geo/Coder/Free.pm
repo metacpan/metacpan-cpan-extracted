@@ -17,11 +17,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 our $alternatives;
 
@@ -86,8 +86,8 @@ sub new {
 		$/ = $keep;
 
 		$alternatives = Config::Auto->new(source => $data)->parse();
-		foreach my $entry(keys %{$alternatives}) {
-			$alternatives->{$entry} = join(', ', @{$alternatives->{$entry}});
+		while(my ($key, $value) = (each %{$alternatives})) {
+			$alternatives->{$key} = join(', ', @{$value});
 		}
 	}
 
@@ -176,13 +176,25 @@ sub geocode {
 		if((!$param{'scantext'}) && (my $alternatives = $self->{'alternatives'})) {
 			# Try some alternatives, would be nice to read this from somewhere on line
 			my $location = $param{'location'};
-			foreach my $left(keys %{$alternatives}) {
-				if($location =~ $left) {
-					# ::diag($left, '=>', $alternatives->{$left});
-					$location =~ s/$left/$alternatives->{$left}/;
+			while (my($key, $value) = each %{$alternatives}) {
+				if($location =~ $key) {
+					# ::diag("$key=>$value");
+					my $keep = $location;
+					$location =~ s/$key/$value/;
 					$param{'location'} = $location;
 					if(my $rc = $self->geocode(\%param)) {
 						return $rc;
+					}
+					# Try without the commas, for "Tyne and Wear"
+					if($value =~ /, /) {
+						my $string = $value;
+						$string =~ s/,//g;
+						$location = $keep;
+						$location =~ s/$key/$string/;
+						$param{'location'} = $location;
+						if(my $rc = $self->geocode(\%param)) {
+							return $rc;
+						}
 					}
 				}
 			}
@@ -416,3 +428,4 @@ __DATA__
 St Lawrence, Thanet, Kent = Ramsgate, Kent
 St Peters, Thanet, Kent = St Peters, Kent
 Minster, Thanet, Kent = Ramsgate, Kent
+Tyne and Wear = Borough of North Tyneside

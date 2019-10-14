@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Run Statocles commands
 package statocles;
-our $VERSION = '0.094';
+our $VERSION = '0.095';
 
 use Statocles::Base;
 use Encode qw( decode );
@@ -38,7 +38,7 @@ statocles - Run Statocles commands
 
 =head1 VERSION
 
-version 0.094
+version 0.095
 
 =head1 SYNOPSIS
 

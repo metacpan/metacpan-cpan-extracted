@@ -3,7 +3,7 @@ package Mastodon::Entity::Status;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moo;
 with 'Mastodon::Role::Entity';
@@ -37,7 +37,7 @@ has emojis => (
 );
 
 has favourited => (
-  is => 'ro', isa => Bool,
+  is => 'ro', isa => Bool, coerce => 1,
 );
 
 has favourites_count => (
@@ -69,7 +69,7 @@ has reblog => (
 );
 
 has reblogged => (
-  is => 'ro', isa => Bool,
+  is => 'ro', isa => Bool, coerce => 1,
 );
 
 has reblogs_count => (
@@ -77,7 +77,7 @@ has reblogs_count => (
 );
 
 has sensitive => (
-  is => 'ro', isa => Bool,
+  is => 'ro', isa => Bool, coerce => 1,
 );
 
 has spoiler_text => (

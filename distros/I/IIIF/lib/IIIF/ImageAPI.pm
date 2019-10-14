@@ -1,7 +1,7 @@
 package IIIF::ImageAPI;
 use 5.014001;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use parent 'Plack::Component';
 
@@ -18,7 +18,7 @@ use Plack::MIME;
 use Cwd;
 use Plack::Util;
 
-use Plack::Util::Accessor qw(root base cache formats canonical magick_args);
+use Plack::Util::Accessor qw(images base cache formats canonical magick_args);
 
 our @FORMATS = qw(jpg png gif);
 
@@ -28,8 +28,8 @@ sub call {
 
     if ( $req->path_info =~ qr{^/([^/]+)/?(.*)$} ) {
         my ( $identifier, $request ) = ( $1, $2 );
-        if ( my $file = $self->file( $self->base // $req->base, $identifier ) )
-        {
+        if ( my $file = $self->file($identifier) ) {
+            $file->{id} = ( $self->base // $req->base ) . $identifier;
             return $self->response( $file, $request );
         }
     }
@@ -102,15 +102,15 @@ sub response {
 }
 
 sub file {
-    my ( $self, $base, $identifier ) = @_;
+    my ( $self, $identifier ) = @_;
 
-    my $root = $self->root // '.';
+    my $images = $self->images // '.';
 
-    for my $format ( @{ $self->formats // [qw{jpg png gif}] } ) {
-        my $path = File::Spec->catfile( $root, "$identifier.$format" );
+    my $formats = $self->formats // [qw{jpg png gif}];
+    for my $format (@$formats) {
+        my $path = File::Spec->catfile( $images, "$identifier.$format" );
         if ( -r $path ) {
             return {
-                id     => $base . $identifier,
                 path   => $path,
                 format => $format
             };
@@ -152,7 +152,7 @@ sub json_response {
     state $JSON = JSON::PP->new->pretty->canonical(1);
 
     [
-        $code // 200,
+        $code,
         [
             'Content-Type' => $type // 'application/json',
             'Link' => 'http://iiif.io/api/image/3/level3.json>;rel="profile"'
@@ -182,8 +182,8 @@ IIIF::ImageAPI - IIIF Image API implementation as Plack application
     builder {
         enable 'CrossOrigin', origins => '*';
         IIIF::ImageAPI->new(
-            root => 'path/to/images',
-            base => 'https://example.org/iiif/'
+            images => 'path/to/images',
+            base   => 'https://example.org/iiif/'
         );
     }
 
@@ -191,7 +191,7 @@ IIIF::ImageAPI - IIIF Image API implementation as Plack application
 
 =over
 
-=item root
+=item images
 
 Image directory
 

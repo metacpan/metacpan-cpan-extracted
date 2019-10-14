@@ -1,5 +1,24 @@
 Changelog for Yancy-Backend-Static
 
+0.010     2019-10-12 18:08:37-05:00 America/Chicago
+
+    [Added]
+
+    - Added an example application and some getting started
+      documentation [Github #8]
+
+    [Fixed]
+
+    - Fixed the code example in the SYNOPSIS. Thanks @Ferki for
+      reporting this! [Github #8]
+
+0.009     2019-10-11 22:46:20-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed files without frontmatter being saved incorrectly. Thanks
+      @wbazant! [Github #6]
+
 0.008     2019-09-24 20:42:09-05:00 America/Chicago
 
     [Fixed]

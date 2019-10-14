@@ -71,13 +71,13 @@ documentation for [detailed instructions on pull
 requests](https://help.github.com/articles/creating-a-pull-request)
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
-can submit an issue report [via the web](http://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Plugin-NoWarnings) or [via email](bug-test2-plugin-nowarnings@rt.cpan.org).
+can submit an issue report [via the web](https://github.com/houseabsolute/Test2-Plugin-NoWarnings/issues).
 
 
 ## Continuous Integration
 
 All pull requests for this distribution will be automatically tested
-on Linux by [Travis](https://travis-ci.org/houseabsolute/Test2-Plugin-NoWarnings).
+on Linux by [Travis](https://travis-ci.org/houseabsolute/Test2-Plugin-NoWarnings) and on Windows by [AppVeyor](https://ci.appveyor.com/project/autarch/Test2-Plugin-NoWarnings).
 
 All CI results will be visible in the pull request on GitHub. Follow the
 appropriate links for details when tests fail.

@@ -1,9 +1,10 @@
 ^\.git\/
 maint
 ^tags$
-.last_cover_stats
-.travis.yml
-.appveyor.yml
+^\.last_cover_stats
+^\.travis.yml
+^\.prove
+^\.appveyor.yml
 ^\.github
 Makefile$
 ^blib

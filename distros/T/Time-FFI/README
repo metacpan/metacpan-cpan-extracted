@@ -107,9 +107,11 @@ FUNCTIONS
 
     Returns a Time::FFI::tm record representing the passed string, parsed
     according to the passed format. Consult your system's strptime(3)
-    manual for available format descriptors. The tm_mday member will
-    default to 1 if not specified by the string, and the tm_isdst member
-    will be set to -1; all other unspecified members will default to 0.
+    manual for available format descriptors. The tm_isdst value will be set
+    to -1; all other unspecified values will default to 0. Note that the
+    default tm_mday value of 0 is outside of the standard range [1,31] and
+    may cause an error or be interpreted as the last day of the previous
+    month.
 
     A Time::FFI::tm record may be passed as the third argument, in which
     case it will be modified in place to (on most systems) update only the
@@ -124,12 +126,16 @@ FUNCTIONS
 
       my $epoch = timegm $tm;
 
+    Since version 1.002
+
     Like "mktime", but interprets the passed Time::FFI::tm record as UTC.
     This function is not always available.
 
  timelocal
 
       my $epoch = timelocal $tm;
+
+    Since version 1.002
 
     The same as "mktime", but not always available.
 

@@ -5,6 +5,13 @@
 # Download the OPENADDR_HOME data from http://results.openaddresses.io.
 # Download the WHOSONFIRST_HOME data using https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-sqlite-download
 # You can look up a WOF place by https://spelunker.whosonfirst.org/id/$locality_id
+#
+# Try:
+#	sqlite3 whosonfirst-data-latest.db
+#	select body from geojson where body like '%north shields%';
+# It'll be slow, but it shows the sort of thing this is about,
+#	You'll see and id: field (e.g. 1108937103), then look at
+#	https://spelunker.whosonfirst.org/id/1108937103
 
 # TODO: perhaps use a layered approach to the database schema
 
@@ -14,7 +21,7 @@ use warnings;
 # use autodie qw(:all);
 use autodie;	# Don't want system() to die, we catch failures
 use File::Copy;
-use File::Open::NoCache::ReadOnly;
+use File::Open::NoCache::ReadOnly 0.02;
 use DBI;
 use Data::Dumper;
 use JSON;
@@ -47,6 +54,7 @@ use	constant	DEBUG => DEBUG_OFF;
 
 use	constant	MAX_INSERT_COUNT => 250;	# Maximum number of CSV rows to insert in a single statement
 # use	constant	MAX_INSERT_COUNT => 1;	# Maximum number of CSV rows to insert in a single statement
+use	constant	SQLITE_CHUNK_SIZE => 1_000;	# Number of rows to read at a time
 
 my %zipcodes = (
 	'04350' => { city => 'Litchfield', county => 'Kennebec' },
@@ -121,8 +129,21 @@ my %max_state_lengths = (
 );
 
 # TODO: Use Geo::Coder::Free::Local, until then keep the data in sync
+# Ensure you use abbreviations, e.e. RD not ROAD
 my %known_places = (	# Places I've checked with my GPS
-	'us/md/statewide.csv' => [
+	'us/ks/statewide.csv' => [
+		{
+			'LAT' => 39.005175,
+			'LON' => -95.706681,
+			'NUMBER' => 3516,
+			'STREET' => 'SW MACVICAR AVE',
+			'CITY' => 'TOPEKA',
+			'COUNTY' => 'SHAWNEE',
+			'STATE' => 'KS',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 66611,
+		},
+	], 'us/md/statewide.csv' => [
 		{
 			'NAME' => 'NCBI',
 			'LAT' => 38.99516556,
@@ -241,7 +262,7 @@ my %known_places = (	# Places I've checked with my GPS
 			'LON' => -77.009501,
 			'NAME' => 'LA CASITA PUPESERIA AND MARKET',
 			'NUMBER' => 8214,
-			'STREET' => 'PINEY BRANCH ROAD',
+			'STREET' => 'PINEY BRANCH RD',
 			'CITY' => 'SILVER SPRING',
 			'COUNTY' => 'MONTGOMERY',
 			'STATE' => 'MD',
@@ -325,7 +346,7 @@ my %known_places = (	# Places I've checked with my GPS
 			'LAT' => 39.07669788,
 			'LON' => -77.12306436,
 			'NUMBER' => 1605,
-			'STREET' => 'VIERS MILL ROAD',
+			'STREET' => 'VIERS MILL RD',
 			'CITY' => 'ROCKVILLE',
 			'COUNTY' => 'MONTGOMERY',
 			'STATE' => 'MD',
@@ -346,7 +367,7 @@ my %known_places = (	# Places I've checked with my GPS
 			'LON' => -77.05466857,
 			'NAME' => 'BP',
 			'NUMBER' => 2601,
-			'STREET' => 'FOREST GLEN ROAD',
+			'STREET' => 'FOREST GLEN RD',
 			'CITY' => 'SILVER SPRING',
 			'COUNTY' => 'MONTGOMERY',
 			'STATE' => 'MD',
@@ -427,6 +448,26 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'DC',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20011
+		}
+	], 'us/id/statewide.csv' => [
+		{
+			'LAT' => 47.693615,
+			'LON' => -116.915357,
+			'NUMBER' => 880,
+			'STREET' => 'SOUTH GREENSFERRY RD',
+			'CITY' => "COUER D'ALENE",
+			'COUNTY' => 'KOOTENAI',
+			'STATE' => 'ID',
+			'POSTCODE' => 83814
+		}, {
+			'LAT' => 47.69556,
+			'LON' => -116.91564,
+			'NUMBER' => 898,
+			'STREET' => 'SOUTH GREENSFERRY RD',
+			'CITY' => "COUER D'ALENE",
+			'COUNTY' => 'KOOTENAI',
+			'STATE' => 'ID',
+			'POSTCODE' => 83814
 		}
 	], 'us/in/statewide.csv' => [
 		{
@@ -537,7 +578,7 @@ my %known_places = (	# Places I've checked with my GPS
                         'LON' => 1.391367,
                         'NAME' => 'WESTWOOD CROSS',
                         'NUMBER' => 23,
-                        'STREET' => 'MARGATE ROAD',
+                        'STREET' => 'MARGATE RD',
                         'CITY' => 'BROADSTAIRS',
                         'STATE' => 'KENT',
                         'COUNTRY' => 'GB',
@@ -553,7 +594,7 @@ my %known_places = (	# Places I've checked with my GPS
                         'LAT' => 51.357510,
                         'LON' => 1.388894,
                         'NAME' => 'TOBY CARVERY',
-                        'STREET' => 'NEW HAINE ROAD',
+                        'STREET' => 'NEW HAINE RD',
                         'CITY' => 'RAMSGATE',
                         'STATE' => 'KENT',
                         'COUNTRY' => 'GB',
@@ -664,7 +705,7 @@ my %state_parent_md5s;
 
 if(!-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
 	(system('bash bin/createdatabase') == 0)
-		or warn "Can't create the SQLite database - expect poor performance";
+		or warn "Can't create the SQLite database (perhaps you don't have sqlite3 installed) - expect poor performance";
 
 	if(-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
 		if(-r 'blib/lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
@@ -692,7 +733,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 	exit(0) if(-r $sqlite_file);
 
 	my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite_file", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' });
-	$dbh->do('PRAGMA cache_size = 65536');
+	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
 	$dbh->do('PRAGMA journal_mode = OFF');
 	if(!-d $oa) {
 		mkdir $oa;
@@ -721,7 +762,6 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 		print "\n" if(DEBUG);
 		$| = 0;
 		my %state_fips;
-
 
 		my $csv = Text::CSV->new({
 			sep_char => "\t",
@@ -764,7 +804,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			}
 		}
 
-		# close($fin);
+		$fh->close();
 
 		# Import the counties
 		$filename = 'lib/Geo/Coder/Free/OpenAddresses/databases/counties.txt';
@@ -812,42 +852,27 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				$inserts = 0;
 			}
 		}
-		# close($fin);
+		$fh->close();
 	}
 
 	my $current_state;
 	my $current_country;
 	my %whosonfirst;
-	my $wof_global_dbh;
-	my $wof_global_file;
-	if(my $whosonfirst = $ENV{WHOSONFIRST_HOME}) {
-		$| = 1;
-		printf "%-70s\r", "Traversing $whosonfirst";
-		print "\n" if(DEBUG);
-		$| = 0;
-		foreach my $file(<"$whosonfirst/*.db">) {
-			$whosonfirst{$file} = 1;
-		}
-		$wof_global_file = "$whosonfirst/whosonfirst-data-latest.db";
-		if(-r $wof_global_file) {
-			$wof_global_dbh = DBI->connect("dbi:SQLite:dbname=$wof_global_file", undef, undef, {
-				sqlite_open_flags => SQLITE_OPEN_READONLY,
-			});
-		}
-
-	}
-
 	my $ua = LWP::UserAgent::Throttled->new(keep_alive => 1);
 	$ua->throttle({ 'api.zippopotam.us' => 1 });
 	$ua->env_proxy(1);
 
 	# Import the Maxmind databases
 	if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
-	   open(my $fin, '<', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
-	   open(my $fin1, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db') &&
+	   # open(my $fin, '<', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
+	   # open(my $fin1, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db') &&
+	   (my $all_countries = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) &&
+	   (my $admin1 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) &&
 	   (my $admin2 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db'))) {
 	   # open(my $fin2, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
+		my $fin = $all_countries->fd();
 		aio_readahead($fin, 0, 10240);
+		my $fin1 = $admin1->fd();
 		aio_readahead($fin1, 0, 10240);
 		my $fin2 = $admin2->fd();
 		aio_readahead($fin2, 0, 10240);
@@ -876,7 +901,8 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 		while(my $row = $csv->getline_hr($fin1)) {
 			$admin1{$row->{'concatenated_codes'}} = $row->{'asciiname'};
 		}
-		close($fin1);
+
+		$admin1->close();
 
 		my %admin2;
 
@@ -884,7 +910,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			$admin2{$row->{'concatenated_codes'}} = $row->{'asciiname'};
 		}
 
-		# close($fin2);
+		$admin2->close();
 
 		my $inserts = 0;
 
@@ -966,7 +992,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				$inserts = 0;
 			}
 		}
-		close($fin);
+		$all_countries->close();
 	}
 	flush_queue($dbh);
 
@@ -977,9 +1003,26 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 	# exit(0);
 
 	my %address_parsers;
+	my $wof_global_dbh;
+	my $wof_global_file;
+	if(my $whosonfirst = $ENV{WHOSONFIRST_HOME}) {
+		$| = 1;
+		printf "%-70s\r", "Traversing $whosonfirst";
+		print "\n" if(DEBUG);
+		$| = 0;
+		foreach my $file(<"$whosonfirst/*.db">) {
+			$whosonfirst{$file} = 1;
+		}
+		$wof_global_file = "$whosonfirst/whosonfirst-data-latest.db";
+		if(-r $wof_global_file) {
+			$wof_global_dbh = DBI->connect("dbi:SQLite:dbname=$wof_global_file", undef, undef, {
+				sqlite_open_flags => SQLITE_OPEN_READONLY,
+			});
+		}
+	}
 
 	if($wof_global_dbh) {
-		$wof_global_dbh->do('PRAGMA cache_size = 65536');
+		$wof_global_dbh->do('PRAGMA cache_size = -65536');	# 64MB
 		my $file = basename($wof_global_file);
 		# Import from the global file
 		$| = 1;
@@ -996,12 +1039,12 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			# if($data->{'body'}) {
 				# $data = $data->{'body'};
 			# }
-		my $rowcache = $sth->fetchall_arrayref(undef, 10_000);
+		my $rowcache = $sth->fetchall_arrayref(undef, SQLITE_CHUNK_SIZE);
 		my $region_id;
 		my $region_name;
 		while(my $aref = shift(@{$rowcache})) {
 			if(scalar(@{$rowcache}) == 0) {
-				$rowcache = $sth->fetchall_arrayref(undef, 10_000);
+				$rowcache = $sth->fetchall_arrayref(undef, SQLITE_CHUNK_SIZE);
 			}
 			next if(!defined($aref));
 			my $data = @{$aref}[0];
@@ -1358,7 +1401,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					sqlite_open_flags => SQLITE_OPEN_READONLY,
 				});
 				$wof_dbh->do('PRAGMA synchronous = OFF');
-				$wof_dbh->do('PRAGMA cache_size = 65536');
+				$wof_dbh->do('PRAGMA cache_size = -65536');	# 64MB
 
 				my $sth = $wof_dbh->prepare('SELECT body FROM geojson');
 				$sth->execute() || die $wof_file;
@@ -1369,10 +1412,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						# $data = $data->{'body'};
 					# }
 					# next if(!defined($data));
-				my $rowcache = $sth->fetchall_arrayref(undef, 10_000);
+				my $rowcache = $sth->fetchall_arrayref(undef, SQLITE_CHUNK_SIZE);
 				while(my $aref = shift(@{$rowcache})) {
 					if(scalar(@{$rowcache}) == 0) {
-						$rowcache = $sth->fetchall_arrayref(undef, 10_000);
+						$rowcache = $sth->fetchall_arrayref(undef, SQLITE_CHUNK_SIZE);
 					}
 					next if(!defined($aref));
 					my $data = @{$aref}[0];
@@ -1585,7 +1628,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				}
 			}
 
-			# close($fin);
+			$fh->close();
 
 			flush_queue($dbh);	# Check for hanging dups in current state
 			$inserts = 0;
@@ -1630,7 +1673,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				sqlite_open_flags => SQLITE_OPEN_READONLY,
 			});
 			$wof_dbh->do('PRAGMA synchronous = OFF');
-			$wof_dbh->do('PRAGMA cache_size = 65536');
+			$wof_dbh->do('PRAGMA cache_size = -65536');	# 64MB
 
 			my $sth = $wof_dbh->prepare('SELECT body FROM geojson');
 			$sth->execute() || die $wof_file;
@@ -1642,10 +1685,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					# $data = $data->{'body'};
 				# }
 				# next if(!defined($data));
-			my $rowcache = $sth->fetchall_arrayref(undef, 10_000);
+			my $rowcache = $sth->fetchall_arrayref(undef, SQLITE_CHUNK_SIZE);
 			while(my $aref = shift(@{$rowcache})) {
 				if(scalar(@{$rowcache}) == 0) {
-					$rowcache = $sth->fetchall_arrayref(undef, 10_000);
+					$rowcache = $sth->fetchall_arrayref(undef, SQLITE_CHUNK_SIZE);
 				}
 				next if(!defined($aref));
 				my $data = @{$aref}[0];

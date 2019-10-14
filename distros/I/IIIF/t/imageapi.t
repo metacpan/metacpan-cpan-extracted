@@ -9,7 +9,7 @@ use File::Temp qw(tempdir);
 plan skip_all => "ImageMagick missing" unless IIIF::Magick::available();
 
 my $cache = tempdir( CLEANUP => 1 );
-my $app = IIIF::ImageAPI->new(root => 't/img', cache => $cache);
+my $app = IIIF::ImageAPI->new(images => 't/img', cache => $cache);
 my $identifier = "67352ccc-d1b0-11e1-89ae-279075081939";
 
 test_psgi $app, sub {
@@ -35,7 +35,10 @@ test_psgi $app, sub {
     is $res->code, 200, "image request";    
 
     $res = $cb->(GET "/$identifier/pct:200");
-    is $res->code, 400, "invalid image request";    
+    is $res->code, 400, "invalid image request (malformed)";
+
+    $res = $cb->(GET "/$identifier/full/pct:0.01/0/default.png");
+    is $res->code, 400, "invalid image request (image size)";
 
     $res = $cb->(GET "/$identifier/0,0,10,10/max/0/default.png");
     is $res->code, 200, "valid image request";    
@@ -44,7 +47,8 @@ test_psgi $app, sub {
     is $res->code, 200, "valid image request (from cache)";    
 };
 
-$app = IIIF::ImageAPI->new(root => 't/img', canonical => 1, base => "https://example.org/iiif/");
+$app = IIIF::ImageAPI->new(
+    images => 't/img', canonical => 1, base => "https://example.org/iiif/");
 test_psgi $app, sub {
     my ($cb, $res) = @_;
 
@@ -52,5 +56,12 @@ test_psgi $app, sub {
     is $res->code, 303, "redirect to canonical request";
     is $res->header('Location'), "https://example.org/iiif/example/full/150,100/0/default.jpg";
 };
+
+test_psgi( IIIF::ImageAPI->new( images => 't/img', magick_args => [qw(-xxx)] ), sub {
+    my ($cb, $res) = @_;
+    $res = $cb->(GET "/example/0,0,10,10/max/0/default.png");
+    is $res->code, 500, 'error response on ImageMagick error';
+    is $res->header('Content-Type'), "application/json";
+});
 
 done_testing;

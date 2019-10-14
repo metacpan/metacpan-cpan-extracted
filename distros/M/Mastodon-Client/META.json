@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,59 +27,35 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Class::Load" : "0",
-            "Data::Dumper" : "0",
-            "DateTime" : "0",
+            "Class::Load" : "0.25",
+            "DateTime" : "1.51",
             "DateTime::Format::Strptime" : "1.73",
-            "Encode" : "0",
             "Future" : "0.35",
-            "HTTP::Request::Common" : "0",
-            "IO::Async::Loop" : "0.66",
-            "Image::Info" : "0",
+            "HTTP::Request::Common" : "6.18",
+            "HTTP::Thin" : "0.006",
+            "IO::Async" : "0.66",
+            "Image::Info" : "1.41",
             "JSON::MaybeXS" : "1.003009",
-            "LWP::UserAgent" : "6.25",
             "List::Util" : "1.47",
             "Log::Any" : "1.049",
-            "MIME::Base64" : "0",
             "Moo" : "2.003002",
-            "Moo::Role" : "0",
             "Net::Async::HTTP" : "0.41",
-            "Path::Tiny" : "0",
             "Role::EventEmitter" : "0.002",
             "Try::Tiny" : "0.28",
-            "Type::Library" : "0",
             "Type::Params" : "1.000006",
-            "Type::Utils" : "0",
             "Types::Common::String" : "1.000006",
             "Types::Path::Tiny" : "0.005",
             "Types::Standard" : "1.000006",
             "URI" : "1.71",
-            "URI::QueryParam" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Config::Tiny" : "0",
-            "HTML::FormatText::WithLinks" : "0",
-            "Lingua::EN::Inflexion" : "0",
-            "Log::Any::Adapter" : "0",
             "Plack" : "1.0043",
-            "Plack::Component" : "0",
-            "Plack::Runner" : "0",
-            "Plack::Util" : "0",
-            "Term::ANSIColor" : "0",
-            "Test2::V0" : "0",
-            "Test::Exception" : "0.043",
-            "Test::More" : "1.302078",
+            "Test2::V0" : "0.000126",
             "Test::Pod" : "1.51",
             "Test::TCP" : "2.17",
-            "diagnostics" : "0",
-            "lib" : "0",
-            "parent" : "0",
             "perl" : "5.010"
          }
       }
@@ -87,79 +63,79 @@
    "provides" : {
       "Mastodon::Client" : {
          "file" : "lib/Mastodon/Client.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Account" : {
          "file" : "lib/Mastodon/Entity/Account.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Application" : {
          "file" : "lib/Mastodon/Entity/Application.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Attachment" : {
          "file" : "lib/Mastodon/Entity/Attachment.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Card" : {
          "file" : "lib/Mastodon/Entity/Card.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Context" : {
          "file" : "lib/Mastodon/Entity/Context.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Error" : {
          "file" : "lib/Mastodon/Entity/Error.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Instance" : {
          "file" : "lib/Mastodon/Entity/Instance.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Mention" : {
          "file" : "lib/Mastodon/Entity/Mention.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Notification" : {
          "file" : "lib/Mastodon/Entity/Notification.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Relationship" : {
          "file" : "lib/Mastodon/Entity/Relationship.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Report" : {
          "file" : "lib/Mastodon/Entity/Report.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Results" : {
          "file" : "lib/Mastodon/Entity/Results.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Status" : {
          "file" : "lib/Mastodon/Entity/Status.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Entity::Tag" : {
          "file" : "lib/Mastodon/Entity/Tag.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Listener" : {
          "file" : "lib/Mastodon/Listener.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Role::Entity" : {
          "file" : "lib/Mastodon/Role/Entity.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Role::UserAgent" : {
          "file" : "lib/Mastodon/Role/UserAgent.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mastodon::Types" : {
          "file" : "lib/Mastodon/Types.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -174,13 +150,16 @@
          "web" : "https://gitlab.com/jjatria/Mastodon-Client"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_contributors" : [
       "Al Beano <albino@autistici.org>",
+      "Eric Prestemon <ecp@prestemon.com>",
       "Florian Obser <florian+gitlab@narrans.de>",
       "Lance Wicks <lancew@cpan.org>",
+      "Luc Didry <luc@didry.org>",
       "Shura <shura0@yandex.ru>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

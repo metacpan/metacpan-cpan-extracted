@@ -1,0 +1,73 @@
+{
+   "abstract" : "Bindings for librtmidi - Realtime MIDI library",
+   "author" : [
+      "John Barrett <john@jbrt.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MIDI-RtMidi-FFI",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "FFI::CheckLib" : "0.11"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "0",
+            "FFI::Platypus::Buffer" : "0",
+            "FFI::Platypus::Memory" : "0",
+            "FFI::Platypus::Record" : "0",
+            "MIDI::Event" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::More" : "0.88",
+            "Time::HiRes" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jbarrett/MIDI-RtMidi-FFI/issues"
+      },
+      "homepage" : "https://github.com/jbarrett/MIDI-RtMidi-FFI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jbarrett/MIDI-RtMidi-FFI.git",
+         "web" : "https://github.com/jbarrett/MIDI-RtMidi-FFI"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+}
+

@@ -48,12 +48,13 @@ requires:
   Moo: '1.0'
   MooX::Singleton: '0'
   YAML::XS: '0.34'
+  namespace::clean: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MARC/issues
   homepage: https://github.com/LibreCat/Catmandu-MARC
   repository: https://github.com/LibreCat/Catmandu-MARC.git
-version: '1.252'
+version: '1.253'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'
@@ -61,6 +62,7 @@ x_contributors:
   - 'Jakob Voss <voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Johann Rolschewski <rolschewski@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'

@@ -160,6 +160,8 @@ my $configure_ampache=sub {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install cyrus-sasl-plain sendmail-cf m4 java java-devel',
       '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'yum -y install yum-utils --enablerepo=extras','__display__');
    # https://www.unixmen.com/setup-your-own-youtube-clone-website-using-ampache/
    # http://opensourceeducation.net/clip-bucket-2-8-on-ubuntu-14-04-with-nginx-php5-fpm-on-digitalocean-vps/
    # https://mtlynch.io/ansible-role-ampache/
@@ -233,9 +235,10 @@ if ($b==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cmake --version','__display__');
       $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
+      $stdout||=0;
       if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'git clone https://gitlab.kitware.com/cmake/cmake',
+            'git clone https://github.com/Kitware/CMake.git',
             '__display__');
          ($stdout,$stderr)=$handle->cwd('cmake');
          ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1700,6 +1703,9 @@ END
       print $output;
       if (-1<index $output,'root (enter for none):') {
          $handle->{_cmd_handle}->print();
+         next;
+      } elsif (-1<index $output,'so you can safely answer \'n\'') {
+         $handle->{_cmd_handle}->print('n');
          next;
       } elsif (-1<index $output,'Set root password? [Y/n]') {
          $handle->{_cmd_handle}->print('n');

@@ -6,7 +6,7 @@ use XML::LibXML::Reader;
 use Catmandu::PNX;
 use feature 'state';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moo;
 use namespace::clean;

@@ -1,12 +1,10 @@
-#!/usr/bin/perl -w
-
 package MPEG::Audio::Frame;
 
 # BLECH! With 5.005_04 compatibility the pretty 0b000101001 notation went away,
 # and now we're stuck using hex. Phooey!
 
 use strict;
-#use warnings;
+use warnings;
 use integer;
 
 # fields::new is not used because it is very costly in such a tight loop. about 1/4th of the time, according to DProf
@@ -27,7 +25,7 @@ use integer;
 use overload '""' => \&asbin;
 
 use vars qw/$VERSION $free_bitrate $lax $mpeg25/;
-$VERSION = 0.09;
+$VERSION = '0.10';
 
 $mpeg25 = 1; # normally support it
 
@@ -179,8 +177,8 @@ BEGIN {
 	my $i = 0;
 	foreach my $c (@consts){
 		my $CONST = $c->[0];
-		eval "sub $CONST () { $i }"; # offset in $self->{header}
-		eval "sub M_$CONST () { " . M($i) ." }"; # bit mask
+		eval "sub $CONST () { $i }";              # offset in $self->{header}
+		eval "sub M_$CONST () { " . M($i) ." }";  # bit mask
 		eval "sub B_$CONST () { " . B($i) . " }"; # offset in read()'s @hb
 		eval "sub R_$CONST () { " . R($i) . " }"; # amount to right shift
 		$i++;
@@ -191,13 +189,13 @@ BEGIN {
 # constructor and work horse
 sub read {
 	my $pkg = shift || return undef;
-	my $fh = shift || return undef;
-	
+	my $fh = shift || return undef; binmode($fh);
+
 	local $/ = "\xff"; # get readline to find 8 bits of sync.
 	
 	my $offset;	# where in the handle
 	my $header; # the binary header data... what a fabulous pun.
-	my @hr; # an array of integer
+	my @hr;     # an array of integer
 
 	OUTER: {
 		while (defined(<$fh>)){ # readline, readline, find me a header, make me a header, catch me a header. somewhate wasteful, perhaps. But I don't want to seek.
@@ -243,8 +241,8 @@ sub read {
 
 	my $use_smaller = $hr[VERSION] == 2 || $hr[VERSION] == 0; # FIXME VERSION == 2 means no support for MPEG2 multichannel
 	my $length = $layer[$hr[LAYER]]
-		?  (($use_smaller ? 72 : 144) * ($bitrate * 1000) / $sample + $hr[PAD])		# layers 2 & 3
-		: ((($use_smaller ? 6  : 12 ) * ($bitrate * 1000) / $sample + $hr[PAD]) * 4);	# layer 1
+		?  (($use_smaller ? 72 : 144) * ($bitrate * 1000) / $sample + $hr[PAD])       # layers 2 & 3
+		: ((($use_smaller ? 6  : 12 ) * ($bitrate * 1000) / $sample + $hr[PAD]) * 4); # layer 1
 	
 	my $clength = $length - 4 - ($hr[CRC] ? 0 : 2);
 	(read $fh, my($content), $clength or return undef) == $clength or return undef; # appearantly header length is included... learned this the hard way.
@@ -252,14 +250,14 @@ sub read {
 	my $self = bless {}, $pkg;
 	
 	%$self = (
-		binhead	=> $header,		# binary header
-		header	=> \@hr,		# array of integer header records
-		content	=> $content,	# the actuaol content of the frame, excluding the header and crc
-		length	=> $length,		# the length of the header + content == length($frame->content()) + 4 + ($frame->crc() ? 2 : 0);
-		bitrate	=> $bitrate,	# the bitrate, in kilobits
-		sample	=> $sample,		# the sample rate, in Hz
-		offset	=> $offset,		# the offset where the header was found in the handle, based on tell
-		crc_sum	=> $sum,		# the bytes of the network order short that is the crc sum
+		binhead	=> $header,     # binary header
+		header	=> \@hr,        # array of integer header records
+		content	=> $content,    # the actuaol content of the frame, excluding the header and crc
+		length	=> $length,     # the length of the header + content == length($frame->content()) + 4 + ($frame->crc() ? 2 : 0);
+		bitrate	=> $bitrate,    # the bitrate, in kilobits
+		sample	=> $sample,     # the sample rate, in Hz
+		offset	=> $offset,     # the offset where the header was found in the handle, based on tell
+		crc_sum	=> $sum,        # the bytes of the network order short that is the crc sum
 	);
 
 	$self;
@@ -502,8 +500,8 @@ sub crc_ok {
 }
 
 sub broken { # was the crc broken?
-    my $self = shift;
-    if (not defined $self->{broken}){
+	my $self = shift;
+	if (not defined $self->{broken}){
 		return $self->{broken} = 0 unless $self->has_crc; # we assume it's OK if we have no CRC at all
 		return $self->{broken} = 0 unless (($self->{header}[LAYER] & 0x02) == 0x00); # can't sum
 
@@ -528,9 +526,9 @@ sub broken { # was the crc broken?
 			$c = ($c << 8) ^ $crc_table[(($c >> 8) ^ (ord(substr($self->{content},$i++,1)))) & 0xff];
 		} continue { $bits -= 8 }
 		$self->{broken} = (( $c & 0xffff ) != unpack("n",$self->{crc_sum})) ? 1 : 0;
-    }
+	}
 
-    return $self->{broken};
+	return $self->{broken};
 }
 
 

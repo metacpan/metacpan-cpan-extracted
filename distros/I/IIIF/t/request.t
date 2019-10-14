@@ -2,6 +2,8 @@ use strict;
 use Test::More 0.98;
 use IIIF::Request;
 
+ok(IIIF::Request->new()->is_default, 'default request');
+
 my @tests = (
 
     # region
@@ -39,6 +41,9 @@ while ( my ($req, $expect) = splice @tests, 0, 2 ) {
 
 my @invalid = qw(
     0,0,0,0
+    pct:0,0,101,101
+
+    0,0
     pct:0,1
     pct:0
     pct:150

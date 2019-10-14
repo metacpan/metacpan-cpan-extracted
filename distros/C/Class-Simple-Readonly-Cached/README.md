@@ -4,7 +4,7 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ and that is used.
 
 ## object
 
-Return the encapsulated objet
+Return the encapsulated object
 
 # AUTHOR
 

@@ -25,7 +25,7 @@ WriteMakefile
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999812,
+                            'Math::BigInt'        => 1.999817,
                             'Bit::Vector'         => 0,
                            },
 
@@ -41,4 +41,15 @@ WriteMakefile
    'DEFINE'             => '',            # e.g., '-DHAVE_SOMETHING'
    'INC'                => '',            # e.g., '-I/usr/include/other'
    'SIGN'               => 1,
+
+   'META_MERGE'         => {
+       'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/pjacklam/p5-Math-BigInt-BitVect.git',
+                web  => 'https://github.com/pjacklam/p5-Math-BigInt-BitVect',
+            },
+        },
+    },
   );

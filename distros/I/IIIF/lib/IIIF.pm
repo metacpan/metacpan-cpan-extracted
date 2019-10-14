@@ -1,7 +1,7 @@
 package IIIF;
 use 5.014001;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 1;
 __END__
@@ -26,6 +26,25 @@ IIIF - IIIF Image API implementation
 
 Module IIIF provides an implementation of L<IIIF ImageAPI|https://iiif.io/api/image/3.0/>
 based on the L<ImageMagick|https://www.imagemagick.org/> command line application.
+
+=head1 FEATURES
+
+=over
+
+=item
+
+Full IIIF Image API 3.0 level 2 compliance.
+
+=item
+
+Tested with ImageMagick 6 (Ubuntu) and 7 (Windows)
+
+=item 
+
+100% L<test coverage|https://coveralls.io/github/nichtich/IIIF> on statement
+level, (>90% on branch level and >70% on condition level).
+
+=back
 
 =head1 MODULES
 

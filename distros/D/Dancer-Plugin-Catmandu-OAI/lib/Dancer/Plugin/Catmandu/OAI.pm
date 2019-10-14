@@ -6,14 +6,15 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0503';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
-use Catmandu::Serializer::messagepack;
+use Data::MessagePack;
+use MIME::Base64 qw(encode_base64url decode_base64url);
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
@@ -54,26 +55,42 @@ my $VERBS = {
     ListSets => {valid => {resumptionToken => 1}, required => [],},
 };
 
-sub _serializer {
-    state $serializer = Catmandu::Serializer::messagepack->new;
+{
+    state $mp = Data::MessagePack->new->utf8;
+
+    sub _deserialize {
+        $mp->unpack(decode_base64url($_[0]));
+    }
+
+    sub _serialize {
+        encode_base64url($mp->pack($_[0]));
+    }
+
 }
 
 sub _new_token {
-    my ($settings, $hits) = @_;
+    my ($settings, $hits, $params, $from, $until, $old_token) = @_;
+
+    my $n = $old_token && $old_token->{_n} ? $old_token->{_n} : 0;
+    $n += $hits->size;
+
+    return unless $n < $hits->total;
 
     my $strategy = $settings->{search_strategy};
 
+    my $token;
+
     if ($strategy eq 'paginate' && $hits->more) {
-        return _add_token_values(@_, {start => $hits->start + $hits->limit});
+        $token = {start => $hits->start + $hits->limit};
     }
     elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
-        return _add_token_values(@_, {scroll_id => $hits->{scroll_id}});
+        $token = {scroll_id => $hits->{scroll_id}};
     }
-    return;
-}
+    else {
+        return;
+    }
 
-sub _add_token_values {
-    my ($settings, $hits, $params, $from, $until, $token) = @_;
+    $token->{_n} = $n;
     $token->{_s} = $params->{set} if defined $params->{set};
     $token->{_m} = $params->{metadataPrefix}
         if defined $params->{metadataPrefix};
@@ -84,18 +101,23 @@ sub _add_token_values {
 
 sub _search {
     my ($settings, $bag, $q, $token) = @_;
+
+    my $strategy = $settings->{search_strategy};
+
     my %args = (
         %{$settings->{default_search_params}},
         limit     => $settings->{limit} // $DEFAULT_LIMIT,
         cql_query => $q,
     );
     if ($token) {
-        for my $key (qw(token start)) {
-            next unless exists $token->{$key};
-            $args{$key} = $token->{$key};
-            last;
+        if ($strategy eq 'paginate' && exists $token->{start}) {
+            $args{start} = $token->{start};
+        }
+        elsif ($strategy eq 'es.scroll' && exists $token->{scroll_id}) {
+            $args{scroll_id} = $token->{scroll_id};
         }
     }
+
     $bag->search(%args);
 }
 
@@ -114,14 +136,14 @@ sub oai_provider {
         $setting->{cql_filter} = delete $setting->{filter};
     }
 
-    $setting->{default_search_params} ||= {};
+    $setting->{default_search_params} //= {};
 
     $setting->{search_strategy} //= 'paginate';
 
     # TODO expire scroll_id if finished
     # TODO set resumptionToken expirationDate
     if ($setting->{search_strategy} eq 'es.scroll') {
-        $setting->{default_search_params}{scroll} //= '2m';
+        $setting->{default_search_params}{scroll} //= '10m';
     }
 
     my $datestamp_parser;
@@ -296,8 +318,8 @@ $template_header
 [%- FOREACH records %]
 $template_record_header
 [%- END %]
-[%- IF token %]
-<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
+[%- IF resumption_token %]
+<resumptionToken completeListSize="[% total %]">[% resumption_token %]</resumptionToken>
 [%- ELSE %]
 <resumptionToken completeListSize="[% total %]"/>
 [%- END %]
@@ -318,8 +340,8 @@ $template_record_header
 [%- END %]
 </record>
 [%- END %]
-[%- IF token %]
-<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
+[%- IF resumption_token %]
+<resumptionToken completeListSize="[% total %]">[% resumption_token %]</resumptionToken>
 [%- ELSE %]
 <resumptionToken completeListSize="[% total %]"/>
 [%- END %]
@@ -464,8 +486,7 @@ TT
             }
             else {
                 try {
-                    my $token = _serializer->deserialize(
-                        $params->{resumptionToken});
+                    my $token = _deserialize($params->{resumptionToken});
                     $params->{set}            = $token->{_s};
                     $params->{metadataPrefix} = $token->{_m};
                     $params->{from}           = $token->{_f};
@@ -642,13 +663,14 @@ TT
 
             if (
                 defined(
-                    my $token
-                        = _new_token($setting, $search, $params, $from,
-                        $until)
+                    my $new_token = _new_token(
+                        $setting, $search, $params,
+                        $from,    $until,  $vars->{token}
+                    )
                 )
                 )
             {
-                $vars->{token} = _serializer->serialize($token);
+                $vars->{resumption_token} = _serialize($new_token);
             }
 
             $vars->{total} = $search->total;

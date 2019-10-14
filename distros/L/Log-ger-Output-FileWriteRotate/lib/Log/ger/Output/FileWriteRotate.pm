@@ -1,7 +1,7 @@
 package Log::ger::Output::FileWriteRotate;
 
-our $DATE = '2017-08-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -42,7 +42,7 @@ Log::ger::Output::FileWriteRotate - Log to File::Write::Rotate
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2017-08-02.
+This document describes version 0.003 of Log::ger::Output::FileWriteRotate (from Perl distribution Log-ger-Output-FileWriteRotate), released on 2019-09-10.
 
 =head1 SYNOPSIS
 
@@ -57,13 +57,16 @@ This document describes version 0.002 of Log::ger::Output::FileWriteRotate (from
 
 =head1 DESCRIPTION
 
-This output sends logs to File::Write::Rotate object.
+This plugin sends logs to L<File::Write::Rotate> (FWR) object. FWR allows
+autorotation when logging, meaning you don't need an additional external process
+to perform log rotation but FWR can perform the rotation itself.
 
 =for Pod::Coverage ^(.+)$
 
 =head1 CONFIGURATION
 
-These configuration parameters are File::Write::Rotate's.
+These configuration parameters are FWR's. See that module's documentation for
+more details.
 
 =head2 dir
 
@@ -111,7 +114,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

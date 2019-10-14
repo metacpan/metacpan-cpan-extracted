@@ -10,7 +10,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.21
+Version 0.22
 
 # SYNOPSIS
 
@@ -97,7 +97,7 @@ it under the same terms as Perl itself.
 # GETTING STARTED
 
 Before you start,
-install [App::csv2sqlite](https://metacpan.org/pod/App::csv2sqlite);
+install [App::csv2sqlite](https://metacpan.org/pod/App%3A%3Acsv2sqlite);
 optionally set the environment variable OPENADDR\_HOME to point to an empty directory and download the data from [http://results.openaddresses.io](http://results.openaddresses.io) into that directory;
 optionally set the environment variable WHOSONFIRST\_HOME to point to an empty directory and download the data using [https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-sqlite-download](https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-sqlite-download).
 You do not need to download the MaxMind data, that will be downloaded automatically.
@@ -119,7 +119,7 @@ Both are in their early days, but I have examples which do surprisingly well.
 
 The local copy of the database is built using the createdatabase.PL script which is bundled with G:C:F.
 That script creates a single SQLite file from downloaded copies of the databases listed above, to create the database you will need
-to first install [App::csv2sqlite](https://metacpan.org/pod/App::csv2sqlite).
+to first install [App::csv2sqlite](https://metacpan.org/pod/App%3A%3Acsv2sqlite).
 Running 'make' will download GeoNames and MaxMind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:F.
 
 There is a sample website at [https://geocode.nigelhorne.com/](https://geocode.nigelhorne.com/).  The source code for that site is included in the G:C:F distribution.
@@ -129,7 +129,7 @@ There is a sample website at [https://geocode.nigelhorne.com/](https://geocode.n
 Some lookups fail at the moments, if you find one please file a bug report.
 
 Doesn't include results from
-[Geo::Coder::Free::Local](https://metacpan.org/pod/Geo::Coder::Free::Local).
+[Geo::Coder::Free::Local](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3ALocal).
 
 The MaxMind data only contains cities.
 The OpenAddresses data doesn't cover the globe.
@@ -140,7 +140,7 @@ Can't parse and handle "London, England".
 
 VWF, OpenAddresses, MaxMind and geonames.
 
-See [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo::Coder::Free::OpenAddresses) for instructions creating the SQLite database from
+See [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AOpenAddresses) for instructions creating the SQLite database from
 [http://results.openaddresses.io/](http://results.openaddresses.io/).
 
 # LICENSE AND COPYRIGHT

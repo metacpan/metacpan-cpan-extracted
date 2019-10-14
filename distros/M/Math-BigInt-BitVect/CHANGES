@@ -1,4 +1,10 @@
+1.16 2019-10-10
+
+ * Sync test files with Math-BigInt.
+
 1.15 2018-10-09
+
+ * Add information about the github repository.
 
  * Update MANIFEST.SKIP.
 

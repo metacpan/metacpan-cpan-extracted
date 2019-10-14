@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.040';
+our $VERSION = '1.041';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -373,6 +373,8 @@ sub read_schema {
     return $given_tables ? @schema{ @table_names } : \%schema;
 }
 
+sub supports { 0 }
+
 1;
 
 __END__
@@ -385,7 +387,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.040
+version 1.041
 
 =head1 SYNOPSIS
 
