@@ -12,7 +12,7 @@ use Data::Object::Data;
 use Data::Object::Opts;
 use Data::Object::Vars;
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 has args => (
   is => 'ro',
@@ -83,8 +83,8 @@ sub main {
 sub help {
   my ($self) = @_;
 
-  my $data = $self->data;
-  my $help = $data->content('help');
+  my $data = $self->data->contents('pod', 'help');
+  my $help = $data->[0];
 
   return $help;
 }
@@ -137,8 +137,8 @@ sub handle {
 sub spec {
   my ($self) = @_;
 
-  my $data = $self->data;
-  my $spec = $data->content('spec');
+  my $data = $self->data->contents('pod', 'spec');
+  my $spec = $data->[0];
 
   return [] if !$spec || !@$spec;
 
@@ -148,8 +148,8 @@ sub spec {
 sub sign {
   my ($self) = @_;
 
-  my $data = $self->data;
-  my $sign = $data->content('sign');
+  my $data = $self->data->contents('pod', 'sign');
+  my $sign = $data->[0];
 
   return {} if !$sign || !@$sign;
 
@@ -482,7 +482,7 @@ attribute.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

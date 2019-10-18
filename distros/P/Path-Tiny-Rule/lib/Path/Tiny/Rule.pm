@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Path::Tiny qw( path );
 
@@ -39,13 +39,13 @@ Path::Tiny::Rule - Path::Iterator::Rule subclass that returns Path::Tiny objects
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
   use Path::Tiny::Rule;
 
-  my $iter = Path::Tiny::Rule->new->name(qr/\.t$/)->in('t');
+  my $iter = Path::Tiny::Rule->new->name(qr/\.t$/)->iter('t');
 
   while ( my $test_file = $iter->() ) {
       print $test_file->basename, "\n";
@@ -58,7 +58,7 @@ returns L<Path::Tiny> objects instead of strings. It should otherwise be a
 drop-in replacement for L<Path::Iterator::Rule>, and any deviation from that
 is a bug.
 
-This module has no public API that is not provided L<Path::Iterator::Rule>.
+This module has no public API that is not provided by L<Path::Iterator::Rule>.
 
 It exists because I got really tired of writing this:
 
@@ -100,7 +100,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2017 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

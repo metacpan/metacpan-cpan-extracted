@@ -1,17 +1,15 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.24';
+$Geo::Coder::OpenCage::VERSION = '0.25';
 use strict;
 use warnings;
 
 use Carp;
-use Data::Dumper;
-$Data::Dumper::Sortkeys = 1;
 use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.24;
+my $version = 0.25;
 my $ua_string;
 
 sub new {
@@ -32,7 +30,6 @@ sub new {
         url     => URI->new('https://api.opencagedata.com/geocode/v1/json/'),
     };
 
-    print Dumper $ua;
     return bless $self, $class;
 }
 
@@ -143,7 +140,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.726'; # VERSION
+our $DATE = '2019-09-09'; # DATE
+our $VERSION = '0.727'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ pmxs - Check whether an installed Perl module is XS/pure-perl
 
 =head1 VERSION
 
-This document describes version 0.726 of pmxs (from Perl distribution App-PMUtils), released on 2019-07-25.
+This document describes version 0.727 of pmxs (from Perl distribution App-PMUtils), released on 2019-09-09.
 
 =head1 SYNOPSIS
 

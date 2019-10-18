@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 use Quiq::Path;
 use Quiq::Parameters;
@@ -167,11 +167,24 @@ Aufrufreihenfolge.
 Datei, in der die Ausgaben aller Prozesse (chronologische
 Aufrufreihenfolge) zusammengefasst werden. Dies geschieht nach
 Beendigung des letzten Prozesses. Wird '-' als Dateiname angegeben,
-wird die Ausgabe nach STDOUT geschrieben.
+wird die Ausgabe nach STDOUT geschrieben. ACHTUNG: Bricht das
+steuernde Programm ab, wird keine Ausgabe produziert. Die
+Ausgabedateien verschwinden mit dem temporären Verzeichnis,
+in dem sie gespeichert werden.
 
 =item -progressMeter => $bool (Default: 1)
 
 Zeige Fortschrittsanzeige an.
+
+=item -progressNameSub => sub {}
+
+Liefere die Bezeichnung des Elements für die Fortschrittsanzeige.
+Dies ist erforderlich, wenn das Element ein Objekt ist. Beispiel:
+
+  -progressNameSub => sub {
+      my $obj = shift;
+      return $obj->bezeichnung;
+  },
 
 =back
 
@@ -213,6 +226,7 @@ sub runFetch {
     my $outputDir = undef;
     my $outputFile = undef;
     my $progressMeter = 1;
+    my $progressNameSub = undef;
     
     my $argA = Quiq::Parameters->extractToVariables(\@_,2,2,
         -maxFetches => \$maxFetches,
@@ -220,6 +234,7 @@ sub runFetch {
         -outputDir => \$outputDir,
         -outputFile => \$outputFile,
         -progressMeter => \$progressMeter,
+        -progressNameSub => \$progressNameSub,
     );
     my ($fetchSub,$sub) = @$argA;
 
@@ -247,15 +262,16 @@ sub runFetch {
         if ($pid >= 0) {
             my $elem = $processH->{$pid};
 
-            my $type = Scalar::Util::reftype($elem) || '';
-            if ($type eq 'HASH') {
-                print $pro->msg($i,'i/n x% t/t(t) x/h x/s');
+            my $type = Scalar::Util::reftype($elem);
+            if (!$type) {
+                print $pro->msg($i,'i/n x% t/t(t) x/h x/s: %s',$elem);
             }
-            elsif ($type eq 'ARRAY') {
-                print $pro->msg($i,'i/n x% t/t(t) x/h x/s: %s',$elem->[0]);
+            elsif ($progressNameSub) {
+                print $pro->msg($i,'i/n x% t/t(t) x/h x/s: %s',
+                    $progressNameSub->($elem));
             }
             else {
-                print $pro->msg($i,'i/n x% t/t(t) x/h x/s: %s',$elem);
+                print $pro->msg($i,'i/n x% t/t(t) x/h x/s');
             }
 
             delete $processH->{$pid};
@@ -322,9 +338,7 @@ sub runFetch {
 
     # Warte auf die letzten Childs
 
-    while ($wait->($pro,$processH,++$j) >= 0) {
-    }
-
+    while ($wait->($pro,$processH,++$j) >= 0) {}
     print $pro->msg;
 
     if ($outputFile) {
@@ -344,7 +358,7 @@ sub runFetch {
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

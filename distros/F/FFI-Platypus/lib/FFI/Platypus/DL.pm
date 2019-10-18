@@ -10,7 +10,7 @@ our @EXPORT = qw( dlopen dlerror dlsym dlclose );
 push @EXPORT, grep /RTLD_/, keys %FFI::Platypus::DL::;
 
 # ABSTRACT: Slightly non-portable interface to libdl
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 
 1;
@@ -27,7 +27,7 @@ FFI::Platypus::DL - Slightly non-portable interface to libdl
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -206,6 +206,8 @@ Petr Pisar (ppisar)
 Mohammad S Anwar (MANWAR)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+Meredith (merrilymeredith, MHOWARD)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -9,7 +9,7 @@ use Moo::Role;
 
 use Carp ();
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # BUILD
 
@@ -128,7 +128,7 @@ called and handled automatically.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

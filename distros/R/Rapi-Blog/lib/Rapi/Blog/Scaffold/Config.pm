@@ -17,6 +17,7 @@ has 'default_view_path',  is => 'rw', isa => Maybe[Str],        default => sub {
 has 'not_found',          is => 'rw', isa => Maybe[Str],        default => sub { undef };
 has 'view_wrappers',      is => 'rw', isa => ArrayRef[HashRef], default => sub { [] };
 has 'static_paths',       is => 'rw', isa => ArrayRef,          default => sub { [] };
+has 'template_names',     is => 'rw', isa => ArrayRef,          default => sub { ['*'] };
 has 'private_paths',      is => 'rw', isa => ArrayRef,          default => sub { [] };
 has 'default_ext',        is => 'rw', isa => Maybe[Str],        default => sub { 'html' };
 

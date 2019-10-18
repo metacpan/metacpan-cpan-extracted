@@ -1,4 +1,4 @@
-# AWS::Config::RemediationConfiguration generated from spec 5.3.0
+# AWS::Config::RemediationConfiguration generated from spec 6.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration',
@@ -39,6 +39,28 @@ package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::Static
   extends 'Cfn::Value::TypedValue';
   
   has Values => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControls',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControls',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControlsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControlsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ConcurrentExecutionRatePercentage => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ErrorPercentage => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ResourceValue',
@@ -84,14 +106,39 @@ package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::Remedi
   has StaticValue => (isa => 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::StaticValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControls',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControls',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControlsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControlsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has SsmControls => (isa => 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControls', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has Automatic => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ConfigRuleName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ExecutionControls => (isa => 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControls', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaximumAutomaticAttempts => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Parameters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ResourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RetryAttemptSeconds => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TargetId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TargetType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TargetVersion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

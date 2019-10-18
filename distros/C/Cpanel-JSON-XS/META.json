@@ -4,7 +4,7 @@
       "Reini Urban <rurban@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,12 +27,36 @@
       },
       "configure" : {
          "requires" : {
+            "Config" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Pod::Text" : "2.08"
+            "Carp" : "0",
+            "Encode" : "1.9801",
+            "Exporter" : "0",
+            "Pod::Text" : "2.08",
+            "XSLoader" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "B" : "0",
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "Devel::Peek" : "0",
+            "POSIX" : "0",
+            "Test" : "0",
+            "Test::More" : "0",
+            "Tie::Array" : "0",
+            "Tie::Hash" : "0",
+            "charnames" : "0",
+            "lib" : "0",
+            "utf8" : "0"
          }
       }
    },
@@ -48,7 +72,7 @@
          "url" : "https://github.com/rurban/Cpanel-JSON-XS"
       }
    },
-   "version" : "4.12",
+   "version" : "4.14",
    "x_contributors" : [
       "Ashley Willis <ashleyw@cpan.org>",
       "Chip Salzenberg <chip@pobox.com>",
@@ -75,5 +99,5 @@
       "Syohei Yoshida <syohex@gmail.com>",
       "tevfik1903 <tevfik1903@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 2.97001_04"
 }

@@ -8,7 +8,7 @@ plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 my $embedder = LinkEmbedder->new;
 
 my $link;
-$embedder->get_p('https://paste.fedoraproject.org/paste/9qkGGjN-D3fL2M-bimrwNQ')->then(sub { $link = shift })->wait;
+$embedder->get_p('https://paste.fedoraproject.org/paste/Rf4s0DMsl54bV4l9-veIOQ')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Fpaste');
 cmp_deeply(
   $link->TO_JSON,
@@ -19,7 +19,7 @@ cmp_deeply(
     provider_url  => 'https://fedoraproject.org/',
     title         => re(qr{LinkEmbedder test}),
     type          => 'rich',
-    url           => 'https://paste.fedoraproject.org/paste/9qkGGjN-D3fL2M-bimrwNQ',
+    url           => 'https://paste.fedoraproject.org/paste/Rf4s0DMsl54bV4l9-veIOQ',
     version       => '1.0',
   },
   'paste.fedoraproject.org'

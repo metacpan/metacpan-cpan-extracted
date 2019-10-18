@@ -104,12 +104,32 @@ List of path prefixes which are considered 'static' meaning no template processi
 those paths. You want to list asset/image dirs like 'css/', 'fonts/' etc in this param, which
 helps performance for paths which the system doesn't need to parse for template directives.
 
+New in v1.13 - in addition to prefixes and literal paths, standard glob wildcard patterns are also supported. 
+
+=head2 template_names
+
+New in v1.13.
+
+Works in conjunction with C<static_paths> but is inclusive rather than exclusive. If a set of 
+C<template_names> is defined, only scaffold templates which match will be treated as active/dynamic,
+the rest will be treated as static. Unlike C<static_paths> which apply to public, URL paths, the
+C<template_names> match the actual, post-translated name. 
+
+For instance, when a C<default_ext> is defined, as is typical and is usually 'html' the public 
+path C<'/list'> actually resolves to C<'/list.html'> and it is the latter which is considered by 
+the C<template_names> parameter. So, for instance, if you set C<'*.html'> as the only entry in 
+C<template_names>, it would mean that all files which do not end in .html will be static, but 
+C</list> would still render as an active template because its effective path is C</list.html> 
+which does match the rule.
+
 =head2 private_paths
 
 List of path prefixes which will not be served publicly, but will still be available internally
 to include, use as a wrapper, etc. Note that this option isn't really about security but about cleaning
 the public namespace of paths which are known not to be able to render as stand-alone pages in that
 context (like snippets, block directives, etc etc)
+
+New in v1.13, these also now support standard glob wildcards.
 
 =head2 landing_page
 
@@ -294,6 +314,12 @@ call the template directive C<[% Post.record_hit %]>.
 
 Posts with the most comments (includes sub-comments/replies) first
 
+=head2 get_posts
+
+Exactly the same as C<list_posts> except the C<'body'> column is not excluded from the returned rows.
+The default C<list_posts> excludes the body for performance, since it is typically not needed when
+fetching a list of posts. C<get_posts> should only be used when the body of each post is needed.
+
 =head2 list_tags
 
 Interface to retrieve and filter Tags from the database. This is exposed with the 
@@ -448,6 +474,38 @@ Also note that these templates are designed such that the reCAPTCHA dialog only 
 C<recaptcha_config> has been defined, and since this requires per-site registration with Google,
 this is not (and cannot be) enabled by default. For more information, refer to the Google recaptcha_config
 v2 documentation.
+
+=head2 ppRender
+
+When performing final rendering of a post, the body content is processed by a Post-processor, which 
+is simply a Template::Toolkit processor class. The default Post-processor is 
+C<Rapi::Blog::Template::Postprocessor::MarkdownElement> which injects a script include and wraps the
+content to be processed on the client-side browser using the C<marked.js> library.
+
+This post-processing only happens during specific dispatch flows and on the Post body, however, it 
+can also be called interactively on any arbitrary content by using the C<ppRender> directive. This
+must be called with both the name of the post-processor and the content to be processed. For example:
+
+  [% ppRender.MarkdownElement(content) %]
+
+There is a new post-processor class now available called C<TextMarkdown> which processes markdown
+content using the perl L<Text::Markdown> package:
+
+  [% ppRender.TextMarkdown(content) %]
+
+Text::Markdown is an older library and doesn't support as many features as C<marked.js> which is why
+the latter is the default. However, this does come with the limitation that it relies on client-side
+javascript. In cases where this isn't available, such as RSS feeds or other repost scenarios, the
+TextMarkdown post-processor is available.
+
+The C<ppRender> directive supports several different call forms. The following are all equivalent:
+
+  [% ppRender.TextMarkdown(content) %]
+  [% ppRender('TextMarkdown',content) %]
+  [% ppRender('Rapi::Blog::Template::Postprocessor::TextMarkdown',content) %]
+
+The base namespace C<Rapi::Blog::Template::Postprocessor::> is used by default, but full package
+names can also be supplied so user-defined post-processors can be used.
 
 =head2 Post
 

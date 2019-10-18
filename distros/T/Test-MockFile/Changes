@@ -1,5 +1,8 @@
 Revision history for Test-MockFile
 
+0.020
+ - Basic introduction of file ownership. Set default uid/gid to current user when not set
+
 0.19
  - Fix POD for stat example in POD.
  - Allow scalar file handles on open. We don't care about those

@@ -1,0 +1,88 @@
+{
+   "abstract" : "Formatting TAP output using the Evaluation and Report Language",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "TAP-Formatter-EARL",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attean" : "0.024",
+            "Moo" : "0",
+            "MooX::Attribute::ENV" : "0",
+            "RDF::NS::Curated" : "1.002",
+            "TAP::Formatter::Console" : "0",
+            "Types::DateTime" : "0",
+            "Types::Standard" : "0",
+            "URI::NamespaceMap" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "TAP::Formatter::EARL" : {
+         "file" : "lib/TAP/Formatter/EARL.pm",
+         "version" : "0.001"
+      },
+      "TAP::Formatter::EARL::Session" : {
+         "file" : "lib/TAP/Formatter/EARL/Session.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-tap-formatter-earl/issues"
+      },
+      "homepage" : "https://metacpan.org/release/TAP-Formatter-EARL",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-tap-formatter-earl.git",
+         "web" : "https://github.com/kjetilk/p5-tap-formatter-earl"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/TAP-Formatter-EARL/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

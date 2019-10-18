@@ -1,5 +1,8 @@
 Revision history for JSON-Slurper
 
+0.10  2019-10-17 12:19:17 CDT
+        - Remove ability to pass arrays and hashes via prototypes. Now anonymous arrays and hashes may be provided.
+
 0.09  2019-10-03 21:20:39 CDT
         - Use Exporter::Shiny instead of Exporter. Fixes #4. Thanks @dbook and @tobyink.
         - Add -std, -std_auto, -slurp_auto, and -spurt_auto tags.

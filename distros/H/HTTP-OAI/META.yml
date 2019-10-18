@@ -40,12 +40,13 @@ resources:
   bugtracker: https://github.com/LibreCat/perl-oai-lib/issues
   homepage: https://github.com/LibreCat/perl-oai-lib
   repository: https://github.com/LibreCat/perl-oai-lib.git
-version: '4.09'
+version: '4.10'
 x_contributors:
   - 'gregor herrmann <gregoa@debian.org>'
   - 'Jakob Voss <voss@gbv.de>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Sebastien Francois <sf2@ecs.soton.ac.uk>'
   - 'Stephen Thirlwall <stephent@strategicdata.com.au>'

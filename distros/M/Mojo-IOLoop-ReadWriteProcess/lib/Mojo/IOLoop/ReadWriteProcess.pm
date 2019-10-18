@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -783,7 +783,7 @@ You do not need to specify C<code>, it is implied if no arguments is given.
 =head2 args
 
     use Mojo::IOLoop::ReadWriteProcess;
-    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".shift() }, args => "User" );
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".$_[1] }, args => "User" );
     $process->start();
     $process->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
     $process->stop();
@@ -825,9 +825,9 @@ Returns the current L<Mojo::IOLoop::ReadWriteProcess::Session> singleton.
 =head2 subreaper
 
     use Mojo::IOLoop::ReadWriteProcess;
-    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".shift() }, args => "User" );
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".$_[1] }, args => "User" );
     $process->subreaper(1)->start();
-    $process->on( stop => sub { $_->disable_subreaper } );
+    $process->on( stop => sub { shift()->disable_subreaper } );
     $process->stop();
 
     # The process will print "Hello User"

@@ -78,7 +78,21 @@ sub _api_params_undef_map {{ section_id => 'none' }};
 
 # Method exposed to templates:
 
+
 sub list_posts {
+  (shift)
+    ->_all_columns_except('body')
+    ->_list_posts_rs(@_)
+    ->_list_api
+}
+
+sub get_posts {
+  (shift)
+    ->_list_posts_rs(@_)
+    ->_list_api
+}
+
+sub _list_posts_rs {
   my ($self, @args) = @_;
   
   my $P = $self->_list_api_params(@args);
@@ -86,7 +100,6 @@ sub list_posts {
   my $Rs = $self
     ->published
     ->newest_first
-    ->_all_columns_except('body')
     ->search_rs(undef, { 
       join     => ['post_tags','post_categories'],
       group_by => 'me.id'
@@ -138,7 +151,7 @@ sub list_posts {
     );
   }
   
-  return $Rs->_list_api
+  return $Rs
 }
 
 

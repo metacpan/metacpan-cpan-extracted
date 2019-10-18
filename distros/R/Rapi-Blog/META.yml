@@ -74,6 +74,8 @@ requires:
   String::CamelCase: 0
   String::Random: 0
   Term::ReadLine: 0
+  Text::Glob: 0.11
+  Text::Markdown: 1.000031
   Types::Standard: 0
   URI: 0
   URI::Escape: 0
@@ -91,4 +93,4 @@ resources:
   bugtracker: https://github.com/vanstyn/Rapi-Blog/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/Rapi-Blog.git
-version: 1.1100
+version: 1.1301

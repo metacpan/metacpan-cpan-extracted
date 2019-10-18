@@ -1,8 +1,8 @@
-# $Id: 00-load.t 1733 2019-03-12 09:49:50Z willem $
+# $Id: 00-load.t 1758 2019-10-14 13:17:11Z willem $
 #
 
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 my @module = qw(
 	Net::DNS::SEC
@@ -28,9 +28,10 @@ my @module = qw(
 my @diag = "\nThese tests were run using:";
 foreach my $module ( sort @module ) {
 	eval "use $module";
-	my $version = eval { $module->VERSION } || next;
-	$version =~ s/(\.\d)$/${1}0/;
-	push @diag, sprintf "%-25s  %s", $module, $version;
+	for ( grep $_, eval { $module->VERSION } ) {
+		s/^(\d+\.\d)$/${1}0/;
+		push @diag, sprintf "%-25s  %s", $module, $_;
+	}
 }
 diag join "\n\t", @diag;
 
@@ -40,12 +41,21 @@ ok( eval { Net::DNS::SEC::libcrypto->VERSION }, 'XS component SEC.xs loaded' )
 
 use_ok('Net::DNS::SEC');
 
+
+my @index;
+foreach my $class ( map "Net::DNS::SEC::$_", qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
+	my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";
+	push @index, map( ( $_ => $class ), @algorithms );
+}
+ok( scalar(@index), 'create consolidated algorithm index' );
+
+
 eval {
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
 	my $broken = Net::DNS::SEC::libcrypto::EVP_sign( 'sigdata', $evpkey );
 };
-my $exception = $1 if $@ =~ /^(.+)\n/;
-ok( $exception ||= '', "XS libcrypto error\t[$exception]" );
+my ($exception) = split /\n/, "$@\n";
+ok( $exception, "XS libcrypto error\t[$exception]" );
 
 
 eval {

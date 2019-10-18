@@ -1,0 +1,27 @@
+Unix::ScriptUtil - some utility routines for scripts
+
+this module can be installed using cpanm:
+
+    cpanm Unix::ScriptUtil
+
+
+run perldoc(1) on Unix::ScriptUtil for documentation
+
+
+to install from source code, with dependencies:
+
+    git clone https://github.com/thrig/Unix-ScriptUtil
+    cd Unix-ScriptUtil
+    cpanm .
+
+or the manual way:
+
+    perl Build.PL && ./Build test && ./Build install
+
+
+to author a new release:
+
+    git tag -u ... -s v...
+    ./Build disttest
+    cpan-upload ...
+    git push ...

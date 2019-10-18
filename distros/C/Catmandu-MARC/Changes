@@ -1,7 +1,10 @@
 Revision history for Catmandu-MARC
 
+1.254  2019-10-17 14:30:11 CEST
+  - Fixing dependencies [manwar]
+  
 1.253  2019-10-11 07:50:42 CEST
-  - Fixing dependencies [manwar] 
+  - Fixing dependencies [manwar]
 
 1.252  2019-10-07 16:00:01 CEST
   - Adding marc_sort support (jorol)

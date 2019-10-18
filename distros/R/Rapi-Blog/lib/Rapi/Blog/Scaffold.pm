@@ -7,6 +7,7 @@ use Rapi::Blog::Util;
 use Scalar::Util 'blessed';
 use List::Util;
 use String::Random;
+require Text::Glob;
 
 use Moo;
 use Types::Standard ':all';
@@ -53,6 +54,7 @@ has 'config',
 
 
 sub static_paths       { (shift)->config->static_paths       }
+sub template_names     { (shift)->config->template_names     }
 sub private_paths      { (shift)->config->private_paths      }
 sub default_ext        { (shift)->config->default_ext        }
 sub view_wrappers      { (shift)->config->view_wrappers      }
@@ -109,12 +111,6 @@ sub resolve_ViewWrapper {
 
 
 
-
-sub owns_path {
-  my ($self, $path) = @_;
-  $self->owns_path_as($path) ? 1 : 0
-}
-
 sub _resolve_path_to_post {
   my ($self, $path) = @_;
   
@@ -129,38 +125,70 @@ has '_static_path_regexp', is => 'ro', lazy => 1, default => sub {
   return $self->_compile_path_list_regex(@{$self->static_paths});
 };
 
+has '_template_name_regexp', is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+  return $self->_compile_path_list_regex(@{$self->template_names});
+};
+
 has '_private_path_regexp', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
   return $self->_compile_path_list_regex(@{$self->private_paths});
 };
 
+
 sub _compile_path_list_regex {
+  my ($self, @paths) = @_;
+  my $reStr = $self->_get_path_list_regex_string(@paths);# or return undef;
+  qr/$reStr/
+}
+
+
+sub __re_always    { '(^.+$)'    } # Always matches
+sub __re_never     { '(?=a)[^a]' } # Never matches
+
+sub _glob_to_re_str {
+  my ($self,$glob) = @_;
+  
+  my $re = Text::Glob::glob_to_regex_string($glob);
+  
+  # unless the glob ends in a *, we do not 
+  # want to match past the end of the pattern
+  $glob =~ /\*$/ ? $re : $re.'$'
+}
+
+sub _get_path_list_regex_string {
   my ($self, @paths) = @_;
   return undef unless (scalar(@paths) > 0);
   
-  my @list = ();
+  my @gList  = ();
+  my @eqList = ();
   for my $path (@paths) {
     next if ($path eq ''); # empty string match nothing
-    push @list, '^.*$' and next if($path eq '/') ; # special handling for '/' -- match everything
+    
+    # Either * or / match everything. Bail out and return the match everything regex
+    return $self->__re_always if ($path eq '*' || $path eq '/');
 
     $path =~ s/^\///; # strip and ignore leading /
-    if ($path =~ /\/$/) {
-      # ends in slash, matches begining of the path
-      push @list, join('','^',$path);
-    }
-    else {
-      # does not end in slash, match as if it did AND the whole path
-      push @list, join('','^',$path,'/');
-      push @list, join('','^',$path,'$');
-    }
+    $path .= '*' if ($path =~ /\/$/); # append wildcard if we end in / we want to match everything that follows
+    
+    # Check for any glob pattern special characters:
+    $path =~ /[\*\?\[\]\{\}]/ ? push(@gList, $path) : push(@eqList,$path);
   }
   
-  return undef unless (scalar(@list) > 0);
+  local $Text::Glob::strict_leading_dot    = 0;
+  local $Text::Glob::strict_wildcard_slash = 0;
   
-  my $reStr = join('','(',join('|', @list ),')');
+  my @re_list = (
+    (map { $self->_glob_to_re_str($_) } @gList ),
+    (map { join('','^',quotemeta($_),'$') } @eqList )
+  );
   
-  return qr/$reStr/
+  my $reStr = join('','(',join('|', @re_list ),')');
+  
+  $reStr ? $reStr : $self->__re_never
 }
+
+
 
 
 has 'static_path_app', is => 'ro', lazy => 1, default => sub {
@@ -188,23 +216,16 @@ sub _is_static_path {
   $Regexp ? $template =~ $Regexp : 0
 }
 
+sub _is_valid_template_name {
+  my ($self, $name) = @_;
+  my $Regexp = $self->_template_name_regexp;
+  $Regexp ? $name =~ $Regexp : 0
+}
+
 sub _is_private_path {
   my ($self, $template) = @_;
   my $Regexp = $self->_private_path_regexp;
   $Regexp ? $template =~ $Regexp : 0
-}
-
-
-sub resolve_path {
-  my $self = shift;
-  my $path = shift or return undef;
-  
-  my $File = $self->resolve_file($path);
-  
-  # If not found, try once more by appending the default file extenson:
-  $File = $self->resolve_file(join('.',$path,$self->default_ext)) if (!$File && $self->default_ext);
-  
-  $File
 }
 
 

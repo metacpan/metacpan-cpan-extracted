@@ -10,7 +10,7 @@ use Moo::Role;
 
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # BUILD
 
@@ -126,7 +126,7 @@ return empty.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

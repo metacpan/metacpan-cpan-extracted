@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-OpenCage
 
+0.25    2019-10-15
+        - remove debugging mistakenly left in 0.24. Sorry!
+
 0.24    2019-10-11
         - new ua method for getting/setting user agent
           As suggested by NHORNE. Thanks!

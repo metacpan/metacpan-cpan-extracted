@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 use Quiq::Option;
 use DBI ();
@@ -50,7 +50,21 @@ Name des DBMS, für DBMS-spezifische Fallunterscheidungen.
 
 =head4 Synopsis
 
-  $db = $class->new($udlObj);
+  $db = $class->new($udlObj,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -autoCommit => $bool (Default: 0)
+
+Öffne die Verbindung im Autocommit-Modus.
+
+=item -handle => $handle
+
+=item utf8 => $bool (Default: 0)
+
+=back
 
 =head4 Description
 
@@ -68,10 +82,12 @@ sub new {
 
     # Optionen
 
+    my $autoCommit = 0;
     my $handle = undef;
     my $utf8 = 0;
 
     Quiq::Option->extract(\@_,
+        -autoCommit => \$autoCommit,
         -handle => \$handle,
         -utf8 => \$utf8,
     );
@@ -81,7 +97,6 @@ sub new {
     my $user = $udlObj->user;
     my $passw = $udlObj->password;
 
-    my $autoCommit = 0;
     if ($dbms eq 'sqlite') {
         # SQLite3: AutoCommit muss angeschaltet sein, sonst gibt
         # es "database is locked" Fehler mit jedem SQL-Statement.
@@ -520,7 +535,7 @@ sub sql {
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

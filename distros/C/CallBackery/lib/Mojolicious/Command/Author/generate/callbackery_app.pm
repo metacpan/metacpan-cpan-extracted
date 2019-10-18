@@ -67,10 +67,12 @@ EOF
         'frontend/Makefile.am' => 'frontend/Makefile.am',
         'frontend/Manifest.json' => 'frontend/Manifest.json',
         'frontend/config.json' => 'frontend/config.json',
+        'frontend/compile.json' => 'frontend/compile.json',
+        'frontend/compile.js' => 'frontend/compile.js',
+        'frontend/package.json' => 'frontend/package.json',
         'frontend/source/class/app/Application.js' => 'frontend/source/class/'.$qxclass.'/Application.js',
         'frontend/source/class/app/__init__.js' => 'frontend/source/class/'.$qxclass.'/__init__.js',
         'frontend/source/class/app/theme/Theme.js' => 'frontend/source/class/'.$qxclass.'/theme/Theme.js',
-        'frontend/source/index.html' => 'frontend/source/index.html',
         't/basic.t' => 't/basic.t',
     };
 

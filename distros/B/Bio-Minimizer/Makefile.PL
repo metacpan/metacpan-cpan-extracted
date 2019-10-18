@@ -22,6 +22,7 @@ WriteMakefile1(
     'threads::shared'=> 0,
     'Thread::Queue'  => 0,
     'Exporter'       => 0,
+    'List::MoreUtils'=> 0,
   },
   TEST_REQUIRES => {
     'Test::More'     => 0.47,

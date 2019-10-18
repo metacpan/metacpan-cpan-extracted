@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 
 sub _native_name
@@ -276,7 +276,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -513,6 +513,8 @@ Petr Pisar (ppisar)
 Mohammad S Anwar (MANWAR)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+Meredith (merrilymeredith, MHOWARD)
 
 =head1 COPYRIGHT AND LICENSE
 

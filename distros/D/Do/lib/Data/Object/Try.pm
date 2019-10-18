@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use Try::Tiny ();
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 has invocant => (
   is => 'ro',
@@ -535,7 +535,7 @@ arguments were passed directly to this method.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

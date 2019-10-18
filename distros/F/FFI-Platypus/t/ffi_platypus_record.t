@@ -421,4 +421,127 @@ subtest 'string rw' => sub {
   is $foo->get_value, 'starscream!!!', 'foo.get_value = starscream!!!';
 };
 
+subtest 'record with custom ffi' => sub {
+
+  {
+    package
+      Foo8;
+
+    use FFI::Platypus::Record;
+
+    my $ffi = FFI::Platypus->new;
+    $ffi->type('string rw' => 'foo_t');
+
+    record_layout($ffi, qw(
+      foo_t foo
+    ));
+  }
+
+  my $foo8 = Foo8->new;
+  isa_ok $foo8, 'Foo8';
+
+  $foo8->foo("yo this is a string");
+  is( $foo8->foo, "yo this is a string" );
+
+};
+
+subtest 'record with ffi args' => sub {
+
+  { package
+      FFI::Platypus::Lang::Foo9;
+    sub native_type_map
+    {
+      return { foo_t => 'sint32' };
+    }
+  }
+
+  { package
+      Foo9;
+
+    use FFI::Platypus::Record;
+
+    record_layout
+      [ lang => 'Foo9', api => 1, experimental => 1 ],
+      foo_t => 'foo'
+    ;
+  }
+
+  my $foo8 = Foo8->new;
+  isa_ok $foo8, 'Foo8';
+
+  $foo8->foo(-42);
+  is( $foo8->foo, -42 );
+};
+
+subtest 'api_1' => sub {
+
+  my $api;
+  my $ffi = FFI::Platypus->new;
+
+  no warnings 'once';
+  no warnings 'redefine';
+  local *FFI::Platypus::new = do {
+    my $orig = FFI::Platypus->can('new');
+    sub {
+      my $class = shift;
+      my %args = @_;
+      $api = $args{api};
+      $api = 0 unless defined $args{api};
+      $class->$orig(@_, experimental => 1);
+    };
+  };
+
+  subtest 'no $ffi or args' => sub {
+
+    local $@;
+    undef $api;
+
+    eval q{
+      package Foo10;
+      use FFI::Platypus::Record;
+      record_layout_1(
+        string => 'a',
+      );
+    };
+
+    is "$@", '';
+    is( $api, 1 );
+  };
+
+  subtest 'args' => sub {
+
+    local $@;
+    undef $api;
+
+    eval q{
+      package Foo11;
+      use FFI::Platypus::Record;
+      record_layout_1( [],
+        string => 'a',
+      );
+    };
+
+    is "$@", '';
+    is( $api, 1 );
+  };
+
+  subtest '$ffi' => sub {
+
+    local $@;
+    undef $api;
+
+    eval q{
+      package Foo12;
+      use FFI::Platypus::Record;
+      record_layout_1( $ffi,
+        string => 'a',
+      );
+    };
+
+    is "$@", '';
+    is( $api, undef );
+  };
+
+};
+
 done_testing;

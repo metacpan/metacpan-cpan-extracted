@@ -54,7 +54,7 @@ completely isolated Perl installations.
 
 # CREDITS
 
-Al Newkirk, `+317`
+Al Newkirk, `+319`
 
 Anthony Brummett, `+10`
 

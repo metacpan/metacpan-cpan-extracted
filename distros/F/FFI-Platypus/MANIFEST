@@ -40,6 +40,20 @@ corpus/ffi_build_mm/project1/t/ffi/b.c
 corpus/ffi_build_mm/project1/t/ffi/c.c
 corpus/ffi_probe_runner/bar.c
 corpus/ffi_probe_runner/foo.c
+corpus/memory/arg_array.pl
+corpus/memory/arg_custom.pl
+corpus/memory/arg_object.pl
+corpus/memory/arg_pointer.pl
+corpus/memory/arg_scalar.pl
+corpus/memory/attach.pl
+corpus/memory/empty.pl
+corpus/memory/function.pl
+corpus/memory/return_array.pl
+corpus/memory/return_custom.pl
+corpus/memory/return_object.pl
+corpus/memory/return_pointer.pl
+corpus/memory/return_scalar.pl
+corpus/memory/supp/basic_type_cache.supp
 dist.ini
 examples/archive.pl
 examples/archive_object.pl
@@ -184,6 +198,7 @@ t/ffi/complex_float.c
 t/ffi/double.c
 t/ffi/float.c
 t/ffi/gh117.c
+t/ffi/gh174.c
 t/ffi/longdouble.c
 t/ffi/memcmp4.c
 t/ffi/meta.c
@@ -245,7 +260,9 @@ t/forks.t
 t/gh117.t
 t/gh129.t
 t/lib/Test/Cleanup.pm
+t/lib/Test/FauxAttach.pm
 t/lib/Test/Platypus.pm
+t/memory.t
 t/threads.t
 t/type_complex_double.t
 t/type_complex_float.t
@@ -277,6 +294,7 @@ xs/Internal.xs
 xs/Record.xs
 xs/Type.xs
 xs/TypeParser.xs
+xs/cast.c
 xs/closure.c
 xs/complex.c
 xs/custom.c

@@ -73,6 +73,7 @@
             "Test::Simple" : "1.001003",
             "Test::Warn" : "0",
             "Test::Warnings" : "0",
+            "XML::LibXML" : "0",
             "XML::XPath" : "1.13"
          }
       }
@@ -89,7 +90,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MARC"
       }
    },
-   "version" : "1.253",
+   "version" : "1.254",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.12';
+$Neo4j::Driver::Session::VERSION = '0.13';
 
 use Cpanel::JSON::XS 3.0201 qw(decode_json);
 use URI 1.25;
@@ -67,7 +67,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -144,9 +144,9 @@ context.
 
  $session->close;  # no-op
 
-This driver does not support persistent connections at present. All
-connections are closed automatically. There is no need for explicit
-calls to C<close> at this time.
+All resources opened by this driver are closed automatically once
+they are no longer required. Explicit calls to C<close()> are neither
+required nor useful.
 
 =head2 ServerInfo
 
@@ -187,15 +187,6 @@ Sessions support autocommit transactions while an explicit
 transaction is open. Since it is not clear to me if this is
 intended behaviour when the Bolt protocol is used, this feature
 is listed as experimental.
-
-=head1 BUGS
-
-The implementation of sessions in this driver is incomplete. In
-particular, some of the official drivers implement restrictions on
-the count of transactions that can be used per session and offer
-additional methods to manage transactions.
-
-See the F<TODO> document and Github for details.
 
 =head1 SECURITY CONSIDERATIONS
 

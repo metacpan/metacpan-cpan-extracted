@@ -1,11 +1,10 @@
-# $Id: 10-keyset.t 1716 2018-09-24 09:51:04Z willem $	-*-perl-*-
+# $Id: 10-keyset.t 1758 2019-10-14 13:17:11Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Digest::SHA'	=> 5.23,
 	'Net::DNS::SEC' => 1.01,
 	'MIME::Base64'	=> 2.13,
 	);
@@ -16,6 +15,9 @@ foreach my $package ( sort keys %prerequisite ) {
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
+
+plan skip_all => 'disabled RSA'
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_RSA') };
 
 plan tests => 29;
 
@@ -397,8 +399,8 @@ like( Net::DNS::SEC::Keyset->keyset_err, '/Multiple names/',	'Expected error mes
 
 
 eval { $keyset->writekeyset( File::Spec->rel2abs('nonexdir') ) };
-my $exception = $1 if $@ =~ /^(.+)\n/;
-ok( $exception ||= '', "unwritable file\t[$exception]" );
+my ($exception) = split /\n/, "$@\n";
+ok( $exception, "unwritable file\t[$exception]" );
 
 
 # 0.17 backward compatibility (exercise code for test coverage only)

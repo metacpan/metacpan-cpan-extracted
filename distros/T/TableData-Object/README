@@ -2,8 +2,8 @@ NAME
     TableData::Object - Manipulate data structure via table object
 
 VERSION
-    This document describes version 0.110 of TableData::Object (from Perl
-    distribution TableData-Object), released on 2019-01-16.
+    This document describes version 0.111 of TableData::Object (from Perl
+    distribution TableData-Object), released on 2019-09-15.
 
 FUNCTIONS
   table($data[ , $spec ]) => obj

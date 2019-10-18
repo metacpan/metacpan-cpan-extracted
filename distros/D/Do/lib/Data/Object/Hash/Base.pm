@@ -10,7 +10,7 @@ use Scalar::Util ();
 
 use parent 'Data::Object::Base';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # BUILD
 
@@ -111,7 +111,7 @@ instance.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

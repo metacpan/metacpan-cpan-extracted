@@ -1,7 +1,7 @@
 package TableData::Object::aohos;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,6 +45,11 @@ sub new {
 sub row_count {
     my $self = shift;
     scalar @{ $self->{data} };
+}
+
+sub rows {
+    my $self = shift;
+    $self->{data};
 }
 
 sub rows_as_aoaos {
@@ -269,7 +274,7 @@ TableData::Object::aohos - Manipulate array of hashes-of-scalars via table objec
 
 =head1 VERSION
 
-This document describes version 0.110 of TableData::Object::aohos (from Perl distribution TableData-Object), released on 2019-01-16.
+This document describes version 0.111 of TableData::Object::aohos (from Perl distribution TableData-Object), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

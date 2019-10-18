@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -27,6 +27,7 @@ use Quiq::Parameters;
 use File::Find ();
 use Quiq::TempDir;
 use Cwd ();
+use Quiq::Time;
 use Quiq::Process;
 
 # -----------------------------------------------------------------------------
@@ -2447,6 +2448,53 @@ sub mtime {
 
 # -----------------------------------------------------------------------------
 
+=head3 mtimePaths() - Setze mtime inkrementierend
+
+=head4 Synopsis
+
+  $this->mtimePaths(\@paths,$startTime,$step);
+
+=head4 Arguments
+
+=over 4
+
+=item @path
+
+Die Pfade, die zu nummerieren sind.
+
+=item $startTime
+
+Startzeitpunkt im Format "YYYY-MM-DD HH:MM:SS".
+
+=item $step
+
+Schrittweite in Sekunden.
+
+=back
+
+=head4 Example
+
+  $ perl -MQuiq::Path -E '$p = Quiq::Path->new; $p->mtimePaths([$p->glob("*.jpg")],"2019-10-08 20:00:00",60)'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub mtimePaths {
+    my ($this,$pathA,$startTime,$step) = splice @_,0,4;
+
+    my $mtime = Quiq::Time->new(ymdhms=>$startTime)->epoch;
+
+    for my $path (@$pathA) {
+         $this->mtime($path,$mtime);
+         $mtime += $step;
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 newer() - Vergleiche Modifikationsdatum zweier Pfade
 
 =head4 Synopsis
@@ -3069,7 +3117,7 @@ sub uid {
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

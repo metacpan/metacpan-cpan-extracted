@@ -8,6 +8,7 @@ on 'test', sub {
   requires 'Test::Warn', '0';
   requires 'Test::Exception', '0';
   requires 'XML::XPath', '1.13';
+  requires 'XML::LibXML', '0';
   requires 'Pod::Simple::HTML', '>=3.23';
   requires 'Test::Pod' , '0';
 };

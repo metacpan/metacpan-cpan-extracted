@@ -1,0 +1,32 @@
+---
+abstract: 'some utility routines for scripts'
+author:
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
+build_requires:
+  Cwd: '0'
+  Test::Most: '0'
+  perl: v5.10.0
+  strict: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unix-ScriptUtil
+provides:
+  Unix::ScriptUtil:
+    file: lib/Unix/ScriptUtil.pm
+    version: '0.02'
+requires:
+  Carp: '0'
+  POSIX: '0'
+  perl: v5.10.0
+  strict: '0'
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Unix-ScriptUtil
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

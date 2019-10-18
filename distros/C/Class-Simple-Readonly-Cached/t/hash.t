@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 41;
+use Test::Most tests => 38;
 use Test::NoWarnings;
 use CHI;
 
@@ -14,13 +14,9 @@ HASH: {
 	my $cache = {};
 	my $cached = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => x->new() ]);
 
-	ok($cached->calls() == 0);
 	ok($cached->barney('betty') eq 'betty');
-	ok($cached->calls() == 1);
 	ok($cached->barney() eq 'betty');
-	ok($cached->calls() == 1);
 	ok($cached->barney() eq 'betty');
-	ok($cached->calls() == 1);
 	my @abc = $cached->abc();
 	ok(scalar(@abc) == 3);
 	ok($abc[0] eq 'a');
@@ -81,6 +77,18 @@ HASH: {
 	# foreach my $key(sort keys %{$cache}) {
 		# diag($key);
 	# }
+
+	# diag(Data::Dumper->new([$cached->state()])->Dump());
+	my $misses = $cached->state()->{'misses'};
+	my $fail;
+	while(my($k, $v) = each %{$misses}) {
+		if($v != 1) {
+			$fail = $k;
+			last;
+		}
+	}
+	ok(!defined($fail));
+	diag($fail) if($fail);
 }
 
 package x;
@@ -90,14 +98,13 @@ sub new {
 
 	my $class = ref($proto) || $proto;
 
-	return bless { calls => 0 }, $class;
+	return bless { }, $class;
 }
 
 sub barney {
 	my $self = shift;
 	my $param = shift;
 
-	$self->{'calls'}++;
 	return 'betty';
 }
 
@@ -124,12 +131,6 @@ sub echo {
 	}
 
 	return $_[0];
-}
-
-sub calls {
-	my $self = shift;
-
-	return $self->{'calls'};
 }
 
 1;

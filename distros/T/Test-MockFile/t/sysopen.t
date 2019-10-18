@@ -79,6 +79,10 @@ is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" ) or 
     is( seek( $fh, 49, 0 ), 1, "Seek to near EOF" );
     is( sysread( $fh, $buf, 4 ), 2, "Read 2 into buf since we're at EOF" );
     is( $buf, "yz", "Buffer is clear" );
+
+    ok( seek( $fh, 0, 0 ), 0, "Seek to start of file returns true" );
+    is( sysseek( $fh, 0, 0 ), "0 but true", "sysseek to start of file returns '0 but true' to make it so." );
+    ok( sysseek( $fh, 0, 0 ), "sysseek to start of file returns true when checked with ok()" );
 }
 
 {
@@ -110,9 +114,14 @@ is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" ) or 
     is( $buf, "cc\0\0\0\0GHI", "Buffer has null bytes in the middle of it." );
 
     $buf = "d" x 5;
-    is( seek( $fh, 49, 0 ), 1, "Seek to near EOF" );
+    is( seek( $fh, 49, 0 ), 49, "Seek to near EOF" );
     is( sysread( $fh, $buf, 4 ), 2, "Read 2 into buf since we're at EOF" );
     is( $buf, "yz", "Buffer is clear" );
+
+    ok( seek( $fh, 0, 0 ), 0, "Seek to start of file returns true" );
+    is( sysseek( $fh, 0, 0 ), "0 but true", "sysseek to start of file returns '0 but true' to make it so." );
+    ok( sysseek( $fh, 0, 0 ), "sysseek to start of file returns true when checked with ok()" );
+
     close $fh;
     undef $bar;
 }

@@ -12,6 +12,7 @@ build_requires:
   Test::Simple: '1.001003'
   Test::Warn: '0'
   Test::Warnings: '0'
+  XML::LibXML: '0'
   XML::XPath: '1.13'
 configure_requires:
   Module::Build: '0.28'
@@ -54,7 +55,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MARC/issues
   homepage: https://github.com/LibreCat/Catmandu-MARC
   repository: https://github.com/LibreCat/Catmandu-MARC.git
-version: '1.253'
+version: '1.254'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

@@ -4,13 +4,13 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "ack",
    "no_index" : {
@@ -64,11 +64,9 @@
          "https://www.perlfoundation.org/artistic-license-20.html"
       ],
       "repository" : {
-         "type" : "git",
          "url" : "git://github.com/beyondgrep/ack3.git"
       },
       "x_MailingList" : "https://groups.google.com/group/ack-users"
    },
-   "version" : "v3.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v3.1.2"
 }

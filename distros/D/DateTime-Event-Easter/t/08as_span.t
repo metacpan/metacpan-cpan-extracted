@@ -28,9 +28,12 @@
 #
 use strict;
 
-use Test::More tests => 8;
+use Test::More;
 
+use DateTime::Calendar::Julian;
 use DateTime::Event::Easter qw/easter/;
+
+plan(tests => 18);
 
 my $post_easter_2003 = DateTime->new(
         year  => 2003,
@@ -86,3 +89,14 @@ $event_easter_sunday->as_span();
 $span_easter_sunday = $event_easter_sunday->previous($span_easter_sunday);
 ok( ! $span_easter_sunday->isa("DateTime"),       "Result is no longer a DateTime object");
 ok(   $span_easter_sunday->isa("DateTime::Span"), "Result is again a span");
+
+my $western_easter = DateTime::Event::Easter->new(easter => 'western', as => 'span');
+for (8, 10) {
+  my $jd = DateTime::Calendar::Julian->new(year => 2019, month => 4, day => $_);
+  my $span = $western_easter->closest($jd);
+  ok( $span       ->isa("DateTime::Span")            , "Result is a span");
+  ok( $span->start->isa("DateTime::Calendar::Julian"), "Result is a span of Julian datetimes");
+  ok( $span->end  ->isa("DateTime::Calendar::Julian"), "Result is a span of Julian datetimes");
+  is( $span->start, "2019-04-08J00:00:00", "Resultat starts on 8 April (Julian)");
+  is( $span->end  , "2019-04-09J00:00:00", "Resultat ends   on 9 April (Julian)");
+}

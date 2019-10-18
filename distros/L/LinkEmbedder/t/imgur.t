@@ -6,7 +6,7 @@ plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 
 my $embedder = LinkEmbedder->new;
 my $link;
-$embedder->get_p('https://imgur.com/2lXFJK0')->then(sub { $link = shift })->wait;
+$embedder->get_p('https://imgur.com/w3cmS')->then(sub { $link = shift })->wait; # exists since Jan 2, 2011
 isa_ok($link, 'LinkEmbedder::Link::Imgur');
 is_deeply $link->TO_JSON,
   {
@@ -16,11 +16,11 @@ is_deeply $link->TO_JSON,
   provider_name    => 'Imgur',
   provider_url     => 'https://imgur.com',
   thumbnail_height => 315,
-  thumbnail_url    => 'https://i.imgur.com/2lXFJK0.png?fb',
+  thumbnail_url    => 'https://i.imgur.com/w3cmS.png?fb',
   thumbnail_width  => 600,
-  title            => 'Yay Mojo!',
+  title            => 'Attempt to sit still until cat decides to move.  via  #reddit',
   type             => 'photo',
-  url              => 'https://i.imgur.com/2lXFJK0.png',
+  url              => 'https://i.imgur.com/w3cmS.png',
   version          => '1.0',
   width            => 0,
   },
@@ -32,7 +32,7 @@ done_testing;
 sub photo_html {
   return <<'HERE';
 <div class="le-photo le-provider-imgur">
-  <img src="https://i.imgur.com/2lXFJK0.png" alt="Yay Mojo!">
+  <img src="https://i.imgur.com/w3cmS.png" alt="Attempt to sit still until cat decides to move.  via  #reddit">
 </div>
 HERE
 }

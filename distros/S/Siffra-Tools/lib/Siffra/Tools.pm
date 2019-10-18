@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.18';
+    $VERSION = '0.19';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -569,6 +569,18 @@ sub validaHeader()
 
     return ( $originalHeaderString eq $headerString ) ? TRUE : FALSE;
 } ## end sub validaHeader
+
+=head2 C<validaArCorreios()>
+=cut
+
+sub validaArCorreios()
+{
+    $log->debug( "validaArCorreios", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+    my $arCorreios = $parameters{ ar };
+
+    return ( $arCorreios =~ /^([a-zA-Z]{2})(\d{9})([a-zA-Z]{2})$/ ) ? TRUE : FALSE;
+} ## end sub validaArCorreios
 
 =head2 C<trim()>
 =cut

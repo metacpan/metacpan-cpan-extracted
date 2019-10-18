@@ -1,4 +1,4 @@
-# AWS::ECS::TaskDefinition generated from spec 5.3.0
+# AWS::ECS::TaskDefinition generated from spec 6.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition',
@@ -62,7 +62,51 @@ package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::TmpfsValue {
   
   has ContainerPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has MountOptions => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Size => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Size => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SecretValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SecretValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ValueFrom => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::KernelCapabilities',
@@ -220,12 +264,12 @@ package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::UlimitValue {
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SoftLimit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
-subtype 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+subtype 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControl',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
 message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
 
-coerce 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+coerce 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControl',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
@@ -238,31 +282,31 @@ coerce 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
    via {
      Cfn::Value::Array->new(Value => [
        map { 
-         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret')->coerce($_)
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControl')->coerce($_)
        } @$_
      ]);
    };
 
-subtype 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+subtype 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControl',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret',
+coerce 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControl',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SecretValue->new( %$_ );
+       return Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControlValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SecretValue {
+package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControlValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has ValueFrom => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Namespace => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Value => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::ResourceRequirement',
      as 'Cfn::Value',
@@ -440,6 +484,7 @@ package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::LogConfigurationVal
   
   has LogDriver => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Options => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SecretOptions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::LinuxParameters',
@@ -837,6 +882,7 @@ package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::ContainerDefinition
   has HealthCheck => (isa => 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::HealthCheck', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Hostname => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Image => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Interactive => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Links => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LinuxParameters => (isa => 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::LinuxParameters', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LogConfiguration => (isa => 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::LogConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
@@ -846,12 +892,14 @@ package Cfn::Resource::Properties::AWS::ECS::TaskDefinition::ContainerDefinition
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PortMappings => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::PortMapping', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Privileged => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has PseudoTerminal => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ReadonlyRootFilesystem => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RepositoryCredentials => (isa => 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::RepositoryCredentials', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ResourceRequirements => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::ResourceRequirement', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Secrets => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Secret', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has StartTimeout => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has StopTimeout => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SystemControls => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::SystemControl', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Ulimits => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::Ulimit', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has User => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has VolumesFrom => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::VolumeFrom', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
@@ -867,8 +915,10 @@ package Cfn::Resource::Properties::AWS::ECS::TaskDefinition {
   has Cpu => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ExecutionRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Family => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has IpcMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Memory => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has NetworkMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has PidMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PlacementConstraints => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::TaskDefinition::TaskDefinitionPlacementConstraint', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ProxyConfiguration => (isa => 'Cfn::Resource::Properties::AWS::ECS::TaskDefinition::ProxyConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has RequiresCompatibilities => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

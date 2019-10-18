@@ -1,0 +1,12 @@
+0.04
+  - Prepare distribution to be released to CPAN.
+
+0.03
+  - ListBlobs: For convenience, enable auto-retrieval of paginated results. When the call parameter 'auto_retrieve_paginated_results' is set to 1, the client will automatically perform additional requests under the hood and return the complete list of blobs.
+
+0.02
+  - Add 'DeleteBlob' API call.
+  - Remove warning on Signer service, related to the concatenation of an uninitialized string (empty headers).
+
+0.01
+  - Initial release.

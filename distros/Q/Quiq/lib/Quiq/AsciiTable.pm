@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 use Quiq::Unindent;
 use Quiq::FileHandle;
@@ -66,8 +66,7 @@ sind die Werte weder eindeutig links noch rechts ausgerichtet.
 
 Der Tabellen-Kopf, also die Titel, können mehrzeilig sein:
 
-  Right Left
-
+    Right Left
   Aligned Aligned Centered
   ------- ------- --------
         1 A          A
@@ -85,8 +84,7 @@ Die Titel sind optional, können also auch fehlen:
 
 Die Kolumnenwerte können mehrzeilig sein:
 
-  Right   Left
-
+    Right   Left
   Aligned   Aligned          Centered
   -------   --------------   --------
         1   This is             A
@@ -104,8 +102,7 @@ Zeile 2). Die Trennzeile kann eine einfache Leerzeile sein oder
 Bindestriche enthalten wie die Trennzeile zwischen Tabellen-Kopf
 und -Körper:
 
-  Right   Left
-
+    Right   Left
   Aligned   Aligned          Centered
   -------   --------------   --------
         1   This is             A
@@ -417,8 +414,7 @@ Linksbündig (left aligned).
 
 Tabelle:
 
-  Right Left    Centered
-
+    Right Left    Centered
   Aligned Aligned  Header
   ------- ------- --------
         1 A          A
@@ -466,8 +462,7 @@ Liefere 1, wenn die Tabelle eine MultiLine-Tabelle ist, andernfalls 0.
 
 Tabelle:
 
-  Right Left    Centered
-
+    Right Left    Centered
   Aligned Aligned  Header
   ------- ------- --------
         1 Erste       A
@@ -499,8 +494,7 @@ Liste.
 
 Tabelle:
 
-  Right Left    Centered
-
+    Right Left    Centered
   Aligned Aligned  Header
   ------- ------- --------
         1 A          A
@@ -541,8 +535,7 @@ auf die Liste.
 
 Tabelle:
 
-  Right Left    Centered
-
+    Right Left    Centered
   Aligned Aligned  Header
   ------- ------- --------
         1 A          A
@@ -584,8 +577,7 @@ Liefere die Anzahl der Kolumnen der Tabelle.
 
 Tabelle:
 
-  Right Left    Centered
-
+    Right Left    Centered
   Aligned Aligned  Header
   ------- ------- --------
         1 A          A
@@ -626,7 +618,7 @@ sub asText {
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

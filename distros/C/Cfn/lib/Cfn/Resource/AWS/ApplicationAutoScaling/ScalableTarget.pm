@@ -1,4 +1,4 @@
-# AWS::ApplicationAutoScaling::ScalableTarget generated from spec 5.3.0
+# AWS::ApplicationAutoScaling::ScalableTarget generated from spec 6.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget',
@@ -40,6 +40,29 @@ package Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::
   
   has MaxCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::SuspendedState',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::SuspendedState',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::SuspendedStateValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::SuspendedStateValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DynamicScalingInSuspended => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DynamicScalingOutSuspended => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ScheduledScalingSuspended => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::ScheduledAction',
      as 'Cfn::Value',
@@ -101,6 +124,7 @@ package Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget {
   has ScalableDimension => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ScheduledActions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::ScheduledAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServiceNamespace => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SuspendedState => (isa => 'Cfn::Resource::Properties::AWS::ApplicationAutoScaling::ScalableTarget::SuspendedState', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

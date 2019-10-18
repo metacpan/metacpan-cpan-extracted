@@ -7,7 +7,7 @@ use warnings;
 
 use Moo::Role;
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # BUILD
 
@@ -98,7 +98,7 @@ object. Calling this method without arguments returns all stashed data.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

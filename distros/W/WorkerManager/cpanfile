@@ -1,7 +1,7 @@
 requires 'DBI';
 requires 'File::Pid';
 requires 'Module::Load';
-requires 'Parallel::ForkManager';
+requires 'Parallel::ForkManager', '2.02';
 requires 'Proc::Daemon';
 requires 'TheSchwartz';
 requires 'TheSchwartz::Simple';

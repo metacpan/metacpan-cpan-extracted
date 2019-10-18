@@ -3,45 +3,44 @@ abstract: 'A grep-like program for searching source code'
 author:
   - 'Andy Lester <andy@petdance.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: ack
 no_index:
   directory:
     - t
     - inc
 requires:
-  Cwd: '3.00'
-  File::Basename: '1.00015'
-  File::Next: '1.18'
-  File::Spec: '3.00'
-  File::Temp: '0.19'
-  Getopt::Long: '2.39'
-  List::Util: '0'
-  Pod::Perldoc: '3.20'
-  Pod::Text: '0'
-  Pod::Usage: '1.26'
-  Scalar::Util: '0'
-  Term::ANSIColor: '1.10'
-  Test::Harness: '2.50'
-  Test::More: '0.98'
-  Text::ParseWords: '3.1'
-  if: '0'
-  parent: '0'
-  perl: '5.010001'
-  version: '0'
+  Cwd: 3.00
+  File::Basename: 1.00015
+  File::Next: 1.18
+  File::Spec: 3.00
+  File::Temp: 0.19
+  Getopt::Long: 2.39
+  List::Util: 0
+  Pod::Perldoc: 3.20
+  Pod::Text: 0
+  Pod::Usage: 1.26
+  Scalar::Util: 0
+  Term::ANSIColor: 1.10
+  Test::Harness: 2.50
+  Test::More: 0.98
+  Text::ParseWords: 3.1
+  if: 0
+  parent: 0
+  perl: 5.010001
+  version: 0
 resources:
-  MailingList: https://groups.google.com/group/ack-users
   bugtracker: https://github.com/beyondgrep/ack3
   homepage: https://beyondgrep.com/
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.1.1
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  x_MailingList: https://groups.google.com/group/ack-users
+version: v3.1.2

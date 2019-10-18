@@ -192,7 +192,7 @@ on-demand, or on-construction. See the L<Moo> documentation for more details.
 
   new => 1
 
-The C<new> directive, if truthy, denotes the the attribute will be constructed
+The C<new> directive, if truthy, denotes that the attribute will be constructed
 on-demand, i.e. is lazy, with a builder named C<new_{attribute}>. This ability
 is not supported by the L<Moo> object superclass.
 
@@ -226,6 +226,18 @@ return the attribute's value. See the L<Moo> documentation for more details.
 
 The C<trigger> directive expects a coderef and is executed whenever the
 attribute's value is changed. See the L<Moo> documentation for more details.
+
++=item use
+
+  # lazy dependency injection
+
+  use => ['service', 'datetime']
+
+The C<use> directive denotes that the attribute will be constructed
+on-demand, i.e. is lazy, using a custom builder meant to perform service
+construction. This directive exists to provide a simple dependency injection
+mechanism for class attributes. This ability is not supported by the L<Moo>
+object superclass.
 
 +=item wkr|weak_ref
 

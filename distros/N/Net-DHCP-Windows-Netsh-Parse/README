@@ -1,0 +1,60 @@
+Net-DHCP-Windows-Netsh-Parse
+
+Parses the output from 'netsh dhcp server dump'
+
+    use Net::DHCP::Windows::Netsh::Parse;
+
+    my $parser=Net::DHCP::Windows::Netsh::Parse->new;
+    
+    eval{
+        $parser->parse( $dump );
+    };
+    if ( $@ ){
+        print "It failed with... ".$@."\n";
+    }
+    
+    # no white space
+    my $json=$parser->json(0);
+    
+    # now with useful white space
+    $json=$parser->json(0);
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::DHCP::Windows::Netsh::Parse
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-DHCP-Windows-Netsh-Parse
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-DHCP-Windows-Netsh-Parse
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Net-DHCP-Windows-Netsh-Parse
+
+    Search CPAN
+        https://metacpan.org/release/Net-DHCP-Windows-Netsh-Parse
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

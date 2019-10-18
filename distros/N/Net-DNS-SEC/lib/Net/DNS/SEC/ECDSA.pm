@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
 #
-# $Id: ECDSA.pm 1732 2019-02-15 13:31:34Z willem $
+# $Id: ECDSA.pm 1758 2019-10-14 13:17:11Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1732 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1758 $)[1];
 
 
 =head1 NAME
@@ -55,6 +55,8 @@ my %parameters = (
 	13 => [415, 32, sub { Net::DNS::SEC::libcrypto::EVP_sha256() }],
 	14 => [715, 48, sub { Net::DNS::SEC::libcrypto::EVP_sha384() }],
 	);
+
+sub _index { keys %parameters }
 
 
 sub sign {

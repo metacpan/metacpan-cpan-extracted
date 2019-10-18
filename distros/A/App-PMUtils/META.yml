@@ -42,7 +42,7 @@ requires:
   File::Which: '0'
   HTTP::Tiny: '0.057'
   IO::Prompt::I18N: '0'
-  IPC::System::Options: '0.331'
+  IPC::System::Options: '0.332'
   JSON::MaybeXS: '0'
   Log::ger: '0.027'
   Module::CoreList: '0'
@@ -52,7 +52,7 @@ requires:
   Module::Path::More: '0.32'
   Module::XSOrPP: '0.08'
   PERLANCAR::AppUtil::PerlStripper: '0.03'
-  PERLANCAR::Module::List: '0.004002'
+  PERLANCAR::Module::List: '0.004004'
   Perinci::CmdLine::Any: '0.13'
   Perinci::CmdLine::Lite: '1.820'
   Perinci::Sub::Util: '0.46'
@@ -73,7 +73,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils
   homepage: https://metacpan.org/release/App-PMUtils
   repository: git://github.com/perlancar/perl-App-PMUtils.git
-version: '0.726'
+version: '0.727'
 x_Dist_Zilla:
   perl:
     version: '5.028002'
@@ -81,6 +81,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertBlock
       name: InsertBlock
+      version: '0.09'
+    -
+      class: Dist::Zilla::Plugin::InsertExample
+      name: InsertExample
       version: '0.09'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

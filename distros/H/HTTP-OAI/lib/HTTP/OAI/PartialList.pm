@@ -4,7 +4,7 @@ package HTTP::OAI::PartialList;
 
 use strict;
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 sub resumptionToken { shift->_elem('resumptionToken',@_) }
 

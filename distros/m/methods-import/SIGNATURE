@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 0e88667def712c5372b96da8508450bdbe71edf17b526ca0c818dc5418630053 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 041d0ce9fa40a54c69006efc2ff74f022049582baa3642a5df8a0e5911df9baa Changes
+SHA256 439c09b3cece8a1db4964406460ba1ce6091ff53a7d6dea8da76de4f68de9cfc INSTALL
+SHA256 5c791221f0dde289392a38a5921b66d4a1be8248cc64ee6de15f3c2426892673 LICENSE
+SHA256 344e78af2cc2cb7c94e7b24110283a93c263bb2e4b0459643af10ab2abcf3a6d MANIFEST
+SHA256 caff3eca56f723df82b62ea4a07b5a351435a016ec56313195f37e97b9b0cff5 META.json
+SHA256 7dd5bc7a01c0aa5f81beed4b94a3d34a2b32bc6f79b78b6aec43369ab02a03d0 META.yml
+SHA256 6b8bdf94453b463655e0aaa446d31182248b9992ac7c6f8198efd9893eaafcfc Makefile.PL
+SHA256 902983383b3cd2905afb0315a015668e54aa9a2c2334010c081238f858ca4c7d README
+SHA256 e7d0c0cfa57a38f2bc9e89fc0c2a27117c8cbd8e565fef640975fbec9f9aa475 dist.ini
+SHA256 416b7aab43267a1a617e20f642c8763e973fc00d2421e44b39a621fd32c83360 doap.ttl
+SHA256 8bd6893b5e5aba34dab797138b388057f20821ba05a487391211ce59d0cd3303 lib/methods/import.pm
+SHA256 ce43ba0b84656251e5fcf4cae436de952a4e9b51d87f3ccd8e69bf9bd8e837e9 t/01basic.t
+SHA256 9d91b45a3d21f757ee39968715700c79d32023f4e47f4ee62169af023e1368cd t/02using.t
+SHA256 806cd4806c9fdb7d0e733283b14858650e9a484d1d4d859dfd1fe9cf97245e98 t/03using1.t
+SHA256 3a5151972fb0ed88fce7c5a9c9a1942b63324a51d2b408b47518cfafb7907279 t/04prototypes.t
+SHA256 bac2ffc3245f8c93531d3f123e87f7270e75e0ee0ad396cc9e3af577909a707a t/05keep.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCXaXiWQAKCRDOv4Eoaip9
+OcdVAJwJcnKor2sqvGzB2kxaopGPKEMXpACfXSZde6NM1aGqfx4h+TQ5gVH/bfc=
+=W9ta
+-----END PGP SIGNATURE-----

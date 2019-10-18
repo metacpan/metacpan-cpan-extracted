@@ -10,7 +10,7 @@ use Moo;
 with 'Data::Object::Role::Proxyable';
 with 'Data::Object::Role::Stashable';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 has named => (
   is => 'ro'
@@ -277,7 +277,7 @@ The stashed method returns the stashed data associated with the object.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

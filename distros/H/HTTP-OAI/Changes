@@ -1,5 +1,8 @@
 Revision history for HTTP-OAI
 
+4.10  2019-10-16 16:18:38 CEST
+  - Support 429 Too Many Requests (RFC6585)
+
 4.09  2019-08-22 10:39:03 CEST
   - Fixing set option in script/oai_pmh.pl [stain]
   

@@ -18,8 +18,17 @@ Class::Accessor::Typed - Class::Accessor::Lite with Type
         wo => {
             hoge => 'Int',
         },
+        rw_lazy => {
+            foo_lazy => 'Str',
+        }
+        ro_lazy => {
+            bar_lazy => { isa => 'Int', builder => 'bar_lazy_builder' },
+        }
         new => 1,
     );
+
+    sub _build_foo_lazy  { 'string' }
+    sub bar_lazy_builder { 'string' }
 
 # DESCRIPTION
 
@@ -53,9 +62,18 @@ Setting of property is defined by hash reference that specifies property name as
 
     create a write-only accessor.
 
+- rw\_lazy => \\%name\_and\_option\_of\_the\_properties
+
+    create a read / write lazy accessor.
+
+- ro\_lazy => \\%name\_and\_option\_of\_the\_properties
+
+    create a read-only lazy accessor.
+
 ## PROPERTY RULE
 
-Property rule can receive string of type name (e.g. `Int`) or hash reference (with `isa`/`does` and `default`).
+Property rule can receive string of type name (e.g. `Int`) or hash reference (with `isa`/`does`, `default` and `builder`).
+`default` can only use on `rw`, `ro` and `wo`, and `builder` can only use on `rw_lazy` and `ro_lazy`.
 
 # SEE ALSO
 

@@ -1,7 +1,7 @@
 package TableData::Object::Base;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010;
 use strict;
@@ -223,7 +223,7 @@ TableData::Object::Base - Base class for TableData::Object::*
 
 =head1 VERSION
 
-This document describes version 0.110 of TableData::Object::Base (from Perl distribution TableData-Object), released on 2019-01-16.
+This document describes version 0.111 of TableData::Object::Base (from Perl distribution TableData-Object), released on 2019-09-15.
 
 =head1 METHODS
 
@@ -280,17 +280,28 @@ unknown.
 
 See also: C<col_name()>.
 
+=head2 $td->rows() => array
+
+Return rows as array(ref). Each element (row) can either be a scalar (in the
+case of hash or aos table data) or aos (in the case of aoaos table data) or hos
+(in the case of aohos table data).
+
+This is appropriate if you only want the rows and do not care about the fom of
+the row, for example if you want to output some of the rows or shuffle them.
+
+See also: C<rows_as_aoaos()> and C<rows_as_aohos()>.
+
 =head2 $td->rows_as_aoaos() => aoaos
 
 Return rows as array of array-of-scalars.
 
-See also: C<rows_as_aohos()>.
+See also: C<rows()> and C<rows_as_aohos()>.
 
 =head2 $td->rows_as_aohos() => aohos
 
 Return rows as array of hash-of-scalars.
 
-See also: C<rows_as_aoaos()>.
+See also: C<rows()> and C<rows_as_aoaos()>.
 
 =head2 $td->select_as_aoaos([ \@cols[ , $func_filter_row[ , \@sorts] ] ]) => aoaos
 

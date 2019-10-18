@@ -1,16 +1,20 @@
-#!perl -T
+#!perl
 
 use utf8;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 
 BEGIN {
 	use_ok('Date::Holidays::BY');
 }
 
-isnt($Date::Holidays::BY::HOLIDAYS_VALID_SINCE, '', 'declared vars');
-isnt($Date::Holidays::BY::INACCURATE_TIMES_SINCE, '', 'declared vars');
-isnt($Date::Holidays::BY::strict, '', 'declared vars');
+isnt($Date::Holidays::BY::HOLIDAYS_VALID_SINCE, undef, 'declared vars');
+isnt($Date::Holidays::BY::INACCURATE_TIMES_SINCE, undef, 'declared vars');
+is($Date::Holidays::BY::strict, 0, 'declared vars');
+
+$Date::Holidays::BY::strict=1;
+is($Date::Holidays::BY::strict, 1, 'change of declared vars');
+$Date::Holidays::BY::strict=0;
 
 dies_ok { Date::Holidays::BY::is_holiday( 1989, 1, 1 ) }, 'prehistoric time';
 ok { Date::Holidays::BY::is_holiday( 2017, 1, 1 ) }, 'valid';

@@ -52,8 +52,8 @@ WriteMakefile(
        dynamic_config => 0,
        provides       => {
            'DateTime::Event::Easter' => {
-                file => 'lib/DateTime/Event/Easter.pm',
-                version => '1.07',
+                file => 'lib/DateTime/Event/Easter.pm'
+              , version => '1.08'
            },
        },
        'meta-spec' => { version => 2 },

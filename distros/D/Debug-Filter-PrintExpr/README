@@ -1,0 +1,33 @@
+Debug::Filter::PrintExpr
+
+This module provides a perl filter that turns specially formed
+comments into print statements for debugging purposes.
+It is similar to Smart::Comments.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Debug::Filter::PrintExpr
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2019 Jörg Sommrey
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

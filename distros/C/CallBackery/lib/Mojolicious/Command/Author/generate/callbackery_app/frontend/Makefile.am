@@ -2,25 +2,27 @@
 
 AUTOMAKE_OPTIONS=foreign
 
-EXTRA_DIST = config.json Manifest.json source/index.html \
-	$(shell find source/class source/resource source/translation -type d \( -name ".??*" -o -name "build" \) -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print )
+EXTRA_DIST = $(shell find . -type d \( -name ".??*" -o -name "complied" -o -name "node_modules" \) -prune -o -not -name ".*" -a -not -name "*~" -a -not -name "*.tmp"  -a -type f -print )
 
 if BUILD_QOOXDOO_APP
 
-CALLBACKERY_PATH := $(shell PERL5LIB=../lib:$(PERL5LIB):../thirdparty/lib/perl5 $(PERL) -e 'use File::Basename;use Cwd qw(realpath); eval { require CallBackery }; print !$$@ ? realpath(dirname($$INC{q{CallBackery/Config.pm}}).q{/qooxdoo}) : "CALLBACKERY_NOT_FOUND" ' )
+all-local: build
 
-GENTARGETS := lint pretty migration translation api source-all source-hybrid source
+node_modules:
+	$(NPM) i
 
-.PHONY: $(GENTARGETS)
+source: node_modules
+	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --feedback=false --erase
 
-$(GENTARGETS): $(shell find source/class/ $(CALLBACKERY_PATH) -type f) config.json
-	$(QOOXDOO_PATH)/tool/bin/generator.py -m QOOXDOO_PATH:$(QOOXDOO_PATH) -m CALLBACKERY_PATH:$(CALLBACKERY_PATH) -m CACHE:./cache $@
+source-watch: node_modules
+	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --watch --feedback=false --erase
 
-all-local: source
+build: node_modules ../public/versions.json
+
+clean: node_modules
+	$(NPX) qx clean
+
+../public/versions.json: $(EXTRA_DIST)
+	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --target=build --feedback=false --erase
 
 endif
-
-# clean-local:
-deepclean:
-	test -d ./cache && rm -r ./cache || true
-	test -f source/script/$(QX_CLASS).js && rm source/script/* || true

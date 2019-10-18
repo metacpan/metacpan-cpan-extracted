@@ -4,12 +4,17 @@ use warnings;
 
 use Config qw/%Config/;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use Importer Importer => 'import';
 our @EXPORT_OK = qw/term_size USE_GCS USE_TERM_READKEY USE_TERM_SIZE_ANY uni_length/;
 
 sub DEFAULT_SIZE() { 80 }
+
+my $IO;
+BEGIN {
+    open($IO, '>&', STDOUT) or die "Could not clone STDOUT";
+}
 
 sub try(&) {
     my $code = shift;
@@ -23,7 +28,7 @@ my ($tsa) = try { require Term::Size::Any; Term::Size::Any->import('chars') };
 my ($trk) = try { require Term::ReadKey };
 $trk &&= Term::ReadKey->can('GetTerminalSize');
 
-if (!-t *STDOUT) {
+if (!-t $IO) {
     *USE_TERM_READKEY  = sub() { 0 };
     *USE_TERM_SIZE_ANY = sub() { 0 };
     *term_size         = sub {
@@ -35,7 +40,7 @@ elsif ($tsa) {
     *USE_TERM_READKEY  = sub() { 0 };
     *USE_TERM_SIZE_ANY = sub() { 1 };
     *_term_size        = sub {
-        my $size = chars(\*STDOUT);
+        my $size = chars($IO);
         return DEFAULT_SIZE if !$size;
         return DEFAULT_SIZE if $size < DEFAULT_SIZE;
         return $size;
@@ -50,7 +55,7 @@ elsif ($trk) {
             my @warnings;
             {
                 local $SIG{__WARN__} = sub { push @warnings => @_ };
-                ($total) = Term::ReadKey::GetTerminalSize(*STDOUT);
+                ($total) = Term::ReadKey::GetTerminalSize($IO);
             }
             @warnings = grep { $_ !~ m/Unable to get Terminal Size/ } @warnings;
             warn @warnings if @warnings;

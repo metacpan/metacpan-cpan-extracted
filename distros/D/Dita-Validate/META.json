@@ -1,5 +1,5 @@
 {
-   "abstract" : "In situ validation of XML parse trees representing OASIS DITA documents.",
+   "abstract" : "Validate one level of a DITA document.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -23,10 +23,11 @@
          "requires" : {
             "Acme::Tools" : "0",
             "Carp" : "0",
-            "Data::DFA" : "20181027",
+            "Data::DFA" : "20180429",
             "Data::Dump" : "0",
-            "Data::Edit::Xml" : "20181027",
-            "Data::Table::Text" : "20181026",
+            "Data::Edit::Xml" : "20190925",
+            "Data::NFA" : "20181027",
+            "Data::Table::Text" : "20190919",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -37,10 +38,7 @@
    "provides" : {
       "Dita::Validate" : {
          "file" : "lib/Dita/Validate.pm",
-         "version" : "20181027"
-      },
-      "Dita::Validate::Result" : {
-         "file" : "lib/Dita/Validate.pm"
+         "version" : "20191016"
       }
    },
    "release_status" : "stable",
@@ -49,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20181027",
+   "version" : "20191016",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

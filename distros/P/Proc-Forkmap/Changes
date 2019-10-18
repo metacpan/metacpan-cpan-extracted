@@ -6,3 +6,9 @@ Revision history for Proc-Forkmap
 0.2     2019-10-12
         New flag to set conditional blocking
 
+0.2005  2019-10-14
+        New functional interface
+
+0.2007  2019-10-16
+        Timeouts
+

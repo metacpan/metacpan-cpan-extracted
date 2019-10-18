@@ -8,6 +8,7 @@ plan skip_all => 'set TEST_ONLINE to enable this test' unless $ENV{TEST_ONLINE};
 
 use Minion;
 use Mojo::IOLoop;
+use BSON::OID;
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
@@ -52,7 +53,7 @@ is $job->info->{state}, 'active', 'job is still active';
 ok !!$minion->backend->list_workers(0, 1, {ids => [$id]})->{workers}[0],
   'is registered';
 $minion->backend->workers->update_one(
-    { _id => $id },
+    { _id => $minion->backend->_oid($id) },
     { '$set' => {
         notified => DateTime->now->add(seconds => - $minion->missing_after - 1)
     } }
@@ -82,10 +83,10 @@ my $id3 = $minion->enqueue('test');
 $worker->dequeue(0)->perform for 1 .. 3;
 
 my $finished = $minion->backend->jobs->find_one(
-    {_id => $id2}
+    {_id => $minion->backend->_oid($id2)}
 )->{finished};
 $minion->backend->jobs->update_one(
-    {_id => $id2},
+    {_id => $minion->backend->_oid($id2)},
     {'$set' => {
         'finished' => $finished->as_datetime->add(
             seconds => -$minion->remove_after-1)
@@ -93,10 +94,10 @@ $minion->backend->jobs->update_one(
 );
 
 $finished = $minion->backend->jobs->find_one(
-    {_id => $id3}
+    {_id => $minion->backend->_oid($id3)}
 )->{finished};
 $minion->backend->jobs->update_one(
-    {_id => $id3},
+    {_id => $minion->backend->_oid($id3)},
     {'$set' => {
         'finished' => $finished->as_datetime->add(
             seconds => -$minion->remove_after-1)
@@ -486,7 +487,7 @@ is $worker->register->dequeue(0), undef, 'too early for job';
 $job = $minion->job($id);
 ok $job->info->{delayed} > $job->info->{created}, 'delayed timestamp';
 $minion->backend->jobs->update_one(
-    {_id => $id},
+    {_id => $minion->backend->_oid($id)},
     {'$set' => {
         delayed => DateTime->now->add(seconds => -1)
     }}
@@ -657,7 +658,7 @@ $job = $worker->register->dequeue(0);
 $job->perform;
 is $job->info->{state}, 'finished', 'right state';
 ok $job->note(yada => ['works']), 'added metadata';
-ok !$minion->backend->note(-1, {yada => ['failed']}), 'not added metadata';
+ok !$minion->backend->note(undef, {yada => ['failed']}), 'not added metadata';
 my $notes = {
   foo  => [4, 5, 6],
   bar  => {baz => [1, 2, 3]},
@@ -666,8 +667,10 @@ my $notes = {
 };
 is_deeply $job->info->{notes}, $notes, 'right metadata';
 is_deeply $job->info->{result}, [{23 => 'testtesttest'}], 'right structure';
+ok !$job->note(), 'do nothing';
+ok $job->note(foo => 5, baz => undef), 'changes and removed metadata';
 ok $job->note(yada => undef, bar => undef), 'removed metadata';
-$notes = {foo => [4, 5, 6], baz => 'yada'};
+$notes = {foo => 5};
 is_deeply $job->info->{notes}, $notes, 'right metadata';
 $worker->unregister;
 
@@ -706,7 +709,7 @@ is $info->{state},    'inactive',                 'right state';
 is $info->{result},   'Non-zero exit status (1)', 'right result';
 ok $info->{retried} < $job->info->{delayed}, 'delayed timestamp';
 $minion->backend->jobs->update_one(
-    {_id => $id},
+    {_id => $minion->backend->_oid($id)},
     {'$set' => {delayed => DateTime->now}}
 );
 $job = $worker->register->dequeue(0);
@@ -740,7 +743,7 @@ is $job->info->{state},  'inactive',         'right state';
 is $job->info->{result}, 'Worker went away', 'right result';
 ok $job->info->{retried} < $job->info->{delayed}, 'delayed timestamp';
 $minion->backend->jobs->update_one(
-    {_id => $id},
+    {_id => $minion->backend->_oid($id)},
     {'$set' => {delayed => DateTime->now}}
 );
 $job = $worker->register->dequeue(0);
@@ -867,18 +870,19 @@ is $minion->repair->stats->{finished_jobs}, 2, 'two finished jobs';
 ok $job->finish, 'job finished';
 is $minion->stats->{finished_jobs}, 3, 'three finished jobs';
 is $minion->repair->stats->{finished_jobs}, 0, 'no finished jobs';
-$id = $minion->enqueue(test => [] => {parents => [-1]});
+my $fake_hex = '00000000000000000000000';
+$id = $minion->enqueue(test => [] => {parents => ["${fake_hex}1"]});
 $job = $worker->dequeue(0);
 is $job->id, $id, 'right id';
 ok $job->finish, 'job finished';
-$id = $minion->enqueue(test => [] => {parents => [-1]});
+$id = $minion->enqueue(test => [] => {parents => ["${fake_hex}1"]});
 $job = $worker->dequeue(0);
 is $job->id, $id, 'right id';
-is_deeply $job->info->{parents}, [-1], 'right parents';
-$job->retry({parents => [-1, -2]});
+is_deeply $job->info->{parents}, ["${fake_hex}1"], 'right parents';
+$job->retry({parents => ["${fake_hex}1", "${fake_hex}2"]});
 $job = $worker->dequeue(0);
 is $job->id, $id, 'right id';
-is_deeply $job->info->{parents}, [-1, -2], 'right parents';
+is_deeply $job->info->{parents}, ["${fake_hex}1", "${fake_hex}2"], 'right parents';
 ok $job->finish, 'job finished';
 $worker->unregister;
 

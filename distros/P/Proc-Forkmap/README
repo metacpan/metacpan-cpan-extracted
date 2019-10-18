@@ -1,21 +1,38 @@
 Proc-Forkmap
 
-This module supplies an easy to use map method that provides built-in forking and IPC.
+This module provides mapping with built-in forking.
 
 EXAMPLE:
 
-    use Proc::Forkmap;
-    
-    sub foo {
-        my $x = shift;
-        my $t = sprintf("%1.0f", $x + 1);
-        sleep $t;
-        print "slept $t seconds\n";
-    }
-    
-    my @x = (rand(), rand(), rand());
-    my $p = Proc::Forkmap->new;
-    $p->fmap(\&foo, @x);
+  use Proc::Forkmap qw(forkmap);
+
+  $Proc::Forkmap::MAX_PROC = 4;
+
+  sub foo {
+    my $n = shift;
+    sleep($n);
+    print "slept for $n seconds\n";
+  }
+
+  my @x = (1, 2, 3);
+
+  map { foo($_) } @x;  # serial
+  forkmap { foo($_) } @x;  # parallel, just like that
+
+  # Or OO interface, if you like that sort of thing
+
+  use Proc::Forkmap;
+
+  sub foo {
+    my $x = shift;
+    my $t = sprintf("%1.0f", $x + 1);
+    sleep $t;
+    print "slept $t seconds\n";
+  }
+
+  my @x = (rand(), rand(), rand());
+  my $p = Proc::Forkmap->new;
+  $p->fmap(\&foo, @x);
 
 INSTALLATION
 

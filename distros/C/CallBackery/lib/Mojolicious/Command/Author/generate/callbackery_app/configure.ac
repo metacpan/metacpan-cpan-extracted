@@ -9,6 +9,7 @@ MJ_CLASS=<%= $p->{class} %>
 MJ_SCRIPT=<%= $p->{name} %>
 QX_CLASS=<%= $p->{qxclass} %>
 
+
 AC_SUBST(MJ_CLASS)
 AC_SUBST(MJ_SCRIPT)
 AC_SUBST(QX_CLASS)
@@ -25,6 +26,13 @@ AC_ARG_VAR(PERL,   [Path to local perl binary])
 AC_PATH_PROG(PERL, perl, no)
 AC_PATH_PROG(CURL, curl, no)
 AC_PATH_PROG(WGET, wget, no)
+AC_ARG_VAR(NODE,   [Path to local node binary])
+AC_PATH_PROG(NODE, node, no)
+AC_PATH_PROG(NPM, npm, no)
+AC_PATH_PROG(NPX, npx, no)
+AC_PATH_PROG(XGETTEXT, xgettext, no)
+AC_PATH_PROG(MSGMERGE, msgmerge, no)
+
 
 URL_CAT="neither curl nor wget found"
 
@@ -38,20 +46,42 @@ fi
 
 AC_SUBST(URL_CAT)
 
+ac_perl_version="5.22.0"
 
-ac_perl_version="5.10.1"
-
-if test "x$PERL" != "x"; then
+if test -x "$PERL"; then
   AC_MSG_CHECKING(for perl version greater than or equal to $ac_perl_version)
   $PERL -e "use $ac_perl_version;" >/dev/null 2>&1
   if test $? -ne 0; then
     AC_MSG_RESULT(no);
-    AC_MSG_ERROR(at least version 5.10.1 is required to run mojolicious)
+    AC_MSG_ERROR(at least version ${ac_perl_version} is required to run mojolicious)
   else
     AC_MSG_RESULT(ok);
   fi
 else
   AC_MSG_ERROR(could not find perl)
+fi
+
+ac_node_version="10"
+
+if test -x "$NODE"; then
+  AC_MSG_CHECKING(make sure we have at least node ${ac_node_version})
+  case `$NODE --version` in
+  v10*)
+    AC_MSG_RESULT(ok)
+    ;;
+  *)
+    AC_MSG_RESULT(no);
+    NODE=
+  esac
+fi
+
+AM_CONDITIONAL(BUILD_QOOXDOO_APP,[test -x $NODE])
+
+AC_PATH_PROG(OPENSSL, openssl, no)
+if  test -x "$OPENSSL"; then
+:
+else
+  AC_MSG_ERROR(could not find openssl binary)
 fi
 
 AC_MSG_CHECKING(is perl reasonably complete)
@@ -97,42 +127,27 @@ AC_ARG_ENABLE(pkgonly,
 AC_SUBST(enable_pkgonly)
 
 actual_prefix=$prefix
-if test x$actual_prefix = xNONE; then
+if test "$actual_prefix" = "NONE"; then
     actual_prefix=$ac_default_prefix
 fi
 
 AC_MSG_CHECKING([Checking Install Prefix])
-if test -f $actual_prefix/configure; then
+if test -f "$actual_prefix/configure"; then
     AC_MSG_ERROR([The install prefix must NOT point to the directory where you unpacked the source.])
 else
     AC_MSG_RESULT([install Prefix is fine])
 fi
 
+AC_ARG_VAR(CALLBACKERY_QX, [Alternate CallBackery/qooxdoo folder location])
+if test "$CALLBACKERY_QX" = ""; then
+    script_path=`readlink -f "$0"`
+    # Absolute path this script is in, thus /home/user/bin
+    CALLBACKERY_QX=`dirname "$script_path"`/thirdparty/lib/perl5/CallBackery/qooxdoo
+fi
+AC_SUBST(CALLBACKERY_QX)
 
 AC_ARG_VAR(PERL5LIB,   [Colon separated list of perl library directories])
 AC_SUBST(PERL5LIB)
-
-QOOXDOO_PATH=
-AC_ARG_WITH(qooxdoo-sdk-dir,AC_HELP_STRING([--with-qooxdoo-sdk-dir=DIR],[Where can we find the qooxdoo sdk (required to rebuild the web ui)]), [
-        if test -d $withval/framework; then
-             QOOXDOO_PATH=$withval
-        else
-        cat <<NOTES
-
-** Aborting Configure ******************************
-
-   You specified --with-qooxdoo-sdk-dir=DIR without pointing it
-   to a copy of the qooxdoo sdk.
-   Get your copy form www.qooxdoo.org.
-
-NOTES
-          exit 1
-        fi
-])
-
-AC_SUBST(QOOXDOO_PATH)
-
-AM_CONDITIONAL(BUILD_QOOXDOO_APP,[test x$QOOXDOO_PATH != x])
 
 AC_CONFIG_FILES([
     Makefile
@@ -147,21 +162,19 @@ AC_SUBST(VERSION)
 
 AC_OUTPUT
 
-if test x$QOOXDOO_PATH = x; then
-
+if test -z "$NODE"; then
 cat <<NOTES
 
 ** WARNING ***********************************************
 
-You did NOT specify --with-qooxdoo-sdk-dir.  It is therefore NOT
-possible to re-compile the JavaScript parts (web interface)
-of the application.
+To run the qooxdoo compiler, at least node v10 is required.
+Use nvm to setup your local, up to date copy of node.
+Go to https://github.com/nvm-sh/nvm for futher information
 
 NOTES
 fi
 
-
-if test x$mod_ok = x0; then
+if test "$mod_ok" = "0"; then
     cat <<NOTES
 
 ** SOME PERL MODULES ARE MISSING ******************************
@@ -170,6 +183,9 @@ If you know where perl can find the missing modules, set
 the PERL5LIB environment variable accordingly. Otherwise
 just proceed and the missing modules will be installed
 automatically.
+
+To force the system to download missing perl modules, you can
+do a `touch PERL_MODULES` before running `$GMAKE`
 NOTES
 
 fi

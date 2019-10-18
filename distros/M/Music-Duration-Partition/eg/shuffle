@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use List::Util qw/ shuffle /;
+use lib '/Users/gene/sandbox/MIDI-Drummer-Tiny/lib';
+use MIDI::Drummer::Tiny; # https://metacpan.org/pod/MIDI::Drummer::Tiny
+use lib '/Users/gene/sandbox/MIDI-Util/lib';
+use MIDI::Util; # https://metacpan.org/pod/MIDI::Util
+use Music::Duration::Partition;
+use Music::Scales;
+
+my $size = shift || 4;
+my $max  = shift || 8;
+my $bpm  = shift || 90;
+
+my $score = MIDI::Util::setup_score( bpm => $bpm );
+
+$score->synch(
+    \&melody,
+    \&beat,
+);
+
+$score->write_score("$0.mid");
+
+sub beat {
+    my $d = MIDI::Drummer::Tiny->new( bpm => $bpm, score => $score );
+
+    for my $n ( 0 .. $size * $max * 2 - 1 ) {
+        $d->note( $d->quarter, $d->closed_hh );
+    }
+}
+
+sub melody {
+    my $mdp = Music::Duration::Partition->new(
+        size => $size,
+#        pool => [qw/ qn en ddsn dsn ten sn tsn /],
+        pool => [qw/ qn en sn /],
+    );
+
+    my $motif = $mdp->motif;
+
+    my @scale = map { $_ . 5 } get_scale_notes( 'A', 'pminor' );
+    # Transform to MIDI accidentals
+    for ( @scale ) {
+        s/#/s/;
+        s/b/f/;
+    }
+
+    for my $i ( 1 .. $max ) {
+        my @notes = map { $scale[ int rand @scale ] } 0 .. @$motif - 1;
+
+        my @phrase = $i % 2 ? @$motif : shuffle @$motif;
+
+        for my $n ( 0 .. @notes - 1 ) {
+            $score->n( $phrase[$n], $notes[$n] );
+        }
+
+        $score->r('wn');
+    }
+}

@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1744 2019-04-29 08:47:46Z willem $"
+#define XS_Id "$Id: SEC.xs 1758 2019-10-14 13:17:11Z willem $"
 
 
 =head1 NAME
@@ -64,6 +64,10 @@ extern "C" {
 #define NO_DSA
 #endif
 
+#ifdef OPENSSL_NO_RSA
+#define NO_RSA
+#endif
+
 #ifdef OPENSSL_NO_EC
 #define NO_ECCGOST
 #define NO_ECDSA
@@ -71,18 +75,15 @@ extern "C" {
 #endif
 
 
-#ifndef OPENSSL_VERSION_NUMBER		/* 0xMNN00PPSL	backward compatible unto the end */
+#ifndef OPENSSL_VERSION_NUMBER		/* 0xMNN00PPSL	retain backward compatibility */
 #ifdef OPENSSL_VERSION_PRE_RELEASE
-#define _OPENSSL_VERSION_PRE_RELEASE 0x0L
-#else
-#define _OPENSSL_VERSION_PRE_RELEASE 0xfL
-#endif
 #define OPENSSL_VERSION_NUMBER  \
-	( (OPENSSL_VERSION_MAJOR<<28) | (OPENSSL_VERSION_MINOR<<20)  \
-	| (OPENSSL_VERSION_PATCH<<4)  | _OPENSSL_VERSION_PRE_RELEASE )
+	( (OPENSSL_VERSION_MAJOR<<28) | (OPENSSL_VERSION_MINOR<<20) | (OPENSSL_VERSION_PATCH<<4) | 0x0L )
+#else
+#define OPENSSL_VERSION_NUMBER  \
+	( (OPENSSL_VERSION_MAJOR<<28) | (OPENSSL_VERSION_MINOR<<20) | (OPENSSL_VERSION_PATCH<<4) | 0xfL )
 #endif
-
-#define LIBCRYPTO_VERSION OPENSSL_VERSION_NUMBER
+#endif
 
 
 #ifdef LIBRESSL_VERSION_NUMBER
@@ -91,26 +92,15 @@ extern "C" {
 #define OPENSSL_VERSION_NUMBER 0x10002000L
 #else
 #define OPENSSL_VERSION_NUMBER 0x10100000L
-#define BN_bn2binpad(a, to, tolen) BN_bn2bin(a, to)
 #endif
-#undef LIBCRYPTO_VERSION
-#define LIBCRYPTO_VERSION LIBRESSL_VERSION_NUMBER
-#endif
-
-
-#ifdef OPENSSL_IS_BORINGSSL
 #define NO_ECCGOST
 #endif
 
 
-#if (OPENSSL_VERSION_NUMBER < 0x30000000)
-#define EC_POINT_set_affine_coordinates	EC_POINT_set_affine_coordinates_GFp
-#endif
-
-
 #if (OPENSSL_VERSION_NUMBER < 0x10101000)
-#undef NO_EdDSA
 #define NO_EdDSA
+
+#define EC_POINT_set_affine_coordinates	EC_POINT_set_affine_coordinates_GFp
 
 int EVP_DigestSign(EVP_MD_CTX *ctx,
 		unsigned char *sig, size_t *sig_len,
@@ -131,21 +121,15 @@ int EVP_DigestVerify(EVP_MD_CTX *ctx,
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10100000)
-#undef NO_ECCGOST
 #define NO_ECCGOST
 
 #define EVP_MD_CTX_new()	EVP_MD_CTX_create()
 #define EVP_MD_CTX_free(ctx)	EVP_MD_CTX_destroy((ctx))
-#define EVP_MD_CTX_reset(ctx)	EVP_MD_CTX_init((ctx))
 
-#ifndef NO_DSA
 int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
 {
-	BN_free(d->p);
 	d->p = p;
-	BN_free(d->q);
 	d->q = q;
-	BN_free(d->g);
 	d->g = g;
 	return 1;
 }
@@ -153,27 +137,21 @@ int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
 int DSA_set0_key(DSA *d, BIGNUM *pub_key, BIGNUM *priv_key)
 {
 	d->priv_key = priv_key;
-	d->pub_key = pub_key;
+	d->pub_key  = pub_key;
 	return 1;
 }
-#endif
 
 int RSA_set0_key(RSA *r, BIGNUM *n, BIGNUM *e, BIGNUM *d)
 {
-	BN_free(r->n);
 	r->n = n;
-	BN_free(r->e);
 	r->e = e;
-	BN_free(r->d);
 	r->d = d;
 	return 1;
 }
 
 int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 {
-	BN_free(r->p);
 	r->p = p;
-	BN_free(r->q);
 	r->q = q;
 	return 1;
 }
@@ -183,7 +161,7 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 #if (OPENSSL_VERSION_NUMBER < 0x10001000)
 #define NO_ECDSA
 #error	unsupported libcrypto version
-void malfunction() { return LIBCRYPTO_VERSION; }
+#include OPENSSL_VERSION_TEXT /* in error log; by any means, however reprehensible! */
 #endif
 
 
@@ -204,6 +182,7 @@ int checkret(const int ret, int line)
 }
 
 #define checkerr(arg)	checkret( (arg), __LINE__ )
+#define nocheckerr(arg)	/* NOOP */
 
 
 MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
@@ -213,12 +192,9 @@ PROTOTYPES: ENABLE
 SV*
 VERSION(void)
     PREINIT:
-	char *v = XS_Id;;
-	SV *v_SV = newSVpv( v, 16 );
+	char *v = SvEND( newSVpv(XS_Id, 17) );
     CODE:
-	v = (char*) SvEND(v_SV);
-	v = v - 4;
-	RETVAL = newSVpvf( "%s %8.8x", v, (unsigned int) LIBCRYPTO_VERSION );
+	RETVAL = newSVpvf( "%s	%s", v-5, OPENSSL_VERSION_TEXT );
     OUTPUT:
 	RETVAL
 
@@ -245,18 +221,16 @@ EVP_PKEY_new()
 
 SV*
 EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
-    PREINIT:
+    INIT:
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-	unsigned char *m;
+	unsigned char *m = (unsigned char*) SvPVX(message);
 	unsigned char sigbuf[512];		/* RFC3110(2) */
-	STRLEN slen;
+	STRLEN mlen = SvCUR(message);
+	STRLEN slen = sizeof(sigbuf);
 	int r;
     CODE:
-	m = (unsigned char*) SvPVX(message);
-	EVP_MD_CTX_reset(ctx);
 	checkerr( EVP_DigestSignInit( ctx, NULL, md, NULL, pkey ) );
-	slen = sizeof(sigbuf);
-	r = EVP_DigestSign( ctx, sigbuf, &slen, m, SvCUR(message) );
+	r = EVP_DigestSign( ctx, sigbuf, &slen, m, mlen );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
 	checkerr(r);
@@ -266,16 +240,15 @@ EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
 
 int
 EVP_verify(SV *message, SV *signature, EVP_PKEY *pkey, const EVP_MD *md=NULL)
-    PREINIT:
+    INIT:
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-	unsigned char *m;
-	unsigned char *s;
+	unsigned char *m = (unsigned char*) SvPVX(message);
+	unsigned char *s = (unsigned char*) SvPVX(signature);
+	STRLEN mlen = SvCUR(message);
+	STRLEN slen = SvCUR(signature);
     CODE:
-	m = (unsigned char*) SvPVX(message);
-	s = (unsigned char*) SvPVX(signature);
-	EVP_MD_CTX_reset(ctx);
 	checkerr( EVP_DigestVerifyInit( ctx, NULL, md, NULL, pkey ) );
-	RETVAL = EVP_DigestVerify( ctx, s, SvCUR(signature), m, SvCUR(message) );
+	RETVAL = EVP_DigestVerify( ctx, s, slen, m, mlen );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
     OUTPUT:
@@ -298,26 +271,21 @@ DSA_new()
 
 int
 DSA_set0_pqg(DSA *d, SV *p_SV, SV *q_SV, SV *g_SV)
-    PREINIT:
-	BIGNUM *p;
-	BIGNUM *q;
-	BIGNUM *g;
+    INIT:
+	BIGNUM *p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
+	BIGNUM *q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
+	BIGNUM *g = BN_bin2bn( (unsigned char*) SvPVX(g_SV), SvCUR(g_SV), NULL );
     CODE:
-	p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
-	q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
-	g = BN_bin2bn( (unsigned char*) SvPVX(g_SV), SvCUR(g_SV), NULL );
 	RETVAL = checkerr( DSA_set0_pqg( d, p, q, g ) );
     OUTPUT:
 	RETVAL
 
 int
 DSA_set0_key(DSA *dsa, SV *y_SV, SV *x_SV)
-    PREINIT:
-	BIGNUM *x;
-	BIGNUM *y;
+    INIT:
+	BIGNUM *x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
+	BIGNUM *y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
     CODE:
-	x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
-	y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
 	RETVAL = checkerr( DSA_set0_key( dsa, y, x ) );
     OUTPUT:
 	RETVAL
@@ -326,6 +294,8 @@ DSA_set0_key(DSA *dsa, SV *y_SV, SV *x_SV)
 
 
 ####	RSA	####
+
+#ifndef NO_RSA
 
 int
 EVP_PKEY_assign_RSA(EVP_PKEY *pkey, RSA *key)
@@ -339,29 +309,26 @@ RSA_new()
 
 int
 RSA_set0_factors(RSA *r, SV *p_SV, SV *q_SV)
-    PREINIT:
-	BIGNUM *p;
-	BIGNUM *q;
+    INIT:
+	BIGNUM *p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
+	BIGNUM *q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
     CODE:
-	p = BN_bin2bn( (unsigned char*) SvPVX(p_SV), SvCUR(p_SV), NULL );
-	q = BN_bin2bn( (unsigned char*) SvPVX(q_SV), SvCUR(q_SV), NULL );
 	RETVAL = checkerr( RSA_set0_factors( r, p, q ) );
     OUTPUT:
 	RETVAL
 
 int
 RSA_set0_key(RSA *r, SV *n_SV, SV *e_SV, SV *d_SV)
-    PREINIT:
-	BIGNUM *d;
-	BIGNUM *e;
-	BIGNUM *n;
+    INIT:
+	BIGNUM *d = BN_bin2bn( (unsigned char*) SvPVX(d_SV), SvCUR(d_SV), NULL );
+	BIGNUM *e = BN_bin2bn( (unsigned char*) SvPVX(e_SV), SvCUR(e_SV), NULL );
+	BIGNUM *n = BN_bin2bn( (unsigned char*) SvPVX(n_SV), SvCUR(n_SV), NULL );
     CODE:
-	d = BN_bin2bn( (unsigned char*) SvPVX(d_SV), SvCUR(d_SV), NULL );
-	e = BN_bin2bn( (unsigned char*) SvPVX(e_SV), SvCUR(e_SV), NULL );
-	n = BN_bin2bn( (unsigned char*) SvPVX(n_SV), SvCUR(n_SV), NULL );
 	RETVAL = checkerr( RSA_set0_key( r, n, e, d ) );
     OUTPUT:
 	RETVAL
+
+#endif
 
 
 ####	ECDSA	####
@@ -381,10 +348,9 @@ EC_KEY_new_by_curve_name(int nid)
 
 int
 EC_KEY_set_private_key(EC_KEY *key, SV *prv_SV)
-    PREINIT:
-	BIGNUM *prv;
+    INIT:
+	BIGNUM *prv = BN_bin2bn( (unsigned char*) SvPVX(prv_SV), SvCUR(prv_SV), NULL );
     CODE:
-	prv = BN_bin2bn( (unsigned char*) SvPVX(prv_SV), SvCUR(prv_SV), NULL );
 	RETVAL = EC_KEY_set_private_key( key, prv );
 	BN_clear_free(prv);
 	checkerr(RETVAL);
@@ -393,12 +359,10 @@ EC_KEY_set_private_key(EC_KEY *key, SV *prv_SV)
 
 int
 EC_KEY_set_public_key_affine_coordinates(EC_KEY *key, SV *x_SV, SV *y_SV)
-    PREINIT:
-	BIGNUM *x;
-	BIGNUM *y;
+    INIT:
+	BIGNUM *x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
+	BIGNUM *y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
     CODE:
-	x = BN_bin2bn( (unsigned char*) SvPVX(x_SV), SvCUR(x_SV), NULL );
-	y = BN_bin2bn( (unsigned char*) SvPVX(y_SV), SvCUR(y_SV), NULL );
 	RETVAL = EC_KEY_set_public_key_affine_coordinates( key, x, y );
 	BN_free(x);
 	BN_free(y);
@@ -460,7 +424,7 @@ EC_KEY_new_ECCGOST()
 	BN_free(x);
 	BN_free(y);
 	BN_free(h);
-	checkerr( EC_GROUP_check(group, ctx) );
+	nocheckerr( EC_GROUP_check(group, ctx) );
 	BN_CTX_free(ctx);
 	RETVAL = EC_KEY_new();
 	checkerr( EC_KEY_set_group(RETVAL, group) );
@@ -470,39 +434,31 @@ EC_KEY_new_ECCGOST()
 
 int
 ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
-    PREINIT:
-	BIGNUM *alpha;
+    INIT:
+	STRLEN len = SvCUR(H);
+	unsigned char *bin = (unsigned char*) SvPVX(H);
+	BIGNUM *alpha = BN_bin2bn( bin, len, NULL );
+	BIGNUM *r = BN_bin2bn( (unsigned char*) SvPVX(r_SV), SvCUR(r_SV), NULL );
+	BIGNUM *s = BN_bin2bn( (unsigned char*) SvPVX(s_SV), SvCUR(s_SV), NULL );
+	const EC_GROUP *group = EC_KEY_get0_group(eckey);
+	BN_CTX *ctx = BN_CTX_new();
 	BIGNUM *e = BN_new();
 	BIGNUM *m = BN_new();
 	BIGNUM *q = BN_new();
-	BIGNUM *r;
-	BIGNUM *s;
-	BN_CTX *ctx = BN_CTX_new();
-	const EC_GROUP *group;
-	ECDSA_SIG *ecsig;
-	unsigned char *bin;
-	STRLEN len;
+	ECDSA_SIG *ecsig = ECDSA_SIG_new();
     CODE:
-	r = BN_bin2bn( (unsigned char*) SvPVX(r_SV), SvCUR(r_SV), NULL );
-	s = BN_bin2bn( (unsigned char*) SvPVX(s_SV), SvCUR(s_SV), NULL );
-	bin = (unsigned char*) SvPVX(H);
-	len = SvCUR(H);
-	alpha = BN_bin2bn( bin, len, NULL );
-
-	group = EC_KEY_get0_group(eckey);
 	checkerr( EC_GROUP_get_order(group, q, ctx) );
 	checkerr( BN_mod(e, alpha, q, ctx) );
+	if ( BN_is_zero(e) ) BN_set_word(e, 1);
 	BN_free(alpha);
 
 	/* algebraic transformation of ECC-GOST into equivalent ECDSA problem */
-	if ( BN_is_zero(e) ) BN_one(e);
 	checkerr( BN_mod_sub(m, q, s, q, ctx) );
 	checkerr( BN_mod_sub(s, q, e, q, ctx) );
 	BN_CTX_free(ctx);
 	BN_free(e);
 	BN_free(q);
 
-	ecsig = ECDSA_SIG_new();
 	checkerr( ECDSA_SIG_set0(ecsig, r, s) );
 
 	BN_bn2binpad(m, bin, len);

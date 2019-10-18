@@ -20,37 +20,51 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 8;
+use Test::More 0.96 tests => 13;
 use Test::Exception;
 use Test::Warnings qw(warnings :no_end_test);
 
 
-my ($q, $r, @a);
+my ($q, $r, @a, $a);
 
 
 subtest 'wantarray' => sub {
-	plan tests => 13;
+	plan tests => 15;
 	$q = <<END;
-RETURN 0 AS n UNION RETURN 1 AS n
+RETURN 7 AS n UNION RETURN 11 AS n
 END
-	lives_ok { @a = $s->run($q)->list; } 'get records as list';
-	lives_and { is $a[0]->get('n'), 0; } 'get record 0 in record list';
-	lives_and { is $a[1]->get('n'), 1; } 'get record 1 in record list';
 	lives_ok { @a = $s->run($q); } 'get result as list';
-	lives_and { is $a[0]->get('n'), 0; } 'get record 0 in result list';
-	lives_and { is $a[1]->get('n'), 1; } 'get record 1 in result list';
-	lives_ok { @a = $s->run($q)->keys; } 'get keys as list';
-	lives_and { is $a[0], 'n'; } 'get record 0 in keys list';
+	lives_and { is $a[0]->get('n'), 7; } 'get record 0 in result list';
+	lives_and { is $a[1]->get('n'), 11; } 'get record 1 in result list';
+	lives_ok { $a = $s->run($q)->keys; } 'get keys as array';
+	lives_and { is $a->[0], 'n'; } 'get record 0 in keys array';
 	
 	# notifications
-	my $t = $driver->session->begin_transaction;
-	$t->{return_stats} = 1;
-	lives_ok { @a = $t->run($q)->summary->notifications; } 'no notifications';
+	lives_ok { $a = 0;  $a = $s->run($q)->summary->notifications; } 'no notifications';
+	lives_and { is $a, undef; } 'no notifications array size';
 	$q = <<END;
 EXPLAIN MATCH (n), (m) RETURN n, m
 END
-	lives_ok { @a = $t->run($q)->summary->notifications; } 'get notifications';
-	lives_and { like $a[0]->{code}, qr/CartesianProduct/ } 'notification';
+	lives_ok { $a = 0;  $a = $s->run($q)->summary->notifications; } 'get notifications';
+	lives_and { is scalar @$a, 1; } 'get notifications array size';
+	
+	# type objects
+	my $tx = $driver->session->begin_transaction;
+	$tx->{return_stats} = 0;  # optimise sim
+	$q = <<END;
+CREATE p=(a:Test:Want:Array)-[:TEST]->(c)
+RETURN p, a
+END
+	lives_ok { $r = $tx->run($q)->single; } 'get type objects';
+	throws_ok {
+		 $a = $r->get('p')->nodes;
+	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path nodes as scalar';
+	throws_ok {
+		 $a = $r->get('p')->relationships;
+	} qr/\bscalar context\b.*\bnot supported\b/i, 'get path rels as scalar';
+	throws_ok {
+		 $a = $r->get('a')->labels;
+	} qr/\bscalar context\b.*\bnot supported\b/i, 'get node labels as scalar';
 	
 	# multiple statements; see below
 	$q = [
@@ -102,43 +116,108 @@ subtest 'die_on_error = 0' => sub {
 	# If this option is ever officially supported, one would expect
 	# it to also affect all croaks this driver issues by itself.
 	# The latter are not yet covered by these tests.
-	plan tests => 4;
+	plan tests => 3;
 	my $t = $driver->session->begin_transaction;
 	$t->{transport}->{die_on_error} = 0;
-	lives_and { is $t->run('RETURN 42')->single->get, 42 } 'no error';
+	lives_and { is $t->run('RETURN 42, "live on error"')->single->get(0), 42 } 'no error';
 	lives_and { warnings { is $t->run('iced manifolds.')->size, 0 } } 'cypher syntax error';
-	$t = $driver->session->begin_transaction;
-	$t->{transport}->{die_on_error} = 0;
-	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';
-	lives_and { warnings { is $t->run('RETURN 42')->size, 0 } } 'HTTP 404';
 	lives_ok { warnings {
-		my $d = Neo4j::Driver->new('http://none.invalid');
+		my $d = Neo4j::Test->driver_no_host;
 		$d->{die_on_error} = 0;
-		$d->session->begin_transaction->run;
+		$d->session->run;
 	} } 'no connection';
 };
 
 
-subtest 'nested transactions: explicit' => sub {
-	plan tests => 1;
+subtest 'result stream interface: attachment' => sub {
+	plan tests => 5;
+	$r = $s->run('RETURN 42');
+	my ($a, $c);
+	lives_ok { $a = $r->attached } 'is attached';
+	lives_ok { $c = $r->detach } 'detach';
+	is $c, ($a ? 1 : 0), 'one row detached';
+	lives_and { ok ! $r->attached } 'not attached';
+	lives_and { ok $r->has_next } 'not exhausted';
+};
+
+
+subtest 'result stream interface: discard result stream' => sub {
+	plan tests => 4;
+	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
+	my $c;
+	lives_ok { $c = $r->consume } 'consume()';
+	isa_ok $c, 'Neo4j::Driver::ResultSummary', 'summary from consume()';
+	lives_and { ok ! $r->has_next } 'no has next';
+	TODO: {
+		local $TODO = 'records are not yet cheaply discarded';
+		lives_and { ok ! $r->size } 'no size';
+	};
+};
+
+
+subtest 'result stream interface: look ahead' => sub {
+	plan tests => 10;
+	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
+	my ($peek, $v);
+	lives_ok { $peek = 0;  $peek = $r->peek } 'peek 1st';
+	lives_ok { $v = 0;  $v = $r->fetch } 'fetch 1st';
+	isa_ok $peek, 'Neo4j::Driver::Record', 'peek record 1st';
+	is $peek, $v, 'peek matches fetch 1st';
+	lives_ok { $peek = 0;  $peek = $r->peek } 'peek 2nd';
+	lives_ok { $v = 0;  $v = $r->fetch } 'fetch 2nd';
+	isa_ok $peek, 'Neo4j::Driver::Record', 'peek record 2nd';
+	is $peek, $v, 'peek matches fetch 2nd';
+	lives_and { ok ! $r->fetch } 'no fetch 3rd';
+	throws_ok { $r->peek } qr/\bexhausted\b/i, 'peek dies 3rd';
+};
+
+
+subtest 'nested transactions: explicit (REST)' => sub {
+	plan skip_all => '(currently testing Bolt)' if $Neo4j::Test::bolt;
+	plan tests => 4 if ! $Neo4j::Test::bolt;
 	my $session = $driver->session;
+	my ($t1, $t2);
 	lives_ok {
-		$session->begin_transaction;
-		$session->begin_transaction;
-	} 'explicit nested transactions';
+		$t1 = $session->begin_transaction;
+		$t1->run("CREATE (nested1:Test)");
+	} 'explicit nested transactions: 1st';
+	lives_ok {
+		$t2 = $session->begin_transaction;
+		$t2->run("CREATE (nested2:Test)");
+	} 'explicit nested transactions: 2nd';
+	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
+	lives_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
+};
+
+
+subtest 'nested transactions: explicit (Bolt)' => sub {
+	plan skip_all => '(currently testing HTTP)' if ! $Neo4j::Test::bolt;
+	plan tests => 4 if $Neo4j::Test::bolt;
+	my $session = $driver->session;
+	my ($t1, $t2);
+	lives_ok {
+		$t1 = $session->begin_transaction;
+		$t1->run("CREATE (nested1:Test)");
+	} 'explicit nested transactions: 1st';
+	throws_ok {
+		$t2 = $session->begin_transaction;
+		$t2->run("CREATE (nested2:Test)");
+	} qr/\bnested\b/i, 'explicit nested transactions: 2nd';
+	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
+	dies_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
 };
 
 
 subtest 'stats' => sub {
 	plan tests => 9;
 	my $t = $driver->session->begin_transaction;
-	$t->{return_stats} = 1;
-	lives_ok { $r = $t->run('RETURN 42'); } 'run stats query';
+	$t->{return_stats} = 0;
+	lives_ok { $r = $s->run('RETURN 42'); } 'run normal query';
 	# deprecation warnings are expected
 	lives_and { warnings { isa_ok $r->stats, 'Neo4j::Driver::SummaryCounters', 'stats' } };
 	lives_and { warnings { isa_ok $r->single->stats, 'Neo4j::Driver::SummaryCounters', 'single stats type' } };
 	lives_and { warnings { ok ! $r->single->stats->{contains_updates} } } 'single stats value';
-	lives_ok { $r = $s->run('RETURN 42'); } 'run normal query';
+	lives_ok { $r = $t->run('RETURN "no stats old syntax"'); } 'run no stats query';
 	lives_and { warnings { is ref $r->stats, 'HASH' } } 'no stats: type';
 	lives_and { warnings { is scalar keys %{$r->stats}, 0 } } 'no stats: none';
 	lives_and { warnings { is ref $r->single->stats, 'HASH' } } 'no single stats: type';
@@ -146,27 +225,46 @@ subtest 'stats' => sub {
 };
 
 
+subtest 'disable HTTP summary counters' => sub {
+	plan skip_all => '(Bolt always provides stats)' if $Neo4j::Test::bolt;
+	plan tests => 4 unless $Neo4j::Test::bolt;
+	throws_ok { $s->run()->summary; } qr/missing stats/i, 'missing statement - summary';
+	my $tx = $driver->session->begin_transaction;
+	$tx->{return_stats} = 0;
+	throws_ok {
+		$tx->run('RETURN "no stats 0"')->summary;
+	} qr/missing stats/i, 'no stats requested - summary';
+	throws_ok {
+		$tx->run('RETURN "no stats 1"')->single->summary;
+	} qr/missing stats/i, 'no stats requested - single summary';
+	lives_ok {
+		$tx->run('RETURN "no stats 2"')->single;
+	} 'no stats requested - single';
+};
+
+
 subtest 'get_bool' => sub {
 	plan tests => 4;
 	$q = <<END;
-RETURN false, true, 0, [42], 1, 'yes', '', [], {a:1}, {}, null
+RETURN 42, 0.5, 'yes', 0, '', true, false, null
 END
 	lives_ok { $r = $s->run($q)->list->[0]; } 'get property values';
 	# deprecation warnings are expected
-	warnings { is $r->get_bool(0), undef, 'get_bool false'; };
-	warnings { ok $r->get_bool(1), 'get_bool true'; };
-	warnings { is $r->get_bool(2), 0, 'get_bool 0'; };
+	warnings { is $r->get_bool(6), undef, 'get_bool false'; };
+	warnings { ok $r->get_bool(5), 'get_bool true'; };
+	warnings { is $r->get_bool(3), 0, 'get_bool 0'; };
 };
 
 
 subtest 'support for get_person in LOMS plugin' => sub {
-	plan tests => 5;
-	$r = $s->run('RETURN 42 AS value')->single;
-	lives_and { is $r->{column_keys}->count, 1 } 'ResultColumns count 1';
-	lives_ok { $r->{column_keys}->add('name'), 1 } 'ResultColumns add';
+	plan tests => 6;
+	$r = $s->run('RETURN 1 AS one, 2 AS two')->single;
 	lives_and { is $r->{column_keys}->count, 2 } 'ResultColumns count 2';
-	$r->{1} = 'Universal Answer';
-	lives_and { is $r->get('name'), $r->{name} } 'ResultColumns get';
+	lives_and { is $r->{column_keys}->add('three'), 2 } 'ResultColumns add';
+	lives_and { is $r->{column_keys}->count, 3 } 'ResultColumns count 3';
+	$r->{row}->[2] = 'Three!';
+	lives_and { is $r->get(2), 'Three!' } 'ResultColumns get col by index';
+	lives_and { is $r->get('three'), 'Three!' } 'ResultColumns get col by name';
 	throws_ok {
 		$s->run('')->_column_keys;
 	} qr/missing columns/i, 'result missing columns';
@@ -189,13 +287,13 @@ END
 	lives_ok { $n = $r->{graph}->{nodes}; } 'got nodes';
 	lives_ok { $e = $r->{graph}->{relationships}; } 'got rels';
 	lives_and {
-		ok grep {$_->{properties}->{name} eq $r->get('a')->{name}} @$n;
+		ok grep {$_->{properties}->{name} eq $r->get('a')->get('name')} @$n;
 	} 'node a found';
 	lives_and {
-		is $e->[0]->{properties}->{since}, $r->get('b')->{since};
+		is $e->[0]->{properties}->{since}, $r->get('b')->get('since');
 	} 'rel b found';
 	lives_and {
-		ok grep {$_->{properties}->{name} eq $r->get('c')->{name}} @$n;
+		ok grep {$_->{properties}->{name} eq $r->get('c')->get('name')} @$n;
 	} 'node c found';
 };
 

@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 use Test::More;
 eval "use Test::Pod 1.14";
 plan skip_all => "Test::Pod 1.14 required for testing POD" if $@;

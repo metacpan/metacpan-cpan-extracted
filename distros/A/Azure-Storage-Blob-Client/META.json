@@ -1,0 +1,70 @@
+{
+   "abstract" : "Azure Storage Blob API client",
+   "author" : [
+      "Oriol Soriano <oriol.soriano@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Azure-Storage-Blob-Client",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Tiny" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "Throwable::Error" : "0",
+            "XML::LibXML" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Prove::Watch" : "0",
+            "Test::Exception" : "0",
+            "Test::MockTime" : "0",
+            "Test::Spec::Acceptance" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ureesoriano/Azure-Storage-Blob-Client/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/ureesoriano/Azure-Storage-Blob-Client"
+      }
+   },
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

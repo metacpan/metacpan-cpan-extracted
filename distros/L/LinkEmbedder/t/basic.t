@@ -31,10 +31,11 @@ is_deeply $link->TO_JSON,
   cache_age     => 0,
   html          => thorsen_html(),
   provider_name => 'Thorsen',
-  title         => 'jhthorsen - blog',
+  title         => 'My blog - thorsen.pm',
   type          => 'rich',
   url           => 'http://thorsen.pm/blog/',
   provider_url  => 'http://thorsen.pm/',
+  thumbnail_url => 'https://www.thorsen.pm/editor/wp-content/uploads/2019/03/jhthorsen-face-1300.jpg',
   version       => '1.0'
   },
   'json for thorsen.pm';
@@ -89,10 +90,11 @@ HERE
 sub thorsen_html {
   return <<'HERE';
 <div class="le-card le-image-card le-rich le-provider-thorsen">
-    <a href="http://thorsen.pm/blog/" class="le-thumbnail-placeholder">
-      <img src="http://placehold.it/200x200?text=Thorsen" alt="Placeholder">
+    <a href="http://thorsen.pm/blog/" class="le-thumbnail">
+      <img src="https://www.thorsen.pm/editor/wp-content/uploads/2019/03/jhthorsen-face-1300.jpg" alt="Placeholder">
     </a>
-  <h3>jhthorsen - blog</h3>
+  <h3>My blog - thorsen.pm</h3>
+  <p class="le-description">All blog posts written by Jan Henning Thorsen.</p>
   <div class="le-meta">
     <span class="le-goto-link"><a href="http://thorsen.pm/blog/"><span>http://thorsen.pm/blog/</span></a></span>
   </div>

@@ -25,11 +25,12 @@ my %WriteMakefileArgs = (
     "URI" => "1.25"
   },
   "TEST_REQUIRES" => {
+    "File::Slurp" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cpanel::JSON::XS" => "3.0201",
+  "File::Slurp" => 0,
   "JSON::PP" => 0,
   "LWP::UserAgent" => 0,
   "REST::Client" => 134,

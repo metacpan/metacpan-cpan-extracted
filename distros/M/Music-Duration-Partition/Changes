@@ -1,0 +1,14 @@
+Revision history for Music-Duration-Partition
+
+0.0103 2019-10-17 10:47:16
+    - Add the eg/shuffle program.
+    - Clean up documentation.
+
+0.0102 2019-10-17 09:09:05
+    - Improve documentation.
+
+0.0101 2019-10-17 08:56:07
+    - Improve documentation.
+
+0.0100 2019-10-17 08:26:23
+    - Mint with Dist:Zilla.

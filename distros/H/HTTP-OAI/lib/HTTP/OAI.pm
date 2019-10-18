@@ -2,7 +2,7 @@ package HTTP::OAI;
 
 use strict;
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 use constant OAI_NS => 'http://www.openarchives.org/OAI/2.0/';
 
@@ -117,7 +117,7 @@ L<HTTP::OAI::Repository|HTTP::OAI::Repository>.
 =head1 SEE ALSO
 
 You can find links to this and other OAI tools (perl, C++, java) at:
-http://www.openarchives.org/tools/tools.html.
+http://www.openarchives.org/pmh/tools/.
 
 Ed Summers L<Net::OAI::Harvester> module.
 

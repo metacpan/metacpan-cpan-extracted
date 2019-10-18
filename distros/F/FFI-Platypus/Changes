@@ -1,5 +1,30 @@
 Revision history for FFI-Platypus
 
+0.98      2019-10-14 13:18:02 -0600
+  - Production release identical to 0.97_05
+
+0.97_05   2019-10-12 13:09:12 -0600
+  - Fixed several memory leaks on some return types and complex type
+    arguments (gh#190, gh#191)
+
+0.97_04   2019-10-05 12:31:32 -0600
+  - pointer is no longer an alias for opaque with api => 1 (gh#189)
+  - Added several reserved words for the type parser when api => 1 (gh#189)
+
+0.97_03   2019-09-25 18:03:13 -0600
+  - FFI::Platypus::Record has a record_layout_1 function which
+    uses api => 1 by default. (gh#187)
+
+0.97_02   2019-09-20 04:03:59 -0600
+  - FFI::Platypus::Record record_layout may now take FFI::Platypus
+    constructor arguments as a array reference as the first argument
+    (gh#185)
+
+0.97_01   2019-09-18 20:56:59 -0600
+  - Pre-compute cast functions when they are created to save time each time
+    they are called (gh#178, #179)
+  - sizeof and alignof can now be used as class methods (gh#183)
+
 0.96      2019-08-19 18:33:58 -0400
   - Production release identical to 0.95_11
 

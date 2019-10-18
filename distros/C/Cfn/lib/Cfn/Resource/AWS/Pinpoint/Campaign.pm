@@ -1,4 +1,4 @@
-# AWS::Pinpoint::Campaign generated from spec 3.4.0
+# AWS::Pinpoint::Campaign generated from spec 6.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::Pinpoint::Campaign {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'CampaignId' ]
+    [ 'Arn','CampaignId' ]
   }
   sub supported_regions {
     [ 'ap-south-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
@@ -397,6 +397,7 @@ package Cfn::Resource::Properties::AWS::Pinpoint::Campaign {
   has Schedule => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::Schedule', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SegmentId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SegmentVersion => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TreatmentDescription => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TreatmentName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }

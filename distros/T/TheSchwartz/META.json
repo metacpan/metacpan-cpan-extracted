@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Accessor::Fast" : "0",
             "Data::ObjectDriver" : "0.04",
             "Digest::MD5" : "0",
             "Storable" : "0",
@@ -57,7 +58,7 @@
    "provides" : {
       "TheSchwartz" : {
          "file" : "lib/TheSchwartz.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "TheSchwartz::Error" : {
          "file" : "lib/TheSchwartz/Error.pm"
@@ -89,13 +90,14 @@
          "web" : "https://github.com/akiym/TheSchwartz"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_authority" : "cpan:AKIYM",
    "x_contributors" : [
       "Akira Sawada <akira@peatix.com>",
       "Brad Fitzpatrick <brad@danga.com>",
       "Jeff Fearn <Jeff.Fearn@gmail.com>",
       "Jeff Fearn <jfearn@redhat.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Six Apart Ltd. <cpan@sixapart.com>",
       "Takumi Akiyama <t.akiym@gmail.com>"
    ],

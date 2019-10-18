@@ -29,8 +29,8 @@ has controller => '';
 sub _cgroup {
   path($_[0]->parent
     ?
-      path($_[0]->_vfs, $_[0]->controller, $_[0]->name, $_[0]->parent)
-    : path($_[0]->_vfs, $_[0]->controller, $_[0]->name));
+      path($_[0]->_vfs, $_[0]->controller // '', $_[0]->name // '', $_[0]->parent)
+    : path($_[0]->_vfs, $_[0]->controller // '', $_[0]->name // ''));
 }
 
 sub child {

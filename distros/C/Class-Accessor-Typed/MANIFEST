@@ -9,5 +9,6 @@ minil.toml
 t/00_compile.t
 t/01_base.t
 t/02_does.t
+t/03_lazy.t
 META.yml
 MANIFEST

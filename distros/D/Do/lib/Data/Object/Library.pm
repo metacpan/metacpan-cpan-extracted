@@ -13,7 +13,7 @@ use Type::Tiny ();
 use Type::Utils ();
 use Types::TypeTiny ();
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 Type::Utils::extends('Types::Standard');
 Type::Utils::extends('Types::TypeTiny');
@@ -2572,7 +2572,7 @@ can not be validated. The C<is_VarsObject> function can be used to return true
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

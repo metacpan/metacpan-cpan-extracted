@@ -14,6 +14,7 @@ lib/LinkEmbedder/Link/Google.pm
 lib/LinkEmbedder/Link/Imgur.pm
 lib/LinkEmbedder/Link/Ix.pm
 lib/LinkEmbedder/Link/Metacpan.pm
+lib/LinkEmbedder/Link/NHL.pm
 lib/LinkEmbedder/Link/oEmbed.pm
 lib/LinkEmbedder/Link/OpenSUSE.pm
 lib/LinkEmbedder/Link/Pastebin.pm
@@ -40,6 +41,7 @@ t/ix.t
 t/link.t
 t/metacpan.t
 t/mojopaste.t
+t/nhl.t
 t/opensuse.t
 t/pastebin.t
 t/perlbot.t

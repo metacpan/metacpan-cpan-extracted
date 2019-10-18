@@ -20,15 +20,17 @@ BEGIN {
 # see also:
 # https://github.com/majensen/rest-neo4p/pull/19/commits/227b94048a1d0277f1d5700c6934ba26fe7bfc1e
 
-use Test::More 0.96 tests => 5 + 1;
+use Test::More 0.96 tests => 7 + 1;
 use Test::Exception;
 my $transaction = $driver->session->begin_transaction;
+$transaction->{return_stats} = 0;  # optimise sim
 
 
 my ($r);
 
 
 sub to_hex ($) {
+	return unless defined $_[0];
 	join ' ', map { sprintf "%02x", ord $_ } split m//, shift;
 }
 
@@ -42,7 +44,13 @@ my %props = (
 	mixed      => "%äĀ한😀ô",  # 0x25c3a4c480ed959cf09f98806fcc82
 );
 my @keys = sort keys %props;
-my (@id, $mixed_r, $props_r);
+my (@id, $smp_r, $mixed_r, $node);
+
+
+lives_ok {
+	$smp_r = $driver->session->run('RETURN {smp}', smp => $props{smp})->list->[0]->get(0);
+} 'get smp';
+is to_hex $smp_r, to_hex $props{smp}, 'smp';
 
 
 # store test data
@@ -70,17 +78,18 @@ subtest 'read single property' => sub {
 
 
 subtest 'read full property list' => sub {
-	plan tests => 2 + @keys;
+	plan tests => 3 + @keys;
 	# This strategy depends on the implementation detail that Neo4j
 	# returns exactly the property map in JSON when a node is requested.
 	lives_ok {
 		$r = $transaction->run('MATCH (n) WHERE id(n) = {id} RETURN n', @id);
 	} 'read props';
 	lives_ok {
-		$props_r = $r->list->[0]->get(0);
-	} 'get props_r';
+		$node = $r->list->[0]->get(0);
+	} 'get node';
+	is ref $node, 'Neo4j::Driver::Type::Node', '$node is blessed node';
 	foreach my $key (@keys) {
-		is to_hex $props_r->{$key}, to_hex $props{$key}, "props_r: $key";
+		is to_hex $node->get($key), to_hex $props{$key}, "prop: $key";
 	}
 };
 

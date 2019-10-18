@@ -1,3 +1,4 @@
+use lib 'lib';
 use Mojo::Base -strict;
 use Test::More;
 use LinkEmbedder;
@@ -15,6 +16,7 @@ is_deeply $link->TO_JSON,
   html          => photo_html(),
   provider_name => 'Xkcd',
   provider_url  => 'http://xkcd.com',
+  thumbnail_url => 'https://imgs.xkcd.com/comics/',
   title         => 'Standards',
   type          => 'photo',
   url           => '//imgs.xkcd.com/comics/standards.png',

@@ -7,7 +7,7 @@ use warnings;
 
 use Moo::Role;
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # METHODS
 
@@ -241,7 +241,7 @@ Output stringified object data with newline.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

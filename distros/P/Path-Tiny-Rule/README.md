@@ -4,13 +4,13 @@ Path::Tiny::Rule - Path::Iterator::Rule subclass that returns Path::Tiny objects
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
     use Path::Tiny::Rule;
 
-    my $iter = Path::Tiny::Rule->new->name(qr/\.t$/)->in('t');
+    my $iter = Path::Tiny::Rule->new->name(qr/\.t$/)->iter('t');
 
     while ( my $test_file = $iter->() ) {
         print $test_file->basename, "\n";
@@ -23,7 +23,7 @@ returns [Path::Tiny](https://metacpan.org/pod/Path::Tiny) objects instead of str
 drop-in replacement for [Path::Iterator::Rule](https://metacpan.org/pod/Path::Iterator::Rule), and any deviation from that
 is a bug.
 
-This module has no public API that is not provided [Path::Iterator::Rule](https://metacpan.org/pod/Path::Iterator::Rule).
+This module has no public API that is not provided by [Path::Iterator::Rule](https://metacpan.org/pod/Path::Iterator::Rule).
 
 It exists because I got really tired of writing this:
 
@@ -65,7 +65,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2017 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

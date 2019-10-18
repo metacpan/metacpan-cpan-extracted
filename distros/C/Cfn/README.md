@@ -439,7 +439,7 @@ properties of a CloudFormation resource are well formed.
 
 # Cfn::Resource
 
-Represents a CloudFormation Resource. All `Cfn::Resource::*` objects (like [Cfn::Resource::AWS::IAM::User](https://metacpan.org/pod/Cfn::Resource::AWS::IAM::User))
+Represents a CloudFormation Resource. All `Cfn::Resource::*` objects (like [Cfn::Resource::AWS::IAM::User](https://metacpan.org/pod/Cfn%3A%3AResource%3A%3AAWS%3A%3AIAM%3A%3AUser))
 use `Cfn::Resource` as a base class.
 
 ## Attributes for Cfn::Resource objects
@@ -522,7 +522,7 @@ for transforming to JSON.
 
 A base class for the objects that the `Properties` attribute of `Cfn::Resource`s hold.
 Subclasses of `Cfn::Resource::Properties` are used to validate and represent the properties
-of resources inside the object model. See [Cfn::Resource::Properties::AWS::IAM::User](https://metacpan.org/pod/Cfn::Resource::Properties::AWS::IAM::User) for 
+of resources inside the object model. See [Cfn::Resource::Properties::AWS::IAM::User](https://metacpan.org/pod/Cfn%3A%3AResource%3A%3AProperties%3A%3AAWS%3A%3AIAM%3A%3AUser) for 
 an example.
 
 Each subclass of `Cfn::Resource::Properties` has to have attributes to hold the values of 

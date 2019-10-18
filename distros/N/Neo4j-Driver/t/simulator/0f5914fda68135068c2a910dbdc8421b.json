@@ -1,0 +1,1 @@
+{"results":[],"errors":[{"code":"Neo.ClientError.Statement.SyntaxError","message":"Invalid input 'N': expected <init> (line 1, column 1 (offset: 0))\n\"Neo4j::Test=SCALAR(0x7f9c4014c550)\"\n ^"}]}

@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 93377fa613c783e0aab763c5a24396014b445d7a0a78b83cf1437acae45029a2 Build.PL
+SHA256 238dbe17c5382fffea10da32a99caf1a7663859ae26d93d09623c9ad24dc4354 Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 277b5425b8f27f0eb586cbaa08d2193004a33f8781cf50fde657ff3ffc975aaf MANIFEST
+SHA256 5d847339245b6d9cae82439eb58fc2b10969619133d72dff959bd975a0f3da10 META.json
+SHA256 69660ba474fc560b20cdd6d67ad915f55e951e840b38e9bdb28c20dca17b1478 META.yml
+SHA256 79a31e42fcc5d8aa5e7f2d5b070b7ea07114316c272b537f141556a6e433545f README
+SHA256 1ad9d9e38df696b0e7599ddadc144ef26a49dcbd911e96336eefdcbfd478bbf2 lib/Unix/ScriptUtil.pm
+SHA256 164af4371f51c62a1caaa8bcc14020f0e756ae7825c759321254aee035aa4878 t/00-load.t
+SHA256 b9e4c19b2286fcb5e1987635d1a07955c42305bd1a9ddd3c233c78c6af06a612 t/ScriptUtil.t
+SHA256 0bc87a42d1a13c1a686e4c6d9324be0dcbd42831be2b0a907194f56c6026774b t/pod-coverage.t
+SHA256 d0972c349443a4f0230a4fbba1317af939f3c35a28562a54e37a2925ceb17517 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJdpj6RAAoJEIGZLuHhLAOFZgoH/RXAiOuqj//VhWmsnc5WJZGl
+G+j3oWYU4//bc5GX/gyjAW+nMESgKGVbTNfEcfPFBO8G+w2ZK7aSsR+OTD7Yx6xu
+LaVoLJ3F9ijN3HUdjx8d77AI2rHDvhPDUFeRsaq1fJ1VGL+6P9c/xl7NwZP2y005
+Ntj6XCdTsGM+EChPyJRjPGM/Iy4V7FL53nPdDiUbQqzQe7/h2Q/9EKwjhxNRHiJt
+V2xtF/yDtsn8H45t0oynJub/SnDBbZAp5S7LXl8Yq0dR9m+tjhTx5QcIeSO9T6jB
+tkKxOwFDzUWw8Ey9NtVkZVy7tAAZwHYorHpYf20f4lKGmLppXoJK+kzDlsUi330=
+=21RG
+-----END PGP SIGNATURE-----

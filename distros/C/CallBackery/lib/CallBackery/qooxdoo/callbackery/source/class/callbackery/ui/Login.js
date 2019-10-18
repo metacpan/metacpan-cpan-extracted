@@ -21,6 +21,7 @@ qx.Class.define("callbackery.ui.Login", {
 
     construct : function() {
         this.base(arguments, this.tr("Login"));
+        this.__iframe = this.__ensureIframe();
         // some browsers will be so nice to save the
         // content of the form elements if they appear inside a form AND
         // the form has a name (firefox comes to mind).
@@ -65,17 +66,17 @@ qx.Class.define("callbackery.ui.Login", {
             });
         }
 
-	if (! cfg.hide_password) {
+        if (! cfg.hide_password) {
             this.add(new qx.ui.basic.Image("icon/64/status/dialog-password.png").set({
-		alignY : 'top',
-		alignX : 'right'
+                alignY : 'top',
+                alignX : 'right'
             }),
             {
-		row     : 2,
-		column  : 0,
-		rowSpan : 2
+                row     : 2,
+                column  : 0,
+                rowSpan : 2
             });
-	}
+        }
 
         this.add(new qx.ui.basic.Label(this.tr("User")), {
             row    : 2,
@@ -91,11 +92,11 @@ qx.Class.define("callbackery.ui.Login", {
             column : 2
         });
 
-	var login;
-	if (! cfg.hide_password) {
+        var login;
+        if (! cfg.hide_password) {
             this.add(new qx.ui.basic.Label(this.tr("Password")), {
                 row    : 3,
-		column : 1
+                column : 1
             });
 
             var password = new qx.ui.form.PasswordField();
@@ -104,13 +105,13 @@ qx.Class.define("callbackery.ui.Login", {
 
             this.add(password, {
                 row    : 3,
-		column : 2
+                column : 2
             });
             login = new qx.ui.form.Button(this.tr("Login"), "icon/16/actions/dialog-ok.png");
-	}
-	else {
+        }
+        else {
             login = new qx.ui.form.Button(this.tr("OK"), "icon/16/actions/dialog-ok.png");
-	}
+        }
 
         login.set({
             marginTop  : 6,
@@ -125,7 +126,7 @@ qx.Class.define("callbackery.ui.Login", {
         });
 
         if ( cfg.company_name && !cfg.hide_company){
-	    var who = '';
+            var who = '';
             if (cfg.company_url){
                 who += '<a href="' + cfg.company_url + '" style="color: #444;" target="_blank">' + cfg.company_name + '</a>';
             }
@@ -133,16 +134,16 @@ qx.Class.define("callbackery.ui.Login", {
                 who += cfg.company_name;
             }
         }
-	if (! cfg.hide_release) {
+        if (! cfg.hide_release) {
             this.add(new qx.ui.basic.Label(this.tr('release %1, %2 by %3','#VERSION#','#DATE#',who)).set({
                 textColor : '#444',
-		rich : true
+                rich : true
             }), {
-		row    : 5,
-		column : 0,
-		colSpan: 3
+                row    : 5,
+                column : 0,
+                colSpan: 3
             });
-	}
+        }
 
         this.addListener('keyup', function(e) {
             if (e.getKeyIdentifier() == 'Enter') {
@@ -155,14 +156,14 @@ qx.Class.define("callbackery.ui.Login", {
 
         login.addListener("execute", function(e) {
             this.setEnabled(false);
-            var id = this.__getIframe();
+            var doc = this.__getIframeDocument();
             // save the username and password to our hidden iframe form
-            id.getElementById("cbUsername").value = username.getValue();
-	    var passwordValue;
-	    if (! cfg.hide_password) {
-		passwordValue = password.getValue();
-		id.getElementById("cbPassword").value = passwordValue;
-	    }
+            doc.getElementById("cbUsername").value = username.getValue();
+            var passwordValue;
+            if (! cfg.hide_password) {
+                passwordValue = password.getValue();
+                doc.getElementById("cbPassword").value = passwordValue;
+            }
             rpc.callAsync(qx.lang.Function.bind(this.__loginHandler, this), 'login',
                 username.getValue(),
                 passwordValue
@@ -171,9 +172,9 @@ qx.Class.define("callbackery.ui.Login", {
         this);
 
         this.addListener('appear', function() {
-	    if (! cfg.hide_password) {
-		password.setValue('');
-	    }
+            if (! cfg.hide_password) {
+                password.setValue('');
+            }
             this.setEnabled(true);
             if (username.getValue()){
                 username.set({
@@ -181,10 +182,10 @@ qx.Class.define("callbackery.ui.Login", {
                     readOnly: true,
                     focusable: false
                 });
-		if (! cfg.hide_password) {
+                if (! cfg.hide_password) {
                     password.focus();
                     password.activate();
-		}
+                }
             }
             else {
                 username.focus();
@@ -207,15 +208,28 @@ qx.Class.define("callbackery.ui.Login", {
          * @param exc {Exception} any error found during the login process.
          * @return {void}
          */
-        __getIframe: function(){
+        __iframe: null,
+        __ensureIframe: function(){
             var iframe = document.getElementById("cbLoginIframe");
+            if (!iframe) {
+                iframe = qx.dom.Element.create('iframe',{
+                        id: "cbLoginIframe",
+                        src: "login",
+                        style: "width:0px;height:0px;border:0px;"
+                    });
+                document.body.appendChild(iframe);
+            }
+            return iframe;
+        },
+        __getIframeDocument: function(){
+            var iframe = this.__iframe;
             return iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
         },
         __loginHandler : function(ret, exc) {
             if (exc == null) {
                 if (qx.lang.Type.isObject(ret) && ret.sessionCookie) {
                     // submit the iframe form to trigger the browser to save the password
-                    this.__getIframe().getElementById('cbLoginForm').submit();
+                    this.__getIframeDocument().getElementById('cbLoginForm').submit();
                     this.fireDataEvent('login', ret);
                     this.close();
                 }

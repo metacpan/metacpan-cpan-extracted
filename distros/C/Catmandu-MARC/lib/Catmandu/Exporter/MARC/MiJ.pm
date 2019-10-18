@@ -115,7 +115,7 @@ use MARC::Record;
 use MARC::Field;
 use MARC::File::MiJ;
 
-our $VERSION = '1.253';
+our $VERSION = '1.254';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 

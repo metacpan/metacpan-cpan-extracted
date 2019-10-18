@@ -1,0 +1,7 @@
+Revision history for Perl extension CayleyDickson.pm
+
+0.01 Thu Oct 17 21:28:05 2019
+        - extracted this module from Tangle.pm.
+        - Tangle requires a hypercomplex calculator, which could be useful elsewhere.
+
+ 

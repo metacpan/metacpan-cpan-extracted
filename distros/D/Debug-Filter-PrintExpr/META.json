@@ -1,0 +1,55 @@
+{
+   "abstract" : "Convert comment lines to debug print statements",
+   "author" : [
+      "Jörg Sommrey <git@sommrey.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Debug-Filter-PrintExpr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::String" : "0",
+            "Test2::V0" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Filter::Simple" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jo-37/debug-filter-printexpr/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jo-37/debug-filter-printexpr.git",
+         "web" : "https://github.com/jo-37/debug-filter-printexpr"
+      }
+   },
+   "version" : "0.02"
+}

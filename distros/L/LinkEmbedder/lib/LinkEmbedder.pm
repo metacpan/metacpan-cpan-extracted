@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -26,6 +26,7 @@ has url_to_link => sub {
     'ix.io'                   => 'LinkEmbedder::Link::Ix',
     'instagram.com'           => 'LinkEmbedder::Link::oEmbed',
     'metacpan.org'            => 'LinkEmbedder::Link::Metacpan',
+    'nhl.com'                 => 'LinkEmbedder::Link::NHL',
     'paste.fedoraproject.org' => 'LinkEmbedder::Link::Fpaste',
     'paste.opensuse.org'      => 'LinkEmbedder::Link::OpenSUSE',
     'paste.scsys.co.uk'       => 'LinkEmbedder::Link::Shadowcat',
@@ -46,7 +47,9 @@ sub get {
   $self->get_p($args)->then(sub {
     $self->$cb(shift);
   })->catch(sub {
-    $self->$cb(LinkEmbedder::Link->new(error => shift));
+    my $err = pop // 'Unknown error.';
+    $err = {message => "$err", code => 500} unless ref $err eq 'HASH';
+    $self->$cb(LinkEmbedder::Link->new(error => $err));
   });
 
   return $self;
@@ -56,7 +59,7 @@ sub get_p {
   my ($self, $args) = @_;
   my ($e, $link);
 
-  $args = ref $args eq 'HASH' ? {%$args} : {url => $args};
+  $args        = ref $args eq 'HASH' ? {%$args} : {url => $args};
   $args->{url} = Mojo::URL->new($args->{url} || '') unless ref $args->{url};
   $args->{ua}  = $self->ua;
 
@@ -87,7 +90,7 @@ sub serve {
     my $err  = $link->error;
 
     $c->stash(status => $err->{code} || 500) if $err;
-    return $c->render(data => $link->html) if $format eq 'html';
+    return $c->render(data => $link->html)   if $format eq 'html';
 
     my $json = $err ? {err => $err->{code} || 500} : $link->TO_JSON;
     return $c->render(json => $json) unless $format eq 'jsonp';

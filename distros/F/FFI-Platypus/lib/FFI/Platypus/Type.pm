@@ -6,7 +6,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -57,7 +57,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -422,6 +422,7 @@ custom type:
      my($ptr) = @_;
      my $str = $ffi->cast( 'opaque' => 'string', $ptr ); # copies the string
      free_string($ptr);
+     $str;
    }
  });
  
@@ -1162,6 +1163,8 @@ Petr Pisar (ppisar)
 Mohammad S Anwar (MANWAR)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+Meredith (merrilymeredith, MHOWARD)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -76,7 +76,7 @@ cmp_deeply(
   {
     %expected,
     html          => re(qr{The browser sends the value of the checkbox only if it is checked}),
-    thumbnail_url => re(qr{githubusercontent.com/u/737152\b}),
+    thumbnail_url => re(qr{githubusercontent.com/u/}),
     title         => "Validate <input type=\"checkbox\"> \x{b7} Issue #729 \x{b7} mojolicious/mojo",
     url           => "https://github.com/mojolicious/mojo/issues/729",
   },
@@ -89,7 +89,7 @@ cmp_deeply(
   {
     %expected,
     html          => re(qr{Exit early when the subprocess parent callback}),
-    thumbnail_url => re(qr{githubusercontent.com/u/735765\b}),
+    thumbnail_url => re(qr{githubusercontent.com/u/}),
     title         => "Proposed fix for #1054 by jberger \x{b7} Pull Request #1055 \x{b7} mojolicious/mojo",
     url           => "https://github.com/mojolicious/mojo/pull/1055",
   },

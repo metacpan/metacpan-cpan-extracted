@@ -1,0 +1,8 @@
+Revision history for Unix::ScriptUtil
+
+0.02    2019-10-15
+        Some tweaks based on #perl rake-over.
+
+0.01    2019-10-15
+        First version, released on an unsuspecting world. (Routines are
+        mostly from a $work utility module.)

@@ -1,0 +1,41 @@
+---
+abstract: 'import methods to be used like keywords'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: methods-import
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  methods::import:
+    file: lib/methods/import.pm
+    version: '0.001'
+requires:
+  Sub::Util: '0'
+  namespace::clean: '0'
+  perl: '5.008006'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/methods-import/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=methods-import
+  homepage: https://metacpan.org/release/methods-import
+  license: http://dev.perl.org/licenses/
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,0 +1,385 @@
+Revision history for SQL::Abstract
+
+revision 1.91  2019-10-17
+----------------------------
+    - New namespace providing path forward without SQL::Abstract churn
+    - Allow puke() and belch() to be used as both functions and methods
+      greatly simplifying subclassing
+    - Fix order clauses with bind parameters in ->where
+    - Documentation improvements for ORDER BY
+    - Fix syntax errors in ORDER BY docs (GH#7)
+    - Remove obsolete documentation about arrayrefref as the $source
+      argument for ->select (removed in version 1.74)
+    - Do not replace literal '0' with empty string in WHERE clauses (GH#14)
+
+revision 1.81  2014-10-25
+----------------------------
+    - Fix overly-enthusiastic parenthesis unroller (RT#99503)
+
+revision 1.80  2014-10-05
+----------------------------
+    - Fix erroneous behavior of is_literal_value($) wrt { -ident => ... }
+    - Explicitly croak on top-level special ops (they didn't work anyway)
+
+revision 1.79  2014-09-25
+----------------------------
+    - New exportable functions: is_literal_value($) and is_plain_value($)
+    - New attribute 'escape_char' allowing for proper escape of quote_chars
+      present in an identifier
+    - Deprecate { "" => \... } constructs
+    - Treat { -value => undef } as plain undef in all cases
+    - Explicitly throw on { -ident => undef }
+
+revision 1.78  2014-05-28
+----------------------------
+    - Fix parsing of binary ops to correctly take up only a single LHS
+      element, instead of gobbling up the entire parse-to-date
+    - Explicitly handle ROW_NUMBER() OVER as the snowflake-operator it is
+    - Improve signatures/documentation of is_same_sql_bind / eq_sql_bind
+    - Retire script/format-sql - the utility needs more work to be truly
+      end-user convenient
+
+revision 1.77  2014-01-17
+----------------------------
+    - Reintroduce { -not => undef } column operator (regression from 1.75)
+
+revision 1.75  2013-12-27
+----------------------------
+    - *UPCOMING INCOMPATIBLE BUGFIX*: SQLA used to generate incorrect SQL
+      on undef-containing lists fed to -in and -not_in. An exception will
+      be raised for a while before properly fixing this, to avoid quiet
+      but subtle changes to query results in production
+    - Deprecate and warn when supplying an empty arrayref to like/not_like
+      operators (likely to be removed before 2.0)
+
+    - Warn when using an inequality operator with a multi-value array to
+      arrive at what amounts to a 1=1 condition (no pre-2.0 plans to fix
+      this behavior due to backwards comp concerns)
+    - Fix false negative comparison of ORDER BY <function> ASC
+    - More improvements of incorrect parsing (placeholder at end of list
+      element)
+    - Fix typos in POD and comments (RT#87776)
+    - Augment -not_bool example with nesting (RT#89601)
+
+revision 1.74  2013-06-04
+----------------------------
+    - Fix insufficient parenthesis unroll during operator comparison
+    - 'ORDER BY foo' and 'ORDER BY foo ASC' are now considered equal
+      by default (with a switch to reenable old behavior when necessary)
+    - Change parser to not eagerly slurp RHS expressions it doesn't recognize
+
+revision 1.73  2012-07-10
+----------------------------
+    - Fix parsing of ORDER BY foo + ?
+    - Stop filling in placeholders in `format-sql` since it does not support
+      passing values for them anyway
+    - Fix parsing of NOT EXISTS
+    - Fix over-eager parenthesis unrolling
+    - Fix deep recursion warnings while parsing obnoxiously long sql statements
+    - Fix incorrect comparison of malformed lists
+    - Fix incorrect reporting of mismatch-members in SQLA::Test
+    - Migrate the -ident operator from DBIC into SQLA
+    - Migrate the -value operator from DBIC into SQLA
+
+revision 1.72  2010-12-21
+----------------------------
+    - Extra checks of search arguments for possible SQL injection attacks
+    - Remove excess parentheses in debug SQL
+    - Fix parsing of foo.* in SQLA::Tree
+    - Fix bindtype fail when using -between with arrayrefref literals
+    - Add handling for NULL for -in
+    - The -nest operator has entered semi-deprecated status and has been
+      undocumented. Please do not use it in new code
+
+revision 1.71  2010-11-09
+----------------------------
+    - Add EXECUTING for clarity of long running SQL
+    - Add "squash_repeats" option to fix it such that repeated SQL gets ellided
+      except for placeholders
+    - Highlight transaction keywords
+    - Highlight HAVING
+    - Leave quotes from DBIC in bindargs
+    - Add error checking on "profile" for SQLA::Tree
+    - Hide bulk inserts from DBIx::Class
+    - Fix missing doc (RT#62587)
+    - Format functions in MySQL-friendly manner foo( ... ) vs foo ( ... )
+
+revision 1.69  2010-10-22
+----------------------------
+    - Add quotes for populated placeholders and make the background
+      magenta instead of cyan
+    - Color and indent pagination keywords
+    - Fix a silly bug which broke placeholder fill-in in DBIC
+    - Installs format-sql to format SQL passed in over STDIN
+    - Switch the tokenizer to precompiled regexes (massive speedup)
+    - Rudimentary handling of quotes ( 'WHERE' vs WHERE )
+    - Fix extended argument parsing by IN/BETWEEN
+    - Add proper handling of lists (foo,bar,?)
+    - Better handling of generic -function's during AST construction
+    - Special handle IS NOT? NULL
+    - Make sure unparse() does not destroy a passed in \@bindargs
+    - Support ops with _'s in them (valid in Oracle)
+    - Properly parse both types of default value inserts
+    - Allow { -func => $val } as arguments to UPDATE
+
+revision 1.68  2010-09-16
+----------------------------
+    - Document methods on Tree
+    - Add affordances for color coding placeholders
+    - Change ::Tree::whitespace to whitespace_keyword
+
+revision 1.67_03  2010-09-11
+----------------------------
+    - Add docs for SQL::Abstract::Tree->new
+    - correcty merge profile and parameters
+    - added fill_in_placeholders option for excellent copy/pasta
+
+revision 1.67_02  2010-09-08
+----------------------------
+    - rename DBIx::Class::Storage::PrettyPrinter to DBIx::Class::Storage::Debug::PrettyPrint
+    - decreased a lot of indentation from ::Tree
+    - cleaned up handling of newlines inside of parens
+
+revision 1.67_01  2010-09-06
+----------------------------
+    - Add SQL::Abstract::Tree
+    - Add unindexed DBIx::Class::Storage::PrettyPrinter
+    - Better documentation of undef/NULL in where clause
+    - Depend on bugfixed Module::Install (now again installs
+      on old < 5.8.3 perls)
+
+revision 1.67  2010-05-31 14:21 (UTC)
+----------------------------
+    - Fix SQL::Test failure when first chunk is an unrecognized
+      literal
+    - Generic -not operator tests
+    - More columns-bindtype assertion checks
+
+revision 1.66  2010-04-27 02:44 (UTC)
+----------------------------
+    - Optimized the quoting mechanism, winning nearly 10%
+      speedup on repeatable sql generation
+
+revision 1.65  2010-04-11 19:59 (UTC)
+----------------------------
+    - Rerelease last version to not include .svn files
+      and grab MANIFEST.SKIP from DBIx::Class so it
+      won't happen again
+
+revision 1.64  2010-04-11 16:58 (UTC)
+----------------------------
+    - Fix multiple generic op handling regressions by
+      reverting the auto-equality assumption (turned out
+      to be a very very bad idea)
+
+revision 1.63  2010-03-24 09:56 (UTC)
+----------------------------
+    - Add ILIKE to the core list of comparision ops
+
+revision 1.62  2010-03-15 11:06 (UTC)
+----------------------------
+    - Fixed open outer parens for a multi-line literal
+    - Allow recursively-nested column-functions in WHERE
+    - Bumped minimum perl to 5.6.2 and changed tests to
+      rely on core dependencies
+
+revision 1.61  2010-02-05 16:28 (UTC)
+----------------------------
+    - Allow INSERT to take additional attributes
+    - Support for INSERT ... RETURNING
+    - Another iteration of SQL::Abstract::Test fixes and improvements
+
+revision 1.60  2009-09-22 11:03 (UTC)
+----------------------------
+    - fix a well masked error in the sql-test tokenizer
+
+revision 1.59  2009-09-22 08:39 (UTC)
+----------------------------
+    - fixed a couple of untrapped undefined warnings
+    - allow -in/-between to accept literal sql in all logical
+      variants - see POD for details
+    - unroll multiple parenthesis around IN arguments to accomodate
+      crappy databases
+
+revision 1.58  2009-09-04 15:20 (UTC)
+----------------------------
+    - expanded the scope of -bool and -not_bool operators
+    - added proper testing support
+
+revision 1.57  2009-09-03 20:18 (UTC)
+----------------------------
+    - added -bool and -not_bool operators
+
+revision 1.56  2009-05-30 16:31 (UTC)
+----------------------------
+    - support for \[$sql, @bind] in order_by clauses e.g.:
+      { -desc => \['colA LIKE ?', 'somestring'] }
+
+revision 1.55  2009-05-17 22:54 (UTC)
+----------------------------
+    - make sure that sql generation does not mutate the supplied
+      where condition structure
+
+revision 1.54  2009-05-07 17:23 (UTC)
+----------------------------
+    - allow special_operators to take both code refs and method names
+      (makes it possible to properly subclass the builtin ones)
+
+revision 1.53  2009-04-30 14:58 (UTC)
+----------------------------
+    - make sure hash keys are sorted in all search sub-conditions
+    - switch installer from EU::MM to M::I
+
+revision 1.52  2009-04-28 23:14 (UTC)
+----------------------------
+    - allow -between to handle [\"", \""] and \["", @bind]
+    - allow order_by to handle -asc|desc => [qw/colA colB/] (artifact from DBIx::Class)
+    - more tests and clearing up of some corner cases
+    - t/10test.t does not run by default (developer only, too cpu intensive)
+
+----------------------------
+revision 1.51  2009-03-28 10:00 (UTC)
+    - fixed behavior of [-and => ... ] depending on the current
+      condition scope. This introduces backwards comp with 1.24
+
+----------------------------
+revision 1.50  2009-03-10 12:30 (UTC)
+    - fixed the problem with values() not behaving the same as the rest of the code (RT#43483)
+    - fixed interjecting arrayrefref into a where clause
+    - added value-only insert test with a literal SQL snippet
+    - cleanup and enhancement of t/03values.t
+    - better handling of borked SQL in tests
+    - deal properly with parentheses in is_same_sql_bind()
+    - fixed test subs (is_same_*) in SQL::Abstract::Test to return the correct test value
+    - do not version MANIFEST
+
+    Version 1.50 was a major internal refactoring of SQL::Abstract.
+    Great care has been taken to preserve the published behavior
+    documented in previous versions in the 1.* family; however,
+    some features that were previously undocumented, or behaved.
+    differently from the documentation, had to be changed in order
+    to clarify the semantics. Hence, client code that was relying
+    on some dark areas of SQL::Abstract v1.* might behave differently
+    in v1.50.
+
+----------------------------
+revision 1.49_04  2009-03-03
+    - add support for a [\%column_meta => value] bind value format
+
+----------------------------
+revision 1.49_03  2009-02-17
+    - clarify syntax of \['...', @bind] when used with a bindtype
+      of 'columns'
+
+----------------------------
+revision 1.49_02  2009-02-16
+    - added an AST-aware SQL::Abstract::Test library for sql syntax tests
+    - vastly expanded test coverage
+    - support for the { operator => \'...'|\['...', @bind] } syntax
+      allowing to embed arbitrary operators on the LHS
+    - fixed multiple regressions wrt DBIx::Class
+
+----------------------------
+revision 1.49_01  2009-02-11
+    - support for literal SQL through the [$sql, bind] syntax.
+    - added -nest1, -nest2 or -nest_1, -nest_2, ...
+    - optional support for array datatypes
+    - defensive programming : check arguments to functions/methods
+    - fixed bug with global logic of -and/-or (no side-effects any more)
+    - changed logic for distributing an op over arrayrefs
+    - fixed semantics of  _bindtype on array args
+    - dropped the _anoncopy of the %where tree. No longer necessary.
+    - dropped the _modlogic function
+    - Make col => [] and col => {$op => [] } DTRT or die instead of generating
+      broken SQL. Added tests for this.
+    - Added { -desc => 'column' } order by support
+    - Tiny "$_"-related fix for { -desc => 'columns'} order by support
+      tests + docs
+
+----------------------------
+revision 1.20
+date: 2005/08/18 18:41:58;  author: nwiger;  state: Exp;  lines: +104 -50
+- added patch from Dan Kubb enabling quote_char and name_sep options
+- added patch from Andy Grundman to enhance _anoncopy for deep refs
+----------------------------
+revision 1.19
+date: 2005/04/29 18:20:30;  author: nwiger;  state: Exp;  lines: +34 -20
+added _anoncopy to prevent destroying original; updated docs
+----------------------------
+revision 1.18
+date: 2005/03/07 20:14:12;  author: nwiger;  state: Exp;  lines: +201 -65
+added support for -and, -or, and -nest; see docs for details
+----------------------------
+revision 1.17
+date: 2004/08/25 20:11:27;  author: nwiger;  state: Exp;  lines: +58 -46
+added patch from Eric Kolve to iterate over all hashref elements
+----------------------------
+revision 1.16
+date: 2004/06/10 17:20:01;  author: nwiger;  state: Exp;  lines: +178 -12
+added bindtype param to allow this to work with Orasuck 9+
+----------------------------
+revision 1.15
+date: 2003/11/05 23:40:40;  author: nwiger;  state: Exp;  lines: +18 -6
+several bugfixes, including _convert being applied wrong and
+the edge case field => { '!=', [qw/this that/] } not working
+----------------------------
+revision 1.14
+date: 2003/11/04 21:20:33;  author: nwiger;  state: Exp;  lines: +115 -34
+added patch from Philip Collins, and also added 'convert' option
+----------------------------
+revision 1.13
+date: 2003/05/21 17:22:29;  author: nwiger;  state: Exp;  lines: +230 -74
+added "IN" and "BETWEEN" operator support, as well as "NOT"
+modified where() to support ORDER BY, and fixed some bugs too
+added PERFORMANCE and FORMBUILDER doc sections
+fixed several bugs in _recurse_where(), it now works as expected
+added test suite, many thanks to Chas Owens
+modified all hash access to return keys sorted, to allow cached queries
+----------------------------
+revision 1.12
+date: 2003/05/08 20:10:56;  author: nwiger;  state: Exp;  lines: +181 -96
+1.11 interim checking; major bugfixes and order_by, 1.12 will go to CPAN
+----------------------------
+revision 1.11
+date: 2003/05/02 00:07:30;  author: nwiger;  state: Exp;  lines: +52 -12
+many minor enhancements to add querying flexibility
+----------------------------
+revision 1.10
+date: 2002/09/27 18:06:25;  author: nwiger;  state: Exp;  lines: +6 -2
+added precatch for messed up where string
+----------------------------
+revision 1.9
+date: 2002/08/29 18:04:35;  author: nwiger;  state: Exp;  lines: +4 -3
+CPAN
+----------------------------
+revision 1.8
+date: 2001/11/07 22:18:12;  author: nwiger;  state: Exp;  lines: +31 -14
+added embedded SCALAR ref capability to insert() and update()
+----------------------------
+revision 1.7
+date: 2001/11/07 01:23:28;  author: nwiger;  state: Exp;  lines: +3 -3
+damn uninit warning
+----------------------------
+revision 1.6
+date: 2001/11/06 21:09:44;  author: nwiger;  state: Exp;  lines: +14 -6
+oops, had to actually *implement* the order by for select()!
+----------------------------
+revision 1.5
+date: 2001/11/06 03:13:16;  author: nwiger;  state: Exp;  lines: +43 -4
+lots of docs
+----------------------------
+revision 1.4
+date: 2001/11/06 03:07:42;  author: nwiger;  state: Exp;  lines: +16 -7
+added extra layer of ()'s to ensure correct semantics on AND
+----------------------------
+revision 1.3
+date: 2001/11/06 01:16:31;  author: nwiger;  state: Exp;  lines: +11 -10
+updated all statements so that they use wantarray to just return SQL if asked
+----------------------------
+revision 1.2
+date: 2001/10/26 22:23:46;  author: nwiger;  state: Exp;  lines: +112 -15
+added scalar ref for SQL verbatim in where, fixed bugs, array ref, docs
+----------------------------
+revision 1.1
+date: 2001/10/24 00:26:43;  author: nwiger;  state: Exp;
+Initial revision

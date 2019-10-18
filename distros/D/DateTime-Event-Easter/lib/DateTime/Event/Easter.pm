@@ -25,7 +25,7 @@ require Exporter;
 
 @EXPORT_OK = qw(easter golden_number western_epact western_sunday_letter western_sunday_number
                                      eastern_epact eastern_sunday_letter eastern_sunday_number);
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub new {
     my $class = shift;
@@ -87,7 +87,12 @@ sub following {
   my $self   = shift;
   my $dt     = shift;
   croak ("Dates need to be datetime objects")
-    unless $dt->can('utc_rd_values');
+    unless defined($dt)
+        && ref($dt) ne ''
+        && ref($dt) ne 'SCALAR'
+        && ref($dt) ne 'HASH'
+        && ref($dt) ne 'ARRAY'
+        && $dt->can('utc_rd_values');
   my $result = $self->_following_point($dt);
   return ($self->{as} eq 'span') 
       ? _tospan($result)
@@ -134,8 +139,8 @@ sub _following_point {
   }
 
   my $easter_start_dt = $event_start_dt - $self->{offset};
-  my $start_mmdd  = $easter_start_dt->strftime("%m-%d");
-  my $latest_mmdd = '04-25';
+  my $start_mmdd      = $easter_start_dt->strftime("%m-%d");
+  my $latest_mmdd     = '04-25';
   my $easter_sunday;
   if ($start_mmdd le $latest_mmdd) {
     $easter_sunday = $self->_easter($easter_start_dt->year);
@@ -156,7 +161,12 @@ sub previous {
   my $self   = shift;
   my $dt     = shift;
   croak ("Dates need to be datetime objects")
-    unless $dt->can('utc_rd_values');
+    unless defined($dt)
+        && ref($dt) ne ''
+        && ref($dt) ne 'SCALAR'
+        && ref($dt) ne 'HASH'
+        && ref($dt) ne 'ARRAY'
+        && $dt->can('utc_rd_values');
   my $result = $self->_previous_point($dt);
   return ($self->{as} eq 'span') 
       ? _tospan($result)
@@ -175,8 +185,8 @@ sub _previous_point {
   }
 
   my $easter_start_dt = $event_start_dt - $self->{offset};
-  my $start_mmdd    = $easter_start_dt->strftime("%m-%d");
-  my $earliest_mmdd = '03-21';
+  my $start_mmdd      = $easter_start_dt->strftime("%m-%d");
+  my $earliest_mmdd   = '03-21';
   my $easter_sunday;
   if ($start_mmdd ge $earliest_mmdd) {
     $easter_sunday = $self->_easter($easter_start_dt->year);
@@ -192,37 +202,50 @@ sub _previous_point {
 }
 
 sub closest {
-  my $self = shift;
-  my $dt   = shift;
+  my ($self, $dt) = @_;
   croak ("Dates need to be datetime objects")
-    unless $dt->can('utc_rd_values');
+    unless defined($dt)
+        && ref($dt) ne ''
+        && ref($dt) ne 'SCALAR'
+        && ref($dt) ne 'HASH'
+        && ref($dt) ne 'ARRAY'
+        && $dt->can('utc_rd_values');
 
   my $class = ref($dt);
 
-    if ($self->is($dt)) {
-      my $easter = $dt->clone->truncate(to=>'day');
-      $easter    = $class->from_object(object=>$easter) if (ref($easter) ne $class);
-      return ($self->{as} eq 'span') 
-                        ? _tospan($easter)
-                        : $easter;
-    }
-    my $following_easter = $self->following($dt);
-    my $following_delta  = $following_easter - $dt;
-    my $previous_easter  = $self->previous($dt);
-        
-    my $easter = ($previous_easter + $following_delta < $dt) 
-        ? $following_easter 
-        : $previous_easter;
-    $easter = $class->from_object(object=>$easter) if (ref($easter) ne $class);
+  if ($self->is($dt)) {
+    my $easter = $dt->clone->truncate(to => 'day');
+    # I do not see how $easter can be anything else than a $class,
+    # so the conversion below should be unnecessary.
+    # Yet, "if it ain't broke, don't fix it". So it remains.
+    $easter    = $class->from_object(object => $easter) if (ref($easter) ne $class);
     return ($self->{as} eq 'span') 
-        ? _tospan($easter)
-        : $easter;
+                      ? _tospan($easter)
+                      : $easter;
+  }
+  my $following_easter = $self->_following_point($dt);
+  my $following_delta  = $following_easter - $dt;
+  my $previous_easter  = $self->_previous_point($dt);
+      
+  my $easter = ($previous_easter + $following_delta < $dt) 
+      ? $following_easter 
+      : $previous_easter;
+  # Same remark as above.
+  $easter = $class->from_object(object => $easter) if (ref($easter) ne $class);
+  return ($self->{as} eq 'span') 
+      ? _tospan($easter)
+      : $easter;
 }
 
 sub is {
   my ($self, $dt) = @_;
   croak ("Dates need to be datetime objects")
-    unless $dt->can('utc_rd_values');
+    unless defined($dt)
+        && ref($dt) ne ''
+        && ref($dt) ne 'SCALAR'
+        && ref($dt) ne 'HASH'
+        && ref($dt) ne 'ARRAY'
+        && $dt->can('utc_rd_values');
 
   my $class = ref($dt);
   if ($self->{easter} eq 'western' && $class ne 'DateTime') {
@@ -360,16 +383,18 @@ sub _easter {
 
 sub western_easter {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
-    
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
+
   my $epact_1 = western_epact($year);
   my $epact_2 = $epact_1;
   if ($epact_1 eq '25*') {
-    # ajustement 25* → 26
+    # adjust 25* → 26
     $epact_2 = 26;
   }
   elsif ($epact_1 == 24) {
-    # ajustement 24 → 25
+    # adjust 24 → 25
     $epact_2 = 25;
   }
   if ($epact_2 > 24) {
@@ -388,7 +413,9 @@ sub western_easter {
 
 sub eastern_easter {
   my $year = shift;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
     
   my $epact_1 = eastern_epact($year);
   my $epact_2;
@@ -401,16 +428,18 @@ sub eastern_easter {
   my $day   = 45 - $epact_2 + ($epact_2 + eastern_sunday_number($year) + 1) % 7;
   my $month = 3;
   if ($day > 31) {
-    $day -= 31;
+    $day  -= 31;
     $month = 4;
   }
 
-  return DateTime::Calendar::Julian->new(year=>$year, month=>$month, day=>$day);
+  return DateTime::Calendar::Julian->new(year => $year, month => $month, day => $day);
 }
 
 sub golden_number {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   return $year % 19 + 1;
 }
 
@@ -419,7 +448,9 @@ sub golden_number {
 #
 sub western_epact {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   # centu is not the century, but nearly so
   my $centu      = int($year / 100);
   my $metemptose = $centu - int($centu / 4);
@@ -436,7 +467,9 @@ sub western_epact {
 #
 sub western_sunday_letter {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   my $prec = $year - 1;
   my $n1 = 7 - ($year + int($prec / 4) - int($prec / 100) + int($prec / 400) + 6) % 7;
   my $n2 = 7 - ($year + int($year / 4) - int($year / 100) + int($year / 400) + 6) % 7;
@@ -452,7 +485,9 @@ sub western_sunday_letter {
 }
 sub western_sunday_number {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   return 7 - ($year + int($year / 4) - int($year / 100) + int($year / 400) + 6) % 7;
 }
 
@@ -462,7 +497,9 @@ sub western_sunday_number {
 #
 sub eastern_epact {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   return (11 * golden_number($year) + 27) % 30;
 }
 
@@ -471,7 +508,9 @@ sub eastern_epact {
 #
 sub eastern_sunday_letter {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   my $prec = $year - 1;
   my $n1 = 7 - ($year + int($prec / 4) - 3) % 7;
   my $n2 = 7 - ($year + int($year / 4) - 3) % 7;
@@ -487,7 +526,9 @@ sub eastern_sunday_letter {
 }
 sub eastern_sunday_number {
   my ($year) = @_;
-  croak "Year value '$year' should be numeric." if $year!~/^\-?\d+$/;
+  $year ||= '';    # should be //= in 5.10.0 or later, but we keep the compatibility with 5.6.1
+  croak "Year value '$year' should be numeric."
+    if $year !~ /^\-?\d+$/;
   return 7 - ($year + int($year / 4) - 3) % 7;
 }
 
@@ -533,7 +574,7 @@ DateTime::Event::Easter - Returns Easter events for DateTime objects
   $is_easter_sunday = $easter_sunday->is($dt);
   # 1
   
-  $palm_sunday = DateTime::Event::Easter->new(day=>'Palm Sunday');
+  $palm_sunday = DateTime::Event::Easter->new(day => 'Palm Sunday');
 
 
   $dt2 = DateTime->new( year   => 2006,
@@ -700,6 +741,13 @@ This method switches output to points rather than spans. See the 'as' attribute
 of the constructor for more information. The method returns the object for easy
 chaining.
 
+=item * as_old_set()
+
+Deprecated method.
+
+In the next  version (1.09) or in two years  (October 2021), whichever
+comes last,  this method will emit  a warning. And within  another two
+years / one version, this method will be removed.
 
 =back
 
@@ -801,8 +849,26 @@ falls in January or February.
 
 =item * easter($year)
 
-Given a Gregorian year, this method  will return a DateTime object for
-Western Easter Sunday in that year.
+Given a Gregorian year, this  subroutine will return a DateTime object
+for Western Easter Sunday in that year.
+
+=item * western_easter($year)
+
+Given a Gregorian year, this  subroutine will return a DateTime object
+for  Western Easter  Sunday  in  that year.  But  unlike the  previous
+subroutine,  C<western_easter> cannot  be imported.  You must  use its
+fully qualified name:
+
+  my $date = DateTime::Event::Easter::western_easter($year);
+
+=item * eastern_easter($year)
+
+Given  a  Julian year,  this  subroutine  will  return a  DateTime  ::
+Calendar :: Julian object for Eastern  Easter Sunday in that year. And
+like C<western_easter>, C<eastern_easter> cannot be imported. You must
+use its fully qualified name:
+
+  my $date = DateTime::Event::Easter::eastern_easter($year);
 
 =back
 
@@ -857,9 +923,9 @@ for exactly 24 hours or exactly one day which gives 23 hours?
 A similar question exists for DST "fall backward" day in the Southern
 countries.
 
-Also, since you can use a numeric C<day> offset up to 250, you can reach
-the Northern "fall backwards" and the Southern "spring forward" days, where
-the same problem will happen in reverse.
+Also, since  you can use  a numeric  C<day> offset beyond  the Trinity
+sunday, you can  reach the Northern "fall backwards"  and the Southern
+"spring forward" days, where the same problem will happen in reverse.
 
 =head1 THE SMALL PRINT
 
@@ -871,7 +937,7 @@ the same problem will happen in reverse.
 of the DateTime project
 
 =item * L<https://www.tondering.dk/claus/calendar.html> - Claus Tøndering's
-calendar FAQ
+calendar FAQ, especially the page L<https://www.tondering.dk/claus/cal/easter.php>.
 
 =item * I<Calendrical Calculations> (Third or Fourth Edition) by Nachum Dershowitz and
 Edward M. Reingold, Cambridge University Press, see

@@ -110,7 +110,12 @@ lib/Cfn/Resource/AWS/Cognito/IdentityPool.pm
 lib/Cfn/Resource/AWS/Cognito/IdentityPoolRoleAttachment.pm
 lib/Cfn/Resource/AWS/Cognito/UserPool.pm
 lib/Cfn/Resource/AWS/Cognito/UserPoolClient.pm
+lib/Cfn/Resource/AWS/Cognito/UserPoolDomain.pm
 lib/Cfn/Resource/AWS/Cognito/UserPoolGroup.pm
+lib/Cfn/Resource/AWS/Cognito/UserPoolIdentityProvider.pm
+lib/Cfn/Resource/AWS/Cognito/UserPoolResourceServer.pm
+lib/Cfn/Resource/AWS/Cognito/UserPoolRiskConfigurationAttachment.pm
+lib/Cfn/Resource/AWS/Cognito/UserPoolUICustomizationAttachment.pm
 lib/Cfn/Resource/AWS/Cognito/UserPoolUser.pm
 lib/Cfn/Resource/AWS/Cognito/UserPoolUserToGroupAttachment.pm
 lib/Cfn/Resource/AWS/Config/AggregationAuthorization.pm
@@ -118,6 +123,7 @@ lib/Cfn/Resource/AWS/Config/ConfigRule.pm
 lib/Cfn/Resource/AWS/Config/ConfigurationAggregator.pm
 lib/Cfn/Resource/AWS/Config/ConfigurationRecorder.pm
 lib/Cfn/Resource/AWS/Config/DeliveryChannel.pm
+lib/Cfn/Resource/AWS/Config/OrganizationConfigRule.pm
 lib/Cfn/Resource/AWS/Config/RemediationConfiguration.pm
 lib/Cfn/Resource/AWS/DAX/Cluster.pm
 lib/Cfn/Resource/AWS/DAX/ParameterGroup.pm
@@ -170,6 +176,10 @@ lib/Cfn/Resource/AWS/EC2/Subnet.pm
 lib/Cfn/Resource/AWS/EC2/SubnetCidrBlock.pm
 lib/Cfn/Resource/AWS/EC2/SubnetNetworkAclAssociation.pm
 lib/Cfn/Resource/AWS/EC2/SubnetRouteTableAssociation.pm
+lib/Cfn/Resource/AWS/EC2/TrafficMirrorFilter.pm
+lib/Cfn/Resource/AWS/EC2/TrafficMirrorFilterRule.pm
+lib/Cfn/Resource/AWS/EC2/TrafficMirrorSession.pm
+lib/Cfn/Resource/AWS/EC2/TrafficMirrorTarget.pm
 lib/Cfn/Resource/AWS/EC2/TransitGateway.pm
 lib/Cfn/Resource/AWS/EC2/TransitGatewayAttachment.pm
 lib/Cfn/Resource/AWS/EC2/TransitGatewayRoute.pm
@@ -182,6 +192,7 @@ lib/Cfn/Resource/AWS/EC2/VPCCidrBlock.pm
 lib/Cfn/Resource/AWS/EC2/VPCDHCPOptionsAssociation.pm
 lib/Cfn/Resource/AWS/EC2/VPCEndpoint.pm
 lib/Cfn/Resource/AWS/EC2/VPCEndpointConnectionNotification.pm
+lib/Cfn/Resource/AWS/EC2/VPCEndpointService.pm
 lib/Cfn/Resource/AWS/EC2/VPCEndpointServicePermissions.pm
 lib/Cfn/Resource/AWS/EC2/VPCGatewayAttachment.pm
 lib/Cfn/Resource/AWS/EC2/VPCPeeringConnection.pm
@@ -238,6 +249,7 @@ lib/Cfn/Resource/AWS/Glue/Partition.pm
 lib/Cfn/Resource/AWS/Glue/SecurityConfiguration.pm
 lib/Cfn/Resource/AWS/Glue/Table.pm
 lib/Cfn/Resource/AWS/Glue/Trigger.pm
+lib/Cfn/Resource/AWS/Glue/Workflow.pm
 lib/Cfn/Resource/AWS/Greengrass/ConnectorDefinition.pm
 lib/Cfn/Resource/AWS/Greengrass/ConnectorDefinitionVersion.pm
 lib/Cfn/Resource/AWS/Greengrass/CoreDefinition.pm
@@ -351,6 +363,7 @@ lib/Cfn/Resource/AWS/PinpointEmail/ConfigurationSet.pm
 lib/Cfn/Resource/AWS/PinpointEmail/ConfigurationSetEventDestination.pm
 lib/Cfn/Resource/AWS/PinpointEmail/DedicatedIpPool.pm
 lib/Cfn/Resource/AWS/PinpointEmail/Identity.pm
+lib/Cfn/Resource/AWS/QLDB/Ledger.pm
 lib/Cfn/Resource/AWS/RAM/ResourceShare.pm
 lib/Cfn/Resource/AWS/RDS/DBCluster.pm
 lib/Cfn/Resource/AWS/RDS/DBClusterParameterGroup.pm
@@ -401,6 +414,7 @@ lib/Cfn/Resource/AWS/SSM/MaintenanceWindowTask.pm
 lib/Cfn/Resource/AWS/SSM/Parameter.pm
 lib/Cfn/Resource/AWS/SSM/PatchBaseline.pm
 lib/Cfn/Resource/AWS/SSM/ResourceDataSync.pm
+lib/Cfn/Resource/AWS/SageMaker/CodeRepository.pm
 lib/Cfn/Resource/AWS/SageMaker/Endpoint.pm
 lib/Cfn/Resource/AWS/SageMaker/EndpointConfig.pm
 lib/Cfn/Resource/AWS/SageMaker/Model.pm

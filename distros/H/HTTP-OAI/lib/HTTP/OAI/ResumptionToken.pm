@@ -6,7 +6,7 @@ use strict;
 
 use overload "bool" => \&not_empty;
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 sub resumptionToken { shift->_elem('resumptionToken',@_) }
 sub expirationDate { shift->_elem('expirationDate',@_) }

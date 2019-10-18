@@ -24,7 +24,7 @@ Test::MockFile::FileHandle - Provides a class for L<Test::MockFile> to tie to on
 
 =head1 VERSION
 
-Version 0.019
+Version 0.020
 
 =cut
 
@@ -383,7 +383,7 @@ sub SEEK {
 
     $self->{'tell'} = $pos;
 
-    return 1;
+    return $pos == 0 ? '0 but true' : $pos;
 }
 
 =head2 TELL

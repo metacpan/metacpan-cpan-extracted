@@ -58,16 +58,16 @@
          "web" : "https://github.com/perlancar/perl-App-renwd"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028002"
       },
       "plugins" : [
          {
-            "class" : "Dist::Zilla::Plugin::InsertDistImage",
-            "name" : "InsertDistImage",
-            "version" : "0.005"
+            "class" : "Dist::Zilla::Plugin::InsertExample",
+            "name" : "InsertExample",
+            "version" : "0.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",

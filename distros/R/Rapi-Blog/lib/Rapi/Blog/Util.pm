@@ -8,6 +8,7 @@ use RapidApp::Util ':all';
 use DateTime;
 use HTTP::Request::Common;
 use LWP::UserAgent;
+use Rapi::Blog::Util::ppRender;
 
 sub _dt_base_opts {(
   time_zone => 'local'

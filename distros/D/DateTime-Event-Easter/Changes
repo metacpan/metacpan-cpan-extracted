@@ -135,4 +135,9 @@ Note on version conventions:
         - Improve code coverage.
         - Allow building an infinite (i.e. unbounded) set of spans.
         - Define separate functions to obtain the computus elements: golden number, epact, sunday letter.
-	- Improve (a little bit) code speed.
+        - Improve (a little bit) code speed.
+
+1.08 Tue 2019-10-15
+        - Fixed POD issues and improve code formatting.
+        - Improve code coverage.
+        - Fix a few bugs, such as the parameter check which was incompatible with perl-5.16 and earlier.

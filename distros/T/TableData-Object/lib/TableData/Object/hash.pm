@@ -1,7 +1,7 @@
 package TableData::Object::hash;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,6 +22,12 @@ sub new {
 sub row_count {
     my $self = shift;
     scalar keys %{ $self->{data} };
+}
+
+sub rows {
+    my $self = shift;
+    my $data = $self->{data};
+    [sort keys %$data];
 }
 
 sub rows_as_aoaos {
@@ -136,7 +142,7 @@ TableData::Object::hash - Manipulate hash via table object
 
 =head1 VERSION
 
-This document describes version 0.110 of TableData::Object::hash (from Perl distribution TableData-Object), released on 2019-01-16.
+This document describes version 0.111 of TableData::Object::hash (from Perl distribution TableData-Object), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

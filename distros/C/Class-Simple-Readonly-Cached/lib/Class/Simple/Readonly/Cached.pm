@@ -13,11 +13,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,20 @@ sub _caller_class
 	}
 }
 
+=head2 state
+
+Returns the state of the object
+
+    print Data::Dumper->new([$obj->state()]->Dump();
+
+=cut
+
+sub state {
+	my $self = shift;
+
+	return { hits => $self->{_hits}, misses => $self->{_misses} };
+}
+
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
@@ -144,9 +158,10 @@ sub AUTOLOAD {
 	} else {
 		$rc = $cache->get($key);
 	}
-	if($rc) {
+	if(defined($rc)) {
 		die $key if($rc eq 'never');
 		if(ref($rc) eq 'ARRAY') {
+			$self->{_hits}{$key}++;
 			my @foo = @{$rc};
 			if(wantarray) {
 				die $key if($foo[0] eq __PACKAGE__ . ">UNDEF<");
@@ -156,14 +171,17 @@ sub AUTOLOAD {
 			return pop @foo;
 		}
 		if($rc eq __PACKAGE__ . '>UNDEF<') {
+			$self->{_hits}{$key}++;
 			return;
 		}
 		if(!wantarray) {
+			$self->{_hits}{$key}++;
 			return $rc;
 		}
 	}
 	if(wantarray) {
 		my @rc = $object->$func(@_);
+		$self->{_hits}{$key}++;
 		if(scalar(@rc) == 0) {
 			return;
 		}
@@ -174,6 +192,7 @@ sub AUTOLOAD {
 		}
 		return @rc;
 	}
+	$self->{_misses}{$key}++;
 	$rc = $object->$func(@_);
 	if(!defined($rc)) {
 		if(ref($cache) eq 'HASH') {

@@ -15,6 +15,7 @@ thirdparty/*
 Build.bat
 .last_cover_stats
 Makefile
+Makefile.in
 Makefile.old
 MANIFEST.bak
 /META.yml
@@ -26,5 +27,6 @@ nytprof.out
 *.bs
 /_eumm/
 public/
-config.*
+/config.*
 etc/*.cfg
+/frontend/compiled/

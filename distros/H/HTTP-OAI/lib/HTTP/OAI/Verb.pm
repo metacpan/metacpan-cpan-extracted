@@ -4,7 +4,7 @@ package HTTP::OAI::Verb;
 
 use strict;
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 # back compatibility
 sub toDOM {

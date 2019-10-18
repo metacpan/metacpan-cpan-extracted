@@ -1,3 +1,4 @@
-CallBackery@0.14.2
-Mojo::SQLite@3.000
-PPI
+% my $p = shift;
+% use CallBackery;
+CallBackery@<%= $CallBackery::VERSION %>
+Mojo::SQLite

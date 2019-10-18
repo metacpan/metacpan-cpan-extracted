@@ -1,0 +1,57 @@
+{
+   "abstract" : "Execute shell commands using specific shell",
+   "author" : [
+      "Jörg Sommrey <git@sommrey.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Shell-Run",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Which" : "0",
+            "IO::Select" : "0",
+            "IO::String" : "0",
+            "IPC::Open2" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jo-37/shell-run/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jo-37/shell-run.git",
+         "web" : "https://github.com/jo-37/shell-run"
+      }
+   },
+   "version" : "0.04"
+}

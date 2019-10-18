@@ -1,0 +1,31 @@
+---
+abstract: 'Execute shell commands using specific shell'
+author:
+  - 'Jörg Sommrey <git@sommrey.de>'
+build_requires:
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-Run
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Which: '0'
+  IO::Select: '0'
+  IO::String: '0'
+  IPC::Open2: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/jo-37/shell-run/issues
+  repository: git://github.com/jo-37/shell-run.git
+version: '0.04'

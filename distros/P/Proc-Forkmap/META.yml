@@ -1,5 +1,5 @@
 ---
-abstract: 'map with forking and IPC'
+abstract: 'map with forking'
 author:
   - 'Andrew Shapiro <trski@cpan.org>'
 build_requires:
@@ -20,4 +20,4 @@ no_index:
 requires:
   Proc::Fork: 0.71
   Test::More: 0
-version: 0.2002
+version: 0.2008

@@ -1,3 +1,6 @@
+0.10 2019-10-14
+  - Implements the resources in CloudFormation spec 6.3.0 (published as of 2019-10-07)
+
 0.09 2019-09-02
   - Implements the resources in CloudFormation spec 5.3.0 (published as of 2019-09-02)
   - Added region-support information for all resources for ap-east-1, cn-north-1,

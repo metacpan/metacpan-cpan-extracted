@@ -6,7 +6,7 @@ use List::Util 1.45 qw( uniqstr );
 use Carp qw( croak );
 
 # ABSTRACT: FFI Type Parser
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 
 # The TypeParser and Type classes are used internally ONLY and
@@ -79,8 +79,6 @@ sub types
     $store{rev}->{$type_code} = $name;
   }
 
-  $store{$_}->{pointer} = $store{$_}->{opaque} for qw( basic ptr );
-
   sub global_types
   {
     \%store;
@@ -110,7 +108,7 @@ FFI::Platypus::TypeParser - FFI Type Parser
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 DESCRIPTION
 
@@ -148,6 +146,8 @@ Petr Pisar (ppisar)
 Mohammad S Anwar (MANWAR)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+Meredith (merrilymeredith, MHOWARD)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -3,11 +3,12 @@
 # bootstrap-blog: default, simple scaffold
 #
 
-static_paths  : [ css/, js/, fonts/, img/ ]
-private_paths : [ private/, scaffold.yml ]
-landing_page  : recent_posts
-not_found     : private/404.html
-favicon       : img/favicon.ico
+static_paths   : [ css/, js/, fonts/, img/ ]
+template_names : [ '*.{html,xml,css,js,txt,htm,tt}' ]
+private_paths  : [ private/, scaffold.yml ]
+landing_page   : recent_posts
+not_found      : private/404.html
+favicon        : img/favicon.ico
 
 view_wrappers:
   - { path: post/, type: include, wrapper: private/post.html }

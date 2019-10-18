@@ -1,5 +1,9 @@
 Revision history for Perl extension WorkerManager
 
+0.1001 2019-10-17T10:19:01Z
+
+    - Fix child process check using documented method of ForkManager (thanks @itchyny)
+
 0.1000 2019-07-03T08:54:59Z
 
   [BREAKING CHANGES]

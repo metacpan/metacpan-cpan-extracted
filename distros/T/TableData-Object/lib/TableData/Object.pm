@@ -1,7 +1,7 @@
 package TableData::Object;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.110'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.111'; # VERSION
 
 use 5.010001;
 use strict;
@@ -52,7 +52,7 @@ TableData::Object - Manipulate data structure via table object
 
 =head1 VERSION
 
-This document describes version 0.110 of TableData::Object (from Perl distribution TableData-Object), released on 2019-01-16.
+This document describes version 0.111 of TableData::Object (from Perl distribution TableData-Object), released on 2019-09-15.
 
 =for Pod::Coverage ^$
 

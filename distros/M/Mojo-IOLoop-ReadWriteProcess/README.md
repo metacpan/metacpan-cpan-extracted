@@ -167,7 +167,7 @@ You do not need to specify `code`, it is implied if no arguments is given.
 ## args
 
     use Mojo::IOLoop::ReadWriteProcess;
-    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".shift() }, args => "User" );
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".$_[1] }, args => "User" );
     $process->start();
     $process->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
     $process->stop();
@@ -208,9 +208,9 @@ Returns the current [Mojo::IOLoop::ReadWriteProcess::Session](https://metacpan.o
 ## subreaper
 
     use Mojo::IOLoop::ReadWriteProcess;
-    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".shift() }, args => "User" );
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".$_[1] }, args => "User" );
     $process->subreaper(1)->start();
-    $process->on( stop => sub { $_->disable_subreaper } );
+    $process->on( stop => sub { shift()->disable_subreaper } );
     $process->stop();
 
     # The process will print "Hello User"

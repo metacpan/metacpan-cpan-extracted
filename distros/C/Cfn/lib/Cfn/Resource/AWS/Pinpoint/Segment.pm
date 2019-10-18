@@ -1,4 +1,4 @@
-# AWS::Pinpoint::Segment generated from spec 3.4.0
+# AWS::Pinpoint::Segment generated from spec 6.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Segment',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::Pinpoint::Segment {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::Segment', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'SegmentId' ]
+    [ 'Arn','SegmentId' ]
   }
   sub supported_regions {
     [ 'ap-south-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
@@ -368,6 +368,7 @@ package Cfn::Resource::Properties::AWS::Pinpoint::Segment {
   has Dimensions => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::Segment::SegmentDimensions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SegmentGroups => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::Segment::SegmentGroups', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

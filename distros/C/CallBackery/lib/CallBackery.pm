@@ -34,7 +34,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.18.2';
+our $VERSION = '0.19.0';
 
 use Mojo::Base 'Mojolicious';
 
@@ -134,6 +134,10 @@ sub startup {
         $app->log->handle($file);
     }
 
+    unshift @{$app->static->paths}, 
+        $app->home->rel_file('frontend').'/compiled/source/'
+        if $app->mode eq 'development';    # Router
+
     # properly figure your own path when running under fastcgi
     $app->hook( before_dispatch => sub {
         my $c = shift;
@@ -163,6 +167,7 @@ sub startup {
     }
 
     $app->secrets([ path($app->config->secretFile)->slurp ]);
+   
 
     my $routes = $app->routes;
 

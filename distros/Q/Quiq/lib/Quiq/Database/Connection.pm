@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -115,6 +115,7 @@ sub new {
 
     # Optionen
 
+    my $autoCommit = undef;
     my $cacheDir = undef;
     my $handle = undef;
     my $log = undef;
@@ -124,6 +125,7 @@ sub new {
     my $utf8 = undef;
 
     Quiq::Option->extract(\@_,
+        -autoCommit => \$autoCommit,
         -cacheDir => \$cacheDir,
         -handle => \$handle,
         -log => \$log,
@@ -138,6 +140,7 @@ sub new {
     if ($self) {
         # Defaults der neuen Verbindung
 
+        $autoCommit = $self->{'autoCommit'} if !defined $autoCommit;
         $log = $self->{'log'} if !defined $log;
         $logfile = $self->{'logfile'} if !defined $logfile;
         $sqlClass = $self->{'sqlClass'} if !defined $sqlClass;
@@ -146,6 +149,7 @@ sub new {
 
         # FIXME: alle Attribute kopieren
         return $class->new($self->{'udlObj'},
+            -autoCommit => $autoCommit,
             -log => $log,
             -logfile => $logfile,
             -sqlClass => $sqlClass,
@@ -156,6 +160,7 @@ sub new {
 
     # Defaults im Falle einer neuen Verbindung
 
+    $autoCommit = 0 if !defined $autoCommit;
     $log = 0 if !defined $log;
     $sqlClass = 'Quiq::Sql' if !defined $sqlClass;
     $utf8 = 0 if !defined $utf8;
@@ -176,8 +181,9 @@ sub new {
 
     my $udlObj = ref $udl? $udl: Quiq::Udl->new($udl);
     my $apiObj = Quiq::Database::Api->connect($udlObj,
-        -utf8 => $utf8,
+        -autoCommit => $autoCommit,
         -handle => $handle,
+        -utf8 => $utf8,
     );
     my $sqlObj = $sqlClass->new($udlObj->dbms);
 
@@ -4903,7 +4909,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

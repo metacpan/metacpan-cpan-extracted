@@ -10,7 +10,7 @@ use IO::Handle;
 use IO::File;
 our $LOGGER;
 
-our $VERSION = '0.1000';
+our $VERSION = '0.1001';
 
 sub new {
     my $class = shift;
@@ -112,7 +112,7 @@ sub set_signal_handlers {
 
         $self->{terminating} = 1;
         $self->{client}->terminate if $self->{client};
-        unless ($self->{pm}->{in_child}) {
+        if ($self->{pm}->is_parent) {
             $self->terminate_all_children;
         }
     };
@@ -127,7 +127,7 @@ sub set_signal_handlers {
 
         $self->{terminating} = 1;
         $self->{client}->terminate if $self->{client};
-        unless ($self->{pm}->{in_child}) {
+        if ($self->{pm}->is_parent) {
             $self->killall_children;
         }
         exit(1);

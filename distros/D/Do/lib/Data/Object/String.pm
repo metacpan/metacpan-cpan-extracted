@@ -21,7 +21,7 @@ with qw(
 
 use parent 'Data::Object::String::Base';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 1;
 
@@ -779,7 +779,7 @@ array reference. This method returns an array value.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

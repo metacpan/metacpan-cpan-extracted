@@ -30,6 +30,7 @@
 package SNMP::Info::Layer3::PaloAlto;
 
 use strict;
+use warnings;
 use Exporter;
 use SNMP::Info::Layer3;
 
@@ -38,7 +39,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.68';
+$VERSION = '3.70';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -52,7 +53,7 @@ $VERSION = '3.68';
     # Oids from PAN-COMMON-MIB.
     'os_ver'     => 'panSysSwVersion',
     'serial1'    => 'panSysSerialNumber',
-    'pa_model'   => 'panChassisType'
+    'pa_model'   => 'panChassisType',
 );
 
 %FUNCS = (
@@ -64,7 +65,7 @@ $VERSION = '3.68';
 );
 
 sub vendor {
-    return 'Palo Alto Networks';
+    return 'palo alto networks';
 }
 
 sub model {
@@ -142,11 +143,11 @@ These are methods that return scalar value from SNMP
 
 =item $pa->vendor()
 
-Returns C<'Palo Alto Networks'>.
+Returns C<'palo alto networks'>.
 
 =item $pa->os()
 
-Returns C<'PANOS'>.
+Returns C<'PAN-OS'>.
 
 =item $pa->model()
 

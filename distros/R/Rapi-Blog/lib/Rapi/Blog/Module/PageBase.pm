@@ -49,6 +49,8 @@ sub apply_permissions {
         allow_edit => 0
       );
       
+      # We never want them to see preauth_actions:
+      $self->apply_colspec_columns(['preauth_actions'], no_column => 1);
       
     
     }

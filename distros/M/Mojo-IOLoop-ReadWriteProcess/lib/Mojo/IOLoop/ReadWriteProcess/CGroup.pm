@@ -33,8 +33,8 @@ sub from {
 
 sub _cgroup {
   path($_[0]->parent ?
-      path($_[0]->_vfs, $_[0]->name, $_[0]->parent)
-    : path($_[0]->_vfs, $_[0]->name));
+      path($_[0]->_vfs, $_[0]->name // '', $_[0]->parent)
+    : path($_[0]->_vfs, $_[0]->name // ''));
 }
 
 sub create { $_[0]->_cgroup->make_path unless -d $_[0]->_cgroup; $_[0] }

@@ -1,5 +1,4 @@
 # SNMP::Info::Layer3::C3550
-# $Id$
 #
 # Copyright (c) 2008-2009 Max Baker changes from version 0.8 and beyond.
 # Copyright (c) 2004 Regents of the University of California
@@ -47,7 +46,7 @@ our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
 @SNMP::Info::Layer3::C3550::EXPORT_OK = qw//;
 
-$VERSION = '3.68';
+$VERSION = '3.70';
 
 # NOTE: Order creates precedence
 #       Example: v_name exists in Bridge.pm and CiscoVTP.pm
@@ -105,7 +104,7 @@ sub ports {
     return $ports;
 }
 
-#  Verions prior to 12.1(22)EA1a use the older CiscoStack method
+#  Versions prior to 12.1(22)EA1a use the older CiscoStack method
 #  Newer versions use the ETHERLIKE-MIB to report operational duplex.
 #  See http://www.ciscosystems.com/en/US/products/hw/switches/ps646/prod_release_note09186a00802a08ee.html
 
@@ -228,11 +227,6 @@ These devices run IOS but have some of the same characteristics as the
 Catalyst WS-C family (5xxx,6xxx).  For example, forwarding tables are held in
 VLANs, and extended interface information is gleaned from F<CISCO-SWITCH-MIB>.
 
-For speed or debugging purposes you can call the subclass directly, but not
-after determining a more specific class using the method above.
-
- my $c3550 = new SNMP::Info::Layer3::C3550(...);
-
 =head2 Inherited Classes
 
 =over
@@ -304,7 +298,7 @@ Software version 12.1(22)EA1a or greater returns duplex based upon the
 result of $c3550->el_duplex().  Otherwise it uses the result of
 the call to CiscoStack::i_duplex().
 
-See L<SNMP::Info::Etherlike> for el_duplex() method and
+See L<SNMP::Info::EtherLike> for el_duplex() method and
 L<SNMP::Info::CiscoStack> for its i_duplex() method.
 
 =item $c3550->i_duplex_admin()

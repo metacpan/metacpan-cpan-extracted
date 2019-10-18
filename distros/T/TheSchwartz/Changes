@@ -1,3 +1,7 @@
+1.14 2019-10-17T17:51:40Z
+
+    - Added missing prereq Class::Accessor::Fast as suggested by CPANTS. GH#1 (@manwar++)
+
 1.13 2019-08-07T16:28:14Z
 
     - the module maintainer has been changed to Takumi Akiyama (AKIYM)

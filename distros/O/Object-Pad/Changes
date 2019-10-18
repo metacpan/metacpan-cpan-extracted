@@ -1,0 +1,9 @@
+Revision history for Syntax-Keyword-Dynamically
+
+0.02    2019-10-17
+        [CHANGES]
+         * `method name :lvalue` and (maybe) other attributes
+         * Support perls back to 5.22 due to wrap_keyword_plugin hax
+
+0.01    2019-10-17
+        First version, released on an unsuspecting world.

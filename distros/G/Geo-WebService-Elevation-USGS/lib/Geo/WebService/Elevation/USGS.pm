@@ -13,68 +13,16 @@ Geo::WebService::Elevation::USGS - Elevation queries against USGS web services.
 
 =head1 NOTICE
 
-Version 0.106_01 changes the default value of the C<'compatible'>
-attribute to C<0> (i.e. false). With version 0.108_01, the
-first attempt to modify this attribute will warn. With version
-0.110_01, all attempts to modify this attribute will warn,
-and six months after the release of this version, any attempt to modify
-it will become fatal.
-
 The GIS data web service this module was originally based on has gone
 the way of the dodo. This release uses the NED service, which is similar
-but simpler. I have taken advantage of the new service's ability to
-provide output in JSON to simplify processing, and have added a
-compatibility mode to make the output from the new service as much like
-the output of the old as possible, but there are still differences:
-
-* The new service does not expose data source selection. Therefore all
-functionality related to selecting data from a particular source now
-does nothing.
-
-* The new service does not support retrieval of data from more than one
-source. Therefore any functionality that used to do this now returns
-data from a single source.
-
-* The new service does not return the C<{Data_ID}> information in any
-way whatsoever. So, at least in compatibility mode, this is set to the
-value of C<{Data_Source}>.
-
-* The new service does not report extent errors. Instead it appears to
-return an elevation of C<0>.
-
-* The structure returned by the new service is similar to that returned
-by the old service, but the top-level hash key name is different. This
-module will attempt to hide this difference in compatibility mode.
-
-Because this module attempts to hide the differences from the data
-returned by the old service, a new attribute, C<compatible>, is added to
-manage this. If this attribute is true (the default) returned data will
-be as close to the old server's data as possible.
-
-With release 0.100, the following functionality is
-deprecated:
-
-* Attributes C<default_ns>, C<proxy>, C<source>, and C<use_all_limit>.
-
-* Methods C<getElevation()> and C<getAllElevations()>. The
-C<elevation()> method will remain.
-
-Starting with release 0.104_01, all deprecated functionality warns
-every time it is used. The plan was to make these fatal in another six
-months, but that fell in the cracks, and when I revisited it I thought
-the change in the default value of the C<'compatible'> attribute (to
-false, see below) was disruptive enough that I would make it a release
-by itself. The current plan is to delay making the deprecated methods
-fatal until the C<compatible> attribute becomes fatal.
-
-In the meantime you can suppress the warnings with
-
- no warnings qw{ deprecated };
-
-The C<compatible> attribute is deprecated as of release 0.104_01. As of
-release 0.106_01 it will warn when set true. In the first
-release after March 1 2019 it will warn on any use. Six months after
-that, it will become a fatal error to use it.
+but simpler. When the change was made, code was installed to ease the
+transition by emulating the old service to the extent possible. This
+code was deprecated pretty much when it was released as 0.100_01 in July
+of 2014. With release 0.115_01 use of any of the compatibility code,
+including the C<'compatible'> attribute itself, results in a fatal
+error. In another six months, all the compatibility machinery will be
+stripped, and we will left with a reasonably-pure interface to the NED
+service.
 
 =head1 DESCRIPTION
 
@@ -127,7 +75,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 
 use constant BEST_DATA_SET => -1;
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
@@ -325,8 +273,8 @@ sub get {
 =head3 $rslt = $eq->getAllElevations($lat, $lon, $valid);
 
 Starting with version 0.100, this method is essentially a wrapper for
-the C<elevation()> method. For compatibility with the prior version of
-this module it returns an array reference in scalar context.
+the C<elevation()> method. Starting with version 0.115_01, calling this
+method results in a fatal error.
 
 =cut
 
@@ -344,15 +292,8 @@ sub getAllElevations {
 =head3 $rslt = $eq->getElevation($lat, $lon, $source, $elevation_only);
 
 Starting with version 0.100, this method is essentially a wrapper for
-the C<elevation()> method.
-
-The C<$source> argument is both optional and ignored, but must be
-present for backwards compatibility if the C<$elevation_only> argument
-is used. Feel free to pass C<undef>.
-
-The C<$elevation_only> argument is optional. If provided and true (in the
-Perl sense) it causes the return on success to be the numeric value of
-the elevation, rather than the hash reference described below.
+the C<elevation()> method. Starting with version 0.115_01, calling this
+method results in a fatal error.
 
 =cut
 
@@ -502,11 +443,11 @@ sub _set_unsigned_integer {
 	attribute	=> {
 	    dflt	=> sub { return },
 	    item	=> {
-		compatible	=> 2,
-		default_ns	=> 2,
-		proxy		=> 2,
-		source		=> 2,
-		use_all_limit	=> 2,
+		compatible	=> 3,
+		default_ns	=> 3,
+		proxy		=> 3,
+		source		=> 3,
+		use_all_limit	=> 3,
 	    },
 	},
 	subroutine	=> {
@@ -515,8 +456,8 @@ sub _set_unsigned_integer {
 		return $name;
 	    },
 	    item	=> {
-		getElevation		=> 2,
-		getAllElevations	=> 2,
+		getElevation		=> 3,
+		getAllElevations	=> 3,
 	    },
 	},
     );
@@ -794,11 +735,8 @@ Boolean
 This Boolean attribute determines whether this object attempts to make
 returned data consistent with the old GIS server.
 
-The default was C<1> (i.e. true) when it was introduced in version
-0.100, but as of version 0.106_01, and per the deprecation
-plan, it is C<0> (i.e. false). Like the other deprecated attributes any
-use of it will eventually become fatal. See the L<NOTICE|/NOTICE> above
-for details.
+As of version 0.115_01, any access of this attribute is fatal.  See the
+L<NOTICE|/NOTICE> above for details.
 
 =head3 croak
 
@@ -816,20 +754,8 @@ The default is 1 (i.e. true).
 
 String
 
-This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
-deprecation schedule.
-
-This attribute records the XML namespace used by the SOAP query. This
-must agree with the targetNamespace value given in the USGS' WSDL found
-at
-C<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_service.asmx?WSDL>.
-
-This attribute should not ordinarily need to be modified, but the
-desperate user may be able to use it to get him- or herself going again
-if the USGS changes the WSDL and this module has not been modified to
-track the change.
-
-The default is C<'http://gisdata.usgs.gov/XMLWebServices2/'>.
+This attribute is deprecated. As of version 0.115.01, any access of this
+attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
 
 =head3 error
 
@@ -855,31 +781,17 @@ The default is undef.
 
 String
 
-This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
-deprecation schedule.
-
-This attribute specifies the actual url to which the SOAP query is
-posted. It must agree with the soap:address location value given for
-wsdl:port name "Elevation_ServiceSoap" given in the USGS' WSDL found
-at
-C<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_service.asmx?WSDL>.
-
-This attribute should not ordinarily need to be modified, but the
-desperate user may be able to use it to get him- or herself going again
-if the USGS changes the WSDL and this module has not been modified to
-track the change.
-
-The default is
-C<'http://gisdata.usgs.gov/XMLWebServices2/Elevation_Service.asmx'>.
+This attribute is deprecated. As of version 0.115_01 any access of this
+attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
 
 =head3 retry
 
 Unsigned integer
 
 This attribute specifies the number of retries to be done by
-C<getAllElevations()> and C<getElevation()> when an error is
-encountered. The first try is not considered a retry, so if you set this
-to 1 you get a maximum of two queries (the try and the retry).
+C<elevation()> when an error is encountered. The first try is not
+considered a retry, so if you set this to 1 you get a maximum of two
+queries (the try and the retry).
 
 Retries are done only on actual errors, not on bad extents. They are
 also subject to the L</throttle> setting if any.
@@ -893,11 +805,10 @@ Code reference
 This attribute specifies a piece of code to be called before retrying.
 The code will be called before a retry takes place, and will be passed
 the Geo::WebService::Elevation::USGS object, the number of the retry
-(from 1), the name of the method being retried (C<'getAllElevations'> or
-C<'getElevation'>), and the arguments to that method. If the position
-was passed as an object, the hook gets the latitude and longitude
-unpacked from the object. The hook will B<not> be called before the
-first try, nor after the last retry.
+(from 1), the name of the method being retried (C<'elevation'> and the
+arguments to that method. If the position was passed as an object, the
+hook gets the latitude and longitude unpacked from the object. The hook
+will B<not> be called before the first try, nor after the last retry.
 
 Examples:
 
@@ -915,19 +826,8 @@ The default is the null subroutine, i.e. C<sub {}>.
 
 =head3 source
 
-This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
-deprecation schedule.
-
-This attribute specifies the ID of the source layer to be queried by
-the elevation() method. Valid layer IDs are documented at
-C<http://gisdata.usgs.gov/XMLWebServices/TNM_Elevation_Service_Methods.php>.
-
-A legal value is a scalar, or an ARRAY, CODE, HASH, or Regexp reference.
-Please see the elevation() method's documentation for how these are
-used.
-
-The default is '-1', which requests a response from the 'best' data
-source for the given point.
+This attribute is deprecated. As of version 0.115_01 any access of this
+attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
 
 =head3 throttle
 
@@ -980,23 +880,8 @@ compatibility code goes away.
 
 Integer
 
-This attribute is deprecated. See the L<NOTICE|/NOTICE> above for the
-deprecation schedule.
-
-This attribute is used to optimize the behavior of the elevation()
-method when the 'source' attribute is an array or hash reference. If the
-number of elements in the array or hash is greater than or equal to this,
-elevation() gets its data by calling getAllElevations() and then
-dropping unwanted data. If the number of elements is less than
-this number, elevation() iterates over the elements of the array or the
-sorted keys of the hash, calling getElevation() on each.
-
-Note that setting this to 0 causes getAllElevations() to be used always.
-Setting this to -1 (or any negative number) is special-cased to cause
-getElevation() to be used whenever the 'source' array or hash has any
-entries at all, no matter how many it has.
-
-The default is 5, which was chosen based on timings of the two methods.
+This attribute is deprecated. As of version 0.115_01 any access of this
+attribute is fatal. See the L<NOTICE|/NOTICE> above for details.
 
 =head3 usgs_url
 

@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 =encoding utf8
 
@@ -48,7 +48,7 @@ L<Quiq::Cascm> - Schnittstelle zu CA Harvest SCM
 
 =item *
 
-L<Quiq::ChartJs::TimeSeries> - Zeitreihen-Plot via Chart.js
+L<Quiq::ChartJs::TimeSeries> - Zeitreihen-Plot mittels Chart.js
 
 =item *
 
@@ -588,6 +588,10 @@ L<Quiq::Rsync> - Aufruf von rsync von Perl aus
 
 =item *
 
+L<Quiq::Sdoc::Producer> - Sdoc-Generator
+
+=item *
+
 L<Quiq::Section::Object> - Abschnitts-Objekt
 
 =item *
@@ -750,7 +754,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

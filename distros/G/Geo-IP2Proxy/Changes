@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+2.20  Fri October 18 16:00:00 2019
+      Reduced file I/O to improve query performance
+
 2.11  Tue June 25 16:00:00 2019
       Minor fix on Math::BigInt->beq()
 

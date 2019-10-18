@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+README
+lib/Unix/ScriptUtil.pm
+t/00-load.t
+t/ScriptUtil.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

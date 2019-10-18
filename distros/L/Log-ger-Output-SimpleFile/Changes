@@ -1,3 +1,11 @@
-0.001    2017-07-14 (PERLANCAR)
+0.002   2019-09-10  Released-By: PERLANCAR; Urgency: low
 
-         - First release.
+	- No functional changes.
+
+	- [doc] Tweak description & mentions.
+
+
+0.001    2017-07-14  Released-By: PERLANCAR
+
+         - First release, forked from LGO-File so we can become the simple
+           bare-bones version when LGO-File accumulates new features.

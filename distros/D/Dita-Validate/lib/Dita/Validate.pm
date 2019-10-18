@@ -1,27 +1,26 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataDFA/lib/ -I/home/phil/perl/cpan/DataNFA/lib/ -I/home/phil/perl/cpan/DataTableText/lib/
 #-------------------------------------------------------------------------------
-# In situ validation of XML parse trees representing OASIS DITA documents
-# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2018
+# Check that a level of an XML parse tree conforms to the L<Dita> standard
+# without resorting to either the L<DitaOT> or L<xmllint>.
+# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2018-2019
 #-------------------------------------------------------------------------------
 # podDocumentation
-
 package Dita::Validate;
-our $VERSION = q(20181027);
-use v5.16;
+our $VERSION = q(20191016);
+use v5.20;
 use warnings FATAL => qw(all);
 use strict;
 use Acme::Tools qw(zipb64 unzipb64);
-use Carp;
+use Carp qw(confess cluck);
 use Data::DFA;
 use Data::Dump qw(dump);
-use Data::Edit::Xml;
 use Data::Table::Text qw(:all);
 use Storable;
 use utf8;
 
-#1 Validate                                                                     # Validate the structure of an XML parse tree representing an L<OASIS DITA|https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=dita> document without using the L<DITA-OT|http://www.dita-ot.org/download> toolkit.
+#D1 Validate                                                                    # Check that a level of an XML parse tree conforms to the L<Dita> standard without resorting to either the L<DitaOT> or L<xmllint>.
 
-sub new                                                                         #P Create a new set of Dita XML validation DFAs.  Each Data::DFA below has been dumped, zipped, then converted to base 64 for convenient storage.
+sub dfas                                                                        #P Create a new set of Dita XML validation DFAs.  Each Data::DFA below has been dumped, zipped, then converted to base 64 for convenient storage.
  {bless {
   "abstract"                 => "eNrt181uG8kVBtB9noLgagJYANn8HyADBBjkJYIsmmRL6ph/bjZlOYbfPU1JlkhWGbO/ONrYkj5V\nddW9Vc2z3FTH42/f/9br9Qf9Xu8ff/T+fdqtq/tPvbd/vvfK5bFtylV7/uV82Pvx9qv/fDr/0fDt\nj7r/f3y9/ulf/ej71XfdWOVy2VRPddlW67v7fbPtn0cuRp+S3KHelduq//GjLjcaJrllv3fz1eXG\naWy/31Tl7nq4YpbkVnVb9W+HK+ZpbrvOPF4672q/rpab/epz/yI3G2Rzh8f+9bzDNLcu2zJ5vvE0\nm7srl/tT27/ILdJc/dRPtm+W7st600+3eZqWY92U9+3dar/dVrvXqbvcZJLkqi+nsq33u7v3zTnP\nO/917r5+ODXVayMOZ7/O1btNvfuZS9fbDZOud5iJbapD2V4U5Bwr0twusy2TtBxdp1f1w037TdLy\nPpb/K5v1se2Ox9sGnrc53b461/WZ2LZ8uG7n83CDfG5bHq6WO0l3r+4O+HNbnU/tRW7+61xT3fff\nc2nVPlffvu6b9c2pTOc9l/SufWz2p4fH9/Gm2dgxWW5atc2XXDOnd9C2bD6fDpfn/HzIB5lc+7jd\n3BzeSdpVXUlPq/K4Ktc/Bzx3VbqO7fHh+s54ORzDXG532t7MO5rkctd3y8u86Xp3+8zlN00vtW7S\n1WPZvBf3dd60DfbL/1ar9ub5pul699nLJW2X/eF8xG/Xm9Z3/1Q1b7fAxf4lsUPuEE3TZRzKpmuB\nrp27E1m3314P5WiRy113wcu0RTZ3/fI4j5eW46Zmb2XLPF9TpXfaNH2+L7n1FmlbNd1lWjfd+3l1\nfmWeDi+v6Hna9sdVU1W35Zil6zg+7pt2XR1XV7dG2lbHenvYVG253Fwcj1kml2uXWdr2x27au/J4\nfbuM0z54uW5v6zbOjHdapvtcZGKHNJZW7fj00L0nd23ZNWrz/qbMDPdtlzm8w1yuLZ/XdfnQdevP\n8caZeb8du5dL98Hg8POzwXm8dJcv6/Cxy+nhvXodvO9Kkck9t2lunM29H7T3aqTd124zXVCkVWvb\nTC5t0lPucKRn6FSfa9Zc3FjnWdOnO2V7NDPe7vNu//X2g0Hm8Y5VU+8OHx/nXqqWrvapbDKfS9Oq\nfa3PW7y5uYPSs/G83ZTt7RU+HuZy1aZ6/9D3lityud3x6gnPuVEud6iTM5l2y/PFS+ijHjfr/XH9\n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\n",
   "alt"                      => "eNrt3M1O60YYBuB9ryLKqpWIRBIIcKRWqnTUm6i6MIkBi/injg0HIe699kkgxGOpS2bxsIFYLxPP\nfDPz7L7bbbrb/fr6y2QyPZ9OJr//Mfm7LTbp3dnk8Ot1kmyb/vnF1eTt8PSfsz4/P+S7v48/+//6\nv0evJ5+6sZLb2zp9ypIm3czuyjqf9iMvLs6CXJUVSZ5Oj4+63HUQu51OBj9dbDkPcut8Ew43H8mV\nm7R6mA7Guwlym6RJpsPvvRqNzZLbsm2mx9jiMszVyV0zW5d5nhb7aJ8Lx0v/bZMmK4tZVmyzIt3X\nZXke5O6ybVolzaeJ9HUNp9tVIM3ui9NlWQSxbHSVw9xj+vJc1pvT4cLZ9q8+ax7qsr0/vGE/3DLI\n5Un92Faf69blViOx5iHfDmoWzrVb2nad7NbJ5n24fk3Ct8t390WbD4dbjOVOd8rP8cJcN9j6Ianr\n9O7TLObh95ZVX9nB94Y7r3xK60PtP9UiPEBVUncL16R1t6Oy5mW/VearsVx+ejT6XLilBnM9bJXw\n/epuj2Z1d7rX2zQp2mp/wMOTuyvrZpbsBidyJNcOz3g/39VIrhrJhcu8e7rvDlrRJN0a1u9HLdx7\nu5dipLrnI7ldk+bdAa/ez3ifC8frCpEHF8ZiLPejCXOr0dxHZT+WL7wxmmakbMsw144e8bAcbdYv\nXl0ez1s/3/D92uKxKJ8HN0u4S9tdWmdFdbwff8bC3FNSj9zf4fI9Z/2abAe7ORzvR75NTpemz92M\n5dJt+nErH8pxPpYrdidv2OfmY7kqG26rxeDSeDv9eDLKXuQFkYlMZCITmchEjkDkJZGJTGQiE5nI\nRI5A5AsiE5nIRCYykYkcgciXRCYykYlMZCITOQKRV0QmMpGJTGQiEzkCka+ITGQiE5nIRCZyBCJf\nE5nIRCYykYlM5AhEviEykYlMZCITmcgRiDw/nxKZyEQmMpGJTOSvF3lOZCITmchEJjKRIxB5QWQi\nE5nIRCYykSMQeUlkIhOZyEQmMpEjEPmCyEQmMpGJTGQiRyDyJZGJTGQiE5nIRI5A5BWRiUxkIhOZ\nyESOQOQrIhOZyEQmMpGJHIHI10QmMpGJTGQiEzkCkW+ITGQiE5nIRCby14u80LOLyEQmMpGJTOQY\nRNazi8hEJjKRiUzkGETWs4vIRCYykYlM5BhE1rOLyEQmMpGJTOQYRNazi8hEJjKRiUzkGETWs4vI\nRCYykYlM5BhE1rOLyEQmMpGJTOQYRNazi8hEJjKRiUzkGETWs4vIRCYykYlM5BhE1rOLyEQmMpGJ\nTOQIRF7q2UVkIhOZyEQmcgwi69lFZCITmchEJnIMIuvZRWQiE5nIRCZyDCLr2UVkIhOZyEQmcgwi\n69lFZCITmchEJnIMIuvZRWQiE5nIRCZyDCLr2UVkIhOZyEQmcgwi69lFZCITmchEJnIMIuvZRWQi\nE5nIRCZyDCLr2UVkIhOZyEQmcgQiX+jZRWQiE5nIRCZyDCLr2UVkIhOZyEQmcgwi69lFZCITmchE\nJnIMIuvZRWQiE5nIRCZyDCLr2UVkIhOZyEQmcgwi69lFZCITmchEJnIMIuvZRWQiE5nIRCZyDCLr\n2UVkIhOZyEQm8leL/HY2mX7vYPn27ftff05/+w8FZRnO\n",
@@ -365,74 +364,79 @@ sub new                                                                         
 
 my $dfaCache;                                                                   # Cache decompressed DFAs
 
-sub directChildren($)                                                           #S Validate the  children immediately under a parent node of an Data::Edit::Xml parse tree. Return B<undef> if the child nodes occur are complete and in a valid order as defined by L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> else return a description of why the validation failed.
- {my ($parent) = @_;                                                            # Node in parse tree
-  my $tag      = $parent->tag;                                                  # Node tag
-  my $dfa      = $$dfaCache{$tag} // do                                         # Get the DFA from the cache or reconstitute a new one
-   {my $validate = new;                                                         # New set of DFAs
-    my $compressedDfa = $$validate{$tag};                                       # Compressed DFA
-    return &result(undef, $parent, $validate, "Invalid DITA tag: $tag")         # Not a dita tag - list the possible tags
-      unless $compressedDfa;
-    my $dfa = eval unzipb64($compressedDfa);                                    # Decompress DFA for this node
-    confess $@ if $@;                                                           # Not Dita XML
-    $$dfaCache{$tag} = $dfa;                                                    # Cache decompressed DFA
-    $dfa;
-   };
+sub unpackDFA($)                                                                #P Unpack the DFA required to check the parent
+ {my ($parent)       = @_;                                                      # Parent node
+  my $tag            = $parent->tag;                                            # Parent tag
+  my $cache          = $$dfaCache{$tag};                                        # Looked for a cached version
+  return $cache      if $cache;                                                 # Return version found in cache
+  my $validate       = dfas;                                                    # New set of DFAs
+  my $compressedDfa  = $$validate{$tag};                                        # Compressed DFA
+  return undef       unless $compressedDfa;                                     # Not a dita tag
+  my $dfa = eval unzipb64($compressedDfa);                                      # Decompress DFA for this node
+  confess "$@ \n"    if $@;                                                     # Unable to decompress DFA
+  $$dfaCache{$tag}   = $dfa;                                                    # Cache and return decompressed DFA
+ }
+
+sub validateChild($)                                                            #S Confirm that the given child B<$node> is both reachable from its parent and allowed in its current position.  Return 0 for parent is not in Dita, 1 for not reachable (presumably a prior sibling is in error), 2 - reachable and invalid, 3 - reachable and valid.  Note that the root node is always reachable and valid.
+ {my ($node) = @_;                                                              # Node in a L<dex> parse tree
+  return 3 unless my $parent = $node->parent;                                   # Get parent of node
+  return 0 unless my $dfa    = unpackDFA($parent);                              # Get the DFA for the parent or show invalid parent
   my $parser = $dfa->parser;                                                    # Parser from DFA
-  my $state  = 0;                                                               # Parser starts in this state
-  my $valid;                                                                    # Last valid node
-  my $steps  = 0;
-  for my $node($parent, $parent->contents)                                      # The nodes to check
-   {my $transitions   = $$dfa{$state}[Data::DFA::Transitions];                  # Transitions table for this state
-    my $symbol        = $node->tag =~ s(CDATA) (text)gsr;                       # Transition symbol
-    if (my $nextState = $$transitions{$symbol})                                 # Try to move to next state
-     {$state = $nextState;                                                      # Success: move to next state and continue validating
-      $steps++;
+  my $state  = $$dfa{0}[Data::DFA::Transitions]{$parent->tag};                  # Parser starts in this state
+  die "Invalid DFA" unless $state;
+
+  for my $n($parent->contents)                                                  # The nodes to check
+   {my $transitions = $$dfa{$state}[Data::DFA::Transitions];                    # Transitions table for this state
+    my $symbol      = $n->tag =~ s(CDATA) (text)gsr;                            # Transition symbol
+    if (my $nextState = $$transitions{$symbol})                                 # Move to valid state
+     {$state = $nextState;                                                      # Next state
+      return 3 if $n == $node;                                                  # Reached child node
      }
-    else
-     {return &result($valid, $node, $transitions,                               # Failed: report error
-        "Tag: ".$node->tag." cannot appear ".
-        ($steps < 2 ? q(first under) : q(after)).
-        " tag: ".$valid->tag.
-        ($steps < 2 ? q() : q( under tag: ).$parent->tag)
-        );
+    else                                                                        # Failed
+     {return 2 if $n == $node;                                                  # Failed on the child node
+      return 1;                                                                 # Failed before the child node
      }
-    $valid = $node;                                                             # The first node is always valid so this will be set
    }
-  return undef if $$dfa{$state}[Data::DFA::Final];                              # Final state must be final for parse to succeed
-  my $transitions = $$dfa{$state}[Data::DFA::Transitions];
-  &result($valid, $parent->last, $transitions,                                  # Failed because the last state reached was not a final state
-   "Expected a following tag chosen from: ".join ", ", sort keys %$transitions);
+  confess "This should not happen!\n";
  }
 
-sub allChildren($)                                                              #S Validate all the child nodes in the entire sub tree of a parent node in an Data::Edit::Xml parse tree representing a L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> document. Return B<undef> if they are complete and occur in a valid order else return a description of why the validation failed.
- {my ($parent) = @_;                                                            # Node in parse tree
-  my $r;
-  $parent->downX(sub
-   {return unless $_->contents;
-    $r = directChildren($_);                                                    # Node tag
-    die if $r;
-   });
-  $r
- }
+sub firstFailure($)                                                             #S Return the first node to fail when checking that a specified B<$node> and its immediate  children (if any) conform to the L<Dita> standard else return B<undef> if no failing node was found.
+ {my ($node) = @_;                                                              # Node in a L<dex> parse tree
+  return $node unless my $dfa = unpackDFA($node);                               # Get the DFA for the node or show invalid
 
-#1 Validation results                                                           # If the validation of the XML Parse tree corresponding to the input DITA fails then this object is returned to describe the reason for the failure in detail:
+  my $parser = $dfa->parser;                                                    # Parser from DFA
+  my $state  = $$dfa{0}[Data::DFA::Transitions]{$node->tag};                    # Parser starts in this state
+  die "Invalid DFA" unless $state;
 
-sub result($$$$)                                                                #SP Create a validation results description.
- {my ($node, $failingNode, $transitions, $reason) = @_;                         # Last good node, node at which validation failed, array of possible symbols, readable reason for failure
-  package Dita::Validate::Result;                                               # Results of validation
-  use Data::Table::Text qw(genLValueScalarMethods);
-  return bless                                                                  # Construct reason for failure
-   {fail=>$failingNode, last=>$node, next=>[sort keys %$transitions],
-    reason=>$reason,
-   };
-  BEGIN {
-    genLValueScalarMethods(qw(fail));                                           # The node in the XML parse tree at which validation failed.
-    genLValueScalarMethods(qw(last));                                           # The last valid node visited in the XML parse tree before validation failed.
-    genLValueScalarMethods(qw(next));                                           # The tags that would have succeeded at the last valid node.
-    genLValueScalarMethods(qw(reason));                                         # A readable description of the error.
+  for my $n($node->contents)                                                    # The nodes to check
+   {my $transitions = $$dfa{$state}[Data::DFA::Transitions];                    # Transitions table for this state
+    my $symbol      = $n->tag =~ s(CDATA) (text)gsr;                            # Transition symbol
+    if (my $nextState = $$transitions{$symbol})                                 # Move to valid state
+     {$state = $nextState;                                                      # Next state
+     }
+    else                                                                        # Failed
+     {return $n;
+     }
    }
+
+  return $node unless $$dfa{$state}[Data::DFA::Final];                          # Failed to finish in a final state - ascribe the failure to the specified node
+  undef                                                                         # No failing node found
  }
+
+#D0
+#-------------------------------------------------------------------------------
+# Export - eeee
+#-------------------------------------------------------------------------------
+
+use Exporter qw(import);
+
+use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+# containingFolder
+
+@ISA          = qw(Exporter);
+@EXPORT       = qw();
+@EXPORT_OK    = qw();
 
 # podDocumentation
 
@@ -442,59 +446,23 @@ sub result($$$$)                                                                
 
 =head1 Name
 
-Dita::Validate - In situ validation of XML parse trees representing OASIS DITA documents.
+Dita::Validate - Check that a level of an XML parse tree conforms to the
+L<Dita> standard without resorting to either the L<DitaOT> or
+L<xmllint>.
 
 =head1 Synopsis
 
-Parse some XML representing a document that almost conforms to L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>:
-
-  use Data::Edit::Xml;
-  use Dita::Validate;
-
-  my $x = Data::Edit::Xml::new(<<END);
-<ol>
-<li><p>ppp</p></li>
-<li><q>qqq</q></li>
-<li><conbody>ccc</conbody></li>
-</ol>
-END
-
-Validate the XML tree structure against the L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> standard and diagnose any errors in situ:
-
-  if (my $r = Dita::Validate::allChildren($x))
-   {
-    ok $r->last->tag eq q(li);
-    ok $r->fail->tag eq q(conbody);
-    ok $r->reason    eq q(Tag: conbody cannot appear first under tag: li);
-    ok join(" ", @{$r->next}) =~ m(b boolean cite cmdname codeblock);
-   }
-
-This approach avoids the need to: construct a complete L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> topic, write the
-topic to a file, apply L<xmllint|http://xmlsoft.org/xmllint.html> to the file containing the topic and then
-manually connect the resulting error messages back to the failing nodes in the
-parse tree.
-
-This module does not require you to install
-L<DITA-OT|http://www.dita-ot.org/download>
-or
-L<xmllint|http://xmlsoft.org/xmllint.html>. To apply L<xmllint|http://xmlsoft.org/xmllint.html>
-to a large number of files see: L<Data::Edit::Xml::Lint>.
-
-The deterministic finite state automatons used internally to validate the XML
-representing
-L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>
-conforming documents were obtained by parsing the L<Normative
-Form|https://docs.oasis-open.org/dita/dita/v1.3/csprd01/part2-tech-content/archSpec/base/using-relax-ng.html>
-of the
-L<DITA|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>
-specification with L<Data::Edit::Xml> and then applying L<Data::NFA> and L<Data::DFA>.
+Given a child node of an L<xml> parse tree produced by L<Data::Edit::Xml>
+confirm that said child can be reached from its parent via the intervening
+siblings along a path conforming to the L<Dita> standard without the overhead of invoking either
+the L<DitaOT> toolkit or L<xmllint>.
 
 =head1 Description
 
-In situ validation of XML parse trees representing OASIS DITA documents.
+Check that a level of an XML parse tree conforms to the
 
 
-Version q(20181027).
+Version q(20191016).
 
 
 The following sections describe the methods in each functional area of this
@@ -502,9 +470,132 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 
 
+=head1 Validate
+
+Check that a level of an XML parse tree conforms to the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> standard without resorting to either the L<DITA-OT|http://www.dita-ot.org/download> or L<xmllint>.
+
+=head2 validateChild($)
+
+Confirm that the given child node is both reachable and allowed in its current position.  Return 0 for parent is not in Dita, 1 for not reachable (presumably a prior sibling is in error), 2 - reachable and invalid, 3 - reachable and valid.  Note that the root node is always reachable and valid.
+
+     Parameter  Description
+  1  $node      Node in a L<Data::Edit::Xml|https://metacpan.org/pod/Data::Edit::Xml> parse tree
+
+B<Example:>
+
+
+  if (1)
+   {my $x = Data::Edit::Xml::new(<<END);
+  <concept>
+    <title>aaa</title>
+    <conbody>
+      <p>aaa</p>
+      <p><ol><li/><LI/><li/></ol></p>
+      <q>ccc</q>
+      <p>ddd</p>
+    </conbody>
+  </concept>
+  END
+
+
+    ok 3 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x);
+    ok 3 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_title);
+    ok 3 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody);
+    ok 3 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_p);
+    ok 3 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_p_1);
+    ok 2 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_q);
+    ok 1 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_p_2);
+
+    ok 3 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_p_1_ol_li);
+    ok 2 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_p_1_ol_LI);
+    ok 1 == 𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲𝗖𝗵𝗶𝗹𝗱($x->go_conbody_p_1_ol_li_1);
+
+    my $ol = $x->go_conbody_p_1_ol;
+    my $LI = $x->go_conbody_p_1_ol_LI;
+    ok $LI == firstFailure($ol);
+    ok $LI == firstFailure($LI);
+   }
+
+
+This is a static method and so should be invoked as:
+
+  Dita::Validate::validateChild
+
+
+=head2 firstFailure($)
+
+Return the first node to fail when checking that a specified B<$node> and its immediate  children (if any) conform to the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> standard else return B<undef> if no failing node was found.
+
+     Parameter  Description
+  1  $node      Node in a L<Data::Edit::Xml|https://metacpan.org/pod/Data::Edit::Xml> parse tree
+
+B<Example:>
+
+
+  if (1)
+   {my $x = Data::Edit::Xml::new(<<END);
+  <concept>
+    <title>aaa</title>
+    <conbody>
+      <p>aaa</p>
+      <p><ol><li/><LI/><li/></ol></p>
+      <q>ccc</q>
+      <p>ddd</p>
+    </conbody>
+  </concept>
+  END
+
+
+    ok 3 == validateChild($x);
+    ok 3 == validateChild($x->go_title);
+    ok 3 == validateChild($x->go_conbody);
+    ok 3 == validateChild($x->go_conbody_p);
+    ok 3 == validateChild($x->go_conbody_p_1);
+    ok 2 == validateChild($x->go_conbody_q);
+    ok 1 == validateChild($x->go_conbody_p_2);
+
+    ok 3 == validateChild($x->go_conbody_p_1_ol_li);
+    ok 2 == validateChild($x->go_conbody_p_1_ol_LI);
+    ok 1 == validateChild($x->go_conbody_p_1_ol_li_1);
+
+    my $ol = $x->go_conbody_p_1_ol;
+    my $LI = $x->go_conbody_p_1_ol_LI;
+    ok $LI == 𝗳𝗶𝗿𝘀𝘁𝗙𝗮𝗶𝗹𝘂𝗿𝗲($ol);
+    ok $LI == 𝗳𝗶𝗿𝘀𝘁𝗙𝗮𝗶𝗹𝘂𝗿𝗲($LI);
+   }
+
+
+This is a static method and so should be invoked as:
+
+  Dita::Validate::firstFailure
+
+
+
+=head1 Private Methods
+
+=head2 dfas()
+
+Create a new set of Dita XML validation DFAs.  Each Data::DFA below has been dumped, zipped, then converted to base 64 for convenient storage.
+
+
+=head2 unpackDFA($)
+
+Unpack the DFA required to check the parent
+
+     Parameter  Description
+  1  $parent    Parent node
+
 
 =head1 Index
 
+
+1 L<dfas|/dfas> - Create a new set of Dita XML validation DFAs.
+
+2 L<firstFailure|/firstFailure> - Return the first node to fail when checking that a specified B<$node> and its immediate  children (if any) conform to the L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html> standard else return B<undef> if no failing node was found.
+
+3 L<unpackDFA|/unpackDFA> - Unpack the DFA required to check the parent
+
+4 L<validateChild|/validateChild> - Confirm that the given child node is both reachable and allowed in its current position.
 
 =head1 Installation
 
@@ -521,7 +612,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -550,82 +641,40 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>14;
+use Test::More qw(no_plan);
+use Data::Edit::Xml;
 
-if (1)                                                                          # Valid empty tag
+if (1)                                                                          #TvalidateChild #TfirstFailure
  {my $x = Data::Edit::Xml::new(<<END);
-<supplyli/>
-END
-  my $r = Dita::Validate::directChildren($x);
-  ok $r->reason eq q(Expected a following tag chosen from: supply);
- }
-
-if (1)
- {my $x = Data::Edit::Xml::new(<<END);                                          # Valid tags
 <concept>
-<title>aaa</title>
-<conbody>
-</conbody>
+  <title>aaa</title>
+  <conbody>
+    <p>aaa</p>
+    <p><ol><li/><LI/><li/></ol></p>
+    <q>ccc</q>
+    <p>ddd</p>
+  </conbody>
 </concept>
 END
-  ok !Dita::Validate::directChildren($x);
+
+
+  ok 3 == validateChild($x);
+  ok 3 == validateChild($x->go_title);
+  ok 3 == validateChild($x->go_conbody);
+  ok 3 == validateChild($x->go_conbody_p);
+  ok 3 == validateChild($x->go_conbody_p_1);
+  ok 2 == validateChild($x->go_conbody_q);
+  ok 1 == validateChild($x->go_conbody_p_2);
+
+  ok 3 == validateChild($x->go_conbody_p_1_ol_li);
+  ok 2 == validateChild($x->go_conbody_p_1_ol_LI);
+  ok 1 == validateChild($x->go_conbody_p_1_ol_li_1);
+
+  my $ol = $x->go_conbody_p_1_ol;
+  my $LI = $x->go_conbody_p_1_ol_LI;
+
+  ok $LI == firstFailure($ol);
+  ok $LI == firstFailure($LI);
  }
 
-if (1)
- {my $x = Data::Edit::Xml::new(<<END);                                          # Valid text
-<p>
-aaa
-</p>
-END
-  ok !Dita::Validate::directChildren($x);
- }
-
-if (1)                                                                          # Invalid tag after text
- {my $x = Data::Edit::Xml::new(<<END);                                          #TdirectChildren
-<p>aaa<p>
-</p>
-</p>
-END
-  my $r = Dita::Validate::directChildren($x);                                   #TdirectChildren
-  ok $r->last->text eq qq(aaa);                                                 #TdirectChildren
-  ok $r->reason eq q(Tag: p cannot appear after tag: CDATA under tag: p);       #TdirectChildren
- }
-
-if (1)                                                                          # Invalid tag
- {my $x = Data::Edit::Xml::new(<<END);
-<supplyli><help>
-</help>
-</supplyli>
-END
-  my $r = Dita::Validate::directChildren($x);
-  ok $r->last->tag eq q(supplyli);
-  is_deeply $r->next, [qw(supply)];
-  ok $r->reason eq q(Tag: help cannot appear first under tag: supplyli);
- }
-
-if (1)                                                                          # Tag not in Dita
- {my $x = Data::Edit::Xml::new(<<END);
-<aa></aa>
-END
-  my $r = Dita::Validate::directChildren($x);
-  ok scalar(keys %{&new}) == scalar @{$r->next};
-  ok $r->reason eq q(Invalid DITA tag: aa);
- }
-
-if (1)                                                                          # Tag not in Dita
- {my $x = Data::Edit::Xml::new(<<END);                                          #TallChildren
-<ol>
-<li><p>ppp</p></li>
-<li><q>qqq</q></li>
-<li><conbody>ccc</conbody></li>
-</ol>
-END
-  if (my $r = Dita::Validate::allChildren($x)) {                                #TallChildren
-    ok $r->last->tag eq q(li);                                                  #TallChildren
-    ok $r->fail->tag eq q(conbody);                                             #TallChildren
-    ok $r->reason    eq q(Tag: conbody cannot appear first under tag: li);      #TallChildren
-    ok join(" ", @{$r->next}) =~ m(b boolean cite cmdname codeblock);           #TallChildren
-   }
- }
-
-1
+done_testing;

@@ -1,7 +1,7 @@
 #!perl
 
 our $DATE = '2019-09-09'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -79,7 +79,7 @@ renwd - REName current (Working Directory)
 
 =head1 VERSION
 
-This document describes version 0.003 of renwd (from Perl distribution App-renwd), released on 2019-09-09.
+This document describes version 0.004 of renwd (from Perl distribution App-renwd), released on 2019-09-09.
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,15 @@ and the current directory name is completed for you to edit/modify/
 Pro-tip: install this bash function to be able to rename current directory as
 well as cd to the new directory (tab completion is also provided):
 
-# EXAMPLE: share/renwd-cd.bash
+ # function definition
+ renwd-cd ()
+ {
+     local dir=`renwd --print -- "$1" 2>/dev/null`
+     if [[ "$dir" = "" ]]; then echo "Failed"; else cd "../$dir"; fi
+ }
+ 
+ # activate tab completion
+ complete -C renwd renwd-cd
 
 Afterwards, you can:
 

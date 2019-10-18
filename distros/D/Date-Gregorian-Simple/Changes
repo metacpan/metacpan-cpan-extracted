@@ -1,5 +1,8 @@
 Revision history for Date::Gregorian::Simple
 
+0.17  Tue Oct 15 18:40:00 2019
+      - Updated dependency on Date::Utils v0.28.
+
 0.16  Thu Aug 15 18:45:00 2019
       - Updated dependency on Date::Utils v0.27.
 

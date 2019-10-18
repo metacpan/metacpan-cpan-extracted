@@ -1,5 +1,10 @@
 Revision history for perl distribution LinkEmbedder
 
+1.06 2019-10-16T18:55:09+0900
+ - Add support for NHL videos #12
+ - Fixed a bunch of failing tests #12
+ - Make sure error() is always a hash-ref
+
 1.05 2019-04-17T18:33:02+0700
  - No longer EXPERIMENTAL
  - Replaced a bunch of outdated example links

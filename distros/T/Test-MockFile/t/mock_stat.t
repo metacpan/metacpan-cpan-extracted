@@ -68,13 +68,13 @@ my $basic_stat_return = array {
     item 0;
     item 0100644;
     item 0;
+    item match qr/^[0-9]+$/;
+    item match qr/^[0-9\s]+$/;
     item 0;
     item 0;
-    item 0;
-    item 0;
-    item match qr/^\d\d\d\d+$/;
-    item match qr/^\d\d\d\d+$/;
-    item match qr/^\d\d\d\d+$/;
+    item match qr/^[0-9]{3,}$/;
+    item match qr/^[0-9]{3,}$/;
+    item match qr/^[0-9]{3,}$/;
     item 4096;
     item 1;
 };
@@ -91,19 +91,33 @@ my $symlink_lstat_return = array {
     item 0;
     item 0127777;
     item 0;
-    item 0;
-    item 0;
+    item match qr/^[0-9]+$/;
+    item match qr/^[0-9\s]+$/;
     item 0;
     item 1;
-    item match qr/^\d\d\d\d+$/;
-    item match qr/^\d\d\d\d+$/;
-    item match qr/^\d\d\d\d+$/;
+    item match qr/^[0-9]{3,}$/;
+    item match qr/^[0-9]{3,}$/;
+    item match qr/^[0-9]{3,}$/;
     item 4096;
     item 1;
 };
 
 is( Test::MockFile::_mock_stat( 'lstat', '/broken_link' ), $symlink_lstat_return, "lstat on /broken_link returns the stat on the symlink itself." );
 is( Test::MockFile::_mock_stat( 'stat', '/broken_link' ), [], "stat on /broken_link is an empty array since what it points to doesn't exist." );
+
+{
+    my $exe = q[/tmp/custom.exe];
+    my $tmp = Test::MockFile->file( $exe, " ", { mode => 0700 } );
+    ok -x $exe, "mocked file is executable";
+
+     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks)
+           = stat($exe);
+
+    is $uid, $>, 'default uid is current UID';
+    note "GID $gid";
+    is $gid, int $), 'default fid is current GID';
+}
 
 done_testing();
 exit;

@@ -1,0 +1,55 @@
+NAME
+    Acme::CPANModules::PickingRandomItemsFromList - Picking random items
+    from a list
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::PickingRandomItemsFromList (from Perl distribution
+    Acme-CPANModules-PickingRandomItemsFromList), released on 2019-09-15.
+
+DESCRIPTION
+    Picking random items from a list.
+
+    If you are picking random lines from a file, there's a separate
+    CPANModules list for it: Acme::CPANModules::PickingRandomLinesFromFile.
+    If your "list" is a Perl array, there's "shuffle" from List::Util and
+    "samples" from List::MoreUtils (if you don't want duplicates) or you can
+    just select random elements using "rand()" if you don't mind duplicates.
+
+INCLUDED MODULES
+    *   List::Util
+
+    *   List::MoreUtils
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-PickingRandomItemsFromLis
+    t>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-PickingRandomItemsFr
+    omList>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Pick
+    ingRandomItemsFromList>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

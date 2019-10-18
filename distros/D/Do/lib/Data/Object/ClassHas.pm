@@ -7,7 +7,7 @@ use warnings;
 
 use Data::Object::Utility;
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # BUILD
 
@@ -51,6 +51,7 @@ sub _formulate_opts {
   %opts = (%opts, _formulate_rdr($info, $name, %opts)) if $opts{rdr};
   %opts = (%opts, _formulate_req($info, $name, %opts)) if $opts{req};
   %opts = (%opts, _formulate_tgr($info, $name, %opts)) if $opts{tgr};
+  %opts = (%opts, _formulate_use($info, $name, %opts)) if $opts{use};
   %opts = (%opts, _formulate_wkr($info, $name, %opts)) if $opts{wkr};
   %opts = (%opts, _formulate_wrt($info, $name, %opts)) if $opts{wrt};
 
@@ -170,6 +171,35 @@ sub _formulate_tgr {
   $opts{trigger} = delete $opts{tgr};
 
   return (%opts);
+}
+
+sub _formulate_use {
+  my ($info, $name, %opts) = @_;
+
+  if (my $use = delete $opts{use}) {
+    $opts{builder} = _formulate_use_builder($info, $name, @$use);
+    $opts{lazy} = 1;
+  }
+
+  return (%opts);
+}
+
+sub _formulate_use_builder {
+  my ($info, $name, $sub, @args) = @_;
+
+  return sub {
+    my ($self) = @_;
+
+    @_ = ($self, @args);
+
+    my $point = $self->can($sub) or do {
+      require Carp;
+      my $class = $info->[1];
+      Carp::croak("has '$name' cannot 'use' method '$sub' via package '$class'");
+    };
+
+    goto $point;
+  }
 }
 
 sub _formulate_wkr {
@@ -391,7 +421,7 @@ on-demand, or on-construction. See the L<Moo> documentation for more details.
 
   new => 1
 
-The C<new> directive, if truthy, denotes the the attribute will be constructed
+The C<new> directive, if truthy, denotes that the attribute will be constructed
 on-demand, i.e. is lazy, with a builder named C<new_{attribute}>. This ability
 is not supported by the L<Moo> object superclass.
 
@@ -426,6 +456,18 @@ return the attribute's value. See the L<Moo> documentation for more details.
 The C<trigger> directive expects a coderef and is executed whenever the
 attribute's value is changed. See the L<Moo> documentation for more details.
 
+=item use
+
+  # lazy dependency injection
+
+  use => ['service', 'datetime']
+
+The C<use> directive denotes that the attribute will be constructed
+on-demand, i.e. is lazy, using a custom builder meant to perform service
+construction. This directive exists to provide a simple dependency injection
+mechanism for class attributes. This ability is not supported by the L<Moo>
+object superclass.
+
 =item wkr|weak_ref
 
   # weaken ref
@@ -451,7 +493,7 @@ details.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

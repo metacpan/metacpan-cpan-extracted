@@ -24,7 +24,7 @@ SYNOPSIS
         },
       );
     
-      spurt_json @people, 'people.json';
+      spurt_json \@people, 'people.json';
     
       my @people_from_file = slurp_json 'people.json';
     
@@ -48,7 +48,7 @@ SYNOPSIS
       use JSON::Slurper -std_auto;
     
       # This saves to people.json
-      spurt_json @people, 'people';
+      spurt_json \@people, 'people';
     
       # This reads from people.json
       my @people_from_file = slurp_json 'people';
@@ -144,13 +144,15 @@ FUNCTIONAL INTERFACE
 
     spurt_json $data, $filename, [$json_encoder]
 
-      # values can be passed as refs
+      # data must be passed as references or scalars
       spurt_json \@array, 'ref.json';
     
-      # or as an array or hash (still passed as refs using prototypes)
-      spurt_json @array, 'array.json';
+      spurt_json 'string', 'ref.json';
     
-      spurt_json %hash, 'hash.json';
+      # pass anonymous array or hash refs
+      spurt_json [1, 2, 3], 'ref.json';
+    
+      spurt_json {key => 'value'}, 'ref.json';
     
       # You can pass your own JSON encoder
       spurt_json $ref, 'ref.json', JSON::PP->new->ascii->pretty;

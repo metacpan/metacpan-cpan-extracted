@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.24 2019-10-15T11:11:50Z
+
+   - Fix compatibility with Mojolicious 8.23 by kraih
+
 0.23 2018-08-14T07:25:56Z
 
    - Add prctl syscall codes for ppc64le and aarch64

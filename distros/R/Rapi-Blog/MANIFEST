@@ -64,11 +64,13 @@ lib/Rapi/Blog/Template/Dispatcher/ScaffoldFile.pm
 lib/Rapi/Blog/Template/Dispatcher/Unclaimed.pm
 lib/Rapi/Blog/Template/Dispatcher/ViewWrapper.pm
 lib/Rapi/Blog/Template/Postprocessor/MarkdownElement.pm
+lib/Rapi/Blog/Template/Postprocessor/TextMarkdown.pm
 lib/Rapi/Blog/Util.pm
 lib/Rapi/Blog/Util/Mailer.pm
 lib/Rapi/Blog/Util/Rabl.pm
 lib/Rapi/Blog/Util/Rabl/Create.pm
 lib/Rapi/Blog/Util/Term/ReadPassword.pm
+lib/Rapi/Blog/Util/ppRender.pm
 script/rabl.pl
 share/assets/css/metro.css
 share/assets/css/rapi-blog.css
@@ -311,3 +313,4 @@ share/templates/dv/postview.html
 share/tpc2017-video-preview.png
 sql/rapi_blog.sql
 t/01_basic.t
+t/02_path_list_matching.t

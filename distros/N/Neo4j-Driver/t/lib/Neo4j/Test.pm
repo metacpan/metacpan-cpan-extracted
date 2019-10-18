@@ -4,14 +4,16 @@ use warnings;
 
 use URI;
 use Neo4j::Driver;
+use Neo4j::Sim;
 
-my $ok;
+
+# may be used for conditional testing
+our $bolt;
+our $sim;
 
 
 # returns a driver that might or might not work
 sub driver_maybe {
-	
-	return unless my $pass = $ENV{TEST_NEO4J_PASSWORD};
 	
 	my $driver;
 	eval {
@@ -21,7 +23,16 @@ sub driver_maybe {
 	return unless $driver;
 	
 	my $user = $ENV{TEST_NEO4J_USERNAME} || 'neo4j';
+	my $pass = $ENV{TEST_NEO4J_PASSWORD};
 	$driver->basic_auth($user, $pass);
+	
+	$bolt = $driver->{uri} && $driver->{uri}->scheme eq 'bolt';
+	if (! $ENV{TEST_NEO4J_PASSWORD} && ! $bolt) {
+		# the driver has no chance of connecting to a real database via
+		# HTTP without a password, so we use the REST simulator instead
+		$driver->{client_factory} = Neo4j::Sim->factory;
+		$sim = 1;
+	}
 	
 	return $driver;
 }
@@ -38,13 +49,25 @@ sub driver {
 	};
 	return if $@;
 	
-	$ok = 1;
 	return $driver;
 }
 
 
-# used for testing driver readiness
-sub driver_ok { $ok }
+# returns a driver that is expected to fail (no connection)
+sub driver_no_host {
+	driver_maybe;  # init $bolt
+	my $driver = Neo4j::Driver->new(($bolt ? 'bolt' : 'http') . '://none.invalid');
+	return $driver;
+}
+
+
+# returns a driver that is expected to fail (unauthorized)
+sub driver_no_auth {
+	my $driver = driver_maybe;
+	$driver->basic_auth('nobody', '');  # relies on Driver mutability and on empty passwords not being allowed by Neo4j
+	$driver->{client_factory} = Neo4j::Sim->factory(auth => 0) if $sim;
+	return $driver;
+}
 
 
 # used for the ResultSummary/ServerInfo test

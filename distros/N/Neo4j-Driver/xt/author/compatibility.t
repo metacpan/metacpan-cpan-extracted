@@ -24,16 +24,15 @@ use REST::Neo4p;
 use Neo4j::Cypher::Abstract;
 
 
-my $t = $s->begin_transaction;
 my ($q);
 
 
 subtest 'query acceptance' => sub {
 	plan tests => 2;
 	$q = REST::Neo4p::Query->new('RETURN 42');
-	lives_and { is $t->run($q)->single->get, 42 } 'REST::Neo4p::Query';
+	lives_and { is $s->run($q)->single->get, 42 } 'REST::Neo4p::Query';
 	$q = Neo4j::Cypher::Abstract->new->return(42);
-	lives_and { is $t->run($q)->single->get, 42 } 'Neo4j::Cypher::Abstract';
+	lives_and { is $s->run($q)->single->get, 42 } 'Neo4j::Cypher::Abstract';
 };
 
 

@@ -1,0 +1,118 @@
+NAME
+
+    Object::Pad - a simple syntax for lexical slot-based objects
+
+SYNOPSIS
+
+       use Object::Pad;
+    
+       class Point {
+          has $x;
+          has $y;
+    
+          method CREATE {
+             $x = $y = 0;
+          }
+    
+          method move {
+             $x += shift;
+             $y += shift;
+          }
+    
+          method describe {
+             print "A point at ($x, $y)\n";
+          }
+       }
+
+DESCRIPTION
+
+    WARNING This is a highly experimental proof-of-concept. Please don't
+    actually use this in production :)
+
+    This module provides a simple syntax for creating object classes, which
+    uses private variables that look like lexicals as object member
+    attributes.
+
+KEYWORDS
+
+ class
+
+       class Name {
+          ...
+       }
+
+    Behaves similarly to the package keyword, but provides a package that
+    defines a new class. Such a class provides an automatic constructor
+    method called new, which will invoke the class's CREATE method if it
+    exists.
+
+ has
+
+       has $var;
+       has @var;
+       has %var;
+
+    Declares that the instances of the class have a member attribute of the
+    given name. This member attribute (called a "slot") will be accessible
+    as a lexical variable within any method declarations in the class.
+
+    Array and hash members are permitted and behave as expected; you do not
+    need to store references to anonymous arrays or hashes.
+
+ method
+
+       method NAME {
+          ...
+       }
+    
+       method NAME :attrs... {
+          ...
+       }
+
+    Declares a new named method. This behaves similarly to the sub keyword,
+    except that within the body of the method all of the member attributes
+    ("slots") are also accessible. In addition, the method body will have a
+    lexical called $self which contains the invocant object directly; it
+    will already have been shifted from the @_ array.
+
+    A list of attributes may be supplied as for sub. The most useful of
+    these is :lvalue, allowing easy creation of read-write accessors for
+    slots.
+
+       class Counter {
+          has $count;
+    
+          method count :lvalue { $count }
+       }
+    
+       my $c = Counter->new;
+       $c->count++;
+
+TODO
+
+      * Setting default package using class Name; statement without block.
+
+      * Subclassing. Single-inheritence is easier than multi so maybe that
+      first.
+
+      * Sub signatures
+
+      * Detect and croak on attempts to invoke method subs on
+      non-instances.
+
+      * Experiment with CvOUTSIDE or other techniques as a way to set up
+      the per-method pad, and consider if we can detect which slots are in
+      use that way to improve method-enter performance.
+
+      * Some extensions of the has syntax:
+
+      Default expressions
+
+         has $var = DEFAULT;
+
+      A way to request generated accessors - ro or rw.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

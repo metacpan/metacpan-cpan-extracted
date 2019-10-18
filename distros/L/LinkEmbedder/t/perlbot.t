@@ -8,7 +8,7 @@ plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
 my $embedder = LinkEmbedder->new;
 
 my $link;
-$embedder->get_p('https://perlbot.pl/p/mgyz68')->then(sub { $link = shift })->wait;
+$embedder->get_p('https://perlbot.pl/p/tm6ukh')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Basic');
 cmp_deeply(
   $link->TO_JSON,
@@ -19,7 +19,7 @@ cmp_deeply(
     provider_url  => 'https://perlbot.pl/',
     title         => re(qr{Perlbot Pastebin}),
     type          => 'rich',
-    url           => 'https://perlbot.pl/p/mgyz68',
+    url           => 'https://perlbot.pl/p/tm6ukh',
     version       => '1.0',
   },
   'https://perlbot.pl'

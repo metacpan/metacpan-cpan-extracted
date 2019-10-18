@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.12';
+$Neo4j::Driver::ResultSummary::VERSION = '0.13';
 
 use Carp qw(croak);
 
@@ -13,12 +13,12 @@ use Neo4j::Driver::SummaryCounters;
 
 
 sub new {
-	my ($class, $result, $response, $statement) = @_; 
+	my ($class, $result, $notifications, $statement) = @_; 
 	my $self = {};
 	if ($result && $result->{stats}) {
 		$self->{counters} = $result->{stats};
 		$self->{plan} = $result->{plan};
-		$self->{notifications} = $response->{notifications};
+		$self->{notifications} = $notifications;
 		$self->{statement} = $statement;
 	}
 	return bless $self, $class;
@@ -93,16 +93,14 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
  my $driver = Neo4j::Driver->new->basic_auth(...);
+ my $result = $driver->session->run('MATCH (a)-[:KNOWS]-(b) RETURN a, b');
  
- my $transaction = $driver->session->begin_transaction;
- $transaction->{return_stats} = 1;
- my $result = $transaction->run('MATCH (a)-[:KNOWS]-(b) RETURN a, b');
  my $summary = $result->summary;
  
  # SummaryCounters
@@ -112,7 +110,7 @@ version 0.12
  my $query  = $summary->statement->{text};
  my $params = $summary->statement->{parameters};
  my $plan   = $summary->plan;
- my @notes  = @{ $summary->notifications };
+ my @notes  = $summary->notifications;
 
 =head1 DESCRIPTION
 
@@ -169,12 +167,12 @@ features. These are subject to unannounced modification or removal
 in future versions. Expect your code to break if you depend upon
 these features.
 
-=head2 Calling in list context
+=head2 Calling in scalar context
 
- my @notifications = $summary->notifications;
+ my $notifications = $summary->notifications;  # arrayref
 
-The C<notifications> method tries to Do What You Mean if called in
-list context.
+The C<notifications()> method returns an array reference if called in
+scalar context, or C<undef> if there are no notifications.
 
 =head1 SEE ALSO
 

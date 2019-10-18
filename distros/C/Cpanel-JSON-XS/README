@@ -1382,12 +1382,12 @@ MAPPING
         directly if you want.
 
            encode_json [Cpanel::JSON::XS::false, Cpanel::JSON::XS::true] # yields [false,true]
-           encode_json [!1, !0]      # yields [false,true]
+           encode_json [!1, !0], [JSON_TYPE_BOOL, JSON_TYPE_BOOL] # yields [false,true]
 
         eq/ne comparisons with true, false:
 
         false is eq to the empty string or the string 'false' or the special
-        empty string "!!0", i.e. "SV_NO", or the numbers 0 or 0.0.
+        empty string "!!0" or "!1", i.e. "SV_NO", or the numbers 0 or 0.0.
 
         true is eq to the string 'true' or to the special string "!0" (i.e.
         "SV_YES") or to the numbers 1 or 1.0.
@@ -1515,7 +1515,7 @@ MAPPING
               $uri->as_string
            }
 
-    2. "convert_blessed" is enabled and the object has a stringification
+    3. "convert_blessed" is enabled and the object has a stringification
     overload.
         In this case, the overloaded "" method of the object is invoked in
         scalar context. It must return a single scalar that can be directly
@@ -1528,10 +1528,10 @@ MAPPING
             package URI;
             use overload '""' => sub { shift->as_string };
 
-    3. "allow_blessed" is enabled.
+    4. "allow_blessed" is enabled.
         The object will be serialized as a JSON null value.
 
-    4. none of the above
+    5. none of the above
         If none of the settings are enabled or the respective methods are
         missing, "Cpanel::JSON::XS" throws an exception.
 

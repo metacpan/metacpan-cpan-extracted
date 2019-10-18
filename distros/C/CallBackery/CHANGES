@@ -1,3 +1,8 @@
+0.19.0 2019-10-17 16:51:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make callbackery work with qx6 and the new node based qooxdoo compiler
+   get the gooddies by running the generator to creat a new app.
+
 0.18.2 2019-09-10 15:14:45 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - added french translation

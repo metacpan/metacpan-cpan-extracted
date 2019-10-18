@@ -4,11 +4,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
-A sub-class of [Class::Simple](https://metacpan.org/pod/Class::Simple) which caches calls to read
+A sub-class of [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) which caches calls to read
 the status of an object that are otherwise expensive.
 
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
@@ -32,12 +32,18 @@ or is a reference to a hash where the return values are to be stored.
 
 It takes one optional argument: object,
 which is an object which is taken to be the object to be cached.
-If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class::Simple) is instantiated
+If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) is instantiated
 and that is used.
 
 ## object
 
 Return the encapsulated object
+
+## state
+
+Returns the state of the object
+
+    print Data::Dumper->new([$obj->state()]->Dump();
 
 # AUTHOR
 
@@ -60,7 +66,7 @@ things to happen.
 
 # SEE ALSO
 
-[Class::Simple](https://metacpan.org/pod/Class::Simple), [CHI](https://metacpan.org/pod/CHI)
+[Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple), [CHI](https://metacpan.org/pod/CHI)
 
 # SUPPORT
 

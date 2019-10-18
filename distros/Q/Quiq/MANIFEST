@@ -141,6 +141,7 @@ lib/Quiq/Range.pm
 lib/Quiq/Record.pm
 lib/Quiq/Reference.pm
 lib/Quiq/Rsync.pm
+lib/Quiq/Sdoc/Producer.pm
 lib/Quiq/Section/Object.pm
 lib/Quiq/Section/Parser.pm
 lib/Quiq/Shell.pm
@@ -325,6 +326,7 @@ t/bin/Quiq/Range.t
 t/bin/Quiq/Record.t
 t/bin/Quiq/Reference.t
 t/bin/Quiq/Rsync.t
+t/bin/Quiq/Sdoc/Producer.t
 t/bin/Quiq/Section/Object.t
 t/bin/Quiq/Section/Parser.t
 t/bin/Quiq/Shell.t

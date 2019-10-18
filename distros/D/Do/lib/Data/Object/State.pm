@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Moo';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # BUILD
 
@@ -128,7 +128,7 @@ The renew method resets the state and returns a new singleton.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

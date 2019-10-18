@@ -1,5 +1,20 @@
 Revision history for Rapi::Blog
 
+1.1301 2019-10-17
+    - Remove the no longer accessible "Pre-Auth" user profile link (VANSTYN)
+
+1.1300 2019-10-17
+    - Added new scaffold config 'template_names' (VANSTYN)
+    - The *_paths scaffold configs now accept glob wildcard patterns (VANSTYN)
+    - Misc bug fixes in scaffold *_paths params (VANSTYN)
+    - Unit tests now validate the API of the *_paths scaffold cfgs (VANSTYN)
+
+1.1200 2019-10-14
+    - Hit tracking properly handles proxied requests (VANSTYN)
+    - Added the 'get_posts' template directive (VANSTYN)
+    - Added the 'ppRender' template directive (VANSTYN)
+    - Added the 'TextMarkdown' post-processor class (VANSTYN)
+
 1.1100 2019-10-05
     - Require RapidApp 1.3200 (VANSTYN)
     - Fix bugs in changing usernames while logged in (VANSTYN)

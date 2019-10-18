@@ -134,5 +134,5 @@ $wm->main();
 $pid->remove if $pid;
 
 END {
-    $wm->killall_children() if !$DAEMON && ! $wm->{pm}->{in_child};
+    $wm->killall_children() if !$DAEMON && $wm->{pm}->is_parent;
 }

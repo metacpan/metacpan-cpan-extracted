@@ -1,3 +1,10 @@
+0.004   2019-09-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [build] [bugfix] Didn't render example in Synopsis.
+
+
 0.003   2019-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add share/renwd-cd.bash.

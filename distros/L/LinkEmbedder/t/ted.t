@@ -17,7 +17,7 @@ cmp_deeply(
     cache_age     => 300,
     html          => re(qr{iframe.*src="}),
     provider_name => 'TED',
-    provider_url  => 'http://ted.com',
+    provider_url  => 'https://www.ted.com',
     title         => "Jill Bolte Taylor: My stroke of insight",
     type          => 'video',
     version       => '1.0',

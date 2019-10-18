@@ -7,7 +7,7 @@ use warnings;
 
 use Memoize;
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 my $map = {};
 
@@ -250,7 +250,7 @@ Returns the registered type-namespaces.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

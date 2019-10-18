@@ -1,6 +1,6 @@
 Date-Holidays-BY
 
-Determine Belarus official holidays and business days in 2017-2019
+Determine Belarus official holidays and business days in 2017-2020
 
 Source https://ru.wikipedia.org/wiki/Праздники_Белоруссии
 
@@ -29,7 +29,8 @@ or use cpanminus:
 
 DEVELOP CPAN RELEASE
 
-Install Carton ( https://metacpan.org/pod/Carton ), then dependencies:
+Install Carton ( https://metacpan.org/pod/Carton  ), then dependencies:
+	cpanm Carton
 	perl dev/dev.pl
 Do something with code and test:
 	carton exec dzil (test/build/clean)
@@ -51,7 +52,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright © 2017-2019 Vladimir Varlamov <bes.internal@gmail.com>
+Copyright © 2017-2020 Vladimir Varlamov <bes.internal@gmail.com>
 This module is adapted copy of Date-Holidays-RU:
 Copyright © 2014 Alexander Nalobin <alexander@nalobin.ru>
 

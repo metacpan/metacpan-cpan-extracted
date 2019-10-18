@@ -1,5 +1,5 @@
 {
-   "abstract" : "map with forking and IPC",
+   "abstract" : "map with forking",
    "author" : [
       "Andrew Shapiro <trski@cpan.org>"
    ],
@@ -38,5 +38,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.2002"
+   "resources" : {
+      "homepage" : "https://github.com/trski/proc-forkmap",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trski/proc-forkmap.git",
+         "web" : "https://github.com/trski/proc-forkmap"
+      }
+   },
+   "version" : "0.2008"
 }

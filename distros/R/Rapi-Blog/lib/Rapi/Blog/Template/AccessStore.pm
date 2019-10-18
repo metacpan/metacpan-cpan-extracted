@@ -93,6 +93,7 @@ around '_get_default_template_vars' => sub {
     BlogCfg         => $self->BlogCfg,
     scaffold        => $self->scaffold_cfg,
     list_posts      => sub { $self->Model->resultset('Post')     ->list_posts(@_)      },
+    get_posts       => sub { $self->Model->resultset('Post')     ->get_posts(@_)       },
     list_tags       => sub { $self->Model->resultset('Tag')      ->list_tags(@_)       },
     list_categories => sub { $self->Model->resultset('Category') ->list_categories(@_) },
     list_sections   => sub { $self->Model->resultset('Section')  ->list_sections(@_)   },
@@ -174,9 +175,26 @@ around '_get_default_template_vars' => sub {
         ) : ''
     },
     
-    
+    ## All of these work the same:
+    # [% ppRender.TextMarkdown(content) %]
+    # [% ppRender('TextMarkdown',content) %]
+    # [% ppRender('Rapi::Blog::Template::Postprocessor::TextMarkdown',content) %]
+    # [% SET pRen = ppRender('TextMarkdown') %]
+    # [% pRen(content) %]
+    ppRender => sub {
+      if (scalar(@_) == 0) {
+        return Rapi::Blog::Util::ppRender->new
+      }
+      elsif(scalar(@_) == 1) {
+        my $pRen = Rapi::Blog::Util::ppRender->new( _post_processor => (shift) );
+        return sub { $pRen->_call_process(@_) }
+      }
+      else {
+        return Rapi::Blog::Util::ppRender->new->_call_process(@_)
+      }
+    }
   };
-  
+
   #if (my $Scaffold = $self->DispatchRule_for($template)->Scaffold) {
   #  $vars->{scaffold} = $Scaffold->config;
   #}

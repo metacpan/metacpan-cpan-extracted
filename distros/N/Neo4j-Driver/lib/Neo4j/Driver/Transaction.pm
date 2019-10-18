@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.12';
+$Neo4j::Driver::Transaction::VERSION = '0.13';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Session Neo4j::Driver);
@@ -21,7 +21,7 @@ sub new {
 		transport => $session->{transport},
 		open => 1,
 		return_graph => 0,
-		return_stats => 0,
+		return_stats => 1,
 	};
 	
 	return bless $transaction, $class;
@@ -31,7 +31,7 @@ sub new {
 sub run {
 	my ($self, $query, @parameters) = @_;
 	
-	croak 'Transaction closed' unless $self->is_open;
+	croak 'Transaction already closed' unless $self->is_open;
 	
 	my @statements;
 	if (ref $query eq 'ARRAY') {
@@ -100,7 +100,7 @@ sub _autocommit {
 sub commit {
 	my ($self) = @_;
 	
-	croak 'Transaction closed' unless $self->is_open;
+	croak 'Transaction already closed' unless $self->is_open;
 	
 	$self->{transport}->commit($self);
 	$self->{open} = 0;
@@ -110,7 +110,7 @@ sub commit {
 sub rollback {
 	my ($self) = @_;
 	
-	croak 'Transaction closed' unless $self->is_open;
+	croak 'Transaction already closed' unless $self->is_open;
 	
 	$self->{transport}->rollback($self);
 	$self->{open} = 0;
@@ -138,7 +138,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -167,12 +167,12 @@ Logical container for an atomic unit of work that is either committed
 in its entirety or is rolled back on failure. A driver Transaction
 object corresponds to a server transaction.
 
-This driver currently only supports blocking transactions that are
-executed non-lazily. In other words, each call to the C<run> method
-immediately initiates an HTTP request to the Neo4j server that runs
-the given statement and waits for the result. The C<run> method does
-not return until either the statement result has been fully received
-or an error is triggered.
+Statements may be run lazily. Most of the time, you will not notice
+this, because the driver automatically waits for statements to
+complete at specific points to fulfill its contracts. If you require
+execution of a statement to have completed, you need to use the
+L<result|Neo4j::Driver::StatementResult>, for example by calling
+one of the methods C<fetch()>, C<list()> or C<summary()>.
 
 Transactions are often wrapped in a C<try> (or C<eval>) block to
 ensure that C<commit> and C<rollback> occur correctly. Note that the
@@ -250,13 +250,29 @@ given as a hash / balanced list.
  my $result = $transaction->run('...', \%hash);
  my $result = $transaction->run('...',  %hash);
 
-The Neo4j values C<true>, C<false> and C<null> may be given as C<\1>,
-C<\0> and C<undef>, respectively, as specified for the
-L<JSON module|Cpanel::JSON::XS/"MAPPING"> used by this class to
-encode the request sent to the Neo4j server. To force numeric values, an
-arithmetic operation should be carried out, such as adding zero
-(S<e. g.> C<< number => 0 + $value >>). String values may be forced
-by concatenating the empty string (C<< string => '' . $value >>).
+When used as parameters, Perl values are converted to Neo4j types as
+shown in the following example:
+
+ my $parameters = {
+   number =>  0 + $scalar,
+   string => '' . $scalar,
+   true   => \1,
+   false  => \0,
+   null   => undef,
+   list   => [ ],
+   map    => { },
+ };
+
+A Perl scalar may internally be represented as a number or a string
+(see L<perldata/Scalar values>). Perl usually auto-converts one into
+the other based on the context in which the scalar is used. However,
+Perl cannot know the context of a Neo4j query parameter, because
+queries are just opaque strings to Perl. Most often your scalars will
+already have the correct internal flavour. A typical example for a
+situation in which this is I<not> the case are numbers parsed out
+of strings using regular expressions. If necessary, you can force
+conversion of such values into the correct type using unary coercions
+as shown in the example above.
 
 Running empty queries is supported. Such queries establish a
 connection with the Neo4j server, which returns a result with zero
@@ -304,16 +320,17 @@ single HTTP request. This driver exposes this feature to the client.
 This feature is likely to be removed from this driver in favour of
 lazy execution, similar to the official Neo4j drivers.
 
-=head2 Obtain query statistics
+=head2 Disable obtaining query statistics
 
  my $transaction = $session->begin_transaction;
- $transaction->{return_stats} = 1;
+ $transaction->{return_stats} = 0;
  my $result = $transaction->run('...');
- my $stats = $result->summary->counters;
 
-The Neo4j server supports requesting query statistics. This driver
-exposes this feature to the client and will continue to do so, but
-the interface is not yet finalised.
+Since version 0.13, this driver requests query statistics from the
+Neo4j server by default. When using HTTP, this behaviour can be
+disabled. Doing so might provide a very minor performance increase.
+
+The ability to disable the statistics may be removed in future.
 
 =head2 Return results in graph format
 

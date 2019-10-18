@@ -1,12 +1,12 @@
-# $Id: 22-RSA-SHA1.t 1677 2018-05-22 11:59:10Z willem $	-*-perl-*-
+# $Id: 22-RSA-SHA1.t 1758 2019-10-14 13:17:11Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Net::DNS'     => 1.01,
-	'MIME::Base64' => 2.13,
+	'Net::DNS::SEC' => 1.01,
+	'MIME::Base64'	=> 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
@@ -15,6 +15,9 @@ foreach my $package ( sort keys %prerequisite ) {
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
+
+plan skip_all => 'disabled RSA'
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_RSA') };
 
 plan tests => 17;
 
@@ -131,21 +134,21 @@ ok( !eval { Net::DNS::SEC::RSA->verify( $sigdata, $key, undef ) },
 
 
 # test detection of invalid private key descriptors
-my $invalid1 = eval { Net::DNS::SEC::Private->new('Kinvalid.private') };
-chomp $@;
-is( $invalid1, undef, "invalid keyfile:	[$@]" );
+eval { Net::DNS::SEC::Private->new('Kinvalid.private') };
+my ($exception1) = split /\n/, "$@\n";
+ok( $exception1, "invalid keyfile:	[$exception1]" );
 
-my $invalid2 = eval { Net::DNS::SEC::Private->new('Kinvalid.+0+0.private') };
-chomp $@;
-is( $invalid2, undef, "missing keyfile:	[$@]" );
+eval { Net::DNS::SEC::Private->new('Kinvalid.+0+0.private') };
+my ($exception2) = split /\n/, "$@\n";
+ok( $exception2, "missing keyfile:	[$exception2]" );
 
-my $invalid3 = eval { Net::DNS::SEC::Private->new( signame => 'private' ) };
-chomp $@;
-is( $invalid3, undef, "unspecified algorithm:	[$@]" );
+eval { Net::DNS::SEC::Private->new( signame => 'private' ) };
+my ($exception3) = split /\n/, "$@\n";
+ok( $exception3, "unspecified algorithm:	[$exception3]" );
 
-my $invalid4 = eval { Net::DNS::SEC::Private->new( algorithm => 1 ) };
-chomp $@;
-is( $invalid4, undef, "unspecified signame:	[$@]" );
+eval { Net::DNS::SEC::Private->new( algorithm => 1 ) };
+my ($exception4) = split /\n/, "$@\n";
+ok( $exception4, "unspecified signame:	[$exception4]" );
 
 
 # exercise code for key with long exponent (not required for DNSSEC)

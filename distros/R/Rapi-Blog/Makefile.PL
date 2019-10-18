@@ -86,6 +86,8 @@ my %WriteMakefileArgs = (
     "String::CamelCase" => 0,
     "String::Random" => 0,
     "Term::ReadLine" => 0,
+    "Text::Glob" => "0.11",
+    "Text::Markdown" => "1.000031",
     "Types::Standard" => 0,
     "URI" => 0,
     "URI::Escape" => 0,
@@ -102,7 +104,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.1100",
+  "VERSION" => "1.1301",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -172,6 +174,8 @@ my %FallbackPrereqs = (
   "String::Random" => 0,
   "Term::ReadLine" => 0,
   "Test::More" => 0,
+  "Text::Glob" => "0.11",
+  "Text::Markdown" => "1.000031",
   "Types::Standard" => 0,
   "URI" => 0,
   "URI::Escape" => 0,

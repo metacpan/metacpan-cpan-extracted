@@ -1,20 +1,25 @@
-0.110   2019-01-16 (PERLANCAR)
+0.111   2019-09-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add rows().
+
+
+0.110   2019-01-16  Released-By: PERLANCAR
 
 	- select(): Allow '*' as column to mean all columns, allow
 	  excluding columns.
 
 
-0.10    2017-01-01 (PERLANCAR)
+0.10    2017-01-01  Released-By: PERLANCAR
 
 	- Add methods: set_col_val(), add_col().
 
 
-0.09    2016-01-13 (PERLANCAR)
+0.09    2016-01-13  Released-By: PERLANCAR
 
 	- Add del_col(), rename_col(), switch_cols().
 
 
-0.08    2016-01-11 (PERLANCAR)
+0.08    2016-01-11  Released-By: PERLANCAR
 
 	- [Removed feature] Remove const_col_idxs().
 
@@ -23,18 +28,18 @@
         - Add uniq_col_names().
 
 
-0.07    2016-01-11 (PERLANCAR)
+0.07    2016-01-11  Released-By: PERLANCAR
 
 	- Add const_col_names for aohos & aoaos (and const_col_idxs too for
 	  aoaos).
 
 
-0.06    2015-11-02 (PERLANCAR)
+0.06    2015-11-02  Released-By: PERLANCAR
 
 	- [ux] select_*(): Allow cols to be optional.
 
 
-0.05    2015-11-02 (PERLANCAR)
+0.05    2015-11-02  Released-By: PERLANCAR
 
 	- Add methods: rows_as_aoaos(), rows_as_aohos(), select_as_aoaos(),
           select_as_aohos().
@@ -50,19 +55,19 @@
 	- Bug fixes.
 
 
-0.04    2015-10-29 (PERLANCAR)
+0.04    2015-10-29  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to update package name.
 
 
-0.03    2015-09-15 (PERLANCAR)
+0.03    2015-09-15  Released-By: PERLANCAR
 
         - [Incompatible changes] Rewrite, with different interface.
 
         - Implement row_count, col_count, and sort.
 
 
-0.02    2015-09-06 (PERLANCAR)
+0.02    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 

@@ -1,5 +1,10 @@
 Revision history for Class::Simple::Readonly::Cached
 
+0.05	Thu 17 Oct 09:36:27 EDT 2019
+	Improved caching of functions that return 0
+	Better testing that caching actually caches everywhere
+	Added stats() call
+
 0.04	Fri 11 Oct 19:38:38 EDT 2019
 	Object shouldn't be instantiated if cache argument is not given
 	Improved handling of scalar then array call on same method

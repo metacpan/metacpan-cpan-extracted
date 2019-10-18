@@ -12,7 +12,7 @@ use Getopt::Long ();
 with 'Data::Object::Role::Proxyable';
 with 'Data::Object::Role::Stashable';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 has args => (
   is => 'ro'
@@ -398,7 +398,7 @@ The warnings method returns the set of warnings emitted during option parsing.
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

@@ -1,3 +1,38 @@
+1.160 2019-10-17
+================
+[Quiq::ChartJs::TimeSeries]
+* Doku bearbeitet
+
+[Quiq::Database::Api::Dbi::Connection]
+* new() - Option -autoCommit hinzugefügt
+
+[Quiq::Database::Connection]
+* new() - Option -autoCommit hinzugefügt
+
+[Quiq::Sdoc::Producer]
+* Klasse hinzugefügt
+
+[Quiq::AsciiTable]
+* Doku bearbeitet
+
+[Quiq::Cascm]
+* edit() - Rückfrage vor switchPackage()
+* putFiles() - Rückfrage vor switchPackage()
+* deleteVersion() - verallgemeinert, Löschen bis zu einer bestimmten Version
+* findItem() - Optionalen Parameter $minVersion hinzugefügt
+* createPackage() - Optionalen Parameter $state hinzugefügt
+* switchPackage() - Packages können sich nun auf verschieden Stufen befinden
+* movePackage() - Option -askUser hinzugefügt
+
+[Quiq::Parallel]
+* runFetch() - Option -progressNameSub hinzugefügt
+
+[Quiq::Path]
+* mtimePaths() - hinzugefügt
+
+[Quiq::Progress]
+* Prozentangabe nun abgerundet
+
 1.159 2019-10-05
 ================
 [Quiq::ChartJs::TimeSeries]

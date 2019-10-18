@@ -1,3 +1,10 @@
+0.116		2019-10-14	T. R. Wyant
+    All the functionality based on the old GIS web site that this module was
+    originally based on now results in a fatal error. This includes not only
+    getElevation() and getAllElevations(), but any attributes that support
+    them, and the 'compatible' attribute that was installed to aid the
+    tranition.
+
 0.115		2019-09-02	T. R. Wyant
     Change default usgs_url to https://nationalmap.gov/epqs/pqs.php
     since that is what is documented at

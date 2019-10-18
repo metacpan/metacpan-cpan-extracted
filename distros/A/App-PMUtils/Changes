@@ -1,3 +1,10 @@
+0.727   2019-09-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [bugfix] [build] pmpath: Didn't render example in Synopsis.
+
+
 0.726   2019-07-25  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Allow wildcard in pmlist.

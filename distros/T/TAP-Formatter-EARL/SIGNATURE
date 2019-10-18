@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 a20bb6e66c6220ab5ac10ecbe437d43b867d88340c3e1a4af3c843cb34e2c463 COPYRIGHT
+SHA256 c2fa5f625b8687ad497be645c96ca038d9c28c3a052e07523f06f240c17a9799 CREDITS
+SHA256 9bb620edc41e923177f46d723dbeb695a315f653f0e808782bd605c3f5816578 Changes
+SHA256 ab19cd96a6c12cbf613bf1d8745a6da5cd883a6f3c5d903aa60aa2b2ad07b55f INSTALL
+SHA256 43cc0cd006066d53969351c0df1c366794ed193420809decd7b6a0635702e73b LICENSE
+SHA256 d9a59ce2c3e584562862ae4f540d4b108243411822b9333a951e7fdbbcae31ac MANIFEST
+SHA256 b970b4d6f1334bb4ff4ad8b2b4720b020eed00547c6ada4175f89b13d05a0d60 META.json
+SHA256 224f753c787025c2ba4b35a280929ff4b70101514090378729e65c375a1980b5 META.yml
+SHA256 546304c02af5e0a4469e8d786b776fc093f1c7f009af689378f1f7830120ceae Makefile.PL
+SHA256 f47c9d0c9a14a7fe90e6f6709c9fabeca315d89d960f21f7531b3cf9695c4daa README
+SHA256 a915888fe76de247df0c313228b7109fc8069fd87951ea57c77d2c53bbf0061b README.md
+SHA256 72028330bec0d97c57b6bff50259185ea2d109eab45a9fc06d324342fd271223 dist.ini
+SHA256 3cf5c6a3c552aee4cdd86f9e92df261e000a87d5cec9861aa0f7d6ab97a22d13 doap.ttl
+SHA256 640cc0f3198ffe687e31f15399d2495fb23734c5aee81853827067d14a687d7c lib/TAP/Formatter/EARL.pm
+SHA256 9eaf32b3e6356a1a52831bdc716559f94aeced7f2975b3b8324b6713bd2909c9 lib/TAP/Formatter/EARL/Session.pm
+SHA256 4965d0f0540483b52b747b1470105bb96b000630f783fcbfdcb960cea33c1868 t/01basic.t
+SHA256 65d584084a5756bbd6ea4fe83a41c93982e70bb9f2dfffeb8ad0ef9c1e7304b1 t/unit-earl.t
+SHA256 04cb7a18bb9a1154151008d6f1e68085dd8309c092e5ff5c275346c68b21959d t/unit-session.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAl2ogRUACgkQf77o3zqe
+SqW9Tg/+ODCuhXjbeoyAJjg2Vkug5unj+b7Lb4DgOoG/saerDWsDahpzIzuY5Z39
+WrhvjrEHKkl93m01b8jmSX3r8cAc/w7bXGzDYoHkYsvoDt15rlD0jm7caOLhkoF4
+1BKgruSxhg55rJqUZBf546SK7n/HQP761jxisMj55umrHHWfb5gWHwW1irJ8dHQO
+rFQZmZQ1FKQrcDaE4O3jMF3DfSCwMLWABLVDFQ148oDT/6R//klh35gqFgOZSHSJ
+wQGu+rkPVRBC5m676jnrlxSW1yUMgx7ppcRDjQ5u5xDrYEmjUkWhXqyHgG8LVhqo
+mQZ6HJPT1uFfxEovmpgwnGGlIoLefERKivvsGW/hmnMzrKH7MjZBjBJ8Wrwsb+xo
+Ss0Pb0hh/8AoqYPAYDFJdTRNmvv0vKLPTOzLSCTWHahyMcn2QPXM7XAXpG2uwwaG
+0EqZEksvegG9IJZEV+DSRlr3ENswjvY5dUZ9fmn0f/WB4Tk2SRE7YFfiPOrPJhGS
+z/Td+Yvcu7ZFvUql/kW4fWvSBCbdp5KHtm2ED0UqGp/gO4WU5Jda4kQYPRmhJ0Fq
+WobQ2+eRj/Ot3BdT9VNCe1ViWicPDtqL/8i8K2QlAjTN6H0Dg8XA3l+WLb7a+FZG
+iBbBPPkfpIZ9IEIu9loU754SAp8fHnaDOZPYhzk38Tr/xVgiP5c=
+=9O30
+-----END PGP SIGNATURE-----

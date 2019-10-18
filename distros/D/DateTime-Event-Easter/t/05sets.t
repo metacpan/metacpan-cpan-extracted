@@ -92,7 +92,7 @@ while ( my $dt = $exclusive_iterator1->next ) {
 @ni_set = $exclusive_set2->as_list();
 is ($#ni_set, $#non_inclusive_expect, "Non-inclusive (explicit): Correct number of results");
 
-my $i = 0;
+$i = 0;
 my $exclusive_iterator2 = $exclusive_set2->iterator;
 while ( my $dt = $exclusive_iterator2->next ) {
         is( $dt->ymd,

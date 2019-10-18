@@ -1,5 +1,5 @@
 package Cpanel::JSON::XS;
-our $VERSION = '4.12';
+our $VERSION = '4.14';
 our $XS_VERSION = $VERSION;
 # $VERSION = eval $VERSION;
 
@@ -1552,12 +1552,12 @@ respectively. You can also use C<\1> and C<\0> or C<!0> and C<!1>
 directly if you want.
 
    encode_json [Cpanel::JSON::XS::false, Cpanel::JSON::XS::true] # yields [false,true]
-   encode_json [!1, !0]      # yields [false,true]
+   encode_json [!1, !0], [JSON_TYPE_BOOL, JSON_TYPE_BOOL] # yields [false,true]
 
 eq/ne comparisons with true, false:
 
 false is eq to the empty string or the string 'false' or the special
-empty string C<!!0>, i.e. C<SV_NO>, or the numbers 0 or 0.0.
+empty string C<!!0> or C<!1>, i.e. C<SV_NO>, or the numbers 0 or 0.0.
 
 true is eq to the string 'true' or to the special string C<!0>
 (i.e. C<SV_YES>) or to the numbers 1 or 1.0.
@@ -1694,7 +1694,7 @@ originally were L<URI> objects is lost.
       $uri->as_string
    }
 
-=item 2. C<convert_blessed> is enabled and the object has a stringification overload.
+=item 3. C<convert_blessed> is enabled and the object has a stringification overload.
 
 In this case, the overloaded C<""> method of the object is invoked in scalar
 context. It must return a single scalar that can be directly encoded into
@@ -1707,11 +1707,11 @@ originally were L<URI> objects is lost.
     package URI;
     use overload '""' => sub { shift->as_string };
 
-=item 3. C<allow_blessed> is enabled.
+=item 4. C<allow_blessed> is enabled.
 
 The object will be serialized as a JSON null value.
 
-=item 4. none of the above
+=item 5. none of the above
 
 If none of the settings are enabled or the respective methods are missing,
 C<Cpanel::JSON::XS> throws an exception.

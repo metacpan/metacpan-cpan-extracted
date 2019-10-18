@@ -7,7 +7,7 @@ use File::Basename ();
 use File::Slurper  ();
 use Scalar::Util   ();
 
-our $VERSION     = '0.09';
+our $VERSION     = '0.10';
 our %EXPORT_TAGS = (
     std      => [qw(slurp_json spurt_json)],
     std_auto => [qw(-auto_ext slurp_json spurt_json)],
@@ -109,7 +109,7 @@ sub slurp {
 sub _generate_spurt_json {
     my $auto_ext = exists $_[3]->{auto_ext};
 
-    return sub (\[@$%]$;@) {
+    return sub ($$;@) {
         my ($data, $filename, $encoder) = @_;
 
         if (defined $encoder) {
@@ -124,10 +124,6 @@ sub _generate_spurt_json {
               ->escape_slash
               ->stringify_infnan
               : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
-        }
-
-        if (ref $data eq 'REF' or ref $data eq 'SCALAR') {
-            $data = $$data;
         }
 
         if ($auto_ext and not ((File::Basename::fileparse($filename, qr/\.[^.]*/xm))[2])) {
@@ -180,7 +176,7 @@ JSON::Slurper - Convenient file slurping and spurting of data using JSON
     },
   );
 
-  spurt_json @people, 'people.json';
+  spurt_json \@people, 'people.json';
 
   my @people_from_file = slurp_json 'people.json';
 
@@ -204,7 +200,7 @@ JSON::Slurper - Convenient file slurping and spurting of data using JSON
   use JSON::Slurper -std_auto;
 
   # This saves to people.json
-  spurt_json @people, 'people';
+  spurt_json \@people, 'people';
 
   # This reads from people.json
   my @people_from_file = slurp_json 'people';
@@ -301,13 +297,15 @@ and has C<encode> and C<decode> methods.
 
 =back
 
-  # values can be passed as refs
+  # data must be passed as references or scalars
   spurt_json \@array, 'ref.json';
 
-  # or as an array or hash (still passed as refs using prototypes)
-  spurt_json @array, 'array.json';
+  spurt_json 'string', 'ref.json';
 
-  spurt_json %hash, 'hash.json';
+  # pass anonymous array or hash refs
+  spurt_json [1, 2, 3], 'ref.json';
+
+  spurt_json {key => 'value'}, 'ref.json';
 
   # You can pass your own JSON encoder
   spurt_json $ref, 'ref.json', JSON::PP->new->ascii->pretty;

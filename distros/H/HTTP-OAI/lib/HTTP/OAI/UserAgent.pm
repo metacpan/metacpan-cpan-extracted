@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw(@ISA $ACCEPT);
 
-our $VERSION = '4.09';
+our $VERSION = '4.10';
 
 # Do not use eval()
 our $USE_EVAL = 1;
@@ -103,7 +103,7 @@ HTTP::OAI::Debug::trace( $args{verb} . " " . ref($parser) . "->parse_chunk()" );
 	undef $parser;
 
 	# OAI retry-after
-	if( defined($r) && $r->code == 503 && defined(my $timeout = $r->headers->header('Retry-After')) ) {
+	if( defined($r) && ( $r->code == 503 || $r->code == 429 ) && defined(my $timeout = $r->headers->header('Retry-After')) ) {
 		if( $self->{recursion}++ > 10 ) {
 			$r->code(500);
 			$r->message("Server did not give a response after 10 retries");

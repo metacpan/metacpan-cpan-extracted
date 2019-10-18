@@ -7,15 +7,31 @@ use FFI::Platypus;
 use base qw( Exporter );
 use constant 1.32 ();
 
-our @EXPORT = qw( record_layout );
+our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 
 sub record_layout
 {
-  my $ffi = ref($_[0]) ? shift : FFI::Platypus->new;
+  my $ffi;
+
+  if(defined $_[0])
+  {
+    if(ref($_[0]) eq 'ARRAY')
+    {
+      my @args = @{ shift() };
+      $ffi = FFI::Platypus->new(@args);
+    }
+    elsif(eval { $_[0]->isa('FFI::Platypus') })
+    {
+      $ffi = shift;
+    }
+  }
+
+  $ffi ||= FFI::Platypus->new;
+
   my $offset = 0;
   my $record_align = 0;
 
@@ -143,6 +159,34 @@ sub record_layout
   ();
 }
 
+
+# TODO: maybe we should invert this so that record_layout calls record_layout_1
+
+sub record_layout_1
+{
+  if(@_ % 2 == 0)
+  {
+    my $ffi = FFI::Platypus->new( api => 1 );
+    unshift @_, $ffi;
+    goto &record_layout;
+  }
+  elsif(defined $_[0] && ref($_[0]) eq 'ARRAY')
+  {
+    my @args = @{ shift @_ };
+    unshift @args, api => 1;
+    unshift @_, \@args;
+    goto &record_layout;
+  }
+  elsif(defined $_[0] && eval { $_[0]->isa('FFI::Platypus') })
+  {
+    goto &record_layout;
+  }
+  else
+  {
+    croak "odd number of arguments, but first argument is not either an array reference or Platypus instance";
+  }
+}
+
 1;
 
 __END__
@@ -157,7 +201,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -224,11 +268,27 @@ L<FFI::Platypus>, though it may have other applications.
 =head2 record_layout
 
  record_layout($ffi, $type => $name, ... );
+ record_layout(\@ffi_args, $type => $name, ... );
  record_layout($type => $name, ... );
 
 Define the layout of the record.  You may optionally provide an instance
 of L<FFI::Platypus> as the first argument in order to use its type
-aliases.  Then you provide members as type/name pairs.
+aliases.  Alternatively you may provide constructor arguments that will
+be passed to the internal platypus instance.  Thus this is the same:
+
+ my $ffi = FFI::Platypus->new( lang => 'Rust' );
+ record_layout( $ffi, ... );
+ # same as:
+ record_layout( [ lang => 'Rust' ], ... );
+
+and this is the same:
+
+ my $ffi = FFI::Platypus->new;
+ record_layout( $ffi, ... );
+ # same as:
+ record_layout( ... );
+
+Then you provide members as type/name pairs.
 
 For each member you declare, C<record_layout> will create an accessor
 which can be used to read and write its value. For example imagine a
@@ -346,6 +406,15 @@ Arrays of integer, floating points and opaque pointers are supported.
  $foo->bar(5, -6); # sets the 5th element in the array to -6
  my $item = $foo->bar(5); gets the 5th element in the array
 
+=head2 record_layout_1
+
+ record_layout_1($ffi, $type => $name, ... );
+ record_layout_1(\@ffi_args, $type => $name, ... );
+ record_layout_1($type => $name, ... );
+
+This function works like C<record_layout> except that
+C<api =E<gt> 1> is used instead of the legacy API.
+
 =head1 TODO
 
 These useful features (and probably more) are missing:
@@ -412,6 +481,8 @@ Petr Pisar (ppisar)
 Mohammad S Anwar (MANWAR)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+Meredith (merrilymeredith, MHOWARD)
 
 =head1 COPYRIGHT AND LICENSE
 

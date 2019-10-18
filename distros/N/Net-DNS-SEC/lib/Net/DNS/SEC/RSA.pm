@@ -1,9 +1,9 @@
 package Net::DNS::SEC::RSA;
 
 #
-# $Id: RSA.pm 1732 2019-02-15 13:31:34Z willem $
+# $Id: RSA.pm 1758 2019-10-14 13:17:11Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1732 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1758 $)[1];
 
 
 =head1 NAME
@@ -58,6 +58,8 @@ my %parameters = (
 	8  => [sub { Net::DNS::SEC::libcrypto::EVP_sha256() }],
 	10 => [sub { Net::DNS::SEC::libcrypto::EVP_sha512() }],
 	);
+
+sub _index { keys %parameters }
 
 
 sub sign {

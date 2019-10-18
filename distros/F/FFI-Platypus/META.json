@@ -87,7 +87,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.96",
+   "version" : "0.98",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -102,7 +102,8 @@
       "Ilya Pavlov (Ilya33)",
       "Petr Pisar (ppisar)",
       "Mohammad S Anwar (MANWAR)",
-      "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)"
+      "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
+      "Meredith (merrilymeredith, MHOWARD)"
    ],
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

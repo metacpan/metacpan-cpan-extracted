@@ -1,0 +1,20 @@
+Revision history for Shell-Run
+0.04	Fri Oct 18 08:23:43 2019 +0200
+		[fix]
+		set failing test to TODO
+
+0.03	Thu Oct 17 19:54:54 2019 +0200
+		[fix]
+		adjusted minimum perl version
+
+		[pod]
+		fixed typo
+
+		[fix]
+		more specific TODO in test
+
+0.02	Mon Oct 14 20:24:57 2019 +0200
+		First release
+
+0.01    Wed Sep 18 19:24:44 2019 +0200
+		First version, released on an unsuspecting world.

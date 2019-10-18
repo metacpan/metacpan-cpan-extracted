@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '2.11';
+$VERSION = '2.20';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -420,6 +420,11 @@ sub getIPv6Record {
 		$ipto = $obj->read128($handle, $baseaddr + ($mid + 1) * (($dbcolumn * 4) + 12));
 		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
 			my $row_pointer = $baseaddr + $mid * (($dbcolumn * 4) + 12);
+			# read whole results string into temp string and parse results from memory
+			my $raw_positions_row;
+			seek($handle, $row_pointer - 1, 0);
+			read($handle, $raw_positions_row, $dbcolumn * 4 + 12);
+
 			if ($mode == ALL) {
 				my $countryshort = NOT_SUPPORTED;
 				my $countrylong = NOT_SUPPORTED;
@@ -435,36 +440,35 @@ sub getIPv6Record {
 				my $isproxy  = -1;
 				
 				if ($IPV6_COUNTRY_POSITION[$dbtype] != 0) {
-					my $pos = $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype]));
-					$countryshort = $obj->readStr($handle, $pos);
-					$countrylong = $obj->readStr($handle, $pos + 3);
+					$countryshort = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype]), 4)));
+					$countrylong = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype]), 4)) + 3);
 				}
 				if ($IPV6_REGION_POSITION[$dbtype] != 0) {
-					$region = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_REGION_POSITION[$dbtype])));
+					$region = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_REGION_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_CITY_POSITION[$dbtype] != 0) {
-					$city = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_CITY_POSITION[$dbtype])));
+					$city = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_CITY_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_ISP_POSITION[$dbtype] != 0) {
-					$isp = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_ISP_POSITION[$dbtype])));
+					$isp = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_ISP_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_PROXYTYPE_POSITION[$dbtype] != 0) {
-					$proxytype = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype])));
+					$proxytype = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_DOMAIN_POSITION[$dbtype] != 0) {
-					$domain = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_DOMAIN_POSITION[$dbtype])));
+					$domain = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_DOMAIN_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_USAGETYPE_POSITION[$dbtype] != 0) {
-					$usagetype = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_USAGETYPE_POSITION[$dbtype])));
+					$usagetype = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_USAGETYPE_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_ASN_POSITION[$dbtype] != 0) {
-					$asn = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_ASN_POSITION[$dbtype])));
+					$asn = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_ASN_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_AS_POSITION[$dbtype] != 0) {
-					$as = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_AS_POSITION[$dbtype])));
+					$as = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_AS_POSITION[$dbtype]), 4)));
 				}
 				if ($IPV6_LASTSEEN_POSITION[$dbtype] != 0) {
-					$lastseen = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_LASTSEEN_POSITION[$dbtype])));
+					$lastseen = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_LASTSEEN_POSITION[$dbtype]), 4)));
 				}
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
@@ -478,37 +482,37 @@ sub getIPv6Record {
 				return ($isproxy, $proxytype, $countryshort, $countrylong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen);
 			}
 			if ($mode == COUNTRYSHORT) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == COUNTRYLONG) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype])) + 3);
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype]), 4)) + 3);
 			}
 			if ($mode == REGION) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_REGION_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_REGION_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == CITY) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_CITY_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_CITY_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == ISP) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_ISP_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_ISP_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == PROXYTYPE) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == DOMAIN) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_DOMAIN_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_DOMAIN_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == USAGETYPE) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_USAGETYPE_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_USAGETYPE_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == ASN) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_ASN_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_ASN_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == AS) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_AS_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_AS_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == LASTSEEN) {
-				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_LASTSEEN_POSITION[$dbtype])));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_LASTSEEN_POSITION[$dbtype]), 4)));
 			}
 			if ($mode == ISPROXY) {
 				my $countryshort = NOT_SUPPORTED;
@@ -516,9 +520,9 @@ sub getIPv6Record {
 				my $isproxy = NOT_SUPPORTED;
 				if ($IPV6_PROXYTYPE_POSITION[$dbtype] == 0) {
 					# PX1, use country as detection
-					$countryshort = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype])));
+					$countryshort = obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype]), 4)));
 				} else {
-					$proxytype = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype])));
+					$proxytype = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype]), 4)));
 				}
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
@@ -634,6 +638,11 @@ sub getIPv4Record {
 		$ipfrom = $obj->read32($handle, $baseaddr + $mid * $dbcolumn * 4);
 		$ipto = $obj->read32($handle, $baseaddr + ($mid + 1) * $dbcolumn * 4);
 		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
+			# read whole results string into temp string and parse results from memory
+			my $raw_positions_row;
+			seek($handle, ($baseaddr + $mid * $dbcolumn * 4) - 1, 0);
+			read($handle, $raw_positions_row, $dbcolumn * 4);
+			
 			if ($mode == ALL) {
 				my $countryshort = NOT_SUPPORTED;
 				my $countrylong = NOT_SUPPORTED;
@@ -649,36 +658,36 @@ sub getIPv4Record {
 				my $isproxy  = -1;
 
 				if ($IPV4_COUNTRY_POSITION[$dbtype] != 0) {
-					my $pos = $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1));
+					my $pos = unpack("V", substr($raw_positions_row, 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1), 4));
 					$countryshort = $obj->readStr($handle, $pos);
 					$countrylong = $obj->readStr($handle, $pos + 3);
 				}
 				if ($IPV4_REGION_POSITION[$dbtype] != 0) {
-					$region = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_REGION_POSITION[$dbtype]-1)));
+					$region = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_REGION_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_CITY_POSITION[$dbtype] != 0) {
-					$city = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_CITY_POSITION[$dbtype]-1)));
+					$city = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_CITY_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_ISP_POSITION[$dbtype] != 0) {
-					$isp = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_ISP_POSITION[$dbtype]-1)));
+					$isp = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_ISP_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_PROXYTYPE_POSITION[$dbtype] != 0) {
-					$proxytype = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1)));
+					$proxytype = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_DOMAIN_POSITION[$dbtype] != 0) {
-					$domain = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_DOMAIN_POSITION[$dbtype]-1)));
+					$domain = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_DOMAIN_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_USAGETYPE_POSITION[$dbtype] != 0) {
-					$usagetype = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_USAGETYPE_POSITION[$dbtype]-1)));
+					$usagetype = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_USAGETYPE_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_ASN_POSITION[$dbtype] != 0) {
-					$asn = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_ASN_POSITION[$dbtype]-1)));
+					$asn = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_ASN_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_AS_POSITION[$dbtype] != 0) {
-					$as = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_AS_POSITION[$dbtype]-1)));
+					$as = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_AS_POSITION[$dbtype]-1), 4)));
 				}
 				if ($IPV4_LASTSEEN_POSITION[$dbtype] != 0) {
-					$lastseen = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_LASTSEEN_POSITION[$dbtype]-1)));
+					$lastseen = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_LASTSEEN_POSITION[$dbtype]-1), 4)));
 				}
 				if ($countryshort eq "-") {
 					$isproxy = 0;
@@ -692,37 +701,37 @@ sub getIPv4Record {
 				return ($isproxy, $proxytype, $countryshort, $countrylong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen);
 			}
 			if ($mode == COUNTRYSHORT) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == COUNTRYLONG) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1))+3);
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1), 4))+3);
 			}
 			if ($mode == REGION) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_REGION_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_REGION_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == CITY) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_CITY_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_CITY_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == ISP) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_ISP_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_ISP_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == PROXYTYPE) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == DOMAIN) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_DOMAIN_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_DOMAIN_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == USAGETYPE) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_USAGETYPE_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_USAGETYPE_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == ASN) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_ASN_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_ASN_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == AS) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_AS_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_AS_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == LASTSEEN) {
-				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_LASTSEEN_POSITION[$dbtype]-1)));
+				return $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_LASTSEEN_POSITION[$dbtype]-1), 4)));
 			}
 			if ($mode == ISPROXY) {
 				my $countryshort = NOT_SUPPORTED;
@@ -730,9 +739,9 @@ sub getIPv4Record {
 				my $isproxy = NOT_SUPPORTED;
 				if ($IPV4_PROXYTYPE_POSITION[$dbtype] == 0) {
 					# PX1, use country as detection
-					$countryshort = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1)));
+					$countryshort = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1), 4)));
 				} else {
-					$proxytype = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1)));
+					$proxytype = $obj->readStr($handle, unpack("V", substr($raw_positions_row, 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1), 4)));
 				}
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
@@ -1147,7 +1156,7 @@ L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-2.11
+2.20
 
 =head1 AUTHOR
 

@@ -1,13 +1,13 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1746 2019-05-06 14:26:09Z willem $
+# $Id: SEC.pm 1760 2019-10-14 21:04:41Z willem $
 #
 our $VERSION;
-$VERSION = '1.13';
-our $SVNVERSION = (qw$LastChangedRevision: 1746 $)[1];
+$VERSION = '1.14';
+our $SVNVERSION = (qw$LastChangedRevision: 1760 $)[1];
 our $XS_VERSION = $VERSION;
-$VERSION = eval($VERSION);
+$VERSION = eval $VERSION;
 
 
 =head1 NAME
@@ -114,7 +114,7 @@ sub key_difference {
 eval { Net::DNS::SEC->bootstrap($XS_VERSION) } || warn;
 
 
-foreach (qw(DS CDS DLV RRSIG)) {
+foreach (qw(DS CDS RRSIG)) {
 	new Net::DNS::RR( type => $_ );				# pre-load to access class methods
 }
 

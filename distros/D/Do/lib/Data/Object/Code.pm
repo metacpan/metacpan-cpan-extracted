@@ -22,7 +22,7 @@ with qw(
 
 use parent 'Data::Object::Code::Base';
 
-our $VERSION = '1.87'; # VERSION
+our $VERSION = '1.88'; # VERSION
 
 # METHODS
 
@@ -293,7 +293,7 @@ The self method returns the calling object (noop).
 
 =head1 CREDITS
 
-Al Newkirk, C<+317>
+Al Newkirk, C<+319>
 
 Anthony Brummett, C<+10>
 

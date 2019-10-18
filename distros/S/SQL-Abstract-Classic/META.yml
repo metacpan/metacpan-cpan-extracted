@@ -1,0 +1,38 @@
+---
+abstract: 'Generate SQL from Perl data structures'
+author:
+  - 'Peter Rabbitson <ribasushi@leporine.io>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Storable: 0
+  Test::Deep: 0.101
+  Test::Exception: 0.31
+  Test::More: 0.88
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.19'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SQL-Abstract-Classic
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Exporter: 5.57
+  List::Util: 0
+  MRO::Compat: 0.12
+  SQL::Abstract: 1.79
+  Scalar::Util: 0
+  Text::Balanced: 2.00
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-Classic
+  license: http://dev.perl.org/licenses/
+version: 1.91

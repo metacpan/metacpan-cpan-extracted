@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.96
+    version 0.98
 
 SYNOPSIS
 
@@ -432,6 +432,7 @@ METHODS
  closure
 
      my $closure = $ffi->closure($coderef);
+     my $closure = FFI::Platypus->closure($coderef);
 
     Prepares a code reference so that it can be used as a FFI closure (a
     Perl subroutine that can be called from C code). For details on
@@ -463,6 +464,7 @@ METHODS
  sizeof
 
      my $size = $ffi->sizeof($type);
+     my $size = FFI::Platypus->sizeof($type);
 
     Returns the total size of the given type in bytes. For example to get
     the size of an integer:
@@ -1539,6 +1541,8 @@ AUTHOR
     Mohammad S Anwar (MANWAR)
 
     Håkon Hægland (hakonhagland, HAKONH)
+
+    Meredith (merrilymeredith, MHOWARD)
 
 COPYRIGHT AND LICENSE
 

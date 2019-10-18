@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.96'; # VERSION
+our $VERSION = '0.98'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -148,7 +148,7 @@ sub lang
       $type_map{$_} = $_ for grep { $self->{tp}->have_type($_) }
         qw( void sint8 uint8 sint16 uint16 sint32 uint32 sint64 uint64 float double string opaque
             longdouble complex_float complex_double );
-      $type_map{pointer} = 'opaque';
+      $type_map{pointer} = 'opaque' if $self->{tp}->isa('FFI::Platypus::TypeParser::Version0');
       $self->{tp}->type_map(\%type_map);
     }
   }
@@ -283,6 +283,7 @@ sub function
   my $address = $name =~ /^-?[0-9]+$/ ? $name : $self->find_symbol($name);
   croak "unable to find $name" unless defined $address || $self->ignore_not_found;
   return unless defined $address;
+  $address = @args > 0 ? _cast1() : _cast0() if $address == 0;
   my $function = FFI::Platypus::Function::Function->new($self, $address, $self->{abi}, $fixed_arg_count, $ret, @args);
   $wrapper
     ? FFI::Platypus::Function::Wrapper->new($function, $wrapper)
@@ -366,14 +367,18 @@ sub attach_cast
 sub sizeof
 {
   my($self,$name) = @_;
-  $self->{tp}->parse($name)->sizeof;
+  ref $self
+    ? $self->{tp}->parse($name)->sizeof
+    : $self->new->sizeof($name);
 }
 
 
 sub alignof
 {
   my($self, $name) = @_;
-  $self->{tp}->parse($name)->alignof;
+  ref $self
+    ? $self->{tp}->parse($name)->alignof
+    : $self->new->alignof($name);
 }
 
 
@@ -503,7 +508,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -954,6 +959,7 @@ will be thrown.
 =head2 closure
 
  my $closure = $ffi->closure($coderef);
+ my $closure = FFI::Platypus->closure($coderef);
 
 Prepares a code reference so that it can be used as a FFI closure (a
 Perl subroutine that can be called from C code).  For details on
@@ -985,6 +991,7 @@ faster and may be useful if you are calling a particular cast a lot.
 =head2 sizeof
 
  my $size = $ffi->sizeof($type);
+ my $size = FFI::Platypus->sizeof($type);
 
 Returns the total size of the given type in bytes.  For example to get
 the size of an integer:
@@ -2081,6 +2088,8 @@ Petr Pisar (ppisar)
 Mohammad S Anwar (MANWAR)
 
 Håkon Hægland (hakonhagland, HAKONH)
+
+Meredith (merrilymeredith, MHOWARD)
 
 =head1 COPYRIGHT AND LICENSE
 

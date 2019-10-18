@@ -1,4 +1,4 @@
-# AWS::Elasticsearch::Domain generated from spec 5.3.0
+# AWS::Elasticsearch::Domain generated from spec 6.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain',
@@ -19,6 +19,27 @@ package Cfn::Resource::AWS::Elasticsearch::Domain {
 }
 
 
+
+subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AvailabilityZoneCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::VPCOptions',
      as 'Cfn::Value';
@@ -129,6 +150,7 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClus
   has DedicatedMasterType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InstanceCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ZoneAwarenessConfig => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ZoneAwarenessEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

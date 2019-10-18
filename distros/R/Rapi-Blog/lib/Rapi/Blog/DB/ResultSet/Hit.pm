@@ -33,6 +33,27 @@ sub create_from_request {
   
   $create->{ts} ||= Rapi::Blog::Util->now_ts;
   
+  # ----
+  # Handle front-end proxy case
+  my $env = $request->env;
+  if(my $real_addr = $env->{HTTP_X_FORWARDED_FOR}) {
+    $create->{client_ip} = $real_addr;
+  
+    if(my $fport = $env->{HTTP_X_FORWARDED_PORT}) {
+      my $uri = $request->uri->clone;
+      $uri->scheme( $env->{HTTP_X_FORWARDED_PROTO} || $uri->scheme );
+   
+      # Take the port out of the url if it is the standard port:
+      ($uri->scheme eq 'http' && $fport != 80) or ($uri->scheme eq 'https' && $fport != 443)
+        ? $uri->port( $fport ) 
+        : $uri->port( undef );
+
+      $create->{uri} = $uri;
+    }
+  }
+  # ----
+  
+  
   $self->create( $create )
 }
 

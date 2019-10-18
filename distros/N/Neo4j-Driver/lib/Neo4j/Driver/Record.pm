@@ -5,19 +5,28 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.12';
+$Neo4j::Driver::Record::VERSION = '0.13';
 
-use Carp qw(carp croak);
+use Carp qw(croak);
 use JSON::PP;
 
 use Neo4j::Driver::ResultSummary;
+
+
+sub new {
+	my ($class, $record, $columns, $deep_bless) = @_;
+	
+	$record->{column_keys} = $columns;
+	$deep_bless->( $record->{row}, $record->{meta}, $record->{rest} );
+	return bless $record, $class;
+}
 
 
 sub get {
 	my ($self, $field) = @_;
 	
 	if ( ! defined $field ) {
-		carp "Ambiguous get() on " . __PACKAGE__ . " with multiple fields" if @{$self->{row}} > 1;
+		warnings::warnif ambiguous => "Ambiguous get() on " . __PACKAGE__ . " with multiple fields" if @{$self->{row}} > 1;
 		return $self->{row}->[0];
 	}
 	my $key = $self->{column_keys}->key($field);
@@ -36,7 +45,7 @@ sub get {
 # superfluous.
 sub get_bool {
 	my ($self, $field) = @_;
-	carp __PACKAGE__ . "->get_bool is deprecated";
+	warnings::warnif deprecated => __PACKAGE__ . "->get_bool is deprecated";
 	
 	my $value = $self->get($field);
 	return $value if ! ref $value;
@@ -66,7 +75,7 @@ sub summary {
 
 sub stats {
 	my ($self) = @_;
-	carp __PACKAGE__ . "->stats is deprecated; use summary instead";
+	warnings::warnif deprecated => __PACKAGE__ . "->stats is deprecated; use summary instead";
 	
 	return $self->{_summary} ? $self->{_summary}->counters : {};
 }
@@ -86,7 +95,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -128,10 +137,34 @@ parameters.
  my $value = $session->run('RETURN "It works!"')->single->get;
  my $value = $session->run('RETURN "two", "fields"')->single->get;  # fails
 
-Nodes, relationships and maps are returned as hash references of
-their properties. Lists and paths are returned as array references.
+When retrieving values from records, Neo4j types are converted to Perl
+types as shown in the following table.
+
+ Neo4j type      resulting Perl type
+ ----------      -------------------
+ Number          scalar
+ String          scalar
+ Boolean         JSON::PP::true or JSON::PP::false
+ null            undef
+ 
+ Node            Neo4j::Driver::Type::Node
+ Relationship    Neo4j::Driver::Type::Relationship
+ Path            Neo4j::Driver::Type::Path
+ 
+ List            array reference
+ Map             hash reference
+
 Boolean values are returned as JSON types; use C<!!> to force-convert
 to a plain Perl boolean value if necessary.
+
+Note that early versions of this class returned nodes, relationships
+and paths as hashrefs or arrayrefs rather than blessed objects. This
+was a bug. The underlying data structure of nodes and relationships
+is an implementation detail that should not be relied upon. If you
+try to treat L<Neo4j::Driver::Type::Node>,
+L<Neo4j::Driver::Type::Relationship> or L<Neo4j::Driver::Type::Path>
+objects as hashrefs or arrayrefs, your code will eventually fail
+with a future version of this driver.
 
 =head2 data
 
@@ -177,6 +210,9 @@ server provide.
 =head1 SEE ALSO
 
 L<Neo4j::Driver>,
+L<Neo4j::Driver::Type::Node>,
+L<Neo4j::Driver::Type::Relationship>,
+L<Neo4j::Driver::Type::Path>,
 L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/v1/Record.html>,
 L<Neo4j JavaScript Driver|https://neo4j.com/docs/api/javascript-driver/current/class/src/v1/record.js~Record.html>,
 L<Neo4j .NET Driver|https://neo4j.com/docs/api/dotnet-driver/current/html/dfbf8228-17a4-99ed-58bb-81b638ae788a.htm>

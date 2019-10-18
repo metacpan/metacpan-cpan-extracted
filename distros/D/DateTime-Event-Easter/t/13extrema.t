@@ -38,8 +38,8 @@ use DateTime::Event::Easter;
 # Note that there are a few mistakes in this table. For example, the entry
 # for 1758 is a black printed 26 and the entry for 2236 is a black printed 27,
 # which translate as 1758-04-26 and 2236-04-27, while actually the easter dates
-# for those two years are 1758-03-26 and 2236-03-27 (black ink means April, blue
-# ink means March in this table).
+# for those two years are 1758-03-26 and 2236-03-27. Also, the entry for 2133 is
+# a blue-printed 19 which translates to 2133-03-19, while the real date is 2133-04-19. 
 my @data = (
     [ qw< 1693   1693-01-01   1693-03-22   1693-11-27 > ], 
     [ qw< 1818   1818-01-01   1818-03-22   1818-11-27 > ], 

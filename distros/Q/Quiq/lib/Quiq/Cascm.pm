@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.159';
+our $VERSION = '1.160';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -377,12 +377,12 @@ sub edit {
     # Ermittele die Stufe des Package
 
     my $state = $self->packageState($package);
-    if (!$state) {
-        $self->throw(
-            'CASCM-00099: Package does not exist',
-            Package => $package,
-        );
-    }
+    #if (!$state) {
+    #    $self->throw(
+    #        'CASCM-00099: Package does not exist',
+    #        Package => $package,
+    #    );
+    #}
 
     # Erzeuge ein Transportpackage, falls sich das Zielpackage
     # nicht auf der untersten Stufe befindet
@@ -487,14 +487,16 @@ sub edit {
         say $self->a->str('green','NO CHANGE');
     }
 
-    # Checke Datei ein. Wenn sie nicht geändert wurde (kein Copy oben),
-    # wird keine neue Version erzeugt.
+    # Checke Datei ein. Wenn sie nicht geändert wurde (d.h. kein Copy
+    # oben), wird keine neue Version erzeugt.
     $output .= $self->checkin($transportPackage || $package,$repoFile);
     
     if ($transportPackage) {
         if ($fileChanged) {
-            $output .= $self->movePackage($state,$transportPackage);
-            $output .= $self->switchPackage($state,$transportPackage,
+            $output .= $self->movePackage($state,$transportPackage,
+                -askUser => 1,
+            );
+            $output .= $self->switchPackage($transportPackage,
                 $package,$repoFile);
         }
         $output .= $self->deletePackages($transportPackage);
@@ -608,12 +610,12 @@ sub putFiles {
     # Ermittele die Stufe des Package
 
     my $state = $self->packageState($package);
-    if (!$state) {
-        $self->throw(
-            'CASCM-00099: Package does not exist',
-            Package => $package,
-        );
-    }
+    #if (!$state) {
+    #    $self->throw(
+    #        'CASCM-00099: Package does not exist',
+    #        Package => $package,
+    #    );
+    #}
 
     # Erzeuge ein Transportpackage, falls sich das Zielpackage
     # nicht auf der untersten Stufe befindet
@@ -663,8 +665,10 @@ sub putFiles {
     }
 
     if ($transportPackage) {
-        $output .= $self->movePackage($state,$transportPackage);
-        $output .= $self->switchPackage($state,$transportPackage,
+        $output .= $self->movePackage($state,$transportPackage,
+            -askUser => 1,
+        );
+        $output .= $self->switchPackage($transportPackage,
             $package,@items);
         $output .= $self->deletePackages($transportPackage);
     }
@@ -1105,6 +1109,7 @@ sub diff {
 =head4 Synopsis
 
   $output = $scm->deleteVersion($repoFile);
+  $output = $scm->deleteVersion($repoFile,$version);
 
 =head4 Arguments
 
@@ -1114,6 +1119,10 @@ sub diff {
 
 Der Pfad der zu löschenden Repository-Datei.
 
+=item $version (Default: I<höchste Versionsnummer>)
+
+Version der Datei, die gelöscht werden soll.
+
 =back
 
 =head4 Returns
@@ -1122,31 +1131,138 @@ Ausgabe des Kommandos (String)
 
 =head4 Description
 
-Lösche die höchste Version der Repository-Datei (Item) $repoFile.
-Dies geht nur, wenn sich diese Version auf der untersten Stufe
-(Entwicklung) befindet.
+Lösche die höchste Version oder bis zur Version $version die
+Repository-Datei $repoFile. Befinden sich davon eine oder mehrere
+Versionen nicht auf der untersten Stufe, wird ein temporäres
+Transport-Package erzeugt und die Versionen darüber vor dem Löschen
+auf die unterste Ebene bewegt.
+
+=head4 Examples
+
+Höchste Version der Datei C<lib/MetaData.pm> löschen:
+
+  $scm->deleteVersion('lib/MetaData.pm');
+
+Alle Versionen der Datei C<lib/MetaData.pm> löschen:
+
+  $scm->deleteVersion('lib/MetaData.pm',0);
+
+Die Versionen bis 110 der Datei C<lib/MetaData.pm> löschen:
+
+  $scm->deleteVersion('lib/MetaData.pm',110);
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub deleteVersion {
-    my ($self,$repoFile) = @_;
+    my ($self,$repoFile,$version) = @_;
 
-    my ($dir,$file) = Quiq::Path->split($repoFile);
-    my $viewPath = $self->viewPath;
+    my $output;
 
-    my $c = Quiq::CommandLine->new;
-    $c->addArgument($file);
-    $c->addOption(
-        $self->credentialsOptions,
-        -b => $self->broker,
-        -en => $self->projectContext,
-        -vp => $dir? "$viewPath/$dir": $viewPath,
-        -st => $self->states->[0],
+    if (!defined $version) {
+        $version = $self->versionNumber($repoFile);
+    }
+
+    # Versionen selektieren
+
+    my $tab = $self->findItem($repoFile,$version);
+    my $count = $tab->count;
+
+    if (!$count) {
+        $self->throw(
+            'CASCM-00099: Version does not exist',
+            Version => $version,
+            RepoFile => $repoFile,
+        );
+    }
+
+    # Benutzer fragen, ob die Versionen wirklich gelöscht werden sollen
+
+    print $tab->asTable(-info=>0);
+
+    my $answ = Quiq::Terminal->askUser(
+        $count == 1? 'Delete this version?': 'Delete these versions?',
+        -values => 'y/n',
+        -default => 'n',
     );
+    if ($answ ne 'y') {
+        return undef; # Abbruch
+    }
 
-    return $self->runCmd('hdv',$c);
+    # Transportpaket erzeugen, falls nötig
+
+    my $transportPackage;
+    my @rows = reverse $tab->rows;
+    for my $row (@rows) {
+        if ($row->[6] ne $self->states->[0]) {
+            my $name = Quiq::Converter->intToWord(time);
+            $transportPackage = "S6800_0_Seitz_Lift_$name";
+            $output .= $self->createPackage($transportPackage);
+            last;
+        }
+    }
+
+    # Versionen von höheren Stufen in Transportpackage zusammensammeln
+    # und das Transportpackage auf die unterste Stufe bewegen
+
+    if ($transportPackage) {
+        my $transportPackageCount = 0;
+        for my $row (@rows) {
+            my $state = $row->[6];
+            if ($state ne $self->states->[0]) {
+                my $out = $self->movePackage($state,$transportPackage,
+                    -askUser => $transportPackageCount,
+                );
+                if ($out) {
+                    # Ab der 2. Bewegung fragen wir zurück
+                    $transportPackageCount++;
+                    $output .= $out;
+                }
+
+                # Version in Transportpackage bewegen
+                # say sprintf '%s[%s] => %s',$state,$row->[3],$transportPackage;
+
+                my $repoFile = $row->[1];
+                my $package = $row->[5];
+                my $version = $row->[3];
+
+                $self->switchPackage($package,$transportPackage,
+                    "$repoFile:$version");
+            }
+        }
+        $self->movePackage($self->states->[0],$transportPackage);
+    }
+
+    # Alle zu löschenden Versionen befinden sich auf der untersten Stufe.
+    # Wir löschen die Dateien.
+
+    for my $row (@rows) {
+        my $repoFile = $row->[1];
+
+        my ($dir,$file) = Quiq::Path->split($repoFile);
+        my $viewPath = $self->viewPath;
+
+        my $c = Quiq::CommandLine->new;
+        $c->addArgument($file);
+        $c->addOption(
+            $self->credentialsOptions,
+            -b => $self->broker,
+            -en => $self->projectContext,
+            -vp => $dir? "$viewPath/$dir": $viewPath,
+            # Löschen ist nur auf unterster Stufe möglích
+            -st => $self->states->[0],
+        );
+        $output .= $self->runCmd('hdv',$c);
+    }
+
+    # Transportpaket löschen
+
+    if ($transportPackage) {
+        $output .= $self->deletePackages($transportPackage);
+    }
+
+    return $output;
 }
 
 # -----------------------------------------------------------------------------
@@ -1281,6 +1397,7 @@ sub deleteAllVersions {
 =head4 Synopsis
 
   $tab = $scm->findItem($namePattern);
+  $tab = $scm->findItem($namePattern,$minVersion);
 
 =head4 Arguments
 
@@ -1291,6 +1408,10 @@ sub deleteAllVersions {
 Name des Item (File oder Directory), SQL-Wildcards sind erlaubt.
 Der Name ist nicht verankert, wird intern also als '%$namePattern%'
 abgesetzt.
+
+=item $minVersion (Default: 0)
+
+Die Item-Version muss mindestens $minVersion sein.
 
 =back
 
@@ -1309,7 +1430,9 @@ Ergebnismengen-Objekt.
 # -----------------------------------------------------------------------------
 
 sub findItem {
-    my ($self,$namePattern) = @_;
+    my $self = shift;
+    my $namePattern = shift;
+    my $minVersion = shift // 0;
 
     my $projectContext = $self->projectContext;
     my $viewPath = $self->viewPath;
@@ -1320,7 +1443,9 @@ sub findItem {
         FROM (
             SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
                 itm.itemobjid AS id
-                , SYS_CONNECT_BY_PATH(itm.itemname,'/') AS item_path
+                -- Warum ist /zenmod manchmal im Pfad?
+                , REPLACE(SYS_CONNECT_BY_PATH(itm.itemname,'/'),'/zenmod','')
+                    AS item_path
                 , itm.itemtype AS item_type
                 , ver.mappedversion AS version
                 , ver.versiondataobjid
@@ -1342,7 +1467,6 @@ sub findItem {
                     ON rep.repositobjid = itm.repositobjid
             WHERE
                 env.environmentname = '$projectContext'
-                -- AND itm.itemname LIKE '%$namePattern%'
             START WITH
                 itm.itemname = '$viewPath'
                 AND itm.repositobjid = rep.repositobjid
@@ -1354,6 +1478,7 @@ sub findItem {
          )
          WHERE
              item_path LIKE '%$namePattern%'
+             AND version >= $minVersion
     ");
 
     # Wir entfernen den Anfang des View-Path,
@@ -1497,14 +1622,19 @@ sub repoFileToFile {
 =head4 Synopsis
 
   $output = $scm->createPackage($package);
+  $output = $scm->createPackage($package,$state);
 
 =head4 Arguments
 
 =over 4
 
-=item $packge
+=item $package
 
 Name des Package, das erzeugt werden soll.
+
+=item $state (Default: I<unterste Stufe>)
+
+State, auf dem das Package erzeugt werden soll.
 
 =back
 
@@ -1514,14 +1644,17 @@ Ausgabe des Kommandos (String)
 
 =head4 Description
 
-Erzeuge Package $package und liefere die Ausgabe des Kommandos zurück.
+Erzeuge Package $package auf Stufe $state und liefere die Ausgabe
+des Kommandos zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub createPackage {
-    my ($self,$package) = @_;
+    my $self = shift;
+    my $package = shift;
+    my $state = shift // $self->states->[0];
 
     my $c = Quiq::CommandLine->new;
     $c->addArgument($package);
@@ -1531,8 +1664,13 @@ sub createPackage {
         -en => $self->projectContext,
         -st => $self->states->[0],
     );
+    my $output = $self->runCmd('hcp',$c);
 
-    return $self->runCmd('hcp',$c);
+    if ($state ne $self->states->[0]) {
+        $output .= $self->movePackage($state,$package);
+    }
+
+    return $output;
 }
 
 # -----------------------------------------------------------------------------
@@ -1780,15 +1918,11 @@ sub showPackage {
 
 =head4 Synopsis
 
-  $output = $scm->switchPackage($stage,$fromPackage,$toPackage,@files);
+  $output = $scm->switchPackage($fromPackage,$toPackage,@files);
 
 =head4 Arguments
 
 =over 4
-
-=item $stage
-
-Stufe (stage), auf der sich die Packete befinden.
 
 =item $fromPackage
 
@@ -1817,7 +1951,28 @@ Ausgabe des Kommandos (String)
 # -----------------------------------------------------------------------------
 
 sub switchPackage {
-    my ($self,$stage,$fromPackage,$toPackage,@files) = @_;
+    my ($self,$fromPackage,$toPackage,@files) = @_;
+
+    my $output;
+
+    # Ermittele die Stufen der Packages
+
+    my $fromState = $self->packageState($fromPackage);
+    my $toState = $self->packageState($toPackage);
+
+    # Wenn die Stufen verschieden sind, bewegen wir die Items über
+    # ein Transportpackage auf die Zielstufe
+
+    my $transportPackage;
+    if ($fromState ne $toState) {
+        my $name = Quiq::Converter->intToWord(time);
+        $transportPackage = "S6800_0_Seitz_Lift_$name";
+        $output .= $self->createPackage($transportPackage,$fromState);
+        $output .= $self->switchPackage($fromPackage,$transportPackage,@files);
+        $output .= $self->movePackage($toState,$transportPackage,
+            -askUser => 1,
+        );
+    }
 
     # Pfade müssen wir auf den Dateinamen reduzieren
 
@@ -1831,8 +1986,8 @@ sub switchPackage {
         $self->credentialsOptions,
         -b => $self->broker,
         -en => $self->projectContext,
-        -st => $stage,
-        -fp => $fromPackage,
+        -st => $toState,
+        -fp => $transportPackage // $fromPackage,
         -tp => $toPackage,
     );
     $c->addBoolOption(
@@ -1840,7 +1995,13 @@ sub switchPackage {
     );
     $c->addArgument(@files);
 
-    return $self->runCmd('hspp',$c);
+    $output .= $self->runCmd('hspp',$c);
+
+    if ($transportPackage) {
+        $output .= $self->deletePackages($transportPackage);
+    }
+
+    return $output;
 }
 
 # -----------------------------------------------------------------------------
@@ -1953,7 +2114,7 @@ sub demote {
 
 =head4 Synopsis
 
-  $output = $scm->movePackage($state,$package);
+  $output = $scm->movePackage($state,$package,@opt);
 
 =head4 Arguments
 
@@ -1966,6 +2127,16 @@ Stufe, auf die das Package gebracht werden soll.
 =item $packge
 
 Package, das bewegt werden soll.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -askUser => $bool (Default: 0)
+
+Frage den Benutzer, ob er die Post-Deployment-Bestätigung erhalten hat.
 
 =back
 
@@ -1984,7 +2155,17 @@ $state und liefere die Ausgabe des Kommandos zurück. Liegt die Zielstufe
 # -----------------------------------------------------------------------------
 
 sub movePackage {
-    my ($self,$state,$package) = @_;
+    my ($self,$state,$package) = splice @_,0,3;
+
+    my $output = '';
+
+    # Optionen
+
+    my $askUser = 0;
+
+    $self->parameters(\@_,
+        -askUser => \$askUser,
+    );
 
     my @states = $self->states;
     my $i = Quiq::Array->index(\@states,$state);
@@ -1998,17 +2179,34 @@ sub movePackage {
     my $currState = $self->packageState($package);
     my $j = Quiq::Array->index(\@states,$currState);    
 
-    my $output = '';
+    my $op;
     if ($i > $j) {
+        $op = 'promote';
         for (my $k = $j; $k < $i; $k++) {
-            $self->promote($states[$k],$package);
+            $output .= $self->promote($states[$k],$package);
         }
     } 
     elsif ($i < $j) {
+        $op = 'demote';
         for (my $k = $j; $k > $i; $k--) {
-            $self->demote($states[$k],$package);
+            $output .= $self->demote($states[$k],$package);
         }
     } 
+    else {
+        # Kein Promote/Demote nötig
+        return $output;
+    }
+
+    if ($askUser) {
+        my $answ = Quiq::Terminal->askUser(
+            sprintf("Package %s %sd?",$package,$op),
+            -values => 'y',
+            -default => 'y',
+        );
+        if ($answ ne 'y') {
+            return undef; # Abbruch
+        }
+    }
 
     return $output;
 }
@@ -2069,7 +2267,15 @@ sub packageState {
             AND pkg.packagename = '$package'
     ");
 
-    return $tab->count? $tab->rows->[0]->[0]: '';
+    if ($tab->count == 0) {
+        $self->throw(
+            'CASCM-00099: Package does not exist',
+            Package => $package,
+        );
+    }
+
+    # return $tab->count? $tab->rows->[0]->[0]: '';
+    return $tab->rows->[0]->[0];
 }
 
 # -----------------------------------------------------------------------------
@@ -2471,7 +2677,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.159
+1.160
 
 =head1 AUTHOR
 

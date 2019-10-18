@@ -85,6 +85,57 @@
 #define STR_NAN "nan"
 #endif
 
+/* NV_INF compatibility for Perl 5.6 */
+#if !defined(NV_INF) && defined(USE_LONG_DOUBLE) && defined(LDBL_INFINITY)
+#  define NV_INF LDBL_INFINITY
+#endif
+#if !defined(NV_INF) && defined(DBL_INFINITY)
+#  define NV_INF (NV)DBL_INFINITY
+#endif
+#if !defined(NV_INF) && defined(INFINITY)
+#  define NV_INF (NV)INFINITY
+#endif
+#if !defined(NV_INF) && defined(INF)
+#  define NV_INF (NV)INF
+#endif
+#if !defined(NV_INF) && defined(USE_LONG_DOUBLE) && defined(HUGE_VALL)
+#  define NV_INF (NV)HUGE_VALL
+#endif
+#if !defined(NV_INF) && defined(HUGE_VAL)
+#  define NV_INF (NV)HUGE_VAL
+#endif
+
+/* NV_NAN compatibility for Perl 5.6 */
+#if !defined(NV_NAN) && defined(USE_LONG_DOUBLE)
+#   if !defined(NV_NAN) && defined(LDBL_NAN)
+#       define NV_NAN LDBL_NAN
+#   endif
+#   if !defined(NV_NAN) && defined(LDBL_QNAN)
+#       define NV_NAN LDBL_QNAN
+#   endif
+#   if !defined(NV_NAN) && defined(LDBL_SNAN)
+#       define NV_NAN LDBL_SNAN
+#   endif
+#endif
+#if !defined(NV_NAN) && defined(DBL_NAN)
+#  define NV_NAN (NV)DBL_NAN
+#endif
+#if !defined(NV_NAN) && defined(DBL_QNAN)
+#  define NV_NAN (NV)DBL_QNAN
+#endif
+#if !defined(NV_NAN) && defined(DBL_SNAN)
+#  define NV_NAN (NV)DBL_SNAN
+#endif
+#if !defined(NV_NAN) && defined(QNAN)
+#  define NV_NAN (NV)QNAN
+#endif
+#if !defined(NV_NAN) && defined(SNAN)
+#  define NV_NAN (NV)SNAN
+#endif
+#if !defined(NV_NAN) && defined(NAN)
+#  define NV_NAN (NV)NAN
+#endif
+
 /* modfl() segfaults for -Duselongdouble && 64-bit mingw64 && mingw
    runtime version 4.0 [perl #125924] */
 #if defined(USE_LONG_DOUBLE) && defined(__MINGW64__) \
@@ -676,6 +727,25 @@ json_atof (const char *s)
   return neg ? -accum : accum;
 }
 
+INLINE int
+is_bignum_obj (pTHX_ SV *sv)
+{
+  HV *stash = SvSTASH (sv);
+  return (stash == gv_stashpvs ("Math::BigInt", 0) || stash == gv_stashpvs ("Math::BigFloat", 0)) ? 1 : 0;
+}
+
+INLINE int
+is_bool_obj (pTHX_ SV *sv)
+{
+  dMY_CXT;
+
+  HV *bstash   = MY_CXT.json_boolean_stash; /* JSON-XS-3.x interop (Types::Serialiser/JSON::PP::Boolean) */
+  HV *oldstash = MY_CXT.jsonold_boolean_stash; /* JSON-XS-2.x interop (JSON::XS::Boolean) */
+  HV *mstash   = MY_CXT.mojo_boolean_stash; /* Mojo::JSON::_Bool interop */
+  HV *stash    = SvSTASH (sv);
+
+  return (stash == bstash || stash == mstash || stash == oldstash) ? 1 : 0;
+}
 
 /* target of scalar reference is bool?  -1 == nope, 0 == false, 1 == true */
 static int
@@ -712,16 +782,8 @@ json_nonref (pTHX_ SV *scalar)
   if (!SvOBJECT (scalar) && ref_bool_type (aTHX_ scalar) >= 0)
     return 1;
 
-  if (SvOBJECT (scalar)) {
-    dMY_CXT;
-    HV *bstash   = MY_CXT.json_boolean_stash;
-    HV *oldstash = MY_CXT.jsonold_boolean_stash;
-    HV *mstash   = MY_CXT.mojo_boolean_stash;
-    HV *stash    = SvSTASH (scalar);
-
-    if (stash == bstash || stash == mstash || stash == oldstash)
-      return 1;
-  }
+  if (SvOBJECT (scalar) && is_bool_obj (aTHX_ scalar))
+    return 1;
   
   return 0;
 }
@@ -1442,10 +1504,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
         && (memEQc(str, "NaN") || memEQc(str, "nan") ||
             memEQc(str, "inf") || memEQc(str, "-inf"))))
   {
-    HV *stash = SvSTASH(SvRV(sv));
-    if (stash
-        && ((stash == gv_stashpvn ("Math::BigInt", sizeof("Math::BigInt")-1, 0)) ||
-            (stash == gv_stashpvn ("Math::BigFloat", sizeof("Math::BigFloat")-1, 0))))
+    if (is_bignum_obj (aTHX_ SvRV (sv)))
     {
       if (enc->json.infnan_mode == 0) {
         encode_const_str (aTHX_ enc, "null", 4, 0);
@@ -1478,14 +1537,7 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
 INLINE int
 encode_bool_obj (pTHX_ enc_t *enc, SV *sv, int force_conversion, int as_string)
 {
-  dMY_CXT;
-
-  HV *bstash   = MY_CXT.json_boolean_stash; /* JSON-XS-3.x interop (Types::Serialiser/JSON::PP::Boolean) */
-  HV *oldstash = MY_CXT.jsonold_boolean_stash; /* JSON-XS-2.x interop (JSON::XS::Boolean) */
-  HV *mstash   = MY_CXT.mojo_boolean_stash; /* Mojo::JSON::_Bool interop */
-  HV *stash    = SvSTASH (sv);
-
-  if (stash == bstash || stash == mstash || stash == oldstash)
+  if (is_bool_obj (aTHX_ sv))
     {
       if (as_string)
         encode_ch (aTHX_ enc, '"');
@@ -1615,10 +1667,7 @@ encode_rv (pTHX_ enc_t *enc, SV *rv)
 
           FREETMPS; LEAVE;
         }
-      else if ((enc->json.flags & F_ALLOW_BIGNUM)
-               && stash
-               && ((stash == gv_stashpvn ("Math::BigInt", sizeof("Math::BigInt")-1, 0))
-                || (stash == gv_stashpvn ("Math::BigFloat", sizeof("Math::BigFloat")-1, 0))))
+      else if ((enc->json.flags & F_ALLOW_BIGNUM) && is_bignum_obj (aTHX_ sv))
         encode_stringify(aTHX_ enc, rv, 1);
       else if (enc->json.flags & F_CONV_BLESSED)
         encode_stringify(aTHX_ enc, sv, 0);
@@ -1736,6 +1785,9 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
 
   if (UNLIKELY (SvOK (typesv)))
     {
+      if (SvROK (sv) && SvOBJECT (SvRV (sv)) && !(enc->json.flags & (F_ALLOW_TAGS|F_CONV_BLESSED|F_ALLOW_BLESSED)) && !is_bool_obj (aTHX_ SvRV (sv)) && !is_bignum_obj (aTHX_ SvRV (sv)))
+        croak ("encountered object '%s', but neither allow_blessed, convert_blessed nor allow_tags settings are enabled (or TO_JSON/FREEZE method missing)", SvPV_nolen (sv));
+
       if (!SvIOKp (typesv))
         {
           if (SvROK (typesv) &&
@@ -1792,6 +1844,7 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
     encode_bool (aTHX_ enc, sv);
   else if (type == JSON_TYPE_FLOAT)
     {
+      int is_bigobj = 0;
       char *savecur, *saveend;
       char inf_or_nan = 0;
 #ifdef NEED_NUMERIC_LOCALE_C
@@ -1802,151 +1855,302 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
       bool loc_changed = FALSE;
       char *locale = NULL;
 #endif
-      NV nv = SvNOKp (sv) ? SvNVX (sv) : SvNV_nomg (sv);
-      /* trust that perl will do the right thing w.r.t. JSON syntax. */
-      need (aTHX_ enc, NV_DIG + 32);
-      savecur = enc->cur;
-      saveend = enc->end;
+      NV nv = 0;
+      int had_nokp = SvNOKp(sv);
 
-#if defined(HAVE_ISINF) && defined(HAVE_ISNAN)
-      /* With no stringify_infnan we can skip the conversion, returning null. */
-      if (enc->json.infnan_mode == 0) {
-# if defined(USE_QUADMATH) && defined(HAVE_ISINFL) && defined(HAVE_ISNANL)
-        if (UNLIKELY(isinfl(nv) || isnanl(nv)))
-# else
-        if (UNLIKELY(isinf(nv) || isnan(nv)))
-# endif
+      if (UNLIKELY (SvROK (sv) && SvOBJECT (SvRV (sv))) && (enc->json.flags & F_ALLOW_BIGNUM) && is_bignum_obj (aTHX_ SvRV (sv)))
+        is_bigobj = 1;
+
+      if (UNLIKELY (is_bigobj))
         {
-          goto is_inf_or_nan;
+          STRLEN len;
+          char *str = SvPV_nomg (sv, len);
+          if (UNLIKELY (str[0] == '+'))
+            {
+              str++;
+              len--;
+            }
+          if (UNLIKELY (memEQc (str, "NaN") || memEQc (str, "nan")))
+            {
+              nv = NV_NAN;
+              is_bigobj = 0;
+            }
+          else if (UNLIKELY (memEQc (str, "inf")))
+            {
+              nv = NV_INF;
+              is_bigobj = 0;
+            }
+          else if (UNLIKELY (memEQc (str, "-inf")))
+            {
+              nv = -NV_INF;
+              is_bigobj = 0;
+            }
+          else
+            {
+              need (aTHX_ enc, len+1+2); /* +2 for '.0' */
+              savecur = enc->cur;
+              saveend = enc->end;
+              memcpy (enc->cur, str, len);
+              *(enc->cur+len) = '\0';
+            }
         }
-      }
+      else if (SvNOKp (sv))
+        {
+          nv = SvNVX (sv);
+        }
+      else
+        {
+          if (enc->json.flags & F_ALLOW_BIGNUM)
+            {
+              STRLEN len;
+              char *str;
+              SV *pv;
+              SV *errsv;
+              int numtype;
+
+              str = SvPV_nomg (sv, len);
+
+              numtype = grok_number (str, len, NULL);
+              if (UNLIKELY (numtype & IS_NUMBER_INFINITY))
+                nv = (numtype & IS_NUMBER_NEG) ? -NV_INF : NV_INF;
+              else if (UNLIKELY (numtype & IS_NUMBER_NAN))
+                nv = NV_NAN;
+              else if (UNLIKELY (!numtype))
+                nv = SvNV_nomg (sv);
+              else
+                {
+                  pv = newSVpvs ("require Math::BigFloat && Math::BigFloat->new(\"");
+                  sv_catpvn (pv, str, len);
+                  sv_catpvs (pv, "\");");
+
+                  eval_sv (pv, G_SCALAR);
+                  SvREFCNT_dec (pv);
+
+                  /* rethrow current error */
+                  errsv = ERRSV;
+                  if (SvROK (errsv))
+                    croak (NULL);
+                  else if (SvTRUE (errsv))
+                    croak ("%" SVf, SVfARG (errsv));
+
+                  {
+                    dSP;
+                    pv = POPs;
+                    PUTBACK;
+                  }
+
+                  str = SvPV (pv, len);
+                  if (UNLIKELY (str[0] == '+'))
+                    {
+                      str++;
+                      len--;
+                    }
+                  need (aTHX_ enc, len+1);
+                  savecur = enc->cur;
+                  saveend = enc->end;
+                  memcpy (enc->cur, str, len);
+                  *(enc->cur+len) = '\0';
+                  is_bigobj = 1;
+                }
+            }
+          else
+            {
+
+#if PERL_VERSION < 8 || (PERL_VERSION == 8 && PERL_SUBVERSION < 8)
+              if (SvPOKp (sv))
+                {
+                  int numtype = grok_number (SvPVX (sv), SvCUR (sv), NULL);
+                  if (UNLIKELY (numtype & IS_NUMBER_INFINITY))
+                    nv = (numtype & IS_NUMBER_NEG) ? -NV_INF : NV_INF;
+                  else if (UNLIKELY (numtype & IS_NUMBER_NAN))
+                    nv = NV_NAN;
+                  else
+                    nv = SvNV_nomg (sv);
+                }
+              else
+                {
+                  nv = SvNV_nomg (sv);
+                }
+#else
+              nv = SvNV_nomg (sv);
 #endif
-      /* locale insensitive sprintf radix #96 */
+            }
+        }
+
+      if (LIKELY (!is_bigobj))
+        {
+          /* trust that perl will do the right thing w.r.t. JSON syntax. */
+          need (aTHX_ enc, NV_DIG + 32);
+          savecur = enc->cur;
+          saveend = enc->end;
+
+          if (force_conversion)
+            {
+              had_nokp = 0;
+#if defined(USE_QUADMATH) && defined(HAVE_ISINFL)
+              if (UNLIKELY(isinfl(nv)))
+#else
+              if (UNLIKELY(isinf(nv)))
+#endif
+                nv = (nv > 0) ? NV_MAX : -NV_MAX;
+#if defined(USE_QUADMATH) && defined(HAVE_ISNANL)
+              if (UNLIKELY(isnanl(nv)))
+#else
+              if (UNLIKELY(isnan(nv)))
+#endif
+                nv = 0;
+            }
+          /* With no stringify_infnan we can skip the conversion, returning null. */
+          else if (enc->json.infnan_mode == 0)
+            {
+#if defined(USE_QUADMATH) && defined(HAVE_ISINFL)
+              if (UNLIKELY(isinfl(nv)))
+#else
+              if (UNLIKELY(isinf(nv)))
+#endif
+                {
+                  inf_or_nan = (nv > 0) ? 1 : 2;
+                  goto is_inf_or_nan;
+                }
+#if defined(USE_QUADMATH) && defined(HAVE_ISNANL)
+              if (UNLIKELY(isnanl(nv)))
+#else
+              if (UNLIKELY(isnan(nv)))
+#endif
+                {
+                  inf_or_nan = 3;
+                  goto is_inf_or_nan;
+                }
+            }
+          /* locale insensitive sprintf radix #96 */
 #ifdef NEED_NUMERIC_LOCALE_C
-      locale = setlocale(LC_NUMERIC, NULL);
-      if (!locale || strNE(locale, "C")) {
-        loc_changed = TRUE;
+          locale = setlocale(LC_NUMERIC, NULL);
+          if (!locale || strNE(locale, "C"))
+            {
+              loc_changed = TRUE;
 # ifdef HAS_USELOCALE
-        /* thread-safe variant for children not changing the global state */
-        oldloc = uselocale((locale_t)0);
-        if (oldloc == LC_GLOBAL_LOCALE)
-          newloc = newlocale(LC_NUMERIC_MASK, "C", (locale_t)0);
-        else
-          newloc = newlocale(LC_NUMERIC_MASK, "C", oldloc);
-        uselocale(newloc);
+              /* thread-safe variant for children not changing the global state */
+              oldloc = uselocale((locale_t)0);
+              if (oldloc == LC_GLOBAL_LOCALE)
+                newloc = newlocale(LC_NUMERIC_MASK, "C", (locale_t)0);
+              else
+                newloc = newlocale(LC_NUMERIC_MASK, "C", oldloc);
+              uselocale(newloc);
 # else
-        setlocale(LC_NUMERIC, "C");
+              setlocale(LC_NUMERIC, "C");
 # endif
-      }
+            }
 #endif
 
 #ifdef USE_QUADMATH
-      quadmath_snprintf(enc->cur, enc->end - enc->cur, "%.*Qg", (int)NV_DIG, nv);
+          quadmath_snprintf(enc->cur, enc->end - enc->cur, "%.*Qg", (int)NV_DIG, nv);
 #else
-      PERL_UNUSED_RESULT(Gconvert (nv, NV_DIG, 0, enc->cur));
+          PERL_UNUSED_RESULT(Gconvert (nv, NV_DIG, 0, enc->cur));
 #endif
 
 #ifdef NEED_NUMERIC_LOCALE_C
-      if (loc_changed) {
+          if (loc_changed)
+            {
 # ifdef HAS_USELOCALE
-        (void)uselocale(oldloc);
-        if (newloc)
-          freelocale(newloc);
+              (void)uselocale(oldloc);
+              if (newloc)
+                freelocale(newloc);
 # else
-        (void)setlocale(LC_NUMERIC, locale);
+              (void)setlocale(LC_NUMERIC, locale);
 # endif
-      }
+            }
 #endif
 
 #ifdef STR_INF4
-      if (UNLIKELY(strEQc(enc->cur, STR_INF)
-                   || strEQc(enc->cur, STR_INF2)
-                   || strEQc(enc->cur, STR_INF3)
-                   || strEQc(enc->cur, STR_INF4)))
+          if (UNLIKELY(strEQc(enc->cur, STR_INF)
+                       || strEQc(enc->cur, STR_INF2)
+                       || strEQc(enc->cur, STR_INF3)
+                       || strEQc(enc->cur, STR_INF4)))
 #elif defined(STR_INF2)
-      if (UNLIKELY(strEQc(enc->cur, STR_INF)
-                   || strEQc(enc->cur, STR_INF2)))
+          if (UNLIKELY(strEQc(enc->cur, STR_INF)
+                       || strEQc(enc->cur, STR_INF2)))
 #else
-      if (UNLIKELY(strEQc(enc->cur, STR_INF)))
+          if (UNLIKELY(strEQc(enc->cur, STR_INF)))
 #endif
-        inf_or_nan = 1;
+            inf_or_nan = 1;
 #if defined(__hpux)
-      else if (UNLIKELY(strEQc(enc->cur, STR_NEG_INF)))
-        inf_or_nan = 2;
-      else if (UNLIKELY(strEQc(enc->cur, STR_NEG_NAN)))
-        inf_or_nan = 3;
+          else if (UNLIKELY(strEQc(enc->cur, STR_NEG_INF)))
+            inf_or_nan = 2;
+          else if (UNLIKELY(strEQc(enc->cur, STR_NEG_NAN)))
+            inf_or_nan = 3;
 #endif
-      else if
+          else if
 #ifdef HAVE_QNAN
 # ifdef STR_QNAN2
-        (UNLIKELY(strEQc(enc->cur, STR_NAN)
-                  || strEQc(enc->cur, STR_QNAN)
-                  || strEQc(enc->cur, STR_NAN2)
-                  || strEQc(enc->cur, STR_QNAN2)))
+            (UNLIKELY(strEQc(enc->cur, STR_NAN)
+                      || strEQc(enc->cur, STR_QNAN)
+                      || strEQc(enc->cur, STR_NAN2)
+                      || strEQc(enc->cur, STR_QNAN2)))
 # else
-        (UNLIKELY(strEQc(enc->cur, STR_NAN)
-                  || strEQc(enc->cur, STR_QNAN)))
+            (UNLIKELY(strEQc(enc->cur, STR_NAN)
+                      || strEQc(enc->cur, STR_QNAN)))
 # endif
 #else
-        (UNLIKELY(strEQc(enc->cur, STR_NAN)))
+            (UNLIKELY(strEQc(enc->cur, STR_NAN)))
 #endif
-        inf_or_nan = 3;
-      else if (*enc->cur == '-') {
+            inf_or_nan = 3;
+          else if (*enc->cur == '-') {
 #ifdef STR_INF4
-        if (UNLIKELY(strEQc(enc->cur+1, STR_INF)
-                     || strEQc(enc->cur+1, STR_INF2)
-                     || strEQc(enc->cur+1, STR_INF3)
-                     || strEQc(enc->cur+1, STR_INF4)))
+            if (UNLIKELY(strEQc(enc->cur+1, STR_INF)
+                         || strEQc(enc->cur+1, STR_INF2)
+                         || strEQc(enc->cur+1, STR_INF3)
+                         || strEQc(enc->cur+1, STR_INF4)))
 #elif defined(STR_INF2)
-        if (UNLIKELY(strEQc(enc->cur+1, STR_INF)
-                   || strEQc(enc->cur+1, STR_INF2)))
+            if (UNLIKELY(strEQc(enc->cur+1, STR_INF)
+                       || strEQc(enc->cur+1, STR_INF2)))
 #else
-        if (UNLIKELY(strEQc(enc->cur+1, STR_INF)))
+            if (UNLIKELY(strEQc(enc->cur+1, STR_INF)))
 #endif
-          inf_or_nan = 2;
-        else if
+              inf_or_nan = 2;
+            else if
 #ifdef HAVE_QNAN
 # ifdef STR_QNAN2
-          (UNLIKELY(strEQc(enc->cur+1, STR_NAN)
+              (UNLIKELY(strEQc(enc->cur+1, STR_NAN)
                     || strEQc(enc->cur+1, STR_QNAN)
                     || strEQc(enc->cur+1, STR_NAN2)
                     || strEQc(enc->cur+1, STR_QNAN2)))
 # else
-          (UNLIKELY(strEQc(enc->cur+1, STR_NAN)
+              (UNLIKELY(strEQc(enc->cur+1, STR_NAN)
                     || strEQc(enc->cur+1, STR_QNAN)))
 # endif
 #else
-          (UNLIKELY(strEQc(enc->cur+1, STR_NAN)))
+              (UNLIKELY(strEQc(enc->cur+1, STR_NAN)))
 #endif
-            inf_or_nan = 3;
-      }
-      if (UNLIKELY(inf_or_nan)) {
-#if defined(HAVE_ISINF) && defined(HAVE_ISNAN)
-      is_inf_or_nan:
-#endif
-        if (enc->json.infnan_mode == 0) {
-          strncpy(enc->cur, "null\0", 5);
+                inf_or_nan = 3;
+          }
+          if (UNLIKELY(inf_or_nan)) {
+          is_inf_or_nan:
+            if (enc->json.infnan_mode == 0) {
+              strncpy(enc->cur, "null\0", 5);
+            }
+            else if (enc->json.infnan_mode == 1) {
+              const int l = strlen(enc->cur);
+              memmove(enc->cur+1, enc->cur, l);
+              *enc->cur = '"';
+              *(enc->cur + l+1) = '"';
+              *(enc->cur + l+2) = 0;
+            }
+            else if (enc->json.infnan_mode == 3) {
+              if (inf_or_nan == 1)
+                strncpy(enc->cur, "\"inf\"\0", 6);
+              else if (inf_or_nan == 2)
+                strncpy(enc->cur, "\"-inf\"\0", 7);
+              else if (inf_or_nan == 3)
+                strncpy(enc->cur, "\"nan\"\0", 6);
+            }
+            else if (enc->json.infnan_mode != 2) {
+              croak ("invalid stringify_infnan mode %c. Must be 0, 1, 2 or 3",
+                     enc->json.infnan_mode);
+            }
+          }
+
         }
-        else if (enc->json.infnan_mode == 1) {
-          const int l = strlen(enc->cur);
-          memmove(enc->cur+1, enc->cur, l);
-          *enc->cur = '"';
-          *(enc->cur + l+1) = '"';
-          *(enc->cur + l+2) = 0;
-        }
-        else if (enc->json.infnan_mode == 3) {
-          if (inf_or_nan == 1)
-            strncpy(enc->cur, "\"inf\"\0", 6);
-          else if (inf_or_nan == 2)
-            strncpy(enc->cur, "\"-inf\"\0", 7);
-          else if (inf_or_nan == 3)
-            strncpy(enc->cur, "\"nan\"\0", 6);
-        }
-        else if (enc->json.infnan_mode != 2) {
-          croak ("invalid stringify_infnan mode %c. Must be 0, 1, 2 or 3",
-                 enc->json.infnan_mode);
-        }
-      }
+
       if (!force_conversion && SvPOKp (sv) && !strEQ(enc->cur, SvPVX (sv))) {
         char *str = SvPVX (sv);
         STRLEN len = SvCUR (sv);
@@ -1959,8 +2163,8 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
       }
       else {
         NV intpart;
-        if (!( inf_or_nan || (SvNOKp(sv) && Perl_modf(SvNVX(sv), &intpart)) || (!force_conversion && SvIOK(sv))
-            || strchr(enc->cur,'e') || strchr(enc->cur,'E')
+        if (!( inf_or_nan || (had_nokp && Perl_modf(SvNVX(sv), &intpart)) || (!force_conversion && SvIOK(sv))
+            || strchr(enc->cur,'e') || strchr(enc->cur,'E') || strchr(savecur,'.')
 #if PERL_VERSION < 10
                /* !!1 with 5.8 */
                || (SvPOKp(sv) && strEQc(SvPVX(sv), "1")
@@ -1983,7 +2187,98 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
       UV uv = 0;
       IV iv = 0;
       int is_neg = 0;
-      if (SvIOKp (sv))
+
+      if (UNLIKELY (SvROK (sv) && SvOBJECT (SvRV (sv))) && (enc->json.flags & F_ALLOW_BIGNUM))
+        {
+          HV *stash = SvSTASH (SvRV (sv));
+          int is_bigint = (stash && stash == gv_stashpvs ("Math::BigInt", 0));
+          int is_bigfloat = (stash && stash == gv_stashpvs ("Math::BigFloat", 0));
+
+          if (is_bigint || is_bigfloat)
+            {
+              STRLEN len;
+              char *str;
+
+              if (is_bigfloat)
+                {
+                  dSP;
+                  int is_negative;
+
+                  ENTER;
+                  SAVETMPS;
+
+                  PUSHMARK (SP);
+                  XPUSHs (sv);
+                  PUTBACK;
+
+                  call_method ("is_negative", G_SCALAR);
+
+                  SPAGAIN;
+                  is_negative = SvTRUEx (POPs);
+                  PUTBACK;
+
+                  PUSHMARK (SP);
+                  XPUSHs (sv);
+                  PUTBACK;
+
+                  /* This bceil/bfloor logic can be replaced by just one "bint" method call
+                   * but it is not supported by older Math::BigFloat versions.
+                   * Older Math::BigFloat versions have also "as_number" method which should
+                   * do same thing as "bint" method but it is broken and loose precision.
+                   * This bceil/bfloor logic needs Math::BigFloat 1.16 which is in Perl 5.8.0. */
+                  call_method (is_negative ? "bceil" : "bfloor", G_SCALAR);
+
+                  SPAGAIN;
+                  sv = POPs;
+                  PUTBACK;
+                }
+
+              str = SvPV_nomg (sv, len);
+              if (UNLIKELY (str[0] == '+'))
+                {
+                  str++;
+                  len--;
+                }
+
+              if (UNLIKELY (strEQc (str, "NaN") || strEQc (str, "nan")))
+                {
+                  encode_const_str (aTHX_ enc, "0", 1, 0);
+                }
+              else if (UNLIKELY (strEQc (str, "inf")))
+                {
+                  need (aTHX_ enc, IVUV_MAXCHARS);
+                  savecur = enc->cur;
+                  saveend = enc->end;
+                  enc->cur += snprintf (enc->cur, IVUV_MAXCHARS, "%" UVuf, UV_MAX);
+                }
+              else if (UNLIKELY (strEQc (str, "-inf")))
+                {
+                  need (aTHX_ enc, IVUV_MAXCHARS);
+                  savecur = enc->cur;
+                  saveend = enc->end;
+                  enc->cur += snprintf (enc->cur, IVUV_MAXCHARS, "%" IVdf, IV_MIN);
+                }
+              else
+                {
+                  need (aTHX_ enc, len+1);
+                  savecur = enc->cur;
+                  saveend = enc->end;
+                  memcpy (enc->cur, str, len);
+                  enc->cur += len;
+                  *enc->cur = '\0';
+                }
+
+              if (is_bigfloat)
+                {
+                  FREETMPS;
+                  LEAVE;
+                }
+
+              return;
+            }
+        }
+
+      if (SvIOK (sv))
         {
           is_neg = !SvIsUV (sv);
           iv = SvIVX (sv);
@@ -2000,7 +2295,10 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
                   if (LIKELY(uv <= (UV)(IV_MAX) + 1))
                     iv = -(IV)uv;
                   else
-                    iv = IV_MIN; /* underflow */
+                    {
+                      iv = IV_MIN; /* underflow, but F_ALLOW_BIGNUM can handle this */
+                      numtype |= IS_NUMBER_GREATER_THAN_UV_MAX;
+                    }
                   uv = (UV)iv;
                 }
               else
@@ -2020,7 +2318,63 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
                   iv = (IV)uv;
                 }
             }
-          else if (LIKELY (!(numtype & IS_NUMBER_NAN)))
+
+          if ((numtype & (IS_NUMBER_GREATER_THAN_UV_MAX|IS_NUMBER_NOT_INT)) && (enc->json.flags & F_ALLOW_BIGNUM))
+            {
+              STRLEN len;
+              char *str;
+              SV *pv;
+              SV *errsv;
+
+              if (numtype & IS_NUMBER_NOT_INT)
+                pv = newSVpvs ("my $obj; require Math::BigFloat && ($obj = Math::BigFloat->new(\"");
+              else
+                pv = newSVpvs ("require Math::BigInt && return Math::BigInt->new(\"");
+
+              sv_catpvn (pv, SvPVX (sv), SvCUR (sv));
+
+              if (numtype & IS_NUMBER_NOT_INT)
+                /* This bceil/bfloor logic can be replaced by just one "bint" method call
+                 * but it is not supported by older Math::BigFloat versions.
+                 * Older Math::BigFloat versions have also "as_number" method which should
+                 * do same thing as "bint" method but it is broken and loose precision.
+                 * This bceil/bfloor logic needs Math::BigFloat 1.16 which is in Perl 5.8.0. */
+                sv_catpvs (pv, "\")) && ($obj->is_negative ? $obj->bceil : $obj->bfloor);");
+              else
+                sv_catpvs (pv, "\");");
+
+              eval_sv (pv, G_SCALAR);
+              SvREFCNT_dec (pv);
+
+              /* rethrow current error */
+              errsv = ERRSV;
+              if (SvROK (errsv))
+                croak (NULL);
+              else if (SvTRUE (errsv))
+                croak ("%" SVf, SVfARG (errsv));
+
+              {
+                dSP;
+                pv = POPs;
+                PUTBACK;
+              }
+
+              str = SvPV (pv, len);
+              if (UNLIKELY (str[0] == '+'))
+                {
+                  str++;
+                  len--;
+                }
+              need (aTHX_ enc, len+1);
+              savecur = enc->cur;
+              saveend = enc->end;
+              memcpy (enc->cur, str, len);
+              enc->cur += len;
+              *enc->cur = '\0';
+
+              return;
+            }
+          else if (!(numtype & (IS_NUMBER_IN_UV|IS_NUMBER_INFINITY|IS_NUMBER_NAN)))
             {
               sv_to_ivuv (aTHX_ sv, &is_neg, &iv, &uv);
             }

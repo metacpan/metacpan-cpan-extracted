@@ -7,7 +7,7 @@ use Catmandu::MARC;
 use Catmandu::Fix::Has;
 use namespace::clean;
 
-our $VERSION = '1.253';
+our $VERSION = '1.254';
 
 has var    => (fix_opt => 1);
 has __marc => (is => 'lazy');

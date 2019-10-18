@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-25'; # DATE
-our $VERSION = '0.726'; # VERSION
+our $DATE = '2019-09-09'; # DATE
+our $VERSION = '0.727'; # VERSION
 
 use 5.010;
 use strict;
@@ -31,7 +31,7 @@ pmpath - Get path to locally installed Perl module
 
 =head1 VERSION
 
-This document describes version 0.726 of pmpath (from Perl distribution App-PMUtils), released on 2019-07-25.
+This document describes version 0.727 of pmpath (from Perl distribution App-PMUtils), released on 2019-09-09.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,23 @@ Find all modules (-a), return absolute paths (-P):
 Pro-tip: install this bash function to be able to cd quickly to directory of
 Perl module/prefix (tab completion is also provided):
 
-# EXAMPLE: share/cdpm.bash
+ # function definition
+ cdpm ()
+ {
+     if [[ "$1" = "" ]]; then echo "Please specify a Perl module/prefix name"; return; fi
+     local dir=`pmdir "$1"`
+     if [[ "$dir" = "" ]]; then echo "Failed"; else cd "$dir"; fi
+ }
+ 
+ # tab completion
+ _cdpm ()
+ {
+     local cur=${COMP_WORDS[COMP_CWORD]}
+     COMPREPLY=( `COMP_LINE="pmdir $cur" COMP_POINT=$[6+${#cur}] pmdir` )
+ }
+ 
+ # activate tab completion
+ complete -F _cdpm cdpm
 
 Afterwards, you can:
 

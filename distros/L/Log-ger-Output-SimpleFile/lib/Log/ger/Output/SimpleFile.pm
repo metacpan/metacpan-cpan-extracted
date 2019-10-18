@@ -1,7 +1,7 @@
 package Log::ger::Output::SimpleFile;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -48,7 +48,7 @@ Log::ger::Output::SimpleFile - Send logs to file
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -61,9 +61,10 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This is a simple output to file. File will be opened with append mode.
-Filehandle will be flushed after each log. No locking, rotation, or other fancy
-features (see L<Log::ger::Output::File> for that).
+This is a plugin to send outputs to a file. File will be opened with append
+mode. Filehandle will be flushed after each log. No locking, rotation, or other
+fancy features (see L<Log::ger::Output::File> and
+L<Log::ger::Output::FileWriteRotate> for these features).
 
 =for Pod::Coverage ^(.+)$
 
@@ -81,9 +82,10 @@ Alternatively, you can provide an already opened filehandle.
 
 L<Log::ger>
 
-L<Log::ger::Output::File>
+L<Log::ger::Output::File> is a similar output plugin with a few more options:
+locking, autoflush, lazy (filehandle is opened when a log is actually produced).
 
-L<Log::ger::Output::FileWriteRotate>
+L<Log::ger::Output::FileWriteRotate> offers autorotation feature.
 
 =head1 AUTHOR
 
@@ -91,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
