@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,16 +34,16 @@ SemanticWeb::Schema::LegalService - A LegalService is a business that provides l
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A LegalService is a business that provides legally-oriented services,
+=for html <p>A LegalService is a business that provides legally-oriented services,
 advice and representation, e.g. law firms.<br/><br/> As a <a
 class="localLink" href="http://schema.org/LocalBusiness">LocalBusiness</a>
 it can be described as a <a class="localLink"
 href="http://schema.org/provider">provider</a> of one or more <a
-class="localLink" href="http://schema.org/Service">Service</a>(s).
+class="localLink" href="http://schema.org/Service">Service</a>(s).<p>
 
 =head1 SEE ALSO
 

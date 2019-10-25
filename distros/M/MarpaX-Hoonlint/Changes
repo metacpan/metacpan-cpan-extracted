@@ -1,5 +1,10 @@
 Revision history for MarpaX::Hoonlint
 
+1.010000 Sun Oct 20 12:26:31 EDT 2019
+
+   * Add -f option, allow multiple files
+     on command line
+
 1.008000 Fri Oct  4 12:05:46 EDT 2019
 
    * See github for changes

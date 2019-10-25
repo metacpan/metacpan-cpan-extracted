@@ -20,10 +20,10 @@ use Getopt::Long qw{
     :config posix_default bundling require_order no_ignore_case
 };
 
-use base 'Exporter';
+use Exporter 'import';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.22';    # Don't forget to update the manpage version, too!
+our $VERSION = '0.23';    # Don't forget to update the manpage version, too!
 
 use Readonly;
 Readonly my $V_FOR_VERBOSE => 'ALIAS OF VERBOSE';
@@ -150,7 +150,7 @@ sub set_usage
 # Set a file writer for the rc file.
 sub set_write_rcfile
 {
-    my $self = shift;
+    my $self   = shift;
     my $writer = shift || 0;
 
     $self->die('set_write_rcfile() called after init()')
@@ -447,12 +447,12 @@ sub _parse_spec
             : $attrs{subtype} eq 'n' ? 'i'
             :                          $attrs{subtype}
         ),
-        array   => ( $attrs{type} eq '@'        ? 1 : 0 ),
-        hash    => ( $attrs{type} eq '%'        ? 1 : 0 ),
-        scalar  => ( $attrs{type} !~ m{[@%]}xms ? 1 : 0 ),
-        boolean => ( $attrs{type} eq '!'        ? 1 : 0 ),
-        count   => ( $attrs{type} eq '+'        ? 1 : 0 ),
-        flag => ( $attrs{type} eq '' && $attrs{argument} eq '' ? 1 : 0 ),
+        array   => ( $attrs{type} eq '@'                          ? 1 : 0 ),
+        hash    => ( $attrs{type} eq '%'                          ? 1 : 0 ),
+        scalar  => ( $attrs{type} !~ m{[@%]}xms                   ? 1 : 0 ),
+        boolean => ( $attrs{type} eq '!'                          ? 1 : 0 ),
+        count   => ( $attrs{type} eq '+'                          ? 1 : 0 ),
+        flag    => ( $attrs{type} eq '' && $attrs{argument} eq '' ? 1 : 0 ),
     };
 
     #>> End perltidy free zone
@@ -784,7 +784,7 @@ sub _read_config_file
 
             for my $arg (@args)
             {
-                next   if ref $arg;
+                next if ref $arg;
                 return if $arg =~ /Unable to recognise encoding/ms;
                 return if $arg =~ /ParserDetails[.]ini/xms;
             }
@@ -985,7 +985,7 @@ sub print_manpage
 sub print_version
 {
     my $version = $::VERSION || 'UNKNOWN';
-    my $name = basename($PROGRAM_NAME);
+    my $name    = basename($PROGRAM_NAME);
 
     print { \*STDERR } <<"EOF";
 This is $name, version $version
@@ -1089,7 +1089,7 @@ sub _choose_rcfile_writer
 
     # Check whether a file format was specified; if not, use the default.
     my $options = $self->get_options;
-    my $format = uc( $options->{'rcfile-format'} || $default );
+    my $format  = uc( $options->{'rcfile-format'} || $default );
 
     $self->die("Unknown --rcfile-format option specified: \"$format\"")
         unless defined $writer->{$format};
@@ -1248,7 +1248,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =head1 SYNOPSIS
 

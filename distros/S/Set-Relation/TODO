@@ -4,6 +4,14 @@
 
 Following is a summary of things that still need doing.
 
+* Tweak more things to help MetaCPAN and Perl toolchains handle us better.
+
+* Modernize and/or purge legacy documentation like README/INSTALL/etc.
+
+* See if Test::More's is_deeply() obviates the need for Test::Deep.
+
+* Add BEGIN blocks if that is useful.
+
 * Update any idempotent routines such as "union" and "intersection" to
 short-cut if any 2 input relations are equal, or at least the Set::Relation
 objects are both Perl refs to the same object, so just return one of those.
@@ -75,7 +83,7 @@ would for its internal relation objects.
 
 * Improve performance in other ways.
 
-* Port this to Perl 6 again; meanwhile, a much older initial version
-pre-dating this Perl 5 rewrite already exists FYI.
+* Port this to Raku again; meanwhile, a much older initial version
+pre-dating this Perl rewrite already exists FYI.
 
 * Whatever else needs doing, such as, fixing bugs.

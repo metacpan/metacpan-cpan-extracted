@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use File::Temp ();
@@ -54,14 +54,32 @@ dieses Objekt zurück.
 
 sub new {
     my $class = shift;
-    return bless \File::Temp->newdir,$class;
+    # @_: @opt
+
+    # Optionen und Argumente
+
+    my $cleanup;
+
+    my $argA = $class->parameters(0,0,\@_,
+        -cleanup => \$cleanup,
+    );
+
+    # Wir setzen unsere Optionen in die Optionen von File::Temp::newdir() um
+
+    my @args;
+    if (defined $cleanup) {
+        push @args,'CLEANUP',$cleanup;
+    }
+
+    # Objekt instantiieren
+    return bless \File::Temp->newdir(@args),$class;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

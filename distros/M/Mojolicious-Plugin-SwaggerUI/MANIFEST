@@ -1,0 +1,13 @@
+Build.PL
+lib/Mojolicious/Plugin/SwaggerUI.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+share/images/Screenshot.png
+share/resources/public/swagger-ui/swagger-ui-bundle.js
+share/resources/public/swagger-ui/swagger-ui-standalone-preset.js
+share/resources/public/swagger-ui/swagger-ui.css
+share/resources/templates/swagger_ui.html.ep
+t/10_load.t
+META.yml
+META.json

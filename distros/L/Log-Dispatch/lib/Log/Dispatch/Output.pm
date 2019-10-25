@@ -3,7 +3,7 @@ package Log::Dispatch::Output;
 use strict;
 use warnings;
 
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 use Carp ();
 use Try::Tiny;
@@ -203,7 +203,7 @@ Log::Dispatch::Output - Base class for all Log::Dispatch::* objects
 
 =head1 VERSION
 
-version 2.68
+version 2.69
 
 =head1 SYNOPSIS
 
@@ -335,7 +335,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

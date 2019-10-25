@@ -1,0 +1,90 @@
+NAME
+    Dist::Zilla::Plugin::Test::Perl::Critic::Subset - Tests to check your
+    code against best practices
+
+VERSION
+    version 3.001.003
+
+SYNOPSIS
+    In your dist.ini:
+
+        [Test::Perl::Critic]
+        critic_config = perlcritic.rc ; default / relative to project root
+
+        ; to add some files/dirs
+        ;file = t/mytest.t
+        ;file = t/myothertest.t
+        ;dir  = xt
+
+        ; to exclude some files/dirs by regex
+        skip  = todo
+        skip  = lib/Bencher/ScenarioR/
+
+        ; you can also specify finders to include/exclude files
+        ;finder = :TestFiles
+        ;finder = :InstallModules
+
+    Another example of specifying finders, by defining a custom finder (see
+    Dist::Zilla::Plugin::FileFinder::ByName for more details):
+
+        [FileFinder::ByName / MyFiles]
+        dir = lib
+        dir = script
+        file = *.t
+        skip = lib/Bencher/ScenarioR/
+
+        [Test::Perl::Critic]
+        finder = MyFiles
+
+DESCRIPTION
+    Fork notice: This is a temporary fork of
+    Dist::Zilla::Plugin::Test::Perl::Critic 3.001 which includes
+    <https://github.com/perlancar/operl-Dist-Zilla-Plugin-Test-Perl-Critic/c
+    ommit/bd46961d9d7da767f7a431fba13de441db4b6848> to add "finder" and
+    "files" configuration options. These options let you select, include,
+    exclude files to be tested.
+
+    This will provide a xt/author/critic.t file for use during the "test"
+    and "release" calls of "dzil". To use this, make the changes to dist.ini
+    above and run one of the following:
+
+        dzil test
+        dzil release
+
+    During these runs, xt/author/critic.t will use Test::Perl::Critic to run
+    Perl::Critic against your code and by report findings.
+
+    This plugin accepts the "critic_config" option, which specifies your own
+    config file for Perl::Critic. It defaults to "perlcritic.rc", relative
+    to the project root. If the file does not exist, Perl::Critic will use
+    its defaults.
+
+    This plugin is an extension of Dist::Zilla::Plugin::InlineFiles.
+
+CONFIGURATION OPTIONS
+  critic_config
+    Specify a perl critic profile. Will be passed to Test::Perl::Critic's
+    "-profile" import option.
+
+  finder
+    This is the name of a FileFinder for finding files to check. The default
+    value is ":InstallModules", ":ExecFiles", ":TestFiles" (see also
+    Dist::Zilla::Plugin::ExecDir); this option can be used more than once.
+
+    Other predefined finders are listed in "default_finders" in
+    Dist::Zilla::Role::FileFinderUser. You can define your own with the
+    Dist::Zilla::Plugin::FileFinder::ByName plugin.
+
+  file
+    A filename to also test, in addition to any files found earlier. This
+    option can be repeated to specify multiple additional files.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

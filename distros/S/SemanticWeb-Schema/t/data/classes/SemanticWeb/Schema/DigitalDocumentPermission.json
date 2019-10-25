@@ -13,9 +13,9 @@
          "schema:domainIncludes" : "schema:DigitalDocumentPermission",
          "schema:rangeIncludes" : [
             "schema:Organization",
+            "schema:Audience",
             "schema:ContactPoint",
-            "schema:Person",
-            "schema:Audience"
+            "schema:Person"
          ]
       },
       "schema:permissionType" : {

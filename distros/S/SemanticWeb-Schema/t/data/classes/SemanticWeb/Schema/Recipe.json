@@ -81,8 +81,8 @@
          "rdfs:subPropertyOf" : "schema:yield",
          "schema:domainIncludes" : "schema:Recipe",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Text"
          ]
       },
       "schema:suitableForDiet" : {
@@ -90,8 +90,8 @@
          "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
          "rdfs:label" : "suitableForDiet",
          "schema:domainIncludes" : [
-            "schema:Recipe",
-            "schema:MenuItem"
+            "schema:MenuItem",
+            "schema:Recipe"
          ],
          "schema:rangeIncludes" : "schema:RestrictedDiet"
       }

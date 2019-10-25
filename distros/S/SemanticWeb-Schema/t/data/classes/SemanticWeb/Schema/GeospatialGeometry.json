@@ -18,8 +18,8 @@
             "schema:Place"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ]
       },
       "schema:geoCoveredBy" : {
@@ -27,8 +27,8 @@
          "rdfs:comment" : "Represents a relationship between two geometries (or the places they represent), relating a geometry to another that covers it. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoCoveredBy",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
             "schema:Place",
@@ -44,8 +44,8 @@
             "schema:GeospatialGeometry"
          ],
          "schema:rangeIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ]
       },
       "schema:geoCrosses" : {
@@ -57,8 +57,8 @@
             "schema:Place"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ]
       },
       "schema:geoDisjoint" : {
@@ -79,12 +79,12 @@
          "rdfs:comment" : "Represents spatial relations in which two geometries (or the places they represent) are topologically equal, as defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>. \"Two geometries are topologically equal if their interiors intersect and no part of the interior or boundary of one geometry intersects the exterior of the other\" (a symmetric relationship)",
          "rdfs:label" : "geoEquals",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
-         ],
-         "schema:rangeIncludes" : [
             "schema:GeospatialGeometry",
             "schema:Place"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ]
       },
       "schema:geoIntersects" : {
@@ -92,12 +92,12 @@
          "rdfs:comment" : "Represents spatial relations in which two geometries (or the places they represent) have at least one point in common. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoIntersects",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
-         ],
-         "schema:rangeIncludes" : [
             "schema:GeospatialGeometry",
             "schema:Place"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ]
       },
       "schema:geoOverlaps" : {
@@ -105,8 +105,8 @@
          "rdfs:comment" : "Represents a relationship between two geometries (or the places they represent), relating a geometry to another that geospatially overlaps it, i.e. they have some but not all points in common. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoOverlaps",
          "schema:domainIncludes" : [
-            "schema:GeospatialGeometry",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeospatialGeometry"
          ],
          "schema:rangeIncludes" : [
             "schema:GeospatialGeometry",
@@ -118,8 +118,8 @@
          "rdfs:comment" : "Represents spatial relations in which two geometries (or the places they represent) touch: they have at least one boundary point in common, but no interior points.\" (a symmetric relationship, as defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a> )",
          "rdfs:label" : "geoTouches",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
             "schema:Place",
@@ -131,8 +131,8 @@
          "rdfs:comment" : "Represents a relationship between two geometries (or the places they represent), relating a geometry to one that contains it, i.e. it is inside (i.e. within) its interior. As defined in <a href=\"https://en.wikipedia.org/wiki/DE-9IM\">DE-9IM</a>.",
          "rdfs:label" : "geoWithin",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeospatialGeometry"
+            "schema:GeospatialGeometry",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
             "schema:Place",

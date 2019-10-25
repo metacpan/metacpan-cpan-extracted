@@ -30,4 +30,14 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'jQuery-File-Upload-*' },
+   'META_MERGE'         => {
+       'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/srchulo/jQuery-File-Upload.git',
+                web  => 'https://github.com/srchulo/jQuery-File-Upload',
+            },
+        },
+    },
 );

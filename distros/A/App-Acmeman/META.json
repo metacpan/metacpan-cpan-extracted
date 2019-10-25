@@ -22,7 +22,7 @@
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "2.02"
+         "version" : "3.02"
       },
       "App::Acmeman::Apache::Layout" : {
          "file" : "lib/App/Acmeman/Apache/Layout.pm",
@@ -65,5 +65,5 @@
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "2.02"
+   "version" : "3.02"
 }

@@ -20,3 +20,9 @@
     * Use full path for external commands
     * Be more careful with the QMail pid
 
+## 2.0.3 - 2019-10-20
+
+### Added
+
+* More documentation.
+

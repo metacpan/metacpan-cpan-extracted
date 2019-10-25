@@ -1,33 +1,40 @@
-0.011   2018-06-10 (PERLANCAR)
+0.012   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- Update test (GDAX is now no more) [RT#130592].
+
+
+0.011   2018-06-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix terminology in currency_pair.
 
 
-0.010   2018-06-07 (PERLANCAR)
+0.010   2018-06-07  Released-By: PERLANCAR
 
         - [build] Rebuild to set minimum version of coerce module dependencies
           [RT#125498].
 
 
-0.009   2018-06-06 (PERLANCAR)
+0.009   2018-06-06  Released-By: PERLANCAR
 
 	- Add schema: cryptoexchange::currency_pair.
 
 
-0.008   2018-06-06 (PERLANCAR)
+0.008   2018-06-06  Released-By: PERLANCAR
 
 	- Add schemas: fiat_currency, fiat_or_cryptocurrency.
 
 
-0.007   2018-05-29 (PERLANCAR)
+0.007   2018-05-29  Released-By: PERLANCAR
 
         - [build] Rebuild with update DZP:Sah::Schemas to add prereqs to coerce
           modules [RT#125432].
 
 
-0.006   2018-05-29 (PERLANCAR)
+0.006   2018-05-29  Released-By: PERLANCAR
 
 	- Add schemas: cryptocurrency, cryptocurrency::safename,
 	  cryptoexchange, cryptoexchange::code, cryptoexchange::safename.
@@ -35,12 +42,12 @@
         - [test] Add tests.
 
 
-0.005   2018-04-06 (PERLANCAR)
+0.005   2018-04-06  Released-By: PERLANCAR
 
 	- [ux] cryptocurrency::code: Convert to uppercase.
 
 
-0.004   2018-03-08 (PERLANCAR)
+0.004   2018-03-08  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename schemas: cryptocurrency::symbol ->
 	  cryptocurrency::code, cryptocurrency::symbol_or_name ->
@@ -50,17 +57,17 @@
 	- [doc] Mention Sah::Schemas::Currency.
 
 
-0.003   2018-01-30 (PERLANCAR)
+0.003   2018-01-30  Released-By: PERLANCAR
 
 	- Add schema: cryptoexchange::name.
 
 
-0.002   2018-01-14 (PERLANCAR)
+0.002   2018-01-14  Released-By: PERLANCAR
 
         - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
           Perinci::Sub::XCompletion::* modules.
 
 
-0.001   2018-01-12 (PERLANCAR)
+0.001   2018-01-12  Released-By: PERLANCAR
 
         - First release.

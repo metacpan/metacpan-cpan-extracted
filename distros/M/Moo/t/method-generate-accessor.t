@@ -6,11 +6,25 @@ use Method::Generate::Accessor;
 use Sub::Quote 'quote_sub';
 use Sub::Defer ();
 
-my $gen = Method::Generate::Accessor->new;
+my $gen;
+BEGIN {
+  $gen = Method::Generate::Accessor->new;
+}
 
 {
   package Foo;
   use Moo;
+}
+
+BEGIN {
+  # lie about overload.pm just in case
+  local $INC{'overload.pm'};
+  delete $INC{'overload.pm'};
+  my $c = bless {}, 'Gorf';
+  like(
+    exception { $gen->generate_method('Foo' => 'gorf' => { is => 'ro', coerce => $c } ) },
+    qr/^Invalid coerce '\Q$c\E' for Foo->gorf /, "coerce - object rejected (before overload loaded)"
+  );
 }
 
 {

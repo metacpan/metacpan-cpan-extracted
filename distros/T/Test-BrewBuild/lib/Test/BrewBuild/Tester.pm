@@ -14,7 +14,7 @@ use Test::BrewBuild;
 use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Git;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 $| = 1;
 
@@ -330,6 +330,10 @@ sub listen {
 
                 $log->_7("repo $repo_name exists");
 
+                # dispatcher is expecting a repository status message
+
+                $dispatch->send('repo ok');
+
                 if (defined $self->{auto} && $self->{auto}){
                     $log->_6("in auto mode");
 
@@ -387,7 +391,22 @@ sub listen {
             }
             else {
                 $log->_7("repo doesn't exist... cloning");
-                $git->clone($repo);
+
+                my $repo_cloned_ok = eval {
+                    $git->clone($repo);
+                    1;
+                };
+
+                if (! $repo_cloned_ok){
+                    my $err = "error: repository '$repo' couldn't be cloned...";
+                    $log->_0($err);
+                    $dispatch->send($err);
+                    next;
+                }
+                else {
+                    $dispatch->send('repo ok');
+                }
+
                 chdir $git->name($repo);
                 $log->_7("chdir to: ".getcwd());
             }

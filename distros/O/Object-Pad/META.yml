@@ -3,6 +3,7 @@ abstract: 'a simple syntax for lexical slot-based objects'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  Data::Dump: '0'
   ExtUtils::CBuilder: '0'
   Test::More: '0.88'
 configure_requires:
@@ -17,8 +18,11 @@ name: Object-Pad
 provides:
   Object::Pad:
     file: lib/Object/Pad.pm
-    version: '0.02'
+    version: '0.06'
+requires:
+  indirect: '0'
+  perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

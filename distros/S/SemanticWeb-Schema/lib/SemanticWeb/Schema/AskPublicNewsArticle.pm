@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::AskPublicNewsArticle;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A NewsArticle expressing an open call by a NewsMediaOrganization asking the public for input
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,19 +30,20 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::AskPublicNewsArticle - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::AskPublicNewsArticle - A NewsArticle expressing an open call by a NewsMediaOrganization asking the public for input
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>
-expressing an open call by a <a class="localLink"
+=for html <p>A <a class="localLink"
+href="http://schema.org/NewsArticle">NewsArticle</a> expressing an open
+call by a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>
 asking the public for input, insights, clarifications, anecdotes,
-documentation, etc., on an issue, for reporting purposes.
+documentation, etc., on an issue, for reporting purposes.<p>
 
 =head1 SEE ALSO
 

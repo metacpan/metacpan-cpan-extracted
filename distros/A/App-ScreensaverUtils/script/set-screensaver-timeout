@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /Screensaver/Any/set_screensaver_timeout
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-04'; # DATE
+our $DATE = '2019-09-15'; # DATE
 our $DIST = 'App-ScreensaverUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ set-screensaver-timeout - Set screensaver idle timeout
 
 =head1 VERSION
 
-This document describes version 0.006 of set-screensaver-timeout (from Perl distribution App-ScreensaverUtils), released on 2019-09-04.
+This document describes version 0.007 of set-screensaver-timeout (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

@@ -17,5 +17,7 @@ t/03-aws.t
 t/04-legacy.t
 t/05-nonascii.t
 t/06-suffix-without-root.t
+t/07-issue-3.t
+t/99-publicsuffix-test.t
 t/author-pod-syntax.t
 t/effective_tld_names.dat

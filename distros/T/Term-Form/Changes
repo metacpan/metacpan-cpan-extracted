@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.522   2019-10-19
+        - Bugfix in "fill_form" - 'page_up' and 'page_down': check argument of 'up()'.
+
 0.521   2019-10-05
         - Refactored functional interface.
         - Added option 'color'.

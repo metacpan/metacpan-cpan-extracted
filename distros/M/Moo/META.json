@@ -4,7 +4,7 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,10 +31,10 @@
       "develop" : {
          "requires" : {
             "Class::Tiny" : "1.001",
-            "Moose" : "0",
+            "Moose" : "1.15",
             "MooseX::Types::Common::Numeric" : "0",
             "Mouse" : "0",
-            "Type::Tiny" : "0",
+            "Type::Tiny" : "0.004",
             "bareword::filehandles" : "0",
             "indirect" : "0",
             "multidimensional" : "0",
@@ -50,21 +50,20 @@
             "strictures" : "2"
          },
          "requires" : {
-            "Class::Method::Modifiers" : "1.1",
-            "Devel::GlobalDestruction" : "0.11",
+            "Class::Method::Modifiers" : "1.10",
             "Exporter" : "5.57",
             "Module::Runtime" : "0.014",
-            "Role::Tiny" : "2.000004",
-            "Scalar::Util" : "0",
-            "Sub::Defer" : "2.003001",
-            "Sub::Quote" : "2.003001",
+            "Role::Tiny" : "2.001004",
+            "Scalar::Util" : "1.09",
+            "Sub::Defer" : "2.006006",
+            "Sub::Quote" : "2.006006",
             "perl" : "5.006"
          }
       },
       "test" : {
          "recommends" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Requirements" : "0"
+            "CPAN::Meta::Requirements" : "0",
+            "Parse::CPAN::Meta" : "1.4200"
          },
          "requires" : {
             "Test::Fatal" : "0.003",
@@ -79,7 +78,7 @@
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Moo"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
@@ -88,7 +87,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#moose"
    },
-   "version" : "2.003004",
+   "version" : "2.003006",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {
       "App::Commando" : "<= 0.012",
@@ -104,5 +103,5 @@
          "use_warnings" : "internal module used to apply warnings"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,16 +34,16 @@ SemanticWeb::Schema::ApplyAction - The act of registering to an organization/ser
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of registering to an organization/service without the guarantee to
-receive it.<br/><br/> Related actions:<br/><br/> <ul> <li><a
+=for html <p>The act of registering to an organization/service without the guarantee
+to receive it.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink"
 href="http://schema.org/RegisterAction">RegisterAction</a>: Unlike
 RegisterAction, ApplyAction has no guarantees that the application will be
-accepted.</li> </ul> 
+accepted.</li> </ul> <p>
 
 =head1 SEE ALSO
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has applicable_location => (
@@ -82,7 +82,7 @@ SemanticWeb::Schema::DrugCost - The cost per unit of a medical drug
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 

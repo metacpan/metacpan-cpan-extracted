@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,14 +34,14 @@ SemanticWeb::Schema::ConfirmAction - The act of notifying someone that a future 
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of notifying someone that a future event/action is going to happen
-as expected.<br/><br/> Related actions:<br/><br/> <ul> <li><a
+=for html <p>The act of notifying someone that a future event/action is going to
+happen as expected.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/CancelAction">CancelAction</a>:
-The antonym of ConfirmAction.</li> </ul> 
+The antonym of ConfirmAction.</li> </ul> <p>
 
 =head1 SEE ALSO
 

@@ -1,0 +1,15 @@
+^Syslog.bs
+^Syslog.c
+^Syslog.o
+^.git/
+pm_to_blib
+^MANIFEST.bak$
+^MYMETA.*
+^const-c.inc$
+^const-xs.inc$
+^macros.all$
+MANIFEST.bak
+^blib/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$

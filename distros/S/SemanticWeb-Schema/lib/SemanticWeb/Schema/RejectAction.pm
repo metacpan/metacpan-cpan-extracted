@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,14 +34,14 @@ SemanticWeb::Schema::RejectAction - The act of rejecting to/adopting an object
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of rejecting to/adopting an object.<br/><br/> Related
+=for html <p>The act of rejecting to/adopting an object.<br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/AcceptAction">AcceptAction</a>: The antonym of
-RejectAction.</li> </ul> 
+RejectAction.</li> </ul> <p>
 
 =head1 SEE ALSO
 

@@ -6,8 +6,12 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Object::Pad',
    requires => {
+      'indirect' => 0,
+
+      'perl' => '5.016', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
    },
    test_requires => {
+      'Data::Dump' => 0,
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

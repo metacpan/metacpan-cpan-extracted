@@ -6,6 +6,7 @@ use base qw/Quiq::Test::Class/;
 use v5.10;
 use strict;
 use warnings;
+use utf8;
 
 # -----------------------------------------------------------------------------
 
@@ -15,8 +16,10 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_new: Test(5) {
+sub test_new: Test(6) {
     my $self = shift;
+
+    # Temporäres Verzeichnis wird automatisch gelöscht
 
     my $path;
     {
@@ -32,6 +35,15 @@ sub test_new: Test(5) {
         $self->like(sprintf('%s',$dir),qr|^$tempDir/|);
     }
     $self->ok(!-d $path);
+
+    # Temporäres Verzeichnis bleibt stehen
+
+    {
+        my $dir = Quiq::TempDir->new(-cleanup=>0);
+        $path = "$dir";
+    }
+    $self->ok(-d $path);
+    Quiq::Path->delete($path);
 }
 
 # -----------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.01 2019-10-22T00:03:54Z
+
+    - Implement line-break control (KINSOKU) for Japanese.
+
 0.07 2019-09-19T12:11:24Z
 
     - configure() create private object when called by class method.

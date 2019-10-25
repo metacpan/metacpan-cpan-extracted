@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.020';
+our $VERSION = '3.021';
 
 
 use 5.006;
@@ -281,8 +281,8 @@ use vars qw(@EXPORT @EXPORT_OK %term_input %test %Dump %tosspass %b
             %DB_LOG_NOSYNC %DB_REPMGR_CONF_PREFMAS_CLIENT
             %DB_SET_MUTEX_FAILCHK_TIMEOUT %DB_INTERNAL_BLOB_DB
             %DB_EVENT_FAILCHK_PANIC %DB_EXIT_FAILCHK
-            %LOGREC_LONGARG %DB_EVENT_MUTEX_DIED %stdout_capture
-            %DB_MUTEX_OWNER_DEAD %DB_STREAM_WRITE %stderr_capture
+            %LOGREC_LONGARG %DB_EVENT_MUTEX_DIED
+            %DB_MUTEX_OWNER_DEAD %DB_STREAM_WRITE
             %DB_REPMGR_CONF_PREFMAS_MASTER %DB_EXIT_FILE_EXISTS
             %DB_MEM_EXTFILE_DATABASE %DB_EVENT_REP_AUTOTAKEOVER
             %DB_FORCESYNCENV %SELECT %DB_REPMGR_CONF_FORWARD_WRITES
@@ -855,7 +855,7 @@ BEGIN { ##  Begin  Net::FullAuto  Settings
          if $fa_code->[0] && -1==index $fa_code->[0],'Net/FullAuto';
       $fa_code->[0]||='';
       my $argv=join " ",@ARGV;
-      if ($argv!~/--edi*t*\s*|-e[a-z]|--admin|-V|-v|--VE*R*S*I*O*N*|
+      if ($argv!~/--edi*t*\s*|^-e[a-z]|--admin|-V|-v|--VE*R*S*I*O*N*|
                   --users|--ve*r*s*i*o*n*|--cat|--tutorial|--figlet/xm) {
          if ($fa_code->[0]) {
             if ($Term::Menus::canload->($fa_code->[0])) {
@@ -880,7 +880,7 @@ BEGIN { ##  Begin  Net::FullAuto  Settings
       $fa_conf->[0]='Net/FullAuto/'.$fa_conf->[0]
          if $fa_conf->[0] && -1==index $fa_conf->[0],'Net/FullAuto';
       $fa_conf->[0]||='';
-      if ($argv!~/--edit |-e[a-z]|--cat /) {
+      if ($argv!~/--edit |^-e[a-z]|--cat /) {
          if ($fa_conf->[0]) {
             if ($Term::Menus::canload->($fa_conf->[0])) {
                require $fa_conf->[0];
@@ -904,7 +904,7 @@ BEGIN { ##  Begin  Net::FullAuto  Settings
       $fa_host->[0]='Net/FullAuto/'.$fa_host->[0]
          if $fa_host->[0] && -1==index $fa_host->[0],'Net/FullAuto';
       $fa_host->[0]||='';
-      if ($argv!~/--edit |-e[a-z]/) {
+      if ($argv!~/--edit |^-e[a-z]/) {
          if ($fa_host->[0]) {
             if ($Term::Menus::canload->($fa_host->[0])) {
                require $fa_host->[0];
@@ -928,7 +928,7 @@ BEGIN { ##  Begin  Net::FullAuto  Settings
       $fa_menu->[0]='Net/FullAuto/'.$fa_menu->[0]
          if $fa_menu->[0] && -1==index $fa_menu->[0],'Net/FullAuto';
       $fa_menu->[0]||='';
-      if ($argv!~/--edit |-e[a-z]/) {
+      if ($argv!~/--edit |^-e[a-z]/) {
          if ($fa_menu->[0]) {
             if ($Term::Menus::canload->($fa_menu->[0])) {
                require $fa_menu->[0];
@@ -990,34 +990,20 @@ if (defined $fa_code::tosspass && $fa_code::tosspass) {
 
 ##  Begin  Term::Menus
 
-our $termwidth='';
-our $termheight='';
+our $termwidth=0;
+our $termheight=0;
 our $padwalker=0;
 our $term_input=0;
-our $stdout_capture='';
-our $stderr_capture='';
 eval { require Term::ReadKey };
 unless ($@) {
    import Term::ReadKey;
-   ($termwidth,$termheight,
-         $stdout_capture,$stderr_capture)=eval {
+   ($termwidth,$termheight)=eval {
       no strict 'subs';
       my ($termwidth,$termheight)=('','');
-      if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
-         ($termwidth, $termheight) =
-            Term::ReadKey::GetTerminalSize(STDOUT);
-         $termwidth||='';$termheight||='';
-         return $termwidth,$termheight,
-            $stdout_capture,$stderr_capture;
-      } else {
-         my ($stdout_capture,$stderr_capture)=
-            Capture::Tiny::capture {
-               ($termwidth, $termheight) =
-                  Term::ReadKey::GetTerminalSize();
-               $termwidth||='';$termheight||='';
-         }; return $termwidth,$termheight,
-               $stdout_capture,$stderr_capture;
-      }
+      ($termwidth, $termheight) =
+         Term::ReadKey::GetTerminalSize();
+      $termwidth||='';$termheight||='';
+      return $termwidth,$termheight;
    };
    if ($@) {
       $termwidth='';$termheight='';
@@ -1135,7 +1121,7 @@ sub check_for_dupe_menus {
 
 {
    use Sys::Hostname;
-   our $local_hostname=&Sys::Hostname::hostname;
+   our $local_hostname=&Sys::Hostname::hostname();
 }
 
 my $count=0;
@@ -4962,6 +4948,7 @@ sub pick # USAGE: &pick( ref_to_choices_array,
          } elsif (((!$ikey || $ikey eq 'ENTER') &&
                ($numbor=~/^()$/ || $numbor=~/^\n/)) || $numbor=~/^d$/i
                || $ikey eq 'DOWNARROW' || $ikey eq 'PAGEDOWN') {
+            $ikey||='ENTER';
             delete $main::maintain_scroll_flag->{$MenuUnit_hash_ref}
                if defined $main::maintain_scroll_flag;
             if (($ikey eq 'DOWNARROW' || $numbor=~/^d$/i) &&

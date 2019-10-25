@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Net::IDN::Encode" => "2.401",
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }

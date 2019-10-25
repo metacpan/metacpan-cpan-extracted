@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -26,7 +26,7 @@ use version (); # but don't import qv()
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_MEDIUM;
@@ -171,18 +171,18 @@ all!
 =head2 Details
 
 A version declaration must be before the first multi-constant, so it's
-checked before the multi-constant is attempted (and gives an obscure error).
+checked before the multi-constant is attempted and gives an obscure error.
 
     use constant { X => 1, Y => 2 };       # bad
     use 5.008;
 
-A C<require> for the perl version is not adequate since the C<use constant>
-is at C<BEGIN> time, before plain code.
+A C<require> for the perl version is not enough since C<use constant> is at
+C<BEGIN> time, before plain code.
 
-    require 5.008;
+    require 5.008;                         # doesn't run early enough
     use constant { X => 1, Y => 2 };       # bad
 
-But a C<require> within a C<BEGIN> block is ok (an older style, still found
+But a C<require> within a C<BEGIN> block is ok (a past style, still found
 occasionally).
 
     BEGIN { require 5.008 }
@@ -194,9 +194,10 @@ occasionally).
     }
     use constant { X => 1, Y => 2 };       # ok
 
-Currently ConstantPragmaHash pays no attention to any conditionals within
+Currently C<ConstantPragmaHash> pays no attention to any conditionals within
 the C<BEGIN>, it assumes any C<require> there always runs.  It could be
-tricked by some obscure tests but hopefully anything like that is rare.
+tricked by some obscure tests but hopefully anything like that is rare or
+does the right thing anyway.
 
 A quoted version number like
 
@@ -208,15 +209,15 @@ name to define (which you'll see it objects to as soon as you try run it).
 
 =head2 Drawbacks
 
-Explicitly adding version numbers to your code can be irritating if other
-modules you're using only run on 5.8 anyway.  But declaring what your own
-code wants is accurate, it allows maybe for backports of those other things,
-and explicit versions can be grepped out to create or check F<Makefile.PL>
-or F<Build.PL> prereqs.
+Explicitly adding required version numbers in the code can be irritating,
+especially if other things you're doing only run on 5.8 up anyway.  But
+declaring what code needs is accurate, it allows maybe for backports of
+modules, and explicit versions can be grepped out to create or check
+F<Makefile.PL> or F<Build.PL> prereqs.
 
-As always if you don't care about this and in particular if you only ever
-use Perl 5.8 anyway then you can disable C<ConstantPragmaHash> from your
-F<.perlcriticrc> in the usual way (see L<Perl::Critic/CONFIGURATION>),
+As always if you don't care about this or if you only ever use Perl 5.8
+anyway then you can disable C<ConstantPragmaHash> from your F<.perlcriticrc>
+in the usual way (see L<Perl::Critic/CONFIGURATION>),
 
     [-Compatibility::ConstantPragmaHash]
 
@@ -228,6 +229,7 @@ L<Perl::Critic::Policy::Compatibility::ConstantLeadingUnderscore>,
 L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma>,
 L<Perl::Critic::Policy::Modules::RequirePerlVersion>
 
+L<constant>,
 L<perlsub/Constant Functions>
 
 =head1 HOME PAGE
@@ -236,7 +238,7 @@ L<http://user42.tuxfamily.org/perl-critic-pulp/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

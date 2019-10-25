@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000022';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -56,15 +56,12 @@ sub parse_text {
 
     $parsed{is_module_name} = is_module_name($text);
 
-    if ( !$parsed{file_name} && $text =~ m{\Ahttp}i ) {
+    if ( !$parsed{file_name} && $text =~ m{\Ahttps?://}i ) {
         $parsed{file_name} = _maybe_extract_file_from_url( \$text );
     }
 
-    if ( !$parsed{file_name} ) {
-        if ( my $is_module_name = is_module_name($text) ) {
-            $parsed{is_module_name} = $is_module_name;
-            $parsed{file_name}      = _maybe_find_local_file($text);
-        }
+    if ( !$parsed{file_name} && $parsed{is_module_name} ) {
+        $parsed{file_name} = _maybe_find_local_file($text);
     }
 
     # This is a loadable module.  Have this come after the local module checks
@@ -334,7 +331,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000021
+version 0.000022
 
 =head1 DESCRIPTION
 

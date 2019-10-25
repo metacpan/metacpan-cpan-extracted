@@ -20,8 +20,8 @@ no_index:
 requires:
   Exporter: '0'
 resources:
-  bugtracker: https://github.com/DeBos99/Math-CooGeo/issues
-  homepage: https://github.com/DeBos99/Math-CooGeo
-  repository: https://github.com/DeBos99/Math-CooGeo.git
-version: v1.0.2
+  bugtracker: https://gitlab.com/DeBos/Math-CooGeo/issues
+  homepage: https://gitlab.com/DeBos/Math-CooGeo
+  repository: https://gitlab.com/DeBos/Math-CooGeo.git
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

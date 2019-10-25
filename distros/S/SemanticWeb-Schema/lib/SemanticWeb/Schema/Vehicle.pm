@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has acceleration_time => (
@@ -338,7 +338,7 @@ SemanticWeb::Schema::Vehicle - A vehicle is a device that is designed or used to
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -351,8 +351,8 @@ over land, water, air, or through space.
 
 C<accelerationTime>
 
-=for html The time needed to accelerate the vehicle from a given start velocity to a
-given target velocity.<br/><br/> Typical unit code(s): SEC for
+=for html <p>The time needed to accelerate the vehicle from a given start velocity to
+a given target velocity.<br/><br/> Typical unit code(s): SEC for
 seconds<br/><br/> <ul> <li>Note: There are unfortunately no standard unit
 codes for seconds/0..100 km/h or seconds/0..60 mph. Simply use "SEC" for
 seconds and indicate the velocities in the <a class="localLink"
@@ -362,7 +362,7 @@ class="localLink"
 href="http://schema.org/valueReference">valueReference</a> with a <a
 class="localLink"
 href="http://schema.org/QuantitativeValue">QuantitativeValue</a> of 0..60
-mph or 0..100 km/h to specify the reference speeds.</li> </ul> 
+mph or 0..100 km/h to specify the reference speeds.</li> </ul> <p>
 
 A acceleration_time should be one of the following types:
 
@@ -393,11 +393,11 @@ A body_type should be one of the following types:
 
 C<cargoVolume>
 
-=for html The available volume for cargo or luggage. For automobiles, this is usually
-the trunk volume.<br/><br/> Typical unit code(s): LTR for liters, FTQ for
-cubic foot/feet<br/><br/> Note: You can use <a class="localLink"
+=for html <p>The available volume for cargo or luggage. For automobiles, this is
+usually the trunk volume.<br/><br/> Typical unit code(s): LTR for liters,
+FTQ for cubic foot/feet<br/><br/> Note: You can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
-href="http://schema.org/maxValue">maxValue</a> to indicate ranges.
+href="http://schema.org/maxValue">maxValue</a> to indicate ranges.<p>
 
 A cargo_volume should be one of the following types:
 
@@ -459,11 +459,11 @@ A emissions_co2 should be one of the following types:
 
 C<fuelCapacity>
 
-=for html The capacity of the fuel tank or in the case of electric cars, the battery.
-If there are multiple components for storage, this should indicate the
-total of all storage of the same type.<br/><br/> Typical unit code(s): LTR
-for liters, GLL of US gallons, GLI for UK / imperial gallons, AMH for
-ampere-hours (for electrical vehicles).
+=for html <p>The capacity of the fuel tank or in the case of electric cars, the
+battery. If there are multiple components for storage, this should indicate
+the total of all storage of the same type.<br/><br/> Typical unit code(s):
+LTR for liters, GLL of US gallons, GLI for UK / imperial gallons, AMH for
+ampere-hours (for electrical vehicles).<p>
 
 A fuel_capacity should be one of the following types:
 
@@ -477,10 +477,10 @@ A fuel_capacity should be one of the following types:
 
 C<fuelConsumption>
 
-=for html The amount of fuel consumed for traveling a particular distance or temporal
-duration with the given vehicle (e.g. liters per 100 km).<br/><br/> <ul>
-<li>Note 1: There are unfortunately no standard unit codes for liters per
-100 km. Use <a class="localLink"
+=for html <p>The amount of fuel consumed for traveling a particular distance or
+temporal duration with the given vehicle (e.g. liters per 100
+km).<br/><br/> <ul> <li>Note 1: There are unfortunately no standard unit
+codes for liters per 100 km. Use <a class="localLink"
 href="http://schema.org/unitText">unitText</a> to indicate the unit of
 measurement, e.g. L/100 km.</li> <li>Note 2: There are two ways of
 indicating the fuel consumption, <a class="localLink"
@@ -491,7 +491,7 @@ per gallon). They are reciprocal.</li> <li>Note 3: Often, the absolute
 value is useful only when related to driving speed ("at 80 km/h") or usage
 pattern ("city traffic"). You can use <a class="localLink"
 href="http://schema.org/valueReference">valueReference</a> to link the
-value for the fuel consumption to another value.</li> </ul> 
+value for the fuel consumption to another value.</li> </ul> <p>
 
 A fuel_consumption should be one of the following types:
 
@@ -505,10 +505,10 @@ A fuel_consumption should be one of the following types:
 
 C<fuelEfficiency>
 
-=for html The distance traveled per unit of fuel used; most commonly miles per gallon
-(mpg) or kilometers per liter (km/L).<br/><br/> <ul> <li>Note 1: There are
-unfortunately no standard unit codes for miles per gallon or kilometers per
-liter. Use <a class="localLink"
+=for html <p>The distance traveled per unit of fuel used; most commonly miles per
+gallon (mpg) or kilometers per liter (km/L).<br/><br/> <ul> <li>Note 1:
+There are unfortunately no standard unit codes for miles per gallon or
+kilometers per liter. Use <a class="localLink"
 href="http://schema.org/unitText">unitText</a> to indicate the unit of
 measurement, e.g. mpg or km/L.</li> <li>Note 2: There are two ways of
 indicating the fuel consumption, <a class="localLink"
@@ -519,7 +519,7 @@ per gallon). They are reciprocal.</li> <li>Note 3: Often, the absolute
 value is useful only when related to driving speed ("at 80 km/h") or usage
 pattern ("city traffic"). You can use <a class="localLink"
 href="http://schema.org/valueReference">valueReference</a> to link the
-value for the fuel economy to another value.</li> </ul> 
+value for the fuel economy to another value.</li> </ul> <p>
 
 A fuel_efficiency should be one of the following types:
 
@@ -581,9 +581,9 @@ A meets_emission_standard should be one of the following types:
 
 C<mileageFromOdometer>
 
-=for html The total distance travelled by the particular vehicle since its initial
+=for html <p>The total distance travelled by the particular vehicle since its initial
 production, as read from its odometer.<br/><br/> Typical unit code(s): KMT
-for kilometers, SMI for statute miles
+for kilometers, SMI for statute miles<p>
 
 A mileage_from_odometer should be one of the following types:
 
@@ -628,7 +628,7 @@ A number_of_airbags should be one of the following types:
 
 C<numberOfAxles>
 
-=for html The number of axles.<br/><br/> Typical unit code(s): C62
+=for html <p>The number of axles.<br/><br/> Typical unit code(s): C62<p>
 
 A number_of_axles should be one of the following types:
 
@@ -644,7 +644,7 @@ A number_of_axles should be one of the following types:
 
 C<numberOfDoors>
 
-=for html The number of doors.<br/><br/> Typical unit code(s): C62
+=for html <p>The number of doors.<br/><br/> Typical unit code(s): C62<p>
 
 A number_of_doors should be one of the following types:
 
@@ -660,8 +660,8 @@ A number_of_doors should be one of the following types:
 
 C<numberOfForwardGears>
 
-=for html The total number of forward gears available for the transmission system of
-the vehicle.<br/><br/> Typical unit code(s): C62
+=for html <p>The total number of forward gears available for the transmission system
+of the vehicle.<br/><br/> Typical unit code(s): C62<p>
 
 A number_of_forward_gears should be one of the following types:
 
@@ -677,8 +677,8 @@ A number_of_forward_gears should be one of the following types:
 
 C<numberOfPreviousOwners>
 
-=for html The number of owners of the vehicle, including the current one.<br/><br/>
-Typical unit code(s): C62
+=for html <p>The number of owners of the vehicle, including the current
+one.<br/><br/> Typical unit code(s): C62<p>
 
 A number_of_previous_owners should be one of the following types:
 
@@ -692,10 +692,10 @@ A number_of_previous_owners should be one of the following types:
 
 =head2 C<payload>
 
-=for html The permitted weight of passengers and cargo, EXCLUDING the weight of the
-empty vehicle.<br/><br/> Typical unit code(s): KGM for kilogram, LBR for
-pound<br/><br/> <ul> <li>Note 1: Many databases specify the permitted TOTAL
-weight instead, which is the sum of <a class="localLink"
+=for html <p>The permitted weight of passengers and cargo, EXCLUDING the weight of
+the empty vehicle.<br/><br/> Typical unit code(s): KGM for kilogram, LBR
+for pound<br/><br/> <ul> <li>Note 1: Many databases specify the permitted
+TOTAL weight instead, which is the sum of <a class="localLink"
 href="http://schema.org/weight">weight</a> and <a class="localLink"
 href="http://schema.org/payload">payload</a></li> <li>Note 2: You can
 indicate additional information in the <a class="localLink"
@@ -708,7 +708,7 @@ href="http://schema.org/valueReference">valueReference</a>.</li> <li>Note
 4: Note that you can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> to indicate ranges.</li>
-</ul> 
+</ul> <p>
 
 A payload should be one of the following types:
 
@@ -750,9 +750,9 @@ A purchase_date should be one of the following types:
 
 C<seatingCapacity>
 
-=for html The number of persons that can be seated (e.g. in a vehicle), both in terms
-of the physical space available, and in terms of limitations set by
-law.<br/><br/> Typical unit code(s): C62 for persons
+=for html <p>The number of persons that can be seated (e.g. in a vehicle), both in
+terms of the physical space available, and in terms of limitations set by
+law.<br/><br/> Typical unit code(s): C62 for persons<p>
 
 A seating_capacity should be one of the following types:
 
@@ -766,8 +766,8 @@ A seating_capacity should be one of the following types:
 
 =head2 C<speed>
 
-=for html The speed range of the vehicle. If the vehicle is powered by an engine, the
-upper limit of the speed range (indicated by <a class="localLink"
+=for html <p>The speed range of the vehicle. If the vehicle is powered by an engine,
+the upper limit of the speed range (indicated by <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> should be the maximum speed
 achievable under regular conditions.<br/><br/> Typical unit code(s): KMH
 for km/h, HM for mile per hour (0.447 04 m/s), KNT for knot<br/><br/> *Note
@@ -777,7 +777,7 @@ indicate the range. Typically, the minimal value is zero. * Note 2: There
 are many different ways of measuring the speed range. You can link to
 information about how the given value has been determined using the <a
 class="localLink"
-href="http://schema.org/valueReference">valueReference</a> property.
+href="http://schema.org/valueReference">valueReference</a> property.<p>
 
 A speed should be one of the following types:
 
@@ -805,7 +805,7 @@ A steering_position should be one of the following types:
 
 C<tongueWeight>
 
-=for html The permitted vertical load (TWR) of a trailer attached to the vehicle.
+=for html <p>The permitted vertical load (TWR) of a trailer attached to the vehicle.
 Also referred to as Tongue Load Rating (TLR) or Vertical Load Rating
 (VLR)<br/><br/> Typical unit code(s): KGM for kilogram, LBR for
 pound<br/><br/> <ul> <li>Note 1: You can indicate additional information in
@@ -819,7 +819,7 @@ href="http://schema.org/valueReference">valueReference</a>.</li> <li>Note
 3: Note that you can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> to indicate ranges.</li>
-</ul> 
+</ul> <p>
 
 A tongue_weight should be one of the following types:
 
@@ -833,7 +833,7 @@ A tongue_weight should be one of the following types:
 
 C<trailerWeight>
 
-=for html The permitted weight of a trailer attached to the vehicle.<br/><br/>
+=for html <p>The permitted weight of a trailer attached to the vehicle.<br/><br/>
 Typical unit code(s): KGM for kilogram, LBR for pound * Note 1: You can
 indicate additional information in the <a class="localLink"
 href="http://schema.org/name">name</a> of the <a class="localLink"
@@ -844,7 +844,7 @@ provides additional information using <a class="localLink"
 href="http://schema.org/valueReference">valueReference</a>. * Note 3: Note
 that you can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
-href="http://schema.org/maxValue">maxValue</a> to indicate ranges.
+href="http://schema.org/maxValue">maxValue</a> to indicate ranges.<p>
 
 A trailer_weight should be one of the following types:
 
@@ -948,9 +948,9 @@ A vehicle_model_date should be one of the following types:
 
 C<vehicleSeatingCapacity>
 
-=for html The number of passengers that can be seated in the vehicle, both in terms
-of the physical space available, and in terms of limitations set by
-law.<br/><br/> Typical unit code(s): C62 for persons.
+=for html <p>The number of passengers that can be seated in the vehicle, both in
+terms of the physical space available, and in terms of limitations set by
+law.<br/><br/> Typical unit code(s): C62 for persons.<p>
 
 A vehicle_seating_capacity should be one of the following types:
 
@@ -1002,10 +1002,10 @@ A vehicle_transmission should be one of the following types:
 
 C<weightTotal>
 
-=for html The permitted total weight of the loaded vehicle, including passengers and
-cargo and the weight of the empty vehicle.<br/><br/> Typical unit code(s):
-KGM for kilogram, LBR for pound<br/><br/> <ul> <li>Note 1: You can indicate
-additional information in the <a class="localLink"
+=for html <p>The permitted total weight of the loaded vehicle, including passengers
+and cargo and the weight of the empty vehicle.<br/><br/> Typical unit
+code(s): KGM for kilogram, LBR for pound<br/><br/> <ul> <li>Note 1: You can
+indicate additional information in the <a class="localLink"
 href="http://schema.org/name">name</a> of the <a class="localLink"
 href="http://schema.org/QuantitativeValue">QuantitativeValue</a> node.</li>
 <li>Note 2: You may also link to a <a class="localLink"
@@ -1015,7 +1015,7 @@ href="http://schema.org/valueReference">valueReference</a>.</li> <li>Note
 3: Note that you can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> to indicate ranges.</li>
-</ul> 
+</ul> <p>
 
 A weight_total should be one of the following types:
 
@@ -1027,9 +1027,9 @@ A weight_total should be one of the following types:
 
 =head2 C<wheelbase>
 
-=for html The distance between the centers of the front and rear wheels.<br/><br/>
+=for html <p>The distance between the centers of the front and rear wheels.<br/><br/>
 Typical unit code(s): CMT for centimeters, MTR for meters, INH for inches,
-FOT for foot/feet
+FOT for foot/feet<p>
 
 A wheelbase should be one of the following types:
 

@@ -8,74 +8,359 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef av_top_index
+#define av_top_index(av)       AvFILL(av)
+#endif
+
+/* Not real API but this avoids so many off-by-one errors */
+#ifndef av_count
+#define av_count(av)           (av_top_index(av) + 1)
+#endif
+
+#ifndef block_end
+#define block_end(a,b)         Perl_block_end(aTHX_ a,b)
+#endif
+
+#ifndef block_start
+#define block_start(a)         Perl_block_start(aTHX_ a)
+#endif
+
+#ifndef intro_my
+#define intro_my()             Perl_intro_my(aTHX)
+#endif
+
 #ifndef wrap_keyword_plugin
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#if HAVE_PERL_VERSION(5, 31, 3)
+#  define HAVE_PARSE_SUBSIGNATURE
+#elif HAVE_PERL_VERSION(5, 26, 0)
+#  include "parse_subsignature.c.inc"
+#  define HAVE_PARSE_SUBSIGNATURE
+#endif
+
 #include "lexer-additions.c.inc"
 
-static OP *newPADSVOP(PADOFFSET padix)
+#ifndef OpSIBLING
+#  define OpSIBLING(op)  (op->op_sibling)
+#endif
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define HAVE_UNOP_AUX
+#endif
+
+#ifndef HAVE_UNOP_AUX
+typedef struct {
+  UNOP baseop;
+  IV   iv;
+} UNOP_with_IV;
+
+#define newUNOP_with_IV(type, flags, first, iv)  MY_newUNOP_with_IV(aTHX_ type, flags, first, iv)
+static OP *MY_newUNOP_with_IV(pTHX_ I32 type, I32 flags, OP *first, IV iv)
 {
-  OP *op = newOP(OP_PADSV, 0);
+  /* Cargoculted from perl's op.c:Perl_newUNOP()
+   */
+  UNOP_with_IV *op = PerlMemShared_malloc(sizeof(UNOP_with_IV) * 1);
+  NewOp(1101, op, 1, UNOP_with_IV);
+
+  if(!first)
+    first = newOP(OP_STUB, 0);
+  UNOP *unop = (UNOP *)op;
+  unop->op_type = (OPCODE)type;
+  unop->op_first = first;
+  unop->op_ppaddr = NULL;
+  unop->op_flags = (U8)flags | OPf_KIDS;
+  unop->op_private = (U8)(1 | (flags >> 8));
+
+  op->iv = iv;
+
+  return (OP *)op;
+}
+#endif
+
+#define newMETHOD_REDIR_OP(rclass, methname, flags)  MY_newMETHOD_REDIR_OP(aTHX_ rclass, methname, flags)
+static OP *MY_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
+{
+#if HAVE_PERL_VERSION(5, 22, 0)
+  OP *op = newMETHOP_named(OP_METHOD_REDIR, flags, methname);
+#  ifdef USE_ITHREADS
+  {
+    /* cargoculted from S_op_relocate_sv() */
+    PADOFFSET ix = pad_alloc(OP_CONST, SVf_READONLY);
+    PAD_SETSV(ix, rclass);
+    cMETHOPx(op)->op_rclass_targ = ix;
+  }
+#  else
+  cMETHOPx(op)->op_rclass_sv = rclass;
+#  endif
+#else
+  OP *op = newUNOP(OP_METHOD, flags,
+    newSVOP(OP_CONST, 0, newSVpvf("%s::%s", SvPV_nolen(rclass), SvPV_nolen(methname))));
+#endif
+
+  return op;
+}
+
+#ifndef op_convert_list
+#define op_convert_list(type, flags, o)  MY_op_convert_list(aTHX_ type, flags, o)
+static OP *MY_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
+{
+  /* A minimal recreation just for our purposes */
+  o->op_type = type;
+  o->op_flags |= flags;
+  o->op_ppaddr = PL_ppaddr[type];
+
+  o = PL_check[type](aTHX_ o);
+
+  return o;
+}
+#endif
+
+/* A SLOTOFFSET is an offset within the AV of an object instance */
+typedef IV SLOTOFFSET;
+
+typedef struct {
+  SV *name;
+  OP *defaultop;
+} SlotMeta;
+
+/* Metadata about a class */
+typedef struct {
+  SLOTOFFSET offset;  /* first slot index of this partial within its instance */
+  AV *slots;          /* each AV item is a raw pointer directly to a SlotMeta */
+} ClassMeta;
+
+/* The metadata on the currently-compiling class */
+#ifdef MULTIPLICITY
+#  define compclassmeta  \
+    (*((ClassMeta **)hv_fetchs(PL_modglobal, "Object::Pad/compclassmeta", GV_ADD)))
+#else
+/* without MULTIPLICITY there's only one, so we might as well just store it
+ * in a static
+ */
+static ClassMeta *compclassmeta;
+#endif
+
+static OP *newPADSVOP(PADOFFSET padix, I32 flags)
+{
+  OP *op = newOP(OP_PADSV, flags);
   op->op_targ = padix;
+  return op;
+}
+
+static XOP xop_methstart;
+static OP *pp_methstart(pTHX)
+{
+  SV *self = av_shift(GvAV(PL_defgv));
+  HV *classstash = CvSTASH(find_runcv(0));
+
+  if(!SvROK(self) || !SvOBJECT(SvRV(self)))
+    croak("Cannot invoke method on a non-instance");
+
+  if(!sv_derived_from(self, HvNAME(classstash)))
+    croak("Cannot invoke foreign method on non-derived instance");
+
+  sv_setsv(PAD_SVl(1), self);
+
+  return PL_op->op_next;
+}
+
+static OP *newMETHSTARTOP(void)
+{
+  OP *op = newOP(OP_CUSTOM, 0);
+  op->op_ppaddr = &pp_methstart;
   return op;
 }
 
 static XOP xop_slotpad;
 static OP *pp_slotpad(pTHX)
 {
-  UNOP_AUX_item *aux = cUNOP_AUX->op_aux;
-  I32 slotix = aux[0].iv;
+#ifdef HAVE_UNOP_AUX
+  SLOTOFFSET slotix = PTR2IV(cUNOP_AUX->op_aux);
+#else
+  UNOP_with_IV *op = (UNOP_with_IV *)PL_op;
+  SLOTOFFSET slotix = op->iv;
+#endif
   PADOFFSET targ = PL_op->op_targ;
 
   SV *self = PAD_SV(1);
-  SV **slots = AvARRAY((AV *)SvRV(self));
+  AV *av = (AV *)SvRV(self);
+  SV **slots = AvARRAY(av);
+
+  if(slotix > av_top_index(av))
+    croak("ARGH: instance does not have a slot at index %d", slotix);
 
   if(PAD_SV(targ))
     SvREFCNT_dec(PAD_SV(targ));
 
-  PAD_SVl(targ) = SvREFCNT_inc(slots[slotix]);
+  /* TODO: Consider do we need two different SLOTPAD ops? */
+  if(PL_op->op_flags & OPf_SPECIAL) {
+    SV *slot = slots[slotix];
+    if(!SvROK(slot))
+      croak("ARGH: expected to find an RV at slot index %d", slotix);
+    PAD_SVl(targ) = SvREFCNT_inc(SvRV(slot));
+  }
+  else
+    PAD_SVl(targ) = SvREFCNT_inc(slots[slotix]);
 
   return PL_op->op_next;
 }
 
-static OP *newSLOTPADOP(PADOFFSET padix, I32 slotix)
+static OP *newSLOTPADOP(I32 flags, PADOFFSET padix, SLOTOFFSET slotix)
 {
-  UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 1);
-  aux[0].iv = slotix;
-
-  OP *op = newUNOP_AUX(OP_CUSTOM, 0, NULL, aux);
+#ifdef HAVE_UNOP_AUX
+  OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NUM2PTR(UNOP_AUX_item *, slotix));
+#else
+  OP *op = newUNOP_with_IV(OP_CUSTOM, flags, NULL, slotix);
+#endif
   op->op_targ = padix;
   op->op_ppaddr = &pp_slotpad;
 
   return op;
 }
 
-
-#define get_class_slots(stash)  MY_get_class_slots(aTHX_ stash)
-static AV *MY_get_class_slots(pTHX_ HV *stash)
+#define import_pragma(pragma, arg)  MY_import_pragma(aTHX_ pragma, arg)
+static void MY_import_pragma(pTHX_ const char *pragma, const char *arg)
 {
-  GV **gvp = (GV **)hv_fetchs(stash, "SLOTS", 0);
-  if(gvp)
-    return GvAV(*gvp);
+  dSP;
+  bool unimport = FALSE;
 
-  gvp = (GV **)hv_fetchs(PL_curstash, "SLOTS", GV_ADD);
-  GV *gv = *gvp;
-  gv_init_pvn(gv, PL_curstash, "SLOTS", 5, 0);
-  GvMULTI_on(gv);
+  if(pragma[0] == '-') {
+    unimport = TRUE;
+    pragma++;
+  }
 
-  AV *slots = GvAVn(*gvp);
+  SAVETMPS;
 
-  /* Reserve slotix=0 for something special maybe? */
-  av_push(slots, newSV(0));
+  EXTEND(SP, 2);
+  PUSHMARK(SP);
+  mPUSHp(pragma, strlen(pragma));
+  if(arg)
+    mPUSHp(arg, strlen(arg));
+  PUTBACK;
 
-  return slots;
+  call_method(unimport ? "unimport" : "import", G_VOID);
+
+  FREETMPS;
 }
 
-#define get_this_class_slots()  MY_get_this_class_slots(aTHX)
-static AV *MY_get_this_class_slots(pTHX)
+
+#define get_class_isa(stash)  MY_get_class_isa(aTHX_ stash)
+static AV *MY_get_class_isa(pTHX_ HV *stash)
 {
-  return get_class_slots(PL_curstash);
+  GV **gvp = (GV **)hv_fetchs(stash, "ISA", 0);
+  if(!gvp || !GvAV(*gvp))
+    croak("Expected %s to have a @ISA list", HvNAME(stash));
+
+  return GvAV(*gvp);
+}
+
+#define generate_initslots_method(meta, stash)  MY_generate_initslots_method(aTHX_ meta, stash)
+static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
+{
+  OP *ops = NULL;
+  int i;
+
+  I32 floor_ix = start_subparse(FALSE, 0);
+  SAVEFREESV(PL_compcv);
+
+  I32 save_ix = block_start(TRUE);
+
+  /* A more optimised implementation of this method would be able to generate
+   * a @self lexical and OP_REFASSIGN it, but that would only work on newer
+   * perls. For now we'll take the small performance hit of RV2AV every time
+   */
+
+  PADOFFSET selfix = pad_add_name_pvs("$self", 0, NULL, NULL);
+  if(selfix != 1)
+    croak("ARGH: Expected that selfix = 1");
+
+  ops = op_append_list(OP_LINESEQ, ops,
+    /* $self = shift */
+    newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0), newPADSVOP(selfix, OPf_MOD)));
+
+  intro_my();
+
+  /* TODO: Icky horrible implementation; if our slotoffset > 0 then
+   * we must be a subclass
+   */
+  if(meta->offset) {
+    AV *isa = get_class_isa(stash);
+    SV *superclass = AvARRAY(isa)[0];
+
+    /* Build an OP_ENTERSUB for  $self->SUPER::INITSLOTS() */
+    OP *op = NULL;
+    op = op_append_list(OP_LIST, op,
+      newPADSVOP(selfix, 0));
+    op = op_append_list(OP_LIST, op,
+      newMETHOD_REDIR_OP(superclass, newSVpvn_share("INITSLOTS", 9, 0), 0));
+
+    ops = op_append_list(OP_LINESEQ, ops,
+      op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
+  }
+
+  /* TODO: If in some sort of debug mode: insert equivalent of
+   *   if((av_count(self)) != offset)
+   *     croak("ARGH: Expected self to have %d slots by now\n", offset);
+   */
+
+  /* To make an OP_PUSH we have to build a generic OP_LIST then call
+   * op_convert_list() on it later
+   */
+  OP *itemops = op_append_elem(OP_LIST, NULL,
+    newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, newPADSVOP(selfix, 0)));
+
+  AV *slots = meta->slots;
+  I32 nslots = av_count(slots);
+  for(int i = 0; i < nslots; i++) {
+    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+    char *slotname = SvPV_nolen(slotmeta->name);
+    OP *op = NULL;
+
+    switch(slotname[0]) {
+      case '$':
+        /* push ..., undef */
+        if(slotmeta->defaultop)
+          op = slotmeta->defaultop;
+        else
+          op = newOP(OP_UNDEF, 0);
+        break;
+      case '@':
+        /* push ..., [] */
+        op = newLISTOP(OP_ANONLIST, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
+        break;
+      case '%':
+        /* push ..., {} */
+        op = newLISTOP(OP_ANONHASH, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
+        break;
+
+      default:
+        croak("ARGV: notsure how to handle a slot sigil %c\n", slotname[0]);
+    }
+
+    if(op) {
+      op_contextualize(op, G_SCALAR);
+      itemops = op_append_elem(OP_LIST, itemops, op);
+    }
+  }
+
+  if(OpSIBLING(cLISTOPx(itemops)->op_first)) {
+    ops = op_append_list(OP_LINESEQ, ops,
+      op_convert_list(OP_PUSH, OPf_WANT_VOID, itemops));
+  }
+  else {
+    op_free(itemops);
+  }
+
+  SvREFCNT_inc(PL_compcv);
+  ops = block_end(save_ix, ops);
+
+  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvs("INITSLOTS")),
+    NULL, NULL, ops);
 }
 
 
@@ -83,11 +368,9 @@ static int keyword_class(pTHX_ OP **op_ptr)
 {
   lex_read_space(0);
 
-  SV *packagename = lex_scan_ident(); // TODO: accept Package::Names
+  SV *packagename = lex_scan_packagename();
   if(!packagename)
     croak("Expected 'class' to be followed by package name");
-
-  lex_read_space(0);
 
   ENTER;
 
@@ -103,17 +386,72 @@ static int keyword_class(pTHX_ OP **op_ptr)
     PL_parser->copline = NOLINE;
   }
 
-  // TODO: Accept VERSION
-
+  AV *isa;
   {
     SV *isaname = newSVpvf("%s::ISA", SvPV_nolen(PL_curstname));
     SAVEFREESV(isaname);
 
-    AV *isa = get_av(SvPV_nolen(isaname), GV_ADD);
-    if(av_top_index(isa) >= 0)
-      croak("Already have an @ISA list");
+    isa = get_av(SvPV_nolen(isaname), GV_ADD);
+  }
 
+  // TODO: This grammar is quite flexible; maybe too much?
+  while(1) {
+    lex_read_space(0);
+
+    // TODO: Maybe accept `v1.23`
+
+    if(lex_consume("extends")) {
+      if(av_count(isa))
+        croak("Multiple superclasses are not currently supported");
+
+      lex_read_space(0);
+      SV *superclassname = lex_scan_packagename();
+      HV *superstash = gv_stashsv(superclassname, 0);
+
+      if(!superstash)
+        croak("Superclass %s does not exist", SvPV_nolen(superclassname));
+
+      if(!sv_derived_from(superclassname, "Object::Pad::_base"))
+        croak("Superclass %s does not derive from Object::Pad", SvPV_nolen(superclassname));
+
+      av_push(isa, superclassname);
+    }
+    else
+      break;
+  }
+
+  import_pragma("strict", NULL);
+  import_pragma("-indirect", ":fatal");
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  import_pragma("experimental", "signatures");
+#endif
+
+  SAVEVPTR(compclassmeta);
+  Newx(compclassmeta, 1, ClassMeta);
+
+  compclassmeta->offset = 0;
+  compclassmeta->slots  = newAV();
+
+  if(av_count(isa) == 0) {
+    /* A base class */
     av_push(isa, newSVpvs("Object::Pad::_base"));
+  }
+  else {
+    /* A subclass */
+    HV *superstash = gv_stashsv(AvARRAY(isa)[0], 0);
+    ClassMeta *supermeta = NUM2PTR(ClassMeta *,
+      SvUV(GvSV(*hv_fetchs(superstash, "META", 0))));
+
+    compclassmeta->offset = supermeta->offset + av_count(supermeta->slots);
+  }
+
+  {
+    GV **gvp = (GV **)hv_fetchs(PL_curstash, "META", GV_ADD);
+    GV *gv = *gvp;
+    gv_init_pvn(gv, PL_curstash, "META", 4, 0);
+    GvMULTI_on(gv);
+
+    sv_setuv(GvSVn(gv), PTR2UV(compclassmeta));
   }
 
   // TODO: Accept ';' here to end a statement and set default class for
@@ -121,6 +459,8 @@ static int keyword_class(pTHX_ OP **op_ptr)
   I32 save_ix = block_start(TRUE);
   OP *body = parse_block(0);
   body = block_end(save_ix, body);
+
+  generate_initslots_method(compclassmeta, PL_curstash);
 
   LEAVE;
 
@@ -137,10 +477,47 @@ static int keyword_has(pTHX_ OP **op_ptr)
   if(!name)
     croak("Expected a slot name");
 
-  AV *slots = get_this_class_slots();
+  AV *slots = compclassmeta->slots;
 
   // TODO: Check for name collisions
-  av_push(slots, name);
+  SlotMeta *slotmeta;
+  Newx(slotmeta, 1, SlotMeta);
+
+  slotmeta->name = name;
+  slotmeta->defaultop = NULL;
+
+  av_push(slots, (SV *)slotmeta);
+
+  lex_read_space(0);
+
+  if(lex_peek_unichar(0) == '=') {
+    lex_read_unichar(0);
+    lex_read_space(0);
+
+    if(SvPV_nolen(name)[0] != '$')
+      croak("Can only attach a default expression to a 'has' default");
+
+    OP *op = parse_termexpr(0);
+
+    if(!op || PL_parser->error_count)
+      return 0;
+
+    /* TODO: This is currently very restrictive. However, if we allow any
+     * expression then the pad indexes within it will be all wrong. We'll have
+     * to tread carefully.
+     * It should be possible to allow somewhat more in future but for now this
+     * is at least safe
+     */
+    if(op->op_type != OP_CONST || op->op_flags & OPf_KIDS)
+      croak("Default expression for 'has %s' must be compiletime constant",
+        SvPV_nolen(name));
+
+    slotmeta->defaultop = op;
+  }
+
+  if(lex_read_unichar(0) != ';') {
+    croak("Expected default expression or end of statement");
+  }
 
   *op_ptr = newOP(OP_NULL, 0);
   return KEYWORD_PLUGIN_STMT;
@@ -162,34 +539,56 @@ static int keyword_method(pTHX_ OP **op_ptr)
     attrs = lex_scan_attrs(PL_compcv);
   }
 
-  // TODO: Parse sub signatures
-  // steal much code from F:AA here
-
   I32 save_ix = block_start(TRUE);
 
   OP *slotops = NULL;
   {
     PADOFFSET selfix = pad_add_name_pvs("$self", 0, NULL, NULL);
+
     if(selfix != 1)
       croak("ARGH: Expected that selfix = 1");
 
     slotops = op_append_list(OP_LINESEQ, slotops,
-      /* $self = shift */
-      newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0), newPADSVOP(selfix)));
+      newMETHSTARTOP()
+    );
 
-    AV *slots = get_this_class_slots();
-    for(int slotix = 1; slotix <= av_top_index(slots); slotix++) {
-      SV *slotname = (AvARRAY(slots))[slotix];
+    AV *slots = compclassmeta->slots;
+    SLOTOFFSET offset = compclassmeta->offset;
+    int i;
+    I32 nslots = av_count(slots);
+    for(i = 0; i < nslots; i++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+      /* TODO: Slot names can't have \0 */
+      char *slotname = SvPV_nolen(slotmeta->name);
 
-      PADOFFSET padix = pad_add_name_pvn(SvPV_nolen(slotname), SvCUR(slotname), 0, NULL, NULL);
+      PADOFFSET padix = pad_add_name_pvn(slotname, SvCUR(slotmeta->name), 0, NULL, NULL);
+      SLOTOFFSET slotix = offset + i;
 
       slotops = op_append_list(OP_LINESEQ, slotops,
         /* alias the padix from the slot */
-        newSLOTPADOP(padix, slotix));
+        newSLOTPADOP(slotname[0] != '$' ? OPf_SPECIAL : 0, padix, slotix));
     }
 
     intro_my();
   }
+
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  OP *sigop = NULL;
+  if(lex_peek_unichar(0) == '(') {
+    lex_read_unichar(0);
+
+    sigop = parse_subsignature(0);
+    lex_read_space(0);
+
+    if(PL_parser->error_count)
+      return 0;
+
+    if(lex_peek_unichar(0) != ')')
+      croak("Expected ')'");
+    lex_read_unichar(0);
+    lex_read_space(0);
+  }
+#endif
 
   OP *body = parse_block(0);
   SvREFCNT_inc(PL_compcv);
@@ -203,10 +602,19 @@ static int keyword_method(pTHX_ OP **op_ptr)
      * correctly
      *   See https://rt.cpan.org/Ticket/Display.html?id=130417
      */
+#ifdef HAVE_PARSE_SUBSIGNATURE
+    if(sigop)
+      op_free(sigop);
+#endif
     op_free(body);
     *op_ptr = newOP(OP_NULL, 0);
     return name ? KEYWORD_PLUGIN_STMT : KEYWORD_PLUGIN_EXPR;
   }
+
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  if(sigop)
+    body = op_append_list(OP_LINESEQ, sigop, body);
+#endif
 
   body = op_append_list(OP_LINESEQ, slotops, body);
 
@@ -255,71 +663,20 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
   return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
 }
 
-MODULE = Object::Pad    PACKAGE = Object::Pad::_base
-
-SV *
-new(class, ...)
-  SV *class
-  INIT:
-    HV *stash;
-    AV *slots;
-    AV *self;
-  CODE:
-    // TODO: It'd be nice if we could inject a 'new' into the class at 'class'
-    // time which would know how to do the right thing
-    stash = gv_stashsv(class, 0);
-    slots = get_class_slots(stash);
-
-    self = newAV();
-    av_push(self, newSV(0));
-
-    for(int slotix = 1; slotix <= av_top_index(slots); slotix++) {
-      char *slotname = SvPV_nolen((AvARRAY(slots))[slotix]);
-      switch(slotname[0]) {
-        case '$':
-          av_push(self, newSV(0));
-          break;
-        case '@':
-          av_push(self, (SV *)newAV());
-          break;
-        case '%':
-          av_push(self, (SV *)newHV());
-          break;
-
-        default:
-          croak("ARGV: notsure how to handle a slot sigil %c\n", slotname[0]);
-      }
-    }
-
-    RETVAL = newRV_noinc((SV *)self);
-    sv_bless(RETVAL, stash);
-
-    if(hv_fetchs(stash, "CREATE", 0)) {
-      /* TODO: check it actually has a CV slot */
-      dSP;
-
-      ENTER;
-      SAVETMPS;
-
-      ST(0) = RETVAL;
-      PUSHMARK(SP-items); // evilness
-      PUTBACK;
-
-      call_method("CREATE", G_VOID);
-
-      FREETMPS;
-      LEAVE;
-    }
-
-  OUTPUT:
-    RETVAL
-
 MODULE = Object::Pad    PACKAGE = Object::Pad
 
 BOOT:
+  XopENTRY_set(&xop_methstart, xop_name, "methstart");
+  XopENTRY_set(&xop_methstart, xop_desc, "methstart()");
+  XopENTRY_set(&xop_methstart, xop_class, OA_BASEOP);
+
   XopENTRY_set(&xop_slotpad, xop_name, "slotpad");
   XopENTRY_set(&xop_slotpad, xop_desc, "slotpad()");
+#ifdef HAVE_UNOP_AUX
   XopENTRY_set(&xop_slotpad, xop_class, OA_UNOP_AUX);
+#else
+  XopENTRY_set(&xop_slotpad, xop_class, OA_UNOP); /* technically a lie */
+#endif
   Perl_custom_op_register(aTHX_ &pp_slotpad, &xop_slotpad);
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

@@ -1,4 +1,0 @@
-% my $p = shift;
-% use CallBackery;
-CallBackery@<%= $CallBackery::VERSION %>
-Mojo::SQLite

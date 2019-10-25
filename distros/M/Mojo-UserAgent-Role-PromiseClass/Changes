@@ -1,3 +1,12 @@
+0.005     Oct 25 2019
+        * restore Class::Method::Modifiers prereq dropped by Dist::Zilla switch
+
+0.004     Oct 24 2019
+	* pod cleanups and update git repository info
+
+0.003     Oct 02 2019
+        * added Role::Tiny and Class::Method::Modifiers prereqs
+
 0.002     Oct 01 2019
         * Fixed module packaging issues
 

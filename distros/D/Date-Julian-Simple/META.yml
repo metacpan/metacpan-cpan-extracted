@@ -20,15 +20,15 @@ no_index:
 provides:
   Date::Julian::Simple:
     file: lib/Date/Julian/Simple.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Date::Calc: '6.0'
-  Date::Utils: '0.27'
+  Date::Utils: '0.28'
   Moo: '2.000000'
   Time::localtime: '1.02'
   namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Date-Julian-Simple.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

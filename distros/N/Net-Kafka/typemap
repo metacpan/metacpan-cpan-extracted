@@ -1,0 +1,74 @@
+TYPEMAP
+plrd_kafka_t* T_RDKAFKA
+rd_kafka_message_t* T_RD_KAFKA_MSG
+rd_kafka_topic_t* T_RD_KAFKA_TOPIC
+rd_kafka_topic_partition_list_t* T_RD_KAFKA_TOPIC_PARTITION_LIST
+rd_kafka_headers_t* T_RD_KAFKA_HEADERS
+rd_kafka_event_t* T_RD_KAFKA_EVENT
+HV* T_HVREF_REFCOUNT_FIXED
+
+INPUT
+T_RDKAFKA
+        if(sv_derived_from($arg, \"Net::Kafka\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else {
+                croak(\"$var is not of type Net::Kafka\");
+        }
+T_RD_KAFKA_MSG
+        if(sv_derived_from($arg, \"Net::Kafka::Message\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else {
+                croak(\"$var is not of type Net::Kafka::Message\");
+        }
+T_RD_KAFKA_TOPIC
+        if(sv_derived_from($arg, \"Net::Kafka::Topic\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else {
+                croak(\"$var is not of type Net::Kafka::Topic\");
+        }
+T_RD_KAFKA_TOPIC_PARTITION_LIST
+        if(sv_derived_from($arg, \"Net::Kafka::TopicPartitionList\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else {
+                croak(\"$var is not of type Net::Kafka::TopicPartitionList\");
+        }
+T_RD_KAFKA_HEADERS
+        if(!SvOK($arg)) {
+                $var = NULL;
+        } else if(sv_derived_from($arg, \"Net::Kafka::Headers\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else {
+                croak(\"$var is not of type Net::Kafka::Headers\");
+        }
+T_RD_KAFKA_EVENT
+        if(sv_derived_from($arg, \"Net::Kafka::Event\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else {
+                croak(\"$var is not of type Net::Kafka::Event\");
+        }
+
+OUTPUT
+T_RDKAFKA
+        sv_setref_pv($arg, \"Net::Kafka\", (void *)$var);
+T_RD_KAFKA_MSG
+        sv_setref_pv($arg, \"Net::Kafka::Message\", (void *)$var);
+T_RD_KAFKA_TOPIC
+        sv_setref_pv($arg, \"Net::Kafka::Topic\", (void *)$var);
+T_RD_KAFKA_TOPIC_PARTITION_LIST
+        sv_setref_pv($arg, \"Net::Kafka::TopicPartitionList\", (void *)$var);
+T_RD_KAFKA_HEADERS
+        sv_setref_pv($arg, \"Net::Kafka::Headers\", (void *)$var);
+T_RD_KAFKA_EVENT
+        sv_setref_pv($arg, \"Net::Kafka::Event\", (void *)$var);

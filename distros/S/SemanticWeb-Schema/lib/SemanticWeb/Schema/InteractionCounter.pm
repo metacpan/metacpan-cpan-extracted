@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has interaction_service => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::InteractionCounter - A summary of how users have interacted
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -88,11 +88,11 @@ A interaction_service should be one of the following types:
 
 C<interactionType>
 
-=for html The Action representing the type of interaction. For up votes, +1s, etc.
+=for html <p>The Action representing the type of interaction. For up votes, +1s, etc.
 use <a class="localLink"
 href="http://schema.org/LikeAction">LikeAction</a>. For down votes use <a
 class="localLink" href="http://schema.org/DislikeAction">DislikeAction</a>.
-Otherwise, use the most specific Action.
+Otherwise, use the most specific Action.<p>
 
 A interaction_type should be one of the following types:
 

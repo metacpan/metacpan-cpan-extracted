@@ -1,0 +1,35 @@
+<clacks>
+    <appname>Clacks Master</appname>
+    <ip>127.0.0.1</ip>
+    <port>18888</port>
+
+    <!-- This is the magic that makes Unix domain sockets possible
+         In most (is not all) cases, you should use absolute paths.
+         The only reason this one isn't: I don't know anything about
+         *your* system, so i used only the filename.
+
+         If you are so inclined, you can specify multiple <socket> lines
+         to listen on multiple unix domain sockets...
+         ...for whatever reason you might have -->
+    <socket>example.sock</socket>
+
+
+    <pingtimeout>600</pingtimeout>
+    <interclackspingtimeout>10</interclackspingtimeout>
+    <ssl>
+        <cert>exampleserver.crt</cert>
+        <key>exampleserver.key</key>
+    </ssl>
+    <username>exampleuser</username>
+    <password>unsafepassword</password>
+    <throttle>
+        <maxsleep>5000</maxsleep>
+        <step>1</step>
+    </throttle>
+    <hosts>
+        <developmentbox>
+            <ip>128.0.0.1</ip>
+            <ip>::1</ip>
+        </developmentbox>
+    </hosts>
+</clacks>

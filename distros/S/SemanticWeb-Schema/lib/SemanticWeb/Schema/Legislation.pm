@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has legislation_applies => (
@@ -130,7 +130,7 @@ SemanticWeb::Schema::Legislation - A legal document such as an act
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -143,14 +143,14 @@ a component of a legal act (like an article).
 
 C<legislationApplies>
 
-=for html Indicates that this legislation (or part of a legislation) somehow
+=for html <p>Indicates that this legislation (or part of a legislation) somehow
 transfers another legislation in a different legislative context. This is
 an informative link, and it has no legal value. For legally-binding links
 of transposition, use the <a
 href="/legislationTransposes">legislationTransposes</a> property. For
 example an informative consolidated law of a European Union's member state
 "applies" the consolidated version of the European Directive implemented in
-it.
+it.<p>
 
 A legislation_applies should be one of the following types:
 
@@ -164,14 +164,14 @@ A legislation_applies should be one of the following types:
 
 C<legislationChanges>
 
-=for html Another legislation that this legislation changes. This encompasses the
+=for html <p>Another legislation that this legislation changes. This encompasses the
 notions of amendment, replacement, correction, repeal, or other types of
 change. This may be a direct change (textual or non-textual amendment) or a
 consequential or indirect change. The property is to be used to express the
 existence of a change relationship between two acts rather than the
 existence of a consolidated version of the text that shows the result of
 the change. For consolidation relationships, use the <a
-href="/legislationConsolidates">legislationConsolidates</a> property.
+href="/legislationConsolidates">legislationConsolidates</a> property.<p>
 
 A legislation_changes should be one of the following types:
 

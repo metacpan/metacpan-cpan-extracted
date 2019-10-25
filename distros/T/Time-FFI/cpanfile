@@ -6,7 +6,7 @@ requires 'Module::Runtime';
 requires 'Time::Local';
 test_requires 'Test2::V0';
 test_requires 'Test::Needs';
-author_requires 'Time::Piece';
+author_requires 'Time::Piece' => '1.16';
 author_requires 'Time::Moment';
 author_requires 'Time::Moment::Role::TimeZone';
 author_requires 'DateTime';

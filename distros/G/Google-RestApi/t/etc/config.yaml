@@ -1,0 +1,23 @@
+---
+customers:
+  name: Customers Sheet
+  worksheets:
+    addresses:
+      name: Customer_Addresses
+      cols:
+        id: Customer ID
+        name: Customer Name
+        address: Address
+      rows:
+        sam: Sam Brady
+        george: George Jones
+    orders:
+      name: Customer_Orders
+      cols:
+        id: ID
+        item: Item
+    config:
+      name: Config
+      cols:
+        field: Field
+        value: Value

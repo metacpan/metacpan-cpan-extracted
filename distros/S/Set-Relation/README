@@ -6,27 +6,27 @@ by Darren Duncan <darren@DarrenDuncan.net>
 
 PREFACE
 
-This distribution features the Perl 5 or 6 (depending on which copy of this
+This distribution features the Perl or Raku (depending on which copy of this
 README file you are reading) module named Set::Relation (Relation data type
 for Perl) and its support structure.
 
 Set::Relation has 2 co-developed versions, which are written in native
-Perl 5 and Perl 6 respectively, and which are distributed separately from
+Perl and Raku respectively, and which are distributed separately from
 each other.  But while the 2 versions would be similar, they are explicitly
 not intended to be drop-in substitutable for each other, as each would have
 some API differences that optimizes it for its host language.  The actual
 Muldis D language specification document will be identical for both,
 though.
 
-The Perl 5 version is intended to be the primary version during the present
-time, as Perl 5 itself is stable, production-ready, and commonly used now.
-Eventually the Perl 6 version is expected to supercede it, once Perl 6
+The Perl version is intended to be the primary version during the present
+time, as Perl itself is stable, production-ready, and commonly used now.
+Eventually the Raku version is expected to supercede it, once Raku
 itself has implementations that are production-ready and in common use.
 
-That all being said, development of the Perl 6 version has been temporarily
-suspended, to focus resources on the Perl 5 version, and therefore the Perl
-6 version is likely out of date by the time you read this.  In the future,
-the more-advanced Perl 5 version will be translated to Perl 6 again, either
+That all being said, development of the Raku version has been temporarily
+suspended, to focus resources on the Perl version, and therefore the Raku
+version is likely out of date by the time you read this.  In the future,
+the more-advanced Perl version will be translated to Raku again, either
 to re-establish their parallel development, or just to provide snapshots.
 
 Read below for how to get support or keep up to date.
@@ -52,15 +52,15 @@ KEEPING UP TO DATE
 
 My module set is constantly under development.  The canonical copies are
 all linked to through my personal website, "http://www.darrenduncan.net/",
-or through my business website, "http://www.muldis.com/".
+or through my business website, "https://muldis.com".
 
 For those of you that are interested in the bleeding edge of development, I
 have all parts of the Set::Relation project in one or more public
-repositories.  The Perl 5 Set::Relation project is in a Git repository
+repositories.  The Perl Set::Relation project is in a Git repository
 whose public clone url is "git://github.com/muldis/Set-Relation.git" and
-whose web information url is at "http://github.com/muldis/Set-Relation".
-The Perl 6 Set::Relation project used to be in a Subversion repository for
-the Perl 6 Pugs project but the host domain pugscode.org has since expired.
+whose web information url is at "https://github.com/muldis/Set-Relation".
+The Raku Set::Relation project used to be in a Subversion repository for
+the Raku Pugs project but the host domain pugscode.org has since expired.
 
 You can download slightly older versions of all of my modules from the
 public CPAN archives at "http://www.cpan.org/authors/id/D/DU/DUNCAND/", or
@@ -71,7 +71,7 @@ an organized and searchable fashion.  Their main search site is at
 "http://search.cpan.org", and my own DUNCAND author page is at
 "http://search.cpan.org/search?author=DUNCAND".
 
-The main CPAN search site url for Set::Relation for Perl 5 is
+The main CPAN search site url for Set::Relation for Perl is
 "http://search.cpan.org/dist/Set-Relation/"; that is the url you should
 link to presently if you want something to consider the "home page" of
 Set::Relation; it is best to refer people there by default.
@@ -94,7 +94,7 @@ necessarily to each individually.  All of these you can reach via
 
 Alternately, you can purchase more advanced commercial support for various
 Muldis D implementations, particularly Muldis::D::RefEng, from its author by
-way of Muldis Data Systems; see "http://www.muldis.com/" for details.
+way of Muldis Data Systems; see "https://muldis.com" for details.
 
 FIN
 

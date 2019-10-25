@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000475';
+our $VERSION='1.0000477';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -847,7 +847,7 @@ if ($^O eq 'cygwin') {
    my %need_packages=();
    if ($uname_all=~/x86_64/) {
       foreach my $package ('gcc-core','gcc-g++','make','openssh','openssl',
-                           'libssl-devel','perl','db','libdb-devel',
+                           'libssl-devel','perl','db','libdb-devel','zip',
                            'ncurses','cron','inetutils','procps-ng','vim',
                            'unzip','libmpfr4','libcrypt-devel','nano',
                            'perl-libwww-perl','perl-LWP-Protocol-https',
@@ -864,7 +864,7 @@ if ($^O eq 'cygwin') {
       foreach my $package ('gcc-core','gcc-g++','make','openssh','openssl',
                            'libssl-devel','perl','perl-Win32','db4.8',
                            'libdb4.8-devel','ncurses','cron','inetutils',
-                           'procps','vim','unzip','libmpfr4','nano',
+                           'procps','vim','unzip','libmpfr4','nano','zip',
                            'wget','git','figlet') {
          unless (-1<index $cygcheck, "$package ") {
             $need_packages{$package}='';
@@ -1860,9 +1860,16 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('HTTP::Message','install','Makefile');
    &fa_install_module('File::Listing','install','Makefile');
    &fa_install_module('HTTP::Cookies','install','Makefile');
+   &fa_install_module('ExtUtils::Config','install','Makefile');
+   &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
+   &fa_install_module('ExtUtils::Helpers','install','Makefile');
+   &fa_install_module('Test::Harness','install','Makefile','','3.33');
+   &fa_install_module('Module::Build::Tiny','install','Build');
+   &fa_install_module('IO::Socket::IP','install','Makefile');
+   &fa_install_module('Test::Needs','install','Makefile');
    if ($^O ne 'cygwin'
          || grep { /-*add[-_]?dependencies/i } @ARGV) {
-      &fa_install_module('HTTP::Daemon','install','Makefile');
+      &fa_install_module('HTTP::Daemon','install','Build');
    }
    &fa_install_module('WWW::RobotRules','install','Makefile');
    &fa_install_module('Date::Format','install','Makefile');
@@ -1881,7 +1888,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('Data::Dump','install','Makefile');
    &fa_install_module('File::HomeDir','install','Makefile');
    &fa_install_module('Test::Fatal','install','Makefile');
-   &fa_install_module('Test::Needs','install','Makefile');
+   #&fa_install_module('Test::Needs','install','Makefile');
    &fa_install_module('Test::RequiresInternet','install','Makefile');
    &fa_install_module('Try::Tiny','install','Makefile');
    &fa_install_module('LWP','install','Makefile');
@@ -1961,11 +1968,6 @@ END
    &fa_install_module('Task::Weaken','install','Makefile');
    &fa_install_module('ExtUtils::Depends','install','Makefile');
    &fa_install_module('B::Utils','install','Makefile');
-   &fa_install_module('ExtUtils::Config','install','Makefile');
-   &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
-   &fa_install_module('ExtUtils::Helpers','install','Makefile');
-   &fa_install_module('Test::Harness','install','Makefile','','3.33');
-   &fa_install_module('Module::Build::Tiny','install','Build');
    &fa_install_module('Class::Method::Modifiers','install','Makefile');
    &fa_install_module('common::sense','install','Makefile');
    &fa_install_module('Types::Serialiser','install','Makefile');
@@ -2828,7 +2830,7 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
             if ($^O eq 'MSWin64' || msw64bit()) {
                $setup_cmd="$drlet & cd \"$cygwin_root_dir\" & "
                       .'setup-x86_64.exe -P gcc-core,perl-libwww-perl,'
-                      .'gcc-g++,make,openssh,openssl,libssl-devel,'
+                      .'gcc-g++,make,openssh,openssl,libssl-devel,zip,'
                       .'perl,procps-ng,vim,unzip,libmpfr4,figlet,wget,get,'
                       .'db,libdb-devel,ncurses,cron,inetutils,pkg-config,'
                       .'git,libcrypt-devel,perl-LWP-Protocol-https,nano,'
@@ -2838,7 +2840,7 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
                       .'-s '.$mirror_url;
             } else {
                $setup_cmd="$drlet & cd \"$cygwin_root_dir\" & "
-                      .'setup-x86.exe -P gcc-core,nano,'
+                      .'setup-x86.exe -P gcc-core,nano,zip,'
                       .'gcc-g++,make,openssh,openssl,libssl-devel,perl,'
                       .'perl-Win32,db4.8,libdb4.8-devel,ncurses,cron,'
                       .'inetutils,procps,vim,unzip,libmpfr4,figlet,git,'
@@ -2887,7 +2889,7 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
                    Label  => 'Menu_select_account_type',
                    Item_1 => {
         
-                      Text => "Use separate user account for sshd service",
+                      Text => "Use separate user account for s hd service",
          
                    },
                    Item_2 => {
@@ -3242,7 +3244,7 @@ END
             if (($sshd_selection ne 'Do *NOT* Install sshd')
                   && -1==index $cygsrvs,'sshd') {
                my $netstart="cmd /c $clo\\\\bin\\\\bash -lc ".
-                    '"net start sshd 2>&1"';
+                    '"net start cygsshd 2>&1"';
                my $netout=`$netstart`;
             }
             if (-1==index $cygsrvs,'cygserver') {
@@ -3373,7 +3375,7 @@ END
                if ($sshd_selection ne 'Do *NOT* Install sshd') {
                   my $netstart='SET CYGWIN=nodosfilewarning & '.
                        "cmd /c $clo\\bin\\bash -lc ".
-                       '"net start sshd 2>&1"';
+                       '"net start cygsshd 2>&1"';
                   my $netout=`$netstart`;
                   if (-1<index $netout,'System error') {
                      my $netdel='SET CYGWIN=nodosfilewarning & '.
@@ -3415,7 +3417,7 @@ END
                      print "\n   FullAuto Install continues . . . \n\n";
                      my $net_start='SET CYGWIN=nodosfilewarning & '.
                            "cmd /c $clo\\\\bin\\\\bash -lc ".
-                           '"net start sshd 2>&1"';
+                           '"net start cygsshd 2>&1"';
                      my $netot=`$net_start`;
                   }
                }
@@ -3427,7 +3429,7 @@ END
                  && -1==index $cygsrvs,'sshd') {
                my $nettstart='SET CYGWIN=nodosfilewarning & '.
                     "cmd /c $clo\\\\bin\\\\bash -lc ".
-                    '"net start sshd 2>&1"';
+                    '"net start cygsshd 2>&1"';
                my $netut=`$nettstart`;
                if (-1<index $netut,'System error') {
                   my $netdel='SET CYGWIN=nodosfilewarning & '.
@@ -3451,7 +3453,7 @@ END
                   print "\n   FullAuto Install continues . . . \n\n";
                   my $net_start='SET CYGWIN=nodosfilewarning & '.
                        "cmd /c $clo\\\\bin\\\\bash -lc ".
-                       '"net start sshd 2>&1"';
+                       '"net start cygsshd 2>&1"';
                   my $netot=`$net_start`;
                }
             }

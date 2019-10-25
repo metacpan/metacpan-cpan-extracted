@@ -931,7 +931,7 @@ subtest(
             )
         );
 
-        my $called = 0;
+        my $called  = 0;
         my $message = sub { $called = 1 };
 
         $dispatch->log( level => 'debug', message => $message );
@@ -1253,7 +1253,7 @@ subtest(
     'passing level as name or integer',
     sub {
         my $dispatch = Log::Dispatch->new;
-        my $log = File::Spec->catdir( $tempdir, 'emerg.log' );
+        my $log      = File::Spec->catdir( $tempdir, 'emerg.log' );
 
         $dispatch->add(
             Log::Dispatch::File->new(
@@ -1295,7 +1295,7 @@ subtest(
     'more levels as integers',
     sub {
         my $dispatch = Log::Dispatch->new;
-        my $log = File::Spec->catdir( $tempdir, 'emerg.log' );
+        my $log      = File::Spec->catdir( $tempdir, 'emerg.log' );
 
         $dispatch->add(
             Log::Dispatch::File->new(

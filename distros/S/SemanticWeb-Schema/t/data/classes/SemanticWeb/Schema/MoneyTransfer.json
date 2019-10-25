@@ -14,8 +14,8 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
@@ -25,21 +25,21 @@
             "issue-1253"
          ],
          "schema:domainIncludes" : [
-            "schema:InvestmentOrDeposit",
+            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
+            "schema:InvestmentOrDeposit",
             "schema:DatedMoneySpecification",
-            "schema:LoanOrCredit",
-            "schema:MoneyTransfer"
+            "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:Number"
+            "schema:Number",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:beneficiaryBank" : {
          "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A bank or bankÃ¢ÂÂs branch, financial institution or international financial institution operating the beneficiaryÃ¢ÂÂs bank account or releasing funds for the beneficiary",

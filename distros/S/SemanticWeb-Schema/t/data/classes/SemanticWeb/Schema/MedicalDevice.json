@@ -13,8 +13,8 @@
          "rdfs:comment" : "A possible complication and/or side effect of this therapy. If it is known that an adverse outcome is serious (resulting in death, disability, or permanent damage; requiring hospitalization; or is otherwise life-threatening or requires immediate medical attention), tag it as a seriouseAdverseOutcome instead.",
          "rdfs:label" : "adverseOutcome",
          "schema:domainIncludes" : [
-            "schema:TherapeuticProcedure",
-            "schema:MedicalDevice"
+            "schema:MedicalDevice",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalEntity"
@@ -24,13 +24,13 @@
          "rdfs:comment" : "A contraindication for this therapy.",
          "rdfs:label" : "contraindication",
          "schema:domainIncludes" : [
-            "schema:MedicalTherapy",
-            "schema:MedicalDevice"
+            "schema:MedicalDevice",
+            "schema:MedicalTherapy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MedicalContraindication"
+            "schema:MedicalContraindication",
+            "schema:Text"
          ]
       },
       "schema:indication" : {
@@ -38,8 +38,8 @@
          "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
          "rdfs:label" : "indication",
          "schema:domainIncludes" : [
-            "schema:MedicalDevice",
             "schema:TherapeuticProcedure",
+            "schema:MedicalDevice",
             "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
@@ -74,9 +74,9 @@
          "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
          "rdfs:label" : "purpose",
          "schema:domainIncludes" : [
+            "schema:MedicalDevice",
             "schema:AllocateAction",
-            "schema:PayAction",
-            "schema:MedicalDevice"
+            "schema:PayAction"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [

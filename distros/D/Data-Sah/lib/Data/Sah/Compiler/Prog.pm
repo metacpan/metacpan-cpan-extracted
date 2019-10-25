@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.901'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.902'; # VERSION
 
 use 5.010;
 use strict;
@@ -824,6 +824,7 @@ sub before_all_clauses {
                 } elsif ($rt_is_str) {
                     $expr_fail = $self->expr_list(
                         $self->expr_set_err_str($et, $self->expr_array_subscript($dt, 0)),
+                        $self->expr_set($dt, $self->expr_array_subscript($dt, 1)),
                         $self->false,
                     );
                 } else {
@@ -983,7 +984,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.901 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2019-08-14.
+This document describes version 0.902 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2019-10-24.
 
 =head1 SYNOPSIS
 

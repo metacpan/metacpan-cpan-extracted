@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has breadcrumb => (
@@ -114,15 +114,15 @@ SemanticWeb::Schema::WebPage - A web page
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A web page. Every web page is implicitly assumed to be declared to be of
+=for html <p>A web page. Every web page is implicitly assumed to be declared to be of
 type WebPage, so the various properties about that webpage, such as
 <code>breadcrumb</code> may be used. We recommend explicit declaration if
 these properties are specified, but if they are found outside of an
-itemscope, they will be assumed to be about the page.
+itemscope, they will be assumed to be about the page.<p>
 
 =head1 ATTRIBUTES
 
@@ -247,8 +247,8 @@ A significant_links should be one of the following types:
 
 =head2 C<speakable>
 
-=for html Indicates sections of a Web page that are particularly 'speakable' in the
-sense of being highlighted as being especially appropriate for
+=for html <p>Indicates sections of a Web page that are particularly 'speakable' in
+the sense of being highlighted as being especially appropriate for
 text-to-speech conversion. Other sections of a page may also be usefully
 spoken in particular circumstances; the 'speakable' property serves to
 indicate the parts most likely to be generally useful for speech.<br/><br/>
@@ -267,7 +267,8 @@ sophisticated markup of speakable sections beyond simple ID references,
 either CSS selectors or XPath expressions to pick out document section(s)
 as speakable. For this we define a supporting type, <a class="localLink"
 href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
-which is defined to be a possible value of the <em>speakable</em> property.
+which is defined to be a possible value of the <em>speakable</em>
+property.<p>
 
 A speakable should be one of the following types:
 

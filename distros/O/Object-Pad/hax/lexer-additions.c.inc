@@ -32,38 +32,43 @@ static int MY_lex_consume(pTHX_ char *s)
   return i;
 }
 
-#define lex_scan_ident()  MY_lex_scan_ident(aTHX)
-static SV *MY_lex_scan_ident(pTHX)
+enum {
+  LEX_IDENT_PACKAGENAME = (1<<0),
+};
+
+#define lex_scan_ident(      )  MY_lex_scan_ident(aTHX_ 0)
+#define lex_scan_packagename()  MY_lex_scan_ident(aTHX_ LEX_IDENT_PACKAGENAME)
+static SV *MY_lex_scan_ident(pTHX_ int flags)
 {
-  /* Inspired by
-   *   https://metacpan.org/source/MAUKE/Function-Parameters-1.0705/Parameters.xs#L265
-   */
   I32 c;
-  bool at_start;
-  SV *ret = newSVpvs("");
-  if(lex_bufutf8())
-    SvUTF8_on(ret);
+  bool at_start = TRUE;
 
-  at_start = TRUE;
+  char *ident = PL_parser->bufptr;
 
-  c = lex_peek_unichar(0);
-
-  while(c != -1) {
-    if(at_start ? isIDFIRST_uni(c) : isALNUM_uni(c)) {
+  while((c = lex_peek_unichar(0))) {
+    if(at_start ? isIDFIRST_uni(c) : isALNUM_uni(c))
       at_start = FALSE;
-      sv_cat_c(ret, lex_read_unichar(0));
-
-      c = lex_peek_unichar(0);
+    // TODO: This sucks in the case of a false Foo:Bar match
+    else if((flags & LEX_IDENT_PACKAGENAME) && (c == ':')) {
+      lex_read_unichar(0);
+      if(lex_read_unichar(0) != ':')
+        croak("Expected colon to be followed by another in package name");
     }
     else
       break;
+
+    lex_read_unichar(0);
   }
 
-  if(SvCUR(ret))
-    return ret;
+  STRLEN len = PL_parser->bufptr - ident;
+  if(!len)
+    return NULL;
 
-  SvREFCNT_dec(ret);
-  return NULL;
+  SV *ret = newSVpvn(ident, len);
+  if(lex_bufutf8())
+    SvUTF8_on(ret);
+
+  return ret;
 }
 
 #define lex_scan_attr()  MY_lex_scan_attr(aTHX)

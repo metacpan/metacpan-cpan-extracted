@@ -22,13 +22,13 @@ my %WriteMakefileArgs = (
 			dynamic_config => 0,
 			'meta-spec'    => { version => 2 },
 			resources      => {
-				homepage   => 'https://github.com/DeBos99/Math-RPN-Simple',
+				homepage   => 'https://gitlab.com/DeBos/Math-RPN-Simple',
 				repository => {
 					type => 'git',
-					url  => 'https://github.com/DeBos99/Math-RPN-Simple.git',
-					web  => 'https://github.com/DeBos99/Math-RPN-Simple',
+					url  => 'https://gitlab.com/DeBos/Math-RPN-Simple.git',
+					web  => 'https://gitlab.com/DeBos/Math-RPN-Simple',
 				},
-				bugtracker => { web => 'https://github.com/DeBos99/Math-RPN-Simple/issues' },
+				bugtracker => { web => 'https://gitlab.com/DeBos/Math-RPN-Simple/issues' },
 			},
 		})
 	),

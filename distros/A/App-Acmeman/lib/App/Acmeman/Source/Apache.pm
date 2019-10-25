@@ -12,6 +12,7 @@ use parent 'App::Acmeman::Source';
 use Getopt::Long qw(GetOptionsFromArray :config gnu_getopt no_ignore_case);
 use Apache::Defaults;
 use Apache::Config::Preproc;
+use Text::ParseWords;
 
 sub new {
     my $class = shift;
@@ -96,7 +97,8 @@ sub examine_http_config {
     foreach my $sect ($app->section(-name => "virtualhost")) {
 	 my ($server_name) = (map { $self->dequote($_->value) }
 			      $sect->directive('servername'));
-	 my @server_aliases = map { $self->dequote($_->value) }
+	 my @server_aliases = map { quotewords('\s+', 0,
+					       $self->dequote($_->value)) }
 	                      $sect->directive('serveralias');
 	 my @d = map {
 	     if ($_->value =~ m{^(?ix)
@@ -118,7 +120,7 @@ sub examine_http_config {
 	 } elsif (my ($ref) = map { $_->[1] }
 		              grep { $_->[0] eq 'reference' } @d) {
 	     $self->set('domain', $ref, 'files', 'apache');
-	     $self->define_alias($ref, @server_aliases);
+	     $self->define_alias($ref, $server_name, @server_aliases);
          }			    
     }
     return 1;	

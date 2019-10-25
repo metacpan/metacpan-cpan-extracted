@@ -17,7 +17,7 @@ package Thing {
         my ($self) = @_;
         return $self->data;
     }
-};
+}
 
 package Thing::Role {
     use exact 'role';
@@ -38,32 +38,32 @@ package Thing::Role {
 }
 
 package Thing::SubClassA {
-    use exact 'class';
-
-    with 'Thing::Role';
-
     BEGIN {
         our @ISA;
         push @ISA, 'Thing';
     }
+
+    use exact 'class';
+
+    with 'Thing::Role';
 
     has name  => 'a';
     has name2 => 'a2';
-};
+}
 
 package Thing::SubClassB {
-    use exact 'class';
-
-    with 'Thing::Role';
-
     BEGIN {
         our @ISA;
         push @ISA, 'Thing';
     }
 
+    use exact 'class';
+
+    with 'Thing::Role';
+
     has name  => 'b';
     has name2 => 'b2';
-};
+}
 
 my $obj;
 

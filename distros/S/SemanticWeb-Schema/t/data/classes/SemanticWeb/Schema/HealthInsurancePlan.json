@@ -24,9 +24,9 @@
          "rdfs:comment" : "A contact point for a person or organization.",
          "rdfs:label" : "contactPoint",
          "schema:domainIncludes" : [
+            "schema:HealthInsurancePlan",
             "schema:Person",
-            "schema:Organization",
-            "schema:HealthInsurancePlan"
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:ContactPoint"
       },

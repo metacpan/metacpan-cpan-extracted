@@ -1,0 +1,85 @@
+{
+   "abstract" : "quickly create a bunch of Moo/Moose/Mouse classes and roles",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Press",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "1.000000",
+            "Module::Runtime" : "0",
+            "Moo" : "1.006",
+            "Type::Tiny" : "1.004000",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Moose" : "2.12",
+            "Mouse" : "0"
+         },
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::Press" : {
+         "file" : "lib/MooX/Press.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press"
+      },
+      "homepage" : "https://metacpan.org/release/MooX-Press",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moox-press.git",
+         "web" : "https://github.com/tobyink/p5-moox-press"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

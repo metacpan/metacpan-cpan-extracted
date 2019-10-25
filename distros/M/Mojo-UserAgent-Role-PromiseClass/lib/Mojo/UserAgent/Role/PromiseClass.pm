@@ -1,10 +1,8 @@
-package Mojo::UserAgent::Role::PromiseClass;
+package Mojo::UserAgent::Role::PromiseClass 0.005;
 
-# ABSTRACT: Specify the Mojo::Promise class used by Mojo::UserAgent
+# ABSTRACT: Choose the Mojo::Promise class used by Mojo::UserAgent
 
 use Mojo::Base -role;
-
-our $VERSION = '0.003';
 
 has promise_class => sub { 'Mojo::Promise' };
 
@@ -33,6 +31,10 @@ __END__
 
 Mojo::UserAgent::Role::PromiseClass - Choose the Promise class used by Mojo::UserAgent
 
+=head1 VERSION
+
+version 0.005
+
 =head1 SYNOPSIS
 
   $ua = Mojo::UserAgent->new(...)
@@ -47,6 +49,8 @@ Mojo::UserAgent::Role::PromiseClass - Choose the Promise class used by Mojo::Use
 
 L<Mojo::UserAgent::Role::PromiseClass> is a role that allows specifying the promise class to be used for the promise-returning methods like L<UserAgent/get_p> and L<UserAgent/post_p>, if you want something different from L<Mojo::Promise>.
 
+Note that since most methods on L<Mojo::Promise> will use L<clone|Mojo::Promise/clone> to create new instances, roles assigned in this way will usually propagate down method chains.  (As of version 8.25, the only places in core L<Mojolicious> other than L<Mojo::UserAgent> where promises are being created from scratch is L<Mojolicious::Plugin::DefaultHelpers/proxy-E<gt>start_p> and related helpers, which you would need to wrap if your application uses them.)
+
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent::Role::PromiseClass> implements the following attributes.
@@ -56,7 +60,7 @@ L<Mojo::UserAgent::Role::PromiseClass> implements the following attributes.
   $pclass = $ua->promise_class;
   $ua     = $ua->promise_class('Mojo::Promise');
 
-Specifieds the class to use for promises returned by L<User::Agent/start_p> and all derived routines (L<User::Agent/get_p>, L<User::Agent/post_p>, ...).
+Specifies the class to use for promises returned by L<User::Agent/start_p> and all derived routines (L<User::Agent/get_p>, L<User::Agent/post_p>, ...).
 
 =head1 METHODS
 
@@ -69,6 +73,8 @@ L<Mojo::UserAgent::Role::PromiseClass> supplies the following methods:
 This is a shortcut to add the specified C<@roles> to the user agent's promise_class, returning the original L<User::Agent>, equivalent to
 
   $ua->promise_class($ua->promise_class->with_roles(@roles));
+
+Using this method is slightly safer than setting L</promise_class> directly in that if the user agent's existing promise_class is derived from L<Mojo::Promise> (which it will be by default) then you won't be changing that, and this is typically what you want.
 
 For roles following the naming scheme C<Mojo::Promise::Role::RoleName> you can use the shorthand C<+RoleName>.
 

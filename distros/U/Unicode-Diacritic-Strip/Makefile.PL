@@ -16,7 +16,6 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'Unicode::UCD' => '0',
-	'Encode' => '0',
     },
     META_MERGE => {
         resources => {

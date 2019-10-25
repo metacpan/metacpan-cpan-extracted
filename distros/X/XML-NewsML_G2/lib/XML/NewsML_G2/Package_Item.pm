@@ -9,23 +9,26 @@ extends 'XML::NewsML_G2::AnyItem';
 has '+nature', default => 'composite';
 has 'title', isa => 'Str', is => 'ro';
 
-has 'root_group', isa => 'XML::NewsML_G2::Group', is => 'ro', lazy => 1,
+has 'root_group',
+    isa     => 'XML::NewsML_G2::Group',
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_root_group';
 
 has 'root_role', isa => 'Str', is => 'ro', default => 'main';
-has 'root_id', isa => 'Str', is => 'ro', default => 'root_group';
+has 'root_id',   isa => 'Str', is => 'ro', default => 'root_group';
 
 sub _build_sent {
-    return DateTime->now(time_zone => 'local');
+    return DateTime->now( time_zone => 'local' );
 }
 
 sub _build_root_group {
     my $self = shift;
-    return XML::NewsML_G2::Group->new(role => $self->root_role);
+    return XML::NewsML_G2::Group->new( role => $self->root_role );
 }
 
 sub add_to_root_group {
-    my ($self, @items) = @_;
+    my ( $self, @items ) = @_;
     return $self->root_group->add_item(@items);
 }
 

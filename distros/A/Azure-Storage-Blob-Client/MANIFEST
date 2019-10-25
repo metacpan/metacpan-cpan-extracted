@@ -19,6 +19,7 @@ lib/Azure/Storage/Blob/Client/Meta/Attribute/Custom/Trait/BodyParameter.pm
 lib/Azure/Storage/Blob/Client/Meta/Attribute/Custom/Trait/HeaderParameter.pm
 lib/Azure/Storage/Blob/Client/Meta/Attribute/Custom/Trait/URIParameter.pm
 lib/Azure/Storage/Blob/Client/Service/Signer.pm
+script/generate_pod_documentation.pl
 t/Azure/Storage/Blob/Client/Call.t
 t/Azure/Storage/Blob/Client/Caller.t
 t/Azure/Storage/Blob/Client/Service/Signer.t

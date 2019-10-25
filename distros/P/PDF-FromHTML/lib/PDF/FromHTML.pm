@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 BEGIN {
     foreach my $method ( qw( pdf twig tidy args ) ) {
@@ -248,7 +248,7 @@ Charleston Software Associates E<lt>info@charletonsw.comE<gt>
 
 =head1 AUTHORS
 
-唐鳳 E<lt>cpan@audreyt.orgE<gt>
+Audrey Tang E<lt>cpan@audreyt.orgE<gt>
 
 =head1 CC0 1.0 Universal
 

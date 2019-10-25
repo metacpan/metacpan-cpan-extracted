@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Middleware-HatenaOAuth
 
+0.02 2019-10-24T02:46:45Z
+
+    - Update USER_INFO_URL (#1)
+
 0.01 2015-07-23T03:18:08Z
 
     - original version

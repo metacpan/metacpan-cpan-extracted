@@ -1,4 +1,11 @@
-0.002   2017-01-25 (PERLANCAR)
+0.003   2019-10-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participants: Hash::Subset, hash slice, hash slice+exists.
+
+        - Bump perl version to 5.020 for hash slice support.
+
+
+0.002   2017-01-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,6 +14,6 @@
           type=x_benchmarks.
 
 
-0.001   2016-08-29 (PERLANCAR)
+0.001   2016-08-29  Released-By: PERLANCAR
 
         - First release.

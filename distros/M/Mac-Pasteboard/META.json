@@ -41,7 +41,7 @@
    "provides" : {
       "Mac::Pasteboard" : {
          "file" : "lib/Mac/Pasteboard.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/trwyant/perl-Mac-Pasteboard"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

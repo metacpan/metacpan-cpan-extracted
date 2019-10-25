@@ -5,10 +5,13 @@ META.json
 README.md
 cpanfile
 lib/Text/ANSI/Fold.pm
+lib/Text/ANSI/Fold/Japanese/W3C.pm
+lib/Text/ANSI/Fold/Japanese/Wikipedia.pm
 minil.toml
 t/00_compile.t
 t/01_fold.t
 t/02_oo.t
 t/03_chops.t
+t/04_linebreak.t
 META.yml
 MANIFEST

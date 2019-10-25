@@ -1,40 +1,47 @@
 package XML::NewsML_G2;
 
-use XML::NewsML_G2::News_Item;
-use XML::NewsML_G2::News_Item_Text;
-use XML::NewsML_G2::News_Item_Picture;
-use XML::NewsML_G2::News_Item_Video;
-use XML::NewsML_G2::News_Item_Graphics;
-use XML::NewsML_G2::News_Item_Audio;
-use XML::NewsML_G2::News_Message;
-use XML::NewsML_G2::Provider;
-use XML::NewsML_G2::Copyright_Holder;
-use XML::NewsML_G2::Service;
-use XML::NewsML_G2::Genre;
-use XML::NewsML_G2::Desk;
-use XML::NewsML_G2::Media_Topic;
-use XML::NewsML_G2::Location;
-use XML::NewsML_G2::Organisation;
-use XML::NewsML_G2::Picture;
-use XML::NewsML_G2::Video;
-use XML::NewsML_G2::Graphics;
 use XML::NewsML_G2::Audio;
-use XML::NewsML_G2::Icon;
-use XML::NewsML_G2::Topic;
-use XML::NewsML_G2::Product;
-use XML::NewsML_G2::Link;
-use XML::NewsML_G2::Package_Item;
+use XML::NewsML_G2::Binary;
+use XML::NewsML_G2::Copyright_Holder;
+use XML::NewsML_G2::Desk;
+use XML::NewsML_G2::ElectionDistrict;
+use XML::NewsML_G2::ElectionProvince;
+use XML::NewsML_G2::Genre;
+use XML::NewsML_G2::Graphics;
 use XML::NewsML_G2::Group;
-use XML::NewsML_G2::Scheme_Manager;
+use XML::NewsML_G2::Icon;
+use XML::NewsML_G2::Inline_CData;
+use XML::NewsML_G2::Inline_Data;
+use XML::NewsML_G2::Link;
+use XML::NewsML_G2::Destination;
+use XML::NewsML_G2::Location;
+use XML::NewsML_G2::Media_Topic;
+use XML::NewsML_G2::News_Item;
+use XML::NewsML_G2::News_Item_Audio;
+use XML::NewsML_G2::News_Item_Graphics;
+use XML::NewsML_G2::News_Item_Picture;
+use XML::NewsML_G2::News_Item_Text;
+use XML::NewsML_G2::News_Item_Video;
+use XML::NewsML_G2::News_Message;
+use XML::NewsML_G2::Organisation;
+use XML::NewsML_G2::Package_Item;
+use XML::NewsML_G2::Picture;
+use XML::NewsML_G2::Product;
+use XML::NewsML_G2::Provider;
+use XML::NewsML_G2::Remote_Info;
 use XML::NewsML_G2::Scheme;
+use XML::NewsML_G2::Scheme_Manager;
+use XML::NewsML_G2::Service;
+use XML::NewsML_G2::Topic;
+use XML::NewsML_G2::Video;
 use XML::NewsML_G2::Writer::News_Item;
-use XML::NewsML_G2::Writer::Package_Item;
 use XML::NewsML_G2::Writer::News_Message;
+use XML::NewsML_G2::Writer::Package_Item;
 
 use warnings;
 use strict;
 
-use version; our $VERSION = qv('0.2.6');
+use version; our $VERSION = qv('0.3.1');
 
 1;
 
@@ -47,7 +54,7 @@ XML::NewsML_G2 - generate NewsML-G2 news items
 
 =head1 VERSION
 
-0.2.6
+0.3.1
 
 =begin readme
 
@@ -93,7 +100,7 @@ Guides|http://www.iptc.org/download?g2quickstartguides>.
 =head1 GETTING STARTED
 
 To start, you need to create an instance of the item class of your
-choice, e.g. L<XML::NewsML_G2::NewsML_G2_Text> for a text story, or
+choice, e.g. L<XML::NewsML_G2::News_Item_Text> for a text story, or
 L<XML::NewsML_G2::News_Item_Picture> for an image. Each of these
 classes might have some required attributes (e.g. C<title>,
 C<language>, C<provider>), which you will have to provide when

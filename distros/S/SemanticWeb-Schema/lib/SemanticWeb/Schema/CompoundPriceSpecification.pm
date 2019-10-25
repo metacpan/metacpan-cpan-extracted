@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has price_component => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::CompoundPriceSpecification - A compound price specification
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -57,11 +57,11 @@ dimension of a price component (e.g. "electricity" or "final cleaning").
 
 C<priceComponent>
 
-=for html This property links to all <a class="localLink"
+=for html <p>This property links to all <a class="localLink"
 href="http://schema.org/UnitPriceSpecification">UnitPriceSpecification</a>
 nodes that apply in parallel for the <a class="localLink"
 href="http://schema.org/CompoundPriceSpecification">CompoundPriceSpecificat
-ion</a> node.
+ion</a> node.<p>
 
 A price_component should be one of the following types:
 

@@ -10,15 +10,59 @@ IIIF - IIIF Image API implementation
 
 # DESCRIPTION
 
-Module IIIF provides an implementation of [IIIF ImageAPI](https://iiif.io/api/image/3.0/)
+Package IIIF provides an implementation of [IIIF ImageAPI](https://iiif.io/api/image/3.0/)
 based on the [ImageMagick](https://www.imagemagick.org/) command line application.
 
 # FEATURES
 
-- Full IIIF Image API 3.0 level 2 compliance.
-- Tested with ImageMagick 6 (Ubuntu) and 7 (Windows)
-- 100% [test coverage](https://coveralls.io/github/nichtich/IIIF) on statement
-level, (>90% on branch level and >70% on condition level).
+- Full [IIIF ImageAPI 3.0](https://iiif.io/api/image/3.0/) level 2 compliance
+- Support abbreviated requests (e.g. `300,200` to select size, `90/gray` to
+select rotation and quality...).
+- Web service ([IIIF::ImageAPI](https://metacpan.org/pod/IIIF::ImageAPI)) and command line client ([i3f](https://metacpan.org/pod/i3f))
+- Heavily tested
+    - fully passing the [IIIF Image API Validator](https://iiif.io/api/image/validator/)
+    with all Level 2 plus all optional features expect `Canonical Link Header`
+    and some [inexplicable test failures](https://github.com/nichtich/IIIF/issues/8#issuecomment-545852786)
+    with PDF, WebP, and JP2 format.
+    - works with ImageMagick 6 (tested on Ubuntu Linux) and ImageMagick 7 (tested on Windows)
+    - 100% [test coverage](https://coveralls.io/github/nichtich/IIIF) on statement
+    level, (>90% on branch level and >70% on condition level).
+
+# INSTALLATION
+
+See also ["REQUIREMENTS" in IIIF::Magick](https://metacpan.org/pod/IIIF::Magick#REQUIREMENTS) for additional installation for optional
+features.
+
+# UNIX
+
+Most Unixes include system Perl by default. You should also install ImageMagick and
+[cpanminus](https://metacpan.org/pod/App::cpanminus#INSTALLATION). For instance at
+Ubuntu Linux:
+
+    sudo apt-get install imagemagick cpanminus
+
+To speed up installation of Perl dependencies of this package, optionally:
+
+    sudo apt-get install libplack-perl libplack-middleware-crossorigin-perl
+
+And for optional support of WebP format:
+
+    sudo apt-get install webp libwebp-dev
+
+Then install IIIF with Perl package manager:
+
+    cpanm IIIF
+
+## WINDOWS
+
+Install ImageMagick and Perl, for instance with `Chocolatey|https://chocolatey.org`:
+
+    choco install imagemagick.tool
+    choco install strawberryperl
+
+Then install IIIF with Perl package manager:
+
+    cpanm IIIF
 
 # MODULES
 

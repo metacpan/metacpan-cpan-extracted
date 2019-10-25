@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::CheckInAction - The act of an agent communicating (service 
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of an agent communicating (service provider, social media, etc)
+=for html <p>The act of an agent communicating (service provider, social media, etc)
 their arrival by registering/confirming for a previously reserved service
 (e.g. flight check in) or at a place (e.g. hotel), possibly resulting in a
 result (boarding pass, etc).<br/><br/> Related actions:<br/><br/> <ul>
@@ -51,7 +51,7 @@ the start of a previously reserved service.</li> <li><a class="localLink"
 href="http://schema.org/ConfirmAction">ConfirmAction</a>: Unlike
 ConfirmAction, CheckInAction implies that the agent is informing/confirming
 the <em>start</em> of a previously reserved service rather than its
-validity/existence.</li> </ul> 
+validity/existence.</li> </ul> <p>
 
 =head1 SEE ALSO
 

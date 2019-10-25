@@ -206,9 +206,11 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #ifdef _MSC_VER
    #define CONST64(n) n ## ui64
    typedef unsigned __int64 ulong64;
+   typedef __int64 long64;
 #else
    #define CONST64(n) n ## ULL
    typedef unsigned long long ulong64;
+   typedef long long long64;
 #endif
 
 /* ulong32: "32-bit at least" data type */
@@ -241,8 +243,9 @@ typedef unsigned long ltc_mp_digit;
    #undef ENDIAN_32BITWORD
    #undef ENDIAN_64BITWORD
    #undef LTC_FAST
-   #define LTC_NO_ROLC
    #define LTC_NO_BSWAP
+   #define LTC_NO_ROLC
+   #define LTC_NO_ROTATE
 #endif
 
 /* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
@@ -287,15 +290,25 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_BSWAP_BUILTIN
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 301)
-   #define LTC_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER) && _MSC_VER >= 1500
-   /* supported since Visual Studio 2008 */
-   #define LTC_DEPRECATED __declspec(deprecated)
-#else
-   #define LTC_DEPRECATED
+#if !defined(LTC_NO_ROTATE) && (__has_builtin(__builtin_rotateleft32) && __has_builtin(__builtin_rotateright32))
+   #define LTC_HAVE_ROTATE_BUILTIN
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 405)
+#  define LTC_DEPRECATED(s) __attribute__((deprecated("replaced by " #s)))
+#  define PRIVATE_LTC_DEPRECATED_PRAGMA(s) _Pragma(#s)
+#  define LTC_DEPRECATED_PRAGMA(s) PRIVATE_LTC_DEPRECATED_PRAGMA(GCC warning s)
+#elif defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 301)
+#  define LTC_DEPRECATED(s) __attribute__((deprecated))
+#  define LTC_DEPRECATED_PRAGMA(s)
+#elif defined(_MSC_VER) && _MSC_VER >= 1500
+   /* supported since Visual Studio 2008 */
+#  define LTC_DEPRECATED(s) __declspec(deprecated("replaced by " #s))
+#  define LTC_DEPRECATED_PRAGMA(s) __pragma(message(s))
+#else
+#  define LTC_DEPRECATED(s)
+#  define LTC_DEPRECATED_PRAGMA(s)
+#endif
 /* ref:         $Format:%D$ */
 /* git commit:  $Format:%H$ */
 /* commit time: $Format:%ai$ */

@@ -11,15 +11,15 @@
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
          "schema:domainIncludes" : [
-            "schema:Role",
-            "schema:DatedMoneySpecification",
-            "schema:CreativeWorkSeries",
             "schema:Event",
-            "schema:CreativeWorkSeason"
+            "schema:DatedMoneySpecification",
+            "schema:CreativeWorkSeason",
+            "schema:CreativeWorkSeries",
+            "schema:Role"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:namedPosition" : {
@@ -28,8 +28,8 @@
          "rdfs:label" : "namedPosition",
          "schema:domainIncludes" : "schema:Role",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ],
          "schema:supersededBy" : "schema:roleName"
       },
@@ -39,8 +39,8 @@
          "rdfs:label" : "roleName",
          "schema:domainIncludes" : "schema:Role",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:startDate" : {
@@ -48,15 +48,15 @@
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
-            "schema:CreativeWorkSeries",
-            "schema:Role",
             "schema:Event",
+            "schema:CreativeWorkSeries",
+            "schema:CreativeWorkSeason",
+            "schema:Role",
             "schema:DatedMoneySpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       }
    }

@@ -31,58 +31,58 @@ name: Log-Dispatch
 provides:
   Log::Dispatch:
     file: lib/Log/Dispatch.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::ApacheLog:
     file: lib/Log/Dispatch/ApacheLog.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Base:
     file: lib/Log/Dispatch/Base.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Code:
     file: lib/Log/Dispatch/Code.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Email:
     file: lib/Log/Dispatch/Email.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Email::MIMELite:
     file: lib/Log/Dispatch/Email/MIMELite.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Email::MailSend:
     file: lib/Log/Dispatch/Email/MailSend.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Email::MailSender:
     file: lib/Log/Dispatch/Email/MailSender.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Email::MailSendmail:
     file: lib/Log/Dispatch/Email/MailSendmail.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::File:
     file: lib/Log/Dispatch/File.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::File::Locked:
     file: lib/Log/Dispatch/File/Locked.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Handle:
     file: lib/Log/Dispatch/Handle.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Null:
     file: lib/Log/Dispatch/Null.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Output:
     file: lib/Log/Dispatch/Output.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Screen:
     file: lib/Log/Dispatch/Screen.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Syslog:
     file: lib/Log/Dispatch/Syslog.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Types:
     file: lib/Log/Dispatch/Types.pm
-    version: '2.68'
+    version: '2.69'
   Log::Dispatch::Vars:
     file: lib/Log/Dispatch/Vars.pm
-    version: '2.68'
+    version: '2.69'
 requires:
   Carp: '0'
   Devel::GlobalDestruction: '0'
@@ -112,7 +112,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/Log-Dispatch/issues
   homepage: http://metacpan.org/release/Log-Dispatch
   repository: git://github.com/houseabsolute/Log-Dispatch.git
-version: '2.68'
+version: '2.69'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -137,7 +137,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -197,14 +197,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.46'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.46'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
@@ -440,13 +440,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.18.0
+          git_version: 2.20.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -608,8 +608,12 @@ x_Dist_Zilla:
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
       name: '@DROLSKY/InstallGuide'
-      version: '1.200011'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
@@ -641,7 +645,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.01'
@@ -653,7 +657,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -679,16 +683,16 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CODE_OF_CONDUCT.md
@@ -702,12 +706,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -715,16 +719,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.68
-          tag_format: v%v
-          tag_message: v%v
+          tag: v2.69
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -733,10 +737,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -762,12 +766,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -776,10 +780,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
       config:
@@ -869,6 +873,7 @@ x_contributors:
   - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
   - 'Carsten Grohmann <mail@carstengrohmann.de>'
   - 'Doug Bell <doug@preaction.me>'
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Gregory Oschwald <goschwald@maxmind.com>'
   - 'hartzell <hartzell@alerce.com>'

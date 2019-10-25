@@ -39,8 +39,8 @@
          "rdfs:label" : "interestRate",
          "schema:domainIncludes" : "schema:FinancialProduct",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       }
    }

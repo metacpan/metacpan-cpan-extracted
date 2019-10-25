@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Distance;
 
-# ABSTRACT: Properties that take Distances as values are of the form '&lt;Number&gt; &lt;Length unit of measure&gt;'
+# ABSTRACT: Properties that take Distances as values are of the form '<Number> <Length unit of measure>'
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,11 +30,11 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Distance - Properties that take Distances as values are of the form '&lt;Number&gt; &lt;Length unit of measure&gt;'
+SemanticWeb::Schema::Distance - Properties that take Distances as values are of the form '<Number> <Length unit of measure>'
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 

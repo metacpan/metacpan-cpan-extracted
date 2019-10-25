@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has end_time => (
@@ -58,13 +58,13 @@ SemanticWeb::Schema::FoodEstablishmentReservation - A reservation to dine at a f
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A reservation to dine at a food-related business.<br/><br/> Note: This type
-is for information about actual reservations, e.g. in confirmation emails
-or HTML pages with individual confirmations of reservations.
+=for html <p>A reservation to dine at a food-related business.<br/><br/> Note: This
+type is for information about actual reservations, e.g. in confirmation
+emails or HTML pages with individual confirmations of reservations.<p>
 
 =head1 ATTRIBUTES
 
@@ -72,14 +72,14 @@ or HTML pages with individual confirmations of reservations.
 
 C<endTime>
 
-=for html The endTime of something. For a reserved event or service (e.g.
+=for html <p>The endTime of something. For a reserved event or service (e.g.
 FoodEstablishmentReservation), the time that it is expected to end. For
 actions that span a period of time, when the action was performed. e.g.
 John wrote a book from January to <em>December</em>. For media, including
 audio and video, it's the time offset of the end of a clip within a larger
 file.<br/><br/> Note that Event uses startDate/endDate instead of
 startTime/endTime, even when describing dates with times. This situation
-may be clarified in future revisions.
+may be clarified in future revisions.<p>
 
 A end_time should be one of the following types:
 
@@ -109,14 +109,14 @@ A party_size should be one of the following types:
 
 C<startTime>
 
-=for html The startTime of something. For a reserved event or service (e.g.
+=for html <p>The startTime of something. For a reserved event or service (e.g.
 FoodEstablishmentReservation), the time that it is expected to start. For
 actions that span a period of time, when the action was performed. e.g.
 John wrote a book from <em>January</em> to December. For media, including
 audio and video, it's the time offset of the start of a clip within a
 larger file.<br/><br/> Note that Event uses startDate/endDate instead of
 startTime/endTime, even when describing dates with times. This situation
-may be clarified in future revisions.
+may be clarified in future revisions.<p>
 
 A start_time should be one of the following types:
 

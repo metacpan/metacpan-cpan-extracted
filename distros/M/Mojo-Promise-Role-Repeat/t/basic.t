@@ -15,18 +15,20 @@ ok(length($promise_class), 'with_roles works');
 
 sub loop_test {
     my $start = shift;
+    my $is_r_u_s = shift;
+    my $repeat = $is_r_u_s ? 'repeat_catch' : 'repeat';
     my $out='';
     my $p;
-    $promise_class->repeat(
+    $promise_class->$repeat(
 	$start,
 	sub {
-	    my $n = shift;
-	    $_->('yay') if $n <= 0;
+	    my $n = 0+shift;
+	    $_->(12) if $n <= 0;
 	    $out .= "($n)";
-	    return Mojo::Promise->new(sub {$_[0]->(2)}) if $n == 11;
-	    return Mojo::Promise->new(sub {$_[1]->('buh')}) if $n == 14;
-	    die b('crap') if $n == 7;
-	    return $n-1;
+	    return $promise_class->new(sub {$_[0]->(2)}) if $n == 11;
+	    return $promise_class->new(sub {$_[1]->(3)}) if $n == 14;
+	    die b(13) if $n == 7;
+	    if ($is_r_u_s) { --$n; die b($n); } else { return $n-1; }
 	})
       ->tap( sub { weaken($p = $_); })
       ->then( sub { $out .= shift; },
@@ -35,14 +37,21 @@ sub loop_test {
     return $out;
 }
 
-is(loop_test(5), "(5)(4)(3)(2)(1)yay", 'break');
-is(loop_test(9), "(9)(8)(7)!crap", 'die');
-is(loop_test(12), "(12)(11)(2)(1)yay", 'presolved');
-is(loop_test(15), "(15)(14)!buh", 'prejected');
-is(loop_test(-1), "yay", 'first iteration');
+is(loop_test(5), "(5)(4)(3)(2)(1)12", 'break');
+is(loop_test(9), "(9)(8)(7)!13", 'die');
+is(loop_test(12), "(12)(11)(2)(1)12", 'presolved');
+is(loop_test(15), "(15)(14)!3", 'prejected');
+is(loop_test(-1), "12", 'first iteration');
+is(loop_test(5,1), "(5)(4)(3)(2)(1)!12", 'break');
+is(loop_test(9,1), "(9)(8)(7)(13)(12)(11)2", 'die');
+is(loop_test(12,1), "(12)(11)2", 'presolved');
+is(loop_test(15,1), "(15)(14)(3)(2)(1)!12", 'prejected');
+is(loop_test(-1,1), "!12", 'first iteration');
 
 sub break_test {
     my @s = split '',shift;
+    my ($repeat1,$repeat2)
+      = map { $_ ? 'repeat_catch' : 'repeat' } (shift,shift);
     my $out = '';
     my $die = sub { die b("noBC:$_[0]");};
     my $do = sub {
@@ -120,5 +129,9 @@ is(break_test("PR1RIPR2R3R4B!"),
    "1o2tT4r!W");
 is(break_test("PR1RIPR2R3R4FB!"),
    "1o2tT4r!L");
+is(break_test("PR1RSRxRIPR2R3R4R5R6R7R6C8R9R0B!",1),
+   "1oxo2tT4rR6rR6r8uU0o!W");
+is(break_test("PR1RSRxRIPR2R3R4R5R6R7R6C8R9R0B!",0,1),
+   "1oxo2tT4rR6rR6r8uU0o!W");
 
 done_testing();

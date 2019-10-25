@@ -1,17 +1,47 @@
 use 5.006;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 
 WriteMakefile(
     NAME             => 'obogaf::parser',
     VERSION_FROM     => 'lib/obogaf/parser.pm',
     ABSTRACT         => 'a perl5 module to handle obo and gaf file',
     AUTHOR           => 'Marco Notaro',
-    LICENSE          => 'Perl_5',
+    LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.006',
     PREREQ_PM        => {
-        'strict'   => 0,
-        'warnings' => 0,
-        'Graph'    => 0,
+        'Graph'             => 0,
+        'IO::File'          => 0,
+        'PerlIO::gzip'      => 0
+    },
+    TEST_REQUIRES  => {
+        'Test::More'            => 0, 
+        'Test::Exception'       => 0,
+        'Test::Files'           => 0,
+            'Algorithm::Diff'       => 0,   ## Test::Files dependency    
+            'Test::Builder'         => 0,   ## Test::Files dependency
+            'Text::Diff'            => 0    ## Test::Files dependency
+    },
+    CONFIGURE_REQUIRES  => {
+        'Module::Metadata'      => 0,
+        'ExtUtils::MakeMaker'   => 0
+    },
+    META_ADD         => {
+        provides  => Module::Metadata->provides(version => '2', dir => 'lib'),
+    },
+    clean   => {
+        FILES   => "t/data/test_gobasic_no_namespace.obo
+                    t/data/test_gobasic_edges.txt
+                    t/data/test_gobasic_edges_hack.txt
+                    t/data/test_gobasic_edgesBP.txt
+                    t/data/test_chicken.uniprot2go.txt
+                    t/data/test_goa_chicken_header.gaf
+                    t/data/test_chicken_uniprot2go_header.txt
+                    t/data/test_chicken_goa_mapped.txt
+                    t/data/test_goa_chicken_128_header.gaf
+                    t/data/test_chicken_goa_mapped_header.txt
+                    t/data/test_goa_chicken_128_unpair.gaf
+                    t/data/test_chicken_goa_mapped_unpair.txt"
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( 
         META_MERGE => {
@@ -23,7 +53,7 @@ WriteMakefile(
                     url  => 'git://github.com/marconotaro/obogaf-parser.git',
                 },
             },
-            keywords => ['parser','obo', 'gaf', 'bio-ontology','annotations'],
+            keywords => ['parser', 'obo', 'gaf', 'bio-ontology', 'annotations'],
         }
     ) : () ),
 );

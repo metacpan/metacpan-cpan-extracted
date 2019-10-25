@@ -89,17 +89,17 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:Service",
             "schema:Reservation",
-            "schema:ParcelDelivery",
-            "schema:Trip",
             "schema:CreativeWork",
-            "schema:Invoice"
+            "schema:Service",
+            "schema:Invoice",
+            "schema:EducationalOccupationalProgram",
+            "schema:ParcelDelivery",
+            "schema:Trip"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:trackingNumber" : {

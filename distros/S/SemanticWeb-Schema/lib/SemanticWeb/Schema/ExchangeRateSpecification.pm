@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has currency => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::ExchangeRateSpecification - A structured value representing
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -68,14 +68,14 @@ A structured value representing exchange rate.
 
 =head2 C<currency>
 
-=for html The currency in which the monetary amount is expressed.<br/><br/> Use
+=for html <p>The currency in which the monetary amount is expressed.<br/><br/> Use
 standard formats: <a href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217
 currency format</a> e.g. "USD"; <a
 href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
 symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
 href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
 Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
-HOUR".
+HOUR".<p>
 
 A currency should be one of the following types:
 

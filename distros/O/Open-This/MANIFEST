@@ -24,9 +24,12 @@ t/git.t
 t/github.t
 t/kate.t
 t/lib/Foo/Bar.pm
+t/lib/Foo/Require.pm
+t/lib/HTTP/FakeTestClass.pm
 t/nano.t
 t/open-this.t
 t/other-lib/Foo/Baz.pm
+t/require.t
 t/test-data/file
 't/test-data/file with spaces'
 t/test-data/file-with-numbers-0.000020.txt

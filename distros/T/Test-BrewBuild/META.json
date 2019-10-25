@@ -42,6 +42,7 @@
             "Logging::Simple" : "1.04",
             "MetaCPAN::Client" : "2.017",
             "Module::Load" : "0",
+            "POSIX" : "0",
             "Parallel::ForkManager" : "0",
             "Plugin::Simple" : "1.01",
             "Proc::Background" : "0",
@@ -63,6 +64,6 @@
          "web" : "https://github.com/stevieb9/p5-test-brewbuild"
       }
    },
-   "version" : "2.21",
+   "version" : "2.22",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,3 +1,12 @@
+1.25 2019-10-22
+
+  [FEATURES]
+  - Add 'ARRAY' context to construct PostgreSQL arrays.
+
+  [ADMINISTRATIVE]
+  - Git repo moved to https://code.blicky.net/yorhel/SQL-Interp
+  - Updated and converted README to Markdown
+  - Remove old references to Text::Balanced and Filter::Simple
 
 1.24 2016-02-11
   No code changes.

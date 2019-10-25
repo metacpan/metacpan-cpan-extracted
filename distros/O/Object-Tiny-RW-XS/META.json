@@ -4,13 +4,13 @@
       "Adam Kennedy <adamk@cpan.org>, ::RW fork by Steffen Schwigon, ::RW::XS fork by Adam Hopkins"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Object-Tiny-RW-XS",
    "no_index" : {
@@ -38,5 +38,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/srchulo/Object-Tiny-RW-XS.git",
+         "web" : "https://github.com/srchulo/Object-Tiny-RW-XS"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

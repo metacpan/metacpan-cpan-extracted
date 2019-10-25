@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has amenity_feature => (
@@ -74,17 +74,17 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An accommodation is a place that can accommodate human beings, e.g. a hotel
-room, a camping pitch, or a meeting room. Many accommodations are for
+=for html <p>An accommodation is a place that can accommodate human beings, e.g. a
+hotel room, a camping pitch, or a meeting room. Many accommodations are for
 overnight stays, but this is not a mandatory requirement. For more specific
 types of accommodations not defined in schema.org, one can use
 additionalType with external vocabularies. <br /><br /> See also the <a
 href="/docs/hotels.html">dedicated document on the use of schema.org for
-marking up hotels and other forms of accommodations</a>.
+marking up hotels and other forms of accommodations</a>.<p>
 
 =head1 ATTRIBUTES
 

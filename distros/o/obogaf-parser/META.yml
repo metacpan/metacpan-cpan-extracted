@@ -3,9 +3,16 @@ abstract: 'a perl5 module to handle obo and gaf file'
 author:
   - 'Marco Notaro'
 build_requires:
+  Algorithm::Diff: '0'
   ExtUtils::MakeMaker: '0'
+  Test::Builder: '0'
+  Test::Exception: '0'
+  Test::Files: '0'
+  Test::More: '0'
+  Text::Diff: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -23,12 +30,16 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  obogaf::parser:
+    file: lib/obogaf/parser.pm
+    version: '1.014'
 requires:
   Graph: '0'
+  IO::File: '0'
+  PerlIO::gzip: '0'
   perl: '5.006'
-  strict: '0'
-  warnings: '0'
 resources:
   repository: git://github.com/marconotaro/obogaf-parser.git
-version: '0.001'
+version: '1.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

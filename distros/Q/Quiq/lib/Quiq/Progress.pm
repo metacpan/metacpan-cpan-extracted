@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -528,6 +528,11 @@ Wert von $pi->timePerStep.
 
 =back
 
+Beginnt $fmt mit einem Doppelpunkt (:) werden alle obigen Formatelemente
+an den Anfang gesetzt. Beispiel:
+
+  $pi->msg($i,': %s',$name);
+
 =item @args
 
 Ausgabe-Zeichenketten oder Argumente für sprintf-Platzhalter.
@@ -597,6 +602,13 @@ sub msg {
     elsif (@_) {
         my $fmt = shift;
         # @_: sprintf-Argumente
+
+        # Alle Formatelemente einsetzen, wenn $fmt mit
+        # einem Doppelpunkt (:) beginnt
+
+        if (substr($fmt,0,1) eq ':') {
+            $fmt = "i/n x% t/t(t) x/h x/s t/1$fmt";
+        }
 
         # Format sichern (für $pro->msg ohne Parameter)
 
@@ -738,7 +750,7 @@ sub warn {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use IO::Socket::INET;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 BEGIN {
 
@@ -84,7 +84,8 @@ sub poll {
     my $gps_perl_data = decode_json $gps_json_data;
 
     if (! defined $gps_perl_data->{tpv}[0]){
-        warn "\n\nincomplete or empty dataset returned from GPS...\n\n";
+        warn "\n\nWaiting for valid GPS signal...\n\n";
+        return;
     }
 
     $self->_parse($gps_perl_data);
@@ -408,23 +409,29 @@ See the above link for information on changing the listen IP and port.
 
     sudo gpsd /dev/ttyS0 -n -F /var/log/gpsd.sock
 
+NOTE: The C<-n> flag *must* be present when running C<gpsd>. If not, this
+software will stay in an endless loop of "Waiting for a valid GPS signal", even
+if the GPS device has been triangulated. See your Operating Systems startup
+system to add this flag to the startup if necessary (on Ubuntu, add "-n" to the
+C<GPSD_OPTIONS> section in C</etc/defaults/gpsd>).
+
 =head2 Available Data
 
 Each of the methods that return data have a table in their respective
 documentation within the L</METHODS> section. Specifically, look at the
-C<tpv()>, C<sattelites()> and the more broad C<sky()> method sections to
-understand what available data attributes you can extract.
+L</tpv($stat)>, L</satellites($num, $stat)> and the more broad L</sky> method
+sections to understand what available data attributes you can extract.
 
 =head2 Conversions
 
 All output where applicable defaults to metric (metres). See the C<metric>
-parameter in the C<new()> method to change this to use imperial/standard
-measurements. You can also toggle this at runtime with the C<feet()> and
-C<metres()> methods.
+parameter in the L</new(%args)> method to change this to use imperial/standard
+measurements. You can also toggle this at runtime with the L</feet> and
+L</metres> methods.
 
 For latitude and longitude, we default to using the signed notation. You can
-disable this with the C<signed> parameter in C<new()>, along with the
-C<signed()> and C<unsigned()> methods to toggle this conversion at runtime.
+disable this with the C<signed> parameter in L</new(%args)>, along with the
+L</signed> and L</unsigned> methods to toggle this conversion at runtime.
 
 =head1 METHODS
 
@@ -448,7 +455,7 @@ Defaults to C<2947> if not sent in.
 
 Optional, Integer: By default, we return measurements in metric (metres). Send
 in a false value (C<0>) to use imperial/standard measurement conversions
-(ie. feet). Note that if returning the raw *JSON* data from the C<poll()>
+(ie. feet). Note that if returning the raw *JSON* data from the L</poll(%args)>
 method, the conversions will not be done. The default raw Perl return will have
 been converted however.
 
@@ -465,8 +472,8 @@ longitude. Send in a false value (C<0>) to disable this. Here's an example:
 
 We add the letter notation at the end of the result if C<signed> is disabled.
 
-NOTE: You can toggle this at runtime by calling the C<signed()> and
-C<unsigned()> methods. The data returned at the next poll will reflect any
+NOTE: You can toggle this at runtime by calling the L</signed> and
+L</unsigned> methods. The data returned at the next poll will reflect any
 change.
 
     file => 'filename.ext'
@@ -575,7 +582,7 @@ information related to the specific numbered satellite.
 
 Note that the data returned by this function has been manipuated and is not
 exactly equivalent of that returned by C<gpsd>. To get the raw data, see 
-C<sky()>.
+L</sky>.
 
 Parameters:
 
@@ -682,8 +689,8 @@ signed notation, eg:
     -114.1111111111 # lon
     51.111111111111 # lat
 
-If you've switched to C<unsigned()>, calling this method will toggle it back,
-and the results will be visible after the next C<poll()>.
+If you've switched to L</unsigned>, calling this method will toggle it back,
+and the results will be visible after the next L</poll(%args)>
 
 You can optionally use this method to convert values in a manual way. Simply
 send in the latitude and longitude in that order as parameters, and we'll return
@@ -702,8 +709,8 @@ Calling this method will convert those to:
     114.1111111111W # lon
     51.11111111111N # lat
 
-If you've switched to C<signed()>, calling this method will toggle it back,
-and the results will be visible after the next C<poll()>.
+If you've switched to L</signed> calling this method will toggle it back,
+and the results will be visible after the next L</poll(%args)>.
 
 You can optionally use this method to convert values in a manual way. Simply
 send in the latitude and longitude in that order as parameters, and we'll return
@@ -713,7 +720,7 @@ a list containing them both after modification, if it was necessary.
 
 By default, we use metres as the measurement for any attribute that is measured
 in distance. Call this method to have all attributes converted into feet
-commencing at the next call to C<poll()>. Use C<metres()> to revert back.
+commencing at the next call to L</poll(%args)>. Use L</metres> to revert back.
 
 =head2 metres
 
@@ -724,12 +731,12 @@ measurement unit, a call to this method will revert back to the default.
 
 Puts C<gpsd> in listening mode, ready to poll data from.
 
-We call this method internally when the object is instantiated with C<new()> if
+We call this method internally when the object is instantiated with L</new(%args)> if
 we're not in file mode. Likewise, when the object is destroyed (end of program
-run), we call the subsequent C<off()> method.
+run), we call the subsequent L</off> method.
 
 If you have long periods of a program run where you don't need the GPS, you can
-manually run the C<off()> and C<on()> methods to disable and re-enable the GPS.
+manually run the L</off> and L</on> methods to disable and re-enable the GPS.
 
 =head2 off
 
@@ -737,7 +744,7 @@ Turns off C<gpsd> listening mode.
 
 Not necessary to call, but it will help preserve battery life if running on a
 portable device for long program runs where the GPS is used infrequently. Use in
-conjunction with C<on()>. We call C<off()> automatically when the object goes
+conjunction with L</on>. We call L</off> automatically when the object goes
 out of scope (program end for example).
 
 =head1 EXAMPLES
@@ -745,8 +752,8 @@ out of scope (program end for example).
 =head2 Basic Features and Options
 
 Here's a simple example using some of the basic features and options. Please
-read through the documentation of the methods (particularly C<new()> and 
-C<tpv()> to get a good grasp on what can be fetched.
+read through the documentation of the methods (particularly L</new(%args)> and
+L</tpv($stat)> to get a good grasp on what can be fetched).
 
     use warnings;
     use strict;
@@ -793,7 +800,7 @@ Output:
 =head2 Displaying Satellite Information
 
 Here's a rough example that displays the status of tracked satellites, along
-with the information on the one's we're currently using.
+with the information on the ones we're currently using.
 
     use warnings;
     use strict;
@@ -889,7 +896,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Steve Bertrand.
+Copyright 2019 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

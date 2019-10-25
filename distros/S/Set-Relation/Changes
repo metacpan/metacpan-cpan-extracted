@@ -2,6 +2,64 @@
                                   Changes
 ---------------------------------------------------------------------------
 
+2019-10-20
+
+    * Set::Relation version 0.13.2 for Perl is released on CPAN as
+    Set-Relation-0.13.2.tar.gz.
+
+    * Split the 3 files lib/Set/Relation[|/V[1|2]].pm into themselves plus
+    the 3 new files lib/Set/Relation[|/V[1|2]].pod or in other words split
+    every main file in 2.  As such, all of the lib/*.pm files now only
+    contain Perl code, and all POD now lives in lib/*.pod files.
+
+    * Between the prior release and this one, the programming language
+    formerly known as "Perl 6" was renamed to "Raku".  As such, all
+    documentation that refers to that language was updated to use its new
+    name, and all language that referred to "Perl 5" now simply refers to
+    "Perl" because "Perl" now unambiguously means Perl 5.  The only
+    exception to these changes is in documentation about history, such as
+    all prior entries in this Changes file.
+
+    * (Relation.pod, V2.pm, V1.pm)  Minor docs update to reflect that the
+    obsolete Muldis D dialect HDMD_Perl5_STD was renamed to HDMD_Perl_STD.
+
+    * Lowered the declared minimum Perl version dependency to 5.8.0 (2002)
+    from 5.8.1 (2003) since the prior .1 requirement seemed rather
+    arbitrary and all 5.8.z and newer should suffice.
+
+    * The declared minimum version dependencies for some Perl-bundled
+    modules were lowered to those shipped with 5.8.0 from those with 5.8.1:
+    ExtUtils::MakeMaker is now 6.03 from 6.17.
+
+    * For the first time, as long as your Perl is version 5.26.0 (2017) or
+    newer, each of the 2 Set::Relation classes requires only the Perl core
+    and core modules to run, and nothing else, so usage is trivially easy.
+    If your Perl is an older version, back to 5.8.1 (2003), you need only
+    also install the 1 dual-life CPAN module List::Util version 1.4602+.
+    If your Perl is instead version 5.8.0 (2002), you need to install that
+    plus the 1 dual-life CPAN module Scalar::Util version 1.13+.
+
+    * Increased the explicit dependency on the Perl core module List::Util
+    to 1.4602 (was 0.45), which is the version bundled with Perl 5.26.0;
+    1.45 is the actual minimum dependency, but 1.4602 was chosen so it
+    matched the version with the first stable Perl release to have any
+    suitable version.  Similarly for Scalar::Util, 1.09 is the actual
+    minimum dependency, but 1.13 matches what was bundled with Perl 5.8.1.
+
+    * Reversing a minor change by release 0.13.0, increased the explicit
+    dependency on the Perl core module Test::More to 0.92 (was 0.47), which
+    is the version bundled with Perl 5.10.1; the reason is that the test
+    suite uses the done_testing() feature added by Test::More version 0.88.
+
+    * Set::Relation is now released under the terms of the Artistic
+    License version 2 rather than the GNU Lesser General Public License
+    (LGPL) version 3+.
+
+    * Updated all documentation to use an updated canonical Muldis Data
+    Systems url of https://muldis.com rather than several http:// variants.
+
+    * Incremented all copyright year range-ends to 2019.
+
 2016-06-26
 
     * Set::Relation version 0.13.1 for Perl 5 is released on CPAN as

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Role::Tiny" => 0,
     "Scalar::Util" => 0,
-    "exact" => 0,
+    "exact" => "1.11",
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "1.04",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "exact" => 0,
+  "exact" => "1.11",
   "strict" => 0,
   "warnings" => 0
 );

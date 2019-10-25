@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/373",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A single season of a podcast. Many podcasts do not break down into separate seasons. In that case, PodcastSeries should be used.",
+      "rdfs:label" : "PodcastSeason",
+      "rdfs:subClassOf" : "schema:CreativeWorkSeason",
+      "schema:category" : "issue-373",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

@@ -1,5 +1,9 @@
 Revision history for Catmandu
 
+1.2008  2019-10-23 15:14:27 CEST
+  - new disassoc fix
+  - add missing dependency
+
 1.2007  2019-09-25 15:48:32 CEST
   - Searchable stores get a new maximum_offset option to avoid deep paging if
     needed

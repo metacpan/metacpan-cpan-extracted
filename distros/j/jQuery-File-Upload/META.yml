@@ -28,5 +28,7 @@ requires:
   Net::SSH2::SFTP: '0'
   URI: '0'
   perl: '5.006'
-version: '0.31'
+resources:
+  repository: https://github.com/srchulo/jQuery-File-Upload.git
+version: '0.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

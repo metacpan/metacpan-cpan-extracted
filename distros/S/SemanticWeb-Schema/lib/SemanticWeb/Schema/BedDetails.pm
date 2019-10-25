@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has number_of_beds => (
@@ -50,15 +50,15 @@ SemanticWeb::Schema::BedDetails - An entity holding detailed information about t
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An entity holding detailed information about the available bed types, e.g.
-the quantity of twin beds for a hotel room. For the single case of just one
-bed of a certain type, you can use bed directly with a text. See also <a
-class="localLink" href="http://schema.org/BedType">BedType</a> (under
-development).
+=for html <p>An entity holding detailed information about the available bed types,
+e.g. the quantity of twin beds for a hotel room. For the single case of
+just one bed of a certain type, you can use bed directly with a text. See
+also <a class="localLink" href="http://schema.org/BedType">BedType</a>
+(under development).<p>
 
 =head1 ATTRIBUTES
 

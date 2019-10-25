@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,16 +34,16 @@ SemanticWeb::Schema::Play - A play is a form of literature
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A play is a form of literature, usually consisting of dialogue between
+=for html <p>A play is a form of literature, usually consisting of dialogue between
 characters, intended for theatrical performance rather than just reading.
 Note the peformance of a Play would be a <a class="localLink"
 href="http://schema.org/TheaterEvent">TheaterEvent</a> - the <em>Play</em>
 being the <a class="localLink"
-href="http://schema.org/workPerformed">workPerformed</a>.
+href="http://schema.org/workPerformed">workPerformed</a>.<p>
 
 =head1 SEE ALSO
 

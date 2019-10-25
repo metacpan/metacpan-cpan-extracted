@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has delivery_method => (
@@ -42,18 +42,18 @@ SemanticWeb::Schema::TrackAction - An agent tracks an object for updates
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An agent tracks an object for updates.<br/><br/> Related actions:<br/><br/>
-<ul> <li><a class="localLink"
+=for html <p>An agent tracks an object for updates.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/FollowAction">FollowAction</a>: Unlike
 FollowAction, TrackAction refers to the interest on the location of
 innanimates objects.</li> <li><a class="localLink"
 href="http://schema.org/SubscribeAction">SubscribeAction</a>: Unlike
 SubscribeAction, TrackAction refers to the interest on the location of
-innanimate objects.</li> </ul> 
+innanimate objects.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

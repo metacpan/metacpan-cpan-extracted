@@ -31,7 +31,7 @@ per font.
 =head1 CONSTANTS
 
 The following encoding constants are exported by default by L<Font::FreeType>.
-See L<freetype documenation|http://www.freetype.org/freetype2/docs/reference/ft2-base_interface.html#FT_Encoding>
+See L<freetype documentation|http://www.freetype.org/freetype2/docs/reference/ft2-base_interface.html#FT_Encoding>
 
 =head2 FT_ENCODING_NONE
 

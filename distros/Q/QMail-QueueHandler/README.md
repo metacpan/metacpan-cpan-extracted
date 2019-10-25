@@ -12,6 +12,11 @@ by Michele Beltrame, but rewritten to take advantage of modern Perl techniques.
 The QMail::QueueHandler distribution contains a new version of qmHandle which has much
 the same functionality as the original version.
 
+## Installation
+
+You need a working installation of Qmail for this to work properly. It
+looks for QMail queues in all the standard places.
+
 ## qmHandle
 
 qmHandle accepts a number of command-line options.

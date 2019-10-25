@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has actionable_feedback_policy => (
@@ -522,7 +522,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -534,13 +534,13 @@ An organization such as a school, NGO, corporation, club, etc.
 
 C<actionableFeedbackPolicy>
 
-=for html For a <a class="localLink"
+=for html <p>For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a> or
 other news-related <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, a statement about
 public engagement activities (for news media, the newsroomâs), including
 involving the public - digitally or otherwise -- in coverage decisions,
-reporting and activities after publication.
+reporting and activities after publication.<p>
 
 A actionable_feedback_policy should be one of the following types:
 
@@ -684,12 +684,12 @@ A contact_points should be one of the following types:
 
 C<correctionsPolicy>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (e.g. <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
 a statement describing (in news media, the newsroomâs) disclosure and
-correction policy for errors.
+correction policy for errors.<p>
 
 A corrections_policy should be one of the following types:
 
@@ -734,14 +734,14 @@ A dissolution_date should be one of the following types:
 
 C<diversityPolicy>
 
-=for html Statement on diversity policy by an <a class="localLink"
+=for html <p>Statement on diversity policy by an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> e.g. a <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>.
 For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>, a
 statement describing the newsroomâs diversity policy on both staffing and
-sources, typically providing staffing data.
+sources, typically providing staffing data.<p>
 
 A diversity_policy should be one of the following types:
 
@@ -757,12 +757,12 @@ A diversity_policy should be one of the following types:
 
 C<diversityStaffingReport>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (often but not
 necessarily a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
 a report on staffing diversity issues. In a news context this might be for
-example ASNE or RTDNA (US) reports, or self-reported.
+example ASNE or RTDNA (US) reports, or self-reported.<p>
 
 A diversity_staffing_report should be one of the following types:
 
@@ -827,7 +827,7 @@ A employees should be one of the following types:
 
 C<ethicsPolicy>
 
-=for html Statement about ethics policy, e.g. of a <a class="localLink"
+=for html <p>Statement about ethics policy, e.g. of a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>
 regarding journalistic and publishing practices, or of a <a
 class="localLink" href="http://schema.org/Restaurant">Restaurant</a>, a
@@ -835,7 +835,7 @@ page describing food source policies. In the case of a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>,
 an ethicsPolicy is typically a statement describing the personal,
 organizational, and corporate standards of behavior expected by the
-organization.
+organization.<p>
 
 A ethics_policy should be one of the following types:
 
@@ -956,10 +956,10 @@ A funder should be one of the following types:
 
 C<globalLocationNumber>
 
-=for html The <a href="http://www.gs1.org/gln">Global Location Number</a> (GLN,
+=for html <p>The <a href="http://www.gs1.org/gln">Global Location Number</a> (GLN,
 sometimes also referred to as International Location Number or ILN) of the
 respective organization, person, or place. The GLN is a 13-digit number
-used to identify parties and physical locations.
+used to identify parties and physical locations.<p>
 
 A global_location_number should be one of the following types:
 
@@ -1046,13 +1046,13 @@ A isic_v4 should be one of the following types:
 
 C<knowsAbout>
 
-=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
-less typically of an <a class="localLink"
+=for html <p>Of a <a class="localLink" href="http://schema.org/Person">Person</a>,
+and less typically of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, to indicate a topic
 that is known about - suggesting possible expertise but not implying it. We
 do not distinguish skill levels here, or relate this to educational
 content, events, objectives or <a class="localLink"
-href="http://schema.org/JobPosting">JobPosting</a> descriptions.
+href="http://schema.org/JobPosting">JobPosting</a> descriptions.<p>
 
 A knows_about should be one of the following types:
 
@@ -1068,12 +1068,12 @@ A knows_about should be one of the following types:
 
 C<knowsLanguage>
 
-=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
-less typically of an <a class="localLink"
+=for html <p>Of a <a class="localLink" href="http://schema.org/Person">Person</a>,
+and less typically of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, to indicate a known
 language. We do not distinguish skill levels or
 reading/writing/speaking/signing here. Use language codes from the <a
-href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>.
+href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>.<p>
 
 A knows_language should be one of the following types:
 
@@ -1236,7 +1236,7 @@ A number_of_employees should be one of the following types:
 
 C<ownershipFundingInfo>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (often but not
 necessarily a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
@@ -1244,7 +1244,7 @@ a description of organizational ownership structure; funding and grants. In
 a news/media setting, this is with particular reference to editorial
 independence. Note that the <a class="localLink"
 href="http://schema.org/funder">funder</a> is also available and can be
-used to make basic funder information machine-readable.
+used to make basic funder information machine-readable.<p>
 
 A ownership_funding_info should be one of the following types:
 
@@ -1276,8 +1276,8 @@ A owns should be one of the following types:
 
 C<parentOrganization>
 
-=for html The larger organization that this organization is a <a class="localLink"
-href="http://schema.org/subOrganization">subOrganization</a> of, if any.
+=for html <p>The larger organization that this organization is a <a class="localLink"
+href="http://schema.org/subOrganization">subOrganization</a> of, if any.<p>
 
 A parent_organization should be one of the following types:
 
@@ -1291,7 +1291,7 @@ A parent_organization should be one of the following types:
 
 C<publishingPrinciples>
 
-=for html The publishingPrinciples property indicates (typically via <a
+=for html <p>The publishingPrinciples property indicates (typically via <a
 class="localLink" href="http://schema.org/URL">URL</a>) a document
 describing the editorial principles of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (or individual e.g.
@@ -1306,7 +1306,7 @@ href="http://schema.org/CreativeWork">CreativeWork</a>.<br/><br/> While
 such policies are most typically expressed in natural language, sometimes
 related information (e.g. indicating a <a class="localLink"
 href="http://schema.org/funder">funder</a>) can be expressed using
-schema.org terminology.
+schema.org terminology.<p>
 
 A publishing_principles should be one of the following types:
 
@@ -1448,12 +1448,12 @@ A telephone should be one of the following types:
 
 C<unnamedSourcesPolicy>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (typically a <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
 a statement about policy on use of unnamed sources and the decision process
-required.
+required.<p>
 
 A unnamed_sources_policy should be one of the following types:
 

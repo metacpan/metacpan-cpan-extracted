@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Database::Row::Array;
 use Quiq::AnsiColor;
@@ -325,6 +325,7 @@ sub abstract {
 
 =head4 Synopsis
 
+  $output = $scm->edit($repoFile);
   $output = $scm->edit($repoFile,$package);
 
 =head4 Arguments
@@ -374,15 +375,12 @@ sub edit {
     # Vollständigen Pfad der Repository-Datei ermitteln
     my $file = $self->repoFileToFile($repoFile);
 
-    # Ermittele die Stufe des Package
+    if (!$package) {
+        $package = $self->package($repoFile);
+    }
 
+    # Ermittele die Stufe des Package
     my $state = $self->packageState($package);
-    #if (!$state) {
-    #    $self->throw(
-    #        'CASCM-00099: Package does not exist',
-    #        Package => $package,
-    #    );
-    #}
 
     # Erzeuge ein Transportpackage, falls sich das Zielpackage
     # nicht auf der untersten Stufe befindet
@@ -691,6 +689,7 @@ sub putFiles {
 =item $package
 
 Package, dem die Dateien innerhalb von CASCM zugeordnet werden.
+Das Package sollte sich auf der untersten Stufe befinden.
 
 =item $dir
 
@@ -708,7 +707,7 @@ Konkatenierte Ausgabe der der checkout- und checkin-Kommandos (String)
 =head4 Description
 
 Füge alle Dateien in Verzeichnis $dir via Methode put()
-zum Repository hinzu bzw. aktualisiere sie. Details siehe dort.
+zum Repository hinzu bzw. aktualisiere sie.
 
 =cut
 
@@ -950,7 +949,7 @@ sub versionInfo {
 
 =head4 Synopsis
 
-  $file = $scm->getVersion($repoFile,$version,$destDir);
+  $file = $scm->getVersion($repoFile,$version,$destDir,@opt);
 
 =head4 Arguments
 
@@ -980,6 +979,10 @@ Prüfe nicht, ob die angegebene Version existiert. Dies spart
 einen CASCM Aufruf und ist sinnvoll, wenn die Richtigkeit der
 Versionsnummer gesichert ist, siehe deleteToVersion().
 
+=item -versionSuffix => $bool (Default: 1)
+
+Hänge die Version an den Dateinamen an.
+
 =back
 
 =head4 Returns
@@ -1001,9 +1004,11 @@ sub getVersion {
     # Optionen und Argumente
 
     my $sloppy = 0;
+    my $versionSuffix = 1;
 
     my $argA = $self->parameters(3,3,\@_,
         -sloppy => \$sloppy,
+        -versionSuffix => \$versionSuffix,
     );
     my ($repoFile,$version,$destDir) = @$argA;
 
@@ -1041,8 +1046,10 @@ sub getVersion {
     my $output = $self->runCmd('hco',$c);
 
     my $srcFile = "$tempDir/$repoFile";
-    my $destFile = sprintf '%s/%s.%s',$destDir,$p->filename($repoFile),
-        $version;
+    my $destFile = sprintf '%s/%s',$destDir,$p->filename($repoFile);
+    if ($versionSuffix) {
+        $destFile .= ".$version";
+    }
     $p->copy($srcFile,$destFile);
 
     return $destFile;
@@ -1267,11 +1274,11 @@ sub deleteVersion {
 
 # -----------------------------------------------------------------------------
 
-=head3 deleteToVersion() - Lösche alle Versionen oberhalb einer Version
+=head3 passVersion() - Überhole die aktuelle mit der vorigen Version
 
 =head4 Synopsis
 
-  $scm->deleteToVersion($repoFile,$version,$backupDir);
+  $output = $scm->passVersion($repoFile);
 
 =head4 Arguments
 
@@ -1280,70 +1287,6 @@ sub deleteVersion {
 =item $repoFile
 
 Der Pfad der zu löschenden Repository-Datei.
-
-=item $version
-
-Version, oberhalb welcher alle anderen Versionen gelöscht werden,
-d.h. diese Version I<bleibt stehen>.
-
-=item $backupDir
-
-Verzeichnis, in das alle gelöschten Versionen gesichert werden.
-
-=back
-
-=head4 Description
-
-Lösche alle Versionen der Repository-Datei $repoFile oberhalb der
-Version $version. Dies setzt voraus, dass alle diese Versionen in einem
-(oder mehreren) Paketen auf I<Entwicklung> enthalten sind. Jede gelöschte
-Version wird in Verzeichnis $backupDir gesichert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub deleteToVersion {
-    my ($self,$repoFile,$version,$backupDir) = @_;
-
-    my $repoVersion = $self->versionNumber($repoFile);
-    if ($version >= $repoVersion) {
-        $self->throw(
-            'CASCM-00099: Delete-To-Version must be less than repository version',
-            Version => $version,
-            RepoVersion => $repoVersion,
-            RepoFile => $repoFile,
-        );
-    }
-
-    for (my $v = $repoVersion; $v > $version; $v--) {
-        $self->getVersion($repoFile,$v,$backupDir,-sloppy=>1);
-        $self->deleteVersion($repoFile);
-    }
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 deleteAllVersions() - Lösche alle Versionen einer Repository-Datei
-
-=head4 Synopsis
-
-  $output = $scm->deleteAllVersions($repoFile,$backupDir);
-
-=head4 Arguments
-
-=over 4
-
-=item $repoFile
-
-Der Pfad der zu löschenden Repository-Datei.
-
-=item $backupDir
-
-Verzeichnis, in das die Repository-Datei nach dem Löschen der
-letzten Version gesichert wird.
 
 =back
 
@@ -1353,41 +1296,152 @@ Ausgabe des Kommandos (String)
 
 =head4 Description
 
-Lösche alle Versionen der Repository-Datei $repoFile. Dies setzt
-voraus, dass alle Versionen in einem (oder mehreren) Paketen
-auf I<Entwicklung> enthalten sind.
+Erzeuge eine neue Version von $repoFile mit dem Stand I<vor> der aktuellen
+Version. Dies ist nützlich, wenn an einem vorherigen Stand "vorbeigezogen"
+werden soll.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub deleteAllVersions {
-    my ($self,$repoFile,$backupDir) = @_;
-
-    my $p = Quiq::Path->new;
-    
-    if (!$p->exists($backupDir)) {
-        $self->throw(
-            'CASCM-00099: Backup directory does not exist',
-            BackupDir => $backupDir,
-        );
-    }
+sub passVersion {
+    my ($self,$repoFile) = @_;
 
     my $output;
-    my $tab = $self->findItem($repoFile);
-    for ($tab->rows) {
-        $output .= $self->deleteVersion($repoFile);
+
+    my $p = Quiq::Path->new;
+
+    # Aktuelle Version ermitteln
+
+    my $version = $self->versionNumber($repoFile);
+    if ($version == 0) {
+        $self->throw(
+            'CASCM-00099: Previous version does not exist',
+            Version => $version,
+            RepoFile => $repoFile,
+        );
     }
-    my $file = $self->repoFileToFile($repoFile,-sloppy=>1);
-    if ($p->exists($file)) {
-        my ($repoDir) = $p->split($repoFile);
-        $p->copyToDir($file,"$backupDir/$repoDir",
-            -createDir => 1,
-            -move => 1,
+    my $prevVersion = $version-1;
+
+    # Vormaligen Stand holen
+
+    my $tmpDir = $p->tempDir;
+    my $file = $self->getVersion($repoFile,$version-1,$tmpDir,
+        -sloppy => 1,
+        -versionSuffix => 0,
+    );
+    my $prevPackage = $self->package($repoFile,$prevVersion);
+
+    my ($repoDir) = $p->split($repoFile);
+    return $self->putFiles($prevPackage,$repoDir,$file);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 package() - Package einer Version
+
+=head4 Synopsis
+
+  $package = $scm->package($repoFile);
+  $package = $scm->package($repoFile,$version);
+
+=head4 Arguments
+
+=over 4
+
+=item $repoFile
+
+Pfad der Repository-Datei (String).
+
+=item $version
+
+Version der Repository-Datei (Integer).
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $package
+
+Package-Name (String).
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub package {
+    my ($self,$repoFile,$version) = @_;
+
+    my $projectContext = $self->projectContext;
+    my $viewPath = $self->viewPath;
+
+    if (!defined $version) {
+        $version = $self->versionNumber($repoFile);
+    }
+
+    my $tab = $self->runSql("
+        SELECT
+            package
+        FROM (
+            SELECT DISTINCT -- Warum ist hier DISTINCT nötig?
+                itm.itemobjid AS id
+                -- Warum ist /zenmod manchmal im Pfad?
+                , REPLACE(SYS_CONNECT_BY_PATH(itm.itemname,'/'),'/zenmod','')
+                    AS item_path
+                , itm.itemtype AS item_type
+                , ver.mappedversion AS version
+                , ver.versiondataobjid
+                , pkg.packagename AS package
+                , sta.statename AS state
+            FROM
+                haritems itm
+                JOIN harversions ver
+                    ON ver.itemobjid = itm.itemobjid
+                JOIN harpackage pkg
+                    ON pkg.packageobjid = ver.packageobjid
+                JOIN harenvironment env
+                    ON env.envobjid = pkg.envobjid
+                JOIN harstate sta
+                    ON sta.stateobjid = pkg.stateobjid
+                JOIN haritems par
+                    ON par.itemobjid = itm.parentobjid
+                JOIN harrepository rep
+                    ON rep.repositobjid = itm.repositobjid
+            WHERE
+                env.environmentname = '$projectContext'
+            START WITH
+                itm.itemname = '$viewPath'
+                AND itm.repositobjid = rep.repositobjid
+            CONNECT BY
+                PRIOR itm.itemobjid = itm.parentobjid
+            ORDER BY
+                item_path
+                , TO_NUMBER(ver.mappedversion)
+         )
+         WHERE
+             item_path LIKE '%$repoFile%'
+             AND version = $version
+    ");
+    if ($tab->count == 0) {
+        $self->throw(
+            'CASCM-00099: Repository file or version does not exist',
+            RepoFile => $repoFile,
+            Version => $version,
+        );
+    }
+    elsif ($tab->count > 1) {
+        $self->throw(
+            'CASCM-00099: Repository file plus version is not unique',
+            RepoFile => $repoFile,
+            Version => $version,
         );
     }
 
-    return $output;
+    return $tab->rows->[0][0];
 }
 
 # -----------------------------------------------------------------------------
@@ -1785,7 +1839,7 @@ sub renamePackage {
 
 =head4 Synopsis
 
-  @rows | $tab = $scm->showPackage($package);
+  @rows | $tab = $scm->showPackage(@packages,@opt);
 
 =head4 Returns
 
@@ -1861,7 +1915,17 @@ und liefere diese Ergebnismenge zurück.
 # -----------------------------------------------------------------------------
 
 sub showPackage {
-    my ($self,@packages) = @_;
+    my $self = shift;
+    # @packages,@opt
+
+    # Optionen und Argumente
+
+    my $minVersion = 0;
+
+    my $argA = $self->parameters(1,undef,\@_,
+        -minVersion => \$minVersion,
+    );
+    my @packages = @$argA;
 
     my $projectContext = $self->projectContext;
     my $viewPath = $self->viewPath;
@@ -1892,6 +1956,7 @@ sub showPackage {
         WHERE
             env.environmentname = '$projectContext'
             AND pkg.packagename IN ($packages)
+            AND ver.mappedversion >= $minVersion
         START WITH
             itm.itemname = '$viewPath'
             AND itm.repositobjid = rep.repositobjid
@@ -2677,7 +2742,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

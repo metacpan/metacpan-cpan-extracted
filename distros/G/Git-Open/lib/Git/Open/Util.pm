@@ -7,13 +7,15 @@ has remote_url => (
     is      => 'ro',
     isa     => 'Str',
     default => sub {
-        my $git_url = `git ls-remote --get-url`;
-
-        $git_url =~ s/\n//;
-        $git_url =~ s/:/\//; # Change : to /
-        $git_url =~ s/^git@/http:\/\//; # Change protocal to http
-        $git_url =~ s/\.git$//; # Remove .git at the end
-        return $git_url;
+        for (`git ls-remote --get-url`) {
+          chomp;
+          if (/^git@/) { # Change protocal to http if git
+            s/:/\//; # Change : to /
+            s/^git@/https:\/\//;
+          }
+          s/\.git$//; # Remove .git at the end
+          return $_;
+        }
     }
 );
 
@@ -22,6 +24,7 @@ has current_branch => (
     isa     => 'Str',
     default => sub {
         my $current_branch = `git symbolic-ref --short HEAD`;
+        chomp $current_branch;
         return $current_branch;
     }
 );
@@ -91,7 +94,7 @@ Git::Open::Util
 
 =head1 VERSION
 
-version 0.1.11
+version 0.1.12
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-Modern-PBP-Perl version 1.240
+Modern-PBP-Perl version 1.300
 ================================================================================
 Loading all the features of the current Perl version installed, or the specified
 version of Perl. The corresponding warnings are deactivated. If a version of
@@ -57,13 +57,13 @@ The following pragmas and modules are required:
 
 INCOMPATIBILITIES
 
-The module works with Perl version 5.12, 5.14, 5.16, 5.18, 5.20, 5.22 and 5.24.
+The module works with Perl version 5.10 to 5.30.
 Developers Perl versions are not supported.
 
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2015, 2016 Juergen von Brietzke
+Copyright (C) 2015, 2016. 2019 Juergen von Brietzke
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,0 +1,46 @@
+format-version: 1.2
+data-version: releases/2019-07-01
+subsetdef: gocheck_do_not_annotate "Term not to be used for direct annotation"
+subsetdef: gocheck_do_not_manually_annotate "Term not to be used for direct manual annotation"
+subsetdef: goslim_agr "AGR slim"
+subsetdef: goslim_aspergillus "Aspergillus GO slim"
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_chembl "ChEMBL protein targets summary"
+subsetdef: goslim_flybase_ribbon "FlyBase Drosophila GO ribbon slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_metagenomics "Metagenomics GO slim"
+subsetdef: goslim_mouse "Mouse GO slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_pombe "Fission yeast GO slim"
+subsetdef: goslim_synapse "synapse GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+synonymtypedef: syngo_official_label "label approved by the SynGO project"
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+default-namespace: gene_ontology
+remark: cvs version: use data-version
+remark: Includes Ontology(OntologyID(OntologyIRI(<http://purl.obolibrary.org/obo/go/never_in_taxon.owl>))) [Axioms: 18 Logical Axioms: 0]
+ontology: go
+
+[Term]
+id: GO:0007260
+name: tyrosine phosphorylation of STAT protein
+namespace: biological_process
+alt_id: GO:0042502
+alt_id: GO:0042503
+alt_id: GO:0042504
+alt_id: GO:0042505
+alt_id: GO:0042506
+alt_id: GO:0042507
+alt_id: GO:0042508
+def: "The process of introducing a phosphate group to a tyrosine residue of a STAT (Signal Transducer and Activator of Transcription) protein." [GOC:jl, PMID:10918594]
+synonym: "tyrosine phosphorylation of Stat1 protein" NARROW []
+synonym: "tyrosine phosphorylation of Stat2 protein" NARROW []
+synonym: "tyrosine phosphorylation of Stat3 protein" NARROW []
+synonym: "tyrosine phosphorylation of Stat4 protein" NARROW []
+synonym: "tyrosine phosphorylation of Stat5 protein" NARROW []
+synonym: "tyrosine phosphorylation of Stat6 protein" NARROW []
+synonym: "tyrosine phosphorylation of Stat7 protein" NARROW []
+is_a: GO:0018108 ! peptidyl-tyrosine phosphorylation
+relationship: part_of GO:0007259 ! receptor signaling pathway via JAK-STAT
+

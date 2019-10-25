@@ -17,7 +17,7 @@ use Data::GUID;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',

@@ -1,4 +1,9 @@
-0.004   2019-06-06 (PERLANCAR)
+0.005   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add snippets: MOD/EXPORT/1, SUB/CODE/1, SUB/CODE/2.
+
+
+0.004   2019-06-06  Released-By: PERLANCAR
 
 	- Add some snippets on picking elements from array, assigning hash
           arguments.
@@ -8,18 +13,18 @@
 	- Mention Perl Cookbook.
 
 
-0.003   2019-06-04 (PERLANCAR)
+0.003   2019-06-04  Released-By: PERLANCAR
 
 	- Rename dist from Perl::Snippets -> perlsnippets.
 
         - Reorganize headings.
 
 
-0.002   2019-05-29 (PERLANCAR)
+0.002   2019-05-29  Released-By: PERLANCAR
 
 	- Mention perlsecret.
 
 
-0.001   2019-05-28 (PERLANCAR)
+0.001   2019-05-28  Released-By: PERLANCAR
 
         - First release.

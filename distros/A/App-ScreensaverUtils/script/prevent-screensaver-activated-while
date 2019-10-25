@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ScreensaverUtils/prevent_screensaver_activated_while
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-04'; # DATE
+our $DATE = '2019-09-15'; # DATE
 our $DIST = 'App-ScreensaverUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ prevent-screensaver-activated-while - Prevent screensaver activated while runnin
 
 =head1 VERSION
 
-This document describes version 0.006 of prevent-screensaver-activated-while (from Perl distribution App-ScreensaverUtils), released on 2019-09-04.
+This document describes version 0.007 of prevent-screensaver-activated-while (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 =head1 SYNOPSIS
 
@@ -49,8 +49,11 @@ Usage:
 
 =head1 DESCRIPTION
 
-Uses L<Proc::Govern>. For more options when running command, e.g. timeout,
-load control, autorestart, use the module or its CLI L<govproc> instead.
+Uses L<Proc::Govern> to run a command, with the option `no-screensaver' to
+instruct Proc::Govern to regularly simulate user activity, thus preventing the
+screensaver from ever activating while running the command. For more options
+when running command, e.g. timeout, load control, autorestart, use the module or
+its CLI L<govproc> directly.
 
 =head1 OPTIONS
 

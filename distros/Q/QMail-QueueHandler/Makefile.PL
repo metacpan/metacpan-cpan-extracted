@@ -1,5 +1,5 @@
 use ExtUtils::MakeMaker;
- 
+
 WriteMakefile(
     NAME              => 'QMail::QueueHandler',
     VERSION_FROM      => 'lib/QMail/QueueHandler.pm',
@@ -24,6 +24,5 @@ WriteMakefile(
                 web => 'https://github.com/davorg/qmail-queuehandler',
             },
         },
-  
     },
 );

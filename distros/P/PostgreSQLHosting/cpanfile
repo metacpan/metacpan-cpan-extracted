@@ -1,0 +1,21 @@
+requires 'Class::Load';
+requires 'Digest::MD5';
+requires 'DigitalOcean';
+requires 'LWP::UserAgent::Determined';
+requires 'List::Util';
+requires 'List::Util';
+requires 'MIME::Base64';
+requires 'Mojo::IOLoop';
+requires 'Moo';
+requires 'MooX::HandlesVia';
+requires 'Path::Tiny';
+requires 'Rex';
+requires 'Scalar::Util';
+requires 'String::CamelCase';
+requires 'Term::ANSIColor';
+requires 'Term::ANSIScreen';
+requires 'WebService::Linode';
+requires 'YAML';
+requires 'Time::HiRes';
+requires 'Fatal'; # for 5.16 compat
+requires 'https://github.com/bmwiedemann/hcloud-perl.git';

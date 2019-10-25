@@ -12,31 +12,32 @@ around '_build_g2_catalog_schemes' => sub {
     return $result;
 };
 
-
 after '_create_remote_content' => sub {
-    my ($self, $root, $video) = @_;
+    my ( $self, $root, $video ) = @_;
 
-    foreach (qw/size width height duration videoframerate videoavgbitrate audiosamplerate/) {
+    foreach (
+        qw/size width height duration videoframerate videoavgbitrate audiosamplerate/
+        ) {
         $root->setAttribute( $_, $video->$_ ) if defined $video->$_;
     }
 
-    my $audiochannels = $self->scheme_manager->build_qcode('adc', $video->audiochannels);
-    $root->setAttribute('audiochannels', $audiochannels) if $audiochannels;
+    my $audiochannels =
+        $self->scheme_manager->build_qcode( 'adc', $video->audiochannels );
+    $root->setAttribute( 'audiochannels', $audiochannels ) if $audiochannels;
 };
 
 sub _create_icon {
-    my ($self, $root) = @_;
+    my ( $self, $root ) = @_;
 
-    for my $icon (@{$self->news_item->icon}) {
-        my $rendition = $self->scheme_manager->build_qcode('rnd', $icon->rendition);
-        my $icon_element = $self->create_element(
-            'icon',
-            rendition => $rendition,
-        );
+    for my $icon ( @{ $self->news_item->icon } ) {
+        my $rendition =
+            $self->scheme_manager->build_qcode( 'rnd', $icon->rendition );
+        my $icon_element =
+            $self->create_element( 'icon', rendition => $rendition, );
 
         foreach (qw/href width height/) {
             next unless $icon->$_;
-            $icon_element->setAttribute($_, $icon->$_);
+            $icon_element->setAttribute( $_, $icon->$_ );
         }
         $root->appendChild($icon_element);
     }

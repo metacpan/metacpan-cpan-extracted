@@ -1,0 +1,16 @@
+prefix: pgcluster
+root_pass: <root_pass>
+replication_password: <rep_pass>
+providers:
+  linode:
+    secret: <API KEY> 
+    master:
+      name: pgmaster
+      size: 1
+    slaves:
+      - name: s1
+        size: 1
+      - name: s2
+        size: 1
+        
+  

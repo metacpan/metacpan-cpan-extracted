@@ -1,7 +1,8 @@
 package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
-our $VERSION = '0.0.12'; # VERSION
+use version;
+our $VERSION = 'v0.0.14'; # VERSION
 
 use Moose;
 with qw(
@@ -23,34 +24,44 @@ sub configure {
         ) ]
     } );
 
+    # We need to reconfigure the MakeMaker Plugin to require
+    # a new enough version to support "version ranges".
+    # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/215
+    my ($mm)
+        = grep { $_->[1] eq 'Dist::Zilla::Plugin::MakeMaker' }
+        @{ $self->plugins };
+
+    $mm->[2]->{eumm_version} = '7.1101';
+
     $self->add_plugins(
         'Author::GSG',
 
         'MetaJSON',
-        'OurPkgVersion',
+        [ 'OurPkgVersion' => {
+            semantic_version => 1,
+        } ],
         'Prereqs::FromCPANfile',
         'ReadmeAnyFromPod',
         $meta_provides,
 
-        [   'StaticInstall' => $self->config_slice(
-            {   static_install_mode    => 'mode',
-                static_install_dry_run => 'dry_run',
-            }
-        ) ],
+        [ 'StaticInstall' => $self->config_slice( {
+            static_install_mode    => 'mode',
+            static_install_dry_run => 'dry_run',
+        } ) ],
 
-        [   'PodWeaver' => {
-                replacer           => 'replace_with_comment',
-                post_code_replacer => 'replace_with_nothing',
-                config_plugin      => [ '@Default', 'Contributors' ]
-            }
-        ],
+        [ 'PodWeaver' => {
+            replacer           => 'replace_with_comment',
+            post_code_replacer => 'replace_with_nothing',
+            config_plugin      => [ '@Default', 'Contributors' ]
+        } ],
 
         [ 'ChangelogFromGit' => {
-            tag_regexp => '^v(\d+\.\d+\.\d+)$'
+            tag_regexp => '\b(v\d+\.\d+\.\d+(?:\.\d+)*)\b'
         } ],
 
         [ 'Git::NextVersion' => {
-            first_version => '0.0.1',
+            first_version  => 'v0.0.1',
+            version_regexp => '\b(v\d+\.\d+\.\d+)\b',
         } ],
 
         'Git::Commit',
@@ -124,7 +135,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version 0.0.12
+version v0.0.14
 
 =head1 SYNOPSIS
 
@@ -148,6 +159,10 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     -remove = UploadToCPAN
     -remove = GatherDir
 
+    # The MakeMaker Plugin gets an additional setting
+    # in order to support "version ranges".
+    eumm_version = 7.1101
+
     # The defaults for author and license come from
     #[Author::GSG]
 
@@ -167,10 +182,11 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     config_plugin = [ @Default, Contributors ]
 
     [ChangelogFromGit]
-    tag_regexp = ^v(\d+\.\d+\.\d+)$
+    tag_regexp = \b(v\d+\.\d+\.\d+(?:\.\d+)*)\b
 
     [Git::NextVersion]
-    first_version = 0.0.1
+    first_version  = v0.0.1
+    version_regexp = \b(v\d+\.\d+\.\d+)(?:\.\d+)*\b
 
     [Git::Commit]
     [Git::Tag]
@@ -205,6 +221,10 @@ and then run C<carton exec dzil release>.
 You can set a specific release version with the C<V> environment variable,
 as described in the
 L<Git::NextVersion Plugin|Dist::Zilla::Plugin::Git::NextVersion> documentation.
+
+The version regexps for both the Changelog and NextVersion
+should be open enough to pick up the older style tags we used
+as well as incrementing a more strict C<semver>.
 
 =head1 ATTRIBUTES / PARAMETERS
 

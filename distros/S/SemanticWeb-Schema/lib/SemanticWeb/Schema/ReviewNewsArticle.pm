@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::ReviewNewsArticle;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A NewsArticle and CriticReview providing a professional critic's assessment of a service
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,19 +30,19 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ReviewNewsArticle - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::ReviewNewsArticle - A NewsArticle and CriticReview providing a professional critic's assessment of a service
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>
-and <a class="localLink"
-href="http://schema.org/CriticReview">CriticReview</a> providing a
-professional critic's assessment of a service, product, performance, or
-artistic or literary work.
+=for html <p>A <a class="localLink"
+href="http://schema.org/NewsArticle">NewsArticle</a> and <a
+class="localLink" href="http://schema.org/CriticReview">CriticReview</a>
+providing a professional critic's assessment of a service, product,
+performance, or artistic or literary work.<p>
 
 =head1 SEE ALSO
 

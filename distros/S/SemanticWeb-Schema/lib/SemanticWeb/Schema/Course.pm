@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has course_code => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::Course - A description of an educational course which may b
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -91,10 +91,10 @@ learners.
 
 C<courseCode>
 
-=for html The identifier for the <a class="localLink"
+=for html <p>The identifier for the <a class="localLink"
 href="http://schema.org/Course">Course</a> used by the course <a
 class="localLink" href="http://schema.org/provider">provider</a> (e.g.
-CS101 or 6.001).
+CS101 or 6.001).<p>
 
 A course_code should be one of the following types:
 
@@ -108,11 +108,11 @@ A course_code should be one of the following types:
 
 C<coursePrerequisites>
 
-=for html Requirements for taking the Course. May be completion of another <a
+=for html <p>Requirements for taking the Course. May be completion of another <a
 class="localLink" href="http://schema.org/Course">Course</a> or a textual
 description like "permission of instructor". Requirements may be a
 pre-requisite competency, referenced using <a class="localLink"
-href="http://schema.org/AlignmentObject">AlignmentObject</a>.
+href="http://schema.org/AlignmentObject">AlignmentObject</a>.<p>
 
 A course_prerequisites should be one of the following types:
 

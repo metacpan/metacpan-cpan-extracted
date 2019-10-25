@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has funded_item => (
@@ -50,11 +50,11 @@ SemanticWeb::Schema::Grant - A grant
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A grant, typically financial or otherwise quantifiable, of resources.
+=for html <p>A grant, typically financial or otherwise quantifiable, of resources.
 Typically a <a class="localLink" href="http://schema.org/funder">funder</a>
 sponsors some <a class="localLink"
 href="http://schema.org/MonetaryAmount">MonetaryAmount</a> to an <a
@@ -78,7 +78,7 @@ for a project to be associated with a single grant.<br/><br/> The amount of
 a <a class="localLink" href="http://schema.org/Grant">Grant</a> is
 represented using <a class="localLink"
 href="http://schema.org/amount">amount</a> as a <a class="localLink"
-href="http://schema.org/MonetaryAmount">MonetaryAmount</a>.
+href="http://schema.org/MonetaryAmount">MonetaryAmount</a>.<p>
 
 =head1 ATTRIBUTES
 
@@ -86,8 +86,8 @@ href="http://schema.org/MonetaryAmount">MonetaryAmount</a>.
 
 C<fundedItem>
 
-=for html Indicates an item funded or sponsored through a <a class="localLink"
-href="http://schema.org/Grant">Grant</a>.
+=for html <p>Indicates an item funded or sponsored through a <a class="localLink"
+href="http://schema.org/Grant">Grant</a>.<p>
 
 A funded_item should be one of the following types:
 

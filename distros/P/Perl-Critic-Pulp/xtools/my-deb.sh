@@ -2,7 +2,7 @@
 
 # my-deb.sh -- make .deb
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Kevin Ryde
 
 # my-deb.sh is shared by several distributions.
 #
@@ -30,12 +30,14 @@ if test -z "$DISTNAME"; then
   echo "DISTNAME not found"
   exit 1
 fi
+echo "DISTNAME   $DISTNAME"
 
 VERSION=`sed -n 's/^VERSION = \(.*\)/\1/p' Makefile`
 if test -z "$VERSION"; then
   echo "VERSION not found"
   exit 1
 fi
+echo "VERSION    $VERSION"
 
 DISTVNAME=`sed -n 's/^DISTVNAME = \(.*\)/\1/p' Makefile`
 if test -z "$DISTVNAME"; then
@@ -43,26 +45,45 @@ if test -z "$DISTVNAME"; then
   exit 1
 fi
 DISTVNAME=`echo "$DISTVNAME" | sed "s/[$][(]VERSION[)]/$VERSION/"`
+DISTVNAME=`echo "$DISTVNAME" | sed "s/[$][(]DISTNAME[)]/$DISTNAME/"`
+echo "DISTVNAME  $DISTVNAME"
 
 XS_FILES=`sed -n 's/^XS_FILES = \(.*\)/\1/p' Makefile`
 EXE_FILES=`sed -n 's/^EXE_FILES = \(.*\)/\1/p' Makefile`
 
-if test -z "$XS_FILES"
-then DPKG_ARCH=all
-else DPKG_ARCH=`dpkg --print-architecture`
+if test "$DISTNAME" = pngtextadd
+then DPKG_ARCH=`dpkg --print-architecture`
+elif test -n "$XS_FILES"
+then DPKG_ARCH=`dpkg --print-architecture`
+else DPKG_ARCH=all
 fi
+echo "DPKG_ARCH  $DPKG_ARCH"
 
 # programs named after the dist, libraries named with "lib"
 # gtk2-ex-splash and wx-perl-podbrowser programs are lib too though
 DEBNAME=`echo $DISTNAME | tr A-Z a-z`
 DEBNAME=`echo $DEBNAME | sed 's/app-//'`
-case "$EXE_FILES" in
-gtk2-ex-splash|wx-perl-podbrowser|'')
-  DEBNAME="lib${DEBNAME}-perl" ;;
+IS_PERL_LIB=0
+if test -f Makefile.PL; then     # Perl modules
+  IS_PERL_LIB=1
+fi
+if test -n "$EXE_FILES"; then    # Perl programs
+  IS_PERL_LIB=0
+fi
+case $DISTNAME in
+  # these have EXE_FILES programs but still named lib...-perl
+  Gtk2-Ex-Splash|Wx-Perl-PodBrowser)
+    IS_PERL_LIB=1 ;;
 esac
+if test $IS_PERL_LIB = 1; then
+  DEBNAME="lib${DEBNAME}-perl"
+fi
+echo "DEBNAME    $DEBNAME"
 
 DEBVNAME="${DEBNAME}_$VERSION-0.1"
 DEBFILE="${DEBVNAME}_$DPKG_ARCH.deb"
+echo "DEBVNAME   $DEBVNAME"
+echo "DEBFILE    $DEBFILE"
 
 # ExtUtils::MakeMaker 6.42 of perl 5.10.0 makes "$(DISTVNAME).tar.gz" depend
 # on "$(DISTVNAME)" distdir directory, which is always non-existent after a
@@ -103,27 +124,24 @@ cd ..
 rm -rf $DISTVNAME
 
 #------------------------------------------------------------------------------
-# lintian .deb and source
+# source .dsc
 
-lintian -I -i \
-  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file,emacsen-common-without-dh-elpa \
-  $DEBFILE
-
-TEMP="/tmp/temp-lintian-$DISTVNAME"
-rm -rf $TEMP
-mkdir $TEMP
-cp $DISTVNAME.tar.gz $TEMP/${DEBNAME}_$VERSION.orig.tar.gz
-
-cd $TEMP
+cp $DISTVNAME.tar.gz ${DEBNAME}_$VERSION.orig.tar.gz
 tar xfz ${DEBNAME}_$VERSION.orig.tar.gz
 if test "$DISTVNAME" != "$DEBNAME-$VERSION"; then
   mv -T $DISTVNAME $DEBNAME-$VERSION
 fi
-dpkg-source -b $DEBNAME-$VERSION \
-               ${DEBNAME}_$VERSION.orig.tar.gz; \
+dpkg-source -b $DEBNAME-$VERSION ${DEBNAME}_$VERSION.orig.tar.gz
+rm -rf $DEBNAME-$VERSION
+
+#------------------------------------------------------------------------------
+# lintian .deb and source
+
+lintian -I -i \
+  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file,emacsen-common-without-dh-elpa,bugs-field-does-not-refer-to-debian-infrastructure \
+  $DEBFILE
+
 lintian -I -i \
   --suppress-tags maintainer-upload-has-incorrect-version-number,changelog-should-mention-nmu,empty-debian-diff,debian-rules-uses-deprecated-makefile,testsuite-autopkgtest-missing *.dsc
-cd /
-rm -rf $TEMP
 
 exit 0

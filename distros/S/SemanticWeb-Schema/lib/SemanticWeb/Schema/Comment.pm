@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has downvote_count => (
@@ -58,15 +58,15 @@ SemanticWeb::Schema::Comment - A comment on an item - for example
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A comment on an item - for example, a comment on a blog post. The comment's
-content is expressed via the <a class="localLink"
+=for html <p>A comment on an item - for example, a comment on a blog post. The
+comment's content is expressed via the <a class="localLink"
 href="http://schema.org/text">text</a> property, and its topic via <a
 class="localLink" href="http://schema.org/about">about</a>, properties
-shared with all CreativeWorks.
+shared with all CreativeWorks.<p>
 
 =head1 ATTRIBUTES
 

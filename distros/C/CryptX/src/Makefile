@@ -1,8 +1,8 @@
 OBJS=ltc/ciphers/anubis.o ltc/ciphers/blowfish.o ltc/ciphers/camellia.o ltc/ciphers/cast5.o \
 ltc/ciphers/des.o ltc/ciphers/idea.o ltc/ciphers/kasumi.o ltc/ciphers/khazad.o ltc/ciphers/kseed.o \
 ltc/ciphers/multi2.o ltc/ciphers/noekeon.o ltc/ciphers/rc2.o ltc/ciphers/rc5.o ltc/ciphers/rc6.o \
-ltc/ciphers/serpent.o ltc/ciphers/skipjack.o ltc/ciphers/xtea.o ltc/ciphers/aes/aes.o \
-ltc/ciphers/safer/safer.o ltc/ciphers/safer/saferp.o ltc/ciphers/twofish/twofish.o \
+ltc/ciphers/serpent.o ltc/ciphers/skipjack.o ltc/ciphers/tea.o ltc/ciphers/xtea.o \
+ltc/ciphers/aes/aes.o ltc/ciphers/safer/safer.o ltc/ciphers/safer/saferp.o ltc/ciphers/twofish/twofish.o \
 ltc/encauth/ccm/ccm_add_aad.o ltc/encauth/ccm/ccm_add_nonce.o ltc/encauth/ccm/ccm_done.o \
 ltc/encauth/ccm/ccm_init.o ltc/encauth/ccm/ccm_memory.o ltc/encauth/ccm/ccm_process.o \
 ltc/encauth/ccm/ccm_reset.o ltc/encauth/chachapoly/chacha20poly1305_add_aad.o ltc/encauth/chachapoly/chacha20poly1305_decrypt.o \
@@ -44,7 +44,7 @@ ltc/misc/adler32.o ltc/misc/burn_stack.o ltc/misc/compare_testvector.o ltc/misc/
 ltc/misc/crc32.o ltc/misc/error_to_string.o ltc/misc/mem_neq.o ltc/misc/zeromem.o \
 ltc/misc/base16/base16_decode.o ltc/misc/base16/base16_encode.o ltc/misc/base32/base32_decode.o \
 ltc/misc/base32/base32_encode.o ltc/misc/base64/base64_decode.o ltc/misc/base64/base64_encode.o \
-ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o \
+ltc/misc/bcrypt/bcrypt.o ltc/misc/crypt/crypt.o ltc/misc/crypt/crypt_argchk.o ltc/misc/crypt/crypt_cipher_descriptor.o \
 ltc/misc/crypt/crypt_cipher_is_valid.o ltc/misc/crypt/crypt_constants.o ltc/misc/crypt/crypt_find_cipher.o \
 ltc/misc/crypt/crypt_find_cipher_any.o ltc/misc/crypt/crypt_find_cipher_id.o ltc/misc/crypt/crypt_find_hash.o \
 ltc/misc/crypt/crypt_find_hash_any.o ltc/misc/crypt/crypt_find_hash_id.o ltc/misc/crypt/crypt_find_hash_oid.o \
@@ -104,26 +104,33 @@ ltc/pk/dh/dh_set_pg_dhparam.o ltc/pk/dh/dh_shared_secret.o ltc/pk/dsa/dsa_decryp
 ltc/pk/dsa/dsa_encrypt_key.o ltc/pk/dsa/dsa_export.o ltc/pk/dsa/dsa_free.o ltc/pk/dsa/dsa_generate_key.o \
 ltc/pk/dsa/dsa_generate_pqg.o ltc/pk/dsa/dsa_import.o ltc/pk/dsa/dsa_make_key.o ltc/pk/dsa/dsa_set.o \
 ltc/pk/dsa/dsa_set_pqg_dsaparam.o ltc/pk/dsa/dsa_shared_secret.o ltc/pk/dsa/dsa_sign_hash.o \
-ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ecc/ecc.o ltc/pk/ecc/ecc_ansi_x963_export.o \
-ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o ltc/pk/ecc/ecc_encrypt_key.o \
-ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o ltc/pk/ecc/ecc_find_curve.o \
-ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o ltc/pk/ecc/ecc_get_size.o \
-ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o ltc/pk/ecc/ecc_import_pkcs8.o \
-ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o ltc/pk/ecc/ecc_recover_key.o \
-ltc/pk/ecc/ecc_set_curve.o ltc/pk/ecc/ecc_set_curve_internal.o ltc/pk/ecc/ecc_set_key.o \
-ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o ltc/pk/ecc/ecc_sizes.o \
-ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o ltc/pk/ecc/ltc_ecc_export_point.o \
-ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o \
-ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o ltc/pk/ecc/ltc_ecc_mulmod.o \
-ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o ltc/pk/ecc/ltc_ecc_projective_add_point.o \
-ltc/pk/ecc/ltc_ecc_projective_dbl_point.o ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/pkcs1/pkcs_1_i2osp.o \
-ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o ltc/pk/pkcs1/pkcs_1_oaep_encode.o \
-ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o ltc/pk/pkcs1/pkcs_1_pss_encode.o \
-ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o ltc/pk/rsa/rsa_decrypt_key.o \
-ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_free.o \
-ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o ltc/pk/rsa/rsa_import_pkcs8.o ltc/pk/rsa/rsa_import_x509.o \
-ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_set.o ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o \
-ltc/pk/rsa/rsa_verify_hash.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
+ltc/pk/dsa/dsa_verify_hash.o ltc/pk/dsa/dsa_verify_key.o ltc/pk/ec25519/ec25519_export.o \
+ltc/pk/ec25519/ec25519_import_pkcs8.o ltc/pk/ec25519/tweetnacl.o ltc/pk/ecc/ecc.o \
+ltc/pk/ecc/ecc_ansi_x963_export.o ltc/pk/ecc/ecc_ansi_x963_import.o ltc/pk/ecc/ecc_decrypt_key.o \
+ltc/pk/ecc/ecc_encrypt_key.o ltc/pk/ecc/ecc_export.o ltc/pk/ecc/ecc_export_openssl.o \
+ltc/pk/ecc/ecc_find_curve.o ltc/pk/ecc/ecc_free.o ltc/pk/ecc/ecc_get_key.o ltc/pk/ecc/ecc_get_oid_str.o \
+ltc/pk/ecc/ecc_get_size.o ltc/pk/ecc/ecc_import.o ltc/pk/ecc/ecc_import_openssl.o \
+ltc/pk/ecc/ecc_import_pkcs8.o ltc/pk/ecc/ecc_import_x509.o ltc/pk/ecc/ecc_make_key.o \
+ltc/pk/ecc/ecc_recover_key.o ltc/pk/ecc/ecc_set_curve.o ltc/pk/ecc/ecc_set_curve_internal.o \
+ltc/pk/ecc/ecc_set_key.o ltc/pk/ecc/ecc_shared_secret.o ltc/pk/ecc/ecc_sign_hash.o \
+ltc/pk/ecc/ecc_sizes.o ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.o ltc/pk/ecc/ecc_verify_hash.o \
+ltc/pk/ecc/ltc_ecc_export_point.o ltc/pk/ecc/ltc_ecc_import_point.o ltc/pk/ecc/ltc_ecc_is_point.o \
+ltc/pk/ecc/ltc_ecc_is_point_at_infinity.o ltc/pk/ecc/ltc_ecc_map.o ltc/pk/ecc/ltc_ecc_mul2add.o \
+ltc/pk/ecc/ltc_ecc_mulmod.o ltc/pk/ecc/ltc_ecc_mulmod_timing.o ltc/pk/ecc/ltc_ecc_points.o \
+ltc/pk/ecc/ltc_ecc_projective_add_point.o ltc/pk/ecc/ltc_ecc_projective_dbl_point.o \
+ltc/pk/ecc/ltc_ecc_verify_key.o ltc/pk/ed25519/ed25519_export.o ltc/pk/ed25519/ed25519_import.o \
+ltc/pk/ed25519/ed25519_import_pkcs8.o ltc/pk/ed25519/ed25519_import_x509.o ltc/pk/ed25519/ed25519_make_key.o \
+ltc/pk/ed25519/ed25519_set_key.o ltc/pk/ed25519/ed25519_sign.o ltc/pk/ed25519/ed25519_verify.o \
+ltc/pk/pkcs1/pkcs_1_i2osp.o ltc/pk/pkcs1/pkcs_1_mgf1.o ltc/pk/pkcs1/pkcs_1_oaep_decode.o \
+ltc/pk/pkcs1/pkcs_1_oaep_encode.o ltc/pk/pkcs1/pkcs_1_os2ip.o ltc/pk/pkcs1/pkcs_1_pss_decode.o \
+ltc/pk/pkcs1/pkcs_1_pss_encode.o ltc/pk/pkcs1/pkcs_1_v1_5_decode.o ltc/pk/pkcs1/pkcs_1_v1_5_encode.o \
+ltc/pk/rsa/rsa_decrypt_key.o ltc/pk/rsa/rsa_encrypt_key.o ltc/pk/rsa/rsa_export.o \
+ltc/pk/rsa/rsa_exptmod.o ltc/pk/rsa/rsa_get_size.o ltc/pk/rsa/rsa_import.o ltc/pk/rsa/rsa_import_pkcs8.o \
+ltc/pk/rsa/rsa_import_x509.o ltc/pk/rsa/rsa_key.o ltc/pk/rsa/rsa_make_key.o ltc/pk/rsa/rsa_set.o \
+ltc/pk/rsa/rsa_sign_hash.o ltc/pk/rsa/rsa_sign_saltlen_get.o ltc/pk/rsa/rsa_verify_hash.o \
+ltc/pk/x25519/x25519_export.o ltc/pk/x25519/x25519_import.o ltc/pk/x25519/x25519_import_pkcs8.o \
+ltc/pk/x25519/x25519_import_x509.o ltc/pk/x25519/x25519_make_key.o ltc/pk/x25519/x25519_set_key.o \
+ltc/pk/x25519/x25519_shared_secret.o ltc/prngs/chacha20.o ltc/prngs/fortuna.o ltc/prngs/rc4.o \
 ltc/prngs/rng_get_bytes.o ltc/prngs/rng_make_prng.o ltc/prngs/sober128.o ltc/prngs/sprng.o \
 ltc/prngs/yarrow.o ltc/stream/chacha/chacha_crypt.o ltc/stream/chacha/chacha_done.o \
 ltc/stream/chacha/chacha_ivctr32.o ltc/stream/chacha/chacha_ivctr64.o ltc/stream/chacha/chacha_keystream.o \

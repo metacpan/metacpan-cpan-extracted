@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::CampingPitch;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A CampingPitch is an individual place for overnight stay in the outdoors
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,15 +30,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CampingPitch - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::CampingPitch - A CampingPitch is an individual place for overnight stay in the outdoors
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink"
+=for html <p>A <a class="localLink"
 href="http://schema.org/CampingPitch">CampingPitch</a> is an individual
 place for overnight stay in the outdoors, typically being part of a larger
 camping site, or <a class="localLink"
@@ -53,7 +53,7 @@ many campsites. (Source: Wikipedia see <a
 href="https://en.wikipedia.org/wiki/Campsite">https://en.wikipedia.org/wiki
 /Campsite</a>).<br/><br/> See also the dedicated <a
 href="/docs/hotels.html">document on the use of schema.org for marking up
-hotels and other forms of accommodations</a>.
+hotels and other forms of accommodations</a>.<p>
 
 =head1 SEE ALSO
 

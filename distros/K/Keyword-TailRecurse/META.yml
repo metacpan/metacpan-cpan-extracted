@@ -28,14 +28,14 @@ no_index:
 provides:
   Keyword::TailRecurse:
     file: lib/Keyword/TailRecurse.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Keyword::Declare: '0.001014'
   perl: '5.014'
 resources:
   homepage: https://gitlab.com/scrapheap/keyword_tailRecurse
   repository: git://gitlab.com/scrapheap/keyword_tailRecurse.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:JLCOOPER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

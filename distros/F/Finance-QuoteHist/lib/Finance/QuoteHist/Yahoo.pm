@@ -39,6 +39,10 @@ sub new {
   $ticker = $ticker->[0] if ref $ticker eq 'ARRAY';
   my $html = $self->fetch("https://finance.yahoo.com/quote/$ticker/history");
 
+  open(F, ">/tmp/hmm.html");
+  print F $html;
+  close(F);
+
   # extract the cookie crumb
   my %crumbs;
   for my $c ($html =~ /"crumb"\s*:\s*"([^"]+)"/g) {

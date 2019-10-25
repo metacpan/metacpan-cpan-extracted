@@ -37,9 +37,10 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::More" => 0,
     "Test::Requires::Git" => 0,
-    "Test::Warnings" => 0
+    "Test::Warnings" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.000021",
+  "VERSION" => "0.000022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,6 +62,7 @@ my %FallbackPrereqs = (
   "Test::Warnings" => 0,
   "Try::Tiny" => 0,
   "URI" => 0,
+  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

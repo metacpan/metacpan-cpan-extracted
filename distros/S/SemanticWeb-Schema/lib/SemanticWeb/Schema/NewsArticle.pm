@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has dateline => (
@@ -74,23 +74,23 @@ SemanticWeb::Schema::NewsArticle - A NewsArticle is an article whose content rep
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A NewsArticle is an article whose content reports news, or provides
+=for html <p>A NewsArticle is an article whose content reports news, or provides
 background context and supporting materials for understanding the
 news.<br/><br/> A more detailed overview of <a
-href="/docs/news.html">schema.org News markup</a> is also available.
+href="/docs/news.html">schema.org News markup</a> is also available.<p>
 
 =head1 ATTRIBUTES
 
 =head2 C<dateline>
 
-=for html A <a href="https://en.wikipedia.org/wiki/Dateline">dateline</a> is a brief
-piece of text included in news articles that describes where and when the
-story was written or filed though the date is often omitted. Sometimes only
-a placename is provided.<br/><br/> Structured representations of
+=for html <p>A <a href="https://en.wikipedia.org/wiki/Dateline">dateline</a> is a
+brief piece of text included in news articles that describes where and when
+the story was written or filed though the date is often omitted. Sometimes
+only a placename is provided.<br/><br/> Structured representations of
 dateline-related information can also be expressed more explicitly using <a
 class="localLink"
 href="http://schema.org/locationCreated">locationCreated</a> (which
@@ -100,7 +100,7 @@ href="http://schema.org/contentLocation">contentLocation</a>.<br/><br/>
 Dateline summaries are oriented more towards human readers than towards
 automated processing, and can vary substantially. Some examples: "BEIRUT,
 Lebanon, June 2.", "Paris, France", "December 19, 2017 11:43AM Reporting
-from Washington", "Beijing/Moscow", "QUEZON CITY, Philippines".
+from Washington", "Beijing/Moscow", "QUEZON CITY, Philippines".<p>
 
 A dateline should be one of the following types:
 

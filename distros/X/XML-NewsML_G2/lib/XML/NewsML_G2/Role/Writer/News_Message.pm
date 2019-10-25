@@ -5,7 +5,6 @@ use namespace::autoclean;
 
 with 'XML::NewsML_G2::Role::Writer';
 
-
 1;
 __END__
 

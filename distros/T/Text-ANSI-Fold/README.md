@@ -1,6 +1,6 @@
 # NAME
 
-Text::ANSI::Fold - Text folding with ANSI sequence and Asian wide characters.
+Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.
 
 # SYNOPSIS
 
@@ -18,6 +18,15 @@ Text::ANSI::Fold - Text folding with ANSI sequence and Asian wide characters.
             Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
+    use Text::ANSI::Fold qw(:constants);
+    my $fold = new Text::ANSI::Fold
+        width     => 70,
+        boundary  => 'word',
+        linebreak => LINEBREAK_ALL,
+        runin     => 4,
+        runout    => 4,
+        ;
+
 # DESCRIPTION
 
 Text::ANSI::Fold provides capability to fold a text into two strings
@@ -27,7 +36,9 @@ appended to folded text, and recover sequence is prepended to trimmed
 string.
 
 This module also support Unicode Asian full-width and non-spacing
-combining characters properly.
+combining characters properly.  Japanese text formatting with
+head-or-end of line prohibition character is also supported.  Set
+the linebreak mode to enable it.
 
 Use exported **ansi\_fold** function to fold original text, with number
 of visual columns you want to cut off the text.  Width parameter have
@@ -163,6 +174,59 @@ function as well as **new** and **configure** method.
     is "narrow" which means single column.  Set "wide" to tell the module
     to treat them as wide character.
 
+- **linebreak** => _mode_
+- **runin** => _width_
+- **runout** => _width_
+
+    These options specify the behavior of line break handling for Asian
+    multi byte characters.  Only Japanese is supported currently.
+
+    If the cut-off text start with space or prohibited characters
+    (e.g. closing parenthesis), they are ran-in at the end of current line
+    as much as possible.
+
+    If the trimmed text end with prohibited characters (e.g. opening
+    parenthesis), they are ran-out to the head of next line, if it fits to
+    maximum width.
+
+    Default **linebreak** mode is **LINEBREAK\_NONE** and can be set one of
+    those:
+
+        LINEBREAK_NONE
+        LINEBREAK_RUNIN
+        LINEBREAK_RUNOUT
+        LINEBREAK_ALL
+
+    Import-tag **:constants** can be used to access these constants.
+
+    Option **runin** and **runout** is used to set maximum width of moving
+    characters.  Default values are both 2.
+
+# EXAMPLE
+
+Next code implements almost perfect fold command for multi byte
+characters with prohibited character handling.
+
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    use open IO => 'utf8', ':std';
+    
+    use Text::ANSI::Fold qw(:constants);
+    my $fold = new Text::ANSI::Fold
+        width     => 70,
+        boundary  => 'word',
+        linebreak => LINEBREAK_ALL,
+        runin     => 4,
+        runout    => 4,
+        ;
+    
+    $, = "\n";
+    while (<>) {
+        print $fold->text($_)->chops;
+    }
+
 # SEE ALSO
 
 - [App::ansifold](https://metacpan.org/pod/App::ansifold)
@@ -186,6 +250,13 @@ function as well as **new** and **configure** method.
     are not supported by these modules.
 
 - [https://en.wikipedia.org/wiki/ANSI\_escape\_code](https://en.wikipedia.org/wiki/ANSI_escape_code)
+
+    ANSI escape code definition.
+
+- [https://www.w3.org/TR/2012/NOTE-jlreq-20120403/](https://www.w3.org/TR/2012/NOTE-jlreq-20120403/)
+
+    Requirements for Japanese Text Layout,
+    W3C Working Group Note 3 April 2012
 
 # LICENSE
 

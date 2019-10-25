@@ -2,7 +2,7 @@ package App::perlbrew;
 use strict;
 use warnings;
 use 5.008;
-our $VERSION = "0.86";
+our $VERSION = "0.87";
 use Config;
 
 BEGIN {
@@ -23,20 +23,9 @@ use Getopt::Long ();
 use CPAN::Perl::Releases;
 use JSON::PP 'decode_json';
 
+use App::Perlbrew::Util;
 use App::Perlbrew::Path;
 use App::Perlbrew::Path::Root;
-
-sub min(@) {
-    my $m = $_[0];
-    for(@_) {
-        $m = $_ if $_ < $m;
-    }
-    return $m;
-}
-
-sub uniq {
-    my %seen; grep { !$seen{$_}++ } @_;
-}
 
 ### global variables
 
@@ -246,29 +235,7 @@ sub perl_version_to_integer {
     return $v[1]*1000000 + $v[2]*1000 + $v[3];
 }
 
-# straight copy of Wikipedia's "Levenshtein Distance"
-sub editdist {
-    my @a = split //, shift;
-    my @b = split //, shift;
-
-    # There is an extra row and column in the matrix. This is the
-    # distance from the empty string to a substring of the target.
-    my @d;
-    $d[$_][0] = $_ for (0 .. @a);
-    $d[0][$_] = $_ for (0 .. @b);
-
-    for my $i (1 .. @a) {
-        for my $j (1 .. @b) {
-            $d[$i][$j] = ($a[$i-1] eq $b[$j-1] ? $d[$i-1][$j-1]
-                : 1 + min($d[$i-1][$j], $d[$i][$j-1], $d[$i-1][$j-1]));
-        }
-    }
-
-    return $d[@a][@b];
-}
-
 ### methods
-
 sub new {
     my($class, @argv) = @_;
 
@@ -418,7 +385,7 @@ sub home {
 }
 
 sub builddir {
-	my ($self) = @_;
+    my ($self) = @_;
 
     return $self->{builddir} || $self->root->build;
 }
@@ -728,8 +695,8 @@ sub run_command_compgen {
 }
 
 sub _firstrcfile {
-    my ($self) = @_;
-    foreach my $path (@_) {
+    my ($self, @files) = @_;
+    foreach my $path (@files) {
         return $path if -f App::Perlbrew::Path->new ($self->env('HOME'), $path);
     }
     return;
@@ -981,7 +948,7 @@ sub perl_release {
         }
     }
 
-    my $json = http_get("https://fastapi.metacpan.org/v1/release/_search?size=1&q=name:perl-${version}");
+    my $json = http_get("'https://fastapi.metacpan.org/v1/release/_search?size=1&q=name:perl-${version}'");
 
     my $result;
     unless ($json and $result = decode_json($json)->{hits}{hits}[0]) {
@@ -1057,7 +1024,7 @@ sub release_detail_perl_remote {
         }
     }
 
-    my $json = http_get("https://fastapi.metacpan.org/v1/release/_search?size=1&q=name:perl-${version}");
+    my $json = http_get("'https://fastapi.metacpan.org/v1/release/_search?size=1&q=name:perl-${version}'");
 
     my $result;
     unless ($json and $result = decode_json($json)->{hits}{hits}[0]) {
@@ -1205,11 +1172,11 @@ sub run_command_init {
         elsif ($shell =~ m/zsh\d?$/) {
             $code = "source $root_dir/etc/bashrc";
             $yourshrc = $self->_firstrcfile(qw(
-                zshenv
+                .zshenv
                 .bash_profile
                 .bash_login
                 .profile
-            )) || "zshenv";
+            )) || ".zshenv";
         }
         elsif ($shell =~ m/fish/) {
             $code = ". $root_dir/etc/perlbrew.fish";
@@ -1308,7 +1275,7 @@ sub do_install_git {
 
     require File::Spec;
     my $dist_extracted_dir = File::Spec->rel2abs($dist);
-    $self->do_install_this($dist_extracted_dir, $dist_version, "$dist_name-$dist_version");
+    $self->do_install_this(App::Perlbrew::Path->new ($dist_extracted_dir), $dist_version, "$dist_name-$dist_version");
     return;
 }
 
@@ -1319,7 +1286,11 @@ sub do_install_url {
     my ($dist_version) = $dist =~ m/-([\d.]+(?:-RC\d+)?|git)\./;
     my ($dist_tarball) = $dist =~ m{/([^/]*)$};
 
-    my $dist_tarball_path = $self->root->dists ($dist_tarball);
+    if (! $dist_version && $dist =~ /blead\.tar.gz$/) {
+        $dist_version = "blead";
+    }
+
+    my $dist_tarball_path = $self->root->dists($dist_tarball);
     my $dist_tarball_url  = $dist;
     $dist = "$dist_name-$dist_version"; # we install it as this name later
 
@@ -1373,74 +1344,15 @@ sub do_extract_tarball {
     return $extracted_dir;
 }
 
-# Search for directories inside a extracted tarball downloaded as perl "blead"
-# Use a Schwartzian Transform in case there are lots of dirs that
-# look like "perl-$SHA1", which is what's inside blead.tar.gz,
-# so we stat each one only once, ordering (descending )the directories per mtime
-# Expects as parameters:
-# - the path to the extracted "blead" tarball
-# - an array reference, that will be used to cache all contents from the read directory
-# Returns the most recent directory which name matches the expected one.
-sub search_blead_dir {
-    my ($build_dir, $contents_ref) = @_;
-    local *DIRH;
-    opendir DIRH, $build_dir or die "Couldn't open ${build_dir}: $!";
-    @{$contents_ref} = grep {!/^\./ && -d $build_dir->child ($_)} readdir DIRH;
-    closedir DIRH or warn "Couldn't close ${build_dir}: $!";
-    my @candidates = grep { m/^perl-blead-[0-9a-f]{4,40}$/ } @{$contents_ref};
-    @candidates =   map  { $_->[0] }
-                    sort { $b->[1] <=> $a->[1] } # descending
-                    map  { [ $_, (stat( $build_dir->child ($_) ))[9] ] } @candidates;
-    if (scalar(@candidates) > 0) {
-        # take the newest one
-        return $candidates[0];
-    } else {
-        return;
-    }
-}
-
 sub do_install_blead {
-    my ($self, $dist) = @_;
-    my $dist_name           = 'perl';
-    my $dist_git_describe   = 'blead';
-    my $dist_version        = 'blead';
+    my ($self) = @_;
 
     # We always blindly overwrite anything that's already there,
     # because blead is a moving target.
-    my $dist_tarball = 'blead.tar.gz';
-    my $dist_tarball_path = $self->root->dists ($dist_tarball);
-    print "Fetching $dist_git_describe as $dist_tarball_path\n";
+    my $dist_tarball_path = $self->root->dists("blead.tar.gz");
+    unlink($dist_tarball_path) if -f $dist_tarball_path;
 
-    my $error = http_download("http://perl5.git.perl.org/perl.git/snapshot/$dist_tarball", $dist_tarball_path);
-
-    if ($error) {
-        die "\nERROR: Failed to download perl-blead tarball.\n\n";
-    }
-
-    # Returns the wrong extracted dir for blead
-    $self->do_extract_tarball($dist_tarball_path);
-
-    my $build_dir = $self->builddir;
-    my @contents;
-    my $dist_extracted_subdir = search_blead_dir($build_dir, \@contents);
-
-    # there might be an additional level on $build_dir
-    unless (defined($dist_extracted_subdir)) {
-        warn "No candidate found at $build_dir, trying a level deeper";
-        for my $item (@contents) {
-            my $another_sub = $build_dir->child ($item);
-            $dist_extracted_subdir = search_blead_dir($another_sub);
-            if (defined($dist_extracted_subdir)) {
-               $build_dir = $another_sub;
-                last;
-            }
-        }
-    }
-
-    die "Could not identify where is the source code to build under $build_dir, aborting..." unless (defined($dist_extracted_subdir));
-    my $dist_extracted_dir = $build_dir->child ($dist_extracted_subdir);
-    $self->do_install_this($dist_extracted_dir, $dist_version, "$dist_name-$dist_version");
-    return;
+    $self->do_install_url("https://github.com/Perl/perl5/archive/blead.tar.gz");
 }
 
 sub resolve_stable_version {
@@ -1500,7 +1412,6 @@ sub run_command_install {
 
     my ($dist_type, $dist_version);
     if (($dist_type, $dist_version) = $dist =~ /^(?:(c?perl)-?)?([\d._]+(?:-RC\d+)?|git|stable|blead)$/) {
-        my $dist_version = ($dist_version eq 'stable' ? $self->resolve_stable_version : $2);
         $dist_version = $self->resolve_stable_version if $dist_version eq 'stable';
         $dist_type ||= "perl";
         $dist = "${dist_type}-${dist_version}"; # normalize dist name
@@ -1511,7 +1422,7 @@ sub run_command_install {
         }
 
         if ($dist_type eq 'perl' && $dist_version eq 'blead') {
-            $self->do_install_blead($dist);
+            $self->do_install_blead();
         }
         else {
             $self->do_install_release($dist, $dist_version);
@@ -1523,7 +1434,7 @@ sub run_command_install {
         $self->do_install_git($dist);
     }
     elsif (-f $dist) {
-        $self->do_install_archive($dist);
+        $self->do_install_archive(App::Perlbrew::Path->new ($dist));
     }
     elsif ($dist =~ m/^(?:https?|ftp|file)/) { # more protocols needed?
         $self->do_install_url($dist);
@@ -1733,8 +1644,8 @@ sub do_install_archive {
     }
 
     my $dist_extracted_path = $self->do_extract_tarball($dist_tarball_path);
+
     $self->do_install_this($dist_extracted_path, $dist_version, $installation_name);
-    return;
 }
 
 sub do_install_this {
@@ -1805,7 +1716,7 @@ INSTALL
         "cd $dist_extracted_dir",
         "rm -f config.sh Policy.sh",
     );
-    push @preconfigure_commands, $patchperl unless $self->{"no-patchperl"} || $looks_like_we_are_installing_cperl;
+    push @preconfigure_commands, 'chmod -R +w .', $patchperl unless $self->{"no-patchperl"} || $looks_like_we_are_installing_cperl;
 
     my $configure_flags = $self->env("PERLBREW_CONFIGURE_FLAGS") || '-de';
 
@@ -2167,7 +2078,7 @@ sub run_command_list {
     my $is_verbose = $self->{verbose};
 
     for my $i ($self->installed_perls) {
-        printf "%2s %-20s %-20s %s\n",
+        printf "%-2s%-20s %-20s %s\n",
             $i->{is_current} ? '*' : '',
             $i->{name},
             ( $is_verbose ?
@@ -2468,7 +2379,7 @@ sub run_command_exec {
     local (@ARGV) = @{$self->{original_argv}};
 
     Getopt::Long::Configure ('require_order');
-    my @command_options = ('with=s', 'halt-on-error');
+    my @command_options = ('with=s', 'halt-on-error', 'min=s', 'max=s');
 
     $self->parse_cmdline (\%opts, @command_options);
     shift @ARGV; # "exec"
@@ -2490,6 +2401,16 @@ sub run_command_exec {
     else {
         @exec_with = map { ($_, @{$_->{libs}}) } $self->installed_perls;
     }
+
+    if ($opts{min}) {
+        # TODO use comparable version.
+        # For now, it doesn't produce consistent results for 5.026001 and 5.26.1
+        @exec_with = grep { $_->{orig_version} >= $opts{min} } @exec_with;
+    };
+
+    if ($opts{max}) {
+        @exec_with = grep { $_->{orig_version} <= $opts{max} } @exec_with;
+    };
 
     if (0 == @exec_with) {
         print "No perl installation found.\n" unless $self->{quiet};
@@ -2801,7 +2722,7 @@ sub run_command_list_modules {
         'perl',
         '-MExtUtils::Installed',
         '-le',
-        sprintf('BEGIN{@INC=grep {$_ ne q!.!} @INC}; %s print {%s} $_ for ExtUtils::Installed->new->modules;',
+        sprintf('BEGIN{@INC=grep {$_ ne q!.!} @INC}; %s print {%s} $_ for grep {$_ ne q!Perl!} ExtUtils::Installed->new->modules;',
                 $output_filename ? sprintf('open my $output_fh, \'>\', "%s"; ', $output_filename) : '',
                 $output_filename ? '$output_fh' : 'STDOUT')
     );
@@ -3291,14 +3212,14 @@ sub CSH_WRAPPER_CONTENT {
     return <<'WRAPPER';
 set perlbrew_exit_status=0
 
-if ( $1 =~ -* ) then
-    set perlbrew_short_option=$1
+if ( "$1" =~ -* ) then
+    set perlbrew_short_option="$1"
     shift
 else
     set perlbrew_short_option=""
 endif
 
-switch ( $1 )
+switch ( "$1" )
     case use:
         if ( $%2 == 0 ) then
             if ( $?PERLBREW_PERL == 0 ) then
@@ -3312,8 +3233,8 @@ switch ( $1 )
             endif
         else
             set perlbrew_line_count=0
-            foreach perlbrew_line ( "`\perlbrew env $2`" )
-                eval $perlbrew_line
+            foreach perlbrew_line ( "`\perlbrew env $2:q`" )
+                eval "$perlbrew_line"
                 @ perlbrew_line_count++
             end
             if ( $perlbrew_line_count == 0 ) then
@@ -3328,27 +3249,27 @@ switch ( $1 )
         if ( $%2 == 0 ) then
             \perlbrew switch
         else
-            perlbrew use $2 && source $PERLBREW_ROOT/etc/csh_reinit $2
+            perlbrew use "$2" && source "$PERLBREW_ROOT/etc/csh_reinit" "$2"
         endif
         breaksw
 
     case off:
         unsetenv PERLBREW_PERL
         foreach perlbrew_line ( "`\perlbrew env`" )
-            eval $perlbrew_line
+            eval "$perlbrew_line"
         end
-        source $PERLBREW_ROOT/etc/csh_set_path
+        source "$PERLBREW_ROOT/etc/csh_set_path"
         echo "perlbrew is turned off."
         breaksw
 
     case switch-off:
         unsetenv PERLBREW_PERL
-        source $PERLBREW_ROOT/etc/csh_reinit ''
+        source "$PERLBREW_ROOT/etc/csh_reinit" ''
         echo "perlbrew is switched off."
         breaksw
 
     default:
-        \perlbrew $perlbrew_short_option $argv
+        \perlbrew $perlbrew_short_option:q $argv:q
         set perlbrew_exit_status=$?
         breaksw
 endsw
@@ -3412,7 +3333,7 @@ if ( $?PERLBREW_PATH == 0 ) then
 endif
 
 source "$PERLBREW_ROOT/etc/csh_set_path"
-alias perlbrew 'source $PERLBREW_ROOT/etc/csh_wrapper'
+alias perlbrew 'source "$PERLBREW_ROOT/etc/csh_wrapper"'
 CSHRC
 
 }

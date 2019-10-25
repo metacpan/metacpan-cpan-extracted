@@ -1,10 +1,10 @@
-use 5.008001;
+use 5.008000;
 use utf8;
 use strict;
 use warnings;
 use Carp::Always 0.01;
 
-use Test::More 0.47;
+use Test::More 0.92;
 
 my $sr_class_name;
 sub relation { return $sr_class_name->new( @_ ); }
@@ -107,4 +107,4 @@ is_deeply( $got_r3_as_ofmt_perl, $exp_r3_as_ofmt_perl, q{$r3o val corr} );
 
 ###########################################################################
 
-1; # Magic true value required at end of a reusable file's code.
+1;

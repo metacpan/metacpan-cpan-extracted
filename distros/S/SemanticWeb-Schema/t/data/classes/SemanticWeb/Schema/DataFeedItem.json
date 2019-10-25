@@ -11,8 +11,8 @@
          "rdfs:comment" : "The date on which the CreativeWork was created or the item was added to a DataFeed.",
          "rdfs:label" : "dateCreated",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:DataFeedItem"
+            "schema:DataFeedItem",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",

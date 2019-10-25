@@ -117,13 +117,15 @@ my $ret;
 
     # NOTE has false(?) alarm'd on older perls on mswin32 where perhaps
     # the seed produces different random numbers than elsewhere (and
-    # also next test)
+    # also next test), twice now, so author-only test
     # http://www.cpantesters.org/cpan/report/ad196dad-6bfe-1014-88c5-db75185cf9ae
-    # TODO make these author tests or statistical if it's more
-    # widespread than old stuff running windows
-    srand 640;
-    my @alts = map { $ret->render } 1 .. 5;
-    $deeply->(\@alts, [qw/b c c d a/]);
+    if ($ENV{AUTHOR_TEST_JMATES}) {
+        srand 640;
+        my @alts = map { $ret->render } 1 .. 5;
+        $deeply->(\@alts, [qw/b c c d a/]);
+    } else {
+        $test_counter--;
+    }
 }
 
 # recursion
@@ -131,10 +133,14 @@ my $ret;
     $ret = $parser->from_string(q{ [[a[b]][["c"]"d"]] });
     is($ret->render, 'abcd');
 
-    $ret = $parser->from_string(q{ x[a/b]/y[c/d] });
-    srand 640;
-    my @recs = map { $ret->render } 1 .. 4;
-    $deeply->(\@recs, [qw/xb yd xa yc/]);
+    if ($ENV{AUTHOR_TEST_JMATES}) {
+        $ret = $parser->from_string(q{ x[a/b]/y[c/d] });
+        srand 640;
+        my @recs = map { $ret->render } 1 .. 4;
+        $deeply->(\@recs, [qw/xb yd xa yc/]);
+    } else {
+        $test_counter--;
+    }
 }
 
 plan tests => $test_counter + 18;

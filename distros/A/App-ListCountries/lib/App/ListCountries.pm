@@ -1,7 +1,7 @@
 package App::ListCountries;
 
-our $DATE = '2019-07-18'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2019-09-10'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -64,6 +64,18 @@ Source data is generated from `Locale::Codes::Country_Codes`. so make sure you
 have a relatively recent version of the module.
 
 _
+    extra_props => {
+        examples => [
+            {
+                args => {query=>'lu'},
+                test => 0,
+            },
+            {
+                args => {query=>'lu', detail=>1},
+                test => 0,
+            },
+        ],
+    },
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
@@ -82,7 +94,7 @@ App::ListCountries - List countries
 
 =head1 VERSION
 
-This document describes version 0.020 of App::ListCountries (from Perl distribution App-ListCountries), released on 2019-07-18.
+This document describes version 0.021 of App::ListCountries (from Perl distribution App-ListCountries), released on 2019-09-10.
 
 =head1 SYNOPSIS
 
@@ -98,6 +110,33 @@ Usage:
  list_countries(%args) -> [status, msg, payload, meta]
 
 List countries.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ list_countries(query => "lu"); # -> ["bol", "lca", "lux", "tuv"]
+
+=item * Example #2:
+
+ list_countries(query => "lu", detail => 1);
+
+Result:
+
+ [
+   {
+     alpha3  => "bol",
+     alpha2  => "bo",
+     en_name => "Bolivia (Plurinational State of)",
+   },
+   { alpha3 => "lca", alpha2 => "lc", en_name => "Saint Lucia" },
+   { alpha3 => "lux", alpha2 => "lu", en_name => "Luxembourg" },
+   { alpha3 => "tuv", alpha2 => "tv", en_name => "Tuvalu" },
+ ]
+
+=back
 
 Source data is generated from C<Locale::Codes::Country_Codes>. so make sure you
 have a relatively recent version of the module.

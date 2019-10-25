@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Plack::Middleware::HatenaOAuth:
     file: lib/Plack/Middleware/HatenaOAuth.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   JSON::XS: '0'
   OAuth::Lite::Consumer: '0'
@@ -43,7 +43,10 @@ resources:
   bugtracker: https://github.com/hatena/Plack-Middleware-HatenaOAuth/issues
   homepage: https://github.com/hatena/Plack-Middleware-HatenaOAuth
   repository: git://github.com/hatena/Plack-Middleware-HatenaOAuth.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:TARAO
 x_contributors:
+  - 'astj <asato.wakisaka@gmail.com>'
   - 'tarao <tarao.gnn@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

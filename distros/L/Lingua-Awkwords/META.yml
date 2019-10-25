@@ -1,33 +1,49 @@
 ---
-abstract: 'randomly generates output from a given pattern'
+abstract: 'randomly generates outputs from a given pattern'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
   Test::Most: '0'
-  lib: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  perl: v5.14.0
   strict: '0'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Lingua-Awkwords
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Lingua::Awkwords:
+    file: lib/Lingua/Awkwords.pm
+    version: '0.10'
+  Lingua::Awkwords::ListOf:
+    file: lib/Lingua/Awkwords/ListOf.pm
+    version: '0.10'
+  Lingua::Awkwords::OneOf:
+    file: lib/Lingua/Awkwords/OneOf.pm
+    version: '0.10'
+  Lingua::Awkwords::Parser:
+    file: lib/Lingua/Awkwords/Parser.pm
+    version: '0.10'
+  Lingua::Awkwords::String:
+    file: lib/Lingua/Awkwords/String.pm
+    version: '0.10'
+  Lingua::Awkwords::Subpattern:
+    file: lib/Lingua/Awkwords/Subpattern.pm
+    version: '0.10'
 requires:
   Carp: '0'
   Math::Random::Discrete: '0'
   Moo: '0'
   Parser::MGC: '0'
   namespace::clean: '0'
-  perl: '5.014000'
+  perl: v5.14.0
   strict: '0'
 resources:
-  repository: git://github.com/thrig/Lingua-Awkwords.git
-version: '0.09'
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Lingua-Awkwords
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

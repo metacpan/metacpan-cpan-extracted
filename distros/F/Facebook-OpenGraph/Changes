@@ -17,6 +17,9 @@ https://developers.facebook.com/bugs/597779113651383/
 
 ###############################################################################
 
+1.31 2019-10-22T07:01:51Z
+    - Support captions_file parameter to upload captions for videos
+
 1.30 2019-09-10T14:36:32Z
     - Support Perl 5.30
     - Handle newly added error message fields as of v2.1

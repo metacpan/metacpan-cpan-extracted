@@ -1,4 +1,23 @@
 Revision history for Shell-Run
+0.06	Fri Oct 25 00:00:48 2019 +0200
+		[feature]
+		added procedural interface
+		provide command exit status
+
+		[pod]
+		documented procedural interface
+		documented return value
+
+		[fix]
+		check if provided interpreter is available
+
+0.05	Sat Oct 19 11:43:50 2019 +0200
+		[pod]
+		fix POD
+		
+		[fix]
+		modify test for netbsd platform
+
 0.04	Fri Oct 18 08:23:43 2019 +0200
 		[fix]
 		set failing test to TODO
@@ -6,12 +25,10 @@ Revision history for Shell-Run
 0.03	Thu Oct 17 19:54:54 2019 +0200
 		[fix]
 		adjusted minimum perl version
+		more specific TODO in test
 
 		[pod]
 		fixed typo
-
-		[fix]
-		more specific TODO in test
 
 0.02	Mon Oct 14 20:24:57 2019 +0200
 		First release

@@ -19,9 +19,9 @@
          "rdfs:label" : "coursePrerequisites",
          "schema:domainIncludes" : "schema:Course",
          "schema:rangeIncludes" : [
+            "schema:AlignmentObject",
             "schema:Text",
-            "schema:Course",
-            "schema:AlignmentObject"
+            "schema:Course"
          ]
       },
       "schema:educationalCredentialAwarded" : {
@@ -31,13 +31,13 @@
          "rdfs:label" : "educationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Course",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
          ],
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:URL",
-            "schema:EducationalOccupationalCredential",
-            "schema:Text"
+            "schema:EducationalOccupationalCredential"
          ]
       },
       "schema:hasCourseInstance" : {
@@ -54,8 +54,8 @@
          "rdfs:label" : "occupationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Course",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [

@@ -13447,6 +13447,31 @@ sub log
       $LOG='';
       return 0;
    }
+   my $mr="__Master_".$$."__";
+   unless (exists $Hosts{$mr}) {
+      $mr="__Master_".getppid."__";
+   }
+   my $fconf=$Hosts{$mr}{'FA_Core'}.'Custom/'.
+             $Net::FullAuto::FA_Core::fa_conf;
+   open(CH,"+<$fconf") or &handle_error("Cannot open $fconf");
+   flock CH, 2;
+   my @data=<CH>;
+   foreach my $ln (@data) {
+      if ($ln=~/^\s*[#]*\s*our\s+[\$]logcount\s*=\s*(\d+)\s*;*\s*$/i) {
+         $Hosts{'localhost'}{'LogCount'}=$1;
+      }
+   }
+   $fconf=$Hosts{$mr}{'FA_Core'}.'Custom/'.$username.
+             '/Conf/'.$Net::FullAuto::FA_Core::fa_conf;
+   @data=();
+   open(CH,"+<$fconf") or &handle_error("Cannot open $fconf");
+   flock CH, 2;
+   @data=<CH>;
+   foreach my $ln (@data) {
+      if ($ln=~/^\s*[#]*\s*our\s+[\$]logcount\s*=\s*(\d+)\s*;*\s*$/i) {
+         $Hosts{'localhost'}{'LogCount'}=$1;
+      }
+   }
    if ($logdir && ((exists $Hosts{'localhost'}{'LogCount'} &&
           $Hosts{'localhost'}{'LogCount'} &&
           $Hosts{'localhost'}{'LogCount'}=~/^\d+$/) || $logcount)) {

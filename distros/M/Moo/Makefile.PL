@@ -13,45 +13,44 @@ my %META = (
     } },
     test => {
       requires => {
-        'Test::More'  => 0.94,
-        'Test::Fatal' => 0.003,
+        'Test::More'  => '0.94',
+        'Test::Fatal' => '0.003',
       },
       recommends => {
-        'CPAN::Meta' => 0,
-        'CPAN::Meta::Requirements' => 0,
+        'Parse::CPAN::Meta'         => '1.4200',
+        'CPAN::Meta::Requirements'  => 0,
       },
     },
     runtime => {
       requires => {
-        'Class::Method::Modifiers'  => 1.10,  # for RT#80194
-        'Module::Runtime'           => 0.014, # for RT#86394
-        'Role::Tiny'                => 2.000004,
-        'Devel::GlobalDestruction'  => 0.11,  # for RT#78617
-        'Scalar::Util'              => 0,
-        'perl'                      => 5.006,
-        'Exporter'                  => 5.57,  # Import 'import'
-        'Sub::Quote'                => 2.003001,
-        'Sub::Defer'                => 2.003001,
+        'Class::Method::Modifiers'  => '1.10',  # for RT#80194
+        'Module::Runtime'           => '0.014', # for RT#86394
+        'Role::Tiny'                => '2.001004',
+        'Scalar::Util'              => '1.09',
+        'perl'                      => '5.006',
+        'Exporter'                  => '5.57',  # Import 'import'
+        'Sub::Quote'                => '2.006006',
+        'Sub::Defer'                => '2.006006',
       },
       recommends => {
-        'Class::XSAccessor'         => 1.18,
-        'Sub::Name'                 => 0.08,
-        'strictures'                => 2,
+        'Class::XSAccessor'         => '1.18',
+        'Sub::Name'                 => '0.08',
+        'strictures'                => '2',
       },
     },
     develop   => {
       requires => {
-        'strictures' => 2,
-        'indirect' => 0,
-        'multidimensional' => 0,
-        'bareword::filehandles' => 0,
-        'Moose' => 0,
-        'Mouse' => 0,
-        'namespace::clean' => 0,
-        'namespace::autoclean' => 0,
-        'MooseX::Types::Common::Numeric' => 0,
-        'Type::Tiny' => 0,
-        'Class::Tiny' => 1.001,
+        'strictures'                      => '2',
+        'bareword::filehandles'           => 0,
+        'indirect'                        => 0,
+        'multidimensional'                => 0,
+        'Class::Tiny'                     => '1.001',
+        'Moose'                           => '1.15',
+        'MooseX::Types::Common::Numeric'  => 0,
+        'Mouse'                           => 0,
+        'namespace::autoclean'            => 0,
+        'namespace::clean'                => 0,
+        'Type::Tiny'                      => '0.004',
       },
     },
   },
@@ -66,7 +65,7 @@ my %META = (
       web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Moo',
       mailto => 'bug-Moo@rt.cpan.org',
     },
-    license => [ 'http://dev.perl.org/licenses/' ],
+    license => [ 'https://dev.perl.org/licenses/' ],
   },
   no_index => {
     directory => [ 't', 'xt' ]
@@ -86,11 +85,21 @@ my %META = (
   } },
 );
 
+my $xt = $ENV{EXTENDED_TESTING};
 my %MM_ARGS = (
   PREREQ_PM => {
     ("$]" >= 5.008_000 ? () : ('Task::Weaken' => 0)),
     ("$]" >= 5.010_000 ? () : ('MRO::Compat' => 0)),
+    ("$]" >= 5.014_000 ? () : ('Devel::GlobalDestruction' => 0.11)),
   },
+  ($xt ? (
+    TEST_REQUIRES => {
+      %{ $META{prereqs}{runtime}{recommends} },
+      %{ $META{prereqs}{test}{recommends} },
+      %{ $META{prereqs}{develop}{requires} },
+    },
+    test => { TESTS => 't/*.t xt/*.t' },
+  ):()),
 );
 
 {
@@ -103,13 +112,21 @@ my %MM_ARGS = (
   }
 
   sub postamble {
-    my $MOO_TEST_ENV = !-f 'META.yml' ? "MOO_FATAL_WARNINGS" : '';
-    <<"POSTAMBLE";
+    my $MOO_TEST_ENV = (!-f 'META.yml' || $xt) ? "MOO_FATAL_WARNINGS" : '';
+    ($xt ? <<"XT" : '')
+test :: test_no_xs
+XT
+    .<<"POSTAMBLE"
 MOO_TEST_ENV=$MOO_TEST_ENV
 fulltest: test test_no_xs
-test_no_xs: pure_all
-\t\$(NOECHO)\$(MAKE) test MOO_TEST_ENV="\$(MOO_TEST_ENV),MOO_XS_DISABLE"
+\t\$(NOECHO) \$(NOOP)
+test_no_xs: \$(TEST_TYPE)_no_xs
+\t\$(NOECHO) \$(NOOP)
 POSTAMBLE
+    .join('', map <<"TEST_TYPE", 'dynamic', 'static', '')
+test_${_}_no_xs: pure_all
+\t\$(NOECHO)\$(MAKE) test_$_ MOO_TEST_ENV="\$(MOO_TEST_ENV),MOO_XS_DISABLE"
+TEST_TYPE
   }
 }
 

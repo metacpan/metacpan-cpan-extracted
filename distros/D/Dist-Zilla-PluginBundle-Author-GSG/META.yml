@@ -15,7 +15,7 @@ build_requires:
   Test::Pod: '1.14'
   Test::Strict: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.1101'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
@@ -27,10 +27,10 @@ name: Dist-Zilla-PluginBundle-Author-GSG
 provides:
   Dist::Zilla::Plugin::Author::GSG:
     file: lib/Dist/Zilla/Plugin/Author/GSG.pm
-    version: v0.0.12
+    version: v0.0.14
   Dist::Zilla::PluginBundle::Author::GSG:
     file: lib/Dist/Zilla/PluginBundle/Author/GSG.pm
-    version: v0.0.12
+    version: v0.0.14
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::ChangelogFromGit: '0'
@@ -60,7 +60,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG/issues
   repository: git://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG.git
-version: 0.0.12
+version: v0.0.14
 x_contributors:
   - 'Andrew Fresh <andrew.fresh@grantstreet.com>'
   - 'Mark Flickinger <mark.flickinger@grantstreet.com>'

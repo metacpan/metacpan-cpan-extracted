@@ -1,0 +1,12 @@
+^docs\/
+^blib\/
+^script\/
+^cover_db\/
+^.git\/
+^MYMETA.*
+^Makefile$
+.bak$
+.md$
+.tar.gz$
+.gitignore$
+_blib$

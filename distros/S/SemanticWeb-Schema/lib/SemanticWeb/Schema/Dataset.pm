@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has catalog => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Dataset - A body of structured information describing some 
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -193,7 +193,7 @@ A issn should be one of the following types:
 
 C<measurementTechnique>
 
-=for html A technique or technology used in a <a class="localLink"
+=for html <p>A technique or technology used in a <a class="localLink"
 href="http://schema.org/Dataset">Dataset</a> (or <a class="localLink"
 href="http://schema.org/DataDownload">DataDownload</a>, <a
 class="localLink" href="http://schema.org/DataCatalog">DataCatalog</a>),
@@ -220,7 +220,7 @@ href="http://schema.org/PropertyValue">PropertyValue</a> for each <a
 class="localLink"
 href="http://schema.org/variableMeasured">variableMeasured</a> and attach
 the corresponding <a class="localLink"
-href="http://schema.org/measurementTechnique">measurementTechnique</a>.
+href="http://schema.org/measurementTechnique">measurementTechnique</a>.<p>
 
 A measurement_technique should be one of the following types:
 

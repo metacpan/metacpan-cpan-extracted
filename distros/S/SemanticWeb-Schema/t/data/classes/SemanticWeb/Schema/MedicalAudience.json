@@ -5,8 +5,8 @@
       "rdfs:label" : "MedicalAudience",
       "rdfs:subClassOf" : [
          "schema:PeopleAudience",
-         "schema:MedicalEnumeration",
-         "schema:Audience"
+         "schema:Audience",
+         "schema:MedicalEnumeration"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },

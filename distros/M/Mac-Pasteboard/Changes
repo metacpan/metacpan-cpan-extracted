@@ -1,3 +1,27 @@
+0.011		2019-10-21	T. R. Wyant
+    Stopgap mods for macOS 10.15 Catalina
+
+    The underlying problem appears to be that copy() does not put stuff on
+    the public pasteboards. It puts it somewhere, though, becase paste() can
+    find it, even if run in a separate process. But paste() also finds stuff
+    put on the pasteboard by pbcopy (1).
+
+    The above makes no sense to me, but I band-aided it by having copy()
+    spawn pbcopy if POSIX::uname indicates that we are running under Darwin
+    19 or higher.
+
+0.010_01	2019-10-13	T. R. Wyant
+    Stopgap modifications for macOS 10.15 Catalina.
+
+    The underlying problem appears to be that copy() does not put stuff on
+    the public pasteboards. It puts it somewhere, though, becase paste() can
+    find it, even if run in a separate process. But paste() also finds stuff
+    put on the pasteboard by pbcopy (1).
+    
+    The above makes no sense to me, but I band-aided it by having copy()
+    spawn pbcopy (1) if POSIX::uname indicates that we are running under
+    Darwin 19 or higher.
+
 0.010		2019-08-07	T. R. Wyant
     Tweak t/pasteboard.t do() file names.  This test does things like
     "do 't/misc.tx';", and some CPAN testers flunk this with the error

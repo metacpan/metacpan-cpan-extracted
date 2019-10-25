@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has additional_property => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::QualitativeValue - A predefined value for a product charact
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -111,14 +111,14 @@ type 'US' or the garment sizes 'S', 'M', 'L', and 'XL'.
 
 C<additionalProperty>
 
-=for html A property-value pair representing an additional characteristics of the
+=for html <p>A property-value pair representing an additional characteristics of the
 entitity, e.g. a product feature or another characteristic for which there
 is no matching property in schema.org.<br/><br/> Note: Publishers should be
 aware that applications designed to use specific schema.org properties
 (e.g. http://schema.org/width, http://schema.org/color,
 http://schema.org/gtin13, ...) will typically expect such data to be
 provided using those properties, rather than using the generic
-property/value mechanism.
+property/value mechanism.<p>
 
 A additional_property should be one of the following types:
 

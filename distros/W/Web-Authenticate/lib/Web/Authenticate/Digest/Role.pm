@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Digest::Role;
-$Web::Authenticate::Digest::Role::VERSION = '0.012';
+$Web::Authenticate::Digest::Role::VERSION = '0.013';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::Digest object should contain.
 
@@ -24,7 +24,7 @@ Web::Authenticate::Digest::Role - A Mouse::Role that defines what methods a Web:
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 
@@ -34,7 +34,7 @@ All L</Web::Authenticate::Digest> objects should be able to digest text and retu
 
     my $hash = $digest->generate($password);
 
-=head2
+=head2 validate
 
 Validates the stored hash for the user against the user entered password.
 

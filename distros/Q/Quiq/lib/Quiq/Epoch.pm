@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -200,6 +200,9 @@ sub as {
     if ($fmt eq 'YYYY-MM-DD HH:MI:SS') {
         $strFmt = '%Y-%m-%d %H:%M:%S';
     }
+    elsif ($fmt eq 'YYYY-MM-DD') {
+        $strFmt = '%Y-%m-%d';
+    }
     else {
         $self->throw(
             'EPOCH-00001: Unknown time format',
@@ -214,7 +217,7 @@ sub as {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

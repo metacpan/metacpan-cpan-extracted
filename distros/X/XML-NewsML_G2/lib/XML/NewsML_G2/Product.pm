@@ -3,14 +3,14 @@ package XML::NewsML_G2::Product;
 use Moose;
 use namespace::autoclean;
 
-
 has 'name', isa => 'Str', is => 'ro', lazy => 1, builder => '_build_name';
 has 'isbn', isa => 'Str', is => 'rw';
-has 'ean', isa => 'Str', is => 'rw';
+has 'ean',  isa => 'Str', is => 'rw';
 has 'name_template', isa => 'Str', is => 'ro', default => 'Product %d';
 
 {
     my $product_count = 0;
+
     sub _build_name {
         my $self = shift;
         return sprintf $self->name_template, ++$product_count;

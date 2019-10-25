@@ -1,4 +1,4 @@
-6.36 Oct 8, 2019
+6.37 Oct 22, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -435,6 +435,7 @@ BEGIN {
       FBINFO_HWACCEL_XPAN
       FBINFO_HWACCEL_YPAN
       FBINFO_HWACCEL_YWRAP
+      $VERSION
     );
     our @EXPORT = qw(
       TRUE
@@ -521,6 +522,8 @@ If none of these work, then the module goes into emulation mode.
 
 You really only need to define this if there is more than one framebuffer device in your system, and you want a specific one (else it always chooses the first it finds).  If you have only one framebuffer device, then you likely do not need to define this.
 
+Use "EMULATED" instead of an actual framebuffer device, and it will open a memory only or "emulated" framebuffer.  You can use this mode to have multiple "layers" for loading and manipulating images, but a single main framebuffer for displaying them.
+
 =item B<FOREGROUND>
 
 Sets the default (global) foreground color for when 'attribute_reset' is called.  It is in the same format as "set_color" expects:
@@ -588,11 +591,19 @@ You can disable this behavior by setting this to 0.
 
 =head3 EMULATION MODE OPTIONS
 
+=over 6
+
 The options here only apply to emulation mode.
 
 Emulation mode can be used as a secondary off-screen drawing surface, if you are clever.
 
-=over 6
+=back
+
+=over 12
+
+=item B<FB_DEVICE> => 'EMULATED'
+
+Sets this object to be in emulation mode
 
 =item B<VXRES>
 
@@ -622,6 +633,8 @@ Defines the colorspace for the graphics routines to draw in.  The possible (and 
     'BGR'  for Blue-Green-Red (Many video cards are this)
 
 =back
+
+##############################################################################
 
 =cut
 
@@ -660,148 +673,6 @@ sub new {
         'DRAW_MODE'   => NORMAL_MODE,     # Drawing mode (Normal default)
         'DIAGNOSTICS' => FALSE,           # Determines if diagnostics are shown when images are loaded.
 
-        'PIXEL_TYPES'  => [
-            'Packed Pixels',
-            'Planes',
-            'Interleaved Planes',
-            'Text',
-            'VGA Planes',
-        ],
-        'PIXEL_TYPES_AUX' => {
-            'Packed Pixels' => [
-                '',
-            ],
-            'Planes' => [
-                '',
-            ],
-            'Interleaved Planes' => [
-                '',
-            ],
-            'Text' => [
-                'MDA',
-                'CGA',
-                'S3 MMIO',
-                'MGA Step 16',
-                'MGA Step 8',
-                'SVGA Group',
-                'SVGA Mask',
-                'SVGA Step 2',
-                'SVGA Step 4',
-                'SVGA Step 8',
-                'SVGA Step 16',
-                'SVGA Last',
-            ],
-            'VGA Planes' => [
-                'VGA 4',
-                'CFB 4',
-                'CFB 8',
-            ],
-        },
-        'VISUAL_TYPES' => [
-            'Mono 01',
-            'Mono 10',
-            'True Color',
-            'Pseudo Color',
-            'Direct Color',
-            'Static Pseudo Color',
-        ],
-        'ACCEL_TYPES' => [
-            'NONE',
-            'Atari Blitter',
-            'Amiga Blitter',
-            'S3 Trio64',
-            'NCR 77C32BLT',
-            'S3 Virge',
-            'ATI Mach 64 GX',
-            'ATI DEC TGA',
-            'ATI Mach 64 CT',
-            'ATI Mach 64 VT',
-            'ATI Mach 64 GT',
-            'Sun Creator',
-            'Sun CG Six',
-            'Sun Leo',
-            'IWS Twin Turbo',
-            '3D Labs Permedia2',
-            'Matrox MGA 2064W',
-            'Matrox MGA 1064SG',
-            'Matrox MGA 2164W',
-            'Matrox MGA 2164W AGP',
-            'Matrox MGA G100',
-            'Matrox MGA G200',
-            'Sun CG14',
-            'Sun BW Two',
-            'Sun CG Three',
-            'Sun TCX',
-            'Matrox MGA G400',
-            'NV3',
-            'NV4',
-            'NV5',
-            'CT 6555x',
-            '3DFx Banshee',
-            'ATI Rage 128',
-            'IGS Cyber 2000',
-            'IGS Cyber 2010',
-            'IGS Cyber 5000',
-            'SIS Glamour',
-            '3D Labs Permedia',
-            'ATI Radeon',
-            'i810',
-            'NV 10',
-            'NV 20',
-            'NV 30',
-            'NV 40',
-            'XGI Volari V',
-            'XGI Volari Z',
-            'OMAP i610',
-            'Trident TGUI',
-            'Trident 3D Image',
-            'Trident Blade 3D',
-            'Trident Blade XP',
-            'Cirrus Alpine',
-            'Neomagic NM2070',
-            'Neomagic NM2090',
-            'Neomagic NM2093',
-            'Neomagic NM2097',
-            'Neomagic NM2160',
-            'Neomagic NM2200',
-            'Neomagic NM2230',
-            'Neomagic NM2360',
-            'Neomagic NM2380',
-            'PXA3XX', # 99
-            '','','','','','','','','','','','','','','','','','','','','','','','','','','','',
-            'Savage 4',
-            'Savage 3D',
-            'Savage 3D MV',
-            'Savage 2000',
-            'Savage MX MV',
-            'Savage MX',
-            'Savage IX MV',
-            'Savage IX',
-            'Pro Savage PM',
-            'Pro Savage KM',
-            'S3 Twister P',
-            'S3 Twister K',
-            'Super Savage',
-            'Pro Savage DDR',
-            'Pro Savage DDRX',
-        ],
-
-        'NORMAL_MODE'   => NORMAL_MODE,     #   Constants for DRAW_MODE
-        'XOR_MODE'      => XOR_MODE,
-        'OR_MODE'       => OR_MODE,
-        'AND_MODE'      => AND_MODE,
-        'MASK_MODE'     => MASK_MODE,
-        'UNMASK_MODE'   => UNMASK_MODE,
-        'ALPHA_MODE'    => ALPHA_MODE,
-        'ADD_MODE'      => ADD_MODE,
-        'SUBTRACT_MODE' => SUBTRACT_MODE,
-        'MULTIPLY_MODE' => MULTIPLY_MODE,
-        'DIVIDE_MODE'   => DIVIDE_MODE,
-
-        'ARC'      => ARC,                  #   Constants for "draw_arc" method
-        'PIE'      => PIE,
-        'POLY_ARC' => POLY_ARC,
-
         'SHOW_ERRORS' => FALSE,             # If on, it will output any errors in Imager or elsewhere, else all errors are squelched
 
         'FOREGROUND' => {                   # Default foreground for "attribute_reset" method
@@ -822,61 +693,13 @@ sub new {
 
         'SPLASH' => 2,                                          # Time in seconds to show the splash screen
 
-        'RGB' => RGB,                                           #   Constants for color mapping
-        'RBG' => RBG,                                           #   Constants for color mapping
-        'BGR' => BGR,                                           #   Constants for color mapping
-        'BRG' => BRG,                                           #   Constants for color mapping
-        'GBR' => GBR,                                           #   Constants for color mapping
-        'GRB' => GRB,                                           #   Constants for color mapping
-
-        'CENTER_NONE' => CENTER_NONE,                           #   Constants for centering
-        'CENTER_X'    => CENTER_X,                              #   Constants for centering
-        'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
-        'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
-        'CENTRE_NONE' => CENTRE_NONE,                           #   Constants for centering
-        'CENTRE_X'    => CENTRE_X,                              #   Constants for centering
-        'CENTRE_Y'    => CENTRE_Y,                              #   Constants for centering
-        'CENTRE_XY'   => CENTRE_XY,                             #   Constants for centering
-
         'WAIT_FOR_CONSOLE' => FALSE,
         'THIS_CONSOLE'     => 1,
         'CONSOLE'          => 1,
         ####################################################################
 
-        ## Set up the Framebuffer driver "constants" defaults
-        # These "fb.h" constants may go away in future versions, as the data needed to get from these
-        # Is available from Inline::C now.
-        # Commands
-        'FBIOGET_VSCREENINFO' => 0x4600,    # These come from "fb.h" in the kernel source
-        'FBIOPUT_VSCREENINFO' => 0x4601,
-        'FBIOGET_FSCREENINFO' => 0x4602,
-        'FBIOGETCMAP'         => 0x4604,
-        'FBIOPUTCMAP'         => 0x4605,
-        'FBIOPAN_DISPLAY'     => 0x4606,
-        'FBIO_CURSOR'         => 0x4608,
-        'FBIOGET_CON2FBMAP'   => 0x460F,
-        'FBIOPUT_CON2FBMAP'   => 0x4610,
-        'FBIOBLANK'           => 0x4611,
-        'FBIOGET_VBLANK'      => 0x4612,
-        'FBIOGET_GLYPH'       => 0x4615,
-        'FBIOGET_HWCINFO'     => 0x4616,
-        'FBIOPUT_MODEINFO'    => 0x4617,
-        'FBIOGET_DISPINFO'    => 0x4618,
-        'FBIO_WAITFORVSYNC'   => 0x4620,
-        'VT_GETSTATE'         => 0x5603,
-        'KDSETMODE'           => 0x4B3A,
         'KD_GRAPHICS'         => 1,
         'KD_TEXT'             => 0,
-
-        # FLAGS
-        'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source
-        'FBINFO_HWACCEL_COPYAREA'  => 0x0100,
-        'FBINFO_HWACCEL_FILLRECT'  => 0x0200,
-        'FBINFO_HWACCEL_IMAGEBLIT' => 0x0400,
-        'FBINFO_HWACCEL_ROTATE'    => 0x0800,
-        'FBINFO_HWACCEL_XPAN'      => 0x1000,
-        'FBINFO_HWACCEL_YPAN'      => 0x2000,
-        'FBINFO_HWACCEL_YWRAP'     => 0x4000,
 
         # I=32.64,L=32,S=16,C=8,A=string
         # Structure Definitions
@@ -935,15 +758,9 @@ sub new {
           'S' .                            # 16 bits for capabilities
           'S2',                            # 16 bits x 2 reserved
 
-        # Unfortunately, these are not IOCTLs.  Gee, that would be nice if they were.
-        'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)?
-        'FBinfo_hwaccel_copyarea'  => 'L6',      # dx(32),dy(32),width(32),height(32),sx(32),sy(32)
-        'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)
-        'FBinfo_hwaccel_imageblit' => 'L6CL',    # dx(32),dy(32),width(32),height(32),fg_color(32),bg_color(32),depth(8),image pointer(32),color map pointer(32)
-                                                 # COLOR MAP:
-                                                 #   start(32),length(32),red(16),green(16),blue(16),alpha(16)
 
         # Default values
+        'GARBAGE'     => FALSE,
         'VXRES'       => 640,                    # Virtual X resolution
         'VYRES'       => 480,                    # Virtual Y resolution
         'BITS'        => 32,                     # Bits per pixel
@@ -958,10 +775,210 @@ sub new {
                                                  #   2 = C & Hardware accelerated.
         @_
     };
+    if ($self->{'GARBAGE'}) {
+        my $garbage = {
+            'NORMAL_MODE'   => NORMAL_MODE,     #   Constants for DRAW_MODE
+            'XOR_MODE'      => XOR_MODE,
+            'OR_MODE'       => OR_MODE,
+            'AND_MODE'      => AND_MODE,
+            'MASK_MODE'     => MASK_MODE,
+            'UNMASK_MODE'   => UNMASK_MODE,
+            'ALPHA_MODE'    => ALPHA_MODE,
+            'ADD_MODE'      => ADD_MODE,
+            'SUBTRACT_MODE' => SUBTRACT_MODE,
+            'MULTIPLY_MODE' => MULTIPLY_MODE,
+            'DIVIDE_MODE'   => DIVIDE_MODE,
 
+            'ARC'      => ARC,                  #   Constants for "draw_arc" method
+            'PIE'      => PIE,
+            'POLY_ARC' => POLY_ARC,
+
+            'RGB' => RGB,                                           #   Constants for color mapping
+            'RBG' => RBG,                                           #   Constants for color mapping
+            'BGR' => BGR,                                           #   Constants for color mapping
+            'BRG' => BRG,                                           #   Constants for color mapping
+            'GBR' => GBR,                                           #   Constants for color mapping
+            'GRB' => GRB,                                           #   Constants for color mapping
+
+            'CENTER_NONE' => CENTER_NONE,                           #   Constants for centering
+            'CENTER_X'    => CENTER_X,                              #   Constants for centering
+            'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
+            'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
+            'CENTRE_NONE' => CENTRE_NONE,                           #   Constants for centering
+            'CENTRE_X'    => CENTRE_X,                              #   Constants for centering
+            'CENTRE_Y'    => CENTRE_Y,                              #   Constants for centering
+            'CENTRE_XY'   => CENTRE_XY,                             #   Constants for centering
+
+            'PIXEL_TYPES'  => [
+                'Packed Pixels',
+                'Planes',
+                'Interleaved Planes',
+                'Text',
+                'VGA Planes',
+            ],
+            'PIXEL_TYPES_AUX' => {
+                'Packed Pixels' => [
+                    '',
+                ],
+                'Planes' => [
+                    '',
+                ],
+                'Interleaved Planes' => [
+                    '',
+                ],
+                'Text' => [
+                    'MDA',
+                    'CGA',
+                    'S3 MMIO',
+                    'MGA Step 16',
+                    'MGA Step 8',
+                    'SVGA Group',
+                    'SVGA Mask',
+                    'SVGA Step 2',
+                    'SVGA Step 4',
+                    'SVGA Step 8',
+                    'SVGA Step 16',
+                    'SVGA Last',
+                ],
+                'VGA Planes' => [
+                    'VGA 4',
+                    'CFB 4',
+                    'CFB 8',
+                ],
+            },
+            'VISUAL_TYPES' => [
+                'Mono 01',
+                'Mono 10',
+                'True Color',
+                'Pseudo Color',
+                'Direct Color',
+                'Static Pseudo Color',
+            ],
+            'ACCEL_TYPES' => [
+                'NONE',
+                'Atari Blitter',
+                'Amiga Blitter',
+                'S3 Trio64',
+                'NCR 77C32BLT',
+                'S3 Virge',
+                'ATI Mach 64 GX',
+                'ATI DEC TGA',
+                'ATI Mach 64 CT',
+                'ATI Mach 64 VT',
+                'ATI Mach 64 GT',
+                'Sun Creator',
+                'Sun CG Six',
+                'Sun Leo',
+                'IWS Twin Turbo',
+                '3D Labs Permedia2',
+                'Matrox MGA 2064W',
+                'Matrox MGA 1064SG',
+                'Matrox MGA 2164W',
+                'Matrox MGA 2164W AGP',
+                'Matrox MGA G100',
+                'Matrox MGA G200',
+                'Sun CG14',
+                'Sun BW Two',
+                'Sun CG Three',
+                'Sun TCX',
+                'Matrox MGA G400',
+                'NV3',
+                'NV4',
+                'NV5',
+                'CT 6555x',
+                '3DFx Banshee',
+                'ATI Rage 128',
+                'IGS Cyber 2000',
+                'IGS Cyber 2010',
+                'IGS Cyber 5000',
+                'SIS Glamour',
+                '3D Labs Permedia',
+                'ATI Radeon',
+                'i810',
+                'NV 10',
+                'NV 20',
+                'NV 30',
+                'NV 40',
+                'XGI Volari V',
+                'XGI Volari Z',
+                'OMAP i610',
+                'Trident TGUI',
+                'Trident 3D Image',
+                'Trident Blade 3D',
+                'Trident Blade XP',
+                'Cirrus Alpine',
+                'Neomagic NM2070',
+                'Neomagic NM2090',
+                'Neomagic NM2093',
+                'Neomagic NM2097',
+                'Neomagic NM2160',
+                'Neomagic NM2200',
+                'Neomagic NM2230',
+                'Neomagic NM2360',
+                'Neomagic NM2380',
+                'PXA3XX', # 99
+                '','','','','','','','','','','','','','','','','','','','','','','','','','','','',
+                'Savage 4',
+                'Savage 3D',
+                'Savage 3D MV',
+                'Savage 2000',
+                'Savage MX MV',
+                'Savage MX',
+                'Savage IX MV',
+                'Savage IX',
+                'Pro Savage PM',
+                'Pro Savage KM',
+                'S3 Twister P',
+                'S3 Twister K',
+                'Super Savage',
+                'Pro Savage DDR',
+                'Pro Savage DDRX',
+            ],
+            # Unfortunately, these are not IOCTLs.  Gee, that would be nice if they were.
+            'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)?
+            'FBinfo_hwaccel_copyarea'  => 'L6',      # dx(32),dy(32),width(32),height(32),sx(32),sy(32)
+            'FBinfo_hwaccel_fillrect'  => 'L6',      # dx(32),dy(32),width(32),height(32),color(32),rop(32)
+            'FBinfo_hwaccel_imageblit' => 'L6CL',    # dx(32),dy(32),width(32),height(32),fg_color(32),bg_color(32),depth(8),image pointer(32),color map pointer(32)
+                                                     # COLOR MAP:
+                                                     #   start(32),length(32),red(16),green(16),blue(16),alpha(16)
+            # FLAGS
+            'FBINFO_HWACCEL_NONE'      => 0x0000,    # These come from "fb.h" in the kernel source
+            'FBINFO_HWACCEL_COPYAREA'  => 0x0100,
+            'FBINFO_HWACCEL_FILLRECT'  => 0x0200,
+            'FBINFO_HWACCEL_IMAGEBLIT' => 0x0400,
+            'FBINFO_HWACCEL_ROTATE'    => 0x0800,
+            'FBINFO_HWACCEL_XPAN'      => 0x1000,
+            'FBINFO_HWACCEL_YPAN'      => 0x2000,
+            'FBINFO_HWACCEL_YWRAP'     => 0x4000,
+
+            ## Set up the Framebuffer driver "constants" defaults
+            # These "fb.h" constants may go away in future versions, as the data needed to get from these
+            # Is available from Inline::C now.
+            # Commands
+            'FBIOGET_VSCREENINFO' => 0x4600,    # These come from "fb.h" in the kernel source
+            'FBIOPUT_VSCREENINFO' => 0x4601,
+            'FBIOGET_FSCREENINFO' => 0x4602,
+            'FBIOGETCMAP'         => 0x4604,
+            'FBIOPUTCMAP'         => 0x4605,
+            'FBIOPAN_DISPLAY'     => 0x4606,
+            'FBIO_CURSOR'         => 0x4608,
+            'FBIOGET_CON2FBMAP'   => 0x460F,
+            'FBIOPUT_CON2FBMAP'   => 0x4610,
+            'FBIOBLANK'           => 0x4611,
+            'FBIOGET_VBLANK'      => 0x4612,
+            'FBIOGET_GLYPH'       => 0x4615,
+            'FBIOGET_HWCINFO'     => 0x4616,
+            'FBIOPUT_MODEINFO'    => 0x4617,
+            'FBIOGET_DISPINFO'    => 0x4618,
+            'FBIO_WAITFORVSYNC'   => 0x4620,
+            'VT_GETSTATE'         => 0x5603,
+            'KDSETMODE'           => 0x4B3A,
+        };
+        $self = { %{$self},%{$garbage} };
+    }
     unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices at both possible locations
         foreach my $dev (0 .. 31) {
-            foreach my $prefix (qw(/dev/fb /dev/graphics/fb /dev/fb/)) {
+            foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
                 if (-e "$prefix$dev") {
                     $self->{'FB_DEVICE'} = "$prefix$dev";
                     last;
@@ -970,12 +987,15 @@ sub new {
             last if (defined($self->{'FB_DEVICE'}));
         }
     }
-    $self->{'CONSOLE'}      = _slurp('/sys/class/tty/tty0/active');
-    $self->{'CONSOLE'}     =~ s/\D+//gs;
-    $self->{'CONSOLE'}     += 0;
-    $self->{'THIS_CONSOLE'} = $self->{'CONSOLE'};
-    if ( ! defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && $self->{'FB_DEVICE'} !~ /virtual/i && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
-        binmode($self->{'FB'});                                                                                                                                   # We have to be in binary mode first
+    $self->{'CONSOLE'} = 1;
+    eval {
+        $self->{'CONSOLE'}      = _slurp('/sys/class/tty/tty0/active');
+        $self->{'CONSOLE'}     =~ s/\D+//gs;
+        $self->{'CONSOLE'}     += 0;
+        $self->{'THIS_CONSOLE'} = $self->{'CONSOLE'};
+    };
+    if ( ! defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
+        binmode($self->{'FB'});                                                                                                                            # We have to be in binary mode first
         $|++;
         if ($self->{'ACCELERATED'}) {
             (
@@ -1120,7 +1140,6 @@ sub new {
                 ) = _get_ioctl(FBIOGET_FSCREENINFO, $typedef, $self->{'FB'});
             }
 
-            #            print "$typedef - \n",Dumper($self->{'fscreeninfo'}),"\n";
             $extra++;
             } until (($self->{'fscreeninfo'}->{'line_length'} < $self->{'fscreeninfo'}->{'smem_len'} && $self->{'fscreeninfo'}->{'line_length'} > 0) || $extra > 4);
         }
@@ -1231,7 +1250,7 @@ Actual error reported:\n\n$@\n};
             sleep ($self->{'RESET'}) ? 10 : 1;
             exit(1);
         }
-    } elsif (exists($ENV{'DISPLAY'}) && $self->{'FB_DEVICE'} !~ /virtual/i) {
+    } elsif (exists($ENV{'DISPLAY'}) && (-e $self->{'FB_DEVICE'})) {
         print STDERR qq{
 OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
@@ -1246,6 +1265,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         sleep ($self->{'RESET'}) ? 10 : 1;
         exit(1);
     } else { # Go into emulation mode if no actual framebuffer available
+        $self->{'FB_DEVICE'}   = 'EMULATED';
         $self->{'SPLASH'}      = FALSE;
         $self->{'ERROR'}       = 'Framebuffer Device Not Found! Emulation mode.  EXPERIMENTAL!!';
         $self->{'COLOR_ORDER'} = $self->{ uc($self->{'COLOR_ORDER'}) };    # Translate the color order
@@ -1437,7 +1457,7 @@ When called in a scalar context, it returns a hash reference:
      'bottom_clip'    => bottom edge of clipping rectangle (YY),
      'right_clip'     => right edge of clipping rectangle (XX),
      'width_clip'     => width of clipping rectangle,
-     'height_clip'    => height of clipp rectangle,
+     'height_clip'    => height of clipping rectangle,
      'color_order'    => RGB, BGR, etc,
  }
 
@@ -2029,6 +2049,7 @@ $pixel is a hash reference in the form:
     'green' => integer value, # 0 - 255
     'blue'  => integer value, # 0 - 255
     'alpha' => integer value, # 0 - 255
+    'hex'   => hexadecimal string of the values from 00000000 to FFFFFFFF
     'raw'   => 16/24/32bit encoded string
  }
 
@@ -2091,7 +2112,7 @@ sub pixel {
             $G = $G << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
             $B = $B << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
         }
-        return ({ 'red' => $R, 'green' => $G, 'blue' => $B, 'alpha' => $A, 'raw' => $color });
+        return ({ 'red' => $R, 'green' => $G, 'blue' => $B, 'alpha' => $A, 'raw' => $color, 'hex' => sprintf('%02x%02x%02x%02x',$R,$G,$B,$A) });
     }
     return (undef);
 }
@@ -4979,7 +5000,6 @@ sub _blit_adjust_for_clipping {
         $params->{'width'} = $w;
     }
 
-    #    return($params);
     my $size = ($params->{'width'} * $params->{'height'}) * $bytes;
     if (length($params->{'image'}) < $size) {
         $params->{'image'} .= chr(0) x ($size - length($params->{'image'}));
@@ -7137,7 +7157,7 @@ I have never tested with forks.  Do at your own risk, but follow the same rules 
 
 =head2 MCE
 
-Mario Roy has tested Graphics::Framebuffer with various methods to use the MCE modules for multiprocessing, and creating a single shared library.  See the "README" file for more.
+Mario Roy has tested Graphics::Framebuffer with various methods to use the MCE modules for multiprocessing, and creating a single shared library.  See the "README" file for more.  I highly recommend this for multiprocessing.
 
 =head2 BLITTING
 

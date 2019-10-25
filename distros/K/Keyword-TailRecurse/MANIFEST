@@ -9,6 +9,8 @@ lib/Keyword/TailRecurse.pm
 minil.toml
 t/00_compile.t
 t/10_tailRecurse.t
+t/11_tailrecurse.t
+t/12_tail_recurse.t
 t/20_subCallTail.t
 META.yml
 MANIFEST

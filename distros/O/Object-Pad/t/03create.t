@@ -8,10 +8,10 @@ use Test::More;
 use Object::Pad;
 
 class Point {
-   has $x;
-   has $y;
+   has $x = 0;
+   has $y = 0;
 
-   method CREATE {
+   method BUILDALL {
       ( $x, $y ) = @_;
    }
 

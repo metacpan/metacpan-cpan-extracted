@@ -8,12 +8,19 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 use Carp;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
+
+# So that feature->import will work in `class`
+require feature;
+if( $] >= 5.020 ) {
+   require experimental;
+   require indirect;
+}
 
 =head1 NAME
 
@@ -24,16 +31,12 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
    use Object::Pad;
 
    class Point {
-      has $x;
-      has $y;
+      has $x = 0;
+      has $y = 0;
 
-      method CREATE {
-         $x = $y = 0;
-      }
-
-      method move {
-         $x += shift;
-         $y += shift;
+      method move($dX, $dY) {
+         $x += $dX;
+         $y += $dY;
       }
 
       method describe {
@@ -47,7 +50,7 @@ B<WARNING> This is a highly experimental proof-of-concept. Please don't
 actually use this in production :)
 
 This module provides a simple syntax for creating object classes, which uses
-private variables that look like lexicals as object member attributes.
+private variables that look like lexicals as object member fields.
 
 =head1 KEYWORDS
 
@@ -59,24 +62,47 @@ private variables that look like lexicals as object member attributes.
 
 Behaves similarly to the C<package> keyword, but provides a package that
 defines a new class. Such a class provides an automatic constructor method
-called C<new>, which will invoke the class's C<CREATE> method if it exists.
+called C<new>, which will invoke the class's C<BUILDALL> method if it exists.
+
+A single superclass is supported by the keyword C<extends>
+
+   class Cat extends Animal {
+      ...
+   }
+
+The superclass must also be implemented by C<Object::Pad>.
 
 =head2 has
 
    has $var;
+   has $var = CONST;
    has @var;
    has %var;
 
-Declares that the instances of the class have a member attribute of the given
-name. This member attribute (called a "slot") will be accessible as a lexical
+Declares that the instances of the class have a member field of the given
+name. This member field (called a "slot") will be accessible as a lexical
 variable within any C<method> declarations in the class.
 
 Array and hash members are permitted and behave as expected; you do not need
 to store references to anonymous arrays or hashes.
 
+Member fields are private to a class. They are not visible to users of the
+class, nor to subclasses. In order to provide access to them a class may wish
+to use L</method> to create an accessor.
+
+A scalar slot may provide a expression that gives an initialisation value,
+which will be assigned into the slot of every instance during the constructor
+before C<BUILDALL> is invoked. For ease-of-implementation reasons this
+expression must currently be a compiletime constant, but it is hoped that a
+future version will relax this restriction and allow runtime-computed values.
+
 =head2 method
 
    method NAME {
+      ...
+   }
+
+   method NAME (SIGNATURE) {
       ...
    }
 
@@ -85,10 +111,21 @@ to store references to anonymous arrays or hashes.
    }
 
 Declares a new named method. This behaves similarly to the C<sub> keyword,
-except that within the body of the method all of the member attributes
-("slots") are also accessible. In addition, the method body will have a
-lexical called C<$self> which contains the invocant object directly; it will
-already have been shifted from the C<@_> array.
+except that within the body of the method all of the member fields ("slots")
+are also accessible. In addition, the method body will have a lexical called
+C<$self> which contains the invocant object directly; it will already have
+been shifted from the C<@_> array.
+
+The C<signatures> feature is automatically enabled for method declarations. In
+this case the signature does not have to account for the invocant instance; 
+that is handled directly.
+
+   method m($one, $two) {
+      say "$self invokes method on one=$one two=$two";
+   }
+
+   ...
+   $obj->m(1, 2);
 
 A list of attributes may be supplied as for C<sub>. The most useful of these
 is C<:lvalue>, allowing easy creation of read-write accessors for slots.
@@ -101,6 +138,27 @@ is C<:lvalue>, allowing easy creation of read-write accessors for slots.
 
    my $c = Counter->new;
    $c->count++;
+
+=head1 IMPLIED PRAGMATA
+
+In order to encourage users to write clean, modern code, the body of the
+C<class> block acts as if the following pragmata are in effect:
+
+   use strict;
+   use warnings;
+   no indirect ':fatal';
+   use feature 'signatures';
+
+This list may be extended in subsequent versions to add further restrictions
+and should not be considered exhaustive.
+
+Further additions will only be ones that remove "discouraged" or deprecated
+language features with the overall goal of enforcing a more clean modern style
+within the body. As long as you write code that is in a clean, modern style
+(and I fully accept that this wording is vague and subjective) you should not
+find any new restrictions to be majorly problematic. Either the code will
+continue to run unaffected, or you may have to make some small alterations to
+bring it into a conforming style.
 
 =cut
 
@@ -125,6 +183,18 @@ sub import_into
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
+sub Object::Pad::_base::new
+{
+   my $class = shift;
+
+   my $self = bless [], $class;
+   $self->INITSLOTS;
+
+   $self->BUILDALL( @_ ) if $self->can( "BUILDALL" );
+
+   return $self;
+}
+
 =head1 TODO
 
 =over 4
@@ -135,15 +205,15 @@ Setting default package using C<class Name;> statement without block.
 
 =item *
 
-Subclassing. Single-inheritence is easier than multi so maybe that first.
+Multiple inheritence of subclassing
 
 =item *
 
-Sub signatures
+Roles
 
 =item *
 
-Detect and croak on attempts to invoke C<method> subs on non-instances.
+Consider visibility of superclass slots to subclasses.
 
 =item *
 
@@ -155,11 +225,15 @@ to improve method-enter performance.
 
 Some extensions of the C<has> syntax:
 
-Default expressions
+Non-constant default expressions
 
-   has $var = DEFAULT;
+   has $var = EXPR;
 
 A way to request generated accessors - ro or rw.
+
+=item *
+
+Work out why C<no indirect> doesn't appear to work properly before perl 5.20.
 
 =back
 

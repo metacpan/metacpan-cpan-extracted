@@ -21,8 +21,8 @@
          "rdfs:label" : "commentTime",
          "schema:domainIncludes" : "schema:UserComments",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:creator" : {
@@ -30,12 +30,12 @@
          "rdfs:comment" : "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.",
          "rdfs:label" : "creator",
          "schema:domainIncludes" : [
-            "schema:UserComments",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:UserComments"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:discusses" : {

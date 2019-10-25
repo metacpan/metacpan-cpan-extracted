@@ -20,8 +20,8 @@
          "rdfs:label" : "actionPlatform",
          "schema:domainIncludes" : "schema:EntryPoint",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:application" : {

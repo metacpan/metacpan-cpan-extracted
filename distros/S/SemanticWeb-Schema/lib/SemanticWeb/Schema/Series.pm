@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,14 +34,14 @@ SemanticWeb::Schema::Series - A Series in schema
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A Series in schema.org is a group of related items, typically but not
+=for html <p>A Series in schema.org is a group of related items, typically but not
 necessarily of the same kind. See also <a class="localLink"
 href="http://schema.org/CreativeWorkSeries">CreativeWorkSeries</a>, <a
-class="localLink" href="http://schema.org/EventSeries">EventSeries</a>.
+class="localLink" href="http://schema.org/EventSeries">EventSeries</a>.<p>
 
 =head1 SEE ALSO
 

@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::ContactPoint;
 
-# ABSTRACT: A contact point&#x2014;for example
+# ABSTRACT: A contact point—for example
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has area_served => (
@@ -110,11 +110,11 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ContactPoint - A contact point&#x2014;for example
+SemanticWeb::Schema::ContactPoint - A contact point—for example
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -146,10 +146,10 @@ A area_served should be one of the following types:
 
 C<availableLanguage>
 
-=for html A language someone may use with or at the item, service or place. Please
+=for html <p>A language someone may use with or at the item, service or place. Please
 use one of the language codes from the <a
 href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>. See also
-<a class="localLink" href="http://schema.org/inLanguage">inLanguage</a>
+<a class="localLink" href="http://schema.org/inLanguage">inLanguage</a><p>
 
 A available_language should be one of the following types:
 

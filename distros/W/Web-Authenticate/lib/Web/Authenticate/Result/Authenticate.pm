@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Result::Authenticate;
-$Web::Authenticate::Result::Authenticate::VERSION = '0.012';
+$Web::Authenticate::Result::Authenticate::VERSION = '0.013';
 use Mouse;
 #ABSTRACT: The result of calling Web::Authenticate::authenticate.
 
@@ -62,7 +62,7 @@ Web::Authenticate::Result::Authenticate - The result of calling Web::Authenticat
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

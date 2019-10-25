@@ -11,8 +11,11 @@ LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/chaining.t
+t/define.t
 t/inheritance.t
 t/lib/ExampleModule.pm
+t/mock_strict.t
 t/mockmodule.t
 t/pod.t
 t/pod_coverage.t

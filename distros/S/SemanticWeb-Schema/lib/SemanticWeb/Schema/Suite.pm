@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has bed => (
@@ -58,17 +58,17 @@ SemanticWeb::Schema::Suite - A suite in a hotel or other public accommodation
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A suite in a hotel or other public accommodation, denotes a class of luxury
-accommodations, the key feature of which is multiple rooms (Source:
+=for html <p>A suite in a hotel or other public accommodation, denotes a class of
+luxury accommodations, the key feature of which is multiple rooms (Source:
 Wikipedia, the free encyclopedia, see <a
 href="http://en.wikipedia.org/wiki/Suite_(hotel)">http://en.wikipedia.org/w
 iki/Suite_(hotel)</a>). <br /><br /> See also the <a
 href="/docs/hotels.html">dedicated document on the use of schema.org for
-marking up hotels and other forms of accommodations</a>.
+marking up hotels and other forms of accommodations</a>.<p>
 
 =head1 ATTRIBUTES
 

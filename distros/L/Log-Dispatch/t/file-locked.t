@@ -26,7 +26,7 @@ done_testing();
 sub _run_children {
     my $close_after_write = shift;
 
-    my $dir = tempdir( CLEANUP => 1 );
+    my $dir  = tempdir( CLEANUP => 1 );
     my $file = File::Spec->catfile( $dir, 'lock-test.log' );
 
     my $logger = _dispatch_for_file( $close_after_write, $file );

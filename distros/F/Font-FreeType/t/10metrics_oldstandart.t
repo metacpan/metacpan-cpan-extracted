@@ -57,9 +57,9 @@ is($font->units_per_em, 1000, '$face->units_per_em() is right');
 my $underline_position = $font->underline_position;
 ok $underline_position <= -178 || $underline_position >= -198, 'underline position';
 is($font->underline_thickness, 40, 'underline thickness');
-is($font->height, 1482, 'text height');
-is($font->ascender, 952, 'ascender');
-is($font->descender, -294, 'descender');
+like($font->height, qr/(1482)|(1236)/, 'text height, different free-type returns different versions');
+like($font->ascender, qr/(952)|(762)/, 'ascender, different free-type returns different versions');
+like($font->descender, qr/(-238)|(-294)/, 'descender, different free-type returns different versions');
 
 subtest "charmaps" => sub {
     subtest "default charmap" => sub {

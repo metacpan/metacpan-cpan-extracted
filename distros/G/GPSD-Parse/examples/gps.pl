@@ -5,11 +5,16 @@ use feature 'say';
 use Data::Dumper;
 use GPSD::Parse;
 
-my $want = $ARGV[0];
-
 my $gps = GPSD::Parse->new;
 
-my $raw = $gps->poll(return => $want);
+my $raw;
+
+while (1){
+    $raw = $gps->poll;
+    print "$raw->{tpv}\n";
+    last if $raw->{tpv};
+    sleep 1;
+}
 
 # print Dumper $gps->satellites;
 # print Dumper $gps->sky;

@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Test::Mock::Cmd: '0.6'
+  Test::Mock::Cmd: '0.7'
   Test::More: '1.001002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,18 +27,19 @@ no_index:
 provides:
   Git::Open:
     file: lib/Git/Open.pm
-    version: v0.1.11
+    version: v0.1.12
   Git::Open::Util:
     file: lib/Git/Open/Util.pm
-    version: v0.1.11
+    version: v0.1.12
 requires:
   Moose: '0'
   MooseX::Getopt::Usage: '0'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/rabbiveesh/git-open/issues
   homepage: https://github.com/rabbiveesh/git-open
   repository: https://github.com/rabbiveesh/git-open.git
-version: 0.1.11
+version: 0.1.12
 x_Dist_Zilla:
   perl:
     version: '5.022001'
@@ -169,7 +170,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: 0.1.11
+          tag: 0.1.12
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -330,6 +331,10 @@ x_Dist_Zilla:
       name: PodWeaver
       version: '4.008'
     -
+      class: Dist::Zilla::Plugin::MinimumPerlFast
+      name: MinimumPerlFast
+      version: '0.003'
+    -
       class: Dist::Zilla::Plugin::Git::Check
       config:
         Dist::Zilla::Plugin::Git::Check:
@@ -371,7 +376,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-0.1.11
+          tag: release-0.1.12
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

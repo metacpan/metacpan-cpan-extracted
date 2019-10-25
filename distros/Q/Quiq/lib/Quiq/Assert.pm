@@ -1,11 +1,11 @@
 package Quiq::Assert;
-use base qw/Quiq::Object/;
+use base qw/Quiq::Hash/;
 
 use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Math;
 
@@ -19,7 +19,7 @@ Quiq::Assert - Zusicherungen
 
 =head1 BASE CLASS
 
-L<Quiq::Object>
+L<Quiq::Hash>
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ Methode zurück, im Fehlerfall wirft sie eine Exception.
 
 Test von der Kommandozeile aus:
 
-  $ perl -MQuiq::Assert -E 'Quiq::Assert->isNotNull("",-name=>"x")'
+  $ perl -MQuiq::Assert -E 'Quiq::Assert->new->isNotNull("",-name=>"x")'
   Exception:
       ASSERT-00002: Value is null
   Name:
@@ -64,7 +64,17 @@ Test von der Kommandozeile aus:
 
 =head4 Synopsis
 
-  $a = $class->new;
+  $a = $class->new(@att);
+
+=head4 Arguments
+
+=over 4
+
+=item @att
+
+Attribut/Wert-Paare.
+
+=back
 
 =head4 Returns
 
@@ -83,8 +93,15 @@ Aufrufschreibweise zu ermöglichen.
 
 sub new {
     my $class = shift;
-    state $dummy;
-    return bless \$dummy,$class;
+    # @_: @att
+
+    my $self = $class->SUPER::new(
+        nameSection => 'Name',
+        stacktrace => 1,
+    );
+    $self->set(@_);
+
+    return $self;
 }
 
 # -----------------------------------------------------------------------------
@@ -92,13 +109,15 @@ sub new {
 =head2 Tests
 
 Die folgenden Testmethoden können sowohl als Klassen- als auch als
-Objektmethode aufgerufen werden.
+Objektmethoden aufgerufen werden. Im Void-Kontext gerufen, werfen sie
+eine Exception, wenn die Bedingung verletzt ist, andernfalls 0 oder 1.
 
 =head3 isEnumValue() - Prüfe auf Enthaltensein in Enum
 
 =head4 Synopsis
 
-  $bool = $this->isEnumValue($val,\@values,@opt);
+  $this->isEnumValue($val,\@values,@opt);         # Exception
+  $bool = $this->isEnumValue($val,\@values,@opt); # Rückgabewert
 
 =head4 Arguments
 
@@ -124,61 +143,53 @@ Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
 ausgegeben wird. Dies kann der Name der geprüften Variable,
 des geprüften Parameters o.ä. sein.
 
-=item -sloppy => $bool
-
-Wirf keine Exception, sondern zeige über den Returnwert an, ob die
-Bedingung erfüllt ist. Liefere 1, wenn die Bedingung erfüllt ist,
-andernfalls 0. Ist der Wert leer, liefere C<undef>.
-
 =back
 
 =head4 Returns
 
-Boolean oder C<undef>
+Boolean
 
 =head4 Description
 
 Prüfe den Wert $val daraufhin, dass er in Liste @values enthalten ist.
-Ist dies nicht der Fall, wirf eine Exception.  Ein leerer Wert wird
-übergangen.
+Ist dies nicht der Fall, wirf eine Exception, wenn die Methode
+im Void-Kontext gerufen wurde, andernfalls 0. Ein leerer Wert verletzt
+die Bedingung nicht.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isEnumValue {
-    my ($this,$val,$valueA) = splice @_,0,3;
+    my $self = ref $_[0]? shift: shift->new;
+    my $val = shift;
+    my $valueA = shift;
     # @_: @opt
 
     # Optionen
 
     my $name = undef;
-    my $sloppy = 0;
 
-    $this->parameters(\@_,
+    $self->parameters(\@_,
         -name => \$name,
-        -sloppy => \$sloppy,
     );
 
     # Prüfung
 
-    if (!defined($val) || $val eq '') {
-        return;
+    if (!defined($val) || $val eq '' || grep {$val eq $_} @$valueA) {
+        return 1;
+    }
+    elsif (defined wantarray) {
+        return 0;
     }
 
-    if (!grep {$val eq $_} @$valueA) {
-        if ($sloppy) {
-            return 0;
-        }
-        $this->throw(
-            'ASSERT-00001: Value not allowed',
-            defined $name? (Name => $name): (),
-            Value => $val,
-            Allowed => join(', ',map {"'$_'"} @$valueA),
-        );
-    }
-
-    return 1;
+    $self->throw(
+        'ASSERT-00001: Unexpected value',
+        defined $name? ($self->{'nameSection'} => $name): (),
+        Value => "'$val'",
+        Allowed => join(', ',map {"'$_'"} @$valueA),
+        -stacktrace => $self->{'stacktrace'},
+    );
 }
 
 # -----------------------------------------------------------------------------
@@ -187,7 +198,8 @@ sub isEnumValue {
 
 =head4 Synopsis
 
-  $bool = $this->isNotNull($val,@opt);
+  $this->isNotNull($val,@opt);         # Exception
+  $bool = $this->isNotNull($val,@opt); # Rückgabewert
 
 =head4 Arguments
 
@@ -209,55 +221,49 @@ Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
 ausgegeben wird. Dies kann der Name der geprüften Variable,
 des geprüften Parameters o.ä. sein.
 
-=item -sloppy => $bool
-
-Wirf keine Exception, sondern zeige über den Returnwert an, ob die
-Bedingung erfüllt ist. Liefere 1, wenn die Bedingung erfüllt ist,
-andernfalls 0. Ist der Wert leer, liefere CL<lt>undef>.
-
 =back
 
 =head4 Returns
 
-Boolean oder C<undef>
+Boolean
 
 =head4 Description
 
 Prüfe den Wert $val daraufhin, dass er nichtleer, also weder
-undefiniert noch ein Leerstring ist. Ist er leer, wirf
-eine Exception.
+undefiniert noch ein Leerstring ist. Ist er leer, wirf eine Exception,
+wenn die Methode im Void-Kontext gerufen wurde, andernfalls 0.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isNotNull {
-    my ($this,$val) = splice @_,0,2;
+    my $self = ref $_[0]? shift: shift->new;
+    my $val = shift;
     # @_: @opt
 
     # Optionen
 
     my $name = undef;
-    my $sloppy = 0;
 
-    $this->parameters(\@_,
+    $self->parameters(\@_,
         -name => \$name,
-        -sloppy => \$sloppy,
     );
 
     # Prüfung
 
-    if (!defined($val) || $val eq '') {
-        if ($sloppy) {
-            return 0;
-        }
-        $this->throw(
-            'ASSERT-00002: Value is null',
-            defined $name? (Name => $name): (),
-        );
+    if (defined($val) && $val ne '') {
+        return 1;
+    }
+    elsif (defined wantarray) {
+        return 0;
     }
 
-    return 1;
+    $self->throw(
+        'ASSERT-00002: Value is null',
+        defined $name? ($self->{'nameSection'} => $name): (),
+        -stacktrace => $self->{'stacktrace'},
+    );
 }
 
 # -----------------------------------------------------------------------------
@@ -266,7 +272,8 @@ sub isNotNull {
 
 =head4 Synopsis
 
-  $bool = $this->isNumber($val,@opt);
+  $this->isNumber($val,@opt);         # Exception
+  $bool = $this->isNumber($val,@opt); # Rückgabewert
 
 =head4 Arguments
 
@@ -288,67 +295,58 @@ Name, der bei Verletzung der Bedingung als Teil der Fehlermeldung
 ausgegeben wird. Dies kann der Name der geprüften Variable,
 des geprüften Parameters o.ä. sein.
 
-=item -sloppy => $bool
-
-Wirf keine Exception, sondern zeige über den Returnwert an, ob die
-Bedingung erfüllt ist. Liefere 1, wenn die Bedingung erfüllt ist,
-andernfalls 0. Ist der Wert leer, liefere CL<lt>undef>.
-
 =back
 
 =head4 Returns
 
-Boolean oder C<undef>
+Boolean
 
 =head4 Description
 
-Prüfe den Wert $val daraufhin, dass er eine dezimale Zahl
-darstellt. Ist dies nicht der Fall, wirf eine Exception.  Ein
-leerer Wert wird übergangen.
+Prüfe den Wert $val daraufhin, dass er eine dezimale Zahl darstellt.
+Ist dies nicht der Fall, wirf eine Exception, wenn die Methode im
+Void-Kontext gerufen wurde, andernfalls 0. Ein leerer Wert verletzt
+die Bedingung nicht.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isNumber {
-    my ($this,$val) = splice @_,0,2;
+    my $self = ref $_[0]? shift: shift->new;
+    my $val = shift;
     # @_: @opt
 
     # Optionen
 
     my $name = undef;
-    my $sloppy = 0;
 
-    $this->parameters(\@_,
+    $self->parameters(\@_,
         -name => \$name,
-        -sloppy => \$sloppy,
     );
 
     # Prüfung
 
-    if (!defined($val) || $val eq '') {
-        return;
+    if (!defined($val) || $val eq '' || Quiq::Math->isNumber($val)) {
+        return 1;
+    }
+    elsif (defined wantarray) {
+        return 0;
     }
 
-    if (!Quiq::Math->isNumber($val)) {
-        if ($sloppy) {
-            return 0;
-        }
-        $this->throw(
-            'ASSERT-00001: Not a number',
-            defined $name? (Name => $name): (),
-            Value => $val,
-        );
-    }
-
-    return 1;
+    $self->throw(
+        'ASSERT-00001: Not a number',
+        defined $name? ($self->{'nameSection'} => $name): (),
+        Value => "'$val'",
+        -stacktrace => $self->{'stacktrace'},
+    );
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

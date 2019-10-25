@@ -1,5 +1,15 @@
 Revision history for Debug-Filter-PrintExpr
 
+0.03	Fri Oct 18 19:18:51 2019 +0200
+		[fix]
+		set perl minversion
+
+		[doc]
+		fixed POD
+
+		[doc]
+		fixed README.md
+
 0.02	Mon Oct 14 14:18:13 2019 +0200
 
 		[meta]

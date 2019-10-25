@@ -90,4 +90,96 @@ like($@, qr/Attribute aliases not available for \'Fail\'/, '... got the error we
        
 }
 
+# test the MariaDB mock db
+{
+    my $dbh;
+    eval {
+        $dbh = DBI->connect('dbi:Mock:mariadb', '', '');
+    };
+    ok(!$@, '... got our mock DB successfully');
+    isa_ok($dbh, 'DBI::db');
+
+    is($dbh->{mock_database_name}, 'mariadb', '... and its the name we expected');        
+
+    ok(defined($dbh->{mock_attribute_aliases}), '... got something here');
+    is(ref($dbh->{mock_attribute_aliases}), 'HASH', '... and its the hash we expected');   
+    
+    my $sth = $dbh->prepare('INSERT INTO Foo (bar) VALUES(NULL)');
+    isa_ok($sth, 'DBI::st');
+    
+    $sth->execute();    
+    
+    is($dbh->{mariadb_insertid}, 1, '... our alias works');
+       
+}
+
+# and test it with the lowercasing
+{
+    my $dbh;
+    eval {
+        $dbh = DBI->connect('dbi:Mock:MariaDB', '', '');
+    };
+    ok(!$@, '... got our mock DB successfully');
+    isa_ok($dbh, 'DBI::db');
+
+    is($dbh->{mock_database_name}, 'MariaDB', '... and its the name we expected');        
+
+    ok(defined($dbh->{mock_attribute_aliases}), '... got something here');
+    is(ref($dbh->{mock_attribute_aliases}), 'HASH', '... and its the hash we expected');   
+    
+    my $sth = $dbh->prepare('INSERT INTO Foo (bar) VALUES(NULL)');
+    isa_ok($sth, 'DBI::st');
+    
+    $sth->execute();    
+    
+    is($dbh->{mariadb_insertid}, 1, '... our alias works');
+
+}
+
+# test the MariaDB mock db
+{
+    my $dbh;
+    eval {
+        $dbh = DBI->connect('dbi:Mock:host=localhost;port=3306;database=mariadb', '', '');
+    };
+    ok(!$@, '... got our mock DB successfully');
+    isa_ok($dbh, 'DBI::db');
+
+    is($dbh->{mock_database_name}, 'mariadb', '... and its the name we expected');        
+
+    ok(defined($dbh->{mock_attribute_aliases}), '... got something here');
+    is(ref($dbh->{mock_attribute_aliases}), 'HASH', '... and its the hash we expected');   
+    
+    my $sth = $dbh->prepare('INSERT INTO Foo (bar) VALUES(NULL)');
+    isa_ok($sth, 'DBI::st');
+    
+    $sth->execute();    
+    
+    is($dbh->{mariadb_insertid}, 1, '... our alias works');
+       
+}
+
+# and test it with the lowercasing
+{
+    my $dbh;
+    eval {
+        $dbh = DBI->connect('dbi:Mock:host=;database=MariaDB;port=', '', '');
+    };
+    ok(!$@, '... got our mock DB successfully');
+    isa_ok($dbh, 'DBI::db');
+
+    is($dbh->{mock_database_name}, 'MariaDB', '... and its the name we expected');        
+
+    ok(defined($dbh->{mock_attribute_aliases}), '... got something here');
+    is(ref($dbh->{mock_attribute_aliases}), 'HASH', '... and its the hash we expected');   
+    
+    my $sth = $dbh->prepare('INSERT INTO Foo (bar) VALUES(NULL)');
+    isa_ok($sth, 'DBI::st');
+    
+    $sth->execute();    
+    
+    is($dbh->{mariadb_insertid}, 1, '... our alias works');
+
+}
+
 done_testing();

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::Campground - A camping site
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A camping site, campsite, or <a class="localLink"
+=for html <p>A camping site, campsite, or <a class="localLink"
 href="http://schema.org/Campground">Campground</a> is a place used for
 overnight stay in the outdoors, typically containing individual <a
 class="localLink" href="http://schema.org/CampingPitch">CampingPitch</a>
@@ -52,7 +52,7 @@ campground may contain many campsites (Source: Wikipedia see <a
 href="https://en.wikipedia.org/wiki/Campsite">https://en.wikipedia.org/wiki
 /Campsite</a>).<br/><br/> See also the dedicated <a
 href="/docs/hotels.html">document on the use of schema.org for marking up
-hotels and other forms of accommodations</a>.
+hotels and other forms of accommodations</a>.<p>
 
 =head1 SEE ALSO
 

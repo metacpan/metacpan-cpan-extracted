@@ -26,7 +26,7 @@ $score->write_score("$0.mid");
 sub beat {
     my $d = MIDI::Drummer::Tiny->new( bpm => $bpm, score => $score );
 
-    for my $n ( 0 .. $size * $max * 2 - 1 ) {
+    for my $n ( 1 .. $size * $max * 2 ) {
         $d->note( $d->quarter, $d->closed_hh );
     }
 }
@@ -34,18 +34,13 @@ sub beat {
 sub melody {
     my $mdp = Music::Duration::Partition->new(
         size => $size,
-#        pool => [qw/ qn en ddsn dsn ten sn tsn /],
+#        pool => [qw/ twn thn tqn ten tsn /],
         pool => [qw/ qn en sn /],
     );
 
     my $motif = $mdp->motif;
 
-    my @scale = map { $_ . 5 } get_scale_notes( 'A', 'pminor' );
-    # Transform to MIDI accidentals
-    for ( @scale ) {
-        s/#/s/;
-        s/b/f/;
-    }
+    my @scale = get_scale_MIDI( 'A', 3, 'pminor' );
 
     for my $i ( 1 .. $max ) {
         my @notes = map { $scale[ int rand @scale ] } 0 .. @$motif - 1;

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has address => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::GeoShape - The geographic shape of a place
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -127,9 +127,9 @@ A address should be one of the following types:
 
 C<addressCountry>
 
-=for html The country. For example, USA. You can also provide the two-letter <a
+=for html <p>The country. For example, USA. You can also provide the two-letter <a
 href="http://en.wikipedia.org/wiki/ISO_3166-1">ISO 3166-1 alpha-2 country
-code</a>.
+code</a>.<p>
 
 A address_country should be one of the following types:
 
@@ -171,11 +171,11 @@ A circle should be one of the following types:
 
 =head2 C<elevation>
 
-=for html The elevation of a location (<a
+=for html <p>The elevation of a location (<a
 href="https://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a>).
 Values may be of the form 'NUMBER UNIT<em>OF</em>MEASUREMENT' (e.g., '1,000
 m', '3,200 ft') while numbers alone should be assumed to be a value in
-meters.
+meters.<p>
 
 A elevation should be one of the following types:
 

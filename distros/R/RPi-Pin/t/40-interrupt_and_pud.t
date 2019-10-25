@@ -11,6 +11,10 @@ my $mod = 'RPi::Pin';
 my $run;
 
 BEGIN {
+    if (! $ENV{RPI_SUBMODULE_TESTING}){
+        plan(skip_all => "RPI_SUBMODULE_TESTING environment variable not set");
+    }
+
     if ($> == 0){
         $ENV{PI_BOARD} = 1;
         $run = 1;

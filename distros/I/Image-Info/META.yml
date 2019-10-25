@@ -5,15 +5,15 @@ author:
   - 'Gisle Aas <gisle@ActiveState.com'
   - Tels
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Image-Info
 no_index:
   directory:
@@ -23,13 +23,13 @@ no_index:
     - img
     - xt
 recommends:
-  Bundle::Image::Info::PNG: 0
-  Bundle::Image::Info::SVG: 0
-  Bundle::Image::Info::XBM: 0
-  Bundle::Image::Info::XPM: 0
+  Bundle::Image::Info::PNG: '0'
+  Bundle::Image::Info::SVG: '0'
+  Bundle::Image::Info::XBM: '0'
+  Bundle::Image::Info::XPM: '0'
 requires:
-  IO::Scalar: 0
-  perl: 5.006
+  IO::Scalar: '0'
+  perl: '5.006'
 resources:
   repository: git://github.com/eserte/image-info.git
-version: 1.41
+version: '1.42'

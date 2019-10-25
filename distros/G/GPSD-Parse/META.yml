@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/gpsd-parse/issues
   repository: https://github.com/stevieb9/gpsd-parse.git
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

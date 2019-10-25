@@ -1,0 +1,12 @@
+QQ::exmail v0.002
+
+腾讯企业邮箱提供了API管理方式，可以参见页面https://exmail.qq.com/qy_mng_logic/doc#10028
+
+获取ACCESS_TOKEN
+QQ::exmail::gettoken(corpid,corpsecret);
+获取登录企业邮的url
+QQ::exmail::get_login_url(access_token);
+批量检查帐号
+QQ::exmail::user::batchcheck(access_token,param);
+查询邮件
+QQ::exmail::log::mail(access_token,param);

@@ -87,7 +87,7 @@ WriteMakefile(
         'Inline::C'      => '0.53',
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-    clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *log'},
+    clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *log lib/Graphics/Framebuffer.pm'},
 );
 print colored(['cyan on_cyan'],$line),"\n";
 print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:\n};

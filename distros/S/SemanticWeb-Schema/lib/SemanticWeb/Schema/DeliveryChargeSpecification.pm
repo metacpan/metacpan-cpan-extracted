@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has applies_to_delivery_method => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DeliveryChargeSpecification - The price for the delivery of
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -113,10 +113,11 @@ A area_served should be one of the following types:
 
 C<eligibleRegion>
 
-=for html The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the
-GeoShape for the geo-political region(s) for which the offer or delivery
-charge specification is valid.<br/><br/> See also <a class="localLink"
-href="http://schema.org/ineligibleRegion">ineligibleRegion</a>.
+=for html <p>The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or
+the GeoShape for the geo-political region(s) for which the offer or
+delivery charge specification is valid.<br/><br/> See also <a
+class="localLink"
+href="http://schema.org/ineligibleRegion">ineligibleRegion</a>.<p>
 
 A eligible_region should be one of the following types:
 
@@ -134,11 +135,11 @@ A eligible_region should be one of the following types:
 
 C<ineligibleRegion>
 
-=for html The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the
-GeoShape for the geo-political region(s) for which the offer or delivery
-charge specification is not valid, e.g. a region where the transaction is
-not allowed.<br/><br/> See also <a class="localLink"
-href="http://schema.org/eligibleRegion">eligibleRegion</a>.
+=for html <p>The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or
+the GeoShape for the geo-political region(s) for which the offer or
+delivery charge specification is not valid, e.g. a region where the
+transaction is not allowed.<br/><br/> See also <a class="localLink"
+href="http://schema.org/eligibleRegion">eligibleRegion</a>.<p>
 
 A ineligible_region should be one of the following types:
 

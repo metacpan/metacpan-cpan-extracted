@@ -1,10 +1,142 @@
 ==================================================
-Changes from 2018-07-11 00:00:00 +0000 to present.
+Changes from 2018-10-24 00:00:00 +0000 to present.
 ==================================================
 
--------------------------------------------
-version 0.0.12 at 2019-07-11 21:58:53 +0000
--------------------------------------------
+--------------------------------------------
+version v0.0.14 at 2019-10-24 18:20:08 +0000
+--------------------------------------------
+
+  Change: 79bd5482177beacd1e2eb30c85557a969856b6a2
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 14:19:50 +0000
+
+    Update README 
+
+  Change: 3cf95cc386358ef32dc7aca34bd754cde3d08372
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 14:18:29 +0000
+
+    Merge pull request #13 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
+    fix-version-detection to master
+
+    * commit '0f1bae0bbc861703e3d87258645147db20b5e828':
+
+    Document version specs
+
+    Adjust Changelog detection for our actual versions
+
+    Fix NextVersion for v0.0.0.0
+
+    Make sure we populate # VERSION 
+
+  Change: 0f1bae0bbc861703e3d87258645147db20b5e828
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 12:43:00 +0000
+
+    Document version specs 
+
+  Change: 53ce62ec28ca39cb8d6b0020f7eb7912b7f6045e
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 12:34:13 +0000
+
+    Adjust Changelog detection for our actual versions
+
+    This should mean things going forward are right, but we still end up
+    with decent Changelogs. 
+
+  Change: e5fe8db606afe81efc9174e6dd59135330781e28
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-24 12:33:57 +0000
+
+    Fix NextVersion for v0.0.0.0
+
+    Because we used to tag with four digits for some reason. 
+
+  Change: b979dd308b849bb2748ce7cc2f0c49fb999e0848
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 19:50:12 +0000
+
+    Make sure we populate # VERSION
+
+    Because we should be and need to. 
+
+--------------------------------------------
+version v0.0.13 at 2019-10-23 20:39:40 +0000
+--------------------------------------------
+
+  Change: a0d820f60a28183104f4c3dad6a42fa56ff07706
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 16:39:40 +0000
+
+    Update README 
+
+  Change: bb6b1292b4e17160ada800b14ed56a7f8f56eb27
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 16:27:21 +0000
+
+    Merge pull request #11 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from set-eumm_version
+    to master
+
+    * commit 'dd8e1efe582da6a534e6624866e1c3a8ac283cf0':
+
+    Require new enough MakeMaker for "version range"
+
+    Fix $source_git directory 
+
+  Change: dd8e1efe582da6a534e6624866e1c3a8ac283cf0
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 14:32:12 +0000
+
+    Require new enough MakeMaker for "version range"
+
+    Because otherwise it just complains and doesn't work. 
+
+  Change: 67f9c66bc865f4aca612e5c8afbd759abe2032b1
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-23 13:00:40 +0000
+
+    Fix $source_git directory
+
+    It was "." which was all sorts of problematic as it was committing to
+    our local repo instead of the test temp repo. For some reason that
+    caused it to find the wrong "version" in the package.
+
+    I guess a new version of the Git Plugins changed something? not sure. 
+
+  Change: 4c053b6ef5bd8377f9022c5c8d78f896c5bdd716
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-25 11:42:14 +0000
+
+    Merge pull request #9 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
+    use-vstring-versions to master
+
+    * commit 'c1e68133a3d742296059a597846d443edef61b43':
+
+    Correctly use semantic versioning
+
+    Whitespace improvements 
+
+  Change: c1e68133a3d742296059a597846d443edef61b43
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-24 11:44:55 +0000
+
+    Correctly use semantic versioning
+
+    As described by DAGOLDEN
+    https://xdg.me/blog/version-numbers-should-be-boring/ 
+
+  Change: 5a28f67fd0295639b75fd806c5e8482cc5b5f6e8
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-07-24 11:43:16 +0000
+
+    Whitespace improvements 
+
+--------------------------------------------
+version v0.0.12 at 2019-07-11 21:47:49 +0000
+--------------------------------------------
 
   Change: 87e1b2f819bbbe8e09fe03ec8ff1c1c7abb7f8ef
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -46,9 +178,9 @@ version 0.0.12 at 2019-07-11 21:58:53 +0000
 
     Diag the git version to make debugging easier 
 
--------------------------------------------
-version 0.0.11 at 2019-06-28 16:42:30 +0000
--------------------------------------------
+--------------------------------------------
+version v0.0.11 at 2019-06-28 16:42:30 +0000
+--------------------------------------------
 
   Change: 4f804dd70de177ca4f28ef890bfe2842e6621834
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -110,9 +242,9 @@ version 0.0.11 at 2019-06-28 16:42:30 +0000
 
     https://cpants.cpanauthors.org/kwalitee/has_meta_yml 
 
--------------------------------------------
-version 0.0.10 at 2019-06-11 21:36:34 +0000
--------------------------------------------
+--------------------------------------------
+version v0.0.10 at 2019-06-11 21:36:34 +0000
+--------------------------------------------
 
   Change: f79ab3b70dcd7a7a6a117c7c2643f8fcdab69058
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -132,9 +264,9 @@ version 0.0.10 at 2019-06-11 21:36:34 +0000
 
     Fix Makefile examples in documentation 
 
-------------------------------------------
-version 0.0.9 at 2019-06-10 18:48:05 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.9 at 2019-06-10 18:48:05 +0000
+-------------------------------------------
 
   Change: dc315bdb2deba1f804087c8ca200fea982266dca
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -167,9 +299,9 @@ version 0.0.9 at 2019-06-10 18:48:05 +0000
     Unfortunately this *won't* update automatically so that's super
     annoying, but not too much stuff is using it yet. 
 
-------------------------------------------
-version 0.0.8 at 2019-06-07 19:07:07 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.8 at 2019-06-07 19:07:07 +0000
+-------------------------------------------
 
   Change: af88b64684d83eb92e16b09f2b57adf132f9c599
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -223,9 +355,9 @@ version 0.0.8 at 2019-06-07 19:07:07 +0000
 
     This fixes a bug with connecting. 
 
-------------------------------------------
-version 0.0.7 at 2019-05-31 16:18:28 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.7 at 2019-05-31 16:18:28 +0000
+-------------------------------------------
 
   Change: 8a2c6f6a6ab37d4c86c053cdc817f562f58fc1a9
   Author: Mark Flickinger <mark.flickinger@grantstreet.com>
@@ -259,9 +391,9 @@ version 0.0.7 at 2019-05-31 16:18:28 +0000
 
     Add OurPkgVersion plugin 
 
-------------------------------------------
-version 0.0.6 at 2019-05-02 16:58:04 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.6 at 2019-05-02 16:58:04 +0000
+-------------------------------------------
 
   Change: a65e53ce67e28e7dec0b426eb4f6fe78787d11bd
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
@@ -300,9 +432,9 @@ version 0.0.6 at 2019-05-02 16:58:04 +0000
 
     Pass configuration to StaticInstall Plugin 
 
-------------------------------------------
-version 0.0.5 at 2019-04-24 16:36:33 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.5 at 2019-04-24 16:36:33 +0000
+-------------------------------------------
 
   Change: f1627b95bfc9178e1f65e73c1ecb86469d85882b
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
@@ -393,9 +525,9 @@ version 0.0.5 at 2019-04-24 16:36:33 +0000
 
     Tests for Plugin::Author::GSG 
 
-------------------------------------------
-version 0.0.4 at 2019-03-29 18:45:33 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.4 at 2019-03-29 18:45:33 +0000
+-------------------------------------------
 
   Change: eec8519840799f3e40f218c2e7e25ff708eb3979
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -411,9 +543,9 @@ version 0.0.4 at 2019-03-29 18:45:33 +0000
 
     Improve docs for cutting a new release 
 
-------------------------------------------
-version 0.0.3 at 2019-03-27 02:20:30 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.3 at 2019-03-27 02:20:30 +0000
+-------------------------------------------
 
   Change: 4f9c7a5d6f6f36fec7ffbac64c9e9583e4099dfc
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -446,9 +578,9 @@ version 0.0.3 at 2019-03-27 02:20:30 +0000
     SHould probably fix it and upstream what needs to happen, but this
     gets me past a block. 
 
-------------------------------------------
-version 0.0.1 at 2019-03-27 01:48:40 +0000
-------------------------------------------
+-------------------------------------------
+version v0.0.1 at 2019-03-27 01:48:40 +0000
+-------------------------------------------
 
   Change: 0064ab00c6af0ed812eb7cb1cc65213f84f5b806
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>

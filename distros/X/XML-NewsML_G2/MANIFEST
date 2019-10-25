@@ -3,12 +3,18 @@ Changes
 lib/XML/NewsML_G2.pm
 lib/XML/NewsML_G2/AnyItem.pm
 lib/XML/NewsML_G2/Audio.pm
+lib/XML/NewsML_G2/Binary.pm
 lib/XML/NewsML_G2/Copyright_Holder.pm
 lib/XML/NewsML_G2/Desk.pm
+lib/XML/NewsML_G2/Destination.pm
+lib/XML/NewsML_G2/ElectionDistrict.pm
+lib/XML/NewsML_G2/ElectionProvince.pm
 lib/XML/NewsML_G2/Genre.pm
 lib/XML/NewsML_G2/Graphics.pm
 lib/XML/NewsML_G2/Group.pm
 lib/XML/NewsML_G2/Icon.pm
+lib/XML/NewsML_G2/Inline_CData.pm
+lib/XML/NewsML_G2/Inline_Data.pm
 lib/XML/NewsML_G2/Link.pm
 lib/XML/NewsML_G2/Location.pm
 lib/XML/NewsML_G2/Media_Topic.pm
@@ -24,6 +30,7 @@ lib/XML/NewsML_G2/Package_Item.pm
 lib/XML/NewsML_G2/Picture.pm
 lib/XML/NewsML_G2/Product.pm
 lib/XML/NewsML_G2/Provider.pm
+lib/XML/NewsML_G2/Remote_Info.pm
 lib/XML/NewsML_G2/Role/HasQCode.pm
 lib/XML/NewsML_G2/Role/Remote.pm
 lib/XML/NewsML_G2/Role/RemoteAudible.pm
@@ -51,7 +58,6 @@ lib/XML/NewsML_G2/Writer/News_Item.pm
 lib/XML/NewsML_G2/Writer/News_Message.pm
 lib/XML/NewsML_G2/Writer/Package_Item.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -74,6 +80,7 @@ t/09-News_Item_Video.t
 t/10-News_Message.t
 t/11-press-release.t
 t/author-test-eol.t
+t/deprecations.t
 t/NewsML_G2_Test_Helpers.pm
 t/perlcritic.t
 t/perlcriticrc
@@ -87,11 +94,9 @@ t/release-pod-syntax.t
 t/release-portability.t
 t/release-synopsis.t
 t/release-unused-vars.t
-t/signature.t
-t/xsds/NewsML-G2_2_9-spec-All-Power.xsd
 t/xsds/NewsML-G2_2_12-spec-All-Power.xsd
 t/xsds/NewsML-G2_2_15-spec-All-Power.xsd
 t/xsds/NewsML-G2_2_18-spec-All-Power.xsd
+t/xsds/NewsML-G2_2_9-spec-All-Power.xsd
 t/xsds/xml.xsd
 TODO
-SIGNATURE    Added here by Module::Build

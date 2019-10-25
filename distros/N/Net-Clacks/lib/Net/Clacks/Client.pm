@@ -7,12 +7,13 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 7;
+our $VERSION = 8;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
 
 use IO::Socket::IP;
+#use IO::Socket::UNIX;
 use Time::HiRes qw[sleep usleep];
 use Sys::Hostname;
 use IO::Select;
@@ -20,11 +21,39 @@ use IO::Socket::SSL;
 use MIME::Base64;
 
 sub new {
-    my ($class, $server, $port, , $username, $password, $clientname, $iscaching) = @_;
+    my ($class, $server, $port, $username, $password, $clientname, $iscaching) = @_;
     my $self = bless {}, $class;
 
     $self->{server} = $server;
     $self->{port} = $port;
+
+    $self->init($username, $password, $clientname, $iscaching);
+
+    return $self;
+}
+
+sub newSocket {
+    my ($class, $socketpath, $username, $password, $clientname, $iscaching) = @_;
+    my $self = bless {}, $class;
+
+    my $udsloaded = 0;
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        require IO::Socket::UNIX;
+        $udsloaded = 1;
+    };
+    if(!$udsloaded) {
+        croak("Specified a unix domain socket, but i couldn't load IO::Socket::UNIX!");
+    }
+
+    $self->{socketpath} = $socketpath;
+
+    $self->init($username, $password, $clientname, $iscaching);
+
+    return $self;
+}
+
+sub init {
+    my ($self, $username, $password, $clientname, $iscaching) = @_;
 
     if(!defined($username) || $username eq '') {
         croak("Username not defined!");
@@ -44,7 +73,8 @@ sub new {
         $iscaching = 0;
     }
     $self->{iscaching} = $iscaching;
-    if($iscaching) {
+
+    if($self->{iscaching}) {
         $self->{cache} = {};
     }
 
@@ -63,7 +93,7 @@ sub new {
 
     $self->reconnect();
 
-    return $self;
+    return;
 }
 
 sub reconnect {
@@ -73,9 +103,7 @@ sub reconnect {
         delete $self->{socket};
     }
 
-    if($self->{firstconnect}) {
-        $self->{firstconnect} = 0;
-    } else {
+    if(!$self->{firstconnect}) {
         # Not our first connection (=real reconnect).
         # wait a short random time before reconnecting. In case all
         # clients got disconnected, we want to avoid having all clients reconnect
@@ -84,11 +112,21 @@ sub reconnect {
         sleep($waittime);
     }
 
-    my $socket = IO::Socket::IP->new(
-        PeerHost => $self->{server},
-        PeerPort => $self->{port},
-        Type => SOCK_STREAM,
-    ) or croak("Failed to connect to Clacks message service: $ERRNO");
+    my $socket;
+    if(defined($self->{server}) && defined($self->{port})) {
+        $socket = IO::Socket::IP->new(
+            PeerHost => $self->{server},
+            PeerPort => $self->{port},
+            Type => SOCK_STREAM,
+        ) or croak("Failed to connect to Clacks TCP message service: $ERRNO");
+    } elsif(defined($self->{socketpath})) {
+        $socket = IO::Socket::UNIX->new(
+            Peer => $self->{socketpath},
+            Type => SOCK_STREAM,
+        ) or croak("Failed to connect to Clacks Unix Domain Socket message service: $ERRNO");
+    } else {
+        croak("Neither TCP nor Unix domain socket specified. Don't know where to connect to.");
+    }
 
     #binmode($socket, ':bytes');
     $socket->blocking(0);
@@ -98,6 +136,8 @@ sub reconnect {
                                ) or croak("Can't use SSL: " . $SSL_ERROR);
 
     $self->{socket} = $socket;
+    $self->{selector} = IO::Select->new($self->{socket});
+    $self->{failcount} = 0;
     $self->{lastping} = time;
     $self->{inbuffer} = '';
     $self->{incharbuffer} = [];
@@ -111,11 +151,18 @@ sub reconnect {
     # "LISTEN" commands.
     # $self->{inlines} = ();
 
+    if($self->{firstconnect}) {
+        $self->{firstconnect} = 0;
+    } else {
+        push @{$self->{inlines}}, "RECONNECTED";
+    }
+
     # Startup "handshake". As everything else, this is asyncronous, both server and
     # client send their respective version strings and then wait to recieve their counterparts
     # Also, this part is REQUIRED, just to make sure we actually speek to CLACKS protocol
     $self->{outbuffer} .= 'CLACKS ' . $self->{clientname} . "\r\n";
     $self->{outbuffer} .= 'OVERHEAD A ' . $self->{authtoken} . "\r\n";
+    $self->doNetwork();
 
     return;
 }
@@ -129,6 +176,11 @@ sub activate_memcached_compat {
 
 sub doNetwork {
     my ($self, $readtimeout) = @_;
+
+    if(!defined($readtimeout)) {
+        # Don't wait
+        $readtimeout = 0;
+    }
 
     if($self->{needreconnect}) {
         $self->reconnect();
@@ -184,24 +236,41 @@ sub doNetwork {
         }
     }
 
-    if(defined($readtimeout) && $readtimeout > 0) {
+    {
         my $select = IO::Select->new($self->{socket});
-        my @temp = $select->can_read($readtimeout);
+        my @temp = $self->{selector}->can_read($readtimeout);
         if(scalar @temp == 0) {
             # Timeout
             return $workCount;
         }
     }
 
+    my $totalread = 0;
     while(1) {
         my $buf;
         sysread($self->{socket}, $buf, 10_000); # Read in at most 10kB at once
         if(defined($buf) && length($buf)) {
+            $totalread += length($buf);
             #print STDERR "+ $buf\n--\n";
             push @{$self->{incharbuffer}}, split//, $buf;
             next;
         }
         last;
+    }
+    
+    # Check if we actually got data after checking with can_read() first
+    if($totalread) {
+        $self->{failcount} = 0;
+    } else {
+        # This should normally not happen, but thanks to SSL, it sometimes does
+        # We ignore single instances of those but disconnect if many happen in a row
+        $self->{failcount}++;
+        sleep(0.05);
+        
+        if($self->{failcount} > 5) {
+            $self->{needreconnect} = 1;
+            return;
+        }
     }
     while(@{$self->{incharbuffer}}) {
         my $char = shift @{$self->{incharbuffer}};
@@ -306,6 +375,11 @@ restartgetnext:
             data => 'timeout',
         );
         $self->{needreconnect} = 1;
+    } elsif($line =~ /^RECONNECTED/) {
+        %data = (
+            type => 'reconnected',
+            data => 'send your LISTEN requests again',
+        );
     } elsif($line =~ /^OVERHEAD\ (.+?)\ (.+)/) {
         # Minimal handling of OVERHEAD flags
         my ($flags, $value) = ($1, $2);
@@ -984,6 +1058,14 @@ with each other
 =head2 new
 
 Create a new instance.
+
+=head2 newSocket
+
+Create a new instance, but use a Unix domain socket instead of tcp/ip
+
+=head2 init
+
+Internal function
 
 =head2 reconnect
 

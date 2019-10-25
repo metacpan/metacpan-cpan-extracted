@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Time::HiRes ();
+use Quiq::Duration;
 use Quiq::Option;
 use Quiq::Path;
 use Quiq::Converter;
@@ -158,11 +159,11 @@ sub DESTROY {
 
     if ($self->{'timeSummary'}) {
         (my $prog = $0) =~ s|.*/||;
-        my $pre = $self->{'msgPrefix'};
-        my $t = Time::HiRes::gettimeofday - $self->{'t0'};
         my $fd = $self->{'logDest'};
-        printf $fd "%sAusführungszeit %s: %d Min. %d Sek.\n",
-            $pre,$prog,$t/60,$t%60;
+        my $pre = $self->{'msgPrefix'};
+        my $t = Time::HiRes::gettimeofday-$self->{'t0'};
+        my $duration = Quiq::Duration->new($t)->asString(2);
+        printf $fd "%s%s: %s\n",$pre,$prog,$duration;
     }
 
     return;
@@ -373,7 +374,7 @@ sub exec {
         my $t1 = Time::HiRes::gettimeofday;
         if ($log && $self->{'time'}) {
             my $fd = $self->{'logDest'};
-            printf "%s%s\n",$self->{'timePrefix'},
+            printf $fd "%s%s\n",$self->{'timePrefix'},
                 Quiq::Converter->epochToDuration($t1-$t0,1,3);
         }
         if ($except) {
@@ -629,7 +630,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

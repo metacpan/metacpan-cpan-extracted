@@ -6,6 +6,11 @@ t/01_minimizer.t
 t/02_minimizer-MT.t
 t/03_kmer.t
 t/04_kmer-MT.t
+t/05_starts.t
 t/11_speedtest.t
+t/21_compressionBenchmark.t
+scripts/sortFastqInterleaved.pl
+scripts/sortFastq.pl
+scripts/indexFasta.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

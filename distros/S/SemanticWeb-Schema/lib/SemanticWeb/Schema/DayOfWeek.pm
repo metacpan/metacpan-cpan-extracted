@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,12 +34,12 @@ SemanticWeb::Schema::DayOfWeek - The day of the week, e
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The day of the week, e.g. used to specify to which day the opening hours of
-an OpeningHoursSpecification refer.<br/><br/> Originally, URLs from <a
+=for html <p>The day of the week, e.g. used to specify to which day the opening hours
+of an OpeningHoursSpecification refer.<br/><br/> Originally, URLs from <a
 href="http://purl.org/goodrelations/v1">GoodRelations</a> were used (for <a
 class="localLink" href="http://schema.org/Monday">Monday</a>, <a
 class="localLink" href="http://schema.org/Tuesday">Tuesday</a>, <a
@@ -50,7 +50,7 @@ class="localLink" href="http://schema.org/Saturday">Saturday</a>, <a
 class="localLink" href="http://schema.org/Sunday">Sunday</a> plus a special
 entry for <a class="localLink"
 href="http://schema.org/PublicHolidays">PublicHolidays</a>); these have now
-been integrated directly into schema.org.
+been integrated directly into schema.org.<p>
 
 =head1 SEE ALSO
 

@@ -6,7 +6,7 @@ use Carp qw(croak);
 use Test::BrewBuild;
 use Test::BrewBuild::Constant qw(:all);
 
-our $VERSION = '2.20';
+our $VERSION = '2.22';
 
 # we let BrewBuild manage the argument list so that the other scripts can
 # simply pass in the args directly and use the API instead of wrapping around

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::CheckOutAction - The act of an agent communicating (service
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of an agent communicating (service provider, social media, etc)
+=for html <p>The act of an agent communicating (service provider, social media, etc)
 their departure of a previously reserved service (e.g. flight check in) or
 place (e.g. hotel).<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/CheckInAction">CheckInAction</a>:
@@ -48,7 +48,7 @@ DepartAction, CheckOutAction implies that the agent is informing/confirming
 the end of a previously reserved service.</li> <li><a class="localLink"
 href="http://schema.org/CancelAction">CancelAction</a>: Unlike
 CancelAction, CheckOutAction implies that the agent is informing/confirming
-the end of a previously reserved service.</li> </ul> 
+the end of a previously reserved service.</li> </ul> <p>
 
 =head1 SEE ALSO
 

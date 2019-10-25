@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has article_body => (
@@ -98,15 +98,15 @@ SemanticWeb::Schema::Article - An article
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An article, such as a news article or piece of investigative report.
+=for html <p>An article, such as a news article or piece of investigative report.
 Newspapers and magazines have articles of many different types and this is
 intended to cover them all.<br/><br/> See also <a
 href="http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.
-html">blog post</a>.
+html">blog post</a>.<p>
 
 =head1 ATTRIBUTES
 
@@ -141,13 +141,13 @@ A article_section should be one of the following types:
 
 =head2 C<backstory>
 
-=for html For an <a class="localLink" href="http://schema.org/Article">Article</a>,
-typically a <a class="localLink"
-href="http://schema.org/NewsArticle">NewsArticle</a>, the backstory
-property provides a textual summary giving a brief explanation of why and
-how an article was created. In a journalistic setting this could include
-information about reporting process, methods, interviews, data sources,
-etc.
+=for html <p>For an <a class="localLink"
+href="http://schema.org/Article">Article</a>, typically a <a
+class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>, the
+backstory property provides a textual summary giving a brief explanation of
+why and how an article was created. In a journalistic setting this could
+include information about reporting process, methods, interviews, data
+sources, etc.<p>
 
 A backstory should be one of the following types:
 
@@ -206,8 +206,8 @@ A pagination should be one of the following types:
 
 =head2 C<speakable>
 
-=for html Indicates sections of a Web page that are particularly 'speakable' in the
-sense of being highlighted as being especially appropriate for
+=for html <p>Indicates sections of a Web page that are particularly 'speakable' in
+the sense of being highlighted as being especially appropriate for
 text-to-speech conversion. Other sections of a page may also be usefully
 spoken in particular circumstances; the 'speakable' property serves to
 indicate the parts most likely to be generally useful for speech.<br/><br/>
@@ -226,7 +226,8 @@ sophisticated markup of speakable sections beyond simple ID references,
 either CSS selectors or XPath expressions to pick out document section(s)
 as speakable. For this we define a supporting type, <a class="localLink"
 href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
-which is defined to be a possible value of the <em>speakable</em> property.
+which is defined to be a possible value of the <em>speakable</em>
+property.<p>
 
 A speakable should be one of the following types:
 

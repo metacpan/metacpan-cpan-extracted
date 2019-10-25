@@ -642,7 +642,7 @@ $c->extract_cookies($res);
 $req = HTTP::Request->new(GET => "http://www.example.com/foo");
 $c->add_cookie_header($req);
 #print $req->as_string;
-ok($req->header("Cookie"), "foo=\"bar\"");
+ok($req->header("Cookie"), "foo=bar");
 
 # Test cookies that expire far into the future [RT#50147]
 $c = HTTP::Cookies->new;

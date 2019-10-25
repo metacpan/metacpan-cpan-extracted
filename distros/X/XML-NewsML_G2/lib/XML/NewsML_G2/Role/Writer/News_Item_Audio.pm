@@ -12,16 +12,16 @@ around '_build_g2_catalog_schemes' => sub {
     return $result;
 };
 
-
 after '_create_remote_content' => sub {
-    my ($self, $root, $audio) = @_;
+    my ( $self, $root, $audio ) = @_;
 
     for (qw/size duration audiosamplerate/) {
         $root->setAttribute( $_, $audio->$_ ) if defined $audio->$_;
     }
 
-    my $audiochannels = $self->scheme_manager->build_qcode('adc', $audio->audiochannels);
-    $root->setAttribute('audiochannels', $audiochannels) if $audiochannels;
+    my $audiochannels =
+        $self->scheme_manager->build_qcode( 'adc', $audio->audiochannels );
+    $root->setAttribute( 'audiochannels', $audiochannels ) if $audiochannels;
     return;
 };
 

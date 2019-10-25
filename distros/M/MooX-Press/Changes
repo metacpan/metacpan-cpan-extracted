@@ -1,0 +1,57 @@
+MooX-Press
+==========
+
+Created:      2019-10-22
+Home page:    <https://metacpan.org/release/MooX-Press>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.007	2019-10-25
+
+ [ Bug Fixes ]
+ - Fixes for Moo 2.003_005 which changes how Moo's keyword subs are
+   tracked.
+
+0.006	2019-10-24
+
+ [ Documentation ]
+ - Document that multiple inheritance is supported.
+ - Fix example in pod.
+
+ [ Other ]
+ - Less hacky way of calling Moo's has, extends, and with functions.
+ - Throw an error if people try to use extends in roles.
+ - You can now add a '+' before a class name to indicate that it should be
+   prefixed by the parent class name.
+
+0.005	2019-10-24
+
+ [ Bug Fixes ]
+ - Fixes for undef type_library.
+
+ [ Documentation ]
+ - Bundle a simple example, HTTP::Tiny::Objects.
+
+ [ Other ]
+ - Suppress loading MooX::TypeTiny if it's not needed.
+
+0.004	2019-10-23
+
+ [ Packaging ]
+ - Declare dependency on namespace::autoclean.
+
+ [ Other ]
+ - Added: Set $VERSION and $AUTHORITY in generated packages.
+ - Better handling of caller option.
+
+0.003	2019-10-23
+
+ [ Packaging ]
+ - Remove old test script from tarball.
+
+0.002	2019-10-23
+
+ [ Bug Fixes ]
+ - Fix syntax for Perl < 5.22.
+
+0.001	2019-10-23	Initial release

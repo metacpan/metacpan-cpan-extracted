@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has page_end => (
@@ -66,15 +66,15 @@ SemanticWeb::Schema::PublicationVolume - A part of a successively published publ
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A part of a successively published publication such as a periodical or
+=for html <p>A part of a successively published publication such as a periodical or
 multi-volume work, often numbered. It may represent a time span, such as a
 year.<br/><br/> See also <a
 href="http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.
-html">blog post</a>.
+html">blog post</a>.<p>
 
 =head1 ATTRIBUTES
 

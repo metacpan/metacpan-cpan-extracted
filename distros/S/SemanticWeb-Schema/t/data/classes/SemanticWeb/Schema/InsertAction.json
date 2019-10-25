@@ -12,9 +12,9 @@
          "rdfs:label" : "toLocation",
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
-            "schema:MoveAction",
-            "schema:ExerciseAction",
             "schema:InsertAction",
+            "schema:ExerciseAction",
+            "schema:MoveAction",
             "schema:TransferAction"
          ],
          "schema:rangeIncludes" : "schema:Place"

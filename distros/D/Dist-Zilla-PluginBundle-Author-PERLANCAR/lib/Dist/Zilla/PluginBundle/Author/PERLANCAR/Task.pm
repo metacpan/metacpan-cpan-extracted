@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::PERLANCAR::Task;
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-our $VERSION = '0.597'; # VERSION
+our $VERSION = '0.598'; # VERSION
 
 use Dist::Zilla::PluginBundle::Filter;
 
@@ -37,7 +37,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::Task - Dist::Zilla like PERLANCAR 
 
 =head1 VERSION
 
-This document describes version 0.597 of Dist::Zilla::PluginBundle::Author::PERLANCAR::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-07-04.
+This document describes version 0.598 of Dist::Zilla::PluginBundle::Author::PERLANCAR::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-20.
 
 =head1 SYNOPSIS
 

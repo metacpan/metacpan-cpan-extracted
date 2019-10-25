@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::ProfessionalService - Original definition: "provider of pro
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html Original definition: "provider of professional services."<br/><br/> The
+=for html <p>Original definition: "provider of professional services."<br/><br/> The
 general <a class="localLink"
 href="http://schema.org/ProfessionalService">ProfessionalService</a> type
 for local businesses was deprecated due to confusion with <a
@@ -60,7 +60,7 @@ class="localLink"
 href="http://schema.org/RoofingContractor">RoofingContractor</a>. <a
 class="localLink" href="http://schema.org/LegalService">LegalService</a>
 was introduced as a more inclusive supertype of <a class="localLink"
-href="http://schema.org/Attorney">Attorney</a>.
+href="http://schema.org/Attorney">Attorney</a>.<p>
 
 =head1 SEE ALSO
 

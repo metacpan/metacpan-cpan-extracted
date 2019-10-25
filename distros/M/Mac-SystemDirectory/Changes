@@ -1,5 +1,14 @@
 Revision history for Mac::SystemDirectory
 
+0.13      2019-10-19 18:58:11Z
+    - no changes since last release
+
+0.12      2018-04-19 12:23:47Z (TRIAL RELEASE)
+    - also drop -ObjC option (RT#73539)
+
+0.11      2018-04-19 12:11:37Z (TRIAL RELEASE)
+    - patch MakeMaker subs to fix issues on various versions of gcc (RT#73539)
+
 0.10      2017-05-11 15:21:38Z
     - actually load EUHC from inc (RT#121613)
 

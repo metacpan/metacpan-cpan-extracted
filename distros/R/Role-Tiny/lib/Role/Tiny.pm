@@ -2,7 +2,7 @@ package Role::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '2.001003';
+our $VERSION = '2.001004';
 $VERSION =~ tr/_//d;
 
 our %INFO;
@@ -80,8 +80,26 @@ sub import {
   my $me = shift;
   strict->import;
   warnings->import;
+  my $non_methods = $me->_non_methods($target);
   $me->_install_subs($target, @_);
   $me->make_role($target);
+  $me->_mark_new_non_methods($target, $non_methods)
+    if $non_methods && %$non_methods;
+  return;
+}
+
+sub _mark_new_non_methods {
+  my ($me, $target, $old_non_methods) = @_;
+
+  my $non_methods = $INFO{$target}{non_methods};
+
+  my $subs = $me->_all_subs($target);
+  for my $sub (keys %$subs) {
+    if ( exists $old_non_methods->{$sub} && $non_methods->{$sub} != $subs->{$sub} ) {
+      $non_methods->{$sub} = $subs->{$sub};
+    }
+  }
+
   return;
 }
 
@@ -330,9 +348,14 @@ sub _composite_info_for {
   };
 }
 
+sub _composable_package_name_for {
+  my ($me, $role) = @_;
+  'Role::Tiny::_COMPOSABLE::'.$role;
+}
+
 sub _composable_package_for {
   my ($me, $role) = @_;
-  my $composed_name = 'Role::Tiny::_COMPOSABLE::'.$role;
+  my $composed_name = $me->_composable_package_name_for($role);
   return $composed_name if $COMPOSED{role}{$composed_name};
   $me->_install_methods($composed_name, $role);
   my $base_name = $composed_name.'::_BASE';
@@ -433,8 +456,18 @@ sub _install_methods {
   my $methods = $me->_concrete_methods_of($role);
 
   my %existing_methods;
-  for my $package ($to, grep $_ ne $role, keys %{$APPLIED_TO{$to}}) {
-    @existing_methods{keys %{ $me->_concrete_methods_of($package) }} = ();;
+  @existing_methods{keys %{ $me->_all_subs($to) }} = ();
+
+  my $applied_to = $APPLIED_TO{$to};
+  if ($applied_to && %$applied_to) {
+    require(_MRO_MODULE);
+    my %isa = map +($_ => 1), @{mro::get_linear_isa($to)};
+    my @composed =
+      grep $_ ne $role && $isa{$me->_composable_package_name_for($_)},
+      keys %{$APPLIED_TO{$to}};
+    for my $package (@composed) {
+      @existing_methods{keys %{ $me->_concrete_methods_of($package) }} = ();
+    }
   }
 
   # _concrete_methods_of caches its result on roles.  that cache needs to be

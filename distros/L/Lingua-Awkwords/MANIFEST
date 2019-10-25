@@ -1,7 +1,7 @@
+Build.PL
 Changes
 LICENSE
 MANIFEST
-Makefile.PL
 README
 eg/README
 eg/athshean
@@ -26,6 +26,6 @@ t/README
 t/phrase
 t/pod-coverage.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
-SIGNATURE                                Public-key signature (added by MakeMaker)
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

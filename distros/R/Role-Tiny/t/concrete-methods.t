@@ -99,4 +99,22 @@ like $@,
   qr/is not a Role::Tiny/,
   'methods_provided_by refuses to work on classes';
 
+{
+  package Look::Out::Here::Comes::A::Role;
+  use Role::Tiny;
+  sub its_a_method { 1 }
+}
+
+{
+  package And::Another::One;
+  sub its_a_method { 2 }
+  use Role::Tiny;
+
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_ };
+  with 'Look::Out::Here::Comes::A::Role';
+  ::is join('', @warnings), '',
+    'non-methods not overwritten by role composition';
+}
+
 done_testing;

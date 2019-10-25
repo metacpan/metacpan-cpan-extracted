@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has max_value => (
@@ -98,17 +98,17 @@ SemanticWeb::Schema::PropertyValue - A property-value pair, e
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A property-value pair, e.g. representing a feature of a product or place.
-Use the 'name' property for the name of the property. If there is an
+=for html <p>A property-value pair, e.g. representing a feature of a product or
+place. Use the 'name' property for the name of the property. If there is an
 additional human-readable version of the value, put that into the
 'description' property.<br/><br/> Always use specific schema.org properties
 when a) they exist and b) you can populate them. Using PropertyValue as a
 substitute will typically not trigger the same effect as using the
-original, specific property.
+original, specific property.<p>
 
 =head1 ATTRIBUTES
 
@@ -130,7 +130,7 @@ A max_value should be one of the following types:
 
 C<measurementTechnique>
 
-=for html A technique or technology used in a <a class="localLink"
+=for html <p>A technique or technology used in a <a class="localLink"
 href="http://schema.org/Dataset">Dataset</a> (or <a class="localLink"
 href="http://schema.org/DataDownload">DataDownload</a>, <a
 class="localLink" href="http://schema.org/DataCatalog">DataCatalog</a>),
@@ -157,7 +157,7 @@ href="http://schema.org/PropertyValue">PropertyValue</a> for each <a
 class="localLink"
 href="http://schema.org/variableMeasured">variableMeasured</a> and attach
 the corresponding <a class="localLink"
-href="http://schema.org/measurementTechnique">measurementTechnique</a>.
+href="http://schema.org/measurementTechnique">measurementTechnique</a>.<p>
 
 A measurement_technique should be one of the following types:
 
@@ -223,8 +223,8 @@ A unit_code should be one of the following types:
 
 C<unitText>
 
-=for html A string or text indicating the unit of measurement. Useful if you cannot
-provide a standard unit code for <a href='unitCode'>unitCode</a>.
+=for html <p>A string or text indicating the unit of measurement. Useful if you
+cannot provide a standard unit code for <a href='unitCode'>unitCode</a>.<p>
 
 A unit_text should be one of the following types:
 
@@ -236,8 +236,8 @@ A unit_text should be one of the following types:
 
 =head2 C<value>
 
-=for html The value of the quantitative value or property value node.<br/><br/> <ul>
-<li>For <a class="localLink"
+=for html <p>The value of the quantitative value or property value node.<br/><br/>
+<ul> <li>For <a class="localLink"
 href="http://schema.org/QuantitativeValue">QuantitativeValue</a> and <a
 class="localLink"
 href="http://schema.org/MonetaryAmount">MonetaryAmount</a>, the recommended
@@ -247,7 +247,7 @@ href="http://schema.org/PropertyValue">PropertyValue</a>, it can be
 from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039))
 rather than superficially similiar Unicode symbols.</li> <li>Use '.'
 (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point.
-Avoid using these symbols as a readability separator.</li> </ul> 
+Avoid using these symbols as a readability separator.</li> </ul> <p>
 
 A value should be one of the following types:
 

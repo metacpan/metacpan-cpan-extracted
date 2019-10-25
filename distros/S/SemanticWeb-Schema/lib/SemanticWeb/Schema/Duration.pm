@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Duration;
 
-# ABSTRACT: Quantity: Duration (use <a href="http://en
+# ABSTRACT: Quantity: Duration (use ISO 8601 duration format ).
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,16 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Duration - Quantity: Duration (use <a href="http://en
+SemanticWeb::Schema::Duration - Quantity: Duration (use ISO 8601 duration format ).
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html Quantity: Duration (use <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO
-8601 duration format</a>).
+=for html <p>Quantity: Duration (use <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration
+format</a>).<p>
 
 =head1 SEE ALSO
 

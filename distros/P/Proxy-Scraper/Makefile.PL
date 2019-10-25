@@ -27,13 +27,13 @@ my %WriteMakefileArgs = (
 			dynamic_config => 0,
 			'meta-spec'    => { version => 2 },
 			resources      => {
-				homepage   => 'https://github.com/DeBos99/Proxy-Scraper',
+				homepage   => 'https://gitlab.com/DeBos/Proxy-Scraper',
 				repository => {
 					type => 'git',
-					url  => 'https://github.com/DeBos99/Proxy-Scraper.git',
-					web  => 'https://github.com/DeBos99/Proxy-Scraper',
+					url  => 'https://gitlab.com/DeBos/Proxy-Scraper.git',
+					web  => 'https://gitlab.com/DeBos/Proxy-Scraper',
 				},
-				bugtracker => { web => 'https://github.com/DeBos99/Proxy-Scraper/issues' },
+				bugtracker => { web => 'https://gitlab.com/DeBos/Proxy-Scraper/issues' },
 			},
 		})
 	),

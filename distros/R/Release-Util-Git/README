@@ -1,0 +1,112 @@
+NAME
+    Release::Util::Git - Utility routines related to software releases and
+    git
+
+VERSION
+    This document describes version 0.007 of Release::Util::Git (from Perl
+    distribution Release-Util-Git), released on 2019-10-24.
+
+FUNCTIONS
+  list_git_release_tags
+    Usage:
+
+     list_git_release_tags(%args) -> [status, msg, payload, meta]
+
+    List git release tags.
+
+    Examples:
+
+    *   Example #1:
+
+         list_git_release_tags(detail => 1, release_tag_regex => "^release");
+
+    It's common to tag a release with something like:
+
+     v1.2.3
+
+    This routine returns a list of them.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   release_tag_regex => *re* (default:
+        qr(\A(?^:(?:(?:version|ver|v|release|rel)[_-]?)?\d)))
+
+        Regex to match a release tag.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_git_release_years
+    Usage:
+
+     list_git_release_years(%args) -> [status, msg, payload, meta]
+
+    List git release years.
+
+    Examples:
+
+    *   Example #1:
+
+         list_git_release_years(detail => 1, regex => "^release");
+
+    This routine uses list_git_release_tags() to collect the release tags
+    and their dates, then group them by year.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   release_tag_regex => *re* (default:
+        qr(\A(?^:(?:(?:version|ver|v|release|rel)[_-]?)?\d)))
+
+        Regex to match a release tag.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Release-Util-Git>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Release-Util-Git>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Release-Util-Git>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

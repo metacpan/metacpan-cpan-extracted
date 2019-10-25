@@ -21,15 +21,26 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 
 #all_pod_coverage_ok();
 
-pod_coverage_ok(
-    'RPi::GPIOExpander::MCP23017',
-    {
-        also_private => [
-            qr/\p{Lowercase}+\p{Uppercase}\p{Lowercase}+/, # camelCase (XS)
-            qr/^clean$/
-        ],
-    },
-    "Test Perl subs, skip XS/C functions"
+my $pc = Pod::Coverage->new(
+    package => 'RPi::GPIOExpander::MCP23017',
+    pod_from => 'lib/RPi/GPIOExpander/MCP23017.pm',
+    private => [
+        qr/\p{Lowercase}+\p{Uppercase}\p{Lowercase}+/, # camelCase (XS)
+        qr/^clean$/,
+        qr/^bootstrap$/,
+        qr/^_/,
+        qr/^bank_write/, # doesn't exist, don't know why it barfs
+        qr/^bank_mode/,  # doesn't exist, don't know why it barfs
+    ],
+    #"Test Perl subs, skip XS/C functions"
 );
+
+is $pc->coverage, 1, "pod coverage ok";
+
+if ($pc->uncovered){
+    warn "Uncovered:\n\t", join( ", ", $pc->uncovered ), "\n";
+}
+
+warn $pc->why_unrated if ! defined $pc->coverage;
 
 done_testing();

@@ -1,3 +1,47 @@
+1.161 2019-10-25
+================
+[Quiq::AnsiColor]
+* Doku bearbeitet
+
+[Quiq::Assert]
+* Option -sloppy entfernt
+* Unterscheidung nach Aufrufkontext eingeführt
+* Stacktrace konfigurierbar
+* Namensabschnitt in Exception konfigurierbar
+
+[Quiq::Cascm]
+* edit() - Packagename optional gemacht
+* passVersion() - hinzugefügt
+* package() - Versionsnummer optional gemacht
+* showPackage() - Option -minVersion hinzugefügt
+
+[Quiq::Database::Connection]
+* Kosmetik
+
+[Quiq::Epoch]
+* Format YYYY-MM-DD hinzugefügt
+
+[Quiq::Path]
+* tempDir() - Optionen eingeführt
+
+[Quiq::Program]
+* assert() - hinzugefügt
+
+[Quiq::Progress]
+* ":" für alle Formatelemente
+
+[Quiq::Shell]
+* Laufzeitausgabe verbessert
+
+[Quiq::Sql::Script::Reader]
+* Doku bearbeitet
+
+[Quiq::TempDir]
+* new() - Option -cleanup hinzugefügt
+
+[Quiq::Test::Class]
+* Asserts angepasst
+
 1.160 2019-10-17
 ================
 [Quiq::ChartJs::TimeSeries]

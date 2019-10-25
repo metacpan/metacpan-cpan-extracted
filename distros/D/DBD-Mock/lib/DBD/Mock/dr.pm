@@ -3,6 +3,8 @@ package DBD::Mock::dr;
 use strict;
 use warnings;
 
+use List::Util qw(reduce);
+
 our $imp_data_size = 0;
 
 my @connect_callbacks;
@@ -16,12 +18,14 @@ sub connect {
     }
     $attributes ||= {};
 
+    my %driverParameters = _parse_driver_dsn( $dbname );
+
     if ( $dbname && $DBD::Mock::AttributeAliasing ) {
 
         # this is the DB we are mocking
         $attributes->{mock_attribute_aliases} =
-          DBD::Mock::_get_mock_attribute_aliases($dbname);
-        $attributes->{mock_database_name} = $dbname;
+          DBD::Mock::_get_mock_attribute_aliases($driverParameters{database});
+        $attributes->{mock_database_name} = $driverParameters{database};
     }
 
     # holds statement parsing coderefs/objects
@@ -115,6 +119,24 @@ sub set_connect_callbacks {
 
 sub add_connect_callbacks {
     push @connect_callbacks, map { die "connect callbacks needs to be a reference to a function " unless ref $_ eq "CODE"; $_ } @_;
+}
+
+sub _parse_driver_dsn {
+    my ( $driverDsn ) = @_;
+
+    $driverDsn = $driverDsn ? $driverDsn : '';
+
+    my %driverParameters;
+
+    foreach my $parameter ( split /;/, $driverDsn ) {
+        if ( my ( $key, $value ) = $parameter =~ m/^(.*?)=(.*)$/ ) {
+            $driverParameters{ $key } = $value;
+        }
+    }
+
+    $driverParameters{database} = $driverDsn unless %driverParameters;
+
+    return %driverParameters;
 }
 
 1;

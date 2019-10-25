@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/qooxdoo/qooxdoo-compiler/master/source/resource/qx/tool/schema/compile-1-0-0.json",
+  "targets": [
+    {
+      "type": "source",
+      "outputPath": "compiled/source",
+      "bundle": {
+        "include": "qx.*"
+      },
+      "babelOptions": {
+        "targets": "Chrome >= 76, Firefox >= 68, edge >= 18"
+      }
+    },
+    {
+      "type": "build",
+      "outputPath": "../public",
+      "babelOptions": {
+        "targets": "Chrome >= 76, Firefox >= 68, edge >= 18"
+      }
+    }
+  ],
+  "defaultTarget": "source",
+  "locales": ["en","de","fr","it"],
+  "environment": {
+      "qx.icontheme": "Tango"
+  },
+  "applications": [
+    {
+      "class": "<%= ${class_file} %>.Application",
+      "theme": "<%= ${class_file} %>.theme.Theme",
+      "name": "<%= ${class_file} %>",
+      "bootPath": "source/boot"
+    }
+  ]
+}

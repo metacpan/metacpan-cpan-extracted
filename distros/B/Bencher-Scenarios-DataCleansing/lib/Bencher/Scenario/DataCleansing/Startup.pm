@@ -1,7 +1,7 @@
 package Bencher::Scenario::DataCleansing::Startup;
 
-our $DATE = '2017-08-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,12 +11,10 @@ our $scenario = {
     summary => 'Benchmark startup of various data cleansing modules',
     module_startup => 1,
     modules => {
-        # specify minimum version
-        'Data::Clean::JSON' => {version=>'0.38'},
     },
     participants => [
         {module=>'Data::Clean'},
-        {module=>'Data::Clean::JSON'},
+        {module=>'Data::Clean::ForJSON'},
 
         {module=>'JSON::MaybeXS'},
         {module=>'JSON::PP'},
@@ -45,7 +43,7 @@ Bencher::Scenario::DataCleansing::Startup - Benchmark startup of various data cl
 
 =head1 VERSION
 
-This document describes version 0.004 of Bencher::Scenario::DataCleansing::Startup (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2017-08-25.
+This document describes version 0.005 of Bencher::Scenario::DataCleansing::Startup (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2019-09-11.
 
 =head1 SYNOPSIS
 
@@ -63,25 +61,25 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Cpanel::JSON::XS> 3.0217
+L<Cpanel::JSON::XS> 3.0239
 
 L<Data::Abridge> 0.03.01
 
-L<Data::Clean> 0.49
+L<Data::Clean> 0.505
 
-L<Data::Clean::JSON> 0.38
+L<Data::Clean::ForJSON> 0.394
 
-L<Data::Rmap> 0.64
+L<Data::Rmap> 0.65
 
 L<Data::Tersify> 0.001
 
 L<Data::Visitor::Callback> 0.30
 
-L<JSON::MaybeXS> 1.003005
+L<JSON::MaybeXS> 1.004
 
-L<JSON::PP> 2.27300
+L<JSON::PP> 2.27400_02
 
-L<JSON::XS> 3.02
+L<JSON::XS> 3.04
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -93,9 +91,9 @@ L<Data::Clean>
 
 
 
-=item * Data::Clean::JSON (perl_code)
+=item * Data::Clean::ForJSON (perl_code)
 
-L<Data::Clean::JSON>
+L<Data::Clean::ForJSON>
 
 
 
@@ -151,26 +149,26 @@ L<Data::Tersify>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
 
 Benchmark with default options (C<< bencher -m DataCleansing::Startup >>):
 
  #table1#
- +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | participant             | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
- +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | Data::Visitor::Callback | 3.1                          | 6.5                | 22             |     210   |                  202.4 |        1   |   0.00045 |      20 |
- | Data::Tersify           | 0.82                         | 4.2                | 16             |      34   |                   26.4 |        6   |   0.00013 |      20 |
- | JSON::PP                | 1.3                          | 4.8                | 20             |      29   |                   21.4 |        7.2 |   9e-05   |      20 |
- | JSON::MaybeXS           | 3.12                         | 6.68               | 22.3           |      20.5 |                   12.9 |       10   | 1.9e-05   |      20 |
- | Data::Abridge           | 16                           | 19                 | 55             |      19   |                   11.4 |       11   | 4.7e-05   |      20 |
- | JSON::XS                | 1.3                          | 4.8                | 20             |      16   |                    8.4 |       13   | 6.5e-05   |      20 |
- | Data::Rmap              | 1.7                          | 5.1                | 19             |      16   |                    8.4 |       13   | 5.7e-05   |      21 |
- | Cpanel::JSON::XS        | 1.4                          | 4.8                | 19             |      15   |                    7.4 |       14   | 4.5e-05   |      22 |
- | Data::Clean::JSON       | 1.9                          | 5.4                | 23             |      15   |                    7.4 |       14   | 4.3e-05   |      20 |
- | Data::Clean             | 1.3                          | 4.7                | 16             |      12   |                    4.4 |       16   | 3.7e-05   |      20 |
- | perl -e1 (baseline)     | 1.1                          | 4.5                | 16             |       7.6 |                    0   |       27   | 1.6e-05   |      20 |
- +-------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ +-------------------------+-----------+------------------------+------------+----------+---------+
+ | participant             | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors  | samples |
+ +-------------------------+-----------+------------------------+------------+----------+---------+
+ | Data::Visitor::Callback |     190   |                  181.3 |       1    |   0.0004 |      20 |
+ | Data::Tersify           |      32   |                   23.3 |       6    | 3.5e-05  |      23 |
+ | JSON::PP                |      28.8 |                   20.1 |       6.75 | 2.5e-05  |      22 |
+ | JSON::MaybeXS           |      21   |                   12.3 |       9.28 | 1.7e-05  |      20 |
+ | Data::Abridge           |      19.1 |                   10.4 |      10.2  | 1.7e-05  |      21 |
+ | Data::Rmap              |      16   |                    7.3 |      12    | 3.3e-05  |      21 |
+ | JSON::XS                |      16   |                    7.3 |      12    | 2.7e-05  |      20 |
+ | Cpanel::JSON::XS        |      15   |                    6.3 |      13    | 1.7e-05  |      20 |
+ | Data::Clean::ForJSON    |      15   |                    6.3 |      13    | 3.8e-05  |      20 |
+ | Data::Clean             |      13   |                    4.3 |      15    | 3.4e-05  |      20 |
+ | perl -e1 (baseline)     |       8.7 |                    0   |      22    |   3e-05  |      20 |
+ +-------------------------+-----------+------------------------+------------+----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -199,7 +197,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

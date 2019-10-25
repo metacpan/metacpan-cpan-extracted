@@ -2,8 +2,8 @@ NAME
     App::ListCountries - List countries
 
 VERSION
-    This document describes version 0.020 of App::ListCountries (from Perl
-    distribution App-ListCountries), released on 2019-07-18.
+    This document describes version 0.021 of App::ListCountries (from Perl
+    distribution App-ListCountries), released on 2019-09-10.
 
 SYNOPSIS
      # Use via list-countries CLI script
@@ -15,6 +15,29 @@ FUNCTIONS
      list_countries(%args) -> [status, msg, payload, meta]
 
     List countries.
+
+    Examples:
+
+    *   Example #1:
+
+         list_countries(query => "lu"); # -> ["bol", "lca", "lux", "tuv"]
+
+    *   Example #2:
+
+         list_countries(query => "lu", detail => 1);
+
+        Result:
+
+         [
+           {
+             alpha3  => "bol",
+             alpha2  => "bo",
+             en_name => "Bolivia (Plurinational State of)",
+           },
+           { alpha3 => "lca", alpha2 => "lc", en_name => "Saint Lucia" },
+           { alpha3 => "lux", alpha2 => "lu", en_name => "Luxembourg" },
+           { alpha3 => "tuv", alpha2 => "tv", en_name => "Tuvalu" },
+         ]
 
     Source data is generated from "Locale::Codes::Country_Codes". so make
     sure you have a relatively recent version of the module.

@@ -23,7 +23,7 @@ meta-spec:
 name: Music-BachChoralHarmony
 requires:
   File::ShareDir: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Moo: '2'
   Text::CSV: '0'
   namespace::clean: '0'
@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-BachChoralHarmony
   repository: https://github.com/ology/Music-BachChoralHarmony.git
-version: '0.0402'
+version: '0.0403'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

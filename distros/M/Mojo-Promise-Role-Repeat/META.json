@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Promise looping construct with break",
    "author" : [
       "Roger Crew <wrog@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,31 +13,47 @@
       "version" : 2
    },
    "name" : "Mojo-Promise-Role-Repeat",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Mojolicious" : "8.23",
-            "Role::Tiny" : "2.000001"
+            "Role::Tiny" : "2.000001",
+            "perl" : "5.014"
          }
       }
    },
+   "provides" : {
+      "Mojo::Promise::Role::Repeat" : {
+         "file" : "lib/Mojo/Promise/Role/Repeat.pm",
+         "version" : "0.004"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wrog/ipromise/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wrog/ipromise.git",
+         "web" : "http://github.com/wrog/ipromise"
+      }
+   },
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
+

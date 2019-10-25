@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ListCountries/list_countries
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-18'; # DATE
+our $DATE = '2019-09-10'; # DATE
 our $DIST = 'App-ListCountries'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +37,31 @@ list-countries - List countries
 
 =head1 VERSION
 
-This document describes version 0.020 of list-countries (from Perl distribution App-ListCountries), released on 2019-07-18.
+This document describes version 0.021 of list-countries (from Perl distribution App-ListCountries), released on 2019-09-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % list-countries [options] [query]
+
+Examples:
+
+ % list-countries lu
+ bol
+ lca
+ lux
+ tuv
+
+ % list-countries lu --detail
+ +--------+--------+----------------------------------+
+ | alpha3 | alpha2 | en_name                          |
+ +--------+--------+----------------------------------+
+ | bol    | bo     | Bolivia (Plurinational State of) |
+ | lca    | lc     | Saint Lucia                      |
+ | lux    | lu     | Luxembourg                       |
+ | tuv    | tv     | Tuvalu                           |
+ +--------+--------+----------------------------------+
 
 =head1 DESCRIPTION
 

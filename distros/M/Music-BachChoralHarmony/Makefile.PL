@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Music::BachChoralHarmony",
   "PREREQ_PM" => {
     "File::ShareDir" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.33",
     "Moo" => 2,
     "Text::CSV" => 0,
     "namespace::clean" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.0402",
+  "VERSION" => "0.0403",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.33",
   "Moo" => 2,
   "Test::Exception" => 0,
   "Test::More" => 0,

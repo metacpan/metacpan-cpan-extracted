@@ -27,7 +27,7 @@ earlier) and/or you are otherwise having problems with the Makefile, you
 can still install this module the old fashioned way, by copying.
 
 Every file in the "lib" folder of this distribution goes in its
-corresponding location within the "lib" folder that came with your Perl 5
+corresponding location within the "lib" folder that came with your Perl
 distribution.
 
 Or alternately, put them anywhere you want, but you will need to have that

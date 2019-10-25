@@ -2,7 +2,7 @@ use strict;
 use vars qw{$VERSION};
 BEGIN {
 	require 5.003_96;
-	$VERSION = '0.03';
+	$VERSION = '0.04';
 }
 use ExtUtils::MakeMaker;
 
@@ -22,4 +22,14 @@ WriteMakefile(
 	($ExtUtils::MakeMaker::VERSION ge '6.30_00' ? (
 		LICENSE => 'perl',
 	) : ()),
+        'META_MERGE'         => {
+                'meta-spec' => { version => 2 },
+                resources => {
+                       repository => {
+                           type => 'git',
+                           url  => 'https://github.com/srchulo/Object-Tiny-RW-XS.git',
+                           web  => 'https://github.com/srchulo/Object-Tiny-RW-XS',
+                       },
+                },
+        },
 );

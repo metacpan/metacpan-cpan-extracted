@@ -16,8 +16,8 @@
          "schema:domainIncludes" : [
             "schema:TVSeries",
             "schema:Movie",
-            "schema:TVSeason",
-            "schema:TVEpisode"
+            "schema:TVEpisode",
+            "schema:TVSeason"
          ],
          "schema:rangeIncludes" : "schema:Country"
       },
@@ -27,9 +27,9 @@
          "rdfs:label" : "partOfTVSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
-            "schema:TVClip",
             "schema:TVEpisode",
-            "schema:TVSeason"
+            "schema:TVSeason",
+            "schema:TVClip"
          ],
          "schema:rangeIncludes" : "schema:TVSeries",
          "schema:supersededBy" : "schema:partOfSeries"

@@ -5,7 +5,7 @@ Facebook::OpenGraph - Simple way to handle Facebook's Graph API.
 
 # VERSION
 
-This is Facebook::OpenGraph version 1.30
+This is Facebook::OpenGraph version 1.31
 
 # SYNOPSIS
 
@@ -467,7 +467,7 @@ Request batch request and returns an array reference.
 ### `$fb->batch(\@requests)`
 
 Request batch request and returns an array reference of response objects. It
-sets `$fb-`access\_token> as top level access token, but other than that you
+sets `$fb->access_token` as top level access token, but other than that you
 can specify indivisual access token for each request. The document says
 "The Batch API is flexible and allows individual requests to specify their own
 access tokens as a query string or form post parameter. In that case the top

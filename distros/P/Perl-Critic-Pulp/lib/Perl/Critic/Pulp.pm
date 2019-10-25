@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 
@@ -21,7 +21,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 1;
 __END__
@@ -236,11 +236,11 @@ a wide range of builtin and add-on perlcritic policies ranging from buggy
 practice to deliberately restrictive or even quite bizarre.  You're not
 meant to pass everything.  Some policies may even be mutually contradictory.
 
-The restrictive policies are meant as building blocks for a limited house
-style.  For example C<ProhibitBarewordDoubleColon> here, or something like
+The restrictive policies are meant as building blocks for a house style.
+For example C<ProhibitBarewordDoubleColon> here, or something like
 C<ProhibitUnlessBlocks>.  They're usually a matter of personal preference,
 and "non de gustibus disputandum" as they say in the classics.  Trying to
-follow all of them would give away big parts of the language and quite
+follow all such policies would give away big parts of the language and quite
 likely result in very un-typical code.
 
 Some of the restrictive policies are geared towards beginners.
@@ -283,7 +283,7 @@ Emacs will recognise.
     verbose=%f:%l:%c:\n %P\n %m\n
 
 See L<Perl::Critic::Violation> for all available C<%> escapes.
-F<perlcritic.el> which comes with perlcritic has regexp patterns for Emacs
+C<perlcritic.el> which comes with perlcritic has regexp patterns for Emacs
 to recognise the builtin perlcritic formats, but it's easier to output
 "file:line:column:" in the first place.
 
@@ -297,7 +297,7 @@ L<http://user42.tuxfamily.org/perl-critic-pulp/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

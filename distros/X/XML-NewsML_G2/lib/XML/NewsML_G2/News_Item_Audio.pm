@@ -5,8 +5,8 @@ use namespace::autoclean;
 
 extends 'XML::NewsML_G2::News_Item';
 
-has '+nature', default => 'audio';
-has '+remotes', isa => 'HashRef[XML::NewsML_G2::Audio]';
+has '+nature',  default => 'audio';
+has '+remotes', isa     => 'HashRef[XML::NewsML_G2::Audio]';
 
 __PACKAGE__->meta->make_immutable;
 

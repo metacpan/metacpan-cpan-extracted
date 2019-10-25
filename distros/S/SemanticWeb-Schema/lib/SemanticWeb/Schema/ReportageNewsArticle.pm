@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::ReportageNewsArticle;
 
-# ABSTRACT: The <a class="localLink" href="http://schema
+# ABSTRACT: The ReportageNewsArticle type is a subtype of NewsArticle representing news articles which are the result of journalistic news reporting conventions
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,15 +30,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ReportageNewsArticle - The <a class="localLink" href="http://schema
+SemanticWeb::Schema::ReportageNewsArticle - The ReportageNewsArticle type is a subtype of NewsArticle representing news articles which are the result of journalistic news reporting conventions
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The <a class="localLink"
+=for html <p>The <a class="localLink"
 href="http://schema.org/ReportageNewsArticle">ReportageNewsArticle</a> type
 is a subtype of <a class="localLink"
 href="http://schema.org/NewsArticle">NewsArticle</a> representing news
@@ -64,7 +64,7 @@ judgements typically expressed elsewhere.<br/><br/> A <a class="localLink"
 href="http://schema.org/ReportageNewsArticle">ReportageNewsArticle</a>
 which goes deeper into analysis can also be marked with an additional type
 of <a class="localLink"
-href="http://schema.org/AnalysisNewsArticle">AnalysisNewsArticle</a>.
+href="http://schema.org/AnalysisNewsArticle">AnalysisNewsArticle</a>.<p>
 
 =head1 SEE ALSO
 

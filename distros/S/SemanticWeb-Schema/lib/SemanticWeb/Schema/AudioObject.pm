@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has caption => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::AudioObject - An audio file.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -60,10 +60,10 @@ An audio file.
 
 =head2 C<caption>
 
-=for html The caption for this object. For downloadable machine formats (closed
+=for html <p>The caption for this object. For downloadable machine formats (closed
 caption, subtitles etc.) use MediaObject and indicate the <a
 class="localLink"
-href="http://schema.org/encodingFormat">encodingFormat</a>.
+href="http://schema.org/encodingFormat">encodingFormat</a>.<p>
 
 A caption should be one of the following types:
 

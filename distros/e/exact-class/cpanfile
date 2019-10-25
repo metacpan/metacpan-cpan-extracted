@@ -1,6 +1,6 @@
 requires "Role::Tiny" => "0";
 requires "Scalar::Util" => "0";
-requires "exact" => "0";
+requires "exact" => "1.11";
 requires "perl" => "5.014";
 requires "strict" => "0";
 requires "warnings" => "0";

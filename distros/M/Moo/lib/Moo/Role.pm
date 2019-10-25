@@ -2,10 +2,12 @@ package Moo::Role;
 
 use Moo::_strictures;
 use Moo::_Utils qw(
+  _check_tracked
   _getglob
   _getstash
   _install_coderef
   _install_modifier
+  _install_tracked
   _load_module
   _name_coderef
   _set_loaded
@@ -23,7 +25,7 @@ BEGIN {
   );
 }
 
-our $VERSION = '2.003004';
+our $VERSION = '2.003006';
 $VERSION =~ tr/_//d;
 
 require Moo::sification;
@@ -42,12 +44,6 @@ our %APPLY_DEFAULTS;
 our %COMPOSED;
 our @ON_ROLE_CREATE;
 
-sub _install_tracked {
-  my ($target, $name, $code) = @_;
-  $INFO{$target}{exports}{$name} = $code;
-  _install_coderef "${target}::${name}" => "Moo::Role::${name}" => $code;
-}
-
 sub import {
   my $target = caller;
   if ($Moo::MAKERS{$target} and $Moo::MAKERS{$target}{is_class}) {
@@ -55,6 +51,14 @@ sub import {
   }
   _set_loaded(caller);
   goto &Role::Tiny::import;
+}
+
+sub _accessor_maker_for {
+  my ($class, $target) = @_;
+  ($INFO{$target}{accessor_maker} ||= do {
+    require Method::Generate::Accessor;
+    Method::Generate::Accessor->new
+  });
 }
 
 sub _install_subs {
@@ -69,10 +73,8 @@ sub _install_subs {
     my %spec = @_;
     foreach my $name (@name_proto) {
       my $spec_ref = @name_proto > 1 ? +{%spec} : \%spec;
-      ($INFO{$target}{accessor_maker} ||= do {
-        require Method::Generate::Accessor;
-        Method::Generate::Accessor->new
-      })->generate_method($target, $name, $spec_ref);
+      $me->_accessor_maker_for($target)
+        ->generate_method($target, $name, $spec_ref);
       push @{$INFO{$target}{attributes}||=[]}, $name, $spec_ref;
       $me->_maybe_reset_handlemoose($target);
     }
@@ -111,7 +113,7 @@ sub meta {
 
 sub unimport {
   my $target = caller;
-  _unimport_coderefs($target, $INFO{$target});
+  _unimport_coderefs($target);
 }
 
 sub _maybe_reset_handlemoose {
@@ -119,6 +121,19 @@ sub _maybe_reset_handlemoose {
   if ($INC{'Moo/HandleMoose.pm'} && !$Moo::sification::disabled) {
     Moo::HandleMoose::maybe_reinject_fake_metaclass_for($target);
   }
+}
+
+sub _non_methods {
+  my $self = shift;
+  my ($role) = @_;
+
+  my $non_methods = $self->SUPER::_non_methods(@_);
+
+  my $all_subs = $self->_all_subs($role);
+  $non_methods->{$_} = $all_subs->{$_}
+    for _check_tracked($role, [ keys %$all_subs ]);
+
+  return $non_methods;
 }
 
 sub methods_provided_by {
@@ -491,8 +506,9 @@ And elsewhere:
 =head1 DESCRIPTION
 
 C<Moo::Role> builds upon L<Role::Tiny>, so look there for most of the
-documentation on how this works.  The main addition here is extra bits to make
-the roles more "Moosey;" which is to say, it adds L</has>.
+documentation on how this works (in particular, using C<Moo::Role> also
+enables L<strict> and L<warnings>).  The main addition here is extra bits to
+make the roles more "Moosey;" which is to say, it adds L</has>.
 
 =head1 IMPORTED SUBROUTINES
 

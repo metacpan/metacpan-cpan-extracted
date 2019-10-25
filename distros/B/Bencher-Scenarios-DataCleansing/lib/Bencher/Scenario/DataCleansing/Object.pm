@@ -1,7 +1,7 @@
 package Bencher::Scenario::DataCleansing::Object;
 
-our $DATE = '2017-08-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,8 +13,6 @@ our $scenario = {
         # for the Data::Rmap method
         'Acme::Damn' => {},
         'Scalar::Util' => {},
-        # specify minimum version
-        'Data::Clean' => {version=>'0.48'},
     },
     participants => [
         {
@@ -101,7 +99,7 @@ Bencher::Scenario::DataCleansing::Object - Benchmark data cleansing (unblessing 
 
 =head1 VERSION
 
-This document describes version 0.004 of Bencher::Scenario::DataCleansing::Object (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2017-08-25.
+This document describes version 0.005 of Bencher::Scenario::DataCleansing::Object (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2019-09-11.
 
 =head1 SYNOPSIS
 
@@ -125,13 +123,13 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<Acme::Damn> 0.08
 
-L<Data::Clean> 0.49
+L<Data::Clean> 0.505
 
-L<Data::Rmap> 0.64
+L<Data::Rmap> 0.65
 
-L<JSON::PP> 2.27300
+L<JSON::PP> 2.27400_02
 
-L<Scalar::Util> 1.45
+L<Scalar::Util> 1.5
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -195,7 +193,7 @@ A 10k-element array containing 10k "unclean" data: object
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
 
 Benchmark with default options (C<< bencher -m DataCleansing::Object >>):
 
@@ -203,36 +201,36 @@ Benchmark with default options (C<< bencher -m DataCleansing::Object >>):
  +---------------------+-----------------+---------+-----------+-----------+------------+---------+---------+
  | participant         | dataset         | p_tags  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
  +---------------------+-----------------+---------+-----------+-----------+------------+---------+---------+
- | JSON::PP            | ary10k-u1-obj   |         |     165   | 6.06      |      1     | 5.4e-06 |      21 |
- | Data::Rmap          | ary10k-u10k-obj | inplace |     219   | 4.57      |      1.33  | 1.8e-06 |      20 |
- | JSON::PP            | ary10k-u10k-obj |         |     240   | 4.2       |      1.4   |   6e-06 |      20 |
- | Data::Rmap          | ary10k-u1-obj   | inplace |     441   | 2.27      |      2.67  | 1.5e-06 |      20 |
- | Data::Clean-clone   | ary10k-u10k-obj |         |     752   | 1.33      |      4.56  | 4.8e-07 |      20 |
- | Data::Clean-inplace | ary10k-u10k-obj | inplace |     990   | 1         |      6     | 1.3e-06 |      22 |
- | JSON::PP            | ary100-u1-obj   |         |    1560   | 0.64      |      9.47  | 6.2e-07 |      21 |
- | JSON::PP            | ary100-u100-obj |         |    2020   | 0.494     |     12.3   | 1.9e-07 |      24 |
- | Data::Rmap          | ary100-u100-obj | inplace |    2200   | 0.46      |     13     | 8.5e-07 |      20 |
- | Data::Clean-clone   | ary10k-u1-obj   |         |    3100   | 0.32      |     19     |   6e-07 |      23 |
- | Data::Clean-inplace | ary10k-u1-obj   | inplace |    4000   | 0.3       |     20     | 4.3e-06 |      37 |
- | Data::Rmap          | ary100-u1-obj   | inplace |    4300   | 0.23      |     26     | 1.4e-06 |      20 |
- | Data::Clean-clone   | ary100-u100-obj |         |    7100   | 0.14      |     43     | 2.1e-07 |      20 |
- | Data::Clean-inplace | ary100-u100-obj | inplace |   10600   | 0.0939    |     64.5   | 2.6e-08 |      21 |
- | Data::Clean-clone   | ary100-u1-obj   |         |   27792.1 | 0.0359814 |    168.432 | 1.1e-11 |      20 |
- | Data::Clean-inplace | ary100-u1-obj   | inplace |   38000   | 0.026     |    230     |   1e-07 |      20 |
+ | JSON::PP            | ary10k-u1-obj   |         |       156 |     6.39  |       1    | 2.5e-06 |      23 |
+ | Data::Clean-clone   | ary10k-u10k-obj |         |       200 |     5     |       1    | 5.8e-05 |      20 |
+ | Data::Rmap          | ary10k-u10k-obj | inplace |       216 |     4.62  |       1.38 | 4.4e-06 |      20 |
+ | JSON::PP            | ary10k-u10k-obj |         |       227 |     4.41  |       1.45 | 1.3e-06 |      22 |
+ | Data::Rmap          | ary10k-u1-obj   | inplace |       419 |     2.39  |       2.68 | 2.3e-06 |      20 |
+ | Data::Clean-inplace | ary10k-u10k-obj | inplace |       976 |     1.02  |       6.24 | 2.7e-07 |      20 |
+ | JSON::PP            | ary100-u1-obj   |         |      1500 |     0.67  |       9.5  | 1.3e-06 |      20 |
+ | Data::Clean-clone   | ary100-u100-obj |         |      1900 |     0.52  |      12    | 6.1e-07 |      22 |
+ | JSON::PP            | ary100-u100-obj |         |      2000 |     0.51  |      12    | 6.4e-07 |      20 |
+ | Data::Rmap          | ary100-u100-obj | inplace |      2150 |     0.465 |      13.8  | 4.3e-07 |      20 |
+ | Data::Clean-clone   | ary10k-u1-obj   |         |      2470 |     0.405 |      15.8  | 3.7e-07 |      26 |
+ | Data::Rmap          | ary100-u1-obj   | inplace |      3990 |     0.25  |      25.5  | 1.9e-07 |      24 |
+ | Data::Clean-inplace | ary10k-u1-obj   | inplace |      4080 |     0.245 |      26.1  | 4.6e-08 |      27 |
+ | Data::Clean-inplace | ary100-u100-obj | inplace |      9700 |     0.1   |      62    | 2.2e-07 |      23 |
+ | Data::Clean-clone   | ary100-u1-obj   |         |     15000 |     0.067 |      95    | 1.1e-07 |      20 |
+ | Data::Clean-inplace | ary100-u1-obj   | inplace |     39000 |     0.026 |     250    |   1e-07 |      25 |
  +---------------------+-----------------+---------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m DataCleansing::Object --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | JSON::PP            | 3.12                         | 6.68               | 22.3           |      26.7 |                   20.6 |        1   | 1.2e-05 |      20 |
- | Data::Rmap          | 1.4                          | 4.9                | 19             |      15   |                    8.9 |        1.8 |   3e-05 |      20 |
- | Data::Clean         | 1.1                          | 4.5                | 16             |      11   |                    4.9 |        2.4 |   3e-05 |      20 |
- | perl -e1 (baseline) | 1.1                          | 4.6                | 16             |       6.1 |                    0   |        4.4 | 1.7e-05 |      21 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | JSON::PP            |      27   |                   20   |       1    | 4.6e-05 |      22 |
+ | Data::Rmap          |      14.9 |                    7.9 |       1.82 | 1.3e-05 |      20 |
+ | Data::Clean         |      11   |                    4   |       2.4  | 1.4e-05 |      20 |
+ | perl -e1 (baseline) |       7   |                    0   |       3.9  | 2.7e-05 |      20 |
+ +---------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -261,7 +259,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

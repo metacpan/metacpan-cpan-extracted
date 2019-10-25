@@ -1,5 +1,5 @@
 package Domain::PublicSuffix;
-$Domain::PublicSuffix::VERSION = '0.15';
+$Domain::PublicSuffix::VERSION = '0.16';
 use strict;
 use warnings;
 use base 'Class::Accessor::Fast';
@@ -11,6 +11,7 @@ use Net::IDN::Encode ();
 __PACKAGE__->mk_accessors(qw/
 	use_default
 	data_file
+	allow_unlisted_tld
 	domain_allow_underscore
 	tld_tree
 	error
@@ -108,6 +109,12 @@ Use the provided publicsuffix file, do not search for any other files.
 A flag to indicate that underscores should be allowed in hostnames
 (contra to the RFCs). Default: undef.
 
+=item allow_unlisted_tld
+
+A flag to indicate that unlisted TLDs should be passed through. This follows
+the spec as listed on publicsuffix.org, but is not how this module works by
+default, or before 0.16. Default: undef
+
 =back
 
 =back
@@ -124,7 +131,7 @@ sub new {
 		$self->data_file( $args[0]->{'dataFile'} );
 	}
 
-	$self->_parse_data_file();
+	$self->tld_tree($self->_parse_data_to_tree());
 
 	return $self;
 }
@@ -142,7 +149,14 @@ the error accessor with a human-readable error string.
 =cut
 
 sub get_root_domain {
-	my ( $self, $domain ) = @_;
+	my ( $self, $inbound ) = @_;
+
+	unless ($inbound) {
+		$self->error('No input');
+		return;
+	}
+
+	my $domain = lc($inbound);
 
 	# Clear meta properties
 	foreach ( qw/tld suffix root_domain error/ ) {
@@ -158,83 +172,84 @@ sub get_root_domain {
 	my @domain_array = split(/\./, $domain);
 	my $tld = pop(@domain_array);
 	unless ( defined $self->tld_tree->{$tld} ) {
-		$self->error('Invalid TLD');
-		return;
+		if ( $self->allow_unlisted_tld ) {
+			$self->tld($tld);
+			$self->suffix($tld);
+			if ( my $next = pop(@domain_array) ) {
+				$self->root_domain( join( '.', $next, $tld ) );
+			} else {
+				$self->root_domain($tld);
+			}
+			return $self->root_domain;
+		} else {
+			$self->error('Invalid TLD');
+			return;
+		}
 	}
 
 	$self->tld($tld);
-	$self->suffix($tld) if ( scalar( keys %{$self->tld_tree->{$tld}} ) == 0 );
+	my $raw_suffix = $self->get_suffix_for_domain($domain);
 
-	# Reverse iterate through domain to find effective root
-	my $last = $self->tld_tree->{$tld};
-	my $effective_root = $tld;
-
-	while ( !$self->suffix ) {
-		my $sub = pop(@domain_array);
-
-		if (!defined $sub) {
-			if (defined $last->{'RootEnable'}) {
-				$self->suffix($effective_root);
-			} else {
-				$self->{'root_domain'} = $self->suffix;
-			}
-			last;
-		}
-	
-		if ( defined $last->{$sub} and scalar(keys %{$last->{$sub}}) == 0 ) {
-			# check if $sub.$last is a root
-			$self->suffix( $sub . "." . $effective_root );
-
-		} elsif ( defined $last->{'*'} ) {
-			# wildcard means everything is a root, but check for exceptions
-			my $exception_flag = 0;
-			foreach my $sub_check (keys %{$last}) {
-				if ($sub_check =~ /^!/) {
-					$sub_check =~ s/!//;
-					if ($sub eq $sub_check) {
-						$exception_flag++;
-					}
-				}
-			}
-			if ( $exception_flag > 0 ) {
-				# This is is not an root, push it back to the domain
-				push(@domain_array, $sub);
-				$self->suffix($effective_root);
-			} else {
-				$self->suffix(join(".", $sub, $effective_root));
-			}
-
-		} elsif ( defined $last->{'RootEnable'} and !defined $last->{$sub} ) {
-			# we have nothing left in the domain string, check
-			# if the root we have is enough
-			$self->suffix($effective_root);
-
-			# Set root domain to one step below effective root.
-			$self->{'root_domain'} = join( '.', $sub, $self->suffix );
-		}
-
-		$effective_root = join( '.', $sub, $effective_root );
-		$last = $last->{$sub};
-	}
-
-	# Leave if we still haven't found an effective root
-	if ( !$self->root_domain ) {
+	# Leave if we still haven't found a suffix
+	if ( !$raw_suffix ) {
 		$self->error('Domain not valid');
 		return;
 	}
 
-	# Check if we're left with just a root
-	if ( $self->root_domain eq $domain ) {
-		$self->error('Domain is already root');
+	my $suffix = $raw_suffix;
+	$suffix =~ s/!//g;
+	$self->suffix($suffix);
+
+	# Check if we're left with just a suffix
+	if ( $raw_suffix !~ /!/ and $self->suffix eq $domain ) {
+		$self->error('Domain is already a suffix');
+		return;
+	}
+
+	# Generate root domain using suffix
+	if ($raw_suffix =~ /!/) {
+		# Exception suffixes are also domains
+		$self->root_domain($suffix);
+	} else {
+		my $root_domain = $domain;
+		$root_domain =~ s/^.*\.(.*?\.$suffix)$/$1/;
+		$self->root_domain($root_domain);
 	}
 
 	return $self->root_domain;
 }
 
-sub _parse_data_file {
-	my ( $self ) = @_;
+sub get_suffix_for_domain {
+    my ( $self, $domain ) = @_;
 
-	$self->{'tld_tree'} = {};
+    my @labels = split( /\./, $domain );
+    my $point = $self->tld_tree;
+    my @suffix;
+    while ( my $label = pop(@labels) ) {
+        # If there is a wildcard here, it is a suffix, except for !exceptions
+        # Theoretically, there would be further processing here for .*.
+        # wildcards, but those have not existed before in the list, so saving
+        # the work until it actually happens.
+        if ( $point->{'*'} ) {
+			my $exception = '!' . $label;
+			if ( $point->{$exception} ) {
+				push( @suffix, $exception );
+				last;
+			}
+        } elsif (!$point->{$label}) {
+            # If we run out of rules at this point, the root is just below here
+            last;
+        }
+    
+        push( @suffix, $label );
+        $point = $point->{$label};
+    }
+    return join('.', reverse(@suffix));
+}
+
+sub _load_data {
+	my ($self) = @_;
+
 	my $data_stream_ref;
 
 	# Find an effective_tld_names.dat file
@@ -275,9 +290,19 @@ sub _parse_data_file {
 		$data_stream_ref = Domain::PublicSuffix::Default::retrieve();
 	}
 
-	foreach ( @{$data_stream_ref} ) {
+	return $data_stream_ref;
+}
+
+sub _parse_data_to_tree {
+	my ($self) = @_;
+
+    my $data_stream_ref = $self->_load_data();
+    my $tree = {};
+
+    foreach (@{$data_stream_ref}) {
 		chomp;
-		# Remove comments, skip if full line comment, remove if on-line comment
+    
+		# Remove comments, skip if full line comment, remove if inline comment
 		next if ( /^\// or /^[ \t]*?$/ );
 		s/[\s\x{0085}\x{000A}\x{000C}\x{000D}\x{0020}].*//;
 
@@ -287,30 +312,17 @@ sub _parse_data_file {
 		push( @tlds, $ascii ) if ( $_ ne $ascii );
 
 		foreach (@tlds) {
-			# Break down by dots
-			my @domain_array = split( /\./, $_ );
-			my $last = $self->tld_tree;
-
-			if (scalar(@domain_array) == 1) {
-				my $sub = pop(@domain_array);
-				next if (!$sub);
-
-				$last->{$sub} = {} unless ( defined $last->{$sub} );
-				$last->{$sub}->{'RootEnable'} = 1;
-			}
-
-			# Reverse iterate domain array to build hash tree of tlds
-			while (scalar(@domain_array) > 0) {
-				my $sub = pop(@domain_array);
-				$sub =~ s/\s.*//g;
-				next if (!$sub);
-
-				$last->{$sub} = {} unless ( defined $last->{$sub} );
-				$last->{$sub}->{'RootEnable'} = 1 if ( scalar @domain_array == 0 );
-				$last = $last->{$sub};
-			}
-		}
-	}
+			# Split domain and convert to a tree
+			my @domain = split( /\./, $_ );
+            my $previous = $tree;
+            while (my $label = pop(@domain)) {
+                $label =~ s/\s.*//;
+                $previous->{$label} ||= {};
+                $previous = $previous->{$label};
+            }
+        }
+    }
+    return $tree;
 }
 
 sub _validate_domain {
@@ -344,7 +356,7 @@ sub _validate_length {
 sub _parseDataFile {
 	my ($self) = @_;
 
-	return $self->_parse_data_file();
+	$self->tld_tree($self->_parse_data_to_tree());
 }
 sub getRootDomain {
 	my ( $self, $domain ) = @_;

@@ -8,9 +8,9 @@ with 'XML::NewsML_G2::Role::HasQCode';
 has 'relevance', isa => 'Int', is => 'ro', required => 1;
 has 'parent', isa => __PACKAGE__, is => 'rw';
 has 'direct', isa => 'Bool', is => 'rw', default => '';
-has 'iso_code', isa => 'Str', is => 'rw';
+has 'iso_code',  isa => 'Str', is => 'rw';
 has 'longitude', isa => 'Num', is => 'rw';
-has 'latitude', isa => 'Num', is => 'rw';
+has 'latitude',  isa => 'Num', is => 'rw';
 
 __PACKAGE__->meta->make_immutable;
 

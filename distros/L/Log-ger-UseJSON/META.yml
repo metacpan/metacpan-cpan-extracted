@@ -17,16 +17,16 @@ meta-spec:
   version: '1.4'
 name: Log-ger-UseJSON
 requires:
-  Data::Clean::JSON: '0.38'
+  Data::Clean::ForJSON: '0'
   JSON::MaybeXS: '0'
-  Log::ger: '0.023'
+  Log::ger: '0.027'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseJSON
   homepage: https://metacpan.org/release/Log-ger-UseJSON
   repository: git://github.com/perlancar/perl-Log-ger-UseJSON.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -102,7 +102,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.592'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -114,11 +114,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -127,6 +127,17 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CheckSelfDependency
+      config:
+        Dist::Zilla::Plugin::CheckSelfDependency:
+          finder:
+            - ':InstallModules'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
+      name: '@Author::PERLANCAR/CheckSelfDependency'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -156,9 +167,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
-      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
-      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::PERLANCAR/OurPkgVersion'
+      version: '0.15'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -254,7 +265,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -288,11 +299,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -322,7 +333,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -342,7 +353,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.04'
+      version: '0.050'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'

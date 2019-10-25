@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 use strict;
 use warnings;
@@ -176,6 +176,21 @@ sub _sql_interp {
                             _sql_interp_data($_);
                         } @$item) . ")";
                     }
+                }
+                else {
+                    _error_item($idx, \@items);
+                }
+            }
+            elsif ($sql =~ /\bARRAY\s*$/si) {
+                $item = [ $$item ] if ref $item eq 'SCALAR';
+
+                # allow double references
+                $item = $$item if ref $item eq 'REF' ;
+
+                if (ref $item eq 'ARRAY') {
+                    $sql .= '[' . join(', ', map {
+                        _sql_interp_data($_);
+                    } @$item) . ']';
                 }
                 else {
                     _error_item($idx, \@items);
@@ -618,6 +633,19 @@ I<This is not commonly used.>
   # Example usage (where $x and $y are table references):
   'SELECT * FROM', $x, 'JOIN', $y
 
+=head3 Context ('ARRAY', $x)
+
+A scalarref or arrayref can be turned into an array value. Such values are supported by PostgreSQL.
+
+  IN:  'SELECT ARRAY', $aref
+  OUT: 'SELECT ARRAY[?, ?]', @$aref
+
+  IN:  'SELECT ARRAY', $sref
+  OUT: 'SELECT ARRAY[?]', $$sref
+
+  IN:  'SELECT ARRAY', []
+  OUT: 'SELECT ARRAY[]'
+
 =head3 Other Rules
 
 Whitespace is automatically added between parameters:
@@ -773,11 +801,13 @@ PostgreSQL.  Please inform the author of any incompatibilities.
 
 =head1 Contributor and Contributing
 
-David Manura (L<http://math2.org/david/contact>) (author).
-Mark Stosberg (L<http://mark.stosberg.com/>) created and maintains
-the SQL::Interp fork. Also thanks to: Mark Tiefenbruck (syntax), Wojciech Pietron (Oracle
-compat), Jim Chromie (DBIx::Interp idea), Juerd Waalboer,
-Terrence Brannon (early feedback), and others.
+David Manura is the author of the original L<SQL::Interpolate>, Mark Stosberg
+(L<http://mark.stosberg.com/>) created the SQL::Interp fork. It is now
+maintained by Yoran Heling (L<https://yorhel.nl/>).
+
+Also thanks to: Mark Tiefenbruck (syntax), Wojciech Pietron (Oracle compat),
+Jim Chromie (DBIx::Interp idea), Juerd Waalboer, Terrence Brannon (early
+feedback), and others.
 
 If you like SQL::Interp, please consider supporting the project by adding
 support for the 'quote_char' and 'name_sep' options. SQL::Abstract has code
@@ -789,9 +819,8 @@ performance improvement, considering working on this optimization: "RT#39778:
 wish: optimize IN() to be ANY() for compatible PostgreSQL versions":
 https://rt.cpan.org/Ticket/Display.html?id=39778
 
-SQL::Interp now has a code repository hosted on Github:
-
- L<https://github.com/markstos/SQL-Interp>
+The SQL::Interp Git repository is hosted at
+L<https://code.blicky.net/yorhel/SQL-Interp>.
 
 =head1 Bug Reporting
 
@@ -799,7 +828,12 @@ Use rt.cpan.org for bug reports.
 
 =head1 License
 
-Copyright (c) 2003-2005, David Manura.
+Copyright (c) 2004-2005 David Manura.
+
+Copyright (c) 2005-2019 Mark Stosberg.
+
+Copyright (c) 2019 Yoran Heling.
+
 This module is free software. It may be used, redistributed
 and/or modified under the same terms as Perl itself.
 See L<http://www.perl.com/perl/misc/Artistic.html>.

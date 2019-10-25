@@ -1,7 +1,7 @@
 package Bencher::Scenarios::HashPicking;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-10-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Scenarios to benchmark hash picking
@@ -18,7 +18,7 @@ Bencher::Scenarios::HashPicking - Scenarios to benchmark hash picking
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenarios::HashPicking (from Perl distribution Bencher-Scenarios-HashPicking), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenarios::HashPicking (from Perl distribution Bencher-Scenarios-HashPicking), released on 2019-10-20.
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension LWP::Protocol::PSGI
 
+0.11  2019-10-25 09:55:42 JST
+        - Make it possible to unregister() and register() again #11
+
 0.10  2017-05-29 12:30:35 PDT
         - Fix mirror() (haarg) #9
 

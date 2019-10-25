@@ -1,0 +1,89 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Set::Relation::V2 -
+Bundled second implementation of Set::Relation role
+
+=head1 VERSION
+
+This document describes Set::Relation::V2 version 0.13.2 for Perl.
+
+=head1 SYNOPSIS
+
+See the SYNOPSIS of L<Set::Relation>, which represents this file also.
+
+=head1 DESCRIPTION
+
+Set::Relation::V2 provides the second complete implementation of the
+Set::Relation role, following L<Set::Relation::V1>, and it does not
+implement the Set::Relation::Mutable role.  This newer version is the one
+you should be using in practice, rather than the older one, since it should
+have better performance.
+
+There are 2 main differences that Set::Relation::V2 has from
+Set::Relation::V1.  The first is that V2 provides immutable objects while
+V1 provides mutable objects.  The second is that V2 is lazy and will defer
+any tests for duplicate tuples as late as possible, while V1 is eager and
+will test for duplicate tuples as early as possible; V2 will also respect
+true C<$allow_dup_tuples> arguments, while V1 will ignore them.  Besides
+those 2 matters and their associated large differences in performance
+profiles, V2 is essentially the same as V1, including that relation tuples
+are internally represented by Perl Hashes.
+
+=head1 INTERFACE
+
+Set::Relation::V2 composes the Set::Relation role declared in the
+L<Set::Relation> file.
+
+=head1 DIAGNOSTICS
+
+I<This documentation is pending.>
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+I<This documentation is pending.>
+
+=head1 DEPENDENCIES
+
+This file requires any version of Perl 5.x.y that is at least 5.8.0.
+
+It also requires these Perl packages that are available both bundled with
+Perl 5.8.0+ and on CPAN: L<Carp-ver(1.01..*)|Carp>.
+
+It also requires these Perl packages that are available both bundled with
+Perl 5.8.1+ and on CPAN: L<Scalar::Util-ver(1.13..*)|Scalar::Util>.
+
+It also requires these Perl packages that are available both bundled with
+Perl 5.26.0+ and on CPAN: L<List::Util-ver(1.4602..*)|List::Util>.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 SEE ALSO
+
+Go to L<Set::Relation> for the majority of both distribution-internal
+and external references.
+
+=head1 BUGS AND LIMITATIONS
+
+I<This documentation is pending.>
+
+=head1 AUTHOR
+
+Darren Duncan (C<darren@DarrenDuncan.net>)
+
+=head1 LICENSE AND COPYRIGHT
+
+Set::Relation is Copyright © 2006-2019, Muldis Data Systems, Inc.
+
+See the LICENSE AND COPYRIGHT of L<Set::Relation> for details.
+
+=head1 ACKNOWLEDGEMENTS
+
+The ACKNOWLEDGEMENTS in L<Set::Relation> apply to this file too.
+
+=cut

@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Authenticator::Redirect::Role;
-$Web::Authenticate::Authenticator::Redirect::Role::VERSION = '0.012';
+$Web::Authenticate::Authenticator::Redirect::Role::VERSION = '0.013';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::Authenticator::Redirect object should contain.
 
@@ -24,7 +24,7 @@ Web::Authenticate::Authenticator::Redirect::Role - A Mouse::Role that defines wh
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

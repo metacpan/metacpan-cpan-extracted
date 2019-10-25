@@ -178,6 +178,20 @@ interp_test(['WHERE field in', $v0],
             ['WHERE 1=0'],
             'IN lowercase');  # fails in 0.31
 
+# ARRAY
+interp_test(['SELECT ARRAY', $maybe_array],
+            ['SELECT ARRAY[?, ?]', @$maybe_array],
+            'ARRAY');
+interp_test(['SELECT ARRAY', \$maybe_array],
+            ['SELECT ARRAY[?, ?]', @$maybe_array],
+            'ARRAY ref');
+interp_test(['SELECT ARRAY', \$v0],
+            ['SELECT ARRAY[]'],
+            'ARRAY empty');
+interp_test(['SELECT ARRAY', \$x],
+            ['SELECT ARRAY[?]', $x],
+            'ARRAY scalar');
+
 # SET
 interp_test(['UPDATE mytable SET', $h],
             ["UPDATE mytable SET $hi->{keys}[0]=?, $hi->{keys}[1]=?", @{$hi->{values}}],

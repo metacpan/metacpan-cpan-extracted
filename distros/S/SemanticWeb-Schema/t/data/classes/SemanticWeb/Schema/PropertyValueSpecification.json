@@ -13,8 +13,8 @@
          "rdfs:label" : "defaultValue",
          "schema:domainIncludes" : "schema:PropertyValueSpecification",
          "schema:rangeIncludes" : [
-            "schema:Thing",
-            "schema:Text"
+            "schema:Text",
+            "schema:Thing"
          ]
       },
       "schema:maxValue" : {
@@ -24,9 +24,9 @@
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
             "schema:QuantitativeValue",
-            "schema:MonetaryAmount",
             "schema:PropertyValue",
-            "schema:PropertyValueSpecification"
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -36,10 +36,10 @@
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:PropertyValue",
-            "schema:MonetaryAmount",
             "schema:QuantitativeValue",
-            "schema:PropertyValueSpecification"
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount",
+            "schema:PropertyValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },

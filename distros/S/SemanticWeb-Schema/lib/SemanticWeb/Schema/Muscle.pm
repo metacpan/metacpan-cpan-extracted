@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has action => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Muscle - A muscle is an anatomical structure consisting of 
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -101,10 +101,10 @@ tissue that animals use to effect movement.
 
 =head2 C<action>
 
-=for html Obsolete term for <a class="localLink"
+=for html <p>Obsolete term for <a class="localLink"
 href="http://schema.org/muscleAction">muscleAction</a>. Not to be confused
 with <a class="localLink"
-href="http://schema.org/potentialAction">potentialAction</a>.
+href="http://schema.org/potentialAction">potentialAction</a>.<p>
 
 A action should be one of the following types:
 

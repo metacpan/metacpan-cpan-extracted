@@ -3,14 +3,14 @@ package XML::NewsML_G2::Scheme;
 use Moose;
 use namespace::autoclean;
 
-
 has 'alias', isa => 'Str', is => 'ro', required => 1;
 has 'uri', isa => 'Str', is => 'ro';
 has 'catalog', isa => 'Str', is => 'ro';
 
 sub BUILD {
     my $self = shift;
-    die "Either uri or catalog is required\n" unless ($self->uri or $self->catalog);
+    die "Either uri or catalog is required\n"
+        unless ( $self->uri or $self->catalog );
     return;
 }
 

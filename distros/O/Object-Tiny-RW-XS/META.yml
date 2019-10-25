@@ -3,21 +3,24 @@ abstract: 'A date object with as little code as possible (and rw accessors)'
 author:
   - 'Adam Kennedy <adamk@cpan.org>, ::RW fork by Steffen Schwigon, ::RW::XS fork by Adam Hopkins'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Object-Tiny-RW-XS
 no_index:
   directory:
     - t
     - inc
 requires:
-  Class::XSAccessor: 0.11
-  Test::More: 0.47
-version: 0.03
+  Class::XSAccessor: '0.11'
+  Test::More: '0.47'
+resources:
+  repository: https://github.com/srchulo/Object-Tiny-RW-XS.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

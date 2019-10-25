@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.3.0");
+use version; our $VERSION = qv("v2.3.1");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -60,8 +60,9 @@ for details.
 sub all_files_ok {
     my ($self, @dirs) = @_;
 
-    $self->all_pm_files_ok(@dirs);
-    $self->all_pl_files_ok(@dirs);
+    if ( $self->all_pm_files_ok(@dirs) && $self->all_pl_files_ok(@dirs) ) {
+        return 1;
+    }
 }
 
 
@@ -79,10 +80,13 @@ sub all_pm_files_ok {
 
     my $test = $self->{test};
 
+    my $ok = 1;
     for my $file ( $self->all_pm_files(@dirs) ) {
-        my $ok = $self->pm_file_compiles($file);
-        $test->ok($ok, "$file compiles");
+        my $testok = $self->pm_file_compiles($file);
+	$ok = $testok ? $ok : 0;
+        $test->ok($testok, "$file compiles");
     }
+    return $ok;
 }
 
 
@@ -100,10 +104,13 @@ sub all_pl_files_ok {
 
     my $test = $self->{test};
 
+    my $ok = 1;
     for my $file ( $self->all_pl_files(@dirs) ) {
-        my $ok = $self->pl_file_compiles($file);
-        $test->ok($ok, "$file compiles");
+        my $testok = $self->pl_file_compiles($file);
+	$ok = $testok ? $ok : 0;
+        $test->ok($testok, "$file compiles");
     }
+    return $ok;
 }
 
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Sql::Analyzer;
 use Quiq::FileHandle;
@@ -36,11 +36,15 @@ L<Quiq::Hash>
 
 Die Klasse implementiert einen Leser von SQL-Skripten. Ein SQL-Skript
 ist eine Folge von SQL-Statements, die mit Semikolon I<am Ende einer
-Zeile> voneinander abgegrenzt sind. Eine Instanz der Klasse liefert
-nacheinander die einzelnen Statements, die ausgeführt oder
-anderweitig verarbeitet werden können. Da das Skript sukzessive gelesen
-wird, können auch sehr große SQL-Skripte, z.B. von Datenbank-Dumps,
-durch die Klasse verarbeitet werden.
+Zeile> (also vor einem Newline) voneinander getrennt sind. Eine Instanz
+der Klasse liefert nacheinander die einzelnen Statements, die ausgeführt
+oder anderweitig verarbeitet werden können. Da das Skript sukzessive
+gelesen wird, können auch sehr große SQL-Skripte, z.B. von
+Datenbank-Dumps, durch die Klasse verarbeitet werden.
+
+Leerzeilen am Anfang eines Statements werden entfernt, außerdem
+das abschließende Semikolon und darauffolgender Whitespace bis
+zum Zeilenende.
 
 =head1 CAVEATS
 
@@ -172,10 +176,11 @@ sub nextStmt {
             if ($aly->isCreateFunction($stmt)) {
 
                 # Im Falle von CREATE FUNCTION oder CREATE OR REPLACE
-                # FUNCTIONbei PostgreSQL endet das Statement nicht unbedingt
+                # FUNCTION bei PostgreSQL endet das Statement nicht unbedingt
                 # mit dem ersten Semikolon am Zeilenende. Ggf. müssen wir
                 # den Inhalt zwischen den Begrenzern $STR$ ... $STR$
-                # überlesen. Die Begrenzer sind aber offenbar optional. 
+                # (STR ist ein frei gewählter Bezeichner) überlesen.
+                # Die Begrenzer sind aber optional. 
 
                 # Begrenzer ermitteln
                 my ($as) = $stmt =~ /AS\s+(\$.*?\$)/i;
@@ -224,7 +229,7 @@ sub nextStmt {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

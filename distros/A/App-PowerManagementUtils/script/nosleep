@@ -1,0 +1,202 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/PowerManagementUtils/prevent_sleep_until_interrupted
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2019-09-15'; # DATE
+our $DIST = 'App-PowerManagementUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/PowerManagementUtils/prevent_sleep_until_interrupted",
+    program_name => "nosleep",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Prevent sleep until interrupted
+# PODNAME: nosleep
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+nosleep - Prevent sleep until interrupted
+
+=head1 VERSION
+
+This document describes version 0.003 of nosleep (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % nosleep [options]
+
+=head1 DESCRIPTION
+
+Uses L<Proc::Govern> to run C<sleep infinity>, with the option `no-sleep' to
+instruct Proc::Govern to disable system from sleeping until interrupted.
+
+For more options when running command, e.g. timeout, load control, autorestart,
+screensaver control, use the module or its CLI L<govproc> directly.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C nosleep nosleep
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete nosleep 'p/*/`nosleep`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PowerManagementUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PowerManagementUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PowerManagementUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

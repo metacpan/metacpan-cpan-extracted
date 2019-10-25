@@ -1,11 +1,14 @@
 package Release::Util::Git;
 
-our $DATE = '2017-02-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
+
+use Regexp::Pattern 'Git::release_tag';
 
 our %SPEC;
 
@@ -22,10 +25,18 @@ This routine returns a list of them.
 
 _
     args => {
-        regex => {
+        release_tag_regex => {
             summary => 'Regex to match a release tag',
             schema => 're*',
-            default => qr/\A(version|ver|v)?\d/,
+            default => qr/\A$RE{release_tag}/,
+        },
+        author_name_regex => {
+            summary => 'Only consider release commits where author name matches this regex',
+            schema => 're*',
+        },
+        author_email_regex => {
+            summary => 'Only consider release commits where author email matches this regex',
+            schema => 're*',
         },
         detail => {
             schema => ['bool*', is=>1],
@@ -37,7 +48,7 @@ _
     },
     examples => [
         {
-            args => {detail=>1, regex=>'^release'},
+            args => {detail=>1, release_tag_regex=>'^release'},
             'x.doc.show_result' => 0,
             test => 0,
         },
@@ -49,7 +60,9 @@ sub list_git_release_tags {
     my %args = @_;
 
     # XXX schema
-    my $regex = $args{regex} // qr/\A(version|ver|v)?\d/;
+    my $release_tag_regex  = $args{release_tag_regex} // $args{regex} // $RE{release_tag};
+    my $author_name_regex  = $args{author_name_regex};
+    my $author_email_regex = $args{author_email_regex};
 
     -d ".git" or return [412, "No .git subdirectory found"];
     File::Which::which("git") or return [412, "git is not found in PATH"];
@@ -57,19 +70,30 @@ sub list_git_release_tags {
     my @res;
     my $resmeta = {};
 
-    for my $line (`git for-each-ref --format='%(creatordate:raw) %(refname) %(objectname)' refs/tags`) {
-        my ($epoch, $offset, $tag, $commit) = $line =~ m!^(\d+) ([+-]\d+) refs/tags/(.+) (.+)$! or next;
-        $tag =~ $regex or next;
-        push @res, {
+    for my $line (`git for-each-ref --format='%(creatordate:raw)%09%(authorname)%09%(authoremail)%09%(refname)%09%(objectname)' refs/tags`) {
+        my ($epoch, $offset, $author_name, $author_email, $tag, $commit) = $line =~ m!^(\d+) ([+-]\d+)\t(.+?)\t(.+?)\trefs/tags/(.+)\t(.+)$! or next;
+        $tag =~ $release_tag_regex or next;
+        my $rec = {
             tag => $tag,
             date => $epoch,
             tz_offset => $offset,
+            author_name => $author_name,
+            author_email => $author_email,
             commit => $commit,
         };
+        if (defined $author_name_regex && $rec->{author_name} !~ $author_name_regex) {
+            log_debug "Not including release tag $tag because author name ($rec->{author_name}) does not match regex $author_name_regex";
+            next;
+        }
+        if (defined $author_email_regex && $rec->{author_email} !~ $author_email_regex) {
+            log_debug "Not including release tag $tag because author email ($rec->{author_email}) does not match regex $author_email_regex";
+            next;
+        }
+        push @res, $rec;
     }
 
     if ($args{detail}) {
-        $resmeta->{'table.fields'} = [qw/tag date tz_offset commit/];
+        $resmeta->{'table.fields'} = [qw/tag date tz_offset author_name author_email commit/];
     } else {
         @res = map { $_->{tag} } @res;
     }
@@ -137,7 +161,7 @@ Release::Util::Git - Utility routines related to software releases and git
 
 =head1 VERSION
 
-This document describes version 0.004 of Release::Util::Git (from Perl distribution Release-Util-Git), released on 2017-02-10.
+This document describes version 0.007 of Release::Util::Git (from Perl distribution Release-Util-Git), released on 2019-10-24.
 
 =head1 FUNCTIONS
 
@@ -146,7 +170,7 @@ This document describes version 0.004 of Release::Util::Git (from Perl distribut
 
 Usage:
 
- list_git_release_tags(%args) -> [status, msg, result, meta]
+ list_git_release_tags(%args) -> [status, msg, payload, meta]
 
 List git release tags.
 
@@ -156,7 +180,7 @@ Examples:
 
 =item * Example #1:
 
- list_git_release_tags(detail => 1, regex => "^release");
+ list_git_release_tags(detail => 1, release_tag_regex => "^release");
 
 =back
 
@@ -174,7 +198,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
-=item * B<regex> => I<re> (default: qr(\A(version|ver|v)?\d))
+=item * B<release_tag_regex> => I<re> (default: qr(\A(?^:(?:(?:version|ver|v|release|rel)[_-]?)?\d)))
 
 Regex to match a release tag.
 
@@ -185,18 +209,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_git_release_years
 
 Usage:
 
- list_git_release_years(%args) -> [status, msg, result, meta]
+ list_git_release_years(%args) -> [status, msg, payload, meta]
 
 List git release years.
 
@@ -221,7 +246,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
-=item * B<regex> => I<re> (default: qr(\A(version|ver|v)?\d))
+=item * B<release_tag_regex> => I<re> (default: qr(\A(?^:(?:(?:version|ver|v|release|rel)[_-]?)?\d)))
 
 Regex to match a release tag.
 
@@ -232,7 +257,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -260,7 +285,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

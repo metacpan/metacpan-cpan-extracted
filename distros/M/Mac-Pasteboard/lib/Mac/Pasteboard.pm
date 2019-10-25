@@ -51,13 +51,28 @@ use constant CODE_REF	=> ref sub {};
     our @EXPORT = @funcs;	## no critic (ProhibitAutomaticExportation)
 }
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 our $XS_VERSION = $VERSION;
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
 
 require XSLoader;
-XSLoader::load('Mac::Pasteboard', $XS_VERSION);
+XSLoader::load( 'Mac::Pasteboard', $XS_VERSION);
+
+# This global and its associated environment variable are UNDOCUMENTED
+# and subject to change or retraction without notice.
+our $USE_PBCOPY = $ENV{MAC_PASTEBOARD_USE_PBCOPY};
+unless ( defined $USE_PBCOPY ) {
+    local $@ = undef;
+    eval {	## no critic (RequireCheckingReturnValueOfEval)
+	require POSIX;
+	my ( $sysname, undef, $release ) = POSIX::uname();
+	$release =~ s/ [.] .* //smx;
+	# macOS 10.15 Catalina
+	$USE_PBCOPY = $sysname =~ m/ \A Darwin \z /smxi && $release >= 19;
+	1;
+    };
+}
 
 BEGIN {
     eval {
@@ -94,6 +109,7 @@ my %attr = (
     },
     missing_ok => 1,	# read/write
     name => 0,		# read only
+    requested_name => 0, # read only
     status => sub {	# read/write. This is the mutator.
 	$_[2] =~ m/^[+\-]?\d+$/
 	    or croak "Status value must be an integer";
@@ -118,6 +134,7 @@ sub new {
 	id		=> undef,
 	missing_ok	=> 0,
 	name		=> $name,
+	requested_name	=> $name,
     }, $class;
     my ($status, $pbref, $created_name) = xs_pbl_create ($self->{name});
     __PACKAGE__->_check ($status) and return;
@@ -143,19 +160,30 @@ sub clone {
 
 sub copy {
     my ($self, $data, $flavor, $flags) = @_;
-    defined $flavor
-	and $flavor ne ''
-	or $flavor = $self->{default_flavor};
-    defined $flags or $flags = kPasteboardFlavorNoFlags ();
-    return $self->_check (
-	xs_pbl_copy (
-	    $self->{pbref},
-	    $self->_xlate( encode => $data, $flavor ),
-	    ( defined $self->{id} ? $self->{id} : 1 ),
-	    $flavor,
-	    $flags,
-	)
-    );
+    if ( $USE_PBCOPY ) {
+	my @arg;
+	kPasteboardFind() eq $self->get( 'requested_name' )
+	    and push @arg, qw{ -pboard find };
+	open my $fh, '|-', 'pbcopy', @arg,
+	    or croak "Unable to open pipe to pbcopy: $!";
+	print { $fh } $data;
+	close $fh;
+	return $? ? coreFoundationUnknownError() : !1;
+    } else {
+	defined $flavor
+	    and $flavor ne ''
+	    or $flavor = $self->{default_flavor};
+	defined $flags or $flags = kPasteboardFlavorNoFlags ();
+	return $self->_check (
+	    xs_pbl_copy (
+		$self->{pbref},
+		$self->_xlate( encode => $data, $flavor ),
+		( defined $self->{id} ? $self->{id} : 1 ),
+		$flavor,
+		$flags,
+	    )
+	);
+    }
 }
 
 sub flavors {
@@ -477,6 +505,12 @@ or equivalently, using the object-oriented interface,
   $pb->copy ("Hello, sailor!\n");
 
 =head1 CAVEATS
+
+macOS (as they spell it now) 10.15 Catalina appears to have broken this
+module. The problem appears to be in placing text on the pasteboard.
+As a stopgap until I can sort this out properly, the C<copy()> method
+spawns L<pbcopy (1)> if run under Darwin 19 or higher. If L<pbcopy (1)>
+is spawned, the flavor functionality is unavailable.
 
 This module is only useful if the script calling it has access to the
 desktop. Otherwise attempts to instantiate a Mac::Pasteboard object will
@@ -935,6 +969,10 @@ be equivalent. That is,
      $pb1->get('name'));
 
 gives two handles to the same clipboard.
+
+=head2 requested_name (string, readonly)
+
+This attribute reports the name passed to C<new()>.
 
 =head2 status (dualvar)
 

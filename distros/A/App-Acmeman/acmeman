@@ -448,6 +448,36 @@ hostname.
 
 =back
 
+=head2 B<[account]>
+
+Configures where to store ACME account credentials: account key ID and
+account private key.  Both values are stored in separate files on disk.
+If the files do not exist B<acmeman> will initiate creation of a new
+account and will save its credentials for further use.
+
+=over 4
+
+=item B<directory=>I<DIR>
+
+Directory where to store credential files.  Defaults to
+F</etc/ssl/acme>.
+
+=item B<id=>I<FILE>
+
+Name of the file with account key ID.  Unless I<FILE> begins with a
+directory separator, it is taken relative to B<account.directory>.
+
+Default: F</etc/ssl/acme/key.id>.
+
+=item B<key=>I<FILE>
+
+Name of the file with account key.  Unless I<FILE> begins with a
+directory separator, it is taken relative to B<account.directory>.
+
+Default: F</etc/ssl/acme/key.pem>.
+
+=back
+
 =head2 B<[domain I<CN>]>
 
 Declares the domain for which a certificate should be maintained. I<CN> is

@@ -1,11 +1,17 @@
-0.004   2017-08-25 (PERLANCAR)
+0.005   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Update new module name: Data::Clean::JSON ->
+	  Data::Clean::ForJSON.
+
+
+0.004   2017-08-25  Released-By: PERLANCAR
 
 	- Add participant: Data::Tersify.
 
         - Add scenario: DataCleansing::Object_DateTime.
 
 
-0.003   2017-01-25 (PERLANCAR)
+0.003   2017-01-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,13 +20,13 @@
           type=x_benchmarks.
 
 
-0.002   2017-01-15 (PERLANCAR)
+0.002   2017-01-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [build] Rebuild with newer versions of modules.
 
 
-0.001   2016-04-24 (PERLANCAR)
+0.001   2016-04-24  Released-By: PERLANCAR
 
         - First release.

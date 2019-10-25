@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,13 +34,13 @@ SemanticWeb::Schema::UserReview - A review created by an end-user (e
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A review created by an end-user (e.g. consumer, purchaser, attendee etc.),
-in contrast with <a class="localLink"
-href="http://schema.org/CriticReview">CriticReview</a>.
+=for html <p>A review created by an end-user (e.g. consumer, purchaser, attendee
+etc.), in contrast with <a class="localLink"
+href="http://schema.org/CriticReview">CriticReview</a>.<p>
 
 =head1 SEE ALSO
 

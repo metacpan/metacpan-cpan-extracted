@@ -1,3 +1,6 @@
+0.13 2018-10-19 dmol@cpan.org
+ - update tests, as freetype changed font metrices under hood
+
 0.12 2018-08-12 dmol@cpan.org
  - Fix MANIFEST
 

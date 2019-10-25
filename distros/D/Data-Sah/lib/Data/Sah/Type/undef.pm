@@ -1,7 +1,7 @@
 package Data::Sah::Type::undef;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.901'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.902'; # VERSION
 
 use Role::Tiny;
 use Data::Sah::Util::Role 'has_clause';
@@ -21,7 +21,7 @@ Data::Sah::Type::undef - undef type
 
 =head1 VERSION
 
-This document describes version 0.901 of Data::Sah::Type::undef (from Perl distribution Data-Sah), released on 2019-08-14.
+This document describes version 0.902 of Data::Sah::Type::undef (from Perl distribution Data-Sah), released on 2019-10-24.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

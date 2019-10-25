@@ -1,0 +1,5 @@
+Revision history for Perl extension Google::RestApi.
+
+0.01  Thu Sep  5 11:47:30 2019
+	- original version; created by h2xs 1.23 with options
+		-X -n Google::RestApi

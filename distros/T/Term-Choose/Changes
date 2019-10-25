@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.705   2019-10-18
+    - Bugfix in 'busy_string'.
+
 1.704   2019-10-13
     - Added 'busy_string'.
 

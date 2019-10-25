@@ -22,24 +22,23 @@ produces output
     aAaAaceEeEeEeiiouUuuUがぎぐげご
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.11/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.13/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Unicode::Diacritic::Strip version 0.11
-corresponding to git commit L<221f13a3bc5f4a26a8b6c7f39cbad02c83b36010|https://github.com/benkasminbullock/Unicode-Diacritic-Strip/commit/221f13a3bc5f4a26a8b6c7f39cbad02c83b36010> released on Mon Sep 10 14:44:50 2018 +0900.
+This documents Unicode::Diacritic::Strip version 0.13
+corresponding to git commit L<1659e34a4150d1257da209a0e6078b6cd777be95|https://github.com/benkasminbullock/Unicode-Diacritic-Strip/commit/1659e34a4150d1257da209a0e6078b6cd777be95> released on Mon Oct 21 14:26:51 2019 +0900.
 
 =head1 DESCRIPTION
 
 This module offers two ways to remove diacritics from Unicode
-text. One of them, L</strip_diacritics>, uses the unicode
+text. One of them, L</strip_diacritics>, uses the Unicode
 decompositions to break the characters down. The other one,
-L</fast_strip>, is a faster alternative, which is basically C<tr> with
-a big list of alphabetical characters with and without
-diacritics. There is also L</strip_alphabet>, which is the same as
-L</strip_diacritics>, but it also returns a list of what characters
-were changed.
+L</fast_strip>, is a faster alternative based on a hash of
+alphabetical characters with and without diacritics. There is also
+L</strip_alphabet>, which is the same as L</strip_diacritics>, but it
+also returns a list of what characters were changed.
 
 =head1 FUNCTIONS
 
@@ -76,7 +75,7 @@ produces output
     í was converted to i
 
 
-(This example is included as L<F<strip-alphabet.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.11/examples/strip-alphabet.pl> in the distribution.)
+(This example is included as L<F<strip-alphabet.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.13/examples/strip-alphabet.pl> in the distribution.)
 
 
 This was added to the module in version 0.08. Prior to that it was in
@@ -88,9 +87,9 @@ duplicate of this module, but fortunately hadn't released to CPAN.
     my $stripped = fast_strip ($text);
 
 Rapidly strip alphabetical Unicode characters to the nearest plain
-ASCII equivalents. This is just a big list of characters and a C<tr>
-to zap them into ASCII. It also contains a few other things like the
-thorn character and a ligature.
+ASCII equivalents. This is just a big list of characters and a
+substitution statement which zaps them into ASCII. It also contains a
+few other things like the thorn character and a ligature.
 
     
     use utf8;
@@ -106,13 +105,14 @@ produces output
     Bjorn Lodz
 
 
-(This example is included as L<F<ask.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.11/examples/ask.pl> in the distribution.)
+(This example is included as L<F<ask.pl>|https://fastapi.metacpan.org/source/BKB/Unicode-Diacritic-Strip-0.13/examples/ask.pl> in the distribution.)
 
 
 This was added to the module in version 0.07. It has been in service
 for several years at the following website:
 L<http://www.sljfaq.org/cgi/e2k.cgi> for converting the user's inputs
-into the closest English equivalent.
+into the closest English equivalent. It was changed from a C<tr> to a
+substitution in version 0.12.
 
 =head1 SEE ALSO
 
@@ -155,8 +155,6 @@ Kurmanov.
 
 =item L<Unicode::UCD>
 
-=item L<Encode>
-
 =back
 
 =head1 EXPORTS
@@ -195,7 +193,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2018
+2012-2019
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

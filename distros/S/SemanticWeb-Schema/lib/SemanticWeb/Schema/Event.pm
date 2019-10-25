@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has about => (
@@ -314,14 +314,14 @@ SemanticWeb::Schema::Event - An event happening at a certain time and location
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An event happening at a certain time and location, such as a concert,
+=for html <p>An event happening at a certain time and location, such as a concert,
 lecture, or festival. Ticketing information may be added via the <a
 class="localLink" href="http://schema.org/offers">offers</a> property.
-Repeated events may be structured as separate Event objects.
+Repeated events may be structured as separate Event objects.<p>
 
 =head1 ATTRIBUTES
 
@@ -465,8 +465,8 @@ A door_time should be one of the following types:
 
 =head2 C<duration>
 
-=for html The duration of the item (movie, audio recording, event, etc.) in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.
+=for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.<p>
 
 A duration should be one of the following types:
 
@@ -480,8 +480,8 @@ A duration should be one of the following types:
 
 C<endDate>
 
-=for html The end date and time of the item (in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+=for html <p>The end date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
 
 A end_date should be one of the following types:
 
@@ -525,11 +525,11 @@ A funder should be one of the following types:
 
 C<inLanguage>
 
-=for html The language of the content or performance or used in an action. Please use
-one of the language codes from the <a
+=for html <p>The language of the content or performance or used in an action. Please
+use one of the language codes from the <a
 href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>. See also
 <a class="localLink"
-href="http://schema.org/availableLanguage">availableLanguage</a>.
+href="http://schema.org/availableLanguage">availableLanguage</a>.<p>
 
 A in_language should be one of the following types:
 
@@ -722,8 +722,8 @@ A sponsor should be one of the following types:
 
 C<startDate>
 
-=for html The start date and time of the item (in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+=for html <p>The start date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
 
 A start_date should be one of the following types:
 

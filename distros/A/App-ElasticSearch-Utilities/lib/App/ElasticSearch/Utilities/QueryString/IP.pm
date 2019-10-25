@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::IP;
 use strict;
 use warnings;
 
-our $VERSION = '7.3'; # VERSION
+our $VERSION = '7.4'; # VERSION
 
 use Net::CIDR::Lite;
 use namespace::autoclean;
@@ -12,17 +12,20 @@ use namespace::autoclean;
 use Moo;
 with 'App::ElasticSearch::Utilities::QueryString::Plugin';
 
+sub _build_priority { 25 }
+
 
 sub handle_token {
     my ($self,$token) = @_;
     if( my ($term,$match) = split /\:/, $token, 2 ) {
-        if($term =~ /_ip$/ ) {
-            if($match =~ m|^\d{1,3}(\.\d{1,3}){1,3}(/\d+)$|) {
-                my $cidr = Net::CIDR::Lite->new();
-                $cidr->add($match);
-                my @range = split /-/, ($cidr->list_range)[0];
-                return { query_string => sprintf("%s:[%s TO %s]", $term, @range) };
-            }
+        # These are not 100% accurate IP matchers, but they are fast
+        if(     $match =~ m|^\d{1,3}(?:\.\d{1,3}){1,3}(?:/\d+)$|
+            or  $match =~ m|^[0-9a-fA-F:]+(?:/\d+)$|
+        ) {
+            my $cidr = Net::CIDR::Lite->new();
+            $cidr->add($match);
+            my @range = split /-/, ($cidr->list_range)[0];
+            return { condition => { range => { $term => { gte => $range[0], lte => $range[1] } } } };
         }
     }
     return;
@@ -40,7 +43,7 @@ App::ElasticSearch::Utilities::QueryString::IP - Expand IP CIDR Notation to ES r
 
 =head1 VERSION
 
-version 7.3
+version 7.4
 
 =head1 SYNOPSIS
 

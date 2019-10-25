@@ -7,16 +7,12 @@ SYNOPSIS
        use Object::Pad;
     
        class Point {
-          has $x;
-          has $y;
+          has $x = 0;
+          has $y = 0;
     
-          method CREATE {
-             $x = $y = 0;
-          }
-    
-          method move {
-             $x += shift;
-             $y += shift;
+          method move($dX, $dY) {
+             $x += $dX;
+             $y += $dY;
           }
     
           method describe {
@@ -30,8 +26,7 @@ DESCRIPTION
     actually use this in production :)
 
     This module provides a simple syntax for creating object classes, which
-    uses private variables that look like lexicals as object member
-    attributes.
+    uses private variables that look like lexicals as object member fields.
 
 KEYWORDS
 
@@ -43,25 +38,49 @@ KEYWORDS
 
     Behaves similarly to the package keyword, but provides a package that
     defines a new class. Such a class provides an automatic constructor
-    method called new, which will invoke the class's CREATE method if it
+    method called new, which will invoke the class's BUILDALL method if it
     exists.
+
+    A single superclass is supported by the keyword extends
+
+       class Cat extends Animal {
+          ...
+       }
+
+    The superclass must also be implemented by Object::Pad.
 
  has
 
        has $var;
+       has $var = CONST;
        has @var;
        has %var;
 
-    Declares that the instances of the class have a member attribute of the
-    given name. This member attribute (called a "slot") will be accessible
-    as a lexical variable within any method declarations in the class.
+    Declares that the instances of the class have a member field of the
+    given name. This member field (called a "slot") will be accessible as a
+    lexical variable within any method declarations in the class.
 
     Array and hash members are permitted and behave as expected; you do not
     need to store references to anonymous arrays or hashes.
 
+    Member fields are private to a class. They are not visible to users of
+    the class, nor to subclasses. In order to provide access to them a
+    class may wish to use "method" to create an accessor.
+
+    A scalar slot may provide a expression that gives an initialisation
+    value, which will be assigned into the slot of every instance during
+    the constructor before BUILDALL is invoked. For ease-of-implementation
+    reasons this expression must currently be a compiletime constant, but
+    it is hoped that a future version will relax this restriction and allow
+    runtime-computed values.
+
  method
 
        method NAME {
+          ...
+       }
+    
+       method NAME (SIGNATURE) {
           ...
        }
     
@@ -70,10 +89,21 @@ KEYWORDS
        }
 
     Declares a new named method. This behaves similarly to the sub keyword,
-    except that within the body of the method all of the member attributes
+    except that within the body of the method all of the member fields
     ("slots") are also accessible. In addition, the method body will have a
     lexical called $self which contains the invocant object directly; it
     will already have been shifted from the @_ array.
+
+    The signatures feature is automatically enabled for method
+    declarations. In this case the signature does not have to account for
+    the invocant instance; that is handled directly.
+
+       method m($one, $two) {
+          say "$self invokes method on one=$one two=$two";
+       }
+    
+       ...
+       $obj->m(1, 2);
 
     A list of attributes may be supplied as for sub. The most useful of
     these is :lvalue, allowing easy creation of read-write accessors for
@@ -88,17 +118,37 @@ KEYWORDS
        my $c = Counter->new;
        $c->count++;
 
+IMPLIED PRAGMATA
+
+    In order to encourage users to write clean, modern code, the body of
+    the class block acts as if the following pragmata are in effect:
+
+       use strict;
+       use warnings;
+       no indirect ':fatal';
+       use feature 'signatures';
+
+    This list may be extended in subsequent versions to add further
+    restrictions and should not be considered exhaustive.
+
+    Further additions will only be ones that remove "discouraged" or
+    deprecated language features with the overall goal of enforcing a more
+    clean modern style within the body. As long as you write code that is
+    in a clean, modern style (and I fully accept that this wording is vague
+    and subjective) you should not find any new restrictions to be majorly
+    problematic. Either the code will continue to run unaffected, or you
+    may have to make some small alterations to bring it into a conforming
+    style.
+
 TODO
 
       * Setting default package using class Name; statement without block.
 
-      * Subclassing. Single-inheritence is easier than multi so maybe that
-      first.
+      * Multiple inheritence of subclassing
 
-      * Sub signatures
+      * Roles
 
-      * Detect and croak on attempts to invoke method subs on
-      non-instances.
+      * Consider visibility of superclass slots to subclasses.
 
       * Experiment with CvOUTSIDE or other techniques as a way to set up
       the per-method pad, and consider if we can detect which slots are in
@@ -106,11 +156,14 @@ TODO
 
       * Some extensions of the has syntax:
 
-      Default expressions
+      Non-constant default expressions
 
-         has $var = DEFAULT;
+         has $var = EXPR;
 
       A way to request generated accessors - ro or rw.
+
+      * Work out why no indirect doesn't appear to work properly before
+      perl 5.20.
 
 AUTHOR
 

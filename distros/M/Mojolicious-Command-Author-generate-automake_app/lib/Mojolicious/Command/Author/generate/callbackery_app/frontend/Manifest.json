@@ -1,0 +1,30 @@
+{
+ "$schema": "https://raw.githubusercontent.com/qooxdoo/qooxdoo-compiler/master/source/resource/qx/tool/schema/Manifest-1-0-0.json",
+  "info" :
+  {
+    "name" : "<%= ${class} %>",
+    "summary" : "<%= ${class} %> web app",
+    "description" : "A generic Callbackery app.",
+    "homepage" : "https://your-homepage",
+    "license" : "???",
+    "authors" : [
+        {
+            "name" : "<%= "${fullName}" %>",
+            "email" : "<%= ${email} %>"
+          }
+    ],
+    "version" : "0.0.1"
+  },
+  "provides" :
+  {
+    "namespace"   : "<%= ${class_file} %>",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation"
+  },
+  "requires": {
+    "@qooxdoo/framework": "^6.0.0-beta",
+    "@qooxdoo/compiler" : "^1.0.0-beta"
+  }
+}

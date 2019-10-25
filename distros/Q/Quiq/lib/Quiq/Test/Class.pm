@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -826,7 +826,7 @@ inTest()
 sub in {
     my ($self,$got,$expectedA,$text) = @_;
 
-    my $bool = Quiq::Assert->isEnumValue($got,$expectedA,-sloppy=>1);
+    my $bool = Quiq::Assert->isEnumValue($got,$expectedA);
 
     # Um Warnungen à la "does not map to ascii" zu verhindern
     $text = Quiq::Converter->umlautToAscii($text);
@@ -853,7 +853,7 @@ sub in {
 sub in_orig {
     my ($self,$got,$expectedA,$text) = @_;
 
-    my $bool = Quiq::Assert->isEnumValue($got,$expectedA,-sloppy=>1);
+    my $bool = Quiq::Assert->isEnumValue($got,$expectedA);
 
     # Um Warnungen à la "does not map to ascii" zu verhindern
     $text = Quiq::Converter->umlautToAscii($text);
@@ -1198,7 +1198,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

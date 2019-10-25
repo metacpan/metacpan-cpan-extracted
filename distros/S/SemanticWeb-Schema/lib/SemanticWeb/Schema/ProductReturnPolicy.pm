@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::ProductReturnPolicy;
 
-# ABSTRACT: A ProductReturnPolicy provides information about product return policies associated with an <a class="localLink" href="http://schema
+# ABSTRACT: A ProductReturnPolicy provides information about product return policies associated with an Organization or Product .
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has in_store_returns_offered => (
@@ -78,18 +78,18 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ProductReturnPolicy - A ProductReturnPolicy provides information about product return policies associated with an <a class="localLink" href="http://schema
+SemanticWeb::Schema::ProductReturnPolicy - A ProductReturnPolicy provides information about product return policies associated with an Organization or Product .
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A ProductReturnPolicy provides information about product return policies
+=for html <p>A ProductReturnPolicy provides information about product return policies
 associated with an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> or <a
-class="localLink" href="http://schema.org/Product">Product</a>.
+class="localLink" href="http://schema.org/Product">Product</a>.<p>
 
 =head1 ATTRIBUTES
 

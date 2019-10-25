@@ -7,9 +7,9 @@ use namespace::autoclean;
 
 with 'XML::NewsML_G2::Role::Remote';
 
-has 'duration', isa => 'Str', is => 'rw';
+has 'duration',        isa => 'Str', is => 'rw';
 has 'audiosamplerate', isa => 'Int', is => 'rw';
-has 'audiochannels', isa => 'Str', is => 'rw';
+has 'audiochannels',   isa => 'Str', is => 'rw';
 
 # IIM :
 # 2:150 Audio Type '1A'

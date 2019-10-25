@@ -73,6 +73,7 @@ FWILES
 Fabian
 Father
 Fesler
+Fiegehenn
 Finch
 Froehlich
 Gavin
@@ -115,6 +116,7 @@ Joe
 Joerg
 John
 Jr
+Julien
 KONISHI
 Kaji
 Kaminsky
@@ -335,6 +337,7 @@ jwilk
 jwittkoski
 ka
 katarina
+leedo
 lib
 loopback
 lwp

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has question => (
@@ -42,14 +42,14 @@ SemanticWeb::Schema::AskAction - The act of posing a question / favor to someone
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of posing a question / favor to someone.<br/><br/> Related
+=for html <p>The act of posing a question / favor to someone.<br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/ReplyAction">ReplyAction</a>: Appears generally as
-a response to AskAction.</li> </ul> 
+a response to AskAction.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

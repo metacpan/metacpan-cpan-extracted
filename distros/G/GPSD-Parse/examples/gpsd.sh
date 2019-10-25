@@ -1,1 +1,3 @@
-sudo gpsd /dev/ttyS0 -n -F /var/log/gpsd.sock
+#!/bin/sh
+
+sudo gpsd /dev/ttyUSB0 -n -F /var/log/gpsd.sock

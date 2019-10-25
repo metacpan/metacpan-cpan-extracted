@@ -1,0 +1,12 @@
+Revision history for Mojolicious-Command-bcrypt
+
+0.03  2019-10-24 14:50:06 CDT
+        - Bump minimum Mojolicious version to 8.16 to when getopt started returning the result from GetOptionsFromArray. Fixes #2.
+          relevant Mojo::Util commit: https://github.com/mojolicious/mojo/commit/e021a28152e9b0e796dfd0051f7f47966624b864#diff-f794a3437aab8543fdc53904e356a38f
+          Thanks, @eserte.
+
+0.02  2019-10-21 21:46:43 CDT
+        - Fixed minor typo in the pod. #1 (@manwar)
+
+0.01  2019-10-20 17:32:19 CDT
+        - Initial release

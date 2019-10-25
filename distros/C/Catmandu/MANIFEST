@@ -115,6 +115,7 @@ lib/Catmandu/Fix/copy.pm
 lib/Catmandu/Fix/copy_field.pm
 lib/Catmandu/Fix/count.pm
 lib/Catmandu/Fix/cp.pm
+lib/Catmandu/Fix/disassoc.pm
 lib/Catmandu/Fix/downcase.pm
 lib/Catmandu/Fix/error.pm
 lib/Catmandu/Fix/eval.pm
@@ -304,6 +305,7 @@ t/Catmandu-Fix-copy.t
 t/Catmandu-Fix-copy_field.t
 t/Catmandu-Fix-count.t
 t/Catmandu-Fix-cp.t
+t/Catmandu-Fix-disassoc.t
 t/Catmandu-Fix-downcase.t
 t/Catmandu-Fix-error.t
 t/Catmandu-Fix-eval.t

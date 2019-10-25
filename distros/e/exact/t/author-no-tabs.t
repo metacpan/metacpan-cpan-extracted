@@ -27,6 +27,7 @@ my @files = (
     't/control.t',
     't/extension.t',
     't/features.t',
+    't/no_dup_add_isa.t',
     't/release-kwalitee.t',
     't/try.t',
     't/use.t',

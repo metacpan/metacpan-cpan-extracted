@@ -47,6 +47,7 @@ for my $dist (
   'Moo',
   'namespace::autoclean',
   'Dancer2',
+  'MooX::Options',
 ) {
   note "Testing $dist ...";
 

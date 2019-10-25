@@ -8,7 +8,7 @@ use Test::More;
 use Object::Pad;
 
 class Counter {
-   has $count;
+   has $count = 0;
 
    method inc { $count++ };
 
@@ -26,12 +26,11 @@ class Counter {
 }
 
 class AllTheTypes {
-   has $scalar;
+   has $scalar = 123;
    has @array;
    has %hash;
 
-   method CREATE {
-      $scalar = 123;
+   method BUILDALL {
       push @array, 456;
       $hash{789} = 10;
    }
@@ -43,6 +42,22 @@ class AllTheTypes {
    }
 }
 
-AllTheTypes->new->test;
+{
+   use Data::Dump 'pp';
+
+   my $instance = AllTheTypes->new;
+
+   $instance->test;
+
+   # The exact output of this test is fragile as it depends on the internal
+   # representation of the instance, which we do not document and is not part
+   # of the API guarantee. We're not really checking that it has exactly this
+   # output, just that Data::Dump itself doesn't crash. If a later version
+   # changes the representation so that the output here differs, just change
+   # the test as long as it is something sensible.
+   is( pp($instance),
+      q(bless([123, [456], { 789 => 10 }], "AllTheTypes")),
+      'pp($instance) sees slot data' );
+}
 
 done_testing;

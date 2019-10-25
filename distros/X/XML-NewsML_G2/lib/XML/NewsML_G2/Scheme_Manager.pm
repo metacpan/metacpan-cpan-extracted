@@ -4,9 +4,11 @@ use Moose;
 use Carp;
 use namespace::autoclean;
 
-my @attrs = (qw(desk hltype role ind geo org topic crel crol drol svc
-isbn ean isrol nprov ninat stat sig iso3166_1a2 genre isin medtop rnd
-colsp adc group pgrmod copyright_holder));
+my @attrs = (
+    qw(desk hltype role ind geo org topic crel crol drol svc
+        isbn ean isrol nprov ninat stat sig iso3166_1a2 genre isin medtop rnd
+        colsp adc group pgrmod copyright_holder electiondistrict electionprovince)
+);
 
 foreach (@attrs) {
     has $_, isa => 'XML::NewsML_G2::Scheme', is => 'rw';
@@ -17,54 +19,56 @@ foreach (@attrs) {
 sub get_all_schemes {
     my $self = shift;
 
-    return grep {defined} map {$self->$_()} sort $self->meta->get_attribute_list();
+    return grep {defined}
+        map     { $self->$_() } sort $self->meta->get_attribute_list();
 }
 
 sub build_qcode {
-    my ($self, $name, $value) = @_;
+    my ( $self, $name, $value ) = @_;
     return unless $value;
 
     my $getter = $self->can($name) or croak "No schema named '$name'!";
     my $scheme = $getter->($self);
-    return unless ($scheme and ($scheme->uri or $scheme->catalog));
+    return unless ( $scheme and ( $scheme->uri or $scheme->catalog ) );
 
     return $scheme->alias . ':' . $value;
 }
 
 sub add_qcode_or_literal {
-    my ($self, $elem, $name, $value) = @_;
-    $self->_add_qcode($elem, $name, $value) or $elem->setAttribute('literal', $name . '#' . $value);
+    my ( $self, $elem, $name, $value ) = @_;
+    $self->_add_qcode( $elem, $name, $value )
+        or $elem->setAttribute( 'literal', $name . '#' . $value );
     return 1;
 }
 
 sub add_qcode {
-    my ($self, $elem, $name, $value) = @_;
-    $self->_add_qcode($elem, $name, $value) or die "Specifying a '$name' schema with uri or catalog required\n";
+    my ( $self, $elem, $name, $value ) = @_;
+    $self->_add_qcode( $elem, $name, $value )
+        or die "Specifying a '$name' schema with uri or catalog required\n";
     return 1;
 }
 
 sub add_role {
-    my ($self, $elem, $name, $value) = @_;
+    my ( $self, $elem, $name, $value ) = @_;
 
-    my $role = $self->build_qcode($name, $value);
+    my $role = $self->build_qcode( $name, $value );
     return unless $role;
 
-    $elem->setAttribute('role', $role);
+    $elem->setAttribute( 'role', $role );
     return 1;
 }
 
 # private methods
 
 sub _add_qcode {
-    my ($self, $elem, $name, $value) = @_;
+    my ( $self, $elem, $name, $value ) = @_;
 
-    my $qcode = $self->build_qcode($name, $value);
+    my $qcode = $self->build_qcode( $name, $value );
     return unless $qcode;
 
-    $elem->setAttribute('qcode', $qcode);
+    $elem->setAttribute( 'qcode', $qcode );
     return 1;
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

@@ -42,7 +42,7 @@ Azure Storage Services is composed of 4 APIs:
 * Blob service API
 * File service API
 * Queue service API
-* Table service API  
+* Table service API
 
 (More info on Azure's docs: https://docs.microsoft.com/en-us/rest/api/storageservices/)
 Azure::Storage::Blob::Client is a client solely for the Blob API.
@@ -105,6 +105,9 @@ $client->DeleteBlob(
   blob_name => $blob_name,
 );
 ```
+
+# Contributors && Kudos:
+* Alexandr Ciornii (@chorny): For pointing out build dependencies were being installed for end-users.
 
 # AUTHOR
 ```

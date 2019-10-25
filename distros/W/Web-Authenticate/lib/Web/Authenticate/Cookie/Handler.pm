@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Cookie::Handler;
-$Web::Authenticate::Cookie::Handler::VERSION = '0.012';
+$Web::Authenticate::Cookie::Handler::VERSION = '0.013';
 use Mouse;
 use CGI;
 use CGI::Cookie;
@@ -111,7 +111,7 @@ Web::Authenticate::Cookie::Handler - The default implementation of Web::Authenti
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

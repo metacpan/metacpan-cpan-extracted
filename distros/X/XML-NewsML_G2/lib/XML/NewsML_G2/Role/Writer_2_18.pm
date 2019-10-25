@@ -3,9 +3,15 @@ package XML::NewsML_G2::Role::Writer_2_18;
 use Moose::Role;
 use namespace::autoclean;
 
-has 'schema_location', isa => 'Str', is => 'ro', default => 'http://iptc.org/std/nar/2006-10-01/';
-has 'g2_catalog_url', isa => 'Str', is => 'ro', default => 'http://www.iptc.org/std/catalog/catalog.IPTC-G2-Standards_24.xml';
-
+has 'schema_location',
+    isa     => 'Str',
+    is      => 'ro',
+    default => 'http://iptc.org/std/nar/2006-10-01/';
+has 'g2_catalog_url',
+    isa => 'Str',
+    is  => 'ro',
+    default =>
+    'http://www.iptc.org/std/catalog/catalog.IPTC-G2-Standards_24.xml';
 
 1;
 __END__

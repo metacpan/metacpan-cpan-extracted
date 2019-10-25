@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has constraining_property => (
@@ -58,12 +58,12 @@ SemanticWeb::Schema::StatisticalPopulation - A StatisticalPopulation is a set of
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A StatisticalPopulation is a set of instances of a certain given type that
-satisfy some set of constraints. The property <a class="localLink"
+=for html <p>A StatisticalPopulation is a set of instances of a certain given type
+that satisfy some set of constraints. The property <a class="localLink"
 href="http://schema.org/populationType">populationType</a> is used to
 specify the type. Any property that can be used on instances of that type
 can appear on the statistical population. For example, a <a
@@ -93,7 +93,7 @@ class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>
 could be used. See also <a class="localLink"
 href="http://schema.org/Observation">Observation</a>, and the <a
 href="/docs/data-and-datasets.html">data and datasets</a> overview for more
-details.
+details.<p>
 
 =head1 ATTRIBUTES
 
@@ -101,11 +101,12 @@ details.
 
 C<constrainingProperty>
 
-=for html Indicates a property used as a constraint to define a <a class="localLink"
+=for html <p>Indicates a property used as a constraint to define a <a
+class="localLink"
 href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>
 with respect to the set of entities corresponding to an indicated type (via
 <a class="localLink"
-href="http://schema.org/populationType">populationType</a>).
+href="http://schema.org/populationType">populationType</a>).<p>
 
 A constraining_property should be one of the following types:
 
@@ -119,13 +120,14 @@ A constraining_property should be one of the following types:
 
 C<numConstraints>
 
-=for html Indicates the number of constraints (not counting <a class="localLink"
+=for html <p>Indicates the number of constraints (not counting <a class="localLink"
 href="http://schema.org/populationType">populationType</a>) defined for a
 particular <a class="localLink"
 href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.
 This helps applications understand if they have access to a sufficiently
 complete description of a <a class="localLink"
-href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.
+href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.<p
+>
 
 A num_constraints should be one of the following types:
 
@@ -139,9 +141,10 @@ A num_constraints should be one of the following types:
 
 C<populationType>
 
-=for html Indicates the populationType common to all members of a <a
+=for html <p>Indicates the populationType common to all members of a <a
 class="localLink"
-href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.
+href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.<p
+>
 
 A population_type should be one of the following types:
 

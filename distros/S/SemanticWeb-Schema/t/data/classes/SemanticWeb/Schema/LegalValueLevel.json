@@ -2,8 +2,8 @@
    "class" : {
       "core:closeMatch" : "ontology:LegalValue",
       "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1156",
-         "eli:index.html"
+         "eli:index.html",
+         "https://github.com/schemaorg/schemaorg/issues/1156"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A list of possible levels for the legal validity of a legislation.",

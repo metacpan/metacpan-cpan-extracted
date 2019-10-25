@@ -22,7 +22,7 @@ use Term::ANSIColor;
 use Getopt::Std;
 use File::Basename;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 my $me       = basename $0;
 
 # Where qmail stores all of its files
@@ -178,18 +178,17 @@ sub run {
     $self->start_qmail;
 }
 
-sub _build_msglist {
+sub _get_todo {
     my $self = shift;
+    my ($todohash, $msglist) = @_;
 
     my $queue = $self->queue;
 
-    my ( %todohash, %bouncehash );
-    my $msglist = {};
-
     opendir( my $tododir, "${queue}todo" );
+
     if ( $self->bigtodo ) {
         foreach my $todofile ( grep { !/\./ } readdir $tododir ) {
-            $todohash{$todofile} = $todofile;
+            $todohash->{$todofile} = $todofile;
         }
     }
     else {
@@ -204,67 +203,111 @@ sub _build_msglist {
         }
     }
     closedir $tododir;
+}
+
+sub _get_info {
+    my $self = shift;
+    my ($dir, $msglist) = @_;
+
+    my $queue = $self->queue;
+
+    opendir( my $infosubdir, "${queue}info/$dir" );
+
+    foreach my $infofile (
+        grep { !/\./ }
+        map  { "$dir/$_" } readdir $infosubdir
+      ) {
+        $msglist->{$infofile}{sender} = 'S';
+    }
+
+    close $infosubdir;
+}
+
+sub _get_local {
+    my $self = shift;
+    my ($dir, $msglist) = @_;
+
+    my $queue = $self->queue;
+
+    opendir( my $localsubdir, "${queue}local/$dir" );
+
+    foreach my $localfile (
+        grep { !/\./ }
+        map  { "$dir/$_" } readdir $localsubdir
+      ) {
+        $msglist->{$localfile}{local} = 'L';
+    }
+
+    close $localsubdir;
+}
+
+sub _get_remote {
+    my $self = shift;
+    my ($dir, $msglist) = @_;
+
+    my $queue = $self->queue;
+
+    opendir( my $remotesubdir, "${queue}remote/$dir" );
+
+    foreach my $remotefile (
+        grep { !/\./ }
+        map  { "$dir/$_" } readdir $remotesubdir
+    ) {
+        $msglist->{$remotefile}{remote} = 'R';
+    }
+
+  close $remotesubdir;
+}
+
+sub _get_subdir {
+    my $self = shift;
+    my ($dir, $msglist, $todohash, $bouncehash) = @_;
+
+    my $queue = $self->queue;
+
+    opendir( my $subdir, "${queue}mess/$dir" );
+
+    foreach my $file (
+        grep { !/\./ }
+        map  { "$dir/$_" } readdir $subdir
+      ) {
+        my ( $dirno, $msgno ) = split( /\//, $file );
+        if ( $bouncehash->{$msgno} ) {
+            $msglist->{$file}{bounce} = 'B';
+        }
+        if ( $self->bigtodo ) {
+            if ( $todohash->{$msgno} ) {
+                $msglist->{$file}{todo} = $msgno;
+            }
+        }
+    }
+
+    closedir $subdir;
+}
+
+sub _build_msglist {
+    my $self = shift;
+
+    my $queue = $self->queue;
+
+    my ( $todohash, $bouncehash );
+    my $msglist = {};
+
+    $self->_get_todo($todohash, $msglist);
 
     opendir( my $bouncedir, "${queue}bounce" );
     foreach my $bouncefile ( grep { !/\./ } readdir $bouncedir ) {
-        $bouncehash{$bouncefile} = 'B';
+        $bouncehash->{$bouncefile} = 'B';
     }
     closedir $bouncedir;
 
     opendir( my $messdir, "${queue}mess" );
+
     foreach my $dir ( grep { !/\./ } readdir $messdir ) {
-
-        opendir( my $infosubdir, "${queue}info/$dir" );
-
-        foreach my $infofile (
-            grep { !/\./ }
-            map  { "$dir/$_" } readdir $infosubdir
-          ) {
-            $msglist->{$infofile}{sender} = 'S';
-        }
-
-        close $infosubdir;
-
-        opendir( my $localsubdir, "${queue}local/$dir" );
-
-        foreach my $localfile (
-            grep { !/\./ }
-            map  { "$dir/$_" } readdir $localsubdir
-          ) {
-            $msglist->{$localfile}{local} = 'L';
-        }
-
-        close $localsubdir;
-
-        opendir( my $remotesubdir, "${queue}remote/$dir" );
-
-        foreach my $remotefile (
-            grep { !/\./ }
-            map  { "$dir/$_" } readdir $remotesubdir
-          ) {
-            $msglist->{$remotefile}{remote} = 'R';
-        }
-
-        close $remotesubdir;
-
-        opendir( my $subdir, "${queue}mess/$dir" );
-
-        foreach my $file (
-            grep { !/\./ }
-            map  { "$dir/$_" } readdir $subdir
-          ) {
-            my ( $dirno, $msgno ) = split( /\//, $file );
-            if ( $bouncehash{$msgno} ) {
-                $msglist->{$file}{bounce} = 'B';
-            }
-            if ( $self->bigtodo ) {
-                if ( $todohash{$msgno} ) {
-                    $msglist->{$file}{todo} = $msgno;
-                }
-            }
-        }
-
-        closedir $subdir;
+        $self->_get_info($dir);
+        $self->_get_local($dir);
+        $self->_get_remote($dir);
+        $self->_get_subdir($dir);
     }
     closedir $messdir;
 
@@ -284,132 +327,180 @@ sub parse_args {
 
     my %opt;
 
-    my %optargs = (
-        a => 0, # (Attempt to) send all queued messages
-        l => 0, # List message queues
-        L => 0, # List local message queue
-        R => 0, # List remote message queue
-        N => 0, # List message numbers only
-        c => 0, # Coloured output
-        s => 0, # Show statistics of queues
-        m => 1, # Display message with given number
-        f => 1, # Delete messages from given sender
-        F => 1, # Delete messages from given sender (regex match)
-        d => 1, # Delete message with given number
-        S => 1, # Delete messages with matching subject
-        h => 1, # Delete messages with matching header (case insensitive)
-        b => 1, # Delete messages with matching body (case insensitive)
-        H => 1, # Delete messages with matching header (case sensitive)
-        B => 1, # Delete messages with matching body (case sensitive)
-        t => 1, # Flag messages with matching recipients
-        D => 0, # Delete all messages in queues
-        V => 0, # Display program version
-        '?' => 0, # Display help
-    );
-
-    my $optstring = join '', map { $_ . ( $optargs{$_} ? ':' : '' ) }
-      keys %optargs;
-
-    getopts( $optstring, \%opt );
-
-    foreach my $opt ( keys %opt ) {
-        if ( $optargs{$opt} and not $opt{$opt} ) {
-            die "Option $opt must have an argument\n";
-        }
-      SWITCH: {
-            $opt eq 'a' and do {
+    my %option = (
+        # (Attempt to) send all queued messages
+        a => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&send_msgs ] );
-                last SWITCH;
-            };
-            $opt eq 'l' and do {
+            },
+        },
+        # List message queues
+        l => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&list_msg, 'A' ] );
-                last SWITCH;
-            };
-            $opt eq 'L' and do {
+            },
+        },
+        # List local message queue
+        L => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&list_msg, 'L' ] );
-                last SWITCH;
-            };
-            $opt eq 'R' and do {
+            },
+        },
+        # List remote message queue
+        R => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&list_msg, 'R' ] );
-                last SWITCH;
-            };
-            $opt eq 'N' and do {
+            },
+        },
+        # List message numbers only
+        N => {
+            arg  => 0,
+            code => sub {
                 $self->summary(1);
-                last SWITCH;
-            };
-            $opt eq 'c' and do {
+            },
+        },
+        # Coloured output
+        c => {
+            arg  => 0,
+            code => sub {
                 @{ $self->colours }{qw[msg stat end]} = (
                     color('bold bright_blue'),
                     color('bold bright_red'),
                     color('reset'),
                 );
-                last SWITCH;
-            };
-            $opt eq 's' and do {
+            },
+        },
+        # Show statistics of queues
+        s => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&stats ] );
-                last SWITCH;
-            };
-            $opt eq 'm' and do {
-                $self->add_action( [ \&view_msg, $opt{$opt} ] );
-                last SWITCH;
-            };
-            $opt eq 'f' and do {
-                $self->add_action( [ \&del_msg_from_sender, $opt{$opt} ] );
+            },
+        },
+        # Display message with given number
+        m => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&view_msg, @_ ] );
+            },
+        },
+        # Delete messages from given sender
+        f => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_from_sender, @_ ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'F' and do {
-                $self->add_action( [ \&del_msg_from_sender_r, $opt{$opt} ] );
+            },
+        },
+        # Delete messages from given sender (regex match)
+        F => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_from_sender_r, @_ ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'd' and do {
-                $self->add_action( [ \&del_msg, $opt{$opt} ] );
+            },
+        },
+        # Delete message with given number
+        d => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg, @_ ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'S' and do {
-                $self->add_action( [ \&del_msg_subj, $opt{$opt} ] );
+            },
+        },
+        # Delete messages with matching subject
+        S => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_subj, @_ ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'h' and do {
-                $self->add_action( [ \&del_msg_header_r, $opt{$opt}, 1 ] );
+            },
+        },
+        # Delete messages with matching header (case insensitive)
+        h => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_header_r, @_, 1 ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'b' and do {
-                $self->add_action( [ \&del_msg_body_r, $opt{$opt}, 1 ] );
+            },
+        },
+        # Delete messages with matching body (case insensitive)
+        b => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_body_r, @_, 1 ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'H' and do {
-                $self->add_action( [ \&del_msg_header_r, $opt{$opt}, 0 ] );
+            },
+        },
+        # Delete messages with matching header (case sensitive)
+        H => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_header_r, @_, 0 ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'B' and do {
-                $self->add_action( [ \&del_msg_body_r, $opt{$opt}, 0 ] );
+            },
+        },
+        # Delete messages with matching body (case sensitive)
+        B => {
+            arg  => 1,
+            code => sub {
+                $self->add_action( [ \&del_msg_body_r, @_, 0 ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 't' and do {
-                $self->add_actions( [ \&flag_remote, $opt{$opt} ] );
-                last SWITCH;
-            };
-            $opt eq 'D' and do {
+            },
+        },
+        # Flag messages with matching recipients
+        t => {
+            arg  => 1,
+            code => sub {
+                $self->add_actions( [ \&flag_remote, @_ ] );
+            },
+        },
+        # Delete all messages in queues
+        D => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&del_all ] );
                 $self->deletions(1);
-                last SWITCH;
-            };
-            $opt eq 'V' and do {
+            },
+        },
+        # Display program version
+        V => {
+            arg  => 0,
+            code => sub {
                 $self->add_action( [ \&version ] );
-                last SWITCH;
-            };
-            $opt eq '?' and do {
+            },
+        },
+        # Display help
+        '?' => {
+            arg  => 0,
+            code => sub {
                 $self->usage;
-                last SWITCH;
-            };
+            },
+        },
+    );
+
+    my $optstring = join '', map { $_ . ( $option{$_}{arg} ? ':' : '' ) }
+      keys %option;
+
+    getopts( $optstring, \%opt );
+
+    foreach my $opt ( keys %opt ) {
+        if (! exists $option{$opt}) {
+            warn "$opt is not a valid option\n";
+            next;
+        }
+        if ( $option{$opt}{arg} and not $opt{$opt} ) {
+            die "Option $opt must have an argument\n";
+        }
+
+        if ($option{$opt}{arg}) {
+            $option{$opt}{code}->($opt{$opt});
+        } else {
+            $option{$opt}{code}->();
         }
     }
 
@@ -638,11 +729,16 @@ sub list_msg {
     my $self = shift;
     my ($q) = @_;
 
+    $q = uc $q;
+
+    my $local =  $q ne 'R';
+    my $remote = $q ne 'L';
+
     my $msglist = $self->msglist;
     if ( !$self->summary ) {
         for my $msg ( keys %$msglist ) {
-            next if $q eq 'L' and ! $msglist->{$msg}{local};
-            next if $q eq 'R' and ! $msglist->{$msg}{remote};
+            next if $local  and not $msglist->{$msg}{local};
+            next if $remote and not $msglist->{$msg}{remote};
 
             $self->show_msg_info($msg);
         }
@@ -1147,11 +1243,17 @@ Available parameters:
   -fsender : delete message from sender
   -F're'   : delete message from senders matching regular expression re
   -Stext   : delete all messages that have/contain text as Subject
-  -h're'   : delete all messages with headers matching regular expression re (case insensitive)
-  -b're'   : delete all messages with body matching regular expression re (case insensitive)
-  -H're'   : delete all messages with headers matching regular expression re (case sensitive)
-  -B're'   : delete all messages with body matching regular expression re (case sensitive)
-  -t're'   : flag messages with recipients in regular expression 're' for earlier retry (note: this lengthens the time message can stay in queue)
+  -h're'   : delete all messages with headers matching regular expression
+             re (case insensitive)
+  -b're'   : delete all messages with body matching regular expression
+             re (case insensitive)
+  -H're'   : delete all messages with headers matching regular expression
+             re (case sensitive)
+  -B're'   : delete all messages with body matching regular expression
+             re (case sensitive)
+  -t're'   : flag messages with recipients in regular expression 're' for
+             earlier retry (note: this lengthens the time message can
+             stay in queue)
   -D       : delete all messages in the queue (local and remote)
   -V       : print program version
   -?       : Display this help
@@ -1166,6 +1268,9 @@ You can view/delete multiple message i.e. -d123 -m456 -d567
 END_OF_HELP
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 =head2 version()
 
 Display the version.
@@ -1179,9 +1284,9 @@ sub version {
 
 =head2 AUTHOR
 
-Copyright (c) 2016 Dave Cross <dave@perlhacks.com>
+Copyright (c) 2016 Dave Cross E<lt>dave@perlhacks.comE<gt>
 
-Based on original version by Michele Beltrame <mb@italpro.net>
+Based on original version by Michele Beltrame E<lt>mb@italpro.netE</gt>
 
 =head2 LICENCE
 

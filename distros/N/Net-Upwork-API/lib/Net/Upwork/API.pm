@@ -19,7 +19,7 @@ use warnings;
 use Net::Upwork::API::Config;
 use Net::Upwork::API::Client;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.1.0';
 
 use constant TOKEN_TYPE_BEARER => 'Bearer';
 

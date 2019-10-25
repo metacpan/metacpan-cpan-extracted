@@ -13,7 +13,7 @@ perlsnippets - A collection of Perl idioms or short pieces of Perl code
 
 =head1 VERSION
 
-This document describes version 0.004 of perlsnippets (from Perl distribution perlsnippets), released on 2019-06-06.
+This document describes version 0.005 of perlsnippets (from Perl distribution perlsnippets), released on 2019-09-11.
 
 =head1 DESCRIPTION
 
@@ -130,6 +130,22 @@ Related documentation: C<$/> in L<perlvar>.
 
 =head1 MOD (Modules)
 
+=head2 MOD/EXPORT/1 (Export requested symbols)
+
+ sub import {
+     # NOTE: make sure 'no strict "refs"' is in effect
+     my $pkg = shift;
+     my $caller = caller;
+     for my $sym (@_) {
+         if ($sym eq 'foo' || $sym eq 'bar') { *{"$caller\::$sym"} = \&{$sym} }
+         else { die "$sym is not exported!" }
+     }
+ }
+
+This is for (the rare) cases when you want to avoid using L<Exporter> and do
+your own exporting. The above snippet can export from a fixed list of exportable
+subroutines.
+
 =head2 MOD/LOAD/1 (Require a module by name from variable)
 
  { (my $mod_pm = "$mod.pm") =~ s!::!/!g; require $mod_pm }
@@ -209,6 +225,38 @@ This variant shifts C<$self> from C<@_> first, so you can do this later:
 
  $self->yet_other_method(...);
  $self->SUPER::method(@_);
+
+=head1 SUB/CODE (Subroutines / Code In Subroutines)
+
+=head2 SUB/CODE/1 (Run code in subroutine only once)
+
+ my $code_run;
+ sub yoursub {
+     unless ($code_run) {
+         ... # blah
+         $code_run++;
+     }
+     ...
+ }
+
+When C<yoursub()> is first called, code in C<# blah> will be run. On subsequent
+calls, the code will not be run again. This can be done to do initialization,
+DIY caching, etc.
+
+=head2 SUB/CODE/2 (Run code in subroutine only once, variant 2)
+
+Another variant for L</"SUB/CODE/1"> is to (mis)use state variable:
+
+ use feature 'state';
+ sub yoursub {
+     state $init = do {
+         ... # blah
+     };
+     ...
+ }
+
+State variables require perl 5.10, which all systems should already have. But
+you still have to say C<use feature 'state';> or at least C<use 5.010;>.
 
 =head1 HOMEPAGE
 

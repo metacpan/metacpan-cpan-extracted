@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has code_value => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::CategoryCode - A Category Code.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -76,9 +76,9 @@ A code_value should be one of the following types:
 
 C<inCodeSet>
 
-=for html A <a class="localLink"
+=for html <p>A <a class="localLink"
 href="http://schema.org/CategoryCodeSet">CategoryCodeSet</a> that contains
-this category code.
+this category code.<p>
 
 A in_code_set should be one of the following types:
 

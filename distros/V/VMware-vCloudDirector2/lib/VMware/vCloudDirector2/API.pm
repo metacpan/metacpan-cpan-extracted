@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.104'; # VERSION
+our $VERSION = '0.105'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -113,12 +113,12 @@ has _json => (
     builder => '_build_json',
 );
 
-method _build_json () { return Cpanel::JSON::XS->new->utf8; }
+method _build_json () { return Cpanel::JSON::XS->new->utf8->allow_blessed->convert_blessed; }
 
 # ------------------------------------------------------------------------
 method _decode_xml_response ($response) {
-        my $content = $response->decoded_content;
-          return  if ( length($content) == 0 );
+    my $content = $response->decoded_content;
+    return if ( length($content) == 0 );
 
     VMware::vCloudDirector2::Error->throw(
         { message => "Not a XML response as expected - $content", response => $response } )
@@ -139,7 +139,7 @@ method _decode_xml_response ($response) {
 # ------------------------------------------------------------------------
 method _decode_json_response ($response) {
     my $content = $response->decoded_content;
-          return  if ( length($content) == 0 );
+    return if ( length($content) == 0 );
 
     VMware::vCloudDirector2::Error->throw(
         {   message  => "Not a JSON response as expected - $content",
@@ -368,8 +368,13 @@ method _build_returned_objects ($response) {
 
         # See if this is a list of things, in which case the type element will
         # be thingList and it will have a set of thing in it
-        my $mime_type  = $hash->{type};
-        my $type       = ( $mime_type =~ m|^application/vnd\..*\.(\w+)\+json$| ) ? $1 : $mime_type;
+        my $mime_type = $hash->{type};
+        unless ( defined($mime_type) ) {
+            $mime_type = $response->header('Content-Type');
+            $mime_type =~ s/;.*//;
+            $hash->{type} = $mime_type;
+        }
+        my $type = ( $mime_type =~ m|^application/vnd\..*\.(\w+)\+json$| ) ? $1 : $mime_type;
         my $thing_type = ( substr( $type, -4, 4 ) eq 'List' ) ? substr( $type, 0, -4 ) : $type;
 
         if (    ( $type ne $thing_type )
@@ -492,7 +497,7 @@ VMware::vCloudDirector2::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head2 Attributes
 

@@ -24,8 +24,15 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "indirect" : "0",
+            "perl" : "5.016"
+         }
+      },
       "test" : {
          "requires" : {
+            "Data::Dump" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -33,7 +40,7 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.02"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -42,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

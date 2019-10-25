@@ -1,5 +1,5 @@
 package Selenium::Firefox::Binary;
-$Selenium::Firefox::Binary::VERSION = '1.34';
+$Selenium::Firefox::Binary::VERSION = '1.35';
 use strict;
 use warnings;
 
@@ -126,7 +126,7 @@ Selenium::Firefox::Binary - Subroutines for locating and properly initializing t
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SUBROUTINES
 

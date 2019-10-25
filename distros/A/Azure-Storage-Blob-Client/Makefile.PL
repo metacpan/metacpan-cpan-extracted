@@ -9,12 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Azure Storage Blob API client",
   "AUTHOR" => "Oriol Soriano <oriol.soriano\@capside.com>",
-  "BUILD_REQUIRES" => {
-    "Dist::Zilla" => 0,
-    "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
-    "Dist::Zilla::Plugin::VersionFromModule" => 0,
-    "Dist::Zilla::PluginBundle::Git" => 0
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -36,13 +30,7 @@ my %WriteMakefileArgs = (
     "Throwable::Error" => 0,
     "XML::LibXML" => 0
   },
-  "TEST_REQUIRES" => {
-    "App::Prove::Watch" => 0,
-    "Test::Exception" => 0,
-    "Test::MockTime" => 0,
-    "Test::Spec::Acceptance" => 0
-  },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/Azure/Storage/Blob/Client/*.t t/Azure/Storage/Blob/Client/Service/*.t"
   }
@@ -50,13 +38,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::Prove::Watch" => 0,
   "Data::Dumper" => 0,
   "Digest::SHA" => 0,
-  "Dist::Zilla" => 0,
-  "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
-  "Dist::Zilla::Plugin::VersionFromModule" => 0,
-  "Dist::Zilla::PluginBundle::Git" => 0,
   "Encode" => 0,
   "HTTP::Date" => 0,
   "HTTP::Headers" => 0,
@@ -66,9 +49,6 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "MIME::Base64" => 0,
   "Moose" => 0,
-  "Test::Exception" => 0,
-  "Test::MockTime" => 0,
-  "Test::Spec::Acceptance" => 0,
   "Throwable::Error" => 0,
   "XML::LibXML" => 0
 );

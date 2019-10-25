@@ -5,7 +5,7 @@ use XML::NewsML_G2::Types;
 use Moose::Role;
 use namespace::autoclean;
 
-has 'size', isa => 'Int', is => 'rw';
+has 'size',     isa => 'Int', is => 'rw';
 has 'mimetype', isa => 'Str', is => 'rw';
 
 1;

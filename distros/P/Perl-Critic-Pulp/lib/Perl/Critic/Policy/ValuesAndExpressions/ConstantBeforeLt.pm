@@ -31,7 +31,7 @@ use Perl::Critic::Utils qw(is_included_module_name
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 #
 # Incidentally "require Foo < 123" is a similar sort of problem in all Perls

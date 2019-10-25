@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,16 +34,16 @@ SemanticWeb::Schema::WarrantyScope - A range of of services that will be provide
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A range of of services that will be provided to a customer free of charge
-in case of a defect or malfunction of a product.<br/><br/> Commonly used
-values:<br/><br/> <ul>
+=for html <p>A range of of services that will be provided to a customer free of
+charge in case of a defect or malfunction of a product.<br/><br/> Commonly
+used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#Labor-BringIn</li>
 <li>http://purl.org/goodrelations/v1#PartsAndLabor-BringIn</li>
-<li>http://purl.org/goodrelations/v1#PartsAndLabor-PickUp</li> </ul> 
+<li>http://purl.org/goodrelations/v1#PartsAndLabor-PickUp</li> </ul> <p>
 
 =head1 SEE ALSO
 

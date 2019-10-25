@@ -1,22 +1,46 @@
-0.004   2017-02-10 (PERLANCAR)
+0.007   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [Deprecation] list_git_release_tags(): rename 'regex' argument to
+          'release_tag_regex'. Old argument name still supported for now but
+          deprecated & undocumented and will be removed in the future.
+
+	- list_git_release_tags(): return author_name & author_email
+	  fields, add options author_name_regex & author_email_regex to
+	  filter certain tags only.
+
+
+0.006   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Refactor release tags pattern to Regexp-Pattern-Git.
+
+        - [bugfix] Updated release tags pattern was not used.
+
+
+0.005   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Expand default regex to include e.g. rel-1.23, release1.23,
+	  as well as (version,ver,v)-1.23 (separated by dash/underscore).
+
+
+0.004   2017-02-10  Released-By: PERLANCAR
 
         - Use File::Which first to check that the git program exists.
 
         - Add list_git_release_years().
 
 
-0.003   2017-02-09 (PERLANCAR)
+0.003   2017-02-09  Released-By: PERLANCAR
 
 	- Include tz_offset in result.
 
 
-0.002   2017-02-09 (PERLANCAR)
+0.002   2017-02-09  Released-By: PERLANCAR
 
 	- [Bugfix] When detail=0, only return list of tags.
 
 	- Fix Rinci metadata.
 
 
-0.001   2017-02-05 (PERLANCAR)
+0.001   2017-02-05  Released-By: PERLANCAR
 
         - First release.

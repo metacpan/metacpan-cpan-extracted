@@ -23,7 +23,7 @@ Catalyst::Helper::Model::DBIx::Raw - Helper for DBIx::Raw Model
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -74,6 +74,8 @@ __PACKAGE__->config(
 	conf => '/path/to/conf.pl',
 	dbix_class_model => 'DB',
 );
+
+=end pod_to_ignore
  
 =head1 NAME
  

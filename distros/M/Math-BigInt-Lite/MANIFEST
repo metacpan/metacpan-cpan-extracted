@@ -10,6 +10,7 @@ README
 t/alias.inc
 t/bigintpm.inc
 t/bigintpm.t
+t/bnok-mbil.t
 t/from_bin-mbl.t
 t/from_hex-mbl.t
 t/from_oct-mbl.t

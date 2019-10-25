@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has in_defined_term_set => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::DefinedTerm - A word, name, acronym, phrase, etc
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -66,9 +66,9 @@ code allocated, use description to provide the definition of the term.
 
 C<inDefinedTermSet>
 
-=for html A <a class="localLink"
+=for html <p>A <a class="localLink"
 href="http://schema.org/DefinedTermSet">DefinedTermSet</a> that contains
-this term.
+this term.<p>
 
 A in_defined_term_set should be one of the following types:
 
@@ -84,10 +84,10 @@ A in_defined_term_set should be one of the following types:
 
 C<termCode>
 
-=for html A code that identifies this <a class="localLink"
+=for html <p>A code that identifies this <a class="localLink"
 href="http://schema.org/DefinedTerm">DefinedTerm</a> within a <a
 class="localLink"
-href="http://schema.org/DefinedTermSet">DefinedTermSet</a>
+href="http://schema.org/DefinedTermSet">DefinedTermSet</a><p>
 
 A term_code should be one of the following types:
 

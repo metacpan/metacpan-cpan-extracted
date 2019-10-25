@@ -17,6 +17,7 @@ on 'test' => sub {
   requires "Test::More" => "0";
   requires "Test::Requires::Git" => "0";
   requires "Test::Warnings" => "0";
+  requires "lib" => "0";
   requires "perl" => "5.006";
 };
 

@@ -1,0 +1,26 @@
+3.001.003  2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	   - Add configurations 'dir' and 'skip' as well.
+
+	   - [doc] Use 'file' instead of 'files' in the example in Synopsis, to
+	     be more consistent with FileFinder::ByName's configuration.
+
+
+3.001.002  2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	   - No functional changes.
+
+	   - [dist][bugfix] Fix year in copyright notice.
+
+
+3.001.001  2019-10-21  Released-By: PERLANCAR; Urgency: low
+
+	   - No functional changes.
+
+	   - Fix POD formatting.
+
+
+3.001.000 2019-10-20  Released-By: PERLANCAR
+
+          - First release, forked from Dist::Zilla::Plugin::Test::Perl::Critic
+            3.001.

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,13 +34,13 @@ SemanticWeb::Schema::Attorney - Professional service: Attorney
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html Professional service: Attorney. <br/><br/> This type is deprecated - <a
+=for html <p>Professional service: Attorney. <br/><br/> This type is deprecated - <a
 class="localLink" href="http://schema.org/LegalService">LegalService</a> is
-more inclusive and less ambiguous.
+more inclusive and less ambiguous.<p>
 
 =head1 SEE ALSO
 

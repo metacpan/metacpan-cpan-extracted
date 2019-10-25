@@ -38,5 +38,6 @@ my $cmpChart = "";
     }
   );
 };
-diag $cmpChart;
+diag "NOTE: numcpus is disabled at this time";
+diag "\n".$cmpChart;
 

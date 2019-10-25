@@ -27,7 +27,7 @@ use Perl::Critic::Utils 1.100 qw(is_perl_builtin
                                  is_perl_builtin_with_no_arguments
                                  precedence_of);
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 
 use constant supported_parameters => ();

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,15 +34,15 @@ SemanticWeb::Schema::Periodical - A publication in any medium issued in successi
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A publication in any medium issued in successive parts bearing numerical or
-chronological designations and intended, such as a magazine, scholarly
+=for html <p>A publication in any medium issued in successive parts bearing numerical
+or chronological designations and intended, such as a magazine, scholarly
 journal, or newspaper to continue indefinitely.<br/><br/> See also <a
 href="http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.
-html">blog post</a>.
+html">blog post</a>.<p>
 
 =head1 SEE ALSO
 

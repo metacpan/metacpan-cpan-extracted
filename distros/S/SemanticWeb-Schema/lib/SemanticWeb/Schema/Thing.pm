@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has additional_type => (
@@ -130,7 +130,7 @@ SemanticWeb::Schema::Thing - The most generic type of item.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -202,12 +202,12 @@ A disambiguating_description should be one of the following types:
 
 =head2 C<identifier>
 
-=for html The identifier property represents any kind of identifier for any kind of
-<a class="localLink" href="http://schema.org/Thing">Thing</a>, such as
+=for html <p>The identifier property represents any kind of identifier for any kind
+of <a class="localLink" href="http://schema.org/Thing">Thing</a>, such as
 ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for
 representing many of these, either as textual strings or as URL (URI)
 links. See <a href="/docs/datamodel.html#identifierBg">background notes</a>
-for more details.
+for more details.<p>
 
 A identifier should be one of the following types:
 
@@ -221,9 +221,9 @@ A identifier should be one of the following types:
 
 =head2 C<image>
 
-=for html An image of the item. This can be a <a class="localLink"
+=for html <p>An image of the item. This can be a <a class="localLink"
 href="http://schema.org/URL">URL</a> or a fully described <a
-class="localLink" href="http://schema.org/ImageObject">ImageObject</a>.
+class="localLink" href="http://schema.org/ImageObject">ImageObject</a>.<p>
 
 A image should be one of the following types:
 
@@ -239,10 +239,10 @@ A image should be one of the following types:
 
 C<mainEntityOfPage>
 
-=for html Indicates a page (or other CreativeWork) for which this thing is the main
-entity being described. See <a
+=for html <p>Indicates a page (or other CreativeWork) for which this thing is the
+main entity being described. See <a
 href="/docs/datamodel.html#mainEntityBackground">background notes</a> for
-details.
+details.<p>
 
 A main_entity_of_page should be one of the following types:
 

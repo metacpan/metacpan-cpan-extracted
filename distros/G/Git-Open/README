@@ -3,7 +3,7 @@ NAME
     hard to remember and open via browser manually.
 
 VERSION
-    version 0.1.11
+    version 0.1.12
 
 USAGE
         git open # it will open homepage of your repository

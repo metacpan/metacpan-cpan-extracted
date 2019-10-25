@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,15 +34,15 @@ SemanticWeb::Schema::UserPlusOnes - UserInteraction and its subtypes is an old w
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html UserInteraction and its subtypes is an old way of talking about users
+=for html <p>UserInteraction and its subtypes is an old way of talking about users
 interacting with pages. It is generally better to use <a class="localLink"
 href="http://schema.org/Action">Action</a>-based vocabulary, alongside
 types such as <a class="localLink"
-href="http://schema.org/Comment">Comment</a>.
+href="http://schema.org/Comment">Comment</a>.<p>
 
 =head1 SEE ALSO
 

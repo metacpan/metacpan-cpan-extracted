@@ -15,8 +15,8 @@
             "schema:FoodEstablishmentReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Integer"
+            "schema:Integer",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:pickupLocation" : {

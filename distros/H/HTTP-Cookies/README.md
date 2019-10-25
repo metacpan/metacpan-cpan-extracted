@@ -4,7 +4,7 @@ HTTP::Cookies - HTTP cookie jars
 
 # VERSION
 
-version 6.04
+version 6.05
 
 # SYNOPSIS
 
@@ -33,8 +33,8 @@ knows about.
 Cookies are a general mechanism which server side connections can use
 to both store and retrieve information on the client side of the
 connection.  For more information about cookies refer to
-<URL:http://curl.haxx.se/rfc/cookie\_spec.html> and
-<URL:http://www.cookiecentral.com/>.  This module also implements the
+[Cookie Spec](http://curl.haxx.se/rfc/cookie_spec.html) and
+[Cookie Central](http://www.cookiecentral.com).  This module also implements the
 new style cookies described in [RFC 2965](https://tools.ietf.org/html/rfc2965).
 The two variants of cookies are supposed to be able to coexist happily.
 
@@ -54,9 +54,9 @@ cookies to track your user agent across all sites under a top level
 domain.  See `t/publicsuffix.t` in this module's distribution for
 details.
 
-[HTTP::CookieJar::LWP](https://metacpan.org/pod/HTTP::CookieJar::LWP) supports Public Suffix, but only provides a
+[HTTP::CookieJar::LWP](https://metacpan.org/pod/HTTP%3A%3ACookieJar%3A%3ALWP) supports Public Suffix, but only provides a
 limited subset of this module's functionality and [does not
-support](https://metacpan.org/pod/HTTP::CookieJar#LIMITATIONS-AND-CAVEATS) standards older than
+support](https://metacpan.org/pod/HTTP%3A%3ACookieJar#LIMITATIONS-AND-CAVEATS) standards older than
 _RFC 6265_.
 
 # METHODS
@@ -109,8 +109,11 @@ The following methods are provided:
     $key, $val, $domain, $port and $path arguments are strings.  The
     $path\_spec, $secure, $discard arguments are boolean values. The $maxage
     value is a number indicating number of seconds that this cookie will
-    live.  A value of $maxage <= 0 will delete this cookie.  %rest defines
-    various other attributes like "Comment" and "CommentURL".
+    live.  A value of $maxage <= 0 will delete this cookie.  The $version argument
+    sets the version of the cookie; the default value is 0 ( original Netscape 
+    spec ).  Setting $version to another value indicates the RFC to which the
+    cookie conforms (e.g. version 1 for RFC 2109).  %rest defines various other
+    attributes like "Comment" and "CommentURL".
 
 - $cookie\_jar->save
 - $cookie\_jar->save( $file )
@@ -184,7 +187,7 @@ The following methods are provided:
 
 # SEE ALSO
 
-[HTTP::Cookies::Netscape](https://metacpan.org/pod/HTTP::Cookies::Netscape), [HTTP::Cookies::Microsoft](https://metacpan.org/pod/HTTP::Cookies::Microsoft)
+[HTTP::Cookies::Netscape](https://metacpan.org/pod/HTTP%3A%3ACookies%3A%3ANetscape), [HTTP::Cookies::Microsoft](https://metacpan.org/pod/HTTP%3A%3ACookies%3A%3AMicrosoft)
 
 # AUTHOR
 

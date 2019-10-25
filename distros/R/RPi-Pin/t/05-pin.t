@@ -11,6 +11,10 @@ if (! $ENV{PI_BOARD}){
     plan skip_all => "not on a pi board\n";
 }
 
+if (! $ENV{RPI_SUBMODULE_TESTING}){
+    plan(skip_all => "RPI_SUBMODULE_TESTING environment variable not set");
+}
+
 {# pin
 
     my $pin = $mod->new(18, "blah");

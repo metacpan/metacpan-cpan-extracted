@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has branch => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Nerve - A common pathway for the electrochemical nerve impu
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -77,8 +77,9 @@ transmitted along each of the axons.
 
 =head2 C<branch>
 
-=for html The branches that delineate from the nerve bundle. Not to be confused with
-<a class="localLink" href="http://schema.org/branchOf">branchOf</a>.
+=for html <p>The branches that delineate from the nerve bundle. Not to be confused
+with <a class="localLink"
+href="http://schema.org/branchOf">branchOf</a>.<p>
 
 A branch should be one of the following types:
 

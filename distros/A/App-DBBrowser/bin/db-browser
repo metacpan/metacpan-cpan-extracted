@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.214';
+our $VERSION = '2.218';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.214
+Version 2.218
 
 =head1 SYNOPSIS
 
@@ -422,8 +422,82 @@ Insert a cell in a chosen row. The new cell is inserted in front of a chosen cel
 =item Append Col
 
 Append an empty column. Appends a header element to the header row and adjusts the remaining rows to the length of the
-header row. If the input has rows with different numbers of cells, use the L<Row Group> filter first to select the right
+header row. If the input has rows with different numbers of cells, use the I<Row Group> filter first to select the right
 row-group.
+
+=item Split Column
+
+     Item | length/width/height             Item | length | width | height
+    ------|---------------------            -----|--------|-------|------
+      423 |            40/30/25              423 |     40 |    30 |    25
+    ------|---------------------              64 |     80 |    60 |    30
+       64 |            80/60/30              705 |     50 |    50 |    40
+    ------|---------------------
+      705 |            50/50/40
+
+=item Search & Replace
+
+     y  | factor                            y  | factor
+    ----|---------                          ---|-------
+     62 | 8,975.1                           62 | 8975.1
+    ----|---------                          63 | 9745.8
+     63 | 9,745.8                           64 | 9818.2
+    ----|---------
+     64 | 9,818.2
+
+In the replacement it can be used the variable C<$c> as a counter. C<$c> is set to C<0> before each C<s///>.
+
+=item Split Table
+
+     y  | factor  | y  | factor             y  | factor
+    ----|---------|----|---------           ---|--------
+     62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
+    ----|---------|----|---------           63 | 9,745.8
+     63 | 9,745.8 | 65 | 9,782.7            y  | factor
+                                            64 | 9,818.2
+                                            65 | 9,986.5
+
+=item Merge Rows
+
+     Month | Average | Average              Month | Average MinTemp | Average MaxTemp
+    -------|---------|---------             ------|-----------------|----------------
+           | MinTemp | MaxTemp              Jan   |               9 |              22
+    -------|---------|---------             Feb   |              10 |              23
+     Jan   |       9 |      22
+    -------|---------|---------
+     Feb   |      10 |      23
+
+I<Merge Rows> can be used to edit a row by selecting only one row.
+
+=item Join Columns
+
+     Item | length | width | height          Item | length/width/height
+    ------|--------|-------|--------         -----|-------------------
+      423 |     40 |    30 |     25           423 | 40/30/25
+    ------|--------|-------|--------           64 | 80/60/30
+       64 |     80 |    60 |     30           705 | 50/50/40
+    ------|--------|-------|--------
+      705 |     50 |    50 |     40
+
+I<Join Columns> can be used to edit a column by selecting only one column.
+
+=item Fill up Rows
+
+If the input table rows have different numbers of cells, this filter appends empty cells to the rows until the cell
+count of the rows are equal to the cell count of the row with highest cell count.
+
+One can enter in the I<Row Group> filter to see if the table has rows with different length. If I<Row Group> shows only
+one group, all rows have the same length.
+
+=item Cols to Rows
+
+Transpose columns to rows.
+
+     Year | 2000 | 2001 | 2002              Year | Max | Min
+    ------|------|------|------             -----|-----|----
+     Max  |   14 |   22 |   17              2000 |  14 |  11
+    ------|------|------|------             2001 |  22 |  10
+     Min  |   11 |   10 |    9              2002 |  17 |   9
 
 =item Empty to NULL
 
@@ -438,58 +512,6 @@ Reset the filters to the default values.
 =item Reparse
 
 Change the parse settings and reparse the data with the new settings.
-
-=item Cols to Rows
-
-Transpose columns to rows.
-
-     Year | 2000 | 2001 | 2002              Year | Max | Min
-    ------|------|------|------             -----|-----|----
-     Max  |   14 |   22 |   17              2000 |  14 |  11
-    ------|------|------|------             2001 |  22 |  10
-     Min  |   11 |   10 |    9              2002 |  17 |   9
-
-=item Merge Rows
-
-     Month | Average | Average              Month | Average MinTemp | Average MaxTemp
-    -------|---------|---------             ------|-----------------|----------------
-           | MinTemp | MaxTemp              Jan   |               9 |              22
-    -------|---------|---------             Feb   |              10 |              23
-     Jan   |       9 |      22
-    -------|---------|---------
-     Feb   |      10 |      23
-
-=item Split Table
-
-     y  | factor  | y  | factor             y  | factor
-    ----|---------|----|---------           ---|--------
-     62 | 8,975.1 | 64 | 9,986.5            62 | 8,975.1
-    ----|---------|----|---------           63 | 9,745.8
-     63 | 9,745.8 | 65 | 9,782.7            y  | factor
-                                            64 | 9,818.2
-                                            65 | 9,986.5
-
-=item Split Col
-
-     Item | length/width/heigh              Item | length | width | heigh
-    ------|--------------------             -----|--------|-------|------
-      423 | 40/30/25                         423 |     40 |    30 |    25
-    ------|--------------------               64 |     80 |    60 |    30
-       64 | 80/60/30                         705 |     50 |    50 |    40
-    ------|--------------------
-      705 | 50/50/40
-
-=item Search Replace
-
-     y  | factor                            y  | factor
-    ----|---------                          ---|-------
-     62 | 8,975.1                           62 | 8975.1
-    ----|---------                          63 | 9745.8
-     63 | 9,745.8                           64 | 9818.2
-    ----|---------
-     64 | 9,818.2
-
-In the replacement it can be used the variable C<$c> as a counter. C<$c> is set to C<0> before each C<s///>.
 
 =back
 
@@ -944,7 +966,10 @@ The values assigned to the IRS and the IFS are treated as regexps.
 
 Template
 
-Uses C<unpack> to break up input lines.
+Uses C<unpack> with the C<A> character to break up input lines.
+
+C<unpack> used with C<A> strips trailing whitespace. For leading whitespace to user has the option to remove it or not.
+Any remaining column separators can be removed with the I<Search & Replace> filter.
 
 If the row length is greater than the screen width, make notes of the number of columns and the length of each column
 before using I<Template>.

@@ -16,6 +16,7 @@ my $sock = eval {
 };
 
 $gps = GPSD::Parse->new(file => $fname) if ! $sock;
+$ENV{GPSD_LIVE_TESTING} = 1 if $sock;
 
 my @stats = qw(
     satellites
@@ -37,9 +38,16 @@ $gps->poll;
 
     is ref $s, 'HASH', "sky() returns a hash ref ok";
 
-    is keys %$s, @stats, "keys match SKY entry count";
+    if ($ENV{GPSD_LIVE_TESTING}){
+        note "GPSD_LIVE_TESTING env var not set\n";
+        is keys %$s, @stats -1, "keys match SKY entry count";
+    }
+    else {
+        is keys %$s, @stats, "keys match SKY entry count";
+    }
 
     for (@stats){
+        next if $_ eq 'tag' && $ENV{GPSD_LIVE_TESTING};
         is exists $s->{$_}, 1, "SKY stat $_ exists";
     }
 

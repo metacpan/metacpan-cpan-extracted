@@ -1,5 +1,8 @@
 Revision history for exact
 
+1.11      2019-10-18 13:18:58-07:00 America/Los_Angeles
+        - Prevent duplicate add_isa() calls
+
 1.10      2019-10-06 16:27:22-07:00 America/Los_Angeles
         - Add inheritance capability
         - Add monkey_patch, add_isa, no_parent, and late_parent methods

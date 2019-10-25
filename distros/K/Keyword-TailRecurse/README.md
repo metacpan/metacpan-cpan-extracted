@@ -29,6 +29,12 @@ After using the module you can precede a function call with the keyword
 `tailRecurse` and rather adding a new entry on the call stack the function
 call will replace the current entry on the call stack.
 
+# ALIASES
+
+By default the keyword `tailRecurse` is added, but you can use the
+`tail_recurse` and/or `tailrecurse` keywords to add the tail recursion
+keyword in a form more suitable for different naming conventions.
+
 ## Sub::Call::Tail compatability
 
 If compatibility with `Sub::Call::Tail` is required then you can use the

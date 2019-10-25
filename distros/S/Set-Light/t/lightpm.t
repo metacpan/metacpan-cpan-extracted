@@ -1,13 +1,11 @@
 #!/usr/bin/perl -w
 
-use Test::More;
-use strict;
+use Test::Most;
 
 BEGIN
   {
-  chdir 't' if -d 't';		# for manual runs
-  unshift @INC, '../lib';	# for manual runs
-  plan tests => 46;
+  chdir 't' if -d 't';          # for manual runs
+  unshift @INC, '../lib';       # for manual runs
   use_ok ('Set::Light');
   }
 
@@ -16,7 +14,7 @@ can_ok ('Set::Light', qw/
   insert
   delete remove
   has contains exists
-
+  members
   is_empty is_null
   size
   /);
@@ -41,6 +39,8 @@ ok ($set->is_null(),  'set is empty');
 ok ($set->is_empty(), 'set is empty');
 is ($set->size(), 0, 'set is empty');
 
+cmp_deeply [$set->members], [], 'members';
+
 #############################################################################
 # insert(), size()
 
@@ -49,9 +49,13 @@ is ($set->has("foo"), 1, 'was really inserted');
 is ($set->insert('foo'), 0, 'inserted zero');
 is ($set->has("foo"), 1, 'was really inserted');
 
+cmp_deeply [$set->members], bag(qw/ foo /), 'members';
+
 is ($set->insert('foo','bar'), 1, 'inserted bar');
 is ($set->has("foo"), 1, 'was really inserted');
 is ($set->has("bar"), 1, 'was really inserted');
+
+cmp_deeply [$set->members], bag(qw/ foo bar /), 'members';
 
 is ($set->insert('foo','bar'), 0, 'inserted none');
 is ($set->has("foo"), 1, 'foo is still there');
@@ -104,4 +108,4 @@ is ($set->insert( 'a', 'a', 'a', 'a', 'a' ), 1, 'inserted once');
 is ($set->size(), 4, '4 elements');
 ok (!$set->is_null(),  'set is not empty');
 
-
+done_testing;

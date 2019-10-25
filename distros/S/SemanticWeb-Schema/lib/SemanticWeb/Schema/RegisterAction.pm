@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::RegisterAction - The act of registering to be a user of a s
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of registering to be a user of a service, product or web
+=for html <p>The act of registering to be a user of a service, product or web
 page.<br/><br/> Related actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/JoinAction">JoinAction</a>: Unlike JoinAction,
 RegisterAction implies you are registering to be a user of a service,
@@ -47,7 +47,7 @@ FollowAction, RegisterAction doesn't imply that the agent is expecting to
 poll for updates from the object.</li> <li><a class="localLink"
 href="http://schema.org/SubscribeAction">SubscribeAction</a>: Unlike
 SubscribeAction, RegisterAction doesn't imply that the agent is expecting
-updates from the object.</li> </ul> 
+updates from the object.</li> </ul> <p>
 
 =head1 SEE ALSO
 

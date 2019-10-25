@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Result::CheckForSession;
-$Web::Authenticate::Result::CheckForSession::VERSION = '0.012';
+$Web::Authenticate::Result::CheckForSession::VERSION = '0.013';
 use Mouse;
 #ABSTRACT: The result of calling Web::Authenticate::check_for_session.
 
@@ -56,7 +56,7 @@ Web::Authenticate::Result::CheckForSession - The result of calling Web::Authenti
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

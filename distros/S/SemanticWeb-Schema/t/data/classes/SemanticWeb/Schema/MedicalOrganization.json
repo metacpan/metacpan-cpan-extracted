@@ -35,8 +35,8 @@
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
             "schema:MedicalOrganization",
-            "schema:Physician",
             "schema:MedicalClinic",
+            "schema:Physician",
             "schema:Hospital"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

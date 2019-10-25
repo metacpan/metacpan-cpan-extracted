@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -691,7 +691,10 @@ sub choose_a_subset {
 
     while ( 1 ) {
         my @tmp;
-        my $sofar = defined $self->{current_selection_label} ? $self->{current_selection_label} : '';
+        my $sofar;
+        if ( defined $self->{current_selection_label} ) {
+            $sofar .= $self->{current_selection_label};
+        }
         #if ( @{$available}[@$new_idx] ) {
         if ( @$new_idx ) {
             $sofar .= $self->{current_selection_begin} . join( $self->{current_selection_separator}, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $self->{current_selection_end};
@@ -699,7 +702,9 @@ sub choose_a_subset {
         elsif ( $opt->{all_by_default} ) {
             $sofar .= $self->{current_selection_begin} . '*' . $self->{current_selection_end};
         }
-        @tmp = ( $sofar );
+        if ( defined $sofar ) {
+            @tmp = ( $sofar );
+        }
         if ( length $self->{prompt} ) {
             push @tmp, $self->{prompt};
         }
@@ -929,7 +934,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.103
+Version 0.104
 
 =cut
 

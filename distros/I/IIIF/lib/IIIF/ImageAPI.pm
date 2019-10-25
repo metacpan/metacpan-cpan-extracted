@@ -1,7 +1,7 @@
 package IIIF::ImageAPI;
 use 5.014001;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use parent 'Plack::Component';
 
@@ -14,13 +14,28 @@ use JSON::PP;
 use File::Temp qw(tempdir);
 use Digest::MD5 qw(md5_hex);
 use HTTP::Date;
+
 use Plack::MIME;
+Plack::MIME->add_type( '.jp2',  'image/jp2' );
+Plack::MIME->add_type( '.webp', 'image/webp' );
+
 use Cwd;
 use Plack::Util;
 
-use Plack::Util::Accessor qw(images base cache formats canonical magick_args);
+use Plack::Util::Accessor
+  qw(images base cache formats rights service canonical magick_args);
 
 our @FORMATS = qw(jpg png gif);
+
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
+
+    $self->images('.') unless $self->images;
+    $self->formats( [qw{jpg png gif}] ) unless $self->formats;
+
+    $self;
+}
 
 sub call {
     my ( $self, $env ) = @_;
@@ -45,11 +60,7 @@ sub response {
         return redirect( $file->{id} . "/info.json" );
     }
     elsif ( $local eq 'info.json' ) {
-        return json_response(
-            200,
-            info( $file->{path}, id => $file->{id}, protocol => 'level3' ),
-'application/ld+json;profile="http://iiif.io/api/image/3/context.json"'
-        );
+        return $self->info_response($file);
     }
 
     # allow abbreviated requests, redirect to full form
@@ -59,6 +70,9 @@ sub response {
     }
 
     $request->{format} = $request->{format} // $file->{format};
+
+    return error_response( 400, "unsupported format" )
+      unless grep { $_ eq $request->{format} } @{ $self->formats };
 
     if ( $self->canonical ) {
         my $info = info( $file->{path} );
@@ -101,14 +115,43 @@ sub response {
     error_response( 500, "Conversion failed" );
 }
 
+sub info_response {
+    my ( $self, $file ) = @_;
+
+    my $info = info(
+        $file->{path},
+        id      => $file->{id},
+        profile => 'level2',
+
+        # TODO: maxWidth or maxArea, maxHeight (required!)
+
+        extraQualities => [qw(color gray bitonal default)],
+        extraFormats   => $self->formats,
+        extraFeatures  => [
+            qw(
+              baseUriRedirect cors jsonldMediaType mirroring
+              profileLinkHeader
+              regionByPct regionByPx regionSquare rotationArbitrary rotationBy90s
+              sizeByConfinedWh sizeByH sizeByPct sizeByW sizeByWh sizeUpscaling
+              )
+        ]
+    );
+
+    # TODO: canonicalLinkHeader?
+
+    $info->{rights}  = $self->rights  if $self->rights;
+    $info->{service} = $self->service if $self->service;
+
+    return json_response( 200, $info,
+        'application/ld+json;profile="http://iiif.io/api/image/3/context.json"'
+    );
+}
+
 sub file {
     my ( $self, $identifier ) = @_;
 
-    my $images = $self->images // '.';
-
-    my $formats = $self->formats // [qw{jpg png gif}];
-    for my $format (@$formats) {
-        my $path = File::Spec->catfile( $images, "$identifier.$format" );
+    for my $format ( @{ $self->formats } ) {
+        my $path = File::Spec->catfile( $self->images, "$identifier.$format" );
         if ( -r $path ) {
             return {
                 path   => $path,
@@ -140,7 +183,7 @@ sub image_response {
             'Content-Type'   => $type,
             'Content-Length' => $stat[7],
             'Last-Modified'  => HTTP::Date::time2str( $stat[9] ),
-            'Link' => 'http://iiif.io/api/image/3/level3.json>;rel="profile"'
+            'Link' => '<http://iiif.io/api/image/3/level2.json>;rel="profile"'
         ],
         $fh,
     ];
@@ -155,7 +198,7 @@ sub json_response {
         $code,
         [
             'Content-Type' => $type // 'application/json',
-            'Link' => 'http://iiif.io/api/image/3/level3.json>;rel="profile"'
+            'Link' => '<http://iiif.io/api/image/3/level2.json>;rel="profile"'
         ],
         [ $JSON->encode($body) ]
     ];
@@ -182,8 +225,9 @@ IIIF::ImageAPI - IIIF Image API implementation as Plack application
     builder {
         enable 'CrossOrigin', origins => '*';
         IIIF::ImageAPI->new(
-            images => 'path/to/images',
-            base   => 'https://example.org/iiif/'
+            images  => 'path/to/images',
+            base    => 'https://example.org/iiif/',
+            formats => [qw(jpg png gif tif pdf webp jp2)],
         );
     }
 
@@ -211,11 +255,24 @@ and include (disabled by default).
 
 =item formats
 
-List of supported image formats. Set to C<['jpg', 'png', 'gif']> by default. 
+List of supported image formats. Set to C<['jpg', 'png', 'gif']> by default. On
+configuration with other formats make sure ImageMagick supports them (see
+L<IIIF::Magick/REQUIREMENTS>).
+
+=item rights
+
+Optional string that identifies a license or rights statement for all images,
+to be included in image information responses.
+
+=item service
+
+Optional array with L<Services|https://iiif.io/api/image/3.0/#58-linking-properties>
+to be included in image information responses.
 
 =item magick_args
 
-Additional command line arguments always used when calling ImageMagick. For instance C<[qw(-limit memory 1GB -limit disk 1GB)]> to limit resources.
+Additional command line arguments always used when calling ImageMagick. For
+instance C<[qw(-limit memory 1GB -limit disk 1GB)]> to limit resources.
 
 =back
 

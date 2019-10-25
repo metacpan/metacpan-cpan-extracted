@@ -1,0 +1,21 @@
+requires 'Term::ANSIColor';
+requires 'Rex';
+requires 'Moo';
+requires 'Path::Tiny';
+requires 'DigitalOcean';
+requires 'YAML';
+requires 'MIME::Base64';
+requires 'Digest::MD5';
+requires 'Scalar::Util';
+requires 'UI::Dialog::Backend::CDialog';
+requires 'Term::ANSIScreen';
+requires 'List::Util';
+requires 'Class::Load';
+requires 'MooX::HandlesVia';
+requires 'WebService::Linode';
+requires 'Mango';
+requires 'Mojo::IOLoop';
+requires 'List::Util';
+requires 'Time::HiRes';
+requires 'String::CamelCase';
+

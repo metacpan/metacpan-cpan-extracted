@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::LibrarySystem;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A LibrarySystem is a collaborative system amongst several libraries.
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,17 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::LibrarySystem - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::LibrarySystem - A LibrarySystem is a collaborative system amongst several libraries.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink"
+=for html <p>A <a class="localLink"
 href="http://schema.org/LibrarySystem">LibrarySystem</a> is a collaborative
-system amongst several libraries.
+system amongst several libraries.<p>
 
 =head1 SEE ALSO
 

@@ -19,6 +19,7 @@ WriteMakefile(
 		'Test2::V0' => 0,
     },
     PREREQ_PM => {
+		'Exporter::Tiny' => 0.025,
 		'IPC::Open2' => 0,
 		'IO::Select' => 0,
 		'IO::String' => 0,

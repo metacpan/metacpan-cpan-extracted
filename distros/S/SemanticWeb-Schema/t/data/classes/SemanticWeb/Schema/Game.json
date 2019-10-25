@@ -31,13 +31,13 @@
          "rdfs:comment" : "Real or fictional location of the game (or part of game).",
          "rdfs:label" : "gameLocation",
          "schema:domainIncludes" : [
-            "schema:Game",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:Game"
          ],
          "schema:rangeIncludes" : [
-            "schema:PostalAddress",
+            "schema:URL",
             "schema:Place",
-            "schema:URL"
+            "schema:PostalAddress"
          ]
       },
       "schema:numberOfPlayers" : {
@@ -45,8 +45,8 @@
          "rdfs:comment" : "Indicate how many people can play this game (minimum, maximum, or range).",
          "rdfs:label" : "numberOfPlayers",
          "schema:domainIncludes" : [
-            "schema:Game",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:Game"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },

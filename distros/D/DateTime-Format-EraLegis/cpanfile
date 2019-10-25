@@ -7,3 +7,4 @@ requires 'DBD::SQLite';
 requires 'Any::Moose', '== 0.26';
 requires 'Method::Signatures';
 requires 'Carp';
+requires 'Astro::Sunrise';

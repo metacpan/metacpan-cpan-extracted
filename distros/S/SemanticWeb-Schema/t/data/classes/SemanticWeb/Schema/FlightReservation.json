@@ -19,8 +19,8 @@
          "rdfs:label" : "passengerPriorityStatus",
          "schema:domainIncludes" : "schema:FlightReservation",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:Text"
          ]
       },
       "schema:passengerSequenceNumber" : {

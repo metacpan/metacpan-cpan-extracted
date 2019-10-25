@@ -1,0 +1,67 @@
+Google-RestApi version 0.1
+==========================
+
+This a collection of modules that is used for interfacing with
+Google's various APIs. Currenly only paritial Drive support is
+included, and more comprehensive support for Google Sheets.
+Other APIs may be added in future (pull requests welcome).
+
+VERSION
+0.1 Initial version, beta status, partial support for Drive
+and more comprehensive support for Sheets. New versions will
+continue to build out these two APIs to be more complete.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  aliased
+  autodie 
+  autovivification
+  constant
+  Carp
+  Exporter
+  Furl 
+  Hash::Merge 
+  JSON 
+  List::MoreUtils
+  List::Util
+  Net::OAuth2::Client 
+  Net::OAuth2::Profile::WebServer 
+  Scalar::Util
+  Storable
+  Sub::Retry 
+  Tie::Hash 
+  Time::Out
+  Type::Params
+  Types::Standard
+  URI 
+  URI::QueryParam 
+  YAML::Any
+  Test::Class::Load
+  Test::MockObject::Extends
+  Test::Most
+  Spreadsheet::Perl
+
+'make test' currently uses Spreadsheet::Perl. I tried using
+this to mock a Google Sheets spreadsheet in local memory,
+but it turned out to be not practical. I have to remove it
+and come up with some other method of mocking. It works for
+now but does require this for testing.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 by Robin Murray
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.

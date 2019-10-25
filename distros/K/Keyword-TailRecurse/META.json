@@ -57,7 +57,7 @@
    "provides" : {
       "Keyword::TailRecurse" : {
          "file" : "lib/Keyword/TailRecurse.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://gitlab.com/scrapheap/keyword_tailRecurse"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:JLCOOPER",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1

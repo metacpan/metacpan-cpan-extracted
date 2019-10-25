@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Term::ANSIColor ();
 
@@ -32,8 +32,7 @@ L<Quiq::Object>
 
 Die  Klasse erlaubt es, Textausgaben - die typischerweise aufs
 Terminal gehen - mit ANSI Colorcodes auszuzeichnen und diese
-Auszeichnung zentral an- und ab-zuschalten. Die An- oder Abschaltung
-erfolgt bei Aufruf des Konstruktors.
+Auszeichnung bei Aufruf des Konstruktors zentral an- oder ab-zuschalten.
 
 =head2 Terminal-Eigenschaften
 
@@ -89,9 +88,9 @@ Debian-Repository enthalten.
 
 =item $bool (Default: 1)
 
-Wenn wahr, findet eine Auszeichnung mit ANSI Colorcodes durch die
-Klasse statt, wenn falsch, nicht. Ist das Argument nicht angegeben,
-ist dies gleichbedeutend mit wahr.
+Wenn wahr, findet eine Auszeichnung mit ANSI Colorcodes statt, wenn
+falsch, nicht. Ist das Argument nicht angegeben, ist dies
+gleichbedeutend mit wahr.
 
 =back
 
@@ -102,8 +101,8 @@ AnsiColor-Objekt
 =head4 Description
 
 Instantiiere ein Objekt der Klasse und liefere dieses zurück. Durch
-den Parameter $bool wird entschieden, ob die Ausgabe mit oder ohne
-ANSI Colorcodes erfolgt.
+den Parameter $bool wird entschieden, ob die Methode L<str|"str() - Formatiere String mit Colorcodes">()
+ihren Rückgabewert mit oder ohne ANSI Colorcodes liefert.
 
 =cut
 
@@ -196,7 +195,7 @@ sub str {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

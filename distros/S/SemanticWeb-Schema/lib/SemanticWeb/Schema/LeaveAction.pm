@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has event => (
@@ -42,17 +42,17 @@ SemanticWeb::Schema::LeaveAction - An agent leaves an event / group with partici
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An agent leaves an event / group with participants/friends at a
+=for html <p>An agent leaves an event / group with participants/friends at a
 location.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/JoinAction">JoinAction</a>: The
 antonym of LeaveAction.</li> <li><a class="localLink"
 href="http://schema.org/UnRegisterAction">UnRegisterAction</a>: Unlike
 UnRegisterAction, LeaveAction implies leaving a group/team of people rather
-than a service.</li> </ul> 
+than a service.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

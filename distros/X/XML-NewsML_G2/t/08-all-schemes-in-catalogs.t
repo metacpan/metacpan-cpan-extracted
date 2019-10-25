@@ -17,19 +17,31 @@ my $ni = create_ni_text();
 
 my %schemes;
 foreach (qw(crel desk geo svc role ind org topic hltype)) {
-    $schemes{$_} = XML::NewsML_G2::Scheme->new(alias => "apa$_", uri => "http://cv.apa.at/$_/", catalog => "http://www.apa-it.at/NewsML_G2/apa_it_catalog_4.xml");
+    $schemes{$_} = XML::NewsML_G2::Scheme->new(
+        alias   => "apa$_",
+        uri     => "http://cv.apa.at/$_/",
+        catalog => "http://www.apa-it.at/NewsML_G2/apa_it_catalog_4.xml"
+    );
 }
 
-ok(my $sm = XML::NewsML_G2::Scheme_Manager->new(%schemes), 'create Scheme Manager');
+ok( my $sm = XML::NewsML_G2::Scheme_Manager->new(%schemes),
+    'create Scheme Manager' );
 
-ok(my $writer = XML::NewsML_G2::Writer::News_Item->new(news_item => $ni, scheme_manager => $sm), 'creating 2.15 writer');
-ok(my $dom = $writer->create_dom(), '2.15 writer creates DOM');
+ok( my $writer = XML::NewsML_G2::Writer::News_Item->new(
+        news_item      => $ni,
+        scheme_manager => $sm
+    ),
+    'creating 2.15 writer'
+);
+ok( my $dom = $writer->create_dom(), '2.15 writer creates DOM' );
 
-ok(my $xpc = XML::LibXML::XPathContext->new($dom), 'create XPath context for DOM tree');
-$xpc->registerNs('nar', 'http://iptc.org/std/nar/2006-10-01/');
+ok( my $xpc = XML::LibXML::XPathContext->new($dom),
+    'create XPath context for DOM tree' );
+$xpc->registerNs( 'nar', 'http://iptc.org/std/nar/2006-10-01/' );
 
-ok(!$xpc->find('//nar:scheme'), 'no scheme is created in XML');
-like($xpc->findvalue('//nar:catalogRef/@href'), qr/www.apa-it.at/, 'correct catalog ref found in XML');
+ok( !$xpc->find('//nar:scheme'), 'no scheme is created in XML' );
+like( $xpc->findvalue('//nar:catalogRef/@href'),
+    qr/www.apa-it.at/, 'correct catalog ref found in XML' );
 
 #diag($dom->serialize(1));
 

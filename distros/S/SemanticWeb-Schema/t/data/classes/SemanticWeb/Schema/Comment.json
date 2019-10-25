@@ -11,8 +11,8 @@
          "rdfs:comment" : "The number of downvotes this question, answer or comment has received from the community.",
          "rdfs:label" : "downvoteCount",
          "schema:domainIncludes" : [
-            "schema:Question",
-            "schema:Comment"
+            "schema:Comment",
+            "schema:Question"
          ],
          "schema:rangeIncludes" : "schema:Integer"
       },

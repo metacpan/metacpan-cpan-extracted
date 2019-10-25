@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has number_of_rooms => (
@@ -50,16 +50,16 @@ SemanticWeb::Schema::Apartment - An apartment (in American English) or flat (in 
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An apartment (in American English) or flat (in British English) is a
+=for html <p>An apartment (in American English) or flat (in British English) is a
 self-contained housing unit (a type of residential real estate) that
 occupies only part of a building (Source: Wikipedia, the free encyclopedia,
 see <a
 href="http://en.wikipedia.org/wiki/Apartment">http://en.wikipedia.org/wiki/
-Apartment</a>).
+Apartment</a>).<p>
 
 =head1 ATTRIBUTES
 

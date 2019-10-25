@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has event => (
@@ -42,11 +42,11 @@ SemanticWeb::Schema::JoinAction - An agent joins an event/group with participant
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An agent joins an event/group with participants/friends at a
+=for html <p>An agent joins an event/group with participants/friends at a
 location.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink"
 href="http://schema.org/RegisterAction">RegisterAction</a>: Unlike
@@ -57,7 +57,7 @@ SubscribeAction, JoinAction does not imply that you'll be receiving
 updates.</li> <li><a class="localLink"
 href="http://schema.org/FollowAction">FollowAction</a>: Unlike
 FollowAction, JoinAction does not imply that you'll be polling for
-updates.</li> </ul> 
+updates.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

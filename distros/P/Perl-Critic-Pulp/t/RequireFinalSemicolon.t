@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -21,7 +21,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 91;
+use Test::More tests => 95;
 
 use lib 't';
 use MyTestHelpers;
@@ -30,7 +30,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 require Perl::Critic::Policy::CodeLayout::RequireFinalSemicolon;
 
 #-----------------------------------------------------------------------------
-my $want_version = 96;
+my $want_version = 97;
 is ($Perl::Critic::Policy::CodeLayout::RequireFinalSemicolon::VERSION, $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::CodeLayout::RequireFinalSemicolon->VERSION, $want_version, 'VERSION class method');
 {
@@ -100,6 +100,28 @@ foreach my $data ([ 'use syntax q{try}', 'try', 1 ],
 #-----------------------------------------------------------------------------
 foreach my $data
   (# no critic (RequireInterpolationOfMetachars)
+
+   [ 0, "my \$hashref = { key=>1 
+                         }" ],
+   [ 0, "my \$aref = [ { key=>1 
+                        } ]" ],
+   [ 0, "my %hash = (row => [ { key => [ { \%foo, other=>1
+                                          } ] } ])" ],
+
+   # Andy Lester
+   # https://rt.cpan.org/Ticket/Display.html?id=130725
+   # ppidump '[{x=>1,%y}]'       # ok, hash
+   # ppidump '[{%y,x=>1}]'       # bad, code block
+   [ 0, "
+my \%bongo = (
+    key => {
+        hrows => [
+            { 
+              \%foo, other => 'field'
+            }
+        ],
+});
+" ],
 
    [ 0, "grep { defined\n } \@y" ],
    [ 1, "sub { defined\n }" ],

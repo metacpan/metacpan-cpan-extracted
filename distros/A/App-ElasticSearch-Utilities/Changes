@@ -1,9 +1,60 @@
 ==================================================
-Changes from 2017-09-08 00:00:00 +0000 to present.
+Changes from 2017-10-20 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.3 at 2019-09-08 18:33:21 +0000
+version 7.4 at 2019-10-20 13:28:14 +0000
+----------------------------------------
+
+  Change: be1145db74f2394ae9c4f2747332cc03d3f7ca07
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-10-20 09:24:50 +0000
+
+    Ready v7.4 Release
+
+    * Docs updated * Update tests to handle the new IP range query 
+
+  Change: feca6053d575b523277743a937a51cb226781d66
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-10-20 09:03:07 +0000
+
+    Add Support for --or and IPv6
+
+    * Added support to change the default token joiner to OR to es-search.pl *
+    Added support for IPv6 to the ::QueryString::IP expander * Converted
+    ::QueryString::IP to use a range query 
+
+  Change: 17e80653b2a90e665e59c545eda7776b2fae7c90
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-10-19 10:46:48 +0000
+
+    Update the examples/es-utils.yml file for new options
+
+    This file had gotten outdated. 
+
+  Change: 31c3caf10224615723e8036eae28ac7789a1824d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-10-09 20:23:57 +0000
+
+    Use a better name for fields metadata 
+
+  Change: f6369b88f311751908dec2addad33d999a452c75
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-10-09 20:19:38 +0000
+
+    Some code cleanup for es-search.pl 
+
+  Change: 29bbf1415b2be39cf79d0281608832ade50565a9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-10-09 20:18:57 +0000
+
+    Allow field metadata sharing with ::Query
+
+    This will enable automatic detection of and working with nested fields in
+    the near term. Possibly other features in the long term. 
+
+----------------------------------------
+version 7.3 at 2019-09-08 18:32:53 +0000
 ----------------------------------------
 
   Change: 56b99467e968c2a4dcb6eeb5e49f62ff55213ca2
@@ -897,45 +948,6 @@ version 5.5 at 2018-03-17 06:01:25 +0000
 
     document * Change to an array so you can add multiple --show's 
 
-----------------------------------------
-version 5.4 at 2017-10-13 19:36:20 +0000
-----------------------------------------
-
-  Change: c31b5f39953589c497f4374be9c22f36a2514dc2
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-10-13 12:36:20 +0000
-
-    Documentation update for the 5.4 release. 
-
-  Change: 3b6a379937869eaf46e80eea6f7d54e5c4f2220a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-12 20:50:57 +0000
-
-    Default to UTC, warn when using incompatible options. 
-
-  Change: 570de7b2ffa8896b723a3d5c739cec25f4fe8297
-  Author: Lisa Hare <lhare@inview.co.uk>
-  Date : 2017-06-23 08:50:42 +0000
-
-    add older option to es-apply-settings
-
-    when older argument is passed to es_indices in Utilities.pm if days is also
-    specified then it will only return indexes older that the specified days
-
-    Refs #24 
-
-  Change: 04a72068727474471abd709e993b9095bcf4e489
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-07 11:05:12 +0000
-
-    Fixup the optimize call for newer ElasticSearch releases. 
-
-  Change: 25ad9e95697a92093c30375836041c7fb2f691e8
-  Author: Markus Linnala <Markus.Linnala@cybercom.com>
-  Date : 2017-04-05 19:33:52 +0000
-
-    es-alias-manager.pl: relax index name checker to allow _ 
-
 =================================================
-Plus 60 releases after 2017-09-08 00:00:00 +0000.
+Plus 61 releases after 2017-10-20 00:00:00 +0000.
 =================================================

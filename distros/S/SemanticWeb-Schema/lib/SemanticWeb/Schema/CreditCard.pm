@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has monthly_minimum_repayment_amount => (
@@ -42,11 +42,11 @@ SemanticWeb::Schema::CreditCard - A card payment method of a particular brand or
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A card payment method of a particular brand or name. Used to mark up a
+=for html <p>A card payment method of a particular brand or name. Used to mark up a
 particular payment method and/or the financial product/service that
 supplies the card account.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#AmericanExpress</li>
@@ -54,7 +54,7 @@ supplies the card account.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#Discover</li>
 <li>http://purl.org/goodrelations/v1#JCB</li>
 <li>http://purl.org/goodrelations/v1#MasterCard</li>
-<li>http://purl.org/goodrelations/v1#VISA</li> </ul> 
+<li>http://purl.org/goodrelations/v1#VISA</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

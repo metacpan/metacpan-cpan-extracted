@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.214';
+our $VERSION = '2.218';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -321,6 +321,10 @@ sub epoch_to_date {
 
 sub truncate {
     my ( $sf, $col, $precision ) = @_;
+    #if ( $sf->get_db_driver eq 'SQLite' ) {
+    #    my $prec_num = '1' . '0' x $precision;
+    #    return "cast( ( $col * $prec_num ) as int ) / $prec_num.0";
+    #}
     return "TRUNC($col,$precision)"     if $sf->get_db_driver eq 'Pg';
     return "TRUNCATE($col,$precision)";
 }
@@ -357,7 +361,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.214
+Version 2.218
 
 =head1 DESCRIPTION
 

@@ -1,18 +1,20 @@
 package obogaf::parser;
 
 require 5.006;
-our $VERSION= '0.001'; 
+our $VERSION= '1.014'; 
 $VERSION= eval $VERSION;
 
 use strict;
 use warnings;
 use Graph;
+use IO::File;
+use PerlIO::gzip;
 
 sub build_edges{
     my ($obofile)= @_;
     my ($namespace, $source, $destination, $pof, $res);
-    if($obofile=~/.obo$/){ open IN, "$obofile" or die "cannot open $obofile"; }
-    while(<IN>){
+    if($obofile=~/.obo$/){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; } else { die "cannot open $obofile. The extension must be obo.\n"; }
+    while(<FH>){
         chomp;
         next if $_=~/^\s*$/;
         if($_=~/^namespace:\s+(\D+)/){
@@ -27,20 +29,24 @@ sub build_edges{
             if(defined $namespace){ $res .= "$namespace\t$pof\t$destination\tpart-of\n"; } else { $res .= "$pof\t$destination\tpart-of\n"; }    
         }
     }
-    close IN;
+    close FH;
     return \$res;
 }
 
 sub build_subonto{
     my ($edgesfile, $namespace)= @_;
     my ($res);
-    if($edgesfile=~/.gz$/){ open IN, "gunzip -c $edgesfile |" or die "cannot open $edgesfile";  } else { open IN, "$edgesfile" or die "cannot open $edgesfile"; }
-    while(<IN>){
-        next if $_=~/^\s*$/;
+    open FH, "<", $edgesfile or die "cannot open $edgesfile. $!.\n";
+    while(<FH>){
+        next if $_=~/^[!,#]|^\s*$/;
         my @vals= split(/\t/, $_);
-        if($vals[0] eq $namespace){ $res .= join("\t", @vals[1..$#vals]); }
+        if($vals[0] eq $namespace){ 
+            $res .= join("\t", @vals[1..$#vals]);
+        } else { 
+            die "number of columns of $edgesfile must be 4 and $namespace must be in the first column.\n";
+        }
     }
-    close IN;
+    close FH;
     return \$res;
 }
 
@@ -49,13 +55,13 @@ sub make_stat{
     my (%indeg, %outdeg, %deg, $ed, $nd, $mindeg, $maxdeg, $medeg, $avgdeg, $den, $scc, $resdeg, $stat, $res);
     ## create graph
     my $g= Graph->new(directed => 1);
-    open IN, $edgesfile;
-    while(<IN>){
+    open FH, "<", $edgesfile or die "cannot open $edgesfile. $!.\n";
+    while(<FH>){
         chomp;
         my @vals= split(/\t/,$_);
         $g->add_edge($vals[$parentIndex], $vals[$childIndex]); 
     }
-    close IN;
+    close FH;
     ## compute indegree/outdegree/degree
     my @V= $g->vertices;
     foreach my $nd (@V){
@@ -94,8 +100,12 @@ sub gene2biofun{
     my ($annfile, $geneIndex, $classIndex)= @_;
     my (%gene2biofun, @genes, @biofun, $stat)= ();
     my ($sample, $oboterm)= (0)x2;
-    if($annfile=~/.gz$/){ open IN, "gunzip -c $annfile |" or die "cannot open $annfile"; } else { open IN, "$annfile" or die "cannot open $annfile"; }
-    while(<IN>){
+    if ($annfile =~ /.gz$/){ 
+        open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n";
+    }else{ 
+        open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n";
+    }
+    while(<FH>){
         next if $_=~/^[!,#]|^\s*$/;
         chomp;  
         my @vals=split(/\t/,$_);
@@ -103,7 +113,7 @@ sub gene2biofun{
         push(@biofun, $vals[$classIndex]);
         $gene2biofun{$vals[$geneIndex]} .= $vals[$classIndex]."|";
     }
-    close IN;
+    close FH;
     foreach my $gene (keys %gene2biofun){ chop $gene2biofun{$gene}; }
     my %seen=();
     my @uniqgenes= grep{!$seen{$_}++} @genes;
@@ -120,25 +130,29 @@ sub map_OBOterm_between_release{
     my (%altid, %oldclass, %old2new, $header, $id, $fln, $pair, $stat, $pstat); 
     my ($alt, $classes, $seen, $unseen)= (0)x4;
     ## step 0: pairing altid_2_id (key: alt_id) 
-    if($obofile=~/.obo$/){ open IN, "$obofile" or die "cannot open $obofile"; }
-    while (<IN>){
+    if($obofile=~/.obo$/){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; } else { die "cannot open $obofile. The extension must be obo.\n"; }
+    while (<FH>){
         chomp;
         next if $_=~/^\s*$/;
         if($_=~/^id:\s+(\D+\d+)/){ $id=$1; }
         if($_=~/^alt_id:\s+(\D+\d+)/){ $altid{$1}=$id; }
     }
-    close IN;
+    close FH;
     $alt= keys(%altid);
     # step 1: storing old ontology terms in a hash
-    if($annfile=~/.gz$/){ open IN, "gunzip -c $annfile |" or die "cannot open $annfile"; } else { open IN, "$annfile" or die "cannot open $annfile"; }
-    while(<IN>){
+    if ($annfile =~ /.gz$/){ 
+        open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n";  
+    }else{ 
+        open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n";
+    }
+    while(<FH>){
         chomp; 
         if($_=~/^[!,#]|^\s*$/){ $header .= "$_\n"; }
         next if $_=~/^[!,#]|^\s*$/;         
         my @vals=split(/\t/,$_); 
         $oldclass{$vals[$classIndex]}=$vals[$classIndex];
     }
-    close IN;
+    close FH;
     $classes= keys(%oldclass);
     ## step 2: mapping old GO terms to the new one using *alt_id* as key
     my $tmp= "";
@@ -156,8 +170,12 @@ sub map_OBOterm_between_release{
         }
     }
     ## step 3: substitute ALT-ID with the updated ID, then the annotation file is returned.
-    if($annfile=~/.gz$/){ open IN, "gunzip -c $annfile |" or die "cannot open $annfile"; } else { open IN, "$annfile" or die "cannot open $annfile"; }
-    while(<IN>){
+    if ($annfile =~ /.gz$/){ 
+        open FH, "<:gzip", $annfile or die "cannot open $annfile. $!.\n";  
+    }else{ 
+        open FH, "<", "$annfile" or die "cannot open $annfile. $!.\n";
+    }
+    while(<FH>){
         chomp;
         next if $_=~/^[!,#]|^\s*$/;
         my @vals= split(/\t/, $_);
@@ -170,8 +188,8 @@ sub map_OBOterm_between_release{
             $fln .= "$_\n";
         }
     }
-    close IN;
-    $fln = $header.$fln;
+    close FH;
+    if(defined $header){$fln = $header.$fln;}
     ## print mapping stat
     $stat .= "Tot. ontology terms:\t$classes\nTot. altID:\t$alt\nTot. altID seen:\t$seen\nTot. altID unseen:\t$unseen\n";
     unless(not defined $pair){ 
@@ -191,7 +209,7 @@ __END__
 
 =head1 NAME
  
-obogaf::parser
+obogaf::parser - a perl5 module to handle obo and gaf file
 
 =head1 SYNOPSIS
 
@@ -209,13 +227,18 @@ $stat= make_stat(edgesfile, parentIndex, childIndex);
 
 ($res, $stat)= map_OBOterm_between_release(obofile, annfile, classIndex);
 
+=head1 ABSTRACT
+
+B<obogaf::parser> is a perl5 module desinged to handle open biological and biomedical ontology and gene association file. 
+
 =head1 DESCRIPTION
 
-B<obogaf::parser> is a perl5 module desinged to handle obo and gene association file. 
+B<obogaf::parser> is a perl5 module specifically designed to handle GO and HPO obo (Open Biological and Biomedical Ontology) file and their Gene Annotation File (gaf file). However, all the B<obogaf::parser> subroutines can be safely used to parse any obo file listed in L<OBO foundry|http://www.obofoundry.org/> and any gene annotation file structured as those
+shown in L<GOA website|https://www.ebi.ac.uk/GOA/downloads> and L<HPO website|https://hpo.jax.org/app/download/annotation> (basically a I<csv> file using I<tab> as separator).
 
 =over 2
 
-=item 1. B<build_edges>: extract edges from an obo file. 
+=item build_edges - extract edges from an obo file. 
     
     my $graph= build_edges(obofile);
 
@@ -224,7 +247,7 @@ B<obofile>: any obo file listed in L<OBO foundry|http://www.obofoundry.org/>. Th
 B<output>: the graph is returned as tuple: C<subdomain E<lt>tabE<gt> source E<lt>tabE<gt> destination E<lt>tabE<gt> relationship>. This means that the graph is returned as a list of edges, where each edge is represented as a pair of vertices in the form C<source E<lt>tabE<gt> destination>. For each couple of nodes, the
 subdomain (if any) and the relationships for which is safe group annotations (i.e. C<is_a> and C<part_of>) are returned as well. The graph is stored as an anonymous scalar.
 
-=item 2. B<build_subonto>: extract edges of a specified sub-ontology domain.
+=item build_subonto - extract edges of a specified sub-ontology domain.
 
     my $subonto= build_subonto(edgesfile, namespace);
 
@@ -236,7 +259,7 @@ B<namespace>: name of the subontology for which the edges must be extracted.
 B<output>: the graph is returned as a tuple>: C<source E<lt>tabE<gt> destination E<lt>tabE<gt> relationship>. In other words the graph is returned as a list of edges, where each edge is represented as a pair of vertices in the form C<source E<lt>tabE<gt> destination>. For each couple of nodes the relationships
 C<is_a> and C<part_of> are also returned. The graph is stored as an anonymous scalar.
 
-=item 3. B<make_stat>: make basic statistic on graph.
+=item make_stat - make basic statistic on graph.
 
     my $stat= make_stat(edgesfile, parentIndex, childIndex);
 
@@ -249,7 +272,7 @@ B<childIndex>: index referring to the column containing the I<child> vertices (d
 B<output>: statistics about the graph are printed on the shell. More precisely, for each vertex of the graph degree, in-degree and out-degree are printed. The vertex are sorted in a decreasing order on the basis of degree, from the higher degree to the smaller degree. Finally, the following
 statistics are returned as well: 1) number of nodes and edges of the graph; 2) maximum and minimum degree; 3) average and median degree; 4) density of the graph.
 
-=item 4. B<gene2biofun>: make annotations adjacency list.
+=item gene2biofun - make annotations adjacency list.
 
     my ($res, $stat)= gene2biofun(annfile, geneIndex, classIndex);
 
@@ -262,7 +285,7 @@ B<classIndex>: index referring to the column containing the ontology terms.
 
 B<output>: a list of two anonymous references. The first is an anonymous hash storing for each gene (or protein) all the associated ontology terms (pipe separated). The second is an anonymous scalar containing basic statistics, such as the total unique number of genes/proteins and annotated ontology terms. 
 
-=item 5. B<map_OBOterm_between_release>: map ontology terms between different releases.
+=item map_OBOterm_between_release - map ontology terms between different releases.
 
     my ($res, $stat)= map_OBOterm_between_release(obofile, annfile, classIndex);
 
@@ -299,7 +322,7 @@ Marco Notaro (https://marconotaro.github.io)
 
 =head1 SEE ALSO
 
-A step-by-step tutorial showing how to apply B<obogaf::parser> to real case studies in Computational Biology and Precision Medicine is situated at the following link L<https://github.com/marconotaro/obogaf-parser>.
+A step-by-step tutorial showing how to apply B<obogaf::parser> to real biomedical case studies is available at the following link L<https://obogaf-parser.readthedocs.io>.
 
 =cut
 

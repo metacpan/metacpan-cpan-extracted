@@ -27,7 +27,7 @@ resources:
   homepage: https://github.com/plicease/Kafka-Librd
   license: http://dev.perl.org/licenses/
   repository: git://github.com/plicease/perl-Kafka-Librd
-version: '0.12'
+version: '0.14'
 x_contributors:
   - 'Pavel Shaydo <zwon@cpan.org>'
   - 'Graham Ollis <plicease@cpan.org>'

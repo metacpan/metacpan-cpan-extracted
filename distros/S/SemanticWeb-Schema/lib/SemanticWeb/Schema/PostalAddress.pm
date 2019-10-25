@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has address_country => (
@@ -82,7 +82,7 @@ SemanticWeb::Schema::PostalAddress - The mailing address.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -94,9 +94,9 @@ The mailing address.
 
 C<addressCountry>
 
-=for html The country. For example, USA. You can also provide the two-letter <a
+=for html <p>The country. For example, USA. You can also provide the two-letter <a
 href="http://en.wikipedia.org/wiki/ISO_3166-1">ISO 3166-1 alpha-2 country
-code</a>.
+code</a>.<p>
 
 A address_country should be one of the following types:
 
@@ -127,10 +127,10 @@ A address_locality should be one of the following types:
 
 C<addressRegion>
 
-=for html The region in which the locality is, and which is in the country. For
+=for html <p>The region in which the locality is, and which is in the country. For
 example, California or another appropriate first-level <a
 href="https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_cou
-ntry">Administrative division</a>
+ntry">Administrative division</a><p>
 
 A address_region should be one of the following types:
 

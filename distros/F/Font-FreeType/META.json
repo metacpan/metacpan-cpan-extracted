@@ -4,7 +4,7 @@
       "Geoff Richards <qef@laxan.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,6 +49,6 @@
          "url" : "https://github.com/zmughal/p5-Font-FreeType"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

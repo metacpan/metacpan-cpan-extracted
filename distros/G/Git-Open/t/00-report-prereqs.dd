@@ -16,7 +16,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Moose' => '0',
-                                      'MooseX::Getopt::Usage' => '0'
+                                      'MooseX::Getopt::Usage' => '0',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {
@@ -26,7 +27,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::Mock::Cmd' => '0.6',
+                                   'Test::Mock::Cmd' => '0.7',
                                    'Test::More' => '1.001002'
                                  }
                  }

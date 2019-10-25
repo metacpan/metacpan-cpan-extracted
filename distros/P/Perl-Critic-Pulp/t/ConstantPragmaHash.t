@@ -31,7 +31,7 @@ require Perl::Critic::Policy::Compatibility::ConstantPragmaHash;
 
 
 #------------------------------------------------------------------------------
-my $want_version = 96;
+my $want_version = 97;
 is ($Perl::Critic::Policy::Compatibility::ConstantPragmaHash::VERSION,
     $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::Compatibility::ConstantPragmaHash->VERSION,

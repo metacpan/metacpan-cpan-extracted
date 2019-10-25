@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has recipient => (
@@ -42,17 +42,17 @@ SemanticWeb::Schema::GiveAction - The act of transferring ownership of an object
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of transferring ownership of an object to a destination. Reciprocal
-of TakeAction.<br/><br/> Related actions:<br/><br/> <ul> <li><a
+=for html <p>The act of transferring ownership of an object to a destination.
+Reciprocal of TakeAction.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/TakeAction">TakeAction</a>:
 Reciprocal of GiveAction.</li> <li><a class="localLink"
 href="http://schema.org/SendAction">SendAction</a>: Unlike SendAction,
 GiveAction implies that ownership is being transferred (e.g. I may send my
-laptop to you, but that doesn't mean I'm giving it to you).</li> </ul> 
+laptop to you, but that doesn't mean I'm giving it to you).</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

@@ -39,4 +39,10 @@ eq_or_diff(
     'full https GitHub URL with invalid fragment'
 );
 
+eq_or_diff(
+    [ to_editor_args('HTTP::FakeTestClass') ],
+    ['t/lib/HTTP/FakeTestClass.pm'],
+    'non-URL package name starting with HTTP gets handled properly'
+);
+
 done_testing();

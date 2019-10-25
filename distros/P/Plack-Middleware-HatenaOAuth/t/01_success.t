@@ -38,7 +38,7 @@ test_psgi
         my $response = +{
             'https://www.hatena.com/oauth/initiate' => 'oauth_token=xxx&oauth_token_secret=yyy&oauth_callback_confirmed=true',
             'https://www.hatena.com/oauth/token' => 'oauth_token=xxx&oauth_token_secret=yyy',
-            'http://n.hatena.com/applications/my.json' => '{"url_name":"tarao"}',
+            'https://n.hatena.ne.jp/applications/my.json' => '{"url_name":"tarao"}',
         };
         my $g = mock_guard 'LWP::UserAgent', {
             request => sub {

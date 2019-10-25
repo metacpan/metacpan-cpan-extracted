@@ -28,14 +28,14 @@
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
-            "schema:PublicationIssue",
             "schema:Article",
-            "schema:PublicationVolume",
-            "schema:Chapter"
+            "schema:PublicationIssue",
+            "schema:Chapter",
+            "schema:PublicationVolume"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pageStart" : {
@@ -45,10 +45,10 @@
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:PublicationIssue",
-            "schema:Article",
             "schema:PublicationVolume",
-            "schema:Chapter"
+            "schema:Chapter",
+            "schema:PublicationIssue",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -62,9 +62,9 @@
          "rdfs:comment" : "Any description of pages that is not separated into pageStart and pageEnd; for example, \"1-6, 9, 55\" or \"10-12, 46-49\".",
          "rdfs:label" : "pagination",
          "schema:domainIncludes" : [
+            "schema:PublicationIssue",
             "schema:Chapter",
             "schema:Article",
-            "schema:PublicationIssue",
             "schema:PublicationVolume"
          ],
          "schema:rangeIncludes" : "schema:Text"

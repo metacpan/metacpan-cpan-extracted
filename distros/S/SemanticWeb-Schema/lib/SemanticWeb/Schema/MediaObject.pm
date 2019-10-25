@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has associated_article => (
@@ -170,7 +170,7 @@ SemanticWeb::Schema::MediaObject - A media object
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -238,8 +238,8 @@ A content_url should be one of the following types:
 
 =head2 C<duration>
 
-=for html The duration of the item (movie, audio recording, event, etc.) in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.
+=for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.<p>
 
 A duration should be one of the following types:
 
@@ -253,9 +253,9 @@ A duration should be one of the following types:
 
 C<embedUrl>
 
-=for html A URL pointing to a player for a specific video. In general, this is the
+=for html <p>A URL pointing to a player for a specific video. In general, this is the
 information in the <code>src</code> element of an <code>embed</code> tag
-and should not be the same as the content of the <code>loc</code> tag.
+and should not be the same as the content of the <code>loc</code> tag.<p>
 
 A embed_url should be one of the following types:
 
@@ -283,7 +283,7 @@ A encodes_creative_work should be one of the following types:
 
 C<encodingFormat>
 
-=for html Media type typically expressed using a MIME format (see <a
+=for html <p>Media type typically expressed using a MIME format (see <a
 href="http://www.iana.org/assignments/media-types/media-types.xhtml">IANA
 site</a> and <a
 href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME
@@ -297,7 +297,7 @@ alongside particular <a class="localLink"
 href="http://schema.org/encodingFormat">encodingFormat</a>
 information.<br/><br/> Unregistered or niche encoding and file formats can
 be indicated instead via the most appropriate URL, e.g. defining Web page
-or a Wikipedia/Wikidata entry.
+or a Wikipedia/Wikidata entry.<p>
 
 A encoding_format should be one of the following types:
 
@@ -311,14 +311,14 @@ A encoding_format should be one of the following types:
 
 C<endTime>
 
-=for html The endTime of something. For a reserved event or service (e.g.
+=for html <p>The endTime of something. For a reserved event or service (e.g.
 FoodEstablishmentReservation), the time that it is expected to end. For
 actions that span a period of time, when the action was performed. e.g.
 John wrote a book from January to <em>December</em>. For media, including
 audio and video, it's the time offset of the end of a clip within a larger
 file.<br/><br/> Note that Event uses startDate/endDate instead of
 startTime/endTime, even when describing dates with times. This situation
-may be clarified in future revisions.
+may be clarified in future revisions.<p>
 
 A end_time should be one of the following types:
 
@@ -375,9 +375,9 @@ A production_company should be one of the following types:
 
 C<regionsAllowed>
 
-=for html The regions where the media is allowed. If not specified, then it's assumed
-to be allowed everywhere. Specify the countries in <a
-href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166 format</a>.
+=for html <p>The regions where the media is allowed. If not specified, then it's
+assumed to be allowed everywhere. Specify the countries in <a
+href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166 format</a>.<p>
 
 A regions_allowed should be one of the following types:
 
@@ -391,9 +391,9 @@ A regions_allowed should be one of the following types:
 
 C<requiresSubscription>
 
-=for html Indicates if use of the media require a subscription (either paid or free).
-Allowed values are <code>true</code> or <code>false</code> (note that an
-earlier version had 'yes', 'no').
+=for html <p>Indicates if use of the media require a subscription (either paid or
+free). Allowed values are <code>true</code> or <code>false</code> (note
+that an earlier version had 'yes', 'no').<p>
 
 A requires_subscription should be one of the following types:
 
@@ -409,14 +409,14 @@ A requires_subscription should be one of the following types:
 
 C<startTime>
 
-=for html The startTime of something. For a reserved event or service (e.g.
+=for html <p>The startTime of something. For a reserved event or service (e.g.
 FoodEstablishmentReservation), the time that it is expected to start. For
 actions that span a period of time, when the action was performed. e.g.
 John wrote a book from <em>January</em> to December. For media, including
 audio and video, it's the time offset of the start of a clip within a
 larger file.<br/><br/> Note that Event uses startDate/endDate instead of
 startTime/endTime, even when describing dates with times. This situation
-may be clarified in future revisions.
+may be clarified in future revisions.<p>
 
 A start_time should be one of the following types:
 

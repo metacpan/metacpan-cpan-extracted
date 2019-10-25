@@ -1,10 +1,10 @@
 {
-   "abstract" : "randomly generates output from a given pattern",
+   "abstract" : "randomly generates outputs from a given pattern",
    "author" : [
-      "Jeremy Mates <jmates@cpan.org>"
+      "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "bsd"
    ],
@@ -13,20 +13,10 @@
       "version" : 2
    },
    "name" : "Lingua-Awkwords",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {}
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48",
-            "strict" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -36,25 +26,53 @@
             "Moo" : "0",
             "Parser::MGC" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.014000",
+            "perl" : "v5.14.0",
             "strict" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Test::Most" : "0",
-            "lib" : "0"
+            "perl" : "v5.14.0",
+            "strict" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Lingua::Awkwords" : {
+         "file" : "lib/Lingua/Awkwords.pm",
+         "version" : "0.10"
+      },
+      "Lingua::Awkwords::ListOf" : {
+         "file" : "lib/Lingua/Awkwords/ListOf.pm",
+         "version" : "0.10"
+      },
+      "Lingua::Awkwords::OneOf" : {
+         "file" : "lib/Lingua/Awkwords/OneOf.pm",
+         "version" : "0.10"
+      },
+      "Lingua::Awkwords::Parser" : {
+         "file" : "lib/Lingua/Awkwords/Parser.pm",
+         "version" : "0.10"
+      },
+      "Lingua::Awkwords::String" : {
+         "file" : "lib/Lingua/Awkwords/String.pm",
+         "version" : "0.10"
+      },
+      "Lingua::Awkwords::Subpattern" : {
+         "file" : "lib/Lingua/Awkwords/Subpattern.pm",
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/thrig/Lingua-Awkwords.git",
-         "web" : "https://github.com/thrig/Lingua-Awkwords"
+         "url" : "https://github.com/thrig/Lingua-Awkwords"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

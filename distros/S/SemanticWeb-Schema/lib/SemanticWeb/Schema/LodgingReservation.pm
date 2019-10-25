@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has checkin_time => (
@@ -82,13 +82,14 @@ SemanticWeb::Schema::LodgingReservation - A reservation for lodging at a hotel
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A reservation for lodging at a hotel, motel, inn, etc.<br/><br/> Note: This
-type is for information about actual reservations, e.g. in confirmation
-emails or HTML pages with individual confirmations of reservations.
+=for html <p>A reservation for lodging at a hotel, motel, inn, etc.<br/><br/> Note:
+This type is for information about actual reservations, e.g. in
+confirmation emails or HTML pages with individual confirmations of
+reservations.<p>
 
 =head1 ATTRIBUTES
 

@@ -1,4 +1,13 @@
-2019-11-10  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+2019-10-20  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.021
+
+        * Fixed Getting Termwidth.
+
+	* Added ^ to parm -e regex.
+
+
+2019-10-11  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
 
         * Version 3.020
 

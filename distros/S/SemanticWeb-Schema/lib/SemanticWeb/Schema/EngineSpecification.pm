@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has engine_displacement => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::EngineSpecification - Information about the engine of the v
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -87,15 +87,15 @@ engines represented by multiple engine specification entities.
 
 C<engineDisplacement>
 
-=for html The volume swept by all of the pistons inside the cylinders of an internal
-combustion engine in a single movement. <br/><br/> Typical unit code(s):
-CMQ for cubic centimeter, LTR for liters, INQ for cubic inches * Note 1:
-You can link to information about how the given value has been determined
-using the <a class="localLink"
+=for html <p>The volume swept by all of the pistons inside the cylinders of an
+internal combustion engine in a single movement. <br/><br/> Typical unit
+code(s): CMQ for cubic centimeter, LTR for liters, INQ for cubic inches *
+Note 1: You can link to information about how the given value has been
+determined using the <a class="localLink"
 href="http://schema.org/valueReference">valueReference</a> property. * Note
 2: You can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
-href="http://schema.org/maxValue">maxValue</a> to indicate ranges.
+href="http://schema.org/maxValue">maxValue</a> to indicate ranges.<p>
 
 A engine_displacement should be one of the following types:
 
@@ -109,10 +109,10 @@ A engine_displacement should be one of the following types:
 
 C<enginePower>
 
-=for html The power of the vehicle's engine. Typical unit code(s): KWT for kilowatt,
-BHP for brake horsepower, N12 for metric horsepower (PS, with 1 PS =
-735,49875 W)<br/><br/> <ul> <li>Note 1: There are many different ways of
-measuring an engine's power. For an overview, see <a
+=for html <p>The power of the vehicle's engine. Typical unit code(s): KWT for
+kilowatt, BHP for brake horsepower, N12 for metric horsepower (PS, with 1
+PS = 735,49875 W)<br/><br/> <ul> <li>Note 1: There are many different ways
+of measuring an engine's power. For an overview, see <a
 href="http://en.wikipedia.org/wiki/Horsepower#Engine_power_test_codes">http
 ://en.wikipedia.org/wiki/Horsepower#Engine<em>power</em>test_codes</a>.</li
 > <li>Note 2: You can link to information about how the given value has
@@ -121,7 +121,7 @@ href="http://schema.org/valueReference">valueReference</a> property.</li>
 <li>Note 3: You can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> to indicate ranges.</li>
-</ul> 
+</ul> <p>
 
 A engine_power should be one of the following types:
 
@@ -167,16 +167,16 @@ A fuel_type should be one of the following types:
 
 =head2 C<torque>
 
-=for html The torque (turning force) of the vehicle's engine.<br/><br/> Typical unit
-code(s): NU for newton metre (N m), F17 for pound-force per foot, or F48
-for pound-force per inch<br/><br/> <ul> <li>Note 1: You can link to
+=for html <p>The torque (turning force) of the vehicle's engine.<br/><br/> Typical
+unit code(s): NU for newton metre (N m), F17 for pound-force per foot, or
+F48 for pound-force per inch<br/><br/> <ul> <li>Note 1: You can link to
 information about how the given value has been determined (e.g. reference
 RPM) using the <a class="localLink"
 href="http://schema.org/valueReference">valueReference</a> property.</li>
 <li>Note 2: You can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> to indicate ranges.</li>
-</ul> 
+</ul> <p>
 
 A torque should be one of the following types:
 

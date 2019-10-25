@@ -6,9 +6,9 @@ use Moose;
 use namespace::autoclean;
 
 with qw(XML::NewsML_G2::Role::RemoteAudible
-        XML::NewsML_G2::Role::RemoteVisual);
+    XML::NewsML_G2::Role::RemoteVisual);
 
-has 'videoframerate', isa => 'Int', is => 'rw';
+has 'videoframerate',  isa => 'Int', is => 'rw';
 has 'videoavgbitrate', isa => 'Int', is => 'rw';
 
 __PACKAGE__->meta->make_immutable;

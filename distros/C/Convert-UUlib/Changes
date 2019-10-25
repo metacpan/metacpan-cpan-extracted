@@ -1,5 +1,11 @@
 Revision history for Perl extension Convert::UUlib.
 
+1.6  Thu Oct 24 17:11:54 CEST 2019
+	- fix heap overflow (testcase by Noel Duffy, reported
+          by Robert Scheck). The defense-in-depth mechanism based
+          on mmap should make this unexploitable for other than denial
+          of service, on systems supporting mmap/mprotect.
+
 1.5  Sat Jul 11 03:56:06 CEST 2015
 	- fix a heap overflow (testcase by Krzysztof Wojtaś).
         - on systems that support it (posix + mmap + map_anonymous),

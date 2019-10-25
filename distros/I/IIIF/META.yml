@@ -27,16 +27,16 @@ no_index:
 provides:
   IIIF:
     file: lib/IIIF.pm
-    version: '0.05'
+    version: '0.06'
   IIIF::ImageAPI:
     file: lib/IIIF/ImageAPI.pm
-    version: '0.05'
+    version: '0.06'
   IIIF::Magick:
     file: lib/IIIF/Magick.pm
-    version: '0.05'
+    version: '0.06'
   IIIF::Request:
     file: lib/IIIF/Request.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   HTTP::Date: '0'
   Plack: '1.0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/nichtich/IIIF/issues
   homepage: https://github.com/nichtich/IIIF
   repository: git://github.com/nichtich/IIIF.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'

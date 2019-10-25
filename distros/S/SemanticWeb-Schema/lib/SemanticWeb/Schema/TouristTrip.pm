@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has tourist_type => (
@@ -42,11 +42,11 @@ SemanticWeb::Schema::TouristTrip - A tourist trip
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A tourist trip. A created itinerary of visits to one or more places of
+=for html <p>A tourist trip. A created itinerary of visits to one or more places of
 interest (<a class="localLink"
 href="http://schema.org/TouristAttraction">TouristAttraction</a>/<a
 class="localLink"
@@ -54,7 +54,7 @@ href="http://schema.org/TouristDestination">TouristDestination</a>) often
 linked by a similar theme, geographic area, or interest to a particular <a
 class="localLink" href="http://schema.org/touristType">touristType</a>. The
 <a href="http://www2.unwto.org/">UNWTO</a> defines tourism trip as the Trip
-taken by visitors. (See examples below).
+taken by visitors. (See examples below).<p>
 
 =head1 ATTRIBUTES
 

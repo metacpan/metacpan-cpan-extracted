@@ -1,7 +1,7 @@
 package Bencher::Scenario::DataCleansing::Object_DateTime;
 
-our $DATE = '2017-08-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,8 +17,6 @@ our $scenario = {
         # for the Data::Rmap method
         'Acme::Damn' => {},
         'Scalar::Util' => {},
-        # specify minimum version
-        'Data::Clean' => {version=>'0.48'},
     },
 
     participants => [
@@ -101,7 +99,7 @@ Bencher::Scenario::DataCleansing::Object_DateTime - Benchmark data cleansing (Da
 
 =head1 VERSION
 
-This document describes version 0.004 of Bencher::Scenario::DataCleansing::Object_DateTime (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2017-08-25.
+This document describes version 0.005 of Bencher::Scenario::DataCleansing::Object_DateTime (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2019-09-11.
 
 =head1 SYNOPSIS
 
@@ -125,13 +123,13 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<Acme::Damn> 0.08
 
-L<Data::Clean> 0.49
+L<Data::Clean> 0.505
 
-L<Data::Rmap> 0.64
+L<Data::Rmap> 0.65
 
 L<Data::Tersify> 0.001
 
-L<Scalar::Util> 1.45
+L<Scalar::Util> 1.5
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -199,7 +197,7 @@ A 1000-element array containing 1 DateTime objects
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.1 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.10.0-38-generic >>.
 
 Benchmark with default options (C<< bencher -m DataCleansing::Object_DateTime >>):
 
@@ -207,40 +205,40 @@ Benchmark with default options (C<< bencher -m DataCleansing::Object_DateTime >>
  +---------------------+----------------+---------+-----------+-----------+------------+---------+---------+
  | participant         | dataset        | p_tags  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
  +---------------------+----------------+---------+-----------+-----------+------------+---------+---------+
- | Data::Rmap          | ary1000-dt1000 | inplace |      12.2 |    82     |       1    | 7.7e-05 |      20 |
- | Data::Tersify       | ary1000-dt1000 |         |      60   |    17     |       4.9  | 6.6e-05 |      20 |
- | Data::Clean-clone   | ary1000-dt1000 |         |      67   |    15     |       5.5  | 3.8e-05 |      20 |
- | Data::Clean-inplace | ary1000-dt1000 | inplace |      92.3 |    10.8   |       7.57 | 7.4e-06 |      20 |
- | Data::Rmap          | ary100-dt100   | inplace |     120   |     8.7   |       9.4  | 2.5e-05 |      30 |
- | Data::Rmap          | ary1000-dt1    | inplace |     270   |     3.7   |      22    | 9.9e-06 |      20 |
- | Data::Tersify       | ary100-dt100   |         |     628   |     1.59  |      51.5  | 1.4e-06 |      20 |
- | Data::Rmap          | ary10-dt10     | inplace |     636   |     1.57  |      52.2  | 9.1e-07 |      20 |
- | Data::Clean-clone   | ary100-dt100   |         |     802   |     1.25  |      65.8  | 6.9e-07 |      20 |
- | Data::Clean-inplace | ary100-dt100   | inplace |    1050   |     0.956 |      85.8  | 4.3e-07 |      20 |
- | Data::Rmap          | ary1-dt1       | inplace |    1160   |     0.863 |      95    | 4.3e-07 |      20 |
- | Data::Tersify       | ary1000-dt1    |         |    1250   |     0.803 |     102    | 4.3e-07 |      20 |
- | Data::Clean-clone   | ary1000-dt1    |         |    3160   |     0.316 |     259    | 2.1e-07 |      20 |
- | Data::Clean-inplace | ary1000-dt1    | inplace |    3780   |     0.265 |     310    | 2.1e-07 |      21 |
- | Data::Tersify       | ary10-dt10     |         |    4500   |     0.22  |     370    | 7.3e-07 |      31 |
- | Data::Clean-clone   | ary10-dt10     |         |    5900   |     0.17  |     480    |   2e-07 |      22 |
- | Data::Clean-inplace | ary10-dt10     | inplace |    6800   |     0.15  |     560    |   2e-07 |      23 |
- | Data::Tersify       | ary1-dt1       |         |   14000   |     0.07  |    1200    |   2e-07 |      22 |
- | Data::Clean-clone   | ary1-dt1       |         |   17000   |     0.059 |    1400    | 1.1e-07 |      20 |
- | Data::Clean-inplace | ary1-dt1       | inplace |   18000   |     0.056 |    1500    | 5.5e-07 |      21 |
+ | Data::Rmap          | ary1000-dt1000 | inplace |      12.1 |    82.4   |       1    |   4e-05 |      20 |
+ | Data::Clean-clone   | ary1000-dt1000 |         |      48.8 |    20.5   |       4.02 | 8.5e-06 |      21 |
+ | Data::Tersify       | ary1000-dt1000 |         |      58.6 |    17.1   |       4.83 | 8.7e-06 |      21 |
+ | Data::Clean-inplace | ary1000-dt1000 | inplace |      86   |    11.6   |       7.09 | 7.4e-06 |      20 |
+ | Data::Rmap          | ary100-dt100   | inplace |     115   |     8.68  |       9.49 | 6.9e-06 |      20 |
+ | Data::Rmap          | ary1000-dt1    | inplace |     299   |     3.35  |      24.6  | 2.9e-06 |      20 |
+ | Data::Clean-clone   | ary100-dt100   |         |     510   |     2     |      42    | 2.9e-06 |      20 |
+ | Data::Tersify       | ary100-dt100   |         |     627   |     1.59  |      51.7  | 1.5e-06 |      20 |
+ | Data::Rmap          | ary10-dt10     | inplace |     640   |     1.6   |      53    | 2.2e-06 |      20 |
+ | Data::Clean-inplace | ary100-dt100   | inplace |     970   |     1     |      80    | 2.9e-06 |      20 |
+ | Data::Rmap          | ary1-dt1       | inplace |    1160   |     0.859 |      96    | 8.5e-07 |      20 |
+ | Data::Tersify       | ary1000-dt1    |         |    1200   |     0.81  |     100    | 8.8e-07 |      21 |
+ | Data::Clean-clone   | ary1000-dt1    |         |    2170   |     0.461 |     179    | 4.3e-07 |      20 |
+ | Data::Clean-clone   | ary10-dt10     |         |    3600   |     0.28  |     300    | 1.2e-06 |      23 |
+ | Data::Clean-inplace | ary1000-dt1    | inplace |    3800   |     0.26  |     320    | 2.7e-07 |      20 |
+ | Data::Tersify       | ary10-dt10     |         |    4800   |     0.21  |     400    | 6.9e-07 |      20 |
+ | Data::Clean-inplace | ary10-dt10     | inplace |    6700   |     0.15  |     550    | 1.1e-06 |      21 |
+ | Data::Clean-clone   | ary1-dt1       |         |   10000   |     0.1   |     830    | 2.1e-07 |      21 |
+ | Data::Tersify       | ary1-dt1       |         |   15000   |     0.065 |    1300    | 3.2e-07 |      20 |
+ | Data::Clean-inplace | ary1-dt1       | inplace |   18000   |     0.056 |    1500    | 1.2e-07 |      26 |
  +---------------------+----------------+---------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m DataCleansing::Object_DateTime --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Data::Tersify       | 12                           | 16                 | 46             |      33   |                   25.6 |        1   | 3.7e-05 |      20 |
- | Data::Rmap          | 1.4                          | 4.9                | 19             |      16   |                    8.6 |        2   | 6.3e-05 |      20 |
- | Data::Clean         | 1.1                          | 4.6                | 16             |      13   |                    5.6 |        2.5 | 7.5e-05 |      20 |
- | perl -e1 (baseline) | 1.1                          | 4.6                | 16             |       7.4 |                    0   |        4.4 | 2.2e-05 |      20 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | Data::Tersify       |      32   |                   23.3 |        1   | 3.5e-05 |      21 |
+ | Data::Rmap          |      17   |                    8.3 |        2   | 4.2e-05 |      20 |
+ | Data::Clean         |      14   |                    5.3 |        2.4 | 4.3e-05 |      20 |
+ | perl -e1 (baseline) |       8.7 |                    0   |        3.7 |   5e-05 |      20 |
+ +---------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -269,7 +267,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

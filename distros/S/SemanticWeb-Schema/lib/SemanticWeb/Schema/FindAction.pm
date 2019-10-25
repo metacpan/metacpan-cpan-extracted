@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,14 +34,14 @@ SemanticWeb::Schema::FindAction - The act of finding an object
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of finding an object.<br/><br/> Related actions:<br/><br/> <ul>
+=for html <p>The act of finding an object.<br/><br/> Related actions:<br/><br/> <ul>
 <li><a class="localLink"
 href="http://schema.org/SearchAction">SearchAction</a>: FindAction is
-generally lead by a SearchAction, but not necessarily.</li> </ul> 
+generally lead by a SearchAction, but not necessarily.</li> </ul> <p>
 
 =head1 SEE ALSO
 

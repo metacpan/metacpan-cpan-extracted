@@ -1,3 +1,11 @@
+0.19 2019-10-24
+
+ * Add test file for bnok().
+
+ * Sync tests with Math-BigInt.
+
+ * Better Makefile.PL
+
 0.18 2018-04-17
 
  * Sync with recent versions of Math::BigInt. Also fix config() and tests of
@@ -19,7 +27,7 @@
 
  * No need for "require Exporter" when our parent class loads it.
 
- * Make sure tests pass for newer versions of Perl where '.' is not in @INC.
+ * Make tests pass when '.' is not in @INC. (CPAN RT #120893)
 
 0.17 2017-03-01 pjacklam
 

@@ -1,11 +1,11 @@
 package XML::NewsML_G2::Link;
 
-
 use Moose;
 use namespace::autoclean;
 
-has 'residref', isa => 'Str', is => 'rw', required => 1;
-has 'version', isa => 'Int', is => 'rw', default => 1;
+has 'residref', isa => 'Str', is => 'rw';
+has 'href',     isa => 'Str', is => 'rw';
+has 'version',  isa => 'Int', is => 'rw', default => 1;
 
 __PACKAGE__->meta->make_immutable;
 
@@ -30,9 +30,14 @@ XML::NewsML_G2::Link - a link specification
 
 A unique id as free text
 
+=item href
+
+Resource locator i.e. http://somesite.eu/image.jpg
+
 =item version
 
 The version of the item
+
 
 =back
 

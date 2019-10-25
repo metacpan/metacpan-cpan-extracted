@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 7;
+our $VERSION = 8;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -44,7 +44,9 @@ handling a high number of clients, you can run multiple servers in a master/slav
 A slave can also run itself as master for it's own slaves, so a tree-like setup is possible. This
 is implemented by using Interclacks mode via OVERHEAD mode setting.
 
-=head1 VERSION 6 UPGRADE NOTES
+=head1 IMPORTANT UPGRADE NOTES
+
+=head2 VERSION 6
 
 Version 6 (and higher) of L<Net::Clacks::Server> imlements a smarter interclacks sync. Make
 sure to upgrade all nodes on your local clacks network at the same time! While the protocol itself
@@ -59,7 +61,7 @@ file.
 This change to "smarter" syncing has increased stability of some of my systems using "Net::Clacks", but
 has been in use for only a limited time. You should test with your own software before upgrading.
 
-=head1 VERSION 7 UPGRADE NOTES
+=head2 VERSION 7
 
 Version 7 (and higher) of L<Net::Clacks::Server> and L<Net::Clacks::Client> implement a lot of
 bugfixes and improvements. This includes authentication timeouts, somewhat smarter automatic reconnects
@@ -69,10 +71,36 @@ While the protocol in theory is backwards compatible to version 6, it is strongl
 upgrade ALL nodes (clients and servers) in your network at the same time. I have done only limited testing
 with backward compatibility and i would not recommending a mix&match approach on critical systems.
 
+=head2 VERSION 8
+
+On Systems that support Unix domain sockets and have IO::Socket::UNIX installed,
+L<Net::Clacks::Server> and L<Net::Clacks::Client> can now use Unix domain sockets
+for local communication. See the examples for. This might or might not drastically
+lower CPU usage, depending on your hardware, software, weather on moon phase.
+
+Version 8 also includes a number of bugfixes and improvements. This includes a better
+way of detecting closed/broken connection which should prevent servers and clients
+from holding on to closed connection until it times out. This should also lower CPU
+usage under certain circumstances. This is far from perfect, though and may lead to
+some false positives (e.g. accidental closure of perfectly fine connections) thanks
+to the combination of SSL and non-blocking sockets.
+
+Version 8 is fully backwards compatible with Version 7 on the network layer (no protocol change),
+but as always it is recommended to update all servers and clients at the same time if possible.
+
+One important client API change (sort of) is the generation of messages with type "reconnected"
+after a connection has been re-established. After receiving this message, a client application
+must resend any LISTEN calls it wants to make. While in previous versions, this was accomplished
+by checking for type "disconnect" messages, this was unreliable at best. The "reconnected" message
+is generated internally B<after> a new connection has been established, except on the first ever
+connection. Technically, at that point in time L<Net::Clacks::Client> has spooled the Auth request
+to the server, but may not have recieved the answer yet, but i'll assume here that you have configured
+your client correctly.
+
 =head1 PROTOCOL
 
 Clacks is a text based protocol through SSL/TLS encrypted TCP connections. Most of the
-command are asyncronous and do not generate any return value. These commands are truly
+commands are asyncronous and do not generate any return value. These commands are truly
 fire-and-forget with minimal delay for the client.
 
 A few functions/commands generate one or more lines of data return, so the client has to wait

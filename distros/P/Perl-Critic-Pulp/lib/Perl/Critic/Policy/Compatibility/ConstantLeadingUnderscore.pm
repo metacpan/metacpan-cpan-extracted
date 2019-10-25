@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -27,7 +27,7 @@ use version (); # but don't import qv()
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_MEDIUM;
@@ -181,18 +181,18 @@ CPAN.
 =head2 Details
 
 A version declaration must be before the first leading underscore, so it's
-checked before the underscore is attempted (and gives an error).
+checked before the underscore is attempted (and would give an error).
 
     use constant _FOO => 123;        # bad
     use 5.006;
 
-A C<require> for the Perl version is not enough since the C<use constant> is
-at C<BEGIN> time, before plain code.
+A C<require> for the Perl version is not enough since C<use constant> is at
+C<BEGIN> time, before plain code.
 
     require 5.006;                   # doesn't run early enough
     use constant _FOO => 123;        # bad
 
-But a C<require> within a C<BEGIN> block is ok (an older style, still found
+But a C<require> within a C<BEGIN> block is ok (a past style, still found
 occasionally).
 
     BEGIN { require 5.006 }
@@ -204,42 +204,43 @@ occasionally).
     }
     use constant _FOO => 123;        # ok
 
-Currently ConstantLeadingUnderscore pays no attention to any conditionals
+Currently C<ConstantLeadingUnderscore> pays no attention to any conditionals
 within the C<BEGIN>, it assumes any C<require> there always runs.  It might
-be tricked by obscure tests but hopefully anything like that is rare.
+be tricked by obscure tests but hopefully anything like that is rare or does
+the right thing anyway.
 
 A quoted version number like
 
     use constant '1.02';    # no good
 
-is no good, only a bare number is recognised by the C<use> statement.
-A string like that in fact goes through to C<constant> as a name to define
-(which it will reject).
+is no good, only a bare number is recognised by the C<use> statement as a
+version check.  A string like that in fact goes through to C<constant> as a
+name to define, and which it will reject.
 
-Leading underscores in the multi-constant hash are not flagged, since if
-you've got multi-constants then you've got underscores.  See
+Leading underscores in a multi-constant hash are not flagged, since new
+enough C<constant.pm> to have multi-constants is new enough to have
+underscores.  See
 L<Compatibility::ConstantPragmaHash|Perl::Critic::Policy::Compatibility::ConstantPragmaHash>
-for checking multi-constants.
+for multi-constants version check.
 
     use constant { _FOO => 1 };      # not checked
 
 Leading double-underscore is disallowed by all versions of C<constant.pm>.
 That's not reported by this policy since the code won't run at all.
 
-    use constant __FOO = 123;  # not allowed by any constant.pm
+    use constant __FOO => 123;  # not allowed by any constant.pm
 
 =head2 Drawbacks
 
 Explicitly adding required version numbers in the code can be irritating,
-especially if other things you're using only run on 5.6 up anyway.  But
+especially if other things you're doing only run on 5.6 up anyway.  But
 declaring what code needs is accurate, it allows maybe for backports of
 modules, and explicit versions can be grepped out to create or check
 F<Makefile.PL> or F<Build.PL> prereqs.
 
-As always if you don't care about this and in particular if you only ever
-use Perl 5.6 anyway then you can disable C<ConstantLeadingUnderscore> from
-your F<.perlcriticrc> in the usual way (see
-L<Perl::Critic/CONFIGURATION>),
+As always, if you don't care about this or if you only ever use Perl 5.6
+anyway then you can disable C<ConstantLeadingUnderscore> from your
+F<.perlcriticrc> in the usual way (see L<Perl::Critic/CONFIGURATION>),
 
     [-Compatibility::ConstantLeadingUnderscore]
 
@@ -260,16 +261,16 @@ arithmetic expression etc (see L<perlsub/Constant Functions>).
 The purpose of a leading underscore is normally a hint that the sub is meant
 to be private to the module and/or its friends.  If you don't need the
 constant folding then a C<my> scalar is even more private, being invisible
-to anything outside the relevant scope,
+to anything outside relevant scope,
 
     my $FOO = 123;         # more private
     # ...
     do_something ($FOO);   # nothing to constant-fold anyway
 
-The scalar from a constant sub is flagged read-only, which might prevent
-accidental when passed around.  The C<Readonly> module can have a similar
-effect on scalars.  If you've got C<Readonly::XS> then it's just a flag too
-(no performance penalty on using the value).
+The scalar returned from C<constant.pm> subs is flagged read-only, which
+might prevent accidental mis-use when passed around.  The C<Readonly> module
+gives the same effect on variables.  If you have C<Readonly::XS> then it's
+just a flag too (no performance penalty on using the value).
 
     use Readonly;
     Readonly::Scalar my $FOO => 123;
@@ -282,7 +283,7 @@ L<Perl::Critic::Policy::Compatibility::ConstantPragmaHash>,
 L<Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma>,
 L<Perl::Critic::Policy::Modules::RequirePerlVersion>
 
-L<perlsub/Constant Functions>
+L<constant>, L<perlsub/Constant Functions>
 
 =head1 HOME PAGE
 
@@ -290,7 +291,7 @@ L<http://user42.tuxfamily.org/perl-critic-pulp/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

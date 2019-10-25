@@ -14,7 +14,9 @@ rdkafkaxs.c
 rdkafkaxs.h
 README
 t/00-load.t
+t/basic.t
 t/constants.t
+t/errors.t
 typemap
 utils/generate_const.pl
 xt/manifest.t

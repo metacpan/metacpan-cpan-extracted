@@ -26,7 +26,7 @@ $score->write_score("$0.mid");
 sub beat {
     my $d = MIDI::Drummer::Tiny->new( bpm => $bpm, score => $score );
 
-    for my $n ( 0 .. $size * $max * 2 - 1 ) {
+    for my $n ( 1 .. $size * $max * 2 ) {
         $d->note( $d->quarter, $d->closed_hh );
     }
 }
@@ -34,7 +34,7 @@ sub beat {
 sub melody {
     my $mdp = Music::Duration::Partition->new(
         size => $size,
-#        pool => [qw/ qn en ddsn dsn ten sn tsn /],
+#        pool => [qw/ twn thn tqn ten tsn /],
         pool => [qw/ qn en sn /],
     );
 

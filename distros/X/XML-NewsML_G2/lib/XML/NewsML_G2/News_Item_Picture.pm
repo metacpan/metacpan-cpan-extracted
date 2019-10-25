@@ -5,8 +5,8 @@ use namespace::autoclean;
 
 extends 'XML::NewsML_G2::News_Item';
 
-has '+nature', default => 'picture';
-has '+remotes', isa => 'HashRef[XML::NewsML_G2::Picture]';
+has '+nature',  default => 'picture';
+has '+remotes', isa     => 'HashRef[XML::NewsML_G2::Picture]';
 
 has 'photographer', isa => 'Str', is => 'rw';
 

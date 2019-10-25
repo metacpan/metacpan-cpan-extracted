@@ -1,5 +1,5 @@
 
-TODO ist for Set::Light
+TODO list for Set::Light
 
 * tests for $set->add(123) and $set->(1.2)
 * make benchmarks (memory, time)
@@ -11,7 +11,7 @@ TODO ist for Set::Light
     + 16..23 byte strings in another bucket
     + and so on
   + the bucket list is a sorted double linked list
-  + insert string:  
+  + insert string:
     + search the bucket from stringlength via binary search
     + if bucket doesn't exist, create it
     + insert string into bucket (double hashed hash table?)

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has area => (
@@ -106,7 +106,7 @@ SemanticWeb::Schema::BroadcastService - A delivery service through which content
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -178,8 +178,8 @@ A broadcast_frequency should be one of the following types:
 
 C<broadcastTimezone>
 
-=for html The timezone in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601
-format</a> for which the service bases its broadcasts
+=for html <p>The timezone in <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601
+format</a> for which the service bases its broadcasts<p>
 
 A broadcast_timezone should be one of the following types:
 

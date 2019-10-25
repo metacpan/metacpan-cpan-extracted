@@ -5,8 +5,17 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.170.0';
+$VERSION = '0.171.0';
 
+our $STRICT_MODE;
+
+sub import {
+    my ( $class, @args ) = @_;
+
+    $STRICT_MODE = 1 if ( grep { $_ =~ m/strict/i } @args );
+
+    return;
+}
 my %mocked;
 sub new {
 	my $class = shift;
@@ -21,7 +30,7 @@ sub new {
 		croak "Invalid package name $package";
 	}
 
-	unless ($args{no_auto} || ${"$package\::VERSION"}) {
+	unless ($package eq "CORE::GLOBAL" || $args{no_auto} || ${"$package\::VERSION"}) {
 		(my $load_package = "$package.pm") =~ s{::}{/}g;
 		TRACE("$package is empty, loading $load_package");
 		require $load_package;
@@ -57,8 +66,7 @@ sub redefine {
 
 		if ( $sub_name =~ qr{^(.+)::([^:]+)$} ) {
 			my ( $pkg, $sub ) = ( $1, $2 );
-			my $object = bless {}, $pkg;
-			next if $object->can( $sub );
+			next if $pkg->can( $sub );
 		}
 
 		if ('CODE' ne ref $coderef) {
@@ -66,10 +74,33 @@ sub redefine {
 		}
 	}
 
-	return $self->mock(@_);
+	return $self->_mock(@_);
+}
+
+sub define {
+	my ($self, @mocks) = (shift, @_);
+
+	while ( my ($name, $value) = splice @mocks, 0, 2 ) {
+		my $sub_name = $self->_full_name($name);
+		my $coderef = *{$sub_name}{'CODE'};
+
+		if ('CODE' eq ref $coderef) {
+			croak "$sub_name exists!";
+		}
+	}
+
+	return $self->_mock(@_);
 }
 
 sub mock {
+	my ($self, @mocks) = (shift, @_);
+
+	croak "mock is not allowed in strict mode. Please use define or redefine" if $STRICT_MODE;
+
+	return $self->_mock(@mocks);
+}
+
+sub _mock {
 	my $self = shift;
 
 	while (my ($name, $value) = splice @_, 0, 2) {
@@ -95,11 +126,18 @@ sub mock {
 		TRACE("Installing mocked $sub_name");
 		_replace_sub($sub_name, $code);
 	}
+
+	return $self;
 }
 
 sub noop {
     my $self = shift;
-    $self->mock($_,1) for @_;
+
+    croak "noop is not allowed in strict mode. Please use define or redefine" if $STRICT_MODE;
+
+    $self->_mock($_,1) for @_;
+
+    return;
 }
 
 sub original {
@@ -134,6 +172,8 @@ sub unmock_all {
 	foreach (keys %{$self->{_mocked}}) {
 		$self->unmock($_);
 	}
+
+	return;
 }
 
 sub is_mocked {
@@ -208,9 +248,21 @@ Test::MockModule - Override subroutines in a module for unit testing
 		$module->mock('subroutine', sub { ... });
 		Module::Name::subroutine(@args); # mocked
 
-		#Same effect, but this will die() if other_subroutine()
-		#doesn't already exist, which is often desirable.
+		# Same effect, but this will die() if other_subroutine()
+		# doesn't already exist, which is often desirable.
 		$module->redefine('other_subroutine', sub { ... });
+
+		# This will die() if another_subroutine() is defined.
+		$module->define('another_subroutine', sub { ... });
+	}
+
+	{
+		# you can also chain new/mock/redefine/define
+
+		Test::MockModule->new('Module::Name')
+		->mock( one_subroutine => sub { ... })
+		->redefine( other_subroutine => sub { ... } )
+		->define( a_new_sub => 1234 );
 	}
 
 	Module::Name::subroutine(@args); # original subroutine
@@ -225,6 +277,18 @@ Test::MockModule - Override subroutines in a module for unit testing
 		my $foo = Foo->new();
 		$foo->foo(); # prints "Foo!\n"
 	}
+
+    # If you want to prevent noop and mock from working, you can
+    # load Test::MockModule in strict mode
+
+    use Test::MockModule qw/strict/;
+    my $module = Test::MockModule->new('Module::Name');
+
+    # Redefined the other_subroutine or dies if it's not there.
+    $module->redefine('other_subroutine', sub { ... });
+
+    # Dies since you specified you wanted strict mode.
+    $module->mock('subroutine', sub { ... });
 
 =head1 DESCRIPTION
 
@@ -264,6 +328,10 @@ mocked
 Temporarily replaces one or more subroutines in the mocked module. A subroutine
 can be mocked with a code reference or a scalar. A scalar will be recast as a
 subroutine that returns the scalar.
+
+Returns the current C<Test::MockModule> object, so you can chain L<new> with L<mock>.
+
+	my $mock = Test::MockModule->new->(...)->mock(...);
 
 The following statements are equivalent:
 
@@ -355,6 +423,26 @@ code path that no longer behaves consistently with the mocked behavior.
 
 Note that redefine is also now checking if one of the parent provides the sub
 and will not die if it's available in the chain.
+
+Returns the current C<Test::MockModule> object, so you can chain L<new> with L<redefine>.
+
+	my $mock = Test::MockModule->new->(...)->redefine(...);
+
+=item define($subroutine)
+
+The reverse of redefine, this will fail if the passed subroutine exists.
+While this use case is rare, there are times where the perl code you are
+testing is inspecting a package and adding a missing subroutine is actually
+what you want to do.
+
+By using define, you're asserting that the subroutine you want to be mocked
+should not exist in advance.
+
+Note: define does not check for inheritance like redefine.
+
+Returns the current C<Test::MockModule> object, so you can chain L<new> with L<define>.
+
+	my $mock = Test::MockModule->new->(...)->define(...);
 
 =item original($subroutine)
 

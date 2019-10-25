@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 8;
-
 BEGIN {
     use_ok( 'Net::DHCP::Windows::Netsh::Parse' ) || print "Bail out!\n";
 }

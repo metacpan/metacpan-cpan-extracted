@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has from_location => (
@@ -50,15 +50,15 @@ SemanticWeb::Schema::MoveAction - The act of an agent relocating to a place
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of an agent relocating to a place.<br/><br/> Related
+=for html <p>The act of an agent relocating to a place.<br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/TransferAction">TransferAction</a>: Unlike
 TransferAction, the subject of the move is a living Person or Organization
-rather than an inanimate object.</li> </ul> 
+rather than an inanimate object.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

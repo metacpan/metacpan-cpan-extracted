@@ -1,5 +1,12 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99026  Oct 25 2019 Alexander Nalobin
+    - Change whois.rightside.co whois server to whois.donuts.co
+
+2.99025  Oct 24 2019 Eugeny Subachev
+    - Fixed 'not found' pattern for whois.nic.so
+    - New tld .NET.SO
+
 2.99024  Oct 10 2019 Eugeny Subachev
     - A lot of new tlds added
 

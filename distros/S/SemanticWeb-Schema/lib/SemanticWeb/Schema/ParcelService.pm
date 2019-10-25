@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,15 +34,15 @@ SemanticWeb::Schema::ParcelService - A private parcel service as the delivery mo
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A private parcel service as the delivery mode available for a certain
+=for html <p>A private parcel service as the delivery mode available for a certain
 offer.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#DHL</li>
 <li>http://purl.org/goodrelations/v1#FederalExpress</li>
-<li>http://purl.org/goodrelations/v1#UPS</li> </ul> 
+<li>http://purl.org/goodrelations/v1#UPS</li> </ul> <p>
 
 =head1 SEE ALSO
 

@@ -38,13 +38,16 @@ IIIF Image API Request. It can also be used to get IIIF Image Information.
 
 =head1 EXAMPLE
 
+    # convert IIIF Image API Request into ImageMagick convert syntax
     $ i3f 100,120,15,20/\!12
     convert -crop 15x20+100+120 -flop -rotate 12 -background none
 
-    $ i3f 64,64 image.png target.png
+    # Apply IIIF Image API Request to transform image into another
+    $ i3f 64,64 image.png image-selection.png
 
 =head1 SEE ALSO
 
-Core parts of implementation in L<IIIF::Magick>.
+This script is part of Perl package L<IIIF> with core implementation in module
+L<IIIF::Magick>.
 
 =cut

@@ -86,10 +86,14 @@ sub __choose_columns {
     }
     else {
         # Choose
-        return $tu->choose_a_subset(
+        my $subset = $tu->choose_a_subset(
             $cols,
             { current_selection_label => $function . ': ', layout => 1, current_selection_separator => ',', keep_chosen => 1 }
         );
+        if ( ! defined $subset || ! @$subset ) {
+            return;
+        }
+        return $subset;
     }
 }
 

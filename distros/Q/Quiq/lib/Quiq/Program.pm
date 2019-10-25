@@ -5,11 +5,12 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Perl;
 use Encode ();
 use Quiq::Parameters;
+use Quiq::Assert;
 use Quiq::Option;
 use Time::HiRes ();
 use Quiq::FileHandle;
@@ -560,6 +561,59 @@ sub parameters {
 
 # -----------------------------------------------------------------------------
 
+=head2 Zusicherungen
+
+=head3 assert() - Prüfe Werte
+
+=head4 Synopsis
+
+  $prg->assert(sub {...});
+
+=head4 Description
+
+Prüfe Werte durch Methoden der Klasse Quiq::Assert. Ist eine
+Zusicherung verletzt, wird die betreffende Exception in die
+Ausgabe der Programm-Hilfeseite umgesetzt. Die Subroutine
+erhält als Argument ein instantiiertes Quiq::Assert-Objekt.
+
+=head4 Example
+
+  Prüfe die Werte der Variablen $system und $user gegen eine Menge
+  möglicher Werte:
+  
+      $self->assert(sub {
+          my $a = shift;
+          $a->isEnumValue($system,['test','prod'],
+              -name=>'SYSTEM',
+          );
+          $a->isEnumValue($user,[qw/etlt etls etlr etlp/],
+              -name=>'USER',
+          );
+      });
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub assert {
+    my ($self,$sub) = @_;
+
+    my $a = Quiq::Assert->new(
+        stacktrace => 0,
+        nameSection => 'Parameter',
+    );
+
+    eval {$sub->($a)};
+    if ($@) {
+        $@ =~ s/ASSERT-\d+: //;
+        $self->help(10,$@);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Optionen
 
 =head3 options() - Verarbeite Programmoptionen (DEPRECATED)
@@ -849,7 +903,8 @@ sub help {
 
     if ($msg) {
         $msg =~ s/\n+$//;
-        $text = "$msg\n\n$text$msg\n";
+        $text =~ s/\n+$//;
+        $text = "$msg\n-----\n$text\n-----\n$msg\n";
     }
 
     # Doku anzeigen
@@ -959,7 +1014,7 @@ sub new {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 7;
+our $VERSION = 8;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -17,6 +17,7 @@ use Time::HiRes qw(sleep usleep time);
 use Sys::Hostname;
 use Errno;
 use IO::Socket::IP;
+#use IO::Socket::UNIX;
 use IO::Select;
 use IO::Socket::SSL;
 use YAML::Syck;
@@ -45,6 +46,27 @@ my %overheadflags = (
     Z => "no_flags", # Only sent when no other flags are set
 );
 
+BEGIN {
+    {
+        # We need to add some extra function to IO::Socket::SSL so we can track the client ID
+        # on both TCP and Unix Domain Sockets
+        no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
+        *{"IO::Socket::SSL::_setClientID"} = sub {
+            my ($self, $cid) = @_;
+    
+            ${*$self}{'__client_id'} = $cid; ## no critic (References::ProhibitDoubleSigils)
+            return;
+        };
+        
+        *{"IO::Socket::SSL::_getClientID"} = sub {
+            my ($self) = @_;
+    
+            return ${*$self}{'__client_id'} || ''; ## no critic (References::ProhibitDoubleSigils)
+        };
+    }
+    
+}
+
 sub new {
     my ($class, $isDebugging, $configfile) = @_;
 
@@ -63,7 +85,7 @@ sub init {
 
     print "Loading config file ", $self->{configfile}, "\n";
     my $config = XMLin($self->{configfile},
-                        ForceArray => [ 'ip' ],);
+                        ForceArray => [ 'ip', 'socket' ],);
 
     my $hname = hostname;
 
@@ -121,18 +143,47 @@ sub init {
 
     my @tcpsockets;
 
-    foreach my $ip (@{$config->{ip}}) {
-        my $tcp = IO::Socket::IP->new(
-            LocalHost => $ip,
-            LocalPort => $config->{port},
-            Listen => 1,
-            Blocking => 0,
-            ReuseAddr => 1,
-            Proto => 'tcp',
-        ) or croak($ERRNO);
-        #binmode($tcp, ':bytes');
-        push @tcpsockets, $tcp;
-        print "Listening on $ip:18888/tcp\n";
+    if(defined($config->{ip})) {
+        foreach my $ip (@{$config->{ip}}) {
+            my $tcp = IO::Socket::IP->new(
+                LocalHost => $ip,
+                LocalPort => $config->{port},
+                Listen => 1,
+                Blocking => 0,
+                ReuseAddr => 1,
+                Proto => 'tcp',
+            ) or croak($ERRNO);
+            #binmode($tcp, ':bytes');
+            push @tcpsockets, $tcp;
+            print "Listening on $ip:", $config->{port}, "/tcp\n";
+        }
+    }
+
+    if(defined($config->{socket})) {
+        my $udsloaded = 0;
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            require IO::Socket::UNIX;
+            $udsloaded = 1;
+        };
+        if(!$udsloaded) {
+            croak("Specified a unix domain socket, but i couldn't load IO::Socket::UNIX!");
+        }
+        foreach my $socket (@{$config->{socket}}) {
+            if(-S $socket) {
+                print "Removing old unix domain socket file $socket\n";
+                unlink $socket;
+            }
+            my $tcp = IO::Socket::UNIX->new(
+                Type => SOCK_STREAM(),
+                Local => $socket,
+                Listen => 1,
+                #Blocking => 0,
+            ) or croak($ERRNO);
+            $tcp->blocking(0);
+            #binmode($tcp, ':bytes');
+            push @tcpsockets, $tcp;
+            print "Listening on Unix domain socket $socket\n";
+        }
     }
 
     $self->{tcpsockets} = \@tcpsockets;
@@ -262,8 +313,10 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         lastmessage => time,
                         authtimeout => time + $self->{config}->{authtimeout},
                         authok => 0,
+                        failcount => 0,
                     );
                     $clients{$mcid} = \%tmp;
+                    $msocket->_setClientID($mcid);
                     $selector->add($msocket);
 
                     $workCount++;
@@ -274,9 +327,16 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         foreach my $tcpsocket (@{$self->{tcpsockets}}) {
             my $clientsocket = $tcpsocket->accept;
             if(defined($clientsocket)) {
-                my ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
-                my $cid = "$chost:$cport";
+                $clientsocket->blocking(0);
+                my ($cid, $chost, $cport);
+                if(ref $tcpsocket eq 'IO::Socket::UNIX') {
+                    $chost = 'unixdomainsocket';
+                    $cport = time . ':' . int(rand(1_000_000));
+                } else {
+                    ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
+                }
                 print "Got a new client $chost:$cport!\n";
+                $cid = "$chost:$cport";
                 foreach my $debugcid (keys %clients) {
                     if($clients{$debugcid}->{mirror}) {
                         $clients{$debugcid}->{outbuffer} .= "DEBUG CONNECTED=" . $cid . "\r\n";
@@ -327,12 +387,14 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     lastmessage => time,
                     authtimeout => time + $self->{config}->{authtimeout},
                     authok => 0,
+                    failcount => 0,
                 );
                 if(0 && $self->{isDebugging}) {
                     $tmp{authok} = 1;
                     $tmp{outbuffer} .= "OVERHEAD M debugmode_auth_not_really_required\r\n"
                 }
                 $clients{$cid} = \%tmp;
+                $clientsocket->_setClientID($cid);
                 $selector->add($clientsocket);
                 $workCount++;
             }
@@ -385,7 +447,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                 }
 
                 if($clients{$cid}->{interclacksclient} && $interclackslock) {
-                    print "...this is one is interclacks master and has us locked - UNLOCKING mid-sync!\n";
+                    print "...this one is interclacks master and has us locked - UNLOCKING mid-sync!\n";
                     $interclackslock = 0;
                 }
 
@@ -418,17 +480,33 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
         my @inclients = $selector->can_read($selecttimeout);
         foreach my $clientsocket (@inclients) {
-            my ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
-            my $cid = "$chost:$cport";
+            my $cid = $clientsocket->_getClientID();
 
+            my $totalread = 0;
             while(1) {
                 my $rawbuffer;
                 sysread($clients{$cid}->{socket}, $rawbuffer, 10_000); # Read at most 10kB at a time
                 if(defined($rawbuffer) && length($rawbuffer)) {
+                    $totalread += length($rawbuffer);
                     push @{$clients{$cid}->{charbuffer}}, split//, $rawbuffer;
                     next;
                 }
                 last;
+            }
+            
+            # Check if we could read data from a socket that was marked as readable.
+            # Thanks to SSL, this might ocxasionally fail. Don't bail out at the first
+            # error, only if multiple happen one after the other
+            if($totalread) {
+                $clients{$cid}->{failcount} = 0;
+            } else {
+                $clients{$cid}->{failcount}++;
+                
+                if($clients{$cid}->{failcount} > 5) {
+                    # Socket was active multiple times but delivered no data?
+                    # EOF, maybe, possible, perhaps?
+                    push @toremove, $cid;
+                }
             }
         }
 
@@ -447,8 +525,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     next;
                 } elsif($buf eq "\n") {
                     next if($clients{$cid}->{buffer} eq ''); # Empty lines
-
-                    #print "<", $clients{$cid}->{buffer}, "\n";
 
                     # Handle CLACKS identification header
                     if($clients{$cid}->{buffer} =~ /^CLACKS\ (.+)/) {
@@ -839,12 +915,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
 
         # Send as much as possible
         foreach my $cid (keys %clients) {
-            #if(!$clients{$cid}->{socket}->connected) {
-            #    print "Client disconnected: $ERRNO\n";
-            #    push @toremove, $cid;
-            #    next;
-            #}
-
             if(length($clients{$cid}->{outbuffer})) {
                 $clients{$cid}->{lastmessage} = time;
             } elsif(($clients{$cid}->{lastmessage} + 60) < time) {

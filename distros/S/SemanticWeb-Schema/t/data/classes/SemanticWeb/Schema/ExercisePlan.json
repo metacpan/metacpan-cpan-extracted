@@ -28,8 +28,8 @@
          "schema:domainIncludes" : "schema:ExercisePlan",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QualitativeValue"
          ]
       },
       "schema:additionalVariable" : {
@@ -69,8 +69,8 @@
          "schema:domainIncludes" : "schema:ExercisePlan",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
-            "schema:Number"
+            "schema:Number",
+            "schema:QualitativeValue"
          ]
       },
       "schema:restPeriods" : {

@@ -128,6 +128,9 @@ const char *crypt_build_settings =
 #if defined(LTC_SERPENT)
    "   Serpent\n"
 #endif
+#if defined(LTC_TEA)
+   "   TEA\n"
+#endif
    "Stream ciphers built-in:\n"
 #if defined(LTC_CHACHA)
    "   ChaCha\n"
@@ -353,6 +356,14 @@ const char *crypt_build_settings =
 #if defined(LTC_MDSA)
     "   DSA\n"
 #endif
+#if defined(LTC_CURVE25519)
+#if defined(LTC_CURVE25519)
+    "   Ed25519\n"
+#endif
+#if defined(LTC_CURVE25519)
+    "   X25519\n"
+#endif
+#endif
 #if defined(LTC_PK_MAX_RETRIES)
     "   "NAME_VALUE(LTC_PK_MAX_RETRIES)"\n"
 #endif
@@ -422,6 +433,10 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_BASE16)
     " BASE16 "
+#endif
+#if defined(LTC_BCRYPT)
+    " BCRYPT "
+    " " NAME_VALUE(LTC_BCRYPT_DEFAULT_ROUNDS) " "
 #endif
 #if defined(LTC_CRC32)
     " CRC32 "
@@ -506,7 +521,9 @@ const char *crypt_build_settings =
 #if defined(LTC_NO_ASM)
     " LTC_NO_ASM "
 #endif
-#if defined(LTC_ROx_ASM)
+#if defined(LTC_ROx_BUILTIN)
+    " LTC_ROx_BUILTIN "
+#elif defined(LTC_ROx_ASM)
     " LTC_ROx_ASM "
 #if defined(LTC_NO_ROLC)
     " LTC_NO_ROLC "

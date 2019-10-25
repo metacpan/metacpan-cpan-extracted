@@ -1,3 +1,10 @@
+0.902   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Didn't set value of data in the case of coercion
+	  failure, so data incorrectly became the return value of coerce
+	  rule.
+
+
 0.901   2019-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Handle cases where we generate code "grep { ... } ..."

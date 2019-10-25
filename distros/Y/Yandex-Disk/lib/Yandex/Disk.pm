@@ -14,11 +14,10 @@ use Encode;
 use IO::Socket::SSL;
 use Term::Sk;
 
-our $VERSION    = '0.05';
+our $VERSION    = '0.06';
 
 my $WAIT_RETRY  = 20;
-#my $BUFF_SIZE   = 8192;
-my $BUFF_SIZE   = 81;
+my $BUFF_SIZE   = 8192;
 
 sub new {
     my $class                   = shift;
@@ -416,7 +415,7 @@ B<Yandex::Disk> - a simple API for Yandex Disk
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSYS
     

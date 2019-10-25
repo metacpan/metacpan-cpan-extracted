@@ -8,7 +8,7 @@ use namespace::autoclean;
 use Try::Tiny;
 use Sub::Util 'set_subname';
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -181,7 +181,7 @@ sub add_isa {
     my ( $self, $parent, $child ) = @_;
     {
         no strict 'refs';
-        push( @{"${child}::ISA"}, $parent );
+        push( @{"${child}::ISA"}, $parent ) unless ( grep { $_ eq $parent } @{"${child}::ISA"} );
     }
     return;
 }
@@ -210,7 +210,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)
@@ -475,15 +475,7 @@ L<GitHub|https://github.com/gryphonshafer/exact>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/exact>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/exact>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/exact>
 
 =item *
 

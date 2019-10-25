@@ -8,9 +8,8 @@ package Text::Layout::FontConfig;
 
 use Carp;
 
-use Text::Layout::Version;
 
-our $VERSION = $Text::Layout::VERSION;
+our $VERSION = "0.013";
 
 use Text::Layout::FontDescriptor;
 
@@ -39,6 +38,7 @@ with new() will always return the same object.
 my %fonts;
 my @dirs;
 my $loader;
+my $debug = 0;
 
 =head2 METHODS
 
@@ -190,11 +190,12 @@ sub register_aliases {
 
 =over
 
-=item register_corefonts
+=item register_corefonts( $noaliases )
 
 This is a convenience method that registers all built-in corefonts.
 
-Aliases for families C<serif>, C<sans>, and C<monospace> are added.
+Aliases for families C<serif>, C<sans>, and C<monospace> are added
+unless $noaliases is specified.
 
 You do not need to call this method if you provide your own font
 registrations.
@@ -205,25 +206,33 @@ registrations.
 
 sub register_corefonts {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+    my ( $noaliases ) = @_;
 
     register_font( "Times-Roman",           "Times"                );
     register_font( "Times-Bold",            "Times", "Bold"        );
     register_font( "Times-Italic",          "Times", "Italic"      );
     register_font( "Times-BoldItalic",      "Times", "BoldItalic"  );
-    register_aliases( "Times", "Serif" );
+
+    register_aliases( "Times", "Serif" )
+      unless $noaliases;
 
     register_font( "Helvetica",             "Helvetica"                 );
     register_font( "Helvetica-Bold",        "Helvetica",  "Bold"        );
     register_font( "Helvetica-Oblique",     "Helvetica",  "Oblique"     );
     register_font( "Helvetica-BoldOblique", "Helvetica",  "BoldOblique" );
-    register_aliases( "Helvetica", "Sans", "Arial" );
+
+    register_aliases( "Helvetica", "Sans", "Arial" )
+      unless $noaliases;
 
     register_font( "Courier",               "Courier"                 );
     register_font( "Courier-Bold",          "Courier",  "Bold"        );
     register_font( "Courier-Oblique",       "Courier",  "Italic"      );
     register_font( "Courier-BoldOblique",   "Courier",  "BoldItalic"  );
-    register_aliases( "Courier", "Mono", "Monospace", "fixed" );
-    register_aliases( "Courier", "Mono", "Monospace", "fixed" );
+
+    register_aliases( "Courier", "Mono", "Monospace", "fixed" )
+      unless $noaliases;
+    register_aliases( "Courier", "Mono", "Monospace", "fixed" )
+      unless $noaliases;
 
     register_font( "ZapfDingbats",          "Dingbats"                );
 
@@ -247,7 +256,7 @@ sub register_corefonts {
 
 Returns a font descriptor based on the given family, style and weight.
 
-Note: No fallback yet.
+On Linux, fallback using fontconfig.
 
 =back
 
@@ -257,10 +266,8 @@ sub find_font {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
     my ( $family, $style, $weight, $atts ) = @_;
 
-    $style  = _norm_style( $style   // "normal" );
-    $weight = _norm_weight( $weight // "normal" );
-
-    if ( $fonts{$family}
+    my $try = sub {
+      if ( $fonts{$family}
 	 && $fonts{$family}->{$style}
 	 && $fonts{$family}->{$style}->{$weight} ) {
 	my $ff;
@@ -280,10 +287,24 @@ sub find_font {
 		style  => $style,
 		weight => $weight );
 	}
-    }
+	else {
+	    return;
+	}
+      }
+    };
+
+    $style  = _norm_style( $style   // "normal" );
+    $weight = _norm_weight( $weight // "normal" );
+    my $res = $try->();
+    return $res if $res;
 
     # TODO: Some form of font fallback.
+    if ( _fallback( $family, $style, $weight ) ) {
+	$res = $try->();
+	return $res if $res;
+    }
 
+    # Nope.
     croak("Cannot find font: $family $style $weight\n");
 }
 
@@ -294,7 +315,7 @@ sub find_font {
 Returns a font descriptor using a Pango-style font description, e.g.
 C<Sans Italic 14>.
 
-Note: No fallback yet.
+On Linux, fallback using fontconfig.
 
 =back
 
@@ -307,17 +328,40 @@ sub from_string {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
     my ( $description ) = @_;
 
+    my $i = parse($description);
+
+    my $res = find_font( $i->{family}, $i->{style}, $i->{weight} );
+    $res->set_size($i->{size}) if $res && $i->{size};
+    $res;
+}
+
+=item parse( $description )
+
+Parses a Pango-style font description and returns a hash ref with keys
+C<family>, C<style>, C<weight>, and C<size>.
+
+Unspecified items are returned as empty strings or, in the case of
+C<size>, zero.
+
+=back
+
+=cut
+
+sub parse {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+    my ( $description ) = @_;
+
     my $family = "";
-    my $style = "";
+    my $style  = "";
     my $weight = "";
-    my $size;
+    my $size   = 0;
 
     my @p = split( ' ', $description );
     $size = pop(@p) if $p[-1] =~ /^\d+(?:\.\d+)?$/;
 
     for ( @p ) {
 	my $t = lc;
-	if ( exists($fonts{$t}) ) {
+	if ( ! $family ) {
 	    $family = $t;
 	}
 	elsif ( $t =~ $stylep ) {
@@ -334,9 +378,55 @@ sub from_string {
 	}
     }
 
-    my $res = find_font( $family, $style, $weight );
-    $res->set_size($size) if $res && $size;
-    $res;
+    return { family => $family,
+	     style  => $style,
+	     weight => $weight,
+	     size   => $size,
+	   };
+}
+
+=over
+
+=item from_filename( $filename )
+
+Returns a font descriptor from a filename. Tries to infer Pango data
+from the name.
+
+=back
+
+=cut
+
+use File::Basename;
+
+sub from_filename {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+    my ( $file ) = @_;
+    my $b;
+    ( $b, undef, undef ) = fileparse( $file, qr/\.\w+/ );
+    my ( $family, $style, $weight ) = ( $b, "normal", "normal" );
+
+    if ( lc($b) =~ m/^
+		 ( .*? )
+		 -?
+		 (roman?|normal|regular)?
+		 (light|book|bold)?
+		 (italic|ital|oblique|obli)?
+		 $/ix ) {
+	$family = $1       if $1;
+	$style  = "italic" if $4;
+	$weight = "bold"   if $3 && $3 =~ /^(bold)$/;
+    }
+
+    my $fd = Text::Layout::FontDescriptor->new
+      ( loader_data => $file,
+	loader => $loader,
+	family => $family,
+	style  => $style,
+	weight => $weight );
+
+    $fonts{$family}{$style}{$weight} //= $fd;
+
+    return $fd;
 }
 
 ################ Helper Routines ################
@@ -374,6 +464,44 @@ sub _norm_weight {
     return "normal";
 }
 
+my $fallback;
+
+sub _fallback {
+    unless ( defined $fallback ) {
+	$fallback = '';
+	foreach ( split( /:/, $ENV{PATH} ) ) {
+	    next unless -f -x "$_/fc-match";
+	    $fallback = "$_/fc-match";
+	    last;
+	}
+    }
+    return unless $fallback;
+
+    my ( $family, $style, $weight ) = @_;
+
+    my $pattern = $family;
+    $pattern .= ":$style" if $style;
+    $pattern .= ":$weight" if $weight;
+
+    open( my $fd, '-|',
+	  $fallback, '-s', '--format=%{file}\n', $pattern )
+      or do { $fallback = ''; return };
+
+    my $res;
+    while ( <$fd> ) {
+	chomp;
+	next unless -f -r $_;
+	next unless /\.[ot]tf$/i;
+	$res = $_;
+	last;
+    }
+
+    close($fd);
+    register_font( $res, $family, $style, $weight ) if $res;
+    warn("Lookup $pattern -> $res\n") if $debug;
+    return $res;
+}
+
 =head1 SEE ALSO
 
 L<Text::Layout>, L<Text::Layout::FontDescriptor>.
@@ -401,5 +529,25 @@ GitHub.
 See L<Text::Layout>.
 
 =cut
+
+sub _dump {
+    foreach my $family ( sort keys %fonts ) {
+	foreach my $style ( qw( normal italic ) ) {
+	    foreach my $weight ( qw( normal bold ) ) {
+		my $f = $fonts{$family}{$style}{$weight};
+		next unless $f;
+		printf STDERR ( "%-13s %s%s%s %s\n",
+				$family,
+				$style eq 'normal' ? "-" : "i",
+				$weight eq 'normal' ? "-" : "b",
+				$f->{font} ? "+" : " ",
+				$f->{loader_data},
+			      );
+	    }
+	}
+    }
+}
+
+# END { _dump }
 
 1;

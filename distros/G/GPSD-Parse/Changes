@@ -1,5 +1,17 @@
 Revision history for GPSD-Parse
 
+1.03    2019-10-23
+        - fix issue in t/device.t where we were looking for a specific serial
+          interface name, but may differ from the regex if there's a real GPS
+          device connected (fixes #11, work on #9)
+        - add links to internal POD sections, and added POD linkcheck test file
+          (closes #7, closes #6)
+        - add "Waiting for valid GPS signal" warning and return early from
+          poll() if no data is available, instead of running blindly ahead and
+          throwing irrelevant warnings (fixes #9)
+        - added note about running gpsd with the '-n' flag
+        - update tests to better handle test runs whether in file or socket mode
+
 1.02    2018-02-28
         - added convenience methods lon(), lat(), alt(), climb(), speed() and
           track(). This alleviates a user from having to expand the indivitual

@@ -14,8 +14,8 @@
    "properties" : {
       "schema:actionableFeedbackPolicy" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1525",
-            "schemadotorgsources2:TP"
+            "schemadotorgsources2:TP",
+            "https://github.com/schemaorg/schemaorg/issues/1525"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "For a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a> or other news-related <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a>, a statement about public engagement activities (for news media, the newsroomÃ¢ÂÂs), including involving the public - digitally or otherwise -- in coverage decisions, reporting and activities after publication.",
@@ -23,8 +23,8 @@
          "rdfs:subPropertyOf" : "schema:publishingPrinciples",
          "schema:category" : "issue-1525",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:NewsMediaOrganization"
+            "schema:NewsMediaOrganization",
+            "schema:Organization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -48,22 +48,22 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:URL"
+            "schema:URL",
+            "schema:CreativeWork"
          ]
       },
       "schema:diversityPolicy" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1525",
-            "schemadotorgsources2:TP"
+            "schemadotorgsources2:TP",
+            "https://github.com/schemaorg/schemaorg/issues/1525"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Statement on diversity policy by an <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> e.g. a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a>. For a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a>, a statement describing the newsroomÃ¢ÂÂs diversity policy on both staffing and sources, typically providing staffing data.",
          "rdfs:label" : "diversityPolicy",
          "schema:category" : "issue-1525",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:NewsMediaOrganization"
+            "schema:NewsMediaOrganization",
+            "schema:Organization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -87,8 +87,8 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Article",
-            "schema:URL"
+            "schema:URL",
+            "schema:Article"
          ]
       },
       "schema:ethicsPolicy" : {
@@ -103,8 +103,8 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:masthead" : {
@@ -120,14 +120,14 @@
          "schema:domainIncludes" : "schema:NewsMediaOrganization",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:missionCoveragePrioritiesPolicy" : {
          "dc:source" : [
-            "schemadotorgsources2:TP",
-            "https://github.com/schemaorg/schemaorg/issues/1525"
+            "https://github.com/schemaorg/schemaorg/issues/1525",
+            "schemadotorgsources2:TP"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "For a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a>, a statement on coverage priorities, including any public agenda or stance on issues.",
@@ -137,8 +137,8 @@
          "schema:domainIncludes" : "schema:NewsMediaOrganization",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:CreativeWork",
-            "schema:URL"
+            "schema:URL",
+            "schema:CreativeWork"
          ]
       },
       "schema:noBylinesPolicy" : {
@@ -154,14 +154,14 @@
          "schema:domainIncludes" : "schema:NewsMediaOrganization",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:ownershipFundingInfo" : {
          "dc:source" : [
-            "schemadotorgsources2:TP",
-            "https://github.com/schemaorg/schemaorg/issues/1525"
+            "https://github.com/schemaorg/schemaorg/issues/1525",
+            "schemadotorgsources2:TP"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "For an <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> (often but not necessarily a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a>), a description of organizational ownership structure; funding and grants. In a news/media setting, this is with particular reference to editorial independence.   Note that the <a class=\"localLink\" href=\"http://schema.org/funder\">funder</a> is also available and can be used to make basic funder information machine-readable.",
@@ -174,16 +174,16 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:URL",
             "schema:Text",
             "schema:CreativeWork",
-            "schema:URL",
             "schema:AboutPage"
          ]
       },
       "schema:unnamedSourcesPolicy" : {
          "dc:source" : [
-            "schemadotorgsources2:TP",
-            "https://github.com/schemaorg/schemaorg/issues/1525"
+            "https://github.com/schemaorg/schemaorg/issues/1525",
+            "schemadotorgsources2:TP"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "For an <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> (typically a <a class=\"localLink\" href=\"http://schema.org/NewsMediaOrganization\">NewsMediaOrganization</a>), a statement about policy on use of unnamed sources and the decision process required.",
@@ -191,13 +191,13 @@
          "rdfs:subPropertyOf" : "schema:publishingPrinciples",
          "schema:category" : "issue-1525",
          "schema:domainIncludes" : [
-            "schema:NewsMediaOrganization",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:NewsMediaOrganization"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:verificationFactCheckingPolicy" : {

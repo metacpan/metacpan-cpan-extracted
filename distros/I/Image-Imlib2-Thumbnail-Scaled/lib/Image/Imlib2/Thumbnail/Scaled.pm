@@ -19,13 +19,13 @@ Version 0.05
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
   use Image::Imlib2::Thumbnail::Scaled;
   my $thumbnail = Image::Imlib2::Thumbnail::Scaled->new;
-  
+
   # generates a set of thumbnails for $source image in $directory
   my $thumbnails = $thumbnail->generate( $source, $directory );
 
@@ -60,12 +60,12 @@ Returns a new L<Image::Imlib2::Thumbnail::Scaled> object. Can take in any of the
 
   my $thumbnail = Image::Imlib2::Thumbnail::Scaled->new(
     sizes => [
-               { 
+               {
                  name => 'my_image',
                  width => 180,
                  height => 180,
                },
-               { 
+               {
                  name => 'my_other_image',
                  width => 240,
                  height => 240,
@@ -83,18 +83,18 @@ Returns a new L<Image::Imlib2::Thumbnail::Scaled> object. Can take in any of the
 sub _set_default_sizes {
 	my ($self) = @_;
     $self->sizes(
-        [   
-			{   
+        [
+			{
                 name   => 'square',
                 width  => 75,
                 height => 75
             },
-            {  
+            {
                 name   => 'thumbnail',
                 width  => 100,
                 height => 75
             },
-            { 
+            {
                 name   => 'small',
                 width  => 240,
                 height => 180
@@ -117,12 +117,12 @@ sub _set_default_sizes {
 
   my $thumbnail = Image::Imlib2::Thumbnail::Scaled->new(
     sizes => [
-               { 
+               {
                  name => 'my_image',
                  width => 180,
                  height => 180,
                },
-               { 
+               {
                  name => 'my_other_image',
                  width => 240,
                  height => 240,
@@ -136,7 +136,7 @@ L<sizes|/"sizes"> allows you to override the default sizes that are provided.
 
   $thumbnail->include_original(1);
 
-If set to 1, L<generate|/"generate"> will return the original image along with 
+If set to 1, L<generate|/"generate"> will return the original image along with
 the created thumbnails in the returned arrayref. Default is false.
 
 =cut
@@ -165,14 +165,14 @@ Default is false.
 Add an extra size:
 
   $thumbnail->add_size(
-      {   
+      {
           name    => 'header',
           width   => 350,
           height  => 200,
           quality => 80,
       }
   );
- 
+
 The quality is the JPEG quality compression ratio. This defaults to 75.
 
 =cut
@@ -189,7 +189,7 @@ Will include the original image if L<include_original|/"include_original">
 is set to 1.
 
   my $thumbnails = $thumbnail->generate( $source, $directory );
-  for my $thumbnail (@$thumbnails) { 
+  for my $thumbnail (@$thumbnails) {
     my $name = $thumbnail->{name};
     my $width = $thumbnail->{width};
     my $requested_width = $thumbnail->{requested_width};
@@ -236,8 +236,8 @@ sub generate {
 
     my $mime_type = MIME::Types->new->mimeTypeOf($original_extension);
 
-	if($self->include_original) { 
-		my $orig_file = {   
+	if($self->include_original) {
+		my $orig_file = {
 			filename => $filename,
             name     => 'original',
             width    => $o_width,
@@ -246,9 +246,9 @@ sub generate {
 			requested_height => $o_height,
         };
 
-		if($return_hash) { 
+		if($return_hash) {
 			$return_obj->{original} = $orig_file;
-		}	
+		}
 		else { push @$return_obj, $orig_file }
 	}
 
@@ -292,13 +292,13 @@ sub generate {
             mime_type => $mime_type,
         };
 
-		if($return_hash) { 
+		if($return_hash) {
 			$return_obj->{$name} = $resized_image;
 		}
 		else { push @$return_obj, $resized_image }
     }
 
-	if($self->move_original) { 
+	if($self->move_original) {
 		my $base_filename = basename($filename);
 		move($filename, file($directory, $base_filename)->stringify);
 	}

@@ -1,6 +1,7 @@
 Build.PL
 Changes
 hax/lexer-additions.c.inc
+hax/parse_subsignature.c.inc
 hax/wrap_keyword_plugin.c.inc
 lib/Object/Pad.pm
 lib/Object/Pad.xs
@@ -14,5 +15,10 @@ t/01method.t
 t/02slots.t
 t/03create.t
 t/04capture.t
-t/05method-attrs.t
+t/05extends.t
+t/10method-attrs.t
+t/11method-signatures.t
+t/20slots-private.t
+t/50croak-method.t
+t/51pragmata.t
 t/99pod.t

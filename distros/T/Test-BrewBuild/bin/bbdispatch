@@ -5,7 +5,7 @@ use strict;
 use Getopt::Long;
 use Test::BrewBuild::Dispatch;
 
-our $VERSION = '2.20';
+our $VERSION = '2.22';
 
 my %args = (auto => -1);
 my $help;

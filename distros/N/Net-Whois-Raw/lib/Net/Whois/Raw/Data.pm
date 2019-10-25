@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99024';
+$Net::Whois::Raw::Data::VERSION = '2.99026';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -151,6 +151,7 @@ our %servers = qw(
     AGENCY          whois.donuts.co
     APARTMENTS      whois.donuts.co
     ASSOCIATES      whois.donuts.co
+    BAND            whois.donuts.co
     BARGAINS        whois.donuts.co
     BIKE            whois.donuts.co
     BINGO           whois.donuts.co
@@ -216,6 +217,7 @@ our %servers = qw(
     EXPOSED         whois.donuts.co
     EXPRESS         whois.donuts.co
     FAIL            whois.donuts.co
+    FAMILY          whois.donuts.co
     FARM            whois.donuts.co
     FINANCE         whois.donuts.co
     FINANCIAL       whois.donuts.co
@@ -229,6 +231,7 @@ our %servers = qw(
     FURNITURE       whois.donuts.co
     FYI             whois.donuts.co
     GALLERY         whois.donuts.co
+    GAMES           whois.donuts.co
     GIFTS           whois.donuts.co
     GLASS           whois.donuts.co
     GMBH            whois.donuts.co
@@ -261,6 +264,7 @@ our %servers = qw(
     LIGHTING        whois.donuts.co
     LIMITED         whois.donuts.co
     LIMO            whois.donuts.co
+    LIVE            whois.donuts.co
     LOANS           whois.donuts.co
     LTD             whois.donuts.co
     MAISON          whois.donuts.co
@@ -272,6 +276,7 @@ our %servers = qw(
     MONEY           whois.donuts.co
     MOVIE           whois.donuts.co
     NETWORK         whois.donuts.co
+    NEWS            whois.donuts.co
     PARTNERS        whois.donuts.co
     PARTS           whois.donuts.co
     PHOTOGRAPHY     whois.donuts.co
@@ -289,8 +294,10 @@ our %servers = qw(
     REPAIR          whois.donuts.co
     REPORT          whois.donuts.co
     RESTAURANT      whois.donuts.co
+    RIP             whois.donuts.co
     RUN             whois.donuts.co
     SALON           whois.donuts.co
+    SALE            whois.donuts.co
     SARL            whois.donuts.co
     SCHOOL          whois.donuts.co
     SCHULE          whois.donuts.co
@@ -302,6 +309,7 @@ our %servers = qw(
     SOCCER          whois.donuts.co
     SOLAR           whois.donuts.co
     SOLUTIONS       whois.donuts.co
+    STUDIO          whois.donuts.co   
     STYLE           whois.donuts.co
     SUPPLIES        whois.donuts.co
     SUPPLY          whois.donuts.co
@@ -327,6 +335,7 @@ our %servers = qw(
     VACATIONS       whois.donuts.co
     VENTURES        whois.donuts.co
     VIAJES          whois.donuts.co
+    VIDEO           whois.donuts.co
     VILLAS          whois.donuts.co
     VIN             whois.donuts.co
     VISION          whois.donuts.co
@@ -459,16 +468,6 @@ our %servers = qw(
     TOKYO           whois.nic.tokyo
     VET             whois.nic.vet
     YOKOHAMA        whois.nic.yokohama
-
-    BAND            whois.rightside.co
-    FAMILY          whois.rightside.co
-    GAMES           whois.rightside.co
-    LIVE            whois.rightside.co
-    NEWS            whois.rightside.co
-    RIP             whois.rightside.co
-    SALE            whois.rightside.co
-    STUDIO          whois.rightside.co
-    VIDEO           whois.rightside.co
 
     AC               whois.nic.ac
     AG               whois.nic.ag
@@ -1207,6 +1206,8 @@ our %servers = qw(
 
     XN--CLCHC0EA0B2G2A9GCD  whois.sgnic.sg
     XN--YFRO4I67O           whois.sgnic.sg
+
+    NET.SO                  whois.nic.so
 
     INT.RU                  whois.int.ru
 
@@ -2454,7 +2455,7 @@ our %notfound = (
     'whois.nic.ooo'                        => 'The queried object does not exist: DOMAIN NOT FOUND',
     'whois.nic.priv.at'                    => 'No entries found for the selected source',
     'whois.nic.pro'                        => 'NOT FOUND',
-    'whois.nic.so'                         => 'Not found',
+    'whois.nic.so'                         => 'No Object Found',
     'whois.nic.srl'                        => 'NOT FOUND',
     'whois.nic.study'                      => 'No Data Found',
     'whois.nic.top'                        => 'The queried object does not exist',
@@ -4584,7 +4585,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99024
+version 2.99026
 
 =head1 AUTHOR
 

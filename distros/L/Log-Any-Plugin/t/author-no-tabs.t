@@ -16,6 +16,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Log/Any/Plugin.pm',
+    'lib/Log/Any/Plugin/Encode.pm',
     'lib/Log/Any/Plugin/Levels.pm',
     'lib/Log/Any/Plugin/Stringify.pm',
     'lib/Log/Any/Plugin/Util.pm',
@@ -27,6 +28,9 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
+    't/plugin/encode-custom.t',
+    't/plugin/encode-default.t',
+    't/plugin/encode-rationale.t',
     't/plugin/levels.t',
     't/plugin/stringify.t',
     't/release-check-changes.t',

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has result_comment => (
@@ -42,16 +42,16 @@ SemanticWeb::Schema::ReplyAction - The act of responding to a question/message a
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of responding to a question/message asked/sent by the object.
+=for html <p>The act of responding to a question/message asked/sent by the object.
 Related to <a class="localLink"
 href="http://schema.org/AskAction">AskAction</a><br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/AskAction">AskAction</a>: Appears generally as an
-origin of a ReplyAction.</li> </ul> 
+origin of a ReplyAction.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

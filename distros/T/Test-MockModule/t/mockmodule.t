@@ -161,4 +161,7 @@ $test_mock->unmock('ISA');
 ok(!Test_Child->can('ISA') && $Test_Child::ISA[0] eq 'Test_Parent',
 	"restoring an undefined sub doesn't clear out the rest of the symbols");
 
+# ensure mocking CORE::GLOBAL works
+ok(Test::MockModule->new("CORE::GLOBAL"));
+
 done_testing;

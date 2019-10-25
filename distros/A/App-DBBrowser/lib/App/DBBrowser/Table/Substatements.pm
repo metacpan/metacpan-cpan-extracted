@@ -193,10 +193,10 @@ sub __add_aggregate_substmt {
         }
         if ( $aggr eq 'STRING_AGG' ) {
             # pg: the separator is mandatory in STRING_AGG(DISTINCT, "Col", ',')
-            $sql->{aggr_cols}[$i] .= ' ' . $f_col . ", ',')";
+            $sql->{aggr_cols}[$i] .= ' ' . $f_col . ", ',' )";
         }
         else {
-            $sql->{aggr_cols}[$i] .= ' ' . $f_col . ")";
+            $sql->{aggr_cols}[$i] .= ' ' . $f_col . " )";
         }
     }
     my $alias = $ax->alias( 'aggregate', $sql->{aggr_cols}[$i] );
@@ -272,7 +272,7 @@ sub where {
         my @choices = ( @cols );
         if ( $sf->{o}{enable}{parentheses} ) {
             unshift @choices, $unclosed ? ')' : '(';
-        }
+         }
         $ax->print_sql( $sql );
         # Choose
         my $quote_col = $tc->choose(
@@ -291,7 +291,7 @@ sub where {
                 $sql->{where_stmt} = '';
             }
             if ( $unclosed == 1 ) { # close an open parentheses automatically on OK
-                $sql->{where_stmt} .= ")";
+                $sql->{where_stmt} .= " )";
                 $unclosed = 0;
             }
             return 1;
@@ -309,7 +309,7 @@ sub where {
         }
         if ( $quote_col eq ')' ) {
             push @bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
-            $sql->{where_stmt} .= ")";
+            $sql->{where_stmt} .= " )";
             $unclosed--;
             next WHERE;
         }

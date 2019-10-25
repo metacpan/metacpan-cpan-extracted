@@ -188,4 +188,54 @@ subtest 'transfer chunked file content with Resumable' => sub {
 
 };
 
+subtest 'post captioned movie' => sub {
+
+    $Mock_furl_http->mock(
+        request => sub {
+            my ($mock, %args) = @_;
+
+            ok delete $args{content}, 'content'; # too huge to compare, so just check if it's given
+            is_deeply(
+                \%args,
+                +{
+                    url     => 'https://graph.facebook.com/video_id_12345/captions',
+                    method  => 'POST',
+                    headers => [
+                        'Authorization'  => 'OAuth 12345qwerty',
+                        'Content-Length' => 254,
+                        'Content-Type'   => 'multipart/form-data; boundary=xYzZY',
+                    ],
+                },
+                'args'
+            );
+
+            return (
+                1,
+                200,
+                'OK',
+                ['Content-Type' => 'text/javascript; charset=UTF-8'],
+                encode_json(+{
+                    success => JSON::true,
+                }),
+            );
+
+        },
+    );
+
+    my $fb = Facebook::OpenGraph->new(+{
+        app_id       => 12345678,
+        access_token => '12345qwerty',
+    });
+    my $response = $fb->publish(
+        '/video_id_12345/captions',
+        +{
+            captions_file  => './t/resource/captions.ja_JP.srt',
+            default_locale => 'ja_JP',
+        }
+    );
+
+    is_deeply $response, +{ success => JSON::true }, 'response';
+
+};
+
 done_testing;

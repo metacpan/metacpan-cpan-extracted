@@ -1,0 +1,8 @@
+<%= ${class} %>
+a cool web app with Mojolicious backend
+
+Copyright (c) <%= ${year}." ".${fullName} %> and the other people listed in the
+AUTHORS file.
+
+All rights reserved.
+

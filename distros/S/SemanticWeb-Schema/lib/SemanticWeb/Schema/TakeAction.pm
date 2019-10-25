@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,17 +34,17 @@ SemanticWeb::Schema::TakeAction - The act of gaining ownership of an object from
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of gaining ownership of an object from an origin. Reciprocal of
+=for html <p>The act of gaining ownership of an object from an origin. Reciprocal of
 GiveAction.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/GiveAction">GiveAction</a>: The
 reciprocal of TakeAction.</li> <li><a class="localLink"
 href="http://schema.org/ReceiveAction">ReceiveAction</a>: Unlike
 ReceiveAction, TakeAction implies that ownership has been transfered.</li>
-</ul> 
+</ul> <p>
 
 =head1 SEE ALSO
 

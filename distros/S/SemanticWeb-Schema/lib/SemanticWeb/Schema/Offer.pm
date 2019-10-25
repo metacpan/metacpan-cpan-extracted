@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has accepted_payment_method => (
@@ -370,20 +370,20 @@ SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to p
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An offer to transfer some rights to an item or to provide a service â for
-example, an offer to sell tickets to an event, to rent the DVD of a movie,
-to stream a TV show over the internet, to repair a motorcycle, or to loan a
-book.<br/><br/> For <a
+=for html <p>An offer to transfer some rights to an item or to provide a service â
+for example, an offer to sell tickets to an event, to rent the DVD of a
+movie, to stream a TV show over the internet, to repair a motorcycle, or to
+loan a book.<br/><br/> For <a
 href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GTIN</a>-related
 fields, see <a
 href="http://www.gs1.org/barcodes/support/check_digit_calculator">Check
 Digit calculator</a> and <a
 href="http://www.gs1us.org/resources/standards/gtin-validation-guide">valid
-ation guide</a> from <a href="http://www.gs1.org/">GS1</a>.
+ation guide</a> from <a href="http://www.gs1.org/">GS1</a>.<p>
 
 =head1 ATTRIBUTES
 
@@ -637,10 +637,11 @@ A eligible_quantity should be one of the following types:
 
 C<eligibleRegion>
 
-=for html The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the
-GeoShape for the geo-political region(s) for which the offer or delivery
-charge specification is valid.<br/><br/> See also <a class="localLink"
-href="http://schema.org/ineligibleRegion">ineligibleRegion</a>.
+=for html <p>The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or
+the GeoShape for the geo-political region(s) for which the offer or
+delivery charge specification is valid.<br/><br/> See also <a
+class="localLink"
+href="http://schema.org/ineligibleRegion">ineligibleRegion</a>.<p>
 
 A eligible_region should be one of the following types:
 
@@ -673,7 +674,7 @@ A eligible_transaction_volume should be one of the following types:
 
 =head2 C<gtin>
 
-=for html A Global Trade Item Number (<a
+=for html <p>A Global Trade Item Number (<a
 href="https://www.gs1.org/standards/id-keys/gtin">GTIN</a>). GTINs identify
 trade items, including products and services, using numeric identification
 codes. The <a class="localLink" href="http://schema.org/gtin">gtin</a>
@@ -694,7 +695,7 @@ href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1's GTIN
 Summary</a> and <a
 href="https://en.wikipedia.org/wiki/Global_Trade_Item_Number">Wikipedia</a>
 for more details. Left-padding of the gtin values is not required or
-encouraged.
+encouraged.<p>
 
 A gtin should be one of the following types:
 
@@ -706,11 +707,12 @@ A gtin should be one of the following types:
 
 =head2 C<gtin12>
 
-=for html The GTIN-12 code of the product, or the product to which the offer refers.
-The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C.
-Company Prefix, Item Reference, and Check Digit used to identify trade
-items. See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1
-GTIN Summary</a> for more details.
+=for html <p>The GTIN-12 code of the product, or the product to which the offer
+refers. The GTIN-12 is the 12-digit GS1 Identification Key composed of a
+U.P.C. Company Prefix, Item Reference, and Check Digit used to identify
+trade items. See <a
+href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
+Summary</a> for more details.<p>
 
 A gtin12 should be one of the following types:
 
@@ -722,12 +724,12 @@ A gtin12 should be one of the following types:
 
 =head2 C<gtin13>
 
-=for html The GTIN-13 code of the product, or the product to which the offer refers.
-This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit
-UPC codes can be converted into a GTIN-13 code by simply adding a
+=for html <p>The GTIN-13 code of the product, or the product to which the offer
+refers. This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former
+12-digit UPC codes can be converted into a GTIN-13 code by simply adding a
 preceeding zero. See <a
 href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+Summary</a> for more details.<p>
 
 A gtin13 should be one of the following types:
 
@@ -739,9 +741,9 @@ A gtin13 should be one of the following types:
 
 =head2 C<gtin14>
 
-=for html The GTIN-14 code of the product, or the product to which the offer refers.
-See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+=for html <p>The GTIN-14 code of the product, or the product to which the offer
+refers. See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1
+GTIN Summary</a> for more details.<p>
 
 A gtin14 should be one of the following types:
 
@@ -753,11 +755,12 @@ A gtin14 should be one of the following types:
 
 =head2 C<gtin8>
 
-=for html The <a href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-8.aspx">GTIN-8</a>
-code of the product, or the product to which the offer refers. This code is
-also known as EAN/UCC-8 or 8-digit EAN. See <a
+=for html <p>The <a
+href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-8.aspx">GTIN-8</a> code
+of the product, or the product to which the offer refers. This code is also
+known as EAN/UCC-8 or 8-digit EAN. See <a
 href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+Summary</a> for more details.<p>
 
 A gtin8 should be one of the following types:
 
@@ -786,11 +789,11 @@ A includes_object should be one of the following types:
 
 C<ineligibleRegion>
 
-=for html The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the
-GeoShape for the geo-political region(s) for which the offer or delivery
-charge specification is not valid, e.g. a region where the transaction is
-not allowed.<br/><br/> See also <a class="localLink"
-href="http://schema.org/eligibleRegion">eligibleRegion</a>.
+=for html <p>The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or
+the GeoShape for the geo-political region(s) for which the offer or
+delivery charge specification is not valid, e.g. a region where the
+transaction is not allowed.<br/><br/> See also <a class="localLink"
+href="http://schema.org/eligibleRegion">eligibleRegion</a>.<p>
 
 A ineligible_region should be one of the following types:
 
@@ -881,7 +884,7 @@ A offered_by should be one of the following types:
 
 =head2 C<price>
 
-=for html The offer price of a product, or of a price component when attached to
+=for html <p>The offer price of a product, or of a price component when attached to
 PriceSpecification and its subtypes.<br/><br/> Usage guidelines:<br/><br/>
 <ul> <li>Use the <a class="localLink"
 href="http://schema.org/priceCurrency">priceCurrency</a> property (with
@@ -902,7 +905,7 @@ RDFa</a> and Microdata syntax allow the use of a "content=" attribute for
 publishing simple machine-readable values alongside more human-friendly
 formatting.</li> <li>Use values from 0123456789 (Unicode 'DIGIT ZERO'
 (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar
-Unicode symbols.</li> </ul> 
+Unicode symbols.</li> </ul> <p>
 
 A price should be one of the following types:
 
@@ -918,7 +921,7 @@ A price should be one of the following types:
 
 C<priceCurrency>
 
-=for html The currency of the price, or a price component when attached to <a
+=for html <p>The currency of the price, or a price component when attached to <a
 class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> and its
 subtypes.<br/><br/> Use standard formats: <a
@@ -928,7 +931,7 @@ href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
 symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
 href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
 Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
-HOUR".
+HOUR".<p>
 
 A price_currency should be one of the following types:
 

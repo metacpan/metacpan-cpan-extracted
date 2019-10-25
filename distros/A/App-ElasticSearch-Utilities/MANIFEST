@@ -9,8 +9,8 @@ README.mkdn
 dist.ini
 examples/aliases.yml
 examples/es-parse-index-names.pl
+examples/es-parse-query-string.pl
 examples/es-utils.yml
-examples/parse-query-string.pl
 lib/App/ElasticSearch/Utilities.pm
 lib/App/ElasticSearch/Utilities/Connection.pm
 lib/App/ElasticSearch/Utilities/HTTPRequest.pm

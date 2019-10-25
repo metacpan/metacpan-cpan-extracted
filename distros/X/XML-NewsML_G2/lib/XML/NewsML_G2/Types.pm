@@ -7,13 +7,24 @@ use namespace::autoclean;
 use warnings;
 use strict;
 
-enum 'XML::NewsML_G2::Types::Nature', [qw(text picture graphics audio video composite)];
+enum 'XML::NewsML_G2::Types::Nature',
+    [qw(text picture graphics audio video composite)];
 
 enum 'XML::NewsML_G2::Types::Group_Mode', [qw(bag sequential alternative)];
 
 class_type 'XML::NewsML_G2::Link';
 coerce 'XML::NewsML_G2::Link', from 'Str',
-    via {use_module('XML::NewsML_G2::Link')->new(residref => $_)};
+    via { use_module('XML::NewsML_G2::Link')->new( residref => $_ ) };
+
+class_type 'XML::NewsML_G2::Destination';
+coerce 'XML::NewsML_G2::Destination', from 'Str',
+    via { use_module('XML::NewsML_G2::Destination')->new( name => $_ ) };
+
+subtype 'XML::NewsML_G2::ArrayRefOfLinks',
+    as 'ArrayRef[XML::NewsML_G2::Link]';
+coerce 'XML::NewsML_G2::ArrayRefOfLinks', from 'ArrayRef[HashRef]', via {
+    [ map { XML::NewsML_G2::Link->new($_) } @$_ ]
+};
 
 1;
 __END__

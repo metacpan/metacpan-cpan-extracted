@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has arrival_time => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Trip - A trip or journey
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -128,11 +128,11 @@ A departure_time should be one of the following types:
 
 =head2 C<itinerary>
 
-=for html Destination(s) ( <a class="localLink"
+=for html <p>Destination(s) ( <a class="localLink"
 href="http://schema.org/Place">Place</a> ) that make up a trip. For a trip
 where destination order is important use <a class="localLink"
 href="http://schema.org/ItemList">ItemList</a> to specify that order (see
-examples).
+examples).<p>
 
 A itinerary should be one of the following types:
 
@@ -162,9 +162,9 @@ A offers should be one of the following types:
 
 C<partOfTrip>
 
-=for html Identifies that this <a class="localLink"
+=for html <p>Identifies that this <a class="localLink"
 href="http://schema.org/Trip">Trip</a> is a subTrip of another Trip. For
-example Day 1, Day 2, etc. of a multi-day trip.
+example Day 1, Day 2, etc. of a multi-day trip.<p>
 
 A part_of_trip should be one of the following types:
 
@@ -194,9 +194,9 @@ A provider should be one of the following types:
 
 C<subTrip>
 
-=for html Identifies a <a class="localLink" href="http://schema.org/Trip">Trip</a>
+=for html <p>Identifies a <a class="localLink" href="http://schema.org/Trip">Trip</a>
 that is a subTrip of this Trip. For example Day 1, Day 2, etc. of a
-multi-day trip.
+multi-day trip.<p>
 
 A sub_trip should be one of the following types:
 

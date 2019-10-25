@@ -25,21 +25,21 @@ stdout_is(
 );
 
 stdout_is(
-    sub { App::Dest->make( 'actions/003', 'bash' ) },
-    "actions/003/deploy.bash actions/003/verify.bash actions/003/revert.bash\n",
-    'make bash',
+    sub { App::Dest->make( 'actions/003', 'sh' ) },
+    "actions/003/deploy.sh actions/003/verify.sh actions/003/revert.sh\n",
+    'make sh',
 );
 
 ok(
     (
-        -f 'actions/003/deploy.bash' and
-        -f 'actions/003/verify.bash' and
-        -f 'actions/003/revert.bash'
+        -f 'actions/003/deploy.sh' and
+        -f 'actions/003/verify.sh' and
+        -f 'actions/003/revert.sh'
     ),
     'make created files correctly',
 );
 
-open( my $out, '>>', 'actions/003/deploy.bash' );
+open( my $out, '>>', 'actions/003/deploy.sh' );
 print $out "# dest.prereq: actions/002\n";
 close $out;
 
@@ -52,7 +52,7 @@ stdout_is(
 stdout_is(
     sub { App::Dest->make('actions/000') },
     "actions/000/deploy actions/000/verify actions/000/revert\n",
-    'make bash',
+    'make',
 );
 
 dircopy( 'actions/001', '.dest/actions/001' );

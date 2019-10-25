@@ -23,7 +23,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
-        'Date::Hijri::Simple'        => '0.24',
+        'Date::Hijri::Simple'        => '0.25',
         'Calendar::Plugin::Renderer' => '0.15',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -31,7 +31,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Hijri' => { file => 'lib/Calendar/Hijri.pm', version => '0.42' },
+            'Calendar::Hijri' => { file => 'lib/Calendar/Hijri.pm', version => '0.43' },
         },
         resources => {
             repository => {

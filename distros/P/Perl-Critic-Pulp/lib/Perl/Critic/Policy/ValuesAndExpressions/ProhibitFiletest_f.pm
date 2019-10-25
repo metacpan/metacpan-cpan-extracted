@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -23,7 +23,7 @@ use base 'Perl::Critic::Policy';
 use Perl::Critic::Utils;
 use Perl::Critic::Pulp;
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_MEDIUM;
@@ -58,8 +58,8 @@ under the "bugs" theme, see L<Perl::Critic/POLICY THEMES>.
 =item C<-f> is not the opposite of C<-d>
 
 If you're traversing a tree and want to distinguish files from directories
-to descend into then C<-d> should be used so device files or pipes can be
-processed.
+to descend into then C<-d> should be used so device files or named pipes can
+be processed.
 
     if (-f $filename) {      # bad
       process ($filename);
@@ -104,7 +104,8 @@ disallow device files.
 
 Testing a filename before opening is bad.  Any test before opening is
 useless because the file can change or be removed in between the test and
-the open.
+the open (L<perlfunc/-X>, and L<filetest/Consider this carefully>, note this
+about C<-r> etc too).
 
     if (-f $filename) {               # bad
       open HANDLE, '<', $filename
@@ -115,7 +116,7 @@ return from C<open()> must be checked, so a test beforehand only duplicates
 that, and is an opportunity to wrongly presume what the system or the user's
 permissions can or can't do.
 
-When opening C<ENOENT> will say if there was no such file, or C<EISDIR> if
+When opening, C<ENOENT> will say if there was no such file, or C<EISDIR> if
 it's in fact a directory.
 
     if (! open HANDLE, '<', $filename) {  # better
@@ -125,12 +126,12 @@ it's in fact a directory.
     }
 
 If you really do want to enquire into the nature of the file, in order to
-only accept ordinary files, then open first and then C<-f> on the handle.
-But that's unusual except for an archiving or backup program.
+only accept ordinary files, then open first and C<-f> on the handle.  But
+that's unusual except for an archiving or backup program.
 
-Incidentally, for error message in C<$!> is normally the best thing to
+Incidentally, the error message in C<$!> is normally the best thing to
 print.  It can be slightly technical, but its wording will at least be
-familiar from other programs and will be translated into the user's locale
+familiar from other programs and is translated into the user's locale
 language.
 
 =back
@@ -139,12 +140,13 @@ language.
 
 Most uses of C<-f> tend to shell script style code written in Perl.  In the
 shell it's usually not possible to do better than such tests (though C<-d>
-or C<-e> is generally still better than C<-f>), but in Perl it is.
+or C<-e> are still generally better than C<-f>), but in Perl it is possible
+to do better.
 
 A blanket prohibition like this policy is harsh, but is meant as a building
 block or at least to make you think carefully whether C<-f> is really right.
-As always though you can disable C<ProhibitFiletest_f> from your
-F<.perlcriticrc> in the usual way (see L<Perl::Critic/CONFIGURATION>),
+As always you can disable C<ProhibitFiletest_f> from your F<.perlcriticrc>
+in the usual way (see L<Perl::Critic/CONFIGURATION>),
 
     [-ValuesAndExpressions::ProhibitFiletest_f]
 
@@ -163,7 +165,7 @@ http://user42.tuxfamily.org/perl-critic-pulp/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

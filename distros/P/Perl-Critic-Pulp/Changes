@@ -1,4 +1,4 @@
-Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 This file is part of Perl-Critic-Pulp.
 
@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License along
 with Perl-Critic-Pulp.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 97, October 2019
+    - RequireFinalSemicolon allow hashref in arrayref (which PPI 1.270
+      says code block), as reported by Andy Lester RT#130725
 
 Version 96, December 2017
     - ProhibitUnknownBackslash allow for non-ascii in strings, as

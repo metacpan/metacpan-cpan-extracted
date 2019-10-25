@@ -5,7 +5,7 @@ Mojolicious::Plugin::Loco - launch a web browser; easy local GUI
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Or you can be more elaborate
         })
   % end );
 
-Options for L</jsload> include
+Options for L</loco-E<gt>jsload> include
 
 =head3 jquery
 

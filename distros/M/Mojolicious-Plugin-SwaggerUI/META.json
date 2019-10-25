@@ -1,0 +1,49 @@
+{
+   "abstract" : "Swagger UI plugin for Mojolicious",
+   "author" : [
+      "Tudor Marghidanu"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4229",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-SwaggerUI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "Mojolicious" : "8.25"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::SwaggerUI" : {
+         "file" : "lib/Mojolicious/Plugin/SwaggerUI.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://gitlab.com/marghidanu/mojolicious-plugin-swaggerui.git"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_contributors" : [
+      "Tudor Marghidanu <tudor@marghidanu.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

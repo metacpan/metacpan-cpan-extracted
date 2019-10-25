@@ -3,7 +3,7 @@ package Log::Dispatch::Email;
 use strict;
 use warnings;
 
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 use Devel::GlobalDestruction qw( in_global_destruction );
 use Log::Dispatch::Types;
@@ -119,7 +119,7 @@ Log::Dispatch::Email - Base class for objects that send log messages via email
 
 =head1 VERSION
 
-version 2.68
+version 2.69
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

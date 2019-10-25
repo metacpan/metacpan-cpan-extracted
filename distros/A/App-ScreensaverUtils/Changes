@@ -1,3 +1,10 @@
+0.007   2019-09-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Tweak description.
+
+
 0.006   2019-09-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: get-screenasver-info.

@@ -1,8 +1,8 @@
 {
    "class" : {
       "core:closeMatch" : [
-         "ontology:LegalResource",
-         "ontology:LegalExpression"
+         "ontology:LegalExpression",
+         "ontology:LegalResource"
       ],
       "dc:source" : [
          "https://github.com/schemaorg/schemaorg/issues/1156",
@@ -64,8 +64,8 @@
       "schema:legislationDate" : {
          "core:exactMatch" : "ontology:date_document",
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1156",
-            "eli:index.html"
+            "eli:index.html",
+            "https://github.com/schemaorg/schemaorg/issues/1156"
          ],
          "owl:equivalentProperty" : "ontology:date_document",
          "rdf:type" : "rdf:Property",
@@ -80,8 +80,8 @@
       "schema:legislationDateVersion" : {
          "core:exactMatch" : "ontology:version_date",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:version_date",
          "rdf:type" : "rdf:Property",
@@ -95,8 +95,8 @@
       "schema:legislationIdentifier" : {
          "core:closeMatch" : "ontology:id_local",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An identifier for the legislation. This can be either a string-based identifier, like the CELEX at EU level or the NOR in France, or a web-based, URL/URI identifier, like an ELI (European Legislation Identifier) or an URN-Lex.",
@@ -113,8 +113,8 @@
       "schema:legislationJurisdiction" : {
          "core:exactMatch" : "ontology:jurisdiction",
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1156",
-            "eli:index.html"
+            "eli:index.html",
+            "https://github.com/schemaorg/schemaorg/issues/1156"
          ],
          "owl:equivalentProperty" : "ontology:jurisdiction",
          "rdf:type" : "rdf:Property",
@@ -159,15 +159,15 @@
          "schema:domainIncludes" : "schema:Legislation",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:legislationResponsible" : {
          "core:exactMatch" : "ontology:responsibility_of",
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1156",
-            "eli:index.html"
+            "eli:index.html",
+            "https://github.com/schemaorg/schemaorg/issues/1156"
          ],
          "owl:equivalentProperty" : "ontology:responsibility_of",
          "rdf:type" : "rdf:Property",
@@ -184,8 +184,8 @@
       "schema:legislationTransposes" : {
          "core:exactMatch" : "ontology:transposes",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:transposes",
          "rdf:type" : "rdf:Property",
@@ -200,8 +200,8 @@
       "schema:legislationType" : {
          "core:exactMatch" : "ontology:type_document",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:type_document",
          "rdf:type" : "rdf:Property",

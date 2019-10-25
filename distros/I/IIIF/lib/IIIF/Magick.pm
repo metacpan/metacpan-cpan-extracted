@@ -1,7 +1,7 @@
 package IIIF::Magick;
 use 5.014001;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use parent 'Exporter';
 our @EXPORT = qw(info available convert convert_command convert_args);
@@ -161,6 +161,18 @@ parameters to L<ImageMagick|https://www.imagemagick.org/> command line
 arguments. See L<i3f> (command line) and L<IIIF::ImageAPI> (web service)
 for applications that make use of it.
 
+=head1 REQUIREMENTS
+
+Function C<info> and C<convert> require ImageMagick to be installed. Converting
+to PDF and/or WebP may not be enabled by default. For instance at Ubuntu Linux
+remove the line
+
+  <policy domain="coder" rights="none" pattern="PDF" />
+
+fro C</etc/ImageMagick*/policy.xml> and install WebP support via:
+
+  sudo apt-get install webp libwebp-dev
+
 =head1 FUNCTIONS
 
 =head2 available
@@ -170,7 +182,7 @@ Returns whether ImageMagick is available.
 =head2 info( $file [, id => $id ] [, profile => $profile ] )
 
 Returns L<image information|https://iiif.io/api/image/3.0/#5-image-information>
-object with fields C<@context>, C<type>, C<protocol>, C<width>, and C<height>.
+object with fields C<@context>, C<type>, C<profile>, C<width>, and C<height>.
 Fields C<id> and C<profile> must be added for full IIIF compliance.
 
 =head2 convert( $request, $file, $output [, @args ] )

@@ -1,0 +1,25 @@
+#/lib/systemd/system/mongos.service
+[Unit]
+Description=Mongo Cluster Router
+After=network.target
+
+[Service]
+#User=mongodb
+#Group=mongodb
+ExecStart=/usr/bin/mongos -f /etc/mongos.conf
+# file size
+LimitFSIZE=infinity
+# cpu time
+LimitCPU=infinity
+# virtual memory size
+LimitAS=infinity
+# open files
+LimitNOFILE=64000
+# processes/threads
+LimitNPROC=64000
+# total threads (user+kernel)
+TasksMax=infinity
+TasksAccounting=false
+
+[Install]
+WantedBy=multi-user.target

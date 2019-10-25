@@ -14,10 +14,10 @@
          "rdfs:label" : "issn",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
+            "schema:WebSite",
             "schema:Dataset",
-            "schema:CreativeWorkSeries",
             "schema:Blog",
-            "schema:WebSite"
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

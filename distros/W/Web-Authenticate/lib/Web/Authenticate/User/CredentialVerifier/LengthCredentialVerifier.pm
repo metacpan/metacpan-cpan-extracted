@@ -1,5 +1,5 @@
 package Web::Authenticate::User::CredentialVerifier::LengthCredentialVerifier;
-$Web::Authenticate::User::CredentialVerifier::LengthCredentialVerifier::VERSION = '0.012';
+$Web::Authenticate::User::CredentialVerifier::LengthCredentialVerifier::VERSION = '0.013';
 use strict;
 use Mouse;
 
@@ -65,7 +65,7 @@ Web::Authenticate::User::CredentialVerifier::LengthCredentialVerifier
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

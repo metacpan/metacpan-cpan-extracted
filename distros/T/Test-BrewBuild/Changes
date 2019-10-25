@@ -1,5 +1,23 @@
 Revision history for Test-BrewBuild
 
+2.22    2019-10-19
+        - added timestamp() to BrewBuild, exact code copy from Logging::Simple
+        - Dispatch now creates bblog output file with a timestamp appended so
+          that we can maintain multiple fail/pass logs for review
+        - fix issue in Git where in some cases, we'd fail looking up a repo,
+          but weren't receiving any errors. This rendered tests to fail, but the
+          process to proceed (fixes #247)
+        - fix issue when using "-c brewbuild -o ver" with a single version (with
+          bbdispatch -c "bb -o" or just plain "brewbuild"), results weren't
+          being returned properly (fixes #246)
+        - --notest for brewbuild is now disabled in the default config file
+        - bbdispatch --tester now defaults to 127.0.0.1 if not supplied, via the
+          config file (closes #248)
+        - modify warning and die() if in dispatch auto mode and a tester isn't
+          available (closes #234)
+        - dispatcher is now properly informed if a repo is invalid, and the
+          testers continue to run as opposed to croaking (fixes #251)
+
 2.21    2019-06-07
         - modified text in dispatch auto mode LCD output (closes #233)
         - Dispatch auto() now logs at startup how many seconds between each test

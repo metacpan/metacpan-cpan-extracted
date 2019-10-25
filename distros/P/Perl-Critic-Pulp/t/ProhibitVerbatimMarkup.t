@@ -30,7 +30,7 @@ require Perl::Critic::Policy::Documentation::ProhibitVerbatimMarkup;
 
 
 #------------------------------------------------------------------------------
-my $want_version = 96;
+my $want_version = 97;
 is ($Perl::Critic::Policy::Documentation::ProhibitVerbatimMarkup::VERSION,
     $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::Documentation::ProhibitVerbatimMarkup->VERSION,

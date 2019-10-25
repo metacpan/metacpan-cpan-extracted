@@ -5,13 +5,16 @@ author:
   - 'Mario Paumann <mario.paumann@apa.at>'
   - 'Christian Eder <christian.eder@apa.at>'
   - 'Stefan Hrdlicka <stefan.hrdlicka@apa.at>'
+  - 'Jozef Kutej <jozef.kutej@apa.at>'
 build_requires:
+  Test::EOL: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Warnings: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,15 +23,23 @@ name: XML-NewsML_G2
 provides:
   XML::NewsML_G2:
     file: lib/XML/NewsML_G2.pm
-    version: v0.2.6
+    version: v0.3.1
   XML::NewsML_G2::AnyItem:
     file: lib/XML/NewsML_G2/AnyItem.pm
   XML::NewsML_G2::Audio:
     file: lib/XML/NewsML_G2/Audio.pm
+  XML::NewsML_G2::Binary:
+    file: lib/XML/NewsML_G2/Binary.pm
   XML::NewsML_G2::Copyright_Holder:
     file: lib/XML/NewsML_G2/Copyright_Holder.pm
   XML::NewsML_G2::Desk:
     file: lib/XML/NewsML_G2/Desk.pm
+  XML::NewsML_G2::Destination:
+    file: lib/XML/NewsML_G2/Destination.pm
+  XML::NewsML_G2::ElectionDistrict:
+    file: lib/XML/NewsML_G2/ElectionDistrict.pm
+  XML::NewsML_G2::ElectionProvince:
+    file: lib/XML/NewsML_G2/ElectionProvince.pm
   XML::NewsML_G2::Genre:
     file: lib/XML/NewsML_G2/Genre.pm
   XML::NewsML_G2::Graphics:
@@ -37,6 +48,10 @@ provides:
     file: lib/XML/NewsML_G2/Group.pm
   XML::NewsML_G2::Icon:
     file: lib/XML/NewsML_G2/Icon.pm
+  XML::NewsML_G2::Inline_CData:
+    file: lib/XML/NewsML_G2/Inline_CData.pm
+  XML::NewsML_G2::Inline_Data:
+    file: lib/XML/NewsML_G2/Inline_Data.pm
   XML::NewsML_G2::Link:
     file: lib/XML/NewsML_G2/Link.pm
   XML::NewsML_G2::Location:
@@ -67,6 +82,8 @@ provides:
     file: lib/XML/NewsML_G2/Product.pm
   XML::NewsML_G2::Provider:
     file: lib/XML/NewsML_G2/Provider.pm
+  XML::NewsML_G2::Remote_Info:
+    file: lib/XML/NewsML_G2/Remote_Info.pm
   XML::NewsML_G2::Role::HasQCode:
     file: lib/XML/NewsML_G2/Role/HasQCode.pm
   XML::NewsML_G2::Role::Remote:
@@ -133,6 +150,7 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#xml-newsml-g2
   bugtracker: https://github.com/apa-it/xml-newsml-g2/issues
-  license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+  license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/apa-it/xml-newsml-g2
-version: v0.2.6
+version: v0.3.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

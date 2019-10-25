@@ -13,8 +13,10 @@ use Carp 'croak';
 
 # UTF Support?
 sub HAVE_UTF8 () { $] >= 5.007003 }
+
 BEGIN {
-    if ( HAVE_UTF8 ) {
+    if (HAVE_UTF8) {
+
         # The string eval helps hide this from Test::MinimumVersion
         eval "require utf8;";
         die "Failed to load UTF-8 support" if $@;
@@ -22,19 +24,24 @@ BEGIN {
 
     # Class structure
     require 5.004;
-    $YAML::Tiny::VERSION   = '1.40';
+    $YAML::Tiny::VERSION = '1.40';
 
     # Error storage
-    $YAML::Tiny::errstr    = '';
+    $YAML::Tiny::errstr = '';
 }
 
 # Printable characters for escapes
 my %UNESCAPES = (
-    z => "\x00", a => "\x07", t    => "\x09",
-    n => "\x0a", v => "\x0b", f    => "\x0c",
-    r => "\x0d", e => "\x1b", '\\' => '\\',
+    z    => "\x00",
+    a    => "\x07",
+    t    => "\x09",
+    n    => "\x0a",
+    v    => "\x0b",
+    f    => "\x0c",
+    r    => "\x0d",
+    e    => "\x1b",
+    '\\' => '\\',
 );
-
 
 #####################################################################
 # Implementation
@@ -42,7 +49,7 @@ my %UNESCAPES = (
 # Create an empty YAML::Tiny object
 sub new {
     my $class = shift;
-    bless [ @_ ], $class;
+    bless [@_], $class;
 }
 
 # Create an object from a file
@@ -50,15 +57,17 @@ sub read {
     my $class = ref $_[0] ? ref shift : shift;
 
     # Check the file
-    my $file = shift or return $class->_error( 'You did not specify a file name' );
-    return $class->_error( "File '$file' does not exist" )              unless -e $file;
-    return $class->_error( "'$file' is a directory, not a file" )       unless -f _;
-    return $class->_error( "Insufficient permissions to read '$file'" ) unless -r _;
+    my $file = shift
+        or return $class->_error('You did not specify a file name');
+    return $class->_error("File '$file' does not exist") unless -e $file;
+    return $class->_error("'$file' is a directory, not a file") unless -f _;
+    return $class->_error("Insufficient permissions to read '$file'")
+        unless -r _;
 
     # Slurp in the file
     local $/ = undef;
     local *CFG;
-    unless ( open(CFG, $file) ) {
+    unless ( open( CFG, $file ) ) {
         return $class->_error("Failed to open file '$file': $!");
     }
     my $contents = <CFG>;
@@ -66,13 +75,13 @@ sub read {
         return $class->_error("Failed to close file '$file': $!");
     }
 
-    $class->read_string( $contents );
+    $class->read_string($contents);
 }
 
 # Create an object from a string
 sub read_string {
-    my $class  = ref $_[0] ? ref shift : shift;
-    my $self   = bless [], $class;
+    my $class = ref $_[0] ? ref shift : shift;
+    my $self = bless [], $class;
     my $string = $_[0];
     unless ( defined $string ) {
         return $self->_error("Did not provide a string to load");
@@ -89,7 +98,8 @@ sub read_string {
     # );
     if ( $string =~ /^(?:\376\377|\377\376|\377\376\0\0|\0\0\376\377)/ ) {
         return $self->_error("Stream has a non UTF-8 BOM");
-    } else {
+    }
+    else {
         # Strip UTF-8 bom if found, we'll just ignore it
         $string =~ s/^\357\273\277//;
     }
@@ -104,44 +114,52 @@ sub read_string {
     }
 
     # Split the file into lines
-    my @lines = grep { ! /^\s*(?:\#.*)?\z/ }
-                split /(?:\015{1,2}\012|\015|\012)/, $string;
+    my @lines = grep { !/^\s*(?:\#.*)?\z/ }
+        split /(?:\015{1,2}\012|\015|\012)/, $string;
 
     # Strip the initial YAML header
     @lines and $lines[0] =~ /^\%YAML[: ][\d\.]+.*\z/ and shift @lines;
 
     # A nibbling parser
-    while ( @lines ) {
+    while (@lines) {
+
         # Do we have a document header?
         if ( $lines[0] =~ /^---\s*(?:(.+)\s*)?\z/ ) {
+
             # Handle scalar documents
             shift @lines;
             if ( defined $1 and $1 !~ /^(?:\#.+|\%YAML[: ][\d\.]+)\z/ ) {
-                push @$self, $self->_read_scalar( "$1", [ undef ], \@lines );
+                push @$self, $self->_read_scalar( "$1", [undef], \@lines );
                 next;
             }
         }
 
-        if ( ! @lines or $lines[0] =~ /^(?:---|\.\.\.)/ ) {
+        if ( !@lines or $lines[0] =~ /^(?:---|\.\.\.)/ ) {
+
             # A naked document
             push @$self, undef;
             while ( @lines and $lines[0] !~ /^---/ ) {
                 shift @lines;
             }
 
-        } elsif ( $lines[0] =~ /^\s*\-/ ) {
-            # An array at the root
-            my $document = [ ];
-            push @$self, $document;
-            $self->_read_array( $document, [ 0 ], \@lines );
+        }
+        elsif ( $lines[0] =~ /^\s*\-/ ) {
 
-        } elsif ( $lines[0] =~ /^(\s*)\S/ ) {
+            # An array at the root
+            my $document = [];
+            push @$self, $document;
+            $self->_read_array( $document, [0], \@lines );
+
+        }
+        elsif ( $lines[0] =~ /^(\s*)\S/ ) {
+
             # A hash at the root
-            my $document = { };
+            my $document = {};
             push @$self, $document;
             $self->_read_hash( $document, [ length($1) ], \@lines );
 
-        } else {
+        }
+        else {
             croak("YAML::Tiny failed to classify the line '$lines[0]'");
         }
     }
@@ -151,7 +169,7 @@ sub read_string {
 
 # Deparse a scalar string to the actual scalar
 sub _read_scalar {
-    my ($self, $string, $indent, $lines) = @_;
+    my ( $self, $string, $indent, $lines ) = @_;
 
     # Trim trailing whitespace
     $string =~ s/\s*\z//;
@@ -167,11 +185,13 @@ sub _read_scalar {
         return $string;
     }
     if ( $string =~ /^\"((?:\\.|[^\"])*)\"\z/ ) {
+
         # Reusing the variable is a little ugly,
         # but avoids a new variable and a string copy.
         $string = $1;
         $string =~ s/\\"/"/g;
-        $string =~ s/\\([never\\fartz]|x([0-9a-fA-F]{2}))/(length($1)>1)?pack("H2",$2):$UNESCAPES{$1}/gex;
+        $string =~
+            s/\\([never\\fartz]|x([0-9a-fA-F]{2}))/(length($1)>1)?pack("H2",$2):$UNESCAPES{$1}/gex;
         return $string;
     }
 
@@ -186,10 +206,11 @@ sub _read_scalar {
     return $string unless $string =~ /^[>|]/;
 
     # Error
-    croak("YAML::Tiny failed to find multi-line scalar content") unless @$lines;
+    croak("YAML::Tiny failed to find multi-line scalar content")
+        unless @$lines;
 
     # Check the indent depth
-    $lines->[0]   =~ /^(\s*)/;
+    $lines->[0] =~ /^(\s*)/;
     $indent->[-1] = length("$1");
     if ( defined $indent->[-2] and $indent->[-1] <= $indent->[-2] ) {
         croak("YAML::Tiny found bad indenting in line '$lines->[0]'");
@@ -197,22 +218,23 @@ sub _read_scalar {
 
     # Pull the lines
     my @multiline = ();
-    while ( @$lines ) {
+    while (@$lines) {
         $lines->[0] =~ /^(\s*)/;
         last unless length($1) >= $indent->[-1];
-        push @multiline, substr(shift(@$lines), length($1));
+        push @multiline, substr( shift(@$lines), length($1) );
     }
 
-    my $j = (substr($string, 0, 1) eq '>') ? ' ' : "\n";
-    my $t = (substr($string, 1, 1) eq '-') ? ''  : "\n";
+    my $j = ( substr( $string, 0, 1 ) eq '>' ) ? ' ' : "\n";
+    my $t = ( substr( $string, 1, 1 ) eq '-' ) ? ''  : "\n";
     return join( $j, @multiline ) . $t;
 }
 
 # Parse an array
 sub _read_array {
-    my ($self, $array, $indent, $lines) = @_;
+    my ( $self, $array, $indent, $lines ) = @_;
 
-    while ( @$lines ) {
+    while (@$lines) {
+
         # Check for a new document
         if ( $lines->[0] =~ /^(?:---|\.\.\.)/ ) {
             while ( @$lines and $lines->[0] !~ /^---/ ) {
@@ -225,48 +247,62 @@ sub _read_array {
         $lines->[0] =~ /^(\s*)/;
         if ( length($1) < $indent->[-1] ) {
             return 1;
-        } elsif ( length($1) > $indent->[-1] ) {
+        }
+        elsif ( length($1) > $indent->[-1] ) {
             croak("YAML::Tiny found bad indenting in line '$lines->[0]'");
         }
 
         if ( $lines->[0] =~ /^(\s*\-\s+)[^\'\"]\S*\s*:(?:\s+|$)/ ) {
+
             # Inline nested hash
             my $indent2 = length("$1");
             $lines->[0] =~ s/-/ /;
-            push @$array, { };
+            push @$array, {};
             $self->_read_hash( $array->[-1], [ @$indent, $indent2 ], $lines );
 
-        } elsif ( $lines->[0] =~ /^\s*\-(\s*)(.+?)\s*\z/ ) {
+        }
+        elsif ( $lines->[0] =~ /^\s*\-(\s*)(.+?)\s*\z/ ) {
+
             # Array entry with a value
             shift @$lines;
-            push @$array, $self->_read_scalar( "$2", [ @$indent, undef ], $lines );
+            push @$array,
+                $self->_read_scalar( "$2", [ @$indent, undef ], $lines );
 
-        } elsif ( $lines->[0] =~ /^\s*\-\s*\z/ ) {
+        }
+        elsif ( $lines->[0] =~ /^\s*\-\s*\z/ ) {
             shift @$lines;
-            unless ( @$lines ) {
+            unless (@$lines) {
                 push @$array, undef;
                 return 1;
             }
             if ( $lines->[0] =~ /^(\s*)\-/ ) {
                 my $indent2 = length("$1");
                 if ( $indent->[-1] == $indent2 ) {
+
                     # Null array entry
                     push @$array, undef;
-                } else {
+                }
+                else {
                     # Naked indenter
-                    push @$array, [ ];
-                    $self->_read_array( $array->[-1], [ @$indent, $indent2 ], $lines );
+                    push @$array, [];
+                    $self->_read_array( $array->[-1], [ @$indent, $indent2 ],
+                        $lines );
                 }
 
-            } elsif ( $lines->[0] =~ /^(\s*)\S/ ) {
-                push @$array, { };
-                $self->_read_hash( $array->[-1], [ @$indent, length("$1") ], $lines );
+            }
+            elsif ( $lines->[0] =~ /^(\s*)\S/ ) {
+                push @$array, {};
+                $self->_read_hash( $array->[-1], [ @$indent, length("$1") ],
+                    $lines );
 
-            } else {
+            }
+            else {
                 croak("YAML::Tiny failed to classify line '$lines->[0]'");
             }
 
-        } elsif ( defined $indent->[-2] and $indent->[-1] == $indent->[-2] ) {
+        }
+        elsif ( defined $indent->[-2] and $indent->[-1] == $indent->[-2] ) {
+
             # This is probably a structure like the following...
             # ---
             # foo:
@@ -276,7 +312,8 @@ sub _read_array {
             # ... so lets return and let the hash parser handle it
             return 1;
 
-        } else {
+        }
+        else {
             croak("YAML::Tiny failed to classify line '$lines->[0]'");
         }
     }
@@ -286,9 +323,10 @@ sub _read_array {
 
 # Parse an array
 sub _read_hash {
-    my ($self, $hash, $indent, $lines) = @_;
+    my ( $self, $hash, $indent, $lines ) = @_;
 
-    while ( @$lines ) {
+    while (@$lines) {
+
         # Check for a new document
         if ( $lines->[0] =~ /^(?:---|\.\.\.)/ ) {
             while ( @$lines and $lines->[0] !~ /^---/ ) {
@@ -301,14 +339,17 @@ sub _read_hash {
         $lines->[0] =~ /^(\s*)/;
         if ( length($1) < $indent->[-1] ) {
             return 1;
-        } elsif ( length($1) > $indent->[-1] ) {
+        }
+        elsif ( length($1) > $indent->[-1] ) {
             croak("YAML::Tiny found bad indenting in line '$lines->[0]'");
         }
 
         # Get the key
         unless ( $lines->[0] =~ s/^\s*([^\'\" ][^\n]*?)\s*:(\s+|$)// ) {
             if ( $lines->[0] =~ /^\s*[?\'\"]/ ) {
-                croak("YAML::Tiny does not support a feature in line '$lines->[0]'");
+                croak(
+                    "YAML::Tiny does not support a feature in line '$lines->[0]'"
+                );
             }
             croak("YAML::Tiny failed to classify line '$lines->[0]'");
         }
@@ -316,26 +357,35 @@ sub _read_hash {
 
         # Do we have a value?
         if ( length $lines->[0] ) {
+
             # Yes
-            $hash->{$key} = $self->_read_scalar( shift(@$lines), [ @$indent, undef ], $lines );
-        } else {
+            $hash->{$key} =
+                $self->_read_scalar( shift(@$lines), [ @$indent, undef ],
+                $lines );
+        }
+        else {
             # An indent
             shift @$lines;
-            unless ( @$lines ) {
+            unless (@$lines) {
                 $hash->{$key} = undef;
                 return 1;
             }
             if ( $lines->[0] =~ /^(\s*)-/ ) {
                 $hash->{$key} = [];
-                $self->_read_array( $hash->{$key}, [ @$indent, length($1) ], $lines );
-            } elsif ( $lines->[0] =~ /^(\s*)./ ) {
+                $self->_read_array( $hash->{$key}, [ @$indent, length($1) ],
+                    $lines );
+            }
+            elsif ( $lines->[0] =~ /^(\s*)./ ) {
                 my $indent2 = length("$1");
                 if ( $indent->[-1] >= $indent2 ) {
+
                     # Null hash entry
                     $hash->{$key} = undef;
-                } else {
+                }
+                else {
                     $hash->{$key} = {};
-                    $self->_read_hash( $hash->{$key}, [ @$indent, length($1) ], $lines );
+                    $self->_read_hash( $hash->{$key},
+                        [ @$indent, length($1) ], $lines );
                 }
             }
         }
@@ -355,16 +405,13 @@ sub errstr {
     $YAML::Tiny::errstr;
 }
 
-
-
 #####################################################################
 # Use Scalar::Util if possible, otherwise emulate it
 
 BEGIN {
-    eval {
-        require Scalar::Util;
-    };
-    if ( $@ ) {
+    eval { require Scalar::Util; };
+    if ($@) {
+
         # Failed to load Scalar::Util
         eval <<'END_PERL';
 sub refaddr {
@@ -380,11 +427,11 @@ sub refaddr {
     $i;
 }
 END_PERL
-    } else {
+    }
+    else {
         Scalar::Util->import('refaddr');
     }
 }
-
 
 #####################################################################
 # main test
@@ -404,36 +451,36 @@ BEGIN {
     # we'll still get the relevant version number.
 
     my %skip = map { $_ => 1 } qw(
-      App::FatPacker
-      Class::Accessor::Classy
-      Devel::Cover
-      Module::Install
-      Moose::Role
-      POE::Loop::Tk
-      Template::Test
-      Test::Kwalitee
-      Test::Pod::Coverage
-      Test::Portability::Files
-      Test::YAML::Meta
-      open
+        App::FatPacker
+        Class::Accessor::Classy
+        Devel::Cover
+        Module::Install
+        Moose::Role
+        POE::Loop::Tk
+        Template::Test
+        Test::Kwalitee
+        Test::Pod::Coverage
+        Test::Portability::Files
+        Test::YAML::Meta
+        open
     );
 
     my $Test = Test::Builder->new;
 
-    $Test->plan(skip_all => "META.yml could not be found")
+    $Test->plan( skip_all => "META.yml could not be found" )
         unless -f 'META.yml' and -r _;
 
-    my $meta = (Local::YAML::Tiny->read('META.yml'))->[0];
+    my $meta = ( Local::YAML::Tiny->read('META.yml') )->[0];
     my %requires;
-    for my $require_key (grep { /requires/ } keys %$meta) {
+    for my $require_key ( grep {/requires/} keys %$meta ) {
         my %h = %{ $meta->{$require_key} };
         $requires{$_}++ for keys %h;
     }
     delete $requires{perl};
 
     diag("Testing with Perl $], $^X");
-    for my $module (sort keys %requires) {
-        if ($skip{$module}) {
+    for my $module ( sort keys %requires ) {
+        if ( $skip{$module} ) {
             note "$module doesn't want to be loaded directly, skipping";
             next;
         }

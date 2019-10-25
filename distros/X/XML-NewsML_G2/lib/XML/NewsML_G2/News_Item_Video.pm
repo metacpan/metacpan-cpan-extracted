@@ -5,11 +5,14 @@ use namespace::autoclean;
 
 extends 'XML::NewsML_G2::News_Item';
 
-has '+nature', default => 'video';
-has '+remotes', isa => 'HashRef[XML::NewsML_G2::Video]';
-has 'icon', isa => 'ArrayRef[XML::NewsML_G2::Icon]', is => 'rw',
-    default => sub { [] }, traits => ['Array'],
-    handles => {add_icon => 'push', has_icon => 'count'};
+has '+nature',  default => 'video';
+has '+remotes', isa     => 'HashRef[XML::NewsML_G2::Video]';
+has 'icon',
+    isa     => 'ArrayRef[XML::NewsML_G2::Icon]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_icon => 'push', has_icon => 'count' };
 
 __PACKAGE__->meta->make_immutable;
 

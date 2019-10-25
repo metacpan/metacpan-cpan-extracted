@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has includes_attraction => (
@@ -50,11 +50,11 @@ SemanticWeb::Schema::TouristDestination - A tourist destination
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A tourist destination. In principle any <a class="localLink"
+=for html <p>A tourist destination. In principle any <a class="localLink"
 href="http://schema.org/Place">Place</a> can be a <a class="localLink"
 href="http://schema.org/TouristDestination">TouristDestination</a> from a
 <a class="localLink" href="http://schema.org/City">City</a>, <a
@@ -76,7 +76,7 @@ linked by a similar theme or interest to a particular <a class="localLink"
 href="http://schema.org/touristType">touristType</a>. The <a
 href="http://www2.unwto.org/">UNWTO</a> defines Destination (main
 destination of a tourism trip) as the place visited that is central to the
-decision to take the trip. (See examples below).
+decision to take the trip. (See examples below).<p>
 
 =head1 ATTRIBUTES
 

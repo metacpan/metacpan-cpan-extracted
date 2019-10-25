@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Observation;
 
-# ABSTRACT: Instances of the class <a class="localLink" href="http://schema
+# ABSTRACT: Instances of the class Observation are used to specify observations about an entity (which may or may not be an instance of a StatisticalPopulation )
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has margin_of_error => (
@@ -70,15 +70,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Observation - Instances of the class <a class="localLink" href="http://schema
+SemanticWeb::Schema::Observation - Instances of the class Observation are used to specify observations about an entity (which may or may not be an instance of a StatisticalPopulation )
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html Instances of the class <a class="localLink"
+=for html <p>Instances of the class <a class="localLink"
 href="http://schema.org/Observation">Observation</a> are used to specify
 observations about an entity (which may or may not be an instance of a <a
 class="localLink"
@@ -100,7 +100,7 @@ href="https://www.w3.org/TR/vocab-data-cube/#dsd-example">lifeExpectancy
 example</a>). See also <a class="localLink"
 href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>,
 and the <a href="/docs/data-and-datasets.html">data and datasets</a>
-overview for more details.
+overview for more details.<p>
 
 =head1 ATTRIBUTES
 
@@ -108,8 +108,8 @@ overview for more details.
 
 C<marginOfError>
 
-=for html A marginOfError for an <a class="localLink"
-href="http://schema.org/Observation">Observation</a>.
+=for html <p>A marginOfError for an <a class="localLink"
+href="http://schema.org/Observation">Observation</a>.<p>
 
 A margin_of_error should be one of the following types:
 
@@ -123,11 +123,11 @@ A margin_of_error should be one of the following types:
 
 C<measuredProperty>
 
-=for html The measuredProperty of an <a class="localLink"
+=for html <p>The measuredProperty of an <a class="localLink"
 href="http://schema.org/Observation">Observation</a>, either a schema.org
 property, a property from other RDF-compatible systems e.g. W3C RDF Data
 Cube, or schema.org extensions such as <a
-href="https://www.gs1.org/voc/?show=properties">GS1's</a>.
+href="https://www.gs1.org/voc/?show=properties">GS1's</a>.<p>
 
 A measured_property should be one of the following types:
 
@@ -141,8 +141,8 @@ A measured_property should be one of the following types:
 
 C<measuredValue>
 
-=for html The measuredValue of an <a class="localLink"
-href="http://schema.org/Observation">Observation</a>.
+=for html <p>The measuredValue of an <a class="localLink"
+href="http://schema.org/Observation">Observation</a>.<p>
 
 A measured_value should be one of the following types:
 
@@ -156,8 +156,8 @@ A measured_value should be one of the following types:
 
 C<observationDate>
 
-=for html The observationDate of an <a class="localLink"
-href="http://schema.org/Observation">Observation</a>.
+=for html <p>The observationDate of an <a class="localLink"
+href="http://schema.org/Observation">Observation</a>.<p>
 
 A observation_date should be one of the following types:
 
@@ -171,10 +171,11 @@ A observation_date should be one of the following types:
 
 C<observedNode>
 
-=for html The observedNode of an <a class="localLink"
+=for html <p>The observedNode of an <a class="localLink"
 href="http://schema.org/Observation">Observation</a>, often a <a
 class="localLink"
-href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.
+href="http://schema.org/StatisticalPopulation">StatisticalPopulation</a>.<p
+>
 
 A observed_node should be one of the following types:
 

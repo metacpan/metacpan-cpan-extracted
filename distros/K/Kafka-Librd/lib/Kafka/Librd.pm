@@ -3,7 +3,7 @@ package Kafka::Librd;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 require XSLoader;
 XSLoader::load('Kafka::Librd', $VERSION);
@@ -176,6 +176,12 @@ messages
 
 return the current out queue length.
 
+=head2 flush
+
+    $kafka->flush($timeout_ms)
+
+wait until all outstanding produce requests, et.al, are completed.
+
 =head2 destroy
 
     $kafka->destroy
@@ -202,6 +208,12 @@ produce a message for the topic. I<$msgflags> can be RD_KAFKA_MSG_F_BLOCK in
 the future, but currently it should be set to 0, RD_KAFKA_MSG_F_COPY and
 RD_KAFKA_MSG_F_FREE must not be used, internally RD_KAFKA_MSG_F_COPY is always
 set.
+
+=head2 destroy
+
+    $topic->destroy
+
+destroy topic handle
 
 =head1 Kafka::Librd::Message
 

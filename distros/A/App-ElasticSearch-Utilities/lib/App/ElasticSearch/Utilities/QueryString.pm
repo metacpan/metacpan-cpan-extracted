@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString;
 use strict;
 use warnings;
 
-our $VERSION = '7.3'; # VERSION
+our $VERSION = '7.4'; # VERSION
 
 use App::ElasticSearch::Utilities qw(:config);
 use App::ElasticSearch::Utilities::Query;
@@ -12,7 +12,7 @@ use CLI::Helpers qw(:output);
 use Module::Pluggable::Object;
 use Moo;
 use Ref::Util qw(is_arrayref);
-use Types::Standard qw(ArrayRef Enum);
+use Types::Standard qw(ArrayRef Enum HashRef);
 
 use namespace::autoclean;
 
@@ -51,10 +51,19 @@ has plugins => (
 );
 
 
+has fields_meta => (
+    is => 'rw',
+    isa => HashRef,
+    default => sub { {} },
+);
+
+
 sub expand_query_string {
     my $self = shift;
 
-    my $query  = App::ElasticSearch::Utilities::Query->new();
+    my $query  = App::ElasticSearch::Utilities::Query->new(
+        fields_meta => $self->fields_meta,
+    );
     my @processed = ();
     TOKEN: foreach my $token (@_) {
         foreach my $p (@{ $self->plugins }) {
@@ -114,7 +123,6 @@ sub expand_query_string {
             @qs = @joined;
         }
     }
-    # $query->add_aggregation();
     $query->add_bool($context => { query_string => { query => join(' ', @qs) } }) if @qs;
 
     return $query;
@@ -152,7 +160,7 @@ App::ElasticSearch::Utilities::QueryString - CLI query string fixer
 
 =head1 VERSION
 
-version 7.3
+version 7.4
 
 =head1 SYNOPSIS
 
@@ -189,6 +197,10 @@ and defaults to C<AND>.
 =head2 plugins
 
 Array reference of ordered query string processing plugins, lazily assembled.
+
+=head2 fields_meta
+
+A hash reference with the field data from L<App::ElasticSearch::Utilities::es_index_fields>.
 
 =head1 METHODS
 

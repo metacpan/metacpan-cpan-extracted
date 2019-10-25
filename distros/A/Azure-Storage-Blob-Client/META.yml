@@ -2,15 +2,7 @@
 abstract: 'Azure Storage Blob API client'
 author:
   - 'Oriol Soriano <oriol.soriano@capside.com>'
-build_requires:
-  App::Prove::Watch: '0'
-  Dist::Zilla: '0'
-  Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
-  Dist::Zilla::Plugin::VersionFromModule: '0'
-  Dist::Zilla::PluginBundle::Git: '0'
-  Test::Exception: '0'
-  Test::MockTime: '0'
-  Test::Spec::Acceptance: '0'
+build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -37,6 +29,6 @@ requires:
 resources:
   bugtracker: https://github.com/ureesoriano/Azure-Storage-Blob-Client/issues
   repository: https://github.com/ureesoriano/Azure-Storage-Blob-Client
-version: '0.04'
+version: '0.05'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

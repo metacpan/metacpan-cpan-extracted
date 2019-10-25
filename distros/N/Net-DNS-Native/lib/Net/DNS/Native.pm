@@ -8,7 +8,7 @@ use Symbol ();
 use POSIX ();
 use Config;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use constant {
     INET_ATON     => 0,
@@ -294,7 +294,7 @@ parameters but instead of result returns handle on which you need to wait for av
 
 =head2 gethostbyname($host)
 
-This method may be used only for resolving to IPv4. For full documentation see L<gethostbyname()|http://perldoc.perl.org/5.14.0/functions/gethostbyname.html>.
+This method may be used only for resolving to IPv4. For full documentation see L<gethostbyname()|perlfunc/gethostbyname NAME>.
 This method accepts same parameters but instead of result returns handle on which you need to wait for availability to read.
 
 =head2 get_result($handle)

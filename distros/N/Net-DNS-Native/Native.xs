@@ -92,7 +92,8 @@ typedef struct {
 
 struct DNS_result {
     int fd1;
-    int error;
+    int gai_error;
+    int sys_error;
     struct addrinfo *hostinfo;
     int type;
     DNS_thread_arg *arg;
@@ -110,8 +111,10 @@ void *DNS_getaddrinfo(void *v_arg) {
     
     if (arg->self->notify_on_begin)
         write(arg->res->fd1, "1", 1);
-    arg->res->error = getaddrinfo(arg->host, arg->service, arg->hints, &arg->res->hostinfo);
-    
+    arg->res->gai_error = getaddrinfo(arg->host, arg->service, arg->hints, &arg->res->hostinfo);
+    if (arg->res->gai_error == EAI_SYSTEM)
+        arg->res->sys_error = errno;
+
     pthread_mutex_lock(&arg->self->mutex);
     arg->res->arg = arg;
     if (arg->extra) arg->self->extra_threads_cnt--;
@@ -163,7 +166,7 @@ void DNS_free_timedout(Net_DNS_Native *self, char force) {
             
             if (force || res->arg) {
                 bstree_del(self->fd_map, fd);
-                if (!res->error && res->hostinfo)
+                if (!res->gai_error && res->hostinfo)
                     freeaddrinfo(res->hostinfo);
                 
                 close(fd);
@@ -473,7 +476,8 @@ _getaddrinfo(Net_DNS_Native *self, char *host, SV* sv_service, SV* sv_hints, int
         
         DNS_result *res = malloc(sizeof(DNS_result));
         res->fd1 = fd[1];
-        res->error = 0;
+        res->gai_error = 0;
+        res->sys_error = 0;
         res->hostinfo = NULL;
         res->type = type;
         res->arg = NULL;
@@ -544,12 +548,14 @@ _get_result(Net_DNS_Native *self, int fd)
         
         XPUSHs(sv_2mortal(newSViv(res->type)));
         SV *err = newSV(0);
-        sv_setiv(err, (IV)res->error);
-        sv_setpv(err, res->error ? gai_strerror(res->error) : "");
+        sv_setiv(err, (IV)res->gai_error);
+        sv_setpv(err, res->gai_error ? gai_strerror(res->gai_error) : "");
+        if (res->gai_error == EAI_SYSTEM)
+            sv_catpvf(err, " (%s)", strerror(res->sys_error));
         SvIOK_on(err);
         XPUSHs(sv_2mortal(err));
         
-        if (!res->error) {
+        if (!res->gai_error) {
             struct addrinfo *info;
             for (info = res->hostinfo; info != NULL; info = info->ai_next) {
                 HV *hv_info = newHV();
@@ -661,7 +667,7 @@ DESTROY(Net_DNS_Native *self)
                         if (buf[0] == '2') break;
                     }
                     
-                    if (!res->error && res->hostinfo) freeaddrinfo(res->hostinfo);
+                    if (!res->gai_error && res->hostinfo) freeaddrinfo(res->hostinfo);
                     if (res->arg->hints)   free(res->arg->hints);
                     if (res->arg->host)    Safefree(res->arg->host);
                     if (res->arg->service) Safefree(res->arg->service);

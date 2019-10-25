@@ -43,9 +43,9 @@
          "rdfs:label" : "identifier",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:URL",
             "schema:PropertyValue",
-            "schema:URL"
+            "schema:Text"
          ]
       },
       "schema:image" : {
@@ -74,7 +74,7 @@
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The name of the item.",
          "rdfs:label" : "name",
-         "rdfs:subPropertyOf" : "ns:label",
+         "rdfs:subPropertyOf" : "rdfs:label",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -101,8 +101,8 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:inverseOf" : "schema:about",
          "schema:rangeIncludes" : [
-            "schema:Event",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Event"
          ]
       },
       "schema:url" : {

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,4 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues
   repository: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies
-version: '2.48'
+version: '2.49'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

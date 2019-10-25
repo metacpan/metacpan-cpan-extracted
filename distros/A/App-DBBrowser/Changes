@@ -1,6 +1,19 @@
 Revision history for App-DBBrowser
 
 
+2.218    2019-10-23
+        - Update documentation.
+
+2.217    2019-10-20
+        - Bugfix 'choose_a_subset' return values: check for empty arrays.
+
+2.216    2019-10-19
+        - Bugfix in filter 'merge_rows'.
+
+2.215    2019-10-19
+        - New filter 'fill_up_rows', 'join_columns'.
+        - Update filter 'merge_rows'.
+
 2.214    2019-10-13
         - Update documentation.
 

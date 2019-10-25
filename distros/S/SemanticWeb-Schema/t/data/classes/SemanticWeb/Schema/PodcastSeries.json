@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/373",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A podcast is an episodic series of digital audio or video files which a user can download and listen to.",
+      "rdfs:label" : "PodcastSeries",
+      "rdfs:subClassOf" : "schema:CreativeWorkSeries",
+      "schema:category" : "issue-373",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:webFeed" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The URL for the feed associated with the podcast series. This is usually RSS or Atom.",
+         "rdfs:label" : "webFeed",
+         "schema:category" : "issue-373",
+         "schema:domainIncludes" : "schema:PodcastSeries",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:URL"
+      }
+   }
+}

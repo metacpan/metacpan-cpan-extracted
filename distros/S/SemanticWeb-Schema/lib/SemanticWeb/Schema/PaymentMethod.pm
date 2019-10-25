@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,15 +34,15 @@ SemanticWeb::Schema::PaymentMethod - A payment method is a standardized procedur
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A payment method is a standardized procedure for transferring the monetary
-amount for a purchase. Payment methods are characterized by the legal and
-technical structures used, and by the organization or group carrying out
-the transaction.<br/><br/> Commonly used values:<br/><br/> <ul>
-<li>http://purl.org/goodrelations/v1#ByBankTransferInAdvance</li>
+=for html <p>A payment method is a standardized procedure for transferring the
+monetary amount for a purchase. Payment methods are characterized by the
+legal and technical structures used, and by the organization or group
+carrying out the transaction.<br/><br/> Commonly used values:<br/><br/>
+<ul> <li>http://purl.org/goodrelations/v1#ByBankTransferInAdvance</li>
 <li>http://purl.org/goodrelations/v1#ByInvoice</li>
 <li>http://purl.org/goodrelations/v1#Cash</li>
 <li>http://purl.org/goodrelations/v1#CheckInAdvance</li>
@@ -50,7 +50,7 @@ the transaction.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#DirectDebit</li>
 <li>http://purl.org/goodrelations/v1#GoogleCheckout</li>
 <li>http://purl.org/goodrelations/v1#PayPal</li>
-<li>http://purl.org/goodrelations/v1#PaySwarm</li> </ul> 
+<li>http://purl.org/goodrelations/v1#PaySwarm</li> </ul> <p>
 
 =head1 SEE ALSO
 

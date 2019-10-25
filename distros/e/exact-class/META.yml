@@ -22,7 +22,7 @@ name: exact-class
 requires:
   Role::Tiny: '0'
   Scalar::Util: '0'
-  exact: '0'
+  exact: '1.11'
   perl: '5.014'
   strict: '0'
   warnings: '0'
@@ -30,6 +30,6 @@ resources:
   bugtracker: https://github.com/gryphonshafer/exact-class/issues
   homepage: https://github.com/gryphonshafer/exact-class
   repository: https://github.com/gryphonshafer/exact-class.git
-version: '1.04'
+version: '1.05'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

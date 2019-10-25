@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Session::Token" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => ""
   }

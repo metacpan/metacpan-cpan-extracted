@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -139,22 +139,16 @@ sub new {
 
     if ($self) {
         # Defaults der neuen Verbindung
-
-        $autoCommit = $self->{'autoCommit'} if !defined $autoCommit;
-        $log = $self->{'log'} if !defined $log;
-        $logfile = $self->{'logfile'} if !defined $logfile;
-        $sqlClass = $self->{'sqlClass'} if !defined $sqlClass;
-        $strict = $self->strict if !defined $strict;
-        $utf8 = $self->{'utf8'} if !defined $utf8;
-
         # FIXME: alle Attribute kopieren
+
         return $class->new($self->{'udlObj'},
-            -autoCommit => $autoCommit,
-            -log => $log,
-            -logfile => $logfile,
-            -sqlClass => $sqlClass,
-            -strict => $strict,
-            -utf8 => $utf8,
+            -autoCommit => $autoCommit //
+                $self->{'apiObj'}->{'AutoCommit'},
+            -log => $log // $self->{'log'},
+            -logfile => $logfile // $self->{'logfile'},
+            -sqlClass => $sqlClass // $self->{'sqlClass'},
+            -strict => $strict // $self->strict,
+            -utf8 => $utf8 // $self->{'utf8'},
         );
     }
 
@@ -4909,7 +4903,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

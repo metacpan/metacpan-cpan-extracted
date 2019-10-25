@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Deterministic finite state parser from a regular expression
-# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2018
+# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2018-2019
 #-------------------------------------------------------------------------------
 # podDocumentation
 
 package Data::DFA;
-our $VERSION = "20190330";
+our $VERSION = "20191027";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -14,13 +14,13 @@ use Carp qw(confess);
 use Data::Dump qw(dump);
 use Data::NFA;
 use Data::Table::Text qw(:all);
-use Storable qw(freeze);
 use utf8;
 
-sub StateName{1}                                                                # Constants describing a state of the finite state automaton: [{transition label=>new state}, {jump target=>1}, final state if true]
-sub States{1}
-sub Transitions{2}
-sub Final{3}
+sub StateName  {1}                                                              # Constants describing a state of the finite state automaton: [{transition label=>new state}, {symbol=>state}, final state if true, [[]...] pumping lemmas]
+sub Transitions{2}                                                              # Transitions out of this state
+sub Final      {3}                                                              # Final state if true
+sub Pump       {4}                                                              # Array of arrays of pumping lemmas
+sub Sequence   {5}                                                              # Shortest sequence to visit this state from start
 
 sub compressDfa{1}                                                              #P Compress the DFA once constructed by renumbering the state names, however, you might find the uncompressed DFA easier to debug while testing.
 
@@ -78,10 +78,11 @@ sub fromExpr(@)                                                                 
   $dfa->superStates(0, $nfa);                                                   # Create DFA
   return $dfa unless compressDfa;                                               # Uncompressed DFA
   my $cfa = $dfa->compress;                                                     # Rename states so that they occupy less space and remove NFA states as no longer needed
+  return $cfa->removeDuplicatedStates;                                          # Compressed DFA
   $cfa
  }
 
-sub finalState($$)                                                              #P Check whether any of the specified states in the NFA are final
+sub finalState($$)                                                              #P Check whether any of the specified states in the L<NFA> are final
  {my ($nfa, $reach) = @_;                                                       # NFA, hash of states in the NFA
   for my $state(sort keys %$reach)
    {return 1 if $nfa->isFinal($state);
@@ -135,7 +136,7 @@ sub transitionOnSymbol($$$)                                                     
   $$transitions{$symbol}
  }
 
-sub compress($)                                                                 # Compress DFA by renaming states and deleting no longer needed NFA states
+sub compress($)                                                                 # Compress the L<DFA> by removing duplicate states and deleting no longer needed L<NFA> states
  {my ($dfa) = @_;                                                               # DFA
   my %rename;
   my $cfa = bless {};
@@ -146,7 +147,7 @@ sub compress($)                                                                 
    {my $sourceState = $rename{$superStateName};
     my $s = $$cfa{$sourceState} = [];
     my $superState  = $$dfa{$superStateName};
-    my (undef, $nfaStates, $transitions, $final) = @$superState;
+    my (undef, undef, $transitions, $final) = @$superState;
     for my $symbol(sort keys %$transitions)                                     # Rename the target of every transition
      {$$s[Transitions]{$symbol} = $rename{$$transitions{$symbol}};
      }
@@ -197,7 +198,7 @@ sub symbols($)                                                                  
   sort keys %symbols;
  }
 
-sub parser($)                                                                   #S Create a parser from a deterministic finite state automaton constructed from a regular expression.
+sub parser($)                                                                   # Create a parser from a deterministic finite state automaton constructed from a regular expression.
  {my ($dfa) = @_;                                                               # Deterministic finite state automaton generated from an expression
   package Data::DFA::Parser;
   return bless {dfa=>$dfa, state=>0, processed=>[]};
@@ -208,7 +209,7 @@ sub parser($)                                                                   
    }
  }
 
-sub dumpAsJson($)                                                               #S Create a JSON representation {transitions=>{symbol=>state}, finalStates=>{state=>1}}
+sub dumpAsJson($)                                                               # Create a JSON representation {transitions=>{symbol=>state}, finalStates=>{state=>1}}
  {my ($dfa) = @_;                                                               # Deterministic finite state automaton generated from an expression
   my $jfa;
   for my $state(sort keys %$dfa)                                                # Each state
@@ -221,13 +222,237 @@ sub dumpAsJson($)                                                               
   encodeJson($jfa);
  }
 
+sub removeDuplicatedStates($)                                                   #P Remove duplicated states in a DFA
+ {my ($dfa)   = @_;                                                             # Deterministic finite state automaton generated from an expression
+
+  for(1..10)                                                                    # Keep squeezing out duplicates
+   {my %d;
+    for my $state(sort keys %$dfa)                                              # Each state
+     {my $c = dump($$dfa{$state});                                              # State content
+      push $d{$c}->@*, $state;
+     }
+
+    my %m;                                                                      # Map deleted duplicated states back to undeleted original
+    for my $d(sort keys %d)                                                     # Delete unitary states
+     {my ($b, @d) = $d{$d}->@*;
+      if (@d)
+       {for my $r(@d)                                                           # Map duplicated states to base unduplicated state
+         {$m{$r} = $b;                                                          # Map
+          delete $$dfa{$r};                                                     # Remove duplicated state from DFA
+         }
+       }
+     }
+
+    if (keys %m)
+     {for my $state(sort keys %$dfa)                                            # Each state
+       {my (undef, undef, $transitions, $final) = $$dfa{$state}->@*;
+        for my $symbol(keys %$transitions)
+         {my $state = $$transitions{$symbol};
+          if (defined $m{$state})
+           {$$transitions{$symbol} = $m{$state};
+           }
+         }
+       }
+     }
+    else {last};
+   }
+
+  compress($dfa);                                                               # Renumber states
+ }
+
+# Trace from the start node through to each node remembering the long path.  If
+# we reach a node we have already visited then add a pumping lemma to it as the
+# long path minus the short path used to reach the node the first time.
+#
+# Trace from start node to final states without revisiting nodes. Write the
+# expressions so obtained as a choice of sequences with pumping lemmas.
+
+sub printAsExpr2($%)                                                            #P Print a DFA B<$dfa_> in expression form
+ {my ($dfa, %options) = @_;                                                     # Dfa, options
+
+  checkKeys(\%options,                                                          # Check options
+   {element    => q(Format a single element),
+    choice     => q(Format a choice of expressions),
+    sequence   => q(Format a sequence of expressions),
+    zeroOrMore => q(Format zero or more instances of a single expression),
+   });
+
+  my ($fe, $fc, $fs, $fz) = @options{qw(element choice sequence zeroOrMore)};
+
+  my %pumped;                                                                   # States pumped => [symbols along pump]
+  my $pump; $pump = sub                                                         # Create pumping lemmas for each state
+   {my ($state, @path) = @_;                                                    # Current state, path to state
+    if (defined $pumped{$state})                                                # State already visited
+     {my @pump = @path[$pumped{$state}..$#path];                                # Long path minus short path
+      push $$dfa{$state}[Pump]->@*, [@pump] if @pump;                           # Add the pumping lemma
+     }
+    else                                                                        # State not visited
+     {my $transitions = $$dfa{$state}[Transitions];                             # Transitions hash
+      $pumped{$state} = @path;                                                  # Record visit to this state
+      for my $t(sort keys %$transitions)                                        # Visit each adjacent states
+       {&$pump($$transitions{$t}, @path, $t);                                   # Visit adjacent state
+       }
+     }
+   };
+
+  &$pump(0);                                                                    # Find the pumping lemmas for each node
+
+  my %visited;                                                                  # States visited => [symbols along path to state]
+  my $visit; $visit = sub                                                       # Find non pumped paths
+   {my ($state, @path) = @_;                                                    # Current state, sequence to get here
+    if (!defined $visited{$state})                                              # States not yet visited
+     {my $transitions = $$dfa{$state}[Transitions];                             # Transitions hash
+      push $$dfa{$state}[Sequence]->@*, [@path] if @path and $$dfa{$state}[Final];
+      $visited{$state} = [@path];
+      for my $symbol(sort keys %$transitions)                                   # Visit each adjacent states
+       {my $s = $$transitions{$symbol};                                         # Adjacent state
+        &$visit($$transitions{$symbol}, @path, [$state, $symbol, $s]);          # Visit adjacent state
+       }
+      delete $visited{$state};
+     }
+   };
+
+  &$visit(0);                                                                   # Find unpumped paths
+
+  my @choices;                                                                  # Construct expression as choices amongst pumped paths
+  for my $state(sort keys %$dfa)                                                # Each state
+   {if ($$dfa{$state}[Final])                                                   # Final state
+     {my $paths = $$dfa{$state}[Sequence];                                      # Path to this final state
+      for my $path(@$paths)                                                     # Each path to this state
+       {my @seq;
+        for my $step(@$path)                                                    # Current state, sequence to get here
+         {my ($from, $symbol, $to) = @$step;                                    # States not yet visited
+          push @seq, &$fe($symbol);                                             # Element
+          if (my $pump = $$dfa{$to}[Pump])                                      # Add pumping lemmas
+           {my @c;
+            for my $p(@$pump)
+             {if (@$p == 1)
+               {push @c, map {&$fe($_)} @$p;
+               }
+              else
+               {push @c, &$fs(join ', ', map {&$fe($_)} @$p);
+               }
+             }
+            if (@c == 1)
+             {my ($c) = @c;
+              push @seq, &$fz($c);
+             }
+            else
+             {if (@c == 1)
+               {push @seq, @c;
+               }
+              else
+               {push @seq, &$fz(&$fc(@c));
+               }
+             }
+           }
+         }
+        push @choices, join ', ', @seq;
+       }
+     }
+   };
+
+  return $choices[0] if @choices == 1;                                          # No wrapping needed if only one choice
+  &$fc(map {&$fs($_)} @choices)
+ } # printAsExpr2
+
+sub printAsExpr($)                                                              # Print a B<$dfa> as an expression
+ {my ($dfa) = @_;                                                               # DFA
+
+  my %options =                                                                 # Formatting methods
+   (element    => sub {my ($e) = @_; qq/element(q($e))/},
+    choice     => sub {my $c = join ', ', @_; qq/choice($c)/},
+    sequence   => sub {my $s = join ', ', @_; qq/sequence($s)/},
+    zeroOrMore => sub {my ($z) = @_; qq/zeroOrMore($z)/},
+   );
+
+  printAsExpr2($dfa, %options);                                                 # Create an expression for the DFA
+ }
+
+sub printAsRe($)                                                                # Print a B<$dfa> as a regular expression
+ {my ($dfa) = @_;                                                               # DFA
+
+  my %options =                                                                 # Formatting methods
+   (element    => sub {my ($e) = @_; $e},
+    zeroOrMore => sub {my ($z) = @_; qq/$z*/},
+    choice     => sub
+     {my %c = map {$_=>1} @_;
+      my @c = sort keys %c;
+      return $c[0] if @c == 1;
+      my $c = join ' | ', @c;
+      qq/($c)/
+     },
+    sequence   => sub
+     {return $_[0] if @_ == 1;
+      my $s = join ' | ', @_;
+      qq/($s)/
+     },
+   );
+
+  printAsExpr2($dfa, %options);                                                 # Create an expression for the DFA
+ }
+
+sub parseDtdElement($)                                                          # Convert the Dtd Element definition in B<$string>to a DFA
+ {my ($string) = @_;                                                            # String representation of DTD element expression
+  package dtdElementDfa;
+  use Carp;
+  use Data::Dump qw(dump);
+  use Data::Table::Text qw(:all);
+
+  sub element($)                                                                # An element
+   {my ($e) = @_;
+    bless ['element', $e]
+   }
+
+  sub  multiply                                                                 # Zero or more, one or more, optional
+   {my ($l, $r) = @_;
+    my $o = sub
+     {return q(zeroOrMore) if $r eq q(*);
+      return q(OneOrMore)  if $r eq q(+);
+      return q(optional)   if $r eq q(?);
+      confess "Unexpected multiplier $r";
+     }->();
+    bless [$o, $l];
+   }
+
+  sub choice                                                                    # Choice
+   {my ($l, $r) = @_;
+    bless ["choice", $l, $r];
+   }
+
+  sub sequence                                                                  # Sequence
+   {my ($l, $r) = @_;
+    bless ["sequence", $l, $r];
+   }
+
+  use overload
+    '**'  => \&multiply,
+    '*'   => \&choice,
+    '+'   => \&sequence;
+
+  sub parse($)                                                                  # Parse a string
+   {my ($s) = @_;                                                               # String
+    $s =~ s(((\w|-)+))  (element(q($1)))gs;                                     # Word
+    $s =~ s(\)([*+?]))  (\) ** q($1))gs;
+    $s =~ s(\|)         (*)gs;
+    $s =~ s(\,)         (+)gs;
+    my $r = eval $s;
+    say STDERR "$@" if $@;
+    $r
+   }
+
+  my $r = parse($string);
+  Data::DFA::fromExpr($r);
+ }
+
 #D1 Parser methods                                                              # Use the DFA to parse a sequence of symbols
 
 sub Data::DFA::Parser::accept($$)                                               # Accept the next symbol drawn from the symbol set if possible by moving to a new state otherwise confessing with a helpful message
  {my ($parser, $symbol) = @_;                                                   # DFA Parser, next symbol to be processed by the finite state automaton
   my $dfa = $parser->dfa;
   my $transitions = $$dfa{$parser->state}[Transitions];
-  if (my $nextState = $$transitions{$symbol})
+  my $nextState = $$transitions{$symbol};
+  if (defined $nextState)
    {$parser->state = $nextState;
     push @{$parser->processed}, $symbol;
     return 1;
@@ -362,21 +587,43 @@ END
 
   eval { $parser->accept($_) } for qw(a b a);                                   # Try to parse a b a
 
-  say STDERR $@;                                                                # Error message
-#   Already processed: a b
-#   Expected one of  : b c d e
-#   But was given    : a
+# Create a parser and use it to parse a sequence of symbols
 
-  is_deeply [$parser->next],     [qw(b c d e)];                                 # Next acceptable symbol
-  is_deeply  $parser->processed, [qw(a b)];                                     # Symbols processed
-  ok !$parser->final;                                                           # Not in a final state
+  my $parser = $dfa->parser;
+
+  eval { $parser->accept($_) } for qw(a b a);
+  my $r = $@;
+  ok $r =~ m(Already processed: a b);
+  ok $r =~ m(Expected one of  : b c d e);
+  ok $r =~ m(But found        : a);
+
+  is_deeply [$parser->next],     [qw(b c d e)];
+  is_deeply  $parser->processed, [qw(a b)];
+  ok !$parser->final;
+
+To construct and parse regular expressions in the format used by B<!ELEMENT>
+definitions in L<DTD>s:
+
+ {my $e = q/element(q(a)), zeroOrMore(choice(element(q(b)), element(q(c)))), element(q(d))/;
+  my $d = eval qq/fromExpr($e)/;
+
+  my $E = $d->printAsExpr;
+  ok $e eq $E;
+
+  my $R = $d->printAsRe;
+  ok $R eq q(a, (b | c)*, d);                                                   # Print as DTD regular expression
+
+  my $D = parseDtdElement($R);                                                  # Parse DTD regular expression
+  my $S = $D->printAsExpr;
+  ok $e eq $S;
+ }
 
 =head1 Description
 
 Deterministic finite state parser from regular expression
 
 
-Version "20190329".
+Version "20191025".
 
 
 The following sections describe the methods in each functional area of this
@@ -413,22 +660,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -462,15 +705,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -478,22 +720,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -566,22 +802,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -652,22 +887,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -701,15 +932,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -717,22 +947,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -805,22 +1029,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -891,22 +1114,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -940,15 +1159,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -956,22 +1174,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -1046,22 +1258,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -1095,15 +1303,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -1111,22 +1318,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -1199,22 +1400,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -1285,22 +1485,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -1334,15 +1530,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -1350,22 +1545,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -1417,7 +1606,7 @@ This is a static method and so should be invoked as:
 
 =head2 compress($)
 
-Compress DFA by renaming states and deleting no longer needed NFA states
+Compress the L<DFA> by removing duplicate states and deleting no longer needed L<NFA> states
 
      Parameter  Description
   1  $dfa       DFA
@@ -1438,22 +1627,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -1519,22 +1707,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->𝗽𝗿𝗶𝗻𝘁(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->𝗽𝗿𝗶𝗻𝘁(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -1600,22 +1787,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -1659,22 +1842,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -1708,15 +1887,14 @@ B<Example:>
 
     ok !$𝗽𝗮𝗿𝘀𝗲𝗿->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -1724,22 +1902,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -1784,11 +1956,6 @@ B<Example:>
    }
 
 
-This is a static method and so should be invoked as:
-
-  Data::DFA::parser
-
-
 =head2 dumpAsJson($)
 
 Create a JSON representation {transitions=>{symbol=>state}, finalStates=>{state=>1}}
@@ -1814,22 +1981,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -1848,9 +2011,85 @@ B<Example:>
    }
 
 
-This is a static method and so should be invoked as:
+=head2 printAsExpr($)
 
-  Data::DFA::dumpAsJson
+Print a B<$dfa> as an expression
+
+     Parameter  Description
+  1  $dfa       DFA
+
+B<Example:>
+
+
+  if (1)
+   {my $e = q/element(q(a)), zeroOrMore(choice(element(q(b)), element(q(c)))), element(q(d))/;
+    my $d = eval qq/fromExpr($e)/;
+    confess $@ if $@;
+
+    my $E = $d->𝗽𝗿𝗶𝗻𝘁𝗔𝘀𝗘𝘅𝗽𝗿;
+    ok $e eq $E;
+
+    my $R = $d->printAsRe;
+    ok $R eq q(a, (b | c)*, d);
+
+    my $D = parseDtdElement($R);
+    my $S = $D->𝗽𝗿𝗶𝗻𝘁𝗔𝘀𝗘𝘅𝗽𝗿;
+    ok $e eq $S;
+   }
+
+
+=head2 printAsRe($)
+
+Print a B<$dfa> as a regular expression
+
+     Parameter  Description
+  1  $dfa       DFA
+
+B<Example:>
+
+
+  if (1)
+   {my $e = q/element(q(a)), zeroOrMore(choice(element(q(b)), element(q(c)))), element(q(d))/;
+    my $d = eval qq/fromExpr($e)/;
+    confess $@ if $@;
+
+    my $E = $d->printAsExpr;
+    ok $e eq $E;
+
+    my $R = $d->𝗽𝗿𝗶𝗻𝘁𝗔𝘀𝗥𝗲;
+    ok $R eq q(a, (b | c)*, d);
+
+    my $D = parseDtdElement($R);
+    my $S = $D->printAsExpr;
+    ok $e eq $S;
+   }
+
+
+=head2 parseDtdElement($)
+
+Convert the Dtd Element definition in B<$string>to a DFA
+
+     Parameter  Description
+  1  $string    String representation of DTD element expression
+
+B<Example:>
+
+
+  if (1)
+   {my $e = q/element(q(a)), zeroOrMore(choice(element(q(b)), element(q(c)))), element(q(d))/;
+    my $d = eval qq/fromExpr($e)/;
+    confess $@ if $@;
+
+    my $E = $d->printAsExpr;
+    ok $e eq $E;
+
+    my $R = $d->printAsRe;
+    ok $R eq q(a, (b | c)*, d);
+
+    my $D = 𝗽𝗮𝗿𝘀𝗲𝗗𝘁𝗱𝗘𝗹𝗲𝗺𝗲𝗻𝘁($R);
+    my $S = $D->printAsExpr;
+    ok $e eq $S;
+   }
 
 
 =head1 Parser methods
@@ -1884,15 +2123,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -1900,22 +2138,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -1972,22 +2204,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -2051,22 +2282,21 @@ B<Example:>
     $parser->accept(qw(a b c d e f g a b c d e f g a));
     ok $parser->final;
 
-
     ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
   Test
       State  Final  Symbol  Target  Final
    1      0         a            2      1
    2                b            3      1
-   3                c            4      1
+   3                c            3      1
    4      1      0  a            2      1
    5                b            3      1
-   6                c            4      1
-   7      2      1  b            5      0
-   8      5      0  c            6      0
-   9      6      0  d            7      0
-  10      7      0  e            8      0
-  11      8      0  f            9      0
-  12      9      0  g            1      0
+   6                c            3      1
+   7      2      1  b            4      0
+   8      4      0  c            5      0
+   9      5      0  d            6      0
+  10      6      0  e            7      0
+  11      7      0  f            8      0
+  12      8      0  g            1      0
   END
 
     ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -2133,15 +2363,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -2149,22 +2378,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -2235,22 +2458,18 @@ B<Example:>
 
     ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
   Dfa for a(b|c)+d?e :
-      State  Final  Symbol  Target  Final
-   1      0         a            2      0
-   2      1      0  b            1      0
-   3                c            3      0
-   4                d            4      0
-   5                e            5      1
-   6      2      0  b            1      0
-   7                c            3      0
-   8      3      0  b            1      0
-   9                c            3      0
-  10                d            4      0
-  11                e            5      1
-  12      4      0  e            5      1
+     State  Final  Symbol  Target  Final
+  1      0         a            2      0
+  2      1      0  b            1      0
+  3                c            1      0
+  4                d            3      0
+  5                e            4      1
+  6      2      0  b            1      0
+  7                c            1      0
+  8      3      0  e            4      1
   END
 
-    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+    ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
   Dfa for a(b|c)+d?e :
       State        Final  Symbol  Target       Final
    1            0         a       1 3              0
@@ -2284,15 +2503,14 @@ B<Example:>
 
     ok !$parser->final;                                                           # Not in a final state
 
-    ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+    ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
   {
      "finalStates" : {
         "0" : 0,
         "1" : 0,
         "2" : 0,
         "3" : 0,
-        "4" : 0,
-        "5" : 1
+        "4" : 1
      },
      "transitions" : {
         "0" : {
@@ -2300,22 +2518,16 @@ B<Example:>
         },
         "1" : {
            "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
+           "c" : 1,
+           "d" : 3,
+           "e" : 4
         },
         "2" : {
            "b" : 1,
-           "c" : 3
+           "c" : 1
         },
         "3" : {
-           "b" : 1,
-           "c" : 3,
-           "d" : 4,
-           "e" : 5
-        },
-        "4" : {
-           "e" : 5
+           "e" : 4
         }
      }
   }
@@ -2365,7 +2577,7 @@ B<Example:>
 
 =head2 finalState($$)
 
-Check whether any of the specified states in the NFA are final
+Check whether any of the specified states in the L<NFA> are final
 
      Parameter  Description
   1  $nfa       NFA
@@ -2400,6 +2612,21 @@ The super state reached by transition on a symbol from a specified state
   2  $superStateName  Start state in DFA
   3  $symbol          Symbol
 
+=head2 removeDuplicatedStates($)
+
+Remove duplicated states in a DFA
+
+     Parameter  Description
+  1  $dfa       Deterministic finite state automaton generated from an expression
+
+=head2 printAsExpr2($%)
+
+Print a DFA B<$dfa_> in expression form
+
+     Parameter  Description
+  1  $dfa       Dfa
+  2  %options   Options
+
 
 =head1 Index
 
@@ -2430,21 +2657,31 @@ The super state reached by transition on a symbol from a specified state
 
 13 L<optional|/optional> - An optional sequence of element.
 
-14 L<parser|/parser> - Create a parser from a deterministic finite state automaton constructed from a regular expression.
+14 L<parseDtdElement|/parseDtdElement> - Convert the Dtd Element definition in B<$string>to a DFA
 
-15 L<print|/print> - Print DFA to a string and optionally to STDERR or STDOUT
+15 L<parser|/parser> - Create a parser from a deterministic finite state automaton constructed from a regular expression.
 
-16 L<sequence|/sequence> - Sequence of elements.
+16 L<print|/print> - Print DFA to a string and optionally to STDERR or STDOUT
 
-17 L<superState|/superState> - Create super states from existing superstate
+17 L<printAsExpr|/printAsExpr> - Print a B<$dfa> as an expression
 
-18 L<superStates|/superStates> - Create super states from existing superstate
+18 L<printAsExpr2|/printAsExpr2> - Print a DFA B<$dfa_> in expression form
 
-19 L<symbols|/symbols> - Return an array of all the symbols accepted by the DFA
+19 L<printAsRe|/printAsRe> - Print a B<$dfa> as a regular expression
 
-20 L<transitionOnSymbol|/transitionOnSymbol> - The super state reached by transition on a symbol from a specified state
+20 L<removeDuplicatedStates|/removeDuplicatedStates> - Remove duplicated states in a DFA
 
-21 L<zeroOrMore|/zeroOrMore> - Zero or more repetitions of a sequence of elements.
+21 L<sequence|/sequence> - Sequence of elements.
+
+22 L<superState|/superState> - Create super states from existing superstate
+
+23 L<superStates|/superStates> - Create super states from existing superstate
+
+24 L<symbols|/symbols> - Return an array of all the symbols accepted by the DFA
+
+25 L<transitionOnSymbol|/transitionOnSymbol> - The super state reached by transition on a symbol from a specified state
+
+26 L<zeroOrMore|/zeroOrMore> - Zero or more repetitions of a sequence of elements.
 
 =head1 Installation
 
@@ -2461,7 +2698,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -2490,18 +2727,20 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>24;
+use Test::More qw(no_plan);
+
+#goto latestTest;
 
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
   my $d = fromExpr(zeroOrMore(choice(element("a"))),
                    zeroOrMore(choice(element("a"))));
+
   if (compressDfa)
    {ok $d->print("a*a* 2:") eq <<END;
 a*a* 2:
    State  Final  Symbol  Target  Final
-1      0      1  a            1      1
-2      1      1  a            1      1
+1      0      1  a            0      1
 END
    }
   else
@@ -2516,18 +2755,18 @@ END
 
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
-  my $d = eval qq(fromExpr(&sequence($s,$s,$s,$s)));
+  my $S = join ', ', ($s) x 4;
+  my $d = eval qq(fromExpr(&sequence($S)));
   if (compressDfa)
-   {ok $d->print("a*a* 2:") eq <<END;
-a*a* 2:
+   {ok $d->print("a*a* 4:") eq <<END;
+a*a* 4:
    State  Final  Symbol  Target  Final
-1      0      1  a            1      1
-2      1      1  a            1      1
+1      0      1  a            0      1
 END
    }
   else
-   {ok $d->print("a*a* 2:") eq <<END;
-a*a* 2:
+   {ok $d->print("a*a* 4:") eq <<END;
+a*a* 4:
    State              Final  Symbol  Target             Final
 1                  0      1  a       0 1 2 3 4 5 6 7 8      1
 2  0 1 2 3 4 5 6 7 8      1  a       0 1 2 3 4 5 6 7 8      1
@@ -2553,19 +2792,15 @@ if (1)
   if (compressDfa)
    {ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END;
 Dfa for a(b|c)+d?e :
-    State  Final  Symbol  Target  Final
- 1      0         a            2      0
- 2      1      0  b            1      0
- 3                c            3      0
- 4                d            4      0
- 5                e            5      1
- 6      2      0  b            1      0
- 7                c            3      0
- 8      3      0  b            1      0
- 9                c            3      0
-10                d            4      0
-11                e            5      1
-12      4      0  e            5      1
+   State  Final  Symbol  Target  Final
+1      0         a            2      0
+2      1      0  b            1      0
+3                c            1      0
+4                d            3      0
+5                e            4      1
+6      2      0  b            1      0
+7                c            1      0
+8      3      0  e            4      1
 END
    }
   else
@@ -2591,11 +2826,10 @@ END
   my $parser = $dfa->parser;
 
   eval { $parser->accept($_) } for qw(a b a);
-
-  say STDERR $@;
-#   Already processed: a b
-#   Expected one of  : b c d e
-#   But was given    : a
+  my $r = $@;
+  ok $r =~ m(Already processed: a b);
+  ok $r =~ m(Expected one of  : b c d e);
+  ok $r =~ m(But found        : a);
 
   is_deeply [$parser->next],     [qw(b c d e)];
   is_deeply  $parser->processed, [qw(a b)];
@@ -2617,22 +2851,18 @@ if (1) {                                                                        
 
   ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END if compressDfa;               # Print compressed DFA
 Dfa for a(b|c)+d?e :
-    State  Final  Symbol  Target  Final
- 1      0         a            2      0
- 2      1      0  b            1      0
- 3                c            3      0
- 4                d            4      0
- 5                e            5      1
- 6      2      0  b            1      0
- 7                c            3      0
- 8      3      0  b            1      0
- 9                c            3      0
-10                d            4      0
-11                e            5      1
-12      4      0  e            5      1
+   State  Final  Symbol  Target  Final
+1      0         a            2      0
+2      1      0  b            1      0
+3                c            1      0
+4                d            3      0
+5                e            4      1
+6      2      0  b            1      0
+7                c            1      0
+8      3      0  e            4      1
 END
 
-  ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompresed DFA
+  ok $dfa->print("Dfa for a(b|c)+d?e :") eq <<END unless compressDfa;           # Print uncompressed DFA
 Dfa for a(b|c)+d?e :
     State        Final  Symbol  Target       Final
  1            0         a       1 3              0
@@ -2666,15 +2896,14 @@ if (1) {                                                                        
 
   ok !$parser->final;                                                           # Not in a final state
 
-  ok dumpAsJson($dfa) eq <<END if compressDfa;                                  # Dump as json
+  ok $dfa->dumpAsJson eq <<END if compressDfa;                                  # Dump as json
 {
    "finalStates" : {
       "0" : 0,
       "1" : 0,
       "2" : 0,
       "3" : 0,
-      "4" : 0,
-      "5" : 1
+      "4" : 1
    },
    "transitions" : {
       "0" : {
@@ -2682,22 +2911,16 @@ if (1) {                                                                        
       },
       "1" : {
          "b" : 1,
-         "c" : 3,
-         "d" : 4,
-         "e" : 5
+         "c" : 1,
+         "d" : 3,
+         "e" : 4
       },
       "2" : {
          "b" : 1,
-         "c" : 3
+         "c" : 1
       },
       "3" : {
-         "b" : 1,
-         "c" : 3,
-         "d" : 4,
-         "e" : 5
-      },
-      "4" : {
-         "e" : 5
+         "e" : 4
       }
    }
 }
@@ -2754,22 +2977,21 @@ if (1) {                                                                        
   $parser->accept(qw(a b c d e f g a b c d e f g a));
   ok $parser->final;
 
-
   ok $dfa->print(q(Test)) eq <<END if compressDfa;                              # Print compressed DFA
 Test
     State  Final  Symbol  Target  Final
  1      0         a            2      1
  2                b            3      1
- 3                c            4      1
+ 3                c            3      1
  4      1      0  a            2      1
  5                b            3      1
- 6                c            4      1
- 7      2      1  b            5      0
- 8      5      0  c            6      0
- 9      6      0  d            7      0
-10      7      0  e            8      0
-11      8      0  f            9      0
-12      9      0  g            1      0
+ 6                c            3      1
+ 7      2      1  b            4      0
+ 8      4      0  c            5      0
+ 9      5      0  d            6      0
+10      6      0  e            7      0
+11      7      0  f            8      0
+12      8      0  g            1      0
 END
 
   ok $dfa->print(q(Test)) eq <<END unless compressDfa;                          # Print uncompressed DFA
@@ -2809,3 +3031,39 @@ END
   ok 1 if compressDfa;
  }
 
+if (1)
+ {my $e = q/element(q(a)), zeroOrMore(element(q(b))), element(q(c))/;
+  my $d = eval qq/fromExpr($e)/;
+  confess $@ if $@;
+
+  my $E = $d->printAsExpr;
+  ok $e eq $E;
+
+  my $R = $d->printAsRe;
+  ok $R eq q(a, b*, c);
+
+  my $D = parseDtdElement($R);
+  my $S = $D->printAsExpr;
+  ok $e eq $S;
+ }
+
+latestTest:;
+
+if (1)                                                                          #TprintAsExpr #TprintAsRe #TparseDtdElement
+ {my $e = q/element(q(a)), zeroOrMore(choice(element(q(b)), element(q(c)))), element(q(d))/;
+  my $d = eval qq/fromExpr($e)/;
+  confess $@ if $@;
+
+  my $E = $d->printAsExpr;
+  ok $e eq $E;
+
+  my $R = $d->printAsRe;
+  ok $R eq q(a, (b | c)*, d);
+
+  my $D = parseDtdElement($R);
+  my $S = $D->printAsExpr;
+  ok $e eq $S;
+ }
+
+done_testing;
+#   owf(q(/home/phil/z/z/z/zzz.txt), $dfa->dumpAsJson);

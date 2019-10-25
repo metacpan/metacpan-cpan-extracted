@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::FAQPage;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A FAQPage is a WebPage presenting one or more " Frequently asked questions " (see also QAPage ).
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,19 +30,20 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::FAQPage - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::FAQPage - A FAQPage is a WebPage presenting one or more " Frequently asked questions " (see also QAPage ).
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink" href="http://schema.org/FAQPage">FAQPage</a> is a <a
-class="localLink" href="http://schema.org/WebPage">WebPage</a> presenting
-one or more "<a href="https://en.wikipedia.org/wiki/FAQ">Frequently asked
-questions</a>" (see also <a class="localLink"
-href="http://schema.org/QAPage">QAPage</a>).
+=for html <p>A <a class="localLink" href="http://schema.org/FAQPage">FAQPage</a> is a
+<a class="localLink" href="http://schema.org/WebPage">WebPage</a>
+presenting one or more "<a
+href="https://en.wikipedia.org/wiki/FAQ">Frequently asked questions</a>"
+(see also <a class="localLink"
+href="http://schema.org/QAPage">QAPage</a>).<p>
 
 =head1 SEE ALSO
 

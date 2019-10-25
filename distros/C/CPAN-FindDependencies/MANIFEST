@@ -40,5 +40,6 @@ ARTISTIC.txt
 GPL2.txt
 shared/doincludes
 MANIFEST.SKIP
+t/06-configure.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -41,13 +41,13 @@
          "rdfs:label" : "duration",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
             "schema:MusicRecording",
+            "schema:MediaObject",
             "schema:Audiobook",
-            "schema:Movie",
-            "schema:Event",
+            "schema:QuantitativeValueDistribution",
             "schema:MusicRelease",
-            "schema:QuantitativeValueDistribution"
+            "schema:Event",
+            "schema:Movie"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -85,8 +85,8 @@
          "rdfs:label" : "endTime",
          "schema:domainIncludes" : [
             "schema:MediaObject",
-            "schema:FoodEstablishmentReservation",
-            "schema:Action"
+            "schema:Action",
+            "schema:FoodEstablishmentReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
@@ -98,10 +98,10 @@
          "rdfs:comment" : "The height of the item.",
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
             "schema:Product",
-            "schema:VisualArtwork",
-            "schema:Person"
+            "schema:MediaObject",
+            "schema:Person",
+            "schema:VisualArtwork"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -120,14 +120,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:Movie",
             "schema:MediaObject",
-            "schema:Episode",
+            "schema:MovieSeries",
             "schema:RadioSeries",
-            "schema:CreativeWorkSeason",
             "schema:TVSeries",
-            "schema:MovieSeries"
+            "schema:CreativeWorkSeason",
+            "schema:Episode",
+            "schema:VideoGameSeries",
+            "schema:Movie"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -158,13 +158,13 @@
          "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "startTime",
          "schema:domainIncludes" : [
-            "schema:FoodEstablishmentReservation",
+            "schema:MediaObject",
             "schema:Action",
-            "schema:MediaObject"
+            "schema:FoodEstablishmentReservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:uploadDate" : {
@@ -179,13 +179,13 @@
          "rdfs:comment" : "The width of the item.",
          "rdfs:label" : "width",
          "schema:domainIncludes" : [
-            "schema:Product",
+            "schema:MediaObject",
             "schema:VisualArtwork",
-            "schema:MediaObject"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Distance"
+            "schema:Distance",
+            "schema:QuantitativeValue"
          ]
       }
    }

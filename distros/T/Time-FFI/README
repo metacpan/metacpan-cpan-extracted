@@ -17,7 +17,7 @@ SYNOPSIS
       my $moment = $tm->to_object('Time::Moment', 0);
     
       use Time::FFI::tm;
-      my $tm = Time::FFI::tm->from_object(DateTime->now, 1);
+      my $tm = Time::FFI::tm->from_object(DateTime->now);
       my $epoch = $tm->epoch(1);
       my $piece = $tm->to_object('Time::Piece', 1);
 
@@ -83,12 +83,11 @@ FUNCTIONS
 
     Returns the epoch timestamp representing the passed Time::FFI::tm
     record interpreted in the local time zone. The time is interpreted from
-    the tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, and tm_isdst
-    members of the record, ignoring the rest. DST status will be
-    automatically determined if tm_isdst is a negative value. The record
-    will also be updated to normalize any out-of-range values and populate
-    the tm_isdst, tm_wday, and tm_yday values, as well as tm_gmtoff and
-    tm_zone if supported.
+    the sec, min, hour, mday, mon, year, and isdst members of the record,
+    ignoring the rest. DST status will be automatically determined if isdst
+    is a negative value. The record will also be updated to normalize any
+    out-of-range values and populate the isdst, wday, and yday values, as
+    well as gmtoff and zone if supported.
 
  strftime
 
@@ -107,11 +106,10 @@ FUNCTIONS
 
     Returns a Time::FFI::tm record representing the passed string, parsed
     according to the passed format. Consult your system's strptime(3)
-    manual for available format descriptors. The tm_isdst value will be set
-    to -1; all other unspecified values will default to 0. Note that the
-    default tm_mday value of 0 is outside of the standard range [1,31] and
-    may cause an error or be interpreted as the last day of the previous
-    month.
+    manual for available format descriptors. The isdst value will be set to
+    -1; all other unspecified values will default to 0. Note that the
+    default mday value of 0 is outside of the standard range [1,31] and may
+    cause an error or be interpreted as the last day of the previous month.
 
     A Time::FFI::tm record may be passed as the third argument, in which
     case it will be modified in place to (on most systems) update only the

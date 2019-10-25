@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::FundingScheme - A FundingScheme combines organizational
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A FundingScheme combines organizational, project and policy aspects of
+=for html <p>A FundingScheme combines organizational, project and policy aspects of
 grant-based funding that sets guidelines, principles and mechanisms to
 support other kinds of projects and activities. Funding is typically
 organized via <a class="localLink" href="http://schema.org/Grant">Grant</a>
@@ -48,7 +48,7 @@ institutional strategic support fund. For large scale public sector
 funding, the management and administration of grant awards is often handled
 by other, dedicated, organizations - <a class="localLink"
 href="http://schema.org/FundingAgency">FundingAgency</a>s such as ERC, REA,
-...
+...<p>
 
 =head1 SEE ALSO
 

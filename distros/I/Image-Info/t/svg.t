@@ -29,6 +29,11 @@ my $i = image_info("../img/test.svg") ||
   no warnings 'once';
   diag "Using SVG module $Image::Info::SVG::USING_MODULE";
   diag "XML::Simple $XML::Simple::VERSION" if defined $XML::Simple::VERSION;
+  if (defined $XML::SAX::ParserPackage) {
+      no strict 'refs';
+      my $ver = ${ $XML::SAX::ParserPackage . "::VERSION" };
+      diag "XML::SAX::ParserPackage $XML::SAX::ParserPackage $ver";
+  }
   diag "XML::LibXML::Reader $XML::LibXML::Reader::VERSION" if defined $XML::LibXML::Reader::VERSION;
   diag "Compiled against libxml2 version: " . XML::LibXML::LIBXML_VERSION() if defined &XML::LibXML::LIBXML_VERSION;
   diag "Running libxml2 version:          " . XML::LibXML::LIBXML_RUNTIME_VERSION() if defined &XML::LibXML::LIBXML_VERSION;

@@ -1,5 +1,15 @@
 Revision history for Text::Layout
 
+0.013	2019-10-22
+
+	Fix test 102.
+	Some more version issues.
+
+0.012	2019-10-21
+
+	Fix some packaging problems.
+	Fix version number in release.
+
 0.011	2019-09-01
 
 	Fix return values of get*extent and get*size.

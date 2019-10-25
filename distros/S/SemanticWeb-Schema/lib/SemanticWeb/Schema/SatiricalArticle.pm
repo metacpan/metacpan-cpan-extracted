@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::SatiricalArticle;
 
-# ABSTRACT: An <a class="localLink" href="http://schema
+# ABSTRACT: An Article whose content is primarily [satirical] in nature
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,22 +30,22 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::SatiricalArticle - An <a class="localLink" href="http://schema
+SemanticWeb::Schema::SatiricalArticle - An Article whose content is primarily [satirical] in nature
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An <a class="localLink" href="http://schema.org/Article">Article</a> whose
-content is primarily <a
+=for html <p>An <a class="localLink" href="http://schema.org/Article">Article</a>
+whose content is primarily <a
 href="https://en.wikipedia.org/wiki/Satire">[satirical]</a> in nature, i.e.
 unlikely to be literally true. A satirical article is sometimes but not
 necessarily also a <a class="localLink"
 href="http://schema.org/NewsArticle">NewsArticle</a>. <a class="localLink"
 href="http://schema.org/ScholarlyArticle">ScholarlyArticle</a>s are also
-sometimes satirized.
+sometimes satirized.<p>
 
 =head1 SEE ALSO
 

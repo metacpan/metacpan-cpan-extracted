@@ -16,6 +16,7 @@ lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm
 lib/App/Perlbrew/Path/Installations.pm
 lib/App/Perlbrew/Path/Root.pm
+lib/App/Perlbrew/Util.pm
 lib/App/perlbrew.pm
 metamerge.json
 script/perlbrew
@@ -58,7 +59,9 @@ t/command-exec.t
 t/command-help.t
 t/command-info.t
 t/command-install-cpanm.t
+t/command-install-from-archive.t
 t/command-install-patchperl.t
+t/command-install.t
 t/command-lib.t
 t/command-list.t
 t/current_perl.t
@@ -67,7 +70,6 @@ t/do_system.t
 t/failure-command-install-cpanm.t
 t/failure-command-install-patchperl.t
 t/fake-bin/curl
-t/get_blead_perl.t
 t/home.t
 t/http-program-control.t
 t/http-ua-detect-non-curl.t

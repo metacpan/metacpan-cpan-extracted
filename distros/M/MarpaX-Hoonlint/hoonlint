@@ -11,6 +11,12 @@ use Getopt::Long;
 
 use MarpaX::Hoonlint;
 
+sub slurpStdin {
+    local $RS = undef;
+    my $file = <STDIN>;
+    return \$file;
+}
+
 sub slurp {
     my ($fileName) = @_;
     local $RS = undef;
@@ -68,11 +74,13 @@ my @suppressionsFileNames;
 my @policiesArg;
 my $contextSize = 0;
 my $displayDetails = 1;
+my $fileList;
 
 GetOptions(
     "verbose"               => \$verbose,
     "context|C:i"           => \$contextSize,
     "displayDetails|details:i"           => \$displayDetails,
+    "filelist|f:s"           => \$fileList,
     "inclusions-file|I=s"   => \$inclusionsFileName,
     "suppressions_file|S=s" => \@suppressionsFileNames,
     "policy|P=s"            => \@policiesArg,
@@ -82,8 +90,17 @@ sub usage {
     die "usage: $PROGRAM_NAME [options ...] fileName\n";
 }
 
-usage() if scalar @ARGV != 1;
-my $fileName = $ARGV[0];
+my @fileNames = ();
+GET_FILE_LIST: {
+    last GET_FILE_LIST unless $fileList;
+    if ($fileList eq '-') {
+        push @fileNames, (split "\n", ${ slurpStdin() });
+        last GET_FILE_LIST;
+    }
+    push @fileNames, (split "\n", ${ slurp($fileList) });
+}
+push @fileNames, @ARGV;
+die "No files specified\n" if scalar @fileNames <= 0;
 
 # Config is essentially a proto-lint-instance, containing all
 # variables which are from some kind of "environment", which
@@ -96,29 +113,25 @@ my $fileName = $ARGV[0];
 # which contains information taken from the command line
 # arguments and read from various files.
 
-my %config = ();
-
-$config{fileName} = $fileName;
-
-$config{topicLines}       = {};
-$config{mistakeLines}     = {};
+my %sharedConfig = ();
 
 my @policies = ();
 push @policies, @policiesArg;
+
 # Default policy
 @policies = ('Test::Whitespace') if not scalar @policies;
 die "Multiple policies not yet implemented" if scalar @policies != 1;
 my %policies = ();
 for my $shortPolicyName (@policies) {
-  my $fullPolicyName = 'MarpaX::Hoonlint::Policy::' . $shortPolicyName;
+    my $fullPolicyName = 'MarpaX::Hoonlint::Policy::' . $shortPolicyName;
 
-  # "require policy name" is a hack until I create the full directory
-  # structure required to make this a Perl module
-  my $eval_ok = eval "require $fullPolicyName";
-  die $EVAL_ERROR if not $eval_ok;
-  $policies{$shortPolicyName} = $fullPolicyName;
+    # "require policy name" is a hack until I create the full directory
+    # structure required to make this a Perl module
+    my $eval_ok = eval "require $fullPolicyName";
+    die $EVAL_ERROR if not $eval_ok;
+    $policies{$shortPolicyName} = $fullPolicyName;
 }
-$config{policies} = \%policies;
+$sharedConfig{policies} = \%policies;
 
 my $defaultSuppressionFile = 'hoonlint.suppressions';
 if ( not @suppressionsFileNames
@@ -136,35 +149,40 @@ my $pSuppressions;
     $pSuppressions = \( join "", @suppressions );
 }
 
-my ( $suppressions, $unusedSuppressions ) = parseReportItems(\%config, $pSuppressions);
-die $unusedSuppressions if not $suppressions;
-$config{suppressions}       = $suppressions;
-$config{unusedSuppressions} = $unusedSuppressions;
-
-my $pInclusions;
-my ( $inclusions, $unusedInclusions );
-if ( defined $inclusionsFileName ) {
-    $pInclusions = slurp($inclusionsFileName);
-    ( $inclusions, $unusedInclusions ) = parseReportItems(\%config, $pInclusions);
-    die $unusedInclusions if not $inclusions;
-}
-$config{inclusions}       = $inclusions;
-$config{unusedInclusions} = $unusedInclusions;
-
-my $pHoonSource = slurp($fileName);
-
-$config{pHoonSource} = $pHoonSource;
-$config{contextSize} = $contextSize;
+$sharedConfig{contextSize} = $contextSize;
 SET_DISPLAY_DETAILS: {
-    if (not defined $displayDetails) {
-         $config{displayDetails} = $contextSize >= 1 ? 1 : 0;
-         last SET_DISPLAY_DETAILS;
+    if ( not defined $displayDetails ) {
+        $sharedConfig{displayDetails} = $contextSize >= 1 ? 1 : 0;
+        last SET_DISPLAY_DETAILS;
     }
-    $config{displayDetails} = $displayDetails;
+    $sharedConfig{displayDetails} = $displayDetails;
 }
 
-MarpaX::Hoonlint->new(\%config);
+for my $fileName (@fileNames) {
+    my %config = %sharedConfig;
+    $config{fileName} = $fileName;
+    my $pHoonSource = slurp($fileName);
+    $config{pHoonSource} = $pHoonSource;
 
+    my ( $suppressions, $unusedSuppressions ) =
+      parseReportItems( \%config, $pSuppressions );
+    die $unusedSuppressions if not $suppressions;
+    $config{suppressions}       = $suppressions;
+    $config{unusedSuppressions} = $unusedSuppressions;
+
+    my $pInclusions;
+    my ( $inclusions, $unusedInclusions );
+    if ( defined $inclusionsFileName ) {
+        $pInclusions = slurp($inclusionsFileName);
+        ( $inclusions, $unusedInclusions ) =
+          parseReportItems( \%config, $pInclusions );
+        die $unusedInclusions if not $inclusions;
+    }
+    $config{inclusions}       = $inclusions;
+    $config{unusedInclusions} = $unusedInclusions;
+
+    MarpaX::Hoonlint->new( \%config );
+}
 
 =pod
 
@@ -176,7 +194,7 @@ hoonlint - lint utility for the Hoon language
 
 =head1 SYNOPSIS
 
-    hoonlint [options] FILE
+    hoonlint [options] FILE ...
 
 =head1 Status
 
@@ -196,6 +214,11 @@ At this point, the link is
 L<https://github.com/jeffreykegler/hoonlint/blob/master/UPDATES.md>.
 
 =head1 Description
+
+The C<hoonlint> command runs checks on one or more hoon
+files.
+These may be specified on the command line,
+or via the C<-f> option.
 
 =head2 Simple example
 
@@ -313,6 +336,13 @@ I<NUM> defaults to 1 if more than one line of context
 is being displayed.
 I<NUM> defaults to 0 is no lines of context are being
 displayed.
+
+=item B<-f I<listFile>>, B<--filelist=I<listFile>>
+
+Add the files in the file named I<listFile>
+to the files to be processed by C<hoonlint>.
+If I<listFile> is C<->, read the list of files
+from STDIN.
 
 =item B<-P I<policy>>, B<--policy=I<policy>>
 

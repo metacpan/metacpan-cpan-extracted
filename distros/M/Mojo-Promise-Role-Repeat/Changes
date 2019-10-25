@@ -1,3 +1,8 @@
+0.004     Oct 24 2019
+
+0.003     Oct 24 2019
+	* added repeat_catch method
+
 0.002     Oct 01 2019
         * added Role::Tiny prereq
 

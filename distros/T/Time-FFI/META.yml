@@ -28,10 +28,10 @@ no_index:
 provides:
   Time::FFI:
     file: lib/Time/FFI.pm
-    version: '1.004'
+    version: '2.000'
   Time::FFI::tm:
     file: lib/Time/FFI/tm.pm
-    version: '1.004'
+    version: '2.000'
 requires:
   Carp: '0'
   Exporter: '5.57'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Time-FFI/issues
   homepage: https://github.com/Grinnz/Time-FFI
   repository: https://github.com/Grinnz/Time-FFI.git
-version: '1.004'
+version: '2.000'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -189,7 +189,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.004'
+          tag: '2.000'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

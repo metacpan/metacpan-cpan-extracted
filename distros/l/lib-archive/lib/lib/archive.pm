@@ -10,7 +10,7 @@ use Archive::Tar;
 use File::Spec::Functions qw(file_name_is_absolute rel2abs);
 use File::Basename qw(dirname fileparse);
 
-our $VERSION = "0.5";
+our $VERSION = "0.7";
 
 =pod
 
@@ -131,7 +131,8 @@ sub import {
         my ( $cref, $rel ) = @_;
         return unless my $rec = $cache{$rel};
         $INC{$rel} = $rec->{path};
-        return $rec->{content};
+        open(my $fh, '<', $rec->{content});
+        return $fh;
     };
 }
 

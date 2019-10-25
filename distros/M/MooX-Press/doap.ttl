@@ -1,0 +1,164 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Type::Tiny 1.004000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moo 1.006"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Moose 2.12"^^doap-deps:CpanId ], [ doap-deps:on "Mouse"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>;
+	doap:created         "2019-10-22"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooX-Press>;
+	doap:homepage        <https://metacpan.org/release/MooX-Press>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooX-Press";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-007>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moox-press>;
+	];
+	doap:shortdesc       "quickly create a bunch of Moo/Moose/Mouse classes and roles".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooX-Press-0.001"^^xsd:string;
+	dc:issued            "2019-10-23"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.002"^^xsd:string;
+	dc:issued            "2019-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix syntax for Perl < 5.22.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.003"^^xsd:string;
+	dc:issued            "2019-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Remove old test script from tarball.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.004"^^xsd:string;
+	dc:issued            "2019-10-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Declare dependency on namespace::autoclean.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Set $VERSION and $AUTHORITY in generated packages.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Better handling of caller option.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.005"^^xsd:string;
+	dc:issued            "2019-10-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Suppress loading MooX::TypeTiny if it's not needed.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixes for undef type_library.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Bundle a simple example, HTTP::Tiny::Objects.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.006"^^xsd:string;
+	dc:issued            "2019-10-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix example in pod.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that multiple inheritance is supported.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Throw an error if people try to use extends in roles.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Less hacky way of calling Moo's has, extends, and with functions.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "You can now add a '+' before a class name to indicate that it should be prefixed by the parent class name.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.007"^^xsd:string;
+	dc:issued            "2019-10-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixes for Moo 2.003_005 which changes how Moo's keyword subs are tracked.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

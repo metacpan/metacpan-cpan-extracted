@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "DateTime::Format::EraLegis",
   "PREREQ_PM" => {
     "Any::Moose" => 0,
+    "Astro::Sunrise" => 0,
     "Carp" => 0,
     "DBI" => 0,
     "Method::Signatures" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Any::Moose" => 0,
+  "Astro::Sunrise" => 0,
   "Carp" => 0,
   "DBD::SQLite" => 0,
   "DBI" => 0,

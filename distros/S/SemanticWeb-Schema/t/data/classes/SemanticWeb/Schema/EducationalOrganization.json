@@ -11,8 +11,8 @@
          "rdfs:comment" : "Alumni of an organization.",
          "rdfs:label" : "alumni",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:EducationalOrganization"
+            "schema:EducationalOrganization",
+            "schema:Organization"
          ],
          "schema:inverseOf" : "schema:alumniOf",
          "schema:rangeIncludes" : "schema:Person"

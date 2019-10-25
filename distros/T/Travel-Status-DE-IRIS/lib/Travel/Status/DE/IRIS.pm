@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -259,6 +259,14 @@ sub get_station {
 			next;
 		}
 
+		if ( $station_node->getAttribute('ds100') =~ m{ ^ D \d+ $ }x ) {
+
+			# This is an invalid DS100 code, at least from DB perspective.
+			# So far it seems to refer to subway stations which do not have
+			# IRIS departures.
+			next;
+		}
+
 		push(
 			@ret,
 			{
@@ -451,7 +459,9 @@ sub get_realtime {
            # All observed cases of message ID 900 were related to bus
            # connections ("Anschlussbus wartet"). We can't access which bus
            # it refers to, so we don't show that either.
-			if ( defined $value and $value > 1 and $value != 900 ) {
+           # ID 1000 is a generic free text message, which (as we lack access
+           # to the text itself) is not helpful either.
+			if ( defined $value and $value > 1 and $value < 100 ) {
 				$messages{$msgid} = [ $ts, $type, $value ];
 			}
 		}
@@ -614,7 +624,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 DESCRIPTION
 
@@ -707,6 +717,17 @@ departures for all related stations.
 
 In case of a fatal HTTP request or IRIS error, returns a string describing it.
 Returns undef otherwise.
+
+=item $status->related_stations
+
+Returns a list of hashes describing related stations whose
+arrivals/departures are included in B<results>. Only useful when setting
+B<with_related> to a true value, see its documentation above for details.
+
+Each hash contains the keys B<uic> (UIC/EVA number; known as IBNR in Germany),
+B<name> (station name), and B<ds100> (station code). Note that stations
+returned by B<related_stations> are not necessarily known to
+Travel::Status::DE::IRIS::Stations(3pm).
 
 =item $status->results
 

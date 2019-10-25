@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Result::CreateUser;
-$Web::Authenticate::Result::CreateUser::VERSION = '0.012';
+$Web::Authenticate::Result::CreateUser::VERSION = '0.013';
 use Mouse;
 #ABSTRACT: The result of calling Web::Authenticate::create_user.
 
@@ -64,7 +64,7 @@ Web::Authenticate::Result::CreateUser - The result of calling Web::Authenticate:
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

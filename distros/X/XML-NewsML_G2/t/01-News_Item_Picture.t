@@ -15,6 +15,6 @@ use strict;
 
 use XML::NewsML_G2;
 
-test_ni_picture(create_ni_picture());
+test_ni_picture( create_ni_picture() );
 
 done_testing;

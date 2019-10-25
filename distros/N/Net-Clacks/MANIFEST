@@ -4,8 +4,10 @@ devscripts/resetpod.pl
 devscripts/setcopyright.pl
 devscripts/setversion.pl
 example/chat.pl
+example/chat_unixdomainsocket.pl
 example/chatbot.pl
 example/clacks_master.xml
+example/clacks_master_unixdomainsocket.xml
 example/clacks_slaveserver1.xml
 example/clacks_slaveserver2.xml
 example/clock.pl

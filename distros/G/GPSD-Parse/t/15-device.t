@@ -24,7 +24,7 @@ $gps = GPSD::Parse->new(file => $fname) if ! $sock;
     my $t = $gps->device;
 
     is ref \$t, 'SCALAR', "device is returned as a string";
-    like $t, qr|^/dev/ttyS0$|, "...and is ok"; 
+    like $t, qr|^/dev/tty|, "...and is ok";
 }
 
 done_testing;

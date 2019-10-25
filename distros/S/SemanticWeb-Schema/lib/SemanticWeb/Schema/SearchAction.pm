@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has query => (
@@ -42,14 +42,14 @@ SemanticWeb::Schema::SearchAction - The act of searching for an object
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of searching for an object.<br/><br/> Related actions:<br/><br/>
+=for html <p>The act of searching for an object.<br/><br/> Related actions:<br/><br/>
 <ul> <li><a class="localLink"
 href="http://schema.org/FindAction">FindAction</a>: SearchAction generally
-leads to a FindAction, but not necessarily.</li> </ul> 
+leads to a FindAction, but not necessarily.</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

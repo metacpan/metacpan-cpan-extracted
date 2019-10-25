@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,16 +34,16 @@ SemanticWeb::Schema::BefriendAction - The act of forming a personal connection w
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of forming a personal connection with someone (object)
+=for html <p>The act of forming a personal connection with someone (object)
 mutually/bidirectionally/symmetrically.<br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/FollowAction">FollowAction</a>: Unlike
 FollowAction, BefriendAction implies that the connection is
-reciprocal.</li> </ul> 
+reciprocal.</li> </ul> <p>
 
 =head1 SEE ALSO
 

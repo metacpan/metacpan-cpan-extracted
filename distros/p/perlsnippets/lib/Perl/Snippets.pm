@@ -1,7 +1,7 @@
 package Perl::Snippets;
 
-our $DATE = '2019-06-06'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Old name for perlsnippets
@@ -18,7 +18,7 @@ Perl::Snippets - Old name for perlsnippets
 
 =head1 VERSION
 
-This document describes version 0.004 of Perl::Snippets (from Perl distribution perlsnippets), released on 2019-06-06.
+This document describes version 0.005 of Perl::Snippets (from Perl distribution perlsnippets), released on 2019-09-11.
 
 =head1 HOMEPAGE
 

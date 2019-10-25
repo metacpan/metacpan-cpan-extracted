@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,15 +34,15 @@ SemanticWeb::Schema::ScheduleAction - Scheduling future actions, events, or task
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html Scheduling future actions, events, or tasks.<br/><br/> Related
+=for html <p>Scheduling future actions, events, or tasks.<br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/ReserveAction">ReserveAction</a>: Unlike
 ReserveAction, ScheduleAction allocates future actions (e.g. an event, a
-task, etc) towards a time slot / spatial allocation.</li> </ul> 
+task, etc) towards a time slot / spatial allocation.</li> </ul> <p>
 
 =head1 SEE ALSO
 

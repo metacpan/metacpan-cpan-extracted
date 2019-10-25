@@ -15,7 +15,7 @@ my $thing = q/
 
         has 'answer';
         class_has thing => 'shared';
-    };
+    }
 /;
 
 my ( $obj, $obj2 );

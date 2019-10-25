@@ -7,7 +7,7 @@ use namespace::autoclean;
 
 with 'XML::NewsML_G2::Role::Remote';
 
-has 'width', isa => 'Int', is => 'rw';
+has 'width',  isa => 'Int', is => 'rw';
 has 'height', isa => 'Int', is => 'rw';
 
 1;

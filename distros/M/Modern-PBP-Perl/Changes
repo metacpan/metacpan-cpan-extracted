@@ -54,3 +54,5 @@ Revision history for Modern-PBP-Perl (formerly Perl-Modern-Perl / PBP-Perl)
 1.240  Mon 17.Jun.2016 - 14:12
        Support for perl 5.24
 
+1.300  Mit 23.10.2019 - 21.49
+       Support for perl 5.26. 5.28, 5.30

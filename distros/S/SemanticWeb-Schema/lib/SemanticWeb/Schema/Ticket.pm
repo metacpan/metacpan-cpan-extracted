@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has date_issued => (
@@ -98,7 +98,7 @@ SemanticWeb::Schema::Ticket - Used to describe a ticket to an event
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -138,7 +138,7 @@ A issued_by should be one of the following types:
 
 C<priceCurrency>
 
-=for html The currency of the price, or a price component when attached to <a
+=for html <p>The currency of the price, or a price component when attached to <a
 class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> and its
 subtypes.<br/><br/> Use standard formats: <a
@@ -148,7 +148,7 @@ href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
 symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
 href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
 Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
-HOUR".
+HOUR".<p>
 
 A price_currency should be one of the following types:
 
@@ -205,12 +205,12 @@ A ticketed_seat should be one of the following types:
 
 C<totalPrice>
 
-=for html The total price for the reservation or ticket, including applicable taxes,
-shipping, etc.<br/><br/> Usage guidelines:<br/><br/> <ul> <li>Use values
-from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039))
-rather than superficially similiar Unicode symbols.</li> <li>Use '.'
-(Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point.
-Avoid using these symbols as a readability separator.</li> </ul> 
+=for html <p>The total price for the reservation or ticket, including applicable
+taxes, shipping, etc.<br/><br/> Usage guidelines:<br/><br/> <ul> <li>Use
+values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE'
+(U+0039)) rather than superficially similiar Unicode symbols.</li> <li>Use
+'.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal
+point. Avoid using these symbols as a readability separator.</li> </ul> <p>
 
 A total_price should be one of the following types:
 

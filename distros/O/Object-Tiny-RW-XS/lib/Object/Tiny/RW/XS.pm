@@ -3,7 +3,7 @@ package Object::Tiny::RW::XS;
 use strict 'vars', 'subs';
 BEGIN {
 	require 5.004;
-	$Object::Tiny::RW::XS::VERSION = '0.03';
+	$Object::Tiny::RW::XS::VERSION = '0.04';
 }
 
 sub import {
@@ -41,15 +41,15 @@ Object::Tiny::RW::XS - Class building as simple as it gets (with rw accessors an
 
   # Define a class
   package Foo;
-  
+
   use Object::Tiny::RW::XS qw{ bar baz };
-  
+
   1;
-  
-  
+
+
   # Use the class
   my $object = Foo->new( bar => 1 );
-  
+
   print "bar is " . $object->bar . "\n";       # 1
   $object->bar(2);
   print "bar is now " . $object->bar . "\n";   # 2

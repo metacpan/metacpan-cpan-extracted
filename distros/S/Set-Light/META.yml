@@ -1,11 +1,36 @@
---- #YAML:1.0
-name: Set-Light
-version: 0.03
-version_from: lib/Set/Light.pm
+---
+abstract: '(memory efficient) unordered set of strings'
+author:
+  - 'Tels <nospam-abuse@bloodgate.com>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::More: '0.62'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - set
 license: perl
-distribution_type: module
-generated_by: Set-Light version 0.03
-installdirs: site
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Set-Light
+provides:
+  Set::Light:
+    file: lib/Set/Light.pm
+    version: '0.92'
 requires:
-  Array::RefElem: 1
-  Test::Simple: 0.47
+  Array::RefElem: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Set-Light
+  repository: git://github.com/robrwo/Set-Light.git
+version: '0.92'
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

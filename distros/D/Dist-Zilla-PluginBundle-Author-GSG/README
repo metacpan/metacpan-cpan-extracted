@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.0.12
+    version v0.0.14
 
 SYNOPSIS
 
@@ -28,6 +28,10 @@ SYNOPSIS
         -remove = UploadToCPAN
         -remove = GatherDir
     
+        # The MakeMaker Plugin gets an additional setting
+        # in order to support "version ranges".
+        eumm_version = 7.1101
+    
         # The defaults for author and license come from
         #[Author::GSG]
     
@@ -47,10 +51,11 @@ SYNOPSIS
         config_plugin = [ @Default, Contributors ]
     
         [ChangelogFromGit]
-        tag_regexp = ^v(\d+\.\d+\.\d+)$
+        tag_regexp = \b(v\d+\.\d+\.\d+(?:\.\d+)*)\b
     
         [Git::NextVersion]
-        first_version = 0.0.1
+        first_version  = v0.0.1
+        version_regexp = \b(v\d+\.\d+\.\d+)(?:\.\d+)*\b
     
         [Git::Commit]
         [Git::Tag]
@@ -83,6 +88,10 @@ DESCRIPTION
     commit those, and then run carton exec dzil release. You can set a
     specific release version with the V environment variable, as described
     in the Git::NextVersion Plugin documentation.
+
+    The version regexps for both the Changelog and NextVersion should be
+    open enough to pick up the older style tags we used as well as
+    incrementing a more strict semver.
 
 ATTRIBUTES / PARAMETERS
 

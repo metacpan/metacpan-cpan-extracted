@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 7;
+our $VERSION = 8;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -58,8 +58,20 @@ sub reconnect {
     return if($self->{initfromhandle});
     return if(defined($self->{clacks}));
 
-    my $clacks = Net::Clacks::Client->new($self->{host}, $self->{port}, $self->{user}, $self->{password}, $self->{APPNAME} . '/' . $VERSION, 0)
-            or croak("Can't connect to Clacks server");
+    my $clacks;
+    if(defined($self->{host}) && defined($self->{port})) {
+        $clacks = Net::Clacks::Client->new($self->{host}, $self->{port}, 
+                                            $self->{user}, $self->{password}, 
+                                            $self->{APPNAME} . '/' . $VERSION, 0)
+                or croak("Can't connect to Clacks server");
+    } elsif(defined($self->{socketpath})) {
+        $clacks = Net::Clacks::Client->newSocket($self->{socketpath}, 
+                                            $self->{user}, $self->{password}, 
+                                            $self->{APPNAME} . '/' . $VERSION, 0)
+                or croak("Can't connect to Clacks server");
+    } else {
+        croak("No valid connection configured. Don't know where to connect to!");
+    }
     $self->{clacks} = $clacks;
 
     $self->{clacks}->disablePing(); # Webclient doesn't know when it is called again

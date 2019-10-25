@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Claim;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A Claim in Schema
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has appearance => (
@@ -46,15 +46,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Claim - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::Claim - A Claim in Schema
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink" href="http://schema.org/Claim">Claim</a> in
+=for html <p>A <a class="localLink" href="http://schema.org/Claim">Claim</a> in
 Schema.org represents a specific, factually-oriented claim that could be
 the <a class="localLink"
 href="http://schema.org/itemReviewed">itemReviewed</a> in a <a
@@ -76,15 +76,15 @@ class="localLink" href="http://schema.org/Question">Question</a> might be
 <a class="localLink" href="http://schema.org/about">about</a> some <a
 class="localLink" href="http://schema.org/Claim">Claim</a>.<br/><br/> At
 this time, Schema.org does not define any types of relationship between
-claims. This is a natural area for future exploration.
+claims. This is a natural area for future exploration.<p>
 
 =head1 ATTRIBUTES
 
 =head2 C<appearance>
 
-=for html Indicates an occurence of a <a class="localLink"
+=for html <p>Indicates an occurence of a <a class="localLink"
 href="http://schema.org/Claim">Claim</a> in some <a class="localLink"
-href="http://schema.org/CreativeWork">CreativeWork</a>.
+href="http://schema.org/CreativeWork">CreativeWork</a>.<p>
 
 A appearance should be one of the following types:
 
@@ -98,9 +98,9 @@ A appearance should be one of the following types:
 
 C<firstAppearance>
 
-=for html Indicates the first known occurence of a <a class="localLink"
+=for html <p>Indicates the first known occurence of a <a class="localLink"
 href="http://schema.org/Claim">Claim</a> in some <a class="localLink"
-href="http://schema.org/CreativeWork">CreativeWork</a>.
+href="http://schema.org/CreativeWork">CreativeWork</a>.<p>
 
 A first_appearance should be one of the following types:
 

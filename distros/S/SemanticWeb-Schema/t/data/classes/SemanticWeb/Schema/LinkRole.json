@@ -14,11 +14,11 @@
          "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
          "rdfs:label" : "inLanguage",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:LinkRole",
-            "schema:WriteAction",
             "schema:CommunicateAction",
-            "schema:CreativeWork"
+            "schema:WriteAction",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

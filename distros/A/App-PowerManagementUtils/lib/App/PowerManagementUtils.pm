@@ -1,7 +1,7 @@
 package App::PowerManagementUtils;
 
-our $DATE = '2019-06-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,8 +14,10 @@ $SPEC{prevent_sleep_while} = {
     summary => 'Prevent sleep while running a command',
     description => <<'_',
 
-Uses <pm:Proc::Govern>. For more options when running command, e.g. timeout,
-load control, autorestart, use the module or its CLI <prog:govproc> instead.
+Uses <pm:Proc::Govern> to run a command, with the option `no-sleep' to instruct
+Proc::Govern to disable system from sleeping while running the command. For more
+options when running command, e.g. timeout, load control, autorestart,
+screensaver control, use the module or its CLI <prog:govproc> directly.
 
 _
     args => {
@@ -40,6 +42,36 @@ sub prevent_sleep_while {
     [200, "Exit code is $exit", "", {"cmdline.exit_code"=>$exit}];
 }
 
+$SPEC{prevent_sleep_until_interrupted} = {
+    v => 1.1,
+    summary => 'Prevent sleep until interrupted',
+    description => <<'_',
+
+Uses <pm:Proc::Govern> to run `sleep infinity`, with the option `no-sleep' to
+instruct Proc::Govern to disable system from sleeping until interrupted.
+
+For more options when running command, e.g. timeout, load control, autorestart,
+screensaver control, use the module or its CLI <prog:govproc> directly.
+
+_
+    args => {
+    },
+};
+sub prevent_sleep_until_interrupted {
+    require Proc::Govern;
+
+    my %args = @_;
+
+    print "Now preventing system from sleeping. ",
+        "Press Ctrl-C to stop.\n";
+    my $exit = Proc::Govern::govern_process(
+        command => ['sleep', 'infinity'],
+        no_sleep => 1,
+    );
+
+    [200, "Exit code is $exit", "", {"cmdline.exit_code"=>$exit}];
+}
+
 1;
 # ABSTRACT: CLI utilities related to power management
 
@@ -55,7 +87,7 @@ App::PowerManagementUtils - CLI utilities related to power management
 
 =head1 VERSION
 
-This document describes version 0.002 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-06-09.
+This document describes version 0.003 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
 
 =head1 DESCRIPTION
 
@@ -63,7 +95,11 @@ This distribution contains the following CLI utilities related to screensaver:
 
 =over
 
+=item * L<nosleep>
+
 =item * L<prevent-sleep>
+
+=item * L<prevent-sleep-until-interrupted>
 
 =item * L<prevent-sleep-while>
 
@@ -76,6 +112,37 @@ This distribution contains the following CLI utilities related to screensaver:
 =head1 FUNCTIONS
 
 
+=head2 prevent_sleep_until_interrupted
+
+Usage:
+
+ prevent_sleep_until_interrupted() -> [status, msg, payload, meta]
+
+Prevent sleep until interrupted.
+
+Uses L<Proc::Govern> to run C<sleep infinity>, with the option `no-sleep' to
+instruct Proc::Govern to disable system from sleeping until interrupted.
+
+For more options when running command, e.g. timeout, load control, autorestart,
+screensaver control, use the module or its CLI L<govproc> directly.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 prevent_sleep_while
 
 Usage:
@@ -84,8 +151,10 @@ Usage:
 
 Prevent sleep while running a command.
 
-Uses L<Proc::Govern>. For more options when running command, e.g. timeout,
-load control, autorestart, use the module or its CLI L<govproc> instead.
+Uses L<Proc::Govern> to run a command, with the option `no-sleep' to instruct
+Proc::Govern to disable system from sleeping while running the command. For more
+options when running command, e.g. timeout, load control, autorestart,
+screensaver control, use the module or its CLI L<govproc> directly.
 
 This function is not exported.
 

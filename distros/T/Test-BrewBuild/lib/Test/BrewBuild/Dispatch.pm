@@ -16,7 +16,7 @@ use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Git;
 use Test::BrewBuild::Regex;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 $| = 1;
 
@@ -207,69 +207,6 @@ sub auto {
         sleep $sleep;
     }
 }
-sub _lcd {
-    # used only for dispatching to an RPi in auto mode
-
-    my ($pins, $rows, $cols) = @_;
-
-    require RPi::LCD;
-
-    my $lcd = RPi::LCD->new;
-
-    $lcd->init(
-        rows    => $rows,
-        cols    => $cols,
-        bits    => 4,
-        rs      => $pins->[0],
-        strb    => $pins->[1],
-        d0      => $pins->[2],
-        d1      => $pins->[3],
-        d2      => $pins->[4],
-        d3      => $pins->[5],
-        d4      => 0,
-        d5      => 0,
-        d6      => 0,
-        d7      => 0
-    );
-
-    return $lcd;
-}
-sub _lcd_display {
-    my ($self, $lcd, %args) = @_;
-
-    if ($self->{rpi_lcd_rows} == 4 && $self->{rpi_lcd_cols} == 20){
-        $lcd->position(0, 0);
-        $lcd->print($args{repo}); 
-
-        $lcd->position(0, 1);
-        $lcd->print($args{time});
-
-        $lcd->position(0, 2);
-        $lcd->print($ENV{BB_RUN_STATUS});
-
-        $lcd->position(5, 2);
-        $lcd->print("commit: $args{commit}");
-
-        $lcd->position(0, 3);
-        $lcd->print("run: $args{run_count}");
-
-        $lcd->position(10, 3);
-        $lcd->print("fails: $self->{fail_count}");
-    }
-    else {
-        $lcd->position(0, 0);
-        $lcd->print($args{time});
-
-        $lcd->position(12, 0);
-        $lcd->print($ENV{BB_RUN_STATUS});
-
-        $lcd->position(9, 1);
-        $lcd->print($args{commit});
-
-        $lcd->position(0, 1);
-        $lcd->print($args{run_count});
-    }
-}
 sub dispatch {
     my ($self, %params) = @_;
 
@@ -337,8 +274,9 @@ sub dispatch {
             $log->_7("generating build log: $build_log");
 
             my $content = $remotes{$ip}{build}{files}{$build_log};
+            my $timestamp = Test::BrewBuild::timestamp();
             $log->_7("writing out log: " . getcwd() . "/bblog/$ip\_$build_log");
-            open my $wfh, '>', "bblog/$ip\_$build_log" or croak $!;
+            open my $wfh, '>', "bblog/$ip\_$build_log.$timestamp" or croak $!;
             for (@$content){
                 print $wfh $_;
             }
@@ -416,9 +354,10 @@ sub _fork {
             PeerPort => $remotes->{$tester}{port},
             Proto => 'tcp',
         );
+
         if (! $socket){
-            croak "can't connect to remote $tester on port " .
-                "$remotes->{$tester}{port} $!\n";
+            die "\nCAN'T CONNECT TO REMOTE TESTER $tester on port " .
+                "$remotes->{$tester}{port}: $!\n\n";
         }
 
         $log->_7("tester $tester socket created ok");
@@ -486,6 +425,14 @@ sub _fork {
 
             $socket->send($repo_link);
 
+            my $repo_clone_check = '';
+            $socket->recv($repo_clone_check, 1024);
+
+            if ($repo_clone_check =~ /error/) {
+                $log->_0("REPO CLONE ERROR: $repo_clone_check");
+                exit;
+            }
+
             my $ok = eval {
                 $return{$tester}{build} = Storable::fd_retrieve($socket);
                 1;
@@ -515,6 +462,70 @@ sub _fork {
 
     return %$remotes;
 }
+sub _lcd {
+    # used only for dispatching to an RPi in auto mode
+
+    my ($pins, $rows, $cols) = @_;
+
+    require RPi::LCD;
+
+    my $lcd = RPi::LCD->new;
+
+    $lcd->init(
+        rows    => $rows,
+        cols    => $cols,
+        bits    => 4,
+        rs      => $pins->[0],
+        strb    => $pins->[1],
+        d0      => $pins->[2],
+        d1      => $pins->[3],
+        d2      => $pins->[4],
+        d3      => $pins->[5],
+        d4      => 0,
+        d5      => 0,
+        d6      => 0,
+        d7      => 0
+    );
+
+    return $lcd;
+}
+sub _lcd_display {
+    my ($self, $lcd, %args) = @_;
+
+    if ($self->{rpi_lcd_rows} == 4 && $self->{rpi_lcd_cols} == 20){
+        $lcd->position(0, 0);
+        $lcd->print($args{repo});
+
+        $lcd->position(0, 1);
+        $lcd->print($args{time});
+
+        $lcd->position(0, 2);
+        $lcd->print($ENV{BB_RUN_STATUS});
+
+        $lcd->position(5, 2);
+        $lcd->print("commit: $args{commit}");
+
+        $lcd->position(0, 3);
+        $lcd->print("run: $args{run_count}");
+
+        $lcd->position(10, 3);
+        $lcd->print("fails: $self->{fail_count}");
+    }
+    else {
+        $lcd->position(0, 0);
+        $lcd->print($args{time});
+
+        $lcd->position(12, 0);
+        $lcd->print($ENV{BB_RUN_STATUS});
+
+        $lcd->position(9, 1);
+        $lcd->print($args{commit});
+
+        $lcd->position(0, 1);
+        $lcd->print($args{run_count});
+    }
+}
+
 1;
 
 =head1 NAME

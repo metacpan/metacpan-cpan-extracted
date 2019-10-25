@@ -104,6 +104,6 @@
          "url" : "git://github.com/jeffreykegler/hoonlint.git"
       }
    },
-   "version" : "1.008000",
+   "version" : "1.010000",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

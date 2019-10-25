@@ -1,0 +1,55 @@
+use strict;
+use warnings;
+
+use 5.026001;
+use ExtUtils::MakeMaker;
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+WriteMakefile(
+    NAME              => 'Google::RestApi',
+    AUTHOR            => 'Robin Murray <mvsjes@cpan.org>',
+    ABSTRACT_FROM     => 'lib/Google/RestApi.pm',
+    VERSION_FROM      => 'lib/Google/RestApi.pm',
+    PREREQ_PM         => {
+	'aliased'                         => 0,
+	'autodie'                         => 0,
+	'autovivification'                => 0,
+	'constant'                        => 0,
+	'Carp'                            => 0,
+	'Exporter'                        => 0,
+	'Furl'                            => 0,
+	'Hash::Merge'                     => 0,
+	'JSON'                            => 0,
+	'List::MoreUtils'                 => 0,
+	'List::Util'                      => 0,
+	'Net::OAuth2::Client'             => 0,
+	'Net::OAuth2::Profile::WebServer' => 0,
+	'Scalar::Util'                    => 0,
+	'Storable'                        => 0,
+	'Sub::Retry'                      => 0,
+	'Tie::Hash'                       => 0,
+	'Time::Out'                       => 0,
+	'Type::Params'                    => 0,
+	'Types::Standard'                 => 0,
+	'URI'                             => 0,
+	'URI::QueryParam'                 => 0,
+	'YAML::Any'                       => 0,
+    },
+    TEST_REQUIRES => {
+	'Spreadsheet::Perl'         => 0,
+	'Test::Class::Load'         => 0,
+	'Test::MockObject::Extends' => 0,
+	'Test::Most'                => 0,
+    },
+    META_MERGE    => {
+      "meta-spec" => { version => 2 }, 
+      resources   => {
+        repository => {
+          type => 'git',
+          url  => 'https://github.com/mvsjes2/p5-google-restapi.git',
+          web  => 'https://github.com/mvsjes2/p5-google-restapi',
+        },
+      },
+    },
+    LICENSE           => 'perl',
+);

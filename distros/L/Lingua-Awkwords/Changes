@@ -1,6 +1,8 @@
 See also the git repository.
 
- * 0.09 - some example script changes, repo meta fixes, etc
+ * 0.10 - two srand-based tests problematic on Windows systems are now
+   author-only. switch to Module::Build.
+ * 0.09 - some example script changes, repo meta fixes, etc.
  * 0.06 - add utility percentize, weights2str, weights_from routines to
    assist with corpus parsing. Remove upper limit of 128 on weights.
  * 0.05 - set_patterns no longer clobbers (for easier updates of

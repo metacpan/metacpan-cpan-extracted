@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.3'; # VERSION
+our $VERSION = '7.4'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
@@ -16,6 +16,13 @@ use namespace::autoclean;
 
 my %TO = (
     array_ref => sub { defined $_[0] && is_arrayref($_[0]) ? $_[0] : defined $_[0] ? [ $_[0] ] : $_[0] },
+);
+
+
+has fields_meta => (
+    is => 'rw',
+    isa => HashRef,
+    default => sub { {} },
 );
 
 
@@ -276,9 +283,13 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.3
+version 7.4
 
 =head1 ATTRIBUTES
+
+=head2 fields_meta
+
+A hash reference with the field data from L<App::ElasticSearch::Utilities::es_index_fields>.
 
 =head2 query_stash
 

@@ -33,12 +33,12 @@
          "rdfs:comment" : "The product that this structured value is referring to.",
          "rdfs:label" : "typeOfGood",
          "schema:domainIncludes" : [
-            "schema:TypeAndQuantityNode",
-            "schema:OwnershipInfo"
+            "schema:OwnershipInfo",
+            "schema:TypeAndQuantityNode"
          ],
          "schema:rangeIncludes" : [
-            "schema:Product",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product"
          ]
       },
       "schema:unitCode" : {
@@ -47,10 +47,10 @@
          "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
          "rdfs:label" : "unitCode",
          "schema:domainIncludes" : [
-            "schema:UnitPriceSpecification",
             "schema:QuantitativeValue",
             "schema:PropertyValue",
-            "schema:TypeAndQuantityNode"
+            "schema:TypeAndQuantityNode",
+            "schema:UnitPriceSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -62,8 +62,8 @@
          "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
          "rdfs:label" : "unitText",
          "schema:domainIncludes" : [
-            "schema:UnitPriceSpecification",
             "schema:TypeAndQuantityNode",
+            "schema:UnitPriceSpecification",
             "schema:QuantitativeValue",
             "schema:PropertyValue"
          ],

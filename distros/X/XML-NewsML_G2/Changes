@@ -1,5 +1,20 @@
 Revision history for XML::NewsML_G2
 
+v0.3.1  Thu Oct 21 08:48:00 2019
+        remove generated Makefile.PL
+
+v0.3.0  Thu Sep 26 14:18:00 2019
+        Add support for election infos
+
+v0.2.9  Sun Mar 31 23:00:00 2019
+        Added Binary and Inline_CData
+
+v0.2.8  Tue Mar 26 20:00:00 2019
+        Added processedFrom links
+
+v0.2.7  Mon Mar 16 16:00:00 2015
+        Added Inline_Data
+
 v0.2.6  Tue Feb 25 17:00:00 2015
         derived_from added, location now supports latitude/longitude
 

@@ -8,9 +8,32 @@
 # This program is distributed under the GNU GPL.
 # For more information have a look at http://www.gnu.org
 
+=head1 NAME
+
+qmHandle - Tools for working with Qmail queues
+
+=head1 DESCRIPTION
+
+This program provides a number of options for working with Qmail queues.
+
+=head1 SYNOPSIS
+
+    $ qmHandle -?
+
+Running C<qmHandle -?> will display a list of command-line options.
+
+=cut
+
 use strict;
 use warnings;
 
 use QMail::QueueHandler;
 
 QMail::QueueHandler->new->run;
+
+=head1 AUTHOR
+
+Dave Cross E<lt>davecross@cpan.orgE<gt>
+
+Based on original version by Michele Beltrame E<lt>mb@italpro.netE<gt>
+

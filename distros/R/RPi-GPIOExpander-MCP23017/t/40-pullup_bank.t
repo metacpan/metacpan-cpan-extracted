@@ -2,18 +2,29 @@ use warnings;
 use strict;
 use feature 'say';
 
-use RPi::Const qw(:all);
-use RPi::GPIOExpander::MCP23017;
 use Test::More;
 
-if (! $ENV{RPI_MCP23017}){
-    plan(skip_all => "Skipping: RPI_MCP23017 environment variable not set");
+BEGIN {
+    if (!$ENV{RPI_MCP23017}) {
+        plan(skip_all => "RPI_MCP23017 environment variable not set");
+    }
+
+    if (!$ENV{RPI_SUBMODULE_TESTING}) {
+        plan(skip_all => "RPI_SUBMODULE_TESTING environment variable not set");
+    }
 }
+
+use RPi::Const qw(:all);
+use RPi::GPIOExpander::MCP23017;
 
 use constant {
     BANK_A => 0,
     BANK_B => 1,
 };
+
+if (! $ENV{RPI_SUBMODULE_TESTING}){
+    plan(skip_all => "RPI_SUBMODULE_TESTING environment variable not set");
+}
 
 my $mod = 'RPi::GPIOExpander::MCP23017';
 

@@ -4,7 +4,7 @@
       "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,24 +21,33 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.58"
          }
       },
       "runtime" : {
          "requires" : {
             "Math::BigInt" : "1.999812",
-            "Test::More" : "0.94",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pjacklam/p5-Math-BigInt-Lite.git",
+         "web" : "https://github.com/pjacklam/p5-Math-BigInt-Lite"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

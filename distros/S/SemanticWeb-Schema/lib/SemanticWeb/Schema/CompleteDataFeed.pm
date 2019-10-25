@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::CompleteDataFeed;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A CompleteDataFeed is a DataFeed whose standard representation includes content for every item currently in the feed
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,15 +30,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CompleteDataFeed - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::CompleteDataFeed - A CompleteDataFeed is a DataFeed whose standard representation includes content for every item currently in the feed
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink"
+=for html <p>A <a class="localLink"
 href="http://schema.org/CompleteDataFeed">CompleteDataFeed</a> is a <a
 class="localLink" href="http://schema.org/DataFeed">DataFeed</a> whose
 standard representation includes content for every item currently in the
@@ -49,7 +49,7 @@ feed that represents a collection of items that varies over time (e.g. "Top
 Twenty Records") there is no need to have newer entries mixed in alongside
 older, obsolete entries. By marking this feed as a CompleteDataFeed, old
 entries can be safely discarded when the feed is refreshed, since we can
-assume the feed has provided descriptions for all current items.
+assume the feed has provided descriptions for all current items.<p>
 
 =head1 SEE ALSO
 

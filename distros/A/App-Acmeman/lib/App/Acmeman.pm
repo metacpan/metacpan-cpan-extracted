@@ -1,8 +1,7 @@
 package App::Acmeman;
 use strict;
 use warnings;
-use Protocol::ACME;
-use Protocol::ACME::Challenge::LocalFile;
+use Net::ACME2::LetsEncrypt;
 use Crypt::Format;
 use Crypt::OpenSSL::PKCS10 qw(:const);
 use Crypt::OpenSSL::RSA;
@@ -25,12 +24,10 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '2.02';
+our $VERSION = '3.02';
 
 my $progdescr = "manages ACME certificates";
 
-my %acme_endpoint = (prod => 'acme-v01.api.letsencrypt.org',  
-                     staging => 'acme-staging.api.letsencrypt.org');
 my $letsencrypt_root_cert_url =
     'https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem';
 
@@ -38,7 +35,7 @@ sub new {
     my $class = shift;
     my $self = bless {
 	_progname => basename($0),
-        _acme_host => 'prod',
+        _acme_host => 'production',
         _command => 'renew',
 	_option => {
 	    config_file => '/etc/acmeman.conf'
@@ -100,7 +97,7 @@ sub run {
 
 sub cf { shift->{_cf} }
 sub progname { shift->{_progname} }
-sub acme_host { $acme_endpoint{shift->{_acme_host}} }
+sub acme_host { shift->{_acme_host} }
 
 sub option {
     my ($self,$opt) = @_;
@@ -300,8 +297,6 @@ sub selected_domains {
     return grep { $self->{_selection}{$_} } $self->domains;
 }
 
-sub challenge { shift->{_challenge} }
-
 sub renew {
     my $self = shift;
 
@@ -311,10 +306,6 @@ sub renew {
 	exit(0);
     }
     $self->coalesce;
-    
-    $self->{_challenge} = Protocol::ACME::Challenge::LocalFile->new({
-	www_root => $self->cf->get(qw(core rootdir))
-    });
 
     my $renewed = 0;
     foreach my $vhost ($self->selected_domains) {
@@ -405,6 +396,95 @@ sub debug_to_loglevel {
     return $lev[$v > $#lev ? $#lev : $v];
 }
 
+sub save_challenge {
+    my ($self,$challenge) = @_;
+    my $file = File::Spec->catfile($self->cf->get(qw(core rootdir)), $challenge->get_path);
+    if (open(my $fh, '>', $file)) {
+	print $fh $self->acme->make_key_authorization($challenge);
+	close $fh;
+	debug(3, "wrote challenge file $file");
+    } else {
+	error("can't open $file for writing: $!");
+	die;
+    }
+}   
+
+sub account_key {
+    my $self = shift;
+
+    unless ($self->{_account_key}) {
+	my $keyfile = $self->cf->get('account', 'key');
+	if (-r $keyfile) {
+	    if (open(my $fh, '<', $keyfile)) {
+		local $/ = undef;
+		$self->{_account_key} = Crypt::OpenSSL::RSA->new_private_key(<$fh>);
+		close $fh;
+	    } else {
+		error("can't open $keyfile for reading: $!");
+	    }
+	} else {
+	    $self->{_account_key} = Crypt::OpenSSL::RSA->generate_key($self->cf->get('core', 'key-size'));
+	}
+    }
+    return $self->{_account_key};
+}
+
+sub account_key_id {
+    my $self = shift;
+    
+    my $idfile = $self->cf->get('account', 'id');
+    if (my $val = shift) {
+	$self->{_account_key_id} = $val;
+	$self->prep_dir($idfile);
+	if (open(my $fh, '>', $idfile)) {
+	    print $fh $val;
+	    close $fh;
+	} else {
+	    error("can't open $idfile for writing: $!");
+	}
+    } elsif (!$self->{_account_key_id}) {
+	if (-r $idfile) {
+	    if (open(my $fh, '<', $idfile)) {
+		chomp($self->{_account_key_id} = <$fh>);
+		close $fh;
+		debug(3, "using key_id $self->{_account_key_id}");
+	    } else {
+		error("can't open $idfile for reading: $!");
+	    }
+	}
+    }
+    return $self->{_account_key_id};
+}
+
+sub acme {
+    my $self = shift;
+    unless ($self->{_acme}) {
+	my $acme = Net::ACME2::LetsEncrypt->new(
+	    environment => $self->acme_host,
+	    key => $self->account_key->get_private_key_string(),
+	    key_id => $self->account_key_id
+        );
+	$self->{_acme} = $acme;
+
+	unless ($acme->key_id()) {
+	    # Create new account
+	    debug(3, "creating account");
+	    my $terms_url = $acme->get_terms_of_service();
+	    $acme->create_account(termsOfServiceAgreed => 1);
+	    debug(3, "saving account credentials");
+	    $self->account_key_id($acme->key_id());
+	    my $keyfile = $self->cf->get('account', 'key');
+	    if (open(my $fh, '>', $keyfile)) {
+	        print $fh $self->account_key->get_private_key_string();
+	        close $fh;
+	    } else {
+		error("can't open $keyfile for writing: $!");
+	    }
+	}
+    }
+    return $self->{_acme};
+}
+
 sub register_domain_certificate {
     my ($self,$domain) = @_;
     
@@ -422,77 +502,89 @@ sub register_domain_certificate {
     }
 
     return 1 if $self->dry_run_option;
-    my $account_key = Crypt::OpenSSL::RSA->generate_key($key_size);
 
-    my $acme = Protocol::ACME->new(
-    	host => $self->acme_host,
-    	account_key => { buffer => $account_key->get_private_key_string(),
-			 format => 'PEM' },
-    	loglevel => $self->debug_to_loglevel()
+    my $acme = $self->acme;
+	
+    # Create order
+    my $order = $acme->create_order(
+                  identifiers => [
+                     map { { type => 'dns', value => $_ } } $domain->names
+                  ]
     );
+    debug(3, "$domain: created order");
 
-    eval {
-	$acme->directory();
-	$acme->register();
-	$acme->accept_tos();
-
-        foreach my $name ($domain->names) {
-   	    $acme->authz($name);
-  	    $acme->handle_challenge($self->challenge);
-	    $acme->check_challenge();
-	    $acme->cleanup_challenge($self->challenge);
-        }
-
-	my $csr = $self->make_csr($domain, $key_size);
-        my $cert = $acme->sign({ format => 'PEM',
-				 buffer => $csr->get_pem_req() });
-        my $chain = $acme->chain();
-
-        if (my $filename = $domain->file(KEY_FILE)) {
-	    debug(3, "writing $filename");
-	    $self->prep_dir($filename);
-	    my $u = umask(077);
-	    $csr->write_pem_pk($filename);
-	    umask($u);
-
-            if ($filename = $domain->file(CA_FILE)) {
-                $self->save_crt($domain, CA_FILE, $chain);
-            }
-            $self->save_crt($domain, CERT_FILE, $cert);
-        } else {
-            $filename = $domain->certificate_file;
-	    debug(3, "writing $filename");
-	    $self->prep_dir($filename);
-	    my $u = umask(077);
-            open(my $fd, '>', $filename)
-		or abend(EX_CANTCREAT,
-		         "can't open $filename for writing: $!");
-	    print $fd Crypt::Format::der2pem($cert, 'CERTIFICATE');
-	    print $fd "\n";
-	    print $fd Crypt::Format::der2pem($chain, 'CERTIFICATE');
-	    print $fd "\n";
-	    print $fd $csr->get_pem_pk();
-	    print $fd "\n";
-	    umask($u);
+    foreach my $authz (map { $acme->get_authorization($_) } $order->authorizations()) {
+    
+	my ($challenge) = grep { $_->type() eq 'http-01' } $authz->challenges();
+	if (!$challenge) {
+	    error("$domain: no challenge of acceptable type received");
+	    return 0;
 	}
-    };
-    if ($@) {
-    	if (UNIVERSAL::isa($@, 'Protocol::ACME::Exception')) {
-    	    error("$domain: can't renew certificate: $@->{status}");
-            if (exists($@->{error})) {
-    	        error("$domain: $@->{error}{status} $@->{error}{detail}");
-    	    } else {
-    	        error("$domain: $@->{detail} $@->{type}");
-            }
-        } elsif (ref($@) eq '') {
-            chomp $@;
-            error("$domain: failed to renew certificate: $@");
-    	} else {
-            error("$domain: failed to renew certificate");
-            print STDERR Dumper([$@]);
-    	}
-        return 0;  
+
+	debug(3, "$domain: serving challenge");
+	$self->save_challenge($challenge);
+	$acme->accept_challenge($challenge);
+
+	my $ret;
+	while (($ret = $acme->poll_authorization($authz)) eq 'pending') {
+	    sleep 1
+	}
+	if ($ret ne 'valid') {
+	    error("$domain: can't renew certificate: authorization: $ret");
+	    return 0;
+	}
     }
+    
+    my $csr = $self->make_csr($domain, $key_size);
+
+    my $status = $acme->finalize_order($order, $csr->get_pem_req());
+    while ($status eq 'pending') {
+	sleep 1;
+	$status = $order->status()
+    }
+
+    unless ($status eq 'valid') {
+	error("$domain: can't renew certificate: finalize: $status");
+	return 0;
+    }
+    my $chain = $acme->get_certificate_chain($order);
+
+    if (my $filename = $domain->file(KEY_FILE)) {
+	debug(3, "writing $filename");
+	$self->prep_dir($filename);
+	my $u = umask(077);
+	$csr->write_pem_pk($filename);
+	umask($u);
+
+	my $cert;
+        if ($chain =~ /(^-+BEGIN\s+CERTIFICATE-+$
+                       .+?
+                       ^-+END\s+CERTIFICATE-+$)
+                       (.+)/msx) {
+	    $cert = $1;
+	    ($chain = $2) =~ s/^\s+//s;
+	} else {
+	    $cert = $chain; # FIXME: not sure if that's right
+	}
+	
+	if ($filename = $domain->file(CA_FILE)) {
+	    $self->save_crt($domain, CA_FILE, $chain);
+	}
+	$self->save_crt($domain, CERT_FILE, $cert);
+    } else {
+        $filename = $domain->certificate_file;
+        debug(3, "writing $filename");
+        $self->prep_dir($filename);
+        my $u = umask(077);
+        open(my $fd, '>', $filename)
+	    or abend(EX_CANTCREAT, "can't open $filename for writing: $!");
+        print $fd $chain;
+        print $fd "\n";
+        print $fd $csr->get_pem_pk();
+        print $fd "\n";
+        umask($u);
+    }
+    
     return 1;
 }
 
@@ -509,20 +601,13 @@ sub make_csr {
 }
 
 sub save_crt {
-    my $self = shift;
-    my $domain = shift;
-    my $type = shift;
+    my ($self, $domain, $type, $pem) = @_;
 
     if (my $filename = $domain->file($type)) {
 	debug(3, "writing $filename");
 	$self->prep_dir($filename);
 	open(my $fd, '>', $filename);
-
-	foreach my $der (@_) {
-	    my $pem = Crypt::Format::der2pem($der, 'CERTIFICATE');
-	    print $fd $pem;
-	    print $fd "\n";
-	}
+        print $fd $pem;
 	close $fd;
 	return $filename;
     }

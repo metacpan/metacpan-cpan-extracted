@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use RPi::Const qw(:all);
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 require XSLoader;
 XSLoader::load('RPi::GPIOExpander::MCP23017', $VERSION);
@@ -238,7 +238,7 @@ functionality, particularly interrupts.
 
     my $mcp23017_i2c_addr = 0x20;
 
-    my $exp = RPi::GPIOExpander::MCP23017->new($mcp_i2c_addr);
+    my $exp = RPi::GPIOExpander::MCP23017->new($mcp23017_i2c_addr);
 
     # pins are INPUT by default. Turn the first pin to OUTPUT
 
@@ -509,11 +509,10 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Steve Bertrand.
+Copyright 2018,2019 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
-

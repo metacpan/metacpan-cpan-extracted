@@ -13,9 +13,9 @@
          "rdfs:comment" : "The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity.",
          "rdfs:label" : "eligibleQuantity",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:PriceSpecification",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -25,9 +25,9 @@
          "rdfs:comment" : "The transaction volume, in a monetary unit, for which the offer or price specification is valid, e.g. for indicating a minimal purchasing volume, to express free shipping above a certain order volume, or to limit the acceptance of credit cards to purchases to a certain minimal amount.",
          "rdfs:label" : "eligibleTransactionVolume",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:PriceSpecification",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:PriceSpecification"
       },
@@ -57,8 +57,8 @@
             "schema:TradeAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:priceCurrency" : {
@@ -66,11 +66,11 @@
          "rdfs:comment" : "The currency of the price, or a price component when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
          "rdfs:label" : "priceCurrency",
          "schema:domainIncludes" : [
-            "schema:TradeAction",
             "schema:Ticket",
+            "schema:Offer",
+            "schema:TradeAction",
             "schema:Reservation",
-            "schema:PriceSpecification",
-            "schema:Offer"
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -80,12 +80,12 @@
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:PriceSpecification",
-            "schema:Offer",
             "schema:LocationFeatureSpecification",
-            "schema:Permit",
-            "schema:Demand",
+            "schema:PriceSpecification",
             "schema:OpeningHoursSpecification",
+            "schema:Demand",
+            "schema:Permit",
+            "schema:Offer",
             "schema:MonetaryAmount"
          ],
          "schema:rangeIncludes" : [
@@ -99,17 +99,17 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:LocationFeatureSpecification",
             "schema:Offer",
-            "schema:JobPosting",
-            "schema:PriceSpecification",
+            "schema:Demand",
             "schema:MonetaryAmount",
-            "schema:OpeningHoursSpecification",
-            "schema:Demand"
+            "schema:LocationFeatureSpecification",
+            "schema:PriceSpecification",
+            "schema:JobPosting",
+            "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:valueAddedTaxIncluded" : {

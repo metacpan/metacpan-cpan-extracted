@@ -7,7 +7,7 @@ use Filter::Simple;
 use Data::Dumper;
 
 our
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # variable is exposed and my be overwritten by caller
 our $handle = *STDERR;
@@ -268,7 +268,7 @@ in parentheses.
 The expression is used as argument in a while-each loop and the output
 consists of pairs of the form 'key' => 'value' inside parentheses.
 
-=item \\
+=item \
 
 The expression shall be a list of references.
 These will be evaluated using C<Data::Dumper>.
@@ -404,7 +404,7 @@ undefined values should be clearly distinguishable from empty values.
 =back
 
 The first three requirements are not met by C<Smart::Comments> as there is
-an extra efford needed to display a line number,
+an extra effort needed to display a line number,
 the display of a label and the literal expression are mutual exclusive
 and a specific context is not enforced by the module.
 

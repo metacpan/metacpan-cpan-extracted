@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has price => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::TradeAction - The act of participating in an exchange of go
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ participant in exchange for a one time or periodic payment.
 
 =head2 C<price>
 
-=for html The offer price of a product, or of a price component when attached to
+=for html <p>The offer price of a product, or of a price component when attached to
 PriceSpecification and its subtypes.<br/><br/> Usage guidelines:<br/><br/>
 <ul> <li>Use the <a class="localLink"
 href="http://schema.org/priceCurrency">priceCurrency</a> property (with
@@ -91,7 +91,7 @@ RDFa</a> and Microdata syntax allow the use of a "content=" attribute for
 publishing simple machine-readable values alongside more human-friendly
 formatting.</li> <li>Use values from 0123456789 (Unicode 'DIGIT ZERO'
 (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar
-Unicode symbols.</li> </ul> 
+Unicode symbols.</li> </ul> <p>
 
 A price should be one of the following types:
 
@@ -107,7 +107,7 @@ A price should be one of the following types:
 
 C<priceCurrency>
 
-=for html The currency of the price, or a price component when attached to <a
+=for html <p>The currency of the price, or a price component when attached to <a
 class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> and its
 subtypes.<br/><br/> Use standard formats: <a
@@ -117,7 +117,7 @@ href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
 symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
 href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
 Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
-HOUR".
+HOUR".<p>
 
 A price_currency should be one of the following types:
 

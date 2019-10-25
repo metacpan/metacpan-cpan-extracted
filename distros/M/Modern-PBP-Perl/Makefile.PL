@@ -11,7 +11,7 @@ else {
       VERSION_FROM     => 'lib/Modern/PBP/Perl.pm',
       ABSTRACT_FROM    => 'lib/Modern/PBP/Perl.pm',
       PL_FILES         => {},
-      MIN_PERL_VERSION => '5.012000',
+      MIN_PERL_VERSION => '5.010000',
       PREREQ_PM => {
          'Carp'          => 0,
          'English'       => 0,

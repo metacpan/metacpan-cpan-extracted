@@ -14,21 +14,21 @@
    "properties" : {
       "schema:touristType" : {
          "dc:source" : [
-            "schemadotorgsources:IIT-CNR.it",
-            "schemadotorgsources:Tourism"
+            "schemadotorgsources:Tourism",
+            "schemadotorgsources:IIT-CNR.it"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Attraction suitable for type(s) of tourist. eg. Children, visitors from a particular country, etc.",
          "rdfs:label" : "touristType",
          "schema:category" : "issue-1810",
          "schema:domainIncludes" : [
-            "schema:TouristAttraction",
             "schema:TouristTrip",
+            "schema:TouristAttraction",
             "schema:TouristDestination"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Audience"
+            "schema:Audience",
+            "schema:Text"
          ]
       }
    }

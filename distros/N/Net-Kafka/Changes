@@ -1,0 +1,6 @@
+1.05    Thu Oct 25 2019
+ - Added META_MERGE info for Metacpan build
+ - Fixed Net::Kafka::Producer close sequence
+
+1.04    Thu Oct 24 2019
+First public version of Net::Kafka

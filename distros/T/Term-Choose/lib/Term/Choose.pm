@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.704';
+our $VERSION = '1.705';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -252,8 +252,8 @@ sub __choose {
     local $, = undef;
     local $| = 1;
     if ( defined $self->{busy_string} ) {
-        print clear_to_end_of_line();
-        print "\r" . $self->{busy_string};
+        print "\r" . clear_to_end_of_line();
+        print $self->{busy_string};
     }
     $self->{wantarray} = wantarray;
     if ( ! defined $self->{prompt} ) {
@@ -1171,7 +1171,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.704
+Version 1.705
 
 =cut
 

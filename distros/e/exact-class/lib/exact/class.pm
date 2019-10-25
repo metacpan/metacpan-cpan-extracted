@@ -4,27 +4,31 @@ package exact::class;
 use 5.014;
 use exact;
 use Role::Tiny ();
-use Scalar::Util;
+use Scalar::Util ();
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 my ( $store, $roles );
 
 sub import {
     my ( $self, $caller ) = @_;
-    $caller //= caller();
-    $store->{$caller} = {};
 
-    my @methods = qw( new tap attr class_has has with_roles with );
-    {
-        no strict 'refs';
-        for (@methods) {
-            *{ $caller . '::' . $_ } = \&$_ unless ( defined &{ $caller . '::' . $_ } );
-        }
+    if ($caller) {
+        exact->late_parent;
+    }
+    else {
+        $caller //= caller();
+        exact->add_isa( $self, $caller ) if ( $self eq 'exact::class');
     }
 
-    exact->autoclean( -except => [@methods] );
+    $store->{$caller} = {};
+
+    for ( qw( has class_has with ) ) {
+        exact->monkey_patch( $caller, $_, \&$_ ) unless ( defined &{ $caller . '::' . $_ } );
+    }
 }
+
+sub DESTROY {}
 
 sub ____parents {
     my ($namespace) = @_;
@@ -213,7 +217,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-class.svg)](https://travis-ci.org/gryphonshafer/exact-class)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-class/badge.png)](https://coveralls.io/r/gryphonshafer/exact-class)
@@ -229,12 +233,11 @@ version 1.04
     has name => 'Unnamed';
     has ['age', 'weight'] => 4;
 
-    # ...and just for this inline example:
+    # ...and just for this inline example we need:
     BEGIN { $INC{'Cat.pm'} = 1 }
 
     package AttackCat;
-    use exact -class;
-    use parent 'Cat';
+    use exact 'Cat';
 
     has attack => 4;
     has thac0  => -3;
@@ -265,7 +268,7 @@ L<exact>. See the L<exact> documentation for additional informatioh about
 extensions. The intended use of L<exact::class> is via the extension interface
 of L<exact>.
 
-    use exact class, conf, noutf8;
+    use exact -class, -conf, -noutf8;
 
 However, you can also use it directly, which will also use L<exact> with
 default options:
@@ -278,11 +281,24 @@ are a way to design object-oriented APIs around method chaining to create
 domain-specific languages, with the goal of making the readablity of the source
 code close to written prose.
 
-All attribute accessors created with "has" (or "attr") or "class_has" will
-return their invocant whenever they are used to assign a new attribute value.
+=head2 Subclasses
 
-The interface and much of the code is highly influenced (i.e. plagiarized) from
-the excellent L<Mojo::Base> and L<Role::Tiny>.
+Note that L<exact::class> will place itself as a parent to package in which it's
+used. If you setup a subclass to your package, that subclass should not also
+use L<exact::class>, or else you'll probably end up with an inheritance error.
+
+=head2 "Highly Influenced" Interface
+
+The interface and much of the code is "highly influenced" (i.e. plagiarized)
+from the excellent L<Mojo::Base> and L<Role::Tiny>. So much so that you can
+replace:
+
+    use Mojo::Base 'Mojolicious';
+    use Role::Tiny::With;
+
+...with:
+
+    use exact -class, 'Mojolicious';
 
 =head1 FUNCTIONS
 
@@ -409,15 +425,7 @@ L<GitHub|https://github.com/gryphonshafer/exact-class>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/exact-class>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/exact::class>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/exact-class>
 
 =item *
 

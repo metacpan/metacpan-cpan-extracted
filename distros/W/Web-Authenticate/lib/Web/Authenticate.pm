@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate;
-$Web::Authenticate::VERSION = '0.012';
+$Web::Authenticate::VERSION = '0.013';
 use Mouse;
 use Carp;
 use Web::Authenticate::Cookie::Handler;
@@ -350,7 +350,7 @@ Web::Authenticate - Allows web authentication using cookies and a storage engine
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

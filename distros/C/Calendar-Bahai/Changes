@@ -1,5 +1,8 @@
 Revision history for Calendar::Bahai
 
+0.56  Mon Oct 21 14:45:00 2019
+      - Updated dependency on Date::Bahai::Simple v0.28.
+
 0.55  Wed Aug 21 18:45:00 2019
       - Updated dependency on Date::Bahai::Simple v0.27.
 

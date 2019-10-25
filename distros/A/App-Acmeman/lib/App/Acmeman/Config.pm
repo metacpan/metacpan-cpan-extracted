@@ -6,6 +6,7 @@ use Carp;
 use parent 'Config::Parser::Ini';
 use Text::ParseWords;
 use App::Acmeman::Log qw(debug_level :sysexits);
+use File::Spec;
 
 sub new {
     my $class = shift;
@@ -103,6 +104,14 @@ sub mangle {
 	}
     }
 
+    my $dir = $self->get(qw(account directory));
+    for my $k (qw(id key)) {
+	my $file = $self->get('account', $k);
+	unless (File::Spec->file_name_is_absolute($file)) {
+	    $self->set('account', $k, File::Spec->catfile($dir, $file));
+	}
+    }
+    
     exit(EX_CONFIG) if $err;
 }
 
@@ -118,7 +127,11 @@ __DATA__
     check-dns = BOOL :default=1
     my-ip = STRING :array
     key-size = NUMBER :default=4096
-    verbose = NUMBER
+    verbose = NUMBER :default=0
+[account]
+    directory = STRING :default=/etc/ssl/acme
+    id = STRING :default=key.id
+    key = STRING :default=key.pem
 [files ANY]
     type = STRING :re="^(single|split)$"
     certificate-file = STRING

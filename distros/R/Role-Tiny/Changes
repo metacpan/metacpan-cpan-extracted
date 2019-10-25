@@ -1,5 +1,12 @@
 Revision history for Role-Tiny
 
+2.001004 - 2019-10-25
+  - fix methods being excluded from composition if they previously existed in
+    the composing role (RT#130811)
+  - fix role application overwriting subs that are not considered methods
+  - fix helper subs created by a Role::Tiny extension (like Moo::Role)
+    sometimes being teated as methods
+
 2.001003 - 2019-10-09
   - releasing as stable
 

@@ -3,7 +3,7 @@ package XML::NewsML_G2::Role::HasQCode;
 use Moose::Role;
 use namespace::autoclean;
 
-has 'name', isa => 'Str', is => 'ro', required => 1;
+has 'name',  isa => 'Str', is => 'ro', required => 1;
 has 'qcode', isa => 'Str', is => 'ro', required => 1;
 
 1;

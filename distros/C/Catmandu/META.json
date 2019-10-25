@@ -97,6 +97,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Log::Any::Adapter::Log4perl" : "0",
             "Log::Any::Test" : "1.03",
             "Log::Log4perl" : "0",
@@ -120,7 +121,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2007",
+   "version" : "1.2008",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",

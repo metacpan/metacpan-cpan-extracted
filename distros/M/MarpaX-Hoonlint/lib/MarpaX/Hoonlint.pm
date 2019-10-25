@@ -15,7 +15,7 @@ use Getopt::Long;
 use MarpaX::Hoonlint::yahc;
 
 use vars qw($VERSION $STRING_VERSION @ISA $DEBUG);
-$VERSION        = '1.008000';
+$VERSION        = '1.010000';
 $STRING_VERSION = $VERSION;
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -1007,10 +1007,13 @@ sub new {
     my $fileName     = $config->{fileName};
     my %lint         = (%{$config}, %baseLintInstance);
     my $lintInstance = \%lint;
+
     bless $lintInstance, "MarpaX::Hoonlint";
     my $policies = $lintInstance->{policies};
     my $pSource  = $lintInstance->{pHoonSource};
     my $parser  = $lintInstance->{parser};
+    $lintInstance->{topicLines}   = {};
+    $lintInstance->{mistakeLines} = {};
 
     my @data = ();
 

@@ -9,6 +9,7 @@ build_requires:
   Test::More: '0'
   Test::Requires::Git: '0'
   Test::Warnings: '0'
+  lib: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -41,7 +42,7 @@ resources:
   bugtracker: https://github.com/oalders/open-this/issues
   homepage: https://github.com/oalders/open-this
   repository: https://github.com/oalders/open-this.git
-version: '0.000021'
+version: '0.000022'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -130,7 +131,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -338,7 +339,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -346,7 +347,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.21.0
+          git_version: 2.23.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -371,7 +372,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::OALDERS/CheckIssues'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
@@ -433,7 +434,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -446,11 +447,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000021
+          tag: v0.000022
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -487,7 +488,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -501,7 +502,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'

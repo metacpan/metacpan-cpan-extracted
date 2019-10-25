@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::IpAddressProvider::Role;
-$Web::Authenticate::IpAddressProvider::Role::VERSION = '0.012';
+$Web::Authenticate::IpAddressProvider::Role::VERSION = '0.013';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::IpAddressProvider object should contain.
 
@@ -21,7 +21,7 @@ Web::Authenticate::IpAddressProvider::Role - A Mouse::Role that defines what met
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

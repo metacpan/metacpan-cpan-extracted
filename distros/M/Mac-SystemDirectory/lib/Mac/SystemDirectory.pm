@@ -1,11 +1,11 @@
-package Mac::SystemDirectory; # git description: v0.09-2-g9008eff
+package Mac::SystemDirectory; # git description: v0.12-8-g045285c
 # ABSTRACT: Locate Mac OS X Standard System Directories
 
 use 5.006000;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 our @EXPORT_OK   = ('FindDirectory', 'HomeDirectory', 'TemporaryDirectory');
 
@@ -35,7 +35,7 @@ Mac::SystemDirectory - Locate Mac OS X Standard System Directories
 
 =head1 VERSION
 
-version 0.10
+version 0.13
 
 =head1 SYNOPSIS
 

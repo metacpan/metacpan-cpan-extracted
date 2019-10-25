@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -1053,8 +1053,8 @@ Anzahl NEWLINEs am Ende.
 
 -nl => 2 (zwei NEWLINEs):
 
-  <TAG>CONTENT</TAG>\n\n
-
+     <TAG>CONTENT</TAG>\n\n
+  
   usw.
 
 =item -placeholders => \@keyVal (Default: undef)
@@ -2175,7 +2175,7 @@ sub import {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

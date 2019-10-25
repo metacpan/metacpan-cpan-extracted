@@ -12,7 +12,6 @@ around '_build_g2_catalog_schemes' => sub {
     return $result;
 };
 
-
 1;
 __END__
 

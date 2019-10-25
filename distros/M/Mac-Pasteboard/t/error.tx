@@ -39,15 +39,21 @@ eval {
 test_error $data, undef,
     'Retrieve from cleared pasteboard, if missing_ok is true.';
 
-$pb->copy ('original data');
-eval {
-    $data = $pb->copy ('different data');
-    1;
-} or do {
-    $ENV{DEVELOPER_DEBUG} and warn $@;
-    $data = $pb->get ('status');
-};
-test_error $data, -25134, 'Duplicate copy.';
+SKIP: {
+    $Mac::Pasteboard::USE_PBCOPY
+	and skip 'Duplicate data test fails if spawning pbcopy', 1;
+
+    $pb->copy ('original data');
+    eval {
+	$data = $pb->copy ('different data');
+	1;
+    } or do {
+	$ENV{DEVELOPER_DEBUG} and warn $@;
+	$data = $pb->get ('status');
+    };
+    test_error $data, -25134, 'Duplicate copy.'
+	or diag 'Status was ', explain $data;
+}
 
 done_testing;
 

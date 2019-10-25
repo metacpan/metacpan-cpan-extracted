@@ -1,0 +1,146 @@
+NAME
+    Regexp::Pattern::Git - Regexp patterns related to git
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::Git (from Perl
+    distribution Regexp-Pattern-Git), released on 2019-10-24.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Git::ref");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   ref
+
+        Valid reference name.
+
+        This single regex pattern enforces the rules defined by the
+        git-check-ref-format manpage, reproduced below:
+
+        1. They can include slash / for hierarchical (directory) grouping,
+        but no slash-separated component can begin with a dot . or end with
+        the sequence .lock.
+        2. They must contain at least one /. This enforces the presence of a
+        category like heads/, tags/ etc. but the actual names are not
+        restricted.
+        3. They cannot have two consecutive dots .. anywhere.
+        4. They cannot have ASCII control characters (i.e. bytes whose
+        values are lower than \040, or \177 DEL), space, tilde ~, caret ^,
+        or colon : anywhere.
+        5. They cannot have question-mark ?, asterisk *, or open bracket [
+        anywhere.
+        6. They cannot begin or end with a slash / or contain multiple
+        consecutive slashes.
+        7. They cannot end with a dot ..
+        8. They cannot contain a sequence @{.
+        9. They cannot be the single character @.
+        10. They cannot contain a .
+
+        Examples:
+
+         "foo/bar" =~ re("Git::ref");  # matches
+
+         # A slash-separated component begins with dot (rule 1)
+         ".foo/bar" =~ re("Git::ref");  # doesn't match
+
+         # A slash-separated component begins with dot (rule 1)
+         "foo/.bar" =~ re("Git::ref");  # doesn't match
+
+         # A slash-separated component ends with ".lock" (rule 1)
+         "foo.lock/bar" =~ re("Git::ref");  # doesn't match
+
+         "foo.locker/bar" =~ re("Git::ref");  # matches
+
+         # A slash-separated component ends with ".lock" (rule 1)
+         "foo/bar.lock" =~ re("Git::ref");  # doesn't match
+
+         # A slash-separated component ends with ".lock" (rule 1)
+         "foo/bar.lock/baz" =~ re("Git::ref");  # doesn't match
+
+         "foo/bar.locker/baz" =~ re("Git::ref");  # matches
+
+         # Does not contain at least one / (rule 2)
+         "foo" =~ re("Git::ref");  # doesn't match
+
+         # Contains two consecutive dots (rule 3)
+         "foo../bar" =~ re("Git::ref");  # doesn't match
+
+         # Contains colon (rule 4)
+         "foo:/bar" =~ re("Git::ref");  # doesn't match
+
+         # Contains question mark (rule 5)
+         "foo?/bar" =~ re("Git::ref");  # doesn't match
+
+         # Contains open bracket (rule 5)
+         "foo[2]/bar" =~ re("Git::ref");  # doesn't match
+
+         # Begins with / (rule 6)
+         "/foo/bar" =~ re("Git::ref");  # doesn't match
+
+         # Ends with / (rule 6)
+         "foo/bar/" =~ re("Git::ref");  # doesn't match
+
+         # Contains multiple consecutive slashes
+         "foo//bar" =~ re("Git::ref");  # doesn't match
+
+         # Ends with . (rule 7)
+         "foo/bar." =~ re("Git::ref");  # doesn't match
+
+         # Contains sequence @{ (rule 8)
+         "foo\@{/bar" =~ re("Git::ref");  # doesn't match
+
+         # Contains sequence @{ (rule 8)
+         "foo\@{baz}/bar" =~ re("Git::ref");  # doesn't match
+
+         # Cannot be single character @ (rule 9)
+         "\@" =~ re("Git::ref");  # doesn't match
+
+    *   release_tag
+
+        Common release tag pattern.
+
+        This is not defined by git, but just common convention.
+
+        Examples:
+
+         # Does not contain digit
+         "release" =~ re("Git::release_tag");  # doesn't match
+
+         1 =~ re("Git::release_tag");  # matches
+
+         "1.23-456-foobar" =~ re("Git::release_tag");  # matches
+
+         "release-1.23" =~ re("Git::release_tag");  # matches
+
+         "v1.23" =~ re("Git::release_tag");  # matches
+
+         "ver-1.23" =~ re("Git::release_tag");  # matches
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Git>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Git>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Git>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

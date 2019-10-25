@@ -1,4 +1,9 @@
 Revision history for Net-DHCP-Windows-Netsh-Parse
 
+0.1.0	 2918-10-20/03:50
+		 - Now recognizes IP ranges and
+		   adds them as a option.
+		 - Minor correction to t/parse.t.
+
 0.0.1	 2019-10-14/03:45
 		 - Initial release.

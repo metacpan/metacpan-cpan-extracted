@@ -1,3 +1,11 @@
+[Changes for 0.33 - Wed Oct 23 20:00:23 EAT 2019]
+
+* Fix META.yml and README; no functional changes.
+
+[Changes for 0.32 - Wed Oct 23 19:36:25 EAT 2019]
+
+* Fix an arbitrary 10-page limitation.
+
 [Changes for 0.31 - 2010年 1月 8日 周五 18時58分48秒 CST]
 
 * Fix an incorrect MANIFEST leading to installation failure.

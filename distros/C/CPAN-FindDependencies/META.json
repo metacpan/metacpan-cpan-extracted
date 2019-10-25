@@ -4,14 +4,14 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CPAN-FindDependencies",
    "no_index" : {
@@ -54,5 +54,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-CPAN-FindDependencies"
       }
    },
-   "version" : "2.48"
+   "version" : "2.49",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

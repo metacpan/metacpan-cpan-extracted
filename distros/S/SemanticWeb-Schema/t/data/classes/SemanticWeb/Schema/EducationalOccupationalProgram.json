@@ -16,13 +16,13 @@
          "rdfs:label" : "educationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Course",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
          ],
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:URL",
-            "schema:EducationalOccupationalCredential",
-            "schema:Text"
+            "schema:EducationalOccupationalCredential"
          ]
       },
       "schema:occupationalCredentialAwarded" : {
@@ -32,8 +32,8 @@
          "rdfs:label" : "occupationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Course",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
@@ -49,14 +49,14 @@
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:Service",
             "schema:Product",
-            "schema:MenuItem",
-            "schema:Trip",
+            "schema:Event",
+            "schema:AggregateOffer",
             "schema:CreativeWork",
+            "schema:Service",
+            "schema:MenuItem",
             "schema:EducationalOccupationalProgram",
-            "schema:AggregateOffer"
+            "schema:Trip"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -70,9 +70,9 @@
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:EducationalOccupationalCredential",
+            "schema:Course",
             "schema:AlignmentObject",
-            "schema:Text",
-            "schema:Course"
+            "schema:Text"
          ]
       },
       "schema:provider" : {
@@ -82,17 +82,17 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:Service",
             "schema:Reservation",
-            "schema:ParcelDelivery",
-            "schema:Trip",
             "schema:CreativeWork",
-            "schema:Invoice"
+            "schema:Service",
+            "schema:Invoice",
+            "schema:EducationalOccupationalProgram",
+            "schema:ParcelDelivery",
+            "schema:Trip"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:salaryUponCompletion" : {

@@ -46,6 +46,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.31",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/srchulo/jQuery-File-Upload.git",
+         "web" : "https://github.com/srchulo/jQuery-File-Upload"
+      }
+   },
+   "version" : "0.32",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

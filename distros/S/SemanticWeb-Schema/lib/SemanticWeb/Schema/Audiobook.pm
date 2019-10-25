@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has duration => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Audiobook - An audiobook.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -60,8 +60,8 @@ An audiobook.
 
 =head2 C<duration>
 
-=for html The duration of the item (movie, audio recording, event, etc.) in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.
+=for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.<p>
 
 A duration should be one of the following types:
 

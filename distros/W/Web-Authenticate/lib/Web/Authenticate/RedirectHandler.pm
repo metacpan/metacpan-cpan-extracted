@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::RedirectHandler;
-$Web::Authenticate::RedirectHandler::VERSION = '0.012';
+$Web::Authenticate::RedirectHandler::VERSION = '0.013';
 use Mouse;
 use Carp;
 #ABSTRACT: The default implementation of Web::Authentication::RedirectHandler::Role.
@@ -38,7 +38,7 @@ Web::Authenticate::RedirectHandler - The default implementation of Web::Authenti
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

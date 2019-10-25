@@ -6,8 +6,8 @@ use strict;
 use 5.010001;
 
 use Term::Choose           qw();
-use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( insert_sep get_term_width );
+use Term::Choose::LineFold qw( line_fold print_columns );
+use Term::Choose::Util     qw( insert_sep get_term_width unicode_sprintf );
 use Term::Choose::Screen   qw( clear_to_end_of_line );
 use Term::Form             qw();
 
@@ -46,6 +46,8 @@ sub input_filter {
     my $s_and_replace = 'S_&_Replace';
     my $split_table   = 'Split_Table';
     my $merge_rows    = 'Merge_Rows';
+    my $join_columns  = 'Join_Columns';
+    my $fill_up_rows  = 'Fill_up_Rows';
     my $cols_to_rows  = 'Cols_to_Rows';
     my $empty_to_null = 'Empty_2_NULL';
     $sf->{empty_to_null} = $default_e2n;
@@ -55,10 +57,10 @@ sub input_filter {
     FILTER: while ( 1 ) {
         $ax->print_sql( $sql );
         my $choices = [
-            undef,    $choose_cols,   $choose_rows, $range_rows, $row_groups,
-            $confirm, $remove_cell,   $insert_cell, $append_col, $split_column,
-            $reset,   $s_and_replace, $split_table, $merge_rows, $cols_to_rows,
-            $reparse, $empty_to_null,
+            undef,    $choose_cols,   $choose_rows,  $range_rows, $row_groups,
+            $confirm, $remove_cell,   $insert_cell,  $append_col, $split_column,
+            $reset,   $s_and_replace, $split_table,  $merge_rows, $join_columns,
+            $reparse, $empty_to_null, $fill_up_rows, $cols_to_rows,
         ];
         # Choose
         my $idx = $tc->choose(
@@ -130,6 +132,12 @@ sub input_filter {
         }
         elsif ( $filter eq $merge_rows ) {
             $sf->__merge_rows( $sql, $filter_str );
+        }
+        elsif ( $filter eq $join_columns ) {
+            $sf->__join_columns( $sql, $filter_str );
+        }
+        elsif ( $filter eq $fill_up_rows ) {
+            $sf->__fill_up_rows( $sql, $filter_str );
         }
         elsif ( $filter eq $cols_to_rows ) {
             $sf->__transpose_rows_to_cols( $sql, $filter_str );
@@ -212,14 +220,28 @@ sub __range_of_rows {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $aoa = $sql->{insert_into_args};
     # Choose
-    my ( $idx_first_row, $idx_last_row ) = $sf->__choose_range( $sql, $filter_str );
+    my $prompt = "Choose first row:";
+    # Choose
+    my $idx_first_row = $sf->__choose_a_row_idx( $aoa, $filter_str, $prompt );
+    if ( ! defined $idx_first_row ) {
+        return;
+    }
+    $ax->print_sql( $sql, $sf->{i}{working} );
+    $prompt = "Choose last row:";
+    # Choose
+    my $idx_last_row = $sf->__choose_a_row_idx( [ @{$aoa}[$idx_first_row .. $#$aoa] ], $filter_str, $prompt );
+    if ( ! defined $idx_last_row ) {
+        return;
+    }
     if ( ! defined $idx_first_row || ! defined $idx_last_row ) {
         return;
     }
     $ax->print_sql( $sql, $sf->{i}{working} );
+    $idx_last_row += $idx_first_row;
     $sql->{insert_into_args} = [ @{$aoa}[$idx_first_row .. $idx_last_row] ];
     return;
 }
+
 
 sub __row_groups {
     my ( $sf, $sql, $filter_str ) = @_;
@@ -400,6 +422,37 @@ sub __insert_cell {
         return;
     }
 }
+
+
+sub __fill_up_rows {
+    my ( $sf, $sql, $filter_str ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $aoa = $sql->{insert_into_args};
+    my $prompt = 'Fill up shorter rows?';
+    my $ok = $tc->choose(
+        [ undef, '- YES' ],
+        { info => $filter_str, prompt => $prompt, index => 1, undef => '- NO', layout => 3 }
+    );
+    $ax->print_sql( $sql, $sf->{i}{working} );
+    if ( ! $ok ) {
+        return;
+    }
+    my $longest_row = 0;
+    for my $row ( @$aoa ) {
+        my $col_count = scalar @$row;
+        if ( $col_count > $longest_row ) {
+            $longest_row = $col_count;
+        }
+    }
+    my $last_idx = $longest_row - 1;
+    for my $row ( @$aoa ) {
+        $#$row = $last_idx;
+    }
+    $sql->{insert_into_args} = $aoa;
+    return;
+}
+
 
 sub __append_col {
     my ( $sf, $sql, $filter_str ) = @_;
@@ -629,28 +682,45 @@ sub __split_table {
     $sql->{insert_into_args} = $tmp;
 }
 
+
 sub __merge_rows {
     my ( $sf, $sql, $filter_str ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    # Choose
-    my ( $idx_first_row, $idx_last_row ) = $sf->__choose_range( $sql, $filter_str );
-    if ( ! defined $idx_first_row || ! defined $idx_last_row ) {
+    my $aoa = $sql->{insert_into_args};
+    my $term_w = get_term_width();
+    my @stringified_rows;
+    {
+        no warnings 'uninitialized';
+        @stringified_rows = map {
+            my $str_row = join( ',', @$_ );
+            if ( print_columns( $str_row ) > $term_w ) {
+                unicode_sprintf( $str_row, $term_w, 0, 1 );
+            }
+            else {
+                $str_row;
+            }
+        } @$aoa;
+    }
+    my $prompt = 'Choose rows:';
+    my $chosen_idxs = $tu->choose_a_subset(
+        \@stringified_rows,
+        { current_selection_separator => "\n", current_selection_end => "\n",
+          layout => 3, order => 0, all_by_default => 0, prompt => $prompt, index => 1,
+          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str } # order
+    );
+    if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
     }
-    $ax->print_sql( $sql, $sf->{i}{working} );
-    my $aoa = $sql->{insert_into_args};
-    my $first = 0;
-    my $last = 1;
-    my @rows_to_merge = @{$aoa}[ $idx_first_row .. $idx_last_row ];
     my $merged = [];
-    for my $col ( 0 .. $#{$rows_to_merge[0]} ) {
+    for my $col ( 0 .. $#{$aoa->[$chosen_idxs->[0]]} ) {
         my @tmp;
-        for my $row ( 0 .. $#rows_to_merge ) {
-            next if ! defined $rows_to_merge[$row][$col];
-            next if $rows_to_merge[$row][$col] =~ /^\s*\z/;
-            $rows_to_merge[$row][$col] =~ s/^\s+|\s+\z//g;
-            push @tmp, $rows_to_merge[$row][$col];
+        for my $row ( @$chosen_idxs ) {
+            next if ! defined $aoa->[$row][$col];
+            next if $aoa->[$row][$col] =~ /^\s*\z/;
+            $aoa->[$row][$col] =~ s/^\s+|\s+\z//g;
+            push @tmp, $aoa->[$row][$col];
         }
         $merged->[$col] = join ' ', @tmp;
     }
@@ -659,17 +729,88 @@ sub __merge_rows {
     # Fill_form
     my $form = $tf->fill_form(
         $fields,
-        { info => $filter_str, prompt => 'Edit result:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+        { info => $filter_str, prompt => 'Edit cells of merged rows:',
+          auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
     );
     if ( ! $form ) {
         return;
     }
     $ax->print_sql( $sql, $sf->{i}{working} );
     $merged = [ map { $_->[1] } @$form ];
-    splice @$aoa, $idx_first_row, ( $idx_last_row - $idx_first_row + 1 ), $merged; # modifies $aoa
+    my $first_idx = shift @$chosen_idxs;
+    $aoa->[$first_idx] = $merged; # modifies $aoa
+    for my $idx ( sort { $b <=> $a } @$chosen_idxs ) {
+        splice @$aoa, $idx, 1;
+    }
     $sql->{insert_into_args} = $aoa;
     return;
 }
+
+
+sub __join_columns {
+    my ( $sf, $sql, $filter_str ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $tf = Term::Form->new( $sf->{i}{tf_default} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $aoa = $sql->{insert_into_args};
+    my $empty_cells_of_col_count =  $sf->__count_empty_cells_of_cols( $aoa );
+    my $header = $sf->__prepare_header( $aoa, $empty_cells_of_col_count );
+    # Choose
+    my $chosen_idxs = $tu->choose_a_subset(
+        $header,
+        { current_selection_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok},
+          back => '<<', info => $filter_str } # order
+    );
+    if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
+        return;
+    }
+    $ax->print_sql( $sql, $sf->{i}{working} );
+    # Readline
+    my $join_char = $tf->readline( 'Join-string: ' );
+    if ( ! defined $join_char ) {
+        return;
+    }
+    my $merged = [];
+    for my $row ( 0 .. $#{$aoa} ) {
+        my @tmp;
+        for my $col ( @$chosen_idxs ) {
+            next if ! defined $aoa->[$row][$col];
+            next if $aoa->[$row][$col] =~ /^\s*\z/;
+            $aoa->[$row][$col] =~ s/^\s+|\s+\z//g;
+            push @tmp, $aoa->[$row][$col];
+        }
+        $merged->[$row] = join $join_char, @tmp;
+    }
+    my $col_number = 0;
+    my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$merged ];
+    # Fill_form
+    my $form = $tf->fill_form(
+        $fields,
+        { info => $filter_str, prompt => 'Edit cells of joined cols:', auto_up => 2,
+          confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+    );
+    if ( ! $form ) {
+        return;
+    }
+    $ax->print_sql( $sql, $sf->{i}{working} );
+    $merged = [ map { $_->[1] } @$form ];
+    my $first_idx = shift @$chosen_idxs;
+    for my $row ( 0 .. $#{$aoa} ) { # modifies $aoa
+        $aoa->[$row][$first_idx] = $merged->[$row];
+        for my $idx ( sort { $b <=> $a } @$chosen_idxs ) {
+            splice @{$aoa->[$row]}, $idx, 1;
+        }
+    }
+    $sql->{insert_into_args} = $aoa;
+    return;
+}
+
+
+
+
+
+
+
 
 sub __transpose_rows_to_cols {
     my ( $sf, $sql, $filter_str ) = @_;
@@ -793,26 +934,6 @@ sub __choose_a_row_idx {
         return;
     }
     return $row_idx - @pre;
-}
-
-sub __choose_range {
-    my ( $sf, $sql, $filter_str ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $aoa = $sql->{insert_into_args};
-    my $prompt = "Choose first row:";
-    # Choose
-    my $idx_first_row = $sf->__choose_a_row_idx( $aoa, $filter_str, $prompt );
-    if ( ! defined $idx_first_row ) {
-        return;
-    }
-    $ax->print_sql( $sql, $sf->{i}{working} );
-    $prompt = "Choose last row:";
-    # Choose
-    my $idx_last_row = $sf->__choose_a_row_idx( [ @{$aoa}[$idx_first_row .. $#$aoa] ], $filter_str, $prompt );
-    if ( ! defined $idx_last_row ) {
-        return;
-    }
-    return $idx_first_row, $idx_last_row + $idx_first_row;
 }
 
 

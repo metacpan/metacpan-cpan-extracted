@@ -1,4 +1,4 @@
-use 5.008001;
+use 5.008000;
 use utf8;
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use warnings;
 ###########################################################################
 
 { package Set::Relation::V1; # class
-    our $VERSION = '0.013001';
+    our $VERSION = '0.013002';
     $VERSION = eval $VERSION;
 
     use Carp 'confess';
@@ -202,7 +202,7 @@ sub BUILD {
     my ($self, $args) = @_;
     my ($members, $keys) = @{$args}{'members', 'keys'};
 
-    # Note, $members may be in all of the same formats as a HDMD_Perl5_STD
+    # Note, $members may be in all of the same formats as a HDMD_Perl_STD
     # Relation value literal payload, but with a few extra trivial options.
 
     if (!defined $members) {
@@ -3509,218 +3509,4 @@ sub _delete {
 ###########################################################################
 ###########################################################################
 
-1; # Magic true value required at end of a reusable file's code.
-__END__
-
-=pod
-
-=encoding utf8
-
-=head1 NAME
-
-Set::Relation::V1 -
-Bundled original implementation of Set::Relation role
-
-=head1 VERSION
-
-This document describes Set::Relation::V1 version 0.13.1 for Perl 5.
-
-=head1 SYNOPSIS
-
-See the SYNOPSIS of L<Set::Relation>, which represents this file also.
-
-=head1 DESCRIPTION
-
-Set::Relation::V1 provides the original complete implementation of the
-Set::Relation and Set::Relation::Mutable roles.  It is their first working
-proof of concept or prototype or reference implementation.  Early lessons
-learned while making this implementation did subsequently lead to the
-creation of L<Set::Relation::V2>, which kept the same interface but
-reworked the internals in several large ways to improve execution
-performance and other resource efficiencies.  This older version is kept in
-parallel to having the newer one, as a baseline for benchmarking the
-reworked internals as well as for learning from.
-
-=head2 Matters of Mutability
-
-Now, while a relation value is conceptually immutable, the
-Set::Relation::V1 class allows you to mutate a Set::Relation::V1 object
-under some circumstances as a convenience to users, in a similar manner to
-how you can mutate a Perl Hash or Array by inserting or deleting its
-elements.  By default, a newly created Set::Relation::V1 object is mutable,
-that is its identity is said to not be frozen; but when you perform certain
-operations with one, it will become immutable, gaining a frozen identity,
-and this change can not be reversed, though you can clone said object to
-get an un-frozen duplicate.
-
-There are 3 main ways to make a Set::Relation::V1 object immutable. The
-first is explicitly, by invoking its C<freeze_identity> method.  The second
-is implicitly, by invoking its C<which> method I<(this one may be
-reconsidered on users' request)>; this also happens to be done indirectly
-any time a tuple-representing Hash is given to a Set::Relation routine.
-The third is if another Set::Relation::V1 object is constructed that is
-given the first object as a tuple attribute value; this was done rather
-than cloning the input object under the assumption that most of the time
-you wouldn't want to mutate the input object afterwards, for efficiency.
-
-=head2 Matters of Performance
-
-Set::Relation::V1 by itself is strictly an in-memory data structure, same
-as Perl's built-in arrays and hashes.  Its design focuses on providing
-correct-behaving features in a relatively simple manner.
-
-Performance is made as good as possible, using multiple design techniques,
-while not becoming too complicated.  Set::Relation::V1 keeps a variety of
-indexes automatically and makes a trade-off of being willing to use more
-RAM (by storing multiple copies of data in hashed form, at least 3 copies
-total) in order to get better CPU performance.
-
-Loosely speaking, each Set::Relation::V1 object is a Perl hash-ref with one
-element per tuple, where the hash value is the tuple itself as a Perl
-hash-ref and the key is a unique hash / serialization of the entire deep
-value of said tuple.
-
-This basic structure means that fundamental operations of taking a whole
-arbitrary tuple and querying whether or not it is in the relation is an
-O(1) / constant-time operation, same as testing the existence of a key in a
-Perl hash; likewise, inserting a tuple into or deleting a tuple from a
-relation is also an O(1) / constant-time operation.
-
-All basic set operations, like relational union or difference, are all O(N)
-/ linear-time due to that basic structure alone.  When comparing 2 input
-relations for a set operation, only the smaller one needs to be fully (at
-the worst) or partially scanned, and the other does not; the scan produces
-a list of tuples to search for, and each search for a tuple in the second
-relation is O(1).  Similarly, many basic relational operations like
-projection and extension are 0(N).  No such operations are in
-polynomial-time such as O(N^2); that would simply be unacceptable.
-
-Set::Relation::V1 also automatically generates more indexes to help with
-the general cases of relational joins or semijoins where the arguments have
-some but not all attributes in common (the common ones only providing the
-join criteria).  Without the extra indexes, a generic join would be in
-polynomial time since it would have to pair up every tuple of one argument
-with every one of another to see if parts of each tuple match.  However,
-this is changed to linear time by first creating (or reusing) an index on
-each argument that is a hash of just the portion of the tuple attributes
-that overlap with the other argument.  Creating each index is also linear
-time.  So then using those indexes, doing an ordinary join or semijoin then
-has the same performance characteristics as relational union or difference.
-
-Now to be more accurate concerning relational join operations, finding out
-what set of tuples in each input match each other is always a linear time
-operation like relational intersection (what is actually happening on the
-indexes), but producing the result set of tuples is an O(N*M) operation.
-Now if the attributes overlapped between both inputs are superkeys of each
-input, then producing the result set reduces to linear / O(N) time;
-otherwise it is appropriately slower since the then multiple tuples on each
-side of a match are then cartesian joined.  If the main operation is a
-semijoin, that is always O(N) since we are actually just filtering one
-input by the other, not joining them for a result.
-
-Of course, a regular cartesian product, a join between 2 relations having
-no attributes in common, can't be helped by an index (and generates none),
-and so does have O(N*M) performance all the time.  This can't be helped
-since we know that the result will always have a cardinality that is the
-multiplication of input relations' cardinalities.
-
-For the various few more complicated operators provided by
-Set::Relation::V1, which are conceptually defined in terms of simpler
-operators, their performance is generally based on what they are defined in
-terms of.
-
-To keep things simple, creation of indexes (besides the single fundemental
-one) is strictly automatic and you can not explicitly add or remove an
-index on a Set::Relation::V1 object.  Creation is just done the first time
-the indexes would be I<used>, so they only happen say if you do a regular
-join or such operation.  Once an index is created, it is automatically kept
-up to date by any Set::Relation::V1 mutator methods; the design of said
-indexes also makes it such that keeping them up to date during tuple
-inserts or deletes is also O(1) per index.
-
-To keep things simple, when new Set::Relation::V1 objects are generated
-from relational operations, that new object starts out with no indexes
-(other than the fundamental), even if conceivably the parent's could be
-copied.
-
-The various Set::Relation::V1 operators know about and look for certain
-special cases of inputs which allow them to short-circuit the operation.
-In some cases they may return certain constant values, or they may just
-return one of their input objects directly.  They may also use a cheaper
-operation than you requested which for example doesn't involve creating or
-using indexes.  For example, if you use C<join> on 2 input relations that
-have all the same attributes, it will short circuit to C<intersection>.  Or
-for example if you do C<union> and one input relation has zero tuples, it
-will simply return the other input object.
-
-Now in the general relational model where relations are immutable, that
-makes no semantical difference, but it is important to know if you plan to
-mutate the result object of a relational operation, as you might then be
-mutating an argument too.  So take appropriate precautions and do
-appropriate tests where necessary so that you don't have undesired
-side-effects in your program.
-
-Note that due to an aspect of its design, using the Set::Relation-defined
-parameter C<$allow_dup_tuples> on any applicable method of
-C<Set::Relation::V1> will have no effect since uniqueness comparisons for
-tuples are always done eagerly on storage and there is no mechanism to have
-even partial multiset semantics for performance.
-
-I<Note from 2016 May 3:  While the hashing-based algorithm
-Set::Relation::V1 (and V2) uses internally to make relational operations
-perform in O(N)/O(1) rather than O(N*M) was invented by its author in 2009
-for this purpose, in retrospect it turns out that the algorithm had prior
-art and an industry standard name, that being "hash join".>
-
-=head1 INTERFACE
-
-Set::Relation::V1 composes the Set::Relation::Mutable role declared in the
-L<Set::Relation> file, which in turn composes the Set::Relation role.
-
-=head1 DIAGNOSTICS
-
-I<This documentation is pending.>
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-I<This documentation is pending.>
-
-=head1 DEPENDENCIES
-
-This file requires any version of Perl 5.x.y that is at least 5.8.1.
-
-It also requires these Perl 5 packages that are available both bundled with
-Perl 5.8.1+ and on CPAN:
-L<Carp-ver(1.01..*)|Carp>, L<Scalar::Util-ver(1.13..*)|Scalar::Util>.
-
-It also requires these Perl 5 packages that are available both bundled with
-Perl 5.25.1+ and on CPAN: L<List::Util-ver(1.45..*)|List::Util>.
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 SEE ALSO
-
-Go to L<Set::Relation> for the majority of both distribution-internal
-and external references.
-
-=head1 BUGS AND LIMITATIONS
-
-I<This documentation is pending.>
-
-=head1 AUTHOR
-
-Darren Duncan (C<darren@DarrenDuncan.net>)
-
-=head1 LICENSE AND COPYRIGHT
-
-Set::Relation is Copyright © 2006-2016, Muldis Data Systems, Inc.
-
-See the LICENSE AND COPYRIGHT of L<Set::Relation> for details.
-
-=head1 ACKNOWLEDGEMENTS
-
-The ACKNOWLEDGEMENTS in L<Set::Relation> apply to this file too.
-
-=cut
+1;

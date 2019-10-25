@@ -1,14 +1,16 @@
 package XML::NewsML_G2::Writer::News_Message;
 
 use Moose;
+use List::MoreUtils qw(uniq);
 use namespace::autoclean;
 
 extends 'XML::NewsML_G2::Writer';
 
-has 'news_message', isa => 'XML::NewsML_G2::News_Message', is => 'ro',
+has 'news_message',
+    isa      => 'XML::NewsML_G2::News_Message',
+    is       => 'ro',
     required => 1;
 has '+_root_node_name', default => 'newsMessage';
-
 
 sub _build__root_item {
     my $self = shift;
@@ -16,39 +18,50 @@ sub _build__root_item {
 }
 
 sub _create_header {
-    my ($self, $root) = @_;
+    my ( $self, $root ) = @_;
 
     my $header = $self->create_element('header');
     $header->appendChild(
         $self->create_element(
-            'sent'
-            , _text => $self->_formatter->format_datetime(
-                $self->news_message->sent)
-        ));
+            'sent',
+            _text => $self->_formatter->format_datetime(
+                $self->news_message->sent
+            )
+        )
+    );
+    for my $dest ( @{ $self->news_message->destination } ) {
+        next unless $dest;
+        my %attr = ( '_text' => $dest->name );
+        $attr{role} = $dest->role if $dest->role;
+        $header->appendChild( $self->create_element( 'destination', %attr ) );
+    }
 
     $root->appendChild($header);
     return;
 }
 
 sub _create_itemSet {
-    my ($self, $root) = @_;
+    my ( $self, $root ) = @_;
     my $item_set = $self->create_element('itemSet');
 
     my $writer;
-    for my $item (@{$self->news_message->items}){
-        if ($item->isa('XML::NewsML_G2::News_Item')) {
+    for my $item ( @{ $self->news_message->items } ) {
+        if ( $item->isa('XML::NewsML_G2::News_Item') ) {
             $writer = XML::NewsML_G2::Writer::News_Item->new(
-                news_item => $item,
+                news_item      => $item,
                 scheme_manager => $self->scheme_manager,
-                g2_version => $self->g2_version);
-        } elsif ($item->isa('XML::NewsML_G2::Package_Item')) {
+                g2_version     => $self->g2_version
+            );
+        }
+        elsif ( $item->isa('XML::NewsML_G2::Package_Item') ) {
             $writer = XML::NewsML_G2::Writer::Package_Item->new(
-                package_item => $item,
+                package_item   => $item,
                 scheme_manager => $self->scheme_manager,
-                g2_version => $self->g2_version);
+                g2_version     => $self->g2_version
+            );
         }
 
-        $item_set->appendChild($writer->create_dom()->documentElement());
+        $item_set->appendChild( $writer->create_dom()->documentElement() );
     }
     $root->appendChild($item_set);
     return;
@@ -57,7 +70,8 @@ sub _create_itemSet {
 override '_create_root_element' => sub {
     my $self = shift;
 
-    my $root = $self->doc->createElementNS($self->g2_ns, $self->_root_node_name);
+    my $root =
+        $self->doc->createElementNS( $self->g2_ns, $self->_root_node_name );
     $self->doc->setDocumentElement($root);
     return $root;
 };

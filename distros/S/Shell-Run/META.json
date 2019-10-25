@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Exporter::Tiny" : "0.025",
             "File::Which" : "0",
             "IO::Select" : "0",
             "IO::String" : "0",
@@ -53,5 +54,5 @@
          "web" : "https://github.com/jo-37/shell-run"
       }
    },
-   "version" : "0.04"
+   "version" : "0.06"
 }

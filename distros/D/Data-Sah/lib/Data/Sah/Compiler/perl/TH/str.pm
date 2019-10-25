@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::perl::TH::str;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.901'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.902'; # VERSION
 
 use 5.010;
 use strict;
@@ -190,7 +190,7 @@ Data::Sah::Compiler::perl::TH::str - perl's type handler for type "str"
 
 =head1 VERSION
 
-This document describes version 0.901 of Data::Sah::Compiler::perl::TH::str (from Perl distribution Data-Sah), released on 2019-08-14.
+This document describes version 0.902 of Data::Sah::Compiler::perl::TH::str (from Perl distribution Data-Sah), released on 2019-10-24.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

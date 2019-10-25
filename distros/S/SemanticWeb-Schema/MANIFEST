@@ -519,6 +519,8 @@ lib/SemanticWeb/Schema/OccupationalTherapy.pm
 lib/SemanticWeb/Schema/OceanBodyOfWater.pm
 lib/SemanticWeb/Schema/Offer.pm
 lib/SemanticWeb/Schema/OfferCatalog.pm
+lib/SemanticWeb/Schema/OfferForLease.pm
+lib/SemanticWeb/Schema/OfferForPurchase.pm
 lib/SemanticWeb/Schema/OfferItemCondition.pm
 lib/SemanticWeb/Schema/OfficeEquipmentStore.pm
 lib/SemanticWeb/Schema/OnDemandEvent.pm
@@ -575,6 +577,9 @@ lib/SemanticWeb/Schema/Play.pm
 lib/SemanticWeb/Schema/PlayAction.pm
 lib/SemanticWeb/Schema/Playground.pm
 lib/SemanticWeb/Schema/Plumber.pm
+lib/SemanticWeb/Schema/PodcastEpisode.pm
+lib/SemanticWeb/Schema/PodcastSeason.pm
+lib/SemanticWeb/Schema/PodcastSeries.pm
 lib/SemanticWeb/Schema/PoliceStation.pm
 lib/SemanticWeb/Schema/Pond.pm
 lib/SemanticWeb/Schema/PostOffice.pm
@@ -624,6 +629,7 @@ lib/SemanticWeb/Schema/Rating.pm
 lib/SemanticWeb/Schema/ReactAction.pm
 lib/SemanticWeb/Schema/ReadAction.pm
 lib/SemanticWeb/Schema/RealEstateAgent.pm
+lib/SemanticWeb/Schema/RealEstateListing.pm
 lib/SemanticWeb/Schema/ReceiveAction.pm
 lib/SemanticWeb/Schema/Recipe.pm
 lib/SemanticWeb/Schema/RecommendedDoseSchedule.pm
@@ -1328,6 +1334,8 @@ t/data/classes/SemanticWeb/Schema/OccupationalTherapy.json
 t/data/classes/SemanticWeb/Schema/OceanBodyOfWater.json
 t/data/classes/SemanticWeb/Schema/Offer.json
 t/data/classes/SemanticWeb/Schema/OfferCatalog.json
+t/data/classes/SemanticWeb/Schema/OfferForLease.json
+t/data/classes/SemanticWeb/Schema/OfferForPurchase.json
 t/data/classes/SemanticWeb/Schema/OfferItemCondition.json
 t/data/classes/SemanticWeb/Schema/OfficeEquipmentStore.json
 t/data/classes/SemanticWeb/Schema/OnDemandEvent.json
@@ -1384,6 +1392,9 @@ t/data/classes/SemanticWeb/Schema/Play.json
 t/data/classes/SemanticWeb/Schema/PlayAction.json
 t/data/classes/SemanticWeb/Schema/Playground.json
 t/data/classes/SemanticWeb/Schema/Plumber.json
+t/data/classes/SemanticWeb/Schema/PodcastEpisode.json
+t/data/classes/SemanticWeb/Schema/PodcastSeason.json
+t/data/classes/SemanticWeb/Schema/PodcastSeries.json
 t/data/classes/SemanticWeb/Schema/PoliceStation.json
 t/data/classes/SemanticWeb/Schema/Pond.json
 t/data/classes/SemanticWeb/Schema/PostOffice.json
@@ -1433,6 +1444,7 @@ t/data/classes/SemanticWeb/Schema/Rating.json
 t/data/classes/SemanticWeb/Schema/ReactAction.json
 t/data/classes/SemanticWeb/Schema/ReadAction.json
 t/data/classes/SemanticWeb/Schema/RealEstateAgent.json
+t/data/classes/SemanticWeb/Schema/RealEstateListing.json
 t/data/classes/SemanticWeb/Schema/ReceiveAction.json
 t/data/classes/SemanticWeb/Schema/Recipe.json
 t/data/classes/SemanticWeb/Schema/RecommendedDoseSchedule.json

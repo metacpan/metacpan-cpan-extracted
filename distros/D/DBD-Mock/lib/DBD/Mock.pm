@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.49';
+our $VERSION = '1.51';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -89,6 +89,16 @@ my %AttributeAliases = (
               sub { (shift)->{Database}->{'mock_last_insert_id'} }
         }
     },
+
+    mariadb => {
+        db => {
+            mariadb_insertid => 'mock_last_insert_id'
+        },
+        st => {
+            mariadb_insertid =>
+              sub { (shift)->{Database}->{'mock_last_insert_id'} }
+        }
+    }
 );
 
 sub _get_mock_attribute_aliases {
@@ -953,9 +963,27 @@ Once this is turned on, you will need to choose a database specific attribute al
 
   DBI->connect('dbi:Mock:MySQL', '', '');
 
+Or, by using the database name if using driver DSNs:
+
+  DBI->connect('dbi:Mock:host=localhost;port=3306;database=MySQL', '', '');
+
 The 'MySQL' in the DSN will be picked up and the MySQL specific attribute aliasing will be used.
 
-Right now only MySQL is supported by this feature, and even that support is very minimal. Currently the MySQL C<$dbh> and C<$sth> attributes 'mysql_insertid' are aliased to the C<$dbh> attribute 'mock_last_insert_id'. It is possible to add more aliases though, using the C<DBD::Mock:_set_mock_attribute_aliases> function (see the source code for details).
+Right now there is only minimal support for MySQL and MariaDB:
+
+=over 4
+
+=item MySQL
+
+Currently the 'mysql_insertid' attribute for C<$dbh> and C<$sth> are aliased to the C<$dbh> attribute 'mock_last_insert_id'.
+
+=item MariaDB
+
+Currently the 'mariadb_insertid' attribute for C<$dbh> and C<$sth> are aliased to the C<$dbh> attribute 'mock_last_insert_id'.
+
+=back
+
+It is possible to add more aliases though, using the C<DBD::Mock:_set_mock_attribute_aliases> function (see the source code for details)
 
 =item Connection Callbacks
 

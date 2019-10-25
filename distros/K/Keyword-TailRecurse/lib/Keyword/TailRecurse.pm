@@ -3,18 +3,37 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Keyword::Declare;
 
 my $subCallTailCompatible = 0;
 
+my %imported;
+
 sub import {
     my %option = map { $_ => 1 } @_;
 
-    keyword tailRecurse (Bareword $function, List? $parameters) {
-        return "\@_ = ( $parameters ); goto &$function;";
-    };
+    if( $option{tailrecurse} ) {
+        keyword tailrecurse (Bareword $function, List? $parameters) {
+            return "\@_ = ( $parameters ); goto &$function;";
+        };
+        $imported{tailrecurse} = 1;
+    }
+
+    if( $option{tail_recurse} ) {
+        keyword tail_recurse (Bareword $function, List? $parameters) {
+            return "\@_ = ( $parameters ); goto &$function;";
+        };
+        $imported{tail_recurse} = 1;
+    }
+
+    if( $option{tailRecurse} || ! keys %imported ) {
+        keyword tailRecurse (Bareword $function, List? $parameters) {
+            return "\@_ = ( $parameters ); goto &$function;";
+        };
+        $imported{tailRecurse} = 1;
+    }
 
     if ( $option{subCallTail} ) {
         keyword tail (Bareword $function, List? $parameters) {
@@ -26,14 +45,22 @@ sub import {
 
             return "\@_ = ( $object, $parameters ); goto &{(ref $object) . '::$method'};";
         };
-        $subCallTailCompatible = 1;
+
+        $imported{subCallTail} = 1;
     }
 }
 
 sub unimport {
-    unkeyword tailRecurse;
-
-    if ( $subCallTailCompatible ) {
+    if( $imported{tailRecurse} ) {
+        unkeyword tailRecurse;
+    }
+    if( $imported{tailrecurse} ) {
+        unkeyword tailrecurse;
+    }
+    if( $imported{tail_recurse} ) {
+        unkeyword tail_recurse;
+    }
+    if( $imported{subCallTail} ) {
         unkeyword tail;
     }
 }   
@@ -75,6 +102,12 @@ recursion that doesn't grow the call stack.
 After using the module you can precede a function call with the keyword
 C<tailRecurse> and rather adding a new entry on the call stack the function
 call will replace the current entry on the call stack.
+
+=head1 ALIASES
+
+By default the keyword C<tailRecurse> is added, but you can use the
+C<tail_recurse> and/or C<tailrecurse> keywords to add the tail recursion
+keyword in a form more suitable for different naming conventions.
 
 =head2 Sub::Call::Tail compatability
 

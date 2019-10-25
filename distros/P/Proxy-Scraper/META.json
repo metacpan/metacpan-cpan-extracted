@@ -45,15 +45,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/DeBos99/Proxy-Scraper/issues"
+         "web" : "https://gitlab.com/DeBos/Proxy-Scraper/issues"
       },
-      "homepage" : "https://github.com/DeBos99/Proxy-Scraper",
+      "homepage" : "https://gitlab.com/DeBos/Proxy-Scraper",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/DeBos99/Proxy-Scraper.git",
-         "web" : "https://github.com/DeBos99/Proxy-Scraper"
+         "url" : "https://gitlab.com/DeBos/Proxy-Scraper.git",
+         "web" : "https://gitlab.com/DeBos/Proxy-Scraper"
       }
    },
-   "version" : "v2.1.0",
+   "version" : "v2.1.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

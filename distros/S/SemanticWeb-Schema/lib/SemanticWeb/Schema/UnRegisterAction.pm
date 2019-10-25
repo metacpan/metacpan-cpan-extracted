@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,18 +34,18 @@ SemanticWeb::Schema::UnRegisterAction - The act of un-registering from a service
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of un-registering from a service.<br/><br/> Related
+=for html <p>The act of un-registering from a service.<br/><br/> Related
 actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/RegisterAction">RegisterAction</a>: antonym of
 UnRegisterAction.</li> <li><a class="localLink"
 href="http://schema.org/LeaveAction">LeaveAction</a>: Unlike LeaveAction,
 UnRegisterAction implies that you are unregistering from a service you
 werer previously registered, rather than leaving a team/group of
-people.</li> </ul> 
+people.</li> </ul> <p>
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.160';
+our $VERSION = '1.161';
 
 use Quiq::Shell;
 use Quiq::FileHandle;
@@ -308,7 +308,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.160
+1.161
 
 =head1 AUTHOR
 

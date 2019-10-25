@@ -3,7 +3,7 @@ package Log::Dispatch::Vars;
 use strict;
 use warnings;
 
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 use Exporter qw( import );
 
@@ -69,7 +69,7 @@ Log::Dispatch::Vars - Variables used internally by multiple packages
 
 =head1 VERSION
 
-version 2.68
+version 2.69
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

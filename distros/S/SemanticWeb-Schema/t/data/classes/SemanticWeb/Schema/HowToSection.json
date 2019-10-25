@@ -5,8 +5,8 @@
       "rdfs:label" : "HowToSection",
       "rdfs:subClassOf" : [
          "schema:CreativeWork",
-         "schema:ItemList",
-         "schema:ListItem"
+         "schema:ListItem",
+         "schema:ItemList"
       ]
    },
    "properties" : {
@@ -15,12 +15,12 @@
          "rdfs:comment" : "A single step item (as HowToStep, text, document, video, etc.) or a HowToSection (originally misnamed 'steps'; 'step' is preferred).",
          "rdfs:label" : "steps",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToSection"
+            "schema:HowToSection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : [
-            "schema:ItemList",
             "schema:Text",
+            "schema:ItemList",
             "schema:CreativeWork"
          ],
          "schema:supersededBy" : "schema:step"

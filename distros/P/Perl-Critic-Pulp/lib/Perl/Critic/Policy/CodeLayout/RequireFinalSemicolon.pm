@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -27,7 +27,7 @@ use Perl::Critic::Pulp::Utils;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 use constant supported_parameters =>
   ({ name           => 'except_same_line',
@@ -53,7 +53,9 @@ sub violates {
     return;
   }
 
-  my $block_last = $elem->schild(-1) || return;   # if empty
+  my $block_last = $elem->schild(-1)
+    || return;   # empty block doesn't need a semi
+
   ### block_last: ref($block_last),$block_last->content
   $block_last->isa('PPI::Statement') || do {
     ### last in block is not a PPI-Statement ...
@@ -69,7 +71,7 @@ sub violates {
     ### bstat_last in statement: ref($bstat_last),$bstat_last->content
 
     if (_elem_is_semicolon($bstat_last)) {
-      ### has final semicolon, ok
+      ### has final semicolon, ok ...
       return;
     }
   }
@@ -220,8 +222,8 @@ sub _block_is_hash_constructor {
 
     if ($prev eq 'sub') {
       # "sub foo {}"
-        ### named sub, block is correct ...
-        return 0;
+      ### named sub, block is correct ...
+      return 0;
     }
     # "word bless { ... }"
     # "word return { ... }" etc
@@ -230,15 +232,46 @@ sub _block_is_hash_constructor {
   }
 
   my $parent = $elem->parent || do {
-    ### umm, toplevel, is a block
+    ### umm, at toplevel, is a block ...
     return 0;
   };
 
   if ($parent->isa('PPI::Statement::Compound')
       && ($parent = $parent->parent)
-      && $parent->isa('PPI::Structure::List')) {
-    # "func({ %args })"
-    ### in a list, is a hashref ...
+      && (
+          # $parent->isa('PPI::Structure::List')
+          # || 
+          $parent->isa('PPI::Structure::Constructor'))) {
+    ### in a list or arrayref, is a hashref ...
+
+    # This catches
+    #     ppidump "[{%args}]"
+    # which comes out (from PPI 1.270) as
+    #
+    #     PPI::Structure::Constructor  	[ ... ]
+    #       PPI::Statement::Compound
+    #         PPI::Structure::Block  	{ ... }
+    #           PPI::Statement
+    #             PPI::Token::Symbol  	'%args'
+    #
+    # It should be like
+    #
+    #     PPI::Structure::Constructor  	[ ... ]
+    #       PPI::Statement
+    #         PPI::Structure::Constructor  	{ ... }
+    #           PPI::Statement::Expression
+    #
+    # which is what ppidump "[{x=>1}]" gives.
+    #
+    # The PPI::Structure::List case was for something like
+    #     ppidump "func({ %args })"
+    # which in the past was PPI::Structure::Block too.  Think it might be ok
+    # in PPI 1.270.
+    #
+    # The plan would be to remove the whole of this check for
+    # PPI::Statement::Compound if PPI can do the right thing on arrayrefs
+    # too ...
+
     return 1;
   }
 
@@ -435,7 +468,7 @@ on that basis this policy is low severity and under the "cosmetic" theme
 
 =head2 Same Line Closing Brace
 
-By default (see L</CONFIGURATION> below) a semicolon is not required when
+By default (see L</CONFIGURATION> below), a semicolon is not required when
 the closing brace is on the same line as the last statement.  This is good
 for constants and one-liners.
 
@@ -467,9 +500,9 @@ This currently means
     mapp map_pairwise grepp grep_pairwise    # List::Pairwise
     firstp first_pairwise lastp last_pairwise 
 
-The module functions are always treated as expressions.  There's no check
-for whether the respective module is actually in use.  Fully qualified names
-like C<List::Util::first> are recognised too.
+These module function names are always treated as expressions.  There's no
+check for whether the respective module is actually in use.  Fully qualified
+names like C<List::Util::first> are recognised too.
 
 C<do {} while> or C<do {} until> loops are ordinary blocks, not expression
 blocks, so still require a semicolon on the last statement inside.
@@ -478,18 +511,11 @@ blocks, so still require a semicolon on the last statement inside.
       foo()                  # bad
     } until ($condition);
 
-The last statement of a C<sub{}> is not considered an expression.  Perhaps
-there could be an option to excuse all one-statement subs or even all subs
-and have the policy just for nested code and control blocks.  For now the
-suggestion is that if a sub is big enough to need a separate line for its
-result expression then write an actual C<return> statement for maximum
-clarity.
-
 =head2 Try/Catch Blocks
 
 The C<Try>, C<TryCatch> and C<Syntax::Feature::Try> modules all add C<try>
-block forms.  These statements don't require a terminating semicolon (the
-same as an C<if> doesn't).
+block forms.  These are blocks not requiring a terminating semicolon, the
+same as an C<if> etc doesn't.
 
     use TryCatch;
     sub foo {
@@ -500,8 +526,8 @@ same as an C<if> doesn't).
       } # ok, no semi required here for TryCatch
     }
 
-The insides of the C<try> and C<catch> are treated the same as other blocks.
-But the C<try> statement itself doesn't require a semicolon.  (See policy
+The insides of the C<try> and C<catch> are the same as other blocks, but the
+C<try> statement itself doesn't require a semicolon.  (See policy
 C<ValuesAndExpressions::ProhibitNullStatements> to notice one added
 unnecessarily.)
 
@@ -559,8 +585,8 @@ expression block, as described under L</Final Value Expression> above.
 The statements and functions for this exception are currently hard coded.
 Maybe in the future they could be configurable, though multi-line
 expressions in this sort of thing tends to be unusual anyway.  (See policy
-C<BuiltinFunctions::RequireSimpleSortBlock> to demand C<sort> is only one
-line.)
+C<BuiltinFunctions::RequireSimpleSortBlock> for example to demand C<sort> is
+only one line.)
 
 =back
 
@@ -578,6 +604,15 @@ are presumed to be code blocks (the various Try modules).  Perhaps other
 common or particular functions or syntax with code blocks could be
 recognised.  In general this sort of ambiguity is another good reason to
 avoid function prototypes.
+
+PPI as of its version 1.270 sometimes takes hashrefs in lists and arrarefs
+to be code blocks, eg.
+
+    ppidump 'foo({%y,x=>1})'
+    ppidump '[{%y,x=>1}]'
+
+    ppidump '[{x=>1,%y}]'       # ok, hash
+
 
 =head1 SEE ALSO
 
@@ -598,7 +633,7 @@ L<http://user42.tuxfamily.org/perl-critic-pulp/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

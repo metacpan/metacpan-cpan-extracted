@@ -1519,3 +1519,14 @@ Revision history for Graphics-Framebuffer
       
       Multiprocesssing examples now have been moved to their own directory in
       examples.
+
+6.37  Oct 22, 2019
+
+      Because $VERSION is no longer exported by default, the example scripts
+      got hosed.  They have been fixed.  Note, the MCE examples have been
+      given the same fix, if needed.
+
+      "pixel" and "get_pixel" return an additional "hex" field for hexadecimal
+      color values.
+
+      Removed a lot of "garbage" from the object that is created.

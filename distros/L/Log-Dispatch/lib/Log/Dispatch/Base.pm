@@ -8,7 +8,7 @@ use Log::Dispatch::Vars
     qw( %CanonicalLevelNames %LevelNamesToNumbers @OrderedLevels );
 use Scalar::Util qw( refaddr );
 
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _level_as_number {
@@ -93,7 +93,7 @@ Log::Dispatch::Base - Code shared by dispatch and output objects.
 
 =head1 VERSION
 
-version 2.68
+version 2.69
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

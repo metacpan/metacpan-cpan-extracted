@@ -5,6 +5,8 @@ if($ENV{RELEASE_TESTING}) {
     opendir(T, 't') || die("Can't read t/ directory: $!\n");
     my @tests = grep { -f "t/$_" } readdir(T);
     closedir(T);
+    unlink(map { "t/$_" } grep { /^XX-/ } @tests);
+    @tests = grep { $_ !~ /^XX-/ } @tests;
     foreach my $test (@tests) {
         open(IN, "t/$test") || die("Can't read t/$test: $!\n");
         open(OUT, ">t/XX-$test") || die("Can't write t/XX-$test: $!\n");

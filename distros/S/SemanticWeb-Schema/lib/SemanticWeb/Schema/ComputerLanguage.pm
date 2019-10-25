@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,14 +34,14 @@ SemanticWeb::Schema::ComputerLanguage - This type covers computer programming la
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html This type covers computer programming languages such as Scheme and Lisp, as
-well as other language-like computer representations. Natural languages are
-best represented with the <a class="localLink"
-href="http://schema.org/Language">Language</a> type.
+=for html <p>This type covers computer programming languages such as Scheme and Lisp,
+as well as other language-like computer representations. Natural languages
+are best represented with the <a class="localLink"
+href="http://schema.org/Language">Language</a> type.<p>
 
 =head1 SEE ALSO
 

@@ -72,6 +72,7 @@ WriteMakefile(
         'Module::Load' => 0,   # corelist since 5.9.4
         'Parallel::ForkManager' => 0,
         'Plugin::Simple' => '1.01',
+        'POSIX' => 0,
         'Proc::Background' => 0,
         'Test::BrewBuild::Plugin::Author' => '0.02',
         'Test::BrewBuild::Plugin::TestAgainst' => '0.06',

@@ -9,6 +9,7 @@ do { my $x = {
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::Code::TidyAll' => '0.50',
                                       'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
                                       'warnings' => '0'
                                     }
                     },
@@ -18,11 +19,9 @@ do { my $x = {
                                       'HTTP::Date' => '6',
                                       'HTTP::Headers::Util' => '6',
                                       'HTTP::Request' => '0',
-                                      'Time::Local' => '0',
                                       'locale' => '0',
                                       'perl' => '5.008001',
-                                      'strict' => '0',
-                                      'vars' => '0'
+                                      'strict' => '0'
                                     }
                     },
        'test' => {

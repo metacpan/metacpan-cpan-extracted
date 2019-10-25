@@ -4,8 +4,6 @@
 use strict;
 use warnings;
 
-$|=1;           # Flush STDOUT
-
 use App::ElasticSearch::Utilities qw(:all);
 use App::ElasticSearch::Utilities::Query;
 use App::ElasticSearch::Utilities::QueryString;
@@ -51,11 +49,15 @@ GetOptions(\%OPT, qw(
     top=s
     interval=s
     with=s@
+    or
 ));
 
 # Search string is the rest of the argument string
 my $context = $OPT{filter} ? 'filter' : 'must';
-my $qs = App::ElasticSearch::Utilities::QueryString->new( $OPT{filter} ? (qw(context filter)) : () );
+my $qs = App::ElasticSearch::Utilities::QueryString->new(
+            $OPT{filter} ?  (context => 'filter') : (),
+            default_join => $OPT{or} ? 'OR' : 'AND',
+);
 my $q = exists $OPT{'match-all'} && $OPT{'match-all'}
             ? App::ElasticSearch::Utilities::Query->new($context => { match_all => {} })
             : $qs->expand_query_string(@ARGV);
@@ -122,6 +124,9 @@ foreach my $index (sort by_index_age keys %indices) {
         $CONFIG{timestamp} ||= es_local_index_meta(timestamp => $index);
     }
 }
+
+# Set fields so we know how to construct complex aggs
+$q->fields_meta( \%FIELDS );
 
 #------------------------------------------------------------------------#
 # Figure out the timestamp
@@ -199,8 +204,6 @@ if( exists $OPT{missing} ) {
         $q->add_bool( must_not => { exists => { field => $field } } );
     }
 }
-my $DONE = 0;
-local $SIG{INT} = sub { $DONE=1 };
 
 my %SUPPORTED_AGGREGATIONS = map {$_=>'simple_value'} qw(cardinality sum min max avg);
 my $SUBAGG = undef;
@@ -319,8 +322,11 @@ my $age               = undef;
 my %last_batch_id     = ();
 my %AGGS_TOTALS       = ();
 my %AGES_SEEN         = ();
+# Handle CTRL+C During the Loop
+my $DONE              = 0;
+local $SIG{INT}       = sub { $DONE=1 };
 
-verbose({color=>'green'}, "= Query setup complete, beginning request.");
+verbose({color=>'green',level=>1}, "= Query setup complete, beginning request.");
 AGES: while( !$DONE && @AGES ) {
     # With --tail, we don't want to deplete @AGES
     $age = $OPT{tail} ? $AGES[0] : shift @AGES;
@@ -373,8 +379,7 @@ AGES: while( !$DONE && @AGES ) {
         output({stderr=>1,color=>'red'},
             "# Received an error from the cluster. $simple_error"
         );
-        last if $DONE;
-        next;
+        last;
     }
     $displayed_indices{$_} = 1 for @{ $by_age{$age} };
     $TOTAL_HITS += $result->{hits}{total} if $result->{hits}{total};
@@ -713,7 +718,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 7.3
+version 7.4
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+0.05
+  - Add POD documentation.
+  - Add 'Contributors && Kudos' section to documentation.
+  - Simplify dependencies blocks.
+  - Prevent 'build' dependencies to be installed for end-users.
+
 0.04
   - Prepare distribution to be released to CPAN.
 

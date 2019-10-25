@@ -122,3 +122,6 @@ Revision history for jQuery-File-Upload
 
 0.31
     Fixed license meta name. (@manwar)
+
+0.32
+    Added repo meta data. (@manwar)

@@ -8,41 +8,44 @@ with 'XML::NewsML_G2::Role::Writer';
 around '_build_g2_catalog_schemes' => sub {
     my ( $orig, $self, @args ) = @_;
     my $result = $self->$orig(@args);
-    $result->{rnd} = undef;
+    $result->{rnd}   = undef;
     $result->{colsp} = undef;
     return $result;
 };
 
 before '_create_authors' => sub {
-    my ($self, $root) = @_;
+    my ( $self, $root ) = @_;
 
-    if ($self->news_item->photographer) {
-        my $c = $self->_create_creator($self->news_item->photographer);
+    if ( $self->news_item->photographer ) {
+        my $c = $self->_create_creator( $self->news_item->photographer );
         $root->appendChild($c);
-        $self->scheme_manager->add_qcode($c, 'crol', 'photographer');
+        $self->scheme_manager->add_qcode( $c, 'crol', 'photographer' );
     }
     return;
 };
 
 after '_create_remote_content' => sub {
-    my ($self, $root, $picture) = @_;
+    my ( $self, $root, $picture ) = @_;
 
-    foreach (qw/size width height orientation/) {
+    return unless $picture->isa('XML::NewsML_G2::Picture');
+
+    foreach (qw/width height orientation/) {
         $root->setAttribute( $_, $picture->$_ ) if defined $picture->$_;
     }
 
     my $rendition =
-        $self->scheme_manager->build_qcode('rnd', $picture->rendition);
-    $root->setAttribute('rendition', $rendition) if $rendition;
+        $self->scheme_manager->build_qcode( 'rnd', $picture->rendition );
+    $root->setAttribute( 'rendition', $rendition ) if $rendition;
 
     my $colsp =
-        $self->scheme_manager->build_qcode('colsp', $picture->colorspace);
-    $root->setAttribute('colourspace', $colsp) if $colsp;
+        $self->scheme_manager->build_qcode( 'colsp', $picture->colorspace );
+    $root->setAttribute( 'colourspace', $colsp ) if $colsp;
 
-    if (my $altId=$picture->altId) {
-        $root->appendChild($self->create_element('altId', _text => $altId));
+    if ( my $altId = $picture->altId ) {
+        $root->appendChild(
+            $self->create_element( 'altId', _text => $altId ) );
     }
-
+    return;
 };
 
 1;

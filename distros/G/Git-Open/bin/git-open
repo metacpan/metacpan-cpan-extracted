@@ -19,7 +19,7 @@ git-open - wrapper for Git::Open
 
 =head1 VERSION
 
-version 0.1.11
+version 0.1.12
 
 =head1 AUTHOR
 

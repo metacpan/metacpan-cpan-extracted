@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::EventSeries;
 
-# ABSTRACT: A series of <a class="localLink" href="http://schema
+# ABSTRACT: A series of Event s
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,16 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::EventSeries - A series of <a class="localLink" href="http://schema
+SemanticWeb::Schema::EventSeries - A series of Event s
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A series of <a class="localLink" href="http://schema.org/Event">Event</a>s.
-Included events can relate with the series using the <a class="localLink"
+=for html <p>A series of <a class="localLink"
+href="http://schema.org/Event">Event</a>s. Included events can relate with
+the series using the <a class="localLink"
 href="http://schema.org/superEvent">superEvent</a> property.<br/><br/> An
 EventSeries is a collection of events that share some unifying
 characteristic. For example, "The Olympic Games" is a series, which is
@@ -58,7 +59,7 @@ without worrying about which kinds of series are really event-like enough
 to call an Event. In general an EventSeries may seem more Event-like when
 the period of time is compact and when aspects such as location are fixed,
 but it may also sometimes prove useful to describe a longer-term series as
-an Event.
+an Event.<p>
 
 =head1 SEE ALSO
 

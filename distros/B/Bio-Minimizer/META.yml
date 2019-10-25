@@ -30,4 +30,4 @@ requires:
   threads::shared: 0
 resources:
   repository: git://github.com/lskatz/Bio--Minimizer.git
-version: 0.6
+version: 0.8

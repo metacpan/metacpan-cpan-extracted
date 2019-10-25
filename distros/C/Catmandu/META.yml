@@ -3,6 +3,7 @@ abstract: 'a data toolkit'
 author:
   - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
 build_requires:
+  Capture::Tiny: '0'
   Log::Any::Adapter::Log4perl: '0'
   Log::Any::Test: '1.03'
   Log::Log4perl: '0'
@@ -80,7 +81,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu/issues
   homepage: https://github.com/LibreCat/Catmandu
   repository: https://github.com/LibreCat/Catmandu.git
-version: '1.2007'
+version: '1.2008'
 x_contributors:
   - 'Christian Pietsch <chr.pietsch+github@googlemail.com>'
   - 'Dave Sherohman <dsheroh@cpan.org>'

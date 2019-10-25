@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has publication_type => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::MedicalScholarlyArticle - A scholarly article in the medica
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -54,9 +54,9 @@ A scholarly article in the medical domain.
 
 C<publicationType>
 
-=for html The type of the medical article, taken from the US NLM MeSH publication
+=for html <p>The type of the medical article, taken from the US NLM MeSH publication
 type catalog. See also <a
-href="http://www.nlm.nih.gov/mesh/pubtypes.html">MeSH documentation</a>.
+href="http://www.nlm.nih.gov/mesh/pubtypes.html">MeSH documentation</a>.<p>
 
 A publication_type should be one of the following types:
 

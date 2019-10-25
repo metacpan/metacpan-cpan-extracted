@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has actor => (
@@ -122,7 +122,7 @@ SemanticWeb::Schema::CreativeWorkSeason - A media season e
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -162,8 +162,8 @@ A director should be one of the following types:
 
 C<endDate>
 
-=for html The end date and time of the item (in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+=for html <p>The end date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
 
 A end_date should be one of the following types:
 
@@ -260,8 +260,8 @@ A season_number should be one of the following types:
 
 C<startDate>
 
-=for html The start date and time of the item (in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+=for html <p>The start date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
 
 A start_date should be one of the following types:
 

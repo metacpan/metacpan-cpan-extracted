@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::User::Role;
-$Web::Authenticate::User::Role::VERSION = '0.012';
+$Web::Authenticate::User::Role::VERSION = '0.013';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::User object should contain.
 
@@ -21,7 +21,7 @@ Web::Authenticate::User::Role - A Mouse::Role that defines what methods a Web::A
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

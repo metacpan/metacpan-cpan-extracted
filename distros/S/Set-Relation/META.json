@@ -4,13 +4,13 @@
       "Darren Duncan <darren@DarrenDuncan.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "lgpl_3_0"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Set-Relation",
    "no_index" : {
@@ -23,36 +23,36 @@
       "build" : {
          "requires" : {
             "Carp::Always" : "0.01",
-            "ExtUtils::MakeMaker" : "6.17",
+            "ExtUtils::MakeMaker" : "6.03",
             "Test::Deep" : "0.106",
-            "Test::More" : "0.47"
+            "Test::More" : "0.92"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.17"
+            "ExtUtils::MakeMaker" : "6.03"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "1.01",
-            "List::Util" : "1.45",
+            "List::Util" : "1.4602",
             "Scalar::Util" : "1.13",
-            "perl" : "5.008001"
+            "perl" : "5.008000"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://www.muldis.com/",
+      "homepage" : "https://muldis.com",
       "license" : [
-         "http://www.fsf.org/licensing/licenses/lgpl.html"
+         "https://www.perlfoundation.org/artistic-license-20.html"
       ],
       "repository" : {
-         "url" : "http://github.com/muldis/Set-Relation"
+         "url" : "https://github.com/muldis/Set-Relation"
       },
       "x_MailingList" : "http://mm.darrenduncan.net/mailman/listinfo"
    },
-   "version" : "v0.13.1",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.13.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

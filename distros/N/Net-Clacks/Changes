@@ -1,5 +1,55 @@
-@  changeset:   79:bad7fa609ea7
+@  changeset:   89:64198b152bb3
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 17:00:16 2019 +0200
+|  summary:     Make examples clearer
+|
+o  changeset:   88:e2c7631b15cd
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 16:52:40 2019 +0200
+|  summary:     Bump version to 8
+|
+o  changeset:   87:6df4a26becfc
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 16:48:29 2019 +0200
+|  summary:     More fixes for disconnect handling
+|
+o  changeset:   86:54d46c6eff84
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 16:46:16 2019 +0200
+|  summary:     Updated docs
+|
+o  changeset:   85:cd2d5a46223e
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 14:57:28 2019 +0200
+|  summary:     POD, Perl::Critic
+|
+o  changeset:   84:0b441534fc26
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 14:42:55 2019 +0200
+|  summary:     Cleanup
+|
+o  changeset:   83:fcbeb8f6e4de
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 14:39:52 2019 +0200
+|  summary:     CLeanup
+|
+o  changeset:   82:ef94a24f951b
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 14:18:24 2019 +0200
+|  summary:     Better detection of closed sockets that lowers CPU usage
+|
+o  changeset:   81:cbb6df1315e5
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 13:50:51 2019 +0200
+|  summary:     Start supporting Unix Domain Sockets
+|
+o  changeset:   80:f4e1d4971868
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Oct 09 10:22:22 2019 +0200
+|  summary:     Release version 7
+|
+o  changeset:   79:bad7fa609ea7
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Wed Oct 09 10:21:31 2019 +0200
 |  summary:     Updated documentation in preparation for version 7 release

@@ -40,7 +40,7 @@ BEGIN
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.19';
+    $VERSION = '0.21';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -436,6 +436,7 @@ sub parseCSV()
     my ( $self, %parameters ) = @_;
     my $file           = $parameters{ file };
     my $sep_char       = $parameters{ sep_char } // ',';
+    my $quote_char     = $parameters{ quote_char } // '"';
     my $encoding       = $parameters{ encoding } // 'iso-8859-1';
     my $originalHeader = $parameters{ originalHeader };
     my $retorno        = { rows => undef, error => 0, message => undef, };
@@ -455,12 +456,14 @@ sub parseCSV()
 
         Text::CSV_XS->new(
             {
-                binary         => 1,
-                auto_diag      => 0,
-                diag_verbose   => 0,
-                blank_is_undef => 1,
-                empty_is_undef => 1,
-                sep_char       => $sep_char,
+                binary             => 1,
+                auto_diag          => 0,
+                diag_verbose       => 0,
+                blank_is_undef     => 1,
+                empty_is_undef     => 1,
+                allow_loose_quotes => 0,
+                sep_char           => $sep_char,
+                quote_char         => $quote_char,
             }
         );
 
@@ -487,6 +490,7 @@ sub parseCSV()
             #    return;
             #}
         );
+
         my @rows;
         open my $fh, "<:encoding($encoding)", $file or die "$file->{path}: $!";
 
@@ -495,12 +499,24 @@ sub parseCSV()
                 $fh,
                 {
                     detect_bom         => ( $encoding =~ /utf-8/i ) ? 1 : 0,
+                    sep_set            => [ $sep_char ],
                     munge_column_names => sub {
                         uc;
                     }
                 }
             );
         };
+
+        my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
+        if ( $cde > 0 )
+        {
+            $rec--;
+            undef @rows;
+            $retorno->{ error }   = $cde;
+            $retorno->{ message } = "$str @ rec $rec, pos $pos, field $fld";
+            return $retorno;
+        } ## end if ( $cde > 0 )
+        $retorno->{ header } = \@header;
 
         if ( $originalHeader )
         {
@@ -516,17 +532,6 @@ sub parseCSV()
                 $log->info( "*** Header validado com sucesso ***" );
             }
         } ## end if ( $originalHeader )
-
-        my ( $cde, $str, $pos, $rec, $fld ) = $csv->error_diag();
-        if ( $cde > 0 )
-        {
-            $rec--;
-            undef @rows;
-            $retorno->{ error }   = $cde;
-            $retorno->{ message } = "$str @ rec $rec, pos $pos, field $fld";
-            return $retorno;
-        } ## end if ( $cde > 0 )
-        $retorno->{ header } = \@header;
 
         while ( my $row = $csv->getline( $fh ) )
         {

@@ -1,11 +1,17 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::CopyrightYearFromGit - Set copyright year from git
 
+VERSION
+    This document describes version 0.006 of
+    Dist::Zilla::Plugin::CopyrightYearFromGit (from Perl distribution
+    Dist-Zilla-Plugin-CopyrightYearFromGit), released on 2019-10-24.
+
+SYNOPSIS
     In dist.ini:
 
      [CopyrightYearFromGit]
 
 DESCRIPTION
-
     This plugin will set copyright year to something like:
 
      2017, 2015, 2014, 2013
@@ -18,5 +24,47 @@ DESCRIPTION
 
      Copyright (c) 2013, 2010, 2008, 2006 by Pearson Education, Inc.
 
+CONFIGURATION
+  min_year
+    Instruct the plugin to not include years below this year. Note that the
+    current year will always be used, even though "min_year" is
+    (incorrectly) set to a value larger than the current year.
+
+  release_tag_regex
+    Specify a custom regular expression for matching git release tags.
+
+    An old alias "regex" is still recognized, but deprecated.
+
+  author_name_regex
+    Only consider release commits where author name matches this regex.
+
+  author_email_regex
+    Only consider release commits where author email matches this regex.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-CopyrightYearFromGit>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-CopyrightYearFromGi
+    t>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Cop
+    yrightYearFromGit>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

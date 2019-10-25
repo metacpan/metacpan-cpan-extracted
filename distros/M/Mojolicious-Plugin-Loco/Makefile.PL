@@ -29,13 +29,10 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "7.87"
   },
   "TEST_REQUIRES" => {
-    "Pod::Coverage::TrustPod" => 0,
     "Test::Fatal" => 0,
-    "Test::More" => 0,
-    "Test::Pod" => 0,
-    "Test::Pod::Coverage" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,11 +43,8 @@ my %FallbackPrereqs = (
   "Browser::Open" => 0,
   "File::ShareDir" => 0,
   "Mojolicious" => "7.87",
-  "Pod::Coverage::TrustPod" => 0,
   "Test::Fatal" => 0,
-  "Test::More" => 0,
-  "Test::Pod" => 0,
-  "Test::Pod::Coverage" => 0
+  "Test::More" => 0
 );
 
 

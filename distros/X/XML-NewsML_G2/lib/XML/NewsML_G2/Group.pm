@@ -5,13 +5,17 @@ use XML::NewsML_G2::News_Item;
 use namespace::autoclean;
 
 has 'role', isa => 'Str', is => 'ro', required => 1;
-has 'mode', isa => 'XML::NewsML_G2::Types::Group_Mode', is => 'rw', default => 'bag';
+has 'mode',
+    isa     => 'XML::NewsML_G2::Types::Group_Mode',
+    is      => 'rw',
+    default => 'bag';
 
-has 'items', isa =>
-    'ArrayRef[XML::NewsML_G2::News_Item|XML::NewsML_G2::Group]',
-    is => 'ro', default => sub {[]},
-    traits => ['Array'], handles => {add_item => 'push'};
-
+has 'items',
+    isa     => 'ArrayRef[XML::NewsML_G2::News_Item|XML::NewsML_G2::Group]',
+    is      => 'ro',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_item => 'push' };
 
 __PACKAGE__->meta->make_immutable;
 

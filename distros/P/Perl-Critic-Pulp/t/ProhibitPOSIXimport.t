@@ -31,7 +31,7 @@ require Perl::Critic::Policy::Modules::ProhibitPOSIXimport;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 96;
+my $want_version = 97;
 is ($Perl::Critic::Policy::Modules::ProhibitPOSIXimport::VERSION,
     $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::Modules::ProhibitPOSIXimport->VERSION,

@@ -4,35 +4,35 @@ use Test::Most;
 package ExactClassTest {
     use exact 'class';
     has answer => 42;
-};
+}
 
 package ExactClassTest::Role::Attack {
     use exact 'role';
     requires 'attack';
     has 'hp' => 100;
     sub attack { return 42 }
-};
+}
 
 package ExactClassTest::Role::Defend {
     use exact::role;
     has 'thac0' => -3;
-};
+}
 
 package ExactClassTest::Role::Pur {
     use exact::role;
     has 'happy' => 13;
-};
+}
 
 package ExactClassTest::Cat {
     use exact 'class';
     has 'name';
     with 'ExactClassTest::Role::Attack';
-};
+}
 
 package ExactClassTest::Cat::Role::Hiss {
     use exact 'role';
     has 'hiss_power' => 12;
-};
+}
 
 my $cat;
 lives_ok( sub { $cat = ExactClassTest::Cat->new }, 'new Cat' );

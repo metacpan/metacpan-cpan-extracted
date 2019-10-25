@@ -85,7 +85,7 @@ my $thread;
 
 print_it($F, ' ', '00FFFFFF');
 $F->{'SPLASH'} = $splash;
-$F->splash($VERSION) unless ($nosplash);
+$F->splash($Graphics::Framebuffer::VERSION) unless ($nosplash);
 
 my $benchmark;
 

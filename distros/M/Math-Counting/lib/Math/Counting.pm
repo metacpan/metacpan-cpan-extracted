@@ -2,7 +2,7 @@ package Math::Counting;
 our $AUTHORITY = 'cpan:GENE';
 # ABSTRACT: Combinatorial counting operations
 
-our $VERSION = '0.1305';
+our $VERSION = '0.1306';
 
 use strict;
 use warnings;
@@ -129,7 +129,7 @@ Math::Counting - Combinatorial counting operations
 
 =head1 VERSION
 
-version 0.1305
+version 0.1306
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,7 @@ B<Higher Order Perl> by Mark Jason Dominus
 B<Mastering Algorithms with Perl> by Orwant, Hietaniemi & Macdonald
 (L<http://www.oreilly.com/catalog/maperl>).
 
-L<http://en.wikipedia.org/wiki/Factorial>, 
+L<http://en.wikipedia.org/wiki/Factorial>,
 L<http://en.wikipedia.org/wiki/Permutation> &
 L<http://en.wikipedia.org/wiki/Combination>
 
@@ -247,15 +247,12 @@ take your pick:
 L<Algorithm::Combinatorics>,
 L<Algorithm::Loops>,
 L<Algorithm::Permute>,
-L<CM::Group::Sym>,
-L<CM::Permutation>,
 L<Games::Word>,
 L<List::Permutor>,
 L<Math::Combinatorics>,
 L<Math::GSL::Permutation>,
 L<Math::Permute::List>,
-L<String::Glob::Permute>,
-L<String::OrderedCombination>
+L<String::Glob::Permute>
 
 =head1 CREDITS
 

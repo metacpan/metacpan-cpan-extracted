@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has spoken_by_character => (
@@ -42,17 +42,17 @@ SemanticWeb::Schema::Quotation - A quotation
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A quotation. Often but not necessarily from some written work, attributable
-to a real world author and - if associated with a fictional character - to
-any fictional Person. Use <a class="localLink"
+=for html <p>A quotation. Often but not necessarily from some written work,
+attributable to a real world author and - if associated with a fictional
+character - to any fictional Person. Use <a class="localLink"
 href="http://schema.org/isBasedOn">isBasedOn</a> to link to source/origin.
 The <a class="localLink" href="http://schema.org/recordedIn">recordedIn</a>
 property can be used to reference a Quotation from an <a class="localLink"
-href="http://schema.org/Event">Event</a>.
+href="http://schema.org/Event">Event</a>.<p>
 
 =head1 ATTRIBUTES
 

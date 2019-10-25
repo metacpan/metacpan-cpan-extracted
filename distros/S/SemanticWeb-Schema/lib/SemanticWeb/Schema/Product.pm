@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has additional_property => (
@@ -338,7 +338,7 @@ SemanticWeb::Schema::Product - Any offered product or service
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -352,14 +352,14 @@ online.
 
 C<additionalProperty>
 
-=for html A property-value pair representing an additional characteristics of the
+=for html <p>A property-value pair representing an additional characteristics of the
 entitity, e.g. a product feature or another characteristic for which there
 is no matching property in schema.org.<br/><br/> Note: Publishers should be
 aware that applications designed to use specific schema.org properties
 (e.g. http://schema.org/width, http://schema.org/color,
 http://schema.org/gtin13, ...) will typically expect such data to be
 provided using those properties, rather than using the generic
-property/value mechanism.
+property/value mechanism.<p>
 
 A additional_property should be one of the following types:
 
@@ -480,7 +480,7 @@ A depth should be one of the following types:
 
 =head2 C<gtin>
 
-=for html A Global Trade Item Number (<a
+=for html <p>A Global Trade Item Number (<a
 href="https://www.gs1.org/standards/id-keys/gtin">GTIN</a>). GTINs identify
 trade items, including products and services, using numeric identification
 codes. The <a class="localLink" href="http://schema.org/gtin">gtin</a>
@@ -501,7 +501,7 @@ href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1's GTIN
 Summary</a> and <a
 href="https://en.wikipedia.org/wiki/Global_Trade_Item_Number">Wikipedia</a>
 for more details. Left-padding of the gtin values is not required or
-encouraged.
+encouraged.<p>
 
 A gtin should be one of the following types:
 
@@ -513,11 +513,12 @@ A gtin should be one of the following types:
 
 =head2 C<gtin12>
 
-=for html The GTIN-12 code of the product, or the product to which the offer refers.
-The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C.
-Company Prefix, Item Reference, and Check Digit used to identify trade
-items. See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1
-GTIN Summary</a> for more details.
+=for html <p>The GTIN-12 code of the product, or the product to which the offer
+refers. The GTIN-12 is the 12-digit GS1 Identification Key composed of a
+U.P.C. Company Prefix, Item Reference, and Check Digit used to identify
+trade items. See <a
+href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
+Summary</a> for more details.<p>
 
 A gtin12 should be one of the following types:
 
@@ -529,12 +530,12 @@ A gtin12 should be one of the following types:
 
 =head2 C<gtin13>
 
-=for html The GTIN-13 code of the product, or the product to which the offer refers.
-This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit
-UPC codes can be converted into a GTIN-13 code by simply adding a
+=for html <p>The GTIN-13 code of the product, or the product to which the offer
+refers. This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former
+12-digit UPC codes can be converted into a GTIN-13 code by simply adding a
 preceeding zero. See <a
 href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+Summary</a> for more details.<p>
 
 A gtin13 should be one of the following types:
 
@@ -546,9 +547,9 @@ A gtin13 should be one of the following types:
 
 =head2 C<gtin14>
 
-=for html The GTIN-14 code of the product, or the product to which the offer refers.
-See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+=for html <p>The GTIN-14 code of the product, or the product to which the offer
+refers. See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1
+GTIN Summary</a> for more details.<p>
 
 A gtin14 should be one of the following types:
 
@@ -560,11 +561,12 @@ A gtin14 should be one of the following types:
 
 =head2 C<gtin8>
 
-=for html The <a href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-8.aspx">GTIN-8</a>
-code of the product, or the product to which the offer refers. This code is
-also known as EAN/UCC-8 or 8-digit EAN. See <a
+=for html <p>The <a
+href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-8.aspx">GTIN-8</a> code
+of the product, or the product to which the offer refers. This code is also
+known as EAN/UCC-8 or 8-digit EAN. See <a
 href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+Summary</a> for more details.<p>
 
 A gtin8 should be one of the following types:
 
@@ -752,10 +754,10 @@ A mpn should be one of the following types:
 
 =head2 C<nsn>
 
-=for html Indicates the <a
+=for html <p>Indicates the <a
 href="https://en.wikipedia.org/wiki/NATO_Stock_Number">NATO stock
 number</a> (nsn) of a <a class="localLink"
-href="http://schema.org/Product">Product</a>.
+href="http://schema.org/Product">Product</a>.<p>
 
 A nsn should be one of the following types:
 
@@ -783,8 +785,8 @@ A offers should be one of the following types:
 
 C<productID>
 
-=for html The product identifier, such as ISBN. For example: <code>meta
-itemprop="productID" content="isbn:123-456-789"</code>.
+=for html <p>The product identifier, such as ISBN. For example: <code>meta
+itemprop="productID" content="isbn:123-456-789"</code>.<p>
 
 A product_id should be one of the following types:
 

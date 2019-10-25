@@ -39,8 +39,8 @@
             "schema:BroadcastChannel"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:BroadcastFrequencySpecification"
+            "schema:BroadcastFrequencySpecification",
+            "schema:Text"
          ]
       },
       "schema:broadcastTimezone" : {
@@ -79,8 +79,8 @@
          "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
-            "schema:BroadcastEvent",
             "schema:BroadcastService",
+            "schema:BroadcastEvent",
             "schema:ScreeningEvent"
          ],
          "schema:rangeIncludes" : "schema:Text"

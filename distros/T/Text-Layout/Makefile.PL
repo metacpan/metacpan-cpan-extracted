@@ -1,9 +1,11 @@
+#! perl
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = MM->parse_version($master);
+my $version = "0.013";
 $master =~ s;/Version;;;
 
 WriteMakefile(
@@ -19,7 +21,7 @@ WriteMakefile(
      'Test::More' => 0,
  },
  TEST_REQUIRES  => {
-		    'PDF::API2'  => 2.020,
+		    'PDF::API2'  => 2.036,
 		   },
  META_MERGE => {
    resources    => {
@@ -38,31 +40,15 @@ WriteMakefile(
 	 "Text::Layout"
 		  => { file => "lib/Text/Layout.pm",
 		       version => $version },
-	 "Text::Layout::Pango"
-		  => { file => "lib/Text/Pango.pm",
-		       version => $version },
-	 "Text::Layout::Cairo"
-		  => { file => "lib/Text/Cairo.pm",
-		       version => $version },
-	 "Text::Layout::PDFAPI2"
-		  => { file => "lib/Text/PDFAPI2.pm",
-		       version => $version },
-	 "Text::Layout::Markdown"
-		  => { file => "lib/Text/Markdown.pm",
-		       version => $version },
-	 "Text::Layout::FontConfig"
-		  => { file => "lib/Text/FontConfig.pm",
-		       version => $version },
-	 "Text::Layout::FontDescriptor"
-		  => { file => "lib/Text/FontDescriptor.pm",
-		       version => $version },
      },
+
      no_index => {
-         file => [
-	    "lib/App/Music/ChordPro/Version.pm",
-	 ],
+#         file => [
+#	    "lib/Text/Layout/Version.pm",
+#	 ],
          directory => [
 	    "tests",
+	    "lib/Text/Layout",
 	 ],
      },
  }

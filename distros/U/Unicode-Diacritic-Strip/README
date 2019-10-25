@@ -12,7 +12,7 @@
                                                                 |_|    
 
 
-This is the README for Unicode::Diacritic::Strip version 0.11.
+This is the README for Unicode::Diacritic::Strip version 0.13.
 
 Unicode::Diacritic::Strip is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -33,25 +33,23 @@ document contains four sections:
 Unicode::Diacritic::Strip - strip diacritics from Unicode text
 
 This module offers two ways to remove diacritics from Unicode
-text. One of them, "strip_diacritics", uses the unicode
+text. One of them, "strip_diacritics", uses the Unicode
 decompositions to break the characters down. The other one,
-"fast_strip", is a faster alternative, which is basically "tr" with
-a big list of alphabetical characters with and without
-diacritics. There is also "strip_alphabet", which is the same as
-"strip_diacritics", but it also returns a list of what characters
-were changed.
+"fast_strip", is a faster alternative based on a hash of
+alphabetical characters with and without diacritics. There is also
+"strip_alphabet", which is the same as "strip_diacritics", but it
+also returns a list of what characters were changed.
 
 -----------------------------------------------------------------------------
 
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Unicode::Diacritic::Strip
     * http://metacpan.org/release/Unicode-Diacritic-Strip
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -73,10 +71,10 @@ If you have the App::cpanminus installer, you may prefer
     cpanm Unicode::Diacritic::Strip
 
 To install the module from the source file,
-Unicode-Diacritic-Strip-0.11.tar.gz, follow this sequence of commands:
+Unicode-Diacritic-Strip-0.13.tar.gz, follow this sequence of commands:
 
-    tar xfz Unicode-Diacritic-Strip-0.11.tar.gz
-    cd Unicode-Diacritic-Strip-0.11
+    tar xfz Unicode-Diacritic-Strip-0.13.tar.gz
+    cd Unicode-Diacritic-Strip-0.13
     perl Makefile.PL
     make
     make install
@@ -101,6 +99,6 @@ the public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Sep 10 14:47:08 2018.
+This README was written on Mon Oct 21 14:27:23 2019.
 
 -----------------------------------------------------------------------------

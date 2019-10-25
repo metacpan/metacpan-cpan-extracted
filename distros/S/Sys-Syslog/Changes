@@ -1,5 +1,12 @@
 Revision history for Sys-Syslog
 
+0.36 -- 2019-10-22 -- Sebastien Aperghis-Tramoni (SAPER)
+
+  [Tests]
+  - RT #127454 / GitHub PR #8: Intermittent failures on OpenBSD and other
+    platforms (Jim Keenan).
+
+
 0.35 -- 2016-09-01 -- Sebastien Aperghis-Tramoni (SAPER)
 
   [Security]

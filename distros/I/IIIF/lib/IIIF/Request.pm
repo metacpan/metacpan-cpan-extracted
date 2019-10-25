@@ -1,7 +1,7 @@
 package IIIF::Request;
 use 5.014001;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Plack::Util::Accessor qw(region size rotation quality format);
 use Carp qw(croak);

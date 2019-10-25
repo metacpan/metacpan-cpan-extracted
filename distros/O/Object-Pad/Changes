@@ -1,5 +1,27 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.06    2019-10-23
+        [CHANGES]
+         * First attempt at `has $slot = DEFAULT` expressions. Only accepts
+           compiletime constants and only on scalar slots
+
+0.05    2019-10-20
+        [CHANGES]
+         * Implement single-inheriance subclassing
+
+0.04    2019-10-19
+        [CHANGES]
+         * Croak on attempts to invoke methods on non-instances, non-derived
+           classes, etc...
+         * Support perls back to 5.16 by various trickery
+         * Store array and hash slot variables via RV so the instances are
+           well-behaved as perl data structures
+
+0.03    2019-10-18
+        [CHANGES]
+         * Implement sub signatures
+         * Apply automatic pragmata - strict, warnings, -indirect
+
 0.02    2019-10-17
         [CHANGES]
          * `method name :lvalue` and (maybe) other attributes

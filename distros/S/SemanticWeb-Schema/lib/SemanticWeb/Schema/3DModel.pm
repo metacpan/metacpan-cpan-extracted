@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,11 +34,11 @@ SemanticWeb::Schema::3DModel - A 3D model represents some kind of 3D content
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A 3D model represents some kind of 3D content, which may have <a
+=for html <p>A 3D model represents some kind of 3D content, which may have <a
 class="localLink" href="http://schema.org/encoding">encoding</a>s in one or
 more <a class="localLink"
 href="http://schema.org/MediaObject">MediaObject</a>s. Many 3D formats are
@@ -54,7 +54,7 @@ single file published after Zip compression, the convention of appending
 href="http://schema.org/encodingFormat">encodingFormat</a> can be used.
 Geospatial, AR/VR, artistic/animation, gaming, engineering and scientific
 content can all be represented using <a class="localLink"
-href="http://schema.org/3DModel">3DModel</a>.
+href="http://schema.org/3DModel">3DModel</a>.<p>
 
 =head1 SEE ALSO
 

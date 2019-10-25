@@ -78,6 +78,38 @@ sub get_skills {
     return $self->client()->get("/profiles/v1/metadata/skills");
 }
 
+=item get_skills_v2
+
+    Get skills V2
+
+B<Return value>
+
+    JSON response as a string
+
+=cut
+
+sub get_skills_v2 {
+    my $self = shift;
+
+    return $self->client()->get("/profiles/v2/metadata/skills");
+}
+
+=item get_specialties
+
+    Get specialties
+
+B<Return value>
+
+    JSON response as a string
+
+=cut
+
+sub get_specialties {
+    my $self = shift;
+
+    return $self->client()->get("/profiles/v1/metadata/specialties");
+}
+
 =item get_regions
 
     Get regions

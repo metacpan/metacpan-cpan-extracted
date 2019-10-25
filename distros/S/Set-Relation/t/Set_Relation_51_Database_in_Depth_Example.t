@@ -3,13 +3,13 @@
 # This is trying to use the running example data from
 # "Database in Depth" by C.J. Date.
 
-use 5.008001;
+use 5.008000;
 use utf8;
 use strict;
 use warnings;
 use Carp::Always 0.01;
 
-use Test::More 0.47;
+use Test::More 0.92;
 use Test::Deep 0.106;
 
 my $sr_class_name;
@@ -295,4 +295,4 @@ my @shipment_tuples =
 
 ###########################################################################
 
-1; # Magic true value required at end of a reusable file's code.
+1;

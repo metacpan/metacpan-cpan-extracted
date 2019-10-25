@@ -1,0 +1,34 @@
+---
+abstract: 'An app generator for Mojolicious providing app skeletons with automake infrastructure.'
+author:
+  - 'Tobias Oetiker <tobi@oetiker.ch>'
+build_requires:
+  CPAN::Uploader: '0'
+  Devel::Confess: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-Author-generate-automake_app
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - example
+    - setup
+    - lib/Mojolicious/Command/Author/generate/automake_app
+    - lib/Mojolicious/Command/Author/generate/callbackery_app
+requires:
+  Mojolicious: '8'
+  perl: '5.024001'
+resources:
+  bugtracker: https://github.com/oposs/mojolicious-automake/issues
+  license: http://opensource.org/licenses/MIT
+  repository: https://github.com/oposs/mojolicious-automake
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has end_date => (
@@ -66,18 +66,19 @@ SemanticWeb::Schema::Role - Represents additional information about a relationsh
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html Represents additional information about a relationship or property. For
+=for html <p>Represents additional information about a relationship or property. For
 example a Role can be used to say that a 'member' role linking some
 SportsTeam to a player occurred during a particular time period. Or that a
 Person's 'actor' role in a Movie was for some particular characterName.
 Such properties can be attached to a Role entity, which is then associated
 with the main entities using ordinary properties like 'member' or
 'actor'.<br/><br/> See also <a
-href="http://blog.schema.org/2014/06/introducing-role.html">blog post</a>.
+href="http://blog.schema.org/2014/06/introducing-role.html">blog
+post</a>.<p>
 
 =head1 ATTRIBUTES
 
@@ -85,8 +86,8 @@ href="http://blog.schema.org/2014/06/introducing-role.html">blog post</a>.
 
 C<endDate>
 
-=for html The end date and time of the item (in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+=for html <p>The end date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
 
 A end_date should be one of the following types:
 
@@ -133,8 +134,8 @@ A role_name should be one of the following types:
 
 C<startDate>
 
-=for html The start date and time of the item (in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+=for html <p>The start date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).<p>
 
 A start_date should be one of the following types:
 

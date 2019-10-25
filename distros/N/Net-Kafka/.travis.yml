@@ -1,0 +1,26 @@
+language: "perl"
+perl:
+  - "5.22"
+  - "5.26"
+  - "5.28"
+  - "5.30"
+sudo: required
+env:
+  - KAFKA_VERSION=2.3.0 LIBRDKAFKA_VERSION=1.1.0~1confluent5.3.1-1 KAFKA_BOOTSTRAP_SERVERS=localhost:9092 KAFKA_TEST_TOPIC=test KAFKA_TEST_TOPIC_PARTITIONS=8 KAFKA_CONSUMER_GROUP_PREFIX=net-kafka
+before_install:
+  - wget -qO - https://packages.confluent.io/deb/5.3/archive.key | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://packages.confluent.io/deb/5.3 stable main"
+  - sudo apt-get update -q
+  - sudo apt-get install librdkafka-dev=$LIBRDKAFKA_VERSION
+  - mkdir kafka && cd kafka
+  - curl "https://www.apache.org/dist/kafka/$KAFKA_VERSION/kafka_2.12-$KAFKA_VERSION.tgz" -o kafka.tgz
+  - tar -xvzf kafka.tgz --strip 1
+  - echo -e "\nauto.create.topics.enable=false" >> config/server.properties
+  - bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+  - bin/kafka-server-start.sh -daemon config/server.properties
+  - bin/kafka-topics.sh --create --bootstrap-server $KAFKA_BOOTSTRAP_SERVERS --replication-factor 1 --partitions $KAFKA_TEST_TOPIC_PARTITIONS --topic $KAFKA_TEST_TOPIC
+  - bin/kafka-topics.sh --list --bootstrap-server $KAFKA_BOOTSTRAP_SERVERS
+  - cd ../
+  - cpanm ExtUtils::PkgConfig
+install:
+  - cpanm -v --installdeps --notest .

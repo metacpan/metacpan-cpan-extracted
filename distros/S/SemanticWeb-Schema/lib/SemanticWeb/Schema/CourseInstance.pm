@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::CourseInstance;
 
-# ABSTRACT: An instance of a <a class="localLink" href="http://schema
+# ABSTRACT: An instance of a Course which is distinct from other instances because it is offered at a different time or location or through different media or modes of study or to a specific section of students.
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has course_mode => (
@@ -54,18 +54,18 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CourseInstance - An instance of a <a class="localLink" href="http://schema
+SemanticWeb::Schema::CourseInstance - An instance of a Course which is distinct from other instances because it is offered at a different time or location or through different media or modes of study or to a specific section of students.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An instance of a <a class="localLink"
+=for html <p>An instance of a <a class="localLink"
 href="http://schema.org/Course">Course</a> which is distinct from other
 instances because it is offered at a different time or location or through
-different media or modes of study or to a specific section of students.
+different media or modes of study or to a specific section of students.<p>
 
 =head1 ATTRIBUTES
 
@@ -106,9 +106,9 @@ A course_workload should be one of the following types:
 
 =head2 C<instructor>
 
-=for html A person assigned to instruct or provide instructional assistance for the
-<a class="localLink"
-href="http://schema.org/CourseInstance">CourseInstance</a>.
+=for html <p>A person assigned to instruct or provide instructional assistance for
+the <a class="localLink"
+href="http://schema.org/CourseInstance">CourseInstance</a>.<p>
 
 A instructor should be one of the following types:
 

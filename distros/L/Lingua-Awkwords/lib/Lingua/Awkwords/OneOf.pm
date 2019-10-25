@@ -13,7 +13,7 @@ use Math::Random::Discrete;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $DEFAULT_WEIGHT = 1;
 

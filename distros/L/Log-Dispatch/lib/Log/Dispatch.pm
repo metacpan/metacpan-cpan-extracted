@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.68';
+our $VERSION = '2.69';
 
 use Carp ();
 use Log::Dispatch::Types;
@@ -306,7 +306,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 =head1 VERSION
 
-version 2.68
+version 2.69
 
 =head1 SYNOPSIS
 
@@ -718,7 +718,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Ollis Gregory Oschwald hartzell Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Michael Schout Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Sergey Leschenko Slaven Rezic Steve Bertrand Whitney Jackson
+=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Knop Ollis Gregory Oschwald hartzell Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Michael Schout Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Sergey Leschenko Slaven Rezic Steve Bertrand Whitney Jackson
 
 =over 4
 
@@ -733,6 +733,10 @@ Carsten Grohmann <mail@carstengrohmann.de>
 =item *
 
 Doug Bell <doug@preaction.me>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 
@@ -814,7 +818,7 @@ Whitney Jackson <whitney.jackson@baml.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

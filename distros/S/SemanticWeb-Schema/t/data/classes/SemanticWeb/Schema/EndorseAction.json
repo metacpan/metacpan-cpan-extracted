@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : "schema:EndorseAction",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

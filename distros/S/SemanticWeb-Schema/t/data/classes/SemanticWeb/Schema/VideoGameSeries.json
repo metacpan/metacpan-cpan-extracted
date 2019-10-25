@@ -12,16 +12,16 @@
          "rdfs:label" : "actor",
          "schema:domainIncludes" : [
             "schema:MovieSeries",
-            "schema:TVSeries",
-            "schema:RadioSeries",
-            "schema:CreativeWorkSeason",
-            "schema:VideoObject",
-            "schema:Episode",
-            "schema:Movie",
-            "schema:Clip",
             "schema:VideoGameSeries",
+            "schema:Episode",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:TVSeries",
             "schema:VideoGame",
-            "schema:Event"
+            "schema:VideoObject",
+            "schema:Event",
+            "schema:CreativeWorkSeason",
+            "schema:Clip"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -30,15 +30,15 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actors",
          "schema:domainIncludes" : [
-            "schema:MovieSeries",
+            "schema:VideoGame",
+            "schema:Clip",
             "schema:TVSeries",
-            "schema:VideoObject",
-            "schema:RadioSeries",
             "schema:Episode",
+            "schema:MovieSeries",
             "schema:Movie",
             "schema:VideoGameSeries",
-            "schema:VideoGame",
-            "schema:Clip"
+            "schema:VideoObject",
+            "schema:RadioSeries"
          ],
          "schema:rangeIncludes" : "schema:Person",
          "schema:supersededBy" : "schema:actor"
@@ -58,8 +58,8 @@
          "rdfs:comment" : "Cheat codes to the game.",
          "rdfs:label" : "cheatCode",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:VideoGame"
+            "schema:VideoGame",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:CreativeWork"
       },
@@ -69,9 +69,9 @@
          "rdfs:label" : "containsSeason",
          "rdfs:subPropertyOf" : "schema:hasPart",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
             "schema:RadioSeries",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:CreativeWorkSeason"
       },
@@ -80,17 +80,17 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "director",
          "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:MovieSeries",
+            "schema:TVSeries",
             "schema:VideoGame",
+            "schema:RadioSeries",
             "schema:VideoObject",
             "schema:Movie",
-            "schema:Event",
-            "schema:CreativeWorkSeason",
-            "schema:Clip",
-            "schema:TVSeries",
-            "schema:MovieSeries",
-            "schema:Episode",
             "schema:VideoGameSeries",
-            "schema:RadioSeries"
+            "schema:Episode",
+            "schema:CreativeWorkSeason",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -99,15 +99,15 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video games etc. content. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "directors",
          "schema:domainIncludes" : [
+            "schema:VideoObject",
             "schema:Episode",
             "schema:MovieSeries",
             "schema:VideoGame",
-            "schema:RadioSeries",
-            "schema:VideoObject",
-            "schema:Movie",
             "schema:Clip",
             "schema:TVSeries",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:RadioSeries",
+            "schema:Movie"
          ],
          "schema:rangeIncludes" : "schema:Person",
          "schema:supersededBy" : "schema:director"
@@ -118,9 +118,9 @@
          "rdfs:label" : "episode",
          "rdfs:subPropertyOf" : "schema:hasPart",
          "schema:domainIncludes" : [
-            "schema:RadioSeries",
-            "schema:VideoGameSeries",
             "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:RadioSeries",
             "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:Episode"
@@ -130,10 +130,10 @@
          "rdfs:comment" : "An episode of a TV/radio series or season.",
          "rdfs:label" : "episodes",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
             "schema:VideoGameSeries",
             "schema:TVSeries",
-            "schema:RadioSeries"
+            "schema:RadioSeries",
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:Episode",
          "schema:supersededBy" : "schema:episode"
@@ -153,13 +153,13 @@
          "rdfs:comment" : "Real or fictional location of the game (or part of game).",
          "rdfs:label" : "gameLocation",
          "schema:domainIncludes" : [
-            "schema:Game",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:Game"
          ],
          "schema:rangeIncludes" : [
-            "schema:PostalAddress",
+            "schema:URL",
             "schema:Place",
-            "schema:URL"
+            "schema:PostalAddress"
          ]
       },
       "schema:gamePlatform" : {
@@ -167,8 +167,8 @@
          "rdfs:comment" : "The electronic systems used to play <a href=\"http://en.wikipedia.org/wiki/Category:Video_game_platforms\">video games</a>.",
          "rdfs:label" : "gamePlatform",
          "schema:domainIncludes" : [
-            "schema:VideoGame",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:VideoGame"
          ],
          "schema:rangeIncludes" : [
             "schema:Thing",
@@ -181,19 +181,19 @@
          "rdfs:comment" : "The composer of the soundtrack.",
          "rdfs:label" : "musicBy",
          "schema:domainIncludes" : [
-            "schema:Episode",
             "schema:MovieSeries",
             "schema:VideoObject",
+            "schema:VideoGame",
             "schema:TVSeries",
-            "schema:RadioSeries",
-            "schema:Clip",
-            "schema:VideoGameSeries",
             "schema:Movie",
-            "schema:VideoGame"
+            "schema:VideoGameSeries",
+            "schema:Episode",
+            "schema:RadioSeries",
+            "schema:Clip"
          ],
          "schema:rangeIncludes" : [
-            "schema:MusicGroup",
-            "schema:Person"
+            "schema:Person",
+            "schema:MusicGroup"
          ]
       },
       "schema:numberOfEpisodes" : {
@@ -201,9 +201,9 @@
          "rdfs:comment" : "The number of episodes in this season or series.",
          "rdfs:label" : "numberOfEpisodes",
          "schema:domainIncludes" : [
+            "schema:VideoGameSeries",
             "schema:RadioSeries",
             "schema:TVSeries",
-            "schema:VideoGameSeries",
             "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:Integer"
@@ -213,8 +213,8 @@
          "rdfs:comment" : "Indicate how many people can play this game (minimum, maximum, or range).",
          "rdfs:label" : "numberOfPlayers",
          "schema:domainIncludes" : [
-            "schema:Game",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:Game"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -223,9 +223,9 @@
          "rdfs:comment" : "The number of seasons in this series.",
          "rdfs:label" : "numberOfSeasons",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
             "schema:TVSeries",
-            "schema:RadioSeries"
+            "schema:RadioSeries",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:Integer"
       },
@@ -234,8 +234,8 @@
          "rdfs:comment" : "Indicates whether this game is multi-player, co-op or single-player.  The game can be marked as multi-player, co-op and single-player at the same time.",
          "rdfs:label" : "playMode",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:VideoGame"
+            "schema:VideoGame",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:GamePlayMode"
       },
@@ -244,14 +244,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:Movie",
             "schema:MediaObject",
-            "schema:Episode",
+            "schema:MovieSeries",
             "schema:RadioSeries",
-            "schema:CreativeWorkSeason",
             "schema:TVSeries",
-            "schema:MovieSeries"
+            "schema:CreativeWorkSeason",
+            "schema:Episode",
+            "schema:VideoGameSeries",
+            "schema:Movie"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -271,9 +271,9 @@
          "rdfs:label" : "season",
          "rdfs:subPropertyOf" : "schema:hasPart",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
+            "schema:VideoGameSeries",
             "schema:RadioSeries",
-            "schema:VideoGameSeries"
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:CreativeWorkSeason",
          "schema:supersededBy" : "schema:containsSeason"
@@ -283,9 +283,9 @@
          "rdfs:comment" : "A season in a media series.",
          "rdfs:label" : "seasons",
          "schema:domainIncludes" : [
+            "schema:RadioSeries",
             "schema:VideoGameSeries",
-            "schema:TVSeries",
-            "schema:RadioSeries"
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:CreativeWorkSeason",
          "schema:supersededBy" : "schema:season"
@@ -295,14 +295,14 @@
          "rdfs:comment" : "The trailer of a movie or tv/radio series, season, episode, etc.",
          "rdfs:label" : "trailer",
          "schema:domainIncludes" : [
-            "schema:MovieSeries",
-            "schema:TVSeries",
-            "schema:CreativeWorkSeason",
-            "schema:RadioSeries",
-            "schema:Episode",
-            "schema:Movie",
+            "schema:VideoGame",
             "schema:VideoGameSeries",
-            "schema:VideoGame"
+            "schema:TVSeries",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:CreativeWorkSeason",
+            "schema:Episode"
          ],
          "schema:rangeIncludes" : "schema:VideoObject"
       }

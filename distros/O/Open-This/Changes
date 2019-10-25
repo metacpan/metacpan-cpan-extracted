@@ -1,5 +1,10 @@
 Revision history for Open-This
 
+0.000022  2019-10-24 01:53:11Z
+    - Avoid false positives when testing URLs (GH#27) (José Joaquín Atria)
+    - Avoid calling is_module_name twice in parse_text (GH#28) (José Joaquín Atria)
+    - Make sure we don't require modules to find them (GH#26) (José Joaquín Atria)
+
 0.000021  2019-08-25 17:11:12Z
     - Use Module::Util to find modules without requiring them (GH#24) (José Joaquín Atria)
 

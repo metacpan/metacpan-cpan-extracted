@@ -775,9 +775,23 @@ All functionality listed here is highly experimental and should be used with gre
 
         DBI->connect('dbi:Mock:MySQL', '', '');
 
+    Or, by using the database name if using driver DSNs:
+
+        DBI->connect('dbi:Mock:host=localhost;port=3306;database=MySQL', '', '');
+
     The 'MySQL' in the DSN will be picked up and the MySQL specific attribute aliasing will be used.
 
-    Right now only MySQL is supported by this feature, and even that support is very minimal. Currently the MySQL `$dbh` and `$sth` attributes 'mysql\_insertid' are aliased to the `$dbh` attribute 'mock\_last\_insert\_id'. It is possible to add more aliases though, using the `DBD::Mock:_set_mock_attribute_aliases` function (see the source code for details).
+    Right now there is only minimal support for MySQL and MariaDB:
+
+    - MySQL
+
+        Currently the 'mysql\_insertid' attribute for `$dbh` and `$sth` are aliased to the `$dbh` attribute 'mock\_last\_insert\_id'.
+
+    - MariaDB
+
+        Currently the 'mariadb\_insertid' attribute for `$dbh` and `$sth` are aliased to the `$dbh` attribute 'mock\_last\_insert\_id'.
+
+    It is possible to add more aliases though, using the `DBD::Mock:_set_mock_attribute_aliases` function (see the source code for details)
 
 - Connection Callbacks
 

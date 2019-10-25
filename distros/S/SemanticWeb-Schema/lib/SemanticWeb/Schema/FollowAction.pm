@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has followee => (
@@ -42,11 +42,11 @@ SemanticWeb::Schema::FollowAction - The act of forming a personal connection wit
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of forming a personal connection with someone/something (object)
+=for html <p>The act of forming a personal connection with someone/something (object)
 unidirectionally/asymmetrically to get updates polled from.<br/><br/>
 Related actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/BefriendAction">BefriendAction</a>: Unlike
@@ -65,7 +65,7 @@ the object.</li> <li><a class="localLink"
 href="http://schema.org/TrackAction">TrackAction</a>: Unlike TrackAction,
 FollowAction refers to the polling of updates of all aspects of animate
 objects rather than the location of inanimate objects (e.g. you track a
-package, but you don't follow it).</li> </ul> 
+package, but you don't follow it).</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

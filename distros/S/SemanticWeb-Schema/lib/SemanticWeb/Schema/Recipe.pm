@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has cook_time => (
@@ -114,15 +114,15 @@ SemanticWeb::Schema::Recipe - A recipe
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A recipe. For dietary restrictions covered by the recipe, a few common
+=for html <p>A recipe. For dietary restrictions covered by the recipe, a few common
 restrictions are enumerated via <a class="localLink"
 href="http://schema.org/suitableForDiet">suitableForDiet</a>. The <a
 class="localLink" href="http://schema.org/keywords">keywords</a> property
-can also be used to add more detail.
+can also be used to add more detail.<p>
 
 =head1 ATTRIBUTES
 
@@ -130,8 +130,9 @@ can also be used to add more detail.
 
 C<cookTime>
 
-=for html The time it takes to actually cook the dish, in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration format</a>.
+=for html <p>The time it takes to actually cook the dish, in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration
+format</a>.<p>
 
 A cook_time should be one of the following types:
 

@@ -17,7 +17,7 @@ our @ISA = qw(Math::BigInt);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -1167,11 +1167,11 @@ sub bexp {
 }
 
 sub batan2 {
-    my ($class, $x, @r) = objectify(2, @_);
+    my ($class, $x, $y, @r) = objectify(2, @_);
 
     $x = $upgrade->new($$x) if $x->isa($class);
 
-    $x->batan2(@r);
+    $x->batan2($y, @r);
 }
 
 sub bnok {

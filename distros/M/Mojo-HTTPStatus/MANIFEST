@@ -1,0 +1,8 @@
+Build.PL
+lib/Mojo/HTTPStatus.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01_load.t
+META.yml
+META.json

@@ -13,8 +13,8 @@
          "rdfs:comment" : "The delivery method(s) to which the delivery charge or payment charge specification applies.",
          "rdfs:label" : "appliesToDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:PaymentChargeSpecification",
-            "schema:DeliveryChargeSpecification"
+            "schema:DeliveryChargeSpecification",
+            "schema:PaymentChargeSpecification"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -23,24 +23,24 @@
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
+            "schema:DeliveryChargeSpecification",
             "schema:Offer",
             "schema:Demand",
             "schema:ContactPoint",
-            "schema:Service",
-            "schema:DeliveryChargeSpecification",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:Place",
             "schema:AdministrativeArea",
+            "schema:Place",
             "schema:GeoShape"
          ]
       },
       "schema:eligibleRegion" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "schemadotorgsources:source_GoodRelationsTerms"
+            "schemadotorgsources:source_GoodRelationsTerms",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
@@ -48,30 +48,34 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:DeliveryChargeSpecification",
             "schema:ActionAccessSpecification",
-            "schema:Demand"
+            "schema:DeliveryChargeSpecification",
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:Place",
             "schema:GeoShape",
-            "schema:Place"
+            "schema:Text"
          ]
       },
       "schema:ineligibleRegion" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2242",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is not valid, e.g. a region where the transaction is not allowed.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/eligibleRegion\">eligibleRegion</a>.",
          "rdfs:label" : "ineligibleRegion",
+         "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
+            "schema:ActionAccessSpecification",
             "schema:Offer",
             "schema:Demand",
             "schema:DeliveryChargeSpecification"
          ],
+         "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:Place",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:Text"
          ]
       }
    }

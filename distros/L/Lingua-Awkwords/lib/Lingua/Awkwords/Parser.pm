@@ -14,7 +14,7 @@ use Lingua::Awkwords::OneOf;
 use Lingua::Awkwords::String;
 use Lingua::Awkwords::Subpattern;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub parse {
     my $self = shift;

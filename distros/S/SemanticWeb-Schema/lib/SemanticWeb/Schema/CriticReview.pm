@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::CriticReview;
 
-# ABSTRACT: A <a class="localLink" href="http://schema
+# ABSTRACT: A CriticReview is a more specialized form of Review written or published by a source that is recognized for its reviewing activities
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,15 +30,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CriticReview - A <a class="localLink" href="http://schema
+SemanticWeb::Schema::CriticReview - A CriticReview is a more specialized form of Review written or published by a source that is recognized for its reviewing activities
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A <a class="localLink"
+=for html <p>A <a class="localLink"
 href="http://schema.org/CriticReview">CriticReview</a> is a more
 specialized form of Review written or published by a source that is
 recognized for its reviewing activities. These can include online columns,
@@ -50,7 +50,7 @@ user/visitor/viewer/customer reviews, it is more appropriate to use the <a
 class="localLink" href="http://schema.org/UserReview">UserReview</a> type.
 Review aggregator sites such as Metacritic already separate out the site's
 user reviews from selected critic reviews that originate from third-party
-sources.
+sources.<p>
 
 =head1 SEE ALSO
 

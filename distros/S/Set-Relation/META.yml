@@ -4,14 +4,14 @@ author:
   - 'Darren Duncan <darren@DarrenDuncan.net>'
 build_requires:
   Carp::Always: '0.01'
-  ExtUtils::MakeMaker: '6.17'
+  ExtUtils::MakeMaker: '6.03'
   Test::Deep: '0.106'
-  Test::More: '0.47'
+  Test::More: '0.92'
 configure_requires:
-  ExtUtils::MakeMaker: '6.17'
+  ExtUtils::MakeMaker: '6.03'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
-license: lgpl
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -22,13 +22,13 @@ no_index:
     - inc
 requires:
   Carp: '1.01'
-  List::Util: '1.45'
+  List::Util: '1.4602'
   Scalar::Util: '1.13'
-  perl: '5.008001'
+  perl: '5.008000'
 resources:
   MailingList: http://mm.darrenduncan.net/mailman/listinfo
-  homepage: http://www.muldis.com/
-  license: http://www.fsf.org/licensing/licenses/lgpl.html
-  repository: http://github.com/muldis/Set-Relation
-version: v0.13.1
+  homepage: https://muldis.com
+  license: https://www.perlfoundation.org/artistic-license-20.html
+  repository: https://github.com/muldis/Set-Relation
+version: v0.13.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

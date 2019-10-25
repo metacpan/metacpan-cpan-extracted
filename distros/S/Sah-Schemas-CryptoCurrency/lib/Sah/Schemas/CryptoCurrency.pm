@@ -1,7 +1,7 @@
 package Sah::Schemas::CryptoCurrency;
 
-our $DATE = '2018-06-10'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 1;
 # ABSTRACT: Various Sah cryptocurrency schemas
@@ -18,7 +18,7 @@ Sah::Schemas::CryptoCurrency - Various Sah cryptocurrency schemas
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-06-10.
+This document describes version 0.012 of Sah::Schemas::CryptoCurrency (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-10-24.
 
 =head1 SAH SCHEMAS
 
@@ -96,7 +96,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

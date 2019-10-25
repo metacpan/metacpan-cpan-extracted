@@ -1,13 +1,13 @@
 package Log::ger::UseJSON;
 
-our $DATE = '2018-06-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger ();
 
-use Data::Clean::JSON;
+use Data::Clean::ForJSON;
 use JSON::MaybeXS;
 
 my @known_configs = qw(pretty);
@@ -17,7 +17,7 @@ my %default_configs = (
     clean => 1,
 );
 
-my $cleanser = Data::Clean::JSON->get_cleanser;
+my $cleanser = Data::Clean::ForJSON->get_cleanser;
 my $json;
 
 sub import {
@@ -54,7 +54,7 @@ Log::ger::UseJSON - Use JSON::MaybeXS to dump data structures (as JSON)
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::UseJSON (from Perl distribution Log-ger-UseJSON), released on 2018-06-17.
+This document describes version 0.002 of Log::ger::UseJSON (from Perl distribution Log-ger-UseJSON), released on 2019-09-11.
 
 =head1 SYNOPSIS
 
@@ -103,7 +103,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

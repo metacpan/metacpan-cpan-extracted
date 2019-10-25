@@ -11,6 +11,19 @@ DISTRIBUTIONS
       perl 5.006_002
       strict 0
       warnings 0
+  Astro-Sunrise-0.98
+    pathname: J/JF/JFORGET/Astro-Sunrise-0.98.tar.gz
+    provides:
+      Astro::Sunrise 0.98
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.57_02
+      Math::Trig 0
+      POSIX 0
+      Test::More 0
+      perl 5.006002
+      strict 0
+      warnings 0
   B-Hooks-EndOfScope-0.24
     pathname: E/ET/ETHER/B-Hooks-EndOfScope-0.24.tar.gz
     provides:

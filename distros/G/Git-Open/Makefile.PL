@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "bin/git-open"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Git::Open",
   "PREREQ_PM" => {
     "Moose" => 0,
@@ -25,10 +26,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::Mock::Cmd" => "0.6",
+    "Test::Mock::Cmd" => "0.7",
     "Test::More" => "1.001002"
   },
-  "VERSION" => "0.1.11",
+  "VERSION" => "0.1.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +41,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Moose" => 0,
   "MooseX::Getopt::Usage" => 0,
-  "Test::Mock::Cmd" => "0.6",
+  "Test::Mock::Cmd" => "0.7",
   "Test::More" => "1.001002"
 );
 

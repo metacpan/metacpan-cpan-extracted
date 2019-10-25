@@ -65,7 +65,7 @@ SKIP:
 # itxt tests
 SKIP:
     {
-       skip 'Need Encode for this itxt test', 2
+       skip 'Need Encode for this itxt test', 3
 	   if !eval { require Encode; 1 };
 
        # test files generated with pngcrush, which actually honours the spec:

@@ -6,7 +6,7 @@ lib/SQL/Interp.pm
 Makefile.PL
 Build.PL
 MANIFEST
-README
+README.md
 t/lib.pl
 t/dbi.t
 t/dist.t

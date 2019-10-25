@@ -47,6 +47,7 @@ Jonathan
 Karen
 Kerin
 Kivanc
+Knop
 Konrad
 Leschenko
 Locked
@@ -114,6 +115,7 @@ ether
 fd
 filename
 goschwald
+haarg
 hartzell
 ident
 jorol

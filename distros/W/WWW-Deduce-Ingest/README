@@ -1,0 +1,81 @@
+
+NAME
+    WWW::Deduce::Ingest - an interface to Deduce Ingestion
+
+SYNOPSIS
+      use WWW:Deduce::Ingest;
+
+      my $d = WWW::Deduce::Ingest->new( 'my site id', 'my secret api key' );
+
+      # output html widget
+      print $d->html('email@example.com');
+
+      # send an event
+      my $err = $d->event( 'email@example.com', '192.0.2.3', 'eventname', { ... }, $opts );
+      print STDERR "uh oh! $err\n" if $err;
+
+INTERFACE
+  new( site, apikey )
+    Create a new object. You need to pass in the site id and api key that
+    were assigned to you by Deduce.
+
+  html( email, opts )
+    Generate HTML to place on your web page.
+
+    "email"
+        The user's email address. It will be processed and hashed, not used
+        directly.
+
+  event(email, client_ip, eventtype, additional, opts)
+    When something interesting happens on your site, tell Deduce.
+
+    "email"
+        The user's email address. It will be processed and hashed, not used
+        directly.
+
+    "client_ip"
+        the user's IP address in dotted quad format (IPv4), or coloned
+        octopus (IPv6). can often be found in $ENV{REMOTE_ADDR}.
+
+    "eventtype"
+        the event type. Consult with Deduce support to determine the event
+        types.
+
+    "additional"
+        a hashref of event data to send. Consult with Deduce support to
+        determine data to send.
+
+        if you pass in 'email_prev' or 'cc' fields, they will be
+        automatically processed and hashed, not send directly.
+
+    "returns"
+        if there is an error, the error message will be returned. on
+        success, nothing.
+
+  events(evts, opts)
+    You can send several related events, by sending an array of event data.
+
+    "evts"
+        an array of event data (hashrefs).
+
+        the events must contain valid email, ip, and event fields.
+
+        any email, email_prev, and cc fields will automatically be processed
+        and hashed.
+
+    "returns"
+        if there is an error, the error message will be returned. on
+        success, nothing.
+
+BUGS
+    There are no known bugs in the module.
+
+SEE ALSO
+        http://www.deduce.com/
+
+LICENSE
+    This software may be copied and distributed under the terms found in the
+    Perl "Artistic License".
+
+    A copy of the "Artistic License" may be found in the standard Perl
+    distribution.

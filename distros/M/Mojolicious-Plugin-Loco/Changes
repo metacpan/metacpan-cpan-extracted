@@ -1,3 +1,9 @@
+0.008     Oct 25 2019
+        * fix metacpan issues, remove CONTRIBUTING.pod
+
+0.007     Oct 22 2019
+        * remove author dependencies from Makefile.PL
+
 0.006     Aug 10 2018
         * loco->conf renamed to loco->config
         * Application config can override option settings

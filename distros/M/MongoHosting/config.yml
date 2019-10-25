@@ -1,0 +1,79 @@
+region: nyc3
+app_host: 138.59.61.4
+tag: project_foo
+provider: digital_ocean
+hosts:
+# data servers
+# rs0  
+  - name: rs0-data1-mongodb
+    size: s-6vcpu-16gb
+    
+  - name: rs0-data2-mongodb
+    size: s-6vcpu-16gb
+    
+  - name: rs0-arb-mongodb
+    size: s-1vcpu-1gb
+#rs1
+  - name: rs1-data1-mongodb
+    size: s-6vcpu-16gb
+    
+  - name: rs1-data2-mongodb
+    size: s-6vcpu-16gb
+    
+  - name: rs1-arb-mongodb
+    size: s-1vcpu-1gb
+    
+
+# config + arbiters    
+  - name: config1-mongodb
+    size: s-1vcpu-1gb
+  - name: config2-mongodb
+    size: s-1vcpu-1gb
+  - name: config3-mongodb
+    size: s-1vcpu-1gb
+# routers  
+  - name: router1-mongodb
+    size: s-1vcpu-1gb
+    tag: Fooo
+  - name: router2-mongodb
+    size: s-1vcpu-1gb
+    tag: Bar
+  
+replicas:
+  - name: routers
+    type: router
+    members:
+      - host: router1-mongodb
+      - host: router2-mongodb
+  - name: mongoc
+    type: config
+    members:
+      - host: config1-mongodb
+        type: config
+        primary: 1
+      - host: config2-mongodb
+        type: config
+      - host: config3-mongodb
+        type: config    
+  - name: rs0
+    type: shard
+    members:
+      - host: rs0-data1-mongodb
+        port: 27030      
+        primary: 1
+      - host: rs0-data2-mongodb
+        port: 27031      
+      - host: rs0-arb-mongodb
+        arbiter: 1
+        port: 27032      
+  - name: rs1
+    type: shard    
+    members:
+      - host: rs1-data1-mongodb
+        port: 27030      
+        primary: 1
+      - host: rs1-data2-mongodb
+        port: 27031      
+      - host: rs1-arb-mongodb
+        arbiter: 1          
+        port: 27032      

@@ -1,7 +1,7 @@
 package Data::Sah::Lang;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.901'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.902'; # VERSION
 
 use 5.010;
 use strict;
@@ -32,7 +32,7 @@ Data::Sah::Lang - Language routines
 
 =head1 VERSION
 
-This document describes version 0.901 of Data::Sah::Lang (from Perl distribution Data-Sah), released on 2019-08-14.
+This document describes version 0.902 of Data::Sah::Lang (from Perl distribution Data-Sah), released on 2019-10-24.
 
 =for Pod::Coverage add_translations
 

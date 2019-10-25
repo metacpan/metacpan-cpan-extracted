@@ -20,6 +20,22 @@
 #######################################################################
 
 
+2019-10-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000477 released
+
+        * Moved dependency order for HTTP::Daemon
+          in Makefile.PL.
+
+
+2019-10-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000476 released
+
+	* Moved dependency order for Build::Tiny
+	  in Makefile.PL.
+
+
 2019-10-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000475 released

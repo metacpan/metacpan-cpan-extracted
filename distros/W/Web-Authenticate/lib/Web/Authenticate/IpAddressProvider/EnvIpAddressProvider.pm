@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::IpAddressProvider::EnvIpAddressProvider;
-$Web::Authenticate::IpAddressProvider::EnvIpAddressProvider::VERSION = '0.012';
+$Web::Authenticate::IpAddressProvider::EnvIpAddressProvider::VERSION = '0.013';
 use Mouse;
 #ABSTRACT: Implementation of Web::Authentication::UserAgentProvider::Role that users environment variables.
 
@@ -23,7 +23,7 @@ Web::Authenticate::IpAddressProvider::EnvIpAddressProvider - Implementation of W
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

@@ -5,7 +5,7 @@ use warnings;
 
 use base 'PDF::FromHTML::Template::Base';
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 use PDF::Writer;
 

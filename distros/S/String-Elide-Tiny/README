@@ -1,0 +1,85 @@
+NAME
+    String::Elide::Tiny - A very simple text truncating function, elide()
+
+VERSION
+    This document describes version 0.002 of String::Elide::Tiny (from Perl
+    distribution String-Elide-Tiny), released on 2019-09-11.
+
+SYNOPSIS
+     use String::Elide::Tiny qw(elide);
+
+     # ruler:                                      0----5---10---15---20
+     my $text =                                   "this is your brain";
+     elide($text, 16);                       # -> "this is your ..."
+     elide($text, 14);                       # -> "this is yo ..."
+
+     # marker option:
+     elide($text, 14, {marker=>"xxx"});      # -> "this is youxxx"
+
+     # truncate option:
+     elide($text, 14, {truncate=>"left"});   # -> "... your brain"
+     elide($text, 14, {truncate=>"middle"}); # -> "this ... brain"
+     elide($text, 14, {truncate=>"ends"});   # -> "...is your ..."
+
+DESCRIPTION
+    This module offers "elide"() function that is very simple; it's not
+    word-aware. It has options to choose marker or to select side(s) to
+    truncate.
+
+FUNCTIONS
+  elide
+    Usage:
+
+     my $truncated = elide($str, $max_len [ , \%opts ])
+
+    Elide a string with " ..." if length exceeds $max_len.
+
+    Known options:
+
+    *   truncate
+
+        String, either "right", "left", "middle", "ends".
+
+    *   marker
+
+        String. Default: "...".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Elide-Tiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Elide-Tiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Elide-Tiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::Elide is also quite simple and elides at word boundaries, but it's
+    not tiny enough.
+
+    Text::Truncate is tiny enough, but does not support truncating at the
+    left/both ends.
+
+    String::Elide::Parts can elide at different points of the string.
+
+    String::Truncate has similar interface like String::Elide::Parts and has
+    some options. But it's not tiny: it has a couple of non-core
+    dependencies.
+
+    String::Elide::Lines is based on this module but works on a line-basis.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

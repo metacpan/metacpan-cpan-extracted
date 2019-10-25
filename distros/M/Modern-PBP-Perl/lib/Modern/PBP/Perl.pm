@@ -2,12 +2,12 @@
 # # Script     : Modern::PBP::Perl                                             #
 # # -------------------------------------------------------------------------- #
 # # Copyright  : Free under 'GNU General Public License' or 'Artistic License' #
-# # Authors    : JVBSOFT - Jürgen von Brietzke                   0.001 - 1.240 #
-# # Version    : 1.240                                             23.Mai.2016 #
+# # Authors    : JVBSOFT - Jürgen von Brietzke                   0.001 - 1.300 #
+# # Version    : 1.300                                             23.Oct.2019 #
 # # -------------------------------------------------------------------------- #
 # # Function   : Loading pragmas and Modules for 'Perl Best Practices'.        #
 # # -------------------------------------------------------------------------- #
-# # Language   : PERL 5                                (V) 5.12.xx  -  5.24.xx #
+# # Language   : PERL 5                                (V) 5.12.xx  -  5.30.xx #
 # # Coding     : ISO 8859-15 / Latin-9                        UNIX-lineendings #
 # # Standards  : Perl-Best-Practices                       severity 1 (brutal) #
 # # -------------------------------------------------------------------------- #
@@ -22,7 +22,7 @@
 # #              Perl::Version                          ActivePerl-REPO-Module #
 # ##############################################################################
 
-package Modern::PBP::Perl 1.240;
+package Modern::PBP::Perl 1.300;
 
 # ##############################################################################
 
@@ -42,7 +42,7 @@ use IO::Handle;
 use Perl::Version;
 
 # ##############################################################################
-# # Feature/Warnings-Table : Contains all the features available to Perl 5.24  #
+# # Feature/Warnings-Table : Contains all the features available to Perl 5.30  #
 # # -------------------------------------------------------------------------- #
 # # 5.xx  <->  Feature is included in the feature tag ( ':5.xx' )              #
 # # ++++  <->  Feature can be switched on in Perl version                      #
@@ -50,37 +50,44 @@ use Perl::Version;
 # ##############################################################################
 
                                                                       ## no tidy
-# ------ Perl-Version ---- 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 -------------
+# ------ Perl-Version ------ 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 -
 our %FEATURES = (
-   array_base      => [qw( 5.10 5.12 5.14 ++++ ++++ ++++ ++++ ++++ )],
-   bitwise         => [qw( ---- ---- ---- ---- ---- ---- ++++ ++++ )],
-   current_sub     => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 )],
-   evalbytes       => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 )],
-   fc              => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 )],
-   lexical_subs    => [qw( ---- ---- ---- ---- ++++ ++++ ++++ ++++ )],
-   postderef       => [qw( ---- ---- ---- ---- ---- ++++ ++++ ++++ )],
-   postderef_qq    => [qw( ---- ---- ---- ---- ---- ++++ ++++ 5.24 )],
-   refaliasing     => [qw( ---- ---- ---- ---- ---- ---- ++++ ++++ )],
-   say             => [qw( 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 )],
-   signatures      => [qw( ---- ---- ---- ---- ---- ++++ ++++ ++++ )],
-   state           => [qw( 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 )],
-   switch          => [qw( 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 )],
-   unicode_eval    => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 )],
-   unicode_strings => [qw( ---- 5.12 5.14 5.16 5.18 5.20 5.22 5.24 )],
+   array_base        => [qw( 5.10 5.12 5.14 ++++ ++++ ++++ ++++ ++++ ++++ ++++ ---- )],
+   bitwise           => [qw( ---- ---- ---- ---- ---- ---- ++++ ++++ ++++ 5.28 5.30 )],
+   current_sub       => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   declared_refs     => [qw( ---- ---- ---- ---- ---- ---- ---- ---- 5.26 ++++ ++++ )],
+   evalbytes         => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   fc                => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   lexical_subs      => [qw( ---- ---- ---- ---- ++++ ++++ ++++ ++++ ---- ---- ---- )],
+   postderef         => [qw( ---- ---- ---- ---- ---- ++++ ++++ ++++ ---- ---- ---- )],
+   postderef_qq      => [qw( ---- ---- ---- ---- ---- ++++ ++++ 5.24 5.26 5.28 5.30 )],
+   refaliasing       => [qw( ---- ---- ---- ---- ---- ---- ++++ ++++ ++++ ++++ ++++ )],
+   say               => [qw( 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   signatures        => [qw( ---- ---- ---- ---- ---- ++++ ++++ ++++ ++++ ++++ ++++ )],
+   state             => [qw( 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   switch            => [qw( 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   unicode_eval      => [qw( ---- ---- ---- 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   unicode_strings   => [qw( ---- 5.12 5.14 5.16 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
 );
 
 our %WARNINGS = (
-   autoderef       => [qw( ---- ---- ---- ---- ---- 5.20 5.22 ---- )],
-   bitwise         => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 )],
-   const_attr      => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 )],
-   lexical_subs    => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 5.24 )],
-   lexical_topic   => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 ---- )],
-   postderef       => [qw( ---- ---- ---- ---- ---- 5.20 5.22 5.24 )],
-   re_strict       => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 )],
-   refaliasing     => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 )],
-   regex_sets      => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 5.24 )],
-   signatures      => [qw( ---- ---- ---- ---- ---- 5.20 5.22 5.24 )],
-   smartmatch      => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 5.24 )],
+   alpha_assertions  => [qw( ---- ---- ---- ---- ---- ---- ---- ---- ---- 5.28 5.30 )],
+   autoderef         => [qw( ---- ---- ---- ---- ---- 5.20 5.22 ---- ---- ---- ---- )],
+   bitwise           => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 5.26 5.28 5.30 )],
+   const_attr        => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 5.26 5.28 5.30 )],
+   declared_refs     => [qw( ---- ---- ---- ---- ---- ---- ---- ---- 5.26 5.28 ---- )],
+   lexical_subs      => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   lexical_topic     => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 ---- ---- ---- ---- )],
+   postderef         => [qw( ---- ---- ---- ---- ---- 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   private_use       => [qw( ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 5.30 )],
+   re_strict         => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 5.26 5.28 5.30 )],
+   refaliasing       => [qw( ---- ---- ---- ---- ---- ---- 5.22 5.24 5.26 5.28 5.30 )],
+   regex_sets        => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   script_run        => [qw( ---- ---- ---- ---- ---- ---- ---- ---- ---- 5.28 5.30 )],
+   signatures        => [qw( ---- ---- ---- ---- ---- 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   smartmatch        => [qw( ---- ---- ---- ---- 5.18 5.20 5.22 5.24 5.26 5.28 5.30 )],
+   uniprop_wildcards => [qw( ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 5.30 )],
+   vlb               => [qw( ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 5.30 )],
 );                                                                   ## use tidy
 
 # ##############################################################################
@@ -119,7 +126,7 @@ sub import {
 
    # --- Check the version string and form feature tag -------------------------
    my $version = $version[0] // $actual_perl_version;
-   if ( $version =~ /^5[.](1[02468]|2[024])$/ismx ) {
+   if ( $version =~ /^5[.](1[02468]|2[02468]|3[0])$/ismx ) {
       $use_perl_version = "5.0$1";
       $version_idx      = $1 / 2 - 5;
       $version_tag      = ":$version";
@@ -234,7 +241,7 @@ Modern::PBP::Perl - Loading pragmas and Modules for 'Perl Best Practices'
 
 =head1 VERSION
 
-This document describes Modern::PBP::Perl version 1.240.
+This document describes Modern::PBP::Perl version 1.300.
 
 
 =head1 SYNOPSIS
@@ -349,7 +356,7 @@ The following pragmas and modules are required:
 
 =head1 INCOMPATIBILITIES
 
-The module works with Perl version 5.12, 5.14, 5.16, 5.18, 5.20, 5.22 and 5.24.
+The module works with Perl version 5.10 to and 5.30.
 Developers Perl versions are not supported.
 
 
@@ -369,7 +376,7 @@ Juergen von Brietzke - JVBSOFT  C<< <juergen.von.brietzke@t-online.de> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2015, 2016
+Copyright (c) 2015, 2016, 2019
 Juergen von Brietzke C<< <juergen.von.brietzke@t-online.de> >>.
 All rights reserved.
 

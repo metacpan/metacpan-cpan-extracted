@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,15 +34,16 @@ SemanticWeb::Schema::DeliveryMethod - A delivery method is a standardized proced
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A delivery method is a standardized procedure for transferring the product
-or service to the destination of fulfillment chosen by the customer.
-Delivery methods are characterized by the means of transportation used, and
-by the organization or group that is the contracting party for the sending
-organization or person.<br/><br/> Commonly used values:<br/><br/> <ul>
+=for html <p>A delivery method is a standardized procedure for transferring the
+product or service to the destination of fulfillment chosen by the
+customer. Delivery methods are characterized by the means of transportation
+used, and by the organization or group that is the contracting party for
+the sending organization or person.<br/><br/> Commonly used
+values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#DeliveryModeDirectDownload</li>
 <li>http://purl.org/goodrelations/v1#DeliveryModeFreight</li>
 <li>http://purl.org/goodrelations/v1#DeliveryModeMail</li>
@@ -50,7 +51,7 @@ organization or person.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#DeliveryModePickUp</li>
 <li>http://purl.org/goodrelations/v1#DHL</li>
 <li>http://purl.org/goodrelations/v1#FederalExpress</li>
-<li>http://purl.org/goodrelations/v1#UPS</li> </ul> 
+<li>http://purl.org/goodrelations/v1#UPS</li> </ul> <p>
 
 =head1 SEE ALSO
 

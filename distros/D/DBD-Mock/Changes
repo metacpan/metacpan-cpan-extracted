@@ -1,5 +1,12 @@
 Revision history for Perl extension DBD::Mock.
 
+1.51 2019-10-23T11:43:51Z
+    - Fixed issue with using attribute aliases alongside a driver DSN
+      in the DBI->connect call
+
+1.50 2019-10-22T19:37:26Z
+    - Added attribute aliases support for MariaDB
+
 1.49 2019-09-12T12:59:51Z
     - Fixing tests that fail on some old versions of Perl
 

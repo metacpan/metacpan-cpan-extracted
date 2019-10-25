@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has actor => (
@@ -114,7 +114,7 @@ SemanticWeb::Schema::Movie - A movie.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -193,8 +193,8 @@ A directors should be one of the following types:
 
 =head2 C<duration>
 
-=for html The duration of the item (movie, audio recording, event, etc.) in <a
-href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.
+=for html <p>The duration of the item (movie, audio recording, event, etc.) in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>.<p>
 
 A duration should be one of the following types:
 
@@ -239,8 +239,8 @@ A production_company should be one of the following types:
 
 C<subtitleLanguage>
 
-=for html Languages in which subtitles/captions are available, in <a
-href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard format</a>.
+=for html <p>Languages in which subtitles/captions are available, in <a
+href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard format</a>.<p>
 
 A subtitle_language should be one of the following types:
 

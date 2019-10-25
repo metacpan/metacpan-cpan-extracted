@@ -1,3 +1,6 @@
+0.006     2019-10-20 21:15:50-05:00 America/Chicago
+    Fixed pod error reported by CPANTS #3. (@manwar)
+
 0.005     2019-10-05 16:05:19-05:00 America/Chicago
     Auto generate META.json using the plugin [MetaJSON]. (@manwar)
 

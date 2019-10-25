@@ -13,6 +13,11 @@ https://academic.oup.com/bioinformatics/article/20/18/3363/202143
     my $kmers     = $minimizer->{kmers};     # hash of minimizer => kmer
     my $minimizers= $minimizer->{minimizers};# hash of minimizer => [kmer1,kmer2,...]
 
+    # hash of minimizer => [start1,start2,...] 
+    # Start coordinates are on the fwd strand even when
+    # matched against the rev strand.
+    my $starts    = $minimizer->{starts}; 
+
     # With more options
     my $minimizer2= Bio::Minimizer->new($sequenceString,{k=>31,l=>21});
 
@@ -25,6 +30,8 @@ Creates a set of minimizers from sequence
 example: Sort a fastq file by minimizer, potentially 
 shrinking gzip size.
 
+This is implemented in this package's scripts/sort*.pl scripts.
+
     use Bio::Minimizer
 
     # Read fastq file via stdin, in this example
@@ -34,9 +41,9 @@ shrinking gzip size.
       chomp($id,$seq,$plus,$qual); 
 
       # minimizer object
-      $MINIMIZER = Bio::Minimizer->new($seq); 
-      # Get smallest minimizer in this entry
-      $minMinimizer = (sort {$a cmp $b} values(%{$$MINIMIZER{minimizers}}))[0]; 
+      $MINIMIZER = Bio::Minimizer->new($seq,{k=>length($seq)}); 
+      # The only minimizer in this entry because k==length(seq)
+      $minMinimizer = (values(%{$$MINIMIZER{minimizers}}))[0]; 
 
       # combine the minimum minimizer with the entry, for
       # sorting later.
@@ -50,16 +57,6 @@ shrinking gzip size.
       print $$e[1];
     } 
 
-=head1 VARIABLES
-
-=over
-
-=item $Bio::Minimizer::iThreads
-
-Boolean describing whether the module instance is using threads
-
-=back
-
 =head1 METHODS
 
 =over
@@ -71,7 +68,7 @@ Boolean describing whether the module instance is using threads
       settings     A hash
         k          Kmer length
         l          Minimizer length (some might call it lmer)
-        numcpus    Number of threads to use. Currently might work against you.
+        numcpus    Number of threads to use. (not used)
 
 =back
 

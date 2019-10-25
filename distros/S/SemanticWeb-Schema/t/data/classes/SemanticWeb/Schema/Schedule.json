@@ -58,8 +58,8 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:repeatCount" : {

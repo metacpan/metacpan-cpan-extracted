@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has holding_archive => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::ArchiveComponent - An intangible type to be applied to any 
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -63,10 +63,10 @@ set of properties required to describe archival items and collections.
 
 C<holdingArchive>
 
-=for html <a class="localLink"
+=for html <p><a class="localLink"
 href="http://schema.org/ArchiveOrganization">ArchiveOrganization</a> that
 holds, keeps or maintains the <a class="localLink"
-href="http://schema.org/ArchiveComponent">ArchiveComponent</a>.
+href="http://schema.org/ArchiveComponent">ArchiveComponent</a>.<p>
 
 A holding_archive should be one of the following types:
 

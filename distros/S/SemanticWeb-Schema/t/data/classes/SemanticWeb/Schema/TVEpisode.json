@@ -13,8 +13,8 @@
          "schema:domainIncludes" : [
             "schema:TVSeries",
             "schema:Movie",
-            "schema:TVSeason",
-            "schema:TVEpisode"
+            "schema:TVEpisode",
+            "schema:TVSeason"
          ],
          "schema:rangeIncludes" : "schema:Country"
       },
@@ -24,25 +24,29 @@
          "rdfs:label" : "partOfTVSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
-            "schema:TVClip",
             "schema:TVEpisode",
-            "schema:TVSeason"
+            "schema:TVSeason",
+            "schema:TVClip"
          ],
          "schema:rangeIncludes" : "schema:TVSeries",
          "schema:supersededBy" : "schema:partOfSeries"
       },
       "schema:subtitleLanguage" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2110",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Languages in which subtitles/captions are available, in <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard format</a>.",
          "rdfs:label" : "subtitleLanguage",
+         "schema:category" : "issue-2110",
          "schema:domainIncludes" : [
+            "schema:Movie",
+            "schema:BroadcastEvent",
             "schema:ScreeningEvent",
-            "schema:TVEpisode",
-            "schema:Movie"
+            "schema:TVEpisode"
          ],
+         "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Language",
-            "schema:Text"
+            "schema:Text",
+            "schema:Language"
          ]
       }
    }

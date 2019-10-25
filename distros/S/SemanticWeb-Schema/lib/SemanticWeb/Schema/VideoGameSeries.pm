@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has actor => (
@@ -210,7 +210,7 @@ SemanticWeb::Schema::VideoGameSeries - A video game series.
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -376,9 +376,9 @@ A game_location should be one of the following types:
 
 C<gamePlatform>
 
-=for html The electronic systems used to play <a
+=for html <p>The electronic systems used to play <a
 href="http://en.wikipedia.org/wiki/Category:Video_game_platforms">video
-games</a>.
+games</a>.<p>
 
 A game_platform should be one of the following types:
 

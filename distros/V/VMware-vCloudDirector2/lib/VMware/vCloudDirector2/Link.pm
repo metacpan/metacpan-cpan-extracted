@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Link;
 use strict;
 use warnings;
 
-our $VERSION = '0.104'; # VERSION
+our $VERSION = '0.105'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -62,6 +62,7 @@ method DELETE () { return $self->object->api->DELETE( $self->href ); }
 
 
 method GET () { return $self->object->api->GET( $self->href ); }
+method GET_hash () { return $self->object->api->GET_hash( $self->href ); }
 
 
 method POST ($hash) { return $self->object->api->POST( $self->href, $hash, $self->mime_type ); }
@@ -87,7 +88,7 @@ VMware::vCloudDirector2::Link - Link within the vCloud
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head3 DELETE
 
@@ -98,6 +99,11 @@ generate an exception.  See L<VMware::vCloudDirector2::API/DELETE>.
 
 Make a get request to the URL in this link.  Returns Objects.  Failure will
 generate an exception.  See L<VMware::vCloudDirector2::API/GET>.
+
+=head3 GET_hash
+
+Make a get request to the URL in this link.  Returns a decoded hash.  Failure
+will generate an exception.  See L<VMware::vCloudDirector2::API/GET_hash>.
 
 =head3 POST
 

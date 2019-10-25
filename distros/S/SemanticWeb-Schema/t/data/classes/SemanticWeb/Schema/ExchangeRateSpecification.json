@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:FIBO",
-         "https://github.com/schemaorg/schemaorg/issues/1253"
+         "https://github.com/schemaorg/schemaorg/issues/1253",
+         "schemadotorgsources:FIBO"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A structured value representing exchange rate.",
@@ -19,11 +19,11 @@
          "rdfs:label" : "currency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmountDistribution",
+            "schema:MonetaryAmount",
             "schema:ExchangeRateSpecification",
-            "schema:DatedMoneySpecification",
             "schema:LoanOrCredit",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmountDistribution",
+            "schema:DatedMoneySpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -42,8 +42,8 @@
       },
       "schema:exchangeRateSpread" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The difference between the price at which a broker or other intermediary buys and sells foreign currency.",

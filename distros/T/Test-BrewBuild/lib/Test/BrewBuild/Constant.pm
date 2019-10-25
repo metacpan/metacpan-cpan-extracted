@@ -2,7 +2,7 @@ package Test::BrewBuild::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 require Exporter;
 use base qw( Exporter );

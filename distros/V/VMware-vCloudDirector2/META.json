@@ -84,23 +84,23 @@
    "provides" : {
       "VMware::vCloudDirector2" : {
          "file" : "lib/VMware/vCloudDirector2.pm",
-         "version" : "0.104"
+         "version" : "0.105"
       },
       "VMware::vCloudDirector2::API" : {
          "file" : "lib/VMware/vCloudDirector2/API.pm",
-         "version" : "0.104"
+         "version" : "0.105"
       },
       "VMware::vCloudDirector2::Error" : {
          "file" : "lib/VMware/vCloudDirector2/Error.pm",
-         "version" : "0.104"
+         "version" : "0.105"
       },
       "VMware::vCloudDirector2::Link" : {
          "file" : "lib/VMware/vCloudDirector2/Link.pm",
-         "version" : "0.104"
+         "version" : "0.105"
       },
       "VMware::vCloudDirector2::Object" : {
          "file" : "lib/VMware/vCloudDirector2/Object.pm",
-         "version" : "0.104"
+         "version" : "0.105"
       }
    },
    "release_status" : "stable",
@@ -112,7 +112,7 @@
          "web" : "https://github.com/Perl-VMware/VMware-vCloudDirector2"
       }
    },
-   "version" : "0.104",
+   "version" : "0.105",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -155,7 +155,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                }
             },
@@ -179,7 +179,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -196,12 +196,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.104",
+                  "tag" : "0.105",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -221,7 +221,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                }
             },
@@ -256,7 +256,7 @@
                   "version_regexp" : "(?^u:^(\\d+.\\d+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                }
             },
@@ -267,7 +267,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                }
             },
@@ -283,7 +283,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -305,7 +305,7 @@
                   "release_message" : "Build results of %h (on %b)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.21.0 (Apple Git-122)",
                   "repo_root" : "."
                }
             },
@@ -640,7 +640,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHubREADME::Badge",
             "name" : "GitHubREADME::Badge",
-            "version" : "0.28"
+            "version" : "0.29"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

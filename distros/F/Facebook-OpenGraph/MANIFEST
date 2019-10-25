@@ -43,6 +43,7 @@ t/003_publish/06_publish_staging_resource.t
 t/003_publish/07_post_like.t
 t/004_response/01_basic.t
 t/resource/IMG_6753.MOV
+t/resource/captions.ja_JP.srt
 t/resource/fields.yaml
 t/resource/sample.png
 xt/02_perlcritic.t

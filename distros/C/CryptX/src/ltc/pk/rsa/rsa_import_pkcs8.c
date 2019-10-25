@@ -39,10 +39,10 @@
  */
 
 /**
-  Import an RSAPublicKey or RSAPrivateKey in PKCS#8 format
+  Import an RSAPrivateKey in PKCS#8 format
   @param in        The packet to import from
   @param inlen     It's length (octets)
-  @param passwd    The password for decrypting privkey (NOT SUPPORTED YET)
+  @param passwd    The password for decrypting privkey
   @param passwdlen Password's length (octets)
   @param key       [out] Destination for newly imported key
   @return CRYPT_OK if successful, upon error allocated memory is freed
@@ -78,9 +78,9 @@ int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen,
    buf2 = XMALLOC(buf2len);
    if (buf2 == NULL) { err = CRYPT_MEM; goto LBL_FREE1; }
 
+   if ((err = mp_init_multi(&zero, &iter, NULL)) != CRYPT_OK) { goto LBL_FREE2; }
    /* init key */
-   err = mp_init_multi(&key->e, &key->d, &key->N, &key->dQ, &key->dP, &key->qP, &key->p, &key->q, &zero, &iter, NULL);
-   if (err != CRYPT_OK) { goto LBL_FREE2; }
+   if ((err = rsa_init(key)) != CRYPT_OK) { goto LBL_FREE3; }
 
    /* try to decode encrypted priv key */
    if ((err = pkcs8_decode_flexi(in, inlen, passwd, passwdlen, &l)) != CRYPT_OK) {
@@ -117,13 +117,14 @@ int rsa_import_pkcs8(const unsigned char *in, unsigned long inlen,
    if (err != CRYPT_OK) { goto LBL_ERR; }
    key->type = PK_PRIVATE;
    err = CRYPT_OK;
-   goto LBL_FREE2;
+   goto LBL_FREE3;
 
 LBL_ERR:
    rsa_free(key);
-LBL_FREE2:
-   if (l) der_free_sequence_flexi(l);
+LBL_FREE3:
    mp_clear_multi(iter, zero, NULL);
+   if (l) der_free_sequence_flexi(l);
+LBL_FREE2:
    XFREE(buf2);
 LBL_FREE1:
    XFREE(buf1);

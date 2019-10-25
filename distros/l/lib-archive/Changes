@@ -1,3 +1,9 @@
+0.7 2019-10-21
+  - fix tests for perls < 5.20
+
+0.6 2019-10-19
+  - fix DATA filehandle for packed modules
+
 0.5 2019-03-25
   - better support for relative paths
 

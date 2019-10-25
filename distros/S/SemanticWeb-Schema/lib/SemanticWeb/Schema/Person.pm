@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has additional_name => (
@@ -514,7 +514,7 @@ SemanticWeb::Schema::Person - A person (alive
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -823,9 +823,17 @@ A funder should be one of the following types:
 
 =head2 C<gender>
 
-Gender of the person. While http://schema.org/Male and
+=for html <p>Gender of something, typically a <a class="localLink"
+href="http://schema.org/Person">Person</a>, but possibly also fictional
+characters, animals, etc. While http://schema.org/Male and
 http://schema.org/Female may be used, text strings are also acceptable for
-people who do not identify as a binary gender.
+people who do not identify as a binary gender. The <a class="localLink"
+href="http://schema.org/gender">gender</a> property can also be used in an
+extended sense to cover e.g. the gender of sports teams. As with the gender
+of individuals, we do not try to enumerate all possibilities. A
+mixed-gender <a class="localLink"
+href="http://schema.org/SportsTeam">SportsTeam</a> can be indicated with a
+text value of "Mixed".<p>
 
 A gender should be one of the following types:
 
@@ -856,10 +864,10 @@ A given_name should be one of the following types:
 
 C<globalLocationNumber>
 
-=for html The <a href="http://www.gs1.org/gln">Global Location Number</a> (GLN,
+=for html <p>The <a href="http://www.gs1.org/gln">Global Location Number</a> (GLN,
 sometimes also referred to as International Location Number or ILN) of the
 respective organization, person, or place. The GLN is a 13-digit number
-used to identify parties and physical locations.
+used to identify parties and physical locations.<p>
 
 A global_location_number should be one of the following types:
 
@@ -1033,13 +1041,13 @@ A knows should be one of the following types:
 
 C<knowsAbout>
 
-=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
-less typically of an <a class="localLink"
+=for html <p>Of a <a class="localLink" href="http://schema.org/Person">Person</a>,
+and less typically of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, to indicate a topic
 that is known about - suggesting possible expertise but not implying it. We
 do not distinguish skill levels here, or relate this to educational
 content, events, objectives or <a class="localLink"
-href="http://schema.org/JobPosting">JobPosting</a> descriptions.
+href="http://schema.org/JobPosting">JobPosting</a> descriptions.<p>
 
 A knows_about should be one of the following types:
 
@@ -1055,12 +1063,12 @@ A knows_about should be one of the following types:
 
 C<knowsLanguage>
 
-=for html Of a <a class="localLink" href="http://schema.org/Person">Person</a>, and
-less typically of an <a class="localLink"
+=for html <p>Of a <a class="localLink" href="http://schema.org/Person">Person</a>,
+and less typically of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, to indicate a known
 language. We do not distinguish skill levels or
 reading/writing/speaking/signing here. Use language codes from the <a
-href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>.
+href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>.<p>
 
 A knows_language should be one of the following types:
 
@@ -1201,7 +1209,7 @@ A performer_in should be one of the following types:
 
 C<publishingPrinciples>
 
-=for html The publishingPrinciples property indicates (typically via <a
+=for html <p>The publishingPrinciples property indicates (typically via <a
 class="localLink" href="http://schema.org/URL">URL</a>) a document
 describing the editorial principles of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (or individual e.g.
@@ -1216,7 +1224,7 @@ href="http://schema.org/CreativeWork">CreativeWork</a>.<br/><br/> While
 such policies are most typically expressed in natural language, sometimes
 related information (e.g. indicating a <a class="localLink"
 href="http://schema.org/funder">funder</a>) can be expressed using
-schema.org terminology.
+schema.org terminology.<p>
 
 A publishing_principles should be one of the following types:
 

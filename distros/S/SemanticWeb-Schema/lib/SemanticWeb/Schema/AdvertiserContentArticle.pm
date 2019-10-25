@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::AdvertiserContentArticle;
 
-# ABSTRACT: An <a class="localLink" href="http://schema
+# ABSTRACT: An Article that an external entity has paid to place or to produce to its specifications
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,19 +30,19 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::AdvertiserContentArticle - An <a class="localLink" href="http://schema
+SemanticWeb::Schema::AdvertiserContentArticle - An Article that an external entity has paid to place or to produce to its specifications
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An <a class="localLink" href="http://schema.org/Article">Article</a> that
-an external entity has paid to place or to produce to its specifications.
-Includes <a
+=for html <p>An <a class="localLink" href="http://schema.org/Article">Article</a>
+that an external entity has paid to place or to produce to its
+specifications. Includes <a
 href="https://en.wikipedia.org/wiki/Advertorial">advertorials</a>,
-sponsored content, native advertising and other paid content.
+sponsored content, native advertising and other paid content.<p>
 
 =head1 SEE ALSO
 

@@ -4,13 +4,13 @@
       "Len Budney <len.budney@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CLI-Startup",
    "prereqs" : {
@@ -62,7 +62,7 @@
    "provides" : {
       "CLI::Startup" : {
          "file" : "lib/CLI/Startup.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

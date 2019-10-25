@@ -8,7 +8,7 @@ use Logging::Simple;
 use LWP::Simple qw(head);
 use Test::BrewBuild::Regex;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 my $log;
 
@@ -82,6 +82,8 @@ sub clone {
 
     my $git = $self->git;
 
+    _repo_availability_check($git, $repo);
+
     my $output = capture_merged {
         `"$git" clone $repo`;
     };
@@ -129,17 +131,16 @@ sub revision {
                   "remote mode.";
         }
 
-        $log->_6("remote: 'ls-remote $repo' sent");
-
-        # void capture, as there's unneeded stuff going to STDERR
-        # on the ls-remote call
+        _repo_availability_check($git, $repo);
 
         capture_stderr {
             my $sums = `"$git" ls-remote $repo`;
             if ($sums =~ /${ re_git('extract_commit_csum') }/){
                 $csum = $1;
             }
-        }
+        };
+
+        $log->_6("remote: 'ls-remote $repo' sent");
     }
 
     chomp $csum;
@@ -159,6 +160,21 @@ sub status {
         return 0;
     }
     return 1;
+}
+sub _repo_availability_check {
+    my ($git, $repo) = @_;
+
+    my $repo_availability_check = capture_stderr {
+        my $git_protocol_repo = $repo;
+        $git_protocol_repo =~ s/https/git/;
+        $git_protocol_repo =~ s|git://.*?@|git://|;
+        `"$git" ls-remote $git_protocol_repo`;
+    };
+
+    if ($repo_availability_check =~ /fatal/) {
+        $log->_0("fatal: repository '$repo' not found. Typo?...\n");
+        croak "fatal: repository '$repo' not found. Typo?...\n";
+    }
 }
 sub _separate_url {
     # this method is actually not needed. Was going to be used if we used the

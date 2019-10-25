@@ -1,0 +1,76 @@
+=head1 NAME
+
+Sys::Syslog - Perl interface to the UNIX syslog(3) calls
+
+
+=head1 DESCRIPTION
+
+Sys::Syslog is an interface to the UNIX syslog(3) program.
+Call syslog() with a string priority and a list of printf() args
+just like syslog(3).
+
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ make install
+
+An ANSI-compliant compiler is required to compile the extension.
+
+Sys::Syslog should work on any Perl since 5.6.0. This module is 
+regularly compiled and tested by the CPAN Testers on various
+combinations of Perl and operating systems.
+
+See also the corresponding CPAN Testers page:
+http://testers.cpan.org/show/Sys-Syslog.html
+
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module 
+with the perldoc command.
+
+    perldoc Sys::Syslog
+
+You can also look for information at:
+
+=over
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Sys-Syslog/>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/module/Sys::Syslog>
+
+=item * Perl Documentation
+
+L<http://perldoc.perl.org/Sys/Syslog.html>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Sys-Syslog>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Sys-Syslog>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=Sys-Syslog>
+
+=back
+
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 1990-2012 by Larry Wall and others.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

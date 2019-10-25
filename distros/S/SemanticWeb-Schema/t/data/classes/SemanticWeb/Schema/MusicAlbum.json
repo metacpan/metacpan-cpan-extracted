@@ -35,8 +35,8 @@
          "rdfs:comment" : "The artist that performed this album or recording.",
          "rdfs:label" : "byArtist",
          "schema:domainIncludes" : [
-            "schema:MusicAlbum",
-            "schema:MusicRecording"
+            "schema:MusicRecording",
+            "schema:MusicAlbum"
          ],
          "schema:rangeIncludes" : [
             "schema:MusicGroup",

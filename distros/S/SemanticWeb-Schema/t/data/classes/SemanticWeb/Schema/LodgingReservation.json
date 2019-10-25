@@ -11,8 +11,8 @@
          "rdfs:comment" : "The earliest someone may check into a lodging establishment.",
          "rdfs:label" : "checkinTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
@@ -24,8 +24,8 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:LodgingReservation"
+            "schema:LodgingReservation",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
@@ -45,8 +45,8 @@
          "rdfs:label" : "lodgingUnitType",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:Text"
          ]
       },
       "schema:numAdults" : {
@@ -55,8 +55,8 @@
          "rdfs:label" : "numAdults",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Integer"
+            "schema:Integer",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numChildren" : {

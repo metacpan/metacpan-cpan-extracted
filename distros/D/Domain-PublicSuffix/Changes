@@ -1,5 +1,13 @@
 Revision history for Domain-PublicSuffix
 
+0.16    2019-10-18 20:00 GMT
+  - Refresh PublicSuffix list
+  - Add publicsuffix.org unit tests
+  - Force lower case on ASCII domains
+  - Rewrite suffix parser to both more closely match publicsuffix intentions,
+    as well as reduce needless complexity, also solving a comment on issue
+    #3
+
 0.15    2019-04-23 20:00 GMT
   - Refresh PublicSuffix list
   - Merged pull request from Gavin Carr to explicitly open a file with UTF-8

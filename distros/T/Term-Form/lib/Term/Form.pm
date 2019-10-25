@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.521';
+our $VERSION = '0.522';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -901,11 +901,13 @@ sub __write_screen {
             $page_number = substr sprintf( '%d/%d', $self->{i}{page}, $self->{i}{pages} ), 0, $self->{i}{term_w};
         }
         print "\n", $page_number;
-        print up( $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} ) ); #
+        my $up = $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} );
+        print up( $up ) if $up;
     }
     else {
         $self->{i}{page} = 1;
-        print up( $self->{i}{end_row} - $self->{i}{curr_row} );
+        my $up = $self->{i}{end_row} - $self->{i}{curr_row};
+        print up( $up ) if $up;
     }
 }
 
@@ -1054,7 +1056,8 @@ sub fill_form {
         next CHAR if $char == KEY_TAB;
         my ( $tmp_term_w, $tmp_term_h ) = get_term_size();
         if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
-            print up( $self->{i}{curr_row} + $self->{i}{pre_text_row_count} );
+            my $up = $self->{i}{curr_row} + $self->{i}{pre_text_row_count};
+            print up( $up ) if $up;
             ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
             $self->__prepare_meta_menu_elements( $term_w );
             $self->__length_longest_key( $list );
@@ -1162,7 +1165,8 @@ sub fill_form {
                 }
             }
             else {
-                print up( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
+                print up( $up ) if $up;
                 $self->{i}{curr_row} = $self->{i}{begin_row} - $self->{i}{avail_h};
                 $m = $self->__string_and_pos( $list );
                 $self->__print_previous_page( $list );
@@ -1183,7 +1187,8 @@ sub fill_form {
                 }
             }
             else {
-                print up( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
+                print up( $up ) if $up;
                 $self->{i}{curr_row} = $self->{i}{end_row} + 1;
                 $m = $self->__string_and_pos( $list );
                 $self->__print_next_page( $list );
@@ -1319,7 +1324,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.521
+Version 0.522
 
 =cut
 

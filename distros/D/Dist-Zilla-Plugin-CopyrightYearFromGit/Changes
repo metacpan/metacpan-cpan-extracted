@@ -1,17 +1,36 @@
-0.003   2017-02-10 (PERLANCAR)
+0.006   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [Deprecation] Rename configuration option: regex -> release_tag_regex.
+	  Old name still supported for now, but deprecated and will be removed
+	  in the future.
+
+        - Add configuration options: author_{name,email}_regex.
+
+
+0.005   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add configuration: regex (thanks Stephen Thirlwall).
+
+
+0.004   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add configuration: min_year.
+
+
+0.003   2017-02-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [refactor] Use list_git_release_years() from Release::Git::Util 0.004.
 
 
-0.002   2017-02-09 (PERLANCAR)
+0.002   2017-02-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [refactor] Use Release::Git::Util to remove code duplication.
 
 
-0.001    2017-02-04 (PERLANCAR)
+0.001    2017-02-04  Released-By: PERLANCAR
 
          - First release.

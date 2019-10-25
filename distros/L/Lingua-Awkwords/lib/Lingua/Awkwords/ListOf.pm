@@ -11,7 +11,7 @@ use warnings;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has filters => (
     is      => 'rwp',

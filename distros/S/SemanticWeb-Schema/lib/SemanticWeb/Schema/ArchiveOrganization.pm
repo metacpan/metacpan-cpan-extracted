@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has archive_held => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::ArchiveOrganization - An organization with archival holding
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -56,9 +56,9 @@ public.
 
 C<archiveHeld>
 
-=for html Collection, <a href="https://en.wikipedia.org/wiki/Fonds">fonds</a>, or
+=for html <p>Collection, <a href="https://en.wikipedia.org/wiki/Fonds">fonds</a>, or
 item held, kept or maintained by an <a class="localLink"
-href="http://schema.org/ArchiveOrganization">ArchiveOrganization</a>.
+href="http://schema.org/ArchiveOrganization">ArchiveOrganization</a>.<p>
 
 A archive_held should be one of the following types:
 

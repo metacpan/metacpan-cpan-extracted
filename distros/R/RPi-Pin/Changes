@@ -1,5 +1,10 @@
 Revision history for RPi-Pin
 
+2.3608  2019-10-19
+        - add extra environment checks, and disable tests if required (work on
+          stevieb9/rpi-wiringpi#159)
+        - bump prereq WiringPi::API from 2.3612 to 2.3616
+
 2.3607  2019-07-03
         - added comment(), allows you to associate a note or purpose to a pin.
           We've also added a comment parameter in new()

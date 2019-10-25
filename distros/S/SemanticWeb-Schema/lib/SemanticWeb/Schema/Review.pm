@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has item_reviewed => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::Review - A review of an item - for example
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -121,11 +121,11 @@ A review_body should be one of the following types:
 
 C<reviewRating>
 
-=for html The rating given in this review. Note that reviews can themselves be rated.
-The <code>reviewRating</code> applies to rating given by the review. The <a
-class="localLink"
+=for html <p>The rating given in this review. Note that reviews can themselves be
+rated. The <code>reviewRating</code> applies to rating given by the review.
+The <a class="localLink"
 href="http://schema.org/aggregateRating">aggregateRating</a> property
-applies to the review itself, as a creative work.
+applies to the review itself, as a creative work.<p>
 
 A review_rating should be one of the following types:
 

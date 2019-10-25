@@ -1,0 +1,741 @@
+NAME
+    MooX::Press - quickly create a bunch of Moo/Moose/Mouse classes and roles
+
+SYNOPSIS
+      package MyApp;
+      use Types::Standard qw(Str Num);
+      use MooX::Press (
+        role => [
+          'Livestock',
+          'Pet',
+          'Milkable' => {
+            can => [
+              'milk' => sub { print "giving milk\n"; },
+            ],
+          },
+        ],
+        class => [
+          'Animal' => {
+            has => [
+              'name'   => Str,
+              'colour',
+              'age'    => Num,
+              'status' => { enum => ['alive', 'dead'], default => 'alive' },
+            ],
+            subclass => [
+              'Panda',
+              'Cat'  => { with => ['Pet'] },
+              'Dog'  => { with => ['Pet'] },
+              'Cow'  => { with => ['Livestock', 'Milkable'] },
+              'Pig'  => { with => ['Livestock'] },
+            ],
+          },
+        ],
+      );
+
+    Using your classes:
+
+      use MyApp;
+  
+      my $kitty = MyApp->new_cat(name => "Grey", status => "alive");
+      # or:       MyApp::Cat->new(name => "Grey", status => "alive");
+  
+      MyApp->new_cow(name => "Daisy")->milk();
+
+    I realize this is a longer synopsis than most CPAN modules give, but
+    considering it sets up six classes and three roles with some attributes
+    and methods, applies the roles to the classes, and creates a type library
+    with nine types in it, it's pretty concise.
+
+DESCRIPTION
+    MooX::Press (pronounced "Moo Express") is a quick way of creating a bunch
+    of simple Moo classes and roles at once without needing to create separate
+    Perl modules for each class and each role, and without needing to add a
+    bunch of boilerplate to each file.
+
+    It also supports Moose and Mouse, though Moo classes and roles play nicely
+    with Moose (and to a certain extent with Mouse) anyway.
+
+  Import Options
+    MooX::Press is called like:
+
+      use MooX::Press %import_opts;
+
+    The following options are supported. To make these easier to remember,
+    options follow the convention of using lower-case singular, and reusing
+    keywords from Perl and Moo/Moose/Mouse when possible.
+
+    `class` *(OptList)*
+        This is the list of classes to create as an optlist. An optlist is an
+        arrayref of strings, where each string is optionally followed by a
+        reference.
+
+          [ "A", "B", "C", \%opt_for_C, "D", "E", \%opts_for_E, "F" ]
+
+        In particular, for the class optlist the references should be hashrefs
+        of class options (see "Class Options"), though key-value pair
+        arrayrefs are also accepted.
+
+    `role` *(OptList)*
+        This is the list of roles to create, structured almost the same as the
+        optlist for classes, but see "Role Options".
+
+    `toolkit` *(Str)*
+        The strings "Moo", "Moose", or "Mouse" are accepted and instruct
+        MooX::Press to use your favourite OO toolkit. "Moo" is the default.
+
+    `version` *(Num)*
+        This has nothing to do with the version of MooX::Press you are using.
+        It sets the `our $VERSION` variable for the classes and roles being
+        generated.
+
+    `authority` *(Str)*
+        This sets the `our $AUTHORITY` variable for the classes and roles
+        being generated.
+
+        `version` and `authority` will be copied from the caller if they are
+        not set, but you can set them to undef explicitly if you want to avoid
+        that.
+
+    `prefix` *(Str|Undef)*
+        A namespace prefix for MooX::Press to put all your classes into. If
+        MooX::Press is told to create a class "Animal" and `prefix` is set to
+        "MyApp::OO", then it will create a class called "MyApp::OO::Animal".
+
+        This is optional and defaults to the caller. If you wish to have no
+        prefix, then pass an explicit `prefix => undef` option.
+
+        You can bypass the prefix for a specific class or a specific role
+        using a leading double colon, like "::Animal".
+
+    `factory_package` *(Str|Undef)*
+        A package name to install methods like the `new_cat` and `new_cow`
+        methods in "SYNOPSIS".
+
+        This defaults to caller, but may be explicitly set to undef to
+        suppress the creation of such methods.
+
+    `type_library` *(Str|Undef)*
+        MooX::Press will automatically create a Type::Library-based type
+        library with type constraints for all your classes and roles. It will
+        be named using your prefix followed by "::Types".
+
+        You can specify a new name or explicitly set to undef to suppress this
+        behaviour, but a lot of the coercion features of MooX::Press rely on
+        there being a type library.
+
+        MooX::Press will create a get_type_for_package method that allows you
+        to do this:
+
+          MyApp::Types->get_type_for_package(class => "MyApp::Animal");
+
+        MooX::Press will mark "MyApp/Types.pm" as loaded in %INC, so you can
+        do things like:
+
+          use MyApp::Types qw(Animal);
+
+        And it won't complain about "MyApp/Types.pm" not being found.
+
+    `caller` *(Str)*
+        MooX::Press determines some things based on which package called it.
+        If you are wrapping MooX::Press, you can fake the caller by passing it
+        as an option.
+
+    `end` *(CodeRef)*
+        After creating each class or role, this coderef will be called. It
+        will be passed two parameters; the fully-qualified package name of the
+        class or role, plus the string "class" or "role" as appropriate.
+
+        Optional; defaults to nothing.
+
+    `mutable` *(Bool)*
+        Boolean to indicate that classes should be left mutable after creating
+        them rather than making them immutable. Constructors for mutable
+        classes are considerably slower than for immutable classes, so this is
+        usually a bad idea.
+
+        Only supported for Moose. Unnecessary for Moo anyway. Defaults to
+        false.
+
+   Class Options
+    Each class in the list of classes can be followed by a hashref of options:
+
+      use MooX::Press (
+        class => [
+          'Foo' => \%options_for_foo,
+          'Bar' => \%options_for_bar,
+        ],
+      );
+
+    The following class options are supported.
+
+    `extends` *(Str|ArrayRef[Str])*
+        The parent class for this class.
+
+        The prefix is automatically added. Include a leading "::" if you don't
+        want the prefix to be added.
+
+        Multiple inheritance is supported.
+
+    `with` *(ArrayRef[Str])*
+        Roles for this class to consume.
+
+        The prefix is automatically added. Include a leading "::" if you don't
+        want the prefix to be added.
+
+    `has` *(OptList)*
+        The list of attributes to add to the class as an optlist.
+
+        The strings are the names of the attributes, but these strings may be
+        "decorated" with sigils and suffixes:
+
+        $foo
+            Creates an attribute "foo" intended to hold a single value. This
+            adds a type constraint forbidding arrayrefs and hashrefs but
+            allowing any other value, including undef, strings, numbers, and
+            any other reference.
+
+        @foo
+            Creates an attribute "foo" intended to hold a list of values. This
+            adds a type constraint allowing arrayrefs or objects overloading
+            `@{}`.
+
+        %foo
+            Creates an attribute "foo" intended to hold a collection of
+            key-value pairs. This adds a type constraint allowing hashrefs or
+            objects overloading `%{}`.
+
+        `foo!`
+            Creates an attribute "foo" which will be required by the
+            constructor.
+
+        An attribute can have both a sigil and a suffix.
+
+        The references in the optlist may be attribute specification hashrefs,
+        type constraint objects, or builder coderefs.
+
+          # These mean the same thing...
+          "name!" => Str,
+          "name"  => { is => "rw", required => 1, isa => Str },
+
+          # These mean the same thing...
+          "age"   => sub { return 0 },
+          "age"   => {
+            is         => "rw",
+            lazy       => 1,
+            builder    => sub { return 0 },
+            clearer    => "clear_age",
+          },
+
+        Type constraints can be any blessed object supported by the toolkit.
+        For Moo, use Type::Tiny. For Moose, use Type::Tiny, MooseX::Types, or
+        Specio. For Mouse, use Type::Tiny or MouseX::Types.
+
+        Builder coderefs are automatically installed as methods like
+        "YourPrefix::YourClass::_build_age()".
+
+        For details of the hashrefs, see "Attribute Specifications".
+
+    `can` *(HashRef[CodeRef])*
+        A hashref of coderefs to install into the package.
+
+          package MyApp;
+          use MooX::Press (
+            class => [
+              'Foo' => {
+                 can => {
+                   'bar' => sub { print "in bar" },
+                 },
+               },
+            ],
+          );
+  
+          package main;
+          MyApp->new_foo()->bar();
+
+        As an alternative, you can do this to prevent your import from getting
+        cluttered with coderefs. Which you choose depends a lot on stylistic
+        preference.
+
+          package MyApp;
+          use MooX::Press (
+            class => ['Foo'],
+          );
+  
+          package MyApp::Foo;
+          sub bar { print "in bar" },
+  
+          package main;
+          MyApp->new_foo()->bar();
+
+    `constant` *(HashRef[Item])*
+        A hashref of scalar constants to define in the package.
+
+          package MyApp;
+          use MooX::Press (
+            class => [
+              'Foo' => {
+                 constant => {
+                   'BAR' => 42,
+                 },
+               },
+            ],
+          );
+  
+          package main;
+          print MyApp::Foo::BAR, "\n";
+          print MyApp->new_foo->BAR, "\n";
+
+    `around` *(ArrayRef|HashRef)*
+    `before` *(ArrayRef|HashRef)*
+    `after` *(ArrayRef|HashRef)*
+        Installs method modifiers.
+
+          package MyApp;
+          use MooX::Press (
+            role => [
+              'Loud' => {
+                around => [
+                  'greeting' => sub {
+                    my $orig = shift;
+                    my $self = shift;
+                    return uc( $self->$orig(@_) );
+                  },
+                ],
+              }
+            ],
+            class => [
+              'Person' => {
+                can => {
+                  'greeting' => sub { "hello" },
+                }
+                subclass => [
+                  'LoudPerson' => { with => 'Loud' },
+                ],
+              },
+            ],
+          );
+  
+          package main;
+          print MyApp::LoudPerson->new->greeting, "\n";  # prints "HELLO"
+
+    `coerce` *(ArrayRef)*
+        When creating a class or role "Foo", MooX::Press will also create a
+        Type::Tiny::Class or Type::Tiny::Role called "Foo". The `coerce`
+        option allows you to add coercions to that type constraint. Coercions
+        are called as methods on the class or role. This is perhaps best
+        explained with an example:
+
+          package MyApp;
+          use Types::Standard qw(Str);
+          use MooX::Press (
+            class => [
+              'Person' => {
+                has    => [ 'name!' => Str ],
+                can    => {
+                  'from_name' => sub {
+                    my ($class, $name) = @_;
+                    return $class->new(name => $name);
+                  },
+                },
+                coerce => [
+                  Str, 'from_name',
+                ],
+              },
+              'Company' => {
+                has    => [ 'name!' => Str, 'owner!' => { isa => 'Person' } ],
+              },
+            ],
+          );
+
+        This looks simple but it's like the swan, graceful above the surface
+        of the water, legs paddling frantically below.
+
+        It creates a class called "MyApp::Person" with a "name" attribute, so
+        you can do this kind of thing:
+
+          my $bob = MyApp::Person->new(name => "Bob");
+          my $bob = MyApp->new_person(name => "Bob");
+
+        As you can see from the `can` option, it also creates a method
+        "from_name" which can be used like this:
+
+          my $bob = MyApp::Person->from_name("Bob");
+
+        But here's where coercions come in. It also creates a type constraint
+        called "Person" in "MyApp::Types" and adds a coercion from the `Str`
+        type. The coercion will just call the "from_name" method.
+
+        Then when the "MyApp::Company" class is created and the "owner"
+        attribute is being set up, MooX::Press knows about the coercion from
+        Str, and will set up coercion for that attribute.
+
+          # So this should just work...
+          my $acme = MyApp->new_company(name => "Acme Inc", owner => "Bob");
+          print $acme->owner->name, "\n";
+
+        Now that's out of the way, the exact structure for the arrayref of
+        coercions can be explained. It is essentially a list of type-method
+        pairs.
+
+        The type may be either a blessed type constraint object (Type::Tiny,
+        etc) or it may be a class or role name that is being set up by
+        MooX::Press, in which case it will have the prefix added, etc.
+
+        The method is a string containing the method name to perform the
+        coercion.
+
+        This may optionally be followed by coderef to install as the method.
+        The following two examples are equivalent:
+
+          use MooX::Press (
+            class => [
+              'Person' => {
+                has    => [ 'name!' => Str ],
+                can    => {
+                  'from_name' => sub {
+                    my ($class, $name) = @_;
+                    return $class->new(name => $name);
+                  },
+                },
+                coerce => [
+                  Str, 'from_name',
+                ],
+              },
+            ],
+          );
+
+          use MooX::Press (
+            class => [
+              'Person' => {
+                has    => [ 'name!' => Str ],
+                coerce => [
+                  Str, 'from_name' => sub {
+                    my ($class, $name) = @_;
+                    return $class->new(name => $name);
+                  },
+                ],
+              },
+            ],
+          );
+
+        In the second example, you can see the `can` option to install the
+        "from_name" method has been dropped and the coderef put into `coerce`
+        instead.
+
+        In case it's not obvious, I suppose it's worth explicitly stating that
+        it's possible to have coercions from many different types.
+
+          use MooX::Press (
+            class => [
+              'Foo::Bar' => {
+                coerce => [
+                  Str,        'from_string', sub { ... },
+                  ArrayRef,   'from_array',  sub { ... },
+                  HashRef,    'from_hash',   sub { ... },
+                  'Foo::Baz', 'from_foobaz', sub { ... },
+                ],
+              },
+              'Foo::Baz',
+            ],
+          );
+
+        You should generally order the coercions from most specific to least
+        specific. If you list "Num" before "Int", "Int" will never be used
+        because all integers are numbers.
+
+        There is no automatic inheritance for coercions because that does not
+        make sense. If `Mammal->from_string($str)` is a coercion returning a
+        "Mammal" object, and "Person" is a subclass of "Mammal", then there's
+        no way for MooX::Press to ensure that when `Person->from_string($str)`
+        is called, it will return a "Person" object and not some other kind of
+        mammal. If you want "Person" to have a coercion, define the coercion
+        in the "Person" class and don't rely on it being inherited from
+        "Mammal".
+
+    `subclass` *(OptList)*
+        Set up subclasses of this class. This accepts an optlist like the
+        class list. It allows subclasses to be nested as deep as you like:
+
+          package MyApp;
+          use MooX::Press (
+            class => [
+              'Animal' => {
+                 has      => ['name!'],
+                 subclass => [
+                   'Fish',
+                   'Bird',
+                   'Mammal' => {
+                      can      => { 'lactate' => sub { ... } },
+                      subclass => [
+                        'Cat',
+                        'Dog',
+                        'Primate' => {
+                          subclass => ['Monkey', 'Gorilla', 'Human'],
+                        },
+                      ],
+                   },
+                 ],
+               },
+            ];
+          );
+  
+          package main;
+          my $uncle = MyApp->new_human(name => "Bob");
+          $uncle->isa('MyApp::Human');    # true
+          $uncle->isa('MyApp::Primate');  # true
+          $uncle->isa('MyApp::Mammal');   # true
+          $uncle->isa('MyApp::Animal');   # true
+          $uncle->isa('MyApp::Bird');     # false
+          $uncle->can('lactate');         # eww, but true
+
+        We just defined a nested heirarchy with ten classes there!
+
+        Subclasses can be named with a leading "+" to tell them to use their
+        parent class name as a prefix. So, in the example above, if you'd
+        called your subclasses "+Mammal", "+Dog", etc, you'd end up with
+        packages like "MyApp::Animal::Mammal::Dog". (In cases of multiple
+        inheritance, it uses $ISA[0].)
+
+    `factory` *(Str)*
+        This is the name for the method installed into the factory package. So
+        for class "Cat", it might be "new_cat".
+
+        The default is the class name (excluding the prefix), lowercased, with
+        double colons replaced by single underscores, and with "new_" added in
+        front. To suppress the creation of this method, set `factory` to an
+        explicit undef.
+
+    `type_name` *(Str)*
+        The name for the type being installed into the type library.
+
+        The default is the class name (excluding the prefix), with double
+        colons replaced by single underscores.
+
+        This:
+
+          use MooX::Press prefix => "ABC::XYZ", class => ["Foo::Bar"];
+
+        Will create class "ABC::XYZ::Foo::Bar", a factory method
+        `ABC::XYZ->new_foo_bar()`, and a type constraint "Foo_Bar" in type
+        library "ABC::XYZ::Types".
+
+    `toolkit` *(Str)*
+        Override toolkit choice for this class and any child classes.
+
+    `version` *(Num)*
+        Override version number for this class and any child classes.
+
+    `authority` *(Str)*
+        Override authority for this class and any child classes.
+
+        See "Import Options".
+
+    `prefix` *(Str)*
+        Override namespace prefix for this class and any child classes.
+
+        See "Import Options".
+
+    `factory_package` *(Str)*
+        Override factory_package for this class and any child classes.
+
+        See "Import Options".
+
+    `mutable` *(Bool)*
+        Override mutability for this class and any child classes.
+
+        See "Import Options".
+
+    `end` *(CodeRef)*
+        Override `end` for this class and any child classes.
+
+        See "Import Options".
+
+   Role Options
+    Options for roles are largely the same as for classes with the following
+    exceptions:
+
+    `extends` *(Any)*
+        This option is disallowed.
+
+    `can` *(HashRef[CodeRef])*
+        The alternative style for defining methods may cause problems with the
+        order in which things happen. Because `use MooX::Press` happens at
+        compile time, the following might not do what you expect:
+
+          package MyApp;
+          use MooX::Press (
+            role   => ["MyRole"],
+            class  => ["MyClass" => { with => "MyRole" }],
+          );
+  
+          package MyApp::MyRole;
+          sub my_function { ... }
+
+        The "my_function" will not be copied into "MyApp::MyClass" because at
+        the time the class is constructed, "my_function" doesn't yet exist
+        within the role "MyApp::MyRole".
+
+        You can combat this by changing the order you define things in:
+
+          package MyApp::MyRole;
+          sub my_function { ... }
+  
+          package MyApp;
+          use MooX::Press (
+            role   => ["MyRole"],
+            class  => ["MyClass" => { with => "MyRole" }],
+          );
+
+        If you don't like having method definitions "above" MooX::Press in
+        your file, then you can move them out into a module.
+
+          # MyApp/Methods.pm
+          #
+          package MyApp::MyRole;
+          sub my_function { ... }
+
+          # MyApp.pm
+          #
+          package MyApp;
+          use MyApp::Methods (); # load extra methods
+          use MooX::Press (
+            role   => ["MyRole"],
+            class  => ["MyClass" => { with => "MyRole" }],
+          );
+
+        Or force MooX::Press to happen at runtime instead of compile time.
+
+          package MyApp;
+          require MooX::Press;
+          import MooX::Press (
+            role   => ["MyRole"],
+            class  => ["MyClass" => { with => "MyRole" }],
+          );
+  
+          package MyApp::MyRole;
+          sub my_function { ... }
+
+    `subclass` *(Any)*
+        This option is silently ignored.
+
+    `factory` *(Any)*
+        This option is silently ignored.
+
+    `mutable` *(Any)*
+        This option is silently ignored.
+
+   Attribute Specifications
+    Attribute specifications are mostly just passed to the OO toolkit
+    unchanged, somewhat like:
+
+      has $attribute_name => %attribute_spec;
+
+    So whatever specifications (`required`, `trigger`, `coerce`, etc) the
+    underlying toolkit supports should be supported.
+
+    The following are exceptions:
+
+    `is` *(Str)*
+        This is optional rather than being required, and defaults to "rw".
+        (Yes, I prefer "ro" generally, but whatever.)
+
+    `isa` *(Str|Object)*
+        When the type constraint is a string, it is always assumed to be a
+        class name and your application's namespace prefix is added. So `isa
+        => "HashRef"` doesn't mean what you think it means. It means an object
+        blessed into the "YourApp::HashRef" class.
+
+        Use blessed type constraint objects, such as those from
+        Types::Standard.
+
+    `coerce` *(Bool)*
+        MooX::Press automatically implies `coerce => 1` when you give a type
+        constraint that has a coercion. If you don't want coercion then
+        explicitly provide `coerce => 0`.
+
+    `does` *(Str)*
+        Similarly, these will be given your namespace prefix.
+
+    `enum` *(ArrayRef[Str])*
+        This is a cute shortcut for an enum type constraint.
+
+          # These mean the same...
+          enum => ['foo', 'bar'],
+          isa  => Types::Standard::Enum['foo', 'bar'],
+
+  Optimization Features
+    MooX::Press will automatically load MooX::TypeTiny if it's installed,
+    which optimizes how Type::Tiny constraints and coercions are inlined into
+    Moo constructors. This is only used for Moo classes.
+
+    MooX::Press will automatically load MooseX::XSAccessor if it's installed,
+    which speeds up some Moose accessors. This is only used for Moose classes.
+
+  Subclassing MooX::Press
+    All the internals of MooX::Press are called as methods, which should make
+    subclassing it possible.
+
+      package MyX::Press;
+      use parent 'MooX::Press';
+      use Class::Method::Modifiers;
+  
+      around make_class => sub {
+        my $orig = shift;
+        my $self = shift;
+        my ($name, %opts) = @_;
+        ## Alter %opts here
+        my $qname = $self->$orig($name, %opts);
+        ## Maybe do something to the returned class
+        return $qname;
+      };
+
+    It is beyond the scope of this documentation to fully describe all the
+    methods you could potentially override, but here is a quick summary of
+    some that may be useful.
+
+    `import(%opts|\%opts)`
+    `qualify_name($name, $prefix)`
+    `croak($error)`
+    `prepare_type_library($qualified_name)`
+    `make_type_for_role($name, %opts)`
+    `make_type_for_class($name, %opts)`
+    `make_role($name, %opts)`
+    `make_class($name, %opts)`
+    `install_methods($qualified_name, \%methods)`
+    `install_constants($qualified_name, \%values)`
+
+FAQ
+    This is a new module so I haven't had any questions about it yet, let
+    alone any frequently asked ones, but I will anticipate some.
+
+  Why doesn't MooX::Press automatically import strict and warnings for me?
+    Your MooX::Press import will typically contain a lot of strings, maybe
+    some as barewords, some coderefs, etc. You should manually import strict
+    and warnings before importing MooX::Press to ensure all of that is covered
+    by strictures.
+
+  Are you insane?
+    Quite possibly.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>.
+
+SEE ALSO
+    Moo, MooX::Struct, Types::Standard.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2019 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::EmployerReview;
 
-# ABSTRACT: An <a class="localLink" href="http://schema
+# ABSTRACT: An EmployerReview is a review of an Organization regarding its role as an employer
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,20 +30,20 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::EmployerReview - An <a class="localLink" href="http://schema
+SemanticWeb::Schema::EmployerReview - An EmployerReview is a review of an Organization regarding its role as an employer
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An <a class="localLink"
+=for html <p>An <a class="localLink"
 href="http://schema.org/EmployerReview">EmployerReview</a> is a review of
 an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> regarding its role
 as an employer, written by a current or former employee of that
-organization.
+organization.<p>
 
 =head1 SEE ALSO
 

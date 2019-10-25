@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has applicant_location_requirements => (
@@ -62,6 +62,14 @@ has employment_type => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'employmentType',
+);
+
+
+
+has employment_unit => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'employmentUnit',
 );
 
 
@@ -218,6 +226,14 @@ has title => (
 
 
 
+has total_job_openings => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'totalJobOpenings',
+);
+
+
+
 has valid_through => (
     is        => 'rw',
     predicate => 1,
@@ -250,7 +266,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -347,6 +363,21 @@ A employment_type should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<employment_unit>
+
+C<employmentUnit>
+
+Indicates the department, unit and/or facility where the employee reports
+and/or in which the job is to be performed.
+
+A employment_unit should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -514,14 +545,15 @@ A job_start_date should be one of the following types:
 
 C<occupationalCategory>
 
-=for html A category describing the job, preferably using a term from a taxonomy such
-as <a href="http://www.onetcenter.org/taxonomy.html">BLS O*NET-SOC</a>, <a
+=for html <p>A category describing the job, preferably using a term from a taxonomy
+such as <a href="http://www.onetcenter.org/taxonomy.html">BLS
+O*NET-SOC</a>, <a
 href="https://www.ilo.org/public/english/bureau/stat/isco/isco08/">ISCO-08<
 /a> or similar, with the property repeated for each applicable value.
 Ideally the taxonomy should be identified, and both the textual label and
 formal code for the category should be provided.<br/><br/> Note: for
 historical reasons, any textual label and formal code provided as a literal
-may be assumed to be from O*NET-SOC.
+may be assumed to be from O*NET-SOC.<p>
 
 A occupational_category should be one of the following types:
 
@@ -577,9 +609,9 @@ A responsibilities should be one of the following types:
 
 C<salaryCurrency>
 
-=for html The currency (coded using <a
+=for html <p>The currency (coded using <a
 href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> ) used for the
-main salary information in this job posting or for this employee.
+main salary information in this job posting or for this employee.<p>
 
 A salary_currency should be one of the following types:
 
@@ -625,6 +657,21 @@ A title should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<total_job_openings>
+
+C<totalJobOpenings>
+
+The number of positions open for this job posting. Use a positive integer.
+Do not use if the number of positions is unclear or not known.
+
+A total_job_openings should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
 

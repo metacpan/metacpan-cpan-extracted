@@ -6,89 +6,147 @@ use Carp;
 use Moose;
 use namespace::autoclean;
 
-
 # document properties
 extends 'XML::NewsML_G2::AnyItem';
 
 has 'title', isa => 'Str', is => 'ro', required => 1;
-has 'subtitle', isa => 'Str', is => 'rw';
-has 'caption', isa => 'Str', is => 'rw';
-has 'teaser', isa => 'Str', is => 'rw';
-has 'summary', isa => 'Str', is => 'rw';
+has 'subtitle',   isa => 'Str',               is => 'rw';
+has 'caption',    isa => 'Str',               is => 'rw';
+has 'teaser',     isa => 'Str',               is => 'rw';
+has 'summary',    isa => 'Str',               is => 'rw';
 has 'paragraphs', isa => 'XML::LibXML::Node', is => 'rw';
-has 'content_created', isa => 'DateTime', is => 'ro', lazy => 1, builder => '_build_content_created';
+has 'content_created',
+    isa     => 'DateTime',
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_content_created';
 has 'content_modified', isa => 'DateTime', is => 'ro';
 
-has 'credit', isa => 'Str', is => 'rw';
-has 'priority', isa => 'Int', is => 'ro', default => 5;
-has 'message_id', isa => 'Str', is => 'ro';
-has 'slugline', isa => 'Str', is => 'ro';
+has 'credit',       isa => 'Str', is => 'rw';
+has 'priority',     isa => 'Int', is => 'ro', default => 5;
+has 'message_id',   isa => 'Str', is => 'ro';
+has 'slugline',     isa => 'Str', is => 'ro';
 has 'slugline_sep', isa => 'Str', is => 'ro', default => '/';
+has 'electiondistrict', isa => 'XML::NewsML_G2::ElectionDistrict', is => 'rw';
 
-has 'sources', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_source => 'push'};
-has 'authors', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_author => 'push'};
-has 'cities', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_city => 'push'};
+has 'sources',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_source => 'push' };
+has 'authors',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_author => 'push' };
+has 'cities',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_city => 'push' };
 
-has 'genres', isa => 'ArrayRef[XML::NewsML_G2::Genre]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_genre => 'push'};
-has 'organisations', isa => 'ArrayRef[XML::NewsML_G2::Organisation]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_organisation => 'push', has_organisations => 'count'};
-has 'topics', isa => 'ArrayRef[XML::NewsML_G2::Topic]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_topic => 'push', has_topics => 'count'};
-has 'products', isa => 'ArrayRef[XML::NewsML_G2::Product]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_product => 'push', has_products => 'count'};
-has 'desks', isa => 'ArrayRef[XML::NewsML_G2::Desk]', is => 'rw',  default => sub { [] },
-  traits => ['Array'], handles => {add_desk => 'push', has_desks => 'count'};
-has 'media_topics', isa => 'HashRef[XML::NewsML_G2::Media_Topic]', is => 'rw', default => sub { {} },
-  traits => ['Hash'], handles => {has_media_topics => 'count'};
-has 'locations', isa => 'HashRef[XML::NewsML_G2::Location]', is => 'rw', default => sub { {} },
-  traits => ['Hash'], handles => {has_locations => 'count'};
-has 'keywords', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-    traits => ['Array'],
-    handles => {add_keyword => 'push', has_keywords => 'count'};
-has 'remotes', isa => 'HashRef', is => 'rw', default => sub { {} },
-    traits => ['Hash'], handles => {has_remotes => 'count'};
+has 'genres',
+    isa     => 'ArrayRef[XML::NewsML_G2::Genre]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_genre => 'push' };
+has 'organisations',
+    isa     => 'ArrayRef[XML::NewsML_G2::Organisation]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_organisation => 'push', has_organisations => 'count' };
+has 'topics',
+    isa     => 'ArrayRef[XML::NewsML_G2::Topic]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_topic => 'push', has_topics => 'count' };
+has 'products',
+    isa     => 'ArrayRef[XML::NewsML_G2::Product]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_product => 'push', has_products => 'count' };
+has 'desks',
+    isa     => 'ArrayRef[XML::NewsML_G2::Desk]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_desk => 'push', has_desks => 'count' };
+has 'media_topics',
+    isa     => 'HashRef[XML::NewsML_G2::Media_Topic]',
+    is      => 'rw',
+    default => sub { {} },
+    traits  => ['Hash'],
+    handles => { has_media_topics => 'count' };
+has 'locations',
+    isa     => 'HashRef[XML::NewsML_G2::Location]',
+    is      => 'rw',
+    default => sub { {} },
+    traits  => ['Hash'],
+    handles => { has_locations => 'count' };
+has 'keywords',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_keyword => 'push', has_keywords => 'count' };
+has 'remotes',
+    isa     => 'HashRef',
+    is      => 'rw',
+    default => sub { {} },
+    traits  => ['Hash'],
+    handles => { has_remotes => 'count' };
+has 'inlinedata',
+    isa     => 'ArrayRef[XML::NewsML_G2::Inline_Data]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_inlinedata => 'push', has_inlinedata => 'count' };
 
 sub _build_content_created {
-    return DateTime->now(time_zone => 'local');
+    return DateTime->now( time_zone => 'local' );
 }
 
 # public methods
 
 sub add_media_topic {
-    my ($self, $mt) = @_;
-    return if exists $self->media_topics->{$mt->qcode};
-    $self->media_topics->{$mt->qcode} = $mt;
-    $self->add_media_topic($mt->parent) if ($mt->parent);
+    my ( $self, $mt ) = @_;
+    return if exists $self->media_topics->{ $mt->qcode };
+    $self->media_topics->{ $mt->qcode } = $mt;
+    $self->add_media_topic( $mt->parent ) if ( $mt->parent );
     return 1;
 }
 
 sub add_location {
-    my ($self, $l) = @_;
-    return if exists $self->locations->{$l->qcode};
-    $self->locations->{$l->qcode} = $l;
-    $self->add_location($l->parent) if $l->parent;
+    my ( $self, $l ) = @_;
+    return if exists $self->locations->{ $l->qcode };
+    $self->locations->{ $l->qcode } = $l;
+    $self->add_location( $l->parent ) if $l->parent;
     return 1;
 }
 
 sub add_paragraph {
-    my ($self, $text) = @_;
+    my ( $self, $text ) = @_;
     my $paras = $self->paragraphs;
     unless ($paras) {
-        $self->paragraphs($paras = XML::LibXML->createDocument()->createElement('paragraphs'));
+        $self->paragraphs( $paras =
+                XML::LibXML->createDocument()->createElement('paragraphs') );
     }
     my $doc = $paras->getOwnerDocument;
-    my $p = $doc->createElementNS('http://www.w3.org/1999/xhtml', 'p');
-    $p->appendChild($doc->createTextNode($text));
+    my $p   = $doc->createElementNS( 'http://www.w3.org/1999/xhtml', 'p' );
+    $p->appendChild( $doc->createTextNode($text) );
     $paras->appendChild($p);
     return 1;
 }
 
 sub add_remote {
-    my ($self, $uri, $remote) = @_;
+    my ( $self, $uri, $remote ) = @_;
     return if exists $self->remotes->{$uri};
     $self->remotes->{$uri} = $remote;
 
@@ -148,7 +206,11 @@ Human readable content description string
 
 =item derived_from
 
-Free-format string or XML::NewsML_G2::Link instance
+Deprecated - use derived_froms and add_derived_from instead!
+
+=item derived_froms
+
+List of  XML::NewsML_G2::Link instances
 
 =item desks
 
@@ -218,6 +280,10 @@ control of the output.
 
 Numeric message priority, defaults to 5
 
+=item processed_froms
+
+List of XML::NewsML_G2::Link instances
+
 =item products
 
 List of L<XML::NewsML_G2::Product> instances
@@ -232,7 +298,11 @@ Hash mapping of hrefs to remote object (e.g. XML::NewsML_G2::Picture) instances
 
 =item see_also
 
-Free-format string or XML::NewsML_G2::Link instance
+Deprecated - use see_alsos and add_see_also instead!
+
+=item see_alsos
+
+List of XML::NewsML_G2::Link instances
 
 =item service
 
@@ -245,6 +315,10 @@ String containing the slugline
 =item slugline_sep
 
 Slugline separator, defaults to "/"
+
+=item election_district
+
+L<XML::NewsML_G2::ElectionDistrict> instance
 
 =item sources
 
@@ -288,6 +362,11 @@ Add a string to the authors
 
 Add a string to the cities
 
+=item add_derived_from
+
+Add a new "derived from" link - either a string, or a
+XML::NewsML_G2::Link instance
+
 =item add_desk
 
 Add a L<XML::NewsML_G2::Desk> instance
@@ -326,6 +405,11 @@ Add a new L<XML::NewsML_G2::Product> instance
 =item add_remote
 
 Add a new remote instance (e.g. XML::NewsML_G2::Picture) with a given href
+
+=item add_see_also
+
+Add a new "see also" link - either a string, or a XML::NewsML_G2::Link
+instance
 
 =item add_source
 

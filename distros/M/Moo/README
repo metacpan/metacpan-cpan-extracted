@@ -53,7 +53,9 @@ DESCRIPTION
 
     "Moo" avoids depending on any XS modules to allow for simple
     deployments. The name "Moo" is based on the idea that it provides almost
-    -- but not quite -- two thirds of Moose.
+    -- but not quite -- two thirds of Moose. As such, the Moose::Manual can
+    serve as an effective guide to "Moo" aside from the MOP and Types
+    sections.
 
     Unlike Mouse this module does not aim at full compatibility with Moose's
     surface syntax, preferring instead to provide full interoperability via
@@ -136,7 +138,7 @@ MOO VERSUS ANY::MOOSE
     using Moo.
 
     For a full explanation, see the article
-    <http://shadow.cat/blog/matt-s-trout/moo-versus-any-moose> which
+    <https://shadow.cat/blog/matt-s-trout/moo-versus-any-moose> which
     explains the differing strategies in more detail and provides a direct
     example of where Moo succeeds and Any::Moose fails.
 
@@ -598,9 +600,16 @@ CLEANING UP IMPORTS
 
       1;
 
-    If you were to import "md5_hex" after namespace::clean you would be able
-    to call "->md5_hex()" on your "Record" instances (and it probably
-    wouldn't do what you expect!).
+    For example if you were to import these subroutines after
+    namespace::clean like this
+
+      use namespace::clean;
+
+      use Digest::MD5 qw(md5_hex);
+      use Moo;
+
+    then any "Record" $r would have methods such as "$r->md5_hex()",
+    "$r->has()" and "$r->around()" - almost certainly not what you intend!
 
     Moo::Roles behave slightly differently. Since their methods are composed
     into the consuming class, they can do a little more for you
@@ -615,6 +624,7 @@ CLEANING UP IMPORTS
     are using version 0.16 or newer.
 
 INCOMPATIBILITIES WITH MOOSE
+  TYPES
     There is no built-in type system. "isa" is verified with a coderef; if
     you need complex types, Type::Tiny can provide types, type libraries,
     and will work seamlessly with both Moo and Moose. Type::Tiny can be
@@ -624,17 +634,10 @@ INCOMPATIBILITIES WITH MOOSE
       use Types::Standard qw(Int);
       has days_to_live => (is => 'ro', isa => Int);
 
+  API INCOMPATIBILITIES
     "initializer" is not supported in core since the author considers it to
     be a bad idea and Moose best practices recommend avoiding it. Meanwhile
     "trigger" or "coerce" are more likely to be able to fulfill your needs.
-
-    There is no meta object. If you need this level of complexity you need
-    Moose - Moo is small because it explicitly does not provide a
-    metaprotocol. However, if you load Moose, then
-
-      Class::MOP::class_of($moo_class_or_role)
-
-    will return an appropriate metaclass pre-populated by Moo.
 
     No support for "super", "override", "inner", or "augment" - the author
     considers augment to be a bad idea, and override can be translated:
@@ -706,6 +709,16 @@ INCOMPATIBILITIES WITH MOOSE
       use warnings FATAL => "all";
       use MooseX::AttributeShortcuts;
 
+  META OBJECT
+    There is no meta object. If you need this level of complexity you need
+    Moose - Moo is small because it explicitly does not provide a
+    metaprotocol. However, if you load Moose, then
+
+      Class::MOP::class_of($moo_class_or_role)
+
+    will return an appropriate metaclass pre-populated by Moo.
+
+  IMMUTABILITY
     Finally, Moose requires you to call
 
       __PACKAGE__->meta->make_immutable;
@@ -718,9 +731,7 @@ INCOMPATIBILITIES WITH MOOSE
     by providing a more Moose-like interface.
 
 SUPPORT
-    Users' IRC: #moose on irc.perl.org
-
-    Development and contribution IRC: #web-simple on irc.perl.org
+    IRC: #moose on irc.perl.org
 
     Bugtracker: <https://rt.cpan.org/Public/Dist/Display.html?Name=Moo>
 
@@ -773,5 +784,5 @@ COPYRIGHT
 
 LICENSE
     This library is free software and may be distributed under the same
-    terms as perl itself. See <http://dev.perl.org/licenses/>.
+    terms as perl itself. See <https://dev.perl.org/licenses/>.
 

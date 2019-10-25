@@ -15,13 +15,14 @@ Getopt::Long::Configure ("no_ignore_case", "pass_through");
 use Logging::Simple;
 use Module::Load;
 use Plugin::Simple default => 'Test::BrewBuild::Plugin::DefaultExec';
+use POSIX qw(strftime);
 use Test::BrewBuild::BrewCommands;
 use Test::BrewBuild::Constant qw(:all);
 use Test::BrewBuild::Dispatch;
 use Test::BrewBuild::Regex;
 use Test::BrewBuild::Tester;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 my $log;
 my $bcmd;
@@ -340,8 +341,14 @@ sub test {
 
     my $results = $self->_exec;
 
-    if (@perls_installed == 1){
-        if ($results !~ /${ re_brewbuild('check_result') }/){
+    # add perl version info to top of results if we're in a single-instance
+    # run, and the results don't contain that info
+
+    if ($results !~ /${ re_brewbuild('check_result') }/){
+        if ($self->{args}{on} && @{ $self->{args}{on} } == 1){
+            $results = "perl-$self->{args}{on}[0]\n==========\n" . $results;
+        }
+        elsif (@perls_installed == 1){
             $results = "$perls_installed[0]\n==========\n" . $results;
         }
     }
@@ -401,6 +408,12 @@ sub tempdir {
     $self->{temp_handle} = $dir;
     $self->{tempdir} = $dir_name;
     return $self->{tempdir};
+}
+sub timestamp {
+    my $t = time;
+    my $date = strftime "%Y-%m-%d %H:%M:%S", localtime $t;
+    $date .= sprintf ".%03d", ($t-int($t))*1000; # without rounding
+    return $date;
 }
 sub workdir {
     my $self = shift;
@@ -606,7 +619,19 @@ sub _exec {
 
     if ($self->{args}{on}){
         my $vers = join ',', @{ $self->{args}{on} };
+
         $log->_5("versions to run on: $vers");
+
+        for my $run_on_version (@{ $self->{args}{on} }){
+            my $prefixed_version = $run_on_version;
+
+            if ($run_on_version !~ /^perl-/){
+                $prefixed_version = "perl-$run_on_version";
+            }
+            if (! grep {$prefixed_version eq $_} $self->perls_installed){
+                croak "\nversion '$run_on_version' is invalid. Can't continue\n";
+            }
+        }
 
         my $wfh = File::Temp->new(UNLINK => 1);
         my $fname = $wfh->filename;
@@ -1098,6 +1123,12 @@ Returns an instance of the packages log object for creating child log objects.
 
 Sets up the object with a temporary directory used for test logs, that will be 
 removed after the run.
+
+=head2 timestamp
+
+Returns a date/time string for timestamping items. Format:
+
+    YYYY-MM-DD HH:MM:SS.xxx
 
 =head2 workdir
 

@@ -2,8 +2,8 @@ NAME
     Log::ger::UseJSON - Use JSON::MaybeXS to dump data structures (as JSON)
 
 VERSION
-    This document describes version 0.001 of Log::ger::UseJSON (from Perl
-    distribution Log-ger-UseJSON), released on 2018-06-17.
+    This document describes version 0.002 of Log::ger::UseJSON (from Perl
+    distribution Log-ger-UseJSON), released on 2019-09-11.
 
 SYNOPSIS
      use Log::ger::UseJSON;
@@ -43,7 +43,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

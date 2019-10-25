@@ -4,10 +4,9 @@ use Moose;
 use namespace::autoclean;
 
 has 'rendition', isa => 'Str', is => 'rw', required => 1;
-has 'href', isa => 'Str', is => 'rw', required => 1;
-has 'width', isa => 'Int', is => 'rw';
-has 'height', isa => 'Int', is => 'rw';
-
+has 'href',      isa => 'Str', is => 'rw', required => 1;
+has 'width',     isa => 'Int', is => 'rw';
+has 'height',    isa => 'Int', is => 'rw';
 
 __PACKAGE__->meta->make_immutable;
 

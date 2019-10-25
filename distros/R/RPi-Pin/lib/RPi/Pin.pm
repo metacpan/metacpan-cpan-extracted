@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'WiringPi::API';
 
-our $VERSION = '2.3607';
+our $VERSION = '2.3608';
 
 sub new {
     my ($class, $pin, $comment) = @_;
@@ -41,6 +41,7 @@ sub mode {
     if (! defined $mode){
         return $self->get_alt($self->num);
     }
+
     if ($mode != 0 && $mode != 1 && $mode != 2 && $mode != 3){
         die "mode() mode param must be either 0 (input), 1 " .
             "(output), 2 (PWM output) or 3 (GPIO CLOCK output)\n";
@@ -283,7 +284,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Steve Bertrand
+Copyright (C) 2017-2019 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

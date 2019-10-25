@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Mass;
 
-# ABSTRACT: Properties that take Mass as values are of the form '&lt;Number&gt; &lt;Mass unit of measure&gt;'
+# ABSTRACT: Properties that take Mass as values are of the form '<Number> <Mass unit of measure>'
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,11 +30,11 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Mass - Properties that take Mass as values are of the form '&lt;Number&gt; &lt;Mass unit of measure&gt;'
+SemanticWeb::Schema::Mass - Properties that take Mass as values are of the form '<Number> <Mass unit of measure>'
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 

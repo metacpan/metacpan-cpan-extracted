@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has additional_property => (
@@ -226,10 +226,26 @@ has isic_v4 => (
 
 
 
+has latitude => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'latitude',
+);
+
+
+
 has logo => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'logo',
+);
+
+
+
+has longitude => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'longitude',
 );
 
 
@@ -354,7 +370,7 @@ SemanticWeb::Schema::Place - Entities that have a somewhat fixed
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -366,14 +382,14 @@ Entities that have a somewhat fixed, physical extension.
 
 C<additionalProperty>
 
-=for html A property-value pair representing an additional characteristics of the
+=for html <p>A property-value pair representing an additional characteristics of the
 entitity, e.g. a product feature or another characteristic for which there
 is no matching property in schema.org.<br/><br/> Note: Publishers should be
 aware that applications designed to use specific schema.org properties
 (e.g. http://schema.org/width, http://schema.org/color,
 http://schema.org/gtin13, ...) will typically expect such data to be
 provided using those properties, rather than using the generic
-property/value mechanism.
+property/value mechanism.<p>
 
 A additional_property should be one of the following types:
 
@@ -433,11 +449,11 @@ A amenity_feature should be one of the following types:
 
 C<branchCode>
 
-=for html A short textual code (also called "store code") that uniquely identifies a
-place of business. The code is typically assigned by the parentOrganization
-and used in structured URLs.<br/><br/> For example, in the URL
-http://www.starbucks.co.uk/store-locator/etc/detail/3047 the code "3047" is
-a branchCode for a particular branch.
+=for html <p>A short textual code (also called "store code") that uniquely identifies
+a place of business. The code is typically assigned by the
+parentOrganization and used in structured URLs.<br/><br/> For example, in
+the URL http://www.starbucks.co.uk/store-locator/etc/detail/3047 the code
+"3047" is a branchCode for a particular branch.<p>
 
 A branch_code should be one of the following types:
 
@@ -546,11 +562,11 @@ A geo should be one of the following types:
 
 C<geoContains>
 
-=for html Represents a relationship between two geometries (or the places they
+=for html <p>Represents a relationship between two geometries (or the places they
 represent), relating a containing geometry to a contained geometry. "a
 contains b iff no points of b lie in the exterior of a, and at least one
 point of the interior of b lies in the interior of a". As defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_contains should be one of the following types:
 
@@ -566,9 +582,9 @@ A geo_contains should be one of the following types:
 
 C<geoCoveredBy>
 
-=for html Represents a relationship between two geometries (or the places they
+=for html <p>Represents a relationship between two geometries (or the places they
 represent), relating a geometry to another that covers it. As defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_covered_by should be one of the following types:
 
@@ -584,10 +600,10 @@ A geo_covered_by should be one of the following types:
 
 C<geoCovers>
 
-=for html Represents a relationship between two geometries (or the places they
+=for html <p>Represents a relationship between two geometries (or the places they
 represent), relating a covering geometry to a covered geometry. "Every
 point of b is a point of (the interior or boundary of) a". As defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_covers should be one of the following types:
 
@@ -603,11 +619,11 @@ A geo_covers should be one of the following types:
 
 C<geoCrosses>
 
-=for html Represents a relationship between two geometries (or the places they
+=for html <p>Represents a relationship between two geometries (or the places they
 represent), relating a geometry to another that crosses it: "a crosses b:
 they have some but not all interior points in common, and the dimension of
 the intersection is less than that of at least one of them". As defined in
-<a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+<a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_crosses should be one of the following types:
 
@@ -623,10 +639,10 @@ A geo_crosses should be one of the following types:
 
 C<geoDisjoint>
 
-=for html Represents spatial relations in which two geometries (or the places they
+=for html <p>Represents spatial relations in which two geometries (or the places they
 represent) are topologically disjoint: they have no point in common. They
 form a set of disconnected geometries." (a symmetric relationship, as
-defined in <a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>)
+defined in <a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>)<p>
 
 A geo_disjoint should be one of the following types:
 
@@ -642,12 +658,12 @@ A geo_disjoint should be one of the following types:
 
 C<geoEquals>
 
-=for html Represents spatial relations in which two geometries (or the places they
+=for html <p>Represents spatial relations in which two geometries (or the places they
 represent) are topologically equal, as defined in <a
 href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>. "Two geometries are
 topologically equal if their interiors intersect and no part of the
 interior or boundary of one geometry intersects the exterior of the other"
-(a symmetric relationship)
+(a symmetric relationship)<p>
 
 A geo_equals should be one of the following types:
 
@@ -663,9 +679,9 @@ A geo_equals should be one of the following types:
 
 C<geoIntersects>
 
-=for html Represents spatial relations in which two geometries (or the places they
+=for html <p>Represents spatial relations in which two geometries (or the places they
 represent) have at least one point in common. As defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_intersects should be one of the following types:
 
@@ -681,10 +697,10 @@ A geo_intersects should be one of the following types:
 
 C<geoOverlaps>
 
-=for html Represents a relationship between two geometries (or the places they
+=for html <p>Represents a relationship between two geometries (or the places they
 represent), relating a geometry to another that geospatially overlaps it,
 i.e. they have some but not all points in common. As defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_overlaps should be one of the following types:
 
@@ -700,10 +716,10 @@ A geo_overlaps should be one of the following types:
 
 C<geoTouches>
 
-=for html Represents spatial relations in which two geometries (or the places they
+=for html <p>Represents spatial relations in which two geometries (or the places they
 represent) touch: they have at least one boundary point in common, but no
 interior points." (a symmetric relationship, as defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a> )
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a> )<p>
 
 A geo_touches should be one of the following types:
 
@@ -719,10 +735,10 @@ A geo_touches should be one of the following types:
 
 C<geoWithin>
 
-=for html Represents a relationship between two geometries (or the places they
+=for html <p>Represents a relationship between two geometries (or the places they
 represent), relating a geometry to one that contains it, i.e. it is inside
 (i.e. within) its interior. As defined in <a
-href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.<p>
 
 A geo_within should be one of the following types:
 
@@ -738,10 +754,10 @@ A geo_within should be one of the following types:
 
 C<globalLocationNumber>
 
-=for html The <a href="http://www.gs1.org/gln">Global Location Number</a> (GLN,
+=for html <p>The <a href="http://www.gs1.org/gln">Global Location Number</a> (GLN,
 sometimes also referred to as International Location Number or ILN) of the
 respective organization, person, or place. The GLN is a 13-digit number
-used to identify parties and physical locations.
+used to identify parties and physical locations.<p>
 
 A global_location_number should be one of the following types:
 
@@ -797,6 +813,21 @@ A isic_v4 should be one of the following types:
 
 =back
 
+=head2 C<latitude>
+
+=for html <p>The latitude of a location. For example <code>37.42242</code> (<a
+href="https://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a>).<p>
+
+A latitude should be one of the following types:
+
+=over
+
+=item C<Num>
+
+=item C<Str>
+
+=back
+
 =head2 C<logo>
 
 An associated logo.
@@ -806,6 +837,21 @@ A logo should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
+
+=item C<Str>
+
+=back
+
+=head2 C<longitude>
+
+=for html <p>The longitude of a location. For example <code>-122.08585</code> (<a
+href="https://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a>).<p>
+
+A longitude should be one of the following types:
+
+=over
+
+=item C<Num>
 
 =item C<Str>
 
@@ -895,9 +941,9 @@ A photos should be one of the following types:
 
 C<publicAccess>
 
-=for html A flag to signal that the <a class="localLink"
+=for html <p>A flag to signal that the <a class="localLink"
 href="http://schema.org/Place">Place</a> is open to public visitors. If
-this property is omitted there is no assumed default boolean value
+this property is omitted there is no assumed default boolean value<p>
 
 A public_access should be one of the following types:
 
@@ -962,12 +1008,12 @@ A smoking_allowed should be one of the following types:
 
 C<specialOpeningHoursSpecification>
 
-=for html The special opening hours of a certain place.<br/><br/> Use this to
+=for html <p>The special opening hours of a certain place.<br/><br/> Use this to
 explicitly override general opening hours brought in scope by <a
 class="localLink"
 href="http://schema.org/openingHoursSpecification">openingHoursSpecificatio
 n</a> or <a class="localLink"
-href="http://schema.org/openingHours">openingHours</a>.
+href="http://schema.org/openingHours">openingHours</a>.<p>
 
 A special_opening_hours_specification should be one of the following types:
 

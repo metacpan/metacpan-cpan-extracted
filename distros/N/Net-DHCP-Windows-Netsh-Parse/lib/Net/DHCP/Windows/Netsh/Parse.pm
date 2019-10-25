@@ -11,11 +11,11 @@ Net::DHCP::Windows::Netsh::Parse - Parses the output from 'netsh dhcp server dum
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -143,6 +143,7 @@ sub parse{
 				$self->add_scope($server, $the_rest[1], $the_rest[2], $the_rest[3]);
 			}
 		}elsif( $command =~ /^[Ss]cope$/ ){
+			# Dhcp Server \\winboot Scope 10.31.129.248 Add iprange 10.31.129.251 10.31.129.254
 			# Dhcp Server \\winboot Scope 10.31.110.0 set optionvalue 51 DWORD "1800"
 			# Dhcp Server \\winboot Scope 10.31.110.0 set optionvalue 3 IPADDRESS "10.31.110.1"
 			my @the_rest=split(/\ +/, $the_rest);
@@ -160,6 +161,12 @@ sub parse{
 				}
 
 				$self->add_option($server, $the_rest[0], $the_rest[3], \@values);
+			}elsif(
+				   ( $the_rest[1] eq 'Add' ) &&
+				   ( $the_rest[2] eq 'iprange' )
+				   ){
+				my @values=($the_rest[3].' '.$the_rest[4]);
+				$self->add_option($server, $the_rest[0], 'range', \@values);
 			}
 		}
 	}
@@ -196,10 +203,20 @@ The structure of it is as below for both the return
 hash ref or JSON.
 
    $hostname=>{$scope}=>{
-                         $options=>[],
+                         $options=>{
+                                     $option_id=>[]
+                                    },
                          mask=>subnet mask,
                          desc=>description,
                         }
+
+The $option_id will always be numeric, except for one special
+case, which is range. That option contains a array of ranges
+that the scope in question uses with in that subnet. Each item
+the array represents one range. The format is as below for the
+string.
+
+    $start_ip $end_ip
 
 Hostname will always have \\ removed, so \\winboot
 becomes just winboot.

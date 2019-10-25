@@ -8,8 +8,8 @@
       "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a> and <a class=\"localLink\" href=\"http://schema.org/CriticReview\">CriticReview</a> providing a professional critic's assessment of a service, product, performance, or artistic or literary work.",
       "rdfs:label" : "ReviewNewsArticle",
       "rdfs:subClassOf" : [
-         "schema:NewsArticle",
-         "schema:CriticReview"
+         "schema:CriticReview",
+         "schema:NewsArticle"
       ],
       "schema:category" : "issue-1525",
       "schema:isPartOf" : "http:pending.schema.org"

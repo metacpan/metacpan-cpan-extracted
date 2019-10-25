@@ -1,5 +1,5 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.018'; # TRIAL
+$ExtUtils::HasCompiler::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -153,12 +153,14 @@ sub can_compile_loadable_object {
 	}
 }
 
+my %static_unsupported_on = map { $_ => 1 } qw/VMS aix MSWin32 cygwin/;
 sub can_compile_static_library {
 	my %args = @_;
 
 	my $output = $args{output} || \*STDOUT;
 
 	my $config = $args{config} || 'ExtUtils::HasCompiler::Config';
+	return if $config->get('useshrplib') eq 'true';
 
 	my ($source_handle, $source_name) = tempfile('TESTXXXX', DIR => $tempdir, SUFFIX => '.c', UNLINK => 1);
 	my $basename = basename($source_name, '.c');
@@ -170,16 +172,11 @@ sub can_compile_static_library {
 	my $static_library = $abs_basename.$lib_ext;
 
 	my @commands;
-	if ($^O eq 'VMS' or $^O eq 'aix') {
+	if ($static_unsupported_on{$^O}) {
 		return;
 	}
-	elsif ($^O eq 'MSWin32' && $cc =~ /^cl/) {
-		my $my_ar = $ar || 'lib';
-		push @commands, qq{$cc $ccflags $optimize /I "$incdir" /c $source_name /Fo$object_file};
-		push @commands, qq{$my_ar /out:$static_library $object_file};
-	}
 	else {
-		my $my_ar = defined $full_ar ? $full_ar : $ar;
+		my $my_ar = length $full_ar ? $full_ar : $ar;
 		push @commands, qq{$cc $ccflags $optimize "-I$incdir" -c $source_name -o $object_file};
 		push @commands, qq{$my_ar cr $static_library $object_file};
 		push @commands, qq{$ranlib $static_library} if $ranlib ne ':';
@@ -225,7 +222,7 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 

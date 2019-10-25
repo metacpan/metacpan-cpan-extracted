@@ -9,8 +9,8 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
@@ -20,15 +20,15 @@
             "issue-1253"
          ],
          "schema:domainIncludes" : [
-            "schema:InvestmentOrDeposit",
+            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
+            "schema:InvestmentOrDeposit",
             "schema:DatedMoneySpecification",
-            "schema:LoanOrCredit",
-            "schema:MoneyTransfer"
+            "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:Number"
+            "schema:Number",
+            "schema:MonetaryAmount"
          ]
       }
    }

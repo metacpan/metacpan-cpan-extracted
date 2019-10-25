@@ -1,10 +1,11 @@
 package DateTime::Format::EraLegis;
-$DateTime::Format::EraLegis::VERSION = '0.009';
+$DateTime::Format::EraLegis::VERSION = '0.011';
 # ABSTRACT: DateTime formatter for Era Legis (http://oto-usa.org/calendar.html)
 
 use 5.010;
 use Any::Moose;
 use Method::Signatures;
+use Astro::Sunrise qw(sunrise);
 
 has 'ephem' => (
     is => 'ro',
@@ -27,19 +28,42 @@ method _build_style {
 }
 
 
-method format_datetime(DateTime $dt, Str $format = 'plain') {
+method format_datetime(DateTime $dt, Str :$format = 'plain', :$geo = undef) {
     $dt = $dt->clone;
 
     ### Day of week should match existing time zone
     my $dow = $dt->day_of_week;
 
-    ### But pull ephemeris data based on UTC
-    $dt->set_time_zone('UTC');
+    ### Adjust $dow based on sunrise time
+    my $sunrise = '06:00:00';     # default to 6am sunrise
+    if ($geo) {
+        ($sunrise, undef) = sunrise(
+            { year => $dt->year
+                  , month => $dt->month
+                  , day => $dt->day
+                  , lat => $geo->[0]
+                  , lon => $geo->[1]
+                  , tz => ($dt->offset / 3600)
+                  , precise => 1
+              }
+        );
+        $sunrise .= ':00';
+    }
+    if ($dt->hms lt $sunrise) {
+        $dow = $dow == 1 ? 7 : $dow - 1;
+    }
 
     my %tdate = (
-        evdate => $dt->ymd . ' ' . $dt->hms,
+        evdate_local => $dt->ymd . ' ' . $dt->hms,
         dow => $dow,
+        sunrise => $sunrise,
+        is_dst => $dt->is_dst,
+        tz_offset => $dt->offset,
         );
+
+    ### But pull ephemeris data based on UTC
+    $dt->set_time_zone('UTC');
+    $tdate{evdate_utc} = $dt->ymd . ' ' . $dt->hms;
 
     for ( qw(sol luna) ) {
         my $deg = $self->ephem->lookup( $_, $dt );
@@ -62,7 +86,7 @@ no Any::Moose;
 
 ######################################################
 package DateTime::Format::EraLegis::Ephem;
-$DateTime::Format::EraLegis::Ephem::VERSION = '0.009';
+$DateTime::Format::EraLegis::Ephem::VERSION = '0.011';
 use Any::Moose qw(Role);
 
 requires 'lookup';
@@ -71,7 +95,7 @@ no Any::Moose;
 
 ######################################################
 package DateTime::Format::EraLegis::Ephem::DBI;
-$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.009';
+$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.011';
 use 5.010;
 use Any::Moose;
 use Carp;
@@ -120,7 +144,7 @@ no Any::Moose;
 ######################################################
 
 package DateTime::Format::EraLegis::Style;
-$DateTime::Format::EraLegis::Style::VERSION = '0.009';
+$DateTime::Format::EraLegis::Style::VERSION = '0.011';
 use 5.010;
 use Any::Moose;
 use utf8;
@@ -170,17 +194,23 @@ has 'template' => (
     lazy_build => 1,
     );
 
+has 'vs15' => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 1,
+    );
+
 method _build_dow {
     return
         ($self->lang eq 'symbol')
-        ? [qw( ☉︎ ☽︎ ♂︎ ☿︎ ♃︎ ♀︎ ♄︎ ☉︎ )]
+        ? [qw( ☉ ☽ ♂ ☿ ♃ ♀ ♄ ☉ )]
         : ($self->lang eq 'english')
         ? [qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday)]
         : [qw(Solis Lunae Martis Mercurii Iovis Veneris Saturni Solis)];
 }
 
 method _build_signs {
-    return [qw( ♈︎ ♉︎ ♊︎ ♋︎ ♌︎ ♍︎ ♎︎ ♏︎ ♐︎ ♑︎ ♒︎ ♓︎ )]
+    return [qw( ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ )]
         if $self->lang eq 'symbol';
 
     return [qw(Aries Taurus Gemini Cancer Leo Virgo Libra Scorpio Sagittarius Capricorn Aquarius Pisces)]
@@ -204,11 +234,12 @@ method _build_years {
 
 method _build_template {
     my $template = '';
+    my $vs = $self->vs15 ? '︎' : '';
     if ($self->show_deg) {
-        $template = '☉︎ in {sdeg}° {ssign} : ☽︎ in {ldeg}° {lsign}';
+        $template = "☉$vs in {sdeg}° {ssign} : ☽$vs in {ldeg}° {lsign}";
     }
     else {
-        $template = '☉︎ in {ssign} : ☽︎ in {lsign}';
+        $template = "☉$vs in {ssign} : ☽$vs in {lsign}";
     }
     if ($self->show_terse) {
         $template =~ s/ in / /g;
@@ -235,11 +266,13 @@ method _build_template {
 method express( HashRef $tdate ) {
     my $datestr = $self->template;
 
+    my $vs = $self->lang eq 'symbol' && $self->vs15 ? '︎' : '';
+
     $datestr =~ s/{sdeg}/$tdate->{sol}{deg}/ge;
-    $datestr =~ s/{ssign}/$self->signs->[$tdate->{sol}{sign}]/ge;
+    $datestr =~ s/{ssign}/$self->signs->[$tdate->{sol}{sign}].$vs/ge;
     $datestr =~ s/{ldeg}/$tdate->{luna}{deg}/ge;
-    $datestr =~ s/{lsign}/$self->signs->[$tdate->{luna}{sign}]/ge;
-    $datestr =~ s/{dow}/$self->dow->[$tdate->{dow}]/ge;
+    $datestr =~ s/{lsign}/$self->signs->[$tdate->{luna}{sign}].$vs/ge;
+    $datestr =~ s/{dow}/$self->dow->[$tdate->{dow}].$vs/ge;
     $datestr =~ s/{year1}/$self->years->[$tdate->{year}[0]]/ge;
     $datestr =~ s/{year2}/lc($self->years->[$tdate->{year}[1]])/ge;
 

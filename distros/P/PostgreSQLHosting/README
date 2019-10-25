@@ -1,0 +1,73 @@
+
+NAME
+
+	# PostgreSQLHosting
+
+	High Availability, Load Balancing, and Replication for PostgreSQL using Hot Standby
+
+SYNOPSIS
+
+	## Install 
+
+	$ sudo apt-get install carton git
+	$ git clone git@github.com:ovntatar/PostgreSQLHosting.git
+	$ cd PostgreSQLHosting
+	$ carton install 
+
+
+	## Configuration
+
+	Edit `config.yml` according to your needs. 
+
+	> Please, use only alphanumeric characters and underscore to name the hosts
+
+	## Usage
+
+	### Deploy
+
+
+	PRIVATE_KEY=/path/to/private/key carton exec -- rex deploy
+
+
+	### List machines
+
+	PRIVATE_KEY=/path/to/private/key carton exec -- rex inventory
+
+
+
+	### Remove machines [!!!!]
+
+	PLEASE, BE CAREFUL. THIS COMMAND REMOVES ALL MACHINES
+
+	PRIVATE_KEY=/path/to/private/key carton exec -- rex wipe
+
+DESCRIPTION
+ 
+	
+	High Availability, Load Balancing, and Replication for PostgreSQL using Hot Standby
+ 
+PERL VERSIONS
+
+	You can also specify the minimum perl required in C<cpanfile>:
+ 
+  	requires 'perl', '5.16.3';
+
+AUTHOR
+ 
+  	Ovidiu Tatar, Gabriel Andrade
+ 
+COPYRIGHT
+ 
+ 	3Ziele.de - ovntatar
+ 
+LICENSE
+ 
+  	This software is licensed under the same terms as Perl itself.
+ 
+SEE ALSO
+ 
+ 
+L<PostgreSQLHosting|https://github.com/ovntatar/PostgreSQLHosting>
+ 
+ 
+=cut 

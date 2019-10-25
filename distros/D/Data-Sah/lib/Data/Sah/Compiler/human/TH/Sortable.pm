@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH::Sortable;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.901'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.902'; # VERSION
 
 use 5.010;
 use strict;
@@ -77,7 +77,7 @@ Data::Sah::Compiler::human::TH::Sortable - human's type handler for role "Sortab
 
 =head1 VERSION
 
-This document describes version 0.901 of Data::Sah::Compiler::human::TH::Sortable (from Perl distribution Data-Sah), released on 2019-08-14.
+This document describes version 0.902 of Data::Sah::Compiler::human::TH::Sortable (from Perl distribution Data-Sah), released on 2019-10-24.
 
 =for Pod::Coverage ^(name|clause_.+|superclause_.+|before_.+|after_.+)$
 

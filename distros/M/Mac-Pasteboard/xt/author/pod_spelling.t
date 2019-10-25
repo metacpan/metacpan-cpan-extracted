@@ -50,6 +50,7 @@ kPasteboardModified
 kPasteboardUniqueName
 mac
 macerror
+macOS
 MacRoman
 MacSomething
 merchantability

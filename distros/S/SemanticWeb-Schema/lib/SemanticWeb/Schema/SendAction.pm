@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has delivery_method => (
@@ -50,17 +50,17 @@ SemanticWeb::Schema::SendAction - The act of physically/electronically dispatchi
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html The act of physically/electronically dispatching an object for transfer
+=for html <p>The act of physically/electronically dispatching an object for transfer
 from an origin to a destination.Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/ReceiveAction">ReceiveAction</a>:
 The reciprocal of SendAction.</li> <li><a class="localLink"
 href="http://schema.org/GiveAction">GiveAction</a>: Unlike GiveAction,
 SendAction does not imply the transfer of ownership (e.g. I can send you my
-laptop, but I'm not necessarily giving it to you).</li> </ul> 
+laptop, but I'm not necessarily giving it to you).</li> </ul> <p>
 
 =head1 ATTRIBUTES
 

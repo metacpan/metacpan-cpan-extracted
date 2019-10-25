@@ -5,14 +5,30 @@ use namespace::autoclean;
 
 with 'XML::NewsML_G2::Role::HasQCode';
 
-has 'isins', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_isin => 'push'};
-has 'websites', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_website => 'push', has_websites => 'count'};
-has 'indices', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_index => 'push'};
-has 'stock_exchanges', isa => 'ArrayRef[Str]', is => 'rw', default => sub { [] },
-  traits => ['Array'], handles => {add_stock_exchange => 'push'};
+has 'isins',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_isin => 'push' };
+has 'websites',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_website => 'push', has_websites => 'count' };
+has 'indices',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_index => 'push' };
+has 'stock_exchanges',
+    isa     => 'ArrayRef[Str]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_stock_exchange => 'push' };
 
 __PACKAGE__->meta->make_immutable;
 

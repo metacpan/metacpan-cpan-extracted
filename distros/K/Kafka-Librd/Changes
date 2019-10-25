@@ -1,5 +1,8 @@
 Revision history for Kafka-Librd
 
+0.14 2019-10-20 19:50:39 -0600
+  - Aded flush and destroy methods (gh#19, miket++)
+
 0.12 2019-07-26 15:25:57 -0400
   - Added timestamp method (gh#10, gh#14, eserte++)
 

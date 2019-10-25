@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has closes => (
@@ -74,19 +74,19 @@ SemanticWeb::Schema::OpeningHoursSpecification - A structured value providing in
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A structured value providing information about the opening hours of a place
-or a certain service inside a place.<br/><br/> The place is
+=for html <p>A structured value providing information about the opening hours of a
+place or a certain service inside a place.<br/><br/> The place is
 <strong>open</strong> if the <a class="localLink"
 href="http://schema.org/opens">opens</a> property is specified, and
 <strong>closed</strong> otherwise.<br/><br/> If the value for the <a
 class="localLink" href="http://schema.org/closes">closes</a> property is
 less than the value for the <a class="localLink"
 href="http://schema.org/opens">opens</a> property then the hour range is
-assumed to span over the next day.
+assumed to span over the next day.<p>
 
 =head1 ATTRIBUTES
 

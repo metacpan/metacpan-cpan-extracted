@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::User;
-$Web::Authenticate::User::VERSION = '0.012';
+$Web::Authenticate::User::VERSION = '0.013';
 use Mouse;
 #ABSTRACT: The default implementation of Web::Authentication::User::Role.
 
@@ -35,7 +35,7 @@ Web::Authenticate::User - The default implementation of Web::Authentication::Use
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

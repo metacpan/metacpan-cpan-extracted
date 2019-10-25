@@ -16,6 +16,7 @@ my $sock = eval {
 };
 
 $gps = GPSD::Parse->new(file => $fname) if ! $sock;
+$ENV{GPSD_LIVE_TESTING} = 1 if $sock;
 
 my @stats = qw(
    time
@@ -45,9 +46,19 @@ $gps->poll;
 
     is ref $t, 'HASH', "tpv() returns a hash ref ok";
 
-    is keys %$t, @stats, "tpv() key count matches number of stats";
+    if ($ENV{GPSD_LIVE_TESTING}){
+        note "GPSD_LIVE_TESTING env var not set\n";
+        is keys %$t, @stats -2, "tpv() key count matches number of stats";
+    }
+    else {
+        is keys %$t, @stats, "tpv() key count matches number of stats";
+    }
 
     for (@stats){
+        if ($ENV{GPSD_LIVE_TESTING}){
+            next if $_ eq 'epc';
+            next if $_ eq 'tag';
+        }
         is exists $t->{$_}, 1, "$_ stat exists in return";
     }
 

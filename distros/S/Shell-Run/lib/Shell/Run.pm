@@ -3,6 +3,7 @@ package Shell::Run;
 use strict;
 use warnings;
 
+use Exporter::Tiny;
 use IPC::Open2;
 use IO::Select;
 use IO::String;
@@ -12,28 +13,50 @@ use Carp;
 use constant BLKSIZE => 1024;
 
 our
-	$VERSION = '0.04';
+	$VERSION = '0.06';
+
+our @ISA = qw(Exporter::Tiny);
 
 sub new {
 	my $class = shift;
+	my @cmd;
+	
+	my $shell = _get_shell(@_);
+	return bless $shell, $class;
+}
+
+sub _exporter_expand_sub {
+	my $class = shift;
+	my ($name, $args, $globals) = @_;
+	my $shell = new($class, name => $name, %$args);
+	my $as = $args->{as} || $name;
+	croak "$as: not a valid subroutine name" unless $as =~ /^[a-z][\w]*$/;
+	return ($as => sub {return run($shell, @_);});
+}
+
+sub _get_shell {
 	my %args = @_;
 	my @cmd;
 	
 	if ($args{exe}) {
+		croak "$args{exe}: not an excutable file" unless -x $args{exe};
 		$cmd[0] = $args{exe};
 	} else {
 		my $name = $args{name} || 'sh';
 		$cmd[0] = which $name;
+		croak "$name: not found in PATH" unless $cmd[0];
 	}	
+
 	if (defined $args{args}) {
 		push @cmd, @{$args{args}};
 	} else {
 		push @cmd, '-c';
 	}
+
 	my $shell;
 	$shell->{shell} = \@cmd;
 	$shell->{debug} = $args{debug};
-	return bless $shell, $class;
+	return $shell;
 }
 
 sub run {
@@ -169,7 +192,7 @@ sub run {
 	my $status = $? >> 8;
 	print STDERR "cmd exited with rc=$status\n\n" if $self->{debug};
 
-	return !$status;
+	return ($status, !$status);
 }
 
 1;
@@ -185,8 +208,72 @@ Shell::Run - Execute shell commands using specific shell
 
 =head1 SYNOPSIS
 
-	use Shell::Run;
+=head2 Procedural Interface
+
+	use Shell::Run 'sh';
+	my ($input, $output, $rc, $sc);
+
+	# no input
+	sh 'echo -n hello', $output;
+	print "output is '$output'\n";
+	# gives "output is 'hello'"
+
+	# input and output, status check
+	$input = 'fed to cmd';
+	sh 'cat', $output, $input or warn 'sh failed';
+	print "output is '$output'\n";
+	# gives "output is 'fed to cmd'"
 	
+	# insert shell variable
+	sh 'echo -n $foo', $output, undef, foo => 'var from env';
+	print "output is '$output'\n";
+	# gives "output is 'var from env'"
+
+	# special bash feature
+	use Shell::Run 'bash';
+	bash 'cat <(echo -n $foo)', $output, undef, foo => 'var from file';
+	print "output is '$output'\n";
+	# gives "output is 'var from file'"
+
+	# change export name
+	use Shell::Run 'sea-shell.v3' => {as => 'seash3'};
+	seash3 'echo hello', $output;
+
+	# specify program not in PATH
+	use Shell::Run sgsh => {exe => '/opt/shotgun/shell'};
+	sgsh 'fire', $output;
+
+	# not a shell
+	use Shell::Run sed => {args => ['-e']};
+	sed 's/fed to/eaten by/', $output, $input;
+	print "output is '$output'\n";
+	# gives "output is 'eaten by cmd'"
+
+	# look behind the scenes
+	use Shell::Run sh => {debug => 1, as => 'sh_d'};
+	sh_d 'echo', $output;
+	# gives:
+	## using shell: /bin/sh -c
+	## executing cmd:
+	## echo -n
+	##
+	## closing output from cmd
+	## cmd exited with rc=0
+
+	# remove export
+	no Shell::Run qw(seash3 sgsh);
+	# from here on seash3 and sgsh are no longer known
+	# use aliased name (seash3) if provided!
+
+	# capture command status code
+	($sc, $rc) = sh 'exit 2';
+	# status code $sc is 2, return code $rc is false
+
+
+=head2 OO Interface
+
+	use Shell::Run;
+
 	my $bash = Shell::Run->new(name => 'bash');
 
 	my ($input, $output);
@@ -196,20 +283,11 @@ Shell::Run - Execute shell commands using specific shell
 	$bash->run('cat', $output, $input) or warn('bash failed');
 	print "output is '$output'\n";
 	
-	# no input
-	$bash->run('echo hello', $output);
-	print "output is '$output'\n";
+	# everything else analogous to the procedural interface
 	
-	# use shell variable
-	$bash->run('echo $foo', $output, undef, foo => 'var from env');
-	print "output is '$output'\n";
-
-	# use bash feature
-	$bash->run('cat <(echo $foo)', $output, undef, foo => 'var from file');
-	print "output is '$output'\n";
-
 =head1 DESCIPTION
-The C<Shell::Run> class provides an alternative interface for executing
+
+The Shell::Run module provides an alternative interface for executing
 shell commands in addition to 
 
 =over
@@ -227,7 +305,7 @@ C<open CMD, '|-', 'cmd'>
 C<open CMD, '-|', 'cmd'>
 
 =item *
-C<IPC::Run>
+L<IPC::Run>
 
 =back
 
@@ -270,18 +348,17 @@ perl variables are not accessible from the shell.
 Another challenge consists in feeding the called command
 with input from the perl script and capturing the output at
 the same time.
-While this last item is perfectly solved by C<IPC::Run>,
+While this last item is perfectly solved by L<IPC::Run>,
 the latter is rather complex and even requires some special setup to
 execute code by a specific shell.
 
-The class C<Shell::Run> tries to merge the possibilities of the
+The module Shell::Run tries to merge the possibilities of the
 above named alternatives into one. I.e.:
 
 =over
 
 =item *
-use a specific command interpreter e.g. C<bash> (or C<sh> as default
-which does not make too much sense).
+use a specific command interpreter e.g. C<bash>.
 
 =item *
 provide the command to execute as a single string, like in C<system()>
@@ -296,69 +373,152 @@ of the called command
 =item *
 enable access to perl variables within the called command
 
+=item *
+easy but flexible usage
+
 =back
 
-Using the C<Shell::Run> class, the above given shell script example
+Using the Shell::Run module, the above given shell script example
 might be implemented this way in perl:
 
-	my $bash = Shell::Run->new(name => 'bash');
+	use Shell::Run 'bash';
 
 	my $passwd = 'secret';
 	my $key;
-	$bash->run('openssl pkcs12 -nocerts -nodes -in demo.pfx \
-		-passin env:passwd', $key, undef, passwd => $passwd);
+	bash 'openssl pkcs12 -nocerts -nodes -in demo.pfx \
+		-passin env:passwd', $key, undef, passwd => $passwd;
 	my $signdata = 'some data to be signed';
 	my $signature;
-	$bash->run('openssl dgst -sha256 -sign <(echo "$key") -hex',
-		 $signature, $signdata, key => $key);
+	bash 'openssl dgst -sha256 -sign <(echo "$key") -hex',
+		 $signature, $signdata, key => $key;
 	print $signature;
 
 Quite similar, isn't it?
 
-Actually, the a call to C<openssl dgst> as above was the very reason
-to create this class.
+Actually, the call to C<openssl dgst> as above was the very reason
+to create this module.
 
-Commands run by C<$sh->run> are by default executed via the C<-c> option
+Commands run by Shell::Run are by default executed via the C<-c> option
 of the specified shell.
 This behaviour can be modified by providing other arguments in the
-constructor C<Shell::Run->new>.
+C<use> statement or the constructor C<< Shell::Run->new >>.
 
 Debugging output can be enabled in a similar way.
+
+=head1 USAGE
+
+The procedural interface's behaviour can be configured by arguments given
+to the C<use> statement.
+Providing arguments to the C<use Shell::Run> statement is mandatory
+for the procedural interfaces as nothing will be exported by default.
+
+=over
+
+=item use Shell::Run qw(I<name>...)
+
+Searches every given I<name> in C<PATH> and exports a subroutine of the
+same name for each given argument into the caller for accessing the
+specified external programs.
+
+=item use Shell::Run I<name> => I<options>, ...
+
+Export a subroutine into the caller for accessing an external program.
+Unless otherwise specified in I<options>, search for an executable
+named I<name> in C<PATH> and export a subroutine named I<name>
+
+I<options> must be a hash reference as follows:
+
+=over
+
+=item exe => I<executable>
+
+Use I<executable> as the path to an external program.
+Disables a C<PATH> search.
+
+=item args => I<arguments>
+
+Call the specified external program with these arguments.
+Must be a reference to an array.
+
+Default: C<['-c']>.
+
+=item as => I<export>
+
+Use I<export> as the name of the exported subroutine.
+
+=item debug => I<debug>
+
+Provide debugging output to C<STDERR> if I<debug> has a true value.
+
+=back
+
+=back
+
+=head1 FUNCTIONS
+
+=head3 I<name> I<cmd>, I<output>, [I<input>, [I<key> => I<value>,...]]
+
+Call external program configured as I<name>.
+
+=over
+
+=item I<cmd>
+
+The code that is to be executed by this shell.
+
+=item I<output>
+
+A scalar that will receive STDOUT from I<cmd>.
+The content of this variable will be overwritten by C<< $sh->run >> calls.
+
+=item I<input>
+
+An optional scalar holding data that is fed to STDIN of I<cmd>
+
+=item I<key> => I<value>, ...
+
+A list of key-value pairs that are set in the environment of the
+called shell.
+
+=back
+
+In scalar context, returns true or false according
+to the exit status of the called command.
+In list context, returns two values: the completion code
+of the executed command and the exit status as the
+logical negation of the completion code from a perl view.
 
 =head1 METHODS
 
 =head2 Constructor
 
+=head3 Shell::Run->new([I<options>])
 
-=head3 Shell::Run->new([name => I<shell>,] [exe => I<path>,] [args => I<arguments>,] [debug => I<debug>])
+I<options> (if provided) must be a hash as follows:
 
 =over
 
-=item I<shell>
+=item name => I<name>
 
-The name of the shell interpreter to be used by the
-created instance.
-The executable is searched for in the C<PATH> variable.
+Searches I<name> in C<PATH> for an external program to be used.
 
-This value is ignored if I<path> is given and defaults to C<sh>.
+This value is ignored if I<executable> is given and defaults to C<sh>.
 
-=item I<path>
+=item exe => I<executable>
 
-The fully specified path to an executable to be used by
-the created instance.
+Use I<executable> as the path to an external program.
+Disables a C<PATH> search.
 
-=item I<arguments>
+=item args => I<arguments>
 
-If I<arguments> is provided, it shall be a reference to an array
-specifying arguments that are passed to the specified shell.
+Call the specified external program with these arguments.
+Must be a reference to an array.
 
-The default is C<-c>.
-Use a reference to an empty array to avoid this.
+Default: C<['-c']>.
 
-=item I<debug>
+=item debug => I<debug>
 
-When I<debug> is set to true, calls to the C<run> method will print
-debugging output to STDERR.
+Provide debugging output to C<STDERR> if I<debug> has a true value.
 
 =back
 
@@ -375,7 +535,7 @@ The code that is to be executed by this shell.
 =item I<output>
 
 A scalar that will receive STDOUT from I<cmd>.
-The content of this variable will be overwritten by C<$sh->run> calls.
+The content of this variable will be overwritten by C<< $sh->run >> calls.
 
 =item I<input>
 
@@ -388,6 +548,12 @@ called shell.
 
 =back
 
+In scalar context, returns true or false according
+to the exit status of the called command.
+In list context, returns two values: the completion code
+of the executed command and the exit status as the
+logical negation of the completion code from a perl view.
+
 =head1 BUGS AND LIMITATIONS
 
 There seems to be some race condition when the called script
@@ -397,7 +563,7 @@ Sometimes a SIGPIPE is caught and sometimes C<syswrite>
 returns an error.
 It is not clear if all situations are handled correctly.
 
-Best efford has been made to avoid blocking situations
+Best effort has been made to avoid blocking situations
 where neither reading output from the script
 nor writing input to it is possible.
 However, under some circumstance such blocking might occur.

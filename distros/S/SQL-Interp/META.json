@@ -1,17 +1,18 @@
 {
    "abstract" : "Interpolate Perl variables into SQL statements",
    "author" : [
-      "David Manura (http://math2.org/david/contact)",
-      "Mark Stosberg <mark@summersault.com>"
+      "David Manura",
+      "Mark Stosberg <mark@summersault.com>",
+      "Yoran Heling <projects@yorhel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SQL-Interp",
    "prereqs" : {
@@ -22,9 +23,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Filter::Simple" : "0",
-            "Scalar::Util" : "0",
-            "Text::Balanced" : "1.87"
+            "Scalar::Util" : "0"
          },
          "requires" : {
             "DBI" : "1",
@@ -36,7 +35,7 @@
    "provides" : {
       "DBIx::Interp" : {
          "file" : "lib/DBIx/Interp.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "DBIx::Interp::STX" : {
          "file" : "lib/DBIx/Interp.pm"
@@ -46,7 +45,7 @@
       },
       "SQL::Interp" : {
          "file" : "lib/SQL/Interp.pm",
-         "version" : "1.24"
+         "version" : "1.25"
       },
       "SQL::Interp::SQL" : {
          "file" : "lib/SQL/Interp.pm"
@@ -61,8 +60,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/markstos/SQL-Interp"
+         "url" : "https://code.blicky.net/yorhel/SQL-Interp"
       }
    },
-   "version" : "1.24"
+   "version" : "1.25",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,5 +1,20 @@
 Revision history for Music-Duration-Partition
 
+0.0302 2019-10-24 10:09:12
+    - Improve documentation ever so slightly.
+
+0.0301 2019-10-24 10:02:13
+    - Improve documentation.
+
+0.0300 2019-10-24 09:58:33
+    - Improve documentation.
+    - Add the pool_code attribute.
+
+0.0200 2019-10-24 07:11:40
+    - Remove the threshold attribute.
+    - Add the min_size attribute.
+    - Attempt to repair the ->motif loop next and last conditions to satisfy https://rt.cpan.org/Ticket/Display.html?id=130757
+
 0.0103 2019-10-17 10:47:16
     - Add the eg/shuffle program.
     - Clean up documentation.

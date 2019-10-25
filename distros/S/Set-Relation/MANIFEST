@@ -1,10 +1,12 @@
 Changes
 INSTALL
 lib/Set/Relation.pm
+lib/Set/Relation.pod
 lib/Set/Relation/V1.pm
+lib/Set/Relation/V1.pod
 lib/Set/Relation/V2.pm
-LICENSE/GPL
-LICENSE/LGPL
+lib/Set/Relation/V2.pod
+LICENSE/artistic-2_0.txt
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP

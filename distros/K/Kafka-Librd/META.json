@@ -57,10 +57,10 @@
          "url" : "git://github.com/plicease/perl-Kafka-Librd"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_contributors" : [
       "Pavel Shaydo <zwon@cpan.org>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

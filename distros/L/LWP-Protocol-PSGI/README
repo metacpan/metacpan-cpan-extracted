@@ -77,7 +77,7 @@ TESTING
     set, runs the requests against the live server.
 
     You can also combine Plack::App::Proxy with LWP::Protocol::PSGI to
-    route all requests made in your test aginst a specific server.
+    route all requests made in your test against a specific server.
 
       use LWP::Protocol::PSGI;
       use Plack::App::Proxy;
@@ -145,7 +145,8 @@ DIFFERENCES WITH OTHER MODULES
     Test::LWP::UserAgent has the similar concept of overriding LWP request
     method with particular PSGI applications. It has more features and
     options such as passing through the requests to the native LWP handler,
-    while LWP::Protocol::PSGI only allows to map certain hosts and ports.
+    while LWP::Protocol::PSGI only allows one to map certain hosts and
+    ports.
 
     Test::LWP::UserAgent requires you to change the instantiation of
     UserAgent from LWP::UserAgent->new to Test::LWP::UserAgent->new somehow

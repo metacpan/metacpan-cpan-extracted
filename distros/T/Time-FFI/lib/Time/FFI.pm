@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer;
 use FFI::Platypus::Memory;
 use Time::FFI::tm;
 
-our $VERSION = '1.004';
+our $VERSION = '2.000';
 
 our @EXPORT_OK = qw(asctime ctime gmtime localtime mktime strftime strptime timegm timelocal);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -119,7 +119,7 @@ $ffi->attach(strptime => ['string', 'string', 'tm'] => 'string' => sub {
   $tm = Time::FFI::tm->new unless defined $tm;
   my $rc = $xsub->($str, $format, $tm);
   croak "strptime: Failed to match input to format string" unless defined $rc;
-  $tm->tm_isdst(-1);
+  $tm->isdst(-1);
   $$remaining = $rc if defined $remaining;
   return $tm;
 });
@@ -159,7 +159,7 @@ Time::FFI - libffi interface to POSIX date and time functions
   my $moment = $tm->to_object('Time::Moment', 0);
 
   use Time::FFI::tm;
-  my $tm = Time::FFI::tm->from_object(DateTime->now, 1);
+  my $tm = Time::FFI::tm->from_object(DateTime->now);
   my $epoch = $tm->epoch(1);
   my $piece = $tm->to_object('Time::Piece', 1);
 
@@ -224,12 +224,12 @@ L<localtime_r(3)> function is used if available.
   my $epoch = mktime $tm;
 
 Returns the epoch timestamp representing the passed L<Time::FFI::tm> record
-interpreted in the local time zone. The time is interpreted from the C<tm_sec>,
-C<tm_min>, C<tm_hour>, C<tm_mday>, C<tm_mon>, C<tm_year>, and C<tm_isdst>
-members of the record, ignoring the rest. DST status will be automatically
-determined if C<tm_isdst> is a negative value. The record will also be updated
-to normalize any out-of-range values and populate the C<tm_isdst>, C<tm_wday>,
-and C<tm_yday> values, as well as C<tm_gmtoff> and C<tm_zone> if supported.
+interpreted in the local time zone. The time is interpreted from the C<sec>,
+C<min>, C<hour>, C<mday>, C<mon>, C<year>, and C<isdst> members of the record,
+ignoring the rest. DST status will be automatically determined if C<isdst> is a
+negative value. The record will also be updated to normalize any out-of-range
+values and populate the C<isdst>, C<wday>, and C<yday> values, as well as
+C<gmtoff> and C<zone> if supported.
 
 =head2 strftime
 
@@ -248,9 +248,9 @@ for available format descriptors.
 
 Returns a L<Time::FFI::tm> record representing the passed string, parsed
 according to the passed format. Consult your system's L<strptime(3)> manual for
-available format descriptors. The C<tm_isdst> value will be set to -1; all
-other unspecified values will default to 0. Note that the default C<tm_mday>
-value of 0 is outside of the standard range [1,31] and may cause an error or be
+available format descriptors. The C<isdst> value will be set to -1; all other
+unspecified values will default to 0. Note that the default C<mday> value of 0
+is outside of the standard range [1,31] and may cause an error or be
 interpreted as the last day of the previous month.
 
 A L<Time::FFI::tm> record may be passed as the third argument, in which case it

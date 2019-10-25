@@ -19,6 +19,7 @@ do { my $x = {
                                       'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::EOL' => '0',
+                                      'Test::LeakTrace' => '0.16',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.94',

@@ -1,6 +1,6 @@
 use strict;
 package Web::Authenticate::Session::Storage::Handler::Role;
-$Web::Authenticate::Session::Storage::Handler::Role::VERSION = '0.012';
+$Web::Authenticate::Session::Storage::Handler::Role::VERSION = '0.013';
 use Mouse::Role;
 #ABSTRACT: A Mouse::Role that defines what methods a Web::Authenticate::Session::Storage::Handler object should contain.
 
@@ -33,7 +33,7 @@ Web::Authenticate::Session::Storage::Handler::Role - A Mouse::Role that defines 
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 METHODS
 

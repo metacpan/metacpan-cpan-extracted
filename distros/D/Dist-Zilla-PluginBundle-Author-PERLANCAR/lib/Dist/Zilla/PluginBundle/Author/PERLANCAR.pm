@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.597'; # VERSION
+our $DATE = '2019-10-20'; # DATE
+our $VERSION = '0.598'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -17,6 +17,7 @@ sub configure {
     });
 
     $self->add_plugins(
+        ['FileFinder::ByName' => 'FileFinder::ByName PERLANCAR' => {dir => ['lib', 'script'], skip => ['lib/Bencher/ScenarioR/']}],
         ['ExecDir' => 'ExecDir script' => {dir=>'script'}],
         'PERLANCAR::BeforeBuild',
         'Rinci::AbstractFromMeta',
@@ -44,7 +45,7 @@ sub configure {
         'Rinci::EmbedValidator',
         'SetScriptShebang',
         'Test::Compile',
-        'Test::Perl::Critic',
+        ['Test::Perl::Critic::Subset' => {finder => ['@Author::PERLANCAR/FileFinder::ByName PERLANCAR']}],
         'Test::Rinci',
         'StaticInstall', # by default enable static install because 99% of the time my dist is pure-perl
         'EnsureSQLSchemaVersionedTest',
@@ -72,7 +73,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.597 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-07-04.
+This document describes version 0.598 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-10-20.
 
 =head1 SYNOPSIS
 

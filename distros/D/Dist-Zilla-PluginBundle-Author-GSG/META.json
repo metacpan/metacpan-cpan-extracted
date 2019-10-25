@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.1101",
             "File::ShareDir::Install" : "0.06"
          }
       },
@@ -76,11 +76,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GSG" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
-         "version" : "v0.0.12"
+         "version" : "v0.0.14"
       },
       "Dist::Zilla::PluginBundle::Author::GSG" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
-         "version" : "v0.0.12"
+         "version" : "v0.0.14"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "0.0.12",
+   "version" : "v0.0.14",
    "x_contributors" : [
       "Andrew Fresh <andrew.fresh@grantstreet.com>",
       "Mark Flickinger <mark.flickinger@grantstreet.com>"

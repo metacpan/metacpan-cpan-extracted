@@ -1,5 +1,10 @@
 Revision history for Perl extension Finance::QuoteHist.
 
+1.28  Wed Oct 23 12:11:32 EDT 2019
+    - Updated yahoo test data again
+    - Retired Finance::QuoteHist::Google (no data)
+    - Retired Finance::QuoteHist::DailyFinance (no data)
+
 1.27  Tue Jul 18 10:46:49 EDT 2017
     - Updated yahoo test data
 

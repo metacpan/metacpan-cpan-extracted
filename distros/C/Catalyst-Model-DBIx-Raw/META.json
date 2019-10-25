@@ -37,8 +37,8 @@
          "web" : "https://github.com/srchulo/Catalyst--Model--DBIx--Raw/issues"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.13"
 }
 

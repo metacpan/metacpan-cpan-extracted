@@ -11,7 +11,7 @@ use HTTP::Request ();
 use HTTP::Response ();
 use URI ();
 
-my $expiry_string = HTTP::Date::time2str( time + 86400 );
+my $expiry_string = HTTP::Date::time2str( time + 86_400 );
 my $jar = HTTP::Cookies->new();
 
 plan tests => 20;

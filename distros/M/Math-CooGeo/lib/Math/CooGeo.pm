@@ -7,7 +7,7 @@ use Exporter;
 our @ISA=qw(Exporter);
 our @EXPORT=qw(distance midpoint slope gradient);
 
-our $VERSION='1.0.2';
+our $VERSION='1.0.4';
 our $LIBRARY=__PACKAGE__;
 
 sub distance(x1,y1,x2,y2){return sqrt((x2-x1)**2+(y2-y1)**2)}
@@ -27,7 +27,7 @@ Math::CooGeo - Coordinate geometry library for Perl.
 
 =head1 VERSION
 
-Version 1.0.1
+Version 1.0.4
 
 =head1 DESCRIPTION
 

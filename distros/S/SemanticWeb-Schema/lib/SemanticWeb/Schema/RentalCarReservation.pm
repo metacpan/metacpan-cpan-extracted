@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has dropoff_location => (
@@ -66,13 +66,13 @@ SemanticWeb::Schema::RentalCarReservation - A reservation for a rental car
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A reservation for a rental car.<br/><br/> Note: This type is for
+=for html <p>A reservation for a rental car.<br/><br/> Note: This type is for
 information about actual reservations, e.g. in confirmation emails or HTML
-pages with individual confirmations of reservations.
+pages with individual confirmations of reservations.<p>
 
 =head1 ATTRIBUTES
 

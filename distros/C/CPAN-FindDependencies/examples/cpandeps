@@ -99,6 +99,10 @@ by default.
 
 Adds recommended modules to the list of dependencies, if set to a true value.
 
+=item configreqs
+ 
+ Adds modules required for configuration (the 'configure_requires' list in yaml) to the list of dependencies, if set to a true value.
+
 
 =back
 

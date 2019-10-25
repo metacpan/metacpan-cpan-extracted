@@ -130,6 +130,11 @@ METHODS
 
     return the current out queue length.
 
+  flush
+        $kafka->flush($timeout_ms)
+
+    wait until all outstanding produce requests, et.al, are completed.
+
   destroy
         $kafka->destroy
 
@@ -152,6 +157,11 @@ Kafka::Librd::Topic
     in the future, but currently it should be set to 0, RD_KAFKA_MSG_F_COPY
     and RD_KAFKA_MSG_F_FREE must not be used, internally RD_KAFKA_MSG_F_COPY
     is always set.
+
+  destroy
+        $topic->destroy
+
+    destroy topic handle
 
 Kafka::Librd::Message
     This class maps to "rd_kafka_message_t" structure from librdkafka and

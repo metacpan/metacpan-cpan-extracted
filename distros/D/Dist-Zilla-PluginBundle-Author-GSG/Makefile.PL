@@ -4,7 +4,7 @@ use warnings;
 
 use 5.014000;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 7.1101;
 
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Grant Street Group CPAN dists",
   "AUTHOR" => "Grant Street Group <developers\@grantstreet.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::MakeMaker" => "7.1101",
     "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-GSG",
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Strict" => 0
   },
-  "VERSION" => "0.0.12",
+  "VERSION" => "v0.0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }

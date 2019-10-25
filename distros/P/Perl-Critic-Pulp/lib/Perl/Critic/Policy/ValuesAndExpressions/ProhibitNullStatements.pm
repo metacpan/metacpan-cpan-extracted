@@ -24,7 +24,7 @@ use base 'Perl::Critic::Policy';
 use Perl::Critic::Utils;
 use Perl::Critic::Policy::CodeLayout::RequireFinalSemicolon; # for try helpers
 
-our $VERSION = 96;
+our $VERSION = 97;
 
 
 use constant supported_parameters =>

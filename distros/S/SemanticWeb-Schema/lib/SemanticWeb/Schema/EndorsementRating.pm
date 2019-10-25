@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -34,13 +34,13 @@ SemanticWeb::Schema::EndorsementRating - An EndorsementRating is a rating that e
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html An EndorsementRating is a rating that expresses some level of endorsement,
-for example inclusion in a "critic's pick" blog, a "Like" or "+1" on a
-social network. It can be considered the <a class="localLink"
+=for html <p>An EndorsementRating is a rating that expresses some level of
+endorsement, for example inclusion in a "critic's pick" blog, a "Like" or
+"+1" on a social network. It can be considered the <a class="localLink"
 href="http://schema.org/result">result</a> of an <a class="localLink"
 href="http://schema.org/EndorseAction">EndorseAction</a> in which the <a
 class="localLink" href="http://schema.org/object">object</a> of the action
@@ -54,7 +54,7 @@ href="http://schema.org/EndorsementRating">EndorsementRating</a> may be
 part of a numeric scale or organized system, but this is not required:
 having an explicit type for indicating a positive, endorsement rating is
 particularly useful in the absence of numeric scales as it helps consumers
-understand that the rating is broadly positive.
+understand that the rating is broadly positive.<p>
 
 =head1 SEE ALSO
 

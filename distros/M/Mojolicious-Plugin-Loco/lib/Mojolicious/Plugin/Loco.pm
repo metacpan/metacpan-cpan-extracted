@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Loco 0.006;
+package Mojolicious::Plugin::Loco 0.008;
 
 # ABSTRACT: launch a web browser; easy local GUI
 

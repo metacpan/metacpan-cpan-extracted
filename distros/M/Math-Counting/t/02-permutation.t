@@ -78,7 +78,7 @@ like $x, $f1, "$n bperm $n";
 
 # Big Permutation with repetition
 $x = bperm(0 - $k, 0 - $n, 1);
-is $x, $nan, "-$k bperm -$n";
+is $x, 0, "-$k bperm -$n";
 $x = bperm(-1, 0, 1);
 cmp_ok $x, '==', 1, "-1 bperm 0";
 $x = bperm(0, -1, 1);

@@ -1,0 +1,113 @@
+NAME
+
+    Mojolicious::Plugin::BcryptSecure - Securely bcrypt and validate your
+    passwords.
+
+STATUS
+
+SYNOPSIS
+
+      # Mojolicious::Lite
+    
+      # use the default cost of 12
+      plugin 'BcryptSecure'
+    
+      # set your own cost
+      plugin BcryptSecure => { cost => 8 };
+    
+      # Mojolicious
+    
+      sub startup {
+        my $self = shift;
+    
+        # use the default cost of 12
+        $self->plugin('BcryptSecure');
+    
+        # set your own cost
+        $self->plugin('BcryptSecure', { cost => 8 })
+      }
+
+DESCRIPTION
+
+    Mojolicious::Plugin::BcryptSecure is a fork of
+    Mojolicious::Plugin::Bcrypt with two main differences:
+
+      * Crypt::URandom is used to generate the salt used in "bcrypt" with
+      strongest available source of non-blocking randomness on the current
+      platform.
+
+      * "secure_compare" in Mojo::Util is used in "bcrypt_validate" when
+      comparing the crypted passwords to help prevent timing attacks.
+
+    You also may want to look at Mojolicious::Command::bcrypt to help
+    easily generate crypted passwords with your app's bcrypt settings via a
+    Mojolicious::Command.
+
+OPTIONS
+
+ cost
+
+    A non-negative integer with at most two digits that controls the cost
+    of the hash function. The number of operations is proportional to
+    2^cost. The default value is 12. This option is described more in
+    Crypt::Eksblowfish::Bcrypt.
+
+      # Mojolicious::Lite
+      plugin BcryptSecure => { cost => 8 };
+    
+      # Mojolicious
+      sub startup {
+        my $self = shift;
+    
+        $self->plugin('BcryptSecure', { cost => 8 })
+      }
+
+HELPERS
+
+ bcrypt
+
+    Crypts a password via the bcrypt algorithm and returns the resulting
+    crypted value.
+
+      my $crypted_password = $c->bcrypt($plaintext_password);
+    
+      # optionally pass your own settings
+      my $crypted_password = $c->bcrypt($plaintext_password, $settings);
+
+    $settings is an optional string which encodes the algorithm parameters,
+    as described in Crypt::Eksblowfish::Bcrypt.
+
+ bcrypt_validate
+
+    Validates a password against a crypted password (from your database,
+    for example):
+
+      if ($c->bcrypt_validate($plaintext_password, $crypted_password)) {
+          # Authenticated
+      } else {
+          # Uh oh...
+      }
+
+AUTHOR
+
+    Adam Hopkins <srchulo@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2019- Adam Hopkins
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+      * Mojolicious::Command::bcrypt
+
+      * Crypt::Eksblowfish::Bcrypt
+
+      * Crypt::URandom
+
+      * Mojolicious::Plugin::Bcrypt
+

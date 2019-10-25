@@ -2,19 +2,28 @@ package Text::ANSI::Fold;
 use 5.014;
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = "0.07";
+our $VERSION = "1.01";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
 
 ######################################################################
 use Exporter 'import';
-our @EXPORT_OK = qw(&ansi_fold);
+our %EXPORT_TAGS = (
+    constants => [ qw(
+		   &LINEBREAK_NONE
+		   &LINEBREAK_ALL
+		   &LINEBREAK_RUNIN
+		   &LINEBREAK_RUNOUT
+		   ) ] );
+our @EXPORT_OK = ( qw(&ansi_fold),
+		   @{$EXPORT_TAGS{constants}} );
 
 sub ansi_fold {
     my($text, $width, @option) = @_;
-    __PACKAGE__->configure->fold($text, width => $width, @option);
+    __PACKAGE__->fold($text, width => $width, @option);
 }
 ######################################################################
 
@@ -51,6 +60,17 @@ sub _startWideSpacing {
     }
 }
 
+use constant {
+    LINEBREAK_NONE   => 0,
+    LINEBREAK_RUNIN  => 1,
+    LINEBREAK_RUNOUT => 2,
+    LINEBREAK_ALL    => 3,
+};
+
+our $DEFAULT_LINEBREAK = LINEBREAK_NONE;
+our $DEFAULT_RUNIN_WIDTH  = 2;
+our $DEFAULT_RUNOUT_WIDTH = 2;
+
 sub new {
     my $class = shift;
     my $obj = bless {
@@ -60,12 +80,43 @@ sub new {
 	boundary  => '',
 	padchar   => ' ',
 	ambiguous => 'narrow',
+	linebreak => $DEFAULT_LINEBREAK,
+	runin     => $DEFAULT_RUNIN_WIDTH,
+	runout    => $DEFAULT_RUNOUT_WIDTH,
     }, $class;
 
     $obj->configure(@_) if @_;
 
     $obj;
 }
+
+use Text::ANSI::Fold::Japanese::W3C qw(%prohibition);
+
+sub chars_to_regex {
+    my $chars = shift;
+    my($c, @s);
+    for ($chars =~ /\X/g) {
+	if (length == 1) {
+	    $c .= $_;
+	} else {
+	    push @s, $_;
+	}
+    }
+    if (@s) {
+	local $" = '|';
+	qr/(?:[\Q$c\E]|@s)/;
+    } else {
+	qr/[\Q$c\E]/;
+    }
+}
+
+my %prohibition_re = do {
+    head => do {
+	my $re = chars_to_regex $prohibition{head};
+	qr/(?: $re | \p{Space_Separator} )/x;
+    },
+    end  => chars_to_regex $prohibition{end},
+};
 
 sub configure {
     my $obj = ref $_[0] ? $_[0] : do {
@@ -82,7 +133,10 @@ sub configure {
 }
 
 sub fold {
-    my $obj = shift;
+    my $obj = ref $_[0] ? $_[0] : do {
+	state $private = configure();
+    };
+    shift;
 
     local $_ = shift // '';
     my %opt = @_;
@@ -92,6 +146,9 @@ sub fold {
     my $padding   = $opt{padding}   // $obj->{padding};
     my $padchar   = $opt{padchar}   // $obj->{padchar};
     my $ambiguous = $opt{ambiguous} // $obj->{ambiguous};
+    my $linebreak = $opt{linebreak} // $obj->{linebreak};
+    my $runin     = $opt{runin}     // $obj->{runin};
+    my $runout    = $opt{runout}    // $obj->{runout};
 
     if (not defined $width or $width < 1) {
 	croak "invalid width";
@@ -103,6 +160,7 @@ sub fold {
     my $eol = '';
     my $room = $width;
     my @color_stack;
+
     while (length) {
 
 	if (s/\A(\r*\n)//) {
@@ -170,6 +228,26 @@ sub fold {
 	if ($room + $l < $width and $l + length($tail) <= $width) {
 	    $_ = substr($folded, $s, $l, '') . $_;
 	    $room += $l;
+	}
+    }
+
+    ##
+    ## Adjust line-breaking
+    ##
+    if ($linebreak & LINEBREAK_RUNIN) {
+	my $m = $runin;
+	while (/\A$prohibition_re{head}/p) {
+	    last if ($m -= vwidth ${^MATCH}) < 0;
+	    $folded .= ${^MATCH};
+	    $_ = ${^POSTMATCH};
+	}
+    }
+    if ($linebreak & LINEBREAK_RUNOUT) {
+	if ($folded =~ /$prohibition_re{end}+\z/p) {
+	    if (${^PREMATCH} ne '' and vwidth(${^MATCH}) <= $runout) {
+		$folded = ${^PREMATCH};
+		$_ = ${^MATCH} . $_;
+	    }
 	}
     }
 
@@ -261,7 +339,7 @@ __END__
 
 =head1 NAME
 
-Text::ANSI::Fold - Text folding with ANSI sequence and Asian wide characters.
+Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.
 
 =head1 SYNOPSIS
 
@@ -279,6 +357,15 @@ Text::ANSI::Fold - Text folding with ANSI sequence and Asian wide characters.
             Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
+    use Text::ANSI::Fold qw(:constants);
+    my $fold = new Text::ANSI::Fold
+        width     => 70,
+        boundary  => 'word',
+        linebreak => LINEBREAK_ALL,
+        runin     => 4,
+        runout    => 4,
+        ;
+
 =head1 DESCRIPTION
 
 Text::ANSI::Fold provides capability to fold a text into two strings
@@ -288,7 +375,9 @@ appended to folded text, and recover sequence is prepended to trimmed
 string.
 
 This module also support Unicode Asian full-width and non-spacing
-combining characters properly.
+combining characters properly.  Japanese text formatting with
+head-or-end of line prohibition character is also supported.  Set
+the linebreak mode to enable it.
 
 Use exported B<ansi_fold> function to fold original text, with number
 of visual columns you want to cut off the text.  Width parameter have
@@ -426,7 +515,62 @@ Tells how to treat Unicode East Asian ambiguous characters.  Default
 is "narrow" which means single column.  Set "wide" to tell the module
 to treat them as wide character.
 
+=item B<linebreak> => I<mode>
+
+=item B<runin> => I<width>
+
+=item B<runout> => I<width>
+
+These options specify the behavior of line break handling for Asian
+multi byte characters.  Only Japanese is supported currently.
+
+If the cut-off text start with space or prohibited characters
+(e.g. closing parenthesis), they are ran-in at the end of current line
+as much as possible.
+
+If the trimmed text end with prohibited characters (e.g. opening
+parenthesis), they are ran-out to the head of next line, if it fits to
+maximum width.
+
+Default B<linebreak> mode is B<LINEBREAK_NONE> and can be set one of
+those:
+
+    LINEBREAK_NONE
+    LINEBREAK_RUNIN
+    LINEBREAK_RUNOUT
+    LINEBREAK_ALL
+
+Import-tag B<:constants> can be used to access these constants.
+
+Option B<runin> and B<runout> is used to set maximum width of moving
+characters.  Default values are both 2.
+
 =back
+
+=head1 EXAMPLE
+
+Next code implements almost perfect fold command for multi byte
+characters with prohibited character handling.
+
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    use open IO => 'utf8', ':std';
+    
+    use Text::ANSI::Fold qw(:constants);
+    my $fold = new Text::ANSI::Fold
+        width     => 70,
+        boundary  => 'word',
+        linebreak => LINEBREAK_ALL,
+        runin     => 4,
+        runout    => 4,
+        ;
+    
+    $, = "\n";
+    while (<>) {
+        print $fold->text($_)->chops;
+    }
 
 =head1 SEE ALSO
 
@@ -454,6 +598,13 @@ are not supported by these modules.
 
 =item L<https://en.wikipedia.org/wiki/ANSI_escape_code>
 
+ANSI escape code definition.
+
+=item L<https://www.w3.org/TR/2012/NOTE-jlreq-20120403/>
+
+Requirements for Japanese Text Layout,
+W3C Working Group Note 3 April 2012
+
 =back
 
 =head1 LICENSE
@@ -476,4 +627,4 @@ it under the same terms as Perl itself.
 =cut
 
 #  LocalWords:  ansi Unicode undef bool diff cdif sdif SGR Kazumasa
-#  LocalWords:  Utashiro
+#  LocalWords:  Utashiro linebreak LINEBREAK runin runout

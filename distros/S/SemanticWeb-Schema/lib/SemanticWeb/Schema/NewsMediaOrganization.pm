@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has actionable_feedback_policy => (
@@ -122,7 +122,7 @@ SemanticWeb::Schema::NewsMediaOrganization - A News/Media organization such as a
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -134,13 +134,13 @@ A News/Media organization such as a newspaper or TV station.
 
 C<actionableFeedbackPolicy>
 
-=for html For a <a class="localLink"
+=for html <p>For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a> or
 other news-related <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, a statement about
 public engagement activities (for news media, the newsroomâs), including
 involving the public - digitally or otherwise -- in coverage decisions,
-reporting and activities after publication.
+reporting and activities after publication.<p>
 
 A actionable_feedback_policy should be one of the following types:
 
@@ -156,12 +156,12 @@ A actionable_feedback_policy should be one of the following types:
 
 C<correctionsPolicy>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (e.g. <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
 a statement describing (in news media, the newsroomâs) disclosure and
-correction policy for errors.
+correction policy for errors.<p>
 
 A corrections_policy should be one of the following types:
 
@@ -177,14 +177,14 @@ A corrections_policy should be one of the following types:
 
 C<diversityPolicy>
 
-=for html Statement on diversity policy by an <a class="localLink"
+=for html <p>Statement on diversity policy by an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> e.g. a <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>.
 For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>, a
 statement describing the newsroomâs diversity policy on both staffing and
-sources, typically providing staffing data.
+sources, typically providing staffing data.<p>
 
 A diversity_policy should be one of the following types:
 
@@ -200,12 +200,12 @@ A diversity_policy should be one of the following types:
 
 C<diversityStaffingReport>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (often but not
 necessarily a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
 a report on staffing diversity issues. In a news context this might be for
-example ASNE or RTDNA (US) reports, or self-reported.
+example ASNE or RTDNA (US) reports, or self-reported.<p>
 
 A diversity_staffing_report should be one of the following types:
 
@@ -221,7 +221,7 @@ A diversity_staffing_report should be one of the following types:
 
 C<ethicsPolicy>
 
-=for html Statement about ethics policy, e.g. of a <a class="localLink"
+=for html <p>Statement about ethics policy, e.g. of a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>
 regarding journalistic and publishing practices, or of a <a
 class="localLink" href="http://schema.org/Restaurant">Restaurant</a>, a
@@ -229,7 +229,7 @@ page describing food source policies. In the case of a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>,
 an ethicsPolicy is typically a statement describing the personal,
 organizational, and corporate standards of behavior expected by the
-organization.
+organization.<p>
 
 A ethics_policy should be one of the following types:
 
@@ -243,9 +243,9 @@ A ethics_policy should be one of the following types:
 
 =head2 C<masthead>
 
-=for html For a <a class="localLink"
+=for html <p>For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>, a
-link to the masthead page or a page listing top editorial management.
+link to the masthead page or a page listing top editorial management.<p>
 
 A masthead should be one of the following types:
 
@@ -261,10 +261,10 @@ A masthead should be one of the following types:
 
 C<missionCoveragePrioritiesPolicy>
 
-=for html For a <a class="localLink"
+=for html <p>For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>, a
 statement on coverage priorities, including any public agenda or stance on
-issues.
+issues.<p>
 
 A mission_coverage_priorities_policy should be one of the following types:
 
@@ -280,11 +280,11 @@ A mission_coverage_priorities_policy should be one of the following types:
 
 C<noBylinesPolicy>
 
-=for html For a <a class="localLink"
+=for html <p>For a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a> or
 other news-related <a class="localLink"
 href="http://schema.org/Organization">Organization</a>, a statement
-explaining when authors of articles are not named in bylines.
+explaining when authors of articles are not named in bylines.<p>
 
 A no_bylines_policy should be one of the following types:
 
@@ -300,7 +300,7 @@ A no_bylines_policy should be one of the following types:
 
 C<ownershipFundingInfo>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (often but not
 necessarily a <a class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
@@ -308,7 +308,7 @@ a description of organizational ownership structure; funding and grants. In
 a news/media setting, this is with particular reference to editorial
 independence. Note that the <a class="localLink"
 href="http://schema.org/funder">funder</a> is also available and can be
-used to make basic funder information machine-readable.
+used to make basic funder information machine-readable.<p>
 
 A ownership_funding_info should be one of the following types:
 
@@ -326,12 +326,12 @@ A ownership_funding_info should be one of the following types:
 
 C<unnamedSourcesPolicy>
 
-=for html For an <a class="localLink"
+=for html <p>For an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (typically a <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a>),
 a statement about policy on use of unnamed sources and the decision process
-required.
+required.<p>
 
 A unnamed_sources_policy should be one of the following types:
 
@@ -347,11 +347,11 @@ A unnamed_sources_policy should be one of the following types:
 
 C<verificationFactCheckingPolicy>
 
-=for html Disclosure about verification and fact-checking processes for a <a
+=for html <p>Disclosure about verification and fact-checking processes for a <a
 class="localLink"
 href="http://schema.org/NewsMediaOrganization">NewsMediaOrganization</a> or
 other fact-checking <a class="localLink"
-href="http://schema.org/Organization">Organization</a>.
+href="http://schema.org/Organization">Organization</a>.<p>
 
 A verification_fact_checking_policy should be one of the following types:
 

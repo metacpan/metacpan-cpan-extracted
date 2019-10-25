@@ -11,8 +11,8 @@
          "rdfs:comment" : "Specifying the health condition(s) of a patient, medical study, or other target audience.",
          "rdfs:label" : "healthCondition",
          "schema:domainIncludes" : [
-            "schema:Patient",
             "schema:PeopleAudience",
+            "schema:Patient",
             "schema:MedicalStudy"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

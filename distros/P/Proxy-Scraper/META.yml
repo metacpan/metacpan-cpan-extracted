@@ -26,8 +26,8 @@ requires:
   WWW::UserAgent::Random: '0'
   Win32::Console::ANSI: '0'
 resources:
-  bugtracker: https://github.com/DeBos99/Proxy-Scraper/issues
-  homepage: https://github.com/DeBos99/Proxy-Scraper
-  repository: https://github.com/DeBos99/Proxy-Scraper.git
-version: v2.1.0
+  bugtracker: https://gitlab.com/DeBos/Proxy-Scraper/issues
+  homepage: https://gitlab.com/DeBos/Proxy-Scraper
+  repository: https://gitlab.com/DeBos/Proxy-Scraper.git
+version: v2.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

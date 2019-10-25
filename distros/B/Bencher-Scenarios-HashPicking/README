@@ -1,0 +1,38 @@
+NAME
+    Bencher::Scenarios::HashPicking - Scenarios to benchmark hash picking
+
+VERSION
+    This document describes version 0.003 of Bencher::Scenarios::HashPicking
+    (from Perl distribution Bencher-Scenarios-HashPicking), released on
+    2019-10-20.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::HashPicking::pick
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-HashPicking>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-HashPicking>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Has
+    hPicking>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

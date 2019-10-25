@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has number_of_rooms => (
@@ -42,15 +42,15 @@ SemanticWeb::Schema::House - A house is a building or structure that has the abi
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A house is a building or structure that has the ability to be occupied for
-habitation by humans or other creatures (Source: Wikipedia, the free
+=for html <p>A house is a building or structure that has the ability to be occupied
+for habitation by humans or other creatures (Source: Wikipedia, the free
 encyclopedia, see <a
 href="http://en.wikipedia.org/wiki/House">http://en.wikipedia.org/wiki/Hous
-e</a>).
+e</a>).<p>
 
 =head1 ATTRIBUTES
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has css_selector => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::WebPageElement - A web page element
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -62,12 +62,12 @@ A web page element, like a table or an image.
 
 C<cssSelector>
 
-=for html A CSS selector, e.g. of a <a class="localLink"
+=for html <p>A CSS selector, e.g. of a <a class="localLink"
 href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
 or <a class="localLink"
 href="http://schema.org/WebPageElement">WebPageElement</a>. In the latter
 case, multiple matches within a page can constitute a single conceptual
-"Web page element".
+"Web page element".<p>
 
 A css_selector should be one of the following types:
 
@@ -79,12 +79,12 @@ A css_selector should be one of the following types:
 
 =head2 C<xpath>
 
-=for html An XPath, e.g. of a <a class="localLink"
+=for html <p>An XPath, e.g. of a <a class="localLink"
 href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
 or <a class="localLink"
 href="http://schema.org/WebPageElement">WebPageElement</a>. In the latter
 case, multiple matches within a page can constitute a single conceptual
-"Web page element".
+"Web page element".<p>
 
 A xpath should be one of the following types:
 

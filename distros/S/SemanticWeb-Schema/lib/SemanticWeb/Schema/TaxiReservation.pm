@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has party_size => (
@@ -58,14 +58,14 @@ SemanticWeb::Schema::TaxiReservation - A reservation for a taxi
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
-=for html A reservation for a taxi.<br/><br/> Note: This type is for information
+=for html <p>A reservation for a taxi.<br/><br/> Note: This type is for information
 about actual reservations, e.g. in confirmation emails or HTML pages with
 individual confirmations of reservations. For offers of tickets, use <a
-class="localLink" href="http://schema.org/Offer">Offer</a>.
+class="localLink" href="http://schema.org/Offer">Offer</a>.<p>
 
 =head1 ATTRIBUTES
 

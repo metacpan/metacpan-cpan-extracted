@@ -29,4 +29,14 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Image-Imlib2-Thumbnail-Scaled-*' },
+    'META_MERGE'   => {
+       'meta-spec' => { version => 2 },
+        resources  => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/srchulo/Image--Imlib2--Thumbnail--Scaled.git',
+                web  => 'https://github.com/srchulo/Image--Imlib2--Thumbnail--Scaled',
+            },
+        },
+    },
 );

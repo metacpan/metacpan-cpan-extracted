@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 has about => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'about',
+);
+
+
+
+has abstract => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'abstract',
 );
 
 
@@ -802,7 +810,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 
@@ -820,6 +828,20 @@ A about should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=back
+
+=head2 C<abstract>
+
+=for html <p>An abstract is a short description that summarizes a <a
+class="localLink"
+href="http://schema.org/CreativeWork">CreativeWork</a>.<p>
+
+A abstract should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 
@@ -860,9 +882,10 @@ A access_mode_sufficient should be one of the following types:
 
 C<accessibilityAPI>
 
-=for html Indicates that the resource is compatible with the referenced accessibility
-API (<a href="http://www.w3.org/wiki/WebSchemas/Accessibility">WebSchemas
-wiki lists possible values</a>).
+=for html <p>Indicates that the resource is compatible with the referenced
+accessibility API (<a
+href="http://www.w3.org/wiki/WebSchemas/Accessibility">WebSchemas wiki
+lists possible values</a>).<p>
 
 A accessibility_api should be one of the following types:
 
@@ -876,10 +899,10 @@ A accessibility_api should be one of the following types:
 
 C<accessibilityControl>
 
-=for html Identifies input methods that are sufficient to fully control the described
-resource (<a
+=for html <p>Identifies input methods that are sufficient to fully control the
+described resource (<a
 href="http://www.w3.org/wiki/WebSchemas/Accessibility">WebSchemas wiki
-lists possible values</a>).
+lists possible values</a>).<p>
 
 A accessibility_control should be one of the following types:
 
@@ -893,10 +916,10 @@ A accessibility_control should be one of the following types:
 
 C<accessibilityFeature>
 
-=for html Content features of the resource, such as accessible media, alternatives
+=for html <p>Content features of the resource, such as accessible media, alternatives
 and supported enhancements for accessibility (<a
 href="http://www.w3.org/wiki/WebSchemas/Accessibility">WebSchemas wiki
-lists possible values</a>).
+lists possible values</a>).<p>
 
 A accessibility_feature should be one of the following types:
 
@@ -910,10 +933,10 @@ A accessibility_feature should be one of the following types:
 
 C<accessibilityHazard>
 
-=for html A characteristic of the described resource that is physiologically
+=for html <p>A characteristic of the described resource that is physiologically
 dangerous to some users. Related to WCAG 2.0 guideline 2.3 (<a
 href="http://www.w3.org/wiki/WebSchemas/Accessibility">WebSchemas wiki
-lists possible values</a>).
+lists possible values</a>).<p>
 
 A accessibility_hazard should be one of the following types:
 
@@ -1124,15 +1147,16 @@ A comment_count should be one of the following types:
 
 C<conditionsOfAccess>
 
-=for html Conditions that affect the availability of, or method(s) of access to, an
-item. Typically used for real world items such as an <a class="localLink"
+=for html <p>Conditions that affect the availability of, or method(s) of access to,
+an item. Typically used for real world items such as an <a
+class="localLink"
 href="http://schema.org/ArchiveComponent">ArchiveComponent</a> held by an
 <a class="localLink"
 href="http://schema.org/ArchiveOrganization">ArchiveOrganization</a>. This
 property is not suitable for use as a general Web access control mechanism.
 It is expressed only in natural language.<br/><br/> For example "Available
 by appointment from the Reading Room" or "Accessible only from logged-in
-accounts ".
+accounts ".<p>
 
 A conditions_of_access should be one of the following types:
 
@@ -1235,11 +1259,11 @@ A copyright_year should be one of the following types:
 
 =head2 C<correction>
 
-=for html Indicates a correction to a <a class="localLink"
+=for html <p>Indicates a correction to a <a class="localLink"
 href="http://schema.org/CreativeWork">CreativeWork</a>, either via a <a
 class="localLink"
 href="http://schema.org/CorrectionComment">CorrectionComment</a>, textually
-or in another document.
+or in another document.<p>
 
 A correction should be one of the following types:
 
@@ -1400,7 +1424,7 @@ A encoding should be one of the following types:
 
 C<encodingFormat>
 
-=for html Media type typically expressed using a MIME format (see <a
+=for html <p>Media type typically expressed using a MIME format (see <a
 href="http://www.iana.org/assignments/media-types/media-types.xhtml">IANA
 site</a> and <a
 href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME
@@ -1414,7 +1438,7 @@ alongside particular <a class="localLink"
 href="http://schema.org/encodingFormat">encodingFormat</a>
 information.<br/><br/> Unregistered or niche encoding and file formats can
 be indicated instead via the most appropriate URL, e.g. defining Web page
-or a Wikipedia/Wikidata entry.
+or a Wikipedia/Wikidata entry.<p>
 
 A encoding_format should be one of the following types:
 
@@ -1453,14 +1477,14 @@ A example_of_work should be one of the following types:
 
 =head2 C<expires>
 
-=for html Date the content expires and is no longer useful or available. For example
-a <a class="localLink" href="http://schema.org/VideoObject">VideoObject</a>
-or <a class="localLink"
-href="http://schema.org/NewsArticle">NewsArticle</a> whose availability or
-relevance is time-limited, or a <a class="localLink"
+=for html <p>Date the content expires and is no longer useful or available. For
+example a <a class="localLink"
+href="http://schema.org/VideoObject">VideoObject</a> or <a
+class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>
+whose availability or relevance is time-limited, or a <a class="localLink"
 href="http://schema.org/ClaimReview">ClaimReview</a> fact check whose
 publisher wants to indicate that it may no longer be relevant (or helpful
-to highlight) after some date.
+to highlight) after some date.<p>
 
 A expires should be one of the following types:
 
@@ -1474,14 +1498,14 @@ A expires should be one of the following types:
 
 C<fileFormat>
 
-=for html Media type, typically MIME format (see <a
+=for html <p>Media type, typically MIME format (see <a
 href="http://www.iana.org/assignments/media-types/media-types.xhtml">IANA
 site</a>) of the content e.g. application/zip of a SoftwareApplication
 binary. In cases where a CreativeWork has several media type
 representations, 'encoding' can be used to indicate each MediaObject
 alongside particular fileFormat information. Unregistered or niche file
 formats can be indicated instead via the most appropriate URL, e.g.
-defining Web page or a Wikipedia entry.
+defining Web page or a Wikipedia entry.<p>
 
 A file_format should be one of the following types:
 
@@ -1549,11 +1573,11 @@ A headline should be one of the following types:
 
 C<inLanguage>
 
-=for html The language of the content or performance or used in an action. Please use
-one of the language codes from the <a
+=for html <p>The language of the content or performance or used in an action. Please
+use one of the language codes from the <a
 href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>. See also
 <a class="localLink"
-href="http://schema.org/availableLanguage">availableLanguage</a>.
+href="http://schema.org/availableLanguage">availableLanguage</a>.<p>
 
 A in_language should be one of the following types:
 
@@ -1897,7 +1921,7 @@ A publisher_imprint should be one of the following types:
 
 C<publishingPrinciples>
 
-=for html The publishingPrinciples property indicates (typically via <a
+=for html <p>The publishingPrinciples property indicates (typically via <a
 class="localLink" href="http://schema.org/URL">URL</a>) a document
 describing the editorial principles of an <a class="localLink"
 href="http://schema.org/Organization">Organization</a> (or individual e.g.
@@ -1912,7 +1936,7 @@ href="http://schema.org/CreativeWork">CreativeWork</a>.<br/><br/> While
 such policies are most typically expressed in natural language, sometimes
 related information (e.g. indicating a <a class="localLink"
 href="http://schema.org/funder">funder</a>) can be expressed using
-schema.org terminology.
+schema.org terminology.<p>
 
 A publishing_principles should be one of the following types:
 
@@ -1998,9 +2022,9 @@ A schema_version should be one of the following types:
 
 C<sdDatePublished>
 
-=for html Indicates the date on which the current structured data was generated /
+=for html <p>Indicates the date on which the current structured data was generated /
 published. Typically used alongside <a class="localLink"
-href="http://schema.org/sdPublisher">sdPublisher</a>
+href="http://schema.org/sdPublisher">sdPublisher</a><p>
 
 A sd_date_published should be one of the following types:
 
@@ -2031,14 +2055,14 @@ A sd_license should be one of the following types:
 
 C<sdPublisher>
 
-=for html Indicates the party responsible for generating and publishing the current
-structured data markup, typically in cases where the structured data is
-derived automatically from existing published content but published on a
-different site. For example, student projects and open data initiatives
-often re-publish existing content with more explicitly structured metadata.
-The <a class="localLink"
+=for html <p>Indicates the party responsible for generating and publishing the
+current structured data markup, typically in cases where the structured
+data is derived automatically from existing published content but published
+on a different site. For example, student projects and open data
+initiatives often re-publish existing content with more explicitly
+structured metadata. The <a class="localLink"
 href="http://schema.org/sdPublisher">sdPublisher</a> property helps make
-such practices more explicit.
+such practices more explicit.<p>
 
 A sd_publisher should be one of the following types:
 
@@ -2066,14 +2090,14 @@ A source_organization should be one of the following types:
 
 =head2 C<spatial>
 
-=for html The "spatial" property can be used in cases when more specific properties
-(e.g. <a class="localLink"
+=for html <p>The "spatial" property can be used in cases when more specific
+properties (e.g. <a class="localLink"
 href="http://schema.org/locationCreated">locationCreated</a>, <a
 class="localLink"
 href="http://schema.org/spatialCoverage">spatialCoverage</a>, <a
 class="localLink"
 href="http://schema.org/contentLocation">contentLocation</a>) are not known
-to be appropriate.
+to be appropriate.<p>
 
 A spatial should be one of the following types:
 
@@ -2120,14 +2144,14 @@ A sponsor should be one of the following types:
 
 =head2 C<temporal>
 
-=for html The "temporal" property can be used in cases where more specific properties
-(e.g. <a class="localLink"
+=for html <p>The "temporal" property can be used in cases where more specific
+properties (e.g. <a class="localLink"
 href="http://schema.org/temporalCoverage">temporalCoverage</a>, <a
 class="localLink" href="http://schema.org/dateCreated">dateCreated</a>, <a
 class="localLink" href="http://schema.org/dateModified">dateModified</a>,
 <a class="localLink"
 href="http://schema.org/datePublished">datePublished</a>) are not known to
-be appropriate.
+be appropriate.<p>
 
 A temporal should be one of the following types:
 
@@ -2141,7 +2165,7 @@ A temporal should be one of the following types:
 
 C<temporalCoverage>
 
-=for html The temporalCoverage of a CreativeWork indicates the period that the
+=for html <p>The temporalCoverage of a CreativeWork indicates the period that the
 content applies to, i.e. that it describes, either as a DateTime or as a
 textual string indicating a time period in <a
 href="https://en.wikipedia.org/wiki/ISO_8601#Time_intervals">ISO 8601 time
@@ -2156,7 +2180,7 @@ format format via "1939/1945".<br/><br/> Open-ended date ranges can be
 written with ".." in place of the end date. For example, "2015-11/.."
 indicates a range beginning in November 2015 and with no specified final
 date. This is tentative and might be updated in future when ISO 8601 is
-officially updated.
+officially updated.<p>
 
 A temporal_coverage should be one of the following types:
 

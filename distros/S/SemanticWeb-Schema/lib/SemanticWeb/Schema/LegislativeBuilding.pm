@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::LegislativeBuilding;
 
-# ABSTRACT: A legislative building&#x2014;for example
+# ABSTRACT: A legislative building—for example
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.9.0';
+our $VERSION = 'v4.0.1';
 
 
 
@@ -30,11 +30,11 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::LegislativeBuilding - A legislative building&#x2014;for example
+SemanticWeb::Schema::LegislativeBuilding - A legislative building—for example
 
 =head1 VERSION
 
-version v3.9.0
+version v4.0.1
 
 =head1 DESCRIPTION
 

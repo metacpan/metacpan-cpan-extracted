@@ -1,7 +1,7 @@
 package Bencher::Scenarios::DataCleansing;
 
-our $DATE = '2017-08-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Benchmark Data::Clean::* against other related modules for data cleansing
@@ -18,7 +18,7 @@ Bencher::Scenarios::DataCleansing - Benchmark Data::Clean::* against other relat
 
 =head1 VERSION
 
-This document describes version 0.004 of Bencher::Scenarios::DataCleansing (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2017-08-25.
+This document describes version 0.005 of Bencher::Scenarios::DataCleansing (from Perl distribution Bencher-Scenarios-DataCleansing), released on 2019-09-11.
 
 =head1 DESCRIPTION
 
@@ -28,9 +28,9 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =item * L<Bencher::Scenario::DataCleansing::Object_DateTime>
 
-=item * L<Bencher::Scenario::DataCleansing::Object>
-
 =item * L<Bencher::Scenario::DataCleansing::Startup>
+
+=item * L<Bencher::Scenario::DataCleansing::Object>
 
 =back
 
@@ -56,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

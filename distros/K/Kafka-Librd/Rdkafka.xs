@@ -282,6 +282,13 @@ krd_outq_len(rdk)
         RETVAL
 
 void
+krd_flush(rdk, timeout_ms)
+        rdkafka_t* rdk
+        int timeout_ms
+    CODE:
+        rd_kafka_flush(rdk->rk, timeout_ms);
+
+void
 krd_DESTROY(rdk)
         rdkafka_t* rdk
     CODE:
@@ -336,6 +343,12 @@ krdt_produce(rkt, partition, msgflags, payload, key)
 
 void
 krdt_DESTROY(rkt)
+        rd_kafka_topic_t* rkt
+    CODE:
+        rd_kafka_topic_destroy(rkt);
+
+void
+krdt_destroy(rkt)
         rd_kafka_topic_t* rkt
     CODE:
         rd_kafka_topic_destroy(rkt);

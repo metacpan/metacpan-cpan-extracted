@@ -1,5 +1,9 @@
 Change history for Math::Counting
 
+0.1306 2019-10-23 08:37:25
+    - Cleaned up SEE ALSO.
+    - Fix permutation test for new Math::BigInt bpow() implementation.
+
 0.1305 2015-10-19 21:47:24
     - Added handy plugins to dist.ini.
     - Corrected numeric tests with "cmp_ok ==."

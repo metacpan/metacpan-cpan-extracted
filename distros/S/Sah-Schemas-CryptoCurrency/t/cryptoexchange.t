@@ -13,26 +13,27 @@ subtest "basics" => sub {
         {return_type => "str+val"},
     );
 
-    my ($res, $val);
+    my ($res0, $res, $val);
 
-    ($res, $val) = @{ $v->("foo") };
-    ok($res);
+    $res0 = $v->("foo");
+    ($res, $val) = @$res0;
+    ok($res) or diag explain $res0;
 
-    ($res, $val) = @{ $v->("GDAX") };
-    ok(!$res);
-    is($val, "gdax");
+    $res0 = $v->("BX Thailand");
+    ($res, $val) = @$res0;
+    ok(!$res) or diag explain $res0;
+    is($val, "bx-thailand") or diag explain $res0;
 
-    ($res, $val) = @{ $v->("BX Thailand") };
-    ok(!$res);
-    is($val, "bx-thailand");
+    # case variation
+    $res0 = $v->("BX-thailand");
+    ($res, $val) = @$res0;
+    ok(!$res) or diag explain $res0;
+    is($val, "bx-thailand") or diag explain $res0;
 
-    ($res, $val) = @{ $v->("BX-thailand") };
-    ok(!$res);
-    is($val, "bx-thailand");
-
-    ($res, $val) = @{ $v->("BX") };
-    ok(!$res);
-    is($val, "bx-thailand");
+    $res0 = $v->("BX");
+    ($res, $val) = @$res0;
+    ok(!$res) or diag explain $res0;
+    is($val, "bx-thailand") or diag explain $res0;
 
 };
 

@@ -3,7 +3,6 @@ Changes
 Debian_CPANTS.txt
 examples/rs
 lib/CLI/Startup.pm
-lib/CLI/Startup.pm.bak
 Makefile.PL
 MANIFEST
 META.json

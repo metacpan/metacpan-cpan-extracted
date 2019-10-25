@@ -1,0 +1,52 @@
+{
+   "abstract" : "Testable network automation and reporting",
+   "author" : [
+      "Mike Menza <mmenza@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mnet",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Expect" : "0",
+            "JSON" : "0",
+            "Text::Diff" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/menzascripting/Mnet.git",
+         "web" : "https://github.com/menzascripting/Mnet"
+      }
+   },
+   "version" : "5.16",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

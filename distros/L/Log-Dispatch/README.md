@@ -4,7 +4,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 # VERSION
 
-version 2.68
+version 2.69
 
 # SYNOPSIS
 
@@ -400,6 +400,7 @@ Dave Rolsky <autarch@urth.org>
 - Anirvan Chatterjee <anirvan@users.noreply.github.com>
 - Carsten Grohmann <mail@carstengrohmann.de>
 - Doug Bell <doug@preaction.me>
+- Graham Knop <haarg@haarg.org>
 - Graham Ollis <plicease@cpan.org>
 - Gregory Oschwald <goschwald@maxmind.com>
 - hartzell <hartzell@alerce.com>
@@ -422,7 +423,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

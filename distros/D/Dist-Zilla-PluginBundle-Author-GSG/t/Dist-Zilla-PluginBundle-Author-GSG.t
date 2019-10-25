@@ -56,18 +56,23 @@ subtest 'Build a basic dist' => sub {
                     '@Author::GSG',
                 ),
                 'source/lib/External/Package.pm' =>
-                    "package External::Package;\n# ABSTRACT: ABSTRACT\n1;",
+                    "package External::Package;\n# ABSTRACT: ABSTRACT\n# VERSION\n1;",
             }
         }
     );
 
-    my $source_git = $tzil->plugin_named('@Author::GSG/Git::Commit')->git;
+    is $tzil->plugin_named('@Author::GSG/@Filter/MakeMaker')->eumm_version,
+        '7.1101', "Require a newer ExtUtils::MakeMaker";
+
+    my $source_git = Git::Wrapper->new( $tzil->tempdir->child('/source') );
     $source_git->add('.');
     $source_git->commit( -a => { m => "Add new files for Git::GatherDir" });
 
     $tzil->build;
 
     my $built = $tzil->slurp_file('build/lib/External/Package.pm');
+    like $built, qr/\nour \$VERSION = 'v0.0.1';/,
+        "Found the correct version in the module";
     like $built,
         qr/\QThis software is Copyright (c) 2001 - $year by $holder./,
         "Put the expected copyright in the module";
@@ -87,8 +92,7 @@ subtest 'Build a basic dist' => sub {
     # similar to what they do, but in the correct directory.
     {
         my ($url) = map /Fetch URL: (.*)/,
-                $tzil->plugin_named('@Author::GSG/Git::Push')
-                    ->git->remote( 'show', '-n', 'origin' );
+            $source_git->remote( 'show', '-n', 'origin' );
 
         unless ( $url =~ /\Q$upstream/ ) {
             diag "Not checking 'resources', invalid Fetch URL [$url]";
@@ -102,7 +106,7 @@ subtest 'Build a basic dist' => sub {
         author         => ['Grant Street Group <developers@grantstreet.com>'],
         x_contributors => [$contributor],
 
-        version => '0.0.1',
+        version => 'v0.0.1',
 
         requires => { perl => 'v5.10.0' },
         provides => {
@@ -142,6 +146,82 @@ subtest 'Build a basic dist' => sub {
         Test::Deep::superhashof(\%expect),
         "Built the expected META.json"
     );
+};
+
+subtest 'NextVersion' => sub {
+    my $dir = File::Temp->newdir("dzpbag-XXXXXXXXX");
+
+    #local $Git::Wrapper::DEBUG = 1;
+    my $git = Git::Wrapper->new($dir);
+    my $upstream = 'GrantStreetGroup/p5-Versioned-Package';
+
+    $git->init;
+    $git->remote( qw/ add origin /,
+        "https://fake-github.com/$upstream.git" );
+    $git->commit( { m => 'init', date => '2001-02-03 04:05:06' },
+        '--allow-empty' );
+
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/versioned' },
+        {   also_copy => { $dir => 'source' },
+            add_files => {
+                'source/dist.ini' => dist_ini(
+                    { name => 'Versioned' },
+                    '@Author::GSG',
+                ),
+                'source/lib/Versioned.pm' =>
+                    "package Versioned;\n# ABSTRACT: ABSTRACT\n# VERSION\n1;",
+            }
+        }
+    );
+
+    is $tzil->version, 'v0.0.1', 'First version is v0.0.1';
+
+    my ($version_plugin)
+        = $tzil->plugin_named('@Author::GSG/Git::NextVersion');
+    my ($changelog_plugin)
+        = $tzil->plugin_named('@Author::GSG/ChangelogFromGit');
+
+    my @versions = (
+        [ 'v0.0.1'              => 'v0.0.2' ],
+        [ 'v1.2.3.4'            => 'v1.2.4' ],
+        [ 'dist/v2.31.1.2/prod' => 'v2.31.2' ],
+    );
+
+    my @expected_changes = { changes => ["init\n"] };
+    for (@versions) {
+        my ($have, $expect) = @{ $_ };
+        sleep 1; # ugh, ChangelogFromGit uses the commit date
+        delete $version_plugin->{_all_versions};
+        delete $changelog_plugin->{releases};
+
+        $version_plugin->git->tag($have);
+        $version_plugin->git->commit( { m => "Version $expect" },
+            '--allow-empty' );
+
+        $expected_changes[-1]{version} = $have;
+        push @expected_changes, { changes => ["Version $expect\n"] };
+
+        is $version_plugin->provide_version, $expect,
+            "Version after $have is $expect";
+    }
+
+    $version_plugin->git->tag('v3.0.0');
+    $expected_changes[-1]{version} = 'v3.0.0';
+
+    {
+        my $dir = File::pushd::pushd( $version_plugin->git->dir )
+            or die "Unable to chdir source: $!";
+        $changelog_plugin->gather_files;
+    }
+
+    my @got = map { {
+        version => $_->version,
+        changes => [ map { $_->description } @{ $_->changes } ]
+    } } $changelog_plugin->all_releases;
+
+    is_deeply \@got, \@expected_changes,
+        "Expected Changes generated";
 };
 
 subtest "Override MetaProvides subclass" => sub {

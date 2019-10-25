@@ -41,7 +41,8 @@
       "runtime" : {
          "requires" : {
             "Moose" : "0",
-            "MooseX::Getopt::Usage" : "0"
+            "MooseX::Getopt::Usage" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -51,7 +52,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Test::Mock::Cmd" : "0.6",
+            "Test::Mock::Cmd" : "0.7",
             "Test::More" : "1.001002"
          }
       }
@@ -59,11 +60,11 @@
    "provides" : {
       "Git::Open" : {
          "file" : "lib/Git/Open.pm",
-         "version" : "v0.1.11"
+         "version" : "v0.1.12"
       },
       "Git::Open::Util" : {
          "file" : "lib/Git/Open/Util.pm",
-         "version" : "v0.1.11"
+         "version" : "v0.1.12"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/rabbiveesh/git-open"
       }
    },
-   "version" : "0.1.11",
+   "version" : "0.1.12",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022001"
@@ -248,7 +249,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.1.11",
+                  "tag" : "0.1.12",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -460,6 +461,11 @@
             "version" : "4.008"
          },
          {
+            "class" : "Dist::Zilla::Plugin::MinimumPerlFast",
+            "name" : "MinimumPerlFast",
+            "version" : "0.003"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Git::Check",
             "config" : {
                "Dist::Zilla::Plugin::Git::Check" : {
@@ -514,7 +520,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-0.1.11",
+                  "tag" : "release-0.1.12",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },

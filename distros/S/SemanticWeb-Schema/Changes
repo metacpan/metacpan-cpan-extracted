@@ -1,5 +1,15 @@
 Revision history for SemanticWeb-Schema:
 
+v4.0.1    2019-10-23 17:20:32+01:00 Europe/London
+  [Documentation]
+  - Enclose HTML descriptions inside of paragraph elements.
+
+  - Strip HTML from module abstracts.
+
+v4.0.0    2019-10-23 16:57:27+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 4.0 of the schema.
+
 v3.9.0    2019-08-08 16:04:56+01:00 Europe/London
   [Enhancements]
   - Updated classes to Version 3.9 of the schema.

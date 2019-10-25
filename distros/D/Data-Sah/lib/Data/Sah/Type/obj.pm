@@ -1,7 +1,7 @@
 package Data::Sah::Type::obj;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.901'; # VERSION
+our $DATE = '2019-10-24'; # DATE
+our $VERSION = '0.902'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -37,7 +37,7 @@ Data::Sah::Type::obj - obj type
 
 =head1 VERSION
 
-This document describes version 0.901 of Data::Sah::Type::obj (from Perl distribution Data-Sah), released on 2019-08-14.
+This document describes version 0.902 of Data::Sah::Type::obj (from Perl distribution Data-Sah), released on 2019-10-24.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 
