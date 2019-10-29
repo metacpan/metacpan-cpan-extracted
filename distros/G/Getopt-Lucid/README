@@ -2,7 +2,7 @@ NAME
     Getopt::Lucid - Clear, readable syntax for command line processing
 
 VERSION
-    version 1.09
+    version 1.10
 
 SYNOPSIS
        use Getopt::Lucid qw( :all );
@@ -175,7 +175,7 @@ USAGE
 
        @spec = (
          Param("input")->default("/dev/random")->needs("output"),
-         Param("output)->default("/dev/null"),
+         Param("output")->default("/dev/null"),
        );
 
    valid()
@@ -211,7 +211,7 @@ USAGE
 
        @spec = (
          Param("input")->needs("output"),
-         Param("output),
+         Param("output"),
        );
 
    anycase()
@@ -668,6 +668,8 @@ AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
+    *   Chris White <cxwembedded@gmail.com>
+
     *   David Golden <xdg@xdg.me>
 
     *   David Precious <davidp@preshweb.co.uk>
@@ -683,7 +685,7 @@ CONTRIBUTORS
     *   thilp <thilp@thilp.net>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2018 by David Golden.
+    This software is Copyright (c) 2019 by David Golden.
 
     This is free software, licensed under:
 

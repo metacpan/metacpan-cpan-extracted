@@ -13,7 +13,6 @@ class Money
   class Currency
     include Comparable
     extend Enumerable
-    extend Money::Currency::Loader
     extend Money::Currency::Heuristics
 
     # Keeping cached instances in sync between threads
@@ -76,9 +75,10 @@ class Money
       #
       # @example
       #   Money::Currency.find_by_iso_numeric(978) #=> #<Money::Currency id: eur ...>
+      #   Money::Currency.find_by_iso_numeric(51) #=> #<Money::Currency id: amd ...>
       #   Money::Currency.find_by_iso_numeric('001') #=> nil
       def find_by_iso_numeric(num)
-        num = num.to_s
+        num = num.to_s.rjust(3, '0')
         return if num.empty?
         id, _ = self.table.find { |key, currency| currency[:iso_numeric] == num }
         new(id)
@@ -121,7 +121,7 @@ class Money
       # See https://en.wikipedia.org/wiki/List_of_circulating_currencies and
       # http://search.cpan.org/~tnguyen/Locale-Currency-Format-1.28/Format.pm
       def table
-        @table ||= load_currencies
+        @table ||= Loader.load_currencies
       end
 
       # List the currencies imported and registered
@@ -414,7 +414,7 @@ class Money
 
     # Returns the relation between subunit and unit as a base 10 exponent.
     #
-    # Note that MGA and MRO are exceptions and are rounded to 1
+    # Note that MGA and MRU are exceptions and are rounded to 1
     # @see https://en.wikipedia.org/wiki/ISO_4217#Active_codes
     #
     # @return [Integer]

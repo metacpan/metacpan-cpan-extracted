@@ -1,6 +1,6 @@
 package Memento::TimeTravel;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use Moo;
@@ -9,26 +9,26 @@ use Scalar::Util qw(blessed);
 use LWP::Simple;
 
 sub find_mementos {
-	my ($self,$uri,$date) = @_;
+    my ($self, $uri, $date) = @_;
 
-	unless (blessed($self)) {
-		$date = $uri;
-		$uri  = $self;
-	}
+    unless (blessed($self)) {
+        $date = $uri;
+        $uri  = $self;
+    }
 
-	die "usage: find_mementos(uri,date)" unless defined($uri) && defined($date);
+    die "usage: find_mementos(uri,date)"
+        unless defined($uri) && defined($date);
 
-	die "usage: date =~ YYYYMMDDHHMMSS" unless ($date =~ /^\d{4,14}$/);
+    die "usage: date =~ YYYYMMDDHHMMSS" unless ($date =~ /^\d{4,14}$/);
 
-	my $api_call = sprintf "http://timetravel.mementoweb.org/api/json/%s/%s" 
-								, $date
-								, $uri;
+    my $api_call = sprintf "http://timetravel.mementoweb.org/api/json/%s/%s",
+        $date, $uri;
 
-	my $mementos = get($api_call);
+    my $mementos = get($api_call);
 
-	return undef unless defined($mementos) && length($mementos);
+    return undef unless defined($mementos) && length($mementos);
 
-	decode_json($mementos);
+    decode_json($mementos);
 }
 
 =head1 NAME
@@ -56,6 +56,5 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-
 
 1;

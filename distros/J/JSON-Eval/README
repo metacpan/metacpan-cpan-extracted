@@ -1,0 +1,110 @@
+NAME
+    JSON::Eval - eval Perl code found in JSON
+
+SYNOPSIS
+      my $encoder = JSON::Eval->new();
+  
+      my $object = {
+        coderef   => sub { 2 + shift },
+        scalarref => do { my $x = 40; \$x },
+      };
+  
+      my $jsontext = $encoder->encode($object);
+  
+      my $decoded   = $encoder->decode($jsontext);  
+      my $coderef   = $decoded->{coderef};
+      my $scalarref = $decoded->{scalarref};
+  
+      print $coderef->($$scalarref);   # 42
+
+DESCRIPTION
+    Perl data structures can contain several types of reference which do not
+    have a JSON equivalent. This module provides a technique for encoding and
+    decoding two of those reference types as JSON: coderefs and scalarrefs.
+    (It also has partial support for Type::Tiny objects.)
+
+    Coderefs must be self-contained, not closing over any variables. They will
+    be encoded as the following JSON:
+
+      { "$eval": "sub { ... }" }
+
+    When decoding, any JSON object that contains a single key called "$eval"
+    and no other keys will be passed through eval to return the original
+    coderef. (Technically, when decoding, the Perl code being evaluated
+    doesn't have to return a coderef; it can return anything. This could allow
+    for filehandles or blessed objects, for example, to be decoded from JSON.)
+
+    Scalarrefs are encoded as:
+
+      { "$scalar": ... }
+
+    So for example, the following JSON:
+
+      { "foo": { "$scalar:" 42 } }
+
+    Will be decoded to this Perl structure:
+
+      { 'foo' => \ 42 }
+
+  Object-Oriented Interface
+   `new`
+    Use the `new` method to make an encoder.
+
+      my $encoder = JSON::Eval->new($backend);
+      my $encoder = JSON::Eval->new();
+
+    $backend is a JSON::PP-compatible object that JSON::Eval will use to
+    actually produce valid JSON. Any of JSON::PP, JSON::XS, or
+    Cpanel::JSON::XS should work fine. If you don't provide a backend,
+    JSON::Eval will use JSON::MaybeXS to find the best supported backend
+    available on your system.
+
+   `encode`
+    Encode a Perl reference to JSON.
+
+      my $jsontext = $encoder->encode($ref);
+
+   `decode`
+    Decode a Perl reference from JSON.
+
+      my $ref = $encoder->decode($jsontext);
+
+   `eval_object` and `deparse_object`
+    These don't directly operate on JSON data, but are used internally by
+    JSON::Eval. If you're a smart cookie, it shouldn't take long for you to
+    figure out what they do. They're a stable and supported part of the API,
+    but this is all you're getting in terms of their documentation.
+
+   AUTOLOAD
+    JSON::Eval uses AUTOLOAD to pass other method calls straight to the
+    backend.
+
+      my $backend = JSON::PP->new;
+      my $encoder = JSON::Eval->new($backend);
+  
+      $encoder->pretty(1); # $backend->pretty(1)
+
+  Function-Based Interface
+    there is no function-based interface lol
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=JSON-Eval>.
+
+SEE ALSO
+    JSON::MaybeXS.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2019 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

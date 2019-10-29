@@ -61,7 +61,7 @@
    "provides" : {
       "Set::Light" : {
          "file" : "lib/Set/Light.pm",
-         "version" : "0.92"
+         "version" : "0.93"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/robrwo/Set-Light"
       }
    },
-   "version" : "0.92",
+   "version" : "0.93",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Robert Rothenberg <rrwo@cpan.org>"

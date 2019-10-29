@@ -1,5 +1,5 @@
 package Mongoose::Role::Collapser;
-$Mongoose::Role::Collapser::VERSION = '2.00';
+$Mongoose::Role::Collapser::VERSION = '2.01';
 use Moose::Role;
 
 requires 'collapse';

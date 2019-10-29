@@ -88,7 +88,5 @@ is(${$params->{'http-pairs'}}[1]->{response}->content_type, 'text/turtle', 'Seco
 cmp_deeply([${$params->{'http-pairs'}}[1]->{response}->header('Content-Type')], bag("text/turtle"), 'Response header field value bag comparison can be used for single values');
 cmp_deeply([${$params->{'http-pairs'}}[1]->{response}->header('Accept-Post')], bag("text/turtle", "application/ld+json"), 'Response header field value bag comparison');
 
-# TODO: Test retrieving content from URI
-
 done_testing;
 

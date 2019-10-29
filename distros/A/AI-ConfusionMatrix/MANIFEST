@@ -10,4 +10,6 @@ dist.ini
 lib/AI/ConfusionMatrix.pm
 t/01_csv.t
 t/02_cmData.t
+test.csv
+test.pl
 xt/author/pod-syntax.t

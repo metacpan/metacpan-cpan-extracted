@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:         IPC-Locker
-version:      1.496
+version:      1.500
 version_from: lib/IPC/Locker.pm
 abstract:     Distributed lock handler
 license:      perl
@@ -8,8 +8,8 @@ installdirs:  site
 author:
     - Wilson Snyder <wsnyder@wsnyder.org>
 resources:
-    homepage: http://www.veripool.org/ipc-locker
-    bugtracker: http://www.veripool.org/ipc-locker-bugs
+    homepage: https://www.veripool.org/ipc-locke
+    bugtracker: https://www.veripool.org/ipc-locker
 requires:
     Net::Domain:                   0
     Pod::Usage:                    1.34

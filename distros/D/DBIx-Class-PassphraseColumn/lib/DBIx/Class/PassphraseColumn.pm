@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
-package DBIx::Class::PassphraseColumn; # git description: 0.02-6-g962fbc2
+package DBIx::Class::PassphraseColumn; # git description: v0.04-6-g3f91ab8
 # ABSTRACT: Automatically hash password/passphrase columns
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
-use Class::Load 'load_class';
+use Module::Runtime 'require_module';
 use Sub::Name 'subname';
+use Encode ();
 use namespace::clean;
 
 use parent 'DBIx::Class';
@@ -161,7 +162,7 @@ sub register_column {
                 && defined $info->{passphrase_class};
 
         my $class = 'Authen::Passphrase::' . $info->{passphrase_class};
-        load_class $class;
+        require_module($class);
 
         my $args = $info->{passphrase_args} || {};
         $self->throw_exception(q['passphrase_args' must be a hash reference])
@@ -169,7 +170,7 @@ sub register_column {
 
         my $encoder = sub {
             my ($val) = @_;
-            $class->new(%{ $args }, passphrase => $val)->${\"as_${encoding}"};
+            $class->new(%{ $args }, passphrase => Encode::encode('UTF-8', $val))->${\"as_${encoding}"};
         };
 
         $self->_passphrase_columns({
@@ -180,7 +181,7 @@ sub register_column {
         if (defined(my $meth = $info->{passphrase_check_method})) {
             my $checker = sub {
                 my ($row, $val) = @_;
-                return $row->get_inflated_column($column)->match($val);
+                return $row->get_inflated_column($column)->match(Encode::encode('UTF-8', $val));
             };
 
             my $name = join q[::] => $self->result_class, $meth;
@@ -254,7 +255,7 @@ DBIx::Class::PassphraseColumn - Automatically hash password/passphrase columns
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

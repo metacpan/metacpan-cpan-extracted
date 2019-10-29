@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2019-06-07'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -430,7 +430,7 @@ sub latest_version {
     for my $sw (@$sws) {
         my $mod = _load_swcat_mod($sw);
         my $res = _cache_result(
-            code => sub { $mod->get_latest_version(arch => $args{arch}) },
+            code => sub { $mod->latest_version(arch => $args{arch}) },
             dbh => $state->{dbh},
             cache_period => $args{cache_period},
             table => 'sw_cache',
@@ -473,8 +473,8 @@ sub available_versions {
     my $sw = $args{software};
 
     my $mod = _load_swcat_mod($sw);
-    return [501, "Not implemented"] unless $mod->can("get_available_versions");
-    $mod->get_available_versions(arch => $args{arch});
+    return [501, "Not implemented"] unless $mod->can("available_versions");
+    $mod->available_versions(arch => $args{arch});
 }
 
 $SPEC{download_url} = {
@@ -504,7 +504,7 @@ sub download_url {
     my @rows;
     for my $sw (@$sws) {
         my $mod = _load_swcat_mod($sw);
-        my $res = $mod->get_download_url(
+        my $res = $mod->download_url(
             maybe arch => $args{arch},
         );
         $envres->add_result($res->[0], $res->[1], {item_id=>$sw});
@@ -542,8 +542,8 @@ sub release_note {
 
     my $sw = delete $args{software};
     my $mod = _load_swcat_mod($sw);
-    return [501, "Not implemented"] unless $mod->can("get_available_versions");
-    $mod->get_release_note(%args);
+    return [501, "Not implemented"] unless $mod->can("release_note");
+    $mod->release_note(%args);
 }
 
 $SPEC{archive_info} = {
@@ -563,7 +563,7 @@ sub archive_info {
     my $sw = $args{software};
 
     my $mod = _load_swcat_mod($sw);
-    my $res = $mod->get_archive_info(
+    my $res = $mod->archive_info(
         maybe arch => $args{arch},
     );
     $res;
@@ -584,7 +584,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.013 of App::swcat (from Perl distribution App-swcat), released on 2019-06-07.
+This document describes version 0.014 of App::swcat (from Perl distribution App-swcat), released on 2019-10-26.
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 ###############################################################################
@@ -260,9 +260,23 @@ At least one worksheet should be added to a new workbook. A worksheet is used to
 
 If C<$sheetname> is not specified the default Excel convention will be followed, i.e. Sheet1, Sheet2, etc.
 
-The worksheet name must be a valid Excel worksheet name, i.e. it cannot contain any of the following characters, C<[ ] : * ? / \> and it must be less than 32 characters. In addition, you cannot use the same, case insensitive, C<$sheetname> for more than one worksheet.
+The worksheet name must be a valid Excel worksheet name, i.e:
 
+=over
 
+=item * It must be less than 32 characters.
+
+=item * It cannot contain any of the following characters: C<[ ] : * ? / \>
+
+=item * It cannot start or end with an apostrophe.
+
+=item * It cannot be the same as an existing worksheet name (or a case insensitive variant).
+
+=item * It cannot be the reserved name "History" (or a case insensitive variant).
+
+=back
+
+See the Excel worksheet naming rules at L<https://support.office.com/en-ie/article/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9>.
 
 
 =head2 add_format( %properties )
@@ -1679,24 +1693,49 @@ See the C<write_handler 1-4> programs in the C<examples> directory for further e
 
 
 
-=head2 insert_image( $row, $col, $filename, $x, $y, $x_scale, $y_scale )
+=head2 insert_image( $row, $col, $filename, { %options } )
 
-This method can be used to insert a image into a worksheet. The image can be in PNG, JPEG or BMP format. The C<$x>, C<$y>, C<$x_scale> and C<$y_scale> parameters are optional.
+This method can be used to insert a image into a worksheet. The image can be in PNG, JPEG or BMP format.
 
     $worksheet1->insert_image( 'A1', 'perl.bmp' );
     $worksheet2->insert_image( 'A1', '../images/perl.bmp' );
     $worksheet3->insert_image( 'A1', '.c:\images\perl.bmp' );
 
-The parameters C<$x> and C<$y> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
+The optional C<options> hash/hashref parameter can be used to set various options for the image. The defaults are:
 
-    $worksheet1->insert_image('A1', 'perl.bmp', 32, 10);
+    %options = (
+        x_offset        => 0,
+        y_offset        => 0,
+        x_scale         => 1,
+        y_scale         => 1,
+        object_position => 2,
+    );
+
+The parameters C<x_offset> and C<y_offset> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
+
+    $worksheet1->insert_image('A1', 'perl.bmp', { x_offset =>32, y_offset => 10 });
 
 The offsets can be greater than the width or height of the underlying cell. This can be occasionally useful if you wish to align two or more images relative to the same cell.
 
-The parameters C<$x_scale> and C<$y_scale> can be used to scale the inserted image horizontally and vertically:
+The parameters C<x_scale> and C<y_scale> can be used to scale the inserted image horizontally and vertically:
 
     # Scale the inserted image: width x 2.0, height x 0.8
-    $worksheet->insert_image( 'A1', 'perl.bmp', 0, 0, 2, 0.8 );
+    $worksheet->insert_image( 'A1', 'perl.bmp', { y_scale => 2, y_scale => 0.8 } );
+
+
+The positioning of the image when cells are resized can be set with the C<object_position> parameter:
+
+    $worksheet->insert_image( 'A1', 'perl.bmp', { object_position => 1 } );
+
+The C<object_position> parameter can have one of the following allowable values:
+
+    1. Move and size with cells.
+    2. Move but don’t size with cells.
+    3. Don’t move or size with cells.
+    4. Same as Option 1, see below.
+
+Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This allows the user to hide an image in a cell, possibly as part of an autofilter.
+
 
 Note: you must call C<set_row()> or C<set_column()> before C<insert_image()> if you wish to change the default dimensions of any of the rows or columns that the image occupies. The height of a row can also change if you use a font that is larger than the default. This in turn will affect the scaling of your image. To avoid this you should explicitly set the height of the row using C<set_row()> if it contains a font size that will change the row height.
 
@@ -1705,7 +1744,7 @@ BMP images must be 24 bit, true colour, bitmaps. In general it is best to avoid 
 
 
 
-=head2 insert_chart( $row, $col, $chart, $x, $y, $x_scale, $y_scale )
+=head2 insert_chart( $row, $col, $chart, { %options } )
 
 This method can be used to insert a Chart object into a worksheet. The Chart must be created by the C<add_chart()> Workbook method and it must have the C<embedded> option set.
 
@@ -1719,16 +1758,38 @@ This method can be used to insert a Chart object into a worksheet. The Chart mus
 
 See C<add_chart()> for details on how to create the Chart object and L<Excel::Writer::XLSX::Chart> for details on how to configure it. See also the C<chart_*.pl> programs in the examples directory of the distro.
 
-The C<$x>, C<$y>, C<$x_scale> and C<$y_scale> parameters are optional.
+The optional C<options> hash/hashref parameter can be used to set various options for the chart. The defaults are:
 
-The parameters C<$x> and C<$y> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
+    %options = (
+        x_offset        => 0,
+        y_offset        => 0,
+        x_scale         => 1,
+        y_scale         => 1,
+        object_position => 1,
+    );
 
-    $worksheet1->insert_chart( 'E2', $chart, 3, 3 );
+The parameters C<x_offset> and C<y_offset> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
 
-The parameters C<$x_scale> and C<$y_scale> can be used to scale the inserted chart horizontally and vertically:
+    $worksheet1->insert_chart( 'E2', $chart, { x_offset =>10, y_offset => 20 });
+
+The parameters C<x_scale> and C<y_scale> can be used to scale the inserted chart horizontally and vertically:
 
     # Scale the width by 120% and the height by 150%
-    $worksheet->insert_chart( 'E2', $chart, 0, 0, 1.2, 1.5 );
+    $worksheet->insert_chart( 'E2', $chart, { y_scale => 1.2, y_scale => 1.5 } );
+
+The positioning of the chart when cells are resized can be set with the C<object_position> parameter:
+
+    $worksheet->insert_chart( 'E2', $chart, { object_position => 2 } );
+
+The C<object_position> parameter can have one of the following allowable values:
+
+    1. Move and size with cells.
+    2. Move but don’t size with cells.
+    3. Don’t move or size with cells.
+    4. Same as Option 1, see below.
+
+Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
+
 
 =head2 insert_shape( $row, $col, $shape, $x, $y, $x_scale, $y_scale )
 
@@ -1761,7 +1822,7 @@ See also the C<shape*.pl> programs in the examples directory of the distro.
 
 
 
-=head2 insert_button( $row, $col, { %properties })
+=head2 insert_button( $row, $col, { %options })
 
 The C<insert_button()> method can be used to insert an Excel form button into a worksheet.
 
@@ -7485,7 +7546,7 @@ In no event unless required by applicable law or agreed to in writing will any c
 
 =head1 LICENSE
 
-Either the Perl Artistic Licence L<http://dev.perl.org/licenses/artistic.html> or the GPL L<http://www.opensource.org/licenses/gpl-license.php>.
+The Perl Artistic Licence L<http://dev.perl.org/licenses/artistic.html>.
 
 
 

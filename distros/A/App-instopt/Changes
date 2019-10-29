@@ -1,3 +1,26 @@
+0.014   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	- Adjust to Software::Catalog 1.0.6 (incompatible change, renamed
+	  methods).
+
+        [REMOVED FEATURES]
+
+        - Remove make_latest_dir_as_symlink option, instead check
+	  dedicated_profile setting from the software catalog module.
+
+
+0.013   2019-10-15  Released-By: PERLANCAR; Urgency: medium
+
+	- list-downloaded: Add --arch (previously private argument _arch) and
+          --per-arch options.
+
+        - cleanup-download-dir: Perform cleanup on a per-arch basis, as it
+          should. Example, if firefox has these versions downloaded: 69.0
+          (win64), 69.0.1 (linux-x86_64), 69.0.2 (linux-x86_64), then we should
+          only remove 69.0.1 (older Linux version) and not 69.0 because 69.0 for
+          win64 is the newest.
+
+
 0.012   2019-10-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix][ux] Fix wrong argument name (symlink ->

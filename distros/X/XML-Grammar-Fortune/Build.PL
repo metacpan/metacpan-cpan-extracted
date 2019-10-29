@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "XML-Grammar-Fortune",
-  "dist_version" => "0.0702",
+  "dist_version" => "0.0800",
   "license" => "mit",
   "module_name" => "XML::Grammar::Fortune",
   "recursive_test_files" => 1,

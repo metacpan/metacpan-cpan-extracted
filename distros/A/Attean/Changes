@@ -5,6 +5,10 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
+0.025  2019-10-25
+
+ - (Update) Fix Moo::Role/Role::Tiny imports (#141, #142 from @haarg).
+
 0.024  2019-09-22
 
  - (Addition) Add attribute in AbbreviatingSerializer to omit base

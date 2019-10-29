@@ -30,74 +30,74 @@ no_index:
 provides:
   LWP:
     file: lib/LWP.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Authen::Basic:
     file: lib/LWP/Authen/Basic.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Authen::Digest:
     file: lib/LWP/Authen/Digest.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Authen::Ntlm:
     file: lib/LWP/Authen/Ntlm.pm
-    version: '6.40'
+    version: '6.41'
   LWP::ConnCache:
     file: lib/LWP/ConnCache.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Debug:
     file: lib/LWP/Debug.pm
-    version: '6.40'
+    version: '6.41'
     x_deprecated: 1
   LWP::Debug::TraceHTTP:
     file: lib/LWP/Debug/TraceHTTP.pm
-    version: '6.40'
+    version: '6.41'
   LWP::DebugFile:
     file: lib/LWP/DebugFile.pm
-    version: '6.40'
+    version: '6.41'
   LWP::MemberMixin:
     file: lib/LWP/MemberMixin.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol:
     file: lib/LWP/Protocol.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::cpan:
     file: lib/LWP/Protocol/cpan.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::data:
     file: lib/LWP/Protocol/data.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::file:
     file: lib/LWP/Protocol/file.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::ftp:
     file: lib/LWP/Protocol/ftp.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::gopher:
     file: lib/LWP/Protocol/gopher.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::http:
     file: lib/LWP/Protocol/http.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::loopback:
     file: lib/LWP/Protocol/loopback.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::mailto:
     file: lib/LWP/Protocol/mailto.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::nntp:
     file: lib/LWP/Protocol/nntp.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Protocol::nogo:
     file: lib/LWP/Protocol/nogo.pm
-    version: '6.40'
+    version: '6.41'
   LWP::RobotUA:
     file: lib/LWP/RobotUA.pm
-    version: '6.40'
+    version: '6.41'
   LWP::Simple:
     file: lib/LWP/Simple.pm
-    version: '6.40'
+    version: '6.41'
   LWP::UserAgent:
     file: lib/LWP/UserAgent.pm
-    version: '6.40'
+    version: '6.41'
 requires:
   Digest::MD5: '0'
   Encode: '2.12'
@@ -134,7 +134,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/libwww-perl/issues
   homepage: https://github.com/libwww-perl/libwww-perl
   repository: https://github.com/libwww-perl/libwww-perl.git
-version: '6.40'
+version: '6.41'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -177,7 +177,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
@@ -237,7 +237,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: InstallGuide
       version: '1.200013'
@@ -253,7 +253,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: DynamicPrereqs
       version: '0.035'
@@ -591,7 +591,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.40
+          tag: v6.41
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -753,6 +753,7 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Katarina Durechova <katarina.durechova@nic.cz>'
   - 'leedo <leedo@users.noreply.github.com>'
+  - 'Mark Fowler <mark@twoshortplanks.com>'
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Martin H. Sluka <martin@sluka.de>'
   - 'Matthew Horsfall <wolfsage@gmail.com>'

@@ -32,10 +32,10 @@ no_index:
 provides:
   Getopt::Lucid:
     file: lib/Getopt/Lucid.pm
-    version: '1.09'
+    version: '1.10'
   Getopt::Lucid::Exception:
     file: lib/Getopt/Lucid/Exception.pm
-    version: '1.09'
+    version: '1.10'
 requires:
   Carp: '0'
   Exception::Class: '1.23'
@@ -50,9 +50,10 @@ resources:
   bugtracker: https://github.com/dagolden/Getopt-Lucid/issues
   homepage: https://github.com/dagolden/Getopt-Lucid
   repository: https://github.com/dagolden/Getopt-Lucid.git
-version: '1.09'
+version: '1.10'
 x_authority: cpan:DAGOLDEN
 x_contributors:
+  - 'Chris White <cxwembedded@gmail.com>'
   - 'David Golden <xdg@xdg.me>'
   - 'David Precious <davidp@preshweb.co.uk>'
   - 'James E Keenan <jkeenan@cpan.org>'
@@ -60,5 +61,5 @@ x_contributors:
   - 'Nova Patch <patch@cpan.org>'
   - 'Robert Bohne <rbo@cpan.org>'
   - 'thilp <thilp@thilp.net>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -5,9 +5,6 @@ use Test::Fatal;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-my $class = Mojo::UserAgent->with_roles('+PromiseClass');
-ok(defined $class, "class->with_roles works");
-
 {
     package Mojo::Promise::Role::Fake;
     use Mojo::Base -role;
@@ -15,6 +12,23 @@ ok(defined $class, "class->with_roles works");
 	return 42;
     }
 }
+
+my $class = Mojo::Base->with_roles('+PromiseClass');
+ok(defined $class, "base->with_roles works");
+my $obj = $class->new;
+ok(defined $obj, "new");
+is($obj->promise_class, 'Mojo::Promise');
+ok(!Role::Tiny::does_role($obj->promise_class,'Mojo::Promise::Role::Fake'));
+like(exception { $obj->promise_class->does('Mojo::Promise::Role::Fake') }, qr/Can't locate object method/);
+
+$obj->promise_roles('+Fake');
+ok($obj->promise_class->does('Mojo::Promise::Role::Fake'));
+is($obj->promise_class->new->the_answer_to_everything, '42');
+is($obj->promise_class, $obj->promise_roles('+Fake')->promise_class, "twice");
+
+$class = Mojo::UserAgent->with_roles('+PromiseClass');
+ok(defined $class, "ua->with_roles works");
+
 get '/' => sub {
   my $c = shift;
   $c->render(text => "Hello World");

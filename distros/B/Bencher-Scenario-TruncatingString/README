@@ -1,0 +1,137 @@
+NAME
+    Bencher::Scenario::TruncatingString - Benchmark modules that
+    truncate/elide string
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenario::TruncatingString (from Perl distribution
+    Bencher-Scenario-TruncatingString), released on 2019-09-11.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m TruncatingString
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m TruncatingString
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    String::Elide::Parts 0.07
+
+    String::Elide::Tiny 0.002
+
+    String::Truncate 1.100602
+
+    Text::Elide 0.0.3
+
+    Text::Truncate 1.06
+
+BENCHMARK PARTICIPANTS
+    *   String::Elide::Parts::elide (perl_code)
+
+        Function call template:
+
+         String::Elide::Parts::elide(<string>, <max_len>)
+
+    *   String::Elide::Tiny::elide (perl_code)
+
+        Function call template:
+
+         String::Elide::Tiny::elide(<string>, <max_len>)
+
+    *   String::Truncate::elide (perl_code)
+
+        Function call template:
+
+         String::Truncate::elide(<string>, <max_len>)
+
+    *   Text::Elide::elide (perl_code)
+
+        Function call template:
+
+         Text::Elide::elide(<string>, <max_len>)
+
+    *   Text::Truncate::truncstr (perl_code)
+
+        Function call template:
+
+         Text::Truncate::truncstr(<string>, <max_len>)
+
+BENCHMARK DATASETS
+    *   str100-70
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.28.2*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.3*, OS kernel: *Linux
+    version 4.8.0-53-generic*.
+
+    Benchmark with default options ("bencher -m TruncatingString"):
+
+     #table1#
+     +-----------------------------+-----------+-----------+------------+---------+---------+
+     | participant                 | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +-----------------------------+-----------+-----------+------------+---------+---------+
+     | String::Elide::Parts::elide |     81000 |     12    |        1   |   3e-08 |      20 |
+     | Text::Elide::elide          |    130000 |      7.6  |        1.6 | 2.7e-08 |      20 |
+     | String::Truncate::elide     |    600000 |      1.7  |        7.4 | 6.5e-09 |      21 |
+     | String::Elide::Tiny::elide  |    910000 |      1.1  |       11   | 2.1e-09 |      20 |
+     | Text::Truncate::truncstr    |   1400000 |      0.72 |       17   | 1.6e-09 |      22 |
+     +-----------------------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m TruncatingString
+    --module-startup"):
+
+     #table2#
+     +----------------------+-----------+------------------------+------------+-----------+---------+
+     | participant          | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
+     +----------------------+-----------+------------------------+------------+-----------+---------+
+     | String::Truncate     |      25   |                   19.8 |        1   |   0.00011 |      20 |
+     | Text::Elide          |      20   |                   14.8 |        1.3 | 7.1e-05   |      20 |
+     | Text::Truncate       |      14   |                    8.8 |        1.8 | 5.6e-05   |      20 |
+     | String::Elide::Parts |       9.9 |                    4.7 |        2.5 | 5.9e-05   |      20 |
+     | String::Elide::Tiny  |       5.8 |                    0.6 |        4.3 | 4.2e-05   |      20 |
+     | perl -e1 (baseline)  |       5.2 |                    0   |        4.8 | 2.7e-05   |      20 |
+     +----------------------+-----------+------------------------+------------+-----------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-TruncatingString>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-TruncatingString>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Trun
+    catingString>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -5,7 +5,6 @@
 #   Expect required in Mnet::Expect modules, best to find our here if missing
 use warnings;
 use strict;
-use Expect;
 use Test::More tests => 12;
 
 # use current perl for tests

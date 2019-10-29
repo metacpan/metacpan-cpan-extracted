@@ -8,7 +8,7 @@
 #########################################################################
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 3;
 
 eval "require 'Term/Clui.pm'";
 ok (! $@, 'Term::Clui compiles');
@@ -26,5 +26,3 @@ diag 'It\'s not easy to test a user-interface automatically';
 diag 'to test it by hand, try "perl examples/test_script" ...';
 diag '';
 diag '';
-
-done_testing;

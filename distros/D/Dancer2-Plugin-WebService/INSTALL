@@ -228,10 +228,6 @@ dance;
 
 
 
-
-
-
-
 If you are using nginx web server to reverse proxy you service 
 from port 80 or for adding https protection ( port 443 )
 Add at your nginx.conf something similar to

@@ -21,7 +21,7 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "Attean"            => 0.024,
+                                           "Attean"            => 0.025,
                                            "HTTP::Message"     => 0,
                                            "LWP::UserAgent"    => 0,
                                            "Moo"               => "1.006000",
@@ -39,15 +39,16 @@ my $meta = {
                                        },
                           test      => {
                                          requires => {
-                                           "FindBin"      => 0,
-                                           "Test::Deep"   => 0,
-                                           "Test::Modern" => 0,
-                                           "Test::More"   => 0.96,
+                                           "FindBin"                 => 0,
+                                           "Test::Deep"              => 0,
+                                           "Test::HTTP::LocalServer" => 0,
+                                           "Test::Modern"            => 0,
+                                           "Test::More"              => 0.96,
                                          },
                                        },
                         },
   "provides"         => {
-                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.014 },
+                          "Test::FITesque::RDF" => { file => "lib/Test/FITesque/RDF.pm", version => 0.016 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -62,7 +63,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.014,
+  "version"          => 0.016,
   "x_static_install" => 1,
 };
 

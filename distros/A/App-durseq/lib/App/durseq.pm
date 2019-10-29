@@ -1,7 +1,7 @@
 package App::durseq;
 
-our $DATE = '2019-07-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,8 +14,8 @@ $SPEC{durseq} = {
     summary => 'Generate a sequence of durations',
     description => <<'_',
 
-This utility is similar to Unix <prog:seq> command or Perl script
-<prog:dateseq>, except that it generates a sequence of dates.
+This utility is similar to Perl script <prog:dateseq>, except that it generates
+a sequence of durations instead of dates.
 
 _
     args_rels => {
@@ -208,7 +208,7 @@ App::durseq - Generate a sequence of durations
 
 =head1 VERSION
 
-This document describes version 0.002 of App::durseq (from Perl distribution App-durseq), released on 2019-07-23.
+This document describes version 0.003 of App::durseq (from Perl distribution App-durseq), released on 2019-09-15.
 
 =head1 FUNCTIONS
 
@@ -221,8 +221,8 @@ Usage:
 
 Generate a sequence of durations.
 
-This utility is similar to Unix L<seq> command or Perl script
-L<dateseq>, except that it generates a sequence of dates.
+This utility is similar to Perl script L<dateseq>, except that it generates
+a sequence of durations instead of dates.
 
 This function is not exported.
 

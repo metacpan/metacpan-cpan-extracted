@@ -8,8 +8,8 @@
 #########################################################################
 
 package Term::Clui::FileSelect;
-our $VERSION = '1.75';
-import Term::Clui(':DEFAULT','back_up');
+our $VERSION = '1.76';
+use Term::Clui(':DEFAULT','back_up', 'set_default');
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(select_file);
@@ -169,7 +169,6 @@ Term::Clui::FileSelect - Perl module to ask the user to select a file.
 
 =head1 SYNOPSIS
 
- use Term::Clui;
  use Term::Clui::FileSelect;
  $file = &select_file(-Readable=>1, -TopDir=>"/home", -FPat=>"*.html");
  @files = &select_file(-Chdir=>0, -Path=>$ENV{PWD}, -FPat=>"*.mp3");

@@ -1,10 +1,11 @@
 # ABSTRACT:RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access
 # Multiple input/output formats : JSON , XML , YAML, PERL , HUMAN
 #
-# George Bouras, george.mpouras@yandex.com
+# George Bouras , george.mpouras@yandex.com
+# Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.0';
+our	$VERSION = '4.2.1';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -13,7 +14,6 @@ use	Data::Dumper;	$Data::Dumper::Sortkeys=0; $Data::Dumper::Indent=2; $Data::Dum
 use	YAML::XS;		$YAML::XS::QuoteNumericStrings=1;
 use	XML::Hash::XS;	$XML::Hash::XS::root='Data'; $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
 use JSON::XS;		my $JSON=JSON::XS->new; $JSON->canonical(0); $JSON->pretty(1); $JSON->indent(1); $JSON->space_before(0); $JSON->space_after(0); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->utf8(1); $JSON->max_depth(1024);
-
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
 
@@ -229,7 +229,7 @@ closedir __SESSIONDIR;
 	# add header
 	$app->request->header('Content-Type'=> $plg->formats->{$plg->Format->{to}});
 
-	# Convert the received data string, to hash $plg->data
+	# Convert the posted data string, to hash $plg->data
 
 		if ( $app->request->body ) { 
 
@@ -322,11 +322,11 @@ closedir __SESSIONDIR;
 			$plg->reply(
 			Application	=> $_[0]->{name},
 			Routes		=> {
-				'Info'			=> [ qw(version client about) ],
-				'WebService'	=> [ qw(login logout) ],
+				'Info'			=> [ map {"WebService/$_"} qw(version client about) ],
+				'WebService'	=> [ map {"/$_"} qw(login logout) ],
 				'Application'	=> {
-					'Protected' => [ grep   $Routes->{$_}->{Protected}, keys %{$Routes} ],
-					'Public'    => [ grep ! $Routes->{$_}->{Protected}, keys %{$Routes} ]
+					'Protected' => [ map {"/$_"} grep   $Routes->{$_}->{Protected}, sort keys %{$Routes} ],
+					'Public'    => [ map {"/$_"} grep ! $Routes->{$_}->{Protected}, sort keys %{$Routes} ]
 					}
 				}
 			)
@@ -725,7 +725,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.2.0
+version 4.2.1
 
 =head1 SYNOPSIS
 
@@ -995,15 +995,15 @@ If the route's Groups list is empty or missing, the route will run with any vali
 This is usefull because you can have role based access control at your routes.
 Every user with its token will be able to access only the routes is assigned to.
 
-A sample route definition is
+A sample route definition. Plese mention the \/ path separator
 
     Routes:      
-      route1:
+      Route1      :
         Protected : false
-      route2: 
+      Route\/foo1 :
         Protected : true
         Groups    : [ group1 , group2 ... ]
-      route3: 
+      Route\/foo2 :
         Protected : true
         Groups    : [ ]
 
@@ -1025,11 +1025,11 @@ A sample I<config.yml> is the following.
       Routes              :
         mirror            : { Protected: false }
         somekeys          : { Protected: false }
-        data1             : { Protected: false }
-        data3             : { Protected: false }
-      INeedLogin_store  : { Protected: true, Groups: [ ftp , storage ] }
-      INeedLogin_delete : { Protected: true, Groups: log }
-      INeedLogin_read   : { Protected: true }
+        data\/m1          : { Protected: false }
+        data\/m1          : { Protected: false }
+      INeedLogin_store    : { Protected: true, Groups: [ ftp , storage ] }
+      INeedLogin_delete   : { Protected: true, Groups: log }
+      INeedLogin_read     : { Protected: true }
 
       Allowed hosts:
       - 127.*

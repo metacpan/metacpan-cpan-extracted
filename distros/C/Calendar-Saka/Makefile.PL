@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
-        'Date::Saka::Simple'         => '0.25',
+        'Date::Saka::Simple'         => '0.26',
         'Calendar::Plugin::Renderer' => '0.15',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Saka' => { file => 'lib/Calendar/Saka.pm', version => '1.43' },
+            'Calendar::Saka' => { file => 'lib/Calendar/Saka.pm', version => '1.44' },
         },
         resources => {
             repository => {

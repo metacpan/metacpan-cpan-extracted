@@ -1,33 +1,42 @@
-1.0.5   2019-01-14 (PERLANCAR)
+1.0.6   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	[INCOMPATIBLE CHANGES]
+
+        - Role::Software: rename get_latest_version -> latest_version,
+          get_download_url -> download_url, get_archive_info -> archive_info,
+          plan to get everything with a method for maximum flexibility.
+
+
+1.0.5   2019-01-14  Released-By: PERLANCAR
 
 	- extract_from_url(): Add option all.
 
 
-1.0.4   2018-10-18 (PERLANCAR)
+1.0.4   2018-10-18  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- [logging] Add logging to extract_from_url() utility routine.
 
 
-1.0.3   2018-10-05 (PERLANCAR)
+1.0.3   2018-10-05  Released-By: PERLANCAR
 
 	- SW:Role::Software: requires get_latest_version, get_download_url,
 	  get_archive_info, is_valid_version, cmp_version.
 
 
-1.0.2   2018-10-04 (PERLANCAR)
+1.0.2   2018-10-04  Released-By: PERLANCAR
 
 	- Remove role: Software::Catalog::Role::VersionScheme::* (moved to
 	  Versioning::Scheme::* in their own distro).
 
 
-1.0.1   2018-09-13 (PERLANCAR)
+1.0.1   2018-09-13  Released-By: PERLANCAR
 
 	- Add role: VersionScheme::SemVer.
 
 
-1.0.0   2018-09-13 (PERLANCAR)
+1.0.0   2018-09-13  Released-By: PERLANCAR
 
         [INCOMPATIBLE CHANGES]
 
@@ -35,7 +44,7 @@
           module becomes a specification.
 
 
-0.05    2015-09-04 (PERLANCAR)
+0.05    2015-09-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -44,7 +53,7 @@
 	  requirement.
 
 
-0.04    2014-08-22 (SHARYANTO)
+0.04    2014-08-22  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -53,17 +62,17 @@
           in 5.14) [CT].
 
 
-0.03    2012-11-08 (SHARYANTO)
+0.03    2012-11-08  Released-By: SHARYANTO
 
         - Require software ID to be [a-z0-9_]+ only (no more dashes), so it can
           be used as module name.
 
 
-0.02    2012-11-08 (SHARYANTO)
+0.02    2012-11-08  Released-By: SHARYANTO
 
         - Add get_software_info(). Add some more data. Some fixes/tweaks.
 
 
-0.01    2012-11-08 (SHARYANTO)
+0.01    2012-11-08  Released-By: SHARYANTO
 
         - First release (proof of concept).

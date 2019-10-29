@@ -1,7 +1,7 @@
 package Module::Abstract::Cwalitee::Core;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -105,7 +105,7 @@ sub indicator_not_template {
         [200, "OK", "Template from h2xs '$1'"];
     } elsif ($ab =~ /^(The great new )\w+(::\w+)*/i) {
         [200, "OK", "Template from module-starter '$1'"];
-    } elsif ($ab =~ /^\b(blah blah)\b/i) {
+    } elsif ($ab =~ /^\b(blah blah)\b|^it's new \$module/i) {
         [200, "OK", "Looks like a template"];
     } else {
         [200, "OK", ""];
@@ -256,7 +256,7 @@ Module::Abstract::Cwalitee::Core - A collection of core indicators for module ab
 
 =head1 VERSION
 
-This document describes version 0.005 of Module::Abstract::Cwalitee::Core (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-26.
+This document describes version 0.006 of Module::Abstract::Cwalitee::Core (from Perl distribution Module-Abstract-Cwalitee), released on 2019-09-15.
 
 =head1 FUNCTIONS
 

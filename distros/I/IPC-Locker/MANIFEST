@@ -13,8 +13,7 @@ MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
 nagios/check_lockerd
 nagios/check_pidstatd
-README
-readme.texi
+README.pod
 script/lockerd
 script/lockersh
 script/pidstat

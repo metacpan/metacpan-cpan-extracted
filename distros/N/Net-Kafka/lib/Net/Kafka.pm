@@ -9,7 +9,7 @@ our @ISA = qw/Exporter/;
 our (@EXPORT_OK, %EXPORT_TAGS);
 
 BEGIN {
-    our $VERSION = "1.05";
+    our $VERSION = "1.06";
     my $XS_VERSION = $VERSION;
     $VERSION = eval $VERSION;
 
@@ -85,7 +85,7 @@ BEGIN {
 sub partitions_for {
     my ($self, $topic, $timeout_ms) = @_;
     $timeout_ms //= DEFAULT_METADATA_TIMEOUT;
-    my $metadata = $self->metadata($self->topic($topic), $timeout_ms);
+    my $metadata = $self->topic($topic)->metadata($timeout_ms);
     my @topics   = grep { $_->{topic_name} eq $topic } @{ $metadata->{topics} };
     die sprintf("Unable to fetch metadata for topic %s", $topic)
         if scalar @topics != 1;
@@ -98,6 +98,8 @@ sub partitions_for {
 1;
 
 =head1 NAME
+
+=for markdown [![Build Status](https://travis-ci.com/bookingcom/perl-Net-Kafka.svg?branch=master)](https://travis-ci.com/bookingcom/perl-Net-Kafka)
 
 Net::Kafka - High-performant Perl client for Apache Kafka
 
@@ -148,8 +150,8 @@ Net::Kafka - High-performant Perl client for Apache Kafka
 
 =head1 DESCRIPTION
 
-This module provides Perl bindings to librdkafka C client library (https://github.com/edenhill/librdkafka).
-It is heavily inspired by Kafka::Librd module originally developed by Pavel Shaydo (https://github.com/trinitum/perl-Kafka-Librd).
+This module provides Perl bindings to L<librdkafka|https://github.com/edenhill/librdkafka> C client library.
+It is heavily inspired by L<Kafka::Librd> module originally developed by Pavel Shaydo.
 
 Please refer to the following modules documentation in order to understand how to use it:
 
@@ -171,30 +173,21 @@ C<Net::Kafka::Consumer> - consumer interface that supports both Simple and Distr
 GNU make
 
 =item *
-pthreads
-
-=item *
 librdkafka >= 1.0.0
-
-=item *
-lz (optional, for gzip compression support)
-
-=item *
-libssl (optional, for SSL and SASL SCRAM support)
-
-=item *
-libsasl2 (optional, for SASL GSSAPI support)
-
-=item *
-libzstd (optional, for ZStd compression support)
 
 =back
 
 =head1 INSTALLATION
 
-First download and build librdkafka (https://github.com/edenhill/librdkafka#building).
+First install librdkafka (L<https://github.com/edenhill/librdkafka#installation>).
 
-Then to install this module run the following commands:
+=head2 BUILD FROM CPAN
+
+    cpanm install Net::Kafka
+
+=head2 BUILD FROM SOURCE
+
+Sources are available on Github: L<https://github.com/bookingcom/perl-Net-Kafka>.
 
     perl Makefile.pl
     make
@@ -224,15 +217,15 @@ Note that only C<error_cb> and C<stats_cb> callbacks are supported for Producer.
 =item produce()
 
     my $promise = $producer->produce(
-        payload => "my_message",
-        topic   => "my_topic",
-        key     => "my_key",    # optional
-        timestamp => 1234567,   # optional, if not specified current local timestamp will be used
-        partition => 0          # optional, if not specified internal librdkafka partitioner will be used
-        headers   => $headers,  # Optional, see Net::Kafka::Headers
+        payload     => "my_message",
+        topic       => "my_topic",
+        key         => "my_key",    # optional
+        timestamp   => 1234567,   # optional, if not specified current local timestamp will be used
+        partition   => 0          # optional, if not specified internal librdkafka partitioner will be used
+        headers     => $headers,  # Optional, see Net::Kafka::Headers
     )->then(sub {
         my $delivery_report = shift;
-        echo "Message is sent with offset " . $delivery_report->{offset};
+        print "Message is sent with offset " . $delivery_report->{offset};
     })->catch(sub {
         my $error = shift;
         print $error->{error} . "\n";
@@ -264,6 +257,8 @@ Explicitly closees C<Net::Kafka::Producer> instance and underlying librdkafka ha
 
 The Net::Kafka::Consumer class provides interface to librdkafka's consumer functionality. It supports both "distributed" (subscription based) and
 "simple" (manual partition assignment) modes of work.
+
+=head2 METHODS
 
 =over 4
 
@@ -514,7 +509,15 @@ Message offset is truncated to 32 bit if perl is compiled without support for 64
 
 =head1 SEE ALSO
 
+=over
+
+=item *
 L<https://github.com/edenhill/librdkafka>
+
+=item *
+L<https://github.com/trinitum/perl-Kafka-Librd>
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -62,12 +62,18 @@ invoker_ck_entersub(pTHX_ OP *o, void *ud) {
             if (tmp == -1) {
                 gv = gv_fetchpvn_flags("self", 4, GV_NOINIT, SVt_PV);
                 if (SvOK(gv) && SvTYPE(gv) == SVt_PVGV) {
-                    // "$self" was defined as a package variable -- use it
-                    cUNOPx(arg)->op_first = newGVOP(
+                    /** "$self" was defined as a package variable; use it **/
+                    OP *new_gvop = newGVOP(
                         gvop->op_type,
                         gvop->op_flags,
                         gv
                     );
+#if PERL_REVISION == 5 && PERL_VERSION >= 26
+                    op_sibling_splice(arg, NULL, 1, new_gvop);
+#else
+                    cUNOPx(arg)->op_first = new_gvop;
+#endif
+                    op_free(gvop);
                 }
                 else {
                     croak("$self not found");

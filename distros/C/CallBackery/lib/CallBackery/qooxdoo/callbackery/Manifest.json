@@ -4,7 +4,7 @@
     "name" : "callbackery",
 
     "summary" : "CallBackery Toolkit",
-    "description" : "A framework for creating single page webapplications",
+    "description" : "A framework for creating single page web applications",
 
     "homepage" : "http://www.oetiker.ch/",
 
@@ -12,7 +12,7 @@
     "authors" :
     [
       {
-        "name" : "Tobias Oetiker (oetiker)",
+        "name" : "Tobias Oetiker",
         "email" : "tobi@oetiker.ch"
       }
     ],

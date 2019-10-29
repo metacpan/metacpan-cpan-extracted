@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::wales_towns;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.012';
+our $VERSION = '1.013';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -41,6 +41,12 @@ Abigail, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-10-28 - v1.013
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.054.
 
 =item *
 
@@ -144,12 +150,10 @@ Abercarn
 Aberdare
 Abergavenny
 Abergele
-Aberporth
 Abertillery
 Aberystwyth
 Amlwch
 Ammanford
-Argoed
 Bagillt
 Bala
 Bangor
@@ -157,12 +161,10 @@ Bargoed
 Barmouth
 Barry
 Beaumaris
-Bedwas
-Benllech
 Bethesda
+Blackwood
 Blaenau_Ffestiniog
 Blaenavon
-Blackwood
 Blaina
 Brecon
 Bridgend
@@ -181,6 +183,7 @@ Cardigan
 Carmarthen
 Chepstow
 Chirk
+Cilgerran
 Colwyn_Bay
 Connah_s_Quay
 Conwy
@@ -189,21 +192,21 @@ Cowbridge
 Criccieth
 Crickhowell
 Crumlin
+Crymych
 Cwmamman
 Cwmbran
 Denbigh
 Dolgellau
 Ebbw_Vale
 Ewloe
-Ffestiniog
 Fishguard
 Flint
 Gelligaer
 Glynneath
 Goodwick
 Gorseinon
-Gresford
 Gowerton
+Gresford
 Harlech
 Haverfordwest
 Hay_on_Wye
@@ -219,7 +222,6 @@ Llandovery
 Llandrindod_Wells
 Llandudno
 Llandudno_Junction
-Llanddulas
 Llandysul
 Llanelli
 Llanfair_Caereinion
@@ -242,8 +244,6 @@ Milford_Haven
 Mold
 Monmouth
 Montgomery
-Maesglas
-Miskin
 Narberth
 Neath
 Nefyn
@@ -267,10 +267,10 @@ Pontarddulais
 Pontyclun
 Pontypool
 Pontypridd
-Port_Talbot
 Porth
 Porthcawl
 Porthmadog
+Port_Talbot
 Prestatyn
 Presteigne
 Pwllheli
@@ -281,14 +281,13 @@ Rhyl
 Rhymney
 Risca
 Ruthin
+Saltney
+Senghenydd
+Shotton
 St_Asaph
 St_Clears
-Senghenydd
-Saltney
-Shotton
 Swansea
 Talgarth
-Templeton
 Tenby
 Tonypandy
 Tredegar
@@ -301,4 +300,3 @@ Whitland
 Wrexham
 Ystradgynlais
 Ystrad_Mynach
-Ynysddu

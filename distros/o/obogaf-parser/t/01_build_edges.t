@@ -39,7 +39,7 @@ close $fh;
 
 ## test obo file without namespace
 my $gores_hack   = obogaf::parser::build_edges($gobo_hack);
-my $goedges_hack = "t/data/test_gobasic_edges_hack.txt"; 
+my $goedges_hack = "t/data/test_gobasic_edges_no_namespace.txt"; 
 open $fh, ">", $goedges_hack; 
 print $fh "${$gores_hack}";
 close $fh;

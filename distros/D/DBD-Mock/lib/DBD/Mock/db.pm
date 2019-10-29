@@ -111,10 +111,12 @@ sub prepare {
         # If we have available resultsets seed the tracker with one
 
         my $rs;
+        my $callback;
         if ( my $all_rs = $dbh->{mock_rs} ) {
             if ( my $by_name = defined $all_rs->{named}{$statement} ? $all_rs->{named}{$statement} : first { $statement =~ m/$_->{regexp}/ } @{ $all_rs->{matching} } ) {
                 # We want to copy this, because it is meant to be reusable
                 $rs = [ @{ $by_name->{results} } ];
+                $callback = $by_name->{callback};
                 if ( exists $by_name->{failure} ) {
                     $track_params{failure} = [ @{ $by_name->{failure} } ];
                 }
@@ -124,12 +126,17 @@ sub prepare {
             }
         }
 
-        if ( ref($rs) eq 'ARRAY' && scalar( @{$rs} ) > 0 ) {
+        if ( ref($rs) eq 'ARRAY' && ( scalar( @{$rs} ) > 0 || $callback ) ) {
             my $fields = shift @{$rs};
             $track_params{return_data} = $rs;
             $track_params{fields}      = $fields;
-            $sth->STORE( NAME          => $fields );
-            $sth->STORE( NUM_OF_FIELDS => scalar @{$fields} );
+            $track_params{callback}    = $callback;
+
+            if( $fields ) {
+                $sth->STORE( NAME          => $fields );
+                $sth->STORE( NUM_OF_FIELDS => scalar @{$fields});
+            }
+
         }
         else {
             $sth->trace_msg( "No return data set in DBH\n", 1 );
@@ -354,15 +361,16 @@ sub STORE {
                   "as hashref key to 'mock_add_resultset'.\n";
             }
 
-            my @copied_values = @{ $value->{results} };
+            my @copied_values = @{ $value->{results} ? $value->{results} : [] };
 
             if ( ref $name eq "Regexp" ) {
                 push @{ $dbh->{mock_rs}{matching} }, {
                     regexp => $name,
                     results => \@copied_values,
+                    callback => $value->{callback},
                 };
             } else {
-                $dbh->{mock_rs}{named}{$name} = { results => \@copied_values, };
+                $dbh->{mock_rs}{named}{$name} = { results => \@copied_values, callback => $value->{callback} };
             }
 
             if ( exists $value->{failure} ) {

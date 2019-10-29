@@ -5,6 +5,8 @@ pod_spelling_system:
   stopwords:
     - libxml
     - FFI
+    - Shlomi
+    - shlomif
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

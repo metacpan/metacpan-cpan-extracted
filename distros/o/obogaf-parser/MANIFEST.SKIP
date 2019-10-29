@@ -9,4 +9,5 @@
 .md$
 .tar.gz$
 .gitignore$
+.travis.yml$
 _blib$

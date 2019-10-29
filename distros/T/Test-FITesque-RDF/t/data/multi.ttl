@@ -7,7 +7,7 @@
 
 
 :test_list a test:FixtureTable ;
-    test:fixtures :test1, :test2 .
+    test:fixtures :test1, :test2, :test3 .
 
 :test1 a test:AutomatedTest ;
     test:param_base <http://example.org/my-parameters#> ;
@@ -25,8 +25,17 @@
         my:product 42
     ] .
 
+:test3 a test:AutomatedTest ;
+    test:purpose "Run with no param_base"@en ;
+    test:test_script <http://example.org/simple#string_found_long> ;
+    test:params [ my:all "counter-clockwise dahut" ] .
+
 <http://example.org/simple#string_found> a nfo:SoftwareItem ;
     nfo:definesFunction "string_found" ;
+    deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
+
+<http://example.org/simple#string_found_long> a nfo:SoftwareItem ;
+    nfo:definesFunction "string_found_long" ;
     deps:test-requirement "Internal::Fixture::Simple"^^deps:CpanId .
 
 <http://example.org/multi#multiplication> a nfo:SoftwareItem ;

@@ -3,7 +3,7 @@ package App::Pods2Site::SiteBuilder::BasicFramesTreeTOC;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -41,7 +41,24 @@ sub _getCategoryTOC
 	}
 	$self->_genRefs($sitedir, \$toc, $podInfo, \%tree, -1);
 	chomp($toc);
-	$toc = qq(<details class="toc-top">\n<summary class="toc-top">$groupName</summary>\n$toc\n</details>) if $toc;
+	if ($toc)
+	{
+		if ($groupName)
+		{
+			$toc = qq(<details class="toc-top">\n\t\t\t<summary class="toc-top">$groupName</summary>\n\t\t\t\t$toc\n\t\t</details>\n);
+		}
+		else
+		{
+			my $newtoc = '';
+			while ($toc =~ /class="toc-(top|\d+)"/g)
+			{
+				my $lvl = ($1 == 0) ? 'top' : $1 - 1;
+				$newtoc .= substr( $toc, 0, $-[0] ) . qq(class="toc-$lvl");
+				$toc = substr( $toc, $+[0] );
+			}
+			$toc = "$newtoc$toc"; 
+		}
+	}
 	
 	return $toc;
 }

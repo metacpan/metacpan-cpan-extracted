@@ -49,9 +49,9 @@ Test::More::is(`echo; $perl -e '
     Mnet::Log->new({ silent => 1})->warn("TEST warn");
     Mnet::Log->new({ silent => 1})->fatal("TEST fatal");
 ' -- 2>&1 | grep -e '- Mnet::Log' -e 'Mnet ver' -e TEST | sed 's/=.*/= dev/'`, '
- -  - Mnet::Log -e started
+--- - Mnet::Log -e started
 dbg - Mnet::Version Mnet version = dev
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'silent object option');
 
 # check functions with --silent cli option

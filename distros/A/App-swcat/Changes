@@ -1,9 +1,15 @@
-0.013   2019-06-07 (PERLANCAR)
+0.014   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	- Adjust to Software::Catalog 1.0.6 (incompatible change, renamed
+	  methods).
+
+
+0.013   2019-06-07  Released-By: PERLANCAR
 
 	- Add --self-upgrade (-U).
 
 
-0.012   2019-06-03 (PERLANCAR)
+0.012   2019-06-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -11,46 +17,46 @@
 	  suggests.
 
 
-0.011   2019-05-20 (PERLANCAR)
+0.011   2019-05-20  Released-By: PERLANCAR
 
 	- Add subcommand: list-cpan.
 
 
-0.010   2019-01-15 (PERLANCAR)
+0.010   2019-01-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Tweak Synopsis.
 
 
-0.009   2019-01-14 (PERLANCAR)
+0.009   2019-01-14  Released-By: PERLANCAR
 
 	- Add subcommands: release-note, available-versions.
 
 
-0.008   2018-11-21 (PERLANCAR)
+0.008   2018-11-21  Released-By: PERLANCAR
 
 	- Add subcommand: archive-info.
 
 
-0.007   2018-10-18 (PERLANCAR)
+0.007   2018-10-18  Released-By: PERLANCAR
 
 	- [Bugfix] Don't only set argument default once, but every time.
 
 
-0.006   2018-10-18 (PERLANCAR)
+0.006   2018-10-18  Released-By: PERLANCAR
 
 	- Rename internal subroutine for consistency.
 
 	- [logging] Remove extraneous logging.
 
 
-0.005   2018-10-18 (PERLANCAR)
+0.005   2018-10-18  Released-By: PERLANCAR
 
 	- Define %arg0_softwares_or_patterns.
 
 
-0.004   2018-10-18 (PERLANCAR)
+0.004   2018-10-18  Released-By: PERLANCAR
 
 	- list-version & download-url: Accept multiple software
 	  names/patterns.
@@ -58,7 +64,7 @@
 	- [bugfix] Fix updating sw_cache record.
 
 
-0.003   2018-09-21 (PERLANCAR)
+0.003   2018-09-21  Released-By: PERLANCAR
 
 	- latest-version: Supply 'arch' to get_latest_version.
 
@@ -66,11 +72,11 @@
 	  table.
 
 
-0.002   2018-09-20 (PERLANCAR)
+0.002   2018-09-20  Released-By: PERLANCAR
 
         - Some tweaks to make App::swcat more suitable to use as library.
 
 
-0.001   2018-09-13 (PERLANCAR)
+0.001   2018-09-13  Released-By: PERLANCAR
 
         - First version.

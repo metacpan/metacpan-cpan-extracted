@@ -1,5 +1,8 @@
 Revision history for Perl extension invoker
 
+0.36      Tue Oct 29 08:22:40 JST 2019
+        - Fix a segfault case. See https://rt.cpan.org/Ticket/Display.html?id=130167
+
 0.35
         - make it work with perl-5.26.
 

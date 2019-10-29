@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 package IO::CaptureOutput;
-# ABSTRACT: capture STDOUT and STDERR from Perl code, subprocesses or XS
+# ABSTRACT: (DEPRECATED) capture STDOUT and STDERR from Perl code, subprocesses or XS
 
-our $VERSION = '1.1104';
+our $VERSION = '1.1105';
 
 use vars qw/@ISA @EXPORT_OK %EXPORT_TAGS $CarpLevel/;
 use Exporter;
@@ -227,11 +227,11 @@ __END__
 
 =head1 NAME
 
-IO::CaptureOutput - capture STDOUT and STDERR from Perl code, subprocesses or XS
+IO::CaptureOutput - (DEPRECATED) capture STDOUT and STDERR from Perl code, subprocesses or XS
 
 =head1 VERSION
 
-version 1.1104
+version 1.1105
 
 =head1 SYNOPSIS
 
@@ -462,9 +462,17 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mike Latimer Olivier Mengué Tony Cook
+=for stopwords David Golden José Joaquín Atria Mike Latimer Olivier Mengué Tony Cook
 
 =over 4
+
+=item *
+
+David Golden <xdg@xdg.me>
+
+=item *
+
+José Joaquín Atria <jjatria@gmail.com>
 
 =item *
 
@@ -482,7 +490,7 @@ Tony Cook <tony@develop-help.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Simon Flack and David Golden.
+This software is copyright (c) 2019 by Simon Flack and David Golden.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

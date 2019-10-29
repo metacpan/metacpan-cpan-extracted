@@ -100,8 +100,8 @@ sub a_test {
     );
 
     # Run them
-    $fork->ready_all();
-    $fork->wait_all();
+    $fork->ready_all;
+    $fork->wait_all;
 
     # Check right procs died
     print " Didit: ", (join ' ',(sort (keys %Didit))), "\n";

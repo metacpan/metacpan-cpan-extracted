@@ -37,7 +37,7 @@ sub a_test {
 			},
 			run_on_finish => sub {
 			    my $running=0;
-			    foreach my $proc ($fork->running()) {   # Loop on each running child
+			    foreach my $proc ($fork->running) {   # Loop on each running child
 				$running++;
 			    }
 			    $Max_Running = $running+1 if $running>$Max_Running;
@@ -46,8 +46,8 @@ sub a_test {
     }
 
     # Run them
-    $fork->ready_all();
-    $fork->wait_all();
+    $fork->ready_all;
+    $fork->wait_all;
     ok(1, "ready");
     print "Maximum jobs = $Max_Running\n";
     is($Max_Running, $fork->{max_proc}, "max_proc");

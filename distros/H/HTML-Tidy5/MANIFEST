@@ -15,6 +15,7 @@ t/cfg-for-parse.cfg
 t/cfg-for-parse.t
 t/clean.t
 t/clean-crash.t
+t/drop-empty-elements.t
 t/extra-quote.t
 t/html_fragment_tidy_ok.t
 t/html_tidy_ok.t
@@ -23,12 +24,14 @@ t/ignore.t
 t/illegal-options.t
 t/levels.t
 t/message.t
+t/new-tags.t
 t/opt-00.t
 t/parse.t
 t/parse-errors.t
 t/perfect.t
 t/roundtrip.t
 t/segfault-form.t
+t/show-info.t
 t/simple.t
 t/too-many-titles.t
 t/unicode.html

@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Module-Abstract-Cwalitee"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

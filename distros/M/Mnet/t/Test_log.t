@@ -58,7 +58,7 @@ Test::More::is(`( echo; $perl -e '
     \$log->warn("warn3");
     Mnet::Test::done({ replay => \$file, test => 1 });
 ' -- $file || echo ERROR ) 2>&1 | sed "s/replay .*/replay/"`, '
- -  - Mnet::Log -e started
+--- - Mnet::Log -e started
 inf - main info1
 inf - main info3
 WRN - main warn1
@@ -76,7 +76,7 @@ diff --test --replay
 -WRN - main warn3
 +WRN - main warn2
 
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ERROR
 ', 'replay test fail with mnet log and exit status');
 

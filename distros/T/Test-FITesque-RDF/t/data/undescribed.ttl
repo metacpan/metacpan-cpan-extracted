@@ -1,0 +1,11 @@
+@prefix test: <http://ontologi.es/doap-tests#> .
+@prefix deps: <http://ontologi.es/doap-deps#>.
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix my:   <http://example.org/my-parameters#> .
+@prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix :     <http://example.org/test#> .
+
+
+:test_list a test:FixtureTable ;
+    test:fixtures :test1, :test2 .
+

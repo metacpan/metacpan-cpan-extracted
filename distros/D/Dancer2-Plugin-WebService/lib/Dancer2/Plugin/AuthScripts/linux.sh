@@ -3,9 +3,9 @@
 # Execute as
 #                     ./linux.sh 6a6f65 736f6d6570617373
 # sudo -u dancer sudo ./linux.sh 6a6f65 736f6d6570617373
-#
-# George Bouras
-# george.mpouras@yandex.com
+
+# George Bouras , george.mpouras@yandex.com
+# Joan Ntzougani, gravitalsun@hotmail.com
 # 30 Sep 2019
 
 

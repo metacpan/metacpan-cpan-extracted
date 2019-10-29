@@ -28,11 +28,10 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.149",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.150",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
-            "Encode" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -57,13 +56,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Load" : "0",
             "DBIx::Class" : "0",
             "DBIx::Class::InflateColumn::Authen::Passphrase" : "0",
+            "Encode" : "0",
+            "Module::Runtime" : "0",
             "Sub::Name" : "0",
             "namespace::clean" : "0",
             "parent" : "0",
-            "perl" : "5.006",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -73,6 +73,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Authen::Passphrase::AcceptAll" : "0",
             "Authen::Passphrase::RejectAll" : "0",
             "DBD::SQLite" : "0",
             "DBIx::Class::Core" : "0",
@@ -81,7 +82,9 @@
             "File::Spec" : "0",
             "Test::More" : "0.89",
             "lib" : "0",
-            "perl" : "5.006"
+            "open" : "0",
+            "perl" : "5.008",
+            "utf8" : "0"
          }
       },
       "x_Dist_Zilla" : {
@@ -155,7 +158,7 @@
             "Dist::Zilla::Plugin::TestRelease" : "0",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
             "Dist::Zilla::Plugin::UseUnsafeInc" : "0",
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.117",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.119",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007",
             "Software::License::Perl_5" : "0"
          }
@@ -164,7 +167,7 @@
    "provides" : {
       "DBIx::Class::PassphraseColumn" : {
          "file" : "lib/DBIx/Class/PassphraseColumn.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -180,10 +183,10 @@
          "web" : "https://github.com/karenetheridge/DBIx-Class-PassphraseColumn"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030000"
+         "version" : "5.031004"
       },
       "plugins" : [
          {
@@ -223,7 +226,12 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "CONTRIBUTING",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
+                  ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
@@ -287,7 +295,7 @@
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -396,7 +404,7 @@
             "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
             "config" : {
                "Dist::Zilla::Plugin::Test::MinimumVersion" : {
-                  "max_target_perl" : "5.006"
+                  "max_target_perl" : "5.008"
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
@@ -671,7 +679,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -732,7 +740,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -772,7 +780,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -823,7 +831,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20190522"
+                  "Module::CoreList" : "5.20190920"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -856,7 +864,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
@@ -867,7 +875,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
@@ -878,7 +886,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
@@ -912,7 +920,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
@@ -922,7 +930,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckIssues",
             "name" : "@Author::ETHER/CheckIssues",
-            "version" : "0.010"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
@@ -1013,13 +1021,17 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
-                     "Changes"
+                     "CONTRIBUTING",
+                     "Changes",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
                   ],
                   "allow_dirty_match" : [],
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1036,12 +1048,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.03",
+                  "tag" : "v0.05",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1091,7 +1103,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1122,7 +1134,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.23.0",
                   "repo_root" : "."
                }
             },
@@ -1275,8 +1287,8 @@
    "x_contributors" : [
       "Karen Etheridge <ether@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.31.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

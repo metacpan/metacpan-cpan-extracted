@@ -11,7 +11,7 @@ use Parallel::Forker::Process;
 use strict;
 use vars qw($Debug $VERSION);
 
-$VERSION = '1.250';
+$VERSION = '1.252';
 
 ######################################################################
 #### CONSTRUCTOR
@@ -176,7 +176,7 @@ sub poll {
 sub ready_all {
     my $self = shift;
     foreach my $procref ($self->processes) {
-	$procref->ready() if $procref->is_idle();
+	$procref->ready if $procref->is_idle;
     };
 }
 
@@ -291,7 +291,7 @@ sub write_tree {
 	print $fh "$line\n";  #if $line !~ /^\s*$/;
     }
 
-    $fh->close();
+    $fh->close;
 }
 
 sub min {
@@ -328,18 +328,18 @@ Parallel::Forker - Parallel job forking and management
       (run_on_start => sub {print "child work here...";},
        # run_on_start => \&child_subroutine,  # Alternative: call a named sub.
        run_on_finish => sub {print "parent cleanup here...";},
-       )->run();
+       )->run;
 
-   $Fork->wait_all();   # Wait for all children to finish
+   $Fork->wait_all;   # Wait for all children to finish
 
    # More processes
-   my $p1 = $Fork->schedule(...)->ready();
-   my $p2 = $Fork->schedule(..., run_after=>[$p1])->ready();
-   $Fork->wait_all();   # p1 will complete before p2 starts
+   my $p1 = $Fork->schedule(...)->ready;
+   my $p2 = $Fork->schedule(..., run_after=>[$p1])->ready;
+   $Fork->wait_all;   # p1 will complete before p2 starts
 
    # Other functions
-   $Fork->poll();       # Service any active children
-   foreach my $proc ($Fork->running()) {  # Loop on each running child
+   $Fork->poll;       # Service any active children
+   foreach my $proc ($Fork->running) {  # Loop on each running child
 
    while ($Fork->is_any_left) {
        $Fork->poll;
@@ -554,7 +554,7 @@ Print a dump of the execution tree.
 =head1 DISTRIBUTION
 
 The latest version is available from CPAN and from
-L<http://www.veripool.org/>.
+L<https://www.veripool.org/parallel-forker>.
 
 Copyright 2002-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU

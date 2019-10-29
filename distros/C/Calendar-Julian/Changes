@@ -1,5 +1,8 @@
 Revision history for Calendar::Julian
 
+0.16  Fri Oct 25 21:40:00 2019
+      - Added dependency on Date::Julian::Simple v0.11.
+
 0.15  Sun Aug 25 23:00:00 2019
       - Added dependency on Date::Julian::Simple v0.10.
 

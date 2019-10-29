@@ -15,7 +15,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.40';
+our $VERSION = '6.41';
 
 sub new
 {
@@ -966,7 +966,7 @@ sub mirror
 {
     my($self, $url, $file) = @_;
 
-    die "Local file name is missing" unless $file;
+    die "Local file name is missing" unless defined $file && length $file;
 
     my $request = HTTP::Request->new('GET', $url);
 

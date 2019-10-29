@@ -99,7 +99,7 @@ static OP *MY_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
 #  endif
 #else
   OP *op = newUNOP(OP_METHOD, flags,
-    newSVOP(OP_CONST, 0, newSVpvf("%s::%s", SvPV_nolen(rclass), SvPV_nolen(methname))));
+    newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::%" SVf, rclass, methname)));
 #endif
 
   return op;
@@ -130,8 +130,12 @@ typedef struct {
 
 /* Metadata about a class */
 typedef struct {
-  SLOTOFFSET offset;  /* first slot index of this partial within its instance */
-  AV *slots;          /* each AV item is a raw pointer directly to a SlotMeta */
+  SLOTOFFSET offset;   /* first slot index of this partial within its instance */
+  AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
+  enum {
+    REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
+    REPR_FOREIGN_HASH, /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
+  } repr;
 } ClassMeta;
 
 /* The metadata on the currently-compiling class */
@@ -145,6 +149,12 @@ typedef struct {
 static ClassMeta *compclassmeta;
 #endif
 
+/* Special pad indexes within `method` CVs */
+enum {
+  PADIX_SELF = 1,
+  PADIX_SLOTS = 2,
+};
+
 static OP *newPADSVOP(PADOFFSET padix, I32 flags)
 {
   OP *op = newOP(OP_PADSV, flags);
@@ -156,25 +166,58 @@ static XOP xop_methstart;
 static OP *pp_methstart(pTHX)
 {
   SV *self = av_shift(GvAV(PL_defgv));
+  SV *rv;
   HV *classstash = CvSTASH(find_runcv(0));
 
-  if(!SvROK(self) || !SvOBJECT(SvRV(self)))
+  if(!SvROK(self) || !SvOBJECT(rv = SvRV(self)))
     croak("Cannot invoke method on a non-instance");
 
   if(!sv_derived_from(self, HvNAME(classstash)))
     croak("Cannot invoke foreign method on non-derived instance");
 
-  sv_setsv(PAD_SVl(1), self);
+  sv_setsv(PAD_SVl(PADIX_SELF), self);
+
+  SV *slotsav;
+
+  /* op_private contains the repr type so we can extract slots */
+  switch(PL_op->op_private) {
+    case REPR_NATIVE:
+      if(SvTYPE(rv) != SVt_PVAV)
+        croak("Not an ARRAY reference");
+      slotsav = rv;
+      break;
+
+    case REPR_FOREIGN_HASH:
+    {
+      if(SvTYPE(rv) != SVt_PVHV)
+        croak("Not a HASH reference");
+      SV **slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", 0);
+      if(!slotssvp || !SvROK(*slotssvp) || SvTYPE(SvRV(*slotssvp)) != SVt_PVAV)
+        croak("Expected $self->{\"Object::Pad/slots\"} to be an ARRAY reference");
+      slotsav = SvRV(*slotssvp);
+      break;
+    }
+  }
+
+  PAD_SVl(PADIX_SLOTS) = slotsav;
 
   return PL_op->op_next;
 }
 
-static OP *newMETHSTARTOP(void)
+static OP *newMETHSTARTOP(U8 private)
 {
   OP *op = newOP(OP_CUSTOM, 0);
   op->op_ppaddr = &pp_methstart;
+  op->op_private = private;
   return op;
 }
+
+/* op_private flags on SLOTPAD ops */
+enum {
+  OPpSLOTPAD_SV,  /* has $x */
+  OPpSLOTPAD_AV,  /* has @y */
+  OPpSLOTPAD_HV,  /* has %z */
+};
 
 static XOP xop_slotpad;
 static OP *pp_slotpad(pTHX)
@@ -187,30 +230,41 @@ static OP *pp_slotpad(pTHX)
 #endif
   PADOFFSET targ = PL_op->op_targ;
 
-  SV *self = PAD_SV(1);
-  AV *av = (AV *)SvRV(self);
-  SV **slots = AvARRAY(av);
+  AV *slotsav = (AV *)PAD_SV(PADIX_SLOTS);
 
-  if(slotix > av_top_index(av))
+  if(slotix > av_top_index(slotsav))
     croak("ARGH: instance does not have a slot at index %d", slotix);
+
+  SV **slots = AvARRAY(slotsav);
+
+  SV *slot = slots[slotix];
 
   if(PAD_SV(targ))
     SvREFCNT_dec(PAD_SV(targ));
 
-  /* TODO: Consider do we need two different SLOTPAD ops? */
-  if(PL_op->op_flags & OPf_SPECIAL) {
-    SV *slot = slots[slotix];
-    if(!SvROK(slot))
-      croak("ARGH: expected to find an RV at slot index %d", slotix);
-    PAD_SVl(targ) = SvREFCNT_inc(SvRV(slot));
+  SV *val;
+  switch(PL_op->op_private) {
+    case OPpSLOTPAD_SV:
+      val = slot;
+      break;
+    case OPpSLOTPAD_AV:
+      if(!SvROK(slot) || SvTYPE(val = SvRV(slot)) != SVt_PVAV)
+        croak("ARGH: expected to find an ARRAY reference at slot index %d", slotix);
+      break;
+    case OPpSLOTPAD_HV:
+      if(!SvROK(slot) || SvTYPE(val = SvRV(slot)) != SVt_PVHV)
+        croak("ARGH: expected to find a HASH reference at slot index %d", slotix);
+      break;
+    default:
+      croak("ARGH: unsure what to do with this slot type");
   }
-  else
-    PAD_SVl(targ) = SvREFCNT_inc(slots[slotix]);
+
+  PAD_SVl(targ) = SvREFCNT_inc(val);
 
   return PL_op->op_next;
 }
 
-static OP *newSLOTPADOP(I32 flags, PADOFFSET padix, SLOTOFFSET slotix)
+static OP *newSLOTPADOP(I32 flags, U8 private, PADOFFSET padix, SLOTOFFSET slotix)
 {
 #ifdef HAVE_UNOP_AUX
   OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NUM2PTR(UNOP_AUX_item *, slotix));
@@ -218,6 +272,7 @@ static OP *newSLOTPADOP(I32 flags, PADOFFSET padix, SLOTOFFSET slotix)
   OP *op = newUNOP_with_IV(OP_CUSTOM, flags, NULL, slotix);
 #endif
   op->op_targ = padix;
+  op->op_private = private;
   op->op_ppaddr = &pp_slotpad;
 
   return op;
@@ -275,13 +330,13 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
    * perls. For now we'll take the small performance hit of RV2AV every time
    */
 
-  PADOFFSET selfix = pad_add_name_pvs("$self", 0, NULL, NULL);
-  if(selfix != 1)
-    croak("ARGH: Expected that selfix = 1");
+  PADOFFSET padix = pad_add_name_pvs("$self", 0, NULL, NULL);
+  if(padix != PADIX_SELF)
+    croak("ARGH: Expected that padix[$self] = 1");
 
   ops = op_append_list(OP_LINESEQ, ops,
     /* $self = shift */
-    newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0), newPADSVOP(selfix, OPf_MOD)));
+    newBINOP(OP_SASSIGN, 0, newOP(OP_SHIFT, 0), newPADSVOP(PADIX_SELF, OPf_MOD)));
 
   intro_my();
 
@@ -295,7 +350,7 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
     /* Build an OP_ENTERSUB for  $self->SUPER::INITSLOTS() */
     OP *op = NULL;
     op = op_append_list(OP_LIST, op,
-      newPADSVOP(selfix, 0));
+      newPADSVOP(PADIX_SELF, 0));
     op = op_append_list(OP_LIST, op,
       newMETHOD_REDIR_OP(superclass, newSVpvn_share("INITSLOTS", 9, 0), 0));
 
@@ -311,17 +366,31 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
   /* To make an OP_PUSH we have to build a generic OP_LIST then call
    * op_convert_list() on it later
    */
-  OP *itemops = op_append_elem(OP_LIST, NULL,
-    newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, newPADSVOP(selfix, 0)));
+  OP *slotsavop;
+  switch(meta->repr) {
+    case REPR_NATIVE:
+      /* $self->@* */
+      slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0));
+      break;
+    case REPR_FOREIGN_HASH:
+      /* $self->{"Object::Pad/slots"}->@* */
+      slotsavop = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF,
+        newBINOP(OP_HELEM, OPf_MOD,
+          newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, newPADSVOP(PADIX_SELF, 0)),
+          newSVOP(OP_CONST, 0, newSVpvs("Object::Pad/slots"))));
+      break;
+  }
+
+  OP *itemops = op_append_elem(OP_LIST, NULL, slotsavop);
 
   AV *slots = meta->slots;
   I32 nslots = av_count(slots);
-  for(int i = 0; i < nslots; i++) {
+  for(i = 0; i < nslots; i++) {
     SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-    char *slotname = SvPV_nolen(slotmeta->name);
+    char sigil = SvPV_nolen(slotmeta->name)[0];
     OP *op = NULL;
 
-    switch(slotname[0]) {
+    switch(sigil) {
       case '$':
         /* push ..., undef */
         if(slotmeta->defaultop)
@@ -339,7 +408,7 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
         break;
 
       default:
-        croak("ARGV: notsure how to handle a slot sigil %c\n", slotname[0]);
+        croak("ARGV: notsure how to handle a slot sigil %c\n", sigil);
     }
 
     if(op) {
@@ -388,11 +457,13 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
   AV *isa;
   {
-    SV *isaname = newSVpvf("%s::ISA", SvPV_nolen(PL_curstname));
+    SV *isaname = newSVpvf("%" SVf "::ISA", PL_curstname);
     SAVEFREESV(isaname);
 
-    isa = get_av(SvPV_nolen(isaname), GV_ADD);
+    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvUTF8(PL_curstash) ? SVf_UTF8 : 0));
   }
+
+  ClassMeta *supermeta = NULL;
 
   // TODO: This grammar is quite flexible; maybe too much?
   while(1) {
@@ -409,10 +480,11 @@ static int keyword_class(pTHX_ OP **op_ptr)
       HV *superstash = gv_stashsv(superclassname, 0);
 
       if(!superstash)
-        croak("Superclass %s does not exist", SvPV_nolen(superclassname));
+        croak("Superclass %" SVf " does not exist", superclassname);
 
-      if(!sv_derived_from(superclassname, "Object::Pad::_base"))
-        croak("Superclass %s does not derive from Object::Pad", SvPV_nolen(superclassname));
+      GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
+      if(metagvp)
+        supermeta = NUM2PTR(ClassMeta *, SvUV(GvSV(*metagvp)));
 
       av_push(isa, superclassname);
     }
@@ -431,18 +503,37 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
   compclassmeta->offset = 0;
   compclassmeta->slots  = newAV();
+  compclassmeta->repr   = REPR_NATIVE;
 
-  if(av_count(isa) == 0) {
-    /* A base class */
-    av_push(isa, newSVpvs("Object::Pad::_base"));
+  if(av_count(isa) > 0) {
+    if(supermeta) {
+      /* A subclass of an Object::Pad class */
+      compclassmeta->offset = supermeta->offset + av_count(supermeta->slots);
+      compclassmeta->repr = supermeta->repr;
+    }
+    else {
+      /* A subclass of a foreign class - presume HASH for now */
+      compclassmeta->repr = REPR_FOREIGN_HASH;
+    }
   }
-  else {
-    /* A subclass */
-    HV *superstash = gv_stashsv(AvARRAY(isa)[0], 0);
-    ClassMeta *supermeta = NUM2PTR(ClassMeta *,
-      SvUV(GvSV(*hv_fetchs(superstash, "META", 0))));
 
-    compclassmeta->offset = supermeta->offset + av_count(supermeta->slots);
+  {
+    /* Inject the constructor */
+    CV *newcv;
+    switch(compclassmeta->repr) {
+      case REPR_NATIVE:
+        newcv = get_cv("Object::Pad::__new", 0);
+        break;
+      case REPR_FOREIGN_HASH:
+        newcv = get_cv("Object::Pad::__new_foreign_HASH", 0);
+        break;
+    }
+
+    GV *gv = gv_fetchpvs("new", GV_ADD, SVt_PVCV);
+    GvMULTI_on(gv);
+
+    SvREFCNT_inc((SV *)newcv);
+    GvCV_set(gv, newcv);
   }
 
   {
@@ -509,8 +600,8 @@ static int keyword_has(pTHX_ OP **op_ptr)
      * is at least safe
      */
     if(op->op_type != OP_CONST || op->op_flags & OPf_KIDS)
-      croak("Default expression for 'has %s' must be compiletime constant",
-        SvPV_nolen(name));
+      croak("Default expression for 'has %" SVf "' must be compiletime constant",
+        SVfARG(name));
 
     slotmeta->defaultop = op;
   }
@@ -543,13 +634,19 @@ static int keyword_method(pTHX_ OP **op_ptr)
 
   OP *slotops = NULL;
   {
-    PADOFFSET selfix = pad_add_name_pvs("$self", 0, NULL, NULL);
+    PADOFFSET padix;
 
-    if(selfix != 1)
-      croak("ARGH: Expected that selfix = 1");
+    padix = pad_add_name_pvs("$self", 0, NULL, NULL);
+    if(padix != PADIX_SELF)
+      croak("ARGH: Expected that padix[$self] = 1");
+
+    /* Give it a name that isn't valid as a Perl variable so it can't collide */
+    padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
+    if(padix != PADIX_SLOTS)
+      croak("ARGH: Expected that padix[@slots] = 2");
 
     slotops = op_append_list(OP_LINESEQ, slotops,
-      newMETHSTARTOP()
+      newMETHSTARTOP(compclassmeta->repr)
     );
 
     AV *slots = compclassmeta->slots;
@@ -558,15 +655,21 @@ static int keyword_method(pTHX_ OP **op_ptr)
     I32 nslots = av_count(slots);
     for(i = 0; i < nslots; i++) {
       SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-      /* TODO: Slot names can't have \0 */
-      char *slotname = SvPV_nolen(slotmeta->name);
+      char sigil = SvPV_nolen(slotmeta->name)[0];
 
-      PADOFFSET padix = pad_add_name_pvn(slotname, SvCUR(slotmeta->name), 0, NULL, NULL);
+      padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
       SLOTOFFSET slotix = offset + i;
+
+      U8 private;
+      switch(sigil) {
+        case '$': private = OPpSLOTPAD_SV; break;
+        case '@': private = OPpSLOTPAD_AV; break;
+        case '%': private = OPpSLOTPAD_HV; break;
+      }
 
       slotops = op_append_list(OP_LINESEQ, slotops,
         /* alias the padix from the slot */
-        newSLOTPADOP(slotname[0] != '$' ? OPf_SPECIAL : 0, padix, slotix));
+        newSLOTPADOP(0, private, padix, slotix));
     }
 
     intro_my();

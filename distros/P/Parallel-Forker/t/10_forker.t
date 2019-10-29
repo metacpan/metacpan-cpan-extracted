@@ -35,8 +35,8 @@ ok(1, "sig");
     $fork->schedule(
 		    run_on_start => sub { $start_pid = $$; },
 		    run_on_finish => sub { $Didit = 1; $finish_pid = $$; },
-		    )->run();
-    $fork->wait_all();   # Wait for all children to finish
+		    )->run;
+    $fork->wait_all;   # Wait for all children to finish
     ok($Didit, "wait_all");
     ok(!defined $start_pid, "start_pid");  # runs in child
     is($finish_pid, $$, "finish_pid");  # runs in parent (us)
@@ -159,8 +159,8 @@ sub run_a_test {
 				 my ($procref, $status) = @_;
 				 $procref->{my_done_time} = [gettimeofday()];
 			     },);
-    $p1->run() if $params{run_it};
-    $p1->ready() if $params{wait_it};
+    $p1->run if $params{run_it};
+    $p1->ready if $params{wait_it};
     ok(1, "forked");
 
     my $p2 = $fork->schedule(
@@ -170,9 +170,9 @@ sub run_a_test {
 				 my ($procref, $status) = @_;
 				 $procref->{my_done_time} = [gettimeofday()];
 			     },);
-    $p2->run() if $params{run_it};
+    $p2->run if $params{run_it};
     $p2->run_after($p1) if $params{wait_it};
-    $p2->ready() if $params{wait_it};
+    $p2->ready if $params{wait_it};
     ok(1, "ready");
 
     my $p3 = $fork->schedule(run_on_start => sub { usleep(100*1000); },
@@ -180,16 +180,16 @@ sub run_a_test {
 				 my ($procref, $status) = @_;
 				 $procref->{my_done_time} = [gettimeofday()];
 			     },);
-    $p3->run() if $params{run_it};
+    $p3->run if $params{run_it};
     if ($params{wait_label}) {
 	$p3->run_after('after_p1_p2');
     } elsif ($params{wait_it}) {
 	$p3->run_after($p2->{name});
     }
-    $p3->ready() if $params{wait_it};
+    $p3->ready if $params{wait_it};
     ok(1, "ready");
 
-    $fork->wait_all();   # Wait for all children to finish
+    $fork->wait_all;   # Wait for all children to finish
     ok(1, "wait_all");
 
     ok($p1->{my_done_time}, "p1 ran");   # Check actually ran at some point

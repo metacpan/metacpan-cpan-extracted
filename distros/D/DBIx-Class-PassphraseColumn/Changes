@@ -1,5 +1,15 @@
 Revision history for DBIx-Class-PassphraseColumn
 
+0.05      2019-10-26 20:32:32Z
+  * added some more tests
+
+0.04      2019-07-09 17:13:34Z (TRIAL RELEASE)
+  * remove the implicit need for SQL::Translator in tests
+  * support non-ascii passphrases by utf8-encoding the passphrase before
+    passing it to Authen::Passphrase (NOTE: this is a breaking change for any
+    passphrases containing characters between 0x80 and 0xff, i.e. non-ascii
+    characters in the latin1 character set!!) (RT#92497)
+
 0.03      2019-06-07 01:04:05Z
   * add DBD::SQLite to test requirements (RT#79809)
   * remove unused SQL::Translator from test requirements.

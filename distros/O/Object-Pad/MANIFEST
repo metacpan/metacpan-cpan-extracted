@@ -16,6 +16,7 @@ t/02slots.t
 t/03create.t
 t/04capture.t
 t/05extends.t
+t/06extends-HASH.t
 t/10method-attrs.t
 t/11method-signatures.t
 t/20slots-private.t

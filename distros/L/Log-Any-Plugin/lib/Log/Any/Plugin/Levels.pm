@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Levels;
 # ABSTRACT: Logging-level filtering plugin for log adapters
-$Log::Any::Plugin::Levels::VERSION = '0.008';
+$Log::Any::Plugin::Levels::VERSION = '0.010';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -94,7 +94,7 @@ Log::Any::Plugin::Levels - Logging-level filtering plugin for log adapters
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -126,10 +126,6 @@ Log::Any::Plugin::Levels allows you to add level filtering functionality into
 any adapter. Logs lower than $log->level are ignored.
 
 The $log->is_debug family of functions are modified to reflect this level.
-
-=head1 NAME
-
-Log::Any::Plugin::FilterArgs - custom log-level filtering for log adapters
 
 =head1 CONFIGURATION
 

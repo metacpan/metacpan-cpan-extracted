@@ -34,11 +34,13 @@ Mnet::Expect implements the methods listed below.
 =cut
 
 # required modules
+#   importing Expect namespace conflicted with expect sub here
 use warnings;
 use strict;
 use parent qw( Mnet::Log::Conditional );
 use Carp;
 use Errno;
+use Expect();
 use Mnet::Dump;
 use Mnet::Opts::Cli::Cache;
 

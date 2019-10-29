@@ -49,7 +49,6 @@ sub new {
         _write_queue_fd  => $w,
         _error_cb        => $error_cb,
         _stats_cb        => $stats_cb,
-        _topics          => {},
         _watcher         => undef,
         _is_closed       => 0,
     }, $class;
@@ -142,7 +141,7 @@ sub produce {
     my ($self, %args) = @_;
     $self->_check_if_closed();
 
-    my $topic_name  = $args{topic} or die 'topic name is required';
+    my $topic       = $args{topic} or die 'topic name is required';
     my $partition   = $args{partition} // RD_KAFKA_PARTITION_UA;
     my $timestamp   = $args{timestamp} // 0;
     my $key         = $args{key};
@@ -150,11 +149,11 @@ sub produce {
     my $headers     = $args{headers};
 
     my $d           = deferred;
-    my $topic       = $self->_topic($topic_name);
     my $msg_id      = $self->_register_deferred($d, \%args);
 
     eval {
-        $topic->produce(
+        $self->{_kafka}->produce(
+            $topic,
             $partition,
             $key,
             $payload,
@@ -173,18 +172,6 @@ sub produce {
     };
 
     return $d->promise;
-}
-
-sub _topic {
-    my ($self, $topic_name) = @_;
-    $self->_check_if_closed();
-
-    return $self->{_topics}{$topic_name}
-        if exists $self->{_topics}{$topic_name};
-
-    my $topic = $self->{_kafka}->topic($topic_name);
-    $self->{_topics}{$topic_name} = $topic;
-    return $topic;
 }
 
 sub _register_deferred {
@@ -235,9 +222,7 @@ sub close {
     my $self = shift;
     return if $self->{_is_closed};
 
-    $self->{_topics} = {}; # avoid use-after-free errors from topic destruction
     $self->{_kafka}->close() if defined $self->{_kafka};
-
     $self->{_watcher} = undef;
     close $self->{_read_queue_fd};
     close $self->{_write_queue_fd};

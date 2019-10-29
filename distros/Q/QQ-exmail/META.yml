@@ -1,24 +1,49 @@
 ---
-abstract: 'QQ::exmail - api for 腾讯企业邮箱'
+name: QQ-exmail
+version: '1.06'
 author:
-  - 'yourself <yourself@gmail.com>'
+  - 'yourself <admz@mail.scuec.edu.cn>'
+abstract: 'QQ::exmail - api for 腾讯企业邮箱'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
 build_requires:
   ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
-license: perl
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
-name: QQ-exmail
-no_index:
-  directory:
-requires:
   JSON: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
-  Webqq::Encryption: '0'
-resources: {}
-version: '0.002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+provides:
+  QQ::exmail:
+    file: lib/QQ/exmail.pm
+    version: 1.06
+  QQ::exmail::department:
+    file: lib/QQ/exmail/department.pm
+    version: 1.06
+  QQ::exmail::group:
+    file: lib/QQ/exmail/group.pm
+    version: 1.06
+  QQ::exmail::log:
+    file: lib/QQ/exmail/log.pm
+    version: 1.06
+  QQ::exmail::mail:
+    file: lib/QQ/exmail/mail.pm
+    version: 1.06
+  QQ::exmail::service:
+    file: lib/QQ/exmail/service.pm
+    version: 1.06
+  QQ::exmail::tag:
+    file: lib/QQ/exmail/tag.pm
+    version: 1.06
+  QQ::exmail::user:
+    file: lib/QQ/exmail/user.pm
+    version: 1.06
+  QQ::exmail::useroption:
+    file: lib/QQ/exmail/useroption.pm
+    version: 1.06
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'

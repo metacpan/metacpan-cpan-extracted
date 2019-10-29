@@ -1,0 +1,10 @@
+Changes
+lib/Perl/RT2Github.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/new.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

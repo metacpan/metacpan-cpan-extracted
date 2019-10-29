@@ -1,0 +1,70 @@
+---
+name: mydemo
+class: MyDemo
+plugins: [-Meta]
+appspec: { version: 0.001 }
+title: Demo
+abstract: Demonstrate appspec for bash
+
+options:
+- version|V --Show version
+
+subcommands:
+
+  test1:
+    summary: Test command
+    op: test1
+
+    options:
+    - flag-a|a   --Flag a
+    - flag-b|b   --Flag b
+    - flag-c|c+  --Flag c (incremental)
+    - test-d|d=s --Option d
+    - spec: test-e|e=s --Option e
+      enum: [e1, e2, e3]
+    - spec: test-f|f=s@  --Option f (multi)
+      enum: [f1, f2, f3]
+    - +test-g|g=s         --Option g (required)
+
+  nested1:
+    op: nested1
+    summary: Nested subcommand 1
+
+    subcommands:
+
+      nested2:
+        op: nested2
+        summary: Nested subcommand 2
+
+  service:
+    summary: Start and stop services
+
+    subcommands:
+
+      start:
+        summary: Start
+        op: start
+        options:
+        - restart|r --Restart if already running
+        parameters:
+        - &service
+          name: service
+          required: true
+          summary: Service name
+          completion:
+            command_string: |
+              mydemo service list | cut -d ':' -f 1
+      stop:
+        summary: Stop
+        op: stop
+        parameters: [*service]
+      status:
+        summary: Status
+        op: status
+        parameters: [*service]
+      list:
+        summary: List services
+        op: list
+
+
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

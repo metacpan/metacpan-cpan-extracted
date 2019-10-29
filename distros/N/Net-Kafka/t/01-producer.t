@@ -16,7 +16,7 @@ subtest 'Partitions For' => sub {
     my $producer = TestProducer->new();
     my $partitions = $producer->partitions_for( TestProducer::topic );
     isa_ok($partitions, 'ARRAY');
-    is (scalar(@$partitions), TestProducer::topic_partitions, "fetch partitions info");
+    is (scalar(@$partitions), TestProducer::topic_partitions(), "fetch partitions info");
 };
 
 subtest 'Partitions For (missing topic)' => sub {

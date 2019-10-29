@@ -120,6 +120,9 @@ sub execute {
 
     $tracker->mark_executed;
     my $fields = $tracker->fields;
+    $sth->STORE( NUM_OF_FIELDS => scalar @{ $fields ? $fields : [] } );
+    $sth->STORE( NAME => $fields );
+
     $sth->STORE( NUM_OF_PARAMS => $tracker->num_params );
 
     # handle INSERT statements and the mock_last_insert_ids

@@ -1,5 +1,21 @@
 History Revision for Set-Light:
 
+0.93      2019-10-27 11:51:24+00:00 Europe/London
+  [Bug Fixes]
+  - Use CORE::exists for internal use of exists function.
+
+  [Documentation]
+  - Reorganised POD to be intereleaved with methods.
+
+  - Made minor changes to wording.
+
+  - Removed tabs and reformatted sections.
+
+  - Fixed typo in Pod::Weaver config: METHODS was called TYPES.
+
+  [Other Changes]
+  - Perltidied code.
+
 0.92      2019-10-25 14:12:27+01:00 Europe/London
   [Other Changes]
   - Add missing MANIFEST.SKIP to distribution.
@@ -10,7 +26,7 @@ History Revision for Set-Light:
   - Add members method for returning all set members.
 
   [Bug Fixes]
-  - Fixed incorrect argument handling in insert and delete methods.
+  - Fixed incorrect argument handling in insert and del#ete methods.
 
   [Documentation]
   - Reformatted Changes to conform to modern specs.

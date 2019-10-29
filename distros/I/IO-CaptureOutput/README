@@ -1,9 +1,9 @@
 NAME
-    IO::CaptureOutput - capture STDOUT and STDERR from Perl code,
-    subprocesses or XS
+    IO::CaptureOutput - (DEPRECATED) capture STDOUT and STDERR from Perl
+    code, subprocesses or XS
 
 VERSION
-    version 1.1104
+    version 1.1105
 
 SYNOPSIS
         use IO::CaptureOutput qw(capture qxx qxy);
@@ -195,6 +195,10 @@ AUTHORS
     *   David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
+    *   José Joaquín Atria <jjatria@gmail.com>
+
     *   Mike Latimer <mlatimer@suse.com>
 
     *   Olivier Mengué <dolmen@cpan.org>
@@ -202,7 +206,7 @@ CONTRIBUTORS
     *   Tony Cook <tony@develop-help.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2015 by Simon Flack and David Golden.
+    This software is copyright (c) 2019 by Simon Flack and David Golden.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

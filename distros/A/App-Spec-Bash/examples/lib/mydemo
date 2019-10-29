@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+SERVICES=(cups docker libvirtd nginx)
+
+declare docker_status=active
+declare cups_status=active
+declare libvirtd_status=inactive
+declare nginx_status=error
+
+declare status_active=(GREEN)
+declare status_inactive=()
+declare status_error=(RED)
+
+MyDemo.test1() {
+    APPSPEC.say "MyDemo.test1" BOLD MAGENTA
+    echo "=== OPTION flag-a '$OPT_FLAG_A'"
+    echo "=== OPTION flag-b '$OPT_FLAG_B'"
+    echo "=== OPTION flag-c '$OPT_FLAG_C'"
+    echo "=== OPTION test-d '$OPT_TEST_D'"
+    echo "=== OPTION test-e '$OPT_TEST_E'"
+    echo "=== OPTION test-f '${OPT_TEST_F[*]}'"
+    echo "=== OPTION test-g '$OPT_TEST_G'"
+}
+
+MyDemo.nested1() {
+    APPSPEC.say "MyDemo.nested1" BOLD YELLOW
+}
+
+MyDemo.nested2() {
+    APPSPEC.say "MyDemo.nested2" BOLD GREEN
+}
+
+MyDemo.start() {
+    assert-service $PARAM_SERVICE
+    APPSPEC.say "Starting service '$PARAM_SERVICE'..." BOLD MAGENTA
+    if $OPT_RESTART; then
+      APPSPEC.say "(Restarting if running)"
+    fi
+}
+MyDemo.stop() {
+    assert-service $PARAM_SERVICE
+    APPSPEC.say "Stooping service '$PARAM_SERVICE'..." BOLD CYAN
+}
+MyDemo.status() {
+    assert-service $PARAM_SERVICE
+    APPSPEC.say "Status service '$PARAM_SERVICE':" BOLD
+    output-service "$PARAM_SERVICE"
+}
+
+MyDemo.list() {
+    local varname status varname colors
+    for i in ${SERVICES[@]}; do
+        output-service "$i"
+    done
+}
+
+assert-service() {
+    for i in "${SERVICES[@]}"; do
+        [[ $i == $1 ]] && return 0
+    done
+    APPSPEC.error "Could not find service '$1'"
+    return 1
+}
+
+output-service() {
+    local service="$1"
+    local colors colorized
+    local varname="$service"_status
+    local status="${!varname}"
+    varname="status_"$status"[@]"
+    colors=(${!varname})
+    colorized="$(APPSPEC.colored stdout "$status" ${colors[@]})"
+    echo -e "$service: $colorized"
+}
+
+
+
+# TODO shouldn't be necessary
+MyDemo.cmd_help() {
+  APPSPEC.cmd_help
+}

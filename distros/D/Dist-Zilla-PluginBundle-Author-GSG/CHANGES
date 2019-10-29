@@ -1,9 +1,40 @@
 ==================================================
-Changes from 2018-10-24 00:00:00 +0000 to present.
+Changes from 2018-10-25 00:00:00 +0000 to present.
 ==================================================
 
 --------------------------------------------
-version v0.0.14 at 2019-10-24 18:20:08 +0000
+version v0.0.15 at 2019-10-25 22:35:42 +0000
+--------------------------------------------
+
+  Change: ddc01f9d3a417f8b918294e85137dc6a028e875b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-25 18:35:27 +0000
+
+    Update README 
+
+  Change: 584f9028f21b7115d3e5686b82c73bfde11679ad
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-25 18:30:37 +0000
+
+    Merge pull request #14 in
+    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
+    require-newer-our_pkg_version-plugin to master
+
+    * commit '5679bca0a8e7dab0ce8d9e8754787428db8dd3d0':
+
+    Require OurPkgVersion Plugin version 0.20 
+
+  Change: 5679bca0a8e7dab0ce8d9e8754787428db8dd3d0
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-25 14:16:29 +0000
+
+    Require OurPkgVersion Plugin version 0.20
+
+    Which fixes a bug we're running into where it won't provide a version
+    number for us. 
+
+--------------------------------------------
+version v0.0.14 at 2019-10-24 18:19:50 +0000
 --------------------------------------------
 
   Change: 79bd5482177beacd1e2eb30c85557a969856b6a2

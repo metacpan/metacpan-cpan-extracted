@@ -1,5 +1,24 @@
 # Changelog
 
+## 6.13.4
+- Update currency config for Zambian Kwacha (ZMW)
+- Do not modify options passed to FormattingRules
+
+## 6.13.3
+- Remove specs from the packaged gem
+- Use Currency::Loader directly without extending
+- Add Money.with_rounding_mode as a replacement for calling Money.rounding_mode with a block
+- Fix currency search for two digit ISO numbers
+- Add description to TypeError raised by +/- operations
+
+## 6.13.2
+- Prevent Money initialization with non-finite amounts
+- Convert the fractional value of a Money object to BigDecimal when initializing
+- Offer replacements for currency position deprecations
+- Fix Peruvian Sol symbol
+- Lock i18n to <= 1.2.0 for older (< 2.3) rubies
+- Prevent Divide By Zero in `Money#allocate`
+
 ## 6.13.1
 - Add bolívar soberano (VES)
 - Deprecate bolívar fuerte (VEF)

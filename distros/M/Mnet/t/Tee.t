@@ -101,11 +101,11 @@ Test::More::is(`echo; echo SCRIPT; $perl -e '
 ' -- --silent --tee "$file" 2>&1; echo FILE; cat "$file" | grep -v 'tee ='`, '
 SCRIPT
 FILE
- -  - Mnet::Log -e started
+--- - Mnet::Log -e started
 inf - Mnet::Opts::Cli new parsed opt cli silent = 1
 stdout
 stderr
- -  - Mnet::Log finished with no errors
+--- - Mnet::Log finished with no errors
 ', 'tee to file with log --silent option');
 
 # finished

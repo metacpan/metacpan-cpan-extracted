@@ -23,7 +23,8 @@
 #	Authorization error
 #	null
 #
-# George Bouras, george.mpouras@yandex.com
+# George Bouras , george.mpouras@yandex.com
+# Joan Ntzougani, gravitalsun@hotmail.com
 # Athens, Hellas, 12 Jul 2019
 
 

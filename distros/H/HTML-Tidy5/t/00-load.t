@@ -10,7 +10,7 @@ use HTML::Tidy5;
 use HTML::Tidy5::Message;
 use Test::HTML::Tidy5;
 
-diag( "Testing HTML::Tidy5 $HTML::Tidy5::VERSION, tidy " . HTML::Tidy5->tidy_library_version() . ", Perl $], $^X" );
+diag( "Testing HTML::Tidy5 $HTML::Tidy5::VERSION, tidy library version " . HTML::Tidy5->tidy_library_version() . ", Perl $], $^X" );
 
 cmp_ok( HTML::Tidy5->tidy_library_version, 'ge', '5.6.0', 'HTML::Tidy5 requires version 5.6.0 or higher of the tidy-html5 library' );
 

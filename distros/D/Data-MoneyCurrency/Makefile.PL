@@ -30,11 +30,11 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.88",
     "Test::Pod" => 0,
-    "Test::Pod::Coverage" => 0,
+    "Test::Pod::Coverage" => "1.08",
     "Test::Warn" => 0,
     "Types::Serialiser" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => "0.88",
   "Test::Pod" => 0,
-  "Test::Pod::Coverage" => 0,
+  "Test::Pod::Coverage" => "1.08",
   "Test::Warn" => 0,
   "Types::Serialiser" => 0
 );

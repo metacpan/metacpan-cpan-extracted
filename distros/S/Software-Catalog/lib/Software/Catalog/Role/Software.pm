@@ -1,17 +1,34 @@
 package Software::Catalog::Role::Software;
 
-our $DATE = '2019-01-14'; # DATE
-our $VERSION = '1.0.5'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '1.0.6'; # VERSION
 
 use Role::Tiny;
 
 requires 'canon2native_arch_map';
-requires 'get_latest_version';
-requires 'get_download_url';
-requires 'get_archive_info';
+requires 'latest_version';
+
+# requires 'homepage_url'; # optional for now.
+
+# requires qw(available_versions); # optional for now. args: arch.
+
+requires 'download_url';
+
+# requires qw(release_note); # optional for now. args: arch, version
+
+requires 'archive_info';
 
 # versioning scheme
 requires qw(is_valid_version cmp_version);
+
+# dedicated_profile means the software checks program location for profile, like
+# firefox 67+. this means, we should not use symlink for latest version, e.g.
+# /opt/firefox -> /opt/firefox-70.0 but should copy /opt/firefox-70.0 (or later
+# version) to /opt/firefox instead, to avoid changing of program location
+# whenever there's a new version.
+# requires 'dedicated_profile'; # optional for now
+
+###
 
 sub _canon2native_arch {
     my ($self, $arch) = @_;
@@ -56,7 +73,7 @@ Software::Catalog::Role::Software - Role for software
 
 =head1 VERSION
 
-This document describes version 1.0.5 of Software::Catalog::Role::Software (from Perl distribution Software-Catalog), released on 2019-01-14.
+This document describes version 1.0.6 of Software::Catalog::Role::Software (from Perl distribution Software-Catalog), released on 2019-10-26.
 
 =head1 HOMEPAGE
 

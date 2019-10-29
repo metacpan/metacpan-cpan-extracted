@@ -22,6 +22,7 @@ WriteMakefile(
     PREREQ_PM => {
 		'Filter::Simple' => 0,
 		'Data::Dumper' => 0,
+		'Scalar::Util' => 1.26,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Debug-Filter-PrintExpr-*' },

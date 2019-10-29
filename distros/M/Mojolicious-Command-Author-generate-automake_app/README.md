@@ -3,29 +3,29 @@ MojoliciousAutomake
 
 [![Build Status](https://travis-ci.org/oposs/mojolicious-automake.svg?branch=master)](https://travis-ci.org/oposs/mojolicious-automake)
 
-MojoAutomake is a Mojolicious app skeleton generator which sets up
-Mojolicious Projects with automake support.
+MojoliciousAutomake is a mojolicious app skeleton generator which sets up
+mojolicious projects with automake support.
 
 Currently the following templates are supported
 
 * automake_app - a simple mojolicious app with full automake support
-* callbackery_app - a sample callbackery app
+* callbackery_app - a sample [callbackery app](https://github.com/oetiker/callbackery)
 
 Quickstart
 ----------
 
-Open a terminal and follow these instructions below. We have tested them on
-ubuntu but they should work on any recent linux system with at least
+Open a terminal and follow the instructions below. We have tested them on
+Ubuntu but they should work on any recent linux system with at least
 perl 5.24 installed.
 
 First make sure you have gcc, perl curl and automake installed. The following commands
-will work on debian and ubuntu. 
+will work on Debian and Ubuntu. 
 
 ```console
 sudo apt-get install curl automake perl gcc unzip libssl-dev
 ```
 
-For redhat try
+For Redhat try
 
 ```console
 sudo yum install curl automake perl-core openssl-devel gcc unzip
@@ -44,7 +44,7 @@ curl -L cpanmin.us \
   | perl - -n --no-lwp https://github.com/oposs/mojolicious-automake/archive/master.tar.gz
 ```
 
-Finally lets generate a sample application.
+Finally, lets generate a sample application.
 
 ```console
 mkdir -p ~/src

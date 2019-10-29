@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Escapes string into RTF",
+  "ABSTRACT" => "Escapes strings into RTF",
   "AUTHOR" => "Dave Lambley <dlambley\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -16,12 +16,14 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "RTF::Encode",
   "PREREQ_PM" => {
-    "Encode" => 0
+    "Encode" => 0,
+    "Exporter" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,7 +32,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Encode" => 0,
-  "Test::More" => 0
+  "Exporter" => 0,
+  "Test::More" => 0,
+  "parent" => 0
 );
 
 

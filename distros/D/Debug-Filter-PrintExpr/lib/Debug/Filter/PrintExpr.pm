@@ -4,95 +4,136 @@ use strict;
 use warnings;
  
 use Filter::Simple;
+use Scalar::Util qw(isdual blessed);
 use Data::Dumper;
 
 our
-$VERSION = '0.03';
+$VERSION = '0.04';
+
+local ($,, $\);
 
 # variable is exposed and my be overwritten by caller
 our $handle = *STDERR;
 
 # generate a prefix containing line number or custom label
-sub genprefix {
+sub _genprefix {
 	my ($self, $label, $line, $expr, $value) = @_;
+	local ($,, $\);
 	print $handle $label ? $label : "line $line:";
 	print $handle " $expr = " if $expr;
 }
 
+sub _singlevalue {
+	my $val = shift;
+	my $dual = isdual($val);
+	my $str;
+	$str = "$val" if defined $val;
+	my $purestring = !$dual && !isdual($val);
+	if (my $class = blessed($val)) {
+		return "blessed($class)";
+	} elsif (ref($val)) {
+		return $val;
+	} elsif (!defined $val) {
+		return 'undef';
+	} elsif ($dual) {
+		my $num = $val+0;
+		return "'$val' : $num";
+	} elsif ($purestring) {
+		return "'$val'";
+	} else {
+		return $val+0;
+	}
+}
+
 # print out an expression in scalar context
-sub valuescalar {
-	my $value = shift;
-	print $handle (defined($value) ?
-		(ref($value) ? $value : ("'", $value, "'")) :
-		'undef');
+sub _valuescalar {
+	local ($,, $\);
+	print $handle _singlevalue($_[0]);
 }
 
 # print out an expression in list context
-sub valuearray {
-	my (@value) = @_;
-	print $handle join(', ', map({defined($_) ? "'$_'" : 'undef'} @value));
+sub _valuearray {
+	local ($,, $\);
+	print $handle join(', ', map({_singlevalue($_)} @_));
 }
 
 # print out an key-value pair, prefixed by a seperator
-sub valuehash {
+sub _valuehash {
 	our $sep;
+	local ($,, $\);
 	local *sep = \$_[0];
 	shift;
 	my ($key, $value) = @_;
 	print $handle $sep || '',
-		"'$key' => ", defined($value) ?  "'$value'" : 'undef';
+		"'$key' => ", _singlevalue($value);
 	$sep = ', ';
 }
 
 # print opening before list/hash data
-sub genopen {
+sub _genopen {
+	local ($,, $\);
 	print $handle '(';
 }
 
 # print closing after list/hash data
-sub genclose {
+sub _genclose {
+	local ($,, $\);
 	print $handle ");\n";
 }
 
 # process a complete scalar debug statement
-sub printscalar {
+sub _printscalar {
 	my ($self, $label, $line, $expr, $value) = @_;
-	genprefix @_;
-	valuescalar($value) if $value;
-	print $handle ';' if $value;
+	local ($,, $\);
+	_genprefix @_;
+	_valuescalar($_[4]) if defined $value;
+	print $handle ';' if defined $value;
 	print $handle "\n";
 }
 
+sub _printstr {
+	my ($self, $label, $line, $expr, $value) = @_;
+	_printscalar($self, $label, $line, $expr, "$value");
+}
+
+sub _printnum {
+	no warnings qw(numeric);
+	my ($self, $label, $line, $expr, $value) = @_;
+	_printscalar($self, $label, $line, $expr, $value+0);
+}
+
+
 # process a complete array debug statement
-sub printarray {
+sub _printarray {
 	my ($self, $label, $line, $expr, @value) = @_;
-	genprefix @_;
-	genopen;
-	valuearray @value;
-	genclose;
+	_genprefix @_;
+	_genopen;
+	_valuearray @value;
+	_genclose;
 }
 
 # start a hash debug statement
-sub printhashopen {
+sub _printhashopen {
 	my ($self, $label, $line, $expr) = @_;
-	genprefix @_;
-	genopen;
+	_genprefix @_;
+	_genopen;
 }
 
 # process a single iteration of a key-value pair
-sub printhashitem {
+sub _printhashitem {
 	my ($sep, $key, $value) = @_;
-	valuehash @_;
+	_valuehash @_;
 }
 
 # end a hash debug statement
-sub printhashclose {
-	genclose;
+sub _printhashclose {
+	_genclose;
 }
 
 # process a complete reference debug statement
-sub printref {
+sub _printref {
 	my ($self, $label, $line, $expr, @value) = @_;
+	local ($,, $\);
 	print $handle $label ? $label : "line $line:", " ";
 	my $d = Data::Dumper->new([@value]);
 	my $dump =  $d->Dump;
@@ -105,20 +146,28 @@ sub printref {
 }
 
 # process a debug statement
-sub gen_print {
+sub _gen_print {
 	my ($self, $type, $label, $expr) = @_;
 	$label ||= '';
 	if ($type eq '$') {
-		my $print = $self . "::printscalar";
+		my $print = $self . "::_printscalar";
+		$expr ||= '';
+		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar(($expr)));}];
+	} elsif ($type eq '"') {
+		my $print = $self . "::_printstr";
+		$expr ||= '';
+		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar(($expr)));}];
+	} elsif ($type eq '#') {
+		my $print = $self . "::_printnum";
 		$expr ||= '';
 		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar(($expr)));}];
 	} elsif ($type eq '@') {
-		my $print = $self . "::printarray";
+		my $print = $self . "::_printarray";
 		return qq[{$print("$self", "$label", __LINE__, q{$expr}, $expr);}];
 	} elsif ($type eq '%') {
-		my $printopen = $self . '::printhashopen';
-		my $printitem = $self . '::printhashitem';
-		my $printclose = $self . '::printhashclose';
+		my $printopen = $self . '::_printhashopen';
+		my $printitem = $self . '::_printhashitem';
+		my $printclose = $self . '::_printhashclose';
 		my $sep = '$' . $self . '::sep';
 		my $pair = '@' . $self . '::pair';
 		my $stmt = qq[{local ($sep, $pair); ];
@@ -128,7 +177,7 @@ sub gen_print {
 		$stmt .= qq[$printclose;}];
 		return $stmt;
 	} elsif ($type eq '\\') {
-		my $print = $self . "::printref";
+		my $print = $self . "::_printref";
 		return qq[{$print("$self", "$label", __LINE__, q{$expr}, $expr);}];
 	} else {
 		return '# type unknown';
@@ -140,13 +189,13 @@ FILTER {
 	my ($self, %opt) = @_;
 	s/
 		^\h*\#
-		(?<type>[%@\$\\])
+		(?<type>[%@\$\\#"])
 		\{\h*
 		(?<label>[[:alpha:]_]\w*:)?
 		\h*
 		(?<expr>\V+)?
 		\}\h*\r?$
-	/ gen_print($self, $+{type}, $+{label}, $+{expr}) /gmex;
+	/ _gen_print($self, $+{type}, $+{label}, $+{expr}) /gmex;
 	print STDERR if $opt{-debug};
 };
 
@@ -166,12 +215,13 @@ Debug::Filter::PrintExpr - Convert comment lines to debug print statements
 
 	my $s = 'a scalar';
 	my @a = qw(this is an array);
-	my %h = (key1 => 'value1', key2 => 'value2');
+	my %h = (key1 => 'value1', key2 => 'value2', '' => 'empty', undef => undef);
 	my $ref = \%h;
+	
 
 	#${$s}
 	#@{@a}
-	#%{%h}
+	#%{ %h}
 	#${ calc: @a * 2 }
 	#\{$ref}
 
@@ -179,16 +229,15 @@ This program produces an output like this:
 
 	line 13: $s = 'a scalar';
 	line 14: @a = ('this', 'is', 'an', 'array');
-	line 15: %h = ('key1' => 'value1', 'key2' => 'value2');
-	calc: @a * 2  = '8';
-	line 17:
+	line 15: %h = ('' => 'empty', 'key1' => 'value1', 'key2' => 'value2', 'undef' => undef);
+	calc: @a * 2  = 8;
+	line 17: 
 	$ref = {
-          'undef' => undef,
-          'a' => 1,
-          '' => 'empty',
-          'b' => 2
-        };
-
+		  '' => 'empty',
+		  'key1' => 'value1',
+		  'key2' => 'value2',
+		  'undef' => undef
+		};
 
 =head1 DESCRIPTION
 
@@ -208,16 +257,16 @@ this leads to a similar solution in Perl.
 
 =head2 A Solution
 
-The C<Filter::Simple> module by Damian Conway provides a convenient way
+The L<Filter::Simple> module by Damian Conway provides a convenient way
 of implementing Perl filters.
 
-C<Debug::Filter::PrintExpr> makes use of C<Filter::Simple>
+C<Debug::Filter::PrintExpr> makes use of L<Filter::Simple>
 to transform specially formed comment lines into print statements
 for various debugging purposes.
-(Besides, there is C<Smart::Comments> from Damian, that does something
+(Besides, there is L<Smart::Comments> from Damian, that does something
 very similar but more advanced.)
 
-Just by removing the "use" of Debug::Filter::PrintExpr completely
+Just by removing the "use" of C<Debug::Filter::PrintExpr> completely
 or disabling it partially by
 
 	no Debug::Filter::PrintExpr;
@@ -233,7 +282,7 @@ or more formally must be matched by the following regexp:
 	
  qr{
 	^\h*\#
-	(?<type>[%@\$\\])
+	(?<type>[%@\$\\"#])
 	\{\h*
 	(?<label>[[:alpha:]_]\w*:)?
 	\h*
@@ -252,34 +301,61 @@ and the output format of the result:
 
 =over 4
 
-=item $
+=item C<$>
 
-The expression is evaluated in scalar context and printed inside
-single quotes;
+The expression is evaluated in scalar context. Strings and floating
+point numbers are printed inside single quotes, integer numbers are
+printed unquoted and dual valued variables are shown in both
+representations seperated by a colon.
+Undefined values are represented by the unquoted string C<undef>.
+Hash and array references are shown in their usual string representation
+as e.g. C<ARRAY(0x19830d0)> or C<HASH(0xccba88)>.
+Blessed references are shown by the class they are belong to as
+C<blessed(I<class>)>.
 
-=item @
+=item C<@>
 
 The expression is evaluated in list context and the elements of the
-list are printed inside single quotes, separated by commas and gathered
+list are printed like single scalars, separated by commas and gathered
 in parentheses.
 
-=item %
+=item C<%>
 
 The expression is used as argument in a while-each loop and the output
-consists of pairs of the form 'key' => 'value' inside parentheses.
+consists of pairs of the form 'key' => I<value> inside parentheses.
+I<value> is formatted like a single scalar.
 
-=item \
+=item C<\>
 
 The expression shall be a list of references.
-These will be evaluated using C<Data::Dumper>.
+These will be evaluated using L<Data::Dumper>.
+
+=item C<">
+
+The expression is evaluated in scalar context as a string.
+
+=item C<#>
+
+The expression is evaluated in scalar context as a numeric value.
 
 =back
 
-Undefined values are presented by the (unquoted) String C<undef>.
-References are presented unquoted in their native representation
-e.g. as ARRAY(0x19830d0).
+The usage and difference between C<#${}>, C<#"{}> and C<##{}> is
+best described by example:
 
-The forms #${} and #@{} may be used for any type of expression
+	my $dt = DateTime->now;
+	#${$dt}		# line nnn: $dt = blessed(DateTime);
+	#"{$dt}		# line nnn: $dt = '2019-10-27T15:54:28';
+
+	my $num = ' 42 ';
+	#${$num}	# line nnn: $num = ' 42 ';
+	$num + 0;
+	#${$num}	# line nnn: $num = ' 42 ' : 42;
+	#"{$num}	# line nnn: $num = ' 42 ';
+	##{$num}	# line nnn: $num = 42;
+
+
+The forms #${}, #"{}, ##{} and #@{} may be used for any type of expression
 and inside the #%{} form, arrays are permitted too.
 With the varibles $s, @a and %h as defined above, it is possible
 to use:
@@ -335,7 +411,7 @@ hash and sigil from the PrintExpr line:
 The resulting code must still be valid and should only emit a warning
 about a useless use of something in void context.
 
-=head2 Arguments to Debug::Filter::PrintExpr
+=head2 Arguments to C<Debug::Filter::PrintExpr>
 
 The use-statement for C<Debug::Filter::PrintExpr> may contain
 a hash of options:
@@ -348,7 +424,7 @@ a hash of options:
 
 When this option is set to true, the resulting source code after
 comment transformation is written to the default output file handle.
-Only the parts of source where Debug::Filter::PrintExpr is in effect
+Only the parts of source where C<Debug::Filter::PrintExpr> is in effect
 are printed out.
 
 =back
@@ -368,10 +444,10 @@ The default is STDERR and may be changed by the caller.
 
 =head1 SEE ALSO
 
-Damian Conway's module C<Smart::Comments> provides something similar
+Damian Conway's module L<Smart::Comments> provides something similar
 and more advanced.
 
-While C<Smart::Comments> has lots of features for visualizing the
+While L<Smart::Comments> has lots of features for visualizing the
 program flow, this module focuses on data representation.
 The main requirements for this module were:
 
@@ -390,7 +466,7 @@ Always print the literal expression along with its evaluation.
 Give a defined context where the expression is evaluated.
 Especially provide scalar and list context or perform an iteration
 over a while-each-loop.
-The usage of C<Data::Dumper> was adopted later from Damian's
+The usage of L<Data::Dumper> was adopted later from Damian's
 implementation.
 
 =item *
@@ -403,7 +479,7 @@ undefined values should be clearly distinguishable from empty values.
 
 =back
 
-The first three requirements are not met by C<Smart::Comments> as there is
+The first three requirements are not met by L<Smart::Comments> as there is
 an extra effort needed to display a line number,
 the display of a label and the literal expression are mutual exclusive
 and a specific context is not enforced by the module.

@@ -11,15 +11,10 @@ use Carp;
 
 sub MY::postamble {
     q{
-all:: README
-
-README: README.pod
-	-$(RM_RF) $@
-	pod2text --loose $< > $@
+all::
 
 preexist:
 	svnorcvs nexists $(DISTNAME)_$(VERSION_SYM)
-	test -s README
 
 tag:
 	svnorcvs tag  $(DISTNAME)_$(VERSION_SYM)
@@ -33,7 +28,7 @@ maintainer-dist: preexist dist tag
 maintainer-clean: distclean
 	-$(RM_RF) README
 
-maintainer-copy: README
+maintainer-copy:
 
 clean::
 	-$(RM_RF) test_dir
@@ -53,7 +48,7 @@ WriteMakefile(
 			},
 	      'dist'    => {COMPRESS => 'gzip -9f',
 			    SUFFIX   => '.gz',
-			    DIST_DEFAULT => 'README all tardist',
+			    DIST_DEFAULT => 'all tardist',
 			},
 	      );
 

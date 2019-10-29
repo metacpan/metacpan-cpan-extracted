@@ -60,7 +60,7 @@ namespace-->
         <body>
             <xsl:choose>
                 <xsl:when test="$fortune.id">
-                    <xsl:apply-templates select="list/f[@id=$fortune.id]" />
+                    <xsl:apply-templates select="list/*[(self::f or self::fact) and @id=$fortune.id]" />
                 </xsl:when>
                 <xsl:when test="$filter-facts-list.id">
                     <xsl:apply-templates select="list[@xml:id=$filter-facts-list.id]" />
@@ -81,19 +81,19 @@ namespace-->
         <h3 id="{@xml:id}"><xsl:value-of select="@title" /></h3>
         <div class="main_facts_list">
             <ul>
-                <xsl:apply-templates select="f[l/@xml:lang = $filter.lang]" />
+                <xsl:apply-templates select="*[self::f or self::fact][*[self::l or self::lang]/@xml:lang = $filter.lang]" />
             </ul>
         </div>
     </div>
 </xsl:template>
 
-<xsl:template match="/facts/list/f">
+<xsl:template match="/facts/list/*[self::f or self::fact]">
     <li class="fact">
-        <xsl:apply-templates select="l[@xml:lang = $filter.lang]"/>
+        <xsl:apply-templates select="*[self::l or self::lang][@xml:lang = $filter.lang]"/>
     </li>
 </xsl:template>
 
-<xsl:template match="/facts/list/f/l">
+<xsl:template match="/facts/list/*[self::f or self::fact]/*[self::l or self::lang]">
     <blockquote>
         <xsl:apply-templates select="body/*" mode="copy-html-ns"/>
     </blockquote>

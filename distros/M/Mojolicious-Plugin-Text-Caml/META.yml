@@ -3,12 +3,12 @@ abstract: 'Mojolicious Plugin'
 author:
   - 'Cyrill Novgorodcev.'
 build_requires:
-  Software::License::GPL_3: '0'
+  Software::License::LGPL_3_0: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
-license: gpl
+license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -26,13 +26,13 @@ no_index:
 provides:
   Mojolicious::Plugin::Text::Caml:
     file: lib/Mojolicious/Plugin/Text/Caml.pm
-    version: '0.05'
+    version: '0.07'
 requires:
-  Mojolicious: '0'
+  Mojolicious: '6.33'
   Text::Caml: '0'
 resources:
   repository: git://gitlab.com/cynovg/Mojolicious-Plugin-Text-Caml.git
-version: '0.05'
+version: '0.07'
 x_authority: cpan:CYNOVG
 x_contributors:
   - 'Cyrill Novgorodcev <cynovg@cpan.org>'

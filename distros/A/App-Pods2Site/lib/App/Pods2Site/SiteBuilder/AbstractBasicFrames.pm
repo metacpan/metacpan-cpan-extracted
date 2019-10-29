@@ -3,7 +3,7 @@ package App::Pods2Site::SiteBuilder::AbstractBasicFrames;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -33,17 +33,64 @@ sub makeSite
 	my $args = shift;
 	my $workGroups = shift;
 	my $partCounts = shift;
+	my $mainpage = shift;
 
-	$self->__updateMain($args, $partCounts);
-	$self->__updateHeader($args);
+	$self->__updateHeader($args, $mainpage);
+	$self->__updateAbout($args, $partCounts);
 	$self->__updateTOC($args, $workGroups);
-	$self->__updateIndex($args);
+	$self->__updateIndex($args, $mainpage);
 }
 
 # PRIVATE
 #
 
-sub __updateMain
+sub __updateHeader
+{
+	my $self = shift;
+	my $args = shift;
+	my $mainpage = shift;
+
+	my $title = encode_entities($args->getTitle());
+	my $sysCssName = $self->getSystemCssName();
+
+	my ($mainspan, $aboutspan);
+	if ($mainpage eq ':std')
+	{
+		$mainspan = qq(<span style="float:left"><a href="about.html" target="main_frame" style="font-size:250%;font-weight:bold">$title</a></span>);
+		$aboutspan = '';
+	}
+	else
+	{
+		$mainspan = qq(<span style="float:left"><a href="$mainpage" target="main_frame" style="font-size:250%;font-weight:bold">$title</a></span>);
+		$aboutspan = qq(<span style="float:right"><a href="about.html" target="main_frame" style="font-size:125%;font-weight:bold">about</a></span>);
+	}
+
+	my $headerContent = <<HDR;
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Pods2Site header</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+		<link href="$sysCssName.css" rel="stylesheet"/>
+	</head>
+
+	<body>
+		$mainspan
+		$aboutspan
+	</body>
+
+</html>
+HDR
+
+	my $sitedir = $args->getSiteDir();
+	my $headerFile = slashify("$sitedir/header.html");
+	writeUTF8File($headerFile, $headerContent);
+
+	print "Wrote header as '$headerFile'\n" if $args->isVerboseLevel(2);
+}
+
+sub __updateAbout
 {
 	my $self = shift;
 	my $args = shift;
@@ -55,19 +102,19 @@ sub __updateMain
 		$loc = encode_entities($loc);
 		$scannedLocations .= "&emsp;$loc<br/>"
 	}
-	$scannedLocations = "<p><strong>Scanned locations:</strong><br/>$scannedLocations</p>\n";
+	$scannedLocations = "<p>\n\t\t\t<strong>Scanned locations:</strong><br/>$scannedLocations\n\t\t</p>\n";
 
-	my $style = "<p><strong>Style:</strong><br/>";
+	my $style = "<p>\n\t\t\t<strong>Style:</strong><br/>";
 	$style .= "&emsp;" . encode_entities($self->getStyleName()) . "<br/>";
-	$style .= "</p>\n";
+	$style .= "\n\t\t</p>\n";
 	
 	my $actualCSS = encode_entities($args->getCSS() || '(default)');
-	$actualCSS = "<p><strong>CSS:</strong><br/>&emsp;$actualCSS<br/></p>";
+	$actualCSS = "<p>\n\t\t\t<strong>CSS:</strong><br/>&emsp;$actualCSS<br/>\n\t\t</p>\n";
 	
 	my $groupDefs = '';
 	foreach my $groupDef (@{$args->getGroupDefs()})
 	{
-		$groupDefs .= '<br/>' if $groupDefs;
+		$groupDefs .= "\n\t\t\t<br/>" if $groupDefs;
 		my $name = encode_entities($groupDef->{name});
 		$groupDefs .= "&emsp;<strong>$name</strong> ($partCounts->{$groupDef->{name}} pods)<br/>";
 		my $query = encode_entities($groupDef->{query}->getQuery());
@@ -77,29 +124,29 @@ sub __updateMain
 		}
 		$groupDefs .= "&emsp;&emsp;<em>$query</em><br/>";
 	}	
-	$groupDefs = "<p><strong>Groups:</strong><br/>$groupDefs</p>\n";
+	$groupDefs = "<p>\n\t\t\t<strong>Groups:</strong>\n\t\t\t<br/>$groupDefs\n\t\t</p>\n";
 	
 	my $sitedir = $args->getSiteDir();
 	my $savedTS = readData($sitedir, 'timestamps') || [];
 	push(@$savedTS, time());
 	writeData($sitedir, 'timestamps', $savedTS);
 	
-	my $createdUpdated = '';
-	$createdUpdated .= ('&emsp;' . encode_entities(scalar(localtime($_))) . "<br/>\n") foreach (@$savedTS);
-	$createdUpdated = "<p><strong>Created/Updated:</strong><br/>$createdUpdated</p>\n";
-	
 	my $z = encode_entities(slashify($0));
 	my $zv = encode_entities($App::Pods2Site::VERSION);
 	my $x = encode_entities($^X);
 	my $xv = encode_entities($]);
-	my $builtBy = "<p><strong>This site built using:</strong><br/>";
+	my $builtBy = "<p>\n\t\t\t<strong>This site built using:</strong><br/>";
 	$builtBy .= "&emsp;$z ($zv)<br/>";
 	$builtBy .= "&emsp;$x ($xv)<br/>\n";
-	$builtBy .= "</p>\n";
+	$builtBy .= "\t\t</p>\n";
+
+	my $createdUpdated = '';
+	$createdUpdated .= ('&emsp;' . encode_entities(scalar(localtime($_))) . "<br/>") foreach (@$savedTS);
+	$createdUpdated = "<p>\n\t\t\t<strong>Created/Updated:</strong><br/>$createdUpdated\n\t\t</p>\n";
 	
 	my $sysCssName = $self->getSystemCssName();
 	
-	my $mainContent = <<MAIN;
+	my $aboutContent = <<ABOUT;
 <!DOCTYPE html>
 <html>
 
@@ -110,53 +157,21 @@ sub __updateMain
 	</head>
 		
 	<body>
-$scannedLocations
-$style
-$actualCSS
-$groupDefs
-$createdUpdated
-$builtBy
+		$scannedLocations
+		$style
+		$actualCSS
+		$groupDefs
+		$createdUpdated
+		$builtBy
 	</body>
 	
 </html>
-MAIN
+ABOUT
 
-	my $mainFile = slashify("$sitedir/main.html");
-	writeUTF8File($mainFile, $mainContent);
+	my $aboutFile = slashify("$sitedir/about.html");
+	writeUTF8File($aboutFile, $aboutContent);
 	
-	print "Wrote main as '$mainFile'\n" if $args->isVerboseLevel(2);
-}
-
-sub __updateHeader
-{
-	my $self = shift;
-	my $args = shift;
-
-	my $title = encode_entities($args->getTitle());
-	my $sysCssName = $self->getSystemCssName();
-
-	my $headerContent = <<MAIN;
-<!DOCTYPE html>
-<html>
-
-	<head>
-		<title>Pods2Site header</title>
-		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-		<link href="$sysCssName.css" rel="stylesheet"/>
-	</head>
-		
-	<body>
-		<h2><a href="main.html" target="main_frame">Pods2Site - $title</a></h2>
-	</body>
-	
-</html>
-MAIN
-
-	my $sitedir = $args->getSiteDir();
-	my $headerFile = slashify("$sitedir/header.html");
-	writeUTF8File($headerFile, $headerContent);
-	
-	print "Wrote header as '$headerFile'\n" if $args->isVerboseLevel(2);
+	print "Wrote about as '$aboutFile'\n" if $args->isVerboseLevel(2);
 }
 
 sub __updateTOC
@@ -188,7 +203,7 @@ sub __updateTOC
 	</head>
 		
 	<body>
-$sections
+		$sections
 	</body>
 	
 </html>
@@ -204,6 +219,9 @@ sub __updateIndex
 {
 	my $self = shift;
 	my $args = shift;
+	my $mainpage = shift;
+
+	$mainpage = 'about.html' if $mainpage eq ':std';
 
 	my $sysCssName = $self->getSystemCssName();
 	my $title = encode_entities($args->getTitle());
@@ -222,7 +240,7 @@ sub __updateIndex
 		<frame src="header.html" name="header_frame" />
 		<frameset cols="15%,*">
 			<frame src="toc.html" name="toc_frame" />
-			<frame src="main.html" name="main_frame" />
+			<frame src="$mainpage" name="main_frame" />
 		</frameset>
 	</frameset>
 

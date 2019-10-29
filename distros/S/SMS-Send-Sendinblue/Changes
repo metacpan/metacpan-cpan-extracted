@@ -1,0 +1,8 @@
+Revision history for SMS-Send-Sendinblue
+
+0.02    2019-10-29
+        Add required modules in PREREQ_PM
+
+0.01    2019-10-29
+        First version
+

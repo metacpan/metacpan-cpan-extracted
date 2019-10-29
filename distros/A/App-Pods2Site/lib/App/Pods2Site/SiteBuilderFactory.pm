@@ -3,7 +3,7 @@ package App::Pods2Site::SiteBuilderFactory;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -11,7 +11,7 @@ require App::Pods2Site::SiteBuilder::None;
 require App::Pods2Site::SiteBuilder::BasicFramesSimpleTOC;
 require App::Pods2Site::SiteBuilder::BasicFramesTreeTOC;
 
-my $STDSTYLE = 'basicframes-simple-toc';
+my $STDSTYLE = 'basicframes-tree-toc';
 my %VALIDSTYLES =
 	(
 		'none' => 'App::Pods2Site::SiteBuilder::None',

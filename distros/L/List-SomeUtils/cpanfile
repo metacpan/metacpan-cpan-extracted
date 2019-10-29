@@ -60,5 +60,4 @@ on 'develop' => sub {
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
   requires "Tie::Array" => "0";
-  requires "blib" => "1.01";
 };

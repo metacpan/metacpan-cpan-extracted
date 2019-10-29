@@ -1,4 +1,15 @@
 Revision history for Debug-Filter-PrintExpr
+0.04	Sun Oct 27 21:36:21 2019 +0100
+		[pod]
+		jekyll fails on '{%' in a code block, so avoid this in POD
+		fix example code for given output
+		
+		[fix]
+		treat defined false values
+
+		[feature]
+		differentiate between string, numeric and dual valued scalars
+		add contexts for string and numeric evaluation of scalars
 
 0.03	Fri Oct 18 19:18:51 2019 +0200
 		[fix]

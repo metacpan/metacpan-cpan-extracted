@@ -45,7 +45,7 @@ sub a_test {
 			run_on_finish => sub {
 			    my ($procref, $status) = @_;
 			    my $running=0;
-			    foreach my $proc ($fork->running()) {   # Loop on each running child
+			    foreach my $proc ($fork->running) {  # Loop on each running child
 				$running++;
 			    }
 			    print "Stat = $status, Running = $running\n";
@@ -55,7 +55,7 @@ sub a_test {
 
     # Run them
     alarm(60);
-    $fork->ready_all();
-    $fork->wait_all();
+    $fork->ready_all;
+    $fork->wait_all;
     ok(1, "wait");
 }

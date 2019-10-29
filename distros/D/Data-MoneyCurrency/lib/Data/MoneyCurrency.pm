@@ -19,7 +19,7 @@ $Data::Dumper::Sortkeys = 1;
 my $rh_currency_for_country = {};
 
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 my $rh_currency_iso; # contains character strings
@@ -300,7 +300,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -317,13 +317,13 @@ Get currency information for different currencies.
     #   # ...
     # }
 
-This uses some data found in in the Ruby library
+This uses some data found in the Ruby library
 L<money|https://github.com/RubyMoney/money/tree/master/config>, but it has no
 dependency on it, the relevant data files are already included.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 EXPORT
 
@@ -390,7 +390,7 @@ edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Opencage Data Limited.
+This software is copyright (c) 2019 by Opencage Data Limited.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,16 @@
+Revision history for Mojolicious-Plugin-CanonicalURL
+
+0.05  2019-10-28 11:32:01 CDT
+        - Bump minimum Mojolicious version to 7.15 when Mojo::File was introduced.
+
+0.04  2019-10-28 11:26:43 CDT
+        - Add parentheses to shift in _get_should_canonicalize_request_config_name() to fix old perls.
+
+0.03  2019-10-27 19:07:58 CDT
+        - Don't test on broken travis-perl perls https://github.com/travis-perl/helpers/issues/71.
+
+0.02  2019-10-27 18:47:50 CDT
+        - Fix broken build due to get_ok with a 404.
+
+0.01  2019-10-27 18:11:41 CDT
+        - Initial release

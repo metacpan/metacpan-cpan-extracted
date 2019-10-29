@@ -5,7 +5,7 @@
 
 our $DATE = '2019-09-15'; # DATE
 our $DIST = 'App-ScreensaverUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ detect-screensaver - Detect which screensaver program is currently running
 
 =head1 VERSION
 
-This document describes version 0.007 of detect-screensaver (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
+This document describes version 0.008 of detect-screensaver (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

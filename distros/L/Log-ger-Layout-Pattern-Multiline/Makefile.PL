@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,9 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Log-ger-Layout-Pattern-Multiline",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Log::ger::Layout::Pattern::Multiline",
   "PREREQ_PM" => {
-    "Log::ger::Layout::Pattern" => 0,
+    "Log::ger::Layout::Pattern" => "0.002",
     "strict" => 0,
     "warnings" => 0
   },
@@ -24,13 +25,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Log::ger" => "0.023",
+    "Log::ger" => "0.027",
     "Log::ger::Layout" => 0,
     "Log::ger::Output" => "0.005",
     "Test::More" => "0.98",
     "vars" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,9 +42,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.023",
+  "Log::ger" => "0.027",
   "Log::ger::Layout" => 0,
-  "Log::ger::Layout::Pattern" => 0,
+  "Log::ger::Layout::Pattern" => "0.002",
   "Log::ger::Output" => "0.005",
   "Test::More" => "0.98",
   "strict" => 0,

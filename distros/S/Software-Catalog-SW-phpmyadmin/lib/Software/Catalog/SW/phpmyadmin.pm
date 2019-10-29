@@ -1,7 +1,7 @@
 package Software::Catalog::SW::phpmyadmin;
 
-our $DATE = '2019-04-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,13 +13,9 @@ with 'Software::Catalog::Role::Software';
 
 use Software::Catalog::Util qw(extract_from_url);
 
-sub meta {
-    return {
-        homepage_url => "https://www.phpmyadmin.net/",
-    };
-}
+sub homepage_url { "https://www.phpmyadmin.net/" }
 
-sub get_latest_version {
+sub latest_version {
     my ($self, %args) = @_;
 
     extract_from_url(
@@ -31,7 +27,7 @@ sub get_latest_version {
 sub canon2native_arch_map {
 }
 
-sub get_download_url {
+sub download_url {
     my ($self, %args) = @_;
 
     my $version = $args{version} // $self->get_latest_version->[2];
@@ -42,7 +38,7 @@ sub get_download_url {
      {'func.arch' => 'src'}];
 }
 
-sub get_archive_info {
+sub archive_info {
     my ($self, %args) = @_;
     [200, "OK", {
         programs => [],
@@ -64,7 +60,7 @@ Software::Catalog::SW::phpmyadmin - phpMyAdmin
 
 =head1 VERSION
 
-This document describes version 0.002 of Software::Catalog::SW::phpmyadmin (from Perl distribution Software-Catalog-SW-phpmyadmin), released on 2019-04-04.
+This document describes version 0.003 of Software::Catalog::SW::phpmyadmin (from Perl distribution Software-Catalog-SW-phpmyadmin), released on 2019-10-26.
 
 =for Pod::Coverage ^(.+)$
 

@@ -8,7 +8,7 @@ author:
   - 'Osama Elsayed <osama.elsayed@booking.com>'
   - 'Eduardo Dalla Favera <eduardo.dallafavera@booking.com>'
   - 'Pavel Gurkov <pavel.gurkov@booking.com>'
-  - "Przemys√ÖÇaw Iskra <sparky@pld-linux.org>"
+  - 'Przemyslaw Iskra <sparky@pld-linux.org>'
   - 'Alex Mironov <alex.mironov@booking.com>'
   - 'Pavel Shaydo <zwon@cpan.org>'
 build_requires:
@@ -31,9 +31,10 @@ requires:
   AnyEvent: '0'
   AnyEvent::XSPromises: '0'
   Test::More: '0'
+  perl: '5.022000'
 resources:
   bugtracker: https://github.com/bookingcom/perl-Net-Kafka/issues
   homepage: https://github.com/bookingcom/perl-Net-Kafka
   repository: https://github.com/bookingcom/perl-Net-Kafka.git
-version: '1.05'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

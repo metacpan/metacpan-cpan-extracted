@@ -1,3 +1,10 @@
+0.006     Oct 28 2019
+	* Artistic License 2.0 (same as Mojolicious)
+	* simplify repeat
+
+0.005     Oct 27 2019
+	* fix repeat_catch misbehavior on instances
+
 0.004     Oct 24 2019
 
 0.003     Oct 24 2019

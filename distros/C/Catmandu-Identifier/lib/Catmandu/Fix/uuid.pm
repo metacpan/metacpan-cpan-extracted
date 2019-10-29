@@ -1,6 +1,6 @@
 package Catmandu::Fix::uuid;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Catmandu::Sane;
 use Data::UUID::MT;
@@ -15,10 +15,14 @@ sub emit {
     my ($self, $fixer) = @_;
     my $path = $fixer->split_path($self->path);
 
-    $fixer->emit_create_path($fixer->var, $path, sub {
-        my $var = shift;
-        "${var} = Data::UUID::MT->new(version => 4)->create_string;";
-    });
+    $fixer->emit_create_path(
+        $fixer->var,
+        $path,
+        sub {
+            my $var = shift;
+            "${var} = Data::UUID::MT->new(version => 4)->create_string;";
+        }
+    );
 }
 
 =head1 NAME

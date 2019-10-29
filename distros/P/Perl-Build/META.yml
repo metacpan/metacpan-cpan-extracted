@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +26,10 @@ no_index:
 provides:
   Perl::Build:
     file: lib/Perl/Build.pm
-    version: '1.29'
+    version: '1.30'
   Perl::Build::Built:
     file: lib/Perl/Build/Built.pm
-    version: '1.29'
+    version: '1.30'
 requires:
   CPAN::Perl::Releases: '3.58'
   CPAN::Perl::Releases::MetaCPAN: '0.006'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Perl-Build/issues
   homepage: https://github.com/tokuhirom/Perl-Build
   repository: git://github.com/tokuhirom/Perl-Build.git
-version: '1.29'
+version: '1.30'
 x_contributors:
   - 'Akihiro Uchida <uchida@ike-dyn.ritsumei.ac.jp>'
   - 'AnaTofuZ <anatofuz@gmail.com>'
@@ -54,6 +54,7 @@ x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Dean Hamstead <dean@fragfest.com.au>'
   - 'Diab Jerius <djerius@cfa.harvard.edu>'
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Katsuhiro KONISHI <konishi@hauN.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
@@ -71,6 +72,7 @@ x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
   - 'Tony <zearin@gonk.net>'
+  - 'Ville Skyttä <ville.skytta@iki.fi>'
   - 'hagihala <hagihala@hatena.ne.jp>'
   - 'moznion <moznion@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

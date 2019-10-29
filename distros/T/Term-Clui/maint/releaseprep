@@ -41,3 +41,4 @@ if($version)
   }
 }
 
+system 'pod2github lib/Term/Clui.pm > README.md';

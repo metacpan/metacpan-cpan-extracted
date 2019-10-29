@@ -84,6 +84,7 @@ use Mnet::Opts;
 use Mnet::Opts::Cli::Cache;
 use Mnet::Version;
 use Time::HiRes;
+
 # export function names
 our @EXPORT_OK = qw( DEBUG INFO WARN FATAL );
 
@@ -325,7 +326,7 @@ sub output {
 # $true = output($self, $prefix, $severity, $caller, $text)
 # purpose: used by other methods in this module to output Mnet::Log entries
 # $self: object instance passed from public methods in this module, or undef
-# $prefix: set to keyword dbg, inf, WRN, ERR, or " - " to bypass Mnet::Tee
+# $prefix: set to keyword dbg, inf, WRN, ERR, or "---" to bypass Mnet::Tee
 # $severity: 7=debug, 6=info, 5=notice (no Mnet::Test), 4=warn, 3=error, 2=fatal
 # $caller: original caller of method or function making log entry
 # $text: zero or more lines of log text, formatted with timestamps, etc
@@ -476,7 +477,7 @@ sub notice {
 
     # call output function
     my ($self, $text) = (shift, shift);
-    return output($self, " - ", 5, scalar(caller), $text);
+    return output($self, "---", 5, scalar(caller), $text);
 }
 
 
@@ -568,7 +569,7 @@ sub NOTICE {
 
     # call output function
     my $text = shift;
-    return output(undef, " - ", 5, scalar(caller), $text);
+    return output(undef, "---", 5, scalar(caller), $text);
 }
 
 
@@ -612,7 +613,7 @@ to fatal are handled in an eval the same as calls to die.
 
 
 # output Mnet::Log finished entry at end of script
-#   output log prefix " - " bypasses Mnet::Test recording of these entries
+#   output log prefix "---" bypasses Mnet::Test recording of these entries
 END {
 
     # note --debug_error filename, substitute unique timestamp/pid for asterisk

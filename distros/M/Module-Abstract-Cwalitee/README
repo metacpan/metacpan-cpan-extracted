@@ -3,9 +3,9 @@ NAME
     Abstract
 
 VERSION
-    This document describes version 0.005 of Module::Abstract::Cwalitee
+    This document describes version 0.006 of Module::Abstract::Cwalitee
     (from Perl distribution Module-Abstract-Cwalitee), released on
-    2019-07-26.
+    2019-09-15.
 
 SYNOPSIS
      use Module::Abstract::Cwalitee qw(

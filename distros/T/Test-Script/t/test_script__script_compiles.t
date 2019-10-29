@@ -3,7 +3,6 @@ use Test::Script;
 use File::Spec;
 use File::Temp qw( tempdir );
 use Data::Dumper qw( Dumper );
-  
 
 # the first subtest replaces t/02_compiles_good.t
 
@@ -24,14 +23,14 @@ subtest 'good' => sub {
       },
       'script_compiles t/bin/good.pl',
     );
-    
+
     diag Dumper($events) unless $rv;
 
     is $rv, T(), 'script_compiles_ok returns true as convenience';
   };
 
   subtest 'with different name' => sub {
-  
+
     my $events;
     my $rv;
 
@@ -88,14 +87,14 @@ subtest 'bad' => sub {
     diag Dumper($events) unless $rv2;
 
     is $rv, F(), 'script_compiles_ok returns false as convenience';
-    
+
   };
 
   subtest 'custom name' => sub {
-  
+
     my $rv;
     my $events;
-    
+
     my $rv2 = is(
       $events = intercept { $rv = script_compiles 't/bin/bad.pl', 'It worked' },
       array {
@@ -118,7 +117,7 @@ subtest 'bad' => sub {
     diag Dumper($events) unless $rv2;
 
     is $rv, F(), 'script_compiles_ok returns false as convenience';
-    
+
   };
 
 };
@@ -144,7 +143,7 @@ subtest 'unreasonable number of libs' => sub {
 subtest exception => sub {
 
   my $events;
-  
+
   is(
     $events = intercept { script_compiles( 't/bin/missing.pl' ) },
     array {
@@ -184,4 +183,3 @@ subtest 'signal' => sub {
 script_compiles 't/bin/taint.pl';
 
 done_testing;
-

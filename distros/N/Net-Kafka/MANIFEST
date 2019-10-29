@@ -12,6 +12,7 @@ netkafka.h
 ppport.h
 README
 README.md
+scripts/generate_readme.sh
 t/00-load.t
 t/01-producer.t
 t/02-topic-list.t

@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::is_live_web_uri;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Catmandu::Sane;
 use Moo;

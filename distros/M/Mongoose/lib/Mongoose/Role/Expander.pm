@@ -1,5 +1,5 @@
 package Mongoose::Role::Expander;
-$Mongoose::Role::Expander::VERSION = '2.00';
+$Mongoose::Role::Expander::VERSION = '2.01';
 use Moose::Role;
 
 requires 'expand';

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::linux;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.034';
+our $VERSION = '1.035';
 
 our %Remote = (
     source  => 'http://distrowatch.com/',
@@ -45,6 +45,12 @@ Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-10-28 - v1.035
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.054.
 
 =item *
 
@@ -329,7 +335,6 @@ BeeFree
 Berry
 Bicom
 BigLinux
-Bio_Linux
 BitKey
 BlackArch
 blackPanther
@@ -352,7 +357,6 @@ Clonezilla
 ClonOS
 CloudReady
 Clu
-Condres
 Container
 CRUX
 Cucumber
@@ -373,9 +377,11 @@ Elastix
 elementary
 Elive
 Emmabuntus
+EndeavourOS
 Endian
 Endless
 Enso
+EuroLinux
 Exe
 Exherbo
 ExTiX
@@ -383,6 +389,7 @@ Fatdog64
 Fedora
 Feren
 FreeBSD
+FreedomBox
 FreeNAS
 FreePBX
 Freespire
@@ -392,7 +399,6 @@ Gecko
 GeeXboX
 Gentoo
 GhostBSD
-GNUstep
 GParted
 Greenie
 Grml
@@ -414,7 +420,6 @@ KolibriOS
 Kubuntu
 Kwort
 Lakka
-Legacy
 LFS
 LibreELEC
 LinHES
@@ -464,7 +469,7 @@ openSUSE
 Openwall
 OPNsense
 Oracle
-OSGeo
+OSGeoLive
 OSMC
 OviOS
 paldo
@@ -538,12 +543,10 @@ Star
 SteamOS
 Stella
 Subgraph
-SuliX
 Super_Grub2
 SuperGamer
 SuperX
 SUSE
-SwagArch
 SystemRescue
 T2
 Tails
@@ -552,7 +555,6 @@ TENS
 Thinstation
 Tiny_Core
 ToOpPy
-Toutou
 Trident
 Trisquel
 TrueOS
@@ -570,7 +572,6 @@ Ultimate
 Univention
 Untangle
 Uruk
-Vector
 VenenuX
 Vine
 Void

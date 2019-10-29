@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Class-PassphraseColumn",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "DBIx::Class::PassphraseColumn",
   "PREREQ_PM" => {
-    "Class::Load" => 0,
     "DBIx::Class" => 0,
     "DBIx::Class::InflateColumn::Authen::Passphrase" => 0,
+    "Encode" => 0,
+    "Module::Runtime" => 0,
     "Sub::Name" => 0,
     "namespace::clean" => 0,
     "parent" => 0,
@@ -27,6 +28,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Authen::Passphrase::AcceptAll" => 0,
     "Authen::Passphrase::RejectAll" => 0,
     "DBD::SQLite" => 0,
     "DBIx::Class::Core" => 0,
@@ -34,9 +36,11 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => "0.89",
-    "lib" => 0
+    "lib" => 0,
+    "open" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,21 +48,25 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Authen::Passphrase::AcceptAll" => 0,
   "Authen::Passphrase::RejectAll" => 0,
-  "Class::Load" => 0,
   "DBD::SQLite" => 0,
   "DBIx::Class" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::InflateColumn::Authen::Passphrase" => 0,
   "DBIx::Class::Schema" => 0,
+  "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Module::Runtime" => 0,
   "Sub::Name" => 0,
   "Test::More" => "0.89",
   "lib" => 0,
   "namespace::clean" => 0,
+  "open" => 0,
   "parent" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

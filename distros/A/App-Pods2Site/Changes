@@ -1,5 +1,12 @@
 Revision history for App-Pods2Site
 
+1.003	2019-10-28
+
+	Update of dependency
+	
+	Updated to use of Pod::Simple 3.40 as it allows setting case
+	insensitivity on Windows.
+
 1.002	2019-08-24
 
 	Minor layout changes of header/main page

@@ -7,7 +7,7 @@ package App::Pods2Site::Args;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -69,11 +69,25 @@ sub getTitle
 	return $self->{title};
 }
 
+sub getMainpage
+{
+	my $self = shift;
+
+	return $self->{mainpage};
+}
+
 sub getStyle
 {
 	my $self = shift;
 	
 	return $self->{style};
+}
+
+sub getUpdating
+{
+	my $self = shift;
+
+	return $self->{updating};
 }
 
 sub getWorkDir
@@ -115,26 +129,27 @@ sub isVerboseLevel
 # PRIVATE
 #
 
+# these options are persisted to the site
+# and can't be used when updating
+#
+my @STICKYOPTS =
+	qw
+		(
+			bindirectory
+			libdirectory
+			group
+			css
+			style
+			title
+			mainpage
+		);
+
 sub __parseArgv
 {
 	my $self = shift;
 	my $version = shift;
 	my @argv = @_;
 
-	# these options are persisted to the site
-	# and can't be used when updating
-	#	
-	my @stickyOpts =
-		qw
-			(
-				bindirectory
-				libdirectory
-				group
-				css
-				style
-				title
-			);
-		
 	my %rawOpts =
 		(
 			usage => 0,
@@ -165,6 +180,7 @@ sub __parseArgv
 			'css=s',
 			'style=s',
 			'title=s',
+			'mainpage=s',
 			
 			# hidden
 			#
@@ -223,13 +239,13 @@ sub __parseArgv
 	# manage the sitedir
 	# assume we need to create it
 	#
-	my $newSiteDir = 1;
+	$self->{newsitedir} = 1;
 	my $sitedir = $self->__getSiteDir($argv[0]);
 	die("You must provide a sitedir (use ':std' for a default location)\n") unless $sitedir;
 	$sitedir = slashify(File::Spec->rel2abs($sitedir));
 	if (-e $sitedir)
 	{
-		$newSiteDir = 0;
+		$self->{newsitedir} = 0;
 		
 		# if the sitedir exists as a dir, our sticky opts better be found in it
 		# otherwise it's not a sitedir
@@ -237,11 +253,11 @@ sub __parseArgv
 		die("The output '$sitedir' exists, but is not a directory\n") unless -d $sitedir;
 		my $savedOpts = readData($sitedir, 'opts');
 		die("The sitedir '$sitedir' exists, but is missing our marker file\n") unless $savedOpts;
-
+		$self->{updating} = 1;
 		# clean up any sticky opts given by the user
 		#
 		print "NOTE: updating '$sitedir' - reusing options used when created!\n" if $self->isVerboseLevel(0);
-		foreach my $opt (@stickyOpts)
+		foreach my $opt (@STICKYOPTS)
 		{
 			warn("WARNING: The option '$opt' ignored when updating the existing site '$sitedir'\n") if exists($rawOpts{$opt});
 			delete($rawOpts{$opt});
@@ -251,6 +267,7 @@ sub __parseArgv
 	else
 	{
 		print "Creating '$sitedir'...\n" if $self->isVerboseLevel(0);
+		$self->{updating} = 0;
 	}
 	
 	# fix up any user given bindir locations or get us the standard ones
@@ -293,8 +310,8 @@ sub __parseArgv
 	{
 		eval
 		{
-			die("Group definition not in form 'name=query': '$rawGroupDef'\n") unless $rawGroupDef =~ /^([^=]+)=(.+)/s;
-			my ($name, $query) = (trim($1), trim($2));
+			die("Group definition not in form 'name=query': '$rawGroupDef'\n") unless $rawGroupDef =~ /^([^=]*)=(.+)/s;
+			my ($name, $query) = (trim($1 || ''), trim($2));
 			die("Group '$name' multiply defined\n") if $groupsSeen{$name};
 			$groupsSeen{$name} = 1;
 			push(@groupDefs, { name => $name, query => Grep::Query->new($query) });
@@ -313,26 +330,35 @@ sub __parseArgv
 		$self->{css} = $css;
 	}
 
-	$rawOpts{title} = $rawOpts{title} || ($Config{myuname} ? $Config{myuname} : 'Pods2Site');
+	$rawOpts{title} = $rawOpts{title} || 'Pods2Site';
 	$self->{title} = $rawOpts{title};
 	
+	$rawOpts{mainpage} = $rawOpts{mainpage} || ':std';
+	$self->{mainpage} = $rawOpts{mainpage};
+
 	$self->{style} = $rawOpts{style};
 	my $sbf = App::Pods2Site::SiteBuilderFactory->new($rawOpts{style});
 	$self->{style} = $sbf->getRealStyle();
 	$self->{sitebuilder} = $sbf->createSiteBuilder();
 	
-	# if we need to create the site dir...
-	#
-	if ($newSiteDir)
-	{	
-		# ...do it and persist the sticky options
-		#
-		make_path($sitedir) || die("Failed to create sitedir '$sitedir': $!\n");
-		my %opts2save = map { $_ => $rawOpts{$_} } @stickyOpts;
-		writeData($sitedir, 'opts', \%opts2save);
-	}
-	
+	$self->{rawopts} = \%rawOpts;
+
 	$self->{sitedir} = $sitedir;
+}
+
+sub finish
+{
+	my $self = shift;
+
+	# if the site dir was brand new...
+	#
+	if ($self->{newsitedir})
+	{
+		# ...persist the sticky options
+		#
+		my %opts2save = map { $_ => $self->{rawopts}->{$_} } @STICKYOPTS;
+		writeData($self->{sitedir}, 'opts', \%opts2save);
+	}
 }
 
 sub __getSiteDir

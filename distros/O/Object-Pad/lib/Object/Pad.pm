@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 
@@ -70,7 +70,16 @@ A single superclass is supported by the keyword C<extends>
       ...
    }
 
-The superclass must also be implemented by C<Object::Pad>.
+The superclass must either be implemented by C<Object::Pad>, or be some class
+whose instances are blessed hash references.
+
+In the latter case, all C<Object::Pad>-based subclasses derived from it will
+store their instance data in a key called C<"Object::Pad/slots">, which is
+fairly unlikely to clash with existing storage on the instance. The exact
+format of the value stored here is not specified and may change between module
+versions, though it can be relied on to be well-behaved as some kind of perl
+data structure for purposes of modules like L<Data::Dumper> or serialisation
+into things like C<YAML> or C<JSON>.
 
 =head2 has
 
@@ -183,11 +192,29 @@ sub import_into
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
-sub Object::Pad::_base::new
+# One of these methods gets injected into every Object::Pad class
+sub Object::Pad::__new
 {
    my $class = shift;
 
    my $self = bless [], $class;
+   $self->INITSLOTS;
+
+   $self->BUILDALL( @_ ) if $self->can( "BUILDALL" );
+
+   return $self;
+}
+
+sub Object::Pad::__new_foreign_HASH
+{
+   my $class = shift;
+   # Ugh... :(
+   my $superclass = do {
+      no strict 'refs';
+      ${"${class}::ISA"}[0];
+   };
+   my $self = $superclass->can( "new" )->( $class, @_ );
+
    $self->INITSLOTS;
 
    $self->BUILDALL( @_ ) if $self->can( "BUILDALL" );

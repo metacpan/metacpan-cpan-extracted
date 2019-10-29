@@ -1,7 +1,7 @@
 package Module::Abstract::Cwalitee;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -98,7 +98,7 @@ Module::Abstract::Cwalitee - Calculate the cwalitee of your module Abstract
 
 =head1 VERSION
 
-This document describes version 0.005 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-07-26.
+This document describes version 0.006 of Module::Abstract::Cwalitee (from Perl distribution Module-Abstract-Cwalitee), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

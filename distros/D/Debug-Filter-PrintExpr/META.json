@@ -36,6 +36,7 @@
          "requires" : {
             "Data::Dumper" : "0",
             "Filter::Simple" : "0",
+            "Scalar::Util" : "1.26",
             "perl" : "5.01"
          }
       }
@@ -51,5 +52,5 @@
          "web" : "https://github.com/jo-37/debug-filter-printexpr"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04"
 }

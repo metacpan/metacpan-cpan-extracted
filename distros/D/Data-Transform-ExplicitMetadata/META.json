@@ -4,13 +4,13 @@
       "Anthony Brummett <brummett@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Transform-ExplicitMetadata",
    "prereqs" : {
@@ -42,7 +42,7 @@
    "provides" : {
       "Data::Transform::ExplicitMetadata" : {
          "file" : "lib/Data/Transform/ExplicitMetadata.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -51,5 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

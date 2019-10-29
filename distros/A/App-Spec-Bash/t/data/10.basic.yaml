@@ -1,0 +1,68 @@
+---
+- args: [mydemo, test1, -abcccce, e1, -d, foo, -f, f1, -f, f2, --test-g, xy]
+  output:
+    - regex: === OPTION flag-a 'true'
+    - regex: === OPTION flag-b 'true'
+    - regex: === OPTION flag-c '4'
+    - regex: === OPTION test-d 'foo'
+    - regex: === OPTION test-e 'e1'
+    - regex: === OPTION test-f 'f1 f2'
+    - regex: === OPTION test-g 'xy'
+
+- args: [mydemo, test1, -ccee1, -dfoo]
+  output:
+    - regex: === OPTION flag-c '2'
+    - regex: === OPTION test-d 'foo'
+    - regex: === OPTION test-e 'e1'
+
+- args: [mydemo, help]
+  output:
+    - regex: 'Usage: mydemo \<subcommands\> \[options\]'
+
+- args: [mydemo, help, nested1]
+  output:
+    - regex: 'Usage: mydemo nested1 \<subcommands\> \[options\]'
+
+- args: [mydemo, help, nested1 nested2]
+  output:
+    - regex: 'Usage: mydemo nested1 nested2 \[options\]'
+
+- args: [mydemo, service]
+  exit: 1
+  output:
+      - regex: 'Missing subcommand'
+
+- args: [mydemo, service, --foo]
+  exit: 1
+  output:
+      - regex: 'Missing subcommand'
+      - regex: 'Unknown option'
+
+- args: [mydemo, service, start, --foo]
+  exit: 1
+  output:
+      - regex: 'Missing required parameter'
+      - regex: 'Unknown option'
+
+- args: [mydemo, service, start, nginx, --foo]
+  exit: 1
+  output:
+      - regex: "Unknown option"
+
+- args: [mydemo, service, start, nginx, --restart]
+  output:
+      - regex: "Starting service"
+      - regex: "Restarting"
+
+- args: [mydemo, service, start, --restart, nginx]
+  output:
+      - regex: "Starting service"
+      - regex: "Restarting"
+- args: [mydemo, service, start, --restart, --, nginx]
+  output:
+      - regex: "Starting service"
+      - regex: "Restarting"
+- args: [mydemo, service, start, --restart, --, -v]
+  exit: 1
+  output:
+      - regex: "Could not find service '-v'"

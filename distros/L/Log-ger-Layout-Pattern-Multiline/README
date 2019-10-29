@@ -3,7 +3,7 @@ NAME
     message split)
 
 VERSION
-    version 0.001
+    version 0.003
 
 SYNOPSIS
      use Log::ger::Layout 'Pattern::Multiline', format => '%d (%F:%L)> %m';
@@ -12,7 +12,7 @@ SYNOPSIS
 DESCRIPTION
     This is just like Log::ger::Layout::Pattern except that multiline log
     message is split per-line so that a message like "line1\nline2\nline3"
-    (with "[%r] %m" format) is not laid out not as:
+    (with "[%r] %m" format) is not laid out as:
 
      [0.003] line1
      line2

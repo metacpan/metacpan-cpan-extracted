@@ -21,6 +21,7 @@
          "example",
          "setup",
          "lib/Mojolicious/Command/Author/generate/automake_app",
+         "lib/Mojolicious/Command/Author/generate/automake_app/lib/App/Controller",
          "lib/Mojolicious/Command/Author/generate/callbackery_app"
       ]
    },
@@ -55,6 +56,6 @@
          "url" : "https://github.com/oposs/mojolicious-automake"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

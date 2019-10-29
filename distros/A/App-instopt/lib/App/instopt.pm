@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2019-10-09'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -13,9 +13,12 @@ use File::chdir;
 use File::MoreUtil qw(dir_has_non_dot_files);
 use Perinci::Object;
 use PerlX::Maybe;
+use Sah::Schema::software::arch;
 
 use vars '%Config';
 our %SPEC;
+
+our @all_known_archs = @{ $Sah::Schema::software::arch::schema->[1]{in} };
 
 our %args_common = (
     download_dir => {
@@ -59,44 +62,13 @@ our %argopt_download = (
     },
 );
 
-our %argopt_make_latest_dir_as_symlink = (
-    make_latest_dir_as_symlink => {
-        summary => 'Whether to use symlink to create the latest version directory',
-        'summary.alt.bool.not' => 'Do not use symlink to create latest version directory, '.
-            'but hard-copy instead',
-        schema => ['bool*'],
-        default => 1,
-        description => <<'_',
-
-The default is to use symlink. This will create a symlink to the latest version
-directory, e.g.:
-
-    firefox -> firefox-69.0.2
-
-Then the program will be symlinked from this directory, e.g.:
-
-    /usr/local/bin/firefox -> /opt/firefox/firefox
-
-Another alternative (when this option is set to false) is to use hardlink. A
-directory (`firefox`) will be copied from the latest version directory (e.g.
-`firefox-69.0.2`). Then a file (`firefox/instopt.version`) will be written to
-contain the version number (`69.0.2`). Then, as usual, the program will be
-symlinked from this directory, e.g.:
-
-    /usr/local/bin/firefox -> /opt/firefox/firefox
-
-Currently hardlinking is performed using the `cp` command (with the option
-`-la`), so you need to have this on your system (normally present on all Unix
-systems).
-
-_
-    },
-);
-
 sub _set_args_default {
-    my $args = shift;
-    if (!$args->{arch}) {
-        $args->{arch} = App::swcat::_detect_arch();
+    my ($args, $opts) = @_;
+
+    if ($opts->{set_default_arch}) {
+        if (!$args->{arch}) {
+            $args->{arch} = App::swcat::_detect_arch();
+        }
     }
     if (!$args->{download_dir}) {
         require PERLANCAR::File::HomeDir;
@@ -177,10 +149,13 @@ sub _convert_download_urls_to_filenames {
 }
 
 sub _init {
-    my ($args) = @_;
+    my ($args, $opts) = @_;
+
+    $opts //= {};
+    $opts->{set_default_arch} //= 1;
 
     unless ($App::instopt::state) {
-        _set_args_default($args);
+        _set_args_default($args, $opts);
         my $state = {
         };
         $App::instopt::state = $state;
@@ -323,15 +298,20 @@ $SPEC{list_downloaded} = {
     summary => 'List all downloaded software',
     args => {
         %args_common,
-        detail => {
-            schema => ['bool*', is=>1],
-            cmdline_aliases => {l=>{}},
+        %argopt_arch,
+        %argopt_detail,
+        per_arch => {
+            summary => 'Return per-arch hash in the all_versions field',
+            schema => 'true*',
         },
+    },
+    args_rels => {
+        #choose_one => ['arch', 'per_arch'],
     },
 };
 sub list_downloaded {
     my %args = @_;
-    my $state = _init(\%args);
+    my $state = _init(\%args, {set_default_arch=>0});
 
     my $res = App::swcat::list();
     return [500, "Can't list known software: $res->[0] - $res->[1]"] if $res->[0] != 200;
@@ -353,31 +333,48 @@ sub list_downloaded {
         for my $sw (@$swlist) {
             my $dir = sprintf "%s/%s", substr($sw, 0, 1), $sw;
             unless (-d $dir) {
-                log_trace "Skipping software '$sw': directory doesn't exist";
+                log_trace "Skipping software '$sw': directory '$CWD/$dir' doesn't exist";
                 next SW;
             }
             local $CWD = $dir;
             my $mod = App::swcat::_load_swcat_mod($sw);
-            my @vers;
+            my %arch_vers; # key = arch, val = [ver1, ...]
+            my @archs = defined($args{arch}) ? ($args{arch}) : @all_known_archs;
           VER:
             for my $e (glob "*") {
-                if ($args{_arch}) {
-                    next unless dir_has_non_dot_files("$e/$args{_arch}");
-                } else {
-                    next unless -d $e;
+                unless ($mod->is_valid_version($e)) {
+                    log_trace "Skipping invalid version '$e' of software '$sw'";
+                    next;
                 }
-                next unless $mod->is_valid_version($e);
-                push @vers, $e;
+                for my $arch (@archs) {
+                    #log_trace "Searching software '$sw' version '$e' arch '$arch'";
+                    unless (dir_has_non_dot_files("$e/$arch")) {
+                        #log_trace "Skipping software '$sw' version '$e' arch '$arch': no files found";
+                        next;
+                    }
+                    push @{ $arch_vers{$arch} }, $e;
+                }
             }
-            unless (@vers) {
-                log_trace "Skipping software '$sw': no downloaded versions found";
+
+            my @vers;
+            for my $arch (@archs) {
+                next unless $arch_vers{$arch};
+                log_trace "Found downloaded versions %s for software '%s' arch '$arch'",
+                    $arch_vers{$arch}, $sw, $arch;
+                for my $ver (@{ $arch_vers{$arch} }) {
+                    push @vers, $ver unless grep { $ver eq $_ } @vers;
+                }
             }
             @vers = sort { $mod->cmp_version($a, $b) } @vers;
-            log_trace "Found downloaded versions %s for software '%s'", \@vers, $sw;
+            unless (@vers) {
+                log_trace "Skipping software '$sw': no downloaded versions found";
+                next;
+            }
             push @rows, {
                 software => $sw,
                 latest_version => $vers[-1],
-                all_versions => join(", ", @vers),
+                all_versions => $args{per_arch} ? \%arch_vers : join(", ", @vers),
+                (arch => $args{arch}) x !!defined($args{arch}),
             };
         }
     }
@@ -408,7 +405,7 @@ sub list_downloaded_versions {
 
     return [400, "Please specify software"] unless $args{software};
 
-    my $res = list_downloaded(%args, _software=>$args{software}, _arch=>$args{arch}, detail=>1);
+    my $res = list_downloaded(%args, _software=>$args{software}, arch=>$args{arch}, detail=>1);
     return $res unless $res->[0] == 200;
     my $row = $res->[2][0];
     return [200, "OK (none downloaded)"] unless $row;
@@ -523,7 +520,7 @@ sub download {
         my (@urls, @filenames, $got_arch);
       GET_DOWNLOAD_URL:
         {
-            my $dlurlres = $mod->get_download_url(
+            my $dlurlres = $mod->download_url(
                 arch => $args{arch},
             );
             unless ($dlurlres->[0] == 200) {
@@ -646,32 +643,34 @@ sub cleanup_download_dir {
     require File::Path;
 
     my %args = @_;
-    my $state = _init(\%args);
+    my $state = _init(\%args, {set_default_arch=>0});
 
     local $CWD = $args{download_dir};
-    my $res = list_downloaded(%args, detail=>1);
+    my $res = list_downloaded(%args, detail=>1, per_arch=>1);
     return $res unless $res->[0] == 200;
   SW:
     for my $row (@{ $res->[2] }) {
         my $sw = $row->{software};
         next unless $row->{all_versions};
-        my @vers = split /, /, $row->{all_versions};
-        unless (@vers > 1) {
-            log_trace "Skipping software $sw (<2 versions)";
-            next SW;
-        }
-        pop @vers; # remove latest version
-        my $dir = sprintf "%s/%s", substr($sw, 0, 1), $sw;
-        local $CWD = $dir;
-      VER:
-        for my $v (@vers) {
-            if ($args{-dry_run}) {
-                log_trace "[DRY-RUN] Cleaning up $sw-$v ...";
-            } else {
-                log_trace "Cleaning up software $sw-$v ...";
-                File::Path::remove_tree($v);
+        for my $arch (sort keys %{ $row->{all_versions} }) {
+            my @vers = @{ $row->{all_versions}{$arch} };
+            unless (@vers > 1) {
+                log_trace "Skipping software '$sw' arch '$arch' (<2 versions)";
+                next SW;
             }
-        }
+            pop @vers; # remove latest version
+            my $dir = sprintf "%s/%s", substr($sw, 0, 1), $sw;
+            local $CWD = $dir;
+          VER:
+            for my $v (@vers) {
+                if ($args{-dry_run}) {
+                    log_trace "[DRY-RUN] Cleaning up $sw-$v arch $arch ...";
+                } else {
+                    log_trace "Cleaning up software $sw-$v arch $arch ...";
+                    File::Path::remove_tree("$v/$arch");
+                }
+            }
+        } # for arch
     }
     $args{-dry_run} ? [304, "Dry-run"] : [200];
 }
@@ -683,7 +682,6 @@ $SPEC{update} = {
         %args_common,
         %App::swcat::arg0_softwares_or_patterns,
         %argopt_download,
-        %argopt_make_latest_dir_as_symlink,
     },
 };
 sub update {
@@ -698,8 +696,6 @@ sub update {
 
     my ($sws, $is_single_software) =
         App::swcat::_get_arg_softwares_or_patterns(\%args);
-
-    my $make_latest_dir_as_symlink = $args{make_latest_dir_as_symlink} // 1;
 
     my $envres = envresmulti();
   SW:
@@ -797,7 +793,7 @@ sub update {
             "/", $target_name,
         );
 
-        my $aires = $mod->get_archive_info(%args, version => $v);
+        my $aires = $mod->archive_info(%args, version => $v);
         unless ($aires->[0] == 200) {
             my $errmsg = "Can't install $sw: Can't get archive info: $aires->[0] - $aires->[1]";
             log_error $errmsg;
@@ -827,7 +823,8 @@ sub update {
             if (File::MoreUtil::file_exists($sw)) {
                 File::Path::remove_tree($sw);
             }
-            if ($make_latest_dir_as_symlink) {
+            my $use_symlink = !$mod->can("dedicated_profile") || !$mod->dedicated_profile;
+            if ($use_symlink) {
                 symlink $target_name, $sw or die "Can't symlink $sw -> $target_name: $!";
             } else {
                 IPC::System::Options::system(
@@ -868,7 +865,6 @@ $SPEC{update_all} = {
     args => {
         %args_common,
         %argopt_download,
-        %argopt_make_latest_dir_as_symlink,
     },
 };
 sub update_all {
@@ -896,7 +892,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.012 of App::instopt (from Perl distribution App-instopt), released on 2019-10-09.
+This document describes version 0.014 of App::instopt (from Perl distribution App-instopt), released on 2019-10-26.
 
 =head1 SYNOPSIS
 
@@ -1126,11 +1122,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<detail> => I<bool>
+=item * B<arch> => I<software::arch>
+
+=item * B<detail> => I<true>
 
 =item * B<download_dir> => I<dirname>
 
 =item * B<install_dir> => I<dirname>
+
+=item * B<per_arch> => I<true>
+
+Return per-arch hash in the all_versions field.
 
 =item * B<program_dir> => I<dirname>
 
@@ -1284,31 +1286,6 @@ Whether to download latest version from URLor just find from download dir.
 
 =item * B<install_dir> => I<dirname>
 
-=item * B<make_latest_dir_as_symlink> => I<bool> (default: 1)
-
-Whether to use symlink to create the latest version directory.
-
-The default is to use symlink. This will create a symlink to the latest version
-directory, e.g.:
-
- firefox -> firefox-69.0.2
-
-Then the program will be symlinked from this directory, e.g.:
-
- /usr/local/bin/firefox -> /opt/firefox/firefox
-
-Another alternative (when this option is set to false) is to use hardlink. A
-directory (C<firefox>) will be copied from the latest version directory (e.g.
-C<firefox-69.0.2>). Then a file (C<firefox/instopt.version>) will be written to
-contain the version number (C<69.0.2>). Then, as usual, the program will be
-symlinked from this directory, e.g.:
-
- /usr/local/bin/firefox -> /opt/firefox/firefox
-
-Currently hardlinking is performed using the C<cp> command (with the option
-C<-la>), so you need to have this on your system (normally present on all Unix
-systems).
-
 =item * B<program_dir> => I<dirname>
 
 =item * B<softwares_or_patterns>* => I<array[str]>
@@ -1349,31 +1326,6 @@ Whether to download latest version from URLor just find from download dir.
 =item * B<download_dir> => I<dirname>
 
 =item * B<install_dir> => I<dirname>
-
-=item * B<make_latest_dir_as_symlink> => I<bool> (default: 1)
-
-Whether to use symlink to create the latest version directory.
-
-The default is to use symlink. This will create a symlink to the latest version
-directory, e.g.:
-
- firefox -> firefox-69.0.2
-
-Then the program will be symlinked from this directory, e.g.:
-
- /usr/local/bin/firefox -> /opt/firefox/firefox
-
-Another alternative (when this option is set to false) is to use hardlink. A
-directory (C<firefox>) will be copied from the latest version directory (e.g.
-C<firefox-69.0.2>). Then a file (C<firefox/instopt.version>) will be written to
-contain the version number (C<69.0.2>). Then, as usual, the program will be
-symlinked from this directory, e.g.:
-
- /usr/local/bin/firefox -> /opt/firefox/firefox
-
-Currently hardlinking is performed using the C<cp> command (with the option
-C<-la>), so you need to have this on your system (normally present on all Unix
-systems).
 
 =item * B<program_dir> => I<dirname>
 

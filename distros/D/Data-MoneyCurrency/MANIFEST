@@ -54,6 +54,7 @@ ruby-money/spec/locale_backend/legacy_spec.rb
 ruby-money/spec/money/allocation_spec.rb
 ruby-money/spec/money/arithmetic_spec.rb
 ruby-money/spec/money/constructors_spec.rb
+ruby-money/spec/money/formatting_rules_spec.rb
 ruby-money/spec/money/formatting_spec.rb
 ruby-money/spec/money/locale_backend_spec.rb
 ruby-money/spec/money_spec.rb

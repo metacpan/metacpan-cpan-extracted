@@ -1,6 +1,6 @@
 package Catmandu::Fix::uri_status_code;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Catmandu::Sane;
 use LWP::UserAgent;
@@ -15,10 +15,14 @@ sub emit {
     my ($self, $fixer) = @_;
     my $path = $fixer->split_path($self->path);
 
-    $fixer->emit_create_path($fixer->var, $path, sub {
-        my $var = shift;
-        "${var} = LWP::UserAgent->new->get(${var})->code if is_value(${var}) && length(${var});";
-    });
+    $fixer->emit_create_path(
+        $fixer->var,
+        $path,
+        sub {
+            my $var = shift;
+            "${var} = LWP::UserAgent->new->get(${var})->code if is_value(${var}) && length(${var});";
+        }
+    );
 }
 
 =head1 NAME

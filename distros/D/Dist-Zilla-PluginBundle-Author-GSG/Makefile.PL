@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
     "Dist::Zilla::Plugin::GitHub::UploadRelease" => 0,
     "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
-    "Dist::Zilla::Plugin::OurPkgVersion" => 0,
+    "Dist::Zilla::Plugin::OurPkgVersion" => "0.20",
     "Dist::Zilla::Plugin::PodWeaver" => 0,
     "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
     "Dist::Zilla::Plugin::ReadmeAnyFromPod" => 0,
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Strict" => 0
   },
-  "VERSION" => "v0.0.14",
+  "VERSION" => "v0.0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +80,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
   "Dist::Zilla::Plugin::GitHub::UploadRelease" => 0,
   "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
-  "Dist::Zilla::Plugin::OurPkgVersion" => 0,
+  "Dist::Zilla::Plugin::OurPkgVersion" => "0.20",
   "Dist::Zilla::Plugin::PodWeaver" => 0,
   "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
   "Dist::Zilla::Plugin::ReadmeAnyFromPod" => 0,

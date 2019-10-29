@@ -2,192 +2,278 @@
 # purpose: tests Mnet::Expect::Cli functionality
 
 # required modules
-#   Expect required in Mnet::Expect modules, best to find our here if missing
 use warnings;
 use strict;
-use Expect;
-use Test::More tests => 9;
+use Mnet::T;
+use Test::More tests => 8;
 
-# use current perl for tests
-my $perl = $^X;
-
-# init perl code used for new login tests
-#   for debug uncomment the use Mnet::Opts::Set::Debug line below
-my $perl_new_login = "chmod 700 \$CLI; echo; $perl -e '" . '
+# init perl code for these tests
+my $perl = <<'perl-eof';
     use warnings;
     use strict;
     use Mnet::Expect::Cli;
-    # use Mnet::Log; use Mnet::Opts::Set::Debug;
-    my $opts = { spawn => $ENV{CLI}, timeout => 2, failed_re => "fail" };
-    $opts->{username} = "user" if "@ARGV" =~ /user/;
-    $opts->{password} = "pass" if "@ARGV" =~ /pass/;
-    $opts->{prompt_re} = undef if "@ARGV" =~ /no_prompt_re/;
-    my $expect = Mnet::Expect::Cli->new($opts) or die "expect undef";
-    syswrite STDOUT, "prompt = ".$expect->prompt_re."\n" if $expect->prompt_re;
-    $expect->close;
-' . "'";
-
-# check new login with username, no password, prompt%
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"username: \"; read INPUT
-    echo -n \"prompt% \"; read INPUT
-    echo -n \"prompt% \"; read INPUT
-' >\$CLI; $perl_new_login -- user 2>&1; rm \$CLI`, '
-prompt = (^|\r|\n)prompt% \r?$
-', 'new login with username, no password, prompt%');
-
-# new login with passcode, no username, prompt#
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"passcode: \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-    echo -n \"prompt# \"; read INPUT
-' >\$CLI; $perl_new_login -- pass 2>&1; rm \$CLI`, '
-prompt = (^|\r|\n)prompt# \r?$
-', 'new login with passcode, no username, prompt#');
-
-# new login with no username, no password and prompt:
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt: \"; read INPUT
-    echo -n \"prompt: \"; read INPUT
-' >\$CLI; $perl_new_login 2>&1; rm \$CLI`, '
-prompt = (^|\r|\n)prompt: \r?$
-', 'new login with no username, no password, prompt:');
-
-# new login failed before username prompt
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"fail\"; read INPUT
-' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-DIE - Mnet::Expect::Cli login failed_re matched "fail"
-', 'new login failed before username prompt');
-
-# new login failed after login prompt
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"login: \"; read INPUT
-    echo -n \"fail\"; read INPUT
-' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-DIE - Mnet::Expect::Cli login failed_re matched "fail"
-', 'new login failed after login prompt');
-
-# new login failed after password prompt
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"username: \"; read INPUT
-    echo -n \"password: \"; read INPUT
-    echo -n \"fail\"; read INPUT
-' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-DIE - Mnet::Expect::Cli login failed_re matched "fail"
-', 'new login failed after password prompt');
-
-# new login with no user, password, or prompt
-Test::More::is(`export CLI=\$(mktemp); echo '
-' >\$CLI; $perl_new_login no_prompt_re 2>&1; rm \$CLI`, '
-', 'new login with no user, password, or prompt');
-
-# check log_login set to info
-#   note that prompt$ log txt lines in output have a space at the end
-Test::More::is(`
-    export CLI=\$(mktemp); echo '
-        echo -n \"prompt\$ \"; read INPUT
-        echo -n \"prompt\$ \"; read INPUT
-        echo -n \"prompt\$ \"; read INPUT
-    ' >\$CLI; chmod 700 \$CLI; echo; $perl -e '
-        use warnings;
-        use strict;
-        use Mnet::Expect::Cli;
-        use Mnet::Log;
-        use Mnet::Log::Test;
-        use Mnet::Opts::Set::Debug;
-        my \$opts = { spawn => \$ENV{CLI}, timeout => 2, log_login => "info" };
-        my \$expect = Mnet::Expect::Cli->new(\$opts) or die "expect undef";
-        \$expect->command("test");
-        \$expect->close;
-    ' -- 2>&1 | grep -e 'Mnet::Log fin' -e '^inf' -e 'log txt: test';`, '
-inf - Mnet::Expect log txt: prompt$'.' '.'
-inf - Mnet::Expect log txt: prompt$'.' '.'
-dbg - Mnet::Expect log txt: test
- -  - Mnet::Log finished with no errors
-', 'check log_login info');
-
-#? temporary code below, to help track down error in some cpan tests
-#   only used in test call below, delete this $perl_new_login redef when done
-$perl_new_login = "chmod 700 \$CLI; echo; $perl -e '" . '
-    use warnings;
-    use strict;
-    use Mnet::Expect::Cli;
+    use Mnet::Log qw( DEBUG );
+    use Mnet::Log::Test;
     use Mnet::Opts::Cli;
     use Mnet::Opts::Set::Quiet;
-    use Mnet::Log;
-    my ($cli, @args) = Mnet::Opts::Cli->new;
-    my $opts = { spawn => $ENV{CLI}, timeout => 2, failed_re => "fail" };
-    $opts->{username} = "user" if "@ARGV" =~ /user/;
-    $opts->{password} = "pass" if "@ARGV" =~ /pass/;
-    $opts->{prompt_re} = undef if "@ARGV" =~ /no_prompt_re/;
+    Mnet::Opts::Cli::define({ getopt => "username=s" });
+    Mnet::Opts::Cli::define({ getopt => "password=s" });
+    Mnet::Opts::Cli::define({ getopt => "prompt-re-undef" });
+    Mnet::Opts::Cli::define({ getopt => "log-login=s" });
+    my $opts = Mnet::Opts::Cli->new;
+    $opts->{spawn} = $ENV{EXPECT};
+    $opts->{failed_re} = "fail";
+    $opts->{timeout} = 2;
+    $opts->{prompt_re} = undef if $opts->{prompt_re_undef};
+    DEBUG("spawn script: $_") foreach (split/\n/, `cat $ENV{EXPECT} 2>&1`);
     my $expect = Mnet::Expect::Cli->new($opts) or die "expect undef";
-    syswrite STDOUT, "prompt = ".$expect->prompt_re."\n" if $expect->prompt_re;
+    my $prompt = $expect->prompt_re;
+    syswrite STDOUT, "prompt = $prompt\n" if $prompt;
+    $expect->command("test") if $opts->{log_login};
     $expect->close;
-    my $expected = "(^|\\\r|\\\n)prompt>\\\r?\\$";
-    warn "mismatch, $expected" if $expect->prompt_re ne $expected;
-' . "' -- --debug-error /dev/stdout";
+perl-eof
 
-# new login prompt match with spurrious prompt text in banner
-Test::More::is(`export CLI=\$(mktemp); echo '
-    echo -n \"prompt:\"'"'"'\\n'"'"'\"prompt>\"; read INPUT
-    echo -n \"prompt>\"; read INPUT
-    echo -n \"prompt>\"; read INPUT
-    echo -n \"prompt>\"; read INPUT
-    echo -n \"prompt>\"; read INPUT
-' >\$CLI; $perl_new_login 2>&1; rm \$CLI`, '
-prompt = (^|\r|\n)prompt>\r?$
-', 'new login with extra prompt, no trailing spaces prompt>');
+# new login with username, no password, prompt%
+Mnet::T::test_perl({
+    name    => 'new login with username, no password, prompt%',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "username: "; read INPUT
+            echo -n "prompt% ";   read INPUT
+            echo -n "prompt% ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    post    => 'rm $EXPECT',
+    args    => '--username user',
+    expect  => 'prompt = (^|\r|\n)prompt% \r?$'."\n",
+    debug   => '--debug --noquiet',
+});
 
-# new login can skip pre-login banner text that matches failed_re
+# new login with passcode, no username, prompt#
+Mnet::T::test_perl({
+    name    => 'new login with passcode, no username, prompt#',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "passcode: "; read INPUT
+            echo -n "prompt# ";   read INPUT
+            echo -n "prompt# ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    post    => 'rm $EXPECT',
+    args    => '--password pass',
+    expect  => 'prompt = (^|\r|\n)prompt# \r?$'."\n",
+    debug   => '--debug --noquiet',
+});
+
+# new login with no username, no password and prompt:
+Mnet::T::test_perl({
+    name    => 'new login with no username, no password and prompt:',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt: "; read INPUT
+            echo -n "prompt: "; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    post    => 'rm $EXPECT',
+    expect  => 'prompt = (^|\r|\n)prompt: \r?$'."\n",
+    debug   => '--debug --noquiet',
+});
+
+# new login failed before username prompt
+Mnet::T::test_perl({
+    name    => 'new login failed before username prompt',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "fail"; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--username user --password pass',
+    post    => 'rm $EXPECT',
+    expect  => 'DIE - Mnet::Expect::Cli login failed_re matched "fail"'."\n",
+    debug   => '--debug --noquiet',
+});
+
+# new login failed after login prompt
+Mnet::T::test_perl({
+    name    => 'new login failed after login prompt',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "login: "; read INPUT
+            echo -n "fail";    read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--username user --password pass',
+    post    => 'rm $EXPECT',
+    expect  => 'DIE - Mnet::Expect::Cli login failed_re matched "fail"'."\n",
+    debug   => '--debug --noquiet',
+});
+
+# new login failed after password prompt
+Mnet::T::test_perl({
+    name    => 'new login failed after password prompt',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "username: "; read INPUT
+            echo -n "password: "; read INPUT
+            echo -n "fail";       read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--username user --password pass',
+    post    => 'rm $EXPECT',
+    expect  => 'DIE - Mnet::Expect::Cli login failed_re matched "fail"'."\n",
+    debug   => '--debug --noquiet',
+});
+
+# new login with no user, password, or prompt
+Mnet::T::test_perl({
+    name    => 'new login with no user, password, or prompt',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--prompt-re-undef',
+    post    => 'rm $EXPECT',
+    expect  => "\n",
+    debug   => '--debug --noquiet',
+});
+
+# check log_login info
+#   note that prompt$ log txt lines in output have a space at the end
+Mnet::T::test_perl({
+    name    => 'check log_login info',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt\$ "; read INPUT
+            echo -n "prompt\$ "; read INPUT
+            echo -n "prompt\$ "; read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug --log-login info',
+    post    => 'rm $EXPECT',
+    filter  => <<'    filter-eof',
+        grep -e "Mnet::Log fin" -e ^inf -e "log txt: test" \
+        | grep -v Mnet::Opts::Cli
+    filter-eof
+    expect  => '
+        inf - Mnet::Expect log txt: prompt$'.' '.'
+        inf - Mnet::Expect log txt: prompt$'.' '.'
+        dbg - Mnet::Expect log txt: test
+        --- - Mnet::Log finished with no errors
+    ',
+    debug   => '--debug --noquiet',
+});
+
+# new login with spurious prompt, no trailing spaces prompt>
+#? try enabling this test after everything else works
+#Mnet::T::test_perl({
+#    name    => 'new login with spurious prompt, no trailing spaces prompt>',
+#    pre     => <<'    pre-eof',
+#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+#            echo "prompt:"
+#            echo -n "prompt>"; read INPUT
+#            echo -n "prompt>"; read INPUT
+#            echo -n "prompt>"; read INPUT
+#        ' >$EXPECT
+#    pre-eof
+#    perl    => $perl,
+#    args    => '',
+#    post    => 'rm $EXPECT',
+#    expect  => 'prompt = (^|\r|\n)prompt>\r?$',
+#    debug   => '--debug --noquiet',
+#});
+
+# new login skipped pre-login banner failed_re text
 #   example: failed_re /refused/, banner "unauthorized access refused"
+#   this would be an enhancement, current code can't handle this situation
 #   fix is no default failed_re, perldoc says set failed_re or timeout on fails
 #   refer to to-do not in git commit 65d08eb Mnet::Expect::Cli for ideas
-#Test::More::is(`export CLI=\$(mktemp); echo '
-#    echo \"banner start\"; echo \"not failed\"; echo \"banner end\"
-#    echo -n \"username: \"; read INPUT
-#    echo -n \"password: \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-#prompt = (^|\r|\n)prompt% \r?$
-#', 'new login skipped pre-login banner fail text');
+#Mnet::T::test_perl({
+#    name    => 'new login skipped pre-login banner failed_re text',
+#    pre     => <<'    pre-eof',
+#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+#            echo "banner start"; echo "not failed"; echo "banner end"
+#            echo -n "username: "; read INPUT
+#            echo -n "password: "; read INPUT
+#            echo -n "prompt% ";   read INPUT
+#            echo -n "prompt% ";   read INPUT
+#        ' >$EXPECT
+#    pre-eof
+#    perl    => $perl,
+#    args    => '--username user --password pass',
+#    post    => 'rm $EXPECT',
+#    expect  => 'prompt = (^|\r|\n)prompt% \r?$',
+#    debug   => '--debug --noquiet',
+#});
 
-# new login can skip post-login banner text that matches failed_re
+# new login skipped post-login banner failed_re text (enhancement)
 #   example: failed_re /refused/, banner "unauthorized access refused"
+#   this would be an enhancement, current code can't handle this situation
 #   fix is no default failed_re, timeouts on fails, perldoc says set failed_re
 #   refer to to-do not in git commit 65d08eb Mnet::Expect::Cli for ideas
-#Test::More::is(`export CLI=\$(mktemp); echo '
-#    echo -n \"username: \"; read INPUT
-#    echo -n \"password: \"; read INPUT
-#    echo \"banner start\"; echo \"not failed\"; echo \"banner end\"
-#    echo -n \"prompt% \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-#prompt = (^|\r|\n)prompt% \r?$
-#', 'new login skipped post-login banner fail text');
+#Mnet::T::test_perl({
+#    name    => 'new login skipped post-login banner failed_re text',
+#    pre     => <<'    pre-eof',
+#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+#            echo -n "username: "; read INPUT
+#            echo -n "password: "; read INPUT
+#            echo "banner start"; echo "not failed"; echo "banner end"
+#            echo -n "prompt% ";   read INPUT
+#            echo -n "prompt% ";   read INPUT
+#        ' >$EXPECT
+#    pre-eof
+#    perl    => $perl,
+#    args    => '--username user --password pass',
+#    post    => 'rm $EXPECT',
+#    expect  => 'prompt = (^|\r|\n)prompt% \r?$',
+#    debug   => '--debug --noquiet',
+#});
 
 # new login autodetects that username is not needed
-#   workaround as per perldoc says to set username only if needed
+#   this would be an enhancement, current code can't handle this situation
+#   workaround as per perldoc says to set username only if it will be needed
 #   refer to to-do not in git commit 65d08eb Mnet::Expect::Cli for ideas
-#Test::More::is(`export CLI=\$(mktemp); echo '
-#    echo -n \"password: \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-#prompt = (^|\r|\n)prompt% \r?$
-#', 'new login username not needed');
+#Mnet::T::test_perl({
+#    name    => 'new login autodetects that username is not needed',
+#    pre     => <<'    pre-eof',
+#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+#            echo -n "password: "; read INPUT
+#            echo -n "prompt% ";   read INPUT
+#            echo -n "prompt% ";   read INPUT
+#        ' >$EXPECT
+#    pre-eof
+#    perl    => $perl,
+#    args    => '--username user --password pass',
+#    post    => 'rm $EXPECT',
+#    expect  => 'prompt = (^|\r|\n)prompt% \r?$',
+#    debug   => '--debug --noquiet',
+#});
 
-# new login autodetects that username and password not both not needed
+# new login autodetects that username and password not needed
+#   this would be an enhancement, current code can't handle this situation
 #   workaround as per perldoc says to set username and passwords only if needed
 #   refer to to-do not in git commit 65d08eb Mnet::Expect::Cli for ideas
-#Test::More::is(`export CLI=\$(mktemp); echo '
-#    echo -n \"password: \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#    echo -n \"prompt% \"; read INPUT
-#' >\$CLI; $perl_new_login user pass 2>&1; rm \$CLI`, '
-#prompt = (^|\r|\n)prompt% \r?$
-#', 'new login username and passowrd not needed');
+#Mnet::T::test_perl({
+#    name    => 'new login autodetects that username and password not needed',
+#    pre     => <<'    pre-eof',
+#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+#            echo -n "prompt% ";   read INPUT
+#            echo -n "prompt% ";   read INPUT
+#        ' >$EXPECT
+#    pre-eof
+#    perl    => $perl,
+#    args    => '--username user --password pass',
+#    post    => 'rm $EXPECT',
+#    expect  => 'prompt = (^|\r|\n)prompt% \r?$',
+#    debug   => '--debug --noquiet',
+#});
 
 # finished
 exit;

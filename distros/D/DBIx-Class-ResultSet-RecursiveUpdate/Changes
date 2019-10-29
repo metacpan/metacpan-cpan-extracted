@@ -1,8 +1,19 @@
 Revision history for DBIx::Class::ResultSet::RecursiveUpdate
 
-0.34      2014-02-06 23:37:32 America/New_York
+0.40      2019-10-29 14:16:34+01:00 Europe/Vienna
+    - Fix missing Try::Tiny dependency
+    - Don't try to find a row by primary key if not all primary key columns are
+      defined
+    - Reduce select queries for has_many relationships
+      to one per non-prefetched or none for prefetched has_many relationships
+      down from one per related row even for prefetched relationships
+    - Don't execute a delete/update query for has_many relationships if no
+      rows need to be deleted or unlinked by setting their foreign key
+      column(s) to NULL
+    - Preserve prefetched related resultsets on row update
+    - Stable update order by sorting all columns and relationships
 
-0.34 2014-02-07
+0.34      2014-02-06 23:37:32 America/New_York
     - More changes to support custom CODE relationship condition
 
 0.33      2014-02-06 14:58:54 America/New_York

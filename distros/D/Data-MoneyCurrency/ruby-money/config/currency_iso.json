@@ -1412,9 +1412,9 @@
     "iso_numeric": "446",
     "smallest_denomination": 10
   },
-  "mro": {
+  "mru": {
     "priority": 100,
-    "iso_code": "MRO",
+    "iso_code": "MRU",
     "name": "Mauritanian Ouguiya",
     "symbol": "UM",
     "alternate_symbols": [],
@@ -1424,7 +1424,7 @@
     "html_entity": "",
     "decimal_mark": ".",
     "thousands_separator": ",",
-    "iso_numeric": "478",
+    "iso_numeric": "929",
     "smallest_denomination": 1
   },
   "mur": {
@@ -2260,7 +2260,7 @@
     "priority": 100,
     "iso_code": "UZS",
     "name": "Uzbekistan Som",
-    "symbol": "",
+    "symbol": "so'm",
     "alternate_symbols": ["so‘m", "сўм", "сум", "s", "с"],
     "subunit": "Tiyin",
     "subunit_to_unit": 100,
@@ -2594,12 +2594,12 @@
     "priority": 100,
     "iso_code": "ZMW",
     "name": "Zambian Kwacha",
-    "symbol": "ZK",
+    "symbol": "K",
     "disambiguate_symbol": "ZMW",
     "alternate_symbols": [],
     "subunit": "Ngwee",
     "subunit_to_unit": 100,
-    "symbol_first": false,
+    "symbol_first": true,
     "html_entity": "",
     "decimal_mark": ".",
     "thousands_separator": ",",

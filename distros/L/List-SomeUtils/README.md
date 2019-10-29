@@ -4,7 +4,7 @@ List::SomeUtils - Provide the stuff missing in List::Util
 
 # VERSION
 
-version 0.56
+version 0.58
 
 # SYNOPSIS
 
@@ -178,10 +178,13 @@ Evaluation of BLOCK will immediately stop at the second true value.
 
 ### apply BLOCK LIST
 
-Applies BLOCK to each item in LIST and returns a list of the values after BLOCK
-has been applied. In scalar context, the last element is returned.  This
-function is similar to `map` but will not modify the elements of the input
-list:
+Makes a copy of the list and then passes each element _from the copy_ to the
+BLOCK. Any changes or assignments to `$_` in the BLOCK will only affect the
+elements of the new list. However, if `$_` is a reference then changes to the
+referenced value will be seen in both the original and new list.
+
+This function is similar to `map` but will not modify the elements of the
+input list:
 
     my @list = (1 .. 4);
     my @mult = apply { $_ *= 2 } @list;
@@ -194,6 +197,15 @@ list:
 Think of it as syntactic sugar for
 
     for (my @mult = @list) { $_ *= 2 }
+
+Note that you must alter `$_` directly inside BLOCK in order for changes to
+make effect. New value returned from the BLOCK are ignored:
+
+    # @new is identical to @list.
+    my @new = apply { $_ * 2 } @list;
+
+    # @new is different from @list
+    my @new = apply { $_ =* 2 } @list;
 
 ### insert\_after BLOCK VALUE LIST
 
@@ -331,7 +343,7 @@ Negative values are only ok when they refer to a partition previously created:
 
     my @idx  = ( 0, 1, -1 );
     my $i    = 0;
-    my @part = part { $idx[$++ % 3] } 1 .. 8; # [1, 4, 7], [2, 3, 5, 6, 8]
+    my @part = part { $idx[$i++ % 3] } 1 .. 8; # [1, 4, 7], [2, 3, 5, 6, 8]
 
 ## Iteration
 
@@ -591,8 +603,8 @@ If more than one item appears the same number of times in the list, all such
 items will be returned. For example, the mode of a unique list is the list
 itself.
 
-This function **always** returns a list. That means that in scalar context you
-get a count indicating the number of modes in the list.
+This function returns a list in list context. In scalar context it returns a
+count indicating the number of modes in the list.
 
 # MAINTENANCE
 
@@ -763,6 +775,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 - Aaron Crane <arc@cpan.org>
 - BackPan <BackPan>
+- bay-max1 <34803732+bay-max1@users.noreply.github.com>
 - Brad Forschinger <bnjf@bnjf.id.au>
 - David Golden <dagolden@cpan.org>
 - jddurand <jeandamiendurand@free.fr>
@@ -776,7 +789,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky <autarch@urth.org>.
+This software is copyright (c) 2019 by Dave Rolsky <autarch@urth.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

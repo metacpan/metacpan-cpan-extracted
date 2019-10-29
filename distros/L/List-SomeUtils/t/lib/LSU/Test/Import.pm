@@ -10,20 +10,66 @@ use Test::More;
 
 sub run_tests {
     use_ok(
-        "List::SomeUtils", qw(any all none notall
-            any_u all_u none_u notall_u
-            true false firstidx lastidx
-            insert_after insert_after_string
-            apply indexes
-            after after_incl before before_incl
-            firstval lastval
-            each_array each_arrayref
-            pairwise natatime
-            mesh uniq
-            minmax part
+        'List::SomeUtils',
+        qw(
+            after
+            after_incl
+            all
+            all_u
+            any
+            any_u
+            apply
+            before
+            before_incl
             bsearch
-            sort_by nsort_by
-            first_index last_index first_value last_value zip distinct)
+            bsearchidx
+            each_array
+            each_arrayref
+            false
+            firstidx
+            firstres
+            firstval
+            indexes
+            insert_after
+            insert_after_string
+            lastidx
+            lastres
+            lastval
+            mesh
+            minmax
+            mode
+            natatime
+            none
+            none_u
+            notall
+            notall_u
+            nsort_by
+            one
+            one_u
+            onlyidx
+            onlyres
+            onlyval
+            pairwise
+            part
+            singleton
+            sort_by
+            true
+            uniq
+            ),
+        qw(
+            bsearch_index
+            distinct
+            first_index
+            first_result
+            first_value
+            last_index
+            last_result
+            last_value
+            only_index
+            only_result
+            only_value
+            zip
+            )
     );
     done_testing();
 }

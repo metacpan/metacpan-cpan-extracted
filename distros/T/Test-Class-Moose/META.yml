@@ -29,73 +29,73 @@ name: Test-Class-Moose
 provides:
   Test::Class::Moose:
     file: lib/Test/Class/Moose.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::AttributeRegistry:
     file: lib/Test/Class/Moose/AttributeRegistry.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::CLI:
     file: lib/Test/Class/Moose/CLI.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Config:
     file: lib/Test/Class/Moose/Config.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Deprecated:
     file: lib/Test/Class/Moose/Deprecated.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Executor::Parallel:
     file: lib/Test/Class/Moose/Executor/Parallel.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Executor::Sequential:
     file: lib/Test/Class/Moose/Executor/Sequential.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Load:
     file: lib/Test/Class/Moose/Load.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Report:
     file: lib/Test/Class/Moose/Report.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Report::Class:
     file: lib/Test/Class/Moose/Report/Class.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Report::Instance:
     file: lib/Test/Class/Moose/Report/Instance.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Report::Method:
     file: lib/Test/Class/Moose/Report/Method.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Report::Time:
     file: lib/Test/Class/Moose/Report/Time.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role:
     file: lib/Test/Class/Moose/Role.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role::AutoUse:
     file: lib/Test/Class/Moose/Role/AutoUse.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role::CLI:
     file: lib/Test/Class/Moose/Role/CLI.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role::Executor:
     file: lib/Test/Class/Moose/Role/Executor.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role::HasTimeReport:
     file: lib/Test/Class/Moose/Role/HasTimeReport.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role::ParameterizedInstances:
     file: lib/Test/Class/Moose/Role/ParameterizedInstances.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Role::Reporting:
     file: lib/Test/Class/Moose/Role/Reporting.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Runner:
     file: lib/Test/Class/Moose/Runner.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Tutorial:
     file: lib/Test/Class/Moose/Tutorial.pm
-    version: '0.97'
+    version: '0.98'
   Test::Class::Moose::Util:
     file: lib/Test/Class/Moose/Util.pm
-    version: '0.97'
+    version: '0.98'
 recommends:
   Parallel::ForkManager: v0.7.6
 requires:
@@ -137,7 +137,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/test-class-moose/issues
   homepage: http://metacpan.org/release/Test-Class-Moose/
   repository: git://github.com/houseabsolute/test-class-moose.git
-version: '0.97'
+version: '0.98'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -771,7 +771,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.97
+          tag: v0.98
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -927,6 +927,7 @@ x_contributors:
   - 'Jeremy Krieg <Jeremy.Krieg@YourAmigo.com>'
   - 'Jonathan C. Otsuka <djgoku@gmail.com>'
   - 'Jonathan Stowe <jns@gellyfish.co.uk>'
+  - 'jrubinator <jjrs.pam+github@gmail.com>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Larry Leszczynski <larryl@cpan.org>'
   - 'mark-5 <maflick88@gmail.com>'

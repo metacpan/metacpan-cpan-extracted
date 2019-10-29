@@ -2,9 +2,9 @@ NAME
     Software::Catalog::SW::phpmyadmin - phpMyAdmin
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Software::Catalog::SW::phpmyadmin (from Perl distribution
-    Software-Catalog-SW-phpmyadmin), released on 2019-04-04.
+    Software-Catalog-SW-phpmyadmin), released on 2019-10-26.
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.94';
+our $VERSION = '1.95';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1015,8 +1015,7 @@ sub submit_form {
 
     for ( keys %args ) {
         if ( !/^(form_(number|name|fields|id)|(with_)?fields|button|x|y|strict_forms)$/ ) {
-            # XXX Why not die here?
-            $self->warn( qq{Unknown submit_form parameter "$_"} );
+            $self->die( qq{Unknown submit_form parameter "$_"} );
         }
     }
 
@@ -1027,7 +1026,7 @@ sub submit_form {
                 $fields = $args{$_};
             }
             else {
-                die "$_ arg to submit_form must be a hashref";
+                $self->die("$_ arg to submit_form must be a hashref");
             }
             last;
         }
@@ -1037,22 +1036,22 @@ sub submit_form {
     if ( $args{with_fields} ) {
         $fields || die q{must submit some 'fields' with with_fields};
         my @got = $self->all_forms_with_fields(keys %{$fields});
-        die "There is no form with the requested fields" if not @got;
+        $self->die("There is no form with the requested fields") if not @got;
         push @filtered_sets, \@got;
     }
     if ( my $form_number = $args{form_number} ) {
         my $got = $self->form_number( $form_number );
-        die "There is no form numbered $form_number" if not $got;
+        $self->die("There is no form numbered $form_number") if not $got;
         push @filtered_sets, [ $got ];
     }
     if ( my $form_name = $args{form_name} ) {
         my @got = $self->all_forms_with( name => $form_name );
-        die qq{There is no form named "$form_name"} if not @got;
+        $self->die(qq{There is no form named "$form_name"}) if not @got;
         push @filtered_sets, \@got;
     }
     if ( my $form_id = $args{form_id} ) {
         my @got = $self->all_forms_with( id => $form_id );
-        $self->warn(qq{ There is no form with ID "$form_id"}) if not @got;
+        $self->die(qq{There is no form with ID "$form_id"}) if not @got;
         push @filtered_sets, \@got;
     }
 
@@ -1074,10 +1073,10 @@ sub submit_form {
         my $expected_count = scalar @filtered_sets;
         my @matched = grep { $c{$_} == $expected_count } keys %c;
         if (not @matched) {
-            die "There is no form that satisfies all the criteria";
+            $self->die('There is no form that satisfies all the criteria');
         }
         if (@matched > 1) {
-            die "More than one form satisfies all the criteria";
+            $self->die('More than one form satisfies all the criteria');
         }
         $self->{current_form} = $matched[0];
     }
@@ -1687,7 +1686,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.94
+version 1.95
 
 =head1 SYNOPSIS
 

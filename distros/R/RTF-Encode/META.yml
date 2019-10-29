@@ -1,5 +1,5 @@
 ---
-abstract: 'Escapes string into RTF'
+abstract: 'Escapes strings into RTF'
 author:
   - 'Dave Lambley <dlambley@cpan.org>'
 build_requires:
@@ -17,8 +17,10 @@ recommends:
   RTF::Writer: '0'
 requires:
   Encode: '0'
+  Exporter: '0'
+  parent: '0'
 resources:
   homepage: https://github.com/davel/perl-RTF-Encode
   repository: https://github.com/davel/perl-RTF-Encode.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'YAML::Tiny version 1.70'

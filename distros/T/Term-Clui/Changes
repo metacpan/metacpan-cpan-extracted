@@ -1,5 +1,10 @@
 Revision history for Term-Clui
 
+1.76 2019-10-28 03:15:58 -0700
+  - Fix import error with -File option in Term::Clui::FileSelect (gh#10, gh#11)
+  - You can now use Term::Clui::FileSelect without first explicitly using
+    Term::Clui (gh#11)
+
 1.75 2018-10-01 21:04:18 -0400
   - Misc administrative fixes (gh#4, gh#5 manwar++)
   - This release is functionally identical to 1.74_01.

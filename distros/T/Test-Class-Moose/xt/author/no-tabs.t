@@ -56,6 +56,8 @@ my @files = (
     't/lib/Person.pm',
     't/lib/Test/Events.pm',
     't/lib/Test/Reporting.pm',
+    't/lib_with_a+/TestsFor/Basic.pm',
+    't/load-special-characters.t',
     't/load.t',
     't/loadlib/helpers/Fail.pm',
     't/loadlib/tests/LoadTests/Success.pm',

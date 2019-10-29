@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.name        = "money"
   s.version     = Money::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Shane Emmons"]
-  s.email       = ["shane@emmons.io"]
+  s.authors     = ['Shane Emmons', 'Anthony Dmitriyev']
+  s.email       = ['shane@emmons.io', 'anthony.dmitriyev@gmail.com']
   s.homepage    = "https://rubymoney.github.io/money"
   s.summary     = "A Ruby Library for dealing with money and currency conversion."
   s.description = "A Ruby Library for dealing with money and currency conversion."
@@ -16,13 +16,13 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'i18n', [">= 0.6.4", '<= 2']
 
-  s.add_development_dependency "bundler", "~> 1.3"
+  s.add_development_dependency "bundler"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec", "~> 3.4"
   s.add_development_dependency "yard", "~> 0.9.11"
   s.add_development_dependency "kramdown", "~> 1.1"
 
-  s.files         = `git ls-files`.split($/)
+  s.files         = `git ls-files -z -- config/* lib/* CHANGELOG.md LICENSE money.gemspec README.md`.split("\x0")
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ["lib"]

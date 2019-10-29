@@ -1,3 +1,14 @@
-0.001    2019-03-26 (PERLANCAR)
+0.003   2019-10-27  Released-By: PERLANCAR; Urgency: high
+
+	- [dist] Edit urgency for 0.002.
+
+
+0.002   2019-10-27  Released-By: PERLANCAR; Urgency: high
+
+	- Adjust to Log::ger::Layout::Pattern 0.002 (arguments for
+	  _layout()) [RT#129269].
+
+
+0.001    2019-03-26  Released-By: PERLANCAR
 
          - First release.

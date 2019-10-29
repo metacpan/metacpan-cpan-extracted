@@ -1,3 +1,8 @@
+0.006   2019-09-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Recognize template "it's a new $module".
+
+
 0.005   2019-07-26  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

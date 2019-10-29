@@ -5,7 +5,7 @@ use warnings;
 package Test::FITesque::RDF;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.016';
 
 use Moo;
 use Attean::RDF;
@@ -143,12 +143,14 @@ sub transform_rdf {
 						} elsif ($req_data->object->is_iri) {
 						  # If the http:content predicate points to a IRI, the framework will retrieve content from there
 						  my $ua = LWP::UserAgent->new;
-						  my $content_response = $ua->get($req_data->object);
+						  my $content_response = $ua->get(URI->new($req_data->object->as_string));
 						  if ($content_response->is_success) {
 							 $req->content($content_response->decoded_content); # TODO: might need encoding
 						  } else {
 							 croak "Could not retrieve content from " . $req_data->object->as_string . " . Got " . $content_response->status_line;
 						  }
+						} else {
+						  croak 'Unsupported object ' . $req_data->object->as_string . " in " . $self->source;
 						}
 					 } elsif (defined($local_header)) {
 						$req->push_header(_find_header($local_header) => $req_data->object->value);

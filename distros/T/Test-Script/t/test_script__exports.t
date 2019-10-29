@@ -15,6 +15,15 @@ imported_ok $_ for qw(
   script_stderr_isnt
   script_stderr_like
   script_stderr_unlike
+  program_runs
+  program_stdout_is
+  program_stdout_isnt
+  program_stdout_like
+  program_stdout_unlike
+  program_stderr_is
+  program_stderr_isnt
+  program_stderr_like
+  program_stderr_unlike
 );
 
 done_testing;

@@ -16,6 +16,7 @@ maint/cip-before-install
 maint/tags-to-versions.pl
 t/00_diag.t
 t/alien_libxml2.t
+t/c/test.c
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

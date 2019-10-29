@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 

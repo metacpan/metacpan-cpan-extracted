@@ -13,6 +13,7 @@ use Music::Scales;
 my $size = shift || 4;
 my $max  = shift || 8;
 my $bpm  = shift || 90;
+my $mod  = shift || 2; # Default: alternating
 
 my $score = MIDI::Util::setup_score( bpm => $bpm );
 
@@ -45,7 +46,7 @@ sub melody {
     for my $i ( 1 .. $max ) {
         my @notes = map { $scale[ int rand @scale ] } 0 .. @$motif - 1;
 
-        my @phrase = $i % 2 ? @$motif : shuffle @$motif;
+        my @phrase = $i % $mod ? @$motif : shuffle @$motif;
 
         for my $n ( 0 .. @notes - 1 ) {
             $score->n( $phrase[$n], $notes[$n] );

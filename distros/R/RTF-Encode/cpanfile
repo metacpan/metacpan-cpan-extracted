@@ -1,4 +1,6 @@
 requires "Encode" => "0";
+requires "Exporter" => "0";
+requires "parent" => "0";
 recommends "RTF::Writer" => "0";
 
 on 'test' => sub {

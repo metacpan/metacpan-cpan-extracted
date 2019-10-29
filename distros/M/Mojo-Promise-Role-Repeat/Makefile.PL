@@ -13,14 +13,14 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Mojo-Promise-Role-Repeat",
-  "LICENSE" => "perl",
+  "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojo::Promise::Role::Repeat",
   "PREREQ_PM" => {
     "Mojolicious" => "8.23",
     "Role::Tiny" => "2.000001"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

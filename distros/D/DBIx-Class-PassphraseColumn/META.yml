@@ -3,6 +3,7 @@ abstract: 'Automatically hash password/passphrase columns'
 author:
   - 'Florian Ragwitz <rafl@debian.org>'
 build_requires:
+  Authen::Passphrase::AcceptAll: '0'
   Authen::Passphrase::RejectAll: '0'
   DBD::SQLite: '0'
   DBIx::Class::Core: '0'
@@ -11,7 +12,9 @@ build_requires:
   File::Spec: '0'
   Test::More: '0.89'
   lib: '0'
-  perl: '5.006'
+  open: '0'
+  perl: '5.008'
+  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
@@ -29,25 +32,26 @@ no_index:
 provides:
   DBIx::Class::PassphraseColumn:
     file: lib/DBIx/Class/PassphraseColumn.pm
-    version: '0.03'
+    version: '0.05'
 requires:
-  Class::Load: '0'
   DBIx::Class: '0'
   DBIx::Class::InflateColumn::Authen::Passphrase: '0'
+  Encode: '0'
+  Module::Runtime: '0'
   Sub::Name: '0'
   namespace::clean: '0'
   parent: '0'
-  perl: '5.006'
+  perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class-PassphraseColumn
   homepage: https://github.com/karenetheridge/DBIx-Class-PassphraseColumn
   repository: https://github.com/karenetheridge/DBIx-Class-PassphraseColumn.git
-version: '0.03'
+version: '0.05'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.031004'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -78,7 +82,11 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - CONTRIBUTING
+            - INSTALL
+            - LICENCE
+            - README.pod
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -129,7 +137,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::ETHER/InstallGuide'
       version: '1.200013'
@@ -213,7 +221,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
-          max_target_perl: '5.006'
+          max_target_perl: '5.008'
       name: '@Author::ETHER/Test::MinimumVersion'
       version: '2.000010'
     -
@@ -425,7 +433,7 @@ x_Dist_Zilla:
           inherit_version: '0'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
@@ -470,7 +478,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.19.1
+          git_version: 2.23.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -499,7 +507,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
@@ -537,7 +545,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20190522'
+          Module::CoreList: '5.20190920'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -562,7 +570,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.046'
@@ -570,7 +578,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -578,7 +586,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -604,14 +612,14 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.046'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::ETHER/UploadToCPAN'
@@ -679,11 +687,15 @@ x_Dist_Zilla:
           commit_msg: '%N-%v%t%n%n%c'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CONTRIBUTING
             - Changes
+            - INSTALL
+            - LICENCE
+            - README.pod
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -696,11 +708,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.03
+          tag: v0.05
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -737,7 +749,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -759,7 +771,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.046'
@@ -872,7 +884,7 @@ x_Dist_Zilla:
 x_authority: cpan:FLORA
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.31.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

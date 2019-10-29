@@ -6,7 +6,7 @@ Commandline options and arguments understood for TestOnTap processing
 
 =head1 VERSION
 
-Version 1.002
+Version 1.003
 
 =head1 SYNOPSIS
 

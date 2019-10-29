@@ -15,7 +15,8 @@ requires 'Dist::Zilla::Plugin::Test::ReportPrereqs';
 
 requires 'Dist::Zilla::Plugin::StaticInstall';
 
-requires 'Dist::Zilla::Plugin::OurPkgVersion';
+# Fails to set a version due to to a misplaced check fixed in 0.20
+requires 'Dist::Zilla::Plugin::OurPkgVersion', '0.20';
 requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
 requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod';
 requires 'Dist::Zilla::Plugin::MetaProvides::Package';

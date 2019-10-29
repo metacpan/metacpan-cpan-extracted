@@ -26,20 +26,59 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Modern qw(-more -fatal -warnings -deeper);
 use FindBin qw($Bin);
 use Test::FITesque;
 use Test::FITesque::Test;
 
 use lib 't/lib';
 
-my $file = $Bin . '/data/multi.ttl';
+use_ok('Test::FITesque::RDF');
 
-use Test::FITesque::RDF;
+subtest 'Run with no file' => sub {
+  like(
+		 exception { my $suite = Test::FITesque::RDF->new(source => undef)->suite },
+		 qr/Undef did not pass type constraint "Path"/,
+		 'Failed due to missing file'
+		)
+};
 
-my $suite = Test::FITesque::RDF->new(source => $file)->suite;
+subtest 'Run with invalid file' => sub {
+  my $file = $Bin . '/data/invalid.ttl';
+  like(
+		 exception { my $suite = Test::FITesque::RDF->new(source => $file)->suite },
+		 qr|Failed to parse \S+/t/data/invalid.ttl due to|,
+		 'Failed correctly due to parse error'
+		)
+};
 
-$suite->run_tests;
+subtest 'Run with no tests file' => sub {
+  my $file = $Bin . '/data/notests.ttl';
+  like(
+		 exception { my $suite = Test::FITesque::RDF->new(source => $file)->suite },
+		 qr|No tests found in \S+t/data/notests.ttl|,
+		 'Failed correctly due to no test error'
+		)
+};
 
+subtest 'Run with no descriptions in file' => sub {
+  my $file = $Bin . '/data/undescribed.ttl';
+  my @expect = (ignore(), ignore()); # TODO: Improve pattern matching
+  cmp_deeply(
+				 warning { my $suite = Test::FITesque::RDF->new(source => $file)->suite },
+				 bag(@expect),
+				 'Failed correctly due to undescribed test error'
+				)
+};
+
+
+
+subtest 'Test multiple tests' => sub {
+  my $file = $Bin . '/data/multi.ttl';
+  my $suite = Test::FITesque::RDF->new(source => $file)->suite;
+  $suite->run_tests;
+};
+  
 done_testing;
   
 

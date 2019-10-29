@@ -13,11 +13,11 @@ HTML::Tidy5 - HTML validation in a Perl object
 
 =head1 VERSION
 
-Version 1.04
+Version 1.06
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 =head1 SYNOPSIS
 
@@ -414,10 +414,6 @@ You can also look for information at:
 =item * HTML::Tidy5's issue queue at github
 
 L<http://github.com/petdance/html-tidy5/issues>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/HTML-Tidy5>
 
 =item * CPAN Ratings
 

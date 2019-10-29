@@ -1,7 +1,7 @@
 package App::ScreensaverUtils;
 
 our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,6 +71,8 @@ sub prevent_screensaver_activated_until_interrupted {
 
     my %args = @_;
 
+    print "Now preventing screensaver from being activated. ",
+        "Press Ctrl-C to stop.\n";
     my $exit = Proc::Govern::govern_process(
         command => ['sleep', 'infinity'],
         no_screensaver => 1,
@@ -127,7 +129,7 @@ App::ScreensaverUtils - CLI utilities related to screensaver
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ScreensaverUtils (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
+This document describes version 0.008 of App::ScreensaverUtils (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 =head1 DESCRIPTION
 

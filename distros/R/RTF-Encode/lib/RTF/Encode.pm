@@ -1,16 +1,16 @@
 package RTF::Encode;
 # vim:ts=4:shiftwidth=4:expandtab
 
-# ABSTRACT: Escapes string into RTF
+# ABSTRACT: Escapes strings into RTF
 
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 NAME
 
-RTF::Encode
+RTF::Encode - Escapes strings into RTF
 
 =head1 SYNOPSIS
 
@@ -91,6 +91,11 @@ L<http://www.biblioscape.com/rtf15_spec.htm>
 =head1 AUTHOR
 
 Dave Lambley <dlambley@cpan.org>
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 

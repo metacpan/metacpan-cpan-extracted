@@ -5,7 +5,7 @@ use 5.010_001;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -18,6 +18,7 @@ use App::Pods2Site::Util qw(slashify);
 use Cwd;
 use File::Basename;
 use File::Copy;
+use File::Path qw(make_path);
 
 # main entry point
 #
@@ -39,6 +40,31 @@ sub main
 	my $podFinder = App::Pods2Site::PodFinder->new($args);
 	my ($sum, $partCounts) = $podFinder->getCounts(); 
 	die("No pods found!\n") unless $sum;
+
+	my $mainpagename = $args->getMainpage();
+	my $mainpage;
+	if ($mainpagename eq ':std')
+	{
+		$mainpage = $mainpagename;
+	}
+	else
+	{
+		foreach my $group (@{$podFinder->getGroups()})
+		{
+			foreach my $pod (@{$group->{pods}})
+			{
+				if ($pod->{name} eq $mainpagename)
+				{
+					$mainpage = $pod->{name};
+					$mainpage =~ s{::}{/}g;
+					$mainpage = "pod2html/$group->{name}/$mainpage.html";
+					last;
+				}
+			}
+		}
+	}
+	die("Failed to find the main page pod named '$mainpagename'\n") unless $mainpage;
+
 	my $counts = '';
 	foreach my $groupDef (@{$args->getGroupDefs()})
 	{
@@ -51,6 +77,12 @@ sub main
 	my $podCopier = App::Pods2Site::PodCopier->new($args, $podFinder);
 	print "Prepared ", $podCopier->getCount(), " files\n" if $args->isVerboseLevel(0);
 
+	my $siteDir = $args->getSiteDir();
+	if (!-d $siteDir)
+	{
+		make_path($siteDir) || die("Failed to create sitedir '$siteDir': $!\n");
+	}
+
 	my $sitebuilder = $args->getSiteBuilder(); 
 
 	$sitebuilder->prepareCss($args);
@@ -60,11 +92,13 @@ sub main
 
 	print "Generated ", $pod2html->getGenerated(), " documents (", $pod2html->getUptodate(), " up to date)\n" if $args->isVerboseLevel(0);
 
-	$sitebuilder->makeSite($args, $podCopier->getWorkGroups(), $partCounts);
+	$sitebuilder->makeSite($args, $podCopier->getWorkGroups(), $partCounts, $mainpage);
+
+	$args->finish();
 	
-	my $siteDir = $args->getSiteDir();
 	my $style = $args->getStyle();
-	print "Site created in '$siteDir' using style '$style'.\n" if $args->isVerboseLevel(0);
+	my $updatedOrCreated = $args->getUpdating() ? 'updated' : 'created';
+	print "Site $updatedOrCreated in '$siteDir' using style '$style'.\n" if $args->isVerboseLevel(0);
 
 	chdir($cwd);
 	

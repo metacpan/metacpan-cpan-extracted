@@ -7,7 +7,7 @@ as a simple documentation site for your Perl installation.
 
 =head1 VERSION
 
-Version 1.002
+Version 1.003
 
 =head1 SYNOPSIS
 

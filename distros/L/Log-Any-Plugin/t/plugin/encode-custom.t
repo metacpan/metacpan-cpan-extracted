@@ -20,9 +20,15 @@ use Log::Any qw( $log );
 
 
 my $msg = "鸿涛 \x{1f4A9} -- adapter with encoding set should have no warnings or errors on wide char output";
+
 my $encoding = 'UTF-16';
 my $encoder = find_encoding($encoding)
     or croak "No encoder found for encoding[$encoding]";
+
+my $encoded_msg = $encoder->encode($msg);
+
+my $msg_rx = qr/\Q$msg\E/;
+my $encoded_msg_rx = qr/\Q$encoded_msg\E/;
 
 
 note 'log->error expected to be available to test functionality'; {
@@ -33,7 +39,7 @@ note 'log->error expected to be available to test functionality'; {
     $log->error("test");
 
     is( scalar @{$log->msgs()}, 1, "Exactly 1 error message expected to be logged" );
-    $log->contains_ok("test", "message[test] expected to be logged");
+    $log->contains_ok(qr/test/, "message[test] expected to be logged");
 }
 
 note 'Encode has not been applied yet. Check default behaviour.'; {
@@ -41,8 +47,8 @@ note 'Encode has not been applied yet. Check default behaviour.'; {
 
     $log->error($msg);
 
-    $log->does_not_contain_ok($encoder->encode($msg), 'no encoded message occurs');
-    $log->contains_ok($msg, 'but still logged in original form');
+    $log->does_not_contain_ok($encoded_msg_rx, 'no encoded message occurs');
+    $log->contains_ok($msg_rx, 'but still logged in original form');
 }
 
 note "Applying Encode plugin with custom [$encoding] encoding"; {
@@ -55,7 +61,7 @@ note 'Check that logged message now encoded'; {
 
     $log->error($msg);
 
-    $log->contains_ok($encoder->encode($msg), 'message is logged and encoded');
+    $log->contains_ok($encoded_msg_rx, 'message is logged and encoded');
 }
 
 

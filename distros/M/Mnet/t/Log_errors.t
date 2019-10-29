@@ -32,12 +32,12 @@ Execution of -e aborted due to compilation errors.
     ' -- 2>&1`;
     $out =~ s/^(err - main perl warn,  at) .*/$1 .../m;
     $out =~ s/^(err - main perl warn,)\s+(Mnet::Log::__ANON__).*/$1   $2 .../m;
-    Test::More::is($out, ' -  - Mnet::Log -e started
+    Test::More::is($out, '--- - Mnet::Log -e started
 ERR - main perl warn, Use of uninitialized value in addition (+) at -e line 6.
 err - main perl warn,  at ...
 err - main perl warn,   Mnet::Log::__ANON__ ...
 err - main perl warn, $? = 0
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'perl runtime warning');
 }
 
@@ -52,12 +52,12 @@ err - main perl warn, $? = 0
     ' -- 2>&1`;
     $out =~ s/^(err - main perl warn,  at) .*/$1 .../m;
     $out =~ s/^(err - main perl warn,)\s+(Mnet::Log::__ANON__).*/$1   $2 .../m;
-    Test::More::is($out, ' -  - Mnet::Log -e started
+    Test::More::is($out, '--- - Mnet::Log -e started
 ERR - main perl warn, warn command at -e line 6.
 err - main perl warn,  at ...
 err - main perl warn,   Mnet::Log::__ANON__ ...
 err - main perl warn, $? = 0
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'perl warn command');
 }
 
@@ -72,12 +72,12 @@ err - main perl warn, $? = 0
     ' -- 2>&1`;
     $out =~ s/^(err - main perl die,  at) .*/$1 .../m;
     $out =~ s/^(err - main perl die,)\s+(Mnet::Log::__ANON__).*/$1   $2 .../m;
-    Test::More::is($out, ' -  - Mnet::Log -e started
+    Test::More::is($out, '--- - Mnet::Log -e started
 ERR - main perl die, die command at -e line 6.
 err - main perl die,  at ...
 err - main perl die,   Mnet::Log::__ANON__ ...
 err - main perl die, $? = 0
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'perl die command');
 }
 
@@ -88,10 +88,10 @@ Test::More::is(`$perl -e '
     use Mnet::Log qw( DEBUG INFO WARN FATAL );
     use Mnet::Log::Test;
     eval { warn "warn eval"; my \$x = 1 + undef; }
-' -- 2>&1 | grep -v ^err`, ' -  - Mnet::Log -e started
+' -- 2>&1 | grep -v ^err`, '--- - Mnet::Log -e started
 ERR - main perl warn, warn eval at -e line 6.
 ERR - main perl warn, Use of uninitialized value in addition (+) at -e line 6.
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'eval with perl warn');
 
 # check perl warnings in eval with sig handler trapping warnings
@@ -142,9 +142,9 @@ Test::More::is(`echo; $perl -e '
     use Mnet::Log::Test;
     eval { WARN "fatal eval" };
 ' -- 2>&1`, '
- -  - Mnet::Log -e started
+--- - Mnet::Log -e started
 WRN - main fatal eval
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'eval with fatal function call');
 
 

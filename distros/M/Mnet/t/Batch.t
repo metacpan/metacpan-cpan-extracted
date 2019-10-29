@@ -4,57 +4,107 @@
 # required modules
 use warnings;
 use strict;
-use File::Temp;
+use Mnet::T;
 use Test::More tests => 3;
 
-# use current perl for tests
-my $perl = $^X;
-
 # batch without mnet cli
-Test::More::is(`( echo child1; echo child2 child3 ) | $perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Batch;
-    my \$line = Mnet::Batch::fork({ batch => "/dev/stdin" });
-    exit if not defined \$line;
-    syswrite STDOUT, "line = \$line\n";
-' -- parent 2>&1`, 'line = child1
-line = child2 child3
-', 'batch without mnet cli');
+Mnet::T::test_perl({
+    name    => 'batch without mnet cli',
+    pre     => <<'    pre-eof',
+        export BATCH=$(mktemp); echo '
+            arg1
+            arg2 arg3
+        ' >$BATCH
+    pre-eof
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Batch;
+        use Mnet::Log;
+        use Mnet::Log::Test;
+        use Mnet::Opts::Set::Debug;
+        my $line = Mnet::Batch::fork({ batch => $ENV{BATCH} });
+        exit if not defined $line;
+        syswrite STDOUT, "line = $1\n" if $line =~ /^\s*(.*)/;
+    perl-eof
+    post    => 'rm $BATCH',
+    filter  => 'grep -v ^dbg | grep -v ^---',
+    expect  => '
+        line = arg1
+        line = arg2 arg3
+    ',
+    debug   => '',
+});
+
+# batch with mnet cli
+Mnet::T::test_perl({
+    name    => 'batch with mnet cli',
+    pre     => <<'    pre-eof',
+        export BATCH=$(mktemp); echo '
+            --opt1 1 --opt2 1
+            --opt1 2
+        ' >$BATCH
+    pre-eof
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Batch;
+        use Mnet::Log;
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        use Mnet::Opts::Set::Debug;
+        Mnet::Opts::Cli::define({ getopt => "opt1=i", recordable  => 1 });
+        Mnet::Opts::Cli::define({ getopt => "opt2=i", recordable  => 1 });
+        my $cli = Mnet::Opts::Cli->new;
+        $cli = Mnet::Batch::fork($cli);
+        exit if not $cli;
+        syswrite STDOUT, "opt1 = $cli->{opt1}, opt2 = $cli->{opt2}\n";
+    perl-eof
+    args    => '--batch $BATCH --opt1 3 --opt2 3',
+    post    => 'rm $BATCH',
+    filter  => 'grep -v ^dbg | grep -v ^---',
+    expect  => '
+        opt1 = 1, opt2 = 1
+        opt1 = 2, opt2 = 3
+    ',
+    debug   => '',
+});
 
 # batch with mnet cli and extras
-Test::More::is(`( echo --opt1 1 --opt2 1; echo --opt1 2 ) | $perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Batch;
-    use Mnet::Opts::Cli;
-    Mnet::Opts::Cli::define({ getopt => "opt1=i", recordable  => 1 });
-    Mnet::Opts::Cli::define({ getopt => "opt2=i", recordable  => 1 });
-    my \$cli = Mnet::Opts::Cli->new;
-    \$cli = Mnet::Batch::fork(\$cli);
-    exit if not \$cli;
-    syswrite STDOUT, "opt1 = \$cli->{opt1}, opt2 = \$cli->{opt2}\n";
-' -- --batch /dev/stdin --opt1 3 --opt2 3 2>&1`, 'opt1 = 1, opt2 = 1
-opt1 = 2, opt2 = 3
-', 'batch with mnet cli');
-
-# batch with mnet cli and extras
-Test::More::is(`( echo --opt 1 child; echo --opt 2 ) | $perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Batch;
-    use Mnet::Opts::Cli;
-    Mnet::Opts::Cli::define({ getopt => "opt=i", recordable  => 1 });
-    my (\$cli, \@extras) = Mnet::Opts::Cli->new;
-    (\$cli, \@extras) = Mnet::Batch::fork(\$cli);
-    exit if not defined \$cli;
-    syswrite STDOUT, "opt = \$cli->{opt}\n" if \$cli->{opt};
-    syswrite STDOUT, "extras = \@extras\n" if \@extras;
-' -- --batch /dev/stdin parent 2>&1`, 'opt = 1
-extras = parent child
-opt = 2
-extras = parent
-', 'batch with mnet cli and extras');
+Mnet::T::test_perl({
+    name    => 'batch with mnet cli and extras',
+    pre     => <<'    pre-eof',
+        export BATCH=$(mktemp); echo '
+            --opt 1 child
+            --opt 2
+        ' >$BATCH
+    pre-eof
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Batch;
+        use Mnet::Log;
+        use Mnet::Log::Test;
+        use Mnet::Opts::Cli;
+        use Mnet::Opts::Set::Debug
+        Mnet::Opts::Cli::define({ getopt => "opt=i" });
+        my ($cli, @extras) = Mnet::Opts::Cli->new;
+        ($cli, @extras) = Mnet::Batch::fork($cli);
+        exit if not $cli;
+        syswrite STDOUT, "opt = $cli->{opt}\n" if $cli->{opt};
+        syswrite STDOUT, "extras = @extras\n" if @extras;
+    perl-eof
+    args    => '--batch $BATCH parent',
+    post    => 'rm $BATCH',
+    filter  => 'grep -v ^dbg | grep -v ^inf | grep -v ^---',
+    expect  => '
+        opt = 1
+        extras = parent child
+        opt = 2
+        extras = parent
+    ',
+    debug   => '',
+});
 
 # finished
 exit;

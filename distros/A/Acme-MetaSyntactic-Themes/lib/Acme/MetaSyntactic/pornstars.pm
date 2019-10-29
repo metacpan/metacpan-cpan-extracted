@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::pornstars;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -67,6 +67,12 @@ Sébastien Aperghis-Tramoni, Philippe Bruhat, Rafaël Garcia-Suarez.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-10-28 - v1.033
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.054.
 
 =item *
 
@@ -421,13 +427,13 @@ Amy_Fisher
 Andrea_True
 Andy_San_Dimas
 Angela_White
-Angel_Dark
 Angelica_Bella
 Angelina_Armani
 Angel_Kelly
 Anikka_Albrite
 Anksa_Kara
 Annabel_Chong
+Anna_Bell_Peaks
 Anna_Malle
 Anna_Polina
 Annette_Haven
@@ -456,7 +462,6 @@ Belladonna
 Belle_Knox
 Bibian_Norai
 BiBi_Jones
-Bionca
 Bobbi_Eden
 Bobbi_Starr
 Bodil_Joensen
@@ -501,7 +506,6 @@ Christy_Mack
 C_J_Laing
 Clara_Morgane
 Coralie
-Courtney_Simpson
 Crave
 Crissy_Moran
 Cytherea
@@ -509,7 +513,6 @@ Daisy_Marie
 Dana_DeArmond
 Dana_Vespoli
 Dani_Daniels
-Daniella_Rush
 Danni_Ashe
 Debi_Diamond
 Demi_Delia
@@ -528,7 +531,6 @@ Elly_Akira
 Emanuelle_Cristaldi
 Erica_Boyer
 Erica_Ellyson
-Erica_Fontes
 Erin_Brown
 Estelle_Desanges
 Eva_Angelina
@@ -538,7 +540,6 @@ Felecia
 Felicia_Fox
 Felicia_Tang
 Fiona_Richmond
-Flower_Tucci
 Francesca_Le
 Gauge
 Georgina_Spelvin
@@ -614,7 +615,6 @@ Kylie_Ireland
 Lacy_Rose
 Laly
 Lara_Roxx
-Laura_Angel
 Lauren_Brice
 Lauren_Phoenix
 Laure_Sainclair
@@ -693,7 +693,6 @@ Nikki_Delano
 Nikki_Dial
 Nikki_Tyler
 Nina_Hartley
-Nina_Mercedez
 Nina_Roberts
 Nozomi_Momoi
 Nyomi_Banxxx
@@ -712,7 +711,6 @@ Prinzzess
 Priya_Rai
 Puma_Swede
 Raffaela_Anderson
-Raven_Alexis
 Raven_Riley
 Raylene
 RayVeness
@@ -830,7 +828,6 @@ Alban_Ceray
 Alexandre_Frota
 Alex_Sanders
 Anthony_Crane
-Anthony_Rosano
 Arpad_Miklos
 Barrett_Blade
 Ben_Dover
@@ -906,8 +903,6 @@ Jack_Napier
 Jack_Radcliffe
 James_Deen
 Jamie_Gillis
-Jan_Fischer
-Jan_Novak
 Jason_Hawke
 Jay_Grdina
 Jean_Val_Jean
@@ -917,7 +912,6 @@ Jeremy_Tucker
 Jerry_Butler
 Jesse_Santana
 Joey_Silvera
-Johan_Paulik
 John_Bailey
 John_B_Root
 John_Holmes
@@ -940,7 +934,6 @@ Keiran_Lee
 Keni_Styles
 Ken_Ryker
 Ken_Shimizu
-Kent_North
 Kevin_James
 Kostas_Gousgounis
 Kristen_Bjorn
@@ -949,7 +942,6 @@ Leo_Ford
 Lexington_Steele
 Logan_McCree
 Long_Dong_Silver
-Luc_Wylder
 Luka_Magnotta
 Lukas_Ridgeston
 Mandingo
@@ -960,7 +952,6 @@ Marc_Stevens
 Marc_Wallice
 Mark_Dalton
 Mark_Davis
-Mark_Wood
 Matthew_Rush
 Matt_Sanchez
 Max_Hardcore

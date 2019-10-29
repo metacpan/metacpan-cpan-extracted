@@ -31,8 +31,8 @@ sub run_system {
 sub wholefile {
     my $file = shift;
     my $fh = IO::File->new ($file) or die "%Error: $! $file";
-    my $wholefile = join('',$fh->getlines());
-    $fh->close();
+    my $wholefile = join('',$fh->getlines);
+    $fh->close;
     return $wholefile;
 }
 

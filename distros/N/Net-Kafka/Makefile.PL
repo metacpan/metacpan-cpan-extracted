@@ -1,3 +1,4 @@
+use 5.22.0;
 use strict;
 use warnings;
 
@@ -11,7 +12,7 @@ use constant LIBRDKAFKA_MIN_VERSION => "1.0.0";
 # of the system-wide, do something like:
 # PKG_CONFIG_PATH=/usr/local/lib/pkgconfig perl Makefile.PL
 # or whatever is the actual installation path
-my %rdkafka = ExtUtils::PkgConfig->find( 'rdkafka' );
+my %rdkafka = ExtUtils::PkgConfig->find('rdkafka');
 
 warn sprintf(
     "WARNING: Installed librdkafka version %s is lower than tested %s",
@@ -20,9 +21,6 @@ warn sprintf(
 ) if $rdkafka{modversion} lt LIBRDKAFKA_MIN_VERSION;
 
 print "Compiling Net::Kafka with librdkafka $rdkafka{modversion}\n\n";
-
-my $preop = 'perl -MPod::Markdown -e \'Pod::Markdown->new->filter(@ARGV)\' $(VERSION_FROM) | tee $(DISTVNAME)/README.md > README.md;' .
-            'pod2readme $(VERSION_FROM) $(DISTVNAME)/README';
 
 WriteMakefile(
     NAME          => 'Net::Kafka',
@@ -35,7 +33,7 @@ WriteMakefile(
         'Osama Elsayed <osama.elsayed@booking.com>',
         'Eduardo Dalla Favera <eduardo.dallafavera@booking.com>',
         'Pavel Gurkov <pavel.gurkov@booking.com>',
-        'Przemysław Iskra <sparky@pld-linux.org>',
+        'Przemyslaw Iskra <sparky@pld-linux.org>',
         'Alex Mironov <alex.mironov@booking.com>',
         'Pavel Shaydo <zwon@cpan.org>',
     ],
@@ -49,9 +47,6 @@ WriteMakefile(
         'AnyEvent'               => 0,
         'Test::More'             => 0,
         'AnyEvent::XSPromises'   => 0,
-    },
-    dist          => {
-        PREOP => $preop,
     },
     META_MERGE    => {
         "meta-spec" => { version => 2 },
@@ -67,6 +62,7 @@ WriteMakefile(
             },
         },
     },
+    MIN_PERL_VERSION    => '5.22.0',
     CONFIGURE_REQUIRES  => {
         'ExtUtils::MakeMaker' => 0,
         'ExtUtils::PkgConfig' => 0,

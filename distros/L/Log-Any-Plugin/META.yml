@@ -41,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-Plugin
   homepage: http://search.cpan.org/dist/Log-Any-Plugin
   repository: git://github.com/sdt/log-any-plugin.git
-version: '0.008'
+version: '0.010'
 x_contributors:
   - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Kamal Advani <kamal@namingcrisis.net>'

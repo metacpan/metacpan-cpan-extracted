@@ -86,11 +86,11 @@
    "provides" : {
       "XML::Grammar::Fortune" : {
          "file" : "lib/XML/Grammar/Fortune.pm",
-         "version" : "0.0702"
+         "version" : "0.0800"
       },
       "XML::Grammar::Fortune::ToText" : {
          "file" : "lib/XML/Grammar/Fortune/ToText.pm",
-         "version" : "0.0702"
+         "version" : "0.0800"
       }
    },
    "release_status" : "stable",
@@ -105,10 +105,10 @@
          "web" : "https://github.com/shlomif/fortune-xml"
       }
    },
-   "version" : "0.0702",
+   "version" : "0.0800",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -233,7 +233,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -578,7 +578,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15"
 }
 

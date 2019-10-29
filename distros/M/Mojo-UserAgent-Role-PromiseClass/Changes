@@ -1,3 +1,6 @@
+0.006     Oct 26 2019
+        * split out Mojo::Base::Role::PromiseClass
+
 0.005     Oct 25 2019
         * restore Class::Method::Modifiers prereq dropped by Dist::Zilla switch
 

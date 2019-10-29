@@ -15,38 +15,50 @@ ok(length($promise_class), 'with_roles works');
 
 sub loop_test {
     my $start = shift;
-    my $is_r_u_s = shift;
-    my $repeat = $is_r_u_s ? 'repeat_catch' : 'repeat';
-    my $out='';
-    my $p;
-    $promise_class->$repeat(
-	$start,
-	sub {
-	    my $n = 0+shift;
-	    $_->(12) if $n <= 0;
-	    $out .= "($n)";
-	    return $promise_class->new(sub {$_[0]->(2)}) if $n == 11;
-	    return $promise_class->new(sub {$_[1]->(3)}) if $n == 14;
-	    die b(13) if $n == 7;
-	    if ($is_r_u_s) { --$n; die b($n); } else { return $n-1; }
-	})
-      ->tap( sub { weaken($p = $_); })
-      ->then( sub { $out .= shift; },
-	      sub { $out .= '!'.shift; })->wait;
-    ok(!defined $p, "gc happened for $start");
-    return $out;
+    my $is_repeat_catch = shift;
+    my $expect = shift;
+    my $title = shift;
+    my $repeat = $is_repeat_catch ? 'repeat_catch' : 'repeat';
+    my $out;
+    my $loop_body = sub {
+	my $n = 0+shift;
+	$_->(12) if $n <= 0;
+	$out .= "($n)";
+	return $promise_class->new(sub {$_[0]->(2)}) if $n == 11;
+	return $promise_class->new(sub {$_[1]->(3)}) if $n == 14;
+	die b(13) if $n == 7;
+	if ($is_repeat_catch) {
+	    --$n; die b($n);
+	}
+	else {
+	    return $n-1;
+	}
+    };
+    for my $clobj ($promise_class, $promise_class->new) {
+	my $p;
+	$out = '';
+	$clobj
+	  ->$repeat( $start, $loop_body )
+	  ->tap( sub { weaken($p = $_); })
+	  ->then( sub { $out .= shift; },
+		  sub { $out .= '!'.shift; })
+	  ->tap( sub { unless (ref $clobj) { } elsif ($is_repeat_catch) { $clobj->reject(); } else { $clobj->resolve(); }})
+	  ->wait;
+	ok(!defined $p, "gc happened for $start");
+	is ($out, $expect, $title);
+    }
 }
 
-is(loop_test(5), "(5)(4)(3)(2)(1)12", 'break');
-is(loop_test(9), "(9)(8)(7)!13", 'die');
-is(loop_test(12), "(12)(11)(2)(1)12", 'presolved');
-is(loop_test(15), "(15)(14)!3", 'prejected');
-is(loop_test(-1), "12", 'first iteration');
-is(loop_test(5,1), "(5)(4)(3)(2)(1)!12", 'break');
-is(loop_test(9,1), "(9)(8)(7)(13)(12)(11)2", 'die');
-is(loop_test(12,1), "(12)(11)2", 'presolved');
-is(loop_test(15,1), "(15)(14)(3)(2)(1)!12", 'prejected');
-is(loop_test(-1,1), "!12", 'first iteration');
+loop_test( 5,0, "(5)(4)(3)(2)(1)12", 'break');
+loop_test( 9,0, "(9)(8)(7)!13", 'die');
+loop_test(12,0, "(12)(11)(2)(1)12", 'presolved');
+loop_test(15,0, "(15)(14)!3", 'prejected');
+loop_test(-1,0, "12", 'first iteration');
+loop_test( 5,1, "(5)(4)(3)(2)(1)!12", 'break');
+loop_test( 9,1, "(9)(8)(7)(13)(12)(11)2", 'die');
+loop_test(12,1, "(12)(11)2", 'presolved');
+loop_test(15,1, "(15)(14)(3)(2)(1)!12", 'prejected');
+loop_test(-1,1, "!12", 'first iteration');
 
 sub break_test {
     my @s = split '',shift;

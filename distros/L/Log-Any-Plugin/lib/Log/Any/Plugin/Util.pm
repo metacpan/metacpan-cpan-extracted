@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Util;
 # ABSTRACT: Utilities for Log::Any::Plugin classes
-$Log::Any::Plugin::Util::VERSION = '0.008';
+$Log::Any::Plugin::Util::VERSION = '0.010';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -55,7 +55,7 @@ Log::Any::Plugin::Util - Utilities for Log::Any::Plugin classes
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 DESCRIPTION
 

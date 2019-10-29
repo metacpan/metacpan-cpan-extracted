@@ -61,8 +61,8 @@ my $p3 = $fork->schedule(label=>'p3',
 			 #run_after => ['p1 | p2'],
 			 );
 
-$fork->ready_all();
-$fork->wait_all();
+$fork->ready_all;
+$fork->wait_all;
 
 print "ALL DONE ==> $$\n";
 ok(1, "done");

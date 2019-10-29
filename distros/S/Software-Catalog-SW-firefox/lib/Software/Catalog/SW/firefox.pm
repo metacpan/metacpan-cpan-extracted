@@ -1,7 +1,7 @@
 package Software::Catalog::SW::firefox;
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,7 +19,7 @@ sub meta {
     };
 }
 
-sub get_latest_version {
+sub latest_version {
     my ($self, %args) = @_;
 
     extract_from_url(
@@ -37,7 +37,7 @@ sub canon2native_arch_map {
     },
 }
 
-sub get_download_url {
+sub download_url {
     my ($self, %args) = @_;
 
     # XXX version, language
@@ -54,7 +54,7 @@ sub get_download_url {
     # "https://archive.mozilla.org/pub/firefox/releases/62.0/source/"
 }
 
-sub get_archive_info {
+sub archive_info {
     my ($self, %args) = @_;
     [200, "OK", {
         programs => [
@@ -62,6 +62,8 @@ sub get_archive_info {
         ],
     }];
 }
+
+sub dedicated_profile { 1 }
 
 1;
 # ABSTRACT: Firefox
@@ -78,7 +80,7 @@ Software::Catalog::SW::firefox - Firefox
 
 =head1 VERSION
 
-This document describes version 0.004 of Software::Catalog::SW::firefox (from Perl distribution Software-Catalog-SW-firefox), released on 2018-10-05.
+This document describes version 0.006 of Software::Catalog::SW::firefox (from Perl distribution Software-Catalog-SW-firefox), released on 2019-10-26.
 
 =for Pod::Coverage ^(.+)$
 
@@ -104,7 +106,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

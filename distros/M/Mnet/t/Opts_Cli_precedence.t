@@ -18,8 +18,8 @@ Test::More::is(`$perl -e '
     use Mnet::Opts::Cli;
     my \$cli = Mnet::Opts::Cli->new;
     warn "quiet" if defined \$cli->quiet;
-' -- 2>&1`, ' -  - Mnet::Log -e started
- -  - Mnet::Log finished with no errors
+' -- 2>&1`, '--- - Mnet::Log -e started
+--- - Mnet::Log finished with no errors
 ', 'default option value');
 
 # check that pragma setting overrides default

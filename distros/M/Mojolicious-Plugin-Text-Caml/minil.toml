@@ -2,6 +2,6 @@ name = "Mojolicious-Plugin-Text-Caml"
 badges = ["metacpan"]
 authority="cpan:CYNOVG"
 module_maker="ModuleBuildTiny"
-license="gpl_3"
+license="lgpl_3_0"
 [release]
 pause_config = "/home/cynovg/.pause"

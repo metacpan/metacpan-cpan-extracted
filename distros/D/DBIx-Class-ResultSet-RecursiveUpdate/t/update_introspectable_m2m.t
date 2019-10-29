@@ -69,7 +69,7 @@ $dbic_trace->clear;
 $dvd_rs->recursive_update(\%updates);
 
 ok ! $dbic_trace->count_messages('^DELETE FROM dvdtag WHERE \( dvd = \? \)'), "add one: update did not remove all tags'";
-is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 1, "add one: update executed one delete";
+is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 0, "add one: update executed no delete";
 is $dbic_trace->count_messages("^INSERT INTO dvdtag "), 1, "add one: update executed one insert";
 
 is $dvd_item->tags_rs->count, 3, "add one: DVD item has 3 tags";
@@ -117,7 +117,7 @@ $dbic_trace->clear;
 $dvd_rs->recursive_update(\%updates);
 
 ok ! $dbic_trace->count_messages('^DELETE FROM dvdtag WHERE \( dvd = \? \)'), "add several: update did not remove all tags'";
-is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 1, "add several: update executed one delete";
+is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 0, "add several: update executed no delete";
 is $dbic_trace->count_messages("^INSERT INTO dvdtag "), 3, "add several: update executed three inserts in dvdtag";
 is $dbic_trace->count_messages("^INSERT INTO tag "), 3, "add several: update executed three inserts in tag";
 
@@ -141,7 +141,7 @@ $dbic_trace->clear;
 $dvd_rs->recursive_update(\%updates);
 
 ok ! $dbic_trace->count_messages('^DELETE FROM dvdtag WHERE \( dvd = \? \)'), "add several: update did not remove all tags'";
-is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 1, "add several: update executed one delete";
+is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 0, "add several: update executed no delete";
 is $dbic_trace->count_messages("^INSERT INTO dvdtag "), 0, "add several: update executed no inserts in dvdtag";
 is $dbic_trace->count_messages("^UPDATE tag "), 5, "add several: update executed five updates in tag";
 
@@ -194,7 +194,7 @@ $dbic_trace->clear;
 $dvd_rs->recursive_update(\%updates);
 
 ok ! $dbic_trace->count_messages('^DELETE FROM dvdtag WHERE \( dvd = \? \)'), "add several: update did not remove all tags'";
-is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 1, "add several: update executed one delete";
+is $dbic_trace->count_messages("^DELETE FROM dvdtag "), 0, "add several: update executed no delete";
 is $dbic_trace->count_messages("^INSERT INTO dvdtag "), 2, "add several: update executed two inserts in dvdtag";
 is $dbic_trace->count_messages("^UPDATE tag "), 3, "add several: update executed three updates in tag";
 

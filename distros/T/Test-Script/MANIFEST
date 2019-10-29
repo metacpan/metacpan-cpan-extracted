@@ -24,6 +24,9 @@ t/bin/warnon.pl
 t/bug_gh9.t
 t/test_script__exports.t
 t/test_script__import.t
+t/test_script__program_runs.t
+t/test_script__program_stderr.t
+t/test_script__program_stdout.t
 t/test_script__script_compiles.t
 t/test_script__script_runs.t
 t/test_script__script_stderr.t

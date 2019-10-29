@@ -1,7 +1,8 @@
 Revision history for Perl extension Mojolicious-Plugin-Template-Mustache
 
-0.04 2019-09-19T13:45:08Z
-    - migrate to gitlab
+0.05 2019-10-29T07:09:10Z
+    - fix minimal version for Mojolicious
+    - change license to LGPL
 
 0.03 2017-07-18T08:04:42Z
     - adapted the code to the new version Template::Mustache

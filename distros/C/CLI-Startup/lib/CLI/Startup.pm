@@ -23,7 +23,7 @@ use Getopt::Long qw{
 use Exporter 'import';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.23';    # Don't forget to update the manpage version, too!
+our $VERSION = '0.24';    # Don't forget to update the manpage version, too!
 
 use Readonly;
 Readonly my $V_FOR_VERBOSE => 'ALIAS OF VERBOSE';
@@ -1248,7 +1248,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =head1 SYNOPSIS
 

@@ -74,7 +74,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Identifier"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "brian d foy <brian.d.foy@gmail.com>",
       "Ere Maijala <ere.maijala@helsinki.fi>",

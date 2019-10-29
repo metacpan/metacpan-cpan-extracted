@@ -74,7 +74,7 @@ SKIP:
 
     package DieOnStringify;
     use overload '""' => \&stringify;
-    sub new { bless {}, shift }
+    sub new       { bless {}, shift }
     sub stringify { die 'DieOnStringify exception' }
 }
 

@@ -30,11 +30,15 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
 our $errstr = '';       # will hold any error messages
+
+# Defaulting a result set's fields to undef changes the way DBD::Mock responds, so we default it to off
+our $DefaultFieldsToUndef = 0; 
+
 
 sub driver {
     return $drh if defined $drh;
@@ -1071,6 +1075,78 @@ To clear the current mocked table info set the database handle's C<mock_clear_ta
 
   $dbh->{mock_clear_table_info} = 1;
 
+=item Result Set Callbacks
+
+If you need your result sets to be more dynamic (e.g. if they need to return different results based upon a bound parameter) then you can use a callback.
+
+  $dbh->{mock_add_resultset} = {
+      sql => 'SELECT a FROM b WHERE c = ?',
+      callback => sub {
+          my @bound_params = @_;
+
+          my %result = (
+              fields => [ "a" ],
+              rows => [[ 1] ]
+          );
+
+          if ($bound_params[0] == 1) {
+              $result{rows} = [ [32] ];
+          } elsif ($bound_params[0] == 2) {
+              $result{rows} = [ [43] ];
+          }
+
+          return %result;
+      },
+  };
+
+  my $sth = $dbh->prepare('SELECT a FROM b WHERE c = ?');
+
+  my $rows = $sth->execute(1);
+  my ($result) = $sth->fetchrow_array();  # $result will be 32
+    
+  $rows = $sth->execute(2);
+  ($result) = $sth->fetchrow_array();  # $result this time will be 43
+    
+  $rows = $sth->execute(33); # $results this time will be 1
+    
+  ($result) = $sth->fetchrow_array();
+
+
+The callback needs to return a hash with a C<rows> key that is an array ref of arrays containing the values to return as the answer to the query. In addition a C<fields> key can also be returned with an array ref of field names. If a C<fields> key isn't present in the returned the hash then the fields will be taken from the C<mock_add_resultset>'s C<results> parameter.
+
+  $dbh->{mock_add_resultset} = {
+      sql => 'SELECT x FROM y WHERE z = ?',
+      results => [ ["x"] ],
+      callback => sub {
+          my @bound_params = @_;
+
+          my %result = ( rows => [[ 1] ] );
+
+          if ($bound_params[0] == 1) {
+              $result{rows} = [ [32] ];
+          } elsif ($bound_params[0] == 2) {
+              $result{rows} = [ [43] ];
+          }
+
+          return %result;
+      },
+  };
+
+  my $sth = $dbh->prepare('SELECT x FROM y WHERE z = ?');
+
+  my $rows = $sth->execute(1);
+  my ($result) = $sth->fetchrow_array();  # $result will be 32
+    
+  $rows = $sth->execute(2);
+  ($result) = $sth->fetchrow_array();  # $result will be 43
+
+  $rows = $sth->execute(33);
+  ($result) = $sth->fetchrow_array();  # $result will be 1
+
+
+By default result sets which only define their field names in their callback return values will have a C<NUM_OF_FIELDS> property of 0 until after the statement has actually been executed. This is to make sure that DBD::Mock stays compatible with previous versions. If you need the C<NUM_OF_FIELDS> property to be undef in this situation then set the C<$DBD::Mock::DefaultFieldsToUndef> flag to 1.
+
+
 =back
 
 =head1 BUGS
@@ -1094,8 +1170,6 @@ Each DBD has its own quirks and issues, it would be nice to be able to handle th
 =item Enhance the DBD::Mock::StatementTrack object
 
 I would like to have the DBD::Mock::StatementTrack object handle more of the mock_* attributes. This would encapsulate much of the mock_* behavior in one place, which would be a good thing.
-
-I would also like to add the ability to bind a subroutine (or possibly an object) to the result set, so that the results can be somewhat more dynamic and allow for a more realistic interaction.
 
 =back
 

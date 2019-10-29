@@ -8,9 +8,10 @@ use HTTP::Response;
 use Test::LWP::UserAgent;
 
 my $pkg;
+
 BEGIN {
-  $pkg = 'Catmandu::Fix::memento_find';
-  use_ok $pkg;
+    $pkg = 'Catmandu::Fix::memento_find';
+    use_ok $pkg;
 }
 require_ok $pkg;
 
@@ -20,16 +21,16 @@ dies_ok {$pkg->new()->fix({})} "path required";
 
 dies_ok {$pkg->new('my.field')->fix({})} "date required";
 
-my $data = { url => 'http://lib.ugent.be' };
+my $data = {url => 'http://lib.ugent.be'};
 
-lives_ok { $pkg->new('url','2014')->fix($data)} "execute memento";
+lives_ok {$pkg->new('url', '2014')->fix($data)} "execute memento";
 
 done_testing;
 
 sub user_agent {
-	my $ua = Test::LWP::UserAgent->new;
+    my $ua = Test::LWP::UserAgent->new;
 
-	my $example =<<EOF;
+    my $example = <<EOF;
 {
 	"original_uri":"http://lib.ugent.be",
 	"mementos":{
@@ -97,9 +98,8 @@ sub add_response {
     $ua->map_response(
         qr{^\Q$url\E$},
         HTTP::Response->new(
-            $code,
-            $msg,
-            ['Content-Type' => $content_type ],
+            $code, $msg,
+            ['Content-Type' => $content_type],
             Encode::encode_utf8($content)
         )
     );

@@ -8,7 +8,7 @@
       "Osama Elsayed <osama.elsayed@booking.com>",
       "Eduardo Dalla Favera <eduardo.dallafavera@booking.com>",
       "Pavel Gurkov <pavel.gurkov@booking.com>",
-      "PrzemysÅaw Iskra <sparky@pld-linux.org>",
+      "Przemyslaw Iskra <sparky@pld-linux.org>",
       "Alex Mironov <alex.mironov@booking.com>",
       "Pavel Shaydo <zwon@cpan.org>"
    ],
@@ -44,7 +44,8 @@
          "requires" : {
             "AnyEvent" : "0",
             "AnyEvent::XSPromises" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.022000"
          }
       }
    },
@@ -60,6 +61,6 @@
          "web" : "https://github.com/bookingcom/perl-Net-Kafka"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

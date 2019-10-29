@@ -29,7 +29,7 @@ dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($fakeext,
 dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($obofile, $fakezip, $classindex) }, 'die: wrong file name');
 dies_ok ( sub { my $file = obogaf::parser::map_OBOterm_between_release($obofile, $fakegaf, $classindex) }, 'die: wrong file name');
 
-## test mapping 
+## test mapping without header
 ($res, $stat)= obogaf::parser::map_OBOterm_between_release($obofile, $gafold, $classindex);
 my $mapfile= "t/data/test_chicken_goa_mapped.txt"; 
 open $fh, ">", $mapfile; 
@@ -52,7 +52,7 @@ while(<FH>){
 close FH;
 close $fh;
 
-## test gaf file without header
+## test gaf file with header
 ($res, $stat)= obogaf::parser::map_OBOterm_between_release($obofile, $gafheader, $classindex);
 my $mapfile_header= "t/data/test_chicken_goa_mapped_header.txt"; 
 open $fh, ">", $mapfile_header; 

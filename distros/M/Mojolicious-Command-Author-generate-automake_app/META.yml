@@ -22,6 +22,7 @@ no_index:
     - example
     - setup
     - lib/Mojolicious/Command/Author/generate/automake_app
+    - lib/Mojolicious/Command/Author/generate/automake_app/lib/App/Controller
     - lib/Mojolicious/Command/Author/generate/callbackery_app
 requires:
   Mojolicious: '8'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/oposs/mojolicious-automake/issues
   license: http://opensource.org/licenses/MIT
   repository: https://github.com/oposs/mojolicious-automake
-version: v0.1.1
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

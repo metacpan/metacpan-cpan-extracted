@@ -62,8 +62,20 @@ my $simple = [
 					}
 				  ]
 				 ];
+my $nobase = [
+				  [
+					'Internal::Fixture::Simple'
+				  ],
+				  [
+					'string_found_long',
+					{
+                '-special' => { 'description' => 'Run with no param_base' },
+					 'http://example.org/my-parameters#all' => 'counter-clockwise dahut'
+					}
+				  ]
+				 ];
 
-cmp_deeply($data, bag($multi, $simple), 'Compare the data structures');
+cmp_deeply($data, bag($multi, $simple, $nobase), 'Compare the data structures');
 
 
 done_testing;

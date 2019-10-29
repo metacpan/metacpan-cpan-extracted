@@ -1,0 +1,38 @@
+@prefix test: <http://ontologi.es/doap-tests#> .
+@prefix deps: <http://ontologi.es/doap-deps#>.
+@prefix dc:   <http://purl.org/dc/terms/> .
+@prefix httph:<http://www.w3.org/2007/ont/httph#> .
+@prefix http: <http://www.w3.org/2007/ont/http#> .
+@prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix :     <http://example.org/test#> .
+
+
+:test_list a test:FixtureTable ;
+    test:fixtures ( :html_content ).
+
+
+:html_content a test:AutomatedTest  ;
+    test:purpose "Test for content on external URL that is invalid"@en ;
+    test:test_script <http://example.org/httplist#http_req_res_list_unauthenticated> ;
+    test:params [
+        test:steps (
+            [
+                test:request :html_content_req ;
+                test:response_assertion :html_content_res
+            ]
+        )
+    ] .
+
+
+:html_content_req a http:RequestMessage ;
+    http:method "PUT" ;
+    httph:content_type "text/html" ;
+    http:content _:foo ;
+    http:requestURI </public/foobar.html> .
+
+:html_content_res a http:ResponseMessage ;
+    http:status 201 .
+
+<http://example.org/httplist#http_req_res_list_unauthenticated> a nfo:SoftwareItem ;
+    deps:test-requirement "Internal::Fixture::HTTPList"^^deps:CpanId ;
+    nfo:definesFunction "http_req_res_list_unauthenticated" .

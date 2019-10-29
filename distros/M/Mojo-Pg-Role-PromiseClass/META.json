@@ -1,0 +1,66 @@
+{
+   "abstract" : "Choose the Mojo::Promise class used by Mojo::Pg objects",
+   "author" : [
+      "Roger Crew <wrog@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-Pg-Role-PromiseClass",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "Mojo::Base::Role::PromiseClass" : "0",
+            "Mojo::Pg" : "4.15",
+            "Mojolicious" : "8.23",
+            "Role::Tiny" : "2.000001",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Pg::Database::Role::PgPromiseClass" : {
+         "file" : "lib/Mojo/Pg/Database/Role/PgPromiseClass.pm",
+         "version" : "0.001"
+      },
+      "Mojo::Pg::Role::PromiseClass" : {
+         "file" : "lib/Mojo/Pg/Role/PromiseClass.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wrog/pg-pclass/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wrog/pg-pclass.git",
+         "web" : "http://github.com/wrog/pg-pclass"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+}
+

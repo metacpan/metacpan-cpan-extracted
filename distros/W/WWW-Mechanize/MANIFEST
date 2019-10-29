@@ -96,6 +96,7 @@ t/save_content.html
 t/save_content.t
 t/select.html
 t/select.t
+t/submit_form.t
 t/taint.t
 t/tick.html
 t/tick.t

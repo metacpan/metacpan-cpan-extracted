@@ -1,0 +1,112 @@
+=head1 NAME
+
+mydemo - Demo
+
+=head1 ABSTRACT
+
+Demonstrate appspec for bash
+
+=head1 DESCRIPTION
+
+
+
+=head2 GLOBAL OPTIONS
+
+    --version -V    Show version (flag)     
+    --help -h       Show command help (flag)
+
+
+=head2 SUBCOMMANDS
+
+=head3  nested1
+
+    mydemo  nested1 <subcommands>
+
+Nested subcommand 1
+
+
+=head3 nested1 nested2
+
+    mydemo nested1 nested2
+
+Nested subcommand 2
+
+
+=head3  service
+
+    mydemo  service <subcommands>
+
+Start and stop services
+
+
+=head3 service list
+
+    mydemo service list
+
+List services
+
+
+=head3 service start
+
+    mydemo service start [options] <service>
+
+Start
+
+Options:
+
+    --restart -r    Restart if already running (flag)
+
+Parameters:
+
+    service  *  Service name
+
+=head3 service status
+
+    mydemo service status <service>
+
+Status
+
+Parameters:
+
+    service  *  Service name
+
+=head3 service stop
+
+    mydemo service stop <service>
+
+Stop
+
+Parameters:
+
+    service  *  Service name
+
+=head3  test1
+
+    mydemo  test1 [options]
+
+Test command
+
+Options:
+
+    --flag-a -a       Flag a (flag)                        
+    --flag-b -b       Flag b (flag)                        
+    --flag-c -c    [] Flag c (incremental) (flag; multiple)
+    --test-d -d       Option d                             
+    --test-e -e       Option e                             
+    --test-f -f    [] Option f (multi) (multiple)          
+    --test-g -g  *    Option g (required)                  
+
+
+=head3  help
+
+    mydemo  help <subcommands> [options]
+
+Show command help
+
+Options:
+
+    --all     (flag)
+
+
+
+

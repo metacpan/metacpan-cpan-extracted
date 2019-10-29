@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/Test-FITesque-RDF>
 Bug tracker:  <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.016	2019-10-28	Test coverage to 100%
+
+ - Added: Add tests to bring the test coverage to 100%.
+
 0.014	2019-09-23	Improve the RDF
 
  [ BACK COMPAT ]

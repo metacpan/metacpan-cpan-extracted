@@ -7,6 +7,7 @@ t/00-load.t
 t/cmd.sh
 t/manifest.t
 t/pod.t
+t/z_os-test.t
 t/zz_features.t
 t/zz_oo.t
 t/zz_run_setup.t

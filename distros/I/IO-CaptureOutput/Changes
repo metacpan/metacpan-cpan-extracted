@@ -1,5 +1,11 @@
 Revision history for IO::CaptureOutput
 
+1.1105    2019-10-25 17:40:04-04:00 America/New_York
+
+    [META]
+
+    - Add deprecation data to META file.
+
 1.1104    2015-01-23 22:03:57-05:00 America/New_York
 
     [PREREQS]

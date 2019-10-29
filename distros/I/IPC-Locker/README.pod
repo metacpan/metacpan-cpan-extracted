@@ -1,0 +1,113 @@
+=pod
+
+=head1 SUMMARY
+
+IPC::Locker provides a server for locks and a Perl package for clients to
+access that server.  The result is that clients can access named locks on a
+Internet wide basis, solving critical section problems without the mess of
+NFS or other file locking techniques.
+
+The latest version is available from CPAN and from
+L<https://www.veripool.org/ipc-locker>.
+
+=head1 EXAMPLE
+
+   use IPC::Locker;
+   # ...
+   my $lock = IPC::Locker->lock(host=>'example.std.com');
+   # ... Critical section ...
+   $lock->unlock;
+
+=head1 INSTALLATION
+
+=head2 Build and Install the Package
+
+=head3 Install from CPAN:
+
+   cpan install IPC::Locker
+
+=head3 Or, build from sources:
+
+   # Obtain distribution kit
+   git clone git@github.com:veripool/IPC-Locker.git
+   # Build
+   cd IPC-Locker
+   git pull
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+=head2 Install the Daemons
+
+You may wish to install C<lockerd> and C<pidstatd> in a init.rc file so
+that it is run at system startup.  Depending on your distribution, you may
+be able to just:
+
+   cp init.d/lockerd   /etc/init.d/lockerd  # On one server only
+   cp init.d/pidstatd  /etc/init.d/pidstatd  # On all machines
+
+Edit paths in above to point to /usr/bin instead of /usr/local/bin, if needed.
+
+   service lockerd start  # On one server only
+   service pidstatd start  # On all machines
+   chkconfig lockerd on  # On one server only
+   chkconfig pidstatd on  # On all machines
+
+If you get "This account is currently not available."  you need to change
+the daemon account from a shell of /sbin/nologin to /sbin/bash.
+
+=head2 Nagios
+
+If you are using Nagios http://www.nagios.org, sample scripts to check the
+daemons are included in the nagios subdirectory.
+
+=head1 DOCUMENTATION
+
+IPC::Locker provides the following programs/packages:
+
+=head2 lockerd
+
+C<lockerd> is the daemon that supports IPC::Locker. See C<man
+lockerd> after installation.
+
+=head2 IPC::PidStat
+
+C<IPC::PidStat> is a Perl package which answers the question, "is pid X
+running on host Y?".  See C<man IPC::PidStat> after installation.
+
+=head2 pidstat
+
+C<pidstat> is a program which answers the question, "is pid X running on
+host Y?".  See C<man pidstat> after installation.
+
+=head2 pidstatd
+
+C<pidstat> is the daemon that supports C<IPC::PidStat> and C<pidstat>. See
+C<man pidstatd> after installation.
+
+=head2 pidwatch
+
+C<pidwatch> is a program which starts other programs, and kill that program
+when another job exists.  See C<man pidwatch> after installation.
+
+=head2 uriexec
+
+C<uriexec> is a simple wrapper which allows executing a command which is
+quoted using URI escapes.  This prevents layered shells from interpreting
+special characters.  See C<man uriexec> after installation.
+
+=head2 check_lockerd and check_pidstatd
+
+C<check_lockerd> and C<check_pidstatd> are Nagios plugins to check
+C<lockerd> and C<pidstatd>.  See the Nagios documentation at
+https://www.nagios.org for information on installing plugins.
+
+=head1 LICENSE
+
+This package is Copyright 1999-2019 by Wilson Snyder <wsnyder@wsnyder.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either the GNU Lesser General Public License Version 3
+or the Perl Artistic License Version 2.0.  This code is provided with no
+warranty of any kind, and is used entirely at your own risk.

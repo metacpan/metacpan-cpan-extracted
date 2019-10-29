@@ -2,8 +2,8 @@ NAME
     App::durseq - Generate a sequence of durations
 
 VERSION
-    This document describes version 0.002 of App::durseq (from Perl
-    distribution App-durseq), released on 2019-07-23.
+    This document describes version 0.003 of App::durseq (from Perl
+    distribution App-durseq), released on 2019-09-15.
 
 FUNCTIONS
   durseq
@@ -13,8 +13,8 @@ FUNCTIONS
 
     Generate a sequence of durations.
 
-    This utility is similar to Unix seq command or Perl script dateseq,
-    except that it generates a sequence of dates.
+    This utility is similar to Perl script dateseq, except that it generates
+    a sequence of durations instead of dates.
 
     This function is not exported.
 

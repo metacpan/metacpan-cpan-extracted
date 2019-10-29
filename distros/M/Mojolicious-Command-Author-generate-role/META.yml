@@ -1,0 +1,27 @@
+---
+abstract: 'Role generator command'
+author:
+  - 'Roger Crew <wrog@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-Author-generate-role
+provides:
+  Mojolicious::Command::Author::generate::role:
+    file: lib/Mojolicious/Command/Author/generate/role.pm
+    version: '0.002'
+requires:
+  Mojolicious: '8.25'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/wrog/genrole/issues
+  repository: git://github.com/wrog/genrole.git
+version: '0.002'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

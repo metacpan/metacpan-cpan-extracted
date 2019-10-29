@@ -58,7 +58,11 @@ __PACKAGE__->add_relationship('like_has_many', 'DBSchema::Result::Twokeys', { 'f
 __PACKAGE__->add_relationship('like_has_many2', 'DBSchema::Result::Twokeys_belongsto', 
     { 'foreign.key1' => 'self.twokeysfk' }, 
     { accessor => 'multi' },
-); 
+);
+__PACKAGE__->has_many(
+    keysbymethod => 'KeysByMethod',
+    { 'foreign.dvd' => 'self.dvd_id' }
+);
 
 1;
 

@@ -9,99 +9,86 @@ use warnings;
 
 use Array::RefElem ();
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
+
 
 # shared undef variable
 my $UNDEF = undef;
 
-BEGIN
-  {
-  # handy aliases
-  *has = \&exists;
-  *contains = \&exists;
-  *is_null = \&is_empty;
-  *remove = \&delete;
-  }
+BEGIN {
+    # handy aliases
+    *has      = \&exists;
+    *contains = \&exists;
+    *is_null  = \&is_empty;
+    *remove   = \&delete;
+}
 
-#############################################################################
-# creation
 
-sub new
-  {
-  my $class = shift; my $x = bless { }, $class;
+sub new {
+    my $class = shift;
+    my $x     = bless {}, $class;
 
-  my $opt;
-  $opt = shift if ref($_[0]) eq 'HASH';
+    my $opt;
+    $opt = shift if ref( $_[0] ) eq 'HASH';
 
-  $x->insert(@_) if @_ != 0;
+    $x->insert(@_) if @_ != 0;
 
-  $x;
-  }
+    $x;
+}
 
-#############################################################################
-# inserting
 
-sub insert
-  {
-  my $x = shift;
+sub insert {
+    my $x = shift;
 
-  # Note: this trick may no longer be necessesary for modern perls,
-  # when storing an undef value.
+    # Note: this trick may no longer be necessesary for modern perls,
+    # when storing an undef value.
 
-  my $inserted = 0;
-  for (@_)
-    {
-    $inserted++, Array::RefElem::hv_store(%$x, $_, $UNDEF) if ! exists $x->{$_};
+    my $inserted = 0;
+    for (@_) {
+        $inserted++, Array::RefElem::hv_store( %$x, $_, $UNDEF )
+          unless CORE::exists $x->{$_};
     }
-  $inserted;
-  }
+    $inserted;
+}
 
-#############################################################################
-# size/empty
 
-sub is_empty
-  {
-  my ($x) = @_;
+sub is_empty {
+    my ($x) = @_;
 
-  scalar keys %$x == 0;
-  }
+    scalar keys %$x == 0;
+}
 
-sub size
-  {
-  my ($x) = @_;
 
-  scalar keys %$x;
-  }
+sub size {
+    my ($x) = @_;
 
-#############################################################################
-# test for existance
+    scalar keys %$x;
+}
 
-sub exists
-  {
-  my ($x,$key) = @_;
 
-  exists $x->{$key};
-  }
+sub exists {
+    my ( $x, $key ) = @_;
 
-#############################################################################
-# deletion
+    CORE::exists $x->{$key};
+}
 
-sub delete
-  {
-  my $x = shift;
 
-  my $deleted = 0;
-  for (@_)
-    {
-    $deleted++, delete $x->{$_} if exists $x->{$_};
-    };
-  $deleted;
-  }
+sub delete {
+    my $x = shift;
+
+    my $deleted = 0;
+    for (@_) {
+        $deleted++, delete $x->{$_} if CORE::exists $x->{$_};
+    }
+    $deleted;
+}
+
 
 sub members {
     my ($x) = @_;
     return keys %$x;
 }
+
 
 1;
 
@@ -117,121 +104,133 @@ Set::Light - (memory efficient) unordered set of strings
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 
-        use Set::Light;
+  use Set::Light;
 
-        my $set = Set::Light->new( qw/foo bar baz/ );
+  my $set = Set::Light->new( qw/foo bar baz/ );
 
-        if (!$set->is_empty())
-          {
-          print "Set has ", $set->size(), " elements.\n";
-          for (qw/umpf foo bar baz bam/)
-            {
-            print "Set does ";
-            print " not " unless $set->has($_);
-            print "contain '$_'.\n";
-            }
-          }
+  if (!$set->is_empty())
+  {
+    print "Set has ", $set->size(), " elements.\n";
+    for (qw/umpf foo bar baz bam/)
+    {
+        print "Set does ";
+        print " not " unless $set->has($_);
+        print "contain '$_'.\n";
+    }
+  }
 
 =head1 DESCRIPTION
 
-Set::Light implements an unordered set of strings. Set::Light currently
-uses underneath a hash, and each key of the hash points to the same
-scalar, thus saving memory per item.
+Set::Light implements an unordered set of strings. Set::Light
+currently uses a hash underneath, and each key of the hash points to
+the same scalar, thus saving memory per item.
 
 =head2 Why not use a hash?
 
 Usually you would use a hash to keep track of a list of items like:
 
-        my %SEEN;
-        ...
-        if (!$SEEN->{$item}++)
-          {
-          # haven't seen item before
-          }
+  my %SEEN;
+
+  ...
+
+  if (!$SEEN->{$item}++)
+  {
+    # haven't seen item before
+  }
 
 While this is very fast (both on inserting items, as well as looking them up),
-it wastes quite a lot of memory, since each key in %SEEN needs one scalar.
+it uses quite a lot of memory, since each key in C<%SEEN> needs one scalar.
 
 =head2 Why not use Set::Object or Set::Scalar?
 
-These waste even more memory and/or are slower than an ordinary hash.
+These use even more memory and/or are slower than an ordinary hash.
 
-=head1 TYPES
+=head1 METHODS
 
-=head2 new()
+=head2 new
 
-        my $set = Set::Light->new();
+  my $set = Set::Light->new();
 
 Creates a new Set::Light object. An optionally passed hash reference can
-contain options. Currently no options are supported:
+contain options.
 
-        my $set = Set::Light->new( { myoption => 1, foobar => 2 });
+Currently no options are supported.
 
 Note that:
 
-        my $set = Set::Light->new( qw/for bar baz/);
+  my $set = Set::Light->new( qw/for bar baz/);
 
-will create a set with the members C<for>, C<bar> and C<baz>.
+will create a set with the members "for", "bar" and "baz".
 
-=head2 size()
+=head2 insert
 
-        my $elems = $set->size();
-
-Returns the number of elements in the set.
-
-=head2 is_empty()
-
-        if (!$set->is_empty()) { ... }
-
-Returns true if the set is empty (has zero elements).
-
-=head2 is_null()
-
-C<is_null()> is an alias to C<is_empty()>.
-
-=head2 has()/contains()/exists/()
-
-        if ($set->has($member)) { ... }
-
-Returns true if the set contains the string C<$member>.
-
-C<contains()> and C<exists()> are aliases to C<has()>.
-
-=head2 insert()
-
-        $set->insert( $string );
-        $set->insert( @strings );
+  $set->insert( $string );
+  $set->insert( @strings );
 
 Inserts one or more strings into the set. Returns the number of insertions
 it really did. Elements that are already contained in the set do not
 get inserted twice. So:
 
-        use Set::Light;
-        my $set = Set::Light->new();
-        print $set->insert('foo');              # 1
-        print $set->insert('foo');              # 0
-        print $set->insert('bar','baz','foo');  # 2     (foo already inserted)
+  use Set::Light;
 
-=head2 delete()/remove()
+  my $set = Set::Light->new();
+  print $set->insert('foo');              # 1
+  print $set->insert('foo');              # 0
+  print $set->insert('bar','baz','foo');  # 2     (foo already inserted)
 
-        $set->delete( $string );
-        $set->delete( @strings );
+=head2 is_empty
 
-Deletes one or more strings from the set. Returns the number of deletions
-it really did. Elements that are not contained in the set cannot be deleted.
-So:
+  if (!$set->is_empty()) { ... }
 
-        use Set::Light;
-        my $set = Set::Light->new();
-	print $set->insert('foo','bar');	# 2
-	print $set->delete('foo','foo');	# 1 	(only once deleted)
-	print $set->delete('bar','foo');	# 1 	(only once deleted)
+Returns true if the set is empty (has zero elements).
 
-C<remove()> is an alias for C<delete()>.
+=head2 is_null
+
+This is an alias to L</is_empty>.
+
+=head2 size
+
+  my $elems = $set->size();
+
+Returns the number of elements in the set.
+
+=head2 has
+
+  if ($set->has($member)) { ... }
+
+Returns true if the set contains the string C<$member>.
+
+=head2 contains
+
+This is an alias for L</has>.
+
+=head2 exists
+
+This is an alias for L</has>.
+
+=head2 delete
+
+  $set->delete( $string );
+  $set->delete( @strings );
+
+Deletes one or more strings from the set. Returns the number of
+deletions it really did. Elements that are not contained in the set
+cannot be deleted.  So:
+
+  use Set::Light;
+
+  my $set = Set::Light->new();
+  print $set->insert('foo','bar');	# 2
+  print $set->delete('foo','foo');	# 1 	(only once deleted)
+  pprint $set->delete('bar','foo');	# 1 	(only once deleted)
+
+=head2 remove
+
+This is an alias for L</delete>.
 
 =head2 members
 

@@ -19,8 +19,8 @@ Test::More::is(`echo; $perl -e '
     my \$cli = Mnet::Opts::Cli->new;
     WARN("error");
 ' -- --debug-error /dev/stdout 2>&1 | grep -e 'e started' -e 'Version -e'`, '
- -  - Mnet::Log -e started
- -  - Mnet::Log -e started
+--- - Mnet::Log -e started
+--- - Mnet::Log -e started
 dbg - Mnet::Version -e = ?
 ', 'debug default disabled');
 

@@ -23,7 +23,7 @@ subtest 'good' => sub {
       },
       'script_runs t/bin/good.pl',
     );
-    
+
     diag Dumper($events) unless $rv;
 
     is $rv, T(), 'script_compiles_ok returns true as convenience';
@@ -50,9 +50,8 @@ subtest 'good' => sub {
     diag Dumper($events) unless $rv;
 
     is $rv, T(), 'script_compiles_ok returns true as convenience';
-    
-  };
 
+  };
 
 };
 
@@ -82,9 +81,9 @@ subtest 'bad: returns 4' => sub {
     diag Dumper($events) unless $rv2;
 
     is $rv, F(), 'script_compiles_ok returns false as convenience';
-    
+
   };
-  
+
   subtest 'custom name' => sub {
 
     my $rv;
@@ -109,9 +108,8 @@ subtest 'bad: returns 4' => sub {
     diag Dumper($events) unless $rv2;
 
     is $rv, F(), 'script_compiles_ok returns false as convenience';
-    
-  };
 
+  };
 
 };
 
@@ -141,22 +139,22 @@ subtest 'stdin' => sub {
 
     script_runs     't/bin/stdin.pl', { stdin => 't/bin/stdin.txt' };
     script_stdout_like qr{fbbbaz};
-  
+
   };
 
   subtest 'scalar ref' => sub {
 
     script_runs     't/bin/stdin.pl', { stdin => \'helloooo there' };
     script_stdout_like qr{hellbbbb there};
-  
+
   };
-  
+
 };
 
 subtest exception => sub {
 
   my $events;
-  
+
   is(
     $events = intercept { script_runs( 't/bin/missing.pl' ) },
     array {
@@ -177,7 +175,7 @@ subtest 'signal' => sub {
   skip_all 'not on Winows' if $^O eq 'MSWin32';
 
   my $events;
-  
+
   is(
     $events = intercept { script_runs( 't/bin/signal.pl' ) },
     array {

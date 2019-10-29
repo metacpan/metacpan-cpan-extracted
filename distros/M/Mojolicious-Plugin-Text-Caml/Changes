@@ -1,5 +1,11 @@
 Revision history for Perl extension Mojolicious-Plugin-Text-Caml
 
+0.07 2019-10-29T07:14:33Z
+  - change license to LGPL
+
+0.06 2019-10-29T06:19:51Z
+  - fix minimal version for Minilla
+
 0.05 2019-09-19T14:46:10Z
   - move to gitlab
 

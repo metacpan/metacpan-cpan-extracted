@@ -1,7 +1,7 @@
 package Software::Catalog::SW::filezilla;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,14 +13,11 @@ with 'Software::Catalog::Role::Software';
 
 use Software::Catalog::Util qw(extract_from_url);
 
-sub meta {
-    return {
-        summary => "Cross-platform GUI FTP/SFTP client",
-        homepage_url => "https://filezilla-project.org",
-    };
-}
+sub summary { "Cross-platform GUI FTP/SFTP client" }
 
-sub get_latest_version {
+sub homepage_url { "https://filezilla-project.org" }
+
+sub latest_version {
     my ($self, %args) = @_;
 
     extract_from_url(
@@ -37,7 +34,7 @@ sub canon2native_arch_map {
     },
 }
 
-sub get_download_url {
+sub download_url {
     my ($self, %args) = @_;
 
     # XXX version, language
@@ -47,7 +44,7 @@ sub get_download_url {
     );
 }
 
-sub get_archive_info {
+sub archive_info {
     my ($self, %args) = @_;
     [200, "OK", {
         programs => [
@@ -74,7 +71,7 @@ Software::Catalog::SW::filezilla - FileZilla
 
 =head1 VERSION
 
-This document describes version 0.001 of Software::Catalog::SW::filezilla (from Perl distribution Software-Catalog-SW-filezilla), released on 2019-04-08.
+This document describes version 0.002 of Software::Catalog::SW::filezilla (from Perl distribution Software-Catalog-SW-filezilla), released on 2019-10-26.
 
 =for Pod::Coverage ^(.+)$
 

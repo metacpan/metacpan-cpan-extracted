@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::Executor;
 
 use 5.010000;
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -532,7 +532,7 @@ Test::Class::Moose::Role::Executor - Common code for Runner classes
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 DESCRIPTION
 

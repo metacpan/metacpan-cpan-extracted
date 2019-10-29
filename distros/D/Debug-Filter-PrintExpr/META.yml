@@ -22,8 +22,9 @@ no_index:
 requires:
   Data::Dumper: '0'
   Filter::Simple: '0'
+  Scalar::Util: '1.26'
   perl: '5.01'
 resources:
   bugtracker: https://github.com/jo-37/debug-filter-printexpr/issues
   repository: git://github.com/jo-37/debug-filter-printexpr.git
-version: '0.03'
+version: '0.04'

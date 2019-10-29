@@ -3,16 +3,16 @@
 use strict;
 use warnings;
 
-use Test::More tests => 51;
+use Test::More tests => 54;
 use Test::Differences;
 use Test::XML::Ordered qw(is_xml_ordered);
 
 use File::Spec;
 use Encode;
 
-use XML::Grammar::Fortune;
+use XML::Grammar::Fortune ();
 
-# TEST:$num_texts=17
+# TEST:$num_texts=18
 
 my @tests = (
     qw(
@@ -20,6 +20,7 @@ my @tests = (
         facts-fort-3-more-than-one-list
         facts-fort-4-from-shlomifish.org
         facts-fort-5-author-href
+        facts-fort-6-fact-lang--elems
         irc-conversation-4-several-convos
         irc-convos-and-raw-fortunes-1
         raw-fort-empty-info-1

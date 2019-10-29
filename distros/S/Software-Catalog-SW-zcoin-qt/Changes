@@ -1,28 +1,34 @@
-0.006   2019-01-14 (PERLANCAR)
+0.007   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	- Update to Software::Catalog::Role::Software 1.0.6 (incompatible
+	  change, renamed methods).
+
+
+0.006   2019-01-14  Released-By: PERLANCAR
 
 	- Implement get_release_note() and get_available_versions().
 
 
-0.005   2018-10-18 (PERLANCAR)
+0.005   2018-10-18  Released-By: PERLANCAR
 
 	- [Bugfix] Fix download URL.
 
 
-0.004   2018-10-18 (PERLANCAR)
+0.004   2018-10-18  Released-By: PERLANCAR
 
 	- Tweak regex to extract latest version.
 
 
-0.003   2018-10-05 (PERLANCAR)
+0.003   2018-10-05  Released-By: PERLANCAR
 
 	- Update to Software::Catalog 1.0.3.
 
 
-0.002   2018-10-04 (PERLANCAR)
+0.002   2018-10-04  Released-By: PERLANCAR
 
 	- Add meta property: versioning_scheme.
 
 
-0.001   2018-09-21 (PERLANCAR)
+0.001   2018-09-21  Released-By: PERLANCAR
 
         - First release.

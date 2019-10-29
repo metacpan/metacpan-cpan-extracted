@@ -12,7 +12,7 @@ use Cwd;
 # Create a temp directory
 my $dir    = getcwd();
 my $rcfile = "$dir/tmp/rcfile";
-mkdir "$dir/tmp";
+mkdir "$dir/tmp" or plan skip_all => "Can't create temp directory";
 
 # Reading a nonexistent file should silently succeed
 {
@@ -320,11 +320,16 @@ mkdir "$dir/tmp";
             'bar=s' => 'bar option',
         },
     });
+
     trap { $app->init };
-    ok $trap->leaveby eq 'exit', 'Init with nonexistent command-line rcfile';
+    ok $trap->leaveby eq 'exit', 'Init with nonexistent command-line rcfile'
+        or diag "\$app->init ended by: " . $trap->leaveby . "\nError was: " . $trap->die;
+
     ok $app->get_rcfile eq $file, "rcfile set correctly";
     is_deeply $app->get_config, { default => {} }, "Config is initially empty.";
-    ok -r "$file", "File was created";
+
+    ok -r "$file", "File was created"
+        or diag "Info for file: $file:\n" . file_info($file);
 
     my $app2 = CLI::Startup->new({
         rcfile  => "$file",
@@ -556,3 +561,24 @@ unlink $_ for glob("$dir/tmp/*");
 rmdir "$dir/tmp";
 
 done_testing();
+
+
+sub file_info
+{
+    my ($filename) = @_;
+
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+        $atime,$mtime,$ctime,$blksize,$blocks)
+    = stat($filename);
+
+     return qq{
+        Inode\t$ino
+        Mode\t$mode
+        UID\t$uid
+        GID\t$gid
+        Size\t$size
+        Ctime\t$ctime
+        Mtime\t$mtime
+        Atime\t$atime
+     };
+}

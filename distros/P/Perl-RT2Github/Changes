@@ -1,0 +1,10 @@
+Revision history for Perl module Perl::RT2Github
+
+0.01 Mon Oct 28 09:30:17 2019
+    - original version; created by ExtUtils::ModuleMaker 0.63
+
+0.02 Tue Oct 29 08:19:48 EDT 2019
+    - Require 'git' on system before building or testing
+    - Create HTTP::Tiny object in constructor for reusability;
+      thanks to Dan Book
+

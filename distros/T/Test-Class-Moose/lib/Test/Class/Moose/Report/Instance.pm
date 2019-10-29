@@ -4,7 +4,7 @@ package Test::Class::Moose::Report::Instance;
 
 use 5.010000;
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 use Moose;
 use Carp;
@@ -59,7 +59,7 @@ Test::Class::Moose::Report::Instance - Reporting on test classes
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 DESCRIPTION
 

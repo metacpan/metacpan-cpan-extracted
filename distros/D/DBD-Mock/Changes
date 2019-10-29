@@ -1,5 +1,9 @@
 Revision history for Perl extension DBD::Mock.
 
+1.52 2019-10-28T11:35:41Z
+    - Added in callback feature for result sets so that their contents
+      can be more dynamic.
+
 1.51 2019-10-23T11:43:51Z
     - Fixed issue with using attribute aliases alongside a driver DSN
       in the DBI->connect call

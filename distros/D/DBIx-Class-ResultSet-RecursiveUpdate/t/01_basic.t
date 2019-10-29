@@ -63,6 +63,8 @@ qr/No such column, relationship, many-to-many helper accessor or generic accesso
 }
 
 {
+    my $debug = $user_rs->result_source->storage->debug;
+    $user_rs->result_source->storage->debug(0);
 
     # try to create with a not existing rel but suppressed warning
     my $updates = {
@@ -79,6 +81,7 @@ qr/No such column, relationship, many-to-many helper accessor or generic accesso
     "",
 "nonexisting column, accessor, relationship doesn't warn with unknown_params_ok";
     $expected_user_count++;
+    $user_rs->result_source->storage->debug($debug);
     is( $user_rs->count, $expected_user_count, 'User created' );
 }
 
@@ -218,6 +221,8 @@ my $dvd_without_tags =
 is( $dvd_without_tags->tags->count,
     0, 'Tags deleted when m2m accessor set to undef' );
 
+# this test passes a new value for the pk column dvd_name in the updates hash
+# and expects that the resolved dvd_name is used for the update
 $new_dvd->update( { name => 'New Test Name' } );
 $updates = {
     dvd_id => $new_dvd->dvd_id,
@@ -358,5 +363,37 @@ $user = $user_rs->recursive_update($updates);
 is( $user->owned_dvds->count, 0, 'user owns no dvds' );
 is( $dvd_rs->search( { dvd_id => { -in => \@user_dvd_ids } } )->count,
     0, 'owned dvds deleted' );
+
+ok (my $dvd_with_keysbymethod = $dvd_rs->create({
+    name  => 'DVD with keys by method relationship',
+    owner => $user
+}), 'dvd for test created');
+$dvd_with_keysbymethod->add_to_keysbymethod({
+    key1  => 'foo',
+    key2  => 'bar',
+});
+is($dvd_with_keysbymethod->keysbymethod->first->combined_key, 'foo/bar',
+    'combined_key method returns correct value');
+
+ok( my $dvd_with_keysbymethod_updated = $dvd_rs->recursive_update({
+        dvd_id => $dvd_with_keysbymethod->id,
+        keysbymethod => [{
+            combined_key => 'foo/bar',
+            value        => 'baz',
+        }]
+    }),
+    'updating keysbymethod relationship ok'
+);
+
+my $keysbymethod_rs  = $schema->resultset('KeysByMethod');
+ok( my $keysbymethod = $keysbymethod_rs->recursive_update({
+    dvd => $dvd_with_keysbymethod->id,
+    combined_key => 'foo/bar',
+    value        => 'new-value',
+}),
+    'updating keysbymethod ok'
+);
+is($keysbymethod->value, 'new-value', 'value changed');
+
 
 done_testing;

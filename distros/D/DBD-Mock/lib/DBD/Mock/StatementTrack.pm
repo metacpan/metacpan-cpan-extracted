@@ -9,11 +9,12 @@ sub new {
     # these params have default values
     # but can be overridden
     $params{return_data}       ||= [];
-    $params{fields}            ||= [];
+    $params{fields}            ||= $DBD::Mock::DefaultFieldsToUndef ? undef : [];
     $params{bound_params}      ||= [];
     $params{bound_param_attrs} ||= [];
     $params{statement}         ||= "";
     $params{failure}           ||= undef;
+    $params{callback}          ||= undef;
 
     # these params should never be overridden
     # and should always start out in a default
@@ -43,7 +44,7 @@ sub get_failure {
 
 sub num_fields {
     my ($self) = @_;
-    return scalar @{ $self->{fields} };
+    return $self->{fields} ? scalar @{ $self->{fields} } : $self->{fields};
 }
 
 sub num_rows {
@@ -121,6 +122,7 @@ sub is_finished {
 sub mark_executed {
     my ($self) = @_;
 
+
     push @{$self->{execution_history} }, {
         params => [ @{ $self->{bound_params} } ],
         attrs  => [ @{ $self->{bound_param_attrs} } ],
@@ -128,6 +130,18 @@ sub mark_executed {
 
     $self->is_executed('yes');
     $self->current_record_num(0);
+
+    if (ref $self->{callback} eq "CODE") {
+        my %recordSet = $self->{callback}->(@{ $self->{bound_params} });
+
+        if (ref $recordSet{fields} eq "ARRAY") {
+            $self->{fields} = $recordSet{fields};
+        }
+
+        if (ref $recordSet{rows} eq "ARRAY") {
+            $self->{return_data} = $recordSet{rows};
+        }
+    }
 }
 
 sub next_record {
@@ -181,6 +195,12 @@ sub current_record_num {
     return $self->{current_record_num};
 }
 
+sub callback {
+    my ( $self, $callback ) = @_;
+    $self->{callback} = $callback if defined $callback;
+    return $self->{callback};
+}
+
 # multi-element fields
 
 sub return_data {
@@ -191,7 +211,11 @@ sub return_data {
 
 sub fields {
     my ( $self, @values ) = @_;
+
+    $self->{fields} ||= [];
+
     push @{ $self->{fields} }, @values if scalar @values;
+
     return $self->{fields};
 }
 

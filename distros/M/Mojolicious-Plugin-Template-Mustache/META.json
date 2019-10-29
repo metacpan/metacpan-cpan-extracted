@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.3",
    "license" : [
-      "gpl_3"
+      "lgpl_3_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -42,20 +42,20 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "0",
+            "Mojolicious" : "6.33",
             "Template::Mustache" : "v1.0.2"
          }
       },
       "test" : {
          "requires" : {
-            "Software::License::GPL_3" : "0"
+            "Software::License::LGPL_3_0" : "0"
          }
       }
    },
    "provides" : {
       "Mojolicious::Plugin::Template::Mustache" : {
          "file" : "lib/Mojolicious/Plugin/Template/Mustache.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -64,7 +64,7 @@
          "url" : "git://gitlab.com/cynovg/Mojolicious-Plugin-Template-Mustache.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:CYNOVG",
    "x_contributors" : [
       "Cyrill Novgorodcev <cynovg@cpan.org>"

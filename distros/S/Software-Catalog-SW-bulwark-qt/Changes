@@ -1,28 +1,34 @@
-0.006   2019-01-14 (PERLANCAR)
+0.007   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	- Update to Software::Catalog::Role::Software 1.0.6 (incompatible
+	  change, renamed methods).
+
+
+0.006   2019-01-14  Released-By: PERLANCAR
 
 	- Implement get_available_versions() and get_release_note().
 
 
-0.005   2018-11-21 (PERLANCAR)
+0.005   2018-11-21  Released-By: PERLANCAR
 
 	- [ux] get_archive_info(): Don't make version a required argument.
 
 
-0.004   2018-10-05 (PERLANCAR)
+0.004   2018-10-05  Released-By: PERLANCAR
 
 	- Update to Software::Catalog 1.0.3.
 
 
-0.003   2018-10-04 (PERLANCAR)
+0.003   2018-10-04  Released-By: PERLANCAR
 
 	- Add meta property: versioning_scheme.
 
 
-0.002   2018-10-04 (PERLANCAR)
+0.002   2018-10-04  Released-By: PERLANCAR
 
 	- bulwark-qt 2.0.0 now extracts to / instead of /bin.
 
 
-0.001   2018-09-20 (PERLANCAR)
+0.001   2018-09-20  Released-By: PERLANCAR
 
         - First release.

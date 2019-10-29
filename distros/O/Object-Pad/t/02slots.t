@@ -36,9 +36,9 @@ class AllTheTypes {
    }
 
    method test {
-      ::is( $scalar, 123, '$scalar slot' );
-      ::is_deeply( \@array, [ 456 ], '@array slot' );
-      ::is_deeply( \%hash, { 789 => 10 }, '%hash slot' );
+      Test::More::is( $scalar, 123, '$scalar slot' );
+      Test::More::is_deeply( \@array, [ 456 ], '@array slot' );
+      Test::More::is_deeply( \%hash, { 789 => 10 }, '%hash slot' );
    }
 }
 

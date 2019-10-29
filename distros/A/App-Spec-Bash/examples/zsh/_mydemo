@@ -1,0 +1,404 @@
+#compdef mydemo
+
+# Generated with perl module App::Spec v0.013
+
+_mydemo() {
+    local program=mydemo
+    typeset -A opt_args
+    local curcontext="$curcontext" state line context
+
+
+        # ---- Command: 
+        _arguments -s  \
+            '1: :->cmd1' \
+            '*: :->args' \
+            && ret=0
+
+
+        case $state in
+        cmd1)
+            _alternative 'args:cmd2:((help\:"Show command help" nested1\:"Nested subcommand 1" service\:"Start and stop services" test1\:"Test command"))'
+        ;;
+
+        args)
+            case $line[1] in
+            help)
+
+                # ---- Command: help
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((nested1 service test1))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    nested1)
+
+                        # ---- Command: help nested1
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->cmd3' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((nested2))'
+                        ;;
+
+                        args)
+                            case $line[3] in
+                            nested2)
+
+                                # ---- Command: help nested1 nested2
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '--version[Show version]' \
+                                    '-V[Show version]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            esac
+
+                        ;;
+
+                        esac
+                    ;;
+                    service)
+
+                        # ---- Command: help service
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->cmd3' \
+                            '*: :->args' \
+                            && ret=0
+
+
+                        case $state in
+                        cmd3)
+                            _alternative 'args:cmd4:((list start status stop))'
+                        ;;
+
+                        args)
+                            case $line[3] in
+                            list)
+
+                                # ---- Command: help service list
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '--version[Show version]' \
+                                    '-V[Show version]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            start)
+
+                                # ---- Command: help service start
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '--version[Show version]' \
+                                    '-V[Show version]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            status)
+
+                                # ---- Command: help service status
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '--version[Show version]' \
+                                    '-V[Show version]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            stop)
+
+                                # ---- Command: help service stop
+                                _arguments -s -C \
+                                    '1: :->cmd1' \
+                                    '2: :->cmd2' \
+                                    '3: :->cmd3' \
+                                    '--version[Show version]' \
+                                    '-V[Show version]' \
+                                    '--help[Show command help]' \
+                                    '-h[Show command help]' \
+                                    '--all[]' \
+                                    && ret=0
+
+
+                            ;;
+                            esac
+
+                        ;;
+
+                        esac
+                    ;;
+                    test1)
+
+                        # ---- Command: help test1
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--version[Show version]' \
+                            '-V[Show version]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--all[]' \
+                            && ret=0
+
+
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            nested1)
+
+                # ---- Command: nested1
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((nested2\:"Nested subcommand 2"))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    nested2)
+
+                        # ---- Command: nested1 nested2
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--version[Show version]' \
+                            '-V[Show version]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            && ret=0
+
+
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            service)
+
+                # ---- Command: service
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '2: :->cmd2' \
+                    '*: :->args' \
+                    && ret=0
+
+
+                case $state in
+                cmd2)
+                    _alternative 'args:cmd3:((list\:"List services" start\:"Start" status\:"Status" stop\:"Stop"))'
+                ;;
+
+                args)
+                    case $line[2] in
+                    list)
+
+                        # ---- Command: service list
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '--version[Show version]' \
+                            '-V[Show version]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            && ret=0
+
+
+                    ;;
+                    start)
+
+                        # ---- Command: service start
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->service' \
+                            '--version[Show version]' \
+                            '-V[Show version]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            '--restart[Restart if already running]' \
+                            '-r[Restart if already running]' \
+                            && ret=0
+
+                        case $state in
+                        service)
+_mydemo_service_start_param_service_completion
+                        ;;
+                        esac
+
+                    ;;
+                    status)
+
+                        # ---- Command: service status
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->service' \
+                            '--version[Show version]' \
+                            '-V[Show version]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            && ret=0
+
+                        case $state in
+                        service)
+_mydemo_service_status_param_service_completion
+                        ;;
+                        esac
+
+                    ;;
+                    stop)
+
+                        # ---- Command: service stop
+                        _arguments -s -C \
+                            '1: :->cmd1' \
+                            '2: :->cmd2' \
+                            '3: :->service' \
+                            '--version[Show version]' \
+                            '-V[Show version]' \
+                            '--help[Show command help]' \
+                            '-h[Show command help]' \
+                            && ret=0
+
+                        case $state in
+                        service)
+_mydemo_service_stop_param_service_completion
+                        ;;
+                        esac
+
+                    ;;
+                    esac
+
+                ;;
+
+                esac
+            ;;
+            test1)
+
+                # ---- Command: test1
+                _arguments -s -C \
+                    '1: :->cmd1' \
+                    '--version[Show version]' \
+                    '-V[Show version]' \
+                    '--help[Show command help]' \
+                    '-h[Show command help]' \
+                    '--flag-a[Flag a]' \
+                    '-a[Flag a]' \
+                    '--flag-b[Flag b]' \
+                    '-b[Flag b]' \
+                    '*--flag-c[Flag c (incremental)]' \
+                    '*-c[Flag c (incremental)]' \
+                    '--test-d[Option d]:test-d' \
+                    '-d[Option d]:test-d' \
+                    '--test-e[Option e]:test-e:("e1" "e2" "e3")' \
+                    '-e[Option e]:test-e:("e1" "e2" "e3")' \
+                    '*--test-f[Option f (multi)]:test-f:("f1" "f2" "f3")' \
+                    '*-f[Option f (multi)]:test-f:("f1" "f2" "f3")' \
+                    '--test-g[Option g (required)]:test-g' \
+                    '-g[Option g (required)]:test-g' \
+                    && ret=0
+
+
+            ;;
+            esac
+
+        ;;
+
+        esac
+
+}
+
+_mydemo_service_start_param_service_completion() {
+    local __dynamic_completion
+    local CURRENT_WORD="$words[CURRENT]"
+    IFS=$'\n' __dynamic_completion=( $( mydemo service list | cut -d ':' -f 1
+ ) )
+    compadd -X "service:" $__dynamic_completion
+}
+_mydemo_service_status_param_service_completion() {
+    local __dynamic_completion
+    local CURRENT_WORD="$words[CURRENT]"
+    IFS=$'\n' __dynamic_completion=( $( mydemo service list | cut -d ':' -f 1
+ ) )
+    compadd -X "service:" $__dynamic_completion
+}
+_mydemo_service_stop_param_service_completion() {
+    local __dynamic_completion
+    local CURRENT_WORD="$words[CURRENT]"
+    IFS=$'\n' __dynamic_completion=( $( mydemo service list | cut -d ':' -f 1
+ ) )
+    compadd -X "service:" $__dynamic_completion
+}
+
+__mydemo_dynamic_comp() {
+    local argname="$1"
+    local arg="$2"
+    local comp="arg:$argname:(("
+    local line
+    while read -r line; do
+        local name="$line"
+        local desc="$line"
+        name="${name%$'\t'*}"
+        desc="${desc/*$'\t'}"
+        comp="$comp$name"
+        if [[ -n "$desc" && "$name" != "$desc" ]]; then
+            comp="$comp\\:"'"'"$desc"'"'
+        fi
+        comp="$comp "
+    done <<< "$arg"
+
+    comp="$comp))"
+    _alternative "$comp"
+}
+

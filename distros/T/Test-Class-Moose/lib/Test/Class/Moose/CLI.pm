@@ -4,7 +4,7 @@ package Test::Class::Moose::CLI;
 
 use 5.010000;
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 use Moose 2.0000;
 use Carp;
@@ -28,7 +28,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ runner if it is not already loaded.
 
 This should be the path to a directory containing test classes. The path can
 be relative to the project root (F<t/lib>) or absolute. If you do not pass
-this argument, it will default to F<t/lib>.
+this argument it will default to F<t/lib>.
 
 You can pass this option more than once if you'd like to include multiple test
 directories.

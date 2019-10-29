@@ -30,3 +30,6 @@ public/
 /config.*
 etc/*.cfg
 /frontend/compiled/
+/configure
+*~
+/.vscode/perl-lang/

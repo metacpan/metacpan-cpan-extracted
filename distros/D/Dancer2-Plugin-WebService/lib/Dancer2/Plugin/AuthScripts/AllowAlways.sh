@@ -1,9 +1,7 @@
 #!/bin/sh
 #
-# This script is replaced from the INTERNAL authentication
-# it is here only as an example.
-#
-# It always authorized user successfully no matter the username or the password
+# This script is replaced from the INTERNAL authentication, it is here only as an example.
+# It always authorized users no matter the username or the password
 # Expect two arguments, the username and the password 
 # Prints at standard output as result the three lines
 # 

@@ -3,7 +3,7 @@ package App::Pods2Site::SiteBuilder::BasicFramesSimpleTOC;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -31,7 +31,8 @@ sub _getCategoryTOC
 	}
 	$self->_genRefs($sitedir, \$toc, $podInfo, \%tree);
 	chomp($toc);
-	$toc = qq(<strong>$groupName</strong><br/><br/>\n$toc<br/><hr/>) if $toc;
+	my $groupnameelem = $groupName ? "<strong>$groupName</strong><br/><br/>\n" : ''; 
+	$toc = qq($groupnameelem$toc<br/><hr/>) if $toc;
 	
 	return $toc;
 }

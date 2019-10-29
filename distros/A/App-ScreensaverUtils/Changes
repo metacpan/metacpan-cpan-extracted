@@ -1,3 +1,11 @@
+0.008   2019-09-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] prevent-screensaver-activated-until-interrupted (noss): Show
+	  an informative message.
+
+
 0.007   2019-09-15  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -185,87 +185,6 @@ krd_subscription(rdk)
     OUTPUT:
         RETVAL
 
-HV*
-krd_metadata(rdk,topic,timeout_ms=1000)
-        plrd_kafka_t* rdk
-        rd_kafka_topic_t* topic
-        int timeout_ms
-    PREINIT:
-        const rd_kafka_metadata_t *metadatap;
-        rd_kafka_resp_err_t err;
-        int t,p,b,r,i;
-        rd_kafka_metadata_topic_t topic_md;
-        rd_kafka_metadata_partition_t partition_md;
-        rd_kafka_metadata_broker_t broker_md;
-    CODE:
-        err = rd_kafka_metadata(rdk->rk, 0, topic, &metadatap, timeout_ms);
-        if (err != RD_KAFKA_RESP_ERR_NO_ERROR) {
-            croak("Error retrieving partition information: %s", rd_kafka_err2str(err));
-        }
-        RETVAL = newHV();
-        hv_stores(RETVAL, "orig_broker_name", newSVpv(metadatap->orig_broker_name, strlen(metadatap->orig_broker_name)));
-        hv_stores(RETVAL, "orig_broker_id", newSViv(metadatap->orig_broker_id));
-
-        /* array of hashrefs containing topic information  */
-        AV* topic_AV = newAV();
-        for( t=0; t<metadatap->topic_cnt; t++) {
-
-            /* hash for each topic information */
-            HV * topic_HV = newHV();
-            topic_md = metadatap->topics[t];
-            hv_stores(topic_HV, "topic_name", newSVpv(topic_md.topic, strlen(topic_md.topic)));
-
-            /* array of hashrefs containing partition information within each topic */
-            AV * partition_AV = newAV();
-            for( p=0; p<topic_md.partition_cnt; p++) {
-                /* hash for each partition */
-                HV * partition_HV = newHV();
-                partition_md = topic_md.partitions[p];
-                hv_stores(partition_HV, "id", newSViv(partition_md.id));
-                hv_stores(partition_HV, "leader", newSViv(partition_md.leader));
-
-                /* array containing replica broker ids for each partition */
-                AV * replica_AV = newAV();
-                for ( r=0; r < partition_md.replica_cnt; r++) {
-                    av_push(replica_AV, newSViv(partition_md.replicas[r]));
-                }
-                hv_stores(partition_HV, "replicas", newRV_noinc((SV*)replica_AV));
-
-                /* array containing isr broker ids for each partition */
-                AV* isr_AV = newAV();
-                for( i=0; i < partition_md.isr_cnt; i++ ) {
-                    av_push(isr_AV, newSViv(partition_md.isrs[i]));
-                }
-                hv_stores(partition_HV, "isrs", newRV_noinc((SV*)isr_AV));
-
-                av_push(partition_AV, newRV_noinc((SV*)partition_HV));
-            }
-
-            hv_stores(topic_HV, "partitions", newRV_noinc((SV*)partition_AV));
-
-            av_push(topic_AV, newRV_noinc((SV*)topic_HV));
-        }
-        hv_stores(RETVAL, "topics", newRV_noinc((SV*)topic_AV));
-
-        /* array of hashrefs containing broker information */
-        AV* broker_AV = newAV();
-        for( b = 0; b < metadatap->broker_cnt; b++) {
-            /* broker hash */
-            HV * broker_HV = newHV();
-            broker_md = metadatap->brokers[b];
-            hv_stores(broker_HV, "id", newSViv(broker_md.id));
-            hv_stores(broker_HV, "host", newSVpv(broker_md.host, strlen(broker_md.host)));
-            hv_stores(broker_HV, "port", newSViv(broker_md.port));
-
-            av_push(broker_AV, newRV_noinc((SV*)broker_HV));
-        }
-        hv_stores(RETVAL, "brokers", newRV_noinc((SV*)broker_AV));
-
-        /* Free up memory used by metadata struct */
-        rd_kafka_metadata_destroy(metadatap);
-    OUTPUT:
-        RETVAL
-
 void
 krd_assign(rdk, tp_list = NULL)
         plrd_kafka_t* rdk
@@ -392,6 +311,44 @@ krd_pause(rdk, tp_list = NULL)
         err = rd_kafka_pause_partitions(rdk->rk, tp_list);
         if (err != RD_KAFKA_RESP_ERR_NO_ERROR) {
             croak("Error pausing partitions: %s", rd_kafka_err2str(err));
+        }
+
+void
+krd_produce(rdk, topic, partition, key, payload, timestamp, msg_id, msgflags = 0, hdrs = NULL)
+        plrd_kafka_t *rdk
+        char *topic
+        int partition
+        SV *key
+        SV *payload
+        long timestamp
+        IV msg_id
+        int msgflags
+        rd_kafka_headers_t *hdrs
+    PREINIT:
+        STRLEN plen = 0, klen = 0;
+        char *plptr = NULL, *keyptr = NULL;
+        rd_kafka_resp_err_t err;
+    CODE:
+        if (SvOK(payload))
+            plptr = SvPVbyte(payload, plen);
+        if (SvOK(key))
+            keyptr = SvPVbyte(key, klen);
+
+        err = rd_kafka_producev(
+            rdk->rk,
+            RD_KAFKA_V_TOPIC(topic),
+            RD_KAFKA_V_PARTITION(partition),
+            RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY | msgflags),
+            RD_KAFKA_V_KEY(keyptr, klen),
+            RD_KAFKA_V_TIMESTAMP(timestamp),
+            RD_KAFKA_V_VALUE(plptr, plen),
+            RD_KAFKA_V_OPAQUE((void *) msg_id),
+            /* making a copy here avoids ownership nightmares */
+            RD_KAFKA_V_HEADERS(hdrs ? rd_kafka_headers_copy(hdrs) : NULL),
+            RD_KAFKA_V_END);
+
+        if (err) {
+            croak("Error producing: %s", rd_kafka_err2str(err));
         }
 
 void
@@ -557,44 +514,85 @@ krdev_DESTROY(rkev)
 MODULE = Net::Kafka    PACKAGE = Net::Kafka::Topic    PREFIX = krdt_
 PROTOTYPES: DISABLE
 
-void
-krdt_produce(rkt, partition, key, payload, timestamp, msg_id, msgflags = 0, hdrs = NULL)
+HV*
+krdt_metadata(rkt, timeout_ms = 0)
         rd_kafka_topic_t* rkt
-        int partition
-        SV* key
-        SV* payload
-        long timestamp
-        IV msg_id
-        int msgflags
-        rd_kafka_headers_t *hdrs
+        int timeout_ms
     PREINIT:
-        STRLEN plen = 0, klen = 0;
-        char *plptr = NULL, *keyptr = NULL;
-        plrd_kafka_t* krd;
+        plrd_kafka_t* rdk;
+        const rd_kafka_metadata_t *metadatap;
         rd_kafka_resp_err_t err;
+        int t, p, b, r,i;
+        rd_kafka_metadata_topic_t topic_md;
+        rd_kafka_metadata_partition_t partition_md;
+        rd_kafka_metadata_broker_t broker_md;
     CODE:
-        if (SvOK(payload))
-            plptr = SvPVbyte(payload, plen);
-        if (SvOK(key))
-            keyptr = SvPVbyte(key, klen);
-
-        krd = (plrd_kafka_t *)rd_kafka_topic_opaque(rkt);
-        err = rd_kafka_producev(
-            krd->rk,
-            RD_KAFKA_V_RKT(rkt),
-            RD_KAFKA_V_PARTITION(partition),
-            RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY | msgflags),
-            RD_KAFKA_V_KEY(keyptr, klen),
-            RD_KAFKA_V_TIMESTAMP(timestamp),
-            RD_KAFKA_V_VALUE(plptr, plen),
-            RD_KAFKA_V_OPAQUE((void *) msg_id),
-            /* making a copy here avoids ownership nightmares */
-            RD_KAFKA_V_HEADERS(hdrs ? rd_kafka_headers_copy(hdrs) : NULL),
-            RD_KAFKA_V_END);
-
-        if (err) {
-            croak("Error producing: %s", rd_kafka_err2str(err));
+        rdk = (plrd_kafka_t *)rd_kafka_topic_opaque(rkt);
+        err = rd_kafka_metadata(rdk->rk, 0, rkt, &metadatap, timeout_ms);
+        if (err != RD_KAFKA_RESP_ERR_NO_ERROR) {
+            croak("Error retrieving partition information: %s", rd_kafka_err2str(err));
         }
+        RETVAL = newHV();
+        hv_stores(RETVAL, "orig_broker_name", newSVpv(metadatap->orig_broker_name, strlen(metadatap->orig_broker_name)));
+        hv_stores(RETVAL, "orig_broker_id", newSViv(metadatap->orig_broker_id));
+
+        /* array of hashrefs containing topic information  */
+        AV* topic_AV = newAV();
+        for (t = 0; t < metadatap->topic_cnt; t++) {
+
+            /* hash for each topic information */
+            HV * topic_HV = newHV();
+            topic_md = metadatap->topics[t];
+            hv_stores(topic_HV, "topic_name", newSVpv(topic_md.topic, strlen(topic_md.topic)));
+
+            /* array of hashrefs containing partition information within each topic */
+            AV * partition_AV = newAV();
+            for (p = 0; p < topic_md.partition_cnt; p++) {
+                /* hash for each partition */
+                HV * partition_HV = newHV();
+                partition_md = topic_md.partitions[p];
+                hv_stores(partition_HV, "id", newSViv(partition_md.id));
+                hv_stores(partition_HV, "leader", newSViv(partition_md.leader));
+
+                /* array containing replica broker ids for each partition */
+                AV * replica_AV = newAV();
+                for (r = 0; r < partition_md.replica_cnt; r++) {
+                    av_push(replica_AV, newSViv(partition_md.replicas[r]));
+                }
+                hv_stores(partition_HV, "replicas", newRV_noinc((SV*)replica_AV));
+
+                /* array containing isr broker ids for each partition */
+                AV* isr_AV = newAV();
+                for(i = 0; i < partition_md.isr_cnt; i++) {
+                    av_push(isr_AV, newSViv(partition_md.isrs[i]));
+                }
+
+                hv_stores(partition_HV, "isrs", newRV_noinc((SV*)isr_AV));
+                av_push(partition_AV, newRV_noinc((SV*)partition_HV));
+            }
+            hv_stores(topic_HV, "partitions", newRV_noinc((SV*)partition_AV));
+            av_push(topic_AV, newRV_noinc((SV*)topic_HV));
+        }
+        hv_stores(RETVAL, "topics", newRV_noinc((SV*)topic_AV));
+
+        /* array of hashrefs containing broker information */
+        AV* broker_AV = newAV();
+        for(b = 0; b < metadatap->broker_cnt; b++) {
+            /* broker hash */
+            HV * broker_HV = newHV();
+            broker_md = metadatap->brokers[b];
+            hv_stores(broker_HV, "id", newSViv(broker_md.id));
+            hv_stores(broker_HV, "host", newSVpv(broker_md.host, strlen(broker_md.host)));
+            hv_stores(broker_HV, "port", newSViv(broker_md.port));
+
+            av_push(broker_AV, newRV_noinc((SV*)broker_HV));
+        }
+        hv_stores(RETVAL, "brokers", newRV_noinc((SV*)broker_AV));
+
+        /* Free up memory used by metadata struct */
+        rd_kafka_metadata_destroy(metadatap);
+    OUTPUT:
+        RETVAL
 
 void
 krdt_seek(rkt, partition, offset, timeout_ms = 0)
@@ -616,7 +614,7 @@ krdt_DESTROY(rkt)
     CODE:
         plrd_kafka_t* krd = (plrd_kafka_t *)rd_kafka_topic_opaque(rkt);
         DEBUG2F(krd->debug_xs, "Destroying Net::Kafka::Topic %s", rd_kafka_topic_name(rkt));
-        rd_kafka_topic_destroy( rkt );
+        rd_kafka_topic_destroy(rkt);
 
 MODULE = Net::Kafka    PACKAGE = Net::Kafka::Message    PREFIX = krdm_
 PROTOTYPES: DISABLE

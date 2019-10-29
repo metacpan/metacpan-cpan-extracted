@@ -3,7 +3,7 @@ package App::Pods2Site::Pod2HTML;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -96,7 +96,7 @@ sub __updateHTML
 						"--infile=$podfile",
 						"--outfile=$outfile",
 						"--podroot=$podRoot",
-						"--podpath=$podpath",
+						$podpath ? ("--podpath=$podpath") : (),
 						"--htmlroot=$htmlroot",
 						"--css=$htmlroot/../pods2site.css",
 					);

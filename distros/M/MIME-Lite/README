@@ -1373,7 +1373,7 @@ BUGS
     please, include tests for any patches you provide.
 
 VERSION
-    Version: 3.030
+    Version: 3.031
 
 CHANGE LOG
     Moved to ./changes.pod

@@ -4,7 +4,7 @@ use warnings;
 package Getopt::Lucid::Exception;
 # ABSTRACT: Exception classes for Getopt::Lucid
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Exporter;
 our @ISA = qw/Exporter Exception::Class::Base/;
@@ -55,7 +55,7 @@ Getopt::Lucid::Exception - Exception classes for Getopt::Lucid
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for Pod::Coverage description
 throw_argv
@@ -68,7 +68,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by David Golden.
+This software is Copyright (c) 2019 by David Golden.
 
 This is free software, licensed under:
 

@@ -24,11 +24,11 @@ Test::HTML::Tidy5 - Test::More-style wrapper around HTML::Tidy5
 
 =head1 VERSION
 
-Version 1.04
+Version 1.06
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 my $TB = Test::Builder->new;
 

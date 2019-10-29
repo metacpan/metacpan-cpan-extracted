@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::is_archived_web_uri;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Catmandu::Sane;
 use Moo;
@@ -16,7 +16,7 @@ with 'Catmandu::Fix::Condition::SimpleAllTest';
 sub emit_test {
     my ($self, $var) = @_;
     my $date = $self->date;
-    $date = [ localtime ]->[5] + 1900 unless defined($date) && length($date);
+    $date = [localtime]->[5] + 1900 unless defined($date) && length($date);
 
     "(is_value(${var}) && Data::Validate::URI::is_web_uri(${var}) && Memento::TimeTravel::find_mementos(${var},${date}))";
 }

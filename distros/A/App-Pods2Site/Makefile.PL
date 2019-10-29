@@ -76,7 +76,7 @@ WriteMakefile(
 			'JSON' => 0,
 			'List::MoreUtils' => 0,
 			'Pod::Html' => 0,
-			'Pod::Simple::Search' => 0,
+			'Pod::Simple::Search' => '3.40',
 			'Pod::Usage' => 0,
 		},
 	dist  =>

@@ -1,7 +1,7 @@
 package Software::Catalog::SW::bulwark::qt;
 
-our $DATE = '2019-01-14'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,13 +15,9 @@ with 'Software::Catalog::Role::Software';
 
 use Software::Catalog::Util qw(extract_from_url);
 
-sub meta {
-    return {
-        homepage_url => "https://bulwarkcrypto.com/",
-    };
-}
+sub homepage_url { "https://bulwarkcrypto.com/" }
 
-sub get_latest_version {
+sub latest_version {
     my ($self, %args) = @_;
 
     extract_from_url(
@@ -30,7 +26,7 @@ sub get_latest_version {
     );
 }
 
-sub get_available_versions {
+sub available_versions {
     my ($self, %args) = @_;
 
     my $res = extract_from_url(
@@ -44,7 +40,7 @@ sub get_available_versions {
     $res;
 }
 
-sub get_release_note {
+sub release_note {
     require Mojo::DOM;
 
     my ($self, %args) = @_;
@@ -52,7 +48,7 @@ sub get_release_note {
 
     # 2.1.1 tree means version 2.1.1.0
     my $version = $args{version} // do {
-        my $res = $self->get_latest_version(%args);
+        my $res = $self->latest_version(%args);
         return $res unless $res->[0] == 200;
         $res->[2];
     };
@@ -92,12 +88,12 @@ sub canon2native_arch_map {
 
 # version
 # arch
-sub get_download_url {
+sub download_url {
     my ($self, %args) = @_;
 
     my $version = $args{version};
     if (!$version) {
-        my $verres = $self->get_latest_version(maybe arch => $args{arch});
+        my $verres = $self->latest_version(maybe arch => $args{arch});
         return [500, "Can't get latest version: $verres->[0] - $verres->[1]"]
             unless $verres->[0] == 200;
         $version = $verres->[2];
@@ -130,10 +126,10 @@ sub get_download_url {
      }];
 }
 
-sub get_archive_info {
+sub archive_info {
     my ($self, %args) = @_;
 
-    my $v = $args{version} // get_latest_version()->[2];
+    my $v = $args{version} // latest_version()->[2];
 
     [200, "OK", {
         programs => [
@@ -160,7 +156,7 @@ Software::Catalog::SW::bulwark::qt - Bulwark desktop GUI client
 
 =head1 VERSION
 
-This document describes version 0.006 of Software::Catalog::SW::bulwark::qt (from Perl distribution Software-Catalog-SW-bulwark-qt), released on 2019-01-14.
+This document describes version 0.007 of Software::Catalog::SW::bulwark::qt (from Perl distribution Software-Catalog-SW-bulwark-qt), released on 2019-10-26.
 
 =for Pod::Coverage ^(.+)$
 

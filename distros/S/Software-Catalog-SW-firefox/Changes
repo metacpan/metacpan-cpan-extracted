@@ -1,18 +1,31 @@
-0.004   2018-10-05 (PERLANCAR)
+0.006   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	- No functional changes.
+
+        - [dist] Set release attribute's urgency to high.
+
+
+0.005   2019-10-26  Released-By: PERLANCAR; Urgency: high
+
+	- Update to Software::Catalog::Role::Software 1.0.6 (incompatible
+	  change, renamed methods).
+
+
+0.004   2018-10-05  Released-By: PERLANCAR
 
 	- Update to Software::Catalog 1.0.3.
 
 
-0.003   2018-10-04 (PERLANCAR)
+0.003   2018-10-04  Released-By: PERLANCAR
 
 	- Add meta property: versioning_scheme.
 
 
-0.002   2018-09-20 (PERLANCAR)
+0.002   2018-09-20  Released-By: PERLANCAR
 
 	- Add get_programs().
 
 
-0.001   2018-09-13 (PERLANCAR)
+0.001   2018-09-13  Released-By: PERLANCAR
 
         - First release.

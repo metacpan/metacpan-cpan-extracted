@@ -16,7 +16,12 @@ qx.Class.define("callbackery.ui.Screen", {
      * @param vizWidget {Widget} visualization widget to embed
      */
     construct : function(cfg,getParentFormDataCallBack,extraAction) {
-        this.base(arguments,new qx.ui.layout.Grow());
+        this.base(arguments);
+        // just a reference to the Dock layout to make sure
+        // it gets included
+        qx.ui.layout.Dock; 
+        qx.ui.layout.Canvas;
+        // end
         this.__cfg = cfg;
         this.__getParentFormDataCallBack =  getParentFormDataCallBack;
         this.__extraAction = extraAction;
@@ -61,7 +66,36 @@ qx.Class.define("callbackery.ui.Screen", {
                     content.addListener('changeVisibility',function(){
                         this.setVisibility(content.getVisibility());
                     },that);
-                    that.add(content);
+                    var options = pluginConfig.options;
+                    var layoutClass = qx.ui.layout.Grow;
+                    var layoutClassSet = {};
+                    var containerSet = {};
+                    var containerAddProps = {};
+                    if (options) {
+                        var layout = options.layout;
+                        if (layout) {
+                            if (layout.class) {
+                                layoutClass = qx.Bootstrap.getByName(layout.class);
+                            }
+                            if (layout.set) {
+                                layoutClassSet = layout.set;
+                            }
+                        }
+                        var container = options.container;
+                        if (container) {
+                            if (container.set) {
+                                containerSet = container.set;
+                            }
+                            if (container.addProps) {
+                                containerAddProps = container.addProps;
+                            }
+                        }
+                    }
+                    var lc = new layoutClass;
+                    lc.set(layoutClassSet);
+                    that.setLayout(lc);
+                    content.set(containerSet);
+                    that.add(content,containerAddProps);
                 }
                 else {
                     that.debug('Invalid plugin type:"' + type + '"');

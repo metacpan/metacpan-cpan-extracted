@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo;
 use strictures 2;
@@ -16,17 +16,13 @@ use namespace::clean;
 
 has names => (
     is      => 'ro',
-    default => sub {
-        return \%MIDI::Simple::Length;
-    },
+    default => sub { return \%MIDI::Simple::Length },
 );
 
 
 has sizes => (
     is      => 'ro',
-    default => sub {
-        return { reverse %MIDI::Simple::Length };
-    },
+    default => sub { return { reverse %MIDI::Simple::Length } },
 );
 
 
@@ -94,15 +90,13 @@ sub motif {
         my $size = $self->duration($name);
         my $diff = $self->size - $sum;
         last
-            if $diff < $self->min_size;
+            if sprintf( '%.4f', $diff ) < sprintf( '%.4f', $self->min_size );
         next
-            if $size > $diff;
+            if sprintf( '%.4f', $size ) > sprintf( '%.4f', $diff );
         $sum += $size;
 #warn(__PACKAGE__,' ',__LINE__," MARK: $name, $size, $sum\n");
         push @$motif, $name
             if $sum <= $self->size;
-        last
-            if $sum >= $self->size;
     }
 
     return $motif;
@@ -122,7 +116,7 @@ Music::Duration::Partition - Partition a musical duration
 
 =head1 VERSION
 
-version 0.0302
+version 0.0303
 
 =head1 SYNOPSIS
 

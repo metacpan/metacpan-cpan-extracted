@@ -41,26 +41,22 @@
       "runtime" : {
          "requires" : {
             "Graph" : "0",
-            "IO::File" : "0",
             "PerlIO::gzip" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Algorithm::Diff" : "0",
-            "Test::Builder" : "0",
             "Test::Exception" : "0",
             "Test::Files" : "0",
-            "Test::More" : "0",
-            "Text::Diff" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "obogaf::parser" : {
          "file" : "lib/obogaf/parser.pm",
-         "version" : "1.014"
+         "version" : "1.016"
       }
    },
    "release_status" : "stable",
@@ -68,9 +64,10 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/marconotaro/obogaf-parser.git",
-         "web" : "https://github.com/marconotaro/obogaf-parser"
+         "web" : "https://github.com/marconotaro/obogaf-parser",
+         "x_homepage" : "https://obogaf-parser.readthedocs.io"
       }
    },
-   "version" : "1.014",
+   "version" : "1.016",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

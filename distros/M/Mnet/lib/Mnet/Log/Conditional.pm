@@ -129,7 +129,7 @@ sub notice {
 
     # call Mnet::Log::output if loaded or return;
     my ($self, $text) = (shift, shift);
-    return Mnet::Log::output($self, " - ", 5, scalar(caller), $text)
+    return Mnet::Log::output($self, "---", 5, scalar(caller), $text)
         if $INC{"Mnet/Log.pm"};
     return 1;
 }
@@ -238,7 +238,7 @@ sub NOTICE {
 
     # call Mnet::Log::output if loaded or return;
     my $text = shift;
-    return Mnet::Log::output(undef, " - ", 5, scalar(caller), $text)
+    return Mnet::Log::output(undef, "---", 5, scalar(caller), $text)
         if $INC{"Mnet/Log.pm"};
     return 1;
 }

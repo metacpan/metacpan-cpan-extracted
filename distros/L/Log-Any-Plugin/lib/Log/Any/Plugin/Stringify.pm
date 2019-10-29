@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Stringify;
 # ABSTRACT: Custom argument stringification plugin for log adapters
-$Log::Any::Plugin::Stringify::VERSION = '0.008';
+$Log::Any::Plugin::Stringify::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ Log::Any::Plugin::Stringify - Custom argument stringification plugin for log ada
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

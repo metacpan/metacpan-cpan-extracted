@@ -37,7 +37,7 @@
             "Dist::Zilla::Plugin::GitHub::Meta" : "0.46",
             "Dist::Zilla::Plugin::GitHub::UploadRelease" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
-            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0.20",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
@@ -76,11 +76,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::GSG" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/GSG.pm",
-         "version" : "v0.0.14"
+         "version" : "v0.0.15"
       },
       "Dist::Zilla::PluginBundle::Author::GSG" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/GSG.pm",
-         "version" : "v0.0.14"
+         "version" : "v0.0.15"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
       }
    },
-   "version" : "v0.0.14",
+   "version" : "v0.0.15",
    "x_contributors" : [
       "Andrew Fresh <andrew.fresh@grantstreet.com>",
       "Mark Flickinger <mark.flickinger@grantstreet.com>"

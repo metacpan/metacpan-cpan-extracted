@@ -3,7 +3,7 @@ package App::Pods2Site::PodFinder;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 my $version = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -84,7 +84,7 @@ sub __scan
 	
 	# get all script pods - be 'laborious' since they typically don't fit '.pm' or '.pod' naming
 	#
-	my $binSearch = Pod::Simple::Search->new()->inc(0)->laborious(1)->callback($cb)->verbose($verbosity);
+	my $binSearch = Pod::Simple::Search->new()->inc(0)->laborious(1)->callback($cb)->verbose($verbosity)->is_case_insensitive(0);
 	$binSearch->survey($args->getBinDirs());
 	my $bin_n2p = $binSearch->name2path;
 	foreach my $name (keys(%$bin_n2p))
@@ -95,7 +95,7 @@ sub __scan
 	# get all other pods - specifically turn off automatic 'inc', since that's part of
 	# our own setup
 	#
-	my $libSearch = Pod::Simple::Search->new()->inc(0)->callback($cb)->verbose($verbosity);
+	my $libSearch = Pod::Simple::Search->new()->inc(0)->callback($cb)->verbose($verbosity)->is_case_insensitive(0);
 	$libSearch->survey($args->getLibDirs());
 	my $lib_n2p = $libSearch->name2path();
 	foreach my $name (keys(%$lib_n2p))

@@ -1,3 +1,15 @@
+#### obogaf::parser 1.016
+
+###### CHANGES
+- added some degenerate test 
+- added homepage in Makefile.PL
+
+#### obogaf::parser 1.015
+
+###### CHANGES
+- fixed CPAN Testers issues
+- improved Makefile.PL
+
 #### obogaf::parser 1.014
 
 ###### CHANGES

@@ -8,7 +8,7 @@
 #########################################################################
 
 package Term::Clui;
-our $VERSION = '1.75';
+our $VERSION = '1.76';
 my $stupid_bloody_warning = $VERSION;  # circumvent -w warning
 require Exporter;
 @ISA = qw(Exporter);
@@ -1653,6 +1653,10 @@ Peter J Billam www.pjb.com.au/comp/contact.html
 Current maintainer:
 
 Graham Ollis
+
+Contributors:
+
+Peter Scott
 
 =head1 CREDITS
 

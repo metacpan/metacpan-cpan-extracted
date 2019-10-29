@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Warn;
-use Test::Trap;
 use DBIx::Class::ResultSet::RecursiveUpdate;
 
 use lib 't/lib';

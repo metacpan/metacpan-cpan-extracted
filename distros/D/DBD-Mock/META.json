@@ -61,7 +61,7 @@
    "provides" : {
       "DBD::Mock" : {
          "file" : "lib/DBD/Mock.pm",
-         "version" : "1.51"
+         "version" : "1.52"
       },
       "DBD::Mock::Pool" : {
          "file" : "lib/DBD/Mock/Pool.pm"
@@ -96,7 +96,7 @@
          "web" : "https://gitlab.com/scrapheap/DBD-Mock"
       }
    },
-   "version" : "1.51",
+   "version" : "1.52",
    "x_authority" : "cpan:JLCOOPER",
    "x_contributors" : [
       "Chisel <CHISEL@cpan.org>",

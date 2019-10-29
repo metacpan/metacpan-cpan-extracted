@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::MetaSyntactic" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.053",
+  "VERSION" => "1.054",
   "test" => {
     "TESTS" => "t/*.t"
   }

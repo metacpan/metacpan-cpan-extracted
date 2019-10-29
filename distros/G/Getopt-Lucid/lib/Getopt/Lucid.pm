@@ -4,7 +4,7 @@ use warnings;
 package Getopt::Lucid;
 # ABSTRACT: Clear, readable syntax for command line processing
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 our @EXPORT_OK = qw(Switch Counter Param List Keypair);
 our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
@@ -881,7 +881,7 @@ Getopt::Lucid - Clear, readable syntax for command line processing
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -1087,7 +1087,7 @@ possible.  E.g.:
 
    @spec = (
      Param("input")->default("/dev/random")->needs("output"),
-     Param("output)->default("/dev/null"),
+     Param("output")->default("/dev/null"),
    );
 
 =head3 valid()
@@ -1126,7 +1126,7 @@ exception is thrown.
 
    @spec = (
      Param("input")->needs("output"),
-     Param("output),
+     Param("output"),
    );
 
 =head3 anycase()
@@ -1675,9 +1675,13 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Golden Precious James E Keenan Kevin McGrath Nova Patch Robert Bohne thilp
+=for stopwords Chris White David Golden Precious James E Keenan Kevin McGrath Nova Patch Robert Bohne thilp
 
 =over 4
+
+=item *
+
+Chris White <cxwembedded@gmail.com>
 
 =item *
 
@@ -1711,7 +1715,7 @@ thilp <thilp@thilp.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by David Golden.
+This software is Copyright (c) 2019 by David Golden.
 
 This is free software, licensed under:
 

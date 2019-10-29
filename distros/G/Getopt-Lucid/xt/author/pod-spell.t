@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Bohne
+Chris
 David
 Exception
 Getopt
@@ -24,6 +25,8 @@ Nova
 Patch
 Precious
 Robert
+White
+cxwembedded
 dagolden
 davidp
 getopt

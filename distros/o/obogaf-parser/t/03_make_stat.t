@@ -40,8 +40,8 @@ $res= obogaf::parser::make_stat($gobp, $parentIndex, $childIndex);
 is($res, "#oboterm <tab> degree <tab> indegree <tab> outdegree\nGO:0007260\t2\t2\t0\nGO:0007259\t1\t0\t1\nGO:0018108\t1\t0\t1\n\n~summary stat~\nnodes: 3\nedges: 2\nmax degree: 2\nmin degree: 1\nmedian degree: 1.0000\naverage degree: 0.6667\ndensity: 3.3333e-01\n", "test that make_stat works on whole ontology");
 
 ## test degeneate case 
-my $goedges_hack= "t/data/test_gobasic_edges_hack.txt";
-open $fh, ">", $goedges_hack; 
+my $goedges_stat= "t/data/test_gobasic_edges_stat.txt";
+open $fh, ">", $goedges_stat; 
 open FH, "<", $goedges;
 while(<FH>){
     if($.==1){print $fh $_} else {next;}
@@ -50,7 +50,7 @@ close FH;
 close $fh;
 
 ($parentIndex, $childIndex)= (1,2);
-$res= obogaf::parser::make_stat($goedges_hack, $parentIndex, $childIndex);
+$res= obogaf::parser::make_stat($goedges_stat, $parentIndex, $childIndex);
 is($res, "#oboterm <tab> degree <tab> indegree <tab> outdegree\nGO:0007260\t1\t1\t0\nGO:0018108\t1\t0\t1\n\n~summary stat~\nnodes: 2\nedges: 1\nmax degree: 1\nmin degree: 1\nmedian degree: 1.0000\naverage degree: 0.5000\ndensity: 5.0000e-01\n", "test that make_stat works on whole ontology");
 
 done_testing();

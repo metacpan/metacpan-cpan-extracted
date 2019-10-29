@@ -28,13 +28,13 @@ my @try_flags = (
   { cflags => '-I/usr/local/include/libxml2', libs => '-lxml2' },
 );
 
-plugin 'PkgConfig' => 'libxml-2.0';
-
 probe [
   ['xml2-config', '--version' => \'%{.install.my_version}'],
   ['xml2-config', '--cflags'  => \'%{.install.my_cflags}'],
   ['xml2-config', '--libs'    => \'%{.install.my_libs}'],
 ];
+
+plugin 'PkgConfig' => 'libxml-2.0';
 
 plugin 'Probe::CBuilder' => (
   cflags  => $_->{cflags},
@@ -157,4 +157,3 @@ sys {
   );
 
 };
-

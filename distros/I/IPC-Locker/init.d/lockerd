@@ -2,7 +2,7 @@
 # DESCRIPTION: Sample file to place in /etc/init.d to start the daemon
 # Distributed with IPC::Locker
 #
-# Copyright 1999-2017 by Wilson Snyder.  This program is free software;
+# Copyright 1999-2019 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 #

@@ -1,5 +1,8 @@
 Revision history for Catmandu-Identifier
 
+0.13  2019-10-29 11:53:14 CET
+    - execute live tests only if NETWORK_TEST is set
+
 0.12  2019-10-02 11:46:49 CEST
     - downgrade Catmandu dependency
 

@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::is_valid_issn;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Catmandu::Sane;
 use Moo;

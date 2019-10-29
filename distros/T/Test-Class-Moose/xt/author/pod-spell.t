@@ -117,7 +117,9 @@ goschwald
 hardcode
 hashrefs
 invocant
+jjrs
 jns
+jrubinator
 kwakwaversal
 la
 larryl

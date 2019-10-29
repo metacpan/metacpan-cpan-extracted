@@ -14,7 +14,7 @@ is(
   },
   'script_stdout_is',
 );
-  
+
 is(
   intercept { script_stdout_isnt "XXXX" },
   array {
@@ -44,7 +44,7 @@ is(
   },
   'script_stdout_is fail',
 );
-  
+
 is(
   intercept { script_stdout_isnt "Standard Out\nsecond line\n" },
   array {

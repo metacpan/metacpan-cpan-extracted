@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+lib/Mojo/Base/Role/PromiseClass.pm
 lib/Mojo/UserAgent/Role/PromiseClass.pm
 t/author-critic.t
 t/author-pod-coverage.t

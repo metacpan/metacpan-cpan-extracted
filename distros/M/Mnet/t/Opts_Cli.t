@@ -110,9 +110,9 @@ Test::More::is(`$perl -e '
     use Mnet::Opts::Cli;
     Mnet::Opts::Cli::define({ getopt => "test-opt=s" });
     Mnet::Opts::Cli->new;
-' -- --test-opt test 2>&1`, ' -  - Mnet::Log -e started
+' -- --test-opt test 2>&1`, '--- - Mnet::Log -e started
 inf - Mnet::Opts::Cli new parsed opt cli test-opt = "test"
- -  - Mnet::Log finished with no errors
+--- - Mnet::Log finished with no errors
 ', 'invalid cli opt');
 
 # finished

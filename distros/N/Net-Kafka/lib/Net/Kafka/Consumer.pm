@@ -26,7 +26,6 @@ sub new {
     my $kafka = delete $args{kafka} || Net::Kafka->new(RD_KAFKA_CONSUMER, $config);
     return bless {
         _kafka        => $kafka,
-        _topics       => {},
         _is_closed    => 0,
     }, $class;
 }
@@ -114,23 +113,13 @@ sub commit_message {
 sub seek {
     my ($self, $topic, $partition, $offset, $timeout_ms) = @_;
     $timeout_ms //= DEFAULT_SEEK_TIMEOUT;
-    $self->_topic($topic)->seek($partition, $offset, $timeout_ms);
-}
-
-sub _topic {
-    my ($self, $topic_name) = @_;
-    return $self->{_topics}{$topic_name}
-        if exists $self->{_topics}{$topic_name};
-
-    my $topic = $self->{_kafka}->topic($topic_name);
-    $self->{_topics}{$topic_name} = $topic;
-    return $topic;
+    $self->{_kafka}->topic($topic)->seek($partition, $offset, $timeout_ms);
 }
 
 sub close {
     my $self = shift;
     return if $self->{_is_closed};
-    $self->{_topics} = {}; # avoid use-after-free errors from topic destruction
+
     $self->{_kafka}->close() if defined $self->{_kafka};
     $self->{_is_closed} = 1;
 }

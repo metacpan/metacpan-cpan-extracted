@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::tld;
 use strict;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -38,6 +38,12 @@ Scott Lanning, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2019-10-28 - v1.011
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.054.
 
 =item *
 
@@ -167,7 +173,7 @@ cisco citadel citi citic city cityeats claims cleaning click clinic
 clinique clothing cloud club clubmed coach codes coffee college cologne
 comcast commbank community company compare computer comsec condos
 construction consulting contact contractors cooking cookingchannel cool
-corsica country coupon coupons courses credit creditcard creditunion
+corsica country coupon coupons courses cpa credit creditcard creditunion
 cricket crown crs cruise cruises csc cuisinella cymru cyou
 dabur dad dance data date dating datsun day dclk dds deal dealer deals
 degree delivery dell deloitte delta democrat dental dentist desi design
@@ -184,7 +190,7 @@ fire firestone firmdale fish fishing fit fitness flickr flights flir
 florist flowers flsmidth fly foo food foodnetwork football ford forex
 forsale forum foundation fox free fresenius frl frogans frontdoor frontier
 ftr fujitsu fujixerox fun fund furniture futbol fyi
-gal gallery gallo gallup game games gap garden gbiz gdn gea gent genting
+gal gallery gallo gallup game games gap garden gay gbiz gdn gea gent genting
 george ggee gift gifts gives giving glade glass gle global globo gmail
 gmbh gmo gmx godaddy gold goldpoint golf goo goodhands goodyear goog
 google gop got grainger graphics gratis green gripe grocery group guardian

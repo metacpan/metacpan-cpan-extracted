@@ -4,28 +4,35 @@
 # required modules
 use warnings;
 use strict;
+use Mnet::T;
 use Test::More tests => 1;
 
-# use current perl for tests
-my $perl = $^X;
-
-# check output from Mnet::Dump line function
-#   sed fixes Data::Dumper->Quotekeys variance on older perl cpan test
-Test::More::is(`$perl -e '
-    use warnings;
-    use strict;
-    use Mnet::Dump;
-    print Mnet::Dump::line(undef) . "\n";
-    print Mnet::Dump::line(1) . "\n";
-    print Mnet::Dump::line("test") . "\n";
-    print Mnet::Dump::line([ 1, 2 ]) . "\n";
-    print Mnet::Dump::line({ 1 => 2 }) . "\n";
-' -- 2>&1 | sed 's/{1 => 2}/{"1" => 2}/'`, 'undef
-1
-"test"
-[1,2]
-{"1" => 2}
-', 'line function');
+# Mnet::Dump line function
+#   sed filter fixes Data::Dumper->Quotekeys variance on older perl cpan tests
+Mnet::T::test_perl({
+    name    => 'Mnet::Dump line function',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Dump;
+        print Mnet::Dump::line(undef) . "\n";
+        print Mnet::Dump::line(1) . "\n";
+        print Mnet::Dump::line("test") . "\n";
+        print Mnet::Dump::line([ 1, 2 ]) . "\n";
+        print Mnet::Dump::line({ 1 => 2 }) . "\n";
+    perl-eof
+    filter  => <<'    filter-eof',
+        sed 's/1 => 2/"1" => 2/'
+    filter-eof
+    expect  => <<'    expect-eof',
+        undef
+        1
+        "test"
+        [1,2]
+        {"1" => 2}
+    expect-eof
+    debug => '',
+});
 
 # finished
 exit;

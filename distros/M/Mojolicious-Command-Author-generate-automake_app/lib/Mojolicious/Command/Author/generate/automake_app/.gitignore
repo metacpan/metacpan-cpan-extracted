@@ -27,3 +27,6 @@ nytprof.out
 *.bs
 /_eumm/
 /config.*
+*~
+/.vscode/perl-lang/
+/configure

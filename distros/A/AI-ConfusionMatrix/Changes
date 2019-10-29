@@ -1,10 +1,88 @@
 ==================================================
-Changes from 2016-06-23 00:00:00 +0000 to present.
+Changes from 2017-10-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.009 at 2018-06-23 12:04:12 +0000
+version 0.010 at 2019-10-27 21:13:50 +0000
 ------------------------------------------
+
+  Change: 3d51004bd8892bda9bb21bdb0ca3cff03438a579
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-10-27 22:13:21 +0000
+
+    Release 0.010 
+
+  Change: 80f861c2343ec5f2e7826a1dcadf9dd6a4364d78
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-10-27 22:13:21 +0000
+
+    Exclude temporary files for releases 
+
+  Change: 867d10e770465e46b886df93eb7385c8926a99a5
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-10-27 22:06:01 +0000
+
+    2018 -> 2019 
+
+  Change: 91bccdc2f18dfd7160cf0120863296b93f930a0c
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-10-27 20:23:24 +0000
+
+    Merge branch 'string_class' into 'master'
+
+    text labels now supported
+
+    See merge request vi.le/perl-ai-confusionmatrix!2 
+
+  Change: 64a9b5f6fc680e7b8fc3f83a1e8ccaf6f4178eff
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-10-27 13:33:23 +0000
+
+    Add comment about emptying the CSV file 
+
+  Change: 2c0b2d745e8dd44999bb3460d07e1e3f52cda206
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-10-27 12:30:47 +0000
+
+    Merge branch 'clear_csv' into 'master'
+
+    handle reuse of csv
+
+    See merge request vi.le/perl-ai-confusionmatrix!1 
+
+  Change: f05d56c0f1a6eff14aea5dfbe02d2792219f9693
+  Author: john <4852923-john---@users.noreply.gitlab.com>
+  Date : 2019-10-25 16:45:02 +0000
+
+    text labels now supported 
+
+  Change: 591bbb1ca3ea73b7963ab5eae29739b360ceb4cf
+  Author: john <4852923-john---@users.noreply.gitlab.com>
+  Date : 2019-10-24 22:37:48 +0000
+
+    handle reuse of csv 
+
+  Change: c758dd7ff4eba2541be53832427349e8c1db6185
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-06-08 17:03:24 +0000
+
+    Add .gitlab-ci.yml to excluded files 
+
+  Change: 102cc4c476c08a47ff672fa41f26ca5b66fb1aa7
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2019-06-08 17:03:04 +0000
+
+    Rename some variables to improve readability 
+
+------------------------------------------
+version 0.009 at 2018-06-23 12:11:29 +0000
+------------------------------------------
+
+  Change: 26715ae3594c73d64d14226b47d52636d2685a79
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-06-23 14:11:29 +0000
+
+    Release 0.009 
 
   Change: facd8f12a48582eab14e71c9e16a1e4bb7de14ba
   Author: Vincent Lequertier <vi.le@autistici.org>
@@ -128,174 +206,6 @@ version 0.007 at 2017-12-04 20:14:52 +0000
 
     Add the possibility of supplying a custom separator for the output 
 
-------------------------------------------
-version 0.006 at 2016-11-08 12:59:33 +0000
-------------------------------------------
-
-  Change: 54d890c4b92e8a08bb81d0c3d4cd507e5e24dc73
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-11-08 13:59:33 +0000
-
-    Release 0.006 
-
-  Change: 2c0eee06e08f6224c876bf7ea9d016b2410a9186
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-10-03 07:36:23 +0000
-
-    Use a temporary file for the test 
-
-  Change: 57e93ccc1ec21c2d089f2582f1038d0336ea5133
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-10-03 07:36:12 +0000
-
-    Can't use Tie::File with write-only handles 
-
-  Change: 75e4c45ba6f292a7d99cd1fbea9aa35806e52d76
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-10-02 21:42:05 +0000
-
-    Untie the array 
-
-  Change: 4ea38eceb618d8a1b81df227cf88ba4ebe0d3558
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-10-02 15:10:32 +0000
-
-    Document using makeConfusionMatrix with a file handle 
-
-  Change: 6268561fdc7ffab94a01e28b62bb4b29b5786d40
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-09-19 09:47:52 +0000
-
-    Support perl < 5.10 
-
-------------------------------------------
-version 0.005 at 2016-09-17 16:07:35 +0000
-------------------------------------------
-
-  Change: cf7e6ed4249ce4f1f2cbe71b96d4a92c649227c2
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-09-17 18:07:35 +0000
-
-    Release 0.005 
-
-  Change: b710b6fddc4321cad871a5ac2be0db8c3801116e
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-09-13 21:32:15 +0000
-
-    Fix CPAN tests 
-
-------------------------------------------
-version 0.004 at 2016-09-09 08:29:28 +0000
-------------------------------------------
-
-  Change: 4f973918215997e55df4a8ecada82d17dfacae5f
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-09-09 10:29:28 +0000
-
-    Release 0.004 
-
-  Change: b94468d257f869bb3b7c0feecdab11f8adfbd73c
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-09-04 23:25:39 +0000
-
-    Incorrect initialization of the False Positive Counter 
-
-  Change: c125ed7e0748c2430495037282be462d364807ab
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-09-04 10:35:42 +0000
-
-    Let's add tests 
-
-  Change: 2a8465b04170cd30ac944c44f6fd93401ac0bd25
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-29 21:41:34 +0000
-
-    Incorrect Total accuracy calculation 
-
-------------------------------------------
-version 0.003 at 2016-08-27 11:00:46 +0000
-------------------------------------------
-
-  Change: a206546a26f22950a6e825a3b1ac4ffa3d9499e4
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-27 13:00:46 +0000
-
-    Release 0.003 
-
-  Change: 6f2dbb30b9612e39fa5c69023dcf531b3d5bedcc
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-27 12:56:21 +0000
-
-    Add strict & warnings to the requirements list 
-
-  Change: e2bcba127270e2970a59f8e94a7501b686649cb2
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-27 12:52:48 +0000
-
-    Prettify the table generated 
-
-  Change: 9cd6d207911575705bbe9d2db0722e4877f779c9
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-27 12:42:18 +0000
-
-    Add some comments to improve the readability 
-
-  Change: 2356b83544f97e7ff1d537de17ebe66a32009269
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-23 22:20:31 +0000
-
-    At this state, the False Positive counter can't be undefined 
-
-  Change: d2a71bea5dd5a702ccdd1d67cb8e4c8a5e9100af
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-22 23:39:17 +0000
-
-    use strict & warnings 
-
-  Change: 93705b06aae588718bf9d729aaaf40b48d5c74d9
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-22 23:15:58 +0000
-
-    Add the 'provides' field to the METAs files 
-
-------------------------------------------
-version 0.002 at 2016-08-22 19:33:33 +0000
-------------------------------------------
-
-  Change: 0eff1a511fe9ff7b77920238c76a7deff8fbbafe
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-22 21:33:33 +0000
-
-    Release 0.002 
-
-  Change: 290bc71709666672d860630ff089ebec65850a0e
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-22 21:30:49 +0000
-
-    Documentation 
-
-  Change: d60e8ff6f6cb1ee7f12c0439ac9622f4bfbb00eb
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-22 21:06:02 +0000
-
-    Formatting 
-
-  Change: fac74ae0ce7bc58a4fd6fc9fc35c655268e03a4f
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-22 21:00:34 +0000
-
-    Add the totals per column 
-
-------------------------------------------
-version 0.001 at 2016-08-21 17:30:39 +0000
-------------------------------------------
-
-  Change: e02b467e6a641cba9f3facefcef43733edb744ef
-  Author: Vincent Lequertier <sky@riseup.net>
-  Date : 2016-08-21 19:30:39 +0000
-
-    Initial release 
-
-================
-End of releases.
-================
+================================================
+Plus 6 releases after 2017-10-27 00:00:00 +0000.
+================================================

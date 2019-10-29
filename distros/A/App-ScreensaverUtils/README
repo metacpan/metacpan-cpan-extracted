@@ -2,7 +2,7 @@ NAME
     App::ScreensaverUtils - CLI utilities related to screensaver
 
 VERSION
-    This document describes version 0.007 of App::ScreensaverUtils (from
+    This document describes version 0.008 of App::ScreensaverUtils (from
     Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 DESCRIPTION

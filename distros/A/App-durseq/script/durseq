@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/durseq/durseq
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-23'; # DATE
+our $DATE = '2019-09-15'; # DATE
 our $DIST = 'App-durseq'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ durseq - Generate a sequence of durations
 
 =head1 VERSION
 
-This document describes version 0.002 of durseq (from Perl distribution App-durseq), released on 2019-07-23.
+This document describes version 0.003 of durseq (from Perl distribution App-durseq), released on 2019-09-15.
 
 =head1 SYNOPSIS
 
@@ -89,8 +89,8 @@ Generate 10 durations from P1M (increment 1 week):
 
 =head1 DESCRIPTION
 
-This utility is similar to Unix L<seq> command or Perl script
-L<dateseq>, except that it generates a sequence of dates.
+This utility is similar to Perl script L<dateseq>, except that it generates
+a sequence of durations instead of dates.
 
 =head1 OPTIONS
 

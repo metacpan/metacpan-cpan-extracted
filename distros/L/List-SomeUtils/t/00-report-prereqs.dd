@@ -35,8 +35,7 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'Tie::Array' => '0',
-                                      'blib' => '1.01'
+                                      'Tie::Array' => '0'
                                     }
                     },
        'runtime' => {

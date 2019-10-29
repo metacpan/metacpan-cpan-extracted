@@ -1,6 +1,6 @@
 package Catmandu::Fix::isbn10;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Catmandu::Sane;
 use Business::ISBN;
@@ -12,9 +12,9 @@ has path => (fix_arg => 1);
 with 'Catmandu::Fix::SimpleGetValue';
 
 sub emit_value {
-  my ($self, $var) = @_;
+    my ($self, $var) = @_;
 
-  qq|
+    qq|
 if (is_value(${var}) && length(${var})) {
   my \$isbn10 = Business::ISBN->new(${var})->as_isbn10;
   ${var} = \$isbn10 ? \$isbn10->as_string : '';

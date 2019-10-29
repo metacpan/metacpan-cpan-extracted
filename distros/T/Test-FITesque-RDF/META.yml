@@ -5,6 +5,7 @@ author:
 build_requires:
   FindBin: '0'
   Test::Deep: '0'
+  Test::HTTP::LocalServer: '0'
   Test::Modern: '0'
   Test::More: '0.96'
 configure_requires:
@@ -28,9 +29,9 @@ optional_features: {}
 provides:
   Test::FITesque::RDF:
     file: lib/Test/FITesque/RDF.pm
-    version: '0.014'
+    version: '0.016'
 requires:
-  Attean: '0.024'
+  Attean: '0.025'
   HTTP::Message: '0'
   LWP::UserAgent: '0'
   Moo: '1.006000'
@@ -51,6 +52,6 @@ resources:
   homepage: https://metacpan.org/release/Test-FITesque-RDF
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/kjetilk/p5-test-fitesque-rdf.git
-version: '0.014'
+version: '0.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

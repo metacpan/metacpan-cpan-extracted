@@ -42,9 +42,13 @@
       }
    },
    "provides" : {
+      "Mojo::Base::Role::PromiseClass" : {
+         "file" : "lib/Mojo/Base/Role/PromiseClass.pm",
+         "version" : "0.006"
+      },
       "Mojo::UserAgent::Role::PromiseClass" : {
          "file" : "lib/Mojo/UserAgent/Role/PromiseClass.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -58,7 +62,7 @@
          "web" : "http://github.com/wrog/ua-pclass"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }

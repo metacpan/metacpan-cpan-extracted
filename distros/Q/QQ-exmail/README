@@ -1,12 +1,86 @@
-QQ::exmail v0.002
+QQ::exmail v1.06
 
-腾讯企业邮箱提供了API管理方式，可以参见页面https://exmail.qq.com/qy_mng_logic/doc#10028
+腾讯企业邮箱提供了API管理方式，可以参见页面
+L<https://exmail.qq.com/qy_mng_logic/doc#10001>
 
+一、主动调用
 获取ACCESS_TOKEN
 QQ::exmail::gettoken(corpid,corpsecret);
-获取登录企业邮的url
-QQ::exmail::get_login_url(access_token);
-批量检查帐号
+
+二、通讯录管理
+1. 管理部门
+1) 创建部门
+QQ::exmail::department::create(access_token, hash);
+2) 更新部门
+QQ::exmail::department::update(access_token, hash);
+3) 删除部门
+QQ::exmail::department::delete(access_token, id);
+4) 获取部门列表
+QQ::exmail::department::list(access_token, id);
+5) 查找部门
+QQ::exmail::department::search(access_token, hash);
+2. 管理成员
+1) 创建成员
+QQ::exmail::user::create(access_token, hash);
+2) 更新成员
+QQ::exmail::user::update(access_token, hash);
+3) 删除成员
+QQ::exmail::user::delete(access_token,userid);
+4) 获取成员
+QQ::exmail::user::get(access_token,userid);
+5) 获取部门成员
+QQ::exmail::user::simplelist(access_token, department_id, fetch_child);
+6) 获取部门成员（详情）
+QQ::exmail::user::list(access_token, department_id, fetch_child);
+7) 批量检查帐号
 QQ::exmail::user::batchcheck(access_token,param);
-查询邮件
-QQ::exmail::log::mail(access_token,param);
+3. 管理标签
+1) 创建标签
+QQ::exmail::tag::create(access_token, hash);
+2) 更新标签名字
+QQ::exmail::tag::update(access_token, hash);
+3) 删除标签
+QQ::exmail::tag::delete(access_token, tagid);
+4) 获取标签成员
+QQ::exmail::tag::get(access_token, tagid);
+5) 增加标签成员
+QQ::exmail::tag::addtagusers(access_token, hash);
+6) 删除标签成员
+QQ::exmail::tag::deltagusers(access_token, hash);
+7) 获取标签列表
+QQ::exmail::tag::list(access_token);
+4. 管理邮件群组
+1) 创建邮件群组
+QQ::exmail::group::create(access_token, hash);
+2) 更新邮件群组
+QQ::exmail::group::update(access_token, hash);
+3) 删除邮件群组
+QQ::exmail::group::delete(access_token, groupid);
+4) 获取邮件群组信息
+QQ::exmail::group::get(access_token, groupid);
+
+三、功能设置
+1. 获取功能属性
+QQ::exmail::useroption::get(access_token, hash);
+2. 更改功能属性
+QQ::exmail::useroption::update(access_token, hash);
+
+四、系统日志
+1. 查询邮件概况
+QQ::exmail::log::mailstatus(access_token, hash);
+2. 查询邮件
+QQ::exmail::log::mail(access_token, hash);
+3. 查询成员登录
+QQ::exmail::log::login(access_token, hash);
+4. 查询批量任务
+QQ::exmail::log::batchjob(access_token, hash);
+5. 查询操作记录
+QQ::exmail::log::operation(access_token, hash);
+
+五、新邮件提醒
+获取邮件未读数
+QQ::exmail::mail::newcount(access_token, userid, hash);
+
+六、单点登录
+获取登录企业邮的url
+QQ::exmail::service::get_login_url(access_token);

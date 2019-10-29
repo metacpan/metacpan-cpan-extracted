@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Encode;
 # ABSTRACT: Output message encoding for log adapters
-$Log::Any::Plugin::Encode::VERSION = '0.008';
+$Log::Any::Plugin::Encode::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Log::Any::Plugin::Encode - Output message encoding for log adapters
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

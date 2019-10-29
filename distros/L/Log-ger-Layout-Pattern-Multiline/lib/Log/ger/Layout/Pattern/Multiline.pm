@@ -1,7 +1,7 @@
 package Log::ger::Layout::Pattern::Multiline;
 
-our $DATE = '2019-03-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-10-27'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,12 +12,12 @@ use Log::ger::Layout::Pattern ();
 sub _layout {
     my $format = shift;
     my $msg = shift;
-    #my ($init_args, $lnum, $level) = @_;
+    #my ($init_args, $lvlnum, $lvlname) = @_;
 
     join(
         "\n",
         map {
-            Log::ger::Layout::Pattern::_layout($format, $_, @_)
+            Log::ger::Layout::Pattern::_layout($format, [], [], $_, @_)
           }
             split(/\R/, $msg)
         );
@@ -30,9 +30,15 @@ sub get_hooks {
 
     return {
         create_layouter => [
-            __PACKAGE__, 50,
-            sub {
-                [sub { _layout($conf{format}, @_) }];
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
+
+                my $layouter = sub {
+                    _layout($conf{format}, @_);
+                };
+                [$layouter];
             }],
     };
 }
@@ -52,7 +58,7 @@ Log::ger::Layout::Pattern::Multiline - Pattern layout (with multiline message sp
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -63,7 +69,7 @@ version 0.001
 
 This is just like L<Log::ger::Layout::Pattern> except that multiline log message
 is split per-line so that a message like C<"line1\nline2\nline3"> (with C<<
-"[%r] %m" >> format) is not laid out not as:
+"[%r] %m" >> format) is not laid out as:
 
  [0.003] line1
  line2

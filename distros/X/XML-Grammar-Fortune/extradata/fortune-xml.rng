@@ -24,24 +24,14 @@
                             <text/>
                         </attribute>
                         <oneOrMore>
+                        <choice>
                             <element name="f">
-                                <optional>
-                                    <attribute name="xml:id">
-                                        <data type="ID"/>
-                                    </attribute>
-                                </optional>
-                                <oneOrMore>
-                                    <element name="l">
-                                        <attribute name="xml:lang">
-                                            <text />
-                                        </attribute>
-                                        <ref name="quote_body"/>
-                                        <optional>
-                                            <ref name="common_info" />
-                                        </optional>
-                                    </element>
-                                </oneOrMore>
+                                <ref name="fact_contents" />
                             </element>
+                            <element name="fact">
+                                <ref name="fact_contents" />
+                            </element>
+                            </choice>
                         </oneOrMore>
                     </element>
                 </oneOrMore>
@@ -308,5 +298,33 @@
                 </element>
             </choice>
         </oneOrMore>
+    </define>
+
+    <define name="lang_contents">
+    <attribute name="xml:lang">
+    <text />
+    </attribute>
+    <ref name="quote_body"/>
+    <optional>
+    <ref name="common_info" />
+    </optional>
+    </define>
+
+    <define name="fact_contents">
+    <optional>
+    <attribute name="xml:id">
+    <data type="ID"/>
+    </attribute>
+    </optional>
+    <oneOrMore>
+    <choice>
+    <element name="l">
+    <ref name="lang_contents" />
+    </element>
+    <element name="lang">
+    <ref name="lang_contents" />
+    </element>
+    </choice>
+    </oneOrMore>
     </define>
 </grammar>

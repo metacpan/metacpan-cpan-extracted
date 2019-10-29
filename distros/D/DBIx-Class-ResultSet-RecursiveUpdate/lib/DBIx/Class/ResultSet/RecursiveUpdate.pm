@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package DBIx::Class::ResultSet::RecursiveUpdate;
-{
-  $DBIx::Class::ResultSet::RecursiveUpdate::VERSION = '0.34';
-}
-
+$DBIx::Class::ResultSet::RecursiveUpdate::VERSION = '0.40';
 # ABSTRACT: like update_or_create - but recursive
 
 use base qw(DBIx::Class::ResultSet);
@@ -39,14 +36,14 @@ sub recursive_update {
 }
 
 package DBIx::Class::ResultSet::RecursiveUpdate::Functions;
-{
-  $DBIx::Class::ResultSet::RecursiveUpdate::Functions::VERSION = '0.34';
-}
-
+$DBIx::Class::ResultSet::RecursiveUpdate::Functions::VERSION = '0.40';
 use Carp::Clan qw/^DBIx::Class|^HTML::FormHandler|^Try::Tiny/;
 use Scalar::Util qw( blessed );
-use List::MoreUtils qw/ any all/;
+use List::MoreUtils qw/ any all none /;
 use Try::Tiny;
+use Data::Dumper::Concise;
+
+use constant DEBUG => 0;
 
 sub recursive_update {
     my %params = @_;
@@ -69,6 +66,13 @@ sub recursive_update {
     croak 'fixed fields needs to be an arrayref'
         if defined $fixed_fields && ref $fixed_fields ne 'ARRAY';
 
+    DEBUG and warn "recursive_update: " . $source->name . "\n";
+    DEBUG and warn "object passed, skipping find" .
+        (defined $object->id
+        ? " (id " . $object->id . ")\n"
+        : "\n")
+        if defined $object;
+
     # always warn about additional parameters if storage debugging is enabled
     $unknown_params_ok = 0
         if $source->storage->debug;
@@ -78,45 +82,109 @@ sub recursive_update {
     }
 
     my @pks = $source->primary_columns;
-    if ( !defined $object &&
-        all { exists $updates->{$_} } @pks ) {
-        my @pks = map { $updates->{$_} } @pks;
-        $object = $self->find( @pks, { key => 'primary' } );
+    my %pk_kvs;
+    for my $colname (@pks) {
+        if (exists $updates->{$colname} && defined $updates->{$colname}) {
+            $pk_kvs{$colname} = $updates->{$colname};
+            next;
+        }
+        $pk_kvs{$colname} = $resolved->{$colname}
+            if exists $resolved->{$colname} && defined $resolved->{$colname};
     }
-
-    my %fixed_fields = map { $_ => 1 } @$fixed_fields
-        if $fixed_fields;
-
-    # the updates hashref might contain the pk columns
-    # but with an undefined value
-    my @missing =
-        grep { !defined $updates->{$_} && !exists $fixed_fields{$_} } @pks;
-
-    if ( !defined $object && scalar @missing == 0 ) {
-        $object = $self->find( $updates, { key => 'primary' } );
+    # support the special case where a method on the related row
+    # populates one or more primary key columns and we don't have
+    # all primary key values already
+    # see DBSchema::Result::DVD relationship keysbymethod
+    DEBUG and warn "pk columns so far: " . join (', ',
+        sort keys %pk_kvs) . "\n";
+    my @non_pk_columns = grep {
+        my $colname = $_;
+        none { $colname eq $_ } keys %pk_kvs
     }
-
-    # add the resolved columns to the updates hashref
-    $updates = { %$updates, %$resolved };
-
-    # the resolved hashref might contain the pk columns
-    # but with an undefined value
-    @missing = grep { !defined $resolved->{$_} } @missing;
-
-    if ( !defined $object && scalar @missing == 0 ) {
-        $object = $self->find( $updates, { key => 'primary' } );
-    }
-
-    # try to construct a new row object with all given update attributes
-    # and use it to find the row in the database
-    if ( !defined $object ) {
+        sort keys %$updates;
+    DEBUG and warn "non-pk columns: " . join (', ',
+        @non_pk_columns) . "\n";
+    if ( scalar keys %pk_kvs != scalar @pks && @non_pk_columns) {
+        DEBUG and warn "not all primary keys available, trying " .
+            "object creation\n";
+        # new_result throws exception if non column values are passed
+        # because we want to also support e.g. a BUILDARGS method that
+        # populates primary key columns from an additional value
+        # filter out all relationships
+        my @non_rel_columns = grep {
+            !is_m2m( $self, $_ )
+                && !$source->has_relationship($_)
+        }
+            sort keys %$updates;
+        my %non_rel_updates = map {
+            $_ => $updates->{$_}
+        } @non_rel_columns;
+        # transform columns specified by their accessor name
+        my %columns_by_accessor = _get_columns_by_accessor($self);
+        for my $accessor_name (sort keys %columns_by_accessor) {
+            my $colname = $columns_by_accessor{$accessor_name}->{name};
+            if ($accessor_name ne $colname
+                && exists $non_rel_updates{$accessor_name}) {
+                DEBUG and warn "renaming column accessor " .
+                    "'$accessor_name' to column name '$colname'\n";
+                $non_rel_updates{$colname} = delete
+                    $non_rel_updates{$accessor_name};
+            }
+        }
+        DEBUG and warn "using all non-rel updates for object " .
+            "construction: " . Dumper(\%non_rel_updates);
+        # the object creation might fail because of non-column and
+        # non-constructor handled parameters which shouldn't break RU
         try {
-            $object = $self->new_result($updates)->get_from_storage;
+            my $row = $self->new_result(\%non_rel_updates);
+            for my $colname (@pks) {
+                next
+                    if exists $pk_kvs{$colname};
+
+                if ($row->can($colname)
+                    && defined $row->$colname) {
+                    DEBUG and warn "missing pk column $colname exists " .
+                        "and defined on object\n";
+                    $pk_kvs{$colname} = $row->$colname;
+                }
+                else {
+                    DEBUG and warn "missing pk column $colname doesn't "
+                        . "exist or isn't defined on object, aborting\n";
+                    last;
+                }
+            }
+        }
+        catch {
+            DEBUG and warn "object construction failed, ignoring:
+$_\n";
         };
     }
 
-    $object = $self->new_result( {} )
-        unless defined $object;
+    # check if row can be found in resultset cache
+    if ( !defined $object && scalar keys %pk_kvs == scalar @pks ) {
+        my $cached_rows = $self->get_cache;
+        if (defined $cached_rows) {
+            DEBUG and warn "find in cache\n";
+            $object = _get_matching_row(\%pk_kvs, $cached_rows)
+        }
+    }
+
+    $updates = { %$updates, %$resolved };
+
+    my %fixed_fields = map { $_ => 1 } @$fixed_fields;
+
+    # add the resolved columns to the updates hashref
+    my %all_pks = ( %pk_kvs, %fixed_fields );
+
+    if ( !defined $object && scalar keys %all_pks == scalar @pks) {
+        DEBUG and warn "find by pk\n";
+        $object = $self->find( \%all_pks, { key => 'primary' } );
+    }
+
+    unless (defined $object) {
+        DEBUG and warn "create new row\n";
+        $object = $self->new_result( {} );
+    }
 
     # direct column accessors
     my %columns;
@@ -132,8 +200,11 @@ sub recursive_update {
     my %m2m_accessors;
     my %columns_by_accessor = _get_columns_by_accessor($self);
 
-    for my $name ( keys %$updates ) {
-
+    # this section determines to what each key/value pair maps to,
+    # column or relationship
+    for my $name ( sort keys %$updates ) {
+        DEBUG and warn "updating $name to "
+            . ($updates->{$name} // '[undef]') . "\n";
         # columns
         if ( exists $columns_by_accessor{$name} &&
             !( $source->has_relationship($name) && ref( $updates->{$name} ) ) ) {
@@ -155,6 +226,7 @@ sub recursive_update {
 
         # many-to-many helper accessors
         if ( is_m2m( $self, $name ) ) {
+            DEBUG and warn "is m2m\n";
             # Transform m2m data into recursive has_many data
             # if IntrospectableM2M is in use.
             #
@@ -191,21 +263,22 @@ sub recursive_update {
         # don't throw a warning instead of an exception to give users
         # time to adapt to the new API
         carp(
-            "No such column, relationship, many-to-many helper accessor or generic accessor '$name'"
+            "No such column, relationship, many-to-many helper accessor or " .
+            "generic accessor '$name' on '" . $source->name . "'"
         ) unless $unknown_params_ok;
 
     }
 
     # first update columns and other accessors
     # so that later related records can be found
-    for my $name ( keys %columns ) {
+    for my $name ( sort keys %columns ) {
         $object->$name( $columns{$name} );
     }
-    for my $name ( keys %other_methods ) {
+    for my $name ( sort keys %other_methods ) {
         $object->$name( $other_methods{$name} );
     }
-    for my $name ( keys %pre_updates ) {
-        _update_relation( $self, $name, $pre_updates{$name}, $object, $if_not_submitted );
+    for my $name ( sort keys %pre_updates ) {
+        _update_relation( $self, $name, $pre_updates{$name}, $object, $if_not_submitted, 0 );
     }
 
     # $self->_delete_empty_auto_increment($object);
@@ -213,11 +286,30 @@ sub recursive_update {
     # do the recursion ourselves
     # $object->{_rel_in_storage} = 1;
     # Update if %other_methods because of possible custom update method
+    my $in_storage = $object->in_storage;
+
+    # preserve related resultsets as DBIx::Class::Row->update clears them
+    # yes, this directly accesses a row attribute, but no API exists and in
+    # the hope to get the recursive_update feature into core DBIx::Class this
+    # is the easiest solution
+    my $related_resultsets = $object->{related_resultsets};
+
     $object->update_or_insert if ( $object->is_changed || keys %other_methods );
-    $object->discard_changes;
+
+    # restore related resultsets
+    $object->{related_resultsets} = $related_resultsets;
+
+    # this is needed to populate all columns in the row object because
+    # otherwise _resolve_condition in _update_relation fails if a foreign key
+    # column isn't loaded
+    if (not $in_storage) {
+        DEBUG and warn "discard_changes for created row\n";
+        $object->discard_changes;
+    }
 
     # updating many_to_many
-    for my $name ( keys %m2m_accessors ) {
+    for my $name ( sort keys %m2m_accessors ) {
+        DEBUG and warn "updating m2m $name\n";
         my $value = $m2m_accessors{$name};
 
         # TODO: only first pk col is used
@@ -252,11 +344,8 @@ sub recursive_update {
         my $set_meth = 'set_' . $name;
         $object->$set_meth( \@rows );
     }
-    for my $name ( keys %post_updates ) {
-        # I'm not sure why the following is necessary, but sometimes we get here
-        # and the $object doesn't have a pk, and discard_changes must be executed
-        $object->discard_changes;
-        _update_relation( $self, $name, $post_updates{$name}, $object, $if_not_submitted );
+    for my $name ( sort keys %post_updates ) {
+        _update_relation( $self, $name, $post_updates{$name}, $object, $if_not_submitted, $in_storage );
     }
     delete $ENV{DBIC_NULLABLE_KEY_NOWARN};
     return $object;
@@ -275,14 +364,59 @@ sub _get_columns_by_accessor {
     return %columns;
 }
 
-# Arguments: $rs, $name, $updates, $row, $if_not_submitted
+sub _get_matching_row {
+    my ($kvs, $rows) = @_;
+
+    return
+        unless defined $rows;
+
+    croak 'key/value need to be a hashref'
+        unless ref $kvs eq 'HASH';
+
+    croak 'key/value needs to have at least one pair'
+        if keys %$kvs == 0;
+
+    croak 'rows need to be an arrayref'
+        unless ref $rows eq 'ARRAY';
+
+    unless ($rows) {
+        DEBUG and warn "skipping because no rows passed\n";
+        return;
+    }
+
+    my $matching_row;
+
+    my @matching_rows;
+    for my $row (@$rows) {
+        push @matching_rows, $row
+            if all { $kvs->{$_} eq $row->get_column($_) }
+                grep { !ref $kvs->{$_} }
+                sort keys %$kvs;
+    }
+    DEBUG and warn "multiple matching rows: " . scalar @matching_rows . "\n"
+        if @matching_rows > 1;
+    $matching_row = $matching_rows[0]
+        if scalar @matching_rows == 1;
+    DEBUG and warn "matching row found for: " . Dumper($kvs) . " in " .
+        Dumper([map { { $_->get_columns } } @$rows]) . "\n"
+        if defined $matching_row;
+    DEBUG and warn "matching row not found for: " . Dumper($kvs) . " in " .
+        Dumper([map { { $_->get_columns } } @$rows]) . "\n"
+        unless defined $matching_row;
+
+    return $matching_row;
+}
+
+# Arguments: $rs, $name, $updates, $row, $if_not_submitted, $row_existed
 sub _update_relation {
-    my ( $self, $name, $updates, $object, $if_not_submitted ) = @_;
+    my ( $self, $name, $updates, $object, $if_not_submitted, $row_existed ) = @_;
 
     # this should never happen because we're checking the paramters passed to
     # recursive_update, but just to be sure...
     $object->throw_exception("No such relationship '$name'")
         unless $object->has_relationship($name);
+
+    DEBUG and warn "_update_relation: $name\n";
 
     my $info = $object->result_source->relationship_info($name);
     my $attrs = $info->{attrs};
@@ -305,14 +439,19 @@ sub _update_relation {
     # custom code conditions yet. This needs tests.
     my @rel_cols;
     if ( ref $info->{cond} eq 'CODE' ) {
-        @rel_cols = keys %$resolved;
-        map { s/^me\.// } @rel_cols;
+        my $new_resolved;
+        # remove 'me.' from keys in returned hashref
+        while ( my ( $key, $value ) = each  %$resolved ) {
+            $key =~ s/^me\.//;
+            $new_resolved->{$key} = $value;
+            push @rel_cols, $key;
+        }
+        $resolved = $new_resolved;
     }
     else {
-        @rel_cols = keys %{ $info->{cond} };
+        @rel_cols = sort keys %{ $info->{cond} };
         map { s/^foreign\.// } @rel_cols;
     }
-
 
     # find out if all related columns are nullable
     my $all_fks_nullable = 1;
@@ -326,6 +465,7 @@ sub _update_relation {
 
     # the only valid datatype for a has_many rels is an arrayref
     if ( $attrs->{accessor} eq 'multi' ) {
+        DEBUG and warn "has_many: $name\n";
 
         # handle undef like empty arrayref
         $updates = []
@@ -334,67 +474,190 @@ sub _update_relation {
             unless ref $updates eq 'ARRAY';
 
         my @updated_objs;
+        my @related_rows;
+        # newly created rows can't have related rows
+        if ($row_existed) {
+            @related_rows = $object->$name;
+            DEBUG and warn "got related rows: " . scalar @related_rows . "\n";
+        }
+        my $related_result_source = $related_resultset->result_source;
+        my @pks = $related_result_source->primary_columns;
 
         for my $sub_updates ( @{$updates} ) {
+            DEBUG and warn "updating related row\n";
+            my %pk_kvs;
+            # detect the special case where the primary key of a currently not
+            # related row is passed in the updates hash
+            for my $colname (@pks) {
+                if (exists $sub_updates->{$colname} && defined $sub_updates->{$colname}) {
+                    $pk_kvs{$colname} = $sub_updates->{$colname};
+                    next;
+                }
+                $pk_kvs{$colname} = $resolved->{$colname}
+                    if exists $resolved->{$colname}
+                        && defined $resolved->{$colname};
+            }
+            my $related_object;
+
+            # support the special case where a method on the related row
+            # populates one or more primary key columns and we don't have
+            # all primary key values already
+            # see DBSchema::Result::DVD relationship keysbymethod
+            DEBUG and warn "pk columns so far: " . join (', ',
+                sort keys %pk_kvs) . "\n";
+            my @non_pk_columns = grep {
+                    my $colname = $_;
+                    none { $colname eq $_ } keys %pk_kvs
+                }
+                sort keys %$sub_updates;
+            DEBUG and warn "non-pk columns: " . join (', ',
+                @non_pk_columns) . "\n";
+            if ( scalar keys %pk_kvs != scalar @pks && @non_pk_columns) {
+                DEBUG and warn "not all primary keys available, trying " .
+                    "object creation\n";
+                # new_result throws exception if non column values are passed
+                # because we want to also support e.g. a BUILDARGS method that
+                # populates primary key columns from an additional value
+                # filter out all relationships
+                my @non_rel_columns = grep {
+                        !is_m2m( $related_resultset, $_ )
+                        && !$related_result_source->has_relationship($_)
+                    }
+                    sort keys %$sub_updates;
+                my %non_rel_updates = map {
+                    $_ => $sub_updates->{$_}
+                } @non_rel_columns;
+                # transform columns specified by their accessor name
+                my %columns_by_accessor = _get_columns_by_accessor($related_resultset);
+                for my $accessor_name (sort keys %columns_by_accessor) {
+                    my $colname = $columns_by_accessor{$accessor_name}->{name};
+                    if ($accessor_name ne $colname
+                        && exists $non_rel_updates{$accessor_name}) {
+                        DEBUG and warn "renaming column accessor " .
+                            "'$accessor_name' to column name '$colname'\n";
+                        $non_rel_updates{$colname} = delete
+                            $non_rel_updates{$accessor_name};
+                    }
+                }
+                DEBUG and warn "using all non-rel updates for object " .
+                    "construction: " . Dumper(\%non_rel_updates);
+                # the object creation might fail because of non-column and
+                # non-constructor handled parameters which shouldn't break RU
+                try {
+                    my $related_row = $related_resultset
+                        ->new_result(\%non_rel_updates);
+                    for my $colname (@pks) {
+                        next
+                            if exists $pk_kvs{$colname};
+
+                        if ($related_row->can($colname)
+                            && defined $related_row->$colname) {
+                            DEBUG and warn "missing pk column $colname exists " .
+                                "and defined on object\n";
+                            $pk_kvs{$colname} = $related_row->$colname;
+                        }
+                        else {
+                            DEBUG and warn "missing pk column $colname doesn't "
+                                . "exist or isn't defined on object, aborting\n";
+                            last;
+                        }
+                    }
+                }
+                catch {
+                    DEBUG and warn "object construction failed, ignoring:
+$_\n";
+                };
+            }
+
+            if ( scalar keys %pk_kvs == scalar @pks ) {
+                DEBUG and warn "all primary keys available\n";
+                # the lookup can fail if the primary key of a currently not
+                # related row is passed in the updates hash
+                $related_object = _get_matching_row(\%pk_kvs, \@related_rows);
+            }
+            # pass an empty object if no related row found and it's not the
+            # special case where the primary key of a currently not related
+            # row is passed in the updates hash to prevent the find by pk in
+            # recursive_update to happen
+            else {
+                DEBUG and warn "passing empty row to prevent find by pk\n";
+                $related_object = $related_resultset->new_result({});
+            }
+
             my $sub_object = recursive_update(
                 resultset => $related_resultset,
                 updates   => $sub_updates,
-                resolved  => $resolved
+                resolved  => $resolved,
+                # pass prefetched object if found
+                object    => $related_object,
             );
 
             push @updated_objs, $sub_object;
         }
 
-        my @related_pks = $related_resultset->result_source->primary_columns;
+        # determine if a removal query is required
+        my @remove_rows = grep {
+            my $existing_row = $_;
+            none { $existing_row->ID eq $_->ID } @updated_objs
+        } @related_rows;
+        DEBUG and warn "rows for removal: " .  join(', ', map { $_->ID }
+            @remove_rows) . "\n";
 
-        my $rs_rel_delist = $object->$name;
+        if (scalar @remove_rows) {
+            my $rs_rel_delist = $object->$name;
 
-        # foreign table has a single pk column
-        if ( scalar @related_pks == 1 ) {
-            $rs_rel_delist = $rs_rel_delist->search_rs(
-                {
-                    $self->current_source_alias . "." .
-                        $related_pks[0] => { -not_in => [ map ( $_->id, @updated_objs ) ] }
-                }
-            );
-        }
-
-        # foreign table has multiple pk columns
-        else {
-            my @cond;
-            for my $obj (@updated_objs) {
-                my %cond_for_obj;
-                for my $col (@related_pks) {
-                    $cond_for_obj{ $self->current_source_alias . ".$col" } =
-                        $obj->get_column($col);
-
-                }
-                push @cond, \%cond_for_obj;
+            # foreign table has a single pk column
+            if (scalar @pks == 1) {
+                DEBUG and warn "delete in not_in\n";
+                $rs_rel_delist = $rs_rel_delist->search_rs(
+                    {
+                        $self->current_source_alias . "." .
+                            $pks[0] => { -not_in => [ map ( $_->id, @updated_objs ) ] }
+                    }
+                );
             }
 
-            # only limit resultset if there are related rows left
-            if ( scalar @cond ) {
-                $rs_rel_delist = $rs_rel_delist->search_rs( { -not => [@cond] } );
-            }
-        }
+            # foreign table has multiple pk columns
+            else {
+                my @cond;
+                for my $obj (@updated_objs) {
+                    my %cond_for_obj;
+                    for my $col (@pks) {
+                        $cond_for_obj{ $self->current_source_alias . ".$col" } =
+                            $obj->get_column($col);
 
-        if ( $if_not_submitted eq 'delete' ) {
-            $rs_rel_delist->delete;
-        }
-        elsif ( $if_not_submitted eq 'set_to_null' ) {
-            my %update = map { $_ => undef } @rel_cols;
-            $rs_rel_delist->update( \%update );
+                    }
+                    push @cond, \%cond_for_obj;
+                }
+
+                # only limit resultset if there are related rows left
+                if (scalar @cond) {
+                    $rs_rel_delist = $rs_rel_delist->search_rs({ -not => [ @cond ] });
+                }
+            }
+
+            if ($if_not_submitted eq 'delete') {
+                $rs_rel_delist->delete;
+            }
+            elsif ($if_not_submitted eq 'set_to_null') {
+                my %update = map {$_ => undef} @rel_cols;
+                $rs_rel_delist->update(\%update);
+            }
         }
     }
     elsif ( $attrs->{accessor} eq 'single' ||
         $attrs->{accessor} eq 'filter' ) {
+        DEBUG and warn "has_one, might_have, belongs_to (" .
+            $attrs->{accessor} . "): $name\n";
+
         my $sub_object;
         if ( ref $updates ) {
-            my $no_new_object = 0;
+            my $existing_row = 0;
             my @pks = $related_resultset->result_source->primary_columns;
-            if ( all { exists $updates->{$_} } @pks ) {
-                $no_new_object = 1;
+            if ( all { exists $updates->{$_} && defined $updates->{$_} } @pks ) {
+                $existing_row = 1;
             }
+            DEBUG and warn $existing_row ? "existing row\n" : "new row\n";
             if ( blessed($updates) && $updates->isa('DBIx::Class::Row') ) {
                 $sub_object = $updates;
             }
@@ -404,14 +667,14 @@ sub _update_relation {
                 $sub_object = recursive_update(
                     resultset => $related_resultset,
                     updates   => $updates,
-                    $no_new_object ? () : (object => $object->$name),
+                    $existing_row ? () : (object => $object->$name),
                 );
             }
             else {
                 $sub_object = recursive_update(
                     resultset => $related_resultset,
                     updates   => $updates,
-                    $no_new_object ? () : (resolved  => $resolved),
+                    $existing_row ? () : (resolved => $resolved),
                 );
             }
         }
@@ -433,7 +696,7 @@ sub _update_relation {
         # situations too, but until that's worked out, kludge it
         if ( ( $sub_object || $updates || $might_belong_to || $join_type eq 'LEFT' ) &&
              ref $info->{cond} ne 'CODE'  ) {
-            $object->set_from_related( $name, $sub_object );
+            $object->$name($sub_object);
         }
     }
     else {
@@ -477,7 +740,7 @@ sub get_m2m_source {
 
 sub _delete_empty_auto_increment {
     my ( $self, $object ) = @_;
-    for my $col ( keys %{ $object->{_column_data} } ) {
+    for my $col ( sort keys %{ $object->{_column_data} } ) {
         if (
             $object->result_source->column_info($col)->{is_auto_increment} and
             ( !defined $object->{_column_data}{$col} or
@@ -575,7 +838,7 @@ DBIx::Class::ResultSet::RecursiveUpdate - like update_or_create - but recursive
 
 =head1 VERSION
 
-version 0.34
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -993,7 +1256,7 @@ Gerda Shank <gshank@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Zbigniew Lukasiak, John Napiorkowski, Alexander Hartmaier.
+This software is copyright (c) 2019 by Zbigniew Lukasiak, John Napiorkowski, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

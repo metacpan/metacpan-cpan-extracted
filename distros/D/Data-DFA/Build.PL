@@ -1,4 +1,4 @@
-use v5.16;
+use v5.26;
 use Module::Build;
 
 my $b = Module::Build->new
@@ -10,7 +10,7 @@ my $b = Module::Build->new
    {'Carp'             =>0,
     'Data::Dump'       =>0,
     'Data::Table::Text'              => 20190815,
-    'Data::NFA'                      => 20181027,
+    'Data::NFA'                      => 20191026,
     'Test2::API'       =>0,
     'Test::More'       =>0,
    },

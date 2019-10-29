@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Abstract-Cwalitee
   homepage: https://metacpan.org/release/Module-Abstract-Cwalitee
   repository: git://github.com/perlancar/perl-Module-Abstract-Cwalitee.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

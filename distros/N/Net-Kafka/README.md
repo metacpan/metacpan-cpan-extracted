@@ -1,5 +1,7 @@
 # NAME
 
+[![Build Status](https://travis-ci.com/bookingcom/perl-Net-Kafka.svg?branch=master)](https://travis-ci.com/bookingcom/perl-Net-Kafka)
+
 Net::Kafka - High-performant Perl client for Apache Kafka
 
 # SYNOPSIS
@@ -49,8 +51,8 @@ Net::Kafka - High-performant Perl client for Apache Kafka
 
 # DESCRIPTION
 
-This module provides Perl bindings to librdkafka C client library (https://github.com/edenhill/librdkafka).
-It is heavily inspired by Kafka::Librd module originally developed by Pavel Shaydo (https://github.com/trinitum/perl-Kafka-Librd).
+This module provides Perl bindings to [librdkafka](https://github.com/edenhill/librdkafka) C client library.
+It is heavily inspired by [Kafka::Librd](https://metacpan.org/pod/Kafka%3A%3ALibrd) module originally developed by Pavel Shaydo.
 
 Please refer to the following modules documentation in order to understand how to use it:
 
@@ -60,18 +62,19 @@ Please refer to the following modules documentation in order to understand how t
 # REQUIREMENTS
 
 - GNU make
-- pthreads
 - librdkafka >= 1.0.0
-- lz (optional, for gzip compression support)
-- libssl (optional, for SSL and SASL SCRAM support)
-- libsasl2 (optional, for SASL GSSAPI support)
-- libzstd (optional, for ZStd compression support)
 
 # INSTALLATION
 
-First download and build librdkafka (https://github.com/edenhill/librdkafka#building).
+First install librdkafka ([https://github.com/edenhill/librdkafka#installation](https://github.com/edenhill/librdkafka#installation)).
 
-Then to install this module run the following commands:
+## BUILD FROM CPAN
+
+    cpanm install Net::Kafka
+
+## BUILD FROM SOURCE
+
+Sources are available on Github: [https://github.com/bookingcom/perl-Net-Kafka](https://github.com/bookingcom/perl-Net-Kafka).
 
     perl Makefile.pl
     make
@@ -99,15 +102,15 @@ It is highly suggested to familirize yourself with both [AnyEvent](https://metac
 - produce()
 
         my $promise = $producer->produce(
-            payload => "my_message",
-            topic   => "my_topic",
-            key     => "my_key",    # optional
-            timestamp => 1234567,   # optional, if not specified current local timestamp will be used
-            partition => 0          # optional, if not specified internal librdkafka partitioner will be used
-            headers   => $headers,  # Optional, see Net::Kafka::Headers
+            payload     => "my_message",
+            topic       => "my_topic",
+            key         => "my_key",    # optional
+            timestamp   => 1234567,   # optional, if not specified current local timestamp will be used
+            partition   => 0          # optional, if not specified internal librdkafka partitioner will be used
+            headers     => $headers,  # Optional, see Net::Kafka::Headers
         )->then(sub {
             my $delivery_report = shift;
-            echo "Message is sent with offset " . $delivery_report->{offset};
+            print "Message is sent with offset " . $delivery_report->{offset};
         })->catch(sub {
             my $error = shift;
             print $error->{error} . "\n";
@@ -137,6 +140,8 @@ It is highly suggested to familirize yourself with both [AnyEvent](https://metac
 
 The Net::Kafka::Consumer class provides interface to librdkafka's consumer functionality. It supports both "distributed" (subscription based) and
 "simple" (manual partition assignment) modes of work.
+
+## METHODS
 
 - new()
 
@@ -371,7 +376,8 @@ Message offset is truncated to 32 bit if perl is compiled without support for 64
 
 # SEE ALSO
 
-[https://github.com/edenhill/librdkafka](https://github.com/edenhill/librdkafka)
+- [https://github.com/edenhill/librdkafka](https://github.com/edenhill/librdkafka)
+- [https://github.com/trinitum/perl-Kafka-Librd](https://github.com/trinitum/perl-Kafka-Librd)
 
 # LICENSE AND COPYRIGHT
 

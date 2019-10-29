@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 =encoding iso-8859-1
 
@@ -1081,6 +1081,21 @@ The winners are:
  2018   Physics     Gérard Mourou
  2018   Physics     Donna Strickland
 
+ 2019   Chemistry   John B. Goodenough
+ 2019   Chemistry   M. Stanley Whittingham
+ 2019   Chemistry   Akira Yoshino
+ 2019   Economics   Abhijit Banerjee
+ 2019   Economics   Esther Duflo
+ 2019   Economics   Michael Kremer
+ 2019   Literature  Peter Handke
+ 2019   Medicine    William G. Kaelin Jr
+ 2019   Medicine    Sir Peter J. Ratcliffe
+ 2019   Medicine    Gregg L. Semenza
+ 2019   Peace       Abiy Ahmed Ali
+ 2019   Physics     James Peebles
+ 2019   Physics     Michel Mayor
+ 2019   Physics     Didier Queloz
+
 =cut
 
         next unless $line =~ /^\s+(\d+)\s+(\w+)\s+(.*)/;
@@ -1112,6 +1127,13 @@ Abigail
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2098-10-28 - v1.008
+
+Updated with the Nobel prizes for 2019, and
+published in Acme-MetaSyntactic-Themes version 1.054.
 
 =item *
 

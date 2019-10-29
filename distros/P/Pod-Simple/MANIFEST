@@ -45,6 +45,7 @@ t/begin.t
 t/cbacks.t
 t/chunking.t
 t/closeys.t
+t/content_seen.t
 t/corpus.t
 t/corpus/2202jp.txt
 t/corpus/2202jp.xml
@@ -172,6 +173,9 @@ t/search27.t
 t/search28.t
 t/search29.t
 t/search50.t
+t/search60.t
+t/search60/A/x.pod
+t/search60/B/X.pod
 t/stree.t
 t/strpvbtm.t
 t/testlib1/Blorm.pm
@@ -192,6 +196,7 @@ t/testlib2/hinkhonk/readme.txt
 t/testlib2/hinkhonk/Vliff.pm
 t/testlib2/pod/perlthng.pod
 t/testlib2/pod/perlzuk.pod
+t/testlib2/pods/perlzoned.pod
 t/testlib2/squaa/Vliff.pm
 t/testlib2/squaa/Wowo.pod
 t/testlib2/Suzzle.pm

@@ -1,7 +1,7 @@
 package Software::Catalog::SW::dummy::undownloadable;
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-10-26'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,13 +15,9 @@ with 'Software::Catalog::Role::Software';
 
 use Software::Catalog::Util qw(extract_from_url);
 
-sub meta {
-    return {
-        homepage_url => "https://example.com/",
-    };
-}
+sub homepage_url { "https://example.com/" }
 
-sub get_latest_version {
+sub latest_version {
     my ($self, %args) = @_;
 
     [200, "OK", "1.0.0"];
@@ -36,13 +32,13 @@ sub canon2native_arch_map {
     };
 }
 
-sub get_download_url {
+sub download_url {
     my ($self, %args) = @_;
 
     [200, "OK", "invalid://dummy-undownloadable-1.0.0.tar.gz"];
 }
 
-sub get_archive_info {
+sub archive_info {
     my ($self, %args) = @_;
     [200, "OK", {
         programs => [],
@@ -64,7 +60,7 @@ Software::Catalog::SW::dummy::undownloadable - A dummy software that is undownlo
 
 =head1 VERSION
 
-This document describes version 0.002 of Software::Catalog::SW::dummy::undownloadable (from Perl distribution Software-Catalog-SW-dummy-undownloadable), released on 2018-10-05.
+This document describes version 0.003 of Software::Catalog::SW::dummy::undownloadable (from Perl distribution Software-Catalog-SW-dummy-undownloadable), released on 2019-10-26.
 
 =for Pod::Coverage ^(.+)$
 
@@ -90,7 +86,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

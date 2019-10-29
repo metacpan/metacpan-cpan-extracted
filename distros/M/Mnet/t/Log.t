@@ -23,7 +23,7 @@ my $perl = $^X;
     $date = $1 if $out =~ /(\S\S\S \S\S\S  ?\d\d? \d\d:\d\d:\d\d \d\d\d\d)$/;
     Test::More::is(
         $out,
-        "$time  -  - Mnet::Log -e started, pid $pid, $date",
+        "$time --- - Mnet::Log -e started, pid $pid, $date",
         "timestamped started entry"
     );
 }
@@ -42,7 +42,7 @@ my $perl = $^X;
     $elapsed = $1 if $out =~ /(\d+\.\d+ seconds elapsed)$/;
     Test::More::is(
         $out,
-        "$time  -  - Mnet::Log finished with no errors, pid $pid, $elapsed",
+        "$time --- - Mnet::Log finished with no errors, pid $pid, $elapsed",
         "timestamped finished entry"
     );
 }
@@ -57,11 +57,11 @@ Test::More::is(`$perl -e '
     INFO("info");
     WARN("warn");
     FATAL("fatal");
-' -- 2>&1`, ' -  - Mnet::Log -e started
+' -- 2>&1`, '--- - Mnet::Log -e started
 inf - main info
 WRN - main warn
 DIE - main fatal
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'function calls');
 
 # check output from Mnet::Log methods
@@ -74,11 +74,11 @@ Test::More::is(`$perl -e '
     Mnet::Log->new->info("info");
     Mnet::Log->new->warn("warn");
     Mnet::Log->new->fatal("fatal");
-' -- 2>&1`, ' -  - Mnet::Log -e started
+' -- 2>&1`, '--- - Mnet::Log -e started
 inf - main info
 WRN - main warn
 DIE - main fatal
- -  - Mnet::Log finished with errors
+--- - Mnet::Log finished with errors
 ', 'method calls');
 
 # check output from Mnet::Log with exit status set for error
@@ -89,8 +89,8 @@ Test::More::is(`$perl -e '
     use Mnet::Log::Test;
     Mnet::Log->new->debug("debug");
     exit 1;
-' -- 2>&1`, ' -  - Mnet::Log -e started
- -  - Mnet::Log finished with exit error status
+' -- 2>&1`, '--- - Mnet::Log -e started
+--- - Mnet::Log finished with exit error status
 ', 'exit error status');
 
 # finished

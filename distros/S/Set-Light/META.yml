@@ -21,14 +21,14 @@ name: Set-Light
 provides:
   Set::Light:
     file: lib/Set/Light.pm
-    version: '0.92'
+    version: '0.93'
 requires:
   Array::RefElem: '0'
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Set-Light
   repository: git://github.com/robrwo/Set-Light.git
-version: '0.92'
+version: '0.93'
 x_authority: cpan:RRWO
 x_contributors:
   - 'Robert Rothenberg <rrwo@cpan.org>'

@@ -33,7 +33,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 ###############################################################################
@@ -508,6 +508,16 @@ sub _check_sheetname {
     # Check that sheetname doesn't contain any invalid characters
     if ( $name =~ $invalid_char ) {
         croak 'Invalid character []:*?/\\ in worksheet name: ' . $name;
+    }
+
+    # Check that sheetname doesn't start or end with an apostrophe.
+    if ( $name =~ /^'/ || $name =~ /'$/) {
+        croak "Worksheet name $name cannot start or end with an apostrophe";
+    }
+
+    # Check that sheetname isn't a reserved word.
+    if ( lc($name) eq 'history') {
+        croak "Worksheet name cannot be Excel reserved word 'History'";
     }
 
     # Check that the worksheet name doesn't already exist since this is a fatal
@@ -998,6 +1008,10 @@ sub add_vba_project {
     croak "Couldn't locate $vba_project in add_vba_project(): $!"
       unless -e $vba_project;
 
+    if ( !$self->{_vba_codemame} ) {
+        $self->{_vba_codename} = 'ThisWorkbook';
+    }
+
     $self->{_vba_project} = $vba_project;
 }
 
@@ -1090,6 +1104,15 @@ sub _store_workbook {
     # Set the active sheet.
     for my $sheet ( @{ $self->{_worksheets} } ) {
         $sheet->{_active} = 1 if $sheet->{_index} == $self->{_activesheet};
+    }
+
+    # Set the sheet vba_codename if the workbook has a vbaProject binary.
+    if ( $self->{_vba_project} ) {
+        for my $sheet ( @{ $self->{_worksheets} } ) {
+            if ( !$sheet->{_vba_codename} ) {
+                $sheet->set_vba_name();
+            }
+        }
     }
 
     # Convert the SST strings data structure.
@@ -1860,7 +1883,6 @@ sub _prepare_vml_objects {
     my $vml_shape_id   = 1024;
     my $vml_files      = 0;
     my $comment_files  = 0;
-    my $has_button     = 0;
 
     for my $sheet ( @{ $self->{_worksheets} } ) {
 
@@ -1891,16 +1913,6 @@ sub _prepare_vml_objects {
                 $vml_drawing_id );
         }
 
-        # Set the sheet vba_codename if it has a button and the workbook
-        # has a vbaProject binary.
-        if ( $sheet->{_buttons_array} ) {
-            $has_button = 1;
-
-            if ( $self->{_vba_project} && !$sheet->{_vba_codename} ) {
-                $sheet->set_vba_name();
-            }
-        }
-
     }
 
     $self->{_num_vml_files}     = $vml_files;
@@ -1920,12 +1932,6 @@ sub _prepare_vml_objects {
         $format->get_xf_index();
 
         push @{ $self->{_formats} }, $format;
-    }
-
-    # Set the workbook vba_codename if one of the sheets has a button and
-    # the workbook has a vbaProject binary.
-    if ( $has_button && $self->{_vba_project} && !$self->{_vba_codename} ) {
-        $self->set_vba_name();
     }
 }
 

@@ -1,413 +1,585 @@
 Revision history for Perl extension List-SomeUtils
 
+0.58     2019-10-26
+
+[BACKWARDS INCOMPATIBILITY]
+
+* Fixed a number of bugs in the handling of empty lists. The any_u(), all_u(),
+  none_u(), notall_u(), and one_u() functions returned an empty list in list
+  context instead of undef. This is in direct opposition to the documentation
+  which has always said that it returned undef. Note that the
+  List::SomeUtils::XS code had the _correct_ behavior, so most users probably
+  have never experienced this bug.
+
+[IMPROVEMENTS]
+
+* Fixed some doc issues. Closes #7.
+
+
+0.57     2017-12-12 (TRIAL RELEASE)
+
+[BACKWARDS INCOMPATIBILITY]
+
+* Fixed a number of bugs in the handling of empty lists. The any_u(), all_u(),
+  none_u(), notall_u(), and one_u() functions returned an empty list in list
+  context instead of undef. This is in direct opposition to the documentation
+  which has always said that it returned undef. Note that the
+  List::SomeUtils::XS code had the _correct_ behavior, so most users probably
+  have never experienced this bug.
+
+
 0.56     2017-07-22
-    - Make sure we depend on the latest LSU::XS if the system support XS.
+
+* Make sure we depend on the latest LSU::XS if the system support XS.
+
 
 0.55     2017-07-22
-    - Fixed incorrect comments in doc examples for uniq().
-    - Added a new function, mode(), requested by Jerrad Pierce. GH #2.
+
+* Fixed incorrect comments in doc examples for uniq().
+
+* Added a new function, mode(), requested by Jerrad Pierce. GH #2.
+
 
 0.54     2017-06-01
-    - Moved issue tracking to GitHub.
+
+* Moved issue tracking to GitHub.
+
 
 0.53     2016-08-14
-    - Replaced Exporter::Tiny with Exporter.
+
+* Replaced Exporter::Tiny with Exporter.
+
 
 0.52     2016-05-06
-    - Updated to latest ExtUtils::HasCompiler and simplified dynamic
-      prereqs. Patch by Karen Etheridge. GitHub #3.
+
+* Updated to latest ExtUtils::HasCompiler and simplified dynamic
+  prereqs. Patch by Karen Etheridge. GitHub #3.
+
 
 0.51     2016-02-27
-    - No code changes. The last release was missing a Changes entry.
+
+* No code changes. The last release was missing a Changes entry.
+
 
 0.50    2016-02-27
-    - This is List::MoreUtils under a different name with fewer configure-time
-      prereqs.
-    - The "import as old versions" feature present in LMU does not exist in
-      this distribution.
+
+* This is List::MoreUtils under a different name with fewer configure-time
+  prereqs.
+
+* The "import as old versions" feature present in LMU does not exist in this
+  distribution.
+
 
 0.413	2015-06-10
-    - Fix compiling in c++ mode (depreciated, but some people seem to
-      require it). Solves RT#104690
+
+- Fix compiling in c++ mode (depreciated, but some people seem to
+  require it). Solves RT#104690
+
 
 0.412	2015-05-19
-    - release 0.411_001 without further changes
+
+- release 0.411_001 without further changes
 
 0.411_001	2015-05-11
-    - move generation of test endpoints to author stage as requested per issue/#9
-    - add a rough guide for contributors
-    - fix rt#103251 to avoid removing bundled stuff by accident
-    - Fix compilation errors under cl (Thanks to jddurand)
+
+- move generation of test endpoints to author stage as requested per issue/#9
+- add a rough guide for contributors
+- fix rt#103251 to avoid removing bundled stuff by accident
+- Fix compilation errors under cl (Thanks to jddurand)
+
 
 0.410	2015-03-30
-    - release 0.409_003 after no further issues came up
+
+- release 0.409_003 after no further issues came up
+
 
 0.409_003	2015-03-27
-    - update bundled bootstrap modules
-      * Data::Tumbler to 0.010
-      * Test::WriteVariants to 0.012
-      * Config::AutoConf to 0.311
-    - fix spelling (and add stop-words for names etc. in author tests)
+
+- update bundled bootstrap modules
+  * Data::Tumbler to 0.010
+  * Test::WriteVariants to 0.012
+  * Config::AutoConf to 0.311
+- fix spelling (and add stop-words for names etc. in author tests)
+
 
 0.409_002	2015-03-23
-    - fix multiple mg_get can break weird tie's (thanks to leont)
-    - fix test run using PERL5OPT=d:Confess (thanks kentl & ribasushi)
-    - use base instead of parent, cause parent isn't bundled before 5.10.1
-      (smoke report from SREZIC)
-    - update bundled modules (for bootstrapping) and ppport.h (from 3.25
-      to 3.31)
+
+- fix multiple mg_get can break weird tie's (thanks to leont)
+- fix test run using PERL5OPT=d:Confess (thanks kentl & ribasushi)
+- use base instead of parent, cause parent isn't bundled before 5.10.1
+  (smoke report from SREZIC)
+- update bundled modules (for bootstrapping) and ppport.h (from 3.25
+  to 3.31)
+
 
 0.409_001	2015-03-21
-    - fix RT#102885: uniq bug broke tied array (reported by louying@pwrd.com)
-    - fix issue/8: Macros introduced in dfd851147f cause problems with MSVC
-      (reported by A. Sinan Unur)
-    - Update ppport.h from 3.25 to 3.31
+
+- fix RT#102885: uniq bug broke tied array (reported by louying@pwrd.com)
+- fix issue/8: Macros introduced in dfd851147f cause problems with MSVC
+  (reported by A. Sinan Unur)
+- Update ppport.h from 3.25 to 3.31
+
 
 0.408	2015-03-18
-    - fix RT#102840: uniq broken for call-by-function-return (reported by
-      Jean-Damien Durand), with a new test case thanks to Thomas Sibley
-    - fix RT#102853: hent_val accesses (reported by Brad Forschinger with
-      a reasonable patch)
-    - fix RT#102833: Compilation error with perl 5.21.7+ (reported by
-      Slaven Rezic)
-    - fix regex for RT#44518 test
+
+- fix RT#102840: uniq broken for call-by-function-return (reported by
+  Jean-Damien Durand), with a new test case thanks to Thomas Sibley
+- fix RT#102853: hent_val accesses (reported by Brad Forschinger with
+  a reasonable patch)
+- fix RT#102833: Compilation error with perl 5.21.7+ (reported by
+  Slaven Rezic)
+- fix regex for RT#44518 test
+
 
 0.407	2015-03-17
-    - Added one(), onlyidx(), onlyval() (RT#73134, MHASCH) and onlyres()
-    - improve XS maintainability
-    - document how uniq/distinct deal with undef (RT#49800)
-    - add bsearchidx to satisfy RT#63470
-    - add singleton to satisfy RT#94382
-    - fix RT#82039 - uniq changes the type of its arguments
-    - fix RT#44518 again
+
+- Added one(), onlyidx(), onlyval() (RT#73134, MHASCH) and onlyres()
+- improve XS maintainability
+- document how uniq/distinct deal with undef (RT#49800)
+- add bsearchidx to satisfy RT#63470
+- add singleton to satisfy RT#94382
+- fix RT#82039 - uniq changes the type of its arguments
+- fix RT#44518 again
+
 
 0.406	2015-03-03
-    - add new functions firstres and lastres in addition to firstidx, lastidx,
-      firstval and lastval
-    - regenerate MANIFEST to bundle README.md
+
+- add new functions firstres and lastres in addition to firstidx, lastidx,
+  firstval and lastval
+- regenerate MANIFEST to bundle README.md
+
 
 0.405	2015-02-14
-    - fix RT#78527 - first_val/last_val in documentation
-    - fix RT#102055 - ExtUtils::MakeMaker required version absurdly high
-    - update README (deploy it as README.md now)
-    - fix compiler issue for older/ansi-c89 compilers
-    - remove local compat workarounds in favour for ppport.h
+
+- fix RT#78527 - first_val/last_val in documentation
+- fix RT#102055 - ExtUtils::MakeMaker required version absurdly high
+- update README (deploy it as README.md now)
+- fix compiler issue for older/ansi-c89 compilers
+- remove local compat workarounds in favour for ppport.h
+
 
 0.404	2015-01-28
-    - fix ancient toolchains (PREREQ_PM & Co. set appropriately),
-      reported by ilmari
-    - bump version required of Test::More to 0.96 (#toolchain
-      calls it a "sane subset")
-    - fix some meta-data #toolchain pointed out
+
+- fix ancient toolchains (PREREQ_PM & Co. set appropriately),
+  reported by ilmari
+- bump version required of Test::More to 0.96 (#toolchain
+  calls it a "sane subset")
+- fix some meta-data #toolchain pointed out
+
 
 0.403	2015-01-27
-    - remove most recent stable perl recommendation from meta to
-      workaround misbehaving CPAN clients blocking update
-    - update copyright date
-    - ensure AUTHOR is a string on older toolchains
+
+- remove most recent stable perl recommendation from meta to
+  workaround misbehaving CPAN clients blocking update
+- update copyright date
+- ensure AUTHOR is a string on older toolchains
+
 
 0.402	2014-12-17
-    - bump Config::AutoConf and Test::WriteVariants requirement for
-      improved 5.6 compatibility (fixes rt#101121)
-    - use base instead of parent in configure stage (improves building
-      on 5.6)
-    - fix rt#101067 by applying patch from Father Chrysostomos (thanks
-      to Lukas Mai (MAUKE) for reporting and explaining)
+
+- bump Config::AutoConf and Test::WriteVariants requirement for
+  improved 5.6 compatibility (fixes rt#101121)
+- use base instead of parent in configure stage (improves building
+  on 5.6)
+- fix rt#101067 by applying patch from Father Chrysostomos (thanks
+  to Lukas Mai (MAUKE) for reporting and explaining)
+
 
 0.401	2014-12-08
-    - update bundled Config::AutoConf to 0.307
-    - release after long testing period
+
+- update bundled Config::AutoConf to 0.307
+- release after long testing period
+
 
 0.400_010	2014-12-08
-    - bundle configure_requires using inc::latest
-    - fix RT#96596 by checking types before starting logic ...
-      * RT#86260 reported the same issue
-    - lower minimum perl required to 5.6
-    - switch to check_produce_loadable_xs_build of Config::AutoConf 0.306
+
+- bundle configure_requires using inc::latest
+- fix RT#96596 by checking types before starting logic ...
+  * RT#86260 reported the same issue
+- lower minimum perl required to 5.6
+- switch to check_produce_loadable_xs_build of Config::AutoConf 0.306
+
 
 0.400_009	2014-05-05
-    - improve documentation (David Golden, Jens Rehsack)
-    - bundle non-core modules (compared to 5.14)
+
+- improve documentation (David Golden, Jens Rehsack)
+- bundle non-core modules (compared to 5.14)
+
 
 0.400_008	2014-04-24
-    - fix none for 0.24 and clarify API tag documentation (David Golden)
-    - refactor import tags for clarity (David Golden)
+
+- fix none for 0.24 and clarify API tag documentation (David Golden)
+- refactor import tags for clarity (David Golden)
+
 
 0.400_007	2014-04-22
-    - cut out exporter-related cruft; it was only necessary when needing
-      to choose between multiple implementations (Toby Inkster)
-    - Reorganize and clarify documentation (David Golden)
-    - revise SYNOPSIS and DESCRIPTION for revised export model (David
-      Golden)
-    - introduce ":like_*" import tags (Toby Inkster, Jens Rehsack)
-    - remove Data::Tumbler and Module::Pluggable from configure
-      dependencies, they're coming with Test::WriteVariants
+
+- cut out exporter-related cruft; it was only necessary when needing
+  to choose between multiple implementations (Toby Inkster)
+- Reorganize and clarify documentation (David Golden)
+- revise SYNOPSIS and DESCRIPTION for revised export model (David
+  Golden)
+- introduce ":like_*" import tags (Toby Inkster, Jens Rehsack)
+- remove Data::Tumbler and Module::Pluggable from configure
+  dependencies, they're coming with Test::WriteVariants
+
 
 0.400_006	2014-04-01
-    - fix typos in POD (RT#87490 - thanks to David Steinbrunner)
-    - refactor LMU as discussed with David Golden, Tim Bunce and
-      Toby Inkster
+
+- fix typos in POD (RT#87490 - thanks to David Steinbrunner)
+- refactor LMU as discussed with David Golden, Tim Bunce and
+  Toby Inkster
+
 
 0.400_005	2014-03-24
-    - rename implementations from alias => relax and tassilo => strict
-    - remove 'sno' implementation
-    - add precedence 'default' in addition to 'all' for those who prefer
-      strict over relax
-    - move dependency Module::Runtime from configure to runtime
+
+- rename implementations from alias => relax and tassilo => strict
+- remove 'sno' implementation
+- add precedence 'default' in addition to 'all' for those who prefer
+  strict over relax
+- move dependency Module::Runtime from configure to runtime
+
 
 0.400_004	2014-03-21
-    - Switch from Sub::Exporter to Exporter::Tiny (Toby Inkster)
-    - fix issues on older perls back to 5.8.1 (Config::AutoConf
-      will not do out of the box, but this can be fixed)
-    - fix backward compatibility issues (RT#94013 in conjunction
-      with RT#93995)
-      Details needs to be discussed with Moose community (unless
-      they stop caring) to get out of distinguishing hell as soon
-      as possible
-    - fix some spelling issues reported by David Steinbrunner
-      (RT#86347)
-    - clarify depedencies, especially recommended ones
-    - add some additional tests to prove reported bugs (informed
-      reporters when not reproducable)
+
+- Switch from Sub::Exporter to Exporter::Tiny (Toby Inkster)
+- fix issues on older perls back to 5.8.1 (Config::AutoConf
+  will not do out of the box, but this can be fixed)
+- fix backward compatibility issues (RT#94013 in conjunction
+  with RT#93995)
+  Details needs to be discussed with Moose community (unless
+  they stop caring) to get out of distinguishing hell as soon
+  as possible
+- fix some spelling issues reported by David Steinbrunner
+  (RT#86347)
+- clarify depedencies, especially recommended ones
+- add some additional tests to prove reported bugs (informed
+  reporters when not reproducable)
+
 
 0.400_003	2014-03-18
-    - fix compile error on threaded perls (RT#93934 - thanks Andreas
-      Koenig for reporting)
-    - fix exporter configuration (RT#93929 - thanks Andreas Koenig for
-      reporting)
-    - fix RT#40905 by allowing choose an appropriate implementation
-    - add test for RT#76749 - seems not reproducable (but hopefully
-      reporter David J. Oswald can fix the test to help fixing the
-      issue beyond)
+
+- fix compile error on threaded perls (RT#93934 - thanks Andreas
+  Koenig for reporting)
+- fix exporter configuration (RT#93929 - thanks Andreas Koenig for
+  reporting)
+- fix RT#40905 by allowing choose an appropriate implementation
+- add test for RT#76749 - seems not reproducable (but hopefully
+  reporter David J. Oswald can fix the test to help fixing the
+  issue beyond)
+
 
 0.400_002	2014-03-16
-    - reduce minimum perl version to 5.8.1
-    - split implementations between existing authors
-    - switch to DynaLoader and Sub::Exporter
-    - rely for testing on Test::WriteVariants and Data::Tumbler
-      (DBI::Test technology to improve tests)
-    - fix 64-bit integer precision (RT#93207 reported by Dana Jacobsen)
+
+- reduce minimum perl version to 5.8.1
+- split implementations between existing authors
+- switch to DynaLoader and Sub::Exporter
+- rely for testing on Test::WriteVariants and Data::Tumbler
+  (DBI::Test technology to improve tests)
+- fix 64-bit integer precision (RT#93207 reported by Dana Jacobsen)
+
 
 0.400_001	2013-10-11
-    - Reformat Changes as per CPAN::Changes::Spec
-    - taking FIRSTCOME power and move repository to GitHub
-    - merge Tassilo's 0.25_nn dev releases back
-        * mark "any" and "all" as "to be discussed"
+
+- Reformat Changes as per CPAN::Changes::Spec
+- taking FIRSTCOME power and move repository to GitHub
+- merge Tassilo's 0.25_nn dev releases back
+    * mark "any" and "all" as "to be discussed"
 	  ==> API changes made by Alias/ADAMK 
-    - bump version to clarify new age (contributors welcome!)
-    - bump minimum perl version to 5.8.3
+- bump version to clarify new age (contributors welcome!)
+- bump minimum perl version to 5.8.3
+
 
 0.33	2011-08-04
-    - Updated can_xs to fix a bug in it
+
+- Updated can_xs to fix a bug in it
+
 
 0.32	2011-05-20
-    - Production release, no other changes
+
+- Production release, no other changes
+
 
 0.31_02	2011-03-21
-    - More accurate detection of XS support (ADAMK)
+
+- More accurate detection of XS support (ADAMK)
+
 
 0.31_01	2011-03-21
-    - Updating copyright year (ADAMK)
-    - Teak documentation of all() and none() (WYANT)
-    - Memory leak fixed for apply() and XS version restored (ARC)
-    - Memory leak fixed for indexes() and XS version restored (ARC)
-    - Memory leak fixed for part() and XS version restored (ARC)
+
+- Updating copyright year (ADAMK)
+- Teak documentation of all() and none() (WYANT)
+- Memory leak fixed for apply() and XS version restored (ARC)
+- Memory leak fixed for indexes() and XS version restored (ARC)
+- Memory leak fixed for part() and XS version restored (ARC)
+
 
 0.30	2010-12-16
-    - Change the way we localise PERL_DL_NONLAZY to false to remove
-      a warning that some people were seeing. The new approach is taken
-      from the way that List::Util does it.
+
+- Change the way we localise PERL_DL_NONLAZY to false to remove
+  a warning that some people were seeing. The new approach is taken
+  from the way that List::Util does it.
+
 
 0.29	2010-12-08
-    - Removed an erroneous Test::NoWarnings dependency
+
+- Removed an erroneous Test::NoWarnings dependency
+
 
 0.28	2010-12-07
-    - Switching to a production release
-    - Restored the regression test for RT #38630 from 0.23.
-      As apply() was disabled in 0.27_04 this test will only act
-      to validate the future XS restoration of apply().
-    - Adding uniq warning tests, disabled initially
+
+- Switching to a production release
+- Restored the regression test for RT #38630 from 0.23.
+  As apply() was disabled in 0.27_04 this test will only act
+  to validate the future XS restoration of apply().
+- Adding uniq warning tests, disabled initially
+
 
 0.27_04	2010-12-06
-    - The behaviour of any/all/none/notall has changed when
-      passed a null list to treat a null list as a legitimate list.
-      Instead of returning C<undef> the functions now return the
-      following: any {} == false, all {} == true, none {} == true,
-      notall {} == false.
-      Resolves #40905: Returning undef when none is passed an empty
-    - Disabled the leaking XS versions of part(), apply() and indexes()
+
+- The behaviour of any/all/none/notall has changed when
+  passed a null list to treat a null list as a legitimate list.
+  Instead of returning C<undef> the functions now return the
+  following: any {} == false, all {} == true, none {} == true,
+  notall {} == false.
+  Resolves #40905: Returning undef when none is passed an empty
+- Disabled the leaking XS versions of part(), apply() and indexes()
+
 
 0.27_03	2010-12-06
-    - General house cleaning
+
+- General house cleaning
+
 
 0.27_02	2010-12-01
-    - Reduced test suite peak memory consumption by 5-10 meg
-    - Added the 'distinct' alias for the uniq function, for people that
-      like their chained map/grep/sort pipelines with a SQL'ish flavour.
-    - Expanded test suite for the any() group of functions.
-    - The any() group of functions now strictly always return scalar
-      boolean true, false and undef to match the XS version.
+
+- Reduced test suite peak memory consumption by 5-10 meg
+- Added the 'distinct' alias for the uniq function, for people that
+  like their chained map/grep/sort pipelines with a SQL'ish flavour.
+- Expanded test suite for the any() group of functions.
+- The any() group of functions now strictly always return scalar
+  boolean true, false and undef to match the XS version.
+
 
 0.27_01 2012-12-01
-    - Refactored the split test scripts into a common test module
-      to be shared between both the Perl and XS versions.
-    - Reapply fix for http://rt.cpan.org/Ticket/Display.html?id=39847
-      "minmax error: unpredictable results with lists of 1 element"
+
+- Refactored the split test scripts into a common test module
+  to be shared between both the Perl and XS versions.
+- Reapply fix for http://rt.cpan.org/Ticket/Display.html?id=39847
+  "minmax error: unpredictable results with lists of 1 element"
+
 
 0.26	2010-11-23
-    - No changes
-    - Some parts of the CPAN cloud were confusing my 0.24
-      release with the older deleted 0.24. Bumping version
-      past Tassilo's to clarify things.
+
+- No changes
+- Some parts of the CPAN cloud were confusing my 0.24
+  release with the older deleted 0.24. Bumping version
+  past Tassilo's to clarify things.
+
 
 0.24	2010-11-22
-    - No changes, switching to a production version
+
+- No changes, switching to a production version
+
 
 0.23_01	2010-09-25
-    - First attempt at repackaging the List::SomeUtils code in
-      Makefile.PL and release toolchain similar to Params::Util
+
+- First attempt at repackaging the List::SomeUtils code in
+  Makefile.PL and release toolchain similar to Params::Util
+
 
 0.25_02	2009-08-01
-    - MS VC++ 7 doesn't like inline nor 'long long'
-      (patch provided by Taro Nishino (taro DOT nishino AT gmail.com)
-    - Newx isbn't around in older perls so use New(0,...) instead
+
+- MS VC++ 7 doesn't like inline nor 'long long'
+  (patch provided by Taro Nishino (taro DOT nishino AT gmail.com)
+- Newx isbn't around in older perls so use New(0,...) instead
+
 
 0.25_01	2009-07-30
-    - it seems the only way of handling the stack that works on all 
-      flavors of the multicall API is by making a shallow copy of it
-      and use that between the PUSH/POP_MULTICALL bracket
-    - fix awkward ok() override in List-SomeUtils.t so that it reports
-      line numbers in test failures properly
+
+- it seems the only way of handling the stack that works on all 
+  flavors of the multicall API is by making a shallow copy of it
+  and use that between the PUSH/POP_MULTICALL bracket
+- fix awkward ok() override in List-SomeUtils.t so that it reports
+  line numbers in test failures properly
+
 
 0.24	2009-07-19
-    - List::SomeUtils was not handling the stack properly when the stack was grown
-      from inside code-references
-    - a couple of tests for each_arrayref were calling each_array 
+
+- List::SomeUtils was not handling the stack properly when the stack was grown
+  from inside code-references
+- a couple of tests for each_arrayref were calling each_array 
+
 
 0.23	2009-04-19
-    - BACKWARDS INCOMPATIBLE CHANGE:
-      fixed: Returning undef when none is passed an empty array is counterintuitive
-      (http://rt.cpan.org/Ticket/Display.html?id=40905)
-    - fixed: minmax error: unpredictable results with lists of 1 element 
-      (http://rt.cpan.org/Ticket/Display.html?id=39847)
-    - fixed: bug: uniq doesn't like undef values.
+
+- BACKWARDS INCOMPATIBLE CHANGE:
+  fixed: Returning undef when none is passed an empty array is counterintuitive
+  (http://rt.cpan.org/Ticket/Display.html?id=40905)
+- fixed: minmax error: unpredictable results with lists of 1 element 
+  (http://rt.cpan.org/Ticket/Display.html?id=39847)
+- fixed: bug: uniq doesn't like undef values.
 	     uniq warns on undef values
-      (http://rt.cpan.org/Ticket/Display.html?id=37533)
-      (http://rt.cpan.org/Ticket/Display.html?id=43214)
-    - fixed: bug in pairwise when $a and $b are lexically defined using my
-      (http://rt.cpan.org/Ticket/Display.html?id=44518)
-    - fixed: Big memory leak with XS part()
-      (http://rt.cpan.org/Ticket/Display.html?id=41097)
-    - fixed: memory leak in indexes() [XS]
-      (http://rt.cpan.org/Public/Bug/Display.html?id=41494)
-    - reduced memory-requirements for the part() tests as that was responsible
-      for a lot of unnecessary test-failures
-    - new function bsearch() which performs a binary search
+  (http://rt.cpan.org/Ticket/Display.html?id=37533)
+  (http://rt.cpan.org/Ticket/Display.html?id=43214)
+- fixed: bug in pairwise when $a and $b are lexically defined using my
+  (http://rt.cpan.org/Ticket/Display.html?id=44518)
+- fixed: Big memory leak with XS part()
+  (http://rt.cpan.org/Ticket/Display.html?id=41097)
+- fixed: memory leak in indexes() [XS]
+  (http://rt.cpan.org/Public/Bug/Display.html?id=41494)
+- reduced memory-requirements for the part() tests as that was responsible
+  for a lot of unnecessary test-failures
+- new function bsearch() which performs a binary search
+
 
 0.22	2006-07-02
-    - SvPV_nolen doesn't exist on pre 5.6 perls
+
+- SvPV_nolen doesn't exist on pre 5.6 perls
+
 
 0.21	2006-06-18
-    - propagate dies from inside the code-reference of pairwise to 
-      caller
+
+- propagate dies from inside the code-reference of pairwise to 
+  caller
+
 
 0.20	2006-04-25
-    - part() would destroy the list elements when changing
-      an array in place (@list = part { ... } @list)
+
+- part() would destroy the list elements when changing
+  an array in place (@list = part { ... } @list)
+
 
 0.19	2006-03-13
-    - working down myself the queue of suggestions:
-      part() added
-      (Ricardo SIGNES <rjbs AT cpan DOT org>)
+
+- working down myself the queue of suggestions:
+  part() added
+  (Ricardo SIGNES <rjbs AT cpan DOT org>)
+
 
 0.18	2006-02-25
-    - each_arrayref (XS) couldn't deal with refs to list literals
-      (brought up by David Filmer <usenet AT DavidFilmer DOT com>
-       in comp.lang.perl.misc)
+
+- each_arrayref (XS) couldn't deal with refs to list literals
+  (brought up by David Filmer <usenet AT DavidFilmer DOT com>
+   in comp.lang.perl.misc)
+
 
 0.17	2005-12-07
-    - each_arrayref had no XS implementation and wasn't
-      mentioned in the PODs
-      (patch by Anno Siegel <siegel AT zrz DOT tu-berlin DOT de>)
+
+- each_arrayref had no XS implementation and wasn't
+  mentioned in the PODs
+  (patch by Anno Siegel <siegel AT zrz DOT tu-berlin DOT de>)
+
 
 0.16	2005-11-14
-    - a dangling semicolon in some macros prevented
-      the XS portion to compile on some compilers
-      (Lars Thegler <lars AT thegler DOT dk>)
+
+- a dangling semicolon in some macros prevented
+  the XS portion to compile on some compilers
+  (Lars Thegler <lars AT thegler DOT dk>)
+
 
 0.15	2005-11-11
-    - 0.13 and 0.14 broke the module on 5.6.x
-      (spotted by Thomas A. Lowery <tlowery AT cc3 DOT com>)
-    - internals changed to make use of the new MULTICALL API 
-      which had to be backported to 5.005_x
+
+- 0.13 and 0.14 broke the module on 5.6.x
+  (spotted by Thomas A. Lowery <tlowery AT cc3 DOT com>)
+- internals changed to make use of the new MULTICALL API 
+  which had to be backported to 5.005_x
+
 
 0.14	2005-11-10
-    - 0.13 fixed the leaks but rendered the XS part uncompilable
-      for perls < 5.6.0: Fixed
-      (spotted by Lars Thegler <lars AT thegler DOT dk>)
+
+- 0.13 fixed the leaks but rendered the XS part uncompilable
+  for perls < 5.6.0: Fixed
+  (spotted by Lars Thegler <lars AT thegler DOT dk>)
+
 
 0.13	2005-11-09
-    - nearly all functions receiving a CODE-block as first
-      argument had a hefty memory-leak: Fixed
-      (spotted by Thomas A. Lowery <tlowery AT cc3 DOT com>)
+
+- nearly all functions receiving a CODE-block as first
+  argument had a hefty memory-leak: Fixed
+  (spotted by Thomas A. Lowery <tlowery AT cc3 DOT com>)
+
 
 0.12	2005-09-28
-    - first_index and each_arrayref weren't exportable
-      (spotted by Darren Duncan)
+
+- first_index and each_arrayref weren't exportable
+  (spotted by Darren Duncan)
+
 
 0.11	2005-09-27
-    - make sure that Test::Pod and Test::Pod::Coverage are
-      installed in the required minimum versions
-      (thanks to Ricardo Signes <rjbs AT cpan DOT org>)
+
+- make sure that Test::Pod and Test::Pod::Coverage are
+  installed in the required minimum versions
+  (thanks to Ricardo Signes <rjbs AT cpan DOT org>)
+
 
 0.10	2005-04-01
-    - new function minmax() with comparisons in O(3n/2 - 2)
-    - some POD corrections (Adam Kennedy)
-    - POD- and POD-coverage tests
+
+- new function minmax() with comparisons in O(3n/2 - 2)
+- some POD corrections (Adam Kennedy)
+- POD- and POD-coverage tests
+
 
 0.09	2004-12-04
-    - 0.08 only fixed uniq() for scalar context
+
+- 0.08 only fixed uniq() for scalar context
+
 
 0.08	2004-12-03
-    - uniq() was not mentioned in the perldocs and only had
-      the XS implementation
-    - uniq() also produced wrong results on 5.8.0
-      (thanks to Slaven Rezic for spotting it and suggesting
-      a workaround)
-    - the test-suite triggered a bug in 5.6.x perls
-    - the test-suite now tests both the XS- and Perl-implementation
-    - a wrong example in the perldocs fixed (Ron Savage)
+
+- uniq() was not mentioned in the perldocs and only had
+  the XS implementation
+- uniq() also produced wrong results on 5.8.0
+  (thanks to Slaven Rezic for spotting it and suggesting
+  a workaround)
+- the test-suite triggered a bug in 5.6.x perls
+- the test-suite now tests both the XS- and Perl-implementation
+- a wrong example in the perldocs fixed (Ron Savage)
+
 
 0.07	2004-12-01
-    - new functions:
-      after, after_incl, before, before_incl, indexes
-      lastval, firstval, pairwise, each_array, natatime,
-      mesh (all from Eric J. Roodes' List::MoreUtil).
+
+- new functions:
+  after, after_incl, before, before_incl, indexes
+  lastval, firstval, pairwise, each_array, natatime,
+  mesh (all from Eric J. Roodes' List::MoreUtil).
+
 
 0.06	2004-11-14
-    - new function 'apply' on behalf of Brian McCauley
-      (<nobull AT mail DOT com>)
+
+- new function 'apply' on behalf of Brian McCauley
+  (<nobull AT mail DOT com>)
+
 
 0.05	2004-09-18
-    - merged in insert_after() and insert_after_string() from
-      List::Utils which is now obsolete
-      (thanks to James Keenan <jkeen AT verizon DOT net> and
-      Terrence Brannon <terry AT hcoop DOT net>)
+
+- merged in insert_after() and insert_after_string() from
+  List::Utils which is now obsolete
+  (thanks to James Keenan <jkeen AT verizon DOT net> and
+  Terrence Brannon <terry AT hcoop DOT net>)
+
 
 0.04	2004-07-10
-    - renamed to List::SomeUtils on suggestion by
-      Steve Purkis <spurkis AT quiup DOT com>
+
+- renamed to List::SomeUtils on suggestion by
+  Steve Purkis <spurkis AT quiup DOT com>
+
 
 0.03	2004-07-09
-    - some compilers don't like the stale goto labels
-      without any statement following. Fixed.
-      (Robert Rothenberg <wlkngowl AT i-2000 DOT com>)
+
+- some compilers don't like the stale goto labels
+  without any statement following. Fixed.
+  (Robert Rothenberg <wlkngowl AT i-2000 DOT com>)
+
 
 0.02	2004-07-08
-    - added Perl implementations of all functions 
-      as a fallback 
-      (Adam Kennedy <adam AT phase-n DOT com>)
+
+- added Perl implementations of all functions 
+  as a fallback 
+  (Adam Kennedy <adam AT phase-n DOT com>)
+
 
 0.01	2004-07-05
-    - original version; created by h2xs 1.23 with options
-      -b 5.5.3 -A -n List::Any
+
+- original version; created by h2xs 1.23 with options
+  -b 5.5.3 -A -n List::Any

@@ -878,6 +878,75 @@ All functionality listed here is highly experimental and should be used with gre
 
         $dbh->{mock_clear_table_info} = 1;
 
+- Result Set Callbacks
+
+    If you need your result sets to be more dynamic (e.g. if they need to return different results based upon a bound parameter) then you can use a callback.
+
+        $dbh->{mock_add_resultset} = {
+            sql => 'SELECT a FROM b WHERE c = ?',
+            callback => sub {
+                my @bound_params = @_;
+
+                my %result = (
+                    fields => [ "a" ],
+                    rows => [[ 1] ]
+                );
+
+                if ($bound_params[0] == 1) {
+                    $result{rows} = [ [32] ];
+                } elsif ($bound_params[0] == 2) {
+                    $result{rows} = [ [43] ];
+                }
+
+                return %result;
+            },
+        };
+
+        my $sth = $dbh->prepare('SELECT a FROM b WHERE c = ?');
+
+        my $rows = $sth->execute(1);
+        my ($result) = $sth->fetchrow_array();  # $result will be 32
+          
+        $rows = $sth->execute(2);
+        ($result) = $sth->fetchrow_array();  # $result this time will be 43
+          
+        $rows = $sth->execute(33); # $results this time will be 1
+          
+        ($result) = $sth->fetchrow_array();
+
+    The callback needs to return a hash with a `rows` key that is an array ref of arrays containing the values to return as the answer to the query. In addition a `fields` key can also be returned with an array ref of field names. If a `fields` key isn't present in the returned the hash then the fields will be taken from the `mock_add_resultset`'s `results` parameter.
+
+        $dbh->{mock_add_resultset} = {
+            sql => 'SELECT x FROM y WHERE z = ?',
+            results => [ ["x"] ],
+            callback => sub {
+                my @bound_params = @_;
+
+                my %result = ( rows => [[ 1] ] );
+
+                if ($bound_params[0] == 1) {
+                    $result{rows} = [ [32] ];
+                } elsif ($bound_params[0] == 2) {
+                    $result{rows} = [ [43] ];
+                }
+
+                return %result;
+            },
+        };
+
+        my $sth = $dbh->prepare('SELECT x FROM y WHERE z = ?');
+
+        my $rows = $sth->execute(1);
+        my ($result) = $sth->fetchrow_array();  # $result will be 32
+          
+        $rows = $sth->execute(2);
+        ($result) = $sth->fetchrow_array();  # $result will be 43
+
+        $rows = $sth->execute(33);
+        ($result) = $sth->fetchrow_array();  # $result will be 1
+
+    By default result sets which only define their field names in their callback return values will have a `NUM_OF_FIELDS` property of 0 until after the statement has actually been executed. This is to make sure that DBD::Mock stays compatible with previous versions. If you need the `NUM_OF_FIELDS` property to be undef in this situation then set the `$DBD::Mock::DefaultFieldsToUndef` flag to 1.
+
 # BUGS
 
 - Odd $dbh attribute behavior
@@ -893,8 +962,6 @@ All functionality listed here is highly experimental and should be used with gre
 - Enhance the DBD::Mock::StatementTrack object
 
     I would like to have the DBD::Mock::StatementTrack object handle more of the mock\_\* attributes. This would encapsulate much of the mock\_\* behavior in one place, which would be a good thing.
-
-    I would also like to add the ability to bind a subroutine (or possibly an object) to the result set, so that the results can be somewhat more dynamic and allow for a more realistic interaction.
 
 # SEE ALSO
 

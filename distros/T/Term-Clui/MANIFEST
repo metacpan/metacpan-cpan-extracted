@@ -10,11 +10,13 @@ lib/Term/Clui/FileSelect.pm
 LICENSE
 maint/releaseprep
 Makefile.PL
-MANIFEST                       This list of files
+MANIFEST			This list of files
+MANIFEST.bak
 MANIFEST.SKIP
 py/TermClui.py
 py/test_script
 README
+README.md
 t/term_clui.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

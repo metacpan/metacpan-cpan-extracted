@@ -1,5 +1,9 @@
 Revision history for WWW::Mechanize
 
+1.95      2019-10-28 13:07:45Z
+    [FIXED]
+   - die if submit_form() called with invalid form_id (GH#287) (Olaf Alders)
+
 1.94      2019-10-10 13:12:28Z
     [FIXED]
     - Issue #182: Don't autocheck for mech-dump so basic auth works (GH#285)

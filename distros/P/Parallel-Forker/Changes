@@ -2,6 +2,10 @@ Revision history for Perl extension Parallel::Forker
 
 The contributors that suggested a given feature are shown in [].
 
+* Parallel::Forker 1.252 2019-10-25
+
+****    Documentation cleanups for github release.
+
 * Parallel::Forker 1.250 2019-09-17
 
 ****	Fix CPAN missing tarball, no functional change.

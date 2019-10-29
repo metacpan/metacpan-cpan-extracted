@@ -1,5 +1,5 @@
 package XML::Grammar::Fortune;
-$XML::Grammar::Fortune::VERSION = '0.0702';
+$XML::Grammar::Fortune::VERSION = '0.0800';
 use warnings;
 use strict;
 
@@ -83,7 +83,7 @@ XML::Grammar::Fortune - convert the FortunesXML grammar to other formats and fro
 
 =head1 VERSION
 
-version 0.0702
+version 0.0800
 
 =head1 SYNOPSIS
 
