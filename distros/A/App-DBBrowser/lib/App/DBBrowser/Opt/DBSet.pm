@@ -210,7 +210,7 @@ sub __settings_menu_wrap_db {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $changed = $tu->settings_menu(
         $sub_menu, $db_opt->{$section},
-        { prompt => $prompt }
+        { prompt => $prompt, back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm} }
     );
     return if ! $changed;
     $sf->{write_config}++;

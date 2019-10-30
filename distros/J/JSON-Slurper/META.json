@@ -73,9 +73,10 @@
          "web" : "https://github.com/srchulo/JSON-Slurper"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_contributors" : [
-      "Adam Hopkins <violapiratejunky@gmail.com>"
+      "Adam Hopkins <violapiratejunky@gmail.com>",
+      "Toby Inkster <tobyink@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.13",

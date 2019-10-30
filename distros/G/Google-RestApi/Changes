@@ -1,5 +1,8 @@
 Revision history for Perl extension Google::RestApi.
 
-0.01  Thu Sep  5 11:47:30 2019
+0.1  Thu Sep  5 11:47:30 2019
 	- original version; created by h2xs 1.23 with options
 		-X -n Google::RestApi
+0.2  Wed Oct 30 2019
+        - Simplified login code in session_creator and RestApi. Breaking change.
+        - POD/comments/debug message improvements.

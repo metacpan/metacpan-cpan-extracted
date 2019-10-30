@@ -30,6 +30,7 @@
          "requires" : {
             "B::Keywords" : "0",
             "Carp" : "0",
+            "Exporter" : "0",
             "File::Find" : "0",
             "File::Spec" : "0",
             "HTTP::Tiny" : "0",
@@ -52,7 +53,7 @@
    "provides" : {
       "Test::Pod::LinkCheck::Lite" : {
          "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -70,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

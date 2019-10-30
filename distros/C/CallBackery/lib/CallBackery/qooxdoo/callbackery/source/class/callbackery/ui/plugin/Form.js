@@ -67,9 +67,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var cfg = this._cfg;
             this.setLayout(new qx.ui.layout.VBox(30));
             var form = this._form = new callbackery.ui.form.Auto(
-                cfg.form,null,callbackery.ui.form.renderer.NoteForm).set({
-                paddingRight: 10
-            });
+                cfg.form,null,callbackery.ui.form.renderer.NoteForm);
             if (cfg['options'] && cfg.options['warnAboutUnsavedData']){
                 form.addListener('changeData',function(){
                     if (this._loading == 0){ // only notify when update comes from human interaction

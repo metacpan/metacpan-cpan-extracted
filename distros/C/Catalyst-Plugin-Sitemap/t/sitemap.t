@@ -9,8 +9,6 @@ use Catalyst::Test 'TestApp';
 
 my $xml = get('/sitemap');
 
-note $xml;
-
 $xml =~ s/\s+//g;
 
 like $xml, qr{<url><loc>http://localhost/root/alone</loc></url>}, ':Sitemap';

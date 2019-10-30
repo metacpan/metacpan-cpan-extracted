@@ -115,6 +115,11 @@ DESCRIPTION
         This defaults to caller, but may be explicitly set to undef to
         suppress the creation of such methods.
 
+        In every class (but not role) that MooX::Press builds, there will be a
+        `FACTORY` method created so that, for example
+
+          MyApp::Cow->FACTORY  # returns "MyApp"
+
     `type_library` *(Str|Undef)*
         MooX::Press will automatically create a Type::Library-based type
         library with type constraints for all your classes and roles. It will
@@ -127,7 +132,7 @@ DESCRIPTION
         MooX::Press will create a get_type_for_package method that allows you
         to do this:
 
-          MyApp::Types->get_type_for_package(class => "MyApp::Animal");
+          MyApp::Types->get_type_for_package(class => "MyApp::Animal")
 
         MooX::Press will mark "MyApp/Types.pm" as loaded in %INC, so you can
         do things like:
@@ -135,6 +140,11 @@ DESCRIPTION
           use MyApp::Types qw(Animal);
 
         And it won't complain about "MyApp/Types.pm" not being found.
+
+        MooX::Press will install a `type_library` method into the factory
+        package which returns the name of the type library, so you can do:
+
+          MyApp->type_library->get_type_for_package(class => "MyApp::Animal")
 
     `caller` *(Str)*
         MooX::Press determines some things based on which package called it.
@@ -714,6 +724,49 @@ FAQ
     some as barewords, some coderefs, etc. You should manually import strict
     and warnings before importing MooX::Press to ensure all of that is covered
     by strictures.
+
+  Why all the factory stuff?
+    Factories are big and cool and they put lots of smoke into our atmosphere.
+
+    Also, if you do something like:
+
+            use constant APP => 'MyGarden';
+            use MooX::Press (
+                    prefix => APP,
+                    role  => [
+                            'LeafGrower' => {
+                                    has => [ '@leafs' => sub { [] } ],
+                                    can => {
+                                            'grow_leaf' => sub {
+                                                    my $self = shift;
+                                                    my $leaf = $self->FACTORY->new_leaf;
+                                                    push @{ $self->leafs }, $leaf;
+                                                    return $leaf;
+                                            },
+                                    },
+                            },
+                    ]
+                    class => [
+                            'Leaf',
+                            'Tree'  => { with => ['LeafGrower'] },
+                    ],
+            );
+        
+            my $tree = APP->new_tree;
+            my $leaf = $tree->grow_leaf;
+
+    And you will notice that the string "MyGarden" doesn't appear anywhere in
+    the definitions for any of the classes and roles. The prefix could be
+    changed to something else entirely and all the classes and roles, all the
+    methods within them, would continue to work.
+
+    Whole collections of classes and roles now have portable namespaces. The
+    same classes and roles could be used with different prefixes in different
+    scripts. You could load two different versions of your API in the same
+    script with different prefixes. The possibilities are interesting.
+
+  The plural of "leaf" is "leaves", right?
+    Yeah, but that sounds like something is leaving.
 
   Are you insane?
     Quite possibly.

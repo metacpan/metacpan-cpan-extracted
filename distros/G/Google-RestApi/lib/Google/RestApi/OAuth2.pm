@@ -1,13 +1,13 @@
 package Google::RestApi::OAuth2;
 
-# this was taken from Google::DataAPI::Auth::OAuth2 and had
+# this was taken from Net::Google::DataAPI::Auth::OAuth2 and had
 # a moose-ectomy. this will get rid of warnings about switching
 # to Moo instead of Moose::Any.
 
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -71,7 +71,7 @@ sub access_token {
     );
     my $p = $check->(@_);
     $p->{profile} = $self->oauth2_webserver();
-    # DEBUG("Building access token from:\n", Dump($p)); # this puts the secret into the logs.
+    # DEBUG("Building access token from:\n", Dump($p)); # shows secret in the logs.
     $self->{access_token} = Net::OAuth2::AccessToken->new(%$p);
   }
 
@@ -160,10 +160,10 @@ Google::RestApi::OAuth2 - OAuth2 support for Google Rest APIs
 
 =head1 DESCRIPTION
 
-Google::RestAPI::OAuth2 interacts with google OAuth 2.0 service
+Google::RestApi::OAuth2 interacts with google OAuth 2.0 service
 and adds the 'Authorization' header to subsequent requests.
 
-This was copied from Google::DataAPI::Auth::OAuth2 and modified
+This was copied from Net::Google::DataAPI::Auth::OAuth2 and modified
 to fit this framework. The other framework was dated and produced
 constant warnings to upgrade to Moo. I removed Moose since I didn't
 use Moose anywhere else in this framework.
@@ -197,7 +197,7 @@ See L<https://developers.google.com/accounts/docs/OAuth2> for details.
 
 =head1 AUTHOR
 
-Robin Murray E<lt>mvsjes@cpan.ork<gt>, copied and modifed from Google::DataAPI::Auth::OAuth2.
+Robin Murray E<lt>mvsjes@cpan.ork<gt>, copied and modifed from Net::Google::DataAPI::Auth::OAuth2.
 
 =head1 SEE ALSO
 

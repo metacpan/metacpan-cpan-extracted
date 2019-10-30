@@ -1,5 +1,5 @@
 {
-   "abstract" : "Oauth2 connection to Google APIs (currently Drive and Sheets).",
+   "abstract" : "Connection to Google REST APIs (currently Drive and Sheets).",
    "author" : [
       "Robin Murray <mvsjes@cpan.org>"
    ],
@@ -46,7 +46,7 @@
             "Sub::Retry" : "0",
             "Tie::Hash" : "0",
             "Time::Out" : "0",
-            "Type::Params" : "0",
+            "Type::Params" : "1.004004",
             "Types::Standard" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

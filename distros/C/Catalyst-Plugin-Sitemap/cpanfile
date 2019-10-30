@@ -1,4 +1,3 @@
-requires "List::Util" => "0";
 requires "Moose::Role" => "0";
 requires "WWW::Sitemap::XML" => "0";
 requires "strict" => "0";
@@ -24,6 +23,10 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'configure' => sub {
+  suggests "JSON::PP" => "2.27300";
 };
 
 on 'develop' => sub {

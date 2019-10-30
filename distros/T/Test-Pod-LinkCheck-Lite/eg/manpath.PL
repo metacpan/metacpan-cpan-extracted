@@ -13,7 +13,7 @@ use File::Spec;
 use List::Util qw{ uniq };
 use Pod::Usage;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use constant PATH_SEP	=> qr/ $Config{path_sep} /smx;
 use constant MANPATH_APPEND	=> qr/ (?<= $Config{path_sep} \z ) /smx;
@@ -371,6 +371,8 @@ contents of the environment variable, and an embedded double path
 separator inserts the default manpath at that point. This worked on
 every system where I tried it, but was undocumented in about half of
 them.
+
+=back
 
 =back
 

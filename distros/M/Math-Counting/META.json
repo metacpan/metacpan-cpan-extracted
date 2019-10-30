@@ -61,7 +61,7 @@
          "web" : "https://github.com/ology/Math-Counting"
       }
    },
-   "version" : "0.1306",
+   "version" : "0.1307",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

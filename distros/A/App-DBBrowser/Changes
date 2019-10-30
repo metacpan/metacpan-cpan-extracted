@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.219    2019-10-30
+        - Update required Term::Choose-Util-versions.
+        - Adapt code to the updated Term::Choose-Util version.
+
 2.218    2019-10-23
         - Update documentation.
 

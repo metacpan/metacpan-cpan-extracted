@@ -3,11 +3,27 @@ use 5.14.0;
 use warnings;
 use Test::More;
 BEGIN { require Test::RequiresInternet; Test::RequiresInternet->import(); }
-plan tests => 22;
+plan tests => 24;
 use_ok('Perl::RT2Github');
 
-my $self = Perl::RT2Github->new();
+my $self;
+
+$self = Perl::RT2Github->new({ timeout => 40 });
 isa_ok ($self, 'Perl::RT2Github');
+
+{
+    local $@;
+    eval { $self = Perl::RT2Github->new([ 1, 2, 3]); };
+    like($@, qr/Argument to new\(\) must be hashref/,
+        "Detected non-hashref argument to new");
+}
+
+{
+    local $@;
+    eval { $self = Perl::RT2Github->new({ foo => 'bar' }); };
+    like($@, qr/Bad arguments to new\(\)/,
+        "Detected invalid element in argument to new");
+}
 
 {
     my $self = Perl::RT2Github->new();

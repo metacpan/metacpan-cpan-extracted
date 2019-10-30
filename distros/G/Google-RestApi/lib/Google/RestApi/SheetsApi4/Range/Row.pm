@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Range::Row;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -96,7 +96,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Range::Row - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Range::Row - Represents a row within a Worksheet.
 
 =head1 DESCRIPTION
 

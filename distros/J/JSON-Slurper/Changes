@@ -1,5 +1,12 @@
 Revision history for JSON-Slurper
 
+0.12  2019-10-30 10:44:07 CDT
+        - Factor out creation of default encoder into a method. (@tobyink)
+        - Avoids loading JSON::PP or Cpanel::JSON::XS unless they're needed. (@tobyink)
+
+0.11  2019-10-29 23:48:55 CDT
+        - Allow JSON encoder to be passed at import time #6. (thanks @tobyink!)
+
 0.10  2019-10-17 12:19:17 CDT
         - Remove ability to pass arrays and hashes via prototypes. Now anonymous arrays and hashes may be provided.
 

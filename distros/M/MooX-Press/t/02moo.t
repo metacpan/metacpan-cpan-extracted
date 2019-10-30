@@ -107,6 +107,10 @@ is($d->name, 'Daisy', '$d->name');
 is($d->status, 'alive', '$d->status');
 is($d->milk, 'the white stuff', '$d->milk');
 
+is($d->FACTORY, 'Local::Factories', '$d->FACTORY');
+is($d->FACTORY->type_library, 'Local::MyApp::Types', '$d->FACTORY->type_library');
+is($d->FACTORY->get_type_for_package(class => ref $d)->name, 'Cow', '$d->FACTORY->get_type_for_package');
+
 my $e = exception {
 	Local::MyApp::Cow->new(age => 1);
 };

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.026001;
+use 5.024001;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -29,19 +29,19 @@ WriteMakefile(
 	'Sub::Retry'                      => 0,
 	'Tie::Hash'                       => 0,
 	'Time::Out'                       => 0,
-	'Type::Params'                    => 0,
+	'Type::Params'                    => 1.004004,
 	'Types::Standard'                 => 0,
 	'URI'                             => 0,
 	'URI::QueryParam'                 => 0,
 	'YAML::Any'                       => 0,
     },
-    TEST_REQUIRES => {
+    TEST_REQUIRES     => {
 	'Spreadsheet::Perl'         => 0,
 	'Test::Class::Load'         => 0,
 	'Test::MockObject::Extends' => 0,
 	'Test::Most'                => 0,
     },
-    META_MERGE    => {
+    META_MERGE        => {
       "meta-spec" => { version => 2 }, 
       resources   => {
         repository => {

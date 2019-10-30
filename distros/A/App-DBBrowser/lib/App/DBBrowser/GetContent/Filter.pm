@@ -841,6 +841,7 @@ sub __empty_to_null {
     my $tmp = { empty_to_null => $sf->{empty_to_null} };
     $tu->settings_menu(
         [ [ 'empty_to_null', "  Empty fields to NULL", [ 'NO', 'YES' ] ] ],
+        { back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm} }
         $tmp
     );
     $sf->{empty_to_null} = $tmp->{empty_to_null};

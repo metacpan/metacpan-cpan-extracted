@@ -16,10 +16,12 @@ use aliased "Google::RestApi";
 
 Utils::init_logger();
 
-my $config = Utils::rest_api_config();
+my $config_file = Utils::rest_api_config();
 
 my ($api, $about);
-lives_ok sub { $api = RestApi->new(%$config); }, "New api should succeed";
+lives_ok sub {
+  $api = RestApi->new(config_file => $config_file);
+}, "New api should succeed";
 lives_ok sub { $about = $api->api(
   uri => 'https://www.googleapis.com/drive/v3/about',
   params => {

@@ -1,8 +1,6 @@
 use ExtUtils::MakeMaker;
 use strict;
 use warnings;
-use Devel::CheckBin;
-check_bin('git');
 
 # Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
 # the contents of the Makefile that is written.
@@ -10,11 +8,12 @@ check_bin('git');
 my %WriteMakefileArgs = (
     NAME                => 'Perl::RT2Github',
     VERSION_FROM        => 'lib/Perl/RT2Github.pm',
+    MIN_PERL_VERSION    => '5.20.0',
     AUTHOR              => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT            => 'Given RT ticket number, find corresponding Github issue',
+    LICENSE             => 'perl_5',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
-        'Devel::CheckBin' => 0,
     },
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {

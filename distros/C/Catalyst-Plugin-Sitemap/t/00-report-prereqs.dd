@@ -2,6 +2,9 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -12,7 +15,6 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'List::Util' => '0',
                                       'Moose::Role' => '0',
                                       'WWW::Sitemap::XML' => '0',
                                       'strict' => '0',

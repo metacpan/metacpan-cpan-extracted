@@ -3,7 +3,7 @@ package Google::RestApi::DriveApi3::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -56,6 +56,7 @@ sub copy {
   $p->{method} = 'post';
 
   my $copy = $self->api(%$p);
+  DEBUG(sprintf("Copied file '%s' to '$copy->{id}'", $self->file_id()));
   return ref($self)->new(
     drive => $self->drive(),
     id    => $copy->{id},
@@ -64,6 +65,7 @@ sub copy {
 
 sub delete {
   my $self = shift;
+  DEBUG(sprintf("Deleting file '%s'", $self->file_id()));
   return $self->api(
     method => 'delete',
     uri    => $self->file_id(),
@@ -74,3 +76,30 @@ sub file_id { shift->{id}; }
 sub drive { shift->{drive}; }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Google::RestApi::DriveApi3::File - File object for Google Drive.
+
+=head1 DESCRIPTION
+
+Represents a Drive file. You may currently copy and delete the file.
+This needs further filling out.
+
+=head1 AUTHORS
+
+=over
+
+=item
+
+Robin Murray mvsjes@cpan.org
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2019, Robin Murray. All rights reserved.
+
+This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

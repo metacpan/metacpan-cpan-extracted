@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Worksheet;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -186,6 +186,8 @@ sub cell {
   return $range->values();
 }
 
+# call this before calling tie_rows or header_col. it's an
+# "are you sure you want to do this?" check.
 sub enable_header_col {
   my $self = shift;
   if (shift) {
@@ -321,7 +323,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Worksheet - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Worksheet - Represents a Worksheet within a Google Spreadsheet.
 
 =head1 DESCRIPTION
 

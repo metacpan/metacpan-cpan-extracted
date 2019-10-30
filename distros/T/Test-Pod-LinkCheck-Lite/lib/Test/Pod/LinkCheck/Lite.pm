@@ -9,6 +9,7 @@ use utf8;			# Core since 5.6.0
 
 use B::Keywords ();		# Not core
 use Carp ();			# Core since 5.0
+use Exporter ();		# Core since 5.0
 use File::Find ();		# Core since 5.0
 use File::Spec;			# Core since 5.4.5
 use HTTP::Tiny;			# Core since 5.13.9
@@ -21,7 +22,17 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
+
+our @ISA = qw{ Exporter };
+
+our @EXPORT_OK = qw{
+    ALLOW_REDIRECT_TO_INDEX
+};
+
+our %EXPORT_TAGS = (
+    const	=> [ grep { m/ \A [[:upper:]_]+ \z /smx } @EXPORT_OK ],
+);
 
 use constant ON_DARWIN		=> 'darwin' eq $^O;
 use constant ON_VMS		=> 'VMS' eq $^O;
@@ -44,6 +55,19 @@ use constant SCALAR_REF	=> ref \0;
 # 'pod'. We conditionalize fix-up code on this constant so that, if the
 # fix-up is not needed, the optimizer ditches it.
 use constant NEED_MAN_FIX	=> Pod::Simple->VERSION lt '3.24';
+
+use constant ALLOW_REDIRECT_TO_INDEX => sub {
+    my ( undef, $resp, $url ) = @_;
+    # Does not apply to non-hierarchical URLs. This list is derived from
+    # the URI distribution, and represents those classes that do not
+    # inherit from URI::_generic.
+    $url =~ m/ \A (?: data | mailto | urn ) : /smxi
+	and return $resp->{url} ne $url;
+    $url =~ m| / \z |smx
+	or return $resp->{url} ne $url;
+    ( my $resp_url = $resp->{url} ) =~ s| (?<= / ) [^/]* \z ||smx;
+    return $resp_url ne $url;
+};
 
 # NOTE that Test::Builder->new() gets us a singleton. For this reason I
 # use $Test::Builder::Level (localized) to get tests reported relative
@@ -145,6 +169,10 @@ sub _default_module_index {
     }
     @handlers = sort @handlers;
     return \@handlers;
+}
+
+sub _default_prohibit_redirect {
+    return 0;
 }
 
 sub _default_require_installed {
@@ -252,6 +280,25 @@ sub _init_module_index {
     return;
 }
 
+sub _init_prohibit_redirect {
+    my ( $self, $name, $value ) = @_;
+    if ( CODE_REF eq ref $value ) {
+	$self->{$name} = $self->{"_$name"} = $value;
+    } elsif ( $value ) {
+	$self->{$name} = 1;
+	$self->{"_$name"} = sub {
+	    my ( undef, $resp, $url ) = @_;
+	    return $resp->{url} ne $url;
+	};
+    } else {
+	$self->{$name} = 0;
+	$self->{"_$name"} = sub {
+	    return 0;
+	};
+    }
+    return;
+}
+
 sub _init_require_installed {
     my ( $self, $name, $value ) = @_;
     $self->{$name} = $value ? 1 : 0;
@@ -339,6 +386,7 @@ ${leader}'ignore_url' is $ignore_url
 ${leader}'man' is @{[ _Boolean( $self->man() ) ]}
 ${leader}'module_index' is ( @{[ join ', ', map { "'$_'" }
     $self->module_index() ]} )
+${leader}'prohibit_redirect' is @{[ _Boolean( $self->prohibit_redirect() ) ]}
 ${leader}'require_installed' is @{[ _Boolean( $self->require_installed() ) ]}
 ${leader}'skip_server_errors' is @{[ _Boolean( $self->skip_server_errors() ) ]}
 EOD
@@ -442,6 +490,11 @@ sub pod_file_ok {
     return wantarray ?
 	( @{ $self->{_test} }{ qw{ fail pass skip } } ) :
 	$self->{_test}{fail};
+}
+
+sub prohibit_redirect {
+    my ( $self ) = @_;
+    return $self->{prohibit_redirect};
 }
 
 sub require_installed {
@@ -724,6 +777,7 @@ sub _get_module_index_cpan {
 
     # The following code reproduces
     # CPAN::HandleConfig::cpan_home_dir_candidates()
+    # as of CPAN::HandleConfig version 5.5011.
     my @dir_list;
 
     if ( _has_usable( 'File::HomeDir', 0.52 ) ) {
@@ -803,15 +857,27 @@ sub _handle_url {
 
     my $resp = $user_agent->head( $url );
 
-    $resp->{success}
-	and return 0;
+    if ( $resp->{success} ) {
 
-    $self->skip_server_errors()
-	and $resp->{status} =~ m/ \A 5 /smx
-	and return $self->_skip( $link,
-	    "not checked: server error $resp->{status} $resp->{reason}" );
+	my $code = $self->{_prohibit_redirect};
+	while ( $code = $code->( $self, $resp, $url ) ) {
+	    CODE_REF eq ref $code
+		or return $self->_fail( $link, "redirected to $resp->{url}" );
+	}
 
-    return $self->_fail( $link, "broken: $resp->{status} $resp->{reason}" );
+	return 0;
+
+    } else {
+
+	$self->skip_server_errors()
+	    and $resp->{status} =~ m/ \A 5 /smx
+	    and return $self->_skip( $link,
+		"not checked: server error $resp->{status} $resp->{reason}" );
+
+	return $self->_fail( $link,
+	    "broken: $resp->{status} $resp->{reason}" );
+
+    }
 }
 
 {
@@ -1122,8 +1188,7 @@ module has a section, a skipped test is generated.
 
 The C<::Lite> refers to the fact that a real effort has been made to
 reduce non-core dependencies. Under Perl 5.14 and up, the only known
-non-core dependencies are L<B::Keywords|B::Keywords> and
-L<Pod::Simple::SimpleTree|Pod::Simple::SimpleTree>.
+non-core dependency is L<B::Keywords|B::Keywords>.
 
 An effort has also been made to minimize the spawning of system
 commands.
@@ -1259,6 +1324,30 @@ indices.
 
 By default all indices are considered.
 
+=item prohibit_redirect
+
+Added in version 0.004
+
+This argument controls whether redirects are allowed in the resolution
+of a URL link.
+
+If a code reference is specified, it is called whenever a URL link is
+successfully resolved. The arguments are the
+C<Test::Pod::LinkCheck::Lite> object, the L<HTTP::Tiny> response hash,
+and the URL from the link. The code returns true to declare the link in
+error, false to allow it, or a code reference to defer the decision to
+that code. This latter is provided because I found the case where I
+wanted to do a little pre-processing and then defer to
+L<ALLOW_REDIRECT_TO_INDEX|/ALLOW_REDIRECT_TO_INDEX>, but could not find
+a clean way to use a manifest constant in a C<goto>.
+
+Any other value is interpreted as a Boolean. If the argument is true,
+any redirect is an error. If false, redirects are allowed.
+
+This argument is ignored unless L<check_url|/check_url> is true.
+
+The default is false, for historical reasons.
+
 =item require_installed
 
 This Boolean argument is true to disable the uninstalled module checks.
@@ -1373,6 +1462,15 @@ If called in scalar context, this method returns the number of test
 failures encountered. If called in list context it return the number of
 failures, passes, and skipped tests, in that order.
 
+=head2 prohibit_redirect
+
+ $t->prohibit_redirect()
+     and say 'All URL links must resolve without redirection';
+
+Added in version 0.004
+
+This method returns the value of the C<'prohibit_redirect'> attribute.
+
 =head2 require_installed
 
  $t->require_installed()
@@ -1388,6 +1486,30 @@ This method returns the value of the C<'require_installed'> attribute.
 Added in version 0.002.
 
 This method returns the value of the C<'skip_server_errors'> attribute.
+
+=head1 MANIFEST CONSTANT
+
+The following manifest constant can be imported by name, or using the
+C<:const> tag:
+
+=head2 ALLOW_REDIRECT_TO_INDEX
+
+This manifest constant is intended to be used as a value of the
+C<'prohibit_redirect'> attribute. It is a reference to a piece of code
+that accepts old-style redirects of an hierarchical URL ending in a
+C<'/'> to an index of that leaf of the hierarchy.
+
+Because this is a minimal-dependency module, the code referred to by
+this constant works by hand-checking for an hierarchical scheme
+(anything but C<'data:'>, C<'mailto:'>, or C<'urn:'>). If a URL with an
+hierarchical scheme ends in C<'/'>, the URL in the response has
+everything after the last C<'/'> removed before comparison to the
+original URL.
+
+This mess exists because of my bias that old-style redirection to an
+index is a different beast than indirection in general, and ought to be
+allowed. If you disagree you can ignore this functionality, or
+re-implement to suit yourself.
 
 =head1 SEE ALSO
 
@@ -1421,7 +1543,7 @@ me.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

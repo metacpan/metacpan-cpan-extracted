@@ -29,7 +29,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Math-Counting
   repository: https://github.com/ology/Math-Counting.git
-version: '0.1306'
+version: '0.1307'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

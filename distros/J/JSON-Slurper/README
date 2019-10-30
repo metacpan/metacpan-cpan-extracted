@@ -55,6 +55,15 @@ SYNOPSIS
     
       # auto_ext can also be passed when using the object-oriented interface:
       my $json_slurper = JSON::Slurper->new(auto_ext => 1);
+    
+    
+      # provide an encoder on import to use with spurt_json and slurp_json
+      use JSON::Slurper -encoder => JSON::PP->new->pretty, qw(slurp_json spurt_json);
+    
+      # use encoder passed in above
+      spurt_json \@people, 'people.json';
+    
+      my @people_from_file = slurp_json 'people.json';
 
 DESCRIPTION
 
@@ -120,6 +129,21 @@ FUNCTIONAL INTERFACE
       # Writes to "ref.txt";
       spurt_json $ref, 'ref.txt';
 
+ -encoder
+
+    You can use -encoder at import time to pass the encoder that will be
+    used with "slurp_json" and "spurt_json". If you provide an encoder to
+    the function call, it will override any encoder passed in at import
+    time.
+
+      use JSON::Slurper -encoder => JSON::PP->new->pretty, 'spurt_json';
+    
+      # uses encoder passed in above
+      spurt_json \@people, 'people.json';
+    
+      # use the encoder passed in below to spurt_json instead of the one passed in on import
+      spurt_json \@people, 'people.json', JSON::PP->new->ascii;
+
  slurp_json
 
     slurp_json $filename, [$json_encoder]
@@ -138,7 +162,8 @@ FUNCTIONAL INTERFACE
     This reads in JSON from a file and returns it as a Perl data structure
     (a reference, an array, or a hash). You can pass in your own JSON
     encoder/decoder as an optional argument, as long as it is blessed and
-    has encode and decode methods.
+    has encode and decode methods. Any encoder passed in will override an
+    encoder provided during import via "-encoder".
 
  spurt_json
 
@@ -160,7 +185,8 @@ FUNCTIONAL INTERFACE
     This reads in JSON from a file and returns it as a Perl data structure
     (a reference, an array, or a hash). You can pass in your own JSON
     encoder/decoder as an optional argument, as long as it is blessed and
-    has encode and decode methods.
+    has encode and decode methods. Any encoder passed in will override an
+    encoder provided during import via "-encoder".
 
  Export Tags
 

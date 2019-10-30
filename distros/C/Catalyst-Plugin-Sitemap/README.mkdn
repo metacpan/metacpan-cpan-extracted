@@ -1,0 +1,158 @@
+# NAME
+
+Catalyst::Plugin::Sitemap - Sitemap support for Catalyst.
+
+# VERSION
+
+version 1.0.3
+
+# SYNOPSIS
+
+```perl
+# in MyApp.pm
+
+use Catalyst qw/ Sitemap /;
+
+# in the controller
+
+sub alone :Local :Sitemap {
+    ...
+}
+
+sub with_priority :Local :Sitemap(0.75) {
+    ...
+}
+
+sub with_args :Local
+        :Sitemap( lastmod => 2010-09-27, changefreq => daily ) {
+    ...
+}
+
+sub with_function :Local :Sitemap(*) {
+    ...
+}
+
+sub with_function_sitemap {
+    $_[2]->add( 'http://localhost/with_function' );
+}
+
+# and then...
+
+sub sitemap : Path('/sitemap') {
+    my ( $self, $c ) = @_;
+
+    $c->res->body( $c->sitemap_as_xml );
+}
+```
+
+# DESCRIPTION
+
+[Catalyst::Plugin::Sitemap](https://metacpan.org/pod/Catalyst::Plugin::Sitemap) provides a way to semi-automate the creation
+of the sitemap of a Catalyst application.
+
+# CONTEXT METHOD
+
+## sitemap()
+
+Returns a [WWW::Sitemap::XML](https://metacpan.org/pod/WWW::Sitemap::XML) object. The sitemap object is populated by
+inspecting the controllers of the application for actions with the
+sub attribute `:Sitemap`.
+
+## sitemap\_as\_xml()
+
+Returns the sitemap as a string containing its XML representation.
+
+# `:Sitemap` Subroutine Attribute
+
+The sitemap is populated by actions ear-marked with the <:Sitemap> sub
+attribute.  It can be invoked in different ways:
+
+- `:Sitemap`
+
+    ```perl
+    sub alone :Local :Sitemap {
+        ...
+    }
+    ```
+
+    Adds the url of the action to the sitemap.
+
+    If the action does not
+    resolves in a single url, this will results in an error.
+
+- `:Sitemap($priority)`
+
+    ```perl
+    sub with_priority :Local :Sitemap(0.9) {
+        ...
+    }
+    ```
+
+    Adds the url, with the given number, which has to be between 1 (inclusive)
+    and 0 (exclusive), as its priority.
+
+    If the action does not
+    resolves in a single url, this will results in an error.
+
+- `:Sitemap( %attributes )`
+
+    ```perl
+    sub with_args :Local
+            :Sitemap( lastmod => 2010-09-27, changefreq => daily ) {
+        ...
+    }
+    ```
+
+    Adds the url with the given entry attributes (as defined by
+    [WWW::Sitemap::XML::URL](https://metacpan.org/pod/WWW::Sitemap::XML::URL)).
+
+    If the action does not
+    resolves in a single url, this will results in an error.
+
+- `:Sitemap(*)`
+
+    ```perl
+    sub with_function :Local :Sitemap(*) { }
+
+    sub with_function_sitemap {
+        my ( $self, $c, $sitemap ) = @_;
+
+        $sitemap->add( 'http://localhost/with_function' );
+    }
+    ```
+
+    Calls the function '_action_\_sitemap', if it exists, and passes it the
+    controller, context and sitemap objects.
+
+    This is currently the only way to invoke `:Sitemap` on an action
+    resolving to many urls.
+
+# SEE ALSO
+
+- [WWW::Sitemap::XML](https://metacpan.org/pod/WWW::Sitemap::XML)
+
+    Module that `Catalyst::Plugin::Sitemap` currently uses under the hood.
+
+- [Search::Sitemap](https://metacpan.org/pod/Search::Sitemap)
+
+    Original module that this plugin was using under the hood.
+
+- [Dancer::Plugin::SiteMap](https://metacpan.org/pod/Dancer::Plugin::SiteMap)
+
+    Similar plugin for the [Dancer](https://metacpan.org/pod/Dancer) framework, which inspired
+    `Catalyst::Plugin::Sitemap`.
+
+- [http://techblog.babyl.ca/entry/catalyst-plugin-sitemap](http://techblog.babyl.ca/entry/catalyst-plugin-sitemap)
+
+    Blog article introducing `Catalyst::Plugin::Sitemap`.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2015, 2010 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -58,6 +58,7 @@ sub api {
 
 sub create_spreadsheet {
   my $self = shift;
+
   state $check = compile_named(
     title   => Str, { optional => 1 },
     name    => Str, { optional => 1 },
@@ -74,9 +75,9 @@ sub create_spreadsheet {
       properties => $p,
     },
   );
-  $result->{spreadsheetId} or die "No spreadsheet id returned from creating spreadsheet";
-  $result->{spreadsheetUrl} or die "No spreadsheet URL returned from creating spreadsheet";
-  $result->{properties} or die "No spreadsheet properties returned from creating spreadsheet";
+  for (qw(spreadsheetId spreadsheetUrl properties)) {
+    $result->{$_} or die "No '$_' returned from creating spreadsheet";
+  }
 
   return $self->open_spreadsheet(
     id  => $result->{spreadsheetId},
@@ -112,6 +113,7 @@ sub delete_all_spreadsheets {
   my ($name) = $check->(@_);
   my $spreadsheets = $self->spreadsheets();
   my @spreadsheets = grep { $_->{name} eq $name; } @{ $spreadsheets->{files} };
+  DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
   $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
   return;
 }
@@ -148,7 +150,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4 - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
 
 =head1 SYNOPSIS
 
@@ -162,7 +164,7 @@ Google::RestApi::SheetsApi4 - Perl API to Google Sheets API V4.
  $sheet = $sheets->create_spreadsheet(title => 'my_name');
  $ws0 = $sheet->open_worksheet(id => 0);
 
- # sub worksheet->cell/col/cols/row/rows immediately get/set
+ # sub Worksheet::cell/col/cols/row/rows immediately get/set
  # values. this is less efficient but the simplest way to
  # interface with the api. you don't deal with any intermediate
  # api objects.
@@ -221,19 +223,19 @@ Google::RestApi::SheetsApi4 - Perl API to Google Sheets API V4.
  $rg->bold()->italic()->submit_requests();
 
  # tie ranges to a hash:
- $row = $worksheet->tie_cells({id => 'A2'}, {name => 'B2'});
+ $row = $ws0->tie_cells({id => 'A2'}, {name => 'B2'});
  $row->{id} = '1001';
  $row->{name} = 'Herb Ellis';
  tied(%$row)->submit_values();
 
  # or use a hash slice:
- $ranges = $worksheet->tie_ranges();
+ $ranges = $ws0->tie_ranges();
  @$ranges{ 'A2', 'B2', 'C2', 'D4:E5' } =
    (1001, "Herb Ellis", "123 Some Street", [["Halifax"]]);
  tied(%$ranges)->submit_values();
 
  # use simple header column/row values as a source for tied keys:
- $cols = $worksheet->tie_cols('Id', 'Name');
+ $cols = $ws0->tie_cols('Id', 'Name');
  $cols->{Id} = [1001, 1002, 1003];
  $cols->{Name} = ['Herb Ellis', 'Bela Fleck', 'Freddie Mercury'];
  tied(%$cols)->submit_values();
@@ -248,7 +250,7 @@ Google::RestApi::SheetsApi4 - Perl API to Google Sheets API V4.
 
  # iterators can be used to step through ranges:
  # a basic iterator on a column:
- $col = $worksheet->range_col(1);
+ $col = $ws0->range_col(1);
  $i = $col->iterator();
  while(1) {
    $cell = $i->next();
@@ -256,7 +258,7 @@ Google::RestApi::SheetsApi4 - Perl API to Google Sheets API V4.
  }
 
  # a basic iterator on an arbitrary range, iterating by col or row:
- $range = $worksheet->range("A1:C3");
+ $range = $ws0->range("A1:C3");
  $i = $range->iterator(dim => 'col');
  $cell = $i->next();  # A1
  $cell = $i->next();  # A2
@@ -265,15 +267,15 @@ Google::RestApi::SheetsApi4 - Perl API to Google Sheets API V4.
  $cell = $i->next();  # B1
 
  # an iterator on a range group:
- $col = $worksheet->range_col(1);
- $row = $worksheet->range_row(1);
- $rg = $spreadsheet->range_group($col, $row);
+ $col = $ws0->range_col(1);
+ $row = $ws0->range_row(1);
+ $rg = $sheet->range_group($col, $row);
  $i = $rg->iterator();
  $rg2 = $i->next();  # another range group of cells A1, A1
  $rg2 = $i->next();  # another range group of cells A2, B1
 
  # an iterator on a tied range group:
- $cols = $worksheet->tie_cols(qw(Id Name));
+ $cols = $ws0->tie_cols(qw(Id Name));
  $i = tied(%$cols)->iterator();
  $row = $i->next();
  $row->{Id} = '1001';
@@ -297,6 +299,10 @@ The synopsis above is a quick reference. For more detailed information, see:
  Google::RestApi
  Google::RestApi::SheetsApi4::Spreadsheet
  Google::RestApi::SheetsApi4::Worksheet
+ 
+ t/tutorial/Sheets also has a step-by-step tutorial of creating and
+ updating a spreadsheet, showing you the API calls and return values
+ for each step.
 
 =head1 SUBROUTINES
 
@@ -318,6 +324,10 @@ other URI segment passed in the uri arg.
    'api' subroutine.
  %args: Passes any extra arguments to the RestApi's 'api' subroutine (content,
    params, method etc).
+
+You would not normally call this directly unless you were
+making a Google API call not currently supported by this API
+framework.
 
 =item create_spreadsheet(title|name => <string>, %args);
 

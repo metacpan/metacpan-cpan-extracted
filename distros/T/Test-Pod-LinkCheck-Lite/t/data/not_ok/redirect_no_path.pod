@@ -1,0 +1,12 @@
+=pod
+
+This POD contains a URL link that is redirected. This is
+L<https://heavens-above.com/>. It redirects to
+C<https://heavens-above.com/main.aspx>.
+
+The test should fail if prohibit_redirect is a true scalar, but pass if
+it is false, or if it is C<ALLOW_REDIRECT_IF_NO_PATH>
+
+=cut
+
+# ex: set textwidth=72 :

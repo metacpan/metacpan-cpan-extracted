@@ -1,19 +1,28 @@
 package Perl::RT2Github;
 use 5.14.0;
 use warnings;
-our $VERSION     = '0.03';
+our $VERSION = '0.04';
 use Carp;
 use HTTP::Tiny;
 
 sub new {
-    my ($class) = @_;
+    my ($class, $args) = @_;
+    $args = {} unless defined $args;
+    croak "Argument to new() must be hashref" unless ref($args) eq 'HASH';
+    my %valid_args = map {$_ => 1} (qw| timeout |);
+    my @bad_args = ();
+    while (my ($k,$v) = each(%{$args})) {
+        push @bad_args, $k unless $valid_args{$k};
+    }
+    croak "Bad arguments to new(): @bad_args" if (@bad_args);
+    $args->{timeout} ||= 120;
 
     my %data = (
         rt_stem => 'https://rt.perl.org/Public/Bug/Display.html?id=',
         gh_stem => 'https://github.com/perl/perl5/issues/',
         field => 'location',
         results => {},
-        ua => HTTP::Tiny->new(max_redirect => 0, timeout => 10),
+        ua => HTTP::Tiny->new(max_redirect => 0, timeout => $args->{timeout}),
     );
     my $self = bless \%data, $class;
     return $self;
@@ -115,9 +124,10 @@ Perl::RT2Github constructor.
 
 =item * Arguments
 
-    my $self = Perl::RT2Github->new();
+    my $self = Perl::RT2Github->new({ timeout => 120});
 
-None.
+Hash reference; optional.  Currently, the only possible element in this hashref is
+C<timeout>, whose value defaults to 120 seconds.
 
 =item * Return Value
 
@@ -209,6 +219,14 @@ Hash reference.
 
 None so far.
 
+=head1 CONTRIBUTING
+
+The author prefers patches over pull requests on github.com.  To report bugs or
+otherwise contribute to the development of this module, please attach a patch
+(e.g., output of C<git format-patch>) to either (a) an email sent to
+C<bug-Perl-RT2Github@rt.cpan.org>or use the web interface at
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Perl-RT2Github>.
+
 =head1 AUTHOR
 
     James E Keenan
@@ -219,6 +237,8 @@ None so far.
 =head1 ACKNOWLEDGMENTS
 
 Implementation suggestions from Dagfinn Ilmari Mannsåker and Dan Book.
+Correction of error in Changes from Graham Knop.
+Patch to Makefile.PL from Mohammad S Anwar.
 
 =head1 COPYRIGHT
 

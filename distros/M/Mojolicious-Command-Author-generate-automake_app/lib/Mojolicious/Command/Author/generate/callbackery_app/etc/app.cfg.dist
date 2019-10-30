@@ -1,0 +1,44 @@
+
+*** BACKEND ***
+cfg_db = /tmp/<%= ${filename} %>.db
+sesame_user = adfadsfasdf4ee3r
+# perl -MDigest::SHA -e 'print Digest::SHA::hmac_sha1_hex("access"),"\n"'
+sesame_pass = 393afhkjhffjj
+
+*** FRONTEND ***
+# logo = ../resource/<%= ${filename} %>/logo.png
+# logo_small = ../resource/<%= ${filename} %>/logo-small.png
+title = Song List
+initial_plugin = Songs
+company_name = OETIKER+PARTNER AG
+company_url = http://www.oetiker.ch
+# max_width = 800
+
+*** FRONTEND-COLORS ***
+#tabview-page-background = fdfdfd
+#tabview-page-border = f0f0f0
+#tabview-button-background = fff
+#tabview-button-checked-background = fdfdfd
+#tabview-button-text = 888
+#tabview-button-checked-text = 000
+#tabview-button-border = fff
+#tabview-button-checked-border = f0f0f0
+#textfield-readonly = eee
+
+*** PLUGIN: InitialUser ***
+module = UserForm
+mode = init
+type = add
+tab-name = Create Initial User
+
+*** PLUGIN: Songs ***
+module = Song
+tab-name = Songs
+
+#*** PLUGIN: SongList ***
+#module = SongList
+#tab-name = Song List
+
+*** PLUGIN: AdminUser ***
+module = Users
+tab-name = Admin User Manager

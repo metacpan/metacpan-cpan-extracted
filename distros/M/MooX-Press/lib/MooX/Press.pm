@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use Exporter::Tiny qw(mkopt);
 use Scalar::Util qw(blessed);
@@ -69,7 +69,7 @@ sub import {
 	}
 	
 	if ($opts{type_library}) {
-		$builder->prepare_type_library($opts{type_library}, $opts{version}, $opts{authority});
+		$builder->prepare_type_library($opts{type_library}, %opts);
 	}
 	
 	for my $role (@roles) {
@@ -128,7 +128,8 @@ sub croak {
 my $none;
 sub prepare_type_library {
 	my $builder = shift;
-	my ($lib, $version, $authority) = @_;
+	my ($lib, %opts) = @_;
+	my ($version, $authority) = ($opts{version}, $opts{authority});
 	my %types_hash;
 	require Type::Tiny::Role;
 	require Type::Tiny::Class;
@@ -157,6 +158,19 @@ sub prepare_type_library {
 		my ($kind, $target) = @_;
 		$types_hash{$kind}{$target};
 	};
+	if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
+		require B;
+		eval(
+			sprintf '
+				package %s;
+				sub type_library { %s };
+				sub get_type_for_package { shift->type_library->get_type_for_package(@_) };
+				1;
+			',
+			$opts{'factory_package'}||$opts{'caller'},
+			B::perlstring($lib),
+		) or $builder->croak("Could not install type library methods into factory package: $@");
+	}
 	no strict 'refs';
 	no warnings 'once';
 	*{"$lib\::_mooxpress_add_type"} = $adder;
@@ -466,9 +480,12 @@ sub _make_package {
 		
 		if (defined $opts{'factory'}) {
 			if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
-				my $factoryname = $builder->qualify_name($opts{'factory'}, $opts{'factory_package'}||$opts{'caller'});
+				my $fpackage    = $opts{'factory_package'} || $opts{'caller'};
+				my $factoryname = $builder->qualify_name($opts{'factory'}, $fpackage);
 				eval "sub $factoryname { shift; '$qname'->new(\@_) }; 1"
 					or $builder->croak("Couldn't create factory $factoryname: $@");
+				eval "sub $qname\::FACTORY { '$fpackage' }; 1"
+					or $builder->croak("Couldn't create factory $qname\::FACTORY: $@");
 			}
 		}
 		
@@ -583,6 +600,8 @@ sub install_methods {
 	for my $name (sort keys %$methods) {
 		no strict 'refs';
 		my $coderef = $methods->{$name};
+		# Why use a wrapper? Because don't want to rename coderefs with Sub::Name.
+		# Why not rename? Because it could be installed into multiple packages.
 		eval "package $class; sub $name :method { goto \$coderef }; 1"
 			or $builder->croak("Could not create method $name in package $class: $@");
 	}
@@ -766,6 +785,11 @@ in L</SYNOPSIS>.
 This defaults to caller, but may be explicitly set to undef to suppress the
 creation of such methods.
 
+In every class (but not role) that MooX::Press builds, there will be a
+C<FACTORY> method created so that, for example
+
+  MyApp::Cow->FACTORY  # returns "MyApp"
+
 =item C<< type_library >> I<< (Str|Undef) >>
 
 MooX::Press will automatically create a L<Type::Library>-based type library
@@ -779,7 +803,7 @@ being a type library.
 MooX::Press will create a get_type_for_package method that allows you to
 do this:
 
-  MyApp::Types->get_type_for_package(class => "MyApp::Animal");
+  MyApp::Types->get_type_for_package(class => "MyApp::Animal")
 
 MooX::Press will mark "MyApp/Types.pm" as loaded in %INC, so you can do
 things like:
@@ -787,6 +811,11 @@ things like:
   use MyApp::Types qw(Animal);
 
 And it won't complain about "MyApp/Types.pm" not being found.
+
+MooX::Press will install a C<type_library> method into the factory package
+which returns the name of the type library, so you can do:
+
+  MyApp->type_library->get_type_for_package(class => "MyApp::Animal")
 
 =item C<< caller >> I<< (Str) >>
 
@@ -1433,6 +1462,51 @@ Your MooX::Press import will typically contain a lot of strings, maybe some
 as barewords, some coderefs, etc. You should manually import strict and
 warnings B<before> importing MooX::Press to ensure all of that is covered
 by strictures.
+
+=head2 Why all the factory stuff?
+
+Factories are big and cool and they put lots of smoke into our atmosphere.
+
+Also, if you do something like:
+
+	use constant APP => 'MyGarden';
+	use MooX::Press (
+		prefix => APP,
+		role  => [
+			'LeafGrower' => {
+				has => [ '@leafs' => sub { [] } ],
+				can => {
+					'grow_leaf' => sub {
+						my $self = shift;
+						my $leaf = $self->FACTORY->new_leaf;
+						push @{ $self->leafs }, $leaf;
+						return $leaf;
+					},
+				},
+			},
+		]
+		class => [
+			'Leaf',
+			'Tree'  => { with => ['LeafGrower'] },
+		],
+	);
+	
+	my $tree = APP->new_tree;
+	my $leaf = $tree->grow_leaf;
+
+And you will notice that the string "MyGarden" doesn't appear anywhere in
+the definitions for any of the classes and roles. The prefix could be
+changed to something else entirely and all the classes and roles, all the
+methods within them, would continue to work.
+
+Whole collections of classes and roles now have portable namespaces. The same
+classes and roles could be used with different prefixes in different scripts.
+You could load two different versions of your API in the same script with
+different prefixes. The possibilities are interesting.
+
+=head2 The plural of "leaf" is "leaves", right?
+
+Yeah, but that sounds like something is leaving.
 
 =head2 Are you insane?
 

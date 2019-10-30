@@ -3,23 +3,26 @@ package Google::RestApi;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
 use autodie;
+use File::Basename;
 use Furl;
 use JSON;
+use Hash::Merge;
 use Sub::Retry;
-use Storable qw(dclone);
+use Storable qw(dclone retrieve);
 use Time::Out qw(timeout);
 use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef);
+use Types::Standard qw(Str StrMatch Int ArrayRef HashRef CodeRef slurpy Any);
 use URI;
 use URI::QueryParam;
-use YAML::Any qw(Dump);
+use YAML::Any qw(Dump LoadFile);
 
 use Google::RestApi::OAuth2;
+use Google::RestApi::Utils qw(named_extra);
 
 no autovivification;
 
@@ -29,14 +32,32 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
+    config_file => Str, { optional => 1 },
+    _extra_     => slurpy Any,
+  );
+  my $self = named_extra($check->(@_));
+
+  if ($self->{config_file}) {
+    my $config = eval { LoadFile($self->{config_file}) };
+    die "Unable to load config file '$self->{config_file}': $@" if $@;
+    $self = Hash::Merge::merge($self, $config);
+  }
+
+  state $check2 = compile_named(
+    config_file   => Str, { optional => 1 },
     client_id     => Str,
     client_secret => Str,
-    refresh_token => Str,
+    token_file    => Str,
     timeout       => Int, { default => 120 },
-    post_process  => CodeRef, { optional => 1 },
     throttle      => Int->where('$_ > -1'), { default => 0 },
+    post_process  => CodeRef, { optional => 1 },
   );
-  my $self = $check->(@_);
+  $self = $check2->(%$self);
+
+  $self->{token_file} = dirname($self->{config_file}) . "/$self->{token_file}"
+    if !-f $self->{token_file} && $self->{config_file};
+  die "Token file not found: '$self->{token_file}'"
+    if !-f $self->{token_file};
 
   return bless $self, $class;
 }
@@ -108,6 +129,7 @@ sub api {
   ) if $self->{post_process};
   DEBUG("Rest API response:\n", Dump($api_content));
 
+  # used for integration tests to avoid google 403's.
   sleep($self->{throttle}) if $self->{throttle};
 
   return wantarray ? ($api_content, $api_response, $p) : $api_content;
@@ -166,7 +188,7 @@ sub ua {
   if (!$self->{ua}) {
     my $access_token = $self->access_token();
     $self->{ua} = Furl->new(
-      headers => [ Authorization => sprintf('Bearer %s', $access_token) ],
+      headers => [ Authorization => "Bearer $access_token" ],
       timeout => $self->{timeout},
     );
   }
@@ -193,11 +215,11 @@ sub access_token {
   );
   $oauth2->access_token(
     auto_refresh  => 1,
-    refresh_token => $self->{refresh_token},
+    refresh_token => retrieve($self->{token_file})->{refresh_token},
   );
   $oauth2->refresh_token();
   $self->{access_token} = $oauth2->access_token()->access_token();
-    DEBUG("Successfully attained access token");
+  INFO("Successfully attained access token");
 
   return $self->{access_token};
 }
@@ -215,7 +237,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi - Oauth2 connection to Google APIs (currently Drive and Sheets).
+Google::RestApi - Connection to Google REST APIs (currently Drive and Sheets).
 
 =head1 SYNOPSIS
 
@@ -223,19 +245,21 @@ Google::RestApi - Oauth2 connection to Google APIs (currently Drive and Sheets).
 
   use Google::RestApi;
   $rest_api = Google::RestApi->new(
-    login => {
-      client_id     => <oauth2_client_id>,
-      client_secret => <oath2_secret>,
-    },
-    token => <token_file_path>,
+    config_file   => <path_to_config_file>,
+    client_id     => <oauth2_client_id>,
+    client_secret => <oath2_secret>,
+    token_file    => <path_to_token_file>,
+    timeout       => <int>,
+    throttle      => <int>,
+    post_process  => <coderef>,
   );
 
   $response = $rest_api->api(
-      uri     => <google_api_url>,
-      method  => get|head|put|patch|post|delete,
-      headers => [],
-      params  => <query_params>,
-      content => <data_for_body>,
+    uri     => <google_api_url>,
+    method  => get|head|put|patch|post|delete,
+    headers => [],
+    params  => <query_params>,
+    content => <data_for_body>,
   );
 
   use Google::RestApi::SheetsApi4;
@@ -254,11 +278,11 @@ Google::RestApi - Oauth2 connection to Google APIs (currently Drive and Sheets).
 =head1 DESCRIPTION
 
 Google Rest API is the foundation class used by the included Drive
-and Sheets APIs. It is used to establish an Oauth2 handshake, and
+and Sheets APIs. It is used to establish an OAuth2 handshake, and
 send API requests to the Google API endpoint on behalf of the
 underlying API classes (Sheets and Drive).
 
-Once you have established the Oauth2 handshake, you would not
+Once you have established the OAuth2 handshake, you would not
 use this class much, it would be used indirectly by the Drive/Sheets
 API classes.
 
@@ -266,21 +290,29 @@ API classes.
 
 =over
 
-=item new(login => <hash>, token => <token_file_path>);
+=item new(config_file => <path_to_config_file>, client_id => <str>, client_secret => <str>, token_file => <path_to_token_file>, post_process => <coderef>, throttle => <int>);
 
- login:
-   client_id: The Oauth2 client id you got from Google.
-   client_secret: The Oauth2 client secret you got from Google.
- token: The file path to the previously saved token (see OAUTH2
-   SETUP below).
+ config_file: Optional YAML configuration file that can specify any
+   or all of the following args:
+ client_id: The OAuth2 client id you got from Google.
+ client_secret: The OAuth2 client secret you got from Google.
+ token_file: The file path to the previously saved token (see OAUTH2
+   SETUP below). If a config_file is passed, the dirname of the config
+   file is tried to find the token_file (same directory) if only the
+   token file name is passed.
+ post_process: A coderef to call after each API call.
+ throttle: Used in development to sleep the number of seconds
+   specified between API calls to avoid threshhold errors from Google.
 
+You can specify any of the arguments in the optional YAML config file.
+Any passed in arguments will override what is in the config file.
+   
 =item api(uri => <uri_string>, method => <http_method_string>,
   headers => <headers_string_array>, params => <query_parameters_hash>,
   content => <body_hash>);
 
 The ultimate Google API call for the underlying classes. Handles timeouts
-and retries etc. You would not normally call this directly, unless you
-need to for some special purpose.=
+and retries etc.
 
  uri: The Google API endpoint such as https://www.googleapis.com/drive/v3
    along with any path segments added.
@@ -288,6 +320,10 @@ need to for some special purpose.=
  headers: Array ref of http headers.
  params: Http query params to be added to the uri.
  content: The body being sent for post/put etc. Will be encoded to JSON.
+
+You would not normally call this directly unless you were
+making a Google API call not currently supported by this API
+framework.
 
 =item stats();
 
@@ -298,8 +334,8 @@ Useful for performance tuning during development.
 
 =head1 OAUTH2 SETUP
 
-This class depends on first creating an Oauth2 token session file
-that you point to via the 'token' config param passed via 'new'.
+This class depends on first creating an OAuth2 token session file
+that you point to via the 'token_file' config param passed via 'new'.
 See bin/session_creator and follow the instructions to save your
 token file.
 

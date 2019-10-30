@@ -3,7 +3,7 @@ package Google::RestApi::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -17,6 +17,9 @@ no autovivification;
 use Exporter qw(import);
 our @EXPORT_OK = qw(named_extra strip bool dim dims dims_all);
 
+# similar to allow_extra in params::validate, simply returns the
+# extra key/value pairs we aren't interested in in the checked
+# argument hash.
 sub named_extra {
   my $p = shift;
   my $extra = delete $p->{_extra_}
@@ -31,6 +34,7 @@ sub strip {
   return $p;
 }
 
+# changes perl boolean to json boolean.
 sub bool {
   my $bool = shift;
   return 'true' if !defined $bool;  # bold() should turn on bold.
@@ -38,6 +42,8 @@ sub bool {
   return $bool ? 'true' : 'false';  # converts bold(0) to 'false'.
 }
 
+# allows 'col' and 'row' internally instead of 'COLUMN' and 'ROW'.
+# less shouting.
 sub dim {
   state $check = compile(StrMatch[qr/^(col|row)/i]);
   my ($dim) = $check->(@_);

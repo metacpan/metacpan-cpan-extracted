@@ -13,7 +13,7 @@ use MIME::Base64 'encode_base64url';
 use Crypt::LE ':errors', ':keys';
 use utf8;
 
-my $VERSION = '0.33';
+my $VERSION = '0.34';
 
 exit main();
 
@@ -32,6 +32,8 @@ sub work {
     my $opt = shift;
     my $rv = parse_options($opt);
     return $rv if $rv;
+    # Set the default protocol version to 2 unless it is set explicitly or custom server is set (in which case auto-sense is used).
+    $opt->{'api'} = 2 unless (defined $opt->{'api'} or $opt->{'server'});
     my $le = Crypt::LE->new(autodir => 0, server => $opt->{'server'}, live => $opt->{'live'}, version => $opt->{'api'}||0, debug => $opt->{'debug'}, logger => $opt->{'logger'});
 
     if (-r $opt->{'key'}) {
@@ -241,7 +243,7 @@ sub work {
         }
     }
     $opt->{'logger'}->info("===> NOTE: You have been using the test server for this certificate. To issue a valid trusted certificate add --live option.") unless $opt->{'live'};
-    $opt->{'logger'}->info("The job is done, enjoy your certificate! For feedback and bug reports contact us at [ https://ZeroSSL.com | https://Do-Know.com ]\n");
+    $opt->{'logger'}->info("The job is done, enjoy your certificate!\n");
     return { code => $opt->{'issue-code'}||0 };
 }
 
@@ -707,13 +709,13 @@ e) To use basic DNS verification:
 f) To issue a wildcard certificate, which requires DNS verification:
 
  le.pl --key account.key --csr domain.csr --csr-key domain.key --crt domain.crt
-       --domains "*.domain.ext" --generate-missing --handle-as dns --api 2
+       --domains "*.domain.ext" --generate-missing --handle-as dns
 
 To include a "bare domain", add it too, since it is NOT covered by the wildcard:
 
  le.pl --key account.key --csr domain.csr --csr-key domain.key --crt domain.crt
         --domains "*.domain.ext,domain.ext" --generate-missing
-        --handle-as dns --api 2
+        --handle-as dns
 
 g) To just generate the keys and CSR:
 

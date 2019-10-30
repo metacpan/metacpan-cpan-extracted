@@ -3,6 +3,7 @@ lib/Perl/RT2Github.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 t/new.t
 Todo

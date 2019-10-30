@@ -1,3 +1,8 @@
+0.21.1 2019-10-30 08:41:21 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - remove right padding from form ... if you want padding, you can now add it
+   via screenOpts layout
+
 0.21.0 2019-10-28 15:57:21 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - screenOpts layout and container keys ... see sample app in mojolicious-automake

@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Request::Spreadsheet;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Request::Spreadsheet - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Request::Spreadsheet - Build Google API's batchRequests for a Spreadsheet.
 
 =head1 DESCRIPTION
 

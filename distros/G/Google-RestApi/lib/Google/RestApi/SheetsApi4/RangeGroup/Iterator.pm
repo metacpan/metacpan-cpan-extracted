@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::RangeGroup::Iterator;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -56,7 +56,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::RangeGroup::Iterator - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::RangeGroup::Iterator - An iterator for a group of Ranges.
 
 =head1 DESCRIPTION
 

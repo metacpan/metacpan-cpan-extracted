@@ -10,4 +10,4 @@
 ^pod2htm
 ^_build/
 ^.git/
-^maps/
+^maps/*.png$

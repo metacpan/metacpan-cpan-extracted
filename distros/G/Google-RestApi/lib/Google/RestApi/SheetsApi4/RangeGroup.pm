@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::RangeGroup;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -190,7 +190,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::RangeGroup - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::RangeGroup - Represents a group of ranges in a Worksheet.
 
 =head1 DESCRIPTION
 
@@ -217,8 +217,11 @@ method to create the range group object for you.
 =item api(%args);
 
 Calls the parent spreadsheet's 'api' routine with the ranges added into
-the URI or content appropriately. You would not normally need to call
-this directly.
+the URI or content appropriately.
+
+You would not normally call this directly unless you were
+making a Google API call not currently supported by this API
+framework.
 
 =item append(<arrayref<Range>>);
 

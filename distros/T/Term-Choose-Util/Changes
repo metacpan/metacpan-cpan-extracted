@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.105   2019-10-30
+        - Update "back"- and "confirm"-string in 'settings_menu'.
+
 0.104   2019-10-18
         - Update curent_selection in 'choose_a_subset'.
 

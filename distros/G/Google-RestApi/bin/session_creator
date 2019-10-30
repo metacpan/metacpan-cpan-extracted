@@ -16,10 +16,9 @@
 # 3. Create a yaml file with the following format:
 #
 # ---
-# login:
-#   client_id: <client-id-from-google>
-#   client_secret: <client-secret-from-google>
-# token: <file-name-to-store-your-generated-token>
+# client_id: <client-id-from-google>
+# client_secret: <client-secret-from-google>
+# token_file: <file-name-to-store-your-generated-token>
 #
 #    The token file will be stored in the same directory as
 #    the config file.
@@ -37,12 +36,11 @@
 # 6. On the resulting page, click OK (possibly after being
 #    asked to log in to your Google account). 
 #
-# 7. You will be redirected to a page that provides 
-#    a string that you should copy and paste back into the 
-#    terminal window, so this script can exchange it for
-#    an access token from Google, and store the token.  
-#    That will be the the token the that this package
-#    can use.
+# 7. You will be redirected to a page that provides a string
+#    that you should copy and paste back into the terminal
+#    window, so this script can exchange it for an access
+#    token from Google, and store the token. That wil be
+#    the the token the that this package can use.
 
 use FindBin;
 use lib "$FindBin::RealBin/../lib";
@@ -50,7 +48,9 @@ use lib "$FindBin::RealBin/../lib";
 use File::Basename;
 use Storable;
 use Term::Prompt;
-use YAML::Any qw(LoadFile Dump);
+use Type::Params qw(compile_named);
+use Types::Standard qw(Str);
+use YAML::Any qw(Dump LoadFile);
 use Google::RestApi::OAuth2;
 
 # set the scope for the project you are working one.
@@ -64,9 +64,17 @@ my $config_file = $ARGV[0];
 my $config = LoadFile($config_file);
 print "Config used:\n", Dump($config);
 
+my $check = compile_named(
+  client_id     => Str,
+  client_secret => Str,
+  token_file    => Str,
+);
+$check->(%$config);
+
 my $oauth2 = Google::RestApi::OAuth2->new(
-  %{$config->{login}},
-  scope => \@scope,
+  client_id     => $config->{client_id},
+  client_secret => $config->{client_secret},
+  scope         => \@scope,
 );
 
 # We need to set these parameters this way in order to ensure 
@@ -116,12 +124,12 @@ print "Here are the token contents:\n\n";
 print $token->to_string(), "\n\n";
 
 # Save the token for future use:
-my $session_file = dirname($config_file) . "/$config->{token}";
-store($token->session_freeze(), $session_file);
+my $token_file = dirname($config_file) . "/$config->{token_file}";
+store($token->session_freeze(), $token_file);
 
 print <<END2
 
-Token successfully stored in file $session_file.
+Token successfully stored in file $token_file.
 
 END2
     ;

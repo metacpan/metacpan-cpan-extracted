@@ -8,7 +8,6 @@ use lib "$FindBin::RealBin/../../lib";
 
 use File::Basename;
 use Log::Log4perl qw(:easy);
-use Storable;
 use Term::ANSIColor;
 use YAML::Any qw(Dump LoadFile);
 
@@ -45,25 +44,13 @@ sub sheets_api {
 }
 
 sub rest_api {
-  my $config = rest_api_config();
-  return RestApi->new(@_, %$config, throttle => 1);
+  return RestApi->new(@_, config_file => rest_api_config(), throttle => 1);
 }
 
 sub rest_api_config {
-  my $login_file = $ENV{GOOGLE_RESTAPI_LOGIN}
-    or die "No testing login file found: set env var GOOGLE_RESTAPI_LOGIN first";
-  my $login = eval { LoadFile($login_file); };
-  die "Unable to load login file '$login_file': $@" if $@;
-
-  $login->{login} or die "Login config missing from login file '$login_file'";
-  $login->{token} or die "Token config missing from login file '$login_file'";
-
-  my $dirname = dirname($login_file);
-  my $token_file = "$dirname/$login->{token}";
-  my $token = retrieve($token_file);
-  $login->{login}->{refresh_token} = $token->{refresh_token};
-
-  return $login->{login};
+  my $config_file = $ENV{GOOGLE_RESTAPI_LOGIN}
+    or die "No testing config file found: set env var GOOGLE_RESTAPI_LOGIN first";
+  return $config_file;
 }
 
 sub message { print color(shift), @_, color('reset'), "\n"; }

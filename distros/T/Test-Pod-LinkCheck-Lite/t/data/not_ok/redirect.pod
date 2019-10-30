@@ -1,0 +1,9 @@
+=pod
+
+This POD contains a URL link that is redirected. This is
+L<http://www.cpan.org/>. The test should fail if prohibit_redirect is
+true, but pass otherwise.
+
+=cut
+
+# ex: set textwidth=72 :

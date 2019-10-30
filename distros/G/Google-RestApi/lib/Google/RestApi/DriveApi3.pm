@@ -3,7 +3,7 @@ package Google::RestApi::DriveApi3;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -68,7 +68,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::DriveApi3 - Perl API to Google Drive API V3.
+Google::RestApi::DriveApi3 - API to Google Drive API V3.
 
 =head1 DESCRIPTION
 

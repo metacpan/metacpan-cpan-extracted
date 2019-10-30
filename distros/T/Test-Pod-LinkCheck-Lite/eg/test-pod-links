@@ -8,9 +8,9 @@ use warnings;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use Test::More 0.88;
-use Test::Pod::LinkCheck::Lite;
+use Test::Pod::LinkCheck::Lite qw{ :const };
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 my %opt = (
     ignore_url	=> [],
@@ -18,7 +18,11 @@ my %opt = (
 my $dump;
 
 GetOptions( \%opt,
-    qw{ check_url|check-url! ignore_url|ignore-url=s@ man! },
+    qw{
+	allow_redirect_to_index|allow-redirect-to-index!
+	check_url|check-url! ignore_url|ignore-url=s@ man!
+	prohibit_redirect|prohibit-redirect!
+    },
     'dump!'	=> \$dump,
     help	=> sub { pod2usage( { -verbose => 2 } ) },
 ) and 1 >= @ARGV or pod2usage( { -verbose => 0 } );
@@ -28,6 +32,10 @@ foreach ( @{ $opt{ignore_url} } ) {
 	or next;
     $_ = eval "qr$_"
 	or die $@;
+}
+
+if ( delete $opt{allow_redirect_to_index} ) {
+    $opt{prohibit_redirect} = ALLOW_REDIRECT_TO_INDEX;
 }
 
 my $tp = Test::Pod::LinkCheck::Lite->new( %opt );
@@ -73,6 +81,12 @@ test-pod-links - Test a POD file, or literal POD.
 
 =head1 OPTIONS
 
+=head2 -allow-redirect-to-index
+
+This Boolean option implies L<-prohibit-redirect|/-prohibit-redirect>,
+but sets the corresponding attribute to
+L<ALLOW_REDIRECT_TO_INDEX|Test::Pod::LinkCheck::Lite/ALLOW_REDIRECT_TO_INDEX>.
+
 =head2 -check-url
 
 This Boolean option specifies that World Wide Web access is allowed. If
@@ -114,6 +128,10 @@ links will not be tested.
 
 The default is true if the host system has a C<man> command, and false
 otherwise.
+
+=head2 -prohibit-redirect
+
+This Boolean option fails URL links that redirect to a different URL.
 
 =head2 -version
 

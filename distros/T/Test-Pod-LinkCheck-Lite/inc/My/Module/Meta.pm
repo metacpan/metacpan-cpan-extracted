@@ -68,7 +68,8 @@ sub requires {
 ##  }
     return +{
 	'B::Keywords'	=> 0,
-	'Carp'	=> 0,
+	'Carp'		=> 0,
+	'Exporter'	=> 0,
 	'File::Find'	=> 0,
 	'File::Spec'	=> 0,
 	'HTTP::Tiny'	=> 0,

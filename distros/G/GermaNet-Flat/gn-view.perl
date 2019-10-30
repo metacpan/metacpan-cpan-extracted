@@ -314,7 +314,10 @@ eval {
     }
     print
       (header(-type=>'text/html',-charset=>$charset,%versionHeader),
-       start_html("$label Graph: $qtitle"),
+       start_html(
+                  -title=>"$label Graph: $qtitle",
+                  -meta=>{ROBOTS=>'NOINDEX, NOFOLLOW'},
+                 ),
        h1("$label Graph: $qtitle"),
        ($syns && @$syns
 	? ("<img src=\"${prog}?fmt=${imgfmt}&s=".join('+',@{$syns||[]})."$deptharg\" usemap=\"#gn\" />\n",

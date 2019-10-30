@@ -535,7 +535,7 @@ sub __settings_menu_wrap {
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $changed = $tu->settings_menu(
         $sub_menu, $sf->{o}{$section},
-        { prompt => $prompt }
+        { prompt => $prompt, back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm} }
     );
     return if ! $changed;
     $sf->{write_config}++;

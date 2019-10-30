@@ -1,3 +1,7 @@
+0.004		2019-10-30	T. R. Wyant
+    Optionally fail URL links that redirect. The user can provide code
+    to determine which redirections are allowed.
+
 0.003		2019-08-30	T. R. Wyant
     Fix test of link to extant-but-undocumented module. The result now
     contains the failing link and line number, and a passing test for

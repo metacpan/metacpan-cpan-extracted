@@ -7,7 +7,7 @@ use File::Basename ();
 use File::Slurper  ();
 use Scalar::Util   ();
 
-our $VERSION     = '0.10';
+our $VERSION     = '0.12';
 our %EXPORT_TAGS = (
     std      => [qw(slurp_json spurt_json)],
     std_auto => [qw(-auto_ext slurp_json spurt_json)],
@@ -15,25 +15,31 @@ our %EXPORT_TAGS = (
     spurt_auto => [qw(-auto_ext spurt_json)],
 );
 
-use constant JSON_XS => $ENV{JSON_SLURPER_NO_JSON_XS}                                          ? do { require JSON::PP; undef }
-                     : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } ? 1
-                     : do { require JSON::PP; undef };
 my $DEFAULT_ENCODER;
+sub _build_default_encoder {
+    my $e_class = $ENV{JSON_SLURPER_NO_JSON_XS} ? do { require JSON::PP; 'JSON::PP' }
+        : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.09'); 1 } ? 'Cpanel::JSON::XS'
+        : do { require JSON::PP; 'JSON::PP' };
+    my $encoder = $e_class->new
+        ->utf8
+        ->pretty
+        ->canonical
+        ->allow_nonref
+        ->allow_blessed
+        ->convert_blessed
+        ->escape_slash;
+    $encoder->stringify_infnan if $e_class eq 'Cpanel::JSON::XS';
+    return $encoder;
+}
 
 sub new {
     my ($class, %args) = @_;
 
     my $encoder;
     if (exists $args{encoder}) {
-        $encoder = delete $args{encoder};
-        Carp::croak 'encoder must be an object that can encode and decode'
-          unless Scalar::Util::blessed($encoder) && $encoder->can('encode') && $encoder->can('decode');
+        $encoder = _validate_encoder(delete $args{encoder});
     } else {
-        $encoder = $DEFAULT_ENCODER ||=
-          JSON_XS
-          ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash
-          ->stringify_infnan
-          : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+        $encoder = ($DEFAULT_ENCODER ||= $class->_build_default_encoder);
     }
 
     my $auto_ext = delete $args{auto_ext};
@@ -44,23 +50,19 @@ sub new {
 }
 
 sub _generate_slurp_json {
-    my $auto_ext = exists $_[3]->{auto_ext};
+    my ($class) = @_;
+    my $auto_ext          = exists $_[3]->{auto_ext};
+    my $imported_encoder  = exists $_[3]->{encoder} ? _validate_encoder($_[3]->{encoder}) : undef;
 
     return sub ($;@) {
         my ($filename, $encoder) = @_;
 
         if (defined $encoder) {
-            Carp::croak 'invalid encoder'
-              unless Scalar::Util::blessed($encoder)
-              && $encoder->can('encode')
-              && $encoder->can('decode');
+            _validate_encoder($encoder);
+        } elsif ($imported_encoder) {
+            $encoder = $imported_encoder;
         } else {
-            $encoder = $DEFAULT_ENCODER ||=
-              JSON_XS
-              ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed
-              ->escape_slash
-              ->stringify_infnan
-              : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+            $encoder = ($DEFAULT_ENCODER ||= $class->_build_default_encoder);
         }
 
         my $wantarray = wantarray;
@@ -107,23 +109,19 @@ sub slurp {
 }
 
 sub _generate_spurt_json {
-    my $auto_ext = exists $_[3]->{auto_ext};
+    my ($class) = @_;
+    my $auto_ext          = exists $_[3]->{auto_ext};
+    my $imported_encoder  = exists $_[3]->{encoder} ? _validate_encoder($_[3]->{encoder}) : undef;
 
     return sub ($$;@) {
         my ($data, $filename, $encoder) = @_;
 
         if (defined $encoder) {
-            Carp::croak 'invalid encoder'
-              unless Scalar::Util::blessed($encoder)
-              && $encoder->can('encode')
-              && $encoder->can('decode');
+            _validate_encoder($encoder);
+        } elsif ($imported_encoder) {
+            $encoder = $imported_encoder;
         } else {
-            $encoder = $DEFAULT_ENCODER ||=
-              JSON_XS
-              ? Cpanel::JSON::XS->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed
-              ->escape_slash
-              ->stringify_infnan
-              : JSON::PP->new->utf8->pretty->canonical->allow_nonref->allow_blessed->convert_blessed->escape_slash;
+            $encoder = ($DEFAULT_ENCODER ||= $class->_build_default_encoder);
         }
 
         if ($auto_ext and not ((File::Basename::fileparse($filename, qr/\.[^.]*/xm))[2])) {
@@ -142,6 +140,15 @@ sub spurt {
     }
 
     File::Slurper::write_binary($filename, $self->[0]->encode($data));
+}
+
+sub _validate_encoder {
+    my ($encoder) = @_;
+
+    Carp::confess 'encoder must be an object that can encode and decode'
+      unless Scalar::Util::blessed($encoder) && $encoder->can('encode') && $encoder->can('decode');
+
+    return $encoder;
 }
 
 1;
@@ -208,6 +215,15 @@ JSON::Slurper - Convenient file slurping and spurting of data using JSON
   # auto_ext can also be passed when using the object-oriented interface:
   my $json_slurper = JSON::Slurper->new(auto_ext => 1);
 
+
+  # provide an encoder on import to use with spurt_json and slurp_json
+  use JSON::Slurper -encoder => JSON::PP->new->pretty, qw(slurp_json spurt_json);
+
+  # use encoder passed in above
+  spurt_json \@people, 'people.json';
+
+  my @people_from_file = slurp_json 'people.json';
+
 =head1 DESCRIPTION
 
 JSON::Slurper is a convenient way to slurp/spurt (read/write) Perl data structures to and from JSON files. It tries to do what you mean, and allows you to provide your own JSON encoder/decoder if necessary.
@@ -266,6 +282,20 @@ Passing the C<-auto_ext> flag with the imports causes C<.json> to be added to fi
   # Writes to "ref.txt";
   spurt_json $ref, 'ref.txt';
 
+=head2 -encoder
+
+You can use C<-encoder> at import time to pass the encoder that will be used with L</slurp_json> and L</spurt_json>.
+If you provide an encoder to the function call, it will override any encoder passed in at import
+time.
+
+  use JSON::Slurper -encoder => JSON::PP->new->pretty, 'spurt_json';
+
+  # uses encoder passed in above
+  spurt_json \@people, 'people.json';
+
+  # use the encoder passed in below to spurt_json instead of the one passed in on import
+  spurt_json \@people, 'people.json', JSON::PP->new->ascii;
+
 =head2 slurp_json
 
 =over 4
@@ -287,7 +317,8 @@ Passing the C<-auto_ext> flag with the imports causes C<.json> to be added to fi
 
 This reads in JSON from a file and returns it as a Perl data structure (a reference, an array, or a hash).
 You can pass in your own JSON encoder/decoder as an optional argument, as long as it is blessed
-and has C<encode> and C<decode> methods.
+and has C<encode> and C<decode> methods. Any encoder passed in will override an encoder provided during import
+via L</-encoder>.
 
 =head2 spurt_json
 
@@ -312,7 +343,8 @@ and has C<encode> and C<decode> methods.
 
 This reads in JSON from a file and returns it as a Perl data structure (a reference, an array, or a hash).
 You can pass in your own JSON encoder/decoder as an optional argument, as long as it is blessed
-and has C<encode> and C<decode> methods.
+and has C<encode> and C<decode> methods. Any encoder passed in will override an encoder provided during import
+via L</-encoder>.
 
 =head2 Export Tags
 

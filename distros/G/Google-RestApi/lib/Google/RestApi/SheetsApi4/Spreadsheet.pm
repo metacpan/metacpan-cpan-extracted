@@ -1,9 +1,9 @@
-package Google::RestApi::SheetsApi4::Spreadsheet;
+  package Google::RestApi::SheetsApi4::Spreadsheet;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use 5.010_000;
 
@@ -208,6 +208,12 @@ sub tie {
   return \%tie;
 }
 
+# this is done simply to allow open_worksheet to return the
+# same worksheet instance each time it's called for the
+# same remote worksheet. this is to avoid working on multiple
+# local copies of the same remote worksheet.
+# TODO: if worksheet is renamed, registration should be
+# updated too.
 sub _register_worksheet {
   my $self = shift;
   state $check = compile(HasMethods['worksheet_name']);
@@ -294,7 +300,7 @@ __END__
 
 =head1 NAME
 
-Google::RestApi::SheetsApi4::Spreadsheet - Perl API to Google Sheets API V4.
+Google::RestApi::SheetsApi4::Spreadsheet - Represents a Google Spreadsheet.
 
 =head1 DESCRIPTION
 
@@ -327,7 +333,8 @@ endpoint, along with any args to be passed such as content,
 params, headers, etc.
 
 You would not normally call this directly unless you were
-doing something not natively supported by this API framework.
+making a Google API call not currently supported by this API
+framework.
 
 =item spreadsheet_id();
 

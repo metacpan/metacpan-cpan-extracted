@@ -8,7 +8,9 @@ use warnings;
 use Carp;
 use Storable ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
+
+use constant HASH_REF	=> ref {};
 
 BEGIN {
     local $@ = undef;
@@ -57,15 +59,20 @@ sub head {
 sub request {
     my ( $self, undef, $url ) = @_;
     $self->{status} ||= Storable::retrieve( $self->{fn} );
-    my $status = $self->{status}{$url} || 404;
-    return {
-	success	=> _is_success( $status ),
-	url	=> $url,
-	status	=> $status,
-	reason	=> _status_message( $status ),
-	content	=> '',
-	headers	=> {},
+    my $resp = $self->{status}{$url};
+    HASH_REF eq ref $resp
+	or $resp = {
+	status	=> $resp || 404,
     };
+    $resp->{success} = _is_success( $resp->{status} );
+    defined $resp->{reason}
+	or $resp->{reason} = _status_message( $resp->{status} );
+    defined $resp->{url}
+	or $resp->{url} = $url;
+    defined $resp->{content}
+	or $resp->{content} = '';
+    $resp->{headers} ||= {};
+    return $resp;
 }
 
 sub _is_success {

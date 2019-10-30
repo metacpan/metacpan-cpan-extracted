@@ -45,7 +45,7 @@ lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App/Controller/RpcSe
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/bin/source-mode.sh
 lib/Mojolicious/Command/Author/generate/callbackery_app/bin/app.pl
-lib/Mojolicious/Command/Author/generate/callbackery_app/etc/app.cfg
+lib/Mojolicious/Command/Author/generate/callbackery_app/etc/app.cfg.dist
 lib/Mojolicious/Command/Author/generate/callbackery_app/README.md
 lib/Mojolicious/Command/Author/generate/callbackery_app.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -2,7 +2,7 @@ package Math::Counting;
 our $AUTHORITY = 'cpan:GENE';
 # ABSTRACT: Combinatorial counting operations
 
-our $VERSION = '0.1306';
+our $VERSION = '0.1307';
 
 use strict;
 use warnings;
@@ -129,7 +129,7 @@ Math::Counting - Combinatorial counting operations
 
 =head1 VERSION
 
-version 0.1306
+version 0.1307
 
 =head1 SYNOPSIS
 

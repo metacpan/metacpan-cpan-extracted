@@ -33,8 +33,8 @@ $x = permutation(-1, 0);
 is $x, undef, "-1 P 0";
 $x = permutation(0, -1);
 is $x, undef, "0 P -1";
-$x = permutation(0 - $k, 0 - $n);
-is $x, undef, "-$k P -$n";
+#$x = permutation(0 - $k, 0 - $n);
+#is $x, undef, "-$k P -$n";
 $x = permutation(0, 0);
 cmp_ok $x, '==', 1, "0 P 0";
 $x = permutation(0, 1);
@@ -53,8 +53,8 @@ $x = sprintf $format, permutation($n, $n);
 like $x, $f1, "$n P $n";
 
 # Big Permutation without repetition
-$x = bperm(0 - $k, 0 - $n);
-is $x, $nan, "-$k bperm -$n";
+#$x = bperm(0 - $k, 0 - $n);
+#is $x, $nan, "-$k bperm -$n";
 $x = bperm(-1, 0);
 is $x, $nan, "-1 bperm 0";
 $x = bperm(0, -1);
@@ -77,8 +77,8 @@ $x = sprintf $format, bperm($n, $n);
 like $x, $f1, "$n bperm $n";
 
 # Big Permutation with repetition
-$x = bperm(0 - $k, 0 - $n, 1);
-is $x, 0, "-$k bperm -$n";
+#$x = bperm(0 - $k, 0 - $n, 1);
+#is $x, 0, "-$k bperm -$n";
 $x = bperm(-1, 0, 1);
 cmp_ok $x, '==', 1, "-1 bperm 0";
 $x = bperm(0, -1, 1);

@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2019-10-30
+
+ - Added: Give each class a FACTORY method to return the factory package
+   name.
+ - Added: Give the factory package a type_library method to return the type
+   library name.
+
 0.007	2019-10-25
 
  [ Bug Fixes ]

@@ -25,6 +25,34 @@ All the methods of L<CallBackery::GuiPlugin::AbstractTable> plus:
 
 =cut
 
+
+has screenOpts => sub {
+    my $self = shift;
+    my $opts = $self->SUPER::screenOpts;
+    return {
+        %%$opts,
+        # an alternate layout for this screen
+        layout => {
+            class => 'qx.ui.layout.Dock',
+            set => {},
+        },
+        # and settings accordingly
+        container => {
+            set => {
+                # see https://www.qooxdoo.org/apps/apiviewer/#qx.ui.core.LayoutItem
+                # for inspiration in properties to set
+                maxWidth => 700,
+                maxHeight => 500,
+                alignX => 'left',
+                alignY => 'top',
+            },
+            addProps => {
+                edge => 'west'
+            }
+        }
+    }
+};
+
 has formCfg => sub {
     my $self = shift;
     my $db = $self->user->db;
