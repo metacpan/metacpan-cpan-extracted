@@ -3,19 +3,22 @@ use Test::Deep;
 use Test::More;
 use LinkEmbedder;
 
-plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
+plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
+plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
 my $embedder = LinkEmbedder->new;
 
 # video embed
 my $video_link;
-$embedder->get_p('https://www.nhl.com/video/edlers-blistering-one-timer/t-277752844/c-69511103')->then(sub { $video_link = shift })->wait;
+$embedder->get_p('https://www.nhl.com/video/edlers-blistering-one-timer/t-277752844/c-69511103')
+  ->then(sub { $video_link = shift })->wait;
 isa_ok($video_link, 'LinkEmbedder::Link::NHL');
 cmp_deeply $video_link->TO_JSON,
   {
-  cache_age     => 0,
-  height        => 360,
-  html          => re(qr{src="https://www\.nhl\.com/video/embed/edlers-blistering-one-timer/t-277752844/c-69511103\?autostart=false"}),
+  cache_age => 0,
+  height    => 360,
+  html =>
+    re(qr{src="https://www\.nhl\.com/video/embed/edlers-blistering-one-timer/t-277752844/c-69511103\?autostart=false"}),
   provider_name => 'NHL',
   provider_url  => 'https://www.nhl.com',
   title         => 'NHL Video',
@@ -29,7 +32,8 @@ cmp_deeply $video_link->TO_JSON,
 
 # an article
 my $article_link;
-$embedder->get_p('https://www.nhl.com/gamecenter/stl-vs-ott/2019/10/10/2019020051')->then(sub { $article_link = shift })->wait;
+$embedder->get_p('https://www.nhl.com/gamecenter/stl-vs-ott/2019/10/10/2019020051')
+  ->then(sub { $article_link = shift })->wait;
 isa_ok($article_link, 'LinkEmbedder::Link::NHL');
 cmp_deeply $article_link->TO_JSON,
   {

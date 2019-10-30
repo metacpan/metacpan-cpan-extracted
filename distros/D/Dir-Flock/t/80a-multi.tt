@@ -1,0 +1,79 @@
+use strict;
+use warnings;
+use Test::More;
+use Dir::Flock;
+
+# primary process
+# run with t/80b-multi.tt to contend
+# for a directory with another process
+# using Dir::Flock
+
+$| = 1;
+print "name: primary\n";
+print "start: ",time,"\n";
+my $dirfile = $ENV{MULTI_DIR_FILE} ||
+    "t/80a.dir";
+
+unlink $dirfile;
+my $dir = Dir::Flock::getDir("t");
+print "dir: ",$dir,"\n";
+print "start_ex: ", time, "\n";
+my $z = Dir::Flock::lock_ex($dir,0);
+print "end_ex: ",time, "\n";
+print "status_ex: $z\n";
+open my $fh, ">", $dirfile;
+print $fh $dir;
+close $fh;
+print "save_dir: ",time,"\n";
+
+if ($z) {
+    print "start_sleep1: ",time,"\n";
+    sleep 10;
+    print "end_sleep1: ",time,"\n";
+    print "start_unlock1: ",time,"\n";
+    $z = Dir::Flock::unlock($dir);
+    print "end_unlock1: ",time,"\n";
+    print "status_unlock1: $z\n";
+}
+print "start_sleep2: ",time,"\n";
+sleep 5;
+print "end_sleep2: ",time,"\n";
+
+print "start_ex_nb: ",time,"\n";
+$z = Dir::Flock::lock_ex($dir,0);
+print "end_ex_nb: ",time,"\n";
+print "status_ex_nb: ",$z||0,"\n";
+if ($z) {
+    $z = Dir::Flock::unlock($dir);
+    print "status_unlock3: $z\n";
+}
+print "start_sh_nb: ",time,"\n";
+$z = Dir::Flock::lock_sh($dir,0);
+print "end_sh_nb: ",time,"\n";
+print "status_sh_nb: $z\n";
+if ($z) {
+    $z = Dir::Flock::unlock($dir);
+    print "status_unlock4: $z\n";
+}
+print "start_sleep3: ",time,"\n";
+sleep 5;
+print "end_sleep3: ",time,"\n";
+print "finish: ",time,"\n";
+
+unlink $dirfile;
+
+__END__
+
+multiprocess tests
+
+    lock_ex in primary for 10 seconds
+    non-block lock in secondary fails
+    blocking lock_sh in secondary is 
+        slow but succeeds
+
+    secondary has shared lock for 10s
+    non-blocking lock_ex in primary
+        fails and fails fast
+    non-blocking lock_sh in primary 
+        succeeds and succeeds fast
+

@@ -2,7 +2,7 @@ NAME
     App::PowerManagementUtils - CLI utilities related to power management
 
 VERSION
-    This document describes version 0.003 of App::PowerManagementUtils (from
+    This document describes version 0.004 of App::PowerManagementUtils (from
     Perl distribution App-PowerManagementUtils), released on 2019-09-15.
 
 DESCRIPTION
@@ -30,11 +30,8 @@ FUNCTIONS
     Prevent sleep until interrupted.
 
     Uses Proc::Govern to run "sleep infinity", with the option `no-sleep' to
-    instruct Proc::Govern to disable system from sleeping until interrupted.
-
-    For more options when running command, e.g. timeout, load control,
-    autorestart, screensaver control, use the module or its CLI govproc
-    directly.
+    instruct Proc::Govern to disable system from sleeping. To stop
+    preventing sleep, you can press Ctrl-C.
 
     This function is not exported.
 

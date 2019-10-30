@@ -5,7 +5,7 @@
 # Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.1';
+our	$VERSION = '4.2.2';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -322,7 +322,7 @@ closedir __SESSIONDIR;
 			$plg->reply(
 			Application	=> $_[0]->{name},
 			Routes		=> {
-				'Info'			=> [ map {"WebService/$_"} qw(version client about) ],
+				'Informational'	=> [ map {"WebService/$_"} qw(version client about) ],
 				'WebService'	=> [ map {"/$_"} qw(login logout) ],
 				'Application'	=> {
 					'Protected' => [ map {"/$_"} grep   $Routes->{$_}->{Protected}, sort keys %{$Routes} ],
@@ -592,7 +592,9 @@ sub posted_data :PluginKeyword
 my $plg=shift;
 
 	if (@_) {
-	%{$plg->data}{@_}  # %hash{'k1','k2'} -> k1 v1 k2 v2
+	# A new hash of the selected keys k1 v1 k2 v2
+	# At newer Perl versions   %{$plg->data}{@_}
+	map { $_ , $plg->data->{$_} } @_
 	}
 	else {
 	%{$plg->data}
@@ -614,20 +616,21 @@ my $plg	= shift;
 	$plg->dsl->halt($plg->reply)
 	}
 
-	if (0 == @_) {
+	if (0 == scalar @_) {
 	%{$TokenDB{$plg->data->{token}}->{data}} # all
 	}
-	elsif ((1 == @_)) {
+	elsif ((1 == scalar @_)) {
 
 		if ('ARRAY' eq ref $_[0]) {
-		%{$TokenDB{$plg->data->{token}}->{data}}{@{$_[0]}} # some @{$_[0]} , hash slice as new hash
+		# At new Perl versions hash slice  %{$TokenDB{$plg->data->{token}}->{data}}{@{$_[0]}}
+		map {$_ , $TokenDB{$plg->data->{token}}->{data}->{$_}} @{$_[0]}
 		}
 		else {
-		$TokenDB{$plg->data->{token}}->{data}->{$_[0]}	# one record
+		$_[0] , $TokenDB{$plg->data->{token}}->{data}->{$_[0]}	# one record
 		}
 	}
-	else {
-	%{$TokenDB{$plg->data->{token}}->{data}}{@_} # some @_, hash slice as new hash
+	else {	
+	map {$_ , $TokenDB{$plg->data->{token}}->{data}->{$_}} @_
 	}
 }
 
@@ -725,7 +728,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.2.1
+version 4.2.2
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,9 @@
 Revision history for Perl extension Net::DNS::Native
 
-0.21   Thu Oct 24 21:58:35 +07 2019
+0.22  Tue Oct 29 23:45:34 +07 2019
+    - Refactoring of object destroying
+
+0.21  Thu Oct 24 21:58:35 +07 2019
     - Better link to gethostbyname() inside documentation (#gh11)
     - Include system error to error message when EAI_SYSTEM returned by getaddrinfo() (#gh10)
 

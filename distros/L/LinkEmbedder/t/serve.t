@@ -3,13 +3,15 @@ use Test::Mojo;
 use Test::More;
 use LinkEmbedder;
 
+$ENV{LINK_EMBEDDER_FORCE_SECURE} = 0;
+
 my $link;
 my $embedder = LinkEmbedder->new;
 isa_ok($embedder->ua, 'Mojo::UserAgent');
 
 use Mojolicious::Lite;
 get '/example' => 'example';
-get '/oembed' => sub { $embedder->serve(shift) };
+get '/oembed'  => sub { $embedder->serve(shift) };
 
 my $t = Test::Mojo->new;
 $t->get_ok('/example')->status_is(200);

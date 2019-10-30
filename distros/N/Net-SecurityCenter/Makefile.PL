@@ -30,8 +30,8 @@ WriteMakefile(
         'resources' => {
             repository => {
                 type => 'git',
-                url  => 'git://github.com/LotarProject/perl-Net-SecurityCenter',
-                web  => 'https://github.com/LotarProject/perl-Net-SecurityCenter'
+                url  => 'git://github.com/giterlizzi/perl-Net-SecurityCenter',
+                web  => 'https://github.com/giterlizzi/perl-Net-SecurityCenter'
             },
         }
     },

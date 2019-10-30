@@ -1,5 +1,10 @@
 Revision history for perl distribution LinkEmbedder
 
+1.07 2019-10-30T09:12:36+0900
+ - Add support for force_secure
+ - Replaced most of the insecure "http:" links #11
+ - Changed appear.in to whereby.com #11
+
 1.06 2019-10-16T18:55:09+0900
  - Add support for NHL videos #12
  - Fixed a bunch of failing tests #12

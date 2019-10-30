@@ -1,5 +1,9 @@
 Revision History for perl module Log::Any::Plugin
 
+0.011     2019-10-30T12:47:28AEDT+1100
+
+    - Add separator option to Stringify plugin - thanks Kamal Advani
+
 0.010     2019-10-28T21:54:50AEDT+1100
 
     - Fix links in pod docs - thanks Kamal Advani

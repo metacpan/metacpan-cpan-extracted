@@ -3,11 +3,12 @@ use Mojo::Base -strict;
 use Test::More;
 use LinkEmbedder;
 
-plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
+plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
+plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
 my $embedder = LinkEmbedder->new;
 my $link;
-$embedder->get_p('http://xkcd.com/927')->then(sub { $link = shift })->wait;
+$embedder->get_p('https://xkcd.com/927')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Xkcd');
 is_deeply $link->TO_JSON,
   {
@@ -15,7 +16,7 @@ is_deeply $link->TO_JSON,
   height        => 0,
   html          => photo_html(),
   provider_name => 'Xkcd',
-  provider_url  => 'http://xkcd.com',
+  provider_url  => 'https://xkcd.com',
   thumbnail_url => 'https://imgs.xkcd.com/comics/',
   title         => 'Standards',
   type          => 'photo',

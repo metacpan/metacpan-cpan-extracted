@@ -1,7 +1,7 @@
 package Perl::RT2Github;
 use 5.14.0;
 use warnings;
-our $VERSION     = '0.02';
+our $VERSION     = '0.03';
 use Carp;
 use HTTP::Tiny;
 

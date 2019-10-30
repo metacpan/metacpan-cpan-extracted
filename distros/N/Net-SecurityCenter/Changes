@@ -1,5 +1,12 @@
 Revision history for Net::SecurityCenter
 
+0.203 2019/12/29
+    - Added initial support for Tenable.sc 5.12
+    - Added "Net::SecurityCenter::API::Scanner::health" method
+    - Renamed "Net::SecurityCenter::API::Scanner::get_status" method to "Net::SecurityCenter::API::Scanner::status"
+    - Renamed "Net::SecurityCenter::API::ScanResult::get_status" method to "Net::SecurityCenter::API::ScanResult::status"
+    - Renamed "Net::SecurityCenter::API::ScanResult::get_progress" method to "Net::SecurityCenter::API::ScanResult::progress"
+
 0.202 2019/09/10
     - Added "download" method for Analysis API
 

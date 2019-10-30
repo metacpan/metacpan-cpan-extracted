@@ -84,12 +84,12 @@
          "web" : "https://github.com/sdt/log-any-plugin"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_contributors" : [
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>",
       "Kamal Advani <kamal@namingcrisis.net>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15"
 }
 

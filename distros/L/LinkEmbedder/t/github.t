@@ -3,7 +3,8 @@ use Test::Deep;
 use Test::More;
 use LinkEmbedder;
 
-plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
+plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
+plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
 my %expected = (
   cache_age     => '0',
@@ -16,7 +17,7 @@ my %expected = (
 my $embedder = LinkEmbedder->new;
 my $link;
 
-$embedder->get_p('http://git.io/aKhMuA')->then(sub { $link = shift })->wait;
+$embedder->get_p('https://git.io/aKhMuA')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Github');
 cmp_deeply(
   $link->TO_JSON,
@@ -25,9 +26,9 @@ cmp_deeply(
     html          => re(qr{simplest way.*IRC}),
     thumbnail_url => re(qr{githubusercontent\.com/u/45729\b}),
     title         => "Add back compat redirect from /convos to / \x{b7} Nordaaker/convos\@668368b",
-    url           => "http://git.io/aKhMuA",
+    url           => "https://git.io/aKhMuA",
   },
-  'http://git.io/aKhMuA',
+  'https://git.io/aKhMuA',
 ) or note $link->_dump;
 
 $embedder->get_p('https://github.com/jhthorsen')->then(sub { $link = shift })->wait;

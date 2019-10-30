@@ -4,7 +4,7 @@ use Mojo::Base 'LinkEmbedder::Link';
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
 has provider_name => 'GitHub';
-has provider_url => sub { Mojo::URL->new('https://github.com') };
+has provider_url  => sub { Mojo::URL->new('https://github.com') };
 
 sub learn_p {
   my $self = shift;
@@ -42,10 +42,8 @@ sub _learn_from_gist {
   my @gist_id = split '/', $gist_id;
 
   $gist_id = $gist_id[1] if @gist_id >= 2;
-  my $raw_url = sprintf 'https://api.github.com/gists/%s', $gist_id;
-  warn "[LinkEmbedder] Gist URL $raw_url\n" if DEBUG;
-
-  return $self->ua->get_p($raw_url)->then(sub { $self->_parse_gist(shift) });
+  my $gist_url = Mojo::URL->new(sprintf 'https://api.github.com/gists/%s', $gist_id);
+  return $self->_get_p($gist_url)->then(sub { $self->_parse_gist(shift) });
 }
 
 sub _parse_gist {

@@ -48,4 +48,32 @@ $t->ua->promise_roles('+Fake');
 ok($pc1 eq $t->ua->promise_class, 'add +Fake twice');
 like(exception { $t->ua->promise_roles(); }, qr/^No roles supplied!.*/);
 
+{
+    package MyTransactor;
+    use Mojo::Base 'Mojo::UserAgent::Transactor';
+    our $global;
+    sub promisify {
+	my $self = shift;
+	my ($promise) = @_;
+	$global = eval { $promise->the_answer_to_everything; } // $@;
+	return $self->SUPER::promisify(@_);
+    }
+}
+
+$t = Test::Mojo->new;
+$t->ua->transactor(MyTransactor->new)->with_roles('+PromiseClass')->promise_roles('+Fake');
+$p = $t->ua->get_p('/');
+$p->wait;
+is ($p->the_answer_to_everything, '42', 'method picked up');
+is ($MyTransactor::global, '42', 'method visible in transactor');
+
+$t = Test::Mojo->new;
+$t->ua->transactor(MyTransactor->new);
+$p = $t->ua->get_p('/');
+like (exception { $p->the_answer_to_everything }, qr/the_answer_to_everything/);
+$p->wait;
+like ($MyTransactor::global,
+      qr/the_answer_to_everything/,
+      'transactor indeed being invoked');
+
 done_testing();

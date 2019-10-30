@@ -6,6 +6,7 @@ package Log::Scrubber;
 require 5.8.8;
 use strict;
 use warnings;
+use Scalar::Util qw{refaddr};
 use Carp;
 use Clone;
 no warnings "redefine"; # We make this a few times
@@ -30,7 +31,7 @@ for grep { $_ ne 'all' } keys %EXPORT_TAGS;
 @EXPORT_OK = @{$EXPORT_TAGS{all}};
 @EXPORT = qw(scrubber_init);
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 ###----------------------------------------------------------------###
 
@@ -243,20 +244,28 @@ sub scrubber_remove_signal {
     }
 }
 
-sub _die_signal {
+sub _signal {
+    my $sig_name = shift;
     @_ = scrubber @_;
-    defined $_SDATA->{'SIG'}{'__DIE__'}{'old'} && $_SDATA->{'SIG'}{'__DIE__'}{'old'} ne '' ? $_SDATA->{'SIG'}{'__DIE__'}{'old'}->(@_) : CORE::die(@_);
+    if (defined $_SDATA->{'SIG'}{$sig_name}{'old'} && $_SDATA->{'SIG'}{$sig_name}{'old'} ne '') {
+        my $code_str1 = refaddr $_SDATA->{'SIG'}{$sig_name}{'old'};
+        if (!$_SDATA->{'SIG_USED'}->{$sig_name}->{$code_str1}) {
+            local $_SDATA->{'SIG_USED'}->{$sig_name}->{$code_str1} = 1;
+            return $_SDATA->{'SIG'}{$sig_name}{'old'}->(@_);
+        }
+        CORE::warn("Deep recursion detected in Log::Scrubber\n");
+    }
+    CORE::warn(@_) if $sig_name eq '__WARN__';
+    CORE::die(@_) if $sig_name eq '__DIE__';
 }
 
-sub _warn_signal {
-    @_ = scrubber @_;
-    defined $_SDATA->{'SIG'}{'__WARN__'}{'old'} && $_SDATA->{'SIG'}{'__WARN__'}{'old'} ne '' ? $_SDATA->{'SIG'}{'__WARN__'}{'old'}->(@_) : CORE::warn(@_);
-};
+sub _die_signal { _signal('__DIE__',@_); };
+sub _warn_signal { _signal('__WARN__',@_); };
 
 sub _scrubber_enable_signal {
     return if ! $_SDATA->{'enabled'};
     foreach ( @_ ) {
-    my $sig_name = $_;
+        my $sig_name = $_;
         next if defined $SIG{$sig_name} && defined $_SDATA->{'SIG'}{$sig_name}{'scrubber'} && $SIG{$sig_name} eq $_SDATA->{'SIG'}{$sig_name}{'scrubber'};
 
         $_SDATA->{'SIG'}{$sig_name}{'old'} = $SIG{$sig_name};
@@ -269,7 +278,7 @@ sub _scrubber_enable_signal {
 
 sub scrubber_add_signal {
     foreach ( @_ ) {
-    my $sig_name = '';
+        my $sig_name = '';
         if ($_ eq 'WARN') { $sig_name = '__WARN__'; }
         if ($_ eq '__WARN__') { $sig_name = '__WARN__'; }
         if ($_ eq 'DIE') { $sig_name = '__DIE__'; }

@@ -25,6 +25,6 @@ requires:
   Time::Piece: '0'
   perl: '5.008'
 resources:
-  repository: git://github.com/LotarProject/perl-Net-SecurityCenter
-version: '0.202'
+  repository: git://github.com/giterlizzi/perl-Net-SecurityCenter
+version: '0.203'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

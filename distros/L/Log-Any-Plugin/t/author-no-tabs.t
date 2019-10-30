@@ -32,6 +32,7 @@ my @files = (
     't/plugin/encode-default.t',
     't/plugin/encode-rationale.t',
     't/plugin/levels.t',
+    't/plugin/stringify-alt-separator.t',
     't/plugin/stringify.t',
     't/release-check-changes.t',
     't/release-cpan-changes.t',

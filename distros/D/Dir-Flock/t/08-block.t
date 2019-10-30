@@ -18,7 +18,7 @@ ok(-w $dir, 'getDir return value is writeable');
 my @t = glob("$dir/dir-flock-*");
 ok(@t == 0, "lock directory is empty because it is new");
 
-my $f = "t/08.out";
+my $f = "t/08-$$.out";
 unlink $f;
 
 sub write_f {

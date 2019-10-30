@@ -22,7 +22,7 @@ require Net::SecurityCenter::API::System;
 require Net::SecurityCenter::API::User;
 require Net::SecurityCenter::API::Zone;
 
-our $VERSION = '0.202';
+our $VERSION = '0.203';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -327,7 +327,7 @@ Logout from SecurityCenter.
 
 =head2 analysis
 
-Return L<Net::SecurityCenter::API::Analisys> instance.
+Return L<Net::SecurityCenter::API::Analysis> instance.
 
 =head2 credential
 
@@ -391,7 +391,7 @@ Return L<Net::SecurityCenter::API::Zone> instance.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/LotarProject/perl-Net-SecurityCenter/issues>.
+at L<https://github.com/giterlizzi/perl-Net-SecurityCenter/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -399,9 +399,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/LotarProject/perl-Net-SecurityCenter>
+L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
-    git clone https://github.com/LotarProject/perl-Net-SecurityCenter.git
+    git clone https://github.com/giterlizzi/perl-Net-SecurityCenter.git
 
 
 =head1 AUTHOR

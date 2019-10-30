@@ -3,7 +3,8 @@ use Test::Deep;
 use Test::More;
 use LinkEmbedder;
 
-plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
+plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
+plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
 my $embedder = LinkEmbedder->new;
 my $link;
@@ -25,7 +26,7 @@ cmp_deeply(
   'spotify:track:5tv77MoS0TzE0sJ7RwTj34'
 ) or note $link->_dump;
 
-$embedder->get_p('http://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9')->then(sub { $link = shift })->wait;
+$embedder->get_p('https://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9')->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Spotify');
 cmp_deeply(
   $link->TO_JSON,
@@ -37,7 +38,7 @@ cmp_deeply(
     provider_name => 'Spotify',
     provider_url  => 'https://spotify.com',
     type          => 'rich',
-    url           => 'http://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9',
+    url           => 'https://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9',
     version       => '1.0',
   },
   'spotify:track:5tv77MoS0TzE0sJ7RwTj34'

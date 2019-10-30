@@ -1,12 +1,12 @@
 {
-   "abstract" : "Choose the Mojo::Promise class used by Mojo::UserAgent",
+   "abstract" : "Choose the promise class used by Mojo::UserAgent",
    "author" : [
       "Roger Crew <wrog@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -44,11 +44,11 @@
    "provides" : {
       "Mojo::Base::Role::PromiseClass" : {
          "file" : "lib/Mojo/Base/Role/PromiseClass.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Mojo::UserAgent::Role::PromiseClass" : {
          "file" : "lib/Mojo/UserAgent/Role/PromiseClass.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "http://github.com/wrog/ua-pclass"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }

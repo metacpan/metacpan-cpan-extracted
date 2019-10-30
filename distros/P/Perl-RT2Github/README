@@ -7,11 +7,10 @@ The functionality in this distribution will enable you to provide a list of
 one or more RT ID numbers and get back the corresponding Github issue IDs or
 URLs.
 
-Pre-requisite:  LWP::UserAgent
-
-If this is still here it means the programmer was too lazy to create the readme file.
-
-You can create it now by using the command shown above from this directory.
+Pre-requisites:
+Configuration:  Devel::CheckBin (CPAN)
+Runtime:        HTTP::Tiny (shipped with Perl 5 core distribution 5.14+)
+Testing:        Test::RequiresInternet (CPAN)
 
 At the very least you should be able to use this set of instructions
 to install the module...

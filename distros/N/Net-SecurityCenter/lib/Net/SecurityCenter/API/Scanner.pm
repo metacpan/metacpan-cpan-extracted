@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.202';
+our $VERSION = '0.203';
 
 my $common_template = {
 
@@ -82,7 +82,7 @@ sub get {
 
 #-------------------------------------------------------------------------------
 
-sub get_status {
+sub status {
 
     my ( $self, %args ) = @_;
 
@@ -95,6 +95,42 @@ sub get_status {
 
     return if ( !$scanner );
     return sc_decode_scanner_status( $scanner->{'status'} );
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub health {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = { id => $common_template->{'id'}, count => {} };
+
+    my $params     = sc_check_params( $tmpl, \%args );
+    my $scanner_id = delete( $params->{'id'} );
+
+    my $scanner    = $self->client->get( "/scanner/$scanner_id/health");
+
+    return if ( !$scanner );
+    return $scanner;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub bug_report {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = { id => $common_template->{'id'}, scrub_mode => {}, full_mode => {} };
+
+    my $params     = sc_check_params( $tmpl, \%args );
+    my $scanner_id = delete( $params->{'id'} );
+
+    my $scanner    = $self->client->get( "/scanner/$scanner_id/bug_report", $params);
+
+    return if ( !$scanner );
+    return $scanner;
 
 }
 
@@ -163,9 +199,13 @@ Get the scanner list.
 
 Get the scanner associated with C<id>.
 
-=head2 get_status
+=head2 status
 
 Get the decoded scanner status associated with C<scanner_id>.
+
+=head2 health
+
+Retrieve scanner health statistics by querying the Nessus API endpoint for the Scanner associated with C<scanner_id>.
 
 
 =head1 SUPPORT
@@ -173,7 +213,7 @@ Get the decoded scanner status associated with C<scanner_id>.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/LotarProject/perl-Net-SecurityCenter/issues>.
+at L<https://github.com/giterlizzi/perl-Net-SecurityCenter/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -181,9 +221,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/LotarProject/perl-Net-SecurityCenter>
+L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
-    git clone https://github.com/LotarProject/perl-Net-SecurityCenter.git
+    git clone https://github.com/giterlizzi/perl-Net-SecurityCenter.git
 
 
 =head1 AUTHOR

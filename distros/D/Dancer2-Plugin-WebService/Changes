@@ -1,6 +1,10 @@
+4.2.2  2019-10-30
+
+ - Support older Perl version
+
 4.2.1  2019-10-29
 
- - Documentation changes
+ - Changes at POD documentation
 
 4.2.0  2019-10-01
 
@@ -38,12 +42,12 @@
   - Rename method RestReply     to reply
   - Rename method get_data_user to get_data_post
   - Remove the after hook that clears the posted data
-  - Documentation fixes
+  - Changes at POD documentation
 
 3.014  2017-05-05
 
   - New code for retrieving Os info for built-in route info/version
-  - Documentation fixes
+  - Changes at POD documentation
   - method  set_data_user  does not return defined keys as hash; it was a useless feature
   - Add a new INTERNAL authenication method. This does not use external scripts
   - Authentication 'Always allow login for testing' replaced from the INTERNAL simple

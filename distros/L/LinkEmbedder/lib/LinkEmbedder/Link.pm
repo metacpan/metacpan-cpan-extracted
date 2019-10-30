@@ -19,15 +19,16 @@ my @JSON_ATTRS = (
   'version',          'width'
 );
 
-has author_name => undef;
-has author_url  => undef;
-has cache_age   => 0;
-has description => '';
-has error       => undef;                                                # {message => "", code => ""}
-has height      => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
+has author_name  => undef;
+has author_url   => undef;
+has cache_age    => 0;
+has description  => '';
+has error        => undef;                                                # {message => "", code => ""}
+has force_secure => 0;
+has height       => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
 
 has placeholder_url => sub {
-  return sprintf 'http://placehold.it/200x200?text=%s', shift->provider_name;
+  return sprintf 'https://placehold.it/200x200?text=%s', shift->provider_name;
 };
 
 has provider_name => sub {
@@ -36,14 +37,14 @@ has provider_name => sub {
 };
 
 has provider_url => sub { $_[0]->url->host ? $_[0]->url->clone->path('/') : undef };
-has template         => sub { [__PACKAGE__, sprintf '%s.html.ep', $_[0]->type] };
+has template     => sub { [__PACKAGE__, sprintf '%s.html.ep', $_[0]->type] };
 has thumbnail_height => undef;
 has thumbnail_url    => undef;
 has thumbnail_width  => undef;
 has title            => undef;
 has type             => 'link';
-has ua               => undef;                                                      # Mojo::UserAgent object
-has url              => undef;                                                      # Mojo::URL
+has ua               => undef;                                                # Mojo::UserAgent object
+has url              => undef;                                                # Mojo::URL
 has version          => '1.0';
 has width            => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
 
@@ -57,9 +58,7 @@ sub html {
 
 sub learn_p {
   my $self = shift;
-  my $url  = $self->url;
-
-  return $self->ua->get_p($url)->then(sub { $self->_learn(shift) });
+  return $self->_get_p($self->url)->then(sub { $self->_learn(shift) });
 }
 
 sub TO_JSON {
@@ -89,6 +88,17 @@ sub _el {
   }
 
   return '';
+}
+
+sub _get_p {
+  my ($self, $url) = @_;
+  $url = $url->clone->scheme('https') if $self->force_secure;
+  warn sprintf "[%s] GET %s\n", ref($self), $url if DEBUG;
+  return $self->ua->get_p($url)->then(sub {
+    my $tx = shift;
+    $self->url->scheme('https') if $self->force_secure and $tx->res->is_success;
+    return $tx;
+  });
 }
 
 sub _learn {
@@ -186,6 +196,15 @@ Description of the L</url>. Might be C<undef()>.
 C<undef()> on success, hash-ref on error. Example:
 
   {message => "Oops!", code => 500};
+
+=head2 force_secure
+
+  $bool = $self->force_secure;
+  $self = $self->force_secure(1);
+
+This attribute will translate any unknown http link to https.
+
+This attribute is EXPERIMENTAL. Feeback appreciated.
 
 =head2 height
 

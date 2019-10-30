@@ -1,15 +1,15 @@
-package Mojo::Base::Role::PromiseClass 0.006;
+package Mojo::Base::Role::PromiseClass 0.007;
 
 # ABSTRACT: Add promise_class attribute to Mojo class
 
 use Mojo::Base -role;
 
-has promise_class => sub { 'Mojo::Promise' };
+has promise_class => sub {'Mojo::Promise'};
 
 sub promise_roles {
-    my $self = shift;
+    my $self   = shift;
     my $pclass = $self->promise_class;
-    my @roles =
+    my @roles  =
       grep { !Role::Tiny::does_role($pclass, $_) }
       map  { /^\+(.+)$/ ? "Mojo::Promise::Role::$1" : $_ }
       @_;
@@ -18,9 +18,12 @@ sub promise_roles {
 }
 
 1;
+
 __END__
 
-=encoding utf8
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -28,7 +31,7 @@ Mojo::Base::Role::PromiseClass - Add promise_class attribute to Mojo class
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -101,9 +104,10 @@ Roger Crew <wrog@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Roger Crew.
+This software is Copyright (c) 2019 by Roger Crew.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

@@ -3,12 +3,13 @@ use Test::Deep;
 use Test::More;
 use LinkEmbedder;
 
-plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
+plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
+plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
 my $embedder = LinkEmbedder->new;
 
 my $link;
-$embedder->get_p('http://www.greatcirclemapper.net/en/great-circle-mapper.html?route=KJFK-VHHH&aircraft=&speed=')
+$embedder->get_p('https://www.greatcirclemapper.net/en/great-circle-mapper.html?route=KJFK-VHHH&aircraft=&speed=')
   ->then(sub { $link = shift })->wait;
 isa_ok($link, 'LinkEmbedder::Link::Basic');
 cmp_deeply($link->provider_name, 'Greatcirclemapper', 'correct provider_name');

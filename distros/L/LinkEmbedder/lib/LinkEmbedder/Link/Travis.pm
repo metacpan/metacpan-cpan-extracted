@@ -14,9 +14,9 @@ sub learn_p {
   my $api_path = $api_url->path;
 
   return $self->SUPER::learn_p unless $api_path =~ m!^/(.*/builds/\d+)$!;
-  $api_url->path->parse("/repositories/$1");
 
-  return $self->ua->get_p($api_url)->then(sub { $self->_learn_from_json(shift) });
+  $api_url->path->parse("/repositories/$1");
+  return $self->_get_p($api_url)->then(sub { $self->_learn_from_json(shift) });
 }
 
 sub _learn_from_json {

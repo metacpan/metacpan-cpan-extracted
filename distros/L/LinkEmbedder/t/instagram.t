@@ -2,11 +2,12 @@ use Mojo::Base -strict;
 use Test::More;
 use LinkEmbedder;
 
-plan skip_all => 'TEST_ONLINE=1' unless $ENV{TEST_ONLINE};
+plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
+plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
 my $embedder = LinkEmbedder->new;
 my $link;
-$embedder->get_p('https://www.instagram.com/p/C/')->then(sub { $link = shift })->wait; # oldest IG post
+$embedder->get_p('https://www.instagram.com/p/C/')->then(sub { $link = shift })->wait;    # oldest IG post
 isa_ok($link, 'LinkEmbedder::Link::oEmbed');
 
 my $json = $link->TO_JSON;

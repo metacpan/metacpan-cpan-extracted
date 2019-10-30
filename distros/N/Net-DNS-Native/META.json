@@ -42,6 +42,6 @@
          "url" : "https://github.com/olegwtf/p5-Net-DNS-Native"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

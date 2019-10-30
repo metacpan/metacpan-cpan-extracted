@@ -1,6 +1,6 @@
 package Log::Any::Plugin;
 # ABSTRACT: Adapter-modifying plugins for Log::Any
-$Log::Any::Plugin::VERSION = '0.010';
+$Log::Any::Plugin::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Log::Any::Plugin - Adapter-modifying plugins for Log::Any
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

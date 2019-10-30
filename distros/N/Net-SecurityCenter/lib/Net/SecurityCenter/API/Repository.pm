@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.202';
+our $VERSION = '0.203';
 
 my $common_template = {
 
@@ -196,7 +196,7 @@ B<NOTE>: This method has been DEPRECATED as of SecurityCenter 5.7.0.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/LotarProject/perl-Net-SecurityCenter/issues>.
+at L<https://github.com/giterlizzi/perl-Net-SecurityCenter/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -204,9 +204,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/LotarProject/perl-Net-SecurityCenter>
+L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
-    git clone https://github.com/LotarProject/perl-Net-SecurityCenter.git
+    git clone https://github.com/giterlizzi/perl-Net-SecurityCenter.git
 
 
 =head1 AUTHOR

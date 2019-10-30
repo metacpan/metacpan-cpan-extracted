@@ -7,13 +7,13 @@ use 5.014;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Choose the Mojo::Promise class used by Mojo::UserAgent",
+  "ABSTRACT" => "Choose the promise class used by Mojo::UserAgent",
   "AUTHOR" => "Roger Crew <wrog\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Mojo-UserAgent-Role-PromiseClass",
-  "LICENSE" => "perl",
+  "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojo::UserAgent::Role::PromiseClass",
   "PREREQ_PM" => {
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Fatal" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }

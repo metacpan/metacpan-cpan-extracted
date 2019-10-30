@@ -49,10 +49,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/LotarProject/perl-Net-SecurityCenter",
-         "web" : "https://github.com/LotarProject/perl-Net-SecurityCenter"
+         "url" : "git://github.com/giterlizzi/perl-Net-SecurityCenter",
+         "web" : "https://github.com/giterlizzi/perl-Net-SecurityCenter"
       }
    },
-   "version" : "0.202",
+   "version" : "0.203",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

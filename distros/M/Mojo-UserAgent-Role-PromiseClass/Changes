@@ -1,3 +1,6 @@
+0.007     Oct 29 2019
+	* Artistic License 2.0 (same as Mojolicious)
+
 0.006     Oct 26 2019
         * split out Mojo::Base::Role::PromiseClass
 

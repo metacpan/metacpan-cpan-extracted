@@ -4,6 +4,11 @@ use Mojolicious::Lite;
 use lib 'lib';
 use LinkEmbedder;
 
+# These pastebin provides expire
+$ENV{TEST_FEDORA}    ||= 'TdDtYw1YSaEDqIOqVYlWbw';
+$ENV{TEST_PERLBOT}   ||= 'xogtbq';
+$ENV{TEST_SHADOWCAT} ||= '586840';
+
 helper embedder => sub { state $e = LinkEmbedder->new };
 
 get '/'       => 'index';
@@ -21,30 +26,32 @@ get '/oembed' => sub {
 app->defaults(
   restricted => $ENV{LINK_EMBEDDER_RESTRICTED} ? 1 : 0,
   predefined => [
-    "http://xkcd.com/927",
-    "http://catoverflow.com/cats/r4cIt4z.gif",
+    "https://xkcd.com/927",
+    "https://catoverflow.com/cats/r4cIt4z.gif",
     "https://www.ted.com/talks/jill_bolte_taylor_s_powerful_stroke_of_insight",
-    "http://imgur.com/gallery/ohL3e",
-    "http://www.aftenposten.no",
+    "https://imgur.com/gallery/ohL3e",
+    "https://www.aftenposten.no",
     "https://www.instagram.com/p/BSRYg_Sgbqe/",
     "http://ix.io",
     "http://ix.io/fpW",
-    "http://catoverflow.com/",
-    "http://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9",
+    "https://catoverflow.com/",
+    "https://open.spotify.com/artist/4HV7yKF3SRpY6I0gxu7hm9",
     "https://gist.github.com/jhthorsen/3738de6f44f180a29bbb",
-    "https://appear.in/link-embedder-demo",
+    "https://whereby.com/link-embedder-demo",
     "https://github.com/jhthorsen/linkembedder/blob/master/t/basic.t",
     "https://metacpan.org/pod/Mojolicious",
     "https://pastebin.com/V5gZTzhy",
-    "http://paste.opensuse.org/2931429",
-    "http://twitter.com",
+    "https://paste.fedoraproject.org/paste/$ENV{TEST_FEDORA}",
+    "https://perlbot.pl/p/$ENV{TEST_PERLBOT}",
+    "https://paste.opensuse.org/2931429",
+    "https://twitter.com",
     "https://www.youtube.com/watch?v=OspRE1xnLjE",
     "https://twitter.com/jhthorsen/status/786688349536972802",
     "https://vimeo.com/154038415",
-    "http://paste.scsys.co.uk/557716",
+    "http://paste.scsys.co.uk/$ENV{TEST_SHADOWCAT}",
     "https://travis-ci.org/Nordaaker/convos/builds/47421379",
-    "http://git.io/aKhMuA",
-    "http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html",
+    "https://git.io/aKhMuA",
+    "https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html",
     "spotify:track:0aBi2bHHOf3ZmVjt3x00wv",
     "https://www.nhl.com/video/top-10-of-2018-19-ovechkin/t-277350912/c-68680503",
   ]
@@ -155,7 +162,7 @@ pre.data { color: #999; margin-top: 3rem; padding-top: 1rem; border-top: 1px sol
       </p>
     % } else {
       <label for="form_url">URL</label>
-      %= text_field 'url', value => 'http://git.io/aKhMuA', id => 'form_url'
+      %= text_field 'url', value => 'https://git.io/aKhMuA', id => 'form_url'
       <span class="pure-form-message">Enter any URL, and see how it renders below</span>
       <p>
         <button type="submit" class="pure-button pure-button-primary">Render URL</button>

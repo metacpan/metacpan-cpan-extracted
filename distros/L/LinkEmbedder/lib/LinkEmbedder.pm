@@ -7,18 +7,21 @@ use Mojo::Loader 'load_class';
 use Mojo::Promise;
 use Mojo::UserAgent;
 
+use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.009'); 1 };
+
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
+
+has force_secure => sub { $ENV{LINK_EMBEDDER_FORCE_SECURE} || 0 };
 
 has ua => sub { Mojo::UserAgent->new->max_redirects(3); };
 
 has url_to_link => sub {
   return {
     'default'                 => 'LinkEmbedder::Link::Basic',
-    'appear.in'               => 'LinkEmbedder::Link::AppearIn',
     'git.io'                  => 'LinkEmbedder::Link::Github',
     'github.com'              => 'LinkEmbedder::Link::Github',
     'google'                  => 'LinkEmbedder::Link::Google',
@@ -37,6 +40,7 @@ has url_to_link => sub {
     'twitter.com'             => 'LinkEmbedder::Link::Twitter',
     'vimeo.com'               => 'LinkEmbedder::Link::oEmbed',
     'xkcd.com'                => 'LinkEmbedder::Link::Xkcd',
+    'whereby.com'             => 'LinkEmbedder::Link::AppearIn',
     'youtube.com'             => 'LinkEmbedder::Link::oEmbed',
   };
 };
@@ -49,7 +53,7 @@ sub get {
   })->catch(sub {
     my $err = pop // 'Unknown error.';
     $err = {message => "$err", code => 500} unless ref $err eq 'HASH';
-    $self->$cb(LinkEmbedder::Link->new(error => $err));
+    $self->$cb(LinkEmbedder::Link->new(error => $err, force_secure => $self->force_secure));
   });
 
   return $self;
@@ -59,9 +63,10 @@ sub get_p {
   my ($self, $args) = @_;
   my ($e, $link);
 
-  $args        = ref $args eq 'HASH' ? {%$args} : {url => $args};
-  $args->{url} = Mojo::URL->new($args->{url} || '') unless ref $args->{url};
-  $args->{ua}  = $self->ua;
+  $args                 = ref $args eq 'HASH' ? {%$args} : {url => $args};
+  $args->{force_secure} = $self->force_secure;
+  $args->{url}          = Mojo::URL->new($args->{url} || '') unless ref $args->{url};
+  $args->{ua}           = $self->ua;
 
   $link ||= delete $args->{class};
   $link ||= ucfirst $1 if $args->{url} =~ $PROTOCOL_RE;
@@ -71,7 +76,7 @@ sub get_p {
   $link = $link =~ /::/ ? $link : "LinkEmbedder::Link::$link";
   return $self->_invalid_input($args, "Could not find $link") unless _load($link);
 
-  warn "[LinkEmbedder] $link->new($args->{url})\n" if DEBUG;
+  warn "[$link] url=$args->{url})\n" if DEBUG;
   $link = $link->new($args);
   return $link->learn_p->then(sub { return $link });
 }
@@ -138,8 +143,9 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
 
   use LinkEmbedder;
 
-  my $embedder = LinkEmbedder->new;
-  $embedder->get_p("http://xkcd.com/927")->then(sub {
+  my $embedder = LinkEmbedder->new(force_secure => 1);
+
+  $embedder->get_p("https://xkcd.com/927")->then(sub {
     my $link = shift;
     print $link->html;
   })->wait;
@@ -157,7 +163,7 @@ These web pages are currently supported:
 
 =over 2
 
-=item * L<http://imgur.com/>
+=item * L<https://imgur.com/>
 
 =item * L<https://instagram.com/>
 
@@ -172,7 +178,7 @@ for more information.
 
 =item * L<https://github.com>
 
-=item * L<https://ix.io>
+=item * L<http://ix.io>
 
 =item * L<https://maps.google.com>
 
@@ -180,11 +186,11 @@ for more information.
 
 =item * L<https://paste.fedoraproject.org/>
 
-=item * L<http://paste.opensuse.org>
+=item * L<https://paste.opensuse.org>
 
 =item * L<http://paste.scsys.co.uk>
 
-=item * L<http://pastebin.com>
+=item * L<https://pastebin.com>
 
 =item * L<https://www.spotify.com/>
 
@@ -221,6 +227,15 @@ URLs that looks like a video resource is automatically converted into a video ta
 =back
 
 =head1 ATTRIBUTES
+
+=head2 force_secure
+
+  $bool = $self->force_secure;
+  $self = $self->force_secure(1);
+
+This attribute will translate any unknown http link to https.
+
+This attribute is EXPERIMENTAL. Feeback appreciated.
 
 =head2 ua
 

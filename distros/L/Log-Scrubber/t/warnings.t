@@ -2,7 +2,7 @@
 
 # Test the warning:: overrides
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use warnings;
 use warnings::register;
 use Log::Scrubber;
@@ -36,7 +36,7 @@ my $tests = {
 };
 
 foreach my $key ( keys %$tests ) {
-    eval { 
+    eval {
         _setup;
         warnings::warn($key."\n");
     };
@@ -45,7 +45,7 @@ foreach my $key ( keys %$tests ) {
     $result =~ s/\n.*$//s;
     is ($result, $tests->{$key}, "warnings::warn");
 
-    eval { 
+    eval {
         _setup;
         warnings::warnif("void", $key."\n");
     };
@@ -54,3 +54,41 @@ foreach my $key ( keys %$tests ) {
     $result =~ s/\n.*$//s;
     is ($result, $tests->{$key}, "warnings::warnif");
 }
+
+subtest "Deep recursion check" => sub {
+    eval {
+        # this test is HORRIBLE code, you should never do this...
+        # but we are testing just in case someone actually does something like this
+        _setup;
+        local $SCRUBBER = 1;
+        my $old_warn = $SIG{'__DIE__'};
+        local $SIG{'__DIE__'} = sub {
+            # simulate overriding warn with some other service/tool
+            my $x = shift;
+            $x = '$'.$x;
+            $old_warn->($x,@_);
+        };
+        Log::Scrubber::scrubber_remove_signal('__DIE__');
+        { # new scope
+            local $SCRUBBER = 1;
+            Log::Scrubber::scrubber_add_signal('__DIE__');
+            my $old_warn = $SIG{'__DIE__'};
+            local $SIG{'__DIE__'} = sub {
+                # simulate overriding warn with some other service/tool
+                my $x = shift;
+                $x = '$'.$x;
+                $old_warn->($x,@_);
+            };
+            Log::Scrubber::scrubber_remove_signal('__DIE__');
+            { # new scope
+                local $SCRUBBER = 1;
+                Log::Scrubber::scrubber_add_signal('__DIE__');
+                die 'moo1234';
+            }
+        }
+    };
+    my $e = $@;
+    my $result = _read;
+    cmp_ok($e,'=~','mooXXXX at ','Got the expected die message');
+    cmp_ok($result,'=~','Deep recursion detected in Log::Scrubber','Protected against deep recursion');
+};

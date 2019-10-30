@@ -6,8 +6,9 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
 
     use LinkEmbedder;
 
-    my $embedder = LinkEmbedder->new;
-    $embedder->get_p("http://xkcd.com/927")->then(sub {
+    my $embedder = LinkEmbedder->new(force_secure => 1);
+
+    $embedder->get_p("https://xkcd.com/927")->then(sub {
       my $link = shift;
       print $link->html;
     })->wait;
@@ -23,7 +24,7 @@ Go to [https://thorsen.pm/linkembedder](https://thorsen.pm/linkembedder) to see 
 
 These web pages are currently supported:
 
-- [http://imgur.com/](http://imgur.com/)
+- [https://imgur.com/](https://imgur.com/)
 - [https://instagram.com/](https://instagram.com/)
 
     Instagram need some additional JavaScript. Please look at
@@ -34,13 +35,13 @@ These web pages are currently supported:
 - [https://appear.in/](https://appear.in/)
 - [https://gist.github.com](https://gist.github.com)
 - [https://github.com](https://github.com)
-- [https://ix.io](https://ix.io)
+- [http://ix.io](http://ix.io)
 - [https://maps.google.com](https://maps.google.com)
 - [https://metacpan.org](https://metacpan.org)
 - [https://paste.fedoraproject.org/](https://paste.fedoraproject.org/)
-- [http://paste.opensuse.org](http://paste.opensuse.org)
+- [https://paste.opensuse.org](https://paste.opensuse.org)
 - [http://paste.scsys.co.uk](http://paste.scsys.co.uk)
-- [http://pastebin.com](http://pastebin.com)
+- [https://pastebin.com](https://pastebin.com)
 - [https://www.spotify.com/](https://www.spotify.com/)
 - [https://ted.com](https://ted.com)
 - [https://travis-ci.org](https://travis-ci.org)
@@ -68,6 +69,15 @@ These web pages are currently supported:
     URLs that looks like a video resource is automatically converted into a video tag.
 
 # ATTRIBUTES
+
+## force\_secure
+
+    $bool = $self->force_secure;
+    $self = $self->force_secure(1);
+
+This attribute will translate any unknown http link to https.
+
+This attribute is EXPERIMENTAL. Feeback appreciated.
 
 ## ua
 

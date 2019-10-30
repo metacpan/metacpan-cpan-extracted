@@ -59585,3 +59585,15 @@ K/KJ/KJETILK/Test-FITesque-RDF-0.016.tar.gz
 P/PL/PLICEASE/Test-Script-1.26.tar.gz
 O/OA/OALDERS/WWW-Mechanize-1.95.tar.gz
 S/SH/SHLOMIF/XML-Grammar-Fortune-0.0800.tar.gz
+P/PE/PERLANCAR/App-PowerManagementUtils-0.004.tar.gz
+D/DA/DAMI/App-Zip-X-1.0.tar.gz
+M/MP/MPOURASG/Dancer2-Plugin-WebService-4.2.2.tar.gz
+M/MO/MOB/Dir-Flock-0.03.tar.gz
+J/JH/JHTHORSEN/LinkEmbedder-1.07.tar.gz
+S/SD/SDT/Log-Any-Plugin-0.011.tar.gz
+O/OA/OAXLIN/Log-Scrubber-0.17.tar.gz
+M/MA/MANWAR/Map-Tube-Delhi-0.96.tar.gz
+W/WR/WROG/Mojo-UserAgent-Role-PromiseClass-0.007.tar.gz
+O/OL/OLEG/Net-DNS-Native-0.22.tar.gz
+G/GD/GDT/Net-SecurityCenter-0.203.tar.gz
+J/JK/JKEENAN/Perl-RT2Github-0.03.tar.gz

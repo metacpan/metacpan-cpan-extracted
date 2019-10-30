@@ -20,8 +20,7 @@ sub _fetch_paste {
 
   $raw_url->path(sprintf '/view/raw/%s', $paste_id);
   warn "[LinkEmbedder] openSUSE paste URL $raw_url\n" if DEBUG;
-
-  return $self->title("Paste $paste_id")->type("rich")->ua->get_p($raw_url)->then(sub { $self->_parse_paste(shift) });
+  return $self->title("Paste $paste_id")->type("rich")->_get_p($raw_url)->then(sub { $self->_parse_paste(shift) });
 }
 
 sub _parse_paste {

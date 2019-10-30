@@ -1,8 +1,9 @@
 package LinkEmbedder::Link::Ix;
 use Mojo::Base 'LinkEmbedder::Link';
 
+sub force_secure {0}
 has provider_name => 'Ix';
-has provider_url => sub { Mojo::URL->new('http://ix.io') };
+has provider_url  => sub { Mojo::URL->new('http://ix.io') };
 
 sub _learn {
   my ($self, $tx) = @_;

@@ -1,7 +1,7 @@
 package App::PowerManagementUtils;
 
 our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,10 +48,8 @@ $SPEC{prevent_sleep_until_interrupted} = {
     description => <<'_',
 
 Uses <pm:Proc::Govern> to run `sleep infinity`, with the option `no-sleep' to
-instruct Proc::Govern to disable system from sleeping until interrupted.
-
-For more options when running command, e.g. timeout, load control, autorestart,
-screensaver control, use the module or its CLI <prog:govproc> directly.
+instruct Proc::Govern to disable system from sleeping. To stop preventing sleep,
+you can press Ctrl-C.
 
 _
     args => {
@@ -87,7 +85,7 @@ App::PowerManagementUtils - CLI utilities related to power management
 
 =head1 VERSION
 
-This document describes version 0.003 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
+This document describes version 0.004 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
 
 =head1 DESCRIPTION
 
@@ -121,10 +119,8 @@ Usage:
 Prevent sleep until interrupted.
 
 Uses L<Proc::Govern> to run C<sleep infinity>, with the option `no-sleep' to
-instruct Proc::Govern to disable system from sleeping until interrupted.
-
-For more options when running command, e.g. timeout, load control, autorestart,
-screensaver control, use the module or its CLI L<govproc> directly.
+instruct Proc::Govern to disable system from sleeping. To stop preventing sleep,
+you can press Ctrl-C.
 
 This function is not exported.
 

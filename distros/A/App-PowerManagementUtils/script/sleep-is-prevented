@@ -5,7 +5,7 @@
 
 our $DATE = '2019-09-15'; # DATE
 our $DIST = 'App-PowerManagementUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ sleep-is-prevented - Check if sleep has been prevented
 
 =head1 VERSION
 
-This document describes version 0.003 of sleep-is-prevented (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
+This document describes version 0.004 of sleep-is-prevented (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

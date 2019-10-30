@@ -1,5 +1,11 @@
 Revision history for Dir-Flock
 
+0.03	2019-10-29
+	Enable testing of multi-process contention of directory.
+        Use $Dir::Flock::errstr to store/report module errors.
+        Provide Dir::Flock::Mock to use when system requirements are not met.
+        Randomize wait times between lock attempts to decrease "collisions"
+
 0.02	2019-10-07
 	Support shared locks.
 	Support scoping semantics.

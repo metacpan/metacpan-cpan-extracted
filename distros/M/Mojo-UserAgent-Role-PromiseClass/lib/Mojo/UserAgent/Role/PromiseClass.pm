@@ -1,6 +1,6 @@
-package Mojo::UserAgent::Role::PromiseClass 0.006;
+package Mojo::UserAgent::Role::PromiseClass 0.007;
 
-# ABSTRACT: Choose the Mojo::Promise class used by Mojo::UserAgent
+# ABSTRACT: Choose the promise class used by Mojo::UserAgent
 
 use Mojo::Base -role;
 
@@ -12,9 +12,12 @@ around start_p => sub {
 };
 
 1;
+
 __END__
 
-=encoding utf8
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -22,7 +25,7 @@ Mojo::UserAgent::Role::PromiseClass - Choose the promise class used by Mojo::Use
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -67,9 +70,10 @@ Roger Crew <wrog@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Roger Crew.
+This software is Copyright (c) 2019 by Roger Crew.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

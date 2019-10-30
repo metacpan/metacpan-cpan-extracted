@@ -14,7 +14,7 @@ sub learn_p {
   if ($url =~ s!^spotify:!!) {                                        # spotify:track:5tv77MoS0TzE0sJ7RwTj34
     @path = split /:/, $url;
   }
-  elsif (@{$url->path} == 2) {    # http://open.spotify.com/artist/6VKNnZIuu9YEOvLgxR6uhQ
+  elsif (@{$url->path} == 2) {    # https://open.spotify.com/artist/6VKNnZIuu9YEOvLgxR6uhQ
     @path = @{$url->path};
   }
 

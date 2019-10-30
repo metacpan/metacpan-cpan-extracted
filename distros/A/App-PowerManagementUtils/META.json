@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-App-PowerManagementUtils"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -2,7 +2,7 @@ package LinkEmbedder::Link::Xkcd;
 use Mojo::Base 'LinkEmbedder::Link';
 
 has provider_name => 'Xkcd';
-has provider_url => sub { Mojo::URL->new('http://xkcd.com') };
+has provider_url  => sub { Mojo::URL->new('https://xkcd.com') };
 
 sub _learn_from_dom {
   my ($self, $dom) = @_;

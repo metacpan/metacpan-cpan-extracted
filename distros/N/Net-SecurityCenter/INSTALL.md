@@ -41,8 +41,8 @@ perldoc command.
 
 You can also look for information at:
 
-  * GitHub issues (report bugs here) https://github.com/LotarProject/perl-Net-SecurityCenter/issues
-  * SlackMan documentation https://github.com/LotarProject/perl-Net-SecurityCenter/wiki
+  * GitHub issues (report bugs here) https://github.com/giterlizzi/perl-Net-SecurityCenter/issues
+  * SlackMan documentation https://github.com/giterlizzi/perl-Net-SecurityCenter/wiki
 
 
 ## LICENSE AND COPYRIGHT

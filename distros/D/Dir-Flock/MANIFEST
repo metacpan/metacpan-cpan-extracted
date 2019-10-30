@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 README
 lib/Dir/Flock.pm
+lib/Dir/Flock/Mock.pm
 t/00-load.t
 t/01-lock.t
 t/02-lock-threads.t
@@ -12,5 +13,12 @@ t/05-shared.t
 t/06-shared.t
 t/07-scope.t
 t/08-block.t
+t/09-mock.t
+t/80-multi-tests.pl
+t/80a-multi.tt
+t/80b-multi.tt
+t/81-multi.t
+t/82-multi.t
+t/83-multihost.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

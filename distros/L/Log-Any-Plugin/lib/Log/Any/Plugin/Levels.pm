@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Levels;
 # ABSTRACT: Logging-level filtering plugin for log adapters
-$Log::Any::Plugin::Levels::VERSION = '0.010';
+$Log::Any::Plugin::Levels::VERSION = '0.011';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -94,7 +94,7 @@ Log::Any::Plugin::Levels - Logging-level filtering plugin for log adapters
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

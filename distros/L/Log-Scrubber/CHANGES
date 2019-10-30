@@ -1,10 +1,71 @@
 ==================================================
-Changes from 2017-08-10 00:00:00 +0000 to present.
+Changes from 2018-10-29 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.16 at 2018-08-10 17:34:29 +0000
+version 0.17 at 2019-10-29 20:18:46 +0000
 -----------------------------------------
+
+  Change: 30cbfa32eb52dcd72a65d3adfcc36ce681871fe6
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 14:18:30 +0000
+
+    fix travis finally 
+
+  Change: 4f1c7cc3014ded3b571b7ca2c1f047d35f96c3c7
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 14:06:45 +0000
+
+    fix travis hopefully 
+
+  Change: 01fd5d7b09c5703f759695c6e763f81c67328373
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 13:59:42 +0000
+
+    fix travis hopefully 
+
+  Change: 9efd20dc43c6921cf2c51f8b29cc321ded480e02
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 13:49:17 +0000
+
+    fix travis hopefully 
+
+  Change: 8926293475b8017056c628579c9c553ab5f517d5
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 13:36:39 +0000
+
+    include deps for travis-ci 
+
+  Change: cc6d786c47d978081a19016c36a76abc175168b8
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 13:29:23 +0000
+
+    include deps for travis-ci 
+
+  Change: e32e673974f252f77eaf8e9357e86a2f2c183c5a
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 13:08:13 +0000
+
+    minor change for travis-ci.org testing 
+
+  Change: 4814da1a745f2307078a81c179e1cf02e88de98e
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 12:54:45 +0000
+
+    bump version to 0.17 
+
+  Change: 0ae2985c26b7d26612451363afbdf8a6440a342e
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 12:52:01 +0000
+
+    remove un-needed diags 
+
+  Change: b5ef7c324a4a10289b364933e13eb270146b2939
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-10-29 12:48:24 +0000
+
+    even better checks against deep recursion, just in case someone does
+    something completely unexpected 
 
   Change: 5dc1d9d6d7e1b6312b67133b526bd1a775141143
   Author: Jason Terry <jterry@bluehost.com>
@@ -54,5 +115,5 @@ version 0.16 at 2018-08-10 17:34:29 +0000
     Fix tests in 5.8.8/9 
 
 =================================================
-Plus 14 releases after 2017-08-10 00:00:00 +0000.
+Plus 14 releases after 2018-10-29 00:00:00 +0000.
 =================================================

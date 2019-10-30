@@ -20,13 +20,10 @@ sub learn_p {
   return $self->SUPER::learn_p unless $self->url->path =~ /\w/;
 
   my $api_url = $self->_api_url;
-  unless ($api_url) {
-    $self->error({message => "Unknown oEmbed provider for @{[$self->url]}", code => 400});
-    return $self;
-  }
+  return $self->_get_p($api_url)->then(sub { $self->_learn_from_json(shift) }) if $api_url;
 
-  warn "[LinkEmbedder] oembed URL $api_url\n" if DEBUG;
-  return $self->ua->get_p($api_url)->then(sub { $self->_learn_from_json(shift) });
+  $self->error({message => "Unknown oEmbed provider for @{[$self->url]}", code => 400});
+  return $self;
 }
 
 sub _api_url {

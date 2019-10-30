@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Stringify;
 # ABSTRACT: Custom argument stringification plugin for log adapters
-$Log::Any::Plugin::Stringify::VERSION = '0.010';
+$Log::Any::Plugin::Stringify::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -10,9 +10,13 @@ use Log::Any::Plugin::Util qw(
 
 use Data::Dumper;
 
+my $separator;
+
+
 sub install {
     my ($class, $adapter_class, %args) = @_;
 
+    $separator = defined $args{separator} ? $args{separator} : '';
     my $stringifier = $args{stringifier} || \&default_stringifier;
 
     # Inject the stringifier into the existing logging methods
@@ -27,7 +31,7 @@ sub install {
 }
 
 sub default_stringifier {
-    my (@args) = @_;
+    my @args = @_;
 
     local $Data::Dumper::Indent    = 0;
     local $Data::Dumper::Pair      = '=';
@@ -35,7 +39,7 @@ sub default_stringifier {
     local $Data::Dumper::Sortkeys  = 1;
     local $Data::Dumper::Terse     = 1;
 
-    return join('', map { ref $_ ? Dumper($_) : $_ } @args);
+    return join($separator, map { ref $_ ? Dumper($_) : $_ } @args);
 }
 
 1;
@@ -52,7 +56,7 @@ Log::Any::Plugin::Stringify - Custom argument stringification plugin for log ada
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -89,7 +93,11 @@ These configuration values are passed as key-value pairs:
 The stringifier function takes a list of arguments and should return a single
 string.
 
-See default_stringifier below for the default stringifier.
+See default_stringifier below for the default stringifier behaviour.
+
+=head2 separator => ''
+
+See default_stringifier below for the default stringifier behaviour.
 
 =head1 METHODS
 
@@ -102,8 +110,15 @@ Private method called by Log::Any::Plugin->add()
 
 =head2 default_stringifier
 
-The default stringifier function if none is supplied. Listrefs and hashrefs are
-expanded by Data::Dumper, and the whole lot is concatenated into one string.
+The default stringifier if no custom stringifier is supplied.
+
+Listrefs and hashrefs are expanded by L<Data::Dumper>, and the whole lot is
+concatenated into one string.
+
+The C<separator> configuration argument can be used to customise how log arguments
+are separated from each other, e.g. C<trace("hello", "there", [1, 2, 2])> with
+a separator of '##' results in: C<hello##there##[1,2,2]> -- the Dumper-driven
+output is not affected by the separator.
 
 =head1 SEE ALSO
 

@@ -1,9 +1,10 @@
 # t/new.t
 use 5.14.0;
 use warnings;
-use Test::More tests => 22;
-
-BEGIN { use_ok( 'Perl::RT2Github' ); }
+use Test::More;
+BEGIN { require Test::RequiresInternet; Test::RequiresInternet->import(); }
+plan tests => 22;
+use_ok('Perl::RT2Github');
 
 my $self = Perl::RT2Github->new();
 isa_ok ($self, 'Perl::RT2Github');

@@ -18,7 +18,7 @@ ok(-w $dir, 'getDir return value is writeable');
 my @t = glob("$dir/dir-flock-*");
 ok(@t == 0, "lock directory is empty because it is new");
 
-my $f = "t/07.out";
+my $f = "t/07-$$.out";
 unlink $f;
 
 sub write_f {
@@ -49,9 +49,13 @@ my @contents = <$fh>;
 close $fh;
 ok(@contents == 1, "thread output is on a single line");
 my $data = $contents[0];
+my $found_fail = 0;
 for my $n (10..20) {
     my $patt = qr/( $n){$n}/;
-    ok( $data =~ $patt, "found instances of $n" );
+    ok( $data =~ $patt, "found instances of $n" ) or $found_fail++;
+}
+if ($found_fail) {
+    diag "data was '$data'";
 }
 unlink $f;
 

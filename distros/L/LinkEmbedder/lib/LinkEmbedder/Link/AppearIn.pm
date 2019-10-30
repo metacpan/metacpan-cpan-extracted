@@ -2,14 +2,14 @@ package LinkEmbedder::Link::AppearIn;
 use Mojo::Base 'LinkEmbedder::Link';
 
 has provider_name => 'AppearIn';
-has provider_url => sub { Mojo::URL->new('https://appear.in') };
+has provider_url  => sub { Mojo::URL->new('https://whereby.com') };
 
 sub learn_p {
   my $self = shift;
   my $path = $self->url->path;
   return $self->SUPER::learn_p unless @$path == 1;
 
-  $self->{iframe_src} = "https://appear.in/$path->[0]";
+  $self->{iframe_src} = "https://whereby.com/$path->[0]";
   $self->height(390) unless $self->height;
   $self->width(740)  unless $self->width;
   $self->type('rich');

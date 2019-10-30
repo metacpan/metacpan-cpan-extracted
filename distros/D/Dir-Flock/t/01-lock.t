@@ -53,4 +53,3 @@ my $r = Dir::Flock::unlock($dir);
 ok($r, "funlock successful");
 
 done_testing;
-

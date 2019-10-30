@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use App::Zip::X;
+
+App::Zip::X->run(@ARGV);
+
+
+__END__
+
+=head1 NAME
+
+zip-x -- Simple zip/unzip utility with extra indentation features for XML members
+
+=head1 SYNOPSIS
+
+Extract a member from a ZIP archive, with XML indentation :
+
+  zip-x -x <zip_archive_name> <member_name>
+  
+  # or in more verbose form
+  
+  zip-x -unzip -xml_indent -archive <zip_archive_name> -member <member_name>
+
+
+Replace a member into a ZIP archive, removing XML indentation :
+
+  zip-x -zip -xml_indent -archive <zip_archive_name> -member <member_name>
+
+
+=head1 DESCRIPTION
+
+This command-line utility extracts a single member from a ZIP archive, or
+replaces a single member into a ZIP archive. If the member is an XML file,
+automatic indentation or un-indentation will take place when the
+C<-x> option is activated.
+
+=head1 EMACS USAGE
+
+The motivation for writing this small application was to be able to
+inspect MsOffice files from within Emacs on a Windows machine. It solves
+two problems :
+
+=over
+
+=item *
+
+unlike most common unzip programs on windows, the contents of the extracted
+member is piped to STDOUT. This is a requirement of the C<arc.el> module
+in Emacs to be able to dynamically inspect a ZIP archive;
+
+=item *
+
+when the extracted member is an XML file, its content is nicely indented to
+make it readable by a human; without this feature, contents of MsOffice
+zipped files is hard to work with because this XML is packed on one single
+line without any spaces.
+
+=back
+
+To tell Emacs to use this app, you must customize (C<ESC-x customize-variable>) the 
+following variables :
+
+=over
+
+
+=item *
+
+C<archive-zip-extract> must be set to C<zip-x> with options C<-u> and C<-x>.
+
+=item *
+
+C<archive-zip-update> must be set to C<zip-x> with options C<-z> and C<-x>.
+
+=back
+
+
+
+
+=head1 AUTHOR
+
+DAMI, C<< <dami at cpan.org> >>
+
+=cut
+

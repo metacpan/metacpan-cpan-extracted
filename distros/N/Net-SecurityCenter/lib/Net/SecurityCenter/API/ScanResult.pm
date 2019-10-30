@@ -11,7 +11,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.202';
+our $VERSION = '0.203';
 
 my $common_template = {
 
@@ -165,7 +165,7 @@ sub get {
 
 #-------------------------------------------------------------------------------
 
-sub get_progress {
+sub progress {
 
     my ( $self, %args ) = @_;
 
@@ -185,7 +185,7 @@ sub get_progress {
 
 #-------------------------------------------------------------------------------
 
-sub get_status {
+sub status {
 
     my ( $self, %args ) = @_;
 
@@ -375,11 +375,11 @@ Params:
 =back
 
 
-=head2 get_progress
+=head2 progress
 
 Get scan progress associated with C<id>.
 
-    print 'Scan progress: ' . $sc->get_scan_progress( id => 1337 ) . '%';
+    print 'Scan progress: ' . $sc->progress( id => 1337 ) . '%';
 
 Params:
 
@@ -390,11 +390,11 @@ Params:
 =back
 
 
-=head2 get_status
+=head2 status
 
 Get scan status associated with C<id>.
 
-    print 'Scan status: ' . $sc->get_status( id => 1337 );
+    print 'Scan status: ' . $sc->status( id => 1337 );
 
 Params:
 
@@ -462,7 +462,7 @@ Params:
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/LotarProject/perl-Net-SecurityCenter/issues>.
+at L<https://github.com/giterlizzi/perl-Net-SecurityCenter/issues>.
 You will be notified automatically of any progress on your issue.
 
 
@@ -471,9 +471,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/LotarProject/perl-Net-SecurityCenter>
+L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
-    git clone https://github.com/LotarProject/perl-Net-SecurityCenter.git
+    git clone https://github.com/giterlizzi/perl-Net-SecurityCenter.git
 
 
 =head1 AUTHOR

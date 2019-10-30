@@ -1,0 +1,79 @@
+use strict;
+use warnings;
+use Test::More;
+use Dir::Flock;
+
+# secondary process
+# run with t/80b-multi.tt to contend
+# for a directory with another process
+# using Dir::Flock
+
+$| = 1;
+print "name: secondary\n";
+print "start: ",time,"\n";
+my $dirfile = $ENV{MULTI_DIR_FILE} ||
+    "t/80a.dir";
+
+opendir DH,"t";
+readdir DH;
+closedir DH;
+while (! -f $dirfile) {
+    sleep 1;
+    opendir DH,"t";
+    readdir DH;
+    closedir DH;
+}
+open my $fh, "<", $dirfile;
+my $dir = <$fh>;
+close $fh;
+unlink $dirfile;
+print "dir: $dir\n";
+print "read_dir: ",time,"\n";
+
+print "start_sh_nb1: ", time, "\n";
+my $z = Dir::Flock::lock_sh($dir,0);
+print "end_sh_nb1: ",time, "\n";
+print "status_sh_nb1: ",$z||0,"\n";
+if ($z) {
+    $z = Dir::Flock::unlock($dir);
+    print "status_unlock1: $z\n";
+}
+print "start_sh: ",time,"\n";
+$z = Dir::Flock::lock_sh($dir);
+print "end_sh: ",time,"\n";
+print "status_sh: $z\n";
+if ($z) {
+    print "start_sleep1: ",time,"\n";
+    sleep 10;
+    print "end_sleep1: ",time,"\n";
+    print "start_unlock2: ",time,"\n";
+    $z = Dir::Flock::unlock($dir);
+    print "end_unlock2: ",time,"\n";
+    print "status_unlock2: $z\n";
+}
+print "finish: ",time,"\n";
+
+__END__
+
+With a pair of scripts that interact 
+around the same lock, we can test:
+
+    multiprocess:
+
+        if (fork()==0) { exec("$^X t/80a-multi.tt") }
+        if (fork()==0) { exec("$^X t/80b-multi.tt") }
+        wait; wait;
+
+        if (fork()==0) { exec("$^X t/80b-multi.tt") }
+        if (fork()==0) { exec("$^X t/80a-multi.tt") }
+        wait; wait;
+
+    multihost:
+
+        if (fork()==0) { exec("$^X t/80b-multi.tt") }
+        if (fork()==0) { exec("ssh REMOTE 'cd $dir;$^X t/80a-multi.tt'") }
+        wait; wait;
+
+        if (fork()==0) { exec("$^X t/80a-multi.tt") }
+        if (fork()==0) { exec("ssh REMOTE 'cd $dir;$^X t/80b-multi.tt'") }
+        wait; wait;

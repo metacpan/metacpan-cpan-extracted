@@ -18,9 +18,9 @@ is $link->html, qq(<a class="le-link" href="mailto:jhthorsen\@cpan.org" title=""
 is_deeply $link->TO_JSON, {cache_age => 0, type => 'link', url => 'mailto:jhthorsen@cpan.org', version => '1.0'},
   'json';
 
-$link->url(Mojo::URL->new('http://<script>evil("code")</script>'));
+$link->url(Mojo::URL->new('https://<script>evil("code")</script>'));
 is $link->html,
-  qq(<a class="le-link" href="http://%3Cscript%3Eevil(%22code%22)%3C/script%3E" title="">http://&lt;script&gt;evil(&quot;code&quot;)&lt;/script&gt;</a>\n),
+  qq(<a class="le-link" href="https://%3Cscript%3Eevil(%22code%22)%3C/script%3E" title="">https://&lt;script&gt;evil(&quot;code&quot;)&lt;/script&gt;</a>\n),
   'evil html';
 
 $link = undef;

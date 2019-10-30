@@ -8,3 +8,7 @@ Revision history for Perl module Perl::RT2Github
     - Create HTTP::Tiny object in constructor for reusability;
       thanks to Dan Book
 
+0.03 Tue Oct 29 13:11:46 EDT 2019
+    - Utilize Test::RequiresInternet to determine if there is an
+      internet connection before testing
+
