@@ -12,7 +12,7 @@ use Carp ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.087';
+$VERSION = '2.089';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -1676,6 +1676,12 @@ compile-time as a string.
 The following lzma constants are exported by this module
 
 TODO - more here
+
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to 
+L<https://github.com/pmqs/Compress-Raw-Lzma/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Compress-Raw-Lzma>.
 
 =head1 SEE ALSO
 

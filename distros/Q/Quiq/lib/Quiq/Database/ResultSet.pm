@@ -5,14 +5,14 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.161';
+our $VERSION = '1.162';
 
 use Quiq::Object;
 use Time::HiRes ();
 use Quiq::Option;
 use Quiq::FileHandle;
 use Quiq::Properties;
-use Quiq::String;
+use Quiq::AnsiColor;
 use Quiq::Array;
 use Quiq::Duration;
 
@@ -711,6 +711,10 @@ sub asString {
 
 =over 4
 
+=item -color => $bool
+
+Erzeuge eine farbige Ausgabe mit ANSI Colors.
+
 =item -info => $n (Default: 3)
 
 Umfang an Information, die über die Daten hinaus ausgegeben wird:
@@ -787,11 +791,13 @@ sub asTable {
 
     # Optionen
 
+    my $color = 0;
     my $msg = '';
     my $info = 3;
 
     if (@_) {
         Quiq::Option->extract(\@_,
+            -color => \$color,
             -msg => \$msg,
             -info => \$info,
         );
@@ -800,14 +806,14 @@ sub asTable {
         }
     }
 
+    my $a = Quiq::AnsiColor->new($color);
+
     my $str = '';
 
     # Statement
 
     if ($info >= 3 && (my $stmt = $self->stmt)) {
-        #$str .= sprintf "%s\n\n%s\n\n",$stmt,
-        #    '-' x Quiq::String->maxLineLength($stmt);
-        $str .= sprintf "%s\n\n",$stmt;
+        $str .= $a->str('dark red',$stmt)."\n\n";
     }
     my @titles = $self->titles;
     if ($info >= 2) {
@@ -815,7 +821,7 @@ sub asTable {
 
         my $l = length scalar @titles;
         for (my $i = 0; $i < @titles; $i++) {
-            $str .= sprintf "%*d %s\n",$l,$i+1,$titles[$i];
+            $str .= $a->str('bold',sprintf '%*d %s',$l,$i+1,$titles[$i])."\n";
         }
     }
 
@@ -839,7 +845,8 @@ sub asTable {
             for (my $i = 0; $i < @fmt; $i++) {
                 my $numWidth = length $i+1;
                 my $width = abs($fmt[$i]->width)+3;
-                $str .= sprintf '%d%s',$i+1,(' ' x ($width-$numWidth));
+                $str .= $a->str('bold',sprintf '%d%s',$i+1,
+                    (' ' x ($width-$numWidth)));
             }
             $str .= "\n";
         }
@@ -862,15 +869,18 @@ sub asTable {
     if ($info) {
         # Statistik
 
-        $str .= sprintf "\n%s rows",$self->count;
+        my $tmp = sprintf "\n%s rows",$self->count;
         if (my $duration = $self->execTime + $self->fetchTime) {
-            $str .= ', '.Quiq::Duration->new($duration)->asShortString(
+            $tmp .= ', '.Quiq::Duration->new($duration)->asShortString(
                 -precision => 3,
             );
         }
+        $tmp = $a->str('bold',$tmp);
+
         if ($self->moreRowsExist) {
-            $str .= ' - *MORE ROWS EXIST*';
+            $tmp .= ' - *'.$a->str('red','MORE ROWS EXIST').'*';
         }
+        $str .= $tmp;
     }
     if ($msg) {
         $str .= $msg;
@@ -957,7 +967,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.161
+1.162
 
 =head1 AUTHOR
 

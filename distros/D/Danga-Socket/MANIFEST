@@ -10,3 +10,4 @@ t/10-events.t
 t/12-closerace.t
 examples/subprocess/example.pl
 examples/subprocess/test.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

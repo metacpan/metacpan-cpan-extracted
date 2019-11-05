@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 =head1 NAME
 
@@ -50,7 +50,10 @@ sub from {
     $src->each_while_source(sub {
         $self->emit($_)
     }, $self->source);
-    $src->completed->on_ready($self->source->completed);
+    $src->completed->on_ready(sub {
+        my $f = $self->source->completed;
+        shift->on_ready($f) unless $f->is_ready;
+    });
 # $self->{source} = $src;
     return $self
 }

@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::ResultSet::TestrunScheduling;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::ResultSet::TestrunScheduling::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::ResultSet::TestrunScheduling::VERSION = '5.0.11';
 use 5.010;
 use strict;
 use warnings;
@@ -87,7 +87,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

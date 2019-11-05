@@ -1,9 +1,29 @@
 ==================================================
-Changes from 2018-10-25 00:00:00 +0000 to present.
+Changes from 2018-11-04 00:00:00 +0000 to present.
 ==================================================
 
 --------------------------------------------
-version v0.0.15 at 2019-10-25 22:35:42 +0000
+version v0.0.16 at 2019-11-04 20:16:08 +0000
+--------------------------------------------
+
+  Change: 248acab8647ced2996db6f46550b54c7d1dc0ebc
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-04 15:15:58 +0000
+
+    Update README 
+
+  Change: c9577011e9c7eab977b5592c4b28ee2477f3975f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-11-01 13:14:06 +0000
+
+    Exclude Merge commits from Changelog
+
+    Specific ones hopefully, that are actual merges. Unfortunately the
+    ChangelogFromGit Plugin doesn't let you skip all actual merge
+    commits, the solution it provides is to exclude based on a regex. 
+
+--------------------------------------------
+version v0.0.15 at 2019-10-25 22:35:27 +0000
 --------------------------------------------
 
   Change: ddc01f9d3a417f8b918294e85137dc6a028e875b
@@ -11,18 +31,6 @@ version v0.0.15 at 2019-10-25 22:35:42 +0000
   Date : 2019-10-25 18:35:27 +0000
 
     Update README 
-
-  Change: 584f9028f21b7115d3e5686b82c73bfde11679ad
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-25 18:30:37 +0000
-
-    Merge pull request #14 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
-    require-newer-our_pkg_version-plugin to master
-
-    * commit '5679bca0a8e7dab0ce8d9e8754787428db8dd3d0':
-
-    Require OurPkgVersion Plugin version 0.20 
 
   Change: 5679bca0a8e7dab0ce8d9e8754787428db8dd3d0
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
@@ -42,24 +50,6 @@ version v0.0.14 at 2019-10-24 18:19:50 +0000
   Date : 2019-10-24 14:19:50 +0000
 
     Update README 
-
-  Change: 3cf95cc386358ef32dc7aca34bd754cde3d08372
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-24 14:18:29 +0000
-
-    Merge pull request #13 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
-    fix-version-detection to master
-
-    * commit '0f1bae0bbc861703e3d87258645147db20b5e828':
-
-    Document version specs
-
-    Adjust Changelog detection for our actual versions
-
-    Fix NextVersion for v0.0.0.0
-
-    Make sure we populate # VERSION 
 
   Change: 0f1bae0bbc861703e3d87258645147db20b5e828
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
@@ -102,20 +92,6 @@ version v0.0.13 at 2019-10-23 20:39:40 +0000
 
     Update README 
 
-  Change: bb6b1292b4e17160ada800b14ed56a7f8f56eb27
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-23 16:27:21 +0000
-
-    Merge pull request #11 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from set-eumm_version
-    to master
-
-    * commit 'dd8e1efe582da6a534e6624866e1c3a8ac283cf0':
-
-    Require new enough MakeMaker for "version range"
-
-    Fix $source_git directory 
-
   Change: dd8e1efe582da6a534e6624866e1c3a8ac283cf0
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
   Date : 2019-10-23 14:32:12 +0000
@@ -136,20 +112,6 @@ version v0.0.13 at 2019-10-23 20:39:40 +0000
 
     I guess a new version of the Git Plugins changed something? not sure. 
 
-  Change: 4c053b6ef5bd8377f9022c5c8d78f896c5bdd716
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-25 11:42:14 +0000
-
-    Merge pull request #9 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
-    use-vstring-versions to master
-
-    * commit 'c1e68133a3d742296059a597846d443edef61b43':
-
-    Correctly use semantic versioning
-
-    Whitespace improvements 
-
   Change: c1e68133a3d742296059a597846d443edef61b43
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
   Date : 2019-07-24 11:44:55 +0000
@@ -168,22 +130,6 @@ version v0.0.13 at 2019-10-23 20:39:40 +0000
 --------------------------------------------
 version v0.0.12 at 2019-07-11 21:47:49 +0000
 --------------------------------------------
-
-  Change: 87e1b2f819bbbe8e09fe03ec8ff1c1c7abb7f8ef
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-07-11 17:47:49 +0000
-
-    Merge pull request #8 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from harden-test-suite
-    to master
-
-    * commit 'a671b1db684a83110346137dd20db07b266fd5e0':
-
-    Remove a V from the environment
-
-    Set a default $ENV{EMAIL} in tests
-
-    Diag the git version to make debugging easier 
 
   Change: a671b1db684a83110346137dd20db07b266fd5e0
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
@@ -212,26 +158,6 @@ version v0.0.12 at 2019-07-11 21:47:49 +0000
 --------------------------------------------
 version v0.0.11 at 2019-06-28 16:42:30 +0000
 --------------------------------------------
-
-  Change: 4f804dd70de177ca4f28ef890bfe2842e6621834
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-28 12:42:30 +0000
-
-    Merge pull request #7 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from improve-kwalitee
-    to master
-
-    * commit '6355c0ca8876aa6a3961528d0cbd44fdb3efd330':
-
-    Stop if we detect git is too old
-
-    Update README
-
-    Add MetaProvides Plugin support
-
-    Add requires perl version, for kwalitee
-
-    Include a META.yml 
 
   Change: 6355c0ca8876aa6a3961528d0cbd44fdb3efd330
   Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
@@ -277,18 +203,6 @@ version v0.0.11 at 2019-06-28 16:42:30 +0000
 version v0.0.10 at 2019-06-11 21:36:34 +0000
 --------------------------------------------
 
-  Change: f79ab3b70dcd7a7a6a117c7c2643f8fcdab69058
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-11 17:36:34 +0000
-
-    Merge pull request #6 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
-    correct-docs-on-Makefile to master
-
-    * commit 'd1f6151491a766df210a72f5496fd92f21ba239d':
-
-    Fix Makefile examples in documentation 
-
   Change: d1f6151491a766df210a72f5496fd92f21ba239d
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
   Date : 2019-06-10 16:21:01 +0000
@@ -306,20 +220,6 @@ version v0.0.9 at 2019-06-10 18:48:05 +0000
     Update version in README.md
 
     Still need to figure out how to make that automatic. 
-
-  Change: 0bf1d598ed796d8a325ceace02b3301f8e2d7cbd
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-10 14:43:23 +0000
-
-    Merge pull request #5 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
-    fix-ignored-makefile to master
-
-    * commit 'ff4a1f8c8f8e7f43574c9369ec28574fab0d0b90':
-
-    Rename Makefile in sharedir to avoid MANIFEST.SKIP
-
-    Update README version. 
 
   Change: ff4a1f8c8f8e7f43574c9369ec28574fab0d0b90
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -339,24 +239,6 @@ version v0.0.8 at 2019-06-07 19:07:07 +0000
   Date : 2019-06-07 15:07:07 +0000
 
     Update README version. 
-
-  Change: 575769e0db59ef20fb4ee8496e417df8fe73cc47
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-07 15:01:49 +0000
-
-    Merge pull request #4 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from auto-install-dzil
-    to master
-
-    * commit '4f1a5c53fb4c201d1cdc904fdcfd515080d7c77e':
-
-    Rename carton target
-
-    Auto carton install develop requirements as needed
-
-    use $(CARTON) everywhere instead of hardcoding
-
-    Require GitHub::Meta >= 0.46 
 
   Change: 4f1a5c53fb4c201d1cdc904fdcfd515080d7c77e
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -396,20 +278,6 @@ version v0.0.7 at 2019-05-31 16:18:28 +0000
 
     Update README.md 
 
-  Change: 9e1c17d552f9ad6ef0004d08c625b4e258dc7d4c
-  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
-  Date : 2019-05-23 17:02:21 +0000
-
-    Merge pull request #1 in
-    ~FLICKING/p5-dist-zilla-pluginbundle-author-gsg from
-    feature/add-ourpkgversion to master
-
-    * commit 'c289a803b6c8ae05ae8290dc65c8f6384205d74c':
-
-    Add OurPkgVersion to pod and readme
-
-    Add OurPkgVersion plugin 
-
   Change: c289a803b6c8ae05ae8290dc65c8f6384205d74c
   Author: Mark Flickinger <mark.flickinger@grantstreet.com>
   Date : 2019-05-21 16:08:30 +0000
@@ -425,22 +293,6 @@ version v0.0.7 at 2019-05-31 16:18:28 +0000
 -------------------------------------------
 version v0.0.6 at 2019-05-02 16:58:04 +0000
 -------------------------------------------
-
-  Change: a65e53ce67e28e7dec0b426eb4f6fe78787d11bd
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-05-02 12:58:04 +0000
-
-    Merge pull request #3 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from misc-improvements
-    to master
-
-    * commit 'e05fd53a2fdb6efd31736a09dcb61f454cb4de23':
-
-    Adjust MANIFEST.SKIP to be less draconian
-
-    Switch to Git::GatherDir Plugin for speed
-
-    Pass configuration to StaticInstall Plugin 
 
   Change: e05fd53a2fdb6efd31736a09dcb61f454cb4de23
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>
@@ -466,34 +318,6 @@ version v0.0.6 at 2019-05-02 16:58:04 +0000
 -------------------------------------------
 version v0.0.5 at 2019-04-24 16:36:33 +0000
 -------------------------------------------
-
-  Change: f1627b95bfc9178e1f65e73c1ecb86469d85882b
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-04-24 12:36:33 +0000
-
-    Merge pull request #1 in
-    ~AFRESH/p5-dist-zilla-pluginbundle-author-gsg from
-    improve-test-coverage to master
-
-    * commit 'e4bb0bea97b97acdfad68c4d972d1823966ac4b3':
-
-    Avoid test failure in strange circumstance
-
-    Allow specifying EXTRA_UPDATES in Makefile
-
-    Simplify default license setup
-
-    Make it obvious that BUILDARGS is a class method
-
-    Use the default Pod::Weaver finder
-
-    Improve CONTRIBUTING docs
-
-    Fix bug in POD example
-
-    Use superhashof() instead of ignore()ing values
-
-    Tests for Plugin::Author::GSG 
 
   Change: e4bb0bea97b97acdfad68c4d972d1823966ac4b3
   Author: Andrew Fresh <andrew.fresh@grantstreet.com>

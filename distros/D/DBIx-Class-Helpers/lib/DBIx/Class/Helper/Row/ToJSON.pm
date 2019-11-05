@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::ToJSON;
-$DBIx::Class::Helper::Row::ToJSON::VERSION = '2.034000';
+$DBIx::Class::Helper::Row::ToJSON::VERSION = '2.034001';
 # ABSTRACT: Remove the boilerplate from your TO_JSON functions
 
 use strict;

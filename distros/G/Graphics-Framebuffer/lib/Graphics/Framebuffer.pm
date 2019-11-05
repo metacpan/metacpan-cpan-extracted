@@ -58,7 +58,7 @@ If you are using a Debian based system (Ubuntu, Weezy, Mint, Raspian, etc.) then
 
  sudo apt update
  sudo apt upgrade
- sudo apt install build-essential linux-headers-generic fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libfile-map-perl libtest-more-perl
+ sudo apt install build-essential fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libfile-map-perl libtest-most-perl
 
 =back
 
@@ -68,7 +68,7 @@ If you are using a RedHat based system (Fedora, CentOS, etc):
 
  sudo yum update
  sudo yum upgrade
- sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-file-map perl-imager perl-inline-c perl-test-more
+ sudo yum upgrade build-essential perl-math-bezier perl-math-gradient perl-file-map perl-imager perl-inline-c perl-test-most
 
 =back
 
@@ -169,11 +169,11 @@ If false, then the clipping region is the screen dimensions.
 
 The current drawing mode.  This is a numeric value corresponding to the constants described in the method 'draw_mode'
 
-=item B<COLOR>
+=item B<RAW_FOREGROUND_COLOR>
 
 The current foreground color encoded as a string.
 
-=item B<B_COLOR>
+=item B<RAW_BACKGROUND_COLOR>
 
 The current background color encoded as a string.
 
@@ -406,8 +406,8 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.37';
-    our @ISA       = qw(Exporter Graphics::Framebuffer::Splash Graphics::Framebuffer::Mouse);
+    our $VERSION   = '6.40';
+    our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
       FBIOPUT_VSCREENINFO
@@ -2272,7 +2272,9 @@ Emulation mode can be used as a secondary off-screen drawing surface, if you are
 
 =item B<FB_DEVICE> => 'EMULATED'
 
-Sets this object to be in emulation mode
+Sets this object to be in emulation mode.
+
+Emulation mode special variables for "new" method:
 
 =item B<VXRES>
 
@@ -2316,9 +2318,9 @@ sub new {
     my $this;
     $ENV{'PATH'} = '/usr/bin:/bin:/usr/local/bin'; # Testing doesn't work in taint mode unless this is here.
     my $self = {
-        'SCREEN'        => '',            # The all mighty framebuffer
+        'SCREEN'        => '',            # The all mighty framebuffer that is mapped to the real framebuffer later
 
-        'RESET'         => TRUE,
+        'RESET'         => TRUE,          # Default to use 'reset' on destroy
         'VERSION'       => $VERSION,      # Helps with debugging for people sending me dumps
         'HATCHES'       => [@HATCHES],    # Pull in hatches from Imager
 
@@ -2328,17 +2330,17 @@ sub new {
         'Imager-Has-Freetype2' => $Imager::formats{'ft2'} || 0,
         'Imager-Image-Types'   => [ map( {uc($_) } Imager->read_types()) ],
 
-        'I_COLOR'     => undef,           # Imager foreground color
-        'BI_COLOR'    => undef,           # Imager background color
+        'IMAGER_FOREGROUND_COLOR' => undef, # Imager foreground color
+        'IMAGER_BACKGROUND_COLOR' => undef, # Imager background color
         'X'           => 0,               # Last position plotted X
         'Y'           => 0,               # Last position plotted Y
         'X_CLIP'      => 0,               # Top left clip start X
         'Y_CLIP'      => 0,               # Top left clip start Y
         'YY_CLIP'     => undef,           # Bottom right clip end X
         'XX_CLIP'     => undef,           # Bottom right clip end Y
-        'CLIPPED'     => FALSE,
-        'COLOR'       => undef,           # Global foreground color (Raw string)
-        'B_COLOR'     => undef,           # Global Background Color
+        'CLIPPED'     => FALSE,           # Indicates if clipping is less than the full screen
+        'RAW_FOREGROUND_COLOR'       => undef,           # Global foreground color (Raw string)
+        'RAW_BACKGROUND_COLOR'     => undef,           # Global Background Color
         'DRAW_MODE'   => NORMAL_MODE,     # Drawing mode (Normal default)
         'DIAGNOSTICS' => FALSE,           # Determines if diagnostics are shown when images are loaded.
 
@@ -2365,6 +2367,38 @@ sub new {
         'WAIT_FOR_CONSOLE' => FALSE,
         'THIS_CONSOLE'     => 1,
         'CONSOLE'          => 1,
+
+        'NORMAL_MODE'   => NORMAL_MODE,     #   Constants for DRAW_MODE
+        'XOR_MODE'      => XOR_MODE,
+        'OR_MODE'       => OR_MODE,
+        'AND_MODE'      => AND_MODE,
+        'MASK_MODE'     => MASK_MODE,
+        'UNMASK_MODE'   => UNMASK_MODE,
+        'ALPHA_MODE'    => ALPHA_MODE,
+        'ADD_MODE'      => ADD_MODE,
+        'SUBTRACT_MODE' => SUBTRACT_MODE,
+        'MULTIPLY_MODE' => MULTIPLY_MODE,
+        'DIVIDE_MODE'   => DIVIDE_MODE,
+
+        'ARC'      => ARC,                  #   Constants for "draw_arc" method
+        'PIE'      => PIE,
+        'POLY_ARC' => POLY_ARC,
+
+        'RGB' => RGB,                                           #   Constants for color mapping
+        'RBG' => RBG,                                           #   Constants for color mapping
+        'BGR' => BGR,                                           #   Constants for color mapping
+        'BRG' => BRG,                                           #   Constants for color mapping
+        'GBR' => GBR,                                           #   Constants for color mapping
+        'GRB' => GRB,                                           #   Constants for color mapping
+
+        'CENTER_NONE' => CENTER_NONE,                           #   Constants for centering
+        'CENTER_X'    => CENTER_X,                              #   Constants for centering
+        'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
+        'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
+        'CENTRE_NONE' => CENTRE_NONE,                           #   Constants for centering
+        'CENTRE_X'    => CENTRE_X,                              #   Constants for centering
+        'CENTRE_Y'    => CENTRE_Y,                              #   Constants for centering
+        'CENTRE_XY'   => CENTRE_XY,                             #   Constants for centering
         ####################################################################
 
         'KD_GRAPHICS'         => 1,
@@ -2446,37 +2480,6 @@ sub new {
     };
     if ($self->{'GARBAGE'}) {
         my $garbage = {
-            'NORMAL_MODE'   => NORMAL_MODE,     #   Constants for DRAW_MODE
-            'XOR_MODE'      => XOR_MODE,
-            'OR_MODE'       => OR_MODE,
-            'AND_MODE'      => AND_MODE,
-            'MASK_MODE'     => MASK_MODE,
-            'UNMASK_MODE'   => UNMASK_MODE,
-            'ALPHA_MODE'    => ALPHA_MODE,
-            'ADD_MODE'      => ADD_MODE,
-            'SUBTRACT_MODE' => SUBTRACT_MODE,
-            'MULTIPLY_MODE' => MULTIPLY_MODE,
-            'DIVIDE_MODE'   => DIVIDE_MODE,
-
-            'ARC'      => ARC,                  #   Constants for "draw_arc" method
-            'PIE'      => PIE,
-            'POLY_ARC' => POLY_ARC,
-
-            'RGB' => RGB,                                           #   Constants for color mapping
-            'RBG' => RBG,                                           #   Constants for color mapping
-            'BGR' => BGR,                                           #   Constants for color mapping
-            'BRG' => BRG,                                           #   Constants for color mapping
-            'GBR' => GBR,                                           #   Constants for color mapping
-            'GRB' => GRB,                                           #   Constants for color mapping
-
-            'CENTER_NONE' => CENTER_NONE,                           #   Constants for centering
-            'CENTER_X'    => CENTER_X,                              #   Constants for centering
-            'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
-            'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
-            'CENTRE_NONE' => CENTRE_NONE,                           #   Constants for centering
-            'CENTRE_X'    => CENTRE_X,                              #   Constants for centering
-            'CENTRE_Y'    => CENTRE_Y,                              #   Constants for centering
-            'CENTRE_XY'   => CENTRE_XY,                             #   Constants for centering
 
             'PIXEL_TYPES'  => [
                 'Packed Pixels',
@@ -2833,20 +2836,6 @@ sub new {
         $self->{'BITS'}           = $self->{'vscreeninfo'}->{'bits_per_pixel'}; # The bits per pixel of the screen
         $self->{'BYTES'}          = $self->{'BITS'} / 8;                        # The number of bytes per pixel
         $self->{'BYTES_PER_LINE'} = $self->{'fscreeninfo'}->{'line_length'};    # The length of a single scan line in bytes
-
-#        if ($self->{'BYTES_PER_LINE'} < ($self->{'XRES'} * $self->{'BYTES'})) {    # I really wish I didn't need this
-#            warn __LINE__ . " Unable to detect line length due to improper byte alignment in C structure from IOCTL call, going to 'fbset -i' for more reliable information\n" if ($self->{'SHOW_ERRORS'});
-
-#            # Looks like we still have bad data
-#            my $fbset = `fbset -i`;
-#            if ($fbset =~ /Frame buffer device information/i) {
-#                ($self->{'BYTES_PER_LINE'}) = $fbset =~ /LineLength\s*:\s*(\d+)/m;
-#                $self->{'fscreeninfo'}->{'line_length'} = $self->{'BYTES_PER_LINE'};
-#                ($self->{'fscreeninfo'}->{'smem_len'})  = $fbset =~ /Size\s*:\s*(\d+)/m;
-#                ($self->{'fscreeninfo'}->{'type'})      = $fbset =~ /Type\s*:\s*(.*)/m;
-#            }
-#        }
-
         $self->{'PIXELS'}                    = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
         $self->{'SIZE'}                      = $self->{'PIXELS'} * $self->{'BYTES'};
         $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES_PER_LINE'} * $self->{'VYRES'} if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
@@ -2936,6 +2925,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
     } else { # Go into emulation mode if no actual framebuffer available
         $self->{'FB_DEVICE'}   = 'EMULATED';
         $self->{'SPLASH'}      = FALSE;
+        $self->{'RESET'}       = FALSE;
         $self->{'ERROR'}       = 'Framebuffer Device Not Found! Emulation mode.  EXPERIMENTAL!!';
         $self->{'COLOR_ORDER'} = $self->{ uc($self->{'COLOR_ORDER'}) };    # Translate the color order
 
@@ -3502,8 +3492,8 @@ You can add an optional parameter to turn the console cursor on or off too.
 =over 4
 
  $fb->clear_screen();      # Leave cursor as is.
- $fb->clear_screen('OFF'); # Turn cursor OFF.
- $fb->clear_screen('ON');  # Turn cursor ON.
+ $fb->clear_screen('OFF'); # Turn cursor OFF (Does nothing with emulated framebuffer mode).
+ $fb->clear_screen('ON');  # Turn cursor ON (Does nothing with emulated framebuffer mode).
 
 =back
 
@@ -3514,19 +3504,21 @@ sub clear_screen {
     my $self   = shift;
     my $cursor = shift || '';
 
-    if ($cursor =~ /off/i) {
-        system('clear && tput civis -- invisible');
-    } elsif ($cursor =~ /on/i) {
-        system('tput cnorm -- normal && reset');
+    unless($self->{'DEVICE'} eq 'EMULATED') { # We only do this stuff to real framebuffers
+        if ($cursor =~ /off/i) {
+            system('clear && tput civis -- invisible');
+        } elsif ($cursor =~ /on/i) {
+            system('tput cnorm -- normal && clear');
+        }
+        select(STDOUT);
+        $|++;
     }
-    select(STDOUT);
-    $|++;
     if ($self->{'CLIPPED'}) {
         my $w = $self->{'W_CLIP'};
         my $h = $self->{'H_CLIP'};
-        $self->blit_write({ 'x' => $self->{'X_CLIP'}, 'y' => $self->{'Y_CLIP'}, 'width' => $w, 'height' => $h, 'image' => $self->{'B_COLOR'} x ($w * $h) }, 0);
+        $self->blit_write({ 'x' => $self->{'X_CLIP'}, 'y' => $self->{'Y_CLIP'}, 'width' => $w, 'height' => $h, 'image' => $self->{'RAW_BACKGROUND_COLOR'} x ($w * $h) }, 0);
     } else {
-        substr($self->{'SCREEN'}, 0)                   = $self->{'B_COLOR'} x ($self->{'fscreeninfo'}->{'smem_len'} / $self->{'BYTES'});
+        substr($self->{'SCREEN'}, 0) = $self->{'RAW_BACKGROUND_COLOR'} x ($self->{'fscreeninfo'}->{'smem_len'} / $self->{'BYTES'});
     }
     $self->_flush_screen();
 }
@@ -3613,8 +3605,8 @@ sub plot {
             $self->{'SCREEN'},
             $x, $y,
             $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
-            $self->{'INT_COLOR'},
-            $self->{'INT_B_COLOR'},
+            $self->{'INT_RAW_FOREGROUND_COLOR'},
+            $self->{'INT_RAW_BACKGROUND_COLOR'},
             $self->{'COLOR_ALPHA'},
             $self->{'DRAW_MODE'},
             $self->{'BYTES'},
@@ -3633,54 +3625,54 @@ sub plot {
                     eval {
                         $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $self->{'BYTES'};
                         if ($self->{'DRAW_MODE'} == NORMAL_MODE) {
-                            $c  = $self->{'COLOR'};
+                            $c  = $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == XOR_MODE) {
-                            $c ^= $self->{'COLOR'};
+                            $c ^= $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == OR_MODE) {
-                            $c |= $self->{'COLOR'};
+                            $c |= $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == ALPHA_MODE) {
                             my $back  = $self->get_pixel({ 'x' => $x, 'y' => $y });
-                            my $saved = { 'main' => $self->{'COLOR'} };
+                            my $saved = { 'main' => $self->{'RAW_FOREGROUND_COLOR'} };
                             foreach my $color (qw( red green blue )) {
                                 $saved->{$color} = $self->{ 'COLOR_' . uc($color) };
                                 $back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $self->{'COLOR_ALPHA'}) + ($back->{$color} * (1 - $self->{'COLOR_ALPHA'}));
                             }
                             $back->{'alpha'} = min(255, $self->{'COLOR_ALPHA'} + $back->{'alpha'});
                             $self->set_color($back);
-                            $c = $self->{'COLOR'};
-                            $self->{'COLOR'} = $saved->{'main'};
+                            $c = $self->{'RAW_FOREGROUND_COLOR'};
+                            $self->{'RAW_FOREGROUND_COLOR'} = $saved->{'main'};
                             foreach my $color (qw( red green blue )) {
                                 $self->{ 'COLOR_' . uc($color) } = $saved->{$color};
                             }
                         } elsif ($self->{'DRAW_MODE'} == AND_MODE) {
-                            $c &= $self->{'COLOR'};
+                            $c &= $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == ADD_MODE) {
-                            $c += $self->{'COLOR'};
+                            $c += $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == SUBTRACT_MODE) {
-                            $c -= $self->{'COLOR'};
+                            $c -= $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == MULTIPLY_MODE) {
-                            $c *= $self->{'COLOR'};
+                            $c *= $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == DIVIDE_MODE) {
-                            $c /= $self->{'COLOR'};
+                            $c /= $self->{'RAW_FOREGROUND_COLOR'};
                         } elsif ($self->{'DRAW_MODE'} == MASK_MODE) {
                             if ($self->{'BITS'} == 32) {
-                                $c = $self->{'COLOR'} if (substr($self->{'COLOR'}, 0, 3) ne substr($self->{'B_COLOR'}, 0, 3));
+                                $c = $self->{'RAW_FOREGROUND_COLOR'} if (substr($self->{'RAW_FOREGROUND_COLOR'}, 0, 3) ne substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3));
                             } else {
-                                $c = $self->{'COLOR'} if ($self->{'COLOR'} ne $self->{'B_COLOR'});
+                                $c = $self->{'RAW_FOREGROUND_COLOR'} if ($self->{'RAW_FOREGROUND_COLOR'} ne $self->{'RAW_BACKGROUND_COLOR'});
                             }
                         } elsif ($self->{'DRAW_MODE'} == UNMASK_MODE) {
                             my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
                             my $raw   = $pixel->{'raw'};
                             if ($self->{'BITS'} == 32) {
-                                $c = $self->{'COLOR'} if (substr($raw, 0, 3) eq substr($self->{'B_COLOR'}, 0, 3));
+                                $c = $self->{'RAW_FOREGROUND_COLOR'} if (substr($raw, 0, 3) eq substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3));
                             } else {
-                                $c = $self->{'COLOR'} if ($raw eq $self->{'B_COLOR'});
+                                $c = $self->{'RAW_FOREGROUND_COLOR'} if ($raw eq $self->{'RAW_BACKGROUND_COLOR'});
                             }
                         }
                         substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) = $c;
                     };
                     my $error = $@;
-                    warn __LINE__ . " $error\n" if ($error && $self->{'SHOW_ERRORS'});
+                    warn __LINE__ . " $error" if ($error && $self->{'SHOW_ERRORS'});
                     $self->_fix_mapping() if ($error);
                 }
                 $self->{'history'}->{$y}->{$x} = 1 if (exists($self->{'history'}));
@@ -3948,8 +3940,8 @@ sub drawto {
             $self->{'SCREEN'},
             $start_x, $start_y, $x_end, $y_end,
             $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
-            $self->{'INT_COLOR'},
-            $self->{'INT_B_COLOR'},
+            $self->{'INT_RAW_FOREGROUND_COLOR'},
+            $self->{'INT_RAW_BACKGROUND_COLOR'},
             $self->{'COLOR_ALPHA'},
             $self->{'DRAW_MODE'},
             $self->{'BYTES'},
@@ -3993,15 +3985,15 @@ sub drawto {
             $width   = abs($x_end - $start_x);
             if ($size == 1) {
                 if ($start_x > $x_end) {
-                    $self->blit_write({ 'x' => $x_end, 'y' => $y_end, 'width' => $width, 'height' => 1, 'image' => $self->{'COLOR'} x $width });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $x_end, 'y' => $y_end, 'width' => $width, 'height' => 1, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x $width });    # Blitting a horizontal line is much faster!
                 } else {
-                    $self->blit_write({ 'x' => $start_x, 'y' => $start_y, 'width' => $width, 'height' => 1, 'image' => $self->{'COLOR'} x $width });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $start_x, 'y' => $start_y, 'width' => $width, 'height' => 1, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x $width });    # Blitting a horizontal line is much faster!
                 }
             } else {
                 if ($start_x > $x_end) {
-                    $self->blit_write({ 'x' => $x_end, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $self->{'COLOR'} x ($width * $size) });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $x_end, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x ($width * $size) });    # Blitting a horizontal line is much faster!
                 } else {
-                    $self->blit_write({ 'x' => $start_x, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $self->{'COLOR'} x ($width * $size) });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $start_x, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x ($width * $size) });    # Blitting a horizontal line is much faster!
                 }
             }
         } elsif ($antialiased) {
@@ -4095,8 +4087,10 @@ sub drawto {
 
 sub _flush_screen {
     my $self = shift;
-    select(STDERR);
-    $|++;
+    unless ($self->{'DEVICE'} eq 'EMULATED') {
+        select(STDERR);
+        $|++;
+    }
     select($self->{'FB'});
     $|++;
 }
@@ -4119,7 +4113,7 @@ sub _draw_line_antialiased {
     my $x1   = shift;
     my $y1   = shift;
 
-    my $saved = { %{ $self->{'SET_COLOR'} } };
+    my $saved = { %{ $self->{'SET_RAW_FOREGROUND_COLOR'} } };
 
     my $plot  = \&_adj_plot;
 
@@ -4435,13 +4429,13 @@ sub draw_arc {
                 'd2'     => $end_degrees,
                 'r'      => $radius,
                 'filled' => TRUE,
-                'color'  => $self->{'I_COLOR'},
+                'color'  => $self->{'IMAGER_FOREGROUND_COLOR'},
             );
             if (exists($params->{'hatch'})) {
                 $fill = Imager::Fill->new(
                     'hatch' => $params->{'hatch'} || 'dots16',
-                    'fg'    => $self->{'I_COLOR'},
-                    'bg'    => $self->{'BI_COLOR'}
+                    'fg'    => $self->{'IMAGER_FOREGROUND_COLOR'},
+                    'bg'    => $self->{'IMAGER_BACKGROUND_COLOR'}
                 );
                 $p{'fill'} = $fill;
             } elsif (exists($params->{'texture'})) {
@@ -4510,7 +4504,7 @@ sub draw_arc {
             );
             $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         };
-        warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         $self->blit_write($saved);
         $self->{'DRAW_MODE'} = $draw_mode if (defined($draw_mode));
     }
@@ -4753,7 +4747,7 @@ sub ellipse {
     $self->{'history'} = {} unless ($history_on || !$filled || $size > 1);
     my ($red, $green, $blue, $pattern, $plen, @rc, @gc, @bc);
     my $gradient  = FALSE;
-    my $saved     = $self->{'COLOR'};
+    my $saved     = $self->{'RAW_FOREGROUND_COLOR'};
     my $xdiameter = $XRadius * 2;
     my $ydiameter = $YRadius * 2;
     my $bytes     = $self->{'BYTES'};
@@ -4916,7 +4910,7 @@ sub ellipse {
         }
     }
     delete($self->{'history'}) if (exists($self->{'history'}) && !$history_on);
-    $self->{'COLOR'} = $saved;
+    $self->{'RAW_FOREGROUND_COLOR'} = $saved;
 }
 
 =head2 circle
@@ -4987,7 +4981,7 @@ sub circle {
     my $xstart = $_x;
 
     my @coords;
-    my $saved = $self->{'COLOR'};
+    my $saved = $self->{'RAW_FOREGROUND_COLOR'};
     my $W     = $r * 2;
     my $count = $W + abs($y1 - $y0);
     my $pattern;
@@ -5178,7 +5172,7 @@ sub circle {
                     $self->line({ 'x' => $_x, 'y' => $v, 'xx' => $_xx, 'yy' => $v, 'pixel_size' => 1 });
                 }
             } else {
-                $self->{'COLOR'} = $saved;
+                $self->{'RAW_FOREGROUND_COLOR'} = $saved;
                 $self->box({ 'x' => $_x, 'y' => $y0, 'xx' => $_xx, 'yy' => $y1, 'filled' => 1 });
             }
         } else {
@@ -5195,7 +5189,7 @@ sub circle {
             $self->line({ 'x' => $_x, 'y' => $y0, 'xx' => $_x, 'yy' => $y1, 'pixel_size' => $size });
         }
     }
-    $self->{'COLOR'} = $saved;
+    $self->{'RAW_FOREGROUND_COLOR'} = $saved;
     delete($self->{'history'});
 }
 
@@ -5392,15 +5386,15 @@ sub _fill_polygon {
         } elsif (exists($params->{'hatch'}) && defined($params->{'hatch'})) {
             $fill = Imager::Fill->new(
                 'hatch' => $params->{'hatch'} || 'dots16',
-                'fg'    => $self->{'I_COLOR'},
-                'bg'    => $self->{'BI_COLOR'}
+                'fg'    => $self->{'IMAGER_FOREGROUND_COLOR'},
+                'bg'    => $self->{'IMAGER_BACKGROUND_COLOR'}
             );
         } else {
-            $fill = Imager::Fill->new('solid' => $self->{'I_COLOR'});
+            $fill = Imager::Fill->new('solid' => $self->{'IMAGER_FOREGROUND_COLOR'});
         }
         $img->polygon(
             'points' => $points,
-            'color'  => $self->{'I_COLOR'},
+            'color'  => $self->{'IMAGER_FOREGROUND_COLOR'},
             'aa'     => $params->{'antialiased'} || 0,
             'filled' => TRUE,
             'fill'   => $fill,
@@ -5414,7 +5408,7 @@ sub _fill_polygon {
         );
         $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
     };
-    warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+    warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
     $self->blit_write($saved);
     $self->{'DRAW_MODE'} = $saved_mode;
 }
@@ -5551,8 +5545,8 @@ sub _generate_fill {
 
                 my $fill = Imager::Fill->new(
                     'hatch' => $type || 'dots16',
-                    'fg'    => $self->{'I_COLOR'},
-                    'bg'    => $self->{'BI_COLOR'}
+                    'fg'    => $self->{'IMAGER_FOREGROUND_COLOR'},
+                    'bg'    => $self->{'IMAGER_BACKGROUND_COLOR'}
                 );
                 $img->box('fill' => $fill);
                 $img->write(
@@ -5563,7 +5557,7 @@ sub _generate_fill {
                     'data'          => \$gradient
                 );
             };
-            warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+            warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
             $gradient = $self->_convert_24_to_16($gradient, RGB) if ($self->{'BITS'} == 16);
         }
     }
@@ -5685,7 +5679,7 @@ sub box {
         } elsif (exists($params->{'hatch'})) {
             $pattern = $self->_generate_fill($w, $h, undef, $params->{'hatch'});
         } else {
-            $pattern = $self->{'COLOR'} x ($w * $h);
+            $pattern = $self->{'RAW_FOREGROUND_COLOR'} x ($w * $h);
         }
         $self->blit_write({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $pattern });
         $self->{'X'} = $X;
@@ -5764,13 +5758,13 @@ Even if you are in 16 bit color mode, use 8 bit values.  They will be automatica
 sub set_color {
     my $self   = shift;
     my $params = shift;
-    my $name   = shift || 'COLOR';
+    my $name   = shift || 'RAW_FOREGROUND_COLOR';
 
     my $bytes       = $self->{'BYTES'};
     my $R           = int($params->{'red'})   & 255; # Color forced to fit within 0-255 value
     my $G           = int($params->{'green'}) & 255;
     my $B           = int($params->{'blue'})  & 255;
-    my $def_alpha   = ($name eq 'COLOR') ? 255 : 0;
+    my $def_alpha   = ($name eq 'RAW_FOREGROUND_COLOR') ? 255 : 0;
     my $A           = int($params->{'alpha'} || $def_alpha) & 255;
     my $color_order = $self->{'COLOR_ORDER'};
 
@@ -5815,10 +5809,10 @@ sub set_color {
     } elsif ($color_order == GBR) {
         ($G, $B, $R) = ($R,$G,$B);
     }
-    if ($name eq 'COLOR') {
-        $self->{'I_COLOR'}  = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
+    if ($name eq 'RAW_FOREGROUND_COLOR') {
+        $self->{'IMAGER_FOREGROUND_COLOR'}  = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
     } else {
-        $self->{'BI_COLOR'} = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
+        $self->{'IMAGER_BACKGROUND_COLOR'} = ($self->{'BITS'} == 32) ? Imager::Color->new($R, $G, $B, $A) : Imager::Color->new($R, $G, $B);
     }
 }
 
@@ -5863,7 +5857,7 @@ The same rules as set_color apply.
 
 sub set_b_color {
     my $self = shift;
-    $self->set_color(shift, 'B_COLOR');
+    $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 }
 
 =head2 set_background_color
@@ -5874,7 +5868,7 @@ Same as set_b_color
 
 sub set_background_color {
     my $self = shift;
-    $self->set_color(shift, 'B_COLOR');
+    $self->set_color(shift, 'RAW_BACKGROUND_COLOR');
 }
 
 =head2 fill
@@ -5901,7 +5895,7 @@ sub fill {
     my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
     my $bytes = $self->{'BYTES'};
 
-    return if ($back eq $self->{'COLOR'});
+    return if ($back eq $self->{'RAW_FOREGROUND_COLOR'});
     unless ($self->{'ACCELERATED'}) {
         my $background = $pixel->{'raw'};
         my %visited    = ();
@@ -6002,14 +5996,14 @@ sub fill {
                 $img->flood_fill(
                     'x'     => int($x - $self->{'X_CLIP'}),
                     'y'     => int($y - $self->{'Y_CLIP'}),
-                    'color' => $self->{'I_COLOR'},
+                    'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
                     'fill'  => { 'image' => $pimg }
                 );
             } else {
                 $img->flood_fill(
                     'x'     => int($x - $self->{'X_CLIP'}),
                     'y'     => int($y - $self->{'Y_CLIP'}),
-                    'color' => $self->{'I_COLOR'},
+                    'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
                 );
             }
             $img->write(
@@ -6021,7 +6015,7 @@ sub fill {
             );
             $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         };
-        warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
 
         $self->blit_write($saved);
     }
@@ -6193,6 +6187,8 @@ sub blit_flip {
 
 Moves a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  It moves in the current drawing mode.  It differs from "blit_copy" in that it removes the graphic from the original location (via XOR).
 
+It also returns the data moved like "blit_read"
+
 =over 4
 
  $fb->blit_move({
@@ -6201,7 +6197,8 @@ Moves a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  It
     'width'  => 30,
     'height' => 30,
     'x_dest' => 200,
-    'y_dest' => 200
+    'y_dest' => 200,
+    'image'  => $raw_image_data, # This is optional, but can speed things up
  });
 
 =back
@@ -6213,13 +6210,20 @@ sub blit_move {
     my $params = shift;
 
     my $old_mode = $self->{'DRAW_MODE'};
-    my $image    = $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) });
+    my $image    = (exists($params->{'image'})) ?
+        $params
+        :
+        $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) });
     $self->xor_mode();
     $self->blit_write($image);
     $self->{'DRAW_MODE'} = $old_mode;
     $image->{'x'}        = int($params->{'x_dest'});
     $image->{'y'}        = int($params->{'y_dest'});
+    $self->vsync();
     $self->blit_write($image);
+    delete($image->{'x_dest'});
+    delete($image->{'y_dest'});
+    return($image);
 }
 
 =head2 play_animation
@@ -6396,10 +6400,8 @@ sub blit_read {
     $w = $self->{'XX_CLIP'} - $x if ($w > ($clipw));
     $h = $self->{'YY_CLIP'} - $y if ($h > ($cliph));
 
-    my $yend = $y + $h;
     my $W    = $w * $self->{'BYTES'};
-    my $XX   = ($self->{'XOFFSET'} + $x) * $self->{'BYTES'};
-    my ($index, $scrn, $line);
+    my $scrn = '';
     if ($h > 1 && $self->{'ACCELERATED'} == SOFTWARE) {
         $scrn = chr(0) x ($W * $h);
         c_blit_read(
@@ -6412,12 +6414,14 @@ sub blit_read {
             $self->{'BYTES'},
             $draw_mode,
             $self->{'COLOR_ALPHA'},
-            $self->{'B_COLOR'},
+            $self->{'RAW_BACKGROUND_COLOR'},
             $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}
         );
     } else {
+        my $yend = $y + $h;
+        my $XX   = ($self->{'XOFFSET'} + $x) * $self->{'BYTES'};
         foreach my $line ($y .. ($yend - 1)) {
-            $index = ($self->{'BYTES_PER_LINE'} * ($line + $self->{'YOFFSET'})) + $XX;
+            my $index = ($self->{'BYTES_PER_LINE'} * ($line + $self->{'YOFFSET'})) + $XX;
             $scrn .= substr($self->{'SCREEN'}, $index, $W);
         }
     }
@@ -6475,7 +6479,7 @@ sub blit_write {
             $bytes,
             $draw_mode,
             $self->{'COLOR_ALPHA'},
-            $self->{'B_COLOR'},
+            $self->{'RAW_BACKGROUND_COLOR'},
             $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}
         );
     } else {
@@ -6524,7 +6528,6 @@ sub blit_write {
                                 $g                  = int(($G * $A) + ($g * $invA)) >> 8;
                                 $b                  = int(($B * $A) + ($b * $invA)) >> 8;
 
-#                                $a = int($a + $A) & 255;
                                 my $c = pack("C$bytes", $r, $g, $b, $A);
                                 if (substr($scrn, ($idx + $px4), $bytes) ne $c) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = $c;
@@ -6568,15 +6571,15 @@ sub blit_write {
                             $ipx  = $index + $px4;
                             $data = substr($self->{'SCREEN'}, $ipx, $bytes) || chr(0) x $bytes;
                             if ($self->{'BITS'} == 32) {
-                                if (substr($scrn, ($idx + $px4), 3) ne substr($self->{'B_COLOR'}, 0, 3)) {
+                                if (substr($scrn, ($idx + $px4), 3) ne substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3)) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 24) {
-                                if (substr($scrn, ($idx + $px4), 3) ne $self->{'B_COLOR'}) {
+                                if (substr($scrn, ($idx + $px4), 3) ne $self->{'RAW_BACKGROUND_COLOR'}) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 16) {
-                                if (substr($scrn, ($idx + $px4), 2) ne $self->{'B_COLOR'}) {
+                                if (substr($scrn, ($idx + $px4), 2) ne $self->{'RAW_BACKGROUND_COLOR'}) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             }
@@ -6587,15 +6590,15 @@ sub blit_write {
                             $ipx  = $index + $px4;
                             $data = substr($self->{'SCREEN'}, $ipx, $bytes);
                             if ($self->{'BITS'} == 32) {
-                                if (substr($self->{'SCREEN'}, $ipx, 3) eq substr($self->{'B_COLOR'}, 0, 3)) {
+                                if (substr($self->{'SCREEN'}, $ipx, 3) eq substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3)) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 24) {
-                                if (substr($self->{'SCREEN'}, $ipx, 3) eq $self->{'B_COLOR'}) {
+                                if (substr($self->{'SCREEN'}, $ipx, 3) eq $self->{'RAW_BACKGROUND_COLOR'}) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 16) {
-                                if (substr($self->{'SCREEN'}, $ipx, 2) eq $self->{'B_COLOR'}) {
+                                if (substr($self->{'SCREEN'}, $ipx, 2) eq $self->{'RAW_BACKGROUND_COLOR'}) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             }
@@ -6606,7 +6609,7 @@ sub blit_write {
             }
         };
         if ($@) {
-            warn __LINE__ . " $@\n" if ($self->{'SHOW_ERRORS'});
+            warn __LINE__ . " $@" if ($self->{'SHOW_ERRORS'});
             $self->_fix_mapping();
         }
     }
@@ -6829,7 +6832,7 @@ sub blit_transform {
                 'data'          => \$data
             );
         };
-        warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
 
         $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
         return (
@@ -6905,7 +6908,7 @@ sub blit_transform {
                 my $wh = int(sqrt($width**2 + $height**2) + .5);
 
                 # Try to define as much as possible before the loop to optimize
-                $data = $self->{'B_COLOR'} x (($wh**2) * $bytes);
+                $data = $self->{'RAW_BACKGROUND_COLOR'} x (($wh**2) * $bytes);
 
                 c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes);
                 return (
@@ -6934,9 +6937,9 @@ sub blit_transform {
                 );
                 my $rotated;
                 if (abs($degrees) == 90 || abs($degrees) == 180 || abs($degrees) == 270) {
-                    $rotated = $img->rotate('right' => 0 - $degrees, 'back' => $self->{'BI_COLOR'});
+                    $rotated = $img->rotate('right' => 0 - $degrees, 'back' => $self->{'IMAGER_BACKGROUND_COLOR'});
                 } else {
-                    $rotated = $img->rotate('degrees' => 0 - $degrees, 'back' => $self->{'BI_COLOR'});
+                    $rotated = $img->rotate('degrees' => 0 - $degrees, 'back' => $self->{'IMAGER_BACKGROUND_COLOR'});
                 }
                 $width  = $rotated->getwidth();
                 $height = $rotated->getheight();
@@ -6949,7 +6952,7 @@ sub blit_transform {
                 );
                 $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
             };
-            warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+            warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         }
         return (
             {
@@ -6993,7 +6996,7 @@ sub blit_transform {
                 'data'          => \$data
             );
         };
-        warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         $data = $self->_convert_24_to_16($data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
         return (
             {
@@ -7333,7 +7336,7 @@ sub ttf_print {
             $P_color = $green . $blue . $red . $alpha;
         }
     } else {
-        $P_color = $self->{'I_COLOR'};
+        $P_color = $self->{'IMAGER_FOREGROUND_COLOR'};
     }
 
     my $font = Imager::Font->new(
@@ -7342,7 +7345,7 @@ sub ttf_print {
         'size'  => $TTF_h
     );
     unless (defined($font)) {
-        warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
+        warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr() if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
     if (defined($params->{'rotate'}) && abs($params->{'rotate'}) > 0 && abs($params->{'rotate'} < 360)) {
@@ -7360,7 +7363,7 @@ sub ttf_print {
             #        $TTF_x = $left;
             #        $TTF_y = $miny;
         };
-        warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
     } else {
         eval { ($neg_width, $global_descent, $pos_width, $global_ascent, $descent, $ascent, $advance_width, $right_bearing) = $font->bounding_box('string' => $text, 'canon' => 1, 'size' => $TTF_h, 'sizew' => $sizew); };
         if ($@) {
@@ -7389,7 +7392,7 @@ sub ttf_print {
     my $image;
     my $draw_mode;
     if ($TTF_pw <= 0 || $TTF_ph <= 0) {
-        warn __LINE__ . " Calculated size of font width/height is less than or equal to zero!  Cannot render font.\n" if ($self->{'SHOW_ERRORS'});
+        warn __LINE__ . " Calculated size of font width/height is less than or equal to zero!  Cannot render font." if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
     eval {
@@ -7436,7 +7439,7 @@ sub ttf_print {
         );
     };
     if ($@) {
-        warn __LINE__ . " ERROR $@\n", Imager->errstr() . "\n$TTF_pw,$TTF_ph\n" if ($self->{'SHOW_ERRORS'});
+        warn __LINE__ . " ERROR $@\n", Imager->errstr() . "\n$TTF_pw,$TTF_ph" if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
     $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
@@ -7501,6 +7504,7 @@ sub ttf_paragraph {
     my $text      = $params->{'text'}              || ' ';
     my $face      = $params->{'face'}              || $self->{'FONT_FACE'};
     my $justify   = $params->{'justify'}           || 'left';
+    $justify =~ s/centre/center/; # Wacky Brits and Canadians
     my $linegap   = int($params->{'line_spacing'}) || 0;
     my $font_path = $params->{'font_path'}         || $self->{'FONT_PATH'};
     my $P_color   = $params->{'color'} if (exists($params->{'color'}));
@@ -7531,7 +7535,7 @@ sub ttf_paragraph {
             $P_color = $green . $blue . $red . $alpha;
         }
     } else {
-        $P_color = $self->{'I_COLOR'};
+        $P_color = $self->{'IMAGER_FOREGROUND_COLOR'};
     }
 
     my $font = Imager::Font->new(
@@ -7539,7 +7543,7 @@ sub ttf_paragraph {
         'color' => $P_color,
     );
     unless (defined($font)) {
-        warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
+        warn __LINE__ . " Can't initialize Imager::Font!\n", Imager->errstr() if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
     my $img;
@@ -7796,7 +7800,7 @@ sub load_image {
                 'datachannels'     => max(3, $self->{'BYTES'}),
             ); 
         };
-        warn __LINE__ . " $@\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@" if ($@ && $self->{'SHOW_ERRORS'});
     } else {
         eval {
             push(@Img,Imager->new(
@@ -7807,11 +7811,11 @@ sub load_image {
                 'raw_datachannels' => max(3, $self->{'BYTES'}),
             ));
         };
-        warn __LINE__ . " $@\n" if ($@ && $self->{'SHOW_ERRORS'});
+        warn __LINE__ . " $@" if ($@ && $self->{'SHOW_ERRORS'});
     }
     $bench_load = sprintf('%.03f', time - $bench_load);
     unless (defined($Img[0])) {
-        warn __LINE__ . " I can't get Imager to set up an image buffer $params->{'file'}!  Check your Imager installation.\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
+        warn __LINE__ . " I can't get Imager to set up an image buffer $params->{'file'}!  Check your Imager installation.\n", Imager->errstr() if ($self->{'SHOW_ERRORS'});
     } else {
         foreach my $img (@Img) {
             next unless (defined($img));
@@ -7906,8 +7910,8 @@ sub load_image {
                     'data'              => \$data
                 );
                 if ($params->{'convertalpha'}) {
-                    my $oback = substr($self->{'B_COLOR'}, 0, 3);
-                    my $nback = $self->{'B_COLOR'};
+                    my $oback = substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3);
+                    my $nback = $self->{'RAW_BACKGROUND_COLOR'};
                     $data =~ s/$oback./$nback/g;
                 }
             } elsif ($self->{'BITS'} == 24 ) {
@@ -8129,6 +8133,65 @@ sub _convert_16_to_24 {
         }
     }
     return ($new_img);
+}
+
+### Bitmap conversion routines ###
+
+# Convert 8 bit bitmap to 32 bit bitmap
+
+sub _convert_8_to_32 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+    my $pallette    = shift; # Reference to an array of 256 pallette entries
+
+    my $size = length($img);
+    my $new_img = '';
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = $self->RGB888_to_RGB8888({'color' => $pallette->[unpack('C',substr($img,$idx,1))]});
+        $new_img .= $color->{'color'};
+        $idx++;
+    }
+    return($new_img);
+}
+
+# Convert 8 bit bitmap to 24 bit bitmap
+
+sub _convert_8_to_24 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+    my $pallette    = shift; # Reference to an array of 256 pallette entries
+
+    my $size = length($img);
+    my $new_img = '';
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = $pallette->[unpack('C',substr($img,$idx,1))];
+        $new_img .= $color;
+        $idx++;
+    }
+    return($new_img);
+}
+
+# Convert 8 bit bitmap to 16 bit bitmap
+
+sub _convert_8_to_16 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+    my $pallette    = shift; # Reference to an array of 256 pallette entries
+
+    my $size = length($img);
+    my $new_img = '';
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = $self->RGB888_to_RGB565({'color' => $pallette->[unpack('C',substr($img,$idx,1))]});
+        $new_img .= $color->{'color'};
+        $idx++;
+    }
+    return($new_img);
 }
 
 # Convert 16 bit bitmap to 32 bit bitmap
@@ -8540,9 +8603,10 @@ sub RGB888_to_RGBA8888 {
     my $self   = shift;
     my $params = shift;
 
+    my $alpha    = (exists($params->{'alpha'})) ? $params->{'alpha'} : 255;
     my $big_data = $params->{'color'};
     my $bsize    = length($big_data);
-    my $n_data   = chr(255) x (($bsize / 3) * 4);
+    my $n_data   = chr($alpha) x (($bsize / 3) * 4);
     my $index    = 0;
     for (my $count = 0; $count < $bsize; $count += 3) {
         substr($n_data, $index, 3) = substr($big_data, $count + 2, 1) . substr($big_data, $count + 1, 1) . substr($big_data, $count, 1);
@@ -8786,7 +8850,7 @@ sub _set_ioctl {
     eval { return (ioctl($fb, $command, $data)); };
 }
 
-sub _slurp {
+sub _slurp { # Just used for /proc
     my $file = shift;
     my $buffer = '';
     eval {
@@ -8826,7 +8890,7 @@ I have never tested with forks.  Do at your own risk, but follow the same rules 
 
 =head2 MCE
 
-Mario Roy has tested Graphics::Framebuffer with various methods to use the MCE modules for multiprocessing, and creating a single shared library.  See the "README" file for more.  I highly recommend this for multiprocessing.
+Mario Roy has tested Graphics::Framebuffer with various methods to use the MCE modules for multiprocessing, and creating a single shared library.  See the "README" file for more.  I highly recommend this for multiprocessing, as it should save on memory.
 
 =head2 BLITTING
 
@@ -8954,7 +9018,7 @@ Only use pixel sizes of 1.  Anything larger requires a box to be drawn at the pi
 
 Try using 'polygon' to draw complex shapes instead of a series of plot or line commands.
 
-Does your device have more than one core?  Well, how about using threads?  Just make sure you do it according to the examples in the "examples" directory.  Yes, I know this can be too advanced for the average coder, but the option is there.
+Does your device have more than one core?  Well, how about using threads (or MCE)?  Just make sure you do it according to the examples in the "examples" directory.  Yes, I know this can be too advanced for the average coder, but the option is there.
 
 Plain and simple, your device just may be too slow for some CPU intensive operations, specifically anything involving animated images and heaviy blitting.  If you must use images, then make sure they are already the right size for your needs.  Don't force the module to resize them when loading, as this takes CPU time.
 
@@ -8996,7 +9060,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.37 (Oct 22, 2019)
+Version 6.40 (Nov 4, 2019)
 
 =head1 THANKS
 

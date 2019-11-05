@@ -1,5 +1,5 @@
-=== README for XML-Compile-SOAP-Mojolicious version 0.01
-=   Generated on Tue Mar 15 08:33:30 2016 by OODoc 2.02
+=== README for XML-Compile-SOAP-Mojolicious version 0.03
+=   Generated on Wed Dec 19 09:30:15 2018 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-Compile-SOAP-Mojolicious-0.01.tar.gz
-       tar -xf XML-Compile-SOAP-Mojolicious-0.01.tar
-       cd XML-Compile-SOAP-Mojolicious-0.01
+       gzip -d XML-Compile-SOAP-Mojolicious-0.03.tar.gz
+       tar -xf XML-Compile-SOAP-Mojolicious-0.03.tar
+       cd XML-Compile-SOAP-Mojolicious-0.03
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-Compile-SOAP-Mojolicious-0.01/
+    http://search.cpan.org/dist/XML-Compile-SOAP-Mojolicious-0.03/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-SOAP-Mojolicious

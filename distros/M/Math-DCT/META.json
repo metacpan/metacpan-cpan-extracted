@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Tools::Compare" : "0",
+            "Test2::Tools::Compare" : "0.000081",
             "Test2::Tools::Exception" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0"
@@ -53,6 +53,6 @@
          "web" : "https://github.com/SpareRoom/Math-DCT"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -9,12 +9,11 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-# Use all the modules so we don't get weird dependency issues
-
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
+    'Dist::Zilla::Role::PluginBundle::Airplane',
     'Dist::Zilla::Role::PluginBundle::PluginRemover' =>
     { -version => '0.103' },
     'Dist::Zilla::Role::PluginBundle::Config::Slicer';
@@ -25,14 +24,6 @@ has server => (
     init_arg => undef,
     lazy     => 1,
     default  => sub { $_[0]->payload->{server} // 'gitlab' },
-);
-
-has airplane => (
-    is       => 'ro',
-    isa      => 'Bool',
-    init_arg => undef,
-    lazy     => 1,
-    default => sub { $ENV{DZIL_AIRPLANE} || $_[0]->payload->{airplane} // 0 },
 );
 
 has license => (
@@ -143,21 +134,6 @@ has changes_version_columns => (
     default => sub { $_[0]->payload->{changes_version_columns} // 10 },
 );
 
-my @network_plugins = qw(
-    PromptIfStale
-    Test::Pod::LinkCheck
-    Test::Pod::No404s
-    Git::Remote::Check
-    CheckPrereqsIndexed
-    CheckIssues
-    UploadToCPAN
-    UploadToStratopan
-    Git::Push
-);
-my %network_plugins;
-@network_plugins{ map { Dist::Zilla::Util->expand_config_package_name($_) }
-        @network_plugins } = () x @network_plugins;
-
 sub _warn_me {
     my $msg = shift;
     warn(sprintf("[\@Author::WATERKIP]  %s\n", $msg));
@@ -168,6 +144,20 @@ sub commit_files_after_release {
     grep { -e }
         sort(uniq('README.pod', 'Changes', $self->copy_files_from_release, $self->copy_files_from_build));
 }
+
+sub build_network_plugins {
+    return [qw(
+        PromptIfStale
+        Test::Pod::LinkCheck
+        Test::Pod::No404s
+        Git::Remote::Check
+        CheckPrereqsIndexed
+        CheckIssues
+        UploadToCPAN
+        UploadToStratopan
+        Git::Push
+    )];
+};
 
 my %removed;
 
@@ -293,21 +283,6 @@ sub configure {
         ],
     );
 
-    if ($self->airplane) {
-        _warn_me(
-            "Building in airplane mode, skipping network required modules"
-        );
-        @plugins = grep {
-            my $plugin
-                = Dist::Zilla::Util->expand_config_package_name(
-                !ref($_) ? $_ : ref eq 'ARRAY' ? $_->[0] : die 'wtf');
-            not exists $network_plugins{$plugin}
-        } @plugins;
-
-        # halt release after pre-release checks, but before ConfirmRelease
-        push @plugins, 'BlockRelease';
-    }
-
     # Disable test::perl::critic as it messes with the version rewrite
     # that happens during a build
     # Also disable portability files as foo.conf.dist is not allowed :(
@@ -334,8 +309,9 @@ sub configure {
             # for first Git::Commit
             commit_files_after_release => [$self->commit_files_after_release],
 
-            # because of [Git::Check], only files copied from the release would be added -- there is nothing else
-            # hanging around in the current directory
+            # because of [Git::Check], only files copied from the release would
+            # be added -- there is nothing else hanging around in the current
+            # directory
             'release snapshot.add_files_in' => ['.'],
             'release snapshot.commit_msg'   => '%N-%v%t%n%n%c',
 
@@ -354,6 +330,7 @@ sub configure {
 
 }
 
+
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -368,7 +345,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 SYNOPSIS
 

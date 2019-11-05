@@ -18,29 +18,38 @@ my $meta = {
   "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          develop   => {
-                                         recommends => {
-                                           "Dist::Inkt" => 0.001,
-                                           "Plack" => 0,
-                                           "Plack::Middleware::CrossOrigin" => 0,
-                                           "Web::Simple" => 0,
-                                         },
-                                       },
+                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "FindBin"               => 0,
-                                           "IO::Socket::SSL"       => 0,
-                                           "LWP::UserAgent::https" => 0,
-                                           "Test::Deep"            => 0,
-                                           "Test::FITesque::RDF"   => 0.014,
-                                           "Test::More"            => 0.96,
-                                           "Test::RDF"             => 0,
+                                           "FindBin"                 => 0,
+                                           "IO::Socket::SSL"         => 0,
+                                           "LWP::Protocol::https"    => 0,
+                                           "LWP::UserAgent"          => 0,
+                                           "parent"                  => 0,
+                                           "perl"                    => 5.014,
+                                           "Test::Deep"              => 0,
+                                           "Test::FITesque::Fixture" => 0,
+                                           "Test::FITesque::RDF"     => 0.014,
+                                           "Test::More"              => 0.96,
+                                           "Test::RDF"               => 0,
+                                         },
+                                       },
+                          test      => {
+                                         requires => {
+                                           "HTTP::Server::Simple::PSGI" => 0,
+                                           "Moo" => 0,
+                                           "Net::EmptyPort" => 0,
+                                           "Plack" => 0,
+                                           "Plack::Middleware::CrossOrigin" => 0,
+                                           "Types::Standard" => 0,
+                                           "URI" => 0,
+                                           "Web::Simple" => 0,
                                          },
                                        },
                         },
   "provides"         => {
-                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.004 },
-                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.004 },
+                          "Web::Solid::Test::Basic"     => { file => "lib/Web/Solid/Test/Basic.pm", version => 0.006 },
+                          "Web::Solid::Test::HTTPLists" => { file => "lib/Web/Solid/Test/HTTPLists.pm", version => 0.006 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -56,7 +65,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project",
                         },
-  "version"          => 0.004,
+  "version"          => 0.006,
   "x_static_install" => 1,
 };
 

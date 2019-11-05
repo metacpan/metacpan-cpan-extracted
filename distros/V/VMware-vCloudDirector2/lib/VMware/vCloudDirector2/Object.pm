@@ -5,7 +5,7 @@ package VMware::vCloudDirector2::Object;
 use strict;
 use warnings;
 
-our $VERSION = '0.105'; # VERSION
+our $VERSION = '0.106'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -261,6 +261,17 @@ method build_sub_objects ($type) {
     return @objects;
 }
 
+method build_sub_sub_objects ($type, $subtype) {
+    my @objects;
+
+    return unless ( exists( $self->hash->{$type} ) and is_plain_hashref( $self->hash->{$type} ) );
+    return unless ( exists( $self->hash->{$type}{$subtype} ) );
+    foreach my $thing ( $self->_listify( $self->hash->{$type}{$subtype} ) ) {
+        push( @objects, $self->_create_object( $thing, $subtype ) );
+    }
+    return @objects;
+}
+
 method build_children_objects () {
     my $hash = $self->hash;
     return unless ( exists( $hash->{children} ) and is_plain_hashref( $hash->{children} ) );
@@ -325,7 +336,7 @@ VMware::vCloudDirector2::Object - Module to contain an object!
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head2 Attributes
 
@@ -417,6 +428,14 @@ an object.
 Given a type (specifically a key used within the current object hash), grabs
 the descendants of that key and instantiates them as partial objects (they can
 then be inflated into full objects).
+
+=head3 build_sub_sub_objects
+
+Similar to L<build_sub_objects>, but builds objects from two levels down.
+
+=head3 build_children_objects
+
+Similar to L<build_sub_objects>, but builds objects from within a children hash
 
 =head3 DELETE
 

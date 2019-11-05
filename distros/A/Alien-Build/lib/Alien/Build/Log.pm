@@ -6,7 +6,7 @@ use 5.008001;
 use Carp ();
 
 # ABSTRACT: Alien::Build logging
-our $VERSION = '1.89'; # VERSION
+our $VERSION = '1.92'; # VERSION
 
 
 my $log_class;
@@ -63,7 +63,7 @@ Alien::Build::Log - Alien::Build logging
 
 =head1 VERSION
 
-version 1.89
+version 1.92
 
 =head1 SYNOPSIS
 

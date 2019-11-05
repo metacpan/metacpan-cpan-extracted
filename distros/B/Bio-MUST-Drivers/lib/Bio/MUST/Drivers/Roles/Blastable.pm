@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.191910';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.193030';
 use 5.018;                      # to avoid a crash due to call to "can" below
 use Moose::Role;
 
@@ -181,7 +181,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.191910
+version 0.193030
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Domainable;
 # ABSTRACT: Domainable Moose role for Domain and DomainPlus objects
-$Bio::Palantir::Roles::Domainable::VERSION = '0.192560';
+$Bio::Palantir::Roles::Domainable::VERSION = '0.193080';
 use Moose::Role;
 
 use autodie;
@@ -99,7 +99,7 @@ Bio::Palantir::Roles::Domainable - Domainable Moose role for Domain and DomainPl
 
 =head1 VERSION
 
-version 0.192560
+version 0.193080
 
 =head1 SYNOPSIS
 

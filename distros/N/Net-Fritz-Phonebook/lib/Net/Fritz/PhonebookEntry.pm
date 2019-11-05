@@ -10,7 +10,9 @@ use Net::Fritz::PhonebookEntry::Number;
 use Net::Fritz::PhonebookEntry::Mail;
 
 use vars '$VERSION';
-$VERSION = '0.03';
+$VERSION = '0.04';
+
+our $has_DeletePhonebookEntryUID = 1;
 
 =head1 NAME
 
@@ -273,11 +275,64 @@ sub create( $self, %options ) {
     )->data
 }
 
-sub delete( $self, %options ) {
+sub delete_by_search( $self ) {
+    # Let's do a binary search, in the hope that names are sorted alphabetically:
+    my $count = @{ $self->phonebook->entries };
+    my $high = $count - 1;
+    my $low = 0; # in theory maybe $self->phonebookIndex; ?!
+    my $ofs = $low + int( ($high-$low) / 2 );
+
+    # Maybe we get lucky
+    my $remote_self = $self->phonebook->get_entry_by_index( $self->phonebookIndex );
+    while( $remote_self->name ne $self->name ) {
+
+        #use Data::Dumper;
+        #binmode STDERR, ':utf8';
+        #warn "[$ofs ($low,$high)] " . join "/", $remote_self->name, $self->name;
+
+        if( $high == $low ) {
+            last
+        } elsif( $remote_self->name gt $self->name ) {
+            $high = $ofs;
+        } else {
+            $low = $ofs;
+        };
+        $ofs = $low + int(( $high - $low ) / 2);
+        $remote_self = $self->phonebook->get_entry_by_index( $ofs );
+    };
+    #warn "Found at [$ofs] " . $remote_self->name;
+
+    if( $remote_self->name ne $self->name ) {
+        # Not found anymore?!
+        return Net::Fritz::Error->new( error => sprintf "Name '%s' not found", $self->name );
+    };
+
     my $res = $self->phonebook->service->call('DeletePhonebookEntry',
         NewPhonebookID => $self->phonebook->id,
-        NewPhonebookEntryID => $self->phonebookIndex, # euuugh
+        NewPhonebookEntryID => $ofs,
     );
+
+    return $res
+}
+
+sub delete( $self, %options ) {
+    my $res;
+
+    if( $has_DeletePhonebookEntryUID ) {
+    # This one is available starting with FritzOS 7 and the much better approach
+        $res = $self->phonebook->service->call('DeletePhonebookEntryUID',
+            NewPhonebookID => $self->phonebook->id,
+            NewPhonebookEntryUniqueID => $self->uniqueid,
+        );
+
+        if( $res->error and $res->error eq 'unknown action DeletePhonebookEntryUID' ) {
+            $has_DeletePhonebookEntryUID = 0;
+            $res = $self->delete_by_search();
+        };
+
+    } else {
+        $res = $self->delete_by_search();
+    };
 
     croak $res->error
         if $res->error;

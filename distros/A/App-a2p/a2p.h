@@ -22,6 +22,10 @@
 
 #include <stdio.h>
 
+#include <string.h>
+
+#include <assert.h>
+
 #ifdef I_MATH
 #include <math.h>
 #endif

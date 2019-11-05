@@ -1,0 +1,49 @@
+{
+   "abstract" : "Async socket class",
+   "author" : [
+      "Brad Fitzpatrick <brad@danga.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Danga-Socket",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Poll" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
+            "Sys::Syscall" : "0",
+            "Test::More" : "0",
+            "Test::TCP" : "0",
+            "Time::HiRes" : "0",
+            "fields" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.62",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.23';
+our $VERSION = '3.24';
 
 use vars qw(@ALL_TESTS);
 
@@ -801,9 +801,9 @@ sub _init_core {
 
         # Browser is Neoplanet
 
-        $browser                    = 'ie';
-        $browser_tests->{$browser}  = 1;
-        $browser_tests->{neoplanet} = 1;
+        $browser                     = 'ie';
+        $browser_tests->{$browser}   = 1;
+        $browser_tests->{neoplanet}  = 1;
         $browser_tests->{neoplanet2} = 1 if ( index( $ua, '2.' ) != -1 );
     }
 
@@ -1267,7 +1267,7 @@ sub _init_robots {
         # This isn't all keyed on ids (yet)
         $self->{robot_string} = $ROBOT_NAMES{$id} || $ROBOT_NAMES{$r};
         $robot_tests->{robot} = $r;
-        $robot_fragment = $r if !defined $robot_fragment;
+        $robot_fragment       = $r if !defined $robot_fragment;
     }
     elsif ( $ua =~ /seek (?! mo (?: toolbar )? \s+ \d+\.\d+ )/x ) {
 
@@ -2980,23 +2980,20 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.23
+version 3.24
 
 =head1 SYNOPSIS
 
-    use HTTP::BrowserDetect;
+    use HTTP::BrowserDetect ();
 
     my $user_agent_string
         = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36';
     my $ua = HTTP::BrowserDetect->new($user_agent_string);
 
     # Print general information
-    print "Browser: $ua->browser_string\n"
-        if $ua->browser_string;
-    print "Version: $ua->browser_version$ua->browser_beta\n"
-        if $ua->browser_version;
-    print "OS: $ua->os_string\n"
-        if $ua->os_string;
+    print 'Browser: ' . $ua->browser_string . "\n" if $ua->browser_string;
+    print 'Version: ' . $ua->browser_version . $ua->browser_beta . "\n" if $ua->browser_version;
+    print 'OS: ' . $ua->os_string . "\n" if $ua->os_string;
 
     # Detect operating system
     if ( $ua->windows ) {
@@ -3785,8 +3782,6 @@ POD coverage is not 100%.
 
 L<HTML::ParseBrowser>.
 
-=head1
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -3804,10 +3799,6 @@ L<http://github.com/oalders/http-browserdetect>
 =item * Reporting Issues
 
 L<https://github.com/oalders/http-browserdetect/issues>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/HTTP-BrowserDetect>
 
 =item * CPAN Ratings
 

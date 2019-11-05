@@ -11,14 +11,16 @@ my $tests = 0;
 use_ok('String::Interpolate::Named');
 $tests++;
 
-my $s = { args => { title     => "Hi There!",
-		    subtitle  => [ "%{capo|CAPO %{}}" ],
-		    capo      => [ 1 ],
-		    key	      => [ "G" ],
-		    h	      => [ "Z" ],
-		    head      => [ "yes" ],
-		  },
-	};
+# Using OO with implicit ctl setting.
+my $s = String::Interpolate::Named->new
+  ( { args => { title     => "Hi There!",
+		subtitle  => [ "%{capo|CAPO %{}}" ],
+		capo      => [ 1 ],
+		key	      => [ "G" ],
+		h	      => [ "Z" ],
+		head      => [ "yes" ],
+	      },
+    } );
 
 @ARGV = qw( 10-basic.dat );
 foreach ( @ARGV ) {
@@ -32,7 +34,7 @@ while ( <> ) {
     chomp;
 
     my ( $tpl, $exp ) = split( /\t+/, $_ );
-    my $res = interpolate( $s, $tpl );
+    my $res = $s->interpolate($tpl);
     is( $res, $exp, "$tpl -> $exp" );
 
     $tests++;

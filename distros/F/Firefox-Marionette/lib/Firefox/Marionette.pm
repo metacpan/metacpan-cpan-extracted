@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1005,15 +1005,15 @@ sub _initialise_version {
             }
             if ( !$found ) {
                 Firefox::Marionette::Exception->throw(
-"'adb shell dumpsys package $package_name' did not produce output that looks like '^[ ]+versionName=\\d+[.]\\d+([.]\\d+)?':$version_string"
+"'adb shell dumpsys package $package_name' did not produce output that looks like '^[ ]+versionName=\\d+[.]\\d+([.]\\d+)?\\s*\$':$version_string"
                 );
             }
         }
         else {
             $version_string =
               $self->execute( { master => 1 }, $binary, '--version' );
-            if (
-                $version_string =~ /Mozilla[ ]Firefox[ ]$version_regex\s*$/smx )
+            if ( $version_string =~
+                /Mozilla[ ]Firefox[ ]$version_regex[[:alpha:]]*\s*$/smx )
 
 # not anchoring the start of the regex b/c of issues with
 # RHEL6 and dbus crashing with error messages like
@@ -1025,7 +1025,7 @@ sub _initialise_version {
             }
             else {
                 Firefox::Marionette::Exception->throw(
-"'$binary --version' did not produce output that looks like 'Mozilla Firefox \\d+[.]\\d+([.]\\d+)?':$version_string"
+"'$binary --version' did not produce output that looks like 'Mozilla Firefox \\d+[.]\\d+([.]\\d+)?[[:alpha:]]*\\s*\$':$version_string"
                 );
             }
         }
@@ -4777,7 +4777,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.83
+Version 0.84
 
 =head1 SYNOPSIS
 
@@ -4790,7 +4790,7 @@ Version 0.83
 
     $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
 
-    my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ]);
+    my $file_handle = $firefox->selfie();
 
     $firefox->find('//button[@name="lucky"]')->click();
 
@@ -5495,7 +5495,7 @@ The parameters after the L<element|Firefox::Marionette::Element> parameter are t
 
 =item * scroll - scroll to the L<element|Firefox::Marionette::Element> supplied
 
-=item * highlights - a reference to a list containing L<elements|Firefox::Marionette::Element> to draw a highlight around
+=item * highlights - a reference to a list containing L<elements|Firefox::Marionette::Element> to draw a highlight around.  Not available in L<Firefox 70|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/70#WebDriver_conformance_Marionette> onwards.
 
 =back
 

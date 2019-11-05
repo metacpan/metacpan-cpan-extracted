@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Any-Daemon-HTTP>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Any-Daemon-HTTP/>
-    and <https://metacpan.org/release/Any-Daemon-HTTP>
+  * Indexed from CPAN: <https://metacpan.org/release/Any-Daemon-HTTP>
 
 This is a general purpose HTTP server.  It provides various features which
 you may recognize from Apache, but configured as pure Perl.

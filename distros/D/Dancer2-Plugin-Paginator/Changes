@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Paginator
 
+2.11  2019-11-02 MANWAR
+      - Updated copyright year details.
+
 2.10  2019-10-11 MANWAR
       - Moved author test scripts to xt/ subfolder.
 

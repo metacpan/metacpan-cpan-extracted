@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::ChartLines;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::ChartLines::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::Result::ChartLines::VERSION = '5.0.11';
 # ABSTRACT: Tapper - Keep Chart Lines for Charts
 
 use strict;
@@ -114,7 +114,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

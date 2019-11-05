@@ -1,17 +1,30 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Danga-Socket
-version:      1.61
-version_from: lib/Danga/Socket.pm
-installdirs:  site
+---
+abstract: 'Async socket class'
+author:
+  - 'Brad Fitzpatrick <brad@danga.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Danga-Socket
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    fields:                        0
-    IO::Poll:                      0
-    POSIX:                         0
-    Socket:                        0
-    Sys::Syscall:                  0
-    Test::More:                    0
-    Time::HiRes:                   0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  IO::Poll: '0'
+  POSIX: '0'
+  Socket: '0'
+  Sys::Syscall: '0'
+  Test::More: '0'
+  Test::TCP: '0'
+  Time::HiRes: '0'
+  fields: '0'
+version: '1.62'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,14 +2,18 @@ NAME
     App::BluetoothUtils - CLI utilities related to Bluetooth
 
 VERSION
-    This document describes version 0.002 of App::BluetoothUtils (from Perl
-    distribution App-BluetoothUtils), released on 2019-06-15.
+    This document describes version 0.003 of App::BluetoothUtils (from Perl
+    distribution App-BluetoothUtils), released on 2019-10-04.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
     bluetooth:
 
     *   bluetooth-is-on
+
+    *   btoff
+
+    *   bton
 
     *   turn-bluetooth-off
 

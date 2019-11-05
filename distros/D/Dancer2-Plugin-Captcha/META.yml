@@ -23,7 +23,7 @@ no_index:
 provides:
   Dancer2::Plugin::Captcha:
     file: lib/Dancer2/Plugin/Captcha.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Dancer2: '0.159002'
   Dancer2::Plugin: '0.159002'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Dancer2-Plugin-Captcha.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

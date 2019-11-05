@@ -8,9 +8,10 @@ use Encode;
 use Carp;
 use File::Slurp::Tiny 'read_file';
 use Text::Hunspell;
-use v5.12;
+use Test::Text::Sentence qw(split_sentences);
+use v5.22;
 
-use version; our $VERSION = qv('0.5.0'); # Works with UTF8
+use version; our $VERSION = qv('0.6.1'); # Works with UTF8 and includes Text::Sentence
 
 use base 'Test::Builder::Module'; # Included in Test::Simple
 
@@ -25,7 +26,7 @@ BEGIN {
 # Module implementation here
 sub new {
   my $class = shift;
-  my $dir = shift || croak "Need a directory with text" ;
+  my $dir = shift || croak "Need a single directory with text" ;
   my $data_dir = shift || croak "No default spelling data directory\n";
   my $language = shift || "en_US"; # Defaults to English
   my @files = @_ ; # Use all appropriate files in dir by default
@@ -66,17 +67,24 @@ sub check {
   my $self = shift;
   my $tb= $CLASS->builder;
   my $speller = $self->{'_speller'};
+  my %vocabulary;
+  my @sentences;
   for my $f ( @{$self->files}) {
     my $file_content= read_file($f, binmode => ':utf8');
     if ( $f =~ /(\.md|\.markdown)/ ) {
       $file_content = _strip_urls( $file_content);
       $file_content = _strip_code( $file_content);
     }
+    push @sentences, split_sentences( $file_content );
+    $tb->cmp_ok( scalar @sentences, ">=", 1, "We have " . ($#sentences + 1) . " sentences");
     my @words = ($file_content =~ m{\b(\p{L}+)\b}g);
     for my $w (@words) {
       next if !$w;
+      $vocabulary{lc($w)}++;
       $tb->ok( $speller->check( $w),  "$f >> '". encode_utf8($w) . "'");
     }
+    my $different_words = scalar keys %vocabulary;
+    $tb->cmp_ok(  $different_words, ">", 1, "We have $different_words different words");
   }
 }
 
@@ -119,7 +127,7 @@ Test::Text - A module for testing text files for spelling and (maybe) more.
 
 =head1 VERSION
 
-This document describes Test::Text version 0.3.0
+This document describes Test::Text version 0.5.0
 
 =head1 SYNOPSIS
 
@@ -257,7 +265,7 @@ Regexes for markdown code taken from node-markdown https://github.com/JJ/node-ma
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2014, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
+Copyright (c) 2014, 2017, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

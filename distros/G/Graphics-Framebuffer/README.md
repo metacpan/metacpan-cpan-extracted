@@ -26,14 +26,14 @@ To make your system ready for this module, then please install the following:
 
 ```bash
 sudo apt update`
-sudo apt install build-essential linux-headers libimager-perl libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl libtest-more-perl libsys-cpu-perl fonts-wine
+sudo apt install build-essential libimager-perl libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl libtest-most-perl libsys-cpu-perl fonts-wine
 ```
 
 ### REDHAT BASED SYSTEMS (Fedora, CentOS, etc):
 
 ```bash
 sudo yum update
-sudo yum upgrade kernel-headers build-essential perl-math-gradient perl-math-bezier perl-file-map perl-imager perl-inline-c perl-sys-cpu perl-test-more
+sudo yum upgrade build-essential perl-math-gradient perl-math-bezier perl-file-map perl-imager perl-inline-c perl-sys-cpu perl-test-most
 ```
 
 ## Continuing...

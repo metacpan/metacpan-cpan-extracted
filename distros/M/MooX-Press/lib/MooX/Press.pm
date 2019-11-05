@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 use Exporter::Tiny qw(mkopt);
 use Scalar::Util qw(blessed);
@@ -1469,30 +1469,30 @@ Factories are big and cool and they put lots of smoke into our atmosphere.
 
 Also, if you do something like:
 
-	use constant APP => 'MyGarden';
-	use MooX::Press (
-		prefix => APP,
-		role  => [
-			'LeafGrower' => {
-				has => [ '@leafs' => sub { [] } ],
-				can => {
-					'grow_leaf' => sub {
-						my $self = shift;
-						my $leaf = $self->FACTORY->new_leaf;
-						push @{ $self->leafs }, $leaf;
-						return $leaf;
-					},
-				},
-			},
-		]
-		class => [
-			'Leaf',
-			'Tree'  => { with => ['LeafGrower'] },
-		],
-	);
-	
-	my $tree = APP->new_tree;
-	my $leaf = $tree->grow_leaf;
+  use constant APP => 'MyGarden';
+  use MooX::Press (
+    prefix => APP,
+    role  => [
+      'LeafGrower' => {
+        has => [ '@leafs' => sub { [] } ],
+        can => {
+          'grow_leaf' => sub {
+            my $self = shift;
+            my $leaf = $self->FACTORY->new_leaf;
+            push @{ $self->leafs }, $leaf;
+            return $leaf;
+          },
+        },
+      },
+    ],
+    class => [
+      'Leaf',
+      'Tree'  => { with => ['LeafGrower'] },
+    ],
+  );
+  
+  my $tree = APP->new_tree;
+  my $leaf = $tree->grow_leaf;
 
 And you will notice that the string "MyGarden" doesn't appear anywhere in
 the definitions for any of the classes and roles. The prefix could be

@@ -1,3 +1,11 @@
+0.004005  2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	  - [doc] Mention Module::List::Tiny, Module::List::Wildcard.
+
+	  - Add import() to be able to be imported like Module:List &
+	    Module::List::Tiny.
+
+
 0.004004  2019-07-27  Released-By: PERLANCAR; Urgency: medium
 
 	  - [bugfix] Fix wildcard matching which cut digging down early in

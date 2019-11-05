@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Captcha;
 
-$Dancer2::Plugin::Captcha::VERSION   = '0.12';
+$Dancer2::Plugin::Captcha::VERSION   = '0.13';
 $Dancer2::Plugin::Captcha::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Captcha - Dancer2 add-on for CAPTCHA.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -344,7 +344,7 @@ L<http://search.cpan.org/dist/Dancer2-Plugin-Captcha/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2017 Mohammad S Anwar.
+Copyright (C) 2015 - 2019 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

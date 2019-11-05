@@ -475,6 +475,22 @@ EOD
     execute 'end', undef, 'end of unsatisfied if';
 
     execute 'echo plugh', "plugh\n", 'echo should now execute';
+
+    execute 'if -z "$FUBAR" then echo FUBAR empty', "FUBAR empty\n", '-z';
+
+    execute 'if -z "$FROBOZZ" then echo FROBOZZ empty', undef,
+	'Unsatisfied -z';
+
+    execute 'if -n "$FROBOZZ" then echo FROBOZZ not empty',
+	"FROBOZZ not empty\n", '-n';
+
+    execute 'if -n "$FUBAR" then echo FUBAR not empty', undef,
+	'Unsatisfied -n';
+
+    execute <<'EOD', 'Something happened', 'Error';
+error 'Something happened'
+echo 'Nothing happened'
+EOD
 }
 
 execute 'status clear', undef, 'Clear status for testing' ;

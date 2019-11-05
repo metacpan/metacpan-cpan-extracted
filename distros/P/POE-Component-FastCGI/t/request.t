@@ -1,4 +1,4 @@
-use Test::Simple tests => 17;
+use Test::Simple tests => 24;
 
 use POE::Component::FastCGI::Request;
 # loaded
@@ -23,6 +23,26 @@ ok($get->uri->path eq "/test");
 ok($get->query("foo") eq "bar");
 ok(not defined $get->query("baz"));
 ok(UNIVERSAL::isa($get->make_response, 'POE::Component::FastCGI::Response'));
+
+my $head = POE::Component::FastCGI::Request->new(
+	undef, # XXX
+	1,
+  1,
+	{
+		REQUEST_METHOD => "HEAD",
+		REQUEST_URI => "/test?foo=bar",
+		QUERY_STRING => "foo=bar",
+		HTTP_HOST => "localhost",
+	}
+);
+
+ok(ref $head and $head->isa("HTTP::Request"));
+ok($head->header("hOsT") eq "localhost");
+ok($head->uri->host eq "localhost");
+ok($head->uri->path eq "/test");
+ok($head->query("foo") eq "bar");
+ok(not defined $head->query("baz"));
+ok(UNIVERSAL::isa($head->make_response, 'POE::Component::FastCGI::Response'));
 
 my $post = POE::Component::FastCGI::Request->new(
 	undef, # XXX

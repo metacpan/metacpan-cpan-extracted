@@ -19,7 +19,7 @@ Geo::Geos::PrecisionModel - Specifies the precision model of the Coordinate in a
 
     my $pm = Geo::Geos::PrecisionModel->new;
     $pm->getMaximumSignificantDigits();     # => 16
-    $pm->makePrecise(1.000001);             # => 1.000001
+    $pm->makePrecise(1.5);                  # => 1.5
 
     $pm->compareTo($pm_fixed);  # => 1
 

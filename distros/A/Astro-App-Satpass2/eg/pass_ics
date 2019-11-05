@@ -48,8 +48,14 @@ VERSION:2.0
 [%- punct = '' %]
 BEGIN:VEVENT
 DTSTART:[% first.date( units = 'zulu' ) %]
-DALARM:[% first.date( delta = -300, units = 'zulu' ) %]
-DALARM:[% first.date( units = 'zulu' ) %]
+BEGIN:VALARM
+TRIGGER:-PT5M
+ACTION:DISPLAY
+END:VALARM
+BEGIN:VALARM
+TRIGGER:PT0M
+ACTION:DISPLAY
+END:VALARM
 SUMMARY:[% first.name %]
 DESCRIPTION:
     [%- FOREACH evt IN events %][% punct %]

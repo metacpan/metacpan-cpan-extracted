@@ -1,5 +1,16 @@
 Revision history for Ryu
 
+1.008     2019-11-06 00:05:39+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support ->on_failed on Ryu::Source
+
+    Bugs fixed:
+
+    - a Ryu::Sink could be completed before the Ryu::Source, avoid
+    exceptions when the Ryu::Source subsequently completes and tries
+    to mark the Future as done
+
 1.007     2019-10-03 00:25:56+08:00 Asia/Kuala_Lumpur
     No new features.
 

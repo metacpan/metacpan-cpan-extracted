@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access",
+  "ABSTRACT" => "RESTful Web Services with login, persistent data, multiple in/out formats, IP security, role based access",
   "AUTHOR" => "George Bouras <george.mpouras\@yandex.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::XS" => 0,
     "YAML::XS" => 0
   },
-  "VERSION" => "4.2.2",
+  "VERSION" => "4.2.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

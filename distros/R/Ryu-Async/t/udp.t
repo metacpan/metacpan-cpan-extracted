@@ -7,6 +7,10 @@ use Test::Fatal;
 use IO::Async::Loop;
 use Ryu::Async;
 
+use Socket qw(INADDR_LOOPBACK INADDR_NONE INADDR_ANY inet_ntoa);
+
+my $loopback = inet_ntoa(INADDR_LOOPBACK);
+note 'loopback: ' . $loopback;
 my $loop = IO::Async::Loop->new;
 
 $loop->add(
@@ -15,7 +19,7 @@ $loop->add(
 
 my $message_content = 'test message';
 
-ok(my $server = $ryu->udp_server(host => '127.0.0.1'), 'can create new server');
+ok(my $server = $ryu->udp_server(host => $loopback), 'can create new server');
 isa_ok($server, 'Ryu::Async::Server');
 
 my $f = $loop->new_future;
@@ -35,8 +39,9 @@ is(exception {
     ok($port, 'have nonzero port');
 }, undef, 'able to get port') or die 'no way to continue without a port';
 
+note 'Will try client connection to ' . $loopback;
 ok(my $client = $ryu->udp_client(
-    host => '127.0.0.1',
+    host => $loopback,
     port => $port
 ), 'can create client');
 isa_ok($client, 'Ryu::Async::Client');

@@ -18,10 +18,10 @@ my $raw_contact_xml = <<"XML";
             <email classifier="private">hans.mueller\@example.com</email>
         </services>
         <!-- numbers:4-->
-        <number type="home" quickdial="" vanity="" prio="1" >123</number>
-        <number type="mobile" quickdial="" vanity="" prio="" >345</number>
-        <number type="work" quickdial="" vanity="" prio="" >456</number>
-        <number type="fax_work" quickdial="" vanity="" prio="" >789</number>
+        <number type="home"     prio="1" >123</number>
+        <number type="mobile"   >345</number>
+        <number type="work"     >456</number>
+        <number type="fax_work" >789</number>
         <!-- idx:0 -->
         <!-- ringtoneidx:nil -->
     </telephony>

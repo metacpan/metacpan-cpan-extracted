@@ -23,15 +23,15 @@ requires:
   Array::Transpose: '0'
   Carp: '0'
   List::MoreUtils: '0'
-  List::Util: '0'
+  List::Util: '1.30'
   List::Util::WeightedChoice: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Game-Theory-TwoPersonMatrix
-  repository: https://github.com/ology/Game-Theory-TwoPersonMatrix
-version: '0.2203'
+  homepage: https://github.com/ology/Game-Theory-TwoPersonMatrix
+  repository: https://github.com/ology/Game-Theory-TwoPersonMatrix.git
+version: '0.2204'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -200,9 +200,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -223,6 +223,14 @@ x_Dist_Zilla:
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

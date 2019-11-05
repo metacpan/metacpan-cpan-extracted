@@ -1,7 +1,13 @@
 Revision history for Game-Theory-TwoPersonMatrix
 
+0.2204 2019-10-30 23:45:27
+    - Improved documentation.
+    - Added List::Util version prerequisite.
+
 0.2203 2019-06-06 23:23:04
     - Improved documentation.
+    - Cleaned up the module code a bit.
+    - Enhanced the eg/tournament code.
 
 0.2202 2019-06-05 18:38:55
     - Improved documentation. Imagine that!

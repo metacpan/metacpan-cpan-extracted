@@ -1,9 +1,9 @@
 
                             IO-Compress
 
-                           Version 2.087
+                           Version 2.089
 
-                          10 August 2019
+                          3 November 2019
 
        Copyright (c) 1995-2019 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -13,12 +13,26 @@ DESCRIPTION
 -----------
 
 This distribution provides a Perl interface to allow reading and writing of
-compressed data created with the zlib and bzip2 libraries.
+compressed data created with the zlib and bzip2.
 
-IO-Compress supports reading and writing of bzip2, RFC 1950, RFC
-1951, RFC 1952 (i.e. gzip) and zip files/buffers.
+IO-Compress supports reading and writing of the following compressed data formats
+  * bzip2 
+  * RFC 1950 
+  * RFC 1951 
+  * RFC 1952 (i.e. gzip)  
+  * zip  
 
-The following modules used to be distributed separately, but are now
+There are a number of companion modules for IO-Compress that extend
+the suite of compression formats available.
+
+ * IO-Compress-Lzma 
+   Adds support for lzma, xz and lzip.
+ * IO-Compress-Lzf 
+   Adds support for lzf.
+ * IO-Compress-Lzop 
+   Adds support for lzop.
+
+Note that the following modules used to be distributed separately, but are now
 included with the IO-Compress distribution.
 
     Compress-Zlib
@@ -56,6 +70,13 @@ To install IO-Compress, run the command below:
 TROUBLESHOOTING
 ---------------
 
+SUPPORT
+-------
+
+General feedback/questions/bug reports should be sent to 
+https://github.com/pmqs/IO-Compress/issues (preferred) or
+https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress.
+
 FEEDBACK
 --------
 
@@ -89,7 +110,7 @@ To help me help you, I need all of the following information:
         If you haven't installed IO-Compress then search IO::Compress::Gzip.pm
         for a line like this:
 
-          $VERSION = "2.087" ;
+          $VERSION = "2.089" ;
 
  2. If you are having problems building IO-Compress, send me a
     complete log of what happened. Start by unpacking the IO-Compress

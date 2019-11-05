@@ -9,7 +9,7 @@ build_requires:
   File::Spec: '0'
   FindBin: '0'
   Hash::Merge: '0'
-  JSON::PP: '0'
+  JSON::PP: '4.04'
   List::Util: '1.49'
   Path::Tiny: '0'
   Test::FailWarnings: '0'
@@ -39,10 +39,10 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.23'
+version: '3.24'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -72,7 +72,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.83'
+      version: '0.13'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -126,8 +126,12 @@ x_Dist_Zilla:
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -433,7 +437,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -441,7 +445,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.21.0
+          git_version: 2.23.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -456,6 +460,14 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/ReadmeMdInBuild'
       version: '0.163250'
     -
+      class: Dist::Zilla::Plugin::StaticInstall
+      config:
+        Dist::Zilla::Plugin::StaticInstall:
+          dry_run: 0
+          mode: on
+      name: '@Author::OALDERS/StaticInstall'
+      version: '0.012'
+    -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::OALDERS/ShareDir'
       version: '6.012'
@@ -466,7 +478,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::OALDERS/CheckIssues'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
@@ -528,7 +540,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -541,11 +553,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.23
+          tag: v3.24
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -582,7 +594,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -596,7 +608,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -604,18 +616,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
+          phase: test
           type: requires
-      name: DevelopRequires
+      name: TestRequires
       version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::StaticInstall
-      config:
-        Dist::Zilla::Plugin::StaticInstall:
-          dry_run: 0
-          mode: on
-      name: StaticInstall
-      version: '0.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -682,10 +686,12 @@ x_contributors:
   - 'Maros Kollar <maros@k-1.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Doye <nic@worldofnic.org>'
+  - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Olivier Bilodeau <olivier@bottomlesspit.org>'
   - 'Paul Findlay <paul@findlay.net.nz>'
   - 'Perlover <perlover@perlover.com>'
+  - 'Petr <petr@kle.cz>'
   - 'Ramanan Balakrishnan <ramanan90@gmail.com>'
   - 'reneeb <info@perl-services.de>'
   - 'Robin Smidsrød <robin@smidsrod.no>'
@@ -695,6 +701,6 @@ x_contributors:
   - 'Uwe <uwe@uwevoelker.de>'
   - 'vti <viacheslav.t@gmail.com>'
   - 'yeahoffline <frank.gasser@gmail.com>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

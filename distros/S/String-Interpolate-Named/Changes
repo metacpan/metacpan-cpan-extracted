@@ -1,5 +1,13 @@
 Revision history for String-Interpolate-Named
 
+1.00	2019-10-31
+
+	Fix backslash escapes. \| hides the | from being seen as a |,
+	and leaves a | (not \|) upon completion. Same for \{ and \} .
+	Add object oriented API.
+	Limit max number of iterations.
+	Rework documentation.
+
 0.05	2018-10-25
 
 	%{} should work only within a %{ ... } construct.

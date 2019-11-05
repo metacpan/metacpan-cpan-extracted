@@ -1,0 +1,28 @@
+---
+abstract: 'DateTime parser for EXIF timestamps'
+author:
+  - 'liosha <liosha@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-EXIF
+provides:
+  DateTime::Format::EXIF:
+    file: lib/DateTime/Format/EXIF.pm
+    version: '0.002'
+requires:
+  DateTime::Format::Builder: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/liosha/dt-format-exif.git
+version: '0.002'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

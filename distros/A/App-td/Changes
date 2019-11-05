@@ -1,14 +1,23 @@
-0.092   2019-01-16 (PERLANCAR)
+0.093   2019-09-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add actions: shuf (along with its option --repeat [-r]), as-aoaos,
+          as-aohos.
+
+	- [ux] head/tail/sum/sum-row/avg/avg-row: Return the input's form
+	  of row instead of coercing table data to aoaos.
+
+
+0.092   2019-01-16  Released-By: PERLANCAR
 
 	- Tweak CLI: skip reading config & env.
 
 
-0.091   2019-01-16 (PERLANCAR)
+0.091   2019-01-16  Released-By: PERLANCAR
 
 	- Fix Rinci metadata.
 
 
-0.090   2019-01-16 (PERLANCAR)
+0.090   2019-01-16  Released-By: PERLANCAR
 
 	- select: support '*' and --exclude-column (-e).
 
@@ -23,12 +32,12 @@
 	- [Bugfix] wc and wc-row action aliases were not recognized.
 
 
-0.08    2017-01-01 (PERLANCAR)
+0.08    2017-01-01  Released-By: PERLANCAR
 
 	- Add action: rownum-col.
 
 
-0.07    2016-06-26 (PERLANCAR)
+0.07    2016-06-26  Released-By: PERLANCAR
 
         - select: Pass information from input's
           table.field_{aligns,formats,units}.
@@ -37,7 +46,7 @@
           table field formats/aligns.
 
 
-0.06    2016-04-15 (PERLANCAR)
+0.06    2016-04-15  Released-By: PERLANCAR
 
         - Rewrite to use Perinci::CmdLine. This increases startup overhead but
           eases development and enables tab completion.
@@ -50,30 +59,30 @@
           spec.
 
 
-0.05    2016-04-14 (PERLANCAR)
+0.05    2016-04-14  Released-By: PERLANCAR
 
         - Add/implement actions 'info', 'sum', 'sum-row', 'avg', 'avg-row'.
 
 
-0.04    2016-03-09 (PERLANCAR)
+0.04    2016-03-09  Released-By: PERLANCAR
 
 	- Replace JSON::XS with Cpanel::JSON::XS.
 
 
-0.03    2015-12-07 (PERLANCAR)
+0.03    2015-12-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Typo.
 
 
-0.02    2015-11-02 (PERLANCAR)
+0.02    2015-11-02  Released-By: PERLANCAR
 
         - Add action: select.
 
         - [doc] Fix example for sorting rows by descending order (-COLNAME).
 
 
-0.01    2015-09-15 (PERLANCAR)
+0.01    2015-09-15  Released-By: PERLANCAR
 
         - First release.

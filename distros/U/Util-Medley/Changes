@@ -1,0 +1,120 @@
+==================================================
+Changes from 2018-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2019-11-04 17:31:38 +0000
+------------------------------------------
+
+  Change: 3d95b3e3a0dab29e6f3616b2c9a3edb731be50e2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:30:54 +0000
+
+    updated documentation for lib/Util/Medley/DateTime.pm 
+
+------------------------------------------
+version 0.006 at 2019-11-04 17:25:15 +0000
+------------------------------------------
+
+  Change: a2b2616f4f973045caa3a7ae2b1bfdef0df0f423
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:25:15 +0000
+
+    v0.006 
+
+  Change: f1c6622bbde22b40531f20aa9a0d246b42f14a4b
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:24:37 +0000
+
+    refactored named pair args to use shorter ns 
+
+  Change: 1256ee8ccc4aeac368fdd6072a90c4c1f8fc5291
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:24:04 +0000
+
+    updated documentation for Util::Medley::Crypt 
+
+  Change: 8216f878748b22e6780895704eea2313c74c2e4d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 10:40:52 +0000
+
+    removed Changes file 
+
+------------------------------------------
+version 0.004 at 2019-11-04 16:35:17 +0000
+------------------------------------------
+
+  Change: 125ad803228b1ad8c7141f871a0a63f63c900b5e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 10:35:17 +0000
+
+    fixed pod formatting in Util::Medley::File 
+
+  Change: 4e285de2edf3df97d6882c0f7118561242f0866e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-01 16:44:58 +0000
+
+    fixed pod format in lib/Util/Medley/File.pm 
+
+  Change: 3b74d17aa96de44c4384588d756100817eac2874
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-01 16:41:52 +0000
+
+
+  Change: 3cbd88454cef49104a83b4cbd9c7de71b5780514
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-30 15:25:26 +0000
+
+    first release 
+
+  Change: 834d6d182e30064bc2c7ee3a5331a8860a9dd5be
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 16:40:07 +0000
+
+    checkpoint 
+
+  Change: 3935c5594d2a56b6061de5015dda4f2fc77c4f39
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 12:08:36 +0000
+
+    . 
+
+  Change: f337b98384a22f739a9161d811eea3fe1df237e9
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 12:06:39 +0000
+
+    . 
+
+  Change: 3089c5c181d84148ef7e1bcd3b216c256362b876
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 12:05:56 +0000
+
+    no msg 
+
+  Change: 6b4cdd16bd20989fbd1892742824af92295db93a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:59:35 +0000
+
+    more files 
+
+  Change: 585dc5f224b8d078c550e809f0f3041ec838cebe
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:59:10 +0000
+
+    updated gitignore 
+
+  Change: d6b914d578231a3eb8ee18ddef54eead1bcc61f4
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:58:17 +0000
+
+    more files 
+
+  Change: 069b34e6c84a73ddc0c32f8258057214aa672de2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:57:42 +0000
+
+    first 
+
+================
+End of releases.
+================

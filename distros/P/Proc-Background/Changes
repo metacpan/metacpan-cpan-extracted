@@ -1,3 +1,22 @@
+Sun Nov  3 19:34:00 EST 2019
+
+  Version 1.20
+
+  * More correct parsing of Win32 arguments to determine
+    executable name, and more correct quoting when building
+    command line when starting from an argv.
+  * More correct use of Unix signals during ->die, but also give
+    user the ability to specify a custom sequence of signals.
+  * Emulate Unix exit status of SIGKILL on Win32 when process was
+    ended using $proc->Kill
+  * New attributes ->exit_code and ->exit_signal help inspect the
+    wstat value returned by ->wait.
+  * Fix Win32 path separator used when searching %PATH% for exe
+  * Don't leak changes to $? when calling ->die() during DESTROY
+  * Make sure all die_upon_destroy happens before global destruction
+  * Re-tooled with Dist::Zilla for modern generation of MYMETA and
+    automatic version, license, etc.
+
 Sun Jul  5 15:40:32 PDT 2009
 
 	* Release version 1.10.

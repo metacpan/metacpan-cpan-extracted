@@ -1,6 +1,6 @@
 package Tapper::Schema::TestTools;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestTools::VERSION = '5.0.9';
+$Tapper::Schema::TestTools::VERSION = '5.0.11';
 # inspired by Test::Fixture::DBIC::Schema
 
 use strict;
@@ -85,7 +85,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

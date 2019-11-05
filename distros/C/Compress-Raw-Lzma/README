@@ -1,9 +1,9 @@
 
                             Compress-Raw-Lzma
 
-                              Version 2.087
+                             Version 2.089
 
-                              10 August 2019
+                             3 November 2019
 
        Copyright (c) 2009-2019 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -153,6 +153,13 @@ I've had a report that when building Compress-Raw-Lzma under HP-UX that it
 is necessary to have first built the lzma library with the -fpic
 option.
 
+SUPPORT
+-------
+
+General feedback/questions/bug reports should be sent to 
+https://github.com/pmqs/Compress-Raw-Lzma/issues (preferred) or
+https://rt.cpan.org/Public/Dist/Display.html?Name=Compress-Raw-Lzma.
+
 FEEDBACK
 --------
 
@@ -186,7 +193,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Lzma then search Compress::Raw::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.087" ;
+          $VERSION = "2.089" ;
 
      c. The version of lzma you have used.
         If you have successfully installed Compress-Raw-Lzma, this one-liner

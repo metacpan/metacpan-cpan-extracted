@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +22,5 @@ resources:
   homepage: https://metacpan.org/module/String::CRC32
   license: https://wiki.creativecommons.org/wiki/Public_domain
   repository: https://github.com/leejo/string-crc32
-version: 1.7
+version: 1.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

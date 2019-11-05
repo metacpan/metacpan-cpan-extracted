@@ -3,7 +3,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "ppport.h"
 
 #include <vlc/vlc.h>
 #include <vlc/libvlc_version.h>
@@ -584,7 +583,7 @@ plane(pic, idx)
 			croak("Can't access planes while Picture object is held by VLC decoder thread");
 		RETVAL= (idx < 0 || idx > 3)? &PL_sv_undef
 			: pic->plane_buffer_sv[idx]? newSVsv(pic->plane_buffer_sv[idx])
-			: pic->plane[idx]? newRV_noinc(buffer_scalar_wrap(newSV(0),
+			: pic->plane[idx]? newRV_noinc(buffer_scalar_wrap(aTHX_ newSV(0),
 					PERLVLC_ALIGN_PLANE(pic->plane[idx]),
 					pic->format.pitch[idx] * pic->format.lines[idx], 0, NULL, NULL))
 			: &PL_sv_undef;

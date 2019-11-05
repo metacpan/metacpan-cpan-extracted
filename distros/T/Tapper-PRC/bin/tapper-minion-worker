@@ -79,11 +79,19 @@ sub kill_ps_tree
 
   return unless $pid > 1;
 
+  #say "kill_ps_tree: ";
+
   while (my @pids = get_ps_tree($pid)) {
+    #say "  KILL ".join(',', @pids);
     my $innerpid = $pids[-1];
+    my $second_innerpid = $pids[-2];
     if ($innerpid) {
       kill 'SIGTERM', $innerpid;
       waitpid $innerpid, 0;
+    }
+    if ($second_innerpid) {
+      kill 'SIGTERM', $second_innerpid;
+      waitpid $second_innerpid, 0;
     }
   }
   kill 'SIGTERM', $pid;
@@ -92,11 +100,12 @@ sub kill_ps_tree
 
 # Send report and status back to Tapper
 sub tapper_testrun_finished {
-  my ($job, $prc_cfg, $success) = @_;
+  my ($job, $prc_cfg, $success, $reason) = @_;
 
   require Tapper::PRC;
 
   # Report what happened to Tapper
+  $reason      ||= "unknown";
   my $hostname   = $prc_cfg->{hostname};
   my $testrun_id = $prc_cfg->{testrun_id};
   my $not        = $success ? "" : "not ";
@@ -110,6 +119,7 @@ TAP Version 13
 # Test-moreinfo-url: /minion/admin/jobs?id=@{[$job->id]}
 1..1
 ${not}ok - tapper-minion-worker - job execution
+# Reason: $reason
 # Test-minion-job-id: @{[$job->id]}
 ";
 
@@ -119,10 +129,12 @@ ${not}ok - tapper-minion-worker - job execution
     if $error;
 
   unlink $path_to_config;
+
+  $prc->mcp_inform({state => 'end-testing'}) unless $success;
 }
 
 # monkey-patch the original too hard "KILL" signal away
-local *Minion::Job::stop = sub { kill 'INT', shift->{pid} };
+local *Minion::Job::stop = sub { shift->kill('INT') };
 
 # Add tasks for Tapper testrun execution using Tapper::PRC
 $minion->add_task
@@ -162,7 +174,7 @@ $minion->add_task
            $prc_cfg->{testrun_id}
          );
          kill_ps_tree ($$);
-         tapper_testrun_finished ($job, $prc_cfg, FAIL);
+         tapper_testrun_finished ($job, $prc_cfg, FAIL, "signal $signal");
          $job->fail({ reason  => 'signal',
                       signal  => $signal,
                       command => \@job_cmd,
@@ -190,7 +202,7 @@ $minion->add_task
        run \@job_cmd;
 
        # finish and cleanup
-       tapper_testrun_finished ($job, $prc_cfg, PASS);
+       tapper_testrun_finished ($job, $prc_cfg, PASS, "finished normally");
        $job->finish({ tapper_testrun_id => $prc_cfg->{testrun_id} });
      };
 
@@ -237,7 +249,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,19 +17,21 @@ meta-spec:
 name: LCS-BV
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  perl: '5.008000'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/wollmers/LCS-BV/issues
   homepage: https://github.com/wollmers/LCS-BV
   repository: https://github.com/wollmers/LCS-BV.git
-version: '0.05'
+version: '0.08'
 x_contributors:
+  - 'ade ishs <ade@adeishs.com>'
   - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
   - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>'
+x_serialization_backend: 'YAML::Tiny version 1.66'

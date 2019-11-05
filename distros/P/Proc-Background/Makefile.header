@@ -1,0 +1,13 @@
+my @programs_to_install = qw(timed-process);
+
+# Allow us to suppress all program installation with the -n (library only)
+# option.  This is for those that don't want to mess with the configuration
+# section of this file.
+use Getopt::Std;
+use vars qw($opt_n);
+unless (getopts('n')) {
+  die "Usage: $0 [-n]\n";
+}
+@programs_to_install = () if $opt_n;
+my %optional_PL_FILES= map {("bin/$_.PL" => "bin/$_")} @programs_to_install;
+my @optional_EXE_FILES= map {"bin/$_"} @programs_to_install;

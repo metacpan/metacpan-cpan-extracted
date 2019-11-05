@@ -1,3 +1,7 @@
+0.193030  2019-10-30 21:33:56+01:00 Europe/Brussels
+    Fixes
+      - ClustalO: fixed module filename (Clustalo.pm => ClustalO.pm)
+
 0.191910  2019-07-10 15:50:22+02:00 Europe/Rome
     Additions
       - all: now try to install external dependencies using Homebrew

@@ -75,7 +75,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -720,6 +720,14 @@ sub end : Verb() Tweak( -unsatisfied ) {
     return;
 }
 
+sub error : Verb() {
+    my ( $self, undef, @arg ) = __arguments( @_ );
+    @arg
+	or push @arg, 'An error has occurred';
+    $self->wail( @arg );
+    return;
+}
+
 # Tokenize and execute one or more commands. Optionally (and
 # unsupportedly) you can pass a code reference as the first argument.
 # This code reference will be used to fetch commands when the arguments
@@ -1140,6 +1148,28 @@ EOD
 		    pop @{ $ctx };
 		    return;
 		},
+	    },
+	    '-n' => {
+		handler => sub {
+		    # my ( $self, $def, $ctx, $tokens ) = @_;
+		    my ( undef, undef, $ctx, $tokens ) = @_;
+		    my $v = shift @{ $tokens };
+		    defined $v
+			or $v = '';
+		    push @{ $ctx->[-1]{value} }, '' ne $v;
+		},
+		validation	=> 'prefix',
+	    },
+	    '-z' => {
+		handler => sub {
+		    # my ( $self, $def, $ctx, $tokens ) = @_;
+		    my ( undef, undef, $ctx, $tokens ) = @_;
+		    my $v = shift @{ $tokens };
+		    defined $v
+			or $v = '';
+		    push @{ $ctx->[-1]{value} }, '' eq $v;
+		},
+		validation	=> 'prefix',
 	    },
 	    and	=> {
 		handler	=> sub {
@@ -1569,11 +1599,14 @@ sub _macro_define : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
 	and $name !~ m/ \A _ /smx
 	or $self->wail("Invalid macro name '$name'");
 
+    # NOTE the value of {def} used to be unescaped, but I do not now
+    # know why, and the implementation of \U and friends is more natural
+    # with this stripped out.
     $self->{macro}{$name} =
 	Astro::App::Satpass2::Macro::Command->new(
 	    name	=> $name,
 	    parent	=> $self,
-	    def		=> [ _unescape( @args ) ],
+	    def		=> \@args,
 	    generate	=> \&_macro_define_generator,
 	    level1	=> $self->{frame}[-1]{level1},
 	    warner	=> $self->{_warner},
@@ -4840,19 +4873,6 @@ EOD
     return wantarray ? @rslt : join ' ', @rslt;
 }
 
-#	@result = _unescape( @args );
-#
-#	Remove back slash escapes. Nothing fancy is done here; in
-#	particular, '\n' does not become a new line, it becomes "n".
-
-sub _unescape {
-    my ( @args ) = @_;
-    foreach ( @args ) {
-	s/ \\ (.) /$1/smxg;
-    }
-    return @args;
-}
-
 #	($tokens, $redirect) = $self->_tokenize(
 #		{option => $value}, $buffer, [$arg0 ...]);
 #
@@ -4946,6 +4966,15 @@ sub _unescape {
 	'_' => sub { return $^X },
     );
 
+    my %case_ctl = (
+	E	=> sub { delete $_[0]->{_case_mod} },
+	F	=> sub { $_[0]->{_case_mod}{case} = sub { fold_case( $_[1] ) } },
+	L	=> sub { $_[0]->{_case_mod}{case} = sub { lc $_[1] } },
+	U	=> sub { $_[0]->{_case_mod}{case} = sub { uc $_[1] } },
+	l	=> sub { $_[0]->{_case_mod}{single} = sub { lcfirst $_[1] } },
+	u	=> sub { $_[0]->{_case_mod}{single} = sub { ucfirst $_[1] } },
+    );
+
     # Leading punctuation that is equivalent to a method.
     my %command_equivalent = (
 	'.'	=> 'source',
@@ -4968,6 +4997,7 @@ sub _unescape {
 
     sub _tokenize {
 	my ($self, @parms) = @_;
+	local $self->{_case_mod} = undef;
 	my $opt = HASH_REF eq ref $parms[0] ? shift @parms : {};
 	my $in = $opt->{in};
 	my $buffer = shift @parms;
@@ -5029,7 +5059,11 @@ sub _unescape {
 		    }
 		    $len = length $buffer;
 		} elsif ( $relquote ) {
-		    $rslt[-1]{token} .= $escape{$next} || $next;
+		    if ( my $code = $case_ctl{$next} ) {
+			$code->( $self );
+		    } else {
+			$rslt[-1]{token} .= $escape{$next} || $next;
+		    }
 		} else {
 		    $rslt[-1]{token} .= $next;
 		}
@@ -5049,7 +5083,8 @@ sub _unescape {
 
 	    } elsif ($char eq '"') {
 		$rslt[-1]{token} .= '';	# Empty string, to force defined.
-		$relquote = !$relquote;
+		( $relquote = !$relquote )
+		    or delete $self->{_case_mod};
 
 	    # If we have a whitespace character and we're not inside
 	    # quotes and not in single-token mode, we start a new token.
@@ -5260,10 +5295,15 @@ sub _unescape {
 		ref $value
 		    or $value = defined $value ? [ $value ] : [];
 
-		# Do word splitting on the value, unless we are inside
-		# quotes.
-		$relquote
-		    or $value = [ map { split qr{ \s+ }smx } @{ $value } ];
+		# If we are inside quotes
+		if ( $relquote ) {
+		    # do case modification
+		    # NOTE that the argument list is modified in-place.
+		    $self->_case_mod( @{ $value } );
+		} else {
+		    # otherwise do word splitting
+		    $value = [ map { split qr{ \s+ }smx } @{ $value } ];
+		}
 
 		# If we have a value, append each element to the current
 		# token, and then create a new token for the next
@@ -5358,6 +5398,9 @@ sub _unescape {
 	    # character, whatever it is, is simply appended to it.
 
 	    } elsif (exists $rslt[-1]{token} || $relquote) {
+		# do case modification
+		# NOTE that the argument list is modified in-place.
+		$self->_case_mod( $char );
 		$rslt[-1]{token} .= $char;
 
 	    # If the character is a tilde, we flag the token for tilde
@@ -5499,6 +5542,22 @@ sub _unescape {
 
 	return;
     }
+
+}
+
+# Apply case modification to the arguments
+# NOTE that the argument list is modified in-place. I'm a little
+# surprised that this didn't tickle Perl::Critic.
+sub _case_mod {
+    my $self = shift;
+    foreach ( @_ ) {
+	$self->{_case_mod}{case}
+	    and $_ = $self->{_case_mod}{case}->( $self, $_ );
+	my $code;
+	$code = delete $self->{_case_mod}{single}
+	    and $_ = $code->( $self, $_ );
+    }
+    return;
 }
 
 
@@ -5643,7 +5702,7 @@ install them later. The optional modules are:
 =item L<Astro::SIMBAD::Client|Astro::SIMBAD::Client>
 
 This module looks up the positions of astronomical bodies in the SIMBAD
-database at L<http://simbad.u-strasbg.fr/>. This is only used by the
+database at L<http://simbad.u-strasbg.fr/simbad/>. This is only used by the
 C<lookup> subcommand of the L<sky()|/sky> method.
 
 =item L<Astro::SpaceTrack|Astro::SpaceTrack>
@@ -5978,6 +6037,16 @@ The following option may be specified:
 This interactive method ends a localization block. Nothing is returned.
 It is an error to have an end without a corresponding L<begin()|/begin>.
 
+=head2 error
+
+ $satpass2->error( 'Something happened' );
+ satpass2> error 'Something happened'
+
+This interactive method declares an error, terminating the processing of
+the macro or include file in which it appears. The arguments are used as
+the text of the error message. If none are provided a default (and
+unhelpful) error message is provided.
+
 =head2 execute
 
  $output = $satpass2->execute( <<'EOD' );
@@ -6303,6 +6372,19 @@ For example (assuming OID 99999 is not loaded)
 The following operators and functions are implemented:
 
 =over
+
+=item ( ... )
+
+Parentheses perform grouping of their contents, to force precedence on
+the operations.
+
+=item -n
+
+This prefix operator is true if its operand is not the null string.
+
+=item -z
+
+This prefix operator is true if its operand is the null string.
 
 =item and
 
@@ -8539,8 +8621,11 @@ Unlike C<bash(1)>, but like C<perl(1)>, the back slash is recognized,
 but its only use is to escape a single quote or another back slash.
 
 Double quotes (C<"">) cause everything inside them to be taken as a
-single token. Unlike single quotes, all meta-characters except single
-quotes are recognized inside double quotes.
+single token. Unlike single quotes, all the usual C<C> meta-characters
+except single quotes are recognized inside double quotes. In addition,
+Perl meta-characters C<"\E">, C<"\F">, C<"\L">, C<"\U">, C<"\l">, and
+C<"\u"> (though not C<"\Q">) are recognized inside double quotes. Note,
+though, that before Perl 5.15.8 C<"\F"> is equivalent to C<"\L">.
 
 The dollar sign (C<$>) introduces an interpolation. If the first
 character after the dollar sign is not a left curly bracket, that
@@ -8852,7 +8937,7 @@ without an incentive.
 =item simbad_version
 
 This attribute was used to select the version of the SIMBAD protocol to
-use to access L<http://simbad.u-strasbg.fr/>. Since only version 4 is
+use to access L<http://simbad.u-strasbg.fr/simbad/>. Since only version 4 is
 currently supported, and this has been the default in F<satpass> for
 some time, this attribute is eliminated.
 
@@ -8946,7 +9031,7 @@ in its default location.
 =head1 BUGS
 
 Bugs can be reported to the author by mail, or through
-L<http://rt.cpan.org/>.
+L<https://rt.cpan.org/>.
 
 =head1 AUTHOR
 

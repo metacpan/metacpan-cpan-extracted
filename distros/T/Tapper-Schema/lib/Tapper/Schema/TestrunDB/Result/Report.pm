@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::Report;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::Report::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::Result::Report::VERSION = '5.0.11';
 # ABSTRACT: Tapper - containing reports
 
 use 5.010;
@@ -157,7 +157,7 @@ sub get_cached_tapdom
                                 #print STDERR ".";
                                 my $rawtap = $_->{raw} || '';
                                 #say STDERR "x"x100, "\n", $rawtap, "\n", "x"x 100;
-                                $rawtap    = $TAPVERSION."\n".$rawtap unless $rawtap =~ /^TAP Version/ms;
+                                $rawtap    = $TAPVERSION."\n".$rawtap unless $rawtap =~ /^TAP Version/msi;
                                 #say STDERR length($rawtap);
                                 my $tapdom = new TAP::DOM ( tap    => $rawtap,
                                                             ignore => [qw( raw as_string )],
@@ -230,7 +230,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

@@ -1,12 +1,14 @@
 package LCS::BV;
 
-use 5.006;
+use 5.010001;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 #use utf8;
 
 our $width = int 0.999+log(~0)/log(2);
+
+no warnings 'portable'; # for 0xffffffffffffffff
 
 sub new {
   my $class = shift;
@@ -19,11 +21,89 @@ sub new {
 # of Computer Science and Engineering, Faculty of Electrical
 # Engineering, Czech Technical University, 2004.
 
+sub LLCS {
+  my ($self,$a,$b) = @_;
+
+  use integer;
+  #no warnings 'portable'; # for 0xffffffffffffffff
+
+  # TODO: maybe faster, if we have fewer expensive iterations
+  #if (@$a < @$b) {
+  #  my $temp = $a;
+  #  $a = $b;
+  #  $b = $temp;
+  #}
+
+  my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
+
+  #if (1) {
+  while ($amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin]) {
+    $amin++;
+    $bmin++;
+  }
+  while ($amin <= $amax and $bmin <= $bmax and $a->[$amax] eq $b->[$bmax]) {
+    $amax--;
+    $bmax--;
+  }
+  #}
+
+  my $positions;
+
+  if (1 && $amax < $width ) {
+    $positions->{$a->[$_]} |= 1 << ($_ % $width) for $amin..$amax;
+
+    my $v = ~0;
+    my ($p,$u);
+
+    for ($bmin..$bmax) {
+      $p = $positions->{$b->[$_]} // 0;
+      $u = $v & $p;
+      $v = ($v + $u) | ($v - $u);
+    }
+    return $amin + _count_bits(~$v) + scalar(@$a) - ($amax+1);
+  }
+  else {
+    $positions->{$a->[$_]}->[$_ / $width] |= 1 << ($_ % $width) for $amin..$amax;
+
+    my $S;
+    my $Vs = [];      # $Vs->[$k] = bits;
+
+    my ($p, $u, $carry);
+
+    my $kmax = ($amax+1) / $width;
+    $kmax++ if (($amax+1) % $width);
+
+    for (my $k=0; $k < $kmax; $k++ ) { $Vs->[$k] = ~0; }
+
+    for my $j ($bmin..$bmax) {
+      $carry = 0;
+      for (my $k=0; $k < $kmax; $k++ ) {
+        #$S = (exists($Vs->[$k])) ? $Vs->[$k] : ~0;
+        $S = $Vs->[$k];
+        $p = $positions->{$b->[$j]}->[$k] // 0;
+        $u = $S & $p;             # [Hyy04]
+        $Vs->[$k] = ($S + $u + $carry) | ($S - $u);
+        $carry = (($S & $u) | (($S | $u) & ~($S + $u + $carry))) >> ($width-1) & 1;
+      }
+    }
+
+    my $bitcount = 0;
+
+    if (@$Vs) {
+      for my $k ( @{$Vs} ) {
+        $bitcount += _count_bits(~$k);
+      }
+    }
+    return $amin + $bitcount + scalar(@$a) - ($amax+1);
+  }
+}
+
+
 sub LCS {
   my ($self, $a, $b) = @_;
 
   use integer;
-  no warnings 'portable'; # for 0xffffffffffffffff
+  #no warnings 'portable'; # for 0xffffffffffffffff
 
   my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
 
@@ -36,6 +116,7 @@ sub LCS {
     $bmax--;
   }
 
+
   my $positions;
   my @lcs;
 
@@ -45,23 +126,17 @@ sub LCS {
     my $S = ~0;
 
     my $Vs = [];
-    my ($bj,$y,$u);
+    my ($y,$u);
 
     # outer loop
     for my $j ($bmin..$bmax) {
-      $bj = $b->[$j];
-      unless (defined $positions->{$bj}) {
-        $Vs->[$j] = $S;
-        next;
-      }
-      $y = $positions->{$bj};
-      $u = $S & $y;             # [Hyy04]
+      $y = $positions->{$b->[$j]} // 0;
+      $u = $S & $y;               # [Hyy04]
       $S = ($S + $u) | ($S - $u); # [Hyy04]
       $Vs->[$j] = $S;
     }
 
     # recover alignment
-    #my @lcs;
     my $i = $amax;
     my $j = $bmax;
 
@@ -70,7 +145,11 @@ sub LCS {
         $i--;
       }
       else {
-        unless ($j && ~$Vs->[$j-1] & (1<<$i)) {
+        unless (
+           $j
+           && exists $Vs->[$j-1]
+           && ~$Vs->[$j-1] & (1<<$i)
+        ) {
            unshift @lcs, [$i,$j];
            $i--;
         }
@@ -82,35 +161,29 @@ sub LCS {
     $positions->{$a->[$_]}->[$_ / $width] |= 1 << ($_ % $width) for $amin..$amax;
 
     my $S;
-
     my $Vs = [];
-    my ($bj,$y,$u,$carry);
-    my $kmax = $amax / $width + 1;
+    my ($y,$u,$carry);
+
+    my $kmax = ($amax+1) / $width;
+    $kmax++ if (($amax+1) % $width);
 
     # outer loop
     for my $j ($bmin..$bmax) {
+      for (my $k=0; $k < $kmax; $k++ ) { $Vs->[$j]->[$k] = ~0; }
       $carry = 0;
-      $bj = $b->[$j];
 
       for (my $k=0; $k < $kmax; $k++ ) {
-        #$S = ($j && defined($Vs->[$j-1]->[$k])) ? $Vs->[$j-1]->[$k] : ~0;
-        $S = ($j) ? $Vs->[$j-1]->[$k] : ~0;
-        unless (defined $positions->{$bj}->[$k]) {
-          $Vs->[$j]->[$k] = $S;
-          next;
-        }
-        $y = $positions->{$bj}->[$k];
+        $S = ($j > $bmin) ? $Vs->[$j-1]->[$k] : ~0;
+        $y = $positions->{$b->[$j]}->[$k] // 0;
         $u = $S & $y;             # [Hyy04]
-        #$S = ($S + $u + $carry) | ($S & ~$y);
-        #$Vs->[$j]->[$k] = $S;
-        $Vs->[$j]->[$k] = $S = ($S + $u + $carry) | ($S & ~$y);
-        # carry = ((vv & u) | ((vv | u) & ~(vv + u + carry))) >> 63;
-        $carry = (($S & $u) | (($S | $u) & ~($S + $u + $carry))) >> 63;
+
+        $Vs->[$j]->[$k] = ($S + $u + $carry) | ($S - $u);
+
+        $carry = (($S & $u) | (($S | $u) & ~($S + $u + $carry))) >> ($width-1) & 1;
       }
     }
 
     # recover alignment
-    #my @lcs;
     my $i = $amax;
     my $j = $bmax;
 
@@ -120,7 +193,11 @@ sub LCS {
         $i--;
       }
       else {
-        unless ($j && ~$Vs->[$j-1]->[$k] & (1<<($i % $width))) {
+        unless (
+           $j
+           && exists $Vs->[$j-1]->[$k]
+           && ~$Vs->[$j-1]->[$k] & (1<<($i % $width))
+        ) {
            unshift @lcs, [$i,$j];
            $i--;
         }
@@ -136,6 +213,32 @@ sub LCS {
   ];
 }
 
+sub _count_bits {
+  my $v = shift;
+
+  use integer;
+  #no warnings 'portable'; # for 0xffffffffffffffff
+
+  if ($width == 64) {
+    $v = $v - (($v >> 1) & 0x5555555555555555);
+    $v = ($v & 0x3333333333333333) + (($v >> 2) & 0x3333333333333333);
+    # (bytesof($v) -1) * bitsofbyte = (8-1)*8 = 56 ----------------------vv
+    $v = (($v + ($v >> 4) & 0x0f0f0f0f0f0f0f0f) * 0x0101010101010101) >> 56;
+    return $v;
+  }
+  else {
+    #$v = $v - (($v >> 1) & 0x55555555);
+    #$v = ($v & 0x33333333) + (($v >> 2) & 0x33333333);
+    ## (bytesof($v) -1) * bitsofbyte = (4-1)*8 = 24 ------vv
+    #$v = (($v + ($v >> 4) & 0x0f0f0f0f) * 0x01010101) >> 24
+
+    my $c; # count
+    for ($c = 0; $v; $c++) {
+      $v &= $v - 1; # clear the least significant bit set
+    }
+    return $c;
+  }
+}
 
 1;
 
@@ -186,6 +289,10 @@ LCS() call.
 
 =over 4
 
+=item LLCS(\@a,\@b)
+
+Return the length of a Longest Common Subsequence, taking two arrayrefs as method
+arguments. It returns an integer.
 
 =item LCS(\@a,\@b)
 
@@ -215,7 +322,7 @@ Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014-2015 by Helmut Wollmersdorfer
+Copyright 2014-2019 by Helmut Wollmersdorfer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -4,39 +4,41 @@
       "David Leadbeater <cpan@dgl.cx>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "POE-Component-FastCGI",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "CGI::Util" : 0,
-            "HTTP::Request" : 0,
-            "HTTP::Response" : 0,
-            "POE" : 0
+            "CGI::Util" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "POE" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/bingos/poe-component-fastcgi",
+      "homepage" : "https://github.com/bingos/poe-component-fastcgi",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/bingos/poe-component-fastcgi",
-         "web" : "http://github.com/bingos/poe-component-fastcgi"
+         "url" : "https://github.com/bingos/poe-component-fastcgi.git",
+         "web" : "https://github.com/bingos/poe-component-fastcgi"
       }
    },
-   "version" : "0.19"
+   "version" : "0.20",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14"
 }
 

@@ -33,6 +33,7 @@ diff ... | sdif
     --unified, -u, -U#	unified diff
 
     --width=#, -W#	specify width of output (default 80)
+    --margin=#          specify margin column number (default 0)
     --color=when	'always' (default), 'never' or 'auto'
     --nocolor		--color=never
     --colormap, --cm	specify color map
@@ -104,6 +105,7 @@ my $opt_digit = 4;
 my $opt_column;
 my $opt_view;
 my $opt_ambiguous = 'narrow';
+my $opt_margin = 0;
 our $screen_width;
 
 my $opt_color = 'always';
@@ -140,6 +142,7 @@ my @optargs = (
     "l" => \$opt_l,
     "s" => \$opt_s,
     "width|W=i" => \$opt_W,
+    "margin=i" => \$opt_margin,
     "view|v!" => \$opt_view,
     "ambiguous=s" => \$opt_ambiguous,
     "command!" => \$opt_command,
@@ -372,6 +375,15 @@ if ($readfile) {
 
 my @boundary = $opt_onword ? (boundary => 'word') : ();
 my $color_re = qr{ \e \[ [\d;]* [mK] }x;
+
+use Text::ANSI::Fold qw(ansi_fold :constants);
+
+if ($opt_margin > 0) {
+    Text::ANSI::Fold->configure(
+	linebreak => LINEBREAK_ALL,
+	map { $_ => $opt_margin } qw(margin runin runout),
+	);
+}
 
 my $oline = 1;
 my $nline = 1;
@@ -678,8 +690,6 @@ sub linenum {
     defined $n ? (sprintf $num_format, $n) : (' ' x $opt_digit);
 }
 
-use Text::ANSI::Fold qw(ansi_fold);
-
 sub print_column_23 {
     my $column = @_ / 2;
     my $width = column_width $column;
@@ -984,6 +994,14 @@ B<--no-cdif> option to disable it.
 Use width as a width of output listing.  Default width is 80.  If the
 standard error is assigned to a terminal, the width is taken from it
 if possible.
+
+=item B<--margin>=I<column>
+
+Set margin column number.  Margin columns are left blank at the end of
+each line.  This option implicitly declare line break control, which
+allows to run-in and run-out prohibited characters at the head-and-end
+of line.  Margin columns are used to run-in prohibited characters from
+the head of next line.  See `perldoc Text::ANSI::Fold` for detail.
 
 =item B<-->[B<no>]B<number>, B<-n>
 

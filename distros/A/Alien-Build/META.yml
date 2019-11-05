@@ -5,6 +5,7 @@ author:
   - 'Joel Berger <joel.a.berger@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
+  Test2::API: '1.302096'
   Test2::Mock: '0.000060'
   Test2::Require: '0.000060'
   Test2::Require::Module: '0.000060'
@@ -40,7 +41,7 @@ requires:
   List::Util: '1.33'
   Module::Load: '0'
   Path::Tiny: '0.077'
-  Test2::API: '1.302015'
+  Test2::API: '1.302096'
   Text::ParseWords: '3.26'
   perl: '5.008001'
 resources:
@@ -48,7 +49,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '1.89'
+version: '1.92'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'
@@ -77,6 +78,6 @@ x_contributors:
   - 'Shoichi Kaji (SKAJI)'
   - 'Shawn Laffan (SLAFFAN)'
   - 'Paul Evans (leonerd, PEVANS)'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

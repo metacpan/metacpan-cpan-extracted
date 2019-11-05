@@ -1,0 +1,11 @@
+bin/dbedia-blob
+Build.PL
+Changes
+lib/dbedia/blob.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_dbedia-blob.t
+t/t-files/fi
+t/t-files/site.css

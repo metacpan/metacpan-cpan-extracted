@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.009	2019-10-31
+
+ [ Documentation ]
+ - Fix tree/leaf example.
+
 0.008	2019-10-30
 
  - Added: Give each class a FACTORY method to return the factory package

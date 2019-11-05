@@ -10,7 +10,7 @@ use XML::Simple; # because that's what Net::Fritz uses...
 use Net::Fritz::PhonebookEntry;
 
 use vars '$VERSION';
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 =head1 NAME
 
@@ -186,6 +186,8 @@ sub add_entry( $self, $entry ) {
     #use Data::Dumper;
     #$Data::Dumper::Useqq = 1;
     #print Dumper \$xml;
+    # Force-add the XML header with the encoding:
+    $xml = '<?xml version="1.0" encoding="utf-8"?>'."\n".$xml;
 
     my $res = $self->service->call('SetPhonebookEntry',
         NewPhonebookID => $self->id,

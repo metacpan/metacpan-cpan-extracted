@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::StorageValues;
-$DBIx::Class::Helper::Row::StorageValues::VERSION = '2.034000';
+$DBIx::Class::Helper::Row::StorageValues::VERSION = '2.034001';
 # ABSTRACT: Keep track of stored vs in-memory row values
 
 use strict;

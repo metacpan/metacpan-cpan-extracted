@@ -1,5 +1,16 @@
 Revision history for Alien-Build
 
+1.92      2019-11-04 04:33:57 -0700
+  - Require Test2::API 1.302096 for features used in test suite.
+
+1.91      2019-11-01 20:19:19 -0600
+  - Fix bug where Test::Alien::Diag could crash for Aliens without
+    dynamic libraries.
+
+1.90      2019-11-01 16:15:32 -0700
+  - Added Test::Alien::Diag (gh#142)
+  - Test::Alien ffi_ok add api option. (gh#143)
+
 1.89      2019-09-25 07:58:39 -0600
   - Production release identical to 1.88_01
 

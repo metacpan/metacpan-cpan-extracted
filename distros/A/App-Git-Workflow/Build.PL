@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
         'File::chdir'            => 0,
         'Git'                    => 0,
         'List::MoreUtils'        => 0,
+        'Path::Tiny'             => 0,
         'XML::Tiny'              => 0,
         'Time::Piece'            => 0,
         'YAML'                   => 0,

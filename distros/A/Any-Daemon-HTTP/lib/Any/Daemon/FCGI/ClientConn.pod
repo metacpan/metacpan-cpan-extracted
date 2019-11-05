@@ -1,0 +1,76 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::FCGI::ClientConn - handle FCGI requests
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Handles request from one single client in FCGI protocol.  This object
+gets initialized on any incoming connection by L<Any::Daemon::HTTP|Any::Daemon::HTTP> when
+C<protocol=FCGI>.
+
+More than one request can be collected at any moment, and they will be
+processed once complete.  However, they will be processed in a single
+thread: they have to wait for another to complete.
+
+=head1 METHODS
+
+=over 4
+
+=item Any::Daemon::FCGI::ClientConn-E<gt>B<new>(%options)
+
+ -Option    --Default
+  max_childs  <required>
+  socket      <required>
+
+=over 2
+
+=item max_childs => INTEGER
+
+The number of processes which are started in this back-end server.  We do
+not want more than this number of requests from the front-end server.
+
+=item socket => IO::Socket::IP
+
+Our client socket, for incoming traffic.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<socket>()
+
+=back
+
+=head2 HTTP
+
+=over 4
+
+=item $obj-E<gt>B<my>($request = $client->get_request;)
+
+Returns the next L<Any::Daemon::FCGI::Request|Any::Daemon::FCGI::Request> object (which is a simple
+extension to HTTP::Request).  Maintenance records which are in the
+incoming stream are handled as well.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.29,
+built on November 04, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

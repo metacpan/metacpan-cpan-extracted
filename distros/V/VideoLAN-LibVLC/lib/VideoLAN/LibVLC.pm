@@ -8,7 +8,7 @@ use Socket qw( AF_UNIX SOCK_DGRAM );
 use IO::Handle;
 
 # ABSTRACT: Wrapper for libvlc.so
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 use Exporter::Extensible -exporter_setup => 1;
@@ -125,8 +125,10 @@ sub _set_logger {
 		# if target is a logger
 		elsif (ref($target)->can('info')) {
 			$self->{log}= sub {
-				my ($level, $msg, $attr)= @_;
-				$msg= join(' ', $msg, map { "$_=$attr->{$_}" } keys %$attr);
+				my $event= shift;
+				my $level= $event->{level};
+				my $msg= join ' ', $event->{message}, map "$_=$event->{$_}",
+					grep defined $event->{$_}, qw( name header id module file line );
 				if ($level == LOG_LEVEL_DEBUG()) { $target->debug($msg); }
 				elsif ($level == LOG_LEVEL_NOTICE()) { $target->notice($msg); }
 				elsif ($level == LOG_LEVEL_WARNING()) { $target->warn($msg); }
@@ -142,7 +144,7 @@ sub _set_logger {
 		# Install callback
 		weaken($self);
 		my $cb_id= $self->_register_callback(sub { $self->log->($_[0]) } );
-		$self->_libvlc_log_set($cb_id, $lev, $options->{fields} || ['*']);
+		$self->_libvlc_log_set($cb_id, $lev, $options->{fields} || []);
 	}
 }
 
@@ -260,7 +262,7 @@ VideoLAN::LibVLC - Wrapper for libvlc.so
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -279,7 +281,7 @@ version 0.03
       $player->queue_new_picture(id => ++$next_pic_id)
         while $player->queued_picture_count < 8
     },
-	# callback when it is time to display a filled picture buffer
+    # callback when it is time to display a filled picture buffer
     display => sub ($player, $event) {
       do_stuff( $event->{picture} );  # do something with the picture
       $player->queue_picture($event->{picture});  # recycle the buffer
@@ -434,13 +436,20 @@ Whether or not this version of libvlc supports redirecting the log.
 
 Set the logger object or logging callback or logging file handle for this LibVLC
 instance.  It can be either a logger object like L<Log::Any>, or a callback.
+The C<$event> passed to the callback is a hashref containing C<message>, C<level>,
+and possibly other fields if requested by C<< $options{fields} >>.
 
-The optional second argumnt \%options can request more or less information for
-the callback.  Available options are:
+The optional second argument C<\%options> can request more or less information about the
+log message.  Available options are:
 
-  level   - one of LIBVLC_DEBUG LIBVLC_NOTICE LIBVLC_WARNING LIBVLC_ERROR
-  context - boolean of whether to collect the attributes "module", "file", and "line".
-  object  - boolean of whether to collect the attributes "name", "header", "id".
+  level  => one of LOG_LEVEL_DEBUG LOG_LEVEL_NOTICE LOG_LEVEL_WARNING LOG_LEVEL_ERROR
+  fields => arrayref set of [ "module", "file", "line", "name", "header", "objid" ]
+            or '*' to select all of them.  Each selected field will appear in the
+            log $event.
+
+for example,
+
+  $vlc->log($log, { level => LOG_LEVEL_WARNING, fields => [qw( file line )] });
 
 Note that logging can happen from other threads, so you won't see the messages until
 you call L</callback_dispatch>.
@@ -475,17 +484,20 @@ streams.  VLC can open paths, URIs, or file handles, and if you only
 pass one argument to this method it attempts to decide which of those
 three you intended.
 
-You an instead pass a hash or hashref, and then it just passes them
+You can instead pass a hash or hashref, and then it just passes them
 along to the Media constructor.
 
 =head2 new_media_player
 
   my $player= $vlc->new_media_player();
 
+Creates a new L<VideoLAN::LibVLC::MediaPlayer>
+
 =head2 callback_fh
 
-The file handle of the read-end of the callback pipe.  Listen on this file handle
-to know when to call L</callback_dispatch>.
+The file handle of the read-end of the callback pipe.  Watch the readable status of
+this file handle to know when to call L</callback_dispatch>.  DO NOT READ OR WRITE
+IT FOR ANY REASON, lest ye incur the Wrath of the Segfault.
 
 =head2 callback_dispatch
 
@@ -500,6 +512,14 @@ file handle L</callback_fh> to become readable to know when to call this method.
   my $vlc= VideoLAN::LibVLC->new;
   my $watcher= AE::io $vlc->callback_fh, 0, sub { $vlc->callback_dispatch };  
 
+=item IO::Async example:
+
+  my $vlc= VideoLAN::LibVLC->new;
+  $loop->add( IO::Async::Handle->new(
+    handle => $vlc->callback_fh,
+    on_read_ready => sub { $vlc->callback_dispatch },
+  ));
+
 =item Manual event loop example:
 
   my $vlc= VideoLAN::LibVLC->new;
@@ -512,21 +532,20 @@ file handle L</callback_fh> to become readable to know when to call this method.
 =back
 
 The "wire format" used to stream the callbacks is deliberately hidden within
-this module, and might change drastically in future versions.  It also uses
-raw C-level pointers, so isn't safe for perl to tinker with anyway.
+this module.  It does not contain any user-servicable parts.
 
 =head2 libvlc_video_set_callbacks
 
   libvlc_video_set_callbacks($player, $lock_cb, $unlock_cb, $display_cb, $opaque);
 
-This is part of the LibVLC API, but you should use L<VideoLAN::LibVLC::Player/set_video_callbacks>
+This is part of the LibVLC API, but you should use L<VideoLAN::LibVLC::MediaPlayer/set_video_callbacks>
 instead.
 
 =head2 libvlc_video_set_format_callbacks
 
   libvlc_video_set_format_callbacks($player, $format_cb, $cleanup_cb);
 
-This is part of the LibVLC API, but you should use L<VideoLAN::LibVLC::Player/set_video_callbacks>
+This is part of the LibVLC API, but you should use L<VideoLAN::LibVLC::MediaPlayer/set_video_callbacks>
 instead.
 
 =head1 AUTHOR

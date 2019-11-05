@@ -31,7 +31,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Dancer2::Plugin::Captcha' => { file => 'lib/Dancer2/Plugin/Captcha.pm', version => '0.12' },
+            'Dancer2::Plugin::Captcha' => { file => 'lib/Dancer2/Plugin/Captcha.pm', version => '0.13' },
         },
         resources => {
             repository => {

@@ -613,7 +613,7 @@ sub is_error {
 
 Return true if the servers return a checksum (for this you have to
 build a session with C<trx_securityhash> for this to work, and you
-shoul use the app_security_key).
+should use the app_security_key).
 
 CGI Name: C<ret_param_checksum>
 Data type: String

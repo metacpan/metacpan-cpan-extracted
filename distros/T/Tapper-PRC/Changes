@@ -1,5 +1,10 @@
 Revision history for Tapper-PRC
 
+5.0.4     2019-11-04
+        - adapt hot-patched KILL-avoidance code to latest
+          reworked signal handling in Minion::Job
+        - improve signal finishing behaviour
+
 5.0.3     2018-09-19
         - tweak timout race conditions
         - remove uploaded files on PRC0-Attachments,

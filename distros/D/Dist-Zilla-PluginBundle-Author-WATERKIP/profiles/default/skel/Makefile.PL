@@ -20,7 +20,13 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => "0.96"
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Import::Into" => "1.002003",
+    "Sub::Override" => 0,
+    "Test::More" => "0.96",
+    "Test::Most" => 0
   },
   "VERSION" => "0.001",
   "test" => {
@@ -30,11 +36,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "Import::Into" => "1.002003",
   "Moose" => 0,
+  "Sub::Override" => 0,
   "Test::More" => "0.96",
+  "Test::Most" => 0,
   "namespace::autoclean" => 0
 );
-
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};

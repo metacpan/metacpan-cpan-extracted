@@ -6,6 +6,8 @@ Any::Daemon::HTTP::Session - represents a client connection
 
 =head1 SYNOPSIS
 
+   # created by Any::Daemon::HTTP
+
 =head1 DESCRIPTION
 
 The connection relates to one client.  Each time, some browser connects
@@ -21,12 +23,9 @@ to cache information as well.
 =item Any::Daemon::HTTP::Session-E<gt>B<new>(%options)
 
  -Option--Default
-  client  <required>
   store   {}
 
 =over 2
-
-=item client => IO::Socket-client
 
 =item store => HASH
 
@@ -48,8 +47,8 @@ to cache information as well.
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.28,
-built on March 20, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.29,
+built on November 04, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 

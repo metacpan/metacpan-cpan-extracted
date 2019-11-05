@@ -33,3 +33,6 @@ on 'test' => sub {
 	recommends 'Test::HexString', '>= 0.03';
 };
 
+on 'develop' => sub {
+    requires 'Devel::Cover::Report::Coveralls', '>= 0.11';
+};

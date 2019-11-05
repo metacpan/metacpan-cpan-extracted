@@ -13,13 +13,16 @@ use Test::More ;
 
 BEGIN
 {
+
+    diag "Running Perl version  $]\n";
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
 
-    my $VERSION = '2.087';
+    my $VERSION = '2.089';
     my @NAMES = qw(
 			
 			);
@@ -54,4 +57,3 @@ BEGIN
     }
     
 }
-

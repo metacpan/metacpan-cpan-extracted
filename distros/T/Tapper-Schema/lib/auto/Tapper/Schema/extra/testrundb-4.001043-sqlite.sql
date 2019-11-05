@@ -937,7 +937,7 @@ DROP TABLE chart_line_restrictions;
 CREATE TABLE chart_line_restrictions (
   chart_line_restriction_id INTEGER PRIMARY KEY NOT NULL,
   chart_line_id INT(11) NOT NULL,
-  chart_line_restriction_operator VARCHAR(4) NOT NULL,
+  chart_line_restriction_operator VARCHAR(8) NOT NULL,
   chart_line_restriction_column VARCHAR(512) NOT NULL,
   is_template_restriction TINYINT(3) NOT NULL,
   is_numeric_restriction TINYINT(3) NOT NULL,

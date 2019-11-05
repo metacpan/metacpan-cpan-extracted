@@ -1,8 +1,5 @@
 package POE::Component::FastCGI::Response;
-BEGIN {
-  $POE::Component::FastCGI::Response::VERSION = '0.19';
-}
-
+$POE::Component::FastCGI::Response::VERSION = '0.20';
 use strict;
 use base qw/HTTP::Response/;
 use bytes;

@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2203';
+our $VERSION = '0.2204';
 
 use Carp;
 use Algorithm::Combinatorics qw( permutations );
@@ -512,7 +512,7 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2203
+version 0.2204
 
 =head1 SYNOPSIS
 
@@ -624,7 +624,7 @@ strategic variations of the prisoner's dilemma.
 Create a new C<Game::Theory::TwoPersonMatrix> object.
 
 Player strategies are given by a hash reference of numbered keys - one for each
-strategy.  These are each assumed to add to 1.  Otherwise YMMV.
+strategy.  The values of these are assumed to add to 1.  Otherwise YMMV.
 
 Payoffs are given by array references of lists of outcomes.  For zero-sum games
 this is a single payoff list.  For non-zero-sum games this is given as two lists

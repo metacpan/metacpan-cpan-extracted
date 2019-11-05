@@ -1,3 +1,24 @@
+0.051004 -- 2019-11-05
+
+    - Work around changed Getopt::Long 2.51 behaviour
+        Getopt::Long 2.51 fixed its documented behaviour ("--" is kept
+        in the argument list if "pass_through" is specified). Previous
+        versions removed it. Term::CLI now checks for the Getopt::Long
+        version and adapts where necessary.
+
+        Files modified:
+            lib/Term/CLI/Command.pm
+
+    - Add perl-generators to BuildRequires
+
+        Files modified:
+            pkg/fedora/perl-Term-CLI.spec
+
+    - Fix hint on tagging/pushing.
+
+        Files modified:
+            RELEASING
+
 0.051003 -- 2018-07-11
 
     - POD fixes:

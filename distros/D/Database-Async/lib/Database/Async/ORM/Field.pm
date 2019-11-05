@@ -3,7 +3,7 @@ package Database::Async::ORM::Field;
 use strict;
 use warnings;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 sub new {
     my ($class, %args) = @_;

@@ -8,7 +8,7 @@ use warnings;
 use utf8;
 
 use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -271,7 +271,7 @@ L<Astro::App::Satpass2::Locale|Astro::App::Satpass2::Locale>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

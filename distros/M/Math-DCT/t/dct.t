@@ -2,10 +2,10 @@ use Test2::Tools::Compare 'float';
 use Test2::V0;
 
 use Math::DCT ':all';
-use Data::Dumper;
+
 my $M_PI  = 3.14159265358979323846;
 
-foreach my $sz (qw/3 4 8/) {
+foreach my $sz (qw/3 4 8 11 32 64/) {
     my (@array, @array2d, @array2d_fl);
     foreach my $x (1..$sz) {
         @array = map { rand(256) } ( 1..$sz );
@@ -13,12 +13,12 @@ foreach my $sz (qw/3 4 8/) {
         push @array2d, [@array];
     }
     subtest "Size $sz 1D array" => sub {
-        compare_arrays(perl_dct1d(\@array), dct1d(\@array));
-        compare_arrays(perl_dct1d(\@array), @{dct([\@array])});
+        compare_arrays(naive_perl_dct1d(\@array), dct1d(\@array));
+        compare_arrays(naive_perl_dct1d(\@array), @{dct([\@array])});
     };
     subtest "Size $sz".'x'."$sz 2D array" => sub {
-        compare_arrays(flat_array(perl_dct2d(\@array2d)), dct2d(\@array2d_fl));
-        compare_arrays(flat_array(perl_dct2d(\@array2d)), flat_array(dct([@array2d])));
+        compare_arrays(naive_perl_dct2d(\@array2d), dct2d(\@array2d_fl));
+        compare_arrays(naive_perl_dct2d(\@array2d), dct([@array2d]));
     };
 }
 
@@ -26,6 +26,8 @@ done_testing();
 
 sub compare_arrays {
     my ($ref, $check) = @_;
+    $ref   = flat_array($ref)   if ref $ref->[0]   eq 'ARRAY';
+    $check = flat_array($check) if ref $check->[0] eq 'ARRAY';
     my $sz = scalar @$ref;
     is($ref->[$_], float($check->[$_]), "Array item ".($_+1)." of $sz matches.")
         foreach (0..$sz-1);
@@ -38,7 +40,7 @@ sub flat_array {
     return \@flat;
 }
 
-sub perl_dct1d {
+sub naive_perl_dct1d {
     my $vector = shift;
     my $factor = $M_PI/scalar(@$vector);
     my @result;
@@ -53,7 +55,7 @@ sub perl_dct1d {
     return \@result;
 }
 
-sub perl_dct2d {
+sub naive_perl_dct2d {
     my $vector = shift;
     my $N      = scalar(@$vector);
     my $fact   = $M_PI/$N;

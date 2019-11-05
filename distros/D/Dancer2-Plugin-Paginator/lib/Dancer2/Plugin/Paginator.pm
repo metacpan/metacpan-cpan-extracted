@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Paginator;
 
-$Dancer2::Plugin::Paginator::VERSION   = '2.10';
+$Dancer2::Plugin::Paginator::VERSION   = '2.11';
 $Dancer2::Plugin::Paginator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Paginator - Dancer2 plugin for Paginator::Lite.
 
 =head1 VERSION
 
-Version 2.10
+Version 2.11
 
 =cut
 
@@ -122,7 +122,7 @@ L<http://search.cpan.org/dist/Dancer2-Plugin-Paginator/>
 =head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2013 Blabos de Blebe.
-Copyright (C) 2017 Mohammad S Anwar.
+Copyright (C) 2017 - 2019 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the terms same as Perl 5.

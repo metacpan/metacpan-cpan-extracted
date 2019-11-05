@@ -1,0 +1,72 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon::FCGI - serve the FCGI protocol
+
+=head1 INHERITANCE
+
+ Any::Daemon::FCGI
+   is an IO::Socket::IP
+
+=head1 SYNOPSIS
+
+  use Any::Daemon::HTTP 0.29;
+  my $http = Any::Daemon::HTTP->new
+    ( listen    => 'www.example.com'
+    , protocol  => 'FCGI'
+    , ...
+    );
+
+=head1 DESCRIPTION
+
+The Fast CGI protocol connects a generic front-end web-server (like
+Apache or NGinx) with an backe-end daemon.  The communication reuses
+connections.  The front-end server validates and throttles requests to
+the back-end daemon.  This module is the base for such back-end daemon.
+
+This module extends the network side of a socket.  During L<accept()|Any::Daemon::FCGI/"Actions">,
+each incoming connection will create a new
+L<Any::Daemon::FCGI::ClientConn|Any::Daemon::FCGI::ClientConn> object which handles the requests.
+
+B<Warning:> the session object lives during the whole client connection,
+which may contain requests from different customers.
+
+B<Warning:> this code is new (nov 2019) and only tested with Apache 2.4.
+Please report success (and bug-fixes) for other front-end servers.
+
+=head1 METHODS
+
+=over 4
+
+=item Any::Daemon::FCGI-E<gt>B<new>(%options)
+
+See options of IO::Socket::IP and IO::Socket.
+
+=back
+
+=head2 Accessors
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<accept>( [$pkg] )
+
+Wait for a new connection to arrive on the socket.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon-HTTP distribution version 0.29,
+built on November 04, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
+
+=head1 LICENSE
+
+Copyrights 2013-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

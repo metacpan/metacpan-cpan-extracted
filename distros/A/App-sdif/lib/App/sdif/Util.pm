@@ -79,7 +79,7 @@ sub read_unified {
 
     state $marklines = sub {
 	local $_ = shift;
-	/-/ ? tr/-/-/ : tr/ / / + 1;
+	tr/-/-/ || tr/ / / + 1;
     };
 
     my @stack = new App::sdif::LabelStack @lsopt;

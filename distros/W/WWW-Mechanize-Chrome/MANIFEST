@@ -43,6 +43,7 @@ t/00-load.t
 t/01-chrome-devtools-protocol-target-cycle.t
 t/01-chrome-devtools-protocol-target.t
 t/01-chrome-devtools-protocol.t
+t/01-select-backend-implementation.t
 t/02-chrome-devtools-tab.t
 t/03-listener-leak-test.t
 t/47-mech-simplest.t
@@ -117,6 +118,7 @@ t/78-memleak.t
 t/78-two-instances.t
 t/helper.pm
 t/mixi_jp_index.html
+t/rt127588.t
 t/sophos_co_jp_index.html
 t/test-input-with-class.html
 testrules.yml
@@ -129,4 +131,5 @@ xt/99-test-prerequisites.t
 xt/99-todo.t
 xt/99-unix-text.t
 xt/99-versions.t
+xt/copyright.t
 xt/meta-lint.t

@@ -23,7 +23,7 @@ use POSIX qw{ floor };
 use Scalar::Util 1.26 qw{ isdual reftype };
 use Text::Wrap ();
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 use constant NONE => undef;
 use constant RE_ALL_DIGITS	=> qr{ \A [0-9]+ \z }smx;
@@ -4634,7 +4634,7 @@ The default is C<local>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

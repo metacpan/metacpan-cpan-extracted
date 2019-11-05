@@ -1,6 +1,24 @@
 CHANGES
 -------
 
+  2.089 3 November 2019
+
+      * No Changes
+      
+  2.088 31 October 2019
+
+      *  Beef up reset for zip usecase
+        d8be7b82c93d1ed8f7c396f7b19fef4b642cb7c8
+
+      * remove unnecessary commented code
+        7aaedd5c74335457c55a243e08180df69f35a4b7
+
+      * Add Support Details
+        5f34bf369cceabc8c06fb40ec6e9db32291a85b8
+    
+      * Documentation Updates
+        1e5b9d5f99be6b7a104b96e3349c2c63acf3a7b5
+
   2.087 10 August 2019
 
       * No Changes

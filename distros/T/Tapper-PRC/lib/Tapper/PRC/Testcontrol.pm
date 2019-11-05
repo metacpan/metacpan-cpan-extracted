@@ -1,6 +1,6 @@
 package Tapper::PRC::Testcontrol;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::PRC::Testcontrol::VERSION = '5.0.3';
+$Tapper::PRC::Testcontrol::VERSION = '5.0.4';
 use 5.010;
 use warnings;
 use strict;
@@ -883,7 +883,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

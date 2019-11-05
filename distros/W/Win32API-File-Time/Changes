@@ -1,3 +1,10 @@
+0.009		2019-10-31	T. R. Wyant
+    Correct t/file.t failure report, ReactOS detection
+
+    Fix broken POD links, and add tests to ensure they stay fixed.
+
+    Ditch 'use base' in favor of 'use parent'.
+
 0.008		2016-04-05	T. R. Wyant
   Code and documentation clean-up.
 

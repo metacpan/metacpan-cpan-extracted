@@ -10,7 +10,7 @@
 
 #include "PerlVLC.h"
 
-//#define PERLVLC_TRACE(x...) PerlVLC_cb_log_error(x)
+/*#define PERLVLC_TRACE(x...) PerlVLC_cb_log_error(x) */
 #define PERLVLC_TRACE(...) ((void)0)
 
 static void carp_croak_sv(SV* value) {
@@ -160,7 +160,7 @@ int PerlVLC_media_player_mg_free(pTHX_ SV *player_sv, MAGIC* mg) {
 	for (i= 0; i < mpinfo->picture_count; i++) {
 		mpinfo->pictures[i]->held_by_vlc= 0;
 		mpinfo->pictures[i]->trace_destruction= mpinfo->trace_pictures;
-		sv_2mortal((SV*) mpinfo->pictures[i]->self_hv); // release our hidden reference to the perl objects
+		sv_2mortal((SV*) mpinfo->pictures[i]->self_hv); /* release our hidden reference to the perl objects */
 	}
 	if (mpinfo->pictures) Safefree(mpinfo->pictures);
 	/* Now it should be safe to free mpinfo */
@@ -367,6 +367,7 @@ typedef struct PerlVLC_Message {
 
 typedef struct PerlVLC_Message_LogMsg {
 	PERLVLC_MSG_HEADER
+	uint32_t level;
 	uint32_t line;
 	uint32_t objid;
 	uint8_t module_strlen;
@@ -408,6 +409,7 @@ SV* PerlVLC_inflate_message(void *buffer, int msglen) {
 			logmsg= (PerlVLC_Message_LogMsg_t *) msg;
 			pos= logmsg->stringdata;
 			lim= ((char*)buffer) + msglen;
+			hv_stores(ret, "level", newSViv(logmsg->level));
 			if (logmsg->line)
 				hv_stores(ret, "line", newSViv(logmsg->line));
 			if (logmsg->objid)
@@ -436,7 +438,7 @@ SV* PerlVLC_inflate_message(void *buffer, int msglen) {
 				hv_stores(ret, "header", newSVpvn(pos, logmsg->header_strlen));
 				pos += logmsg->header_strlen+1;
 			}
-			lim[-1]= '\0'; // for strlen safety
+			lim[-1]= '\0'; /* for strlen safety */
 			hv_stores(ret, "message", newSVpvn(pos, strlen(pos)));
 		}
 		if (0) {
@@ -510,6 +512,7 @@ void PerlVLC_log_cb(void *opaque, int level, const libvlc_log_t *ctx, const char
 	
 	if (vlc->log_level > level) return;
 	memset(msg, 0, sizeof(*msg));
+	msg->level= level;
 	pos= msg->stringdata;
 	lim= buffer + sizeof(buffer);
 	if (vlc->log_module || vlc->log_file || vlc->log_line) {
@@ -541,13 +544,13 @@ void PerlVLC_log_cb(void *opaque, int level, const libvlc_log_t *ctx, const char
 		msg->objid= objid;
 	}
 	wrote= vsnprintf(pos, lim-pos, fmt, args);
-//	PERLVLC_TRACE("sprintf into %ld bytes = %d", lim-pos, wrote);
+/*	PERLVLC_TRACE("sprintf into %ld bytes = %d", lim-pos, wrote); */
 	if (wrote > 0) { pos += wrote; if (pos >= lim) pos= lim-1; }
 	*pos++ = 0;
 	msg->event_id= PERLVLC_MSG_LOG;
 	msg->callback_id= (uint16_t) vlc->log_callback_id;
 	wrote= send(vlc->event_pipe[1], buffer, pos - buffer, 0);
-//	PERLVLC_TRACE("send(%d, %p, %d, 0): %d", vlc->event_pipe[1], buffer, pos - buffer, wrote);
+/*	PERLVLC_TRACE("send(%d, %p, %d, 0): %d", vlc->event_pipe[1], buffer, pos - buffer, wrote); */
 }
 #endif
 
@@ -613,7 +616,7 @@ static void* PerlVLC_video_lock_cb(void *opaque, void **planes) {
 			picture= pic_msg.picture;
 			for (i= 0; i < 3; i++)
 				planes[i]= picture->plane_buffer_sv[i]? SvPVX(picture->plane_buffer_sv[i])
-					: PERLVLC_ALIGN_PLANE(picture->plane[i]); // alignment to 32-bytes
+					: PERLVLC_ALIGN_PLANE(picture->plane[i]); /* alignment to 32-bytes */
 			if (mpinfo->trace_pictures)
 				PerlVLC_cb_log_error("video thread got picture %d (%p,%p,%p)", picture->id, planes[0], planes[1], planes[2]);
 			return picture;

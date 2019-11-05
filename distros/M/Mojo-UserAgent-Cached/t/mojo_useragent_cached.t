@@ -282,8 +282,7 @@ subtest 'normalize URLs' => sub {
 };
 
 subtest 'url by url caching' => sub {
-   local $ENV{SUA_CACHE_EXPIRES_IN} = '1 seconds';
-   my $ua = Mojo::UserAgent::Cached->new( cache_url_opts => { 'http://.*?/content' => { expires_in => '5 seconds' } } );
+   my $ua = Mojo::UserAgent::Cached->new( cache_opts => { expires_in => '1 seconds' }, cache_url_opts => { 'http://.*?/content' => { expires_in => '5 seconds' } } );
    $ua->server->app($app);
 
    # Allow caching /foo requests too

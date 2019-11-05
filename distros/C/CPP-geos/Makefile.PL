@@ -10,8 +10,8 @@ use File::Fetch;
 use File::Path qw/rmtree/;
 use XS::Install;
 
-my $version       = '3.7.2';
-my $sha1_checksum = '1b6ec9c197fb4b0ddb96fb192e2f6924a1fbb269';
+my $version       = '3.7.3';
+my $sha1_checksum = '61ce1ac73781d070a49a09c17a4a46dbb2cf5058';
 
 my $filename = "geos-${version}.tar.bz2";
 my $src_dir  = "geos-${version}";

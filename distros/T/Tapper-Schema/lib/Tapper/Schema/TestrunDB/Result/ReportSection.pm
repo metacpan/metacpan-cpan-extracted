@@ -1,12 +1,31 @@
 package Tapper::Schema::TestrunDB::Result::ReportSection;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::ReportSection::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::Result::ReportSection::VERSION = '5.0.11';
 # ABSTRACT: Tapper - Containg additional informations for reports
 
 use strict;
 use warnings;
 
 use parent 'DBIx::Class';
+
+# this enumeration is a bit lame. anyway: copy the list from Tapper::TAP::Harness.@SECTION_HEADER_KEYS_GENERAL.
+# TODO: make it so (put list into schema and copy it from schema to Harness)
+our @meta_cols = qw/ram cpuinfo bios lspci lsusb uname osname uptime language-description
+                    flags kernel changeset description
+                    xen-version xen-changeset xen-dom0-kernel xen-base-os-description
+                    xen-guest-description xen-guest-test xen-guest-start xen-guest-flags xen-hvbits
+                    kvm-module-version kvm-userspace-version kvm-kernel
+                    kvm-base-os-description kvm-guest-description
+                    kvm-guest-test kvm-guest-start kvm-guest-flags
+                    simnow-svn-version
+                    simnow-version
+                    simnow-svn-repository
+                    simnow-device-interface-version
+                    simnow-bsd-file
+                    simnow-image-file
+                    ticket-url wiki-url planning-id moreinfo-url
+                    tags
+ /;
 
 __PACKAGE__->load_components("Core");
 __PACKAGE__->table("reportsection");
@@ -79,24 +98,8 @@ sub some_meta_available
 
         # this enumeration is a bit lame. anyway: copy the list from Tapper::TAP::Harness.@SECTION_HEADER_KEYS_GENERAL.
         # TODO: make it so (put list into schema and copy it from schema to Harness)
-        my @meta_cols = qw/ram cpuinfo bios lspci lsusb uname osname uptime language-description
-                           flags kernel changeset description
-                           xen-version xen-changeset xen-dom0-kernel xen-base-os-description
-                           xen-guest-description xen-guest-test xen-guest-start xen-guest-flags xen-hvbits
-                           kvm-module-version kvm-userspace-version kvm-kernel
-                           kvm-base-os-description kvm-guest-description
-                           kvm-guest-test kvm-guest-start kvm-guest-flags
-                           simnow-svn-version
-                           simnow-version
-                           simnow-svn-repository
-                           simnow-device-interface-version
-                           simnow-bsd-file
-                           simnow-image-file
-                           ticket-url wiki-url planning-id moreinfo-url
-                           tags
-                          /;
-        @meta_cols = map { my $x = $_; $x =~ s/-/_/g; $x } @meta_cols;
-        return 1 if grep { defined } @cols{@meta_cols};
+        my @local_meta_cols = map { my $x = $_; $x =~ s/-/_/g; $x } @meta_cols;
+        return 1 if grep { defined } @cols{@local_meta_cols};
         return 0;
 }
 
@@ -145,7 +148,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

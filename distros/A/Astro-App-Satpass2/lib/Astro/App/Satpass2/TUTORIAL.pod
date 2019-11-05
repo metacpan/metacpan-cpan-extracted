@@ -14,7 +14,7 @@ The simplest way to access C<Astro::App::Satpass2> functionality is
 through the F<satpass2> script, and that what this tutorial does.
 
 To get any real use out of this package, you need satellite orbital
-data. The best source is L<http://www.space-track.org/>, but this
+data. The best source is L<https://www.space-track.org/>, but this
 requires registration, so this tutorial will assume you are not
 registered and use data from other sources. Most other sources are
 redistributions of Space Track data, and will not be as up-to-date, but
@@ -413,7 +413,7 @@ dimmest reportable flare at night is determined by the
 C<flare_mag_night> setting, which defaults to C<0>.
 
 In order to duplicate (fairly closely) the Iridium flares reported by
-L<http://www.heavens-above.com/>, you will want to tweak
+L<https://www.heavens-above.com/>, you will want to tweak
 C<Astro::App::Satpass2>'s settings a bit:
 
  satpass2> set twilight -1.8 flare_mag_night -1

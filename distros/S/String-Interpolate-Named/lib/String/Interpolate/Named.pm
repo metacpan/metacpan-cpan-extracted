@@ -16,7 +16,7 @@ String::Interpolate::Named - Interpolated named arguments in string
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -25,76 +25,205 @@ our $VERSION = '0.05';
     my $ctl = { args => { fn => "Johan", ln => "Bach" } };
     say interpolate( $ctl, "The famous %{fn} %{ln}." );
 
+    # If you like object orientation.
+    my $int = String::Interpolate::Named->new( { args => { ... } } );
+    say $int->interpolate("The famous %{fn} %{ln}.");
+
 =head1 DESCRIPTION
 
-String::Interpolate::Named exports a single function, C<interpolate>, that
-takes a string and substitutes named I<variables> by I<target texts>.
+String::Interpolate::Named provides a function to interpolate named
+I<arguments> by I<target texts> in a template string. The target texts
+are provided to the function via a hash, where the keys correspond to
+the named argument to be replaced.
 
-The subroutine takes two arguments: a reference to a control hash and
-the string.
+=head2 Named Arguments
 
-The arguments to be replaced are marked in the string by enclosing
+The arguments to be replaced are marked in the template by enclosing
 them between C<%{> and C<}>. For example, the string C<"The famous
 %{fn} %{ln}."> contains two named arguments, C<fn> and C<ln>.
 
-In its basic form, the C<%{var}> is replaced by the value of the key
-C<var> in the C<args> element of the control hash. It is also possible
-to specify replacement values depending on whether C<var> has a
-value or not:
+=head2 Basic Interpolation
+
+When interpolated, the keys C<fn> and C<ln> are looked up in the hash,
+and the corresponding values are substituted. If no value was found
+for a named argument, nothing is substituted and the C<%{...}> is
+removed.
+
+You can precede C<%>, C<{>, C<}> (and C<|>, see below) with a
+backslash C<\> to hide their special meanings. For example, C<\}> will
+I<not> be considered closing an argument but yield a plain C<}> in the
+text.
+
+=head2 Conditional Interpolation
+
+It is possible to select replacement values depending on whether
+the named argument has a value or not:
 
     "This book has %{title|title %{title}}"
     "This book has %{title|title %{title}|no title}"
 
-Assuming argument C<title> has the value C<"My Book">, in the first
-example the text C<"title My Book"> will be substituted. If C<title>
-does not have a value, the empty string is substituted.
+These are considered C<%{if|then}> and C<%{if|then|else}> cases.
 
-In the second example, the string C<"no title"> will be substituted.
+Assuming argument C<title> has the value C<"My Book">, in the first
+example the text C<"title My Book">, the 'then' text, will be
+substituted, resulting in
+
+    "This book has title My Title"
+
+If C<title> does not have a value, the empty string is substituted. In
+the second example, the string C<"no title">, the 'else' text, will be
+substituted.
 
 As can be seen, the replacement texts may contain interpolations as
 well. For convenience, you can use C<%{}> to refer to the value of the
-named variable currently being examinated. The last example above can
+named argument currently being examinated. The last example above can
 be written more shortly and elegantly as:
 
     "This book has %{title|title %{}|no title}"
 
-You can test for specific values:
+=head2 Testing Values
+
+Instead of testing for named variables to have a value, you can also
+test for specific values:
 
     "This takes %{days=1|%{} day|%{} days}"
 
-Finally, the values as specified in the control hash may be scalar (in
-general: strings and numbers) or lists of scalars. If a value is a
-list of scalars, it is possible to select a value from the list by
-appending a period and a number to the key. Assume C<customer> has
-value C<[ "Jones", "Smith" ]>, then:
+=head2 List Values
+
+The replacement values hash may be scalar (in general: strings and
+numbers) or lists of scalars. If a value is a list of scalars, it is
+possible to select a particular value from the list by appending an
+index (period and a number) to the named argument.
+
+Assume C<customer> has value C<[ "Jones", "Smith" ]>, then:
 
     "%{customer.1} will be Smith"
     "%{customer.2} will be Jones"
     "%{customer} will be Jones Smith"
 
-The control hash contains the values for the variables in C<"args">:
+When no element is selected the values are concatenated.
 
-    { args => { customer => [ "Jones", "Smith" ],
-                days => 2, ... },
-    }
+=head2 The Control Hash
 
-When list values need to be concatenated, a separator may be
-specified:
+The interpolation process requires two parameters: a hash with
+settings and values for the named arguments, and the string to be used
+as a template for interpolation. The hash will be further referred to
+as the I<control hash>.
 
-    { args => { customer => [ "Jones", "Smith" ],
-                days => 2, ... },
-      separator => ", ",
-    }
+The hash can have the following keys:
 
-The separator defaults to perl variable C<$">, which defaults to a
+=over
+
+=item vars
+
+This is the hash that contains replacement texts for the named variables.
+
+This element should be considered mandatory.
+
+=item separator
+
+The separator used to concatenate list values, see L<List Values> above.
+
+It defaults to Perl variable C<$"> that, on its turn, defaults to a
 single space.
+
+=item maxiter
+
+To enable nested substitutions and recursive replacement, the
+interpolation process is repeated until there are no more
+interpolations to be made. The maximun number of iterations is limited
+to the value of C<maxiter>.
+
+By default maxiter is 16.
+
+=back
+
+An example of a control hash:
+
+    my %ctl =
+      ( args => {
+          customer => [ "Jones", "Smith" ],
+          days     => 2,
+          title    => "My Title",
+        },
+        separator => ", ",
+      );
+
+=head2 Object Oriented API
+
+    my $ii = String::Interpolate::Named->new;
+    $ii->ctl(\%ctl);
+    $result = $ii->interpolate($template);
+
+For convenience, the control hash may be passed to the constructor:
+
+    my $ii = String::Interpolate::Named->new(\%ctl);
+    $result = $ii->interpolate($template);
+
+=head2 Functional API
+
+String::Interpolate::Named privides a single function, C<interpolate>,
+which is exported by default.
+
+The subroutine takes two arguments: a reference to a control hash and
+the template string.
+
+   $result = interpolate( \%ctl, $template );
+
+=cut
+
+=head1 METHODS
+
+=head2 new
+
+Constructs a new String::Interpolate::Named object.
+
+    my $ii = String::Interpolate::Named->new;
+
+or
+
+    my $ii = String::Interpolate::Named->new(\%ctl);
+
+=cut
+
+sub new {
+    my ( $pkg, $ctl ) = @_;
+    $ctl //= {};
+    bless $ctl => $pkg;
+}
+
+=head2 ctl
+
+Associates a control has with an existing object.
+
+    $ii->ctl(\%ctl);
+
+=cut
+
+sub ctl {
+    my ( $self, $ctl ) = @_;
+    $self->{$_} = $ctl->{$_} for keys(%$ctl);
+    return $self;
+}
+
+=head2 interpolate
+
+This routine performs the actual interpolations. It can be used as a method:
+
+    $ii->interpolate($template);
+
+and functional:
+
+    interpolate( \%ctl, $template );
 
 =cut
 
 sub interpolate {
     my ( $ctl, $tpl ) = @_;
 
-    for ( my $cnt = 0; ; $cnt++ ) {
+    my $maxiter = $ctl->{maxiter} // 16;
+
+    for ( my $cnt = 1; $cnt <= $maxiter; $cnt++ ) {
 
 	my $prev = $tpl;
 
@@ -103,39 +232,43 @@ sub interpolate {
 	$tpl =~ s/\\\{/\x{fdd1}/g;
 	$tpl =~ s/\\\}/\x{fdd2}/g;
 	$tpl =~ s/\\\|/\x{fdd3}/g;
+	$tpl =~ s/\\\%/\x{fdd4}/g;
 
 	# Replace some seqs by a single char for easy matching.
-	$tpl =~ s/\%\{\}/\x{fdd4}/g;
-	$tpl =~ s/\%\{/\x{fdd5}/g;
+	$tpl =~ s/\%\{\}/\x{fdde}/g;
+	$tpl =~ s/\%\{/\x{fddf}/g;
 
 	# %{ key [ .index ] [ = value ] [ | then [ | else ] ] }
 
-	$tpl =~ s; ( \x{fdd5}
+	$tpl =~ s; ( \x{fddf}
 		     (?<key>\w+[-_\w.]*)
 		     (?: (?<op> \= )
-			 (?<test> [^|}\x{fdd5}]*) )?
-		     (?: \| (?<then> [^|}\x{fdd5}]*  )
-			 (?: \| (?<else> [^|}\x{fdd5}]* ) )?
+			 (?<test> [^|}\x{fddf}]*) )?
+		     (?: \| (?<then> [^|}\x{fddf}]*  )
+			 (?: \| (?<else> [^|}\x{fddf}]* ) )?
 		     )?
 		     \}
 		   )
 		 ; _interpolate($ctl, {%+} ) ;exo;
 
 	# Unescape escaped specials.
-	$tpl =~ s/\x{fdd0}/\\/g;
-	$tpl =~ s/\x{fdd1}/\\{/g;
-	$tpl =~ s/\x{fdd2}/\\}/g;
-	$tpl =~ s/\x{fdd3}/\\|/g;
+	$tpl =~ s/\x{fdd0}/\\\\/g;
+	$tpl =~ s/\x{fdd1}/\\\{/g;
+	$tpl =~ s/\x{fdd2}/\\\}/g;
+	$tpl =~ s/\x{fdd3}/\\\|/g;
+	$tpl =~ s/\x{fdd4}/\\\%/g;
 
 	# Restore (some) seqs.
-	$tpl =~ s/\x{fdd4}/%{}/g;
-	$tpl =~ s/\x{fdd5}/%{/g;
+	$tpl =~ s/\x{fdde}/%{}/g;
+	$tpl =~ s/\x{fddf}/%{/g;
 
-	last if $prev eq $tpl;
-	# warn("$cnt: $prev -> $tpl\n");
+	if ( $prev eq $tpl ) {
+	    $tpl =~ s/\\([%{}|])/$1/g;
+	    return $tpl;
+	}
+	warn("$cnt: $prev -> $tpl\n") if $ctl->{trace};
     }
-
-    $tpl;
+    Carp::croak("Maximum number of iterations exceeded");
 }
 
 sub _interpolate {
@@ -192,20 +325,22 @@ sub _interpolate {
 	$subst = $i->{else} ? $i->{else} : '';
     }
 
-    $subst =~ s/\x{fdd4}/$val/g;
+    $subst =~ s/\x{fdde}/$val/g;
     return $subst;
 }
 
+=head1 REQUIREMENTS
+
+Minimal Perl version 5.10.1.
 
 =head1 AUTHOR
 
 Johan Vromans, C<< <JV at CPAN dot org> >>
 
-
 =head1 SUPPORT
 
 Development of this module takes place on GitHub:
-https://github.com/sciurius/perl-String-Interpolate-Named.
+L<https://github.com/sciurius/perl-String-Interpolate-Named>.
 
 You can find documentation for this module with the perldoc command.
 
@@ -214,17 +349,16 @@ You can find documentation for this module with the perldoc command.
 Please report any bugs or feature requests using the issue tracker on
 GitHub.
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Many of the existing template / interpolate / substitute modules.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018 Johan Vromans, all rights reserved.
+Copyright 2018,2019 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
 
 =cut
 

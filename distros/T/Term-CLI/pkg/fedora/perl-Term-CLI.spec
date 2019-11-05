@@ -1,5 +1,5 @@
 Name:           perl-Term-CLI
-Version:        0.051003
+Version:        0.051004
 Release:        1%{?dist}
 Summary:        CLI interpreter based on Term::ReadLine
 License:        GPL+ or Artistic
@@ -8,7 +8,6 @@ URL:            http://search.cpan.org/dist/Term-CLI/
 Source0:        http://www.cpan.org/modules/by-module/Term/Term-CLI-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
-BuildRequires:  perl >= 0:5.014_001
 BuildRequires:  perl(Exporter) >= 5.71
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Temp) >= 0.2304
@@ -116,6 +115,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Tue Nov 5 2019 Steven Bakker <sbakker@cpan.org> 0.051004-1
+- New upstream release.
 * Wed Jul 11 2018 Steven Bakker <sbakker@cpan.org> 0.051003-1
 - New upstream release.
 * Fri Mar 16 2018 Steven Bakker <sbakker@cpan.org> 0.051002-1

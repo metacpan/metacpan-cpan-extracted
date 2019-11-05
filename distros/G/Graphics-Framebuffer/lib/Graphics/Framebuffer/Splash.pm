@@ -12,7 +12,11 @@ use constant {
 use List::Util qw(min max);
 
 BEGIN {
-    our $VERSION = '1.20';
+    require Exporter;
+    our @ISA = qw( Exporter );
+    our $VERSION = '1.21';
+    our @EXPORT = qw( _perl_logo splash );
+    our @EXPORT_OK = qw();
 }
 
 sub _perl_logo {

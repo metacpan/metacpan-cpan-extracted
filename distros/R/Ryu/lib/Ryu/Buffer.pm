@@ -3,7 +3,7 @@ package Ryu::Buffer;
 use strict;
 use warnings;
 
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 use parent qw(Ryu::Node);
 

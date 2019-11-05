@@ -1,6 +1,6 @@
 package Tapper::MCP::State::Plugin::Dummy;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::State::Plugin::Dummy::VERSION = '5.0.7';
+$Tapper::MCP::State::Plugin::Dummy::VERSION = '5.0.8';
 use strict;
 use warnings;
 use Tapper::MCP::Net::Reset::DoNothing;
@@ -97,7 +97,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

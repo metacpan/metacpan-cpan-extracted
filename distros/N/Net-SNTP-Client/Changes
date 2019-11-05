@@ -10,3 +10,6 @@ Revision history for Net-SNTP-Client
 0.22    2015-11-6/10:28:19 am
         Twenty second version, modifying in LI (test case) in /t/00-load.t line
 	88 from 0 to ignore(), due to CPAN failing test case.
+
+0.23    2019-10-31/19:06:19 pm
+	Twenty third version, modifyin the documentation example. Minor typo.

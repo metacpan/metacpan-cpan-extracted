@@ -1,0 +1,25 @@
+package Util::Medley::Roles::Attributes::DateTime;
+$Util::Medley::Roles::Attributes::DateTime::VERSION = '0.007';
+use Modern::Perl;
+use Moose::Role;
+use Method::Signatures;
+use Util::Medley::DateTime;
+
+=head1 NAME
+
+Util::Medley::Roles::Attributes::DateTime
+
+=head1 VERSION
+
+version 0.007
+
+=cut
+
+has DateTime => (
+	is      => 'ro',
+	isa     => 'Util::Medley::DateTime',
+	lazy    => 1,
+	default => sub { return Util::Medley::DateTime->new },
+);
+
+1;

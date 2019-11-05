@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.220    2019-10-31
+        - Bugfix in the empty_to_null filter.
+
 2.219    2019-10-30
         - Update required Term::Choose-Util-versions.
         - Adapt code to the updated Term::Choose-Util version.

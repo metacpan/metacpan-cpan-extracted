@@ -15,7 +15,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our @CARP_NOT;
 
 =head1 NAME
@@ -846,6 +846,8 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
+our $VERSION = '0.38';
+
 has 'protocol' => (
     is => 'ro',
     weak_ref => 1,
@@ -910,7 +912,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

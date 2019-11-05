@@ -48,7 +48,7 @@ if ($template =~ /^(.*?)\n/s) {
     $template =~ s/\#\# VERSION \#\#/$version/sg;
     $template =~ s/\#\# VERSION DATE \#\#/$month $day $year/sg;
     $template =~ s/\#\# YEAR \#\#/$year/sg;
-    print colored(['bright_green'],"Version: $version, $month $day, $year"),"\n";
+    print colored(['bright_green'],"Version: $version, $month $day $year"),"\n";
 }
 print colored(['bright_yellow'],'Adding C to Module') . ' ...';
 $template =~ s/\#\# C CODE \#\#/$ccode/s;

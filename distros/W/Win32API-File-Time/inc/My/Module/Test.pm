@@ -5,12 +5,13 @@ use 5.006002;
 use strict;
 use warnings;
 
-use base qw{ Exporter };
+use Exporter ();
+our @ISA = qw{ Exporter };
 
 use Carp;
 use Test::More 0.88;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 our %EXPORT_TAGS = (
     const	=> [ qw{ IS_WINDOWS } ],
@@ -161,7 +162,7 @@ This class has the following attributes:
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -169,7 +170,7 @@ Tom Wyant (wyant at cpan dot org)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Thomas R. Wyant, III
+Copyright (C) 2016-2017, 2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

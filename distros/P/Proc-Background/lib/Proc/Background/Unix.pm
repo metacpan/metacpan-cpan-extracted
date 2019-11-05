@@ -1,9 +1,6 @@
-# Proc::Background::Unix: Unix interface to background process management.
-#
-# Copyright (C) 1998-2005 Blair Zajac.  All rights reserved.
-
 package Proc::Background::Unix;
-
+$Proc::Background::Unix::VERSION = '1.20';
+# ABSTRACT: Unix-specific implementation of process create/wait/kill
 require 5.004_04;
 
 use strict;
@@ -11,9 +8,7 @@ use Exporter;
 use Carp;
 use POSIX qw(:errno_h :sys_wait_h);
 
-use vars qw(@ISA $VERSION);
-@ISA     = qw(Exporter);
-$VERSION = sprintf '%d.%02d', '$Revision: 1.10 $' =~ /(\d+)\.(\d+)/;
+@Proc::Background::Unix::ISA = qw(Exporter);
 
 # Start the background process.  If it is started sucessfully, then record
 # the process id in $self->{_os_obj}.
@@ -64,13 +59,27 @@ sub _new {
 }
 
 # Wait for the child.
+#   (0, exit_value)	: sucessfully waited on.
+#   (1, undef)	: process already reaped and exit value lost.
+#   (2, undef)	: process still running.
 sub _waitpid {
-  my $self    = shift;
-  my $timeout = shift;
+  my ($self, $blocking, $wait_seconds) = @_;
 
   {
     # Try to wait on the process.
-    my $result = waitpid($self->{_os_obj}, $timeout ? 0 : WNOHANG);
+    # Implement the optional timeout with the 'alarm' call.
+    my $result= 0;
+    if ($blocking && $wait_seconds) {
+      require Time::HiRes;
+      local $SIG{ALRM}= sub { die "alarm\n" };
+      Time::HiRes::alarm($wait_seconds);
+      eval { $result= waitpid($self->{_os_obj}, 0); };
+      Time::HiRes::alarm(0);
+    }
+    else {
+      $result= waitpid($self->{_os_obj}, $blocking? 0 : WNOHANG);
+    }
+
     # Process finished.  Grab the exit value.
     if ($result == $self->{_os_obj}) {
       return (0, $?);
@@ -91,19 +100,14 @@ sub _waitpid {
 
 sub _die {
   my $self = shift;
-
+  my @kill_sequence= @_ && ref $_[0] eq 'ARRAY'? @{ $_[0] } : qw( TERM 2 TERM 8 KILL 3 KILL 7 );
   # Try to kill the process with different signals.  Calling alive() will
   # collect the exit status of the program.
-  SIGNAL: {
-    foreach my $signal (qw(HUP QUIT INT KILL)) {
-      my $count = 5;
-      while ($count and $self->alive) {
-        --$count;
-        kill($signal, $self->{_os_obj});
-        last SIGNAL unless $self->alive;
-        sleep 1;
-      }
-    }
+  while (@kill_sequence and $self->alive) {
+    my $sig= shift @kill_sequence;
+    my $delay= shift @kill_sequence;
+    kill($sig, $self->{_os_obj});
+    last if $self->_reap(1, $delay); # block before sending next signal
   }
 }
 
@@ -111,9 +115,17 @@ sub _die {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Proc::Background::Unix - Unix interface to process mangement
+Proc::Background::Unix - Unix-specific implementation of process create/wait/kill
+
+=head1 VERSION
+
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -125,14 +137,29 @@ This is a process management class designed specifically for Unix
 operating systems.  It is not meant used except through the
 I<Proc::Background> class.  See L<Proc::Background> for more information.
 
-=head1 AUTHOR
+=head1 NAME
+
+Proc::Background::Unix - Unix interface to process management
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Blair Zajac <blair@orcaware.com>
 
-=head1 COPYRIGHT
+=item *
 
-Copyright (C) 1998-2005 Blair Zajac.  All rights reserved.  This
-package is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Michael Conrad <mike@nrdvana.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Michael Conrad, (C) 1998-2009 by Blair Zajac.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

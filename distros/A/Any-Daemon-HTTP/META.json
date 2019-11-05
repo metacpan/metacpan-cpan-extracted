@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -39,7 +39,7 @@
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
-            "HTTP::Daemon" : "6.03",
+            "HTTP::Daemon" : "6.01",
             "HTTP::Response" : "0",
             "HTTP::Status" : "0",
             "IO::Select" : "0",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/markov2/perl5-Any-Daemon-HTTP"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

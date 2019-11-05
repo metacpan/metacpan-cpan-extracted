@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.0.15'; # VERSION
+our $VERSION = 'v0.0.16'; # VERSION
 
 use Moose;
 with qw(
@@ -56,7 +56,11 @@ sub configure {
         } ],
 
         [ 'ChangelogFromGit' => {
-            tag_regexp => '\b(v\d+\.\d+\.\d+(?:\.\d+)*)\b'
+            tag_regexp => '\b(v\d+\.\d+\.\d+(?:\.\d+)*)\b',
+            exclude_message => [ q/(?x: ^Merge \s+ (?:
+                pull \s+ request
+              | (?:remote-tracking\s+)? branch # gitc
+            ) \b )/ ],
         } ],
 
         [ 'Git::NextVersion' => {
@@ -135,7 +139,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.0.15
+version v0.0.16
 
 =head1 SYNOPSIS
 
@@ -183,6 +187,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
 
     [ChangelogFromGit]
     tag_regexp = \b(v\d+\.\d+\.\d+(?:\.\d+)*)\b
+    exclude_message = (?x: ^Merge \s+ (?: pull \s+ request | (?:remote-tracking\s+)? branch ) \b )
 
     [Git::NextVersion]
     first_version  = v0.0.1

@@ -2,20 +2,20 @@
 
 ### code_after_shebang
 # Note: This script is a CLI for Riap function /App/td/td
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"td.conf","env_name":"TD_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"td","script_summary":null,"script_version":"0.092","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/td/td","use_cleanser":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"td.conf","env_name":"TD_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":"0","read_env":"0","script_name":"td","script_summary":null,"script_version":"0.093","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/td/td","use_cleanser":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{action=>{description=>"\n",pos=>0,req=>1,schema=>["str",{in=>["actions","avg","avg-row","colcount","colcount-row","colnames","colnames-row","head","info","rowcount","rowcount-row","rownum-col","select","sort","sum","sum-row","tail","wc","wc-row"],req=>1},{}],summary=>"Action to perform on input table"},argv=>{default=>[],greedy=>1,pos=>1,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Arguments"},detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{req=>1},{}],tags=>["category:actions-action"]},exclude_columns=>{cmdline_aliases=>{e=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],tags=>["category:select-action"],"x.name.is_plural"=>1,"x.name.singular"=>"exclude_column"},lines=>{cmdline_aliases=>{n=>{}},schema=>["str",{match=>qr(\A[+-]?[0-9]+\z),req=>1},{}],tags=>["category:head-action","category:tail-action"]}},description=>"\n*td* receives table data from standard input and performs an action on it. It\nhas functionality similar to some Unix commands like *head*, *tail*, *wc*,\n*cut*, *sort* except that it operates on table rows/columns instead of\nlines/characters. This is convenient to use with CLI scripts that output table\ndata.\n\nA _table data_ is JSON-encoded data in the form of either: `hos` (hash of\nscalars, which is viewed as a two-column table where the columns are `key` and\n`value`), `aos` (array of scalars, which is viewed as a 1-column array where the\ncolumn is `elem`), `aoaos` (array of arrays of scalars), or `aohos` (array of\nhashes of scalars).\n\nThe input can also be an _enveloped_ table data, where the envelope is an array:\n`[status, message, content, meta]` and `content` is the actual table data. This\nkind of data is produced by `Perinci::CmdLine`-based scripts and can contain\nmore detailed table specification in the `meta` hash, which `td` can parse.\n\nFirst you might want to use the `info` action to see if the input is a table\ndata:\n\n    % osnames -l --json | td info\n\nIf input is not valid JSON, a JSON parse error will be displayed. If input is\nvalid JSON but not a table data, another error will be displayed. Otherwise,\ninformation about the table will be displayed (form, number of columns, column\nnames, number of rows, and so on).\n\nNext, you can use these actions:\n\n    # count number of rows (equivalent to \"wc -l\" Unix command)\n    % osnames -l --json | td rowcount\n\n    # append a row containing rowcount\n    % osnames -l --json | td rowcount-row\n\n    # return the column names only\n    % lcpan related-mods Perinci::CmdLine | td colnames\n\n    # append a row containing column names\n    % lcpan related-mods Perinci::CmdLine | td colnames-row\n\n    # count number of columns\n    % osnames -l --json | td colcount\n\n    # select some columns\n    % osnames -l --json | td select value description\n    # select all columns but some\n    % osnames -l --json | td select '*' -e value -e description\n\n    # only show first 5 rows\n    % osnames -l --json | td head -n5\n    # show all but the last 5 rows\n    % osnames -l --json | td head -n -5\n\n    # only show last 5 rows\n    % osnames -l --json | td tail -n5\n    # show rows from the row 5 onwards\n    % osnames -l --json | td tail -n +5\n\n    # sort by column(s) (add \"-\" prefix to for descending order)\n    % osnames -l --json | td sort value tags\n    % osnames -l --json | td sort -- -value\n\n    # return sum of all numeric columns\n    % list-files -l --json | td sum\n\n    # append a sum row\n    % list-files -l --json | td sum-row\n\n    # return average of all numeric columns\n    % list-files -l --json | td avg\n\n    # append an average row\n    % list-files -l --json | td avg-row\n\n    # add a row number column (1, 2, 3, ...)\n    % list-files -l --json | td rownum-col\n\nUse this to list all the available actions:\n\n    % td actions\n    % td actions -l ;# show details\n\n",result=>{},summary=>"Manipulate table data",v=>1.1}};
+my $_pci_metas = {""=>{args=>{action=>{description=>"\n",pos=>0,req=>1,schema=>["str",{in=>["actions","as-aoaos","as-aohos","avg","avg-row","colcount","colcount-row","colnames","colnames-row","head","info","rowcount","rowcount-row","rownum-col","select","shuf","sort","sum","sum-row","tail","wc","wc-row"],req=>1},{}],summary=>"Action to perform on input table"},argv=>{default=>[],greedy=>1,pos=>1,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Arguments"},detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{req=>1},{}],tags=>["category:actions-action"]},exclude_columns=>{cmdline_aliases=>{e=>{}},schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],tags=>["category:select-action"],"x.name.is_plural"=>1,"x.name.singular"=>"exclude_column"},lines=>{cmdline_aliases=>{n=>{}},schema=>["str",{match=>qr(\A[+-]?[0-9]+\z),req=>1},{}],tags=>["category:head-action","category:tail-action"]},repeat=>{cmdline_aliases=>{r=>{}},schema=>["bool",{req=>1},{}],summary=>"Allow duplicates",tags=>["category:shuf-action"]}},description=>"\n*td* receives table data from standard input and performs an action on it. It\nhas functionality similar to some Unix commands like *head*, *tail*, *wc*,\n*cut*, *sort* except that it operates on table rows/columns instead of\nlines/characters. This is convenient to use with CLI scripts that output table\ndata.\n\nA _table data_ is JSON-encoded data in the form of either: `hos` (hash of\nscalars, which is viewed as a two-column table where the columns are `key` and\n`value`), `aos` (array of scalars, which is viewed as a 1-column array where the\ncolumn is `elem`), `aoaos` (array of arrays of scalars), or `aohos` (array of\nhashes of scalars).\n\nThe input can also be an _enveloped_ table data, where the envelope is an array:\n`[status, message, content, meta]` and `content` is the actual table data. This\nkind of data is produced by `Perinci::CmdLine`-based scripts and can contain\nmore detailed table specification in the `meta` hash, which `td` can parse.\n\nFirst you might want to use the `info` action to see if the input is a table\ndata:\n\n    % osnames -l --json | td info\n\nIf input is not valid JSON, a JSON parse error will be displayed. If input is\nvalid JSON but not a table data, another error will be displayed. Otherwise,\ninformation about the table will be displayed (form, number of columns, column\nnames, number of rows, and so on).\n\nNext, you can use these actions:\n\n # List available actions\n % td actions\n\n # Convert table data (which might be hash, aos, or aohos) to aoaos form\n % list-files -l --json | td as-aoaos\n\n # Convert table data (which might be hash, aos, or aoaos) to aohos form\n % list-files -l --json | td as-aohos\n\n # Calculate arithmetic average of numeric columns\n % list-files -l --json | td avg\n\n # Append a row at the end containing arithmetic average of number columns\n % list-files -l --json | td avg-row\n\n # Count number of columns\n % osnames -l --json | td colcount\n\n # Append a single-column row at the end containing number of columns\n % osnames -l --json | td colcount-row\n\n # Return the column names only\n % lcpan related-mods Perinci::CmdLine | td colnames\n\n # append a row containing column names\n % lcpan related-mods Perinci::CmdLine | td colnames-row\n\n # Only show first 5 rows\n % osnames -l --json | td head -n5\n\n # Show all but the last 5 rows\n % osnames -l --json | td head -n -5\n\n # Check if input is table data and show information about the table\n % osnames -l --json | td info\n\n # Count number of rows\n % osnames -l --json | td rowcount\n % osnames -l --json | td wc            ;# shorter alias\n\n # Append a single-column row containing row count\n % osnames -l --json | td rowcount-row\n % osnames -l --json | td wc-row        ;# shorter alias\n\n # Add a row number column (1, 2, 3, ...)\n % list-files -l --json | td rownum-col\n\n # Select some columns\n % osnames -l --json | td select value description\n\n # Select all columns but some\n % osnames -l --json | td select '*' -e value -e description\n\n # Return the rows in a random order\n % osnames -l --json | td shuf\n\n # Pick 5 random rows from input\n % osnames -l --json | td shuf -n5\n\n # Sort by column(s) (add \"-\" prefix to for descending order)\n % osnames -l --json | td sort value tags\n % osnames -l --json | td sort -- -value\n\n # Return sum of all numeric columns\n % list-files -l --json | td sum\n\n # Append a sum row\n % list-files -l --json | td sum-row\n\n # Only show last 5 rows\n % osnames -l --json | td tail -n5\n\n # Show rows from the row 5 onwards\n % osnames -l --json | td tail -n +5\n\n",result=>{},summary=>"Manipulate table data",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.544 on Wed Jan 16 20:06:30 2019.
+# This script is generated by Perinci::CmdLine::Inline version 0.545 on Sun Sep 15 21:51:05 2019.
 
 # Rinci metadata taken from these modules: App::td (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.092'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.093'; # VERSION
 # PODNAME: td
 # ABSTRACT: Manipulate table data
 
@@ -129,11 +129,11 @@ my %mentioned_args;
 require Getopt::Long::EvenLess;
 my $go_spec1 = {
     'format=s' => sub { $_pci_r->{format} = $_[1]; },
-    'help|h|?' => sub { print "td - Manipulate table data\n\nUsage:\n  td --help (or -h, -?)\n  td --version (or -v)\n  td [options] <action> [argv] ...\n\n*td* receives table data from standard input and performs an action on it. It\nhas functionality similar to some Unix commands like *head*, *tail*, *wc*,\n*cut*, *sort* except that it operates on table rows/columns instead of\nlines/characters. This is convenient to use with CLI scripts that output table\ndata.\n\nA _table data_ is JSON-encoded data in the form of either: `hos` (hash of\nscalars, which is viewed as a two-column table where the columns are `key` and\n`value`), `aos` (array of scalars, which is viewed as a 1-column array where the\ncolumn is `elem`), `aoaos` (array of arrays of scalars), or `aohos` (array of\nhashes of scalars).\n\nThe input can also be an _enveloped_ table data, where the envelope is an array:\n`[status, message, content, meta]` and `content` is the actual table data. This\nkind of data is produced by `Perinci::CmdLine`-based scripts and can contain\nmore detailed table specification in the `meta` hash, which `td` can parse.\n\nFirst you might want to use the `info` action to see if the input is a table\ndata:\n\n    % osnames -l --json | td info\n\nIf input is not valid JSON, a JSON parse error will be displayed. If input is\nvalid JSON but not a table data, another error will be displayed. Otherwise,\ninformation about the table will be displayed (form, number of columns, column\nnames, number of rows, and so on).\n\nNext, you can use these actions:\n\n    # count number of rows (equivalent to \"wc -l\" Unix command)\n    % osnames -l --json | td rowcount\n\n    # append a row containing rowcount\n    % osnames -l --json | td rowcount-row\n\n    # return the column names only\n    % lcpan related-mods Perinci::CmdLine | td colnames\n\n    # append a row containing column names\n    % lcpan related-mods Perinci::CmdLine | td colnames-row\n\n    # count number of columns\n    % osnames -l --json | td colcount\n\n    # select some columns\n    % osnames -l --json | td select value description\n    # select all columns but some\n    % osnames -l --json | td select '*' -e value -e description\n\n    # only show first 5 rows\n    % osnames -l --json | td head -n5\n    # show all but the last 5 rows\n    % osnames -l --json | td head -n -5\n\n    # only show last 5 rows\n    % osnames -l --json | td tail -n5\n    # show rows from the row 5 onwards\n    % osnames -l --json | td tail -n +5\n\n    # sort by column(s) (add \"-\" prefix to for descending order)\n    % osnames -l --json | td sort value tags\n    % osnames -l --json | td sort -- -value\n\n    # return sum of all numeric columns\n    % list-files -l --json | td sum\n\n    # append a sum row\n    % list-files -l --json | td sum-row\n\n    # return average of all numeric columns\n    % list-files -l --json | td avg\n\n    # append an average row\n    % list-files -l --json | td avg-row\n\n    # add a row number column (1, 2, 3, ...)\n    % list-files -l --json | td rownum-col\n\nUse this to list all the available actions:\n\n    % td actions\n    % td actions -l ;# show details\n\nMain options:\n  --action=s*  Action to perform on input table (=arg[0])\n  --argv=s\@    Arguments (=arg[1-]) [[]]\n\nActions action options:\n  --detail, -l  \n\nHead action options:\n  --lines=s, -n  \n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nSelect action options:\n  --exclude-column=s\@, -e  \n\nTail action options:\n  --lines=s, -n  \n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
+    'help|h|?' => sub { print "td - Manipulate table data\n\nUsage:\n  td --help (or -h, -?)\n  td --version (or -v)\n  td [options] <action> [argv] ...\n\n*td* receives table data from standard input and performs an action on it. It\nhas functionality similar to some Unix commands like *head*, *tail*, *wc*,\n*cut*, *sort* except that it operates on table rows/columns instead of\nlines/characters. This is convenient to use with CLI scripts that output table\ndata.\n\nA _table data_ is JSON-encoded data in the form of either: `hos` (hash of\nscalars, which is viewed as a two-column table where the columns are `key` and\n`value`), `aos` (array of scalars, which is viewed as a 1-column array where the\ncolumn is `elem`), `aoaos` (array of arrays of scalars), or `aohos` (array of\nhashes of scalars).\n\nThe input can also be an _enveloped_ table data, where the envelope is an array:\n`[status, message, content, meta]` and `content` is the actual table data. This\nkind of data is produced by `Perinci::CmdLine`-based scripts and can contain\nmore detailed table specification in the `meta` hash, which `td` can parse.\n\nFirst you might want to use the `info` action to see if the input is a table\ndata:\n\n    % osnames -l --json | td info\n\nIf input is not valid JSON, a JSON parse error will be displayed. If input is\nvalid JSON but not a table data, another error will be displayed. Otherwise,\ninformation about the table will be displayed (form, number of columns, column\nnames, number of rows, and so on).\n\nNext, you can use these actions:\n\n # List available actions\n % td actions\n\n # Convert table data (which might be hash, aos, or aohos) to aoaos form\n % list-files -l --json | td as-aoaos\n\n # Convert table data (which might be hash, aos, or aoaos) to aohos form\n % list-files -l --json | td as-aohos\n\n # Calculate arithmetic average of numeric columns\n % list-files -l --json | td avg\n\n # Append a row at the end containing arithmetic average of number columns\n % list-files -l --json | td avg-row\n\n # Count number of columns\n % osnames -l --json | td colcount\n\n # Append a single-column row at the end containing number of columns\n % osnames -l --json | td colcount-row\n\n # Return the column names only\n % lcpan related-mods Perinci::CmdLine | td colnames\n\n # append a row containing column names\n % lcpan related-mods Perinci::CmdLine | td colnames-row\n\n # Only show first 5 rows\n % osnames -l --json | td head -n5\n\n # Show all but the last 5 rows\n % osnames -l --json | td head -n -5\n\n # Check if input is table data and show information about the table\n % osnames -l --json | td info\n\n # Count number of rows\n % osnames -l --json | td rowcount\n % osnames -l --json | td wc            ;# shorter alias\n\n # Append a single-column row containing row count\n % osnames -l --json | td rowcount-row\n % osnames -l --json | td wc-row        ;# shorter alias\n\n # Add a row number column (1, 2, 3, ...)\n % list-files -l --json | td rownum-col\n\n # Select some columns\n % osnames -l --json | td select value description\n\n # Select all columns but some\n % osnames -l --json | td select '*' -e value -e description\n\n # Return the rows in a random order\n % osnames -l --json | td shuf\n\n # Pick 5 random rows from input\n % osnames -l --json | td shuf -n5\n\n # Sort by column(s) (add \"-\" prefix to for descending order)\n % osnames -l --json | td sort value tags\n % osnames -l --json | td sort -- -value\n\n # Return sum of all numeric columns\n % list-files -l --json | td sum\n\n # Append a sum row\n % list-files -l --json | td sum-row\n\n # Only show last 5 rows\n % osnames -l --json | td tail -n5\n\n # Show rows from the row 5 onwards\n % osnames -l --json | td tail -n +5\n\nMain options:\n  --action=s*  Action to perform on input table (=arg[0])\n  --argv=s\@    Arguments (=arg[1-]) [[]]\n\nActions action options:\n  --detail, -l  \n\nHead action options:\n  --lines=s, -n  \n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nSelect action options:\n  --exclude-column=s\@, -e  \n\nShuf action options:\n  --repeat, -r  Allow duplicates\n\nTail action options:\n  --lines=s, -n  \n\nOther options:\n  --help, -h, -?                 Display help message and exit\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --version, -v                  Display program's version and exit\n"; exit 0; },
     'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
     'naked-res' => sub { $_pci_r->{naked_res} = 1; },
     'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
-    'version|v' => sub { no warnings 'once'; require App::td; print "td version ", "0.092", ($App::td::DATE ? " ($App::td::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.544 (2018-10-03)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::td; print "td version ", "0.093", ($App::td::DATE ? " ($App::td::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.545 (2019-04-15)\n"; exit 0 },
 };
 my $go_spec2 = {
     'action=s' => sub {         $_pci_args{'action'} = $_[1];
@@ -163,7 +163,15 @@ my $go_spec2 = {
     'no-detail' => sub {         $_pci_args{'detail'} = 0;
  },
     'no-naked-res|nonaked-res' => sub {  },
+    'no-repeat' => sub {         $_pci_args{'repeat'} = 0;
+ },
     'nodetail' => sub {         $_pci_args{'detail'} = 0;
+ },
+    'norepeat' => sub {         $_pci_args{'repeat'} = 0;
+ },
+    'r' => sub {         $_pci_args{'repeat'} = $_[1];
+ },
+    'repeat' => sub {         $_pci_args{'repeat'} = $_[1];
  },
     'version|v' => sub {  },
 };
@@ -233,7 +241,7 @@ td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.092 of main (from Perl distribution App-td), released on 2019-01-16.
+This document describes version 0.093 of main (from Perl distribution App-td), released on 2019-09-15.
 
 =head1 SYNOPSIS
 
@@ -272,59 +280,80 @@ names, number of rows, and so on).
 
 Next, you can use these actions:
 
- # count number of rows (equivalent to "wc -l" Unix command)
- % osnames -l --json | td rowcount
- 
- # append a row containing rowcount
- % osnames -l --json | td rowcount-row
- 
- # return the column names only
+ # List available actions
+ % td actions
+
+ # Convert table data (which might be hash, aos, or aohos) to aoaos form
+ % list-files -l --json | td as-aoaos
+
+ # Convert table data (which might be hash, aos, or aoaos) to aohos form
+ % list-files -l --json | td as-aohos
+
+ # Calculate arithmetic average of numeric columns
+ % list-files -l --json | td avg
+
+ # Append a row at the end containing arithmetic average of number columns
+ % list-files -l --json | td avg-row
+
+ # Count number of columns
+ % osnames -l --json | td colcount
+
+ # Append a single-column row at the end containing number of columns
+ % osnames -l --json | td colcount-row
+
+ # Return the column names only
  % lcpan related-mods Perinci::CmdLine | td colnames
- 
+
  # append a row containing column names
  % lcpan related-mods Perinci::CmdLine | td colnames-row
- 
- # count number of columns
- % osnames -l --json | td colcount
- 
- # select some columns
- % osnames -l --json | td select value description
- # select all columns but some
- % osnames -l --json | td select '*' -e value -e description
- 
- # only show first 5 rows
+
+ # Only show first 5 rows
  % osnames -l --json | td head -n5
- # show all but the last 5 rows
+
+ # Show all but the last 5 rows
  % osnames -l --json | td head -n -5
- 
- # only show last 5 rows
- % osnames -l --json | td tail -n5
- # show rows from the row 5 onwards
- % osnames -l --json | td tail -n +5
- 
- # sort by column(s) (add "-" prefix to for descending order)
- % osnames -l --json | td sort value tags
- % osnames -l --json | td sort -- -value
- 
- # return sum of all numeric columns
- % list-files -l --json | td sum
- 
- # append a sum row
- % list-files -l --json | td sum-row
- 
- # return average of all numeric columns
- % list-files -l --json | td avg
- 
- # append an average row
- % list-files -l --json | td avg-row
- 
- # add a row number column (1, 2, 3, ...)
+
+ # Check if input is table data and show information about the table
+ % osnames -l --json | td info
+
+ # Count number of rows
+ % osnames -l --json | td rowcount
+ % osnames -l --json | td wc            ;# shorter alias
+
+ # Append a single-column row containing row count
+ % osnames -l --json | td rowcount-row
+ % osnames -l --json | td wc-row        ;# shorter alias
+
+ # Add a row number column (1, 2, 3, ...)
  % list-files -l --json | td rownum-col
 
-Use this to list all the available actions:
+ # Select some columns
+ % osnames -l --json | td select value description
 
- % td actions
- % td actions -l ;# show details
+ # Select all columns but some
+ % osnames -l --json | td select '*' -e value -e description
+
+ # Return the rows in a random order
+ % osnames -l --json | td shuf
+
+ # Pick 5 random rows from input
+ % osnames -l --json | td shuf -n5
+
+ # Sort by column(s) (add "-" prefix to for descending order)
+ % osnames -l --json | td sort value tags
+ % osnames -l --json | td sort -- -value
+
+ # Return sum of all numeric columns
+ % list-files -l --json | td sum
+
+ # Append a sum row
+ % list-files -l --json | td sum-row
+
+ # Only show last 5 rows
+ % osnames -l --json | td tail -n5
+
+ # Show rows from the row 5 onwards
+ % osnames -l --json | td tail -n +5
 
 =head1 OPTIONS
 
@@ -340,7 +369,7 @@ Action to perform on input table.
 
 Valid values:
 
- ["actions","avg","avg-row","colcount","colcount-row","colnames","colnames-row","head","info","rowcount","rowcount-row","rownum-col","select","sort","sum","sum-row","tail","wc","wc-row"]
+ ["actions","as-aoaos","as-aohos","avg","avg-row","colcount","colcount-row","colnames","colnames-row","head","info","rowcount","rowcount-row","rownum-col","select","shuf","sort","sum","sum-row","tail","wc","wc-row"]
 
 =item B<--argv-json>=I<s>
 
@@ -426,6 +455,16 @@ Can be specified multiple times.
 =item B<--exclude-columns-json>=I<s>
 
 See C<--exclude-column>.
+
+=back
+
+=head2 Shuf action options
+
+=over
+
+=item B<--repeat>, B<-r>
+
+Allow duplicates.
 
 =back
 
@@ -518,11 +557,11 @@ __DATA__
 Data::Section::Seekable v1
 Clone/PP.pm,20,6331,0;0
 Data/Check/Structure.pm,6383,8606,1;193
-Getopt/Long/EvenLess.pm,15021,12600,2;529
-Local/_pci_check_args.pm,27654,7235,3;929
-Local/_pci_clean_json.pm,34922,4414,4;1054
-Perinci/Result/Format/Lite.pm,39374,22687,5;1116
-Text/Table/Tiny.pm,62088,7678,6;1714
+Getopt/Long/EvenLess.pm,15021,11364,2;529
+Local/_pci_check_args.pm,26418,7903,3;911
+Local/_pci_clean_json.pm,34354,4414,4;1047
+Perinci/Result/Format/Lite.pm,38806,22687,5;1109
+Text/Table/Tiny.pm,61520,7678,6;1707
 
 ### Clone/PP.pm ###
 #package Clone::PP;
@@ -1058,8 +1097,8 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 ### Getopt/Long/EvenLess.pm ###
 #package Getopt::Long::EvenLess;
 #
-#our $DATE = '2017-08-09'; # DATE
-#our $VERSION = '0.111'; # VERSION
+#our $DATE = '2019-02-02'; # DATE
+#our $VERSION = '0.112'; # VERSION
 #
 ## IFUNBUILT
 ## # use strict 'subs', 'vars';
@@ -1168,9 +1207,9 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #        my $name = shift;
 #
 #        my $spec_key = $spec_by_opt_name{$name};
-#        my $handler  = $spec{$spec_key};
+#        my $destination = $spec{$spec_key};
 #
-#        $handler->({name=>$name}, @_ ? $_[0] : 1);
+#        $destination->({name=>$name}, @_ ? $_[0] : 1);
 #    };
 #
 #    my $i = -1;
@@ -1292,7 +1331,7 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #
 #=head1 VERSION
 #
-#This document describes version 0.111 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2017-08-09.
+#This document describes version 0.112 of Getopt::Long::EvenLess (from Perl distribution Getopt-Long-EvenLess), released on 2019-02-02.
 #
 #=head1 DESCRIPTION
 #
@@ -1328,10 +1367,10 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #
 #=item * does not support desttypes (C<foo=s@>)
 #
-#=item * does not support handler other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, only C<< "foo=s" => sub { ... } >>)
+#=item * does not support destination other than coderef (so no C<< "foo=s" => \$scalar >>, C<< "foo=s" => \@ary >>, no C<< "foo=s" => \%hash >>, only C<< "foo=s" => sub { ... } >>)
 #
-#Also, in coderef handler, code will get a simple hash instead of a "callback"
-#object as its first argument.
+#Also, in coderef destination, code will get a simple hash instead of a
+#"callback" object as its first argument.
 #
 #=item * does not support hashref as first argument
 #
@@ -1350,27 +1389,7 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #and you're already able to extract C<--flag> or C<--opt=val> from C<@ARGV> but
 #you also lose a lot of stuffs like autoabbreviation, C<--opt val> syntax support
 #syntax (which is more common, but requires you specify an option spec), custom
-#handler, etc.
-#
-#B<Startup overhead>. Here's a sample startup overhead benchmark:
-#
-#                             Rate        run_gl     load_gl run_gl_evenless load_gl_evenless run_gl_less load_gl_less   perl
-# run_gl           64.096+-0.092/s            --       -0.5%          -68.6%           -69.2%      -70.1%       -70.4% -90.6%
-# load_gl            64.39+-0.16/s   0.46+-0.29%          --          -68.4%           -69.1%      -70.0%       -70.3% -90.5%
-# run_gl_evenless   203.88+-0.74/s   218.1+-1.2% 216.6+-1.4%              --            -2.1%       -4.9%        -5.8% -70.0%
-# load_gl_evenless  208.24+-0.57/s     224.9+-1% 223.4+-1.2%     2.14+-0.46%               --       -2.8%        -3.8% -69.4%
-# run_gl_less       214.28+-0.62/s   234.3+-1.1% 232.8+-1.3%      5.1+-0.49%       2.9+-0.41%          --        -1.0% -68.5%
-# load_gl_less      216.44+-0.45/s 237.68+-0.85% 236.1+-1.1%     6.16+-0.44%      3.94+-0.36% 1.01+-0.36%           -- -68.2%
-# perl                679.7+-3.7/s     960.5+-6% 955.7+-6.4%     233.4+-2.2%        226.4+-2%   217.2+-2%  214.1+-1.8%     --
-# 
-# Average times:
-#   perl            :     1.4712ms
-#   load_gl_less    :     4.6202ms
-#   run_gl_less     :     4.6668ms
-#   load_gl_evenless:     4.8022ms
-#   run_gl_evenless :     4.9048ms
-#   load_gl         :    15.5304ms
-#   run_gl          :    15.6016ms
+#destination, etc.
 #
 #=head1 FUNCTIONS
 #
@@ -1444,13 +1463,15 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #
 #If you want I<more> features intead of less, try L<Getopt::Long::More>.
 #
+#Benchmarks in L<Bencher::Scenario::GetoptModules>
+#
 #=head1 AUTHOR
 #
 #perlancar <perlancar@cpan.org>
 #
 #=head1 COPYRIGHT AND LICENSE
 #
-#This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+#This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 #
 #This is free software; you can redistribute it and/or modify it under
 #the same terms as the Perl 5 programming language system itself.
@@ -1471,7 +1492,6 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #
 #        # fill defaults from "default" property and check against schema
 #        no warnings ('void');
-#        use experimental ("smartmatch");
 #        require List::Util;
 #        my $_sahv_dpath;
 #        my $_sahv_err;
@@ -1488,7 +1508,7 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #            &&
 #            
 #            (# clause: in
-#            (($args->{"action"} ~~ ["actions","avg","avg-row","colcount","colcount-row","colnames","colnames-row","head","info","rowcount","rowcount-row","rownum-col","select","sort","sum","sum-row","tail","wc","wc-row"]) ? 1 : (($_sahv_err //= "Must be one of [\"actions\",\"avg\",\"avg-row\",\"colcount\",\"colcount-row\",\"colnames\",\"colnames-row\",\"head\",\"info\",\"rowcount\",\"rowcount-row\",\"rownum-col\",\"select\",\"sort\",\"sum\",\"sum-row\",\"tail\",\"wc\",\"wc-row\"]"),0)))
+#            ((grep { $_ eq $args->{"action"} } @{ ["actions","as-aoaos","as-aohos","avg","avg-row","colcount","colcount-row","colnames","colnames-row","head","info","rowcount","rowcount-row","rownum-col","select","shuf","sort","sum","sum-row","tail","wc","wc-row"] }) ? 1 : (($_sahv_err //= "Must be one of [\"actions\",\"as-aoaos\",\"as-aohos\",\"avg\",\"avg-row\",\"colcount\",\"colcount-row\",\"colnames\",\"colnames-row\",\"head\",\"info\",\"rowcount\",\"rowcount-row\",\"rownum-col\",\"select\",\"shuf\",\"sort\",\"sum\",\"sum-row\",\"tail\",\"wc\",\"wc-row\"]"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
 #        $args->{"argv"} //= [];
@@ -1504,7 +1524,7 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #0
@@ -1540,7 +1560,7 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #            
 #            &&
 #            
-#            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+#            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
 #            ((!defined(List::Util::first(sub {!(
 #                        ($_sahv_dpath->[-1] = $_),
 #                        # req #0
@@ -1569,6 +1589,17 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #            (($args->{"lines"} =~ qr((?:(?-)\A[+-]?[0-9]+\z))) ? 1 : (($_sahv_err //= "Must match regex pattern qr(\\A[+-]?[0-9]+\\z)"),0)))
 #             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
 #        } # if date arg exists
+#        if (exists $args->{"repeat"}) {
+#            $_sahv_dpath = [];
+#            # req #0
+#            ((defined($args->{"repeat"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+#            
+#            &&
+#            
+#            # check type 'bool'
+#            ((!ref($args->{"repeat"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))
+#             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+#        } # if date arg exists
 #
 #        # check required args
 #        return [400, "Missing required argument: action"] unless exists $args->{"action"};
@@ -1577,13 +1608,14 @@ Text/Table/Tiny.pm,62088,7678,6;1714
 #        return [400, "Missing required value for argument: detail"] if exists($args->{"detail"}) && !defined($args->{"detail"});
 #        return [400, "Missing required value for argument: exclude_columns"] if exists($args->{"exclude_columns"}) && !defined($args->{"exclude_columns"});
 #        return [400, "Missing required value for argument: lines"] if exists($args->{"lines"}) && !defined($args->{"lines"});
+#        return [400, "Missing required value for argument: repeat"] if exists($args->{"repeat"}) && !defined($args->{"repeat"});
 #        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
 #        [200];
 #    } else { _pci_err([500, "Unknown subcommand1: $sc_name"]); }
 #}
 #1;
 ### Local/_pci_clean_json.pm ###
-#sub _pci_clean_json { require Scalar::Util; require Clone::PP;  use feature 'state'; state $cleanser = sub {
+#sub _pci_clean_json { require Clone::PP; require Scalar::Util;  use feature 'state'; state $cleanser = sub {
 #my $data = shift;
 #state %refs;
 #state $ctr_circ;

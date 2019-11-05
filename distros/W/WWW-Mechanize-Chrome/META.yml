@@ -10,6 +10,7 @@ build_requires:
   Test::HTTP::LocalServer: '0.61'
   Test::Memory::Cycle: '0'
   Test::More: '0'
+  Test::Without::Module: '0'
   Time::HiRes: '0'
   URI: '0'
   URI::file: '0'
@@ -62,6 +63,6 @@ requires:
   perl: '5.010'
 resources:
   repository: git://github.com/Corion/WWW-Mechanize-Chrome.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

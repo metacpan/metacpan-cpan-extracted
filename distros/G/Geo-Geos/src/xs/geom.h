@@ -58,7 +58,7 @@ struct Typemap<geos::geom::IntersectionMatrix*>: TypemapObject<geos::geom::Inter
 template <>
 struct Typemap<geos::geom::GeometryFactory*>: TypemapObject<geos::geom::GeometryFactory*, geos::geom::GeometryFactory*, ObjectTypePtr, ObjectStorageMG, StaticCast>{
     static panda::string_view package() {return "Geo::Geos::GeometryFactory"; }
-    static void dispose (pTHX_ geos::geom::GeometryFactory* obj,SV*) { obj->destroy(); }
+    static void dispose (geos::geom::GeometryFactory* obj,SV*) { obj->destroy(); }
 };
 
 template <class TYPE>

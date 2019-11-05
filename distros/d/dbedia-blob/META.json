@@ -1,0 +1,69 @@
+{
+   "abstract" : "interface to (not only) b.dbedia.com blob storage",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "perl",
+      "blob",
+      "server"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "dbedia-blob",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "File::MimeInfo" : "0",
+            "File::MimeInfo::Magic" : "0",
+            "File::Temp" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "MooseX::Types::URI" : "0",
+            "Net::SCP" : "0",
+            "Path::Class" : "0",
+            "URI" : "0",
+            "YAML::Syck" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "dbedia::blob" : {
+         "file" : "lib/dbedia/blob.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/meon/dbedia-blob/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/meon/dbedia-blob/"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

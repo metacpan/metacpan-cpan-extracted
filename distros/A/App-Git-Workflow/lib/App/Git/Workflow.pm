@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow::Repository qw//;
 use base qw/Exporter/;
 
-our $VERSION   = version->new(1.1.6);
+our $VERSION   = version->new(1.1.8);
 
 sub _alphanum_sort {
     no warnings qw/once/;
@@ -277,7 +277,7 @@ App::Git::Workflow - Git workflow tools
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow version 1.1.6
+This documentation refers to App::Git::Workflow version 1.1.8
 
 =head1 SYNOPSIS
 

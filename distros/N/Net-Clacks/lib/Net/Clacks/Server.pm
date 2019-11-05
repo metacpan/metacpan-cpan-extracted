@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 8;
+our $VERSION = 9;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -17,7 +17,6 @@ use Time::HiRes qw(sleep usleep time);
 use Sys::Hostname;
 use Errno;
 use IO::Socket::IP;
-#use IO::Socket::UNIX;
 use IO::Select;
 use IO::Socket::SSL;
 use YAML::Syck;
@@ -99,10 +98,10 @@ sub init {
     $self->{config} = $config;
 
     if(!defined($self->{config}->{throttle}->{maxsleep})) {
-        $self->{config}->{throttle}->{maxsleep} = 5000;
+        $self->{config}->{throttle}->{maxsleep} = 100;
     }
     if(!defined($self->{config}->{throttle}->{step})) {
-        $self->{config}->{throttle}->{step} = 1;
+        $self->{config}->{throttle}->{step} = 10;
     }
 
     $self->{usleep} = 0;
@@ -183,6 +182,12 @@ sub init {
             #binmode($tcp, ':bytes');
             push @tcpsockets, $tcp;
             print "Listening on Unix domain socket $socket\n";
+
+            if(defined($config->{socketchmod}) && $config->{socketchmod} ne '') {
+                my $cmd = 'chmod ' . $config->{socketchmod} . ' ' . $socket;
+                print $cmd, "\n";
+                `$cmd`;
+            }
         }
     }
 
@@ -412,13 +417,13 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             }
             if(!$clients{$cid}->{interclacks}) {
                 if($clients{$cid}->{lastping} > 0 && $clients{$cid}->{lastping} < $pingtime) {
-                    syswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
+                    $self->evalsyswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
                     push @toremove, $cid;
                     next;
                 }
             } else {
                 if($clients{$cid}->{lastping} < $interclackspingtime) {
-                    syswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
+                    $self->evalsyswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
                     push @toremove, $cid;
                     next;
                 }
@@ -475,7 +480,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         }
         my $selecttimeout = 0.5; # Half a second
         if($hasoutbufferwork) {
-            $selecttimeout = 0.01;
+            $selecttimeout = 0.05;
         }
 
         my @inclients = $selector->can_read($selecttimeout);
@@ -485,7 +490,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             my $totalread = 0;
             while(1) {
                 my $rawbuffer;
-                sysread($clients{$cid}->{socket}, $rawbuffer, 10_000); # Read at most 10kB at a time
+                sysread($clients{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
                 if(defined($rawbuffer) && length($rawbuffer)) {
                     $totalread += length($rawbuffer);
                     push @{$clients{$cid}->{charbuffer}}, split//, $rawbuffer;
@@ -596,9 +601,9 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         if($parsedflags{close_all_connections} && $value) {
                             foreach my $closecid (keys %clients) {
                                 if($clients{$closecid}->{interclacks} && $parsedflags{forward_message}) {
-                                    syswrite($clients{$closecid}->{socket}, "\r\nOVERHEAD GC 1\r\n");
+                                    $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nOVERHEAD GC 1\r\n");
                                 }
-                                syswrite($clients{$closecid}->{socket}, "\r\nQUIT\r\n");
+                                $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nQUIT\r\n");
                                 push @toremove, $closecid;
                             }
                             $parsedflags{forward_message} = 0; # Already forwarded where needed
@@ -845,7 +850,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         my $lmccid = $1;
                         if(defined($clients{$lmccid})) {
                             # Try to notify the client (may or may not work);
-                            syswrite($clients{$lmccid}->{socket}, "\r\nQUIT\r\n");
+                            $self->evalsyswrite($clients{$lmccid}->{socket}, "\r\nQUIT\r\n");
                             push @toremove, $lmccid;
                         }
                         $sendinterclacks = 0;
@@ -973,7 +978,9 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         } elsif($self->{usleep} < $self->{config}->{throttle}->{maxsleep}) {
             $self->{usleep} += $self->{config}->{throttle}->{step};
         }
-        usleep($self->{usleep});
+        if($self->{usleep}) {
+            sleep($self->{usleep} / 1000);
+        }
     }
 
     print "Shutting down...\n";
@@ -981,7 +988,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
     foreach my $cid (keys %clients) {
         print "Removing client $cid\n";
         # Try to notify the client (may or may not work);
-        syswrite($clients{$cid}->{socket}, "\r\nQUIT\r\n");
+        $self->evalsyswrite($clients{$cid}->{socket}, "\r\nQUIT\r\n");
 
         delete $clients{$cid};
     }
@@ -1003,6 +1010,26 @@ sub deref {
 
     return $val;
 }
+
+sub evalsyswrite {
+    my ($self, $socket, $buffer) = @_; 
+
+    return 0 unless(length($buffer));
+
+    my $written = 0;
+    my $ok = 0;
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        $written = syswrite($socket, $buffer);
+        $ok = 1;
+    };
+    if($EVAL_ERROR || !$ok) {
+        print STDERR "Write error: $EVAL_ERROR\n";
+        return -1;
+    }
+
+    return $written;
+}
+
 
 1;
 __END__

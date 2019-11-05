@@ -16,10 +16,20 @@
     * Tested against Chromium HeadlessChrome/75.0.3770.90
     * Tested against Chromium HeadlessChrome/76.0.3798.0
     * Tested against Chromium HeadlessChrome/77.0.3865.75
-    * Tested against Chromium HeadlessChrome/78.0.3866.0
+    * Tested against Chromium HeadlessChrome/78.0.3904.70
     * Tested against Chromium HeadlessChrome/79.0.3927.0
+    * Tested against Chromium HeadlessChrome/80.0.3952.0
     * Tested against Chromium HeadlessChrome/73.0.3683.75 (Debian "Buster")
     * Tested against Chromium HeadlessChrome/76.0.3809.100 (Debian "Buster")
+
+0.38 2019-11-01
+    * Added wait_file option to wait for a file to disappear so we know that
+      this Chrome instance has quit.
+    * Added ->close() method to disconnect the object. This is just parts of
+      DESTROY().
+    * The backend selection was improved. We now select the backend that is
+      already loaded.
+    * Some memory leaks/circular references eliminated
 
 0.37 2019-09-30
     * WWW::Mechanize::Chrome now asks Chrome for the URL. This allows the test

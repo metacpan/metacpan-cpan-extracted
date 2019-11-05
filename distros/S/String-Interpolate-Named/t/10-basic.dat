@@ -22,7 +22,9 @@ X%{head=no}Y		XY
 
 # Subtitute the 'true' part
 X%{head|foo}Y		XfooY
+X%{head|fo\|o}Y		Xfo|oY
 X%{hexd|foo}Y		XY
+X|%{hexd|fo\|o}|Y	X||Y
 
 # %{} refers to the value of the key.
 X%{head|This is %{}!}Y	XThis is yes!Y

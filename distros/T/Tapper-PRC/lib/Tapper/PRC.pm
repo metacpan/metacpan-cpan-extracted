@@ -1,9 +1,9 @@
 package Tapper::PRC;
-# git description: v5.0.2-9-gcd4b584
+# git description: v5.0.3-3-g416e1c7
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Program run control for test program automation
-$Tapper::PRC::VERSION = '5.0.3';
+$Tapper::PRC::VERSION = '5.0.4';
 use strict;
 use warnings;
 
@@ -76,7 +76,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

@@ -1,5 +1,8 @@
 Revision history for Lingua::IND::Numbers
 
+0.12  2019-10-31T20:00:00+01:00
+      - Updated copyright year details.
+
 0.11  2019-09-18T18:00:00+01:00
       - Moved author test scripts to xt/ subfolder.
 

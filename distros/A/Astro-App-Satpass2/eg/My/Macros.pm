@@ -11,7 +11,7 @@ use Astro::App::Satpass2::Utils qw{ __arguments };
 use Astro::Coord::ECI::Utils 0.059 qw{ rad2deg };
 use Scalar::Util 1.26 qw{ refaddr };
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 {
     my %operands;
@@ -334,7 +334,7 @@ in the L<TUTORIAL|Astro::App::Satpass2::TUTORIAL>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

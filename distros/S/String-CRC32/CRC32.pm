@@ -11,7 +11,7 @@ use vars qw/ @ISA $VERSION @EXPORT_OK @EXPORT /;
 
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = 1.700;
+$VERSION = 1.800;
 
 # Items to export into caller's namespace by default
 @EXPORT = qw(crc32);

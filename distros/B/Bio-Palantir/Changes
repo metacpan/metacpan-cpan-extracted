@@ -1,3 +1,12 @@
+0.193080  2019-11-04 17:56:41+01:00 Europe/Brussels
+	- Additions
+	  - Added example_data/, an example dataset repository
+      - export_bgc_sql_tables.pl: added dna_coordinates, dna_begin and dna_end columns in Clusters table
+	- Changes
+	  - draw_bgc_maps.pl: changed the color of gene blocks (gray instead of red). 
+	- Fixes
+	  - Parser: added a fix for domain duplicates occuring in regions.js files 
+
 0.192560  2019-09-13 16:32:18+02:00 Europe/Brussels
 	- Fixes
 	  - bin::export_bgc_sql_tables: fixed key link between Domains_plus and Sequences tables

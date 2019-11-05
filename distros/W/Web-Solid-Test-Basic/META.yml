@@ -2,7 +2,15 @@
 abstract: 'Basic Solid Tests'
 author:
   - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
-build_requires: {}
+build_requires:
+  HTTP::Server::Simple::PSGI: '0'
+  Moo: '0'
+  Net::EmptyPort: '0'
+  Plack: '0'
+  Plack::Middleware::CrossOrigin: '0'
+  Types::Standard: '0'
+  URI: '0'
+  Web::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -24,24 +32,28 @@ optional_features: {}
 provides:
   Web::Solid::Test::Basic:
     file: lib/Web/Solid/Test/Basic.pm
-    version: '0.004'
+    version: '0.006'
   Web::Solid::Test::HTTPLists:
     file: lib/Web/Solid/Test/HTTPLists.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   FindBin: '0'
   IO::Socket::SSL: '0'
-  LWP::UserAgent::https: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
   Test::Deep: '0'
+  Test::FITesque::Fixture: '0'
   Test::FITesque::RDF: '0.014'
   Test::More: '0.96'
   Test::RDF: '0'
+  parent: '0'
+  perl: '5.014'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project
   bugtracker: https://github.com/kjetilk/p5-web-solid-test-basic/issues
   homepage: https://metacpan.org/release/Web-Solid-Test-Basic
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/kjetilk/p5-web-solid-test-basic.git
-version: '0.004'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -68,7 +68,7 @@ $SIG{'HUB'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = \&finis
 
 my $sinfo = $F->screen_dimensions();
 $F->cls('OFF');
-
+$F->graphics_mode();
 my $screen_width  = $sinfo->{'width'};
 my $screen_height = $sinfo->{'height'};
 
@@ -264,6 +264,9 @@ if ($RUNNING) {
     my @th;
     foreach my $thr (0 .. $threads) {
         $th[$thr] = threads->create(\&run_thread,$thr,$dev);
+    }
+    while($RUNNING) {
+        threads->yield();
     }
     foreach my $t (@th) {
         $t->join();
@@ -1302,15 +1305,17 @@ sub blit_move {
             }
         }
     );
-    $F->blit_write({ %{$image}, 'x' => 10, 'y' => 10 });
-    my $x = 10;
-    my $y = 10;
+    my $x = 20;
+    my $y = 20;
+    $image->{'x'} = $x;
+    $image->{'y'} = $y;
+    $F->blit_write($image);
     my $w = $image->{'width'};
     my $h = $image->{'height'};
     my $s = time + $delay;
     while (time < $s) {
-        $F->blit_move({ 'x' => abs($x), 'y' => abs($y), 'width' => $w, 'height' => $h, 'x_dest' => abs($x) + 4, 'y_dest' => abs($y) + 2 });
-        $x += 4;
+        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => abs($y) });
+        $x += 5;
         $y += 2;
         threads->yield();
     } ## end while (time < $s)

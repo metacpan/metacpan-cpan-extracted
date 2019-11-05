@@ -3,14 +3,31 @@ package Debug::Filter::PrintExpr;
 use strict;
 use warnings;
  
+use Exporter::Tiny;
+
 use Filter::Simple;
 use Scalar::Util qw(isdual blessed);
 use Data::Dumper;
 
 our
-$VERSION = '0.04';
+$VERSION = '0.11';
+
+our @EXPORT_OK = qw(isnumeric isstring);
+our @ISA = qw(Exporter::Tiny);
+our %EXPORT_TAGS = (
+	debug => [],
+	nofilter => [],
+	all	=> [qw(isnumeric isstring)],
+);
+
+require XSLoader;
+XSLoader::load('Debug::Filter::PrintExpr', $VERSION);
 
 local ($,, $\);
+
+sub import {
+	goto \&Exporter::Tiny::import;
+}
 
 # variable is exposed and my be overwritten by caller
 our $handle = *STDERR;
@@ -25,23 +42,23 @@ sub _genprefix {
 
 sub _singlevalue {
 	my $val = shift;
-	my $dual = isdual($val);
-	my $str;
+	my ($str, $num);
+	my $isdual = isdual($val);
+	my $isnumeric = isnumeric($val);
 	$str = "$val" if defined $val;
-	my $purestring = !$dual && !isdual($val);
-	if (my $class = blessed($val)) {
+	$num = $val + 0 if $isnumeric;
+	if (!defined $val) {
+		return 'undef';
+	} elsif (my $class = blessed($val)) {
 		return "blessed($class)";
 	} elsif (ref($val)) {
 		return $val;
-	} elsif (!defined $val) {
-		return 'undef';
-	} elsif ($dual) {
-		my $num = $val+0;
-		return "'$val' : $num";
-	} elsif ($purestring) {
-		return "'$val'";
+	} elsif ($isdual) {
+		return "'$str' : $num";
+	} elsif ($isnumeric) {
+		return $num;
 	} else {
-		return $val+0;
+		return "'$str'";
 	}
 }
 
@@ -86,8 +103,8 @@ sub _printscalar {
 	my ($self, $label, $line, $expr, $value) = @_;
 	local ($,, $\);
 	_genprefix @_;
-	_valuescalar($_[4]) if defined $value;
-	print $handle ';' if defined $value;
+	_valuescalar($_[4]) if $expr;
+	print $handle ';' if $expr;
 	print $handle "\n";
 }
 
@@ -156,11 +173,11 @@ sub _gen_print {
 	} elsif ($type eq '"') {
 		my $print = $self . "::_printstr";
 		$expr ||= '';
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar(($expr)));}];
+		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar($expr));}];
 	} elsif ($type eq '#') {
 		my $print = $self . "::_printnum";
 		$expr ||= '';
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar(($expr)));}];
+		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar($expr));}];
 	} elsif ($type eq '@') {
 		my $print = $self . "::_printarray";
 		return qq[{$print("$self", "$label", __LINE__, q{$expr}, $expr);}];
@@ -186,7 +203,15 @@ sub _gen_print {
 
 # source code processing happens here
 FILTER {
-	my ($self, %opt) = @_;
+	my ($self, @args) = @_;
+	my ($nofilter, $debug);
+	if (ref($_[1]) eq 'HASH') {
+		my $global = $_[1];
+		$debug = $global->{debug};
+		$nofilter = $global->{nofilter};
+	}
+	$debug ||= grep /^-debug$/, @args;
+	$nofilter ||= grep /^-nofilter$/, @args;
 	s/
 		^\h*\#
 		(?<type>[%@\$\\#"])
@@ -195,8 +220,9 @@ FILTER {
 		\h*
 		(?<expr>\V+)?
 		\}\h*\r?$
-	/ _gen_print($self, $+{type}, $+{label}, $+{expr}) /gmex;
-	print STDERR if $opt{-debug};
+	/ _gen_print($self, $+{type}, $+{label}, $+{expr}) /gmex
+		unless $nofilter;
+	print STDERR if $debug;
 };
 
 1;
@@ -221,7 +247,7 @@ Debug::Filter::PrintExpr - Convert comment lines to debug print statements
 
 	#${$s}
 	#@{@a}
-	#%{ %h}
+	#%{ %h }
 	#${ calc: @a * 2 }
 	#\{$ref}
 
@@ -303,8 +329,8 @@ and the output format of the result:
 
 =item C<$>
 
-The expression is evaluated in scalar context. Strings and floating
-point numbers are printed inside single quotes, integer numbers are
+The expression is evaluated in scalar context. Strings are printed
+inside single quotes, integer and floating point numbers are
 printed unquoted and dual valued variables are shown in both
 representations seperated by a colon.
 Undefined values are represented by the unquoted string C<undef>.
@@ -344,15 +370,15 @@ The usage and difference between C<#${}>, C<#"{}> and C<##{}> is
 best described by example:
 
 	my $dt = DateTime->now;
-	#${$dt}		# line nnn: $dt = blessed(DateTime);
-	#"{$dt}		# line nnn: $dt = '2019-10-27T15:54:28';
+	#${$dt}		# line nn: $dt = blessed(DateTime);
+	#"{$dt}		# line nn: $dt = '2019-10-27T15:54:28';
 
 	my $num = ' 42 ';
-	#${$num}	# line nnn: $num = ' 42 ';
+	#${$num}	# line nn: $num = ' 42 ';
 	$num + 0;
-	#${$num}	# line nnn: $num = ' 42 ' : 42;
-	#"{$num}	# line nnn: $num = ' 42 ';
-	##{$num}	# line nnn: $num = 42;
+	#${$num}	# line nn: $num = ' 42 ' : 42;
+	#"{$num}	# line nn: $num = ' 42 ';
+	##{$num}	# line nn: $num = 42;
 
 
 The forms #${}, #"{}, ##{} and #@{} may be used for any type of expression
@@ -368,7 +394,7 @@ to use:
 and produce these results:
 
 	scalar_as_array: $s = ('this is a scalar');
-	array_as_scalar: @a = '4';
+	array_as_scalar: @a = 4;
 	hash_as_array: %h = ('k1', 'v1', 'k2', 'v2');
 	array_as_hash: @a = ('0' => 'this', '1' => 'is', '2' => 'an', '3' => 'array');
 	
@@ -411,21 +437,59 @@ hash and sigil from the PrintExpr line:
 The resulting code must still be valid and should only emit a warning
 about a useless use of something in void context.
 
-=head2 Arguments to C<Debug::Filter::PrintExpr>
+=head2 Usage
 
-The use-statement for C<Debug::Filter::PrintExpr> may contain
-a hash of options:
+The C<use> statement for C<Debug::Filter::PrintExpr> may contain
+arguments as described in L<Exporter::Tiny::Manual::Importing>.
+Importable functions are C<isnumeric> and C<isstring> as well
+as the import tag C<:all> for both of them.
 
-	use Debug::Filter::PrintExpr (-debug => 1);
+The (optional) global options hash may contain
+these module specific entries:
 
 =over 4
 
-=item -debug
+=item debug => 1
 
-When this option is set to true, the resulting source code after
-comment transformation is written to the default output file handle.
-Only the parts of source where C<Debug::Filter::PrintExpr> is in effect
-are printed out.
+This option causes the resulting source code after comment
+transformation to be written to C<STDERR>.
+This option may also be specified as C<-debug> in the
+C<use> statement.
+
+=item nofilter => 1
+
+This options disables source code filtering if only the import
+of functions is desired.
+This option may also be specified as C<-nofilter> in the
+C<use> statement.
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<isstring(I<$var>)>
+
+This function returns true if the "string slot" of I<$var> has a value.
+This is the case when a string value was assigned to the variable,
+the variable has been used (recently) in a string context
+or when the variable is dual-valued.
+
+It will return false for undefined variables, references and
+variables with a numeric value that have never been used in a
+string context.
+
+=item C<isnumeric(I<$var>)>
+
+This function returns true if the "numeric slot" if I<$var> has a
+value.
+This is the case when a numeric value (integer or floating point) was
+assigned to the variable, the variable has been used (recently) in a
+numeric context or when the variable is dual-valued.
+
+It will return false for undefined variables, references and variables
+with a string value that have never been used in numeric context.
 
 =back
 
@@ -475,6 +539,10 @@ Trailing whitespace in values should be clearly visible.
 
 =item *
 
+Distinguish between the numeric and string value of a variable.
+
+=item *
+
 undefined values should be clearly distinguishable from empty values.
 
 =back
@@ -486,6 +554,12 @@ and a specific context is not enforced by the module.
 
 All in all, the module presented here is not much more than a
 programming exercise.
+
+Importing the functions C<isstring> and C<isnumeric> is done
+by L<Exporter::Tiny>.
+For extended options see L<Exporter::Tiny::Manual::Importing>.
+
+Other related modules: L<Scalar::Util>, L<Data::Dumper>
 
 =head1 AUTHOR
 

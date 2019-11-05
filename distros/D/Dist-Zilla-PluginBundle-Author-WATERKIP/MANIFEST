@@ -8,8 +8,6 @@ META.json
 META.yml
 Makefile.PL
 README.md
-corpus/dzil.config
-corpus/gitconfig
 cpanfile
 lib/Dist/Zilla/MintingProfile/Author/WATERKIP.pm
 lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm

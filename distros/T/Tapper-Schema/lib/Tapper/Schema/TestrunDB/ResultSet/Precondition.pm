@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::ResultSet::Precondition;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::ResultSet::Precondition::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::ResultSet::Precondition::VERSION = '5.0.11';
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

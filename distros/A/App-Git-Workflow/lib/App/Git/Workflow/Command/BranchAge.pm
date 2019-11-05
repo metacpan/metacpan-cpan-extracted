@@ -16,7 +16,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use DateTime::Format::HTTP;
 
-our $VERSION  = version->new(1.1.6);
+our $VERSION  = version->new(1.1.8);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option = (
@@ -32,6 +32,7 @@ sub run {
         'unmerged|u!',
         'master|m=s',
         'limit|n=i',
+        'format|f=s',
     );
     my $fmt = join "-%09-%09-", qw/
         %(authordate)
@@ -99,16 +100,44 @@ sub run {
         push @data, $branch;
     }
 
+    my %max = map {$_ => length $_} @headings;
+    for my $branch (@data) {
+        for my $key (keys %{$branch}) {
+            $max{$key} = length $branch->{$key} if !$max{$key} || $max{$key} < length $branch->{$key};
+        }
+    }
+
     @data = sort {$a->{age} cmp $b->{age}} @data;
     if ($option{reverse}) {
         @data = reverse @data;
     }
 
     my $count = 1;
+    my $fmt_out = $option{verbose} ? "%-(age) %-(authorname) %-(short)"
+        : $option{format}      ? $option{format}
+        :                        "%(age)\t%(short)";
+    my ($format, @fields) = formatted($fmt_out, \%max);
+
     for my $branch (@data) {
         last if $option{limit} && $count++ > $option{limit};
-        printf "%s\t%s\n", $branch->{age}, $branch->{short};
+        printf $format, map {$branch->{$_}} @fields;
     }
+}
+
+sub formatted {
+    my ($format, $max) = @_;
+    my @fields;
+    my $fmt = '';
+    my @fmt_parts = split /%([+-]?)\(([^)]+)\)/, $format;
+
+    while (defined (my $fixed = shift @fmt_parts)) {
+        my $align = shift @fmt_parts;
+        my $name = shift @fmt_parts;
+        push @fields, $name;
+        $fmt .= $fixed . ( $align ? "%$align$max->{$name}s" : "%s" );
+    }
+
+    return ("$fmt\n", @fields);
 }
 
 my @master;
@@ -136,7 +165,7 @@ git-branch-age - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-branch-age version 1.1.6
+This documentation refers to git-branch-age version 1.1.8
 
 =head1 SYNOPSIS
 
@@ -156,6 +185,8 @@ This documentation refers to git-branch-age version 1.1.6
                 (Default origin/master)
   -n --limit[=]int
                 Limit the out put to this number
+  -f --format[=]str
+                Specify a format for the output
 
   -v --verbose  Show more detailed option
      --version  Prints the version information

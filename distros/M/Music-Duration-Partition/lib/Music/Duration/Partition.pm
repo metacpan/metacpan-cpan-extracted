@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0304';
 
 use Moo;
 use strictures 2;
@@ -34,6 +34,7 @@ has size => (
 
 has pool => (
     is      => 'ro',
+    isa     => sub { die 'Not a non-empty ArrayRef' unless ref( $_[0] ) eq 'ARRAY' && @{ $_[0] } > 0 },
     default => sub { return [ keys %MIDI::Simple::Length ] },
 );
 
@@ -66,6 +67,12 @@ sub _build_min_size {
 }
 
 
+has verbose => (
+    is      => 'ro',
+    default => sub { return 0 },
+);
+
+
 sub name {
     my ( $self, $size ) = @_;
     return $self->sizes->{$size};
@@ -83,18 +90,26 @@ sub motif {
 
     my $motif = [];
 
+    my $format = '%.4f';
+
     my $sum = 0;
 
     while ( $sum < $self->size ) {
         my $name = $self->pool_code->();
         my $size = $self->duration($name);
         my $diff = $self->size - $sum;
+
         last
-            if sprintf( '%.4f', $diff ) < sprintf( '%.4f', $self->min_size );
+            if sprintf( $format, $diff ) < sprintf( $format, $self->min_size );
+
         next
-            if sprintf( '%.4f', $size ) > sprintf( '%.4f', $diff );
+            if sprintf( $format, $size ) > sprintf( $format, $diff );
+
         $sum += $size;
-#warn(__PACKAGE__,' ',__LINE__," MARK: $name, $size, $sum\n");
+
+        warn(__PACKAGE__,' ',__LINE__," $name, $size, $sum\n")
+            if $self->verbose;
+
         push @$motif, $name
             if $sum <= $self->size;
     }
@@ -116,7 +131,7 @@ Music::Duration::Partition - Partition a musical duration
 
 =head1 VERSION
 
-version 0.0303
+version 0.0304
 
 =head1 SYNOPSIS
 
@@ -135,7 +150,7 @@ version 0.0303
 
   my $score = MIDI::Util::setup_score(); # https://metacpan.org/pod/MIDI::Util
 
-  for my $n ( 0 .. @$notes - 1 ) {
+  for my $n ( 0 .. @$motif - 1 ) {
     $score->n( $motif->[$n], $notes->[$n] );
   }
 
@@ -143,9 +158,8 @@ version 0.0303
 
 =head1 DESCRIPTION
 
-C<Music::Duration::Partition> partitions a musical duration (the
-B<size> attribute) into smaller durations drawn from the B<pool> of
-possible durations.
+C<Music::Duration::Partition> partitions a musical duration, B<size>,
+into smaller durations drawn from the B<pool> of possible durations.
 
 =head1 ATTRIBUTES
 
@@ -196,6 +210,12 @@ Default: Random item of B<pool>
   $min_size = $mdp->min_size;
 
 This is a computed attribute.
+
+=head2 verbose
+
+  $verbose = $mdp->verbose;
+
+Show the progress of the B<motif> method.
 
 =head1 METHODS
 

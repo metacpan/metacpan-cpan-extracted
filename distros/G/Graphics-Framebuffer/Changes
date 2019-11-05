@@ -1530,3 +1530,22 @@ Revision history for Graphics-Framebuffer
       color values.
 
       Removed a lot of "garbage" from the object that is created.
+
+6.38  Nov 2, 2019
+
+      Added the "GARBAGE" parameter to the "new" method.  It forces it to
+      include extra garbage information in the object that typically just
+      takes up memory and isn't normally used.
+
+      Changed some hidden internal variables.  If you were naughty and used
+      them instead of the proper method call, then your code may break.
+
+      Changed how Splash and Mouse are exported.
+
+6.39  Nov 3, 2019
+
+      Fixed a bug in anti-aliased lines introduced in 6.38
+
+6.40  Nov 4, 2019
+
+      Fixed some installation documentation related to installing.

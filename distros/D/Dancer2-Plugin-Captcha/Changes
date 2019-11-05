@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Captcha
 
+0.13  Fri Nov 01 19:25:00 2019
+      - Updated copyright year details.
+
 0.12  Fri Sep 27 18:05:00 2019
       - Moved author test scripts to xt/ subfolder.
 

@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "Exporter::Tiny" : "0.025",
             "Filter::Simple" : "0",
             "Scalar::Util" : "1.26",
             "perl" : "5.01"
@@ -52,5 +53,5 @@
          "web" : "https://github.com/jo-37/debug-filter-printexpr"
       }
    },
-   "version" : "0.04"
+   "version" : "0.11"
 }

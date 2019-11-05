@@ -4,7 +4,6 @@ LICENSE
 MANIFEST.SKIP
 META.json
 README.md
-cdif.el
 cpanfile
 lib/App/cdif/Command.pm
 lib/App/cdif/Command/Mecab.pm
@@ -27,6 +26,7 @@ minil.toml
 script/cdif
 script/sdif
 script/watchdiff
+share/cdif.el
 t/00_compile.t
 t/01_run.t
 t/10_mecab.t

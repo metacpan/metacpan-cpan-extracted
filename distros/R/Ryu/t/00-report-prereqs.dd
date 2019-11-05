@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Devel::Cover::Report::Coveralls' => '0.11',
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::PluginBundle::Author::TEAM' => '0',
                                       'Software::License::Perl_5' => '0',

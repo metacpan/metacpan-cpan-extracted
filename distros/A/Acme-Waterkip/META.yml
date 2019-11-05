@@ -1,0 +1,33 @@
+---
+abstract: 'You should never use this module unless you are a waterkip'
+author:
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.96'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Waterkip
+provides:
+  Acme::Waterkip:
+    file: lib/Acme/Waterkip.pm
+    version: '0.001'
+requires:
+  perl: '5.008'
+resources:
+  repository: git://gitlab.com/opperschaap/perl5/p5-acme-waterkip.git
+version: '0.001'
+x_contributors:
+  - 'Wesley Schwengle <wesley@schwengle.net>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

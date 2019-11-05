@@ -1,5 +1,12 @@
 Revision history for Ryu-Async
 
+0.016     2019-11-06 00:08:35+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Dependency updates:
+
+    - pulls in latest (1.008) version of Ryu for some bugfixes
+
 0.015     2019-04-28 00:19:50+08:00 Asia/Kuala_Lumpur
     New features:
 

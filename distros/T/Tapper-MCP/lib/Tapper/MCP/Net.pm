@@ -1,6 +1,6 @@
 package Tapper::MCP::Net;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Net::VERSION = '5.0.7';
+$Tapper::MCP::Net::VERSION = '5.0.8';
 use strict;
 use warnings;
 use English '-no_match_vars';
@@ -63,18 +63,33 @@ sub start_local
 
 
 
-
-sub _wait_for_minion_job {
-  my ($self, $backend, $job_id, $testrun_id, $hostname) = @_;
+sub wait_for_minion_job {
+  my ($self, $testrun_id, $hostname) = @_;
 
   my $state = '';
   do {
-    my $jobs  = $backend->list_jobs(0, 1, {ids => [$job_id]});
-    $state = $jobs->{jobs}[0]{state};
-    $self->log->debug("minion: wait for job:$job_id testrun:$testrun_id host:$hostname state:$state");
-    sleep 10;
+    my $minion_cfg = $self->cfg->{minion}{frontend}{Minion};
+    my $minion     = Minion->new(%$minion_cfg);
+    my $backend    = $minion->backend;
+    my $job        = $backend->list_jobs
+      (0, 1,
+       {
+         tasks => ['tapper_testrun'],
+         queues => [$hostname],
+       })->{jobs}[0];
+
+    # don't wait if already running different testrun?
+    return if $job->{notes}{testrun_id} != $testrun_id;
+
+    my $job_id = $job->{id};
+    $state     = $job->{state};
+    $self->log->debug("minion: wait for 'finished' ".
+                      "job:$job_id testrun:$testrun_id host:$hostname state:$state");
+    sleep 5;
   } while ($state ne 'finished');
 }
+
+
 
 sub start_minion
 {
@@ -153,7 +168,7 @@ sub stop_minion
   if ($job_testrun == $testrun_id) {
     $self->log->debug(
       "minion: CANCEL/STOP job:$job_id testrun:$job_testrun");
-    $minion->broadcast('stop', [$job_id]);
+    $minion->broadcast('kill', ['INT', $job_id]);
   } else {
     $self->log->debug(
       "minion: NO CANCEL/STOP of job:$job_id testrun:$job_testrun != stopped testrun:$testrun_id");
@@ -278,6 +293,15 @@ Start a testrun locally. This starts both the Installer and PRC.
 @return success - 0
 @return error   - error string
 
+=head2 wait_for_minion_job
+
+Wait until a Minion job reaches its 'finished' state.
+
+@param string - path to config
+
+@return success - 0
+@return error   - error string
+
 =head2 start_minion
 
 Start a testrun via a Minion job. This just enqueues into a queue
@@ -361,7 +385,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

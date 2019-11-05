@@ -6,12 +6,13 @@ use strict;
 use Exporter;
 use base 'Exporter';
 
-our $VERSION = "2.003";
-our @EXPORT = qw(@ARGV_ORIG);
-our @ARGV_ORIG;
+our $VERSION = "2.006";
+
+our @ARGV_CLEAN;
+our @EXPORT = qw(@ARGV_CLEAN);
 
 # Revision - cvs automagically updated
-our $REVISION = '$Id: Conf.pm,v 1.16 2017/11/26 08:04:28 cfaber Exp $';
+our $REVISION = '$Id: Conf.pm,v 1.20 2019/11/02 22:24:21 cfaber Exp $';
 
 # Ruckus Global Version Number
 
@@ -87,11 +88,9 @@ Values may also be macros, so a value could be sourced from a configuration file
 	green = 0,255,0
 	blue  = 0,0,255
 
-=head2 NOTE ON @ARGV
+=head2 @ARGV_CLEAN
 
-Once an entry has been processed successfully it is automatically pruned from the @ARGV list.
-
-B<The unabridged @ARGV list is exported as @ARGV_ORIG>
+An @ARGV like list, cleaned of any arguments which have been captured by the parser.
 
 =head1 CONFIG FILE FORMAT
 
@@ -194,10 +193,23 @@ sub new {
 	shift;
 	my $a = _cliargs(@_);
 	my $c = _fileargs(@_);
+
+	if(ref($c) ne 'HASH'){
+		$c = {};
+	} 
+
 	$c->{argv} = $a;
 
 	my $self = bless _stage2($c);
 }
+
+=head2 argv()
+
+Returns the @ARGV_CLEAN list
+
+=cut
+
+sub argv { return @ARGV_CLEAN; }
 
 =head2 value(SECTION, KEY)
 
@@ -371,8 +383,6 @@ sub _fileargs {
 sub _cliargs {
 	my (@argv, $conf, $last_key);
 	for(my $i = 0; $i < @ARGV; $i++){
-		push @ARGV_ORIG, $ARGV[$i];
-
 		$ARGV[$i] =~ /(.+)/s;	# Untaint everything from the user.
 		$_ = $1;
 
@@ -435,8 +445,8 @@ sub _cliargs {
 		$conf = {};
 	}
 
-	# Make sure to freshen up the @ARGV list
-	@ARGV = (@argv);
+	# Make sure to freshen up the @ARGV_CLEAN list
+	@ARGV_CLEAN = (@argv);
 
 	return $conf;
 }
@@ -545,7 +555,7 @@ sub _die {
 
 =head1 EXPORTS
 
-@ARGV_ORIG is exported automatically containing the unabridged copy of the original @ARGV list
+@ARGV_CLEAN is exported automatically containing any additional arguments from the @ARGV list which have been cleaned of options (--help etc.)
 
 =head1 AUTHOR
 

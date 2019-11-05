@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::Tap;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::Tap::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::Result::Tap::VERSION = '5.0.11';
 # ABSTRACT: Tapper - containing tap reports
 
 use 5.010;
@@ -21,6 +21,7 @@ __PACKAGE__->add_columns
      # raw tap
      "tap",                     { data_type => "LONGBLOB", default_value => "",     is_nullable => 0,                                         },
      "tap_is_archive",          { data_type => "INT",     default_value => undef,   is_nullable => 1, size => 11,                             },
+     "processed",               { data_type => "INT",     default_value => 0,       is_nullable => 0, size => 4,                              },
      #
      # parsed tap
      "tapdom",                  { data_type => "LONGBLOB", default_value => "",     is_nullable => 1,                                         },
@@ -60,7 +61,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

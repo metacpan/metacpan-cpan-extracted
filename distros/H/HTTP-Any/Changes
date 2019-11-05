@@ -1,5 +1,8 @@
 Revision history for Perl extension HTTP::Any.
 
+0.11  2019-11-04
+	- fix for on_body when reuse curl_easy
+
 0.10  2018-11-14
 	- HTTP/2 for curl
 

@@ -3,7 +3,7 @@ package Database::Async::Query;
 use strict;
 use warnings;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 =head1 NAME
 
@@ -174,9 +174,12 @@ Cursors are handled as normal SQL queries.
 
 =cut
 
+no indirect;
+
 use Database::Async::Row;
 
 use Future;
+use Syntax::Keyword::Try;
 use Ryu::Async;
 use Scalar::Util qw(blessed);
 
@@ -382,6 +385,11 @@ sub input_stream {
 
 sub done {
     my ($self) = @_;
+    my $f = $self->completed;
+    if($f->is_ready) {
+        $log->warnf('Calling ->done but we think our status is already %s', $f->state);
+        return $f;
+    }
     # $self->in->completed->done unless $self->in->completed->is_ready;
     $self->completed->done;
 }

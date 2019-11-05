@@ -1,6 +1,18 @@
 CHANGES
 -------
 
+  2.089 3 November 2019
+
+      * No Changes
+
+  2.088 31 October 2019
+
+      * Add SUPPORT section
+        d348ad76c2073a2973d094891fbd0c2e24bf397d
+
+      * 000prereq.t: dump Perl version
+        e1afe502818cb1ccf5bad917b14b029b408f47f1
+
   2.087 10 August 2019
 
       * clang warning in ppport.h
@@ -56,7 +68,7 @@ CHANGES
 
       * Zlib.xs
         Change my_zcalloc to use safecalloc.
-        The link, https://github.com/madler/zlib/issues/253, is the upstream report for the remaining 
+        The link, https://github.com/madler/zlib/issues/253, is the upstream report for the remaining
         valgrind errors not already dealt with by 1.2.11. Using calloc in Zlib.xs for now as a workaround.
         #121074: valgrind errors in the test suite
 
@@ -124,7 +136,7 @@ CHANGES
   2.068 10 Dec 2014
 
       * Silence more compiler warnings
- 
+
       * Disable running of 07bufsize.y by default.
         COMPRESS_ZLIB_RUN_MOST needs set to run them. Makes life more
         bearable on legacy platforms
@@ -181,7 +193,7 @@ CHANGES
       * typo fix
         [#85431]
 
-      * silence compiler warning by making 2nd parameter to 
+      * silence compiler warning by making 2nd parameter to
         DispStream a const char*
 
       * Mishandling of BUILD_ZLIB=0 option
@@ -209,41 +221,41 @@ CHANGES
         [#79812]
 
       * update to ppport.h that includes SvPV_nomg_nolen
-        [#78079] 
-      
+        [#78079]
+
   2.056 10 August 2012
 
       * Fix C++ build issue
         Thanks to Karl Williamson for supplying the patch.
-      
+
   2.055 4 August 2012
 
       * Fix misuse of magic in API
-        [#78079] 
-      
+        [#78079]
+
   2.054 8 May 2012
 
       * Build issue on Win32
-        [#77030] 
-      
+        [#77030]
+
   2.053 6 May 2012
 
       * Include zlib 1.2.7 source.
-      
+
   2.052 29 April 2012
 
       * Fixed build issue when Perl is built with C++
-      
+
   2.051 20 February 2012
 
       * Bug in Compress::Raw::Zlib on Windows
-        [#75222] 
-      
+        [#75222]
+
   2.050 20 February 2012
 
       * Build failure on Irix & Solaris.
         [RT #69985]
-      
+
   2.049 18 February 2012
 
       * Include zlib 1.2.6 source.
@@ -254,13 +266,13 @@ CHANGES
 
   2.047 28 January 2012
 
-      * Allow flush to be called multiple times without any intermediate 
+      * Allow flush to be called multiple times without any intermediate
         call to deflate and still return Z_OK.
-        In the code below $status was Z_BUF_ERROR before this change.  
-                      
+        In the code below $status was Z_BUF_ERROR before this change.
+
           $def->flush(...);
-          $status = $def->flush(...); 
-      
+          $status = $def->flush(...);
+
       * Added support for zlibCompileFlags
 
       * Set minimum Perl version to 5.6
@@ -311,7 +323,7 @@ CHANGES
       * Document inflateReset
         [RT #61082]
 
-  2.030 22 July 2010 
+  2.030 22 July 2010
 
       * Ran the zlib2ansi script against the files in zlib-src.
         Thanks to Nicholas Clark for the reminder.
@@ -319,22 +331,22 @@ CHANGES
       * Added "-DNO_VIZ" to DEFINE in Makefile.PL
         [RT #65293]
 
-  2.027 24 April 2010 
+  2.027 24 April 2010
 
       * Updated to include zlib 1.2.5
 
-  2.026 7 April 2010 
+  2.026 7 April 2010
 
       * Fixed definition of Z_TREES in Makefile.PL
         [RT #65293]
 
       * Fixed build issue with definition of off64_t not found on Solaris
         by modifying the zlib source - changed the symbol
-        _LARGEFILE64_SOURCE to _LARGEFILE64_SOURCE_dummy in zconf.h, 
-        zlib.h and zutil.h 
+        _LARGEFILE64_SOURCE to _LARGEFILE64_SOURCE_dummy in zconf.h,
+        zlib.h and zutil.h
         [RT #56108]
 
-  2.025 27 March 2010 
+  2.025 27 March 2010
 
       * Updated to include zlib 1.2.4
 
@@ -392,10 +404,10 @@ CHANGES
 
       * Document the gzip flags that WindowBits can take.
 
-      * Allow a dictionary to be used with a raw inflate. 
+      * Allow a dictionary to be used with a raw inflate.
         Needs zlib 1.2.2.1 or better.
         [RT #36046]
-      
+
   2.011 5 May 2008
 
       * A C++-style comment sneaked in with the last update. Fixed.

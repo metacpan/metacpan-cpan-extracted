@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 20;
+use Test::More tests => 19;
 
 use lib 't';
 use Util;
@@ -15,14 +15,13 @@ my %types_for_file;
 populate_filetypes();
 
 
-sets_match( [filetypes( 't/swamp/perl.pod' )], [qw( parrot perl pod )], 'foo.pod can be multiple things' );
+sets_match( [filetypes( 't/swamp/perl.pod' )], [qw( perl pod )], 'foo.pod can be multiple things' );
 sets_match( [filetypes( 't/swamp/perl.pm' )], [qw( perl )], 't/swamp/perl.pm' );
 sets_match( [filetypes( 't/swamp/Makefile.PL' )], [qw( perl )], 't/swamp/Makefile.PL' );
 sets_match( [filetypes( 'Unknown.wango' )], [], 'Unknown' );
 
 ok(  is_filetype( 't/swamp/perl.pod', 'perl' ), 'foo.pod can be perl' );
 ok(  is_filetype( 't/swamp/perl.pod', 'pod' ), 'foo.pod can be pod' );
-ok(  is_filetype( 't/swamp/perl.pod', 'parrot' ), 'foo.pod can be parrot' );
 ok( !is_filetype( 't/swamp/perl.pod', 'ruby' ), 'foo.pod cannot be ruby' );
 ok(  is_filetype( 't/swamp/perl.handler.pod', 'perl' ), 'perl.handler.pod can be perl' );
 ok(  is_filetype( 't/swamp/Makefile', 'make' ), 'Makefile is a makefile' );
@@ -58,14 +57,13 @@ sub populate_filetypes {
     my @types_to_try;
 
     foreach my $line ( @{$type_lines} ) {
-        if ( $line =~ /^\s+--\[no\](\w+)/ ) {
+        if ( $line =~ /^    (\w+) / ) {
             push @types_to_try, $1;
         }
     }
 
     foreach my $type (@types_to_try) {
-        my ( $filenames, undef ) = run_ack_with_stderr('-f', "--$type",
-            't/swamp', 't/etc');
+        my ( $filenames, undef ) = run_ack_with_stderr('-f', '-t', $type, 't/swamp', 't/etc');
 
         foreach my $filename ( @{$filenames} ) {
             push @{ $types_for_file{$filename} }, $type;

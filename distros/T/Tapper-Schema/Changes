@@ -1,5 +1,14 @@
 Revision history for Tapper-Schema
 
+5.0.11    2019-11-04
+        - re-upload to correct PAUSE user
+
+5.0.10    2019-11-04
+        - tap: new column 'processed'
+        - make @meta_cols accessible for others
+        - testplans now size 'mediumtext' (up to 16MB)
+        - testrun success ratio includes potential parse errors
+
 5.0.9     2017-02-14
         - support for testrun_scheduling content update
 

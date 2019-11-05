@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.087 ;
+use IO::Compress::Base 2.089 ;
 
-use IO::Compress::Base::Common  2.087 qw(isaScalar createSelfTiedObject);
-use IO::Compress::Adapter::LZO  2.087 ;
+use IO::Compress::Base::Common  2.089 qw(isaScalar createSelfTiedObject);
+use IO::Compress::Adapter::LZO  2.089 ;
 use Compress::LZO qw(crc32 adler32 LZO_VERSION);
-use IO::Compress::Lzop::Constants  2.087 ;
+use IO::Compress::Lzop::Constants  2.089 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzopError);
 
-$VERSION = '2.087';
+$VERSION = '2.089';
 $LzopError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -248,7 +248,6 @@ IO::Compress::Lzop - Write lzop files/buffers
     binmode $z
     fileno $z
     close $z ;
- 
 
 =head1 DESCRIPTION
 
@@ -275,7 +274,8 @@ The functional interface needs Perl5.005 or better.
 =head2 lzop $input_filename_or_reference => $output_filename_or_reference [, OPTS]
 
 C<lzop> expects at least two parameters,
-C<$input_filename_or_reference> and C<$output_filename_or_reference>.
+C<$input_filename_or_reference> and C<$output_filename_or_reference>
+and zero or more optional parameters (see L</Optional Parameters>)
 
 =head3 The C<$input_filename_or_reference> parameter
 
@@ -392,9 +392,9 @@ in C<$output_filename_or_reference> as a distinct entry.
 
 =head2 Optional Parameters
 
-Unless specified below, the optional parameters for C<lzop>,
-C<OPTS>, are the same as those used with the OO interface defined in the
-L</"Constructor Options"> section below.
+The optional parameters for the one-shot function C<lzop>
+are (for the most part) identical to those used with the OO interface defined in the
+L</"Constructor Options"> section. The exceptions are listed below
 
 =over 5
 
@@ -462,6 +462,22 @@ Defaults to 0.
 
 =head2 Examples
 
+Here are a few example that show the capabilities of the module.
+
+=head3 Streaming
+
+This very simple command line example demonstrates the streaming capabilities of the module.
+The code reads data from STDIN, compresses it, and writes the compressed data to STDOUT.
+
+    $ echo hello world | perl -MIO::Compress::Lzop=lzop -e 'lzop \*STDIN => \*STDOUT' >output.lzo
+
+The special filename "-" can be used as a standin for both C<\*STDIN> and C<\*STDOUT>,
+so the above can be rewritten as
+
+    $ echo hello world | perl -MIO::Compress::Lzop=lzop -e 'lzop "-" => "-"' >output.lzo
+
+=head3 Compressing a file from the filesystem
+
 To read the contents of the file C<file1.txt> and write the compressed
 data to the file C<file1.txt.lzo>.
 
@@ -472,6 +488,8 @@ data to the file C<file1.txt.lzo>.
     my $input = "file1.txt";
     lzop $input => "$input.lzo"
         or die "lzop failed: $LzopError\n";
+
+=head3 Reading from a Filehandle and writing to an in-memory buffer
 
 To read from an existing Perl filehandle, C<$input>, and write the
 compressed data to a buffer, C<$buffer>.
@@ -486,6 +504,8 @@ compressed data to a buffer, C<$buffer>.
     my $buffer ;
     lzop $input => \$buffer
         or die "lzop failed: $LzopError\n";
+
+=head3 Compressing multiple files
 
 To compress all files in the directory "/my/home" that match "*.txt"
 and store the compressed data in the same directory
@@ -561,7 +581,7 @@ return undef.
 
 =head2 Constructor Options
 
-C<OPTS> is any combination of the following options:
+C<OPTS> is any combination of zero or more the following options:
 
 =over 5
 
@@ -850,6 +870,12 @@ Same as doing this
 =back
 
 =head1 EXAMPLES
+
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to 
+L<https://github.com/pmqs/IO-Compress-Lzop/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress-Lzop>.
 
 =head1 SEE ALSO
 

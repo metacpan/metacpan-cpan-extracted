@@ -1,5 +1,6 @@
 Changes
 bin/zipdetails  perl
+bin/streamzip perl
 examples/io/anycat  perl
 examples/io/bzip2/bzcat perl
 examples/io/bzip2/bzgrep    perl
@@ -61,6 +62,7 @@ t/005defhdr.t
 t/006zip.t
 t/010examples-bzip2.t
 t/010examples-zlib.t
+t/011streamzip.t
 t/01misc.t
 t/020isize.t
 t/050interop-gzip.t
@@ -152,6 +154,9 @@ t/compress/zlib-generic.pl
 t/files/bad-efs.zip
 t/files/meta.xml
 t/files/test.ods
+t/files/encrypt-aes.zip
+t/files/encrypt-standard.zip
+t/files/jar.zip
 t/globmapper.t
 t/Test/Builder.pm
 t/Test/More.pm

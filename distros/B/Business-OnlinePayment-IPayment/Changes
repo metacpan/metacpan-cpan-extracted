@@ -1,5 +1,19 @@
 Revision history for Business-OnlinePayment-IPayment
 
+0.09 Fri Nov  1 16:20:25 2019 CET
+
+    [BUG FIXES]
+
+    * Get rid of the unnecessary Crypt::SSLeay prerequisite.
+      See https://github.com/nanis/Crypt-SSLeay#cryptssleay---openssl-support-for-lwp
+      for more information.
+    * Fix license string in Makefile.PL (Stefan Hornburg/Racke).
+    * Fix typos ((Stefan Hornburg/Racke).
+
+    [TESTS]
+
+    * Add HTTP response test to auth-refund file (Stefan Hornburg/Racke).
+
 0.08 Thu Nov 19 18:20:10 2015 CET
 
     [BUG FIXES]

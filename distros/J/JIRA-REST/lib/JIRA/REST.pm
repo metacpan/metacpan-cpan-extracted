@@ -1,6 +1,6 @@
 package JIRA::REST;
 # ABSTRACT: Thin wrapper around Jira's REST API
-$JIRA::REST::VERSION = '0.019';
+$JIRA::REST::VERSION = '0.020';
 use 5.010;
 use utf8;
 use strict;
@@ -89,7 +89,7 @@ sub new {
 
     # Since Jira doesn't send an authentication challenge, we force the
     # sending of the authentication header.
-    $rest->addHeader(Authorization => 'Basic ' . encode_base64("$args{username}:$args{password}"))
+    $rest->addHeader(Authorization => 'Basic ' . encode_base64("$args{username}:$args{password}", ''))
         unless $args{anonymous};
 
     for my $ua ($rest->getUseragent) {
@@ -379,14 +379,14 @@ JIRA::REST - Thin wrapper around Jira's REST API
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
     use JIRA::REST;
 
     my $jira = JIRA::REST->new({
-        URL      => 'https://jira.example.net',
+        url      => 'https://jira.example.net',
         username => 'myuser',
         password => 'mypass',
     });
@@ -439,7 +439,7 @@ This module implements a very thin wrapper around Jira's REST APIs:
 
 =over
 
-=item * L<Jira Core REST API|https://docs.atlassian.com/jira/REST/server/>
+=item * L<Jira Core REST API|https://docs.atlassian.com/software/jira/docs/api/REST/latest/>
 
 This rich API superseded the old L<Jira SOAP
 API|http://docs.atlassian.com/software/jira/docs/api/rpc-jira-plugin/latest/com/atlassian/jira/rpc/soap/JiraSoapService.html>
@@ -527,7 +527,7 @@ As an extension, the hash reference also accepts one additional argument
 called B<proxy> that is an extension to the REST::Client configuration and
 will be removed from the hash before passing it on to the REST::Client
 constructor. However, this argument is deprecated since v0.017 and you
-should avoid it. Instead, use the following argument instead.
+should avoid it. Use the following argument instead.
 
 =item * B<proxy>
 
@@ -568,7 +568,7 @@ fields, you pass C</rest/api/latest/field>, and in order to get SLA
 information about an issue you pass
 C</rest/servicedeskapi/request/$key/sla>.
 
-If you're using a method form Jira Core REST API you may omit the prefix
+If you're using a method from Jira Core REST API you may omit the prefix
 C</rest/api/VERSION>. For example, to GET the list of all fields you may
 pass just C</field>.
 
@@ -728,6 +728,10 @@ yet an easy way to test it on different versions.
 
 JIRA::REST uses a REST::Client object to perform the low-level interactions.
 
+=item * C<JIRA::REST::OAuth>
+
+This module Sub Classes JIRA::REST providing OAuth 1.0 support.
+
 =item * C<JIRA::Client::REST>
 
 This is another module implementing Jira's REST API using
@@ -747,7 +751,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2019 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

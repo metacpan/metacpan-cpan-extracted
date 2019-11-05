@@ -1,0 +1,39 @@
+Tk-HyperlinkButton
+==================
+
+This Perl/Tk widget provides an hyperlink widget. That is, a button
+with a slightly changed look and feel, and a default method to open
+the desired target URL in a web browser.
+
+This is useful if you want just quickly want to embedd clickable
+hyperlinks in your Perl/Tk application.
+Otherwise, you would have to code the UI behavior as well as the
+open-in-browser part over and over again.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Tk::HyperlinkButton
+
+INSTALLATION
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+DEPENDENCIES
+
+This module requires some other modules and libraries.
+See Makefile.PL for a detailled list. If you are going to install
+via cpan shell or PPM, you don't have to care about.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 by Alexander Becker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

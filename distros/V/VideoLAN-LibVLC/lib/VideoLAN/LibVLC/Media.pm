@@ -5,7 +5,7 @@ use VideoLAN::LibVLC;
 use Carp;
 
 # ABSTRACT: Playable media stream
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub path { shift->{path} }
@@ -50,7 +50,7 @@ VideoLAN::LibVLC::Media - Playable media stream
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 

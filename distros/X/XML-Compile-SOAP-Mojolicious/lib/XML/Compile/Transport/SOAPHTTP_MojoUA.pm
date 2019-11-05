@@ -1,17 +1,23 @@
-# Copyrights 2016 by [Heiko Jansen/Mark Overmeer].
+# Copyrights 2016-2019 by [Mark Overmeer <markov@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP-Mojolicious.
+# Meta-POD processed with # OODoc into POD and HTML manual-pages. See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Transport::SOAPHTTP_MojoUA;
 use vars '$VERSION';
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 use base 'XML::Compile::Transport';
 
-use XML::Compile::Transport::SOAPHTTP;
+use warnings;
+use strict;
+
+use Log::Report 'xml-compile-soap-mojolicious';
+
+use XML::Compile::Transport::SOAPHTTP ();
 
 BEGIN {
     # code mixin from  XML::Compile::Transport::SOAPHTTP
@@ -20,8 +26,6 @@ BEGIN {
         *{ __PACKAGE__ . "::$_" } = \&{"XML::Compile::Transport::SOAPHTTP::$_"};
     }
 }
-
-use Log::Report 'xml-compile-soap-mojolicious';
 
 use XML::Compile::SOAP::Util qw/SOAP11ENV SOAP11HTTP/;
 use XML::Compile    ();
@@ -32,6 +36,7 @@ use Mojo::IOLoop    ();
 use HTTP::Request   ();
 use HTTP::Response  ();
 use HTTP::Headers   ();
+use Scalar::Util    qw(blessed reftype);
 
 # (Microsofts HTTP Extension Framework)
 my $http_ext_id = SOAP11ENV;
@@ -39,32 +44,27 @@ my $http_ext_id = SOAP11ENV;
 __PACKAGE__->register(SOAP11HTTP);
 
 
-
 sub init($) {
-    my ( $self, $args ) = @_;
-    $self->{'ua_start_cb'} = delete $args->{'ua_start_callback'};
+    my ($self, $args) = @_;
+    if(my $cb = $self->{ua_start_cb} = delete $args->{ua_start_callback}) {
+		panic "callback not a code" if reftype $cb ne 'CODE';
+	}
+
     $self->SUPER::init($args);
     $self;
 }
 
-
 sub initWSDL11($) {
-    my ( $class, $wsdl ) = @_;
+    my ($class, $wsdl) = @_;
     trace "initialize SOAPHTTP-MojoUA transporter for WSDL11";
 }
 
 #-------------------------------------------
 
 
-sub uaStartCallback {
-    my $self = shift;
-    if ( exists $self->{'ua_start_cb'} and ref $self->{'ua_start_cb'} eq 'CODE' ) {
-        return $self->{'ua_start_cb'};
-    }
-}
+sub uaStartCallback { shift->{ua_start_cb} }
 
 #-------------------------------------------
-
 
 
 sub compileClient(@) {
@@ -74,7 +74,7 @@ sub compileClient(@) {
     my $parser = XML::LibXML->new;
 
     sub {
-        my ( $xmlout, $trace, $mtom, $callback ) = @_;
+        my ($xmlout, $trace, $mtom, $callback) = @_;
         my $start = time;
         my $textout = ref $xmlout ? $xmlout->toString : $xmlout;
 
@@ -84,24 +84,24 @@ sub compileClient(@) {
         $trace->{transport_start} = $start;
 
         my $handler = sub {
-            my ( $textin, $xops ) = @_;
+            my ($textin, $xops) = @_;
             my $connected = time;
 
             my $xmlin;
-            if ($textin) {
+            if($textin) {
                 $xmlin = eval { $parser->parse_string($$textin) };
                 $trace->{error} = $@ if $@;
             }
 
             my $answer;
-            if ( $kind eq 'one-way' ) {
+            if($kind eq 'one-way') {
                 my $response = $trace->{http_response};
                 my $code = defined $response ? $response->code : -1;
-                if ( $code == 202 ) { $answer = $xmlin || {} }
-                else                { $trace->{error} = "call failed with code $code" }
+                if($code == 202) { $answer = $xmlin || {} }
+                else  { $trace->{error} = "call failed with code $code" }
             }
-            elsif ($xmlin) { $answer = $xmlin }
-            else           { $trace->{error} ||= 'no xml as answer' }
+            elsif($xmlin) { $answer = $xmlin }
+            else          { $trace->{error} ||= 'no xml as answer' }
 
             my $end = $trace->{transport_end} = time;
 
@@ -119,10 +119,10 @@ sub compileClient(@) {
 
 
 sub _prepare_call($) {
-    my ( $self, $args ) = @_;
-    my $method = $args->{method} || 'POST';
-    my $soap   = $args->{soap}   || 'SOAP11';
-    my $version = ref $soap ? $soap->version : $soap;
+    my ($self, $args) = @_;
+    my $method   = $args->{method} || 'POST';
+    my $soap     = $args->{soap}   || 'SOAP11';
+    my $version  = ref $soap ? $soap->version : $soap;
     my $mpost_id = $args->{mpost_id} || 42;
     my $action   = $args->{action};
     my $mime     = $args->{mime};
@@ -136,31 +136,32 @@ sub _prepare_call($) {
     $self->headerAddVersions($header);
 
     my $content_type;
-    if ( $version eq 'SOAP11' ) {
+    if($version eq 'SOAP11') {
         $mime ||= ref $soap ? $soap->mimeType : 'text/xml';
         $content_type = qq{$mime; charset=$charset};
     }
-    elsif ( $version eq 'SOAP12' ) {
+    elsif($version eq 'SOAP12') {
         $mime ||= ref $soap ? $soap->mimeType : 'application/soap+xml';
         my $sa = defined $action ? qq{; action="$action"} : '';
         $content_type = qq{$mime; charset=$charset$sa};
         $header->header( Accept => $mime );    # not the HTML answer
     }
     else {
-        error "SOAP version {version} not implemented", version => $version;
+        error __x"SOAP version {version} not implemented", version => $version;
     }
 
-    if ( $method eq 'POST' ) {
+    if($method eq 'POST') {
         $header->header( SOAPAction => qq{"$action"} )
             if defined $action;
     }
-    elsif ( $method eq 'M-POST' ) {
+    elsif($method eq 'M-POST') {
         $header->header( Man => qq{"$http_ext_id"; ns=$mpost_id} );
         $header->header( "$mpost_id-SOAPAction", qq{"$action"} )
             if $version eq 'SOAP11';
     }
     else {
-        error "SOAP method must be POST or M-POST, not {method}", method => $method;
+        error __x"SOAP method must be POST or M-POST, not {method}"
+          , method => $method;
     }
 
     # Prepare request
@@ -176,10 +177,10 @@ sub _prepare_call($) {
 
     # Create handler
 
-    my ( $create_message, $parse_message )
-        = exists $INC{'XML/Compile/XOP.pm'}
-        ? $self->_prepare_xop_call($content_type)
-        : $self->_prepare_simple_call($content_type);
+    my ($create_message, $parse_message)
+      = exists $INC{'XML/Compile/XOP.pm'}
+      ? $self->_prepare_xop_call($content_type)
+      : $self->_prepare_simple_call($content_type);
 
     $parse_message = $self->_prepare_for_no_answer($parse_message)
         unless $expect;
@@ -189,91 +190,96 @@ sub _prepare_call($) {
     # the request)
     my $ua = Mojo::UserAgent->new;
 
+    if(my $callback = $self->uaStartCallback) {
+       $ua->on(start => $callback);
+    }
+
     # async call
     sub {
         my ( $content, $trace, $mtom, $callback ) = @_;
-        $create_message->( $request, $content, $mtom );
+        $create_message->($request, $content, $mtom);
 
         $trace->{http_request} = $request;
 
         my $handler = sub {
             my $tx = shift;
 
-            unless ( defined $tx and ref($tx) eq 'Mojo::Transaction::HTTP' ) {
+            unless(blessed $tx && $tx->isa('Mojo::Transaction::HTTP')) {
                 $trace->{error} = "Did not receive a transaction object";
-                return $callback->( undef, undef, $trace );
+                return $callback->(undef, undef, $trace);
             }
 
-            my $headers = $tx->res->headers->to_hash(1);
+			my $res     = $tx->res;
+            my $headers = $res->headers->to_hash(1);
             foreach my $h ( keys %{$headers} ) {
-                if ( ref $headers->{$h} eq ref( [] ) ) {
-                    $headers->{$h} = join( ', ', @{ $headers->{$h} } );
+                if ( reftype $headers->{$h} eq 'ARRAY') {
+                    $headers->{$h} = join ', ', @{$headers->{$h}};
                 }
             }
 
-            if ( defined( $tx->res->error ) && !$tx->res->error->{'code'} ) {
+			my $err      = $res->error;
+            $headers->{'Client-Warning'} = 'Client side error: '.$err->{message}
+                if $err && !$err->{code};
 
-                # Wont parse the response content if the Client-Warning header is set
-                $headers->{'Client-Warning'} = 'Client side error: ' . $tx->res->error->{'message'};
-            }
+            my $response = $trace->{http_response} = HTTP::Response->new(
+                $res->code, $res->message, [%$headers], $res->body
+            );
 
-            my $response = $trace->{'http_response'}
-                = HTTP::Response->new( $tx->res->code, $tx->res->message, [%$headers], $tx->res->body, );
-
-            if ( $response->header('Client-Warning') ) {
+            if($response->header('Client-Warning')) {
                 $trace->{error} = $response->message;
-                return $callback->( undef, undef, $trace );
+                return $callback->(undef, undef, $trace);
             }
 
-            if ( $response->is_error ) {
+            if($response->is_error) {
                 $trace->{error} = $response->message;
 
                 # still try to parse the response for Fault blocks
             }
 
-            my ( $parsed, $mtom ) = try { $parse_message->($response) };
+            my ($parsed, $mtom) = try { $parse_message->($response) };
             if ($@) {
                 $trace->{error} = $@->wasFatal->message;
-                return $callback->( undef, undef, $trace );
+                return $callback->(undef, undef, $trace);
             }
 
-            try { $callback->( $parsed, $mtom, $trace ) };
+            try { $callback->($parsed, $mtom, $trace) };
         };
 
-        my $tx = $ua->build_tx( $request->method => $request->uri->as_string );
-        foreach my $hdr_name ( $request->headers->header_field_names ) {
+        my $tx = $ua->build_tx($request->method => $request->uri->as_string);
+
+        foreach my $hdr_name ($request->headers->header_field_names) {
             next if $hdr_name eq "Content-Length";
+
             foreach my $hdr ( $request->headers->header($hdr_name) ) {
                 $tx->req->headers->append( $hdr_name => $hdr );
             }
         }
-        $tx->req->body( $request->content );
+        $tx->req->body($request->content);
 
-        if ( my $coderef = $self->uaStartCallback ) {
-            $ua->on( start => $coderef );
-        }
         $ua->start(
             $tx => sub {
-                my ( $ua, $tx ) = @_;
+                my ($ua, $tx) = @_;
                 $handler->($tx);
-            }
+            },
         );
     };
-} ## end sub _prepare_call($)
+}
 
 
 
 sub headerAddVersions($) {
     my ( $thing, $h ) = @_;
     foreach my $pkg (
-        qw/XML::Compile XML::Compile::Cache
-        XML::Compile::SOAP XML::LibXML Mojolicious/
-        )
+        qw/XML::Compile
+           XML::Compile::Cache
+           XML::Compile::SOAP
+           XML::LibXML
+           Mojolicious/ )
     {
         no strict 'refs';
         my $version = ${"${pkg}::VERSION"} || 'undef';
         ( my $field = "X-$pkg-Version" ) =~ s/\:\:/-/g;
-        $h->header( $field => $version );
+        $h->header($field => $version);
     }
 }
 

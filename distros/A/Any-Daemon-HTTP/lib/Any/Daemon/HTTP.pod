@@ -101,10 +101,12 @@ then the defaults are used to create a default vhost.
   listen                             <required>
   on_error                           undef
   pid_file          Any::Daemon      undef
+  protocol                           HTTP and HTTPS by port-number
   proxies                            <default>
   proxy_class                        Any::Daemon::HTTP::Proxy
   server_id                          <program name>
   session_class                      Any::Daemon::HTTP::Session
+  show_in_ps                         true
   standard_headers                   [ ]
   user              Any::Daemon      undef
   vhost_class                        Any::Daemon::HTTP::VirtualHost
@@ -138,6 +140,11 @@ been produced.  The result of this function should be the new response
 
 =item pid_file => FILENAME
 
+=item protocol => 'HTTP'|'HTTPS'|'FCGI'
+
+[0.29] Specify which kind of connection has to be managed: plain HTTP,
+HTTP over SSL, or HTTP over FCGI.
+
 =item proxies => PROXY|PACKAGE|\%options|ARRAY
 
 [0.24] For %options, see L<addProxy()|Any::Daemon::HTTP/"Host administration">.
@@ -157,6 +164,11 @@ mixture of proxy definitions.  Same as option C<proxy>.
 [0.21] The PACKAGE must extend the default class.  The extended class may
 be used to implement loading and saving session information, or adding
 abstraction.
+
+=item show_in_ps => BOOLEAN
+
+Show the status of the childs in "ps".  On some systems, this looks nice,
+but on others there are various mutilations.
 
 =item standard_headers => ARRAY
 
@@ -191,9 +203,18 @@ Extends L<"Accessors" in Any::Daemon|Any::Daemon/"Accessors">.
  
 =over 4
 
+=item $obj-E<gt>B<hosts>()
+
+Returns a list of hostnames used to connect to the sockets.
+
 =item $obj-E<gt>B<pidFilename>()
 
 Inherited, see L<Any::Daemon/"Accessors">
+
+=item $obj-E<gt>B<protocol>()
+
+Returns C<HTTP>, C<HTTPS>, or C<FCGI> to express the procotol used. All
+implementations are based on L<HTTP::Daemon> (part of LWP)
 
 =item $obj-E<gt>B<sockets>()
 
@@ -310,6 +331,8 @@ or setup logging.
 
 [0.28] Called by default when a new client has been accepted.
 See L<run(new_connection)|Any::Daemon::HTTP/"Action">.
+
+=item $obj-E<gt>B<psTitle>($string)
 
 =item $obj-E<gt>B<run>(%options)
 
@@ -476,8 +499,8 @@ Ehhh...
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.28,
-built on March 20, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.29,
+built on November 04, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 

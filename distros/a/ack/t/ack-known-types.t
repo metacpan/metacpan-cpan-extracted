@@ -14,7 +14,6 @@ my @files = qw(
 t/swamp/0
 t/swamp/constitution-100k.pl
 t/swamp/Rakefile
-t/swamp/parrot.pir
 t/swamp/options-crlf.pl
 t/swamp/options.pl
 t/swamp/javascript.js
@@ -50,7 +49,6 @@ t/swamp/notes.md
 
 my @files_no_perl = qw(
 t/swamp/Rakefile
-t/swamp/parrot.pir
 t/swamp/javascript.js
 t/swamp/html.html
 t/swamp/sample.rake
@@ -75,7 +73,7 @@ t/swamp/notes.md
 );
 
 ack_sets_match( [ '--known-types', '-f', 't/swamp' ], \@files, '--known-types test #1' );
-ack_sets_match( [ '--known-types', '--noperl', '-f', 't/swamp' ], \@files_no_perl, '--known-types test #2' );
+ack_sets_match( [ '--known-types', '-T', 'perl', '-f', 't/swamp' ], \@files_no_perl, '--known-types test #2' );
 
 ack_sets_match( [ '-k', '-f', 't/swamp' ], \@files, '-k test #1' );
-ack_sets_match( [ '-k', '-f', '--noperl', 't/swamp' ], \@files_no_perl, '-k test #2' );
+ack_sets_match( [ '-k', '-f', '-T', 'perl', 't/swamp' ], \@files_no_perl, '-k test #2' );

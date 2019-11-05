@@ -15,7 +15,7 @@ use IO::Handle;
 use Carp;
 
 # ABSTRACT: Media Player
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub libvlc { shift->{libvlc} }
@@ -274,7 +274,7 @@ VideoLAN::LibVLC::MediaPlayer - Media Player
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

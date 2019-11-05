@@ -1,0 +1,125 @@
+NAME
+
+    dbedia::blob - interface to (not only) b.dbedia.com blob storage
+
+SYNOPSIS
+
+        use dbedia::blob;
+    
+        my $blob = dbedia::blob->new(file => $file);
+        say $blob->file_path;
+        say $blob->file_url;
+        say $blob->file_meta->{mime_type};
+        say $blob->file_meta_yaml;
+    
+        $blob->upload;
+
+DESCRIPTION
+
+    Module to upload files to blob server with their sha256 checksum as a
+    part of their name. So for example swagger-ui.js becomes
+    https://b.dbedia.com/e3d4e875f9d0b751bc7276e6472e96a5262cabc64b060540da
+    190bfdc0e36dec/swagger-ui.js and will be stored under
+    e3/d4/e8/75f9d0b751bc7276e6472e96a5262cabc64b060540da190bfdc0e36dec on
+    a target server.
+
+METHODS
+
+ new(file => ..., base_uri => ...)
+
+    Object constructor
+
+ file
+
+    Object accessor with file location on local filesystem.
+
+ base_uri
+
+    Object accessor with base location on blob server. Default to
+    https://b.dbedia.com/ but can be anything like
+    http://you-server/blob-path/.
+
+ file_chksum
+
+    file sha256 hex checksum.
+
+ file_url
+
+    Web url for a file based on the checksum and base_uri.
+
+ file_path
+
+    File path on a blob server.
+
+ file_meta
+
+    Return file meta has with original filename, mime_type and size. For
+    example:
+
+        {   filename  => 'swagger-ui.js',
+            mime_type => 'application/javascript',
+            size      => 355197,
+        }
+
+ file_meta_yaml
+
+    Returns "file_meta" yaml.
+
+ file_meta_path
+
+    File meta data (yaml) path on a blob server.
+
+ upload($hostname)
+
+    Using Net::SCP will upload "file" to $hostname server. Default is
+    dbedia-blob which can be configured in ~/.ssh/config to point to any
+    hostname/username/auth configuration of your liking.
+
+    In case file is already present will print warning about skipping.
+
+ default_base_uri
+
+    Returns https://b.dbedia.com/ uri.
+
+EXAMPLE NGINX CONFIG
+
+    configuration to serve blobs via nginx:
+
+        server {
+            server_name  b.dbedia.com;
+    
+            access_log /var/log/nginx/b.dbedia-access.log;
+    
+            root   /srv/www/b.dbedia.com;
+            index  index.html index.htm;
+    
+            location / {
+                expires 5m;
+            }
+            location ~ "^(/..)(..)(..)(.{58})(.*)$" {
+                alias /srv/www/b.dbedia.com/$1/$2/$3/$4;
+                expires 24h;
+            }
+        }
+
+CONTRIBUTORS
+
+    The following people have contributed to the Sys::Path by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advice, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        you?
+
+AUTHOR
+
+    Jozef Kutej
+
+LICENSE AND COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

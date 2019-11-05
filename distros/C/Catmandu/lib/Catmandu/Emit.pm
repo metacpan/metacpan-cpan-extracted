@@ -3,7 +3,7 @@ package Catmandu::Emit;
 # eval context ->
 use Catmandu::Sane;
 
-our $VERSION = '1.2008';
+our $VERSION = '1.2009';
 
 use Catmandu::Util qw(:is :string require_package);
 use Clone qw(clone);
@@ -164,11 +164,21 @@ sub _emit_delete {
 
 sub _emit_value {
     my ($self, $val) = @_;
+
+    ## undef
     return 'undef' unless defined $val;
 
-    # numbers should look like number and not start with a 0 (no support
-    # for octals)
-    return $val if is_number($val) && $val !~ /^0+/;
+    ## numbers
+    # we don't quote ints and floats unless there are leading
+    # (and for floats trailing) zero's
+    if (is_integer($val)) {
+        return $val;
+    }
+    if (is_float($val) && $val !~ /0$/) {
+        return $val;
+    }
+
+    ## strings
     $self->_emit_string($val);
 }
 

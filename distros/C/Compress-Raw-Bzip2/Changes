@@ -1,6 +1,18 @@
 CHANGES
 -------
 
+  2.089 3 November 2019
+
+      * No Changes
+      
+  2.088 31 October 2019
+
+      * Add Support Details
+        37e04fb3dc50287a3512b004282425c6eedb8af6
+
+      * upgrade to Bzip2 1.0.8
+        027a30848ee57731b435d2ea7af09e532bf6fbfd
+
   2.087 10 August 2019
 
       * No Changes

@@ -1,3 +1,7 @@
+#ifndef _XOPEN_SOURCE
+#  define _XOPEN_SOURCE 600
+#endif
+
 #include "spvm_native.h"
 
 #include <errno.h>
@@ -15,6 +19,31 @@ int32_t SPNATIVE__SPVM__Errno__set_errno(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   
   errno = stack[0].ival;
+  
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__Errno__strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_number = stack[0].ival;
+
+  char strerr[256] = {0};
+// Don't check the return value of strerror_s and strerror_r for portability
+#ifdef _WIN32
+    strerror_s(strerr, 256, error_number);
+#else
+    strerror_r(error_number, strerr, 256);
+#endif
+  strerr[255] = '\0';
+  
+  // If the first character is '\0', that means can't get an error string.
+  if (strerr[0] == '\0') {
+    SPVM_DIE("strerror can't get a valid message", "SPVM/Errno.c", __LINE__);
+  }
+  
+  void* obj_strerr = env->new_str(env, strerr);
+  
+  stack[0].oval = obj_strerr;
   
   return SPVM_SUCCESS;
 }

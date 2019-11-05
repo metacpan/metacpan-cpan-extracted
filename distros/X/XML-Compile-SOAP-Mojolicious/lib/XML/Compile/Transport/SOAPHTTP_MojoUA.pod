@@ -12,9 +12,14 @@ XML::Compile::Transport::SOAPHTTP_MojoUA - exchange XML via Mojo::UserAgent
 
 =head1 SYNOPSIS
 
+ # See examples in distribution
  use XML::Compile::Transport::SOAPHTTP_MojoUA;
 
- my $http = XML::Compile::Transport::SOAPHTTP_MojoUA->new(@options);
+ my $http = XML::Compile::Transport::SOAPHTTP_MojoUA->new(
+   , ua_start_callback => \&code
+   );
+
+@options);
  my $send = $http->compileClient(@options2);
 
  my $call = $wsdl->compileClient
@@ -28,6 +33,7 @@ XML::Compile::Transport::SOAPHTTP_MojoUA - exchange XML via Mojo::UserAgent
      # so something
    };
 
+ # The _callback relates to async
  $call->($xmlin, _callback => \&handler);
 
 =head1 DESCRIPTION
@@ -67,7 +73,7 @@ Extends L<"Constructors" in XML::Compile::Transport|XML::Compile::Transport/"Con
 
  -Option           --Defined in             --Default
   address            XML::Compile::Transport  'http://localhost'
-  charset            XML::Compile::Transport  'utf-8'
+  charset            XML::Compile::Transport  'UTF-8'
   ua_start_callback                           undef
 
 =over 2
@@ -76,10 +82,9 @@ Extends L<"Constructors" in XML::Compile::Transport|XML::Compile::Transport/"Con
 
 =item charset => STRING
 
-=item ua_start_callback => CODEREF
+=item ua_start_callback => CODE
 
 A subroutine ref passed to the C<start> event of the user agent object.
-The ARRAY is a list of PAIRS.
 
 =back
 
@@ -234,19 +239,14 @@ to be grouped.
 
 =item XML::Compile::Transport::SOAPHTTP_MojoUA-E<gt>B<headerAddVersions>($header)
 
-Adds some lines about module versions, which may help debugging
-or error reports.  This is called when a new client or server
-is being created.
+Adds some lines about module versions, which may help debugging or error
+reports.  This is called when a new client or server is being created.
 
 =back
 
 =head1 DETAILS
 
 Extends L<"DETAILS" in XML::Compile::Transport|XML::Compile::Transport/"DETAILS">.
- 
-=head1 SYNOPSYS
-
-Extends L<"SYNOPSYS" in XML::Compile::Transport|XML::Compile::Transport/"SYNOPSYS">.
  
 =head1 Helpers
 
@@ -262,37 +262,14 @@ Inherited, see L<XML::Compile::Transport/"Helpers">
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.02,
-built on March 17, 2016. Website: F<http://perl.overmeer.net/xml-compile/>
-
-Other distributions in this suite:
-L<XML::Compile>,
-L<XML::Compile::SOAP>,
-L<XML::Compile::WSDL11>,
-L<XML::Compile::SOAP12>,
-L<XML::Compile::SOAP::Daemon>,
-L<XML::Compile::SOAP::WSA>,
-L<XML::Compile::C14N>,
-L<XML::Compile::WSS>,
-L<XML::Compile::WSS::Signature>,
-L<XML::Compile::Tester>,
-L<XML::Compile::Cache>,
-L<XML::Compile::Dumper>,
-L<XML::Compile::RPC>,
-L<XML::Rewrite>
-and
-L<XML::LibXML::Simple>.
-
-Please post questions or ideas to the mailinglist at
-F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
-For live contact with other developers, visit the C<#xml-compile> channel
-on C<irc.perl.org>.
+This module is part of XML-Compile-SOAP-Mojolicious distribution version 0.04,
+built on November 01, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2016 by [Heiko Jansen/Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2016-2019 by [Mark Overmeer <markov@overmeer.net>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

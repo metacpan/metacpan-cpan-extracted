@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/XML/Compile/SOAP/Mojolicious.pm
 lib/XML/Compile/SOAP/Mojolicious.pod
 lib/XML/Compile/Transport/SOAPHTTP_MojoUA.pm

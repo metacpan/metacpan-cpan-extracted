@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.092 of App::td (from Perl distribution
-    App-td), released on 2019-01-16.
+    This document describes version 0.093 of App::td (from Perl distribution
+    App-td), released on 2019-09-15.
 
 FUNCTIONS
   td
@@ -43,59 +43,80 @@ FUNCTIONS
 
     Next, you can use these actions:
 
-     # count number of rows (equivalent to "wc -l" Unix command)
-     % osnames -l --json | td rowcount
- 
-     # append a row containing rowcount
-     % osnames -l --json | td rowcount-row
- 
-     # return the column names only
+     # List available actions
+     % td actions
+
+     # Convert table data (which might be hash, aos, or aohos) to aoaos form
+     % list-files -l --json | td as-aoaos
+
+     # Convert table data (which might be hash, aos, or aoaos) to aohos form
+     % list-files -l --json | td as-aohos
+
+     # Calculate arithmetic average of numeric columns
+     % list-files -l --json | td avg
+
+     # Append a row at the end containing arithmetic average of number columns
+     % list-files -l --json | td avg-row
+
+     # Count number of columns
+     % osnames -l --json | td colcount
+
+     # Append a single-column row at the end containing number of columns
+     % osnames -l --json | td colcount-row
+
+     # Return the column names only
      % lcpan related-mods Perinci::CmdLine | td colnames
- 
+
      # append a row containing column names
      % lcpan related-mods Perinci::CmdLine | td colnames-row
- 
-     # count number of columns
-     % osnames -l --json | td colcount
- 
-     # select some columns
-     % osnames -l --json | td select value description
-     # select all columns but some
-     % osnames -l --json | td select '*' -e value -e description
- 
-     # only show first 5 rows
+
+     # Only show first 5 rows
      % osnames -l --json | td head -n5
-     # show all but the last 5 rows
+
+     # Show all but the last 5 rows
      % osnames -l --json | td head -n -5
- 
-     # only show last 5 rows
-     % osnames -l --json | td tail -n5
-     # show rows from the row 5 onwards
-     % osnames -l --json | td tail -n +5
- 
-     # sort by column(s) (add "-" prefix to for descending order)
-     % osnames -l --json | td sort value tags
-     % osnames -l --json | td sort -- -value
- 
-     # return sum of all numeric columns
-     % list-files -l --json | td sum
- 
-     # append a sum row
-     % list-files -l --json | td sum-row
- 
-     # return average of all numeric columns
-     % list-files -l --json | td avg
- 
-     # append an average row
-     % list-files -l --json | td avg-row
- 
-     # add a row number column (1, 2, 3, ...)
+
+     # Check if input is table data and show information about the table
+     % osnames -l --json | td info
+
+     # Count number of rows
+     % osnames -l --json | td rowcount
+     % osnames -l --json | td wc            ;# shorter alias
+
+     # Append a single-column row containing row count
+     % osnames -l --json | td rowcount-row
+     % osnames -l --json | td wc-row        ;# shorter alias
+
+     # Add a row number column (1, 2, 3, ...)
      % list-files -l --json | td rownum-col
 
-    Use this to list all the available actions:
+     # Select some columns
+     % osnames -l --json | td select value description
 
-     % td actions
-     % td actions -l ;# show details
+     # Select all columns but some
+     % osnames -l --json | td select '*' -e value -e description
+
+     # Return the rows in a random order
+     % osnames -l --json | td shuf
+
+     # Pick 5 random rows from input
+     % osnames -l --json | td shuf -n5
+
+     # Sort by column(s) (add "-" prefix to for descending order)
+     % osnames -l --json | td sort value tags
+     % osnames -l --json | td sort -- -value
+
+     # Return sum of all numeric columns
+     % list-files -l --json | td sum
+
+     # Append a sum row
+     % list-files -l --json | td sum-row
+
+     # Only show last 5 rows
+     % osnames -l --json | td tail -n5
+
+     # Show rows from the row 5 onwards
+     % osnames -l --json | td tail -n +5
 
     This function is not exported.
 
@@ -114,6 +135,10 @@ FUNCTIONS
     *   exclude_columns => *array[str]*
 
     *   lines => *str*
+
+    *   repeat => *bool*
+
+        Allow duplicates.
 
     Returns an enveloped result (an array).
 

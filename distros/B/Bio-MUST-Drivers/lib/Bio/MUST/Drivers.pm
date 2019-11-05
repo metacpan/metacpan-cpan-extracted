@@ -3,7 +3,7 @@ package Bio::MUST::Drivers;
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::VERSION = '0.191910';
+$Bio::MUST::Drivers::VERSION = '0.193030';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ Bio::MUST::Drivers - Bio::MUST classes for driving external programs
 
 =head1 VERSION
 
-version 0.191910
+version 0.193030
 
 =head1 SYNOPSIS
 

@@ -6,8 +6,6 @@
 use Modern::Perl '2011';
 use autodie;
 
-use Smart::Comments;
-
 use Carp;
 use GD::Simple;
 use Getopt::Euclid qw(:vars);
@@ -116,7 +114,7 @@ sub map_cluster {                           ## no critic (Subroutines::ProhibitE
                 begin     => $gene_begin, 
                 end       => $gene_end, 
                 y_cluster => $y_cluster,
-                color     => scalar $gene->all_domains > 0 ? 'red' : 'gray',
+                color     => 'darkgray',
             };
 
             # Domain objects
@@ -394,7 +392,7 @@ draw_bgc_maps.pl - This script draws NRPS/PKS BGC clusters maps in PNG
 
 =head1 VERSION
 
-version 0.192560
+version 0.193080
 
 =head1 NAME
 

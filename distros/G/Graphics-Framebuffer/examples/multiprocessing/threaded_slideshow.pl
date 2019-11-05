@@ -127,7 +127,7 @@ while ($RUNNING) {    # Monitors the running threads and restores them if one di
             }
         }
     } else {
-        sleep 1;
+        threads->yield();
     }
 }
 

@@ -4,13 +4,13 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Win32API-File-Time",
    "no_index" : {
@@ -33,6 +33,7 @@
             "Time::Local" : "0",
             "Win32::API" : "0.01",
             "Win32API::File" : "0.08",
+            "parent" : "0",
             "perl" : "5.006002",
             "strict" : "0",
             "vars" : "0",
@@ -43,7 +44,7 @@
    "provides" : {
       "Win32API::File::Time" : {
          "file" : "lib/Win32API/File/Time.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -61,6 +62,6 @@
          "web" : "https://github.com/trwyant/perl-Win32API-File-Time"
       }
    },
-   "version" : "0.008",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.009",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

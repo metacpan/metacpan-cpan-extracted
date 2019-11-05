@@ -699,10 +699,20 @@ sub manage_regular {
     @tracking = ();
     # print Dumper(\@pieces);
 
-    my $warning = 'Found %s tag %s '
-                  . " in <$string> without a matching closing tag. "
-                  . "Leaving it as-is, but it's unlikely you want this. "
-                  . "To suppress this warning, wrap it around <verbatim>\n";
+    my $chomped_string = $string;
+    chomp($chomped_string);
+
+    my $format_warning = sub {
+        my ($type, $tag) = @_;
+        my $matching = 'closing';
+        if ($type eq 'close' or $type eq 'close_inline') {
+            $matching = 'opening';
+        }
+        return "Found $type tag $tag"
+             . " in <$chomped_string> without a matching $matching tag. "
+             . "Leaving it as-is, but it's unlikely you want this. "
+             . "To suppress this warning, wrap it in <verbatim>\n";
+    };
 
   UNROLL:
     while (@pieces) {
@@ -715,7 +725,7 @@ sub manage_regular {
                 next UNROLL;
             }
             else {
-                warn sprintf($warning, $piece->type, $piece->tag);
+                warn $format_warning->($piece->type, $piece->tag);
                 $piece->type('text');
             }
         }
@@ -726,7 +736,7 @@ sub manage_regular {
                 next UNROLL;
             }
             else {
-                warn sprintf($warning, $piece->type, $piece->tag);
+                warn $format_warning->($piece->type, $piece->tag);
                 $piece->type('text');
             }
         }
@@ -746,7 +756,7 @@ sub manage_regular {
                 push @tagpile, $piece->tag;
             }
             else {
-                warn sprintf($warning, $piece->type, $piece->tag);
+                warn $format_warning->($piece->type, $piece->tag);
                 $piece->type('text');
             }
         }
@@ -763,7 +773,7 @@ sub manage_regular {
                 }
             }
             else {
-                warn sprintf($warning, $piece->type, $piece->tag);
+                warn $format_warning->($piece->type, $piece->tag);
                 $piece->type('text');
             }
         }

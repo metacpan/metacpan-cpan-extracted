@@ -1,0 +1,31 @@
+---
+abstract: 'Create and use an LR(1) parser'
+author:
+  - L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parser-LR
+provides:
+  Parser::LR:
+    file: lib/Parser/LR.pm
+    version: '20191031'
+requires:
+  Carp: '0'
+  Data::DFA: '20191031'
+  Data::Dump: '0'
+  Data::NFA: '20191031'
+  Data::Table::Text: '20190815'
+  Exporter: '0'
+  Test2::API: '0'
+  Test::More: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '20191031'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

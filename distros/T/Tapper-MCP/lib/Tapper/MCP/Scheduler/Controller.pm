@@ -2,7 +2,7 @@
 package Tapper::MCP::Scheduler::Controller;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Main class of the scheduler
-$Tapper::MCP::Scheduler::Controller::VERSION = '5.0.7';
+$Tapper::MCP::Scheduler::Controller::VERSION = '5.0.8';
 use 5.010;
 use Moose;
 use base "Tapper::Base";
@@ -224,7 +224,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

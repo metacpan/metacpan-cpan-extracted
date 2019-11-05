@@ -1,14 +1,24 @@
 package PERLANCAR::Module::List;
 
-our $DATE = '2019-07-27'; # DATE
-our $VERSION = '0.004004'; # VERSION
+our $DATE = '2019-09-12'; # DATE
+our $VERSION = '0.004005'; # VERSION
 
 #IFUNBUILT
-# # use strict;
+# # use strict 'subs', 'vars';
 # # use warnings;
 #END IFUNBUILT
 
 my $has_globstar;
+
+# do our own exporting to start faster
+sub import {
+    my $pkg = shift;
+    my $caller = caller;
+    for my $sym (@_) {
+        if ($sym eq 'list_modules') { *{"$caller\::$sym"} = \&{$sym} }
+        else { die "$sym is not exported!" }
+    }
+}
 
 sub list_modules($$) {
     my($prefix, $options) = @_;
@@ -203,21 +213,31 @@ PERLANCAR::Module::List - A fork of Module::List
 
 =head1 VERSION
 
-This document describes version 0.004004 of PERLANCAR::Module::List (from Perl distribution PERLANCAR-Module-List), released on 2019-07-27.
+This document describes version 0.004005 of PERLANCAR::Module::List (from Perl distribution PERLANCAR-Module-List), released on 2019-09-12.
+
+=head1 SYNOPSIS
+
+Use like you would L<Module::List>, e.g.:
+
+ use PERLANCAR::Module::List qw(list_modules);
+
+ $id_modules = list_modules("Data::ID::", { list_modules => 1});
+ $prefixes = list_modules("", { list_prefixes => 1, recurse => 1 });
 
 =head1 DESCRIPTION
 
-This module is a fork of L<Module::List>. It's exactly like Module::List, except
-for the following differences:
+This module is my personal experimental fork of L<Module::List>; the experiment
+has also produced other forks like L<Module::List::Tiny>,
+L<Module::List::Wildcard>. It's like Module::List, except for the following
+differences:
 
 =over
 
 =item * lower startup overhead (with some caveats)
 
-It strips the usage of L<Exporter> (so you cannot import C<list_modules()> and
-need to invoke it using fully qualified name), L<IO::Dir>, L<Carp>,
-L<File::Spec>, with the goal of saving a few milliseconds (a casual test on my
-PC results in 11ms vs 39ms).
+It avoids using L<Exporter> and implements its own import(). It avoids
+L<IO::Dir>, L<Carp>, L<File::Spec>, with the goal of saving a few milliseconds
+(a casual test on my PC results in 11ms vs 39ms).
 
 Path separator is hard-coded as C</>.
 
@@ -297,6 +317,10 @@ feature.
 =head1 SEE ALSO
 
 L<Module::List>
+
+L<Module::List::Tiny>
+
+L<Module::List::Wildcard>
 
 =head1 AUTHOR
 

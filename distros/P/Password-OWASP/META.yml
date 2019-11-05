@@ -1,0 +1,61 @@
+---
+abstract: 'OWASP recommendations for password storage in perl'
+author:
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Import::Into: '1.002003'
+  Sub::Override: '0'
+  Test::More: '0.96'
+  Test::Most: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Password-OWASP
+provides:
+  Password::OWASP:
+    file: lib/Password/OWASP.pm
+    version: '0.001'
+  Password::OWASP::AbstractBase:
+    file: lib/Password/OWASP/AbstractBase.pm
+    version: '0.001'
+  Password::OWASP::AbstractBaseX:
+    file: lib/Password/OWASP/AbstractBaseX.pm
+    version: '0.001'
+  Password::OWASP::Argon2:
+    file: lib/Password/OWASP/Argon2.pm
+    version: '0.001'
+  Password::OWASP::Bcrypt:
+    file: lib/Password/OWASP/Bcrypt.pm
+    version: '0.001'
+  Password::OWASP::Scrypt:
+    file: lib/Password/OWASP/Scrypt.pm
+    version: '0.001'
+requires:
+  Authen::Passphrase: '0'
+  Authen::Passphrase::Argon2: '0'
+  Authen::Passphrase::BlowfishCrypt: '0'
+  Authen::Passphrase::Scrypt: '0'
+  Digest::SHA: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+resources:
+  repository: git://gitlab.com/waterkip/p5-password-owasp.git
+version: '0.001'
+x_contributors:
+  - 'Wesley Schwengle <wesley@schwengle.net>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

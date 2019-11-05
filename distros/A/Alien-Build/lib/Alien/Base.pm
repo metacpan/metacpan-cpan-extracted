@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.89'; # VERSION
+our $VERSION = '1.92'; # VERSION
 
 
 sub import {
@@ -410,6 +410,7 @@ sub dynamic_libs {
     unless(defined $name)
     {
       $name = $class->config('name');
+      $name = '' unless defined $name;
       # strip leading lib from things like libarchive or libffi
       $name =~ s/^lib//;
       # strip trailing version numbers
@@ -608,7 +609,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.89
+version 1.92
 
 =head1 SYNOPSIS
 

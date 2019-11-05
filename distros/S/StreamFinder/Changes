@@ -107,3 +107,7 @@ Revision history for StreamFinder
         - Minor bugfixes, namely handling double-quotes in titles in 
         some submodules.
         - Minor doc. improvements.
+1.23    2019/11/02
+        - StreamFinder::BannedVideo: Fix to handle change in their site - 
+        to execute extra step now needed for infowarsmedia.com videos and make 
+        the retrieved mp4 stream the "best" stream.

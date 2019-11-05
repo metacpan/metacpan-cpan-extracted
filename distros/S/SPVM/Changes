@@ -1,3 +1,24 @@
+0.0442 2019-10-21
+  - add ctype.h function to SPVM::CORE
+    isalnum
+    isalpha
+    isblank
+    iscntrl
+    isdigit
+    isgraph
+    islower
+    isprint
+    ispunct
+    isspace
+    isupper
+    isxdigi
+    tolower
+    toupper
+  - add SPVM::CORE random method
+  - move strerror to SPVM::Errno
+  - strerror become thread safe
+  - Windows has no SIGPIPE
+  
 0.0441 2019-10-11
   - add pi method to SPVM::Math
   - cleanup SPVM::Unicode. Many methods is remaned.

@@ -1,4 +1,4 @@
-Package Proc::Background Version 1.10
+Package Proc::Background Version 1.20
 
 This is the Proc::Background package.  It provides a generic interface
 to running background processes.  Through this interface, users can
@@ -24,29 +24,20 @@ AVAILABILITY
 The latest released version of this package is available for download
 from a CPAN (Comprehensive Perl Archive Network) archive near you in
 
-    http://www.perl.com/CPAN/authors/id/B/BZ/BZAJAC/
+    https://metacpan.org/pod/proc::Background
 
-The latest beta version of this package is hosted in a Subversion
-repository located at
+The package's source code is hosted in a Git repository at
 
-    http://www.orcaware.com/svn/repos/perl_proc_background/trunk/
-
-Subversion is an open-source source code management system designed to
-replace CVS.  To get Subversion, see
-
-    http://subversion.tigris.org/
-
-and for an overview of Subversion, see
-
-    http://www.orcaware.com/svn/Subversion-Blair_Zajac.ppt
+    https://github.com/nrdvana/perl-Proc-Background
 
 INSTALLATION
 
 In order to use this package you will need Perl version 5.004_04 or
 better.
 
-On Win32 systems Proc::Background requires the Win32::Process module.
-To check if your Perl has Win32::Process installed on it, run
+On Win32 systems Proc::Background requires the Win32::Process and
+Win32::ShellQuote modules.  To check if your Perl has Win32::Process
+installed on it, run
 
     perl Makefile.PL
 

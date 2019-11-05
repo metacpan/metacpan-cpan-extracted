@@ -4,13 +4,13 @@
       "Rocky Bernstein <rocky@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "gpl_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-Trepan",
    "no_index" : {
@@ -52,6 +52,7 @@
             "Getopt::Long" : "2.36",
             "Marpa::R2" : "4",
             "PadWalker" : "0",
+            "Pod::Find" : "1.63",
             "Pod::Text" : "3.13",
             "Scalar::Util" : "0",
             "Syntax::Highlight::Perl::Improved" : "1.01",
@@ -77,6 +78,6 @@
          "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

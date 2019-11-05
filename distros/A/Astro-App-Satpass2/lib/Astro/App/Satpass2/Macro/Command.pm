@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::Macro };
 
 use Astro::App::Satpass2::Utils qw{ quoter ARRAY_REF @CARP_NOT };
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 sub execute {
     my ( $self, $name ) = @_;
@@ -104,7 +104,7 @@ L<Astro::App::Satpass2::Macro|Astro::App::Satpass2::Macro>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

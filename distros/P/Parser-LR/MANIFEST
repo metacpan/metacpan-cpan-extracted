@@ -1,0 +1,9 @@
+.directory
+Build.PL
+CHANGES
+CONTRIBUTING.md
+lib/Parser/LR.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/Web-Solid-Test-Basic>
 Bug tracker:  <https://github.com/kjetilk/p5-web-solid-test-basic/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.006	2019-11-03	Make integration tests fully automated
+
+ - Fix prerequires.
+   Mohammad S Anwar++
+ - Move HTTP integration tests from author tests to normal tests, and make
+   them fully automated.
+
 0.004	2019-09-23	Improve the RDF
 
  [ BACK COMPAT ]

@@ -22,11 +22,22 @@ sub test {
 	is( $player->time, undef, 'time = undef' );
 	is( $player->position, undef, 'position = undef' );
 	ok( $player->play, 'play' );
-	for (my $i= 0; !$player->is_playing && $i < 10; $i++) {
-		sleep .5;
+	# This is tricky to get right, and maybe shouldn't be a test case at all.
+	# After calling 'play', there is an asynchronous about delay before
+	# is_playing becomes true and time and position show a value > 0.
+	# Iterate in a fast loop until this has occurred, but give up after 15 seconds.
+	my $timeout= time + 15;
+	while (time < $timeout && !$player->is_playing) {
 		1 while $vlc->callback_dispatch;
+		sleep .1;
 	}
-	sleep .5;
+	ok( $player->is_playing, 'is_playing becoems true within 15 seconds' );
+	# Another asynchronous wait for the playback to begin
+	$timeout= time + 3;
+	while (time < $timeout && $player->time < 0.5) {
+		1 while $vlc->callback_dispatch;
+		sleep .1;
+	}
 	$player->pause;
 	1 while $vlc->callback_dispatch;
 	is( $player->will_play, 1, 'will_play = 1' );

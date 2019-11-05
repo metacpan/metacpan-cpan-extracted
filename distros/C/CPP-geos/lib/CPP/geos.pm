@@ -1,7 +1,7 @@
 package CPP::geos;
 use 5.012;
 
-our $VERSION = "3.7.2.0";
+our $VERSION = "3.7.3.1";
 
 use XS::Loader;
 

@@ -5,13 +5,17 @@ package QQ::exmail;
 =encoding utf8
 
 =head1 Name
+
 QQ::exmail
 
 =head1 DESCRIPTION
-腾讯企业邮->接口文档
-L<https://exmail.qq.com/qy_mng_logic/doc#10001>
 
-=head2 SYNOPSIS
+腾讯企业邮->接口文档
+
+L<https://exmail.qq.com/qy_mng_logic/doc#10001>  
+
+=head1 SYNOPSIS
+
 腾讯企业邮开放平台旨在为企业拓展、定制邮箱的功能。我们为开发者提供了五大开放接口：通讯录管理、新邮件提醒、单点登录、系统日志、功能设置。希望帮助企业提升开发效率、降低开发成本和难度，从而提升生产和管理之间的协作效率。
 
 企业开发流程如下：
@@ -28,34 +32,48 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '1.06';
+our $VERSION = '1.10';
 our @EXPORT = qw/ gettoken /;
 
-=head2 FUNCTION
-gettoken(corpid,corpsecrect);
+=head1 FUNCTION
+
+=head2 gettoken(corpid,corpsecrect);
+
+获取ACCESS_TOKEN
+
+=head3 SYNOPSIS
+
 L<https://exmail.qq.com/qy_mng_logic/doc#10003>
 
-=head2 SYNOPSIS
-参数说明
-参数	必须	说明
-corpid	是	企业id
-corpsecret	是	应用的凭证密钥
-权限说明
+=head3 参数说明
+
+    参数	        必须	说明  
+    corpid	    是	企业id  
+    corpsecret	是	应用的凭证密钥
+
+=head3 权限说明
+
 每个应用有不同的secret，代表了对应用的不同权限
 
-返回结果
-{
-   "access_token": "accesstoken000001",
-   "expires_in": 7200
-}
-参数	说明
-access_token	获取到的凭证。长度为64至512个字节
-expires_in	凭证的有效时间（秒）
-出错返回示例
-{
-   "errcode": 40001,
-   "errmsg": "invalid credential"
-}
+=head3 RETURN 返回结果
+
+    {
+       "access_token": "accesstoken000001",
+       "expires_in": 7200
+    }
+
+=head4 RETURN 参数说明
+
+    参数	            说明
+    access_token	获取到的凭证。长度为64至512个字节
+    expires_in	    凭证的有效时间（秒）
+
+=head4 RETURN 出错返回示例
+
+    {
+       "errcode": 40001,
+       "errmsg": "invalid credential"
+    }
 
 =cut
 

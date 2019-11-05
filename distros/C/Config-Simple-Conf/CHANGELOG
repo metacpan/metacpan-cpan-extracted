@@ -1,3 +1,10 @@
+11/02/2019 v.2.006	Add Config::Simple::Conf->argv function to return the conten
+                        of the @ARGV_CLEAN list
+
+11/02/2019 v.2.005	Remove @ARGV_ORIG export, add @ARGV_CLEAN export
+
+06/03/2018 v.2.004	Fix string handler error when generating new objects with no file
+
 11/26/2017 v.2.003	Many documentation improvements
 			export @ARGV_ORIG
 			correctly prune @ARGV

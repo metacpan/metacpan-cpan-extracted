@@ -66,6 +66,7 @@ Paul
 Pelzer
 Perlover
 Peter
+Petr
 Purkis
 Ramanan
 Rask
@@ -186,6 +187,7 @@ olaf
 olivier
 paul
 perlover
+petr
 phplib
 polaris
 ps

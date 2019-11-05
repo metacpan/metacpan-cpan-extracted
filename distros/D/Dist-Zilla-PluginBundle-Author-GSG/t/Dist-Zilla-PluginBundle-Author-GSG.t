@@ -182,6 +182,15 @@ subtest 'NextVersion' => sub {
     my ($changelog_plugin)
         = $tzil->plugin_named('@Author::GSG/ChangelogFromGit');
 
+    $version_plugin->git->commit( { m => $_ }, '--allow-empty' ) for (
+        q{Merge branch 'ABC-123'},
+        q{Merge remote-tracking branch 'origin/master' into test},
+        q{Merge remote-tracking branch 'origin/test' into stage},
+        q{Merge remote-tracking branch 'origin/stage' into prod},
+        q{Merge pull request #123 in GHT/gsg-test from internal to master},
+        q{Merge pull request #321 from GrantStreetGroup/external},
+    );
+
     my @versions = (
         [ 'v0.0.1'              => 'v0.0.2' ],
         [ 'v1.2.3.4'            => 'v1.2.4' ],

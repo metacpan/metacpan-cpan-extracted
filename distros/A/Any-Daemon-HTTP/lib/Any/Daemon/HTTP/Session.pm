@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP::Session;
 use vars '$VERSION';
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 
 use strict;
@@ -22,16 +22,7 @@ use Socket         qw(inet_aton AF_INET AF_INET6 PF_INET PF_INET6);
 sub new(%)  {my $class = shift; (bless {}, $class)->init({@_})}
 sub init($)
 {   my ($self, $args) = @_;
-    my $client = $self->{ADHC_store} = $args->{client} or panic;
-    my $store  = $self->{ADHC_store} = $args->{store} || {};
-
-    my $peer   = $store->{peer}    ||= {};
-    my $ip     = $peer->{ip}       ||= $client->peerhost;
-    if($client->sockdomain==PF_INET)
-    {   $peer->{host} = gethostbyaddr inet_aton($ip), AF_INET }
-    elsif($client->sockdomain==PF_INET6)
-    {   $peer->{host} = gethostbyaddr $ip, AF_INET6 }
-
+    $self->{ADHC_store} = $args->{store} || {};
     $self;
 }
 

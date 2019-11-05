@@ -1,8 +1,5 @@
 package POE::Component::FastCGI;
-BEGIN {
-  $POE::Component::FastCGI::VERSION = '0.19';
-}
-
+$POE::Component::FastCGI::VERSION = '0.20';
 use strict;
 
 use Carp qw(croak);

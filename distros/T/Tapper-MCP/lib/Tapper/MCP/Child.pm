@@ -1,7 +1,7 @@
 package Tapper::MCP::Child;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Control one specific testrun on MCP side
-$Tapper::MCP::Child::VERSION = '5.0.7';
+$Tapper::MCP::Child::VERSION = '5.0.8';
 use 5.010;
 use strict;
 use warnings;
@@ -469,15 +469,15 @@ that run 'local'.
 
 =head2 cancel_minion_prc_processes
 
-Kill remaining processes from this testrun. Only done wfor testruns
-that run 'minion'
+Kill remaining processes from this testrun. Only done for testruns
+that run 'minion'.
 
 @param Tapper::MCP::Net object
 
-=head2 cancel_minion_prc_processes
+=head2 wait_for_minion_testrun
 
-Kill remaining processes from this testrun. Only done for testruns
-that run 'minion'.
+Wait until the corresponding Minion job reached its 'finished'
+state. Only done for testruns that run 'minion'.
 
 @param Tapper::MCP::Net object
 
@@ -529,7 +529,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

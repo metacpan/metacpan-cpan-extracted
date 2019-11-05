@@ -1,41 +1,77 @@
-SYNOPSIS
+NAME
+    File::Random::Pick - Pick random lines from a file, without duplicates
 
+VERSION
+    This document describes version 0.03 of File::Random::Pick (from Perl
+    distribution File-Random-Pick), released on 2019-09-15.
+
+SYNOPSIS
      use File::Random::Pick qw(random_line);
      my $line  = random_line("/usr/share/dict/words");
      my @lines = random_line("/usr/share/dict/words", 3);
-    
+
      # also accepts a filehandle
      my $line = random_line($fh);
 
 DESCRIPTION
+    This module can return random lines from a specified file, without
+    duplicates.
 
-    This module can return random lines from a specified file.
-
-    Compared to the existing File::Random, this module does not return
-    duplicates. I have also submitted a ticket to incorporate this
-    functionality into File::Random [1]. It also accepts a filehandle, for
-    convenience.
+    Compared to "random_line()" from File::Random, this module does not
+    return duplicates. I have also submitted a ticket to incorporate this
+    functionality into File::Random [1]. File::Random::Pick also accepts a
+    filehandle, for convenience.
 
 FUNCTIONS
-
- random_line($path_or_handle [ , $num_lines ]) => list
-
+  random_line($path_or_handle [ , $num_lines ]) => list
     Return random lines from a specified file (or filehandle). Will not
     return duplicates (meaning, will not return the same line of the file
     twice, but might still return duplicates if two or more lines contain
-    the same content). Will die on failure to open file. $num_lines
-    defaults to 1. If there are less than $num_lines available in the file,
-    will return just the available number of lines.
+    the same content). Will die on failure to open file. $num_lines defaults
+    to 1. If there are less than $num_lines available in the file, will
+    return just the available number of lines.
 
-    The algorithm used is from perlfaq (perldoc -q "random line"), which
-    scans the file once. The algorithm is for returning a single line and
-    is modified to support returning multiple lines.
+    The algorithm used is from perlfaq ("perldoc -q "random line""), which
+    scans the file once. The algorithm is for returning a single line and is
+    modified to support returning multiple lines.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Random-Pick>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Random-Pick>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Random-Pick>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-    File::Random
+    File::Random also provides "random_line()" which also uses a slightly
+    modified version of the algorithm described in perlfaq ("perldoc -q
+    "random line"") that avoids slurping the whole file into memory in
+    exchange for scanning the whole file once. However, it might return
+    duplicates.
 
     File::RandomLine
 
-    [1] https://rt.cpan.org/Ticket/Display.html?id=109384
+    If you don't mind slurping the whole into memory, you can use
+    List::MoreUtils's "samples" to return N random items from a list. Or, if
+    you also don't mind duplicates, you can just pick random elements from
+    an array of lines.
+
+    [1] <https://rt.cpan.org/Ticket/Display.html?id=109384>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

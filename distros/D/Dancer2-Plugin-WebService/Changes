@@ -1,10 +1,15 @@
+4.2.4  2019-11-03
+
+  - correct a bug when user post anonymous lists
+  - Rename method posted_data to PosteData
+
 4.2.2  2019-10-30
 
- - Support older Perl version
+  - Support for older Perl versions
 
 4.2.1  2019-10-29
 
- - Changes at POD documentation
+  - Documentation changes
 
 4.2.0  2019-10-01
 
@@ -13,7 +18,7 @@
 4.1.8  2019-09-23
 
   - Control output format using the url parameters : pretty, sort, from, to
-  - Changes at POD documentation
+  - Documentation changes
 
 4.1.6  2019-09-18
 
@@ -42,7 +47,7 @@
   - Rename method RestReply     to reply
   - Rename method get_data_user to get_data_post
   - Remove the after hook that clears the posted data
-  - Changes at POD documentation
+  - Documentation changes
 
 3.014  2017-05-05
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access",
+   "abstract" : "RESTful Web Services with login, persistent data, multiple in/out formats, IP security, role based access",
    "author" : [
       "George Bouras <george.mpouras@yandex.com>"
    ],
@@ -43,11 +43,11 @@
    "provides" : {
       "Dancer2::Plugin::WebService" : {
          "file" : "lib/Dancer2/Plugin/WebService.pm",
-         "version" : "v4.2.2"
+         "version" : "v4.2.4"
       }
    },
    "release_status" : "stable",
-   "version" : "4.2.2",
+   "version" : "4.2.4",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "JSON::XS version 4.02"
 }

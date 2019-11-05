@@ -1,6 +1,6 @@
 package Tapper::MCP::Scheduler::Host;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Scheduler::Host::VERSION = '5.0.7';
+$Tapper::MCP::Scheduler::Host::VERSION = '5.0.8';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

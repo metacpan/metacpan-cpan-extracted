@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.29 2019-10-31
+
+ - Fix multiple issues on the tag mismatch warnings. Many thanks to
+   @link2xt for the patch
+
 1.28 2019-05-11
 
  - Interpret <br> at the beginning on the paragraph as \noindent on

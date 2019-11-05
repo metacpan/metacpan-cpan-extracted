@@ -11,6 +11,7 @@ my $tests = 0;
 use_ok('String::Interpolate::Named');
 $tests++;
 
+# Using functional interface.
 my $s = { args => { title     => "Hi There!",
 		    subtitle  => [ "%{capo|CAPO %{}}" ],
 		    capo      => [ 1 ],

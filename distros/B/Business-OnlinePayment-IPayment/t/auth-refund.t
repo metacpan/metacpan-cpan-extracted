@@ -5,9 +5,12 @@ use Test::More;
 use Data::Dumper;
 use File::Spec;
 use LWP::UserAgent;
+# to prevent the following error on older Perls
+# Can't locate object method "new" via package "LWP::Protocol::https::Socket"
+use IO::Socket::SSL;
+
 use URI;
 use POSIX qw/strftime/;
-
 
 use Business::OnlinePayment::IPayment;
 use Business::OnlinePayment::IPayment::Return;
@@ -15,8 +18,6 @@ use Business::OnlinePayment::IPayment::Response;
 
 my $ua = LWP::UserAgent->new;
 $ua->max_redirect(0);
-
-plan tests => 19;
 
 my %account = (
                accountid => 99999,
@@ -47,6 +48,9 @@ my $response = $ua->post($secbopi->ipayment_cgi_location,
                         cc_expdate_month => "02",
                         trx_securityhash => $secbopi->trx_securityhash,
                         cc_expdate_year => next_year() });
+
+ok($response->code == 302, 'Check HTTP response code for POST action')
+    || diag('HTTP response: ' . $response->as_string);
 
 my $ipayres = $secbopi->get_response_obj($response->header('location'));
 
@@ -112,7 +116,7 @@ ok($ipayres->is_success);
 print $ipayres->ret_trx_number, " ", $ipayres->trx_amount, " ", $ipayres->trx_currency, "\n";
 
 $refund = $secbopi->refund($ipayres->ret_trx_number);
-ok($refund->is_success, "Full refund succeedeed");
+ok($refund->is_success, "Full refund succeeded");
 ok($refund->ret_transdate);
 ok($refund->ret_transtime);
 ok($refund->ret_trx_number);
@@ -127,3 +131,5 @@ print Dumper($secbopi->raw_response_hash);
 sub next_year {
     my $year = strftime('%Y', localtime(time())) + 1;
 }
+
+done_testing;

@@ -1,6 +1,6 @@
 package Lingua::IND::Numbers;
 
-$Lingua::IND::Numbers::VERSION   = '0.11';
+$Lingua::IND::Numbers::VERSION   = '0.12';
 $Lingua::IND::Numbers::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Lingua::IND::Numbers - Indian Numbering System representation
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -273,7 +273,7 @@ L<http://search.cpan.org/dist/Lingua-IND-Numbers/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2015 Mohammad S Anwar.
+Copyright (C) 2014 - 2019 Mohammad S Anwar.
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

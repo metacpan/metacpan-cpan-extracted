@@ -15,6 +15,8 @@ use Log::Log4perl ':easy';
 
 delete $ENV{HTTP_PROXY};
 delete $ENV{HTTPS_PROXY};
+$ENV{PERL_FUTURE_DEBUG} = 1
+    if not exists $ENV{PERL_FUTURE_DEBUG};
 
 sub browser_instances {
     my ($filter) = @_;
@@ -126,7 +128,7 @@ sub run_across_instances {
 
     for my $browser_instance (@$instances) {
         runtests( $browser_instance, $new_mech, $code, $test_count );
-        undef $new_mech;
+        #undef $new_mech;
         sleep 0.5 if @$instances;
         # So the browser can shut down before we try to connect
         # to the new instance

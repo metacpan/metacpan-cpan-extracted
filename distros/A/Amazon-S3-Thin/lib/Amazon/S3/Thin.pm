@@ -9,7 +9,7 @@ use Encode;
 use Amazon::S3::Thin::Resource;
 use Amazon::S3::Thin::Credentials;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $MAIN_HOST = 's3.amazonaws.com';
@@ -25,10 +25,12 @@ sub new {
     # wrap credentials
     $self->{credentials} = Amazon::S3::Thin::Credentials->new(
         $self->{aws_access_key_id},
-        $self->{aws_secret_access_key}
+        $self->{aws_secret_access_key},
+        $self->{aws_session_token},
     );
     delete $self->{aws_access_key_id};
     delete $self->{aws_secret_access_key};
+    delete $self->{aws_session_token};
 
     bless $self, $class;
 
@@ -320,6 +322,7 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
   my $s3client = Amazon::S3::Thin->new({
         aws_access_key_id     => $aws_access_key_id,
         aws_secret_access_key => $aws_secret_access_key,
+        aws_session_token     => $aws_session_token, # optional
         region                => $region, # e.g. 'ap-northeast-1'
       });
 

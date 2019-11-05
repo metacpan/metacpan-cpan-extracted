@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.02 2019-11-02T01:51:42Z
+
+    - Implement margin option and refine ANSI code handling.
+
 1.01 2019-10-22T00:03:54Z
 
     - Implement line-break control (KINSOKU) for Japanese.

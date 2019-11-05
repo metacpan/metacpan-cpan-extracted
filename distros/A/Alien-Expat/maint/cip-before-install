@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -ex
+
+if [ "x$CIP_ENV" == "x" ]; then
+  echo "please set CIP_ENV to one of:"
+  echo " export CIP_ENV=ALIEN_INSTALL_TYPE=share"
+  echo " export CIP_ENV=ALIEN_INSTALL_TYPE=system"
+  false
+fi
+
+if echo $CIP_ENV | grep -q system; then
+  echo use system expat
+  cip sudo apt-get update
+  cip sudo apt-get -y install expat libexpat1-dev libffi-dev
+else
+  echo use internet expat
+  cip sudo apt-get update
+  cip sudo apt-get -y install libffi-dev
+fi

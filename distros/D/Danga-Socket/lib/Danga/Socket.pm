@@ -96,11 +96,13 @@ use strict;
 use bytes;
 use POSIX ();
 use Time::HiRes ();
+use IO::Handle qw();
+use Fcntl qw(FD_CLOEXEC F_SETFD F_GETFD);
 
 my $opt_bsd_resource = eval "use BSD::Resource; 1;";
 
 use vars qw{$VERSION};
-$VERSION = "1.61";
+$VERSION = "1.62";
 
 use warnings;
 no  warnings qw(deprecated);
@@ -120,6 +122,7 @@ use fields ('sock',              # underlying socket
             'peer_v6',           # bool: cached; if peer is an IPv6 address
             'peer_ip',           # cached stringified IP address of $sock
             'peer_port',         # cached port number of $sock
+            'local_v6',          # bool: cached; if local IP address is an IPv6 address
             'local_ip',          # cached stringified IP address of local end of $sock
             'local_port',        # cached port number of local end of $sock
             'writer_func',       # subref which does writing.  must return bytes written (or undef) and set $! on errors
@@ -139,6 +142,10 @@ use constant POLLERR       => 8;
 use constant POLLHUP       => 16;
 use constant POLLNVAL      => 32;
 
+# caching pack used by tcp_cork
+use constant PACK_0 => pack("l", 0);
+use constant PACK_1 => pack("l", 1);
+
 our $HAVE_KQUEUE = eval { require IO::KQueue; 1 };
 
 our (
@@ -148,6 +155,7 @@ our (
      %PushBackSet,               # fd (num) -> Danga::Socket (fds with pushed back read data)
      $Epoll,                     # Global epoll fd (for epoll mode only)
      $KQueue,                    # Global kqueue fd (for kqueue mode only)
+     $_io,                       # IO::Handle for Epoll or KQueue
      @ToClose,                   # sockets to close when event loop is done
      %OtherFds,                  # A hash of "other" (non-Danga::Socket) file
                                  # descriptors for the event loop to track.
@@ -187,9 +195,9 @@ sub Reset {
     %PLCMap = ();
     $DoneInit = 0;
 
-    POSIX::close($Epoll)  if defined $Epoll  && $Epoll  >= 0;
-    POSIX::close($KQueue) if defined $KQueue && $KQueue >= 0;
-    
+    POSIX::close($KQueue) if !defined($_io) && defined($KQueue) && $KQueue >= 0;
+    $_io = undef; # closes Epoll, and KQueue if using libkqueue&epoll
+
     *EventLoop = *FirstTimeEventLoop;
 }
 
@@ -352,6 +360,16 @@ sub DescriptorMap {
 *descriptor_map = *DescriptorMap;
 *get_sock_ref = *DescriptorMap;
 
+sub set_cloexec ($) {
+    my ($fd) = @_;
+
+    # new_from_fd fails on real kqueue, but is needed for libkqueue
+    # (which emulates kqueue via epoll on Linux)
+    $_io = IO::Handle->new_from_fd($fd, 'r+') or return;
+    defined(my $fl = fcntl($_io, F_GETFD, 0)) or return;
+    fcntl($_io, F_SETFD, $fl | FD_CLOEXEC);
+}
+
 sub _InitPoller
 {
     return if $DoneInit;
@@ -361,6 +379,7 @@ sub _InitPoller
         $KQueue = IO::KQueue->new();
         $HaveKQueue = $KQueue >= 0;
         if ($HaveKQueue) {
+            set_cloexec($KQueue); # needed if using libkqueue & epoll
             *EventLoop = *KQueueEventLoop;
         }
     }
@@ -368,6 +387,7 @@ sub _InitPoller
         $Epoll = eval { epoll_create(1024); };
         $HaveEpoll = defined $Epoll && $Epoll >= 0;
         if ($HaveEpoll) {
+            set_cloexec($Epoll);
             *EventLoop = *EpollEventLoop;
         }
     }
@@ -487,8 +507,8 @@ sub EpollEventLoop {
                 } else {
                     my $fd = $ev->[0];
                     warn "epoll() returned fd $fd w/ state $state for which we have no mapping.  removing.\n";
-                    POSIX::close($fd);
                     epoll_ctl($Epoll, EPOLL_CTL_DEL, $fd, 0);
+                    POSIX::close($fd);
                 }
                 next;
             }
@@ -554,7 +574,7 @@ sub PollEventLoop {
         # the following sets up @poll as a series of ($poll,$event_mask)
         # items, then uses IO::Poll::_poll, implemented in XS, which
         # modifies the array in place with the even elements being
-        # replaced with the event masks that occured.
+        # replaced with the event masks that occurred.
         my @poll;
         foreach my $fd ( keys %OtherFds ) {
             push @poll, $fd, POLLIN;
@@ -572,7 +592,7 @@ sub PollEventLoop {
         }
 
         my $count = IO::Poll::_poll($timeout, @poll);
-        unless ($count) {
+        unless ($count >= 0) {
             return unless PostEventLoop();
             next;
         }
@@ -813,7 +833,7 @@ sub tcp_cork {
     my $rv;
     if (TCP_CORK) {
         $rv = setsockopt($self->{sock}, IPPROTO_TCP, TCP_CORK,
-                         pack("l", $val ? 1 : 0));
+                         $val ? PACK_1 : PACK_0);
     } else {
         # FIXME: implement freebsd *PUSH sockopts
         $rv = 1;
@@ -1109,8 +1129,10 @@ sub push_back_read {
 
 =head2 C<< $obj->read( $bytecount ) >>
 
-Read at most I<bytecount> bytes from the underlying handle; returns scalar
-ref on read, or undef on connection closed.
+Read at most I<bytecount> bytes from the underlying handle; returns scalar ref
+on read, or undef on connection closed. If you call read more than once and no
+more data available after the first call, a scalar ref to an empty string is
+returned.
 
 =cut
 sub read {
@@ -1156,7 +1178,7 @@ sub read {
 
 =head2 (VIRTUAL) C<< $obj->event_read() >>
 
-Readable event handler. Concrete deriviatives of Danga::Socket should
+Readable event handler. Concrete derivatives of Danga::Socket should
 provide an implementation of this. The default implementation will die if
 called.
 
@@ -1165,7 +1187,7 @@ sub event_read  { die "Base class event_read called for $_[0]\n"; }
 
 =head2 (VIRTUAL) C<< $obj->event_err() >>
 
-Error event handler. Concrete deriviatives of Danga::Socket should
+Error event handler. Concrete derivatives of Danga::Socket should
 provide an implementation of this. The default implementation will die if
 called.
 
@@ -1174,7 +1196,7 @@ sub event_err   { die "Base class event_err called for $_[0]\n"; }
 
 =head2 (VIRTUAL) C<< $obj->event_hup() >>
 
-'Hangup' event handler. Concrete deriviatives of Danga::Socket should
+'Hangup' event handler. Concrete derivatives of Danga::Socket should
 provide an implementation of this. The default implementation will die if
 called.
 
@@ -1183,7 +1205,7 @@ sub event_hup   { die "Base class event_hup called for $_[0]\n"; }
 
 =head2 C<< $obj->event_write() >>
 
-Writable event handler. Concrete deriviatives of Danga::Socket may wish to
+Writable event handler. Concrete derivatives of Danga::Socket may wish to
 provide an implementation of this. The default implementation calls
 C<write()> with an C<undef>.
 
@@ -1356,10 +1378,28 @@ sub local_ip_string {
     my $pn = getsockname($self->{sock});
     return _undef("local_ip_string undef: getsockname") unless $pn;
 
-    my ($port, $iaddr) = Socket::sockaddr_in($pn);
+    my ($port, $iaddr) = eval {
+        if (length($pn) >= 28) {
+            return Socket6::unpack_sockaddr_in6($pn);
+        } else {
+            return Socket::sockaddr_in($pn);
+        }
+    };
+
+    if ($@) {
+        $self->{local_port} = "[Unknown localport '$@']";
+        return "[Unknown localname '$@']";
+    }
+
     $self->{local_port} = $port;
 
-    return $self->{local_ip} = Socket::inet_ntoa($iaddr);
+    if (length($iaddr) == 4) {
+        return $self->{local_ip} = Socket::inet_ntoa($iaddr);
+    } else {
+        $self->{local_v6} = 1;
+        return $self->{local_ip} = Socket6::inet_ntop(Socket6::AF_INET6(),
+                                                      $iaddr);
+    }
 }
 
 =head2 C<< $obj->local_addr_string() >>
@@ -1370,8 +1410,11 @@ object in form "ip:port"
 =cut
 sub local_addr_string {
     my Danga::Socket $self = shift;
-    my $ip = $self->local_ip_string;
-    return $ip ? "$ip:$self->{local_port}" : undef;
+    my $ip = $self->local_ip_string
+        or return undef;
+    return $self->{local_v6} ?
+        "[$ip]:$self->{local_port}" :
+        "$ip:$self->{local_port}";
 }
 
 

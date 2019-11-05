@@ -1595,8 +1595,7 @@ SKIP: {
 					||
 					(($major_version > $min_major)))
 			{
-				my $max_version = '70.0.0'; # force check when the major version gets to 70
-				# $max_version = '69.0.1'; # known bad version
+				my $max_version = '70.0.0'; # known bad version
 				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
 				if ((($major_version == $max_major)
 						&& (defined $minor_version)

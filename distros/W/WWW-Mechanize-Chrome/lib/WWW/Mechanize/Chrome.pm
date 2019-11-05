@@ -23,7 +23,7 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -253,6 +253,14 @@ base data directory for the browsing session.
   my $mech = WWW::Mechanize::Chrome->new(
       data_directory => tempdir(CLEANUP => 1 ),
   );
+
+=item B<wait_file>
+
+  wait_file => "$tempdir/CrashpadMetrics-active.pma"
+
+When shutting down, wait until this file does not exist anymore or can be
+deleted. This can help making sure that the Chrome process has really shut
+down.
 
 =item B<startup_timeout>
 
@@ -817,6 +825,8 @@ sub new($class, %options) {
         $options{ download_directory }= '';
     };
 
+    $options{ startup_timeout } //= 20;
+
     $options{ js_events } ||= [];
     if( ! exists $options{ transport }) {
         $options{ transport } ||= $ENV{ WWW_MECHANIZE_CHROME_TRANSPORT };
@@ -891,9 +901,16 @@ sub new($class, %options) {
 
                 # Try a fresh socket connection, blindly
                 # Just to give Chrome time to start up, make sure it accepts connections
-                my $ok = $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
+                my $ok = $self->_wait_for_socket_connection(
+                    $host,
+                    $self->{port},
+                    $self->{startup_timeout}
+                );
                 if( ! $ok) {
-                    die "Timeout while connecting to $host:$self->{port}. Do you maybe have a non-debug instance of Chrome already running?";
+                    die join ' ',
+                       "Timeout while connecting to $host:$self->{port}.",
+                       "Do you maybe have a non-debug instance of Chrome",
+                       "already running?";
                 };
             };
         };
@@ -974,6 +991,15 @@ sub _connect( $self, %options ) {
             local $SIG{CHLD} = 'IGNORE';
             kill $self->{cleanup_signal} => $pid;
             waitpid $pid, 0;
+
+            if( my $path = $self->{wait_file}) {
+                my $timeout = time + 10;
+                while( time < $timeout ) {
+                    last unless(-e $path);
+                    unlink($path) and last;
+                    $self->sleep(0.1);
+                }
+            };
         };
         croak $err;
     }
@@ -1588,7 +1614,15 @@ sub autoclose_tab( $self, $autoclose ) {
     $self->{autoclose} = $autoclose
 }
 
-sub DESTROY {
+=head2 C<< ->close >>
+
+    $mech->close()
+
+Tear down all connections and shut down Chrome.
+
+=cut
+
+sub close {
     my $pid= delete $_[0]->{pid};
 
     #if( $_[0]->{autoclose} and $_[0]->tab and my $tab_id = $_[0]->tab->{id} ) {
@@ -1620,6 +1654,10 @@ sub DESTROY {
         kill $_[0]->{cleanup_signal} => $pid;
         waitpid $pid, 0;
     };
+}
+
+sub DESTROY {
+    $_[0]->close();
     %{ $_[0] }= (); # clean out all other held references
 }
 
@@ -1769,15 +1807,22 @@ sub _waitForNavigationEnd( $self, %options ) {
 
     $self->log('debug', $msg);
     my $events_f = $self->_collectEvents( sub( $ev ) {
+        if( ! $ev->{method}) {
+            # We get empty responses when talking to indirect targets
+            return
+        };
+
         # Let's assume that the first frame id we see is "our" frame
         $frameId ||= $self->_fetchFrameId($ev);
         $requestId ||= $self->_fetchRequestId($ev);
+
         my $stopped = (    $ev->{method} eq 'Page.frameStoppedLoading'
                        && $ev->{params}->{frameId} eq $frameId);
         # This means basically no navigation events will follow:
         my $internal_navigation = (   $ev->{method} eq 'Page.navigatedWithinDocument'
                        && $requestId
-                       && (! exists $ev->{params}->{requestId} or $ev->{params}->{requestId} eq $requestId));
+                       && (! exists $ev->{params}->{requestId}
+                           or ($ev->{params}->{requestId} eq $requestId)));
         # This is far too early, but some requests only send this?!
         # Maybe this can be salvaged by setting a timeout when we see this?!
         my $domcontent = (  1 # $options{ just_request }
@@ -2074,9 +2119,9 @@ sub httpResponseFromChromeResponse( $self, $res ) {
         $full_response_future = $self->getResponseBody( $requestId )->then( sub( $body ) {
             $s->log('debug', "Response body arrived");
             $response->content( $body );
-            undef $full_response_future;
-            Future->done
-        });
+            #undef $full_response_future;
+            Future->done($body)
+        })->retain;
         #$response->content_ref( \$body );
     };
     $response
@@ -2104,6 +2149,7 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
     if( $url ) {
         # Find the request id of the request
         for( @$events ) {
+            next unless $_->{method};
             if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
                 if( $url and $_->{params}->{request}->{url} eq $url ) {
                     $requestId = $_->{params}->{requestId};
@@ -2355,16 +2401,18 @@ about the current directory of your Perl script.
 
 sub set_download_directory_future( $self, $dir="" ) {
     $self->{download_directory} = $dir;
+    my $res;
     if( "" eq $dir ) {
-        $self->target->send_message('Page.setDownloadBehavior',
+        $res = $self->target->send_message('Page.setDownloadBehavior',
             behavior => 'deny',
         )
     } else {
-        $self->target->send_message('Page.setDownloadBehavior',
+        $res = $self->target->send_message('Page.setDownloadBehavior',
             behavior => 'allow',
             downloadPath => $dir
         )
     };
+    $res
 };
 
 sub set_download_directory( $self, $dir="" ) {
@@ -4914,7 +4962,7 @@ sub saveResources_future( $self, %options ) {
             or croak "Couldn't save url '$resource->{url}' to $target: $!";
         binmode $fh;
         print $fh $resource->{content};
-        close $fh;
+        CORE::close( $fh );
 
         Future->done( $resource );
     }, names => \%names, seen => \my %seen )->then( sub( @resources ) {
@@ -5495,7 +5543,7 @@ Steven Dondley C<s@dondley.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

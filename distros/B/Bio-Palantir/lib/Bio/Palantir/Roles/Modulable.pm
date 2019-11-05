@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable;
 # ABSTRACT: Modulable Moose role for Module object construction
-$Bio::Palantir::Roles::Modulable::VERSION = '0.192560';
+$Bio::Palantir::Roles::Modulable::VERSION = '0.193080';
 use Moose::Role;
 
 use autodie;
@@ -72,19 +72,18 @@ sub _build_modules {
                 $module_n++;
                 $module_for{$module_n}{start} = $gene_n;
             }
-
            
             # define elongation modules
             elsif ( 
                 # define modules anchors on C domains (biological sense with communication domains and condensation steps)
-                ($domains[$i]->function 
+                ($domains[$i]->symbol 
                     =~ $cutting_regex_for{ $self->cutting_mode })
                 # do not allow modules to be separated by an intermediate gene
                 || ( ($genes[$gene_n]->rank
                       - $genes[ $module_for{$module_n}{start} ]->rank) > 1)                
                 # avoid auxilliary domains in modules, for instance: if C-A-PCP-TE | AT | A | ACL | ECH assign a different module for last domains
                 || (@domains == 1
-                    && $domains[$i]->function !~ m/^A$ | ^AT | ^C$ | ^KS | ^PCP$ 
+                    && $domains[$i]->symbol !~ m/^A$ | ^AT | ^C$ | ^KS | ^PCP$ 
                 |      ^ACP$ | KR | DH | ER | cyc | ^TE$ | ^Red$ | ^NAD 
                 |       NRPS-COM/xms)
                 ) {
@@ -177,7 +176,7 @@ Bio::Palantir::Roles::Modulable - Modulable Moose role for Module object constru
 
 =head1 VERSION
 
-version 0.192560
+version 0.193080
 
 =head1 SYNOPSIS
 

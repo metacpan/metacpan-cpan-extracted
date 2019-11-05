@@ -10,7 +10,7 @@ use IO::Async::Loop;
 use Net::Async::WebSocket::Client;
 Net::Async::WebSocket::Client->VERSION(0.12); # fixes some errors with masked frames
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -134,7 +134,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

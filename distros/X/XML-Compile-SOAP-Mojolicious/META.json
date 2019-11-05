@@ -1,16 +1,16 @@
 {
    "abstract" : "SOAP with Mojolicious",
    "author" : [
-      "Heiko Jansen/Mark Overmeer"
+      "Mark Overmeer <markov@overmeer.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile-SOAP-Mojolicious",
    "no_index" : {
@@ -41,5 +41,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious.git",
+         "web" : "https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

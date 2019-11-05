@@ -4,7 +4,7 @@
 use strict;
 use vars qw($loaded);
 
-BEGIN { $| = 1; print "1..47\n"; }
+BEGIN { $| = 1; print "1..50\n"; }
 END   {print "not ok 1\n" unless $loaded; }
 
 my $ok_count = 1;
@@ -211,3 +211,11 @@ $options{die_upon_destroy} = 1;
     ok(0);							# 47
   }
 }
+
+# Test wait with a timeout on a process that doesn't exit.
+my $p8 = EmptySubclass->new(@sleep_exit, 10, 0);
+ok($p8);                             # 48
+ok($p8 && $p8->alive);               # 49
+ok($p8 && !defined $p8->wait(1.5));  # 50
+$p8->die;
+

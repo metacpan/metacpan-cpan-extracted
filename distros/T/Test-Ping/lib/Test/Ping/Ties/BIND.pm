@@ -1,9 +1,11 @@
+package Test::Ping::Ties::BIND;
+$Test::Ping::Ties::BIND::VERSION = '0.204';
 use strict;
 use warnings;
-package Test::Ping::Ties::BIND;
 # ABSTRACT: Bind Tie variable to Test::Ping
-$Test::Ping::Ties::BIND::VERSION = '0.203';
+
 use Net::Ping;
+use Test::Ping;
 use Tie::Scalar;
 use Carp;
 
@@ -25,7 +27,7 @@ Test::Ping::Ties::BIND - Bind Tie variable to Test::Ping
 
 =head1 VERSION
 
-version 0.203
+version 0.204
 
 =head1 DESCRIPTION
 
@@ -47,7 +49,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Sawyer X.
+This software is Copyright (c) 2019 by Sawyer X.
 
 This is free software, licensed under:
 

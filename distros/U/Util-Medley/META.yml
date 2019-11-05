@@ -1,0 +1,43 @@
+---
+abstract: 'A collection of commonly used utilities.'
+author:
+  - 'John Gravatt <gravattj@cpan.org>'
+build_requires:
+  Test2::Plugin::DieOnFail: '0'
+  Test2::V0: '0'
+  Time::ParseDate: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Util-Medley
+requires:
+  Any::Moose: '0.26'
+  Archive::Zip: '0'
+  CHI: '0'
+  Carp: '0'
+  Crypt::Blowfish: '0'
+  Crypt::CBC: '0'
+  Data::Printer: '0'
+  File::LibMagic: '0'
+  File::Path: '0'
+  IPC::Run3: '0'
+  List::Util: '0'
+  Method::Signatures: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Iterator::Rule: '0'
+  String::Util: '0'
+  Time::localtime: '0'
+  Try::Tiny: '0'
+  constant: '0'
+  namespace::autoclean: '0'
+version: '0.007'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

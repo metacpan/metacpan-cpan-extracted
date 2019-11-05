@@ -30,6 +30,8 @@
       },
       "develop" : {
          "requires" : {
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Coveralls" : "0.11",
             "Dist::Zilla" : "5",
             "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
             "Software::License::Perl_5" : "0",
@@ -70,7 +72,7 @@
             "IO::Async::Timer::Periodic" : "0",
             "IO::Socket::IP" : "0.37",
             "Log::Any" : "1.050",
-            "Ryu" : "1.003",
+            "Ryu" : "1.008",
             "Ryu::Sink" : "0",
             "Ryu::Source" : "0",
             "Scalar::Util" : "0",
@@ -96,6 +98,7 @@
             "IO::Async::Loop" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Socket" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::Deep" : "1.126",
             "Test::Fatal" : "0.010",
@@ -111,23 +114,23 @@
    "provides" : {
       "Ryu::Async" : {
          "file" : "lib/Ryu/Async.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Ryu::Async::Client" : {
          "file" : "lib/Ryu/Async/Client.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Ryu::Async::Packet" : {
          "file" : "lib/Ryu/Async/Packet.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Ryu::Async::Process" : {
          "file" : "lib/Ryu/Async/Process.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Ryu::Async::Server" : {
          "file" : "lib/Ryu/Async/Server.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -142,9 +145,9 @@
          "web" : "https://github.com/team-at-cpan/Ryu-Async"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_authority" : "cpan:TEAM",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

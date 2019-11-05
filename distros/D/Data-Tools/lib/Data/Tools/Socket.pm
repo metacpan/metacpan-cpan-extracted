@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -44,7 +44,7 @@ sub socket_read
 #print STDERR "SOCKET_READ: rlen [$rlen]\n";
    while( $rlen > 0 )
      {
-     return undef if ! socket_can_read( $sock ) or ( $timeout > 0 and time() - $stime > $timeout );
+     return undef if ! socket_can_read( $sock, $timeout ) or ( $timeout > 0 and time() - $stime > $timeout );
      
      my $part;
      my $plen = $sock->sysread( $part, $rlen );
@@ -74,7 +74,7 @@ sub socket_write
    my $wpos = 0;
    while( $wpos < $writelen )
      {
-     return undef if ! socket_can_write( $sock ) or ( $timeout > 0 and time() - $stime > $timeout );
+     return undef if ! socket_can_write( $sock, $timeout ) or ( $timeout > 0 and time() - $stime > $timeout );
  
      my $part;
      my $plen = $sock->syswrite( $data, $writelen - $wpos, $wpos );

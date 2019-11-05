@@ -16,7 +16,7 @@ my $b = Module::Build->new
    },
   configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,
-  perl          => '5.16.0',
+  perl          => '5.26.0',
  );
 
 $b->create_build_script();

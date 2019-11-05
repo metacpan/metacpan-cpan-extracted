@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.161';
+our $VERSION = '1.162';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -74,9 +74,15 @@ sub new {
     if ($epoch !~ /^[\d.]+$/) {
         # ISO Zeitangabe
 
+        $epoch =~ s/(\.\d+)//;
+        my $x = $1;
+
         my @arr = reverse split /\D+/,$epoch;
         $arr[4]--;
         $epoch = Time::Local::timelocal(@arr);
+        if ($x) {
+            $epoch .= $x;
+        }
     }
 
     return bless \$epoch,$class;
@@ -217,7 +223,7 @@ sub as {
 
 =head1 VERSION
 
-1.161
+1.162
 
 =head1 AUTHOR
 

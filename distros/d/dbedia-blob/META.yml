@@ -1,0 +1,42 @@
+---
+abstract: 'interface to (not only) b.dbedia.com blob storage'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - perl
+  - blob
+  - server
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: dbedia-blob
+provides:
+  dbedia::blob:
+    file: lib/dbedia/blob.pm
+    version: '0.01'
+requires:
+  Digest::SHA: '0'
+  File::MimeInfo: '0'
+  File::MimeInfo::Magic: '0'
+  File::Temp: '0'
+  Moose: '0'
+  MooseX::Types::Path::Class: '0'
+  MooseX::Types::URI: '0'
+  Net::SCP: '0'
+  Path::Class: '0'
+  URI: '0'
+  YAML::Syck: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: http://github.com/meon/dbedia-blob/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/meon/dbedia-blob/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

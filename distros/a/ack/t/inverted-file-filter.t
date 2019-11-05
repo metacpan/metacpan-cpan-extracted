@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib 't';
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 use Util;
 
 prep_environment();
@@ -40,7 +40,6 @@ EXCLUDE_ONLY: {
         t/swamp/notaMakefile
         t/swamp/notaRakefile
         t/swamp/notes.md
-        t/swamp/parrot.pir
         t/swamp/pipe-stress-freaks.F
         t/swamp/Rakefile
         t/swamp/Sample.ascx
@@ -56,8 +55,15 @@ EXCLUDE_ONLY: {
         't/swamp/not-an-#emacs-workfile#',
     );
 
-    my @args = qw( --noperl -f t/swamp );
+    my @args = qw( -T perl -f t/swamp );
+    ack_sets_match( [ @args ], \@expected, 'Exclude only' );
 
+    # Do it again with -t noperl
+    @args = qw( -t noperl -f t/swamp );
+    ack_sets_match( [ @args ], \@expected, 'Exclude only' );
+
+    # Do it again with --type=noperl
+    @args = qw( -t noperl -f t/swamp );
     ack_sets_match( [ @args ], \@expected, 'Exclude only' );
 }
 
@@ -75,7 +81,7 @@ INCLUDE_PLUS_EXCLUDE_ONLY: {
         t/swamp/perl.pl
     );
 
-    my @args = ( '--type-add=pod:ext:pod', '--perl', '--nopod', '-f', 't/swamp' );
+    my @args = qw( --type-add=pod:ext:pod -t perl -T pod -f t/swamp );
 
     ack_sets_match( [ @args ], \@expected, 'Include plus exclude only' );
 }

@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.89'; # VERSION
+our $VERSION = '1.92'; # VERSION
 
 
 our @aliens;
@@ -485,6 +485,7 @@ sub ffi_ok
     my $min = '0.12'; # the first CPAN release
     $min = '0.15' if $opt->{ignore_not_found};
     $min = '0.18' if $opt->{lang};
+    $min = '0.99' if defined $opt->{api} && $opt->{api} > 0;
     unless(eval { require FFI::Platypus; FFI::Platypus->VERSION($min) })
     {
       $ok = 0;
@@ -510,9 +511,15 @@ sub ffi_ok
   if($ok)
   {
     $ffi = FFI::Platypus->new(
-      lib              => [map { $_->dynamic_libs } @aliens],
-      ignore_not_found => $opt->{ignore_not_found},
-      lang             => $opt->{lang},
+      do {
+        my @args = (
+          lib              => [map { $_->dynamic_libs } @aliens],
+          ignore_not_found => $opt->{ignore_not_found},
+          lang             => $opt->{lang},
+        );
+        push @args, api => $opt->{api} if defined $opt->{api};
+        @args;
+      }
     );
     foreach my $symbol (@{ $opt->{symbols} || [] })
     {
@@ -647,7 +654,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.89
+version 1.92
 
 =head1 SYNOPSIS
 
@@ -926,6 +933,16 @@ not influence the C<symbols> key above.
 =item lang
 
 Set the language.  Used primarily for language specific native types.
+
+=item api
+
+Set the API.  C<api = 1> requires FFI::Platypus 0.99 or later.  This
+option was added with Test::Alien version 1.90, so your use line should
+include this version as a safeguard to make sure it works:
+
+ use Test::Alien 1.90;
+ ...
+ ffi_ok ...;
 
 =back
 

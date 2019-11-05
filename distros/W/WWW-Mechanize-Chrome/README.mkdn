@@ -222,6 +222,14 @@ them in a Perl object to provide the easy-to-use methods documented here.
             data_directory => tempdir(CLEANUP => 1 ),
         );
 
+- **wait\_file**
+
+        wait_file => "$tempdir/CrashpadMetrics-active.pma"
+
+    When shutting down, wait until this file does not exist anymore or can be
+    deleted. This can help making sure that the Chrome process has really shut
+    down.
+
 - **startup\_timeout**
 
         startup_timeout => 5  # set the startup timeout value
@@ -595,6 +603,12 @@ This method is special to WWW::Mechanize::Chrome.
 ## `->autoclose_tab`
 
 Set the `autoclose` option
+
+## `->close`
+
+    $mech->close()
+
+Tear down all connections and shut down Chrome.
 
 ## `$mech->highlight_node( @nodes )`
 
@@ -1712,7 +1726,7 @@ Steven Dondley `s@dondley.org`
 
 # COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein `corion@cpan.org`.
+Copyright 2010-2019 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

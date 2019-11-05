@@ -6,6 +6,8 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
+dist.ini
 eg/maximin
 eg/minimax
 eg/play

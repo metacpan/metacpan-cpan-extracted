@@ -13,7 +13,11 @@ use Time::HiRes qw(alarm);
 use List::Util qw(min max);
 
 BEGIN {
-    our $VERSION = '0.02';
+    require Exporter;
+    our @ISA = qw( Exporter );
+    our $VERSION = '0.03';
+    our @EXPORT = qw( initialize_mouse poll_mouse get_mouse set_mouse );
+    our @EXPORT_OK = qw();
 }
 
 sub initialize_mouse {

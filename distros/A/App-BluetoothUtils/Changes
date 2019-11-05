@@ -1,9 +1,15 @@
-0.002   2019-06-15 (PERLANCAR)
+0.003   2019-10-04  Released-By: PERLANCAR; Urgency: medium
 
-	- Add CLI aliases: turn-bluetooth-off -> turn-off-bluetooth,
+	- Add shorter CLI's: turn-off-bluetooth -> btoff, turn-on-bluetooth
+	  -> bton.
+
+
+0.002   2019-06-15  Released-By: PERLANCAR
+
+	- [ux] Add CLI aliases: turn-bluetooth-off -> turn-off-bluetooth,
 	  turn-bluetooth-on -> turn-on-bluetooth.
 
 
-0.001   2018-10-22 (PERLANCAR)
+0.001   2018-10-22  Released-By: PERLANCAR
 
         - First release.

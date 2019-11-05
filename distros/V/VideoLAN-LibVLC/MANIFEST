@@ -16,7 +16,6 @@ dtest
 lib/VideoLAN/LibVLC.pm
 lib/VideoLAN/LibVLC/Media.pm
 lib/VideoLAN/LibVLC/MediaPlayer.pm
-ppport.h
 t/02-constants.t
 t/10-instance.t
 t/11-log.t
@@ -27,5 +26,6 @@ t/31-playback-into-buffer.t
 t/author-pod-syntax.t
 t/data/NASA-solar-flares-2017-04-02.mp4
 typemap
+util/docker-ubuntu19/Dockerfile
 util/update_lists.pl
 videoplayer.pl

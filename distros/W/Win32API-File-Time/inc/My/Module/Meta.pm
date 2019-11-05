@@ -1,6 +1,6 @@
 package My::Module::Meta;
 
-use 5.006;
+use 5.006002;
 
 use strict;
 use warnings;
@@ -64,6 +64,7 @@ sub requires {
 ##  if ( ! $self->distribution() ) {
 ##  }
     return {
+	'parent'		=> 0,
         'strict'		=> 0,
         'vars'			=> 0,
         'warnings'		=> 0,
@@ -187,7 +188,7 @@ information makes it into F<META.yml>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -195,7 +196,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2011, 2013-2014, 2016 by Thomas R. Wyant, III
+Copyright (C) 2010-2011, 2013-2014, 2016-2017, 2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

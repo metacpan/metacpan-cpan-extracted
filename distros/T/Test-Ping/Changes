@@ -1,5 +1,9 @@
 Revision history for Test-Ping
 
+0.204     2019-10-31 12:18:43+02:00 Asia/Jerusalem
+
+        - Some cleanups.
+
 0.203     2016-03-13 22:18:34+01:00 Europe/Amsterdam
         - Ugh. $VERSION wasn't added and the indexing failed.
         - Fix the LICENSING.

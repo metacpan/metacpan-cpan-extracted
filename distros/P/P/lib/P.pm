@@ -4,20 +4,25 @@
 =encoding utf-8
 
 =head1 NAME
-################################################################################
 P  -   Safer, friendlier printf/print/sprintf + say
 
 =head1 VERSION
 
-Version  "1.1.40"
+Version  "1.1.41"
 
 =cut
 
+################################################################################
 { package P;
 	use warnings; use strict;use mem;
-	our $VERSION='1.1.40';
+	our $VERSION='1.1.41';
 
-# RCS $Revision: 1.55 $ -  $Date: 2018-06-16 04:34:53-07 $
+# RCS $Revision: 1.57 $ -  $Date: 2019-06-02 01:58:47-07 $
+# 1.1.41	- Attempt to fix bug in Metacpan, that was reported fixed in
+# 					Mar, 2013 (over 6 years ago), but seems to still be a problem
+# 					It was suggested that Megacpan copy the working code from
+# 					Cpan's search section as it worked correctly, but apparently
+# 					that never happened.
 # 1.1.40	- remove check for parent pid in test phase -- not important
 #           and caused win platform to fail
 # 1.1.39	- fix in carat encoding; had Single Quote (SQ) included in string
@@ -26,7 +31,7 @@ Version  "1.1.40"
 # 1.1.38  - split declare + definition  in "local *fn=sub" to 
 #           "local (*fn); *fn=sub"
 #         - expand SCALAR refs even past limit as they don't take much space
-#           and they aren't likly to contain nested refs
+#           and shouldn't cause more recursion
 #         - moderate code cleanups
 #         - handle 'undef' if 1st param passed:
 #           - 1) if only parm, unshift in a format "%s", so undef will print
@@ -39,8 +44,8 @@ Version  "1.1.40"
 # 1.1.37	- instead of trying to disable non-working tests in early perl's,
 # 					require perl 5.8.5 and perlIO 1.0.3 to build;
 # 				- only do win32 checks in P.Pt
-# 1.1.36	- instead of disabling broken perl's, in a Major series, disabled all.
-#           fixed that (changes in P.Pt test).
+# 1.1.36	- instead of disabling broken perl's, in a Major series, disable code
+#           was set to diable all: fixed that (changes in P.Pt test).
 # 1.1.35	- Add per-MAJOR-series min req'd. perl (else skip test)
 # 1.1.34  - Compensating for odd Strawberry Perl var-values...
 # 1.1.33  - Trying to Compensate for Strawberry Perl bugs...
@@ -332,14 +337,14 @@ IGN
 
 	sub vrfmt($) {
 		my ($v, $pkg)		= (shift || "", "");
-		my ($vl, $ic)		= (length $v, 2+index $v, "::");
-		if ($ic >= 2  &&  $vl - $ic > 0) {
-			$pkg	= substr $v, 0, $ic;
-			$v 		= substr $v, $ic;
-		}																							# here, 'v' is a var name
-		if ( $v =~ m{^([\x00-\x1f])(\w*)$} ) {				# varname starting w/ctl-ch
-			$v = "^" . chr(0x40 + ord $1) . $2;					# use carot encoding
-		}
+		#my ($vl, $ic)		= (length $v, 2+index $v, "::");
+		#if ($ic >= 2  &&  $vl - $ic > 0) {
+		#	$pkg	= substr $v, 0, $ic;
+		#	$v 		= substr $v, $ic;
+		#}																						# here, 'v' is a var name
+		#if ( $v =~ m{^([\x00-\x1f])(\w*)$} ) {				# varname starting w/ctl-ch
+		#	$v = "^" . chr(0x40 + ord $1) . $2;					# use carot encoding
+		#}
 		$pkg . $v;
 	}
 
@@ -372,11 +377,12 @@ IGN
 		}
 		return sw('undef') unless defined $v;
 		my $rv = ref $v;
-		if (1 > $lvl-- || !$rv) {													# LAST level actons:
+		if (1 > $lvl-- || !$rv) {													# LAST level actions:
 			my $fmt;			# prototypes are documentary (rt#89053)
 			my $given = [	
 				sub ($$) { $_[0] =~ /^[-+]?[0-9]+\.?\z/						&& 	q{%s}		},
-				sub ($$) { $_[1] && ($_[0] = vrfmt($_[0])), $_[1]	&& qq{%s}		},
+				#sub ($$) { $_[1] && ($_[0] = vrfmt($_[0])), $_[1]	&& qq{%s}		},
+				sub ($$) { $_[1] 												 					&& qq{%s}		},
 				sub ($$) { 1 == length($_[0]) 										&& q{'%s'}	},
 				sub ($$) { $_[0] =~ m{^(?:[+-]?(?:\.\d+)
 															|(?:\d+\.\d+))\z}x  				&& q{%.2f}	},
@@ -491,8 +497,19 @@ IGN
 		};
 
 		chomp $res;
-
+	
 		my ($nl, $ctx) = ("\n", defined wantarray ? 1 : 0);
+	
+#		our $Pcount;
+#		sub Pe(@);
+#		if (!$Pcount) {
+#			++$Pcount;
+#			my $from = caller ;
+#			#Pe "cts=%s, from=%s", $ctx, $from;
+#			$ctx=0 if $from =~ /^DB/;
+#		}
+		
+
 
 		($res, $nl, $ctx) = (substr($res, 0, -1 + length $res), "", 2) if
 					ord(substr $res,-1) == NoBrHr;									#"NO_BREAK_HERE"
@@ -607,7 +624,8 @@ IGN
   P FILEHANDLE, LIST         # comma is not disallowed
   P FORMAT, (LIST)
   P (LIST)
-  P @ARRAY                   # may contain FH, FMT+ARGS & return string
+  P @ARRAY                   # may contain File Handle, Format and ARGS
+	                           # all in 1 array.
   $s = P @ARRAY; P $s;       # can be same output as "P @ARRAY" 
   Pe                         # same as P STDERR,...
   $s = P FILEHANDLE ...      # sends same output to $s and FILEHANDLE
@@ -615,8 +633,11 @@ IGN
 =head1 DESCRIPTION
 
 C<P> is a combined print, printf, sprintf & say in 1 routine.  It saves
-tremendously on development time.  It's not just a 1 character verb, 
-but has other time-saving and powerful features:
+tremendously on development time.  It's not just a 1 character 'verb', 
+but has other time-saving and powerful features.  It has the convenience
+of C<say> in adding a newline when needed but also allows specifying
+a File Handle and format statement.
+C<P> accepts a filehandle with or without a comma after the filehandle.
 
 =over
 
@@ -638,7 +659,7 @@ verb:
 
 C<P> can replacing C<sprintf> without the need for a temporary
 variable and without printing cryptic representations for @ARGV,
-like "C<ARRAY(0x12345678)>".  Instead,
+like "C<ARRAY(0x5A2B3C66)>".  Instead,
 C<P> displays the actual contents of the array, showing
 ["arg1", "arg2"].
 

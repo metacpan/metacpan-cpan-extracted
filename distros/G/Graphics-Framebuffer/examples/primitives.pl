@@ -1320,16 +1320,16 @@ sub blit_move {
             }
         }
     );
-    $F->blit_write({ %{$image}, 'x' => 10, 'y' => 10 });
-    my $x = 10;
-    my $y = 10;
-    my $w = $image->{'width'};
-    my $h = $image->{'height'};
+    my $x = 20;
+    my $y = 20;
+    $image->{'x'} = $x;
+    $image->{'y'} = $y;
+    $F->blit_write($image);
     my $s = time + $delay;
     while (time < $s) {
-        $F->blit_move({ 'x' => abs($x), 'y' => abs($y), 'width' => $w, 'height' => $h, 'x_dest' => abs($x) + 4, 'y_dest' => abs($y) + 2 });
-        $x += 4;
-        $y += 2;
+        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => abs($y)});
+        $x += 5;
+        $y += 3;
 
         $benchmark->{'Image Moving'}++;
     } ## end while (time < $s)

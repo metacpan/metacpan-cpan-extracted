@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.08
+    Version 0.09
 
 DESCRIPTION
 
@@ -56,7 +56,7 @@ SYNOPSIS
 
     wsdl_file
 
-      The name of th WSDL file. It should be a local file.
+      The name of the WSDL file. It should be a local file.
 
     accountid
 

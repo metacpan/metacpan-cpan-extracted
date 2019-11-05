@@ -31,8 +31,11 @@ is($result, $expect1d, "1d");
 $result = dct2d($array);
 is($result, $expect2d, "2d");
 
+$result = dct2d($array, 2);
+is($result, $expect2d, "2d - define size");
+
 $result = dct([$array]);
-is($result, [$expect1d], "1d");
+is($result, [$expect1d], "1d - auto");
 
 $result = dct($arrayref);
 is(
@@ -47,7 +50,7 @@ is(
             item float(-2.5);
         }
     ],
-    "2d"
+    "2d - auto"
 );
 
 done_testing;

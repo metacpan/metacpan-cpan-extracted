@@ -13,20 +13,28 @@ use IO::Socket::INET;
 use POSIX;
 no  warnings qw(deprecated);
 
-use vars qw($done);
+use vars qw($done $SERVER_PORT $SERVER_ADDR);
+
+BEGIN {
+    $SERVER_PORT = $ENV{DS_TEST_SERVER_PORT} || 60001;
+    $SERVER_ADDR = "127.0.0.1:$SERVER_PORT";
+}
 
 my $ssock = IO::Socket::INET->new(Listen    => 5,
                                   LocalAddr => '127.0.0.1',
-                                  LocalPort => 60000,
+                                  LocalPort => $SERVER_PORT,
                                   Proto     => 'tcp',
                                   ReuseAddr => 1,
                                   );
+
+diag("Looks like I couldn't create a listen socket at $SERVER_ADDR. If this conflicts with another service on your host, you may like to try setting the DS_TEST_SERVER_PORT environment variable to a free port number") unless $ssock;
+
 ok($ssock, "made server");
-my $c1 = IO::Socket::INET->new(PeerAddr => "127.0.0.1:60000");
+my $c1 = IO::Socket::INET->new(PeerAddr => $SERVER_ADDR);
 ok($c1, "made client1");
 my $sc1 = $ssock->accept;
 ok($sc1, "got client1");
-my $c2 = IO::Socket::INET->new(PeerAddr => "127.0.0.1:60000");
+my $c2 = IO::Socket::INET->new(PeerAddr => $SERVER_ADDR);
 ok($c2, "made client2");
 my $sc2 = $ssock->accept;
 ok($sc2, "got client2");

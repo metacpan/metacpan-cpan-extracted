@@ -1,9 +1,12 @@
 Changes
+ignore.txt
 lib/Net/SNTP/Client.pm
 Makefile.PL
 MANIFEST			This list of files
+Net-SNTP-Client-0.23.tar.gz
 README
 t/00-load.t
+t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

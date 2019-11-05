@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 =head1 NAME
 
@@ -393,9 +393,12 @@ sub udp_client {
             },
         )
     );
+    my $host = $uri->host || '0.0.0.0';
+    $host = '0.0.0.0' if $host eq '*';
+    my $port = $uri->port // 0;
     my $f = $client->connect(
-        host     => $uri->host || '0.0.0.0',
-        service  => $uri->port // 0,
+        host     => $host,
+        service  => $port,
         socktype => 'dgram',
     );
     $f->on_done(sub {
@@ -408,7 +411,7 @@ sub udp_client {
         $f->on_done(sub {
             try {
                 $log->tracef("Sending [%s] to %s", $payload, $uri);
-                $client->send($payload);
+                $client->send($payload, undef, "$host:$port");
             } catch {
                 $log->errorf("Exception when sending: %s", $@);
             }
@@ -458,8 +461,8 @@ sub udp_server {
     );
     $sink->source->each(sub { $server->send($_->payload, 0, $_->addr) });
     my $port_f = $server->bind(
-            service  => $uri->port // 0,
-            socktype => 'dgram'
+        service  => $uri->port // 0,
+        socktype => 'dgram'
     )->then(sub {
         Future->done($server->write_handle->sockport)
     });

@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument  0.051003 {
+package Term::CLI::Argument  0.051004 {
 
 use Modern::Perl 1.20140107;
 use Moo 1.000001;
@@ -91,7 +91,7 @@ Term::CLI::Argument - generic parent class for arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.051003
+version 0.051004
 
 =head1 SYNOPSIS
 

@@ -6,8 +6,6 @@
 use Modern::Perl '2011';
 use autodie;
 
-use Smart::Comments;
-
 use Carp;
 use Const::Fast;
 use Data::UUID;
@@ -62,6 +60,9 @@ size            INTEGER    NOT NULL,
 coordinates     TEXT       NOT NULL,
 begin           INTEGER    NOT NULL,
 end             INTEGER    NOT NULL,
+dna_coordinates INTEGER    NOT NULL,
+dna_begin       INTEGER    NOT NULL,
+dna_end         INTEGER    NOT NULL,
 lineage         TEXT       NOT NULL,
 FOREIGN KEY(lineage) REFERENCES lineages(id)
 );
@@ -501,6 +502,8 @@ sub fill_bgc_tables {
                 $cluster->genomic_prot_size, 
                 (join '-', @{ $cluster->genomic_prot_coordinates }), 
                 $cluster->genomic_prot_begin, $cluster->genomic_prot_end,
+                (join '-', @{ $cluster->genomic_dna_coordinates }), 
+                $cluster->genomic_dna_begin, $cluster->genomic_dna_end,
                 $lid,
             );
             
@@ -738,7 +741,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.192560
+version 0.193080
 
 =head1 NAME
 

@@ -1,0 +1,41 @@
+Mojo-Server-CGI-LegacyMigrate
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mojo::Server::CGI::LegacyMigrate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojo-Server-CGI-LegacyMigrate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mojo-Server-CGI-LegacyMigrate
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Mojo-Server-CGI-LegacyMigrate
+
+    Search CPAN
+        https://metacpan.org/release/Mojo-Server-CGI-LegacyMigrate
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Evan Carroll.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

@@ -4,6 +4,12 @@ Makefile.PL
 README
 README.md
 examples/apache.pl
+lib/Any/Daemon/FCGI.pm
+lib/Any/Daemon/FCGI.pod
+lib/Any/Daemon/FCGI/ClientConn.pm
+lib/Any/Daemon/FCGI/ClientConn.pod
+lib/Any/Daemon/FCGI/Request.pm
+lib/Any/Daemon/FCGI/Request.pod
 lib/Any/Daemon/HTTP.pm
 lib/Any/Daemon/HTTP.pod
 lib/Any/Daemon/HTTP/Directory.pm

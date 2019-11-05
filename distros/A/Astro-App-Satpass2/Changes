@@ -1,3 +1,22 @@
+0.042		2019-11-03	T. R. Wyant
+    Fix redirects in POD URL links.
+
+    Implement \U and friends inside double quotes, except for \Q. If run
+    under Perl before version 5.15.8, \F is equivalent to \L.
+
+    Add interactive method error(). This aborts the macro or include
+    file in which it appears, displaying an error message.
+
+    Add if() operators -z and -n, which are analogous to the test (1)
+    operators of the same name.
+
+    Macro definitions are no longer unescaped. Unescaping was preventing
+    the \U ... functionality from working in a macro, and had no known
+    benefits. I must have put it in there for some reason, but I no
+    longer know why.
+
+    Correct eg/pass_ics to alert before and at rise.
+
 0.041		2019-10-04	T. R. Wyant
     Fix validation error caught by Astro::Coord::ECI 0.109_01.
 

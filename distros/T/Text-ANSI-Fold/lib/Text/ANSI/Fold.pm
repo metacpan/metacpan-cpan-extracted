@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -80,6 +80,7 @@ sub new {
 	boundary  => '',
 	padchar   => ' ',
 	ambiguous => 'narrow',
+	margin    => 0,
 	linebreak => $DEFAULT_LINEBREAK,
 	runin     => $DEFAULT_RUNIN_WIDTH,
 	runout    => $DEFAULT_RUNOUT_WIDTH,
@@ -132,6 +133,11 @@ sub configure {
     $obj;
 }
 
+my @color_stack;
+my $reset;
+sub set_reset { $reset = shift };
+sub get_reset { ("$reset", $reset = '', @color_stack = ())[0] };
+
 sub fold {
     my $obj = ref $_[0] ? $_[0] : do {
 	state $private = configure();
@@ -146,6 +152,7 @@ sub fold {
     my $padding   = $opt{padding}   // $obj->{padding};
     my $padchar   = $opt{padchar}   // $obj->{padchar};
     my $ambiguous = $opt{ambiguous} // $obj->{ambiguous};
+    my $margin    = $opt{margin}    // $obj->{margin};
     my $linebreak = $opt{linebreak} // $obj->{linebreak};
     my $runin     = $opt{runin}     // $obj->{runin};
     my $runout    = $opt{runout}    // $obj->{runout};
@@ -154,12 +161,18 @@ sub fold {
 	croak "invalid width";
     }
 
+    if ($width <= $margin) {
+	croak "invalid margin";
+    }
+    $width -= $margin;
+
     $Text::VisualWidth::PP::EastAsian = $ambiguous eq 'wide';
 
     my $folded = '';
     my $eol = '';
     my $room = $width;
-    my @color_stack;
+    @color_stack = ();
+    $reset = '';
 
     while (length) {
 
@@ -178,13 +191,16 @@ sub fold {
 	    next;
 	}
 	if (s/\A($reset_re)//) {
-	    $folded .= $1;
-	    @color_stack = ();
+	    set_reset($1);
 	    next;
 	}
 
 	last if $room < 1;
 	last if $room != $width and &_startWideSpacing and $room < 2;
+
+	if ($reset) {
+	    $folded .= get_reset();
+	}
 
 	if (s/\A($color_re)//) {
 	    $folded .= $1;
@@ -226,29 +242,57 @@ sub fold {
 	my($s, $e) = ($-[3], $+[3]);
 	my $l = $e - $s;
 	if ($room + $l < $width and $l + length($tail) <= $width) {
-	    $_ = substr($folded, $s, $l, '') . $_;
+	    $_ = substr($folded, $s, $l, '') . get_reset() . $_;
 	    $room += $l;
 	}
     }
 
     ##
-    ## Adjust line-breaking
+    ## RUN-OUT
     ##
-    if ($linebreak & LINEBREAK_RUNIN) {
+    if ($_ ne ''
+	and $linebreak & LINEBREAK_RUNOUT and $runout > 0
+	and $folded =~ m{ (?<color>  (?! ${reset_re}) ${color_re}*+ )
+			  (?<runout> $prohibition_re{end}+ ) \z }xp
+	and ${^PREMATCH} ne ''
+	and (my $w = vwidth $+{runout}) <= $runout) {
+	$folded = ${^PREMATCH};
+	if ($reset) {
+	    $_ = ${^MATCH} . $reset . $_;
+	    @color_stack = () if $+{color};
+	    $reset = '';
+	} else {
+	    $_ = ${^MATCH} . $_;
+	}
+	$room += $w;
+    }
+
+    if ($reset) {
+	$folded .= get_reset();
+    }
+
+    $room += $margin;
+
+    ##
+    ## RUN-IN
+    ##
+    if ($linebreak & LINEBREAK_RUNIN and $runin > 0) {
+	my @runin;
 	my $m = $runin;
-	while (/\A$prohibition_re{head}/p) {
-	    last if ($m -= vwidth ${^MATCH}) < 0;
-	    $folded .= ${^MATCH};
+	while ($m > 0 and
+	       m{\A (?<color> ${color_re}*+)
+	            (?<runin> $prohibition_re{head})
+	            (?<reset> ${reset_re}*)
+	       }xp) {
+	    my $w = vwidth $+{runin};
+	    last if ($m -= $w) < 0;
+	    $+{color} and do { push @color_stack, $+{color} };
+	    $+{reset} and do { @color_stack = () };
+	    $room -= $w;
+	    push @runin, ${^MATCH};
 	    $_ = ${^POSTMATCH};
 	}
-    }
-    if ($linebreak & LINEBREAK_RUNOUT) {
-	if ($folded =~ /$prohibition_re{end}+\z/p) {
-	    if (${^PREMATCH} ne '' and vwidth(${^MATCH}) <= $runout) {
-		$folded = ${^PREMATCH};
-		$_ = ${^MATCH} . $_;
-	    }
-	}
+	$folded .= join '', @runin if @runin;
     }
 
     if (@color_stack) {
@@ -256,8 +300,8 @@ sub fold {
 	$_ = join '', @color_stack, $_ if $_ ne '';
     }
 
-    if ($padding) {
-	$folded .= $padchar x $room if $room > 0;
+    if ($padding and $room > 0) {
+	$folded .= $padchar x $room;
     }
 
     ($folded . $eol, $_, $width - $room);

@@ -24,12 +24,12 @@ WriteMakefile(
     LICENSE => 'gpl',
     PL_FILES            => {},
     PREREQ_PM => {
-	'Test::More' => 0,
-	    'version'    => 0,
-	    'File::Slurp::Tiny' => 0,
-	    'Text::Hunspell' => 2.08,
-	    'Encode' => 0,
-	    'Test::Simple' => 1.0 #base class 
+		  'Test::More' => 0,
+		  'version'    => 0,
+		  'File::Slurp::Tiny' => 0,
+		  'Text::Hunspell' => 2.08,
+		  'Encode' => 0,
+		  'Test::Simple' => 1.0 #base class 
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Test-Text-*' },

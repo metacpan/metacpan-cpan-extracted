@@ -20,18 +20,24 @@ requires:
   Bluetooth::Any: '0'
   Log::ger: '0.027'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.816'
-  Perinci::CmdLine::Classic: '1.770'
-  perl: '5.010001'
+  Perinci::CmdLine::Lite: '1.820'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BluetoothUtils
   homepage: https://metacpan.org/release/App-BluetoothUtils
   repository: git://github.com/perlancar/perl-App-BluetoothUtils.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript btoff'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript bton'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript turn-off-bluetooth'
@@ -127,7 +133,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.596'
+      version: '0.597'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -290,7 +296,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -324,11 +330,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
-      version: '0.01'
+      version: '0.020'
     -
-      class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.24'
+      class: Dist::Zilla::Plugin::Rinci::EmbedValidator
+      name: '@Author::PERLANCAR/Rinci::EmbedValidator'
+      version: '0.250'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

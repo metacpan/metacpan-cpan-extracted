@@ -16,7 +16,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our @CARP_NOT;
 
 =head1 NAME
@@ -521,9 +521,6 @@ sub _send_packet( $self, $response, $method, %params ) {
 
     my $s = $self;
     weaken $s;
-    $response = $self->future->then(sub {
-        $s->on_message( @_ );
-    });
 
     my $payload = eval {
         $self->json->encode({
@@ -543,7 +540,7 @@ sub _send_packet( $self, $response, $method, %params ) {
         # but we want to send the real reply when it comes back from the
         # real target. This is done in the listener for receivedMessageFromTarget
         $result = $self->transport->_send_packet(
-            $response,
+            undef,
             'Target.sendMessageToTarget',
             message => $payload,
             targetId => $self->targetId,
@@ -588,9 +585,7 @@ sub send_message( $self, $method, %params ) {
     # We add our response listener before we've even sent our request to
     # Chrome. This ensures that no amount of buffering etc. will make us
     # miss a reply from Chrome to a request
-    my $f;
-    $f = $self->_send_packet( $response, $method, %params );
-    $f->on_ready( sub { undef $f });
+    my $f = $self->_send_packet( $response, $method, %params )->retain;
     $response
 }
 

@@ -137,7 +137,7 @@ static void check_new_variable(pTHX_ SV* var) {
 static struct buffer_scalar_info* add_sv_magic(pTHX_ SV *var) {
 	struct buffer_scalar_info* info;
 	MAGIC* magic;
-	check_new_variable(var);
+	check_new_variable(aTHX_ var);
 	info= PerlMemShared_malloc(sizeof *info);
 	magic= sv_magicext(var, NULL, PERL_MAGIC_uvar, &buffer_scalar_vtable, (const char*) info, 0);
 #ifdef MGf_LOCAL
@@ -167,6 +167,7 @@ static struct buffer_scalar_info* get_sv_magic(pTHX_ SV* var) {
  */
 
 static SV* buffer_scalar_wrap(
+	pTHX_
 	SV *target, void *address, size_t length, int flags,
 	buffer_scalar_callback_data_t cbdata,
 	buffer_scalar_free_fn destructor
@@ -174,7 +175,7 @@ static SV* buffer_scalar_wrap(
 	struct buffer_scalar_info *info;
 	if (SvMAGICAL(target) && mg_find(target, PERL_MAGIC_uvar))
 		croak("Scalar already has scalar magic applied");
-	info= add_sv_magic(target);
+	info= add_sv_magic(aTHX_ target);
 	info->address= address;
 	info->length= length;
 	info->flags= flags;
@@ -185,14 +186,14 @@ static SV* buffer_scalar_wrap(
 	return target;
 }
 
-static SV* buffer_scalar_unwrap(SV *target) {
-	if (!get_sv_magic(target))
+static SV* buffer_scalar_unwrap(pTHX_ SV *target) {
+	if (!get_sv_magic(aTHX_ target))
 		croak("Scalar is not bound to a buffer");
 	sv_unmagic(target, PERL_MAGIC_uvar);
 	return target;
 }
 
-static int buffer_scalar_iswrapped(SV *target) {
-	return get_sv_magic(target) != NULL;
+static int buffer_scalar_iswrapped(pTHX_ SV *target) {
+	return get_sv_magic(aTHX_ target) != NULL;
 }
 

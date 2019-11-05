@@ -1,11 +1,11 @@
-# ABSTRACT:RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access
+# ABSTRACT:RESTful Web Services with login, persistent data, multiple in/out formats, IP security, role based access
 # Multiple input/output formats : JSON , XML , YAML, PERL , HUMAN
 #
 # George Bouras , george.mpouras@yandex.com
 # Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.2';
+our	$VERSION = '4.2.4';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -29,7 +29,7 @@ has reply_text		=> (is=>'rw', lazy=>1, default=> '');
 has auth_method		=> (is=>'rw', lazy=>1, default=> '');
 has auth_command	=> (is=>'rw', lazy=>1, default=> '');
 has auth_config		=> (is=>'rw', lazy=>1, default=> sub{ {} });
-has data			=> (is=>'rw', lazy=>1, default=> sub{ {} });	# posted data as hash
+has data			=> (is=>'rw', lazy=>1, default=> sub{ {} });	# user posted data
 has Session_timeout	=> (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
 has rules			=> (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '10.*', '172.16.*'] });
 has rules_compiled	=> (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
@@ -136,7 +136,7 @@ print "Module dir               : $module_dir\n";
 print "Main PID                 : $$\n\n";
 
 
-# Restore the sessions, and delete the expired
+# Restore the valid sessions, and delete the expired
 opendir __SESSIONDIR, $plg->dir_session or die "Could not list session directory $plg->{dir_session} because $!\n";
 
 	foreach my $token (grep ! /^\.+$/, readdir __SESSIONDIR) {
@@ -584,22 +584,49 @@ $plg->reply_text
 
 
 
-#	posted_data();              # hash with all      posted keys/values
-#	posted_data('k1', 'k2');    # hash with selected posted keys/values
+#  Returns a list/hash of all or the selected keys
 #
-sub posted_data :PluginKeyword
+#	           PosteData();              # all                posted keys/values
+#	my %DATA = PosteData('k1', 'k2');    # hash with selected posted keys/values
+#   my @DATA = PosteData('k1', 'k2');    # list with selected posted keys/values
+#
+sub PosteData :PluginKeyword
 {
 my $plg=shift;
 
 	if (@_) {
-	# A new hash of the selected keys k1 v1 k2 v2
-	# At newer Perl versions   %{$plg->data}{@_}
-	map { $_ , $plg->data->{$_} } @_
+
+		if ('HASH' eq ref $plg->data) {
+		my %hash;
+		@hash{@_} = 1;
+		map { $_ , $plg->data->{$_} } grep exists $hash{$_}, keys %{$plg->data}
+		}
+		elsif ('ARRAY' eq ref $plg->data) {
+		my %hash;
+		@hash{@_} = 1;
+		grep exists $hash{$_}, @{$plg->data}
+		}
+		elsif ('SCALAR' eq ref $plg->data) {
+
+			foreach (@_) {
+			return $_ if $_ eq ${$plg->data}
+			}
+		}
+		else {
+
+			foreach (@_) {
+			return $_ if $_ eq $plg->data
+			}
+		}
 	}
 	else {
-	%{$plg->data}
+		if    ('HASH'   eq ref $plg->data) { %{$plg->data} }
+		elsif ('ARRAY'  eq ref $plg->data) { @{$plg->data} }
+		elsif ('SCALAR' eq ref $plg->data) { ${$plg->data} }
+		else  { $plg->data }
 	}
 }
+
 
 
 #	Retrieves stored session data
@@ -724,11 +751,11 @@ __END__
 
 =head1 NAME
 
-Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, multiple input/output formats, IP security, role base access
+Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, multiple in/out formats, IP security, role based access
 
 =head1 VERSION
 
-version 4.2.2
+version 4.2.4
 
 =head1 SYNOPSIS
 
@@ -757,11 +784,11 @@ The replies through this module have the extra key B<error> . At success B<error
   use     Dancer2;
   use     Dancer2::Plugin::WebService;
 
-  post '/AllKeys'  => sub { reply   posted_data            };
-  post '/SomeKeys' => sub { reply   posted_data('k1','k2') };
-  get  '/data1'    => sub { reply  'k1'=>'v1', 'k2'=>'v2'  };
-  get  '/data2'    => sub { reply {'k1'=>'v1', 'k2'=>'v2'} };
-  any  '/data3'    => sub { my %H = posted_data('k1', 'k2');
+  post '/AllKeys'  => sub { reply   PosteData            };
+  post '/SomeKeys' => sub { reply   PosteData('k1','k2') };
+  get  '/data1'    => sub { reply  'k1'=>'v1','k2'=>'v2' };
+  get  '/data2'    => sub { reply {'k1'=>'v1','k2'=>'v2'}};
+  any  '/data3'    => sub { my %H = PosteData('k1', 'k2');
                       reply 'foo'=> $H{k1}, 'boo'=>$H{k2}
                       };
   get  '/error'             => sub { reply 'k1', 'v1', 'error', 'oups' };
@@ -795,21 +822,21 @@ I<from> default is the I<config.yml> property
 
 =head2 Examples
 
-  GET   SomeRoute?to=human&sort=true&pretty=true
-  GET   SomeRoute?to=perl&sort=true&pretty=false
+  GET  /SomeRoute?to=human&sort=true&pretty=true
+  GET  /SomeRoute?to=perl&sort=true&pretty=false
 
-  POST  SomeRoute?to=xml&sort=true'    posted data  {"k1":"v1"}
-  POST  SomeRoute?to=yaml'             posted data  {"k1":"v1"}
-  POST  SomeRoute?to=perl'             posted data  {"k1":"v1"}
-  POST  SomeRoute?from=json;to=human'  posted data  {"k1":"v1"}
-  POST  SomeRoute?from=xml;to=human'   posted data  <Data><k1>v1</k1></Data>
-  POST  SomeRoute?from=xml;to=yaml'    posted data  <Data><k1>v1</k1></Data>
+  POST /SomeRoute?to=xml&sort=true'       {"k1":"v1"}
+  POST /SomeRoute?to=yaml'                {"k1":"v1"}
+  POST /SomeRoute?to=perl'                {"k1":"v1"}
+  POST /SomeRoute?from=json;to=human'     {"k1":"v1"}
+  POST /SomeRoute?from=xml;to=human'      <Data><k1>v1</k1></Data>
+  POST /SomeRoute?from=xml;to=yaml'       <Data><k1>v1</k1></Data>
 
 =head1 ROUTES
 
 Your routes can be either B<public> or B<protected>
 
-B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data, but you can post and access data using the method B<posted_data>
+B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data, but you can post and access data using the method B<PosteData>
 
 B<protected> are the routes that you must provide a token, returned by the login route.
 At B<protected> routes you can  I<read>, I<write>, I<delete> persistent data using the  methods B<session_get> , B<session_set> , B<session_del>
@@ -833,10 +860,10 @@ I<public informational routes>
 
 You can use "to" format modifiers if you want
 
-  GET  WebService            The available routes
-  GET  WebService/about      About
-  GET  WebService/version    Perl, Dancer2, WebService, apllication version
-  GET  WebService/client     Your client information
+  GET /WebService            The available routes
+  GET /WebService/about      About
+  GET /WebService/version    Perl, Dancer2, WebService, apllication version
+  GET /WebService/client     Your client information
 
 =head1 LOGIN
 
@@ -844,7 +871,7 @@ I<public route>
 
 Login to get a I<token> for using I<protected> routes and storing I<persistent> data
 
-  POST login   posted data {"username":"SomeUser","password":"SomePass"}  e.g.
+  POST /login              {"username":"SomeUser","password":"SomePass"}  e.g.
   curl -X POST 0/login -d '{"username":"jonathan","password":"__1453__"}'
 
 =head1 LOGOUT
@@ -920,14 +947,20 @@ This should be the last route's statement
   reply( { k1 => 'v1', ... } ) anything you want
   reply   'k1'                 The specific key and its value of the posted data 
 
-=head2 posted_data
+=head2 PosteData
 
 I<public method>
 
 Get the data posted by the user
 
-  posted_data                  hash of all the posted data
-  posted_data('k1', 'k2');     hash of the selected posted keys and their values
+             PosteData               Everything posted
+  my %hash = PosteData('k2','k4');   Only some keys  of a hash
+  my @list = PosteData('k2','k4');   Only some items of a list
+
+The posted data can be anything; hashes, lists, scalars
+
+  curl -X POST 0:/   -d  '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
+  curl -X POST 0:/   -d  '[ "k1", "k2", "k3", "k4" ]'
 
 =head2 session_get
 

@@ -134,6 +134,7 @@ lib/Quiq/PostgreSql/Catalog.pm
 lib/Quiq/PostgreSql/CopyFormat.pm
 lib/Quiq/PostgreSql/Psql.pm
 lib/Quiq/Process.pm
+lib/Quiq/ProcessMatrix.pm
 lib/Quiq/Program.pm
 lib/Quiq/Progress.pm
 lib/Quiq/Properties.pm
@@ -319,6 +320,7 @@ t/bin/Quiq/PostgreSql/Catalog.t
 t/bin/Quiq/PostgreSql/CopyFormat.t
 t/bin/Quiq/PostgreSql/Psql.t
 t/bin/Quiq/Process.t
+t/bin/Quiq/ProcessMatrix.t
 t/bin/Quiq/Program.t
 t/bin/Quiq/Progress.t
 t/bin/Quiq/Properties.t

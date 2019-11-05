@@ -32,6 +32,8 @@ This documentation refers to git-branch-grep version 1.0.3
   -r --remote   List all remote branches
   -R --reverse  Switch the sort order
   -v            Find all branches that don't match regex
+  -f --format[=]str
+                Specify a format for the output
 
      --verbose  Show more detailed option
      --version  Prints the version information

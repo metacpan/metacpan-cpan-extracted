@@ -639,7 +639,7 @@ App::TimeTracker::Command::Core - App::TimeTracker Core commands
 
 =head1 VERSION
 
-version 3.000
+version 3.001
 
 =head1 CORE COMMANDS
 

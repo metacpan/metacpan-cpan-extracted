@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP::Proxy;
 use vars '$VERSION';
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 use parent 'Any::Daemon::HTTP::Source';
 

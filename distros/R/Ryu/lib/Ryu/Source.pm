@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 =head1 NAME
 
@@ -1880,7 +1880,7 @@ sub get {
     })->get
 }
 
-for my $k (qw(then cancel fail on_ready transform is_ready is_done failure is_cancelled else)) {
+for my $k (qw(then cancel fail on_ready transform is_ready is_done is_failed failure is_cancelled else)) {
     do { no strict 'refs'; *$k = $_ } for sub { shift->completed->$k(@_) }
 }
 

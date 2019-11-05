@@ -51,9 +51,8 @@ SKIP: {
     # Test a few remote servers
     # Hopefully they are up when the tests are run.
 
-    ping_ok( 'facebook.com',   'facebook.com'   );
-    ping_ok( 'google.ca',       'google.ca'     );
-    ping_not_ok( 'blahblah.google.ca', 'blahblah.google.ca' );
+    ping_ok( 'facebook.com', 'facebook.com' );
+    ping_ok( 'google.ca',    'google.ca' );
 }
 
 done_testing();

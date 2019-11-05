@@ -12,7 +12,7 @@ use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use AnyEvent::Future qw(as_future_cb);
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our @CARP_NOT = ();
 
 =head1 NAME
@@ -98,8 +98,12 @@ sub close( $self ) {
     delete $self->{ws_client};
 }
 
+# Maybe we should keep track of the callstacks of our ->future()s
+# and when they get lost, so we can more easily pinpoint the locations?!
 sub future {
-    AnyEvent::Future->new
+    my $f = AnyEvent::Future->new;
+    #use Carp qw(cluck); cluck "Producing new future $f";
+    return $f;
 }
 
 =head2 C<< $transport->sleep( $seconds ) >>
@@ -137,7 +141,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

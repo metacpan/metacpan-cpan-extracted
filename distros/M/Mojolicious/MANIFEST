@@ -56,6 +56,7 @@ lib/Mojo/Promise.pm
 lib/Mojo/Reactor.pm
 lib/Mojo/Reactor/EV.pm
 lib/Mojo/Reactor/Poll.pm
+lib/Mojo/resources/html_entities.txt
 lib/Mojo/Server.pm
 lib/Mojo/Server/CGI.pm
 lib/Mojo/Server/Daemon.pm
@@ -226,6 +227,7 @@ t/mojo/response.t
 t/mojo/roles.t
 t/mojo/signatures.t
 t/mojo/subprocess.t
+t/mojo/subprocess_ev.t
 t/mojo/template.t
 t/mojo/templates/exception.mt
 t/mojo/templates/test.mt

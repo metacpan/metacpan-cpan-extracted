@@ -29,6 +29,7 @@ MSWin
 McQueen
 Nemours
 PPM
+ReactOS
 SetFileTime
 Tye
 Wyant
@@ -37,6 +38,8 @@ de
 dll
 exportable
 filename
+hocery
+maintainership
 merchantability
 orthogonality's
 readonly

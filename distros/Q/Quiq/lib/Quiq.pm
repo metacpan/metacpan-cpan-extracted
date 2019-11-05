@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.161';
+our $VERSION = '1.162';
 
 =encoding utf8
 
@@ -560,6 +560,10 @@ L<Quiq::Process> - Information über den laufenden Prozess
 
 =item *
 
+L<Quiq::ProcessMatrix> - Matrix von zeitlichen Vorgängen
+
+=item *
+
 L<Quiq::Program> - Basisklasse für Programme
 
 =item *
@@ -754,7 +758,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.161
+1.162
 
 =head1 AUTHOR
 

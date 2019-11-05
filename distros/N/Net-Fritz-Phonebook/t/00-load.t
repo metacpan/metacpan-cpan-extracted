@@ -1,16 +1,15 @@
 #!perl -T
-
 use strict;
 use warnings;
 
 use Test::More tests => 1;
 
-my $module;
+require './Makefile.PL';
+my %module = get_module_info();
 
-BEGIN {
-   $module  = "Net::Fritz::Phonebook";
-   require_ok( $module );
-}
+my $module = $module{ NAME };
+
+require_ok( $module );
 
 diag( sprintf "Testing %s %s, Perl %s", $module, $module->VERSION, $] );
 

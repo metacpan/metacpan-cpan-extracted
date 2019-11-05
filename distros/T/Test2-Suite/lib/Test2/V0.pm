@@ -4,7 +4,7 @@ use warnings;
 
 use Importer;
 
-our $VERSION = '0.000126';
+our $VERSION = '0.000127';
 
 use Carp qw/croak/;
 
@@ -100,13 +100,16 @@ sub import {
 
     # SRand handling
     my $srand    = delete $options{'-srand'};
-    my $no_srand = delete $options{'-no_srand'};
+
+    my $no_srand = exists $options{'-no_srand'};
+    delete $options{'-no_srand'} if $no_srand;
 
     croak "Cannot combine '-srand' and '-no_srand' options"
         if $no_srand && defined($srand);
 
-    Test2::Plugin::SRand->import($srand ? $srand : ())
-        if $srand || !($no_srand || $SRAND++);
+    if ( !$no_srand ) {
+        Test2::Plugin::SRand->import($srand ? $srand : ()) if defined($srand) || !$SRAND++;
+    }
 
     # Pragmas
     my $no_pragmas  = delete $options{'-no_pragmas'};
@@ -159,7 +162,7 @@ tools and plugins you use directly in your metadata.
 
 =head1 SYNOPSIS
 
-    use Test2::V0
+    use Test2::V0;
 
     ok(1, "pass");
 

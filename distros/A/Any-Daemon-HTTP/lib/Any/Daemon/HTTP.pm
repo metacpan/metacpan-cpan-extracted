@@ -8,14 +8,14 @@
 
 package Any::Daemon::HTTP;
 use vars '$VERSION';
-$VERSION = '0.28';
+$VERSION = '0.29';
 
-use base 'Any::Daemon';
+
+use Log::Report      'any-daemon-http';
+use parent 'Any::Daemon';
 
 use warnings;
 use strict;
-
-use Log::Report      'any-daemon-http';
 
 use Any::Daemon::HTTP::VirtualHost ();
 use Any::Daemon::HTTP::Session     ();
@@ -23,6 +23,7 @@ use Any::Daemon::HTTP::Proxy       ();
 
 use HTTP::Daemon     ();
 use HTTP::Status     qw/:constants :is/;
+use Socket           qw/inet_aton PF_INET AF_INET/;
 use IO::Socket       qw/SOCK_STREAM SOMAXCONN SOL_SOCKET SO_LINGER/;
 use IO::Socket::IP   ();
 use IO::Select       ();
@@ -31,9 +32,9 @@ use File::Spec       ();
 use Scalar::Util     qw/blessed/;
 use Errno            qw/EADDRINUSE/;
 
-use constant
-  { PROTO_HTTP  => 80
-  , PROTO_HTTPS => 443
+use constant   # default ports
+  { PORT_HTTP  => 80
+  , PORT_HTTPS => 443
   };
 
 # To support IPv6, replace ::INET by ::IP
@@ -41,17 +42,20 @@ use constant
 
 
 sub _to_list($) { ref $_[0] eq 'ARRAY' ? @{$_[0]} : defined $_[0] ? $_[0] : () }
+
 sub init($)
 {   my ($self, $args) = @_;
     $self->SUPER::init($args);
 
+    my $listen = $args->{listen} || $args->{socket} || $args->{host};
     my (@sockets, @hosts);
-    foreach (@{$args}{qw/listen socket host/} )
-    {   foreach my $conn (ref $_ eq 'ARRAY' ? @$_ : $_)
-        {   my ($socket, @host) = $self->_create_socket($conn);
-            push @sockets, $socket if $socket;
-            push @hosts, @host;
-        }
+    foreach my $conn (_to_list $listen)
+    {   my ($socket, @host) = $self->_create_socket($conn
+          , protocol => $args->{protocol}
+          );
+
+        push @sockets, $socket if $socket;
+        push @hosts, @host;
     }
 
     @sockets or error __x"host or socket required for {pkg}::new()"
@@ -79,6 +83,7 @@ sub init($)
     $self->{ADH_server}  = $args->{server_id} || basename($0);
     $self->{ADH_headers} = $args->{standard_headers} || [];
     $self->{ADH_error}   = $args->{on_error}  || sub { $_[1] };
+    $self->{ADH_show_ps} = exists $args->{show_in_ps} ? $args->{show_in_ps} : 1;
 
     # "handlers" is probably a common typo
     my $handler = $args->{handlers} || $args->{handler};
@@ -94,24 +99,32 @@ sub init($)
     $self;
 }
 
-sub _create_socket($)
-{   my ($self, $listen) = @_;
+sub _create_socket($%)
+{   my ($self, $listen, %args) = @_;
     defined $listen or return;
 
     return ($listen, $listen->sockhost.':'.$listen->sockport)
         if blessed $listen && $listen->isa('IO::Socket');
 
-    my $port = $listen =~ s/\:([0-9]+)$// ? $1 : PROTO_HTTP;
-    my $host = $listen;
-    
+    my $port  = $listen =~ s/\:([0-9]+)$// ? $1 : PORT_HTTP;
+    my $host  = $listen;
+    my $proto = $self->{ADH_protocol}
+      = $args{protocol} || ($port==PORT_HTTPS ? 'HTTPS' : 'HTTP');
+
     my $sock_class;
-    if($port==PROTO_HTTPS)
+    if($proto eq 'HTTPS')
     {   $sock_class = 'IO::Socket::SSL';
-        eval "require IO::Socket::SSL; require HTTP::Daemon::ClientConn::SSL;"
-            or panic $@;
+        eval "require IO::Socket::SSL; require HTTP::Daemon::SSL" or panic $@;
+    }
+    elsif($proto eq 'HTTP')
+    {   $sock_class = 'IO::Socket::IP';
+    }
+    elsif($proto eq 'FCGI')
+    {   $sock_class = 'IO::Socket::IP';
+        eval "require Any::Daemon::FCGI" or panic $@;
     }
     else
-    {   $sock_class = 'IO::Socket::IP';
+    {   error __x"Unsupported protocol '{proto}'", proto => $proto;
     }
 
     # Wait max 60 seconds to get the socket
@@ -151,8 +164,9 @@ sub _create_socket($)
 
 #----------------
 
-sub sockets() {@{shift->{ADH_sockets}}}
-sub hosts()   {@{shift->{ADH_hosts}}}
+sub sockets()  { @{shift->{ADH_sockets}} }
+sub hosts()    { @{shift->{ADH_hosts}} }
+sub protocol() { shift->{ADH_protocol} }
 
 #-------------
 
@@ -231,40 +245,51 @@ sub _connection($$)
 {   my ($self, $client, $args) = @_;
 
     my $nr_req   = 0;
-    my $max_req  = $args->{max_req_per_conn} || 100;
+    my $max_req  = $args->{max_req_per_conn} ||= 100;
     my $start    = time;
-    my $deadline = $start + ($args->{max_time_per_conn} || 120);
-    my $bonus    = $args->{req_time_bonus} // 2;
+    my $deadline = $start + ($args->{max_time_per_conn} ||= 120);
+    my $bonus    = $args->{req_time_bonus} //= 2;
 
-    my $conn_class = $client->isa('IO::Socket::SSL')
-      ? 'HTTP::Daemon::ClientConn::SSL' : 'HTTP::Daemon::ClientConn';
+    my $conn;
+    if($self->protocol eq 'FCGI')
+    {   $args->{socket} = $client;
+        $conn = Any::Daemon::FCGI::ClientConn->new($args);
+    }
+    else
+    {   # Ugly hack, steal HTTP::Daemon's HTTP/1.1 implementation
+        $conn = bless $client, $client->isa('IO::Socket::SSL')
+          ? 'HTTP::Daemon::ClientConn::SSL'
+          : 'HTTP::Daemon::ClientConn';
 
-    # Ugly hack, steal HTTP::Daemon's http/1.1 implementation
-    bless $client, $conn_class;
-    ${*$client}{httpd_daemon} = $self;
+        ${*$conn}{httpd_daemon} = $self;
+    }
 
-    my $session = $self->{ADH_session_class}->new(client => $client);
-    my $peer    = $session->get('peer');
-    my $host    = $peer->{host};
-    my $ip      = $peer->{ip};
-    info __x"new client from {host} on {ip}", host => $host // '(unnamed)',
-		ip => $ip;
+    my $ip   = $client->peerhost;
+    my $host =
+      ( $client->sockdomain == PF_INET
+      ? gethostbyaddr inet_aton($ip), AF_INET
+      : undef
+      ) || $ip;
+
+    my $session = $self->{ADH_session_class}->new;
+    $session->set(peer => { ip => $ip, host => $host });
+    info __x"new client from {host} on {ip}" , host => $host, ip => $ip;
 
     my $init_conn = $args->{new_connection};
     $self->$init_conn($session);
 
     # Change title in ps-table
     my $title = $0 =~ /^(\S+)/ ? basename($1) : $0;
-    $0        = $title . ' http from '. ($host||$ip);
+    $self->psTitle("$title http from $host");
 
     $SIG{ALRM} = sub {
         notice __x"connection from {host} lasted too long, killed after {time%d} seconds"
-          , host => ($host || $ip), time => $deadline - $start;
+          , host => $host, time => $deadline - $start;
         exit 0;
     };
 
     alarm $deadline - time;
-    while(my $req  = $client->get_request)
+    while(my $req  = $conn->get_request)
     {   my $vhostn = $req->header('Host') || 'default';
 		my $vhost  = $self->virtualHost($vhostn);
 
@@ -275,7 +300,7 @@ sub _connection($$)
         my $resp;
         if($vhost)
         {   $self->{ADH_host_base}
-              = (ref($client) =~ /SSL/ ? 'https' : 'http').'://'.$vhost->name;
+              = (ref($conn) =~ /SSL/ ? 'https' : 'http').'://'.$vhost->name;
             $resp = $vhost->handleRequest($self, $session, $req);
         }
         elsif(my ($proxy, $where) = $self->findProxy($session, $req, $vhostn))
@@ -309,7 +334,7 @@ sub _connection($$)
         my $close = $nr_req++ >= $max_req;
 
         $resp->header(Connection => ($close ? 'close' : 'open'));
-        $client->send_response($resp);
+        $conn->send_response($resp);
 
         last if $close;
     }
@@ -346,9 +371,9 @@ sub run(%)
     my $max_req    = $args{max_req_per_child}  || 100_000;
     my $linger     = $args{linger};
 
-    $0 = "$title manager";  # $0 visible with 'ps' command
+    $self->psTitle("$title manager\x00\x00");
     $args{child_task} ||= sub {
-        $0 = "$title not used yet";
+        $self->psTitle("$title not used yet");
         # even with one port, we still select...
         my $select = IO::Select->new($self->sockets);
 
@@ -362,9 +387,9 @@ sub run(%)
                 $client->sockopt(SO_LINGER, (pack "II", 1, $linger))
                     if defined $linger;
 
-                $0 = "$title handling "
+                $self->psTitle("$title handling "
                    . $client->peerhost.":".$client->peerport . " at "
-                   . $client->sockhost.':'.$client->sockport;
+                   . $client->sockhost.':'.$client->sockport);
 
                 $req_count += $self->_connection($client, \%args);
                 $client->close;
@@ -373,7 +398,7 @@ sub run(%)
                     if $conn_count++ >= $max_conn
                     || $req_count    >= $max_req;
             }
-            $0 = "$title idle after $conn_count";
+            $self->psTitle("$title idle after $conn_count");
         }
         0;
     };
@@ -392,6 +417,12 @@ sub newConnection($)
 sub newChild($)
 {   my ($self, $select) = @_;
     return $self;
+}
+
+
+sub psTitle($)
+{   my ($self, $string) = @_;
+    $0 = $string if $self->{ADH_show_ps};
 }
 
 # HTTP::Daemon methods used by ::ClientConn.  We steal that parent role,

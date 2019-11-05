@@ -1,6 +1,6 @@
 package Tapper::RawSQL::TestrunDB::testruns;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::RawSQL::TestrunDB::testruns::VERSION = '5.0.9';
+$Tapper::RawSQL::TestrunDB::testruns::VERSION = '5.0.11';
 use strict;
 use warnings;
 
@@ -395,7 +395,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

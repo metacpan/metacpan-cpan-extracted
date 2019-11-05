@@ -14,9 +14,9 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::Fetch: '0'
   File::Path: '0'
-  XS::Install: v1.2.9
+  XS::Install: v1.2.11
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +27,6 @@ no_index:
     - t
     - inc
 requires:
-  XS::Install: v1.2.9
-version: v3.7.2.0
+  XS::Install: v1.2.11
+version: v3.7.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use dbedia::blob;
+
+exit main();
+
+sub main {
+    my $help;
+    my $show_meta;
+    my $do_upload;
+    my $base_uri = dbedia::blob->default_base_uri;
+    GetOptions(
+        'help|h'     => \$help,
+        'meta'       => \$show_meta,
+        'base-uri=s' => \$base_uri,
+        'upload'     => \$do_upload,
+    ) or pod2usage;
+    pod2usage if $help;
+
+    foreach my $file (@ARGV) {
+        my $blob = dbedia::blob->new(file => $file, base_uri => $base_uri);
+        say $blob->file_url;
+        say $blob->file_meta_yaml
+            if $show_meta;
+
+        $blob->upload
+            if $do_upload;
+    }
+
+    return 0;
+}
+
+__END__
+
+=head1 NAME
+
+dbedia-blob - command line interface to a blob server
+
+=head1 SYNOPSIS
+
+    dbedia-blob-file-path FILE1 FILE2 ...
+        --help
+        --meta      show also file meta information
+        --upload    upload to blobs/ on dbedia-blob scp server
+        --base-uri=http://base/x/
+                    set different than default base url
+
+=head1 DESCRIPTION
+
+Command line interface to show urls and upload to blob server.
+
+=cut

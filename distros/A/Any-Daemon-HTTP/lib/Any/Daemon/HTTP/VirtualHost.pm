@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP::VirtualHost;
 use vars '$VERSION';
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 
 use warnings;
@@ -169,22 +169,21 @@ sub findHandler(@)
 
 sub handleRequest($$$;$)
 {   my ($self, $server, $session, $req, $uri) = @_;
-
     $uri      ||= $req->uri;
+    info __x"{host} request {uri}", host => $self->name, uri => $uri->as_string;
+
     my $new_uri = $self->rewrite($uri);
+    if($new_uri ne $uri)
+    {   info __x"{vhost} rewrote {uri} into {new}", vhost => $self->name
+          , uri => $uri->as_string, new => $new_uri->as_string;
+        $uri = $new_uri;
+    }
 
     if(my $redir = $self->mustRedirect($new_uri))
     {   return $redir;
     }
 
-    if($new_uri ne $uri)
-    {   info __x"{vhost} rewrote {uri} into {new}"
-          , vhost => $self->name, uri => $uri, new => $new_uri;
-        $uri = $new_uri;
-    }
-
     my $path   = $uri->path;
-    info __x"{vhost} request {path}", vhost => $self->name, path => $uri->path;
 
     my @path   = $uri->path_segments;
     my $source = $self->sourceFor(@path);

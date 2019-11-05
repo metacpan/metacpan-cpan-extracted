@@ -97,3 +97,10 @@ spell checking, like grammar, would be great too. Check out
 the [issues](https://github.com/JJ/Test-Text/issues) and
 the [TODO file](TODO.md) for ideas, or create your own issues. 
 
+LICENSES
+---
+
+This distribution is licensed under the GPL. In includes
+`Test::Text::Sentence`, originally `Text::Sentence`
+from [`HTML::Summary`](https://metacpan.org/pod/HTML::Summary), (c) by
+NEILB, initial copyright by CRE, and licensed under the Artistic license.

@@ -94,7 +94,8 @@ sub test_native_framesize {
 	$player->media(catdir($datadir, 'NASA-solar-flares-2017-04-02.mp4'));
 	1 while $vlc->callback_dispatch;
 	ok( $player->play, 'play' );
-	for (my $i= 0; !$pic && $i < 100; $i++) {
+	my $timeout= time + 15;
+	while (time < $timeout && !$pic) {
 		sleep .01;
 		1 while $vlc->callback_dispatch;
 	}
@@ -103,9 +104,15 @@ sub test_native_framesize {
 	ok( eval { $player->queue_picture($pic); 1 }, 'push picture' );
 	is( $pic->held_by_vlc, 1, 'pic held by vlc again' );
 	$player->stop;
-	for (my $i= 0; (!$done || $player->is_playing) && $i < 100; $i++) {
-		sleep .05;
-		1 while $vlc->callback_dispatch;
+	$timeout= time + 10;
+	while (time < $timeout && (!$done || $player->is_playing)) {
+		sleep .01;
+		# player can run out of pictures if we don't re-queue them, which isn't really
+		# a problem but displays warnings on STDERR.  Re-queue pictures to prevent
+		# underrun.
+		while ($vlc->callback_dispatch) {
+			$player->queue_picture($pic) unless $pic->held_by_vlc;
+		}
 	}
 	ok( $done, 'got cleanup event' );
 	weaken($player);

@@ -1,0 +1,41 @@
+---
+abstract: 'A role for building packages with Dist::Zilla in an airplane'
+author:
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+build_requires:
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moose: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Lib: '0'
+  Test::More: '0.96'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-PluginBundle-Airplane
+provides:
+  Dist::Zilla::Role::PluginBundle::Airplane:
+    file: lib/Dist/Zilla/Role/PluginBundle/Airplane.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::Plugin::BlockRelease: '0'
+  Dist::Zilla::Util: '0'
+  Moose::Role: '0'
+  perl: '5.010'
+resources:
+  repository: git://gitlab.com/waterkip/dzil-role-pluginbundle-airplane.git
+version: '0.001'
+x_contributors:
+  - 'Wesley Schwengle <wesley@schwengle.net>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

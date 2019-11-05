@@ -10,7 +10,7 @@ use parent qw{ Astro::App::Satpass2::Geocode };
 use Astro::App::Satpass2::Utils qw{ instance @CARP_NOT };
 use List::Util ();
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 use constant GEOCODER_CLASS => 'Geo::Coder::OSM';
 
@@ -136,7 +136,7 @@ lifting.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

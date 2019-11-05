@@ -1,3 +1,7 @@
+2019-10-31  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Test/Text.pm: Latest version includes Text::Sentence (taken from HTML::Summary) to avoid installation of all dependencies in that module.
+
 2017-07-28  Juan J. merelo  <jmerelo@penny>
 
 	* lib/Test/Text.pm: Shows correctly (apparently) utf-8 encoded characters.

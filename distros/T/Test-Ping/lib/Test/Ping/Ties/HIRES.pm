@@ -1,8 +1,9 @@
+package Test::Ping::Ties::HIRES;
+$Test::Ping::Ties::HIRES::VERSION = '0.204';
 use strict;
 use warnings;
-package Test::Ping::Ties::HIRES;
 # ABSTRACT: HiRes Tie variable to Test::Ping
-$Test::Ping::Ties::HIRES::VERSION = '0.203';
+
 use Net::Ping;
 use Tie::Scalar;
 
@@ -24,7 +25,7 @@ Test::Ping::Ties::HIRES - HiRes Tie variable to Test::Ping
 
 =head1 VERSION
 
-version 0.203
+version 0.204
 
 =head1 DESCRIPTION
 
@@ -46,7 +47,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Sawyer X.
+This software is Copyright (c) 2019 by Sawyer X.
 
 This is free software, licensed under:
 

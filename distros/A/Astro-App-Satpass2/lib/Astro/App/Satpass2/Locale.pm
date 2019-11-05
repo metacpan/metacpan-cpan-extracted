@@ -14,7 +14,7 @@ use Exporter qw{ import };
 use I18N::LangTags ();
 use I18N::LangTags::Detect ();
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 our @EXPORT_OK = qw{ __localize __message __preferred };
 
@@ -418,7 +418,7 @@ L<Astro::App::Satpass2::FormatValue|Astro::App::Satpass2::FormatValue>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

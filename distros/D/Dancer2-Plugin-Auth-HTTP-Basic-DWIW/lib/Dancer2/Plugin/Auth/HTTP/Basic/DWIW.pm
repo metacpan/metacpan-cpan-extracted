@@ -3,7 +3,7 @@ use warnings;
 
 package Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 # ABSTRACT: HTTP Basic authentication plugin for Dancer2 that does what I want.
-$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.06';
+$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.07';
 use MIME::Base64;
 use Dancer2::Plugin;
 
@@ -35,6 +35,7 @@ register http_basic_auth => sub {
                     my $check_result = eval { $handler->($username, $password); };
 
                     if($@) {
+                        $dsl->error("Error while validating credentials: $@");
                         die \500;
                     }
 
@@ -106,7 +107,7 @@ Dancer2::Plugin::Auth::HTTP::Basic::DWIW - HTTP Basic authentication plugin for 
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

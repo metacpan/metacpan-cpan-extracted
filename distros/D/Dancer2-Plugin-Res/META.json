@@ -43,7 +43,7 @@
    "provides" : {
       "Dancer2::Plugin::Res" : {
          "file" : "lib/Dancer2/Plugin/Res.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "web" : "https://github.com/manwar/Dancer2-Plugin-Res"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

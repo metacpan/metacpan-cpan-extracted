@@ -6,7 +6,6 @@ use Carp 'croak';
 use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
-use Mojo::Util 'deprecated';
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
@@ -78,13 +77,6 @@ sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
 
 sub size { scalar @{$_[0]} }
 
-# DEPRECATED!
-sub slice {
-  deprecated 'Mojo::Collection::slice is DEPRECATED';
-  my $self = shift;
-  return $self->new(@$self[@_]);
-}
-
 sub sort {
   my ($self, $cb) = @_;
 
@@ -114,7 +106,7 @@ sub uniq {
   my ($self, $cb) = (shift, shift);
   my %seen;
   return $self->new(grep { !$seen{$_->$cb(@_) // ''}++ } @$self) if $cb;
-  return $self->new(grep { !$seen{$_          // ''}++ } @$self);
+  return $self->new(grep { !$seen{$_ // ''}++ } @$self);
 }
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }

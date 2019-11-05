@@ -1,3 +1,13 @@
+Version 0.05 - 2019-11-05
+  - Fixed several mistakes in logging callback API and implementation,
+    and more documentation fixes.
+
+Version 0.04 - 2019-11-05
+  - Fixed compatibility with threaded perl
+  - Improved some race conditions in test cases that failed occasionally
+  - Documented a list of packages needed for Ubuntu 19
+  - Improved documentation in example videoplayer.pl
+
 Version 0.03 - 2019-09-01
   - More big documentation fixes
 

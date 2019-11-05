@@ -11,7 +11,7 @@ our @ISA = qw{ Exporter };
 use Astro::App::Satpass2::Utils qw{ load_package };
 use Test::More 0.88;
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 our @EXPORT_OK = qw{ setup geocode };
 our @EXPORT = @EXPORT_OK;
@@ -155,7 +155,7 @@ second argument (number of tests to skip) is C<1>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

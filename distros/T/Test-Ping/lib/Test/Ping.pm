@@ -1,8 +1,9 @@
+package Test::Ping;
+$Test::Ping::VERSION = '0.204';
 use strict;
 use warnings;
-package Test::Ping;
 # ABSTRACT: Testing pings using Net::Ping
-$Test::Ping::VERSION = '0.203';
+
 use Test::Ping::Ties::BIND;
 use Test::Ping::Ties::PORT;
 use Test::Ping::Ties::PROTO;
@@ -31,11 +32,12 @@ our $SOURCE_VERIFY;
 our $SERVICE_CHECK;
 
 BEGIN {
-    use base 'Test::Builder::Module';
+    use parent 'Test::Builder::Module';
     use Net::Ping;
 
     __PACKAGE__->builder->{'_net-ping_object'} = Net::Ping->new($PROTO);
 
+    ## no critic qw(Miscellanea::ProhibitTies)
     tie $PORT,          'Test::Ping::Ties::PORT';
     tie $BIND,          'Test::Ping::Ties::BIND';
     tie $PROTO,         'Test::Ping::Ties::PROTO';
@@ -88,14 +90,14 @@ sub create_ping_object_not_ok {
     $tb->ok( $error, $name );
 }
 
-sub _has_var_ok {
+sub _has_var_ok { ## no critic qw( Subroutines::ProhibitUnusedPrivateSubroutines )
     my ( $var_name, $var_value, $name ) = @_;
     my $tb = $CLASS->builder;
-    $tb->is_eq( $OBJPATH->{$var_name}, $var_value, $name ); ## no critic
+    $tb->is_eq( $OBJPATH->{$var_name}, $var_value, $name );
     return 1;
 }
 
-sub _ping_object {
+sub _ping_object { ## no critic qw( Subroutines::ProhibitUnusedPrivateSubroutines Subroutines::RequireArgUnpacking )
     my $obj = $_[1] || $_[0] || q{};
 
     if ( ref $obj eq 'Net::Ping' ) {
@@ -121,7 +123,7 @@ Test::Ping - Testing pings using Net::Ping
 
 =head1 VERSION
 
-version 0.203
+version 0.204
 
 =head1 SYNOPSIS
 
@@ -295,7 +297,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Sawyer X.
+This software is Copyright (c) 2019 by Sawyer X.
 
 This is free software, licensed under:
 

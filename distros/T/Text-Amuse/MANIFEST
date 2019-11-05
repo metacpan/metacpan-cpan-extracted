@@ -312,5 +312,6 @@ t/tocs-with-fn.t
 t/tocs.t
 t/unroll.t
 t/verbatim.t
+t/warnings.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

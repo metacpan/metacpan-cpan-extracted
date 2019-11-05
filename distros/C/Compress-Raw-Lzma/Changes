@@ -1,6 +1,15 @@
 CHANGES
 -------
 
+  2.089 3 November 2019
+
+      * No Changes
+  
+  2.088 31 October 2019
+
+      * Add SUPPPORT section
+        11a43c1b8053a0502d7a89bcfeb62f8fe5da7f14
+
   2.086 31 March 2019
 
       * Moved source to github https://github.com/pmqs/Compress-Raw-Lzma

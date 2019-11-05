@@ -211,7 +211,7 @@ The real name of this field.
 
 The array of Abstract Syntax Tree (AST) nodes that refer to this field
 in this "selection set" (set of fields) on this object. There may be
-more than one such set for a given field, if it is requested with more
+more than one such set for a given field, if it is requested more
 than once with a given name (not with an alias) - the results will
 be combined into one reply.
 
@@ -334,9 +334,19 @@ declare "DocumentLocation",
     column => Int,
   ];
 
+=head2 JSONable
+
+A value that will be JSON-able.
+
+=cut
+
+declare "JSONable",
+  as Any,
+    where { $JSON->encode($_); 1 };
+
 =head2 ErrorResult
 
-Hash-ref that has keys C<message>, C<location>, C<path>.
+Hash-ref that has keys C<message>, C<location>, C<path>, C<extensions>.
 
 =cut
 
@@ -345,6 +355,7 @@ declare "ErrorResult",
     message => Str,
     path => Optional[ArrayRef[Str]],
     locations => Optional[ArrayRef[DocumentLocation]],
+    extensions => Optional[HashRef[JSONable]],
   ];
 
 =head2 ExecutionResult
@@ -358,10 +369,6 @@ values are either further hashes, array-refs, or scalars. It will be
 JSON-able.
 
 =cut
-
-declare "JSONable",
-  as Any,
-  where { $JSON->encode($_); 1 };
 
 declare "ExecutionResult",
   as Dict[

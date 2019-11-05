@@ -108,6 +108,7 @@ my %WriteMakefileArgs = (
     "lib/Test/Alien/Build.pm"                            => "\$(INST_LIB)/Test/Alien/Build.pm",
     "lib/Test/Alien/CanCompile.pm"                       => "\$(INST_LIB)/Test/Alien/CanCompile.pm",
     "lib/Test/Alien/CanPlatypus.pm"                      => "\$(INST_LIB)/Test/Alien/CanPlatypus.pm",
+    "lib/Test/Alien/Diag.pm"                             => "\$(INST_LIB)/Test/Alien/Diag.pm",
     "lib/Test/Alien/Run.pm"                              => "\$(INST_LIB)/Test/Alien/Run.pm",
     "lib/Test/Alien/Synthetic.pm"                        => "\$(INST_LIB)/Test/Alien/Synthetic.pm",
     "lib/alienfile.pm"                                   => "\$(INST_LIB)/alienfile.pm"
@@ -124,16 +125,17 @@ my %WriteMakefileArgs = (
     "List::Util"          => "1.33",
     "Module::Load"        => 0,
     "Path::Tiny"          => "0.077",
-    "Test2::API"          => "1.302015",
+    "Test2::API"          => "1.302096",
     "Text::ParseWords"    => "3.26"
   },
   "TEST_REQUIRES" => {
+    "Test2::API"             => "1.302096",
     "Test2::Mock"            => "0.000060",
     "Test2::Require"         => "0.000060",
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.89",
+  "VERSION" => "1.92",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -151,7 +153,7 @@ my %FallbackPrereqs = (
   "List::Util"             => "1.33",
   "Module::Load"           => 0,
   "Path::Tiny"             => "0.077",
-  "Test2::API"             => "1.302015",
+  "Test2::API"             => "1.302096",
   "Test2::Mock"            => "0.000060",
   "Test2::Require"         => "0.000060",
   "Test2::Require::Module" => "0.000060",

@@ -51,7 +51,6 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
-            "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0"
          }
@@ -69,7 +68,7 @@
             "List::Util" : "1.33",
             "Module::Load" : "0",
             "Path::Tiny" : "0.077",
-            "Test2::API" : "1.302015",
+            "Test2::API" : "1.302096",
             "Text::ParseWords" : "3.26",
             "perl" : "5.008001"
          },
@@ -80,6 +79,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::API" : "1.302096",
             "Test2::Mock" : "0.000060",
             "Test2::Require" : "0.000060",
             "Test2::Require::Module" : "0.000060",
@@ -104,7 +104,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.89",
+   "version" : "1.92",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -134,8 +134,8 @@
       "Shawn Laffan (SLAFFAN)",
       "Paul Evans (leonerd, PEVANS)"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0
 }
 

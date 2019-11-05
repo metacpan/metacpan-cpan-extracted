@@ -27,11 +27,11 @@ Business::OnlinePayment::IPayment - Checkout via Ipayment Silent Mode
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,7 @@ constructor, as they are pretty much fixed values.
 
 =item wsdl_file
 
-The name of th WSDL file. It should be a local file.
+The name of the WSDL file. It should be a local file.
 
 =cut
 

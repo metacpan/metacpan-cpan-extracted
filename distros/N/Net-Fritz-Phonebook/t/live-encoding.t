@@ -85,7 +85,6 @@ $contact->add_number($number);
                       } @{ $phonebook->entries };
 if( ! is $existing, undef, "Our contact does not yet exist" ) {
     diag "Contact already/still exists as", $existing->uniqueid;
-    use Data::Dumper;
     diag Dumper( $existing->name );
     diag Dumper $existing->numbers;
 };
@@ -102,9 +101,6 @@ $error ||= $res->error;
 is $error, '', "We can add an entry with an umlaut";
 
 {
-# These two tests don't pass currently. It seems that entires added via TR-064
-# get double-encoded on the Fritz!Box :-/
-local $TODO = "Fritz!Box umlaut/UTF-8 handling for TR-064 contacts is wonky";
 
 $phonebook->reload;
 ($existing) = grep { my $c = $_;

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.83
+    Version 0.84
 
 SYNOPSIS
 
@@ -18,7 +18,7 @@ SYNOPSIS
     
         $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
     
-        my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ]);
+        my $file_handle = $firefox->selfie();
     
         $firefox->find('//button[@name="lucky"]')->click();
     
@@ -924,7 +924,9 @@ SUBROUTINES/METHODS
       * scroll - scroll to the element supplied
 
       * highlights - a reference to a list containing elements to draw a
-      highlight around
+      highlight around. Not available in Firefox 70
+      <https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/70#WebDriver_conformance_Marionette>
+      onwards.
 
  send_alert_text
 

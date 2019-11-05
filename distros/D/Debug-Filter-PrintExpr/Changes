@@ -1,7 +1,49 @@
 Revision history for Debug-Filter-PrintExpr
+0.11	Mon Nov 4 23:11:49 2019 +0100
+		[fix]
+		added dependency to Exporter::Tiny
+
+0.10	Mon Nov 4 21:18:18 2019 +0100
+		[feature]
+		moved from Exporter to Exporter::Tiny
+
+		new option "nofilter"
+
+		new import tag ":all"
+
+0.09	Sun Nov 3 23:08:21 2019 +0100
+		[fix]
+		updated MANIFEST
+
+0.08	Sun Nov 3 18:24:21 2019 +0100
+		[feature]
+		change "debug" to "-debug" and remove Exporter hack
+
+0.07	Sat Nov 2 19:07:37 2019 +0100
+		[feature]
+		make isstring and isnumeric exportable
+
+0.06	Fri Nov 1 21:34:51 2019 +0100
+		[fix]
+		treat undefined values
+
+		[feature]
+		remove exports as they conflict with debug
+
+		restore old -debug argument to "use"
+		
+0.05	Wed Oct 30 21:27:44 2019 +0100
+		[feature]
+		new XS functions to differenciate between numeric and string value
+
+		debug no longer via use statement
+
+		isstring() and isnumeric() available for import into caller
+
 0.04	Sun Oct 27 21:36:21 2019 +0100
 		[pod]
 		jekyll fails on '{%' in a code block, so avoid this in POD
+
 		fix example code for given output
 		
 		[fix]
@@ -9,6 +51,7 @@ Revision history for Debug-Filter-PrintExpr
 
 		[feature]
 		differentiate between string, numeric and dual valued scalars
+
 		add contexts for string and numeric evaluation of scalars
 
 0.03	Fri Oct 18 19:18:51 2019 +0200

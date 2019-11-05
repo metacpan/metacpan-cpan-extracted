@@ -1,5 +1,13 @@
 Revision history for Database-Async
 
+0.010     2019-11-06 00:14:42+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Dependencies:
+
+    - Latest version of Ryu, Future::AsyncAwait and Syntax::Keyword::Try to
+    pick up some recent bugfixes.
+
 0.009     2019-06-30 01:48:28+08:00 Asia/Kuala_Lumpur
     New features:
 

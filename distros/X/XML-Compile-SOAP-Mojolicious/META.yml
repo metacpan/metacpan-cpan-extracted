@@ -1,26 +1,31 @@
 ---
 abstract: 'SOAP with Mojolicious'
 author:
-  - 'Heiko Jansen/Mark Overmeer'
+  - 'Mark Overmeer <markov@overmeer.net>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-Compile-SOAP-Mojolicious
 no_index:
   directory:
     - t
     - inc
 requires:
-  HTTP::Message: 6.06
-  Log::Report: 1.05
-  Mojolicious: 6.00
-  Time::HiRes: 0
-  XML::Compile::SOAP: 3.16
-version: 0.02
+  HTTP::Message: '6.06'
+  Log::Report: '1.05'
+  Mojolicious: '6.00'
+  Time::HiRes: '0'
+  XML::Compile::SOAP: '3.16'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

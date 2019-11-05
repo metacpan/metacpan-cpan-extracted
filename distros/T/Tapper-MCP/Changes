@@ -1,5 +1,8 @@
 Revision history for Tapper-MCP
 
+5.0.8     2019-11-04
+        - adapt to reworked Minion signal handling
+
 5.0.7     2018-09-19
         - less aggressive name simplification of uploaded files
         - support for test type 'minion' which enqueues the testrun

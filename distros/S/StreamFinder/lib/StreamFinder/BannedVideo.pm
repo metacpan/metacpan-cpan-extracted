@@ -360,7 +360,7 @@ sub new
 	if (!defined($okStreams[0]) && defined($uops{'keep'})) {
 		@okStreams = (ref($uops{'keep'}) =~ /ARRAY/) ? @{$uops{'keep'}} : split(/\,\s*/, $uops{'keep'});
 	}
-	@okStreams = (qw(m4a direct stream))  unless (defined $okStreams[0]);  # one of:  {m4a, <ext>, direct, stream, any, all}
+	@okStreams = (qw(m4a direct stream any))  unless (defined $okStreams[0]);  # one of:  {m4a, <ext>, direct, stream, any, all}
 
 	print STDERR "-0(BannedVideo): URL=$url=\n"  if ($DEBUG);
 
@@ -398,22 +398,49 @@ sub new
 	my $stindex = 0;
 	my @streams = ();
 	foreach my $streamtype (@okStreams) {
-		while ($html =~ s/\"(?:direct|stream)Url\"\s*\:\s*\"([^\"]+?\.${streamtype}\b[^\"]*)\"//is) {
+		while ($html =~ s/\"(?:embed|direct|stream)Url\"\s*\:\s*\"([^\"]+?\.${streamtype}\b[^\"]*)\"//is) {
 			$streams[$stindex++] = $1;
 		}
-		if ($streamtype =~ /^(direct|stream)$/i) {
+		if ($streamtype =~ /^(embed|direct|stream)$/i) {
 			my $one = $1;
 			while ($html =~ s/\"${one}Url\"\s*\:\s*\"([^\"]+)\"//is) {
 				$streams[$stindex++] = $1;
 			}
 		} elsif ($streamtype =~ /^a(?:ny|ll)$/i) {
-			while ($html =~ s/\"(?:direct|stream)Url\"\s*\:\s*\"([^\"]+)\"//is) {
+			while ($html =~ s/\"(?:embed|direct|stream)Url\"\s*\:\s*\"([^\"]+)\"//is) {
 				$streams[$stindex++] = $1;
 			}
 		}
 	}
 	print STDERR "-2: 1=$streams[0]= 2=$streams[1]\n"  if ($DEBUG);
 	return undef  unless ($#streams >= 0);
+
+	#HACK B/C THEY COMPLICATED UP THEIR SITE (FETCH STREAM FROM FIRST infowarsmedia.com URL FOUND
+	#AND ADD IT TO THE TOP)! :/
+	for (my $i=0;$i<=$#streams;$i++) {
+		if ($streams[$i] =~ m#api\.infowarsmedia\.com/embed#o) {
+			my $html = '';
+			print STDERR "---STEP 2: INFOWARSMEDIA.COM STREAM ($streams[$i])\n"  if ($DEBUG);
+			$url2fetch = $streams[$i];
+			my $response = $ua->get($url2fetch);
+			if ($response->is_success) {
+				$html = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line  if ($DEBUG);
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+				}
+			}
+			print STDERR "-STEP 2: html=$html=\n"  if ($DEBUG > 1);
+			if ($html =~ m#\bdownloadUrl\=\"([^\"]+)\"#) {
+				print STDERR "-3: WILL USE ($1) AS BEST STREAM.\n"  if ($DEBUG);
+				unshift @streams, $1;
+				last;
+			}
+		}
+	}
 
 	$self->{'cnt'} = scalar @streams;
 	$html =~ s/\\\"/\&quot\;/gs;
@@ -425,6 +452,8 @@ sub new
 	$self->{'description'} = uri_unescape($self->{'description'});
 	$self->{'iconurl'} = ($html =~ /\"(?:poster)?ThumbnailUrl\"\s*\:\s*\"([^\"]+)\"/is) ? $1 : '';
 	$self->{'imageurl'} = ($html =~ /\"posterLargeUrl\"\s*\:\s*\"([^\"]+)\"/is) ? $1 : '';
+	$self->{'imageurl'} = $1  if ($html =~ /\"largeImage\"\s*\:\s*\"([^\"]+)\"/is) ? $1 : '';
+	$self->{'iconurl'} ||= $self->{'imageurl'};
 	$self->{'imageurl'} ||= $self->{'iconurl'};
 	$self->{'created'} = $1  if ($html =~ /\"createdAt\"\s*\:\s*\"([^\"]+)\"/is);
 	$self->{'updated'} = $1  if ($html =~ /\"updatedAt\"\s*\:\s*\"([^\"]+)\"/is);

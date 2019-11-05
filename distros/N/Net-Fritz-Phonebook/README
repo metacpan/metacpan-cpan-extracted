@@ -1,5 +1,3 @@
-NAME
-
 Net::Fritz::Phonebook - manage the Fritz!Box phonebook from Perl
 
 
@@ -13,7 +11,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -32,11 +30,18 @@ SUPPORT
 The public support forum of this module is
 L<https://perlmonks.org/>.
 
+
+
 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Fritz-Phonebook>
 or via mail to L<net-fritz-phonebook-Bugs@rt.cpan.org>.
+
+
+SEE ALSO
+
+L<https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/X_contactSCPD.pdf>
 
 AUTHOR
 

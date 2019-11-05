@@ -9,7 +9,7 @@ use Carp;
 
 use constant HASH_REF	=> ref {};
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 our $MOCK_FILE_HOMEDIR_MY_DIST_CONFIG;
 our $MOCK_FILE_HOMEDIR_MY_HOME;
@@ -115,7 +115,7 @@ The real L<File::HomeDir|File::HomeDir>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

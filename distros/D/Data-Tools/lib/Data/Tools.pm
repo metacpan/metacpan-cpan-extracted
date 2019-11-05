@@ -12,14 +12,16 @@ package Data::Tools;
 use strict;
 use Exporter;
 use Carp;
+use Storable;
 use Digest;
 use Digest::Whirlpool;
 use Digest::MD5;
 use Digest::SHA1;
+use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -69,6 +71,8 @@ our @EXPORT = qw(
               hash_lock_recursive
               hash_unlock_recursive
               hash_keys_lock_recursive
+              
+              list_uniq
 
               str_escape 
               str_unescape 
@@ -97,6 +101,9 @@ our @EXPORT = qw(
               
               glob_tree
               read_dir_entries
+              
+              ref_freeze
+              ref_thaw
 
             );
 
@@ -726,6 +733,14 @@ sub hash_keys_lock_recursive
 
 ##############################################################################
 
+sub list_uniq 
+{
+  my %z;
+  return grep ! $z{ $_ }++, @_;
+}
+
+##############################################################################
+
 sub perl_package_to_file
 {
   my $s = shift;
@@ -822,6 +837,26 @@ sub read_dir_entries
   
   return @e;
 }
+
+##############################################################################
+
+sub ref_freeze
+{
+  my $ref = shift;
+
+  die "error: ref_freeze(): requires data reference!\n" unless ref( $ref );
+
+  my $fzd = encode_base64( Storable::nfreeze( $ref ) );                                                     
+};                                                                                                                              
+                                                                                                                                
+sub ref_thaw
+{
+  my $fzd = shift;
+
+  my ( $ref ) = Storable::thaw( decode_base64( $fzd ) );                                                      
+                                                                                                                                
+  return ref( $ref ) ? $ref : undef;                                                                                            
+};                                                                                                                              
 
 ##############################################################################
 

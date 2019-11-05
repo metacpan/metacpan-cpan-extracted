@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Me;
-$DBIx::Class::Helper::ResultSet::Me::VERSION = '2.034000';
+$DBIx::Class::Helper::ResultSet::Me::VERSION = '2.034001';
 # ABSTRACT: Define predefined searches more nicely
 
 use strict;

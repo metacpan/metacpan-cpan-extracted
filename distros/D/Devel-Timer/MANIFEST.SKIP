@@ -42,7 +42,7 @@ MYMETA\.(?:yml|json)$
 \B\._
 # Avoid archives of this distribution
 \bDeel-Timer-[\d\.\_]+
-timer.log
+\btimer.log$
 
 nytprof.out
 

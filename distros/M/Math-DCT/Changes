@@ -1,5 +1,8 @@
 Revision history for Math-DCT
 
+0.03    2019-11-01
+        30% faster function for 1x8 & 8x8 matrices.
+
 0.02    2019-10-30
         Added Test2::V0 requirements for CPAN testers.
 

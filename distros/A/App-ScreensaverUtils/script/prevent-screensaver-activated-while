@@ -5,7 +5,7 @@
 
 our $DATE = '2019-09-15'; # DATE
 our $DIST = 'App-ScreensaverUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ prevent-screensaver-activated-while - Prevent screensaver activated while runnin
 
 =head1 VERSION
 
-This document describes version 0.008 of prevent-screensaver-activated-while (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
+This document describes version 0.009 of prevent-screensaver-activated-while (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 =head1 SYNOPSIS
 

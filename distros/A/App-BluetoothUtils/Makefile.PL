@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
@@ -15,20 +15,20 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-BluetoothUtils",
   "EXE_FILES" => [
     "script/bluetooth-is-on",
+    "script/btoff",
+    "script/bton",
     "script/turn-bluetooth-off",
     "script/turn-bluetooth-on",
     "script/turn-off-bluetooth",
     "script/turn-on-bluetooth"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::BluetoothUtils",
   "PREREQ_PM" => {
     "Bluetooth::Any" => 0,
     "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.816",
-    "Perinci::CmdLine::Classic" => "1.770"
+    "Perinci::CmdLine::Lite" => "1.820"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,8 +50,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.816",
-  "Perinci::CmdLine::Classic" => "1.770",
+  "Perinci::CmdLine::Lite" => "1.820",
   "Test::More" => 0
 );
 

@@ -4,7 +4,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -19,11 +19,9 @@ our @loops = (
     ['AnyEvent.pm'      => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
     ['AE.pm'            => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
     # native POE support would be nice
-
-    # The fallback, will always catch due to loading strict (for now)
-    ['strict.pm'      => 'Chrome::DevToolsProtocol::Transport::AnyEvent'],
 );
 our $implementation;
+our $default = 'Chrome::DevToolsProtocol::Transport::AnyEvent';
 
 =head1 METHODS
 
@@ -61,12 +59,19 @@ sub best_implementation( $class, @candidates ) {
         $INC{$_->[0]}
     } @candidates;
 
+    if( ! @applicable_implementations ) {
+        @applicable_implementations = map {$_->[1]} @candidates;
+    }
+
     # Check which one we can load:
     for my $impl (@applicable_implementations) {
         if( eval "require $impl; 1" ) {
             return $impl;
         };
     };
+
+    # This will crash and burn, but that's how it is
+    return $default;
 };
 
 1;
@@ -116,7 +121,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

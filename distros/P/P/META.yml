@@ -28,5 +28,5 @@ requires:
   Types::Core: v0.1.8
   Xporter: v0.1.2
   mem: v0.4.5
-version: v1.1.40
+version: v1.1.41
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

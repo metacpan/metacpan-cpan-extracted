@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::ReportgroupTestrunStats;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::ReportgroupTestrunStats::VERSION = '5.0.9';
+$Tapper::Schema::TestrunDB::Result::ReportgroupTestrunStats::VERSION = '5.0.11';
 # ABSTRACT: Tapper - Containing additional aggregated data to testruns
 
 use 5.010;
@@ -93,7 +93,7 @@ sub _success_ratio
 {
         my ($self) = @_;
 
-        my $ratio = sprintf("%02.2f", $self->total ? ($self->passed / $self->total * 100) : 100 );
+        my $ratio = sprintf("%02.2f", $self->total ? ($self->passed / ($self->total + $self->parse_errors) * 100) : 100 );
         return $ratio;
 }
 
@@ -177,7 +177,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

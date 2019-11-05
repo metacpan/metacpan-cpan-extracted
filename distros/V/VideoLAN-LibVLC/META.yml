@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::Depends: '0.405'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,6 +35,6 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-VideoLAN-LibVLC/issues
   repository: https://github.com/nrdvana/perl-VideoLAN-LibVLC.git
-version: '0.03'
-x_generated_by_perl: v5.26.3
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.05'
+x_generated_by_perl: v5.20.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

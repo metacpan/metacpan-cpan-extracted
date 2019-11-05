@@ -1,10 +1,10 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use 5.010;
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile::SOAP::Mojolicious'
- , VERSION	=> '0.02'
+ , VERSION	=> '0.04'
  , PREREQ_PM    =>
    { XML::Compile::SOAP   => '3.16'
    , Log::Report          => '1.05'
@@ -12,25 +12,36 @@ WriteMakefile
    , HTTP::Message        => '6.06'
    , Mojolicious          => '6.00'
    }
- , AUTHOR       => 'Heiko Jansen/Mark Overmeer'
+ , AUTHOR       => 'Mark Overmeer <markov@overmeer.net>'
  , ABSTRACT     => 'SOAP with Mojolicious'
- , LICENSE      => 'perl'
+ , LICENSE      => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious.git'
+              , web  => 'https://github.com/markov2/perl5-XML-Compile-SOAP-Mojolicious'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
  );
 
 ### used by oodist during production of distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
-EXTENDS		= ../XMLCompile:../XMLDaemon:../XMLTester:../XMLCache:../XMLSOAP12:../XMLSOAP
+EXTENDS		= ../XML-Compile:../XML-Compile-SOAP-Daemon:../XML-Compile-Tester:../XML-Compile-Cache:../XML-Compile-SOAP12:../XML-Compile-SOAP
 
 # for DIST
 RAWDIR          = ../public_html/xml-compile-soap-mojolicious/raw
 DISTDIR         = ../public_html/xml-compile-soap-mojolicious/source
-LICENSE         = artistic
-SKIP_LINKS	= XML::LibXML
+SKIP_LINKS      = XML::LibXML
 
 # for POD
 FIRST_YEAR      = 2016
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL		= ../XML-shared-podtail
 __POSTAMBLE

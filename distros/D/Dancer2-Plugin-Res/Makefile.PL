@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Dancer2::Plugin::Res' => { file => 'lib/Dancer2/Plugin/Res.pm', version => '0.09' },
+            'Dancer2::Plugin::Res' => { file => 'lib/Dancer2/Plugin/Res.pm', version => '0.10' },
         },
         resources => {
             repository => {

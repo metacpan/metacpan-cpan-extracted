@@ -11,6 +11,10 @@ Files: Changes
  lib/Web/Solid/Test/Basic.pm
  lib/Web/Solid/Test/HTTPLists.pm
  t/01basic.t
+ t/integration-stateful.t
+ t/integration-stateless.t
+ t/lib/MockServer.pm
+ t/lib/MockSolid.pm
  t/unit-get-token-network.t
  t/unit-get-token.t
 Copyright: Copyright 2019 Kjetil Kjernsmo.
@@ -22,6 +26,8 @@ Files: Dockerfile
  README
  README.md
  t/data/alice-token
+ t/data/http-basic.ttl
+ t/data/http-put-check-acl.ttl
 Copyright: Unknown
 License: Unknown
 

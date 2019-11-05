@@ -24,11 +24,28 @@ Femøren
 Kastrup
 Lufthavnen
 
+København H
+Rådhuspladsen
+Gammel Strand
+Marmorkirken
+Østerport
+Trianglen
+Poul Henningsens Plads
+Vibenshus Runddel
+Skjolds Plads
+Nørrebro
+Nørrebros Runddel
+Nuuks Plads
+Aksel Møllers Have
+Frederiksberg Allé
+Enghave Plads
+
 --transfers
 
 --lines
 M1|M1|M1|color:#397c5d,width:8
 M2|M2|M2|color:#e8c929,width:8
+M3|M3|M3|color:#ff3333,width:8
 
 --segments
 M1,M2|Vanløse|Flintholm
@@ -54,3 +71,21 @@ M2|Øresund|Amager Strand
 M2|Amager Strand|Femøren
 M2|Femøren|Kastrup
 M2|Kastrup|Lufthavnen
+
+M3|København H|Rådhuspladsen
+M3|Rådhuspladsen|Gammel Strand
+M3|Gammel Strand|Kongens Nytorv
+M3|Kongens Nytorv|Marmorkirken
+M3|Marmorkirken|Østerport
+M3|Østerport|Trianglen
+M3|Trianglen|Poul Henningsens Plads
+M3|Poul Henningsens Plads|Vibenshus Runddel
+M3|Vibenshus Runddel|Skjolds Plads
+M3|Skjolds Plads|Nørrebro
+M3|Nørrebro|Nørrebros Runddel
+M3|Nørrebros Runddel|Nuuks Plads
+M3|Nuuks Plads|Aksel Møllers Have
+M3|Aksel Møllers Have|Frederiksberg
+M3|Frederiksberg|Frederiksberg Allé
+M3|Frederiksberg Allé|Enghave Plads
+M3|Enghave Plads|København H

@@ -12,14 +12,19 @@
 <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
-	doap-deps:develop-recommendation [
-		doap-deps:on "Plack::Middleware::CrossOrigin"^^doap-deps:CpanId;
-	], [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ], [ doap-deps:on "Web::Simple"^^doap-deps:CpanId ], [ doap-deps:on "Plack"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Deep"^^doap-deps:CpanId ], [ doap-deps:on "Test::RDF"^^doap-deps:CpanId ], [
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "Test::Deep"^^doap-deps:CpanId ], [ doap-deps:on "Test::RDF"^^doap-deps:CpanId ], [
 		doap-deps:on "Test::FITesque::RDF 0.014"^^doap-deps:CpanId;
 	], [ doap-deps:on "FindBin"^^doap-deps:CpanId ], [
-		doap-deps:on "LWP::UserAgent::https"^^doap-deps:CpanId;
-	], [ doap-deps:on "IO::Socket::SSL"^^doap-deps:CpanId ];
+		doap-deps:on "LWP::Protocol::https"^^doap-deps:CpanId;
+	], [ doap-deps:on "IO::Socket::SSL"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::FITesque::Fixture"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Net::EmptyPort"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [
+		doap-deps:on "HTTP::Server::Simple::PSGI"^^doap-deps:CpanId;
+	], [ doap-deps:on "Web::Simple"^^doap-deps:CpanId ], [ doap-deps:on "Plack"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ], [
+		doap-deps:on "Plack::Middleware::CrossOrigin"^^doap-deps:CpanId;
+	];
 	doap:bug-database    <https://github.com/kjetilk/p5-web-solid-test-basic/issues>;
 	doap:created         "2019-04-24"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
@@ -29,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Web-Solid-Test-Basic";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-web-solid-test-basic>;
@@ -54,6 +59,15 @@
 	dc:issued            "2019-08-27"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Regexp-based stateful requests.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "More documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "List requests can be optionally authenticated, change script name.";
+		], [
 			a doap-changeset:Change;
 			rdfs:label "Small fixes.";
 		], [
@@ -65,15 +79,6 @@
 		], [
 			a doap-changeset:Addition;
 			rdfs:label "Author tests again mockup server.";
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Regexp-based stateful requests.";
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "More documentation.";
-		], [
-			a doap-changeset:Change;
-			rdfs:label "List requests can be optionally authenticated, change script name.";
 		];
 		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>;
 	];
@@ -100,6 +105,26 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Web-Solid-Test-Basic-0.004.tar.gz>;
 	doap:revision        "0.004"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>
+	a                    doap:Version;
+	rdfs:label           "Make integration tests fully automated";
+	dc:identifier        "Web-Solid-Test-Basic-0.006"^^xsd:string;
+	dc:issued            "2019-11-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:bugfix;
+			rdfs:label "Fix prerequires.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/manwar>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Move HTTP integration tests from author tests to normal tests, and make them fully automated.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Web-Solid-Test-Basic-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
@@ -109,6 +134,12 @@
 	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-web-solid-test-basic&serialization=PROV-O#user-Kjetil_Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
 	wot:hasKey           _:B1.
+
+<http://purl.org/NET/cpan-uri/person/manwar>
+	a                    foaf:Person;
+	foaf:name            "Mohammad S Anwar";
+	foaf:nick            "MANWAR", "manwar";
+	foaf:page            <https://metacpan.org/author/MANWAR>.
 
 <http://www.kjetil.kjernsmo.net/foaf#me>
 	a                    foaf:Person;

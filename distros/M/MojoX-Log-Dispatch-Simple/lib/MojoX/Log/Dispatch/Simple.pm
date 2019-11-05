@@ -8,13 +8,15 @@ use warnings;
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
 has max_history_size => 10;
 has dispatch         => undef;
 has format_cb        => undef;
+has parent           => undef;
+has context          => undef;
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -74,6 +76,11 @@ sub _log {
     }
 }
 
+sub context {
+    my ( $self, $str ) = @_;
+    return $self->new( parent => $self, context => $str, level => $self->level );
+}
+
 sub format {
     my ($self) = @_;
     return $self->format_cb || sub { localtime(shift) . ' [' . shift() . '] ' . join( "\n", @_, '' ) };
@@ -123,7 +130,7 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple.svg)](https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/MojoX-Log-Dispatch-Simple/badge.png)](https://coveralls.io/r/gryphonshafer/MojoX-Log-Dispatch-Simple)

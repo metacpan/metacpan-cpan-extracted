@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use List::Util qw/ shuffle /;
+use lib '/Users/gene/sandbox/MIDI-Drummer-Tiny/lib';
+use MIDI::Drummer::Tiny;
+use lib '/Users/gene/sandbox/MIDI-Util/lib';
+use MIDI::Util;
+use lib '/Users/gene/sandbox/Music-Duration-Partition/lib';
+use Music::Duration::Partition;
+use Music::Scales;
+use Music::VoiceGen;
+
+my $max   = shift || 4;
+my $bpm   = shift || 90;
+my $size  = shift || 3;
+my $note  = shift || 'A';
+my $scale = shift || 'pminor';
+
+my $top_patch    = 40;
+my $bottom_patch = 42;
+
+my $score = MIDI::Util::setup_score( bpm => $bpm );
+
+$score->synch(
+#    \&top,
+    \&bottom,
+    \&beat,
+);
+
+$score->write_score("$0.mid");
+
+sub top {
+    MIDI::Util::set_chan_patch( $score, 0, $top_patch );
+    $score->Volume(80);
+
+    for my $n ( 1 .. $max * 2 ) {
+        $score->n( 'wn', 'A4', 'C5', 'E5' );
+    }
+}
+
+sub bottom {
+    MIDI::Util::set_chan_patch( $score, 1, $bottom_patch );
+
+    my $mdp1 = Music::Duration::Partition->new(
+        size => $size,
+        pool => [qw/ qn en /],
+        #verbose=>1,
+    );
+    my $motif1 = $mdp1->motif;
+
+    my $mdp2 = Music::Duration::Partition->new(
+        size => $size,
+        pool => [qw/ qn en /],
+        #verbose=>1,
+    );
+    my $motif2 = $mdp2->motif;
+
+    my @pitches = get_scale_MIDI( $note, 1, $scale );
+
+    my $voice = Music::VoiceGen->new(
+        pitches   => \@pitches,
+        intervals => [qw/ -4 -3 -2 2 3 4 /],
+    );
+
+    my @notes1 = map { $voice->rand } 0 .. @$motif1 - 1;
+
+    for my $x ( 1 .. $max ) {
+        my @notes2 = map { $voice->rand } 0 .. @$motif2 - 1;
+
+        for my $n ( 0 .. @$motif1 - 1 ) {
+            $score->n( $motif1->[$n], $notes1[$n] );
+            #warn "1: $motif1->[$n], $notes1[$n]\n";
+        }
+
+        $score->r('qn');
+
+        for my $n ( 0 .. @$motif2 - 1 ) {
+            $score->n( $motif2->[$n], $notes2[$n] );
+            #warn "2: $motif2->[$n], $notes2[$n]\n";
+        }
+
+        $score->r('qn');
+    }
+
+    $score->n( 'wn', $pitches[0] );
+}
+
+sub beat {
+    my $d = MIDI::Drummer::Tiny->new( bpm => $bpm, score => $score );
+
+    for my $n ( 1 .. $max ) {
+        $d->note( $d->quarter, $d->closed_hh ) for 1 .. 2 * ( $size + 1 );
+    }
+}

@@ -432,6 +432,12 @@ tokenize '$_', [ [ $^X ], {} ]
 tokenize '$$', [ [ $$ ], {} ]
     or dump_tokens;
 
+tokenize '"\u\LFEE FIE FOE\E FOO"', [ [ 'Fee fie foe FOO' ], {} ]
+    or dump_tokens;
+
+tokenize '"Fee \U$2\E foe \u$foo"', [ [ 'Fee FIE foe Bar' ], {} ]
+    or dump_tokens;
+
 done_testing;
 
 {

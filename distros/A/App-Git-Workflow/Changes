@@ -1,5 +1,13 @@
 Revision history for git-workflow-tools
 
+1.1.8   2019-11-03
+        Updating for release of version 1.1.8
+        Adding missing dependency (Ivan Wills)
+
+1.1.7   2019-11-01
+        Updating for release of version 1.1.7
+        Adding the ability to format the output of branch age (Ivan Wills)
+
 1.1.6   2019-10-04
         Updating for release of version 1.1.6
         Fixing critic issues (Ivan Wills)

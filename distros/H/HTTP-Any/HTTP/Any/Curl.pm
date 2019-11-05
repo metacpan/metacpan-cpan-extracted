@@ -110,6 +110,8 @@ sub do_http {
 			return $size;
 		};
 		$easy->setopt(CURLOPT_WRITEFUNCTION, $cb_write);
+	} else {
+		$easy->setopt(CURLOPT_WRITEFUNCTION, undef);
 	}
 
 	my $finish = sub {

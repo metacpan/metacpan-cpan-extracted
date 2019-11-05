@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Cap3;
 # ABSTRACT: Bio::MUST driver for running the CAP3 assembly program
-$Bio::MUST::Drivers::Cap3::VERSION = '0.191910';
+$Bio::MUST::Drivers::Cap3::VERSION = '0.193030';
 use Moose;
 use namespace::autoclean;
 
@@ -196,7 +196,7 @@ Bio::MUST::Drivers::Cap3 - Bio::MUST driver for running the CAP3 assembly progra
 
 =head1 VERSION
 
-version 0.191910
+version 0.193030
 
 =head1 SYNOPSIS
 

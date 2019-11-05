@@ -1,6 +1,6 @@
-package Devel::Timer;
-$Devel::Timer::VERSION = '0.12';
 use strict;
+package Devel::Timer;
+$Devel::Timer::VERSION = '0.13';
 use warnings;
 use 5.006;
 
@@ -186,7 +186,7 @@ Devel::Timer - Track and report execution time for parts of code
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

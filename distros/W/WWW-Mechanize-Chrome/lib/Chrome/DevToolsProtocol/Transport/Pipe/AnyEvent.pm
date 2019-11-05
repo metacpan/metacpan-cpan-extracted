@@ -12,7 +12,7 @@ use Carp qw(croak);
 use AnyEvent;
 use AnyEvent::Future qw(as_future_cb);
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our @CARP_NOT = ();
 
 =head1 NAME
@@ -21,7 +21,7 @@ Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent- EXPERIMENTAL Local pipe bac
 
 =head1 SYNOPSIS
 
-    my $t = Chrome::DevToolsProtocol::Transport::Pipe->new;
+    my $t = Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent->new;
     $t->connect( $handler, $got_endpoint, $logger)
     ->then(sub {
         my( $connection ) = @_;
@@ -122,6 +122,12 @@ sub sleep( $self, $seconds ) {
 
 1;
 
+=head1 SEE ALSO
+
+The factory class for transports
+
+L<Chrome::DevToolsProtocol::Transport::Pipe>
+
 =head1 REPOSITORY
 
 The public repository of this module is
@@ -143,7 +149,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

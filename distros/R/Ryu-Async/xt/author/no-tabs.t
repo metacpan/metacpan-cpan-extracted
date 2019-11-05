@@ -20,6 +20,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/source.t',
     't/stream.t',
+    't/tcp.t',
     't/timer.t',
     't/udp.t',
     'xt/author/eol.t',

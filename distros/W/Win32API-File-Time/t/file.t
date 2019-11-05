@@ -13,7 +13,12 @@ use lib qw{ inc };
 use My::Module::Test qw{ :all };
 use Win32API::File::Time qw{ :all };	# Must be loaded after My::Module::Test
 
-my $reactos = 'MSWin32' eq $^O && $ENV{OS} =~ m/ reactos /smxi;
+use constant REACT_OS	=> 'MSWin32' eq $^O && (
+    $ENV{OS} =~m/ reactos /smxi ||
+    defined $ENV{SystemRoot} && $ENV{SystemRoot} =~ m/ reactos /smxi ||
+    defined $ENV{windir} && $ENV{windir} =~ m/ reactos /smxi ||
+    defined $ENV{SystemDrive} && -e "$ENV{SystemDrive}/ReactOS"
+);
 
 my $me = $0;
 my ( undef, undef, undef, undef, undef, undef, undef, undef,
@@ -88,15 +93,15 @@ GetFileTime: @{[ scalar localtime $mtime ]}
        stat: @{[ scalar localtime $pmtim ]}
 EOD
 
-if ( $reactos ) {
+if ( REACT_OS ) {
     note 'Creation time not checked under ReactOS';
 } elsif ( ! $pctim ) {
     note 'Creation time not checked because stat() returned 0';
 } else {
     cmp_ok $ctime, '==', $pctim, 'Got same creation time as stat()'
 	or diag <<"EOD";
-GetFileTime: @{[ scalar localtime $mtime ]}
-       stat: @{[ scalar localtime $pmtim ]}
+GetFileTime: @{[ scalar localtime $ctime ]}
+       stat: @{[ scalar localtime $pctim ]}
 EOD
 }
 

@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Marco Pessotto <melmothx@gmail.com>},
     VERSION_FROM     => 'lib/Business/OnlinePayment/IPayment.pm',
     ABSTRACT_FROM    => 'lib/Business/OnlinePayment/IPayment.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
@@ -20,8 +20,8 @@ WriteMakefile(
     PREREQ_PM => {
                   'Moo' => 1,
                   'XML::Compile::SOAP' => 0,
-                  URI => 1,
-                  'Crypt::SSLeay' => 0,
+                  'LWP::Protocol::https' => 0,
+                  'URI' => 1,
                   'XML::Compile::WSDL11' => 0,
                   'Business::OnlinePayment' => 3,
     },

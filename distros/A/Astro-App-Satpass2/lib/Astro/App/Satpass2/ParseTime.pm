@@ -15,7 +15,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use Astro::Coord::ECI::Utils 0.059 qw{ looks_like_number };
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 my %static = (
     perltime	=> 0,
@@ -531,7 +531,7 @@ zone, not as an accessor call.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

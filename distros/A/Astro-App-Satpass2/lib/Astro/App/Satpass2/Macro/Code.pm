@@ -15,7 +15,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use File::Spec;
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 sub init {
     my ( $self ) = @_;
@@ -186,7 +186,7 @@ L<Astro::App::Satpass2::Macro|Astro::App::Satpass2::Macro>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

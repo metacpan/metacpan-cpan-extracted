@@ -1,7 +1,7 @@
 package App::ScreensaverUtils;
 
 our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,10 +54,7 @@ $SPEC{prevent_screensaver_activated_until_interrupted} = {
 Uses <pm:Proc::Govern> to run `sleep infinity`, with the option `no-screensaver'
 to instruct Proc::Govern to regularly simulate user activity, thus preventing
 the screensaver from ever activating. To stop preventing screensaver from
-sleeping, press Ctrl-C.
-
-For more options when running command, e.g. timeout, load control, autorestart,
-use the module or its CLI <prog:govproc> directly.
+activating, press Ctrl-C.
 
 Available in CLI with two shorter aliases: <prog:pause-screensaver> and
 <prog:noss>.
@@ -129,7 +126,7 @@ App::ScreensaverUtils - CLI utilities related to screensaver
 
 =head1 VERSION
 
-This document describes version 0.008 of App::ScreensaverUtils (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
+This document describes version 0.009 of App::ScreensaverUtils (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
 
 =head1 DESCRIPTION
 
@@ -218,10 +215,7 @@ Prevent screensaver activated until interrupted.
 Uses L<Proc::Govern> to run C<sleep infinity>, with the option `no-screensaver'
 to instruct Proc::Govern to regularly simulate user activity, thus preventing
 the screensaver from ever activating. To stop preventing screensaver from
-sleeping, press Ctrl-C.
-
-For more options when running command, e.g. timeout, load control, autorestart,
-use the module or its CLI L<govproc> directly.
+activating, press Ctrl-C.
 
 Available in CLI with two shorter aliases: L<pause-screensaver> and
 L<noss>.

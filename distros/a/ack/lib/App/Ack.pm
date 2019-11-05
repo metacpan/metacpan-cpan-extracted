@@ -16,7 +16,7 @@ A container for functions for the ack program.
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = 'v3.1.3'; # Check https://beyondgrep.com/ for updates
+    $VERSION = 'v3.2.0'; # Check https://beyondgrep.com/ for updates
     $COPYRIGHT = 'Copyright 2005-2019 Andy Lester.';
 }
 our $STANDALONE = 0;
@@ -317,9 +317,9 @@ File inclusion/exclusion:
   --[no]follow                  Follow symlinks.  Default is off.
 
 File type inclusion/exclusion:
-  --type=X                      Include only X files, where X is a recognized
-                                filetype, e.g. --php, --ruby
-  --type=noX                    Exclude X files, e.g. --nophp, --no-ruby.
+  -t X, --type=X                Include only X files, where X is a filetype,
+                                e.g. python, html, markdown, etc
+  -T X, --type=noX              Exclude X files, where X is a filetype.
   -k, --known-types             Include only files of types that ack recognizes.
   --help-types                  Display all known types, and how they're defined.
 
@@ -384,12 +384,12 @@ sub show_help_types {
     App::Ack::print( <<'END_OF_HELP' );
 Usage: ack [OPTION]... PATTERN [FILES OR DIRECTORIES]
 
-The following is the list of filetypes supported by ack.  You can
-specify a file type with the --type=TYPE format, or the --TYPE
-format.  For example, both --type=perl and --perl work.
+The following is the list of filetypes supported by ack.  You can specify a
+filetype to include with -t TYPE or --type=TYPE.  You can exclude a
+filetype with -T TYPE or --type=noTYPE.
 
-Note that some extensions may appear in multiple types.  For example,
-.pod files are both Perl and Parrot.
+Note that some files may appear in multiple types.  For example, a file
+called Rakefile is both Ruby (--type=ruby) and Rakefile (--type=rakefile).
 
 END_OF_HELP
 
@@ -405,7 +405,7 @@ END_OF_HELP
         if ( ref $ext_list ) {
             $ext_list = join( '; ', map { $_->to_string } @{$ext_list} );
         }
-        App::Ack::print( sprintf( "    --[no]%-*.*s %s\n", $maxlen, $maxlen, $type, $ext_list ) );
+        App::Ack::print( sprintf( "    %-*.*s %s\n", $maxlen, $maxlen, $type, $ext_list ) );
     }
 
     return;

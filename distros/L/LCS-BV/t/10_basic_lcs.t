@@ -21,7 +21,7 @@ use_ok($class);
 
 my $object = new_ok($class);
 
-if (1) {
+if (0) {
 ok($object->new());
 ok($object->new(1,2));
 ok($object->new({}));
@@ -77,8 +77,14 @@ my $examples = [
     're'],
   [ 'abcdefg_',
     '_bcdefgh'],
-  [ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVY_',
+  [ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVY_', # l=52
     '_bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVYZ'],
+  [ 'aabbcc',
+    'abc'],
+  [ 'aaaabbbbcccc',
+    'abc'],
+  [ 'aaaabbcc',
+    'abc'],
 ];
 
 
@@ -93,6 +99,15 @@ my $examples2 = [
     'abcdefghijklmnopqrstuvwxyz012345678_9!"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVYZ'],
   [ 'abcdefghijklmnopqrstuvwxyz012345678_9!"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVYZ',
     'abcdefghijklmnopqrstuvwxyz012345678!9!"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVYZ'],
+  [ 'aaabcdefghijklmnopqrstuvwxyz012345678_9!"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVYZZZ',
+    'a!Z'],
+];
+
+my $examples3 = [
+  [ 'a_',
+    'aa' ],
+  [ '_b_',
+    'abb' ],
 ];
 
 
@@ -119,6 +134,7 @@ for my $example (@$examples) {
 }
 }
 
+
 if (1) {
 for my $example (@$examples2) {
 #for my $example ($examples->[3]) {
@@ -140,6 +156,118 @@ for my $example (@$examples2) {
   }
 }
 }
+
+if (1) {
+for my $example (@$examples3) {
+#for my $example ($examples->[3]) {
+  my $a = $example->[0];
+  my $b = $example->[1];
+  my @a = $a =~ /([^_])/g;
+  my @b = $b =~ /([^_])/g;
+
+  cmp_deeply(
+    LCS::BV->LCS(\@a,\@b),
+    any(@{LCS->allLCS(\@a,\@b)} ),
+
+    "$a, $b"
+  );
+  if (0) {
+    $Data::Dumper::Deepcopy = 1;
+    print STDERR 'allLCS: ',Data::Dumper->Dump(LCS->allLCS(\@a,\@b)),"\n";
+    print STDERR 'LCS: ',Dumper(LCS::BV->LCS(\@a,\@b)),"\n";
+  }
+}
+}
+
+if (1) {
+my $prefix = 'a';
+my $infix  = 'b';
+my $suffix = 'c';
+
+my $max_length = 2;
+
+for my $prefix_length1 (0..$max_length) {
+  for my $infix_length1 (0..$max_length) {
+    for my $suffix_length1 (0..$max_length) {
+      my $a = $prefix x $prefix_length1 . $infix x $infix_length1 . $suffix x $suffix_length1;
+      my @a = split(//,$a);
+      my $m = scalar @a;
+      for my $prefix_length2 (0..$max_length) {
+        for my $infix_length2 (0..$max_length) {
+          for my $suffix_length2 (0..$max_length) {
+
+      my $b = $prefix x $prefix_length2 . $infix x $infix_length2 . $suffix x $suffix_length2;
+      my @b = split(//,$b);
+      my $n = scalar @b;
+
+  is(
+    scalar @{LCS::BV->LCS(\@a,\@b)},
+    LCS->LLCS(\@a,\@b),,
+
+    "[$a] m: $m, [$b] n: $n -> " . LCS->LLCS(\@a,\@b)
+  );
+        }
+    }
+  }
+      }
+    }
+  }
+}
+
+if (1) {
+my $string1 = 'abd';
+my $string2 = 'badc';
+my @base_lengths = (16, 32, 64, 128, 256);
+# int(rand(10))
+
+for my $base_length1 (@base_lengths) {
+  my $mult1 = int($base_length1/length($string1)) + 1;
+    my @a = split(//,$string1 x $mult1);
+    my $m = scalar @a;
+    for my $base_length2 (@base_lengths) {
+      my $mult2 = int($base_length2/length($string2)) + 1;
+      my @b = split(//,$string2 x $mult2);
+      my $n = scalar @b;
+  is(
+    scalar @{LCS::BV->LCS(\@a,\@b)},
+    LCS->LLCS(\@a,\@b),
+
+    "[$string1 x $mult1] m: $m, [$string2 x $mult2] n: $n -> " . LCS->LLCS(\@a,\@b)
+  );
+
+    }
+}
+}
+
+my @data3 = ([qw/a b d/ x 50], [qw/b a d c/ x 50]);
+
+# allLCS will need 100 years
+if (0) {
+  cmp_deeply(
+    LCS::BV->LCS(@data3),
+    any(@{LCS->allLCS(@data3)} ),
+    '[qw/a b d/ x 50], [qw/b a d c/ x 50]'
+  );
+  if (0) {
+    $Data::Dumper::Deepcopy = 1;
+    print STDERR 'allLCS: ',Data::Dumper->Dump(LCS->allLCS(@data3)),"\n";
+    print STDERR 'LCS: ',Dumper(LCS::BV->LCS(@data3)),"\n";
+  }
+}
+
+if (1) {
+  is(
+    scalar @{LCS::BV->LCS(@data3)},
+    LCS->LLCS(@data3),
+    '[qw/a b d/ x 50], [qw/b a d c/ x 50] -> ' . LCS->LLCS(@data3)
+  );
+  if (0) {
+    $Data::Dumper::Deepcopy = 1;
+    print STDERR 'LCS->LCS: ',Dumper(LCS->LCS(@data3)),"\n";
+    print STDERR 'LCS::BV->LCS: ',Dumper(LCS::BV->LCS(@data3)),"\n";
+  }
+}
+
 
 
 done_testing;

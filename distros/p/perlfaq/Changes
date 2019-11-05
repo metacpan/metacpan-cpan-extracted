@@ -1,7 +1,15 @@
 Revision history for perlfaq
 
+5.20191102  2019-11-02 05:34:43Z
+  * fix bad pod markup in perlfaq8 (PR #78; thanks, Joaquín Ferrero!)
+  * remove stale section about lib.pm (PR #82, Dan Book)
+  * update perlfaq9 to reference Email::Stuffer (PR #79, Dan Book)
+  * update perlfaq9 to reference URL::Search (PR #80, Dan Book)
+  * update perlfaq9 to use HTTP::Tiny (PR #81, Dan Book)
+  * fix some broken links (issue #71, dctabuyz)
+
 5.20190126  2019-01-26 04:39:37Z
-  * Many typos and pod markup fixed (PR#75, #76) thanks, Joaquin Ferrero!)
+  * Many typos and pod markup fixed (PR#75, #76; thanks, Joaquin Ferrero!)
   * Added reference in perlfaq to new ~ syntax in indented here-docs (PR#77,
     thanks Celejar!)
 

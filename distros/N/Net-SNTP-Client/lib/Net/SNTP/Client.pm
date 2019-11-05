@@ -15,14 +15,14 @@ Net::SNTP::Client - Perl module to calculate the roundtrip delay d and
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 
 =cut
 
 ## Version of the Net::SNTP::Client module
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 $VERSION = eval $VERSION;
 
 
@@ -521,7 +521,7 @@ We use the L<Data::Dumper|http://search.cpan.org/~ilyam/Data-Dumper-2.121/Dumper
   my %hashInput = (
       -hostname      => "0.pool.ntp.org",
       -port          => 123,
-      -timeOutInput  => 10,
+      -timeOut       => 10,
       -RFC4330       => 1,
       -clearScreen   => 1,
       );
@@ -658,7 +658,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =head1 CHANGE LOG
 $Log: Client.pm,v $
-Revision 22.0  2015/11/6 10:33:21 am  Thanos
+Revision 23.0  2019/31/10 7:01:21 pm  Thanos
 
 =cut
 

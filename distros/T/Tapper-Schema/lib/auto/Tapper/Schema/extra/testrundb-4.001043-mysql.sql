@@ -273,7 +273,7 @@ CREATE TABLE testplan_instance (
   id integer(11) NOT NULL auto_increment,
   path VARCHAR(255) NULL DEFAULT '',
   name VARCHAR(255) NULL DEFAULT '',
-  evaluated_testplan text NULL DEFAULT '',
+  evaluated_testplan mediumtext NULL DEFAULT '',
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at datetime NULL,
   PRIMARY KEY (id)
@@ -458,6 +458,7 @@ CREATE TABLE reportfile (
   created_at datetime NOT NULL,
   updated_at datetime NOT NULL,
   INDEX reportfile_idx_report_id (report_id),
+  INDEX reportfile_idx_filename (filename),
   PRIMARY KEY (id),
   CONSTRAINT reportfile_fk_report_id FOREIGN KEY (report_id) REFERENCES report (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
@@ -778,7 +779,7 @@ DROP TABLE IF EXISTS chart_line_restrictions;
 CREATE TABLE chart_line_restrictions (
   chart_line_restriction_id integer(11) unsigned NOT NULL auto_increment,
   chart_line_id integer(11) unsigned NOT NULL,
-  chart_line_restriction_operator VARCHAR(4) NOT NULL,
+  chart_line_restriction_operator VARCHAR(8) NOT NULL,
   chart_line_restriction_column text NOT NULL,
   is_template_restriction TINYINT(3) unsigned NOT NULL,
   is_numeric_restriction TINYINT(3) unsigned NOT NULL,

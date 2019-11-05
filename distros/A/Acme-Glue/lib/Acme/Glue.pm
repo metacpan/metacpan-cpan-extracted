@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2019.10";
+$Acme::Glue::VERSION = "2019.11";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2019.10
+2019.11
 
 =head1 DESCRIPTION
 
@@ -62,6 +62,23 @@ Here are the snippets that accompany the photo project
 
     say @play.reverse.join( "\n" );
 
+=head2 SLU (MAZE.BAS)
+
+    10 PRINT CHR$(205.5+RND(1));:GOTO 10
+
+=head2 SLU (schwartzian_transform.pl)
+
+
+    #!/usr/bin/env perl
+    # https://en.wikipedia.org/wiki/Schwartzian_transform
+    # Sort list of words according to word length
+
+    print "$_\n" foreach
+      map  { $_->[0] }
+      sort { $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] }
+      map  { [$_, length($_)] }
+      qw(demo of schwartzian transform);
+
 =head1 THANKS
 
 Thanks to all who contributed a snippet
@@ -69,6 +86,10 @@ Thanks to all who contributed a snippet
 =head1 SEE ALSO
 
 L<https://leejo.github.io/projects/>
+
+L<https://www.youtube.com/watch?v=ir6f2SvsXPA&feature=youtu.be&list=PLOOlhkMvt_o4y627mpaCGrO4ughSEeUgb&t=1046>
+
+L<https://leejo.github.io/acme-glue-talk/presentation.html#1>
 
 =head1 AUTHOR
 

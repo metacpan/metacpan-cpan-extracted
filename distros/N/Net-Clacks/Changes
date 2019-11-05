@@ -1,5 +1,20 @@
-@  changeset:   89:64198b152bb3
+@  changeset:   92:2b1f01b693ae
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Nov 05 15:03:21 2019 +0100
+|  summary:     Add the option "socketchmod" to clacks server to automatically chmod the socket file
+|
+o  changeset:   91:6c9b5827a504
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Thu Oct 24 12:44:58 2019 +0200
+|  summary:     Better throttle timing+defaults, make sure syswrite is always eval'd
+|
+o  changeset:   90:52e62062f83f
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Oct 22 17:00:56 2019 +0200
+|  summary:     Updated Changes file
+|
+o  changeset:   89:64198b152bb3
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Oct 22 17:00:16 2019 +0200
 |  summary:     Make examples clearer

@@ -2,8 +2,10 @@
 
 use strict;
 use Test::More tests => 34;
+use Net::EmptyPort;
 use Danga::Socket;
 use IO::Socket::INET;
+use Time::HiRes qw(sleep); # to allow fractional sleep
 use POSIX;
 no  warnings qw(deprecated);
 
@@ -27,6 +29,7 @@ for my $mode ("auto", "poll") {
         ok(Server->new, "created server") if $iters == 1;
         if ($iters == 3) {
             ok(ClientOut->new, "created client outgoing");
+            sleep 0.2;
             is(Danga::Socket->WatchedSockets, 2, "two watched sockets");
         }
         return 1;
@@ -55,17 +58,24 @@ ok(1, "finish");
 
 package Server;
 use base 'Danga::Socket';
+use vars qw($SERVER_PORT);
+use Test::More;
+
+BEGIN {
+    $SERVER_PORT = Net::EmptyPort::empty_port();
+}
 
 sub new {
     my $class = shift;
+    diag("Starting server on port $SERVER_PORT");
     my $ssock = IO::Socket::INET->new(Listen    => 5,
                                       LocalAddr => '127.0.0.1',
-                                      LocalPort => 60000,
+                                      LocalPort => $SERVER_PORT,
                                       Proto     => 'tcp',
                                       ReuseAddr => 1,
+                                      Blocking  => 0,
                                       );
     die "couldn't create socket" unless $ssock;
-    IO::Handle::blocking($ssock, 0);
     my $self = $class->SUPER::new($ssock);
     $self->watch_read(1);
     return $self;
@@ -149,6 +159,7 @@ use fields (
             'connected',  # 0 or 1
             );
 use Socket qw(PF_INET IPPROTO_TCP SOCK_STREAM);
+use Test::More;
 
 sub new {
     my $class = shift;
@@ -158,7 +169,8 @@ sub new {
 
     die "can't create outgoing sock" unless $sock && defined fileno($sock);
     IO::Handle::blocking($sock, 0);
-    connect $sock, Socket::sockaddr_in(60000, Socket::inet_aton('127.0.0.1'));
+    diag("Connecting to 127.0.0.1:$Server::SERVER_PORT");
+    connect $sock, Socket::sockaddr_in($Server::SERVER_PORT, Socket::inet_aton('127.0.0.1'));
 
     my $self = fields::new($class);
     $self->SUPER::new($sock);
@@ -179,3 +191,4 @@ sub event_write {
     $self->write("Hello!\n");
     $self->watch_write(0);
 }
+

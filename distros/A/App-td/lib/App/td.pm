@@ -1,7 +1,7 @@
 package App::td;
 
-our $DATE = '2019-01-16'; # DATE
-our $VERSION = '0.092'; # VERSION
+our $DATE = '2019-09-15'; # DATE
+our $VERSION = '0.093'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -15,6 +15,8 @@ our %SPEC;
 
 our %actions = (
     'actions' => {summary=>'List available actions', req_input=>0},
+    'as-aoaos' => {summary=>'Convert table data to aoaos form'},
+    'as-aohos' => {summary=>'Convert table data to aohos form'},
     'avg-row' => {summary=>'Append an average row'},
     'avg' => {summary=>'Return average of all numeric columns'},
     'colcount-row' => {summary=>'Append a row containing number of columns'},
@@ -27,11 +29,12 @@ our %actions = (
     'rowcount' => {summary=>'Append a row containing rowcount'},
     'rownum-col' => {summary=>'Add a column containing row number'},
     'select' => {summary=>'Select one or more columns'},
+    'shuf' => {summary=>'Generate random permutations of rows'},
     'sort' => {summary=>'Sort rows'},
     'sum-row' => {summary=>'Append a row containing sums'},
     'sum' => {summary=>'Return a row containing sum of all numeric columns'},
     'tail' => {summary=>'Only return the last N rows'},
-    'wc-row' => {summary=>'Alias for wc-row'},
+    'wc-row' => {summary=>'Alias for rowcount-row'},
     'wc' => {summary=>'Alias for rowcount'},
 );
 
@@ -97,59 +100,80 @@ names, number of rows, and so on).
 
 Next, you can use these actions:
 
-    # count number of rows (equivalent to "wc -l" Unix command)
-    % osnames -l --json | td rowcount
+ # List available actions
+ % td actions
 
-    # append a row containing rowcount
-    % osnames -l --json | td rowcount-row
+ # Convert table data (which might be hash, aos, or aohos) to aoaos form
+ % list-files -l --json | td as-aoaos
 
-    # return the column names only
-    % lcpan related-mods Perinci::CmdLine | td colnames
+ # Convert table data (which might be hash, aos, or aoaos) to aohos form
+ % list-files -l --json | td as-aohos
 
-    # append a row containing column names
-    % lcpan related-mods Perinci::CmdLine | td colnames-row
+ # Calculate arithmetic average of numeric columns
+ % list-files -l --json | td avg
 
-    # count number of columns
-    % osnames -l --json | td colcount
+ # Append a row at the end containing arithmetic average of number columns
+ % list-files -l --json | td avg-row
 
-    # select some columns
-    % osnames -l --json | td select value description
-    # select all columns but some
-    % osnames -l --json | td select '*' -e value -e description
+ # Count number of columns
+ % osnames -l --json | td colcount
 
-    # only show first 5 rows
-    % osnames -l --json | td head -n5
-    # show all but the last 5 rows
-    % osnames -l --json | td head -n -5
+ # Append a single-column row at the end containing number of columns
+ % osnames -l --json | td colcount-row
 
-    # only show last 5 rows
-    % osnames -l --json | td tail -n5
-    # show rows from the row 5 onwards
-    % osnames -l --json | td tail -n +5
+ # Return the column names only
+ % lcpan related-mods Perinci::CmdLine | td colnames
 
-    # sort by column(s) (add "-" prefix to for descending order)
-    % osnames -l --json | td sort value tags
-    % osnames -l --json | td sort -- -value
+ # append a row containing column names
+ % lcpan related-mods Perinci::CmdLine | td colnames-row
 
-    # return sum of all numeric columns
-    % list-files -l --json | td sum
+ # Only show first 5 rows
+ % osnames -l --json | td head -n5
 
-    # append a sum row
-    % list-files -l --json | td sum-row
+ # Show all but the last 5 rows
+ % osnames -l --json | td head -n -5
 
-    # return average of all numeric columns
-    % list-files -l --json | td avg
+ # Check if input is table data and show information about the table
+ % osnames -l --json | td info
 
-    # append an average row
-    % list-files -l --json | td avg-row
+ # Count number of rows
+ % osnames -l --json | td rowcount
+ % osnames -l --json | td wc            ;# shorter alias
 
-    # add a row number column (1, 2, 3, ...)
-    % list-files -l --json | td rownum-col
+ # Append a single-column row containing row count
+ % osnames -l --json | td rowcount-row
+ % osnames -l --json | td wc-row        ;# shorter alias
 
-Use this to list all the available actions:
+ # Add a row number column (1, 2, 3, ...)
+ % list-files -l --json | td rownum-col
 
-    % td actions
-    % td actions -l ;# show details
+ # Select some columns
+ % osnames -l --json | td select value description
+
+ # Select all columns but some
+ % osnames -l --json | td select '*' -e value -e description
+
+ # Return the rows in a random order
+ % osnames -l --json | td shuf
+
+ # Pick 5 random rows from input
+ % osnames -l --json | td shuf -n5
+
+ # Sort by column(s) (add "-" prefix to for descending order)
+ % osnames -l --json | td sort value tags
+ % osnames -l --json | td sort -- -value
+
+ # Return sum of all numeric columns
+ % list-files -l --json | td sum
+
+ # Append a sum row
+ % list-files -l --json | td sum-row
+
+ # Only show last 5 rows
+ % osnames -l --json | td tail -n5
+
+ # Show rows from the row 5 onwards
+ % osnames -l --json | td tail -n +5
 
 _
     args => {
@@ -180,6 +204,13 @@ _
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
             tags => ['category:actions-action'],
+        },
+
+        repeat => {
+            summary => 'Allow duplicates',
+            schema => 'bool*',
+            cmdline_aliases => {r=>{}},
+            tags => ['category:shuf-action'],
         },
 
         exclude_columns => {
@@ -269,11 +300,32 @@ sub td {
             last;
         }
 
-        if ($action eq 'rowcount-row' || $action eq 'wc-row') {
+        if ($action eq 'as-aoaos') {
             my $cols = $input_obj->cols_by_idx;
             my $rows = $input_obj->rows_as_aoaos;
-            my $rowcount_row = [map {''} @$cols];
-            $rowcount_row->[0] = $input_obj->row_count if @$rowcount_row;
+            $output = [200, "OK", $rows, {'table.fields' => $cols}];
+            last;
+        }
+
+        if ($action eq 'as-aohos') {
+            my $cols = $input_obj->cols_by_idx;
+            my $rows = $input_obj->rows_as_aohos;
+            $output = [200, "OK", $rows, {'table.fields' => $cols}];
+            last;
+        }
+
+        if ($action eq 'rowcount-row' || $action eq 'wc-row') {
+            my $cols = $input_obj->cols_by_idx;
+            my $rows = $input_obj->rows;
+            my $rowcount = $input_obj->row_count;
+            my $rowcount_row;
+            if (@$rows && ref $rows->[0] eq 'HASH') {
+                $rowcount_row = {rowcount=>$rowcount};
+            } elsif (@$rows && ref $rows->[0] eq 'ARRAY') {
+                $rowcount_row = [$rowcount];
+            } else {
+                $rowcount_row = $rowcount;
+            }
             $output = [200, "OK", [@$rows, $rowcount_row],
                        {'table.fields' => $cols}];
             last;
@@ -281,7 +333,7 @@ sub td {
 
         if ($action eq 'head' || $action eq 'tail') {
             my $cols = $input_obj->cols_by_idx;
-            my $rows = $input_obj->rows_as_aoaos;
+            my $rows = $input_obj->rows;
             my $n = $args{lines} // 5;
             if ($action eq 'head') {
                 if ($n =~ s/\A\+//) {
@@ -321,8 +373,15 @@ sub td {
 
         if ($action eq 'colnames-row') {
             my $cols = $input_obj->cols_by_idx;
-            my $rows = $input_obj->rows_as_aoaos;
-            my $colnames_row = [map {$cols->[$_]} 0..$#{$cols}];
+            my $rows = $input_obj->rows;
+            my $colnames_row;
+            if (@$rows && ref $rows->[0] eq 'HASH') {
+                $colnames_row = $input_obj->cols_by_name;
+            } elsif (@$rows && ref $rows->[0] eq 'ARRAY') {
+                $colnames_row = [map {$cols->[$_]} 0..$#{$cols}];
+            } else {
+                $colnames_row = $cols->[0];
+            }
             $output = [200, "OK", [@$rows, $colnames_row],
                        {'table.fields' => $cols}];
             last;
@@ -339,37 +398,65 @@ sub td {
         if ($action =~ /\A(sum|sum-row|avg|avg-row)\z/) {
             require Scalar::Util;
             my $cols = $input_obj->cols_by_idx;
-            my $rows = $input_obj->rows_as_aoaos;
-            my $sum_row = [map {0} @$cols];
-            for my $i (0..$#{$rows}) {
-                my $row = $rows->[$i];
+            my $rows = $input_obj->rows;
+            # XXX optimize by not producing two versions of rows
+            my $rows_as_aoaos = $input_obj->rows_as_aoaos;
+            my $sums = [map {0} @$cols];
+            for my $i (0..$#{$rows_as_aoaos}) {
+                my $row = $rows_as_aoaos->[$i];
                 for my $j (0..@$cols-1) {
-                    $sum_row->[$j] += $row->[$j]
+                    $sums->[$j] += $row->[$j]
                         if Scalar::Util::looks_like_number($row->[$j]);
                 }
             }
-            my $avg_row;
+            my $avgs;
+            my $results;
             if ($action =~ /avg/) {
                 if (@$rows) {
-                    $avg_row = [map { $_ / @$rows } @$sum_row];
+                    $avgs = [map { $_ / @$rows } @$sums];
                 } else {
-                    $avg_row = [map {0} @$cols];
+                    $avgs = [map {0} @$cols];
                 }
+                $results = $avgs;
+            } else {
+                $results = $sums;
             }
-            # XXX return aohos if input is aohos
-            if ($action eq 'sum') {
-                $output = [200, "OK", [$sum_row],
+
+            my $result_row;
+            if (@$rows && ref $rows->[0] eq 'HASH') {
+                $result_row = {map {$cols->[$_] => $results->[$_]}
+                                   0..$#{$cols}};
+            } elsif (@$rows && ref $rows->[0] eq 'ARRAY') {
+                $result_row = $results;
+            } else {
+                $result_row = $results->[0];
+            }
+
+            if ($action =~ /-row/) {
+                $output = [200, "OK", [@$rows, $result_row],
                            {'table.fields' => $cols}];
-            } elsif ($action eq 'sum-row') {
-                $output = [200, "OK", [@$rows, $sum_row],
-                           {'table.fields' => $cols}];
-            } elsif ($action eq 'avg') {
-                $output = [200, "OK", [$avg_row],
-                           {'table.fields' => $cols}];
-            } elsif ($action eq 'avg-row') {
-                $output = [200, "OK", [@$rows, $avg_row],
+            } else {
+                $output = [200, "OK", $result_row,
                            {'table.fields' => $cols}];
             }
+            last;
+        }
+
+        if ($action eq 'shuf') {
+            my $cols = $input_obj->cols_by_idx;
+            my $input_rows = $input_obj->rows;
+            my @output_rows;
+            if ($args{repeat}) {
+                for my $i (1 .. ($args{lines} // scalar(@$input_rows))) {
+                    $output_rows[$i-1] = $input_rows->[rand() * @$input_rows];
+                }
+            } else {
+                require List::MoreUtils;
+                @output_rows = List::MoreUtils::samples(
+                    $args{lines} // scalar(@$input_rows),
+                    @$input_rows);
+            }
+            $output = [200, "OK", \@output_rows, {'table.fields' => $cols}];
             last;
         }
 
@@ -446,7 +533,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.092 of App::td (from Perl distribution App-td), released on 2019-01-16.
+This document describes version 0.093 of App::td (from Perl distribution App-td), released on 2019-09-15.
 
 =head1 FUNCTIONS
 
@@ -488,59 +575,80 @@ names, number of rows, and so on).
 
 Next, you can use these actions:
 
- # count number of rows (equivalent to "wc -l" Unix command)
- % osnames -l --json | td rowcount
- 
- # append a row containing rowcount
- % osnames -l --json | td rowcount-row
- 
- # return the column names only
+ # List available actions
+ % td actions
+
+ # Convert table data (which might be hash, aos, or aohos) to aoaos form
+ % list-files -l --json | td as-aoaos
+
+ # Convert table data (which might be hash, aos, or aoaos) to aohos form
+ % list-files -l --json | td as-aohos
+
+ # Calculate arithmetic average of numeric columns
+ % list-files -l --json | td avg
+
+ # Append a row at the end containing arithmetic average of number columns
+ % list-files -l --json | td avg-row
+
+ # Count number of columns
+ % osnames -l --json | td colcount
+
+ # Append a single-column row at the end containing number of columns
+ % osnames -l --json | td colcount-row
+
+ # Return the column names only
  % lcpan related-mods Perinci::CmdLine | td colnames
- 
+
  # append a row containing column names
  % lcpan related-mods Perinci::CmdLine | td colnames-row
- 
- # count number of columns
- % osnames -l --json | td colcount
- 
- # select some columns
- % osnames -l --json | td select value description
- # select all columns but some
- % osnames -l --json | td select '*' -e value -e description
- 
- # only show first 5 rows
+
+ # Only show first 5 rows
  % osnames -l --json | td head -n5
- # show all but the last 5 rows
+
+ # Show all but the last 5 rows
  % osnames -l --json | td head -n -5
- 
- # only show last 5 rows
- % osnames -l --json | td tail -n5
- # show rows from the row 5 onwards
- % osnames -l --json | td tail -n +5
- 
- # sort by column(s) (add "-" prefix to for descending order)
- % osnames -l --json | td sort value tags
- % osnames -l --json | td sort -- -value
- 
- # return sum of all numeric columns
- % list-files -l --json | td sum
- 
- # append a sum row
- % list-files -l --json | td sum-row
- 
- # return average of all numeric columns
- % list-files -l --json | td avg
- 
- # append an average row
- % list-files -l --json | td avg-row
- 
- # add a row number column (1, 2, 3, ...)
+
+ # Check if input is table data and show information about the table
+ % osnames -l --json | td info
+
+ # Count number of rows
+ % osnames -l --json | td rowcount
+ % osnames -l --json | td wc            ;# shorter alias
+
+ # Append a single-column row containing row count
+ % osnames -l --json | td rowcount-row
+ % osnames -l --json | td wc-row        ;# shorter alias
+
+ # Add a row number column (1, 2, 3, ...)
  % list-files -l --json | td rownum-col
 
-Use this to list all the available actions:
+ # Select some columns
+ % osnames -l --json | td select value description
 
- % td actions
- % td actions -l ;# show details
+ # Select all columns but some
+ % osnames -l --json | td select '*' -e value -e description
+
+ # Return the rows in a random order
+ % osnames -l --json | td shuf
+
+ # Pick 5 random rows from input
+ % osnames -l --json | td shuf -n5
+
+ # Sort by column(s) (add "-" prefix to for descending order)
+ % osnames -l --json | td sort value tags
+ % osnames -l --json | td sort -- -value
+
+ # Return sum of all numeric columns
+ % list-files -l --json | td sum
+
+ # Append a sum row
+ % list-files -l --json | td sum-row
+
+ # Only show last 5 rows
+ % osnames -l --json | td tail -n5
+
+ # Show rows from the row 5 onwards
+ % osnames -l --json | td tail -n +5
 
 This function is not exported.
 
@@ -561,6 +669,10 @@ Arguments.
 =item * B<exclude_columns> => I<array[str]>
 
 =item * B<lines> => I<str>
+
+=item * B<repeat> => I<bool>
+
+Allow duplicates.
 
 =back
 

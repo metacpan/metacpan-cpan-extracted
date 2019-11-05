@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP::Source;
 use vars '$VERSION';
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 
 use warnings;

@@ -1,5 +1,11 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+2.3       2019-11-01 23:34:25Z
+
+    * Update test dependencies for new modules
+    * Remove corpus from release
+    * Move airplane logic to role and implement role
+
 2.2       2019-03-02 10:39:12Z
 
     * Add default CONTRIBUTERS

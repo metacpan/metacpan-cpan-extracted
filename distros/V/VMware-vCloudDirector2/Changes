@@ -1,5 +1,10 @@
 Revision history for VMware-vCloudDirector2
 
+0.106     2019-10-31 16:42:24+00:00 Europe/London
+	- Added additional methods for building objects from
+	  lists of things within an object - see build_sub_sub_objects
+	  (and vCloud has several inconsistant ways of packaging these).
+
 0.105     2019-10-23 15:57:47+01:00 Europe/London
 	- Convert blessed objects as we create JSON documents
 	- Add GET_hash method to Objects and Links

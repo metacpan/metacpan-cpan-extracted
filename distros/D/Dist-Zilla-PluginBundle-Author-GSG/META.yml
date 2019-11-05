@@ -27,10 +27,10 @@ name: Dist-Zilla-PluginBundle-Author-GSG
 provides:
   Dist::Zilla::Plugin::Author::GSG:
     file: lib/Dist/Zilla/Plugin/Author/GSG.pm
-    version: v0.0.15
+    version: v0.0.16
   Dist::Zilla::PluginBundle::Author::GSG:
     file: lib/Dist/Zilla/PluginBundle/Author/GSG.pm
-    version: v0.0.15
+    version: v0.0.16
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::ChangelogFromGit: '0'
@@ -60,7 +60,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG/issues
   repository: git://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG.git
-version: v0.0.15
+version: v0.0.16
 x_contributors:
   - 'Andrew Fresh <andrew.fresh@grantstreet.com>'
   - 'Mark Flickinger <mark.flickinger@grantstreet.com>'

@@ -75,6 +75,7 @@
             "Test::HTTP::LocalServer" : "0.61",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
+            "Test::Without::Module" : "0",
             "Time::HiRes" : "0",
             "URI" : "0",
             "URI::file" : "0"
@@ -89,7 +90,7 @@
          "web" : "https://github.com/Corion/WWW-Mechanize-Chrome"
       }
    },
-   "version" : "0.37",
+   "version" : "0.38",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

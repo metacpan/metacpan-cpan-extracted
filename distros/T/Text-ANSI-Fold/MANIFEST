@@ -13,5 +13,7 @@ t/01_fold.t
 t/02_oo.t
 t/03_chops.t
 t/04_linebreak.t
+t/05_margin.t
+t/06_color.t
 META.yml
 MANIFEST

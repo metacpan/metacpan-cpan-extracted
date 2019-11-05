@@ -103,7 +103,7 @@ static int payload_marker_SVs_map_free(pTHX_ SV*, MAGIC* mg) {
 
 
 static Sv coordinate_create_null () {
-    Sv ret = xs::out<const Coordinate*>(aTHX_ new Coordinate());
+    Sv ret = xs::out<const Coordinate*>(new Coordinate());
     return ret;
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 #   Perl Makefile for Danga-Socket
-#   $Id: Makefile.PL 119 2007-05-09 17:59:34Z bradfitz $
+#   $Id$
 #
 #   Invoke with 'perl Makefile.PL'
 #
@@ -22,6 +22,7 @@ WriteMakefile(
         fields          => 0,
         'POSIX'         => 0,
         'Test::More'    => 0,
+        'Test::TCP'     => 0,
         'Time::HiRes'   => 0,
         'Sys::Syscall'  => 0,
     },

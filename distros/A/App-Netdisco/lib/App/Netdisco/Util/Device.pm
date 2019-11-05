@@ -237,7 +237,7 @@ sub is_arpnipable {
   my $device = get_device($ip) or return 0;
 
   return _bail_msg("is_arpnipable: $device has no layer 3 capability")
-    unless $device->has_layer(3);
+    if ($device->in_storage() and not $device->has_layer(3));
 
   return _bail_msg("is_arpnipable: $device matched arpnip_no")
     if check_acl_no($device, 'arpnip_no');
@@ -290,7 +290,7 @@ sub is_macsuckable {
   my $device = get_device($ip) or return 0;
 
   return _bail_msg("is_macsuckable: $device has no layer 2 capability")
-    unless $device->has_layer(2);
+    if ($device->in_storage() and not $device->has_layer(2));
 
   return _bail_msg("is_macsuckable: $device matched macsuck_no")
     if check_acl_no($device, 'macsuck_no');

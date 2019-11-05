@@ -9,7 +9,7 @@ use parent qw{ Exporter };
 
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 our @EXPORT_OK = qw{
     DATE_FORMAT FORMAT_TYPE ISO_8601_FORMAT TIME_FORMAT
@@ -90,7 +90,7 @@ used with C<strftime()>, it is C<'%H:%M:%S'>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 

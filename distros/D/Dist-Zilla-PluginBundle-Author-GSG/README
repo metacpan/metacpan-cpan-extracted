@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.0.15
+    version v0.0.16
 
 SYNOPSIS
 
@@ -52,6 +52,7 @@ SYNOPSIS
     
         [ChangelogFromGit]
         tag_regexp = \b(v\d+\.\d+\.\d+(?:\.\d+)*)\b
+        exclude_message = (?x: ^Merge \s+ (?: pull \s+ request | (?:remote-tracking\s+)? branch ) \b )
     
         [Git::NextVersion]
         first_version  = v0.0.1

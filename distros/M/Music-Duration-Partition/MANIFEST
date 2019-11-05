@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/figured-bass
 eg/motif
 eg/shuffle
 lib/Music/Duration/Partition.pm

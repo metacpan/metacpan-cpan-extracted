@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '0.28';
+my $version = '0.29';
 
 WriteMakefile
  ( NAME	 	=> 'Any::Daemon::HTTP'
@@ -16,7 +16,7 @@ WriteMakefile
    , Fcntl            => 0
    , File::Basename   => 0
    , File::Spec       => 0
-   , HTTP::Daemon     => 6.03
+   , HTTP::Daemon     => 6.01
    , HTTP::Response   => 0
    , HTTP::Status     => 0
    , IO::Select       => 0
@@ -35,6 +35,7 @@ WriteMakefile
 
  , AUTHOR       => 'Mark Overmeer'
  , ABSTRACT     => 'Generic http server'
+ , LICENSE      => 'perl_5'
 
  , META_MERGE =>
       { 'meta-spec' => { version => 2 }

@@ -1,3 +1,25 @@
+1.162 2019-10-31
+================
+[Quiq::AsciiTable]
+* Kosmetik
+
+[Quiq::Database::Cursor]
+* width() - hinzugefügt
+* export() - hinzugefügt
+* fetchAll() - keine Instantiierung in Void-Kontext
+
+[Quiq::Database::ResultSet]
+* asTable() - farbige Terminaldarstellung hinzugefügt
+
+[Quiq::Epoch]
+* new() - Behandlung von Sekundenbruchteilen bei ISO-Darstellung korrigiert
+
+[Quiq::FileHandle]
+* setEncoding() - Doku bearbeitet
+
+[Quiq::ProcessMatrix]
+* Klasse hinzugefügt
+
 1.161 2019-10-25
 ================
 [Quiq::AnsiColor]
