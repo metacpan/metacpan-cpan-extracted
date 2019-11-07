@@ -9,7 +9,7 @@ package Rex::Service;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Config;
 use Rex::Commands::Gather;
@@ -32,6 +32,9 @@ sub get {
 
   i_run "systemctl --no-pager > /dev/null", fail_ok => 1;
   my $can_run_systemctl = $? == 0 ? 1 : 0;
+
+  i_run "initctl version | grep upstart", fail_ok => 1;
+  my $running_upstart = $? == 0 ? 1 : 0;
 
   my $class;
 
@@ -63,6 +66,11 @@ sub get {
 
     # this also counts for Ubuntu and LinuxMint
     $class = "Rex::Service::Debian::systemd";
+  }
+  elsif ( is_debian($operatingsystem) && $running_upstart ) {
+
+    # this is mainly Ubuntu with upstart
+    $class = "Rex::Service::Ubuntu";
   }
   elsif ( is_debian($operatingsystem) ) {
     $class = "Rex::Service::Debian";

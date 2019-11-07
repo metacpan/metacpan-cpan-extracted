@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Command  0.051004 {
+package Term::CLI::Command  0.051005 {
 
 use Modern::Perl 1.20140107;
 use List::Util 1.38 qw( first min );
@@ -83,7 +83,7 @@ sub complete_line {
             # Getopt::Long before 2.51 removes '--' from word list;
             # Try to work around the bug. Can still be fooled by
             # "--foo --" if "--foo" takes an argument. :-/
-            my $has_terminator = first { $_ eq '--' } @words[0..$#words-1];
+            $has_terminator = first { $_ eq '--' } @words[0..$#words-1];
             eval { GetOptionsFromArray(\@words, \%parsed_opts, @$opt_specs) };
         }
         else {
@@ -328,7 +328,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.051004
+version 0.051005
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ name: Proc-Background
 resources:
   bugtracker: https://github.com/nrdvana/perl-proc-background/issues
   repository: https://github.com/nrdvana/perl-proc-background.git
-version: '1.20'
+version: '1.21'
 x_contributors:
   - 'Florian Schlichting <fsfs@debian.org>'
   - 'Kevin Ryde <user42@zip.com.au>'

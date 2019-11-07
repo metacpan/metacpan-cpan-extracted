@@ -1,6 +1,54 @@
 ==================================================
-Changes from 2014-06-16 00:00:00 +0000 to present.
+Changes from 2014-11-08 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.68 at 2019-11-07 10:11:25 +0000
+-----------------------------------------
+
+  Change: ad469d13d24b4ba61745025946d94873c6741bbb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-07 10:11:25 +0000
+
+    Release engineering for 1.68
+
+    Don't index package Errno 
+
+-----------------------------------------
+version 1.66 at 2019-11-07 00:59:46 +0000
+-----------------------------------------
+
+  Change: 0b8b9e1a230fc5db2da7a0c134059acb36bd0f18
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-07 00:59:46 +0000
+
+    Release engineering for 1.66 
+
+  Change: 3be89570ad0dc2cbd7de4fe8b2abce06e178e55c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-07 00:51:03 +0000
+
+    Fix issues with v5.7.x (h2ph.PL and Errno.pm.PL) 
+
+  Change: 9795ec9c40d3a2fb627e975b7fc1503375cd9a9b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-06 23:49:45 +0000
+
+    Fix utils/h2ph.PL patching on v5.8.0 
+
+  Change: b4e5461e9e762b26944305ddcb195c29a98c1b39
+  Author: wwlwpd <6434714+wwlwpd@users.noreply.github.com>
+  Date : 2019-06-21 10:10:58 +0000
+
+    Set files to be patched to 0644 if they are 0444, set back after.
+
+    Issue 31: In an environment that uses the Lustre file system, it's
+    been seen that any files that are set to 0444 (read only) will cause
+    fatal filesystem errors when the patch is attempted. This makes using
+    perlbrew to install perl on these systems impossible This change
+    detects read-only files about to be patched, sets them to 0644 for
+    the duration of the patching, then sets them back to 0444 so that
+    they exist as expected during the actual build process. 
 
 -----------------------------------------
 version 1.64 at 2019-06-15 09:35:16 +0000
@@ -354,52 +402,6 @@ version 1.30 at 2014-12-23 22:41:27 +0000
 
     add Devel::PatchPerl version to list of local patches 
 
------------------------------------------
-version 1.28 at 2014-10-03 08:37:00 +0000
------------------------------------------
-
-  Change: 880fb900db81dac342b2a90087afda61934b4d32
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-10-03 09:37:00 +0000
-
-    Fix the patch for v5.18.3 
-
------------------------------------------
-version 1.26 at 2014-10-02 20:17:19 +0000
------------------------------------------
-
-  Change: 92b1112f71c93511f92e9d05a3b8e5e2794efe87
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-10-02 21:17:19 +0000
-
-    Release engineering for 1.26 
-
-  Change: bd03bcc953cc4fde772216b42a11752599268223
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-10-02 21:16:51 +0000
-
-    Update included hints files 
-
-  Change: b31fee861de7216f54bb3a5e220fea7bccf48eba
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-10-02 21:13:57 +0000
-
-    Fix META.json on v5.18.3 
-
-  Change: 6641a5dbcfe4d3159d51488c9134f23b5c303755
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2014-10-02 21:04:35 +0000
-
-    Merge pull request #17 from threebytesfull/fix_preprocessing
-
-    Patch 5.6, 5.8 and 5.10 to use freestanding preprocessor 
-
-  Change: 35feb730a91d6e065b8c4001b9233461923aacd3
-  Author: Rufus Cable <rufus@threebytesfull.com>
-  Date : 2014-09-24 17:08:10 +0000
-
-    Patch 5.6, 5.8 and 5.10 to use freestanding preprocessor 
-
 =================================================
-Plus 62 releases after 2014-06-16 00:00:00 +0000.
+Plus 64 releases after 2014-11-08 00:00:00 +0000.
 =================================================

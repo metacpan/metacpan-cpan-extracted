@@ -1,5 +1,6 @@
 package XML::NewsML_G2::Writer::News_Item;
 
+use Scalar::Util qw(looks_like_number);
 use Moose;
 use namespace::autoclean;
 
@@ -82,6 +83,27 @@ sub _create_subjects_desk {
     return @res;
 }
 
+sub _create_subjects_storytypes {
+    my $self = shift;
+    my @res;
+
+    push @res, $self->doc->createComment('storytypes')
+        if ( @{ $self->news_item->storytypes } );
+
+    foreach ( sort { $a->qcode cmp $b->qcode }
+        @{ $self->news_item->storytypes } ) {
+        push @res,
+            my $s = $self->create_element(
+            'subject',
+            type       => 'cpnat:abstract',
+            _name_text => $_
+            );
+        $self->scheme_manager->add_qcode_or_literal( $s, 'storytype',
+            $_->qcode );
+    }
+    return @res;
+}
+
 sub _create_subjects_media_topic {
     my $self = shift;
     my @res;
@@ -89,7 +111,7 @@ sub _create_subjects_media_topic {
     push @res, $self->doc->createComment('media topics')
         if $self->news_item->has_media_topics;
     foreach my $mt_qcode ( sort keys %{ $self->news_item->media_topics } ) {
-        my $mt  = $self->news_item->media_topics->{$mt_qcode};
+        my $mt = $self->news_item->media_topics->{$mt_qcode};
         my $why = $mt->direct ? 'why:direct' : 'why:ancestor';
         push @res,
             my $s = $self->create_element(
@@ -120,9 +142,61 @@ sub _create_subjects_media_topic {
     return @res;
 }
 
+sub _create_subject_concept {
+    my ( $self, $name, $item, $qcode_prefix ) = @_;
+
+    my $elem = $self->create_element( $name, _name_text => $item );
+    $self->scheme_manager->add_qcode_or_literal( $elem, $qcode_prefix,
+        $item->qcode );
+    foreach my $lang ( sort keys %{ $item->translations } ) {
+        $elem->appendChild(
+            $self->create_element(
+                'name',
+                'xml:lang' => $lang,
+                _text      => $item->translations->{$lang}
+            )
+        );
+    }
+    return $elem;
+}
+
+sub _create_subjects_concepts {
+    my ($self) = @_;
+
+    my @res;
+    push @res, $self->doc->createComment('concepts')
+        if $self->news_item->has_concepts;
+    foreach my $concept_uid ( sort keys %{ $self->news_item->concepts } ) {
+        my $concept = $self->news_item->concepts->{$concept_uid};
+        push @res, my $s = $self->create_element('subject');
+        $s->appendChild(
+            $self->_create_subject_concept(
+                'mainConcept', $concept->main, 'medtop'
+            )
+        );
+        foreach my $facet_qcode ( sort keys %{ $concept->facets } ) {
+            my $facet = $concept->facets->{$facet_qcode};
+            my ($facet_cls) = reverse split '::', $facet->meta->name;
+            $s->appendChild(
+                $self->_create_subject_concept(
+                    'facetConcept', $facet, lc $facet_cls
+                )
+            );
+        }
+    }
+
+    return @res;
+}
+
 sub _sort_subjects_locations {
-    return $b->relevance <=> $a->relevance
-        || $a->qcode <=> $b->qcode;
+    if ( looks_like_number($a) && looks_like_number($b) ) {
+        return ( $b->relevance // 0 ) <=> ( $a->relevance // 0 )
+            || $a->qcode <=> $b->qcode;
+    }
+    else {
+        return ( $b->relevance // 0 ) <=> ( $a->relevance // 0 )
+            || $a->qcode cmp $b->qcode;
+    }
 }
 
 sub _create_subjects_location {
@@ -140,10 +214,11 @@ sub _create_subjects_location {
             my $s = $self->create_element(
             'subject',
             type       => 'cpnat:geoArea',
-            relevance  => $l->relevance,
             why        => $why,
             _name_text => $l
             );
+        $s->setAttribute( 'relevance', $l->relevance )
+            if defined $l->relevance;
         $self->scheme_manager->add_qcode_or_literal( $s, 'geo', $l->qcode );
         if ( $l->iso_code ) {
             $s->appendChild( my $sa = $self->create_element('sameAs') );
@@ -231,8 +306,11 @@ sub _create_subjects {
     my $self = shift;
     my @res;
 
+    push @res, $self->_create_subjects_storytypes();
     push @res, $self->_create_subjects_desk();
     push @res, $self->_create_subjects_media_topic();
+    push @res, $self->_create_subjects_concepts()
+        if $self->news_item->has_concepts;
     push @res, $self->_create_subjects_location();
     push @res, $self->_create_subjects_organisation();
     push @res, $self->_create_subjects_topic();
@@ -409,6 +487,20 @@ sub _create_content_meta {
         );
     }
 
+    if ( $self->news_item->byline ) {
+        $cm->appendChild(
+            $self->create_element( 'by', _text => $self->news_item->byline )
+        );
+    }
+
+    if ( $self->news_item->dateline ) {
+        $cm->appendChild(
+            $self->create_element(
+                'dateline', _text => $self->news_item->dateline
+            )
+        );
+    }
+
     $cm->appendChild(
         $self->create_element(
             'language', tag => $self->news_item->language
@@ -426,13 +518,14 @@ sub _create_content_meta {
     $cm->appendChild($_) foreach (@subjects);
 
     if ( $self->news_item->slugline ) {
-        $cm->appendChild(
-            $self->create_element(
-                'slugline',
-                separator => $self->news_item->slugline_sep,
-                _text     => $self->news_item->slugline
-            )
-        );
+        my $slug =
+            $self->create_element( 'slugline',
+            _text => $self->news_item->slugline );
+        if ( $self->news_item->slugline_sep ) {
+            $slug->setAttribute( 'separator',
+                $self->news_item->slugline_sep );
+        }
+        $cm->appendChild($slug);
     }
 
     $cm->appendChild(

@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Role::HelpText  0.051004 {
+package Term::CLI::Role::HelpText  0.051005 {
 
 use Modern::Perl 1.20140107;
 
@@ -204,7 +204,7 @@ Term::CLI::Role::HelpText - Role for generating help text in Term::CLI
 
 =head1 VERSION
 
-version 0.051004
+version 0.051005
 
 =head1 SYNOPSIS
 

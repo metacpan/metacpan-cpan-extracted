@@ -6,6 +6,6 @@ META.json
 README.md
 cpanfile
 lib/common/header.pm
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 t/author-pod-syntax.t

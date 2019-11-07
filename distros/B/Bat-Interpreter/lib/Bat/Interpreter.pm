@@ -12,7 +12,7 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.014';    # VERSION
+our $VERSION = '0.015';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -271,7 +271,7 @@ sub _handle_condition {
         $right_operand = $self->_variable_substitution( $right_operand, $context );
 
         if ( $operator eq '==' || $operator eq 'EQU' ) {
-            my $a = $left_operand =~ s/\s*(.*)\s*/$1/r;
+            my $a = $left_operand  =~ s/\s*(.*)\s*/$1/r;
             my $b = $right_operand =~ s/\s*(.*)\s*/$1/r;
             return $a eq $b;
         } elsif ( $operator eq 'NEQ' ) {
@@ -284,12 +284,14 @@ sub _handle_condition {
             return $left_operand > $right_operand;
         } elsif ( $operator eq 'GEQ' ) {
             return $left_operand >= $right_operand;
-        }
 
-        else {
+        } else {
             die "Operator: $operator not implemented";
         }
-
+    } elsif ( $type eq 'Exists' ) {
+        my $path = ${ $condition->{'Exists'} }{'Path'};
+        $path = $self->_adjust_path($path);
+        return -e $path;
     } else {
         die "Condition type $type not implemented";
     }
@@ -402,7 +404,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -437,7 +439,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Pablo Rodríguez González.
+This software is Copyright (c) 2019 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

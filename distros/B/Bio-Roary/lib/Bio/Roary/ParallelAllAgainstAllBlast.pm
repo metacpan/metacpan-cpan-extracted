@@ -1,5 +1,5 @@
 package Bio::Roary::ParallelAllAgainstAllBlast;
-$Bio::Roary::ParallelAllAgainstAllBlast::VERSION = '3.12.0';
+$Bio::Roary::ParallelAllAgainstAllBlast::VERSION = '3.13.0';
 # ABSTRACT: Run all against all blast in parallel
 
 
@@ -149,7 +149,7 @@ Bio::Roary::ParallelAllAgainstAllBlast - Run all against all blast in parallel
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

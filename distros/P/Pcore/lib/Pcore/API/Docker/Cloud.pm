@@ -188,7 +188,7 @@ sub create_repo ( $self, $repo_id, @args ) {
 }
 
 # TODO not work
-sub create_autobuild ( $self, $repo_id, $scm_provider, $scm_repo_id, $desc, @args ) {
+sub create_autobuild ( $self, $repo_id, $git_repo_id, $desc, @args ) {
     my $cb = is_plain_coderef $args[-1] ? pop @args : undef;
 
     my %args = (
@@ -233,8 +233,8 @@ sub create_autobuild ( $self, $repo_id, $scm_provider, $scm_repo_id, $desc, @arg
             is_private          => $args{private} ? \1 : \0,
             active              => $args{active} ? \1 : \0,
             dockerhub_repo_name => $repo_id,
-            provider            => $scm_provider,
-            vcs_repo_name       => $scm_repo_id,
+            provider            => 'git',
+            vcs_repo_name       => $git_repo_id,
             description         => $desc,
             build_tags          => $build_tags,
         },

@@ -1,19 +1,55 @@
+bin/add-disclaimer		filter to add disclaimers to mails
 bin/append-signature		filter to append signatures to mails
 bin/dump_mail_struct		helper tool to analyze MIME structures of mails
 bin/ezmlm-append-trailer	filter designed for ezmlm to append signatures to mails
 bin/ignore_errors		wrapper to pass through mails unchanged if no signature can be added
 Changes
+cpanfile
+lib/MIME/Disclaimer.pm
 lib/MIME/Signature.pm
+Makefile
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP			lists files not required in the distribution, for t/manifest.t
+MANIFEST.SKIP			lists files not required in the distribution
+MYMETA.json
+MYMETA.yml
 README
 t/00-load.t
 t/10-append-signature.t
+t/20-add-disclaimer.t
+t/disclaimers/mails/alternative-thunderbird/ascii
+t/disclaimers/mails/alternative-thunderbird/lines
+t/disclaimers/mails/alternative-thunderbird/testsig
+t/disclaimers/mails/alternative-thunderbird/utf8
+t/disclaimers/mails/attachment-mutt/ascii
+t/disclaimers/mails/attachment-mutt/lines
+t/disclaimers/mails/attachment-mutt/testsig
+t/disclaimers/mails/attachment-mutt/utf8
+t/disclaimers/mails/orig/alternative-thunderbird
+t/disclaimers/mails/orig/attachment-mutt
+t/disclaimers/mails/orig/signed-mutt
+t/disclaimers/mails/orig/simple-mutt
+t/disclaimers/mails/signed-mutt/ascii
+t/disclaimers/mails/signed-mutt/lines
+t/disclaimers/mails/signed-mutt/testsig
+t/disclaimers/mails/signed-mutt/utf8
+t/disclaimers/mails/simple-mutt/ascii
+t/disclaimers/mails/simple-mutt/lines
+t/disclaimers/mails/simple-mutt/testsig
+t/disclaimers/mails/simple-mutt/utf8
+t/disclaimers/sigs/ascii
+t/disclaimers/sigs/lines
+t/disclaimers/sigs/testsig
+t/disclaimers/sigs/utf8
+t/mails/alternative-thunderbird/ascii
+t/mails/alternative-thunderbird/lines
+t/mails/alternative-thunderbird/testsig
+t/mails/alternative-thunderbird/utf8
 t/mails/attachment-mutt/ascii
 t/mails/attachment-mutt/lines
 t/mails/attachment-mutt/testsig
 t/mails/attachment-mutt/utf8
+t/mails/orig/alternative-thunderbird
 t/mails/orig/attachment-mutt
 t/mails/orig/signed-mutt
 t/mails/orig/simple-mutt

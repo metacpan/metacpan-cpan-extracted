@@ -1,5 +1,19 @@
 Revision history for Hash-Wrap
 
+0.12      2019-11-07 09:50:32-05:00 America/New_York
+
+  [BUG FIX]
+
+    * tests added in 0.11 were not backwards compatible with Perl < 5.18
+
+0.11      2019-11-06 14:08:02-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new -immutable option, prevents adding keys or changing values.
+    * new -lockkeys option, allows only specified keys in hash.
+
+
 0.10      2019-09-25 13:59:31-04:00 America/New_York
   [BUG FIX]
 

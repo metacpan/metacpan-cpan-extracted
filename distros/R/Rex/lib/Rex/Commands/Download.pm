@@ -38,7 +38,7 @@ use warnings;
 use Rex::Helper::UserAgent;
 use Carp;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use vars qw($has_wget $has_curl $has_lwp);
 
@@ -103,7 +103,7 @@ sub download {
 
   Rex::Logger::debug("saving file to $local");
   $remote = resolv_path($remote);
-  $local = resolv_path( $local, 1 );
+  $local  = resolv_path( $local, 1 );
 
   if ( $remote =~ m/^(https?|ftp):\/\// ) {
     _http_download( $remote, $local, %option );
@@ -172,7 +172,7 @@ sub _get_http {
   }
   elsif ($has_lwp) {
     Rex::Logger::debug("Downloading via LWP::UserAgent");
-    my $ua = Rex::Helper::UserAgent->new;
+    my $ua   = Rex::Helper::UserAgent->new;
     my $resp = $ua->get( $url, %option );
     if ( $resp->is_success ) {
       $html = $resp->content;

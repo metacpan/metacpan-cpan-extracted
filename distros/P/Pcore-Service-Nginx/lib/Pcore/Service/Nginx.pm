@@ -1,4 +1,4 @@
-package Pcore::Service::Nginx v0.1.3;
+package Pcore::Service::Nginx v0.2.0;
 
 use Pcore -dist, -class;
 
@@ -41,15 +41,19 @@ sub run ($self) {
 
     for my $suffix ( keys $mime_types->%* ) { $nginx_mime_types->{$suffix} = $mime_types->{$suffix}->[0] }
 
+    my $geoip2_country_path = $ENV->{share}->get('data/geoip2_country.mmdb') || undef;
+    my $geoip2_city_path    = $ENV->{share}->get('data/geoip2_city.mmdb')    || undef;
+
     my $params = {
-        user               => $self->{user},
-        pid                => $self->conf_dir . '/nginx.pid',
-        error_log          => "$self->{data_dir}/nginx-error.log",
-        geoip_country_path => $ENV->{share}->get('data/geoip_country.dat') || undef,
-        geoip_city_path    => $ENV->{share}->get('data/geoip_city.dat') || undef,
-        vhost_dir          => $self->vhost_dir,
-        ssl_dhparam        => $ENV->{share}->get('data/dhparam-4096.pem'),
-        mime_types         => $nginx_mime_types,
+        user                => $self->{user},
+        pid                 => $self->conf_dir . '/nginx.pid',
+        error_log           => "$self->{data_dir}/nginx-error.log",
+        use_geoip2          => $geoip2_country_path || $geoip2_city_path,
+        geoip2_country_path => $geoip2_country_path,
+        geoip2_city_path    => $geoip2_city_path,
+        vhost_dir           => $self->vhost_dir,
+        ssl_dhparam         => $ENV->{share}->get('data/dhparam-4096.pem'),
+        mime_types          => $nginx_mime_types,
     };
 
     # generate conf.nginx

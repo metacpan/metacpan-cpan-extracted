@@ -1,5 +1,5 @@
 package Proc::Background;
-$Proc::Background::VERSION = '1.20';
+$Proc::Background::VERSION = '1.21';
 # ABSTRACT: Generic interface to background process management
 require 5.004_04;
 
@@ -212,9 +212,8 @@ sub wait {
   # If neither _os_obj or _exit_value are set, then something is wrong.
   return undef if !exists($self->{_os_obj});
 
-  # Otherwise, wait forever for the process to finish.
-  $self->_reap(1, $timeout_seconds);
-  return $self->{_exit_value};
+  # Otherwise, wait for the process to finish.
+  return $self->_reap(1, $timeout_seconds)? $self->{_exit_value} : undef;
 }
 
 sub die {
@@ -237,12 +236,12 @@ sub start_time {
 }
 
 sub exit_code {
-  return undef unless defined $_[0]->{_exit_value};
+  return undef unless exists $_[0]->{_exit_value};
   return $_[0]->{_exit_value} >> 8;
 }
 
 sub exit_signal {
-  return undef unless defined $_[0]->{_exit_value};
+  return undef unless exists $_[0]->{_exit_value};
   return $_[0]->{_exit_value} & 127;
 }
 
@@ -266,7 +265,10 @@ sub timeout_system {
 
   my $proc = Proc::Background->new(@_) or return;
   my $end_time = $proc->start_time + $timeout;
-  $proc->wait($end_time - time) while time < $end_time;
+  my $delay;
+  while (($delay= ($end_time - time)) > 0 && !defined $proc->exit_code) {
+    $proc->wait($delay);
+  }
 
   my $alive = $proc->alive;
   $proc->die if $alive;
@@ -292,7 +294,7 @@ Proc::Background - Generic interface to background process management
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

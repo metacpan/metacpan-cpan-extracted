@@ -57,7 +57,7 @@ use warnings;
 
 use base 'Test::Builder::Module';
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Rex::Commands;
 use Rex::Commands::Box;
@@ -149,7 +149,7 @@ sub base_vm {
   $self->{vm} = $vm;
 }
 
-sub test(&) {
+sub test(&) { ## no critic ProhibitSubroutinePrototypes
   my $code = shift;
   my $test = __PACKAGE__->new;
   $code->($test);
@@ -216,7 +216,7 @@ sub run_task {
   );
 }
 
-sub ok($;$) {
+sub ok() {
   my ( $self, $test, $msg ) = @_;
   my $tb = Rex::Test::Base->builder;
   $tb->ok( $test, $msg );

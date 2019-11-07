@@ -27,18 +27,28 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                     width => 35,
                     align => -1,
                 },
-                release => {
-                    title => "CURRENT\nRELEASE",
+                branch => {
+                    width => 10,
+                    align => 1,
+                },
+                latest_release => {
+                    title => "LATEST\nRELEASE",
                     width => 14,
                     align => 1,
                 },
-                unreleased => {
+                parent_release => {
+                    title => "PARENT\nRELEASE",
+                    width => 14,
+                    align => 1,
+                },
+                release_distance => {
                     title => "UNRELEASED\nCHANGES",
                     width => 12,
                     align => 1,
                 },
-                uncommited => {
-                    width => 14,
+                is_dirty => {
+                    title => 'IS DIRTY',
+                    width => 10,
                     align => 1,
                 },
                 pushed => {
@@ -50,49 +60,149 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
         print $tbl->render_header;
 
-        for my $dist ( sort { $a->name cmp $b->name } $dists->@* ) {
-            my @row;
+        my $order = [ map { $_->name } sort { lc $a->name cmp lc $b->name } $dists->@* ];
 
-            push @row, $dist->name;
+        my $dist_data;
 
-            if ( $dist->id->{release} eq 'v0.0.0' ) {
-                push @row, $WHITE . $ON_RED . ' unreleased ' . $RESET;
-            }
-            else {
-                push @row, $dist->id->{release};
-            }
+        my $cv = P->cv->begin;
 
-            if ( $dist->id->{release_distance} ) {
-                push @row, $WHITE . $ON_RED . sprintf( ' %3s ', $dist->id->{release_distance} ) . $RESET;
-            }
-            else {
-                push @row, q[ - ];
+        my $dist_done = sub {
+            if ( defined $order->[0] && exists $dist_data->{ $order->[0] } ) {
+                my $res = delete $dist_data->{ shift $order->@* };
+
+                $self->_render_dist( $tbl, $res->@* );
+
+                __SUB__->();
+
+                $cv->end;
             }
 
-            if ( !$dist->is_commited ) {
-                push @row, $WHITE . $ON_RED . ' uncommited ' . $RESET;
-            }
-            else {
-                push @row, q[ - ];
-            }
+            return;
+        };
 
-            if ( $dist->id->{phase} ) {
-                if ( lc $dist->id->{phase} eq 'public' ) {
-                    push @row, q[ - ];
+        for my $dist ( $dists->@* ) {
+            $cv->begin;
+
+            $self->_get_dist_info(
+                $dist,
+                sub($data) {
+                    $dist_data->{ $dist->name } = [ $dist, $data ];
+
+                    $dist_done->();
+
+                    return;
                 }
-                else {
-                    push @row, $WHITE . $ON_RED . $SPACE . $dist->id->{phase} . $SPACE . $RESET;
-                }
-            }
-            else {
-                push @row, q[ ??? ];
-            }
-
-            print $tbl->render_row( \@row );
+            );
         }
+
+        $cv->end->recv;
 
         print $tbl->finish;
     }
+
+    return;
+}
+
+sub _get_dist_info ( $self, $dist, $cb ) {
+    my $data;
+
+    my $cv = P->cv->begin( sub ($cv) {
+        $cb->($data);
+
+        return;
+    } );
+
+    # dist id
+    $cv->begin;
+    Coro::async {
+        $data->{id} = $dist->id;
+
+        $cv->end;
+
+        return;
+    };
+
+    # dist is pushed
+    $cv->begin;
+    $dist->git->git_is_pushed( sub ($res) {
+        $data->{is_pushed} = $res;
+
+        $cv->end;
+
+        return;
+    } );
+
+    # dist releases
+    $cv->begin;
+    Coro::async {
+        $data->{releases} = $dist->releases;
+
+        $cv->end;
+
+        return;
+    };
+
+    $cv->end;
+
+    return;
+}
+
+sub _render_dist ( $self, $tbl, $dist, $data ) {
+    my @row;
+
+    # dist name
+    push @row, $dist->name;
+
+    my $dist_id = $data->{id};
+
+    # branch
+    push @row, $dist_id->{branch} || ' - ';
+
+    # latest release
+    if ( my $releases = $data->{releases} ) {
+        my $latest_release = $releases->[-1];
+
+        push @row, $latest_release;
+    }
+    else {
+        push @row, $WHITE . $ON_RED . ' unreleased ' . $RESET;
+    }
+
+    # parent release
+    push @row, defined $dist_id->{release} ? $dist_id->{release} : $WHITE . $ON_RED . ' unreleased ' . $RESET;
+
+    # parent release distance
+    push @row, !$dist_id->{release_distance} ? ' - ' : $WHITE . $ON_RED . sprintf( ' %3s ', $dist_id->{release_distance} ) . $RESET;
+
+    # is dirty
+    push @row, !$dist_id->{is_dirty} ? ' - ' : $WHITE . $ON_RED . ' dirty ' . $RESET;
+
+    # is pushed
+    my $is_pushed = $data->{is_pushed};
+
+    if ( !$is_pushed ) {
+        push @row, q[ ERROR ];
+    }
+    else {
+        my @has_not_pushed;
+
+        for my $branch ( sort keys $is_pushed->{data}->%* ) {
+            my $ahead = $is_pushed->{data}->{$branch};
+
+            if ($ahead) {
+                push @has_not_pushed, $WHITE . $ON_RED . $SPACE . "$branch ($ahead)" . $SPACE . $RESET;
+            }
+        }
+
+        if (@has_not_pushed) {
+            push @row, join "\n", @has_not_pushed;
+        }
+        else {
+            push @row, q[ - ];
+        }
+    }
+
+    print $tbl->render_row( \@row );
 
     return;
 }

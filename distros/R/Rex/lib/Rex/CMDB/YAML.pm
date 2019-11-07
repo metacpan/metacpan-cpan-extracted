@@ -9,7 +9,7 @@ package Rex::CMDB::YAML;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use base qw(Rex::CMDB::Base);
 
@@ -123,16 +123,7 @@ sub get {
     }
   }
 
-  if ( !$item ) {
-    return $all;
-  }
-  else {
-    return $all->{$item};
-  }
-
-  Rex::Logger::debug("CMDB - no item ($item) found");
-
-  return;
+  return $all;
 }
 
 1;

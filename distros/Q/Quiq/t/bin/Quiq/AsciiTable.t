@@ -245,16 +245,16 @@ sub test_unitTest_MultiLineBody1 : Test(8) {
     # Tabelle mit Titel und Zellenausrichtung
 
     my $table = q~
-          Right   Left             
-        Aligned   Aligned          Centered
-        -------   --------------   --------
-              1   This is             A
-                  the first line
+          Right Left             
+        Aligned Aligned        Centered
+        ------- -------------- --------
+              1 This is           A
+                the first line
 
-              2   Second line         B
+              2 Second line       B
 
-              3   The third           C
-                  line
+              3 The third         C
+                line
     ~;
 
     my $tab = Quiq::AsciiTable->new($table);
@@ -266,10 +266,10 @@ sub test_unitTest_MultiLineBody1 : Test(8) {
     my $rangeA = $tab->rangeA;
     $self->isDeeply($rangeA,[
         [1,0,7],
-        [0,7,3],
-        [1,10,14],
-        [0,24,3],
-        [1,27,8],
+        [0,7,1],
+        [1,8,14],
+        [0,22,1],
+        [1,23,8],
     ]);
 
     my $multiLine = $tab->multiLine;
@@ -301,17 +301,17 @@ sub test_unitTest_MultiLineBody2 : Test(8) {
     # Tabelle mit Titel und Zellenausrichtung
 
     my $table = q~
-          Right   Left             
-        Aligned   Aligned          Centered
-        -------   --------------   --------
-              1   This is             A
-                  the first line
-        -------   --------------   --------
-              2   Second line         B
-        -------   --------------   --------
-              3   The third           C
-                  line
-        -------   --------------   --------
+          Right Left             
+        Aligned Aligned        Centered
+        ------- -------------- --------
+              1 This is           A
+                the first line
+        ------- -------------- --------
+              2 Second line       B
+        ------- -------------- --------
+              3 The third         C
+                line
+        ------- -------------- --------
     ~;
 
     my $tab = Quiq::AsciiTable->new($table);
@@ -323,10 +323,10 @@ sub test_unitTest_MultiLineBody2 : Test(8) {
     my $rangeA = $tab->rangeA;
     $self->isDeeply($rangeA,[
         [1,0,7],
-        [0,7,3],
-        [1,10,14],
-        [0,24,3],
-        [1,27,8],
+        [0,7,1],
+        [1,8,14],
+        [0,22,1],
+        [1,23,8],
     ]);
 
     my $multiLine = $tab->multiLine;

@@ -1,5 +1,5 @@
 package Proc::Background::Win32;
-$Proc::Background::Win32::VERSION = '1.20';
+$Proc::Background::Win32::VERSION = '1.21';
 # ABSTRACT: Windows-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -143,7 +143,7 @@ Proc::Background::Win32 - Windows-specific implementation of process create/wait
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

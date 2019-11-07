@@ -5,29 +5,11 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.009';
+our $VERSION   = '0.013';
 
+use Types::Standard -is;
 use Exporter::Tiny qw(mkopt);
-use Scalar::Util qw(blessed);
 use namespace::autoclean;
-
-my $_expand = sub {
-	return unless defined $_[0];
-	return %{$_[0]} if ref $_[0] eq 'HASH';
-	return map @$_, @{mkopt $_[0]} if ref $_[0] eq 'ARRAY';
-	goto $_[0];
-};
-
-my $_merge = sub {
-	map defined($_)&&!ref($_) ? $_ : $_expand->($_), @_;
-};
-
-my $_expand_simple = sub {
-	return unless defined $_[0];
-	return %{$_[0]} if ref $_[0] eq 'HASH';
-	return @{$_[0]} if ref $_[0] eq 'ARRAY';
-	goto $_[0];
-};
 
 # Options not to carry up into subclasses;
 # mostly because subclasses inherit behaviour anyway.
@@ -42,12 +24,37 @@ my @delete_keys = qw(
 	before
 	after
 	type_name
+	can
 );
+
+my $_handle_list = sub {
+	my ($thing) = @_;
+	return ()
+		unless defined $thing;
+	return %$thing
+		if is_HashRef $thing;
+	return @$thing
+		if is_ArrayRef $thing;
+	goto $thing
+		if is_CodeRef $thing;
+	return $thing
+		if is_Str $thing;
+	die "Unexepcted thing; got $thing";
+};
+
+my $_handle_list_add_nulls = sub {
+	my ($thing) = @_;
+	return map @$_, @{mkopt $thing}
+		if is_ArrayRef $thing;
+	goto $_handle_list;
+};
+
+my %_cached_moo_helper;
 
 sub import {
 	my $builder = shift;
 	my $caller  = caller;
-	my %opts    = @_==1 ? $_expand->(shift) : @_;
+	my %opts    = @_==1 ? shift->$_handle_list_add_nulls : @_;
 	$opts{caller}  ||= $caller;
 	$opts{prefix} = $opts{caller} unless exists $opts{prefix};
 	$opts{toolkit} ||= $ENV{'PERL_MOOX_PRESS_TOOLKIT'} || 'Moo';
@@ -56,6 +63,8 @@ sub import {
 		unless exists $opts{version};
 	$opts{authority} = do { no strict 'refs'; no warnings 'once'; ${$opts{caller}."::AUTHORITY"} }
 		unless exists $opts{authority};
+	
+	$builder->munge_options(\%opts);
 	
 	# Sucks that we need to go through the lists thrice, but we really need to
 	# pre-build the type library so it can be used in `isa` for classes/roles.
@@ -70,34 +79,91 @@ sub import {
 	
 	if ($opts{type_library}) {
 		$builder->prepare_type_library($opts{type_library}, %opts);
+	
+		for my $role (@roles) {
+			my ($pkg_name, $pkg_opts) = @$role;
+			$builder->munge_role_options($pkg_opts, \%opts);
+			$builder->make_type_for_role($pkg_name, $pkg_opts->$_handle_list, %opts);
+		}
+		for my $class (@classes) {
+			my ($pkg_name, $pkg_opts) = @$class;
+			$builder->munge_class_options($pkg_opts, \%opts);
+			$builder->make_type_for_class($pkg_name, $pkg_opts->$_handle_list, %opts);
+		}
+	
+		require Type::Registry;
+		my $reg = 'Type::Registry'->for_class($opts{type_library});
+		$reg->add_types($_) for (
+			$opts{type_library},
+			qw( Types::Standard Types::Common::Numeric Types::Common::String Types::TypeTiny ),
+		);
 	}
 	
 	for my $role (@roles) {
-		my ($rolename, $roleopts) = @$role;
-		$builder->make_type_for_role($rolename, $_expand_simple->($roleopts), %opts);
+		my ($pkg_name, $pkg_opts) = @$role;
+		$builder->do_coercions_for_role($pkg_name, $pkg_opts->$_handle_list, %opts);
 	}
 	for my $class (@classes) {
-		my ($classname, $classopts) = @$class;
-		$builder->make_type_for_class($classname, $_expand_simple->($classopts), %opts);
+		my ($pkg_name, $pkg_opts) = @$class;
+		$builder->do_coercions_for_class($pkg_name, $pkg_opts->$_handle_list, %opts);
 	}
 	
 	for my $role (@roles) {
-		my ($rolename, $roleopts) = @$role;
-		$builder->do_coercions_for_role($rolename, $_expand_simple->($roleopts), %opts);
+		my ($pkg_name, $pkg_opts) = @$role;
+		$builder->make_role($pkg_name, $pkg_opts->$_handle_list, %opts);
 	}
 	for my $class (@classes) {
-		my ($classname, $classopts) = @$class;
-		$builder->do_coercions_for_class($classname, $_expand_simple->($classopts), %opts);
+		my ($pkg_name, $pkg_opts) = @$class;
+		$builder->make_class($pkg_name, $pkg_opts->$_handle_list, %opts);
 	}
 	
-	for my $role (@roles) {
-		my ($rolename, $roleopts) = @$role;
-		$builder->make_role($rolename, $_expand_simple->($roleopts), %opts);
+	%_cached_moo_helper = ();  # cleanups
+}
+
+sub munge_options {
+	my $builder = shift;
+	my ($opts) = @_;
+	for my $key (sort keys %$opts) {
+		if ($key =~ /^class:([^:].*)$/) {
+			my $pkg = $1;
+			my $val = delete $opts->{$key};
+			if (ref $val) {
+				push @{ $opts->{class} ||= [] }, $pkg, $val;
+			}
+			elsif ($val eq 1 or not defined $val) {
+				push @{ $opts->{class} ||= [] }, $pkg;
+			}
+			else {
+				$builder->croak("class:$pkg shortcut should be '1' or reference");
+			}
+		}
+		elsif ($key =~ /^role:([^:].*)$/) {
+			my $pkg = $1;
+			my $val = delete $opts->{$key};
+			if (ref $val) {
+				push @{ $opts->{role} ||= [] }, $pkg, $val;
+			}
+			elsif ($val eq 1 or not defined $val) {
+				push @{ $opts->{role} ||= [] }, $pkg;
+			}
+			else {
+				$builder->croak("role:$pkg shortcut should be '1' or reference");
+			}
+		}
 	}
-	for my $class (@classes) {
-		my ($classname, $classopts) = @$class;
-		$builder->make_class($classname, $_expand_simple->($classopts), %opts);
-	}
+	return;
+}
+
+sub munge_role_options {
+	shift;
+	my ($roleopts, $opts) = @_;
+	return;
+}
+
+sub munge_class_options {
+	shift;
+	my ($classopts, $opts) = @_;
+	return;
 }
 
 sub qualify_name {
@@ -197,9 +263,7 @@ sub make_type_for_class {
 sub _make_type {
 	my $builder = shift;
 	my ($name, %opts) = @_;
-	my @isa = map $builder->qualify_name($_, $opts{prefix}),
-		grep $_,
-		$_merge->(@opts{qw/extends/});
+	my @isa = map $builder->qualify_name($_, $opts{prefix}), $opts{extends}->$_handle_list;
 	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
 	
 	my $type_name = $opts{'type_name'} || $builder->type_name($qname, $opts{'prefix'});
@@ -213,12 +277,12 @@ sub _make_type {
 	}
 	
 	if (defined $opts{'subclass'} and not $opts{'is_role'}) {
-		my @subclasses = $_expand->($opts{'subclass'});
+		my @subclasses = $opts{'subclass'}->$_handle_list_add_nulls;
 		while (@subclasses) {
 			my ($sc_name, $sc_opts) = splice @subclasses, 0, 2;
 			my %opts_clone = %opts;
 			delete $opts_clone{$_} for @delete_keys;
-			$builder->make_type_for_class($sc_name, %opts_clone, extends => "::$qname", $_expand_simple->($sc_opts));
+			$builder->make_type_for_class($sc_name, %opts_clone, extends => "::$qname", $sc_opts->$_handle_list);
 		}
 	}
 }
@@ -239,9 +303,7 @@ sub _do_coercions {
 	my $builder = shift;
 	my ($name, %opts) = @_;
 	
-	my @isa = map $builder->qualify_name($_, $opts{prefix}),
-		grep $_,
-		$_merge->(@opts{qw/extends/});
+	my @isa = map $builder->qualify_name($_, $opts{prefix}), $opts{extends}->$_handle_list;
 	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
 	
 	if ($opts{coerce}) {
@@ -266,7 +328,7 @@ sub _do_coercions {
 				or $builder->croak("No method name found for coercion to $qname from $type");
 			
 			my $coderef;
-			$coderef = shift @coercions if ref($coercions[0]) eq 'CODE';
+			$coderef = shift @coercions if is_CodeRef $coercions[0];
 
 			my $mytype;
 			if ($opts{type_library}) {
@@ -285,12 +347,12 @@ sub _do_coercions {
 	}
 	
 	if (defined $opts{'subclass'} and not $opts{'is_role'}) {
-		my @subclasses = $_expand->($opts{'subclass'});
+		my @subclasses = $opts{'subclass'}->$_handle_list_add_nulls;
 		while (@subclasses) {
 			my ($sc_name, $sc_opts) = splice @subclasses, 0, 2;
 			my %opts_clone = %opts;
 			delete $opts_clone{$_} for @delete_keys;
-			$builder->do_coercions_for_class($sc_name, %opts_clone, extends => "::$qname", $_expand_simple->($sc_opts));
+			$builder->do_coercions_for_class($sc_name, %opts_clone, extends => "::$qname", $sc_opts->$_handle_list);
 		}
 	}
 }
@@ -311,9 +373,7 @@ sub _make_package {
 	my $builder = shift;
 	my ($name, %opts) = @_;
 	
-	my @isa = map $builder->qualify_name($_, $opts{prefix}),
-		grep $_,
-		$_merge->(@opts{qw/extends/});
+	my @isa = map $builder->qualify_name($_, $opts{prefix}), $opts{extends}->$_handle_list;
 	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
 	
 	if (!exists $opts{factory}) {
@@ -358,9 +418,7 @@ sub _make_package {
 	
 	{
 		my $method = $opts{toolkit_apply_roles} || ("apply_roles_".lc $toolkit);
-		my @roles = map $builder->qualify_name($_, $opts{prefix}),
-			grep $_,
-			$_merge->(@opts{qw/with/});
+		my @roles = map $builder->qualify_name($_, $opts{prefix}), $opts{with}->$_handle_list;
 		if (@roles) {
 			$builder->$method($qname, \@roles);
 		}
@@ -368,9 +426,7 @@ sub _make_package {
 	
 	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 	{
-		my %methods = map $_expand_simple->($_),
-			grep $_,
-			@opts{qw/can/};
+		my %methods = $opts{can}->$_handle_list_add_nulls;
 		if (keys %methods) {
 			$builder->$method_installer($qname, \%methods);
 		}
@@ -378,9 +434,7 @@ sub _make_package {
 	
 	{
 		my $method = $opts{toolkit_install_methods} || ("install_constants");
-		my %methods = map $_expand_simple->($_),
-			grep $_,
-			@opts{qw/constant/};
+		my %methods = $opts{constant}->$_handle_list_add_nulls;
 		if (keys %methods) {
 			$builder->$method($qname, \%methods);
 		}
@@ -388,13 +442,14 @@ sub _make_package {
 	
 	{
 		my $method = $opts{toolkit_make_attribute} || ("make_attribute_".lc $toolkit);
-		my @attrs = $_merge->(@opts{qw/has/});
+		my @attrs = $opts{has}->$_handle_list_add_nulls;
+		#use Data::Dumper;
+		#warn Dumper(\@attrs);
 		while (@attrs) {
 			my ($attrname, $attrspec) = splice @attrs, 0, 2;
 			
 			my %spec_hints;
 			if ($attrname =~ /^(\+?)(\$|\%|\@)(.+)$/) {
-				require Types::Standard;
 				require Types::TypeTiny;
 				$spec_hints{isa} ||= {
 					'$' => ~(Types::Standard::ArrayRef()|Types::Standard::HashRef()),
@@ -413,10 +468,10 @@ sub _make_package {
 			(my $clearername = ($attrname =~ /^_/ ? "_clear$attrname" : "clear_$attrname")) =~ s/\+//;
 			
 			my %spec =
-				ref($attrspec) eq 'CODE' ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
-				blessed($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
-				$_expand_simple->($attrspec);
-			if (ref $spec{builder} eq 'CODE') {
+				is_CodeRef($attrspec) ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
+				is_Object($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
+				$attrspec->$_handle_list_add_nulls;
+			if (is_CodeRef $spec{builder}) {
 				my $code = delete $spec{builder};
 				$spec{builder} = $buildername;
 				$builder->$method_installer($qname, { $buildername => $code });
@@ -433,7 +488,6 @@ sub _make_package {
 						: undef;
 				};
 				$spec{isa} ||= do {
-					require Types::Standard;
 					Types::Standard::ConsumerOf()->of($target);
 				};
 			}
@@ -445,13 +499,18 @@ sub _make_package {
 						: undef;
 				};
 				$spec{isa} ||= do {
-					require Types::Standard;
 					Types::Standard::InstanceOf()->of($target);
 				};
 			}
 			if ($spec{enum}) {
-				require Types::Standard;
 				$spec{isa} = Types::Standard::Enum()->of(@{delete $spec{enum}});
+			}
+			if (is_Object($spec{type}) and $spec{type}->can('check')) {
+				$spec{isa} = delete $spec{type};
+			}
+			elsif ($spec{type}) {
+				my $reg = 'Type::Registry'->for_class($opts{type_library});
+				$spec{isa} = $reg->lookup(delete $spec{type});
 			}
 			
 			if (ref $spec{isa} && !exists $spec{coerce} && $spec{isa}->has_coercion) {
@@ -464,10 +523,13 @@ sub _make_package {
 	
 	for my $modifier (qw(before after around)) {
 		my $method = $opts{toolkit_modify_methods} || ("modify_method_".lc $toolkit);
-		my @methods = map $_expand->($_), grep $_, $opts{$modifier};
+		my @methods = $opts{$modifier}->$_handle_list;
 		while (@methods) {
-			my ($method_name, $coderef) = splice(@methods, 0, 2);
-			$builder->$method($qname, $modifier, $method_name, $coderef);
+			my @method_names;
+			push(@method_names, shift @methods)
+				while (@methods and not ref $methods[0]);
+			my $coderef = shift @methods;
+			$builder->$method($qname, $modifier, \@method_names, $coderef);
 		}
 	}
 	
@@ -478,24 +540,39 @@ sub _make_package {
 			Moose::Util::find_meta($qname)->make_immutable;
 		}
 		
-		if (defined $opts{'factory'}) {
-			if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
-				my $fpackage    = $opts{'factory_package'} || $opts{'caller'};
-				my $factoryname = $builder->qualify_name($opts{'factory'}, $fpackage);
-				eval "sub $factoryname { shift; '$qname'->new(\@_) }; 1"
-					or $builder->croak("Couldn't create factory $factoryname: $@");
-				eval "sub $qname\::FACTORY { '$fpackage' }; 1"
-					or $builder->croak("Couldn't create factory $qname\::FACTORY: $@");
+		if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
+			my $fpackage = $opts{'factory_package'} || $opts{'caller'};
+			if ($opts{'factory'}) {
+				my @methods = $opts{'factory'}->$_handle_list;
+				while (@methods) {
+					my @method_names;
+					push(@method_names, shift @methods)
+						while (@methods and not ref $methods[0]);
+					my $coderef = shift(@methods) || \"new";
+					for my $name (@method_names) {
+						if (is_CodeRef $coderef) {
+							eval "package $fpackage; sub $name :method { splice(\@_, 1, 0, '$qname'); goto \$coderef }; 1"
+								or $builder->croak("Could not create factory $name in $fpackage: $@");
+						}
+						else {
+							my $target = $$coderef;
+							eval "package $fpackage; sub $name :method { shift; '$qname'->$target\(\@_) }; 1"
+								or $builder->croak("Couldn't create factory $name in $fpackage: $@");
+						}
+					}
+				}
 			}
+			eval "sub $qname\::FACTORY { '$fpackage' }; 1"
+				or $builder->croak("Couldn't create link back to factory $qname\::FACTORY: $@");
 		}
-		
+
 		if (defined $opts{'subclass'}) {
-			my @subclasses = $_expand->($opts{'subclass'});
+			my @subclasses = $opts{'subclass'}->$_handle_list_add_nulls;
 			while (@subclasses) {
 				my ($sc_name, $sc_opts) = splice @subclasses, 0, 2;
 				my %opts_clone = %opts;
 				delete $opts_clone{$_} for @delete_keys;
-				$builder->make_class($sc_name, %opts_clone, extends => "::$qname", $_expand_simple->($sc_opts));
+				$builder->make_class($sc_name, %opts_clone, extends => "::$qname", $sc_opts->$_handle_list);
 			}
 		}
 	}
@@ -512,22 +589,27 @@ sub _make_package {
 	return $qname;
 }
 
-my %_cached_moo_helper;
 sub _get_moo_helper {
 	my $builder = shift;
 	my ($package, $helpername) = @_;
 	return $_cached_moo_helper{"$package\::$helpername"}
 		if $_cached_moo_helper{"$package\::$helpername"};
-	die unless $helpername =~ /^(has|with|extends|around|before|after)$/;
-	my $tracker = ($INC{'Moo/Role.pm'} && 'Moo::Role'->is_role($package))
-		? $Moo::Role::INFO{$package}{exports}
-		: $Moo::MAKERS{$package}{exports};
+	die "lolwut?" unless $helpername =~ /^(has|with|extends|around|before|after)$/;
+	my $is_role = ($INC{'Moo/Role.pm'} && 'Moo::Role'->is_role($package));
+	my $tracker = $is_role ? $Moo::Role::INFO{$package}{exports} : $Moo::MAKERS{$package}{exports};
 	if (ref $tracker) {
-		return ($_cached_moo_helper{"$package\::$helpername"} = $tracker->{$helpername});
+		$_cached_moo_helper{"$package\::$helpername"} ||= $tracker->{$helpername};
 	}
 	# I hate this...
-	$_cached_moo_helper{"$package\::$helpername"} =
-		eval sprintf('do { package %s; use Moo; my $coderef = \&%s; no Moo; $coderef };', $package, $helpername);
+	$_cached_moo_helper{"$package\::$helpername"} ||= eval sprintf(
+		'do { package %s; use Moo%s; my $coderef = \&%s; no Moo%s; $coderef };',
+		$package,
+		$is_role ? '::Role' : '',
+		$helpername,
+		$is_role ? '::Role' : '',
+	);
+	die "BADNESS: couldn't get helper '$helpername' for package '$package'" unless $_cached_moo_helper{"$package\::$helpername"};
+	$_cached_moo_helper{"$package\::$helpername"};
 }
 
 sub make_attribute_moo {
@@ -628,25 +710,31 @@ sub install_constants {
 
 sub modify_method_moo {
 	my $builder = shift;
-	my ($class, $modifier, $method_name, $coderef) = @_;
+	my ($class, $modifier, $method_names, $coderef) = @_;
 	my $helper = $builder->_get_moo_helper($class, $modifier);
-	$helper->($method_name, $coderef);
+	$helper->(@$method_names, $coderef);
 }
 
 sub modify_method_moose {
 	my $builder = shift;
-	my ($class, $modifier, $method_name, $coderef) = @_;
+	my ($class, $modifier, $method_names, $coderef) = @_;
 	my $m = "add_$modifier\_method_modifier";
 	require Moose::Util;
-	(Moose::Util::find_meta($class) or $class->meta)->$m($method_name, $coderef);
+	my $meta = Moose::Util::find_meta($class) || $class->meta;
+	for my $method_name (@$method_names) {
+		$meta->$m($method_name, $coderef);
+	}
 }
 
 sub modify_method_mouse {
 	my $builder = shift;
-	my ($class, $modifier, $method_name, $coderef) = @_;
+	my ($class, $modifier, $method_names, $coderef) = @_;
 	my $m = "add_$modifier\_method_modifier";
 	require Mouse::Util;
-	(Mouse::Util::find_meta($class) or $class->meta)->$m($method_name, $coderef);
+	my $meta = (Mouse::Util::find_meta($class) or $class->meta);
+	for my $method_name (@$method_names) {
+		$meta->$m($method_name, $coderef);
+	}
 }
 
 1;
@@ -840,6 +928,34 @@ idea.
 Only supported for Moose. Unnecessary for Moo anyway. Defaults to false.
 
 =back
+
+At this top level, a shortcut is available for the 'class' and 'role' keys.
+Rather than:
+
+  use MooX::Press (
+    role => [
+      'Quux',
+      'Quuux' => { ... },
+    ],
+    class => [
+      'Foo',
+      'Bar' => { ... },
+      'Baz' => { ... },
+    ],
+  );
+
+It is possible to write:
+
+  use MooX::Press (
+    'role:Quux'  => {},
+    'role:Quuux' => { ... },
+    'class:Foo'  => {},
+    'class:Bar'  => { ... },
+    'class:Baz'  => { ... },
+  );
+
+This saves a level of indentation. (C<< => undef >> or C<< => 1 >> are
+supported as synonyms for C<< => {} >>.)
 
 =head3 Class Options
 
@@ -1198,7 +1314,7 @@ subclasses "+Mammal", "+Dog", etc, you'd end up with packages like
 "MyApp::Animal::Mammal::Dog". (In cases of multiple inheritance, it uses
 C<< $ISA[0] >>.)
 
-=item C<< factory >> I<< (Str) >>
+=item C<< factory >> I<< (Str|ArrayRef|Undef) >>
 
 This is the name for the method installed into the factory package.
 So for class "Cat", it might be "new_cat".
@@ -1207,6 +1323,29 @@ The default is the class name (excluding the prefix), lowercased,
 with double colons replaced by single underscores, and
 with "new_" added in front. To suppress the creation
 of this method, set C<factory> to an explicit undef.
+
+If set to an arrayref, it indicates you wish to create multiple
+methods in the factory package to make objects of this class.
+
+  factory => [
+    "grow_pig"                         => \"new_from_embryo",
+    "new_pork", "new_bacon", "new_ham" => sub { ... },
+    "new_pig", "new_swine",
+  ],
+
+A scalarref indicates the name of a constructor and that the
+methods before are shortcuts for that constructor. So
+C<< MyApp->grow_pig(@args) >> is a shortcut for
+C<< MyApp::Pig->new_from_embryo(@args) >>.
+
+A coderef will have a custom method installed into the factory package
+so that C<< MyApp->new_pork(@args) >> will act as a shortcut for:
+C<< $coderef->("MyApp", "MyApp::Pig", @args) >>. Note that C<new_bacon>
+and C<new_ham> are just aliases for C<new_bacon>.
+
+The C<new_pig> and C<new_swine> method names are followed by
+neither a coderef nor a scalarref, so are treated as if they had
+been followed by C<< \"new" >>.
 
 =item C<< type_name >> I<< (Str) >>
 
@@ -1375,6 +1514,14 @@ an object blessed into the "YourApp::HashRef" class.
 
 Use blessed type constraint objects, such as those from L<Types::Standard>.
 
+=item C<< type >> I<< (Str) >>
+
+C<< type => "HashRef" >> does what you think  C<< isa => "HashRef" >> should
+do. More specifically it searches your type library, along with
+L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>
+to find the type constraint it thinks you wanted. It's smart enough to deal
+with parameterized types, unions, intersections, and complements.
+
 =item C<< coerce >> I<< (Bool) >>
 
 MooX::Press automatically implies C<< coerce => 1 >> when you give a
@@ -1520,6 +1667,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>.
 =head1 SEE ALSO
 
 L<Moo>, L<MooX::Struct>, L<Types::Standard>.
+
+L<portable::loader>.
 
 =head1 AUTHOR
 

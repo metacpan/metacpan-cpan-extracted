@@ -157,7 +157,7 @@ sub encode_data ( $type, $data, @args ) {
 # JSON data should be without UTF8 flag
 # objects aren't deserialized automatically from JSON
 sub decode_data ( $type, $data_ref, @args ) {
-    $data_ref = \$data_ref if !is_ref $_[1];
+    $data_ref = \$_[1] if !is_ref $data_ref;
 
     my %args = (
         compress     => undef,
@@ -323,14 +323,26 @@ sub from_perl ( $data, %args ) {
 
     $data = decode_utf8 is_plain_scalarref $data ? $data->$* : $data;
 
+    my ( $tmp, $eval );
+
+    if ( $data =~ /\A\s*use Filter::Crypto::Decrypt;/sm ) {
+        $tmp = P->file1->tempfile;
+
+        P->file->write_text( $tmp, $data );
+
+        $eval = \"do '$tmp';";
+    }
+    else {
+        $eval = \$data;
+    }
+
     ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
     my $res = eval <<"CODE";
 package $ns;
 
-use Pcore -config;
-
-$data
+$eval->$*;
 CODE
+
     die $@ if $@;
 
     return $res;
@@ -1036,10 +1048,10 @@ sub from_uri_query_utf8 : prototype($) ($uri) {
 ## |      | 159                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 355, 408             | * Postfix control "for" used                                                                                   |
-## |      | 616                  | * Postfix control "while" used                                                                                 |
+## |      | 367, 420             | * Postfix control "for" used                                                                                   |
+## |      | 628                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 951                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 963                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

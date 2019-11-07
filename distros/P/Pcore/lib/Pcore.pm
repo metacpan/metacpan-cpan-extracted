@@ -1,4 +1,4 @@
-package Pcore v0.98.4;
+package Pcore v0.98.15;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -10,7 +10,6 @@ use Pcore::Core::Const qw[:CORE];
 our $EXPORT_PRAGMA = {
     ansi     => undef,    # export ANSI color variables
     class    => undef,    # package is a Moo class
-    config   => undef,    # mark package as perl config, used automatically during .perl config evaluation, do not use directly!!!
     const    => undef,    # export "const" keyword
     dist     => undef,    # mark package aas Pcore dist main module
     embedded => undef,    # run in embedded mode
@@ -79,58 +78,55 @@ sub import {
     # re-export core packages
     Pcore::Core::Const->import( -caller => $caller );
 
-    if ( !$import->{pragma}->{config} ) {
+    # process -l10n pragma
+    if ( $import->{pragma}->{l10n} ) {
+        require Pcore::Core::L10N;
 
-        # process -l10n pragma
-        if ( $import->{pragma}->{l10n} ) {
-            require Pcore::Core::L10N;
+        Pcore::Core::L10N->import( -caller => $caller );
+    }
 
-            Pcore::Core::L10N->import( -caller => $caller );
-        }
+    # export "dump"
+    Pcore::Core::Dump->import( -caller => $caller );
 
-        # export "dump"
-        Pcore::Core::Dump->import( -caller => $caller );
+    # process -export pragma
+    Pcore::Core::Exporter->import( -caller => $caller ) if $import->{pragma}->{export};
 
-        # process -export pragma
-        Pcore::Core::Exporter->import( -caller => $caller ) if $import->{pragma}->{export};
+    # process -dist pragma
+    $ENV->register_dist($caller) if $import->{pragma}->{dist};
 
-        # process -dist pragma
-        $ENV->register_dist($caller) if $import->{pragma}->{dist};
+    # process -const pragma
+    if ( $import->{pragma}->{const} ) {
+        *{"$caller\::const"} = \&Const::Fast::const;
+    }
 
-        # process -const pragma
-        if ( $import->{pragma}->{const} ) {
-            *{"$caller\::const"} = \&Const::Fast::const;
-        }
+    # process -ansi pragma
+    if ( $import->{pragma}->{ansi} ) {
+        Pcore::Core::Const->import( -caller => $caller, qw[:ANSI] );
+    }
 
-        # process -ansi pragma
-        if ( $import->{pragma}->{ansi} ) {
-            Pcore::Core::Const->import( -caller => $caller, qw[:ANSI] );
-        }
+    # import exceptions
+    Pcore::Core::Exception->import( -caller => $caller );
 
-        # import exceptions
-        Pcore::Core::Exception->import( -caller => $caller );
+    # process -res pragma
+    if ( $import->{pragma}->{res} ) {
+        require Pcore::Lib::Result;
 
-        # process -res pragma
-        if ( $import->{pragma}->{res} ) {
-            require Pcore::Lib::Result;
+        Pcore::Lib::Result->import( -caller => $caller, qw[res] );
+    }
 
-            Pcore::Lib::Result->import( -caller => $caller, qw[res] );
-        }
+    # process -sql pragma
+    if ( $import->{pragma}->{sql} ) {
+        require Pcore::Handle::DBI::Const;
 
-        # process -sql pragma
-        if ( $import->{pragma}->{sql} ) {
-            require Pcore::Handle::DBI::Const;
+        Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY] );
+    }
 
-            Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY] );
-        }
-
-        # re-export OOP
-        if ( $import->{pragma}->{class} ) {
-            Pcore::Core::OOP::Class->import($caller);
-        }
-        elsif ( $import->{pragma}->{role} ) {
-            Pcore::Core::OOP::Role->import($caller);
-        }
+    # re-export OOP
+    if ( $import->{pragma}->{class} ) {
+        Pcore::Core::OOP::Class->import($caller);
+    }
+    elsif ( $import->{pragma}->{role} ) {
+        Pcore::Core::OOP::Role->import($caller);
     }
 
     return;
@@ -414,15 +410,15 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 66                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 65                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 158, 187, 190, 194,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 226, 229, 234, 237,  |                                                                                                                |
-## |      | 262, 391             |                                                                                                                |
+## |    3 | 154, 183, 186, 190,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 222, 225, 230, 233,  |                                                                                                                |
+## |      | 258, 387             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 244                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 240                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 162                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 158                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -24,4 +24,5 @@ t/false_injection.t
 t/prop_inherit.t
 t/release-kwalitee.t
 t/role.t
+t/sub_attrs.t
 weaver.ini

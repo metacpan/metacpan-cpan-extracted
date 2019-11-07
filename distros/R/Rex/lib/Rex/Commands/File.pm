@@ -62,7 +62,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -388,6 +388,18 @@ sub file {
     $option->{source} = resolv_path( $option->{source} );
   }
 
+  # default: ensure = present
+  $option->{ensure} ||= "present";
+
+  my $fs = Rex::Interface::Fs->create;
+
+  if ( $option->{ensure} ne 'absent' && $fs->is_symlink($file) ) {
+    my $original_file = $file;
+    $file = resolve_symlink($file);
+    Rex::Logger::info(
+      "$original_file is a symlink, operating on $file instead", 'warn' );
+  }
+
   #### check and run before hook
   eval {
     my @new_args = Rex::Hook::run_hook( file => "before", @_ );
@@ -401,16 +413,11 @@ sub file {
   };
   ##############################
 
-  # default: ensure = present
-  $option->{ensure} ||= "present";
-
   Rex::get_current_connection()->{reporter}
     ->report_resource_start( type => "file", name => $file );
 
   my $need_md5 = ( $option->{"on_change"} && !$is_directory ? 1 : 0 );
   my $on_change = $option->{"on_change"} || sub { };
-
-  my $fs = Rex::Interface::Fs->create;
 
   my $__ret = { changed => 0 };
 
@@ -442,7 +449,7 @@ sub file {
       : $file_name
     );
 
-    my $fh = file_write($tmp_file_name);
+    my $fh    = file_write($tmp_file_name);
     my @lines = split( qr{$/}, $option->{"content"} );
     for my $line (@lines) {
       $fh->write( $line . $/ );
@@ -852,6 +859,8 @@ sub delete_lines_matching {
 
   my $fs = Rex::Interface::Fs->create;
 
+  my %stat = $fs->stat($file);
+
   if ( !$fs->is_file($file) ) {
     Rex::Logger::info("File: $file not found.");
     die("$file not found");
@@ -862,16 +871,13 @@ sub delete_lines_matching {
     die("$file not writable");
   }
 
-  my $nl = $/;
+  my $nl      = $/;
   my @content = split( /$nl/, cat($file) );
 
   my $old_md5 = "";
   eval { $old_md5 = md5($file); };
 
-  my $fh = file_write $file;
-  unless ($fh) {
-    die("Can't open $file for writing");
-  }
+  my @new_content;
 
 OUT:
   for my $line (@content) {
@@ -882,9 +888,14 @@ OUT:
       }
     }
 
-    $fh->write( $line . $nl );
+    push @new_content, $line;
   }
-  $fh->close;
+
+  file $file,
+    content => join( $nl, @new_content ),
+    owner   => $stat{uid},
+    group   => $stat{gid},
+    mode    => $stat{mode};
 
   my $new_md5 = "";
   eval { $new_md5 = md5($file); };
@@ -922,7 +933,7 @@ sub delete_lines_according_to {
   my ( $search, $file, @options ) = @_;
   $file = resolv_path($file);
 
-  my $option = {@options};
+  my $option    = {@options};
   my $on_change = $option->{on_change} || undef;
 
   my ( $old_md5, $new_md5 );
@@ -1046,6 +1057,8 @@ sub _append_or_update {
 
   my $fs = Rex::Interface::Fs->create;
 
+  my %stat = $fs->stat($file);
+
   my ( $old_md5, $ret );
   $old_md5 = md5($file);
 
@@ -1078,29 +1091,11 @@ sub _append_or_update {
 
   push @$content, "$new_line" unless $found;
 
-  eval {
-    my $fh = file_write $file;
-    unless ($fh) {
-      die("can't open file for writing");
-    }
-    $fh->write( join( "\n", @$content ) );
-    $fh->write("\n");
-    $fh->close;
-    $ret = 0;
-    1;
-  } or do {
-    $ret = 3;
-  };
-
-  if ( $ret == 1 ) {
-    die("Can't open $file for reading");
-  }
-  elsif ( $ret == 2 ) {
-    die("Can't open temp file for writing");
-  }
-  elsif ( $ret == 3 ) {
-    die("Can't open $file for writing");
-  }
+  file $file,
+    content => join( "\n", @$content ),
+    owner   => $stat{uid},
+    group   => $stat{gid},
+    mode    => $stat{mode};
 
   my $new_md5 = md5($file);
 

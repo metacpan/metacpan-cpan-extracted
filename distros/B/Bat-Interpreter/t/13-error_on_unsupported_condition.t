@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 1;
+use Test::More skip_all => "All parsed conditions supported. Waiting for support in App::BatParser for more conditions";
 use English qw( -no_match_vars );
 use Bat::Interpreter;
 

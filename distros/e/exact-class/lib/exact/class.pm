@@ -6,7 +6,7 @@ use exact;
 use Role::Tiny ();
 use Scalar::Util ();
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 my ( $store, $roles );
 
@@ -38,10 +38,13 @@ sub ____parents {
 }
 
 sub ____install {
-    my ( $self, $namespace ) = @_;
+    my ( $self, $namespace, $input ) = @_;
     if ( ref $store->{$namespace} eq 'HASH' ) {
         for my $name ( keys %{ $store->{$namespace}->{has} } ) {
-            if ( exists $store->{$namespace}->{value}{$name} ) {
+            if ( exists $input->{$name} ) {
+                $self->attr( $name, $input->{$name} );
+            }
+            elsif ( exists $store->{$namespace}->{value}{$name} ) {
                 $self->attr( $name, $store->{$namespace}->{value}{$name} );
             }
             else {
@@ -53,16 +56,17 @@ sub ____install {
 
 sub new {
     my $class = shift;
-    my $self  = bless( @_ ? @_ > 1 ? {@_} : { %{ $_[0] } } : {}, ref $class || $class );
+    my $input = @_ ? @_ > 1 ? {@_} : { %{ $_[0] } } : {};
+    my $self  = bless( { %$input }, ref $class || $class );
 
     for my $namespace ( reverse ( ref $self, ____parents( ref $self ) ) ) {
         if ( ref $roles->{$namespace} eq 'ARRAY' ) {
             for my $role ( @{ $roles->{$namespace} } ) {
-                ____install( $self, $role );
+                ____install( $self, $role, $input );
             }
         }
 
-        ____install( $self, $namespace );
+        ____install( $self, $namespace, $input );
     }
 
     return $self;
@@ -146,7 +150,8 @@ sub ____attrs {
                         return $self;
                     }
                     else {
-                        return ( ref $self->{$name} eq 'CODE' ) ? $self->{$name}->($self) : $self->{$name};
+                        $self->{$name} = $self->{$name}->($self) if ( ref $self->{$name} eq 'CODE' );
+                        return $self->{$name};
                     }
                 }
                 : sub {
@@ -157,9 +162,11 @@ sub ____attrs {
                         return $self;
                     }
                     else {
-                        return ( ref $store->{ $set->{caller} }->{value}{$name} eq 'CODE' )
-                            ? $store->{ $set->{caller} }->{value}{$name}->($self)
-                            : $store->{ $set->{caller} }->{value}{$name};
+                        $store->{ $set->{caller} }->{value}{$name} =
+                            $store->{ $set->{caller} }->{value}{$name}->($self)
+                            if ( ref $store->{ $set->{caller} }->{value}{$name} eq 'CODE' );
+
+                        return $store->{ $set->{caller} }->{value}{$name};
                     }
                 };
 
@@ -217,7 +224,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.05
+version 1.07
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-class.svg)](https://travis-ci.org/gryphonshafer/exact-class)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-class/badge.png)](https://coveralls.io/r/gryphonshafer/exact-class)

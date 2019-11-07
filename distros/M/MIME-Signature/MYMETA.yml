@@ -1,0 +1,32 @@
+---
+abstract: 'appends signature to mail messages'
+author:
+  - 'Martin H. Sluka <fany@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MIME-Signature
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Method::Modifiers: '0'
+  HTML::Entities: '0'
+  HTML::Parser: '0'
+  MIME::Parser: '0'
+  Path::Tiny: '0'
+  perl: '5.014'
+resources:
+  homepage: https://github.com/fany/MIME-Signature
+  repository: https://github.com/fany/MIME-Signature.git
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

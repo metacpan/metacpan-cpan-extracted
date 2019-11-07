@@ -9,7 +9,7 @@ package Rex::Hardware::Memory;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Hardware::Host;
 use Rex::Commands::Run;
@@ -77,7 +77,7 @@ sub get {
 
   }
   elsif ( $os eq "OpenBSD" ) {
-    my $mem_str = i_run "top -d1 | grep Memory:", fail_ok => 1;
+    my $mem_str   = i_run "top -d1 | grep Memory:", fail_ok => 1;
     my $total_mem = sysctl("hw.physmem");
 
     my ( $phys_mem, $p_m_ent, $virt_mem, $v_m_ent, $free, $f_ent ) =
@@ -95,7 +95,7 @@ sub get {
 
   }
   elsif ( $os eq "NetBSD" ) {
-    my $mem_str = i_run "top -d1 | grep Memory:", fail_ok => 1;
+    my $mem_str   = i_run "top -d1 | grep Memory:", fail_ok => 1;
     my $total_mem = sysctl("hw.physmem");
 
     my (
@@ -123,7 +123,7 @@ sub get {
 
   }
   elsif ( $os =~ /FreeBSD/ ) {
-    my $mem_str = i_run "top -d1 | grep Mem:", fail_ok => 1;
+    my $mem_str   = i_run "top -d1 | grep Mem:", fail_ok => 1;
     my $total_mem = sysctl("hw.physmem");
 
     my (

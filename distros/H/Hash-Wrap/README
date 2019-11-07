@@ -19,8 +19,8 @@ With "Hash::Wrap":
   print $obj->a;
 
 Elements can be added or removed to the object and accessors will track
-them. If the object should be immutable, use the lock routines in
-Hash::Util on it.
+them. The object may be made immutable, or may have a restricted set of
+attributes.
 
 There are many similar modules on CPAN (see "SEE ALSO" for comparisons).
 

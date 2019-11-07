@@ -9,7 +9,7 @@ package Rex::Interface::Fs::HTTP;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Commands;
 use Rex::Interface::Exec;
@@ -78,7 +78,7 @@ sub stat {
     return %{ $resp->{stat} };
   }
 
-  return undef;
+  return undef; ## no critic ProhibitExplicitReturnUndef
 }
 
 sub is_readable {

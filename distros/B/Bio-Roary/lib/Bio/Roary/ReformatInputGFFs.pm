@@ -1,5 +1,5 @@
 package Bio::Roary::ReformatInputGFFs;
-$Bio::Roary::ReformatInputGFFs::VERSION = '3.12.0';
+$Bio::Roary::ReformatInputGFFs::VERSION = '3.13.0';
 # ABSTRACT: Take in gff files and add suffix where a gene id is seen twice
 
 
@@ -15,7 +15,7 @@ use Digest::MD5::File qw(file_md5_hex);
 
 has 'gff_files'        => ( is => 'ro', isa  => 'ArrayRef', required => 1 );
 has 'logger'           => ( is => 'ro', lazy => 1,          builder  => '_build_logger' );
-has '_tags_to_filter'  => ( is => 'ro', isa  => 'Str',      default  => '(CDS|ncRNA|tRNA|tmRNA|rRNA)' );
+has '_tags_to_filter'  => ( is => 'ro', isa  => 'Str',      default  => 'CDS' );
 has 'output_directory' => ( is => 'ro', isa  => 'Str',      default  => 'fixed_input_files' );
 has 'suffix_counter'   => ( is => 'rw', isa  => 'Int',      default  => 1 );
 
@@ -209,7 +209,7 @@ Bio::Roary::ReformatInputGFFs - Take in gff files and add suffix where a gene id
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::Roary;
-$Bio::Roary::Main::Roary::VERSION = '3.12.0';
+$Bio::Roary::Main::Roary::VERSION = '3.13.0';
 # ABSTRACT: Create a pan genome from a set of GFF files
 # PODNAME: roary
 
@@ -25,7 +25,7 @@ roary - Create a pan genome from a set of GFF files
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

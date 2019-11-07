@@ -9,7 +9,7 @@ package Rex::Hardware::Host;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex;
 use Rex::Commands::Run;
@@ -139,7 +139,7 @@ sub get_operating_system {
     return "Debian";
   }
 
-  if ( is_file("/etc/SuSE-release") ) {
+  if ( is_file("/etc/SuSE-release") or is_file("/etc/SUSE-brand") ) {
     return "SuSE";
   }
 
@@ -211,7 +211,7 @@ sub get_operating_system_version {
   if ($is_lsb) {
     if ( my $ret = i_run "lsb_release -r -s" ) {
       my $os_check = i_run "lsb_release -d";
-      unless ( $os_check =~ m/SUSE\sLinux\sEnterprise\sServer/ ) {
+      unless ( $os_check =~ m/SUSE\sLinux\sEnterprise/ ) {
         return $ret;
       }
     }
@@ -275,16 +275,22 @@ sub get_operating_system_version {
 
     my ( $version, $release );
 
-    my $fh      = file_read("/etc/SuSE-release");
+    my $release_file;
+    if ( is_file("/etc/os-release") ) {
+      $release_file = "/etc/os-release";
+    }
+    else {
+      $release_file = "/etc/SuSE-release";
+    }
+
+    my $fh      = file_read($release_file);
     my $content = $fh->read_all;
     $fh->close;
 
     chomp $content;
 
-    if ( $content =~ m/SUSE\sLinux\sEnterprise\sServer/m ) {
-      ( $version, $release ) =
-        $content =~ m/VERSION\s=\s(\d+)\nPATCHLEVEL\s=\s(\d+)/m;
-      $version = "$version.$release";
+    if ( $content =~ m/VERSION_ID/m ) {
+      ($version) = $content =~ m/VERSION_ID="(\d+(?:\.)?\d+)"/m;
     }
     else {
       ($version) = $content =~ m/VERSION = (\d+\.\d+)/m;

@@ -5,7 +5,7 @@ use namespace::autoclean;
 
 with 'XML::NewsML_G2::Role::HasQCode';
 
-has 'relevance', isa => 'Int', is => 'ro', required => 1;
+has 'relevance', isa => 'Int', is => 'ro';
 has 'parent', isa => __PACKAGE__, is => 'rw';
 has 'direct', isa => 'Bool', is => 'rw', default => '';
 has 'iso_code',  isa => 'Str', is => 'rw';

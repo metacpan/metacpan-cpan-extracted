@@ -33,16 +33,17 @@ A string containing the name of the item
 
 =item qcode
 
-The right part of an IPTC complient QCode
+The right part of an IPTC compliant QCode
 
 =back
 
 =head1 AUTHOR
 
 Philipp Gortan  C<< <philipp.gortan@apa.at> >>
+Christian Eder  C<< <christian.eder@apa.at> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2013-2014, APA-IT. All rights reserved.
+Copyright (c) 2013-2019, APA-IT. All rights reserved.
 
 See L<XML::NewsML_G2> for the license.

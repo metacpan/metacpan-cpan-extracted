@@ -57,7 +57,7 @@ package Rex::Commands::SCM;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Config;
@@ -83,7 +83,7 @@ With this function you can checkout a repository defined with I<set repository>.
 sub checkout {
   my ( $name, %data ) = @_;
 
-  my $type = $REPOS{"$name"}->{"type"} ? $REPOS{$name}->{"type"} : "git";
+  my $type  = $REPOS{"$name"}->{"type"} ? $REPOS{$name}->{"type"} : "git";
   my $class = "Rex::SCM::\u$type";
 
   my $co_to = exists $data{"path"} ? $data{"path"} : "";

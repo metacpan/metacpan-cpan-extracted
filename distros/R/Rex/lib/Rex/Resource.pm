@@ -9,7 +9,7 @@ package Rex::Resource;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Constants;
 
@@ -51,7 +51,7 @@ sub call {
 
   $self->set_all_parameters(%params);
 
-  $self->{res_name} = $name;
+  $self->{res_name}   = $name;
   $self->{res_ensure} = $params{ensure} ||= present;
 
   Rex::get_current_connection()->{reporter}

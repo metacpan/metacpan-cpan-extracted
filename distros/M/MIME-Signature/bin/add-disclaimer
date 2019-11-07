@@ -1,0 +1,119 @@
+#!perl
+
+use 5.014;
+use warnings;
+
+use constant {
+    EXIT_SOFT_ERROR => 111,
+    EXIT_SUCCESS    => 0,
+};
+
+BEGIN {
+    $SIG{__DIE__} = sub {
+        print STDERR @_;
+        exit EXIT_SOFT_ERROR;
+    };
+}
+
+use Encode qw(decode FB_CROAK);
+use Getopt::Long qw(GetOptions);
+use Path::Tiny qw(path);
+use MIME::Disclaimer;
+use Path::Tiny qw(path);
+
+my $Encoding = 'UTF-8';
+
+sub read_file {
+    my ( $option, $value ) = @_;
+    path($value)->slurp( { binmode => ":encoding($Encoding)" } );
+}
+
+my %options;
+GetOptions
+  \%options,
+  'encoding=s' => \$Encoding,
+  'help' => sub { exec perldoc => -F => $0 or die "Cannot exec perldoc: $!\n" },
+  'unsign!', map {
+    my $type = $_;
+    (
+        "$type=s" => sub {
+            $options{$type} = decode( $Encoding, $_[1], FB_CROAK );
+        },
+        "$type-file=s" => sub {
+            $options{$type} = &read_file;
+        }
+    );
+  } qw(enriched html plain)
+  or exit EXIT_SOFT_ERROR;
+
+MIME::Disclaimer->new( parse => \*STDIN, %options )->add->print;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+add-disclaimer - add a disclaimer to mail message
+
+=head1 SYNOPSIS
+
+    add-disclaimer -plain-file file <mail.in >mail.out
+
+=head1 DESCRIPTION
+
+This filter adds a disclaimer to the first text/plain, text/enriched
+or text/html part (or all of them, if they are contained in a
+multipart/alternative) of the message/rfc822 given on the standard input
+and emits the result to the standard output.
+
+=head1 OPTIONS
+
+=head2 to provide the disclaimers
+
+=over 4
+
+=item -plain text
+
+=item -enriched text
+
+=item -html text
+
+Used to provide the disclaimer to be prepended and appended to text/plain, text/enriched
+respectively text/html parts of e-mails directly on the command line.
+
+=item -plain-file file
+
+=item -enriched-file file
+
+=item -html-file file
+
+Used to provide the disclaimer to be prepended and appended to text/plain, text/enriched
+respectively text/html parts of e-mails via file.
+
+=back
+
+When missing, the text/enriched and text/html versions will be derived
+from the text/plain disclaimer.
+
+=over 4
+
+=item -encoding name
+
+Set the encoding for all following disclaimers. Default is UTF-8.
+
+=back
+
+=head2 other
+
+=over 4
+
+=item -help
+
+Show this documentation and exit.
+
+=back
+
+=head1 AUTHOR
+
+Martin H. Sluka C<< <fany@cpan.org> >>

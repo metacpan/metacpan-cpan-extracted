@@ -5,6 +5,7 @@ use Moose;
 use Moose::Util;
 use DateTime;
 use DateTime::Format::XSD;
+use XML::NewsML_G2::Scheme;
 use XML::NewsML_G2::Scheme_Manager;
 use namespace::autoclean;
 
@@ -275,7 +276,8 @@ sub _create_item_meta {
         $self->scheme_manager->add_qcode( $s, 'ind', lc );
     }
 
-    foreach my $attr (qw(see_alsos derived_froms processed_froms)) {
+    foreach
+        my $attr (qw(see_alsos derived_froms processed_froms evolved_froms)) {
         if ( $self->_root_item->$attr ) {
             my $arrayref = $self->_root_item->$attr;
             for my $v (@$arrayref) {

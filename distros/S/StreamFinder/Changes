@@ -111,3 +111,9 @@ Revision history for StreamFinder
         - StreamFinder::BannedVideo: Fix to handle change in their site - 
         to execute extra step now needed for infowarsmedia.com videos and make 
         the retrieved mp4 stream the "best" stream.
+1.24
+        - StreamFinder::Youtube: Eliminate express page scan for metadata for 
+        non-Youtube sites processed to prevent ocassional infinite loop caused 
+        by attempting to scan a media stream instead of a website.
+        - Unescape HTML entities in the Genre string in Reciva & Tunein.
+        - Minor doc. improvements.

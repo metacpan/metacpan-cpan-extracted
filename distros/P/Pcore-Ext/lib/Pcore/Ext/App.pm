@@ -27,7 +27,7 @@ has requires => ( init_arg => undef );       # HashRef
 has api      => ( init_arg => undef );       # HashRef, used API methods
 has locales  => ( init_arg => undef );       # HashRef, used l10n msgid's
 
-const our $EXT_VER     => v6.7.0;
+const our $EXT_VER     => v7.0.0;
 const our $EXT_THEME   => 'material';
 const our $EXT_API_VER => 'v1';
 
@@ -294,10 +294,12 @@ sub get_resources ( $self, $devel = undef ) {
 
     my @resources = ( $self->build_resources // [] )->@*;
 
+    my ($major_ver) = $self->{ext_ver} =~ /\Av(\d+)/sm;
+
     # CDN resources
     push @resources, $cdn->get_resources(
         'pcore_api',
-        [   'extjs6',
+        [   "extjs$major_ver",
             ver   => $self->{ext_ver},
             theme => $self->{ext_theme},
             devel => $devel,
@@ -542,7 +544,7 @@ sub _prepare_js ( $self, $js ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 188                  | Subroutines::ProhibitExcessComplexity - Subroutine "_build_class" with high complexity score (25)              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 457                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 459                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

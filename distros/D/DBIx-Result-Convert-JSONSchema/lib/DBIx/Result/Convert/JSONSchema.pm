@@ -1,6 +1,6 @@
 package DBIx::Result::Convert::JSONSchema;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 NAME
@@ -16,7 +16,7 @@ DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
 =head1 VERSION
 
-    0.05
+    0.06
 
 =head1 SYNOPSIS
 
@@ -313,7 +313,7 @@ sub get_json_schema {
         }
 
         # DBIx schema defaults -> JSON schema defaults (no refs e.g. current_timestamp)
-        if ( ! $ignore_property_defaults && $column_info->{default_value} && ! ref $column_info->{default_value} ) {
+        if ( ! $ignore_property_defaults && defined $column_info->{default_value} && ! ref $column_info->{default_value} ) {
             $json_schema{properties}->{ $column }->{default} = $column_info->{default_value};
         }
 

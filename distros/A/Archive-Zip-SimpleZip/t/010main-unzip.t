@@ -26,13 +26,16 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 6980 + $extra ;
+    plan tests => 10341 + $extra ;
 
     use_ok('IO::Uncompress::Unzip', qw(unzip $UnzipError)) ;
     use_ok('IO::Compress::Zip', qw(zip $ZipError)) ;
-    use_ok('Archive::Zip::SimpleZip', qw($SimpleZipError ZIP_CM_DEFLATE ZIP_CM_BZIP2 ZIP_CM_STORE)) ;    
+    use_ok('Archive::Zip::SimpleZip', qw($SimpleZipError ZIP_CM_DEFLATE ZIP_CM_BZIP2 ZIP_CM_STORE ZIP_CM_LZMA)) ;    
     use_ok('Archive::Zip::SimpleUnzip', qw($SimpleUnzipError)) ;
-    
+
+    eval{ require IO::Uncompress::Adapter::UnLzma ;
+          import  IO::Uncompress::Adapter::UnLzma } ;
+
     # eval { require Encode ;  import Encode }
     #use_ok('Encode');
 }
@@ -286,12 +289,15 @@ sub testType
     die "Bad test '$expectedType'";
 }
 
-# TODO - workout available compressors
 if (1)
 {
-    for my $method ( ZIP_CM_DEFLATE, ZIP_CM_BZIP2, ZIP_CM_STORE )
+    SKIP:
+    for my $method ( ZIP_CM_DEFLATE, ZIP_CM_BZIP2, ZIP_CM_STORE, ZIP_CM_LZMA )
     # for my $method ( ZIP_CM_DEFLATE )
     {
+        skip "Skipping LZMA tests", 2568
+            if $method == ZIP_CM_LZMA && ! defined $IO::Uncompress::Adapter::UnLzma::VERSION ;
+
         for my $comment ('', "abcde")
         # for my $comment ("abcde")
         {
@@ -376,6 +382,7 @@ if (1)
                             is $element->name(), $name, "Name is '$name'";
                             is $element->comment(), '', "No comment in '$name";
                             is $element->content(), $expected, "Payload ok in '$name'";
+                            is $element->content(), $expected, "Payload again ok in '$name'";
                             ok testType($element, $expectedType), "Type is '$expectedType'";
                             ok $element->close();
                         }
@@ -391,6 +398,7 @@ if (1)
                             isa_ok $element, "Archive::Zip::SimpleUnzip::Member";
                             is $element->name(), $name, "Name is '$name'";
                             is $element->comment(), "member comment", "comment ok in '$name'";
+                            is $element->content(), $expected;
                             ok testType($element, $expectedType), "Type is '$expectedType'";
                             
                             my $fh = $element->open();
@@ -407,6 +415,11 @@ if (1)
                             ok eof($fh), "eof";  
                                 
                             is $payload, $expected, "payload ok in '$name'";
+
+                            ok $fh->close();
+
+                            is $element->content(), $expected;
+
                         }
                         
                         {
@@ -461,6 +474,7 @@ if (1)
                             is $element->comment(), "", "No comment in '$name'"; 
                             ok testType($element, $expectedType), "Type is '$expectedType'";
 
+                            is $element->content(), $expected, "Payload ok in '$name'";
                             is $element->content(), $expected, "Payload ok in '$name'";
                         }
 
@@ -533,9 +547,20 @@ if (1)
                             {
                                 title "Exists";
                                 ok $z->exists("fred3"), "fred3 exists";
+                                is $z->content("fred3"), "abcd3";
+                                is $z->content("fred3"), "abcd3";
+
+
                                 ok ! $z->exists("dir2/"), "dir2/ does not exist";
                             } 
+                            {
+                                title "Content";
+                                is $z->content("fred3"), "abcd3", "fred3 content ok";
+                                ok ! $z->content("bad1"), "dir2/ does not exist";
+                                ok ! $z->content("bad1"), "dir2/ does not exist";
+                            }                             
                         }                       
+                        
                     }
                     
                             
@@ -587,7 +612,6 @@ if (1)
 {
     title "Extract";
 
-    # TODO - extract errors
     use Cwd;
 
     my $lex = new PushDir;
@@ -639,6 +663,7 @@ if (1)
 
     # Extract by name
 
+    is $unzip->content("fred1"), "abcd1";
     ok $unzip->extract("fred1", "abcd"), "extract to named file";
     # diag `ls -l ; find . -ls`;
 
@@ -647,6 +672,53 @@ if (1)
     my $m = $unzip->member("d1/fred2");
     $m->extract("joe");
     is readFile("joe"), "abcd2", "abcd - payload ok";
+    exit;
+}
+
+{
+    title "Extract errors";
+    
+    use Cwd;
+
+    my $lex = new PushDir;
+    
+    my $output;
+    my $buffer;
+    my $zipfile = \$buffer;
+
+    createZipByName($zipfile,  
+            {
+                # name                    payload   type   opts
+                "f1"                 => [ "abcd1", 'file', [] ],
+                "d1/f2"              => [ "abcd2", 'file', [] ],
+                "d2/d3/f2"           => [ "abcd3", 'file', [] ],
+                "d3/f3"              => [ "",      'dir',  [] ],
+            } ) ;
+
+    my $unzip = new Archive::Zip::SimpleUnzip $zipfile ;
+
+
+    title "output file already exists & is writable, so overwrite";
+    my $out = "f1" ;
+    writeFile($out, "text");
+    ok -e $out ;
+    ok $unzip->extract("f1");
+    is readFile($out), "abcd1" ;
+
+    title "output file already exists & not-writable";
+    writeFile($out, "text");
+    chmod 0444, $out ;
+    ok ! $unzip->extract("f1");
+    # if $SimpleUnzipError, //;
+    chmod 0777, $out ;
+    is readFile($out), "text" ;
+
+    title "part of output path exists, but is already a file";
+    writeFile("d3", "text");
+    ok -e $out ;
+    ok ! $unzip->extract("d3/f3");
+    like $SimpleUnzipError, "/Path is not a directory 'd3'/";
+    ok ! -e "d3/f3";
 }
 
 sub expectedType
@@ -658,9 +730,50 @@ sub expectedType
     ok -d $name, "$name is a dir"  if $data->[1] eq 'dir';
 }
 
+my $TestZipsDir = "./t/test-zips/";
+
+
+if (1)
+{
+    title "jar file with deflated directory";
+
+    # Create Jar as follow
+    #   echo test > file && jar c file > jar.zip
+
+    # Note the deflated directory META-INF with length 0 & size 2
+    #
+    # $ unzip -vl t/files/jar.zip
+    # Archive:  t/files/jar.zip
+    #  Length   Method    Size  Cmpr    Date    Time   CRC-32   Name
+    # --------  ------  ------- ---- ---------- ----- --------  ----
+    #        0  Defl:N        2   0% 2019-09-07 22:35 00000000  META-INF/
+    #       54  Defl:N       53   2% 2019-09-07 22:35 934e49ff  META-INF/MANIFEST.MF
+    #        5  Defl:N        7 -40% 2019-09-07 22:35 3bb935c6  file
+    # --------          -------  ---                            -------
+    #       59               62  -5%                            3 files
+
+    my $zipfile = "./t/files/jar.zip" ;
+    my $z = new Archive::Zip::SimpleUnzip $zipfile 
+        or diag $SimpleUnzipError ;
+    isa_ok $z, "Archive::Zip::SimpleUnzip";
+
+    my $lex = new PushDir;
+
+    ok ! -d "META-INF" ;
+
+    ok $z->extract("META-INF/")
+        or diag $SimpleUnzipError ;
+
+    ok -d "META-INF" ;
+
+    my $member = $z->member("META-INF/");
+    isa_ok $member, "Archive::Zip::SimpleUnzip::Member";
+
+    ok $member->isDirectory();
+}
+
 exit;
 
-my $TestZipsDir = "./t/test-zips/";
 
 SKIP:
 {

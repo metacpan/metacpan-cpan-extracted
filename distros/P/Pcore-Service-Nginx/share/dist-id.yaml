@@ -1,11 +1,11 @@
 ---
-bookmark: ''
-branch: default
-date: 2019-01-25T15:56:30Z
-node: 83a98e2a571d
-phase: public
-release: v0.1.3
+branch: master
+date: 2019-11-06T20:33:45Z
+id: c0477114e15e641d7ce9ba44f32f04fa38d2575d
+id_short: c047711
+is_dirty: 0
+release: v0.2.0
 release_distance: 0
-release_id: v0.1.3
 tags:
-- tip
+- v0.2.0
+- latest

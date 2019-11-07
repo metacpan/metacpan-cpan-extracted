@@ -46,7 +46,7 @@ Use `default => 1` to include the default colorscheme with customisations. Defau
             warning => 'none',          # turn off warning color
     );
 
-Valid colors are any strings acceptable to `colored` in [Term::ANSIColor](https://metacpan.org/pod/Term::ANSIColor).
+Valid colors are any strings acceptable to `colored` in [Term::ANSIColor](https://metacpan.org/pod/Term%3A%3AANSIColor).
 eg. `'blue'` `'bright_red on_white`
 
 # LICENSE

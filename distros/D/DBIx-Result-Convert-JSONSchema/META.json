@@ -58,6 +58,6 @@
          "url" : "https://github.com/Humanstate/p5-dbix-result-convert-jsonschema"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

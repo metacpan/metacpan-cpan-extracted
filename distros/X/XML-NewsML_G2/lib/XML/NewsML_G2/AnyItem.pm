@@ -48,6 +48,13 @@ has 'processed_froms',
     coerce  => 1,
     traits  => ['Array'],
     handles => { add_processed_from => 'push' };
+has 'evolved_froms',
+    isa     => 'XML::NewsML_G2::ArrayRefOfLinks',
+    is      => 'rw',
+    default => sub { [] },
+    coerce  => 1,
+    traits  => ['Array'],
+    handles => { add_evolved_from => 'push' };
 
 has 'embargo',      isa => 'DateTime', is => 'rw';
 has 'embargo_text', isa => 'Str',      is => 'rw';

@@ -1,0 +1,23 @@
+  /home/dj/axaf/src/Hash-Wrap/t:
+  total used in directory 84 available 363149776
+  drwxr-xr-x 2 dj dj        4096 Nov  6 14:36 .
+  drwxr-xr-x 8 dj dj        4096 Nov  6 14:33 ..
+  -rw-r--r-- 1 dj dj        2066 Mar  2  2018 #api.t#
+  -rw-r--r-- 1 dj cxcoptics 1902 Jun 20 16:52 api.t
+  -rw-r--r-- 1 dj dj          59 Jun 19 10:53 attrs.t~
+  -rw-r--r-- 1 dj dj        3198 Nov  6 10:56 basic.t
+  -rw-r--r-- 1 dj dj        2928 Jun 20 16:54 basic.t~
+  -rw-r--r-- 1 dj cxcoptics  181 Mar  5  2018 croak.t
+  -rw-r--r-- 1 dj cxcoptics  983 Mar  5  2018 defined.t
+  -rw-r--r-- 1 dj cxcoptics 1042 Mar  1  2018 defined.t.orig
+  -rw-r--r-- 1 dj dj         927 Jan 30  2018 exists.t
+  -rw-r--r-- 1 dj dj        1025 Nov  6 12:35 immutable.t
+  -rw-r--r-- 1 dj dj        1031 Nov  6 12:29 immutable.t~
+  -rw-r--r-- 1 dj dj         355 Sep 28  2017 import.t
+  -rw-r--r-- 1 dj dj        1854 Nov  6 14:36 lockkeys.t
+  -rw-r--r-- 1 dj dj        1031 Nov  6 12:30 lockattrs.t~
+  -rw-r--r-- 1 dj cxcoptics 1996 Mar  5  2018 lvalue.t
+  -rw-r--r-- 1 dj cxcoptics 1326 Mar  5  2018 lvalue_undef.t
+  -rw-r--r-- 1 dj cxcoptics  759 Mar  5  2018 subclass.t
+  -rw-r--r-- 1 dj dj         430 Mar  2  2018 subclass.t~
+  -rw-r--r-- 1 dj cxcoptics 1094 Mar  5  2018 undef.t

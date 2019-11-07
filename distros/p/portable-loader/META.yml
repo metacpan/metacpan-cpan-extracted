@@ -1,0 +1,60 @@
+---
+abstract: 'load classes and roles which can be moved around your namespace'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: portable-loader
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  portable::alias:
+    file: lib/portable/alias.pm
+    version: '0.001'
+  portable::lib:
+    file: lib/portable/lib.pm
+    version: '0.001'
+  portable::loader:
+    file: lib/portable/loader.pm
+    version: '0.001'
+  portable::loader::JSON:
+    file: lib/portable/loader/JSON.pm
+    version: '0.001'
+  portable::loader::Perl:
+    file: lib/portable/loader/Perl.pm
+    version: '0.001'
+  portable::loader::TOML:
+    file: lib/portable/loader/TOML.pm
+    version: '0.001'
+requires:
+  FindBin: '0'
+  JSON::Eval: '0'
+  Module::Pluggable: '0'
+  MooX::Press: '0.010'
+  TOML::Parser: '0.08'
+  perl: '5.008008'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/portable-loader/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=portable-loader
+  homepage: https://metacpan.org/release/portable-loader
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-portable-loader.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

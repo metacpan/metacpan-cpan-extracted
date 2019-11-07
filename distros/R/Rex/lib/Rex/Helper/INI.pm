@@ -9,7 +9,7 @@ package Rex::Helper::INI;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 BEGIN { String::Escape->use('string2hash'); }
 

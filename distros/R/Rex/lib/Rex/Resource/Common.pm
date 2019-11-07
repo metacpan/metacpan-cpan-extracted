@@ -9,7 +9,7 @@ package Rex::Resource::Common;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Exporter;
 require Rex::Config;
@@ -95,7 +95,7 @@ sub resource {
   if (!$class->can($name)
     && $name_save =~ m/^[a-zA-Z_][a-zA-Z0-9_]+$/ )
   {
-    no strict 'refs';
+    no strict 'refs'; ## no critic ProhibitNoStrict
     Rex::Logger::debug("Registering resource: ${class}::$name_save");
 
     my $code = $_[-2];
@@ -107,7 +107,7 @@ sub resource {
     && $name_save =~ m/^[a-zA-Z_][a-zA-Z0-9_]+$/ )
   {
     # if not in main namespace, register the task as a sub
-    no strict 'refs';
+    no strict 'refs'; ## no critic ProhibitNoStrict
     Rex::Logger::debug(
       "Registering resource (not main namespace): ${class}::$name_save");
     my $code = $_[-2];
@@ -117,7 +117,7 @@ sub resource {
   }
 
   if ( exists $options->{export} && $options->{export} ) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic ProhibitNoStrict
 
     # register in caller namespace
     push @{ $caller_pkg . "::ISA" }, "Rex::Exporter"

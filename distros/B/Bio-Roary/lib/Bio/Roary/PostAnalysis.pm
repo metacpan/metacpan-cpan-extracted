@@ -1,5 +1,5 @@
 package Bio::Roary::PostAnalysis;
-$Bio::Roary::PostAnalysis::VERSION = '3.12.0';
+$Bio::Roary::PostAnalysis::VERSION = '3.13.0';
 # ABSTRACT: Post analysis of pan genomes
 
 
@@ -359,7 +359,7 @@ Bio::Roary::PostAnalysis - Post analysis of pan genomes
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

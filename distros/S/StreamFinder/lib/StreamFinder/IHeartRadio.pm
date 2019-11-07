@@ -98,7 +98,7 @@ of playing.  The author uses his own custom all-purpose media player called
 audio player).  "fauxdacious" can incorporate this module to decode and play 
 IHeartRadio.com streams.
 
-One or more stream URLs can be returned for each station.  
+One or more stream URLs can be returned for each station or podcast.  
 
 =head1 SUBROUTINES/METHODS
 
@@ -107,13 +107,14 @@ One or more stream URLs can be returned for each station.
 =item B<new>(I<url> [, I<-keep|-skip> => I<streamtypes> | I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
-new station object, or I<undef> if the URL is not a valid IHeart station or 
-podcast, or no streams are found.  The URL can be the full URL, 
+new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
+station or podcast, or no streams are found.  The URL can be the full URL, 
 ie. https://www.iheart.com/live/B<station-id>, 
 https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, or just 
 I<station-id>, or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, you must 
 include the I<episode-id> if not specifying a full URL, otherwise, the 
-I<podcast-id> will be interpreted as a I<station-id>!
+I<podcast-id> will be interpreted as a I<station-id> (and you likely won't get any 
+streams)!
 
 I<-keep> and I<-skip> specify a list of one or more I<streamtypes> to either 
 include or skip respectively.  The list for each can be either a comma-separated 
@@ -178,7 +179,7 @@ Returns the URL for the station's "cover art" icon image, if any.
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
 =item $station->B<getImageURL>()
 
@@ -188,7 +189,7 @@ banner image.
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image (binary data).
+"gif", "jpeg", etc.) and the actual station's banner image (binary data).
 
 =item $station->B<getType>()
 
@@ -477,6 +478,25 @@ sub new
 		return $self;
 	}
 
+	$self->{'fccid'} = ($html =~ m#\"callLetters\"\s*\:\s*\"([^\"]+)\"#is) ? $1 : '';
+	$self->{'title'} = ($html =~ m#\"stationName\"\s*\:\s*\"([^\"]+)\"#s) ? $1 : $url;
+	$self->{'title'} = $1  if ($html =~ m#\"broadcastDisplayName\"\s*\:\s*\"([^\"]+)\"#s);
+	$self->{'title'} =~ s#http[s]?\:\/\/www\.iheart\.com\/live\/##;
+	$self->{'description'} = ($html =~ m#\"description\"\s*\:\s*\"([^\"]+)\"#s) ? $1 : $self->{'title'};
+	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+	$self->{'title'} = uri_unescape($self->{'title'});
+	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+	$self->{'description'} = uri_unescape($self->{'description'});
+	$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#s) ? $1 : '';
+#		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
+	$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#s) ? $1 : '';
+	$self->{'imageurl'} ||= $self->{'iconurl'};
+	$self->{'genre'} = $1  if ($html =~ m#\"Genre\"\s+name\=\"twitter\:label1\"\/\>\<meta\s+data\-react\-helmet\=\"[^\"]*\"\s+content\=\"([^\"]+)\"#s);
+	if ($self->{'genre'}) {
+		$self->{'genre'} = HTML::Entities::decode_entities($self->{'genre'});
+		$self->{'genre'} = uri_unescape($self->{'genre'});
+	}
+
 	my ($streamhtml, $streampattern);
 	my %streams = ();
 	my $weight = 999;
@@ -494,17 +514,6 @@ sub new
 			$streampattern = '\"' . $streamtype;
 		}
 		$self->{'cnt'} = 0;
-		$self->{'fccid'} = ($html =~ m#\"callLetters\"\s*\:\s*\"([^\"]+)\"#is) ? $1 : '';
-		$self->{'title'} = ($html =~ m#\"description\"\s*\:\s*\"([^\"]+)\"#s) ? $1 : $url;
-		$self->{'title'} =~ s#http[s]?\:\/\/www\.iheart\.com\/live\/##;
-		$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-		$self->{'title'} = uri_unescape($self->{'title'});
-		$self->{'description'} = $self->{'title'};
-		$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#s) ? $1 : '';
-#		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
-		$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#s) ? $1 : '';
-		$self->{'imageurl'} ||= $self->{'iconurl'};
-		$self->{'genre'} = $1  if ($html =~ m#\"Genre\"\s+name\=\"twitter\:label1\"\/\>\<meta\s+data\-react\-helmet\=\"[^\"]*\"\s+content\=\"([^\"]+)\"#s);
 		# INNER LOOP: MATCH STREAM URLS BY TYPE PATTEREN REGEX UNTIL WE FIND ONE THAT'S ACCEPTABLE (NOT EXCLUDED TYPE):
 		print STDERR "-3: PATTERN=${streampattern}_stream=\n"  if ($DEBUG);
 INNER:  while ($streamhtml =~ s#(${streampattern}_stream)\"\s*\:\s*\"([^\"]+)\"##)
@@ -560,7 +569,7 @@ INNER:  while ($streamhtml =~ s#(${streampattern}_stream)\"\s*\:\s*\"([^\"]+)\"#
 		print STDERR "++++ ADDING STREAM(".$streams{$s}."): $s\n"  if ($DEBUG);
 		++$self->{'total'};
 	}
-	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."=\n"  if ($DEBUG);
+	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= GENRE=".$self->{'genre'}."=\n"  if ($DEBUG);
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!

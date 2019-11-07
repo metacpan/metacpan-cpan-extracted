@@ -1,11 +1,16 @@
 #!/usr/bin/env perl
+use Test::MockTime 'set_fixed_time';
+
+BEGIN {
+    set_fixed_time('2012-01-01T13:00:00Z');
+}
 
 use utf8;
 use Test::More;
 
 use lib 't';
 use NewsML_G2_Test_Helpers
-    qw($prov_apa create_ni_text create_ni_picture validate_g2);
+    qw($prov_apa create_ni_text create_ni_picture validate_g2 :vars);
 
 use warnings;
 use strict;
@@ -28,7 +33,7 @@ sub basic_checks {
     return;
 }
 
-my %args = ( language => 'de', provider => $prov_apa );
+my %args = ( language => 'de', provider => $prov_apa, guid => $guid_pkg );
 
 ok( my $pi = XML::NewsML_G2::Package_Item->new(%args),
     'create Package_Item' );
@@ -72,7 +77,7 @@ ok( my $xpc = XML::LibXML::XPathContext->new($dom),
     'create XPath context for DOM tree' );
 
 basic_checks($xpc);
-validate_g2($dom);
+validate_g2( $dom, undef, 'PackageItem' );
 
 #diag($dom->serialize(1));
 
@@ -126,7 +131,7 @@ is( $xpc->findvalue('//nar:group[@id="root_group"]/@role'),
 is( $xpc->findvalue('//nar:group[@id="root_group"]/@mode'),
     'pgrmod:seq', 'slideshow has correct mode' );
 
-validate_g2($dom);
+validate_g2( $dom, undef, 'PackageItemSlideshow' );
 
 #diag($dom->serialize(1));
 

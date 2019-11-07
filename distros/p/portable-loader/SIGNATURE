@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 9e0cfb892759c3b54bcba866c77e33ff3ee569e98a3980cf5b8b202ec4805da2 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 b7487d045eac5d3cfbd1f588d3d065e42f2cf0f164914115de16008e3d5d1768 Changes
+SHA256 b5cc7f0980d608fe0d5f6436062fe02aef63e8f3926ded34b40ab119ff0d8dbc INSTALL
+SHA256 5c791221f0dde289392a38a5921b66d4a1be8248cc64ee6de15f3c2426892673 LICENSE
+SHA256 656bd6211de1a0116738e79dd86ed6012af131802f2593babf98f1d5bd8d7a01 MANIFEST
+SHA256 11315bcacec5eae0211a2a2f0014d2fe1e79b66530c1a3a0b174c32f6874b0fe META.json
+SHA256 1798f5b493246325a4e91ecd9cd794edcf3e2f3a9b4d59ae79891de01a02bd49 META.yml
+SHA256 1c7b0e3428860ce5f523c7be6febd979dd383d9cade484cd5c32c6f850c83568 Makefile.PL
+SHA256 bcf64d98b672c9bb96a25fe7814500d2a719622147aa09ec2abd3559d2e35419 README
+SHA256 abc004aae8bf44640583ed6fb2306ee43504e2da989fff5c94d30058ffa1234f dist.ini
+SHA256 3383d6d6b0dea473b0e571ef93ee32ff0bd5400d7c2d3dc3741cfcd94f60aa27 doap.ttl
+SHA256 4115d7d7b635f63975faf5c6e8fd8f2989c632d28cb2402c9c6d97df3e5d54a9 lib/portable/alias.pm
+SHA256 8237224897a3fe13dca382bfba16794efbe80fb53d6d3884ee3b3754bbd3b671 lib/portable/lib.pm
+SHA256 1bf19966183832a47ebf93343cefa75f825fba37832f4ff7ccc7f9a0dd6ef515 lib/portable/loader.pm
+SHA256 0efecba73d5207f48403377f19a65aeb0d020bbe5dfc0884f34d6474158dadb4 lib/portable/loader/JSON.pm
+SHA256 649b6317a518f785bbec6272c6ace0f35aa98da11896be2b17e7a92942d6e9b4 lib/portable/loader/Perl.pm
+SHA256 a92c9299e46faa4605fa52ee1210a254aeabc1db36021181acb7bbf874381843 lib/portable/loader/TOML.pm
+SHA256 60f608fc4aa2ad81502ef3d8026662175dbc4b5fb99ce756414a512148bcdf68 t/01basic.t
+SHA256 b90aa021bda036f995c31f3c1bc650498d757d782361fd387e909cc1bba66293 t/02alias.t
+SHA256 a6b711923f23efc1f2943712bd3c032a20f6e70fe56c095a447a52505f912e93 t/03toml.t
+SHA256 9bd3fd2ef7ec8e9c9c7fa589d24ffc029602ccbd5511d72dbd0426117cf85e7b t/lib/Animals.portable
+SHA256 64ca2428b4430b06f97efe4d63e850d574909783c7798f65d68a8d74e0699043 t/lib/Nature.portable.pl
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCXcIFxQAKCRDOv4Eoaip9
+OZXYAJ9a7Fdr3RaG7YSucox9K97Uk5amwwCeNZB9x1kdVV5IH+IRzBYmUuqi+Cw=
+=EWEx
+-----END PGP SIGNATURE-----

@@ -1,4 +1,4 @@
-package <: $module_name :> v0.0.0;
+package <: $module_name :>;
 
 use Pcore -dist, -class, -const, -res;
 use <: $module_name ~ "::Const qw[:CONST]" :>;

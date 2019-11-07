@@ -56,7 +56,7 @@ package Rex::Helper::SSH2::Expect;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 =head2 new($ssh2)
 
@@ -78,7 +78,7 @@ sub new {
   $self->{"__shell"}->shell;
 
   $self->{"__log_stdout"} = $Rex::Helper::SSH2::Expect::Log_Stdout;
-  $self->{"__log_to"} = sub { };
+  $self->{"__log_to"}     = sub { };
 
   return $self;
 }

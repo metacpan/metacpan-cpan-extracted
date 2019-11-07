@@ -1,15 +1,14 @@
-# SCM
-.hg*
-.git*
+# git
+/.git*
 
 # pcore
-data/
-wiki/
+/data/
+/wiki/
 
 # phonegap / cordova
-hooks/
-node_modules/
-platforms/
-plugins/
-package.json
-package-lock.json
+/hooks/
+/node_modules/
+/platforms/
+/plugins/
+/package.json
+/package-lock.json

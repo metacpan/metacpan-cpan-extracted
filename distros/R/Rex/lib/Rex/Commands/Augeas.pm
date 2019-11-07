@@ -39,7 +39,7 @@ package Rex::Commands::Augeas;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Exporter;
 
@@ -298,7 +298,7 @@ Check if an item exists.
     my $file = shift @options;
 
     my $aug_key = $file;
-    my $val = $options[0] || "";
+    my $val     = $options[0] || "";
 
     if ( $is_ssh || !$has_config_augeas ) {
       my @paths;

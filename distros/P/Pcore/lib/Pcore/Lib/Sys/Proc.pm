@@ -1,7 +1,7 @@
 package Pcore::Lib::Sys::Proc;
 
 use Pcore -const, -class;
-use Pcore::Lib::Scalar qw[is_ref];
+use Pcore::Lib::Scalar qw[is_ref weaken];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
 use POSIX qw[:sys_wait_h];
@@ -25,6 +25,8 @@ has status    => ();
 has reason    => ();
 
 has _win32_proc => ();
+has _watcher    => ();
+has _watcher_cb => ();
 
 const our $PROC_STATUS_ACTIVE             => 0;
 const our $PROC_STATUS_TERMINATED_SUCCESS => 200;
@@ -166,6 +168,8 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
     # local $ENV{PERL5LIB} = join $Config{path_sep}, grep { !ref } @INC;
     local $ENV{PATH} = "$ENV{PATH}$Config{path_sep}$ENV{PAR_TEMP}" if $ENV->{is_par};
 
+    my $chdir_guard = $args->{chdir} ? P->file->chdir( $args->{chdir} ) : undef;
+
     # run process
     if ($MSWIN) {
 
@@ -182,6 +186,8 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
 
         $restore->();
 
+        undef $chdir_guard;
+
         if ($win32_proc) {
             $self->{_win32_proc} = $win32_proc;
 
@@ -194,6 +200,11 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
 
                 return;
             }
+
+            $self->{status} = $PROC_STATUS_ACTIVE;
+            $self->{reason} = $STATUS_REASON->{$PROC_STATUS_ACTIVE};
+
+            $self->_set_watcher;
         }
 
         # error creating process
@@ -206,6 +217,7 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
     else {
         my ( $r, $w ) = portable_socketpair();
 
+        # child process
         unless ( $self->{pid} = fork ) {
 
             # run process in own session
@@ -222,8 +234,17 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
                 POSIX::_exit(-1);
             };
         }
+
+        # parent process
         else {
             $restore->();
+
+            undef $chdir_guard;
+
+            $self->{status} = $PROC_STATUS_ACTIVE;
+            $self->{reason} = $STATUS_REASON->{$PROC_STATUS_ACTIVE};
+
+            $self->_set_watcher;
 
             close $w or die $!;
 
@@ -237,41 +258,55 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
         }
     }
 
-    $self->{status} = $PROC_STATUS_ACTIVE;
-    $self->{reason} = $STATUS_REASON->{$PROC_STATUS_ACTIVE};
-
     return;
 }
 
-sub wait ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    return $self if $self->{status} != $PROC_STATUS_ACTIVE;
+sub _set_watcher ($self) {
+    return if $self->{status} != $PROC_STATUS_ACTIVE;
 
-    my $cv = P->cv;
-
-    my $watcher;
+    weaken $self;
 
     if ($MSWIN) {
-        $watcher = AE::timer 0, $self->{win32_alive_timeout}, sub {
+        $self->{_watcher} = AE::timer 0, $self->{win32_alive_timeout}, sub {
 
             # -1 - pid is unknown, 0 - active, > 0 - terminated
             if ( waitpid $self->{pid}, WNOHANG ) {
+                undef $self->{_watcher};
+
                 $self->{_win32_proc}->GetExitCode( my $exit_code );
 
-                $cv->($exit_code);
+                $self->_set_exit_code($exit_code);
+
+                if ( my $cb = delete $self->{_watcher_cb} ) {
+                    $cb->();
+                }
+
             }
 
             return;
         };
     }
     else {
-        $watcher = AE::child $self->{pid}, sub ( $pid, $exit_code ) {
-            $cv->( $exit_code >> 8 );
+        $self->{_watcher} = AE::child $self->{pid}, sub ( $pid, $exit_code ) {
+            undef $self->{_watcher};
+
+            $self->_set_exit_code( $exit_code >> 8 );
+
+            if ( my $cb = delete $self->{_watcher_cb} ) {
+                $cb->();
+            }
 
             return;
         };
     }
 
-    $self->_set_exit_code( $cv->recv );
+    return $self;
+}
+
+sub wait ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    return $self if $self->{status} != $PROC_STATUS_ACTIVE;
+
+    ( $self->{_watcher_cb} = P->cv )->recv;
 
     return $self;
 }

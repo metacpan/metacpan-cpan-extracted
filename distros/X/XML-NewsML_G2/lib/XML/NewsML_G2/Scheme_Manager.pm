@@ -6,8 +6,9 @@ use namespace::autoclean;
 
 my @attrs = (
     qw(desk hltype role ind geo org topic crel crol drol svc
-        isbn ean isrol nprov ninat stat sig iso3166_1a2 genre isin medtop rnd
-        colsp adc group pgrmod copyright_holder electiondistrict electionprovince)
+        isbn ean isrol nprov ninat stat sig iso3166_1a2 genre isin medtop
+        rnd vidrnd colsp adc group pgrmod copyright_holder electiondistrict
+        electionprovince facet sportfacet sportfacetvalue storytype)
 );
 
 foreach (@attrs) {
@@ -27,7 +28,8 @@ sub build_qcode {
     my ( $self, $name, $value ) = @_;
     return unless $value;
 
-    my $getter = $self->can($name) or croak "No schema named '$name'!";
+    my $getter = $self->can($name)
+        or croak "No schema named '$name' for value $value!";
     my $scheme = $getter->($self);
     return unless ( $scheme and ( $scheme->uri or $scheme->catalog ) );
 

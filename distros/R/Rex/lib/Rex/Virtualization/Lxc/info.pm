@@ -9,7 +9,7 @@ package Rex::Virtualization::Lxc::info;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -35,7 +35,7 @@ sub execute {
 
     # Trim white spaces.
     $column =~ s/^\s+|\s+$//g;
-    $value =~ s/^\s+|\s+$//g;
+    $value  =~ s/^\s+|\s+$//g;
 
     $ret{$column} = $value;
   }

@@ -34,9 +34,16 @@ WriteMakefile(
                        'lib/XML/XSH2/Inline.pm' => 'blib/man3/XML::XSH2::Inline.3',
                        'lib/XML/XSH2/Compile.pm' => 'blib/man3/XML::XSH2::Compile.3'
 		     },
+    PM => { 'lib/XML/XSH2.pm' => '$(INST_LIB)/XML/XSH2.pm',
+            map +( "lib/XML/XSH2/$_.pm" => '$(INST_LIB)/XML/XSH2/' . "$_.pm" ),
+            qw( Help Functions Iterators Commands
+                Completion CompletionList LibXMLCompat XPathToXML
+                Grammar Parser )
+    },
     depend => {
                 distdir => 'hide',
-              },
+    },
+
     'dist' => {
          COMPRESS  => 'gzip',
          SUFFIX    => 'gz',
@@ -59,23 +66,34 @@ cvs:    xml
 	@echo "Please, re-run 'perl Makefile.PL' and 'make'"
 	@echo
 
-hide:
-	$(PERL) tools/hide_packages.pl lib/XML/XSH2/Parser.pm "XML::XSH2::"
-
 XSH2.pod: xml
 
-xml:
-	$(PERL) tools/gen_grammar.pl src/xsh_grammar.xml > lib/XML/XSH2/Grammar.pm
-	$(PERL) tools/gen_commands.pl src/xsh_grammar.xml > lib/XML/XSH2/Commands.pm
-	$(PERL) tools/gen_help.pl src/xsh_grammar.xml > lib/XML/XSH2/Help.pm
-	$(PERL) tools/gen_pod.pl src/xsh_grammar.xml > XSH2.pod
-	$(PERL) tools/gen_completions.pl src/xsh_grammar.xml > lib/XML/XSH2/CompletionList.pm
-	$(PERL) -e "use lib q(lib/XML/XSH2); require Grammar; XML::XSH2::Grammar::compile()"
-	$(MAKE) hide
-	$(PERL) -c lib/XML/XSH2/Parser.pm
+hide: lib/XML/XSH2/Parser.pm
+	$(PERL) tools/hide_packages.pl lib/XML/XSH2/Parser.pm "XML::XSH2::"
 
-grammar:
+lib/XML/XSH2/Parser.pm: Parser.pm
+	$(PERL) -pe1 Parser.pm > lib/XML/XSH2/Parser.pm
+
+Parser.pm: lib/XML/XSH2/Grammar.pm
 	$(PERL) -e "use lib q(lib/XML/XSH2); require Grammar; XML::XSH2::Grammar::compile()"
+
+lib/XML/XSH2/Grammar.pm: tools/gen_grammar.pl src/xsh_grammar.xml
+	$(PERL) tools/gen_grammar.pl src/xsh_grammar.xml > lib/XML/XSH2/Grammar.pm
+
+lib/XML/XSH2/Commands.pm: tools/gen_commands.pl src/xsh_grammar.xml
+	$(PERL) tools/gen_commands.pl src/xsh_grammar.xml > lib/XML/XSH2/Commands.pm
+
+lib/XML/XSH2/Help.pm: tools/gen_help.pl src/xsh_grammar.xml
+	$(PERL) tools/gen_help.pl src/xsh_grammar.xml > lib/XML/XSH2/Help.pm
+
+XSH2.pod: tools/gen_pod.pl src/xsh_grammar.xml
+	$(PERL) tools/gen_pod.pl src/xsh_grammar.xml > XSH2.pod
+
+lib/XML/XSH2/CompletionList.pm: tools/gen_completions.pl src/xsh_grammar.xml
+	$(PERL) tools/gen_completions.pl src/xsh_grammar.xml > lib/XML/XSH2/CompletionList.pm
+
+xml: lib/XML/XSH2/Parser.pm lib/XML/XSH2/Commands.pm lib/XML/XSH2/Help.pm XSH2.pod lib/XML/XSH2/CompletionList.pm
+	$(MAKE) hide
 	$(PERL) -c lib/XML/XSH2/Parser.pm
 
 docs: all

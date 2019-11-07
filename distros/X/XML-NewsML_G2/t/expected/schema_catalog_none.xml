@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<newsItem xmlns="http://iptc.org/std/nar/2006-10-01/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://iptc.org/std/nar/2006-10-01/" standard="NewsML-G2" standardversion="2.18" conformance="power" xml:lang="de" guid="urn:newsml:apa.at:20120315:APA0379" version="1">
+  <catalogRef href="http://www.iptc.org/std/catalog/catalog.IPTC-G2-Standards_24.xml"/>
+  <itemMeta>
+    <itemClass qcode="ninat:text"/>
+    <provider qcode="nprov:apa">
+      <name>APA - Austria Presse Agentur</name>
+    </provider>
+    <versionCreated>2012-01-01T14:00:00+01:00</versionCreated>
+    <pubStatus qcode="stat:usable"/>
+    <generator versioninfo="0.3.2">XML::NewsML_G2</generator>
+  </itemMeta>
+  <contentMeta>
+    <urgency>5</urgency>
+    <contentCreated>2012-01-01T14:00:00+01:00</contentCreated>
+    <language tag="de"/>
+    <!--organisations-->
+    <subject type="cpnat:organisation" literal="org#gogl">
+      <name>Google</name>
+    </subject>
+    <headline>Saisonstart im Schweizerhaus: Run aufs Krügerl im Prater</headline>
+  </contentMeta>
+  <!--organisations-->
+  <assert literal="org#gogl">
+    <name>Google</name>
+    <organisationDetails>
+      <contactInfo>
+        <web>http://www.google.com/</web>
+      </contactInfo>
+    </organisationDetails>
+  </assert>
+  <contentSet>
+    <inlineXML contenttype="application/xhtml+xml">
+      <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <title>Saisonstart im Schweizerhaus: Run aufs Krügerl im Prater</title>
+        </head>
+        <body>
+          <h1>Saisonstart im Schweizerhaus: Run aufs Krügerl im Prater</h1>
+          <p>Die Saison im Wiener Prater hat am Donnerstagvormittag mit der Eröffnung des Schweizerhauses begonnen - diese findet traditionell jedes Jahr am 15. März statt.</p>
+        </body>
+      </html>
+    </inlineXML>
+  </contentSet>
+</newsItem>

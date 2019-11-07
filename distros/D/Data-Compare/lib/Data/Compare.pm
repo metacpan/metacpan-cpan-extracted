@@ -12,12 +12,13 @@ use warnings;
 use vars qw(@ISA @EXPORT $VERSION $DEBUG %been_there);
 use Exporter;
 use Carp;
+use Clone qw(clone);
 use Scalar::Util qw(tainted);
 use File::Find::Rule;
 
 @ISA     = qw(Exporter);
 @EXPORT  = qw(Compare);
-$VERSION = 1.26;
+$VERSION = 1.27;
 $DEBUG   = $ENV{PERL_DATA_COMPARE_DEBUG} || 0;
 
 my %handler;
@@ -99,7 +100,14 @@ sub Compare {
 
   my $x = shift;
   my $y = shift;
-  my $opts = shift || {};
+  my $opts = {};
+  if(@_) { $opts = clone(shift); }
+
+  _Compare($x, $y, $opts);
+}
+
+sub _Compare {
+  my($x, $y, $opts) = @_;
   my($xparent, $xpos, $yparent, $ypos) = map {
     $opts->{$_} || ''
   } qw(xparent xpos yparent ypos);
@@ -149,7 +157,7 @@ sub Compare {
       $rval = 1;
     }
     elsif ($refx eq 'SCALAR' || $refx eq 'REF') {
-      $rval = Compare(${$x}, ${$y}, $opts);
+      $rval = _Compare(${$x}, ${$y}, $opts);
     }
     elsif ($refx eq 'ARRAY') {
       if ($#{$x} == $#{$y}) { # same length
@@ -157,7 +165,7 @@ sub Compare {
         $rval = 1;
         for (@$x) {
           $i++;
-          $rval = 0 unless Compare($x->[$i], $y->[$i], { %{$opts}, xparent => $x, xpos => $i, yparent => $y, ypos => $i});
+          $rval = 0 unless _Compare($x->[$i], $y->[$i], { %{$opts}, xparent => $x, xpos => $i, yparent => $y, ypos => $i});
         }
       }
       else {
@@ -172,11 +180,11 @@ sub Compare {
 
       for (@kx) {
         next unless defined $x->{$_} || defined $y->{$_};
-        $rval = 0 unless defined $y->{$_} && Compare($x->{$_}, $y->{$_}, { %{$opts}, xparent => $x, xpos => $_, yparent => $y, ypos => $_});
+        $rval = 0 unless defined $y->{$_} && _Compare($x->{$_}, $y->{$_}, { %{$opts}, xparent => $x, xpos => $_, yparent => $y, ypos => $_});
       }
     }
     elsif($refx eq 'Regexp') {
-      $rval = Compare($x.'', $y.'', $opts);
+      $rval = _Compare($x.'', $y.'', $opts);
     }
     elsif ($refx eq 'CODE') {
       $rval = 0;
@@ -189,21 +197,21 @@ sub Compare {
       if ($type eq 'HASH') {
         my %x = %$x;
         my %y = %$y;
-        $rval = Compare(\%x, \%y, { %{$opts}, xparent => $xparent, xpos => $xpos, yparent => $yparent, ypos => $ypos});
+        $rval = _Compare(\%x, \%y, { %{$opts}, xparent => $xparent, xpos => $xpos, yparent => $yparent, ypos => $ypos});
         $been_there{\%x."-$xpos-$xparent"}--; # decrement count for temp structures
         $been_there{\%y."-$ypos-$yparent"}--;
       }
       elsif ($type eq 'ARRAY') {
         my @x = @$x;
         my @y = @$y;
-        $rval = Compare(\@x, \@y, { %{$opts}, xparent => $xparent, xpos => $xpos, yparent => $yparent, ypos => $ypos});
+        $rval = _Compare(\@x, \@y, { %{$opts}, xparent => $xparent, xpos => $xpos, yparent => $yparent, ypos => $ypos});
         $been_there{\@x."-$xpos-$xparent"}--;
         $been_there{\@y."-$ypos-$yparent"}--;
       }
       elsif ($type eq 'SCALAR' || $type eq 'REF') {
         my $x = ${$x};
         my $y = ${$y};
-        $rval = Compare($x, $y, $opts);
+        $rval = _Compare($x, $y, $opts);
         # $been_there{\$x}--;
         # $been_there{\$y}--;
       }

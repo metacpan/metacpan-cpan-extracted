@@ -3,13 +3,13 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.162';
+our $VERSION = '1.164';
 
 =encoding utf8
 
 =head1 NAME
 
-Quiq - Class library for rapid development (Documentation in German)
+Quiq - Class library for rapid development (German documentation)
 
 =head1 DESCRIPTION
 
@@ -36,11 +36,27 @@ L<Quiq::Array> - Operationen auf Arrays
 
 =item *
 
-L<Quiq::AsciiTable> - ASCII-Tabelle parsen
+L<Quiq::AsciiTable> - Parse ASCII-Tabelle
 
 =item *
 
 L<Quiq::Assert> - Zusicherungen
+
+=item *
+
+L<Quiq::Axis> - Definition einer Plot-Achse (abstrakte Basisklasse)
+
+=item *
+
+L<Quiq::Axis::Numeric> - Definition einer numerischen Plot-Achse
+
+=item *
+
+L<Quiq::Axis::Time> - Definition einer Zeit-Achse
+
+=item *
+
+L<Quiq::AxisTick> - Tick einer Plot-Achse
 
 =item *
 
@@ -245,6 +261,34 @@ L<Quiq::Formatter> - Formatierung von Werten
 =item *
 
 L<Quiq::Gd::Font> - GD- oder TrueType-Font
+
+=item *
+
+L<Quiq::Gd::Graphic> - Basisklasse aller Graphic-Klassen (abstrakt)
+
+=item *
+
+L<Quiq::Gd::Graphic::Axis> - Grafik einer Achse eines XY-Plot
+
+=item *
+
+L<Quiq::Gd::Graphic::BlockDiagram> - Farbige Blöcke in einer Fläche
+
+=item *
+
+L<Quiq::Gd::Graphic::ColorBar> - Rechteck mit einem Farbverlauf
+
+=item *
+
+L<Quiq::Gd::Graphic::ColorLegend> - Legende zu einem Farb-Plot
+
+=item *
+
+L<Quiq::Gd::Graphic::Graph> - Polyline-Grafik für XY-Plot
+
+=item *
+
+L<Quiq::Gd::Graphic::PointGraph> - Polyline-Grafik für XY-Plot mit farbigen Punkten
 
 =item *
 
@@ -560,10 +604,6 @@ L<Quiq::Process> - Information über den laufenden Prozess
 
 =item *
 
-L<Quiq::ProcessMatrix> - Matrix von zeitlichen Vorgängen
-
-=item *
-
 L<Quiq::Program> - Basisklasse für Programme
 
 =item *
@@ -589,6 +629,10 @@ L<Quiq::Reference> - Operationen auf Referenzen
 =item *
 
 L<Quiq::Rsync> - Aufruf von rsync von Perl aus
+
+=item *
+
+L<Quiq::Schedule> - Matrix von zeitlichen Vorgängen
 
 =item *
 
@@ -758,7 +802,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.162
+1.164
 
 =head1 AUTHOR
 

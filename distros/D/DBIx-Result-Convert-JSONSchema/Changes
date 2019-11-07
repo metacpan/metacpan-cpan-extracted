@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::Result::Convert::JSONSchema.
 
+0.06 2019-11-06
+    - Fix bug where DBIx default 'falsey' values were not set on schema
+
 0.05 2019-09-02
 	- Add option to ignore default value presets
 	- By default hide minimum values - having 0's on schema as minimums do not make a lot of sense

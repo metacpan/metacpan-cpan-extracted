@@ -1,12 +1,12 @@
 package Bio::Roary::BedFromGFFRole;
-$Bio::Roary::BedFromGFFRole::VERSION = '3.12.0';
+$Bio::Roary::BedFromGFFRole::VERSION = '3.13.0';
 # ABSTRACT: A role to create a bed file from a gff
 
 
 use Moose::Role;
 use Bio::Tools::GFF;
 
-has '_tags_to_filter'   => ( is => 'ro', isa => 'Str', default => '(CDS|ncRNA|tRNA|tmRNA|rRNA)' );
+has '_tags_to_filter'   => ( is => 'ro', isa => 'Str', default => 'CDS' );
 has 'min_gene_size_in_nucleotides'   => ( is => 'ro', isa => 'Int',  default  => 18 );
 has 'output_directory'               => ( is => 'ro', isa => 'Str', default => '.' );
 
@@ -76,7 +76,7 @@ Bio::Roary::BedFromGFFRole - A role to create a bed file from a gff
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

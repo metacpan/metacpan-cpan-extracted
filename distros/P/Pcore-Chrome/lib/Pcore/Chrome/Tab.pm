@@ -222,6 +222,8 @@ sub convert_cookies ( $self, $chrome_cookies ) {
         $cookies->{ $cookie->{domain} }->{ $cookie->{path} }->{ $cookie->{name} } = $cookie;
 
         $cookie->{val} = delete $cookie->{value};
+
+        delete $cookie->{expires} if $cookie->{expires} && $cookie->{expires} < 0;
     }
 
     return $cookies;

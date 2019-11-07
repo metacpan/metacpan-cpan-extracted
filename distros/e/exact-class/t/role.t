@@ -1,4 +1,3 @@
-use exact;
 use Test::Most;
 
 package ExactClassTest {

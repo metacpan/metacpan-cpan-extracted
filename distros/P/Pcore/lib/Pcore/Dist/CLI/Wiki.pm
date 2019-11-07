@@ -1,7 +1,7 @@
 package Pcore::Dist::CLI::Wiki;
 
 use Pcore -class;
-use Pcore::API::SCM::Const qw[:ALL];
+use Pcore::API::Git qw[:ALL];
 
 extends qw[Pcore::Dist::CLI];
 
@@ -26,17 +26,17 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 }
 
 sub _clone_upstream_wiki ( $self, $dist ) {
-    if ( !$dist->scm || !$dist->scm->upstream ) {
-        say q[SCM wasn't found];
+    if ( !$dist->git || !$dist->git->upstream ) {
+        say q[Git repo wasn't found];
 
         return;
     }
 
-    my $clone_uri = $dist->scm->upstream->get_wiki_clone_url;
+    my $clone_uri = $dist->git->upstream->get_wiki_clone_url;
 
     print qq[Cloning upstream wiki "$clone_uri" ... ];
 
-    my $res = Pcore::API::SCM->scm_clone( $clone_uri, root => "$dist->{root}/wiki", type => $SCM_TYPE_HG );
+    my $res = Pcore::API::Git->git_clone( $clone_uri, root => "$dist->{root}/wiki" );
 
     say $res;
 

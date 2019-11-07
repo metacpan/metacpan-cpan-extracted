@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use POSIX ":sys_wait_h";
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 sub new {
   my $that  = shift;
@@ -28,7 +28,7 @@ sub start {
   my ($self) = @_;
 
   $self->{'running'} = 1;
-  $self->{pid} = fork;
+  $self->{pid}       = fork;
 
   if ( !$self->{pid} ) {
     $self->{coderef}->($self);

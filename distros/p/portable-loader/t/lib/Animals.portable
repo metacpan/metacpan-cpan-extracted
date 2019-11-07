@@ -1,0 +1,43 @@
+version = "1.2"
+authority = "cpan:TOBYINK"
+toolkit = "Moo"
+
+[role:Livestock]
+
+[role:Pet]
+
+[role:Milkable.can]
+milk = {{{
+	return "the white stuff";
+}}}
+
+[class:Animal.has]
+name = { required = true }
+colour = { required = false }
+age = { type = "PositiveOrZeroInt" }
+status = { enum = ["alive", "dead"], default = "alive" }
+
+[class:Panda]
+extends = "Animal"
+
+[class:Cat]
+extends = "Animal"
+with = "Pet"
+
+[class:Cat.can]
+mew = {{{
+	return "meow";
+}}}
+
+[class:Dog]
+extends = "Animal"
+with = "Pet"
+
+[class:Cow]
+extends = "Animal"
+with = ["Livestock", "Milkable"]
+
+[class:Pig]
+extends = "Animal"
+with = ["Livestock"]
+

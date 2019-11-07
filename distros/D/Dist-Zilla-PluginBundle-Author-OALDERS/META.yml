@@ -57,6 +57,7 @@ requires:
   Dist::Zilla::Plugin::MetaResources: '0'
   Dist::Zilla::Plugin::MetaYAML: '0'
   Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::MojibakeTests: '0'
   Dist::Zilla::Plugin::PodCoverageTests: '0'
   Dist::Zilla::Plugin::PodWeaver: '0'
   Dist::Zilla::Plugin::Prereqs: '0'
@@ -67,10 +68,13 @@ requires:
   Dist::Zilla::Plugin::ShareDir: '0'
   Dist::Zilla::Plugin::StaticInstall: '0.012'
   Dist::Zilla::Plugin::Test::CPAN::Changes: '0'
+  Dist::Zilla::Plugin::Test::EOL: '0'
   Dist::Zilla::Plugin::Test::PodSpelling: '0'
+  Dist::Zilla::Plugin::Test::Portability: '0'
   Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
   Dist::Zilla::Plugin::Test::Synopsis: '0'
   Dist::Zilla::Plugin::Test::TidyAll: '0'
+  Dist::Zilla::Plugin::Test::Version: '0'
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::TravisCI::StatusBadge: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
@@ -92,10 +96,10 @@ resources:
   bugtracker: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders/issues
   homepage: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders
   repository: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders.git
-version: '0.000023'
+version: '0.000024'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::lib
@@ -133,7 +137,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.83'
+      version: '0.13'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -187,8 +191,12 @@ x_Dist_Zilla:
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200012'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -218,6 +226,10 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/Test::PodSpelling'
       version: '2.007005'
     -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::OALDERS/MojibakeTests'
+      version: '0.8'
+    -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::OALDERS/PodCoverageTests'
       version: '6.012'
@@ -232,6 +244,25 @@ x_Dist_Zilla:
           changelog: Changes
       name: '@Author::OALDERS/Test::CPAN::Changes'
       version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@Author::OALDERS/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
+      name: '@Author::OALDERS/Test::Portability'
+      version: '2.001000'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::OALDERS/TestRelease'
@@ -248,6 +279,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: '@Author::OALDERS/Test::TidyAll'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::OALDERS/Test::Version'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -393,7 +428,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -401,7 +436,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.21.0
+          git_version: 2.23.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -419,8 +454,8 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::StaticInstall
       config:
         Dist::Zilla::Plugin::StaticInstall:
-          dry_run: 1
-          mode: auto
+          dry_run: 0
+          mode: on
       name: '@Author::OALDERS/StaticInstall'
       version: '0.012'
     -
@@ -434,7 +469,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::OALDERS/CheckIssues'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
@@ -496,7 +531,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -509,11 +544,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000023
+          tag: v0.000024
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -550,7 +585,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -564,7 +599,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.23.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -642,5 +677,6 @@ x_Dist_Zilla:
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

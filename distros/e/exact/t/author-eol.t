@@ -24,6 +24,7 @@ my @files = (
     't/author-portability.t',
     't/author-synopsis.t',
     't/bundle.t',
+    't/carp.t',
     't/control.t',
     't/extension.t',
     't/features.t',

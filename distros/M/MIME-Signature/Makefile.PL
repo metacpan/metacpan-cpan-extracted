@@ -6,10 +6,11 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME          => 'MIME::Signature',
     AUTHOR        => q{Martin H. Sluka <fany@cpan.org>},
-    VERSION_FROM  => 'lib/MIME/Signature.pm',
+    VERSION       => '0.21',
     ABSTRACT_FROM => 'lib/MIME/Signature.pm',
     EXE_FILES     => [
         qw{
+          bin/add-disclaimer
           bin/append-signature
           bin/dump_mail_struct
           bin/ezmlm-append-trailer
@@ -23,10 +24,11 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     PREREQ_PM => {
-        'HTML::Entities' => 0,
-        'HTML::Parser'   => 0,
-        'MIME::Parser'   => 0,
-        'Path::Tiny'     => 0,
+        'HTML::Entities'           => 0,
+        'HTML::Parser'             => 0,
+        'MIME::Parser'             => 0,
+        'Path::Tiny'               => 0,
+        'Class::Method::Modifiers' => 0,
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
@@ -42,11 +44,7 @@ WriteMakefile(
     META_MERGE => {
         resources => {
             homepage   => 'https://github.com/fany/MIME-Signature',
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/fany/MIME-Signature.git',
-                web  => 'https://github.com/fany/MIME-Signature',
-            },
+            repository => 'https://github.com/fany/MIME-Signature.git',
         },
     },
 );

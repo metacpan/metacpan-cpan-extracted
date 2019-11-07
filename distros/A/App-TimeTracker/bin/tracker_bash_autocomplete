@@ -1,5 +1,5 @@
 # ABSTRACT: tracker bash autocomplete
-# PODNAME: tracker bash autocomplete
+# PODNAME: tracker_bash_autocomplete
 
 _tracker() 
 {
@@ -38,11 +38,11 @@ __END__
 
 =head1 NAME
 
-tracker bash autocomplete - tracker bash autocomplete
+tracker_bash_autocomplete - tracker bash autocomplete
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 AUTHOR
 

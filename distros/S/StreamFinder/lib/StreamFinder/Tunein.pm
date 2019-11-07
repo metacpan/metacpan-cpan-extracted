@@ -154,7 +154,7 @@ Returns the URL for the station's "cover art" icon image, if any.
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
 =item $station->B<getImageURL>()
 
@@ -164,7 +164,7 @@ banner image, if any.
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image (binary data).
+"gif", "jpeg", etc.) and the actual station's banner image (binary data).
 
 =item $station->B<getType>()
 
@@ -436,6 +436,11 @@ sub new
 			$self->{'genre'} = $genre;
 		} elsif ($subgenre) {
 			$self->{'genre'} = $subgenre;
+		}
+		if ($self->{'genre'}) {
+			$self->{'genre'} =~ s/\s*\\?u?003E\s*$//;
+			$self->{'genre'} = HTML::Entities::decode_entities($self->{'genre'});
+			$self->{'genre'} = uri_unescape($self->{'genre'});
 		}
 	}
 	return undef  unless ($self->{'id'});

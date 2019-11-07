@@ -153,7 +153,7 @@ Returns the URL for the video's "cover art" icon image, if any.
 =item $video->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
 =item $video->B<getImageURL>()
 
@@ -164,7 +164,7 @@ a separate banner image at this time.
 =item $video->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual video's banner image (binary data).
+"gif", "jpeg", etc.) and the actual video's banner image (binary data).
 
 =item $video->B<getType>()
 
@@ -424,9 +424,9 @@ RETRYIT:
 		goto RETRYIT  if ($1);
 	}
 
-	#NOW MANUALLY SCAN PAGE TO TRY TO GET artist, description, year, ETC. DIRECTLY FROM PAGE:
+	#NOW MANUALLY SCAN PAGE TO TRY TO GET artist, description, year, ETC. DIRECTLY FROM PAGE (IF A YOUTUBE SITE):
 
-	unless ($FAST) {
+	unless ($FAST || $url2fetch !~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/) {
 		print STDERR "-2 FETCHING SCREEN URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@userAgentOps);		
 		$ua->timeout($uops{'timeout'});
@@ -475,7 +475,7 @@ RETRYIT:
 	foreach my $i (qw(title artist description)) {
 		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
 		$self->{$i} = uri_unescape($self->{$i});
-		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
 	}
 	print STDERR "-2: title=".$self->{'title'}."= id=".$self->{'id'}."= artist=".$self->{'artist'}."= year(Published)=".$self->{'year'}."=\n"  if ($DEBUG);
 #print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n"  if ($DEBUG);
@@ -522,9 +522,9 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 		if ($plType =~ /pls/) {  #PLS:
 			my $firstTitle = '';
 			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
 					$firstStream ||= $1;
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
 					$firstTitle ||= $1;
 				}
 			}
@@ -535,11 +535,11 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 		} else {  #m3u8:
 			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
 			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#) {
+				if ($line =~ m#^\s*([^\#].+)$#o) {
 					my $urlpart = $1;
-					$urlpart =~ s#^\s+##;
-					$urlpart =~ s#^\/##;
-					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath .  $urlpart);
+					$urlpart =~ s#^\s+##o;
+					$urlpart =~ s#^\/##o;
+					$firstStream = ($urlpart =~ m#https?\:#o) ? $urlpart : ($urlpath .  $urlpart);
 					last;
 				}
 			}

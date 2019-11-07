@@ -9,7 +9,7 @@ package Rex::Virtualization::Lxc::list;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -50,7 +50,7 @@ sub execute {
   }
 
   my @columns = split( ',', $format );
-  my @ret = ();
+  my @ret     = ();
   for my $line (@containers) {
     next
       if $line =~ m/NAME|AUTOSTART|STATE|IPV4|IPV6|AUTOSTART|PID|RAM|SWAP\s/;

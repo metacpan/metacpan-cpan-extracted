@@ -30,7 +30,8 @@ my @files = (
     't/false_injection.t',
     't/prop_inherit.t',
     't/release-kwalitee.t',
-    't/role.t'
+    't/role.t',
+    't/sub_attrs.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

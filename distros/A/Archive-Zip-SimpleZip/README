@@ -1,9 +1,9 @@
 
                            Archive-Zip-SimpleZip
 
-                               Version 0.025
+                               Version 0.027
 
-                               19 June 2019
+                             7 November 2019
 
         Copyright (c) 2012-2019 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -24,7 +24,7 @@ Before you can build Archive-Zip-SimpleZip you need to have the following
 installed on your system:
 
     * Perl 5.006 or better. 
-    * IO::Compress version 2.080 or better.
+    * IO::Compress version 2.088 or better.
 
 BUILDING THE MODULE
 -------------------
@@ -43,8 +43,12 @@ To install Archive::Zip::SimpleZip, run the command below:
 
     make install
 
-TROUBLESHOOTING
----------------
+SUPPORT
+-------
+
+General feedback/questions/bug reports should be sent to 
+https://github.com/pmqs/Archive-Zip-SimpleZip/issues (preferred) or
+https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip-SimpleZip.
 
 FEEDBACK
 --------

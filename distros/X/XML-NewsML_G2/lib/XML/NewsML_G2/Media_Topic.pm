@@ -3,14 +3,11 @@ package XML::NewsML_G2::Media_Topic;
 use Moose;
 use namespace::autoclean;
 
-with 'XML::NewsML_G2::Role::HasQCode';
+with(
+    'XML::NewsML_G2::Role::HasQCode',
+    'XML::NewsML_G2::Role::HasTranslations'
+);
 
-has 'translations',
-    isa     => 'HashRef',
-    is      => 'rw',
-    default => sub { {} },
-    traits  => ['Hash'],
-    handles => { add_translation => 'set' };
 has 'parent', isa => __PACKAGE__, is => 'rw';
 has 'direct', isa => 'Bool', is => 'rw', default => '';
 
@@ -64,6 +61,6 @@ Philipp Gortan  C<< <philipp.gortan@apa.at> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2013-2014, APA-IT. All rights reserved.
+Copyright (c) 2013-2019, APA-IT. All rights reserved.
 
 See L<XML::NewsML_G2> for the license.

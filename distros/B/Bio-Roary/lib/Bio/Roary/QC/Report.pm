@@ -1,5 +1,5 @@
 package Bio::Roary::QC::Report;
-$Bio::Roary::QC::Report::VERSION = '3.12.0';
+$Bio::Roary::QC::Report::VERSION = '3.13.0';
 # ABSTRACT: generate a report based on kraken output
 
 
@@ -249,7 +249,7 @@ Bio::Roary::QC::Report - generate a report based on kraken output
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

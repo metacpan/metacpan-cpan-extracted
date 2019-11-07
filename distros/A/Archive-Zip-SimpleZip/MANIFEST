@@ -17,5 +17,6 @@ t/Test/Builder.pm
 t/Test/More.pm
 t/Test/Simple.pm
 t/mkTestZips
+t/files/jar.zip
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

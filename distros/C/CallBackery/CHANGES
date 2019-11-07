@@ -1,3 +1,8 @@
+0.22.0 2019-11-06 10:18:12 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - restructure javascript for screen setup to allow override of header and footer
+   from Application.js
+
 0.21.1 2019-10-30 08:41:21 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - remove right padding from form ... if you want padding, you can now add it

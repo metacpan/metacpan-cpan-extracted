@@ -6,6 +6,30 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.013	2019-11-06
+
+ - Added: Allow classes to have multiple factories to create them.
+
+0.012	2019-11-06
+
+ [ Bug Fixes ]
+ - Fix for newer versions of Moo::Role.
+
+0.011	2019-11-05	Treason
+
+ - Added: Support `type` in attribute specs.
+
+0.010	2019-11-05	Gunpowder
+
+ [ Bug Fixes ]
+ - Fixes for methods being redefined in subclasses.
+
+ [ Other ]
+ - Added: Allow coderefs to be used to modify multiple methods in
+   before/after/around, like Moo does.
+ - Added: Top-level shortcuts for creating classes and roles.
+ - Internal cleanups.
+
 0.009	2019-10-31
 
  [ Documentation ]

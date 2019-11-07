@@ -1,3 +1,5 @@
+0.015 2019-11-06 20:00:00+0000
+  -Support IF EXIST conditions
 0.014 2018-10-21 20:00:00+0000
   -Die when condition is not implemented
 0.013 2018-08-06 20:00:00+0000

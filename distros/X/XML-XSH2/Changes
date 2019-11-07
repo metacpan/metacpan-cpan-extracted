@@ -1,4 +1,15 @@
-Release 2.2.2: 19/06/18
+Release 2.2.6: 19/11/07
+Fix Makefile dependency again.
+
+Release 2.2.5: 19/11/06
+Fix Makefile dependency.
+
+Release 2.2.4: 19/11/05
+Fix deprecated "Unescaped left brace".
+Fix error message reporting wrong command.
+Don't warn when saving html with backup.
+
+Release 2.2.3: 19/06/18
 Bug fix: stream output went to ./- instead of STDOUT since
 XML::SAX::Writer 0.57.
 

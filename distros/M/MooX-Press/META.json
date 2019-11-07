@@ -60,7 +60,7 @@
    "provides" : {
       "MooX::Press" : {
          "file" : "lib/MooX/Press.pm",
-         "version" : "0.009"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
    },
-   "version" : "0.009",
+   "version" : "0.013",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

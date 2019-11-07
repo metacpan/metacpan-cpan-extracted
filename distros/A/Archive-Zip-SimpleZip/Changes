@@ -1,11 +1,60 @@
 CHANGES
 -------
 
+  0.027 7 November 2019
+
+        * t/000prereq.t
+          Print our versions of all modules used
+          c560193b1254d8515f2d880a713ba1ece888c0b9
+
+  0.026 5 November 2019
+
+        * Can't extract after read content
+          Fixes to allow nembers to be read multiple times
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/3
+          76943104cfce9e3ee4a4772b115fdb89faefa6fc
+
+        * add example of creating zip from stdin
+          bfb5b815be3f7d5a1600a48509272da37a6d8b3d
+
+        * use mkpath in SimpleUnzip.pm
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/2
+          d683c1d5f5e3c91bfd6beac3187cda6ca232d22c
+
+        * uncompr error with content()
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/4
+          efede5832f33b403c767a458c22fbc7d1f21c672
+    
+        * remove bad test
+          9e302ae233c17b70699091fdd947f2fd2b4c0cfa
+
+        * update to chmod for read-only
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/2
+          28135fa2228790e920e102fd444606c926444246
+
+        * Error when i try extract file to full path
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/2
+          6b33be16c82fab8fe3f85b66c2bce21424960c55
+
+        * Add Support section
+          50190d09901a5a188ad308e8a015563b66e65ca6
+
+        * more tests with deflated directory
+          c8c15cf3f0c47eaf9d9490aa508f14e184b1ba02
+
+        * test with a deflated directory
+          d3cc32b2cc92dba64ba879320b80d6696e56f62a
+
+        * Documentation Updates
+          0978433940737981a97dc1cff083ba4a1dbb4dd3
+
   0.025 19 June 2019
 
         * Don't use // for older perls
+          9f9462be5fe6f6356406ff7dcd1b3e32f6ebebb7
         
         * Add Perl::OSType as a prerequisite module
+          22aeb3f6615752602c48942f1a0e822ed3cb9d1c
 
   0.024 16 June 2019
 
@@ -15,10 +64,12 @@ CHANGES
   
       * SimpleZip.pm
         Populate extended attributes for file times & unix uid/gid
+        2036dcc60355ad32d6e1d3dbc5cbe761327e967f
 
       * SimpleUnzip.pm
         * Added FilesOnly option
         * Added extract method
+          0f1e98f94c6e0c8a8a874311bcdc18cc90ea7b54
 
       * Added source to github
 

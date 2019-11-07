@@ -9,7 +9,7 @@ package Rex::Virtualization::LibVirt::destroy;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -31,9 +31,9 @@ sub execute {
     die("VM $dom not found.");
   }
 
-  # virsh must distinguish between a not-running VM and failed to destroy via exit code!
+# virsh must distinguish between a not-running VM and failed to destroy via exit code!
   my $out = i_run "virsh -c $uri destroy '$dom' 2>&1", fail_ok => 1;
-  if ( $? != 0 && $out !~ /domain is not running/) {
+  if ( $? != 0 && $out !~ /domain is not running/ ) {
     die("Error destroying vm $dom");
   }
 

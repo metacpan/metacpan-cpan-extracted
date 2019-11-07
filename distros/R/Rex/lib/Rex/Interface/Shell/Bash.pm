@@ -9,7 +9,7 @@ package Rex::Interface::Shell::Bash;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Interface::Shell::Base;
 use base qw(Rex::Interface::Shell::Base);
@@ -85,7 +85,8 @@ sub exec {
   }
 
   if ( $self->{source_profile} ) {
-    $complete_cmd = ". ~/.profile >/dev/null 2>&1 ; $complete_cmd";
+    $complete_cmd =
+      "[ -r ~/.profile ] && . ~/.profile >/dev/null 2>&1 ; $complete_cmd";
   }
 
   if ( $self->{source_global_profile} ) {

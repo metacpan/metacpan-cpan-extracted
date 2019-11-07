@@ -194,8 +194,8 @@ sub _generate_meta_json ( $self, $tree ) {
     # resources
     my $upstream_meta;
 
-    if ( $self->{dist}->scm && $self->{dist}->scm->upstream ) {
-        $upstream_meta = $self->{dist}->scm->upstream->get_cpan_meta;
+    if ( $self->{dist}->git && $self->{dist}->git->upstream ) {
+        $upstream_meta = $self->{dist}->git->upstream->get_cpan_meta;
     }
     else {
         $upstream_meta = {};

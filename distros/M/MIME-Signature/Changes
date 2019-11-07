@@ -1,5 +1,12 @@
 Revision history for MIME-Signature
 
+0.2	2019-10-05 17:22
+	Added MIME::Disclaimer and bin/add-disclaimer
+	as contribution from Chris Scheller.
+
+0.16	2018-08-09 22:10
+	Added tests for mutlipart/alternative mails.
+
 0.15	2018-08-08 16:31
 	Tests should also work when RELEASE_TESTING is off.
 

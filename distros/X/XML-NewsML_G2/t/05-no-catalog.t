@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+use Test::MockTime 'set_fixed_time';
+
+BEGIN {
+    set_fixed_time('2012-01-01T13:00:00Z');
+}
+
 use utf8;
 use Test::More;
 use DateTime::Format::XSD;
@@ -25,6 +31,6 @@ ok( !$xpc->find('@qcode'), 'no qcode is created in XML' );
 
 #diag($dom->serialize(1));
 
-validate_g2($dom);
+validate_g2( $dom, undef, 'no_catalog' );
 
 done_testing;

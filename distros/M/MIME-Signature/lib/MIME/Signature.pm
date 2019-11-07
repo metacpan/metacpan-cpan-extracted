@@ -3,11 +3,22 @@ package MIME::Signature;
 use 5.014;
 use warnings;
 
-our $VERSION = '0.15';
+use base 'Exporter';
+
+our $VERSION = '0.17';
 
 use Carp qw(croak);
 use Encode qw(decode encode encode_utf8);
 use MIME::Parser;
+
+our @EXPORT    = ();
+our @EXPORT_OK = (
+  qw(
+    &_decoded_body
+    &_replace_body
+    )
+);
+our %EXPORT_TAGS = ();
 
 sub _decoded_body {
     my $entity = shift;
@@ -285,7 +296,7 @@ MIME::Signature - appends signature to mail messages
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

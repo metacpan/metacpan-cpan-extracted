@@ -18,10 +18,13 @@ my @files = (
     't/defined.t',
     't/defined.t.orig',
     't/exists.t',
+    't/immutable.t',
     't/import.t',
+    't/lockkeys.t',
     't/lvalue.t',
     't/lvalue_undef.t',
     't/subclass.t',
+    't/t',
     't/undef.t'
 );
 

@@ -3,23 +3,20 @@ package Pcore::Dist::Build::Create;
 use Pcore -class, -res;
 use Pcore::Dist;
 use Pcore::Lib::File::Tree;
-use Pcore::API::SCM::Const qw[:ALL];
-use Pcore::API::SCM;
-use Pcore::API::SCM::Upstream;
+use Pcore::API::Git qw[:ALL];
+use Pcore::API::Git::Upstream;
 
 has base_path      => ( required => 1 );    # Str
 has dist_namespace => ( required => 1 );    # Str, Dist::Name
 has dist_name      => ( required => 1 );    # Str, Dist-Name
 has tmpl           => ( required => 1 );    # Str, Dist-Name
 
-has upstream_hosting        => $SCM_HOSTING_BITBUCKET;    # Enum [ $SCM_HOSTING_BITBUCKET, $SCM_HOSTING_GITHUB ]
-has is_private              => 0;                         # Bool
-has upstream_scm_type       => $SCM_TYPE_HG;              # Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ]
-has local_scm_type          => $SCM_TYPE_HG;              # Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ]
-has upstream_repo_namespace => ();                        # Maybe [Str]
+has upstream_hosting        => $GIT_UPSTREAM_BITBUCKET;    # Enum [ $GIT_UPSTREAM_BITBUCKET, $GIT_UPSTREAM_GITHUB, $GIT_UPSTREAM_GITLAB ]
+has is_private              => 0;                          # Bool
+has upstream_repo_namespace => ();                         # Maybe [Str]
 
-has target_path => ( is => 'lazy', init_arg => undef );   # Str
-has tmpl_params => ( is => 'lazy', init_arg => undef );   # HashRef
+has target_path => ( is => 'lazy', init_arg => undef );    # Str
+has tmpl_params => ( is => 'lazy', init_arg => undef );    # HashRef
 
 sub BUILDARGS ( $self, $args ) {
     $args->{dist_namespace} =~ s/-/::/smg;
@@ -87,14 +84,9 @@ sub run ($self) {
 
     $add_dir->( $self->{tmpl} );
 
-    # add SCM files
+    # add git files
     if ( $self->{upstream_hosting} ) {
-        if ( $self->{local_scm_type} eq $SCM_TYPE_HG ) {
-            $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/hg/' );
-        }
-        elsif ( $self->{local_scm_type} eq $SCM_TYPE_GIT ) {
-            $files->add_dir( $ENV->{share}->get_location('Pcore/dist-tmpl') . '/git/' );
-        }
+        $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/git' );
     }
 
     $files->move_tree( '\Alib/__dist_path__', 'lib/' . $self->{dist_name} =~ s[-][/]smgr );
@@ -115,11 +107,21 @@ sub run ($self) {
 }
 
 sub _create_upstream_repo ($self) {
-    my $upstream_repo_namespace = $self->{upstream_repo_namespace} // ( $self->{upstream_hosting} eq $SCM_HOSTING_BITBUCKET ? $ENV->user_cfg->{BITBUCKET}->{default_repo_namespace} : $ENV->user_cfg->{GITHUB}->{default_repo_namespace} );
+    my $upstream_repo_namespace = $self->{upstream_repo_namespace} // do {
+        if ( $self->{upstream_hosting} eq $GIT_UPSTREAM_BITBUCKET ) {
+            $ENV->user_cfg->{BITBUCKET}->{default_repo_namespace};
+        }
+        elsif ( $self->{upstream_hosting} eq $GIT_UPSTREAM_GITHUB ) {
+            $ENV->user_cfg->{GITHUB}->{default_repo_namespace};
+        }
+        elsif ( $self->{upstream_hosting} eq $GIT_UPSTREAM_GITLAB ) {
+            $ENV->user_cfg->{GITLAB}->{default_repo_namespace};
+        }
+    };
 
     my $upstream_repo_id = "$upstream_repo_namespace/" . lc $self->{dist_name};
 
-    my $confirm = P->term->prompt( qq[Create upstream $self->{upstream_scm_type} repository "$upstream_repo_id" on $self->{upstream_hosting}?], [qw[yes no exit]], enter => 1 );
+    my $confirm = P->term->prompt( qq[Create upstream repository "$upstream_repo_id" on $self->{upstream_hosting}?], [qw[yes no exit]], enter => 1 );
 
     if ( $confirm eq 'no' ) {
         return res 200;
@@ -130,30 +132,29 @@ sub _create_upstream_repo ($self) {
 
     print 'Creating upstream repository ... ';
 
-    my $scm_upstream = Pcore::API::SCM::Upstream->new( {
-        scm_type => $self->{upstream_scm_type},
-        hosting  => $self->{upstream_hosting},
-        repo_id  => $upstream_repo_id,
+    my $upstream = Pcore::API::Git::Upstream->new( {
+        hosting => $self->{upstream_hosting},
+        repo_id => $upstream_repo_id,
     } );
 
-    my $hosting_api = $scm_upstream->get_hosting_api;
+    my $hosting_api = $upstream->get_hosting_api;
 
-    my $create_res = $hosting_api->create_repo( $upstream_repo_id, is_private => $self->{is_private}, scm => $self->{upstream_scm_type} );
+    my $create_res = $hosting_api->create_repo( $upstream_repo_id, is_private => $self->{is_private} );
 
     say $create_res;
 
     return $create_res if !$create_res;
 
     # clone repo
-    my $clone_uri = $scm_upstream->get_clone_url( $SCM_URL_TYPE_SSH, $self->{local_scm_type} );
+    my $clone_uri = $upstream->get_clone_url($GIT_UPSTREAM_URL_SSH);
 
     print qq[Cloning upstream repository "$clone_uri" ... ];
 
-    my $clone_res = Pcore::API::SCM->scm_clone( $clone_uri, root => $self->target_path, type => $self->{local_scm_type} );
+    my $res = Pcore::API::Git->git_run_no_root( [ 'clone', $clone_uri, $self->target_path ] );
 
-    say $clone_res;
+    say $res;
 
-    return $clone_res;
+    return $res;
 }
 
 1;
@@ -163,7 +164,7 @@ sub _create_upstream_repo ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 103                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 95                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

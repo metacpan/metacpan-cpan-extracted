@@ -74,7 +74,7 @@ package Rex;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 # development version if this variable is not set
 if ( !$Rex::VERSION ) {

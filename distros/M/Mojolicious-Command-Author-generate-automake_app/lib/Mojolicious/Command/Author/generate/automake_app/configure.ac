@@ -8,7 +8,7 @@ MJ_CLASS=<%= ${class} %>
 MJ_SCRIPT=<%= ${filename} %>
 % if ($package eq 'callbackery' ) {
 QX_CLASS=<%= ${class_file} %>
- %} 
+% } 
 
 AC_SUBST(MJ_CLASS)
 AC_SUBST(MJ_SCRIPT)
@@ -29,10 +29,10 @@ AC_PATH_PROG(WGET, wget, no)
 % if ($package eq 'callbackery' ) {
 AC_ARG_VAR(NODE,   [Path to local node binary])
 AC_PATH_PROG(NODE, node, no)
-AC_PATH_PROG(NPM, npm, no)
-AC_PATH_PROG(NPX, npx, no)
-AC_PATH_PROG(XGETTEXT, xgettext, no)
-AC_PATH_PROG(MSGMERGE, msgmerge, no)
+AC_PATH_PROG(NPM, npm, npm-not-found)
+AC_PATH_PROG(NPX, npx, npx-not-found)
+AC_PATH_PROG(XGETTEXT, xgettext, xgettext-not-found)
+AC_PATH_PROG(MSGMERGE, msgmerge, msgmerge-not-found)
 % }
 
 
@@ -69,11 +69,14 @@ if test -x "$NODE"; then
   AC_MSG_CHECKING(make sure we have at least node ${ac_node_version})
   case `$NODE --version` in
   v10*)
-    AC_MSG_RESULT(ok)
+    AC_MSG_RESULT(ok v10)
+    ;;
+  v11*)
+    AC_MSG_RESULT(ok v11)
     ;;
   *)
     AC_MSG_RESULT(no);
-    NODE=
+    NODE=old-node
   esac
 fi
 
@@ -145,9 +148,10 @@ fi
 % if ($package eq 'callbackery' ) {
 AC_ARG_VAR(CALLBACKERY_QX, [Alternate CallBackery/qooxdoo folder location])
 if test "$CALLBACKERY_QX" = ""; then
-    script_path=`readlink -f "$0"`
+    script_path=`dirname "$0"`
+    script_path=`cd $script_path;pwd`
     # Absolute path this script is in, thus /home/user/bin
-    CALLBACKERY_QX=`dirname "$script_path"`/thirdparty/lib/perl5/CallBackery/qooxdoo
+    CALLBACKERY_QX="$script_path"/thirdparty/lib/perl5/CallBackery/qooxdoo
 fi
 AC_SUBST(CALLBACKERY_QX)
 % }
@@ -169,7 +173,9 @@ AC_OUTPUT
 
 % if ($package eq 'callbackery' ) {
 
-if test -z "$NODE"; then
+if test -x "$NODE"; then
+:
+else
 cat <<NOTES
 
 ** WARNING ***********************************************

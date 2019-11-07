@@ -8,7 +8,7 @@ use namespace::autoclean;
 use Try::Tiny;
 use Sub::Util 'set_subname';
 
-our $VERSION = '1.11'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -95,7 +95,7 @@ sub import {
         croak("$err via use of exact");
     };
 
-    monkey_patch( $self, $caller, ( map { $_ => \&$_ } qw( croak carp confess cluck ) ) )
+    monkey_patch( $self, $caller, ( map { $_ => \&{ 'Carp::' . $_ } } qw( croak carp confess cluck ) ) )
         unless ( grep { $_ eq 'nocarp' } @functions );
 
     eval qq{
@@ -210,7 +210,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)

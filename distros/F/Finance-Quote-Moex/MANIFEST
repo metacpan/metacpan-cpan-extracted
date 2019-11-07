@@ -1,0 +1,14 @@
+Finance-Quote-Moex-0.3.tar.gz-
+lib/Finance/Quote/Micex.pm
+lib/Finance/Quote/Moex.pm
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+readme.md
+t/Moex.t
+t/quote-test.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

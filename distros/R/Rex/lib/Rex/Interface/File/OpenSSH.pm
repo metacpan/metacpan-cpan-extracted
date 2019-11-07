@@ -9,7 +9,7 @@ package Rex::Interface::File::OpenSSH;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Fcntl;
 use Rex::Interface::Fs;
@@ -59,7 +59,7 @@ sub read {
   my ( $self, $len ) = @_;
 
   my $sftp = Rex::get_sftp();
-  my $buf = $sftp->read( $self->{fh}, $len );
+  my $buf  = $sftp->read( $self->{fh}, $len );
   return $buf;
 }
 

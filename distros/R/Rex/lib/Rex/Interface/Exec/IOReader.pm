@@ -9,7 +9,7 @@ package Rex::Interface::Exec::IOReader;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use IO::Select;
 
@@ -22,7 +22,7 @@ sub io_read {
   $selector->add($err_fh);
 
   my $rex_int_conf = Rex::Commands::get("rex_internals") || {};
-  my $buffer_size = 1024;
+  my $buffer_size  = 1024;
   if ( exists $rex_int_conf->{read_buffer_size} ) {
     $buffer_size = $rex_int_conf->{read_buffer_size};
   }

@@ -30,7 +30,8 @@ my @files = (
     't/false_injection.t',
     't/prop_inherit.t',
     't/release-kwalitee.t',
-    't/role.t'
+    't/role.t',
+    't/sub_attrs.t'
 );
 
 notabs_ok($_) foreach @files;

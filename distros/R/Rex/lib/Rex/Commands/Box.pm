@@ -62,7 +62,7 @@ package Rex::Commands::Box;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use YAML;
 use Data::Dumper;
@@ -147,7 +147,7 @@ With this function you can create a new Rex/Box. The first parameter of this fun
 
 =cut
 
-sub box(&) {
+sub box(&) { ## no critic ProhibitSubroutinePrototypes
   my $code = shift;
 
   #### too much black magic...

@@ -30,7 +30,7 @@ package Rex::Commands::Host;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Rex::Exporter;
 use Rex::Commands::Fs;
@@ -137,10 +137,9 @@ sub create_host {
     $fh->close;
   }
   else {
-    my @host = get_host( $host, { file => $data->{file} } );
-    if ( $data->{"ip"} eq $host[0]->{"ip"}
+    if ( $data->{"ip"} eq $cur_host[0]->{"ip"}
       && join( " ", @{ $data->{"aliases"} || [] } ) eq
-      join( " ", @{ $host[0]->{"aliases"} } ) )
+      join( " ", @{ $cur_host[0]->{"aliases"} } ) )
     {
 
       Rex::Logger::debug("Nothing to update for host $host");
@@ -173,7 +172,7 @@ sub delete_host {
     my @content = $fh->read_all;
     $fh->close;
 
-    my @new_content = grep { !/\s$host\s?/ } @content;
+    my @new_content = grep { !/\s\Q$host\E\b/ } @content;
 
     $fh = file_write $file;
     $fh->write(@new_content);

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000024  2019-11-06 02:26:15Z
+    - Add MojibakeTests, Test::EOL, Test::Portability and Test::Version
+
 0.000023  2019-04-04 13:08:45Z
     - Fix cpanfile
 

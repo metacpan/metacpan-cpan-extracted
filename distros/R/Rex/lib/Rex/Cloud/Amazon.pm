@@ -13,7 +13,7 @@ package Rex::Cloud::Amazon;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Cloud::Base;
@@ -258,7 +258,7 @@ sub create_volume {
 
   my $xml = $self->_request(
     "CreateVolume",
-    "Size" => $data{"size"} || 1,
+    "Size"             => $data{"size"} || 1,
     "AvailabilityZone" => $data{"zone"},
   );
 

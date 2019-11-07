@@ -25,22 +25,35 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DateTime" : "0",
             "DateTime::Format::XSD" : "0",
+            "List::MoreUtils" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0.64",
+            "Moose::Role" : "0",
             "Moose::Util" : "0.64",
+            "Moose::Util::TypeConstraints" : "0",
+            "Scalar::Util" : "0",
             "UUID::Tiny" : "1.02",
             "XML::LibXML" : "0",
             "namespace::autoclean" : "0.05",
-            "perl" : "v5.8.0",
+            "perl" : "v5.12.0",
             "version" : "0.77"
          }
       },
       "test" : {
          "requires" : {
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
             "Test::EOL" : "0",
             "Test::Exception" : "0",
+            "Test::File::Contents" : "0",
+            "Test::MockTime" : "0",
             "Test::More" : "0",
             "Test::Warnings" : "0"
          }
@@ -49,7 +62,7 @@
    "provides" : {
       "XML::NewsML_G2" : {
          "file" : "lib/XML/NewsML_G2.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       },
       "XML::NewsML_G2::AnyItem" : {
          "file" : "lib/XML/NewsML_G2/AnyItem.pm"
@@ -59,6 +72,9 @@
       },
       "XML::NewsML_G2::Binary" : {
          "file" : "lib/XML/NewsML_G2/Binary.pm"
+      },
+      "XML::NewsML_G2::Concept" : {
+         "file" : "lib/XML/NewsML_G2/Concept.pm"
       },
       "XML::NewsML_G2::Copyright_Holder" : {
          "file" : "lib/XML/NewsML_G2/Copyright_Holder.pm"
@@ -74,6 +90,9 @@
       },
       "XML::NewsML_G2::ElectionProvince" : {
          "file" : "lib/XML/NewsML_G2/ElectionProvince.pm"
+      },
+      "XML::NewsML_G2::Facet" : {
+         "file" : "lib/XML/NewsML_G2/Facet.pm"
       },
       "XML::NewsML_G2::Genre" : {
          "file" : "lib/XML/NewsML_G2/Genre.pm"
@@ -144,6 +163,9 @@
       "XML::NewsML_G2::Role::HasQCode" : {
          "file" : "lib/XML/NewsML_G2/Role/HasQCode.pm"
       },
+      "XML::NewsML_G2::Role::HasTranslations" : {
+         "file" : "lib/XML/NewsML_G2/Role/HasTranslations.pm"
+      },
       "XML::NewsML_G2::Role::Remote" : {
          "file" : "lib/XML/NewsML_G2/Role/Remote.pm"
       },
@@ -186,6 +208,9 @@
       "XML::NewsML_G2::Role::Writer_2_18" : {
          "file" : "lib/XML/NewsML_G2/Role/Writer_2_18.pm"
       },
+      "XML::NewsML_G2::Role::Writer_2_28" : {
+         "file" : "lib/XML/NewsML_G2/Role/Writer_2_28.pm"
+      },
       "XML::NewsML_G2::Role::Writer_2_9" : {
          "file" : "lib/XML/NewsML_G2/Role/Writer_2_9.pm"
       },
@@ -197,6 +222,15 @@
       },
       "XML::NewsML_G2::Service" : {
          "file" : "lib/XML/NewsML_G2/Service.pm"
+      },
+      "XML::NewsML_G2::SportFacet" : {
+         "file" : "lib/XML/NewsML_G2/SportFacet.pm"
+      },
+      "XML::NewsML_G2::SportFacetValue" : {
+         "file" : "lib/XML/NewsML_G2/SportFacetValue.pm"
+      },
+      "XML::NewsML_G2::StoryType" : {
+         "file" : "lib/XML/NewsML_G2/StoryType.pm"
       },
       "XML::NewsML_G2::Topic" : {
          "file" : "lib/XML/NewsML_G2/Topic.pm"
@@ -233,6 +267,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#xml-newsml-g2"
    },
-   "version" : "v0.3.1",
+   "version" : "v0.3.2",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

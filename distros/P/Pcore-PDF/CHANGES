@@ -1,3 +1,6 @@
+v0.7.0 2019-11-06T20:34:18Z
+ - converted to git
+
 v0.6.0 2019-07-12T12:07:23Z
  - Pcore::Util -> Pcore::Lib
 

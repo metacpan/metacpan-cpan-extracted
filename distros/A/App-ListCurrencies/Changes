@@ -1,6 +1,19 @@
+0.004   2019-09-10  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases.
+
+
+0.003.2 2019-09-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc][ux] Add a couple of examples.
+
+
 0.003   2019-07-28  Released-By: PERLANCAR; Urgency: low
 
 	- [ux] Simplify CLI scripts by not reading config & env vars.
+
 
 
 0.002   2019-07-19  Released-By: PERLANCAR; Urgency: high

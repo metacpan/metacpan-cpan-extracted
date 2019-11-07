@@ -1,5 +1,5 @@
 package Bio::Roary::ExtractProteomeFromGFFs;
-$Bio::Roary::ExtractProteomeFromGFFs::VERSION = '3.12.0';
+$Bio::Roary::ExtractProteomeFromGFFs::VERSION = '3.13.0';
 # ABSTRACT: Take in GFF files and create protein sequences in FASTA format
 
 
@@ -79,7 +79,7 @@ Bio::Roary::ExtractProteomeFromGFFs - Take in GFF files and create protein seque
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Pcore::Dist::CLI::Create;
 
 use Pcore -class;
 use Pcore::Dist;
-use Pcore::API::SCM::Const qw[:ALL];
+use Pcore::API::Git qw[:ALL];
 
 extends qw[Pcore::Core::CLI::Cmd];
 
@@ -21,30 +21,13 @@ sub CLI ($self) {
             },
             hosting => {
                 short   => 'H',
-                desc    => qq[define hosting for upstream repository. Possible values: "$SCM_HOSTING_BITBUCKET", "$SCM_HOSTING_GITHUB"],
-                isa     => [ $SCM_HOSTING_BITBUCKET, $SCM_HOSTING_GITHUB ],
-                default => $SCM_HOSTING_BITBUCKET,
+                desc    => qq[define hosting for upstream repository. Possible values: @{[ join ', ', map {qq["$_"]} sort keys $GIT_UPSTREAM_HOST->%* ]}],
+                isa     => [ keys $GIT_UPSTREAM_HOST->%* ],
+                default => $GIT_UPSTREAM_BITBUCKET,
             },
             private => {
                 desc    => 'create private upstream repository',
                 default => 0,
-            },
-            scm => {
-                short   => 'S',
-                desc    => qq[upstream repository SCM type. Applied only for "bitbucket". Possible values: "$SCM_TYPE_HG", "$SCM_TYPE_GIT"],
-                isa     => [ $SCM_TYPE_HG, $SCM_TYPE_GIT ],
-                default => $SCM_TYPE_HG,
-            },
-            namespace => {
-                short => 'N',
-                desc  => 'upstream repository namespace',
-                isa   => 'Str',
-            },
-            local_scm => {
-                short   => 's',
-                desc    => qq[local repository SCM type. Applied only if remote SCM is "git". Possible values: "$SCM_TYPE_HG", "$SCM_TYPE_GIT"],
-                isa     => [ $SCM_TYPE_HG, $SCM_TYPE_GIT ],
-                default => $SCM_TYPE_HG,
             },
         },
         arg => [    #
@@ -62,8 +45,6 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         tmpl                    => $opt->{tmpl},
         upstream_hosting        => $opt->{hosting},
         is_private              => $opt->{private},
-        upstream_scm_type       => $opt->{scm},
-        local_scm_type          => $opt->{local_scm},
         upstream_repo_namespace => $opt->{namespace},
     } );
 

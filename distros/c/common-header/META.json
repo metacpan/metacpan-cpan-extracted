@@ -33,15 +33,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/softvisio/common-header/issues?status=new&status=open"
+         "web" : "https://bitbucket.org/softvisio/common/issues?status=new&status=open"
       },
-      "homepage" : "https://bitbucket.org/softvisio/common-header/overview",
+      "homepage" : "https://bitbucket.org/softvisio/common/overview",
       "repository" : {
-         "type" : "hg",
-         "url" : "https://bitbucket.org/softvisio/common-header",
-         "web" : "https://bitbucket.org/softvisio/common-header/overview"
+         "type" : "git",
+         "url" : "https://bitbucket.org/softvisio/common",
+         "web" : "https://bitbucket.org/softvisio/common/overview"
       }
    },
-   "version" : "v0.2.1",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v0.3.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

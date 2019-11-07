@@ -167,6 +167,34 @@ DESCRIPTION
         Only supported for Moose. Unnecessary for Moo anyway. Defaults to
         false.
 
+    At this top level, a shortcut is available for the 'class' and 'role'
+    keys. Rather than:
+
+      use MooX::Press (
+        role => [
+          'Quux',
+          'Quuux' => { ... },
+        ],
+        class => [
+          'Foo',
+          'Bar' => { ... },
+          'Baz' => { ... },
+        ],
+      );
+
+    It is possible to write:
+
+      use MooX::Press (
+        'role:Quux'  => {},
+        'role:Quuux' => { ... },
+        'class:Foo'  => {},
+        'class:Bar'  => { ... },
+        'class:Baz'  => { ... },
+      );
+
+    This saves a level of indentation. (`=> undef` or `=> 1` are supported as
+    synonyms for `=> {}`.)
+
    Class Options
     Each class in the list of classes can be followed by a hashref of options:
 
@@ -507,7 +535,7 @@ DESCRIPTION
         packages like "MyApp::Animal::Mammal::Dog". (In cases of multiple
         inheritance, it uses $ISA[0].)
 
-    `factory` *(Str)*
+    `factory` *(Str|ArrayRef|Undef)*
         This is the name for the method installed into the factory package. So
         for class "Cat", it might be "new_cat".
 
@@ -515,6 +543,28 @@ DESCRIPTION
         double colons replaced by single underscores, and with "new_" added in
         front. To suppress the creation of this method, set `factory` to an
         explicit undef.
+
+        If set to an arrayref, it indicates you wish to create multiple
+        methods in the factory package to make objects of this class.
+
+          factory => [
+            "grow_pig"                         => \"new_from_embryo",
+            "new_pork", "new_bacon", "new_ham" => sub { ... },
+            "new_pig", "new_swine",
+          ],
+
+        A scalarref indicates the name of a constructor and that the methods
+        before are shortcuts for that constructor. So `MyApp->grow_pig(@args)`
+        is a shortcut for `MyApp::Pig->new_from_embryo(@args)`.
+
+        A coderef will have a custom method installed into the factory package
+        so that `MyApp->new_pork(@args)` will act as a shortcut for:
+        `$coderef->("MyApp", "MyApp::Pig", @args)`. Note that `new_bacon` and
+        `new_ham` are just aliases for `new_bacon`.
+
+        The `new_pig` and `new_swine` method names are followed by neither a
+        coderef nor a scalarref, so are treated as if they had been followed
+        by `\"new"`.
 
     `type_name` *(Str)*
         The name for the type being installed into the type library.
@@ -659,6 +709,13 @@ DESCRIPTION
         Use blessed type constraint objects, such as those from
         Types::Standard.
 
+    `type` *(Str)*
+        `type => "HashRef"` does what you think `isa => "HashRef"` should do.
+        More specifically it searches your type library, along with
+        Types::Standard, Types::Common::Numeric, and Types::Common::String to
+        find the type constraint it thinks you wanted. It's smart enough to
+        deal with parameterized types, unions, intersections, and complements.
+
     `coerce` *(Bool)*
         MooX::Press automatically implies `coerce => 1` when you give a type
         constraint that has a coercion. If you don't want coercion then
@@ -777,6 +834,8 @@ BUGS
 
 SEE ALSO
     Moo, MooX::Struct, Types::Standard.
+
+    portable::loader.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

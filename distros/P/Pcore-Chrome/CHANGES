@@ -1,3 +1,7 @@
+v0.8.0 2019-11-06T20:29:52Z
+ - fix for convert cookies
+ - converted to git
+
 v0.7.0 2019-07-12T12:08:28Z
  - Pcore::Util -> Pcore::Lib
 

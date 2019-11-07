@@ -4,13 +4,7 @@ use strict;
 use warnings;
 # use diagnostics;
 
-eval 'use Clone';
-($@) ?
-    do {
-        print "1..0 # Skipping no Clone found\n";
-        exit(0);
-    } :
-    eval 'use Test::More tests => 1;';
+use Test::More;
 
 use Data::Compare;
 
@@ -26,3 +20,5 @@ my $k = Clone::clone $j;
 
 Compare($j, $k);
 ok(Compare($j, $k), 'Can compare deeply-nested objecty jibber-jabber');
+
+done_testing();

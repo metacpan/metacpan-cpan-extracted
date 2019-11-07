@@ -60,6 +60,7 @@ on 'develop' => sub {
   requires "Dist::Zilla::PluginBundle::Basic" => "0";
   requires "Dist::Zilla::PluginBundle::Filter" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Pod::Weaver::Section::Contributors" => "0";
   requires "Pod::Weaver::Section::Support" => "0";
   requires "Software::License::GPL_3" => "0";
   requires "Test::CPAN::Changes" => "0.19";

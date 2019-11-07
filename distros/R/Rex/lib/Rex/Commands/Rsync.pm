@@ -47,7 +47,7 @@ package Rex::Commands::Rsync;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -181,9 +181,8 @@ sub sync {
 
   if ( $auth_type eq "pass" ) {
     $cmd = sprintf( $cmd,
-      'ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p '
-        . "$port",
-      $port );
+      "ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p $port",
+    );
     push(
       @expect_options,
       [

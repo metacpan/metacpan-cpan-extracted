@@ -13,6 +13,11 @@
       "version" : 2
    },
    "name" : "Devel-PatchPerl",
+   "no_index" : {
+      "package" : [
+         "Errno"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -45,8 +50,8 @@
          "web" : "https://github.com/bingos/devel-patchperl"
       }
    },
-   "version" : "1.64",
-   "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "version" : "1.68",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14"
 }
 

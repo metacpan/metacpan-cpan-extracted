@@ -60,7 +60,7 @@ sub does_ok {
 				has => [
 					'name!'  => Str,
 					'colour',
-					'age'    => Num,
+					'age'    => { type => 'PositiveOrZeroInt' },
 					'status' => { enum => ['alive', 'dead'], default => 'alive' },
 				],
 				coerce => [
@@ -74,7 +74,14 @@ sub does_ok {
 					'Cat'  => { with => ['Pet'] },
 					'Dog'  => { with => ['Pet'] },
 					'Cow'  => { with => ['Livestock', 'Milkable'] },
-					'Pig'  => { with => ['Livestock'] },
+					'Pig'  => {
+						with => ['Livestock'] ,
+						factory => [
+							'new_swine', 'new_pig', 'new_sow', \'new',
+							'new_bacon', 'new_ham', 'new_pork', sub { my ($f, $k) = (shift, shift); my $o = $k->new(@_); $o->status('dead'); $o },
+							'new_oinker',
+						],
+					},
 				],
 			},
 			'Collar' => {
@@ -88,6 +95,7 @@ for my $class (qw/Animal Panda Cat Dog Cow Pig/) {
 	my $factory = lc "new_$class";
 	can_ok('Local::Factories', $factory);
 	my $obj = 'Local::Factories'->$factory(name => "My $class");
+	is($obj->name, "My $class");
 	isa_ok($obj, "Local::MyApp::Animal");
 	isa_ok($obj, "Local::MyApp::$class") unless $class eq 'Animal';
 	does_ok($obj, 'Local::MyApp::Pet') if $class =~ /Cat|Dog/;
@@ -111,6 +119,12 @@ is($d->FACTORY, 'Local::Factories', '$d->FACTORY');
 is($d->FACTORY->type_library, 'Local::MyApp::Types', '$d->FACTORY->type_library');
 is($d->FACTORY->get_type_for_package(class => ref $d)->name, 'Cow', '$d->FACTORY->get_type_for_package');
 
+my $ham = Local::Factories->new_ham(name => 'Ham');
+is($ham->status, 'dead', 'factory with coderef');
+
+my $harry_trotter = Local::Factories->new_oinker(name => 'Harry');
+is($harry_trotter->name, 'Harry', 'factory with default implementation');
+
 my $e = exception {
 	Local::MyApp::Cow->new(age => 1);
 };
@@ -128,6 +142,62 @@ isa_ok($t->coerce('Flo'), 'Local::MyApp::Animal');
 my $blue = Local::Factories->new_collar(animal => 'Mary');
 isa_ok($blue->animal, 'Local::MyApp::Animal');
 is($blue->animal->name, 'Mary', '$blue->owner->name');
+
+my $xyz;
+
+{
+	package Local::Dummy3;
+	use Types::Standard -types;
+	use MooX::Press (
+		toolkit => 'Moo',
+		role => [
+			'Doubler' => {
+				around => [
+					'm1', 'm2' => sub { my ($orig, $self, @args) = (shift, shift, @_); 2 * $self->$orig(@args) },
+				],
+				before => {
+					'm1' => sub { ++$xyz },
+				},
+			},
+			'Adder' => {
+				around => [
+					'm2' => sub { my ($orig, $self, @args) = (shift, shift, @_); 1 + $self->$orig(@args) },
+				],
+			},
+		],
+		class => [
+			'Base' => [
+				can => [
+					'm1'   => sub { 42 },
+					'm2'   => sub { 666 },
+				],
+				subclass => [
+					'With::Doubler' => { with => 'Doubler' },
+					'With::Adder'   => { with => 'Adder' },
+					'With::Both1'   => { with => ['Adder', 'Doubler'] },
+					'With::Both2'   => { with => ['Doubler', 'Adder'] },
+				],
+			],
+		],
+	);
+};
+
+my @expected = (
+	[ 'new_base'                => 42, 666 ],
+	[ 'new_with_doubler'        => 84, 1332 ],
+	[ 'new_with_adder'          => 42, 667 ],
+	[ 'new_with_both2'          => 84, 1333 ],
+	[ 'new_with_both1'          => 84, 1334 ],
+);
+for (@expected) {
+	my ($factory, $expected_m1, $expected_m2) = @$_;
+	my $object = Local::Dummy3->$factory;
+	isa_ok($object, 'Local::Dummy3::Base');
+	is($object->m1, $expected_m1, "$object\->m1");
+	is($object->m2, $expected_m2, "$object\->m1");
+}
+
+is($xyz, 3, 'sanity check for before');
 
 done_testing;
 

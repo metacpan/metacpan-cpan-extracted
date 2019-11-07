@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+use Test::MockTime 'set_fixed_time';
+
+BEGIN {
+    set_fixed_time('2012-01-01T13:00:00Z');
+}
+
 use utf8;
 use Test::More;
 use DateTime::Format::XSD;
@@ -94,10 +100,10 @@ ok( my $xpc = XML::LibXML::XPathContext->new($dom),
 $xpc->registerNs( 'nar',   'http://iptc.org/std/nar/2006-10-01/' );
 $xpc->registerNs( 'xhtml', 'http://www.w3.org/1999/xhtml' );
 remotes_checks( $dom, $xpc );
-validate_g2( $dom, '2.9' );
+validate_g2( $dom, '2.9', 'NewsItemVideo_2.9' );
 
-# 2.12, 2.15, 2.18 checks
-foreach my $version (qw(2.12 2.15 2.18)) {
+# 2.12, 2.15, 2.18, 2.28 checks
+foreach my $version (qw(2.12 2.15 2.18 2.28)) {
     ok( $writer = XML::NewsML_G2::Writer::News_Item->new(
             news_item      => $ni,
             scheme_manager => $sm,
@@ -114,7 +120,7 @@ foreach my $version (qw(2.12 2.15 2.18)) {
     $xpc->registerNs( 'nar',   'http://iptc.org/std/nar/2006-10-01/' );
     $xpc->registerNs( 'xhtml', 'http://www.w3.org/1999/xhtml' );
     remotes_checks( $dom, $xpc );
-    validate_g2( $dom, $version );
+    validate_g2( $dom, $version, "NewsItemVideo_$version" );
 
     #diag($dom->serialize(1));
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# curl -fsSLO https://bitbucket.org/softvisio/<: $dist_path :>/raw/tip/contrib/<: $dist_path :>.sh && chmod +x <: $dist_path :>.sh
+# curl -fsSLO https://bitbucket.org/softvisio/<: $dist_path :>/raw/master/contrib/<: $dist_path :>.sh && chmod +x <: $dist_path :>.sh
 
 set -e
 

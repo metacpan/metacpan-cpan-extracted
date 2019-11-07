@@ -1,7 +1,9 @@
 daemon                        off;
 worker_processes              auto;
 pcre_jit                      on;
-load_module                   modules/ngx_http_geoip_module.so;
+: if $use_geoip2 {
+load_module                   modules/ngx_http_geoip2_module.so;
+: }
 pid                           <: $pid :>;
 : if $user {
 user                          <: $user :>;
@@ -33,13 +35,25 @@ http {
     output_buffers            1 128k;
 
     keepalive_timeout         70;
+: if $geoip2_country_path {
 
-: if $geoip_country_path {
-    geoip_country             <: $geoip_country_path :>;
+    # NOTE https://github.com/leev/ngx_http_geoip2_module
+    geoip2 <: $geoip2_country_path :> {
+        auto_reload 0m;
+        # $geoip2_metadata_country_build metadata build_epoch;
+        # $geoip2_data_country_code default=US source=$variable_with_ip country iso_code;
+        # $geoip2_data_country_name country names en;
+    }
 : }
-: if $geoip_city_path {
-    geoip_city                <: $geoip_city_path :>;
+: if $geoip2_city_path {
+
+    # NOTE https://github.com/leev/ngx_http_geoip2_module
+    geoip2 <: $geoip2_city_path :> {
+        auto_reload 0m;
+        # $geoip2_data_city_name default=London city names en;
+    }
 : }
+
     gzip                      on;
     gzip_min_length           100;
     gzip_comp_level           4;

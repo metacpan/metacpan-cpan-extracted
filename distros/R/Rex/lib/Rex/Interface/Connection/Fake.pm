@@ -9,7 +9,7 @@ package Rex::Interface::Connection::Fake;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Interface::Connection::Base;
 

@@ -1,5 +1,5 @@
 package Bio::Roary::External::CheckTools;
-$Bio::Roary::External::CheckTools::VERSION = '3.12.0';
+$Bio::Roary::External::CheckTools::VERSION = '3.13.0';
 # ABSTRACT: Check external executables are available and are the correct version
 
 
@@ -82,12 +82,12 @@ my %tools = (
 my %cdhit_tools = (
     'cdhit' => {
         GETVER => "cdhit -h | grep 'CD-HIT version'",
-        REGEXP => qr/version ($BIDEC) /,
+        REGEXP => qr/version\s+($BIDEC)/i,
         MINVER => "4.6",
     },
     'cd-hit' => {
         GETVER => "cd-hit -h | grep 'CD-HIT version'",
-        REGEXP => qr/version ($BIDEC) /,
+        REGEXP => qr/version\s+($BIDEC)i/,
         MINVER => "4.6",
     }
 );
@@ -193,7 +193,7 @@ Bio::Roary::External::CheckTools - Check external executables are available and 
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 Functionality borrowed from PROKKA by Torsten Seemann.

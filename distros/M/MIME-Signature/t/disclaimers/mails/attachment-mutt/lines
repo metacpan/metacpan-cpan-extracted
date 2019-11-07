@@ -1,0 +1,36 @@
+Date: Tue, 7 Aug 2018 19:35:57 +0200
+From: "Martin H. Sluka" <fany@cpan.org>
+To: fany@cpan.org
+Subject: testmail with attachment created with mutt
+Message-ID: <20180807173557.GA26645@sluka.de>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="GvXjxJ+pjyke8COw"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+
+
+--GvXjxJ+pjyke8COw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Das ist der Rand von Ostermundigen.
+
+--GvXjxJ+pjyke8COw
+Content-Type: image/gif
+Content-Disposition: attachment; filename="Clear.gif"
+Content-Transfer-Encoding: base64
+
+R0lGODlhAQABAIABAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==
+
+--GvXjxJ+pjyke8COw
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
+
+
+---------------------------------
+WARNING: UNSAFE CONTENT DETECTED!
+---------------------------------
+
+--GvXjxJ+pjyke8COw--
+

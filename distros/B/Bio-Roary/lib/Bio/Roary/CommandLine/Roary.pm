@@ -1,7 +1,7 @@
 undef $VERSION;
 
 package Bio::Roary::CommandLine::Roary;
-$Bio::Roary::CommandLine::Roary::VERSION = '3.12.0';
+$Bio::Roary::CommandLine::Roary::VERSION = '3.13.0';
 # ABSTRACT: Take in FASTA files of proteins and cluster them
 
 
@@ -392,7 +392,7 @@ Bio::Roary::CommandLine::Roary - Take in FASTA files of proteins and cluster the
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

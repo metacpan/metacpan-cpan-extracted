@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use feature qw( say );
 
@@ -102,13 +102,17 @@ sub configure {
         [ 'ExecDir' => { dir => 'script' } ],
 
         [ 'Test::PodSpelling' => { stopwords => $self->_all_stopwords } ],
+        'MojibakeTests',
         'PodCoverageTests',
         'PodSyntaxTests',
         'Test::CPAN::Changes',
+        'Test::EOL',
+        'Test::Portability',
         'TestRelease',
         'Test::ReportPrereqs',
         'Test::Synopsis',
         'Test::TidyAll',
+        'Test::Version',
 
         'RunExtraTests',
 
@@ -197,7 +201,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head2 configure
 

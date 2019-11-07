@@ -13,6 +13,9 @@ has 'g2_catalog_url',
     default =>
     'http://www.iptc.org/std/catalog/catalog.IPTC-G2-Standards_24.xml';
 
+## no critic (ControlStructures::ProhibitYadaOperator Subroutines::RequireFinalReturn)
+sub _create_subjects_concepts {...}
+
 1;
 __END__
 
@@ -31,3 +34,4 @@ Philipp Gortan  C<< <philipp.gortan@apa.at> >>
 Copyright (c) 2013-2014, APA-IT. All rights reserved.
 
 See L<XML::NewsML_G2> for the license.
+qw

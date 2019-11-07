@@ -7,7 +7,7 @@ use Mojo::File;
 use POSIX qw(strftime);
 use Cwd 'getcwd';
 use File::Spec::Functions qw(catdir catfile);
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.5';
 has description => 'Generate Mojolicious web application with Automake';
 has usage => sub { shift->extract_usage };
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.162';
+our $VERSION = '1.164';
 
 use Term::ANSIColor ();
 
@@ -26,7 +26,7 @@ L<Quiq::Object>
   use Quiq::AnsiColor;
   
   my $a = Quiq::AnsiColor->new(-t STDOUT);
-  printf "%s\n",$a->str('bold white on_cyan','Hello, world!');
+  say $a->str('bold white on_cyan','Hello, world!');
 
 =head1 DESCRIPTION
 
@@ -195,7 +195,7 @@ sub str {
 
 =head1 VERSION
 
-1.162
+1.164
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-Package Proc::Background Version 1.20
+Package Proc::Background Version 1.21
 
 This is the Proc::Background package.  It provides a generic interface
 to running background processes.  Through this interface, users can

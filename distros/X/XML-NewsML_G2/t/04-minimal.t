@@ -1,12 +1,18 @@
 #!/usr/bin/env perl
 
+use Test::MockTime 'set_fixed_time';
+
+BEGIN {
+    set_fixed_time('2012-01-01T13:00:00Z');
+}
+
 use utf8;
 use Test::More;
 use XML::LibXML;
 use XML::NewsML_G2;
 
 use lib 't';
-use NewsML_G2_Test_Helpers qw(validate_g2);
+use NewsML_G2_Test_Helpers qw(validate_g2 :vars);
 
 use warnings;
 use strict;
@@ -22,6 +28,7 @@ ok( my $ni = XML::NewsML_G2::News_Item_Text->new(
         title => 'Saisonstart im Schweizerhaus: Run aufs Krügerl im Prater',
         language => 'de',
         provider => $prov_apa,
+        guid     => $guid_text
     ),
     'create News Item instance'
 );
@@ -37,6 +44,6 @@ ok( my $dom = $writer->create_dom(), 'create DOM' );
 
 #diag($dom->serialize(1));
 
-validate_g2($dom);
+validate_g2( $dom, undef, 'minimal' );
 
 done_testing;

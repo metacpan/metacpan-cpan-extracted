@@ -1,7 +1,7 @@
 package App::ListCurrencies;
 
-our $DATE = '2019-07-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-09-28'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,6 +55,18 @@ Source data is generated from `Locale::Codes::Currency_Codes`. so make sure you
 have a relatively recent version of the module.
 
 _
+    extra_props => {
+        examples => [
+            {
+                args => {query=>'rup'},
+                test => 0,
+            },
+            {
+                args => {query=>'rup', detail=>1},
+                test => 0,
+            },
+        ],
+    },
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
@@ -73,7 +85,7 @@ App::ListCurrencies - List currencies
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ListCurrencies (from Perl distribution App-ListCurrencies), released on 2019-07-28.
+This document describes version 0.004 of App::ListCurrencies (from Perl distribution App-ListCurrencies), released on 2019-09-28.
 
 =head1 SYNOPSIS
 
@@ -89,6 +101,32 @@ Usage:
  list_currencies(%args) -> [status, msg, payload, meta]
 
 List currencies.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ list_currencies(query => "rup"); # -> ["IDR", "INR", "LKR", "MUR", "NPR", "PKR", "SCR"]
+
+=item * Example #2:
+
+ list_currencies(query => "rup", detail => 1);
+
+Result:
+
+ [
+   { alpha => "IDR", en_name => "Rupiah" },
+   { alpha => "INR", en_name => "Indian Rupee" },
+   { alpha => "LKR", en_name => "Sri Lanka Rupee" },
+   { alpha => "MUR", en_name => "Mauritius Rupee" },
+   { alpha => "NPR", en_name => "Nepalese Rupee" },
+   { alpha => "PKR", en_name => "Pakistan Rupee" },
+   { alpha => "SCR", en_name => "Seychelles Rupee" },
+ ]
+
+=back
 
 Source data is generated from C<Locale::Codes::Currency_Codes>. so make sure you
 have a relatively recent version of the module.

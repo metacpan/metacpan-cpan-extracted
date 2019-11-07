@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = "3.001";
+our $VERSION = "3.002";
 # ABSTRACT: time tracking for impatient and lazy command line lovers
 
 use App::TimeTracker::Data::Task;
@@ -307,11 +307,11 @@ App::TimeTracker - time tracking for impatient and lazy command line lovers
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 SYNOPSIS
 
-Backend for the C<tracker> command. See L<tracker|https://metacpan.org/pod/distribution/App-TimeTracker/bin/tracker> and/or C<perldoc tracker> for details.
+Backend for the C<tracker> command. See L<tracker> and/or C<perldoc tracker> for details.
 
 =head1 CONTRIBUTORS
 

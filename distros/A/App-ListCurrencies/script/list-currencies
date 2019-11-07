@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/ListCurrencies/list_currencies
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-07-28'; # DATE
+our $DATE = '2019-09-28'; # DATE
 our $DIST = 'App-ListCurrencies'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +37,37 @@ list-currencies - List currencies
 
 =head1 VERSION
 
-This document describes version 0.003 of list-currencies (from Perl distribution App-ListCurrencies), released on 2019-07-28.
+This document describes version 0.004 of list-currencies (from Perl distribution App-ListCurrencies), released on 2019-09-28.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % list-currencies [options] [query]
+
+Examples:
+
+ % list-currencies rup
+ IDR
+ INR
+ LKR
+ MUR
+ NPR
+ PKR
+ SCR
+
+ % list-currencies rup --detail
+ +-------+------------------+
+ | alpha | en_name          |
+ +-------+------------------+
+ | IDR   | Rupiah           |
+ | INR   | Indian Rupee     |
+ | LKR   | Sri Lanka Rupee  |
+ | MUR   | Mauritius Rupee  |
+ | NPR   | Nepalese Rupee   |
+ | PKR   | Pakistan Rupee   |
+ | SCR   | Seychelles Rupee |
+ +-------+------------------+
 
 =head1 DESCRIPTION
 

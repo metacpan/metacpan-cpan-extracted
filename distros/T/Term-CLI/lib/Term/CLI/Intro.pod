@@ -22,7 +22,7 @@ Term::CLI::Intro - introduction to Term::CLI class/module structure
 
 =head1 VERSION
 
-version 0.051004
+version 0.051005
 
 =head1 DESCRIPTION
 

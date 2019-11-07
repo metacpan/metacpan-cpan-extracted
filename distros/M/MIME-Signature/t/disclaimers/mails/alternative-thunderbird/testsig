@@ -1,0 +1,44 @@
+To: fany@cpan.org
+From: "Martin H. Sluka" <martin@sluka.de>
+Subject: multipart/alternative testmail created with Thunderbird
+Message-ID: <247a9382-101e-cff1-4a5d-dd16e6c2b8e0@sluka.de>
+Date: Thu, 9 Aug 2018 22:04:57 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:52.0)
+ Gecko/20100101 Thunderbird/52.9.1
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="------------73B2CD1536F26DE6926DC449"
+
+This is a multi-part message in MIME format.
+--------------73B2CD1536F26DE6926DC449
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+BAD WOLF. ☺
+
+*Das ist der Rand von Ostermundigen.*
+
+
+BAD WOLF. ☺
+
+--------------73B2CD1536F26DE6926DC449
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  </head>
+  <body text="#000000" bgcolor="#FFFFFF"><br /><hr />BAD WOLF. &#x263A;
+<br /><hr />
+    <p><b>Das ist der Rand von Ostermundigen.</b><br>
+    </p>
+  <br /><hr />BAD WOLF. &#x263A;
+</body>
+</html>
+
+--------------73B2CD1536F26DE6926DC449--
+
+

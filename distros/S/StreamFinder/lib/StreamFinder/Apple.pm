@@ -23,45 +23,45 @@ file.
 
 	use StreamFinder::Apple;
 
-	my $station = new StreamFinder::Apple(<url>);
+	my $podcast = new StreamFinder::Apple(<url>);
 
-	die "Invalid URL or no streams found!\n"  unless ($station);
+	die "Invalid URL or no streams found!\n"  unless ($podcast);
 
-	my $firstStream = $station->get();
+	my $firstStream = $podcast->get();
 
 	print "First Stream URL=$firstStream\n";
 
-	my $url = $station->getURL();
+	my $url = $podcast->getURL();
 
 	print "Stream URL=$url\n";
 
-	my $stationTitle = $station->getTitle();
+	my $podcastTitle = $podcast->getTitle();
 	
-	print "Title=$stationTitle\n";
+	print "Title=$podcastTitle\n";
 	
-	my $stationDescription = $station->getTitle('desc');
+	my $podcastDescription = $podcast->getTitle('desc');
 	
-	print "Description=$stationDescription\n";
+	print "Description=$podcastDescription\n";
 	
-	my $stationID = $station->getID();
+	my $podcastID = $podcast->getID();
 
-	print "Station ID=$stationID\n";
+	print "PODCAST ID=$podcastID\n";
 	
-	my $artist = $station->{'artist'};
+	my $artist = $podcast->{'artist'};
 
 	print "Artist=$artist\n"  if ($artist);
 	
-	my $genre = $station->{'genre'};
+	my $genre = $podcast->{'genre'};
 
 	print "Genre=$genre\n"  if ($genre);
 	
-	my $icon_url = $station->getIconURL();
+	my $icon_url = $podcast->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
 
-		my ($image_ext, $icon_image) = $station->getIconData();
+		my ($image_ext, $icon_image) = $podcast->getIconData();
 
-		if ($icon_image && open IMGOUT, ">/tmp/${stationID}.$image_ext") {
+		if ($icon_image && open IMGOUT, ">/tmp/${podcastID}.$image_ext") {
 
 			binmode IMGOUT;
 
@@ -73,11 +73,11 @@ file.
 
 	}
 
-	my $stream_count = $station->count();
+	my $stream_count = $podcast->count();
 
 	print "--Stream count=$stream_count=\n";
 
-	my @streams = $station->get();
+	my @streams = $podcast->get();
 
 	foreach my $s (@streams) {
 
@@ -122,11 +122,11 @@ https://podcasts.apple.com/podcast/idB<podcast-id>?i=B<episode-id>, or just
 I<podcast-id>, or I<podcast-id>/I<episode-id>.  NOTE:  If the ID is an album 
 or song clip, then the full URL must be given, ie. http://music.apple.com/...
 
-=item $station->B<get>()
+=item $podcast->B<get>()
 
 Returns an array of strings representing all stream urls found.
 
-=item $station->B<getURL>([I<options>])
+=item $podcast->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
@@ -138,45 +138,45 @@ If I<"noplaylists"> is specified, and the stream to be returned is a
 "playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
 in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
 
-=item $station->B<count>()
+=item $podcast->B<count>()
 
 Returns the number of streams found for the podcast / episode / album / song.  
 Episodes and songs usually return 1, whereas podcasts and albums usually 1 
 for each episode / sample song clip in the podcast / album respectively.
 
-=item $station->B<getID>()
+=item $podcast->B<getID>()
 
 Returns the station's Apple ID (numeric).  For podcasts and albums, this 
 is a single numeric value.  For episodes and songs, it's two numbers 
 separated by a slash ("/").
 
-=item $station->B<getTitle>(['desc'])
+=item $podcast->B<getTitle>(['desc'])
 
 Returns the podcast's, album's, episode's or song clip's title, 
 or (long description).  
 
-=item $station->B<getIconURL>()
+=item $podcast->B<getIconURL>()
 
 Returns the url for the podcast's / album's "cover art" icon image, 
 if any.
 
-=item $station->B<getIconData>()
+=item $podcast->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
-=item $station->B<getImageURL>()
+=item $podcast->B<getImageURL>()
 
 Returns the url for the podcast's / album's "cover art" banner image, 
 which for Apple is always the icon image, as Apple does not support 
 a separate banner image at this time.
 
-=item $station->B<getImageData>()
+=item $podcast->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image (binary data).
+"gif", "jpeg", etc.) and the actual station's banner image (binary data).
 
-=item $station->B<getType>()
+=item $podcast->B<getType>()
 
 Returns the station's type ("Apple").
 

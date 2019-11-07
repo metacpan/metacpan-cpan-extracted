@@ -23,7 +23,7 @@ package Rex::Box::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Commands -no => [qw/auth/];
 use Rex::Helper::Run;
@@ -399,7 +399,7 @@ sub _download {
           print $fh $data;
 
           my $current_time = [ gettimeofday() ];
-          my $time_diff = tv_interval( $start_time, $current_time );
+          my $time_diff    = tv_interval( $start_time, $current_time );
 
           my $bytes_per_seconds = $current_size / $time_diff;
 

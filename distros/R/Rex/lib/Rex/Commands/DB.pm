@@ -59,7 +59,7 @@ package Rex::Commands::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -211,7 +211,7 @@ sub import {
 
   my ( $ns_register_to, $file, $line ) = caller;
 
-  no strict 'refs';
+  no strict 'refs'; ## no critic ProhibitNoStrict
   for my $func_name (@EXPORT) {
     *{"${ns_register_to}::$func_name"} = \&$func_name;
   }

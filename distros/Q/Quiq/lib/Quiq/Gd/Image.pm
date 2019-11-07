@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.162';
+our $VERSION = '1.164';
 
 use GD ();
 use Scalar::Util ();
@@ -46,13 +46,11 @@ L<Quiq::Object>
 
 =head1 DESCRIPTION
 
-Die Klasse  ist eine Überdeckung der Klasse GD::Image. Sie
+Die Klasse ist eine Überdeckung der Klasse GD::Image. Sie
 überschreibt existierende Methoden und ergänzt die Klasse um
-weitere Methoden.
-
-Die Klasse kann überall verwendet werden, wo GD::Image verwendet wird.
-Alle Methoden von GD::Image sind auch auf Quiq::Gd::Image-Objekte
-anwendbar.
+weitere Methoden.  Die Klasse kann überall verwendet werden, wo
+GD::Image verwendet wird.  Alle Methoden von GD::Image sind auch
+auf Quiq::Gd::Image-Objekte anwendbar.
 
 =head2 Vorteile
 
@@ -86,7 +84,7 @@ für denselben Farbwert aufgerufen - immer den gleichen
 Farbindex. Bei einem Palette-Bild wird immer ein neuer Farbindex
 geliefert, auch wenn der Farbwert gleich ist. Daher muss aus
 portablitätsgründen die GD-Methode colorResolve() genutzt werden.
-Dies Portabilität wird von der Methode L<color|"color() - Alloziere Farbe">() sichergestellt.
+Diese Portabilität wird von der Methode L<color|"color() - Alloziere Farbe">() sichergestellt.
 
 =head2 Portierung einer existierenden Anwendung
 
@@ -671,7 +669,7 @@ sub rainbowColors {
 
 =head1 VERSION
 
-1.162
+1.164
 
 =head1 AUTHOR
 

@@ -16,7 +16,7 @@ RUN /bin/bash -c ' \
     source <( curl -fsSL https://bitbucket.org/softvisio/scripts/raw/master/perl-build-env.sh || echo false ) setup \
     \
     # deploy deps
-    # && yum -y install ... \
+    # && dnf -y install ... \
     \
     # deploy non-CPAN deps
     # && mkdir "$PCORE_LIB/pcore-cdn-static-data" \

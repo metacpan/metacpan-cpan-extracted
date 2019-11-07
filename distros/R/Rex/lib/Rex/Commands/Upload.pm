@@ -27,7 +27,7 @@ package Rex::Commands::Upload;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Rex::Exporter;
 use File::Basename qw(basename);
@@ -94,7 +94,7 @@ sub upload {
 
   my ( $local, $remote ) = @_;
 
-  $local = resolv_path( $local, 1 );
+  $local  = resolv_path( $local, 1 );
   $remote = resolv_path($remote);
 
   my $fs = Rex::Interface::Fs->create;

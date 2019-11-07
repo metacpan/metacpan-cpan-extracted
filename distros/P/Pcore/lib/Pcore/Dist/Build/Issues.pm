@@ -50,15 +50,15 @@ const our $STATUS_COLOR => {
 };
 
 around new => sub ( $orig, $self, $args ) {
-    my $scm = $args->{dist}->scm;
+    my $git = $args->{dist}->git;
 
-    return if !$scm || !$scm->upstream;
+    return if !$git || !$git->upstream;
 
     return $self->$orig($args);
 };
 
 sub search_issues ( $self, $filters ) {
-    my $upstream = $self->{dist}->scm->upstream;
+    my $upstream = $self->{dist}->git->upstream;
 
     my $api = $upstream->get_hosting_api;
 
@@ -118,7 +118,7 @@ sub print_issues ( $self, $issues ) {
 }
 
 sub get_issue ( $self, $id ) {
-    my $upstream = $self->{dist}->scm->upstream;
+    my $upstream = $self->{dist}->git->upstream;
 
     my $api = $upstream->get_hosting_api;
 
@@ -162,7 +162,7 @@ sub print_issue ( $self, $issue, $print_content = 1 ) {
 }
 
 sub set_issue_status ( $self, $id, $status ) {
-    my $upstream = $self->{dist}->scm->upstream;
+    my $upstream = $self->{dist}->git->upstream;
 
     my $api = $upstream->get_hosting_api;
 

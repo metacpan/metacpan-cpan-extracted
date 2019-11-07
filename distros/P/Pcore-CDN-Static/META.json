@@ -38,15 +38,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/softvisio/pcore-cdn-static/issues?status=new&status=open"
+         "web" : "https://bitbucket.org/softvisio/pcore/issues?status=new&status=open"
       },
-      "homepage" : "https://bitbucket.org/softvisio/pcore-cdn-static/overview",
+      "homepage" : "https://bitbucket.org/softvisio/pcore/overview",
       "repository" : {
-         "type" : "hg",
-         "url" : "https://bitbucket.org/softvisio/pcore-cdn-static",
-         "web" : "https://bitbucket.org/softvisio/pcore-cdn-static/overview"
+         "type" : "git",
+         "url" : "https://bitbucket.org/softvisio/pcore",
+         "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.60.1",
+   "version" : "v0.61.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -9,7 +9,7 @@ package Rex::User::NetBSD;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands::MD5;
@@ -190,8 +190,9 @@ sub rm_user {
 
   my $output = i_run $cmd . " " . $user, fail_ok => 1;
   if ( $? == 67 ) {
-    Rex::Logger::info("Cannot delete user $user (no such user)", "warn");
-  } elsif ( $? != 0 ) {
+    Rex::Logger::info( "Cannot delete user $user (no such user)", "warn" );
+  }
+  elsif ( $? != 0 ) {
     die("Error deleting user $user ($output)");
   }
 
@@ -202,7 +203,7 @@ sub rm_user {
   }
 
   if ( $? != 0 ) {
-    die("Error removing " . $user_info{home});
+    die( "Error removing " . $user_info{home} );
   }
 
 }

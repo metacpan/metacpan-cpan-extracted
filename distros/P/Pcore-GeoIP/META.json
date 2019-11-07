@@ -60,15 +60,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/softvisio/pcore-geoip/issues?status=new&status=open"
+         "web" : "https://bitbucket.org/softvisio/pcore/issues?status=new&status=open"
       },
-      "homepage" : "https://bitbucket.org/softvisio/pcore-geoip/overview",
+      "homepage" : "https://bitbucket.org/softvisio/pcore/overview",
       "repository" : {
-         "type" : "hg",
-         "url" : "https://bitbucket.org/softvisio/pcore-geoip",
-         "web" : "https://bitbucket.org/softvisio/pcore-geoip/overview"
+         "type" : "git",
+         "url" : "https://bitbucket.org/softvisio/pcore",
+         "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v1.5.0",
+   "version" : "v1.6.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -4,14 +4,11 @@ package A1z::HTML5::Template;
 
 use vars qw(%ENV);
 
-# ABSTRACT: Fast/easy Web Apps in Perl
-
+# ABSTRACT: Fast and easy Web Apps in Perl
 
 sub NAME { my $self = shift; my $NAME; $NAME = "Fast and Easy Web Apps"; return $NAME; }
 
-our $VERSION = '0.20';
-
-
+our $VERSION = '0.21';
 
 use parent qw(Exporter); 
 require Exporter; 
@@ -111,13 +108,6 @@ sub header
 {
 	my $self = shift; 
 	
-	# my %in = (
-		# -type => "Content-Type: text/html",  
-		# -char => "charset=utf-8\n\n", 
-		# @_,
-		
-	# ); 
-	
 	my @keys; 
 	if (@_) { @keys = @_; } 
 	
@@ -215,9 +205,9 @@ sub body_js_css
 		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
 		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-		<script type="text/javascript" src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
+		<script  src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
 
-		<script type="text/javascript">
+		<script >
 		
 		// for tabs 
 		\$( function() {
@@ -271,7 +261,7 @@ sub body_js_css
 				chomp;
 				if ($_ =~ /.js$/)
 				{
-					$return .= qq{<script type="text/javascript" src="$_"></script>\n}; 
+					$return .= qq{<script  src="$_"></script>\n}; 
 				}
 				elsif ($_ =~ /.css$/)
 				{
@@ -280,7 +270,6 @@ sub body_js_css
 				else 
 				{
 					# do nothing
-					#return qq{<!--213--> @keys\n}; 
 				}
 			}
 			
@@ -500,7 +489,7 @@ sub head_js_css
 				chomp;
 				if ($_ =~ /.js$/)
 				{
-					$return .= qq{<!--442--> \n<script type="text/javascript" src="$_"></script> \n}; 
+					$return .= qq{<!--442--> \n<script  src="$_"></script> \n}; 
 				}
 				elsif ($_ =~ /.css$/)
 				{
@@ -893,7 +882,7 @@ my %HTML;
 		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
 		<!--bootstrap-->
-		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script  src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 
 		<!--blueimp gallery-->
 		<script src="https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
@@ -902,8 +891,8 @@ my %HTML;
 		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
 		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-		<script type="text/javascript" src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
-		<script type="text/javascript">
+		<script  src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
+		<script >
 		
 		// for tabs 
 		\$( function() {
@@ -1259,8 +1248,8 @@ sub body
 	return qq{<body onload="$in{-onload}">
 <div id="main" class="container">
 	<!--top nav bar begin-->
-	<script type="text/javascript" src="https://www.a1z.us/js/utils/top-nav-bar.js"></script>
-	<script type="text/javascript">
+	<script  src="https://www.a1z.us/js/utils/top-nav-bar.js"></script>
+	<script >
 	//<-- 
 	fixed_top_navbar('$in{-nbhead}', '$in{-nbpage}', '$in{-nbmenu}', '$in{-nbLinks}');
 	//-->
@@ -1280,7 +1269,7 @@ $in{-defaultjquery}
 
 $in{-humanejs}
  
-<script type="text/javascript">
+<script>
 //<!--
 $in{-userjquery}
 //--> 
@@ -1552,8 +1541,7 @@ sub open_file
 			}
 		} 
 		
-		# add an extra item at the end of file output
-		#$out .= qq{\t<h3>Powered by Business Impact Solutions</h3>\n\t<div>bislinks.com, bizImpactSolutions.com - Business Impact Solutions</div>\n}; 
+		# add an extra item at the end of file output 
 		
 		# Step 3 
 		# set the output ending as per format  

@@ -24,8 +24,8 @@ sub run ($self) {
 
         exit 1;
     }
-    elsif ( !$self->{dist}->scm ) {
-        say q[SCM is required];
+    elsif ( !$self->{dist}->git ) {
+        say q[Git is required];
 
         exit 1;
     }

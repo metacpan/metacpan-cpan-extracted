@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Element  0.051004 {
+package Term::CLI::Element  0.051005 {
 
 use Modern::Perl 1.20140107;
 use Term::CLI::ReadLine;
@@ -48,7 +48,7 @@ Term::CLI::Element - generic parent class for elements in Term::CLI
 
 =head1 VERSION
 
-version 0.051004
+version 0.051005
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+Tue Nov  5 17:39:00 EST 2019
+
+  Version 1.21
+  * Fix bug in timeout_system that caused it to wait the maximum
+    duration on every call.
+
 Sun Nov  3 19:34:00 EST 2019
 
   Version 1.20

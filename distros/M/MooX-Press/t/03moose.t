@@ -133,5 +133,61 @@ my $blue = Local::Factories->new_collar(animal => 'Mary');
 isa_ok($blue->animal, 'Local::MyApp::Animal');
 is($blue->animal->name, 'Mary', '$blue->owner->name');
 
+my $xyz;
+
+{
+	package Local::Dummy3;
+	use Types::Standard -types;
+	use MooX::Press (
+		toolkit => 'Moose',
+		role => [
+			'Doubler' => {
+				around => [
+					'm1', 'm2' => sub { my ($orig, $self, @args) = (shift, shift, @_); 2 * $self->$orig(@args) },
+				],
+				before => {
+					'm1' => sub { ++$xyz },
+				},
+			},
+			'Adder' => {
+				around => [
+					'm2' => sub { my ($orig, $self, @args) = (shift, shift, @_); 1 + $self->$orig(@args) },
+				],
+			},
+		],
+		class => [
+			'Base' => [
+				can => [
+					'm1'   => sub { 42 },
+					'm2'   => sub { 666 },
+				],
+				subclass => [
+					'With::Doubler' => { with => 'Doubler' },
+					'With::Adder'   => { with => 'Adder' },
+					'With::Both1'   => { with => ['Adder', 'Doubler'] },
+					'With::Both2'   => { with => ['Doubler', 'Adder'] },
+				],
+			],
+		],
+	);
+};
+
+my @expected = (
+	[ 'new_base'                => 42, 666 ],
+	[ 'new_with_doubler'        => 84, 1332 ],
+	[ 'new_with_adder'          => 42, 667 ],
+	[ 'new_with_both2'          => 84, 1333 ],
+	[ 'new_with_both1'          => 84, 1334 ],
+);
+for (@expected) {
+	my ($factory, $expected_m1, $expected_m2) = @$_;
+	my $object = Local::Dummy3->$factory;
+	isa_ok($object, 'Local::Dummy3::Base');
+	is($object->m1, $expected_m1, "$object\->m1");
+	is($object->m2, $expected_m2, "$object\->m1");
+}
+
+is($xyz, 3, 'sanity check for before');
+
 done_testing;
 

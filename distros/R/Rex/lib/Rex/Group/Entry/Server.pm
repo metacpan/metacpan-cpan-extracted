@@ -9,7 +9,7 @@ package Rex::Group::Entry::Server;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::System;
@@ -31,7 +31,7 @@ use attributes;
 sub function {
   my ( $class, $name, $code ) = @_;
 
-  no strict "refs";
+  no strict "refs"; ## no critic ProhibitNoStrict
   *{ $class . "::" . $name } = $code;
   use strict;
 }

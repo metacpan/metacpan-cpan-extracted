@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::GeneAlignmentFromNucleotides;
-$Bio::Roary::Main::GeneAlignmentFromNucleotides::VERSION = '3.12.0';
+$Bio::Roary::Main::GeneAlignmentFromNucleotides::VERSION = '3.13.0';
 # ABSTRACT: Take in multi-FASTA files of nucleotides and align each file with PRANK or MAFFT
 # PODNAME: protein_alignment_from_nucleotides
 
@@ -25,7 +25,7 @@ protein_alignment_from_nucleotides - Take in multi-FASTA files of nucleotides an
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

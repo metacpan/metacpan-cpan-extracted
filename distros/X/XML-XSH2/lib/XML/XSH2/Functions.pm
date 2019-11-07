@@ -41,7 +41,7 @@ use vars qw/@ISA @EXPORT_OK %EXPORT_TAGS $VERSION $REVISION $OUT
 	  /;
 
 BEGIN {
-  $VERSION='2.2.3'; # VERSION TEMPLATE
+  $VERSION='2.2.6'; # VERSION TEMPLATE
   $REVISION=q($Revision: 2.49 $);
   @ISA=qw(Exporter);
   @PARAM_VARS=qw/$ENCODING
@@ -2465,7 +2465,7 @@ sub open_doc {
 
   if (exists($opts->{file})+exists($opts->{pipe})+
       exists($opts->{string})>1) {
-    die "'save' may have only one output flag: --file | ".
+    die "'open' may have only one input flag: --file | ".
         "--pipe | --string\n";
   }
   my $format= $opts->{format} || $DEFAULT_FORMAT;
@@ -2864,7 +2864,7 @@ sub save_doc {
 	}
 	$F->print("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n")
 	  unless ($_xml_module->has_dtd($doc));
-	$F->print(fromUTF8($enc, toUTF8($_xml_module->doc_encoding($doc),
+	$F->print(fromUTF8($enc, toUTF8($_xml_module->doc_encoding($doc) || 'utf-8',
 					$doc->toStringHTML())));
 
 	$F->close() unless $target eq 'print';

@@ -45,6 +45,7 @@ clean-local:
 share/messages.pot: $(PM)
 	mkdir -p share
 	$(XGETTEXT) --language=perl --package-name=$(PACKAGE) --package-version=$(VERSION) --from-code=UTF-8 --keyword=trm:1 --output=share/messages.pot $(PM)
+	sed -ie 's/charset=CHARSET/charset=UTF-8/g' share/messages.pot
 	touch share/en.po
 	for lang in share/*.po; do \
 		$(MSGMERGE) -U $$lang share/messages.pot; \

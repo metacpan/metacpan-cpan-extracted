@@ -1,5 +1,8 @@
 Revision history for exact
 
+1.12      2019-11-05 09:17:12-08:00 America/Los_Angeles
+        - Fix for Carp methods not being exported properly
+
 1.11      2019-10-18 13:18:58-07:00 America/Los_Angeles
         - Prevent duplicate add_isa() calls
 

@@ -10,19 +10,18 @@ has share_dir    => ( required => 1 );    # absolute path to the dist share dir
 
 has module => ( is => 'lazy' );           # InstanceOf ['Pcore::Lib::Perl::Module']
 
-has is_main     => ( init_arg => undef );                        # main process dist
-has cfg         => ( is       => 'lazy', init_arg => undef );    # dist cfg
-has docker_cfg  => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef], docker.yaml
-has par_cfg     => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef], par.yaml
-has name        => ( is       => 'lazy', init_arg => undef );    # Dist-Name
-has is_pcore    => ( is       => 'lazy', init_arg => undef );
-has scm         => ( is       => 'lazy', init_arg => undef );    # Maybe [ ConsumerOf ['Pcore::API::SCM'] ]
-has build       => ( is       => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Dist::Build']
-has id          => ( is       => 'lazy', init_arg => undef );
-has version     => ( is       => 'lazy', init_arg => undef );
-has is_commited => ( is       => 'lazy', init_arg => undef );    # Maybe [Bool]
-has releases    => ( is       => 'lazy', init_arg => undef );    # Maybe [ArrayRef]
-has docker      => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef]
+has is_main    => ( init_arg => undef );                        # main process dist
+has cfg        => ( is       => 'lazy', init_arg => undef );    # dist cfg
+has docker_cfg => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef], docker.yaml
+has par_cfg    => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef], par.yaml
+has name       => ( is       => 'lazy', init_arg => undef );    # Dist-Name
+has is_pcore   => ( is       => 'lazy', init_arg => undef );
+has git        => ( is       => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::GIT'] ]
+has build      => ( is       => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Dist::Build']
+has id         => ( is       => 'lazy', init_arg => undef );
+has version    => ( is       => 'lazy', init_arg => undef );
+has releases   => ( is       => 'lazy', init_arg => undef );    # Maybe [ArrayRef]
+has docker     => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef]
 
 around new => sub ( $orig, $self, $dist ) {
 
@@ -197,46 +196,37 @@ sub _build_name ($self) { return $self->cfg->{name} }
 
 sub _build_is_pcore ($self) { return $self->name eq 'Pcore' }
 
-sub _build_scm ($self) {
+sub _build_git ($self) {
     return if $self->{is_installed};
 
-    return P->class->load('Pcore::API::SCM')->new( $self->{root} );
+    return P->class->load('Pcore::API::Git')->new( $self->{root} );
 }
 
 sub _build_build ($self) { return P->class->load('Pcore::Dist::Build')->new( { dist => $self } ) }
 
 sub _build_id ($self) {
     my $id = {
-        node             => undef,
-        phase            => undef,
-        tags             => undef,
-        bookmark         => undef,
         branch           => undef,
         date             => undef,
+        id               => undef,
+        id_short         => undef,
+        is_dirty         => undef,
         release          => undef,
         release_distance => undef,
+        tags             => undef,
     };
 
-    if ( !$self->{is_installed} && $self->scm ) {
-        if ( my $scm_id = $self->scm->scm_id ) {
-            $id->@{ keys $scm_id->{data}->%* } = values $scm_id->{data}->%*;
+    if ( !$self->{is_installed} && $self->git ) {
+        if ( my $git_id = $self->git->git_id ) {
+            $id->@{ keys $git_id->{data}->%* } = values $git_id->{data}->%*;
         }
     }
     elsif ( -f "$self->{share_dir}/dist-id.yaml" ) {
         $id = P->cfg->read("$self->{share_dir}/dist-id.yaml");
     }
-    else {
-        $id->{release_distance} = '?';
-    }
 
     # convert date to UTC
     $id->{date} = P->date->from_string( $id->{date} )->at_utc->to_string if defined $id->{date};
-
-    # try to get version from the main module
-    $id->{release} //= $self->module->version;
-
-    $id->{release_id} = $id->{release};
-    $id->{release_id} .= "+$id->{release_distance}" if $id->{release_distance};
 
     return $id;
 }
@@ -252,17 +242,9 @@ sub _build_version ($self) {
     return version->parse( $self->id->{release} );
 }
 
-sub _build_is_commited ($self) {
-    if ( !$self->{is_installed} && $self->scm && ( my $scm_is_commited = $self->scm->scm_is_commited ) ) {
-        return $scm_is_commited->{data};
-    }
-
-    return;
-}
-
 sub _build_releases ($self) {
-    if ( !$self->{is_installed} && $self->scm && ( my $scm_releases = $self->scm->scm_releases ) ) {
-        return $scm_releases->{data};
+    if ( !$self->{is_installed} && $self->git && ( my $releases = $self->git->git_get_releases ) ) {
+        return $releases->{data};
     }
 
     return;

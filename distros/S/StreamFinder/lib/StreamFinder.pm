@@ -215,7 +215,7 @@ Returns the URL for the station's "cover art" icon image, if any.
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.  
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.  
 This makes it easy to download the image to local storage for use by 
 your preferred media player.
 
@@ -229,7 +229,7 @@ the "icon image" URL will be returned.
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image 
+"gif", "jpeg", etc.) and the actual station's banner image 
 (binary data).  This makes it easy to download the image to 
 local storage for use by your preferred media player.
 
@@ -379,7 +379,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 our $DEBUG = 0;
 
 require Exporter;

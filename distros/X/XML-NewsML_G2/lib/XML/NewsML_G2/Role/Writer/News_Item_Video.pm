@@ -17,9 +17,13 @@ after '_create_remote_content' => sub {
 
     foreach (
         qw/size width height duration videoframerate videoavgbitrate audiosamplerate/
-        ) {
+    ) {
         $root->setAttribute( $_, $video->$_ ) if defined $video->$_;
     }
+
+    my $rendition =
+        $self->scheme_manager->build_qcode( 'vidrnd', $video->rendition );
+    $root->setAttribute( 'rendition', $rendition ) if $rendition;
 
     my $audiochannels =
         $self->scheme_manager->build_qcode( 'adc', $video->audiochannels );

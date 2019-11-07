@@ -1,5 +1,85 @@
+1.164 2019-11-07
+================
+
+[Quiq::AnsiColor]
+* Doku bearbeitet
+
+[Quiq::Axis]
+* Doku bearbeitet
+
+[Quiq::AxisTick]
+* Erweitert für nicht-numerische Achsen
+
+[Quiq::Time]
+* Modul POSIX entfernt
+
+[Quiq::Axis::Numeric]
+* Doku bearbeitet
+
+[Quiq::Axis::Time]
+* Klasse hinzugefügt (unfertig)
+
+[Quiq::Gd::Graphic::Axis]
+* Attribut tickDirection (Achsenbeschriftung links, rechts, oben, unten)
+
+[Quiq::Gd::Graphic::BlockDiagram]
+* Modul POSIX entfernt
+
+[Quiq::Gd::Graphic::ColorBar]
+* Modul POSIX entfernt
+
+[Quiq::Schedule]
+* Test robust gegen verschiedene Zeitzonen gemacht
+
+1.163 2019-11-06
+================
+
+[Quiq::AsciiTable]
+* Doku bearbeitet
+
+[Quiq::Axis]
+* Klasse hinzugefügt
+
+[Quiq::AxisTick]
+* Klasse hinzugefügt
+
+[Quiq::Axis::Numeric]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic::Axis]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic::BlockDiagram]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic::ColorBar]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic::ColorLegend]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic::Graph]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Graphic::PointGraph]
+* Klasse hinzugefügt
+
+[Quiq::Gd::Image]
+* Doku bearbeitet
+
+[Quiq::Math]
+* Konstruktor hinzugefügt
+* valueToPixelYTop() - hinzugefügt
+
+[Quiq::Schedule]
+* ehedem Quiq::ProcessMatrix
+
 1.162 2019-10-31
 ================
+
 [Quiq::AsciiTable]
 * Kosmetik
 
@@ -22,6 +102,7 @@
 
 1.161 2019-10-25
 ================
+
 [Quiq::AnsiColor]
 * Doku bearbeitet
 
@@ -66,6 +147,7 @@
 
 1.160 2019-10-17
 ================
+
 [Quiq::ChartJs::TimeSeries]
 * Doku bearbeitet
 
@@ -101,6 +183,7 @@
 
 1.159 2019-10-05
 ================
+
 [Quiq::ChartJs::TimeSeries]
 * Klasse hinzugefügt
 
@@ -122,6 +205,7 @@
 
 1.158 2019-09-21
 ================
+
 [Quiq::Cascm]
 * edit() - Transportpackage eingeführt
 * putFiles() - Transportpackage eingeführt
@@ -131,6 +215,7 @@
 
 1.157 2019-09-15
 ================
+
 [Quiq::Database::Config]
 * Default-Konfigurationsdatei von ~/.database.conf in db.conf umbenannt
 * Option -sloppy zum Konstruktor hinzugefügt
@@ -167,6 +252,7 @@
 
 1.156 2019-09-05
 ================
+
 [Quiq::Database::Connection]
 * Kosmetik
 
@@ -207,6 +293,7 @@
 
 1.155 2019-08-27
 ================
+
 [Quiq::Database::Api::Dbi::Connection]
 * Doku bearbeitet
 
@@ -268,6 +355,7 @@
 
 1.154 2019-08-11
 ================
+
 [Quiq::Cascm]
 * deleteAllVersions() hinzugefügt
 * Selektion in findItem() verbessert
@@ -305,6 +393,7 @@
 
 1.153 2019-08-03
 ================
+
 [Quiq::Diff]
 * Klasse hinzugefügt
 
@@ -333,6 +422,7 @@
 
 1.152 2019-07-25
 ================
+
 [Quiq::Digest]
 * Methode md5() erweitert
 
@@ -350,6 +440,7 @@
 
 1.151 2019-07-08
 ================
+
 [Quiq::Assert]
 * Option -sloppy mit Returnwert eingeführt
 
@@ -367,6 +458,7 @@
 
 1.150 2019-07-07
 ================
+
 [Quiq::Assert]
 * Doku bearbeitet
 
@@ -381,6 +473,7 @@
 
 1.149 2019-07-05
 ================
+
 [Quiq::Assert]
 * Kosmetik
 
@@ -395,6 +488,7 @@
 
 1.148 2019-07-01
 ================
+
 [Quiq::Assert]
 * Methode isEnumValue() hinzugefügt
 * Doku bearbeitet
@@ -443,11 +537,13 @@
 
 1.147 2019-06-22
 ================
+
 [Makefile.PL]
 * Excel::Writer::XLSX zu den Prerequisites hinzugefügt
 
 1.146 2019-06-22
 ================
+
 [Quiq::Cascm]
 * edit(): Checkout und Checkin korrigiert
 * view(): Emacs auf Readonly-Buffer umgestellt
@@ -492,11 +588,13 @@
 
 1.145 2019-06-04
 ================
+
 [Quiq::Epoch]
 * Test ISO-Zeitangabe korrigiert.
 
 1.144 2019-06-04
 ================
+
 [Quiq::Config]
 * Konstruktor umgeschrieben.
 
@@ -518,11 +616,13 @@
 
 1.143 2019-06-01
 ================
+
 [Quiq::Formatter]
 * Tests von Methode reducedIsoTime() verbessert
 
 1.142 2019-05-31
 ================
+
 [Quiq::Formatter]
 * Methode reducedIsoTime() um ISO-Zeitangaben erweitert.
 
@@ -540,6 +640,7 @@
 
 1.140 2019-05-16
 ================
+
 [Quiq::Cascm]
 * Methode edit() um automatischen demoten und promoten erweitert
 * Logausgabe SQL optional gemacht
@@ -586,6 +687,7 @@
 
 1.139 2019-05-01
 ================
+
 [Quiq::AnsiColor]
 * Doku bearbeitet
 
@@ -614,6 +716,7 @@
 
 1.138 2019-04-22
 ================
+
 [Quiq::Database::Connection]
 * Optionales Caching von Ergebnismengen hinzugefügt
 
@@ -654,10 +757,12 @@
 
 1.137 2019-03-30
 ================
+
 Kwalitee Issues bearbeitet.
 
 1.136 2019-03-30
 ================
+
 Link-Generierung für POD verbessert.
 
 [Quiq::Database::Api::Dbi::Connection]
@@ -693,6 +798,7 @@ Link-Generierung für POD verbessert.
 
 1.135 2019-03-02
 ================
+
 [Quiq::Database::ResultSet]
 Konstruktor um Default-Klasse erweitert.
 
@@ -722,11 +828,13 @@ Darstellungen 'up' und 'down' eingeführt.
 
 1.134 2019-02-10
 ================
+
 [Quiq::System]
 Test, der einen Reverse-DNS Eintrag erfordert, entfernt.
 
 1.133 2019-02-09
 ================
+
 [Quiq::Array]
 Methode compare() in different() umbenannt (alter Name als Alias).
 
@@ -753,6 +861,7 @@ Methode user() um parameterlose Fassung erweitert (eigener Benutzername).
 
 1.132 2019-01-27
 ================
+
 In der Doku global Abschnitt SEE ALSO vorgezogen.
 
 [Quiq::Cascm]
@@ -779,6 +888,7 @@ Format @@KEY@@ hinzugefügt.
 
 1.131 2019-01-21
 ================
+
 [Quiq::MediaWiki::Api]
 Request siteInfo() hinzugefügt.
 
@@ -793,6 +903,7 @@ Methode extractPropertiesToObject() hinzugefügt.
 
 1.130 2019-01-19
 ================
+
 [Quiq::Database::ResultSet]
 In asTable() Datensatzzähler und Ausführungszeit vertauscht.
 
@@ -832,10 +943,12 @@ Kosmetik.
 
 1.129 2019-01-12
 ================
+
 Bibliothek umbenannt von Prty in Quiq.
 
 1.128 2019-01-06
 ================
+
 [Quiq::MediaWiki::Markup]
 POD-Fehler behoben.
 
@@ -850,6 +963,7 @@ Test bei Setzung von TMPDIR korrigiert.
 
 1.126 2019-01-06
 ================
+
 [Quiq::Confluence::Client]
 Doku bearbeitet.
 
@@ -937,15 +1051,18 @@ UDL-Zerlegung reimplementiert, damit Quoting von Metazeichen möglich ist.
 
 1.125 2018-10-21
 ================
+
 [Quiq::Test::Class]
 Umlaute in Ausgabe von skipTest(), skipAllTests() konvertiert
 
 1.124 2018-03-02
 ================
+
 Zahlreiche Erweiterungen.
 
 1.123 2018-01-30
 ================
+
 [Quiq::AsciiTable]
 Klasse hinzugefügt.
 
@@ -960,6 +1077,7 @@ Methode trimNL() hinzugefügt.
 
 1.122 2018-01-23
 ================
+
 Kosmetik. Kleinere Erweiterungen.
 
 [Quiq::LaTeX::Generator]
@@ -973,6 +1091,7 @@ Ehedem Quiq::TextFile::Line. Erweitert.
 
 1.121 2017-12-03
 ================
+
 [Quiq::AnsiColor]
 Klasse hinzugefügt.
 
@@ -1028,6 +1147,7 @@ Klasse hinzugefügt.
 
 1.120 2017-08-13
 ================
+
 [Quiq::Array]
 Methoden compare(), eq(), pick() hinzugefügt.
 
@@ -1061,6 +1181,7 @@ Methode isClass() hinzugefügt.
 
 1.119 2017-07-15
 ================
+
 [Quiq::Pod::Generator]
 Eingerückter Code wird nun getrimmt.
 
@@ -1073,6 +1194,7 @@ Methode isLocked() versions-portabel gemacht.
 
 1.118 2017-07-13
 ================
+
 Perl - erforderliche Version auf 5.10.0 gesenkt.
 
 File::Rsync - erforderliche Version auf 0.49 gehoben (in
@@ -1098,6 +1220,7 @@ eingesetzt.
 
 1.117 2017-07-09
 ================
+
 Datei LICENSE hinzugefügt.
 
 [Quiq::Ipc]
@@ -1109,6 +1232,7 @@ Argumente, die undef sind, lösen keine Warning mehr aus.
 
 1.116 2017-07-09
 ================
+
 [Quiq::Hash]
 Unsinnigen Test auf gleiche Bucket-Größe nach clear() entfernt, da
 unportabel. Die zulässigen Keys in einem Restricted Hash

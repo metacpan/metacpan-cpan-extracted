@@ -4,7 +4,7 @@
       "Martin H. Sluka <fany@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Method::Modifiers" : "0",
             "HTML::Entities" : "0",
             "HTML::Parser" : "0",
             "MIME::Parser" : "0",
@@ -47,8 +48,11 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/fany/MIME-Signature"
+      "homepage" : "https://github.com/fany/MIME-Signature",
+      "repository" : {
+         "url" : "https://github.com/fany/MIME-Signature.git"
+      }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

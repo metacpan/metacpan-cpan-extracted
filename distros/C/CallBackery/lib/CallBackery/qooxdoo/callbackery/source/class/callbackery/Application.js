@@ -95,6 +95,14 @@ qx.Class.define("callbackery.Application", {
             if (lang) {
                 qx.locale.Manager.getInstance().setLocale(lang);
             }
+        },
+
+        getFooterWidget : function() {
+            return callbackery.ui.Footer.getInstance();
+        },
+
+        getHeaderWidget : function() {
+            return callbackery.ui.Header.getInstance();
         }
 
     }

@@ -2,7 +2,7 @@ package Pcore::Dist::Build::Wiki;
 
 use Pcore -class;
 use Pod::Markdown;
-use Pcore::API::SCM;
+use Pcore::API::Git;
 
 has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
@@ -17,9 +17,9 @@ sub run ($self) {
 
     my $wiki_path = P->path('wiki')->to_abs;
 
-    my $scm = Pcore::API::SCM->new($wiki_path);
+    my $git = Pcore::API::Git->new($wiki_path);
 
-    my $upstream = $scm->upstream;
+    my $upstream = $git->upstream;
 
     my $base_url = "/$upstream->{repo_id}/wiki";
 
@@ -93,18 +93,18 @@ MD
     say keys( $toc->%* ) + 1 . ' wiki page(s) were generated';
 
     print 'Add/remove wiki changes ... ';
-    my $add_res = $scm->scm_addremove;
+    my $add_res = $git->git_run('add .');
     say $add_res;
 
-    if ( !$scm->scm_is_commited->{data} ) {
+    if ( $git->git_run('status --porcelain')->{data} ) {
         print 'Committing wiki ... ';
-        my $commit_res = $scm->scm_commit('automatically updated');
+        my $commit_res = $git->git_run(q[commit -m"automatically updated"]);
         say $commit_res;
 
       PUSH_WIKI:
         print 'Pushing wiki ... ';
 
-        my $res = $scm->scm_push;
+        my $res = $git->git_run('push');
 
         say $res;
 

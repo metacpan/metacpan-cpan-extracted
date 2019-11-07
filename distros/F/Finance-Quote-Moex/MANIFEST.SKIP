@@ -1,0 +1,13 @@
+~$          # ignore emacs and vim backup files
+.bak$       # ignore manual backups
+\.png$
+.git
+doc
+pic
+blib
+\.kate-swp$
+\.tar$
+\.gz$
+debian
+debian.bak
+\.sh$

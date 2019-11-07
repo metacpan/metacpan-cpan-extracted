@@ -1,5 +1,5 @@
 package Bio::Roary::External::Cdhit;
-$Bio::Roary::External::Cdhit::VERSION = '3.12.0';
+$Bio::Roary::External::Cdhit::VERSION = '3.13.0';
 # ABSTRACT: Wrapper to run cd-hit
 
 
@@ -33,7 +33,7 @@ sub _build_memory_in_mb
     $memory_required = -s $filename;
     # Convert to mb
     $memory_required = int($memory_required/1000000);
-    # Triple memory for worst case senario
+    # Give it bucket loads of memory for the worst case scenario
     $memory_required *= 5;
     $memory_required = 2000 if($memory_required < 2000);
   }
@@ -101,7 +101,7 @@ Bio::Roary::External::Cdhit - Wrapper to run cd-hit
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

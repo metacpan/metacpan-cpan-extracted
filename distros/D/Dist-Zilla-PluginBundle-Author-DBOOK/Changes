@@ -1,3 +1,7 @@
+v1.0.0    2019-11-06 13:25:17 EST
+  - Update travis config in minting profile to add perl 5.30 and correctly
+    configure perls 5.20 and older
+
 0.038     2018-10-03 13:34:28 EDT
   - [Regenerate::AfterReleasers] will now be properly used by subclasses
   - Git tags and commits will no longer include an extraneous 'v' in the version

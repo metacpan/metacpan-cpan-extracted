@@ -165,7 +165,7 @@ Returns the URL for the video's "cover art" icon image, if any.
 =item $video->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
 =item $video->B<getImageURL>()
 
@@ -176,7 +176,7 @@ support a separate banner image at this time.
 =item $video->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual video's banner image (binary data).
+"gif", "jpeg", etc.) and the actual video's banner image (binary data).
 
 =item $video->B<getType>()
 

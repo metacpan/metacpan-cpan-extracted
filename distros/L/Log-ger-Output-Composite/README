@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Composite - Composite output
 
 VERSION
-    version 0.009
+    version 0.010
 
 SYNOPSIS
      use Log::ger::Output Composite => (
@@ -110,7 +110,7 @@ CONFIGURATION
     containing minimum and maximum level).
 
 FAQS
-  Why does re-setting log level (using Log::ger::Util::set_level) doesn't work?
+  Why doesn't re-setting log level using Log::ger::Util::set_level() work?
     This output plugin sets its own levels and logs using a multilevel
     routine (which gets called for all levels). Re-setting log level
     dynamically via Log::ger::Util's "set_level" will not work as intended,
@@ -123,7 +123,22 @@ FAQS
      Log::ger::Output::Composite::set_level('trace');
 
     This sets an internal level setting which is respected and has the
-    highest precedence so all levels settings will use this instead.
+    highest precedence so all levels settings will use this instead. If
+    previously you have:
+
+     Log::ger::Output->set(Composite => {
+         default_level => 'error',
+         outputs => {
+             File => {path=>'/foo', level=>'debug'},
+             Screen => {level=>'info', category_level=>{MyApp=>'warn'}},
+         },
+         category_level => {
+             'MyApp::SubModule1' => 'debug',
+         },
+     });
+
+    then after the "Log::ger::Output::Composite::set_level('trace')", all
+    the above per-category and per-output levels will be set to "trace".
 
 ENVIRONMENT
 SEE ALSO

@@ -14,6 +14,8 @@ has 'subtitle',   isa => 'Str',               is => 'rw';
 has 'caption',    isa => 'Str',               is => 'rw';
 has 'teaser',     isa => 'Str',               is => 'rw';
 has 'summary',    isa => 'Str',               is => 'rw';
+has 'byline',     isa => 'Str',               is => 'rw';
+has 'dateline',   isa => 'Str',               is => 'rw';
 has 'paragraphs', isa => 'XML::LibXML::Node', is => 'rw';
 has 'content_created',
     isa     => 'DateTime',
@@ -54,6 +56,12 @@ has 'genres',
     default => sub { [] },
     traits  => ['Array'],
     handles => { add_genre => 'push' };
+has 'storytypes',
+    isa     => 'ArrayRef[XML::NewsML_G2::StoryType]',
+    is      => 'rw',
+    default => sub { [] },
+    traits  => ['Array'],
+    handles => { add_storytype => 'push' };
 has 'organisations',
     isa     => 'ArrayRef[XML::NewsML_G2::Organisation]',
     is      => 'rw',
@@ -84,6 +92,12 @@ has 'media_topics',
     default => sub { {} },
     traits  => ['Hash'],
     handles => { has_media_topics => 'count' };
+has 'concepts',
+    isa     => 'HashRef[XML::NewsML_G2::Concept]',
+    is      => 'rw',
+    default => sub { {} },
+    traits  => ['Hash'],
+    handles => { has_concepts => 'count' };
 has 'locations',
     isa     => 'HashRef[XML::NewsML_G2::Location]',
     is      => 'rw',
@@ -123,6 +137,13 @@ sub add_media_topic {
     return 1;
 }
 
+sub add_concept {
+    my ( $self, $concept ) = @_;
+    return if exists $self->concepts->{ $concept->uid };
+    $self->concepts->{ $concept->uid } = $concept;
+    return 1;
+}
+
 sub add_location {
     my ( $self, $l ) = @_;
     return if exists $self->locations->{ $l->qcode };
@@ -139,7 +160,7 @@ sub add_paragraph {
                 XML::LibXML->createDocument()->createElement('paragraphs') );
     }
     my $doc = $paras->getOwnerDocument;
-    my $p   = $doc->createElementNS( 'http://www.w3.org/1999/xhtml', 'p' );
+    my $p = $doc->createElementNS( 'http://www.w3.org/1999/xhtml', 'p' );
     $p->appendChild( $doc->createTextNode($text) );
     $paras->appendChild($p);
     return 1;
@@ -204,6 +225,11 @@ Human readable credit line
 
 Human readable content description string
 
+=item dateline
+
+Natural language information indicating the place and time that the content
+was created
+
 =item derived_from
 
 Deprecated - use derived_froms and add_derived_from instead!
@@ -232,6 +258,10 @@ DateTime instance
 
 additional text for specifying details on the embargo
 
+=item evolved_froms
+
+List of  XML::NewsML_G2::Link instances
+
 =item genres
 
 List of L<XML::NewsML_G2::Genre> instances
@@ -256,6 +286,10 @@ Hash mapping qcodes to L<XML::NewsML_G2::Location> instances
 =item media_topics
 
 Hash mapping qcodes to L<XML::NewsML_G2::Media_Topic> instances
+
+=item concepts
+
+Hash mapping generated uids to L<XML::NewsML_G2::Concept> instances
 
 =item message_id
 
@@ -324,6 +358,10 @@ L<XML::NewsML_G2::ElectionDistrict> instance
 
 List of strings containing story source names
 
+=item storytypes
+
+List of L<XML::NewsML_G2::StoryType> instances
+
 =item subtitle
 
 Subtitle string
@@ -331,6 +369,10 @@ Subtitle string
 =item summary
 
 A short overview of all, or at least the most important, facets of the content of the item
+
+=item byline
+
+A free-text expression of the person or organisation that created the content
 
 =item teaser
 
@@ -386,6 +428,10 @@ Add a new L<XML::NewsML_G2::Location> instance
 =item add_media_topic
 
 Add a new L<XML::NewsML_G2::MediaTopic> instance
+
+=item add_concept
+
+Add a new L<XML::NewsML_G2::Concept> instance
 
 =item add_organisation
 

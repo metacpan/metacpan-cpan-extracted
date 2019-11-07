@@ -300,6 +300,7 @@ sub cmd_report {
             $report->{$ancestor}{'_kids'} += $time;
         }
         $top_nodes{$ancestors[0]}++ if @ancestors;
+        $top_nodes{$project}++ if !@ancestors;
     }
 
     $self->_say_current_report_interval;
@@ -639,7 +640,7 @@ App::TimeTracker::Command::Core - App::TimeTracker Core commands
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 CORE COMMANDS
 

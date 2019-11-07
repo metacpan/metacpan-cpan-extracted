@@ -1,11 +1,15 @@
 package NewsML_G2_Test_Helpers;
 
 use Exporter 'import';
-use File::Spec::Functions qw(catfile);
+use File::Copy 'cp';
+use File::Spec::Functions qw(catdir catfile);
+use File::Temp 'tempdir';
 use XML::LibXML;
 use Test::More;
 use Test::Exception;
+use Test::File::Contents;
 use utf8;
+use FindBin;
 
 use warnings;
 use strict;
@@ -17,15 +21,17 @@ our @EXPORT_OK =
 
 our %EXPORT_TAGS = (
     vars => [
-        qw($guid_text $guid_picture
+        qw($guid_text $guid_picture $guid_ots $guid_pkg
             $see_also_guid $derived_from_guid $embargo $apa_id $title $subtitle
             $slugline $creditline $embargo_text $note $prov_apa $svc_apa_bd $time1
-            $time2 @text @genres $org $desk @keywords)
+            $time2 @text @genres $org $desk @keywords %ni_std_opts)
     ]
 );
 
 Exporter::export_ok_tags('vars');
 
+our $guid_pkg          = 'urn:newsml:apa.at:20120315:BUNDLE42';
+our $guid_ots          = 'urn:newsml:apa.at:20120315:OTS0049';
 our $guid_text         = 'urn:newsml:apa.at:20120315:APA0379';
 our $guid_picture      = 'urn:newsml:apa.at:20120315:ABD0111';
 our $see_also_guid     = 'urn:newsml:apa.at:20120315:APA0123';
@@ -186,10 +192,25 @@ our %ni_std_opts = (
 
 );
 
+our $expected_dir = catdir( $FindBin::Bin, 'expected' );
+our $tmpdir = tempdir();
+
 sub validate_g2 {
-    my ( $dom, $version ) = @_;
+    my ( $dom, $version, $testname ) = @_;
     $version ||=
         XML::NewsML_G2::Writer->meta->get_attribute('g2_version')->default;
+
+    if ($testname) {
+        my $tmp_fn =
+            catfile( $tmpdir, sprintf( '%s_%s.xml', $testname, time ) );
+        $dom->toFile( $tmp_fn, 1 );
+        my $expected_fn = catfile( $expected_dir, "$testname.xml" );
+        cp( $tmp_fn, $expected_fn ) if $ENV{FIXIT};
+        `meld $tmp_fn $expected_fn` if $ENV{MELDIT};
+        fail("Expected file $expected_fn not found") unless -e $expected_fn;
+        files_eq_or_diff( $tmp_fn, $expected_fn,
+            "$testname: XML looks as expected" );
+    }
 
 SKIP: {
         skip
@@ -321,13 +342,14 @@ sub _picture_checks {
 }
 
 sub test_ni_versions {
-    my ( $ni, $sm, %version_checks ) = @_;
+    my ( $ni, $sm, $testname, %version_checks ) = @_;
 
     if ( my $h = delete $version_checks{'*'} ) {
-        $version_checks{$_} = $h foreach (qw(2.12 2.15 2.18));
+        $version_checks{$_} = $h foreach (qw(2.12 2.15 2.18 2.28));
     }
 
-    while ( my ( $version, $chkfn ) = each %version_checks ) {
+    for my $version ( sort keys %version_checks ) {
+        my $chkfn = $version_checks{$version};
         ok( my $writer = XML::NewsML_G2::Writer::News_Item->new(
                 news_item      => $ni,
                 scheme_manager => $sm,
@@ -341,7 +363,7 @@ sub test_ni_versions {
         $xpc->registerNs( 'nar',   'http://iptc.org/std/nar/2006-10-01/' );
         $xpc->registerNs( 'xhtml', 'http://www.w3.org/1999/xhtml' );
         $chkfn->( $dom, $xpc, $version );
-        validate_g2( $dom, $version );
+        validate_g2( $dom, $version, "${testname}_${version}" );
 
         # diag($dom->serialize(1));
     }
@@ -384,7 +406,7 @@ sub _test_ni_version {
 }
 
 sub test_ni_picture {
-    my ($ni) = @_;
+    my ( $ni, $testname ) = @_;
 
     my %schemes;
     foreach (qw(crel desk geo svc role ind org topic hltype)) {
@@ -421,7 +443,7 @@ sub test_ni_picture {
         '*'   => \&_test_ni_version
     );
 
-    test_ni_versions( $ni, $sm, %tests );
+    test_ni_versions( $ni, $sm, $testname, %tests );
 
     return $sm;
 }

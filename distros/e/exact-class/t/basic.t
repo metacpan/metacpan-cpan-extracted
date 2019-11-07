@@ -1,4 +1,3 @@
-use exact;
 use Test::Most;
 
 my $thing = q/
@@ -12,6 +11,7 @@ my $thing = q/
         has name6 => sub { return 1024 };
         has [ 'name7', 'name8', 'name9' ]    => 'foo';
         has [ 'name10', 'name11', 'name12' ] => sub { return 1024 };
+        has name13 => 'default';
 
         has 'answer';
         class_has thing => 'shared';
@@ -22,7 +22,7 @@ my ( $obj, $obj2 );
 lives_ok( sub { eval $thing }, 'package definition indirect' );
 lives_ok( sub { Thing->attr( password => 12345 ) }, 'Package->attr(...)' );
 lives_ok( sub { Thing->attr( method => sub { $_[0]->password } ) }, 'Package->attr( sub {...} )' );
-lives_ok( sub { $obj = Thing->new( answer => 42 ) }, 'new( answer => 42 )' );
+lives_ok( sub { $obj = Thing->new( answer => 42, name13 => 13 ) }, 'new( answer => 42, name13 => 13 )' );
 lives_ok( sub { $obj2 = Thing->new( { answer => 43 } ) }, 'new( { answer => 43 } )' );
 
 sub exercise {
@@ -41,6 +41,9 @@ sub exercise {
     is( $obj->name6, 1024, 'name6 returns correct value' );
     is( $obj->name8, 'foo', 'name8 returns correct value' );
     is( $obj->name11, 1024, 'name6 returns correct value' );
+
+    is( $obj->name13, 13, 'name13 returns correct value' );
+    is( $obj2->name13, 'default', 'name13 returns correct value' );
 
     is( $obj->thing, 'shared', 'class_has value correct' );
     is( $obj2->thing, 'shared', 'class_has value correct' );
@@ -74,7 +77,7 @@ $thing =~ s/package Thing/package ThingIndirect/;
 lives_ok( sub { eval $thing }, 'package definition direct' );
 lives_ok( sub { ThingIndirect->attr( password => 12345 ) }, 'Package->attr(...)' );
 lives_ok( sub { ThingIndirect->attr( method => sub { $_[0]->password } ) }, 'Package->attr( sub {...} )' );
-lives_ok( sub { $obj = ThingIndirect->new( answer => 42 ) }, 'new( answer => 42 )' );
+lives_ok( sub { $obj = ThingIndirect->new( answer => 42, name13 => 13 ) }, 'new( answer => 42, name13 => 13 )' );
 lives_ok( sub { $obj2 = ThingIndirect->new( { answer => 43 } ) }, 'new( { answer => 43 } )' );
 
 exercise( $obj, $obj2 );

@@ -3,7 +3,7 @@ package Rex::Hardware::VirtInfo;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex;
 use Rex::Helper::Run;
@@ -97,6 +97,11 @@ sub get {
     }
 
     elsif ( $sys_vendor =~ /QEMU/ ) {
+      $virtualization_type = "kvm";
+      $virtualization_role = "guest";
+    }
+
+    elsif ( $sys_vendor =~ /DigitalOcean/ ) {
       $virtualization_type = "kvm";
       $virtualization_role = "guest";
     }

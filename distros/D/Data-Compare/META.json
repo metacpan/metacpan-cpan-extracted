@@ -4,15 +4,14 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown",
       "artistic_1",
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Data-Compare",
    "no_index" : {
@@ -34,8 +33,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Clone" : "0.43",
             "File::Find::Rule" : "0.1",
             "Scalar::Util" : "0",
+            "Test::More" : "0.88",
             "perl" : "5.006"
          }
       }
@@ -49,6 +50,5 @@
          "url" : "https://github.com/DrHyde/perl-modules-Data-Compare"
       }
    },
-   "version" : 1.26,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 1.27
 }

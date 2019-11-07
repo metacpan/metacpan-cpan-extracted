@@ -49,7 +49,7 @@ package Rex::Commands::Fs;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -331,7 +331,7 @@ sub mkdir {
 
     &chown( $owner, $dir ) if $owner;
     &chgrp( $group, $dir ) if $group;
-    &chmod( $mode, $dir ) if $mode;
+    &chmod( $mode, $dir )  if $mode;
   }
   else {
     my @splitted_dir;
@@ -370,7 +370,7 @@ sub mkdir {
 
         &chown( $owner, $str_part ) if $owner;
         &chgrp( $group, $str_part ) if $group;
-        &chmod( $mode, $str_part ) if $mode;
+        &chmod( $mode, $str_part )  if $mode;
       }
     }
   }
@@ -1059,7 +1059,7 @@ sub mount {
         die("Can't open /etc/fstab for reading.");
       }
 
-      my $f = Rex::FS::File->new( fh => $fh );
+      my $f       = Rex::FS::File->new( fh => $fh );
       my @content = $f->read_all;
       $f->close;
 

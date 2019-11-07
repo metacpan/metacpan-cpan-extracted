@@ -9,7 +9,7 @@ package Rex::Interface::Fs::Local;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Interface::Fs::Base;
 use base qw(Rex::Interface::Fs::Base);
@@ -83,14 +83,14 @@ sub rmdir {
 
 sub is_dir {
   my ( $self, $path ) = @_;
-  ( -d $path ) ? return 1 : return undef;
+  ( -d $path ) ? return 1 : return undef; ## no critic ProhibitExplicitReturnUndef
 }
 
 sub is_file {
   my ( $self, $file ) = @_;
   ( -f $file || -l $file || -b $file || -c $file || -p $file || -S $file )
     ? return 1
-    : return undef;
+    : return undef; ## no critic ProhibitExplicitReturnUndef
 }
 
 sub unlink {
@@ -132,7 +132,7 @@ sub stat {
     return %ret;
   }
 
-  return undef;
+  return undef; ## no critic ProhibitExplicitReturnUndef
 }
 
 sub is_readable {

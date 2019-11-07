@@ -1,5 +1,5 @@
 Name:           perl-Term-CLI
-Version:        0.051004
+Version:        0.051005
 Release:        1%{?dist}
 Summary:        CLI interpreter based on Term::ReadLine
 License:        GPL+ or Artistic
@@ -8,6 +8,8 @@ URL:            http://search.cpan.org/dist/Term-CLI/
 Source0:        http://www.cpan.org/modules/by-module/Term/Term-CLI-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
+BuildRequires:  perl-interpreter >= 0:5.14
+BuildRequires:  perl-generators
 BuildRequires:  perl(Exporter) >= 5.71
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Temp) >= 0.2304
@@ -60,26 +62,26 @@ Requires:       perl(Text::ParseWords) >= 3.29
 Requires:       perl(Types::Standard) >= 1.000005
 Requires:       perl(warnings) >= 1.00
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Provides:       perl(Term::CLI) = 0.05002
-Provides:       perl(Term::CLI::Argument) = 0.05002
-Provides:       perl(Term::CLI::Argument::Bool) = 0.05002
-Provides:       perl(Term::CLI::Argument::Enum) = 0.05002
-Provides:       perl(Term::CLI::Argument::Filename) = 0.05002
-Provides:       perl(Term::CLI::Argument::Number) = 0.05002
-Provides:       perl(Term::CLI::Argument::Number::Float) = 0.05002
-Provides:       perl(Term::CLI::Argument::Number::Int) = 0.05002
-Provides:       perl(Term::CLI::Argument::String) = 0.05002
-Provides:       perl(Term::CLI::Base) = 0.05002
-Provides:       perl(Term::CLI::Command) = 0.05002
-Provides:       perl(Term::CLI::Command::Help) = 0.05002
-Provides:       perl(Term::CLI::Element) = 0.05002
-Provides:       perl(Term::CLI::L10N) = 0.05002
-Provides:       perl(Term::CLI::L10N::en) = 0.05002
-Provides:       perl(Term::CLI::L10N::nl) = 0.05002
-Provides:       perl(Term::CLI::ReadLine) = 0.05002
-Provides:       perl(Term::CLI::Role::ArgumentSet) = 0.05002
-Provides:       perl(Term::CLI::Role::CommandSet) = 0.05002
-Provides:       perl(Term::CLI::Role::HelpText) = 0.05002
+Provides:       perl(Term::CLI) = 0.051004
+Provides:       perl(Term::CLI::Argument) = 0.051004
+Provides:       perl(Term::CLI::Argument::Bool) = 0.051004
+Provides:       perl(Term::CLI::Argument::Enum) = 0.051004
+Provides:       perl(Term::CLI::Argument::Filename) = 0.051004
+Provides:       perl(Term::CLI::Argument::Number) = 0.051004
+Provides:       perl(Term::CLI::Argument::Number::Float) = 0.051004
+Provides:       perl(Term::CLI::Argument::Number::Int) = 0.051004
+Provides:       perl(Term::CLI::Argument::String) = 0.051004
+Provides:       perl(Term::CLI::Base) = 0.051004
+Provides:       perl(Term::CLI::Command) = 0.051004
+Provides:       perl(Term::CLI::Command::Help) = 0.051004
+Provides:       perl(Term::CLI::Element) = 0.051004
+Provides:       perl(Term::CLI::L10N) = 0.051004
+Provides:       perl(Term::CLI::L10N::en) = 0.051004
+Provides:       perl(Term::CLI::L10N::nl) = 0.051004
+Provides:       perl(Term::CLI::ReadLine) = 0.051004
+Provides:       perl(Term::CLI::Role::ArgumentSet) = 0.051004
+Provides:       perl(Term::CLI::Role::CommandSet) = 0.051004
+Provides:       perl(Term::CLI::Role::HelpText) = 0.051004
 
 %description
 Implement an easy-to-use command line interpreter based on
@@ -115,6 +117,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Wed Nov 6 2019 Steven Bakker <sbakker@cpan.org> 0.051005-1
+- New upstream release.
+* Tue Nov 5 2019 Steven Bakker <sbakker@cpan.org> 0.051004-2
+- Fix BuildRequires and Provides
 * Tue Nov 5 2019 Steven Bakker <sbakker@cpan.org> 0.051004-1
 - New upstream release.
 * Wed Jul 11 2018 Steven Bakker <sbakker@cpan.org> 0.051003-1

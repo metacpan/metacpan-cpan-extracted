@@ -9,7 +9,7 @@ package Rex::Batch;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::TaskList;
@@ -50,7 +50,7 @@ sub get_desc {
 
 sub get_batchs {
   my $class = shift;
-  my @a = sort { $a cmp $b } keys %batchs;
+  my @a     = sort { $a cmp $b } keys %batchs;
 }
 
 sub is_batch {

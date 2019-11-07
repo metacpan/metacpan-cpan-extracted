@@ -39,15 +39,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/softvisio/pcore-pdf/issues?status=new&status=open"
+         "web" : "https://bitbucket.org/softvisio/pcore/issues?status=new&status=open"
       },
-      "homepage" : "https://bitbucket.org/softvisio/pcore-pdf/overview",
+      "homepage" : "https://bitbucket.org/softvisio/pcore/overview",
       "repository" : {
-         "type" : "hg",
-         "url" : "https://bitbucket.org/softvisio/pcore-pdf",
-         "web" : "https://bitbucket.org/softvisio/pcore-pdf/overview"
+         "type" : "git",
+         "url" : "https://bitbucket.org/softvisio/pcore",
+         "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.7.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

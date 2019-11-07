@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::GeneAlignmentFromNucleotides;
-$Bio::Roary::CommandLine::GeneAlignmentFromNucleotides::VERSION = '3.12.0';
+$Bio::Roary::CommandLine::GeneAlignmentFromNucleotides::VERSION = '3.13.0';
 # ABSTRACT: Take in a multifasta file of nucleotides, convert to proteins and align with PRANK
 
 
@@ -140,7 +140,7 @@ Bio::Roary::CommandLine::GeneAlignmentFromNucleotides - Take in a multifasta fil
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

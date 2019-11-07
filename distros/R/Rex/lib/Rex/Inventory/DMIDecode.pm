@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Inventory::DMIDecode::BaseBoard;
 use Rex::Inventory::DMIDecode::Bios;
@@ -200,9 +200,9 @@ sub _read_dmidecode {
 
       my ( $key, $val ) = split( /: /, $line, 2 );
       if ( !$val ) { $key =~ s/:$//; }
-      $sub_section = $key;
+      $sub_section       = $key;
       $section{$section} = [ { $key => $val } ];
-      $new_section = 0;
+      $new_section       = 0;
     }
     elsif ( $l =~ m/^\t\t[a-zA-Z0-9]/ ) {
       my $href = $section{$section}->[-1];

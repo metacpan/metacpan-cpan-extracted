@@ -1,6 +1,6 @@
 undef $VERSION;
 package Bio::Roary::CommandLine::CreatePanGenome;
-$Bio::Roary::CommandLine::CreatePanGenome::VERSION = '3.12.0';
+$Bio::Roary::CommandLine::CreatePanGenome::VERSION = '3.13.0';
 # ABSTRACT: Take in FASTA files of proteins and cluster them
 
 
@@ -78,7 +78,7 @@ Bio::Roary::CommandLine::CreatePanGenome - Take in FASTA files of proteins and c
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

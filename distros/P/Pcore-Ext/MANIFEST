@@ -39,6 +39,7 @@ share/data/ext/locale/de.perl
 share/data/ext/locale/ru.perl
 share/data/ext/material-themes.json
 share/data/ext/v6.7.0/config.json
+share/data/ext/v7.0.0/config.json
 share/dist-id.yaml
 share/dist.yaml
 share/l10n/l10n.pot

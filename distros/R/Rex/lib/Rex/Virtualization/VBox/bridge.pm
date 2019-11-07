@@ -9,7 +9,7 @@ package Rex::Virtualization::VBox::bridge;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -28,7 +28,7 @@ sub execute {
   my @blocks = split /\n\n/m, $result;
   for my $block (@blocks) {
 
-    my $if = {};
+    my $if    = {};
     my @lines = split /\n/, $block;
     for my $line (@lines) {
       if ( $line =~ /^Name:\s+(.+?)$/ ) {

@@ -38,15 +38,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/softvisio/pcore-service-nginx/issues?status=new&status=open"
+         "web" : "https://bitbucket.org/softvisio/pcore/issues?status=new&status=open"
       },
-      "homepage" : "https://bitbucket.org/softvisio/pcore-service-nginx/overview",
+      "homepage" : "https://bitbucket.org/softvisio/pcore/overview",
       "repository" : {
-         "type" : "hg",
-         "url" : "https://bitbucket.org/softvisio/pcore-service-nginx",
-         "web" : "https://bitbucket.org/softvisio/pcore-service-nginx/overview"
+         "type" : "git",
+         "url" : "https://bitbucket.org/softvisio/pcore",
+         "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.1.3",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -11,6 +11,7 @@ Files: README
  t/04mouse.t
  t/10plusattr.t
  t/11plusclass.t
+ t/12shortcuts.t
 Copyright: This software is copyright (c) 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

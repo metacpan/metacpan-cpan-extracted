@@ -18,7 +18,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20191105;                                                        # Version
+our $VERSION = 20191107;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -80,7 +80,7 @@ sub fff($$@)                                                                    
 
   confess "  $m\n";                                                             # Confess
  }
-
+# Do not add blank if item ends in \n at 2019.11.05 18:08:04
 sub lll(@)                                                                      # Log messages including the project name if available. This method is not merged as we need to retain its prototype.
  {my (@m) = @_;                                                                 # Messages
   return unless (join '', @_) =~ m(\S)s;
@@ -3676,7 +3676,7 @@ sub confirmHasCommandLineCommand($)                                             
  }
 
 my $numberOfCpus = sub                                                          # Number of cpus
- {return 1 if $^ =~ m(bsd)i;                                                    # Apparently no nproc on BSD
+ {return 1 if $^O =~ m(bsd)i;                                                   # Apparently no nproc on BSD
   my $n = confirmHasCommandLineCommand(q(nproc)) ? qx(nproc) : undef;           # nproc
   return 1 unless $n;                                                           # We must have at least 1
   $n =~ s(\s+\Z) ()r;
@@ -5733,7 +5733,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20191105.
+Version 20191106.
 
 
 The following sections describe the methods in each functional area of this
@@ -11396,7 +11396,7 @@ B<Example:>
 
 =head2 s3ReadString($%)
 
-Read from a B<$file> on S3 and return the contents as a string using specified B<%options> if any.  Any pre existing version of $local iwill be deletd.  Returns whether the local file exists after completion of the download.
+Read from a B<$file> on S3 and return the contents as a string using specified B<%options> if any.  Any pre existing version of $local will be deleted.  Returns whether the local file exists after completion of the download.
 
      Parameter  Description
   1  $file      File to read from on S3
@@ -15764,7 +15764,7 @@ if (1) {                                                                        
  }
 }
 else
- {ok 1 for 1..3
+ {ok 1 for 1..5
  }
 
 ok numberOfCpus(8) >= 8, 'ddd';                                                        #TnumberOfCpus

@@ -9,7 +9,7 @@ package Rex::Inventory::Hal::Object;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 sub new {
   my $that  = shift;
@@ -29,7 +29,7 @@ sub has {
     my $accessor  = $k->{accessor};
     my $overwrite = $k->{overwrite};
 
-    no strict 'refs';
+    no strict 'refs'; ## no critic ProhibitNoStrict
     if ( !$overwrite ) {
       *{"${class}::get_$accessor"} = sub {
         my ($self) = @_;
@@ -88,7 +88,7 @@ sub get_all {
 
   my $r = ref($self);
 
-  no strict 'refs';
+  no strict 'refs'; ## no critic ProhibitNoStrict
   my @items = @{"${r}::items"};
   use strict;
 

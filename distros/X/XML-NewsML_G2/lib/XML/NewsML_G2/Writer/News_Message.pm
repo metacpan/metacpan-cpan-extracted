@@ -1,5 +1,8 @@
 package XML::NewsML_G2::Writer::News_Message;
 
+use XML::NewsML_G2::Writer::News_Item;
+use XML::NewsML_G2::Writer::Package_Item;
+
 use Moose;
 use List::MoreUtils qw(uniq);
 use namespace::autoclean;

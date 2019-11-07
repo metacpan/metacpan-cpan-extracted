@@ -9,7 +9,7 @@ package Rex::Interface::Exec::Sudo;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Config;
 use Rex::Interface::Exec::Local;
@@ -75,7 +75,7 @@ sub exec {
 
   if ($sudo_password) {
     my $random_string = get_random( length($sudo_password), 'a' .. 'z' );
-    my $crypt = $sudo_password ^ $random_string;
+    my $crypt         = $sudo_password ^ $random_string;
 
     $random_file = get_tmp_file;
 

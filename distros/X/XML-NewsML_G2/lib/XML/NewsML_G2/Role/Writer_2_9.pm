@@ -120,6 +120,9 @@ override '_create_creator' => sub {
 override '_create_teaser'                      => sub { };
 override '_create_copyright_holder_remoteinfo' => sub { };
 
+## no critic (ControlStructures::ProhibitYadaOperator Subroutines::RequireFinalReturn)
+sub _create_subjects_concepts {...}
+
 1;
 __END__
 

@@ -27,7 +27,7 @@ sub CLI ($self) {
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     if ( !$opt->{force} ) {
-        my $confirm = P->term->prompt( qq[WARNING!!! This operation is not reversible? Are you sure to continue?], [qw[yes no]], enter => 1 );
+        my $confirm = P->term->prompt( q[WARNING!!! This operation is not reversible? Are you sure to continue?], [qw[yes no]], enter => 1 );
 
         return if $confirm eq 'no';
     }
@@ -101,8 +101,6 @@ sub _process_file ( $self, $path, $verbose ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 30                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 55                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

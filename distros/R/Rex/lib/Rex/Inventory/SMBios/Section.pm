@@ -9,7 +9,7 @@ package Rex::Inventory::SMBios::Section;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Exporter;
 use base qw(Exporter);
@@ -41,7 +41,7 @@ sub has {
     $item = [$_tmp];
   }
 
-  no strict 'refs';
+  no strict 'refs'; ## no critic ProhibitNoStrict
 
   for my $_itm ( @{$item} ) {
     my ( $itm, $from );
@@ -87,7 +87,7 @@ sub get_all {
   use Data::Dumper;
   my $r = ref($self);
 
-  no strict 'refs';
+  no strict 'refs'; ## no critic ProhibitNoStrict
   my @items = @{"${r}::items"};
   use strict;
 

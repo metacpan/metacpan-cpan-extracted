@@ -140,7 +140,7 @@ Returns the URL for the station's "cover art" icon image, if any.
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual icon image (binary data), if any.
+"gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 
 =item $station->B<getImageURL>()
 
@@ -151,7 +151,7 @@ support a separate banner image at this time.
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc. and the actual station's banner image (binary data).
+"gif", "jpeg", etc.) and the actual station's banner image (binary data).
 
 =item $station->B<getType>()
 

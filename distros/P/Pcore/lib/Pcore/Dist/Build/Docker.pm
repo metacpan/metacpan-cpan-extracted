@@ -19,9 +19,9 @@ sub init ( $self, $args ) {
         exit 3;
     }
 
-    my $scm_upstream = $self->{dist}->scm ? $self->{dist}->scm->upstream : undef;
+    my $git_upstream = $self->{dist}->git ? $self->{dist}->git->upstream : undef;
 
-    if ( !$scm_upstream ) {
+    if ( !$git_upstream ) {
         say q[Dist has no upstream repository];
 
         exit 3;
@@ -105,7 +105,7 @@ sub set_from_tag ( $self, $tag ) {
                 # cd to repo root
                 my $chdir_guard = P->file->chdir( $self->{dist}->{root} );
 
-                my $res = $self->{dist}->scm->scm_commit( qq[Docker base image changed from "$1:$2" to "$1:$tag"], ['Dockerfile'] );
+                my $res = $self->{dist}->git->git_run( [ 'commit', '-m', qq[Docker base image changed from "$1:$2" to "$1:$tag"], 'Dockerfile' ] );
 
                 die "$res" if !$res;
             }
@@ -285,24 +285,24 @@ sub remove_tag ( $self, $keep, $tags ) {
 }
 
 sub build_local ( $self, $tag, $args ) {
-    require Pcore::API::SCM;
+    require Pcore::API::Git;
     require Pcore::API::Docker::Engine;
 
     my $dist = $self->{dist};
 
     print 'Cloning ... ';
 
-    # my $res = Pcore::API::SCM->scm_clone( $dist->scm->upstream->get_clone_url );
-    my $res = Pcore::API::SCM->scm_clone( $dist->{root} );
+    my $clone_root = P->file1->tempdir;
+
+    # my $res = Pcore::API::Git->git_run_no_root( [ 'clone', $dist->git->upstream->get_clone_url, $clone_root ] );
+    my $res = Pcore::API::Git->git_run_no_root( [ 'clone', $dist->{root}, $clone_root ] );
     say $res;
     return $res if !$res;
 
-    my $root = $res->{root};
-
-    my $repo = Pcore::Dist->new($root);
+    my $repo = Pcore::Dist->new($clone_root);
 
     print 'Checking out ... ';
-    $res = $repo->scm->scm_update($tag);
+    $res = $repo->git->git_run("checkout $tag");
     say $res;
     return $res if !$res;
 
@@ -312,21 +312,24 @@ sub build_local ( $self, $tag, $args ) {
 
     my @tags;
 
-    for ( $id->{bookmark}->@*, $id->{tags}->@* ) {
+    for ( $id->{branch}, $id->{tags}->@* ) {
+        next if !defined;
+
         push @tags, "$repo_id:$_";
     }
 
     # add dist-id.yaml
     P->cfg->write( "$repo->{root}/share/dist-id.yaml", $id );
 
-    my $dockerignore = $self->_build_dockerignore("$root/.dockerignore");
+    my $dockerignore = $self->_build_dockerignore("$clone_root/.dockerignore");
 
+    print 'Comressing image source ... ';
     my $tar = do {
         require Archive::Tar;
 
         my $_tar = Archive::Tar->new;
 
-        for my $path ( $root->read_dir( max_depth => 0, is_dir => 0 )->@* ) {
+        for my $path ( $clone_root->read_dir( max_depth => 0, is_dir => 0 )->@* ) {
             next if $dockerignore->($path);
 
             my $mode;
@@ -338,11 +341,12 @@ sub build_local ( $self, $tag, $args ) {
                 $mode = P->file->calc_chmod('rw-r--r--');
             }
 
-            $_tar->add_data( "$path", P->file->read_bin("$root/$path"), { mode => $mode } );
+            $_tar->add_data( "$path", P->file->read_bin("$clone_root/$path"), { mode => $mode } );
         }
 
         $_tar->write;
     };
+    say 'done';
 
     my $docker = Pcore::API::Docker::Engine->new;
 

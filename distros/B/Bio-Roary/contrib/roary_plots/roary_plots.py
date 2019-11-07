@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     # Sort the matrix by the sum of strains presence
     idx = roary.sum(axis=1).sort_values(ascending=False).index
-    roary_sorted = roary.ix[idx]
+    roary_sorted = roary.loc[idx]
 
     # Pangenome frequency plot
     plt.figure(figsize=(7, 5))
@@ -128,7 +128,11 @@ if __name__ == "__main__":
         ax1.axis('off')
 
         ax = fig.add_subplot(1,2,1)
-        ax=plt.subplot2grid((1,40), (0, 0), colspan=10, axisbg='white')
+        # matplotlib v1/2 workaround
+        try:
+            ax=plt.subplot2grid((1,40), (0, 0), colspan=10, facecolor='white')
+        except AttributeError:
+            ax=plt.subplot2grid((1,40), (0, 0), colspan=10, axisbg='white')
 
         fig.subplots_adjust(wspace=0, hspace=0)
 

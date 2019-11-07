@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0504  2019-11-06 11:14:45 CET
+  - stricter query parameter checking
+
 0.0503  2019-10-11 12:11:25 CEST
   - fix resumptionToken handling bugs
 

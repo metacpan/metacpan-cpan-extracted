@@ -23,7 +23,7 @@ package Rex::Config;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Helper::File::Spec;
 use Rex::Logger;
@@ -454,7 +454,7 @@ sub get_user {
     return getlogin;
   }
   else {
-    return getpwuid($<);
+    return scalar getpwuid($<);
   }
 }
 
@@ -679,8 +679,8 @@ sub get_ssh_config_hostname {
     && exists $SSH_CONFIG_FOR{ $param->{server} }
     && exists $SSH_CONFIG_FOR{ $param->{server} }->{hostname} )
   {
-    if ( $SSH_CONFIG_FOR{ $param->{server} }->{hostname} =~ m/^\%h\.(.*)/ ) {
-      return $param->{server} . "." . $1;
+    if ( $SSH_CONFIG_FOR{ $param->{server} }->{hostname} =~ m/^\%h(\.(.*))?/ ) {
+      return $param->{server} . $1;
     }
     else {
       return $SSH_CONFIG_FOR{ $param->{server} }->{hostname};
@@ -1006,7 +1006,7 @@ sub _parse_ssh_config {
 
     if ( $line =~ m/^Host(?:\s*=\s*|\s+)(.*)$/i ) {
       my $host_tmp = $1;
-      @host = split( /\s+/, $host_tmp );
+      @host    = split( /\s+/, $host_tmp );
       $in_host = 1;
       for my $h (@host) {
         $ret{$h} = {};
@@ -1073,7 +1073,7 @@ sub import {
   read_config_file();
 }
 
-no strict 'refs';
+no strict 'refs'; ## no critic ProhibitNoStrict
 __PACKAGE__->register_config_handler(
   base => sub {
     my ($param) = @_;

@@ -23,8 +23,9 @@ qx.Class.define("callbackery.ui.Desktop", {
         if (width){
             this.setMaxWidth(parseInt(width));
         }
-        this.add(callbackery.ui.Header.getInstance());
+        var app = qx.core.Init.getApplication();
+        this.add(app.getHeaderWidget());
         this.add(callbackery.ui.TabView.getInstance(),{ flex: 1})
-        this.add(callbackery.ui.Footer.getInstance());
+        this.add(app.getFooterWidget());
     }
 });

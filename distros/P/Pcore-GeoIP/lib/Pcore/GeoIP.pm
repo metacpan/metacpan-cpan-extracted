@@ -1,4 +1,4 @@
-package Pcore::GeoIP v1.5.0;
+package Pcore::GeoIP v1.6.0;
 
 use Pcore -dist;
 

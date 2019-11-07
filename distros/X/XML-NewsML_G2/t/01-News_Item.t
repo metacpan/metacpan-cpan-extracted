@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+use Test::MockTime 'set_fixed_time';
+
+BEGIN {
+    set_fixed_time('2012-01-01T13:00:00Z');
+}
+
 use utf8;
 use Test::More;
 use DateTime::Format::XSD;
@@ -137,10 +143,10 @@ foreach my $ni ( create_ni_text(), create_ni_picture() ) {
         qr/DPA/, 'correct source in XML, 2.9-style' );
     like( $xpc->findvalue('//nar:creator/@literal'),
         qr/dw.*dk.*wh/, 'correct authors in XML, 2.9-style' );
-    validate_g2( $dom, '2.9' );
+    validate_g2( $dom, '2.9', "NewsItem_${ic}_2.9" );
 
-    # 2.12, 2.15 2.18 checks
-    for my $version (qw(2.12 2.15 2.18)) {
+    # 2.12, 2.15, 2.18, 2.28 checks
+    for my $version (qw(2.12 2.15 2.18 2.28)) {
         ok( $writer = XML::NewsML_G2::Writer::News_Item->new(
                 news_item      => $ni,
                 scheme_manager => $sm,
@@ -163,7 +169,7 @@ foreach my $ni ( create_ni_text(), create_ni_picture() ) {
             qr/dw.*dk.*wh/, "correct authors in XML, $version-style" );
         like( $xpc->findvalue('//nar:copyrightHolder/@uri'),
             qr/http:\/\/www.apa.at/, 'correct uri in xml' );
-        validate_g2( $dom, $version );
+        validate_g2( $dom, $version, "NewsItem_${ic}_$version" );
 
         #diag($dom->serialize(1));
     }

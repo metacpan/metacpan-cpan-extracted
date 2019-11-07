@@ -9,7 +9,7 @@ package Rex::Interface::Connection::Local;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 use Rex::Interface::Connection::Base;
 use Rex::Group::Entry::Server;
@@ -35,6 +35,10 @@ sub get_connection_object    { my ($self) = @_; return $self; }
 sub get_fs_connection_object { my ($self) = @_; return $self; }
 sub is_connected             { return 1; }
 sub is_authenticated         { return 1; }
+
+sub get_auth_user {
+  return Rex::Config::get_user();
+}
 
 sub get_connection_type {
   my ($self) = @_;

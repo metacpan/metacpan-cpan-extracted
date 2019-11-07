@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Dancer-Plugin-Catmandu-OAI",
-  "dist_version" => "0.0503",
+  "dist_version" => "0.0504",
   "license" => "perl",
   "module_name" => "Dancer::Plugin::Catmandu::OAI",
   "recursive_test_files" => 1,

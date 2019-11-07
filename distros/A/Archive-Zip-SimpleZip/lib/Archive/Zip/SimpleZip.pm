@@ -5,9 +5,9 @@ use warnings;
 
 require 5.006;
 
-use IO::Compress::Zip 2.081 qw(:all);
-use IO::Compress::Base::Common  2.081 ();
-use IO::Compress::Adapter::Deflate 2.081 ;
+use IO::Compress::Zip 2.088 qw(:all);
+use IO::Compress::Base::Common  2.088 ();
+use IO::Compress::Adapter::Deflate 2.088 ;
 
 use Fcntl ();
 use File::Spec ();
@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "0.025";
+$VERSION = "0.027";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;
@@ -1056,14 +1056,18 @@ revert to using the default, C<ZIP_CM_STORE>.
 
 =head2 File Naming Options
 
-The options listed below control how the names of the files are store in
-the zip archive.
+A quick bit of zip file terminology -- A zip archive consists of one or more I<archive members>, where each member has an associated 
+filename, known as the I<archive member name>.
+
+The options listed in this section control how the I<archive member name> (or filename) is stored the zip archive.
+
 
 =over 5
 
 =item C<< Name => $string >>
 
-Stores the contents of C<$string> in the zip filename header field. 
+This option is used to explicitly set the I<archive member name> in
+the zip archive to C<$string>.
 
 When used with the C<add> method, this option will override any filename
 that was passed as a parameter.
@@ -1074,7 +1078,7 @@ This option is not valid in the constructor.
 
 =item C<< CanonicalName => 0|1 >>
 
-This option controls whether the filename field in the zip header is
+This option controls whether the I<archive member name> is
 I<normalized> into Unix format before being written to the zip archive.
 
 It is recommended that you keep this option enabled unless you really need
@@ -1094,7 +1098,7 @@ This option defaults to B<true>.
 
 =item C<< FilterName => sub { ... }  >>
 
-This option allow the filename field in the zip archive to be modified
+This option allow the I<archive member name> to be modified
 before it is written to the zip archive.
 
 This option takes a parameter that must be a reference to a sub.  On entry
@@ -1115,19 +1119,19 @@ can be used.
 
 =back
 
-Taking all the options described above, filename entry stored in a Zip
+Taking all the options described above, the I<archive member name> stored in a Zip
 archive is constructed as follows.
 
-The initial source for the filename entry that gets stored in the zip
+The initial source for the I<archive member name> that gets stored in the zip
 archive is the filename parameter supplied to the C<add> method, or the
-value supplied with the C<Name> option to the C<addString> and
+value supplied with the C<Name> option for the C<addString> and
 C<openMember> methods. 
 
-Next, for the C<add> option, if the C<Name> option is supplied that will
+Next, if the C<add> method is used, and the C<Name> option is supplied that will
 overide the filename parameter.
 
 If the C<CanonicalName> option is enabled, and it is by default, the
-filename gets normalized into Unix format.  If the filename was absolute,
+I<archive member name> gets normalized into Unix format.  If the filename was absolute,
 it will be changed into a relative filename.
 
 Finally, is the C<FilterName> option is enabled, the filename will get
@@ -1666,6 +1670,25 @@ One point to be aware of with the C<Net::FTP::retr>. Not all FTP servers
 support it. See L<Net::FTP> for details of how to find out what features
 an FTP server implements.
 
+=head2 Creating a Zip file from STDIN
+
+The script below, zipstdin. shows how to create a zip file using data read from STDIN.
+
+    use strict;
+    use warnings;
+
+    use Archive::Zip::SimpleZip qw($SimpleZipError);
+
+    my $zipFile = "stdin.zip";
+      
+    my $zip = new Archive::Zip::SimpleZip $zipFile
+            or die "Cannot create zip file '$zipFile': $SimpleZipError";
+    $zip->adFilehandle(STDIN, Name => "data.txt") ;
+
+or this, to do the whole thing from the commandline
+
+    echo abc | perl -MArchive::Zip::SimpleZip -e 'Archive::Zip::SimpleZip->new("stdin.zip")->addFileHandle(STDIN, Name => "data.txt")'
+    
 
 =head1 Importing 
 
@@ -1775,6 +1798,11 @@ larger than the non-streamed equivalent. If the files you archive are
 32-bit the overhead will be an extra 16 bytes per file written to the zip
 archive. For 64-bit it is 24 bytes per file.
 
+=head1 SUPPORT
+
+General feedback/questions/bug reports should be sent to 
+L<https://github.com/pmqs/Archive-Zip-SimpleZip/issues> (preferred) or
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip-SimpleZip>.
 
 =head1 SEE ALSO
 

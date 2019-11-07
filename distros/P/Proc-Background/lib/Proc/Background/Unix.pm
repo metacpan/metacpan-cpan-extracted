@@ -1,5 +1,5 @@
 package Proc::Background::Unix;
-$Proc::Background::Unix::VERSION = '1.20';
+$Proc::Background::Unix::VERSION = '1.21';
 # ABSTRACT: Unix-specific implementation of process create/wait/kill
 require 5.004_04;
 
@@ -125,7 +125,7 @@ Proc::Background::Unix - Unix-specific implementation of process create/wait/kil
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ package Rex::TaskList::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;
@@ -346,7 +346,7 @@ sub build_child_coderef {
       die $@ if $@;
     }
     else {
-      my $e = $@;
+      my $e         = $@;
       my $exit_code = $@ ? ( $? || 1 ) : 0;
 
       push @SUMMARY,
@@ -369,13 +369,14 @@ sub modify {
   my ( $self, $type, $task, $code, $package, $file, $line ) = @_;
 
   if ( $package ne "main" && $package ne "Rex::CLI" ) {
-    if ( $task =~ m/:/ ) {
+    if ( $task !~ m/:/ ) {
 
       #do we need to detect for base -Rex ?
       $package =~ s/^Rex:://;
-      $package =~ s/::/:/g;
     }
   }
+
+  $package =~ s/::/:/g;
 
   my @all_tasks = map { $self->get_task($_); } grep {
     if ( $package ne "main" && $package ne "Rex::CLI" ) {
@@ -424,7 +425,7 @@ sub get_exit_codes {
 
 sub get_thread_count {
   my ( $self, $task ) = @_;
-  my $threads = $task->parallelism || Rex::Config->get_parallelism;
+  my $threads      = $task->parallelism || Rex::Config->get_parallelism;
   my $server_count = scalar @{ $task->server };
 
   return $1                                if $threads =~ /^(\d+)$/;

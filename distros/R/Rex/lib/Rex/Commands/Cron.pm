@@ -38,7 +38,7 @@ package Rex::Commands::Cron;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.0'; # VERSION
+our $VERSION = '1.7.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -107,7 +107,7 @@ sub cron_entry {
     %option = $c->_create_defaults(%option);
 
     my @crons = &cron( list => $user );
-    my $i = 0;
+    my $i     = 0;
     my $cron_id;
     for my $cron (@crons) {
       if ( $cron->{minute} eq $option{minute}

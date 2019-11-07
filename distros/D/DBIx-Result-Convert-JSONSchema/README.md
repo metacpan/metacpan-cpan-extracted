@@ -9,7 +9,7 @@ DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
 # VERSION
 
-    0.05
+    0.06
 
 # SYNOPSIS
 

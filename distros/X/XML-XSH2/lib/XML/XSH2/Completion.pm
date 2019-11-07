@@ -7,28 +7,28 @@ use XML::XSH2::Functions qw();
 use vars qw($VERSION);
 use strict;
 
-  $VERSION='2.2.3'; # VERSION TEMPLATE
+  $VERSION='2.2.6'; # VERSION TEMPLATE
 
 our @PATH_HASH;
 our $O=qr/:[[:alnum:]]|--[-_[:alnum:]]+/; # option
-our $F=qr/(?:\s${O})*/o;                   # options
+our $F=qr/(?:\s$O)*/o;                   # options
 our $M=qr/(?:^|[;}]|\s+\&?{|:\s*[-+*\/x.\%]?=)\s*/o;         # possible command-start
 our $match_sv=qr/\$([a-zA-Z0-9_]*)$/o; # scalar variable completion
 our $match_command=qr/${M}[^\!=\s]*$/o; # command completion
 our $match_option=qr/\s(\:[[:alnum:]]?|--[-_[:alnum:]]*)$/o; # option completion
-our $match_func=qr/${M}(?:call|undef|undefine)\s+(\S*)$/o; # function name completion
+our $match_func=qr/$M(?:call|undef|undefine)\s+(\S*)$/o; # function name completion
 our $match_nodetype=qr/${M}x?(?:insert|add)\s+(\S*)$/o; # node-type completion
-our $match_help=qr/${M}(?:\?|help)\s+(\S*)$/o; # help topic completion
-our $match_filename=qr/${M}(?:\.|include|open|save)${F}\s+(\S*)$|^\s*!\s*\S+\s+/o;
-our $match_dir=qr/${M}(?:lcd)\s+(\S*)$/o;
-our $match_path_filename=qr/${M}(?:system\s|exec\s)\s*\S*$|^\s*\!\s*\S*$|\s\|\s*\S*$/o;
+our $match_help=qr/$M(?:\?|help)\s+(\S*)$/o; # help topic completion
+our $match_filename=qr/$M(?:\.|include|open|save)$F\s+(\S*)$|^\s*!\s*\S+\s+/o;
+our $match_dir=qr/$M(?:lcd)\s+(\S*)$/o;
+our $match_path_filename=qr/$M(?:system\s|exec\s)\s*\S*$|^\s*\!\s*\S*$|\s\|\s*\S*$/o;
 
 our $NAMECHAR = '[-_.[:alnum:]]';
 our $NNAMECHAR = '[-:_.[:alnum:]]';
-our $NAME = "${NAMECHAR}*${NNAMECHAR}*[_.[:alpha:]]";
+our $NAME = "$NAMECHAR*$NNAMECHAR*[_.[:alpha:]]";
 
-our $WILDCARD = '\*(?!\*|${NAME}|\)|\]|\.)';
-our $OPER = qr/(?:[,=<>\+\|]|-(?!${NAME})|(?:vid|dom|dna|ro)(?=\s*\]|\s*\)|\s*[0-9]+(?!${NNAMECHAR})|\s+{$NAMECHAR}|\s+\*))/;
+our $WILDCARD = '\*(?!\*|$NAME|\)|\]|\.)';
+our $OPER = qr/(?:[,=<>\+\|]|-(?!$NAME)|(?:vid|dom|dna|ro)(?=\s*\]|\s*\)|\s*[0-9]+(?!$NNAMECHAR)|\s+{$NAMECHAR}|\s+\*))/;
 
 
 # PATH-completion: system, !, exec, |, 
@@ -39,7 +39,7 @@ sub complete_option {
   my ($l)=@_;
   if ($l=~/\s--encoding\s+$|\s:e\s+$/) {
   }
-  if ($l=~/${M}(\.|[a-zA-Z_][-a-zA-Z0-9_]*)${F}\s+(:([[:alnum:]]?)|--([-_[:alnum:]]*))$/) {
+  if ($l=~/$M(\.|[a-zA-Z_][-a-zA-Z0-9_]*)$F\s+(:([[:alnum:]]?)|--([-_[:alnum:]]*))$/) {
     my ($cmd,$o,$p)=($1,$2,$3||$4);
     my $c = $XML::XSH2::Functions::COMMANDS{$cmd};
     $c = $XML::XSH2::Functions::COMMANDS{$c} if (defined($c) and !ref($c));
@@ -191,7 +191,7 @@ sub xpath_complete_str {
   }
 
  STEP1:
-  if ( $str =~ /\G(${NAMECHAR}+)?(?::(${NAMECHAR}+))?/gsco ) {
+  if ( $str =~ /\G($NAMECHAR+)?(?::($NAMECHAR+))?/gsco ) {
     my $name = reverse($1);
     my $prefix = reverse($2);
     if ($prefix ne "") {
@@ -223,7 +223,7 @@ sub xpath_complete_str {
   print "STEP2-LOCALMATCH: $localmatch\n" if $debug;
   print "STEP2: $result\n" if $debug;
   print "STEP2-STR: ".reverse(substr($str,pos($str)))."\n" if $debug;
-  while ($str =~ m/\G(::|:|\@|${NAME}\$?|\/\/|\/|${WILDCARD}|\)|\])/gsco) {
+  while ($str =~ m/\G(::|:|\@|$NAME\$?|\/\/|\/|$WILDCARD|\)|\])/gsco) {
     print "STEP2-MATCH: '$1'\n" if $debug;
     if ($1 eq ')' or $1 eq ']') {
       # eat ballanced upto $1
@@ -262,12 +262,12 @@ sub xpath_complete_str {
   if (substr($result,0,1) eq '/') {
     if ($str =~ /\G['"]/gsco) {
       return undef;
-    } elsif ($str =~ /\G(?:\s+['"]|\(|\[|${OPER})/gsco) {
+    } elsif ($str =~ /\G(?:\s+['"]|\(|\[|$OPER)/gsco) {
       return ($result,$localmatch);
     }
     return ($result,$localmatch); # uncertain!!!
   } else {
-    return ($result,$localmatch) if ($str=~/\G\s+(?=${OPER})/gsco);
+    return ($result,$localmatch) if ($str=~/\G\s+(?=$OPER)/gsco);
   }
 
  STEP4:
@@ -312,7 +312,7 @@ sub xpath_complete {
   return () if $@;
 
   my %names;
-  my $prefix = ($local=~/^(${NAMECHAR}+:)/) ? $1 : '';
+  my $prefix = ($local=~/^($NAMECHAR+:)/) ? $1 : '';
   @names{ map { 
     XML::XSH2::Functions::fromUTF8($XML::XSH2::Functions::QUERY_ENCODING,
 				  substr(substr($str,0,
@@ -334,7 +334,7 @@ sub xpath_complete {
 			 preceding-sibling
 			 parent ancestor ancestor-or-self descendant self
 			 descendant-or-self child attribute namespace)) {
-      if ($axis =~ /^\Q${axpart}\E/) {
+      if ($axis =~ /^\Q$axpart\E/) {
 	push @completions, "${pre}${axis}::";
       }
     }
@@ -353,7 +353,7 @@ sub xpath_complete {
 				XML::XSH2::Functions::get_registered_prefix($2).":$1" : $_
 			} keys %XML::XSH2::Functions::_func,
 		       ) {
-	if ($func =~ /^\Q${axpart}\E/) {
+	if ($func =~ /^\Q$axpart\E/) {
 	  push @completions, "${pre}${func}(";
 	}
       }

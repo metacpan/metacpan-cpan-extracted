@@ -2,7 +2,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.6.0 );
+        my $ver = version->parse( $args->{ver} // v4.7.8 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -22,7 +22,7 @@
 
     # amCharts4 geodata
     amcharts4_geodata => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.7 );
+        my $ver = version->parse( $args->{ver} // v4.1.8 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4/geodata';
 
@@ -87,7 +87,7 @@
 
     # FontAwesome
     fa5 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v5.10.2 );
+        my $ver = version->parse( $args->{ver} // v5.11.2 );
 
         state $native_prefix = 'https://use.fontawesome.com/releases';
 
@@ -101,7 +101,7 @@
 
     # froala, https://www.froala.com/wysiwyg-editor
     froala3 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v3.0.5 );
+        my $ver = version->parse( $args->{ver} // v3.0.6 );
 
         if (wantarray) {
             my @res;
@@ -158,7 +158,7 @@
 
     # pdfjs
     pdfjs => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v2.2.228 );
+        my $ver = version->parse( $args->{ver} // v2.3.200 );
 
         state $native_prefix = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js';
 

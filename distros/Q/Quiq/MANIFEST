@@ -5,6 +5,10 @@ lib/Quiq/ApplicationPaths.pm
 lib/Quiq/Array.pm
 lib/Quiq/AsciiTable.pm
 lib/Quiq/Assert.pm
+lib/Quiq/Axis.pm
+lib/Quiq/Axis/Numeric.pm
+lib/Quiq/Axis/Time.pm
+lib/Quiq/AxisTick.pm
 lib/Quiq/Cascm.pm
 lib/Quiq/ChartJs/TimeSeries.pm
 lib/Quiq/ClassConfig.pm
@@ -56,6 +60,13 @@ lib/Quiq/File/Video.pm
 lib/Quiq/FileHandle.pm
 lib/Quiq/Formatter.pm
 lib/Quiq/Gd/Font.pm
+lib/Quiq/Gd/Graphic.pm
+lib/Quiq/Gd/Graphic/Axis.pm
+lib/Quiq/Gd/Graphic/BlockDiagram.pm
+lib/Quiq/Gd/Graphic/ColorBar.pm
+lib/Quiq/Gd/Graphic/ColorLegend.pm
+lib/Quiq/Gd/Graphic/Graph.pm
+lib/Quiq/Gd/Graphic/PointGraph.pm
 lib/Quiq/Gd/Image.pm
 lib/Quiq/Gnuplot/Arrow.pm
 lib/Quiq/Gnuplot/Graph.pm
@@ -134,7 +145,6 @@ lib/Quiq/PostgreSql/Catalog.pm
 lib/Quiq/PostgreSql/CopyFormat.pm
 lib/Quiq/PostgreSql/Psql.pm
 lib/Quiq/Process.pm
-lib/Quiq/ProcessMatrix.pm
 lib/Quiq/Program.pm
 lib/Quiq/Progress.pm
 lib/Quiq/Properties.pm
@@ -142,6 +152,7 @@ lib/Quiq/Range.pm
 lib/Quiq/Record.pm
 lib/Quiq/Reference.pm
 lib/Quiq/Rsync.pm
+lib/Quiq/Schedule.pm
 lib/Quiq/Sdoc/Producer.pm
 lib/Quiq/Section/Object.pm
 lib/Quiq/Section/Parser.pm
@@ -191,6 +202,10 @@ t/bin/Quiq/ApplicationPaths.t
 t/bin/Quiq/Array.t
 t/bin/Quiq/AsciiTable.t
 t/bin/Quiq/Assert.t
+t/bin/Quiq/Axis.t
+t/bin/Quiq/Axis/Numeric.t
+t/bin/Quiq/Axis/Time.t
+t/bin/Quiq/AxisTick.t
 t/bin/Quiq/Cascm.t
 t/bin/Quiq/ChartJs/TimeSeries.t
 t/bin/Quiq/ClassConfig.t
@@ -242,6 +257,13 @@ t/bin/Quiq/File/Video.t
 t/bin/Quiq/FileHandle.t
 t/bin/Quiq/Formatter.t
 t/bin/Quiq/Gd/Font.t
+t/bin/Quiq/Gd/Graphic.t
+t/bin/Quiq/Gd/Graphic/Axis.t
+t/bin/Quiq/Gd/Graphic/BlockDiagram.t
+t/bin/Quiq/Gd/Graphic/ColorBar.t
+t/bin/Quiq/Gd/Graphic/ColorLegend.t
+t/bin/Quiq/Gd/Graphic/Graph.t
+t/bin/Quiq/Gd/Graphic/PointGraph.t
 t/bin/Quiq/Gd/Image.t
 t/bin/Quiq/Gnuplot/Arrow.t
 t/bin/Quiq/Gnuplot/Graph.t
@@ -320,7 +342,6 @@ t/bin/Quiq/PostgreSql/Catalog.t
 t/bin/Quiq/PostgreSql/CopyFormat.t
 t/bin/Quiq/PostgreSql/Psql.t
 t/bin/Quiq/Process.t
-t/bin/Quiq/ProcessMatrix.t
 t/bin/Quiq/Program.t
 t/bin/Quiq/Progress.t
 t/bin/Quiq/Properties.t
@@ -328,6 +349,7 @@ t/bin/Quiq/Range.t
 t/bin/Quiq/Record.t
 t/bin/Quiq/Reference.t
 t/bin/Quiq/Rsync.t
+t/bin/Quiq/Schedule.t
 t/bin/Quiq/Sdoc/Producer.t
 t/bin/Quiq/Section/Object.t
 t/bin/Quiq/Section/Parser.t
@@ -373,6 +395,7 @@ t/data/class/MyClass2.pm
 t/data/class/P1.pm
 t/data/csv/spike-test.csv
 t/data/db/person.tab
+t/data/db/process.dat
 t/data/db/test-databases.conf
 t/data/etc/test1.conf
 t/data/etc/test2.conf

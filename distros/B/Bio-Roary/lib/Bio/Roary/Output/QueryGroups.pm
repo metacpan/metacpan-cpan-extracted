@@ -1,5 +1,5 @@
 package Bio::Roary::Output::QueryGroups;
-$Bio::Roary::Output::QueryGroups::VERSION = '3.12.0';
+$Bio::Roary::Output::QueryGroups::VERSION = '3.13.0';
 # ABSTRACT:  Output the groups of the union of a set of input isolates
 
 
@@ -136,7 +136,7 @@ Bio::Roary::Output::QueryGroups - Output the groups of the union of a set of inp
 
 =head1 VERSION
 
-version 3.12.0
+version 3.13.0
 
 =head1 SYNOPSIS
 

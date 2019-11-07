@@ -5,11 +5,10 @@ use Pod::Markdown;
 use CPAN::Meta;
 use Pcore::API::PAUSE;
 
-has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
-
-has major  => 0;                  # Bool
-has minor  => 0;                  # Bool
-has bugfix => 0;                  # Bool
+has dist   => ( required => 1 );    # InstanceOf ['Pcore::Dist']
+has major  => 0;                    # Bool
+has minor  => 0;                    # Bool
+has bugfix => 0;                    # Bool
 
 sub run ($self) {
 
@@ -66,7 +65,7 @@ sub run ($self) {
     {
         print 'Add/remove changes ... ';
 
-        my $res = $self->{dist}->scm->scm_addremove;
+        my $res = $self->{dist}->git->git_run('add .');
 
         say $res && return if !$res;
 
@@ -77,7 +76,7 @@ sub run ($self) {
     {
         print 'Committing ... ';
 
-        my $res = $self->{dist}->scm->scm_commit(qq[release $new_ver]);
+        my $res = $self->{dist}->git->git_run(qq[commit -m"release $new_ver"]);
 
         say $res && return if !$res;
 
@@ -88,24 +87,30 @@ sub run ($self) {
     {
         print 'Setting tags ... ';
 
-        my $res = $self->{dist}->scm->scm_set_tag( [ 'latest', $new_ver ], 1 );
+        my $res = $self->{dist}->git->git_run(qq[tag -a "$new_ver" -m "Released version: $new_ver" ]);
+        say $res && return if !$res;
 
+        $res = $self->{dist}->git->git_run( [ 'tag', 'latest', '--force' ] );
         say $res && return if !$res;
 
         say 'done';
     }
 
-    if ( $self->{dist}->scm->upstream ) {
-      PUSH_UPSTREAM:
-        print 'Pushing to the upstream repository ... ';
+    if ( $self->{dist}->git->upstream ) {
 
-        my $res = $self->{dist}->scm->scm_push;
-
+        # pushing changesets
+      GIT_PUSH:
+        print 'Pushing changesets ... ';
+        my $res = $self->{dist}->git->git_run('push');
         say $res->{reason};
+        goto GIT_PUSH if !$res && P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
 
-        if ( !$res ) {
-            goto PUSH_UPSTREAM if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
-        }
+        # pushing tags
+      GIT_PUSH_TAGS:
+        print 'Pushing tags ... ';
+        $res = $self->{dist}->git->git_run(qq[push origin -f "refs/tags/$new_ver" "refs/tags/latest"]);
+        say $res->{reason};
+        goto GIT_PUSH_TAGS if !$res && P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
     }
 
     # upload to the CPAN if this is the CPAN distribution, prompt before upload
@@ -115,15 +120,24 @@ sub run ($self) {
 }
 
 sub _can_release ($self) {
-    if ( !$self->{dist}->scm ) {
-        say q[SCM is required.];
+    if ( !$self->{dist}->git ) {
+        say q[Git is required.];
+
+        return;
+    }
+
+    my $id = $self->{dist}->id;
+
+    # check master branch
+    if ( !$id->{branch} || $id->{branch} ne 'master' ) {
+        say q[Git is not on mster branch.];
 
         return;
     }
 
     # check for uncommited changes
-    if ( !$self->{dist}->is_commited ) {
-        say q[Working copy or sub-repositories has uncommited changes or unknown files.];
+    if ( $id->{is_dirty} ) {
+        say q[Working copy or sub-repositories has uncommited changes or untracked files.];
 
         return;
     }
@@ -135,7 +149,7 @@ sub _can_release ($self) {
     }
 
     # check distance from the last release
-    if ( !$self->{dist}->id->{release_distance} ) {
+    if ( !$id->{release_distance} ) {
         return if P->term->prompt( q[No changes since last release. Continue?], [qw[yes no]], enter => 1 ) eq 'no';
     }
 
@@ -265,24 +279,15 @@ sub _create_changes ( $self, $ver, $issues ) {
     # get changesets since latest release
     my $tag = $ver eq 'v0.1.0' ? undef : 'latest';
 
-    my $changesets = $self->{dist}->scm->scm_get_changesets($tag);
-
-    my $summary_idx;
+    my $changesets = $self->{dist}->git->git_get_log($tag);
 
     my $log = <<'TXT';
 LOG: Edit changelog.  Lines beginning with 'LOG:' are removed.
 
 TXT
+
     for my $changeset ( $changesets->{data}->@* ) {
-        if ( !exists $summary_idx->{ $changeset->{summary} } ) {
-            $summary_idx->{ $changeset->{summary} } = undef;
-
-            next if $changeset->{summary} =~ /\Arelease v[\d.]+\z/sm;
-
-            next if $changeset->{summary} =~ /\AAdded tag/sm;
-
-            $log .= "- $changeset->{summary}\n";
-        }
+        $log .= "- $changeset\n";
     }
 
     my $tempfile = P->file1->tempfile;
@@ -310,6 +315,16 @@ TXT
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (21)                       |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 
