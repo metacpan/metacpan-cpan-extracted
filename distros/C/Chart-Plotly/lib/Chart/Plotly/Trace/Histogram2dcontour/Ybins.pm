@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram2dcontour.
 
@@ -69,7 +69,7 @@ Chart::Plotly::Trace::Histogram2dcontour::Ybins - This attribute is one of the p
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

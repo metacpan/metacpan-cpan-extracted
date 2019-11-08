@@ -86,7 +86,7 @@ is($conn->get('smartcards.tokens.token_1.nonexistent'), undef, 'multi with simpl
 # Reuse $base and $conn to ensure we don't accidentally test previous
 # connectors.
 $base = Connector::Proxy::Config::Versioned->new({
-	LOCATION  => $test_data[1]->{dbpath},
+    LOCATION  => $test_data[1]->{dbpath},
 });
 
 my $sym = $base->get('smartcards.tokens');

@@ -1,181 +1,18 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
-use Device::AVR::UPDI;
-use Getopt::Long;
-
-STDOUT->autoflush;
-
-GetOptions(
-   'port|P=s' => \( my $PORT = "/dev/ttyUSB0" ),
-   'part|p=s' => \( my $PART ),
-) or exit 1;
-
-my $updi = Device::AVR::UPDI->new(
-   dev => $PORT,
-   part => $PART,
-);
-
-$updi->init_link->get;
-
-$updi->erase_chip->get;
-$updi->enable_nvmprog->get;
-
-my $sig = $updi->read_signature->get;
-if( $updi->partinfo->signature ne $sig ) {
-   printf STDERR "Signature %v02X does not match expected %v02X\n",
-      $sig, $updi->partinfo->signature;
-   exit 1;
-}
-
-my $hexfile = main::Fileformat::IntelHex->open_in( shift @ARGV );
-my $data = $hexfile->input;
-
-printf "Need to write %d bytes\n", length $data;
-
-my $pagesize = $updi->partinfo->pagesize;
-
-my $addr = 0;
-while( $addr < length $data ) {
-   my $chunk = substr $data, $addr, $pagesize;
-
-   $updi->write_nvm_page( $addr, $chunk )->get;
-
-   $addr += length $chunk;
-   printf "\rWritten %d (%.2f%%)", $addr, 100 * $addr / length $data;
-}
-print "\n";
-
-# Verify
-$addr = 0;
-while( $addr < length $data ) {
-   my $chunk = substr $data, $addr, $pagesize;
-
-   my $readback = $updi->ld( $updi->partinfo->baseaddr_flash + $addr, length $chunk )->get;
-   if( $readback ne $chunk ) {
-      printf STDERR "Read: %v02X\n", $readback;
-      printf STDERR "Exp : %v02X\n", $chunk;
-      die "Verify failed at addr=$addr\n";
-   }
-
-   $addr += length $chunk;
-   printf "\rVerified %d (%.2f%%)", $addr, 100 * $addr / length $data;
-}
-print "\n";
-
-$updi->request_reset( 1 )->get;
-$updi->request_reset( 0 )->get;
-
-print "Done\n";
-
-# IO formats
-package main::Fileformat {
-   use base 'IO::Handle';
-   sub open_out {
-      my $class = shift;
-      my $fh;
-      if( $_[0] eq "-" ) {
-         $fh = IO::Handle->new_from_fd( STDOUT->fileno, "w" );
-      }
-      else {
-         open $fh, ">", $_[0] or die "Cannot write $_[0] - $!\n";
-      }
-      return bless $fh, $class;
-   }
-   sub open_in {
-      my $class = shift;
-      my $fh;
-      if( $_[0] eq "-" ) {
-         $fh = IO::Handle->new_from_fd( STDIN->fileno, "r" );
-      }
-      else {
-         open $fh, "<", $_[0] or die "Cannot read $_[0] - $!\n";
-      }
-      return bless $fh, $class;
-   }
-}
-
-package main::Fileformat::IntelHex {
-   use base 'main::Fileformat';
-   sub output {
-      my $self = shift;
-      my ( $bytes ) = @_;
-      my $addr = 0;
-      foreach my $chunk ( $bytes =~ m/(.{1,16})/gs ) {
-         my $clen = length $chunk;
-         my $cksum = $clen + ( $addr & 0xff ) + ( $addr >> 8 );
-         $self->printf( ":%02X%04X%02X", $clen, $addr, 0 );
-         foreach my $byte ( split //, $chunk ) {
-            $byte = ord $byte;
-            $cksum += $byte;
-            $self->printf( "%02X", $byte );
-         }
-         $self->printf( "%02X\n", ( -$cksum ) & 0xff );
-         $addr += $clen;
-      }
-      $self->print( ":00000001FF\n" );
-   }
-   sub input {
-      my $self = shift;
-      my $bytes = "";
-      while( my $line = <$self> ) {
-         $line =~ s/\r?\n$//; # chomp doesn't do CRLF on Linux
-         next unless my ( $clen, $addr, $type, $data, $cksum ) =
-            $line =~ m/^:([0-9a-f]{2})([0-9a-f]{4})([0-9a-f]{2})([0-9a-f]*)([0-9a-f]{2})$/i;
-         # TODO: check checksum
-         $type = hex $type;
-         last if $type == 1; # EOF
-         next if $type != 0; # unrecognised record
-         warn "Bad record length on line $.\n" and next if
-            length $data != 2 * hex $clen;
-         $data = pack "H*", $data;
-         substr( $bytes, hex $addr, length $data ) = $data;
-      }
-      return $bytes;
-   }
-}
+exec( "avr-updi", "write-flash", @ARGV );
 
 __END__
 
 =head1 NAME
 
-F<avr-updi-write-nvm> - write a program to NVM of an F<AVR> microcontroller over F<UPDI>
+F<avr-updi-write-nvm> - write a program to NVM of an F<AVR> microcontroller over F<UPDI> (deprecated)
 
 =head1 SYNOPSIS
 
-   $ avr-updi-write-nvm -p t814 firmware.hex
+   $ avr-updi write-flash -p t814 firmware.hex
 
 =head1 DESCRIPTION
 
-This program writes to the non-volatile memory ("NVM") of an F<AVR>
-microcontroller using a F<UPDI> interface.
-
-=head1 OPTIONS
-
-=head2 --port, -P DEVICE
-
-Optional. Provides the USB device where the UPDI adapter is connected. If
-absent a default of F</dev/ttyUSB0> will apply.
-
-=head2 --part, -p PART
-
-Required. Gives the name of the ATmega or ATtiny chip that is expected. Parts
-may be specified in the following ways:
-
-   ATmega4809
-   atmega4809
-   m4809
-
-   ATtiny814
-   attiny814
-   t814
-
-Specifically, these are the same forms as recognised by F<avr-gcc>'s C<-mmcu>
-option and F<avrdude>'s C<-p> option, for convenience in Makefiles and build
-scripts.
-
-=head1 AUTHOR
-
-Paul Evans <leonerd@leonerd.org.uk>
+This program is deprecated. See the C<write-flash> subcommand of F<avr-updi>
+instead.

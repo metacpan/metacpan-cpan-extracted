@@ -1,5 +1,11 @@
 Revision history for Device-AVR-UPDI
 
+0.02    2019-11-07 22:06:13
+        [CHANGES]
+         * Move commands into one big wrapper script
+         * Support reading both flash and EEPROM
+         * Support raw binary files
+
 0.01    2019-06-02 22:11:13
         First version, released on an unsuspecting world.
 

@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Contour::Line;
 use Chart::Plotly::Trace::Contour::Stream;
 use Chart::Plotly::Trace::Contour::Transform;
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 # ABSTRACT: The data from which contour lines are computed is set in `z`. Data in `z` must be a {2D array} of numbers. Say that `z` has N rows and M columns, then by default, these N rows correspond to N y coordinates (set in `y` or auto-generated) and the M columns correspond to M x coordinates (set in `x` or auto-generated). By setting `transpose` to *true*, the above behavior is flipped.
 
@@ -79,9 +79,10 @@ has colorscale => (
 );
 
 has connectgaps => (
-        is            => "rw",
-        isa           => "Bool",
-        documentation => "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in.",
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in. It is defaulted to true if `z` is a one dimensional array otherwise it is defaulted to false.",
 );
 
 has contours => ( is  => "rw",
@@ -130,6 +131,13 @@ has hoverinfosrc => ( is            => "rw",
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Contour::Hoverlabel", );
+
+has hoverongaps => (
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data have hover labels associated with them.",
+);
 
 has hovertemplate => (
     is  => "rw",
@@ -401,7 +409,7 @@ Chart::Plotly::Trace::Contour - The data from which contour lines are computed i
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 
@@ -484,7 +492,7 @@ Sets the colorscale. The colorscale must be an array containing arrays mapping a
 
 =item * connectgaps
 
-Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in.
+Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in. It is defaulted to true if `z` is a one dimensional array otherwise it is defaulted to false.
 
 =item * contours
 
@@ -517,6 +525,10 @@ Determines which trace information appear on hover. If `none` or `skip` are set,
 Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
+
+=item * hoverongaps
+
+Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data have hover labels associated with them.
 
 =item * hovertemplate
 

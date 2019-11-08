@@ -41,7 +41,7 @@
             "Locale::Codes" : "3.37",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.820",
-            "Perinci::Sub::Gen::AccessTable" : "0.55",
+            "Perinci::Sub::Gen::AccessTable" : "0.581",
             "Perinci::Sub::Property::result::table" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-App-ListLanguages"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"

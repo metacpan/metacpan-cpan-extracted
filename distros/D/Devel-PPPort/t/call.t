@@ -13,7 +13,7 @@
 BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
-    @INC = ('../lib', '../ext/Devel-PPPort/t') if -d '../lib' && -d '../ext';
+    @INC = ('../lib', '../ext/Devel-PPPort/t', '../ext/Devel-PPPort/parts/inc') if -d '../lib' && -d '../ext';
     require Config; import Config;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
@@ -22,17 +22,18 @@ BEGIN {
     }
   }
   else {
-    unshift @INC, 't';
+    unshift @INC, 't', 'parts/inc';
   }
 
   sub load {
     eval "use Test";
     require 'testutil.pl' if $@;
+    require 'inctools';
   }
 
-  if (69) {
+  if (86) {
     load();
-    plan(tests => 69);
+    plan(tests => 86);
   }
 }
 
@@ -125,6 +126,34 @@ if ("$]" >= '5.007003' or ("$]" >= '5.006001' and "$]" < '5.007')) {
     my $false = False->new;
     ok(!$false);
     ok(eval { Devel::PPPort::eval_pv('die $false', 1); 1 }, undef, 'check false objects are rethrown');
+    ok(ref($@), 'False', 'check that $@ contains False object');
+    ok("$@", "$false", 'check we got the expected object');
+} else {
+    for (1..7) {
+        skip 'skip: no support for references in $@', 0;
+    }
+}
+
+ok(eval { Devel::PPPort::eval_sv('die', 0); 1 });
+ok(!eval { Devel::PPPort::eval_sv('die', &Devel::PPPort::G_RETHROW); 1 });
+ok($@ =~ /^Died at \(eval [0-9]+\) line 1\.\n$/);
+ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('', 0); 1 });
+ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('', &Devel::PPPort::G_RETHROW); 1 });
+ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"', 0); 1 });
+ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"', &Devel::PPPort::G_RETHROW); 1 });
+ok(eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"; die "string3"', 0); 1 });
+ok(!eval { $@ = 'string1'; Devel::PPPort::eval_sv('$@ = "string2"; die "string3"', &Devel::PPPort::G_RETHROW); 1 });
+ok($@ =~ /^string3 at \(eval [0-9]+\) line 1\.\n$/);
+
+if ("$]" >= '5.007003' or ("$]" >= '5.006001' and "$]" < '5.007')) {
+    my $hashref = { key => 'value' };
+    ok(eval { Devel::PPPort::eval_sv('die $hashref', &Devel::PPPort::G_RETHROW); 1 }, undef, 'check plain hashref is rethrown');
+    ok(ref($@), 'HASH', 'check $@ is hashref') and
+        ok($@->{key}, 'value', 'check $@ hashref has correct value');
+
+    my $false = False->new;
+    ok(!$false);
+    ok(eval { Devel::PPPort::eval_sv('die $false', &Devel::PPPort::G_RETHROW); 1 }, undef, 'check false objects are rethrown');
     ok(ref($@), 'False', 'check that $@ contains False object');
     ok("$@", "$false", 'check we got the expected object');
 } else {

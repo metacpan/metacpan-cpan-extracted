@@ -1,21 +1,20 @@
+package A1z::HTML5::Template;
 use strict;
 use warnings;
-package A1z::HTML5::Template;
+use vars qw($NAME);
 
-use vars qw(%ENV);
+# ABSTRACT: Fast and Easy Web Apps
 
-# ABSTRACT: Fast and easy Web Apps in Perl
+sub NAME { my $self = shift; $NAME = "Fast and Easy Web Apps"; return $NAME; }
 
-sub NAME { my $self = shift; my $NAME; $NAME = "Fast and Easy Web Apps"; return $NAME; }
-
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use parent qw(Exporter); 
 require Exporter; 
 our @ISA = ("Exporter"); 
 
 our @EXPORT_OK = qw(header start_html head_title head_meta head_js_css end_head begin_body body_js_css body_topnavbar 
-body_accordion end_body end_html 
+body_accordion end_body end_html head body
 ); 
 
 
@@ -207,7 +206,7 @@ sub body_js_css
 		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 		<script  src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
 
-		<script >
+		<script>
 		
 		// for tabs 
 		\$( function() {
@@ -1140,7 +1139,7 @@ sub head
 		-jqueryui 	=> html_jqueryui_css, 
 		-htmlshim	=> html_shim_respond, 
 		-humanejs  => html_humanejs_css, 
-		-title 		=> "$ENV{SERVER_NAME}", 
+		-title 		=> "A1Z .us", 
 		-cssLinks => "https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css,https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css,https://www.a1z.us/A1z/HTML5/Template.css", 
 		-cssCode => "", 
 		-mobilemeta => qq{<meta name="HandheldFriendly" content="true">
@@ -1229,7 +1228,7 @@ sub body
 	my %in; 
 	
 	%in = (
-		-h1 => qq{$ENV{SERVER_NAME}},
+		-h1 => qq{A1Z .us},
 		-onload => qq{setTitle();},  
 		-nbhead => qq{},
 		-nbpage => qq{}, 
@@ -1239,7 +1238,7 @@ sub body
 		-userjquery => qq{}, 
 		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, "", ""), 
 		-content => qq{<div class="content">Content</div>}, 
-		-footer => qq{All rights reserved &copy; $ENV{SERVER_NAME}}, 	
+		-footer => qq{All rights reserved &copy; A1Z .us}, 	
 		-bootstrapbluimp => html_bootstrap_bluimp,
 		-nbLinks => qq{contact-help-feedback},
 		@_, 		
@@ -1860,11 +1859,11 @@ __END__
 
 =head1 NAME
 
-A1z::HTML5::Template - Fast/easy Web Apps in Perl
+A1z::HTML5::Template - Fast and easy Web Apps
 
 =head1 VERSION
 
-version 0.20
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -1934,13 +1933,13 @@ version 0.20
 
 =head1 NAME
 
-	Fast and Easy Web Apps.
+	Fast and Easy Web Apps
 
 	"A1z::HTML5::Template" provides customizable HTML5 tags for creating "Fast and Easy Web Apps."
 
 =head2 VERSION
 
-	0.20
+	0.22
 
 =head1 Installation
 
@@ -2208,7 +2207,7 @@ version 0.20
 		-jqueryui 	=> html_jqueryui_css, 
 		-htmlshim	=> html_shim_respond, 
 		-humanejs  => html_humanejs_css, 
-		-title 		=> "$ENV{SERVER_NAME}", 
+		-title 		=> "A1Z .us", 
 		-cssLinks => "https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css,https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css,https://www.a1z.us/A1z/HTML5/Template.css", 
 		-cssCode => "", 
 		-mobilemeta => qq{<meta name="HandheldFriendly" content="true">
@@ -2224,7 +2223,7 @@ version 0.20
 	$h->body();
 
 	$h->body(
-		-h1	=> qq{$ENV{SERVER_NAME}},
+		-h1	=> qq{A1Z .us},
 		-onload => qq{setTitle();},  
 		-nbhead => qq{},
 		-nbpage => qq{}, 
@@ -2234,7 +2233,7 @@ version 0.20
 		-userjquery => qq{}, 
 		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, "", ""), 
 		-content => qq{<div class="content">Content</div>}, 
-		-footer => qq{All rights reserved &copy; $ENV{SERVER_NAME}}, 	
+		-footer => qq{All rights reserved &copy; A1Z .us}, 	
 		-bootstrapbluimp => html_bootstrap_bluimp,
 		-nbLinks => qq{contact-help-feedback}		
 	); 

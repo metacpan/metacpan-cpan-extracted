@@ -25,7 +25,7 @@ requires:
   Locale::Codes: '3.37'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
-  Perinci::Sub::Gen::AccessTable: '0.55'
+  Perinci::Sub::Gen::AccessTable: '0.581'
   Perinci::Sub::Property::result::table: '0'
   perl: '5.010001'
   strict: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListLanguages
   homepage: https://metacpan.org/release/App-ListLanguages
   repository: git://github.com/perlancar/perl-App-ListLanguages.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

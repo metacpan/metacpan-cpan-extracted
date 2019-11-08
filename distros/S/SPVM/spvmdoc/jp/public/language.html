@@ -37,52 +37,43 @@
       <div>
         <a href="/">SPVMドキュメント</a> &gt SPVM言語仕様
       </div>
-      <h2 id="language-summary">SPVM言語仕様</a></h2>
+      <h2>名前</h2>
+      <p>
+        SPVM::Guides::LanguageSpecification - SPVM 1.0 言語仕様
+      </p>
+      <p>
+        最終更新日 2019年11月4日 (SPVM言語仕様は、現在95%の完成度)
+      </p>
+      
+      <h2 id="language-summary">説明</a></h2>
       <p>
         <b>SPVM 1.0の言語仕様</b>がこのドキュメントには記述されています。SPVMは、1.0のリリースに向けて、ベータテスト中です。言語仕様は、警告なく変更されることがあります。
       </p>
       <p>
-        最終更新日 2019年7月1日 (SPVM言語仕様は、現在91%の完成度)
+このドキュメントでは、SPVM 1.0言語仕様について説明します。
+SPVMは1.0リリースのベータテスト中です。
+言語仕様は警告なしに変更される場合があります。
       </p>
-      <h2 id="language-toc">目次</h2>
-      <ul class="toc">
-        <li><a href="#language-c99">C99準拠</a></li>
-        <li><a href="#language-parser">構文解析</a></li>
-        <li><a href="#language-comment">コメント</a></li>
-        <li><a href="#language-pod">POD</a></li>
-        <li><a href="#language-package">パッケージ</a></li>
-        <li><a href="#language-module">モジュール</a></li>
-        <li><a href="#language-allow-access">アクセス許可</a></li>
-        <li><a href="#language-package-var">パッケージ変数</a></li>
-        <li><a href="#language-field">フィールド</a></li>
-        <li><a href="#language-sub">サブルーチン</a></li>
-        <li><a href="#language-enum">列挙</a></li>
-        <li><a href="#language-begin-block">BEGINブロック</a></li>
-        <li><a href="#language-lex-var">レキシカル変数</a></li>
-        <li><a href="#language-block">ブロック</a></li>
-        <li><a href="#language-scope">スコープ</a></li>
-        <li><a href="#language-array">配列</a></li>
-        <li><a href="#language-value">値</a></li>
-        <li><a href="#language-value-array">値の配列</a></li>
-        <li><a href="#language-ref">リファレンス</a></li>
-        <li><a href="#language-exception">例外処理</a></li>
-        <li><a href="#language-callback">コールバック</a></li>
-        <li><a href="#language-weak-ref">ウィークリファレンス</a></li>
-        <li><a href="#language-expresssion">式</a></li>
-        <li><a href="#language-literal">リテラル</a></li>
-        <li><a href="#language-fat-comma">ファットカンマ</a></li>
-        <li><a href="#language-string">文字列</a></li>
-        <li><a href="#language-undef">未定義値</a></li>
-        <li><a href="#language-operator">演算子</a></li>
-        <li><a href="#language-operator-precedence">演算子の優先順位</a></li>
-        <li><a href="#language-statement">文</a></li>
-        <li><a href="#language-type">型</a></li>
-        <li><a href="#language-type-inference">型推論</a></li>
-        <li><a href="#language-type-convertion">型変換</a></li>
-        <li><a href="#language-thread">スレッドセーフ</a></li>
-        <li><a href="#language-auto-loaded-module">自動的に読み込まれるモジュール</a></li>
-        <li><a href="#language-limitation">制限</a></li>
-      </ul>
+
+      <p>
+SPVM言語は、Perlから使用するように設計されています。 PerlはSPVMサブルーチンを呼び出すことができます。
+      </p>
+
+      <p>
+SPVM言語は、高速な配列操作と高速な数値計算を提供します。
+      </p>
+
+      <p>
+SPVMサブルーチンは、SPVMランタイムによって実行されます。共有ライブラリまたはDLLに変換できます。
+      </p>
+
+      <p>
+SPVM言語はマシンコードに変換でき、単一の実行可能ファイルとして実行できます。
+      </p>
+
+      <p>
+実行可能ファイルには、Unix / Linux / macOS / ios実行可能ファイルだけでなく、Windowsネイティブな実行ファイルも含みます。
+      </p>
       
       <h2 id="language-c99">C99準拠</h2><!-- 2019/2/27 almost ok -->
       <ul class="list">
@@ -194,7 +185,7 @@
             <b>複数数値型</b>
           </td>
           <td>
-            複数数値型のフィールドの個数と長さが一致する数値の配列型
+            複数数値型のフィールドの型と個数が一致する数値の配列型
           </td>
           <td>
             <p>
@@ -204,7 +195,7 @@
               package Point_2i : mulnum_t { has x : int; has y : int; }
             </p>
             <p>
-              として定義されていた場合は、フィールドの型がint型で、フィールドの個数が2なので
+              として定義されていた場合は
             </p>
             <p>
               C99の「int32_t var[2];」で宣言された型に一致します。
@@ -374,7 +365,7 @@ $
         SPVMにおけるキーワードは以下です。
       </p>
 <pre>
-allow byte BEGIN case die default double elsif else enum eq
+allow byte BEGIN case die warn default double elsif else enum eq
 eval for float gt ge has if callback_t isa int last break length
 lt le long my native ne next new our object package private
 public precompile pointer_t return require rw ro self switch
@@ -417,7 +408,7 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
 %token <opval> DOT3 FATCAMMA RW RO WO BEGIN NEW
-%token <opval> RETURN WEAKEN DIE CURRENT_PACKAGE UNWEAKEN '[' '{' '('
+%token <opval> RETURN WEAKEN DIE WARN CURRENT_PACKAGE UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
 %type <opval> opt_packages packages package package_block refcnt
@@ -588,6 +579,8 @@ statement
   | RETURN expression ';'
   | DIE ';'
   | DIE expression ';'
+  | WARN ';'
+  | WARN expression ';'
   | weaken_field ';'
   | unweaken_field ';'
   | ';'
@@ -619,6 +612,7 @@ default_statement
 
 if_require_statement
   : IF '(' require ')' block
+  | IF '(' require ')' block ELSE block
 
 if_statement
   : IF '(' expression ')' block else_statement
@@ -992,6 +986,9 @@ sub_names
         </tr>
         <tr>
           <td>DIE</td><td>die</td>
+        </tr>
+        <tr>
+          <td>WARN</td><td>warn</td>
         </tr>
         <tr>
           <td>CURRENT_PACKAGE</td><td>__PACKAGE__</td>
@@ -2568,6 +2565,23 @@ switch (式) {
 
 }
 </pre>
+      <h2 id="language-warn">警告</h2>
+      <h3 id="language-exception-summary">警告を発生させる</h3>
+      <p>
+        警告を発生させるにはwarn文を使用します。
+      </p>
+<pre>
+warn 式;
+</pre>
+      <p>
+        式は、<a href="#language-type-string-compatible">文字列互換型</a>でなければなりません。
+      </p>
+      <p>
+        末尾が改行文字「\n」であった場合は、標準エラー出力に式で指定されている文字列が出力されます。
+      </p>
+      <p>
+        末尾が改行文字でない場合は、末尾にファイル名と行番号が追加され、標準エラー出力されます。
+      </p>
 
       <h2 id="language-exception">例外処理</h2>
       <ul class="list">

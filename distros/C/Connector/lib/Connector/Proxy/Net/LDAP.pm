@@ -99,6 +99,17 @@ has action => (
     default => 'replace',
 );
 
+has create => (
+    is  => 'ro',
+    isa => 'HashRef',
+    default => sub { return {} },
+);
+
+has schema => (
+    is  => 'ro',
+    isa => 'HashRef',
+);
+
 sub _build_config {
     my $self = shift;
 
@@ -145,7 +156,7 @@ sub _build_search_options {
         {
         });
 
-    $template->process(\$filter, $arg, \$value) || die "Error processing argument template.";
+    $template->process(\$filter, $arg, \$value) || $self->_log_and_die("Error processing argument template.");
        $options{filter} = $value;
     } else {
         $options{filter} = $filter;
@@ -183,19 +194,21 @@ sub _init_bind {
 
     my $ldap = Net::LDAP->new(
         $self->LOCATION(),
-        onerror => undef,
+        onerror => 'undef',
         $self->_build_new_options(),
     );
 
     if (! $ldap) {
-       die "Could not instantiate ldap object ($@)";
+       $self->_log_and_die("Could not instantiate ldap object ($@)");
     }
 
     my $mesg;
     if (defined $self->binddn()) {
+        my %options = $self->_build_bind_options();
+        $self->log()->warn('Binding with DN but without password') if (!defined $options{password});
         $mesg = $ldap->bind(
             $self->binddn(),
-            $self->_build_bind_options(),
+            %options,
         );
     } else {
         # anonymous bind
@@ -205,7 +218,7 @@ sub _init_bind {
     }
 
     if ($mesg->is_error()) {
-        die "LDAP bind failed with error code " . $mesg->code() . " (error: " . $mesg->error_desc() . ")";
+        $self->_log_and_die(sprintf("LDAP bind failed with error code %s (error: %s)",  $mesg->code(), $mesg->error_desc()));
     }
     return $ldap;
 }
@@ -248,8 +261,8 @@ sub _getbyDN {
 
     # Query is ambigous - can this happen ?
     if ( $mesg->count() > 1) {
-        $self->log()->error('Search by DN got multiple ('.$mesg->count().') results: '.$dn);
-        die "There is more than one matching node.";
+        $self->_log_and_die("There is more than one matching node.",
+            sprintf('Search by DN got multiple (%01d) results (%s)', $mesg->count(), $dn));
     }
 
     # If autocreation is not requested, return undef
@@ -260,11 +273,19 @@ sub _getbyDN {
     # No match, so split up the DN and walk upwards
     my $base_dn = $self->base;
 
-    # Strip the base from the dn and tokenize the rest
+    # we cant do much if the base dn does not exists
+    if ($dn eq $base_dn) {
+        $self->_log_and_die('Request to auto-create the base dn');
+    }
+
+    # Strip the basedn from the dn and tokenize the rest
     my $path = $dn;
     $path =~ s/\,?$base_dn$//;
 
-    #my $dn_parser = OpenXPKI::DN->new($path);
+    if (!$path) {
+        $self->_log_and_die('Request to auto-create empty path');
+    }
+
     my @dn_attributes = $self->_splitDN( $path );
 
     my $currentPath = $base_dn;
@@ -273,7 +294,7 @@ sub _getbyDN {
     for ($i = scalar(@dn_attributes)-1; $i >= 0; $i--) {
 
         # For the moment we just implement single value components
-        my $nextComponentKey = lc $dn_attributes[$i][0];
+        my $nextComponentKey = $dn_attributes[$i][0];
         my $nextComponentValue = $dn_attributes[$i][1];
 
         my $nextComponent = $nextComponentKey.'='.$nextComponentValue;
@@ -294,7 +315,7 @@ sub _getbyDN {
 
         # Reuse counter and list to build the missing nodes
         while ($i >= 0) {
-            $nextComponentKey = lc $dn_attributes[$i][0];
+            $nextComponentKey = $dn_attributes[$i][0];
             $nextComponentValue = $dn_attributes[$i][1];
             $currentPath = $self->_createPathItem($currentPath, $nextComponentKey, $nextComponentValue);
             $i--;
@@ -307,23 +328,42 @@ sub _getbyDN {
 sub _createPathItem {
 
     my $self = shift;
-    my ($currentPath, $nextComponentKey, $nextComponentValue) = @_;
+    my ($currentPath, $nextComponentKey, $nextComponentValue, $attributes) = @_;
+    $nextComponentKey = lc($nextComponentKey);
 
-    my @objectclass = split " ", $self->conn()->get([ 'schema', $nextComponentKey , 'objectclass']);
+    my $schema = $self->schema();
+    $self->_log_and_die("No schema data for create path item ($nextComponentKey)") if (!$schema || !$schema->{$nextComponentKey});
+    $schema = $schema->{$nextComponentKey};
 
-    my $attrib = [
-        objectclass => \@objectclass,
-        $nextComponentKey => $nextComponentValue,
-    ];
+    my @attrib;
+    if (!$schema->{objectclass}) {
+        $self->_log_and_die("No objectclass defined for path item $nextComponentKey");
+    }
+
+    push @attrib, "objectclass";
+    if (ref $schema->{objectclass} eq 'ARRAY') {
+        push @attrib, $schema->{objectclass};
+    } else {
+        my @classnames = split " ", $schema->{objectclass};
+        push @attrib, \@classnames;
+    }
+
+    push @attrib, $nextComponentKey, $nextComponentValue;
 
     # Default Values to push
-    my $values = $self->conn()->get_hash( [ 'schema', $nextComponentKey , 'values'] );
+    my $values = $schema->{values} || {};
+
+    # append attributes to value hash, this will overwrite values from the
+    # config for existing keys
+    map {
+        $values->{$_} = $attributes->{$_};
+    } (keys %{$attributes}) if ($attributes);
 
     foreach my $key ( keys %{$values}) {
-        push @{$attrib}, $key;
         my $val = $values->{$key};
+        next unless defined $val;
         $val = $nextComponentValue if ($val eq 'copy:self');
-        push @{$attrib}, $val;
+        push @attrib, $key, $val;
     }
 
     my $newDN = sprintf '%s=%s,%s', $nextComponentKey, $nextComponentValue, $currentPath;
@@ -331,12 +371,11 @@ sub _createPathItem {
     #print "Create Node $newDN \n";
     #print Dumper( $attrib );
 
-    $self->log()->debug("Create Node $newDN  with attributes " . Dumper $attrib);
+    $self->log()->trace("Create Node $newDN  with attributes " . Dumper \@attrib) if ($self->log()->is_trace);
 
-
-    my $result = $self->ldap()->add( $newDN, attr => $attrib );
+    my $result = $self->ldap()->add( $newDN, attr => \@attrib );
     if ($result->is_error()) {
-        die $result->error_desc;
+        $self->_log_and_die($result->error_desc);
     }
 
     return $newDN;
@@ -347,26 +386,59 @@ sub _triggerAutoCreate {
 
     my $self = shift;
     my $args = shift;
+    my $data = shift || {};
 
-    my $create_info = $self->conn()->get_hash('create');
-    if (!$create_info) {
-        $self->log()->warn('Auto-Create not configured');
-        return;
+    my $path = $self->base();
+    my @rdn;
+
+    my $tt = Template->new({});
+
+    my $create_info = $self->create();
+    if ($create_info->{basedn}) {
+        $path = $create_info->{basedn};
     }
 
-    my $value;
-    # build create value from template
-    if ($create_info->{value}) {
-        my $template = Template->new({});
-        $template->process(\$create_info->{value}, $args, \$value) || die "Error processing argument template.";
+    if ($create_info->{dn}) {
+        my $dn;
+        $tt->process(\$create_info->{dn}, { ARGS => $args, DATA => $data }, \$dn) || $self->_log_and_die("Error processing argument template for DN.");
+        $self->log()->debug('Auto-Create with full dn from template');
+        if (!$dn || $dn !~ /(([^=]+)=(.*?[^\\])\s*,)(.+)/) {
+            $self->_log_and_die("Unable to split DN from template");
+        }
+        @rdn = ($2, $3);
+        # triggers creation of path components below later
+        $path = $4;
+
+    } elsif ($create_info->{rdn}) {
+        my $rdn;
+        $tt->process(\$create_info->{rdn}, { ARGS => $args, DATA => $data }, \$rdn) || $self->_log_and_die("Error processing argument template for RDN.");
+        @rdn = split("=", $rdn, 2);
+        $self->log()->debug('Auto-Create with RDN template');
+
+    } elsif ($create_info->{rdnkey}) {
+        @rdn = ($create_info->{rdnkey}, $args->[0]);
+        $self->log()->debug('Auto-Create with RDN key') if($self->log()->is_debug);
+
     } else {
-        # Fallback to first argument = legacy config
-        $value = $args->[0];
+        my $schema = $self->schema();
+        if ($schema->{'cn'}) {
+            $self->log()->debug('Auto-Create with commonName based on schema:');
+            @rdn = ('cn', $args->[0]);
+        } else {
+            $self->log()->warn('Auto-Create not configured');
+            return;
+        }
     }
 
-    my $nodeDN = sprintf '%s=%s,%s', $create_info->{rdnkey}, $value, $create_info->{basedn};
-    $self->log()->debug('Start Auto-Create for: '.$nodeDN);
-    return $self->_getbyDN( $nodeDN, { create => 1} );
+    # create the components for the path first, without usage of extra data
+    if ($path ne $self->base()) {
+        $path = $self->_getbyDN( $path, { create => 1 } );
+    }
+
+    # now create the leaf node now using the extra data
+    my $nodeDN = $self->_createPathItem( $path, @rdn, $data );
+    $self->log()->debug('Auto-Create done - nodeDN: '.$nodeDN);
+    return $nodeDN;
 
 }
 
@@ -381,6 +453,11 @@ sub _splitDN {
         $self->log()->debug(sprintf 'Split-Result: Key: %s, Value: %s, Remainder: %s ', $2, $3, $4);
         $dn = $4;
     };
+
+    # soemthing is really wrong - likely broken input with comma in the end
+    if (!$dn) {
+        $self->_log_and_die('Empty dn part in splitDN');
+    }
 
     # Split last remainder at =
     my @last = split ("=", $dn);
@@ -489,22 +566,70 @@ the request is ignored.
 
 =back
 
-
 =head2 autocreation of missing nodes
 
-If you want the connector to autocreate missing nodes, you need to provide the
-ldap properties of each node-class.
+If you want the connector to autocreate missing nodes (on a set operation),
+you need to provide the ldap properties for each rdn item.
+
+    schema:
+        cn:
+            objectclass: inetOrgPerson pkiUser
+            values:
+                sn: copy:self
+                ou: IT Department
+
+You can specify multiple objectclass entries seperated by space or as list.
+
+The objects attribute matching the RDN component is always set, you can
+use the special word C<copy:self> to copy the attribute value within the
+object. The values section is optional.
+
+If schema for I<CN> is given and the filter does not find a result, the
+node name is constructed from using the first path argument as CN and the
+base dn of the connector as path. All defined attribute values that have
+been passed are also added to the object on creation. Auto-Creation is not
+applied if action is set to delete.
+
+For creating the actual leaf node, there are additional options by adding
+the node I<create> to the configuration.
+
+=head3 set another component class for the node
 
     create:
-        objectclass: inetOrgPerson pkiUser
-        values:
-            sn: copy:self
-            ou: IT Department
+        rdnkey: emailAddress
 
-You can specify multiple objectclass entries seperated by space.
+Will use the given class name with the first argument as value plus the
+base dn to build the node DN. The old syntax with rdnkey + value pattern
+(which was broken anyway) is no longer supported, use the full rdn template
+as given below if required.
 
-The objects attribute is always set, you can use the special word C<copy:self>
-to copy the attribute value within the object. The values section is optional.
+=head3 set another path to the node
+
+    create:
+        basedn: ou=Webservers,ou=Servers,dc=company,dc=org
+
+=head3 use templating to generate the local component
+
+The given base dn will be prefixed with the component assigned to the
+leaf, e.g. cn=www.example.org,ou=Webservers,ou=Servers,dc=company,dc=org
+
+=head3 use templating to generate the local component
+
+    create:
+        rdn: emailAddress=[% ARGS.0 %]
+
+Same result as the first example, the path arguments are all in ARGS,
+additional data (depends on the subclass implementation) are made
+available in the DATA key.
+
+=head3 use temlating for full DN
+
+    create:
+        dn: emailAddress=[% ARGS.0 %],ou=People,dc=company,dc=org
+
+Same as setting basedn and rdn, components of the path are created if
+there is a matching schema definition. Limitation: this module does not
+support different value patterns for the same class name.
 
 =head2 Full example using Connector::Multi
 

@@ -70,9 +70,13 @@ ACCESSORS
        $addr = $partinfo->baseaddr_nvmctrl
        $addr = $partinfo->baseaddr_fuse
        $addr = $partinfo->baseaddr_flash
+       $addr = $partinfo->baseaddr_eeprom
        $addr = $partinfo->baseaddr_sigrow
     
-       $bytes = $partinfo->pagesize
+       $bytes = $partinfo->pagesize_flash
+       $bytes = $partinfo->pagesize_eeprom
+       $bytes = $partinfo->size_flash
+       $bytes = $partinfo->size_eeprom
     
        $fusenames = $partinfo->fusenames
 
@@ -137,6 +141,18 @@ METHODS
 
     After this, the chip will be unlocked.
 
+    Takes an optional named argument:
+
+    no_reset => BOOL
+
+      If true, does not issue a system reset request after loading the key.
+      This allows you to load multiple keys at once before sending the
+      reset, which may be required e.g. to recover from a bad SYSCFG0 fuse
+      setting.
+
+         await $updi->erase_chip( no_reset => 1 );
+         await $updi->enable_nvmprog;
+
  enable_nvmprog
 
        $updi->enable_nvmprog->get
@@ -145,9 +161,11 @@ METHODS
 
  write_nvm_page
 
-       $updi->write_nvm_page( $addr, $data )->get
+       $updi->write_nvm_page( $addr, $data, $wordsize )->get
 
-    Writes a single page into NVM flash using the NVM controller.
+    Writes a single page into NVM controller in 8- or 16-bit word
+    transfers. $addr is within the data address space. $wordsize must be
+    either 8 or 16.
 
  write_fuse
 

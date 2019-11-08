@@ -150,21 +150,32 @@ sub _route_call {
                 if ( $schema eq 'connector' ) {
                     $conn = $self->get_connector($target);
                     if ( ! $conn ) {
-                        die "Connector::Multi: error creating connector for '$target': $@";
+                        $self->_log_and_die("Connector::Multi: error creating connector for '$target': $@");
                     }
                     $self->log()->debug("Dispatch to connector at $target");
                     # Push path on top of the argument array
                     unshift @args, \@suffix;
                     return $conn->$call( @args );
                 } else {
-                    die "Connector::Multi: unsupported schema for symlink: $schema";
+                    $self->_log_and_die("Connector::Multi: unsupported schema for symlink: $schema");
                 }
             } else {
                 # redirect
-                @prefix = ();
                 my @target = split(/[$delim]/, $meta->{VALUE});
+                # relative path - shift one item from prefix for each dot
+                if ($target[0] eq '') {
+                    $self->log()->debug("Relative redirect at prefix " . join ".", @prefix);
+                    while ($target[0] eq '') {
+                        $self->_log_and_die("Relative path length exceeds prefix length") unless (scalar @prefix);
+                        pop @prefix;
+                        shift @target;
+                    }
+                } else {
+                    @prefix = ();
+                    $self->log()->debug("Plain redirect to " . join ".", @suffix);
+                }
                 unshift @suffix, @target;
-                $self->log()->debug("Plain redirect to " . join ".", @suffix);
+
             }
         } else {
             $ptr_cache->{$path} = 1;
@@ -198,8 +209,10 @@ sub get_connector {
         # use the 'root' connector instance
         my @path = $self->_build_path_with_prefix( $target );
         my $class = $self->get( [ @path, 'class' ] );
-        if (!$class) { die "Nested connector without class ($target)"; }
-        eval "use $class;1" or die "Error use'ing $class: $@";
+        if (!$class) {
+            $self->_log_and_die("Nested connector without class ($target)");
+        }
+        eval "use $class;1" or $self->_log_and_die("Error use'ing $class: $@");
         $self->log()->debug("Initialize connector $class at $target");
         $conn = $class->new( { CONNECTOR => $self, TARGET => $target } );
         $self->_config()->{$target} = $conn;
@@ -255,8 +268,8 @@ Our primary configuration source for both tokens and owners would contain
 the following entries:
 
   smartcards:
-    @tokens: connector:connectors.ldap-query-token
-    @owners: connector:connectors.ldap-query-owners
+    tokens@: connector:connectors.ldap-query-token
+    owners@: connector:connectors.ldap-query-owners
 
 With the symlink now in the key, Multi must walk down each level itself and
 handle the symlink. When 'smartcards.tokens' is reached, it reads the contents
@@ -265,49 +278,46 @@ connector configuration is in the 'connectors' namespace of our primary data sou
 
   connectors:
     ldap-query-tokens:
-        class: Connector::Proxy::Net::LDAP
-        basedn: ou=smartcards,dc=example,dc=org
-        server:
-            uri: ldaps://example.org
-            bind_dn: uid=user,ou=Directory Users,dc=example,dc=org
-            password: secret
+      class: Connector::Proxy::Net::LDAP
+      basedn: ou=smartcards,dc=example,dc=org
+      uri: ldaps://example.org
+      bind_dn: uid=user,ou=Directory Users,dc=example,dc=org
+      password: secret
 
   connectors:
     ldap-query-owners:
-        class: Connector::Proxy::Net::LDAP
-        basedn: ou=people,dc=example,dc=org
-        server:
-            uri: ldaps://example.org
-            bind_dn: uid=user,ou=Directory Users,dc=example,dc=org
-            password: secret
+      class: Connector::Proxy::Net::LDAP
+      basedn: ou=people,dc=example,dc=org
+      uri: ldaps://example.org
+      bind_dn: uid=user,ou=Directory Users,dc=example,dc=org
+      password: secret
 
-B<NOTE: The following is not implemented yet.>
+*Inline Redirects*
 
-Having two queries with duplicate server information could also be simplified.
-In this case, we define that the server information is found when the
-connector accesses 'connectors.ldap-query-token.server.<param>'. The
-resulting LDAP configuration would then be:
+It is also possible to reference other parts of the configuration using a
+kind of redirect/symlink.
 
-  connectors:
-    ldap-query-token:
-        class: Connector::Proxy::Net::LDAP
-        basedn: ou=smartcards,dc=example,dc=org
-        @ldap-server: redirect:connectors.ldap-example-org
-    ldap-query-owners:
-        class: Connector::Proxy::Net::LDAP
-        basedn: ou=people,dc=example,dc=org
-        @ldap-server: redirect:connectors.ldap-example-org
-    ldap-example-org:
-        uri: ldaps://example.org
-        bind_dn: uid=user,ou=Directory Users,dc=example,dc=org
-        password: secret
+    node1:
+       node2:
+          key@: shared.key1
 
+    shared:
+       key1: secret
 
-The alias 'connectors.ldap-example-org' contains the definition needed by the LDAP
-connector. In this case, we don't need a special connector object.
-Instead, all we need is a simple redirect that allows two different
-entries (in this case, the other two connectors) to share a common
-entry in the tree.
+The '@' sign indicates a symlink similar to the example given above but
+there is no additional keyword in front of the value and the remainder of
+the line is treated as an absolute path to read the value from.
+
+If the path value starts with the path separator (default 'dot'), then the
+path is treated as a relative link and each dot means "one level up".
+
+    node1:
+       node2:
+          key2@: ..node2a.key
+
+       node2a:
+          key1@: .key
+          key: secret
 
 =head1 SYNOPSIS
 

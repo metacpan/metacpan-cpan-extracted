@@ -7,12 +7,9 @@ Changes
 cpanfile
 lib/MIME/Disclaimer.pm
 lib/MIME/Signature.pm
-Makefile
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP			lists files not required in the distribution
-MYMETA.json
-MYMETA.yml
 README
 t/00-load.t
 t/10-append-signature.t

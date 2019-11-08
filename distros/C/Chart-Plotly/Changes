@@ -1,3 +1,6 @@
+0.030 2019-11-08 17:00:00+0000  
+  - Update to plotly.js 1.51.1
+  - Add new trace type: image
 0.029 2019-10-09 19:00:00+0000  
   - Update to plotly.js 1.50.0
   - Add new trace type: treemap

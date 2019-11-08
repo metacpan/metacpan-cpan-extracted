@@ -12,9 +12,6 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Devel-PatchPerl
-no_index:
-  package:
-    - Errno
 requires:
   File::pushd: '1.00'
   IO::File: '0'
@@ -24,6 +21,6 @@ requires:
 resources:
   homepage: https://github.com/bingos/devel-patchperl
   repository: https://github.com/bingos/devel-patchperl.git
-version: '1.68'
+version: '1.70'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

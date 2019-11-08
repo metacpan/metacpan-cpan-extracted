@@ -22,11 +22,11 @@ Net::DAVTalk - Interface to talk to DAV servers
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 
 =head1 SYNOPSIS
@@ -116,6 +116,33 @@ sub new {
   $Self->ns(D => 'DAV:');
 
   return $Self;
+}
+
+=head2 my $ua = $Self->ua();
+=head2 $Self->ua($setua);
+
+Get or set the useragent (HTTP::Tiny or compatible) that will be used to make
+the requests:
+
+e.g.
+
+    my $ua = $Self->ua();
+
+    $Self->ua(HTTP::Tiny->new(agent => "MyAgent/1.0", timeout => 5));
+
+=cut
+
+sub ua {
+  my $Self = shift;
+  if (@_) {
+    $Self->{ua} = shift;
+  }
+  else {
+    $Self->{ua} ||= HTTP::Tiny->new(
+      agent => "Net-DAVTalk/0.01",
+    );
+  }
+  return $Self->{ua};
 }
 
 =head2 $Self->SetURL($url)
@@ -233,9 +260,7 @@ sub Request {
   $Content = '' unless defined $Content;
   my $Bytes = encode_utf8($Content);
 
-  $Self->{ua} ||= HTTP::Tiny->new(
-    agent => "Net-DAVTalk/0.01",
-  );
+  my $ua = $Self->ua();
 
   $Headers{'Content-Type'} //= 'application/xml; charset=utf-8';
 
@@ -251,20 +276,12 @@ sub Request {
 
   my $URI = $Self->request_url($Path);
 
-  my $Response;
+  my $Response = $ua->request($Method, $URI, {
+    headers => \%Headers,
+    content => $Bytes,
+  });
 
-  my $OldAlarm = alarm 60;
-  eval {
-    local $SIG{ALRM} = sub { die 'timed out' };
-
-    $Response = $Self->{ua}->request($Method, $URI, {
-      headers => \%Headers,
-      content => $Bytes,
-    });
-  };
-  alarm $OldAlarm;
-
-  if ($@ and $@ =~ /timed out/) {
+  if ($Response->{status} == '599' and $Response->content =~ m/timed out/i) {
     confess "Error with $Method for $URI (504, Gateway Timeout)";
   }
 
@@ -274,19 +291,14 @@ sub Request {
     if ($ENV{DEBUGDAV}) {
       warn "******** REDIRECT ($count) $Response->{status} to $location\n";
     }
-    $OldAlarm = alarm 60;
-    eval {
-      local $SIG{ALRM} = sub { die 'timed out' };
 
-      $Response = $Self->{ua}->request($Method, $location, {
-        headers => \%Headers,
-        content => $Bytes,
-      });
-    };
-    alarm $OldAlarm;
+    $Response = $ua->request($Method, $location, {
+      headers => \%Headers,
+      content => $Bytes,
+    });
 
-    if ($@ and $@ =~ /timed out/) {
-      confess "Error with $Method for $Response->{headers}{location} (504, Gateway Timeout)";
+    if ($Response->{status} == '599' and $Response->content =~ m/timed out/i) {
+      confess "Error with $Method for $location (504, Gateway Timeout)";
     }
   }
 
@@ -302,8 +314,7 @@ sub Request {
 
   if ($Method eq 'REPORT' && $Response->{status} == 403) {
     # maybe invalid sync token, need to return that fact
-    my $Encoded = Encode::decode_utf8($Response->{content});
-    my $Xml = xmlToHash($Encoded);
+    my $Xml = xmlToHash($ResponseContent);
     if (exists $Xml->{"{DAV:}valid-sync-token"}) {
       return {
         error => "valid-sync-token",
@@ -325,9 +336,7 @@ sub Request {
   # }}}
 
   # parse XML response {{{
-  my $Encoded = Encode::decode_utf8($ResponseContent);
-
-  my $Xml = xmlToHash($Encoded);
+  my $Xml = xmlToHash($ResponseContent);
 
   # Normalise XML
 

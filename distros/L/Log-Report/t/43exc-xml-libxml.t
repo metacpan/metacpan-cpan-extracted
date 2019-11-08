@@ -28,13 +28,20 @@ isa_ok $error, 'XML::LibXML::Error';
 #warn Dumper exception_decode($error);
 my @dec = exception_decode($error);
 my $msg = pop @dec;
+
+# error code changed from libxml2 2.9.9 to 2.9.10
+my $rc = delete $dec[1]{errno};
+$dec[1]{errno} = 'RC';
+cmp_ok $rc, '>', 13000, 'error code';
+
 is_deeply \@dec,
   , [ 'caught XML::LibXML::Error'
-    , { location => [ 'libxml', '', '1', 'parser' ], errno => 13077 }
+    , { location => [ 'libxml', '', '1', 'parser' ], errno => 'RC' }
     , 'ERROR'
     ], 'error 1';
 
 # the message may vary over libxml2 versions
+$msg =~ s/\r?\n\s*/ /g;
 like $msg, qr/bad\-xml/, $msg;
 
 done_testing;

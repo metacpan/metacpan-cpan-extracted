@@ -1,10 +1,10 @@
 {
-   "abstract" : "appends signature to mail messages",
+   "abstract" : "sometimes you need to un- em'.",
    "author" : [
-      "Martin H. Sluka <fany@cpan.org>"
+      "Evan Carroll <me@evancarroll.com>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "MIME-Signature",
+   "name" : "unconstant",
    "no_index" : {
       "directory" : [
          "t",
@@ -32,12 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Method::Modifiers" : "0",
-            "HTML::Entities" : "0",
-            "HTML::Parser" : "0",
-            "MIME::Parser" : "0",
-            "Path::Tiny" : "0",
-            "perl" : "5.014"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -48,11 +43,12 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/fany/MIME-Signature",
       "repository" : {
-         "url" : "https://github.com/fany/MIME-Signature.git"
+         "type" : "git",
+         "url" : "https://github.com/EvanCarroll/unconstant.git",
+         "web" : "https://github.com/EvanCarroll/unconstant"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -440,7 +440,7 @@ METHODS
     Otherwise, you my examine the "error" attribute and "error_description"
     attribute for more information about the error.
 
- How to build a send message object
+How to build a send message object
 
     See the LINE Developers API reference about Message objects
     <https://developers.line.biz/en/reference/messaging-api/#message-objects>
@@ -458,7 +458,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Text type
+ Text type
 
     Build a text type object.
 
@@ -468,7 +468,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Image type
+ Image type
 
     Build an image type object.
 
@@ -479,7 +479,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Video type
+ Video type
 
     Build a video type object.
 
@@ -490,7 +490,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Audio type
+ Audio type
 
     Build an audio type object.
 
@@ -501,7 +501,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Location type
+ Location type
 
     Build a location type object.
 
@@ -514,7 +514,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Sticker type
+ Sticker type
 
     Build a sticker type object.
 
@@ -525,7 +525,7 @@ METHODS
         );
         $bot->reply_message($reply_token, $messages->build);
 
-  Imagemap type
+ Imagemap type
 
     To build a message of imagemap type, you may use a helper module.
 
@@ -575,12 +575,12 @@ METHODS
     For more detail about Imagemap message, see:
     https://developers.line.biz/en/reference/messaging-api/#imagemap-message
 
-  Template type
+ Template type
 
     Build a template type object. You can use a helper module for the
     template type.
 
-   Buttons type
+  Buttons type
 
         my $buttons = LINE::Bot::API::Builder::TemplateMessage->new_buttons(
             alt_text  => 'this is a buttons template',
@@ -606,7 +606,7 @@ METHODS
         )->add_template($buttons->build);
         $bot->reply_message($reply_token, $messages->build);
 
-   Confirm type
+  Confirm type
 
         my $confirm = LINE::Bot::API::Builder::TemplateMessage->new_confirm(
             alt_text => 'this is a confirm template',
@@ -627,7 +627,7 @@ METHODS
         )->add_template($confirm->build);
         $bot->reply_message($reply_token, $messages->build);
 
-   Carousel type
+  Carousel type
 
         my $carousel = LINE::Bot::API::Builder::TemplateMessage->new_carousel(
             alt_text => 'this is a carousel template',
@@ -655,7 +655,7 @@ METHODS
         )->add_template($carousel->build);
         $bot->reply_message($reply_token, $messages->build);
 
-   Image Carousel type
+  Image Carousel type
 
         my $carousel = LINE::Bot::API::Builder::TemplateMessage->new_image_carousel(
             alt_text => 'this is a image carousel template',

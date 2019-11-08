@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME          => 'MIME::Signature',
     AUTHOR        => q{Martin H. Sluka <fany@cpan.org>},
-    VERSION       => '0.21',
+    VERSION_FROM  => 'lib/MIME/Signature.pm',
     ABSTRACT_FROM => 'lib/MIME/Signature.pm',
     EXE_FILES     => [
         qw{

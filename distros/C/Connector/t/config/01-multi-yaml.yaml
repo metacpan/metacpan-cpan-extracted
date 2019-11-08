@@ -1,8 +1,19 @@
 parent:
    node:
       conn1@: connector:connectors.conn1
-  
+
 connectors:
   conn1:
     class: Connector::Builtin::Static
     LOCATION: Test
+
+redirect:
+  node:
+    absolute@: values.key
+    relative@: ...values.key
+    oneup@: .sibling
+    sibling: b
+    exceed@: ....values.key
+
+values:
+  key: Redirect

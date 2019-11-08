@@ -1,7 +1,9 @@
 NAME
+
     XML::Char - validate characters for XML
 
 SYNOPSIS
+
         use XML::Char;
         if (not XML::Char->valid("bell ".chr(7))) {
             die 'no way to store this string directly to XML';
@@ -14,7 +16,8 @@ SYNOPSIS
         }
 
 DESCRIPTION
-    For me it was kind of a surprised to learn that `char(0)' is a valid
+
+    For me it was kind of a surprised to learn that char(0) is a valid
     UTF-8 character. All of the 0-0x7F are...
 
         Emo: well it's not because that they are valid utf-8 characters that you have to expect XML to accept them
@@ -27,21 +30,35 @@ DESCRIPTION
         [2]         Char       ::=          #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
         /* any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. */
 
-    This module validates if a given string meets this criteria. In addition
-    the string has to be a Perl UTF-8 string (`is_utf8_string()' - see
-    perlapi).
+    This module validates if a given string meets this criteria. In
+    addition the string has to be a Perl UTF-8 string (is_utf8_string() -
+    see "Unicode-Support" in perlapi).
 
-  valid($value)
-    Returns true or false if `$value' consists of valid UTF-8 XML
-    characters.
+ valid($value)
+
+    Returns true or false if $value consists of valid UTF-8 XML characters.
+
+LINKS
+
+    How can I strip invalid XML characters from strings in Perl?
+    <https://stackoverflow.com/questions/1016910/how-can-i-strip-invalid-xm
+    l-characters-from-strings-in-perl>
+
+    Extensible Markup Language (XML) 1.0
+    <http://www.w3.org/TR/REC-xml/#charsets>
+
+    Extensible Markup Language (XML) 1.1
+    <https://www.w3.org/TR/xml11/#charsets>
 
 AUTHOR
+
     Jozef Kutej
 
     Aristotle Pagaltzis - completely rewrote the initial Char.XS to handle
     the SvUTF8 flag
 
 COPYRIGHT
+
     Copyright 2009 Jozef Kutej, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it

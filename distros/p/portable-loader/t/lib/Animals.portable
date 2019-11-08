@@ -1,6 +1,6 @@
-version = "1.2"
-authority = "cpan:TOBYINK"
-toolkit = "Moo"
+version    = "1.2"
+authority  = "cpan:TOBYINK"
+toolkit    = "Moo"
 
 [role:Livestock]
 
@@ -12,17 +12,17 @@ milk = {{{
 }}}
 
 [class:Animal.has]
-name = { required = true }
-colour = { required = false }
-age = { type = "PositiveOrZeroInt" }
-status = { enum = ["alive", "dead"], default = "alive" }
+name       = { required = true }
+colour     = { required = false }
+age        = { type = "PositiveOrZeroInt" }
+status     = { enum = ["alive", "dead"], default = "alive" }
 
 [class:Panda]
-extends = "Animal"
+extends    = "Animal"
 
 [class:Cat]
-extends = "Animal"
-with = "Pet"
+extends    = "Animal"
+with       = "Pet"
 
 [class:Cat.can]
 mew = {{{
@@ -30,14 +30,14 @@ mew = {{{
 }}}
 
 [class:Dog]
-extends = "Animal"
-with = "Pet"
+extends   = "Animal"
+with       = "Pet"
 
 [class:Cow]
-extends = "Animal"
-with = ["Livestock", "Milkable"]
+extends    = "Animal"
+with       = ["Livestock", "Milkable"]
 
 [class:Pig]
-extends = "Animal"
-with = ["Livestock"]
+extends    = "Animal"
+with       = ["Livestock"]
 

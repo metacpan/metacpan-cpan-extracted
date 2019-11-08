@@ -1,5 +1,10 @@
 Revision history for Net-DAVTalk
 
+0.17    Fri  8 Nov 17:28 2019
+  - don't double-decode XML (thanks tadzik) PR#1
+  - provide the 'ua()' method to get/set the user agent after creation
+  - use the UA's own timeout support rather than duplicating it
+
 0.16    Fri May 10 10:41 2019
   - add GetPropsArray API call to get multi-value properties
 

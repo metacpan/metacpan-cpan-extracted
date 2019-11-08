@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.021';
+our $VERSION = '3.022';
 
 
 use 5.006;
@@ -1198,7 +1198,7 @@ sub fa_login
       $errr=~s/^\s*/\n       /s;
       print $errr;
    }
-   &Net::FullAuto::FA_Core::cleanup(1,$returned);
+   &Net::FullAuto::FA_Core::cleanup(0,$returned);
 
 }
 

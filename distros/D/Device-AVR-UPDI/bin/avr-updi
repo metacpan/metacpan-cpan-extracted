@@ -1,0 +1,453 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::AVR::UPDI;
+use Getopt::Long;
+use List::Util qw( first );
+
+=head1 NAME
+
+F<avr-updi> - communicate with an F<AVR> microcontroller over F<UPDI>
+
+=head1 SYNOPSIS
+
+   $ avr-updi [--port PORT] [--part PART] COMMAND ARGS...
+
+=head1 DESCRIPTION
+
+This program contains a number of sub-commands for interacting with an F<AVR>
+microcontroller using a F<UPDI> interface.
+
+=head1 COMMON OPTIONS
+
+=head2 --port, -P DEVICE
+
+Optional. Provides the USB device where the UPDI adapter is connected. If
+absent a default of F</dev/ttyUSB0> will apply.
+
+=head2 --part, -p PART
+
+Required. Gives the name of the ATmega or ATtiny chip that is expected. Parts
+may be specified in the following ways:
+
+   ATmega4809
+   atmega4809
+   m4809
+
+   ATtiny814
+   attiny814
+   t814
+
+Specifically, these are the same forms as recognised by F<avr-gcc>'s C<-mmcu>
+option and F<avrdude>'s C<-p> option, for convenience in Makefiles and build
+scripts.
+
+=head2 --erase, -e
+
+Send the CHIPERASE key as well as the NVMPROG key when enabling programming
+for the C<write-fuses> operation. Normally this flag is not required when
+writing fuses to a newly-programmed chip, but may be necessary to recover from
+a bad checksum or bad fuse value.
+
+=head2 --binary
+
+Files read from or written to will be in raw binary format, instead of Intel
+hex.
+
+=cut
+
+STDOUT->autoflush;
+
+GetOptions(
+   'port|P=s' => \( my $PORT = "/dev/ttyUSB0" ),
+   'part|p=s' => \( my $PART ),
+
+   'erase|e' => \( my $ERASE ),
+
+   'binary'   => \( my $BINARY ),
+) or exit 1;
+
+my $updi;
+sub make_updi
+{
+   $updi = Device::AVR::UPDI->new(
+      dev => $PORT,
+      part => $PART,
+   );
+
+   $updi->init_link->get;
+}
+
+sub check_signature
+{
+   unless( $updi->read_asi_sys_status->get & (1<<3) ) {
+      $updi->enable_nvmprog->get;
+   }
+
+   my $sig = $updi->read_signature->get;
+   if( $updi->partinfo->signature ne $sig ) {
+      printf STDERR "Signature %v02X does not match expected %v02X\n",
+         $sig, $updi->partinfo->signature;
+      exit 1;
+   }
+}
+
+sub open_input_file
+{
+   if( $BINARY ) {
+      return main::Fileformat::Binary->open_in( shift @ARGV );
+   }
+   else {
+      return main::Fileformat::IntelHex->open_in( shift @ARGV );
+   }
+}
+
+sub open_output_file
+{
+   if( $BINARY ) {
+      return main::Fileformat::Binary->open_out( shift @ARGV );
+   }
+   else {
+      return main::Fileformat::IntelHex->open_out( shift @ARGV );
+   }
+}
+
+sub reset_chip
+{
+   $updi->request_reset( 1 )->get;
+   $updi->request_reset( 0 )->get;
+}
+
+my $OPERATION = shift @ARGV;
+$OPERATION =~ s/-/_/g;
+if( my $code = main->can( "run_$OPERATION" ) ) {
+   $code->();
+}
+else {
+   die "Unrecognised operation '$OPERATION'\n";
+}
+
+=head1 SUBCOMMANDS
+
+=cut
+
+sub _generic_read
+{
+   my ( $baseaddr, $pagesize, $size ) = @_;
+
+   my $data = "";
+   my $addr = 0;
+   while( $addr < $size ) {
+      $data .= $updi->ld( $baseaddr + $addr, $pagesize )->get;
+
+      $addr += $pagesize;
+      printf "\rRead %d (%.2f%%)", $addr, 100 * $addr / $size;
+   }
+   print "\n";
+   print "Done\n";
+
+   return $data;
+}
+
+sub _generic_write
+{
+   my ( $data, $baseaddr, $pagesize, $size, $wordsize ) = @_;
+
+   die "Too much data to write in $size bytes\n"
+      if $size < length $data;
+
+   $size = length $data;
+
+   printf "Need to write %d bytes\n", $size;
+
+   my $addr = 0;
+   while( $addr < $size ) {
+      my $chunk = substr $data, $addr, $pagesize;
+
+      $updi->write_nvm_page( $baseaddr + $addr, $chunk, $wordsize )->get;
+
+      $addr += length $chunk;
+      printf "\rWritten %d (%.2f%%)", $addr, 100 * $addr / $size;
+   }
+   print "\n";
+
+   # Verify
+   $addr = 0;
+   while( $addr < $size ) {
+      my $chunk = substr $data, $addr, $pagesize;
+
+      my $readback = $updi->ld( $baseaddr + $addr, length $chunk )->get;
+      if( $readback ne $chunk ) {
+         printf STDERR "Read: %v02X\n", $readback;
+         printf STDERR "Exp : %v02X\n", $chunk;
+         die "Verify failed at addr=$addr\n";
+      }
+
+      $addr += length $chunk;
+      printf "\rVerified %d (%.2f%%)", $addr, 100 * $addr / $size;
+   }
+   print "\n";
+
+   reset_chip;
+
+   print "Done\n";
+}
+
+=head2 reset
+
+Sends a reset request.
+
+   $ avr-updi reset
+
+Note that this command does not need the C<--part> to be specified.
+
+=cut
+
+sub run_reset
+{
+   $PART //= "ATtiny814"; # part doesn't matter just for reset
+   make_updi;
+
+   print "Issuing Reset over UPDI\n";
+   reset_chip;
+}
+
+=head2 read-flash
+
+Reads from the flash portion of non-volatile memory ("NVM").
+
+   $ avr-updi read-flash -p t814 flash-save.hex
+
+=cut
+
+sub run_read_flash
+{
+   make_updi;
+   check_signature;
+
+   my $data = _generic_read(
+      $updi->partinfo->baseaddr_flash, $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
+
+   open_output_file->output( $data );
+}
+
+=head2 write-flash
+
+Writes to the flash portion of non-volatile memory ("NVM").
+
+   $ avr-updi write-flash -p t814 firmware.hex
+
+=cut
+
+sub run_write_flash
+{
+   make_updi;
+
+   $updi->erase_chip( no_reset => 1 )->get;
+
+   check_signature; # TODO: Check if enable_nvmprog logic is correct
+
+   my $data = open_input_file->input;
+
+   _generic_write( $data,
+      $updi->partinfo->baseaddr_flash, $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash,
+      16 );
+}
+
+=head2 read-eeprom
+
+Reads from the EEPROM portion of non-volatile memory ("NVM").
+
+   $ avr-updi read-eeprom -p t814 eeprom-save.hex
+
+=cut
+
+sub run_read_eeprom
+{
+   make_updi;
+   check_signature;
+
+   my $data = _generic_read(
+      $updi->partinfo->baseaddr_eeprom, $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
+
+   open_output_file->output( $data );
+}
+
+=head2 write-eeprom
+
+Writes to the EEPROM portion of non-volatile memory ("NVM").
+
+   $ avr-updi write-eeprom -p t814 data.hex
+
+=cut
+
+sub run_write_eeprom
+{
+   make_updi;
+
+   check_signature;
+
+   my $data = open_input_file->input;
+
+   _generic_write( $data,
+      $updi->partinfo->baseaddr_eeprom, $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom,
+      8 );
+}
+
+=head2 read-fuses
+
+Reads fuse values.
+
+   $ avr-updi read-fuses -p t814
+   WDTCFG    : 00
+   BODCFG    : 00
+   OSCCFG    : 02
+   TCD0CFG   : 00
+   SYSCFG0   : F6
+   SYSCFG1   : 07
+   APPEND    : 00
+   BOOTEND   : 00
+
+=cut
+
+sub run_read_fuses
+{
+   make_updi;
+   check_signature;
+
+   my @FUSES = @{ $updi->partinfo->fusenames };
+
+   foreach my $idx ( 0 .. $#FUSES ) {
+      my $fuse = $FUSES[$idx];
+      next if !defined $fuse;
+
+      my $value = $updi->read_fuse( $idx )->get;
+      printf "%-10s: %02X\n", $fuse, $value;
+   }
+
+   reset_chip;  # is this necessary?
+}
+
+=head2 write-fuses
+
+Writes fuse values.
+
+   $ avr-updi write-fuses -p t814 BODCFG=02
+
+=cut
+
+sub run_write_fuses
+{
+   make_updi;
+
+   if( $ERASE ) {
+      print "Erasing chip...\n";
+      $updi->erase_chip( no_reset => 1 )->get;
+   }
+
+   check_signature;
+
+   my @FUSES = @{ $updi->partinfo->fusenames };
+
+   foreach( @ARGV ) {
+      my ( $name, $value ) = split m/=/, $_;
+      my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $name } 0 .. $#FUSES or
+         die "Unrecognised fuse";
+
+      $value = hex $value if $value =~ m/^0x/;
+      printf "Setting %s to %x\n", $name, $value;
+
+      $updi->write_fuse( $idx, $value )->get;
+   }
+
+   reset_chip;
+}
+
+# IO formats
+package main::Fileformat {
+   use base 'IO::Handle';
+   sub open_out {
+      my $class = shift;
+      my $fh;
+      if( $_[0] eq "-" ) {
+         $fh = IO::Handle->new_from_fd( STDOUT->fileno, "w" );
+      }
+      else {
+         open $fh, ">", $_[0] or die "Cannot write $_[0] - $!\n";
+      }
+      return bless $fh, $class;
+   }
+   sub open_in {
+      my $class = shift;
+      my $fh;
+      if( $_[0] eq "-" ) {
+         $fh = IO::Handle->new_from_fd( STDIN->fileno, "r" );
+      }
+      else {
+         open $fh, "<", $_[0] or die "Cannot read $_[0] - $!\n";
+      }
+      return bless $fh, $class;
+   }
+}
+
+package main::Fileformat::Binary {
+   use base 'main::Fileformat';
+   sub output {
+      my $self = shift;
+      my ( $bytes ) = @_;
+      $self->print( $bytes );
+   }
+   sub input {
+      my $self = shift;
+      local $/;
+      return scalar <$self>;
+   }
+}
+
+package main::Fileformat::IntelHex {
+   use base 'main::Fileformat';
+   sub output {
+      my $self = shift;
+      my ( $bytes ) = @_;
+      my $addr = 0;
+      foreach my $chunk ( $bytes =~ m/(.{1,16})/gs ) {
+         my $clen = length $chunk;
+         my $cksum = $clen + ( $addr & 0xff ) + ( $addr >> 8 );
+         $self->printf( ":%02X%04X%02X", $clen, $addr, 0 );
+         foreach my $byte ( split //, $chunk ) {
+            $byte = ord $byte;
+            $cksum += $byte;
+            $self->printf( "%02X", $byte );
+         }
+         $self->printf( "%02X\n", ( -$cksum ) & 0xff );
+         $addr += $clen;
+      }
+      $self->print( ":00000001FF\n" );
+   }
+   sub input {
+      my $self = shift;
+      my $bytes = "";
+      while( my $line = <$self> ) {
+         $line =~ s/\r?\n$//; # chomp doesn't do CRLF on Linux
+         next unless my ( $clen, $addr, $type, $data, $cksum ) =
+            $line =~ m/^:([0-9a-f]{2})([0-9a-f]{4})([0-9a-f]{2})([0-9a-f]*)([0-9a-f]{2})$/i;
+         # TODO: check checksum
+         $type = hex $type;
+         last if $type == 1; # EOF
+         next if $type != 0; # unrecognised record
+         warn "Bad record length on line $.\n" and next if
+            length $data != 2 * hex $clen;
+         $data = pack "H*", $data;
+         substr( $bytes, hex $addr, length $data ) = $data;
+      }
+      return $bytes;
+   }
+}
+
+__END__
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

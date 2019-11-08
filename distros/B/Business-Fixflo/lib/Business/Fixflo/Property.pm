@@ -34,6 +34,7 @@ extends 'Business::Fixflo::Resource';
     Address
     Addresses
     Issues
+    IsDeleted
     UpdateDate
 
 =cut
@@ -50,6 +51,7 @@ has [ qw/
     PropertyAddressId
     KeyReference
     UpdateDate
+    IsDeleted
 / ] => (
     is => 'rw',
 );

@@ -5,32 +5,34 @@ use warnings;
 package portable::loader::TOML;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use portable::lib;
 
 our $decoder;
 
-sub load {
+sub init {
 	my $me = shift;
-	my ($collection) = @_;
-	my ($filename) = grep defined,
-		portable::lib->search_inc("$collection.portable.toml"),
-		portable::lib->search_inc("$collection.portable");
-	if ($filename) {
-		require JSON::Eval;
-		$decoder ||= JSON::Eval->new($me->_get_parser);
-		my $tomltext = do {
-			open my $fh, '<', $filename
-				or die "Could not open $filename: $!";
-			local $/;
-			<$fh>;
-		};
-		$me->_munge_toml(\$tomltext);
-		my $decoded = $decoder->decode($tomltext);
-		return ($filename => $decoded);
-	}
+	my ($loader) = @_;
+	$loader->register_extension('portable.toml');
+	$loader->register_extension('portable');
 	return;
+}
+
+sub parse {
+	my $me = shift;
+	my ($filename) = @_;
+	require JSON::Eval;
+	$decoder ||= JSON::Eval->new($me->_get_parser);
+	my $tomltext = do {
+		open my $fh, '<', $filename
+			or die "Could not open $filename: $!";
+		local $/;
+		<$fh>;
+	};
+	$me->_munge_toml(\$tomltext);
+	my $decoded = $decoder->decode($tomltext);
+	return ($filename => $decoded);
 }
 
 sub _munge_toml {

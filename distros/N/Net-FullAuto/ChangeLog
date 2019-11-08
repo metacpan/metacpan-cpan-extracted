@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2019-11-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000478 released
+
+        * Changed output format of prompt().
+	 
+	* Initialized hostlabel with null.
+
+
 2019-10-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000477 released

@@ -32,12 +32,12 @@ my $meta = {
                           test      => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "portable::alias"        => { file => "lib/portable/alias.pm", version => 0.001 },
-                          "portable::lib"          => { file => "lib/portable/lib.pm", version => 0.001 },
-                          "portable::loader"       => { file => "lib/portable/loader.pm", version => 0.001 },
-                          "portable::loader::JSON" => { file => "lib/portable/loader/JSON.pm", version => 0.001 },
-                          "portable::loader::Perl" => { file => "lib/portable/loader/Perl.pm", version => 0.001 },
-                          "portable::loader::TOML" => { file => "lib/portable/loader/TOML.pm", version => 0.001 },
+                          "portable::alias"        => { file => "lib/portable/alias.pm", version => 0.002 },
+                          "portable::lib"          => { file => "lib/portable/lib.pm", version => 0.002 },
+                          "portable::loader"       => { file => "lib/portable/loader.pm", version => 0.002 },
+                          "portable::loader::JSON" => { file => "lib/portable/loader/JSON.pm", version => 0.002 },
+                          "portable::loader::Perl" => { file => "lib/portable/loader/Perl.pm", version => 0.002 },
+                          "portable::loader::TOML" => { file => "lib/portable/loader/TOML.pm", version => 0.002 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,7 +53,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/portable-loader/project",
                         },
-  "version"          => 0.001,
+  "version"          => 0.002,
   "x_static_install" => 1,
 };
 

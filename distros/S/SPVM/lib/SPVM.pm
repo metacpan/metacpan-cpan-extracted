@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0442';
+our $VERSION = '0.0443';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -70,14 +70,14 @@ CHECK {
 }
 
 
-sub exception { SPVM::ExchangeAPI::exception($SPVM_ENV, @_) }
+sub get_exception { SPVM::ExchangeAPI::get_exception($SPVM_ENV, @_) }
 sub set_exception { SPVM::ExchangeAPI::set_exception($SPVM_ENV, @_) }
-sub memory_blocks_count { SPVM::ExchangeAPI::memory_blocks_count($SPVM_ENV, @_) }
+sub get_memory_blocks_count { SPVM::ExchangeAPI::get_memory_blocks_count($SPVM_ENV, @_) }
 sub call_sub { SPVM::ExchangeAPI::call_sub($SPVM_ENV, @_) }
 
 sub new_barray { SPVM::ExchangeAPI::new_barray($SPVM_ENV, @_) }
 sub new_barray_from_bin { SPVM::ExchangeAPI::new_barray_from_bin($SPVM_ENV, @_) }
-sub new_barray_from_str { SPVM::ExchangeAPI::new_barray_from_str($SPVM_ENV, @_) }
+sub new_barray_from_string { SPVM::ExchangeAPI::new_barray_from_string($SPVM_ENV, @_) }
 
 sub new_sarray { SPVM::ExchangeAPI::new_sarray($SPVM_ENV, @_) }
 sub new_sarray_from_bin { SPVM::ExchangeAPI::new_sarray_from_bin($SPVM_ENV, @_) }
@@ -94,8 +94,8 @@ sub new_farray_from_bin { SPVM::ExchangeAPI::new_farray_from_bin($SPVM_ENV, @_) 
 sub new_darray { SPVM::ExchangeAPI::new_darray($SPVM_ENV, @_) }
 sub new_darray_from_bin { SPVM::ExchangeAPI::new_darray_from_bin($SPVM_ENV, @_) }
 
-sub new_str { SPVM::ExchangeAPI::new_str($SPVM_ENV, @_) }
-sub new_str_from_bin { SPVM::ExchangeAPI::new_str_from_bin($SPVM_ENV, @_) }
+sub new_string { SPVM::ExchangeAPI::new_string($SPVM_ENV, @_) }
+sub new_string_from_bin { SPVM::ExchangeAPI::new_string_from_bin($SPVM_ENV, @_) }
 
 sub new_oarray { SPVM::ExchangeAPI::new_oarray($SPVM_ENV, @_) }
 sub new_varray { SPVM::ExchangeAPI::new_varray($SPVM_ENV, @_) }

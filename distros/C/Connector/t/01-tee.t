@@ -8,7 +8,7 @@ use Log::Log4perl qw(:easy);
 
 use Test::More tests => 19;
 
-Log::Log4perl->easy_init($DEBUG);
+Log::Log4perl->easy_init($ERROR);
 
 BEGIN {
     use_ok( 'Connector::Multi::YAML' );

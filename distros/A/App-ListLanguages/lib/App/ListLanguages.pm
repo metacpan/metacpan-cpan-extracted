@@ -1,7 +1,7 @@
 package App::ListLanguages;
 
-our $DATE = '2019-07-28'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-09-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,6 +63,18 @@ Source data is generated from `Locale::Codes::Language_Codes`. so make sure you
 have a relatively recent version of the module.
 
 _
+    extra_props => {
+        examples => [
+            {
+                args => {query=>'indonesian'},
+                test => 0,
+            },
+            {
+                args => {query=>'indonesian', detail=>1},
+                test => 0,
+            },
+        ],
+    },
 );
 die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
@@ -81,7 +93,7 @@ App::ListLanguages - List languages
 
 =head1 VERSION
 
-This document describes version 0.004 of App::ListLanguages (from Perl distribution App-ListLanguages), released on 2019-07-28.
+This document describes version 0.005 of App::ListLanguages (from Perl distribution App-ListLanguages), released on 2019-09-28.
 
 =head1 SYNOPSIS
 

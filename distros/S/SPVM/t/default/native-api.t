@@ -13,24 +13,24 @@ use SPVM 'TestCase::Extension2';
 use SPVM 'TestCase::Pointer';
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::memory_blocks_count();
+my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # package variable access
 {
-  ok(TestCase::Extension->set_bpkgvar);
-  ok(TestCase::Extension->set_spkgvar);
-  ok(TestCase::Extension->set_ipkgvar);
-  ok(TestCase::Extension->set_lpkgvar);
-  ok(TestCase::Extension->set_fpkgvar);
-  ok(TestCase::Extension->set_dpkgvar);
-  ok(TestCase::Extension->set_opkgvar);
-  ok(TestCase::Extension->bpkgvar);
-  ok(TestCase::Extension->spkgvar);
-  ok(TestCase::Extension->ipkgvar);
-  ok(TestCase::Extension->lpkgvar);
-  ok(TestCase::Extension->fpkgvar);
-  ok(TestCase::Extension->dpkgvar);
-  ok(TestCase::Extension->opkgvar);
+  ok(TestCase::Extension->set_package_var_byte);
+  ok(TestCase::Extension->set_package_var_short);
+  ok(TestCase::Extension->set_package_var_int);
+  ok(TestCase::Extension->set_package_var_long);
+  ok(TestCase::Extension->set_package_var_float);
+  ok(TestCase::Extension->set_package_var_double);
+  ok(TestCase::Extension->set_package_var_object);
+  ok(TestCase::Extension->get_package_var_byte);
+  ok(TestCase::Extension->get_package_var_short);
+  ok(TestCase::Extension->get_package_var_int);
+  ok(TestCase::Extension->get_package_var_long);
+  ok(TestCase::Extension->get_package_var_float);
+  ok(TestCase::Extension->get_package_var_double);
+  ok(TestCase::Extension->get_package_var_object);
   ok(TestCase::Extension->push_mortal_multi);
 }
 
@@ -63,21 +63,21 @@ my $start_memory_blocks_count = SPVM::memory_blocks_count();
 
 # Field
 {
-  ok(TestCase::Extension->bfield());
-  ok(TestCase::Extension->sfield());
-  ok(TestCase::Extension->ifield());
-  ok(TestCase::Extension->lfield());
-  ok(TestCase::Extension->ffield());
-  ok(TestCase::Extension->dfield());
-  ok(TestCase::Extension->ofield());
+  ok(TestCase::Extension->get_field_byte());
+  ok(TestCase::Extension->get_field_short());
+  ok(TestCase::Extension->get_field_int());
+  ok(TestCase::Extension->get_field_long());
+  ok(TestCase::Extension->get_field_float());
+  ok(TestCase::Extension->get_field_double());
+  ok(TestCase::Extension->get_field_object());
 
-  ok(TestCase::Extension->set_bfield());
-  ok(TestCase::Extension->set_sfield());
-  ok(TestCase::Extension->set_ifield());
-  ok(TestCase::Extension->set_lfield());
-  ok(TestCase::Extension->set_ffield());
-  ok(TestCase::Extension->set_dfield());
-  ok(TestCase::Extension->set_ofield());
+  ok(TestCase::Extension->set_field_byte());
+  ok(TestCase::Extension->set_field_short());
+  ok(TestCase::Extension->set_field_int());
+  ok(TestCase::Extension->set_field_long());
+  ok(TestCase::Extension->set_field_float());
+  ok(TestCase::Extension->set_field_double());
+  ok(TestCase::Extension->set_field_object());
 
 }
 
@@ -109,5 +109,5 @@ ok(!-f "$FindBin::Bin/spvm_build/work/object/SPVM/CORE.o");
 SPVM::set_exception(undef);
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::memory_blocks_count();
+my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);

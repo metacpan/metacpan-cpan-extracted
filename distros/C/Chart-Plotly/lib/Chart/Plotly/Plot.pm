@@ -6,7 +6,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 use Chart::Plotly;
 
@@ -45,8 +45,7 @@ sub html {
     }
     return
       Chart::Plotly::_render_cell( Chart::Plotly::_process_data( $self->traces() ),
-                                   $chart_id, $layout, $config,
-                                   { load_plotly_using_script_tag => $load_plotly_using_script_tag } );
+                       $chart_id, $layout, $config, { load_plotly_using_script_tag => $load_plotly_using_script_tag } );
 }
 
 sub TO_JSON {
@@ -90,7 +89,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

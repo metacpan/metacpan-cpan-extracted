@@ -27,6 +27,7 @@ eg/line-bot-framework/lib/LINEBotFramework/Response.pm
 eg/push-flex-hello.pl
 eg/push_imagemap-template.pl
 lib/LINE/Bot/API.pm
+lib/LINE/Bot/API/Builder/FlexMessage.pm
 lib/LINE/Bot/API/Builder/ImagemapMessage.pm
 lib/LINE/Bot/API/Builder/SendMessage.pm
 lib/LINE/Bot/API/Builder/TemplateMessage.pm
@@ -53,6 +54,7 @@ lib/LINE/Bot/API/Response/IssueLinkToken.pm
 lib/LINE/Bot/API/Response/NumberOfSentMessages.pm
 lib/LINE/Bot/API/Response/Profile.pm
 lib/LINE/Bot/API/Response/RichMenu.pm
+lib/LINE/Bot/API/Response/RichMenuImageUpload.pm
 lib/LINE/Bot/API/Response/RichMenuList.pm
 lib/LINE/Bot/API/Response/RoomMemberProfile.pm
 lib/LINE/Bot/API/Response/TargetLimit.pm
@@ -83,8 +85,10 @@ t/42_create_events_by_api.t
 t/51_issue_link_token.t
 t/52_rich_menu.t
 t/52_rich_menu_response.t
+t/52_upload_rich_menu_image.t
 t/author-critic.t
 t/author-pod-syntax.t
+t/controller-rich-menu-image-sample.jpg
 t/examples/account-link-event.json
 t/examples/audio-message-1.json
 t/examples/beacon-event.json

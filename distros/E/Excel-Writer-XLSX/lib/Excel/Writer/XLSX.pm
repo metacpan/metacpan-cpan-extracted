@@ -17,7 +17,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 
 ###############################################################################
@@ -1315,7 +1315,8 @@ Finally, you can avoid most of these quoting problems by using forward slashes. 
 
 Note: Excel::Writer::XLSX will escape the following characters in URLs as required by Excel: C<< \s " < > \ [  ] ` ^ { } >> unless the URL already contains C<%xx> style escapes. In which case it is assumed that the URL was escaped correctly by the user and will by passed directly to Excel.
 
-Excel limits hyperlink links and anchor/locations to 255 characters each.
+Versions of Excel prior to Excel 2015 limited hyperlink links and anchor/locations to 255 characters each. Versions after that support urls up to 2079 characters. Excel::Writer::XLSX versions >= 1.0.2 support the new longer limit by default.
+
 
 See also, the note about L</Cell notation>.
 
@@ -1709,6 +1710,8 @@ The optional C<options> hash/hashref parameter can be used to set various option
         x_scale         => 1,
         y_scale         => 1,
         object_position => 2,
+        url             => undef,
+        tip             => undef,
     );
 
 The parameters C<x_offset> and C<y_offset> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
@@ -1730,12 +1733,27 @@ The positioning of the image when cells are resized can be set with the C<object
 The C<object_position> parameter can have one of the following allowable values:
 
     1. Move and size with cells.
-    2. Move but don’t size with cells.
-    3. Don’t move or size with cells.
+    2. Move but don't size with cells.
+    3. Don't move or size with cells.
     4. Same as Option 1, see below.
 
 Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This allows the user to hide an image in a cell, possibly as part of an autofilter.
 
+The C<url> option can be use to used to add a hyperlink to an image:
+
+    $worksheet->insert_image( 'A1', 'logo.png',
+        { url => 'https://github.com/jmcnamara' } );
+
+The supported url formats are the same as those supported by the C<write_url()> method and the same rules/limits apply.
+
+The C<tip> option can be use to used to add a mouseover tip to the hyperlink:
+
+    $worksheet->insert_image( 'A1', 'logo.png',
+        {
+            url => 'https://github.com/jmcnamara',
+            tip => 'GitHub'
+        }
+    );
 
 Note: you must call C<set_row()> or C<set_column()> before C<insert_image()> if you wish to change the default dimensions of any of the rows or columns that the image occupies. The height of a row can also change if you use a font that is larger than the default. This in turn will affect the scaling of your image. To avoid this you should explicitly set the height of the row using C<set_row()> if it contains a font size that will change the row height.
 
@@ -1784,8 +1802,8 @@ The positioning of the chart when cells are resized can be set with the C<object
 The C<object_position> parameter can have one of the following allowable values:
 
     1. Move and size with cells.
-    2. Move but don’t size with cells.
-    3. Don’t move or size with cells.
+    2. Move but don't size with cells.
+    3. Don't move or size with cells.
     4. Same as Option 1, see below.
 
 Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
@@ -7097,19 +7115,20 @@ different features and options of the module. See L<Excel::Writer::XLSX::Example
 
 The following limits are imposed by Excel 2007+:
 
-    Description                             Limit
-    --------------------------------------  ------
-    Maximum number of chars in a string     32,767
-    Maximum number of columns               16,384
-    Maximum number of rows                  1,048,576
-    Maximum chars in a sheet name           31
-    Maximum chars in a header/footer        254
+    Description                                Limit
+    --------------------------------------     ------
+    Maximum number of chars in a string        32,767
+    Maximum number of columns                  16,384
+    Maximum number of rows                     1,048,576
+    Maximum chars in a sheet name              31
+    Maximum chars in a header/footer           254
 
-    Maximum characters in hyperlink url     255
-    Maximum characters in hyperlink anchor  255
-    Maximum number of unique hyperlinks*    65,530
+    Maximum characters in hyperlink url (1)    2079
+    Maximum number of unique hyperlinks (2)    65,530
 
-* Per worksheet. Excel allows a greater number of non-unique hyperlinks if they are contiguous and can be grouped into a single range. This will be supported in a later version of Excel::Writer::XLSX if possible.
+(1) Versions of Excel prior to Excel 2015 limited hyperlink links and anchor/locations to 255 characters each. Versions after that support urls up to 2079 characters. Excel::Writer::XLSX versions >= 1.0.2 support the new longer limit by default.
+
+(2) Per worksheet. Excel allows a greater number of non-unique hyperlinks if they are contiguous and can be grouped into a single range. This isn't supported by Excel::Writer::XLSX.
 
 
 

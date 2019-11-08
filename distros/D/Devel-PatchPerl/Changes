@@ -1,6 +1,25 @@
 ==================================================
-Changes from 2014-11-08 00:00:00 +0000 to present.
+Changes from 2014-11-09 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.70 at 2019-11-08 02:01:40 +0000
+-----------------------------------------
+
+  Change: a28752586c80e3973427a195eee9fef139769126
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-08 02:01:40 +0000
+
+    Release engineering for 1.70 
+
+  Change: cdbf062e9cae9bdccb4d510a506a93c01f879f9b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-08 01:59:33 +0000
+
+    Added Base64 encoding of patches
+
+    This should resolve issues such as RT#130939 Initially encoded the
+    offending patch 
 
 -----------------------------------------
 version 1.68 at 2019-11-07 10:11:25 +0000
@@ -403,5 +422,5 @@ version 1.30 at 2014-12-23 22:41:27 +0000
     add Devel::PatchPerl version to list of local patches 
 
 =================================================
-Plus 64 releases after 2014-11-08 00:00:00 +0000.
+Plus 64 releases after 2014-11-09 00:00:00 +0000.
 =================================================

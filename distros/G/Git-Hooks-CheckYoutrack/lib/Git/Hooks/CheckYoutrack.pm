@@ -14,7 +14,7 @@ use LWP::UserAgent;
 use URI::Builder;
 use JSON::XS;
 
-$Git::Hooks::CheckYoutrack::VERSION = '1.0.1';
+$Git::Hooks::CheckYoutrack::VERSION = '1.0.2';
 
 =head1 NAME
 
@@ -37,10 +37,11 @@ may configure it in a Git configuration file like this:
 
     # Refer: https://www.jetbrains.com/help/youtrack/standalone/Manage-Permanent-Token.html
     # to create a Bearer token
+    # You can also set YoutrackToken ENV instead of this config
     youtrack-token = "<your-token>"
 
     # Regular expression to match for Youtrack ticket id
-    matchkey = '^((?:P|M)(?:AY|\d+)-\d+)'
+    matchkey = "^((?:P)(?:AY|\\d+)-\\d+)"
 
     # Setting this flag will aborts the commit if valid Youtrack number not found
     # Shows a warning message otherwise - default false
@@ -78,10 +79,12 @@ starts with a valid Youtrack ticket Id.
 =cut
 
 sub check_commit_msg {
-    my ($git, $message) = @_;
+    my ($git, $message, $commit_id) = @_;
 
     # Skip for empty message
     return 'no_check' if (!$message || $message =~ /^[\n\r]$/g);
+
+    $log->info("Checking commit message: $message");
 
     my $yt_id = _get_youtrack_id($git, $message);
 
@@ -89,7 +92,7 @@ sub check_commit_msg {
         return _show_error($git, "Missing youtrack ticket id in your message: $message");
     }
 
-    $log->debug("Found Youtrack ticket id from message as: $yt_id");
+    $log->info("Extracted Youtrack ticket id from message as: $yt_id");
 
     my $yt_ticket = _get_ticket($git, $yt_id);
 
@@ -99,6 +102,7 @@ sub check_commit_msg {
 
     if ($yt_ticket && $git->get_config_boolean($CFG => 'print-info')) {
         print '-' x 80 . "\n";
+        print "For git commit:  $commit_id\n" if($commit_id);
         print "Youtrack ticket: $yt_ticket->{ticket_id}\n";
         print "Summary:         $yt_ticket->{summary}\n";
         print "Current status:  $yt_ticket->{State}\n";
@@ -131,6 +135,7 @@ sub check_message_file {
 
 sub _show_error {
     my ($git, $msg) = @_;
+    $log->error($msg);
     if ($git->get_config_boolean($CFG => 'required')) {
         $git->fault("ERROR: $msg");
         return 1;
@@ -163,15 +168,16 @@ sub check_affected_refs {
 
     foreach my $ref ($git->get_affected_refs()) {
         next unless $git->is_reference_enabled($ref);
-        check_ref($git, $ref)
-          or ++$errors;
+        if(check_ref($git, $ref)) {
+            ++$errors;
+        }
     }
 
-	if($errors) {
-		return _show_error($git, "Some of your commit message missing a valid youtrack ticket");
-	}
+    if($errors) {
+        return _show_error($git, "Some of your commit message missing a valid youtrack ticket");
+    }
 
-	return 0;
+    return 0;
 }
 
 # =========================================================================== #
@@ -182,10 +188,14 @@ sub check_ref {
     my $errors = 0;
 
     foreach my $commit ($git->get_affected_ref_commits($ref)) {
-        check_commit_msg($git, $commit->message) or ++$errors;
+        local $log->context->{commit_id} = $commit->commit;
+        $log->info("Commit from : ", $commit->author_name, " Git Ref: ", $ref);
+        if(check_commit_msg($git, $commit->message, $commit->commit)) {
+            ++$errors;
+        }
     }
 
-    return $errors == 0;
+    return $errors;
 }
 
 # =========================================================================== #
@@ -213,7 +223,7 @@ sub add_youtrack_summary {
 
     # Don't do anything if message already exist (user used -m option)
     if ($msg) {
-        $log->debug("Message exist: $msg");
+        $log->info("Message exist: $msg");
         return 0;
     }
 
@@ -238,7 +248,7 @@ sub add_youtrack_summary {
 
     my $ticket_msg = "$yt_id: $task->{summary}\n";
 
-    $log->debug("Pre-populating commit message as: $ticket_msg");
+    $log->info("Pre-populating commit message as: $ticket_msg");
 
     open my $out, '>', path($commit_msg_file) or die "Can't write new file: $!";
     print $out $ticket_msg;
@@ -272,7 +282,7 @@ sub _setup_config {
     my $default = $config->{lc $CFG};
 
     # Default matchkey for matching Youtrack ids (P3-1234 || PAY-1234) keys.
-    $default->{matchkey} //= ['^((?:P|M)(?:AY|\d+)-\d+)'];
+    $default->{matchkey} //= ['^(P(?:AY|\d+)-\d+)'];
 
     $default->{required} //= ['false'];
 
@@ -316,7 +326,7 @@ sub _get_ticket {
     my $ticket = $ua->get($url);
 
     if (!$ticket->is_success) {
-        $log->debug("Youtrack fetch failed");
+        $log->error("Youtrack fetch failed with status: ", $ticket->status_line);
         return;
     }
 
@@ -324,7 +334,7 @@ sub _get_ticket {
     my $ticket_details = _process_ticket($json);
 
     if (!$ticket_details->{ticket_id}) {
-        $log->debug("No valid youtrack ticket found");
+        $log->error("No valid youtrack ticket found");
         return;
     }
 
@@ -381,9 +391,13 @@ sub _get_youtrack_id {
 
     my $matchkey = $git->get_config($CFG => 'matchkey');
 
+    chomp $message;
+
     if ($message =~ /$matchkey/i) {
         return uc($1);
     }
+
+    $log->info("\"$message\" does not match /$matchkey/");
 
     return;
 }

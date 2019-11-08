@@ -1,4 +1,4 @@
-= OVERVIEW =
+# OVERVIEW
 
 The Connector is generic connection to a data set, typically configuration
 data in a hierarchical structure. Each connector object accepts the get(KEY)
@@ -17,7 +17,7 @@ you have a list of connectors and want to use them in a load-balancing,
 round-robin fashion or have the list iterated until a value is found,
 use Connector::List and choose the algorithm to perform.
 
-= USAGE =
+# USAGE 
 
 In general, the following steps are needed (replace MODULENAME with the
 name of the Connector module you need):

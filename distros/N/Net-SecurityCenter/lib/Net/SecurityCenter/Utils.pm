@@ -8,7 +8,7 @@ use Params::Check qw(allow);
 use Time::Piece;
 use Exporter qw(import);
 
-our $VERSION = '0.203';
+our $VERSION = '0.204';
 
 our @EXPORT_OK = qw(
     sc_check_params

@@ -66,7 +66,7 @@ sub get_hash {
     }
 
     if ($mesg->count() > 1) {
-        die "More than one entry found - result is not unique."
+        $self->_log_and_die("More than one entry found - result is not unique.");
     }
 
     my $entry = $mesg->entry(0);
@@ -137,6 +137,11 @@ sub set {
 
     my $entry;
 
+    # We accept only a hash as value
+    if (ref $value ne 'HASH') {
+        $self->_log_and_die('The value must be a hash reference.');
+    }
+
     $self->log()->debug('Set called on ' . \@args );
 
     # Check if a pkey/dn is passed
@@ -148,10 +153,7 @@ sub set {
         }
     } else {
         # Try to find the entry
-
-        my $template_vars = { ARGS => \@args };
-
-        my $mesg = $self->_run_search($template_vars, { noattrs => 1});
+        my $mesg = $self->_run_search({ ARGS => \@args }, { noattrs => 1});
 
         if ($mesg->is_error()) {
             $self->log()->error("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
@@ -159,47 +161,55 @@ sub set {
         }
 
         if ($mesg->count() > 1) {
-            $self->log()->error('Set by filter had multiple results: ' . join "|", @args );
-            die "More than one entry found - result is not unique."
+            $self->_log_and_die('Set by filter had multiple results: ' . join "|", @args );
         }
 
         # Check if autocreate is configured
         if ($mesg->count() == 1) {
             $entry = $mesg->entry(0);
             $self->log()->debug('Entry found ' . $entry->dn());
-        } else {
-            $entry = $self->_triggerAutoCreate( \@args );
-            return $self->_node_not_exists(\@args) if (!$entry);
         }
     }
 
     my $action = $self->action();
     $self->log()->debug('Action is '.$action);
 
-    # We accept only a hash as value
-    if (ref $value ne 'HASH') {
-        $self->log()->error('The value must be a hash reference.');
-        die "The value must be a hash reference"
+    # autocreate if not delete and schema is defined
+    if (!$entry && ($action ne "delete") && $self->schema()) {
+        # create data array
+        my $attrib;
+        while (my ($source, $attribute) = each %{$self->attrmap()}) {
+            $attrib->{$attribute} = $value->{$source} if (exists $value->{$source});
+        }
+        $entry = $self->_triggerAutoCreate( \@args, $attrib );
+        if ($entry) {
+            $self->log()->debug('Entry was created with given attributes');
+            return 1;
+        } else {
+            $self->log()->warn('Auto-Create failed');
+        }
     }
+
+    return $self->_node_not_exists(\@args) if (!$entry);
 
     while (my ($source, $attribute) = each %{$self->attrmap()}) {
         if (!$attribute) {
-            $self->log()->error('Attribute for '.$source.' is undef.');
-            die "Attribute for '.$source.' is undef.";
+            $self->_log_and_die('Attribute for '.$source.' is undef.');
         }
         if (exists $value->{$source}) {
             my $value = $value->{$source};
+            $self->log()->debug("Perform $action on attribute $attribute") unless ($self->log()->is_trace());
             if ($action eq "append") {
-                $self->log()->debug('Append '.$value.' to Attribute '.$attribute);
+                $self->log()->trace('Append '.$value.' to Attribute '.$attribute);
                 $entry->add( $attribute => $value );
             } elsif($action eq "delete") {
-                $self->log()->debug('Delete '.$value.' from Attribute '.$attribute);
-                $entry->delete( $attribute => $value ) if ($value);
+                $self->log()->trace('Delete '.$value.' from Attribute '.$attribute);
+                $entry->delete( $attribute => $value ) if (defined $value);
             } elsif (defined $value) {
-                $self->log()->debug('Replace Attribute '.$attribute.' with '.$value);
+                $self->log()->trace('Replace Attribute '.$attribute.' with '.$value);
                 $entry->replace( $attribute => $value );
             } else { # Implicit delete - replace with an undef value
-                $self->log()->debug('Remove Attribute '.$attribute);
+                $self->log()->trace('Remove Attribute '.$attribute);
                 $entry->delete( $attribute => undef );
             }
         }

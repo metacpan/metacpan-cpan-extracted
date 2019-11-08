@@ -28,5 +28,5 @@ requires:
 resources:
   homepage: https://github.com/fany/MIME-Signature
   repository: https://github.com/fany/MIME-Signature.git
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

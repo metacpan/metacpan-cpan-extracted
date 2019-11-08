@@ -48,6 +48,7 @@ use Business::Fixflo::Property;
     Firstname
     Id
     IsCommunal
+    Landlord
     Media
     Property
     PropertyId
@@ -98,6 +99,7 @@ has [ qw/
     Id
     IsCommunal
     Job
+    Landlord
     Media
     Property
     PropertyAddressId

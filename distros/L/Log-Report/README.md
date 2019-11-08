@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Log-Report>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Log-Report/>
-    and <https://metacpan.org/release/Log-Report>
+  * Indexed from CPAN: <https://metacpan.org/release/Log-Report>
 
 Get messages to users and logs.  Log::Report combines three tasks
 which are closely related in one:

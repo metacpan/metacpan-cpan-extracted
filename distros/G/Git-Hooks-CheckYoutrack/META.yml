@@ -33,5 +33,5 @@ requires:
   URI::Builder: '0'
 resources:
   repository: https://github.com/dinesh-it/Git-Hooks-CheckYoutrack.git
-version: v1.0.1
+version: v1.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

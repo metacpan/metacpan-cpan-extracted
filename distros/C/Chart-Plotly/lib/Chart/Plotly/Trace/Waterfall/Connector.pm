@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Waterfall::Connector::Line;
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace waterfall.
 
@@ -63,7 +63,7 @@ Chart::Plotly::Trace::Waterfall::Connector - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

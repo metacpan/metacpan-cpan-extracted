@@ -41,5 +41,5 @@ requires:
   perl: '5.008008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

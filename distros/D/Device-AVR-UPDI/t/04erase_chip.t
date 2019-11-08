@@ -23,26 +23,38 @@ my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
    expect( $mockfh->print( "\x55\xE0" . "esarEMVN" ) );
    expect( $mockfio->sysread( 10 ) )
       ->and_scalar_return( Future->done( "\x55\x80" . "esarEMVN" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
    # read ASI_KEY_STATUS
    expect( $mockfh->print( "\x55\x87" ) );
    expect( $mockfio->sysread( 3 ) )
       ->and_scalar_return( Future->done( "\x55\x87" . "\x08" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
    # Reset
    expect( $mockfh->print( "\x55\xC8\x59" ) );
    expect( $mockfio->sysread( 3 ) )
       ->and_scalar_return( Future->done( "\x55\xC8\x59" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
    expect( $mockfh->print( "\x55\xC8\x00" ) );
    expect( $mockfio->sysread( 3 ) )
       ->and_scalar_return( Future->done( "\x55\xC8\x00" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
    # read ASI_SYS_STATUS
    expect( $mockfh->print( "\x55\x8B" ) );
    expect( $mockfio->sysread( 3 ) )
       ->and_scalar_return( Future->done( "\x55\x8B\x01" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
    expect( $mockfio->sleep( 0.05 ) )
       ->and_scalar_return( Future->done );
    expect( $mockfh->print( "\x55\x8B" ) );
    expect( $mockfio->sysread( 3 ) )
       ->and_scalar_return( Future->done( "\x55\x8B\x00" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
 
    replay( $mockfh, $mockfio );
    $updi->erase_chip->get;

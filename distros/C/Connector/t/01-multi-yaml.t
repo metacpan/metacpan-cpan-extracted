@@ -9,7 +9,7 @@ use Path::Class;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 Log::Log4perl->easy_init($ERROR);
 
@@ -24,7 +24,7 @@ require_ok( 'Connector::Multi' );
 my $base = Connector::Multi::YAML->new({
     LOCATION => 't/config/01-multi-yaml.yaml'
 });
- 
+
 # Test if base connector is good
 is($base->get('connectors.conn1.class'), 'Connector::Builtin::Static', 'Base works');
 
@@ -40,5 +40,13 @@ is($conn->get('connectors.conn1.class'), 'Connector::Builtin::Static', 'Multi wo
 my @keys = $conn->get_keys('parent.node');
 is( $keys[0], 'conn1', 'Keys ok');
 
-is($conn->get('parent.node.conn1.value'), 'Test', 'Value ok');
-    
+is($conn->get('redirect.node.oneup'), 'b', 'one up ok');
+
+is($conn->get('redirect.node.relative'), 'Redirect', 'Relative Link ok');
+
+is($conn->get('redirect.node.absolute'), 'Redirect', 'Absolute Link ok');
+
+my $exceeded;
+eval{ $exceeded = $conn->get('redirect.node.exceed'); };
+ok(!defined $exceeded, 'No value on to long link');
+ok($EVAL_ERROR, 'Eval error on to long link');

@@ -5,13 +5,12 @@ use strict;
 
 use Carp;
 use English qw( -no_match_vars );
-use List::Util qw( any );
 
 use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.203';
+our $VERSION = '0.204';
 
 my $common_template = {
 

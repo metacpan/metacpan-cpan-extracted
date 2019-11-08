@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Parcoords::Stream;
 use Chart::Plotly::Trace::Parcoords::Tickfont;
 use Chart::Plotly::Trace::Parcoords::Transform;
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 # ABSTRACT: Parallel coordinates for multidimensional exploratory data analysis. The samples are specified in `dimensions`. The colors are set in `line.color`.
 
@@ -164,7 +164,7 @@ Chart::Plotly::Trace::Parcoords - Parallel coordinates for multidimensional expl
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

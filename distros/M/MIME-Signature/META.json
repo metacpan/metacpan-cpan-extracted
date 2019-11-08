@@ -53,6 +53,6 @@
          "url" : "https://github.com/fany/MIME-Signature.git"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

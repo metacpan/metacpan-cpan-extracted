@@ -18,12 +18,12 @@ package TestCase::Extension {
     return new TestCase::Extension;
   }
 
-  sub bpkgvar : int () {
+  sub get_package_var_byte : int () {
     my $extension = TestCase::Extension->new;
     
     $BYTE_VALUE = INT8_MIN();
     
-    my $value = bpkgvar_test($extension);
+    my $value = get_package_var_byte_test($extension);
     
     if ($value == INT8_MIN()) {
       return 1;
@@ -31,14 +31,14 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub bpkgvar_test : byte ($extension : TestCase::Extension);
+  native sub get_package_var_byte_test : byte ($extension : TestCase::Extension);
 
-  sub spkgvar : int () {
+  sub get_package_var_short : int () {
     my $extension = TestCase::Extension->new;
     
     $SHORT_VALUE = INT16_MIN();
     
-    my $value = spkgvar_test($extension);
+    my $value = get_package_var_short_test($extension);
     
     if ($value == INT16_MIN()) {
       return 1;
@@ -46,14 +46,14 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub spkgvar_test : short ($extension : TestCase::Extension);
+  native sub get_package_var_short_test : short ($extension : TestCase::Extension);
 
-  sub ipkgvar : int () {
+  sub get_package_var_int : int () {
     my $extension = TestCase::Extension->new;
 
     $INT_VALUE = INT32_MIN();
     
-    my $value = ipkgvar_test($extension);
+    my $value = get_package_var_int_test($extension);
     
     if ($value == INT32_MIN()) {
       return 1;
@@ -61,14 +61,14 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub ipkgvar_test : int ($extension : TestCase::Extension);
+  native sub get_package_var_int_test : int ($extension : TestCase::Extension);
 
-  sub lpkgvar : int () {
+  sub get_package_var_long : int () {
     my $extension = TestCase::Extension->new;
     
     $LONG_VALUE = INT64_MIN();
     
-    my $value = lpkgvar_test($extension);
+    my $value = get_package_var_long_test($extension);
     
     if ($value == INT64_MIN()) {
       return 1;
@@ -76,14 +76,14 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub lpkgvar_test : long ($extension : TestCase::Extension);
+  native sub get_package_var_long_test : long ($extension : TestCase::Extension);
 
-  sub fpkgvar : int () {
+  sub get_package_var_float : int () {
     my $extension = TestCase::Extension->new;
     
     $FLOAT_VALUE = FLT_MIN();
     
-    my $value = fpkgvar_test($extension);
+    my $value = get_package_var_float_test($extension);
     
     if ($value == FLT_MIN()) {
       return 1;
@@ -91,14 +91,14 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub fpkgvar_test : float ($extension : TestCase::Extension);
+  native sub get_package_var_float_test : float ($extension : TestCase::Extension);
 
-  sub dpkgvar : int () {
+  sub get_package_var_double : int () {
     my $extension = TestCase::Extension->new;
     
     $DOUBLE_VALUE = DBL_MIN();
     
-    my $value = dpkgvar_test($extension);
+    my $value = get_package_var_double_test($extension);
     
     if ($value == DBL_MIN()) {
       return 1;
@@ -106,14 +106,14 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub dpkgvar_test : double ($extension : TestCase::Extension);
+  native sub get_package_var_double_test : double ($extension : TestCase::Extension);
 
-  sub opkgvar : int () {
+  sub get_package_var_object : int () {
     my $extension = TestCase::Extension->new;
     
     $MINIMAL_VALUE = TestCase::Minimal->new;
     
-    my $value = opkgvar_test($extension);
+    my $value = get_package_var_object_test($extension);
     
     if ($value isa TestCase::Minimal) {
       $MINIMAL_VALUE = undef;
@@ -122,12 +122,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub opkgvar_test : TestCase::Minimal ($extension : TestCase::Extension);
+  native sub get_package_var_object_test : TestCase::Minimal ($extension : TestCase::Extension);
   
-  sub set_bpkgvar : int () {
+  sub set_package_var_byte : int () {
     my $extension = TestCase::Extension->new;
     
-    set_bpkgvar_test($extension);
+    set_package_var_byte_test($extension);
     
     if ($BYTE_VALUE == INT8_MIN()) {
       return 1;
@@ -135,12 +135,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_bpkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_byte_test : void ($extension : TestCase::Extension);
 
-  sub set_spkgvar : int () {
+  sub set_package_var_short : int () {
     my $extension = TestCase::Extension->new;
     
-    set_spkgvar_test($extension);
+    set_package_var_short_test($extension);
     
     if ($SHORT_VALUE == INT16_MIN()) {
       return 1;
@@ -148,12 +148,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_spkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_short_test : void ($extension : TestCase::Extension);
 
-  sub set_ipkgvar : int () {
+  sub set_package_var_int : int () {
     my $extension = TestCase::Extension->new;
     
-    set_ipkgvar_test($extension);
+    set_package_var_int_test($extension);
     
     if ($INT_VALUE == INT32_MIN()) {
       return 1;
@@ -161,12 +161,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_ipkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_int_test : void ($extension : TestCase::Extension);
 
-  sub set_lpkgvar : int () {
+  sub set_package_var_long : int () {
     my $extension = TestCase::Extension->new;
     
-    set_lpkgvar_test($extension);
+    set_package_var_long_test($extension);
     
     if ($LONG_VALUE == INT64_MIN()) {
       return 1;
@@ -174,12 +174,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_lpkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_long_test : void ($extension : TestCase::Extension);
 
-  sub set_fpkgvar : int () {
+  sub set_package_var_float : int () {
     my $extension = TestCase::Extension->new;
     
-    set_fpkgvar_test($extension);
+    set_package_var_float_test($extension);
     
     if ($FLOAT_VALUE == FLT_MIN()) {
       return 1;
@@ -187,12 +187,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_fpkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_float_test : void ($extension : TestCase::Extension);
 
-  sub set_dpkgvar : int () {
+  sub set_package_var_double : int () {
     my $extension = TestCase::Extension->new;
     
-    set_dpkgvar_test($extension);
+    set_package_var_double_test($extension);
     
     if ($DOUBLE_VALUE == DBL_MIN()) {
       return 1;
@@ -200,12 +200,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_dpkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_double_test : void ($extension : TestCase::Extension);
 
-  sub set_opkgvar : int () {
+  sub set_package_var_object : int () {
     my $extension = TestCase::Extension->new;
     
-    set_opkgvar_test($extension);
+    set_package_var_object_test($extension);
     
     if ($MINIMAL_VALUE isa TestCase::Minimal) {
       $MINIMAL_VALUE = undef;
@@ -214,7 +214,7 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub set_opkgvar_test : void ($extension : TestCase::Extension);
+  native sub set_package_var_object_test : void ($extension : TestCase::Extension);
 
   native sub has_callback_test : int ($object : object);
   sub has_callback : int () {
@@ -342,10 +342,10 @@ package TestCase::Extension {
     return 0;
   }
 
-  sub set_bfield : int () {
+  sub set_field_byte : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_bfield($simple);
+    native_set_field_byte($simple);
     
     if ($simple->{byte_value} == INT8_MIN()) {
       return 1;
@@ -353,12 +353,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_bfield : void ($simple : TestCase::Simple);
+  native sub native_set_field_byte : void ($simple : TestCase::Simple);
 
-  sub set_sfield : int () {
+  sub set_field_short : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_sfield($simple);
+    native_set_field_short($simple);
     
     if ($simple->{short_value} == INT16_MIN()) {
       return 1;
@@ -366,12 +366,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_sfield : void ($simple : TestCase::Simple);
+  native sub native_set_field_short : void ($simple : TestCase::Simple);
 
-  sub set_ifield : int () {
+  sub set_field_int : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_ifield($simple);
+    native_set_field_int($simple);
     
     if ($simple->{int_value} == INT32_MIN()) {
       return 1;
@@ -379,12 +379,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_ifield : void ($simple : TestCase::Simple);
+  native sub native_set_field_int : void ($simple : TestCase::Simple);
 
-  sub set_lfield : int () {
+  sub set_field_long : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_lfield($simple);
+    native_set_field_long($simple);
     
     if ($simple->{long_value} == INT64_MIN()) {
       return 1;
@@ -392,12 +392,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_lfield : void ($simple : TestCase::Simple);
+  native sub native_set_field_long : void ($simple : TestCase::Simple);
 
-  sub set_ffield : int () {
+  sub set_field_float : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_ffield($simple);
+    native_set_field_float($simple);
     
     if ($simple->{float_value} == FLT_MIN()) {
       return 1;
@@ -405,12 +405,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_ffield : void ($simple : TestCase::Simple);
+  native sub native_set_field_float : void ($simple : TestCase::Simple);
   
-  sub set_dfield : int () {
+  sub set_field_double : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_dfield($simple);
+    native_set_field_double($simple);
     
     if ($simple->{double_value} == DBL_MIN()) {
       return 1;
@@ -418,12 +418,12 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_dfield : void ($simple : TestCase::Simple);
+  native sub native_set_field_double : void ($simple : TestCase::Simple);
 
-  sub set_ofield : int () {
+  sub set_field_object : int () {
     my $simple = TestCase::Simple->new;
     
-    native_set_ofield($simple);
+    native_set_field_object($simple);
     
     if ($simple->{object_value}{x} == 3) {
       return 1;
@@ -431,78 +431,78 @@ package TestCase::Extension {
     
     return 0;
   }
-  native sub native_set_ofield : int ($simple : TestCase::Simple);
+  native sub native_set_field_object : int ($simple : TestCase::Simple);
 
-  sub bfield : int () {
+  sub get_field_byte : int () {
     my $simple = TestCase::Simple->new;
     $simple->{byte_value} = INT8_MIN();
     
-    my $success = native_get_bfield($simple);
+    my $success = native_get_get_field_byte($simple);
     
     return $success;
   }
-  native sub native_get_bfield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_byte : int ($simple : TestCase::Simple);
 
-  sub sfield : int () {
+  sub get_field_short : int () {
     my $simple = TestCase::Simple->new;
     $simple->{short_value} = INT16_MIN();
     
-    my $success = native_get_sfield($simple);
+    my $success = native_get_get_field_short($simple);
     
     return $success;
   }
-  native sub native_get_sfield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_short : int ($simple : TestCase::Simple);
 
-  sub ifield : int () {
+  sub get_field_int : int () {
     my $simple = TestCase::Simple->new;
     $simple->{int_value} = INT32_MIN();
     
-    my $success = native_get_ifield($simple);
+    my $success = native_get_get_field_int($simple);
     
     return $success;
   }
-  native sub native_get_ifield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_int : int ($simple : TestCase::Simple);
 
-  sub lfield : int () {
+  sub get_field_long : int () {
     my $simple = TestCase::Simple->new;
     $simple->{long_value} = INT64_MIN();
     
-    my $success = native_get_lfield($simple);
+    my $success = native_get_get_field_long($simple);
     
     return $success;
   }
-  native sub native_get_lfield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_long : int ($simple : TestCase::Simple);
 
-  sub ffield : int () {
+  sub get_field_float : int () {
     my $simple = TestCase::Simple->new;
     $simple->{float_value} = FLT_MIN();
     
-    my $success = native_get_ffield($simple);
+    my $success = native_get_get_field_float($simple);
     
     return $success;
   }
-  native sub native_get_ffield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_float : int ($simple : TestCase::Simple);
 
-  sub dfield : int () {
+  sub get_field_double : int () {
     my $simple = TestCase::Simple->new;
     $simple->{double_value} = DBL_MIN();
     
-    my $success = native_get_dfield($simple);
+    my $success = native_get_get_field_double($simple);
     
     return $success;
   }
-  native sub native_get_dfield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_double : int ($simple : TestCase::Simple);
 
-  sub ofield : int () {
+  sub get_field_object : int () {
     my $simple = TestCase::Simple->new;
     $simple->{object_value} = TestCase::Minimal->new;
     $simple->{object_value}{x} = 5;
     
-    my $success = native_get_ofield($simple);
+    my $success = native_get_get_field_object($simple);
     
     return $success;
   }
-  native sub native_get_ofield : int ($simple : TestCase::Simple);
+  native sub native_get_get_field_object : int ($simple : TestCase::Simple);
   
   sub spvm_extension_add_iarray : int () {
     my $nums1 = [1, 2, 3];
@@ -543,13 +543,13 @@ package TestCase::Extension {
 
   native sub native_use_strlen : int ($string : string);
 
-  native sub native_env_bfield : byte ($test_case : TestCase);
-  native sub native_env_sfield : short ($test_case : TestCase);
-  native sub native_env_ifield : int ($test_case : TestCase);
-  native sub native_env_lfield : long ($test_case : TestCase);
-  native sub native_env_ffield : float ($test_case : TestCase);
-  native sub native_env_dfield : double ($test_case : TestCase);
-  native sub native_env_ofield : TestCase::Minimal ($test_case : TestCase);
+  native sub native_env_get_field_byte : byte ($test_case : TestCase);
+  native sub native_env_get_field_short : short ($test_case : TestCase);
+  native sub native_env_get_field_int : int ($test_case : TestCase);
+  native sub native_env_get_field_long : long ($test_case : TestCase);
+  native sub native_env_get_field_float : float ($test_case : TestCase);
+  native sub native_env_get_field_double : double ($test_case : TestCase);
+  native sub native_env_get_field_object : TestCase::Minimal ($test_case : TestCase);
   
   sub native_env_set_field : int () {
     
@@ -564,13 +564,13 @@ package TestCase::Extension {
     my $minimal1 = TestCase::Minimal->new();
     $test_case->{minimal} = $minimal1;
     
-    my $x_byte1 = native_env_bfield($test_case);
-    my $x_short1 = native_env_sfield($test_case);
-    my $x_int1 = native_env_ifield($test_case);
-    my $x_long1 = native_env_lfield($test_case);
-    my $x_float1 = native_env_ffield($test_case);
-    my $x_double1 = native_env_dfield($test_case);
-    my $minimal2 = native_env_ofield($test_case);
+    my $x_byte1 = native_env_get_field_byte($test_case);
+    my $x_short1 = native_env_get_field_short($test_case);
+    my $x_int1 = native_env_get_field_int($test_case);
+    my $x_long1 = native_env_get_field_long($test_case);
+    my $x_float1 = native_env_get_field_float($test_case);
+    my $x_double1 = native_env_get_field_double($test_case);
+    my $minimal2 = native_env_get_field_object($test_case);
     
     if ((int)$x_byte1 == (int)(byte)1) {
       if ((int)$x_short1 == (int)(short)2) {

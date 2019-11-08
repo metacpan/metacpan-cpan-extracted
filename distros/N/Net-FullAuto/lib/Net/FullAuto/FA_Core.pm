@@ -6758,7 +6758,8 @@ sub connect_host
             $_[0]->{'loginid'}=$_[0]->{'username'};
             $_[0]->{'login'}=$_[0]->{'username'};
          }
-         $Hosts{$_[0]->{'label'}}=$_[0];
+         $_[0]->{'label'}||='';
+         $Hosts{$_[0]->{'label'}}=$_[0]||'';
          $hostlabel=$_[0]->{'label'};
       } elsif ($_[0] eq '__shell__') {
          $hostlabel="Localhost Shell";

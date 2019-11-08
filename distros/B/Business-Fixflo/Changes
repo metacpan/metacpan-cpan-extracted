@@ -1,5 +1,9 @@
 Revision history for Business-Fixflo
 
+0.37     2019-11-08
+        - Add Landlord to Business::Fixflo::Issue
+        - Add IsDeleted to Business::Fixflo::Property
+
 0.36     2019-03-18
         - Add IsCommunal to Business::Fixflo::Issue
 

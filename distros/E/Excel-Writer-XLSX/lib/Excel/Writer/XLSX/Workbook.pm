@@ -33,7 +33,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 
 ###############################################################################
@@ -96,6 +96,7 @@ sub new {
     $self->{_window_height}      = 9660;
     $self->{_tab_ratio}          = 600;
     $self->{_excel2003_style}    = 0;
+    $self->{_max_url_length}     = 2079;
 
     $self->{_default_format_properties} = {};
 
@@ -118,6 +119,14 @@ sub new {
 
     if ( exists $options->{excel2003_style} ) {
         $self->{_excel2003_style} = 1;
+    }
+
+    if ( exists $options->{max_url_length} ) {
+        $self->{_max_url_length} = $options->{max_url_length};
+
+        if ($self->{_max_url_length} < 255) {
+            $self->{_max_url_length} = 2079;
+        }
     }
 
     # Structures for the shared strings data.
@@ -373,6 +382,7 @@ sub add_worksheet {
         $self->{_tempdir},
         $self->{_excel2003_style},
         $self->{_default_url_format},
+        $self->{_max_url_length},
     );
 
     my $worksheet = Excel::Writer::XLSX::Worksheet->new( @init_data );
@@ -1783,12 +1793,6 @@ sub _prepare_drawings {
             $has_drawing = 1;
         }
 
-        # Prepare the worksheet charts.
-        for my $index ( 0 .. $chart_count - 1 ) {
-            $chart_ref_id++;
-            $sheet->_prepare_chart( $index, $chart_ref_id, $drawing_id );
-        }
-
         # Prepare the worksheet images.
         for my $index ( 0 .. $image_count - 1 ) {
 
@@ -1804,6 +1808,12 @@ sub _prepare_drawings {
                 $width, $height,       $name,
                 $type,  $x_dpi,        $y_dpi
             );
+        }
+
+        # Prepare the worksheet charts.
+        for my $index ( 0 .. $chart_count - 1 ) {
+            $chart_ref_id++;
+            $sheet->_prepare_chart( $index, $chart_ref_id, $drawing_id );
         }
 
         # Prepare the worksheet shapes.

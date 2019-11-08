@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Heatmap::Hoverlabel;
 use Chart::Plotly::Trace::Heatmap::Stream;
 use Chart::Plotly::Trace::Heatmap::Transform;
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 # ABSTRACT: The data that describes the heatmap value-to-color mapping is set in `z`. Data in `z` can either be a {2D array} of values (ragged or not) or a 1D array of values. In the case where `z` is a {2D array}, say that `z` has N rows and M columns. Then, by default, the resulting heatmap will have N partitions along the y axis and M partitions along the x axis. In other words, the i-th row/ j-th column cell in `z` is mapped to the i-th partition of the y axis (starting from the bottom of the plot) and the j-th partition of the x-axis (starting from the left of the plot). This behavior can be flipped by using `transpose`. Moreover, `x` (`y`) can be provided with M or M+1 (N or N+1) elements. If M (N), then the coordinates correspond to the center of the heatmap cells and the cells have equal width. If M+1 (N+1), then the coordinates correspond to the edges of the heatmap cells. In the case where `z` is a 1D {array}, the x and y coordinates must be provided in `x` and `y` respectively to form data triplets.
 
@@ -70,9 +70,10 @@ has colorscale => (
 );
 
 has connectgaps => (
-        is            => "rw",
-        isa           => "Bool",
-        documentation => "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in.",
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in. It is defaulted to true if `z` is a one dimensional array and `zsmooth` is not false; otherwise it is defaulted to false.",
 );
 
 has customdata => (
@@ -111,6 +112,13 @@ has hoverinfosrc => ( is            => "rw",
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Heatmap::Hoverlabel", );
+
+has hoverongaps => (
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data have hover labels associated with them.",
+);
 
 has hovertemplate => (
     is  => "rw",
@@ -372,7 +380,7 @@ Chart::Plotly::Trace::Heatmap - The data that describes the heatmap value-to-col
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 
@@ -451,7 +459,7 @@ Sets the colorscale. The colorscale must be an array containing arrays mapping a
 
 =item * connectgaps
 
-Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in.
+Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data are filled in. It is defaulted to true if `z` is a one dimensional array and `zsmooth` is not false; otherwise it is defaulted to false.
 
 =item * customdata
 
@@ -478,6 +486,10 @@ Determines which trace information appear on hover. If `none` or `skip` are set,
 Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
+
+=item * hoverongaps
+
+Determines whether or not gaps (i.e. {nan} or missing values) in the `z` data have hover labels associated with them.
 
 =item * hovertemplate
 

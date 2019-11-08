@@ -237,7 +237,7 @@ sub _new_ldap {
     $self->log()->debug('Connecting to "' . $ldapuri .'"');
     my $ldap = Net::LDAP->new(
         $ldapuri,
-        onerror => undef,
+        onerror => 'undef',
         $self->_build_new_options(),
     );
     if(defined $ldap) {
@@ -258,15 +258,17 @@ sub _bind {
     }
     if(defined $self->binddn()) {
         $self->log()->debug('Binding to "'.$self->binddn().'"');
+        my %options = $self->_build_bind_options();
+        $self->log()->warn('Binding with DN but without password') if (!defined $options{password});
         $mesg = $ldap->bind(
-                $self->binddn(),
-                $self->_build_bind_options(),
-            );
+            $self->binddn(),
+            %options,
+        );
     } else {
         # anonymous bind
         $self->log()->debug('Binding anonymously');
         $mesg = $ldap->bind(
-                $self->_build_bind_options(),
+            $self->_build_bind_options(),
         );
     }
     if($mesg->is_error()) {
@@ -305,7 +307,7 @@ sub _search_user {
     my $dns;
     for my $entry ($result->entries()) {
         my $dn = $entry->dn();
-        if(defined $self->groupdn()) { 
+        if(defined $self->groupdn()) {
             if(!$self->_check_user_group($dn)) {
                 next;
             }
@@ -384,7 +386,7 @@ sub get {
     }
 
     #
-    # let's check if we were instructed to search for the auth user 
+    # let's check if we were instructed to search for the auth user
     #
     my @userdns;
     if($self->indirect()) {
@@ -435,7 +437,7 @@ Supports simple authentication (via LDAP bind), SASL authentication is not
 supported.
 
 The module allows for direct bind or indirect bind (with preliminary user
-search). Direct bind is the most straightforward method, but it requires 
+search). Direct bind is the most straightforward method, but it requires
 users to know their Distinguished Names (DNs) in LDAP. Indirect bind is more
 convenient for users, but it involves LDAP database search, which requires read
 access to larger parts of LDAP directory (so LDAP ACLs must be set properly to
@@ -443,7 +445,7 @@ allow indirect bind).
 
 The module implements group participation checking. With this option enabled,
 only users that belong to a predefined group may pass the authentication.
-The group is stored in LDAP directory (it may be for example an entry of 
+The group is stored in LDAP directory (it may be for example an entry of
 type I<groupOfUniqueNames> with the group participants listed in attribute
 I<uniqueMember>).
 
@@ -468,7 +470,7 @@ Example:
 
 To configure module for direct bind, the connector object should be created
 with parameter I<indirect> => 0. This is the simplest authentication method
-and requires least parameters to be configured. 
+and requires least parameters to be configured.
 
 Example:
 
@@ -520,7 +522,7 @@ Example:
     })
     my $result = $connector->get(
         'uid=jsmith,ou=people,dc=example,dc=org',
-        { password => 'secret' } 
+        { password => 'secret' }
     );
 
 Note, that in this case we have provided I<binddn> despite the direct-bind
@@ -589,7 +591,7 @@ How to verify the server's certificate:
     optional
         Verify only when the server offers a certificate
     require
-        The server must provide a certificate, and it must be valid.  
+        The server must provide a certificate, and it must be valid.
 
 If you set B<verify> to optional or I<require>, you must also set either
 B<cafile> or B<capath>. The most secure option is require.
@@ -680,13 +682,13 @@ following values:
 
     base
         Search only the base object.
-    one 
+    one
         Search the entries immediately below the base object.
     sub
-    subtree 
+    subtree
         Search the whole tree below (and including) the base object. This is
         the default.
-    children 
+    children
         Search the whole subtree below the base object, excluding the base object itself.
 
 Note: children scope requires LDAPv3 subordinate feature extension.
@@ -705,7 +707,7 @@ value of B<userattr> parameter.
 
 =item B<groupattr> => ATTRNAME
 
-If B<groupdn> is specified by caller, the B<groupattr> defines an attribute 
+If B<groupdn> is specified by caller, the B<groupattr> defines an attribute
 within B<groupdn> object which shall be compared against the DN of the user
 being authenticated in order to check its participation to the group. Defaults
 to I<'member'>.

@@ -1,5 +1,8 @@
 bin/create_tests
 bin/testrun
 .git
+^Makefile$
+^MYMETA.json$
+^MYMETA.yml$
 Makefile.old
 MANIFEST.bak

@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.203';
+our $VERSION = '0.204';
 
 my $common_template = {
 
@@ -109,7 +109,7 @@ sub health {
     my $params     = sc_check_params( $tmpl, \%args );
     my $scanner_id = delete( $params->{'id'} );
 
-    my $scanner    = $self->client->get( "/scanner/$scanner_id/health");
+    my $scanner = $self->client->get("/scanner/$scanner_id/health");
 
     return if ( !$scanner );
     return $scanner;
@@ -127,7 +127,7 @@ sub bug_report {
     my $params     = sc_check_params( $tmpl, \%args );
     my $scanner_id = delete( $params->{'id'} );
 
-    my $scanner    = $self->client->get( "/scanner/$scanner_id/bug_report", $params);
+    my $scanner = $self->client->get( "/scanner/$scanner_id/bug_report", $params );
 
     return if ( !$scanner );
     return $scanner;

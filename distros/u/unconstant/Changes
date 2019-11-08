@@ -1,0 +1,9 @@
+Revision history for unconstant
+
+0.02    2019-11-08
+        Refactor so you can do `no unconstant`.
+        Added tests.
+
+0.01    2019-11-07
+        First version, released on an unsuspecting world.
+

@@ -14,3 +14,4 @@ t/telesec_799972029.crt
 t/verisign.der
 t/dsacert.der
 t/pgpextension.der
+META.json                                Module JSON meta-data (added by MakeMaker)

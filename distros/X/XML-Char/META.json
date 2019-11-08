@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4202",
+   "generated_by" : "Module::Build version 0.4214",
    "keywords" : [
       "xml",
       "characters",
@@ -37,7 +37,7 @@
    "provides" : {
       "XML::Char" : {
          "file" : "lib/XML/Char.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -52,5 +52,6 @@
          "url" : "git://github.com/jozef/XML-Char.git"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

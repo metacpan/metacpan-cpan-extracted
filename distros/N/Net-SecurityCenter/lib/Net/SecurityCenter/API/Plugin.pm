@@ -12,7 +12,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.203';
+our $VERSION = '0.204';
 
 my $common_template = {
 

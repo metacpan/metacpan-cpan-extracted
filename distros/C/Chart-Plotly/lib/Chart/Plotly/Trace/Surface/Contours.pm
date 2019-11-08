@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Surface::Contours::X;
 use Chart::Plotly::Trace::Surface::Contours::Y;
 use Chart::Plotly::Trace::Surface::Contours::Z;
 
-our $VERSION = '0.029';    # VERSION
+our $VERSION = '0.030';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace surface.
 
@@ -61,7 +61,7 @@ Chart::Plotly::Trace::Surface::Contours - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

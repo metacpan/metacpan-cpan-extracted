@@ -20,8 +20,8 @@ sub format_version
 
 sub parse_version
 {
-  # Returns a triplet, (5, major, minor) from the input, which can be in any
-  # of several typical formats
+  # Returns a triplet, (5, major, minor) from the input, treated as a string,
+  # which can be in any of several typical formats.
 
   my $ver = shift;
   $ver = "" unless defined $ver;
@@ -46,6 +46,19 @@ sub parse_version
     return (5, 0 + $v, 0 + $s);
   }
 
+  # For some safety, don't assume something is a version number if it has a
+  # literal dot as one of the three characters.  This will have to be fixed
+  # when we reach 5.46
+  if ($ver !~ /\./ && (($r, $v, $s) = $ver =~ /^(.)(.)(.)$/))  # vstring 5.25.7
+  {
+    $r = ord $r;
+    $v = ord $v;
+    $s = ord $s;
+
+    die "Only Perl 5 is supported '$ver'\n" if $r != 5;
+    return (5, $v, $s);
+  }
+
   my $mesg = "";
   $mesg = ".  (In 5.00x_yz, x must be 1-5.)" if $ver =~ /_/;
   die "Invalid version number format: '$ver'$mesg\n";
@@ -57,6 +70,11 @@ sub int_parse_version
     # names in parts/todo parts/base.
 
     return 0 + join "", map { sprintf("%03d", $_) } parse_version(shift);
+}
+
+sub ivers    # Shorter name for int_parse_version
+{
+    return int_parse_version(shift);
 }
 
 sub format_version_line

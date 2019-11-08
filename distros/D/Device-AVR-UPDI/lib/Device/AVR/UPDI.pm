@@ -15,7 +15,9 @@ use Future::IO 0.03; # ->sysread_exactly
 
 use Struct::Dumb qw( readonly_struct );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+use constant DEBUG => $ENV{UPDI_DEBUG};
 
 readonly_struct PartInfo => [qw(
    signature
@@ -24,14 +26,19 @@ readonly_struct PartInfo => [qw(
    baseaddr_sigrow
 
    baseaddr_flash
-   pagesize
+   pagesize_flash
+   size_flash
+
+   baseaddr_eeprom
+   pagesize_eeprom
+   size_eeprom
 
    fusenames
 )];
 
 my %partinfos;
 {
-   while( <DATA> ) {
+   while( readline DATA ) {
       m/^#/ and next;
       chomp;
       my ( $name, $signature, @fields ) = split m/\|/, $_;
@@ -45,6 +52,8 @@ my %partinfos;
       $partinfos{"m$1"} = $partinfo if $name =~ m/^ATmega(.*)$/;
       $partinfos{"t$1"} = $partinfo if $name =~ m/^ATtiny(.*)$/;
    }
+
+   close DATA;
 }
 
 =head1 NAME
@@ -120,7 +129,8 @@ sub new
 
    my $fh = $args{fh} // do {
       require IO::Termios;
-      IO::Termios->open( $args{dev} );
+      IO::Termios->open( $args{dev} ) or
+         die "Unable to open $args{dev} - $!\n";
    };
 
    $fh->cfmakeraw();
@@ -165,9 +175,13 @@ The returned structure provides the following fields
    $addr = $partinfo->baseaddr_nvmctrl
    $addr = $partinfo->baseaddr_fuse
    $addr = $partinfo->baseaddr_flash
+   $addr = $partinfo->baseaddr_eeprom
    $addr = $partinfo->baseaddr_sigrow
 
-   $bytes = $partinfo->pagesize
+   $bytes = $partinfo->pagesize_flash
+   $bytes = $partinfo->pagesize_eeprom
+   $bytes = $partinfo->size_flash
+   $bytes = $partinfo->size_eeprom
 
    $fusenames = $partinfo->fusenames
 
@@ -247,7 +261,11 @@ async sub _break
    $fh->setbaud( 300 );
    $fh->print( "\x00" );
 
-   await Future::IO->sysread( $fh, 1 );
+   await Future->wait_any(
+      Future::IO->sysread( $fh, 1 ),
+      Future::IO->sleep( 0.05 )
+         ->then_fail( "Timed out waiting for echo of BREAK - is this a UPDI programmer?\n" )
+   );
 
    $fh->setbaud( $was_baud );
 }
@@ -261,9 +279,20 @@ async sub _op_writeread
 
    $fh->print( $write );
 
+   my $buf = "";
    my $len = length( $write ) + $readlen;
 
-   my $buf = await Future::IO->sysread_exactly( $fh, $len );
+   while( length $buf < $len ) {
+      my $what = ( length $buf >= length $write ) ?
+         "chip response - is the chip present?" :
+         "echo of command - is this a UPDI programmer?";
+
+      $buf .= await Future->wait_any(
+         Future::IO->sysread( $fh, $len - length $buf ),
+         Future::IO->sleep( 0.1 )
+            ->then_fail( "Timed out waiting for $what\n" )
+      );
+   }
 
    return substr( $buf, length( $write ) );
 }
@@ -273,14 +302,19 @@ async sub lds8
    my $self = shift;
    my ( $addr ) = @_;
 
-   return unpack "C", await
+   my $ret = unpack "C", await
       $self->_op_writeread( SYNC . pack( "C S<", OP_LDS|OP_ADDR16, $addr ), 1 );
+
+   printf STDERR ">> LDS8[%04X] -> %02X\n", $addr, $ret if DEBUG;
+   return $ret;
 }
 
 async sub sts8
 {
    my $self = shift;
    my ( $addr, $val ) = @_;
+
+   printf STDERR ">> STS8[%04X] = %02X\n", $addr, $val if DEBUG;
 
    my $ack = await
       $self->_op_writeread( SYNC . pack( "C S<", OP_STS|OP_ADDR16, $addr ), 1 );
@@ -302,14 +336,44 @@ async sub ld
 
    await
       $self->_op_writeread( SYNC . pack( "C C", OP_REPEAT, $len - 1 ), 0 ) if $len > 1;
-   return await
+   my $ret = await
       $self->_op_writeread( SYNC . pack( "C", OP_LD|OP_PTRINC|OP_DATA8 ), $len );
+
+   printf STDERR ">> LD[%04X] -> %v02X\n", $addr, $ret if DEBUG;
+   return $ret;
 }
 
-async sub st
+async sub st8
 {
    my $self = shift;
    my ( $addr, $data ) = @_;
+
+   printf STDERR ">> ST[%04X] = %v02X\n", $addr, $data if DEBUG;
+
+   my $len = length( $data );
+
+   my $ack = await
+      $self->_op_writeread( SYNC . pack( "C S<", OP_ST|OP_PTRREG|OP_DATA16, $addr ), 1 );
+   $ack eq "\x40" or croak "Expected ACK to ST PTR";
+
+   await
+      $self->_op_writeread( SYNC . pack( "C C", OP_REPEAT, $len - 1 ), 0 ) if $len > 1;
+
+   await
+      $self->_op_writeread( SYNC . pack( "C", OP_ST|OP_PTRINC|OP_DATA8 ), 0 );
+
+   foreach my $byte ( split //, $data ) {
+      $ack = await $self->_op_writeread( $byte, 1 );
+      $ack eq "\x40" or croak "Expected ACK to STR data";
+   }
+}
+
+async sub st16
+{
+   my $self = shift;
+   my ( $addr, $data ) = @_;
+
+   printf STDERR ">> ST[%04X] = %v02X\n", $addr, $data if DEBUG;
 
    # Count in 16bit words
    my $len = int( length( $data ) / 2 );
@@ -345,14 +409,19 @@ async sub ldcs
    my $self = shift;
    my ( $reg ) = @_;
 
-   return unpack "C", await
-      $self->_op_writeread( SYNC . pack( "C", OP_LDCS | $reg ), 1 )
+   my $ret = unpack "C", await
+      $self->_op_writeread( SYNC . pack( "C", OP_LDCS | $reg ), 1 );
+
+   printf STDERR ">> LDCS[%02X] -> %02X\n", $reg, $ret if DEBUG;
+   return $ret;
 }
 
 async sub stcs
 {
    my $self = shift;
    my ( $reg, $value ) = @_;
+
+   printf STDERR ">> STCS[%02X] = %02X\n", $reg, $value if DEBUG;
 
    await
       $self->_op_writeread( SYNC . pack( "CC", OP_STCS | $reg, $value ), 0 );
@@ -365,6 +434,8 @@ async sub key
 
    length $key == 8 or
       die "Expected 8 byte key\n";
+
+   printf STDERR ">> KEY %v02X\n", $key if DEBUG;
 
    await
       $self->_op_writeread( SYNC . pack( "C a*", OP_KEY, $key ), 0 );
@@ -504,15 +575,33 @@ Requests a full chip erase, waiting until the erase is complete.
 
 After this, the chip will be unlocked.
 
+Takes an optional named argument:
+
+=over 4
+
+=item no_reset => BOOL
+
+If true, does not issue a system reset request after loading the key. This
+allows you to load multiple keys at once before sending the reset, which
+may be required e.g. to recover from a bad C<SYSCFG0> fuse setting.
+
+   await $updi->erase_chip( no_reset => 1 );
+   await $updi->enable_nvmprog;
+
+=back
+
 =cut
 
 async sub erase_chip
 {
    my $self = shift;
+   my %opts = @_;
 
    await $self->key( KEY_CHIPERASE );
 
    die "Failed to set CHIPERASE key\n" unless ASI_KEY_CHIPERASE & await $self->ldcs( REG_ASI_KEY_STATUS );
+
+   return if $opts{no_reset};
 
    await $self->request_reset( 1 );
    await $self->request_reset( 0 );
@@ -551,6 +640,7 @@ async sub enable_nvmprog
 
       await Future::IO->sleep( 0.05 );
    }
+   die "Timed out waiting for NVMPROG key to be accepted\n" if !$timeout;
 }
 
 use constant {
@@ -592,22 +682,32 @@ async sub await_nvm_not_busy
 
 =head2 write_nvm_page
 
-   $updi->write_nvm_page( $addr, $data )->get
+   $updi->write_nvm_page( $addr, $data, $wordsize )->get
 
-Writes a single page into NVM flash using the NVM controller.
+Writes a single page into NVM controller in 8- or 16-bit word transfers.
+C<$addr> is within the data address space. C<$wordsize> must be either 8 or
+16.
 
 =cut
 
 async sub write_nvm_page
 {
    my $self = shift;
-   my ( $addr, $data ) = @_;
+   my ( $addr, $data, $wordsize ) = @_;
 
    # clear page buffer
    await $self->nvmctrl_command( NVMCTRL_CMD_PBC );
    await $self->await_nvm_not_busy;
 
-   await $self->st( $self->{partinfo}->baseaddr_flash + $addr, $data );
+   if( $wordsize == 8 ) {
+      await $self->st8( $addr, $data );
+   }
+   elsif( $wordsize == 16 ) {
+      await $self->st16( $addr, $data );
+   }
+   else {
+      croak "Invalid word size";
+   }
 
    await $self->nvmctrl_command( NVMCTRL_CMD_WP );
    await $self->await_nvm_not_busy;
@@ -688,38 +788,38 @@ Paul Evans <leonerd@leonerd.org.uk>
 
 __DATA__
 # These data are maintained by ./rebuild-partinfo.pl
-# name|signature|baseaddr_nvmctl|baseaddr_fuse|baseaddr_sigrow|baseaddr_flash|pagesize|fuses
-ATmega1608|1e9427|0x1000|0x1280|0x1100|0x4000|64|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega1609|1e9426|0x1000|0x1280|0x1100|0x4000|64|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega3208|1e9530|0x1000|0x1280|0x1100|0x4000|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega3209|1e9531|0x1000|0x1280|0x1100|0x4000|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega4808|1e9650|0x1000|0x1280|0x1100|0x4000|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega4809|1e9651|0x1000|0x1280|0x1100|0x4000|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega808|1e9326|0x1000|0x1280|0x1100|0x4000|64|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATmega809|1e932a|0x1000|0x1280|0x1100|0x4000|64|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1604|1e9425|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1606|1e9424|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1607|1e9423|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1614|1e9422|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1616|1e9421|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny1617|1e9420|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny202|1e9123|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny204|1e9122|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny212|1e9121|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny214|1e9120|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3214|1e9520|0x1000|0x1280|0x1100|0x8000|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3216|1e9521|0x1000|0x1280|0x1100|0x8000|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny3217|1e9522|0x1000|0x1280|0x1100|0x8000|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny402|1e9227|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny404|1e9226|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny406|1e9225|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny412|1e9223|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny414|1e9222|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny416|1e9221|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny417|1e9220|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny804|1e9325|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny806|1e9324|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny807|1e9323|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny814|1e9322|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny816|1e9321|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
-ATtiny817|1e9320|0x1000|0x1280|0x1100|0x8000|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+# name|signature|baseaddr_nvmctl|baseaddr_fuse|baseaddr_sigrow|baseaddr_flash|pagesize_flash|size_flash|baseaddr_eeprom|pagesize_eeprom|size_eeprom|fuses
+ATmega1608|1e9427|0x1000|0x1280|0x1100|0x4000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega1609|1e9426|0x1000|0x1280|0x1100|0x4000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega3208|1e9530|0x1000|0x1280|0x1100|0x4000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega3209|1e9531|0x1000|0x1280|0x1100|0x4000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega4808|1e9650|0x1000|0x1280|0x1100|0x4000|128|49152|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega4809|1e9651|0x1000|0x1280|0x1100|0x4000|128|49152|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega808|1e9326|0x1000|0x1280|0x1100|0x4000|64|8192|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATmega809|1e932a|0x1000|0x1280|0x1100|0x4000|64|8192|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1604|1e9425|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1606|1e9424|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1607|1e9423|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1614|1e9422|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1616|1e9421|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny1617|1e9420|0x1000|0x1280|0x1100|0x8000|64|16384|0x1400|32|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny202|1e9123|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny204|1e9122|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny212|1e9121|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny214|1e9120|0x1000|0x1280|0x1100|0x8000|64|2048|0x1400|32|64|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3214|1e9520|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3216|1e9521|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny3217|1e9522|0x1000|0x1280|0x1100|0x8000|128|32768|0x1400|64|256|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny402|1e9227|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny404|1e9226|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny406|1e9225|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny412|1e9223|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny414|1e9222|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny416|1e9221|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny417|1e9220|0x1000|0x1280|0x1100|0x8000|64|4096|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny804|1e9325|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny806|1e9324|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny807|1e9323|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny814|1e9322|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny816|1e9321|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+ATtiny817|1e9320|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,TCD0CFG,SYSCFG0,SYSCFG1,APPEND,BOOTEND

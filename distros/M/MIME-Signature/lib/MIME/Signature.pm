@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Exporter';
 
-our $VERSION = '0.17';
+our $VERSION = '0.22';
 
 use Carp qw(croak);
 use Encode qw(decode encode encode_utf8);

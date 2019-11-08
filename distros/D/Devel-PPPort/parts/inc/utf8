@@ -15,6 +15,62 @@ __UNDEFINED__ UNICODE_REPLACEMENT  0xFFFD
 __UNDEFINED__  UTF8_MAXBYTES   UTF8_MAXLEN
 #endif
 
+__UNDEF_NOT_PROVIDED__ UTF_START_MARK(len)                                   \
+                    (((len) >  7) ? 0xFF : (0xFF & (0xFE << (7-(len)))))
+
+#if { VERSION < 5.018 }     /* On non-EBCDIC was valid before this, */
+                            /* but easier to just do one check */
+#  undef UTF8_MAXBYTES_CASE
+#endif
+
+#if 'A' == 65
+#  define D_PPP_BYTE_INFO_BITS 6  /* 6 bits meaningful in continuation bytes */
+__UNDEFINED__          UTF8_MAXBYTES_CASE 13
+#else
+#  define D_PPP_BYTE_INFO_BITS 5  /* 5 bits meaningful in continuation bytes */
+__UNDEFINED__          UTF8_MAXBYTES_CASE 15
+#endif
+
+__UNDEF_NOT_PROVIDED__ UTF_ACCUMULATION_SHIFT D_PPP_BYTE_INFO_BITS
+
+#ifdef NATIVE_TO_UTF
+__UNDEF_NOT_PROVIDED__ NATIVE_UTF8_TO_I8(c)  NATIVE_TO_UTF(c)
+#else   /* System doesn't support EBCDIC */
+__UNDEF_NOT_PROVIDED__ NATIVE_UTF8_TO_I8(c)  (c)
+#endif
+
+#ifdef UTF_TO_NATIVE
+__UNDEF_NOT_PROVIDED__ I8_TO_NATIVE_UTF8(c)  UTF_TO_NATIVE(c)
+#else   /* System doesn't support EBCDIC */
+__UNDEF_NOT_PROVIDED__ I8_TO_NATIVE_UTF8(c)  (c)
+#endif
+
+__UNDEF_NOT_PROVIDED__ UTF_START_MASK(len)                                 \
+                                (((len) >= 7) ? 0x00 : (0x1F >> ((len)-2)))
+__UNDEF_NOT_PROVIDED__ UTF_IS_CONTINUATION_MASK                            \
+                                    ((U8) (0xFF << UTF_ACCUMULATION_SHIFT))
+__UNDEF_NOT_PROVIDED__ UTF_CONTINUATION_MARK                               \
+                                          (UTF_IS_CONTINUATION_MASK & 0xB0)
+__UNDEF_NOT_PROVIDED__ UTF_MIN_START_BYTE                                  \
+    ((UTF_CONTINUATION_MARK >> UTF_ACCUMULATION_SHIFT) | UTF_START_MARK(2))
+
+__UNDEF_NOT_PROVIDED__ UTF_MIN_ABOVE_LATIN1_BYTE                           \
+                    ((0x100 >> UTF_ACCUMULATION_SHIFT) | UTF_START_MARK(2))
+
+#if { VERSION < 5.007 }     /* Was the complement of what should have been */
+#  undef UTF8_IS_DOWNGRADEABLE_START
+#endif
+__UNDEF_NOT_PROVIDED__ UTF8_IS_DOWNGRADEABLE_START(c)                       \
+                inRANGE(NATIVE_UTF8_TO_I8(c),                               \
+                        UTF_MIN_START_BYTE, UTF_MIN_ABOVE_LATIN1_BYTE - 1)
+__UNDEF_NOT_PROVIDED__ UTF_CONTINUATION_MASK                                \
+                                ((U8) ((1U << UTF_ACCUMULATION_SHIFT) - 1))
+
+__UNDEF_NOT_PROVIDED__ UTF8_ACCUMULATE(base, added)                         \
+                                  (((base) << UTF_ACCUMULATION_SHIFT)       \
+                                   | ((NATIVE_UTF8_TO_I8(added))            \
+                                       & UTF_CONTINUATION_MASK))
+
 __UNDEF_NOT_PROVIDED__ UTF8_ALLOW_ANYUV                 0
 __UNDEF_NOT_PROVIDED__ UTF8_ALLOW_EMPTY            0x0001
 __UNDEF_NOT_PROVIDED__ UTF8_ALLOW_CONTINUATION     0x0002
@@ -37,6 +93,11 @@ __UNDEFINED__  UTF8_SAFE_SKIP(s, e)  (                                          
                                       ((((e) - (s)) <= 0)                       \
                                       ? 0                                       \
                                       : D_PPP_MIN(((e) - (s)), UTF8SKIP(s))))
+
+__UNDEFINED__ UTF8_CHK_SKIP(s)                                                  \
+    (s[0] == '\0' ? 1 : ((U8) D_PPP_MIN(my_strnlen((char *) (s), UTF8SKIP(s)),  \
+                                      UTF8SKIP(s))))
+__UNDEFINED__ UTF8_SKIP(s)  UTF8SKIP(s)
 #endif
 
 #if 'A' == 65
@@ -49,7 +110,6 @@ __UNDEFINED__ UVCHR_IS_INVARIANT(c)  UTF8_IS_INVARIANT(c)
 
 #ifdef UVCHR_IS_INVARIANT
 #  if 'A' == 65
-#    define D_PPP_BYTE_INFO_BITS 6  /* 6 bits meaningful in continuation bytes */
 #    ifdef QUADKIND
 #      define D_PPP_UVCHR_SKIP_UPPER(c)                                         \
           (WIDEST_UTYPE) (c) <                                                  \
@@ -58,8 +118,6 @@ __UNDEFINED__ UVCHR_IS_INVARIANT(c)  UTF8_IS_INVARIANT(c)
 #      define D_PPP_UVCHR_SKIP_UPPER(c) 7  /* 32 bit platform */
 #    endif
 #  else
-#    define D_PPP_BYTE_INFO_BITS 5      /* EBCDIC has only 5 meaningful bits */
-
      /* In the releases this is backported to, UTF-EBCDIC had a max of 2**31-1 */
 #    define D_PPP_UVCHR_SKIP_UPPER(c) 7
 #  endif
@@ -89,10 +147,10 @@ __UNDEFINED__ foldEQ_utf8(s1,pe1,l1,u1,s2,pe2,l2,u2)                            
 #endif
 
 #if defined(is_utf8_string) && defined(UTF8SKIP)
-__UNDEFINED__ isUTF8_CHAR(s0, e)    (                                           \
-    (e) <= (s0) || ! is_utf8_string(s0, D_PPP_MIN(UTF8SKIP(s0), (e) - (s0)))    \
+__UNDEFINED__ isUTF8_CHAR(s, e)    (                                            \
+    (e) <= (s) || ! is_utf8_string(s, UTF8_SAFE_SKIP(s, e))                     \
     ? 0                                                                         \
-    : UTF8SKIP(s0))
+    : UTF8SKIP(s))
 #endif
 
 #if 'A' == 65
@@ -192,7 +250,7 @@ utf8_to_uvchr_buf(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
          * than 31 bits */
         if (sizeof(ret) < 8) {
             overflows = 1;
-            overflow_length = 7;
+            overflow_length = (*s == 0xFE) ? 7 : 13;
         }
         else {
             const U8 highest[] =    /* 2*63-1 */
@@ -306,7 +364,12 @@ utf8_to_uvchr_buf(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
                 *retlen = D_PPP_MIN(*retlen, curlen);
                 *retlen = D_PPP_MIN(*retlen, UTF8SKIP(s));
                 do {
-                    if (s[i] < 0x80 || s[i] > 0xBF) {
+#      ifdef UTF8_IS_CONTINUATION
+                    if (! UTF8_IS_CONTINUATION(s[i]))
+#      else       /* Versions without the above don't support EBCDIC anyway */
+                    if (s[i] < 0x80 || s[i] > 0xBF)
+#      endif
+                    {
                         *retlen = i;
                         break;
                     }
@@ -335,7 +398,7 @@ utf8_to_uvchr_buf(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
 __UNDEFINED__  utf8_to_uvchr(s, lp)                                             \
     ((*(s) == '\0')                                                             \
     ? utf8_to_uvchr_buf(s,((s)+1), lp) /* Handle single NUL specially */        \
-    : utf8_to_uvchr_buf(s, (s) + my_strnlen((char *) (s), UTF8SKIP(s)), (lp)))
+    : utf8_to_uvchr_buf(s, (s) + UTF8_CHK_SKIP(s), (lp)))
 
 #endif
 
@@ -373,6 +436,46 @@ __UNDEFINED__  utf8_to_uvchr(s, lp)                                             
 
 =xsubs
 
+#if { VERSION >= 5.006 } /* This is just a helper fcn, not publicized */  \
+                         /* as being available and params not what the  */  \
+                         /* API function has; works on EBCDIC too */
+
+SV *
+uvoffuni_to_utf8(uni)
+
+    UV uni
+    PREINIT:
+        int len;
+        U8 string[UTF8_MAXBYTES+1];
+        int i;
+        UV native;
+    CODE:
+        native = UNI_TO_NATIVE(uni);
+
+	len = UVCHR_SKIP(native);
+
+        for (i = 0; i < len; i++) {
+            string[i] = '\0';
+        }
+
+        if (len <= 1) {
+            string[0] = native;
+        }
+        else {
+            i = len;
+            while (i-- > 1) {
+                string[i] = I8_TO_NATIVE_UTF8((uni & UTF_CONTINUATION_MASK) | UTF_CONTINUATION_MARK);
+                uni >>= UTF_ACCUMULATION_SHIFT;
+            }
+            string[0] = I8_TO_NATIVE_UTF8((uni & UTF_START_MASK(len)) | UTF_START_MARK(len));
+        }
+
+        RETVAL = newSVpvn((char *) string, len);
+        SvUTF8_on(RETVAL);
+    OUTPUT:
+        RETVAL
+
+#endif
 #if defined(UTF8_SAFE_SKIP) && defined(UTF8SKIP)
 
 STRLEN

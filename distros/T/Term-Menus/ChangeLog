@@ -1,3 +1,10 @@
+2019-11-05  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.022
+
+	* Changed FA return code from 1 to 0.
+
+
 2019-10-20  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
 
         * Version 3.021

@@ -8,7 +8,7 @@
 
 package Dancer2::Logger::LogReport;
 use vars '$VERSION';
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 # ABSTRACT: Dancer2 logger engine for Log::Report
 

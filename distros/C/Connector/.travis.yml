@@ -1,4 +1,6 @@
 language: perl
+perl:
+    - "5.28"
 
 #before_install:
 ##    - sudo apt-get update -qq

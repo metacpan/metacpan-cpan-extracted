@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Fast and easy Web Apps in Perl",
+  "ABSTRACT" => "Fast and Easy Web Apps",
   "AUTHOR" => "Sudheer Murthy <pause\@a1z.us>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -23,9 +23,12 @@ my %WriteMakefileArgs = (
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.21",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0
+  },
+  "VERSION" => "0.22",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -33,6 +36,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "CGI" => 0,
   "Exporter" => 0,
+  "Test::More" => 0,
   "parent" => 0,
   "strict" => 0,
   "vars" => 0,

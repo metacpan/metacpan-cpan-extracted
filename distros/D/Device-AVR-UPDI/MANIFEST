@@ -1,3 +1,4 @@
+bin/avr-updi
 bin/avr-updi-read-fuses
 bin/avr-updi-reset
 bin/avr-updi-write-fuses

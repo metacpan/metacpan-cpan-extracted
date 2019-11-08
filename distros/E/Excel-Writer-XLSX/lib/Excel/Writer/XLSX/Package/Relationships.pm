@@ -20,7 +20,7 @@ use Carp;
 use Excel::Writer::XLSX::Package::XMLwriter;
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our $schema_root     = 'http://schemas.openxmlformats.org';
 our $package_schema  = $schema_root . '/package/2006/relationships';
@@ -77,13 +77,14 @@ sub _assemble_xml_file {
 #
 sub _add_document_relationship {
 
-    my $self   = shift;
-    my $type   = shift;
-    my $target = shift;
+    my $self        = shift;
+    my $type        = shift;
+    my $target      = shift;
+    my $target_mode = shift;
 
     $type   = $document_schema . $type;
 
-    push @{ $self->{_rels} }, [ $type, $target ];
+    push @{ $self->{_rels} }, [ $type, $target, $target_mode ];
 }
 
 

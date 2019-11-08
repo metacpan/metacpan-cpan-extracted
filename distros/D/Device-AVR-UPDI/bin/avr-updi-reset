@@ -1,41 +1,18 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
-use Device::AVR::UPDI;
-use Getopt::Long;
-
-GetOptions(
-   'port|P=s' => \( my $PORT = "/dev/ttyUSB0" ),
-) or exit 1;
-
-my $updi = Device::AVR::UPDI->new(
-   dev => $PORT,
-   part => "ATtiny814", # part doesn't actually matter just for reset
-);
-
-$updi->init_link->get;
-
-print "Issuing Reset over UPDI\n";
-$updi->request_reset( 1 )->get;
-$updi->request_reset( 0 )->get;
+exec( "avr-updi", "reset", @ARGV );
 
 __END__
 
 =head1 NAME
 
-F<avr-updi-reset> - reset an F<AVR> microcontroller over F<UPDI>
+F<avr-updi-reset> - reset an F<AVR> microcontroller over F<UPDI> (deprecated)
 
 =head1 SYNOPSIS
 
-   $ avr-updi-reset
+   $ avr-updi reset
 
 =head1 DESCRIPTION
 
-This program sends a reset request to an F<AVR> microcontroller over a F<UPDI>
-interface.
-
-=head1 AUTHOR
-
-Paul Evans <leonerd@leonerd.org.uk>
+This program is deprecated. See the C<reset> subcommand of F<avr-updi>
+instead.

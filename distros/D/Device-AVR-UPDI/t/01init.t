@@ -47,5 +47,6 @@ Future::IO->override_impl( "TestFutureIO" );
 done_testing;
 
 package TestFutureIO;
+sub sleep           { Future->new }
 sub sysread         { $mockfio->sysread(@_[2..$#_]) }
 sub sysread_exactly { $mockfio->sysread(@_[2..$#_]) }

@@ -482,15 +482,21 @@ sub new
 		my $one = $1;
 		($self->{'artist'} = $2) =~ s/\s+$//;
 		$self->{'artist'} .= ' - https://www.brighteon.com' . $one  if ($one);
+	} elsif ($html =~ m#\"shortUrl\"\:\"([^\"]+)\"\,\"name\"\:\"([^\"]+)\"#) {
+		$self->{'artist'} = $2;
+		$self->{'artist'} .= " - http://www.brighteon.com/channel/$1"  if ($1);
 	}
 	my $id = $self->{'id'};
-	$self->{'title'} = ($html =~ m#video\:\s+\{\"id\"\:\"${id}\"\,\"name\"\:\"([^\"]+)\"#s) ? $1 : '';
+	$self->{'title'} = ($html =~ m#\<div\s+class\=\"main\-video\-title\"\>([^\<]+)\<#s) ? $1 : '';
+	$self->{'title'} ||= $1  if ($html =~ m#video\:\s+\{\"id\"\:\"${id}\"\,\"name\"\:\"([^\"]+)\"#s);
+	$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+name\=\"twitter\:title\"\s+content\=\"([^\"]+)\"#s);
 	$self->{'description'} = ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#s)
 			? $1 : '';
+	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"twitter\:description\"\s+content\=\"([^\"]+)\"#s);
 
 	$self->{'iconurl'} = ($html =~ m#\<link\s+rel\=\"image_src\"\s+href\=\"([^\"]+)#) ? $1 : '';
 
-	print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--DESC=".$self->{'description'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	#IF WE DIDN'T FIND ANY STREAMS IN THE PAGE, TRY youtube-dl:
 

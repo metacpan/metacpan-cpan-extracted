@@ -101,8 +101,7 @@ sub set {
     my @args = $self->_build_path( $args );
 
     if (!$params->{pkey}) {
-        $self->log()->error('You must pass the pkey as parameter to delete an entry.');
-        die 'You must pass the pkey as parameter to delete an entry.';
+        $self->_log_and_die('You must pass the pkey as parameter to delete an entry.');
     }
 
     my $mesg = $self->_run_search( { ARGS => \@args }, { noattrs => 1} );
@@ -117,7 +116,7 @@ sub set {
     }
 
     my $match_dn = lc($params->{pkey});
-     foreach my $entry ( $mesg->entries()) {
+    foreach my $entry ( $mesg->entries()) {
         if (lc($entry->dn()) eq $match_dn) {
             $entry->delete();
             #$entry->update( $ldap ); # Looks like delete is effective immediately

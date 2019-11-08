@@ -1,6 +1,44 @@
 package XML::Char;
 
 use utf8;
+use 5.006;
+use strict;
+use warnings;
+
+our $VERSION = '0.04';
+
+use parent qw(DynaLoader);
+
+use Exporter 'import';
+our @EXPORT_OK = qw(
+);
+
+__PACKAGE__->bootstrap;
+
+sub valid {
+    my ($self, $value);
+    if (@_ < 2) {
+        $self = __PACKAGE__;
+        $value = shift @_;
+    }
+    else {
+        $self  = shift @_;
+        $value = shift @_;
+    }
+
+    die 'bad usage'
+        if not eval { $self->can('valid') };
+
+    # undef is valid
+    return 1
+        if not defined $value;
+
+    return _valid_xml_string($value);
+}
+
+1;
+
+__END__
 
 =encoding UTF-8
 
@@ -14,7 +52,7 @@ XML::Char - validate characters for XML
     if (not XML::Char->valid("bell ".chr(7))) {
         die 'no way to store this string directly to XML';
     }
-    
+
     use utf8;
     use XML::Char;
     if (XML::Char->valid("UTF8 je pořádný peklo")) {
@@ -38,52 +76,17 @@ L<http://www.w3.org/TR/REC-xml/#charsets> defines which characters XML processor
 This module validates if a given string meets this criteria. In addition
 the string has to be a Perl UTF-8 string (C<is_utf8_string()> - see L<perlapi/Unicode-Support>).
 
-=cut
-
-use 5.006;
-use strict;
-use warnings;
-
-our $VERSION = '0.03';
-
-use parent qw(DynaLoader);
-
-use Exporter 'import';
-our @EXPORT_OK = qw(
-);
-
-__PACKAGE__->bootstrap;
-
 =head2 valid($value)
 
 Returns true or false if C<$value> consists of valid UTF-8 XML characters.
 
-=cut
+=head1 LINKS
 
-sub valid {
-    my ($self, $value);
-    if (@_ < 2) {
-        $self = __PACKAGE__;
-        $value = shift @_;
-    }
-    else {
-        $self  = shift @_;
-        $value = shift @_;
-    }
-    
-    die 'bad usage'
-        if not eval { $self->can('valid') };
-    
-    # undef is valid
-    return 1
-        if not defined $value;
-    
-    return _valid_xml_string($value);
-}
+L<How can I strip invalid XML characters from strings in Perl?|https://stackoverflow.com/questions/1016910/how-can-i-strip-invalid-xml-characters-from-strings-in-perl>
 
-1;
+L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/REC-xml/#charsets>
 
-__END__
+L<Extensible Markup Language (XML) 1.1|https://www.w3.org/TR/xml11/#charsets>
 
 =head1 AUTHOR
 

@@ -7,3 +7,8 @@ Revision history for perl module Git::Hooks::CheckYoutrack
 		Fix test issue - Make tests pass without module installation
 		Update pod for UPDATE hook
 
+1.0.2 - 2019-11-08
+		Fix issue - Rejecting valid commits on push - update hook
+		Improved logging for better debugging
+		Fixed issues on README
+

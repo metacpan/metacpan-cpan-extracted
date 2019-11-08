@@ -7,7 +7,17 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
-version 1.28:
+version 1.29: Fri  8 Nov 09:18:01 CET 2019
+
+	Fixes:
+	- error code changed from libxml2 2.9.9 to 2.9.10
+	  rt.cpan.org#130934 [Petr Pisar]
+
+	Improvements:
+	- skip tests with error messages for Haiku, because they are quite
+	  different. [cpantesters]
+
+version 1.28: Tue 14 May 09:27:50 CEST 2019
 
 	Fixes:
 	- Dancer2 version 0.166001 is too old as well. [cpantesters]

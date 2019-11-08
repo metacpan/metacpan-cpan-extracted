@@ -1,0 +1,41 @@
+unconstant
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc unconstant
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=unconstant
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/unconstant
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/unconstant
+
+    Search CPAN
+        https://metacpan.org/release/unconstant
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Evan Carroll.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

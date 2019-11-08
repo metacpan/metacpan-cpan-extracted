@@ -1,5 +1,5 @@
 package Selenium::Remote::RemoteConnection;
-$Selenium::Remote::RemoteConnection::VERSION = '1.35';
+$Selenium::Remote::RemoteConnection::VERSION = '1.36';
 use strict;
 use warnings;
 
@@ -235,7 +235,7 @@ Selenium::Remote::RemoteConnection - Connect to a selenium server
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

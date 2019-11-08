@@ -40,198 +40,198 @@ typedef void* SPVM_VALUE_object;
 #define SPVM_DIE(message, ...) do {\
   void* buffer = env->alloc_memory_block_zero(env, 255);\
   snprintf(buffer, 255, message " at %s line %d", __VA_ARGS__);\
-  void* exception = env->new_str_len_raw(env, buffer, strlen(buffer));\
+  void* exception = env->new_string_len_raw(env, buffer, strlen(buffer));\
   env->free_memory_block(env, buffer);\
   env->set_exception(env, exception);\
   return SPVM_EXCEPTION;\
 } while (0)\
 
-#define SPVM_NEW_OBJ(env, obj, package_name, file, line) do {\
-  int32_t id = env->basic_type_id(env, package_name);\
+#define SPVM_NEW_OBJECT(env, obj, package_name, file, line) do {\
+  int32_t id = env->get_basic_type_id(env, package_name);\
   if (id < 0) { SPVM_DIE("Package \"%s\" not found", package_name, file, line); };\
-  obj = env->new_obj(env, id);\
+  obj = env->new_object(env, id);\
 } while (0)\
 
 #define SPVM_NEW_POINTER(env, obj, package_name, ptr, file, line) do {\
-  int32_t id = env->basic_type_id(env, package_name);\
+  int32_t id = env->get_basic_type_id(env, package_name);\
   if (id < 0) { SPVM_DIE("Package \"%s\" not found", package_name, file, line); };\
   obj = env->new_pointer(env, id, ptr);\
 } while (0)\
 
-#define SPVM_SET_BFIELD(env, obj, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "byte");\
+#define SPVM_SET_FIELD_BYTE(env, obj, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "byte");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:byte", package_name, sub_name, file, line); };\
-  env->set_bfield(env, obj, id, value);\
+  env->set_field_byte(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_SET_SFIELD(env, obj, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "short");\
+#define SPVM_SET_FIELD_SHORT(env, obj, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "short");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:short", package_name, sub_name, file, line); };\
-  env->set_sfield(env, obj, id, value);\
+  env->set_field_short(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_SET_IFIELD(env, obj, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "int");\
+#define SPVM_SET_FIELD_INT(env, obj, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "int");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:int", package_name, sub_name, file, line); };\
-  env->set_ifield(env, obj, id, value);\
+  env->set_field_int(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_SET_LFIELD(env, obj, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "long");\
+#define SPVM_SET_FIELD_LONG(env, obj, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "long");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:long", package_name, sub_name, file, line); };\
-  env->set_lfield(env, obj, id, value);\
+  env->set_field_long(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_SET_FFIELD(env, obj, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "float");\
+#define SPVM_SET_FIELD_FLOAT(env, obj, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "float");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:float", package_name, sub_name, file, line); };\
-  env->set_ffield(env, obj, id, value);\
+  env->set_field_float(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_SET_DFIELD(env, obj, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "double");\
+#define SPVM_SET_FIELD_DOUBLE(env, obj, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "double");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:double", package_name, sub_name, file, line); };\
-  env->set_dfield(env, obj, id, value);\
+  env->set_field_double(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_SET_OFIELD(env, obj, package_name, sub_name, signature, value, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, signature);\
+#define SPVM_SET_FIELD_OBJECT(env, obj, package_name, sub_name, signature, value, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, signature);\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:%s", package_name, sub_name, signature, file, line); };\
-  env->set_ofield(env, obj, id, value);\
+  env->set_field_object(env, obj, id, value);\
 } while (0)\
 
-#define SPVM_BFIELD(env, left, obj, package_name, sub_name, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "byte");\
+#define SPVM_GET_FIELD_BYTE(env, left, obj, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "byte");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:byte", package_name, sub_name, file, line); };\
-  left = env->bfield(env, obj, id);\
+  left = env->get_field_byte(env, obj, id);\
 } while (0)\
 
-#define SPVM_SFIELD(env, left, obj, package_name, sub_name, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "short");\
+#define SPVM_GET_FIELD_SHORT(env, left, obj, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "short");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:short", package_name, sub_name, file, line); };\
-  left = env->sfield(env, obj, id);\
+  left = env->get_field_short(env, obj, id);\
 } while (0)\
 
-#define SPVM_IFIELD(env, left, obj, package_name, sub_name, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "int");\
+#define SPVM_GET_FIELD_INT(env, left, obj, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "int");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:int", package_name, sub_name, file, line); };\
-  left = env->ifield(env, obj, id);\
+  left = env->get_field_int(env, obj, id);\
 } while (0)\
 
-#define SPVM_LFIELD(env, left, obj, package_name, sub_name, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "long");\
+#define SPVM_GET_FIELD_LONG(env, left, obj, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "long");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:long", package_name, sub_name, file, line); };\
-  left = env->lfield(env, obj, id);\
+  left = env->get_field_long(env, obj, id);\
 } while (0)\
 
-#define SPVM_FFIELD(env, left, obj, package_name, sub_name, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "float");\
+#define SPVM_GET_FIELD_FLOAT(env, left, obj, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "float");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:float", package_name, sub_name, file, line); };\
-  left = env->ffield(env, obj, id);\
+  left = env->get_field_float(env, obj, id);\
 } while (0)\
 
-#define SPVM_DFIELD(env, left, obj, package_name, sub_name, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, "double");\
+#define SPVM_GET_FIELD_DOUBLE(env, left, obj, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, "double");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:double", package_name, sub_name, file, line); };\
-  left = env->dfield(env, obj, id);\
+  left = env->get_field_double(env, obj, id);\
 } while (0)\
 
-#define SPVM_OFIELD(env, left, obj, package_name, sub_name, signature, file, line) do {\
-  int32_t id = env->field_id(env, package_name, sub_name, signature);\
+#define SPVM_GET_FIELD_OBJECT(env, left, obj, package_name, sub_name, signature, file, line) do {\
+  int32_t id = env->get_field_id(env, package_name, sub_name, signature);\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:%s", package_name, sub_name, signature, file, line); };\
-  left = env->ofield(env, obj, id);\
+  left = env->get_field_object(env, obj, id);\
 } while (0)\
 
-#define SPVM_SET_BPKGVAR(env, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "byte");\
+#define SPVM_SET_PACKAGE_VAR_BYTE(env, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "byte");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:byte", package_name, sub_name, file, line); };\
-  env->set_bpkgvar(env, id, value);\
+  env->set_package_var_byte(env, id, value);\
 } while (0)\
 
-#define SPVM_SET_SPKGVAR(env, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "short");\
+#define SPVM_SET_PACKAGE_VAR_SHORT(env, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "short");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:short", package_name, sub_name, file, line); };\
-  env->set_spkgvar(env, id, value);\
+  env->set_package_var_short(env, id, value);\
 } while (0)\
 
-#define SPVM_SET_IPKGVAR(env, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "int");\
+#define SPVM_SET_PACKAGE_VAR_INT(env, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "int");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:int", package_name, sub_name, file, line); };\
-  env->set_ipkgvar(env, id, value);\
+  env->set_package_var_int(env, id, value);\
 } while (0)\
 
-#define SPVM_SET_LPKGVAR(env, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "long");\
+#define SPVM_SET_PACKAGE_VAR_LONG(env, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "long");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:long", package_name, sub_name, file, line); };\
-  env->set_lpkgvar(env, id, value);\
+  env->set_package_var_long(env, id, value);\
 } while (0)\
 
-#define SPVM_SET_FPKGVAR(env, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "float");\
+#define SPVM_SET_PACKAGE_VAR_FLOAT(env, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "float");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:float", package_name, sub_name, file, line); };\
-  env->set_fpkgvar(env, id, value);\
+  env->set_package_var_float(env, id, value);\
 } while (0)\
 
-#define SPVM_SET_DPKGVAR(env, package_name, sub_name, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "double");\
+#define SPVM_SET_PACKAGE_VAR_DOUBLE(env, package_name, sub_name, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "double");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:double", package_name, sub_name, file, line); };\
-  env->set_dpkgvar(env, id, value);\
+  env->set_package_var_double(env, id, value);\
 } while (0)\
 
-#define SPVM_SET_OPKGVAR(env, package_name, sub_name, signature, value, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, signature);\
+#define SPVM_SET_PACKAGE_VAR_OBJECT(env, package_name, sub_name, signature, value, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, signature);\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:%s", package_name, sub_name, signature, file, line); };\
-  env->set_opkgvar(env, id, value);\
+  env->set_package_var_object(env, id, value);\
 } while (0)\
 
-#define SPVM_BPKGVAR(env, left, package_name, sub_name, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "byte");\
+#define SPVM_GET_PACKAGE_VAR_BYTE(env, left, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "byte");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:byte", package_name, sub_name, file, line); };\
-  left = env->bpkgvar(env, id);\
+  left = env->get_package_var_byte(env, id);\
 } while (0)\
 
-#define SPVM_SPKGVAR(env, left, package_name, sub_name, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "short");\
+#define SPVM_GET_PACKAGE_VAR_SHORT(env, left, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "short");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:short", package_name, sub_name, file, line); };\
-  left = env->spkgvar(env, id);\
+  left = env->get_package_var_short(env, id);\
 } while (0)\
 
-#define SPVM_IPKGVAR(env, left, package_name, sub_name, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "int");\
+#define SPVM_GET_PACKAGE_VAR_INT(env, left, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "int");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:int", package_name, sub_name, file, line); };\
-  left = env->ipkgvar(env, id);\
+  left = env->get_package_var_int(env, id);\
 } while (0)\
 
-#define SPVM_LPKGVAR(env, left, package_name, sub_name, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "long");\
+#define SPVM_GET_PACKAGE_VAR_LONG(env, left, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "long");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:long", package_name, sub_name, file, line); };\
-  left = env->lpkgvar(env, id);\
+  left = env->get_package_var_long(env, id);\
 } while (0)\
 
-#define SPVM_FPKGVAR(env, left, package_name, sub_name, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "float");\
+#define SPVM_GET_PACKAGE_VAR_FLOAT(env, left, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "float");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:float", package_name, sub_name, file, line); };\
-  left = env->fpkgvar(env, id);\
+  left = env->get_package_var_float(env, id);\
 } while (0)\
 
-#define SPVM_DPKGVAR(env, left, package_name, sub_name, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, "double");\
+#define SPVM_GET_PACKAGE_VAR_DOUBLE(env, left, package_name, sub_name, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, "double");\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:double", package_name, sub_name, file, line); };\
-  left = env->dpkgvar(env, id);\
+  left = env->get_package_var_double(env, id);\
 } while (0)\
 
-#define SPVM_OPKGVAR(env, left, package_name, sub_name, signature, file, line) do {\
-  int32_t id = env->pkgvar_id(env, package_name, sub_name, signature);\
+#define SPVM_GET_PACKAGE_VAR_OBJECT(env, left, package_name, sub_name, signature, file, line) do {\
+  int32_t id = env->get_package_var_id(env, package_name, sub_name, signature);\
   if (id < 0) { SPVM_DIE("Field not found, package name:%s, sub name:%s, signature:%s", package_name, sub_name, signature, file, line); };\
-  left = env->opkgvar(env, id);\
+  left = env->get_package_var_object(env, id);\
 } while (0)\
 
 #define SPVM_CALL_SUB(env, exception_flag, package_name, sub_name, signature, stack, file, line) do {\
-  int32_t id = env->method_sub_id(env, obj, package_name, sub_name, signature);\
+  int32_t id = env->get_method_sub_id(env, obj, package_name, sub_name, signature);\
   if (id < 0) { SPVM_DIE("Method not found, package name:%s, sub name:%s, signature:%s", package_name, sub_name, signature, file, line); };\
   int32_t exception_flag = env->call_sub(env, id, stack);\
   if (exception_flag) {\
-    const char* message = env->belems(env, env->exception(env));\
+    const char* message = env->get_elems_byte(env, env->exception(env));\
     if (id < 0) { SPVM_DIE("%s", message, file, line); };\
     return SPVM_EXCEPTION;\
   }\
@@ -239,12 +239,12 @@ typedef void* SPVM_VALUE_object;
 
 #define SPVM_CALL_METHOD(env, sub_name, signature, stack, file, line) do {\
   void* obj = stack[0].oval;\
-  int32_t id = env->method_sub_id(env, obj, sub_name, signature);\
+  int32_t id = env->get_method_sub_id(env, obj, sub_name, signature);\
   if (id < 0) { SPVM_DIE("Method not found, object:%p, sub name:%s, signature:%s", obj, sub_name, signature, file, line); };\
   env->call_sub(env, id, stack);\
   int32_t exception_flag = env->call_sub(env, id, stack);\
   if (exception_flag) {\
-    const char* message = env->belems(env, env->exception(env));\
+    const char* message = env->get_elems_byte(env, env->exception(env));\
     if (id < 0) { SPVM_DIE("%s", message, file, line); };\
     return SPVM_EXCEPTION;\
   }\
@@ -317,14 +317,14 @@ struct SPVM_env {
   void* native_mortal_stack;
   void* native_mortal_stack_top;
   void* native_mortal_stack_capacity;
-  int32_t (*basic_type_id)(SPVM_ENV* env, const char* basic_type_name);
-  int32_t (*field_id)(SPVM_ENV* env, const char* package_name, const char* field_name, const char* signature);
-  int32_t (*field_offset)(SPVM_ENV* env, int32_t field_id);
-  int32_t (*pkgvar_id)(SPVM_ENV* env, const char* package_name, const char* package_var_name, const char* signature);
-  int32_t (*sub_id)(SPVM_ENV* env, const char* package_name, const char* sub_name, const char* signature);
-  int32_t (*method_sub_id)(SPVM_ENV* env, void* object, const char* sub_name, const char* signature);
-  void* (*new_obj_raw)(SPVM_ENV* env, int32_t basic_type_id);
-  void* (*new_obj)(SPVM_ENV* env, int32_t basic_type_id);
+  int32_t (*get_basic_type_id)(SPVM_ENV* env, const char* basic_type_name);
+  int32_t (*get_field_id)(SPVM_ENV* env, const char* package_name, const char* field_name, const char* signature);
+  int32_t (*get_field_offset)(SPVM_ENV* env, int32_t field_id);
+  int32_t (*get_package_var_id)(SPVM_ENV* env, const char* package_name, const char* package_var_name, const char* signature);
+  int32_t (*get_sub_id)(SPVM_ENV* env, const char* package_name, const char* sub_name, const char* signature);
+  int32_t (*get_method_sub_id)(SPVM_ENV* env, void* object, const char* sub_name, const char* signature);
+  void* (*new_object_raw)(SPVM_ENV* env, int32_t basic_type_id);
+  void* (*new_object)(SPVM_ENV* env, int32_t basic_type_id);
   void* (*new_barray_raw)(SPVM_ENV* env, int32_t length);
   void* (*new_barray)(SPVM_ENV* env, int32_t length);
   void* (*new_sarray_raw)(SPVM_ENV* env, int32_t length);
@@ -343,59 +343,59 @@ struct SPVM_env {
   void* (*new_marray)(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length);
   void* (*new_varray_raw)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
   void* (*new_varray)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
-  void* (*new_str_raw)(SPVM_ENV* env, const char* bytes);
-  void* (*new_str)(SPVM_ENV* env, const char* bytes);
-  void* (*new_str_len_raw)(SPVM_ENV* env, const char* bytes, int32_t length);
-  void* (*new_str_len)(SPVM_ENV* env, const char* bytes, int32_t length);
+  void* (*new_string_raw)(SPVM_ENV* env, const char* bytes);
+  void* (*new_string)(SPVM_ENV* env, const char* bytes);
+  void* (*new_string_len_raw)(SPVM_ENV* env, const char* bytes, int32_t length);
+  void* (*new_string_len)(SPVM_ENV* env, const char* bytes, int32_t length);
   void* (*new_pointer_raw)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
   void* (*new_pointer)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
   void* (*concat_raw)(SPVM_ENV* env, void* string1, void* string2);
   void* (*concat)(SPVM_ENV* env, void* string1, void* string2);
   void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* package_name, const char* sub_name, const char* file, int32_t line);
   void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* package_name, const char* sub_name, const char* file, int32_t line);
-  int32_t (*len)(SPVM_ENV* env, void* array);
-  int8_t* (*belems)(SPVM_ENV* env, void* array);
-  int16_t* (*selems)(SPVM_ENV* env, void* array);
-  int32_t* (*ielems)(SPVM_ENV* env, void* array);
-  int64_t* (*lelems)(SPVM_ENV* env, void* array);
-  float* (*felems)(SPVM_ENV* env, void* array);
-  double* (*delems)(SPVM_ENV* env, void* array);
-  void* (*oelem)(SPVM_ENV* env, void* array, int32_t index);
-  void (*set_oelem)(SPVM_ENV* env, void* array, int32_t index, void* value);
-  int8_t (*bfield)(SPVM_ENV* env, void* object, int32_t field_id);
-  int16_t (*sfield)(SPVM_ENV* env, void* object, int32_t field_id);
-  int32_t (*ifield)(SPVM_ENV* env, void* object, int32_t field_id);
-  int64_t (*lfield)(SPVM_ENV* env, void* object, int32_t field_id);
-  float (*ffield)(SPVM_ENV* env, void* object, int32_t field_id);
-  double (*dfield)(SPVM_ENV* env, void* object, int32_t field_id);
-  void* (*ofield)(SPVM_ENV* env, void* object, int32_t field_id);
-  void (*set_bfield)(SPVM_ENV* env, void* object, int32_t field_id, int8_t value);
-  void (*set_sfield)(SPVM_ENV* env, void* object, int32_t field_id, int16_t value);
-  void (*set_ifield)(SPVM_ENV* env, void* object, int32_t field_id, int32_t value);
-  void (*set_lfield)(SPVM_ENV* env, void* object, int32_t field_id, int64_t value);
-  void (*set_ffield)(SPVM_ENV* env, void* object, int32_t field_id, float value);
-  void (*set_dfield)(SPVM_ENV* env, void* object, int32_t field_id, double value);
-  void (*set_ofield)(SPVM_ENV* env, void* object, int32_t field_id, void* value);
-  int8_t (*bpkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  int16_t (*spkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  int32_t (*ipkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  int64_t (*lpkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  float (*fpkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  double (*dpkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  void* (*opkgvar)(SPVM_ENV* env, int32_t pkgvar_id);
-  void (*set_bpkgvar)(SPVM_ENV* env, int32_t pkgvar_id, int8_t value);
-  void (*set_spkgvar)(SPVM_ENV* env, int32_t pkgvar_id, int16_t value);
-  void (*set_ipkgvar)(SPVM_ENV* env, int32_t pkgvar_id, int32_t value);
-  void (*set_lpkgvar)(SPVM_ENV* env, int32_t pkgvar_id, int64_t value);
-  void (*set_fpkgvar)(SPVM_ENV* env, int32_t pkgvar_id, float value);
-  void (*set_dpkgvar)(SPVM_ENV* env, int32_t pkgvar_id, double value);
-  void (*set_opkgvar)(SPVM_ENV* env, int32_t pkgvar_id, void* value);
-  void* (*pointer)(SPVM_ENV* env, void* pointer_object);
+  int32_t (*length)(SPVM_ENV* env, void* array);
+  int8_t* (*get_elems_byte)(SPVM_ENV* env, void* array);
+  int16_t* (*get_elems_short)(SPVM_ENV* env, void* array);
+  int32_t* (*get_elems_int)(SPVM_ENV* env, void* array);
+  int64_t* (*get_elems_long)(SPVM_ENV* env, void* array);
+  float* (*get_elems_float)(SPVM_ENV* env, void* array);
+  double* (*get_elems_double)(SPVM_ENV* env, void* array);
+  void* (*get_elem_object)(SPVM_ENV* env, void* array, int32_t index);
+  void (*set_elem_object)(SPVM_ENV* env, void* array, int32_t index, void* value);
+  int8_t (*get_field_byte)(SPVM_ENV* env, void* object, int32_t field_id);
+  int16_t (*get_field_short)(SPVM_ENV* env, void* object, int32_t field_id);
+  int32_t (*get_field_int)(SPVM_ENV* env, void* object, int32_t field_id);
+  int64_t (*get_field_long)(SPVM_ENV* env, void* object, int32_t field_id);
+  float (*get_field_float)(SPVM_ENV* env, void* object, int32_t field_id);
+  double (*get_field_double)(SPVM_ENV* env, void* object, int32_t field_id);
+  void* (*get_field_object)(SPVM_ENV* env, void* object, int32_t field_id);
+  void (*set_field_byte)(SPVM_ENV* env, void* object, int32_t field_id, int8_t value);
+  void (*set_field_short)(SPVM_ENV* env, void* object, int32_t field_id, int16_t value);
+  void (*set_field_int)(SPVM_ENV* env, void* object, int32_t field_id, int32_t value);
+  void (*set_field_long)(SPVM_ENV* env, void* object, int32_t field_id, int64_t value);
+  void (*set_field_float)(SPVM_ENV* env, void* object, int32_t field_id, float value);
+  void (*set_field_double)(SPVM_ENV* env, void* object, int32_t field_id, double value);
+  void (*set_field_object)(SPVM_ENV* env, void* object, int32_t field_id, void* value);
+  int8_t (*get_package_var_byte)(SPVM_ENV* env, int32_t pkgvar_id);
+  int16_t (*get_package_var_short)(SPVM_ENV* env, int32_t pkgvar_id);
+  int32_t (*get_package_var_int)(SPVM_ENV* env, int32_t pkgvar_id);
+  int64_t (*get_package_var_long)(SPVM_ENV* env, int32_t pkgvar_id);
+  float (*get_package_var_float)(SPVM_ENV* env, int32_t pkgvar_id);
+  double (*get_package_var_double)(SPVM_ENV* env, int32_t pkgvar_id);
+  void* (*get_package_var_object)(SPVM_ENV* env, int32_t pkgvar_id);
+  void (*set_package_var_byte)(SPVM_ENV* env, int32_t pkgvar_id, int8_t value);
+  void (*set_package_var_short)(SPVM_ENV* env, int32_t pkgvar_id, int16_t value);
+  void (*set_package_var_int)(SPVM_ENV* env, int32_t pkgvar_id, int32_t value);
+  void (*set_package_var_long)(SPVM_ENV* env, int32_t pkgvar_id, int64_t value);
+  void (*set_package_var_float)(SPVM_ENV* env, int32_t pkgvar_id, float value);
+  void (*set_package_var_double)(SPVM_ENV* env, int32_t pkgvar_id, double value);
+  void (*set_package_var_object)(SPVM_ENV* env, int32_t pkgvar_id, void* value);
+  void* (*get_pointer)(SPVM_ENV* env, void* pointer_object);
   void (*set_pointer)(SPVM_ENV* env, void* pointer_object, void* pointer);
   int32_t (*call_sub)(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args);
-  void* (*exception)(SPVM_ENV* env);
+  void* (*get_exception)(SPVM_ENV* env);
   void (*set_exception)(SPVM_ENV* env, void* exception);
-  int32_t (*ref_count)(SPVM_ENV* env, void* object);
+  int32_t (*get_ref_count)(SPVM_ENV* env, void* object);
   void (*inc_ref_count)(SPVM_ENV* env, void* object);
   void (*dec_ref_count)(SPVM_ENV* env, void* object);
   int32_t (*enter_scope)(SPVM_ENV* env);
@@ -404,16 +404,16 @@ struct SPVM_env {
   int32_t (*remove_mortal)(SPVM_ENV* env, int32_t scope_id, void* remove_object);
   int32_t (*is_type)(SPVM_ENV* env, void* object, int32_t basic_type_id, int32_t type_dimension);
   int32_t (*has_callback)(SPVM_ENV* env, void* object, int32_t callback_basic_type_id);
-  int32_t (*object_basic_type_id)(SPVM_ENV* env, void* object);
-  int32_t (*object_type_dimension)(SPVM_ENV* env, void* object);
+  int32_t (*get_object_basic_type_id)(SPVM_ENV* env, void* object);
+  int32_t (*get_object_type_dimension)(SPVM_ENV* env, void* object);
   void (*weaken)(SPVM_ENV* env, void** object_address);
   int32_t (*isweak)(SPVM_ENV* env, void** object);
   void (*unweaken)(SPVM_ENV* env, void** object_address);
   void* (*alloc_memory_block_zero)(SPVM_ENV* env, int64_t byte_size);
   void (*free_memory_block)(SPVM_ENV* env, void* block);
-  int32_t (*memory_blocks_count)(SPVM_ENV* env);
-  void* (*type_name_raw)(SPVM_ENV* env, void* object);
-  void* (*type_name)(SPVM_ENV* env, void* object);
+  int32_t (*get_memory_blocks_count)(SPVM_ENV* env);
+  void* (*get_type_name_raw)(SPVM_ENV* env, void* object);
+  void* (*get_type_name)(SPVM_ENV* env, void* object);
   SPVM_ENV* (*new_env)(SPVM_ENV* env);
   void (*free_env)(SPVM_ENV* env);
 };

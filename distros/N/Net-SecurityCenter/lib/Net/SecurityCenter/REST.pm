@@ -10,9 +10,10 @@ use HTTP::Cookies;
 use JSON;
 use LWP::UserAgent;
 
+use Net::SecurityCenter::Error;
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.203';
+our $VERSION = '0.204';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR

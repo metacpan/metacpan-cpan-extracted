@@ -60,6 +60,6 @@
          "web" : "https://github.com/dinesh-it/Git-Hooks-CheckYoutrack"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,4 +1,4 @@
-Crypt-X509 version 0.50
+Crypt-X509 version 0.52
 =======================
 
 Crypt::X509 is an object oriented X.509 certificate parser with numerous
@@ -17,3 +17,8 @@ DEPENDENCIES
 This module requires:
 
   Convert::ASN1
+
+ISSUES, PULL REQUESTS
+
+Plesae visit [https://github.com/openxpki/Crypt-X509] for issues, pull
+requests, etc.

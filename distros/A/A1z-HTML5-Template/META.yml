@@ -1,8 +1,9 @@
 ---
-abstract: 'Fast and easy Web Apps in Perl'
+abstract: 'Fast and Easy Web Apps'
 author:
   - 'Sudheer Murthy <pause@a1z.us>'
-build_requires: {}
+build_requires:
+  Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
@@ -19,6 +20,6 @@ requires:
   strict: 0
   vars: 0
   warnings: 0
-version: 0.21
+version: 0.22
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.51'

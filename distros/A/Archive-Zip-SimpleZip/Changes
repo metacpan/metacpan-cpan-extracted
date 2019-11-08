@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  0.029 8 November 2019
+
+        * Fix Use of uninitialized value error
+          53fee715828dfc08071b34fffb7408de91758d09 
+
+  0.028 7 November 2019
+
+        * Beef up test for library versions
+          a154c5c7e286286c393e7b1832b77e0ca48d5594
+   
   0.027 7 November 2019
 
         * t/000prereq.t

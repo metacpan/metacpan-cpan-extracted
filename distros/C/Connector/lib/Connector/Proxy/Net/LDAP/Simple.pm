@@ -28,8 +28,7 @@ sub get {
     my @args = $self->_build_path( shift );
 
     if (!$self->attrs || @{$self->attrs} != 1) {
-        $self->log()->error("The attribute list must contain at least one entry");
-        die "The attribute list must contain at least one entry"
+        $self->_log_and_die("The attribute list must contain at least one entry");
     }
 
     my $mesg = $self->_run_search( { ARGS => \@args } );
@@ -44,7 +43,7 @@ sub get {
     }
 
     if ($mesg->count() > 1) {
-        die "More than one entry found - result is not unique."
+        $self->_log_and_die("More than one entry found - result is not unique.");
     }
 
     my $entry = $mesg->entry(0);
@@ -68,9 +67,11 @@ sub set {
     my @args = $self->_build_path( $args );
 
     if (!$self->attrs || @{$self->attrs} != 1) {
-        $self->log()->error("The attribute list must contain exactly one entry");
-        die "The attribute list must contain exactly one entry"
+        $self->_log_and_die("The attribute list must contain exactly one entry");
     }
+
+    my $action = $self->action();
+    my $attribute = $self->attrs->[0];
 
     my $entry;
 
@@ -83,33 +84,38 @@ sub set {
     }
 
     if ($mesg->count() > 1) {
-        $self->log()->error('Set by filter had multiple results: ' . join '|', @args);
-        die "More than one entry found - result is not unique."
+        $self->_log_and_die('Set by filter had multiple results: ' . join '|', @args);
     }
 
     if ($mesg->count() == 1) {
         $entry = $mesg->entry(0);
         $self->log()->debug('Entry found ' . $entry->dn());
-    } else {
+
         # Check if autocreate is configured
-        $entry = $self->_triggerAutoCreate( \@args );
-        return $self->_node_not_exists(\@args) if (!$entry);
+    } elsif (($action ne "delete") && $self->schema()) {
+
+        $entry = $self->_triggerAutoCreate( \@args, { $attribute => $value } );
+        if ($entry) {
+            $self->log()->debug('Entry was created with given value');
+            return 1;
+        } else {
+            $self->log()->warn('Auto-Create failed');
+        }
     }
 
-    my $action = $self->action();
-    my $attribute = $self->attrs->[0];
+    return $self->_node_not_exists(\@args) if (!$entry);
 
     if ($action eq "append") {
-        $self->log()->debug('Append '.$value.' to Attribute '.$attribute);
+        $self->log()->trace('Append '.$value.' to Attribute '.$attribute);
         $entry->add( $attribute => $value );
     } elsif($action eq "delete") {
-        $self->log()->debug('Delete '.$value.' from Attribute '.$attribute);
+        $self->log()->trace('Delete '.$value.' from Attribute '.$attribute);
         $entry->delete( $attribute => $value ) if ($value);
     } elsif (defined $value) {
-        $self->log()->debug('Replace Attribute '.$attribute.' with '.$value);
+        $self->log()->trace('Replace Attribute '.$attribute.' with '.$value);
         $entry->replace( $attribute => $value );
     } else { # Implicit delete - replace with an undef value
-        $self->log()->debug('Remove Attribute '.$attribute);
+        $self->log()->trace('Remove Attribute '.$attribute);
         $entry->delete( $attribute => undef );
     }
 

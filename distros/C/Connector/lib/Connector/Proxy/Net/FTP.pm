@@ -175,10 +175,10 @@ sub set {
 
         $data = { DATA => $data } if (ref $data eq '');
 
-        $template->process( \$self->content(), $data, \$content) || die "Error processing content template.";
+        $template->process( \$self->content(), $data, \$content) || $self->_log_and_die("Error processing content template.");
     } else {
         if (ref $data ne '') {
-            die "You need to define a content template if data is not a scalar";
+            $self->_log_and_die("You need to define a content template if data is not a scalar");
         }
         $content = $data;
     }
@@ -186,7 +186,7 @@ sub set {
     my $tmpdir = tempdir( CLEANUP => 1 );
     my ($fh, $source) = tempfile( DIR => $tmpdir );
 
-    open FILE, ">$source" || $self->__log_and_die("Unable to open file for writing");
+    open FILE, ">$source" || $self->_log_and_die("Unable to open file for writing");
     print FILE $content;
     close FILE;
 
@@ -197,13 +197,13 @@ sub set {
     if ($dirname && $dirname ne '.') {
         $self->log()->debug('Change dir to ' . $dirname );
         $ftp->cwd($dirname) or
-            $self->__log_and_die('Cannot change working directory: ' . $ftp->message);
+            $self->_log_and_die('Cannot change working directory: ' . $ftp->message);
     }
 
 
     $self->log()->debug('Send put '. $source . ' => ' . $filename );
     $ftp->put( $source, $filename)
-        or $self->__log_and_die('put failed: ' . $ftp->message);
+        or $self->_log_and_die('put failed: ' . $ftp->message);
 
     $ftp->quit;
 
@@ -225,21 +225,21 @@ sub _sanitize_path {
     if ($self->path()) {
         my $pattern = $self->path();
         $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing file template.";
+        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || $self->_log_and_die("Error processing file template.");
     } elsif ($self->file()) {
         my $pattern = $self->file();
         my $template = Template->new({});
         $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing file template.";
+        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || $self->_log_and_die("Error processing file template.");
         if ($file =~ m{[\/\\]}) {
-            $self->__log_and_die('Target file name contains directory seperator! Consider using path instead.');
+            $self->_log_and_die('Target file name contains directory seperator! Consider using path instead.');
         }
     } else {
         $self->log()->debug('Neither target pattern nor file set, join arguments');
 
         map {
             if ($_ =~ /\.\.|\//) {
-                $self->__log_and_die("args contains invalid characters (double dot or slash)");
+                $self->_log_and_die("args contains invalid characters (double dot or slash)");
             }
         } @args;
         $file = join("/", @args);
@@ -265,16 +265,17 @@ sub _client {
         'Passive' => (not $self->active()),
         'Debug' => $self->debug(),
         'Port' => $self->port(),
-    ) or $self->__log_and_die(sprintf("Cannot connect to %s (%s)", $self->LOCATION(), $@));
+    ) or $self->_log_and_die(sprintf("Cannot connect to %s (%s)", $self->LOCATION(), $@));
 
     if ($self->username()) {
         $ftp->login($self->username(),$self->password())
-          or die "Cannot login ", $ftp->message;
+          or $self->_log_and_die("Cannot login " . $ftp->message);
+
     }
 
     if ($self->basedir()) {
         $self->log()->debug('Change basedir to ' . $self->basedir());
-        $ftp->cwd($self->basedir()) or die "Cannot change base directory ", $ftp->message;
+        $ftp->cwd($self->basedir()) or $self->_log_and_die("Cannot change base directory " . $ftp->message);
     }
 
     if ($self->binary()) {
@@ -286,16 +287,6 @@ sub _client {
     }
 
     return $ftp;
-
-}
-
-sub __log_and_die {
-
-    my $self = shift;
-    my $error = shift;
-
-    $self->log()->error($error);
-    die $error;
 
 }
 

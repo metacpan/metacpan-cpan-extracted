@@ -1,8 +1,23 @@
-# NAME
+# Name
 
 Git::Hooks::CheckYoutrack - Git::Hooks plugin which requires youtrack ticket number on each commit message
+A perl cpan module - https://metacpan.org/pod/Git::Hooks::CheckYoutrack
 
-# SYNOPSIS
+# Installation
+
+You can install this module like any other cpan module using cpan or cpanm which automatically installs dependencies.
+
+    cpanm Git::Hooks::CheckYoutrack
+    or
+    cpan Git::Hooks::CheckYoutrack
+    
+You can also install from source (clone of this repository)
+
+     perl Makefile.PL
+     make test
+     make install
+
+# Synopsis
 
 As a `Git::Hooks` plugin you don't use this Perl module directly. Instead, you
 may configure it in a Git configuration file like this:
@@ -19,10 +34,11 @@ may configure it in a Git configuration file like this:
 
        # Refer: https://www.jetbrains.com/help/youtrack/standalone/Manage-Permanent-Token.html
        # to create a Bearer token
+       # You can also set YoutrackToken ENV instead of this config
        youtrack-token = "<your-token>"
 
        # Regular expression to match for Youtrack ticket id
-       matchkey = '^((?:P|M)(?:AY|\d+)-\d+)'
+       matchkey = "^((?:P)(?:AY|\\d+)-\\d+)"
 
        # Setting this flag will aborts the commit if valid Youtrack number not found
        # Shows a warning message otherwise - default false
@@ -32,7 +48,7 @@ may configure it in a Git configuration file like this:
        # default false
        print-info = true
 
-# DESCRIPTION
+# Description
 
 This plugin hooks the following git hooks to guarantee that every commit message 
 cites a valid Youtrack Id in the log message, so that you can be certain that 
@@ -42,7 +58,7 @@ for steps to install and use Git::Hooks
 This plugin also hooks prepare-commit-msg to pre-populate youtrack ticket sumary on the 
 commit message if the current working branch name is starting with the valid ticket number
 
-# METHODS
+# Hooks
 
 ## **commit-msg**, **applypatch-msg**
 
@@ -61,7 +77,7 @@ if config required = false but accepts the push.
 This hook is invoked before a commit, to check if the current branch name start with 
 a valid youtrack ticket id and pre-populates the commit message with youtrack ticket: summary
 
-# USAGE INSTRUCTION
+# Usage Instruction
 
 Create a generic script that will be invoked by Git for every hook. Go to hooks directory of your repository,
 for local repository it is .git/hooks/ and for remote server it is ./hooks/ and create a simple executable perl script
@@ -91,16 +107,12 @@ For remote repository
     $ cd /path/to/repo/hooks
 
     $ ln -s git-hooks.pl update
-
-# SEE ALSO
-
-Git::Hooks
-
-# AUTHORS
+    
+# Author
 
 Dinesh Dharmalingam, &lt;dd.dinesh.rajakumar@gmail.com>
 
-# LICENSE
+# License
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

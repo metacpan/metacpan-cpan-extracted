@@ -81,6 +81,9 @@ examples/traces/histogram2d.png
 examples/traces/histogram2dcontour.html
 examples/traces/histogram2dcontour.pl
 examples/traces/histogram2dcontour.png
+examples/traces/image.html
+examples/traces/image.pl
+examples/traces/image.png
 examples/traces/indicator.html
 examples/traces/indicator.pl
 examples/traces/indicator.png
@@ -467,6 +470,10 @@ lib/Chart/Plotly/Trace/Histogram2dcontour/Xbins.pm
 lib/Chart/Plotly/Trace/Histogram2dcontour/Xbins/ImpliedEdits.pm
 lib/Chart/Plotly/Trace/Histogram2dcontour/Ybins.pm
 lib/Chart/Plotly/Trace/Histogram2dcontour/Ybins/ImpliedEdits.pm
+lib/Chart/Plotly/Trace/Image.pm
+lib/Chart/Plotly/Trace/Image/Hoverlabel.pm
+lib/Chart/Plotly/Trace/Image/Hoverlabel/Font.pm
+lib/Chart/Plotly/Trace/Image/Stream.pm
 lib/Chart/Plotly/Trace/Indicator.pm
 lib/Chart/Plotly/Trace/Indicator/Delta.pm
 lib/Chart/Plotly/Trace/Indicator/Delta/Decreasing.pm

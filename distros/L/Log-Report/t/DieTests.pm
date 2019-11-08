@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package DieTests;
 use vars '$VERSION';
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 use warnings;
 use strict;
@@ -13,7 +13,15 @@ use Log::Report::Die qw/die_decode/;
 use Log::Report      qw/log-report/;
 use Carp;
 
-use Test::More tests => 27;
+use Test::More;
+
+BEGIN {
+    plan skip_all => "Error messages on $^O differ too much."
+        if $^O =~ /haiku$/;
+
+    plan tests => 27;
+}
+
 use DieTests;
 
 $! = 3;
