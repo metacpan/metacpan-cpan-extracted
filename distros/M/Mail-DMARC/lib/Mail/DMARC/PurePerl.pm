@@ -1,5 +1,5 @@
 package Mail::DMARC::PurePerl;
-our $VERSION = '1.20191004'; # VERSION
+our $VERSION = '1.20191025';
 use strict;
 use warnings;
 
@@ -309,7 +309,7 @@ sub is_whitelisted {
             ($comment && $comment =~ /\S/ ? ('comment' => $comment) : () ),
             );
     return $type;
-};
+}
 
 sub has_valid_reporting_uri {
     my ( $self, $rua ) = @_;
@@ -578,7 +578,7 @@ sub verify_external_reporting {
 
 1;
 
-# ABSTRACT: Pure Perl implementation of DMARC
+__END__
 
 =pod
 
@@ -588,7 +588,7 @@ Mail::DMARC::PurePerl - Pure Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20191004
+version 1.20191025
 
 =head1 METHODS
 
@@ -745,17 +745,17 @@ Matt Simerson <msimerson@cpan.org>
 
 Davide Migliavacca <shari@cpan.org>
 
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Matt Simerson.
+This software is copyright (c) 2019 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-sub {}
-

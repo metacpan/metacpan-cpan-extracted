@@ -1,0 +1,28 @@
+---
+abstract: 'read an X11 PCF font file'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Font-PCF
+provides:
+  Font::PCF:
+    file: lib/Font/PCF.pm
+    version: '0.01'
+requires:
+  IO::Handle::Packable: '0'
+  List::Util: '0'
+  PerlIO::gzip: '0'
+  Struct::Dumb: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

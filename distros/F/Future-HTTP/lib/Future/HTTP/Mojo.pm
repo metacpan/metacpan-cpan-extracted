@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 with 'Future::HTTP::Handler';
 
@@ -36,7 +36,7 @@ requests asynchronously.
 
 sub BUILDARGS {
     my( $class, %options ) = @_;
-    
+
     my @ua_args = keys %options ? (_ua_args => \%options) : ();
     return +{
         @ua_args
@@ -51,7 +51,7 @@ sub _ae_from_mojolicious( $self, $tx ) {
     $headers->{Status} = $res->code;
     $headers->{Reason} = '';
     $headers->{URL}    = $tx->req->url;
-    
+
     if( $tx->redirects) {
         my $r = $headers;
         for my $mojolicious_result ( reverse @{ $tx->redirects } ) {
@@ -59,15 +59,15 @@ sub _ae_from_mojolicious( $self, $tx ) {
             $r = $r->{Redirect}->[1]; # point to the new result headers
         };
     };
-    
+
     return ($body, $headers)
 };
 
 sub _request($self, $method, $url, %options) {
-    
+
     # Munge the parameters from AnyEvent::HTTP to Mojolicious::UserAgent
     # we should handle on_body parts here with the 'on read' callback
-    
+
     my $body = defined $options{ body } ? $options{ body } : '';
     # Execute the request (asynchronously)
     my $_tx = $self->ua->build_tx(
@@ -75,14 +75,14 @@ sub _request($self, $method, $url, %options) {
         $options{ headers } || {},
         $body,
     );
-    
+
     my $res = Future::Mojo->new();
     $_tx = $self->ua->start($_tx, sub( $ua, $tx ) {
         my( $body, $headers ) = $self->_ae_from_mojolicious( $tx );
-        
+
         $self->http_response_received( $res, $body, $headers );
     });
-    
+
     $res
 }
 
@@ -194,7 +194,7 @@ L<Mojo::UserAgent> for the backend
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<http://github.com/Corion/future-http>.
 
 =head1 SUPPORT
@@ -214,7 +214,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

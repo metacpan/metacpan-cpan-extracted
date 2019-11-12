@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-our $VERSION = '1.20191004'; # VERSION
 use strict;
 use warnings;
 
@@ -31,20 +30,16 @@ $recv->from_file($file)  if $file;
 
 exit;
 
-# PODNAME: dmarc_receive
-# ABSTRACT: receive aggregate reports via IMAP, mbox, or message file(s)
-
 __END__
-
-=pod
 
 =head1 NAME
 
-dmarc_receive - receive aggregate reports via IMAP, mbox, or message file(s)
+dmarc_receive: receive aggregate reports via IMAP, mbox, or message file(s)
 
-=head1 VERSION
+=head1 USAGE
 
-version 1.20191004
+ dmarc_receive [ --imap | --mbox | --file ]
+
 
 =head1 DESCRIPTION
 
@@ -79,30 +74,5 @@ Accepts the filename of a file containing a mail message. The message is parsed 
 =head2 Mbox
 
 Accepts the filename of a mbox format file containing mail messages. The messages are parsed and stored.
-
-=head1 USAGE
-
- dmarc_receive [ --imap | --mbox | --file ]
-
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Matt Simerson <msimerson@cpan.org>
-
-=item *
-
-Davide Migliavacca <shari@cpan.org>
-
-=back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Matt Simerson.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

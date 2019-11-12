@@ -1,0 +1,30 @@
+0.07 	9 November 2019
+	Adoption.
+
+0.06	17 January 2004
+	Verified Thread::Bless works with 5.8.3 and 5.9.0.  Adapted
+	documentation slightly to reflect this.
+
+	Now requires version 5.8.1 in the Makefile.PL.
+
+0.05	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.04	5 December 2003
+	Added tests for creating blessed objects that are not activated with
+	Thread::Bless.
+
+0.03	4 December 2003
+	Made the registering objects functionality accessible externally so
+	that it can also be used on object that are blessed in XS.  Suggested
+	by Stas Bekman.
+
+0.02	29 November 2003
+	Changed the INIT handler to a normal "initialize" subroutine, and
+	have the INIT handler call that.  Made sure that the handler can be
+	called seperately and multiple times.  Added some documentation in
+	the MOD_PERL section indicating it is ok to call "initialize" as a
+	class method as many times as you want.
+
+0.01	14 November 2003
+	First version of Thread::Bless.

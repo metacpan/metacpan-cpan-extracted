@@ -437,6 +437,57 @@ line 8
 [TheEnd]
 },
 
+### RT #90134
+'G' => {
+  script => 'G',
+  input  => 'bins',
+  expect => <<'[TheEnd]',
+0
+
+111
+
+1000
+
+10001
+
+[TheEnd]
+},
+'G3' => {
+  script => 'G;',
+  input  => 'bins',
+  expect => <<'[TheEnd]',
+0
+
+111
+
+1000
+
+10001
+
+[TheEnd]
+},
+'G2' => {
+  todo   => 'RT #90134, GH#2',
+  script => 'G; s/\n/&&/; /^\([ ~-]*\n\).*\n\1/d; s/\n//; h;',
+  input  => 'bins',
+  expect => <<'[TheEnd]',
+0
+
+111
+0
+
+1000
+111
+0
+
+10001
+1000
+111
+0
+
+[TheEnd]
+},
+
 ### gh ###
 'gh' => {
   script => <<'[TheEnd]',
@@ -456,6 +507,20 @@ line 5
 [TheEnd]
 },
 
+'H' => {
+  script => 'H;p',
+  input  => 'bins',
+  expect => <<'[TheEnd]',
+0
+0
+111
+111
+1000
+1000
+10001
+10001
+[TheEnd]
+},
 ### i ###
 'i' => {
   script => <<'[TheEnd]',

@@ -1,0 +1,12 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/Thread/Pool/Resolve.pm
+t/Resolve01.t
+t/Resolve02.t
+t/resolveit
+META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

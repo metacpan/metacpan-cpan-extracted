@@ -5,3 +5,4 @@ META.yml
 README
 t/0.use.t
 t/1.simple.t
+META.json                                Module JSON meta-data (added by MakeMaker)

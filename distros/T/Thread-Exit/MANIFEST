@@ -8,3 +8,4 @@ lib/Thread/Exit.pm
 t/Exit01.t
 t/Exit02.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

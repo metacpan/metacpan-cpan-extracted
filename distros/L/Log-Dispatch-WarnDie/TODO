@@ -1,0 +1,4 @@
+Add examples and more elaborate test-suite.
+
+Die type messages don't appear in the output of the test-suite because
+Test::Harness installs a __DIE__ handler.

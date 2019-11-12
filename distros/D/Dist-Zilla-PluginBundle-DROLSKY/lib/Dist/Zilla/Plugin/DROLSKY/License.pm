@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Module::Runtime qw( use_module );
 use String::RewritePrefix;
@@ -37,7 +37,7 @@ sub provide_license {
     return $license_class->new(
         {
             holder => $args->{copyright_holder} || 'David Rolsky',
-            year => $years,
+            year   => $years,
         },
     );
 }
@@ -60,7 +60,7 @@ Dist::Zilla::Plugin::DROLSKY::License - Sets up default license and copyright ho
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for Pod::Coverage .*
 
@@ -80,7 +80,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

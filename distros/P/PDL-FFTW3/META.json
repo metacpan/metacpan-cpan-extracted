@@ -4,13 +4,13 @@
       "Dima Kogan <dima@secretsauce.net>, Craig DeForest <deforest@boulder.swri.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0521, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-FFTW3",
    "no_index" : {
@@ -40,11 +40,13 @@
    "provides" : {
       "PDL::FFTW3" : {
          "file" : "FFTW3.pd",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "X_type" : "git",
+      "X_url" : "git://github.com/PDLPorters/pdl-fftw3.git",
       "bugtracker" : {
          "web" : "http://github.com/PDLPorters/pdl-fftw3/issues"
       },
@@ -52,8 +54,9 @@
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/PDLPorters/pdl-fftw3.git"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }
-

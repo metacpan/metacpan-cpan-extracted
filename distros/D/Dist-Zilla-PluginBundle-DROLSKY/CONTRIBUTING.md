@@ -66,8 +66,9 @@ You can learn more about Dist::Zilla at http://dzil.org/.
 The code for this distribution is [hosted on GitHub](https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY).
 
 You can submit code changes by forking the repository, pushing your code
-changes to your clone, and then submitting a pull request. See the GitHub
-documentation for [detailed instructions on pull
+changes to your clone, and then submitting a pull request. Please update the
+Changes file with a user-facing description of your changes as part of your
+work. See the GitHub documentation for [detailed instructions on pull
 requests](https://help.github.com/articles/creating-a-pull-request)
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
@@ -80,7 +81,8 @@ All pull requests for this distribution will be automatically tested
 on Linux by [Travis](https://travis-ci.org/autarch/Dist-Zilla-PluginBundle-DROLSKY).
 
 All CI results will be visible in the pull request on GitHub. Follow the
-appropriate links for details when tests fail.
+appropriate links for details when tests fail. PRs cannot be merged until tests
+pass.
 
 
 ## TidyAll

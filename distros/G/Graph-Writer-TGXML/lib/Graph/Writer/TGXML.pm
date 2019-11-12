@@ -12,7 +12,7 @@ use Graph::Writer;
 use XML::Writer;
 
 use vars qw(@ISA $VERSION);
-$VERSION = 0.01;
+$VERSION = 0.03;
 @ISA = qw(Graph::Writer);
 
 
@@ -55,7 +55,7 @@ sub _write_graph
     #-------------------------------------------------------------------
     # dump out vertices of the graph, including any attributes
     #-------------------------------------------------------------------
-    foreach $v ($graph->vertices)
+    foreach $v (sort { $a cmp $b  } ($graph->vertices))
     {
         my $attributes = $graph->get_vertex_attributes($v) || {};
 

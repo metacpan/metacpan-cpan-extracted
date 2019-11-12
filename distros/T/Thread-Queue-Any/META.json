@@ -4,13 +4,13 @@
       "Elizabeth Mattijsen (liz@dijkmat.nl)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Thread-Queue-Any",
    "no_index" : {
@@ -38,5 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.14"
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

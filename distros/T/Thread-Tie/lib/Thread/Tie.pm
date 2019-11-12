@@ -16,7 +16,7 @@ END { Thread::Tie->shutdown }
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 use strict;
 
 # Clone detection logic
@@ -282,7 +282,7 @@ Thread::Tie - tie variables into a thread of their own
 
 =head1 VERSION
 
-This documentation describes version 0.13.
+This documentation describes version 0.14.
 
 =head1 SYNOPSIS
 

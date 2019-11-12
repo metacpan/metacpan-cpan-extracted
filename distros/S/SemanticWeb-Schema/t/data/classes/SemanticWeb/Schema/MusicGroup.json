@@ -26,13 +26,13 @@
          "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
          "rdfs:label" : "genre",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
             "schema:MusicGroup",
+            "schema:CreativeWork",
             "schema:BroadcastChannel"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:musicGroupMember" : {

@@ -1,8 +1,8 @@
 use 5.014;
-#package Thread::Serialize '1.01'; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Serialize '1.02'; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Serialize;         # please remove if no longer needed
 
-our $VERSION= '1.01';              # please remove if no longer needed
+our $VERSION= '1.02';              # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;;
@@ -118,7 +118,7 @@ Thread::Serialize - serialize data-structures between threads
 
 =head1 VERSION
 
-This documentation describes version 1.01.
+This documentation describes version 1.02.
 
 =head1 DESCRIPTION
 

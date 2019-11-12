@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
 
 
 has alignment_type => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::AlignmentObject - An intangible item that describes an alig
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 

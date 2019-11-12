@@ -1,0 +1,26 @@
+0.04	9 November 2019
+	Adoption.
+
+0.03	27 June 2002
+	Oops.  Object creation only allows one object per interpreter.  Fixed.
+
+	Forgot to update VERSION.  It now correctly shows 0.03.
+
+0.02	26 June 2002
+	Adapted test so that too long lines are now also tested for.
+
+	Removed FLUSH().  Not necessary anymore as everything is written
+	immediately.
+
+	Changed WRITE so that it writes to the handle immediately rather than
+	adding to the buffer in the object.
+
+	Changed PUSHED so that the object is just something to hang the methods
+	on.
+
+	Removed superfluous -package- from pod.
+
+	Emptied TODO: there was some garbage there from another project.
+
+0.01	25 June 2002
+	Initial release of IOLayer::QuotedPrint.

@@ -24,7 +24,7 @@ sub get {
   my ($self, $arg) = @_;
 
   isa_ok $self, 'Net::Facebook::Oauth2', 'FBMock: object checks ok';
-  is $arg, 'https://graph.facebook.com/v2.8/me', 'FBMock: arguments check on get()';
+  is $arg, 'https://graph.facebook.com/v4.0/me', 'FBMock: arguments check on get()';
 
   return bless {}, 'FBMock';
 }
@@ -56,8 +56,8 @@ package main;
     ok my $fb = facebook(), 'facebook object is available to apps';
     isa_ok $fb, 'Net::Facebook::Oauth2';
 
-    is auth_fb_authenticate_url(),
-       'https://www.facebook.com/v2.8/dialog/oauth?client_id=1234&redirect_uri=http%3A%2F%2Fmyserver%3A3000%2Fauth%2Ffacebook%2Fcallback&scope=basic_info,email,user_birthday&display=page',
+    like auth_fb_authenticate_url(),
+       qr{^https://www\.facebook\.com/v4\.0/dialog/oauth},
        'auth_fb_authenticate_url() returns the proper facebook auth url';
 }
 

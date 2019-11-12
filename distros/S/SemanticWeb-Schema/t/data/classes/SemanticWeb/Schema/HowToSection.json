@@ -15,8 +15,8 @@
          "rdfs:comment" : "A single step item (as HowToStep, text, document, video, etc.) or a HowToSection (originally misnamed 'steps'; 'step' is preferred).",
          "rdfs:label" : "steps",
          "schema:domainIncludes" : [
-            "schema:HowToSection",
-            "schema:HowTo"
+            "schema:HowTo",
+            "schema:HowToSection"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

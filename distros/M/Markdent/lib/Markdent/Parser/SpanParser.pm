@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -147,7 +147,7 @@ sub _parse_uri_and_title {
     $uri = q{}
         unless defined $uri;
 
-    $uri =~ s/^<|>$//g;
+    $uri   =~ s/^<|>$//g;
     $title =~ s/^"|"$//g
         if defined $title;
 
@@ -643,7 +643,7 @@ sub _match_html_tag {
     my $self = shift;
     my $text = shift;
 
-    return unless ${$text} =~ /\G (< [^>]+ >)/xgc;
+    return unless ${$text} =~ m{\G (< [^>]+ >)}xgc;
 
     my $tag = $1;
 
@@ -652,37 +652,17 @@ sub _match_html_tag {
         $event = $self->_make_event( EndHTMLTag => tag => $1 );
     }
     else {
-        $tag =~ s/^<|>$//g;
+        $tag =~ s{^<|/?>$}{}g;
 
-        my ( $tag_name, $attr ) = split /\s+/, $tag, 2;
+        my ( $tag_name, $attr_text ) = split /\s+/, $tag, 2;
 
-        $attr =~ s{/\s*$}{}
-            if defined $attr;
-
-        my %attr;
-        if ( defined $attr && $attr =~ /\S/ ) {
-            for my $attr ( split /\s+/, $attr ) {
-                if ( $attr =~ /=/ ) {
-                    my ( $attr_name, $val ) = split /=/, $attr;
-
-                    $val =~ s/^([\"\'])(.+)\1$/$2/g;
-
-                    $attr{$attr_name} = $val;
-                }
-                else {
-
-                    # A value-less attribute like in
-                    # <option value="1" selected>
-                    $attr{$attr} = undef;
-                }
-            }
-        }
+        my $attr = $self->_parse_attributes($attr_text);
 
         if ( $InlineTags{$tag_name} ) {
             $event = $self->_make_event(
                 HTMLTag => (
                     tag        => $tag_name,
-                    attributes => \%attr,
+                    attributes => $attr,
                 ),
             );
         }
@@ -690,7 +670,7 @@ sub _match_html_tag {
             $event = $self->_make_event(
                 StartHTMLTag => (
                     tag        => $tag_name,
-                    attributes => \%attr,
+                    attributes => $attr,
                 ),
             );
         }
@@ -699,6 +679,36 @@ sub _match_html_tag {
     $self->_markup_event($event);
 
     return 1;
+}
+
+# This parsing code is all copied from HTML::Parser::Simple::Attributes by Ron
+# Savage.
+my @quote = (
+    qr{^([a-zA-Z0-9_-]+)\s*=\s*["]([^"]+)["]\s*(.*)$}s,    # Double quotes.
+    qr{^([a-zA-Z0-9_-]+)\s*=\s*[']([^']+)[']\s*(.*)$}s,    # Single quotes.
+    qr{^([a-zA-Z0-9_-]+)\s*=\s*([^\s'"]+)\s*(.*)$}s,       # Unquoted.
+);
+
+sub _parse_attributes {
+    my $self = shift;
+    my $text = shift;
+
+    my %attrs;
+    while ( length $text ) {
+        my $original = $text;
+
+        for my $q (@quote) {
+            if ( $text =~ $q ) {
+                $attrs{$1} = $2;
+                $text = $3;
+            }
+        }
+
+        die "Can't parse $text - not a properly formed attribute string\n"
+            if $text eq $original;
+    }
+
+    return \%attrs;
 }
 
 sub _match_html_entity {
@@ -985,7 +995,7 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 

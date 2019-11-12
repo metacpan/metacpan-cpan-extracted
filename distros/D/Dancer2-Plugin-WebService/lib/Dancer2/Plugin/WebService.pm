@@ -5,7 +5,7 @@
 # Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.4';
+our	$VERSION = '4.2.5';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -37,6 +37,7 @@ has dir_session		=> (is=>'ro', lazy=>0, default=> sub {my $dir = exists $_[0]->c
 has rm				=> (is=>'ro', lazy=>0, default=> sub{for (split /:/,$ENV{PATH}) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
 
 
+
 # Recursive walker of custom Perl Data Structures
 my %Handler; %Handler=(
 SCALAR => sub { $Handler{WALKER}->(${$_[0]}, $_[1], @{$_[2]} )},
@@ -56,14 +57,16 @@ my $plg = shift;
 my $app = $plg->app;
 
 # Security of the built-in routes
-@{$plg->config->{Routes}}{qw/WebService login logout/} = ( {Protected=>0}, {Protected=>0}, {Protected=>1, Groups=>[]} );
+$plg->config->{Routes}->{WebService} = {Protected=>0};
+$plg->config->{Routes}->{login}      = {Protected=>0};
+$plg->config->{Routes}->{logout}     = {Protected=>1, Groups=>[]};
 
 # Default settings
 $app->config->{charset}        //= 'UTF-8';
 $app->config->{encoding}       //= 'UTF-8';
 $app->config->{show_errors}    //= 0;
-$app->config->{content_type}     = $plg->formats->{ $plg->config->{'Default format'} };
 $plg->config->{'Default format'} = 'json' if ((! exists $plg->config->{'Default format'}) || ($plg->config->{'Default format'} !~ $plg->formats_regex));
+$app->config->{content_type}     = $plg->formats->{ $plg->config->{'Default format'} };
 
 # Module directory
 (my $module_dir =__FILE__) =~s|/[^/]+$||;
@@ -127,12 +130,13 @@ print "\nApplication              : $app->{name}\n";
 print "Application version      : ",(exists $app->{config}->{version} ? $app->{config}->{version} : '1.0.0')."\n";
 print "WebService  version      : $Dancer2::Plugin::WebService::VERSION\n";
 print "Dancer2     version      : $Dancer2::VERSION\n";
-print 'Max session idle timeout : ', $plg->Session_timeout ," sec\n";
-print 'Run as user              : ', (getpwuid($>))[0]     ,"\n";
-print 'Session directory        : ', $plg->dir_session     ,"\n";
-print 'Start time               : ', scalar localtime $^T  ,"\n";
-print 'Authorization method     : ', $plg->auth_method     ,"\n";
-print "Module dir               : $module_dir\n";
+print 'Run as user              : ', (getpwuid($>))[0]    ,"\n";
+print 'Start time               : ', scalar localtime $^T ,"\n";
+print "Module auth dir scripts  : $module_dir\n";
+print "Default format           : ", $plg->config->{'Default format'},"\n";
+print "Authorization method     : ", $plg->auth_method ,"\n";
+print "Session directory        : ", $plg->dir_session ,"\n";
+print "Session max idle timeout : ", $plg->Session_timeout ," sec\n";
 print "Main PID                 : $$\n\n";
 
 
@@ -755,7 +759,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.2.4
+version 4.2.5
 
 =head1 SYNOPSIS
 

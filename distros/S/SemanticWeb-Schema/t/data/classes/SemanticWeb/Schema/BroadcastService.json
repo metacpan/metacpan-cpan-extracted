@@ -35,8 +35,8 @@
          "rdfs:label" : "broadcastFrequency",
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
-            "schema:BroadcastChannel"
+            "schema:BroadcastChannel",
+            "schema:BroadcastService"
          ],
          "schema:rangeIncludes" : [
             "schema:BroadcastFrequencySpecification",
@@ -56,6 +56,21 @@
          "rdfs:label" : "broadcaster",
          "schema:domainIncludes" : "schema:BroadcastService",
          "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:callSign" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2109",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Call_sign\">callsign</a>, as used in broadcasting and radio communications to identify people, radio and TV stations, or vehicles.",
+         "rdfs:label" : "callSign",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:category" : "issue-2109",
+         "schema:domainIncludes" : [
+            "schema:Person",
+            "schema:BroadcastService",
+            "schema:Vehicle"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
       },
       "schema:hasBroadcastChannel" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
@@ -80,8 +95,8 @@
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
             "schema:BroadcastService",
-            "schema:BroadcastEvent",
-            "schema:ScreeningEvent"
+            "schema:ScreeningEvent",
+            "schema:BroadcastEvent"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

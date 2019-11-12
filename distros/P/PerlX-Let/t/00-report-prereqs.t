@@ -60,6 +60,7 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
+  Scalar::Util
   Storable
 );
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package [% class_name %];
 
 # ABSTRACT: Moo classes for [% context %] classes
@@ -19,6 +21,8 @@ our $VERSION = '[% version %]';
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
+
+=encoding utf8
 
 =head1 SYNOPSIS
 

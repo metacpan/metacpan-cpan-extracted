@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -29,7 +29,7 @@ use Compress::Raw::Bzip2;
 #use Smart::Comments;
 
 use vars '$VERSION';
-$VERSION = 7;
+$VERSION = 8;
 
 # libbunzip2 supposedly uses either 4Mb or 2.5Mb for decompressing, so an
 # effort is made here to turf the inflator as soon as no longer needed

@@ -35,8 +35,8 @@
          "rdfs:label" : "duringMedia",
          "schema:domainIncludes" : "schema:HowToDirection",
          "schema:rangeIncludes" : [
-            "schema:MediaObject",
-            "schema:URL"
+            "schema:URL",
+            "schema:MediaObject"
          ]
       },
       "schema:performTime" : {
@@ -69,8 +69,8 @@
             "schema:HowTo"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:HowToSupply"
+            "schema:HowToSupply",
+            "schema:Text"
          ]
       },
       "schema:tool" : {
@@ -83,8 +83,8 @@
             "schema:HowTo"
          ],
          "schema:rangeIncludes" : [
-            "schema:HowToTool",
-            "schema:Text"
+            "schema:Text",
+            "schema:HowToTool"
          ]
       },
       "schema:totalTime" : {

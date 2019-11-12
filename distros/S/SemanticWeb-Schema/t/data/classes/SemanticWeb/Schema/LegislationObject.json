@@ -2,15 +2,15 @@
    "class" : {
       "core:closeMatch" : "ontology:Format",
       "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1156",
-         "eli:index.html"
+         "eli:index.html",
+         "https://github.com/schemaorg/schemaorg/issues/1156"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A specific object or file containing a Legislation. Note that the same Legislation can be published in multiple files. For example, a digitally signed PDF, a plain PDF and an HTML version.",
       "rdfs:label" : "LegislationObject",
       "rdfs:subClassOf" : [
-         "schema:MediaObject",
-         "schema:Legislation"
+         "schema:Legislation",
+         "schema:MediaObject"
       ],
       "schema:category" : "issue-1156",
       "schema:isPartOf" : "http:pending.schema.org"
@@ -19,8 +19,8 @@
       "schema:legislationLegalValue" : {
          "core:exactMatch" : "ontology:legal_value",
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1156",
-            "eli:index.html"
+            "eli:index.html",
+            "https://github.com/schemaorg/schemaorg/issues/1156"
          ],
          "owl:equivalentProperty" : "ontology:legal_value",
          "rdf:type" : "rdf:Property",

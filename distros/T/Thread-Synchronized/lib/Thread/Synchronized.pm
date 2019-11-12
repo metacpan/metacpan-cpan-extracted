@@ -3,7 +3,7 @@ package Thread::Synchronized;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 use strict;
 
 # Make sure we can do threads

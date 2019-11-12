@@ -1,5 +1,9 @@
 Revision history for Net-CIDR-Overlap
 
+0.2.0	 2919-11-11/01:00
+		 - Add remove support.
+		 - Now properly handles mixed IPv4 and IPv6.
+
 0.0.1	 2019-10-07/05:50
 		 - Initial release.
 

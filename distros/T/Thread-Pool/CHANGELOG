@@ -1,3 +1,6 @@
+0.35	9 November 2019
+	Adoption
+
 0.33	20 September 2010
 	Checking the tool chain with perl5.13.5.  Fixed some tests that were
 	failing because of Test::Harness not being able to cope with threaded

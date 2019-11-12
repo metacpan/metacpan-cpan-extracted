@@ -327,11 +327,13 @@ lib/SemanticWeb/Schema/HVACBusiness.pm
 lib/SemanticWeb/Schema/HairSalon.pm
 lib/SemanticWeb/Schema/HardwareStore.pm
 lib/SemanticWeb/Schema/HealthAndBeautyBusiness.pm
+lib/SemanticWeb/Schema/HealthAspectEnumeration.pm
 lib/SemanticWeb/Schema/HealthClub.pm
 lib/SemanticWeb/Schema/HealthInsurancePlan.pm
 lib/SemanticWeb/Schema/HealthPlanCostSharingSpecification.pm
 lib/SemanticWeb/Schema/HealthPlanFormulary.pm
 lib/SemanticWeb/Schema/HealthPlanNetwork.pm
+lib/SemanticWeb/Schema/HealthTopicContent.pm
 lib/SemanticWeb/Schema/HighSchool.pm
 lib/SemanticWeb/Schema/HinduTemple.pm
 lib/SemanticWeb/Schema/HobbyShop.pm
@@ -805,6 +807,7 @@ lib/SemanticWeb/Schema/Waterfall.pm
 lib/SemanticWeb/Schema/WearAction.pm
 lib/SemanticWeb/Schema/WebAPI.pm
 lib/SemanticWeb/Schema/WebApplication.pm
+lib/SemanticWeb/Schema/WebContent.pm
 lib/SemanticWeb/Schema/WebPage.pm
 lib/SemanticWeb/Schema/WebPageElement.pm
 lib/SemanticWeb/Schema/WebSite.pm
@@ -1140,11 +1143,13 @@ t/data/classes/SemanticWeb/Schema/HVACBusiness.json
 t/data/classes/SemanticWeb/Schema/HairSalon.json
 t/data/classes/SemanticWeb/Schema/HardwareStore.json
 t/data/classes/SemanticWeb/Schema/HealthAndBeautyBusiness.json
+t/data/classes/SemanticWeb/Schema/HealthAspectEnumeration.json
 t/data/classes/SemanticWeb/Schema/HealthClub.json
 t/data/classes/SemanticWeb/Schema/HealthInsurancePlan.json
 t/data/classes/SemanticWeb/Schema/HealthPlanCostSharingSpecification.json
 t/data/classes/SemanticWeb/Schema/HealthPlanFormulary.json
 t/data/classes/SemanticWeb/Schema/HealthPlanNetwork.json
+t/data/classes/SemanticWeb/Schema/HealthTopicContent.json
 t/data/classes/SemanticWeb/Schema/HighSchool.json
 t/data/classes/SemanticWeb/Schema/HinduTemple.json
 t/data/classes/SemanticWeb/Schema/HobbyShop.json
@@ -1621,6 +1626,7 @@ t/data/classes/SemanticWeb/Schema/Waterfall.json
 t/data/classes/SemanticWeb/Schema/WearAction.json
 t/data/classes/SemanticWeb/Schema/WebAPI.json
 t/data/classes/SemanticWeb/Schema/WebApplication.json
+t/data/classes/SemanticWeb/Schema/WebContent.json
 t/data/classes/SemanticWeb/Schema/WebPage.json
 t/data/classes/SemanticWeb/Schema/WebPageElement.json
 t/data/classes/SemanticWeb/Schema/WebSite.json

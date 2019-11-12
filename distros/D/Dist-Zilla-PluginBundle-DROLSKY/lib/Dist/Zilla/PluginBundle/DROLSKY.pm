@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -850,7 +850,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -1167,7 +1167,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

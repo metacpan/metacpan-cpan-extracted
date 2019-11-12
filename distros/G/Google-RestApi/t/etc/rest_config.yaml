@@ -1,0 +1,4 @@
+---
+client_id: x
+client_secret: x
+token_file: rest_config.token

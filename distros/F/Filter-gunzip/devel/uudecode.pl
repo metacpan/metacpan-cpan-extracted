@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -21,6 +21,7 @@ use 5.006;
 use strict;
 use warnings;
 use Compress::Raw::Zlib;
+$|=1;
 
 use FindBin;
 my $topdir = File::Spec->catdir ($FindBin::Bin, File::Spec->updir);
@@ -30,7 +31,6 @@ my $blibdir_lib = File::Spec->catdir ($blibdir, 'lib');
 my $blibdir_arch = File::Spec->catdir ($blibdir, 'arch');
 
 my $filename = '/tmp/uudecode-gunzip.pl';
-
 
 # {
 #   open my $out, '>', $filename or die;
@@ -44,11 +44,14 @@ my @command = ($^X,
                '-I', $libdir,
                '-I', $blibdir_lib,
                '-I', $blibdir_arch,
+               '-I', "$ENV{HOME}/perl/filter-lib", # copy of Filter::UUdecode
                '-MFilter::UUdecode',
+               # '-e', 'Filter::Util::Call::filter_del()', # not right ...
                '-MFilter::gunzip',
                $filename);
 { local $,=' '; print 'run:',@command,"\n"; }
 my $status = system @command;
+print "end\n";
 if ($status < 0) {
   die "cannot run: $!";
 }

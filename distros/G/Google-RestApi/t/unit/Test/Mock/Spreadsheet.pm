@@ -19,7 +19,7 @@ sub new {
   $self->mock(
     'spreadsheet_id', sub { 'mock_sheets_id'; }
   )->mock(
-    'open_worksheet', sub { Test::Mock::Worksheet->new(spreadsheet => $self, @_) }
+    'open_worksheet', sub { Test::Mock::Worksheet->new() }
   );
 
   return $self;

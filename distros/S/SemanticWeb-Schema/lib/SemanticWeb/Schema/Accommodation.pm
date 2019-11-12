@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
+
+
+has accommodation_category => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'accommodationCategory',
+);
+
 
 
 has amenity_feature => (
@@ -26,10 +34,42 @@ has amenity_feature => (
 
 
 
+has floor_level => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'floorLevel',
+);
+
+
+
 has floor_size => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'floorSize',
+);
+
+
+
+has lease_length => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'leaseLength',
+);
+
+
+
+has number_of_bathrooms_total => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'numberOfBathroomsTotal',
+);
+
+
+
+has number_of_full_bathrooms => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'numberOfFullBathrooms',
 );
 
 
@@ -74,7 +114,7 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 
@@ -87,6 +127,26 @@ href="/docs/hotels.html">dedicated document on the use of schema.org for
 marking up hotels and other forms of accommodations</a>.<p>
 
 =head1 ATTRIBUTES
+
+=head2 C<accommodation_category>
+
+C<accommodationCategory>
+
+=for html <p>Category of an <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, following real
+estate conventions e.g. RESO (see <a
+href="https://ddwiki.reso.org/display/DDW17/PropertySubType+Field">Property
+SubType</a>, and <a
+href="https://ddwiki.reso.org/display/DDW17/PropertyType+Field">PropertyTyp
+e</a> fields for suggested values).<p>
+
+A accommodation_category should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
 
 =head2 C<amenity_feature>
 
@@ -105,6 +165,25 @@ A amenity_feature should be one of the following types:
 
 =back
 
+=head2 C<floor_level>
+
+C<floorLevel>
+
+=for html <p>The floor level for an <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a> in a multi-storey
+building. Since counting systems <a
+href="https://en.wikipedia.org/wiki/Storey#Consecutive_number_floor_designa
+tions">vary internationally</a>, the local system should be used where
+possible.<p>
+
+A floor_level should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
 =head2 C<floor_size>
 
 C<floorSize>
@@ -118,6 +197,65 @@ A floor_size should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<lease_length>
+
+C<leaseLength>
+
+=for html <p>Length of the lease for some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, either particular
+to some <a class="localLink" href="http://schema.org/Offer">Offer</a> or in
+some cases intrinsic to the property.<p>
+
+A lease_length should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Duration']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<number_of_bathrooms_total>
+
+C<numberOfBathroomsTotal>
+
+=for html <p>The total integer number of bathrooms in a some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, following real
+estate conventions as <a
+href="https://ddwiki.reso.org/display/DDW17/BathroomsTotalInteger+Field">do
+cumented in RESO</a>: "The simple sum of the number of bathrooms. For
+example for a property with two Full Bathrooms and one Half Bathroom, the
+Bathrooms Total Integer will be 3.". See also <a class="localLink"
+href="http://schema.org/numberOfRooms">numberOfRooms</a>.<p>
+
+A number_of_bathrooms_total should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=back
+
+=head2 C<number_of_full_bathrooms>
+
+C<numberOfFullBathrooms>
+
+=for html <p>Number of full bathrooms - The total number of full and Â¾ bathrooms in
+an <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>. This corresponds
+to the <a
+href="https://ddwiki.reso.org/display/DDW17/BathroomsFull+Field">BathroomsF
+ull field in RESO</a>.<p>
+
+A number_of_full_bathrooms should be one of the following types:
+
+=over
+
+=item C<Num>
 
 =back
 

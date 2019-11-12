@@ -32,8 +32,8 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:GenderType"
+            "schema:GenderType",
+            "schema:Text"
          ]
       }
    }

@@ -14,6 +14,18 @@ my $server = Test::HTTP::LocalServer->spawn(
     #debug => 1
 );
 
+delete @ENV{ qw[
+    HTTP_PROXY
+    http_proxy
+    HTTP_PROXY_ALL
+    http_proxy_all
+    HTTPS_PROXY
+    https_proxy
+    CGI_HTTP_PROXY
+    ALL_PROXY
+    all_proxy
+] };
+
 diag( "Version of HTTP::Tiny: " . HTTP::Tiny->VERSION );
 my $ua = Future::HTTP::Tiny->new();
 my $url = $server->url;

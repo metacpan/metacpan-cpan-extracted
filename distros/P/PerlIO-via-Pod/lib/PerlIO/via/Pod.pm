@@ -1,6 +1,6 @@
 package PerlIO::via::Pod;
 
-$VERSION= '0.05';
+$VERSION= '0.06';
 
 # be as struct as possible
 use strict;
@@ -97,7 +97,7 @@ PerlIO::via::Pod - PerlIO layer for extracting plain old documentation
 
 =head1 VERSION
 
-This documentation describes version 0.05.
+This documentation describes version 0.06.
 
 =head1 DESCRIPTION
 
@@ -127,6 +127,8 @@ A script that only lets plain old documentation pass.
 L<PerlIO::via>, L<PerlIO::via::UnPod> and any other PerlIO::via modules on CPAN.
 
 =head1 COPYRIGHT
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen.  All rights reserved.
 This library is free software; you can redistribute it and/or modify it under

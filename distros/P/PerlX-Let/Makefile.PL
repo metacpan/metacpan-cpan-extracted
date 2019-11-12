@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Syntactic sugar for lexical constants",
+  "ABSTRACT" => "Syntactic sugar for lexical state constants",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.2.5",
+  "VERSION" => "v0.2.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

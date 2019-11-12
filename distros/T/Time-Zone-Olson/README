@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.26
+    Version 0.28
 
 SYNOPSIS
 
@@ -166,6 +166,12 @@ SUBROUTINES/METHODS
     intended for testing the results of Time::Zone::Olson. In actual use,
     cached values are only used if the mtime of the relevant files has not
     changed.
+
+ tz_definition
+
+    This method will return the TZ environment variable (if any) that
+    describes a timezone after the "transition_times" have been used. This
+    method is only intended for testing the results of Time::Zone::Olson.
 
  win32_mapping
 

@@ -1,0 +1,19 @@
+README for Log::Dispatch::WarnDie
+
+The "Log::Dispatch::WarnDie" module offers a logging alternative for standard
+Perl core functions.  This allows you to use the features of Log::Dispatch
+without having to make extensive changes to your source code.
+
+Copyright (c) 2004 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Required Modules:
+ (none)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

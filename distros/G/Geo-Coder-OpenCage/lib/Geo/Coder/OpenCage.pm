@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.25';
+$Geo::Coder::OpenCage::VERSION = '0.26';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.25;
+my $version = 0.26;
 my $ua_string;
 
 sub new {
@@ -140,7 +140,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -246,7 +246,7 @@ This method supports the optional parameters in the same way that geocode() does
 
 =head1 ENCODING
 
-All strings passed to and recieved from Geo::Coder::OpenCage methods are
+All strings passed to and received from Geo::Coder::OpenCage methods are
 expected to be character strings, not byte strings.
 
 For more information see L<perlunicode>.

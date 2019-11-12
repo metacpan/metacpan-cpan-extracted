@@ -13,8 +13,8 @@
          "rdfs:label" : "arrivalTime",
          "schema:domainIncludes" : "schema:Trip",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:DateTime"
          ]
       },
       "schema:departureTime" : {
@@ -47,14 +47,14 @@
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Event",
-            "schema:AggregateOffer",
-            "schema:CreativeWork",
             "schema:Service",
+            "schema:AggregateOffer",
+            "schema:Product",
             "schema:MenuItem",
+            "schema:Trip",
+            "schema:Event",
             "schema:EducationalOccupationalProgram",
-            "schema:Trip"
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -76,13 +76,13 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Reservation",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWork",
             "schema:Service",
+            "schema:Reservation",
             "schema:Invoice",
-            "schema:EducationalOccupationalProgram",
-            "schema:ParcelDelivery",
-            "schema:Trip"
+            "schema:Trip",
+            "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -1419,19 +1419,42 @@ sub _get_time_for_wday_week_month_year_offset {
     my $check_day_of_week = _DAY_OF_WEEK_AT_EPOCH();
     my $increment         = 0;
     my $leap_year         = 1;
-    while ( $check_year < $params{year} ) {
-        $check_year += 1;
-        if ( $self->_is_leap_year($check_year) ) {
-            $leap_year = 1;
-            $increment = _DAYS_IN_A_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
-            $check_day_of_week += _DAYS_IN_A_LEAP_YEAR();
+    if ( $check_year > $params{year} ) {
+        while ( $check_year > $params{year} ) {
+            $check_year -= 1;
+            if ( $self->_is_leap_year($check_year) ) {
+                $increment = _DAYS_IN_A_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+                $check_day_of_week -= _DAYS_IN_A_LEAP_YEAR();
+                $leap_year = 1;
+            }
+            else {
+                $increment = _DAYS_IN_A_NON_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+                $check_day_of_week -= _DAYS_IN_A_NON_LEAP_YEAR();
+                $leap_year = 0;
+            }
+            $time -= $increment;
         }
-        else {
-            $leap_year = 0;
-            $increment = _DAYS_IN_A_NON_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
-            $check_day_of_week += _DAYS_IN_A_NON_LEAP_YEAR();
+        $check_day_of_week = abs $check_day_of_week % _DAYS_IN_ONE_WEEK();
+    }
+    else {
+        while ( $check_year < $params{year} ) {
+            if ( $self->_is_leap_year($check_year) ) {
+                $increment = _DAYS_IN_A_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+                $check_day_of_week += _DAYS_IN_A_LEAP_YEAR();
+            }
+            else {
+                $increment = _DAYS_IN_A_NON_LEAP_YEAR() * _SECONDS_IN_ONE_DAY();
+                $check_day_of_week += _DAYS_IN_A_NON_LEAP_YEAR();
+            }
+            $time       += $increment;
+            $check_year += 1;
+            if ( $self->_is_leap_year($check_year) ) {
+                $leap_year = 1;
+            }
+            else {
+                $leap_year = 0;
+            }
         }
-        $time += $increment;
     }
 
     $increment = 0;
@@ -1461,15 +1484,12 @@ sub _get_time_for_wday_week_month_year_offset {
     }
     else {
 
-        my $check_week = 1;
         while ( ( $check_day_of_week % _DAYS_IN_ONE_WEEK() ) != $params{day} ) {
             $time              += _SECONDS_IN_ONE_DAY();
             $check_day_of_week += 1;
             $check_day_of_week = $check_day_of_week % _DAYS_IN_ONE_WEEK();
-            if ( $check_day_of_week % _DAYS_IN_ONE_WEEK() == 0 ) {
-                $check_week += 1;
-            }
         }
+        my $check_week = 1;
         $increment = _DAYS_IN_ONE_WEEK() * _SECONDS_IN_ONE_DAY();
         while ( $check_week < $params{week} ) {
             $check_week        += 1;
@@ -1480,6 +1500,13 @@ sub _get_time_for_wday_week_month_year_offset {
     }
 
     return $time;
+}
+
+sub tz_definition {
+    my ($self)        = @_;
+    my $tz            = $self->timezone();
+    my $tz_definition = $self->{_tzdata}->{$tz}->{tz_definition}->{tz};
+    return $tz_definition;
 }
 
 sub _get_tz_offset_according_to_v2_tz_rule {
@@ -2906,7 +2933,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.26
+Version 0.28
 
 =cut
 
@@ -3005,6 +3032,10 @@ This method can be used to get the list of leap seconds for the current time zon
 =head2 reset_cache
 
 This method can be used to reset the cache.  This method is only intended for testing the results of Time::Zone::Olson.  In actual use, cached values are only used if the C<mtime> of the relevant files has not changed.
+
+=head2 tz_definition
+
+This method will return the TZ environment variable (if any) that describes a timezone after the L</transition_times> have been used.  This method is only intended for testing the results of Time::Zone::Olson.
 
 =head2 win32_mapping 
 

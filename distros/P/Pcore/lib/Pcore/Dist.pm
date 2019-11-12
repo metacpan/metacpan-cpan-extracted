@@ -208,8 +208,8 @@ sub _build_id ($self) {
     my $id = {
         branch           => undef,
         date             => undef,
-        id               => undef,
-        id_short         => undef,
+        hash             => undef,
+        hash_short       => undef,
         is_dirty         => undef,
         release          => undef,
         release_distance => undef,
@@ -231,6 +231,7 @@ sub _build_id ($self) {
     return $id;
 }
 
+# TODO remove
 sub _build_version ($self) {
 
     # first, try to get version from the main module
@@ -269,19 +270,21 @@ sub clear ($self) {
 }
 
 sub version_string ($self) {
+    my @res = ( $self->name );
+
     my $id = $self->id;
 
-    if ( !$id->{node} ) {
-        return join $SPACE, $self->name, $id->{release_id};
+    if ( $id->{hash} ) {
+        if ( $id->{release} ) {
+            push @res, $id->{release} . ( $id->{release_distance} ? "+$id->{release_distance}" : $EMPTY );
+        }
+
+        push @res, $id->{hash_short} . ( $id->{is_dirty} ? '+' : $EMPTY );
+
+        push @res, $id->{date} if $id->{date};
     }
 
-    my $is_commited = $self->is_commited;
-
-    $is_commited //= 1;
-
-    my @tags = $id->{tags} ? $id->{tags}->@* : ();
-
-    return join $SPACE, $self->name, $id->{release_id}, join( $SPACE, grep {$_} $id->{branch}, $id->{bookmark}, sort @tags ), $id->{node} . ( $is_commited ? $EMPTY : q[+] ), $id->{date};
+    return join $SPACE, @res;
 }
 
 sub _build_docker ($self) {

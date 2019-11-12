@@ -16,6 +16,10 @@ my $module = 'WWW::Mechanize::Chrome';
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
+my @win32_prerequisites = $^O =~ /mswin/i ? (
+    'Win32::File::VersionInfo' => 0,
+) : ();
+
 my %module = (
     NAME                => $module,
     AUTHOR              => q{Max Maischein <corion@cpan.org>},
@@ -30,7 +34,7 @@ my %module = (
                 type => 'git',
             }
         },
-        dynamic_config   => 0, # we promise to keep META.* up-to-date
+        dynamic_config   => 1, # we have prerequisites depending on the OS
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
@@ -57,11 +61,11 @@ my %module = (
         # You need one of the following event loops:
         # AnyEvent, IO::Async, Mojolicious
         # AnyEvent is the traditional default but it is tested with all three
-        'AnyEvent'           => 0,
-        'AnyEvent::Future'   => 0,
-        'AnyEvent::WebSocket::Client' => 0,
-        #'IO::Async'          => 0, # the pipe handling is tied to IO::Async
-        #'Net::Async::WebSocket' => 0,
+        #'AnyEvent'           => 0,
+        #'AnyEvent::Future'   => 0,
+        #'AnyEvent::WebSocket::Client' => 0,
+        'IO::Async'          => 0, # the pipe handling is tied to IO::Async
+        'Net::Async::WebSocket::Client' => 0.12,
 
         # This is a developer-only prerequisite, but oh well
         'Algorithm::Loops'   => 0,
@@ -89,6 +93,7 @@ my %module = (
         # for extracting element screenshots, loaded dynamically
         'Imager'                           => 0,
         'Imager::File::PNG'                => 0,
+        @win32_prerequisites,
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,

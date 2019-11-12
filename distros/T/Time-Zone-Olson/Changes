@@ -1,5 +1,11 @@
 Revision history for Time-Zone-Olson
 
+0.28   Sun Nov 10 21:29:00 2019
+       Increased the requirements for Win32::API in the test suite to address CPAN Tester issues.
+
+0.27   Sat Nov 09 21:19:00 2019
+       Fixes for TZ environment variable formats such as 'AEST-10AEDT,M10.1.0,M4.1.0/3'.  Thanks to SREZIC for the bug report. RT#130880
+
 0.26   Wed Jun 12 06:29:00 2019
        Windows XP fixes for guessing timezone.
 

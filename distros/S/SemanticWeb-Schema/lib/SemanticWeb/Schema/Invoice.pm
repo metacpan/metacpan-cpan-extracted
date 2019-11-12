@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
 
 
 has account_id => (
@@ -162,7 +162,7 @@ SemanticWeb::Schema::Invoice - A statement of the money due for goods or service
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 

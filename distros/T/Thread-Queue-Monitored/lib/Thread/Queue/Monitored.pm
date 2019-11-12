@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Monitored '1.04'; # not supported by PAUSE/MetaCPAN :-(
+#package Thread::Queue::Monitored '1.05'; # not supported by PAUSE/MetaCPAN :-(
 package Thread::Queue::Monitored;         # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= '1.04';                     # please remove if no longer needed
+our $VERSION= '1.05';                     # please remove if no longer needed
 
 # be as verbose as possible
 use warnings;
@@ -228,7 +228,7 @@ Thread::Queue::Monitored - monitor a queue for specific content
 
 =head1 VERSION
 
-This documentation describes version 1.04.
+This documentation describes version 1.05.
 
 =head1 DESCRIPTION
 

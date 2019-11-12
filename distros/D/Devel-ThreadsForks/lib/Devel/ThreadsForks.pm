@@ -1,7 +1,7 @@
 package Devel::ThreadsForks;
 
 # set version information
-$VERSION= '0.06';
+$VERSION= '0.07';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -147,7 +147,7 @@ Devel::ThreadsForks - check for availability of threads or forks
 
 =head1 VERSION
 
-This documentation describes version 0.06.
+This documentation describes version 0.07.
 
 =head1 SYNOPSIS
 
@@ -213,6 +213,8 @@ Perl is not thread-enabled, or does not have the L<forks> module installed.
 =head1 AUTHOR
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>.
 
 =head1 COPYRIGHT
 

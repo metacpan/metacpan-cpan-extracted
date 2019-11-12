@@ -7,7 +7,7 @@ my $meta = {
   "abstract"           => "download bugs from an RT queue and dump them as RDF",
   "author"             => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config"     => 0,
-  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.014, CPAN::Meta::Converter version 2.120921",
+  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"           => [],
   "license"            => ["perl_5"],
   "meta-spec"          => {
@@ -37,7 +37,7 @@ my $meta = {
                             test => { requires => { "Test::More" => 0.96 } },
                           },
   "provides"           => {
-                            "RT::ClientX::GrabBugs" => { file => "lib/RT/ClientX/GrabBugs.pm", version => 0.002 },
+                            "RT::ClientX::GrabBugs" => { file => "lib/RT/ClientX/GrabBugs.pm", version => 0.004 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -48,11 +48,12 @@ my $meta = {
                             license      => ["http://dev.perl.org/licenses/"],
                             repository   => {
                                               type => "git",
+                                              url  => "git://github.com/tobyink/p5-rt-clientx-grabbugs.git",
                                               web  => "https://github.com/tobyink/p5-rt-clientx-grabbugs",
                                             },
-                            X_identifier => "http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/project",
+                            x_identifier => "http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/project",
                           },
-  "version"            => 0.002,
+  "version"            => 0.004,
   "x_provides_scripts" => { "rt-grabbugs" => { file => "bin/rt-grabbugs" } },
 };
 

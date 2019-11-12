@@ -104,7 +104,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "File::ShareDir::Install" => "0.03";
+  requires "File::ShareDir::Install" => "0.06";
 };
 
 on 'develop' => sub {

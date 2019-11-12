@@ -3,7 +3,7 @@
 package App::WHMCSUtils;
 
 our $DATE = '2019-09-19'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -890,7 +890,7 @@ App::WHMCSUtils - CLI utilities related to WHMCS
 
 =head1 VERSION
 
-This document describes version 0.008 of App::WHMCSUtils (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
+This document describes version 0.009 of App::WHMCSUtils (from Perl distribution App-WHMCSUtils), released on 2019-09-19.
 
 =head1 FUNCTIONS
 

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -21,7 +21,7 @@ use warnings;
 use Carp;
 use Filter::Util::Call;
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 use constant DEBUG => 1;
 

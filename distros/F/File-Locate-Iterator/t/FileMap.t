@@ -39,7 +39,7 @@ diag "File::Map version ",File::Map->VERSION;
 plan tests => 14;
 
 use_ok ('File::Locate::Iterator::FileMap');
-my $want_version = 26;
+my $want_version = 27;
 is ($File::Locate::Iterator::FileMap::VERSION, $want_version,
     'VERSION variable');
 is (File::Locate::Iterator::FileMap->VERSION, $want_version,

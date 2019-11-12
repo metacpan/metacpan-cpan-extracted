@@ -7,6 +7,8 @@ use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Range::Base);
 
 sub class { 'Google::RestApi::SheetsApi4::Range' }
 
+my $sheet = 'Customer Addresses';
+
 sub constructor : Tests(4) {
   my $self = shift;
   $self->SUPER::constructor(
@@ -37,6 +39,114 @@ sub range : Tests(6) {
 
   $range = $self->new_range([{row => 1, col => 'A'},{row => 2, col =>'B'}]);
   is $range->range(), "$self->{name}$x", "[{row => 1, col => A},{row => 2, col => B}] should be $x";
+
+  return;
+}
+
+sub range_col : Tests(26) {
+  my $self = shift;
+
+  my $col = $self->class()->can('is_colA1');
+
+  is $col->("A"), 1, "Range A should be a col";
+  is $col->("A:A"), 1, "Range A:A should be a col";
+  is $col->("A1:A"), 1, "Range A1:A should be a col";
+  is $col->("A1:A2"), 1, "Range A1:A2 should be a col";
+
+  is $col->("$sheet!A"), 1, "Range $sheet!A should be a col";
+  is $col->("$sheet!A:A"), 1, "Range $sheet!A:A should be a col";
+  is $col->("$sheet!A1:A"), 1, "Range $sheet!A1:A should be a col";
+  is $col->("$sheet!A1:A2"), 1, "Range $sheet!A1:A2 should be a col";
+
+  is $col->("'$sheet'!A"), 1, "Range '$sheet'!A should be a col";
+  is $col->("'$sheet'!A:A"), 1, "Range '$sheet'!A:A should be a col";
+  is $col->("'$sheet'!A1:A"), 1, "Range '$sheet'!A1:A should be a col";
+  is $col->("'$sheet'!A1:A2"), 1, "Range '$sheet'!A1:A2 should be a col";
+
+  is $col->("AZ"), 1, "Range AZ should be a col";
+  is $col->("AZ:AZ"), 1, "Range AZ:AZ should be a col";
+  is $col->("AZ1:AZ"), 1, "Range AZ1:AZ should be a col";
+  is $col->("AZ1:AZ2"), 1, "Range AZ1:AZ2 should be a col";
+
+  is $col->("AA:AZ"), undef, "Range AA:AZ should not be a col";
+  is $col->("AA1:AZ"), undef, "Range AA1:AZ should not be a col";
+  is $col->("AA1:AZ2"), undef, "Range AA1:AZ2 should not be a col";
+
+  is $col->("1"), undef, "Range 1 should not be a col";
+  is $col->("1:1"), undef, "Range 1:1 should not be a col";
+  is $col->("A1:1"), undef, "Range A1:1 should not be a col";
+  is $col->("A1"), undef, "Range A1 should not be a col";
+  is $col->("A1:B2"), undef, "Range A1:B2 should not be a col";
+
+  is $col->([[1, 1]]), undef, "Range [[1, 1]] should not be a col";
+  is $col->({ col => 1, row => 1 }), undef, "Range { col => 1, row => 1 } should not be a col";
+
+  return;
+}
+
+sub range_row : Tests(26) {
+  my $self = shift;
+
+  my $row = $self->class()->can('is_rowA1');
+
+  is $row->("1"), 1, "Range 1 should be a row";
+  is $row->("1:1"), 1, "Range 1:1 should be a row";
+  is $row->("1:A1"), 1, "Range 1:A1 should be a row";
+  is $row->("A1:B1"), 1, "Range A1:B1 should be a row";
+
+  is $row->("$sheet!1"), 1, "Range $sheet!1 should be a row";
+  is $row->("$sheet!1:1"), 1, "Range $sheet!1:1 should be a row";
+  is $row->("$sheet!1:A1"), 1, "Range $sheet!1:A1 should be a row";
+  is $row->("$sheet!A1:B1"), 1, "Range $sheet!A1:B1 should be a row";
+
+  is $row->("'$sheet'!1"), 1, "Range '$sheet'!1 should be a row";
+  is $row->("'$sheet'!1:1"), 1, "Range '$sheet'!1:1 should be a row";
+  is $row->("'$sheet'!A1:1"), 1, "Range '$sheet'!A1:1 should be a row";
+  is $row->("'$sheet'!A1:B1"), 1, "Range '$sheet'!A1:B1 should be a row";
+
+  is $row->("11"), 1, "Range 11 should be a row";
+  is $row->("11:Z11"), 1, "Range 11:Z11 should be a row";
+  is $row->("Z11:11"), 1, "Range Z11:11 should be a row";
+  is $row->("A11:Z11"), 1, "Range A11:Z11 should be a row";
+
+  is $row->("11:12"), undef, "Range 11:12 should not be a row";
+  is $row->("A11:A12"), undef, "Range A11:A12 should not be a row";
+  is $row->("A11:AZ12"), undef, "Range A11:AZ12 should not be a row";
+
+  is $row->("A"), undef, "Range A should not be a row";
+  is $row->("A:A"), undef, "Range A:A should not be a row";
+  is $row->("A1:A"), undef, "Range A1:A should not be a row";
+  is $row->("A1"), undef, "Range A1 should not be a row";
+  is $row->("A1:B2"), undef, "Range A1:B2 should not be a row";
+
+  is $row->([[1, 1]]), undef, "Range [[1, 1]] should not be a row";
+  is $row->({ col => 1, row => 1 }), undef, "Range { col => 1, row => 1 } should not be a row";
+
+  return;
+}
+
+sub range_cell : Tests(14) {
+  my $self = shift;
+
+  my $cell = $self->class()->can('is_cellA1');
+
+  is $cell->("A1"), 1, "Range A1 should be a cell";
+  is $cell->("AZ99"), 1, "Range AZ99 should be a cell";
+  is $cell->("$sheet!AZ99"), 1, "Range $sheet!AZ99 should be a cell";
+  is $cell->("'$sheet'!AZ99"), 1, "Range '$sheet'!AZ99 should be a cell";
+
+  is $cell->("A1:B2"), undef, "Range A1:B2 should not be a cell";
+  is $cell->("A"), undef, "Range A should not be a cell";
+  is $cell->("A:A"), undef, "Range A:A should not be a cell";
+  is $cell->("A1:A"), undef, "Range A1:A should not be a cell";
+
+  is $cell->("1"), undef, "Range 1 should not be a cell";
+  is $cell->("1:1"), undef, "Range 1:1 should not be a cell";
+  is $cell->("1:A1"), undef, "Range 1:A1 should not be a cell";
+  is $cell->("A1:1"), undef, "Range A1:1 should not be a cell";
+
+  is $cell->([[1, 1]]), undef, "Range [[1, 1]] should not be a cell";
+  is $cell->({ col => 1, row => 1 }), undef, "Range { col => 1, row => 1 } should not be a cell";
 
   return;
 }

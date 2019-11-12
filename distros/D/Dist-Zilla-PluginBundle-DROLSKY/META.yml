@@ -8,7 +8,7 @@ build_requires:
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0.03'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -27,22 +27,22 @@ no_index:
 provides:
   Dist::Zilla::Plugin::DROLSKY::MakeMaker:
     file: lib/Dist/Zilla/Plugin/DROLSKY/MakeMaker.pm
-    version: '1.01'
+    version: '1.02'
   Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter:
     file: lib/Dist/Zilla/Plugin/DROLSKY/Role/CoreCounter.pm
-    version: '1.01'
+    version: '1.02'
   Dist::Zilla::Plugin::DROLSKY::RunExtraTests:
     file: lib/Dist/Zilla/Plugin/DROLSKY/RunExtraTests.pm
-    version: '1.01'
+    version: '1.02'
   Dist::Zilla::Plugin::DROLSKY::WeaverConfig:
     file: lib/Dist/Zilla/Plugin/DROLSKY/WeaverConfig.pm
-    version: '1.01'
+    version: '1.02'
   Dist::Zilla::PluginBundle::DROLSKY:
     file: lib/Dist/Zilla/PluginBundle/DROLSKY.pm
-    version: '1.01'
+    version: '1.02'
   Pod::Weaver::PluginBundle::DROLSKY:
     file: lib/Pod/Weaver/PluginBundle/DROLSKY.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Code::TidyAll::Config::INI::Reader: '0.44'
   Devel::PPPort: '3.42'
@@ -141,7 +141,7 @@ resources:
   bugtracker: https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues
   homepage: http://metacpan.org/release/Dist-Zilla-PluginBundle-DROLSKY
   repository: git://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY.git
-version: '1.01'
+version: '1.02'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -166,7 +166,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
@@ -207,7 +207,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@DROLSKY/VersionFromMainModule'
       version: '0.04'
@@ -226,14 +226,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.45'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.45'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
@@ -254,7 +254,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@DROLSKY/MetaProvides::Package'
       version: '2.004003'
@@ -370,7 +370,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 8
+          default_jobs: 16
       name: '@DROLSKY/DROLSKY::RunExtraTests'
       version: '1.01'
     -
@@ -464,13 +464,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.7.4
+          git_version: 2.24.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -632,8 +632,12 @@ x_Dist_Zilla:
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
       name: '@DROLSKY/InstallGuide'
-      version: '1.200011'
+      version: '1.200013'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
@@ -653,7 +657,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@DROLSKY/CheckSelfDependency'
       version: '0.011'
@@ -665,7 +669,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.01'
@@ -677,7 +681,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -703,16 +707,16 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CODE_OF_CONDUCT.md
@@ -726,12 +730,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -739,16 +743,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.01
-          tag_format: v%v
-          tag_message: v%v
+          tag: v1.02
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -757,10 +761,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -786,12 +790,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -800,10 +804,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.7.4
+          git_version: 2.24.0
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
       config:
@@ -811,9 +815,9 @@ x_Dist_Zilla:
           make_path: make
           version: '6.012'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.47'
+          version: '0.48'
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 8
+          default_jobs: 16
           version: '6.012'
       name: '@DROLSKY/DROLSKY::MakeMaker'
       version: '1.01'

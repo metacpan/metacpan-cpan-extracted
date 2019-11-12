@@ -1,5 +1,5 @@
 ---
-abstract: 'Create and Read Zip Archives'
+abstract: 'Read and Write Zip Archives'
 author:
   - 'Paul Marquess <pmqs@cpan.org>'
 build_requires:
@@ -19,12 +19,16 @@ no_index:
     - inc
     - t
     - private
+recommends:
+  IO::Compress::Lzma: '2.09'
+  IO::Uncompress::UnLzma: '2.09'
 requires:
-  IO::Compress::Base: '2.088'
+  IO::Compress::Base: '2.09'
+  IO::Uncompress::Base: '2.09'
   Perl::OSType: '0'
 resources:
   bugtracker: https://github.com/pmqs/Archive-Zip-SimpleZip/issues
   homepage: https://github.com/pmqs/Archive-Zip-SimpleZip
   repository: git://github.com/pmqs/Archive-Zip-SimpleZip.git
-version: '0.029'
+version: '0.031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

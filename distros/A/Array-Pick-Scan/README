@@ -1,0 +1,62 @@
+NAME
+    Array::Pick::Scan - Pick random items from an array, without duplicates
+
+VERSION
+    This document describes version 0.001 of Array::Pick::Scan (from Perl
+    distribution Array-Pick-Scan), released on 2019-09-15.
+
+SYNOPSIS
+     use Array::Pick::Scan qw(random_item);
+     my $item  = random_item(\@ary);
+     my @items = random_line(\@ary, 3);
+
+DESCRIPTION
+    This module can return random items from an array, without duplicates.
+    It uses the same algorithm as File::Random::Pick, which in turn uses a
+    slightly modified version of algorithm described in perlfaq ("perldoc -q
+    "random line"")), but uses items from an array instead of lines from a
+    file(handle).
+
+    This module is just a proof of concept and is NOT recommended for
+    general use; as its performance is inferior to List::Util's "shuffle" or
+    List::MoreUtils's "samples".
+
+FUNCTIONS
+  random_item
+    Usage:
+
+     my @items = random_item(\@ary [ , $num_samples ]);
+
+    Number of samples defaults to 1.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Array-Pick-Scan>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Array-Pick-Scan>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Pick-Scan>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::Random::Pick
+
+    List::Util's "shuffle"
+
+    List::MoreUtils's "samples"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

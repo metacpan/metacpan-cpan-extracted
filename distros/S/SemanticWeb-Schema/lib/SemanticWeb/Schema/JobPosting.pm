@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
 
 
 has applicant_location_requirements => (
@@ -266,7 +266,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 
@@ -623,11 +623,15 @@ A salary_currency should be one of the following types:
 
 =head2 C<skills>
 
-Skills required to fulfill this role or in this Occupation.
+A statement of knowledge, skill, ability, task or any other assertion
+expressing a competency that is desired or required to fulfill this role or
+to work in this occupation.
 
 A skills should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
 
 =item C<Str>
 

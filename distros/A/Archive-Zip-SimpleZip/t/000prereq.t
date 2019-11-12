@@ -19,13 +19,15 @@ BEGIN
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
 
-    my $VERSION = '2.052';
+    my $VERSION = '2.090';
     my @NAMES = qw(
             IO::Compress::Zip
+            IO::Uncompress::Unzip
 			);
 
     my @OPT = qw(
-			
+            IO::Compress::Lzma
+            IO::Uncompress::UnLzma			
 			);
 
     plan tests => 1 + @NAMES + @OPT + $extra ;
@@ -65,8 +67,10 @@ BEGIN
                     Archive::Zip::SimpleUnzip
                     IO::Compress::Base
                     IO::Compress::Zip
+                    IO::Compress::Lzma
                     IO::Uncompress::Base
                     IO::Uncompress::Unzip
+                    IO::Uncompress::UnLzma
                     Compress::Raw::Zlib
                     Compress::Raw::Bzip2
                     Compress::Raw::Lzma

@@ -13,12 +13,12 @@
          "rdfs:comment" : "The payment method(s) accepted by seller for this offer.",
          "rdfs:label" : "acceptedPaymentMethod",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:PaymentMethod",
-            "schema:LoanOrCredit"
+            "schema:LoanOrCredit",
+            "schema:PaymentMethod"
          ]
       },
       "schema:advanceBookingRequirement" : {
@@ -27,8 +27,8 @@
          "rdfs:comment" : "The amount of time that is required between accepting the offer and the actual usage of the resource or service.",
          "rdfs:label" : "advanceBookingRequirement",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -39,15 +39,15 @@
          "schema:domainIncludes" : [
             "schema:DeliveryChargeSpecification",
             "schema:Offer",
-            "schema:Demand",
-            "schema:ContactPoint",
+            "schema:Service",
             "schema:Organization",
-            "schema:Service"
+            "schema:ContactPoint",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
+            "schema:Place",
             "schema:Text",
             "schema:AdministrativeArea",
-            "schema:Place",
             "schema:GeoShape"
          ]
       },
@@ -56,8 +56,8 @@
          "rdfs:comment" : "The availability of this item&#x2014;for example In stock, Out of stock, Pre-order, etc.",
          "rdfs:label" : "availability",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:ItemAvailability"
       },
@@ -91,14 +91,14 @@
          "rdfs:label" : "availabilityStarts",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Demand",
+            "schema:ActionAccessSpecification",
             "schema:Offer",
-            "schema:ActionAccessSpecification"
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
+            "schema:DateTime",
             "schema:Time",
-            "schema:Date",
-            "schema:DateTime"
+            "schema:Date"
          ]
       },
       "schema:availableAtOrFrom" : {
@@ -119,8 +119,8 @@
          "rdfs:comment" : "The delivery method(s) available for this offer.",
          "rdfs:label" : "availableDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -153,8 +153,8 @@
          "rdfs:comment" : "The type(s) of customers for which the given offer is valid.",
          "rdfs:label" : "eligibleCustomerType",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:BusinessEntityType"
       },
@@ -164,8 +164,8 @@
          "rdfs:comment" : "The duration for which the given offer is valid.",
          "rdfs:label" : "eligibleDuration",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -175,16 +175,16 @@
          "rdfs:comment" : "The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity.",
          "rdfs:label" : "eligibleQuantity",
          "schema:domainIncludes" : [
-            "schema:PriceSpecification",
             "schema:Demand",
+            "schema:PriceSpecification",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
       "schema:eligibleRegion" : {
          "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "https://github.com/schemaorg/schemaorg/issues/1741"
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
@@ -192,15 +192,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:Demand",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:eligibleTransactionVolume" : {
@@ -223,9 +223,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:category" : "issue-1244",
          "schema:domainIncludes" : [
-            "schema:Demand",
+            "schema:Product",
             "schema:Offer",
-            "schema:Product"
+            "schema:Demand"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -235,13 +235,13 @@
          "rdfs:comment" : "The GTIN-12 code of the product, or the product to which the offer refers. The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C. Company Prefix, Item Reference, and Check Digit used to identify trade items. See <a href=\"http://www.gs1.org/barcodes/technical/idkeys/gtin\">GS1 GTIN Summary</a> for more details.",
          "rdfs:label" : "gtin12",
          "rdfs:subPropertyOf" : [
-            "schema:identifier",
-            "schema:gtin"
+            "schema:gtin",
+            "schema:identifier"
          ],
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:Product",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -251,13 +251,13 @@
          "rdfs:comment" : "The GTIN-13 code of the product, or the product to which the offer refers. This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit UPC codes can be converted into a GTIN-13 code by simply adding a preceeding zero. See <a href=\"http://www.gs1.org/barcodes/technical/idkeys/gtin\">GS1 GTIN Summary</a> for more details.",
          "rdfs:label" : "gtin13",
          "rdfs:subPropertyOf" : [
-            "schema:identifier",
-            "schema:gtin"
+            "schema:gtin",
+            "schema:identifier"
          ],
          "schema:domainIncludes" : [
             "schema:Product",
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -271,9 +271,9 @@
             "schema:identifier"
          ],
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:Demand",
-            "schema:Product",
-            "schema:Offer"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -283,12 +283,12 @@
          "rdfs:comment" : "The <a href=\"http://apps.gs1.org/GDD/glossary/Pages/GTIN-8.aspx\">GTIN-8</a> code of the product, or the product to which the offer refers. This code is also known as EAN/UCC-8 or 8-digit EAN. See <a href=\"http://www.gs1.org/barcodes/technical/idkeys/gtin\">GS1 GTIN Summary</a> for more details.",
          "rdfs:label" : "gtin8",
          "rdfs:subPropertyOf" : [
-            "schema:identifier",
-            "schema:gtin"
+            "schema:gtin",
+            "schema:identifier"
          ],
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Product",
+            "schema:Offer",
             "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -311,16 +311,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:Offer",
             "schema:Demand",
-            "schema:DeliveryChargeSpecification"
+            "schema:DeliveryChargeSpecification",
+            "schema:ActionAccessSpecification",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:inventoryLevel" : {
@@ -330,8 +330,8 @@
          "rdfs:label" : "inventoryLevel",
          "schema:domainIncludes" : [
             "schema:Demand",
-            "schema:SomeProducts",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:SomeProducts"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
@@ -340,9 +340,9 @@
          "rdfs:comment" : "A predefined value from OfferItemCondition or a textual description of the condition of the product or service, or the products or services included in the offer.",
          "rdfs:label" : "itemCondition",
          "schema:domainIncludes" : [
-            "schema:Offer",
+            "schema:Product",
             "schema:Demand",
-            "schema:Product"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:OfferItemCondition"
       },
@@ -351,12 +351,12 @@
          "rdfs:comment" : "The item being offered.",
          "rdfs:label" : "itemOffered",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:Product",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product"
          ]
       },
       "schema:mpn" : {
@@ -365,8 +365,8 @@
          "rdfs:comment" : "The Manufacturer Part Number (MPN) of the product, or the product to which the offer refers.",
          "rdfs:label" : "mpn",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:Product",
+            "schema:Offer",
             "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -377,9 +377,9 @@
          "rdfs:comment" : "One or more detailed price specifications, indicating the unit price and delivery or payment charges.",
          "rdfs:label" : "priceSpecification",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:TradeAction",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:PriceSpecification"
       },
@@ -389,15 +389,15 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer",
-            "schema:Order",
             "schema:Flight",
-            "schema:BuyAction"
+            "schema:Offer",
+            "schema:BuyAction",
+            "schema:Order",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:serialNumber" : {
@@ -420,9 +420,9 @@
          "rdfs:label" : "sku",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
+            "schema:Product",
             "schema:Demand",
-            "schema:Offer",
-            "schema:Product"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -433,10 +433,10 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification",
             "schema:OpeningHoursSpecification",
-            "schema:Demand",
+            "schema:PriceSpecification",
             "schema:Permit",
+            "schema:Demand",
             "schema:Offer",
             "schema:MonetaryAmount"
          ],
@@ -451,17 +451,17 @@
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
+            "schema:LocationFeatureSpecification",
             "schema:Offer",
             "schema:Demand",
-            "schema:MonetaryAmount",
-            "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
-            "schema:JobPosting",
-            "schema:OpeningHoursSpecification"
+            "schema:MonetaryAmount",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:warranty" : {

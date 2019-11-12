@@ -16,7 +16,6 @@ use Mojo::UserAgent::Server;
 use Mojolicious;
 
 # Mojo::UserAgent::Cached specific tests
-
 $ENV{SUA_CACHE_ROOT_DIR} = File::Temp::tempdir( CLEANUP => 1 );
 
 # Setup mock server
@@ -40,6 +39,7 @@ like $ua2->get('t/data/newsfeed.xml')->res->body, qr/^<\?xml/, 'Can fetch local 
 my $ua3 = Mojo::UserAgent::Cached->new( local_dir => "$Bin/../t/data", always_return_file => 'newsfeed.xml' );
 is $ua3->get('NOT_newsfeed.xml')->res->code, 200, 'Always return file provided and get correct status';
 like $ua3->get('NOT_newsfeed.xml')->res->body, qr/^<\?xml/, 'Always return file provided and get its body';
+
 
 my $ua4 = Mojo::UserAgent::Cached->new();
 is $ua4->get('NOT_newsfeed.xml')->res->code, 404, 'Return 404 when file is not found';
@@ -152,11 +152,11 @@ subtest 'Cache with request headers' => sub {
 
     my $keys = {
         'http://www.non-existent-server.com' => ['http://www.non-existent-server.com'],
-        'http://www.non-existent-server.com,{X-Test,Test}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' } ],
-        'http://www.non-existent-server.com,{X-Test,Test}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, sub { } ],
-        'http://www.non-existent-server.com,{},form,{a,b}' => ['http://www.non-existent-server.com', {}, form => { 'a' => 'b' } ],
-        'http://www.non-existent-server.com,{X-Test,Test},form,{a,b}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, form => { 'a' => 'b' }, sub { } ],
-        'http://www.non-existent-server.com,{X-Test,Test},json,{a,b}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, json => { 'a' => 'b' }, sub { } ],
+        'http://www.non-existent-server.com,{"X-Test":"Test"}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' } ],
+        'http://www.non-existent-server.com,{"X-Test":"Test"}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, sub { } ],
+        'http://www.non-existent-server.com,[{},"form",{"a":"b"}]' => ['http://www.non-existent-server.com', {}, form => { 'a' => 'b' } ],
+        'http://www.non-existent-server.com,[{"X-Test":"Test"},"form",{"a":"b"}]' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, form => { 'a' => 'b' }, sub { } ],
+        'http://www.non-existent-server.com,[{"X-Test":"Test"},"json",{"a":"b"}]' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, json => { 'a' => 'b' }, sub { } ],
     };
     while (my ($k, $v) = each %{$keys}) {
         is $ua->generate_key(@{$v}), $k, "generate_key " . (join " ", @{$v}) . " => $k";
@@ -165,10 +165,10 @@ subtest 'Cache with request headers' => sub {
     # Allow caching /foo requests too
     local *Mojo::UserAgent::Cached::is_cacheable = sub { return 1; };
 
-    my @params = ('/content' => { 'X-Test' => 'Test' });
+    my @params = ('/content' => { 'X-Test' => [ 'Test' ] });
 
     my $cache_key = $ua->generate_key(@params);
-    is($cache_key, '/content,{X-Test,Test}', 'cache key is correct');
+    is($cache_key, '/content,{"X-Test":["Test"]}', 'cache key is correct');
     $ua->invalidate($cache_key);
 
     my $tx1 = $ua->get(@params);

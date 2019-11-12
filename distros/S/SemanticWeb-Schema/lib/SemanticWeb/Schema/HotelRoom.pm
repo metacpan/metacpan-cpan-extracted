@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
 
 
 has bed => (
@@ -50,13 +50,13 @@ SemanticWeb::Schema::HotelRoom - A hotel room is a single room in a hotel
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 
-=for html A hotel room is a single room in a hotel. <br /><br /> See also the <a
+=for html <p>A hotel room is a single room in a hotel. <br /><br /> See also the <a
 href="/docs/hotels.html">dedicated document on the use of schema.org for
-marking up hotels and other forms of accommodations</a>.
+marking up hotels and other forms of accommodations</a>.<p>
 
 =head1 ATTRIBUTES
 

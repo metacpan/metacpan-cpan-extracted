@@ -15,15 +15,15 @@
          "rdfs:comment" : "A medical service available from this provider.",
          "rdfs:label" : "availableService",
          "schema:domainIncludes" : [
-            "schema:Physician",
+            "schema:MedicalClinic",
             "schema:Hospital",
-            "schema:MedicalClinic"
+            "schema:Physician"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
+            "schema:MedicalTherapy",
             "schema:MedicalProcedure",
-            "schema:MedicalTest",
-            "schema:MedicalTherapy"
+            "schema:MedicalTest"
          ]
       },
       "schema:medicalSpecialty" : {
@@ -31,9 +31,9 @@
          "rdfs:comment" : "A medical specialty of the provider.",
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
+            "schema:Physician",
             "schema:MedicalOrganization",
             "schema:MedicalClinic",
-            "schema:Physician",
             "schema:Hospital"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

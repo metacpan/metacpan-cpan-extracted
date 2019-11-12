@@ -22,7 +22,7 @@ WriteMakefile(
         'Mail::DMARC::PurePerl'       => 0,
         'Mail::Header'                => 0,
         'Mail::Qmail::Queue::Message' => 0,
-        'Mail::SPF::Query'            => 0,
+        'Mail::SPF'                   => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'App-Qmail-DMARC-*' },
@@ -32,11 +32,7 @@ WriteMakefile(
     META_MERGE => {
         resources => {
             homepage   => 'https://github.com/fany/App-Qmail-DMARC',
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/fany/App-Qmail-DMARC.git',
-                web  => 'https://github.com/fany/App-Qmail-DMARC',
-            },
+            repository => 'https://github.com/fany/App-Qmail-DMARC.git',
         },
     },
 );

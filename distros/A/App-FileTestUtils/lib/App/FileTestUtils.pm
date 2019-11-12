@@ -1,7 +1,7 @@
 package App::FileTestUtils;
 
-our $DATE = '2019-08-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-09-29'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More CLIs for file testing
@@ -18,7 +18,7 @@ App::FileTestUtils - More CLIs for file testing
 
 =head1 VERSION
 
-This document describes version 0.001 of App::FileTestUtils (from Perl distribution App-FileTestUtils), released on 2019-08-17.
+This document describes version 0.002 of App::FileTestUtils (from Perl distribution App-FileTestUtils), released on 2019-09-29.
 
 =head1 DESCRIPTION
 

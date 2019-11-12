@@ -369,12 +369,8 @@ struct RExC_state_t {
 #define REQUIRE_BRANCHJ(flagp, restart_retval)                              \
     STMT_START {                                                            \
                 RExC_use_BRANCHJ = 1;                                       \
-                if (LIKELY(! IN_PARENS_PASS)) {                             \
-                    /* No need to restart the parse immediately if we're    \
-                     * going to reparse anyway to count parens */           \
-                    *flagp |= RESTART_PARSE;                                \
-                    return restart_retval;                                  \
-                }                                                           \
+                *flagp |= RESTART_PARSE;                                    \
+                return restart_retval;                                      \
     } STMT_END
 
 /* Until we have completed the parse, we leave RExC_total_parens at 0 or
@@ -837,7 +833,8 @@ static const scan_data_t zero_scan_data = {
 #define UPDATE_WARNINGS_LOC(loc)                                        \
     STMT_START {                                                        \
         if (TO_OUTPUT_WARNINGS(loc)) {                                  \
-            RExC_latest_warn_offset = (xI(loc)) - RExC_precomp;         \
+            RExC_latest_warn_offset = MAX(sI, MIN(eI, xI(loc)))         \
+                                                       - RExC_precomp;  \
         }                                                               \
     } STMT_END
 
@@ -15897,8 +15894,11 @@ redo_curchar:
 
                     /* Recurse, with the meat of the embedded expression */
                     RExC_parse++;
-                    (void) handle_regex_sets(pRExC_state, &current, flagp,
-                                                    depth+1, oregcomp_parse);
+                    if (! handle_regex_sets(pRExC_state, &current, flagp,
+                                                    depth+1, oregcomp_parse))
+                    {
+                        RETURN_FAIL_ON_RESTART(*flagp, flagp);
+                    }
 
                     /* Here, 'current' contains the embedded expression's
                      * inversion list, and RExC_parse points to the trailing
@@ -15952,6 +15952,7 @@ redo_curchar:
                               FALSE, /* Require return to be an ANYOF */
                               &current))
                 {
+                    RETURN_FAIL_ON_RESTART(*flagp, flagp);
                     goto regclass_failed;
                 }
 
@@ -15988,6 +15989,7 @@ redo_curchar:
                                 FALSE, /* Require return to be an ANYOF */
                                 &current))
                 {
+                    RETURN_FAIL_ON_RESTART(*flagp, flagp);
                     goto regclass_failed;
                 }
 
@@ -16348,8 +16350,10 @@ redo_curchar:
         RExC_flags |= RXf_PMf_FOLD;
     }
 
-    if (!node)
+    if (!node) {
+        RETURN_FAIL_ON_RESTART(*flagp, flagp);
         goto regclass_failed;
+    }
 
     /* Fix up the node type if we are in locale.  (We have pretended we are
      * under /u for the purposes of regclass(), as this construct will only
@@ -22857,7 +22861,7 @@ Perl_parse_uniprop_string(pTHX_
         /* Certain properties whose values are numeric need special handling.
          * They may optionally be prefixed by 'is'.  Ignore that prefix for the
          * purposes of checking if this is one of those properties */
-        if (memBEGINPs(lookup_name, name_len, "is")) {
+        if (memBEGINPs(lookup_name, j, "is")) {
             lookup_offset = 2;
         }
 
@@ -23428,10 +23432,12 @@ Perl_parse_uniprop_string(pTHX_
                  * NV. */
 
                 NV value;
+                SSize_t value_len = lookup_len - equals_pos;
 
                 /* Get the value */
-                if (my_atof3(lookup_name + equals_pos, &value,
-                             lookup_len - equals_pos)
+                if (   value_len <= 0
+                    || my_atof3(lookup_name + equals_pos, &value,
+                                value_len)
                           != lookup_name + lookup_len)
                 {
                     goto failed;

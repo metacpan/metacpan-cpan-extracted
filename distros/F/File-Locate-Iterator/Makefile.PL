@@ -26,24 +26,20 @@ use ExtUtils::MakeMaker;
 # Crib: only print to STDERR so as not to upset "Makefile.PL PREREQ_PRINT=1"
 #
 
-my $want_xs = 1;
+my $MY_WITHOUT_XS = 0;
 @ARGV = grep { /^MY_WITHOUT_XS/
-                 ? do { $want_xs = 0; 0 }  # record and remove
+                 ? do { $MY_WITHOUT_XS = 1; 0 }  # remember and remove
                  : 1 } @ARGV;
-if (! $want_xs) {
+
+my $want_xs;
+if ($MY_WITHOUT_XS) {
   print STDERR "XS skipped by request\n";
-}
-#
-# SvRX() is new in perl 5.10.0 and ppport.h 3.19 doesn't offer an
-# implementation for earlier perl
-#
-if ($want_xs && $] < 5.010) {
-  print STDERR "XS skipped for perl $[ (believe need 5.010 for SvRX)\n";
   $want_xs = 0;
-}
-if ($want_xs) {
-  print STDERR "XS enabled by default (if you don't have a compiler or the .xs doesn't work
-then forcibly disable with \"perl Makefile.PL MY_WITHOUT_XS=1\")
+} else {
+  $want_xs = 1;
+  print STDERR "XS enabled by default.
+I you don't have a compiler or the .xs doesn't work or you don't want it
+then forcibly disable with \"perl Makefile.PL MY_WITHOUT_XS=1\"
 ";
 }
 

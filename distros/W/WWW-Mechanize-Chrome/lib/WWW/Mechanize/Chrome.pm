@@ -4,6 +4,7 @@ use warnings;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
+use PerlX::Maybe;
 use File::Spec;
 use HTTP::Response;
 use HTTP::Headers;
@@ -23,7 +24,7 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -561,6 +562,7 @@ sub additional_executable_search_directories( $class, $os_style=$^O ) {
             ($ENV{'ProgramFiles'},
              $ENV{'ProgramFiles(x86)'},
              $ENV{"ProgramFilesW6432"},
+             $ENV{"LOCALAPPDATA"},
             );
     } elsif( $os_style =~ /darwin/i ) {
         my $path = '/Applications/Google Chrome.app/Contents/MacOS';
@@ -1073,13 +1075,19 @@ needs launching the browser and asking for the version via the network.
 
 =cut
 
-sub chrome_version_from_stdout( $self ) {
+sub chrome_version_from_stdout( $class, $options={} ) {
     # We can try to get at the version through the --version command line:
-    my @cmd = $self->build_command_line({ launch_arg => ['--version'], headless => 0, enable_automation => 0, port => undef });
-    #$self->log('trace', "Retrieving version via [@cmd]" );
+    my @cmd = $class->build_command_line({
+        launch_arg => ['--version'],
+        headless   => 0,
+        enable_automation => 0,
+        port => undef,
+        maybe launch_exe => $options->{launch_exe},
+    });
     if ($^O =~ /darwin/) {
       s/ /\\ /g for @cmd;
     }
+
     my $v = readpipe(join " ", @cmd);
 
     # Chromium 58.0.3029.96 Built on Ubuntu , running on Ubuntu 14.04
@@ -1089,15 +1097,30 @@ sub chrome_version_from_stdout( $self ) {
     return "$1/$2"
 }
 
-sub chrome_version( $self ) {
-    if( $^O !~ /mswin/i ) {
-        my $version = $self->chrome_version_from_stdout();
+sub chrome_version_from_executable_win32( $class, $options={} ) {
+    require Win32::File::VersionInfo;
+
+    my @names = ($options->{launch_exe} ? $options->{launch_exe}: ());
+    my ($program,$error) = $class->find_executable( @names );
+    croak $error if $error;
+
+    my $info = Win32::File::VersionInfo::GetFileVersionInfo( $program );
+    return "Chrome/$info->{ProductVersion}";
+}
+
+sub chrome_version( $self, %options ) {
+    if( blessed $self and $self->target ) {
+        return $self->chrome_version_info()->{product};
+
+    } elsif( $^O !~ /mswin/i ) {
+        my $version = $self->chrome_version_from_stdout(\%options);
         if( $version ) {
             return $version;
         };
-    };
 
-    return $self->chrome_version_info()->{product};
+    } else {
+        $self->chrome_version_from_executable_win32( \%options )
+    };
 }
 
 =head2 C<< $mech->chrome_version_info >>

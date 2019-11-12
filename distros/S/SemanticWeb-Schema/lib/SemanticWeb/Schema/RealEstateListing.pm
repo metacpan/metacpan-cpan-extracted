@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
+
+
+has lease_length => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'leaseLength',
+);
+
 
 
 
@@ -34,7 +42,7 @@ SemanticWeb::Schema::RealEstateListing - A RealEstateListing is a listing that d
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 
@@ -47,6 +55,27 @@ to lease out, or to sell). The <a class="localLink"
 href="http://schema.org/RealEstateListing">RealEstateListing</a> type
 itself represents the overall listing, as manifested in some <a
 class="localLink" href="http://schema.org/WebPage">WebPage</a>.<p>
+
+=head1 ATTRIBUTES
+
+=head2 C<lease_length>
+
+C<leaseLength>
+
+=for html <p>Length of the lease for some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, either particular
+to some <a class="localLink" href="http://schema.org/Offer">Offer</a> or in
+some cases intrinsic to the property.<p>
+
+A lease_length should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Duration']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
 
 =head1 SEE ALSO
 

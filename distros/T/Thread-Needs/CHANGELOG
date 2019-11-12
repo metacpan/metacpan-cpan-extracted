@@ -1,0 +1,28 @@
+0.06	9 November 2019
+	Adoption
+
+0.05	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.04	25 August 2003
+	Found Symbol::delete_package for zapping modules from memory.  Seems
+	to be much more reliable than my own little method.  Now uses that
+	and zaps Symbol from memory if it wasn't loaded already.
+
+0.03	13 August 2003
+	Cleaned up Makefile.PL and updated the copyright info.  Made sure
+	the test-suite runs under strict and warnings.  Added a message
+	about warnings that may occur from AutoLoader.
+
+0.02	29 July 2002
+	Added an actual test-suite.
+
+	Added second example for inclusion in modules.
+
+	Adapted "import" so that it returns the modules that were not yet
+	marked to be saved in threads.
+
+	Fixed some documentation nits.
+
+0.01	28 July 2002
+	First version of Thread::Needs.

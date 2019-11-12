@@ -12,7 +12,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 with 'Future::HTTP::Handler';
 
@@ -161,7 +161,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

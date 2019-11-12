@@ -55,12 +55,14 @@ sub named {
   $range = $worksheet->range($col);
   lives_ok sub { $range->add_named(name => "col")->submit_requests(); }, "Adding col named range should live";
   lives_ok sub { $range = $worksheet->range_col("col"); }, "Creating col named range as a col should live";
+  $spreadsheet->cache(5);
   like $worksheet->range("col")->range(), qr/$col$/, "Normalized range should be $col";
 
   my $row = "A1:J10";
   $range = $worksheet->range($row);
   lives_ok sub { $range->add_named(name => "row")->submit_requests(); }, "Adding row named range should live";
   lives_ok sub { $range = $worksheet->range_row("row"); }, "Creating row named range as a row should live";
+  $spreadsheet->cache(5);
   like $worksheet->range("row")->range(), qr/$row$/, "Normalized range should be $row";
 
   my $named = $spreadsheet->range_group(

@@ -1,5 +1,5 @@
 package Test::Expr;
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use 5.012; use warnings;
 use Keyword::Declare;
@@ -206,7 +206,7 @@ sub import {
             if (eval($desc)//'') ne qq{$test_code};
 
         # Build the test code...
-        qq{
+        my $new_test_code = qq{
             {
                 $test_setup
                 if ($test_expr) {
@@ -217,6 +217,8 @@ sub import {
                 }
             }
         };
+        $new_test_code =~ tr/\n/ /;
+        return $new_test_code;
     }
 }
 
@@ -230,7 +232,7 @@ Test::Expr - Test an expression with better error messages
 
 =head1 VERSION
 
-This document describes Test::Expr version 0.000010
+This document describes Test::Expr version 0.000011
 
 
 =head1 SYNOPSIS

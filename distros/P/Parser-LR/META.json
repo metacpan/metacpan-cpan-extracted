@@ -22,10 +22,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::DFA" : "20191031",
+            "Data::DFA" : "20180429",
             "Data::Dump" : "0",
-            "Data::NFA" : "20191031",
-            "Data::Table::Text" : "20190815",
+            "Data::NFA" : "20181027",
+            "Data::Table::Text" : "20191110",
             "Exporter" : "0",
             "Test2::API" : "0",
             "Test::More" : "0"
@@ -35,7 +35,7 @@
    "provides" : {
       "Parser::LR" : {
          "file" : "lib/Parser/LR.pm",
-         "version" : "20191031"
+         "version" : "20191110"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20191031",
+   "version" : "20191110",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

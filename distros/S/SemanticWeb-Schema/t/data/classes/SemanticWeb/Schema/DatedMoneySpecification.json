@@ -9,21 +9,21 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1698",
-            "issue-1253"
+            "issue-1253",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
-            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
             "schema:InvestmentOrDeposit",
             "schema:DatedMoneySpecification",
+            "schema:MoneyTransfer",
             "schema:LoanOrCredit"
          ],
          "schema:rangeIncludes" : [
@@ -39,8 +39,8 @@
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : [
             "schema:MonetaryAmount",
-            "schema:ExchangeRateSpecification",
             "schema:LoanOrCredit",
+            "schema:ExchangeRateSpecification",
             "schema:MonetaryAmountDistribution",
             "schema:DatedMoneySpecification"
          ],
@@ -52,10 +52,10 @@
          "rdfs:label" : "endDate",
          "schema:domainIncludes" : [
             "schema:Event",
-            "schema:DatedMoneySpecification",
             "schema:CreativeWorkSeason",
             "schema:CreativeWorkSeries",
-            "schema:Role"
+            "schema:Role",
+            "schema:DatedMoneySpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -67,11 +67,11 @@
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:domainIncludes" : [
-            "schema:Event",
+            "schema:DatedMoneySpecification",
             "schema:CreativeWorkSeries",
             "schema:CreativeWorkSeason",
-            "schema:Role",
-            "schema:DatedMoneySpecification"
+            "schema:Event",
+            "schema:Role"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",

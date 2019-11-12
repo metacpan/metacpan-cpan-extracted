@@ -17,8 +17,8 @@
          "rdfs:comment" : "Educational background needed for the position or Occupation.",
          "rdfs:label" : "educationRequirements",
          "schema:category" : [
-            "issue-1779",
-            "issue-1698"
+            "issue-1698",
+            "issue-1779"
          ],
          "schema:domainIncludes" : [
             "schema:Occupation",
@@ -41,9 +41,9 @@
             "schema:Occupation"
          ],
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
+            "schema:Number",
             "schema:MonetaryAmountDistribution",
-            "schema:Number"
+            "schema:MonetaryAmount"
          ]
       },
       "schema:experienceRequirements" : {
@@ -53,8 +53,8 @@
          "rdfs:label" : "experienceRequirements",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:Occupation"
+            "schema:Occupation",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -77,31 +77,31 @@
          "rdfs:comment" : "A category describing the job, preferably using a term from a taxonomy such as <a href=\"http://www.onetcenter.org/taxonomy.html\">BLS O*NET-SOC</a>, <a href=\"https://www.ilo.org/public/english/bureau/stat/isco/isco08/\">ISCO-08</a> or similar, with the property repeated for each applicable value. Ideally the taxonomy should be identified, and both the textual label and formal code for the category should be provided.<br/><br/>\n\nNote: for historical reasons, any textual label and formal code provided as a literal may be assumed to be from O*NET-SOC.",
          "rdfs:label" : "occupationalCategory",
          "schema:category" : [
-            "issue-1698",
             "issue-2289",
+            "issue-1698",
             "issue-2192"
          ],
          "schema:domainIncludes" : [
-            "schema:JobPosting",
             "schema:WorkBasedProgram",
+            "schema:JobPosting",
             "schema:Occupation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:Text"
          ]
       },
       "schema:qualifications" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1779"
+            "https://github.com/schemaorg/schemaorg/issues/1779",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Specific qualifications required for this role or Occupation.",
          "rdfs:label" : "qualifications",
          "schema:category" : [
-            "issue-1698",
-            "issue-1779"
+            "issue-1779",
+            "issue-1698"
          ],
          "schema:domainIncludes" : [
             "schema:JobPosting",
@@ -109,8 +109,8 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:EducationalOccupationalCredential",
-            "schema:Text"
+            "schema:Text",
+            "schema:EducationalOccupationalCredential"
          ]
       },
       "schema:responsibilities" : {
@@ -120,22 +120,31 @@
          "rdfs:label" : "responsibilities",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:Occupation"
+            "schema:Occupation",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:skills" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Skills required to fulfill this role or in this Occupation.",
-         "rdfs:label" : "skills",
-         "schema:category" : "issue-1698",
-         "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:Occupation"
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/2322"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A statement of knowledge, skill, ability, task or any other assertion expressing a competency that is desired or required to fulfill this role or to work in this occupation.",
+         "rdfs:label" : "skills",
+         "schema:category" : [
+            "issue-1698",
+            "issue-2322"
+         ],
+         "schema:domainIncludes" : [
+            "schema:Occupation",
+            "schema:JobPosting"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:DefinedTerm",
+            "schema:Text"
+         ]
       }
    }
 }

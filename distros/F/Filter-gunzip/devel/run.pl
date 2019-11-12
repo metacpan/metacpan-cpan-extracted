@@ -30,6 +30,7 @@ $|=1;
 {
   # PerlIO::gzip 0.19 cannot dup
   require PerlIO::gzip;
+  print "PerlIO::gzip version ",PerlIO::gzip->VERSION,"\n";
   open GG, "<:gzip", "$thisdir/show-argv.pl.gz" or die "cannot open: $!";
   my $line = readline *GG;
   print $line;
@@ -41,6 +42,7 @@ $|=1;
 {
   # PerlIO::gzip 0.19 cannot seek, even rewind
   require PerlIO::gzip;
+  print "PerlIO::gzip version ",PerlIO::gzip->VERSION,"\n";
   open my $fh, "<:gzip", "$thisdir/show-argv.pl.gz" or die $!;
   print "$fh\n";
   my $line = readline $fh;

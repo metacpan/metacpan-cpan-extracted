@@ -1,7 +1,7 @@
 package Class::ExtraAttributes;
 
 # version
-$VERSION= '0.02';
+$VERSION= '0.03';
 
 # be as strict and verbose as possible
 use strict;
@@ -89,7 +89,7 @@ Class::ExtraAttributes - extra attributes for a class
 
 =head1 VERSION
 
-This documentation describes version 0.02.
+This documentation describes version 0.03.
 
 =head1 SYNOPSIS
 
@@ -163,6 +163,8 @@ context).
 =head1 AUTHOR
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Please report bugs to <perlbugs@dijkmat.nl>.
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.0';
 
 
 has area => (
@@ -66,6 +66,14 @@ has broadcaster => (
 
 
 
+has call_sign => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'callSign',
+);
+
+
+
 has has_broadcast_channel => (
     is        => 'rw',
     predicate => 1,
@@ -106,7 +114,7 @@ SemanticWeb::Schema::BroadcastService - A delivery service through which content
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 
@@ -198,6 +206,22 @@ A broadcaster should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=back
+
+=head2 C<call_sign>
+
+C<callSign>
+
+=for html <p>A <a href="https://en.wikipedia.org/wiki/Call_sign">callsign</a>, as
+used in broadcasting and radio communications to identify people, radio and
+TV stations, or vehicles.<p>
+
+A call_sign should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

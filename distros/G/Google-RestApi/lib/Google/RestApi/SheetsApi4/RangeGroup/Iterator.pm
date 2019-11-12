@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::RangeGroup::Iterator;
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use 5.010_000;
 

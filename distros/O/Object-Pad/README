@@ -35,17 +35,32 @@ KEYWORDS
        class Name {
           ...
        }
+    
+       class Name;
 
     Behaves similarly to the package keyword, but provides a package that
     defines a new class. Such a class provides an automatic constructor
     method called new, which will invoke the class's BUILDALL method if it
     exists.
 
+    As with package, an optional block may be provided. If so, the contents
+    of that block define the new class and the preceding package continues
+    afterwards. If not, it sets the class as the package context of
+    following keywords and definitions.
+
     A single superclass is supported by the keyword extends
 
        class Cat extends Animal {
           ...
        }
+
+    If a package providing the superclass does not exist, an attempt is
+    made to load it by code equivalent to
+
+       require Animal ();
+
+    and thus it must either already exist, or be locatable via the usual
+    @INC mechanisms.
 
     The superclass must either be implemented by Object::Pad, or be some
     class whose instances are blessed hash references.
@@ -150,15 +165,27 @@ IMPLIED PRAGMATA
     may have to make some small alterations to bring it into a conforming
     style.
 
-TODO
+DESIGN TODOs
 
-      * Setting default package using class Name; statement without block.
+    The following points are details about the design of pad slot-based
+    object systems in general:
 
-      * Multiple inheritence of subclassing
+      * Is multiple inheritence actually required, if role composition is
+      implemented including giving roles the ability to use private slots?
 
-      * Roles
+      * Consider the visibility of superclass slots to subclasses. Do
+      subclasses even need to be able to see their superclass's slots, or
+      are accessor methods always appropriate?
 
-      * Consider visibility of superclass slots to subclasses.
+IMPLEMENTATION TODOs
+
+    These points are more about this particular module's implementation:
+
+      * Implement roles, including required method checking and the ability
+      to have private slots.
+
+      * Consider multiple inheritence of subclassing, if that is still
+      considered useful after adding roles.
 
       * Experiment with CvOUTSIDE or other techniques as a way to set up
       the per-method pad, and consider if we can detect which slots are in

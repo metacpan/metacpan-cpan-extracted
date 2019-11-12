@@ -14,8 +14,8 @@
          "rdfs:label" : "inventoryLevel",
          "schema:domainIncludes" : [
             "schema:Demand",
-            "schema:SomeProducts",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:SomeProducts"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       }

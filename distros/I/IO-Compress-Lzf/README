@@ -1,9 +1,9 @@
 
-                           IO-Compress-Lzf
+                            IO-Compress-Lzf
 
-                           Version 2.089
+                             Version 2.090
 
-                          3 November 2019
+                             9 November 2019
 
        Copyright (c) 2005-2019 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
@@ -48,7 +48,7 @@ TROUBLESHOOTING
 SUPPORT
 -------
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 https://github.com/pmqs/IO-Compress-Lzf/issues (preferred) or
 https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress-Lzf.
 
@@ -63,12 +63,12 @@ To help me help you, I need all of the following information:
     This includes:
 
      a. The *complete* output from running this
- 
+
             perl -V
- 
+
         Do not edit the output in any way.
         Note, I want you to run "perl -V" and NOT "perl -v".
- 
+
         If your perl does not understand the "-V" option it is too
         old. This module needs Perl version 5.004 or better.
 
@@ -85,7 +85,7 @@ To help me help you, I need all of the following information:
         If you haven't installed IO-Compress-Lzf then search IO::Compress::Lzf.pm
         for a line like this:
 
-          $VERSION = "2.089" ;
+          $VERSION = "2.090" ;
 
  2. If you are having problems building IO-Compress-Lzf, send me a
     complete log of what happened. Start by unpacking the IO-Compress-Lzf

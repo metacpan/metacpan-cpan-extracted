@@ -28,6 +28,21 @@
             "schema:URL"
          ]
       },
+      "schema:callSign" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2109",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Call_sign\">callsign</a>, as used in broadcasting and radio communications to identify people, radio and TV stations, or vehicles.",
+         "rdfs:label" : "callSign",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:category" : "issue-2109",
+         "schema:domainIncludes" : [
+            "schema:Person",
+            "schema:BroadcastService",
+            "schema:Vehicle"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
       "schema:cargoVolume" : {
          "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
          "rdf:type" : "rdf:Property",
@@ -121,8 +136,8 @@
          "schema:isPartOf" : "http:auto.schema.org",
          "schema:rangeIncludes" : [
             "schema:URL",
-            "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QualitativeValue"
          ]
       },
       "schema:mileageFromOdometer" : {
@@ -149,8 +164,8 @@
          "rdfs:label" : "numberOfAirbags",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:numberOfAxles" : {
@@ -160,8 +175,8 @@
          "rdfs:label" : "numberOfAxles",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:numberOfDoors" : {
@@ -182,8 +197,8 @@
          "rdfs:label" : "numberOfForwardGears",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:numberOfPreviousOwners" : {
@@ -212,8 +227,8 @@
          "rdfs:comment" : "The date of production of the item, e.g. vehicle.",
          "rdfs:label" : "productionDate",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -223,8 +238,8 @@
          "rdfs:comment" : "The date the item e.g. vehicle was purchased by the current owner.",
          "rdfs:label" : "purchaseDate",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Vehicle"
+            "schema:Vehicle",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Date"
       },
@@ -354,9 +369,9 @@
          "rdfs:label" : "vehicleTransmission",
          "schema:domainIncludes" : "schema:Vehicle",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:URL",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:Text"
          ]
       },
       "schema:weightTotal" : {

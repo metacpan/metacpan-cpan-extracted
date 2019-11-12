@@ -1,0 +1,86 @@
+NAME
+
+    IO::Handle::Packable - add pack and unpack methods to an IO::Handle
+
+SYNOPSIS
+
+       use IO::Handle::Packable;
+    
+       my $fh = IO::Handle::Packable->new;
+       $fh->open( "my-data.dat", ">" );
+    
+       while( my ( $x, $y, $value ) = $fh->unpack( "S S i" ) ) {
+          print "Value at ($x,$y) is $value\n";
+       }
+
+DESCRIPTION
+
+    This subclass of IO::File adds two new methods to an IO handle; "pack"
+    and "unpack". These provide the ability to write or read packed binary
+    values to and from the filehandle, using the same kind of format
+    strings as the core perl functions of the same names.
+
+ Unpack Format
+
+    Note that due to limitations in the way core perl's unpack() function
+    works, this module has to know in advance how many bytes will be needed
+    per read() call, before it can unpack the data. As a result, it cannot
+    cope with all of the features that core's unpack() can do.
+
+    The following features are supported:
+
+       a A                  # binary and ASCII data of fixed length
+    
+       c C s S i I l L q Q  # integers
+    
+       n N v V              # legacy fixed-endian integers
+    
+       f d                  # native floating-point
+    
+       s< s>                # endian specifiers
+    
+       a123  i45            # repeat counts
+
+    The following features are not currently supported, though should be
+    relatively easy to add:
+
+       b B                  # bitstrings
+    
+       F D                  # perl-internal floating-point
+    
+       i!                   # native-length integers
+    
+       (c c s)              # groups
+    
+       #                    # comments
+
+    Due to needing to know lengths in advance, the following features will
+    be much harder to implement without at least some redesign to the
+    current implementation:
+
+       z*                   # NUL-terminated ASCIIZ strings
+    
+       n/A                  # length-prefixed strings
+    
+       . @ x                # positioning control
+
+METHODS
+
+ pack
+
+       $fh->pack( $format, @values )
+
+    Uses the core pack function to pack the values given the format into a
+    binary string, then writes the result to the filehandle.
+
+ unpack
+
+       @values = $fh->unpack( $format )
+
+    Uses the core unpack function to unpack bytes read from the filehandle
+    using the given format.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

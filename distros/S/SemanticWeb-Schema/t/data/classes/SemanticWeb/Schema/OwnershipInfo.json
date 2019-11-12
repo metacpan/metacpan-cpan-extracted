@@ -44,8 +44,8 @@
             "schema:TypeAndQuantityNode"
          ],
          "schema:rangeIncludes" : [
-            "schema:Service",
-            "schema:Product"
+            "schema:Product",
+            "schema:Service"
          ]
       }
    }

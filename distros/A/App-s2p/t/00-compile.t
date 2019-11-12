@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.040
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
-use Test::More  tests => 2;
+use Test::More;
 
-
+plan tests => 2;
 
 my @module_files = (
 
@@ -38,6 +38,9 @@ for my $lib (@module_files)
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { require blib; blib->VERSION('1.01') };
+
     if (@_warnings)
     {
         warn @_warnings;
@@ -49,9 +52,9 @@ foreach my $file (@scripts)
 { SKIP: {
     open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
     my $line = <$fh>;
-    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!.*?\bperl\b\s*(.*)$/;
 
-    my @flags = $1 ? split(/\s+/, $1) : ();
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    my @flags = $1 ? split(' ', $1) : ();
 
     my $stderr = IO::Handle->new;
 
@@ -61,7 +64,10 @@ foreach my $file (@scripts)
     waitpid($pid, 0);
     is($?, 0, "$file compiled ok");
 
-   # in older perls, -c output is simply the file portion of the path being tested
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { require blib; blib->VERSION('1.01') };
+
+    # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }
         grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
     {
@@ -72,6 +78,7 @@ foreach my $file (@scripts)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found');
+is(scalar(@warnings), 0, 'no warnings found')
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );
 
 

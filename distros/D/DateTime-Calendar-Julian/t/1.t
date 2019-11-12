@@ -3,9 +3,10 @@
 
 #########################
 
-BEGIN { $^W = 1 }
+use strict;
+use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 42;
 BEGIN { use_ok('DateTime::Calendar::Julian') };
 
 #########################
@@ -16,7 +17,7 @@ is(($d->utc_rd_values)[0], 2299160-1721424, 'rata die');
 
 use DateTime;
 
-foreach $date (
+foreach my $date (
                 # Julian date , Gregorian   , diff
                 [ '1582/10/05', '1582/10/15', 10 ], # Jul => Greg reform date
                 [ '1752/09/03', '1752/09/14', 11 ], # English reform date
@@ -30,7 +31,13 @@ foreach $date (
     my $d = DateTime::Calendar::Julian->new(year      => $y,
                                             month     => $m,
                                             day       => $day,
+                                            hour      => 0,    # for
+                                            minute    => 0,    # datetime()
+                                            second    => 0,    # test
                                             time_zone => 'floating' );
+    my $str = sprintf( '%04d-%02d-%02d', $y, $m, $day );
+    is( $d->datetime(), "${str}J00:00:00", "datetime() of $date->[0]" );
+    is( "$d", "${str}T00:00:00", "stringification of $date->[0]" );
     my $dt = DateTime->from_object( object => $d );
     is($dt->ymd('/'), $date->[1], "converting $date->[0] to Gregorian");
     $d = DateTime::Calendar::Julian->from_object( object => $dt );

@@ -15,6 +15,7 @@ WriteMakefile(
 	'autodie'                         => 0,
 	'autovivification'                => 0,
 	'constant'                        => 0,
+        'Cache::Memory::Simple'           => 0,
 	'Carp'                            => 0,
 	'Exporter'                        => 0,
 	'Furl'                            => 0,
@@ -36,7 +37,6 @@ WriteMakefile(
 	'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
-	'Spreadsheet::Perl'         => 0,
 	'Test::Class::Load'         => 0,
 	'Test::MockObject::Extends' => 0,
 	'Test::Most'                => 0,

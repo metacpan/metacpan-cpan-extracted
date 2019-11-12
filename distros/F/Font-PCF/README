@@ -1,0 +1,101 @@
+NAME
+
+    Font::PCF - read an X11 PCF font file
+
+SYNOPSIS
+
+       use Font::PCF;
+    
+       my $font = Font::PCF->open( "/usr/share/fonts/X11/misc/9x15.pcf.gz" );
+    
+       my $glyph = $font->get_glyph_for_char( "A" );
+    
+       sub printbits {
+          my ( $bits ) = @_;
+          while( $bits ) {
+             print +( $bits & (1<<31) ) ? '#' : ' ';
+             $bits <<= 1;
+          }
+          print "\n";
+       }
+    
+       printbits $_ for $glyph->bitmap->@*;
+
+DESCRIPTION
+
+    Instances of this class provide read access to the "PCF" format font
+    files that are typically found as part of an X11 installation.
+
+    This module was written just to be sufficient for generating font
+    bitmaps to encode in microcontroller programs for display on OLED
+    panels. It is possibly useful for other use-cases as well, but may
+    required more methods adding.
+
+CONSTRUCTOR
+
+ open
+
+       $font = Font::PCF->open( $path )
+
+    Opens the PCF file from the given path, and returns a new instance
+    containing the data from it. Throws an exception if an error occurs.
+
+METHODS
+
+ get_glyph_for_char
+
+       $glyph = $font->get_glyph_for_char( $char )
+
+    Returns a Glyph struct representing the unicode character; given as a
+    character string.
+
+GLYPH STRUCTURE
+
+    Each glyph structure returned by "get_glyph_for_char" has the following
+    methods:
+
+ bitmap
+
+       @bits = $glyph->bitmap->@*
+
+    Returns a reference to the array containing lines of the bitmap for
+    this character. Each line is represented by an integer, where high bits
+    represent set pixels. The MSB is the leftmost pixel of the character.
+
+ width
+
+       $pixels = $glyph->width
+
+    The total number of pixels per line stored in the bitmaps.
+
+ left_side_bearing
+
+ right_side_bearing
+
+       $pixels = $glyph->left_side_bearing
+    
+       $pixels = $glyph->right_side_bearing
+
+    The number of pixels of bearing (that is, blank pixels of space) to
+    either side of the character data.
+
+ ascent
+
+ descent
+
+       $pixels = $glyph->ascent
+    
+       $pixels = $glyph->descent
+
+    The number of pixels above and below the glyph.
+
+ name
+
+       $str = $glyph->name
+
+    The PostScript name for the glyph
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

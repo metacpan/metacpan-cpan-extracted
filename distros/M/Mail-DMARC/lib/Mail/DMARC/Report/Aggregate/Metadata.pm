@@ -1,7 +1,9 @@
 package Mail::DMARC::Report::Aggregate::Metadata;
-our $VERSION = '1.20191004'; # VERSION
 use strict;
 use warnings;
+
+our $VERSION = '1.20191025';
+
 use XML::LibXML;
 
 use parent 'Mail::DMARC::Base';
@@ -79,7 +81,8 @@ sub as_xml {
 }
 
 1;
-# ABSTRACT: metadata section of aggregate report
+
+__END__
 
 =pod
 
@@ -89,7 +92,7 @@ Mail::DMARC::Report::Aggregate::Metadata - metadata section of aggregate report
 
 =head1 VERSION
 
-version 1.20191004
+version 1.20191025
 
 =head1 AUTHORS
 
@@ -103,16 +106,18 @@ Matt Simerson <msimerson@cpan.org>
 
 Davide Migliavacca <shari@cpan.org>
 
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Matt Simerson.
+This software is copyright (c) 2019 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-__END__
-sub {}

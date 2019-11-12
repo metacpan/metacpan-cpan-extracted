@@ -11,7 +11,7 @@ use Sub::Util qw(set_subname);
 use B qw(perlstring);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.009';
 
 sub import {
 	my $class  = shift;
@@ -23,10 +23,22 @@ sub setup_for {
 	my $class = shift;
 	my ($target) = @_;
 	
-	my $orig = $Moo::MAKERS{$target}{exports}{has}
-		or croak("$target doesn't have a `has` function");
+	my ($orig, $installer);
+	if ($INC{'Moo/Role.pm'} && Moo::Role->is_role($target)) {
+		$installer = 'Moo::Role::_install_tracked';
+		$orig = $Moo::Role::INFO{$target}{exports}{has};
+	}
+	elsif ($Moo::MAKERS{$target} && $Moo::MAKERS{$target}{is_class}) {
+		$installer = 'Moo::_install_tracked';
+		$orig = $Moo::MAKERS{$target}{exports}{has} || $Moo::MAKERS{$target}{non_methods}{has};
+	}
+	else {
+		croak("$target does not seem to be a Moo class or role");
+	}
+	$orig ||= $target->can('has');
+	ref($orig) or croak("$target doesn't have a `has` function");
 	
-	Moo::_install_tracked $target, has => sub {
+	$target->$installer(has => sub {
 		if (@_ % 2 == 0) {
 			croak "Invalid options for attribute(s): even number of arguments expected, got " . scalar @_;
 		}
@@ -41,7 +53,7 @@ sub setup_for {
 			$orig->($attr, %spec);
 		}
 		return;
-	};
+	});
 }
 
 sub process_spec {
@@ -125,11 +137,29 @@ sub install_delegates {
 	}
 }
 
+sub _accessor_maker_for {
+	my $class = shift;
+	my ($target) = @_;
+	
+	if ($INC{'Moo/Role.pm'} && Moo::Role->is_role($target)) {
+		my $dummy = 'MooX::Enumeration::____DummyClass____';
+		eval('package ' # hide from CPAN indexer
+			. "$dummy; use Moo");
+		return Moo->_accessor_maker_for($dummy);
+	}
+	elsif ($Moo::MAKERS{$target} && $Moo::MAKERS{$target}{is_class}) {
+		return Moo->_accessor_maker_for($target);
+	}
+	else {
+		croak "Cannot get accessor maker for $target";
+	}
+}
+
 sub build_is_delegate {
 	my $class  = shift;
 	my ($target, $method, $attr, $spec, $match) = @_;
 	
-	my $MAKER = Moo->_accessor_maker_for($target);
+	my $MAKER = $class->_accessor_maker_for($target);
 	my ($GET, $CAPTURES) = $MAKER->is_simple_get($attr, $spec)
 		? $MAKER->generate_simple_get('$_[0]', $attr, $spec)
 		: ($MAKER->_generate_get($attr, $spec), delete($MAKER->{captures}));
@@ -339,6 +369,19 @@ Objects of the class will have C<< $object->is_foo >>, C<< $object->is_bar >>,
 and C<< $object->is_baz >> methods.
 
 For more details of method delegation, see L<MooseX::Enumeration>.
+
+=head2 Use in roles
+
+Since version 0.009, this will work in roles too, but with a caveat.
+
+The coderef to be installed into the class is built when defining the role,
+and not when composing the role with the class, so the coderef has no
+knowledge of the class. In particular, it doesn't know anything about what
+kind of reference the blessed object will be (hashref, arrayref, etc), so just
+assumes that it will be a hashref, and that the hash key used for the
+attribute will match the attribute name. Unless you're using non-hashref
+objects or you're doing unusual things with Moo internals, these assumptions
+will usually be safe.
 
 =head1 BUGS
 

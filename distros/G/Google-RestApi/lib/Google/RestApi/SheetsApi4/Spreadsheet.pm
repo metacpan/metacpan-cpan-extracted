@@ -1,17 +1,18 @@
-  package Google::RestApi::SheetsApi4::Spreadsheet;
+package Google::RestApi::SheetsApi4::Spreadsheet;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use 5.010_000;
 
 use autodie;
+use Cache::Memory::Simple;
 use Carp qw(confess);
 use Scalar::Util qw(blessed);
 use Type::Params qw(compile compile_named);
-use Types::Standard qw(Str StrMatch ArrayRef HashRef HasMethods Any slurpy);
+use Types::Standard qw(Int Str StrMatch ArrayRef HashRef CodeRef HasMethods Any slurpy);
 use YAML::Any qw(Dump);
 
 no autovivification;
@@ -37,6 +38,7 @@ sub new {
     title     => Str, { optional => 1 },
     uri       => StrMatch[qr|$qr_uri/$qr_id/|], { optional => 1 },
     config_id => Str, { optional => 1 },
+    cache     => Int->where('$_ > -1'), { default => 5 },
   );
   my $self = $check->(@_);
 
@@ -110,9 +112,10 @@ sub spreadsheet_title { spreadsheet_name(@_); }
 
 sub attrs {
   my $self = shift;
-  state $check = compile(Str);
-  my ($fields) = $check->(@_);
-  return $self->api(params => { fields => $fields });
+  my $fields = shift;
+  return $self->_cache($fields, sub {
+    $self->api(params => { fields => $fields })
+  });
 }
 
 sub properties {
@@ -142,6 +145,29 @@ sub _fields {
     $fields .= ".$what";
   }
   return $fields;
+}
+
+sub _cache {
+  my $self = shift;
+
+  state $check = compile(Str, CodeRef);
+  my ($key, $code) = $check->(@_);
+  return $code->() if !$self->{cache};
+
+  $self->{_cache} ||= Cache::Memory::Simple->new();
+  return $self->{_cache}->get_or_set(
+    $key, $code, $self->{cache}  # cache for x seconds
+  );
+}
+
+sub cache {
+  my $self = shift;
+  state $check = compile(Int->where('$_ > -1'));
+  my ($cache) = $check->(@_);
+  $self->{_cache}->delete_all() if $self->{_cache};
+  delete $self->{_cache} if !$cache;
+  $self->{cache} = $cache;
+  return;
 }
 
 # each worksheet has an entry:
@@ -310,7 +336,7 @@ See the description and synopsis at Google::RestApi::SheetsApi4.
 
 =over
 
-=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), config_id => <string>);
+=item new(sheets => <SheetsApi4>, (id => <string> | name => <string> | title => <string> | uri => <string>), config_id => <string>, cache => <int>);
 
 Creates a new instance of a Spreadsheet object. You would not normally
 call this directly, you would obtain it from the
@@ -322,9 +348,14 @@ Sheets::open_spreadsheet routine.
  title: An alias for name.
  uri: The spreadsheet ID extracted from the overall URI.
  config_id: The custom config for this worksheet.
+ cache: Cache information for this many seconds (default to 5, 0 disables).
 
 Only one of id/name/title/uri should be specified and this API will derive the others
 as necessary.
+
+The cache exists so that repeated calls for the same attributes
+or worksheet properties doesn't keep hammering the Google API
+over and over. The default is 5 seconds. See 'cache' below.
 
 =item api(%args);
 
@@ -364,6 +395,11 @@ Returns the spreadsheet property attributes of the specified fields.
 
 Returns an array ref of the properties of the worksheets
 owned by this spreadsheet.
+
+=item cache(<int>)
+
+Sets the caching time in seconds. Calling will always
+delete the existing cache. 0 also disables the cache.
 
 =item delete_all_protected_ranges();
 

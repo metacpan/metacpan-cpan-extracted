@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use File::Which qw( which );
 
@@ -69,7 +69,7 @@ Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to alway
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for Pod::Coverage .*
 
@@ -89,7 +89,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

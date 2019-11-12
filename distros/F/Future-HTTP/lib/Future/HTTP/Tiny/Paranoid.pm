@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 extends 'Future::HTTP::Tiny';
 
@@ -131,7 +131,7 @@ L<AnyEvent::HTTP> for the details of the API
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<https://github.com/Corion/future-http>.
 
 =head1 SUPPORT
@@ -151,7 +151,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

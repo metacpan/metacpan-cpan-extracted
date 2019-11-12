@@ -1,0 +1,23 @@
+0.06 	9 November 2019
+	Adoption
+
+0.05	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.04	13 August 2003
+	Cleaned up Makefile.PL and updated the copyright notice.  Made sure
+	the test-suite runs under strict.
+
+0.03	30 September 2002
+	Removed "our" from $VERSION, should shave off some bytes in
+	memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.02	30 July 2002
+	Added mention of using "require" if you don't want to have the
+	"import" class method called.  Suggestion of Rafael Garcia-Suarez.
+
+	Changed the class method names so that they are created directly
+	rather than imported into the UNIVERSAL namespace.
+
+0.01	29 July 2002
+	First version of Thread::Use.

@@ -36,6 +36,16 @@ is(IDN2_TRANSITIONAL, 4);
 is(IDN2_NONTRANSITIONAL, 8);
 is(IDN2_ALLOW_UNASSIGNED, 16);
 is(IDN2_USE_STD3_ASCII_RULES, 32);
+my $tr46_default = 0;
+if(Net::LibIDN2::idn2_check_version("2.0.5")) {
+	no strict;
+	is(IDN2_NO_TR46, 64);
+	$tr46_default = IDN2_NO_TR46;
+}
+if(Net::LibIDN2::idn2_check_version("2.2.0")) {
+	no strict;
+	is(IDN2_NO_ALABEL_ROUNDTRIP, 128);
+}
 
 is(Net::LibIDN2::idn2_strerror(0), 'success');
 is(Net::LibIDN2::idn2_strerror_name(0), 'IDN2_OK');
@@ -76,11 +86,11 @@ my $muesli_dot_de_punycode = "xn--mli-5ka8l.de";
 	my $rc = 0;
 	my $result = Net::LibIDN2::idn2_lookup_u8(
 		"\x65\x78\x61\x6d\x70\x6c\x65\x2e\xe1\x84\x80\xe1\x85\xa1\xe1\x86\xa8",
-		0,
+		$tr46_default,
 		$rc);
 
 	is(Net::LibIDN2::idn2_strerror_name($rc), "IDN2_NOT_NFC");
-	is($rc, -300);
+	is($rc, Net::LibIDN2::IDN2_NOT_NFC);
 	is($result, undef);
 }
 

@@ -10,7 +10,7 @@ use Test::FailWarnings;
 
 use Config;
 
-my $long_double_yn = $Config::Config{'uselongdouble'};
+my $long_double_yn = $Config::Config{'uselongdouble'} || $Config::Config{'usequadmath'};
 
 use Types::Serialiser ();
 

@@ -7,6 +7,8 @@ pod_spelling_system:
     - DLLs
     - ffi
     - libtest
+    - fibonacci
+    - rustc
 
 pod_coverage:
   skip: 0
@@ -15,6 +17,7 @@ pod_coverage:
   private:
     - Module::Build::FFI#ACTION_.*
     - Module::Build::FFI#new
+    - Module::Build::FFI::Rust
 
 unused_vars:
   skip: 0

@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store;
-our $VERSION = '1.20191004'; # VERSION
+our $VERSION = '1.20191025';
 use strict;
 use warnings;
 
@@ -50,8 +50,6 @@ sub backend {
 
 1;
 
-# ABSTRACT: persistent storage broker for reports
-
 __END__
 
 =pod
@@ -62,7 +60,7 @@ Mail::DMARC::Report::Store - persistent storage broker for reports
 
 =head1 VERSION
 
-version 1.20191004
+version 1.20191025
 
 =head1 SYNOPSIS
 
@@ -86,11 +84,15 @@ Matt Simerson <msimerson@cpan.org>
 
 Davide Migliavacca <shari@cpan.org>
 
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Matt Simerson.
+This software is copyright (c) 2019 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

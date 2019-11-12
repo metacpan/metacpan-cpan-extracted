@@ -1,5 +1,5 @@
 package Mail::DMARC::Base;
-our $VERSION = '1.20191004'; # VERSION
+our $VERSION = '1.20191025';
 use strict;
 use warnings;
 
@@ -120,7 +120,6 @@ sub any_inet_pton {
         }
         return 0;
      }
-
  }
 
 sub is_public_suffix {
@@ -176,8 +175,7 @@ sub update_psl_file {
 sub find_psl_file {
     my ($self) = @_;
 
-    my $file = $self->config->{dns}{public_suffix_list}
-        || 'share/public_suffix_list';
+    my $file = $self->config->{dns}{public_suffix_list} || 'share/public_suffix_list';
     if ( $file =~ /^\// && -f $file && -r $file ) {
         print "using $file for Public Suffix List\n" if $self->verbose;
         return $file;
@@ -193,7 +191,7 @@ sub find_psl_file {
 
     # Fallback to included suffic list
     return $self->get_sharefile('public_suffix_list');
-};
+}
 
 sub has_dns_rr {
     my ( $self, $type, $domain ) = @_;
@@ -233,7 +231,7 @@ sub epoch_to_iso {
     my $yy = ( $fields[5] + 1900 );                # year
 
     return "$yy-$mm-$dd" .'T'."$hh:$mn:$ss";
-};
+}
 
 sub get_resolver {
     my $self = shift;
@@ -280,7 +278,7 @@ sub is_valid_spf_scope {
     return lc $scope if grep { lc $scope eq $_ } qw/ mfrom helo /;
     carp "$scope is not a valid SPF scope";
     return;
-};
+}
 
 sub is_valid_spf_result {
     my ($self, $result ) = @_;
@@ -288,7 +286,7 @@ sub is_valid_spf_result {
         qw/ fail neutral none pass permerror softfail temperror /;
     carp "$result is not a valid SPF result";
     return;
-};
+}
 
 sub slurp {
     my ( $self, $file ) = @_;
@@ -301,11 +299,11 @@ sub slurp {
 sub verbose {
     return $_[0]->{verbose} if 1 == scalar @_;
     return $_[0]->{verbose} = $_[1];
-};
+}
 
 1;
 
-# ABSTRACT: DMARC utility functions
+__END__
 
 =pod
 
@@ -315,7 +313,7 @@ Mail::DMARC::Base - DMARC utility functions
 
 =head1 VERSION
 
-version 1.20191004
+version 1.20191025
 
 =head1 METHODS
 
@@ -367,17 +365,18 @@ Matt Simerson <msimerson@cpan.org>
 
 Davide Migliavacca <shari@cpan.org>
 
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Matt Simerson.
+This software is copyright (c) 2019 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-sub {}
 

@@ -1,3 +1,6 @@
+0.09	9 November 2019
+	Adoption.
+
 0.08    7 December 2012
         Fixed problem with other parameters than "maint" or "blead" being
         passed to the initial call of "perl Makefile.PL" as described by

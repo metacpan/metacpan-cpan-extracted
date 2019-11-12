@@ -26,9 +26,9 @@
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
             "schema:Invoice",
-            "schema:Service",
             "schema:Order",
-            "schema:Reservation"
+            "schema:Reservation",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",
@@ -41,8 +41,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -51,12 +51,12 @@
          "rdfs:comment" : "Party placing the order or paying the invoice.",
          "rdfs:label" : "customer",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:discount" : {
@@ -65,8 +65,8 @@
          "rdfs:label" : "discount",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:discountCode" : {
@@ -107,8 +107,8 @@
          "rdfs:label" : "orderDate",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:orderDelivery" : {
@@ -116,8 +116,8 @@
          "rdfs:comment" : "The delivery of the parcel related to this order or order item.",
          "rdfs:label" : "orderDelivery",
          "schema:domainIncludes" : [
-            "schema:OrderItem",
-            "schema:Order"
+            "schema:Order",
+            "schema:OrderItem"
          ],
          "schema:rangeIncludes" : "schema:ParcelDelivery"
       },
@@ -162,8 +162,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDue",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:DateTime",
          "schema:supersededBy" : "schema:paymentDueDate"
@@ -173,8 +173,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDueDate",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -186,8 +186,8 @@
          "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
          "rdfs:label" : "paymentMethod",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:PaymentMethod"
       },
@@ -196,8 +196,8 @@
          "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
          "rdfs:label" : "paymentMethodId",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -214,15 +214,15 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:Offer",
-            "schema:Order",
             "schema:Flight",
-            "schema:BuyAction"
+            "schema:Offer",
+            "schema:BuyAction",
+            "schema:Order",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       }
    }

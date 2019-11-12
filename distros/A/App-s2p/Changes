@@ -1,5 +1,9 @@
 Revision history for App-s2p
 
+1.003     2019-11-10 14:50:05+01:00 Europe/Amsterdam
+          Allow commands to be separated by semicolons in addition
+          to newlines, addressing rt.perl.org#90134 , GH#2
+
 1.002     2014-08-16 13:30:33+02:00 Europe/Amsterdam
           Fix licensing and attribution
 
@@ -8,4 +12,4 @@ Revision history for App-s2p
 
 1.000     2013-12-03 17:13:49 Europe/Amsterdam
           Released s2p as in blead circa 5.19.6
-          
+

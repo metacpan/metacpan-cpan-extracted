@@ -8755,7 +8755,10 @@ Perl_sv_gets(pTHX_ SV *const sv, PerlIO *const fp, I32 append)
 
             Note we have to deal with the char in 'i' if we are not at EOF
         */
+        bpx = bp - (STDCHAR*)SvPVX_const(sv);
+        /* signals might be called here, possibly modifying sv */
 	i   = PerlIO_getc(fp);		/* get more characters */
+        bp = (STDCHAR*)SvPVX_const(sv) + bpx;
 
 	DEBUG_Pv(PerlIO_printf(Perl_debug_log,
 	   "Screamer: post: FILE * thinks ptr=%" UVuf ", cnt=%" IVdf ", base=%" UVuf "\n",
@@ -11760,11 +11763,11 @@ S_format_hexfp(pTHX_ char * const buf, const STRLEN bufsize, const char c,
     else {
         *p++ = '0';
         exponent = 0;
-        zerotail = precis;
+        zerotail = has_precis ? precis : 0;
     }
 
     /* The radix is always output if precis, or if alt. */
-    if (precis > 0 || alt) {
+    if ((has_precis && precis > 0) || alt) {
       hexradix = TRUE;
     }
 
@@ -12218,6 +12221,9 @@ Perl_sv_vcatpvfn_flags(pTHX_ SV *const sv, const char *const pat, const STRLEN p
                     }
                     precis = S_sprintf_arg_num_val(aTHX_ args, i, sv, &neg);
                     has_precis = !neg;
+                    /* ignore negative precision */
+                    if (!has_precis)
+                        precis = 0;
                 }
 	    }
 	    else {

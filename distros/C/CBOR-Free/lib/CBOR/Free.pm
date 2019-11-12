@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.12';
+    $VERSION = '0.14';
     XSLoader::load();
 }
 
@@ -64,6 +64,14 @@ The encoder currently does not handle any other blessed references.
 =item * C<canonical> - A boolean that makes the function output
 CBOR in L<canonical form|https://tools.ietf.org/html/rfc7049#section-3.9>.
 
+=item * C<scalar_references> - Tells the encoder to accept scalar references
+(rather than reject them) and encode them via
+L<CBOR’s “indirection” tag|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml>.
+Most languages don’t use references as Perl does, so this option seems of
+little use outside all-Perl IPC contexts; it is arguably more useful, then,
+to have the encoder reject data structures that most other languages cannot
+represent.
+
 =back
 
 Notes on mapping Perl to CBOR:
@@ -77,6 +85,10 @@ encoding.
 =item * L<Types::Serialiser> booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
 undefined.)
+
+=item * Scalar references (including references to other references) are
+unhandled by default, which makes them trigger an exception. You can
+optionally tell CBOR::Free to encode them via the C<scalar_references> flag.
 
 =item * Instances of L<CBOR::Free::Tagged> are encoded as tagged values.
 
@@ -106,9 +118,12 @@ An exception is thrown if the decoder finds anything else as a map key.
 =item * CBOR booleans become the corresponding L<Types::Serialiser> values.
 Both CBOR null and undefined become Perl undef.
 
-=item * This function does not interpret tags; if you need that, look
-at L<CBOR::Free::Decoder>. Any tags that this function sees prompt a warning
-but are otherwise ignored.
+=item * L<CBOR’s “indirection” tag|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml> is interpreted as a scalar reference. This behavior is always
+active; unlike with the encoder, there is no need to enable it manually.
+
+=item * This function does not interpret any other tags. If you need to
+decode other tags, look at L<CBOR::Free::Decoder>. Any unhandled tags that
+this function sees prompt a warning but are otherwise ignored.
 
 =back
 
@@ -127,11 +142,12 @@ convenience aliases for the equivalent L<Types::Serialiser> functions.
 =head1 FRACTIONAL (FLOATING-POINT) NUMBERS
 
 Floating-point numbers are encoded in CBOR as IEEE 754 half-, single-,
-or double-precision. If your Perl is compiled to use “long double”
-floating-point numbers, you may see rounding errors when converting
-to/from CBOR. If that’s a problem for you, append an empty string to
-your floating-point numbers, which will cause CBOR::Free to encode
-them as strings.
+or double-precision. If your Perl is compiled to use anything besides
+IEEE 754 double-precision to represent floating-point values (e.g.,
+“long double” or “quadmath” compilation options), you may see rounding
+errors when converting to/from CBOR. If that’s a problem for you, append
+an empty string to your floating-point numbers, which will cause CBOR::Free
+to encode them as strings.
 
 =head1 INTEGER LIMITS
 

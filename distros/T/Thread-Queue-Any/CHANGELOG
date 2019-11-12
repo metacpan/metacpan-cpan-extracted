@@ -1,3 +1,6 @@
+0.15	9 November 2019
+	Adopted
+
 1.14    23 March 2014
         Upgraded to Thread::Queue 3.*, as part of Perl 5.18.*.
 

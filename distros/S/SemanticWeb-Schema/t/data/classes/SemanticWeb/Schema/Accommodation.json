@@ -7,17 +7,38 @@
       "rdfs:subClassOf" : "schema:Place"
    },
    "properties" : {
+      "schema:accommodationCategory" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Category of an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, following real estate conventions e.g. RESO (see <a href=\"https://ddwiki.reso.org/display/DDW17/PropertySubType+Field\">PropertySubType</a>, and <a href=\"https://ddwiki.reso.org/display/DDW17/PropertyType+Field\">PropertyType</a> fields  for suggested values).",
+         "rdfs:label" : "accommodationCategory",
+         "rdfs:subPropertyOf" : "schema:category",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
       "schema:amenityFeature" : {
          "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:Place",
             "schema:Accommodation",
+            "schema:Place",
             "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
+      },
+      "schema:floorLevel" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The floor level for an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a> in a multi-storey building. Since counting\n  systems <a href=\"https://en.wikipedia.org/wiki/Storey#Consecutive_number_floor_designations\">vary internationally</a>, the local system should be used where possible.",
+         "rdfs:label" : "floorLevel",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
       },
       "schema:floorSize" : {
          "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
@@ -27,18 +48,54 @@
          "schema:domainIncludes" : "schema:Accommodation",
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
+      "schema:leaseLength" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Length of the lease for some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, either particular to some <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> or in some cases intrinsic to the property.",
+         "rdfs:label" : "leaseLength",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:RealEstateListing",
+            "schema:Accommodation"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Duration"
+         ]
+      },
+      "schema:numberOfBathroomsTotal" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total integer number of bathrooms in a some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, following real estate conventions as <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsTotalInteger+Field\">documented in RESO</a>: \"The simple sum of the number of bathrooms. For example for a property with two Full Bathrooms and one Half Bathroom, the Bathrooms Total Integer will be 3.\". See also <a class=\"localLink\" href=\"http://schema.org/numberOfRooms\">numberOfRooms</a>.",
+         "rdfs:label" : "numberOfBathroomsTotal",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:numberOfFullBathrooms" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Number of full bathrooms - The total number of full and Â¾ bathrooms in an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsFull+Field\">BathroomsFull field in RESO</a>.",
+         "rdfs:label" : "numberOfFullBathrooms",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
       "schema:numberOfRooms" : {
          "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:House",
-            "schema:SingleFamilyResidence",
-            "schema:Apartment",
             "schema:Suite",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:House",
+            "schema:Apartment",
+            "schema:SingleFamilyResidence",
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",

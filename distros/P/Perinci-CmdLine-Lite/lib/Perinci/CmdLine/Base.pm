@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '1.824'; # VERSION
+our $DATE = '2019-11-12'; # DATE
+our $VERSION = '1.825'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1740,7 +1740,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.824 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-07-04.
+This document describes version 1.825 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-11-12.
 
 =head1 DESCRIPTION
 

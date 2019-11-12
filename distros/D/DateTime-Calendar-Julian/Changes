@@ -1,3 +1,15 @@
+0.102		2019-11-09	T. R. Wyant
+    - Add optional separator arg to datetime(). This tracks the same
+      change in DateTime version 1.43 dated 2017-05-29. Thanks to Jean
+      Forget for finding, isolating, and reporting this.
+
+    - NOTE that the above change restores the 'T' separator in
+      stringification, as it was before DateTime 1.43.
+
+    - Add tests for datetime() method.
+
+    - Eliminate redirections in POD URL links
+
 0.101		2019-08-14	T. R. Wyant
     - Fix broken POD links, and add test to ensure they stay fixed.
 

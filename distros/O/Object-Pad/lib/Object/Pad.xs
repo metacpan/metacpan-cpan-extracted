@@ -142,11 +142,14 @@ typedef struct {
 #ifdef MULTIPLICITY
 #  define compclassmeta  \
     (*((ClassMeta **)hv_fetchs(PL_modglobal, "Object::Pad/compclassmeta", GV_ADD)))
+#  define have_compclassmeta  \
+    (!!hv_fetchs(PL_modglobal, "Object::Pad/compclassmeta", 0))
 #else
 /* without MULTIPLICITY there's only one, so we might as well just store it
  * in a static
  */
 static ClassMeta *compclassmeta;
+#define have_compclassmeta (!!compclassmeta)
 #endif
 
 /* Special pad indexes within `method` CVs */
@@ -381,48 +384,46 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
       break;
   }
 
-  OP *itemops = op_append_elem(OP_LIST, NULL, slotsavop);
-
   AV *slots = meta->slots;
   I32 nslots = av_count(slots);
-  for(i = 0; i < nslots; i++) {
-    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-    char sigil = SvPV_nolen(slotmeta->name)[0];
-    OP *op = NULL;
 
-    switch(sigil) {
-      case '$':
-        /* push ..., undef */
-        if(slotmeta->defaultop)
-          op = slotmeta->defaultop;
-        else
-          op = newOP(OP_UNDEF, 0);
-        break;
-      case '@':
-        /* push ..., [] */
-        op = newLISTOP(OP_ANONLIST, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
-        break;
-      case '%':
-        /* push ..., {} */
-        op = newLISTOP(OP_ANONHASH, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
-        break;
+  if(nslots) {
+    OP *itemops = op_append_elem(OP_LIST, NULL, slotsavop);
 
-      default:
-        croak("ARGV: notsure how to handle a slot sigil %c\n", sigil);
+    for(i = 0; i < nslots; i++) {
+      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+      char sigil = SvPV_nolen(slotmeta->name)[0];
+      OP *op = NULL;
+
+      switch(sigil) {
+        case '$':
+          /* push ..., undef */
+          if(slotmeta->defaultop)
+            op = slotmeta->defaultop;
+          else
+            op = newOP(OP_UNDEF, 0);
+          break;
+        case '@':
+          /* push ..., [] */
+          op = newLISTOP(OP_ANONLIST, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
+          break;
+        case '%':
+          /* push ..., {} */
+          op = newLISTOP(OP_ANONHASH, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
+          break;
+
+        default:
+          croak("ARGV: notsure how to handle a slot sigil %c\n", sigil);
+      }
+
+      if(op) {
+        op_contextualize(op, G_SCALAR);
+        itemops = op_append_elem(OP_LIST, itemops, op);
+      }
     }
 
-    if(op) {
-      op_contextualize(op, G_SCALAR);
-      itemops = op_append_elem(OP_LIST, itemops, op);
-    }
-  }
-
-  if(OpSIBLING(cLISTOPx(itemops)->op_first)) {
     ops = op_append_list(OP_LINESEQ, ops,
       op_convert_list(OP_PUSH, OPf_WANT_VOID, itemops));
-  }
-  else {
-    op_free(itemops);
   }
 
   SvREFCNT_inc(PL_compcv);
@@ -430,6 +431,13 @@ static void MY_generate_initslots_method(pTHX_ ClassMeta *meta, HV *stash)
 
   newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvs("INITSLOTS")),
     NULL, NULL, ops);
+}
+
+static void late_generate_initslots(pTHX_ void *p)
+{
+  ClassMeta *meta = p;
+
+  generate_initslots_method(meta, PL_curstash);
 }
 
 
@@ -441,7 +449,72 @@ static int keyword_class(pTHX_ OP **op_ptr)
   if(!packagename)
     croak("Expected 'class' to be followed by package name");
 
-  ENTER;
+  SV *superclassname = NULL;
+  ClassMeta *supermeta = NULL;
+
+  // TODO: This grammar is quite flexible; maybe too much?
+  while(1) {
+    lex_read_space(0);
+
+    // TODO: Maybe accept `v1.23`
+
+    if(lex_consume("extends")) {
+      if(superclassname)
+        croak("Multiple superclasses are not currently supported");
+
+      lex_read_space(0);
+      superclassname = lex_scan_packagename();
+
+      /* TODO: look for a version of that package too */
+
+      HV *superstash = gv_stashsv(superclassname, 0);
+      if(!superstash || !hv_fetchs(superstash, "new", 0)) {
+        /* Try to `require` the module then attempt a second time */
+        /* load_module() will modify the name argument and take ownership of it */
+        load_module(PERL_LOADMOD_NOIMPORT, newSVsv(superclassname), NULL, NULL);
+        superstash = gv_stashsv(superclassname, 0);
+      }
+
+      if(!superstash)
+        croak("Superclass %" SVf " does not exist", superclassname);
+
+      GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
+      if(metagvp)
+        supermeta = NUM2PTR(ClassMeta *, SvUV(GvSV(*metagvp)));
+    }
+    else
+      break;
+  }
+
+  bool is_block;
+
+  if(lex_consume("{")) {
+    is_block = true;
+    ENTER;
+  }
+  else if(lex_consume(";")) {
+    is_block = false;
+  }
+  else
+    croak("Expected a block or ';'");
+
+  import_pragma("strict", NULL);
+  import_pragma("-indirect", ":fatal");
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  import_pragma("experimental", "signatures");
+#endif
+
+  if(have_compclassmeta) {
+    SAVEVPTR(compclassmeta);
+  }
+
+  ClassMeta *meta;
+  Newx(meta, 1, ClassMeta);
+  compclassmeta = meta;
+
+  meta->offset = 0;
+  meta->slots  = newAV();
+  meta->repr   = REPR_NATIVE;
 
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
@@ -463,64 +536,25 @@ static int keyword_class(pTHX_ OP **op_ptr)
     isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvUTF8(PL_curstash) ? SVf_UTF8 : 0));
   }
 
-  ClassMeta *supermeta = NULL;
-
-  // TODO: This grammar is quite flexible; maybe too much?
-  while(1) {
-    lex_read_space(0);
-
-    // TODO: Maybe accept `v1.23`
-
-    if(lex_consume("extends")) {
-      if(av_count(isa))
-        croak("Multiple superclasses are not currently supported");
-
-      lex_read_space(0);
-      SV *superclassname = lex_scan_packagename();
-      HV *superstash = gv_stashsv(superclassname, 0);
-
-      if(!superstash)
-        croak("Superclass %" SVf " does not exist", superclassname);
-
-      GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
-      if(metagvp)
-        supermeta = NUM2PTR(ClassMeta *, SvUV(GvSV(*metagvp)));
-
-      av_push(isa, superclassname);
-    }
-    else
-      break;
-  }
-
-  import_pragma("strict", NULL);
-  import_pragma("-indirect", ":fatal");
-#ifdef HAVE_PARSE_SUBSIGNATURE
-  import_pragma("experimental", "signatures");
-#endif
-
-  SAVEVPTR(compclassmeta);
-  Newx(compclassmeta, 1, ClassMeta);
-
-  compclassmeta->offset = 0;
-  compclassmeta->slots  = newAV();
-  compclassmeta->repr   = REPR_NATIVE;
+  if(superclassname)
+    av_push(isa, superclassname);
 
   if(av_count(isa) > 0) {
     if(supermeta) {
       /* A subclass of an Object::Pad class */
-      compclassmeta->offset = supermeta->offset + av_count(supermeta->slots);
-      compclassmeta->repr = supermeta->repr;
+      meta->offset = supermeta->offset + av_count(supermeta->slots);
+      meta->repr = supermeta->repr;
     }
     else {
       /* A subclass of a foreign class - presume HASH for now */
-      compclassmeta->repr = REPR_FOREIGN_HASH;
+      meta->repr = REPR_FOREIGN_HASH;
     }
   }
 
   {
     /* Inject the constructor */
     CV *newcv;
-    switch(compclassmeta->repr) {
+    switch(meta->repr) {
       case REPR_NATIVE:
         newcv = get_cv("Object::Pad::__new", 0);
         break;
@@ -542,27 +576,39 @@ static int keyword_class(pTHX_ OP **op_ptr)
     gv_init_pvn(gv, PL_curstash, "META", 4, 0);
     GvMULTI_on(gv);
 
-    sv_setuv(GvSVn(gv), PTR2UV(compclassmeta));
+    sv_setuv(GvSVn(gv), PTR2UV(meta));
   }
 
-  // TODO: Accept ';' here to end a statement and set default class for
-  // following code
-  I32 save_ix = block_start(TRUE);
-  OP *body = parse_block(0);
-  body = block_end(save_ix, body);
+  if(is_block) {
+    I32 save_ix = block_start(TRUE);
+    OP *body = parse_stmtseq(0);
+    body = block_end(save_ix, body);
 
-  generate_initslots_method(compclassmeta, PL_curstash);
+    generate_initslots_method(meta, PL_curstash);
 
-  LEAVE;
+    if(!lex_consume("}"))
+      croak("Expected }");
 
-  /* CARGOCULT from perl/perly.y:PACKAGE BAREWORD BAREWORD '{' */
-  /* a block is a loop that happens once */
-  *op_ptr = newWHILEOP(0, 1, NULL, NULL, body, NULL, 0);
-  return KEYWORD_PLUGIN_STMT;
+    LEAVE;
+
+    /* CARGOCULT from perl/perly.y:PACKAGE BAREWORD BAREWORD '{' */
+    /* a block is a loop that happens once */
+    *op_ptr = newWHILEOP(0, 1, NULL, NULL, body, NULL, 0);
+    return KEYWORD_PLUGIN_STMT;
+  }
+  else {
+    SAVEDESTRUCTOR_X(&late_generate_initslots, meta);
+
+    *op_ptr = newOP(OP_NULL, 0);
+    return KEYWORD_PLUGIN_STMT;
+  }
 }
 
 static int keyword_has(pTHX_ OP **op_ptr)
 {
+  if(!have_compclassmeta)
+    croak("Cannot 'has' outside of 'class'");
+
   lex_read_space(0);
   SV *name = lex_scan_lexvar();
   if(!name)
@@ -616,6 +662,9 @@ static int keyword_has(pTHX_ OP **op_ptr)
 
 static int keyword_method(pTHX_ OP **op_ptr)
 {
+  if(!have_compclassmeta)
+    croak("Cannot 'method' outside of 'class'");
+
   lex_read_space(0);
   SV *name = lex_scan_ident();
   lex_read_space(0);
@@ -772,6 +821,7 @@ BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");
   XopENTRY_set(&xop_methstart, xop_desc, "methstart()");
   XopENTRY_set(&xop_methstart, xop_class, OA_BASEOP);
+  Perl_custom_op_register(aTHX_ &pp_methstart, &xop_methstart);
 
   XopENTRY_set(&xop_slotpad, xop_name, "slotpad");
   XopENTRY_set(&xop_slotpad, xop_desc, "slotpad()");

@@ -7,6 +7,8 @@ use lib '.';
 use private::MakeUtil;
 use ExtUtils::MakeMaker 5.16 ;
 
+my $ParentVersion = 2.090 ;
+
 WriteMakefile( 
     NAME         => 'Archive::Zip::SimpleZip',
     VERSION_FROM => 'lib/Archive/Zip/SimpleZip.pm',
@@ -15,23 +17,17 @@ WriteMakefile(
                       SUFFIX       => 'gz',
                       DIST_DEFAULT => 'MyTrebleCheck tardist',
                     },
-
-    (
-      $ENV{SKIP_FOR_CORE}
-        ? ()
-	    : (PREREQ_PM   => { 'IO::Compress::Base' => 2.088,
-                             'Perl::OSType'      => 0,
-                          }
-	      )
-    ),
-       
-    (
-    $] >= 5.005
-        ? (ABSTRACT => 'Create and Read Zip Archives',
+      
+    ( $] >= 5.005
+        ? (ABSTRACT => 'Read and Write Zip Archives',
             AUTHOR  => 'Paul Marquess <pmqs@cpan.org>')
         : ()
     ),
 
+    ( (ExtUtils::MakeMaker->VERSION() gt '6.30') 
+        ? ('LICENSE'  => 'perl')         
+        : ()
+    ), 
 
      ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
         ? ( META_MERGE  => {
@@ -56,13 +52,31 @@ WriteMakefile(
                         web     => 'https://github.com/pmqs/Archive-Zip-SimpleZip',
                     },        
                 },
+
+                prereqs => {
+                    runtime => {
+                        requires => {
+                            'IO::Compress::Base'   => $ParentVersion,
+                            'IO::Uncompress::Base' => $ParentVersion,
+                            'Perl::OSType'         => 0,
+                        },
+                        recommends => {
+                            'IO::Compress::Lzma'     => $ParentVersion,
+                            'IO::Uncompress::UnLzma' => $ParentVersion,
+                        },
+                    },
+                },
               } 
             ) 
-        : ()
+        : ( PREREQ_PM   => { 
+                'IO::Compress::Base'   => $ParentVersion,
+                'IO::Uncompress::Base' => $ParentVersion,
+                'Perl::OSType'         => 0,
+                } 
+          )
     ),
 
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),    
+   
 
 ) ;
 

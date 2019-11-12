@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-09-29'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ dir-has-non-dot-subdirs - Test that a directory has non-dot subdirectories
 
 =head1 VERSION
 
-This document describes version 0.001 of dir-has-non-dot-subdirs (from Perl distribution App-FileTestUtils), released on 2019-08-17.
+This document describes version 0.002 of dir-has-non-dot-subdirs (from Perl distribution App-FileTestUtils), released on 2019-09-29.
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ On the command-line:
 =head1 DESCRIPTION
 
 This is a simple CLI for L<File::MoreUtil>'s
-L<dir_has_non_dot_subdirs|File::MoreUtils/dir_has_non_dot_subdirs>. It will exit
+L<dir_has_non_dot_subdirs|File::MoreUtil/dir_has_non_dot_subdirs>. It will exit
 0 if argument is a directory and has non-dot (a.k.a. non-hidden) subdirectories.
 
 =head1 HOMEPAGE

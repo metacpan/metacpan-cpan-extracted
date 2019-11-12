@@ -2,7 +2,7 @@ NAME
     App::WHMCSUtils - CLI utilities related to WHMCS
 
 VERSION
-    This document describes version 0.008 of App::WHMCSUtils (from Perl
+    This document describes version 0.009 of App::WHMCSUtils (from Perl
     distribution App-WHMCSUtils), released on 2019-09-19.
 
 FUNCTIONS

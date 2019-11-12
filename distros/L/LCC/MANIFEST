@@ -1,0 +1,21 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/LCC.pm
+lib/LCC/Backend.pm
+lib/LCC/Backend/DBI.pm
+lib/LCC/Backend/DBI/mysql.pm
+lib/LCC/Backend/Storable.pm
+lib/LCC/Backend/textfile.pm
+lib/LCC/Documents.pm
+lib/LCC/Documents/DBI.pm
+lib/LCC/Documents/filesystem.pm
+lib/LCC/Documents/queue.pm
+lib/LCC/Documents/module.pm
+lib/LCC/UNS.pm
+t/01basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

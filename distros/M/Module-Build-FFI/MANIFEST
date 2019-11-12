@@ -12,12 +12,14 @@ dist.ini
 inc/My/HeaderVersion.pm
 lib/Module/Build/FFI.pm
 lib/Module/Build/FFI/Pascal.pm
+lib/Module/Build/FFI/Rust.pm
 maint/cip-install
 share/include/ffi_util.h
 t/00_diag.t
 t/01_use.t
 t/module_build_ffi.t
 t/module_build_ffi_pascal.t
+t/module_build_ffi_rust.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

@@ -588,7 +588,10 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
 
             ret = _decode( aTHX_ decstate );
 
-            if (decstate->tag_handler) {
+            if (tagnum == CBOR_TAG_INDIRECTION) {
+                ret = newRV_inc(ret);
+            }
+            else if (decstate->tag_handler) {
                 HV *my_tag_handler = decstate->tag_handler;
 
                 SV **handler_cr = hv_fetch( my_tag_handler, (char *) &tagnum, sizeof(UV), 0 );

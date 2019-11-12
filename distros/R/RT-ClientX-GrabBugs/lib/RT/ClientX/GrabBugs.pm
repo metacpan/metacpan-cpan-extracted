@@ -7,7 +7,7 @@ package RT::ClientX::GrabBugs;
 
 BEGIN {
 	$RT::ClientX::GrabBugs::AUTHORITY = 'cpan:TOBYINK';
-	$RT::ClientX::GrabBugs::VERSION   = '0.002';
+	$RT::ClientX::GrabBugs::VERSION   = '0.004';
 }
 
 use Moose;
@@ -22,6 +22,7 @@ use RT::Client::REST         qw();
 use RT::Client::REST::Queue  qw();
 use Cwd                      qw(cwd);
 use Path::FindDev            qw(find_dev);
+use Digest::SHA1             qw(sha1_hex);
 
 use RDF::Trine::Namespace qw/rdf rdfs owl xsd/;
 my $dbug   = RDF::Trine::Namespace->new('http://ontologi.es/doap-bugs#');
@@ -190,13 +191,16 @@ sub _process_ticket
 	
 	for my $email ($ticket->requestors) {
 		my $R = ($email =~ /\A(\w+)\@cpan.org\z/i)
-			? iri(sprintf 'http://purl.org/NET/cpan-uri/person/%s', $1)
+			? iri(sprintf 'http://purl.org/NET/cpan-uri/person/%s', uc $1)
 			: ( $EMAIL{$email} ||= blank() );
 		$model->add_statement($_) for (
 			RDF::Trine::Statement->new($T, $dc->reporter, $R),
 			RDF::Trine::Statement->new($R, $rdf->type, $foaf->Agent),
-			RDF::Trine::Statement->new($R, $foaf->mbox, iri sprintf('mailto:%s', $email)),
+			RDF::Trine::Statement->new($R, $foaf->mbox_sha1sum, literal(sha1_hex(sprintf('mailto:%s', $email)))),
 		);
+		try {
+			RDF::Trine::Statement->new($R, $foaf->mbox, iri sprintf('mailto:%s', $email)),
+		};
 	}
 }
 
@@ -215,16 +219,16 @@ sub process
 	open my $fh, '>:encoding(UTF-8)', $self->dest;
 	
 	$ser->new(namespaces => {
-			dbug   => 'http://ontologi.es/doap-bugs#',
-			dc     => 'http://purl.org/dc/terms/',
-			doap   => 'http://usefulinc.com/ns/doap#',
-			foaf   => 'http://xmlns.com/foaf/0.1/',
-			rdfs   => 'http://www.w3.org/2000/01/rdf-schema#',
-			rt     => 'http://purl.org/NET/cpan-uri/rt/ticket/',
-			status => 'http://purl.org/NET/cpan-uri/rt/status/',
-			prio   => 'http://purl.org/NET/cpan-uri/rt/priority/',
-			xsd    => 'http://www.w3.org/2001/XMLSchema#',
-		})->serialize_model_to_file($fh, $model);
+		dbug   => 'http://ontologi.es/doap-bugs#',
+		dc     => 'http://purl.org/dc/terms/',
+		doap   => 'http://usefulinc.com/ns/doap#',
+		foaf   => 'http://xmlns.com/foaf/0.1/',
+		rdfs   => 'http://www.w3.org/2000/01/rdf-schema#',
+		rt     => 'http://purl.org/NET/cpan-uri/rt/ticket/',
+		status => 'http://purl.org/NET/cpan-uri/rt/status/',
+		prio   => 'http://purl.org/NET/cpan-uri/rt/priority/',
+		xsd    => 'http://www.w3.org/2001/XMLSchema#',
+	})->serialize_model_to_file($fh, $model);
 	
 	$self;
 }

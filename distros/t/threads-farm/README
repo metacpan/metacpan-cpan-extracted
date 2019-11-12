@@ -1,0 +1,15 @@
+README for threads::farm
+
+Create a group of threads to perform similar jobs, without having to start
+and stop a thread for each job.
+
+Copyright (c) 2002 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

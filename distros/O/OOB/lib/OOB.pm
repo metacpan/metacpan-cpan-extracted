@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # version
-$OOB::VERSION = '0.12';
+$OOB::VERSION = '0.13';
 
 # modules that we need
 use Scalar::Util qw( blessed refaddr reftype );
@@ -432,7 +432,7 @@ OOB - out of band data for any data structure in Perl
 
 =head1 VERSION
 
-This documentation describes version 0.12.
+This documentation describes version 0.13.
 
 =head1 SYNOPSIS
 
@@ -612,6 +612,8 @@ of that).
 =head1 AUTHOR
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Please report bugs to <perlbugs@dijkmat.nl>.
 

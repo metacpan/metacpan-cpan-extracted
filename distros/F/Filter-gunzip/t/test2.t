@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -17,10 +17,16 @@
 # You should have received a copy of the GNU General Public License along
 # with Filter-gunzip.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# Exercise Filter::gunzip::Filter by test2.dat containing
+# "use Filter::gunzip::Filter" followed by raw gzipped bytes
+# (of the code in test2.in).
+
+
 use strict;
 use warnings;
 use Test;
-plan tests => 2;
+plan tests => 4;
 
 use lib 't';
 use MyTestHelpers;
@@ -31,18 +37,25 @@ BEGIN { MyTestHelpers::nowarnings() }
   require File::Spec;
   my $used_more_than_once = $FindBin::Bin;
   my $filename = File::Spec->catfile ($FindBin::Bin, 'test2.dat');
+  MyTestHelpers::diag("filename ",$filename);
 
-  use vars qw($test2);
+  use vars qw($test2 $test2_more);
   $test2 = 0;
+  $test2_more = 0;
   my $result = eval {
-    local $SIG{'__WARN__'} = sub {}; # no warnings
+    # warnings not fatal (should be none though)
+    local $SIG{'__WARN__'} = sub {
+      MyTestHelpers::diag("warning message: ",@_);
+    };
     require $filename;
   };
   my $err = $@;
-  print "result ",(defined $result ? $result : '[undef]'), "\n";
-  print "err    ",(defined $err ? $err : '[undef]'), "\n";
+  MyTestHelpers::diag("result: ",(defined $result ? "'$result'" : '[undef]'));
+  MyTestHelpers::diag("err:    ",(defined $err ? "'$err'" : '[undef]'));
   ok (defined $result && $result eq "test2 compressed end");
   ok (defined $err && $err eq '');
+  ok ($test2, "test2 compressed end");
+  ok ($test2_more, 0);
 }
 
 exit 0;

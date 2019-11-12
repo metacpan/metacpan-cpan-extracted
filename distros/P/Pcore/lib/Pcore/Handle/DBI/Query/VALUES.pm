@@ -1,21 +1,83 @@
 package Pcore::Handle::DBI::Query::VALUES;
 
-use Pcore -class;
+use Pcore -class, -const, -export;
 use Pcore::Lib::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref is_blessed_hashref];
 
 has _buf => ( required => 1 );    # ArrayRef
 
+our $EXPORT = [qw[$SQL_VALUES_IDX_FIRST $SQL_VALUES_IDX_SCAN]];
+
+# VALUES [ { a => 1 }, { b => 1 } ] # get columns from the first not empty hash, columns will be ( "a" )
+# VALUES [ {}, { a => 1 }, { b => 1 } ] # perform full scan, columns will be ( "a", "b" ), first row will be ignored
+# VALUES [ [], {}, { a => 1 }, { b => 1 } ] # get columns from the first not empty hash, columns will be ( "a" ), first [] will be ignored, first {} will not be ignored
+
+# default behavior - get index from the first non-empty hash
+const our $SQL_VALUES_IDX_FIRST => 1;    # treat first row as columns index, index row will be ignored
+const our $SQL_VALUES_IDX_SCAN  => 2;    # full scan rows keys
+
 sub get_query ( $self, $dbh, $final, $i ) {
-    my ( @sql, @idx, @bind );
+    my ( @sql, @idx, @bind, $ignore_idx );
+
+    # create columns idx
+    if ( !is_ref $self->{_buf}->[0] ) {
+        if ( $self->{_buf}->[0] == $SQL_VALUES_IDX_FIRST ) {
+            $ignore_idx = 2;
+
+            if ( is_plain_hashref $self->{_buf}->[1] ) {
+                @idx = sort keys $self->{_buf}->[1]->%*;
+            }
+            elsif ( is_plain_arrayref $self->{_buf}->[1] ) {
+                @idx = $self->{_buf}->[1]->@*;
+            }
+            else {
+                die;
+            }
+        }
+        elsif ( $self->{_buf}->[0] == $SQL_VALUES_IDX_SCAN ) {
+            $ignore_idx = 1;
+
+            my $idx;
+
+            for my $token ( $self->{_buf}->@* ) {
+
+                # get hash with keys
+                next if !is_plain_hashref $token || !$token->%*;
+
+                $idx->@{ keys $token->%* } = ();
+            }
+
+            @idx = sort keys $idx->%*;
+        }
+        else {
+            die;
+        }
+
+        die if !@idx;
+    }
 
     for my $token ( $self->{_buf}->@* ) {
+        next if $ignore_idx && $ignore_idx--;
 
         # skip undefined values
         next if !defined $token;
 
         # HashRef prosessed as values set
         if ( is_plain_hashref $token) {
-            @idx = sort keys $token->%* if !@idx;
+
+            # create columns index
+            if ( !@idx ) {
+                for my $token ( $self->{_buf}->@* ) {
+
+                    # get hash with keys
+                    next if !is_plain_hashref $token || !$token->%*;
+
+                    @idx = sort keys $token->%*;
+
+                    last;
+                }
+
+                die q[unable to build columns index] if !@idx;
+            }
 
             my @row;
 
@@ -98,7 +160,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 8                    | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (25)                 |
+## |    3 | 18                   | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (42)                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

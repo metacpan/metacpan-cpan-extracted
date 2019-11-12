@@ -1,0 +1,44 @@
+{
+   "abstract" : "transport of any data-structure",
+   "author" : [
+      "Elizabeth Mattijsen (liz@dijkmat.nl)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Thread-Conveyor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Thread::Serialize" : "0",
+            "Thread::Tie" : "0.09",
+            "load" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

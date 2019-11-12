@@ -1,3 +1,8 @@
+0.70    Sun Nov 10 14:28:41 GMT 2019
+
+* Protect ourselves from Module::Metadata parsing problems
+  [ RT#130939 ]
+
 0.68    Fri Jul 29 08:01:12 BST 2016
 
 * Fix unconditional @INC localisation

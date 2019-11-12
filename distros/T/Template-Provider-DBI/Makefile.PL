@@ -7,5 +7,9 @@ WriteMakefile(
                         'DateTime::Format::DBI' => 0,
                         'Template'              => 2.15,
 #                        'DBD::SQLite'           => 0,
-                    },
+    },
+    BUILD_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+        'DateTime::Format::SQLite' => 0,
+    },
 );

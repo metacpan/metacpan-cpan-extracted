@@ -9,3 +9,4 @@ t/Conveyor-Monitored01.t
 t/Conveyor-Monitored02.t
 t/Conveyor-Monitored03.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

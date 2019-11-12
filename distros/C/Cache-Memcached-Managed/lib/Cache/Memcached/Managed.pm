@@ -2,7 +2,7 @@ package Cache::Memcached::Managed;
 
 # Make sure we have version info for this module
 
-$VERSION= '0.24';
+$VERSION= '0.25';
 
 # Make sure we're as strict as possible
 # With as much feedback that we can get
@@ -2903,6 +2903,8 @@ essentially starting again at 1.
 =head1 AUTHOR
 
  Elizabeth Mattijsen
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 =head1 HISTORY
 

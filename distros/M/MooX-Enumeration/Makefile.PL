@@ -36,7 +36,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Enumeration" => { file => "lib/MooX/Enumeration.pm", version => 0.007 },
+                          "MooX::Enumeration" => { file => "lib/MooX/Enumeration.pm", version => 0.009 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -52,7 +52,8 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/project",
                         },
-  "version"          => 0.007,
+  "version"          => 0.009,
+  "x_contributors"   => ["Diab Jerius (DJERIUS) <djerius\@cpan.org>"],
   "x_static_install" => 1,
 };
 

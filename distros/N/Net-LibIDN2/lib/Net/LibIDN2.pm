@@ -11,6 +11,9 @@ require DynaLoader;
 
 our @ISA = qw(Exporter DynaLoader);
 
+our $VERSION = '1.01';
+bootstrap Net::LibIDN2 $VERSION;
+
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	idn2_strerror
 	idn2_strerror_name
@@ -19,6 +22,34 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	idn2_lookup_ul
 	idn2_register_u8
 	idn2_register_ul
+	IDN2_OK
+	IDN2_MALLOC
+	IDN2_NO_CODESET
+	IDN2_ICONV_FAIL
+	IDN2_ENCODING_ERROR
+	IDN2_NFC
+	IDN2_PUNYCODE_BAD_INPUT
+	IDN2_PUNYCODE_BIG_OUTPUT
+	IDN2_PUNYCODE_OVERFLOW
+	IDN2_TOO_BIG_DOMAIN
+	IDN2_TOO_BIG_LABEL
+	IDN2_INVALID_ALABEL
+	IDN2_UALABEL_MISMATCH
+	IDN2_INVALID_FLAGS
+	IDN2_NOT_NFC
+	IDN2_2HYPHEN
+	IDN2_HYPHEN_STARTEND
+	IDN2_LEADING_COMBINING
+	IDN2_DISALLOWED
+	IDN2_CONTEXTJ
+	IDN2_CONTEXTJ_NO_RULE
+	IDN2_CONTEXTO
+	IDN2_CONTEXTO_NO_RULE
+	IDN2_UNASSIGNED
+	IDN2_BIDI
+	IDN2_DOT_IN_LABEL
+	IDN2_INVALID_TRANSITIONAL
+	IDN2_INVALID_NONTRANSITIONAL
 	IDN2_VERSION
 	IDN2_VERSION_NUMBER
 	IDN2_VERSION_MAJOR
@@ -33,6 +64,14 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	IDN2_ALLOW_UNASSIGNED
 	IDN2_USE_STD3_ASCII_RULES
 ) ] );
+
+if (idn2_check_version("2.0.5")) {
+	push @{$EXPORT_TAGS{all}}, "IDN2_NO_TR46";
+}
+if (idn2_check_version("2.2.0")) {
+	push @{$EXPORT_TAGS{all}}, "IDN2_ALABEL_ROUNDTRIP_FAILED";
+	push @{$EXPORT_TAGS{all}}, "IDN2_NO_ALABEL_ROUNDTRIP";
+}
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -51,9 +90,13 @@ our @EXPORT = qw(
 	IDN2_ALLOW_UNASSIGNED
 	IDN2_USE_STD3_ASCII_RULES
 );
-our $VERSION = '1.00';
 
-bootstrap Net::LibIDN2 $VERSION;
+if (idn2_check_version("2.0.5")) {
+	push @EXPORT, "IDN2_NO_TR46";
+}
+if (idn2_check_version("2.2.0")) {
+	push @EXPORT, "IDN2_NO_ALABEL_ROUNDTRIP";
+}
 
 1;
 __END__
@@ -98,12 +141,16 @@ be in Unicode NFC form.
 
 Pass B<IDN2_NFC_INPUT> in I<$flags> to convert input to NFC form before further
 processing. IDN2_TRANSITIONAL and IDN2_NONTRANSITIONAL do already imply IDN2_NFC_INPUT.
+
 Pass B<IDN2_ALABEL_ROUNDTRIP> in flags to convert any input A-labels
-to U-labels and perform additional testing (not yet implemented).
-Pass IDN2_TRANSITIONAL to enable Unicode
-TR46 transitional processing, and IDN2_NONTRANSITIONAL to enable Unicode TR46
-non-transitional processing.  Multiple flags may be specified
-by binary or:ing them together, for example B<IDN2_NFC_INPUT> | B<IDN2_ALABEL_ROUNDTRIP>.
+to U-labels and perform additional testing. This is default if used with a libidn 
+version >= 2.2. To switch this behavior off, pass IDN2_NO_ALABEL_ROUNDTRIP
+
+Pass IDN2_TRANSITIONAL to enable Unicode TR46 transitional processing, and
+IDN2_NONTRANSITIONAL to enable Unicode TR46 non-transitional processing. 
+
+Multiple flags may be specified by binary or:ing them together, for example
+B<IDN2_NFC_INPUT> | B<IDN2_ALABEL_ROUNDTRIP>.
 
 If linked to library GNU Libidn version > 2.0.3: IDN2_USE_STD3_ASCII_RULES disabled by default.
 Previously we were eliminating non-STD3 characters from domain strings such as
@@ -239,85 +286,85 @@ or 254 characters if it ends with a period.
 
 =over 4
 
-=item B<"IDN2_OK">
+=item B<"Net::LibIDN2::IDN2_OK">
 Successful return.
 
-=item B<"IDN2_MALLOC">
+=item B<"Net::LibIDN2::IDN2_MALLOC">
 Memory allocation error.
 
-=item B<"IDN2_NO_CODESET">
+=item B<"Net::LibIDN2::IDN2_NO_CODESET">
 Could not determine locale string encoding format.
 
-=item B<"IDN2_ICONV_FAIL">
+=item B<"Net::LibIDN2::IDN2_ICONV_FAIL">
 Could not transcode locale string to UTF-8.
 
-=item B<"IDN2_ENCODING_ERROR">
+=item B<"Net::LibIDN2::IDN2_ENCODING_ERROR">
 Unicode data encoding error.
 
-=item B<"IDN2_NFC">
+=item B<"Net::LibIDN2::IDN2_NFC">
 Error normalizing string.
 
-=item B<"IDN2_PUNYCODE_BAD_INPUT">
+=item B<"Net::LibIDN2::IDN2_PUNYCODE_BAD_INPUT">
 Punycode invalid input.
 
-=item B<"IDN2_PUNYCODE_BIG_OUTPUT">
+=item B<"Net::LibIDN2::IDN2_PUNYCODE_BIG_OUTPUT">
 Punycode output buffer too small.
 
-=item B<"IDN2_PUNYCODE_OVERFLOW">
+=item B<"Net::LibIDN2::IDN2_PUNYCODE_OVERFLOW">
 Punycode conversion would overflow.
 
-=item B<"IDN2_TOO_BIG_DOMAIN">
+=item B<"Net::LibIDN2::IDN2_TOO_BIG_DOMAIN">
 Domain name longer than 255 characters.
 
-=item B<"IDN2_TOO_BIG_LABEL">
+=item B<"Net::LibIDN2::IDN2_TOO_BIG_LABEL">
 Domain label longer than 63 characters.
 
-=item B<"IDN2_INVALID_ALABEL">
+=item B<"Net::LibIDN2::IDN2_INVALID_ALABEL">
 Input A-label is not valid.
 
-=item B<"IDN2_UALABEL_MISMATCH">
+=item B<"Net::LibIDN2::IDN2_UALABEL_MISMATCH">
 Input A-label and U-label does not match.
 
-=item B<"IDN2_NOT_NFC">
+=item B<"Net::LibIDN2::IDN2_NOT_NFC">
 String is not NFC.
 
-=item B<"IDN2_2HYPHEN">
+=item B<"Net::LibIDN2::IDN2_2HYPHEN">
 String has forbidden two hyphens.
 
-=item B<"IDN2_HYPHEN_STARTEND">
+=item B<"Net::LibIDN2::IDN2_HYPHEN_STARTEND">
 String has forbidden starting/ending hyphen.
 
-=item B<"IDN2_LEADING_COMBINING">
+=item B<"Net::LibIDN2::IDN2_LEADING_COMBINING">
 String has forbidden leading combining character.
 
-=item B<"IDN2_DISALLOWED">
+=item B<"Net::LibIDN2::IDN2_DISALLOWED">
 String has disallowed character.
 
-=item B<"IDN2_CONTEXTJ">
+=item B<"Net::LibIDN2::IDN2_CONTEXTJ">
 String has forbidden context-j character.
 
-=item B<"IDN2_CONTEXTJ_NO_RULE">
+=item B<"Net::LibIDN2::IDN2_CONTEXTJ_NO_RULE">
 String has context-j character with no rull.
 
-=item B<"IDN2_CONTEXTO">
+=item B<"Net::LibIDN2::IDN2_CONTEXTO">
 String has forbidden context-o character.
 
-=item B<"IDN2_CONTEXTO_NO_RULE">
+=item B<"Net::LibIDN2::IDN2_CONTEXTO_NO_RULE">
 String has context-o character with no rull.
 
-=item B<"IDN2_UNASSIGNED">
+=item B<"Net::LibIDN2::IDN2_UNASSIGNED">
 String has forbidden unassigned character.
 
-=item B<"IDN2_BIDI">
+=item B<"Net::LibIDN2::IDN2_BIDI">
 String has forbidden bi-directional properties.
 
-=item B<"IDN2_DOT_IN_LABEL">
+=item B<"Net::LibIDN2::IDN2_DOT_IN_LABEL">
 Label has forbidden dot (TR46).
 
-=item B<"IDN2_INVALID_TRANSITIONAL">
+=item B<"Net::LibIDN2::IDN2_INVALID_TRANSITIONAL">
 Label has character forbidden in transitional mode (TR46).
 
-=item B<"IDN2_INVALID_NONTRANSITIONAL">
+=item B<"Net::LibIDN2::IDN2_INVALID_NONTRANSITIONAL">
 Label has character forbidden in non-transitional mode (TR46).
 
 =back

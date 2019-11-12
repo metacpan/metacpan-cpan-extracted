@@ -52,6 +52,7 @@ typedef struct di_stream {
 
     //bool     is_tainted;
     bool        forZip;
+    bool        extraFree ;
     lzma_stream stream ; 
 
     lzma_filter filters[LZMA_FILTERS_MAX + 1];
@@ -298,6 +299,7 @@ InitStream()
 
     /* lzma_memory_usage(lzma_preset_lzma, TRUE); */
 
+    s->extraFree = FALSE;
     return s ;
     
 }
@@ -715,6 +717,7 @@ lzma_raw_encoder(Class, flags, bufsize, filters, forZip)
         setupFilters(s, filters, NULL);
 
         s->forZip = forZip ;
+        s->extraFree = TRUE;
         err = lzma_raw_encoder ( &(s->stream), (const lzma_filter*)&s->filters );
 
         if (err != LZMA_OK) {
@@ -1140,6 +1143,10 @@ DESTROY(s)
     Compress::Raw::Lzma::Decoder	s
   CODE:
     lzma_end(&s->stream) ;
+#if LZMA_VERSION <= 50020042    
+    if (s->extraFree)
+        Safefree(s->filters[0].options) ;
+#endif
     destroyStream(s) ;
 
 

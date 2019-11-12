@@ -1,3 +1,6 @@
+1.04	9 November 2019
+	Adoption.
+
 1.03    7 December 2012
         Upgraded to Devel::MaintBlead 0.08.  This should fix the problem as
         reported in https://rt.cpan.org/Ticket/Display.html?id=81354 by

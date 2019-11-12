@@ -1,0 +1,29 @@
+README for Thread::Pool::Resolve
+
+Sub-class of Thread::Pool that creates a special pool of threads for resolving
+log files (any text file or stream of which the first field is an IP number).
+Can be used for real-time asynchronous logging or for batch resolving of log
+files.
+
+                         *** A note of CAUTION ***
+
+This module only functions on Perl versions 5.8.0-RC3 and later.  And then
+only when threads are enabled with -Dusethreads.  It is of no use with any
+version of Perl before 5.8.0-RC3 or without threads enabled.
+
+                         *************************
+
+Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Required Modules:
+ load (any)
+ Thread::Pool (0.29)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

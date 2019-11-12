@@ -1,0 +1,48 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bot-BasicBot-Pluggable-Module-SimpleBlog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bot::BasicBot::Pluggable" : "0.04",
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "Regexp::Common" : "0",
+            "Test::DatabaseRow" : "0",
+            "Test::More" : "0",
+            "Time::Piece" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

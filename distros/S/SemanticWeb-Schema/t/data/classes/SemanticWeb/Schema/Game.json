@@ -35,8 +35,8 @@
             "schema:Game"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Place",
+            "schema:URL",
             "schema:PostalAddress"
          ]
       },
@@ -45,8 +45,8 @@
          "rdfs:comment" : "Indicate how many people can play this game (minimum, maximum, or range).",
          "rdfs:label" : "numberOfPlayers",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:Game"
+            "schema:Game",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },

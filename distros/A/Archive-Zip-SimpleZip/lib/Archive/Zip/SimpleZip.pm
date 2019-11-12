@@ -5,9 +5,9 @@ use warnings;
 
 require 5.006;
 
-use IO::Compress::Zip 2.088 qw(:all);
-use IO::Compress::Base::Common  2.088 ();
-use IO::Compress::Adapter::Deflate 2.088 ;
+use IO::Compress::Zip 2.090 qw(:all);
+use IO::Compress::Base::Common  2.090 ();
+use IO::Compress::Adapter::Deflate 2.090 ;
 
 use Fcntl ();
 use File::Spec ();
@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "0.029";
+$VERSION = "0.031";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;

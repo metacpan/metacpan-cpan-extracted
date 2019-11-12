@@ -1,5 +1,15 @@
 Revision history for SemanticWeb-Schema:
 
+v5.0.0    2019-11-11 17:23:43+00:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 5.0 of the schema.
+
+  [Bug Fixes]
+  - Add utf8 declaration to base package.
+
+  [Tests]
+  - Fixed utf8 encoding issue.
+
 v4.0.1    2019-10-23 17:20:32+01:00 Europe/London
   [Documentation]
   - Enclose HTML descriptions inside of paragraph elements.

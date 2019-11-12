@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/IO/Handle/Packable.pm
+MANIFEST			This list of files
+t/00use.t
+t/01handle.t
+t/10pack.t
+t/11unpack.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

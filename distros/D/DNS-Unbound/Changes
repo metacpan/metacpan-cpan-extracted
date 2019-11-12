@@ -1,5 +1,11 @@
 Revision history for Perl module DNS::Unbound
 
+0.13 - Fri, 8 Nov 2019
+- BUG FIX: Accommodate having AsyncQuery.pm loaded at compile time.
+- Add answer_packet() accessor to DNS::Unbound::Result.
+- Deprecate to_net_dns_rrs().
+- Add examples to demonstrate interaction with AnyEvent and IO::Async.
+
 0.12 - Sat, 14 Sep 2019
 - Rename count_pending_promises() to count_pending_queries().
 

@@ -1,0 +1,88 @@
+0.12	9 November 2019
+	Adoption
+
+0.10	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+	Added dependency on load.pm, it was missing!
+
+0.09	11 August 2003
+	Cleaned up Makefile.PL and updated test-suite and copyright.  Fixed
+	problem in test-suite if there was no Thread::Pool::Resolve installed
+	yet (filter would not search in lib).  Increased dependency on
+	Thread::Pool to 0.29.
+
+0.08	30 September 2002
+	Use "load.pm" instead of AutoLoader.  Increased dependency on
+        Thread::Pool to 0.28, which also use "load.pm" now.
+
+	Removed "our" from $VERSION and @ISA, should shave off some bytes in
+        memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.07	22 September 2002
+	Added use of POSIX::sigaction for setting the signal handler rather
+	than just setting %SIG: the latter seems to only be processed _after_
+	gethostbyaddr() timed out, which sort of defeated the purpose.  So
+	this should really make the timeout value specified, work.
+
+	Made the standard resolver a bit smarter about the case with a
+	specific timeout value and without.
+
+0.06	1 September 2002
+	Increased dependency on Thread::Pool, so it will use the latest and
+	best.  No further changes to the code.
+
+	Split test-suite in two files, so that any potential memory problems
+	cause by "cpu" optimization will not influence the test-suite using
+	the "memory" optimization.
+
+0.05	28 August 2002
+	Added code to "new" to handle problem with timouts in threads.  If
+	it sees that it cannot fix the problem, it dies.  Else it will fix it
+	and output a warning.
+
+	Added BUGS section to the pod to explain the problem with timeouts of
+	the default resolver.
+
+0.04	27 August 2002
+	Added documentation and test-suite for checkpoint functionality, which
+	is basically inherited from the latest Thread::Pool.  Increased
+	dependency on Thread::Pool in Makefile.PL.
+
+0.03	16 August 2002
+	Fixed problem in test-suite which tested for resolving from different
+	threads.
+
+	Added support for reporting status of the resolving process.  Added
+	"status" field to "new" method.  Adapted default resolver and monitor
+	to set the status according to the process.
+
+	Added timeout feature to the default resolver.  Timeout value can
+	be changed with the "timeout" method.
+
+	14 August 2002
+	Adapted test-suite to use select() rather than sleep(), which seems
+	to halt _all_ threads, at least under UNIX.
+
+	13 August 2002
+	Fixed potentially large foreach keys to while each loop.
+
+	7 August 2002
+	Added optimization parameter documentation (inherited from
+	Thread::Pool)
+
+	Added optimization setting to test-suite.
+
+	Raised dependency to Thread::Pool 0.23.
+
+0.02	1 August 2002
+	Raised dependency to Thread::Pool 0.22.
+
+	30 July 2002
+	Added debugging class methods "rand_domain" and "rand_ip".  Adapted
+	test-suite to use these rather than its own version of them.
+
+	Some documentation nits.
+
+0.01	26 July 2002
+	First version of Thread::Pool::Resolve.

@@ -1,0 +1,453 @@
+#!/usr/bin/env perl
+#
+# This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+#
+# This is free software, licensed under:
+#
+#  The Artistic License 2.0 (GPL Compatible)
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Config::Tiny;
+use Net::DHCP::Config::Utilities;
+use Net::DHCP::Config::Utilities::Subnet;
+use Net::DHCP::Config::Utilities::INI_loader;
+use Net::DHCP::Config::Utilities::Generator::ISC_DHCPD;
+use Net::CIDR;
+
+sub version{
+	print "inidhcp v. 0.0.1\n";
+}
+
+sub help{
+	print '
+-a <action>   The action to perform.
+-c <config>   The config file to use.
+-g <IPs>      Comma seperated list of gateways.
+-s <scope>    The base IP of the subnet.
+-m <mask>     Subnet mask
+-t <IP>       TFTP server
+-n <IPs>      Comma seperated list of NTP servers.
+-b <file>     The name of the boot file.
+-B <IP>       Broadcast address.
+-R <IP IP>    The range to use.
+-d <IPs>      Comma seperated list of DNS servers.
+-M <MTU>      The MTU for the subnet.
+-w <URL>      The web proxy for the subnet.
+-l <time>     The lease time.
+-r <path>     Root path for netboot via NFS.
+-V <vars>     The variable section to pass to generator in the templates.
+
+ACTIONS
+add  Adds a new scope. Requires a minimum of -s and -m.
+rm   Removes a scope. Requires -s.
+gen  Generates the output
+';
+}
+
+my $action;
+my $config_file='/usr/local/etc/inidhcp.ini';
+my $routers;
+my $scope;
+my $mask;
+my $tftp;
+my $dns;
+my $bootfile;
+my $broadcast;
+my @range;
+my $ntp;
+my $print=0;
+my $mtu;
+my $web_proxy;
+my $lease_time;
+my $root_path;
+my $desciption;
+my $help;
+my $version;
+my $vars_section;
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   'R=s@'=>\@range,
+		   'a=s'=>\$action,
+		   'c=s'=>\$config_file,
+		   'g=s'=>\$routers,
+		   's=s'=>\$scope,
+		   'm=s'=>\$mask,
+		   't=s'=>\$tftp,
+		   'b=s'=>\$bootfile,
+		   'B=s'=>\$broadcast,
+		   'd=s'=>\$dns,
+		   'n=s'=>\$ntp,
+		   'p'=>\$print,
+		   'M=s'=>\$mtu,
+		   'w=s'=>\$web_proxy,
+		   'l=s'=>\$lease_time,
+		   'r=s'=>\$root_path,
+		   'D=s'=>\$desciption,
+		   'h'=>\$help,
+		   'help'=>\$help,
+		   'v'=>\$version,
+		   'version'=>\$version,
+		   'V'=>\$vars_section
+		   );
+
+if ( $version ){
+	&version;
+	exit;
+}
+
+if ( $help ){
+	&version;
+	&help;
+	exit;
+}
+
+if ( ! defined( $action ) ){
+	die('No action specified via -a');
+}
+
+if ( ! -f $config_file ){
+	die('Config "'.$config_file.'" does not exist');
+}
+
+# test -s if it is specified
+if ( defined( $scope ) ){
+	eval{
+		my @cidrs=Net::CIDR::addr2cidr( $scope );
+	};
+	if ( $@ ){
+		die( '"'.$scope.'" is not a valid base IP for a scope' );
+	}
+}
+
+my $config;
+eval{
+	$config=Config::Tiny->read( $config_file );
+};
+if ( $@ ){
+	die( 'Config::Tiny->read died unexpectedly... '.$@ );
+}elsif( !defined( $config ) ){
+	die( 'Failed to read the config... '.Config::Tiny->errstr );
+}
+
+# make sure we have all the basics we need to operate
+if (!defined( $config->{_}{dir} ) ){
+	die('"dir" not defined in the config');
+}elsif(!defined( $config->{generator}{footer} ) ){
+	$config->{generator}{footer}=$config->{_}{dir}.'/footer';
+	#die('"footer" not defined in the config in the config section "generator"');
+}elsif(!defined( $config->{generator}{header} ) ){
+	$config->{generator}{header}=$config->{_}{dir}.'/header';
+	#die('"header" not defined in the config in the config section "generator"');
+}elsif(!defined( $config->{generator}{output} ) ){
+	$config->{generator}{output}=$config->{_}{dir}.'/output';
+	#die('"output" not defined in the config in the config section "generator"');
+}elsif( ! -d $config->{_}{dir} ){
+	die('"'.$config->{_}{dir}.'" is not a directory or does not exist');
+}
+
+# do this first as we don't need to load anything
+if ( $action eq 'rm' ){
+	if ( !defined( $scope ) ){
+		die('No scope specified via -s');
+	}
+	my $file=$config->{_}{dir}.'/'.$scope.'.dhcp.ini';
+	unlink( $file ) or die( 'Failed to unlink "'.$file.'"');
+	exit 0;
+}
+
+my $util=Net::DHCP::Config::Utilities->new;
+my $loader = Net::DHCP::Config::Utilities::INI_loader->new( $util );
+
+
+eval{
+	$loader->load_dir( $config->{_}{dir} );
+};
+if ( $@ ){
+	die( 'Failed to load the scopes from "'.$config->{_}{dir}.'"'.$@ );
+}
+
+#handle generation
+if ( $action eq 'gen' ){
+	my $vars;
+	if ( !defined( $vars_section ) ){
+		if (!defined( $config->{vars} ) ){
+			$vars={};
+		}else{
+			$vars=$config->{vars};
+		}
+	}else{
+		if ( !defined( $config->{$vars_section} ) ){
+			die( '"'.$vars_section.'" does not exist as a section in "'.$config_file.'"' );
+		}
+		$vars=$config->{$vars_section};
+	}
+
+	# make sure this always exists, even if it is blank so we don't error upon init
+	if (!defined( $config->{vars} ) ){
+		$config->{vars}={};
+	}
+
+	# init generator
+	my $generator;
+	eval{
+        $generator=Net::DHCP::Config::Utilities::Generator::ISC_DHCPD->new({
+																			'footer'=>$config->{generator}{footer},
+																			'header'=>$config->{generator}{header},
+																			'vars'=>$vars,
+																			'output'=>$config->{generator}{output},
+																			});
+	};
+	if ( $@ ){
+		die( 'Failed to init the ISC DHCPD config generation module... '.$@ );
+	}
+
+	# generate it
+	my $isc_dhcpd_config;
+	eval{
+		# if $print is true, then a string is returned and nothing is written to the FS
+		my $isc_dhcpd_config=$generator->generate( $util, $print );
+	};
+	if ( $@ ){
+		die ( 'ISC DHCPD config generation failed... '.$@ );
+	}
+
+	# print the config if requested
+	if ( $print ){
+		print $isc_dhcpd_config;
+	}
+
+	exit 0;
+}
+
+# handle adding
+if ( $action eq 'add' ){
+	if ( !defined( $mask ) ){
+		die( 'No subnet mask specified via -m' );
+	}
+
+	# the bare options needed to create a subnet
+	my $options={
+				 mask=>$mask,
+				 base=>$scope,
+				 };
+
+	# suck in the various options if specified
+	if (defined( $dns )){
+		$options->{dns}=$dns;
+	}
+	if (defined( $routers )){
+		$options->{routers}=$routers;
+	}
+	if (defined( $ntp )){
+		$options->{ntp}=$ntp;
+	}
+	if (defined( $bootfile )){
+		$options->{bootfile}=$bootfile;
+	}
+	if(defined( $tftp )){
+		$options->{'tftp-server'}=$tftp;
+	}
+	if (defined( $range[0] )){
+		$options->{ranges}=\@range;
+	}
+	if (defined( $mtu )){
+		$options->{mtu}=$mtu;
+	}
+	if (defined( $web_proxy )){
+		$options->{'web-proxy'}=$web_proxy;
+	}
+	if (defined( $lease_time )){
+		$options->{'lease-time'}=$lease_time;
+	}
+	if (defined( $broadcast )){
+		$options->{broadcast}=$broadcast;
+	}
+	if (defined( $root_path )){
+		$options->{'root'}=$root_path;
+	}
+	if (defined( $desciption )){
+		$options->{desciption}=$desciption;
+	}
+
+	# make sure everything is sane
+	my $subnet;
+	eval{
+		$subnet = Net::DHCP::Config::Utilities::Subnet->new( $options );
+	};
+	if ( $@ ){
+		die('Failed to create the new subnet... '.$@ );
+	}
+
+	# make sure we don't overlap or anything
+	eval{
+		$util->subnet_add( $subnet );
+	};
+	if ( $@ ){
+		die( 'Failed to add subnet... '.$@ );
+	}
+
+	# begin transforming $options for making the ini
+	delete $options->{base};
+	if( defined( $options->{ranges} ) ){
+		delete $options->{ranges};
+		my $range_int=0;
+		foreach my $current_range ( @range ){
+			$options->{'range'.$range_int}=$current_range;
+			$range_int++;
+		}
+	}
+
+	# create a new ini and shove the options into it
+	my $new_ini=Config::Tiny->new;
+	$new_ini->{$scope}=$options;
+
+	my $new_ini_path=$config->{_}{dir}.'/'.$scope.'.dhcp.ini';
+	if (! $new_ini->write( $new_ini_path ) ){
+		die( 'Failed to write to "'.$new_ini_path.'"' );
+	}
+
+	exit;
+}
+
+=head1 NAME
+
+inidhcp - Works with DHCP information stored in INI files.
+
+=head1 SYNOPSIS
+
+inidhcp B<-c> <config> B<-a> rm B<-s> <scope>
+
+inidhcp B<-c> <config> B<-a> gen [B<-V> <vars section>]
+
+inidhcp B<-c> <config> B<-a> add B<-s> <scope> B<-m> <mask> [B<-g> <gateways>]
+[B<-t> <TFTP server>] [B<-n> <NTP servers>] [B<-B> <broadcast>] [B<-M> <MTU>]
+[B<-d> <DNS servers>]  [B<-w> <URL>] [B<-l> <time>] [B<-b> <bootfile>]
+[B<-R> <IP IP>]
+
+=head1 FLAGS
+
+=head2 -a <action>
+
+The action to perform.
+
+=head2 -c <config>
+
+The config file to use.
+
+=head2 -g <IPs>
+
+Comma seperated list of gateways.
+
+=head2 -s <scope>
+
+The base IP of the subnet.
+
+=head2 -m <mask>
+
+Subnet mask
+
+=head2 -t <IP>
+
+TFTP server
+
+=head2 -n <IPs>
+
+Comma seperated list of NTP servers.
+
+=head2 -b <file>
+
+The name of the boot file.
+
+=head2 -B <IP>
+
+Broadcast address.
+
+=head2 -R <IP IP>
+
+The range to use.
+
+=head2 -d <IPs>
+
+Comma seperated list of DNS servers.
+
+=head2 -M <MTU>
+
+The MTU for the subnet.
+
+=head2 -w <URL>
+
+The web proxy for the subnet.
+
+=head2 -l <time>
+
+The lease time.
+
+=head2 -r <path>
+
+Root path for netboot via NFS.
+
+=head2 -V <vars section>
+
+The variable section to pass to generator for use in the templates.
+
+=head1 CONFIGURATION
+
+Below is a example config in which inidhcp is ran out of the
+current directory.
+
+    dir=./
+    [generator]
+    header=header
+    footer=footer
+    output=output
+
+=head2 SECTIONS
+
+=head3 ROOT
+
+=head4 directory
+
+This is the directory that has the ini.dhcp files in it.
+
+=head3 generator
+
+=head4 header
+
+This is the header template to use. L<Template> is
+used for templating.
+
+=head4 footer
+
+This is the footer template to use. L<Template> is
+used for templating.
+
+=head4 output
+
+This is the file to output to.
+
+=head1 EXAMPLE TEMPLATES
+
+Header...
+
+    default-lease-time 600;
+    max-lease-time 7200;
+    
+    ddns-update-style none;
+    
+    authoritative;
+
+    option web-proxy code 252 = text;
+    
+    log-facility local7;
+
+Footer...
+
+    
+
+
+=cut

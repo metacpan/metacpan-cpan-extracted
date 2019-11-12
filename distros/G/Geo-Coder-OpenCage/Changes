@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-OpenCage
 
+0.26    2019-11-10
+        no code changes
+        - add test for 429 response
+        - travis now tests perl 5.30
+        - use coveralls 
+
 0.25    2019-10-15
         - remove debugging mistakenly left in 0.24. Sorry!
 

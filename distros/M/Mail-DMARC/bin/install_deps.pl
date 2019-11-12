@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-our $VERSION = '1.20191004'; # VERSION 1.10
+# VERSION 1.10
 
 use strict;
 use warnings;
@@ -446,10 +446,10 @@ sub get_cpan_config {
 
 sub name_overrides {
     my $mod = shift;
-# Package and port managers have naming conventions for perl modules. The
-# methods will typically work out the name based on the module name and a
-# couple rules. When that doesn't work, add entries here for FreeBSD (port),
-# MacPorts ($dport), yum, and apt.
+    # Package and port managers have naming conventions for perl modules. The
+    # methods will typically work out the name based on the module name and a
+    # couple rules. When that doesn't work, add entries here for FreeBSD (port),
+    # MacPorts ($dport), yum, and apt.
     my @modules = (
         { module=>'LWP::UserAgent'    , info => { cat=>'www', port=>'p5-libwww', dport=>'p5-libwww-perl', yum=>'perl-libwww-perl' }, },
         { module=>'Mail::Send'        , info => { port => 'Mail::Tools', }  },
@@ -463,20 +463,13 @@ sub name_overrides {
     return { module=>$mod, info => { } };
 };
 
-# PODNAME: install_deps.pl
-# ABSTRACT: install dependencies with package manager or CPAN
-
 __END__
 
 =pod
 
 =head1 NAME
 
-install_deps.pl - install dependencies with package manager or CPAN
-
-=head1 VERSION
-
-version 1.20191004
+install_deps.pl: install dependencies with package manager or CPAN
 
 =head1 AUTHORS
 
@@ -486,17 +479,6 @@ version 1.20191004
 
 Matt Simerson <msimerson@cpan.org>
 
-=item *
-
-Davide Migliavacca <shari@cpan.org>
-
 =back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Matt Simerson.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

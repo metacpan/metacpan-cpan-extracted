@@ -3,20 +3,21 @@ abstract: 'add dump methods to all classes and objects'
 author:
   - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: UNIVERSAL-dump
 no_index:
   directory:
     - t
     - inc
 requires:
-  Data::Dumper: 0
-version: 0.06
+  Data::Dumper: '0'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

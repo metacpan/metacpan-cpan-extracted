@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/MooX-Enumeration>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Enumeration>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.009	2019-11-10
+
+ - Role support.
+
+0.008	2019-11-10
+
+ [ Bug Fixes ]
+ - Fix for recent versions of Moo.
+   Fixes RT#130941.
+   Diab Jerius++
+   <https://rt.cpan.org/Ticket/Display.html?id=130941>
+   <https://github.com/tobyink/p5-moox-enumeration/pull/3>
+
 0.007	2018-07-26	Bond. James Bond.
 
  [ Bug Fixes ]

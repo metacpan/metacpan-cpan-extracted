@@ -1,10 +1,16 @@
 CHANGES
 -------
 
+  2.090 9 November 2019
+
+      * MANIFEST error for streamzip
+        https://github.com/pmqs/IO-Compress/issues/6
+        70dd9bb4d27bd23d47ac9392320f55c124bc347b
+
   2.089 3 November 2019
 
       * bin/streamzip
-        Add zipstream to EXE_FILES
+        Add streamzip to EXE_FILES
         https://github.com/pmqs/IO-Compress/issues/5
         7f5ed78e5652125c9ba78aab720e18d384d59c00
         fb8cd6480af6303f58fd2e12d4999cd1830f0c5f
@@ -28,7 +34,7 @@ CHANGES
         76d2795d0587bafb0cc398e97142740acba82a42
 
       * zipdetails
-      
+
         * Update zipdetails to version 1.11
          8958cb3aa90745a4b3369479846846fdca6b4f76
 

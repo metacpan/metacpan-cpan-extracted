@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use constant DESC => 'Using mod_perl';
 use constant EXPL => 'mod_perl is not designed for writing Perl web applications. Try a Plack-based framework (Web::Simple, Dancer2, Catalyst) or Mojolicious for a modern approach.';

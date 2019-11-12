@@ -15,10 +15,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ServiceChannel",
+            "schema:ContactPoint",
             "schema:LodgingBusiness",
-            "schema:TouristAttraction",
-            "schema:ContactPoint"
+            "schema:ServiceChannel",
+            "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -27,8 +27,8 @@
       },
       "schema:touristType" : {
          "dc:source" : [
-            "schemadotorgsources:Tourism",
-            "schemadotorgsources:IIT-CNR.it"
+            "schemadotorgsources:IIT-CNR.it",
+            "schemadotorgsources:Tourism"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Attraction suitable for type(s) of tourist. eg. Children, visitors from a particular country, etc.",
@@ -40,8 +40,8 @@
             "schema:TouristDestination"
          ],
          "schema:rangeIncludes" : [
-            "schema:Audience",
-            "schema:Text"
+            "schema:Text",
+            "schema:Audience"
          ]
       }
    }

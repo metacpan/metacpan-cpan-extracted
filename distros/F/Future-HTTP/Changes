@@ -1,3 +1,7 @@
+0.13 2019-11-09
+    * Remove HTTP proxy / CGI environment variables to allow the test suite to
+      run on hosts that have them set
+
 0.12 2018-11-23
     * Remove imaginary HTPP::Tiny::threaded
       This adresses  RT #123801 , reported by ANDK

@@ -1,0 +1,41 @@
+README for Thread::Bless
+
+This module adds two features to threads that are sorely missed by some.
+
+The first feature is that the DESTROY method is called only on the object if
+the object is destroyed in the thread it was created in.  This feature is
+automatically activated when Thread::Bless is used.
+
+The second feature is that an optional fixup method is called on the object
+(automatically by Thread::Bless) just after the object is cloned (automatically
+by Perl) when a thread is started.  This is needed if the object contains
+(references to) data structures that are not automatically handled by Perl.
+
+Both features can be switched on/off seperately at compile or runtime to
+provide the utmost flexibility.
+
+For external modules that need to be thread aware but aren't yet (most notably
+the ones that cannot handle having DESTROY called when cloned versions are
+destroyed in threads), you can also activate Thread::Bless on them.
+
+                         *** A note of CAUTION ***
+
+This module only functions on Perl versions 5.8.0 and later.  And then
+only when threads are enabled with -Dusethreads.  It is of no use with
+any version of Perl before 5.8.0 or without threads enabled.
+
+                         *************************
+
+Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Required Modules:
+ Scalar::Util (1.08)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

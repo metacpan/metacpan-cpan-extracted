@@ -11,12 +11,12 @@ sub munge_files
   my($header) = grep { $_->name eq $name } @{ $self->zilla->files };
   $self->log_fatal("unable to find $name!") unless defined $header;
   my $content = $header->content;
-  
+
   my $version = $self->zilla->version;
   $version =~ s{_.*$}{}; # trim off the trial portion of the version number
   $version = int( $version * 100 );
   $version = sprintf "%03s", $version;
-  
+
   if($content =~ s{%%FFI_UTIL_VERSION%%}{$version})
   {
     $header->content($content);

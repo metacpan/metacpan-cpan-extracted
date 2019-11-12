@@ -3,6 +3,8 @@
 use 5.014;
 use warnings;
 
+our $VERSION = '0.61';
+
 use IO::Handle;
 
 my $feedback_fh;
@@ -17,7 +19,6 @@ use FindBin ();
 use Mail::DKIM::Verifier;
 use Mail::DMARC::PurePerl;
 use MailX::Qmail::Queue::Message;
-use Mail::SPF::Query;
 
 my @debug;
 
@@ -36,16 +37,23 @@ sub if_set {
 }
 
 sub reject {
-    $feedback_fh->say("D@_");
+    $feedback_fh->print("D@_");
     debug action => 'reject';
     exit 88 if $ENV{DMARC_REJECT};
+}
+
+sub spf_query {
+    require Mail::SPF;
+    my $request = Mail::SPF::Request->new(@_);
+    state $server = Mail::SPF::Server->new;
+    $server->process($request);
 }
 
 my $message = MailX::Qmail::Queue::Message->receive
   or die "Invalid message\n";
 
 $SIG{__DIE__} = sub {
-    debug died => "@_";
+    debug died => "@_" unless $^S;
     die @_;
 };
 
@@ -65,31 +73,27 @@ else {
 
     if ( $dkim->result ne 'pass' ) {
 
+        debug 'Remote IP' => $ENV{TCPREMOTEIP};
+
+        my %spf_query = ( ip_address => $ENV{TCPREMOTEIP} );
+
+        debug helo => $spf_query{helo_identity} = $message->helo;
+
         my $header_from = $message->header_from;
         my $header_from_domain;
         if ($header_from) {
+            debug 'RFC5322.From' => $spf_query{identity} =
+              $header_from->address;
             $header_from_domain = $header_from->host;
-            debug 'RFC5322.From' => $header_from->address;
-            open my $rcpthosts, '<', '/var/qmail/control/rcpthosts';
-            while (<$rcpthosts>) {
-                chomp;
-                reject 'Valid DKIM signature required for sender domain '
-                  . $header_from_domain
-                  if lc eq lc $header_from_domain;
-            }
+            $spf_query{scope} = 'mfrom';
+        }
+        else {
+            $spf_query{scope} = 'helo';
         }
 
-        my $helo = $message->helo;
-        debug helo => $helo;
-        my $spf = Mail::SPF::Query->new(
-            ip   => $ENV{TCPREMOTEIP},
-            helo => $helo,
-            $header_from ? ( sender => scalar $header_from->address ) : (),
-        );
-        my ( $spf_result, $smtp_comment, $header_comment, $spf_record, $detail )
-          = $spf->result;
-        $message->add_header("Received-SPF: $spf_result ($header_comment)");
-        debug 'SPF result' => "$spf_result ($header_comment)";
+        my $spf_result = spf_query(%spf_query);
+        debug 'SPF result' => $spf_result;
+        $message->add_header( $spf_result->received_spf_header );
 
         my $dmarc_text = (
             my $dmarc_result = Mail::DMARC::PurePerl->new(
@@ -100,8 +104,8 @@ else {
                 dkim => $dkim,
                 spf  => {
                     if_set( domain => $header_from_domain ),
-                    scope  => 'mfrom',
-                    result => $spf_result,
+                    scope  => $spf_query{scope},
+                    result => $spf_result->code,
                 },
             )->validate
         )->result;
@@ -152,13 +156,6 @@ If this is the case, the e-mail is passed to C<qmail-queue>.
 
 =item 3.
 
-If not, but the message has a C<From:> domain contained in
-C</var/qmail/control/rcpthosts> and the environment variable C<DMARC_REJECT>
-is set to a true value, the message is rejected with message
-C<554 Valid DKIM signature required for sender domain ...>
-
-=item 4.
-
 If not, a SPF check is done, and a C<Received-SPF:> header field is added to
 the message.
 Then we check if the message is aligned with its sender's DMARC policy.
@@ -168,7 +165,7 @@ If the message does not align to the policy, the policy advises to reject such
 messages and when the environment variable C<DMARC_REJECT> is set to a true
 value, the message will be rejected with C<554 Failed DMARC test.>
 
-=item 5.
+=item 4.
 
 In any other case the message is passed on to C<qmail-queue>.
 

@@ -1,3 +1,6 @@
+0.08	9 November 2019
+	Adoption
+
 0.07	25 January 2005
 	Eric Garland found that a race condition existed with the marking
 	whether a thread is running.  Fixed by marking the thread as running

@@ -12,9 +12,9 @@
          "rdfs:comment" : "The caption for this object. For downloadable machine formats (closed caption, subtitles etc.) use MediaObject and indicate the <a class=\"localLink\" href=\"http://schema.org/encodingFormat\">encodingFormat</a>.",
          "rdfs:label" : "caption",
          "schema:domainIncludes" : [
-            "schema:AudioObject",
             "schema:VideoObject",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:AudioObject"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -26,8 +26,8 @@
          "rdfs:comment" : "If this MediaObject is an AudioObject or VideoObject, the transcript of that object.",
          "rdfs:label" : "transcript",
          "schema:domainIncludes" : [
-            "schema:AudioObject",
-            "schema:VideoObject"
+            "schema:VideoObject",
+            "schema:AudioObject"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

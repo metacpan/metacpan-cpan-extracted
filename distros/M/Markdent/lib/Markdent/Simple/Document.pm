@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Markdent::Handler::HTMLStream::Document;
 use Markdent::Types;
@@ -81,7 +81,7 @@ Markdent::Simple::Document - Convert Markdown to an HTML Document
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

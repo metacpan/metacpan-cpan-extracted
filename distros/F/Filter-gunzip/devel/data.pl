@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -20,16 +20,33 @@
 use strict;
 use warnings;
 use Devel::Peek;
+use FindBin;
+BEGIN {$|=1}
 
 BEGIN {
   print "tell() ",tell(\*DATA),"\n";
   print "tell() ",tell(\*DATA),"\n";
 }
 
+use lib "$FindBin::Bin/lib";
+use MyFilterShowLine count => 5;
+{
+  my $str = <<'HERE';
+here document string with crlf
+and another crlf
+HERE
+  print "the here document:\n";
+  Devel::Peek::Dump($str);
+  print $str,"\n";
+}
 
-# my $str = <DATA>;
-# print "the data line:\n";
-# Devel::Peek::Dump($str);
-# print $str;
+{
+  my $str = <DATA>;
+  print "the data line:\n";
+  Devel::Peek::Dump($str);
+  print $str;
+}
 
 __DATA__
+a line with crlf
+another line with crlf

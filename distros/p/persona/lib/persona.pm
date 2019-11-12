@@ -1,6 +1,6 @@
 package persona;
 
-$VERSION= '0.12';
+$VERSION= '0.13';
 
 # be as strict and verbose as possible
 use strict;
@@ -402,7 +402,7 @@ persona - control which code will be loaded for an execution context
 
 =head1 VERSION
 
-This documentation describes version 0.12.
+This documentation describes version 0.13.
 
 =head1 DESCRIPTION
 

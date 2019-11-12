@@ -1,5 +1,5 @@
 /*
-   Copyright 2009, 2010, 2011 Kevin Ryde
+   Copyright 2009, 2010, 2011, 2019 Kevin Ryde
 
    This file is part of File-Locate-Iterator.
 
@@ -23,20 +23,27 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* POD docs in ppport.h.  Must have at least ppport.h from Devel::PPPort
+   version 3.55 here for PERL_MAGIC_qr before SvRX.
+*/
+#define NEED_SvRX
 #define NEED_sv_2pv_flags
 #include "ppport.h"
 
-#define DEBUG 0
 
-#if DEBUG >= 1
-#define DEBUG1(code) do { code; } while (0)
+/* set this to 1 or 2 for some debug prints to stderr */
+#define MY_DEBUG  0
+
+
+#if MY_DEBUG >= 1
+#define MY_DEBUG1(code) do { code; } while (0)
 #else
-#define DEBUG1(code)
+#define MY_DEBUG1(code)
 #endif
-#if DEBUG >= 2
-#define DEBUG2(code) do { code; } while (0)
+#if MY_DEBUG >= 2
+#define MY_DEBUG2(code) do { code; } while (0)
 #else
-#define DEBUG2(code)
+#define MY_DEBUG2(code)
 #endif
 
 #define GET_FIELD(var,name)                             \
@@ -48,33 +55,33 @@
     (var) = *svptr;                                     \
   } while (0)
 
-#define MATCH(target)                                                   \
-  do {                                                                  \
-    if (regexp) {                                                       \
-      if (CALLREGEXEC (regexp,                                          \
-                       entry_p, entry_p + entry_len,                    \
-                       entry_p, 0, entry, NULL,                         \
-                       REXEC_IGNOREPOS)) {                              \
-        goto target;                                                    \
-      }                                                                 \
-      DEBUG1 (fprintf (stderr, "  no match regexp\n"));                 \
-    } else {                                                            \
-      if (! globs_ptr) {                                                \
-        DEBUG1 (fprintf (stderr, "  no regexp or globs, so match\n"));  \
-        goto target;                                                    \
-      }                                                                 \
-    }                                                                   \
-    {                                                                   \
-      SSize_t i;                                                        \
-      for (i = 0; i <= globs_lastidx; i++) {                            \
-        DEBUG2 (fprintf (stderr, "  fnmatch \"%s\" entry \"%s\"\n",     \
-                         SvPV_nolen(globs_ptr[i]), entry_p));           \
-        if (fnmatch (SvPV_nolen(globs_ptr[i]), entry_p, 0) == 0)        \
-          goto target;                                                  \
-      }                                                                 \
-      DEBUG1 (fprintf (stderr, "  no match globs\n"));                  \
-    }                                                                   \
-    DEBUG1 (fprintf (stderr, "  no match\n"));                          \
+#define MATCH(target)                                                      \
+  do {                                                                     \
+    if (regexp) {                                                          \
+      if (CALLREGEXEC (regexp,                                             \
+                       entry_p, entry_p + entry_len,                       \
+                       entry_p, 0, entry, NULL,                            \
+                       REXEC_IGNOREPOS)) {                                 \
+        goto target;                                                       \
+      }                                                                    \
+      MY_DEBUG1 (fprintf (stderr, "  no match regexp\n"));                 \
+    } else {                                                               \
+      if (! globs_ptr) {                                                   \
+        MY_DEBUG1 (fprintf (stderr, "  no regexp or globs, so match\n"));  \
+        goto target;                                                       \
+      }                                                                    \
+    }                                                                      \
+    {                                                                      \
+      SSize_t i;                                                           \
+      for (i = 0; i <= globs_lastidx; i++) {                               \
+        MY_DEBUG2 (fprintf (stderr, "  fnmatch \"%s\" entry \"%s\"\n",     \
+                            SvPV_nolen(globs_ptr[i]), entry_p));           \
+        if (fnmatch (SvPV_nolen(globs_ptr[i]), entry_p, 0) == 0)           \
+          goto target;                                                     \
+      }                                                                    \
+      MY_DEBUG1 (fprintf (stderr, "  no match globs\n"));                  \
+    }                                                                      \
+    MY_DEBUG1 (fprintf (stderr, "  no match\n"));                          \
   } while (0)
 
 MODULE = File::Locate::Iterator   PACKAGE = File::Locate::Iterator
@@ -94,7 +101,7 @@ CODE:
     IV sharelen, adj;
     int at_eof = 0;
 
-    DEBUG2 (fprintf (stderr, "FLI XS next()\n"));
+    MY_DEBUG2 (fprintf (stderr, "FLI XS next()\n"));
 
     goto START;
     {
@@ -113,7 +120,7 @@ CODE:
       SV **regexp_svptr = hv_fetch (h, "regexp", 6, 0);
       if (regexp_svptr) {
         SV *regexp_sv = *regexp_svptr;
-        DEBUG2(fprintf (stderr, "regexp sv="); sv_dump (regexp_sv));
+        MY_DEBUG2(fprintf (stderr, "regexp sv="); sv_dump (regexp_sv));
         regexp = SvRX(regexp_sv);
         /* regexp=>undef is no regexp to match.  Normally the regexp field
            is omitted if undef (ie regexp_svptr==NULL), but the Moose stuff
@@ -122,7 +129,7 @@ CODE:
           if (! regexp) croak ("'regexp' not a regexp");
         }
       }
-      DEBUG1 (fprintf (stderr, "REGEXP obj %"UVxf"\n", PTR2UV(regexp)));
+      MY_DEBUG1 (fprintf (stderr, "REGEXP obj %"UVxf"\n", PTR2UV(regexp)));
     }
 
     {
@@ -145,7 +152,7 @@ CODE:
           globs_lastidx = av_len (globs_av);
         }
       }
-      DEBUG1 (fprintf
+      MY_DEBUG1 (fprintf
               (stderr, "globs_svptr %"UVxf" globs_ptr %"UVxf" globs_lastidx %d\n",
                PTR2UV(globs_svptr), PTR2UV(globs_ptr), globs_lastidx));
     }
@@ -163,11 +170,11 @@ CODE:
 
       GET_FIELD (pos_sv, "pos");
       pos = SvUV(pos_sv);
-      DEBUG2 (fprintf (stderr, "mmap %"UVxf" mlen %u, pos %"UVuf"\n",
+      MY_DEBUG2 (fprintf (stderr, "mmap %"UVxf" mlen %u, pos %"UVuf"\n",
                       PTR2UV(mp), mlen, pos));
 
       for (;;) {
-        DEBUG2 (fprintf (stderr, "MREF_LOOP\n"));
+        MY_DEBUG2 (fprintf (stderr, "MREF_LOOP\n"));
         if (pos >= mlen) {
           /* EOF */
           at_eof = 1;
@@ -176,35 +183,35 @@ CODE:
         adj = ((I8*)mp)[pos++];
 
         if (adj == -128) {
-          DEBUG1 (fprintf (stderr, "two-byte adj at pos=%"UVuf"\n", pos));
+          MY_DEBUG1 (fprintf (stderr, "two-byte adj at pos=%"UVuf"\n", pos));
           if (pos >= mlen-1) goto UNEXPECTED_EOF;
           adj = (I16) ((((U16) ((U8*)mp)[pos]) << 8)
                        + ((U8*)mp)[pos+1]);
           pos += 2;
         }
-        DEBUG1 (fprintf (stderr, "adj %"IVdf" at pos=%"UVuf"\n", adj, pos));
-        
+        MY_DEBUG1 (fprintf (stderr, "adj %"IVdf" at pos=%"UVuf"\n", adj, pos));
+
         sharelen += adj;
         if (sharelen < 0 || sharelen > SvCUR(entry)) {
           sv_setpv (entry, NULL);
           croak ("Invalid database contents (bad share length %"IVdf")",
                  sharelen);
         }
-        DEBUG1 (fprintf (stderr, "sharelen %"IVdf"\n", sharelen));
-        
+        MY_DEBUG1 (fprintf (stderr, "sharelen %"IVdf"\n", sharelen));
+
         if (pos >= mlen) goto UNEXPECTED_EOF;
         gets_beg = mp + pos;
         gets_end = memchr (gets_beg, '\0', mlen-pos);
         if (! gets_end) {
-          DEBUG1 (fprintf (stderr, "NUL not found gets_beg=%"UVxf" len=%lu\n",
+          MY_DEBUG1 (fprintf (stderr, "NUL not found gets_beg=%"UVxf" len=%lu\n",
                           PTR2UV(gets_beg), mlen-pos));
           goto UNEXPECTED_EOF;
         }
-        
+
         SvCUR_set (entry, sharelen);
         sv_catpvn (entry, gets_beg, gets_end - gets_beg);
         pos = gets_end + 1 - mp;
-        
+
         entry_p = SvPV(entry, entry_len);
 
         MATCH(MREF_LOOP_END);
@@ -224,7 +231,7 @@ CODE:
 
       GET_FIELD (fh, "fh");
       fp = IoIFP(sv_2io(fh));
-      DEBUG2 (fprintf (stderr, "fp=%"UVxf" fh=\n", PTR2UV(fp));
+      MY_DEBUG2 (fprintf (stderr, "fp=%"UVxf" fh=\n", PTR2UV(fp));
               sv_dump (fh));
 
       /*  local $/ = "\0"  */
@@ -232,7 +239,7 @@ CODE:
       sv_setpvn (PL_rs, "\0", 1);
 
       for (;;) {
-        DEBUG2 (fprintf (stderr, "IO_LOOP\n"));
+        MY_DEBUG2 (fprintf (stderr, "IO_LOOP\n"));
         got = PerlIO_read (fp, adj_u.buf, 1);
         if (got == 0) {
           /* EOF */
@@ -241,7 +248,7 @@ CODE:
         }
         if (got != 1) {
         READ_ERROR:
-          DEBUG1 (fprintf (stderr, "read fp=%"UVxf" got=%d\n",
+          MY_DEBUG1 (fprintf (stderr, "read fp=%"UVxf" got=%d\n",
                            PTR2UV(fp), got));
           if (got < 0) {
             croak ("Error reading database");
@@ -253,18 +260,18 @@ CODE:
 
         adj = (I8) adj_u.buf[0];
         if (adj == -128) {
-          DEBUG1 (fprintf (stderr, "two-byte adj\n"));
+          MY_DEBUG1 (fprintf (stderr, "two-byte adj\n"));
           got = PerlIO_read (fp, adj_u.buf, 2);
           if (got != 2) goto READ_ERROR;
-          DEBUG1 (fprintf (stderr, "raw %X,%X %X ntohs %X\n",
+          MY_DEBUG1 (fprintf (stderr, "raw %X,%X %X ntohs %X\n",
                   (int) (U8) adj_u.buf[0], (int) (U8) adj_u.buf[1],
                           adj_u.u16, ntohs(adj_u.u16)));
           adj = (int) (I16) ntohs(adj_u.u16);
         }
-        DEBUG1 (fprintf (stderr, "adj %"IVdf" %#"UVxf"\n", adj, adj));
+        MY_DEBUG1 (fprintf (stderr, "adj %"IVdf" %#"UVxf"\n", adj, adj));
 
         sharelen += adj;
-        DEBUG1 (fprintf (stderr, "sharelen %"IVdf" %#"UVxf"  SvCUR %d utf8 %d\n",
+        MY_DEBUG1 (fprintf (stderr, "sharelen %"IVdf" %#"UVxf"  SvCUR %d utf8 %d\n",
                         sharelen, sharelen,
                         SvCUR(entry), SvUTF8(entry)));
 
@@ -284,7 +291,7 @@ CODE:
 
         gets_ret = sv_gets (entry, fp, sharelen);
         if (gets_ret == NULL) goto UNEXPECTED_EOF;
-        DEBUG2 (fprintf (stderr,
+        MY_DEBUG2 (fprintf (stderr,
                          "entry gets to %u, chomp to %u, fpos now %lu(%#lx)\n",
                          SvCUR(entry), SvCUR(entry) - 1,
                          (unsigned long) PerlIO_tell(fp),
@@ -294,7 +301,7 @@ CODE:
 
         entry_p = SvPV(entry, entry_len);
         if (entry_len < 1 || entry_p[entry_len-1] != '\0') {
-          DEBUG1 (fprintf (stderr, "no NUL from sv_gets\n"));
+          MY_DEBUG1 (fprintf (stderr, "no NUL from sv_gets\n"));
           goto UNEXPECTED_EOF;
         }
         entry_len--;
@@ -309,14 +316,14 @@ CODE:
     }
     if (at_eof) {
       sv_setpv (entry, NULL);
-      DEBUG2 (fprintf (stderr, "eof\n  entry=\n");
+      MY_DEBUG2 (fprintf (stderr, "eof\n  entry=\n");
               sv_dump (entry);
               fprintf (stderr, "\n"));
       XSRETURN(0);
 
     } else {
       SvUV_set (sharelen_sv, sharelen);
-      DEBUG2 (fprintf (stderr, "return entry=\n");
+      MY_DEBUG2 (fprintf (stderr, "return entry=\n");
               sv_dump (entry);
               fprintf (stderr, "\n"));
 

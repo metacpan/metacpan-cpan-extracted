@@ -1,3 +1,15 @@
+v0.98.16 2019-11-11T15:19:03Z
+ - docker build improvements
+ - .dockerignore parser improved
+ - dockerfile
+ - resources updated
+ - sql values fixed
+ - dist veersion string
+ - pcore log fixed for empty git repo
+ - cli help improved
+ - git windows fix
+ - git command fixed
+
 v0.98.15 2019-11-06T10:23:33Z
  - migrating to git
 

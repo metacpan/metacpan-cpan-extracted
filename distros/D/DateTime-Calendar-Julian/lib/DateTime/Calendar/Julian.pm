@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION @ISA);
 
-$VERSION = '0.101';
+$VERSION = '0.102';
 
 use DateTime 0.08;
 @ISA = 'DateTime';
@@ -90,10 +90,13 @@ sub gregorian_deviation {
     return _floor($year/100)-_floor($year/400)-2;
 }
 
+# NOTE: Do NOT just default the separator to 'J' and delegate to SUPER.
+# This will not work before DateTime 1.43 because before that the
+# datetime() method did not have an argument.
 sub datetime {
-    my $self = shift;
-
-    return join 'J', $self->ymd, $self->hms(':');
+    my ( $self, $sep ) = @_;
+    $sep = 'J' unless defined $sep;
+    return join $sep, $self->ymd( '-' ), $self->hms( ':' );
 }
 
 1;
@@ -143,9 +146,22 @@ calendar.
 
 =item * datetime
 
-This method is now equivalent to:
+  print $dt->datetime( $sep ), "\n";
 
-  $dt->ymd('-') . 'J' . $dt->hms(:)
+This method is equivalent to
+
+  join $sep, $dt->ymd( '-' ), $dt->hms( ':' );
+
+The C<$sep> argument defaults to C<'J'>.
+
+B<Caveat:> the optional argument was added to this method in version
+1.02, to belatedly track a change made in L<DateTime|DateTime> version
+1.43 released 2017-05-29. Fixing this restores the original
+stringification behavior of this class, which was to return an ISO-8601
+string unless a formatter was set. Before this change, the
+stringification separated date and time with either a C<'T'> or a
+C<'J'>, depending on which version of L<DateTime|DateTime> was
+installed.
 
 =back
 

@@ -1,0 +1,15 @@
+README for threads::shared::queue::any
+
+Drop-in replacement for threads::shared::queue that allows any (unshared)
+data-structure to be passed between threads by means of a queue.
+
+Copyright (c) 2002 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

@@ -1,5 +1,19 @@
 Revision history for App-Qmail-DMARC
 
+0.61    2019-11-09 20:50
+        Better solution for not adding debug messages during
+        exceptions which occured in an eval
+
+0.60    2019-11-09 14:57
+        Switched to Mail::SPF due to issues with non-standard result
+        codes (like "unknown") returned by Mail::SPF::Query
+
+0.51    2019-06-30 18:08
+        Do not end feedback message to qmail with newline.
+
+0.50    2019-04-02 00:53
+        Do no longer enforce special rules for local domains.
+
 0.43    2019-03-29 03:49
         Do not pass empty RFC5321.MailFrom to Mail::DMARC::PurePerl,
         because it does not like that.

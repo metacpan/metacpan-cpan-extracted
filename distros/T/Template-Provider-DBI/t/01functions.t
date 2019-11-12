@@ -12,9 +12,9 @@ if(!$ENV{DBI_DSN})
 }
 
 BEGIN {
-    eval { use DBD::SQLite; };
+    eval { require DBD::SQLite; require DateTime::Format::SQLite; 1; };
     plan $@ 
-        ? ( skip_all => 'needs DBD::SQLite for testing' )
+        ? ( skip_all => 'needs DBD::SQLite and DateTime::Format::SQLite for testing' )
         : ( tests => 4 );
 }
 
@@ -22,8 +22,8 @@ my @auth = ();
 @auth = ($ENV{DBI_USER}, $ENV{DBI_PASSWD}) if(defined $ENV{DBI_USER} && defined $ENV{DBI_PASSWD});
 
 my $dbh = DBI->connect($ENV{DBI_DSN}, @auth) or die "Couldn't connect to a database! $DBI::errstr";
-# my $newtable = "CREATE TABLE templates (filename VARCHAR(30), modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP, template VARCHAR(1024))";
-my $newtable = "CREATE TABLE templates (filename VARCHAR(30), template VARCHAR(1024))";
+my $newtable = "CREATE TABLE templates (filename VARCHAR(30), modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP, template VARCHAR(1024))";
+#my $newtable = "CREATE TABLE templates (filename VARCHAR(30), template VARCHAR(1024))";
 
 $dbh->do($newtable) or die "Couldn't create table in DB $DBI::errstr";
 
@@ -57,4 +57,4 @@ is($output, 'A DBI template: Inserted text', 'Parsed template');
 
 $dbh->do("DROP TABLE templates");
 
-# unlink './testing.db';
+unlink './testing.db';

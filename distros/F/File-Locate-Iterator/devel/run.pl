@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2017, 2018 Kevin Ryde
+# Copyright 2009, 2010, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -27,6 +27,42 @@ $|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
+
+{
+  # .pdf files
+  my $it = File::Locate::Iterator->new (glob => '/usr/share/doc/texlive-doc/*.pdf');
+  my @prev;
+  my $count = 0;
+  while (defined(my $filename = $it->next)) {
+    next unless -e $filename;
+    $count++;
+    print "$filename\n";
+  }
+  print "$count backups\n";
+  exit 0;
+}
+{
+  # Emacs backups foo.txt~ without their original file
+
+  my $it = File::Locate::Iterator->new;
+  my @prev;
+  my $count = 0;
+  while (defined(my $this = $it->next)) {
+    if ($this =~ /[^.]~$/) {
+      $count++;
+      my $len = length($this)-1;
+      unless (defined $prev[$len] && $prev[$len] eq substr($this,0,$len)) {
+        if (-e $this) {
+          print "$this\n";
+        }
+      }
+    } else {
+      $prev[length($this)] = $this;
+    }
+  }
+  print "$count backups\n";
+  exit 0;
+}
 
 {
   require PerlIO::via::Base64;
@@ -79,28 +115,7 @@ use Smart::Comments;
   print "$count png files, $count_bad bad\n";
   exit 0;
 }
-{
-  # Emacs backups foo.txt~ without their original file
 
-  my $it = File::Locate::Iterator->new;
-  my @prev;
-  my $count = 0;
-  while (defined(my $this = $it->next)) {
-    if ($this =~ /[^.]~$/) {
-      $count++;
-      my $len = length($this)-1;
-      unless (defined $prev[$len] && $prev[$len] eq substr($this,0,$len)) {
-        if (-e $this) {
-          print "$this\n";
-        }
-      }
-    } else {
-      $prev[length($this)] = $this;
-    }
-  }
-  print "$count backups\n";
-  exit 0;
-}
 {
   use warnings 'layer';
   require File::Map;

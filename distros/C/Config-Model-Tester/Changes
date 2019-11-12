@@ -1,9 +1,14 @@
+4.004 2019-11-10
+
+  Main change:
+  * test setup can now create symlink to actual files.
+
 4.003 2019-05-09
 
   Bug fixes:
     * require perl 5.12.0 in dist.ini
 
-  Mist:
+  Misc:
     * update copyright year
 
 4.002 2019-05-01

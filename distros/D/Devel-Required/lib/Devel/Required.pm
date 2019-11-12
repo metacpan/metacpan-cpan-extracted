@@ -1,7 +1,7 @@
 package Devel::Required;
 
 # set version information
-$VERSION= '0.14';
+$VERSION= '0.15';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -251,7 +251,7 @@ Devel::Required - automatic update of required modules documentation
 
 =head1 VERSION
 
-This documentation describes version 0.14.
+This documentation describes version 0.15.
 
 =head1 SYNOPSIS
 
@@ -440,6 +440,8 @@ The version information is read from the generated "Makefile".
 =head1 AUTHOR
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>.
 
 Please report bugs to <perlbugs@dijkmat.nl>.
 

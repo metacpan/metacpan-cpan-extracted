@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Data::NFA;
-our $VERSION = "20191105";
+our $VERSION = 20191110;
 require v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -16,6 +16,9 @@ use utf8;
 
 # NFA : bless {state=>{symbol=>state}, jumps=>{state=>1}, final=>defined if final, return=>state to return to}
 # Jumps are instead of a transition not after a transition
+
+my $logFile = q(/home/phil/z/z/z/zzz.txt);                                      # Log printed results if developing
+
 sub Element   {q(element)}                                                      # Element of a regular expression.
 sub Sequence  {q(sequence)}                                                     # Sequence of regular expressions.
 sub Optional  {q(optional)}                                                     # Optional regular expression.
@@ -63,7 +66,12 @@ sub except(@)                                                                   
 
 #D1 Non deterministic finite state machine                                      # Create a non deterministic finite state machine to represent a regular expression.
 
-sub newState(%)                                                                 #P Create a new NFA state.
+sub newNfa(%)                                                                   #P Create a new NFA
+ {my (%options) = @_;                                                           # Options
+  bless {}, q(Data::NFA);
+ }
+
+sub newNfaState(%)                                                              #P Create a new NFA state.
  {my (%options) = @_;                                                           # Options
 
   my $r = genHash(q(Data::NFA::State),                                          # NFA State
@@ -77,6 +85,12 @@ sub newState(%)                                                                 
   $r
  }
 
+sub addNewState(%)                                                              #P Create a new NFA state and add it to an NFA created with L<newNfa>.
+ {my ($nfa) = @_;                                                               # Nfa
+  my $n = keys %$nfa;
+  $$nfa{$n} = newNfaState;
+ }
+
 sub fromExpr2($$$)                                                              #P Create an NFA from a regular expression.
  {my ($states, $expr, $symbols) = @_;                                           # States, regular expression constructed from L<element|/element> L<sequence|/sequence> L<optional|/optional> L<zeroOrMore|/zeroOrMore> L<oneOrMore|/oneOrMore> L<choice|/choice>, set of symbols used by the NFA.
   $states  //= {};
@@ -85,7 +99,7 @@ sub fromExpr2($$$)                                                              
 
   my $save   = sub                                                              # Save as a new state
    {my ($transitions, $jumps, $final) = @_;                                     # Transitions, jumps, final
-    my $s = $states->{&$next} = newState
+    my $s = $states->{&$next} = newNfaState
      (transitions=>$transitions, jumps=>$jumps, final=>$final);
     $s;
    };
@@ -205,8 +219,10 @@ sub statesReachableViaJumps($$)                                                 
    {my $stateName = pop @check;
     next if $checked{$stateName}++;
     confess "No such state: $stateName" unless my $state = $$states{$stateName};
-    $reachable{$_}++ for sort keys $state->jumps->%*;                           # States that can be reached via jumps
-    push @check, sort keys $state->jumps->%*;                                   # Make a jump and try again
+    for my $s(sort keys $state->jumps->%*)                                      # States that can be reached via jumps
+     {$reachable{$s}++;                                                         # New state to check
+      push @check, $s;
+     }
    }
 
   [sort keys %reachable]
@@ -242,7 +258,7 @@ sub fromExpr(@)                                                                 
   $symbols->($_) for @expression;                                               # Locate all symbols
 
   $states->fromExpr2($_, \%symbols) for @expression;                            # Create state transitions
-  $states->{keys %$states} = newState(final=>1);                                # End state
+  $states->{keys %$states} = newNfaState(final=>1);                                # End state
 
   for my $state(sort keys %$states)                                             # Collapse multiple jumps
    {$$states{$state}->jumps =
@@ -298,7 +314,11 @@ sub print($$)                                                                   
     my @j = sort keys %{$d->jumps};
     ++$j if @j > 0;
    }
-  if ($j) {&printWithJumps(@_)} else {&printWithOutJumps(@_)}
+
+  my $r = $j ? &printWithJumps(@_) : &printWithOutJumps(@_);                    # Print
+
+  owf($logFile, $r) if -e $logFile;                                             # Log the result if requested
+  $r                                                                            # Return the result
  }
 
 sub symbols($)                                                                  # Return an array of all the transition symbols.
@@ -370,7 +390,7 @@ sub allTransitions($)                                                           
               for @{$$cache{$to} //= statesReachableViaJumps($states, $to)};    # Cache results of this expensive call
            }
           if (my $jumps = $state->jumps)
-           {#push @check, keys %$jumps;                                          # Make a jump and try again
+           {push @check, sort keys %$jumps;                                     # Make a jump and try again
            }
          }
 
@@ -489,7 +509,7 @@ END
 Non deterministic finite state machine from regular expression.
 
 
-Version "20191031".
+Version 20191110.
 
 
 The following sections describe the methods in each functional area of this
@@ -511,7 +531,7 @@ One element. An element can also be represented by a string or number
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                          
     my $nfa = fromExpr(𝗲𝗹𝗲𝗺𝗲𝗻𝘁("a"));
     ok $nfa->print("Element: a") eq <<END;
   Element: a
@@ -526,7 +546,7 @@ B<Example:>
     ok !$nfa->parse(qw(b));
     ok !$nfa->parse(qw(b a));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -543,7 +563,7 @@ Sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $nfa = fromExpr(𝘀𝗲𝗾𝘂𝗲𝗻𝗰𝗲(element("a"), element("b")));
     ok $nfa->print("Sequence: ab") eq <<END;
   Sequence: ab
@@ -557,7 +577,7 @@ B<Example:>
     ok !$nfa->parse(qw(a));
     ok !$nfa->parse(qw(b));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -574,7 +594,7 @@ An optional sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $nfa = fromExpr(element("a"), 𝗼𝗽𝘁𝗶𝗼𝗻𝗮𝗹(element("b")), element("c"));
     ok $nfa->print("Optional: ab?c") eq <<END;
   Optional: ab?c
@@ -588,7 +608,7 @@ B<Example:>
     ok  $nfa->parse(qw(a c));
     ok !$nfa->parse(qw(a c b));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -605,7 +625,7 @@ Zero or more repetitions of a sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $nfa = fromExpr(element("a"), 𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲(element("b")), element("c"));
     ok $nfa->print("Zero Or More: ab*c") eq <<END;
   Zero Or More: ab*c
@@ -621,8 +641,8 @@ B<Example:>
     ok  $nfa->parse(qw(a b b c));
     ok !$nfa->parse(qw(a b b d));
    }
-
-  if (1) {
+  
+  if (1) {                                                                        
     my $nfa = fromExpr(element("a"),
                        𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲(choice(element("a"),
                        element("a"))),
@@ -638,17 +658,17 @@ B<Example:>
          5     { a => 6 }   undef
          6  1  undef        undef
   END
-
+  
     is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(1, "a");
     is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(2, "a");
     is_deeply [1, 3, 4, 5], $nfa->statesReachableViaSymbol(3, "a");
-
+  
     ok !$nfa->parse(qw(a));
     ok  $nfa->parse(qw(a a));
     ok  $nfa->parse(qw(a a a));
     ok !$nfa->parse(qw(a b a));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -665,9 +685,9 @@ One or more repetitions of a sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $nfa = fromExpr(element("a"), 𝗼𝗻𝗲𝗢𝗿𝗠𝗼𝗿𝗲(element("b")), element("c"));
-
+  
     ok $nfa->print("One or More: ab+c") eq <<END;
   One or More: ab+c
   Location  F  Transitions  Jumps
@@ -677,17 +697,17 @@ B<Example:>
          3     { c => 4 }   undef
          4  1  undef        undef
   END
-
+  
     is_deeply [],     $nfa->statesReachableViaSymbol(2,"a");
     is_deeply [1..3], $nfa->statesReachableViaSymbol(2,"b");
     is_deeply [4],    $nfa->statesReachableViaSymbol(2,"c");
-
+  
     ok !$nfa->parse(qw(a c));
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a b b c));
     ok !$nfa->parse(qw(a b b d));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -704,7 +724,7 @@ Choice from amongst one or more elements and/or symbols.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $nfa = fromExpr(element("a"),
                        𝗰𝗵𝗼𝗶𝗰𝗲(element("b"), element("c")),
                        element("d"));
@@ -718,17 +738,17 @@ B<Example:>
          4     { d => 5 }   undef
          5  1  undef        undef
   END
-
+  
     is_deeply [],     $nfa->statesReachableViaSymbol(1, "a");
     is_deeply [2, 4], $nfa->statesReachableViaSymbol(1, "b");
     is_deeply [4],    $nfa->statesReachableViaSymbol(1, "c");
     is_deeply ['a'..'d'], [$nfa->symbols];
-
+  
     ok  $nfa->parse(qw(a b d));
     ok  $nfa->parse(qw(a c d));
     ok !$nfa->parse(qw(a b c d));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -745,9 +765,9 @@ Choice from amongst all symbols except the ones mentioned
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $nfa = fromExpr(choice(qw(a b c)), 𝗲𝘅𝗰𝗲𝗽𝘁(qw(c x)), choice(qw(a b c)));
-
+  
     ok $nfa->print("(a|b|c)(c!x)(a|b|c):") eq <<END;
   (a|b|c)(c!x)(a|b|c):
   Location  F  Transitions  Jumps
@@ -766,12 +786,12 @@ B<Example:>
         12     { c => 13 }  undef
         13  1  undef        undef
   END
-
+  
     ok !$nfa->parse(qw(a a));
     ok  $nfa->parse(qw(a a a));
     ok !$nfa->parse(qw(a c a));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -792,14 +812,14 @@ Create an NFA from a regular B<@expression>.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $nfa = 𝗳𝗿𝗼𝗺𝗘𝘅𝗽𝗿
      (element("a"),
       oneOrMore(choice(qw(b c))),
       optional(element("d")),
       element("e")
      );
-
+  
     ok $nfa->print("a(b|c)+d?e :") eq <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
@@ -812,16 +832,16 @@ B<Example:>
          6     { e => 7 }   undef
          7  1  undef        undef
   END
-
-
+  
+  
     is_deeply ['a'..'e'], [$nfa->symbols];
-
+  
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
    }
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -839,14 +859,14 @@ Print the current B<$states> of the non deterministic finite state automaton usi
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $nfa = fromExpr
      (element("a"),
       oneOrMore(choice(qw(b c))),
       optional(element("d")),
       element("e")
      );
-
+  
     ok $nfa->𝗽𝗿𝗶𝗻𝘁("a(b|c)+d?e :") eq <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
@@ -859,16 +879,16 @@ B<Example:>
          6     { e => 7 }   undef
          7  1  undef        undef
   END
-
-
+  
+  
     is_deeply ['a'..'e'], [$nfa->symbols];
-
+  
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
    }
-
+  
 
 =head2 symbols($)
 
@@ -880,14 +900,14 @@ Return an array of all the transition symbols.
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                           
     my $nfa = fromExpr
      (element("a"),
       oneOrMore(choice(qw(b c))),
       optional(element("d")),
       element("e")
      );
-
+  
     ok $nfa->print("a(b|c)+d?e :") eq <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
@@ -900,16 +920,16 @@ B<Example:>
          6     { e => 7 }   undef
          7  1  undef        undef
   END
-
-
+  
+  
     is_deeply ['a'..'e'], [$nfa->𝘀𝘆𝗺𝗯𝗼𝗹𝘀];
-
+  
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
    }
-
+  
 
 =head2 isFinal($$)
 
@@ -922,7 +942,7 @@ Whether, in the B<$states> specifying an NFA the named state B<$state> is a fina
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                          
     my $nfa = fromExpr(element("a"));
     ok $nfa->print("Element: a") eq <<END;
   Element: a
@@ -937,7 +957,7 @@ B<Example:>
     ok !$nfa->parse(qw(b));
     ok !$nfa->parse(qw(b a));
    }
-
+  
 
 =head2 allTransitions($)
 
@@ -949,11 +969,11 @@ Return all transitions in the NFA specified by B<$states> as {stateName}{symbol}
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                        
     my $s = q(zeroOrMore(choice(element("a"))));
-
+  
     my $nfa = eval qq(fromExpr(sequence($s,$s)));
-
+  
     ok $nfa->print("a*a* 1:") eq <<END;
   a*a* 1:
   Location  F  Transitions  Jumps
@@ -963,26 +983,37 @@ B<Example:>
          3  1  undef        [2, 4]
          4  1  undef        undef
   END
-
+  
     is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(0, q(a));
     is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(1, q(a));
     is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(2, q(a));
     is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(3, q(a));
-
+  
     ok  $nfa->parse(qw());
     ok  $nfa->parse(qw(a));
     ok  $nfa->parse(qw(a a));
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b a));
-
-    is_deeply $nfa->𝗮𝗹𝗹𝗧𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀, {
-    "0" => { a => [0, 1, 2, 4] },
-    "1" => { a => [] },
+  
+    is_deeply $nfa->𝗮𝗹𝗹𝗧𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀,  {
+    "0" => { a => [0 .. 4] },
+    "1" => { a => [0 .. 4] },
     "2" => { a => [2, 3, 4] },
-    "3" => { a => [] },
+    "3" => { a => [2, 3, 4] },
     "4" => { a => [] },
-   };
-
+  };
+  
+    ok $nfa->print("a*a* 2:") eq <<END;
+  a*a* 2:
+  Location  F  Transitions  Jumps
+         0  1  { a => 1 }   [2, 4]
+         1  1  undef        [0, 2, 4]
+         2  1  { a => 3 }   [4]
+         3  1  undef        [2, 4]
+         4  1  undef        undef
+  END
+   }
+  
 
 =head2 parse($@)
 
@@ -995,7 +1026,7 @@ Parse, using the NFA specified by B<$states>, the list of symbols in L<@symbols>
 B<Example:>
 
 
-  if (1) {
+  if (1) {                                                                          
     my $nfa = fromExpr(element("a"));
     ok $nfa->print("Element: a") eq <<END;
   Element: a
@@ -1010,7 +1041,7 @@ B<Example:>
     ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(b));
     ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(b a));
    }
-
+  
 
 
 =head2 Data::NFA::State Definition
@@ -1034,12 +1065,26 @@ B<transitions> - {symbol => state} : transitions from this state consuming one i
 
 =head1 Private Methods
 
-=head2 newState(%)
+=head2 newNfa(%)
+
+Create a new NFA
+
+     Parameter  Description
+  1  %options   Options
+
+=head2 newNfaState(%)
 
 Create a new NFA state.
 
      Parameter  Description
   1  %options   Options
+
+=head2 addNewState(%)
+
+Create a new NFA state and add it to an NFA created with L<newNfa>.
+
+     Parameter  Description
+  1  $nfa       Nfa
 
 =head2 fromExpr2($$$)
 
@@ -1118,51 +1163,55 @@ Parse an array of symbols
 =head1 Index
 
 
-1 L<allTransitions|/allTransitions> - Return all transitions in the NFA specified by B<$states> as {stateName}{symbol} = [reachable states].
+1 L<addNewState|/addNewState> - Create a new NFA state and add it to an NFA created with L<newNfa>.
 
-2 L<choice|/choice> - Choice from amongst one or more elements and/or symbols.
+2 L<allTransitions|/allTransitions> - Return all transitions in the NFA specified by B<$states> as {stateName}{symbol} = [reachable states].
 
-3 L<element|/element> - One element.
+3 L<choice|/choice> - Choice from amongst one or more elements and/or symbols.
 
-4 L<except|/except> - Choice from amongst all symbols except the ones mentioned
+4 L<element|/element> - One element.
 
-5 L<fromExpr|/fromExpr> - Create an NFA from a regular B<@expression>.
+5 L<except|/except> - Choice from amongst all symbols except the ones mentioned
 
-6 L<fromExpr2|/fromExpr2> - Create an NFA from a regular expression.
+6 L<fromExpr|/fromExpr> - Create an NFA from a regular B<@expression>.
 
-7 L<isFinal|/isFinal> - Whether, in the B<$states> specifying an NFA the named state B<$state> is a final state.
+7 L<fromExpr2|/fromExpr2> - Create an NFA from a regular expression.
 
-8 L<newState|/newState> - Create a new NFA state.
+8 L<isFinal|/isFinal> - Whether, in the B<$states> specifying an NFA the named state B<$state> is a final state.
 
-9 L<oneOrMore|/oneOrMore> - One or more repetitions of a sequence of elements and/or symbols.
+9 L<newNfa|/newNfa> - Create a new NFA
 
-10 L<optional|/optional> - An optional sequence of elements and/or symbols.
+10 L<newNfaState|/newNfaState> - Create a new NFA state.
 
-11 L<parse|/parse> - Parse, using the NFA specified by B<$states>, the list of symbols in L<@symbols>.
+11 L<oneOrMore|/oneOrMore> - One or more repetitions of a sequence of elements and/or symbols.
 
-12 L<parse2|/parse2> - Parse an array of symbols
+12 L<optional|/optional> - An optional sequence of elements and/or symbols.
 
-13 L<print|/print> - Print the current B<$states> of the non deterministic finite state automaton using the specified B<$title>.
+13 L<parse|/parse> - Parse, using the NFA specified by B<$states>, the list of symbols in L<@symbols>.
 
-14 L<printFinalState|/printFinalState> - Print the final field of the specified B<$state>.
+14 L<parse2|/parse2> - Parse an array of symbols
 
-15 L<printWithJumps|/printWithJumps> - Print the current B<$states> of an NFA with jumps using the specvified B<$title>.
+15 L<print|/print> - Print the current B<$states> of the non deterministic finite state automaton using the specified B<$title>.
 
-16 L<printWithOutJumps|/printWithOutJumps> - Print the current B<$states> of an NFA without jumps using  the specified B<$title>.
+16 L<printFinalState|/printFinalState> - Print the final field of the specified B<$state>.
 
-17 L<propagateFinalState|/propagateFinalState> - Mark the B<$states> that can reach the final state with a jump as final.
+17 L<printWithJumps|/printWithJumps> - Print the current B<$states> of an NFA with jumps using the specvified B<$title>.
 
-18 L<removeEmptyFields|/removeEmptyFields> - Remove empty fields from the B<states> representing an NFA.
+18 L<printWithOutJumps|/printWithOutJumps> - Print the current B<$states> of an NFA without jumps using  the specified B<$title>.
 
-19 L<sequence|/sequence> - Sequence of elements and/or symbols.
+19 L<propagateFinalState|/propagateFinalState> - Mark the B<$states> that can reach the final state with a jump as final.
 
-20 L<statesReachableViaJumps|/statesReachableViaJumps> - Find the names of all the B<$states> that can be reached from a specified B<$stateName> via jumps alone.
+20 L<removeEmptyFields|/removeEmptyFields> - Remove empty fields from the B<states> representing an NFA.
 
-21 L<statesReachableViaSymbol|/statesReachableViaSymbol> - Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
+21 L<sequence|/sequence> - Sequence of elements and/or symbols.
 
-22 L<symbols|/symbols> - Return an array of all the transition symbols.
+22 L<statesReachableViaJumps|/statesReachableViaJumps> - Find the names of all the B<$states> that can be reached from a specified B<$stateName> via jumps alone.
 
-23 L<zeroOrMore|/zeroOrMore> - Zero or more repetitions of a sequence of elements and/or symbols.
+23 L<statesReachableViaSymbol|/statesReachableViaSymbol> - Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
+
+24 L<symbols|/symbols> - Return an array of all the transition symbols.
+
+25 L<zeroOrMore|/zeroOrMore> - Zero or more repetitions of a sequence of elements and/or symbols.
 
 =head1 Installation
 
@@ -1514,13 +1563,13 @@ END
   ok !$nfa->parse(qw(a b));
   ok !$nfa->parse(qw(b a));
 
-  is_deeply $nfa->allTransitions, {
-  "0" => { a => [0, 1, 2, 4] },
-  "1" => { a => [] },
+  is_deeply $nfa->allTransitions,  {
+  "0" => { a => [0 .. 4] },
+  "1" => { a => [0 .. 4] },
   "2" => { a => [2, 3, 4] },
-  "3" => { a => [] },
+  "3" => { a => [2, 3, 4] },
   "4" => { a => [] },
- };
+};
 
   ok $nfa->print("a*a* 2:") eq <<END;
 a*a* 2:
@@ -1587,8 +1636,6 @@ END
   ok !$nfa->parse(qw(a c a));
  }
 
-latestTest:;
-
 if (1) {
   my $nfa = fromExpr(sequence(qw(a b c)), except(qw(c x)));
 
@@ -1608,6 +1655,8 @@ END
   ok  $nfa->parse(qw(a b c b));
   ok !$nfa->parse(qw(a b c c));
  }
+
+latestTest:;
 
 done_testing;
 #owf(q(/home/phil/z/z/z/zzz.txt), dump($nfa));

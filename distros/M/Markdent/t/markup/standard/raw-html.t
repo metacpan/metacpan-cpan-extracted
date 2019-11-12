@@ -483,4 +483,37 @@ EOF
     parse_ok( $text, $expect, 'two wrapped html entities' );
 }
 
+{
+    my $src  = 'http://example.com/image.png';
+    my $alt  = 'Alt text with spaces';
+    my $text = <<"EOF";
+This image: <img src="$src" alt="$alt">
+EOF
+
+    my $expect = [
+        {
+            type => 'paragraph',
+        },
+        [
+            {
+                type => 'text',
+                text => 'This image: ',
+            }, {
+                type       => 'html_tag',
+                tag        => 'img',
+                attributes => {
+                    alt => $alt,
+                    src => $src,
+                },
+            },
+            {
+                type => 'text',
+                text => "\n",
+            },
+        ],
+    ];
+
+    parse_ok( $text, $expect, 'html in a block' );
+}
+
 done_testing();

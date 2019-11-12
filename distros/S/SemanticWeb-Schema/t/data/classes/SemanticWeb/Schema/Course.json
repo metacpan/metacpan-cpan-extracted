@@ -19,9 +19,9 @@
          "rdfs:label" : "coursePrerequisites",
          "schema:domainIncludes" : "schema:Course",
          "schema:rangeIncludes" : [
-            "schema:AlignmentObject",
             "schema:Text",
-            "schema:Course"
+            "schema:Course",
+            "schema:AlignmentObject"
          ]
       },
       "schema:educationalCredentialAwarded" : {
@@ -35,8 +35,8 @@
             "schema:Course"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:URL",
+            "schema:Text",
             "schema:EducationalOccupationalCredential"
          ]
       },
@@ -59,9 +59,9 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:EducationalOccupationalCredential",
             "schema:URL",
-            "schema:Text",
-            "schema:EducationalOccupationalCredential"
+            "schema:Text"
          ]
       }
    }

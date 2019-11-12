@@ -1,6 +1,6 @@
 package Dancer::Plugin::Auth::Facebook;
 
-$Dancer::Plugin::Auth::Facebook::VERSION = '0.06';
+$Dancer::Plugin::Auth::Facebook::VERSION = '0.08';
 
 use strict;
 use warnings;
@@ -22,6 +22,7 @@ my $cb_fail;
 my $fb_scope;
 my @scope;
 my $me_fields;
+my $api_version;
 
 register 'auth_fb_init' => sub {
   my $config = plugin_setting;
@@ -33,6 +34,7 @@ register 'auth_fb_init' => sub {
   $cb_fail              = $config->{callback_fail}    || '/fail';
   $fb_scope             = $config->{scope};
   $me_fields            = $config->{fields};
+  $api_version          = $config->{api_version} || 'v4.0';
 
   if (defined $fb_scope) {
     foreach my $fs (split(/\s+/, $fb_scope)) {
@@ -51,6 +53,7 @@ register 'auth_fb_init' => sub {
   debug "new facebook with $application_id, $application_secret, $cb_url";
 
   $_FB = Net::Facebook::Oauth2->new(
+    api_version => $api_version,
     application_id => $application_id,  ##get this from your facebook developers platform
     application_secret => $application_secret, ##get this from your facebook developers platform
     callback => $cb_url,  ##Callback URL, facebook will redirect users after authintication
@@ -93,12 +96,13 @@ get '/auth/facebook/callback' => sub {
   }
 
   my $fb = Net::Facebook::Oauth2->new(
+      api_version => $api_version,
        access_token => $access_token,
   );
 
   my ($me, $fb_response);
   eval {
-    $fb_response = $fb->get( 'https://graph.facebook.com/v2.8/me' . ($me_fields ? "?fields=$me_fields" : '') );
+    $fb_response = $fb->get( 'https://graph.facebook.com/' . $api_version . '/me' . ($me_fields ? "?fields=$me_fields" : '') );
     $me = $fb_response->as_hash;
   };
   if ($@ || !$me) {
@@ -165,18 +169,21 @@ has a habit of changing which fields are returned on that endpoint. To force
 any particular fields, please use the C<fields> setting in your plugin
 configuration as shown below.
 
-Please refer to L<< Facebook's documentation | https://developers.facebook.com/docs/graph-api/reference/v2.8/user >>
+Please refer to L<< Facebook's documentation | https://developers.facebook.com/docs/graph-api/reference/v4.0/user >>
 for all available data.
 
 =head1 FACEBOOK GRAPH API VERSION
 
-This module complies to Facebook Graph API version 2.8, the latest
-at the time of publication, B<< scheduled for deprecation on October 5th, 2018 >>.
+This module complies to Facebook Graph API version 4.0, the latest
+at the time of publication, B<< scheduled for deprecation on August 3rd, 2021 >>.
 
 One month prior to that, Net::Facebook::Oauth2 (which this module uses to
 access Facebook's API) will trigger a warning message during your Dancer
 app's startup.
 
+If you want, you may override the default version by setting the C<api_version>
+variable in your settings. This sets the Graph API version in both this module
+and the underlying Net::Facebook::Oauth2 objects. The default value is "v4.0".
 
 =head1 PREREQUISITES
 
@@ -282,7 +289,7 @@ L<Catalyst::Authentication::Credential::Twitter> written by Jesse Stay.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2016 by Prajith Ndimensionz.
+This software is copyright (c) 2014-2019 by Prajith Ndimensionz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

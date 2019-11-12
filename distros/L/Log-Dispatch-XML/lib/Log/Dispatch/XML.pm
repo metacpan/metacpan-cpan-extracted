@@ -4,7 +4,7 @@ use base 'Log::Dispatch::Buffer';
 # Make sure we have version info for this module
 # Be strict from now on
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 use strict;
 
 # Satisfy require
@@ -123,6 +123,8 @@ message is put inside a CDATA section.
 =head1 AUTHOR
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Please report bugs to <perlbugs@dijkmat.nl>.
 

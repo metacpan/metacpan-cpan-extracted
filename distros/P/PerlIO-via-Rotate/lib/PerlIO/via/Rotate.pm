@@ -1,6 +1,6 @@
 package PerlIO::via::Rotate;
 
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # be strict and do everything on octets
 use strict;
@@ -178,7 +178,7 @@ PerlIO::via::Rotate - PerlIO layer for encoding using rotational deviation
 
 =head1 VERSION
 
-This documentation describes version 0.08.
+This documentation describes version 0.09.
 
 =head1 DESCRIPTION
 
@@ -223,6 +223,8 @@ in 10 years, that the module version check is done by UNIVERSAL::VERSION, and
 that you can bypass this by providing your own VERSION class method.
 
 =head1 COPYRIGHT
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Copyright (C) 2002, 2003, 2004, 2012 Elizabeth Mattijsen.  All rights reserved.
 This library is free software; you can redistribute it and/or modify it under

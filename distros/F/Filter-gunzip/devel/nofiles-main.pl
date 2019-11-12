@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with Filter-gunzip.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Running with Nofiles.pm hacking the open files limit.
 
 use strict;
 use warnings;

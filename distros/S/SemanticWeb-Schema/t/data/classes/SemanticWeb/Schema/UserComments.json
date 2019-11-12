@@ -34,8 +34,8 @@
             "schema:UserComments"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:discusses" : {

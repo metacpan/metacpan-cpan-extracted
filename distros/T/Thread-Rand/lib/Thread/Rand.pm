@@ -4,7 +4,7 @@ package Thread::Rand;
 use Thread::Tie ();
 
 # initializations
-$VERSION= '0.07';
+$VERSION= '0.08';
 
 # be as strict as possble
 use strict;
@@ -91,7 +91,7 @@ Thread::Rand - repeatable random sequences between threads
 
 =head1 VERSION
 
-This documentation describes version 0.07.
+This documentation describes version 0.08.
 
 =head1 SYNOPSIS
 

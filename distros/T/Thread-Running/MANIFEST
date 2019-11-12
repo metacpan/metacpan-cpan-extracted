@@ -9,3 +9,4 @@ t/Running01.t
 t/Running02.t
 t/Running03.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

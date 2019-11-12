@@ -24,7 +24,7 @@ my %module_build_args = (
     "Mattia Barbon <mattia\@barbon.org>"
   ],
   "dist_name" => "Alien-uPB",
-  "dist_version" => "0.12",
+  "dist_version" => "0.13",
   "license" => "perl",
   "module_name" => "Alien::uPB",
   "recursive_test_files" => 1

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use File::Slurper qw( read_text );
 

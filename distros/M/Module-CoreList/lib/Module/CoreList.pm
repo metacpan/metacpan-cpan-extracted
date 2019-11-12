@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20191020';
+our $VERSION = '5.20191110';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -355,6 +355,7 @@ sub changes_between {
     5.031003 => '2019-08-20',
     5.031004 => '2019-09-20',
     5.031005 => '2019-10-20',
+    5.030001 => '2019-11-10',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -16850,6 +16851,17 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.030001 => {
+        delta_from => 5.030000,
+        changed => {
+            'B::Op_private'         => '5.030001',
+            'Config'                => '5.030001',
+            'Module::CoreList'      => '5.20191110',
+            'Module::CoreList::Utils'=> '5.20191110',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -17894,6 +17906,13 @@ sub is_core
         removed => {
         }
     },
+    5.030001 => {
+        delta_from => 5.030000,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -18117,8 +18136,12 @@ sub is_core
     'PerlIO::via::QuotedPrint'=> 'cpan',
     'Pod::Checker'          => 'cpan',
     'Pod::Escapes'          => 'cpan',
+    'Pod::Find'             => 'cpan',
+    'Pod::InputObjects'     => 'cpan',
     'Pod::Man'              => 'cpan',
     'Pod::ParseLink'        => 'cpan',
+    'Pod::ParseUtils'       => 'cpan',
+    'Pod::Parser'           => 'cpan',
     'Pod::Perldoc'          => 'cpan',
     'Pod::Perldoc::BaseTo'  => 'cpan',
     'Pod::Perldoc::GetOptsOO'=> 'cpan',
@@ -18132,6 +18155,8 @@ sub is_core
     'Pod::Perldoc::ToText'  => 'cpan',
     'Pod::Perldoc::ToTk'    => 'cpan',
     'Pod::Perldoc::ToXml'   => 'cpan',
+    'Pod::PlainText'        => 'cpan',
+    'Pod::Select'           => 'cpan',
     'Pod::Simple'           => 'cpan',
     'Pod::Simple::BlackBox' => 'cpan',
     'Pod::Simple::Checker'  => 'cpan',
@@ -18141,7 +18166,6 @@ sub is_core
     'Pod::Simple::HTML'     => 'cpan',
     'Pod::Simple::HTMLBatch'=> 'cpan',
     'Pod::Simple::HTMLLegacy'=> 'cpan',
-    'Pod::Simple::JustPod'  => 'cpan',
     'Pod::Simple::LinkSection'=> 'cpan',
     'Pod::Simple::Methody'  => 'cpan',
     'Pod::Simple::Progress' => 'cpan',
@@ -18539,8 +18563,12 @@ sub is_core
     'PerlIO::via::QuotedPrint'=> undef,
     'Pod::Checker'          => undef,
     'Pod::Escapes'          => undef,
+    'Pod::Find'             => undef,
+    'Pod::InputObjects'     => undef,
     'Pod::Man'              => 'https://rt.cpan.org/Dist/Display.html?Name=podlators',
     'Pod::ParseLink'        => 'https://rt.cpan.org/Dist/Display.html?Name=podlators',
+    'Pod::ParseUtils'       => undef,
+    'Pod::Parser'           => undef,
     'Pod::Perldoc'          => undef,
     'Pod::Perldoc::BaseTo'  => undef,
     'Pod::Perldoc::GetOptsOO'=> undef,
@@ -18554,6 +18582,8 @@ sub is_core
     'Pod::Perldoc::ToText'  => undef,
     'Pod::Perldoc::ToTk'    => undef,
     'Pod::Perldoc::ToXml'   => undef,
+    'Pod::PlainText'        => undef,
+    'Pod::Select'           => undef,
     'Pod::Simple'           => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::BlackBox' => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::Checker'  => 'https://github.com/perl-pod/pod-simple/issues',
@@ -18563,7 +18593,6 @@ sub is_core
     'Pod::Simple::HTML'     => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::HTMLBatch'=> 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::HTMLLegacy'=> 'https://github.com/perl-pod/pod-simple/issues',
-    'Pod::Simple::JustPod'  => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::LinkSection'=> 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::Methody'  => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::Progress' => 'https://github.com/perl-pod/pod-simple/issues',

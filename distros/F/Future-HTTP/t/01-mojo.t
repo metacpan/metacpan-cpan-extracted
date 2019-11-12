@@ -19,6 +19,18 @@ if( !$ok) {
 
 plan tests => 11;
 
+delete @ENV{ qw[
+    HTTP_PROXY
+    http_proxy
+    HTTP_PROXY_ALL
+    http_proxy_all
+    HTTPS_PROXY
+    https_proxy
+    CGI_HTTP_PROXY
+    ALL_PROXY
+    all_proxy
+] };
+
 diag( "Version of Mojolicious: " . Mojolicious->VERSION );
 
 my $server = Test::HTTP::LocalServer->spawn(

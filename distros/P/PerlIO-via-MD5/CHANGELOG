@@ -1,3 +1,6 @@
+0.08	9 November 2019
+	Adoption.
+
 0.07	5 April 2012
 	Brought up to date to current code esthetics.  Verified it runs with
 	5.14.2, threaded and unthreaded.

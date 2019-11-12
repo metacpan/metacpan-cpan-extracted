@@ -16,6 +16,18 @@ if( !$ok) {
     exit;
 };
 
+delete @ENV{ qw[
+    HTTP_PROXY
+    http_proxy
+    HTTP_PROXY_ALL
+    http_proxy_all
+    HTTPS_PROXY
+    https_proxy
+    CGI_HTTP_PROXY
+    ALL_PROXY
+    all_proxy
+] };
+
 diag( "Version of AnyEvent::HTTP: " . AnyEvent::HTTP->VERSION );
 
 my $server = Test::HTTP::LocalServer->spawn(

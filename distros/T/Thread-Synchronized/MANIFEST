@@ -7,3 +7,4 @@ Makefile.PL
 lib/Thread/Synchronized.pm
 t/Synchronized.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

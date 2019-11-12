@@ -1,4 +1,4 @@
-Google-RestApi version 0.1
+Google-RestApi version 0.3
 ==========================
 
 This a collection of modules that is used for interfacing with
@@ -10,6 +10,13 @@ VERSION
 0.1 Initial version, beta status, partial support for Drive
 and more comprehensive support for Sheets. New versions will
 continue to build out these two APIs to be more complete.
+
+0.2 Breaking change to OAuth2 login procedure. Minor updates
+to POD, debug messages, comments etc.
+
+0.3 Added an attrs cache, removed testing dependency for
+Spreadsheets::Perl, fixed and added more tests.
+
 
 INSTALLATION
 
@@ -28,6 +35,7 @@ This module requires these other modules and libraries:
   autodie 
   autovivification
   constant
+  Cache::Memory::Simple
   Carp
   Exporter
   Furl 
@@ -50,13 +58,6 @@ This module requires these other modules and libraries:
   Test::Class::Load
   Test::MockObject::Extends
   Test::Most
-  Spreadsheet::Perl
-
-'make test' currently uses Spreadsheet::Perl. I tried using
-this to mock a Google Sheets spreadsheet in local memory,
-but it turned out to be not practical. I have to remove it
-and come up with some other method of mocking. It works for
-now but does require this for testing.
 
 COPYRIGHT AND LICENCE
 

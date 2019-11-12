@@ -35,7 +35,7 @@
    "provides" : {
       "Net::LibIDN2" : {
          "file" : "lib/Net/LibIDN2.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -51,5 +51,5 @@
          "url" : "https://github.com/gnuthor/Net--LibIDN2"
       }
    },
-   "version" : "1.00"
+   "version" : "1.01"
 }

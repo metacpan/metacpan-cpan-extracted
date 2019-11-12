@@ -50,7 +50,6 @@ my %test_data = (timestamp => "2003-03-19 08:09:56",
 
 $store->store( %test_data );
 
-row_ok( table => "blogged",
-	where => [ 1 => 1 ],
+row_ok( sql   => "SELECT * FROM blogged",
         tests => [ %test_data ],
-	label => "can store stuff" );
+        label => "can store stuff" );

@@ -1,0 +1,11 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/Benchmark/Thread/Size.pm
+t/Size01.t
+t/Size02.t
+META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

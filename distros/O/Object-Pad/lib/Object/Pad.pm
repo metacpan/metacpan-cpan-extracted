@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 
@@ -60,15 +60,30 @@ private variables that look like lexicals as object member fields.
       ...
    }
 
+   class Name;
+
 Behaves similarly to the C<package> keyword, but provides a package that
 defines a new class. Such a class provides an automatic constructor method
 called C<new>, which will invoke the class's C<BUILDALL> method if it exists.
+
+As with C<package>, an optional block may be provided. If so, the contents of
+that block define the new class and the preceding package continues
+afterwards. If not, it sets the class as the package context of following
+keywords and definitions.
 
 A single superclass is supported by the keyword C<extends>
 
    class Cat extends Animal {
       ...
    }
+
+If a package providing the superclass does not exist, an attempt is made to
+load it by code equivalent to
+
+   require Animal ();
+
+and thus it must either already exist, or be locatable via the usual C<@INC>
+mechanisms.
 
 The superclass must either be implemented by C<Object::Pad>, or be some class
 whose instances are blessed hash references.
@@ -222,25 +237,41 @@ sub Object::Pad::__new_foreign_HASH
    return $self;
 }
 
-=head1 TODO
+=head1 DESIGN TODOs
+
+The following points are details about the design of pad slot-based object
+systems in general:
 
 =over 4
 
 =item *
 
-Setting default package using C<class Name;> statement without block.
+Is multiple inheritence actually required, if role composition is implemented
+including giving roles the ability to use private slots?
 
 =item *
 
-Multiple inheritence of subclassing
+Consider the visibility of superclass slots to subclasses. Do subclasses even
+need to be able to see their superclass's slots, or are accessor methods
+always appropriate?
+
+=back
+
+=head1 IMPLEMENTATION TODOs
+
+These points are more about this particular module's implementation:
+
+=over 4
 
 =item *
 
-Roles
+Implement roles, including required method checking and the ability to have
+private slots.
 
 =item *
 
-Consider visibility of superclass slots to subclasses.
+Consider multiple inheritence of subclassing, if that is still considered
+useful after adding roles.
 
 =item *
 

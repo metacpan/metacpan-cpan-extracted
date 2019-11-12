@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-10-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ term-attrs - Show terminal attributes (from Term::App::Role::Attrs)
 
 =head1 VERSION
 
-This document describes version 0.003 of MyApp (from Perl distribution App-TermAttrUtils), released on 2019-08-20.
+This document describes version 0.004 of MyApp (from Perl distribution App-TermAttrUtils), released on 2019-10-03.
 
 =head1 SYNOPSIS
 

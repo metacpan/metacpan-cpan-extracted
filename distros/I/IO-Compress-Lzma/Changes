@@ -1,6 +1,11 @@
 CHANGES
 -------
 
+  2.090 9 November 2019
+
+      * typo change lzstrem to xzstream
+        5dfc9c97be1529d546ae0b11c3cf1bfb2f190ad4
+
   2.089 3 November 2019
 
       * No Changes

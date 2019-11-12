@@ -1,7 +1,8 @@
 package Mail::DMARC;
-our $VERSION = '1.20191004'; # VERSION
 use strict;
 use warnings;
+
+our $VERSION = '1.20191025';
 
 use Carp;
 our $psl_loads = 0;
@@ -112,9 +113,12 @@ sub dkim {
 sub _from_mail_dkim {
     my ( $self, $dkim ) = @_;
 
+    my $signatures = 0;
+
     # A DKIM verifier will have result and signature methods.
     foreach my $s ( $dkim->signatures ) {
         next if ref $s eq 'Mail::DKIM::DkSignature';
+        $signatures++;
 
         my $result = $s->result;
 
@@ -130,6 +134,15 @@ sub _from_mail_dkim {
                 human_result => $s->result_detail,
             );
     }
+
+    if ($signatures < 1) {
+        push @{ $self->{dkim}},
+            Mail::DMARC::Report::Aggregate::Record::Auth_Results::DKIM->new(
+                domain       => '',
+                result       => 'none',
+            );
+    }
+
     return;
 }
 
@@ -269,7 +282,7 @@ sub save_aggregate {
 
     $agg->record($rec);
     return $self->report->save_aggregate;
-};
+}
 
 sub init {
     # used for testing
@@ -280,11 +293,15 @@ sub init {
 
 1;
 
-# ABSTRACT: Perl implementation of DMARC
-
 __END__
 
 =pod
+
+=head1 Status Badges
+
+=for markdown [![Build Status](https://travis-ci.org/msimerson/mail-dmarc.svg?branch=master)](https://travis-ci.org/msimerson/mail-dmarc)
+
+=for markdown [![Coverage Status](https://coveralls.io/repos/msimerson/mail-dmarc/badge.svg)](https://coveralls.io/r/msimerson/mail-dmarc)
 
 =head1 NAME
 
@@ -292,7 +309,7 @@ Mail::DMARC - Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20191004
+version 1.20191025
 
 =head1 SYNOPSIS
 
@@ -304,26 +321,26 @@ DMARC: Domain-based Message Authentication, Reporting and Conformance
 
   my $result = $dmarc->validate();
 
- if ( $result->result eq 'pass' ) {
+  if ( $result->result eq 'pass' ) {
      ...continue normal processing...
      return;
- };
+  };
 
- # any result that did not pass is a fail. Now for disposition
+  # any result that did not pass is a fail. Now for disposition
 
- if ( $result->evalated->disposition eq 'reject' ) {
+  if ( $result->evalated->disposition eq 'reject' ) {
      ...treat the sender to a 550 ...
- };
- if ( $result->evalated->disposition eq 'quarantine' ) {
+  };
+  if ( $result->evalated->disposition eq 'quarantine' ) {
      ...assign a bunch of spam points...
- };
- if ( $result->evalated->disposition eq 'none' ) {
+  };
+  if ( $result->evalated->disposition eq 'none' ) {
      ...continue normal processing...
- };
+  };
 
 =head1 DESCRIPTION
 
-This module is a suite of tools for implementing DMARC. It adheres very tightly to the 2013 DMARC draft, intending to implement every MUST and every SHOULD.
+This module is a suite of tools for implementing DMARC. It adheres to the 2013 DMARC draft, intending to implement every MUST and every SHOULD.
 
 This module can be used by...
 
@@ -347,11 +364,11 @@ When a message arrives via SMTP, the MTA or filtering application can pass in a 
 
  a. the header_from domain exists
  b. the header_from domain publishes a DMARC policy
- c. if not, end processing
+ c. if a policy is published...
  d. does the message conform to the published policy?
  e. did the policy request reporting? If so, save details.
 
-The validation results are returned as a L<Mail::DMARC::Result> object. If the author domain requested a report, it was saved to the L<Report Store|Mail::DMARC::Report::Store>. The Store class includes a SQL implementation that is tested with SQLite and MySQL.
+The validation results are returned as a L<Mail::DMARC::Result> object. If the author domain requested a report, it was saved to the L<Report Store|Mail::DMARC::Report::Store>. The Store class includes a SQL implementation that is tested with SQLite, MySQL and PostgreSQL.
 
 There is more information available in the $result object. See L<Mail::DMARC::Result> for complete details.
 
@@ -374,12 +391,6 @@ received reports will have a null value for report_policy_published.rua
 outgoing reports will have null values for report.uuid and report_record.count
 
 =back
-
-=head1 Code Climate
-
-=for markdown [![Build Status](https://travis-ci.org/msimerson/mail-dmarc.svg?branch=master)](https://travis-ci.org/msimerson/mail-dmarc)
-
-=for markdown [![Coverage Status](https://coveralls.io/repos/msimerson/mail-dmarc/badge.svg)](https://coveralls.io/r/msimerson/mail-dmarc)
 
 =head1 CLASSES
 
@@ -460,7 +471,7 @@ The domain portion of the RFC5321.RcptTo, (aka, the envelope recipient), and the
 
 =over 8
 
-RCPT TO:<user@B<example.com>>
+RCPT TO:&lt;user@B<example.com>>
 
 =back
 
@@ -470,7 +481,7 @@ The domain portion of the RFC5321.MailFrom, (aka, the envelope sender). That is 
 
 =over 8
 
-MAIL FROM:<user@B<example.com>>
+MAIL FROM:&lt;user@B<example.com>>
 
 =back
 
@@ -480,7 +491,7 @@ The domain portion of the RFC5322.From, aka, the From message header.
 
 =over 8
 
-From: Ultimate Vacation <sweepstakes@B<example.com>>
+From: Ultimate Vacation &lt;sweepstakes@B<example.com>>
 
 =back
 
@@ -570,15 +581,15 @@ The DMARC spec is lengthy and evolving, making correctness a moving target. In c
 
 =head2 Easy to use
 
-The effectiveness of DMARC will improve significantly as adoption increases. Proving an implementation of DMARC that SMTP utilities like SpamAssassin, amavis, and qpsmtpd can consume will aid adoption.
+Providing an implementation of DMARC that SMTP utilities can utilize will aid DMARC adoption.
 
 The list of dependencies appears long because of reporting. If this module is used without reporting, the number of dependencies not included with perl is about 5. See the [Prereq] versus [Prereq / Recommends] sections in dist.ini.
 
 =head2 Maintainable
 
-Since DMARC is evolving, this implementation aims to be straight forward and dare I say, easy, to alter and extend. The programming style is primarily OO, which carries a small performance penalty but large dividends in maintainability.
+Since DMARC is evolving, this implementation aims to be straight forward and easy to alter and extend. The programming style is primarily OO, which carries a small performance penalty but dividends in maintainability.
 
-When multiple options are available, such as when sending reports via SMTP or HTTP, calls should be made to the parent Send class, to broker the request. When storing reports, calls are made to the Store class, which dispatches to the SQL class. The idea is that if someone desired a data store other than the many provided by perl's DBI class, they could easily implement their own. If you do, please fork it on GitHub and share.
+When multiple options are available, such as when sending reports via SMTP or HTTP, calls should be made to the parent Send class to broker the request. When storing reports, calls are made to the Store class which dispatches to the SQL class. The idea is that if someone desired a data store other than those provided by perl's DBI class, they could easily implement their own. If you do, please fork it on GitHub and share.
 
 =head2 Fast
 
@@ -586,17 +597,15 @@ If you deploy this in an environment where performance is insufficient, please p
 
 =head1 SEE ALSO
 
-Mail::DMARC on GitHub: https://github.com/msimerson/mail-dmarc
+L<Mail::DMARC on GitHub|https://github.com/msimerson/mail-dmarc>
 
-2015-03 RFC 7489: https://tools.ietf.org/html/rfc7489
+2015-03 L<RFC 7489|https://tools.ietf.org/html/rfc7489>
 
-Best Current Practices: http://tools.ietf.org/html/draft-crocker-dmarc-bcp-03
+DMARC L<Best Current Practices|http://tools.ietf.org/html/draft-crocker-dmarc-bcp-03>
 
 =head1 HISTORY
 
-The daddy of this perl module was a DMARC module for the qpsmtpd MTA.
-
-Qpsmtpd plugin: https://github.com/smtpd/qpsmtpd/blob/master/plugins/dmarc
+The daddy of this perl module was a L<DMARC module for the qpsmtpd MTA|https://github.com/smtpd/qpsmtpd/blob/master/plugins/dmarc>.
 
 =head1 AUTHORS
 
@@ -610,11 +619,15 @@ Matt Simerson <msimerson@cpan.org>
 
 Davide Migliavacca <shari@cpan.org>
 
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Benny Pedersen Jean Paul Galea Making GitHub Delicious. Marc Bradshaw Mohammad S Anwar Priyadi Iman Nurcahyo Ricardo Signes
+=for stopwords Benny Pedersen Jean Paul Galea Marisa Clardy Priyadi Iman Nurcahyo Ricardo Signes
 
 =over 4
 
@@ -628,19 +641,7 @@ Jean Paul Galea <jeanpaul@yubico.com>
 
 =item *
 
-Jean Paul Galea <jp@galea.se>
-
-=item *
-
-Making GitHub Delicious. <iron@waffle.io>
-
-=item *
-
-Marc Bradshaw <marc@marcbradshaw.net>
-
-=item *
-
-Mohammad S Anwar <Mohammad.Anwar@yahoo.com>
+Marisa Clardy <marisa@clardy.eu>
 
 =item *
 
@@ -648,21 +649,13 @@ Priyadi Iman Nurcahyo <priyadi@priyadi.net>
 
 =item *
 
-Priyadi Iman Nurcahyo <priyadi@users.noreply.github.com>
-
-=item *
-
 Ricardo Signes <rjbs@cpan.org>
-
-=item *
-
-Ricardo Signes <rjbs@users.noreply.github.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Matt Simerson.
+This software is copyright (c) 2019 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

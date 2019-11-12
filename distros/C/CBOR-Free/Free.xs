@@ -18,6 +18,12 @@
 
 #define _PACKAGE "CBOR::Free"
 
+#define CANONICAL_OPT "canonical"
+#define CANONICAL_OPT_LEN sizeof(CANONICAL_OPT) - 1
+
+#define SCALAR_REFS_OPT "scalar_references"
+#define SCALAR_REFS_OPT_LEN sizeof(SCALAR_REFS_OPT) - 1
+
 HV *cbf_stash = NULL;
 
 //----------------------------------------------------------------------
@@ -44,14 +50,20 @@ encode( SV * value, ... )
         encode_state->recurse_count = 0;
 
         encode_state->is_canonical = false;
+        encode_state->encode_scalar_refs = false;
 
         U8 i;
         for (i=1; i<items; i++) {
             if (!(i % 2)) continue;
 
-            if ((SvCUR(ST(i)) == 9) && memEQ( SvPV_nolen(ST(i)), "canonical", 9)) {
+            if ((SvCUR(ST(i)) == CANONICAL_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), CANONICAL_OPT, CANONICAL_OPT_LEN)) {
                 ++i;
                 if (i<items) encode_state->is_canonical = SvTRUE(ST(i));
+                break;
+            }
+            if ((SvCUR(ST(i)) == SCALAR_REFS_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), SCALAR_REFS_OPT, SCALAR_REFS_OPT_LEN)) {
+                ++i;
+                if (i<items) encode_state->encode_scalar_refs = SvTRUE(ST(i));
                 break;
             }
         }

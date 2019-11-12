@@ -1,3 +1,6 @@
+0.032     2019-11-11 11:09:08 EST
+  - Add check for CORE::wantarray and CORE'wantarray to WantArray policy (simcop2387 #37)
+
 0.031     2019-09-25 19:00:39 EDT
   - Add FindBin to DiscouragedModules policy (#31)
   - Add MultidimensionalArrayEmulation policy (#35)

@@ -42,9 +42,10 @@ You need to configure the plugin first: copy your *application_id* and *applicat
             callback_success:   "/"
             callback_fail:      "/fail"
             scope:              "email friends"
+            api_version:        "v4.0"
 
-*callback_success*, *callback_fail* and *scope* are optional and default to
-'/' , '/fail', and 'email' respectively.
+*callback_success*, *callback_fail*, *scope* and *api_version* are optional and default to
+'/' , '/fail', 'email' and 'v4.0' respectively.
 
 Note that you also need to provide your callback url, whose route handler is automatically
 created by the plugin.
@@ -63,7 +64,7 @@ supported session engines, or [search the CPAN for new ones](http://search.cpan.
 COPYRIGHT AND LICENCE
 ---------------------
 
-Copyright (C) 2014-2016 by Prajith Ndimensionz
+Copyright (C) 2014-2019 by Prajith Ndimensionz
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

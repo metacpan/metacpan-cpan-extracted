@@ -1,0 +1,55 @@
+0.09	9 November 2019
+	Adoption.
+
+0.08	6 November 2019
+	Adoption.
+
+0.07	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+	Added dependency to Devel::Required, so that the conditional
+	dependency to Win32::Process::Info for Win32 systems will be
+	automatically updated on the user's system.
+
+0.06	16 September 2003
+	It is now possible to run Benchmark::Thread::Size in 'refonly' mode
+	from the command line.  This was added so that it is easier to check
+	different threads implementations and/or real-time updates to the
+	threads modules.  Added documentation and tets-suite for this as well.
+
+	Added some more internal documentation to the ramthread* scripts
+	being created.  Even though they're created on the fly and removed
+	afterwards, they could use a little more documentation (looking back
+	at them about a year later).
+
+	Frank Tolstrup was so kind to send me the code to measure process size
+	under Windows.  Now transparently included, which means this module
+	now also works under Windows!  Updated the "HOW TO MEASURE SIZE?"
+	section.  Added Win32::Process::Info as a conditional prerequisite
+	when making on a Windows system.
+
+0.05	8 September 2003
+	Added "refonly" flag to allow for the reference information only to
+	be checked.  Added documentation and test-suite for it.
+
+0.04	13 August 2003
+	Cleaned up Makedfile.PL and updated copyright info.  Made sure the
+	test-suite runs with warnings enabled (a few tweaks were necessary).
+
+	Changed the logic for obtaining the size of a process slightly to
+	account for many operating systems: Mac OS X should now also be
+	supported, even with a buggy "ps".  Thanks to James FitzGibbon.
+
+0.03	1 October 2002
+	Removed "our" from $VERSION, should shave off some bytes in
+	memory usage, as found from testing.
+
+0.02	24 September 2002
+	Renamed module to "Benchmark::Thread::Size" as per suggestion of
+	Arthur Bergman.
+
+	Added logic to _ramthread so that the keys will always appear in the
+	report in the order they were given, rather than alphabetical.
+
+0.01	23 September 2002
+	First version of Thread::Benchmark::Size.

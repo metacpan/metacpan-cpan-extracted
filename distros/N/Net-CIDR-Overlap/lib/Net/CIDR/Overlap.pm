@@ -12,11 +12,11 @@ Net::CIDR::Overlap - A utility module for helping make sure a list of CIDRs don'
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
@@ -55,15 +55,14 @@ our $VERSION = '0.0.1';
         print $cidr."\n";
     }
 
+This works with eithe IPv4 or IPv6. Two instances of L<Net::CIDR::Set>
+are maintained, one for IPv4 and one for IPv6.
+
 =head1 METHODS
 
 =head2 new
 
 This initates the object.
-
-No arguments are taken.
-
-This will always succeeed.
 
     my $nco=Net::CIDR::Overlap->new;
 
@@ -71,8 +70,11 @@ This will always succeeed.
 
 sub new{
 	my $self = {
-				set=>Net::CIDR::Set->new,
-				list=>[],
+				set4=>Net::CIDR::Set->new( { type => 'ipv4' } ),
+				set6=>Net::CIDR::Set->new( { type => 'ipv6' } ),
+				list=>{},
+				set4init=>undef,
+				set6init=>undef,
 				};
 	bless $self;
 
@@ -103,10 +105,72 @@ sub add{
 	my $self=$_[0];
 	my $cidr=$_[1];
 
-	if (!defined( $cidr )){
-		die('No CIDR defined');
-	}
+	# makes sure we have a defined+valid valueand get what set we should remove it from
+	my $set='set'.$self->ip_type( $cidr );
 
+	$self->{$set}->add( $cidr );
+	$self->{list}{$cidr}=1;
+	$self->{init}=1;
+
+	return 1;
+}
+
+=head2 available
+
+This checks to see if the subnet is available.
+
+There is one required argument and two optional.
+
+The first and required is the CIDR/IP. This will be
+validated using Net::CIDR::cidrvalidate.
+
+The second is if to invert the check or not. If set to
+true, it will only be added if overlap is found.
+
+The third is if overlap should be any or all. This is boolean
+and a value of true sets it to all. The default value is false,
+meaning any overlap.
+
+    my $available;
+    eval{
+        $available=$nco->available( $cidr );
+    };
+    if ( $@ ){
+        # do something to handle the error
+        die( 'Most likely a bad CIDR...'.$@ );
+    }elsif( ! $available ){
+        print "Some or all of the IPs in ".$cidr." are unavailable.\n";
+    }
+
+    # this time invert the search and check if all of them are unavailable
+    eval{
+        $available==$nco->available( $cidr, 1, 1 );
+    };
+    if ( $@ ){
+        # do something to handle the error
+        die( 'Most likely a bad CIDR...'.$@ );
+    }elsif( $available ){
+        print "All of the IPs in ".$cidr." are unavailable.\n";
+    }
+
+=cut
+
+sub available{
+	my $self=$_[0];
+	my $cidr=$_[1];
+	my $invert=$_[2];
+	my $all=$_[3];
+
+	# makes sure we have a defined+valid valueand get what set we should remove it from
+	my $set='set'.$self->ip_type( $cidr );
+
+	# set here so we produce nice output if we die
+	if ( !defined( $invert ) ){
+		$invert=0;
+	}
+	if ( !defined( $all ) ){
+		$all=0;
+	}
 	my $valid;
 	eval{
 		 $valid=Net::CIDR::cidrvalidate($cidr);
@@ -115,9 +179,27 @@ sub add{
 		die $cidr.' is not a valid CIDR or IP';
 	}
 
-	$self->{set}->add( $cidr );
+	my $contains=0;
+	if (
+		$all &&
+		$self->{$set}->contains_all( $cidr )
+		){
+		$contains=1;
+	}elsif(
+		   ( ! $all ) &&
+		   $self->{$set}->contains_any( $cidr )
+		   ){
+		$contains=1;
+	}
 
-	push( @{ $self->{list} }, $cidr );
+	if ( $invert ){
+		$contains = $contains ^ 1;
+	}
+
+	if( $contains ){
+		return 0;
+	}
+
 
 	return 1;
 }
@@ -148,7 +230,7 @@ meaning any overlap.
 
     # this time invert it and use use any for the overlap check
     eval{
-        $nco->add( $cidr, '1', '0' );
+        $nco->compare_and_add( $cidr, '1', '0' );
     }
     if ( $@ ){
         warn( $@ );
@@ -162,9 +244,8 @@ sub compare_and_add{
 	my $invert=$_[2];
 	my $all=$_[3];
 
-	if (!defined( $cidr )){
-		die('No CIDR defined');
-	}
+	# makes sure we have a defined+valid valueand get what set we should remove it from
+	my $set='set'.$self->ip_type( $cidr );
 
 	# set here so we produce nice output if we die
 	if ( !defined( $invert ) ){
@@ -173,23 +254,23 @@ sub compare_and_add{
 	if ( !defined( $all ) ){
 		$all=0;
 	}
-	my $valid;
-	eval{
-		 $valid=Net::CIDR::cidrvalidate($cidr);
-	 };
-	if (! defined( $valid ) ){
-		die $cidr.' is not a valid CIDR or IP';
+
+	if ( ! $self->{$set.'init'} ){
+		$self->{$set}->add($cidr);
+		$self->{list}{$cidr}=1;
+		$self->{$set.'init'}=1;
+		return 1;
 	}
 
 	my $contains=0;
 	if (
 		$all &&
-		$self->{set}->contains_all( $cidr )
+		$self->{$set}->contains_all( $cidr )
 		){
 		$contains=1;
 	}elsif(
 		   ( ! $all ) &&
-		   $self->{set}->contains_any( $cidr )
+		   $self->{$set}->contains_any( $cidr )
 		   ){
 		$contains=1;
 	}
@@ -202,18 +283,55 @@ sub compare_and_add{
 		die( 'The compare matched... invert='.$invert.' all='.$all );
 	}
 
-	$self->{set}->add($cidr);
-	push( @{ $self->{list} }, $cidr );
+	$self->{$set}->add($cidr);
+	$self->{list}{$cidr}=1;
+	$self->{$set.'init'}=1;
 
 	return 1;
 }
 
+=head2 exists
+
+This check if the specified value exists in the list or not.
+
+One value is taken and that is a CIDR. If this is not defined,
+it will die.
+
+    my $xists;
+    eval{
+        $nco->exists( $cidr );
+    };
+    if ( $@ ){
+
+    }elsif( ! $exist ){
+        print $cidr." does not exist in the list.\n";
+    }else{
+        print $cidr." does exist in the list.\n";
+    }
+
+=cut
+
+sub exists{
+	my $self=$_[0];
+	my $cidr=$_[1];
+
+	if (!defined( $cidr )){
+		die('No CIDR defined');
+	}
+
+	if ( defined( $self->{list}{$cidr} ) ){
+		return 1;
+	}
+
+	return undef;
+}
+
 =head2 list
 
-This returns a array ref of successfully added items.
+This returns a array of successfully added items.
 
-    my $list=$nco->list;
-    foreach my $cidr ( @${ $list } ){
+    my @list=$nco->list;
+    foreach my $cidr ( @list ){
         print $cidr."\n";
     }
 
@@ -222,7 +340,85 @@ This returns a array ref of successfully added items.
 sub list{
 	my $self=$_[0];
 
-	return $self->{list};
+	return keys( %{ $self->{list} } );
+}
+
+=head2 remove
+
+This removes the specified CIDR from the list.
+
+One argument is taken and that is the CIDR to remove.
+
+If the CIDR is not one that has been added, it will error.
+
+Upon any errors, this method will die.
+
+    eval{
+        $nco->remove( $cidr );
+    };
+    if ( $@ ){
+        die( 'Did you make sure the $cidr was defined and added previously?' );
+    }
+
+=cut
+
+sub remove{
+	my $self=$_[0];
+	my $cidr=$_[1];
+
+	# makes sure we have a defined+valid valueand get what set we should remove it from
+	my $set='set'.$self->ip_type( $cidr );
+
+	if ( !defined( $self->{list}{$cidr} ) ){
+		die( '"'.$cidr.'" is not in the list' );
+	}
+
+	$self->{$set}->remove( $cidr );
+	delete( $self->{list}{$cidr} );
+
+	return 1;
+}
+
+=head2 ip_type
+
+This returns either 4 or 6 based on if it is IPv4 or IPv6.
+
+Upon undef or invalid CIDR, this will die.
+
+    my $type=$nco->ip_type( $cidr );
+    if ( $type eq '4' ){
+        print "It is IPv4\n";
+    }else{
+        print "It is IPv6\n";
+    }
+
+=cut
+
+sub ip_type{
+	my $self=$_[0];
+	my $cidr=$_[1];
+
+	# make sure we have input
+	if (!defined( $cidr )){
+		die('No CIDR defined');
+	}
+
+	# make sure we are valid
+	my $valid;
+	eval{
+		 $valid=Net::CIDR::cidrvalidate($cidr);
+	 };
+	if (! defined( $valid ) ){
+		die $cidr.' is not a valid CIDR or IP';
+	}
+
+	# if it contains a :, then it is IPv6
+	if ( $cidr =~ /\:/ ){
+		return '6';
+	}
+
+	# valid and not IPv6, so IPv4
+	return '4';
 }
 
 =head1 AUTHOR
@@ -264,6 +460,10 @@ L<https://cpanratings.perl.org/d/Net-CIDR-Overlap>
 =item * Search CPAN
 
 L<https://metacpan.org/release/Net-CIDR-Overlap>
+
+=item * GIT Repository
+
+L<https://github.com/VVelox/Net-CIDR-Overlap>
 
 =back
 

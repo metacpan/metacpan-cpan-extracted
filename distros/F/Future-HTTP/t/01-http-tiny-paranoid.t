@@ -12,16 +12,27 @@ my $ok = eval {
     1;
 };
 
-my $server = Test::HTTP::LocalServer->spawn(
-    #debug => 1
-);
 my $err = $@;
 if( !$ok) {
     plan skip_all => "Couldn't load Future::HTTP::Tiny::Paranoid: $err";
-    exit;
 };
 plan tests => 10;
 
+delete @ENV{ qw[
+    HTTP_PROXY
+    http_proxy
+    HTTP_PROXY_ALL
+    http_proxy_all
+    HTTPS_PROXY
+    https_proxy
+    CGI_HTTP_PROXY
+    ALL_PROXY
+    all_proxy
+] };
+
+my $server = Test::HTTP::LocalServer->spawn(
+    #debug => 1
+);
 
 diag( "Version of HTTP::Tiny::Paranoid: " . HTTP::Tiny::Paranoid->VERSION );
 my $url = $server->url;

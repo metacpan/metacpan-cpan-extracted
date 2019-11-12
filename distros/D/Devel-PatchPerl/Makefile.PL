@@ -25,7 +25,10 @@ my %WriteMakefileArgs = (
     "MIME::Base64" => 0,
     "Module::Pluggable" => 0
   },
-  "VERSION" => "1.70",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0
+  },
+  "VERSION" => "1.76",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +39,8 @@ my %FallbackPrereqs = (
   "File::pushd" => "1.00",
   "IO::File" => 0,
   "MIME::Base64" => 0,
-  "Module::Pluggable" => 0
+  "Module::Pluggable" => 0,
+  "Test::More" => 0
 );
 
 

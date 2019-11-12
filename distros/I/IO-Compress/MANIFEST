@@ -62,7 +62,7 @@ t/005defhdr.t
 t/006zip.t
 t/010examples-bzip2.t
 t/010examples-zlib.t
-t/011streamzip.t
+t/011-streamzip.t
 t/01misc.t
 t/020isize.t
 t/050interop-gzip.t

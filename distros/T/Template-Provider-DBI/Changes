@@ -1,3 +1,6 @@
+0.04 - 2019-11-10:
+SQLite does have DateTime Formats now, added to tests.
+
 0.03 - 2007-01-23:
 Rename _mtime to _modified, cos someone munged my patch to TT and didnt tell me
 (Currently untested as SQLite doesnt have datetime formats)

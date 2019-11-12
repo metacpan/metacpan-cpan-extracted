@@ -7,6 +7,7 @@ use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 
 use File::Basename;
+use File::Temp qw(tempdir);
 use Log::Log4perl qw(:easy);
 use Term::ANSIColor;
 use YAML::Any qw(Dump LoadFile);
@@ -26,7 +27,7 @@ sub init_logger {
 }
 
 # this is for log4perl.conf to call back to get the log file name.
-sub log_file_name { "/tmp/$ENV{USER}/google_restapi.log"; }
+sub log_file_name { tempdir() . "/google_restapi.log"; }
 
 sub delete_all_spreadsheets {
   shift->delete_all_spreadsheets($spreadsheet_name);
@@ -43,16 +44,14 @@ sub sheets_api {
   return SheetsApi4->new(api => $api);
 }
 
-sub rest_api {
-  return RestApi->new(@_, config_file => rest_api_config(), throttle => 1);
-}
-
 sub rest_api_config {
   my $config_file = $ENV{GOOGLE_RESTAPI_LOGIN}
     or die "No testing config file found: set env var GOOGLE_RESTAPI_LOGIN first";
   return $config_file;
 }
 
+# set throttle to 1 if you start getting 403's back from google.
+sub rest_api { RestApi->new(@_, config_file => rest_api_config(), throttle => 0); }
 sub message { print color(shift), @_, color('reset'), "\n"; }
 sub start { message('yellow', @_, ".."); }
 sub end { message('green', @_, " Press enter to continue.\n"); <>; }

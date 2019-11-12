@@ -16,10 +16,14 @@
 # with Filter-gunzip.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# libperlio-gzip-perl is for the XS method (which is preferred).
+# Can run without it, though you lose some __DATA__ handle stuff.
+
+
 Source: libfilter-gunzip-perl
 Section: perl
 Priority: optional
-Build-Depends: cdbs, debhelper (>= 5), libtest-more-perl | perl (>= 5.6.2)
+Build-Depends: cdbs, debhelper (>= 5)
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
 Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/filter-gunzip/index.html
@@ -28,7 +32,7 @@ Bugs: mailto:user42_kevin@yahoo.com.au
 Package: libfilter-gunzip-perl
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
-Depends: perl (>= 5.006), libperlio-perl | perl (>= 5.6), libperlio-gzip-perl, ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Depends: perl (>= 5.006), libperlio-gzip-perl, libfilter-perl | perl (>= 5.8), libcompress-raw-zlib-perl | perl (>= 5.10), ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
 Description: Source filter uncompressing gzip files
  Filter::gunzip uncompresses gzipped Perl source files for execution
  using the Perl source filter mechanism.  It can run .pl.gz files or

@@ -12,11 +12,11 @@
          "rdfs:comment" : "Physical address of the item.",
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
-            "schema:GeoShape",
-            "schema:Place",
-            "schema:Organization",
             "schema:Person",
-            "schema:GeoCoordinates"
+            "schema:Place",
+            "schema:GeoCoordinates",
+            "schema:Organization",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -28,9 +28,9 @@
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
+            "schema:GeoCoordinates",
             "schema:PostalAddress",
-            "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -60,8 +60,8 @@
             "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:line" : {
@@ -83,9 +83,9 @@
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
             "schema:GeoShape",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

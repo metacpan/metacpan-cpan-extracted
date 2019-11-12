@@ -59,10 +59,10 @@
          "rdfs:label" : "issn",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:WebSite",
-            "schema:Dataset",
             "schema:Blog",
-            "schema:CreativeWorkSeries"
+            "schema:CreativeWorkSeries",
+            "schema:WebSite",
+            "schema:Dataset"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -73,10 +73,10 @@
          "rdfs:label" : "measurementTechnique",
          "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
-            "schema:DataDownload",
             "schema:Dataset",
             "schema:PropertyValue",
-            "schema:DataCatalog"
+            "schema:DataCatalog",
+            "schema:DataDownload"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [

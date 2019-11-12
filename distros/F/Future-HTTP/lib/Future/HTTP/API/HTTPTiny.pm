@@ -7,7 +7,7 @@ use feature 'signatures';
 require HTTP::Tiny;
 require URI;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -40,7 +40,7 @@ sub as_http_tiny( $self, $body, $headers ) {
         push @redirects, $r;
         $result->{redirects} = \@redirects;
     };
-    
+
     $result
 }
 
@@ -51,7 +51,7 @@ sub munge_ht_options($self, $url, %options) {
         if $options{ content };
     die "Sorry, (code) references for the 'content' parameter are not yet supported"
         if ref $options{ body };
-    
+
     my $parsed_url = URI->new( $url );
     my $auth = $parsed_url->userinfo;
     # if we have Basic auth parameters, add them
@@ -61,7 +61,7 @@ sub munge_ht_options($self, $url, %options) {
         require MIME::Base64;
         $options{ headers }->{authorization} = 'Basic ' . MIME::Base64::encode_base64($auth, '');
     };
-    
+
     # Should we convert the case of the headers here?!
     # Add the cookie jar
     # Convert the case of the headers
@@ -83,7 +83,7 @@ sub mirror($self, $url, $file, $args) {
     binmode $fh;
     $args->{data_callback} = sub {  print {$fh} $_[0] };
     my $response = $self->request('GET', $url, $args);
-    
+
     $response->then(sub( $result ) {
         use Data::Dumper;
         warn Dumper $result;

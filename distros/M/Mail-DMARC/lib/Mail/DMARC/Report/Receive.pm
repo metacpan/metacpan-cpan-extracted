@@ -1,7 +1,8 @@
 package Mail::DMARC::Report::Receive;
-our $VERSION = '1.20191004'; # VERSION
 use strict;
 use warnings;
+
+our $VERSION = '1.20191025';
 
 use Carp;
 use Data::Dumper;
@@ -33,7 +34,7 @@ sub from_imap {
             ($port==993 ? (use_ssl => 1) : ()),
         )
         or do {
-## no critic (PackageVar)
+            ## no critic (PackageVar)
             my $err = $port == 143 ? $Net::IMAP::Simple::errstr : $Net::IMAP::Simple::SSL::errstr;
             croak "Unable to connect to IMAP: $err\n";
         };
@@ -95,20 +96,20 @@ sub from_mbox {
     my ( $self, $file_name ) = @_;
     croak "missing mbox file" if !$file_name;
 
-# TODO: replace this module
-# commented out due to build test failures
-#   eval "require Mail::Mbox::MessageParser";    ## no critic (Eval)
-#   croak "is Mail::Mbox::MessageParser installed?" if $@;
+    # TODO: replace this module
+    # commented out due to build test failures
+    #   eval "require Mail::Mbox::MessageParser";    ## no critic (Eval)
+    #   croak "is Mail::Mbox::MessageParser installed?" if $@;
 
-#   my $file_handle = FileHandle->new($file_name);
+    #   my $file_handle = FileHandle->new($file_name);
 
     my $folder_reader; #  = Mail::Mbox::MessageParser->new(
-#       {   'file_name'    => $file_name,
-#           'file_handle'  => $file_handle,
-#           'enable_cache' => 1,
-#           'enable_grep'  => 1,
-#       }
-#   );
+    #       {   'file_name'    => $file_name,
+    #           'file_handle'  => $file_handle,
+    #           'enable_cache' => 1,
+    #           'enable_grep'  => 1,
+    #       }
+    #   );
 
     croak $folder_reader unless ref $folder_reader;
 
@@ -150,21 +151,32 @@ sub from_email_simple {
             next;
         }
         my $bigger;
-        if (   $c_type eq 'application/zip'
-            || $c_type eq 'application/x-zip-compressed' )
-        {
-            $self->get_submitter_from_filename( $part->{ct}{attributes}{name} );
+        my $filename = $part->{ct}{attributes}{name};
+
+        if ( $c_type eq 'application/zip' || $c_type eq 'application/x-zip-compressed' ) {
+            $self->get_submitter_from_filename( $filename );
             $unzipper->{zip}->( \$part->body, \$bigger );
             $self->handle_body($bigger);
             $rep_type = 'aggregate';
             next;
         }
         if ( $c_type eq 'application/gzip' ) {
-            $self->get_submitter_from_filename( $part->{ct}{attributes}{name} );
+            $self->get_submitter_from_filename( $filename );
             $unzipper->{gz}->( \$part->body, \$bigger );
             $self->handle_body($bigger);
             $rep_type = 'aggregate';
             next;
+        }
+        if ( $filename =~ /xml\.gz$/ ) {
+            if ( $c_type eq 'application/octet-stream' ||
+                 $c_type eq 'multipart/alternative' ) {
+
+                $self->get_submitter_from_filename( $filename );
+                $unzipper->{gz}->( \$part->body, \$bigger );
+                $self->handle_body($bigger);
+                $rep_type = 'aggregate';
+                next;
+            }
         }
         warn "Unknown message part $c_type\n";  ## no critic (Carp)
     }
@@ -190,13 +202,13 @@ sub get_imap_port {
         return 993;
     };
 
-# no CA, disable verification
+    # no CA, disable verification
     IO::Socket::SSL::set_ctx_defaults(
         SSL_verifycn_scheme => 'imap',
         SSL_verify_mode => 0,
     );
     return 993;
-};
+}
 
 sub get_submitter_from_filename {
     my ( $self, $filename ) = @_;
@@ -209,9 +221,9 @@ sub get_submitter_from_filename {
 sub get_submitter_from_subject {
     my ( $self, $subject ) = @_;
 
-  # The 2013 DMARC spec section 12.2.1 suggests that the header SHOULD conform
-  # to a supplied ABNF. Rather than "require" such conformance, this method is
-  # more concerned with reliably extracting the submitter domain. Quickly.
+    # The 2013 DMARC spec section 12.2.1 suggests that the header SHOULD conform
+    # to a supplied ABNF. Rather than "require" such conformance, this method is
+    # more concerned with reliably extracting the submitter domain. Quickly.
     $subject = lc Encode::decode( 'MIME-Header', $subject );
     print $subject . "\n";
     $subject = substr( $subject, 8 ) if 'subject:' eq substr( $subject, 0, 8 );
@@ -364,7 +376,7 @@ sub do_node_record_auth {
             carp "invalid scope: $spf{scope}, ignoring";
             delete $spf{scope};
         };
-# this is for reports from ivenue.com with result=unknown
+        # this is for reports from ivenue.com with result=unknown
         if ( $spf{result} && ! $self->is_valid_spf_result( $spf{result} ) ) {
             carp "invalid SPF result: $spf{result}, setting to temperror";
             $spf{result} = 'temperror';
@@ -379,13 +391,13 @@ sub do_node_record_auth {
     };
 
     return;
-};
+}
 
 sub do_node_record_reason {
     my ($self, $row, $node) = @_;
 
-#    my @types = qw/ forwarded sampled_out trusted_forwarder mailing_list
-#                    local_policy other /;
+    #    my @types = qw/ forwarded sampled_out trusted_forwarder mailing_list
+    #                    local_policy other /;
 
     foreach my $r ( $node->findnodes("./row/policy_evaluated/reason") ) {
         my $type = $r->findnodes('./type')->string_value or next;
@@ -395,9 +407,11 @@ sub do_node_record_reason {
         );
     }
     return;
-};
+}
 
 1;
+
+__END__
 
 =pod
 
@@ -407,7 +421,7 @@ Mail::DMARC::Report::Receive - process incoming DMARC reports
 
 =head1 VERSION
 
-version 1.20191004
+version 1.20191025
 
 =head1 DESCRIPTION
 
@@ -447,18 +461,18 @@ Matt Simerson <msimerson@cpan.org>
 
 Davide Migliavacca <shari@cpan.org>
 
+=item *
+
+Marc Bradshaw <marc@marcbradshaw.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Matt Simerson.
+This software is copyright (c) 2019 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-# ABSTRACT: process incoming DMARC reports
-sub {}
 

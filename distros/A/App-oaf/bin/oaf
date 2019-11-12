@@ -6,7 +6,7 @@
 #
 # Based off copy-as-format for Emacs: https://github.com/sshaw/copy-as-format
 #
-# Copyright (c) 2017 Skye Shaw
+# Copyright (c) 2017-2019 Skye Shaw
 #
 # This library is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -15,33 +15,7 @@
 use strict;
 use warnings;
 
-use Getopt::Std;
-$Getopt::Std::STANDARD_HELP_VERSION = 1;
-
-our $VERSION = '0.02';
-
-sub HELP_MESSAGE {
-    my $out = shift;
-    # Not yet
-    #  -perl     Same as -l perl
-
-    print $out <<USAGE
-usage: oaf [-mps] [-f format] [-l lang]
-Output stdin as code in the given format
-  -f FORMAT Format to output, defaults to markdown
-  --help    Display this message
-  -l LANG   Programming language of stdin, if supported by FORMAT
-  -m        Force multiline output, if supported by FORMAT
-  -p        Print the supported formats and exit
-  -s        Force single line output, if supported by FORMAT
-  --version Print the version
-USAGE
-}
-
-sub VERSION_MESSAGE {
-  my $out = shift;
-  print $out "Output as Format v$VERSION\n";
-}
+package Util;
 
 sub html_escape {
   my $text = shift;
@@ -55,9 +29,137 @@ sub indent {
   $$text =~ s/^/' ' x $n/gme;
 }
 
+
+# Should just do Markdown->quote, Markdown->list, etc...
+package Quote;
+
+sub markdown {
+  my $lines = shift;
+  printf "> %s\n", $_ for @$lines;
+}
+
+sub output {
+  shift;
+
+  my $format = shift;
+  my $lines = [];
+
+  while (<STDIN>) {
+    chomp;
+    s/^\s*//g;
+    push @$lines, $_;
+  }
+
+  $Quote::{$format}->($lines);
+}
+
+package List;
+
+sub html {
+  my ($lines, $numbered) = @_;
+  my $li = sub {
+    for (@$lines) {
+      Util::html_escape(\$_);
+      printf '<li>%s</li>', $_;
+    }
+  };
+
+  if ($numbered) {
+    print '<ol>';
+    $li->();
+    print '</ol>';
+  }
+  else {
+    print '<ul>';
+    $li->();
+    print '</ul>';
+  }
+}
+
+# mediawiki too
+sub markdown {
+  my ($lines, $numbered) = @_;
+  my $prefix = $numbered ? '1.' : '*';
+
+  printf "%s %s\n", $prefix, $_ for @$lines;
+}
+
+sub jira {
+  my ($lines, $numbered) = @_;
+  my $prefix = $numbered ? '#' : '*';
+  printf "%s %s\n", $prefix, $_ for @$lines;
+}
+
+sub orgmode {
+  my ($lines, $numbered) = @_;
+  my $prefix = $numbered ? '1.' : '-';
+
+  printf "- %s\n", $_ for @$lines;
+}
+
+sub rst {
+  # same as markdown for ul
+  my $lines = shift;
+  printf "#. %s\n", $_ for @$lines;
+}
+
+sub pod {
+  # Numbered
+  my $lines = shift;
+  print '=over 2',"\n";
+  printf "=item %s\n" for @$lines;
+  print '=back';
+}
+
+sub output {
+  shift;
+
+  my ($format, $numbered) = @_;
+  my $lines = [];
+
+  while (<STDIN>) {
+    chomp;
+    s/^\s*//g;
+    push @$lines, $_;
+  }
+
+  $List::{$format}->($lines, $numbered);
+}
+
+
+package Code;
+
+sub output {
+  shift;
+
+  my ($format, $lang, $multiline) = @_;
+
+  my @indents;
+  my $snippet = '';
+
+  while (<STDIN>) {
+    s/\t/' ' x 8/eg;
+    $snippet .= $_;
+    push @indents, /^(\s*)/ && length $1;
+  }
+
+  exit 1 unless @indents;
+
+  # Remove the minimum amount of leading white space
+  my $trim = (sort { $a <=> $b } @indents)[0];
+  $snippet =~ s/^\s{$trim}//mg;
+
+  # Remove newline for single line input
+  chomp $snippet if @indents == 1;
+
+  $multiline = @indents > 1 ? 1 : 0 unless defined($multiline);
+
+  $Code::{$format}->($snippet, $multiline, $lang);
+}
+
 sub disqus {
   my ($snippet, undef, $lang) = @_;
-  html_escape(\$snippet);
+  Util::html_escape(\$snippet);
 
   printf "<pre><code class='%s'>\n%s</code></pre>\n", $lang || '', $snippet;
 }
@@ -79,7 +181,7 @@ sub hipchat {
 
 sub html {
   my ($snippet, $multiline, $lang) = @_;
-  html_escape(\$snippet);
+  Util::html_escape(\$snippet);
 
   if ($multiline) {
     printf "<pre><code>\n%s</code></pre>", $snippet;
@@ -103,7 +205,7 @@ sub markdown {
   my ($snippet, $multiline) = @_;
 
   if ($multiline) {
-    indent(\$snippet, 4);
+    Util::indent(\$snippet, 4);
     print $snippet;
   }
   else {
@@ -137,7 +239,7 @@ sub pod {
   my ($snippet, $multiline, $lang) = @_;
 
   if ($multiline) {
-    indent(\$snippet, 2);
+    Util::indent(\$snippet, 2);
     print $snippet;
   }
   else {
@@ -150,7 +252,7 @@ sub rst {
   my ($snippet, $multiline, $lang) = @_;
 
   if ($multiline) {
-    indent(\$snippet, 4);
+    Util::indent(\$snippet, 4);
     printf ".. code::\n\n%s\n", $snippet;
   }
   else {
@@ -169,22 +271,62 @@ sub slack {
   }
 }
 
-my %options;
-my %formats = (bitbucket => \&github,
-               disqus    => \&disqus,
-               github    => \&github,
-               gitlab    => \&github,
-               hipchat   => \&hipchat,
-               html      => \&html,
-               jira      => \&jira,
-               markdown  => \&markdown,
-               mediawiki => \&mediawiki,
-               orgmode   => \&orgmode,
-               pod       => \&pod,
-               rst       => \&rst,
-               slack     => \&slack);
+package main;
 
-HELP_MESSAGE(*STDERR) && exit 1 unless getopts('f:ml:ps', \%options);
+use Getopt::Long qw(:config no_ignore_case);
+
+our $VERSION = '0.03';
+
+sub HELP_MESSAGE {
+    my $out = shift;
+
+    print $out <<USAGE
+usage: oaf [-mps] [-f format] [-l lang] [--list]
+Output stdin according to the given options
+  -f FORMAT Format to output, defaults to markdown
+  --help    Display this message
+  -l LANG   Programming language of stdin, if supported by FORMAT
+  --list    Output a bullet point list using FORMAT, each line is a list item
+  --list1   Output a numbered list using FORMAT, each line is a list item
+  -m        Force multiline output, if supported by FORMAT
+  -p        Print the supported formats and exit
+  --quote   Output as a quote in FORMAT
+  -s        Force single line output, if supported by FORMAT
+  --version Print the version
+USAGE
+}
+
+sub VERSION_MESSAGE {
+  my $out = shift;
+  print $out "Output as Format v$VERSION\n";
+}
+
+my %options;
+my %formats = (bitbucket => 'github',
+               disqus    => 'disqus',
+               github    => 'github',
+               gitlab    => 'github',
+               hipchat   => 'hipchat',
+               html      => 'html',
+               jira      => 'jira',
+               markdown  => 'markdown',
+               mediawiki => 'mediawiki',
+               orgmode   => 'orgmode',
+               pod       => 'pod',
+               rst       => 'rst',
+               slack     => 'slack');
+
+GetOptions('f=s'       => \$options{f},
+           'h|help'    => sub { HELP_MESSAGE(*STDOUT) and exit },
+           'l=s'       => \$options{l},
+           'list'      => \$options{list},
+           'list1'     => \$options{list1},
+           'm'         => \$options{m},
+           'p'         => \$options{p},
+           'quote'     => \$options{quote},
+           's'         => \$options{s},
+           'v|version' => sub { VERSION_MESSAGE(*STDOUT) and exit }
+          ) or HELP_MESSAGE(*STDERR) and exit 1;
 
 if ($options{p}) {
   local $\= "\n";
@@ -199,27 +341,18 @@ my $lang = $options{l} || $ENV{OAF_LANG};
 my $multiline = $options{m};
 $multiline = 0 if $options{s};
 
+# FIXME: use GetOptions for this..?
 my $format = $options{f} || $ENV{OAF_FORMAT} || 'markdown';
-die "unknown format '$format'\n" unless $formats{lc $format};
+die "Unknown format: $format\n" unless $formats{$format};
+# ======
 
-my @indents;
-my $snippet = '';
-
-while (<STDIN>) {
-  s/\t/' ' x 8/eg;
-  $snippet .= $_;
-  push @indents, /^(\s*)/ && length $1;
+if ($options{list} || $options{list1}) {
+  my $numbered = $options{list1} || 0;
+  List->output($format, $numbered);
 }
-
-exit 1 unless @indents;
-
-# Remove the minimum amount of leading white space
-my $trim = (sort { $a <=> $b } @indents)[0];
-$snippet =~ s/^\s{$trim}//mg;
-
-# Remove newline for single line input
-chomp $snippet if @indents == 1;
-
-$multiline = @indents > 1 ? 1 : 0 unless defined($multiline);
-
-$formats{lc $format}->($snippet, $multiline, $lang);
+elsif ($options{quote}) {
+  Quote->output($format);
+}
+else {
+  Code->output($format, $lang, $multiline);
+}

@@ -8,7 +8,7 @@ use warnings;
 # The first version that completely worked with newer versions of Specio.
 use Moose 2.1802 ();
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 1;
 
@@ -26,7 +26,7 @@ Markdent - An event-based Markdown parser toolkit
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

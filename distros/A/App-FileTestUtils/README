@@ -2,8 +2,8 @@ NAME
     App::FileTestUtils - More CLIs for file testing
 
 VERSION
-    This document describes version 0.001 of App::FileTestUtils (from Perl
-    distribution App-FileTestUtils), released on 2019-08-17.
+    This document describes version 0.002 of App::FileTestUtils (from Perl
+    distribution App-FileTestUtils), released on 2019-09-29.
 
 DESCRIPTION
     This distributions provides the following command-line utilities which

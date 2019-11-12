@@ -1,0 +1,13 @@
+0.04	9 November 2019
+	Adoption
+
+0.03	5 February 2004
+	Argh.  Mixup in parameters for "skip" in test-suite.  Adapted the
+	test-suite.  No further changes.
+
+0.02	4 February 2004
+	Changed name to Log::Dispatch::WarnDie because of possible confusion
+	with Log::Log4Perl module.  Spotted by Mike Chilli.
+
+0.01	2 February 2004
+	First version of Log::ForPerl

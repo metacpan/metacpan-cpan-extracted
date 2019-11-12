@@ -1,7 +1,7 @@
 package App::TermAttrUtils;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-10-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to querying terminal attributes
@@ -18,7 +18,7 @@ App::TermAttrUtils - CLI utilities related to querying terminal attributes
 
 =head1 VERSION
 
-This document describes version 0.003 of App::TermAttrUtils (from Perl distribution App-TermAttrUtils), released on 2019-08-20.
+This document describes version 0.004 of App::TermAttrUtils (from Perl distribution App-TermAttrUtils), released on 2019-10-03.
 
 =head1 DESCRIPTION
 

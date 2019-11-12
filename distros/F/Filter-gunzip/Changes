@@ -17,6 +17,10 @@ with Filter-gunzip.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 8, November 2019
+    - XS and PerlIO::gzip optional
+    - avoid trouble with perl 5.30 rsfp at script level
+
 Version 7, February 2019
     - TEST_REQUIRES split, Debian bindnow
 

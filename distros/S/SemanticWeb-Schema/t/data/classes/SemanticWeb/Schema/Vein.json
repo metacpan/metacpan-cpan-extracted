@@ -25,8 +25,8 @@
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalSystem",
-            "schema:AnatomicalStructure"
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
          ]
       },
       "schema:tributary" : {

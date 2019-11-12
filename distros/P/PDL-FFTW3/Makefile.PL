@@ -90,6 +90,9 @@ $descriptor{META_MERGE} = {
     homepage => 'http://github.com/PDLPorters/pdl-fftw3',
     repository => 'git://github.com/PDLPorters/pdl-fftw3.git',
     bugtracker => 'http://github.com/PDLPorters/pdl-fftw3/issues',
+    url => 'git://github.com/PDLPorters/pdl-fftw3.git',
+    type => 'git',
+    x_IRC => 'irc://irc.perl.org/#pdl',
   },
   provides => {
     'PDL::FFTW3' => {

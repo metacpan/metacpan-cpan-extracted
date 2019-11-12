@@ -12,8 +12,8 @@
          "rdfs:comment" : "A contraindication for this therapy.",
          "rdfs:label" : "contraindication",
          "schema:domainIncludes" : [
-            "schema:MedicalDevice",
-            "schema:MedicalTherapy"
+            "schema:MedicalTherapy",
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [

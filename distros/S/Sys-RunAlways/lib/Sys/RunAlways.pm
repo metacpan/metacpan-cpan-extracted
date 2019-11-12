@@ -1,7 +1,7 @@
 package Sys::RunAlways;
 
 # version info
-$VERSION= '0.05';
+$VERSION= '0.06';
 
 # be as strict and verbose as possible
 use strict;
@@ -81,7 +81,7 @@ loaded, is always running on the server.
 
 =head1 VERSION
 
-This documentation describes version 0.05.
+This documentation describes version 0.06.
 
 =head1 METHODS
 
@@ -141,6 +141,8 @@ L<Sys::RunAlone>.
 =head1 AUTHOR
 
  Elizabeth Mattijsen
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 =head1 COPYRIGHT
 

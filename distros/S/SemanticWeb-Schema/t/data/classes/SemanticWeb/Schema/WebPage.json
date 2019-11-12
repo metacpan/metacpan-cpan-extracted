@@ -76,12 +76,12 @@
          "rdfs:label" : "speakable",
          "schema:category" : "issue-1389",
          "schema:domainIncludes" : [
-            "schema:Article",
-            "schema:WebPage"
+            "schema:WebPage",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
-            "schema:SpeakableSpecification",
-            "schema:URL"
+            "schema:URL",
+            "schema:SpeakableSpecification"
          ]
       },
       "schema:specialty" : {

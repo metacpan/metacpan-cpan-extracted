@@ -3,7 +3,7 @@ package Thread::Conveyor::Monitored;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 use strict;
 
 # Make sure we only load stuff when we actually need it
@@ -410,7 +410,7 @@ Thread::Conveyor::Monitored - monitor a belt for specific content
 
 =head1 VERSION
 
-This documentation describes version 0.14.
+This documentation describes version 0.15.
 
 =head1 SYNOPSIS
 

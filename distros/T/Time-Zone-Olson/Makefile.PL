@@ -30,7 +30,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         'Test::More' => 0,
         'Time::Local' => 0,
-	$^O eq 'MSWin32' ? ( 'Win32::API' => 0 ) : (),
+	$^O eq 'MSWin32' ? ( 'Win32::API' => 0.84 ) : (),
 	'XML::LibXML' => 0,
 	'LWP::UserAgent' => 0,
 	'LWP::Protocol::https' => 6.06,

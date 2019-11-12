@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.1 2019-11-09T00:54:05Z
+
+    - Fix bug in handling --cdifopts option.
+
 4.13.0 2019-11-02T02:00:48Z
 
     - Implement --margin option.

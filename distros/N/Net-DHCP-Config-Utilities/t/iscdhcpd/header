@@ -1,0 +1,12 @@
+default-lease-time 600;
+max-lease-time 7200;
+
+ddns-update-style none;
+
+authoritative;
+
+option web-proxy code 252 = text;
+
+log-facility local7;
+
+

@@ -3,7 +3,7 @@ package Thread::Pool;
 # Set the version information
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.33';
+$VERSION = '0.35';
 use strict;
 
 # Make sure we only load stuff when we actually need it
@@ -1221,7 +1221,7 @@ Thread::Pool - group of threads for performing similar jobs
 
 =head1 VERSION
 
-This documentation describes version 0.33.
+This documentation describes version 0.35.
 
 =head1 SYNOPSIS
 

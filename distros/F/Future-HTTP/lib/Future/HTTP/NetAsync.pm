@@ -9,7 +9,7 @@ use feature 'signatures';
 use HTTP::Request;
 use IO::Async::Future;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 with 'Future::HTTP::Handler';
 
@@ -43,7 +43,7 @@ requests asynchronously.
 
 sub BUILDARGS {
     my( $class, %options ) = @_;
-    
+
     my @ua_args = keys %options ? (_ua_args => \%options) : ();
     return +{
         @ua_args
@@ -58,7 +58,7 @@ sub _ae_from_netasync( $self, $res ) {
     $headers->{Status} = $res->code;
     $headers->{Reason} = '';
     $headers->{URL}    = $res->request->url;
-    
+
     if( $res->redirects) {
         my $r = $headers;
         for my $netasync_result ( reverse $res->redirects ) {
@@ -66,12 +66,12 @@ sub _ae_from_netasync( $self, $res ) {
             $r = $r->{Redirect}->[1]; # point to the new result headers
         };
     };
-    
+
     return ($body, $headers)
 };
 
 sub _request($self, $method, $url, %options) {
-    
+
     # Munge the parameters from AnyEvent::HTTP to Net::Async::HTTP
     my $h = HTTP::Headers->new( %{ $options{ headers } || {} });
     my $req = HTTP::Request->new(
@@ -79,7 +79,7 @@ sub _request($self, $method, $url, %options) {
         $h,
         $options{ body },
     );
-    
+
     # Execute the request (asynchronously)
     $self->ua->do_request(
         request => $req
@@ -89,7 +89,7 @@ sub _request($self, $method, $url, %options) {
         my $f = IO::Async::Future->new();
         $self->http_response_received( $f, $body, $headers );
     });
-    
+
 }
 
 sub http_request($self,$method,$url,%options) {
@@ -200,7 +200,7 @@ L<Mojo::UserAgent> for the backend
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<https://github.com/Corion/future-http>.
 
 =head1 SUPPORT
@@ -220,7 +220,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

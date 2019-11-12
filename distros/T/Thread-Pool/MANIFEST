@@ -12,3 +12,4 @@ t/Pool04.t
 t/Pool05.t
 t/Pool06.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

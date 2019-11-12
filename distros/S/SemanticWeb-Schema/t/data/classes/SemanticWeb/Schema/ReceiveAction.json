@@ -29,8 +29,8 @@
             "schema:ReceiveAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
             "schema:Person",
+            "schema:Organization",
             "schema:Audience"
          ]
       }

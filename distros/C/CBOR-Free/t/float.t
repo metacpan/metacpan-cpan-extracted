@@ -25,7 +25,7 @@ for my $i ( @nums ) {
     # NB: Long-double perls introduce rounding errors when decoding CBOR floats.
     cmp_deeply(
         CBOR::Free::decode($encoded),
-        $Config{'uselongdouble'} ? num($i, 0.0001) : $i,
+        $Config{'uselongdouble'} || $Config{'usequadmath'} ? num($i, 0.0001) : $i,
         "… and it round-trips",
     );
 }

@@ -3,7 +3,7 @@ package Google::RestApi::SheetsApi4::Range;
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use 5.010_000;
 
@@ -40,9 +40,10 @@ use constant {
   Dim       => StrMatch[qr/^(col|row)/i],
   Dims      => StrMatch[qr/^(col|row)/i],
   DimsAll   => StrMatch[qr/^(col|row|all)/i],
+  RangeA1   => '^(?:.+!)*[A-Z]+\d+:[A-Z]+\d+$',
   ColA1     => '^(?:.+!)*([A-Z]+)\d*(?::\1\d*)?$',
   RowA1     => '^(?:.+!)*[A-Z]*(\d+)(?::[A-Z]*\1)?$',
-  CellA1    => '^[A-Z]+/d+$',
+  CellA1    => '^(?:.+!)*[A-Z]+\d+$',
 };
 
 do 'Google/RestApi/logger_init.pl';
@@ -99,12 +100,13 @@ sub _value_range {
     # calculated value.
     state $check = compile_named(
       majorDimension => Dims,
-      range          => StrMatch[qr/^\w+!/],
+      range          => StrMatch[qr/.+!/],
       values         => Maybe[ArrayRef], { optional => 1 },
     );
     my $p = $check->(@_);
 
-    my ($worksheet_name) = $p->{range} =~ /(\w+)!/;
+    my ($worksheet_name) = $p->{range} =~ /(.+)!/;
+    $worksheet_name =~ s/'//g;
     die "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: ", $self->worksheet_name()
       if $worksheet_name ne $self->worksheet_name();
     $self->{value_range} = $p;
@@ -119,7 +121,7 @@ sub _value_range {
   if ($shared && $shared->has_values()) {
     my $dim = $shared->{value_range}->{majorDimension};
     my $values = $shared->{value_range}->{values};
-  
+
     my ($top, $left, $bottom, $right) = $self->offsets($shared);
     my $data;
     if ($dim =~ /^col/i) {
@@ -241,12 +243,16 @@ sub is_named {
   my $range = $self->{range};
   return if ref($range);
   return if !$range;
-  return if $range !~ /^[a-zA-Z0-9_]+$/;
-  return if $range =~ /^\d/;
-  return if $range =~ /^(true|false)/;
   return if length($range) > 250;
-  return if $range =~ /^[A-Z]+\d+$/;
-  return if $range =~ /^R\d+C\d+$/;
+  for (
+    qr/^\d/,
+    qr/^(true|false)/,
+    qr/^R\d+C\d+$/,
+    qr/^[A-Z]+\d+$/,
+    RangeA1, ColA1, RowA1, CellA1,
+  ) {
+    return if $range =~ /$_/;
+  }
   return 1;
 }
 
@@ -313,7 +319,7 @@ sub range {
   my $range = $self->{range};
   my ($start_cell, $end_cell);
   if (ref($range) eq 'ARRAY') {
-    if (ref($range->[0])) {
+    if (ref($range->[0]) || ref($range->[1])) {
       ($start_cell, $end_cell) = @$range;
     } else {
       $start_cell = $range;
@@ -344,7 +350,7 @@ sub range {
   $range .= ":$end_cell" if defined $end_cell;
   $range = "'$name'!$range";
 
-  DEBUG(sprintf("Range '%s' converted to '$range'", $self->_flattened_range($self->{range})));
+  DEBUG(sprintf("Range '%s' converted to '$range'", $self->_flatten_range($self->{range})));
   $self->{normalized_range} = $range;
 
   return $range;
@@ -352,25 +358,25 @@ sub range {
 
 # these are just used for debug message just above
 # to display the original range in a pretty format.
-sub _flattened_range {
+sub _flatten_range {
   my $self = shift;
 
   my $range = shift;
   return 'undef' if !$range;
   return $range if !ref($range);
 
-  return _flattened_hash($range) if ref($range) eq 'HASH';
-  return _flattened_array($range)
+  return _flatten_hash($range) if ref($range) eq 'HASH';
+  return _flatten_array($range)
     if ref($range) eq 'ARRAY' && scalar @$range == 1;
 
   # recursion... here be potential dragons.
   return sprintf('[ %s, %s ]',
-    $self->_flattened_range($range->[0]),
-    $self->_flattened_range($range->[1]),
+    $self->_flatten_range($range->[0]),
+    $self->_flatten_range($range->[1]),
   );
 }
 
-sub _flattened_hash {
+sub _flatten_hash {
   my $hash = shift;
   my $flat = '{ ';
   $flat .= "$_ => " . ($hash->{$_} || 'undef') . ", "
@@ -379,7 +385,7 @@ sub _flattened_hash {
   return $flat;
 }
 
-sub _flattened_array {
+sub _flatten_array {
   my $array = shift;
   my $flat = '[ ';
   $flat .= $_ || 'undef' . ", " foreach (@$array);
@@ -387,30 +393,33 @@ sub _flattened_array {
   return $flat;
 }
 
-sub _cell_to_a1 {
-  my $self = shift;
+sub is_colA1 {
+  my $col = shift;
+  return if !defined $col;
+  return if ref($col);
+  my $colA1 = ColA1;
+  my $cellA1 = CellA1;
+  return 1 if !is_cellA1($col) && $col =~ /$colA1/;
+  return;
+}
 
-  state $check = compile(Defined);
-  my ($cell) = $check->(@_);
+sub is_rowA1 {
+  my $row = shift;
+  return if !defined $row;
+  return if ref($row);
+  my $rowA1 = RowA1;
+  my $cellA1 = CellA1;
+  return 1 if !is_cellA1($row) && $row =~ /$rowA1/;
+  return;
+}
 
-  my $cellA1 = ColA1;
-  return $cell if !ref($cell) && $cell =~ qr/$cellA1/;
-
-  my ($col, $row);
-  if (ref($cell) eq 'ARRAY') {
-    ($col, $row) = @$cell;
-    $col = $self->_col_to_a1($col);
-    $row = $self->_row_to_a1($row);
-  } elsif (ref($cell) eq 'HASH') {
-    $col = $self->_col_to_a1($cell->{col});
-    $row = $self->_row_to_a1($cell->{row});
-  }
-
-  confess "Unable to translate cell '", Dump($cell), "' into a worksheet cell" if !$col && !$row;
-  confess "Unable to translate col '$col' into a worksheet col" if looks_like_number($col);
-  confess "Unable to translate row '$row' into a worksheet row" if looks_like_number($row) && $row < 1;
-
-  return "$col$row";
+sub is_cellA1 {
+  my $cell = shift;
+  return if !defined $cell;
+  return if ref($cell);
+  my $cellA1 = CellA1;
+  return 1 if $cell =~ qr/$cellA1/;
+  return;
 }
 
 sub _col_to_a1 {
@@ -419,9 +428,7 @@ sub _col_to_a1 {
   my $col = shift;
   return '' if !$col;
 
-  my $colA1 = ColA1;
-  return $col if $col =~ qr/$colA1/;
-
+  return $col if is_colA1($col);
   return $col if looks_like_number($col) && $col < 1;  # allow this to fail above.
   return $self->_col_i2a($col) if looks_like_number($col);
 
@@ -450,8 +457,7 @@ sub _row_to_a1 {
   my $row = shift;
   return '' if !$row;
 
-  my $rowA1 = RowA1;
-  return $row if $row =~ qr/$rowA1/;
+  return $row if is_rowA1($row);
 
   my $config = $self->config('rows');
   if ($config) {
@@ -470,6 +476,32 @@ sub _row_to_a1 {
   }
 
   confess "Unable to translate row '$row' into a worksheet row";
+}
+
+sub _cell_to_a1 {
+  my $self = shift;
+
+  state $check = compile(Defined);
+  my ($cell) = $check->(@_);
+
+  return $cell if is_cellA1($cell);
+
+  my ($col, $row);
+  if (ref($cell) eq 'ARRAY') {
+    ($col, $row) = @$cell;
+    $col = $self->_col_to_a1($col);
+    $row = $self->_row_to_a1($row);
+  } elsif (ref($cell) eq 'HASH') {
+    $col = $self->_col_to_a1($cell->{col});
+    $row = $self->_row_to_a1($cell->{row});
+  }
+
+  confess sprintf("Unable to translate cell '%s' into a worksheet cell", $self->_flatten_range($cell))
+    if !$col && !$row;
+  confess "Unable to translate col '$col' into a worksheet col" if looks_like_number($col);
+  confess "Unable to translate row '$row' into a worksheet row" if looks_like_number($row) && $row < 1;
+
+  return "$col$row";
 }
 
 sub _col_i2a {

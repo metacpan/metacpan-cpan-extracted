@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.01
+version 1.02
 
 # SYNOPSIS
 
@@ -317,7 +317,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -4,7 +4,7 @@ use DBI;
 use DateTime::Format::DBI;
 use base 'Template::Provider';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub _init
 {

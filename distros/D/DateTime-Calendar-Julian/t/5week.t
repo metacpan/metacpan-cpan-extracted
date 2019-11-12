@@ -1,5 +1,5 @@
 use strict;
-BEGIN { $^W = 1 }
+use warnings;
 
 use Test::More tests => 8;
 use DateTime::Calendar::Julian;

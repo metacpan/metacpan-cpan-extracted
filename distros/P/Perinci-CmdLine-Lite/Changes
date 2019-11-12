@@ -1,3 +1,11 @@
+1.825   2019-11-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Set default in 'dry_run' common option specification so
+	  CLI scripts with features => {dry_run => {default=>1}} in their
+	  metadata can have help that shows the more helpful --no-dry-run
+	  instead of --dry-run.
+
+
 1.824   2019-07-04  Released-By: PERLANCAR; Urgency: low
 
 	- [experimental] Use pre-compiled validator code in

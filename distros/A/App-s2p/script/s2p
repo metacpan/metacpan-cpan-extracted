@@ -6,7 +6,7 @@
 #           Jul 23 2007: Fix bug in regex stripping (M.Thorland)
 
 package App::s2p;
-$App::s2p::VERSION = '1.002';
+$App::s2p::VERSION = '1.003';
 use 5.006;
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ files is delayed until the first line is actually written to the file.
 =item B<-e> I<script>
 
 The editing commands defined by I<script> are appended to the script.
-Multiple commands must be separated by newlines.
+Multiple commands must be separated by newlines or semicolons.
 
 =item B<-f> I<script-file>
 
@@ -111,7 +111,7 @@ A dollar sign (C<$>) is the line number of the last line of the input stream.
 
 =item B</>I<regular expression>B</>
 
-A pattern address is a basic regular expression (see 
+A pattern address is a basic regular expression (see
 L<"BASIC REGULAR EXPRESSIONS">), between the delimiting character C</>.
 Any other character except C<\> or newline may be used to delimit a
 pattern address when the initial delimiter is prefixed with a
@@ -126,7 +126,7 @@ address.
 
 Two addresses select a range that begins whenever the first address
 matches, and ends (including that line) when the second address matches.
-If the first (second) address is a matching pattern, the second 
+If the first (second) address is a matching pattern, the second
 address is not applied to the very same line to determine the end of
 the range. Likewise, if the second address is a matching pattern, the
 first address is not applied to the very same line to determine the
@@ -180,7 +180,7 @@ $ComTab{'c'}=[ 2, 'txt', \&Change,     <<'-X-'                           ]; #ok
 
 =item [2addr]B<c\> I<text>
 
-The line, or range of lines, selected by the address is deleted. 
+The line, or range of lines, selected by the address is deleted.
 The I<text> (which must start on the line following the command)
 is written to standard output. With an address range, this occurs at
 the end of the range.
@@ -365,7 +365,7 @@ $ComTab{'s'}=[ 2, 'sub', \&Emit,       ''                                ]; #ok
 
 Substitute the I<replacement> string for the first substring in
 the pattern space that matches the I<regular expression>.
-Any character other than backslash or newline can be used instead of a 
+Any character other than backslash or newline can be used instead of a
 slash to delimit the regular expression and the replacement.
 To use the delimiter as a literal character within the regular expression
 and the replacement, precede the character by a backslash ('C<\>').
@@ -413,7 +413,7 @@ $ComTab{'t'}=[ 2, 'str', \&Branch,     '{ goto XXX if _t() }'            ]; #ok
 Branch to the B<:> function with the specified I<label> if any B<s>
 substitutions have been made since the most recent reading of an input line
 or execution of a B<t> function. If no label is given, branch to the end of
-the script. 
+the script.
 
 
 =cut
@@ -524,7 +524,7 @@ $Code = '';
 #  Compile Time
 #
 # Labels
-# 
+#
 # Error handling
 #
 sub Warn($;$){
@@ -548,7 +548,7 @@ sub safeHere($$){
         $eod++;
     }
     $$codref =~ s/TheEnd/$eod/e;
-    $$argref .= "$eod\n"; 
+    $$argref .= "$eod\n";
 }
 
 # Emit: create address logic and emit command
@@ -776,7 +776,7 @@ sub makes($$$$$$$){
     # make embedded newlines safe
     $regex =~ s/\n/\\n/g;
     $subst =~ s/\n/\\n/g;
- 
+
     my $code;
     # n-th occurrence
     #
@@ -837,7 +837,7 @@ The BRE bounds are: B<*>, specifying 0 or more matches of the preceding
 atom; B<\{>I<count>B<\}>, specifying that many repetitions;
 B<\{>I<minimum>B<,\}>, giving a lower limit; and
 B<\{>I<minimum>B<,>I<maximum>B<\}> finally defines a lower and upper
-bound. 
+bound.
 
 A bound appearing as the first item in a BRE is taken literally.
 
@@ -872,7 +872,7 @@ initial B<^>. To include a literal 'C<->' make it the first (or
 second after B<^>) or last character, or the second endpoint of
 a range.
 
-The special bracket expression constructs C<[[:E<lt>:]]> and C<[[:E<gt>:]]> 
+The special bracket expression constructs C<[[:E<lt>:]]> and C<[[:E<gt>:]]>
 match the null string at the beginning and end of a word respectively.
 (Note that neither is identical to Perl's '\b' atom.)
 
@@ -1014,7 +1014,7 @@ sub bre2p($$$){
                     $res .= '\\b';
                 } else {               ## \B, \w, \W remain the same
                     $res .= "\\$nc";
-                } 
+                }
 	    } elsif( $nc eq $led ){
 		## \<closing bracketing-delimiter> - keep '\'
 		$res .= "\\$nc";
@@ -1127,7 +1127,7 @@ sub sub2p($$$){
 
     $subst = substr( $subst, 1, length($subst) - 2 );
     my $res = '';
- 
+
     for( my $ic = 0; $ic < length( $subst ); $ic++ ){
         my $c = substr( $subst, $ic, 1 );
         if( $c eq '\\' ){
@@ -1183,7 +1183,7 @@ sub Parse(){
         }
         my $fl = "$pfil$plin";
 
-        # insert command as comment in gnerated code
+        # insert command as comment in generated code
 	#
 	$Code .= "# $cmd\n" if $doGenerate;
 
@@ -1411,6 +1411,15 @@ sub Parse(){
 	    if( $key eq '{' ){
 		# dirty hack to process command on '{' line
 		$Commands[$icom--] = $cmd;
+
+        } elsif( $cmd =~ s/^\s*;\s*// ) {
+        # Another command follows, so handle that in the next round
+        # This is somewhat hacky, but unless we either parse the
+        # commands twice we have no choice but to change the @Commands array
+        # on the fly as we discover new commands
+		# This is the same hack as above
+		$Commands[$icom--] = $cmd;
+
 	    } else {
 		Warn( "extra characters after command ($cmd)", $fl );
 		$error++;
@@ -1466,7 +1475,7 @@ while( @ARGV && $ARGV[0] =~ /^-(.)(.*)$/ ){
         if( length( $arg ) ){
 	    push( @Commands, split( "\n", $arg ) );
         } elsif( @ARGV ){
-	    push( @Commands, shift( @ARGV ) ); 
+	    push( @Commands, shift( @ARGV ) );
         } else {
             Warn( "option -e requires an argument" );
             usage();
@@ -1481,7 +1490,7 @@ while( @ARGV && $ARGV[0] =~ /^-(.)(.*)$/ ){
         if( length( $arg ) ){
 	    $path = $arg;
         } elsif( @ARGV ){
-	    $path = shift( @ARGV ); 
+	    $path = shift( @ARGV );
         } else {
             Warn( "option -f requires an argument" );
             usage();
@@ -1552,7 +1561,7 @@ sub openARGV(){
 # getsARGV: Read another input line into argument (default: $_).
 #           Move on to next input file, and reset EOF flag $isEOF.
 sub getsARGV(;\$){
-    my $argref = @_ ? shift() : \$_; 
+    my $argref = @_ ? shift() : \$_;
     while( $isEOF || ! defined( $$argref = <ARG> ) ){
 	close( ARG );
 	return 0 unless @ARGV;
@@ -1671,7 +1680,7 @@ if( $GenKey{'l'} ){
     $Func .= <<'[TheEnd]';
 # _l: l command processing
 #
-sub _l(){        
+sub _l(){
     my $h = $_;
     my $mcpl = 70;
     # transform non printing chars into escape notation
@@ -1731,7 +1740,7 @@ sub _t(){
 if( $GenKey{'w'} ){
     $Proto .= "sub _w(\$);\n";
     $Func .= <<'[TheEnd]';
-# _w: w command and s command's w flag - write to file 
+# _w: w command and s command's w flag - write to file
 #
 sub _w($){
     my $path   = shift();
@@ -1765,7 +1774,7 @@ if( $doGenerate ){
 
     # write full Perl program
     #
- 
+
     # bang line, declarations, prototypes
     print <<TheEnd;
 #!$Config{perlpath} -w
@@ -1968,7 +1977,7 @@ Trailing spaces are truncated from labels in B<:>, B<t> and B<b> commands.
 
 The meaning of an empty regular expression ('C<//>'), as defined by B<sed>,
 is "the last pattern used, at run time". This deviates from the Perl
-interpretation, which will re-use the "last last successfully executed
+interpretation, which will re-use the "last successfully executed
 regular expression". Since keeping track of pattern usage would create
 terribly cluttered code, and differences would only appear in obscure
 context (where other B<sed> implementations appear to deviate, too),

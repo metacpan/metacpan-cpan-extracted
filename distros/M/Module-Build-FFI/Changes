@@ -1,5 +1,8 @@
 Revision history for Module-Build-FFI
 
+0.50      2019-11-11 16:25:09 -0700
+  - Merge Module::Build::FFI::Rust from FFI-Platypus-Lang-Rust
+
 0.49      2019-01-14 20:16:37 -0500
   - Merge Module::Build::FFI::Pascal from FFI-Platypus-Lang-Pascal
     into this dist

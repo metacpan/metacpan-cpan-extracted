@@ -1,0 +1,8 @@
+The use of Scalar::Util::weaken is not without peril in threaded Perls
+5.8.0 through 5.8.2 (and possibly higher).  There is probably going to be
+some version specific XS code needed to fix these problems with these Perl
+versions.  Hopefully 5.8.3 and higher won't need that anymore.
+
+more extensive test-suite
+
+examples

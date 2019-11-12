@@ -1,6 +1,6 @@
 package PerlIO::via::UnComment;
 
-$VERSION= '0.04';
+$VERSION= '0.05';
 
 # be as strict as possible
 use strict;
@@ -77,7 +77,7 @@ PerlIO::via::UnComment - PerlIO layer for removing comments
 
 =head1 VERSION
 
-This documentation describes version 0.04.
+This documentation describes version 0.05.
 
 =head1 DESCRIPTION
 
@@ -117,6 +117,8 @@ A script that only lets uncommented source code.
 L<PerlIO::via>, L<PerlIO::via::UnPod> and any other PerlIO::via modules on CPAN.
 
 =head1 COPYRIGHT
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen.  All rights reserved.
 This library is free software; you can redistribute it and/or modify it under

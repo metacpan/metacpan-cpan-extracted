@@ -1,3 +1,6 @@
+0.11	9 November 2019
+	Adoption
+
 0.10    22 May 2012
         Fixed problems in test-suite that seemed to be an artefact of some more
         recent changes in Test::More and/or perl 5.16.0.  I hope I didn't

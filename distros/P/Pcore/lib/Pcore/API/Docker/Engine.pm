@@ -3,7 +3,7 @@ package Pcore::API::Docker::Engine;
 use Pcore -class, -const, -res;
 
 const our $API_VER               => 'v1.39';
-const our $DEFAULT_BUILD_TIMEOUT => 60 * 60 * 2;
+const our $DEFAULT_BUILD_TIMEOUT => 60 * 60 * 2;    # 2 hours
 
 has username => sub { $ENV->user_cfg->{DOCKER}->{username} };
 has password => sub { $ENV->user_cfg->{DOCKER}->{password} };
@@ -43,7 +43,7 @@ sub image_build ( $self, $tar, $tags ) {
 
     return res $res if !$res;
 
-    my ( $log, $error );
+    my ( $log, $error, $image_id );
 
     for my $stream ( split /\r\n/sm, $res->{data}->$* ) {
         my $data = P->data->from_json($stream);
@@ -55,11 +55,13 @@ sub image_build ( $self, $tar, $tags ) {
 
             $log .= $data->{error};
         }
+
+        $image_id = $data->{aux}->{ID} if exists $data->{aux}->{ID};
     }
 
     return res 500, log => $log if $error;
 
-    return res 200;
+    return res 200, $image_id;
 }
 
 # https://docs.docker.com/engine/api/v1.39/#operation/ImagePush
@@ -139,7 +141,7 @@ sub _create_url ( $self, $path ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 91                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 93                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

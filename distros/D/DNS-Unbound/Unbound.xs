@@ -58,6 +58,9 @@ SV * _ub_result_to_svhv_and_free (struct ub_result* result) {
     val = newSViv(result->ttl);
     hv_stores(rh, "ttl", val);
 
+    val = newSVpvn(result->answer_packet, result->answer_len);
+    hv_stores(rh, "answer_packet", val);
+
     ub_resolve_free(result);
 
     return (SV *)rh;

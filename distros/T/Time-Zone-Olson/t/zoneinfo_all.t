@@ -242,6 +242,7 @@ foreach my $area ($timezone->areas()) {
 				$transition_time_index += 1;
 				$count += 1;
 				$count = $count % 2;
+				ok($timezone->tz_definition(), "TZ definition for $area/$location is " . $timezone->tz_definition());
 				if ($count == 0) {
 					Time::Zone::Olson->reset_cache();
 					$timezone = Time::Zone::Olson->new();

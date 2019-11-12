@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Digest::SHA qw( sha1_hex );
 use Encode qw( encode );
@@ -808,7 +808,7 @@ Markdent::Parser::BlockParser - Block parser for standard Markdown
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 

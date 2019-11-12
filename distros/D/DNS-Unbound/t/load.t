@@ -37,7 +37,8 @@ eval {
 
     diag explain $result;
 
-    is_deeply( $result->to_net_dns_rrs(), [], 'to_net_dns_rrs() when there’s no data' );
+    # There often is a packet, even if there’s no data in it.
+    # is_deeply( $result->answer_packet(), q<>, 'answer_packet() when there’s no data' );
 
     $result = $dns->resolve('com', 'NS');
     my @data = @{ $result->data() };
@@ -67,13 +68,13 @@ eval {
     ok( !$result->nxdomain(), '!nxdomain()' );
     ok( !$result->{nxdomain}, '!{nxdomain}' );
 
-    my $net_dns_rr = $result->to_net_dns_rrs();
+    my $net_dns_packet = Net::DNS::Packet->new( \$result->answer_packet() );
 
-    if (@$net_dns_rr) {
+    if (my @answer = $net_dns_packet->answer()) {
 
-        my $ns_obj = $net_dns_rr->[0];
+        my $ns_obj = $answer[0];
 
-        isa_ok( $ns_obj, 'Net::DNS::RR::NS', 'to_net_dns_rrs() result' );
+        isa_ok( $ns_obj, 'Net::DNS::RR::NS', 'parse answer_packet() result' );
 
         is( $ns_obj->ttl(), $result->ttl(), 'ttl() match' );
         is( $ns_obj->ttl(), $result->{ttl}, '{ttl} match' );

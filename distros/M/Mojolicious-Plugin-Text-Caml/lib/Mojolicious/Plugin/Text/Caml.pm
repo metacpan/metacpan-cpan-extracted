@@ -1,9 +1,10 @@
 package Mojolicious::Plugin::Text::Caml;
+use v5.10.0;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Text::Caml;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub register {
     my ( $self, $app, $args ) = @_;

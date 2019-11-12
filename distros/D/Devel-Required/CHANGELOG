@@ -1,3 +1,6 @@
+0.15	9 November 2019
+	Adoption.
+
 0.14    7 December 2012
         Added additional text for "Installation" that mentions that any
         additional parameters to the Makefile.PL will simply be passed on.

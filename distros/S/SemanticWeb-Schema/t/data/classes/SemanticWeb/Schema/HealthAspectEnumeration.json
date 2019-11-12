@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "HealthAspectEnumeration enumerates several aspects of health content online, each of which might be described using <a class=\"localLink\" href=\"http://schema.org/hasHealthAspect\">hasHealthAspect</a> and <a class=\"localLink\" href=\"http://schema.org/HealthTopicContent\">HealthTopicContent</a>.",
+      "rdfs:label" : "HealthAspectEnumeration",
+      "rdfs:subClassOf" : "schema:Enumeration",
+      "schema:category" : "issue-2374",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {}
+}

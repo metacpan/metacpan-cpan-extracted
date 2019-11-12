@@ -1,4 +1,13 @@
+0.009   2019-09-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add groups to Changes so it's more readable.
+
+
 0.008   2019-09-19  Released-By: PERLANCAR; Urgency: medium
+
+	[whmcs-send-verification-emails]
 
 	- Add option --limit.
 
@@ -24,6 +33,8 @@
 
 0.005   2018-01-29  Released-By: PERLANCAR
 
+        [whmcs-calc-deferred-revenue]
+
 	- Add total row to CSV.
 
 	- Tweak categorization.
@@ -36,11 +47,15 @@
 
 0.004   2018-01-26  Released-By: PERLANCAR
 
+        [whmcs-calc-deferred-revenue]
+
 	- Allow extra rules to set to revenue, some fixes/improvements of
 	  rules.
 
 
 0.003   2018-01-25  Released-By: PERLANCAR
+
+        [whmcs-calc-deferred-revenue]
 
 	- [ux] Order invoice items by date paid instead of invoice ID.
 

@@ -7,7 +7,7 @@ use Thread::Tie ();
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.19';
+$VERSION = '0.20';
 use strict;
 
 # Make sure we only load stuff when we actually need it
@@ -121,7 +121,7 @@ Thread::Conveyor - transport of any data-structure between threads
 
 =head1 VERSION
 
-This documentation describes version 0.19.
+This documentation describes version 0.20.
 
 =head1 SYNOPSIS
 

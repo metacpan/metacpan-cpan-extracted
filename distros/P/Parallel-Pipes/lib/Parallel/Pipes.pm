@@ -7,7 +7,7 @@ use IO::Select;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 {
     package Parallel::Pipe::Impl;
@@ -17,7 +17,7 @@ our $VERSION = '0.004';
         my $read_fh  = delete $option{read_fh}  or die;
         my $write_fh = delete $option{write_fh} or die;
         $write_fh->autoflush(1);
-        bless { %option, read_fh => $read_fh, write_fh => $write_fh }, $class;
+        bless { %option, read_fh => $read_fh, write_fh => $write_fh, buf => '' }, $class;
     }
     sub read :method {
         my $self = shift;
@@ -35,20 +35,18 @@ our $VERSION = '0.004';
     sub _read {
         my ($self, $size) = @_;
         my $fh = $self->{read_fh};
-        my $read = '';
-        my $offset = 0;
-        while ($size) {
-            my $len = sysread $fh, $read, $size, $offset;
+        my $offset = length $self->{buf};
+        while ($offset < $size) {
+            my $len = sysread $fh, $self->{buf}, 65536, $offset;
             if (!defined $len) {
                 die $!;
             } elsif ($len == 0) {
                 last;
             } else {
-                $size   -= $len;
                 $offset += $len;
             }
         }
-        $read;
+        return substr $self->{buf}, 0, $size, '';
     }
     sub _write {
         my ($self, $data) = @_;

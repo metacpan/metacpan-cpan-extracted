@@ -27,7 +27,7 @@ optional_features: {}
 provides:
   MooX::Enumeration:
     file: lib/MooX/Enumeration.pm
-    version: '0.007'
+    version: '0.009'
 recommends:
   MooseX::Enumeration: '0'
   match::simple::XS: '0'
@@ -44,6 +44,8 @@ resources:
   homepage: https://metacpan.org/release/MooX-Enumeration
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-enumeration.git
-version: '0.007'
+version: '0.009'
+x_contributors:
+  - 'Diab Jerius (DJERIUS) <djerius@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

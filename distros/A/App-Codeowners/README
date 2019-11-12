@@ -1,0 +1,209 @@
+NAME
+
+    git-codeowners - A tool for managing CODEOWNERS files
+
+VERSION
+
+    version 0.41
+
+SYNOPSIS
+
+        git-codeowners [--version|--help|--manual]
+    
+        git-codeowners [show] [--format FORMAT] [--[no-]project] [PATH...]
+    
+        git-codeowners owners [--format FORMAT] [--pattern PATTERN]
+    
+        git-codeowners patterns [--format FORMAT] [--owner OWNER]
+    
+        git-codeowners create|update [REPO_DIRPATH|CODEOWNERS_FILEPATH]
+    
+        # enable bash shell completion
+        eval "$(git-codeowners --shell-completion)"
+
+DESCRIPTION
+
+    git-codeowners is yet another CLI tool for managing CODEOWNERS files in
+    git repos. In particular, it can be used to quickly find out who owns a
+    particular file in a monorepo (or monolith).
+
+    THIS IS EXPERIMENTAL! The interface of this tool and its modules will
+    probably change as I field test some things. Feedback welcome.
+
+INSTALL
+
+    There are several ways to install git-codeowners to your system.
+
+ from CPAN
+
+    You can install git-codeowners using cpanm:
+
+        cpanm App::Codeowners
+
+ from GitHub
+
+    You can also choose to download git-codeowners as a self-contained
+    executable:
+
+        curl -OL https://raw.githubusercontent.com/chazmcgarvey/git-codeowners/solo/git-codeowners
+        chmod +x git-codeowners
+
+    To hack on the code, clone the repo instead:
+
+        git clone https://github.com/chazmcgarvey/git-codeowners.git
+        cd git-codeowners
+        make bootstrap      # installs dependencies; requires cpanm
+
+OPTIONS
+
+ --version
+
+    Print the program name and version to STDOUT, and exit.
+
+    Alias: -v
+
+ --help
+
+    Print the synopsis to STDOUT, and exit.
+
+    Alias: -h
+
+    You can also use --manual to print the full documentation.
+
+ --color
+
+    Enable colorized output.
+
+    Color is ON by default on terminals; use --no-color to disable. Some
+    environment variables may also alter the behavior of colorizing output:
+
+      * NO_COLOR - Set to disable color (same as --no-color).
+
+      * COLOR_DEPTH - Set the number of supportable colors (e.g. 0, 16,
+      256, 16777216).
+
+ --format
+
+    Specify the output format to use. See "FORMAT".
+
+    Alias: -f
+
+ --shell-completion
+
+        eval "$(lintany --shell-completion)"
+
+    Print shell code to enable completion to STDOUT, and exit.
+
+    Does not yet support Zsh...
+
+COMMANDS
+
+ show
+
+        git-codeowners [show] [--format FORMAT] [--[no-]project] [PATH...]
+
+    Show owners of one or more files in a repo.
+
+ owners
+
+        git-codeowners owners [--format FORMAT] [--pattern PATTERN]
+
+ patterns
+
+        git-codeowners patterns [--format FORMAT] [--owner OWNER]
+
+ create
+
+        git-codeowners create [REPO_DIRPATH|CODEOWNERS_FILEPATH]
+
+    Create a new CODEOWNERS file for a specified repo (or current
+    directory).
+
+ update
+
+        git-codeowners update [REPO_DIRPATH|CODEOWNERS_FILEPATH]
+
+    Update the "unowned" list of an existing CODEOWNERS file for a
+    specified repo (or current directory).
+
+FORMAT
+
+    The --format argument can be one of:
+
+      * csv - Comma-separated values (requires Text::CSV)
+
+      * json:pretty - Pretty JSON (requires JSON::MaybeXS)
+
+      * json - JSON (requires JSON::MaybeXS)
+
+      * table - Table (requires Text::Table::Any)
+
+      * tsv - Tab-separated values (requires Text::CSV)
+
+      * yaml - YAML (requires YAML)
+
+      * FORMAT - Custom format (see below)
+
+ Custom
+
+    You can specify a custom format using printf-like format sequences.
+    These are the items that can be substituted:
+
+      * %F - Filename
+
+      * %O - Owner or owners
+
+      * %P - Project
+
+      * %T - Pattern
+
+      * %n - newline
+
+      * %t - tab
+
+      * %% - percent sign
+
+    The syntax also allows padding and some filters. Examples:
+
+        git-codeowners show -f ' * %-50F %O'                # default for "show"
+        git-codeowners show -f '%{quote}F,%{quote}O'        # ad hoc CSV
+        git-codeowners patterns -f '--> %{color:0c0}T'      # whatever...
+
+    Available filters:
+
+      * quote - Quote the replacement string.
+
+      * color:FFFFFF - Colorize the replacement string (if color is ON).
+
+      * nocolor - Do not colorize replacement string.
+
+ Table
+
+    Table formatting can be done by one of several different modules, each
+    with its own features and bugs. The default module is
+    Text::Table::Tiny, but this can be overridden using the PERL_TEXT_TABLE
+    environment variable if desired, like this:
+
+        PERL_TEXT_TABLE=Text::Table::HTML git-codeowners -f table
+
+    The list of available modules is at "@BACKENDS" in Text::Table::Any.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/chazmcgarvey/git-codeowners/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Charles McGarvey <chazmcgarvey@brokenzipper.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2019 by Charles McGarvey.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

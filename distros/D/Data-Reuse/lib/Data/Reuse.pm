@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # set up version info
-our $VERSION= '0.10';
+our $VERSION= '0.11';
 
 # we need this otherwise nothing works
 use Data::Alias qw( alias copy );
@@ -415,7 +415,7 @@ Data::Reuse - share constant values with Data::Alias
 
 =head1 VERSION
 
-This documentation describes version 0.10.
+This documentation describes version 0.11.
 
 =head1 SYNOPSIS
 
@@ -657,6 +657,8 @@ L<Data::Alias> module.
 =head1 AUTHOR
 
 Elizabeth Mattijsen <liz@dijkmat.nl>
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Copyright (C) 2006, 2007, 2009, 2012 Elizabeth Mattijsen.  All rights reserved.
 This program is free software; you can redistribute it and/or modify 

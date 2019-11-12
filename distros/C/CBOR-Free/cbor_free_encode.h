@@ -15,6 +15,7 @@ typedef struct {
     uint8_t recurse_count;
     uint8_t scratch[9];
     bool is_canonical;
+    bool encode_scalar_refs;
 } encode_ctx;
 
 SV * cbf_encode( pTHX_ SV *value, encode_ctx *encode_state, SV *RETVAL );

@@ -1,4 +1,4 @@
-package Pcore v0.98.15;
+package Pcore v0.98.16;
 
 use v5.30;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -118,7 +118,7 @@ sub import {
     if ( $import->{pragma}->{sql} ) {
         require Pcore::Handle::DBI::Const;
 
-        Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY] );
+        Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY :SQL_VALUES_IDX] );
     }
 
     # re-export OOP

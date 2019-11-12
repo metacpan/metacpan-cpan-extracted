@@ -1,5 +1,10 @@
 Revision history for Parse-PMFile
 
+0.42 2019/11/09
+  - no code changes
+  - explicitly declared ExtUtils::MakeMaker::CPANfile as a configure
+    requirement (Nikolo++)
+
 0.41 2016/11/03
   - not to count package declaration in a string
   - treat a package that contains multiple singlequotes correctly

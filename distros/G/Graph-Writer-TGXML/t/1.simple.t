@@ -28,27 +28,27 @@ unlink('t/graph.simple.xml');
 __DATA__
 <TOUCHGRAPH_LB version="1.20">
   <NODESET>
-    <NODE nodeID="Bob">
-      <NODE_LOCATION x="633" y="30" visible="true" />
-      <NODE_LABEL label="Bob" shape="2" backColor="FFFFFF" textColor="000000" fontSize="16" />
-      <NODE_URL url="" urlIsLocal="false" urlIsXML="false" />
-      <NODE_HINT hint="" width="400" height="-1" isHTML="false" />
-    </NODE>
-    <NODE nodeID="Dr">
-      <NODE_LOCATION x="633" y="30" visible="true" />
-      <NODE_LABEL label="Dr" shape="2" backColor="FFFFFF" textColor="000000" fontSize="16" />
-      <NODE_URL url="" urlIsLocal="false" urlIsXML="false" />
-      <NODE_HINT hint="" width="400" height="-1" isHTML="false" />
-    </NODE>
     <NODE nodeID="Alice">
       <NODE_LOCATION x="633" y="30" visible="true" />
       <NODE_LABEL label="Alice" shape="2" backColor="FFFFFF" textColor="000000" fontSize="16" />
       <NODE_URL url="" urlIsLocal="false" urlIsXML="false" />
       <NODE_HINT hint="" width="400" height="-1" isHTML="false" />
     </NODE>
+    <NODE nodeID="Bob">
+      <NODE_LOCATION x="633" y="30" visible="true" />
+      <NODE_LABEL label="Bob" shape="2" backColor="FFFFFF" textColor="000000" fontSize="16" />
+      <NODE_URL url="" urlIsLocal="false" urlIsXML="false" />
+      <NODE_HINT hint="" width="400" height="-1" isHTML="false" />
+    </NODE>
     <NODE nodeID="Crude">
       <NODE_LOCATION x="633" y="30" visible="true" />
       <NODE_LABEL label="Crude" shape="2" backColor="FFFFFF" textColor="000000" fontSize="16" />
+      <NODE_URL url="" urlIsLocal="false" urlIsXML="false" />
+      <NODE_HINT hint="" width="400" height="-1" isHTML="false" />
+    </NODE>
+    <NODE nodeID="Dr">
+      <NODE_LOCATION x="633" y="30" visible="true" />
+      <NODE_LABEL label="Dr" shape="2" backColor="FFFFFF" textColor="000000" fontSize="16" />
       <NODE_URL url="" urlIsLocal="false" urlIsXML="false" />
       <NODE_HINT hint="" width="400" height="-1" isHTML="false" />
     </NODE>

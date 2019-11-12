@@ -11,7 +11,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -30,11 +30,20 @@ SUPPORT
 The public support forum of this module is
 L<https://perlmonks.org/>.
 
+
+
 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Future-HTTP>
 or via mail to L<future-http-Bugs@rt.cpan.org>.
+
+
+SEE ALSO
+
+L<Future>
+
+L<AnyEvent::HTTP> for the details of the API
 
 AUTHOR
 
@@ -46,4 +55,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.

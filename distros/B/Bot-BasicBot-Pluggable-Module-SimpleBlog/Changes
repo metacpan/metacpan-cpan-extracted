@@ -1,3 +1,6 @@
+0.03    09 November 2019
+        Fixed the DB test (Test::DatabaseRow wasn't DWIMing)
+
 0.02    19 March 2003
         Added a couple of tests; nothing spectacular though.
         Fixed a thinko in one of the column names in the SQLite store.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -20,6 +20,14 @@
 
 # Exercise reading from a PerlIO::via::QuotedPrint, if that module
 # available.
+#
+# Had some cpantesters of x86_64-linux / 5.24.3 and 5.24.4, such as
+# http://www.cpantesters.org/cpan/report/de1a8bf8-3a6c-11e9-a916-27670eda5942
+# failing with
+# perl: av.c:583: Perl_av_push: Assertion `val' failed.
+#
+# Dunno if this is a problem here, or PerlIO::via::QuotedPrint, or even Perl
+# itself.
 
 
 use 5.006;

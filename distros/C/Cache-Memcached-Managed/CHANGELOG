@@ -1,3 +1,6 @@
+0.25	9 November 2019
+	Adoption
+
 0.24    24 May 2012
         Removed forced die from Makefile.PL if memcached is not available.
         All relevant tests will be skipped, allowing installs on machines

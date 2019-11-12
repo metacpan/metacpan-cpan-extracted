@@ -1,0 +1,32 @@
+README for LCC
+
+The LCC.pm family of modules contains a Perl implementation of the Content
+Provider part of the Local Content Cache system, as available from
+
+ http://lococa.sourceforge.net/
+
+It currently consists of the following modules:
+
+ LCC                            base module
+ LCC::Backend                   base class for storing local status
+ LCC::Backend::DBI              Backend using DBI for permanent storage
+ LCC::Backend::DBI::mysql       Backend using mysql for permanent storage
+ LCC::Backend::Storable         Backend using Storable for permanent storage
+ LCC::Backend::textfile         Backend using a textfile for permanent storage
+ LCC::Documents                 base class for checking document information
+ LCC::Documents::DBI            Document information stored in a database
+ LCC::Documents::filesystem     Documents stored on a file system
+ LCC::Documents::module         Document information accessible by a Perl module
+ LCC::Documents::queue          Documents accessible by a threads::shared::queue
+ LCC::UNS                       setup connection to Update Notification Server
+
+Copyright (c) 2002 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

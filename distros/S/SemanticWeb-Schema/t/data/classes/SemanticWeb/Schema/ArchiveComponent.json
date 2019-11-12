@@ -31,8 +31,8 @@
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:Place",
-            "schema:Text",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:Text"
          ]
       }
    }

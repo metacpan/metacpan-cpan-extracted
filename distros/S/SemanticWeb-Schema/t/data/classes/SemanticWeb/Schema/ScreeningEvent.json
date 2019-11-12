@@ -13,8 +13,8 @@
          "rdfs:label" : "subtitleLanguage",
          "schema:category" : "issue-2110",
          "schema:domainIncludes" : [
-            "schema:Movie",
             "schema:BroadcastEvent",
+            "schema:Movie",
             "schema:ScreeningEvent",
             "schema:TVEpisode"
          ],
@@ -30,8 +30,8 @@
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
             "schema:BroadcastService",
-            "schema:BroadcastEvent",
-            "schema:ScreeningEvent"
+            "schema:ScreeningEvent",
+            "schema:BroadcastEvent"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

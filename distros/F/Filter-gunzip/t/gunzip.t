@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -19,58 +19,70 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test;
+plan tests => 4;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-require Filter::gunzip;
+BEGIN {
+  require Filter::gunzip;
+}
+
+# #-----------------------------------------------------------------------------
+# # Exercise _rsfp getting PL_rsfp and _rsfp_filters getting PL_rsfp_filters.
+# 
+# BEGIN {
+#   # This runs in BEGIN since later there is no rsfp.
+#   diag "diagnostics:";
+# 
+#   my $filters = Filter::gunzip::_rsfp_filters();
+#   diag "PL_rsfp_filters aref = ",(defined $filters ? "$filters" : '[undef]');
+#   if (defined $filters) {
+#     diag "  length ",scalar(@$filters);
+#   }
+# 
+#   # FIXME: These prints do something which stops all tests at this point.
+#   # Is there something bad about looking at PL_rsfp here?
+#   #
+#   if (defined $filters) {
+#     my $fh = Filter::gunzip::_rsfp();
+#     diag "PL_rsfp = ",$fh;
+#     if (defined $fh) {
+#       my @layers = PerlIO::get_layers($fh);
+#       diag "  layers: ",join(' ',@layers);
+#       diag "  ftell:  ",tell($fh);
+#     }
+#   }
+#   diag "end diagnostics";
+# }
+# CHECK {
+#   diag "final BEGIN block";
+# }
+# CHECK {
+#   diag "CHECK block runs";
+# }
 
 #-----------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 7;
-  is ($Filter::gunzip::VERSION, $want_version, 'VERSION variable');
-  is (Filter::gunzip->VERSION,  $want_version, 'VERSION class method');
-  ok (eval { Filter::gunzip->VERSION($want_version); 1 },
+  my $want_version = 8;
+  ok ($Filter::gunzip::VERSION, $want_version, 'VERSION variable');
+  ok (Filter::gunzip->VERSION,  $want_version, 'VERSION class method');
+  ok (eval { Filter::gunzip->VERSION($want_version); 1 }, 1,
       "VERSION class check $want_version");
   my $check_version = $want_version + 1000;
-  ok (! eval { Filter::gunzip->VERSION($check_version); 1 },
+  ok (! eval { Filter::gunzip->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
 }
 
-#-----------------------------------------------------------------------------
-# _rsfp
-
 # {
-#   my $rsfp = Filter::gunzip::_rsfp();
-#   diag "_rsfp is ", $rsfp;
-#   if ($rsfp) {
-#     my $rsfp_filters = Filter::gunzip::_rsfp_filters();
-#     diag "_rsfp_filters is ", $rsfp_filters;
-#   }
+#   require PerlIO::gzip;
+#   diag "PerlIO::gzip version ",PerlIO::gzip->VERSION;
 # }
 
-
+# diag "end tests";
 #-----------------------------------------------------------------------------
-# test1
-
-{
-  require FindBin;
-  my $used_more_than_once = $FindBin::Bin;
-  my $filename = File::Spec->catfile ($FindBin::Bin, 'test1.dat');
-
-  use vars qw($test1 $test1_more);
-  $test1 = 0;
-  $test1_more = 0;
-  diag "load $filename";
-  my $result = eval { no warnings;
-                      require $filename };
-  my $err = $@;
-  is ($result, "some thing");
-  is ($err, '');
-}
-
 exit 0;

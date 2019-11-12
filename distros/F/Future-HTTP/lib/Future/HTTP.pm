@@ -13,7 +13,7 @@ Future::HTTP - provide the most appropriate HTTP client with a Future API
     my $ua = Future::HTTP->new();
     my $res = $ua->http_get('http://www.nethype.de/')->then(sub {
         my( $body, $data ) = @_;
-        ...
+        # ... handle the response
         return $body
     })->get();
 
@@ -55,7 +55,7 @@ but has not materialized yet.
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @loops;
 push @loops, (
@@ -129,7 +129,7 @@ sub best_implementation( $class, @candidates ) {
         },
     )->then(sub {
         my( $body, $headers ) = @_;
-        ...
+        # ... handle the response
     })->get;
 
 Retrieves the URL and returns the body and headers, like
@@ -207,7 +207,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

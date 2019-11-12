@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Markdent::Types;
 
@@ -57,7 +57,7 @@ Markdent::Role::DebugPrinter - A role for classes which output debugging informa
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 

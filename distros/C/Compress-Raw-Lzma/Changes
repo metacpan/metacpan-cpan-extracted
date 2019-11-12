@@ -1,6 +1,13 @@
 CHANGES
 -------
 
+  2.090 9 November 2019
+
+      * Memory leak in raw_decoder
+        Issue https://github.com/pmqs/Compress-Raw-Lzma/issues/1
+        05c0eac3ab1edd05e5bc945463af004dcbc88c00
+        b020045e17a7ab7338c010f5100ec63e8e8e9040
+
   2.089 3 November 2019
 
       * No Changes

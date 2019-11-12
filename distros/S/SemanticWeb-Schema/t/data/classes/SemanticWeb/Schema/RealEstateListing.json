@@ -8,5 +8,22 @@
       "schema:category" : "issue-2348",
       "schema:isPartOf" : "http:pending.schema.org"
    },
-   "properties" : {}
+   "properties" : {
+      "schema:leaseLength" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Length of the lease for some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, either particular to some <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> or in some cases intrinsic to the property.",
+         "rdfs:label" : "leaseLength",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:RealEstateListing",
+            "schema:Accommodation"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Duration"
+         ]
+      }
+   }
 }

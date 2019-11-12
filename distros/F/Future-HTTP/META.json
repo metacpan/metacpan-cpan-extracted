@@ -30,6 +30,15 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "HTTP::Tiny" : "0",
+            "HTTP::Tiny::Paranoid" : "0",
+            "Mojo::UserAgent" : "0",
+            "Net::Async::HTTP" : "0"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "IO::Uncompress::Bunzip2" : "0",
@@ -40,7 +49,7 @@
             "MIME::QuotedPrint" : "0"
          },
          "requires" : {
-            "Filter::signatures" : "0.03",
+            "Filter::signatures" : "0.13",
             "Future" : "0.31",
             "HTTP::Headers" : "6.07",
             "HTTP::Tiny" : "0",
@@ -58,13 +67,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Corion/future-http.git",
-         "web" : "https://github.com/Corion/future-http"
+         "url" : "git://github.com/Corion/Future-HTTP.git",
+         "web" : "https://github.com/Corion/Future-HTTP"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

@@ -8,7 +8,7 @@ use parent 'Perl::Critic::Policy';
 
 use List::Util 'any';
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use constant DESC => 'Use of multidimensional array emulation in hash subscript';
 use constant EXPL => 'A list in a hash subscript used with the $ sigil triggers Perl 4 multidimensional array emulation. Nest structures using references instead.';

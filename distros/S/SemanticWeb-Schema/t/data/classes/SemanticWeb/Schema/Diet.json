@@ -4,8 +4,8 @@
       "rdfs:comment" : "A strategy of regulating the intake of food to achieve or maintain a specific health-related goal.",
       "rdfs:label" : "Diet",
       "rdfs:subClassOf" : [
-         "schema:CreativeWork",
-         "schema:LifestyleModification"
+         "schema:LifestyleModification",
+         "schema:CreativeWork"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },

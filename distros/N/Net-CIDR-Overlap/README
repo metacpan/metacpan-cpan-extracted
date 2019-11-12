@@ -37,6 +37,8 @@ A utility module for helping make sure a list of CIDRs don't overlap.
         print $cidr."\n";
     }
 
+This module supports both IPv4 and IPv6.
+
 INSTALLATION
 
 To install this module, run the following commands:
@@ -67,6 +69,8 @@ You can also look for information at:
     Search CPAN
         https://metacpan.org/release/Net-CIDR-Overlap
 
+    Git Repository
+        https://github.com/VVelox/Net-CIDR-Overlap
 
 LICENSE AND COPYRIGHT
 

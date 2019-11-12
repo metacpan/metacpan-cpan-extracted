@@ -2,6 +2,7 @@ Makefile
 Makefile.old
 *.tar.gz
 *.bak
+*.swp
 pm_to_blib
 blib/
 Future-HTTP-*
@@ -9,3 +10,6 @@ Future-HTTP-*/
 .releaserc
 cover_db
 MYMETA.*
+*.pl
+.prove
+.patch

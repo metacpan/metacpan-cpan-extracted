@@ -1,0 +1,15 @@
+README for IOLayer::MD5
+
+PerlIO layer that reads files and returns an MD5 digest string for the contents
+of that file.
+
+Copyright (c) 2002 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

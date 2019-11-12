@@ -63,7 +63,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-WHMCSUtils
   homepage: https://metacpan.org/release/App-WHMCSUtils
   repository: git://github.com/perlancar/perl-App-WHMCSUtils.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.028002'

@@ -1,0 +1,28 @@
+0.05	9 November 2019
+	Adoption.
+
+0.04	13 August 2003
+	Cleaned up Makefile.PL and adapted copyright info.  Increased
+	dependency on Thread::Signal.
+
+0.03    30 September 2002
+	Use "load.pm" instead of AutoLoader.  Increased dependency on
+	Thread::Signal to 1.06 in Makefile.PL.
+
+	Removed "our" from $VERSION, should shave off some bytes in
+        memory usage, as found from testing with Benchmark::Thread::Size.
+
+0.02	17 September 2002
+	Changed name of "each" to "every", which seems to be gramatically more
+	appropriate compared to its function.
+
+	Added a lot of documentation that was still missing.
+
+	Removed the threads::shared::cond_wait() hijacking code: no longer
+	necessary because new signal setting code in Thread::Signal.
+
+	Increased dependency on Thread::Signal to 1.05, to make use of the
+	new signal setting code that should also work in cond_wait().
+
+0.01	9 September 2002
+	First version of Thread::Status.  Really alpha state, really.

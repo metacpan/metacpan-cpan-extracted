@@ -1,5 +1,9 @@
 Revision history for Google-ProtocolBuffers-Dynamic
 
+0.27      2019-11-11 22:48:35 CET
+
+    - Fix JSON decoding of quoted numeric values
+
 0.26      2019-09-11 20:50:29 CEST
 
     - Add option to check cases when a reference is passed

@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Cache::Memory::Simple" : "0",
             "Carp" : "0",
             "Exporter" : "0",
             "Furl" : "0",
@@ -59,7 +60,6 @@
       },
       "test" : {
          "requires" : {
-            "Spreadsheet::Perl" : "0",
             "Test::Class::Load" : "0",
             "Test::MockObject::Extends" : "0",
             "Test::Most" : "0"
@@ -74,6 +74,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

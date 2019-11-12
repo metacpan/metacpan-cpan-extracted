@@ -8,6 +8,8 @@
 
 #define TAGGED_CLASS    "CBOR::Free::Tagged"
 
+#define IS_SCALAR_REFERENCE(value) SvTYPE(SvRV(value)) <= SVt_PVMG
+
 static const unsigned char NUL = 0;
 static const unsigned char CBOR_NULL_U8  = CBOR_NULL;
 static const unsigned char CBOR_FALSE_U8 = CBOR_FALSE;
@@ -126,6 +128,8 @@ static inline void _init_length_buffer( pTHX_ UV num, enum CBOR_TYPE major_type,
     }
 }
 
+static inline void _encode_tag( pTHX_ IV tagnum, SV *value, encode_ctx *encode_state );
+
 void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
     ++encode_state->recurse_count;
 
@@ -231,8 +235,7 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
             SV **tag = av_fetch(array, 0, 0);
             IV tagnum = SvIV(*tag);
 
-            _init_length_buffer( aTHX_ tagnum, CBOR_TYPE_TAG, encode_state );
-            _encode( aTHX_ *(av_fetch(array, 1, 0)), encode_state );
+            _encode_tag( aTHX_ tagnum, *(av_fetch(array, 1, 0)), encode_state );
         }
         else if (cbf_get_boolean_stash() == stash) {
             _COPY_INTO_ENCODE(
@@ -310,11 +313,21 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
             }
         }
     }
+    else if (encode_state->encode_scalar_refs && IS_SCALAR_REFERENCE(value)) {
+        SV *referent = SvRV(value);
+
+        _encode_tag( aTHX_ CBOR_TAG_INDIRECTION, referent, encode_state );
+    }
     else {
         _croak_unrecognized(aTHX_ value);
     }
 
     --encode_state->recurse_count;
+}
+
+static inline void _encode_tag( pTHX_ IV tagnum, SV *value, encode_ctx *encode_state ) {
+    _init_length_buffer( aTHX_ tagnum, CBOR_TYPE_TAG, encode_state );
+    _encode( aTHX_ value, encode_state );
 }
 
 SV *cbf_encode( pTHX_ SV *value, encode_ctx *encode_state, SV *RETVAL ) {

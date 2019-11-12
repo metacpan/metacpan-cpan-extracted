@@ -18,13 +18,13 @@ Synchronous queries:
     my $res_hr = $dns->resolve( 'cpan.org', 'NS' );
 
     # See below about encodings in “data”.
-    my @ns = map { $dns->decode_name($_) } @{ $res_hr->{'data'} };
+    my @ns = map { $dns->decode_name($_) } @{ $res_hr->data() };
 
 Asynchronous queries use [the “Promise” pattern](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises):
 
     my $query1 = $dns->resolve_async( 'usa.gov', 'A' )->then(
-        sub { my $data = shift()->{'data'}; ... },  # success handler
-        sub { ... },                                # failure handler
+        sub { my $data = shift()->data(); ... },  # success handler
+        sub { ... },                              # failure handler
     );
 
     my $query2 = $dns->resolve_async( 'in-addr.arpa', 'NS' )->then(
@@ -36,6 +36,9 @@ Asynchronous queries use [the “Promise” pattern](https://developer.mozilla.o
     # the fd(), poll(), and process() methods.
 
     $dns->wait();
+
+See `examples/` in the distribution for demonstrations of
+making this module interface with [AnyEvent](https://metacpan.org/pod/AnyEvent) or [IO::Async](https://metacpan.org/pod/IO::Async).
 
 # DESCRIPTION
 
@@ -146,8 +149,9 @@ functions (but not as class methods). In addition to these,
 [Socket](https://metacpan.org/pod/Socket) provides the `inet_ntoa()` and `inet_ntop()`
 functions for decoding the values of `A` and `AAAA` records.
 
-**NOTE:** [DNS::Unbound::Result](https://metacpan.org/pod/DNS::Unbound::Result)’s `to_net_dns_rrs()` provides a heavier but
-more robust way to parse query result data.
+**NOTE:** Consider parsing [DNS::Unbound::Result](https://metacpan.org/pod/DNS::Unbound::Result)’s `answer_packet()`
+with [Net::DNS::Packet](https://metacpan.org/pod/Net::DNS::Packet) as a more robust, albeit heavier, way to
+parse query result data.
 
 ## $decoded = decode\_name($encoded)
 
@@ -162,6 +166,12 @@ and expected.
 
 Decodes a list of character-strings into component strings,
 returned as an array reference. Useful for `TXT` query results.
+
+# LICENSE & COPYRIGHT
+
+Copyright 2019 Gasper Software Consulting.
+
+This library is licensed under the same terms as Perl itself.
 
 # REPOSITORY
 

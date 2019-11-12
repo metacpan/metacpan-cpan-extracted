@@ -1,15 +1,24 @@
---- #YAML:1.0
-name:                Thread-Conveyor-Monitored
-version:             0.14
-abstract:            monitor a belt for specific content
-license:             ~
-author:              
-    - Elizabeth Mattijsen (liz@dijkmat.nl)
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    load:                          0
-    Thread::Conveyor:              0.15
+---
+abstract: 'monitor a belt for specific content'
+author:
+  - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Thread-Conveyor-Monitored
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Thread::Conveyor: '0.15'
+  load: '0'
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

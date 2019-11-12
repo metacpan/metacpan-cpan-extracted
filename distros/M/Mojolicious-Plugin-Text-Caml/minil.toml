@@ -1,5 +1,5 @@
 name = "Mojolicious-Plugin-Text-Caml"
-badges = ["metacpan"]
+badges = ["metacpan", "travis", "coveralls"]
 authority="cpan:CYNOVG"
 module_maker="ModuleBuildTiny"
 license="lgpl_3_0"

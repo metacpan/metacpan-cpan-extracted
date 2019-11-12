@@ -4,6 +4,7 @@ debian/changelog
 debian/compat
 debian/control
 debian/copyright
+debian/mangle-to-no-xs.sh
 debian/rules
 debian/source/format
 debian/watch
@@ -11,6 +12,7 @@ devel/AnyUncompress.pm
 devel/Base-eof-check.pm
 devel/Base-final-status.pm
 devel/Base.pm
+devel/crlf.pl.gz
 devel/data-gunzip.pl.gz
 devel/data.pl
 devel/exe-zlib-inflate.c
@@ -27,9 +29,12 @@ devel/gunzip-with-smart.pl.gz
 devel/gunzip-with-tee.pl.gz
 devel/GunzipNative.pm
 devel/inflateInit.pl
+devel/lib/MyFilterShowLine.pm
+devel/make-crlf.pl
 devel/Makefile
 devel/nofiles-main.pl
 devel/Nofiles.pm
+devel/rsfp.pl
 devel/run.pl
 devel/selfloader-fork.pl
 devel/selfloader-mmap.pl
@@ -37,6 +42,7 @@ devel/selfloader.pl.gz
 devel/show-argv.pl.gz
 devel/smart.pl
 devel/tee-data.pl
+devel/unused.pl
 devel/uudecode.pl
 devel/zlib.pl
 examples/hello.pl.gz
@@ -56,6 +62,7 @@ t/gunzip.t
 t/MyTestHelpers.pm
 t/test1.dat
 t/test1.in
+t/test1.t
 t/test2.dat
 t/test2.in
 t/test2.t

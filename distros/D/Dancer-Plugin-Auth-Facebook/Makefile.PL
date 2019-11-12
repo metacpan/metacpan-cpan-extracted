@@ -7,6 +7,7 @@ WriteMakefile(
     AUTHOR        => 'Prajith <prajith@ndimensionz.com, prajithpalakkuda@gmail.com>',
     VERSION_FROM  => 'lib/Dancer/Plugin/Auth/Facebook.pm',
     ABSTRACT_FROM => 'lib/Dancer/Plugin/Auth/Facebook.pm',
+    LICENSE       => 'perl_5',
     PL_FILES      => {},
     PREREQ_PM     => {
         'Dancer'                => 0,

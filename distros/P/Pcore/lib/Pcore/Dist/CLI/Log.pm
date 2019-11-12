@@ -19,8 +19,10 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         exit 3;
     }
 
+    my $id = $dist->id;
+
     # get changesets since latest release
-    my $log = $dist->git->git_get_log( $dist->id->{release} );
+    my $log = $dist->git->git_get_log( $id->{release} );
 
     if ($log) {
         if ( $log->{data} ) {
@@ -31,7 +33,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         }
     }
 
-    print "Changelog since release: @{[ $dist->id->{release} ]}\n$log\n";
+    print qq[Changelog since release: @{[ $id->{release} // '"unreleased"' ]}\n$log\n];
 
     return;
 }

@@ -20,7 +20,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 133;
+use Test::More tests => 137;
 
 use lib 't';
 use MyTestHelpers;
@@ -29,11 +29,11 @@ BEGIN { MyTestHelpers::nowarnings() }
 use File::Locate::Iterator;
 
 # uncomment this to run the ### lines
-#use Devel::Comments;
+# use Smart::Comments;
 
 
 {
-  my $want_version = 26;
+  my $want_version = 27;
   is ($File::Locate::Iterator::VERSION, $want_version, 'VERSION variable');
   is (File::Locate::Iterator->VERSION,  $want_version, 'VERSION class method');
 
@@ -599,6 +599,43 @@ SKIP: {
   my $str = "\0LOCATE02\0\0/hello.c\0\006/world.pl\0";
   my $it = File::Locate::Iterator->new (database_str => $str,
                                         regexp => qr/\.pl/);
+  is ($it->next, '/hello/world.pl');
+  is ($it->next, undef);
+}
+
+# The current Iterator.pm code concats regexps with "|" between so actually
+# uses stringize overload rather than qr.
+{
+  package MyOverloadQr;
+  use overload
+    '""' => \&my_str,
+    'qr' => \&my_qr;
+  sub new {
+    my ($class, %self) = @_;
+    my $self = bless \%self, $class;
+    $self->{'regexp_qr'} = qr/$self->{'regexp_str'}/;
+    ### $self
+    return $self;
+  }
+  sub my_qr {
+    my ($self) = @_;
+    ### my_qr() ...
+    return $self->{'regexp_qr'};
+  }
+  sub my_str {
+    my ($self) = @_;
+    ### my_str() ...
+    return $self->{'regexp_str'};
+  }
+}
+{
+  my $overload = MyOverloadQr->new (regexp_str => qr/\.pl/);
+  ok ("foo.pl" =~ $overload);
+  ok (! ("foopl" =~ $overload));
+  
+  my $str = "\0LOCATE02\0\0/hello.c\0\006/world.pl\0";
+  my $it = File::Locate::Iterator->new (database_str => $str,
+                                        regexp => $overload);
   is ($it->next, '/hello/world.pl');
   is ($it->next, undef);
 }

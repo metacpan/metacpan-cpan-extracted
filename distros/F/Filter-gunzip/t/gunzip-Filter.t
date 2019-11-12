@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -19,7 +19,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test;
+plan tests => 7;
 
 use lib 't';
 use MyTestHelpers;
@@ -31,20 +32,20 @@ require Filter::gunzip::Filter;
 # VERSION
 
 {
-  my $want_version = 7;
-  is ($Filter::gunzip::Filter::VERSION, $want_version, 'VERSION variable');
-  is (Filter::gunzip::Filter->VERSION,  $want_version, 'VERSION class method');
-  ok (eval { Filter::gunzip::Filter->VERSION($want_version); 1 },
+  my $want_version = 8;
+  ok ($Filter::gunzip::Filter::VERSION, $want_version, 'VERSION variable');
+  ok (Filter::gunzip::Filter->VERSION,  $want_version, 'VERSION class method');
+  ok (eval { Filter::gunzip::Filter->VERSION($want_version); 1 }, 1,
       "VERSION class check $want_version");
   my $check_version = $want_version + 1000;
-  ok (! eval { Filter::gunzip::Filter->VERSION($check_version); 1 },
+  ok (! eval { Filter::gunzip::Filter->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
 
   my $f = Filter::gunzip::Filter->new;
-  is ($f->VERSION, $want_version, 'VERSION object method');
-  ok (eval { $f->VERSION($want_version); 1 },
+  ok ($f->VERSION, $want_version, 'VERSION object method');
+  ok (eval { $f->VERSION($want_version); 1 }, 1,
       "VERSION object check $want_version");
-  ok (! eval { $f->VERSION($check_version); 1 },
+  ok (! eval { $f->VERSION($check_version); 1 }, 1,
       "VERSION object check $check_version");
 }
 

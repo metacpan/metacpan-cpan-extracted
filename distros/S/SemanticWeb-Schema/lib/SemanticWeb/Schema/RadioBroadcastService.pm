@@ -15,15 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v4.0.1';
-
-
-has call_sign => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'callSign',
-);
-
+our $VERSION = 'v5.0.0';
 
 
 
@@ -42,28 +34,12 @@ SemanticWeb::Schema::RadioBroadcastService - A delivery service through which ra
 
 =head1 VERSION
 
-version v4.0.1
+version v5.0.0
 
 =head1 DESCRIPTION
 
 A delivery service through which radio content is provided via broadcast
 over the air or online.
-
-=head1 ATTRIBUTES
-
-=head2 C<call_sign>
-
-C<callSign>
-
-The official callsign for the radio broadcast.
-
-A call_sign should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
 
 =head1 SEE ALSO
 

@@ -4,7 +4,6 @@ author:
   - 'Robin Murray <mvsjes@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Spreadsheet::Perl: '0'
   Test::Class::Load: '0'
   Test::MockObject::Extends: '0'
   Test::Most: '0'
@@ -22,6 +21,7 @@ no_index:
     - t
     - inc
 requires:
+  Cache::Memory::Simple: '0'
   Carp: '0'
   Exporter: '0'
   Furl: '0'
@@ -47,5 +47,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/mvsjes2/p5-google-restapi.git
-version: '0.2'
+version: '0.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

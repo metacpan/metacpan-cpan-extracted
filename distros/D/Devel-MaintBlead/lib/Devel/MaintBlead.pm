@@ -1,7 +1,7 @@
 package Devel::MaintBlead;
 
 # set version information
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -333,7 +333,7 @@ Devel::MaintBlead - handle maint / blead code paths for distributions
 
 =head1 VERSION
 
-This documentation describes version 0.08.
+This documentation describes version 0.09.
 
 =head1 SYNOPSIS
 
@@ -516,6 +516,8 @@ the necessary actions in the user environment.
 =head1 AUTHOR
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 =head1 COPYRIGHT
 

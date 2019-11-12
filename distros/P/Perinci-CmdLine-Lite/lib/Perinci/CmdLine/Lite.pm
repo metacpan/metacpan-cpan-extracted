@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '1.824'; # VERSION
+our $DATE = '2019-11-12'; # DATE
+our $VERSION = '1.825'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -456,9 +456,9 @@ sub hook_after_get_meta {
         my $optname = 'dry-run' . ($meta_uses_opt_n ? '' : '|n');
         $copts->{dry_run} = {
             getopt  => $default_dry_run ? "$optname!" : $optname,
-            summary => $default_dry_run ?
-                "Disable simulation mode (also via DRY_RUN=0)" :
-                "Run in simulation mode (also via DRY_RUN=1)",
+            summary => "Run in simulation mode (also via DRY_RUN=1)",
+            "summary.alt.bool.not" =>
+                "Disable simulation mode (also via DRY_RUN=0)",
             handler => sub {
                 my ($go, $val, $r) = @_;
                 if ($val) {
@@ -469,6 +469,7 @@ sub hook_after_get_meta {
                     $r->{dry_run} = 0;
                 }
             },
+            default => $default_dry_run,
         };
     }
 
@@ -620,7 +621,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.824 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2019-07-04.
+This document describes version 1.825 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2019-11-12.
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package as;
 
 # make sure we have version info for this module
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # be as strict and verbose as possible
 use strict;
@@ -173,7 +173,7 @@ as - load OO module under another name
 
 =head1 VERSION
 
-This documentation describes version 0.08.
+This documentation describes version 0.09.
 
 =head1 SYNOPSIS
 

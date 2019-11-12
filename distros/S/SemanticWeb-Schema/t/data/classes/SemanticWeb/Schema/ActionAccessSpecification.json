@@ -38,14 +38,14 @@
          "rdfs:label" : "availabilityStarts",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Demand",
+            "schema:ActionAccessSpecification",
             "schema:Offer",
-            "schema:ActionAccessSpecification"
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
+            "schema:DateTime",
             "schema:Time",
-            "schema:Date",
-            "schema:DateTime"
+            "schema:Date"
          ]
       },
       "schema:category" : {
@@ -55,23 +55,23 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:PhysicalActivity",
-            "schema:Invoice",
-            "schema:Offer",
             "schema:Service",
-            "schema:Product"
+            "schema:PhysicalActivity",
+            "schema:Offer",
+            "schema:Product",
+            "schema:Invoice",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Thing",
+            "schema:Text",
             "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Thing"
          ]
       },
       "schema:eligibleRegion" : {
          "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "https://github.com/schemaorg/schemaorg/issues/1741"
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
@@ -79,15 +79,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:Demand",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:expectsAcceptanceOf" : {
@@ -97,9 +97,9 @@
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:MediaSubscription",
             "schema:ConsumeAction",
-            "schema:ActionAccessSpecification"
+            "schema:ActionAccessSpecification",
+            "schema:MediaSubscription"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -110,16 +110,16 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:Offer",
             "schema:Demand",
-            "schema:DeliveryChargeSpecification"
+            "schema:DeliveryChargeSpecification",
+            "schema:ActionAccessSpecification",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
          ]
       },
       "schema:requiresSubscription" : {
@@ -129,12 +129,12 @@
          "rdfs:label" : "requiresSubscription",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
-            "schema:ActionAccessSpecification"
+            "schema:ActionAccessSpecification",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:MediaSubscription",
-            "schema:Boolean"
+            "schema:Boolean",
+            "schema:MediaSubscription"
          ]
       }
    }

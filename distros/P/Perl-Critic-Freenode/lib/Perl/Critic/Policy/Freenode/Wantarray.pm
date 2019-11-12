@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use constant DESC => 'wantarray() called';
 use constant EXPL => 'Context-sensitive functions lead to unexpected errors or vulnerabilities. Functions should explicitly return either a list or a scalar value.';
@@ -18,7 +18,7 @@ sub applies_to { 'PPI::Token::Word' }
 
 sub violates {
 	my ($self, $elem) = @_;
-	return () unless $elem eq 'wantarray' and is_function_call $elem;
+	return () unless (($elem eq 'wantarray' or $elem->literal eq 'CORE::wantarray') and is_function_call $elem);
 	return $self->violation(DESC, EXPL, $elem);
 }
 
@@ -41,6 +41,7 @@ explicitly documented to return either a scalar value or a list, so there is no
 potential for confusion or vulnerability.
 
   return wantarray ? ('a','b','c') : 3; # not ok
+  return CORE::wantarray ? ('a', 'b', 'c') : 3; # not ok
   return ('a','b','c');                 # ok
   return 3;                             # ok
 

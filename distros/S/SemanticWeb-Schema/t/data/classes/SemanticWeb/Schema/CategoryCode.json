@@ -17,8 +17,8 @@
          "rdfs:subPropertyOf" : "schema:termCode",
          "schema:category" : "issue-894",
          "schema:domainIncludes" : [
-            "schema:MedicalCode",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:MedicalCode"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"

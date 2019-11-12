@@ -1,6 +1,6 @@
 package ifdef;
 
-$VERSION= '0.09';
+$VERSION= '0.10';
 
 # be strict from now on
 use strict;
@@ -290,7 +290,7 @@ ifdef - conditionally enable text within pod sections as code
 
 =head1 VERSION
 
-This documentation describes version 0.09.
+This documentation describes version 0.10.
 
 =head1 DESCRIPTION
 

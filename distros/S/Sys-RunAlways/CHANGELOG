@@ -1,3 +1,6 @@
+0.06	9 November 2019
+	Adoption.
+
 0.05	1 April 2012
 	Some more code esthetics tweaks.  Added "silent" parameter.  Made
 	sure it works with 5.14.2 threaded and unthreaded.

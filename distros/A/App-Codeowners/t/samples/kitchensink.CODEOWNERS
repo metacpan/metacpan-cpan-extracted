@@ -1,0 +1,18 @@
+# This is a comment.
+* @batman @robin
+
+mansion.txt alfred@waynecorp.example.com
+
+tricks/Explosions.doc @joker
+tricks/Grinning/             @joker       @the-penguin
+
+  # not the hero gotham deserves!
+/a/b/c/deep    @bane @the-penguin
+
+# project: Transportation
+
+/vehicles/**/batmobile.cad    @"Lucius Fox"
+
+
+### UNOWNED (File::Codeowners)
+# lightcycle.cad

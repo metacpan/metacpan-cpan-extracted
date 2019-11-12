@@ -1,0 +1,81 @@
+Net-DHCP-Config-Utilities
+
+Help generate configs for DHCP servers. This includes
+checking for overlapping subnets and sanity checking
+for the various options.
+
+Basic example showing generating a ISC DHCPD config below.
+
+    # dhcp/header
+	default-lease-time 600;
+    max-lease-time 7200;
+    ddns-update-style none;
+    authoritative;
+    option web-proxy code 252 = text;
+    log-facility local7;
+
+    # dhcp/footer (empty)
+
+    # dhcp/config.ini
+    dir=./dhcp/
+    [generator]
+    header=./dhcp/header
+    footer=./dhcp/footer
+    output=./dhcp/output
+
+    # add a new subnet
+	inidhcp -c dhcp/config.ini -a add -s 192.168.20.0 -m 255.255.255.0 -d 192.168.20.1,192.168.30.1 -g 192.168.20.1 -R '192.168.20.100 192.168.20.200'
+
+    # generate the config
+	inidhcp -c dhcp/config.ini -a gen
+
+TODO
+
+* Implement pools
+* More documentation.
+* IPv6
+* Support for Kea
+* Add various options to inidhcp for tweaking ranges and options.
+    
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::DHCP::Config::Utilities
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-DHCP-Config-Utilities
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-DHCP-Config-Utilities
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Net-DHCP-Config-Utilities
+
+    Search CPAN
+        https://metacpan.org/release/Net-DHCP-Config-Utilities
+
+    Git Repository
+        https://github.com/VVelox/Net-DHCP-Config-Utilities
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

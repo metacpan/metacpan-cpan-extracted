@@ -1,13 +1,13 @@
 ---
-abstract: 'Output stdin as GitHub/Slack/JIRA etc... formatted code'
+abstract: Output stdin as a GitHub/Slack/JIRA etc... formatted code, list, or quote
 author:
-  - 'Skye Shaw <skye.shaw AT gmail.com>'
+  - Skye Shaw <skye.shaw AT gmail.com>
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,9 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
 resources:
   bugtracker: http://github.com/sshaw/output-as-format/issues
   homepage: http://github.com/sshaw/output-as-format
   repository: http://github.com/sshaw/output-as-format
-version: 0.02
+version: '0.03'
+x_serialization_backend: YAML::XS version 0.75

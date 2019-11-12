@@ -10,3 +10,4 @@ lib/Thread/Conveyor/Tied.pm
 lib/Thread/Conveyor/Throttled.pm
 t/Conveyor.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -12,10 +12,8 @@ $eumm_version =~ s/_//;
 
 my $module = 'Future::HTTP';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
-
-# I should maybe use something like Shipwright...
-regen_README($main_file);
-#regen_EXAMPLES();
+(my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -28,10 +26,12 @@ my %module = (
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => 'https://github.com/Corion/future-http',
-                url => 'git://github.com/Corion/future-http.git',
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
-            }
+            },
+            bugtracker => "https://rt.cpan.org/Public/Dist/Display.html?Name=$distbase",
+            license    => "https://dev.perl.org/licenses/",
         },
         prereqs => {
             runtime => {
@@ -45,6 +45,15 @@ my %module = (
                     'MIME::Base64'               => 0,
                 }
             },
+            develop => {
+                requires => {
+                    'AnyEvent::HTTP'       => 0,
+                    'Net::Async::HTTP'     => 0,
+                    'Mojo::UserAgent'      => 0,
+                    'HTTP::Tiny::Paranoid' => 0,
+                    'HTTP::Tiny'           => 0,
+                },
+            },
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
@@ -52,9 +61,7 @@ my %module = (
 
     MIN_PERL_VERSION => '5.006',
 
-    ($eumm_version >= 6.3001
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    'LICENSE'=> 'perl',
 
     PL_FILES            => {},
     BUILD_REQUIRES => {
@@ -62,7 +69,7 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Filter::signatures'         => '0.03', # only needed for Perl <5.22
+        'Filter::signatures'         => '0.13', # only needed for Perl <5.22
         'Moo'                        => 2, # yeah, not all that great, but ...
         'Future'                     => '0.31', # Future 0.25 is incompatible as it doesn't allow Future->done
         'HTTP::Tiny'                 => 0, # our fallback, even distributed with Perl 5.14+
@@ -75,14 +82,23 @@ my %module = (
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Filter-signatures-*' },
+    clean               => { FILES => "$distbase-*" },
 
     test            => { TESTS => join( ' ', @tests ) },
 );
 
-sub get_module_info { %module };
+# This is so that we can do
+#     require 'Makefile.PL'
+# and then call get_module_info
 
-WriteMakefile1( get_module_info() );
+sub get_module_info { %module }
+
+if( ! caller ) {
+    # I should maybe use something like Shipwright...
+    regen_README($main_file);
+    regen_EXAMPLES() if -d 'examples';
+    WriteMakefile1(get_module_info);
+};
 
 1;
 
@@ -132,7 +148,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -143,7 +159,11 @@ Should you wish to install this module manually, the procedure is
 INSTALL
             pod_section($_[0], 'REPOSITORY'),
             pod_section($_[0], 'SUPPORT'),
+            pod_section($_[0], 'TALKS'),
+            pod_section($_[0], 'KNOWN ISSUES'),
             pod_section($_[0], 'BUG TRACKER'),
+            pod_section($_[0], 'CONTRIBUTING'),
+            pod_section($_[0], 'SEE ALSO'),
             pod_section($_[0], 'AUTHOR'),
             pod_section($_[0], 'LICENSE' ),
             pod_section($_[0], 'COPYRIGHT' ),
@@ -162,7 +182,8 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/future-http.svg?branch=master)](https://travis-ci.org/Corion/future-http)
+[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -176,20 +197,35 @@ sub pod_section {
 
     my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] and $section[-1] =~ /^=/;
-    shift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {
+        pop @section if $section[-1] =~ /^=/;
+        shift @section if $remove_heading;
+
         pop @section
-            while $section[-1] =~ /^\s*$/;
+            while @section and $section[-1] =~ /^\s*$/;
         shift @section
-            while $section[0] =~ /^\s*$/;
+            while @section and $section[0] =~ /^\s*$/;
     };
 
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
     return join "", @section;
 }
+
+sub regen_EXAMPLES {
+    my $perl = $^X;
+    if ($perl =~/\s/) {
+        $perl = qq{"$perl"};
+    };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
+    my $examples = `$perl -w examples/gen_examples_pod.pl`;
+    if ($examples) {
+        warn "(Re)Creating $example_file\n";
+        $examples =~ s/\r\n/\n/g;
+        update_file( $example_file, $examples );
+    };
+};
 
 sub update_file {
     my( $filename, $new_content ) = @_;

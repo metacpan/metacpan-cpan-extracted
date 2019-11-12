@@ -7,3 +7,4 @@ Makefile.PL
 lib/Log/Dispatch/XML.pm
 t/logxml01.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

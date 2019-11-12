@@ -9,6 +9,7 @@ t/test_lib/b/X.pm
 t/to_load/AutoLoad.pm
 t/to_load/NotAutoLoad.pm
 t/to_load/Commented.pm
+t/to_load/HereDoc.pm
 t/to_load/InPod.pm
 t/to_load/LoadIt.pm
 t/to_load/LoadMe.pl

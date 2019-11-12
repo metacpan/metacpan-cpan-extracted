@@ -1,3 +1,6 @@
+0.15 	9 November 2019
+	Adoption.
+
 0.14 	19 September 2010
 	Fixed problem in test-suite.  Apparently newer Test::Harness versions
 	dont't really cope that well with testing inside threads.  Apparently

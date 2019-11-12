@@ -1,3 +1,6 @@
+0.03	9 November 2019
+	Adoption.
+
 0.02	31 March 2012
 	Some pod podfixes.  Brought up to date with latest code esthetics.
 	Verified it runs with 5.14.2, threaded and unthreaded.

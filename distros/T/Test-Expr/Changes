@@ -60,3 +60,9 @@ Revision history for Test-Expr
 
         Removed spurious 'use experimentals'
         (Thanks Andreas!)
+
+
+0.000011  Sat Nov  9 04:12:21 2019
+
+        Improved accuracy of line numbers
+        (Thanks F. Li)

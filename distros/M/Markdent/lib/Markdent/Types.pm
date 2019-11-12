@@ -9,6 +9,6 @@ use Markdent::Types::Internal -reexport;
 use Specio::Library::Builtins -reexport;
 use Specio::Library::Numeric -reexport;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 1;

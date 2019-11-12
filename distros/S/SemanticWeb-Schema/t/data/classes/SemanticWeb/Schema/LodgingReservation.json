@@ -55,8 +55,8 @@
          "rdfs:label" : "numAdults",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Integer"
          ]
       },
       "schema:numChildren" : {

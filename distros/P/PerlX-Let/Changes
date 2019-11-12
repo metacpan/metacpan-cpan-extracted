@@ -1,5 +1,15 @@
 Revision history for PerlX-Let:
 
+v0.2.6    2019-11-10 14:08:43+00:00 Europe/London
+  [Documentation]
+  - Updated abstract to make use of state constants explicit.
+
+  - Updated documentation to discuss issues with using state
+    variables, #3.
+
+  [Toolchain]
+  - Added test diagnostics for upstream prerequisites.
+
 v0.2.5    2019-02-19 15:18:37+00:00 Europe/London
   [Bug Fixes]
   - Increased minimum version of Keyword::Simple to fix issue with

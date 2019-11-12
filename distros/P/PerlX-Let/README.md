@@ -1,10 +1,10 @@
 # NAME
 
-PerlX::Let - Syntactic sugar for lexical constants
+PerlX::Let - Syntactic sugar for lexical state constants
 
 # VERSION
 
-version v0.2.5
+version v0.2.6
 
 # SYNOPSIS
 
@@ -38,9 +38,9 @@ is liable to typos. You could simplify it with
 ```perl
 let $key = "username" {
 
-  if (defined $arg{$key}) {
-    $row->update( { $key => $arg{$key} );
-  }
+    if (defined $arg{$key}) {
+        $row->update( { $key => $arg{$key} );
+    }
 
 }
 ```
@@ -48,21 +48,45 @@ let $key = "username" {
 This is roughly equivalent to using
 
 ```perl
-use Const::Fast;
+use Const::Fast ();
 
 {
-  const $key => "username";
+    use feature 'state';
 
-  if (defined $arg{$key}) {
-    $row->update( { $key => $arg{$key} );
-  }
+    state $key = "username";
+
+    unless (state $_flag = 0) {
+        Const::Fast::_make_readonly( \$key );
+        $_flag = 1;
+    }
+
+    if (defined $arg{$key}) {
+        $row->update( { $key => $arg{$key} );
+    }
 
 }
 ```
 
-However, if the value does not contain a sigil, and the variable is a
-scalar, or you are using Perl v5.28 or later, this uses state
-variables so that the value is only set once.
+However, if the value contains a sigil, or (for versions of Perl
+before 5.28) the value is not a scalar, then this uses a my variable
+variable
+
+```perl
+use Const::Fast ();
+
+{
+    Const::Fast::const my $key => "username";
+
+    if (defined $arg{$key}) {
+        $row->update( { $key => $arg{$key} );
+    }
+}
+```
+
+The reason for using state variables is that it takes time to mark a
+variable as read-only, particularly for deeper data structures.
+However, the tradeoff for using this is that the variables remain
+allocated until the process exits.
 
 If the code block is omitted, then this can be used to declare a
 state constant in the current scope, e.g.
@@ -73,15 +97,22 @@ let $x = "foo";
 say $x;
 ```
 
+Note that this may enable the state [feature](https://metacpan.org/pod/feature) in the current scope.
+
 # KNOWN ISSUES
 
 The parsing of assignments is rudimentary, and may fail when assigning
-to another variable or the result of a function.
+to another variable or the result of a function.  Because of this,
+you may get unusual error messages for syntax errors, e.g.
+"Transliteration pattern not terminated".
 
 Because this modifies the source code during compilation, the line
-numbers may be changed.
+numbers may be changed, particularly if the let assignment(s) are on
+multiple lines.
 
 # SEE ALSO
+
+[feature](https://metacpan.org/pod/feature)
 
 [Const::Fast](https://metacpan.org/pod/Const::Fast)
 

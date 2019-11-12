@@ -25,13 +25,13 @@ Synchronous queries:
     my $res_hr = $dns->resolve( 'cpan.org', 'NS' );
 
     # See below about encodings in “data”.
-    my @ns = map { $dns->decode_name($_) } @{ $res_hr->{'data'} };
+    my @ns = map { $dns->decode_name($_) } @{ $res_hr->data() };
 
 Asynchronous queries use L<the “Promise” pattern|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises>:
 
     my $query1 = $dns->resolve_async( 'usa.gov', 'A' )->then(
-        sub { my $data = shift()->{'data'}; ... },  # success handler
-        sub { ... },                                # failure handler
+        sub { my $data = shift()->data(); ... },  # success handler
+        sub { ... },                              # failure handler
     );
 
     my $query2 = $dns->resolve_async( 'in-addr.arpa', 'NS' )->then(
@@ -43,6 +43,9 @@ Asynchronous queries use L<the “Promise” pattern|https://developer.mozilla.o
     # the fd(), poll(), and process() methods.
 
     $dns->wait();
+
+See F<examples/> in the distribution for demonstrations of
+making this module interface with L<AnyEvent> or L<IO::Async>.
 
 =cut
 
@@ -63,7 +66,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.12';
+    $VERSION = '0.13';
     XSLoader::load();
 }
 
@@ -262,13 +265,18 @@ sub resolve_async {
     return $query;
 }
 
+my $installed_cancel_cr;
+
 sub _load_asyncquery_if_needed {
     if (!$INC{'DNS/Unbound/AsyncQuery.pm'}) {
         local ($@, $!);
         require DNS::Unbound::AsyncQuery;
-
-        $DNS::Unbound::AsyncQuery::CANCEL_CR = \&DNS::Unbound::_ub_cancel;
     }
+
+    $installed_cancel_cr ||= do {
+        $DNS::Unbound::AsyncQuery::CANCEL_CR = \&DNS::Unbound::_ub_cancel;
+        1;
+    };
 
     return;
 }
@@ -528,8 +536,9 @@ functions (but not as class methods). In addition to these,
 L<Socket> provides the C<inet_ntoa()> and C<inet_ntop()>
 functions for decoding the values of C<A> and C<AAAA> records.
 
-B<NOTE:> L<DNS::Unbound::Result>’s C<to_net_dns_rrs()> provides a heavier but
-more robust way to parse query result data.
+B<NOTE:> Consider parsing L<DNS::Unbound::Result>’s C<answer_packet()>
+with L<Net::DNS::Packet> as a more robust, albeit heavier, way to
+parse query result data.
 
 =head2 $decoded = decode_name($encoded)
 
@@ -578,6 +587,12 @@ sub DESTROY {
 #----------------------------------------------------------------------
 
 1;
+
+=head1 LICENSE & COPYRIGHT
+
+Copyright 2019 Gasper Software Consulting.
+
+This library is licensed under the same terms as Perl itself.
 
 =head1 REPOSITORY
 

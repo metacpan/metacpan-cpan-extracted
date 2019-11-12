@@ -1,0 +1,10 @@
+Build.PL
+lib/Font/PCF.pm
+MANIFEST			This list of files
+t/00use.t
+t/01font.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

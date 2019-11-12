@@ -19,9 +19,9 @@
          "rdfs:label" : "geoRadius",
          "schema:domainIncludes" : "schema:GeoCircle",
          "schema:rangeIncludes" : [
+            "schema:Distance",
             "schema:Number",
-            "schema:Text",
-            "schema:Distance"
+            "schema:Text"
          ]
       }
    }

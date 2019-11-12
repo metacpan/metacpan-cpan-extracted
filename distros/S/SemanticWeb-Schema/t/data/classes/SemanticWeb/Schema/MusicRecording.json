@@ -11,12 +11,12 @@
          "rdfs:comment" : "The artist that performed this album or recording.",
          "rdfs:label" : "byArtist",
          "schema:domainIncludes" : [
-            "schema:MusicRecording",
-            "schema:MusicAlbum"
+            "schema:MusicAlbum",
+            "schema:MusicRecording"
          ],
          "schema:rangeIncludes" : [
-            "schema:MusicGroup",
-            "schema:Person"
+            "schema:Person",
+            "schema:MusicGroup"
          ]
       },
       "schema:duration" : {
@@ -26,12 +26,12 @@
          "rdfs:label" : "duration",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:Audiobook",
             "schema:MusicRecording",
             "schema:MediaObject",
-            "schema:Audiobook",
             "schema:QuantitativeValueDistribution",
             "schema:MusicRelease",
-            "schema:Event",
             "schema:Movie"
          ],
          "schema:rangeIncludes" : "schema:Duration"

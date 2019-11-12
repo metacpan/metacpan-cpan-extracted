@@ -13,3 +13,4 @@ lib/Thread/Tie/Thread.pm
 t/Tie01.t
 t/Tie02.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

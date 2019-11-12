@@ -169,7 +169,7 @@ my @optargs = (
     "U=i"                   => sub { push @opt_diffopts, '-U' . $_[1] },
     "cdif:s" => \$opt_cdif,
     "nocdif|no-cdif" => sub { $opt_cdif = undef },
-    "cdifopts=s" => \@opt_cdifopts,
+    "cdifopts=s" => sub { push @opt_cdifopts, shellwords $_[1] },
     "colortable" => \$opt_colortable,
 
     "--mecab" => sub { push @opt_cdifopts, "--mecab" },

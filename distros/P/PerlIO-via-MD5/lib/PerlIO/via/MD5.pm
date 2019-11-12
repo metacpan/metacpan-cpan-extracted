@@ -1,6 +1,6 @@
 package PerlIO::via::MD5;
 
-$VERSION= '0.07';
+$VERSION= '0.08';
 
 # be as strict as possible
 use strict;
@@ -105,7 +105,7 @@ PerlIO::via::MD5 - PerlIO layer for creating an MD5 digest of a file
 
 =head1 VERSION
 
-This documentation describes version 0.07.
+This documentation describes version 0.08.
 
 =head1 DESCRIPTION
 
@@ -140,6 +140,8 @@ L<PerlIO::via>, L<Digest::MD5>, L<PerlIO::via::StripHTML>,
 L<PerlIO::via::QuotedPrint>, L<PerlIO::via::Base64>, L<PerlIO::via::Rotate>.
 
 =head1 COPYRIGHT
+
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
 
 Copyright (c) 2002, 2003, 2012 Elizabeth Mattijsen.  All rights reserved.
 This library is free software; you can redistribute it and/or modify it under

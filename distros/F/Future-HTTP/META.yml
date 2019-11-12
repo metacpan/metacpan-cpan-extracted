@@ -28,14 +28,15 @@ recommends:
   MIME::Base64: '0'
   MIME::QuotedPrint: '0'
 requires:
-  Filter::signatures: '0.03'
+  Filter::signatures: '0.13'
   Future: '0.31'
   HTTP::Headers: '6.07'
   HTTP::Tiny: '0'
   Moo: '2'
   perl: '5.006'
 resources:
-  repository: git://github.com/Corion/future-http.git
-version: '0.12'
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Future-HTTP.git
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

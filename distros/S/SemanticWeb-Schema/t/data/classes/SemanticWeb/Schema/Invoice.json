@@ -27,9 +27,9 @@
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
             "schema:Invoice",
-            "schema:Service",
             "schema:Order",
-            "schema:Reservation"
+            "schema:Reservation",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",
@@ -43,17 +43,17 @@
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:PhysicalActivity",
-            "schema:Invoice",
-            "schema:Offer",
             "schema:Service",
-            "schema:Product"
+            "schema:PhysicalActivity",
+            "schema:Offer",
+            "schema:Product",
+            "schema:Invoice",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Thing",
+            "schema:Text",
             "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Thing"
          ]
       },
       "schema:confirmationNumber" : {
@@ -62,8 +62,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -72,12 +72,12 @@
          "rdfs:comment" : "Party placing the order or paying the invoice.",
          "rdfs:label" : "customer",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:minimumPaymentDue" : {
@@ -86,8 +86,8 @@
          "rdfs:label" : "minimumPaymentDue",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:paymentDue" : {
@@ -95,8 +95,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDue",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:DateTime",
          "schema:supersededBy" : "schema:paymentDueDate"
@@ -106,8 +106,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDueDate",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
@@ -119,8 +119,8 @@
          "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
          "rdfs:label" : "paymentMethod",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:PaymentMethod"
       },
@@ -129,8 +129,8 @@
          "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
          "rdfs:label" : "paymentMethodId",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -151,13 +151,13 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Reservation",
+            "schema:EducationalOccupationalProgram",
             "schema:CreativeWork",
             "schema:Service",
+            "schema:Reservation",
             "schema:Invoice",
-            "schema:EducationalOccupationalProgram",
-            "schema:ParcelDelivery",
-            "schema:Trip"
+            "schema:Trip",
+            "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

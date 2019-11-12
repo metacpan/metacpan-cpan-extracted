@@ -22,8 +22,8 @@
          "schema:domainIncludes" : "schema:DoseSchedule",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QualitativeValue"
+            "schema:QualitativeValue",
+            "schema:Number"
          ]
       },
       "schema:frequency" : {
@@ -39,8 +39,8 @@
          "rdfs:comment" : "Characteristics of the population for which this is intended, or which typically uses it, e.g. 'adults'.",
          "rdfs:label" : "targetPopulation",
          "schema:domainIncludes" : [
-            "schema:DietarySupplement",
-            "schema:DoseSchedule"
+            "schema:DoseSchedule",
+            "schema:DietarySupplement"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
