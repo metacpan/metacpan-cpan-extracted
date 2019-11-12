@@ -1,5 +1,5 @@
 name = "Mojolicious-Plugin-Template-Mustache"
-badges = ["metacpan", "travis"]
+badges = ["metacpan", "travis", "coveralls"]
 authority="cpan:CYNOVG"
 module_maker="ModuleBuildTiny"
 

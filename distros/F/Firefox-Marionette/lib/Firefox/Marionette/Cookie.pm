@@ -3,7 +3,7 @@ package Firefox::Marionette::Cookie;
 use strict;
 use warnings;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -65,7 +65,7 @@ Firefox::Marionette::Cookie - Represents a Firefox cookie retrieved using the Ma
 
 =head1 VERSION
 
-Version 0.84
+Version 0.85
 
 =head1 SYNOPSIS
 

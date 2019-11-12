@@ -6,14 +6,14 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '1.004004';
+	$Error::TypeTiny::VERSION   = '1.006000';
 }
 
-use overload
+require Type::Tiny;
+__PACKAGE__->Type::Tiny::_install_overloads(
 	q[""]    => sub { $_[0]->to_string },
 	q[bool]  => sub { 1 },
-	fallback => 1,
-;
+);
 
 our %CarpInternal;
 $CarpInternal{$_}++ for qw(

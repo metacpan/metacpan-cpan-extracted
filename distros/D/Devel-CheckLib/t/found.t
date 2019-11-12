@@ -3,7 +3,7 @@ use strict;
 BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
 
 use lib 't/lib';
-use IO::CaptureOutput qw(capture);
+use Capture::Tiny qw(capture);
 use Config;
 
 use File::Spec;
@@ -16,12 +16,12 @@ if($@ =~ /Couldn't find your C compiler/) {
     eval "use Helper qw/create_testlib/";
 }
 
-my($debug, $stdout, $stderr) = ($ENV{DEVEL_CHECKLIB_DEBUG} || 0);
+my $debug = $ENV{DEVEL_CHECKLIB_DEBUG} || 0;
 
 # compile a test library
 my $libdir = create_testlib("bazbam");
 
-my @lib = 
+my @lib =
     $^O eq 'MSWin32'                       # if Win32 (not Cygwin) ...
         ? (
             $Config{cc} =~ /(^|^\w+ )bcc/
@@ -45,11 +45,11 @@ plan tests => 2 * scalar @cases;
 
 
 for my $c ( @cases ) {
-    capture(
-        sub { eval "assert_lib(debug => $debug, $c)"; },
-        \$stdout,
-        \$stderr
-    );
-    is($@, q{}, "$c") || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
+    my $error;
+    my ($stdout, $stderr) = capture {
+        eval "assert_lib(debug => $debug, $c)";
+        $error = $@;
+    };
+    is($error, q{}, "$c") || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
     ok(check_lib(debug => $debug, eval($c)), "... and check_lib is true");
 }

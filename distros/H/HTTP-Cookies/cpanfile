@@ -27,7 +27,11 @@ on 'configure' => sub {
 on 'develop' => sub {
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::Code::TidyAll" => "0.50";
+  requires "Test::EOL" => "0";
+  requires "Test::Mojibake" => "0";
   requires "Test::More" => "0.96";
   requires "Test::Pod" => "1.41";
+  requires "Test::Portability::Files" => "0";
+  requires "Test::Version" => "1";
   requires "warnings" => "0";
 };

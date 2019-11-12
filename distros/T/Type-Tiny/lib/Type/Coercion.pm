@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '1.004004';
+	$Type::Coercion::VERSION   = '1.006000';
 }
 
 use Eval::TypeTiny qw<>;
@@ -15,20 +15,17 @@ use Types::TypeTiny qw<>;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use overload
-	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
+require Type::Tiny;
+
+__PACKAGE__->Type::Tiny::_install_overloads(
+	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? $_[0]->_stringify_no_magic : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
-	fallback   => 1,
-;
+);
 
-BEGIN {
-	require Type::Tiny;
-	overload->import(
-		q(~~)    => sub { $_[0]->has_coercion_for_value($_[1]) },
-		fallback => 1, # 5.10 loses the fallback otherwise
-	) if Type::Tiny::SUPPORT_SMARTMATCH();
-}
+__PACKAGE__->Type::Tiny::_install_overloads(
+	q(~~)    => sub { $_[0]->has_coercion_for_value($_[1]) },
+) if Type::Tiny::SUPPORT_SMARTMATCH();
 
 sub _overload_coderef
 {
@@ -41,7 +38,8 @@ sub _overload_coderef
 	}
 	else
 	{
-		$self->{_overload_coderef} ||= sub { $self->coerce(@_) };
+		Scalar::Util::weaken(my $weak = $self);
+		$self->{_overload_coderef} ||= sub { $weak->coerce(@_) };
 	}
 	
 	$self->{_overload_coderef};
@@ -71,6 +69,10 @@ sub new
 	}
 	
 	return $self;
+}
+
+sub _stringify_no_magic {
+	sprintf('%s=%s(0x%08x)', blessed($_[0]), Scalar::Util::reftype($_[0]), Scalar::Util::refaddr($_[0]));
 }
 
 sub name                   { $_[0]{name} }

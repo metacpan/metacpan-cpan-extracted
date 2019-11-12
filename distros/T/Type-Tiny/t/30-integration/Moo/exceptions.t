@@ -34,7 +34,7 @@ use Test::Requires { "Moo" => "1.004000" };
 BEGIN {
 	require Method::Generate::Accessor;
 	"Method::Generate::Accessor"->can("_SIGDIE")
-		or "Moo"->VERSION =~ /^1\.006/
+		or "Moo"->VERSION ge '1.006'
 		or plan skip_all => "Method::Generate::Accessor exception support seems missing!!!";
 };
 
@@ -48,8 +48,6 @@ BEGIN {
 my $e_constructor = exception { Goo->new(number => "too") };
 
 isa_ok($e_constructor, 'Error::TypeTiny::Assertion', '$e_constructor');
-# Expect the error message to contain this file, 'exceptions.t'
-like($e_constructor, qr/exceptions\.t/, '$e_constructor location') if Moo->VERSION ge '1.004';
 ok($e_constructor->has_attribute_name, '$e_constructor->has_attribute_name');
 is($e_constructor->attribute_name, 'number', '$e_constructor->attribute_name');
 ok($e_constructor->has_attribute_step, '$e_constructor->has_attribute_step');

@@ -59926,3 +59926,15 @@ L/LN/LNATION/threads-farm-0.02.tar.gz
 L/LN/LNATION/threads-shared-queue-any-0.02.tar.gz
 D/DD/DDICK/Time-Zone-Olson-0.28.tar.gz
 L/LN/LNATION/UNIVERSAL-dump-0.08.tar.gz
+S/SR/SREZIC/CPAN-Plugin-Sysdeps-0.61.tar.gz
+N/NI/NICS/Dancer-Plugin-Catmandu-OAI-0.0505.tar.gz
+J/JF/JFORGET/DateTime-Event-Easter-1.09.tar.gz
+M/MA/MATTN/Devel-CheckLib-1.14.tar.gz
+T/TO/TOBYINK/Type-Tiny-1.006000.tar.gz
+D/DD/DDICK/Firefox-Marionette-0.85.tar.gz
+P/PE/PEVANS/Future-0.42.tar.gz
+O/OA/OALDERS/HTTP-Cookies-6.06.tar.gz
+J/JH/JHTHORSEN/LinkEmbedder-1.08.tar.gz
+O/OE/OETIKER/Mojolicious-Plugin-Qooxdoo-1.0.7.tar.gz
+C/CY/CYNOVG/Mojolicious-Plugin-Template-Mustache-0.06.tar.gz
+C/CR/CRUX/Protocol-HTTP2-1.10.tar.gz

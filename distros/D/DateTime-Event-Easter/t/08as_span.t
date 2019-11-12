@@ -97,6 +97,6 @@ for (8, 10) {
   ok( $span       ->isa("DateTime::Span")            , "Result is a span");
   ok( $span->start->isa("DateTime::Calendar::Julian"), "Result is a span of Julian datetimes");
   ok( $span->end  ->isa("DateTime::Calendar::Julian"), "Result is a span of Julian datetimes");
-  is( $span->start, "2019-04-08J00:00:00", "Resultat starts on 8 April (Julian)");
-  is( $span->end  , "2019-04-09J00:00:00", "Resultat ends   on 9 April (Julian)");
+  is( $span->start->datetime, "2019-04-08J00:00:00",   "Result starts on 8 April (Julian)");
+  is( $span->end  ->datetime, "2019-04-09J00:00:00",   "Result ends   on 9 April (Julian)");
 }

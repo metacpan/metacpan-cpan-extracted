@@ -335,7 +335,11 @@ IMPLEMENTATION METHODS
        $on_cancel->( $future )
 
     If passed another Future instance, the passed instance will be
-    cancelled when the original future is cancelled.
+    cancelled when the original future is cancelled. In this case, the
+    reference is only strongly held while the target future remains
+    pending. If it becomes ready, then there is no point trying to cancel
+    it, and so it is removed from the originating future's cancellation
+    list.
 
 USER METHODS
 

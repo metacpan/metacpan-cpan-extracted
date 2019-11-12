@@ -1,4 +1,4 @@
-
+[![MetaCPAN Release](https://badge.fury.io/pl/Mojolicious-Plugin-Template-Mustache.svg)](https://metacpan.org/release/Mojolicious-Plugin-Template-Mustache) [![Build Status](https://travis-ci.org/cynovg/p5-Mojolicious-Plugin-Template-Mustache.svg?branch=master)](https://travis-ci.org/cynovg/p5-Mojolicious-Plugin-Template-Mustache) [![Coverage Status](https://img.shields.io/coveralls/cynovg/p5-Mojolicious-Plugin-Template-Mustache/master.svg?style=flat)](https://coveralls.io/r/cynovg/p5-Mojolicious-Plugin-Template-Mustache?branch=master)
 # NAME
 
 Mojolicious::Plugin::Template::Mustache - Mojolicious Plugin

@@ -33,6 +33,10 @@
 	a                    doap:Project;
 	cpan-uri:x_IRC       <irc://irc.perl.org/#moops>;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/100014>, <http://purl.org/NET/cpan-uri/rt/ticket/100780>, <http://purl.org/NET/cpan-uri/rt/ticket/101582>, <http://purl.org/NET/cpan-uri/rt/ticket/101639>, <http://purl.org/NET/cpan-uri/rt/ticket/102457>, <http://purl.org/NET/cpan-uri/rt/ticket/102638>, <http://purl.org/NET/cpan-uri/rt/ticket/102639>, <http://purl.org/NET/cpan-uri/rt/ticket/102748>, <http://purl.org/NET/cpan-uri/rt/ticket/102864>, <http://purl.org/NET/cpan-uri/rt/ticket/104154>, <http://purl.org/NET/cpan-uri/rt/ticket/104848>, <http://purl.org/NET/cpan-uri/rt/ticket/105022>, <http://purl.org/NET/cpan-uri/rt/ticket/105034>, <http://purl.org/NET/cpan-uri/rt/ticket/105299>, <http://purl.org/NET/cpan-uri/rt/ticket/105505>, <http://purl.org/NET/cpan-uri/rt/ticket/105561>, <http://purl.org/NET/cpan-uri/rt/ticket/109940>, <http://purl.org/NET/cpan-uri/rt/ticket/114386>, <http://purl.org/NET/cpan-uri/rt/ticket/114915>, <http://purl.org/NET/cpan-uri/rt/ticket/117838>, <http://purl.org/NET/cpan-uri/rt/ticket/120226>, <http://purl.org/NET/cpan-uri/rt/ticket/121478>, <http://purl.org/NET/cpan-uri/rt/ticket/121529>, <http://purl.org/NET/cpan-uri/rt/ticket/121762>, <http://purl.org/NET/cpan-uri/rt/ticket/121763>, <http://purl.org/NET/cpan-uri/rt/ticket/121764>, <http://purl.org/NET/cpan-uri/rt/ticket/121840>, <http://purl.org/NET/cpan-uri/rt/ticket/121841>, <http://purl.org/NET/cpan-uri/rt/ticket/121981>, <http://purl.org/NET/cpan-uri/rt/ticket/122054>, <http://purl.org/NET/cpan-uri/rt/ticket/122305>, <http://purl.org/NET/cpan-uri/rt/ticket/122931>, <http://purl.org/NET/cpan-uri/rt/ticket/123041>, <http://purl.org/NET/cpan-uri/rt/ticket/123243>, <http://purl.org/NET/cpan-uri/rt/ticket/123408>, <http://purl.org/NET/cpan-uri/rt/ticket/124067>, <http://purl.org/NET/cpan-uri/rt/ticket/124121>, <http://purl.org/NET/cpan-uri/rt/ticket/124728>, <http://purl.org/NET/cpan-uri/rt/ticket/125132>, <http://purl.org/NET/cpan-uri/rt/ticket/125765>, <http://purl.org/NET/cpan-uri/rt/ticket/125839>, <http://purl.org/NET/cpan-uri/rt/ticket/125942>, <http://purl.org/NET/cpan-uri/rt/ticket/125948>, <http://purl.org/NET/cpan-uri/rt/ticket/127005>, <http://purl.org/NET/cpan-uri/rt/ticket/127090>, <http://purl.org/NET/cpan-uri/rt/ticket/127327>, <http://purl.org/NET/cpan-uri/rt/ticket/127504>, <http://purl.org/NET/cpan-uri/rt/ticket/127635>, <http://purl.org/NET/cpan-uri/rt/ticket/127986>, <http://purl.org/NET/cpan-uri/rt/ticket/128039>, <http://purl.org/NET/cpan-uri/rt/ticket/128046>, <http://purl.org/NET/cpan-uri/rt/ticket/128337>, <http://purl.org/NET/cpan-uri/rt/ticket/128493>, <http://purl.org/NET/cpan-uri/rt/ticket/128867>, <http://purl.org/NET/cpan-uri/rt/ticket/129650>, <http://purl.org/NET/cpan-uri/rt/ticket/129729>, <http://purl.org/NET/cpan-uri/rt/ticket/130353>, <http://purl.org/NET/cpan-uri/rt/ticket/130411>, <http://purl.org/NET/cpan-uri/rt/ticket/130823>, <http://purl.org/NET/cpan-uri/rt/ticket/85054>, <http://purl.org/NET/cpan-uri/rt/ticket/85149>, <http://purl.org/NET/cpan-uri/rt/ticket/85720>, <http://purl.org/NET/cpan-uri/rt/ticket/85732>, <http://purl.org/NET/cpan-uri/rt/ticket/85895>, <http://purl.org/NET/cpan-uri/rt/ticket/85911>, <http://purl.org/NET/cpan-uri/rt/ticket/86004>, <http://purl.org/NET/cpan-uri/rt/ticket/86172>, <http://purl.org/NET/cpan-uri/rt/ticket/86233>, <http://purl.org/NET/cpan-uri/rt/ticket/86239>, <http://purl.org/NET/cpan-uri/rt/ticket/86383>, <http://purl.org/NET/cpan-uri/rt/ticket/86813>, <http://purl.org/NET/cpan-uri/rt/ticket/86891>, <http://purl.org/NET/cpan-uri/rt/ticket/86892>, <http://purl.org/NET/cpan-uri/rt/ticket/86893>, <http://purl.org/NET/cpan-uri/rt/ticket/87264>, <http://purl.org/NET/cpan-uri/rt/ticket/87366>, <http://purl.org/NET/cpan-uri/rt/ticket/87443>, <http://purl.org/NET/cpan-uri/rt/ticket/87846>, <http://purl.org/NET/cpan-uri/rt/ticket/87999>, <http://purl.org/NET/cpan-uri/rt/ticket/88064>, <http://purl.org/NET/cpan-uri/rt/ticket/88277>, <http://purl.org/NET/cpan-uri/rt/ticket/88291>, <http://purl.org/NET/cpan-uri/rt/ticket/88452>, <http://purl.org/NET/cpan-uri/rt/ticket/88648>, <http://purl.org/NET/cpan-uri/rt/ticket/88655>, <http://purl.org/NET/cpan-uri/rt/ticket/88798>, <http://purl.org/NET/cpan-uri/rt/ticket/88951>, <http://purl.org/NET/cpan-uri/rt/ticket/89073>, <http://purl.org/NET/cpan-uri/rt/ticket/89234>, <http://purl.org/NET/cpan-uri/rt/ticket/89251>, <http://purl.org/NET/cpan-uri/rt/ticket/89279>, <http://purl.org/NET/cpan-uri/rt/ticket/89280>, <http://purl.org/NET/cpan-uri/rt/ticket/89317>, <http://purl.org/NET/cpan-uri/rt/ticket/89352>, <http://purl.org/NET/cpan-uri/rt/ticket/89691>, <http://purl.org/NET/cpan-uri/rt/ticket/89696>, <http://purl.org/NET/cpan-uri/rt/ticket/89936>, <http://purl.org/NET/cpan-uri/rt/ticket/90096>, <http://purl.org/NET/cpan-uri/rt/ticket/90865>, <http://purl.org/NET/cpan-uri/rt/ticket/90867>, <http://purl.org/NET/cpan-uri/rt/ticket/91153>, <http://purl.org/NET/cpan-uri/rt/ticket/91468>, <http://purl.org/NET/cpan-uri/rt/ticket/91802>, <http://purl.org/NET/cpan-uri/rt/ticket/92571>, <http://purl.org/NET/cpan-uri/rt/ticket/92591>, <http://purl.org/NET/cpan-uri/rt/ticket/93345>, <http://purl.org/NET/cpan-uri/rt/ticket/94196>, <http://purl.org/NET/cpan-uri/rt/ticket/94286>, <http://purl.org/NET/cpan-uri/rt/ticket/96379>, <http://purl.org/NET/cpan-uri/rt/ticket/96545>, <http://purl.org/NET/cpan-uri/rt/ticket/97516>, <http://purl.org/NET/cpan-uri/rt/ticket/97684>, <http://purl.org/NET/cpan-uri/rt/ticket/97840>, <http://purl.org/NET/cpan-uri/rt/ticket/98113>, <http://purl.org/NET/cpan-uri/rt/ticket/98159>, <http://purl.org/NET/cpan-uri/rt/ticket/98362>, <http://purl.org/NET/cpan-uri/rt/ticket/98458>, <http://purl.org/NET/cpan-uri/rt/ticket/99312>, <http://purl.org/NET/cpan-uri/rt/ticket/99889>;
+	doap-deps:develop-recommendation [
+		doap-deps:on "Test::Memory::Cycle"^^doap-deps:CpanId;
+	];
 	doap-deps:develop-suggestion [
 		doap-deps:on "Dist::Inkt::Profile::TOBYINK"^^doap-deps:CpanId;
 		rdfs:comment "This is used for building the release tarball."@en;
@@ -57,7 +61,7 @@
 		doap-deps:on "Devel::LexAlias 0.05"^^doap-deps:CpanId;
 		rdfs:comment "Devel::LexAlias is useful for some Eval::TypeTiny features."@en;
 	], [
-		doap-deps:on "Type::Tiny::XS 0.011"^^doap-deps:CpanId;
+		doap-deps:on "Type::Tiny::XS 0.016"^^doap-deps:CpanId;
 		rdfs:comment "Makes a lot of stuff faster."@en;
 	], [
 		doap-deps:on "Ref::Util::XS 0.100"^^doap-deps:CpanId;
@@ -70,7 +74,7 @@
 		rdfs:comment "This allows Type::Library to name subs nicely."@en;
 	];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006001"^^doap-deps:CpanId ], [
-		doap-deps:on "Exporter::Tiny 0.040"^^doap-deps:CpanId;
+		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
 		rdfs:comment "This module was spun off from the Type-Tiny distribution."@en;
 	];
 	doap-deps:runtime-suggestion [
@@ -97,6 +101,9 @@
 		doap-deps:on "Test::More 0.96"^^doap-deps:CpanId;
 		rdfs:comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;
 	];
+	doap-deps:test-suggestion [
+		doap-deps:on "Test::Memory::Cycle"^^doap-deps:CpanId;
+	];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>;
 	doap:category        [ rdfs:label "Moo" ], [ rdfs:label "Argument Validation" ], [ rdfs:label "Argument Checking" ], [ rdfs:label "Validation" ], [ rdfs:label "Moose" ], [ rdfs:label "Mouse" ], [ rdfs:label "Type Constraint" ], [ rdfs:label "Type Coercion" ], [ rdfs:label "Type Library" ], [ rdfs:label "Schema" ], [ rdfs:label "Parameter Validation" ], [ rdfs:label "Parameter Checking" ];
 	doap:created         "2013-03-23"^^xsd:date;
@@ -107,13 +114,14 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tiny";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_14>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_15>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_16>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-013_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-019_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-046>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_14>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_15>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-003_16>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-005_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-007_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-009_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-011_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-013_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-015_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-017_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-019_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-021_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-023_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-025_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-027_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-029_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-031_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-033_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-035_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-037_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_10>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_11>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_12>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-039_13>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-041_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-043_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-045_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-046>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_01>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_02>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_03>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_04>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_05>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_06>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_07>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_08>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-047_09>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-000006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-001_016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-002001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-003_010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_000>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-006000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tiny>;
 	];
 	doap:shortdesc       "tiny, yet Moo(se)-compatible type constraint";
-	doap:tester          <http://purl.org/NET/cpan-uri/person/avenj>.
+	doap:tester          <http://purl.org/NET/cpan-uri/person/avenj>;
+	foaf:page            <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>, <https://ci.appveyor.com/project/tobyink/p5-type-tiny>, <https://coveralls.io/github/tobyink/p5-type-tiny>, <https://github.com/tobyink/p5-type-tiny>, <https://metacpan.org/release/Type-Tiny>, <https://travis-ci.org/tobyink/p5-type-tiny>.
 
 <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_0-000_01>
 	a                    cpan-uri:DeveloperRelease, doap:Version;
@@ -4794,6 +4802,328 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.004004.tar.gz>;
 	doap:revision        "1.004004"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_000>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Type-Tiny-1.005_000"^^xsd:string;
+	dc:issued            "2019-01-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix spelling in error message for Types::Common::String LowerCaseSimpleStr.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/rrwo>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/47>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix Types::Standard documentation error: incorrect third-party module name.";
+			doap-changeset:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/46>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix Type::Params documentation error.";
+			doap-changeset:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/45>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor correction to POD header for Type::Params";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/jonasbn>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/43>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Types::Standard ArrayRef parameterized type can now take a second parameter, the minimum array length.";
+		], [
+			rdfs:label "Tidy up Type::Tiny namespace a little by fully-referencing some functions instead of importing them.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump minimum required version of Exporter::Tiny to 1.000000.";
+		], [
+			rdfs:label "Eval::TypeTiny's API is now considered to be stable.";
+		], [
+			rdfs:label "Tweaks to Type::Tiny and Type::Coercion to avoid unnecessarily loading overload.pm and overloading.pm.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Params multisig function now supports custom error messages.";
+			doap-changeset:blame <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/44>;
+		], [
+			rdfs:label "Types::TypeTiny::TypeTiny->has_coercion is now true.";
+		], [
+			rdfs:label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
+		], [
+			rdfs:label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004002>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.005_000.tar.gz>;
+	doap:revision        "1.005_000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_001>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Type-Tiny-1.005_001"^^xsd:string;
+	dc:issued            "2019-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Library now supports `of` and `where` options when importing type constraints.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_000>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.005_001.tar.gz>;
+	doap:revision        "1.005_001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_002>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Type-Tiny-1.005_002"^^xsd:string;
+	dc:issued            "2019-01-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Params named_to_list feature.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_001>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.005_002.tar.gz>;
+	doap:revision        "1.005_002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_003>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Type-Tiny-1.005_003"^^xsd:string;
+	dc:issued            "2019-02-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Improve test coverage.";
+		], [
+			rdfs:label "Fix Types::Standard's LazyLoad implementation.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_002>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.005_003.tar.gz>;
+	doap:revision        "1.005_003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_004>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Type-Tiny-1.005_004"^^xsd:string;
+	dc:issued            "2019-11-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Eliminate memory cycles created by coderef overloading in Type::Tiny and Type::Coercion.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/130823>;
+			doap-changeset:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Tiny::Enum now has a `unique_values` method.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
+		], [
+			rdfs:label "The `values` attribute of Type::Tiny::Enum now preserves order.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/129650>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/schroeer>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Types::Standard documentation fix.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/lsbuchala>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/48>;
+		], [
+			rdfs:label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-005_003>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.005_004.tar.gz>;
+	doap:revision        "1.005_004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-006000>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-1.006000"^^xsd:string;
+	dc:issued            "2019-11-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor correction to POD header for Type::Params";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/jonasbn>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/43>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Types::Standard ArrayRef parameterized type can now take a second parameter, the minimum array length.";
+		], [
+			rdfs:label "Tidy up Type::Tiny namespace a little by fully-referencing some functions instead of importing them.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump minimum required version of Exporter::Tiny to 1.000000.";
+		], [
+			rdfs:label "Eval::TypeTiny's API is now considered to be stable.";
+		], [
+			rdfs:label "Tweaks to Type::Tiny and Type::Coercion to avoid unnecessarily loading overload.pm and overloading.pm.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Params multisig function now supports custom error messages.";
+			doap-changeset:blame <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/44>;
+		], [
+			rdfs:label "Types::TypeTiny::TypeTiny->has_coercion is now true.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
+		], [
+			rdfs:label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Library now supports `of` and `where` options when importing type constraints.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Params named_to_list feature.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Improve test coverage.";
+		], [
+			rdfs:label "Fix Types::Standard's LazyLoad implementation.";
+		], [
+			rdfs:label "Eliminate memory cycles created by coderef overloading in Type::Tiny and Type::Coercion.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/130823>;
+			doap-changeset:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Tiny::Enum now has a `unique_values` method.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
+		], [
+			rdfs:label "The `values` attribute of Type::Tiny::Enum now preserves order.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/129650>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/schroeer>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Types::Standard documentation fix.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/lsbuchala>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny/pull/48>;
+		], [
+			rdfs:label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Type::Tiny::XS 0.016 is recommended.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Links to Type::Tiny on GitHub/Travis/AppVeyor/Coveralls in Type::Tiny pod.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Type-Tiny/v_1-004004>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-1.006000.tar.gz>;
+	doap:revision        "1.006000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/ANDK>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "cbd91ef3fd54c52cae34a5aaaed67dbf2da2b222".
+
+<http://purl.org/NET/cpan-uri/person/ANDRE>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "2df4a653a57f2b27e8de55ebc0376974cdd60687".
+
+<http://purl.org/NET/cpan-uri/person/BBYRD>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "860965460650325643501bf4e96aae390839b15d".
+
+<http://purl.org/NET/cpan-uri/person/BOOK>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "6c23833ac4a0b3ff955b4bc44976286eb1b15406".
+
+<http://purl.org/NET/cpan-uri/person/CAZADOR>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "e33976c4f7181cf955bd615e23814efb48545a3b".
+
+<http://purl.org/NET/cpan-uri/person/DAGOLDEN>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "943afe1e2148176ac8ba1c73bf2973580ad5b430".
+
+<http://purl.org/NET/cpan-uri/person/DAKKAR>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "eed2e225c2bb8a6b16179ac7dda75c6c59944cb0".
+
+<http://purl.org/NET/cpan-uri/person/DAMS>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "81750d13fe3e08dcbab06cebd34a9fe4fabd946f".
+
+<http://purl.org/NET/cpan-uri/person/DJERIUS>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "e6fb72dd0e31375b4c8626469a9a4ae195a6969e".
+
+<http://purl.org/NET/cpan-uri/person/DROLSKY>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "955e33f1b3b76c38043d3cb7d726fb4a93abf72a".
+
+<http://purl.org/NET/cpan-uri/person/ETHER>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "7699492dc595c10d65b72468627cb6bd0cd6536f".
+
+<http://purl.org/NET/cpan-uri/person/JIRA>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "00f47fd749128f7a4b60b9a9266a3f7dfd3d5f8e".
+
+<http://purl.org/NET/cpan-uri/person/KENTNL>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "726bf25858db97a4640f0eb479d341e3c13c69fe".
+
+<http://purl.org/NET/cpan-uri/person/MITHALDU>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "68bb6d7424e2fe1bb9612197430db87f84a8b6d7".
+
+<http://purl.org/NET/cpan-uri/person/MMCLERIC>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "a3bb054f532b528948e94b81574f172b9eaca03c".
+
+<http://purl.org/NET/cpan-uri/person/MSCHWERN>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "339d855871c015a11cff4d97513ab012ecccb2ea".
+
+<http://purl.org/NET/cpan-uri/person/NERDVANA>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "ea2515cb691aed3a376aaff9e3272a81a0f17c5f".
+
+<http://purl.org/NET/cpan-uri/person/RRWO>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "0a6ed89ab18aed06a0df071c64be174e13fde53c".
+
+<http://purl.org/NET/cpan-uri/person/SCHROEER>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "01353d2d1cc7cb31f847fdc07ff0dee7024b34c9".
+
+<http://purl.org/NET/cpan-uri/person/SJM>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "f30f17582ef9f59c6d0070b7624ea8062ef3f1ce".
+
+<http://purl.org/NET/cpan-uri/person/SKAUFMAN>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "5cfb9529eb9d18c8083a378c2697245ba8f2ee65".
+
+<http://purl.org/NET/cpan-uri/person/SLOYD>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "01f1833f79d2ed448399911d7c175c2602ae168a".
+
+<http://purl.org/NET/cpan-uri/person/SPICEMAN>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "ed010f54c43079761d1e89fe3160a14f07bd5311".
+
+<http://purl.org/NET/cpan-uri/person/SREZIC>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "d182f0d5e392756c7df07f84047fcc7b52b5de90".
+
+<http://purl.org/NET/cpan-uri/person/STEVENL>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "8e5fc889879f63ab979882081793ca857fb8ead5".
+
+<http://purl.org/NET/cpan-uri/person/TIMB>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "5c4419a9f32d74564c6fa40f2d8b57489b8b5233".
+
+<http://purl.org/NET/cpan-uri/person/ZDM>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "d9cd7d7db8c561cc55fc8194b6b6ad0a9e180def".
+
 <http://purl.org/NET/cpan-uri/person/abraxxa>
 	a                    foaf:Person;
 	foaf:name            "Alexander Hartmaier";
@@ -4878,6 +5208,12 @@
 	foaf:nick            "INGY";
 	foaf:page            <https://metacpan.org/author/INGY>.
 
+<http://purl.org/NET/cpan-uri/person/jonasbn>
+	a                    foaf:Person;
+	foaf:name            "Jonas B Nielsen";
+	foaf:nick            "JONASBN";
+	foaf:page            <https://metacpan.org/author/JONASBN>.
+
 <http://purl.org/NET/cpan-uri/person/jrmash>
 	a                    foaf:Person;
 	foaf:name            "Jason R Mash";
@@ -4889,6 +5225,12 @@
 	foaf:name            "Peter Karman";
 	foaf:nick            "KARMAN";
 	foaf:page            <https://metacpan.org/author/KARMAN>.
+
+<http://purl.org/NET/cpan-uri/person/lsbuchala>
+	a                    foaf:Person;
+	foaf:name            "Lucas Buchala";
+	foaf:nick            "LSBUCHALA";
+	foaf:page            <https://metacpan.org/author/LSBUCHALA>.
 
 <http://purl.org/NET/cpan-uri/person/markstos>
 	a                    foaf:Person;
@@ -4954,13 +5296,19 @@
 	a                    foaf:Person;
 	foaf:name            "Robert Rothenberg";
 	foaf:nick            "RRWO";
-	foaf:page            <https://github.com/robrwo>, <https://metacpan.org/author/RRWO>.
+	foaf:page            <https://metacpan.org/author/RRWO>.
 
 <http://purl.org/NET/cpan-uri/person/rsimoes>
 	a                    foaf:Person;
 	foaf:name            "Richard Simões";
 	foaf:nick            "RSIMOES";
 	foaf:page            <https://metacpan.org/author/RSIMOES>.
+
+<http://purl.org/NET/cpan-uri/person/schroeer>
+	a                    foaf:Person;
+	foaf:name            "Daniel Schröer";
+	foaf:nick            "SCHROEER";
+	foaf:page            <https://metacpan.org/author/SCHROEER>.
 
 <http://purl.org/NET/cpan-uri/person/shlomif>
 	a                    foaf:Person;
@@ -5023,65 +5371,392 @@
 	foaf:nick            "XENO";
 	foaf:page            <https://metacpan.org/author/XENO>.
 
+<http://purl.org/NET/cpan-uri/rt/ticket/100014>
+	a                    doap-bugs:Issue;
+	rdfs:label           "check and coerce arguments not being passed to parameterized types";
+	dc:created           "2014-11-04T09:22:03Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "170b4944cacd3cffb9f5a27ab96a099d8650cc38";
+	];
+	doap-bugs:id         "100014";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=100014>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
 <http://purl.org/NET/cpan-uri/rt/ticket/100780>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "100780"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=100780>.
+	rdfs:label           "localize SIG DIE";
+	dc:created           "2014-12-08T15:12:04Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "2b16b2ce13b2165be6ff6908b31276fbbe805630";
+	];
+	doap-bugs:id         "100780", "100780"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=100780>, <https://rt.cpan.org/Ticket/Display.html?id=100780>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/101582>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "101582"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=101582>.
+	rdfs:label           "Malformed UTF-8 character warnings in Perl 5.10 with utf8 pragma on";
+	dc:created           "2015-01-17T02:44:33Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ANDRE>;
+	doap-bugs:id         "101582", "101582"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=101582>, <https://rt.cpan.org/Ticket/Display.html?id=101582>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/101639>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Test suite fails with perl 5.21.8";
+	dc:created           "2015-01-20T22:18:42Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SREZIC>;
+	doap-bugs:id         "101639";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=101639>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/102457>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Document that compile needs to be called from within the subroutine";
+	dc:created           "2015-03-02T19:51:30Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DAGOLDEN>;
+	doap-bugs:id         "102457";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=102457>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/102638>
+	a                    doap-bugs:Issue;
+	rdfs:label           "\"Default\" type constraint for using with Dict and Tuple";
+	dc:created           "2015-03-08T13:14:04Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ZDM>;
+	doap-bugs:id         "102638";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=102638>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/102639>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Types serialization / deserialization";
+	dc:created           "2015-03-08T13:15:18Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ZDM>;
+	doap-bugs:id         "102639";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=102639>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/102748>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Type::Library can't consume MooseX::Types::DBIx::Class";
+	dc:created           "2015-03-13T17:55:43Z"^^xsd:dateTime;
+	dc:reporter          _:B1;
+	doap-bugs:id         "102748";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=102748>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/102864>
+	a                    doap-bugs:Issue;
+	rdfs:label           "\"used only once\" warnings from test suite";
+	dc:created           "2015-03-18T13:55:53Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "fca375f12085d4a03a2606da02bd0d6b346ee4d3";
+	];
+	doap-bugs:id         "102864";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=102864>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/104154>
+	a                    doap-bugs:Issue;
+	rdfs:label           "\"deep_explanation\" never called for some types";
+	dc:created           "2015-05-01T21:11:02+01:00"^^xsd:dateTime;
+	dc:reporter          _:B1;
+	doap-bugs:id         "104154";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=104154>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/104848>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Tests fail on old Perl and old Moose";
+	dc:created           "2015-06-01T17:56:58+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "7dbda2121338302f841f71d891a5b7a20af08056";
+	];
+	doap-bugs:id         "104848";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=104848>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/105022>
+	a                    doap-bugs:Issue;
+	rdfs:label           "coercions fail to be executed on uncompiled type checks";
+	dc:created           "2015-06-06T19:05:28+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/MITHALDU>;
+	doap-bugs:id         "105022";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=105022>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/105034>
+	a                    doap-bugs:Issue;
+	rdfs:label           "documentation on coerce methods needs more details";
+	dc:created           "2015-06-07T14:27:46+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/MITHALDU>;
+	doap-bugs:id         "105034";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=105034>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/105299>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "105299"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=105299>.
+	rdfs:label           "[PATCH] Croak when a parameterized ArrayRef is used like a Tuple";
+	dc:created           "2015-06-17T17:28:14+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "3c261d7474c1dbb3f73460d61d84f80fb0f4111c";
+	];
+	doap-bugs:id         "105299", "105299"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=105299>, <https://rt.cpan.org/Ticket/Display.html?id=105299>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/105505>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Strawberry perl x32 5.22.0 crashes";
+	dc:created           "2015-06-26T14:37:14+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ZDM>;
+	doap-bugs:id         "105505";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=105505>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/105561>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Type::Library messages lost when used with named parameters in Type::Params";
+	dc:created           "2015-06-29T20:18:48+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "c9913d208967575ac8ec0e160f734609a3d240c5";
+	];
+	doap-bugs:id         "105561";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=105561>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/109940>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Make Type::Tiny assertions compatible with Carp::Always and/or Carp::Verbose";
+	dc:created           "2015-11-30T02:26:19Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/NERDVANA>;
+	doap-bugs:id         "109940";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=109940>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/stalled>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/114386>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "114386"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=114386>.
+	rdfs:label           "Unescaped literal \"{\" characters in regular expression patterns are no longer permissible";
+	dc:created           "2016-05-15T05:32:54+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ETHER>;
+	doap-bugs:id         "114386", "114386"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=114386>, <https://rt.cpan.org/Ticket/Display.html?id=114386>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/114915>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Mismatch in isa vs can for parameterized types";
+	dc:created           "2016-05-31T19:50:58+01:00"^^xsd:dateTime;
+	dc:reporter          _:B2;
+	doap-bugs:id         "114915";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=114915>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/117838>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Bug in coercions for parameterized types";
+	dc:created           "2016-09-14T19:47:29+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "4d06cb14e5ce9dc1558c4e9c48d7058203c1a18e";
+	];
+	doap-bugs:id         "117838";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=117838>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/120226>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Provide method to inline an attribute type check";
+	dc:created           "2017-02-13T11:13:56Z"^^xsd:dateTime;
+	dc:reporter          _:B2;
+	doap-bugs:id         "120226";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=120226>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/121478>
+	a                    doap-bugs:Issue;
+	rdfs:label           "1.001_006 breaks SHLOMIF/AI-Pathfinding-OptimizeMultiple-0.0.13.tar.gz";
+	dc:created           "2017-05-01T08:52:48+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SREZIC>;
+	doap-bugs:id         "121478";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121478>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/121529>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Comparison to Params::ValidationCompiler isn't really accurate";
+	dc:created           "2017-05-04T18:52:41+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DROLSKY>;
+	doap-bugs:id         "121529";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121529>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/121762>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "121762"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=121762>.
+	rdfs:label           "FileHandle behaviour is different between Type::Tiny and Type::Tiny::XS";
+	dc:created           "2017-05-18T10:19:45+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "121762", "121762"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121762>, <https://rt.cpan.org/Ticket/Display.html?id=121762>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/121763>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Sometimes \"explain\" is missing from Error::TypeTiny::Assertion";
+	dc:created           "2017-05-18T10:21:25+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "121763";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121763>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/121764>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "121764"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=121764>.
+	rdfs:label           "Weird Perl <5.14 error with Union Types";
+	dc:created           "2017-05-18T10:24:46+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "121764", "121764"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121764>, <https://rt.cpan.org/Ticket/Display.html?id=121764>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/121840>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Document the options hash to `compile` and `compile_named` and provide some more useful options.";
+	dc:created           "2017-05-23T23:45:33+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "121840";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121840>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/121841>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Support `any_of`, `all_of`, `one_of`, and `none_of` in options hash to `compile_named`";
+	dc:created           "2017-05-24T00:05:56+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "121841";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121841>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/121981>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "121981"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=121981>.
+	rdfs:label           "Depends on Ref::Util::XS 0.200.0 which doesn't exist yet";
+	dc:created           "2017-06-04T09:07:45+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/KENTNL>;
+	doap-bugs:id         "121981", "121981"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=121981>, <https://rt.cpan.org/Ticket/Display.html?id=121981>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/122054>
+	a                    doap-bugs:Issue;
+	rdfs:label           "1.002001 fails to install in docker";
+	dc:created           "2017-06-09T01:44:32+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "56ca9233eaa3ac431a6588ed72aefec65a07316a";
+	];
+	doap-bugs:id         "122054";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=122054>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/122305>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "122305"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=122305>.
+	rdfs:label           "Documented code using class_type with plus_coercions doesn’t work";
+	dc:created           "2017-07-01T22:26:24+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "ba2fc0575516e4553efc73b60344d4dc30d5e758";
+	];
+	doap-bugs:id         "122305", "122305"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=122305>, <https://rt.cpan.org/Ticket/Display.html?id=122305>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/122931>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Circular reference on Type::Coercion";
+	dc:created           "2017-08-31T01:40:52+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BBYRD>;
+	doap-bugs:id         "122931";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=122931>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/123041>
+	a                    doap-bugs:Issue;
+	rdfs:label           "typo: Params::ValidateCompiler → Params::ValidationCompiler";
+	dc:created           "2017-09-14T10:51:38+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "8fb5238859d200bb4e1de91964c58d779f04a913";
+	];
+	doap-bugs:id         "123041";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=123041>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/123243>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Code from Type::Utils synopsis doesn't work";
+	dc:created           "2017-10-11T09:14:04+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/JIRA>;
+	doap-bugs:id         "123243";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=123243>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/123408>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "123408"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=123408>.
+	rdfs:label           "[PATCH] Compatibility with constants and with CV-in-stash optimisation";
+	dc:created           "2017-10-27T18:56:31+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "de3f4914b6898a5e74e0642110ee39086fe9aff2";
+	];
+	doap-bugs:id         "123408", "123408"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=123408>, <https://rt.cpan.org/Ticket/Display.html?id=123408>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/124067>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "124067"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=124067>.
+	rdfs:label           "00-begin.t fails with -DDEBUGGING perls";
+	dc:created           "2018-01-13T07:33:26Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ANDK>;
+	doap-bugs:id         "124067", "124067"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=124067>, <https://rt.cpan.org/Ticket/Display.html?id=124067>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/124121>
+	a                    doap-bugs:Issue;
+	rdfs:label           "warning: \"Found = in conditional, should be == at temporary compiled converter from 'Dict' line 1\"";
+	dc:created           "2018-01-17T23:25:54Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ETHER>;
+	doap-bugs:id         "124121";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=124121>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/124728>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "124728"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=124728>.
+	rdfs:label           "Type::Library::_mksub generates a new sub when importing types from another library";
+	dc:created           "2018-03-08T18:40:43Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "124728", "124728"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=124728>, <https://rt.cpan.org/Ticket/Display.html?id=124728>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/125132>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "125132"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=125132>;
+	rdfs:label           "Nasty interaction between compile() and $1";
+	dc:created           "2018-04-19T14:51:32+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "78e234e70caad29b81a6eb58bc71d278e10bf76e";
+	];
+	doap-bugs:id         "125132", "125132"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=125132>, <https://rt.cpan.org/Ticket/Display.html?id=125132>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Test inlined Int type check clobbering '$1'.";
@@ -5093,8 +5768,15 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/125765>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "125765"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=125765>;
+	rdfs:label           "Error when generating explanation";
+	dc:created           "2018-07-06T09:31:57+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "18d9c920110a0a23e4a3d0e284d3e9ef4731a553";
+	];
+	doap-bugs:id         "125765", "125765"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=125765>, <https://rt.cpan.org/Ticket/Display.html?id=125765>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Check weird error doesn't happen with deep explain.";
@@ -5104,25 +5786,256 @@
 		];
 	].
 
+<http://purl.org/NET/cpan-uri/rt/ticket/125839>
+	a                    doap-bugs:Issue;
+	rdfs:label           "dev releases are not removing _ from their versions";
+	dc:created           "2018-07-13T00:03:06+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ETHER>;
+	doap-bugs:id         "125839";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=125839>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
 <http://purl.org/NET/cpan-uri/rt/ticket/125942>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "125942"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=125942>.
+	rdfs:label           "Error::TypeTiny not correctly reporting line number of error";
+	dc:created           "2018-07-27T18:59:51+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "125942", "125942"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=125942>, <https://rt.cpan.org/Ticket/Display.html?id=125942>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/125948>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "125948"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=125948>.
+	rdfs:label           "t/30-integration/Moo/exceptions.t fails with really old Moo";
+	dc:created           "2018-07-28T14:58:22+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "125948", "125948"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=125948>, <https://rt.cpan.org/Ticket/Display.html?id=125948>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/127005>
+	a                    doap-bugs:Issue;
+	rdfs:label           "";
+	dc:created           "2018-08-31T08:59:32+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "2974f68d48930089dcf73edb575a06ed34a5679b";
+	];
+	doap-bugs:id         "127005";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=127005>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/127090>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Bool type check fails on JSON::PP::Boolean";
+	dc:created           "2018-09-11T08:24:49+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SLOYD>;
+	doap-bugs:id         "127090";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=127090>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/127327>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Test Errors while trying to install Type-Tiny 1.004002";
+	dc:created           "2018-10-10T09:21:55+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "b16438b6db2b156bced63c1cf47a1761d3a2df01";
+	];
+	doap-bugs:id         "127327";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=127327>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/127504>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Ambiguous exceptions where used with Params::ValidationCompiler";
+	dc:created           "2018-10-28T19:39:59Z"^^xsd:dateTime;
+	dc:reporter          _:B4;
+	doap-bugs:id         "127504";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=127504>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/127635>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Test::TypeTiny should_pass fails but check works";
+	dc:created           "2018-11-13T19:47:37Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/RRWO>;
+	doap-bugs:id         "127635";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=127635>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/127986>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Predicate for complementary_type";
+	dc:created           "2018-12-10T17:10:38Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BOOK>;
+	doap-bugs:id         "127986";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=127986>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/128039>
+	a                    doap-bugs:Issue;
+	rdfs:label           "allow IntRange and NumRange to only have upper bounds";
+	dc:created           "2018-12-17T20:56:56Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "128039";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=128039>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/128046>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Bool type not properly validated via Type::Params::validate";
+	dc:created           "2018-12-18T15:16:08Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "128046";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=128046>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/128337>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Support something similar to Params::ValidationCompiler#named_to_list";
+	dc:created           "2019-01-23T19:43:53Z"^^xsd:dateTime;
+	dc:reporter          _:B5;
+	doap-bugs:id         "128337";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=128337>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/128493>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Char type in Types::Common::String";
+	dc:created           "2019-02-13T04:49:05Z"^^xsd:dateTime;
+	dc:reporter          _:B5;
+	doap-bugs:id         "128493";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=128493>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/128867>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Add NumberLike to Types::TypeTiny";
+	dc:created           "2019-03-17T14:57:17Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "2e7830c8d1fcbba54d43210e32819ec90fe9a45a";
+	];
+	doap-bugs:id         "128867";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=128867>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/129650>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Allowable value of Type::Tiny::Enum should maintain order";
+	dc:created           "2019-05-22T11:18:33+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SCHROEER>;
+	doap-bugs:id         "129650", "129650"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=129650>, <https://rt.cpan.org/Ticket/Display.html?id=129650>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/129729>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Union with Enum with a value containing a '-' character fails";
+	dc:created           "2019-06-02T02:30:22+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "129729";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=129729>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/130353>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Consider documenting other styles of employing Type::Params";
+	dc:created           "2019-08-21T07:14:17+01:00"^^xsd:dateTime;
+	dc:reporter          _:B4;
+	doap-bugs:id         "130353";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=130353>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/130411>
+	a                    doap-bugs:Issue;
+	rdfs:label           "is_Int sometimes gives false positives";
+	dc:created           "2019-08-29T13:11:07+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "5ce5571608e34e0602196c86d87d1c0e7695f425";
+	];
+	doap-bugs:id         "130411";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=130411>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/130823>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Cycle references";
+	dc:created           "2019-10-26T11:37:51+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "217b5f4f500428733491a7b87d5830252d372a79";
+	];
+	doap-bugs:id         "130823", "130823"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=130823>, <https://rt.cpan.org/Ticket/Display.html?id=130823>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	doap-tests:regression_test [
+		a doap-tests:RegressionTest;
+		doap-tests:purpose "Check for memory cycles.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/40-regression/rt130823.t";
+		];
+	].
+
+<http://purl.org/NET/cpan-uri/rt/ticket/85054>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Confusing error message if required slurpy Dict not present in parameter list";
+	dc:created           "2013-05-05T03:35:42+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "85054";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=85054>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/85149>
+	a                    doap-bugs:Issue;
+	rdfs:label           "exception objects";
+	dc:created           "2013-05-09T04:52:37+01:00"^^xsd:dateTime;
+	dc:reporter          _:B6;
+	doap-bugs:id         "85149";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=85149>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/85720>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Type::Library has wrong VERSION variable";
+	dc:created           "2013-05-30T03:53:03+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "85720";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=85720>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/85732>
+	a                    doap-bugs:Issue;
+	rdfs:label           "support for optional arguments";
+	dc:created           "2013-05-30T14:11:03+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DAMS>;
+	doap-bugs:id         "85732";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=85732>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/85895>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "85895"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=85895>.
+	rdfs:label           "Type comparison not working on 5.8";
+	dc:created           "2013-06-05T18:39:56+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "a0b2c81a1ab31a33a19293431d21804ea3bd09ac";
+	];
+	doap-bugs:id         "85895", "85895"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=85895>, <https://rt.cpan.org/Ticket/Display.html?id=85895>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/85911>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "85911"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=85911>;
+	rdfs:label           "\"coercion cannot be inlined\" error w/ Type::Params::compile & Dict";
+	dc:created           "2013-06-06T04:00:30+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "85911", "85911"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=85911>, <https://rt.cpan.org/Ticket/Display.html?id=85911>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Test Type::Params with deep Dict coercion.";
@@ -5139,8 +6052,12 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86004>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86004"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86004>;
+	rdfs:label           "type constraint fails after coercion if too many elements in Dict";
+	dc:created           "2013-06-08T23:03:45+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "86004", "86004"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86004>, <https://rt.cpan.org/Ticket/Display.html?id=86004>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Test Type::Params with more complex Dict coercion.";
@@ -5152,13 +6069,21 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86172>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86172"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86172>.
+	rdfs:label           "Missing coercion with Moose and Type::Tiny";
+	dc:created           "2013-06-15T22:30:28+01:00"^^xsd:dateTime;
+	dc:reporter          _:B7;
+	doap-bugs:id         "86172", "86172"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86172>, <https://rt.cpan.org/Ticket/Display.html?id=86172>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86233>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86233"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86233>;
+	rdfs:label           "\"Cannot inline type constraint check\" erro with compile and Dict";
+	dc:created           "2013-06-18T15:23:52+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/MMCLERIC>;
+	doap-bugs:id         "86233", "86233"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86233>, <https://rt.cpan.org/Ticket/Display.html?id=86233>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Fix: \"Cannot inline type constraint check\" error with compile and Dict.";
@@ -5170,8 +6095,12 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86239>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86239"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86239>;
+	rdfs:label           "Optional constraints ignored if wrapped in Dict";
+	dc:created           "2013-06-18T16:34:37+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/MMCLERIC>;
+	doap-bugs:id         "86239", "86239"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86239>, <https://rt.cpan.org/Ticket/Display.html?id=86239>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Fix: Optional constraints ignored if wrapped in Dict.";
@@ -5188,108 +6117,267 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86383>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86383"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86383>.
+	rdfs:label           "Can't locate object method \"NAME\" via package \"B::SPECIAL\"";
+	dc:created           "2013-06-24T14:48:37+01:00"^^xsd:dateTime;
+	dc:reporter          _:B7;
+	doap-bugs:id         "86383", "86383"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86383>, <https://rt.cpan.org/Ticket/Display.html?id=86383>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86813>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86813"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86813>.
+	rdfs:label           "'extends' is not declared";
+	dc:created           "2013-07-09T18:53:01+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "1fa560e9f30b9c4621aad0c3ffca750ba9e3abae";
+	];
+	doap-bugs:id         "86813", "86813"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86813>, <https://rt.cpan.org/Ticket/Display.html?id=86813>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86891>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86891"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86891>.
+	rdfs:label           "Reduce boilerplate for inline_as";
+	dc:created           "2013-07-12T14:29:19+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "86891", "86891"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86891>, <https://rt.cpan.org/Ticket/Display.html?id=86891>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86892>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86892"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86892>.
+	rdfs:label           "Reduce boilerplate for message";
+	dc:created           "2013-07-12T14:45:49+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "86892", "86892"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86892>, <https://rt.cpan.org/Ticket/Display.html?id=86892>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86893>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "86893"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86893>.
+	rdfs:label           "Clarify \"may\" in the docs in relation to using constraint => quote_sub q{...}";
+	dc:created           "2013-07-12T15:08:16+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "86893", "86893"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=86893>, <https://rt.cpan.org/Ticket/Display.html?id=86893>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/87264>
+	a                    doap-bugs:Issue;
+	rdfs:label           "I was bitten by equals() being looser than expected (ie structural) which impacts is_subtype_of()";
+	dc:created           "2013-07-24T18:20:27+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "87264";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=87264>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/87366>
+	a                    doap-bugs:Issue;
+	rdfs:label           "PackageName type";
+	dc:created           "2013-07-26T23:18:08+01:00"^^xsd:dateTime;
+	dc:reporter          _:B6;
+	doap-bugs:id         "87366";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=87366>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/87443>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "87443"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=87443>.
+	rdfs:label           "Dict type doesn't notice missing Bool elements";
+	dc:created           "2013-07-30T15:09:13+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "87443", "87443"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=87443>, <https://rt.cpan.org/Ticket/Display.html?id=87443>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/87846>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "87846"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=87846>.
+	rdfs:label           "slurpy Dict[ foo => InstanceOf[\"bar\"] ] fails (due to unescaped quotes in throw?)";
+	dc:created           "2013-08-14T11:59:43+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "87846", "87846"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=87846>, <https://rt.cpan.org/Ticket/Display.html?id=87846>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/87999>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "87999"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=87999>.
+	rdfs:label           "Make constraint failure errors look less like data dumps";
+	dc:created           "2013-08-21T13:22:54+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "87999", "87999"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=87999>, <https://rt.cpan.org/Ticket/Display.html?id=87999>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/88064>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "88064"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88064>.
+	rdfs:label           "Several subclasses of Type::Tiny don't accept a hashref to the constructor";
+	dc:created           "2013-08-23T17:00:11+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "88064", "88064"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88064>, <https://rt.cpan.org/Ticket/Display.html?id=88064>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/88277>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "88277"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88277>.
+	rdfs:label           "Tuple validation unexpectedly successful";
+	dc:created           "2013-08-29T19:42:31+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/STEVENL>;
+	doap-bugs:id         "88277", "88277"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88277>, <https://rt.cpan.org/Ticket/Display.html?id=88277>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/88291>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "88291"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88291>.
+	rdfs:label           "Grouped alternatives";
+	dc:created           "2013-08-30T18:33:23+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "88291", "88291"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88291>, <https://rt.cpan.org/Ticket/Display.html?id=88291>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/88452>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "88452"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88452>.
+	rdfs:label           "Coercion Hierarchies";
+	dc:created           "2013-09-06T00:09:56+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "88452", "88452"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88452>, <https://rt.cpan.org/Ticket/Display.html?id=88452>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/88648>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Type::Tiny::Union could better mock Moose::Meta::TypeConstraint::Union";
+	dc:created           "2013-09-13T09:21:08+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "88648";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88648>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/88655>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "88655"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88655>.
+	rdfs:label           "Better messsages for type constraint failures";
+	dc:created           "2013-09-13T13:52:03+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "88655", "88655"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88655>, <https://rt.cpan.org/Ticket/Display.html?id=88655>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/88798>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "88798"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=88798>.
+	rdfs:label           "Typo in Type::Utils documentation";
+	dc:created           "2013-09-19T03:52:25+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "88798", "88798"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88798>, <https://rt.cpan.org/Ticket/Display.html?id=88798>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/88951>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Union and Intersection should still allow constraint/inlined attributes";
+	dc:created           "2013-09-25T01:13:06+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BBYRD>;
+	doap-bugs:id         "88951";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=88951>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/89073>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Fwd: Union?";
+	dc:created           "2013-09-30T17:42:42+01:00"^^xsd:dateTime;
+	dc:reporter          _:B6;
+	doap-bugs:id         "89073";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89073>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89234>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "89234"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89234>.
+	rdfs:label           "Moo attribute information not included in exception messages";
+	dc:created           "2013-10-03T17:09:02+01:00"^^xsd:dateTime;
+	dc:reporter          _:B2;
+	doap-bugs:id         "89234", "89234"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89234>, <https://rt.cpan.org/Ticket/Display.html?id=89234>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89251>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "89251"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89251>.
+	rdfs:label           "Make truncation length in Type::Tiny::_dd (currently 72) configurable";
+	dc:created           "2013-10-04T12:41:25+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/TIMB>;
+	doap-bugs:id         "89251", "89251"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89251>, <https://rt.cpan.org/Ticket/Display.html?id=89251>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89279>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "89279"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89279>.
+	rdfs:label           "validate_explain and Intersections";
+	dc:created           "2013-10-06T16:21:31+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BBYRD>;
+	doap-bugs:id         "89279", "89279"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89279>, <https://rt.cpan.org/Ticket/Display.html?id=89279>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89280>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "89280"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89280>.
+	rdfs:label           "Types::Exception not being indexed properly";
+	dc:created           "2013-10-06T16:24:38+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BBYRD>;
+	doap-bugs:id         "89280", "89280"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89280>, <https://rt.cpan.org/Ticket/Display.html?id=89280>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/89317>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Item should be a subtype of Any";
+	dc:created           "2013-10-08T01:51:05+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BBYRD>;
+	doap-bugs:id         "89317";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89317>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/89352>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Gazetteer type constraint";
+	dc:created           "2013-10-08T21:20:35+01:00"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "89352";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89352>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/89691>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Types::Standard: please add StrLen (string with length) type";
+	dc:created           "2013-10-22T11:42:15+01:00"^^xsd:dateTime;
+	dc:reporter          _:B8;
+	doap-bugs:id         "89691";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89691>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89696>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "89696"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89696>.
+	rdfs:label           "Types::Standard: is it possible to check for an empty ArrayRef/HashRef?";
+	dc:created           "2013-10-22T13:22:36+01:00"^^xsd:dateTime;
+	dc:reporter          _:B8;
+	doap-bugs:id         "89696", "89696"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89696>, <https://rt.cpan.org/Ticket/Display.html?id=89696>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89936>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "89936"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89936>.
+	rdfs:label           "Maybe[Foo] should better emulate Foo|Undef for constraints";
+	dc:created           "2013-11-01T00:43:36Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/BBYRD>;
+	doap-bugs:id         "89936", "89936"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=89936>, <https://rt.cpan.org/Ticket/Display.html?id=89936>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/90096>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "90096"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=90096>;
+	rdfs:label           "Modification of a read-only value attempted at parameter validation for '__ANON__'";
+	dc:created           "2013-11-06T15:24:29Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SKAUFMAN>;
+	doap-bugs:id         "90096", "90096"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=90096>, <https://rt.cpan.org/Ticket/Display.html?id=90096>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Additional tests related to RT#90096. Make sure that Type::Params localizes '$_'.";
@@ -5308,28 +6396,63 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/90865>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "90865"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=90865>.
+	rdfs:label           "Type::Params::multisig fails to validate when presented with a slurpy Dict";
+	dc:created           "2013-11-28T00:53:07Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "90865", "90865"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=90865>, <https://rt.cpan.org/Ticket/Display.html?id=90865>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/90867>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "90867"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=90867>.
+	rdfs:label           "possible documentation error in Error::TypeTiny::Assertion";
+	dc:created           "2013-11-28T02:25:01Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "90867", "90867"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=90867>, <https://rt.cpan.org/Ticket/Display.html?id=90867>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/91153>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "91153"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=91153>.
+	rdfs:label           "Type::Utils::extends does not handle named type coercions";
+	dc:created           "2013-12-03T17:44:14Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "be10c65554cd95cd10b3305311f8cfb45bf39499";
+	];
+	doap-bugs:id         "91153", "91153"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=91153>, <https://rt.cpan.org/Ticket/Display.html?id=91153>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/91468>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "91468"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=91468>.
+	rdfs:label           "test failure";
+	dc:created           "2013-12-17T12:39:50Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "e808ede8c60c2fe4c802fed08b9b7745f122515d";
+	];
+	doap-bugs:id         "91468", "91468"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=91468>, <https://rt.cpan.org/Ticket/Display.html?id=91468>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/91802>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Types::Standard: please add $class->DOES(...), $class->isa(...) and $class =~ /$valid_class_re/ constraints.";
+	dc:created           "2014-01-02T19:49:31Z"^^xsd:dateTime;
+	dc:reporter          _:B8;
+	doap-bugs:id         "91802";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=91802>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/92571>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "92571"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=92571>;
+	rdfs:label           "unexpected error from on-the-fly type union coercions, e.g. ( Str | Str )->coercion";
+	dc:created           "2014-01-30T05:56:04Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "92571", "92571"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=92571>, <https://rt.cpan.org/Ticket/Display.html?id=92571>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Make sure that the weakening of the reference from a Type::Coercion::Union object back to its \"owner\" type constraint does not break functionality.";
@@ -5348,8 +6471,12 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/92591>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "92591"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=92591>;
+	rdfs:label           "anonymous coercions (via declare_coercion) ignore passed coercion maps if not in a Type::Library";
+	dc:created           "2014-01-30T22:24:22Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "92591", "92591"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=92591>, <https://rt.cpan.org/Ticket/Display.html?id=92591>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Make sure that 'declare_coercion' works outside type libraries.";
@@ -5361,13 +6488,21 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/93345>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "93345"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=93345>.
+	rdfs:label           "Inlining/compiling of coercions which haven't been frozen";
+	dc:created           "2014-02-25T14:13:36Z"^^xsd:dateTime;
+	dc:reporter          _:B3;
+	doap-bugs:id         "93345", "93345"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=93345>, <https://rt.cpan.org/Ticket/Display.html?id=93345>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/94196>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "94196"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=94196>;
+	rdfs:label           "Type::Params; slurpy Dict breaks HasMethods";
+	dc:created           "2014-03-26T04:18:03Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "94196", "94196"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=94196>, <https://rt.cpan.org/Ticket/Display.html?id=94196>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Problematic inlining using '$_'.";
@@ -5377,20 +6512,50 @@
 		];
 	].
 
+<http://purl.org/NET/cpan-uri/rt/ticket/94286>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Type::Tiny and when()";
+	dc:created           "2014-03-28T15:35:36Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SJM>;
+	doap-bugs:id         "94286";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=94286>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
 <http://purl.org/NET/cpan-uri/rt/ticket/96379>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "96379"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=96379>.
+	rdfs:label           "documentation error in Types::Standard vis-à-vis coercions";
+	dc:created           "2014-06-11T17:20:17+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "96379", "96379"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=96379>, <https://rt.cpan.org/Ticket/Display.html?id=96379>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/96545>
+	a                    doap-bugs:Issue;
+	rdfs:label           "5.20+ fails compile( Optional ) if passing explicit undef";
+	dc:created           "2014-06-19T04:42:06+01:00"^^xsd:dateTime;
+	dc:reporter          _:B6;
+	doap-bugs:id         "96545";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=96545>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/97516>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "97516"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=97516>.
+	rdfs:label           "InstanceOf[Class::Name] is not cached, makes declaring coercion inconsistent";
+	dc:created           "2014-07-25T23:50:47+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/MSCHWERN>;
+	doap-bugs:id         "97516", "97516"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=97516>, <https://rt.cpan.org/Ticket/Display.html?id=97516>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/97684>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "97684"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=97684>;
+	rdfs:label           "Strange breakage with Mouse";
+	dc:created           "2014-08-01T22:03:06+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "97684", "97684"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=97684>, <https://rt.cpan.org/Ticket/Display.html?id=97684>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "The \"too few arguments for type constraint check functions\" error.";
@@ -5400,10 +6565,23 @@
 		];
 	].
 
+<http://purl.org/NET/cpan-uri/rt/ticket/97840>
+	a                    doap-bugs:Issue;
+	rdfs:label           "incorrect argument fingered in validate w/ optional coerced arg and bogus extra arg";
+	dc:created           "2014-08-07T19:25:02+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>;
+	doap-bugs:id         "97840";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=97840>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+
 <http://purl.org/NET/cpan-uri/rt/ticket/98113>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "98113"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=98113>;
+	rdfs:label           "Overload fallback gets clobbered on 5.10";
+	dc:created           "2014-08-17T18:41:34+01:00"^^xsd:dateTime;
+	dc:reporter          _:B7;
+	doap-bugs:id         "98113", "98113"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=98113>, <https://rt.cpan.org/Ticket/Display.html?id=98113>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	doap-tests:regression_test [
 		a doap-tests:RegressionTest;
 		doap-tests:purpose "Test overload fallback";
@@ -5415,23 +6593,51 @@
 
 <http://purl.org/NET/cpan-uri/rt/ticket/98159>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "98159"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=98159>.
+	rdfs:label           "Install failed with older Moose";
+	dc:created           "2014-08-18T23:18:09+01:00"^^xsd:dateTime;
+	dc:reporter          _:B7;
+	doap-bugs:id         "98159", "98159"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=98159>, <https://rt.cpan.org/Ticket/Display.html?id=98159>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/98362>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "98362"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=98362>.
+	rdfs:label           "a Dict with optional values and custom coercions can fail to validate";
+	dc:created           "2014-08-27T17:06:50+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DAKKAR>;
+	doap-bugs:id         "98362", "98362"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=98362>, <https://rt.cpan.org/Ticket/Display.html?id=98362>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/98458>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "98458"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=98458>.
+	rdfs:label           "Type constraint parsing fails when using a classname in the fun/method arguments";
+	dc:created           "2014-08-30T03:25:27+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SPICEMAN>;
+	doap-bugs:id         "98458", "98458"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=98458>, <https://rt.cpan.org/Ticket/Display.html?id=98458>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/99312>
 	a                    doap-bugs:Issue;
-	doap-bugs:id         "99312"^^xsd:string;
-	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=99312>.
+	rdfs:label           "inline_check code generation flaw/bug";
+	dc:created           "2014-10-05T11:05:32+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "4adbbbbb2b570e8761bc411981ae5c1daad25184";
+	];
+	doap-bugs:id         "99312", "99312"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=99312>, <https://rt.cpan.org/Ticket/Display.html?id=99312>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/99889>
+	a                    doap-bugs:Issue;
+	rdfs:label           "In Type::Params please throw exception showing caller";
+	dc:created           "2014-10-29T15:03:49Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/CAZADOR>;
+	doap-bugs:id         "99889";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=99889>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
 
 <urn:uuid:26bd4917-ff58-4e17-b2ee-4e81abe27f19>
 	foaf:mbox            <mailto:dsteinbrunner@pobox.com>;
@@ -5448,6 +6654,10 @@
 <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>
 	foaf:mbox            <mailto:peter@morch.com>;
 	foaf:name            "Peter Valdemar Mørch".
+
+<urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>
+	foaf:mbox            <mailto:x86mail@gmail.com>;
+	foaf:name            "Ivanov Anton".
 
 <urn:uuid:a96145d2-d9bc-4d1b-a278-be17c831edfd>
 	foaf:homepage        <http://www.andrewalker.net>;
@@ -5479,6 +6689,38 @@
 
 <urn:uuid:febe859c-fa5c-4abd-8c6c-464643c79e4e>
 	foaf:name            "KB Jørgensen".
+
+_:B1
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "a1ea66ab424d54745bcff0459ccedc34810b6698".
+
+_:B2
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "b07d8ccbdad5ade6520ad7d8b42c5b0784604ff8".
+
+_:B3
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "7ed2c97d6b43f439d14fb072af1c0ce3a2e83d9d".
+
+_:B4
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "4489b6413868d5d58fb4c3fcbd9488bde196f7fc".
+
+_:B5
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "73bf7b6cff88b2a42dc321f8d660290f47e5708c".
+
+_:B6
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "fb673bc745f8b8bc65c33bc4700155dcba13dd5d".
+
+_:B7
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "773c118edc593a4272b888498829f9ef4fb0a55c".
+
+_:B8
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "11285309b4bb0908c954155cfa81c1027c7a146e".
 
 []
 	a                    nfo:FileDataObject;
@@ -5654,23 +6896,23 @@
 	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	nfo:fileName         "TODO.mm".
 
-_:B1
+_:B9
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/00-begin.t".
 
-_:B2
+_:B10
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/01-compile.t".
 
-_:B3
+_:B11
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/02-api.t".
 
-_:B4
+_:B12
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/03-leak.t".
 
-_:B5
+_:B13
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/99-moose-std-types-test.t".
 
@@ -5959,6 +7201,13 @@ _:B5
 		];
 	], [
 		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks 'of' and 'where' import options works.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Library/import-params.t";
+		];
+	], [
+		a doap-tests:UnitTest;
 		doap-tests:purpose "Checks that it's possible to extend existing type libraries.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
@@ -6064,10 +7313,24 @@ _:B5
 		];
 	], [
 		a doap-tests:UnitTest;
+		doap-tests:purpose "Make sure that custom 'multisig()' messages work.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/multisig-custom-message.t";
+		];
+	], [
+		a doap-tests:UnitTest;
 		doap-tests:purpose "Test Type::Params 'multisig' function.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
 			nfo:fileName "t/20-unit/Type-Params/multisig.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Params usage with named parameters and 'named_to_list'.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Params/named-to-list.t";
 		];
 	], [
 		a doap-tests:UnitTest;
@@ -6190,6 +7453,13 @@ _:B5
 		];
 	], [
 		a doap-tests:UnitTest;
+		doap-tests:purpose "Test new type comparison stuff with Type::Tiny objects.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny/cmp.t";
+		];
+	], [
+		a doap-tests:UnitTest;
 		doap-tests:purpose "Checks 'plus_coercions', 'minus_coercions' and 'no_coercions' methods work.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
@@ -6309,6 +7579,13 @@ _:B5
 		];
 	], [
 		a doap-tests:UnitTest;
+		doap-tests:purpose "Test new type comparison stuff with Type::Tiny::Duck objects.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny-Duck/cmp.t";
+		];
+	], [
+		a doap-tests:UnitTest;
 		doap-tests:purpose "Checks duck type constraints throw sane error messages.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
@@ -6330,6 +7607,13 @@ _:B5
 		];
 	], [
 		a doap-tests:UnitTest;
+		doap-tests:purpose "Test new type comparison stuff with Type::Tiny::Enum.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny-Enum/cmp.t";
+		];
+	], [
+		a doap-tests:UnitTest;
 		doap-tests:purpose "Checks enum type constraints throw sane error messages.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
@@ -6348,6 +7632,13 @@ _:B5
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
 			nfo:fileName "t/20-unit/Type-Tiny-Intersection/basic.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Check cmp for Type::Tiny::Intersection.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Tiny-Intersection/cmp.t";
 		];
 	], [
 		a doap-tests:UnitTest;
@@ -6435,27 +7726,6 @@ _:B5
 	rdfs:label           "Type::Utils";
 	doap-tests:unit_test [
 		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Type::Utils 'classifier' function.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Utils/classifier.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks sane behaviour of 'dwim_type' from Type::Utils when both Moose and Mouse are loaded.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Utils/dwim-both.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Checks Moose type constraints, and MooseX::Types type constraints are picked up by 'dwim_type' from Type::Utils.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Type-Utils/dwim-moose.t";
-		];
-	], [
-		a doap-tests:UnitTest;
 		doap-tests:purpose "Checks Mouse type constraints, and MouseX::Types type constraints are picked up by 'dwim_type' from Type::Utils.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
@@ -6474,6 +7744,27 @@ _:B5
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
 			nfo:fileName "t/20-unit/Type-Utils/warnings.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Test Type::Utils 'classifier' function.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Utils/classifier.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks sane behaviour of 'dwim_type' from Type::Utils when both Moose and Mouse are loaded.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Utils/dwim-both.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks Moose type constraints, and MooseX::Types type constraints are picked up by 'dwim_type' from Type::Utils.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Type-Utils/dwim-moose.t";
 		];
 	];
 	nfo:fileName         "lib/Type/Utils.pm";
@@ -6505,20 +7796,6 @@ _:B5
 	rdfs:label           "Types::Common::String";
 	doap-tests:unit_test [
 		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests constraints for Types::Common::String's 'StrLength'tring";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Types-Common-String/strlength.t";
-		];
-	], [
-		a doap-tests:UnitTest;
-		doap-tests:purpose "Tests Unicode support for Types::Common::String. These tests are based on tests from MooseX::Types::Common.";
-		doap-tests:test_script [
-			a nfo:FileDataObject, nfo:SourceCode;
-			nfo:fileName "t/20-unit/Types-Common-String/unicode.t";
-		];
-	], [
-		a doap-tests:UnitTest;
 		doap-tests:purpose "Tests constraints for Types::Common::String. These tests are based on tests from MooseX::Types::Common.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
@@ -6531,6 +7808,20 @@ _:B5
 			a nfo:FileDataObject, nfo:SourceCode;
 			nfo:fileName "t/20-unit/Types-Common-String/coerce.t";
 		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests constraints for Types::Common::String's 'StrLength'tring";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Types-Common-String/strlength.t";
+		];
+	], [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Tests Unicode support for Types::Common::String. These tests are based on tests from MooseX::Types::Common.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Types-Common-String/unicode.t";
+		];
 	];
 	nfo:fileName         "lib/Types/Common/String.pm";
 	nfo:programmingLanguage "Perl".
@@ -6539,6 +7830,13 @@ _:B5
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	rdfs:label           "Types::Standard";
 	doap-tests:unit_test [
+		a doap-tests:UnitTest;
+		doap-tests:purpose "Checks the new ArrayRef[$type, $min, $max] from Types::Standard.";
+		doap-tests:test_script [
+			a nfo:FileDataObject, nfo:SourceCode;
+			nfo:fileName "t/20-unit/Types-Standard/arrayreflength.t";
+		];
+	], [
 		a doap-tests:UnitTest;
 		doap-tests:purpose "Checks various values against the type constraints from Types::Standard.";
 		doap-tests:test_script [
@@ -6631,7 +7929,7 @@ _:B5
 		];
 	], [
 		a doap-tests:UnitTest;
-		doap-tests:purpose "Test Types::TypeTiny::to_TypeTiny pseudo-coercion.";
+		doap-tests:purpose "Test Types::TypeTiny::to_TypeTiny pseudo-coercion and the Types::TypeTiny::_ForeignTypeConstraint type.";
 		doap-tests:test_script [
 			a nfo:FileDataObject, nfo:SourceCode;
 			nfo:fileName "t/20-unit/Types-TypeTiny/coercion.t";
@@ -6661,424 +7959,424 @@ _:B5
 	nfo:fileName         "lib/Types/TypeTiny.pm";
 	nfo:programmingLanguage "Perl".
 
-_:B6
+_:B14
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Class-InsideOut/basic.t".
 
-_:B7
+_:B15
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Exporter-Tiny/basic.t".
 
-_:B8
+_:B16
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Exporter-Tiny/installer.t".
 
-_:B9
+_:B17
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Exporter-Tiny/role-conflict.t".
 
-_:B10
+_:B18
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Function-Parameters/basic.t".
 
-_:B11
+_:B19
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Kavorka/80returntype.t".
 
-_:B12
+_:B20
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Kavorka/basic.t".
 
-_:B13
+_:B21
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moo/basic.t".
 
-_:B14
+_:B22
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moo/coercion-inlining-avoidance.t".
 
-_:B15
+_:B23
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moo/coercion.t".
 
-_:B16
+_:B24
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moo/exceptions.t".
 
-_:B17
+_:B25
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moo/inflation.t".
 
-_:B18
+_:B26
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moo/inflation2.t".
 
-_:B19
+_:B27
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moops/basic.t".
 
-_:B20
+_:B28
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moops/library-keyword.t".
 
-_:B21
+_:B29
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moose/accept-moose-types.t".
 
-_:B22
+_:B30
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moose/basic.t".
 
-_:B23
+_:B31
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moose/coercion-more.t".
 
-_:B24
+_:B32
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moose/coercion.t".
 
-_:B25
+_:B33
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moose/inflate-then-inline.t".
 
-_:B26
+_:B34
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Moose/native-attribute-traits.t".
 
-_:B27
+_:B35
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/MooseX-Getopt/coercion.t".
 
-_:B28
+_:B36
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/MooseX-Types/basic.t".
 
-_:B29
+_:B37
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/MooseX-Types/extending.t".
 
-_:B30
+_:B38
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/MooseX-Types/more.t".
 
-_:B31
+_:B39
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Mouse/basic.t".
 
-_:B32
+_:B40
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Mouse/coercion.t".
 
-_:B33
+_:B41
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/MouseX-Types/basic.t".
 
-_:B34
+_:B42
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/MouseX-Types/extending.t".
 
-_:B35
+_:B43
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Object-Accessor/basic.t".
 
-_:B36
+_:B44
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Return-Type/basic.t".
 
-_:B37
+_:B45
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Sub-Quote/basic.t".
 
-_:B38
+_:B46
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Sub-Quote/delayed-quoting.t".
 
-_:B39
+_:B47
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Sub-Quote/unquote-coercions.t".
 
-_:B40
+_:B48
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Sub-Quote/unquote-constraints.t".
 
-_:B41
+_:B49
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Switcheroo/basic.t".
 
-_:B42
+_:B50
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Type-Tie/basic.t".
 
-_:B43
+_:B51
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Validation-Class-Simple/archaic.t".
 
-_:B44
+_:B52
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/Validation-Class-Simple/basic.t".
 
-_:B45
+_:B53
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/30-integration/match-simple/basic.t".
 
-_:B46
+_:B54
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/40-regression/73f51e2d.t".
 
-_:B47
+_:B55
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/40-regression/gh1.t".
 
-_:B48
+_:B56
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/40-regression/gh14.t".
 
-_:B49
+_:B57
 	a                    nfo:FileDataObject, nfo:SourceCode;
 	nfo:fileName         "t/40-regression/ttxs-gh1.t".
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Print some standard diagnostics before beginning testing.";
-	doap-tests:test_script _:B1.
+	doap-tests:test_script _:B9.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Test that Type::Tiny, Type::Library, etc compile.";
-	doap-tests:test_script _:B2.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints work with Class::InsideOut.";
-	doap-tests:test_script _:B6.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Tests Exporter::Tiny has the features Type::Tiny needs.";
-	doap-tests:test_script _:B7.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Tests Type::Library libraries work with Sub::Exporter plugins.";
-	doap-tests:test_script _:B8.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Tests exporting to two roles; tries to avoid reporting conflicts.";
-	doap-tests:test_script _:B9.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints work with Function::Parameters.";
 	doap-tests:test_script _:B10.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Adopted test from Kavorka test suite.";
-	doap-tests:test_script _:B11.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Checks Type::Tiny works with Kavorka.";
-	doap-tests:test_script _:B12.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints work with Moo. Checks values that should pass and should fail; checks error messages.";
-	doap-tests:test_script _:B13.
-
-[]
-	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "A rather complex case of defining an attribute with a type coercion in Moo; and only then adding coercion definitions to it. Does Moo pick up on the changes? It should.";
+	doap-tests:purpose   "Check type constraints work with Class::InsideOut.";
 	doap-tests:test_script _:B14.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check coercions work with Moo.";
+	doap-tests:purpose   "Tests Exporter::Tiny has the features Type::Tiny needs.";
 	doap-tests:test_script _:B15.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Tests Error::TypeTiny interaction with Moo.";
+	doap-tests:purpose   "Tests Type::Library libraries work with Sub::Exporter plugins.";
 	doap-tests:test_script _:B16.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Checks that type constraints continue to work when a Moo class is inflated to a Moose class. Checks that Moo::HandleMoose correctly calls back to Type::Tiny to build Moose type constraints.";
+	doap-tests:purpose   "Tests exporting to two roles; tries to avoid reporting conflicts.";
 	doap-tests:test_script _:B17.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "A test for type constraint inflation from Moo to Moose.";
+	doap-tests:purpose   "Check type constraints work with Function::Parameters.";
 	doap-tests:test_script _:B18.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check that type constraints work in Moops. This file is borrowed from the Moops test suite, where it is called '31types.t'.";
+	doap-tests:purpose   "Adopted test from Kavorka test suite.";
 	doap-tests:test_script _:B19.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check that type libraries can be declared with Moops. This file is borrowed from the Moops test suite, where it is called '71library.t'.";
+	doap-tests:purpose   "Checks Type::Tiny works with Kavorka.";
 	doap-tests:test_script _:B20.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check that Moose type constraints can be passed into the Type::Tiny API where a Type::Tiny constraint might usually be expected.";
+	doap-tests:purpose   "Check type constraints work with Moo. Checks values that should pass and should fail; checks error messages.";
 	doap-tests:test_script _:B21.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints work with Moose. Checks values that should pass and should fail; checks error messages.";
+	doap-tests:purpose   "A rather complex case of defining an attribute with a type coercion in Moo; and only then adding coercion definitions to it. Does Moo pick up on the changes? It should.";
 	doap-tests:test_script _:B22.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Test for the good old \"You cannot coerce an attribute unless its type has a coercion\" error.";
+	doap-tests:purpose   "Check coercions work with Moo.";
 	doap-tests:test_script _:B23.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check coercions work with Moose; both mutable and immutable classes.";
+	doap-tests:purpose   "Tests Error::TypeTiny interaction with Moo.";
 	doap-tests:test_script _:B24.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraint inlining works with Moose in strange edge cases where we need to inflate Type::Tiny constraints into full Moose::Meta::TypeConstraint objects.";
+	doap-tests:purpose   "Checks that type constraints continue to work when a Moo class is inflated to a Moose class. Checks that Moo::HandleMoose correctly calls back to Type::Tiny to build Moose type constraints.";
 	doap-tests:test_script _:B25.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints and coercions work with Moose native attibute traits.";
+	doap-tests:purpose   "A test for type constraint inflation from Moo to Moose.";
 	doap-tests:test_script _:B26.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check coercions work with MooseX::Getopt; both mutable and immutable classes.";
+	doap-tests:purpose   "Check that type constraints work in Moops. This file is borrowed from the Moops test suite, where it is called '31types.t'.";
 	doap-tests:test_script _:B27.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Complex checks between Type::Tiny and MooseX::Types.";
+	doap-tests:purpose   "Check that type libraries can be declared with Moops. This file is borrowed from the Moops test suite, where it is called '71library.t'.";
 	doap-tests:test_script _:B28.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check that Type::Library can extend an existing MooseX::Types type constraint library.";
+	doap-tests:purpose   "Check that Moose type constraints can be passed into the Type::Tiny API where a Type::Tiny constraint might usually be expected.";
 	doap-tests:test_script _:B29.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "More checks between Type::Tiny and MooseX::Types. This started out as an example of making a parameterized 'Not[]' type constraint, but worked out as a nice test case.";
+	doap-tests:purpose   "Check type constraints work with Moose. Checks values that should pass and should fail; checks error messages.";
 	doap-tests:test_script _:B30.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints work with Mouse. Checks values that should pass and should fail; checks error messages.";
+	doap-tests:purpose   "Test for the good old \"You cannot coerce an attribute unless its type has a coercion\" error.";
 	doap-tests:test_script _:B31.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check coercions work with Mouse; both mutable and immutable classes.";
+	doap-tests:purpose   "Check coercions work with Moose; both mutable and immutable classes.";
 	doap-tests:test_script _:B32.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Complex checks between Type::Tiny and MouseX::Types.";
+	doap-tests:purpose   "Check type constraint inlining works with Moose in strange edge cases where we need to inflate Type::Tiny constraints into full Moose::Meta::TypeConstraint objects.";
 	doap-tests:test_script _:B33.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check that Type::Library can extend an existing MooseX::Types type constraint library.";
+	doap-tests:purpose   "Check type constraints and coercions work with Moose native attibute traits.";
 	doap-tests:test_script _:B34.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints work with Object::Accessor.";
+	doap-tests:purpose   "Check coercions work with MooseX::Getopt; both mutable and immutable classes.";
 	doap-tests:test_script _:B35.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Test that this sort of thing works: sub foo :ReturnType(Int) { ...; }";
+	doap-tests:purpose   "Complex checks between Type::Tiny and MooseX::Types.";
 	doap-tests:test_script _:B36.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints can be made inlinable using Sub::Quote.";
+	doap-tests:purpose   "Check that Type::Library can extend an existing MooseX::Types type constraint library.";
 	doap-tests:test_script _:B37.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints can be made inlinable using Sub::Quote even if Sub::Quote is loaded late.";
+	doap-tests:purpose   "More checks between Type::Tiny and MooseX::Types. This started out as an example of making a parameterized 'Not[]' type constraint, but worked out as a nice test case.";
 	doap-tests:test_script _:B38.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type coercions can be unquoted Sub::Quote.";
+	doap-tests:purpose   "Check type constraints work with Mouse. Checks values that should pass and should fail; checks error messages.";
 	doap-tests:test_script _:B39.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints can be unquoted Sub::Quote.";
+	doap-tests:purpose   "Check coercions work with Mouse; both mutable and immutable classes.";
 	doap-tests:test_script _:B40.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Checks Type::Tiny works with Switcheroo.";
+	doap-tests:purpose   "Complex checks between Type::Tiny and MouseX::Types.";
 	doap-tests:test_script _:B41.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Test that this sort of thing works: tie my $var, Int;";
+	doap-tests:purpose   "Check that Type::Library can extend an existing MooseX::Types type constraint library.";
 	doap-tests:test_script _:B42.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Fake Validation::Class::Simple 7.900017 by overriding '$VERSION' variable. (There is a reason for this... 'Types::TypeTiny::to_TypeTiny' follows two different code paths depending on the version of the Validation::Class::Simple object passed to it.)";
+	doap-tests:purpose   "Check type constraints work with Object::Accessor.";
 	doap-tests:test_script _:B43.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Check type constraints Validation::Class::Simple objects can be used as type constraints.";
+	doap-tests:purpose   "Test that this sort of thing works: sub foo :ReturnType(Int) { ...; }";
 	doap-tests:test_script _:B44.
 
 []
 	a                    doap-tests:IntegrationTest;
-	doap-tests:purpose   "Checks Type::Tiny works with match::simple.";
+	doap-tests:purpose   "Check type constraints can be made inlinable using Sub::Quote.";
 	doap-tests:test_script _:B45.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Check type constraints can be made inlinable using Sub::Quote even if Sub::Quote is loaded late.";
+	doap-tests:test_script _:B46.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Check type coercions can be unquoted Sub::Quote.";
+	doap-tests:test_script _:B47.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Check type constraints can be unquoted Sub::Quote.";
+	doap-tests:test_script _:B48.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Checks Type::Tiny works with Switcheroo.";
+	doap-tests:test_script _:B49.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Test that this sort of thing works: tie my $var, Int;";
+	doap-tests:test_script _:B50.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Fake Validation::Class::Simple 7.900017 by overriding '$VERSION' variable. (There is a reason for this... 'Types::TypeTiny::to_TypeTiny' follows two different code paths depending on the version of the Validation::Class::Simple object passed to it.)";
+	doap-tests:test_script _:B51.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Check type constraints Validation::Class::Simple objects can be used as type constraints.";
+	doap-tests:test_script _:B52.
+
+[]
+	a                    doap-tests:IntegrationTest;
+	doap-tests:purpose   "Checks Type::Tiny works with match::simple.";
+	doap-tests:test_script _:B53.
 
 []
 	a                    doap-tests:RegressionTest;
 	doap-tests:purpose   "Possible issue causing segfaults on threaded Perl 5.18.x.";
-	doap-tests:test_script _:B46.
+	doap-tests:test_script _:B54.
 
 []
 	a                    doap-tests:RegressionTest;
 	doap-tests:purpose   "Test that subtypes of Type::Tiny::Class work.";
-	doap-tests:test_script _:B47.
+	doap-tests:test_script _:B55.
 
 []
 	a                    doap-tests:RegressionTest;
 	doap-tests:purpose   "Test for non-inlined coercions in Moo. The issue that prompted this test was actually invalid, caused by a typo in the bug reporter's code. But I wrote the test case, so I might as well include it.";
-	doap-tests:test_script _:B48.
+	doap-tests:test_script _:B56.
 
 []
 	a                    doap-tests:RegressionTest;
 	doap-tests:purpose   "Test that was failing with Type::Tiny::XS prior to 0.009.";
-	doap-tests:test_script _:B49.
+	doap-tests:test_script _:B57.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Test that Type::Tiny and Type::Coercion provide a Moose/Mouse-compatible API.";
-	doap-tests:test_script _:B3.
+	doap-tests:test_script _:B11.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Check for memory leaks. These tests are not comprehensive; chances are that there are still memory leaks lurking somewhere in Type::Tiny. If you have any concrete suggestions for things to test, or fixes for identified memory leaks, please file a bug report. https://rt.cpan.org/Ticket/Create.html?Queue=Type-Tiny.";
-	doap-tests:test_script _:B4.
+	doap-tests:test_script _:B12.
 
 []
 	a                    doap-tests:Test;
 	doap-tests:purpose   "Type constraint tests pilfered from the Moose test suite.";
-	doap-tests:test_script _:B5.
+	doap-tests:test_script _:B13.
 

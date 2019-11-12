@@ -6,7 +6,7 @@ use warnings;
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.004004';
+our $VERSION   = '1.006000';
 
 # Token types
 # 
@@ -387,8 +387,8 @@ Evaluate: {
 		
 		if (@_ and $_[0] ne $r->type)
 		{
-			unshift @{$self->{stack}}, pop @{$self->{done}};
-			Type::Parser::_croak("Expected $_[0]; got ".$r->type);
+			unshift @{$self->{stack}}, pop @{$self->{done}};        # uncoverable statement
+			Type::Parser::_croak("Expected $_[0]; got ".$r->type);  # uncoverable statement
 		}
 		
 		return $r;

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Duck::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Duck::VERSION   = '1.004004';
+	$Type::Tiny::Duck::VERSION   = '1.006000';
 }
 
 use Scalar::Util qw< blessed >;
@@ -47,6 +47,8 @@ sub methods     { $_[0]{methods} }
 sub inlined     { $_[0]{inlined} ||= $_[0]->_build_inlined }
 
 sub has_inlined { !!1 }
+
+sub _is_null_constraint { 0 }
 
 sub _build_constraint
 {
@@ -123,6 +125,33 @@ sub validate_explain
 		@{$self->methods}
 	];
 }
+
+push @Type::Tiny::CMP, sub {
+	my $A = shift->find_constraining_type;
+	my $B = shift->find_constraining_type;
+	return Type::Tiny::CMP_UNKNOWN unless $A->isa(__PACKAGE__) && $B->isa(__PACKAGE__);
+	
+	my %seen;
+	for my $word (@{$A->methods}) {
+		$seen{$word} += 1;
+	}
+	for my $word (@{$B->methods}) {
+		$seen{$word} += 2;
+	}
+	
+	my $values = join('', CORE::values %seen);
+	if ($values =~ /^3*$/) {
+		return Type::Tiny::CMP_EQUIVALENT;
+	}
+	elsif ($values !~ /2/) {
+		return Type::Tiny::CMP_SUBTYPE;
+	}
+	elsif ($values !~ /1/) {
+		return Type::Tiny::CMP_SUPERTYPE;
+	}
+	
+	return Type::Tiny::CMP_UNKNOWN;
+};
 
 1;
 

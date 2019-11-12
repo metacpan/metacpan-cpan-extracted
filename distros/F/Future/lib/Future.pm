@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -377,6 +377,9 @@ sub _mark_ready
    }
 
    delete $self->{on_cancel};
+   $_->[0] and $_->[0]->_revoke_on_cancel( $_->[1] ) for @{ $self->{revoke_when_ready} };
+   delete $self->{revoke_when_ready};
+
    my $callbacks = delete $self->{callbacks} or return;
 
    my $cancelled = $self->{cancelled};
@@ -700,7 +703,10 @@ order to that in which they were registered.
    $on_cancel->( $future )
 
 If passed another C<Future> instance, the passed instance will be cancelled
-when the original future is cancelled.
+when the original future is cancelled. In this case, the reference is only
+strongly held while the target future remains pending. If it becomes ready,
+then there is no point trying to cancel it, and so it is removed from the
+originating future's cancellation list.
 
 =cut
 
@@ -716,8 +722,35 @@ sub on_cancel
    $self->{ready} and return $self;
 
    push @{ $self->{on_cancel} }, $code;
+   if( $is_future ) {
+      push @{ $code->{revoke_when_ready} }, my $r = [ $self, \$self->{on_cancel}[-1] ];
+      weaken( $r->[0] );
+      weaken( $r->[1] );
+   }
 
    return $self;
+}
+
+sub _revoke_on_cancel
+{
+   my $self = shift;
+   my ( $ref ) = @_;
+
+   undef $$ref;
+   $self->{empty_on_cancel_slots}++;
+
+   my $on_cancel = $self->{on_cancel} or return;
+
+   # If the list is nontrivally large and over half-empty / under half-full, compact it
+   if( @$on_cancel >= 8 and $self->{empty_on_cancel_slots} >= 0.5 * @$on_cancel ) {
+      # We can't grep { defined } because that will break all the existing SCALAR refs
+      my $idx = 0;
+      while( $idx < @$on_cancel ) {
+         defined $on_cancel->[$idx] and $idx++, next;
+         splice @$on_cancel, $idx, 1, ();
+      }
+      $self->{empty_on_cancel_slots} = 0;
+   }
 }
 
 =head1 USER METHODS
@@ -1036,7 +1069,9 @@ sub cancel
    return $self if $self->{ready};
 
    $self->{cancelled}++;
-   foreach my $code ( reverse @{ $self->{on_cancel} || [] } ) {
+   my $on_cancel = delete $self->{on_cancel};
+   foreach my $code ( $on_cancel ? reverse @$on_cancel : () ) {
+      defined $code or next;
       my $is_future = blessed( $code ) && $code->isa( "Future" );
       $is_future ? $code->cancel
                  : $code->( $self );

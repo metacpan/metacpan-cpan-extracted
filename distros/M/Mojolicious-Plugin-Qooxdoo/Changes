@@ -1,5 +1,9 @@
 Revision history for Mojolicious::Pugin::Qooxdoo
 
+1.0.7 2019-11-12
+  - use log method on controller to show request context in log
+1.0.5 2019-03-09
+  - regressions introduced in 1.0.3 fixed
 1.0.3 2019-03-08
   - have explicit functions for loggin in the rpc controller
 

@@ -4,7 +4,7 @@ HTTP::Cookies - HTTP cookie jars
 
 # VERSION
 
-version 6.05
+version 6.06
 
 # SYNOPSIS
 
@@ -110,7 +110,7 @@ The following methods are provided:
     $path\_spec, $secure, $discard arguments are boolean values. The $maxage
     value is a number indicating number of seconds that this cookie will
     live.  A value of $maxage <= 0 will delete this cookie.  The $version argument
-    sets the version of the cookie; the default value is 0 ( original Netscape 
+    sets the version of the cookie; the default value is 0 ( original Netscape
     spec ).  Setting $version to another value indicates the RFC to which the
     cookie conforms (e.g. version 1 for RFC 2109).  %rest defines various other
     attributes like "Comment" and "CommentURL".
@@ -195,7 +195,7 @@ Gisle Aas <gisle@activestate.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2017 by Gisle Aas.
+This software is copyright (c) 2002-2019 by Gisle Aas.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

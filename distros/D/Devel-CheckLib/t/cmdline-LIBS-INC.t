@@ -3,7 +3,7 @@ use strict;
 BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
 
 use lib 't/lib';
-use IO::CaptureOutput qw(capture);
+use Capture::Tiny qw(capture);
 use Config;
 
 use File::Spec;
@@ -36,48 +36,42 @@ my $runtime = '-l'.(
 
 my $rval = undef;
 my @args = (qq{LIBS=$runtime});
-capture(
-    sub { $rval = system(
+($stdout, $stderr) = capture {
+    $rval = system(
         $Config{perlpath},
 	'-Mblib',
 	'-MDevel::CheckLib',
 	'-e',
 	"print @ARGV;assert_lib(debug => $debug)",
         @args
-    )},
-    \$stdout,
-    \$stderr
-);
+    );
+};
 ok($stderr eq '' && defined($rval) && $rval == 0, "linked OK: ".join(', ', @args)) || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
 
 $rval = undef;
 @args = map { "LIBS=$_" } ($runtime, '-lbazbam', "-L$libdir");
-capture(
-    sub { $rval = system(
+($stdout, $stderr) = capture {
+    $rval = system(
         $Config{perlpath},
 	'-Mblib',
 	'-MDevel::CheckLib',
 	'-e',
 	"print @ARGV;assert_lib(debug => $debug)",
         @args
-    )},
-    \$stdout,
-    \$stderr
-);
+    );
+};
 ok($stderr eq '' && defined($rval) && $rval == 0, "linked OK: ".join(', ', @args)) || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
 
 $rval = undef;
 @args = (qq{"LIBS=$runtime -lbazbam -L$libdir"});
-capture(
-    sub { $rval = system(
+($stdout, $stderr) = capture {
+    $rval = system(
         $Config{perlpath},
 	'-Mblib',
 	'-MDevel::CheckLib',
 	'-e',
 	"print @ARGV;assert_lib(debug => $debug)",
         @args
-    )},
-    \$stdout,
-    \$stderr
-);
+    );
+};
 ok($stderr eq '' && defined($rval) && $rval == 0, "linked OK: ".join(', ', @args)) || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");

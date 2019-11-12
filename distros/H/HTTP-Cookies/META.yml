@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Cookies/issues
   homepage: https://github.com/libwww-perl/HTTP-Cookies
   repository: https://github.com/libwww-perl/HTTP-Cookies.git
-version: '6.05'
+version: '6.06'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -144,7 +144,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -152,6 +152,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::OALDERS/MojibakeTests'
+      version: '0.8'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OALDERS/PodSyntaxTests'
@@ -164,6 +168,25 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/Test::CPAN::Changes'
       version: '0.012'
     -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@Author::OALDERS/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
+      name: '@Author::OALDERS/Test::Portability'
+      version: '2.001000'
+    -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::OALDERS/TestRelease'
       version: '6.012'
@@ -175,6 +198,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: '@Author::OALDERS/Test::TidyAll'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::OALDERS/Test::Version'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -424,7 +451,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.05
+          tag: v6.06
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -548,6 +575,7 @@ x_contributors:
   - 'Alex Peters <lxp@cpan.org>'
   - 'amire80 <amir.aharoni@gmail.com>'
   - 'Andreas J. Koenig <andreas.koenig@anima.de>'
+  - 'Bernhard M. Wiedemann <bwiedemann@suse.de>'
   - 'Bill Mann <wfmann@alum.mit.edu>'
   - 'Bron Gondwana <brong@fastmail.fm>'
   - 'Chase Whitener <capoeirab@cpan.org>'

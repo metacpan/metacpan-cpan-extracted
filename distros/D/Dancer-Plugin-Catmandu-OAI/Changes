@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0505  2019-11-12 09:41:00 CET
+  - specify required version of MIME::Base64
+
 0.0504  2019-11-06 11:14:45 CET
   - stricter query parameter checking
 

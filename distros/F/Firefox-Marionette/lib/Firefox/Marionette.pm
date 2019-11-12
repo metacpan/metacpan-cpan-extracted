@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -2604,15 +2604,18 @@ sub add_cookie {
             $self->_command('WebDriver:AddCookie'),
             {
                 cookie => {
-                    httpOnly => $cookie->http_only()
-                    ? JSON::true()
+                    httpOnly => $cookie->http_only() ? JSON::true()
                     : JSON::false(),
                     secure => $cookie->secure() ? JSON::true() : JSON::false(),
                     domain => $domain,
                     path   => $cookie->path(),
                     value  => $cookie->value(),
-                    expiry => $cookie->expiry(),
-                    name   => $cookie->name()
+                    (
+                        defined $cookie->expiry()
+                        ? ( expiry => $cookie->expiry() )
+                        : ()
+                    ),
+                    name => $cookie->name()
                 }
             }
         ]
@@ -4777,7 +4780,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.84
+Version 0.85
 
 =head1 SYNOPSIS
 

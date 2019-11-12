@@ -44,7 +44,7 @@ has thumbnail_width  => undef;
 has title            => undef;
 has type             => 'link';
 has ua               => undef;                                                # Mojo::UserAgent object
-has url              => undef;                                                # Mojo::URL
+has url              => sub { Mojo::URL->new };                               # Mojo::URL
 has version          => '1.0';
 has width            => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
 

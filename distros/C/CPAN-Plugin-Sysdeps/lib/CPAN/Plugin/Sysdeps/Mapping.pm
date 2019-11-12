@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 # shortcuts
 #  os and distros
@@ -14,6 +14,7 @@ use constant os_windows  => (os => 'MSWin32');
 use constant os_darwin   => (os => 'darwin'); # really means installer=homebrew
 use constant like_debian => (linuxdistro => '~debian');
 use constant before_ubuntu_trusty  => (linuxdistrocodename => [qw(squeeze precise wheezy)]);
+use constant before_ubuntu_xenial  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie)]);
 use constant before_debian_stretch => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial)]);
 use constant before_ubuntu_bionic  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
 use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic)]);
@@ -700,6 +701,13 @@ sub mapping {
 	[package => []], # not available before stretch
        ],
        [package => 'libsecp256k1-dev']],
+     ],
+
+     [cpanmod => 'Crypt::LibSCEP',
+      [os_freebsd,
+       [osvers => {'>=', 11},
+	[package => 'libscep']],
+       [package => []]],
      ],
 
      [cpanmod => 'Crypt::Sodium',
@@ -1961,7 +1969,7 @@ sub mapping {
 
      # XXX check whether Kafka::Librd needs an external librdkafka
      # at all, or if works with just the Alien package
-     [cpanmod => 'Kafka::Librd',
+     [cpanmod => ['Kafka::Librd', 'Net::Kafka'],
       [os_freebsd,
        [package => 'librdkafka']],
       [like_debian,
@@ -2032,6 +2040,20 @@ sub mapping {
        [package => 'libsoldout1-dev']], # passes with jessie, fails with xenial
      ],
 
+     [#cpanmod => 'Lingua::Identify::CLD2',
+      cpandist => qr{^Lingua-Identify-CLD2-\d}, # XXX until first stable release happens
+      [os_freebsd,
+       [package => 'cld2']],
+      [like_debian,
+       [before_ubuntu_xenial,
+	[package => []]],
+       [package => 'libcld2-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	package => []],
+       [package => 'cld2-devel']],
+     ],
+      
      [cpanmod => 'Lingua::NATools',
       # XXX what about freebsd?
       [like_debian,
@@ -2060,7 +2082,7 @@ sub mapping {
        [package => 'libnetfilter_log-devel']],
      ],
 
-     [cpanmod => 'Linux::Prctl',
+     [cpanmod => ['Linux::Prctl', 'Linux::Capabilities'],
       [like_debian,
        [package => 'libcap-dev']],
       [like_fedora,
@@ -2239,6 +2261,17 @@ sub mapping {
        [package => 'libid3-3.8.3-dev']],
       [like_fedora,
        [package => 'id3lib-devel']],
+     ],
+
+     [cpanmod => 'MP4::LibMP4v2',
+      [os_freebsd,
+       [package => 'mp4v2']],
+      [like_debian,
+       [before_debian_buster,
+	[package => 'libmp4v2-dev']],
+       [package => []]], # not available for buster
+      [like_fedora,
+       [package => 'libmp4v2-devel']],
      ],
 
      [cpanmod => 'modperl2',
@@ -3264,7 +3297,7 @@ sub mapping {
 
      [cpanmod => 'Wx',
       [os_freebsd,
-       [package => 'wx30-gtk2']],
+       [package => 'wx30-gtk3 | wx30-gtk2']],
       # XXX what about debian?
       # fedora: no package needed (e.g wxGTK-devel or wxGTK3-devel), works with Alien::wxWidgets
      ],

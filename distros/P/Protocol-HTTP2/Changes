@@ -1,5 +1,8 @@
 Revision history for Perl extension Protocol-HTTP2
 
+1.10 2019-11-12T06:19:05Z
+    - test: fixed test 9 (issue 10)
+
 1.09 2018-08-05T16:03:20Z
     - doc: fix spelling mistakes (Gregor Herrmann)
     - doc: added link to RFC 7541 (Mohammad S Anwar)

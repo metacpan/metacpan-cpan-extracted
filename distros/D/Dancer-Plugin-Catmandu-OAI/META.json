@@ -50,7 +50,7 @@
             "DateTime" : "1.08",
             "DateTime::Format::ISO8601" : "0",
             "DateTime::Format::Strptime" : "0",
-            "MIME::Base64" : "0",
+            "MIME::Base64" : "3.15",
             "perl" : "v5.10.1"
          }
       },
@@ -73,7 +73,7 @@
          "web" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI"
       }
    },
-   "version" : "0.0504",
+   "version" : "0.0505",
    "x_contributors" : [
       "Nicolas Franck <Nicolas.Franck@ugent.be>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",

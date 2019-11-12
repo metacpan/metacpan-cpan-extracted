@@ -1,9 +1,10 @@
 package Mojolicious::Plugin::Template::Mustache;
+use v5.10.0;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Template::Mustache;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub register {
     my ( undef, $app, $args ) = @_;

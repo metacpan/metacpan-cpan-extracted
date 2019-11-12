@@ -84,13 +84,54 @@ use Future;
 {
    my $f1 = Future->new;
    my $f2 = Future->new;
+   my $f3 = Future->new;
 
    $f1->on_cancel( $f2 );
+   $f1->on_cancel( $f3 );
+
+   is_oneref( $f1, '$f1 has refcount 1 after on_cancel chaining' );
+   is_refcount( $f2, 2, '$f2 has refcount 2 after on_cancel chaining' );
+   is_refcount( $f3, 2, '$f3 has refcount 2 after on_cancel chaining' );
+
+   $f3->done;
+   is_oneref( $f3, '$f3 has refcount 1 after done in cancel chain' );
+
    my $cancelled;
    $f2->on_cancel( sub { $cancelled++ } );
 
    $f1->cancel;
    is( $cancelled, 1, 'Chained cancellation' );
+}
+
+# test amortized compaction
+{
+   my $f = Future->new;
+   my @subf;
+
+   push @subf, Future->new and $f->on_cancel( $subf[-1] ) for 1 .. 100;
+
+   # gutwrench
+   is( scalar @{ $f->{on_cancel} }, 100, '$f on_cancel list is 100 items initially' );
+
+   # We should be able to cancel the first 49 of these without triggering a compaction
+   $_->done for @subf[0..48];
+
+   # gutwrench
+   is( scalar @{ $f->{on_cancel} }, 100, '$f on_cancel list still 100 items' );
+
+   # Cancelling the next one will cause a compaction
+   $_->done for $subf[49];
+
+   # gutwrench
+   is( scalar @{ $f->{on_cancel} }, 50, '$f on_cancel list now only 50 items' );
+
+   # Cancelling most of the rest will compact again
+   $_->done for @subf[50..90];
+
+   # gutwrench
+   is( scalar @{ $f->{on_cancel} }, 12, '$f on_cancel list now only 12 items' );
+
+   $f->cancel;
 }
 
 # ->done on cancelled

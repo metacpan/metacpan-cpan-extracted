@@ -13,4 +13,4 @@ requires 'Data::MessagePack', '>=1.00';
 requires 'DateTime', '>=1.08';
 requires 'DateTime::Format::ISO8601', 0;
 requires 'DateTime::Format::Strptime', 0;
-requires 'MIME::Base64', 0;
+requires 'MIME::Base64', '>=3.15';

@@ -3,13 +3,13 @@ use strict;
 BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
 
 use lib 't/lib';
-use IO::CaptureOutput qw(capture);
+use Capture::Tiny qw(capture);
 use Config;
 
 use File::Spec;
 use Test::More;
 
-my($debug, $stdout, $stderr) = ($ENV{DEVEL_CHECKLIB_DEBUG} || 0);
+my $debug = $ENV{DEVEL_CHECKLIB_DEBUG} || 0;
 my $libdir;
 
 eval "use Devel::CheckLib";
@@ -37,9 +37,9 @@ my $runtime = '-l'.(
 # my $runtime = $^O eq 'MSWin32' ? '-lmsvcrt' : '-lm';
 my $args = qq{LIBS => '$runtime -lbazbam -L$libdir'};
 
-capture(
-    sub { eval "assert_lib(debug => $debug, $args)"; },
-    \$stdout,
-    \$stderr
-);
-is($@, q{}, "$args") || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
+my $error;
+my ($stdout, $stderr) = capture {
+    eval "assert_lib(debug => $debug, $args)";
+    $error = $@;
+};
+is($error, q{}, "$args") || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");

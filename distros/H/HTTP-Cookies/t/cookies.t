@@ -12,33 +12,33 @@ use HTTP::Response;
 # http://curl.haxx.se/rfc/cookie_spec.html
 
 # Client requests a document, and receives in the response:
-# 
+#
 #       Set-Cookie: CUSTOMER=WILE_E_COYOTE; path=/; expires=Wednesday, 09-Nov-99 23:12:40 GMT
-# 
+#
 # When client requests a URL in path "/" on this server, it sends:
-# 
+#
 #       Cookie: CUSTOMER=WILE_E_COYOTE
-# 
+#
 # Client requests a document, and receives in the response:
-# 
+#
 #       Set-Cookie: PART_NUMBER=ROCKET_LAUNCHER_0001; path=/
-# 
+#
 # When client requests a URL in path "/" on this server, it sends:
-# 
+#
 #       Cookie: CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001
-# 
+#
 # Client receives:
-# 
+#
 #       Set-Cookie: SHIPPING=FEDEX; path=/fo
-# 
+#
 # When client requests a URL in path "/" on this server, it sends:
-# 
+#
 #       Cookie: CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001
-# 
+#
 # When client requests a URL in path "/foo" on this server, it sends:
-# 
+#
 #       Cookie: CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001; SHIPPING=FEDEX
-# 
+#
 # The last Cookie is buggy, because both specifications says that the
 # most specific cookie must be sent first.  SHIPPING=FEDEX is the
 # most specific and should thus be first.
@@ -98,27 +98,27 @@ print $c->as_string;
 
 
 # Second Example transaction sequence:
-# 
+#
 # Assume all mappings from above have been cleared.
-# 
+#
 # Client receives:
-# 
+#
 #       Set-Cookie: PART_NUMBER=ROCKET_LAUNCHER_0001; path=/
-# 
+#
 # When client requests a URL in path "/" on this server, it sends:
-# 
+#
 #       Cookie: PART_NUMBER=ROCKET_LAUNCHER_0001
-# 
+#
 # Client receives:
-# 
+#
 #       Set-Cookie: PART_NUMBER=RIDING_ROCKET_0023; path=/ammo
-# 
+#
 # When client requests a URL in path "/ammo" on this server, it sends:
-# 
+#
 #       Cookie: PART_NUMBER=RIDING_ROCKET_0023; PART_NUMBER=ROCKET_LAUNCHER_0001
-# 
+#
 #       NOTE: There are two name/value pairs named "PART_NUMBER" due to
-#       the inheritance of the "/" mapping in addition to the "/ammo" mapping. 
+#       the inheritance of the "/" mapping in addition to the "/ammo" mapping.
 
 $c = HTTP::Cookies->new;  # clear it
 
@@ -164,67 +164,67 @@ ok(count_cookies($c), 0);
 
 $c = HTTP::Cookies->new;
 
-# 
+#
 # 5.1  Example 1
-# 
+#
 # Most detail of request and response headers has been omitted.  Assume
 # the user agent has no stored cookies.
-# 
+#
 #   1.  User Agent -> Server
-# 
+#
 #       POST /acme/login HTTP/1.1
 #       [form data]
-# 
+#
 #       User identifies self via a form.
-# 
+#
 #   2.  Server -> User Agent
-# 
+#
 #       HTTP/1.1 200 OK
 #       Set-Cookie2: Customer="WILE_E_COYOTE"; Version="1"; Path="/acme"
-# 
+#
 #       Cookie reflects user's identity.
 
 $cookie = interact($c, 'http://www.acme.com/acme/login',
                        'Customer="WILE_E_COYOTE"; Version="1"; Path="/acme"');
 ok(!$cookie);
 
-# 
+#
 #   3.  User Agent -> Server
-# 
+#
 #       POST /acme/pickitem HTTP/1.1
 #       Cookie: $Version="1"; Customer="WILE_E_COYOTE"; $Path="/acme"
 #       [form data]
-# 
+#
 #       User selects an item for ``shopping basket.''
-# 
+#
 #   4.  Server -> User Agent
-# 
+#
 #       HTTP/1.1 200 OK
 #       Set-Cookie2: Part_Number="Rocket_Launcher_0001"; Version="1";
 #               Path="/acme"
-# 
+#
 #       Shopping basket contains an item.
 
 $cookie = interact($c, 'http://www.acme.com/acme/pickitem',
 		       'Part_Number="Rocket_Launcher_0001"; Version="1"; Path="/acme"');
 ok($cookie =~ m(^\$Version="?1"?; Customer="?WILE_E_COYOTE"?; \$Path="/acme"$));
 
-# 
+#
 #   5.  User Agent -> Server
-# 
+#
 #       POST /acme/shipping HTTP/1.1
 #       Cookie: $Version="1";
 #               Customer="WILE_E_COYOTE"; $Path="/acme";
 #               Part_Number="Rocket_Launcher_0001"; $Path="/acme"
 #       [form data]
-# 
+#
 #       User selects shipping method from form.
-# 
+#
 #   6.  Server -> User Agent
-# 
+#
 #       HTTP/1.1 200 OK
 #       Set-Cookie2: Shipping="FedEx"; Version="1"; Path="/acme"
-# 
+#
 #       New cookie reflects shipping method.
 
 $cookie = interact($c, "http://www.acme.com/acme/shipping",
@@ -234,22 +234,22 @@ ok($cookie =~ /^\$Version="?1"?;/);
 ok($cookie =~ /Part_Number="?Rocket_Launcher_0001"?;\s*\$Path="\/acme"/);
 ok($cookie =~ /Customer="?WILE_E_COYOTE"?;\s*\$Path="\/acme"/);
 
-# 
+#
 #   7.  User Agent -> Server
-# 
+#
 #       POST /acme/process HTTP/1.1
 #       Cookie: $Version="1";
 #               Customer="WILE_E_COYOTE"; $Path="/acme";
 #               Part_Number="Rocket_Launcher_0001"; $Path="/acme";
 #               Shipping="FedEx"; $Path="/acme"
 #       [form data]
-# 
+#
 #       User chooses to process order.
-# 
+#
 #   8.  Server -> User Agent
-# 
+#
 #       HTTP/1.1 200 OK
-# 
+#
 #       Transaction is complete.
 
 $cookie = interact($c, "http://www.acme.com/acme/process");
@@ -257,7 +257,7 @@ print "FINAL COOKIE: $cookie\n";
 ok($cookie =~ /Shipping="?FedEx"?;\s*\$Path="\/acme"/);
 ok($cookie =~ /WILE_E_COYOTE/);
 
-# 
+#
 # The user agent makes a series of requests on the origin server, after
 # each of which it receives a new cookie.  All the cookies have the same
 # Path attribute and (default) domain.  Because the request URLs all have
@@ -268,7 +268,7 @@ print $c->as_string;
 
 
 # 5.2  Example 2
-# 
+#
 # This example illustrates the effect of the Path attribute.  All detail
 # of request and response headers has been omitted.  Assume the user agent
 # has no stored cookies.
@@ -277,12 +277,12 @@ $c = HTTP::Cookies->new;
 
 # Imagine the user agent has received, in response to earlier requests,
 # the response headers
-# 
+#
 # Set-Cookie2: Part_Number="Rocket_Launcher_0001"; Version="1";
 #         Path="/acme"
-# 
+#
 # and
-# 
+#
 # Set-Cookie2: Part_Number="Riding_Rocket_0023"; Version="1";
 #         Path="/acme/ammo"
 
@@ -292,11 +292,11 @@ interact($c, "http://www.acme.com/acme/ammo/specific",
 
 # A subsequent request by the user agent to the (same) server for URLs of
 # the form /acme/ammo/...  would include the following request header:
-# 
+#
 # Cookie: $Version="1";
 #         Part_Number="Riding_Rocket_0023"; $Path="/acme/ammo";
 #         Part_Number="Rocket_Launcher_0001"; $Path="/acme"
-# 
+#
 # Note that the NAME=VALUE pair for the cookie with the more specific Path
 # attribute, /acme/ammo, comes before the one with the less specific Path
 # attribute, /acme.  Further note that the same cookie name appears more
@@ -307,9 +307,9 @@ ok($cookie =~ /Riding_Rocket_0023.*Rocket_Launcher_0001/);
 
 # A subsequent request by the user agent to the (same) server for a URL of
 # the form /acme/parts/ would include the following request header:
-# 
+#
 # Cookie: $Version="1"; Part_Number="Rocket_Launcher_0001"; $Path="/acme"
-# 
+#
 # Here, the second cookie's Path attribute /acme/ammo is not a prefix of
 # the request URL, /acme/parts/, so the cookie does not get forwarded to
 # the server.

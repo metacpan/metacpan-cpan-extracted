@@ -10,7 +10,7 @@ my $cookie_jar = HTTP::Cookies->new();
 
 my $request = HTTP::Request->new(GET => 'http://www.en.com/');
 
-my $response = HTTP::Response->parse                           
+my $response = HTTP::Response->parse
         ("HTTP/1.1 302 Moved" . $CRLF . "Set-Cookie: expires=10101$CRLF$CRLF");
 
 $response->request($request);

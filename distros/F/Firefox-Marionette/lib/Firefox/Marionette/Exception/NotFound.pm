@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception::Response);
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 sub throw {
     my ( $class, $response, $parameters ) = @_;
@@ -29,7 +29,7 @@ Firefox::Marionette::Exception::NotFound - Represents a 'no such element' except
 
 =head1 VERSION
 
-Version 0.84
+Version 0.85
 
 =head1 SYNOPSIS
 

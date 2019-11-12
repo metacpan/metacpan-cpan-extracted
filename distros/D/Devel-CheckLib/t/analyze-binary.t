@@ -3,7 +3,7 @@ use strict;
 BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
 
 use lib 't/lib';
-use IO::CaptureOutput qw(capture);
+use Capture::Tiny qw(capture);
 use Config;
 
 use File::Spec;
@@ -39,16 +39,19 @@ my %common = ( debug => $debug,
                function => 'return (argc - 1);',
              );
 
-capture
-    sub { eval { assert_lib(%common,
-                            analyze_binary => sub { analyze_binary @_, 3, qw(foo  bar doz) } ) } },
-    \$stdout, \$stderr;
-is($@, '', "analyze_binary ok") or diagout;
+my $error;
+($stdout, $stderr) = capture {
+    eval { assert_lib(%common,
+                            analyze_binary => sub { analyze_binary @_, 3, qw(foo  bar doz) } ) };
+    $error = $@;
+};
+is($error, '', "analyze_binary ok") or diagout;
 
-capture
-    sub { eval { assert_lib(%common,
-                            analyze_binary => sub { analyze_binary @_, 3, qw(foo) } ) } },
-    \$stdout, \$stderr;
-like($@, qr/wrong analysis/i, "analyze_binary wrong") or diagout;
+($stdout, $stderr) = capture {
+    eval { assert_lib(%common,
+                            analyze_binary => sub { analyze_binary @_, 3, qw(foo) } ) };
+    $error = $@;
+};
+like($error, qr/wrong analysis/i, "analyze_binary wrong") or diagout;
 
 done_testing;

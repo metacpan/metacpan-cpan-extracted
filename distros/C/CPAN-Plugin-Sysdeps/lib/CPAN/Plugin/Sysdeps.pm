@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 use List::Util 'first';
 
@@ -220,7 +220,7 @@ sub _detect_linux_distribution_lsb_release {
 sub _detect_linux_distribution_fallback {
     if (open my $fh, '<', '/etc/redhat-release') {
 	my $contents = <$fh>;
-	if ($contents =~ m{^(CentOS|RedHat|Fedora) (Linux )?release (\d+)\S* \((.*?)\)}) {
+	if ($contents =~ m{^(CentOS|RedHat|Fedora) (?:Linux )?release (\d+)\S* \((.*?)\)}) {
 	    return {linuxdistro => $1, linuxdistroversion => $2, linuxdistrocodename => $3};
 	}
     }
@@ -232,10 +232,12 @@ sub _detect_linux_distribution_fallback {
 	    my %info = (linuxdistro => $1, linuxdistroversion => $2);
 	    $info{linuxdistrocodename} =
 		{
-		 6 => 'squeeze',
-		 7 => 'wheezy',
-		 8 => 'jessie',
-		 9 => 'stretch',
+		 6  => 'squeeze',
+		 7  => 'wheezy',
+		 8  => 'jessie',
+		 9  => 'stretch',
+		 10 => 'buster',
+		 11 => 'bullseye',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} elsif ($line =~ m{^(Ubuntu) (\d+\.\d+)}) {

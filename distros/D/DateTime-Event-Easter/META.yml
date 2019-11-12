@@ -22,11 +22,11 @@ no_index:
 provides:
   DateTime::Event::Easter:
     file: lib/DateTime/Event/Easter.pm
-    version: '1.08'
+    version: '1.09'
 requires:
   Carp: '0'
   DateTime: '0.16'
-  DateTime::Calendar::Julian: '0'
+  DateTime::Calendar::Julian: '0.04'
   DateTime::Set: '0.08'
   Params::Validate: '0'
   perl: '5.006001'
@@ -34,5 +34,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/jforget/DateTime-Event-Easter.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

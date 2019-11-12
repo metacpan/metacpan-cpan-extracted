@@ -25,7 +25,7 @@ require Exporter;
 
 @EXPORT_OK = qw(easter golden_number western_epact western_sunday_letter western_sunday_number
                                      eastern_epact eastern_sunday_letter eastern_sunday_number);
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub new {
     my $class = shift;
@@ -655,7 +655,6 @@ When constructed with a day parameter, the method can return associated
 Easter days other than Easter Sunday. The constructor also allows an
 integer to be passed here as an offset. For example, Maundy Thursday is
 the same as an offset of -3 (Three days before Easter Sunday)
-The numeric offset must be in the -80 .. +250 interval.
 
 When constructed without a day parameter, the method uses the date for
 Easter Sunday (which is the churches' official day for 'Easter', think
@@ -703,12 +702,12 @@ will return midnight of C<$dt> if C<$dt> is the Easter Event.
 
 =item * is($dt)
 
-Return positive (1) if C<$dt> is the Easter Event, otherwise returns false
+Return true (1) if C<$dt> is the Easter Event, otherwise returns false
 (0)
 
 =item * as_list(from => $dt, to => $dt2, inclusive => I<([0]|1)>)
 
-Returns a list of Easter Events between I<to> and I<from>.
+Returns a list of Easter Events between I<from> and I<to>.
 
 If the optional I<inclusive> parameter is true (non-zero), the to and
 from dates will be included if they are the Easter Event.
@@ -722,11 +721,12 @@ value)
 
 Returns a DateTime::Set of Easter Events.
 
-In the past this method used the same syntax as 'as_list' above. However
-we now allow both the above syntax as well as the full options allowable
-when creating sets with C<DateTime::Set>. This means you can call
-C<< $datetime_set = $palm_sunday->as_set; >> and it will return a 
-C<DateTime::Set> of all Palm Sundays. See C<DateTime::Set> for more information.
+In  the past  this method  used the  same syntax  as 'as_list'  above.
+However we now allow both the above syntax as well as the full options
+allowable when creating sets with C<DateTime::Set>. This means you can
+call C<< $datetime_set = $palm_sunday->as_set; >> and it will return a
+C<DateTime::Set> of  all Palm  Sundays. See L<DateTime::Set>  for more
+information.
 
 
 =item * as_span()
@@ -745,9 +745,10 @@ chaining.
 
 Deprecated method.
 
-In the next  version (1.09) or in two years  (October 2021), whichever
-comes last,  this method will emit  a warning. And within  another two
-years / one version, this method will be removed.
+In the  next version (1.10)  or in October  2021 (two years  after the
+v1.08 initial  announcement), whichever  comes last, this  method will
+emit  a warning.  And within  another two  years /  one version,  this
+method will be removed.
 
 =back
 
@@ -769,8 +770,7 @@ These subroutines are not exported by default.
 =item * golden_number($year)
 
 Gives the position of  the year in the Metonic cycle.  This is a 1..19
-number.  We   do  not  use   the  0..18  arithmetic   modulo,  because
-traditionally, the Golden Number is in the 1..19 interval.
+number.
 
 This subroutine applies to both western and eastern computs.
 
@@ -986,6 +986,15 @@ B<Martin Hasch> - who pointed out the posibility of memory leak with an early be
 B<Joe Orost> and B<Andreas König> - for RT tickets about the POD documentation
 
 B<Frank Wiegand> and B<Slaven Rezić> - for patches fixing the POD problems
+
+B<Tom Wyant> -  for a constructive dialog about  the relations between
+L<DateTime::Calendar::Julian>   (versions   0.101   and   0.102)   and
+L<DateTime::Event::Easter> (versions 1.08 and 1.09)
+
+B<Andreas König>  (again) - for  a message  a long time  ago (December
+2010)    in    which    he    told   me    about    his    web    site
+L<http://analysis.cpantesters.org/> which  was very useful  nine years
+later for debugging DT::E::Easter version 1.08.
 
 =head2 COPYRIGHT
 

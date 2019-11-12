@@ -21,11 +21,11 @@ no_index:
     - example
     - setup
 requires:
-  Mojolicious: '8'
-  perl: '5.010001'
+  Mojolicious: '8.26'
+  perl: '5.022001'
 resources:
   bugtracker: https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo
-version: v1.0.5
+version: v1.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

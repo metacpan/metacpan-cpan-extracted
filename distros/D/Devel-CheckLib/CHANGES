@@ -1,3 +1,5 @@
+1.14    2019-11-12      Use Capture::Tiny instead of Capture::Output
+
 1.13    2018-06-23      Improve Makefile.PL
                         update compatibility code from App-EUMM-Upgrade-1.0
 

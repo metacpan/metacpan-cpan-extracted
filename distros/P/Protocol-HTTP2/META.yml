@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   Protocol::HTTP2:
     file: lib/Protocol/HTTP2.pm
-    version: '1.09'
+    version: '1.10'
   Protocol::HTTP2::Client:
     file: lib/Protocol/HTTP2/Client.pm
   Protocol::HTTP2::Connection:
@@ -85,11 +85,12 @@ resources:
   bugtracker: https://github.com/vlet/p5-Protocol-HTTP2/issues
   homepage: https://github.com/vlet/p5-Protocol-HTTP2
   repository: git://github.com/vlet/p5-Protocol-HTTP2.git
-version: '1.09'
+version: '1.10'
 x_contributors:
   - 'Daniil Bondarev <bondarev@amazon.com>'
-  - 'gregor herrmann <gregoa@debian.org>'
-  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Felipe Gasper <felipe@felipegasper.com>'
   - 'Junho Choi <junho@cloudflare.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'gregor herrmann <gregoa@debian.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

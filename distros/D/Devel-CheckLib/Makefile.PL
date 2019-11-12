@@ -28,9 +28,9 @@ WriteMakefile1(
         },
     },
     TEST_REQUIRES => {
-        'Test::More'        => 0.62,  # too high? but API changed here
-        'IO::CaptureOutput' => 1.0801,
-        'Mock::Config'      => 0.02,
+        'Test::More'    => 0.88,  # done_testing
+        'Capture::Tiny' => 0,
+        'Mock::Config'  => 0.02,
     },
     LICENSE => 'perl',
     EXE_FILES    => [qw(

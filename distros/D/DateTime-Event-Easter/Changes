@@ -141,3 +141,7 @@ Note on version conventions:
         - Fixed POD issues and improve code formatting.
         - Improve code coverage.
         - Fix a few bugs, such as the parameter check which was incompatible with perl-5.16 and earlier.
+
+1.09 Tue 2019-11-12
+        - Fix minor compatibility issue about DT::C::Julian stringification with older versions of DateTime.pm.
+	- Some documentation improvements.

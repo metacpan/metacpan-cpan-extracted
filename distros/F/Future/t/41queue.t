@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use Future;
+use Future::Queue;
+
+# push before shift
+{
+   my $queue = Future::Queue->new;
+
+   $queue->push( "ITEM" );
+
+   my $f = $queue->shift;
+   ok( $f->is_done, '$queue->shift already ready' );
+   is( $f->get, "ITEM", '$queue->shift->get' );
+}
+
+# shift before push
+{
+   my $queue = Future::Queue->new;
+
+   my $f = $queue->shift;
+   ok( !$f->is_done, '$queue->shift not yet ready' );
+
+   $queue->push( "ITEM" );
+
+   ok( $f->is_done, '$queue->shift now ready after push' );
+   is( $f->get, "ITEM", '$queue->shift->get' );
+}
+
+done_testing;

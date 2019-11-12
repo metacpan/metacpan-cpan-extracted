@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0505';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);

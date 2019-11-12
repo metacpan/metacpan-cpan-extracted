@@ -12,13 +12,13 @@ WriteMakefile(
   AUTHOR       => 'Tobias Oetiker <tobi@oetiker.ch>',
   LICENSE      => 'artistic_2',
   PREREQ_PM    => {
-    'Mojolicious' => '8'
+    'Mojolicious' => '8.26'
   },
   BUILD_REQUIRES => {
     'CPAN::Uploader' => 0
   },
   META_MERGE   => {
-    requires  => {perl => '5.010001'},
+    requires  => {perl => '5.022001'},
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
       repository  => 'https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo',

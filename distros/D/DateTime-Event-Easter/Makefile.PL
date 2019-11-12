@@ -41,7 +41,7 @@ WriteMakefile(
                     'warnings'         => 0,
                     'Carp'             => 0,
                     'Params::Validate' => 0,
-                    'DateTime::Calendar::Julian' => 0,
+                    'DateTime::Calendar::Julian' => 0.04,
                  },
     'LICENSE'           => 'perl',
     'MIN_PERL_VERSION' => '5.6.1',
@@ -53,7 +53,7 @@ WriteMakefile(
        provides       => {
            'DateTime::Event::Easter' => {
                 file => 'lib/DateTime/Event/Easter.pm'
-              , version => '1.08'
+              , version => '1.09'
            },
        },
        'meta-spec' => { version => 2 },

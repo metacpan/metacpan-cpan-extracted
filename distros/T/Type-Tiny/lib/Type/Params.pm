@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.004004';
+	$Type::Params::VERSION   = '1.006000';
 }
 
 use B qw();
@@ -20,7 +20,7 @@ use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
 use Types::Standard -types;
-use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike to_TypeTiny);
+use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike StringLike to_TypeTiny);
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -66,8 +66,11 @@ sub _mkslurpy
 			$i,
 		)
 		: sprintf(
-			'%s = (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
+			'%s = (@_==%d and ref $_[%d] eq "HASH") ? +{ %%{$_[%d]} } : (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
 			$name,
+			$i + 1,
+			$i,
+			$i,
 			$i,
 			$QUOTE->("$tc"),
 			$i,
@@ -350,10 +353,12 @@ sub compile_named
 	my $had_slurpy;
 	
 	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
+	my @names;
 	
 	while (@_) {
 		++$arg;
 		my ($name, $constraint) = splice(@_, 0, 2);
+		push @names, $name;
 		
 		my $is_optional;
 		my $really_optional;
@@ -483,7 +488,12 @@ sub compile_named
 		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));'
 	}
 	
-	if ($options{bless}) {
+	if ($options{named_to_list}) {
+		Error::TypeTiny::croak("named_to_list option cannot be used with slurpy") if $had_slurpy;
+		my @order = ref $options{named_to_list} ? @{$options{named_to_list}} : @names;
+		push @code, sprintf('@R{%s}', join ",", map $QUOTE->($_), @order);
+	}
+	elsif ($options{bless}) {
 		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
 	}
 	elsif (ArrayRef->check($options{class})) {
@@ -654,6 +664,14 @@ sub validate_named
 sub multisig
 {
 	my %options = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	$options{message}     ||= "Parameter validation failed";
+	$options{description} ||= sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__');
+	for my $key ( qw[ message description ] )
+	{
+		StringLike->check($options{$key})
+			or Error::TypeTiny::croak("Option '$key' expected to be string or stringifiable object");
+	}
+	
 	my @multi = map {
 		CodeLike->check($_)  ? { closure => $_ } :
 		ArrayLike->check($_) ? compile({ want_details => 1 }, @$_) :
@@ -679,12 +697,12 @@ sub multisig
 		push @code, '}' if @cond;
 	}
 	
-	push @code, '"Error::TypeTiny"->throw(message => "Parameter validation failed");';
+	push @code, sprintf('"Error::TypeTiny"->throw(message => "%s");', quotemeta("$options{message}"));
 	push @code, '}';
 	
 	eval_closure(
 		source      => \@code,
-		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description},
 		environment => { '@multi' => \@multi },
 	);
 }
@@ -897,6 +915,32 @@ for declaring both the C<class> and C<constructor> options at once.
 B<< Named parameters only. >> Bypass the constructor entirely and directly
 bless the hashref.
 
+=item C<< named_to_list => Bool >>
+
+B<< Named parameters only. >> Instead of returning a hashref, return a hash
+slice.
+
+ myfunc(bar => "x", foo => "y");
+ 
+ sub myfunc {
+    state $check = compile_named(
+       { named_to_list => 1 },
+       foo => Str, { optional => 1 },
+       bar => Str, { optional => 1 },
+    );
+    my ($foo, $bar) = $check->(@_);
+    ...; ## $foo is "y" and $bar is "x"
+ }
+
+The order of keys for the hash slice is the same as the order of the names
+passed to C<compile_named>. For missing named parameters, C<undef> is
+returned in the list.
+
+=item C<< named_to_list => ArrayRef[Str] >>
+
+B<< Named parameters only. >> As above, but explicitly specify the keys of
+the hash slice.
+
 =item C<< description => Str >>
 
 Description of the coderef that will show up in stack traces. Defaults to
@@ -976,6 +1020,19 @@ For example:
 
 A specification have one or zero slurpy parameters. If there is a slurpy
 parameter, it must be the final one.
+
+From Type::Params 1.005000 onwards, slurpy hashrefs can be passed in as a
+true hashref (which will be shallow cloned) rather than key-value pairs.
+
+ sub xyz {
+   state $check = compile(Int, slurpy HashRef);
+   my ($num, $hr) = $check->(@_);
+ }
+ 
+ xyz( 5,   foo => 1, bar => 2   );   # works
+ xyz( 5, { foo => 1, bar => 2 } );   # works from 1.005000
+
+This feature is only implemented for slurpy hashrefs, not slurpy arrayrefs.
 
 Note that having a slurpy parameter will slightly slow down C<< $check >>
 because it means that C<< $check >> can't just check C<< @_ >> and return
@@ -1133,7 +1190,7 @@ a full example:
       
       my ($needle, $haystack) = $check->(@_);
       
-      for (${^TYPE_PARAMS_MULTISIG) {
+      for (${^TYPE_PARAMS_MULTISIG}) {
          return $haystack->[$needle] if $_ == 0;
          return $haystack->{$needle} if $_ == 1;
          return $haystack->$needle   if $_ == 2;
@@ -1143,6 +1200,25 @@ a full example:
    get_from(0, \@array);      # returns $array[0]
    get_from('foo', \%hash);   # returns $hash{foo}
    get_from('foo', $obj);     # returns $obj->foo
+   
+The default error message is just C<"Parameter validation failed">.
+You can pass an option hashref as the first argument with an informative
+message string:
+
+   sub foo {
+      state $OptionsDict = Dict[...];
+      state $check = multisig(
+         { message => 'USAGE: $object->foo(\%options?, $string)' },
+         [ Object, $OptionsDict, StringLike ],
+         [ Object, StringLike ],
+      );
+      my ($self, @args) = $check->(@_);
+      my ($opts, $str)  = ${^TYPE_PARAMS_MULTISIG} ? ({}, @args) : @_;
+      ...;
+   }
+   
+   $obj->foo(\%opts, "Hello");
+   $obj->foo("World");
 
 =head1 PARAMETER OBJECTS
 

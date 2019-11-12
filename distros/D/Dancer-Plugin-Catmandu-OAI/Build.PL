@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Dancer-Plugin-Catmandu-OAI",
-  "dist_version" => "0.0504",
+  "dist_version" => "0.0505",
   "license" => "perl",
   "module_name" => "Dancer::Plugin::Catmandu::OAI",
   "recursive_test_files" => 1,
@@ -31,7 +31,7 @@ my %module_build_args = (
     "DateTime" => "1.08",
     "DateTime::Format::ISO8601" => 0,
     "DateTime::Format::Strptime" => 0,
-    "MIME::Base64" => 0,
+    "MIME::Base64" => "3.15",
     "perl" => "v5.10.1"
   },
   "test_requires" => {

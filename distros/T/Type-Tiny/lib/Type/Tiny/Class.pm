@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::Class::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Class::VERSION   = '1.004004';
+	$Type::Tiny::Class::VERSION   = '1.006000';
 }
 
 use Scalar::Util qw< blessed >;
@@ -49,6 +49,8 @@ sub class       { $_[0]{class} }
 sub inlined     { $_[0]{inlined} ||= $_[0]->_build_inlined }
 
 sub has_inlined { !!1 }
+
+sub _is_null_constraint { 0 }
 
 sub _build_constraint
 {

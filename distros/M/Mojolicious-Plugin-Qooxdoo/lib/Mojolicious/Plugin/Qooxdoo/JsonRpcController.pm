@@ -13,7 +13,7 @@ use Encode;
 
 has toUTF8 => sub { find_encoding('utf8') };
 
-our $VERSION = '1.0.5';
+our $VERSION = '1.0.7';
 
 has 'service';
 
@@ -24,8 +24,6 @@ has 'requestId';
 has 'methodName';
 
 has 'rpcParams';
-
-has log => sub { shift->app->log };
 
 sub dispatch {
     my $self = shift;

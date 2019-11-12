@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.004004';
+	$Types::Standard::VERSION   = '1.006000';
 }
 
 use Type::Library -base;
@@ -80,6 +80,13 @@ my $add_core_type = sub {
 		$xsub = $xsubname = undef;
 	}
 
+	if (Type::Tiny::_USE_XS
+	and ( Type::Tiny::XS->VERSION < 0.016 or $] < 5.018 )
+	and $name eq 'Int') {
+		# Broken implementation of Int
+		$xsub = $xsubname = undef;
+	}
+	
 	$typedef->{compiled_type_constraint} = $xsub if $xsub;
 	
 	$typedef->{inlined} = sub { "$xsubname\($_[1])" }
@@ -109,50 +116,50 @@ my $meta = __PACKAGE__->meta;
 # better off looking at the code for Types::Common::Numeric
 # and Types::Common::String.
 
-sub Stringable (&)
 {
-	package #private
-	Types::Standard::_Stringable;
-	use overload q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }, fallback => 1;
-	bless +{ code => $_[0] };
-}
+	sub Stringable (&) {
+		bless +{ code => $_[0] }, 'Types::Standard::_Stringable';
+	}
+	Types::Standard::_Stringable->Type::Tiny::_install_overloads(
+		q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }
+	);
 
-my $subname;
-sub LazyLoad ($$)
-{
-	package #private
-	Types::Standard::LazyLoad;
-	use overload fallback => 1, q[&{}] => sub {
-		my ($typename, $function) = @{$_[0]};
-		my $type  = $meta->get_type($typename);
-		my $class = "Types::Standard::$typename";
-		eval "require $class; 1" or die($@);
-		# Majorly break encapsulation for Type::Tiny :-O
-		for my $key (keys %$type)
-		{
-			next unless ref($type->{$key}) eq __PACKAGE__;
-			my $f = $type->{$key}[1];
-			$type->{$key} = $class->can("__$f");
-		}
-		my $mm = $type->{my_methods} || {};
-		for my $key (keys %$mm)
-		{
-			$subname =
-				eval { require Sub::Util } ? \&Sub::Util::set_subname :
-				eval { require Sub::Name } ? \&Sub::Name::subname :
-				0
-				if not defined $subname;
-			next unless ref($mm->{$key}) eq __PACKAGE__;
-			my $f = $mm->{$key}[1];
-			$mm->{$key} = $class->can("__$f");
-			$subname and $subname->(
-				sprintf("%s::my_%s", $type->qualified_name, $key),
-				$mm->{$key},
-			);
-		}
-		return $class->can("__$function");
-	};
-	bless \@_;
+	my $subname;
+	sub LazyLoad ($$) {
+		bless \@_, 'Types::Standard::LazyLoad';
+	}
+	'Types::Standard::LazyLoad'->Type::Tiny::_install_overloads(
+		q[&{}] => sub {
+			my ($typename, $function) = @{$_[0]};
+			my $type  = $meta->get_type($typename);
+			my $class = "Types::Standard::$typename";
+			eval "require $class; 1" or die($@);
+			# Majorly break encapsulation for Type::Tiny :-O
+			for my $key (keys %$type)
+			{
+				next unless ref($type->{$key}) eq 'Types::Standard::LazyLoad';
+				my $f = $type->{$key}[1];
+				$type->{$key} = $class->can("__$f");
+			}
+			my $mm = $type->{my_methods} || {};
+			for my $key (keys %$mm)
+			{
+				$subname =
+					eval { require Sub::Util } ? \&Sub::Util::set_subname :
+					eval { require Sub::Name } ? \&Sub::Name::subname :
+					0
+					if not defined $subname;
+				next unless ref($mm->{$key}) eq 'Types::Standard::LazyLoad';
+				my $f = $mm->{$key}[1];
+				$mm->{$key} = $class->can("__$f");
+				$subname and $subname->(
+					sprintf("%s::my_%s", $type->qualified_name, $key),
+					$mm->{$key},
+				);
+			}
+			return $class->can("__$function");
+		},
+	);
 }
 
 no warnings;
@@ -577,12 +584,15 @@ $meta->add_type({
 	},
 });
 
-use overload ();
 $meta->add_type({
 	name       => "Overload",
 	parent     => $_obj,
-	constraint => sub { overload::Overloaded($_) },
-	inlined    => sub { "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])" },
+	constraint => sub { require overload; overload::Overloaded($_) },
+	inlined    => sub {
+		$INC{'overload.pm'}
+			? "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])"
+			: "Scalar::Util::blessed($_[1]) and do { use overload (); overload::Overloaded($_[1]) }"
+	},
 	constraint_generator => sub
 	{
 		return $meta->get_type('Overload') unless @_;
@@ -593,6 +603,7 @@ $meta->add_type({
 				: _croak("Parameters to Overload[`a] expected to be a strings; got $_");
 		} @_;
 		
+		require overload;
 		return sub {
 			my $value = shift;
 			for my $op (@operations) {
@@ -604,6 +615,7 @@ $meta->add_type({
 	inline_generator => sub {
 		my @operations = @_;
 		return sub {
+			require overload;
 			my $v = $_[1];
 			join " and ",
 				"Scalar::Util::blessed($v)",
@@ -899,6 +911,13 @@ If parameterized, the elements of the array must pass the additional
 constraint. For example, C<< ArrayRef[Num] >> must be a reference to an
 array of numbers.
 
+As an extension to Moose's ArrayRef type, a minimum and maximum array
+length can be given:
+
+   ArrayRef[CodeRef, 1]        # ArrayRef of at least one CodeRef
+   ArrayRef[FileHandle, 0, 2]  # ArrayRef of up to two FileHandles
+   ArrayRef[Any, 0, 100]       # ArrayRef of up to 100 elements
+
 Other customers also bought: C<< ArrayLike >> from L<Types::TypeTiny>.
 
 =item C<< HashRef[`a] >>
@@ -1063,7 +1082,7 @@ Given no parameters, just equivalent to C<Object>.
 
 =head2 More
 
-There are a few other types exported by this function:
+There are a few other types exported by this module:
 
 =over
 
@@ -1243,7 +1262,7 @@ Split a string on a regexp.
    
    has name => (
       is     => "ro",
-      isa    => (ArrayRef[Str])->plus_coercions(Split[qr/\s/]),
+      isa    => ArrayRef->of(Str)->plus_coercions(Split[qr/\s/]),
       coerce => 1,
    );
 

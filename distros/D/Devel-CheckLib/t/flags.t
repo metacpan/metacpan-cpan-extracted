@@ -3,7 +3,7 @@ use strict;
 BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
 
 use lib 't/lib';
-use IO::CaptureOutput qw(capture);
+use Capture::Tiny qw(capture);
 use Config;
 
 use File::Spec;
@@ -38,14 +38,17 @@ return 1;
 
 EOF
 
-capture
-    sub { eval { assert_lib(%common, ccflags => '-DFOO1234') } },
-    \$stdout, \$stderr;
-is($@, '', "ccflags ok") or diagout;
+my $error;
+($stdout, $stderr) = capture {
+    eval { assert_lib(%common, ccflags => '-DFOO1234') };
+    $error = $@;
+};
+is($error, '', "ccflags ok") or diagout;
 
-capture
-    sub { eval { assert_lib(%common) } },
-    \$stdout, \$stderr;
-like($@, qr/wrong/i, "ccflags wrong") or diagout;
+($stdout, $stderr) = capture {
+    eval { assert_lib(%common) };
+    $error = $@;
+};
+like($error, qr/wrong/i, "ccflags wrong") or diagout;
 
 done_testing;

@@ -1,5 +1,14 @@
 Revision history for Future
 
+0.42    2019-11-12
+        [CHANGES]
+         * Added Future::Queue
+
+        [BUGFIXES]
+         * Remove already-completed futures from the on_cancel chain of others
+           to avoid the list growing arbitrarily large in some situations; e.g
+           easily provoked by long loops in Future::AsyncAwait
+
 0.41    2019-06-13
         [CHANGES]
          * Added Future::Exception->throw

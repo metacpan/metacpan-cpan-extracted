@@ -40,3 +40,12 @@
  - Improvements to Eval::TypeTiny.
  - Various bug fixes.
  - Improved test suite.
+
+2019-11-12 Type-Tiny version 1.006000 released!
+
+ - Improved is_subtype_of/is_supertype_of support.
+ - ArrayRef array length parameter.
+ - Eval::TypeTiny's API is now considered to be stable.
+ - Slurpy HashRefs passed to coderefs returned by Type::Params can now
+   be true hashrefs.
+ - More import options for Type::Library

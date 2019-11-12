@@ -3,7 +3,7 @@ use strict;
 BEGIN{ if (not $] < 5.006) { require warnings; warnings->import } }
 
 use lib 't/lib';
-use IO::CaptureOutput qw(capture);
+use Capture::Tiny qw(capture);
 use Config;
 
 use File::Spec;
@@ -14,7 +14,7 @@ if($@ =~ /Couldn't find your C compiler/) {
     plan skip_all => "Couldn't find your C compiler";
 }
 
-my($debug, $stdout, $stderr) = ($ENV{DEVEL_CHECKLIB_DEBUG} || 0);
+my $debug = $ENV{DEVEL_CHECKLIB_DEBUG} || 0;
 
 # cases are strings to interpolate into the assert_lib call
 my %failcases = (
@@ -30,19 +30,19 @@ my @passcases = (
 plan tests => scalar(keys %failcases) + scalar(@passcases);
 
 for my $c (keys %failcases) {
-    capture(
-        sub { eval "assert_lib(debug => $debug, $c)"; },
-        \$stdout,
-        \$stderr
-    );
-    ok($@ =~ /^$failcases{$c}/, "$c") ||
+    my $error;
+    my ($stdout, $stderr) = capture {
+        eval "assert_lib(debug => $debug, $c)";
+        $error = $@;
+    };
+    ok($error =~ /^$failcases{$c}/, "$c") ||
         diag("$@\n\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
 }
 for my $c ( @passcases ) {
-    capture(
-        sub { eval "assert_lib(debug => $debug, $c)"; },
-        \$stdout,
-        \$stderr
-    );
-    is($@, q{}, "$c") || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
+    my $error;
+    my ($stdout, $stderr) = capture {
+        eval "assert_lib(debug => $debug, $c)";
+        $error = $@;
+    };
+    is($error, q{}, "$c") || diag("\tSTDOUT: $stdout\n\tSTDERR: $stderr\n");
 }

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Role::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Role::VERSION   = '1.004004';
+	$Type::Tiny::Role::VERSION   = '1.006000';
 }
 
 use Scalar::Util qw< blessed weaken >;
@@ -34,6 +34,8 @@ sub role        { $_[0]{role} }
 sub inlined     { $_[0]{inlined} ||= $_[0]->_build_inlined }
 
 sub has_inlined { !!1 }
+
+sub _is_null_constraint { 0 }
 
 sub _build_constraint
 {

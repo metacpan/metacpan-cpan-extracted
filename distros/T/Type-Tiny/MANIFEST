@@ -106,6 +106,7 @@ t/20-unit/Type-Coercion/typetiny-constructor.t
 t/20-unit/Type-Library/assert.t
 t/20-unit/Type-Library/deprecation.t
 t/20-unit/Type-Library/errors.t
+t/20-unit/Type-Library/import-params.t
 t/20-unit/Type-Library/inheritance.t
 t/20-unit/Type-Library/is.t
 t/20-unit/Type-Library/to.t
@@ -120,7 +121,9 @@ t/20-unit/Type-Params/defaults.t
 t/20-unit/Type-Params/hashorder.t
 t/20-unit/Type-Params/methods.t
 t/20-unit/Type-Params/mixednamed.t
+t/20-unit/Type-Params/multisig-custom-message.t
 t/20-unit/Type-Params/multisig.t
+t/20-unit/Type-Params/named-to-list.t
 t/20-unit/Type-Params/named.t
 t/20-unit/Type-Params/noninline.t
 t/20-unit/Type-Params/optional.t
@@ -137,10 +140,13 @@ t/20-unit/Type-Tiny-Class/basic.t
 t/20-unit/Type-Tiny-Class/errors.t
 t/20-unit/Type-Tiny-Class/plus-constructors.t
 t/20-unit/Type-Tiny-Duck/basic.t
+t/20-unit/Type-Tiny-Duck/cmp.t
 t/20-unit/Type-Tiny-Duck/errors.t
 t/20-unit/Type-Tiny-Enum/basic.t
+t/20-unit/Type-Tiny-Enum/cmp.t
 t/20-unit/Type-Tiny-Enum/errors.t
 t/20-unit/Type-Tiny-Intersection/basic.t
+t/20-unit/Type-Tiny-Intersection/cmp.t
 t/20-unit/Type-Tiny-Intersection/errors.t
 t/20-unit/Type-Tiny-Role/basic.t
 t/20-unit/Type-Tiny-Role/errors.t
@@ -151,6 +157,7 @@ t/20-unit/Type-Tiny-_HalfOp/double-union.t
 t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t
 t/20-unit/Type-Tiny/arithmetic.t
 t/20-unit/Type-Tiny/basic.t
+t/20-unit/Type-Tiny/cmp.t
 t/20-unit/Type-Tiny/coercion-modifiers.t
 t/20-unit/Type-Tiny/constraint-strings.t
 t/20-unit/Type-Tiny/deprecation.t
@@ -174,6 +181,7 @@ t/20-unit/Types-Common-String/basic.t
 t/20-unit/Types-Common-String/coerce.t
 t/20-unit/Types-Common-String/strlength.t
 t/20-unit/Types-Common-String/unicode.t
+t/20-unit/Types-Standard/arrayreflength.t
 t/20-unit/Types-Standard/basic.t
 t/20-unit/Types-Standard/cycletuple.t
 t/20-unit/Types-Standard/deep-coercions.t
@@ -236,6 +244,7 @@ t/40-regression/gh1.t
 t/40-regression/gh14.t
 t/40-regression/rt125132.t
 t/40-regression/rt125765.t
+t/40-regression/rt130823.t
 t/40-regression/rt85911.t
 t/40-regression/rt86004.t
 t/40-regression/rt86233.t

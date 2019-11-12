@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "6.33",
-            "Template::Mustache" : "v1.0.2"
+            "Template::Mustache" : "v1.0.2",
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -55,16 +56,21 @@
    "provides" : {
       "Mojolicious::Plugin::Template::Mustache" : {
          "file" : "lib/Mojolicious/Plugin/Template/Mustache.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cynovg/p5-Mojolicious-Plugin-Template-Mustache/issues"
+      },
+      "homepage" : "https://github.com/cynovg/p5-Mojolicious-Plugin-Template-Mustache",
       "repository" : {
-         "url" : "git://gitlab.com/cynovg/Mojolicious-Plugin-Template-Mustache.git"
+         "url" : "git://github.com/cynovg/p5-Mojolicious-Plugin-Template-Mustache.git",
+         "web" : "https://github.com/cynovg/p5-Mojolicious-Plugin-Template-Mustache"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:CYNOVG",
    "x_contributors" : [
       "Cyrill Novgorodcev <cynovg@cpan.org>"

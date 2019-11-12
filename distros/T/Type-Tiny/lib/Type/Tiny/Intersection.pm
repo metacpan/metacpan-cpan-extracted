@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Intersection::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Intersection::VERSION   = '1.004004';
+	$Type::Tiny::Intersection::VERSION   = '1.006000';
 }
 
 use Scalar::Util qw< blessed >;
@@ -14,10 +14,12 @@ use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use overload q[@{}] => sub { $_[0]{type_constraints} ||= [] };
-
 use Type::Tiny ();
 our @ISA = 'Type::Tiny';
+
+__PACKAGE__->_install_overloads(
+	q[@{}] => sub { $_[0]{type_constraints} ||= [] },
+);
 
 sub new {
 	my $proto = shift;
@@ -56,6 +58,8 @@ sub new {
 
 sub type_constraints { $_[0]{type_constraints} }
 sub constraint       { $_[0]{constraint} ||= $_[0]->_build_constraint }
+
+sub _is_null_constraint { 0 }
 
 sub _build_display_name
 {
@@ -145,6 +149,35 @@ sub validate_explain
 	return;  # uncoverable statement
 }
 
+
+my $comparator;
+$comparator = sub {
+	my $A = shift->find_constraining_type;
+	my $B = shift->find_constraining_type;
+	
+	if ($A->isa(__PACKAGE__)) {
+		my @A_constraints = map $_->find_constraining_type, @{ $A->type_constraints };
+		
+		my @A_equal_to_B = grep $_->equals($B), @A_constraints;
+		if (@A_equal_to_B == @A_constraints) {
+			return Type::Tiny::CMP_EQUIVALENT();
+		}
+		
+		my @A_subs_of_B = grep $_->is_a_type_of($B), @A_constraints;
+		if (@A_subs_of_B) {
+			return Type::Tiny::CMP_SUBTYPE();
+		}
+	}
+	
+	elsif ($B->isa(__PACKAGE__)) {
+		my $r = $comparator->($B, $A);
+		return  $r if $r eq Type::Tiny::CMP_EQUIVALENT();
+		return -$r if $r eq Type::Tiny::CMP_SUBTYPE();
+	}
+	
+	return Type::Tiny::CMP_UNKNOWN();
+};
+push @Type::Tiny::CMP, $comparator;
 
 1;
 

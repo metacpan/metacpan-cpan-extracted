@@ -1,6 +1,9 @@
 Revision history for Firefox-Marionette
 
-0.84  Tue Oct 10 21:48:00 2019
+0.85  Wed Nov 12 18:40:00 2019
+       Fixing session cookie support.  Thanks to BOKUTIN in RT#130955.
+
+0.84  Tue Nov  5 not sure 2019
        Allowing esr in version string b/c of debian breakage.  Thanks to QUATTRO in RT#130889.
        Removed mention of highlight parameter in selfie after Firefox 70 dropped support for it.
 

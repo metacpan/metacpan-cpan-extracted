@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use Future;
 
@@ -19,17 +19,17 @@ C<Future::Mutex> - mutual exclusion lock around code that returns L<Future>s
 
 =head1 SYNOPSIS
 
- use Future::Mutex;
+   use Future::Mutex;
 
- my $mutex = Future::Mutex->new;
+   my $mutex = Future::Mutex->new;
 
- sub do_atomically
- {
-    return $mutex->enter( sub {
-       ...
-       return $f;
-    });
- }
+   sub do_atomically
+   {
+      return $mutex->enter( sub {
+         ...
+         return $f;
+      });
+   }
 
 =head1 DESCRIPTION
 

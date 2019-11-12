@@ -1,5 +1,10 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.61  2019-11-12
+	- mapping update
+	- bugfix in redhat release detection fallback
+	- recognize newer Debian codenames (buster and bullseye)
+
 0.60  2019-06-18
 	- mapping update
 

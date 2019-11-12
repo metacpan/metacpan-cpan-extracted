@@ -6,15 +6,17 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.004004';
+	$Type::Tiny::Enum::VERSION   = '1.006000';
 }
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use overload q[@{}] => 'values';
-
 use Type::Tiny ();
 our @ISA = 'Type::Tiny';
+
+__PACKAGE__->_install_overloads(
+	q[@{}] => sub { shift->values },
+);
 
 sub new
 {
@@ -26,14 +28,19 @@ sub new
 	_croak "Enum type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply list of values" unless exists $opts{values};
 	
-	my %tmp =
-		map { $_ => 1 }
-		@{ ref $opts{values} eq "ARRAY" ? $opts{values} : [$opts{values}] };
-	$opts{values} = [sort keys %tmp];
+	no warnings 'uninitialized';
+	$opts{values} = [
+		map "$_",
+		@{ ref $opts{values} eq 'ARRAY' ? $opts{values} : [$opts{values}] }
+	];
 	
-	if (Type::Tiny::_USE_XS and not grep /[^-\w]/, @{$opts{values}})
+	my %tmp;
+	undef $tmp{$_} for @{$opts{values}};
+	$opts{unique_values}  = [sort keys %tmp];
+	
+	if (Type::Tiny::_USE_XS and not grep /[^-\w]/, @{$opts{unique_values}})
 	{
-		my $enum = join ",", @{$opts{values}};
+		my $enum = join ",", @{$opts{unique_values}};
 		my $xsub = Type::Tiny::XS::get_coderef_for("Enum[$enum]");
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
@@ -41,21 +48,43 @@ sub new
 	return $proto->SUPER::new(%opts);
 }
 
-sub values      { $_[0]{values} }
-sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
+sub values        { $_[0]{values} }
+sub unique_values { $_[0]{unique_values} }
+sub constraint    { $_[0]{constraint} ||= $_[0]->_build_constraint }
+
+sub _is_null_constraint { 0 }
 
 sub _build_display_name
 {
 	my $self = shift;
-	sprintf("Enum[%s]", join q[,], @$self);
+	sprintf("Enum[%s]", join q[,], @{$self->unique_values});
 }
 
-sub _build_constraint
 {
-	my $self = shift;
-	
-	my $regexp = join "|", map quotemeta, @$self;
-	return sub { defined and m{\A(?:$regexp)\z} };
+	my %cached;
+	sub _build_constraint
+	{
+		my $self = shift;
+		
+		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
+		return $cached{$regexp} if $cached{$regexp};
+		my $coderef = ($cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} });
+		Scalar::Util::weaken($cached{$regexp});
+		return $coderef;
+	}
+}
+
+{
+	my %cached;
+	sub _build_compiled_check
+	{
+		my $self = shift;
+		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
+		return $cached{$regexp} if $cached{$regexp};
+		my $coderef = ($cached{$regexp} = $self->SUPER::_build_compiled_check(@_));
+		Scalar::Util::weaken($cached{$regexp});
+		return $coderef;
+	}
 }
 
 sub can_be_inlined
@@ -69,12 +98,12 @@ sub inline_check
 	
 	if (Type::Tiny::_USE_XS)
 	{
-		my $enum = join ",", @{$self->values};
+		my $enum = join ",", @{$self->unique_values};
 		my $xsub = Type::Tiny::XS::get_subname_for("Enum[$enum]");
 		return "$xsub\($_[0]\)" if $xsub;
 	}
 	
-	my $regexp = join "|", map quotemeta, @$self;
+	my $regexp = join "|", map quotemeta, @{$self->unique_values};
 	$_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
@@ -132,6 +161,32 @@ sub validate_explain
 	];
 }
 
+push @Type::Tiny::CMP, sub {
+	my $A = shift->find_constraining_type;
+	my $B = shift->find_constraining_type;
+	return Type::Tiny::CMP_UNKNOWN unless $A->isa(__PACKAGE__) && $B->isa(__PACKAGE__);
+	
+	my %seen;
+	for my $word (@{$A->unique_values}) {
+		$seen{$word} += 1;
+	}
+	for my $word (@{$B->unique_values}) {
+		$seen{$word} += 2;
+	}
+	
+	my $values = join('', CORE::values %seen);
+	if ($values =~ /^3*$/) {
+		return Type::Tiny::CMP_EQUIVALENT;
+	}
+	elsif ($values !~ /2/) {
+		return Type::Tiny::CMP_SUPERTYPE;
+	}
+	elsif ($values !~ /1/) {
+		return Type::Tiny::CMP_SUBTYPE;
+	}
+	
+	return Type::Tiny::CMP_UNKNOWN;
+};
 
 1;
 
@@ -180,6 +235,11 @@ Instead rely on the default.
 
 Parent is always Types::Standard::Str, and cannot be passed to the
 constructor.
+
+=item C<unique_values>
+
+The list of C<values> but sorted and with duplicates removed. This cannot
+be passed to the constructor.
 
 =back
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojolicious-Plugin-Template-Mustache
 
+0.06 2019-11-12T20:04:36Z
+    - set min Perl version at 5.10
+
 0.05 2019-10-29T07:09:10Z
     - fix minimal version for Mojolicious
     - change license to LGPL
