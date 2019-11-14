@@ -1,3 +1,10 @@
+0.08	14 November 2019
+	- Fix tests for perls that no longer have . in @INC 
+	- Add .travis.yml
+	- Update Makefile.PL to include CONFIGURE_REQUIRES, BUILD_REQUIRES, PREREQ_PM, dist, clean
+	- Add link to github repository
+	- Update Licence
+
 0.07	9 November 2019
 	Adoption
 

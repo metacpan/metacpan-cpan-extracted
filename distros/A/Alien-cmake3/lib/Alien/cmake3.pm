@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download or build cmake 3 or better
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub exe
@@ -41,7 +41,7 @@ Alien::cmake3 - Find or download or build cmake 3 or better
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ From Perl:
  use Alien::cmake3;
  use Env qw( @PATH );
  
- unshift @PATH, Alien::cmake->bin_dir;
+ unshift @PATH, Alien::cmake3->bin_dir;
  system 'cmake', ...;
 
 From L<alienfile>
@@ -111,7 +111,7 @@ these ways:
 
 =over 4
 
-=item L<Alien::cmake3> is based on L<alienfile> and L<Alien::Build> 
+=item L<Alien::cmake3> is based on L<alienfile> and L<Alien::Build>
 
 It integrates better with L<Alien>s that are based on that technology.
 
@@ -133,7 +133,11 @@ In the opinion of the maintainer of both L<Alien::cmake3> and L<Alien::CMake> fo
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Adriano Ferreira (FERREIRA)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,4 +1,4 @@
-# Copyright 1998-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1998-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -15,10 +15,10 @@ package Gedcom::Grammar;
 
 use Data::Dumper;
 
-use Gedcom::Item 1.20;
+use Gedcom::Item 1.21;
 
 use vars qw($VERSION @ISA);
-$VERSION = "1.20";
+$VERSION = "1.21";
 @ISA     = qw( Gedcom::Item );
 
 sub structure {
@@ -74,7 +74,7 @@ sub _valid_items {
         } else {
             die "What's a " . Data::Dumper->new([$item], ["grammar"])
             unless my ($value) = $item->{value} =~ /<<(.*)>>/;
-            die "Can't find $value in gedcom structures"
+            die "Can't find $value in Gedcom structures"
             unless my $structure = $self->structure($value);
             $item->{structure} = $structure;
             while (my($tag, $g) = each %{$structure->valid_items}) {
@@ -119,9 +119,9 @@ __END__
 
 =head1 NAME
 
-Gedcom::Grammar - a module to manipulate Gedcom grammars
+Gedcom::Grammar - a module to manipulate GEDCOM grammars
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ Version 1.20 - 17th September 2017
 
 =head1 DESCRIPTION
 
-A selection of subroutines to handle the grammar of a gedcom file.
+A selection of subroutines to handle the grammar of a GEDCOM file.
 
 Derived from Gedcom::Item.
 

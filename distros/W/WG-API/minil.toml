@@ -1,4 +1,11 @@
+name = 'WG-API'
 license="artistic_2"
-badges = ['metacpan']
+badges = ['metacpan', 'travis', 'coveralls']
 abstract_from="lib/WG/API.pm"
 authors_from="lib/WG/API.pm"
+authority="cpan:CYNOVG"
+module_maker="ModuleBuildTiny"
+
+[release]
+pause_config = "/home/cynovg/.pause"
+

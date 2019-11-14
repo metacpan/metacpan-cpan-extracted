@@ -1,6 +1,18 @@
 ==================================================
-Changes from 2014-11-11 00:00:00 +0000 to present.
+Changes from 2014-11-15 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.78 at 2019-11-14 14:18:25 +0000
+-----------------------------------------
+
+  Change: fd36f9e4d74f0360b79ad8d9db3795d15dd45da7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-14 14:18:25 +0000
+
+    Release engineering for 1.78
+
+    No functional changes, removed stray file from the dist. GH #37 
 
 -----------------------------------------
 version 1.76 at 2019-11-10 21:56:25 +0000
@@ -491,5 +503,5 @@ version 1.30 at 2014-12-23 22:41:27 +0000
     add Devel::PatchPerl version to list of local patches 
 
 =================================================
-Plus 64 releases after 2014-11-11 00:00:00 +0000.
+Plus 64 releases after 2014-11-15 00:00:00 +0000.
 =================================================

@@ -4,11 +4,9 @@
 package DBI::Shell::Spool;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars qw(@ISA);
 
 use IO::Tee;
-
-$VERSION = sprintf( "%d.%02d", q$Revision: 11.91 $ =~ /(\d+)\.(\d+)/ );
 
 sub init {
 	my ($self, $sh, @arg)  = @_;

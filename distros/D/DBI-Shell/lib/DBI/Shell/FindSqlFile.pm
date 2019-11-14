@@ -7,10 +7,6 @@ use File::Find ();
 use File::Basename;
 use File::Spec;
 
-use vars qw($VERSION);
-
-$VERSION = sprintf( "%d.%02d", q$Revision: 11.91 $ =~ /(\d+)\.(\d+)/ );
-
 # Set the variable $File::Find::dont_use_nlink if you're using AFS,
 # since AFS cheats.
 
@@ -62,7 +58,7 @@ sub look_for_file {
 	File::Find::find(
 		{
 			  wanted 	=> \&wanted
-			, no_chrdir 	=> 1
+			, no_chdir 	=> 1
 			, bydepth	=> 0
 		}, 
 		@search_path);

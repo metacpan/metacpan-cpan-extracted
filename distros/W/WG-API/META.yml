@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,28 +36,28 @@ no_index:
 provides:
   WG::API:
     file: lib/WG/API.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::Auth:
     file: lib/WG/API/Auth.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::Base:
     file: lib/WG/API/Base.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::Error:
     file: lib/WG/API/Error.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::NET:
     file: lib/WG/API/NET.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::WoT:
     file: lib/WG/API/WoT.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::WoWp:
     file: lib/WG/API/WoWp.pm
-    version: v0.11.0
+    version: v0.12.0
   WG::API::WoWs:
     file: lib/WG/API/WoWs.pm
-    version: v0.11.0
+    version: v0.12.0
 requires:
   Const::Fast: '0'
   JSON: '2.61'
@@ -69,10 +69,12 @@ requires:
   URI: '0'
   perl: '5.020'
 resources:
-  repository: git://gitlab.com/cynovg/WG-API.git
-version: v0.11
+  bugtracker: https://github.com/cynovg/p5-WG-API/issues
+  homepage: https://github.com/cynovg/p5-WG-API
+  repository: git://github.com/cynovg/p5-WG-API.git
+version: v0.12
+x_authority: cpan:CYNOVG
 x_contributors:
-  - 'Novgorodcev Cyrill <cynovg@gmail.com>'
-  - 'Novgorodcev Cyrill <novgorodtsev.kirill@220-volt.ru>'
-  - 'root <root@cynovg-debian.local>'
+  - 'Cyrill Novgorodcev <cynovg@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

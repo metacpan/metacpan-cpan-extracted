@@ -2,10 +2,7 @@ package DBI::Shell::Completion;
 # vim:ts=4:sw=4:ai:aw:nowrapscan
 
 use strict;
-use vars qw(@ISA $VERSION);
 use Carp;
-
-$VERSION = sprintf( "%d.%02d", q$Revision: 11.91 $ =~ /(\d+)\.(\d+)/ );
 
 my ($loa, @matches, @tables, @table_list, $tbl_nm, $term, $history);
 

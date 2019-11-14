@@ -16,7 +16,7 @@ END { Thread::Tie->shutdown }
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 use strict;
 
 # Clone detection logic
@@ -42,7 +42,7 @@ sub shutdown {
 
     if ($THREAD) {
         $THREAD->shutdown;
-	undef( $THREAD );
+       undef( $THREAD );
     }
 } #shutdown
 
@@ -276,13 +276,15 @@ sub UNTIE {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Thread::Tie - tie variables into a thread of their own
 
 =head1 VERSION
 
-This documentation describes version 0.14.
+This documentation describes version 0.15.
 
 =head1 SYNOPSIS
 
@@ -306,7 +308,7 @@ This documentation describes version 0.14.
     tie @array, 'Thread::Tie', {}, qw(a b c);
     tie %hash, 'Thread::Tie', {}, (a => 'A', b => 'B', c => 'C');
     tie *HANDLE, 'Thread::Tie', {},'>:layer','filename';
-    
+
     # create an alternate thread and use that
     my $tiethread = Thread::Tie::Thread->new;
     tie $scalar, 'Thread::Tie', {thread => $tiethread};
@@ -592,11 +594,13 @@ Examples should be added.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
+
+Please report bugs to <thisusedtobeanemail@gmail.com>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2003, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+Copyright (c) 2002-2003, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>, 2019 LNATION <thisusedtobeanemail@gmail.com>. All rights
 reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

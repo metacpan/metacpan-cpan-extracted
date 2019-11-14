@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -13,7 +13,7 @@ SYNOPSIS
      use Alien::cmake3;
      use Env qw( @PATH );
      
-     unshift @PATH, Alien::cmake->bin_dir;
+     unshift @PATH, Alien::cmake3->bin_dir;
      system 'cmake', ...;
 
     From alienfile
@@ -93,7 +93,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Adriano Ferreira (FERREIRA)
 
 COPYRIGHT AND LICENSE
 

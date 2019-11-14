@@ -10,6 +10,10 @@ pod_spelling_system:
     - alienized
     - autoconf
     - exe
+    - Adriano
+    - FERREIRA
+    - Ferreira
+
 
 pod_coverage:
   skip: 0

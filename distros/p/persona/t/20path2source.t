@@ -1,9 +1,4 @@
-BEGIN {				# Magic Perl CORE pragma
-    if ($ENV{PERL_CORE}) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-}
+use lib '.';
 
 # set up tests to do
 use Test::More tests => 2 + 1 + 2 + 2 + 2 + 1;
@@ -32,7 +27,7 @@ all never
 SRC
 
 # make sure we have it as a file
-my $filename = "$module.pm";
+my $filename = "lib/$module.pm";
 open( my $out, '>', $filename ) or die "Could not open $filename: $!";
 my $written = print $out $source;
 ok( $written, "could write file $filename" );
@@ -58,7 +53,7 @@ foreach ( '', qq{","zero} ) {
     open( $out, "$prefix$_$postfix" );
     is( readline($out), <<'OK', 'PERSONA zero' );
 all
-#line 7 Foo.pm (allowed by persona 'zero')
+#line 7 lib/Foo.pm (allowed by persona 'zero')
 not one
 #PERSONA
 all again
@@ -81,7 +76,7 @@ all
 one only
 #PERSONA one two
 one and two
-#line 9 Foo.pm (all personas)
+#line 9 lib/Foo.pm (all personas)
 all again
 __END__
 #PERSONA one
@@ -98,7 +93,7 @@ foreach ( '', qq{","two} ) {
     open( $out, "$prefix$_$postfix" );
     is( readline($out), <<'OK', 'PERSONA two' );
 all
-#line 5 Foo.pm (allowed by persona 'two')
+#line 5 lib/Foo.pm (allowed by persona 'two')
 one and two
 #PERSONA !one
 not one

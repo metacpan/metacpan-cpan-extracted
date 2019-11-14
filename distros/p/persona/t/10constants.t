@@ -1,9 +1,4 @@
-BEGIN {				# Magic Perl CORE pragma
-    if ($ENV{PERL_CORE}) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-}
+use lib '.';
 
 # set up tests to do
 use Test::More tests => 2 + 3 + ( 2 * 4 ) + 1;
@@ -34,8 +29,8 @@ print "all should never show\$/";
 SRC
 
 # make sure we have it as a file
-my $filename = "$module.pm";
-open( my $out, '>', $filename ) or die "Could not open $filename: $!";
+my $filename = "lib/$module.pm";
+open( my $out, '>', "$filename" ) or die "Could not open $filename: $!";
 my $written = print $out $source;
 ok( $written, "could write file $filename" );
 ok( close($out), "flushed ok to disk" );
@@ -61,6 +56,7 @@ open( $out, "$prefix -Mpersona $postfix" );
 is( readline($out), $all, "no module selected, no interference" );
 open( $out, "$prefix -Mpersona=only_for,Bar $postfix" );
 is( readline($out), $all, "Bar module selected, no interference" );
+
 
 # interference
 foreach my $only_for ( qw( Foo * ) ) {
@@ -94,4 +90,4 @@ OK
 }
 
 # we're done
-ok( unlink($filename), 'remove module' );
+ok( unlink("$filename"), 'remove module' );

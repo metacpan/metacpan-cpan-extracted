@@ -11,7 +11,7 @@ isa_ok( $net, 'WG::API::NET', 'valid instance' );
 
 can_ok( $net, qw/servers_info/ );
 can_ok( $net, qw/accounts_list account_info/ );
-can_ok( $net, qw/clans_list clans_info clans_membersinfo clans_glossary clans_messageboard/ );
+can_ok( $net, qw/clans_info clans_membersinfo clans_glossary clans_messageboard/ );
 
 SKIP: {
     skip 'developers only', 26 unless $ENV{'WGMODE'} && $ENV{'WGMODE'} eq 'dev';
@@ -47,7 +47,6 @@ SKIP: {
 
     subtest 'clans' => sub {
         my ( $clans, $clan_info );
-        is( $net->clans_list( game => 'wox', search => 'hellenes' ), undef, 'Search clan, using deprecated method' );
         is( $clans = $net->clans( game => 'wox', search => 'hellenes' ), undef, 'Search clan with invalid game' );
         is( $net->clans_info( clan_id => 'clan_id' ), undef, 'Get clan info with invalid clan_id' );
 

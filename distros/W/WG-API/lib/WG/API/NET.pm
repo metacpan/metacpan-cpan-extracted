@@ -12,11 +12,11 @@ WG::API::NET - Module to work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.11
+Version v0.12
 
 =cut
 
-our $VERSION = 'v0.11';
+our $VERSION = 'v0.12';
 
 const my $api_uri => '//api.worldoftanks.ru/';
 
@@ -101,21 +101,6 @@ sub account_info {
 =head2 Clans
 
 =over 1
-
-=item B<clans_list>
-
-DEPRECATED: Method searches through clans and sorts them in a specified order.
-
-=cut
-
-sub clans_list {
-    cluck "DEPRECATED!";
-    return shift->_request(
-        'get', 'wgn/clans/list/',
-        [ 'language', 'fields', 'search', 'limit', 'page_no', 'game' ],
-        undef, @_
-    );
-}
 
 =item B<clans>
 

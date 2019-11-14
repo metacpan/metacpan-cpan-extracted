@@ -3,7 +3,7 @@ package Thread::Tie::Thread;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.13';
+$VERSION = '0.15';
 use strict;
 
 # Make sure we only load stuff when we actually need it

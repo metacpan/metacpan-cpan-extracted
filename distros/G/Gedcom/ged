@@ -1,13 +1,13 @@
 #!/usr/local/bin/perl -w
 
-# Copyright 1998-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1998-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
 # The latest version of this software should be available from my homepage:
 # http://www.pjcj.net
 
-# Version 1.20 - 17th September 2017
+# Version 1.21 - 14th November 2019
 
 use strict;
 
@@ -18,10 +18,10 @@ use diagnostics;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 
-use Gedcom 1.20;
+use Gedcom 1.21;
 
 use vars qw( $VERSION );
-$VERSION = "1.20";
+$VERSION = "1.21";
 
 eval "use Date::Manip";
 Date_Init("DateFormat=UK") if $INC{"Date/Manip.pm"};
@@ -169,7 +169,7 @@ sub main {
         print "\nwriting xml...";
         $ged->write_xml("$gedcom_file.xml");
     }
-    if (1) {
+    if (0) {
         print "\nvalidating...";
         my %x;
         my $vcb = sub {
@@ -193,7 +193,7 @@ sub main {
     if (0) {
         print "\nnormalising dates...";
         $ged->normalise_dates("%E %b %Y");
-#   $ged->normalise_dates;
+        # $ged->normalise_dates;
         print "\nrenumbering...";
         $ged->renumber;
         print "\nordering...";
@@ -220,10 +220,19 @@ sub main {
             }
         }
     }
-    if (1) {
+    if (0) {
         my $i = $ged->get_individual("I93");
         my $prim = $i->get_value("_PRIM");
         print "_PRIM: $prim\n";
+    }
+    if (1) {
+        my $from = $ged->get_individual("I14");
+        my $to   = $ged->get_individual("I1");
+        my $rel  = $from->relationship($to);
+        print "\n", $to->name, " is the $rel of ", $from->name, "\n";
+
+        my $i1 = $ged->get_individual("I82");
+        my $r1 = $i1->relationship($to);
     }
 }
 

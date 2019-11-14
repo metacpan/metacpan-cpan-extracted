@@ -3,7 +3,7 @@ package Thread::Tie::Scalar;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.13';
+$VERSION = '0.15';
 use strict;
 
 # Load only the stuff that we really need

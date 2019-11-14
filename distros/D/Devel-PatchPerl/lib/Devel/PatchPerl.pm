@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.76';
+$Devel::PatchPerl::VERSION = '1.78';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -9791,7 +9791,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.76
+version 1.78
 
 =head1 SYNOPSIS
 

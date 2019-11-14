@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,12 +22,15 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Devel::Required" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033",
+            "threads" : "0"
          }
       },
       "runtime" : {
@@ -37,7 +40,40 @@
          }
       }
    },
+   "provides" : {
+      "Thread::Tie" : {
+         "file" : "lib/Thread/Tie.pm",
+         "version" : "0.15"
+      },
+      "Thread::Tie::Array" : {
+         "file" : "lib/Thread/Tie/Array.pm",
+         "version" : "0.15"
+      },
+      "Thread::Tie::Handle" : {
+         "file" : "lib/Thread/Tie/Handle.pm",
+         "version" : "0.15"
+      },
+      "Thread::Tie::Hash" : {
+         "file" : "lib/Thread/Tie/Hash.pm",
+         "version" : "0.15"
+      },
+      "Thread::Tie::Scalar" : {
+         "file" : "lib/Thread/Tie/Scalar.pm",
+         "version" : "0.15"
+      },
+      "Thread::Tie::Thread" : {
+         "file" : "lib/Thread/Tie/Thread.pm",
+         "version" : "0.15"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.14",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Thread-Tie.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Thread-Tie"
+      }
+   },
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

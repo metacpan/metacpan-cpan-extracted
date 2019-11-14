@@ -1,7 +1,7 @@
 package Devel::ThreadsForks;
 
 # set version information
-$VERSION= '0.07';
+$VERSION= '0.08';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -117,7 +117,7 @@ sub import {
     }
 
     # do the check
-    do $file;
+    do "./$file";
 } #import
 
 #-------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ Devel::ThreadsForks - check for availability of threads or forks
 
 =head1 VERSION
 
-This documentation describes version 0.07.
+This documentation describes version 0.08.
 
 =head1 SYNOPSIS
 
@@ -218,7 +218,7 @@ maintained by LNATION, <thisusedtobeanemail@gmail.com>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.  All rights reserved.
+Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>, 2019 LNATION <thisusedtobeanemail@gmail.com>.  All rights reserved.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

@@ -25,10 +25,6 @@ use Text::Reform qw(form break_with);
 
 use Data::Dumper;
 
-use vars qw($VERSION);
-
-$VERSION = sprintf( "%d.%02d", q$Revision: 11.91 $ =~ /(\d+)\.(\d+)/ );
-
 sub header {
     my($self, $sth, $fh, $sep) = @_;
     $self->{'fh'} = $self->setup_fh($fh);
@@ -452,4 +448,4 @@ modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<DBI::Shell(3)>, L<DBI(3)>, L<dbish(1)>
+L<DBI::Shell>, L<DBI>, L<dbish>

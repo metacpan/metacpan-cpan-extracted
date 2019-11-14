@@ -2,9 +2,9 @@ NAME
     App::IndonesianBankingUtils - CLIs related to Indonesian banking
 
 VERSION
-    This document describes version 0.142 of App::IndonesianBankingUtils
+    This document describes version 0.143 of App::IndonesianBankingUtils
     (from Perl distribution App-IndonesianBankingUtils), released on
-    2019-05-10.
+    2019-10-15.
 
 
     This distribution contains several CLI's related to Indonesian banking:

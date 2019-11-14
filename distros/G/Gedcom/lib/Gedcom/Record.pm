@@ -1,4 +1,4 @@
-# Copyright 1998-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1998-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -14,14 +14,14 @@ require 5.005;
 package Gedcom::Record;
 
 use vars qw($VERSION @ISA $AUTOLOAD);
-$VERSION = "1.20";
+$VERSION = "1.21";
 @ISA     = qw( Gedcom::Item );
 
 use Carp;
 BEGIN { eval "use Date::Manip" }             # We'll use this if it is available
 
-use Gedcom::Item       1.20;
-use Gedcom::Comparison 1.20;
+use Gedcom::Item       1.21;
+use Gedcom::Comparison 1.21;
 
 BEGIN
 {
@@ -578,7 +578,7 @@ __END__
 
 Gedcom::Record - a module to manipulate Gedcom records
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 SYNOPSIS
 
@@ -612,7 +612,7 @@ Version 1.20 - 17th September 2017
 
 =head1 DESCRIPTION
 
-A selection of subroutines to handle records in a gedcom file.
+A selection of subroutines to handle records in a GEDCOM file.
 
 Derived from Gedcom::Item.
 
@@ -661,7 +661,7 @@ there is none.  In list context, record() returns all the specified
 records.
 
 Records may be specified by a list of strings.  Each string is either a
-Gedcom tag or a description.  Starting from the first string in the
+GEDCOM tag or a description.  Starting from the first string in the
 list, specified records are retrieved.  Then from those records, records
 specified by the next string in the list are retrieved.  This continues
 until all strings from the list have been used.
@@ -805,7 +805,7 @@ Delete the specified sub-record from the record.
 
 =head2 Access functions
 
-All the Gedcom tag names can be used as function names.  Depending on
+All the GEDCOM tag names can be used as function names.  Depending on
 the context in which they are called, the functions return either an
 array of the specified sub-items, or the first specified sub-item.
 

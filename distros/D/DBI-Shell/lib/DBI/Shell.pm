@@ -18,10 +18,7 @@ or
 =head1 DESCRIPTION
 
 The DBI::Shell module (and dbish command, if installed) provide a
-simple but effective command line interface for the Perl DBI module.
-
-DBI::Shell is very new, very experimental and very subject to change.
-Your mileage I<will> vary. Interfaces I<will> change with each release.
+simple but effective command line interface for the Perl L<DBI> module.
 
 =cut
 
@@ -41,14 +38,7 @@ use Carp;
 @ISA = qw(Exporter DBI::Shell::Std);
 @EXPORT = qw(shell);
 
-$VERSION = sprintf( "%d.%02d", q$Revision: 11.95 $ =~ /(\d+)\.(\d+)/ );
-
-my $warning = <<'EOM';
-
-WARNING: The DBI::Shell interface and functionality are
-=======  very likely to change in subsequent versions!
-
-EOM
+$VERSION = '11.96';
 
 sub new {
 	my $class = shift;
@@ -84,8 +74,6 @@ sub run {
 	my $sh = shift;
     die "Unrecognised options: @{$sh->{unhandled_options}}\n"
 	if @{$sh->{unhandled_options}};
-
-    $sh->log($warning) unless $sh->{batch};
 
     # Use valid "dbi:driver:..." to connect with source.
     $sh->do_connect( $sh->{data_source} );
@@ -133,17 +121,23 @@ use Text::Abbrev ();
 use Term::ReadLine;
 use Getopt::Long 2.17;	# upgrade from CPAN if needed: http://www.perl.com/CPAN
 use IO::File;
+use File::Spec ();
+use File::HomeDir ();
 
 use DBI 1.00 qw(:sql_types :utils);
 use DBI::Format;
 
 use DBI::Shell::FindSqlFile;
+use IO::Interactive qw/ is_interactive /;
 
 use vars qw(@ISA);
 @ISA = qw(DBI::Shell::FindSqlFile);
 
 use constant ADD_RH => 1;	# Add the results, to rhistory.
 use constant  NO_RH => 0;	# Do not add results, to rhistory.
+
+# History saving is also provided by DBI::Shell::Completion.
+use constant HISTORY_FILE => '.dbish-builtin-history';
 
 my $haveTermReadKey;
 my $term;
@@ -413,11 +407,14 @@ sub default_term {
     # Setup Term
     #
     my $mode;
-    if ($sh->{batch} || ! -t STDIN) {
+    if (!is_interactive()) {
 		$sh->{batch} = 1;
 		$mode = "in batch mode";
     } else {
 		$sh->{term} = new Term::ReadLine($class);
+		if ($sh->{term}->Features->{readHistory}) {
+			$sh->{term}->ReadHistory(File::Spec->catfile(File::HomeDir->my_home, HISTORY_FILE));
+		}
 		$mode = "";
     }
 
@@ -467,9 +464,12 @@ sub new {
 	# This may be obsolete since it is run again in DBI::Shell::new.
     $sh->do_format($sh->{format});
 
-    $sh->{data_source}	= shift(@args) || $ENV{DBI_DSN}  || '';
-    $sh->{user}		    = shift(@args) || $ENV{DBI_USER} || '';
-    $sh->{password}	    = shift(@args) || $ENV{DBI_PASS} || undef;
+    $sh->{data_source}  = shift(@args) || $ENV{DBI_DSN}  || '';
+
+    my $user            = shift(@args);
+    $sh->{user}         = defined $user     ? $user     : $ENV{DBI_USER} || '';
+    my $password        = shift(@args);
+    $sh->{password}     = defined $password ? $password : $ENV{DBI_PASS} || undef;
 
     $sh->{chistory} = [];	# command history
     $sh->{rhistory} = [];	# result  history
@@ -544,7 +544,8 @@ sub configuration {
     $sh->{config_file} = $ENV{DBISH_CONFIG} || "$homedir/.dbish_config";
 	my $config;
     if ($sh->{config_file} && -f $sh->{config_file}) {
-		$config = require $sh->{config_file};
+		my $full = File::Spec->rel2abs( $sh->{config_file} );
+		$config = require $full;
 		# allow for custom configuration options.
 		if (exists $config->{'options'} ) {
 			$sh->install_options( $config->{'options'} );
@@ -1125,6 +1126,13 @@ sub do_rollback {
 sub do_quit {
     my ($sh, @args) = @_;
     $sh->do_disconnect if $sh->{dbh};
+
+    if ($sh->{term}) {
+        if ($sh->{term}->Features()->{writeHistory}) {
+            $sh->{term}->WriteHistory(File::Spec->catfile(File::HomeDir->my_home, HISTORY_FILE));
+        }
+    }
+
     undef $sh->{term};
     exit 0;
 }
@@ -1936,7 +1944,7 @@ configurations.
 The DBI::Shell has a long lineage.
 
 It started life around 1994-1997 as the pmsql script written by Andreas
-König. Jochen Wiedmann picked it up and ran with it (adding much along
+KE<ouml>nig. Jochen Wiedmann picked it up and ran with it (adding much along
 the way) as I<dbimon>, bundled with his DBD::mSQL driver modules. In
 1998, around the time I wanted to bundle a shell with the DBI, Adam
 Marks was working on a dbish modeled after the Sybase sqsh utility.

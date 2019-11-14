@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Copyright 2001-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use warnings;
 my $Command = {
     set_version => sub {
         my ($command, $version, $date, @files) = @_;
-        local ($^I, @ARGV) = (".bak", @files);
+        local ($^I, @ARGV) = ("", @files);
         while (<>) {
             s/(^\s*(?:our\s+)?\$VERSION = ")\d+\.\d+(";)/$1$version$2/;
             s/(Version )\d+\.\d+( - ).*/$1$version$2$date/;
@@ -27,6 +27,26 @@ my $Command = {
         while (<>) {
             print if (/NAME/        ... /^[A-Z ]+$/) =~ /^\d+$/;
             print if (/DESCRIPTION/ ... /^[A-Z ]+$/) =~ /^\d+$/;
+        }
+    },
+    munge_readme => sub {
+        my ($command) = @_;
+        local @ARGV;
+        while (<>) {
+            next if $. < 3;
+            s/^/# / if $. == 3;
+            if ($. == 5) {
+                my $coveralls = "https://coveralls.io";
+                my $gedcom    = "github/pjcj/Gedcom.pm";
+                my $travis    = "https://travis-ci.org/pjcj/Gedcom.pm";
+                my $badges    = "[![Build Status]($travis.svg?branch=master)]" .
+                                "($travis) " .
+                                "[![Coverage Status]($coveralls/repos/" .
+                                "$gedcom/badge.svg?branch=master)]" .
+                                "($coveralls/$gedcom?branch=master)";
+                s/.*/$badges/;
+            };
+            print;
         }
     },
 };

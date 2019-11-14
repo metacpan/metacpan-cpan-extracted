@@ -1,13 +1,41 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         DBI-Shell
-version:      11.95
-version_from: lib/DBI/Shell.pm
-installdirs:  site
+---
+abstract: 'Interactive command shell for the DBI'
+author:
+  - 'Tim Bunce <timb@cpan.org>'
+  - 'Jochen Wiedmann <jwied@cpan.org>'
+  - 'Adam Marks'
+  - 'Thomas A. Lowery <tlowery@cpan.org>'
+build_requires:
+  Getopt::Long: '2.17'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBI-Shell
 requires:
-    IO::Tee:                       0
-    Test::More:                    0
-    Text::Reform:                  0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Carp: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::HomeDir: '0.50'
+  File::Spec: '0'
+  IO::Interactive: '0'
+  IO::Tee: '0'
+  Term::ReadLine: '0'
+  Text::Abbrev: '0'
+  Text::CSV_XS: '0'
+  Text::Reform: '0'
+  perl: '5.004'
+resources:
+  repository: https://repo.or.cz/perl-DBI-Shell.git
+version: '11.96'
+x_contributors:
+  - 'Kent Fredric <kentnl@cpan.org>'
+  - 'Rafael Kitover <rkitover@cpan.org>'
+  - 'Dave Lambley <dlambley@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

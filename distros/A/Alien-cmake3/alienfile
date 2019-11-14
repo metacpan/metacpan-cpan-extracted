@@ -77,6 +77,11 @@ elsif($^O eq 'MSWin32' && $Config{ptrsize} == 8)
   $binary_release_name = 'win64-x64';
   $binary_format       = 'zip';
 }
+elsif($^O eq 'darwin' && $Config{ptrsize} == 8)
+{
+  $binary_release_name = 'Darwin-x86_64';
+  $binary_format       = 'tar.gz';
+}
 
 share {
 
@@ -102,10 +107,18 @@ share {
         $build->system("xcopy . $stage /E");
       };
     }
+    elsif($^O eq 'darwin')
+    {
+      build [
+        'cp -a CMake.app/Contents/* %{.install.stage}',
+        sub { shift->runtime_prop->{style} = 'binary' },
+      ];
+    }
     else
     {
       build [
         'cp -ar * %{.install.stage}',
+        sub { shift->runtime_prop->{style} = 'binary' },
       ];
     }
   }
@@ -129,6 +142,7 @@ share {
       '%{configure}',
       '%{make}',
       '%{make} install',
+        sub { shift->runtime_prop->{style} = 'source' },
     ];
   }
   
@@ -144,5 +158,6 @@ sys {
     my($build) = @_;
     $build->runtime_prop->{version} = $build->install_prop->{my_old_cmake_version};
     $build->runtime_prop->{command} = $build->install_prop->{my_old_cmake};
+    $build->runtime_prop->{style}   = "system";
   };
 };

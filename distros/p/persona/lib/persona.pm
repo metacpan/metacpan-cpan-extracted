@@ -1,6 +1,6 @@
 package persona;
 
-$VERSION= '0.13';
+$VERSION= '0.15';
 
 # be as strict and verbose as possible
 use strict;
@@ -402,7 +402,7 @@ persona - control which code will be loaded for an execution context
 
 =head1 VERSION
 
-This documentation describes version 0.13.
+This documentation describes version 0.15.
 
 =head1 DESCRIPTION
 
@@ -653,7 +653,9 @@ as that is more or less expected to be just containing a path at all times.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
+
+Please report bugs to <thisusedtobeanemail@gmail.com>.
 
 =head1 HISTORY
 
@@ -661,7 +663,7 @@ Developed for the mod_perl environment at Booking.com.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+Copyright (c) 2009, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>, 2019 LNATION <thisusedtobeanemail@gmail.com>. All rights
 reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

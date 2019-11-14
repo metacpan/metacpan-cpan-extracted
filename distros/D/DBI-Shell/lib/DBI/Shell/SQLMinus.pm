@@ -13,10 +13,6 @@ use IO::File;
 use IO::Tee;
 use Carp;
 
-use vars qw(@ISA $show $set $VERSION);
-
-$VERSION = sprintf( "%d.%02d", q$Revision: 11.91 $ =~ /(\d+)\.(\d+)/ );
-
 sub init {
     my ($class, $sh, @args) = @_;
 	$class = ref $class || $class;

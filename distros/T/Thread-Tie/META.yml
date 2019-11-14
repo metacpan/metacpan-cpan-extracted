@@ -3,12 +3,15 @@ abstract: 'tie variables into a thread of their own'
 author:
   - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
+  Devel::Required: '0'
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '1.000033'
+  threads: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,8 +20,29 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Thread::Tie:
+    file: lib/Thread/Tie.pm
+    version: '0.15'
+  Thread::Tie::Array:
+    file: lib/Thread/Tie/Array.pm
+    version: '0.15'
+  Thread::Tie::Handle:
+    file: lib/Thread/Tie/Handle.pm
+    version: '0.15'
+  Thread::Tie::Hash:
+    file: lib/Thread/Tie/Hash.pm
+    version: '0.15'
+  Thread::Tie::Scalar:
+    file: lib/Thread/Tie/Scalar.pm
+    version: '0.15'
+  Thread::Tie::Thread:
+    file: lib/Thread/Tie/Thread.pm
+    version: '0.15'
 requires:
   Thread::Serialize: '0.07'
   load: '0.11'
-version: '0.14'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Thread-Tie.git
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

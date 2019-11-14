@@ -1,4 +1,4 @@
-# Copyright 2001-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -15,10 +15,10 @@ package Gedcom::CGI;
 
 use CGI qw(:cgi :html);
 
-use Gedcom 1.20;
+use Gedcom 1.21;
 
 use vars qw($VERSION);
-$VERSION = "1.20";
+$VERSION = "1.21";
 
 sub gedcom {
     my ($gedcom_file) = @_;
@@ -130,7 +130,7 @@ __END__
 
 Gedcom::CGI - Basic CGI routines for Gedcom.pm
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 SYNOPSIS
 

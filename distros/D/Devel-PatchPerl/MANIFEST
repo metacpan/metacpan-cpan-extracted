@@ -11,7 +11,6 @@ dist.ini
 lib/Devel/PatchPerl.pm
 lib/Devel/PatchPerl/Hints.pm
 lib/Devel/PatchPerl/Plugin.pm
-meh
 t/01-hints.t
 t/02_vers.t
 t/03_plugin.t

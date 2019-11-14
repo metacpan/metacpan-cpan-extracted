@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Business/ID/BCA/parse_bca_account
-# and generated automatically using Perinci::CmdLine::Gen version 0.488
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-05-10'; # DATE
+our $DATE = '2019-10-15'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.142'; # VERSION
+our $VERSION = '0.143'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ parse-bca-account - Parse/validate BCA account number
 
 =head1 VERSION
 
-This document describes version 0.142 of parse-bca-account (from Perl distribution App-IndonesianBankingUtils), released on 2019-05-10.
+This document describes version 0.143 of parse-bca-account (from Perl distribution App-IndonesianBankingUtils), released on 2019-10-15.
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ List of known branches
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

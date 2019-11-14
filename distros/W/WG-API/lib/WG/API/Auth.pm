@@ -12,11 +12,11 @@ WG::API::Auth  - Auth-module with using OpenID for work with WG PAPI
 
 =head1 VERSION
 
-Version v0.11
+Version v0.12
 
 =cut
 
-our $VERSION = 'v0.11';
+our $VERSION = 'v0.12';
 
 const my $api_uri => '//api.worldoftanks.ru/';
 

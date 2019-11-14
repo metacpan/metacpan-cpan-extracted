@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use DBI::Shell;
+my $sh = DBI::Shell->new(@ARGV)->run;
+exit(0);
+
+__END__
+
+=head1 NAME
+
+dbish	- Interactive command shell for the Perl DBI
+
+=head1 SYNOPSIS
+
+  dbish <options> dsn [user [password]]
+
+=head1 DESCRIPTION
+
+This tool is a command wrapper for the DBI::Shell perl module.
+See L<DBI::Shell> for full details.
+
+=head1 SEE ALSO
+
+L<DBI::Shell>, L<DBI>
+
+=cut

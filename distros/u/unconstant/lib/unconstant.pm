@@ -11,7 +11,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %declared;
 
@@ -148,16 +148,11 @@ sub constant_import {
 		}
 		elsif (@_) {
 			my @list = @_;
-			_make_const($list[$_]) for 0..$#list;
-			_make_const(@list);
-			if (!exists $symtab->{$name}) {
-				$symtab->{$name} = \@list;
-				$flush_mro->{$pkg}++;
+			{
+				no warnings;
+				*$full_name = sub { @list };
 			}
-			else {
-				local $constant::{_dummy} = \@list;
-				*$full_name = \&{"_dummy"};
-			}
+			$flush_mro->{$pkg}++;
 		}
 		else {
 			die 'foo';

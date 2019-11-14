@@ -4,13 +4,14 @@
       "Paul Johnson (paul@pjcj.net)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Gedcom",
    "no_index" : {
@@ -22,7 +23,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Pod::Markdown" : "0"
          }
       },
       "configure" : {
@@ -39,10 +40,19 @@
          "requires" : {
             "Text::Soundex" : "0"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "0"
+         },
+         "requires" : {
+            "Test::Pod" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "X_mailing_list" : "http://lists.perl.org/list/perl-gedcom.html",
       "bugtracker" : {
          "web" : "https://github.com/pjcj/Gedcom.pm/issues"
       },
@@ -53,8 +63,8 @@
          "type" : "git",
          "url" : "http://github.com/pjcj/Gedcom.pm",
          "web" : "http://github.com/pjcj/Gedcom.pm"
-      },
-      "x_mailing_list" : "http://lists.perl.org/list/perl-gedcom.html"
+      }
    },
-   "version" : "1.20"
+   "version" : "1.21",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

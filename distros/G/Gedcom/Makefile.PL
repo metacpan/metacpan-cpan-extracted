@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 1998-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1998-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -26,8 +26,8 @@ if ($WEBSERVICES_TESTING) {  # For automating webservices testing
 
 $| = 1;
 
-my $Version  = "1.20";
-my $Date     = "17th September 2017";
+my $Version  = "1.21";
+my $Date     = "14th November 2019";
 my $Author   = 'paul@pjcj.net';
 
 my @perlbug  = ("perlbug", "-a", $Author,
@@ -41,17 +41,30 @@ my @versions = grep { !/README|travis|Makefile\.PL/ } @files;
 $ExtUtils::MakeMaker::Verbose = 0;
 
 WriteMakefile(
-    NAME       => "Gedcom",
-    VERSION    => $Version,
-    AUTHOR     => 'Paul Johnson (paul@pjcj.net)',
-    ABSTRACT   => "Interface to genealogy GEDCOM files",
-    DIR        => [],
-    EXE_FILES  => [ "cgi-bin/gedcom.cgi" ],
-    PREREQ_PM  => { "Text::Soundex" => 0 },
-    META_MERGE => {
+    NAME           => "Gedcom",
+    VERSION        => $Version,
+    AUTHOR         => 'Paul Johnson (paul@pjcj.net)',
+    ABSTRACT       => "Interface to genealogy GEDCOM files",
+    DIR            => [],
+    EXE_FILES      => [ "cgi-bin/gedcom.cgi" ],
+    BUILD_REQUIRES => { "Pod::Markdown" => 0 },
+    TEST_REQUIRES  => { "Test::Pod"     => 0 },
+    PREREQ_PM      => { "Text::Soundex" => 0 },
+    META_MERGE     => {
         license => [ "perl_5" ],
         release_status => "stable",
+        # https://metacpan.org/pod/CPAN::Meta::Spec#PREREQUISITES
         prereqs => {
+            build => {
+                requires => {
+                    "Pod::Markdown"     => 0,
+                },
+            },
+            test => {
+                recommends => {
+                    "Test::Pod"         => 0,
+                },
+            },
             runtime => {
                 recommends => {
                     "Date::Manip"       => 0,
@@ -77,9 +90,9 @@ WriteMakefile(
             url     => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         },
     },
-    dist       => { COMPRESS => "gzip --best --force" },
-    clean      => { FILES => join " ",  map { "$_.version" } @versions },
-    depend     => { distdir => "@files" },
+    dist   => { COMPRESS => "gzip --best --force"                     },
+    clean  => { FILES    => join " ",  map { "$_.version" } @versions },
+    depend => { distdir  => "@files"                                  },
 );
 
 print "\n";
@@ -184,11 +197,13 @@ grammar : pure_all gedcom-5.5.grammar gedcom-5.5.1.grammar
 
 @versions : Makefile.PL
 \t \$(PERL) utils/makeh set_version $Version "$Date" @versions
-\t \$(MAKE) grammar README
+\t \$(MAKE) grammar README.md
 
-README : lib/Gedcom.pm
-\t TERMCAP= COLUMNS=80 pod2text -s lib/Gedcom.pm | \\
-  \$(PERL) utils/makeh make_readme > README
+README.md : lib/Gedcom.pm utils/makeh
+\t pod2markdown < lib/Gedcom.pm | \$(PERL) utils/makeh munge_readme > README.md
+
+t : pure_all
+\t exec make test HARNESS_OPTIONS=j8:c HARNESS_TIMER=1
 
 # Webservies section
 

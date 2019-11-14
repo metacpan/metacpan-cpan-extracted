@@ -1,5 +1,8 @@
 Revision history for Alien-cmake3
 
+0.05      2019-11-14 09:39:19 -0500
+  - Use binary version for darwin / OS X for share install
+
 0.04      2017-10-05 11:45:14 -0400
   - use bootstral_ssl option on windows
     cmake3 may be a prereq for Alien::LibreSSL

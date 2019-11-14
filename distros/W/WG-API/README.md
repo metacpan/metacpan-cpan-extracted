@@ -1,11 +1,11 @@
-
+[![MetaCPAN Release](https://badge.fury.io/pl/WG-API.svg)](https://metacpan.org/release/WG-API) [![Build Status](https://travis-ci.org/cynovg/p5-WG-API.svg?branch=master)](https://travis-ci.org/cynovg/p5-WG-API) [![Coverage Status](https://img.shields.io/coveralls/cynovg/p5-WG-API/master.svg?style=flat)](https://coveralls.io/r/cynovg/p5-WG-API?branch=master)
 # NAME
 
 WG::API - Module for work with Wargaming.net Public API
 
 # VERSION
 
-Version v0.11
+Version v0.12
 
 # SYNOPSIS
 
@@ -59,9 +59,9 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-- RT: Gitlab's request tracker (report bugs here)
+- RT: GitHub's request tracker (report bugs here)
 
-    [https://gitlab.com/cynovg/WG-API/issues](https://gitlab.com/cynovg/WG-API/issues)
+    [https://github.com/cynovg/p5-WG-API/issues](https://github.com/cynovg/p5-WG-API/issues)
 
 - AnnoCPAN: Annotated CPAN documentation
 

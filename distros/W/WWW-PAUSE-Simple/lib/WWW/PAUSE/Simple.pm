@@ -1,7 +1,7 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2019-06-05'; # DATE
-our $VERSION = '0.444'; # VERSION
+our $DATE = '2019-11-14'; # DATE
+our $VERSION = '0.445'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,34 +54,20 @@ _
     # 2016-07-13 - for a few months now, PAUSE has been giving random 500 errors
     # when uploading. i'm defaulting to a retries=2.
     # 2017-06-28 - increase default to retries=7.
-    # 2017-06-28 - tone down retries to 5.
+    # 2017-06-28 - tune down retries to 5.
     # 2019-06-05 - now uses exponential backoff, increase retries to 35 to try
     #              for a little over a day
+    # 2019-11-14 - PAUSE is now ok, tune down retries to 5
     retries => {
-        summary => 'Number of retries when received 5xx HTTP error from server',
-        schema  => 'int*',
-        default => 35,
-        tags    => ['common'],
-    },
-    retry_delay => {
-        summary => 'How long to wait before retrying (deprecated)',
-        schema  => 'duration*',
-        tags    => ['common', 'deprecated'],
+        summary => 'Number of retries when received [45]xx HTTP error from server',
         description => <<'_',
 
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default `retries` of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via `retry_max_delay`.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 _
-    },
-    retry_max_delay => {
-        summary => 'How long to wait at most before retrying',
-        schema  => 'duration*',
-        default => 3600,
+        schema  => 'int*',
+        default => 5,
         tags    => ['common'],
     },
 );
@@ -174,30 +160,14 @@ sub _request {
 
     my %args = @_;
     # XXX schema
-    $args{retries} //= 35;
-    if (defined $args{retry_delay}) {
-        warn "retry_delay setting is deprecated, please use retry_max_delay from now on\n"
-            unless $deprecation_warned++;
-    } else {
-        $args{retry_delay} = 3;
-    }
-    $args{retry_max_delay} //= 3600;
-
+    $args{retries} //= 5;
     my $strategy;
-    if (defined $args{retry_delay}) {
-        require Algorithm::Backoff::Constant;
-        $strategy = Algorithm::Backoff::Constant->new(
-            max_attempts  => $args{retries},
-            delay         => $args{retry_delay},
-        );
-    } else {
-        require Algorithm::Backoff::Exponential;
-        $strategy = Algorithm::Backoff::Exponential->new(
-            max_attempts  => $args{retries},
-            initial_delay => 3,
-            max_delay     => $args{retry_max_delay},
-        );
-    }
+    require Algorithm::Backoff::Exponential;
+    $strategy = Algorithm::Backoff::Exponential->new(
+        max_attempts  => $args{retries},
+        initial_delay => 3,
+        max_delay     => 3600,
+    );
 
     # set default for username and password from ~/.pause
     my $username = $args{username};
@@ -948,7 +918,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.444 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2019-06-05.
+This document describes version 0.445 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2019-11-14.
 
 =head1 SYNOPSIS
 
@@ -996,24 +966,12 @@ not yet supported.
 
 Protect some files/wildcard patterns from delete/cleanup.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<username> => I<str>
 
@@ -1044,6 +1002,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 delete_old_releases
@@ -1093,24 +1052,12 @@ not yet supported.
 
 Protect some files/wildcard patterns from delete/cleanup.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<username> => I<str>
 
@@ -1141,6 +1088,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_dists
@@ -1184,24 +1132,12 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<username> => I<str>
 
@@ -1222,6 +1158,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_files
@@ -1261,24 +1198,12 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<size_max> => I<uint>
 
@@ -1303,6 +1228,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_modules
@@ -1334,24 +1260,12 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<type> => I<str>
 
@@ -1376,6 +1290,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 reindex_files
@@ -1406,24 +1321,12 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<username> => I<str>
 
@@ -1454,6 +1357,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 undelete_files
@@ -1488,24 +1392,12 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<username> => I<str>
 
@@ -1536,6 +1428,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 upload_files
@@ -1575,24 +1468,12 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 35)
+=item * B<retries> => I<int> (default: 5)
 
-Number of retries when received 5xx HTTP error from server.
+Number of retries when received [45]xx HTTP error from server.
 
-=item * B<retry_delay> => I<duration>
-
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default C<retries> of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via C<retry_max_delay>.
-
-=item * B<retry_max_delay> => I<duration> (default: 3600)
-
-How long to wait at most before retrying.
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
 =item * B<subdir> => I<str> (default: "")
 

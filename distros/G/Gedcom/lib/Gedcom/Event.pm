@@ -1,4 +1,4 @@
-# Copyright 1999-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1999-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -13,10 +13,10 @@ require 5.005;
 
 package Gedcom::Event;
 
-use Gedcom::Record 1.20;
+use Gedcom::Record 1.21;
 
 use vars qw($VERSION @ISA);
-$VERSION = "1.20";
+$VERSION = "1.21";
 @ISA     = qw( Gedcom::Record );
 
 1;
@@ -25,9 +25,9 @@ __END__
 
 =head1 NAME
 
-Gedcom::Event - a module to manipulate Gedcom events
+Gedcom::Event - a module to manipulate GEDCOM events
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Version 1.20 - 17th September 2017
 
 =head1 DESCRIPTION
 
-A selection of subroutines to handle events in a gedcom file.
+A selection of subroutines to handle events in a GEDCOM file.
 
 Derived from Gedcom::Record.
 

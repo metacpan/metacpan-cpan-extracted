@@ -1,4 +1,4 @@
-# Copyright 2005-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 2005-2019, Paul Johnson (paul@pjcj.net)
 
 require 5.006;
 
@@ -6,11 +6,11 @@ use strict;
 use warnings;
 
 our $AUTOLOAD;
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 package Gedcom::WebServices;
 
-use Gedcom 1.20;
+use Gedcom 1.21;
 
 use Apache::Constants qw( OK DECLINED );
 use Apache::Request;
@@ -205,7 +205,7 @@ __END__
 
 Gedcom::WebServices - Basic web service routines for Gedcom.pm
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 SYNOPSIS
 
@@ -372,11 +372,11 @@ See the BUGS file.  And the TODO file.
 
 =head1 VERSION
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 LICENCE
 
-Copyright 2005-2013, Paul Johnson (paul@pjcj.net)
+Copyright 2005-2019, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

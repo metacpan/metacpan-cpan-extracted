@@ -3,9 +3,12 @@ abstract: 'Check for availability of threads or forks'
 author:
   - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Config: '0'
+  Test::More: '0'
 configure_requires:
+  Devel::Required: '0'
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '1.000033'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,5 +20,15 @@ no_index:
   directory:
     - t
     - inc
-version: '0.07'
+provides:
+  Devel::ThreadsForks:
+    file: lib/Devel/ThreadsForks.pm
+    version: '0.08'
+requires:
+  Config: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks.git
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

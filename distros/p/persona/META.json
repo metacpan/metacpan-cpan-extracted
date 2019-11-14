@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,19 +22,37 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "List::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "persona" : {
+         "file" : "lib/persona.pm",
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/persona.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/persona"
+      }
+   },
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

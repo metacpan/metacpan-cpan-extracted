@@ -1,13 +1,13 @@
 #!/usr/local/bin/perl -w
 
-# Copyright 1999-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1999-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
 # The latest version of this software should be available from my homepage:
 # http://www.pjcj.net
 
-# Version 1.20 - 17th September 2017
+# Version 1.21 - 14th November 2019
 
 use strict;
 
@@ -16,11 +16,11 @@ require 5.005;
 package Basic;
 
 use vars qw($VERSION);
-$VERSION = "1.20";
+$VERSION = "1.21";
 
 use Test ();
 
-use Gedcom 1.20;
+use Gedcom 1.21;
 
 eval "use Date::Manip";
 Date_Init("DateFormat=UK") if $INC{"Date/Manip.pm"};
@@ -89,6 +89,7 @@ sub import {
         my $resolve     = $args{resolve};
         my $gedcom_file = $args{gedcom_file};
         my $read_only   = $args{read_only};
+        my $flush       = $args{flush} || 0;
 
         ok $ged;
         validate_ok($ged, $read_only);
@@ -270,18 +271,29 @@ sub import {
         ok $i->note, "Line 1\nLine 2\nLine 3\nLine 4";
         ok scalar $i->get_value("birth age"), 0;
 
-
         $i = $ged->get_individual("I83");
         my $n = $i->resolve($i->note)->full_value;
         ok $n, "Line 1\nLine 2";
         validate_ok($ged, $read_only);
 
+        my $from1 = $ged->get_individual("I14");
+        my $to1   = $ged->get_individual("I1");
+        my $rel1  = $from1->relationship($to1);
+        ok $rel1, "grandfather";
+
+        my $from2 = $ged->get_individual("I82");
+        my $rel2 = $from2->relationship($to1);
+        ok !defined $rel2;
+
+
         my $f1 = $gedcom_file . $$;
-        $ged->write($f1);
+        $ged->write($f1, $flush);
         validate_ok($ged, $read_only);
         ok -e $f1;
 
         # check the gedcom file is correct
+        map { s/^(\d+)\s+/$1 / } @Ged_data if $flush;
+
         ok open F1, $f1;
         ok scalar <F1>, $_ for @Ged_data;
         ok eof;
@@ -289,7 +301,7 @@ sub import {
         ok unlink $f1;
     };
 
-    my $tests = 1531;
+    my $tests = 1533;
     my $grammar;
     if ($grammar = delete $args{create_grammar}) {
         Test::plan tests => $tests + 3;

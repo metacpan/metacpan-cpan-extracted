@@ -1,5 +1,8 @@
 Revision history for unconstant
 
+0.03    2019-11-13
+        Updated to work with list constants
+
 0.02    2019-11-08
         Refactor so you can do `no unconstant`.
         Added tests.

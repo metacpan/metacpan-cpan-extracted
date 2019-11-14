@@ -1,4 +1,4 @@
-# Copyright 1998-2013, Paul Johnson (paul@pjcj.net)
+# Copyright 1998-2019, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -16,7 +16,7 @@ package Gedcom::Item;
 use Symbol;
 
 use vars qw($VERSION);
-$VERSION = "1.20";
+$VERSION = "1.21";
 
 sub new {
     my $proto = shift;
@@ -137,7 +137,7 @@ sub read {
     unless (@{$self->{items}}) {
         # $#{$self->{items}} = 20000;
         # $#{$self->{items}} = -1;
-        # If we have a grammar, then we are reading a gedcom file and must use
+        # If we have a grammar, then we are reading a GEDCOM file and must use
         # the grammar to verify what is being read.
         # If we do not have a grammar, then that is what we are reading.
         while (my $item = $self->next_item($self)) {
@@ -389,7 +389,7 @@ sub write {
     my ($fh, $level, $flush) = @_;
     $level ||= 0;
     my @p;
-    push @p, $level . "  " x $level         unless $flush || $level < 0;
+    push @p, $level . "  " x ($flush ? 0 : $level) unless $level < 0;
     push @p, "\@$self->{xref}\@"            if     defined $self->{xref} &&
                                                    length $self->{xref};
     push @p, $self->{tag}                   if     $level >= 0;
@@ -611,7 +611,7 @@ __END__
 
 Gedcom::Item - a base class for Gedcom::Grammar and Gedcom::Record
 
-Version 1.20 - 17th September 2017
+Version 1.21 - 14th November 2019
 
 =head1 SYNOPSIS
 
@@ -651,7 +651,7 @@ Version 1.20 - 17th September 2017
 
 =head1 DESCRIPTION
 
-A selection of subroutines to handle items in a gedcom file.
+A selection of subroutines to handle items in a GEDCOM file.
 
 =head1 HASH MEMBERS
 
@@ -687,7 +687,7 @@ The maximum number of items allowed.
 
 =head2 $item->{gedcom}
 
-The top level gedcom object.
+The top level Gedcom object.
 
 =head2 $item->{file}
 
@@ -773,7 +773,7 @@ Write the item to a FileHandle.
 The subroutine takes three parameters:
   $fh:        The FileHandle to which to write
   $level:     The level of the item
-  $flush:     Whether or not to indent the gedcom output according to the level
+  $flush:     Whether or not to indent the GEDCOM output according to the level
 
 =head2 write_xml
 
@@ -891,7 +891,7 @@ the value() function and probably the items() function.
   my $sub_items = $item->_items;
 
 Return a reference to a list of all the sub-items, reading them from the
-Gedcom file if they have not already been read.
+GEDCOM file if they have not already been read.
 
 It should not be necessary to use this function.  See items().
 
@@ -899,7 +899,7 @@ It should not be necessary to use this function.  See items().
 
   my @sub_items = $item->items;
 
-Return a list of all the sub-items, reading them from the Gedcom file if
+Return a list of all the sub-items, reading them from the GEDCOM file if
 they have not already been read.
 
 In general it should not be necessary to use this function.  The

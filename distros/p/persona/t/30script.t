@@ -1,9 +1,4 @@
-BEGIN {				# Magic Perl CORE pragma
-    if ($ENV{PERL_CORE}) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-}
+use lib '.';
 
 # set up tests to do
 use Test::More tests => 2 + 4 + 1;
@@ -37,7 +32,7 @@ print "all should never show\$/";
 SRC
 
 # make sure we have it as a file
-my $filename = "foo";
+my $filename = "lib/foo";
 open( my $out, '>', $filename ) or die "Could not open $filename: $!";
 my $written = print $out $source;
 ok( $written, "could write file $filename" );

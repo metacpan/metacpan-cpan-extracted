@@ -1,8 +1,8 @@
 #!perl
 
-our $DATE = '2019-05-10'; # DATE
+our $DATE = '2019-10-15'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.142'; # VERSION
+our $VERSION = '0.143'; # VERSION
 
 use 5.010;
 use strict;
@@ -51,7 +51,7 @@ parse-bca-statement - Parse BCA internet banking statement
 
 =head1 VERSION
 
-This document describes version 0.142 of parse-bca-statement (from Perl distribution App-IndonesianBankingUtils), released on 2019-05-10.
+This document describes version 0.143 of parse-bca-statement (from Perl distribution App-IndonesianBankingUtils), released on 2019-10-15.
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 

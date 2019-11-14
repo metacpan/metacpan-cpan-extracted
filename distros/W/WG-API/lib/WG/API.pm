@@ -11,11 +11,11 @@ WG::API - Module for work with Wargaming.net Public API
 
 =head1 VERSION
 
-Version v0.11
+Version v0.12
 
 =cut
 
-our $VERSION = 'v0.11';
+our $VERSION = 'v0.12';
 
 =head1 SYNOPSIS
 
@@ -172,9 +172,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: Gitlab's request tracker (report bugs here)
+=item * RT: GitHub's request tracker (report bugs here)
 
-L<https://gitlab.com/cynovg/WG-API/issues>
+L<https://github.com/cynovg/p5-WG-API/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
