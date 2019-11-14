@@ -1,5 +1,9 @@
 Revision history for perl module Test::MonkeyMock
 
+0.12 2019-11-13T09:34:05Z
+
+ - Correctly handle all-uppercase methods
+
 0.11 2018-09-23T15:06:25Z
 
  - add license

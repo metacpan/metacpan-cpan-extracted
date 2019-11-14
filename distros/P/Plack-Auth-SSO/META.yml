@@ -40,6 +40,7 @@ requires:
   Data::Util: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
+  Log::Any: '0'
   Moo: '0'
   Moo::Role: '0'
   Plack: '0'
@@ -52,9 +53,9 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-Auth-SSO/issues
   homepage: https://github.com/LibreCat/Plack-Auth-SSO
   repository: https://github.com/LibreCat/Plack-Auth-SSO.git
-version: '0.0136'
+version: '0.0137'
 x_contributors:
-  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'Nicolas Franck <Nicolas.Franck@ugent.be>'
   - 'Nicolas Franck <njfranck@auster0.ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c526.ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'

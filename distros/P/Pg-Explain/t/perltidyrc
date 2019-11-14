@@ -1,3 +1,4 @@
+--backup-and-modify-in-place
 --backup-file-extension=beforeTidy
 --block-brace-tightness=0
 --brace-tightness=0

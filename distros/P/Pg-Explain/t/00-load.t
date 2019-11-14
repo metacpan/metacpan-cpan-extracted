@@ -1,9 +1,10 @@
 #!perl
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 BEGIN {
     use_ok( 'Pg::Explain' );
+    use_ok( 'Pg::Explain::Analyzer' );
     use_ok( 'Pg::Explain::From' );
     use_ok( 'Pg::Explain::FromJSON' );
     use_ok( 'Pg::Explain::FromText' );

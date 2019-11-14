@@ -1,5 +1,60 @@
-@  changeset:   92:2b1f01b693ae
+@  changeset:   103:fe24c816fd92
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 15:00:25 2019 +0100
+|  summary:     Bump version number to 10
+|
+o  changeset:   102:9883e3551d8a
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 14:59:00 2019 +0100
+|  summary:     Start documenting Version 10 changes
+|
+o  changeset:   101:9e8a64181d26
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 14:47:23 2019 +0100
+|  summary:     Implement very basic error handling via "OVERHEAD E"
+|
+o  changeset:   100:7576dbe56b05
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 13:25:18 2019 +0100
+|  summary:     intersparse KEYSYNC with PING to maintain a "rolling" timeout during lengthy keysyncs
+|
+o  changeset:   99:43f9d2e7b850
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 13:18:49 2019 +0100
+|  summary:     Use unix domain sockets interclacks mode for example slave server 2
+|
+o  changeset:   98:a841804a32ae
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 13:18:15 2019 +0100
+|  summary:     Interclacks can now use unix domain sockets as well
+|
+o  changeset:   97:e2bfe6d5f6f6
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 12:59:48 2019 +0100
+|  summary:     Fix examples
+|
+o  changeset:   96:40634506fa9b
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 12:57:13 2019 +0100
+|  summary:     Only do the clientID stuff on UDS if we actually load IO::Socket::UNIX
+|
+o  changeset:   95:163bcae9f5fb
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 12:45:58 2019 +0100
+|  summary:     Don't use SSL on Unix domain sockets (local connections). Lowers CPU usage and provides shorter round trip time
+|
+o  changeset:   94:ca7ebfe176d5
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Wed Nov 13 11:48:26 2019 +0100
+|  summary:     Update pragmas
+|
+o  changeset:   93:6f31209087b1
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Tue Nov 05 15:05:01 2019 +0100
+|  summary:     Update "Changes" file in preparation for yet another release
+|
+o  changeset:   92:2b1f01b693ae
 |  user:        Rene Schickbauer <cavac@blackmesa>
 |  date:        Tue Nov 05 15:03:21 2019 +0100
 |  summary:     Add the option "socketchmod" to clacks server to automatically chmod the socket file

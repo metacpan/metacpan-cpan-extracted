@@ -2,12 +2,9 @@
 
 Plack::App::GraphQL - Serve GraphQL from Plack / PSGI
 
-https://travis-ci.org/jjn1056/Plack-App-GraphQL
-
 # PROJECT STATUS
-| OS      |  Build status |
-|:-------:|--------------:|
-| Linux   | [![Build Status](https://travis-ci.org/jjn1056/Plack-App-GraphQL.svg?branch=master)](https://travis-ci.org/jjn1056/Plack-App-GraphQL) |
+
+[![Build Status](https://travis-ci.org/jjn1056/Plack-App-GraphQL.svg?branch=master)](https://travis-ci.org/jjn1056/Plack-App-GraphQL)
 [![CPAN version](https://badge.fury.io/pl/Plack-App-GraphQL.svg)](https://metacpan.org/pod/Plack-App-GraphQL) 
 
 # SYNOPSIS
@@ -77,6 +74,12 @@ graphql SDL document that we can build a schema object from.  Makes for easy dem
 An object, hashref or coderef that field resolvers can use to look up requests.  Generally
 the method or hash keys will match the query or mutation keys.  See the examples for
 more.
+
+You can override this at runtime (with for example a bit of middleware) by using the
+'plack.graphql.root\_value' key in the PSGI $env.  This may or my not be considered a
+good practice :)  Some examples suggest always using the $context for stuff like this
+while other examples seem to think its a good idea.  I choose to rather enable this
+ability and let you decide what is right for your application.
 
 ## resolver
 

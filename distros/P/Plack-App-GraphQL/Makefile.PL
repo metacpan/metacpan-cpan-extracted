@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "GraphQL" => "0.33",
     "JSON::MaybeXS" => "1.004000",
+    "Moo" => 0,
     "Plack" => "1.0047",
     "Safe::Isa" => "1.000010",
     "Template::Tiny" => "1.12"
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "GraphQL" => "0.33",
   "HTTP::Request::Common" => 0,
   "JSON::MaybeXS" => "1.004000",
+  "Moo" => 0,
   "Plack" => "1.0047",
   "Plack::Test" => 0,
   "Safe::Isa" => "1.000010",

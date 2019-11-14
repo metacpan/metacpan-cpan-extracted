@@ -42,15 +42,15 @@ lives_ok(
 my $textual = $explain->as_text();
 
 ok( $textual !~ /passwd/, 'anonymize() hides foreign file names (passwd)' );
-ok( $textual !~ /group/, 'anonymize() hides foreign file names (group)' );
+ok( $textual !~ /group/,  'anonymize() hides foreign file names (group)' );
 
-my @files = $textual =~ m{^\s*Foreign File: (.*?)\s*$}mg;
+my @files  = $textual =~ m{^\s*Foreign File: (.*?)\s*$}mg;
 my %counts = ();
 for my $f ( @files ) {
-    $counts{$f}++;
+    $counts{ $f }++;
 }
 
-my @just_counts = sort { $a <=> $b } values %counts;
+my @just_counts   = sort { $a <=> $b } values %counts;
 my $counts_string = join ',', @just_counts;
 ok( $counts_string eq '1,2', 'Same file anonymized to the same string' );
 

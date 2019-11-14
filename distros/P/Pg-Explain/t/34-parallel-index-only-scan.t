@@ -27,9 +27,9 @@ Finalize Aggregate  (cost=23067.12..23067.13 rows=1 width=8) (actual time=85.738
 isa_ok( $explain,           'Pg::Explain' );
 isa_ok( $explain->top_node, 'Pg::Explain::Node' );
 
-is( $explain->top_node->type                                     , 'Finalize Aggregate' , 'Properly extracted top node type' );
-is( $explain->top_node->sub_nodes->[ 0 ]->type                   , 'Gather'             , 'Properly extracted subnode-1' );
-is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type , 'Partial Aggregate'  , 'Properly extracted subnode-1' );
+is( $explain->top_node->type,                                     'Finalize Aggregate', 'Properly extracted top node type' );
+is( $explain->top_node->sub_nodes->[ 0 ]->type,                   'Gather',             'Properly extracted subnode-1' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type, 'Partial Aggregate',  'Properly extracted subnode-1' );
 
 my $parallel = $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ];
 

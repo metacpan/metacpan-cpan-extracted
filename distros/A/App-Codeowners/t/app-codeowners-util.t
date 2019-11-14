@@ -8,11 +8,17 @@ use Path::Tiny qw(path tempdir);
 use Test::More;
 
 can_ok('App::Codeowners::Util', qw{
-    find_nearest_codeowners
+    colorstrip
     find_codeowners_in_directory
-    run_git
+    find_nearest_codeowners
     git_ls_files
     git_toplevel
+    run_command
+    run_git
+    stringf
+    stringify
+    unbackslash
+    zip
 });
 
 my $can_git = _can_git();
@@ -21,16 +27,16 @@ subtest 'git_ls_files' => sub {
     plan skip_all => 'Cannot run git' if !$can_git;
     my $repodir =_setup_git_repo();
 
-    my $r = App::Codeowners::Util::git_ls_files($repodir);
-    is($r, undef, 'git ls-files returns undef when no repo files') or diag explain $r;
+    my (undef, @r) = App::Codeowners::Util::git_ls_files($repodir);
+    is_deeply(\@r, [], 'git ls-files returns [] when no repo files') or diag explain \@r;
 
-    run_git('-C', $repodir, qw{add .});
-    run_git('-C', $repodir, qw{commit -m}, 'initial commit');
+    run_git('-C', $repodir, qw{add .})->wait;
+    run_git('-C', $repodir, qw{commit -m}, 'initial commit')->wait;
 
-    $r = App::Codeowners::Util::git_ls_files($repodir);
-    is_deeply($r, [
+    (undef, @r) = App::Codeowners::Util::git_ls_files($repodir);
+    is_deeply(\@r, [
         qw(a/b/c/bar.txt foo.txt)
-    ], 'git ls-files returns correct repo files') or diag explain $r;
+    ], 'git ls-files returns correct repo files') or diag explain \@r;
 };
 
 subtest 'git_toplevel' => sub {
@@ -45,7 +51,9 @@ subtest 'git_toplevel' => sub {
 };
 
 subtest 'find_nearest_codeowners' => sub {
+    plan skip_all => 'Cannot run git' if !$can_git;
     my $repodir =_setup_git_repo();
+
     $repodir->child('docs')->mkpath;
     my $filepath = _spew_codeowners($repodir->child('docs/CODEOWNERS'));
 
@@ -54,9 +62,10 @@ subtest 'find_nearest_codeowners' => sub {
 };
 
 subtest 'find_codeowners_in_directory' => sub {
+    plan skip_all => 'Cannot run git' if !$can_git;
     my $repodir =_setup_git_repo();
-    $repodir->child('docs')->mkpath;
 
+    $repodir->child('docs')->mkpath;
     my $filepath = _spew_codeowners($repodir->child('docs/CODEOWNERS'));
 
     my $r = App::Codeowners::Util::find_codeowners_in_directory($repodir);
@@ -71,14 +80,16 @@ done_testing;
 exit;
 
 sub _can_git {
-    my ($version) = run_git('--version');
-    return $version;
+    my (undef, $version) = eval { run_git('--version') };
+    note $@ if $@;
+    note "Found: $version" if $version;
+    return $version && $version ge 'git version 1.8.5';     # for -C flag
 }
 
 sub _setup_git_repo {
     my $repodir = tempdir;
 
-    run_git('-C', $repodir, 'init');
+    run_git('-C', $repodir, 'init')->wait;
 
     $repodir->child('foo.txt')->touchpath;
     $repodir->child('a/b/c/bar.txt')->touchpath;

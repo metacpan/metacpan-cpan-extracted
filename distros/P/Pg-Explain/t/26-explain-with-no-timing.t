@@ -10,7 +10,7 @@ use Pg::Explain;
 
 my @plans = (
 
-q{
+    q{
 Aggregate  (cost=22.21..22.22 rows=1 width=0) (actual rows=1 loops=1)
     ->  Hash Join  (cost=5.75..21.93 rows=111 width=0) (actual rows=113 loops=1)
         Hash Cond: (pg_class.oid = pg_index.indrelid)
@@ -23,7 +23,7 @@ Aggregate  (cost=22.21..22.22 rows=1 width=0) (actual rows=1 loops=1)
                     Rows Removed by Filter: 11
 },
 
-q{
+    q{
  Result  (cost=1.06..17.20 rows=314 width=201) (actual rows=0 loops=1)
    One-Time Filter: ($0 > 1000)
    InitPlan 1 (returns $0)
@@ -45,8 +45,9 @@ for my $plan_source ( @plans ) {
     ok( $textual =~ m{\(actual rows=319 loops=1\)}, "Got actual data without timing" );
     if ( $plan_source =~ m{never executed} ) {
         ok( $textual =~ m{never executed}, "Plan is never executed" );
-    } else {
-        ok(1, 'placeholder test, to keep calculation of number of tests simple');
+    }
+    else {
+        ok( 1, 'placeholder test, to keep calculation of number of tests simple' );
     }
 
 }

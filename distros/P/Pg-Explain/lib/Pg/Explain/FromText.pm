@@ -1,19 +1,12 @@
 package Pg::Explain::FromText;
 use strict;
 use Carp;
+use Data::Dumper;
 use Pg::Explain::Node;
 
 =head1 NAME
 
 Pg::Explain::FromText - Parser for text based explains
-
-=head1 VERSION
-
-Version 0.81
-
-=cut
-
-our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -34,6 +27,14 @@ sub new {
     my $self  = bless {}, $class;
     return $self;
 }
+
+=head2 explain
+
+Get/Set master explain object.
+
+=cut
+
+sub explain { my $self = shift; $self->{ 'explain' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
 
 =head2 parse_source
 
@@ -67,8 +68,11 @@ sub parse_source {
     LINE:
     for my $line ( @lines ) {
 
+        # Remove trailing whitespace - it makes next line matches MUCH faster.
+        $line =~ s/\s*\z//;
+
         # There could be stray " at the end. No idea why, but some people paste such explains on explain.depesz.com
-        $line =~ s/"\z//;
+        $line =~ s/\s*"\z//;
 
         if (
             $line =~ m{
@@ -89,13 +93,16 @@ sub parse_source {
            )
         {
             my $new_node = Pg::Explain::Node->new( %+ );
+            $new_node->explain( $self->explain );
             if ( defined $+{ 'never_executed' } ) {
                 $new_node->actual_loops( 0 );
                 $new_node->never_executed( 1 );
             }
             my $element = { 'node' => $new_node, 'subelement-type' => 'subnode', };
 
-            my $prefix_length = length $+{ 'prefix' };
+            my $prefix = $+{ 'prefix' };
+            $prefix =~ s/->.*//;
+            my $prefix_length = length $prefix;
 
             if ( 0 == scalar keys %element_at_depth ) {
                 $element_at_depth{ $prefix_length } = $element;
@@ -140,7 +147,7 @@ sub parse_source {
             my $maximal_depth    = ( sort { $b <=> $a } keys %element_at_depth )[ 0 ];
             my $previous_element = $element_at_depth{ $maximal_depth };
 
-            $element_at_depth{ length $prefix } = {
+            $element_at_depth{ 1 + length $prefix } = {
                 'node'            => $previous_element->{ 'node' },
                 'subelement-type' => lc $type,
             };
@@ -164,14 +171,16 @@ sub parse_source {
         }
         elsif ( $line =~ m{ \A \s* (Planning|Execution) \s+ time: \s+ (\d+\.\d+) \s+ ms \s* \z }xmsi ) {
             my ( $type, $time ) = ( $1, $2 );
-            next unless $top_node;
-            $top_node->planning_time( $2 )  if 'planning' eq lc( $type );
-            $top_node->execution_time( $2 ) if 'execution' eq lc( $type );
+            $self->explain->planning_time( $time )  if 'planning' eq lc( $type );
+            $self->explain->execution_time( $time ) if 'execution' eq lc( $type );
+        }
+        elsif ( $line =~ m{ \A \s* Total \s+ runtime: \s+ (\d+\.\d+) \s+ ms \s* \z }xmsi ) {
+            my ( $time ) = ( $1 );
+            $self->explain->total_runtime( $time );
         }
         elsif ( $line =~ m{ \A \s* Trigger \s+ (.*) : \s+ time=(\d+\.\d+) \s+ calls=(\d+) \s* \z }xmsi ) {
             my ( $name, $time, $calls ) = ( $1, $2, $3 );
-            next unless $top_node;
-            $top_node->add_trigger_time(
+            $self->explain->add_trigger_time(
                 {
                     'name'  => $name,
                     'time'  => $time,

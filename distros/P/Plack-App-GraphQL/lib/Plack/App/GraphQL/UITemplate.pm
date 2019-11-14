@@ -35,6 +35,12 @@ has json_encoder => (
   },
 );
 
+has graphiql_version => (
+  is => 'ro',
+  required => 1,
+  default => 'latest',
+);
+
 sub safe_serialize {
   my ($self, $data) = @_;
   if($data) {
@@ -56,7 +62,7 @@ sub process {
 sub args_from_query {
   my ($self, $query) = @_;
   return my %args = (
-    graphiql_version => 'latest',
+    graphiql_version => $self->graphiql_version,
     queryString      => $self->safe_serialize( $query->{'query'} ),
     operationName    => $self->safe_serialize( $query->{'operationName'} ),
     resultString     => $self->safe_serialize( $query->{'result'} ),

@@ -1,0 +1,9 @@
+[
+  [
+    'Limit'
+  ],
+  [
+    'Limit',
+    'Seq Scan'
+  ]
+]

@@ -1,0 +1,15 @@
+# This file is used by cpanm.
+# To install dependencies, run >> cpanm --local-lib ~/perl5 --installdeps . <<, or something similar, depending on your setup.
+#
+# More details:
+# https://metacpan.org/pod/cpanfile
+# https://metacpan.org/pod/cpanm
+
+requires 'Clone';
+requires 'Digest::SHA';
+requires 'HOP::Lexer';
+requires 'JSON';
+requires 'XML::Simple';
+requires 'YAML';
+
+# vim: set ft=perl:

@@ -1,15 +1,16 @@
 package Net::Clacks::Server;
 #---AUTOPRAGMASTART---
-use 5.010_001;
+use 5.020;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
-use English qw(-no_match_vars);
+use English;
 use Carp;
-our $VERSION = 9;
-use Fatal qw( close );
+our $VERSION = 10;
+use autodie qw( close );
 use Array::Contains;
+use utf8;
 #---AUTOPRAGMAEND---
 
 use XML::Simple;
@@ -31,6 +32,8 @@ my %overheadflags = (
     A => "auth_token", # Authentication token
     O => "auth_ok", # Authentication OK
     F => "auth_failed", # Authentication FAILED
+
+    E => 'error_message', # Server to client error message
 
     C => "close_all_connections",
     D => "discard_message",
@@ -62,6 +65,7 @@ BEGIN {
     
             return ${*$self}{'__client_id'} || ''; ## no critic (References::ProhibitDoubleSigils)
         };
+
     }
     
 }
@@ -158,7 +162,7 @@ sub init {
         }
     }
 
-    if(defined($config->{socket})) {
+    if(defined($config->{socket}) || defined($self->{config}->{master}->{socket})) {
         my $udsloaded = 0;
         eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
             require IO::Socket::UNIX;
@@ -167,6 +171,27 @@ sub init {
         if(!$udsloaded) {
             croak("Specified a unix domain socket, but i couldn't load IO::Socket::UNIX!");
         }
+
+        # Add the ClientID stuff to Unix domain sockets as well. We don't do this in the BEGIN{} block
+        # since we are not yet sure we are going to load IO::Socket::UNIX in the first place
+        {
+            no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
+            *{"IO::Socket::UNIX::_setClientID"} = sub {
+                my ($self, $cid) = @_;
+        
+                ${*$self}{'__client_id'} = $cid; ## no critic (References::ProhibitDoubleSigils)
+                return;
+            };
+            
+            *{"IO::Socket::UNIX::_getClientID"} = sub {
+                my ($self) = @_;
+        
+                return ${*$self}{'__client_id'} || ''; ## no critic (References::ProhibitDoubleSigils)
+            };
+        }
+    }
+
+    if(defined($config->{socket})) {
         foreach my $socket (@{$config->{socket}}) {
             if(-S $socket) {
                 print "Removing old unix domain socket file $socket\n";
@@ -271,30 +296,48 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             $keepRunning = 0;
         }
 
-        if(defined($self->{config}->{master})) {
-            # We are in client mode. We need to add an interclacks link
-            my $mcid = $self->{config}->{master}->{ip}->[0] . ':' . $self->{config}->{master}->{port};
+        # We are in client mode. We need to add an interclacks link
+        if(defined($self->{config}->{master}->{socket}) || defined($self->{config}->{master}->{ip})) {
+            my $mcid;
+            if(defined($self->{config}->{master}->{socket})) {
+                $mcid = 'unixdomainsocket:interclacksmaster';
+            } else {
+                $mcid = $self->{config}->{master}->{ip}->[0] . ':' . $self->{config}->{master}->{port};
+            }
             if(!defined($clients{$mcid}) && $nextinterclackscheck < time) {
                 $nextinterclackscheck = time + $self->{config}->{interclacksreconnecttimeout} + int(rand(10));
 
                 print "Connect to master\n";
-                my $msocket = IO::Socket::IP->new(
-                    PeerHost => $self->{config}->{master}->{ip}->[0],
-                    PeerPort => $self->{config}->{master}->{port},
-                    Type => SOCK_STREAM,
-                    Timeout => 5,
-                );
+                my $msocket;
+
+                if(defined($self->{config}->{master}->{socket})) {
+                    $msocket = IO::Socket::UNIX->new(
+                        Peer => $self->{config}->{master}->{socket}->[0],
+                        Type => SOCK_STREAM,
+                    );
+                } else {
+                    $msocket = IO::Socket::IP->new(
+                        PeerHost => $self->{config}->{master}->{ip}->[0],
+                        PeerPort => $self->{config}->{master}->{port},
+                        Type => SOCK_STREAM,
+                        Timeout => 5,
+                    );
+                }
                 if(!defined($msocket)) {
                     print STDERR "Can't connect to MASTER via interclacks!\n";
                 } else {
                     print "connected to master\n";
 
-                    my $encrypted = IO::Socket::SSL->start_SSL($msocket,
-                                                               SSL_verify_mode => SSL_VERIFY_NONE,
-                    );
-                    if(!$encrypted) {
-                        print "startSSL failed: ", $SSL_ERROR, "\n";
-                        next;
+                    if(ref $msocket ne 'IO::Socket::UNIX') {
+                        # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
+                        # There is simply no point in running it over a local socket.
+                        my $encrypted = IO::Socket::SSL->start_SSL($msocket,
+                                                                   SSL_verify_mode => SSL_VERIFY_NONE,
+                        );
+                        if(!$encrypted) {
+                            print "startSSL failed: ", $SSL_ERROR, "\n";
+                            next;
+                        }
                     }
 
                     $msocket->blocking(0);
@@ -310,8 +353,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                                      "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...send Auth token
                                      "OVERHEAD I 1\r\n",                                        # ...and turn interclacks master mode ON on remote side
                         clientinfo => 'Interclacks link',
-                        host => $self->{config}->{master}->{ip}->[0],
-                        port => $self->{config}->{master}->{port},
                         interclacks => 1,
                         interclacksclient => 1,
                         lastinterclacksping => time,
@@ -320,6 +361,11 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         authok => 0,
                         failcount => 0,
                     );
+
+                    if(defined($self->{config}->{master}->{ip})) {
+                        $tmp{host} = $self->{config}->{master}->{ip}->[0];
+                        $tmp{port} = $self->{config}->{master}->{port};
+                    }
                     $clients{$mcid} = \%tmp;
                     $msocket->_setClientID($mcid);
                     $selector->add($msocket);
@@ -348,27 +394,31 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     }
                 }
 
-                my $encrypted = IO::Socket::SSL->start_SSL($clientsocket,
-                                                           SSL_server => 1,
-                                                           SSL_cert_file => $self->{config}->{ssl}->{cert},
-                                                           SSL_key_file => $self->{config}->{ssl}->{key},
-                                                           SSL_cipher_list => 'ALL:!ADH:!RC4:+HIGH:+MEDIUM:!LOW:!SSLv2:!SSLv3!EXPORT',
-                                                           SSL_create_ctx_callback => sub {
-                                                                my $ctx = shift;
+                if(ref $clientsocket ne 'IO::Socket::UNIX') {
+                    # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
+                    # There is simply no point in running it over a local socket.
+                    my $encrypted = IO::Socket::SSL->start_SSL($clientsocket,
+                                                               SSL_server => 1,
+                                                               SSL_cert_file => $self->{config}->{ssl}->{cert},
+                                                               SSL_key_file => $self->{config}->{ssl}->{key},
+                                                               SSL_cipher_list => 'ALL:!ADH:!RC4:+HIGH:+MEDIUM:!LOW:!SSLv2:!SSLv3!EXPORT',
+                                                               SSL_create_ctx_callback => sub {
+                                                                    my $ctx = shift;
 
-                                                                # Enable workarounds for broken clients
-                                                                Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL); ## no critic (Subroutines::ProhibitAmpersandSigils)
+                                                                    # Enable workarounds for broken clients
+                                                                    Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL); ## no critic (Subroutines::ProhibitAmpersandSigils)
 
-                                                                # Disable session resumption completely
-                                                                Net::SSLeay::CTX_set_session_cache_mode($ctx, $SSL_SESS_CACHE_OFF);
+                                                                    # Disable session resumption completely
+                                                                    Net::SSLeay::CTX_set_session_cache_mode($ctx, $SSL_SESS_CACHE_OFF);
 
-                                                                # Disable session tickets
-                                                                Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_NO_TICKET); ## no critic (Subroutines::ProhibitAmpersandSigils)
-                                                            },
-                );
-                if(!$encrypted) {
-                    print "startSSL failed: ", $SSL_ERROR, "\n";
-                    next;
+                                                                    # Disable session tickets
+                                                                    Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_NO_TICKET); ## no critic (Subroutines::ProhibitAmpersandSigils)
+                                                                },
+                    );
+                    if(!$encrypted) {
+                        print "startSSL failed: ", $SSL_ERROR, "\n";
+                        next;
+                    }
                 }
 
                 $clientsocket->blocking(0);
@@ -535,7 +585,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     if($clients{$cid}->{buffer} =~ /^CLACKS\ (.+)/) {
                         $clients{$cid}->{clientinfo} = $1;
                         $clients{$cid}->{clientinfo} =~ s/\;/\_/g;
-                        print "Client at ", $clients{$cid}->{host}, ':', $clients{$cid}->{port}, " identified as ", $clients{$cid}->{clientinfo}, "\n";
+                        print "Client at ", $cid, " identified as ", $clients{$cid}->{clientinfo}, "\n";
                         $clients{$cid}->{buffer} = '';
                         next;
                     }
@@ -588,10 +638,12 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                                 # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
                                 foreach my $ckey (sort keys %clackscache) {
                                     $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
+                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
                                 }
                                 foreach my $ckey (sort keys %clackscachetime) {
                                     next if(defined($clackscache{$ckey}));
                                     $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
+                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
                                 }
                             }
                             $parsedflags{forward_message} = 0; # Don't forward
@@ -622,6 +674,11 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         if($parsedflags{no_logging}) {
                             $nodebug = 1;
                         }
+
+                        if($parsedflags{error_message}) {
+                            print STDERR 'ERROR from ', $cid, ': ', $value, "\n";
+                        }
+
                         if($parsedflags{set_interclacks_mode}) {
                             $newflags{forward_message} = 0;
                             $newflags{return_to_sender} = 0;
@@ -640,10 +697,12 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                                 #$clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
                                 foreach my $ckey (sort keys %clackscache) {
                                     $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
+                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
                                 }
                                 foreach my $ckey (sort keys %clackscachetime) {
                                     next if(defined($clackscache{$ckey}));
                                     $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
+                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
                                 }
                                 $clients{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
                                 $clients{$cid}->{outbuffer} .= "PING\r\n";
@@ -861,6 +920,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     } else {
                         print STDERR "ERROR Unknown_command ", $clients{$cid}->{buffer}, "\r\n";
                         $sendinterclacks = 0;
+                        $clients{$cid}->{outbuffer} .= "OVERHEAD E unknown_command " . $clients{$cid}->{buffer} . "\r\n";
                     }
 
                     # forward interclacks messages

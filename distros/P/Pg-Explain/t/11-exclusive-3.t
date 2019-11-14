@@ -26,5 +26,5 @@ my $top = $explain->top_node;
 ok(
     abs( $top->total_exclusive_time - 14.114 ) < 0.001,
     'Total exclusive time (14.114) does exclude subnodes'
-);
+  );
 

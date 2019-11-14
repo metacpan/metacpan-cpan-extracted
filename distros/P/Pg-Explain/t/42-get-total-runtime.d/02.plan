@@ -1,0 +1,2 @@
+Result  (cost=0.00..0.26 rows=1 width=0) (actual time=1.247..1.248 rows=1 loops=1)
+Total runtime: 1.266 ms

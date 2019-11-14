@@ -10,7 +10,7 @@ use strict;
 
 use App::Codeowners;
 
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.43'; # VERSION
 
 App::Codeowners->main(@ARGV);
 
@@ -26,13 +26,15 @@ git-codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.41
+version 0.43
 
 =head1 SYNOPSIS
 
     git-codeowners [--version|--help|--manual]
 
-    git-codeowners [show] [--format FORMAT] [--[no-]project] [PATH...]
+    git-codeowners [show] [--format FORMAT] [--owner OWNER]...
+                   [--pattern PATTERN]... [--[no-]patterns]
+                   [--project PROJECT]... [--[no-]projects] [PATH...]
 
     git-codeowners owners [--format FORMAT] [--pattern PATTERN]
 
@@ -128,17 +130,32 @@ Does not yet support Zsh...
 
 =head2 show
 
-    git-codeowners [show] [--format FORMAT] [--[no-]project] [PATH...]
+    git-codeowners [show] [--format FORMAT] [--owner OWNER]...
+                   [--pattern PATTERN]... [--[no-]patterns]
+                   [--project PROJECT]... [--[no-]projects] [PATH...]
 
 Show owners of one or more files in a repo.
+
+If C<--owner>, C<--project>, C<--pattern> are set, only show files with matching
+criteria. These can be repeated.
+
+Use C<--patterns> to also show the matching pattern associated with each file.
+
+By default the output might show associated projects if the C<CODEOWNERS> file
+defines them. You can control this by explicitly using C<--projects> or
+C<--no-projects> to always show or always hide defined projects, respectively.
 
 =head2 owners
 
     git-codeowners owners [--format FORMAT] [--pattern PATTERN]
 
+List all owners defined in the F<CODEOWNERS> file.
+
 =head2 patterns
 
     git-codeowners patterns [--format FORMAT] [--owner OWNER]
+
+List all patterns defined in the F<CODEOWNERS> file.
 
 =head2 create
 
@@ -189,7 +206,7 @@ C<FORMAT> - Custom format (see below)
 
 =back
 
-=head2 Custom
+=head2 Format string
 
 You can specify a custom format using printf-like format sequences. These are the items that can be
 substituted:
@@ -250,7 +267,7 @@ C<nocolor> - Do not colorize replacement string.
 
 =back
 
-=head2 Table
+=head2 Format table
 
 Table formatting can be done by one of several different modules, each with its own features and
 bugs. The default module is L<Text::Table::Tiny>, but this can be overridden using the
@@ -259,6 +276,16 @@ C<PERL_TEXT_TABLE> environment variable if desired, like this:
     PERL_TEXT_TABLE=Text::Table::HTML git-codeowners -f table
 
 The list of available modules is at L<Text::Table::Any/@BACKENDS>.
+
+=head1 CAVEATS
+
+=over 4
+
+=item *
+
+Some commands require F<git> (at least version 1.8.5).
+
+=back
 
 =head1 BUGS
 

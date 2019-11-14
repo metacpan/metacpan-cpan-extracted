@@ -1,15 +1,16 @@
 package Net::Clacks;
 #---AUTOPRAGMASTART---
-use 5.010_001;
+use 5.020;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
-use English qw(-no_match_vars);
+use English;
 use Carp;
-our $VERSION = 9;
-use Fatal qw( close );
+our $VERSION = 10;
+use autodie qw( close );
 use Array::Contains;
+use utf8;
 #---AUTOPRAGMAEND---
 use Net::Clacks::Client;
 use Net::Clacks::Server;
@@ -96,6 +97,29 @@ is generated internally B<after> a new connection has been established, except o
 connection. Technically, at that point in time L<Net::Clacks::Client> has spooled the Auth request
 to the server, but may not have recieved the answer yet, but i'll assume here that you have configured
 your client correctly.
+
+=head2 VERSION 9
+
+Version 9 added the socketchmod option to chmod() the socket file so other users can connect to the socket, too.
+
+=head2 VERSION 10
+
+WARNING: BREAKING CHANGES! It is required to update all servers and clients at the same time.
+
+Version 10 disables SSL on Unix Domain Sockets for better local performance. This version also adds the
+ability to run interclacks through Unix Domain Sockets, in case you want to run a master/slave setup locally. This
+should not really affect security, though. If an attacker has enough permissions to spy on a Unix Domain Socket,
+they will most likely also have the ability to gain access to the configuration files and SSL keys of the Clacks server
+running on the same host..
+
+This version also has a slightly improved timeout handling when a slave reconnects to the master at the cost
+of a bit more traffic during the initial setup phase.
+
+In the protocol, error messages have been implemented via the "E" flag in the "OVERHEAD" command. L<Net::Clacks::Client>
+forwards this to the client software via a clacks message of type "error_message".
+
+In theory, the only *breaking* incompatible change is contained in handling Unix Domain Sockets. You could (try to) upgrade
+to Version 10 client-by-client if you don't use Unix Domain Sockets, but this is neither tested nor recommended.
 
 =head1 PROTOCOL
 

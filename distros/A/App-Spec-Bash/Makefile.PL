@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "App::Spec" => "0.013",
     "App::Spec::Run::Cmd" => 0,
     "Data::Dumper" => 0,
+    "Exporter" => 0,
     "File::Path" => 0,
     "FindBin" => 0,
     "base" => 0,
@@ -44,7 +45,7 @@ my %WriteMakefileArgs = (
     "YAML::PP" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "App::Spec" => "0.013",
   "App::Spec::Run::Cmd" => 0,
   "Data::Dumper" => 0,
+  "Exporter" => 0,
   "File::Path" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,

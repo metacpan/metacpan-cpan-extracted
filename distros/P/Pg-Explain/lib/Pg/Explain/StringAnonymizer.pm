@@ -9,14 +9,6 @@ use strict;
 
 Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
-=head1 VERSION
-
-Version 0.81
-
-=cut
-
-our $VERSION = '0.81';
-
 =head1 SYNOPSIS
 
 This module provides a way to turn defined set of strings into anonymized version of it, that has 4 properties:

@@ -9,7 +9,7 @@ use autodie;
 use Pg::Explain;
 
 my @plans = (
-q{
+    q{
                                                                        QUERY PLAN                                                                        
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
  HashSetOp Intersect All  (cost=0.27..177.83 rows=341 width=8) (actual time=10.922..10.922 rows=0 loops=1)
@@ -24,7 +24,7 @@ q{
  Execution time: 11.060 ms
 (10 rows)
 },
-q{
+    q{
                       QUERY PLAN                       
 -------------------------------------------------------
  [                                                    +
@@ -140,26 +140,26 @@ q{
 
 plan 'tests' => 16;
 
-my $explain = Pg::Explain->new( 'source' => $plans[0] );
+my $explain = Pg::Explain->new( 'source' => $plans[ 0 ] );
 isa_ok( $explain,           'Pg::Explain' );
 isa_ok( $explain->top_node, 'Pg::Explain::Node' );
 
-is( $explain->top_node->type, 'HashSetOp Intersect All' );
-is( $explain->top_node->sub_nodes->[0]->type, 'Append' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->type, 'Subquery Scan' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[1]->type, 'Subquery Scan' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->scan_on->{ 'subquery_name' }, '*SELECT* 1' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[1]->scan_on->{ 'subquery_name' }, '*SELECT* 2' );
+is( $explain->top_node->type,                                                             'HashSetOp Intersect All' );
+is( $explain->top_node->sub_nodes->[ 0 ]->type,                                           'Append' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type,                         'Subquery Scan' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 1 ]->type,                         'Subquery Scan' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->scan_on->{ 'subquery_name' }, '*SELECT* 1' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 1 ]->scan_on->{ 'subquery_name' }, '*SELECT* 2' );
 
-$explain = Pg::Explain->new( 'source' => $plans[1] );
+$explain = Pg::Explain->new( 'source' => $plans[ 1 ] );
 isa_ok( $explain,           'Pg::Explain' );
 isa_ok( $explain->top_node, 'Pg::Explain::Node' );
 
-is( $explain->top_node->type, 'SetOp' );
-is( $explain->top_node->sub_nodes->[0]->type, 'Append' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->type, 'Subquery Scan' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[1]->type, 'Subquery Scan' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->scan_on->{ 'subquery_name' }, '*SELECT* 1' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[1]->scan_on->{ 'subquery_name' }, '*SELECT* 2' );
+is( $explain->top_node->type,                                                             'SetOp' );
+is( $explain->top_node->sub_nodes->[ 0 ]->type,                                           'Append' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type,                         'Subquery Scan' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 1 ]->type,                         'Subquery Scan' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->scan_on->{ 'subquery_name' }, '*SELECT* 1' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 1 ]->scan_on->{ 'subquery_name' }, '*SELECT* 2' );
 
 exit;

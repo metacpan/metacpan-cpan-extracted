@@ -1,3 +1,11 @@
+0.22.2 2019-11-13 18:45:20 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - perl 5.0.22 is ok
+
+0.22.1 2019-11-12 15:09:47 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - use the controllers log if possible to provied call context information in guiplugins
+
 0.22.0 2019-11-06 10:18:12 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - restructure javascript for screen setup to allow override of header and footer

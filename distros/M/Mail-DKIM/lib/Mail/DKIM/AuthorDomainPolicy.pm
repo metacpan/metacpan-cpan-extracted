@@ -58,7 +58,10 @@ sub fetch {
     my $class = shift;
     my %prms  = @_;
 
-    my $self = eval { $class->SUPER::fetch(%prms) };
+    my $self = eval {
+        local $SIG{__DIE__};
+        $class->SUPER::fetch(%prms);
+    };
     my $E = $@;
 
     if ( $self && !$self->is_implied_default_policy ) {

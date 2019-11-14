@@ -9,7 +9,7 @@ use Plack::Request;
 use Plack::Session;
 use JSON;
 
-our $VERSION = "0.0136";
+our $VERSION = "0.0137";
 
 with "Plack::Auth::SSO";
 
@@ -90,13 +90,19 @@ sub to_app {
 
         my $auth_sso = $self->get_auth_sso($session);
 
+        if( $self->log()->is_debug() ){
+
+            $self->log()->debugf( "session: %s", $session->dump() );
+            $self->log()->debugf( "session_key for auth_sso: %s", $self->session_key() );
+
+        }
+
         #already got here before
         if (is_hash_ref($auth_sso)) {
 
-            return [
-                302, [Location => $self->uri_for($self->authorization_path)],
-                []
-            ];
+            $self->log()->debug( "auth_sso already present" );
+
+            return $self->redirect_to_authorization();
 
         }
 
@@ -105,7 +111,19 @@ sub to_app {
         my $shib_application_id = $self->request_param( $env, $self->shib_application_id_field );
         my $uid = $self->request_param( $env, $self->uid_field );
 
+        if( $self->log()->is_debug() ){
+
+            $self->log()->debugf( "shib_session_id: %s", $shib_session_id );
+            $self->log()->debugf( "shib_application_id: %s", $shib_application_id );
+            $self->log()->debugf( "uid: %s", $uid );
+
+        }
+
         unless ( is_string( $shib_session_id ) && is_string( $shib_application_id ) && is_string($uid) ) {
+
+            $self->log()->error(
+                "either shib_session_id, shib_application_id or uid is not present: not authorized"
+            );
 
             return [
                 401, [ "Content-Type" => "text/plain" ], [ "Unauthorized" ]
@@ -147,13 +165,7 @@ sub to_app {
             }
         );
 
-        return [
-            302,
-            [Location => $self->uri_for($self->authorization_path)],
-            []
-        ];
-
-
+        $self->redirect_to_authorization();
 
     };
 }
@@ -434,6 +446,12 @@ This module merely convert these attributes.
     </VirtualHost>
 
 =back
+
+=head1 LOGGING
+
+All subclasses of L<Plack::Auth::SSO> use L<Log::Any>
+to log messages to the category that equals the current
+package name.
 
 =head1 AUTHOR
 

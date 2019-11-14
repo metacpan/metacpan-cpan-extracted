@@ -119,6 +119,6 @@ lives_ok(
 );
 
 ok( $explain->as_text !~ /mix_cliente_compliance|mix_relatorio_up|vendedor_loja|vendedor|public/, 'anonymize() hides table names' );
-ok( $explain->as_text !~ /cnpj_cliente|regiao/,                                                   'anonymize() hides column names' );
+ok( $explain->as_text !~ /cnpj_cliente|regiao/, 'anonymize() hides column names' );
 
 exit;

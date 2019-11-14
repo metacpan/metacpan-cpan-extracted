@@ -15,12 +15,15 @@ our @EXPORT_OK = qw(
     find_nearest_codeowners
     git_ls_files
     git_toplevel
+    run_command
     run_git
     stringf
+    stringify
     unbackslash
+    zip
 );
 
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.43'; # VERSION
 
 
 sub find_nearest_codeowners {
@@ -51,49 +54,50 @@ sub find_codeowners_in_directory {
     }
 }
 
-sub run_git {
-    my @cmd = ('git', @_);
+sub run_command {
+    my $filter;
+    $filter = pop if ref($_[-1]) eq 'CODE';
 
-    require IPC::Open2;
+    print STDERR "# @_\n" if $ENV{GIT_CODEOWNERS_DEBUG};
 
     my ($child_in, $child_out);
-    my $pid = IPC::Open2::open2($child_out, $child_in, @cmd);
+    require IPC::Open2;
+    my $pid = IPC::Open2::open2($child_out, $child_in, @_);
     close($child_in);
 
     binmode($child_out, ':encoding(UTF-8)');
-    chomp(my @lines = <$child_out>);
 
-    waitpid($pid, 0);
-    return if $? != 0;
+    my $proc = App::Codeowners::Util::Process->new(
+        pid     => $pid,
+        fh      => $child_out,
+        filter  => $filter,
+    );
 
-    return @lines;
+    return wantarray ? ($proc, @{$proc->all}) : $proc;
+}
+
+sub run_git {
+    return run_command('git', @_);
 }
 
 sub git_ls_files {
     my $dir = shift || '.';
+    return run_git('-C', $dir, 'ls-files', @_, \&_unescape_git_filepath);
+}
 
-    my @files = run_git('-C', $dir, qw{ls-files}, @_);
-
-    return undef if !@files;    ## no critic (Subroutines::ProhibitExplicitReturn)
-
-    # Depending on git's "core.quotepath" config, non-ASCII chars may be
-    # escaped (identified by surrounding dquotes), so try to unescape.
-    for my $file (@files) {
-        next if $file !~ /^"(.+)"$/;
-        $file = $1;
-        $file = unbackslash($file);
-        $file = decode('UTF-8', $file);
-    }
-
-    return \@files;
+# Depending on git's "core.quotepath" config, non-ASCII chars may be
+# escaped (identified by surrounding dquotes), so try to unescape.
+sub _unescape_git_filepath {
+    return $_ if $_ !~ /^"(.+)"$/;
+    return decode('UTF-8', unbackslash($1));
 }
 
 sub git_toplevel {
     my $dir = shift || '.';
 
-    my ($path) = run_git('-C', $dir, qw{rev-parse --show-toplevel});
+    my ($proc, $path) = run_git('-C', $dir, qw{rev-parse --show-toplevel});
 
-    return if !$path;
+    return if $proc->wait != 0 || !$path;
     return path($path);
 }
 
@@ -101,6 +105,22 @@ sub colorstrip {
     my $str = shift || '';
     $str =~ s/\e\[[\d;]*m//g;
     return $str;
+}
+
+sub stringify {
+    my $item = shift;
+    return ref($item) eq 'ARRAY' ? join(',', @$item) : $item;
+}
+
+# The zip code is from List::SomeUtils (thanks DROLSKY), copied just so as not
+# to bring in the extra dependency.
+sub zip (\@\@) {    ## no critic (Subroutines::ProhibitSubroutinePrototypes)
+    my $max = -1;
+    $max < $#$_ && ( $max = $#$_ ) foreach @_;
+    map {
+        my $ix = $_;
+        map $_->[$ix], @_;
+    } 0 .. $max;
 }
 
 # The stringf code is from String::Format (thanks SREZIC), with changes:
@@ -195,6 +215,57 @@ sub unbackslash {
     return $str;
 }
 
+{
+    package App::Codeowners::Util::Process;
+
+    sub new {
+        my $class = shift;
+        return bless {@_}, $class;
+    }
+
+    sub next {
+        my $self = shift;
+        my $line = readline($self->{fh});
+        if (defined $line) {
+            chomp $line;
+            if (my $filter = $self->{filter}) {
+                local $_ = $line;
+                $line = $filter->($line);
+            }
+        }
+        $line;
+    }
+
+    sub all {
+        my $self = shift;
+        chomp(my @lines = readline($self->{fh}));
+        if (my $filter = $self->{filter}) {
+            $_ = $filter->($_) for @lines;
+        }
+        \@lines;
+    }
+
+    sub wait {
+        my $self = shift;
+        my $pid  = $self->{pid} or return;
+        if (my $fh = $self->{fh}) {
+            close($fh);
+            delete $self->{fh};
+        }
+        waitpid($pid, 0);
+        my $status = $?;
+        print STDERR "# -> status $status\n" if $ENV{GIT_CODEOWNERS_DEBUG};
+        delete $self->{pid};
+        return $status;
+    }
+
+    sub DESTROY {
+        my ($self, $global_destruction) = @_;
+        return if $global_destruction;
+        $self->wait;
+    }
+}
+
 1;
 
 __END__
@@ -209,7 +280,7 @@ App::Codeowners::Util - Grab bag of utility subs for Codeowners modules
 
 =head1 VERSION
 
-version 0.41
+version 0.43
 
 =head1 DESCRIPTION
 

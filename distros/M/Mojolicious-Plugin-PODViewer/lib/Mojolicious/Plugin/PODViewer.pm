@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::PODViewer;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: POD renderer plugin
 
 #pod =encoding utf8
@@ -229,7 +229,7 @@ sub _html {
 
   # Try to find a title
   my $title = 'Perldoc';
-  $dom->find('h1 + p')->first(sub { $title = shift->text });
+  $dom->find('h1 + p')->first(sub { $title = shift->all_text });
 
   # Combine everything to a proper response
   $c->content_for(perldoc => "$dom");
@@ -278,7 +278,7 @@ Mojolicious::Plugin::PODViewer - POD renderer plugin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -436,7 +436,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords brad Oleg Zoffix Znet
+=for stopwords brad CandyAngel Oleg Tekki Zoffix Znet
 
 =over 4
 
@@ -446,7 +446,15 @@ brad <brad@clickmagick.com>
 
 =item *
 
+CandyAngel <candyangel@electricjungle.org>
+
+=item *
+
 Oleg <verdrehung@gmail.com>
+
+=item *
+
+Tekki <tekki@tekki.ch>
 
 =item *
 
@@ -478,11 +486,11 @@ __DATA__
 
 @@ podviewer/perldoc.html.ep
 <div class="crumbs">
-    % my $path;
+    % my $path = '';
     % for my $part (split '/', $module) {
         %= '::' if $path
-        % $path .= "/$part";
-        %= link_to $part => 'plugin.podviewer', { module => $module }
+        % $path .= $path ? "/$part" : $path;
+        %= link_to $part => 'plugin.podviewer', { module => $part }
     % }
     <span class="more">
         (<%= link_to 'source' => 'plugin.podviewer',

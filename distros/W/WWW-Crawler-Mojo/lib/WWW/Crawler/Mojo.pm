@@ -8,7 +8,7 @@ use WWW::Crawler::Mojo::UserAgent;
 use WWW::Crawler::Mojo::ScraperUtil qw{
   collect_urls_css html_handler_presets reduce_html_handlers resolve_href decoded_body};
 use Mojo::Message::Request;
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 has clock_speed       => 0.25;
 has html_handlers     => sub { html_handler_presets() };
@@ -176,19 +176,13 @@ sub _make_child {
 
   return unless ($resolved->scheme =~ qr{^(http|https|ftp|ws|wss)$});
 
-  my $child
-    = $job->child(url => $resolved, literal_uri => $url, context => $context);
+  $resolved->query->append($params) if ($params && $method eq 'GET');
+
+  my $child = $job->child(_url => $resolved, literal_uri => $url,
+    _context => $context);
 
   $child->method($method) if $method;
-
-  if ($params) {
-    if ($method eq 'GET') {
-      $child->url->query->append($params);
-    }
-    else {
-      $child->tx_params($params);
-    }
-  }
+  $child->tx_params($params) if ($params && $method eq 'POST');
 
   return $child;
 }

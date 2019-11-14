@@ -1,0 +1,45 @@
+{
+  'execution_time' => '0.842',
+  'planning_time' => '0.072',
+  'top_node' => {
+    'actual_loops' => '1',
+    'actual_rows' => '0',
+    'actual_time_first' => '0.504',
+    'actual_time_last' => '0.505',
+    'estimated_row_width' => '24',
+    'estimated_rows' => '1',
+    'estimated_startup_cost' => '0',
+    'estimated_total_cost' => '0.01',
+    'is_analyzed' => 1,
+    'scan_on' => {
+      'table_name' => 'foo'
+    },
+    'sub_nodes' => [
+      {
+        'actual_loops' => '1',
+        'actual_rows' => '1',
+        'actual_time_first' => '0.019',
+        'actual_time_last' => '0.02',
+        'estimated_row_width' => '24',
+        'estimated_rows' => '1',
+        'estimated_startup_cost' => '0',
+        'estimated_total_cost' => '0.01',
+        'is_analyzed' => 1,
+        'type' => 'Result'
+      }
+    ],
+    'type' => 'Insert'
+  },
+  'trigger_times' => [
+    {
+      'calls' => '1',
+      'name' => 'foo_system_time_generated_always',
+      'time' => '0.401'
+    },
+    {
+      'calls' => '1',
+      'name' => 'foo_system_time_write_history',
+      'time' => '0.260'
+    }
+  ]
+}

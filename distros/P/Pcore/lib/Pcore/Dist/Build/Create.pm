@@ -39,7 +39,7 @@ sub _build_tmpl_params ($self) {
         copyright_year          => P->date->now->year,
         copyright_holder        => $ENV->user_cfg->{copyright_holder} || $ENV->user_cfg->{author},
         license                 => $ENV->user_cfg->{license},
-        pcore_version           => $ENV->{pcore}->version->normal,
+        pcore_version           => $ENV->{pcore}->{id}->{release},
         cpan_distribution       => 0,
         dockerhub_pcore_repo_id => $ENV->{pcore}->docker->{repo_id},
     };
@@ -150,7 +150,7 @@ sub _create_upstream_repo ($self) {
 
     print qq[Cloning upstream repository "$clone_uri" ... ];
 
-    my $res = Pcore::API::Git->git_run_no_root( [ 'clone', $clone_uri, $self->target_path ] );
+    my $res = Pcore::API::Git->git_run( [ 'clone', $clone_uri, $self->target_path ], undef );
 
     say $res;
 

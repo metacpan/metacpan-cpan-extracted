@@ -19,8 +19,6 @@ DESCRIPTION
         hashes. Values don't necessarily need to be deeply read-only to pass
         the type check.
 
-        This type constraint *only works when it is parameterized*.
-
         This type constraint inherits coercions from its parameter, and makes
         the result read-only (deeply).
 
@@ -51,7 +49,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013 by Toby Inkster.
+    This software is copyright (c) 2013, 2019 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

@@ -32,12 +32,12 @@ my $explain = Pg::Explain->new(
 isa_ok( $explain,           'Pg::Explain' );
 isa_ok( $explain->top_node, 'Pg::Explain::Node' );
 
-is( $explain->top_node->type, 'Finalize GroupAggregate', 'Properly extracted top node type' );
-is( $explain->top_node->sub_nodes->[0]->type, 'Sort', 'Properly extracted subnode-1' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->type, 'Gather', 'Properly extracted subnode-2' );
-is( $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->sub_nodes->[0]->type, 'Partial HashAggregate', 'Properly extracted subnode-3' );
-my $pha = $explain->top_node->sub_nodes->[0]->sub_nodes->[0]->sub_nodes->[0];
-is( $pha->total_inclusive_time, 765.188, "Inclusive time is calculated properly for parallel nodes" );
+is( $explain->top_node->type,                                                       'Finalize GroupAggregate', 'Properly extracted top node type' );
+is( $explain->top_node->sub_nodes->[ 0 ]->type,                                     'Sort',                    'Properly extracted subnode-1' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type,                   'Gather',                  'Properly extracted subnode-2' );
+is( $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->type, 'Partial HashAggregate',   'Properly extracted subnode-3' );
+my $pha = $explain->top_node->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ];
+is( $pha->total_inclusive_time, 765.188,           "Inclusive time is calculated properly for parallel nodes" );
 is( $pha->total_exclusive_time, 765.188 - 600.416, "Exclusive time is calculated properly for parallel nodes" );
 
 lives_ok(

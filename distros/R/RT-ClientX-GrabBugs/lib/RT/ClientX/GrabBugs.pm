@@ -7,7 +7,7 @@ package RT::ClientX::GrabBugs;
 
 BEGIN {
 	$RT::ClientX::GrabBugs::AUTHORITY = 'cpan:TOBYINK';
-	$RT::ClientX::GrabBugs::VERSION   = '0.004';
+	$RT::ClientX::GrabBugs::VERSION   = '0.005';
 }
 
 use Moose;

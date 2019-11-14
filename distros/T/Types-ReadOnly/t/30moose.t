@@ -16,7 +16,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -33,14 +33,14 @@ use Test::Fatal;
 use Types::Standard -types;
 use Types::ReadOnly -types;
 
-my $SciNum = Locked[ Dict[ mantissa => Num, exponent => Optional[Int] ] ];
-$SciNum->coercion->add_type_coercions(
+my $SciNumUnlocked = Dict->of( mantissa => Num, exponent => Optional[Int] )->plus_coercions(
 	Str, q{do{
 		require Math::BigFloat;
 		my $tmp = 'Math::BigFloat'->new($_);
 		+{ mantissa => $tmp->mantissa->bstr, exponent => $tmp->exponent->bstr };
 	}},
 );
+my $SciNum = Locked->of($SciNumUnlocked);
 
 {
 	package Measurement;

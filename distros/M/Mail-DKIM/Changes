@@ -1,6 +1,12 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.58
+
+ * Regex performance improvements
+ * Make some checks case insensative
+ * Don't call external DIE handlers
+
 Version 0.57
 
  * Correct the $self->{result_reason} variable name for $self->{details} that is

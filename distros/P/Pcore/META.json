@@ -145,7 +145,7 @@
             "XML::Hash::XS" : "v0.53.0",
             "YAML::XS" : "v0.76.0",
             "common::header" : "v0.1.2",
-            "perl" : "v5.30.0"
+            "perl" : "v5.30.1"
          }
       },
       "test" : {
@@ -166,6 +166,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.98.16",
+   "version" : "v0.99.6",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -5,7 +5,7 @@ use warnings;
 
 require Carp;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $registry      = {};
 my $magic_counter = 0;
@@ -210,14 +210,14 @@ sub can {
     }
 }
 
+sub DESTROY {}
+
 our $AUTOLOAD;
 
 sub AUTOLOAD {
     my $self = shift;
 
     my ($method) = (split /::/, $AUTOLOAD)[-1];
-
-    return if $method =~ /^[A-Z]+$/;
 
     return _dispatch(ref($self), $method, $self, @_);
 }

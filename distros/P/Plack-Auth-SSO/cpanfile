@@ -14,6 +14,7 @@ requires "WWW::ORCID","0.0401";
 requires "Clone";
 requires "LWP::Protocol::https";
 requires "Data::UUID";
+requires "Log::Any";
 
 on "test" => sub {
     requires "Devel::Cover";

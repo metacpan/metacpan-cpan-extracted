@@ -117,7 +117,7 @@ use Mail::DKIM::ARC::MessageSignature;
 use Mail::DKIM::ARC::Seal;
 use Mail::Address;
 use Carp;
-our $VERSION                   = 0.57;
+our $VERSION                   = 0.58;
 our $MAX_SIGNATURES_TO_PROCESS = 50;
 
 sub init {
@@ -156,6 +156,7 @@ sub handle_header {
 
     if ( lc($field_name) eq 'arc-message-signature' ) {
         eval {
+            local $SIG{__DIE__};
             my $signature = Mail::DKIM::ARC::MessageSignature->parse($line);
             $self->add_signature($signature);
         };
@@ -173,6 +174,7 @@ sub handle_header {
 
     if ( lc($field_name) eq 'arc-seal' ) {
         eval {
+            local $SIG{__DIE__};
             my $signature = Mail::DKIM::ARC::Seal->parse($line);
             $self->add_signature($signature);
         };
@@ -395,6 +397,7 @@ sub check_public_key {
 
     my $result = 0;
     eval {
+        local $SIG{__DIE__};
         $@ = undef;
 
         # HACK- I'm indecisive here about whether I want the
@@ -512,7 +515,10 @@ sub _check_and_verify_signature {
 
     # get public key
     my $pkey;
-    eval { $pkey = $signature->get_public_key; };
+    eval {
+        local $SIG{__DIE__};
+        $pkey = $signature->get_public_key;
+    };
     if ($@) {
         my $E = $@;
         chomp $E;
@@ -536,6 +542,7 @@ sub _check_and_verify_signature {
     my $details;
     local $@ = undef;
     eval {
+        local $SIG{__DIE__};
         $result = $algorithm->verify() ? 'pass' : 'fail';
         $details = $algorithm->{verification_details} || $@;
     };

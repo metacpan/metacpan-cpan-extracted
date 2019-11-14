@@ -118,7 +118,10 @@ sub convert {
 
     my $cork;
 
-    eval { $cork = new_private_key Crypt::OpenSSL::RSA($pkcs); };
+    eval {
+        local $SIG{__DIE__};
+        $cork = new_private_key Crypt::OpenSSL::RSA($pkcs);
+    };
 
     $@
       and $self->errorstr($@),

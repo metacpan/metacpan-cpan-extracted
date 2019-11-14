@@ -10,7 +10,7 @@ use Path::Tiny;
 use Scalar::Util qw(openhandle);
 use Text::Gitignore qw(build_gitignore_matcher);
 
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.43'; # VERSION
 
 sub _croak { require Carp; Carp::croak(@_); }
 sub _usage { _croak("Usage: @_\n") }
@@ -250,6 +250,24 @@ sub patterns {
 }
 
 
+sub projects {
+    my $self  = shift;
+
+    return $self->{projects} if $self->{projects};
+
+    my %projects;
+    for my $line (@{$self->_lines}) {
+        my $project = $line->{project};
+        $projects{$project}++ if $project;
+    }
+
+    my $projects = [sort keys %projects];
+    $self->{projects} = $projects;
+
+    return $projects;
+}
+
+
 sub update_owners {
     my $self    = shift;
     my $pattern = shift;
@@ -319,6 +337,7 @@ sub _clear {
     delete $self->{match_lines};
     delete $self->{owners};
     delete $self->{patterns};
+    delete $self->{projects};
 }
 
 1;
@@ -335,7 +354,7 @@ File::Codeowners - Read and write CODEOWNERS files
 
 =head1 VERSION
 
-version 0.41
+version 0.43
 
 =head1 METHODS
 
@@ -431,6 +450,12 @@ defined in the file.
     $patterns = $codeowners->patterns($owner);
 
 Get an arrayref of all patterns defined.
+
+=head2 projects
+
+    $projects = $codeowners->projects;
+
+Get an arrayref of all projects defined.
 
 =head2 update_owners
 

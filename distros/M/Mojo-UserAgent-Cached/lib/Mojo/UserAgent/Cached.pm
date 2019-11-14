@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
@@ -133,13 +133,16 @@ sub build_tx {
 
   $url = ($self->always_return_file || $url);
 
-  if ($self->local_dir) {
-    $url = 'file://' . File::Spec->catfile($self->local_dir, "$url");
-  } elsif ($self->always_return_file) {
-    $url = 'file://' . "$url";
-  } elsif ($url !~ m{^(/|[^/]+:)}) {
-    $url = 'file://' . Cwd::realpath("$url");
+  if ($url !~ m{^(/|[^/]+:)}) {
+    if ($self->local_dir) {
+      $url = 'file://' . File::Spec->catfile($self->local_dir, "$url");
+    } elsif ($self->always_return_file) {
+      $url = 'file://' . "$url";
+    } elsif ($url !~ m{^(/|[^/]+:)}) {
+      $url = 'file://' . Cwd::realpath("$url");
+    }
   }
+
   $self->transactor->tx($method, $url, @more);
 }
 

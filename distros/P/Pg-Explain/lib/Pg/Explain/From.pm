@@ -7,14 +7,6 @@ use Carp;
 
 Pg::Explain::From - Base class for parsers of non-text explain formats.
 
-=head1 VERSION
-
-Version 0.81
-
-=cut
-
-our $VERSION = '0.81';
-
 =head1 SYNOPSIS
 
 It's internal class to wrap some work. It should be used by Pg::Explain, and not directly.
@@ -32,6 +24,14 @@ sub new {
     my $self  = bless {}, $class;
     return $self;
 }
+
+=head2 explain
+
+Get/Set master explain object.
+
+=cut
+
+sub explain { my $self = shift; $self->{ 'explain' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
 
 =head2 parse_source
 
@@ -75,8 +75,16 @@ sub make_node_from {
 
     $struct = $self->normalize_node_struct( $struct );
 
+    my $use_type = $struct->{ 'Node Type' };
+    if ( $use_type eq 'ModifyTable' ) {
+        $use_type = $struct->{ 'Operation' };
+        if ( $struct->{ 'Relation Name' } ) {
+            $use_type .= ' on ' . $struct->{ 'Relation Name' };
+            $use_type .= ' ' . $struct->{ 'Alias' } if ( $struct->{ 'Alias' } ) && ( $struct->{ 'Alias' } ne $struct->{ 'Relation Name' } );
+        }
+    }
     my $new_node = Pg::Explain::Node->new(
-        'type'                   => $struct->{ 'Node Type' },
+        'type'                   => $use_type,
         'estimated_startup_cost' => $struct->{ 'Startup Cost' },
         'estimated_total_cost'   => $struct->{ 'Total Cost' },
         'estimated_rows'         => $struct->{ 'Plan Rows' },
@@ -86,6 +94,7 @@ sub make_node_from {
         'actual_rows'            => $struct->{ 'Actual Rows' },
         'actual_loops'           => $struct->{ 'Actual Loops' },
     );
+    $new_node->explain( $self->explain );
     if ( $struct->{ 'Actual Loops' } == 0 ) {
         $new_node->never_executed( 1 );
     }
@@ -144,6 +153,17 @@ sub make_node_from {
             );
         }
     }
+
+    $new_node->add_extra_info( 'Heap Fetches: ' . $struct->{ 'Heap Fetches' } ) if $struct->{ 'Heap Fetches' };
+
+    my @heap_blocks_info = ();
+    for my $type ( qw( exact lossy ) ) {
+        my $key = ucfirst( $type ) . ' Heap Blocks';
+        next unless $struct->{ $key };
+        push @heap_blocks_info, sprintf '%s=%s', $type, $struct->{ $key };
+    }
+    $new_node->add_extra_info( 'Heap Blocks: ' . join( ' ', @heap_blocks_info ) ) if 0 < scalar @heap_blocks_info;
+
     my @buf_info = ();
     for my $buf_block ( qw(Shared Local Temp) ) {
         my @buf_block_info = ();

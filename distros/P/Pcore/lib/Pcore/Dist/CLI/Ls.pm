@@ -1,6 +1,6 @@
 package Pcore::Dist::CLI::Ls;
 
-use Pcore -class, -ansi;
+use Pcore -class, -ansi, -res;
 
 extends qw[Pcore::Dist::CLI];
 
@@ -124,13 +124,13 @@ sub _get_dist_info ( $self, $dist, $cb ) {
 
     # dist is pushed
     $cv->begin;
-    $dist->git->git_is_pushed( sub ($res) {
-        $data->{is_pushed} = $res;
+    Coro::async {
+        $data->{is_pushed} = $dist->is_pushed;
 
         $cv->end;
 
         return;
-    } );
+    };
 
     # dist releases
     $cv->begin;
@@ -156,20 +156,40 @@ sub _render_dist ( $self, $tbl, $dist, $data ) {
     my $dist_id = $data->{id};
 
     # branch
-    push @row, $dist_id->{branch} || ' - ';
+    if ( defined $dist_id->{branch} ) {
+        if ( $dist_id->{branch} eq 'master' ) {
+            push @row, $dist_id->{branch};
+        }
+        else {
+            push @row, $WHITE . $ON_RED . " $dist_id->{branch} " . $RESET;
+        }
+    }
+    else {
+        push @row, ' - ';
+    }
 
     # latest release
-    if ( my $releases = $data->{releases} ) {
-        my $latest_release = $releases->[-1];
+    my $latest_release = $data->{releases} ? $data->{releases}->[-1] : undef;
 
+    if ($latest_release) {
         push @row, $latest_release;
     }
     else {
-        push @row, $WHITE . $ON_RED . ' unreleased ' . $RESET;
+        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
     }
 
     # parent release
-    push @row, defined $dist_id->{release} ? $dist_id->{release} : $WHITE . $ON_RED . ' unreleased ' . $RESET;
+    if ( defined $dist_id->{release} ) {
+        if ( $dist_id->{release} eq $latest_release ) {
+            push @row, $dist_id->{release};
+        }
+        else {
+            push @row, $WHITE . $ON_RED . " $dist_id->{release} " . $RESET;
+        }
+    }
+    else {
+        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
+    }
 
     # parent release distance
     push @row, !$dist_id->{release_distance} ? ' - ' : $WHITE . $ON_RED . sprintf( ' %3s ', $dist_id->{release_distance} ) . $RESET;
@@ -186,8 +206,8 @@ sub _render_dist ( $self, $tbl, $dist, $data ) {
     else {
         my @has_not_pushed;
 
-        for my $branch ( sort keys $is_pushed->{data}->%* ) {
-            my $ahead = $is_pushed->{data}->{$branch};
+        for my $branch ( sort keys $is_pushed->%* ) {
+            my $ahead = $is_pushed->{$branch};
 
             if ($ahead) {
                 push @has_not_pushed, $WHITE . $ON_RED . $SPACE . "$branch ($ahead)" . $SPACE . $RESET;

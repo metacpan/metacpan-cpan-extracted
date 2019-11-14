@@ -119,6 +119,8 @@ sub query {
     my $deadline = time + $remaining_time;
     my $E;
     eval {
+        local $SIG{__DIE__};
+
         # set a timeout, 10 seconds by default
         local $SIG{ALRM} = sub { die "DNS query timeout for $domain\n" };
         alarm $TIMEOUT;
@@ -128,6 +130,7 @@ sub query {
         # so we wrap the query in a nested eval {} block
         my $E2;
         eval {
+            local $SIG{__DIE__};
             $resp = $rslv->send( $domain, $type );
             1;
         } or do {
@@ -203,6 +206,7 @@ sub query_async {
         my @resp;
         my $rcode;
         eval {
+            local $SIG{__DIE__};
             @resp = query( $domain, $type );
             $rcode = $@;
             1;

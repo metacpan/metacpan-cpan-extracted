@@ -31,35 +31,60 @@ no_index:
 provides:
   App::Codeowners:
     file: lib/App/Codeowners.pm
-    version: '0.41'
+    version: '0.43'
+  App::Codeowners::Formatter:
+    file: lib/App/Codeowners/Formatter.pm
+    version: '0.43'
+  App::Codeowners::Formatter::CSV:
+    file: lib/App/Codeowners/Formatter/CSV.pm
+    version: '0.43'
+  App::Codeowners::Formatter::JSON:
+    file: lib/App/Codeowners/Formatter/JSON.pm
+    version: '0.43'
+  App::Codeowners::Formatter::String:
+    file: lib/App/Codeowners/Formatter/String.pm
+    version: '0.43'
+  App::Codeowners::Formatter::TSV:
+    file: lib/App/Codeowners/Formatter/TSV.pm
+    version: '0.43'
+  App::Codeowners::Formatter::Table:
+    file: lib/App/Codeowners/Formatter/Table.pm
+    version: '0.43'
+  App::Codeowners::Formatter::YAML:
+    file: lib/App/Codeowners/Formatter/YAML.pm
+    version: '0.43'
   App::Codeowners::Options:
     file: lib/App/Codeowners/Options.pm
-    version: '0.41'
+    version: '0.43'
   App::Codeowners::Util:
     file: lib/App/Codeowners/Util.pm
-    version: '0.41'
+    version: '0.43'
+  App::Codeowners::Util::Process:
+    file: lib/App/Codeowners/Util.pm
+    version: '0.43'
   File::Codeowners:
     file: lib/File/Codeowners.pm
-    version: '0.41'
+    version: '0.43'
   Test::File::Codeowners:
     file: lib/Test/File/Codeowners.pm
-    version: '0.41'
+    version: '0.43'
 recommends:
   Term::Detect::Software: '0'
   Unicode::GCString: '0'
 requires:
   Carp: '0'
-  Color::ANSI::Util: '0'
+  Color::ANSI::Util: '0.03'
   Encode: '0'
   Exporter: '0'
   Getopt::Long: '2.39'
   IPC::Open2: '0'
+  Module::Load: '0'
   Path::Tiny: '0'
   Pod::Usage: '0'
   Scalar::Util: '0'
   Test::Builder: '0'
   Text::Gitignore: '0'
-  Text::Table::Any: '0'
+  parent: '0'
   perl: v5.10.1
   strict: '0'
   utf8: '0'
@@ -68,7 +93,7 @@ resources:
   bugtracker: https://github.com/chazmcgarvey/git-codeowners/issues
   homepage: https://github.com/chazmcgarvey/git-codeowners
   repository: https://github.com/chazmcgarvey/git-codeowners.git
-version: '0.41'
+version: '0.43'
 x_authority: cpan:CCM
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

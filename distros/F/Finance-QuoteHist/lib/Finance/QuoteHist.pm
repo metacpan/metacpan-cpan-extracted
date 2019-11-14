@@ -10,11 +10,10 @@ use Carp;
 
 use Finance::QuoteHist::Generic;
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 my @DEFAULT_ENGINES = qw(
   Finance::QuoteHist::Yahoo
-  Finance::QuoteHist::Google
 );
 
 sub new {

@@ -13,11 +13,11 @@ Net::DHCP::Config::Utilities::Generator::ISC_DHCPD - Generates a config for ISC 
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -196,16 +196,22 @@ sub generate{
 	my @subnets=sort( $object->subnet_list );
 	foreach my $base ( @subnets ){
 		my $subnet=$object->subnet_get( $base );
-		$middle=$middle.'subnet '.$base.' netmask '.$subnet->mask_get." {\n";
+
+		my $desc=$subnet->desc_get;
+		if ( $desc ne '' ){
+			$desc='# '.$desc."\n";
+		}
+
+		$middle=$middle.$desc.'subnet '.$base.' netmask '.$subnet->mask_get." {\n";
 
 		# add any required ranges
 		# unless you have static IPs in the footer you really need ranges
-		my @ranges=$subnet->range_get;
+		my @ranges=sort( $subnet->range_get );
 		foreach my $range ( @ranges ){
 			$middle=$middle.'    range '.$range.";\n";
 		}
 
-		my @options=$subnet->options_list;
+		my @options=sort( $subnet->options_list );
 		foreach my $option ( @options ){
 			my $value=$subnet->option_get( $option );
 			my $long=$self->{options}->get_long( $option );

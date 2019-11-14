@@ -1,0 +1,31 @@
+[
+  [
+    'Limit'
+  ],
+  [
+    'Limit',
+    'Nested Loop'
+  ],
+  [
+    'Limit',
+    'Nested Loop',
+    'Nested Loop'
+  ],
+  [
+    'Limit',
+    'Nested Loop',
+    'Index Scan'
+  ],
+  [
+    'Limit',
+    'Nested Loop',
+    'Nested Loop',
+    'Index Scan Backward'
+  ],
+  [
+    'Limit',
+    'Nested Loop',
+    'Nested Loop',
+    'Index Scan'
+  ]
+]

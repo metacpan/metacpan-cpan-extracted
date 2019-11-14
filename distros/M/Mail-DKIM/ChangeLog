@@ -1,3 +1,16 @@
+-- VERSION 0.58 --
+
+2019-11-13: Marc Bradshaw <marc@marcbradshaw.net>
+
+ Thanks to Martin Sluka <fany@cpan.org>
+ * Prevent outer $SIG{__DIE__} handlers from being called
+
+ Thanks to Todd Richmond
+ * Lowercase q tag before use
+ * Lowercase domain check
+ * Strip quotes from PublicKey.pm in addition to other whitespace chars
+ * Fix regex performance issue
+
 -- VERSION 0.57 --
 
 2019-10-08: Marc Bradshaw <marc@marcbradshaw.net>

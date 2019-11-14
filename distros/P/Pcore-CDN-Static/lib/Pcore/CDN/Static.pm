@@ -1,4 +1,4 @@
-package Pcore::CDN::Static v0.61.0;
+package Pcore::CDN::Static v0.61.1;
 
 use Pcore -dist;
 

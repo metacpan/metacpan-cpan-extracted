@@ -3,7 +3,8 @@ MANIFEST
 README
 Makefile.PL
 JBrowseTest.pl
-test.pl
 lib/Tk/JBrowseEntry.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+t/10_Tk-JBrowseEntry.t
+t/99_Tk-JBrowseEntry_demo.t
 META.json                                Module JSON meta-data (added by MakeMaker)

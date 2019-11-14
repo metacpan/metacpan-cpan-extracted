@@ -13,7 +13,9 @@
 <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [ doap-deps:on "Type::Tiny 0.022"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "Type::Tiny 1.006000"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.008000"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-ReadOnly>;
 	doap:created         "2013-08-02"^^xsd:date;
@@ -24,7 +26,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-ReadOnly";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-003>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-readonly>;
@@ -113,6 +115,21 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-ReadOnly/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Fresh start";
+	dc:identifier        "Types-ReadOnly-0.003"^^xsd:string;
+	dc:issued            "2019-11-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Internal changes to Type::Tiny broke this ages ago. But luckily many of the newer features of Type::Tiny allow Types::ReadOnly to be implemented with far less hacky code.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-ReadOnly-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

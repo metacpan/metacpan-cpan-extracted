@@ -1,15 +1,16 @@
 #!/usr/bin/env perl
 #---AUTOPRAGMASTART---
-use 5.010_001;
+use 5.020;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
-use English qw(-no_match_vars);
+use English;
 use Carp;
-our $VERSION = 9;
-use Fatal qw( close );
+our $VERSION = 10;
+use autodie qw( close );
 use Array::Contains;
+use utf8;
 #---AUTOPRAGMAEND---
 
 # PAGECAMEL  (C) 2008-2019 Rene Schickbauer
@@ -34,7 +35,7 @@ foreach my $file (@files) {
     foreach my $line (@lines) {
         if($line =~ /^use\ +(.+)\;/) {
             my $pragma = $1;
-            if($pragma =~ /(strict|warnings|English|mro|diagnostics|Carp|Fatal|Array\:\:Contains)/ && $pragma !~ /Digest/) {
+            if($pragma =~ /(strict|warnings|English|mro|diagnostics|Carp|Fatal|Array\:\:Contains|autodie|utf8)/ && $pragma !~ /Digest/) {
                 # Remove this (old) lines
                 next;
             }
@@ -62,16 +63,17 @@ foreach my $file (@files) {
         }
         if($line =~ /^package\ / || $line =~ /^\#\!/) {
             print $ofh "#---AUTOPRAGMASTART---\n";
-            print $ofh "use 5.010_001;\n";
+            print $ofh "use 5.020;\n";
             print $ofh "use strict;\n";
             print $ofh "use warnings;\n";
             print $ofh "use diagnostics;\n";
             print $ofh "use mro 'c3';\n";
-            print $ofh "use English qw(-no_match_vars);\n";
+            print $ofh "use English;\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 9;
-            print $ofh "use Fatal qw( close );\n";
+            print $ofh "our \$VERSION = 10;\n";
+            print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
+            print $ofh "use utf8;\n";
             print $ofh "#---AUTOPRAGMAEND---\n";
             $inserted = 1;
         }

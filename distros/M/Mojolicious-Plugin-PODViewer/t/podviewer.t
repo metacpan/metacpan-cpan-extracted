@@ -60,7 +60,11 @@ $t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Default module
 $t->get_ok( '/perldoc' )->status_is( 200 )
-  ->element_exists( 'h1#Default-Page' );
+  ->element_exists( 'h1#Default-Page' )
+  ->element_exists( '.crumbs a[href=/perldoc/MojoliciousTest]', 'parent module in crumbtrail' )
+  ->element_exists( '.crumbs a[href=/perldoc]', 'default module in crumbtrail' );
+
+#diag $t->tx->res->body;
 
 # Headings
 $t->get_ok('/perldoc/MojoliciousTest/PODTest')->status_is(200)

@@ -1,4 +1,13 @@
 Revision history for App-Codeowners.
 
+0.43      2019-11-13 10:12:01-07:00 MST7MDT
+  * Fix "create" and "update" commands... to actually work.
+
+0.42      2019-11-12 21:52:12-07:00 MST7MDT
+  * Add "projects" command to list defined projects.
+  * Add flags to filter matches with the "show" command.
+  * Remove unused Text::Table suggested dependency.
+  * Fix tests to skip if not git 1.8.5+ (thanks CPAN testers).
+
 0.41      2019-11-09 17:45:16-07:00 MST7MDT
-  * First public release
+  * First public release.

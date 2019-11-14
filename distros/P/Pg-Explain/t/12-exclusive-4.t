@@ -29,5 +29,5 @@ my $top = $explain->top_node;
 ok(
     abs( $top->total_exclusive_time - 0.002 ) < 0.001,
     'Total exclusive time (0.002) does *not* exclude ctes'
-);
+  );
 

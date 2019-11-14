@@ -1,0 +1,53 @@
+                               QUERY PLAN                              
+ -----------------------------------------------------------------------
+  <explain xmlns="http://www.postgresql.org/2009/explain">             +
+    <Query>                                                            +
+      <Plan>                                                           +
+        <Node-Type>ModifyTable</Node-Type>                             +
+        <Operation>Insert</Operation>                                  +
+        <Parallel-Aware>false</Parallel-Aware>                         +
+        <Relation-Name>foo</Relation-Name>                             +
+        <Alias>foo</Alias>                                             +
+        <Startup-Cost>0.00</Startup-Cost>                              +
+        <Total-Cost>0.01</Total-Cost>                                  +
+        <Plan-Rows>1</Plan-Rows>                                       +
+        <Plan-Width>24</Plan-Width>                                    +
+        <Actual-Startup-Time>0.357</Actual-Startup-Time>               +
+        <Actual-Total-Time>0.357</Actual-Total-Time>                   +
+        <Actual-Rows>0</Actual-Rows>                                   +
+        <Actual-Loops>1</Actual-Loops>                                 +
+        <Plans>                                                        +
+          <Plan>                                                       +
+            <Node-Type>Result</Node-Type>                              +
+            <Parent-Relationship>Member</Parent-Relationship>          +
+            <Parallel-Aware>false</Parallel-Aware>                     +
+            <Startup-Cost>0.00</Startup-Cost>                          +
+            <Total-Cost>0.01</Total-Cost>                              +
+            <Plan-Rows>1</Plan-Rows>                                   +
+            <Plan-Width>24</Plan-Width>                                +
+            <Actual-Startup-Time>0.012</Actual-Startup-Time>           +
+            <Actual-Total-Time>0.013</Actual-Total-Time>               +
+            <Actual-Rows>1</Actual-Rows>                               +
+            <Actual-Loops>1</Actual-Loops>                             +
+          </Plan>                                                      +
+        </Plans>                                                       +
+      </Plan>                                                          +
+      <Planning-Time>0.041</Planning-Time>                             +
+      <Triggers>                                                       +
+        <Trigger>                                                      +
+          <Trigger-Name>foo_system_time_generated_always</Trigger-Name>+
+          <Relation>foo</Relation>                                     +
+          <Time>0.283</Time>                                           +
+          <Calls>1</Calls>                                             +
+        </Trigger>                                                     +
+        <Trigger>                                                      +
+          <Trigger-Name>foo_system_time_write_history</Trigger-Name>   +
+          <Relation>foo</Relation>                                     +
+          <Time>0.194</Time>                                           +
+          <Calls>1</Calls>                                             +
+        </Trigger>                                                     +
+      </Triggers>                                                      +
+      <Execution-Time>0.588</Execution-Time>                           +
+    </Query>                                                           +
+  </explain>
+ (1 row)

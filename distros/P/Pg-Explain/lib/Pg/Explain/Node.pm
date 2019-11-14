@@ -10,14 +10,6 @@ use strict;
 
 Pg::Explain::Node - Class representing single node from query plan
 
-=head1 VERSION
-
-Version 0.81
-
-=cut
-
-our $VERSION = '0.81';
-
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -120,30 +112,6 @@ ArrayRef of strings, each contains textual information (leading and tailing spac
 
 This is not always filled, as it depends heavily on node type and PostgreSQL version.
 
-=head2 planning_time
-
-Planning time, in milliseconds, only valid for top node, taken from "Planning time: ..." below textual explain.
-
-=head2 execution_time
-
-Execution time, in milliseconds, only valid for top node, taken from "Execution time: ..." below textual explain.
-
-=head2 trigger_times
-
-Array with information about trigger calls. Each element contains:
-
-=over
-
-=item * name
-
-=item * time
-
-=item * calls
-
-=back
-
-This information is extracted from "Trigger ..." lines below textual explain.
-
 =head2 sub_nodes
 
 ArrayRef of Pg::Explain::Node objects, which represent sub nodes.
@@ -178,6 +146,10 @@ For more details, check ->add_cte method description.
 
 Returns true if given node was not executed, according to plan.
 
+=head2 explain
+
+Returns Pg::Explain for this node.
+
 =cut
 
 sub actual_loops           { my $self = shift; $self->{ 'actual_loops' }           = $_[ 0 ] if 0 < scalar @_; return $self->{ 'actual_loops' }; }
@@ -189,12 +161,10 @@ sub estimated_row_width    { my $self = shift; $self->{ 'estimated_row_width' } 
 sub estimated_startup_cost { my $self = shift; $self->{ 'estimated_startup_cost' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_startup_cost' }; }
 sub estimated_total_cost   { my $self = shift; $self->{ 'estimated_total_cost' }   = $_[ 0 ] if 0 < scalar @_; return $self->{ 'estimated_total_cost' }; }
 sub extra_info             { my $self = shift; $self->{ 'extra_info' }             = $_[ 0 ] if 0 < scalar @_; return $self->{ 'extra_info' }; }
-sub planning_time          { my $self = shift; $self->{ 'planning_time' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'planning_time' }; }
-sub execution_time         { my $self = shift; $self->{ 'execution_time' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'execution_time' }; }
-sub trigger_times          { my $self = shift; $self->{ 'trigger_times' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
 sub force_loops            { my $self = shift; $self->{ 'force_loops' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'force_loops' }; }
 sub initplans              { my $self = shift; $self->{ 'initplans' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'initplans' }; }
 sub never_executed         { my $self = shift; $self->{ 'never_executed' }         = $_[ 0 ] if 0 < scalar @_; return $self->{ 'never_executed' }; }
+sub explain                { my $self = shift; $self->{ 'explain' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'explain' }; }
 sub scan_on                { my $self = shift; $self->{ 'scan_on' }                = $_[ 0 ] if 0 < scalar @_; return $self->{ 'scan_on' }; }
 sub sub_nodes              { my $self = shift; $self->{ 'sub_nodes' }              = $_[ 0 ] if 0 < scalar @_; return $self->{ 'sub_nodes' }; }
 sub subplans               { my $self = shift; $self->{ 'subplans' }               = $_[ 0 ] if 0 < scalar @_; return $self->{ 'subplans' }; }
@@ -489,9 +459,6 @@ sub get_struct {
     $reply->{ 'type' }                   = $self->type                       if defined $self->type;
     $reply->{ 'scan_on' }                = clone( $self->scan_on )           if defined $self->scan_on;
     $reply->{ 'extra_info' }             = clone( $self->extra_info )        if defined $self->extra_info;
-    $reply->{ 'planning_time' }          = clone( $self->planning_time )     if defined $self->planning_time;
-    $reply->{ 'execution_time' }         = clone( $self->execution_time )    if defined $self->execution_time;
-    $reply->{ 'trigger_times' }          = clone( $self->trigger_times )     if defined $self->trigger_times;
 
     $reply->{ 'is_analyzed' } = $self->is_analyzed;
 
@@ -508,34 +475,6 @@ sub get_struct {
         }
     }
     return $reply;
-}
-
-=head2 check_for_parallelism
-
-Handles parallelism by setting "override_loops" if plan is analyzed and there are gather nodes.
-
-=cut
-
-sub check_for_parallelism {
-    my $self        = shift;
-    my $force_loops = shift;
-    if ( 'Gather' eq $self->type ) {
-        $force_loops = $self->actual_loops;
-    }
-    else {
-        $self->{ 'force_loops' } = $force_loops;
-    }
-
-    for my $key ( qw( sub_nodes initplans subplans ) ) {
-        next unless $self->{ $key };
-        $_->check_for_parallelism( $force_loops ) for @{ $self->{ $key } };
-    }
-
-    if ( $self->{ 'ctes' } ) {
-        $_->check_for_parallelism( $force_loops ) for values %{ $self->{ 'ctes' } };
-    }
-
-    return;
 }
 
 =head2 total_inclusive_time
@@ -584,6 +523,22 @@ sub total_exclusive_time {
     return 0 if $time < 0;
 
     return $time;
+}
+
+=head2 all_subnodes
+
+Returns list of all subnodes of current node.
+
+=cut
+
+sub all_subnodes {
+    my $self  = shift;
+    my @nodes = ();
+    push @nodes, @{ $self->sub_nodes }   if $self->sub_nodes;
+    push @nodes, @{ $self->initplans }   if $self->initplans;
+    push @nodes, @{ $self->subplans }    if $self->subplans;
+    push @nodes, values %{ $self->ctes } if $self->ctes;
+    return @nodes;
 }
 
 =head2 is_analyzed
@@ -688,17 +643,6 @@ sub as_text {
             $textual .= $prefix_on_spaces . "SubPlan\n";
             $textual .= $ip->as_text( $prefix_on_spaces . "  " );
         }
-    }
-    if ( $self->planning_time ) {
-        $textual .= $prefix_on_spaces . "Planning time: " . $self->planning_time . " ms\n";
-    }
-    if ( $self->trigger_times ) {
-        for my $t ( @{ $self->trigger_times } ) {
-            $textual .= $prefix_on_spaces . sprintf( "Trigger %s: time=%.3f calls=%d\n", $t->{ 'name' }, $t->{ 'time' }, $t->{ 'calls' } );
-        }
-    }
-    if ( $self->execution_time ) {
-        $textual .= $prefix_on_spaces . "Execution time: " . $self->execution_time . " ms\n";
     }
     return $textual;
 }

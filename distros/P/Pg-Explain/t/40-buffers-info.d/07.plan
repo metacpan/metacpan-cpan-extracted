@@ -1,0 +1,63 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Bitmap Heap Scan</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Relation-Name>z</Relation-Name>
+      <Alias>z</Alias>
+      <Startup-Cost>12.90</Startup-Cost>
+      <Total-Cost>24.27</Total-Cost>
+      <Plan-Rows>3</Plan-Rows>
+      <Plan-Width>4</Plan-Width>
+      <Actual-Startup-Time>0.006</Actual-Startup-Time>
+      <Actual-Total-Time>0.008</Actual-Total-Time>
+      <Actual-Rows>3</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+      <Recheck-Cond>(id = ANY ('{1,1000,5000}'::integer[]))</Recheck-Cond>
+      <Rows-Removed-by-Index-Recheck>0</Rows-Removed-by-Index-Recheck>
+      <Exact-Heap-Blocks>3</Exact-Heap-Blocks>
+      <Lossy-Heap-Blocks>0</Lossy-Heap-Blocks>
+      <Shared-Hit-Blocks>9</Shared-Hit-Blocks>
+      <Shared-Read-Blocks>0</Shared-Read-Blocks>
+      <Shared-Dirtied-Blocks>0</Shared-Dirtied-Blocks>
+      <Shared-Written-Blocks>0</Shared-Written-Blocks>
+      <Local-Hit-Blocks>0</Local-Hit-Blocks>
+      <Local-Read-Blocks>0</Local-Read-Blocks>
+      <Local-Dirtied-Blocks>0</Local-Dirtied-Blocks>
+      <Local-Written-Blocks>0</Local-Written-Blocks>
+      <Temp-Read-Blocks>0</Temp-Read-Blocks>
+      <Temp-Written-Blocks>0</Temp-Written-Blocks>
+      <Plans>
+        <Plan>
+          <Node-Type>Bitmap Index Scan</Node-Type>
+          <Parent-Relationship>Outer</Parent-Relationship>
+          <Parallel-Aware>false</Parallel-Aware>
+          <Index-Name>z_pkey</Index-Name>
+          <Startup-Cost>0.00</Startup-Cost>
+          <Total-Cost>12.90</Total-Cost>
+          <Plan-Rows>3</Plan-Rows>
+          <Plan-Width>0</Plan-Width>
+          <Actual-Startup-Time>0.005</Actual-Startup-Time>
+          <Actual-Total-Time>0.005</Actual-Total-Time>
+          <Actual-Rows>3</Actual-Rows>
+          <Actual-Loops>1</Actual-Loops>
+          <Index-Cond>(id = ANY ('{1,1000,5000}'::integer[]))</Index-Cond>
+          <Shared-Hit-Blocks>6</Shared-Hit-Blocks>
+          <Shared-Read-Blocks>0</Shared-Read-Blocks>
+          <Shared-Dirtied-Blocks>0</Shared-Dirtied-Blocks>
+          <Shared-Written-Blocks>0</Shared-Written-Blocks>
+          <Local-Hit-Blocks>0</Local-Hit-Blocks>
+          <Local-Read-Blocks>0</Local-Read-Blocks>
+          <Local-Dirtied-Blocks>0</Local-Dirtied-Blocks>
+          <Local-Written-Blocks>0</Local-Written-Blocks>
+          <Temp-Read-Blocks>0</Temp-Read-Blocks>
+          <Temp-Written-Blocks>0</Temp-Written-Blocks>
+        </Plan>
+      </Plans>
+    </Plan>
+    <Planning-Time>0.018</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>0.016</Execution-Time>
+  </Query>
+</explain>

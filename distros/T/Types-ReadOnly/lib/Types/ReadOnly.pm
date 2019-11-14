@@ -5,14 +5,14 @@ use warnings;
 package Types::ReadOnly;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
-use Type::Tiny 0.022 ();
-use Types::Standard qw( Any Dict );
-use Type::Utils;
+use Type::Tiny 1.006000 ();
+use Type::Coercion ();
+use Types::Standard qw( Any Dict HashRef Ref );
 use Type::Library -base, -declare => qw( ReadOnly Locked );
 
-use Scalar::Util qw( reftype blessed );
+use Scalar::Util qw( reftype blessed refaddr );
 
 sub _dclone($) {
 	require Storable;
@@ -27,7 +27,7 @@ sub _make_readonly {
 	if (my $reftype = reftype $_[0] and not blessed($_[0]) and not &Internals::SvREADONLY($_[0])) {
 		$_[0] = _dclone($_[0]) if !$dont_clone && &Internals::SvREFCNT($_[0]) > 1 && !$skip{$reftype};
 		&Internals::SvREADONLY($_[0], 1);
-		if ($reftype eq 'SCALAR' || $reftype eq 'REF') {
+		if ($reftype eq 'SCALAR' or $reftype eq 'REF') {
 			_make_readonly(${ $_[0] }, 1);
 		}
 		elsif ($reftype eq 'ARRAY') {
@@ -42,30 +42,65 @@ sub _make_readonly {
 	return;
 }
 
-our %READONLY_REF_TYPES = (HASH => 1, ARRAY => 1, SCALAR => 1, REF => 1);
-
-declare ReadOnly,
-	bless     => 'Type::Tiny::Wrapper',
-	pre_check => sub
-	{
-		$READONLY_REF_TYPES{reftype($_)} and &Internals::SvREADONLY($_);
+__PACKAGE__->meta->add_type({
+	name        => 'ReadOnly',
+	parent      => Ref,
+	constraint  => sub {
+		my $r = reftype($_);
+		($r eq 'HASH' or $r eq 'ARRAY' or $r eq 'SCALAR' or $r eq 'REF') and &Internals::SvREADONLY($_);
 	},
-	inlined_pre_check => sub
-	{
+	constraint_generator => sub {
+		my ($parameter) = @_ or return $Type::Tiny::parameterize_type;
+		$parameter->compiled_check; # only need this because parent constraint (i.e. ReadOnly) is automatically checked
+	},
+	inlined     => sub {
+		my ($self, $varname) = @_;
 		return (
-			"\$Types::ReadOnly::READONLY_REF_TYPES{Scalar::Util::reftype($_)}",
-			"&Internals::SvREADONLY($_)",
+			sprintf('do { my $r = Scalar::Util::reftype(%s); $r eq "HASH" or $r eq "ARRAY" or $r eq "SCALAR" or $r eq "REF" }', $varname),
+			sprintf('&Internals::SvREADONLY(%s)', $varname),
 		);
 	},
-	post_coerce => sub
-	{
-		_make_readonly($_);
-		return $_;
+	inline_generator => sub {
+		my ($parameter) = @_ or return $Type::Tiny::parameterize_type;
+		return unless $parameter->can_be_inlined;
+		sub {
+			my ($child, $varname) = @_;
+			my $me = $child->parent;
+			return ($me->inline_check($varname), $parameter->inline_check($varname));
+		};
 	},
-	inlined_post_coerce => sub
-	{
-		"do { Types::ReadOnly::_make_readonly($_); $_ }";
-	};
+	coercion => [
+		Ref ,=> 'do { Types::ReadOnly::_make_readonly(my $ro = $_); $ro }',
+	],
+	coercion_generator => sub {
+		my ($me, $child) = @_;
+		my $parameter = $child->type_parameter;
+		my @extra;
+		if ($parameter->has_coercion) {
+			my @map = @{ $parameter->coercion->type_coercion_map };
+			while (@map) {
+				my ($t, $code) = splice @map, 0, 2;
+				if (Types::TypeTiny::CodeLike->check($code)) {
+					push @extra, $t, sub {
+						my $coerced = $code->(@_);
+						Types::ReadOnly::_make_readonly($coerced);
+						$coerced;
+					};
+				}
+				else {
+					push @extra, $t, sprintf('do { my $coerced = %s; Types::ReadOnly::_make_readonly($coerced); $coerced }', $code);
+				}
+			}
+		}
+		bless(
+			{ type_coercion_map => [
+				$parameter => 'do { Types::ReadOnly::_make_readonly(my $ro = $_); $ro }',
+				@extra,
+			] },
+			'Type::Coercion'
+		);
+	},
+});
 
 my $_FIND_KEYS = sub {
 	my ($dict) = grep {
@@ -83,77 +118,124 @@ my $_FIND_KEYS = sub {
 # Stolen from Hash::Util 0.15.
 # In earlier versions, of Hash::Util, there is only a hashref_unlocked
 # function, which happens to be very broken. :-/
-sub _hashref_locked
-{
-	my $hash=shift;
-	Internals::SvREADONLY(%$hash);
-}
+sub _hashref_locked { &Internals::SvREADONLY($_[0]) }
 
-declare Locked,
-	bless     => 'Type::Tiny::Wrapper',
-	pre_check => sub
-	{
-		return unless reftype($_) eq 'HASH';
-		return unless &Internals::SvREADONLY($_);
-		
-		my $type    = shift;
-		my $wrapped = $type->wrapped;
-		
-		if (my $KEYS = $wrapped->$_FIND_KEYS) {
-			require Hash::Util;
-			my $keys  = join "*#*", @$KEYS;
+__PACKAGE__->meta->add_type({
+	name        => 'Locked',
+	parent      => Ref['HASH'],
+	constraint  => sub {
+		my $r = reftype($_);
+		&Internals::SvREADONLY($_);
+	},
+	constraint_generator => sub {
+		my ($parameter) = @_ or return $Type::Tiny::parameterize_type;
+		my $pchk = $parameter->compiled_check;
+		my $KEYS = $parameter->$_FIND_KEYS or return $pchk;
+		my $keys = join "*#*", @$KEYS;
+		sub {
 			my $legal = join "*#*", sort(&Hash::Util::legal_keys($_));
 			return if $keys ne $legal;
-		}
-		
-		return !!1;
+			goto $pchk;
+		};
 	},
-	inlined_pre_check => sub
-	{
-		my @r;
-		push @r, qq[Scalar::Util::reftype($_) eq 'HASH'];
-		push @r, qq[&Internals::SvREADONLY($_)];
-		
-		my $type    = $_[0];
-		my $wrapped = $type->wrapped;
-		
-		if (my $KEYS = $wrapped->$_FIND_KEYS) {
-			require B;
-			require Hash::Util;
-			push @r, B::perlstring(join "*#*", @$KEYS)
-				.qq[ eq join("*#*", sort(&Hash::Util::legal_keys($_)))||''];
-		}
-		
-		return @r;
+	inlined     => sub {
+		my ($self, $varname) = @_;
+		my $r = Ref['HASH'];
+		return (
+			$r->inline_check($varname),
+			sprintf('&Internals::SvREADONLY(%s)', $varname),
+		);
 	},
-	post_coerce => sub
-	{
+	inline_generator => sub {
 		require Hash::Util;
-		
-		my $type    = shift;
-		my $wrapped = $type->wrapped;
-		
-		&Hash::Util::unlock_hash($_);
-		&Hash::Util::lock_keys($_, @{ $wrapped->$_FIND_KEYS || [] });
-		return $_;
+		my ($parameter) = @_ or return $Type::Tiny::parameterize_type;
+		return unless $parameter->can_be_inlined;
+		my $KEYS = $parameter->$_FIND_KEYS;
+		my $keys = join "*#*", @{ $KEYS || [] };
+		sub {
+			my ($child, $varname) = @_;
+			my @extras;
+			if ($keys) {
+				require Hash::Util;
+				push @extras, sprintf('%s eq join("*#*", sort(&Hash::Util::legal_keys(%s)))', B::perlstring($keys), $varname);
+			}
+			(undef, @extras, $parameter->inline_check($varname));
+		};
 	},
-	inlined_post_coerce => sub
-	{
+	coercion => [
+		Ref['HASH'] , => 'do { Types::ReadOnly::_make_readonly(my $ro = $_); $ro }',
+	],
+	coercion_generator => sub {
 		require Hash::Util;
-		
-		my $type    = shift;
-		my $wrapped = $type->wrapped;
-		
-		my $qkeys = '';
-		if (my $KEYS = $wrapped->$_FIND_KEYS) {
-			require B;
-			$qkeys = join q[,], '', map B::perlstring($_), @$KEYS;
+		my ($me, $child) = @_;
+		my $parameter = $child->type_parameter;
+		my $KEYS = $parameter->$_FIND_KEYS;
+		my $qkeys = $KEYS ? join(q[,], '', map B::perlstring($_), @$KEYS) : '';
+		my @extra;
+		if ($parameter->has_coercion) {
+			my @map = @{ $parameter->coercion->type_coercion_map };
+			while (@map) {
+				my ($t, $code) = splice @map, 0, 2;
+				if (Types::TypeTiny::CodeLike->check($code)) {
+					push @extra, $t, sub {
+						my $coerced = $code->(@_);
+						&Hash::Util::unlock_hash($coerced);
+						&Hash::Util::lock_hash($coerced, @{$KEYS||[]});
+						$coerced;
+					};
+				}
+				else {
+					push @extra, $t, sprintf('do { my $coerced = %s; &Hash::Util::unlock_hash($coerced); &Hash::Util::lock_keys($coerced %s); $coerced }', $code, $qkeys);
+				}
+			}
 		}
-		
-		"&Hash::Util::unlock_hash($_); &Hash::Util::lock_keys($_ $qkeys); $_;";
-	};
+		bless(
+			{ type_coercion_map => [
+				$parameter => sprintf('do { my $coerced = $_; &Hash::Util::unlock_hash($coerced); &Hash::Util::lock_keys($coerced %s); $coerced }', $qkeys),
+				@extra,
+			] },
+			'Type::Coercion'
+		);
+	},
+});
 
-1;
+
+# This comparator allows Locked[Foo] to be seen as a child of Foo, and not
+# just a child of Locked. It's probably not foolproof.
+#
+my $comparator;
+$comparator = sub {
+	my $A  = shift->find_constraining_type;
+	my $B  = shift->find_constraining_type;
+	my $RO = __PACKAGE__->get_type('ReadOnly');
+	my $L  = __PACKAGE__->get_type('Locked');
+		
+	my $Aprime = $A->find_parent(sub {
+		$_->is_parameterized and
+		$_->has_parent and
+		$_->parent->strictly_equals($L) || $_->parent->strictly_equals($RO)
+	});
+	
+	if ($Aprime) {
+		my $param = $Aprime->type_parameter->find_constraining_type;
+		if ($param->is_a_type_of($B)) {
+			return Type::Tiny::CMP_SUBTYPE();
+		}
+	}
+	
+	return Type::Tiny::CMP_UNKNOWN() if @_;
+	
+	my $r = $comparator->($B, $A, 1);
+	return  $r if ($r eq Type::Tiny::CMP_EQUIVALENT());
+	return -$r if ($r eq Type::Tiny::CMP_SUPERTYPE() || $r eq Type::Tiny::CMP_SUBTYPE());
+	
+	Type::Tiny::CMP_UNKNOWN();
+};
+
+push @Type::Tiny::CMP, $comparator;
+
+__PACKAGE__->meta->make_immutable;
+
 
 __END__
 
@@ -187,8 +269,6 @@ This library provides the following type constraints:
 A type constraint for references to read-only scalars, arrays and
 hashes. Values don't necessarily need to be deeply read-only to
 pass the type check.
-
-This type constraint I<< only works when it is parameterized >>.
 
 This type constraint inherits coercions from its parameter, and
 makes the result read-only (deeply).
@@ -226,7 +306,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

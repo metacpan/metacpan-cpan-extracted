@@ -42,35 +42,31 @@
    "provides" : {
       "Pg::Explain" : {
          "file" : "lib/Pg/Explain.pm",
-         "version" : "0.81"
+         "version" : "0.90"
+      },
+      "Pg::Explain::Analyzer" : {
+         "file" : "lib/Pg/Explain/Analyzer.pm"
       },
       "Pg::Explain::From" : {
-         "file" : "lib/Pg/Explain/From.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/From.pm"
       },
       "Pg::Explain::FromJSON" : {
-         "file" : "lib/Pg/Explain/FromJSON.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/FromJSON.pm"
       },
       "Pg::Explain::FromText" : {
-         "file" : "lib/Pg/Explain/FromText.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/FromText.pm"
       },
       "Pg::Explain::FromXML" : {
-         "file" : "lib/Pg/Explain/FromXML.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/FromXML.pm"
       },
       "Pg::Explain::FromYAML" : {
-         "file" : "lib/Pg/Explain/FromYAML.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/FromYAML.pm"
       },
       "Pg::Explain::Node" : {
-         "file" : "lib/Pg/Explain/Node.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/Node.pm"
       },
       "Pg::Explain::StringAnonymizer" : {
-         "file" : "lib/Pg/Explain/StringAnonymizer.pm",
-         "version" : "0.81"
+         "file" : "lib/Pg/Explain/StringAnonymizer.pm"
       }
    },
    "release_status" : "stable",
@@ -79,6 +75,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.81",
+   "version" : "0.90",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

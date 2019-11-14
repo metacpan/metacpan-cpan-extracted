@@ -3,24 +3,56 @@ use strict;
 use warnings;
 use utf8;
 use Mojo::Base -base;
+use Mojo::DOM;
+use Mojo::URL;
 use Mojo::Util qw(md5_sum);
 
 has 'closed';
-has 'context';
+has '_context';
 has depth => 0;
+has '_dom';
 has 'literal_uri';
 has 'method';
 has 'referrer';
 has redirect_history => sub { [] };
 has 'tx_params';
-has 'url';
+has '_url';
+
+sub context {
+  my $self = shift;
+  if (@_) {
+    $self->_context("$_[0]");
+    $self->_dom(1) if ref $_[0] && ref $_[0] eq 'Mojo::DOM';
+  }
+  if (my $c = $self->_context) {
+    return Mojo::DOM->new($c)->[0] if $self->_dom;
+    return Mojo::URL->new($c);
+  }
+}
+
+sub new {
+  my ($class, %args) = (@_);
+  $args{_url} = (delete $args{url}) if $args{url};
+  $args{_url} = "$args{_url}" if $args{_url};
+
+  $args{_context} = (delete $args{context}) if $args{context};
+  $args{_dom} = 1 if ref $args{_context} && ref $args{_context} eq 'Mojo::DOM';
+  $args{_context} = "$args{_context}" if $args{_context};
+
+  $class->SUPER::new(%args);
+}
+
+sub url {
+  my $self = shift;
+  $self->_url("$_[0]") if @_;
+  return Mojo::URL->new($self->_url);
+}
 
 sub upgrade {
   my ($class, $job) = @_;
 
   if (!ref $job || ref $job ne __PACKAGE__) {
-    my $url = !ref $job ? Mojo::URL->new($job) : $job;
-    $job = $class->new(url => $url);
+    $job = $class->new(_url => $job);
   }
 
   return $job;
@@ -44,13 +76,15 @@ sub child {
 
 sub digest {
   my $self     = shift;
-  my $md5_seed = $self->url->to_string . ($self->method || '');
+  my $md5_seed = $self->_url . ($self->method || '');
   $md5_seed .= $self->tx_params->to_string if ($self->tx_params);
   return md5_sum($md5_seed);
 }
 
 sub redirect {
-  my ($self, $last, @history) = @_;
+  my ($self, @history) = @_;
+  @history = map {"$_"} @history;
+  my $last = shift @history;
   $self->url($last);
   $self->redirect_history(\@history);
 }
@@ -58,8 +92,8 @@ sub redirect {
 sub original_url {
   my $self   = shift;
   my @histry = @{$self->redirect_history};
-  return $self->url unless (@histry);
-  return $histry[$#histry];
+  my $url    = scalar @histry ? $histry[$#histry] : $self->url;
+  return Mojo::URL->new($url);
 }
 
 1;

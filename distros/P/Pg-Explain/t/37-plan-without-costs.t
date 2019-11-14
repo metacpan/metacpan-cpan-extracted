@@ -10,10 +10,10 @@ use Pg::Explain;
 
 opendir( my $dir, 't/37-plan-without-costs/' );
 
-my %uniq = ();
+my %uniq  = ();
 my @tests = sort { $a <=> $b }
     grep { !$uniq{ $_ }++ }
-    map { s/\..*//; $_ }
+    map  { s/\..*//; $_ }
     grep { /^\d+\.(?:expect|plan)$/ } readdir $dir;
 closedir $dir;
 
@@ -23,7 +23,7 @@ for my $test ( @tests ) {
     my $expected = get_expected_from_file( $test );
 
     my $plan_file = 't/37-plan-without-costs/' . $test . '.plan';
-    my $explain = Pg::Explain->new( 'source_file' => $plan_file );
+    my $explain   = Pg::Explain->new( 'source_file' => $plan_file );
 
     isa_ok( $explain,           'Pg::Explain',       "Parsed plan $test" );
     isa_ok( $explain->top_node, 'Pg::Explain::Node', "Parsed(2) plan $test" );

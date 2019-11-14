@@ -16,7 +16,7 @@ $t->app->log->on(message => sub {
     my ($log, $level, @lines) = @_;
     if ($ENV{CALLBACKERY_RPC_LOG}){
        if ($lines[0] =~ /CALL|RETURN/){
-          like($lines[0],qr{UnknowUser});
+          like($lines[0],qr{UNKNOWN});
        }
     }
 });

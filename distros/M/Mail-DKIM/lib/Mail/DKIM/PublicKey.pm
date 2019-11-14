@@ -172,7 +172,10 @@ sub check {
     }
 
     # have OpenSSL load the key
-    eval { $self->cork; };
+    eval {
+        local $SIG{__DIE__};
+        $self->cork;
+    };
     if ($@) {
 
         # see also finish_body
@@ -268,7 +271,7 @@ sub check_granularity {
 
     # check subdomains
     if ( $self->subdomain_flag ) {
-        unless ( $domain_part eq lc( $self->{'Domain'} ) ) {
+        unless ( lc( $domain_part ) eq lc( $self->{'Domain'} ) ) {
             $@ = "does not support signing subdomains\n";
             return;
         }
@@ -333,7 +336,10 @@ sub verify {
 
     my $rtrn;
 
-    eval { $rtrn = $self->cork->verify( $prms{'Text'}, $prms{'Signature'} ); };
+    eval {
+        local $SIG{__DIE__};
+        $rtrn = $self->cork->verify( $prms{'Text'}, $prms{'Signature'} );
+    };
 
     $@
       and $self->errorstr($@),
@@ -391,8 +397,8 @@ sub data {
 
     my $p = $self->get_tag('p');
 
-    # remove whitespace (actually only LWSP is allowed)
-    $p =~ tr/\015\012 \t//d if defined $p;
+    # remove whitespace (actually only LWSP is allowed) and double quote (long string delimiter)
+    $p =~ tr/\015\012 \t"//d  if defined $p;
     return $p;
 }
 

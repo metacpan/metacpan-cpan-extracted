@@ -1,3 +1,34 @@
+v0.99.6 2019-11-13T22:47:52Z
+ - fix for test unreleased version
+
+v0.99.5 2019-11-13T22:16:14Z
+ - docket config updated
+
+v0.99.4 2019-11-13T18:23:12Z
+ - make fit api windows compatible
+
+v0.99.3 2019-11-13T14:55:57Z
+ - dockerfile template fixed
+
+v0.99.2 2019-11-13T09:46:34Z
+ - PAR log capitalized
+ - dockerfile improved
+
+v0.99.1 2019-11-13T06:43:44Z
+ - minor fix in release process
+
+v0.99.0 2019-11-13T06:40:04Z
+ - migrating to git
+ - par ported to git
+ - dist release fixes
+ - base class for api threads
+ - dist issues removed
+ - docker registry api:
+ - docker perl 5.30.1
+ - dockerhub api
+ - Pcore::API::Docker::Cloud -> Pcore::API::Docker::Hub
+ - docker engine api v1.40
+
 v0.98.16 2019-11-11T15:19:03Z
  - docker build improvements
  - .dockerignore parser improved

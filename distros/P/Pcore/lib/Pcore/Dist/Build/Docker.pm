@@ -4,17 +4,17 @@ use Pcore -class, -ansi, -res;
 use Pcore::Lib::Scalar qw[is_plain_arrayref];
 
 has dist => ();                                     # InstanceOf ['Pcore::Dist']
-has api  => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Cloud']
+has api  => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Hub']
 
 sub _build_api($self) {
-    require Pcore::API::Docker::Cloud;
+    require Pcore::API::Docker::Hub;
 
-    return Pcore::API::Docker::Cloud->new;
+    return Pcore::API::Docker::Hub->new;
 }
 
 sub init ( $self, $args ) {
     if ( $self->{dist}->docker ) {
-        say qq[Dist is already linked to "$self->{dist}->{docker}->{repo_id}"];
+        say qq[Docker profile is already created "$self->{dist}->{docker}->{repo_id}".];
 
         exit 3;
     }
@@ -22,15 +22,15 @@ sub init ( $self, $args ) {
     my $git_upstream = $self->{dist}->git ? $self->{dist}->git->upstream : undef;
 
     if ( !$git_upstream ) {
-        say q[Dist has no upstream repository];
+        say 'Dist has no upstream repository.';
 
         exit 3;
     }
 
-    my $repo_namespace = $args->{namespace} || $ENV->user_cfg->{DOCKER}->{default_namespace} || $ENV->user_cfg->{DOCKER}->{username};
+    my $repo_namespace = $args->{namespace} || $ENV->user_cfg->{DOCKERHUB}->{default_namespace} || $ENV->user_cfg->{DOCKERHUB}->{username};
 
     if ( !$repo_namespace ) {
-        say 'DockerHub repo namespace is not defined';
+        say 'DockerHub repo namespace is not defined.';
 
         exit 3;
     }
@@ -39,27 +39,27 @@ sub init ( $self, $args ) {
 
     my $repo_id = "$repo_namespace/$repo_name";
 
-    my $confirm = P->term->prompt( qq[Create DockerHub repository "$repo_id"?], [qw[yes no cancel]], enter => 1 );
+    # my $confirm = P->term->prompt( qq[Create DockerHub repository "$repo_id"?], [qw[yes no cancel]], enter => 1 );
 
-    if ( $confirm eq 'cancel' ) {
-        exit 3;
-    }
-    elsif ( $confirm eq 'yes' ) {
-        my $api = $self->api;
+    # if ( $confirm eq 'cancel' ) {
+    #     exit 3;
+    # }
+    # elsif ( $confirm eq 'yes' ) {
+    #     my $api = $self->api;
 
-        print q[Creating DockerHub repository ... ];
+    #     print q[Creating DockerHub repository ... ];
 
-        my $res = $api->create_repo(
-            $repo_id,
-            desc      => $self->{dist}->module->abstract || $self->{dist}->name,
-            full_desc => $EMPTY,
-            private   => 0,
-        );
+    #     my $res = $api->create_repo(
+    #         $repo_id,
+    #         desc      => $self->{dist}->module->abstract || $self->{dist}->name,
+    #         full_desc => $EMPTY,
+    #         private   => 0,
+    #     );
 
-        say $res->{reason};
+    #     say $res->{reason};
 
-        exit 3 if !$res->is_success;
-    }
+    #     exit 3 if !$res->is_success;
+    # }
 
     require Pcore::Lib::File::Tree;
 
@@ -83,11 +83,21 @@ sub init ( $self, $args ) {
 
     $files->write_to( $self->{dist}->{root} );
 
+    say qq[Docker profile created "$repo_namespace/$repo_name".];
+
     return;
 }
 
 sub set_from_tag ( $self, $tag ) {
-    my $dockerfile = P->file->read_bin("$self->{dist}->{root}/Dockerfile");
+    my $path = "$self->{dist}->{root}/Dockerfile";
+
+    if ( !-f $path ) {
+        say q[Dockerfile is not exists.];
+
+        exit 1;
+    }
+
+    my $dockerfile = P->file->read_bin($path);
 
     if ( !defined $tag ) {
         $dockerfile =~ /^FROM\s+([[:alnum:]\/_-]+)(?::([[:alnum:]._-]+))?\s*$/sm;
@@ -99,7 +109,7 @@ sub set_from_tag ( $self, $tag ) {
             say q[Docker base image wasn't changed];
         }
         else {
-            P->file->write_bin( "$self->{dist}->{root}/Dockerfile", $dockerfile );
+            P->file->write_bin( $path, $dockerfile );
 
             {
                 # cd to repo root
@@ -293,7 +303,13 @@ sub build_local ( $self, $tag, $args ) {
     my $dist = $self->{dist};
 
     if ( !$dist->docker ) {
-        $res = res [ 400, 'Docker is not configured for this dist' ];
+        $res = res [ 400, 'Docker profile was not found.' ];
+        say $res;
+        return $res;
+    }
+
+    if ( !$dist->id->{hash} ) {
+        $res = res [ 500, 'Unable to identify current changeset.' ];
         say $res;
         return $res;
     }
@@ -305,17 +321,12 @@ sub build_local ( $self, $tag, $args ) {
 
         $clone_root = P->file1->tempdir;
 
-        # my $res = Pcore::API::Git->git_run_no_root( [ 'clone', $dist->git->upstream->get_clone_url, $clone_root ] );
-        $res = Pcore::API::Git->git_run_no_root( [ 'clone', $dist->{root}, $clone_root ] );
+        # my $res = Pcore::API::Git->git_run( [ 'clone', $dist->git->upstream->get_clone_url, $clone_root ], undef );
+        $res = Pcore::API::Git->git_run( [ 'clone', '--quiet', $dist->{root}, $clone_root, '--branch', $tag ], undef );
         say $res;
         return $res if !$res;
 
         $repo = Pcore::Dist->new($clone_root);
-
-        print 'Checking out ... ';
-        $res = $repo->git->git_run("checkout $tag");
-        say $res;
-        return $res if !$res;
     }
     else {
         $repo = $dist;
@@ -326,10 +337,13 @@ sub build_local ( $self, $tag, $args ) {
     my $repo_id = $dist->docker->{repo_id};
 
     my @tags;
+    my $is_dirty = $id->{is_dirty} ? '.dirty' : $EMPTY;
+    @tags = map {"$repo_id:${_}${is_dirty}"} grep {defined} $id->{branch}, $id->{tags}->@* if defined $tag;
+    push @tags, "$repo_id:$id->{hash_short}${is_dirty}" if !@tags;
 
-    @tags = map {"$repo_id:$_"} grep {defined} $id->{branch}, $id->{tags}->@* if defined $tag;
-
-    push @tags, "$repo_id:$id->{hash_short}" if !@tags;
+    for my $tag (@tags) {
+        say "Tag: $tag";
+    }
 
     my $dockerignore = $self->_build_dockerignore("$repo->{root}/.dockerignore");
 

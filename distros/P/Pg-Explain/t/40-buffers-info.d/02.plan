@@ -1,0 +1,6 @@
+Index Only Scan using z_pkey on z  (cost=0.29..8.31 rows=1 width=4) (actual time=0.003..0.004 rows=1 loops=1)
+  Index Cond: (id = 1)
+  Heap Fetches: 1
+  Buffers: shared hit=3
+Planning Time: 0.012 ms
+Execution Time: 0.008 ms

@@ -1,19 +1,21 @@
 #!/usr/bin/env perl
 #---AUTOPRAGMASTART---
-use 5.010_001;
+use 5.020;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
-use English qw(-no_match_vars);
+use English;
 use Carp;
-our $VERSION = 9;
-use Fatal qw( close );
+our $VERSION = 10;
+use autodie qw( close );
 use Array::Contains;
+use utf8;
 #---AUTOPRAGMAEND---
 
 # PAGECAMEL  (C) 2008-2019 Rene Schickbauer
 # Developed under Artistic license
+
 
 my $newversion = shift @ARGV || "???";
 
@@ -36,7 +38,7 @@ foreach my $file (@files) {
 
     open(my $ofh, ">", $file) or die($ERRNO);
     foreach my $line (@lines) {
-        $line =~ s/VERSION = \d.*\;/VERSION = $newversion\;/g;
+        $line =~ s/VERSION = [\d\.]+/VERSION = $newversion/g;
         print $ofh $line;
     }
     close $ofh;

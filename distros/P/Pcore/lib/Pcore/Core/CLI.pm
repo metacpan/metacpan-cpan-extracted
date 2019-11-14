@@ -527,6 +527,8 @@ sub help_usage ( $self, $invalid_options = undef ) {
 }
 
 sub help_version ($self) {
+
+    # dist info
     if ( $ENV->dist ) {
         say $ENV->dist->version_string;
     }
@@ -534,11 +536,14 @@ sub help_version ($self) {
         say join $SPACE, $ENV->{SCRIPT_NAME}, ( $main::VERSION ? version->new($main::VERSION)->normal : () );
     }
 
+    # Pcore info
     say $ENV->{pcore}->version_string if !$ENV->dist || $ENV->dist->name ne $ENV->{pcore}->name;
 
+    # perl info
     say 'Perl ' . $^V->normal . " $Config{archname}";
 
-    say join "\n", $EMPTY, "Image path: $ENV{PAR_PROGNAME}", "Temp dir: $ENV{PAR_TEMP}" if $ENV->{is_par};
+    # PAR info
+    say join "\n", "Image path: $ENV{PAR_PROGNAME}", "Temp dir: $ENV{PAR_TEMP}" if $ENV->{is_par};
 
     exit 2;
 }

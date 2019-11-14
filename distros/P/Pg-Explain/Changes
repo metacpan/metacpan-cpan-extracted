@@ -1,6 +1,19 @@
 Revision history for Pg-Explain
 
+0.90    2019/11/12
+        - Fix display of heap fetches from json (https://gitlab.com/depesz/explain.depesz.com/issues/15)
+        - Move global data (planning/execution/total time, trigger info) from top_node to explain object itself
+        - Add method to easily get real total, wall-clock, runtime of query.
+        - Add Pg::Explain::Analyzer, so far it can extract node types and their "paths"
+        - Add scripts to run perltidy, start development tmux env, and explain schema dumper
+        - Fix handling of parallel queries (hopefully)
+        - Remove edge-case deep recursion error
+        - Speed optimization for large explains
+
 0.81    2019/08/26
+        # Remove trailing whitespace - it makes next line matches MUCH faster.
+        $line =~ s/\s*\z//;
+
         - Handle properly single-line JSON plans
         per report from William Meitzen
         - Fix MANIFEST file, so it passes tests

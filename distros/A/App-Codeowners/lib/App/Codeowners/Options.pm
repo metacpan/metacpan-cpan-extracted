@@ -8,7 +8,7 @@ use Getopt::Long 2.39 ();
 use Path::Tiny;
 use Pod::Usage;
 
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.43'; # VERSION
 
 sub early_options {
     return {
@@ -30,8 +30,13 @@ sub command_options {
         'patterns'  => {
             'owner=s'   => '',
         },
+        'projects'  => {},
         'show'      => {
-            'project!'  => 1,
+            'owner=s@'      => [],
+            'pattern=s@'    => [],
+            'project=s@'    => [],
+            'patterns!'     => 0,
+            'projects!'     => undef,
         },
         'update'    => {},
     };
@@ -84,7 +89,7 @@ sub new {
         exit 0;
     }
     if ($opts->{help}) {
-        pod2usage(-exitval => 0, -verbose => 99, -sections => [qw(NAME SYNOPSIS OPTIONS)]);
+        pod2usage(-exitval => 0, -verbose => 99, -sections => [qw(NAME SYNOPSIS OPTIONS COMMANDS)]);
     }
     if ($opts->{manual}) {
         pod2usage(-exitval => 0, -verbose => 2);
@@ -273,7 +278,7 @@ App::Codeowners::Options - Getopt and shell completion for App::Codeowners
 
 =head1 VERSION
 
-version 0.41
+version 0.43
 
 =head1 METHODS
 

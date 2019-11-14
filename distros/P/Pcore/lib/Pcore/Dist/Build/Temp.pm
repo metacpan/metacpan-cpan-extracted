@@ -186,7 +186,7 @@ sub _generate_meta_json ( $self, $tree ) {
     };
 
     # version
-    $meta->{version} = $self->{dist}->version;
+    $meta->{version} = $self->{dist}->id->{release} // 'v0.0.0';
 
     # abstract
     $meta->{abstract} = $self->{dist}->module->abstract if $self->{dist}->module->abstract;

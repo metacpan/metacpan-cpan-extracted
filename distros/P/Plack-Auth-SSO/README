@@ -260,6 +260,22 @@ CONFIG
 
 METHODS
 
+ log
+
+    logger instance. Object instance of class Log::Any::Proxy that logs
+    messages to a category that equals your current class name.
+
+    E.g. configure your logging in log4perl.conf:
+
+        log4perl.category.Plack::Auth::SSO::CAS=INFO,STDERR
+        log4perl.appender.STDERR=Log::Log4perl::Appender::Screen
+        log4perl.appender.STDERR.stderr=1
+        log4perl.appender.STDERR.utf8=1
+        log4perl.appender.STDERR.layout=PatternLayout
+        log4perl.appender.STDERR.layout.ConversionPattern=%d %p [%P] - %c[%L] : %m%n
+
+    See Log::Any for more information
+
  to_app
 
     returns a Plack application
@@ -357,5 +373,5 @@ LICENSE AND COPYRIGHT
 SEE ALSO
 
     Plack::Auth::SSO::CAS, Plack::Auth::SSO::ORCID
-    Plack::Auth::SSO::Shibboleth
+    Plack::Auth::SSO::Shibboleth Log::Any
 

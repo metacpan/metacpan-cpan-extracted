@@ -1,5 +1,5 @@
 <clacks>
-    <appname>Clacks Master</appname>
+    <appname>Clacks Slave2</appname>
     <ip>127.0.0.1</ip>
     <port>18887</port>
     <pingtimeout>600</pingtimeout>
@@ -15,7 +15,6 @@
         <step>1</step>
     </throttle>
     <master>
-        <ip>127.0.0.1</ip>
-        <port>18888</port>
+        <socket>example.sock</socket>
     </master>
 </clacks>

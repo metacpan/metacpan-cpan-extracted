@@ -1,5 +1,5 @@
 #!perl
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use Pg::Explain;
 
@@ -20,3 +20,5 @@ my $explain = Pg::Explain->new( 'source' => $plan );
 isa_ok( $explain, 'Pg::Explain' );
 
 is_deeply( $explain->top_node->get_struct(), $expected_output, 'Simple plan passed as string', );
+
+is( $explain->source_format, 'TEXT', 'Correct format detection' );

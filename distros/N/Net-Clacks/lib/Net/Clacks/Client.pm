@@ -1,15 +1,16 @@
 package Net::Clacks::Client;
 #---AUTOPRAGMASTART---
-use 5.010_001;
+use 5.020;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
-use English qw(-no_match_vars);
+use English;
 use Carp;
-our $VERSION = 9;
-use Fatal qw( close );
+our $VERSION = 10;
+use autodie qw( close );
 use Array::Contains;
+use utf8;
 #---AUTOPRAGMAEND---
 
 use IO::Socket::IP;
@@ -131,9 +132,14 @@ sub reconnect {
     #binmode($socket, ':bytes');
     $socket->blocking(0);
 
-    IO::Socket::SSL->start_SSL($socket,
-                               SSL_verify_mode => SSL_VERIFY_NONE,
-                               ) or croak("Can't use SSL: " . $SSL_ERROR);
+
+    if(ref $socket ne 'IO::Socket::UNIX') {
+        # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
+        # There is simply no point in running it over a local socket.
+        IO::Socket::SSL->start_SSL($socket,
+                                   SSL_verify_mode => SSL_VERIFY_NONE,
+                                   ) or croak("Can't use SSL: " . $SSL_ERROR);
+    }
 
     $self->{socket} = $socket;
     $self->{selector} = IO::Select->new($self->{socket});
@@ -315,6 +321,8 @@ my %overheadflags = (
     O => "auth_ok", # Authentication OK
     F => "auth_failed", # Authentication FAILED
 
+    E => 'error_message', # Server to client error message
+
     C => "close_all_connections",
     D => "discard_message",
     G => "forward_message",
@@ -396,6 +404,11 @@ restartgetnext:
         if($parsedflags{auth_ok}) {
             #print STDERR "Clacks AUTH OK\n";
             goto restartgetnext; # try the next message
+        } elsif($parsedflags{error_message}) {
+            %data = (
+                type => 'error_message',
+                data => $value,
+            );
         } elsif($parsedflags{auth_failed}) {
             croak("Clacks Authentication failed!");
         } elsif($parsedflags{informal_message}) {

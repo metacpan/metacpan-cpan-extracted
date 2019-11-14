@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -34,18 +34,18 @@ my $my_hash = HashRef[ Undef ];
 my $my_lock = Locked[ $my_hash ];
 my $foo     = $my_lock->create_child_type(name => 'Foo');
 
-isa_ok(Locked, 'Type::Tiny::Wrapper');
-isa_ok($my_lock, 'Type::Tiny::Wrapped');
+isa_ok(Locked, 'Type::Tiny');
+isa_ok($my_lock, 'Type::Tiny');
 
 ok( $my_lock->is_a_type_of(Locked), '$my_lock->is_a_type_of(Locked)');
 ok( $my_lock->is_a_type_of($my_hash), '$my_lock->is_a_type_of($my_hash)');
-ok(!$my_lock->is_strictly_a_type_of(Locked), '!$my_lock->is_strictly_a_type_of(Locked)');
-ok( $my_lock->is_strictly_a_type_of($my_hash), '$my_lock->is_strictly_a_type_of($my_hash)');
+ok( $my_lock->is_strictly_a_type_of(Locked), '!$my_lock->is_strictly_a_type_of(Locked)');
+ok(!$my_lock->is_strictly_a_type_of($my_hash), '$my_lock->is_strictly_a_type_of($my_hash)');
 
 ok( $foo->is_a_type_of(Locked), '$foo->is_a_type_of(Locked)');
 ok( $foo->is_a_type_of($my_hash), '$foo->is_a_type_of($my_hash)');
-ok(!$foo->is_strictly_a_type_of(Locked), '!$foo->is_strictly_a_type_of(Locked)');
-ok( $foo->is_strictly_a_type_of($my_hash), '$foo->is_strictly_a_type_of($my_hash)');
+ok( $foo->is_strictly_a_type_of(Locked), '!$foo->is_strictly_a_type_of(Locked)');
+ok(!$foo->is_strictly_a_type_of($my_hash), '$foo->is_strictly_a_type_of($my_hash)');
 
 my $hash1 = { foo => undef };
 my $hash2 = { foo => undef };  &Hash::Util::lock_keys($hash2);

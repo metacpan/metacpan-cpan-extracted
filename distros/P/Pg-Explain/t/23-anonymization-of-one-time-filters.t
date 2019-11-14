@@ -38,7 +38,7 @@ for my $plan_source ( @plans ) {
     my $textual = $explain->as_text();
 
     ok( $textual !~ /generate_series/, 'anonymize() hides name of function in function scan' );
-    ok( $textual !~ /whatever/, 'anonymize() hides name of column in one-time filters' );
+    ok( $textual !~ /whatever/,        'anonymize() hides name of column in one-time filters' );
 
 }
 

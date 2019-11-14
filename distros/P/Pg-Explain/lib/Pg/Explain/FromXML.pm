@@ -8,14 +8,6 @@ use Carp;
 
 Pg::Explain::FromXML - Parser for explains in XML format
 
-=head1 VERSION
-
-Version 0.81
-
-=cut
-
-our $VERSION = '0.81';
-
 =head1 SYNOPSIS
 
 It's internal class to wrap some work. It should be used by Pg::Explain, and not directly.
@@ -76,10 +68,23 @@ sub parse_source {
         return;
     }
 
-    my $struct = XMLin( $source );
+    my $struct = XMLin( $source )->{ 'Query' };
 
-    my $top_node = $self->make_node_from( $struct->{ 'Query' }->{ 'Plan' } );
+    my $top_node = $self->make_node_from( $struct->{ 'Plan' } );
 
+    $self->explain->planning_time( $struct->{ 'Planning-Time' } )   if $struct->{ 'Planning-Time' };
+    $self->explain->execution_time( $struct->{ 'Execution-Time' } ) if $struct->{ 'Execution-Time' };
+    $self->explain->total_runtime( $struct->{ 'Total-Runtime' } )   if $struct->{ 'Total-Runtime' };
+    if ( $struct->{ 'Triggers' } ) {
+        for my $t ( @{ $struct->{ 'Triggers' }->{ 'Trigger' } } ) {
+            my $ts = {};
+            $ts->{ 'calls' }    = $t->{ 'Calls' }        if defined $t->{ 'Calls' };
+            $ts->{ 'time' }     = $t->{ 'Time' }         if defined $t->{ 'Time' };
+            $ts->{ 'relation' } = $t->{ 'Relation' }     if defined $t->{ 'Relation' };
+            $ts->{ 'name' }     = $t->{ 'Trigger-Name' } if defined $t->{ 'Trigger-Name' };
+            $self->explain->add_trigger_time( $ts );
+        }
+    }
     return $top_node;
 }
 

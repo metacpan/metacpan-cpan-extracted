@@ -1,23 +1,19 @@
-_______________________________________________________________________________
-2012-03-30 HTTP-Date 6.02
+Change history for HTTP-Date
 
-Added support for parsing dates with (faulty) double TZ spec [RT#75150]
+6.03      2019-11-13 14:11:51Z
+    - RT123557 Fix for DST test issues (GH#14) (@pludlamCVL)
+    - Add Travis tests and convert to Dist::Zilla (GH#13) (Olaf Alders)
 
-Doc tweaks.
+6.02    2012-03-30
+    - Added support for parsing dates with (faulty) double TZ spec [RT#75150]
+    - Doc tweaks.
 
+6.01    2012-02-15
+    - Restore perl-5.6 compatiblity.  Drop MacOS (classic) support.
 
-
-_______________________________________________________________________________
-2012-02-15 HTTP-Date 6.01
-
-Restore perl-5.6 compatiblity.  Drop MacOS (classic) support.
-
-
-
-_______________________________________________________________________________
-2011-02-25 HTTP-Date 6.00
-
-Initial release of HTTP-Date as a separate distribution. There are no code
-changes besides incrementing the version number since libwww-perl-5.837.
+6.00    2011-02-25
+    - Initial release of HTTP-Date as a separate distribution. There are no
+      code changes besides incrementing the version number since
+      libwww-perl-5.837.
 
 The HTTP::Date module used to be bundled with the libwww-perl distribution.

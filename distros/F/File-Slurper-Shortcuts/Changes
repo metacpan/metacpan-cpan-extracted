@@ -1,10 +1,23 @@
-0.002   2018-09-22 (PERLANCAR)
+0.003   2019-10-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Rename functions replace_{text,binary} ->
+	  modify_{text,binary}. Old names removed from docs but still supported
+	  for now.
+
+	- Do not write to file if content does not change.
+
+	- [ux] Return the original content of file.
+
+	- [test] Add some tests.
+
+
+0.002   2018-09-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Grammar.
 
 
-0.001   2018-09-22 (PERLANCAR)
+0.001   2018-09-22  Released-By: PERLANCAR
 
         - First release.

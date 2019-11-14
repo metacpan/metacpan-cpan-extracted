@@ -1,0 +1,9 @@
+                                          QUERY PLAN                                        
+ --------------------------------------------------------------------------------------------
+  Insert on foo  (cost=0.00..0.01 rows=1 width=24) (actual time=0.504..0.505 rows=0 loops=1)
+    ->  Result  (cost=0.00..0.01 rows=1 width=24) (actual time=0.019..0.020 rows=1 loops=1)
+  Planning Time: 0.072 ms
+  Trigger foo_system_time_generated_always: time=0.401 calls=1
+  Trigger foo_system_time_write_history: time=0.260 calls=1
+  Execution Time: 0.842 ms
+ (6 rows)

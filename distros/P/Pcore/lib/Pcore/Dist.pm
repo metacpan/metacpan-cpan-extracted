@@ -19,7 +19,6 @@ has is_pcore   => ( is       => 'lazy', init_arg => undef );
 has git        => ( is       => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::GIT'] ]
 has build      => ( is       => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Dist::Build']
 has id         => ( is       => 'lazy', init_arg => undef );
-has version    => ( is       => 'lazy', init_arg => undef );
 has releases   => ( is       => 'lazy', init_arg => undef );    # Maybe [ArrayRef]
 has docker     => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef]
 
@@ -216,11 +215,88 @@ sub _build_id ($self) {
         tags             => undef,
     };
 
-    if ( !$self->{is_installed} && $self->git ) {
-        if ( my $git_id = $self->git->git_id ) {
-            $id->@{ keys $git_id->{data}->%* } = values $git_id->{data}->%*;
-        }
+    # get data from git
+    if ( $self->git ) {
+        my ( $is_error, $res1 );
+
+        my $cv = P->cv->begin;
+
+        $cv->begin;
+        Coro::async_pool sub {
+            my $res = $self->git->git_run('log -1 --pretty=format:%H%n%cI%n%D');
+
+            $cv->end;
+
+            $is_error = 1 if !$res;
+
+            return if $is_error;
+
+            ( $res1->@{qw[hash date]}, my $ref ) = split /\n/sm, $res->{data};
+
+            $res1->{hash_short} = substr $res1->{hash}, 0, 7;
+
+            my @ref = split /,/sm, $ref;
+
+            # parse current branch
+            if ( ( shift @ref ) =~ /->\s(.+)/sm ) {
+                $res1->{branch} = $1;
+            }
+
+            # parse tags
+            for my $token (@ref) {
+                if ( $token =~ /tag:\s(.+)/sm ) {
+                    push $res1->{tags}->@*, $1;
+                }
+            }
+
+            return;
+        };
+
+        $cv->begin;
+        Coro::async_pool sub {
+            my $res = $self->git->git_run('describe --tags --always --match "v[0-9]*.[0-9]*.[0-9]*"');
+
+            $cv->end;
+
+            $is_error = 1 if !$res;
+
+            return if $is_error;
+
+            # remove trailing "\n"
+            chomp $res->{data};
+
+            my @data = split /-/sm, $res->{data};
+
+            if ( $data[0] =~ /\Av\d+[.]\d+[.]\d+\z/sm ) {
+                $res1->{release} = $data[0];
+
+                $res1->{release_distance} = 0+ $data[1] if defined $data[1];
+            }
+
+            return;
+        };
+
+        $cv->begin;
+        Coro::async_pool sub {
+            my $res = $self->git->git_run('status --porcelain');
+
+            $cv->end;
+
+            $is_error = 1 if !$res;
+
+            return if $is_error;
+
+            $res1->{is_dirty} = 0+ !!$res->{data};
+
+            return;
+        };
+
+        $cv->end->recv;
+
+        $id->@{ keys $res1->%* } = values $res1->%* if !$is_error;
     }
+
+    # get data from dist-id.yaml
     elsif ( -f "$self->{share_dir}/dist-id.yaml" ) {
         $id = P->cfg->read("$self->{share_dir}/dist-id.yaml");
     }
@@ -231,22 +307,18 @@ sub _build_id ($self) {
     return $id;
 }
 
-# TODO remove
-sub _build_version ($self) {
-
-    # first, try to get version from the main module
-    my $ver = $self->module->version;
-
-    return $ver if defined $ver;
-
-    # for crypted PAR distrs try to get version from id
-    return version->parse( $self->id->{release} );
-}
-
 sub _build_releases ($self) {
-    if ( !$self->{is_installed} && $self->git && ( my $releases = $self->git->git_get_releases ) ) {
-        return $releases->{data};
-    }
+    return if !$self->git;
+
+    my $res = $self->git->git_run('tag --merged master');
+
+    return if !$res;
+
+    return if !$res->{data};
+
+    my @releases = sort { version->parse($a) <=> version->parse($b) } grep {/\Av\d+[.]\d+[.]\d+\z/sm} split /\n/sm, $res->{data};
+
+    return \@releases if @releases;
 
     return;
 }
@@ -256,9 +328,9 @@ sub clear ($self) {
     # clear version
     $self->module->clear if exists $self->{module};
 
-    delete $self->{version};
-
     delete $self->{id};
+
+    delete $self->{releases};
 
     delete $self->{cfg};
 
@@ -279,7 +351,7 @@ sub version_string ($self) {
             push @res, $id->{release} . ( $id->{release_distance} ? "+$id->{release_distance}" : $EMPTY );
         }
 
-        push @res, $id->{hash_short} . ( $id->{is_dirty} ? '+' : $EMPTY );
+        push @res, $id->{hash_short} . ( $id->{is_dirty} ? '.dirty' : $EMPTY );
 
         push @res, $id->{date} if $id->{date};
     }
@@ -320,6 +392,55 @@ sub _build_docker ($self) {
     else {
         return;
     }
+}
+
+sub is_pushed ($self) {
+    return if !$self->git;
+
+    my $res = $self->git->git_run('branch -v --no-color');
+
+    return if !$res;
+
+    return if !$res->{data};
+
+    my $data;
+
+    for my $br ( split /\n/sm, $res->{data} ) {
+        if ( $br =~ /\A[*]?\s+(.+?)\s+(?:.+?)\s+(?:\[ahead\s(\d+)\])?/sm ) {
+            $data->{$1} = $2 || 0;
+        }
+        else {
+            die qq[Can't parse branch: $br];
+        }
+    }
+
+    return $data;
+}
+
+sub get_changesets_log ( $self, $tag = undef ) {
+    return if !$self->git;
+
+    my $cmd = 'log --pretty=format:%s';
+
+    $cmd .= " $tag..HEAD" if $tag;
+
+    my $res = $self->git->git_run($cmd);
+
+    return if !$res;
+
+    return if !$res->{data};
+
+    my ( $data, $idx );
+
+    for my $log ( split /\n/sm, $res->{data} ) {
+        if ( !exists $idx->{$log} ) {
+            $idx->{$log} = 1;
+
+            push $data->@*, $log;
+        }
+    }
+
+    return $data;
 }
 
 1;

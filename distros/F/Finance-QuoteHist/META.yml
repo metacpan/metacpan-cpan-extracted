@@ -24,5 +24,5 @@ requires:
   LWP::UserAgent: '0'
   MIME::Base64: '0'
   Text::CSV: '0'
-version: '1.28'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,6 +9,13 @@ use Test::EOL;
 my @files = (
     'bin/git-codeowners',
     'lib/App/Codeowners.pm',
+    'lib/App/Codeowners/Formatter.pm',
+    'lib/App/Codeowners/Formatter/CSV.pm',
+    'lib/App/Codeowners/Formatter/JSON.pm',
+    'lib/App/Codeowners/Formatter/String.pm',
+    'lib/App/Codeowners/Formatter/TSV.pm',
+    'lib/App/Codeowners/Formatter/Table.pm',
+    'lib/App/Codeowners/Formatter/YAML.pm',
     'lib/App/Codeowners/Options.pm',
     'lib/App/Codeowners/Util.pm',
     'lib/File/Codeowners.pm',

@@ -14,7 +14,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $dist = $self->get_dist;
 
     if ( !$dist->git ) {
-        say 'Git not found';
+        say 'Git was not found.';
 
         exit 3;
     }
@@ -22,18 +22,16 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $id = $dist->id;
 
     # get changesets since latest release
-    my $log = $dist->git->git_get_log( $id->{release} );
+    my $log = $dist->get_changesets_log( $id->{release} );
 
     if ($log) {
-        if ( $log->{data} ) {
-            $log = join "\n", $log->{data}->@*;
-        }
-        else {
-            $log = 'no changes';
-        }
+        $log = join "\n", $log->@*;
+    }
+    else {
+        $log = 'no changes';
     }
 
-    print qq[Changelog since release: @{[ $id->{release} // '"unreleased"' ]}\n$log\n];
+    print qq[Changelog since release "@{[ $id->{release} // 'v0.0.0' ]}":\n$log\n];
 
     return;
 }

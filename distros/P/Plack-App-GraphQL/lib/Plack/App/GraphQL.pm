@@ -8,7 +8,7 @@ use Moo;
 
 extends 'Plack::Component';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 has convert => (
   is => 'ro',
@@ -130,7 +130,7 @@ has ui_template => (
 
   sub _build_ui_template {
     my $self = shift;
-    $self->ui_template_class->new(json_encoder => $self->json_encoder);
+    $self->ui_template_class->new(json_encoder => $self->json_encoder, graphiql_version => $self->graphiql_version);
   }
 
 has graphiql => (
@@ -140,6 +140,14 @@ has graphiql => (
 );
 
   sub DEFAULT_GRAPHIQL { our $DEFAULT_GRAPHIQL ||= 0 }
+
+has graphiql_version => (
+  is => 'ro',
+  required => 1,
+  builder => 'DEFAULT_GRAPHIQL_VERSION',
+);
+
+  sub DEFAULT_GRAPHIQL_VERSION { our $DEFAULT_GRAPHIQL_VERSION ||= 'latest' }
 
 has json_encoder => (
   is => 'ro',
@@ -440,6 +448,12 @@ The URI path part that is associated with the graphql API endpoint.  Often this 
 Default is L<Plack::App::GraphQL::Context>.  This is an object that is passed as the 'context'
 argument to your field resolvers.  You might wish to subclass this to add additional useful
 methods such as simple access to a user object (if you you authentication for example).
+
+=head2 graphiql_version
+
+String that defaults to 'latest'.  This allows you to specify the graphiql version to use.
+
+B<NOTE> Setting this does not enable GraphiQL.
 
 =head2 graphiql
 

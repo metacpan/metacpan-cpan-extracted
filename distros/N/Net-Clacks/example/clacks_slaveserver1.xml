@@ -1,5 +1,5 @@
 <clacks>
-    <appname>Clacks Master</appname>
+    <appname>Clacks Slave1</appname>
     <ip>127.0.0.1</ip>
     <port>18889</port>
     <pingtimeout>600</pingtimeout>

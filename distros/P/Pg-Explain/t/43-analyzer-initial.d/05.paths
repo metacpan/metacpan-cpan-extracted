@@ -1,0 +1,20 @@
+[
+  [
+    'Index Scan'
+  ],
+  [
+    'Index Scan',
+    'Limit'
+  ],
+  [
+    'Index Scan',
+    'Limit',
+    'Sort'
+  ],
+  [
+    'Index Scan',
+    'Limit',
+    'Sort',
+    'Index Scan'
+  ]
+]

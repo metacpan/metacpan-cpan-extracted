@@ -6,10 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/Codeowners.pm',
+    'App/Codeowners/Formatter.pm',
+    'App/Codeowners/Formatter/CSV.pm',
+    'App/Codeowners/Formatter/JSON.pm',
+    'App/Codeowners/Formatter/String.pm',
+    'App/Codeowners/Formatter/TSV.pm',
+    'App/Codeowners/Formatter/Table.pm',
+    'App/Codeowners/Formatter/YAML.pm',
     'App/Codeowners/Options.pm',
     'App/Codeowners/Util.pm',
     'File/Codeowners.pm',

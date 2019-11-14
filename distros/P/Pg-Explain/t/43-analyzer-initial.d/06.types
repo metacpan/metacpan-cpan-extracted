@@ -1,0 +1,6 @@
+[
+  'Materialize',
+  'Nested Loop',
+  'Seq Scan',
+  'Sort'
+]

@@ -38,12 +38,12 @@ lives_ok(
 
 my $textual = $explain->as_text();
 
-ok( $textual =~ /::"char"\[\]/, 'anonymize() preserves type casting' );
-ok( $textual =~ /::name\b/, 'anonymize() preserves type casting' );
-ok( $textual =~ /::text\b/, 'anonymize() preserves type casting' );
+ok( $textual =~ /::"char"\[\]/,             'anonymize() preserves type casting' );
+ok( $textual =~ /::name\b/,                 'anonymize() preserves type casting' );
+ok( $textual =~ /::text\b/,                 'anonymize() preserves type casting' );
 ok( $textual !~ /timestamp with time zone/, 'anonymize() hides string literals' );
-ok( $textual !~ /nspname/, 'anonymize() hides column names' );
-ok( $textual !~ /pg_class/, 'anonymize() hides relation names' );
+ok( $textual !~ /nspname/,                  'anonymize() hides column names' );
+ok( $textual !~ /pg_class/,                 'anonymize() hides relation names' );
 
 my $reparsed = Pg::Explain->new( 'source' => $textual );
 isa_ok( $reparsed,           'Pg::Explain' );

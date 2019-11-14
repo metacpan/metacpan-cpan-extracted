@@ -1,0 +1,25 @@
+{
+  'execution_time' => '0.008',
+  'planning_time' => '0.012',
+  'top_node' => {
+    'actual_loops' => '1',
+    'actual_rows' => '1',
+    'actual_time_first' => '0.003',
+    'actual_time_last' => '0.004',
+    'estimated_row_width' => '4',
+    'estimated_rows' => '1',
+    'estimated_startup_cost' => '0.29',
+    'estimated_total_cost' => '8.31',
+    'extra_info' => [
+      'Index Cond: (id = 1)',
+      'Heap Fetches: 1',
+      'Buffers: shared hit=3'
+    ],
+    'is_analyzed' => 1,
+    'scan_on' => {
+      'index_name' => 'z_pkey',
+      'table_name' => 'z'
+    },
+    'type' => 'Index Only Scan'
+  }
+}

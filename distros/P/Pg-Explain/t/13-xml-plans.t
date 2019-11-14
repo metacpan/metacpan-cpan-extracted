@@ -8,23 +8,23 @@ use autodie;
 use Pg::Explain;
 
 my @tests = @ARGV;
-if (0 == scalar @tests) {
+if ( 0 == scalar @tests ) {
     opendir( my $dir, 't/13-xml-plans/' );
 
     my %uniq = ();
     @tests = sort { $a <=> $b }
         grep { !$uniq{ $_ }++ }
-        map { s/\..*//; $_ }
+        map  { s/\..*//; $_ }
         grep { /^\d+\.(?:expect|xml)$/ } readdir $dir;
 
     closedir $dir;
 }
 
-plan 'tests' => 2 * scalar @tests;
+plan 'tests' => 3 * scalar @tests;
 
 for my $test ( @tests ) {
 
-    print STDERR 'Working on test ' . $test . "\n" if  $ENV{'DEBUG_TESTS'};
+    print STDERR 'Working on test ' . $test . "\n" if $ENV{ 'DEBUG_TESTS' };
 
     my $plan_file = 't/13-xml-plans/' . $test . '.xml';
 
@@ -34,8 +34,9 @@ for my $test ( @tests ) {
     my $expected = get_expected_from_file( $test );
 
     my $got = $explain->top_node->get_struct();
-    print STDERR Dumper($got) if  $ENV{'DEBUG_TESTS'};
+    print STDERR Dumper( $got ) if $ENV{ 'DEBUG_TESTS' };
 
+    is( $explain->source_format, 'XML', 'Correct format detection' );
     cmp_deeply( $got, $expected, 'Plan no. ' . $test . ' passed as file.', );
 }
 

@@ -1,0 +1,6 @@
+[
+  'Index Scan',
+  'Limit',
+  'Nested Loop',
+  'Seq Scan'
+]

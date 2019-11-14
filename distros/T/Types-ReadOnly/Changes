@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Types-ReadOnly>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-ReadOnly>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2019-11-12	Fresh start
+
+ - Internal changes to Type::Tiny broke this ages ago. But luckily many of
+   the newer features of Type::Tiny allow Types::ReadOnly to be implemented
+   with far less hacky code.
+
 0.002	2013-11-04
 
  - Cope with upcoming changes to Dict in Types::Standard.

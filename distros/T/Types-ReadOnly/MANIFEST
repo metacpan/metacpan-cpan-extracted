@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -12,9 +11,6 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
-lib/Type/Coercion/Wrapped.pm
-lib/Type/Tiny/Wrapped.pm
-lib/Type/Tiny/Wrapper.pm
 lib/Types/ReadOnly.pm
 t/01basic.t
 t/02readonly.t

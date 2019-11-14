@@ -12,8 +12,8 @@ WriteMakefile(
   AUTHOR       => 'Tobias Oetiker <tobi@oetiker.ch>',
   LICENSE      => 'gpl_3',
   PREREQ_PM    => {
-    'Mojolicious' => '8.0',
-    'Mojolicious::Plugin::Qooxdoo' => '1.0.5',
+    'Mojolicious' => '8.26',
+    'Mojolicious::Plugin::Qooxdoo' => '1.0.8',
     'Config::Grammar' => '1.13',
     'Locale::PO' => '0.27',
   },
@@ -21,7 +21,7 @@ WriteMakefile(
     'CPAN::Uploader' => 0
   },
   META_MERGE   => {
-    requires  => {perl => '5.010001'},
+    requires  => {perl => '5.022000'},
     resources => {
       license     => 'http://opensource.org/licenses/GPL-3.0',
       repository  => 'https://github.com/oetiker/callbackery',

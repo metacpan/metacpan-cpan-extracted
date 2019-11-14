@@ -1,0 +1,25 @@
+[
+  [
+    'Sort'
+  ],
+  [
+    'Sort',
+    'Nested Loop'
+  ],
+  [
+    'Sort',
+    'Nested Loop',
+    'Seq Scan'
+  ],
+  [
+    'Sort',
+    'Nested Loop',
+    'Materialize'
+  ],
+  [
+    'Sort',
+    'Nested Loop',
+    'Materialize',
+    'Seq Scan'
+  ]
+]

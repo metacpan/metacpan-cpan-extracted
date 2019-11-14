@@ -1,6 +1,6 @@
 package HTTP::Date;
 
-$VERSION = "6.02";
+our $VERSION = '6.03';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -258,11 +258,22 @@ sub time2isoz (;$)
 1;
 
 
+# ABSTRACT: HTTP::Date - date conversion routines
+#
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-HTTP::Date - date conversion routines
+HTTP::Date - HTTP::Date - date conversion routines
+
+=head1 VERSION
+
+version 6.03
 
 =head1 SYNOPSIS
 
@@ -371,18 +382,21 @@ string representing time in the local time zone.
 Same as time2str(), but returns a "YYYY-MM-DD hh:mm:ssZ"-formatted
 string representing Universal Time.
 
-
 =back
 
 =head1 SEE ALSO
 
 L<perlfunc/time>, L<Time::Zone>
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright 1995-1999, Gisle Aas
+Gisle Aas <gisle@activestate.com>
 
-This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 1995-2019 by Gisle Aas.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

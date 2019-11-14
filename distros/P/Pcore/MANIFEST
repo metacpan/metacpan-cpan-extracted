@@ -15,8 +15,9 @@ lib/Pcore/API/AntiCaptcha/Role.pm
 lib/Pcore/API/Bitbucket.pm
 lib/Pcore/API/Client.pm
 lib/Pcore/API/Cloudflare.pm
-lib/Pcore/API/Docker/Cloud.pm
 lib/Pcore/API/Docker/Engine.pm
+lib/Pcore/API/Docker/Hub.pm
+lib/Pcore/API/Docker/Registry.pm
 lib/Pcore/API/Dynadot.pm
 lib/Pcore/API/Facebook.pm
 lib/Pcore/API/Facebook/Marketing.pm
@@ -92,7 +93,6 @@ lib/Pcore/Dist/Build/Clean.pm
 lib/Pcore/Dist/Build/Create.pm
 lib/Pcore/Dist/Build/Deploy.pm
 lib/Pcore/Dist/Build/Docker.pm
-lib/Pcore/Dist/Build/Issues.pm
 lib/Pcore/Dist/Build/PAR.pm
 lib/Pcore/Dist/Build/PAR/Script.pm
 lib/Pcore/Dist/Build/Release.pm
@@ -113,7 +113,6 @@ lib/Pcore/Dist/CLI/Docker/Init.pm
 lib/Pcore/Dist/CLI/Docker/Ls.pm
 lib/Pcore/Dist/CLI/Docker/Remove.pm
 lib/Pcore/Dist/CLI/Id.pm
-lib/Pcore/Dist/CLI/Issues.pm
 lib/Pcore/Dist/CLI/Log.pm
 lib/Pcore/Dist/CLI/Ls.pm
 lib/Pcore/Dist/CLI/PAR.pm

@@ -40,6 +40,6 @@ is( $explain->top_node->ctes->{ 'foo' }->sub_nodes->[ 0 ]->type, 'Result',      
 my $work_table = $explain->top_node->ctes->{ 'foo' }->sub_nodes->[ 1 ];
 is( $work_table->type, 'WorkTable Scan', 'Properly got WorkTable type' );
 
-cmp_deeply( $work_table->get_struct, $expected_struct, 'Structure of WorkTable is OK');
+cmp_deeply( $work_table->get_struct, $expected_struct, 'Structure of WorkTable is OK' );
 
 exit;

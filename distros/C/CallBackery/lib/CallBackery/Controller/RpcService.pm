@@ -49,7 +49,7 @@ has config => sub {
 
 has user => sub {
     my $self = shift;
-    my $obj = $self->app->userObject->new(controller=>$self);
+    my $obj = $self->app->userObject->new(controller=>$self,log=>$self->log);
     #
     weaken $obj->{controller};
     return $obj;
@@ -257,7 +257,9 @@ sub instantiatePlugin {
     my $name = shift;
     my $args = shift;
     my $user = $self->user;
-    return $self->config->instantiatePlugin($name,$user,$args);
+    my $plugin = $self->config->instantiatePlugin($name,$user,$args);
+    $plugin->log($self->log);
+    return $plugin;
 }
 
 =head2 processPluginData(plugin,args)
@@ -407,7 +409,7 @@ sub setPreDestroyAction {
 
 sub DESTROY {
     my $self = shift;
-    $self->log->debug('Destroying RpcService controller');
+    eval { $self->helper->log->debug('Destroying RpcService controller'); };
 }
 
 

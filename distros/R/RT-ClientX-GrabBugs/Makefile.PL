@@ -21,6 +21,7 @@ my $meta = {
                             runtime => {
                               recommends => { "RDF::TrineX::Serializer::MockTurtleSoup" => 0 },
                               requires   => {
+                                              "Digest::SHA1"            => 0,
                                               "Getopt::ArgvFile"        => 0,
                                               "Getopt::Long"            => 0,
                                               "Moose"                   => "2.0600",
@@ -37,7 +38,7 @@ my $meta = {
                             test => { requires => { "Test::More" => 0.96 } },
                           },
   "provides"           => {
-                            "RT::ClientX::GrabBugs" => { file => "lib/RT/ClientX/GrabBugs.pm", version => 0.004 },
+                            "RT::ClientX::GrabBugs" => { file => "lib/RT/ClientX/GrabBugs.pm", version => 0.005 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -53,7 +54,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/RT-ClientX-GrabBugs/project",
                           },
-  "version"            => 0.004,
+  "version"            => 0.005,
   "x_provides_scripts" => { "rt-grabbugs" => { file => "bin/rt-grabbugs" } },
 };
 

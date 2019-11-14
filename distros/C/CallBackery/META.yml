@@ -24,12 +24,12 @@ no_index:
 requires:
   Config::Grammar: '1.13'
   Locale::PO: '0.27'
-  Mojolicious: '8.0'
-  Mojolicious::Plugin::Qooxdoo: v1.0.5
-  perl: '5.010001'
+  Mojolicious: '8.26'
+  Mojolicious::Plugin::Qooxdoo: v1.0.8
+  perl: '5.022000'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.22.0
+version: v0.22.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

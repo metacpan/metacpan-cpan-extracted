@@ -1,0 +1,9 @@
+Revision history for Perl module App::Spec::Bash
+
+0.002 2019-11-13 11:37:12+01:00
+
+    - Fix loading of spec
+
+0.001 2019-10-27 14:03:25+01:00
+
+    - Initial version

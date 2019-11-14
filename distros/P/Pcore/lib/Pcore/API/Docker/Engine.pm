@@ -2,11 +2,11 @@ package Pcore::API::Docker::Engine;
 
 use Pcore -class, -const, -res;
 
-const our $API_VER               => 'v1.39';
+const our $API_VER               => 'v1.40';
 const our $DEFAULT_BUILD_TIMEOUT => 60 * 60 * 2;    # 2 hours
 
-has username => sub { $ENV->user_cfg->{DOCKER}->{username} };
-has password => sub { $ENV->user_cfg->{DOCKER}->{password} };
+has username => sub { $ENV->user_cfg->{DOCKERHUB}->{username} };
+has token    => sub { $ENV->user_cfg->{DOCKERHUB}->{token} };
 
 has host          => '/var/run/docker.sock';
 has build_timeout => $DEFAULT_BUILD_TIMEOUT;
@@ -75,7 +75,7 @@ sub image_push ( $self, $tag ) {
             'X-Registry-Auth' => P->data->to_b64(
                 P->data->to_json( {
                     username => $self->{username},
-                    password => $self->{password},
+                    password => $self->{token},
                 } ),
                 $EMPTY
             ),

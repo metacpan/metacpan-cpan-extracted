@@ -1,0 +1,9 @@
+Bitmap Heap Scan on z  (cost=12.90..24.27 rows=3 width=4) (actual time=0.007..0.009 rows=3 loops=1)
+  Recheck Cond: (id = ANY ('{1,1000,5000}'::integer[]))
+  Heap Blocks: exact=3
+  Buffers: shared hit=9
+  ->  Bitmap Index Scan on z_pkey  (cost=0.00..12.90 rows=3 width=0) (actual time=0.005..0.005 rows=3 loops=1)
+        Index Cond: (id = ANY ('{1,1000,5000}'::integer[]))
+        Buffers: shared hit=6
+Planning Time: 0.018 ms
+Execution Time: 0.017 ms

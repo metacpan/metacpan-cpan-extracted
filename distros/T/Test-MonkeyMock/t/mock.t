@@ -13,6 +13,15 @@ subtest 'mock method' => sub {
     is($mock->foo, 'bar');
 };
 
+subtest 'mock mixed case' => sub {
+    my $mock = Test::MonkeyMock->new();
+    $mock->mock(FOO => sub { 'bar' });
+    $mock->mock(Foo => sub { 'baz' });
+
+    is($mock->FOO, 'bar');
+    is($mock->Foo, 'baz');
+};
+
 subtest 'mock method with when option' => sub {
     my $mock = Test::MonkeyMock->new();
     $mock->mock(foo => sub { 'bar' }, when => sub { @_ == 2 });
@@ -94,7 +103,7 @@ subtest 'correctly builds class name' => sub {
     $mock->mock(baz => sub { });
     $mock->mock(daz => sub { });
 
-    like ref($mock), qr/Test::MonkeyMock::8/;
+    like ref($mock), qr/Test::MonkeyMock::\d/;
 };
 
 subtest 'throw on unknown frame' => sub {

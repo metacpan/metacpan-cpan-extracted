@@ -4,9 +4,6 @@ Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Types-ReadOnly
 
 Files: README
- lib/Type/Coercion/Wrapped.pm
- lib/Type/Tiny/Wrapped.pm
- lib/Type/Tiny/Wrapper.pm
  lib/Types/ReadOnly.pm
  t/01basic.t
  t/02readonly.t
@@ -16,23 +13,15 @@ Files: README
  t/30moose.t
  t/40mouse.t
  t/50typeparams.t
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
+Copyright: This software is copyright (c) 2013, 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Changes
  META.json
  META.yml
- Makefile.PL
- dist.ini
  doap.ttl
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: CONTRIBUTING
- INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -40,15 +29,25 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

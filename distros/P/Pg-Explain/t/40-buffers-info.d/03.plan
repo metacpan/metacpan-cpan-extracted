@@ -1,0 +1,37 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Index Only Scan</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Scan-Direction>Forward</Scan-Direction>
+      <Index-Name>z_pkey</Index-Name>
+      <Relation-Name>z</Relation-Name>
+      <Alias>z</Alias>
+      <Startup-Cost>0.29</Startup-Cost>
+      <Total-Cost>8.31</Total-Cost>
+      <Plan-Rows>1</Plan-Rows>
+      <Plan-Width>4</Plan-Width>
+      <Actual-Startup-Time>0.004</Actual-Startup-Time>
+      <Actual-Total-Time>0.004</Actual-Total-Time>
+      <Actual-Rows>1</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+      <Index-Cond>(id = 1)</Index-Cond>
+      <Rows-Removed-by-Index-Recheck>0</Rows-Removed-by-Index-Recheck>
+      <Heap-Fetches>1</Heap-Fetches>
+      <Shared-Hit-Blocks>3</Shared-Hit-Blocks>
+      <Shared-Read-Blocks>0</Shared-Read-Blocks>
+      <Shared-Dirtied-Blocks>0</Shared-Dirtied-Blocks>
+      <Shared-Written-Blocks>0</Shared-Written-Blocks>
+      <Local-Hit-Blocks>0</Local-Hit-Blocks>
+      <Local-Read-Blocks>0</Local-Read-Blocks>
+      <Local-Dirtied-Blocks>0</Local-Dirtied-Blocks>
+      <Local-Written-Blocks>0</Local-Written-Blocks>
+      <Temp-Read-Blocks>0</Temp-Read-Blocks>
+      <Temp-Written-Blocks>0</Temp-Written-Blocks>
+    </Plan>
+    <Planning-Time>0.025</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>0.009</Execution-Time>
+  </Query>
+</explain>

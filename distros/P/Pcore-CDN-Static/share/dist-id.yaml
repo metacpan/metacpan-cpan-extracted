@@ -1,11 +1,11 @@
 ---
 branch: master
-date: 2019-11-06T20:28:30Z
-id: 0ad45c6c7c1c257549e16c21a68909daf1076de3
-id_short: 0ad45c6
+date: 2019-11-13T07:09:33Z
+hash: c2572eb9b8f3e1ced823e996575783e3f72df2a2
+hash_short: c2572eb
 is_dirty: 0
-release: v0.61.0
-release_distance: 0
+release: v0.61.1
+release_distance: ~
 tags:
-- v0.61.0
+- v0.61.1
 - latest

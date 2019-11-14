@@ -1,203 +1,212 @@
 Revision history for "ptkftp".
 
 4.31  Aug/2002
-	- Complete redesign from older version.
-	- Started recording Changes.
+      - Complete redesign from older version.
+      - Started recording Changes.
 4.4   Fri Aug 16, 2002
-	- Fixed bug where "-browsecmd" callback was called too often.
-	- Fixed bug where "end" was added as a value on listboxes with no "-width" 
-	  option specified when list was automatically resized.
-	- Fixed problem where listbox width not automatically resized down to new
-	  entry field width when it became smaller.
-	- Added code to cause the dropdown button and list to be disabled whenever 
-	  the list size becomes zero and reactivate whenever a choice is added to 
-	  a zero-length list.
-	- Fixed minor bugs with "choices" and "insert" function.
-	- Added this Changes file
+      - Fixed bug where "-browsecmd" callback was called too often.
+      - Fixed bug where "end" was added as a value on listboxes with no "-width" 
+      option specified when list was automatically resized.
+      - Fixed problem where listbox width not automatically resized down to new
+      entry field width when it became smaller.
+      - Added code to cause the dropdown button and list to be disabled whenever 
+      the list size becomes zero and reactivate whenever a choice is added to 
+      a zero-length list.
+      - Fixed minor bugs with "choices" and "insert" function.
+      - Added this Changes file
 4.41  Sat Aug 17, 2002
-	- Fixed disabled background color on entry text.
+      - Fixed disabled background color on entry text.
 4.42
-	- Added "-maxwidth" option to limit maximum width in characters the 
-	  entry field will expand to.  Otherwise, it can expand as list items are 
-	  added to accomodate the widest item string.
+      - Added "-maxwidth" option to limit maximum width in characters the 
+      entry field will expand to.  Otherwise, it can expand as list items are 
+      added to accomodate the widest item string.
 4.43  May 31, 2003
-	- Added several patches by Frank Herrmann to cause the "-browsecmd" 
-	  callback to be called whenever the text value changed, and some other 
-	  minor tweeks.
+      - Added several patches by Frank Herrmann to cause the "-browsecmd" 
+      callback to be called whenever the text value changed, and some other 
+      minor tweeks.
 4.44
-	- Added "-listrelief" option to allow one to specify the relief of the 
-	  dropdown list (defaults to "sunken" and was previously always "sunken").
-	- Added "-browse" option to allow for old "-browsecmd" callback behavior 
-	  so that it is only called when a selection is actually made from the 
-	  dropdown list.  This was the behavior before the "Frank Herrmann" 
-	  patches were added.  The default is the new behavior.  To get the old 
-	  behavior, use "-browse => 1".
+      - Added "-listrelief" option to allow one to specify the relief of the 
+      dropdown list (defaults to "sunken" and was previously always "sunken").
+      - Added "-browse" option to allow for old "-browsecmd" callback behavior 
+      so that it is only called when a selection is actually made from the 
+      dropdown list.  This was the behavior before the "Frank Herrmann" 
+      patches were added.  The default is the new behavior.  To get the old 
+      behavior, use "-browse => 1".
 4.47  Thu Nov 20, 2003
-	- Added "-tabcomplete" option to allow pressing the "<Tab>" key in the 
-	  Entry widget to cause an incomplete string typed in to be "completed" to 
-	  the next matching string in the list.  Pressing the "<Tab>" key again 
-	  will transfer focus to the next widget.  To get this behavior, use 
-	  "-tabcomplete => 1".  The default is the old behavior of simply tabbing 
-	  to the next widget without altering the typed text.
+      - Added "-tabcomplete" option to allow pressing the "<Tab>" key in the 
+      Entry widget to cause an incomplete string typed in to be "completed" to 
+      the next matching string in the list.  Pressing the "<Tab>" key again 
+      will transfer focus to the next widget.  To get this behavior, use 
+      "-tabcomplete => 1".  The default is the old behavior of simply tabbing 
+      to the next widget without altering the typed text.
 4.48  Fri Nov 21, 2003
-	- Fixed bug which caused tab-key to be "stuck" on the widget if there 
-	  was nothing in the listbox.  Made "-tabcomplete" not change what 
-	  user typed in if there is no match in the list.  Added 
-	  "-tabcomplete => 2" to keep 4.47 behavior (force tab to change the 
-	  typed value to a valid list entry or the default value).
-4.49	 -not released.
+      - Fixed bug which caused tab-key to be "stuck" on the widget if there 
+      was nothing in the listbox.  Made "-tabcomplete" not change what 
+      user typed in if there is no match in the list.  Added 
+      "-tabcomplete => 2" to keep 4.47 behavior (force tab to change the 
+      typed value to a valid list entry or the default value).
+4.49	 - not released.
 4.50	 Fri Nov 28, 2003
-	- Minor tweeks in relief appearance.
+      - Minor tweeks in relief appearance.
 4.52  Tue Feb 01, 2005
-	- Added "-altbinding" option to allow different keyboard binding schemata.
-	- Added "-disabledbackground" and "-disabledforeground" options.
-	- Fixed "-labelPack" option to work, if packed above or below main widget.
-	- Fixed small glitch in listbox vertical sizing.
-
+      - Added "-altbinding" option to allow different keyboard binding schemata.
+      - Added "-disabledbackground" and "-disabledforeground" options.
+      - Fixed "-labelPack" option to work, if packed above or below main widget.
+      - Fixed small glitch in listbox vertical sizing.
 4.61  Mon Feb 14, 2005
-	- Added hash-reference as an option for the choices so that it can work like 
-	  selects in HTML where one set of values is displyed to the user (the 
-	  hash values and the other (the keys) is actually returned.  Also added 
-	  the functions:  dereference, dereferenceOnly, hasreference, and fetchhash 
-	  to work with these.
+      - Added hash-reference as an option for the choices so that it can work like 
+      selects in HTML where one set of values is displyed to the user (the 
+      hash values and the other (the keys) is actually returned.  Also added 
+      the functions:  dereference, dereferenceOnly, hasreference, and fetchhash 
+      to work with these.
 4.63  Apr 29, 2006
-	- Added option (-deleteitemsok) so that user can delete items from 
-	  history list.
+      - Added option (-deleteitemsok) so that user can delete items from 
+      history list.
 4.64  Sun Jul 30, 2006
-	- Minor tweeks for JFileDialog.
+      - Minor tweeks for JFileDialog.
 4.65  Tue Oct 25, 2006
-	- Add right-arrow completion so that if one types the first (few) letter(s) 
-	  of one of the choices in the list, then presses the right-arrow (with 
-	  the cursor at the end of the typed string, the text will be completed 
-	  with the first matching choice in the list (similar to up and 
-	  down-arrow, but repeated pressing only toggles between any 
-	  matching choices in the list, whereas down-arrow, continues to 
-	  switch between all the choices in the list.  To revert to pre-4.65 
-	  behavior, specify -altbinding => 'Right=NoSearch'.
+      - Add right-arrow completion so that if one types the first (few) letter(s) 
+      of one of the choices in the list, then presses the right-arrow (with 
+      the cursor at the end of the typed string, the text will be completed 
+      with the first matching choice in the list (similar to up and 
+      down-arrow, but repeated pressing only toggles between any 
+      matching choices in the list, whereas down-arrow, continues to 
+      switch between all the choices in the list.  To revert to pre-4.65 
+      behavior, specify -altbinding => 'Right=NoSearch'.
 4.70  Mon Sep 24, 2006
-	- Added new options:  -framehighlightthickness (default 1), 
-	  -buttonborderwidth (default 1), and --entryborderwidth (default 0).
-	- Changed initialization of -borderwidth and -buttonborderwidth to fix 
-	  inconsistancies pointed out by Wolfram Humann.
-	- Fixed activation issue on up and down arrow presses and with "back-
-	  tab with patch from Wolfram Humann.  Thanks for the patches!
-	- Fixed other minor issues.
-	- Fixed makefile using new version by Alexandr Ciornii that, among 
-	  other things, fixes the bug that caused the manpage file to have 
-	  an extra TK:: prefix appended to it.
-4.71	- Added "-listcmd" callback.
-	- Added "-nobutton" option to prevent dropdown list button from being 
-	  displayed (default 0 (false)).
-	- Added "-labelrelief" option (default "flat").
-	- Added invocation of the "-browsecmd" callback if <Return> is 
-	  pressed in the text field and -altbinding includes "Return=Go".
-	- Added a "NoListbox" altbinding to cause the "-browsecmd" callback 
-	  to NOT be invoked for specified altbindings, ie. 
-	  "NoListbox=listbox.space" causes the callback to not be executed if 
-	  the <spacebar> is pressed while the listbox has keyboard focus.
-4.72	- Added new user-callable function get().  get() with no arguments 
-	  returns the current value of the "-textvariable" variable.  If any 
-	  arguments are passed, they are passed directly to the listbox->get() 
-	  function, ie. "0", "end" to return all values of the listbox.
-	- Added new user-callable function activate().  activate() invokes 
-	  the activate() option on the listbox to make the item with the 
-	  index specified by the first argument "active".  Unless a second 
-	  argument is passed containing a false value, the value of the 
-	  "-textvariable" variable is also set to this now active value.
-	- Added new user-callable function index(), which invokes and returns 
-	  the result of the listbox index() function.
-	- Added new user-callable function size(), which invokes and returns 
-	  the result of the listbox size() function (the number of items in 
-	  the list.
-	- Fixed possible bug with the return results from the choices() 
-	  function when called without any arguments.
-4.73	- Fixed so that whenever the mouse is clicked or the spacebar pressed 
-	  within the text area and the text area is readonly and either empty 
-	  or does not contain text that matches any of the items in the 
-	  dropdown list, then the 1st item is activated and highlighted 
-	  instead of the last one.
-4.74	- Fixed so that whenever the "-textvariable" variable is undefined, 
-	  then the dropdown list is shown, the 1st item will be activated 
-	  and highlighted instead of the last one.
-4.75	- Remove accidental reference to DBI in test file (fix broken test)
-	  This closes rt.cpan.org bug#50767.
-4.8	- Use of a hash for the choices list was broken - hash was reversed 
-	  within the insert() function so that fetchhash() returned a hash that 
-	  was the opposite of what was passed to choices.  Renamed fetchhash() 
-	  function to get_hashref_byname() - still returns the reversed hash, 
-	  and fetchhash() remains in place for backwards compat.  Added new 
-	  function get_hashref_byvalue() to return the hash back out correctly!
-	  Also added new functions:  get_index('value') to return the index# 
-	  (usable by get() function of the list option displayed as 'value'); 
-	  delete_byvalue('value' [, 'value2'...]) to delete list items 
-	  by their displayed values; and reference() to return the displayed 
-	  list value for the given hash key (opposite of dereference()).
-4.9	- Add new callback option when user deletes an entry from the drop-down 
-	  menu with the [Delete] key, as permitted by the "-deleteok" option.
-	  The new callback option is "-deletecmd" which invokes a user-defined 
-	  function just before and again just after a menu entry is deleted.
-	  This was needed in order to update arrays in the main program that 
-	  are loaded and saved in "history" files in order to know when the 
-	  valid list choices had changed and apply them properly.  The first 
-	  call receives the entry index# (>0) being deleted, and can return 
-	  true if the deletion needs to be blocked, false or undef otherwise.
-	  This permits the programmer to block user-deletes, ie. for certain 
-	  entries, etc.  The subsequent call (with the parameter of -1), occurs 
-	  just after the deletion (if the first call did not return true) & can 
-	  be used to do something after a deletion has actually occured, ie. 
-	  as explained above.
-5.0	- * Fixed issues involving the -arrowimage / -farrowimage options not 
-	  always working properly, particularly on M$-Windows.
-	  * Added new PressButton() function to enable developers to 
-	  programatically "press" the dropdown list button.
-	  * Added new get_icursor() function to make fetching the cursor location 
-	  in the entry field.  Most useful arguments are: 'insert' and 'end'.
-	  * Added -deletecmd callback to allow user to properly update their 
-	  history files when feeding them to the drop-down list.
-	  * Added -altbinding options:  "Return=NoEmptyGo", "Return=SingleGo", 
-	  and "Down=Popup" as well as "Down=None", "Up=None", "Right=None", 
-	  "Esc=None", "Return=None", and "Space=None".
-	  * Adjusted dropdown menu's width to work better when -nobutton is set.
-	  * Cleaned up the code and documentation, including fixing some 
-	  "strict refs" errors and problems when a -default value is specified.
-5.10	- * Added -fixedlist option to cause the pop-up drop-down list to be 
-	  "fixed" (static) - always visible and be packed as a widget along with 
-	  the text-entry and button portions.  Default is 0 (not fixed), as has 
-	  always been the case.  If set to a true value, the listbox will appear 
-	  just below the text-entry and button widgets.  If set to "top", the 
-	  listbox will appear above them.
-	  * Added -listboxtype option to specify that the drop-down list should 
-	  use a "Tk::HList" widget by specifying "-listboxtype => 'HListbox', 
-	  if Tk::HListbox is installed.  The default remains 'Listbox'.  
-	  * Also added Tk::HListbox-specific options:  -indicator, and -itemtype.
-	  These are ignored if the default Tk::Listbox is used.  
-	  The -label option is now dynamically configurable via $w->configure().
-	  * Added -labelforeground, -labelbackground, and -labelfont options.
-	  * NOTE:  REMOVED the "altbinding" string "Tab=PopList" as this is now 
-	  the default (to roll up / hide the drop-down list whenever 
-	  the [Tab] key is pressed within it (unless -fixedlist is specified).
-	  To retain the old behavior of keeping the drop-down list visible, 
-	  the developer must now specify "Tab=KeepList".  Keeping the list 
-	  visible only worked on Unixish systems anyway, as M$-Windows always 
-	  rolled up the list anyway.
-	  * Fixed several related key-binding / focusing issues along with the 
-	  usual code and doc. cleanups / optimizations.
-5.20   * Added "List=Bouncy" -altbinding to make listbox immediately roll 
-	  back up when user releases the mouse button, more like a popup-menu.
-	  (User can avoid the "bounce" feature by holding down the [Shift] key 
-	  with the mouse).  On "fixed" lists, focus immediately jumps back to 
-	  the text-entry field, so that it behaves the same as if not "fixed".
-	  * Added -buttonforeground and -buttonbackground color config. options.
-	  * Added -colorstate to options that can be changed dynamically via 
-	  $widget->configure.
-	  * Greatly cleaned up the -colorstate option to play nicer with 
-	  setPalette() and other color options as well as fixed alot of 
-	  annoying issues with it (See revised pod docs).
-	  * Updated the test suite to include new "bouncy" and "fixedlist" 
-	  examples.
-5.21   * Fixed minor color issue in M$-Windows where the text part wasn't 
-	  always readable when in "readonly" mode.
-5.22	  * Set newly-active item (row) to selected after user deletes a row 
-	  (when -deleteitemsok is set).  This makes it easier to delete multiple 
-	  items without having to move the cursor up and down between deleting 
-	  each row.
+      - Added new options:  -framehighlightthickness (default 1), 
+      -buttonborderwidth (default 1), and --entryborderwidth (default 0).
+      - Changed initialization of -borderwidth and -buttonborderwidth to fix 
+      inconsistancies pointed out by Wolfram Humann.
+      - Fixed activation issue on up and down arrow presses and with "back-
+      tab with patch from Wolfram Humann.  Thanks for the patches!
+      - Fixed other minor issues.
+      - Fixed makefile using new version by Alexandr Ciornii that, among 
+      other things, fixes the bug that caused the manpage file to have 
+      an extra TK:: prefix appended to it.
+4.71	 - Added "-listcmd" callback.
+      - Added "-nobutton" option to prevent dropdown list button from being 
+      displayed (default 0 (false)).
+      - Added "-labelrelief" option (default "flat").
+      - Added invocation of the "-browsecmd" callback if <Return> is 
+      pressed in the text field and -altbinding includes "Return=Go".
+      - Added a "NoListbox" altbinding to cause the "-browsecmd" callback 
+      to NOT be invoked for specified altbindings, ie. 
+      "NoListbox=listbox.space" causes the callback to not be executed if 
+      the <spacebar> is pressed while the listbox has keyboard focus.
+4.72	 - Added new user-callable function get().  get() with no arguments 
+      returns the current value of the "-textvariable" variable.  If any 
+      arguments are passed, they are passed directly to the listbox->get() 
+      function, ie. "0", "end" to return all values of the listbox.
+      - Added new user-callable function activate().  activate() invokes 
+      the activate() option on the listbox to make the item with the 
+      index specified by the first argument "active".  Unless a second 
+      argument is passed containing a false value, the value of the 
+      "-textvariable" variable is also set to this now active value.
+      - Added new user-callable function index(), which invokes and returns 
+      the result of the listbox index() function.
+      - Added new user-callable function size(), which invokes and returns 
+      the result of the listbox size() function (the number of items in 
+      the list.
+      - Fixed possible bug with the return results from the choices() 
+      function when called without any arguments.
+4.73	 - Fixed so that whenever the mouse is clicked or the spacebar pressed 
+      within the text area and the text area is readonly and either empty 
+      or does not contain text that matches any of the items in the 
+      dropdown list, then the 1st item is activated and highlighted 
+      instead of the last one.
+4.74	 - Fixed so that whenever the "-textvariable" variable is undefined, 
+      then the dropdown list is shown, the 1st item will be activated 
+      and highlighted instead of the last one.
+4.75	 - Remove accidental reference to DBI in test file (fix broken test)
+      This closes rt.cpan.org bug#50767.
+4.8   - Use of a hash for the choices list was broken - hash was reversed 
+      within the insert() function so that fetchhash() returned a hash that 
+      was the opposite of what was passed to choices.  Renamed fetchhash() 
+      function to get_hashref_byname() - still returns the reversed hash, 
+      and fetchhash() remains in place for backwards compat.  Added new 
+      function get_hashref_byvalue() to return the hash back out correctly!
+      Also added new functions:  get_index('value') to return the index# 
+      (usable by get() function of the list option displayed as 'value'); 
+      delete_byvalue('value' [, 'value2'...]) to delete list items 
+      by their displayed values; and reference() to return the displayed 
+      list value for the given hash key (opposite of dereference()).
+4.9   - Add new callback option when user deletes an entry from the drop-down 
+      menu with the [Delete] key, as permitted by the "-deleteok" option.
+      The new callback option is "-deletecmd" which invokes a user-defined 
+      function just before and again just after a menu entry is deleted.
+      This was needed in order to update arrays in the main program that 
+      are loaded and saved in "history" files in order to know when the 
+      valid list choices had changed and apply them properly.  The first 
+      call receives the entry index# (>0) being deleted, and can return 
+      true if the deletion needs to be blocked, false or undef otherwise.
+      This permits the programmer to block user-deletes, ie. for certain 
+      entries, etc.  The subsequent call (with the parameter of -1), occurs 
+      just after the deletion (if the first call did not return true) & can 
+      be used to do something after a deletion has actually occured, ie. 
+      as explained above.
+5.0   Wed Jul 11 2018
+      - Fixed issues involving the -arrowimage / -farrowimage options not 
+      always working properly, particularly on M$-Windows.
+      - Added new PressButton() function to enable developers to 
+      programatically "press" the dropdown list button.
+      - Added new get_icursor() function to make fetching the cursor location 
+      in the entry field.  Most useful arguments are: 'insert' and 'end'.
+      - Added -deletecmd callback to allow user to properly update their 
+      history files when feeding them to the drop-down list.
+      - Added -altbinding options:  "Return=NoEmptyGo", "Return=SingleGo", 
+      and "Down=Popup" as well as "Down=None", "Up=None", "Right=None", 
+      "Esc=None", "Return=None", and "Space=None".
+      - Adjusted dropdown menu's width to work better when -nobutton is set.
+      - Cleaned up the code and documentation, including fixing some 
+      "strict refs" errors and problems when a -default value is specified.
+5.10  Mon Jul 23 2018
+      - Added -fixedlist option to cause the pop-up drop-down list to be 
+      "fixed" (static) - always visible and be packed as a widget along with 
+      the text-entry and button portions.  Default is 0 (not fixed), as has 
+      always been the case.  If set to a true value, the listbox will appear 
+      just below the text-entry and button widgets.  If set to "top", the 
+      listbox will appear above them.
+      - Added -listboxtype option to specify that the drop-down list should 
+      use a "Tk::HList" widget by specifying "-listboxtype => 'HListbox', 
+      if Tk::HListbox is installed.  The default remains 'Listbox'.  
+      - Also added Tk::HListbox-specific options:  -indicator, and -itemtype.
+      These are ignored if the default Tk::Listbox is used.  
+      The -label option is now dynamically configurable via $w->configure().
+      - Added -labelforeground, -labelbackground, and -labelfont options.
+      - NOTE:  REMOVED the "altbinding" string "Tab=PopList" as this is now 
+      the default (to roll up / hide the drop-down list whenever 
+      the [Tab] key is pressed within it (unless -fixedlist is specified).
+      To retain the old behavior of keeping the drop-down list visible, 
+      the developer must now specify "Tab=KeepList".  Keeping the list 
+      visible only worked on Unixish systems anyway, as M$-Windows always 
+      rolled up the list anyway.
+      - Fixed several related key-binding / focusing issues along with the 
+      usual code and doc. cleanups / optimizations.
+5.20  Thu Jul 26 2018
+      - Added "List=Bouncy" -altbinding to make listbox immediately roll 
+      back up when user releases the mouse button, more like a popup-menu.
+      (User can avoid the "bounce" feature by holding down the [Shift] key 
+      with the mouse).  On "fixed" lists, focus immediately jumps back to 
+      the text-entry field, so that it behaves the same as if not "fixed".
+      - Added -buttonforeground and -buttonbackground color config. options.
+      - Added -colorstate to options that can be changed dynamically via 
+      $widget->configure.
+      - Greatly cleaned up the -colorstate option to play nicer with 
+      setPalette() and other color options as well as fixed alot of 
+      annoying issues with it (See revised pod docs).
+      - Updated the test suite to include new "bouncy" and "fixedlist" 
+      examples.
+5.21  Fri Aug 10 2018
+      - Fixed minor color issue in M$-Windows where the text part wasn't 
+      always readable when in "readonly" mode.
+5.22	 Wed Mar 27 2019
+      - Set newly-active item (row) to selected after user deletes a row 
+      (when -deleteitemsok is set).  This makes it easier to delete multiple 
+      items without having to move the cursor up and down between deleting 
+      each row.
+5.23  Tue Nov 12, 2019
+      - Redo test harness to work like Tk::JFileDialog to fix bug preventing 
+      popup example program in Strawberry Perl install on M$-Windows.
+      - Fix type that required Tk::HMListbox (instad of Tk::HListbox) to use 
+      with Tk::HListbox.

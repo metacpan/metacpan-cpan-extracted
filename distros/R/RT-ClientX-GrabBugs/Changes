@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/RT-ClientX-GrabBugs>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RT-ClientX-GrabBugs>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005	2019-11-13
+
+ [ Packaging ]
+ - Dependency on Digest::SHA1.
+
 0.004	2019-11-11
 
  - Force uppercase on PAUSEIDs.

@@ -1,0 +1,17 @@
+Gather  (cost=18308.67..34986.32 rows=3692 width=21) (actual time=92.004..129.183 rows=1 loops=1)
+   Workers Planned: 2
+   Params Evaluated: $1
+   Workers Launched: 2
+   InitPlan 1 (returns $1)
+     ->  Finalize Aggregate  (cost=17308.66..17308.67 rows=1 width=32) (actual time=88.303..88.303 rows=1 loops=1)
+           ->  Gather  (cost=17308.45..17308.66 rows=2 width=32) (actual time=88.020..88.322 rows=3 loops=1)
+                 Workers Planned: 2
+                 Workers Launched: 2
+                 ->  Partial Aggregate  (cost=16308.45..16308.46 rows=1 width=32) (actual time=86.143..86.144 rows=1 loops=3)
+                       ->  Parallel Seq Scan on contents contents_1  (cost=0.00..15896.96 rows=164596 width=5) (actual time=0.021..34.834 rows=131732 loops=3)
+   ->  Parallel Seq Scan on contents  (cost=0.00..16308.45 rows=1538 width=21) (actual time=21.174..33.174 rows=0 loops=3)
+         Filter: ((release_dates)::text = $1)
+         Rows Removed by Filter: 131732
+ Planning Time: 0.098 ms
+ Execution Time: 129.268 ms
+

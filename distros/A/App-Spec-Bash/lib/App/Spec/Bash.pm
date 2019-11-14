@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 package App::Spec::Bash;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use base 'App::Spec::Run::Cmd';
 

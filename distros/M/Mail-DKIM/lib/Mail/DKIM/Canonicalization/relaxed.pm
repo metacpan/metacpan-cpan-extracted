@@ -62,21 +62,20 @@ sub canonicalize_header {
 }
 
 sub canonicalize_body {
-    my $self = shift;
-    my ($multiline) = @_;
+    my ($self, $multiline) = @_;
 
     $multiline =~ s/\015\012\z//s;
 
     #
-    # step 1: ignore all white space at the end of lines
-    #
-    $multiline =~ s/[ \t]+(?=\015\012|\z)//g;
-
-    #
-    # step 2: reduce all sequences of WSP within a line to a single
+    # step 1: reduce all sequences of WSP within a line to a single
     # SP character
     #
     $multiline =~ s/[ \t]+/ /g;
+
+    #
+    # step 2: ignore all white space at the end of lines
+    #
+    $multiline =~ s/[ \t]+(?=\015\012|\z)//g;
 
     $multiline .= "\015\012";
 

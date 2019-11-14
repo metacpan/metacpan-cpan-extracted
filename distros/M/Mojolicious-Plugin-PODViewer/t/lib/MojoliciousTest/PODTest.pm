@@ -4,7 +4,7 @@ package MojoliciousTest::PODTest;
 
 =head1 One
 
-PODTest
+L<MojoliciousTest::PODTest> - a test module
 
 =head2 Two
 

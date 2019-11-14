@@ -358,7 +358,7 @@ sub protocol {
 
     # although draft-delany-domainkeys-base-06 does mandate presence of a
     # q=dns tag, it is quote common that q tag is missing - be merciful
-    return !defined( $self->get_tag('q') ) ? 'dns' : $self->get_tag('q');
+    return !defined( $self->get_tag('q') ) ? 'dns' : lc $self->get_tag('q');
 }
 
 =head2 selector()

@@ -31,7 +31,7 @@ for my $plan_source ( @plans ) {
 
     my $textual = $explain->as_text();
 
-    ok( $textual !~ /relkind/, 'anonymize() hides group keys' );
+    ok( $textual !~ /relkind/,      'anonymize() hides group keys' );
     ok( $textual !~ /relnamespace/, 'anonymize() hides group keys' );
 
 }

@@ -22,11 +22,15 @@ name: App-Spec-Bash
 provides:
   App::Spec::Bash:
     file: lib/App/Spec/Bash.pm
-    version: '0.001'
+    version: '0.002'
+  App::Spec::Bash::Spec:
+    file: lib/App/Spec/Bash/Spec.pm
+    version: '0.002'
 requires:
   App::Spec: '0.013'
   App::Spec::Run::Cmd: '0'
   Data::Dumper: '0'
+  Exporter: '0'
   File::Path: '0'
   FindBin: '0'
   base: '0'
@@ -36,6 +40,6 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/appspec-bash/issues
   repository: https://github.com/perlpunk/appspec-bash
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

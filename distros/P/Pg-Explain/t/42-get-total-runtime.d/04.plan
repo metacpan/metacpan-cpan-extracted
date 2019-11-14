@@ -1,0 +1,4 @@
+ Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.002..0.003 rows=1 loops=1)
+ Planning Time: 0.119 ms
+ Execution Time: 0.083 ms
+ Total runtime: 1.266 ms

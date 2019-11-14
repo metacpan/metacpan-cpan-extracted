@@ -1,0 +1,54 @@
+- Plan: 
+    Node Type: "Bitmap Heap Scan"
+    Parallel Aware: false
+    Relation Name: "z"
+    Alias: "z"
+    Startup Cost: 12.90
+    Total Cost: 24.27
+    Plan Rows: 3
+    Plan Width: 4
+    Actual Startup Time: 0.007
+    Actual Total Time: 0.009
+    Actual Rows: 3
+    Actual Loops: 1
+    Recheck Cond: "(id = ANY ('{1,1000,5000}'::integer[]))"
+    Rows Removed by Index Recheck: 0
+    Exact Heap Blocks: 3
+    Lossy Heap Blocks: 0
+    Shared Hit Blocks: 9
+    Shared Read Blocks: 0
+    Shared Dirtied Blocks: 0
+    Shared Written Blocks: 0
+    Local Hit Blocks: 0
+    Local Read Blocks: 0
+    Local Dirtied Blocks: 0
+    Local Written Blocks: 0
+    Temp Read Blocks: 0
+    Temp Written Blocks: 0
+    Plans: 
+      - Node Type: "Bitmap Index Scan"
+        Parent Relationship: "Outer"
+        Parallel Aware: false
+        Index Name: "z_pkey"
+        Startup Cost: 0.00
+        Total Cost: 12.90
+        Plan Rows: 3
+        Plan Width: 0
+        Actual Startup Time: 0.006
+        Actual Total Time: 0.006
+        Actual Rows: 3
+        Actual Loops: 1
+        Index Cond: "(id = ANY ('{1,1000,5000}'::integer[]))"
+        Shared Hit Blocks: 6
+        Shared Read Blocks: 0
+        Shared Dirtied Blocks: 0
+        Shared Written Blocks: 0
+        Local Hit Blocks: 0
+        Local Read Blocks: 0
+        Local Dirtied Blocks: 0
+        Local Written Blocks: 0
+        Temp Read Blocks: 0
+        Temp Written Blocks: 0
+  Planning Time: 0.032
+  Triggers: 
+  Execution Time: 0.017

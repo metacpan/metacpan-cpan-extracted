@@ -1,5 +1,14 @@
 Changelog for Mojolicious-Plugin-PODViewer
 
+0.005     2019-11-13 12:54:35-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed title not containing all text from the POD. Thanks @Tekki!
+      [Github #6]
+    - Fixed breadcrumb links. They were quite broken. Thanks @CandyAngel
+      (Github #7)
+
 0.004     2019-01-24 15:20:44-06:00 America/Chicago
 
     [Fixed]

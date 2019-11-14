@@ -1,0 +1,13 @@
+[
+  [
+    'Seq Scan'
+  ],
+  [
+    'Seq Scan',
+    'Result'
+  ],
+  [
+    'Seq Scan',
+    'Seq Scan'
+  ]
+]

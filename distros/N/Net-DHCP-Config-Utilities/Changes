@@ -1,4 +1,10 @@
 Revision history for Net-DHCP-Config-Utilities
 
+0.1.0	 2019-11-13/01:00
+		 - ISC DHCPD generator now includes descriptions.
+		 - ISC DHCPD generator now sorts everything,
+		   so only changes to source material will result
+		   in changes to the output.
+
 0.0.1	 2019-11-11/04:00
 		 - Initial release.
