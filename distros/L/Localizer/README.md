@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tokuhirom/Localizer.png?branch=master)](https://travis-ci.org/tokuhirom/Localizer)
+[![Build Status](https://travis-ci.org/tokuhirom/Localizer.svg?branch=master)](https://travis-ci.org/tokuhirom/Localizer)
 # NAME
 
 Localizer - Yet another framework for localization

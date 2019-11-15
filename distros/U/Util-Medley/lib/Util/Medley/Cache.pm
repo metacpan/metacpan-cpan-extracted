@@ -1,14 +1,13 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.007';
+$Util::Medley::Cache::VERSION = '0.008';
 use Modern::Perl;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
-
 use Carp;
 use CHI;
 use File::Path 'remove_tree';
 use Data::Printer alias => 'pdump';
+use Kavorka qw(-all);
 
 ########################################################
 
@@ -18,7 +17,7 @@ Util::Medley::Cache - Simple caching mechanism.
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =cut
 
@@ -26,6 +25,20 @@ version 0.007
 
 =head1 SYNOPSIS
 
+  #
+  # positional
+  #
+  $self->set('unittest', 'test1', {foo => bar});
+  
+  my $data = $self->get('unitest', 'test1');
+ 
+  my @keys = $self->getKeys('unittest');
+
+  $self->delete('unittest', 'test1');
+                
+  # 
+  # named pair 
+  #
   $self->set(ns   => 'unittest', 
              key  => 'test1', 
              data => { foo => 'bar' });
@@ -218,7 +231,9 @@ Clears all cache for a given namespace.
 
 =item usage:
 
- clear( [ ns => $ns ] )
+ clear([$ns])
+ 
+ clear([ns => $ns])
 
 =item args:
 
@@ -234,12 +249,20 @@ The cache namespace.
 
 =cut
 
-method clear (Str :$ns) {
+multi method clear (Str :$ns) {
 
 	$self->_l1Clear(@_) if $self->l1Enabled;
 	$self->_l2Clear(@_) if $self->l2Enabled;
 
 	return 1;
+}
+
+multi method clear (Str $ns?) {
+
+	my %a;
+	$a{ns} = $ns if $ns;
+	
+	return $self->clear(%a);
 }
 
 =head2 delete 
@@ -250,10 +273,9 @@ Deletes a cache object.
 
 =item usage:
 
- delete(
-      key => $key
-    [ ns  => $ns ]
- )
+ delete($key, [$ns])
+ 
+ delete(key => $key, [ns => $ns])
 
 =item args:
 
@@ -273,13 +295,23 @@ The cache namespace.
 
 =cut
 
-method delete (Str :$key!,
-               Str :$ns) {
+multi method delete (Str :$key!,
+               		 Str :$ns) {
 
 	$self->_l1Delete(@_) if $self->l1Enabled;
 	$self->_l2Delete(@_) if $self->l1Enabled;
 
 	return 1;
+}
+
+multi method delete (Str $key, 
+					 Str $ns?) { 
+
+	my %a;
+	$a{key} = $key;
+	$a{ns} = $ns if $ns;
+
+	return $self->delete(%a);		
 }
 
 =head2 destroy
@@ -290,7 +322,9 @@ Deletes L1 cache and removes L2 from disk completely.
 
 =item usage:
 
- destroy( [ ns => $ns ] )
+ destroy([$ns])
+  
+ destroy([ns => $ns])
   
 =item args:
 
@@ -306,12 +340,20 @@ The cache namespace.
 
 =cut
 
-method destroy (Str :$ns) {
-
+multi method destroy (Str :$ns) {
+	
 	$self->_l1Destroy(@_) if $self->l1Enabled;
 	$self->_l2Destroy(@_) if $self->l1Enabled;
 
 	return 1;
+}
+
+multi method destroy (Str $ns?) {
+
+	my %a;
+	$a{ns} = $ns if $ns;
+	
+	return $self->destroy(%a);
 }
 
 =head2 get
@@ -322,9 +364,9 @@ Gets a unique cache object.  Returns undef if not found.
 
 =item usage:
 
- get( key => $key,
-    [ ns  => $ns ]
- );
+ get($key, [$ns])
+ 
+ get(key => $key, [ns => $ns])
  
 =item args:
 
@@ -344,8 +386,8 @@ The cache namespace.
 
 =cut
 
-method get (Str :$ns,
-            Str :$key!) {
+multi method get (Str :$key!,
+				  Str :$ns) {
 
 	if ( $self->l1Enabled ) {
 		my $data = $self->_l1Get(@_);
@@ -363,15 +405,26 @@ method get (Str :$ns,
 	}
 }
 
-=head2 getNamespaceDir
+multi method get (Str $key, Str $ns?) {
 
-Gets the L2 cache dir.
+	my %a;
+	$a{key} = $key;
+	$a{ns} = $ns if $ns;
+	
+	return $self->get(%a);	
+}
+
+=head2 getKeys
+
+Returns a list of cache keys.
 
 =over
 
 =item usage:
 
- getNamespaceDir( [ ns => $ns ] )
+ getKeys([$ns])
+ 
+ getKeys([ns => $ns])
  
 =item args:
 
@@ -387,14 +440,65 @@ The cache namespace.
 
 =cut
 
+multi method getKeys (Str :$ns) {
 
-method getNamespaceDir (Str $ns?) {
+	if ( $self->l2Enabled ) {
+		return $self->_l2GetKeys(@_);
+	}
+
+	if ( $self->l1Enabled ) {
+		return $self->_l1GetKeys(@_);
+	}
+}
+
+multi method getKeys (Str $ns?) {
+
+	my %a;
+	$a{ns} = $ns if $ns;
+	
+	return $self->getKeys(ns => $ns);	
+}
+
+=head2 getNamespaceDir
+
+Gets the L2 cache dir.
+
+=over
+
+=item usage:
+
+ getNamespaceDir([$ns])
+ 
+ getNamespaceDir([ns => $ns])
+ 
+=item args:
+
+=over
+
+=item ns [Str]
+
+The cache namespace.  
+
+=back
+
+=back
+
+=cut
+
+multi method getNamespaceDir (Str :$ns) {
 
 	$ns = $self->_getNamespace($ns);
 
 	return sprintf "%s/%s", $self->rootDir, $ns;
 }
 
+multi method getNamespaceDir (Str $ns?) {
+
+	my %a;
+	$a{ns} = $ns if $ns;
+	
+	return $self->getNamespaceDir(%a);
+}
 
 =head2 set
 
@@ -404,11 +508,9 @@ Commits the data object to the cache.
 
 =item usage:
 
- set(
-      key  => $key,
-      data => $data,
-    [ ns   => $ns ],
- )
+ set($key, $data, [$ns])
+ 
+ set(key => $key, data => $data, [ns => $ns])
    
 =item args:
 
@@ -432,9 +534,9 @@ The cache namespace.
 
 =cut
 
-method set (Str :$key!,
-            Any :$data!,
-            Str :$ns) {
+multi method set (Str :$key!,
+            	  Any :$data!,
+            	  Str :$ns) {
 
 	$self->_l1Set(@_) if $self->l1Enabled;
 	$self->_l2Set(@_) if $self->l2Enabled;
@@ -442,41 +544,18 @@ method set (Str :$key!,
 	return 1;
 }
 
-=head2 getKeys
-
-Returns a list of cache keys.
-
-=over
-
-=item usage:
-
- getKeys( [ ns => $ns ] )
- 
-=item args:
-
-=over
-
-=item ns [Str]
-
-The cache namespace.  
-
-=back
-
-=back
-
-=cut
-
-method getKeys (Str :$ns) {
-
-	if ( $self->l2Enabled ) {
-		return $self->_l2GetKeys(@_);
-	}
-
-	if ( $self->l1Enabled ) {
-		return $self->_l1GetKeys(@_);
-	}
+multi method set (Str $key,
+            	  Any $data,
+            	  Str $ns?) {
+            	
+	my %a;
+	$a{key} = $key;
+	$a{data} = $data;
+	$a{ns} = $ns if $ns;
+	
+	return $self->set(%a);            	
 }
-
+            	
 ############################################################
 
 method _getChiObject (Str :$ns) {
@@ -501,8 +580,6 @@ method _getChiObject (Str :$ns) {
 
 	return $chi;
 }
-
-######################################################################
 
 method _buildL1Enabled {
 
@@ -610,7 +687,7 @@ method _l2Destroy (Str :$ns) {
 		delete $href->{$ns};
 	}
 
-	remove_tree($self->getNamespaceDir($ns));	
+	remove_tree($self->getNamespaceDir(ns => $ns));	
 }
 
 method _l1Clear (Str :$ns) {

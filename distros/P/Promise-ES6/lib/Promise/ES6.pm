@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use constant {
 
@@ -44,18 +44,23 @@ Promise::ES6 - ES6-style promises in Perl
 
 =head1 DESCRIPTION
 
-This is a rewrite of L<Promise::Tiny> that implements fixes for
-certain bugs that proved hard to fix in the original code. This module
-also removes superfluous dependencies on L<AnyEvent> and L<Scalar::Util>.
+This module provides a Perl implementation of L<promises|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises>, a useful pattern
+for coordinating asynchronous tasks.
 
-The interface is the same, except:
+Unlike most other promise implementations on CPAN, this module
+mimics ECMAScript 6’s L<Promise|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise>
+class. As the SYNOPSIS above shows, you can thus use patterns from JavaScript
+in Perl with only minimal changes needed to accommodate language syntax.
+
+This is a rewrite of an earlier module, L<Promise::Tiny>. It fixes several
+bugs and superfluous dependencies in the original.
+
+=head1 INTERFACE NOTES
 
 =over
 
 =item * Promise resolutions and rejections accept exactly one argument,
-not a list. (This accords with the standard.)
-
-=item * A C<finally()> method is defined.
+not a list.
 
 =item * Unhandled rejections are reported via C<warn()>. (See below
 for details.)
@@ -80,6 +85,59 @@ of the following is true:
 (even within the constructor).
 
 =back
+
+=head1 SYNCHRONOUS OPERATION
+
+In JavaScript, the following …
+
+    Promise.resolve().then( () => console.log(1) );
+    console.log(2);
+
+… will log C<2> then C<1> because JavaScript’s C<then()> defers execution
+of its callbacks until the end of the current iteration through JavaScript’s
+event loop.
+
+Perl, of course, has no built-in event loop. This module’s C<then()> method,
+thus, when called on a promise that is already
+“settled” (i.e., not pending), will run the appropriate callback
+I<immediately>. That means that this:
+
+    Promise::ES6->resolve(0)->then( sub { print 1 } );
+    print 2;
+
+… will print C<12> instead of C<21>.
+
+This is an intentional divergence from
+L<the Promises/A+ specification|https://promisesaplus.com/#point-34>.
+A key advantage of this design is that Promise::ES6 instances can abstract
+over whether a given function works synchronously or asynchronously.
+
+If you want a Promises/A+-compliant implementation, look at
+L<Promise::ES6::IOAsync>, L<Promise::ES6::AnyEvent>, or one of the alternatives
+that that module’s documentation suggests.
+
+=head1 CANCELLATION
+
+Promises have never provided a standardized solution for cancellation—i.e.,
+aborting an in-process operation. So, if you need this functionality, you’ll
+have to implement it yourself. Two ways of doing this are:
+
+=over
+
+=item * Subclass Promise::ES6 and provide cancellation logic in your
+subclass. See L<DNS::Unbound::AsyncQuery>’s implementation for an
+example of this.
+
+=item * Implement the cancellation on the object that creates your promises.
+This is probably the more straightforward approach but requires that there
+be some object or ID besides the promise that uniquely identifies the action
+to be canceled. See L<Net::Curl::Promiser> for an example of this approach.
+
+=back
+
+You’ll need to decide if it makes more sense for your application to leave
+a canceled query in the “pending” state or to resolve or reject it.
+All things being equal, I feel the first approach is the most intuitive.
 
 =head1 MEMORY LEAKS
 
@@ -127,12 +185,10 @@ introductions to the topic. You might start with
 L<this one|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises>.
 
 Promise::ES6 serves much the same role as L<Future> but exposes
-a standard, cross-language API rather than a proprietary one.
+a standard, minimal, cross-language API rather than a proprietary (large) one.
 
-CPAN contains a number of other modules that implement promises.
-Promise::ES6’s distinguishing features are simplicity and lightness.
-By design, it implements B<just> the standard Promise API and doesn’t
-assume you use, e.g., L<AnyEvent>.
+CPAN contains a number of other modules that implement promises. I think
+mine is the nicest :), but YMMV. Enjoy!
 
 =head1 LICENSE & COPYRIGHT
 

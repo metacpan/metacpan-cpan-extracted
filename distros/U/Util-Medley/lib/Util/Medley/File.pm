@@ -1,10 +1,9 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.007';
+$Util::Medley::File::VERSION = '0.008';
 use Modern::Perl;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
-
+use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use Carp;
 use File::LibMagic;
@@ -22,34 +21,31 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =cut
 
 =head1 SYNOPSIS
 
- my $file = Util::Medley::File->new;
+ my $util = Util::Medley::File->new;
 
- my $basename = $file->basename($path);
- my $dirname  = $file->dirname($path);
- my $newpath  = $file->trimSuffix($path);
+ my $basename = $util->basename($path);
+ my $dirname  = $util->dirname($path);
+ my $newpath  = $util->trimSuffix($path);
 
- my ($dir, $filename, $suffix) = $file->parsePath($path);
+ my ($dir, $utilname, $suffix) = $util->parsePath($path);
 
- $file->cp($src, $dest);
- $file->mv($src, $dest);
- $file->chmod($path);
- $file->mkdir($path);
- $file->rmdir($path);
- $file->unlink($path);
+ $util->cp($src, $dest);
+ $util->mv($src, $dest);
+ $util->chmod($path);
+ $util->mkdir($path);
+ $util->rmdir($path);
+ $util->unlink($path);
 
- my $prev_dir = $file->chdir($path);
- my $type     = $file->fileType($path);
- my @found    = $file->find($path);
- my $cwd      = $file->getcwd;
-
- $file->xmllint(path => $path);
- my $formated_xml = $file->xmllint(string => $myxml);
+ my $prev_dir = $util->chdir($path);
+ my $type     = $util->fileType($path);
+ my @found    = $util->find($path);
+ my $cwd      = $util->getcwd;
 
 =cut
 
@@ -58,7 +54,7 @@ version 0.007
 =head1 DESCRIPTION
 
 Provides frequently used file operation methods.  Many of these
-are pass-through to a standard module.  Others offer variations on 
+are pass-through to another module.  Others offer variations on 
 the originals.  All methods output debug logging statements when enabled.  
 Any errors are bubbled up with Carp::confess().  Use eval as appropriate.
 
@@ -76,7 +72,9 @@ Pass-through to File::Path::basename().
 
 =item usage:
 
- my $basename = $file->basename($path);
+ $basename = $util->basename($path);
+
+ $basename = $util->basename(path => $path);
 
 =item args:
 
@@ -92,7 +90,12 @@ The file path.
 
 =cut
 
-method basename (Str $path) {
+multi method basename (Str :$path!) {
+	
+	return $self->basename($path);	
+}
+
+multi method basename (Str $path) {
 
 	$self->Logger->debug("basename($path)");
 	return File::Basename::basename($path);
@@ -106,8 +109,10 @@ Pass-through to CORE::chdir(), but differs in that it returns the original dir.
 
 =item usage:
 
- my $previous_dir = $file->chdir($path);
+ $previous_dir = $util->chdir($path);
 
+ $previous_dir = $util->chdir(path => $path);
+ 
 =item args:
 
 =over
@@ -122,7 +127,12 @@ Destination directory.
 
 =cut
 
-method chdir (Str $dir) {
+multi method chdir (Str :$dir!) {
+
+	return $self->chdir($dir);	
+}
+
+multi method chdir (Str $dir) {
 
 	$self->Logger->debug("chdir($dir)");
 	my $orig_dir = $self->getcwd;
@@ -139,15 +149,21 @@ Pass-through to CORE::chmod().
 
 =item usage:
 
- $file->chmod(0755, $path);
+ $util->chmod(0755, $path);
 
+ $util->chmod(perm => 0755, path => $path);
+ 
 =item args:
 
 =over
 
-=item $perm [Str]
+=item perm [Str]
 
 Numeric mode.
+
+=item file [Str]
+
+Location of the file to update.
 
 =back
 
@@ -155,9 +171,14 @@ Numeric mode.
 
 =cut
 
-method chmod (Str $perm, Str $file) {
+multi method chmod (Str :$perm!, Str :$file!) {
 
-	$self->Logger->debug("chmod($perm, $file)");
+	return $self->chmod($perm, $file);	
+}
+
+multi method chmod (Str $perm, Str $file) {
+
+	$self->Logger->debug("chmod($perm, $file");
 	CORE::chmod( $perm, $file );
 }
 
@@ -169,17 +190,19 @@ Pass-through to File::Copy::copy().
 
 =item usage:
 
- $file->cp($src, $dest);
+ $util->cp($src, $dest);
 
+ $util->cp(src => $src, dest => $dest);
+ 
 =item args:
 
 =over
 
-=item $src [Str]
+=item src [Str]
 
 Source file.
 
-=item $dest [Str]
+=item dest [Str]
 
 Destination file.
 
@@ -189,7 +212,12 @@ Destination file.
 
 =cut
 
-method cp (Str $src, Str $dest) {
+multi method cp (Str :$src!, Str :$dest!) {
+
+	return $self->cp($src, $dest);
+}
+
+multi method cp (Str $src, Str $dest) {
 
 	$self->Logger->debug("cp $src, $dest");
 	return File::Copy::copy( $src, $dest );
@@ -203,8 +231,10 @@ Pass-through to File::Path::dirname().
 
 =item usage:
 
- my $dir = $file->dirname($path);
-
+ $dir = $util->dirname($path);
+ 
+ $dir = $util->dirname(path => $path);
+ 
 =item args:
 
 =over
@@ -219,7 +249,12 @@ The file path.
 
 =cut
 
-method dirname (Str $path) {
+multi method dirname (Str :$path!) {
+
+	return $self-dirname($path);
+}
+
+multi method dirname (Str $path) {
 
 	$self->Logger->debug("dirname($path)");
 	return File::Basename::dirname($path);
@@ -233,8 +268,10 @@ Get the filetype of a file.
 
 =item usage:
 
- my $type = $file->fileType($path);
-
+ $type = $util->fileType($path);
+ 
+ $type = $util->fileType(path => $path);
+ 
 =item args:
 
 =over
@@ -249,7 +286,12 @@ Path of the file you wish to interrogate.
 
 =cut
 
-method fileType (Str $path) {
+multi method fileType (Str :$path!) {
+
+	return $self->fileType($path);
+}
+
+multi method fileType (Str $path) {
 
 	if ( $self->String->is_blank($path) ) {
 		confess "path is empty";
@@ -266,7 +308,7 @@ method fileType (Str $path) {
 		$info = $magic->info_from_filename($path);
 	}
 	catch {
-		return "unknown type: $_";
+		return "unknown type for $path: $_";
 	};
 
 	return $info->{description};
@@ -274,16 +316,16 @@ method fileType (Str $path) {
 
 =head2 find
 
-Pass-through to Path::Iterator::Rule.
+Pass-through to Path::Iterator::Rule.  Returns a list of all files and 
+directories.
 
 =over
 
 =item usage:
 
- my @files = $file->find( dir => $dir, 
-                        [ files_only => $bool ],
-                        [ dirs_only  => $bool ]);
- 						
+ @files = $util->find($dir);
+ 
+ @files = $util->find(dir => $dir);
 
 =item args:
 
@@ -293,28 +335,14 @@ Pass-through to Path::Iterator::Rule.
 
 The directory path you wish to search.
 
-=item files_only [Bool]
-
-Return files only (no directories).  Mutually exclusive from dirs_only.
-
-=item dirs_only [Bool]
-
-Return directories only (no files).  Mutually exclusive from files_only.
-
 =back
 
 =back
 
 =cut
 
-method find (Str :$dir!, 
-			 Str :$files_only,
-			 Str :$dirs_only) {
+multi method find (Str :$dir!) {
 
-	if ($files_only and $dirs_only) {
-		confess "options files_only and dirs_only are mutually exclusive";		
-	}
-		
 	if ( !-d $dir ) {
 		confess "dir $dir does not exist";
 	}
@@ -325,14 +353,109 @@ method find (Str :$dir!,
 
 	while ( defined( my $path = $next->() ) ) {
 		
-		next if $files_only and -d $path;
-		next if $dirs_only and !-d $path;
-		
 		push @paths, $path;
 	}
 
 	return @paths;
 }
+
+multi method find (Str $dir) {
+
+	return $self->find(dir => $dir);	
+}
+
+
+=head2 findFiles
+
+Returns a list of all files under a given directory.  Just a 
+convenience wrapper around find.
+
+=over
+
+=item usage:
+
+ @files = $util->findFiles($dir);
+ 
+ @files = $util->find(dir => $dir);
+
+=item args:
+
+=over
+
+=item dir [Str]
+
+The directory path you wish to search.
+
+=back
+
+=back
+
+=cut
+
+multi method findFiles (Str :$dir!) {
+
+	my @paths = $self->find(dir => $dir);
+	my @files;
+	
+	foreach my $path (@paths) {	
+		next if -d $path;
+		push @files, $path;	
+	}
+	
+	return @files;
+}
+
+multi method findFiles (Str $dir) {
+
+	return $self->findFiles(dir => $dir);
+}
+
+
+=head2 findDirs
+
+Returns a list of all directories under a given directory.  Just a 
+convenience wrapper around find.
+
+=over
+
+=item usage:
+
+ @dirs = $util->findDirs($dir);
+ 
+ @dirs = $util->findDirs(dir => $dir);
+
+=item args:
+
+=over
+
+=item dir [Str]
+
+The directory path you wish to search.
+
+=back
+
+=back
+
+=cut
+
+multi method findDirs (Str :$dir!) {
+
+	my @paths = $self->find(dir => $dir);
+	my @dirs;
+	
+	foreach my $path (@paths) {	
+		next if !-d $path;
+		push @dirs, $path;	
+	}
+	
+	return @dirs;
+}
+
+multi method findDirs (Str $dir) {
+
+	return $self->findDirs(dir => $dir);
+}
+
 
 =head2 getcwd 
 
@@ -342,7 +465,7 @@ Pass-through to Cwd::getcwd().
 
 =item usage:
 
- my $cwd = $file->getcwd;
+ $cwd = $util->getcwd;
 
 =back
 
@@ -363,8 +486,9 @@ Pass-through to File::Path::make_path().
 
 =item usage:
 
- $file->mkdir($path;
- $file->mkdir($path, 0755);
+ $util->mkdir($path, [$perm]);
+ 
+ $util->mkdir(path => $path, [perm => $perm]);
 
 =item args:
 
@@ -384,7 +508,12 @@ Numeric mode.
 
 =cut
 
-method mkdir (Str $path, Str $perm?) {
+multi method mkdir (Str :$path!, Str :$perm) {
+
+	return $self->mkdir(@_);
+}
+
+multi method mkdir (Str $path, Str $perm?) {
 
 	my @param = ($path);
 	push @param, { mode => $perm } if defined $perm;
@@ -400,8 +529,10 @@ Pass-through to File::Copy::move().
 
 =item usage:
 
- $file->mv($src, $dest);
+ $util->mv($src, $dest);
 
+ $util->mv(src => $src, dest => $dest);
+ 
 =item args:
 
 =over
@@ -420,7 +551,12 @@ The destination path.
 
 =cut
 
-method mv (Str $src, Str $dest) {
+multi method mv (Str :$src!, Str :$dest!) {
+
+	return $self->mv($src, $dest);
+}
+
+multi method mv (Str $src, Str $dest) {
 
 	$self->Logger->debug("mv($src, $dest)");
 	my $rc = File::Copy::move( $src, $dest );
@@ -439,7 +575,9 @@ from the extension and extraneous trailing /'s in the dir.
 
 =item usage:
 
- my ($dir, $name, $ext) = $file->parsePath($path);
+ ($dir, $name, $ext) = $util->parsePath($path);
+
+ ($dir, $name, $ext) = $util->parsePath(path => $path);
 
 =item args:
 
@@ -455,9 +593,14 @@ The file path for which you wish to parse.
 
 =cut
 
-method parsePath (Str $path) {
+multi method parsePath (Str :$path!) {
 
-	my ( $filename, $dir, $suffix ) =
+	return $self->parsePath($path);
+}
+
+multi method parsePath (Str $path) {
+
+	my ( $utilname, $dir, $suffix ) =
 	  File::Basename::fileparse( $path, qr/\..*$/ );
 
 	if ($dir ne './') {
@@ -468,8 +611,9 @@ method parsePath (Str $path) {
 		$suffix =~ s/^\.//g;
 	}
 
-	return ( $dir, $filename, $suffix );
+	return ( $dir, $utilname, $suffix );
 }
+
 
 =head2 rmdir
 
@@ -479,8 +623,10 @@ Delete a directory and any contents.  Pass-through to File::Path::remove_tree().
 
 =item usage:
 
- $file->rmdir($dir);
+ $util->rmdir($dir);
 
+ $util->rmdir(dir => $dir);
+ 
 =item args:
 
 =over
@@ -495,13 +641,19 @@ Directory to remove.
 
 =cut
 
-method rmdir (Str $dir) {
+multi method rmdir (Str :$dir!) {
+
+	return $self->rmdir($dir);
+}
+
+multi method rmdir (Str $dir) {
 
 	if ( -d $dir ) {
 		$self->Logger->debug("rmdir $dir");
 		remove_tree($dir);
 	}
 }
+
 
 =head2 trimExt
 
@@ -511,13 +663,15 @@ Trim the file extension from a filename.
 
 =item usage:
 
- my $filename_no_ext = $file->trimExt($filename);
+ $filename_no_ext = $util->trimExt($filename);
+
+ $filename_no_ext = $util->trimExt(name => $filename);
 
 =item args:
 
 =over
 
-=item filename [Str]
+=item name [Str]
 
 The filename for which you want to remove the extension.
 
@@ -527,7 +681,12 @@ The filename for which you want to remove the extension.
 
 =cut
 
-method trimExt (Str $name) {
+multi method trimExt (Str :$name!) {
+
+	return $self->trimExt($name);
+}
+
+multi method trimExt (Str $name) {
 
 	$name =~ s/\..*$//g;
 	
@@ -542,8 +701,10 @@ Pass-through to CORE::unlink().
 
 =item usage:
 
- $file->unlink($path);
+ $util->unlink($path);
 
+ $util->unlink(path => $path);
+ 
 =item args:
 
 =over
@@ -558,69 +719,18 @@ Path of the file you wish to delete.
 
 =cut
 
-method unlink (Str $path) {
+multi method unlink (Str :$path!) {
+
+	return $self->unlink($path);
+}
+
+multi method unlink (Str $path) {
 
 	if ( -f $path ) {
 		$self->Logger->debug("unlink $path");
 		Core::unlink($path) or confess "failed to unlink $path: $!";
 	}
 }
-
-=head2 xmllint
-
-Wrapper around the xmllint command.  You can pass an xml string or
-the path to an xml file.
-
-=over
-
-=item usage:
-
- $file->xmllint($path);
-
- my $pretty_xml = $file->xmllint($xmlstring);
- 
-=item args:
-
-=over
-
-=item string [Str]
-
-An xml string.
-
-=item path [Str]
-
-Path to an xml file.
-
-=back
-
-=back
-
-=cut
-
-method xmllint (Str :$string,
-                Str :$path) {
-
-	if ( $string and $path ) {
-		confess "string and path are mutually exclusive";
-	}
-
-	if ($string) {
-		my @cmd = ( 'xmllint', '--format', '-' );
-		my ( $stdout, $stderr, $exit ) =
-		  $self->spawn->capture( cmd => \@cmd, stdin => $string );
-
-		return $stdout;
-	}
-	elsif ($path) {
-		my $cmd = "xmllint --format $path > $path.tmp";
-		$self->spawn->spawn( cmd => $cmd );
-		$self->mv( "$path.tmp", $path );
-	}
-	else {
-		confess "no args provided";
-	}
-}
-
 
 ######################################################################
 

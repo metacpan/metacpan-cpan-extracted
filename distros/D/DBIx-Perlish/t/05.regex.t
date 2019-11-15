@@ -61,6 +61,11 @@ test_select_sql {
 "select * from tbl t01 where t01.id like 'abc!_%' escape '!'",
 [];
 test_select_sql {
+	tbl->id =~ /^abc\'/
+} "like quote",
+"select * from tbl t01 where t01.id like 'abc''%'",
+[];
+test_select_sql {
 	tbl->id =~ /^abc%/
 } "like percent",
 "select * from tbl t01 where t01.id like 'abc!%%' escape '!'",

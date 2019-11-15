@@ -1,6 +1,14 @@
 Revision history for App-DBBrowser
 
 
+2.221    2019-11-15
+        - Create table: no extra confirm for the insert.
+        - Menu-updates for: create table, fetch data, parse data, filter data.
+        - Columns added with Append_col have now an empty header.
+        - Bugfix in empty_to_null.
+        - Code refactoring.
+        - Update documentation.
+
 2.220    2019-10-31
         - Bugfix in the empty_to_null filter.
 

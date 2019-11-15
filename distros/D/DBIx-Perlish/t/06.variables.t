@@ -19,6 +19,11 @@ my %self = ( table => 'table1', id => 42,
 );
 our $GLOBAL = 42;
 our %GLOBAL_HASH; $GLOBAL_HASH{hash} = 42; $GLOBAL_HASH{l1}{l2} = 42;
+our @GLOBAL_ARRAY = (42, [42]);
+our @LOCAL_ARRAY = (42, [42]);
+my %LOCAL_HASH; $LOCAL_HASH{hash} = 42; $LOCAL_HASH{l1}{l2} = 42;
+my ($LOCAL_ARRAYREF, $LOCAL_HASHREF) = ( \@LOCAL_ARRAY, \%LOCAL_HASH);
+my ($GLOBAL_ARRAYREF, $GLOBAL_HASHREF) = ( \@GLOBAL_ARRAY, \%GLOBAL_HASH);
 test_select_sql {
 	table: my $t1 = $vart;
 	my $t2 : table2;
@@ -69,6 +74,34 @@ test_select_sql {
 
 test_select_sql {
 	my $t : table1;
+	$t->id == $LOCAL_HASH{hash};
+} "local hash",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_HASH{l1}{l2};
+} "local hash multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_HASHREF->{hash};
+} "local hashref",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_HASHREF->{l1}{l2};
+} "local hashref multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
 	$t->id == $GLOBAL_HASH{hash};
 } "global hash",
 "select * from table1 t01 where t01.id = ?",
@@ -78,6 +111,76 @@ test_select_sql {
 	my $t : table1;
 	$t->id == $GLOBAL_HASH{l1}{l2};
 } "global hash multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $GLOBAL_HASHREF->{hash};
+} "global hashref",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $GLOBAL_HASHREF->{l1}{l2};
+} "global hashref multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_ARRAY[0];
+} "local array",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_ARRAY[1][0];
+} "local array multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_ARRAYREF->[0];
+} "local arrayref",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $LOCAL_ARRAYREF->[1]->[0];
+} "local arrayref multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $GLOBAL_ARRAY[0];
+} "global array",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $GLOBAL_ARRAY[1][0];
+} "global array multilevel",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $GLOBAL_ARRAYREF->[0];
+} "global arrayref",
+"select * from table1 t01 where t01.id = ?",
+[42];
+
+test_select_sql {
+	my $t : table1;
+	$t->id == $GLOBAL_ARRAYREF->[1]->[0];
+} "global arrayref multilevel",
 "select * from table1 t01 where t01.id = ?",
 [42];
 

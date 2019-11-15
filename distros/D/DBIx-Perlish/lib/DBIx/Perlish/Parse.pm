@@ -10,6 +10,8 @@ use B;
 use Carp;
 use Devel::Caller qw(caller_cv);
 
+sub _o($) { ref($_[0]) . ( $_[0]->can('name') ? ("." . $_[0]->name) : '' ) }
+
 sub bailout
 {
 	my ($S, @rest) = @_;
@@ -111,7 +113,7 @@ sub want_pushmark_or_padrange
 {
 	my ($S, $op) = @_;
 	unless (is_pushmark_or_padrange($op)) {
-		bailout $S, "want op pushmark or op padrange";
+		bailout $S, "want op pushmark or op padrange, got " . _o $op;
 	}
 }
 
@@ -297,9 +299,10 @@ sub parse_multideref
  		my $actions = shift @items;
 
 		my $ref;
-		my $sv = shift(@items) or bailout $S, "unexpected empty multideref";
+		my $sv = shift(@items) or return undef;
 
-		while ( my $ptr = shift @items ) {
+		while ( @items ) {
+			my $ptr = shift @items;
  			my $access  = $actions & B::MDEREF_ACTION_MASK();
 			unless ($ref) {
  				if (
@@ -325,6 +328,14 @@ sub parse_multideref
 				) {
 					bailout_multiref_vivify $S unless ref($sv);
 					$ref = $sv->AV->object_2svref;
+				} elsif (
+					$access == B::MDEREF_AV_gvsv_vivify_rv2av_aelem() ||
+					$access == B::MDEREF_HV_gvsv_vivify_rv2hv_aelem()
+				) {
+					$ref = $sv->object_2svref;
+					bailout_multiref_vivify $S
+						if !$ref || ((ref($ref) eq 'SCALAR') && !$$ref);
+					$ref = $$ref;
 				} else {
 					bailout $S, "don't quite know what to do with multideref access=$access";
  				}
@@ -334,7 +345,9 @@ sub parse_multideref
 			my $index = $actions & B::MDEREF_INDEX_MASK();
 
 			if ( $index != B::MDEREF_INDEX_none() ) {
-				if ( $index == B::MDEREF_INDEX_const() ) {
+				if ( !ref($ptr)) {
+					$key = $ptr;
+				} elsif ( $index == B::MDEREF_INDEX_const() ) {
 					$key = ${$ptr->object_2svref};
 				} elsif ( $index == B::MDEREF_INDEX_padsv() ) {
  					$key  = aux_get_padsv($AUX, $ptr)->object_2svref;
@@ -442,6 +455,16 @@ sub get_value
 	} elsif ( $p{eval} && is_unop_aux($op, "multiconcat")) {
 		my @terms = parse_multiconcat($S, $op, eval => 1) or goto BAILOUT;
 		$val = join('', map { $_->{str} } @terms);
+	} elsif (is_op($op, "aelemfast_lex")) {
+		my $sv = $S->{padlist}->[1]->ARRAYelt($op->targ);
+		goto BAILOUT unless $sv;
+		$sv = $sv->object_2svref;
+		$val = $sv->[$op->private];
+	} elsif (is_svop($op, "aelemfast")) {
+		my $sv = $op->sv or goto BAILOUT;
+		$sv = $sv->object_2svref or goto BAILOUT;
+		$sv = ${$sv} or goto BAILOUT;
+		$val = $sv->[$op->private];
 	} else {
 	BAILOUT:
 		return () if $p{soft};
@@ -745,7 +768,7 @@ sub parse_term
 			("$term is not null", "$term is null") :
 			"$term is not null";
 	} elsif (($placeholder) = get_value($S, $op, soft => 1)) {
-		return 'null' unless defined $placeholder;
+		return 'null' if !defined($placeholder) && $S->{gen_args}->{inline};
 		goto PLACEHOLDER;
 	} elsif (is_unop($op, "backtick")) {
 		my $fop = $op->first;
@@ -873,17 +896,26 @@ sub get_gv
 	if (!$gv || !$$gv) {
 		$gv = $S->{padlist}->[1]->ARRAYelt($gv_idx);
 	}
+	if ( $p{get_name} && $gv->isa("B::IV")) {
+		my $subref = $gv->object_2svref;
+		if (ref($subref) eq 'REF' && ref($$subref) eq 'CODE') {
+			my $cv = B::svref_2object($$subref);
+			return $cv->NAME_HEK;
+		}
+	}
 	goto BAIL_OUT unless $gv->isa("B::GV");
-	return $gv;
+	return $p{get_name} ? $gv->NAME : $gv;
 BAIL_OUT:
 	bailout $S, "unable to get GV from \"", $op->name, "\"" if $p{bailout};
 	return;
 }
 
-sub try_get_dbfetch
+sub  get_gv_name { get_gv(@_, get_name => 1) }
+
+sub try_get_subselect
 {
 	my ($S, $sub) = @_;
-		
+
 	return unless is_unop($sub, "entersub");
 	$sub = $sub->first if is_unop($sub->first, "null");
 	return unless is_pushmark_or_padrange($sub->first);
@@ -902,9 +934,7 @@ sub try_get_dbfetch
 
 	$dbfetch = $dbfetch->first if is_unop($dbfetch->first, "null");
 	$dbfetch = $dbfetch->first;
-	my $gv = get_gv($S, $dbfetch);
-	return unless $gv;
-	return unless $gv->NAME eq 'subselect';
+	return unless (get_gv_name($S, $dbfetch) // '') eq 'subselect';
 
 	return $codeop;
 }
@@ -999,7 +1029,7 @@ sub try_parse_subselect
 		}
 		return in_list($S, $sop, \@what);
 	} else {
-		my $codeop = try_get_dbfetch( $S, $sub);
+		my $codeop = try_get_subselect( $S, $sub);
 		if ($codeop) {
 			$sql = handle_subselect($S, $codeop);
 		} else {
@@ -1057,7 +1087,7 @@ sub parse_assign
 			my $tab = try_parse_attr_assignment($S,
 				$op->last->first->sibling, $val);
 			return if $tab;
-		} elsif (my $codeop = try_get_dbfetch($S, $op->first)) {
+		} elsif (my $codeop = try_get_subselect($S, $op->first)) {
 			my $sql = handle_subselect($S, $codeop, returns_dont_care => 1);
 			my $tab = try_parse_attr_assignment($S,
 				$op->last->first->sibling, "($sql)");
@@ -1122,9 +1152,8 @@ sub try_funcall
 		return unless @args;
 		$op = pop @args;
 		return unless is_svop($op, "gv") || is_padop($op, "gv");
-		my $gv = get_gv($S, $op);
-		return unless $gv;
-		my $func = $gv->NAME;
+		my $func = get_gv_name( $S, $op);
+		return unless defined $func;
 		${$p{func_name_return}} = $func if $p{func_name_return};
 		if ($func =~ /^(union|intersect|except)$/) {
 			return if $p{only_normal_funcs};
@@ -1274,8 +1303,8 @@ sub parse_multi_assign
 		$op = $op->first if is_unop($op, "null");
 		$op = $op->sibling if is_pushmark_or_padrange($op);
 		$op = $op->first if is_unop($op, "rv2cv");
-		my $gv = get_gv($S, $op);
-		$tab = $gv->NAME if $gv;
+		my $gv = get_gv_name($S, $op);
+		$tab = $gv if defined $gv;
 	}
 	bailout $S, "cannot get a table to update" unless $tab;
 }
@@ -1499,10 +1528,10 @@ sub try_special_concat
 	@terms = grep { !$_->{skip} } @terms;
 	while (@terms) {
 		my $t = shift @terms;
-		if ($t->{str}) {
+		if (exists $t->{str}) {
 			$str .= $t->{str};
-		} elsif ($t->{field}) {
-			if ($str) {
+		} elsif (exists $t->{field}) {
+			if (length($str)) {
 				push @v, $str;
 				push @sql, '?';
 			}
@@ -1515,10 +1544,10 @@ sub try_special_concat
 		} else {
 			my $t2 = shift @terms;
 			return () unless $t2;
-			return () unless $t2->{str};
+			return () unless defined $t2->{str};
 			return () unless $t2->{str} =~ s/^->(\w+)//;
 			my $f = $1;
-			if ($str) {
+			if (length($str)) {
 				push @v, $str;
 				push @sql, '?';
 			}
@@ -1530,7 +1559,7 @@ sub try_special_concat
 			$str = $t2->{str};
 		}
 	}
-	if ($str) {
+	if (length($str)) {
 		push @v, $str;
 		push @sql, '?';
 	}
@@ -1673,7 +1702,6 @@ sub parse_regex
 		# return "$lhs $what ?";
 		return ($neg ? "not " : "") . "$what(?, $lhs)";
 	} else {
-		$like =~ s/'/''/g;
 		# XXX is SQL-standard LIKE case-sensitive or not?
 		if ($case) {
 			$lhs = "lower($lhs)";
@@ -1682,6 +1710,7 @@ sub parse_regex
 		bailout $S, "Regex too complex for implementation using LIKE keyword: $like"
 			if $like =~ /(?<!\\)[\[\]\(\)\{\}\?\|]/;
 LIKE:
+		$like =~ s/'/''/g;
 		$like =~ s/\\([^A-Za-z_0-9])/$1/g; # de-quotemeta
 		my $escape = "";
 		if ($flavor eq "pg" || $flavor eq "oracle") {
@@ -1766,7 +1795,7 @@ sub parse_join
 	# subselect
 	my ( $condition, $codeop);
 	if ( $op[2]) {
-		$codeop = try_get_dbfetch( $S, $op[2]);
+		$codeop = try_get_subselect( $S, $op[2]);
 		bailout $S, "third argument to join is not a subselect expression"
 			unless $codeop;
 

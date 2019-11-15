@@ -7,7 +7,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.md
 cpanfile
 dist.ini

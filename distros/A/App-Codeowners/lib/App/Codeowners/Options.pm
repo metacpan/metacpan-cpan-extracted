@@ -1,14 +1,35 @@
 package App::Codeowners::Options;
 # ABSTRACT: Getopt and shell completion for App::Codeowners
 
+use v5.10.1;
 use warnings;
 use strict;
 
 use Getopt::Long 2.39 ();
 use Path::Tiny;
-use Pod::Usage;
 
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.45'; # VERSION
+
+sub pod2usage {
+    eval { require Pod::Usage };
+    if ($@) {
+        my $ref  = $VERSION eq '9999.999' ? 'master' : "v$VERSION";
+        my $exit = (@_ == 1 && $_[0] =~ /^\d+$/ && $_[0]) //
+                   (@_ % 2 == 0 && {@_}->{'-exitval'})    // 2;
+        print STDERR <<END;
+Online documentation is available at:
+
+  https://github.com/chazmcgarvey/git-codeowners/blob/$ref/README.md
+
+Tip: To enable inline documentation, install the Pod::Usage module.
+
+END
+        exit $exit;
+    }
+    else {
+        Pod::Usage::pod2usage(@_);
+    }
+}
 
 sub early_options {
     return {
@@ -278,7 +299,7 @@ App::Codeowners::Options - Getopt and shell completion for App::Codeowners
 
 =head1 VERSION
 
-version 0.43
+version 0.45
 
 =head1 METHODS
 

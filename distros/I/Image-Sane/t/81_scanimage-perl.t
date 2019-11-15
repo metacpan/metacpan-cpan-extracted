@@ -37,6 +37,6 @@ my @tests = (
 for my $test (@tests) {
     my $output = `$scanimage_perl $test`;
     $output =~ s/scanimage-perl/scanimage/g;
-    my $example = `scanimage $test`;
-    is_deeply( $output, $example, $test );
+    my $example = `scanimage --format=pnm $test`;
+    is_deeply( $example, $output, $test );
 }

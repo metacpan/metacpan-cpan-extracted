@@ -86,10 +86,10 @@ sub defaults {
             undef             => '',
         },
         insert => {
-            copy_parse_mode => 1,
-            file_encoding   => 'UTF-8',
-            file_parse_mode => 0,
-            history_dirs    => 4,
+            file_encoding         => 'UTF-8',
+            history_dirs          => 4,
+            parse_mode_input_copy => 1,
+            parse_mode_input_file => 0,
         },
         create => {
             autoincrement_col_name => 'Id',

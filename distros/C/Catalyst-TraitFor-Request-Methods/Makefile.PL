@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Catalyst" => "5.90090",
     "Moose::Role" => 0,
-    "Sub::Util" => "1.40",
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +45,6 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
-  "Sub::Util" => "1.40",
   "Test::More" => 0,
   "Test::Most" => 0,
   "namespace::autoclean" => 0

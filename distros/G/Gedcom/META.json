@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown",
+      "perl_5",
       "perl_5"
    ],
    "meta-spec" : {
@@ -65,6 +65,6 @@
          "web" : "http://github.com/pjcj/Gedcom.pm"
       }
    },
-   "version" : "1.21",
+   "version" : "1.22",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

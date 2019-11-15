@@ -4,7 +4,7 @@ HTTP::Date - HTTP::Date - date conversion routines
 
 # VERSION
 
-version 6.03
+version 6.04
 
 # SYNOPSIS
 

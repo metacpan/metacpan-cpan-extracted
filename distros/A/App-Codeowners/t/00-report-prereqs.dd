@@ -41,6 +41,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'Pod::Usage' => '0',
                                         'Term::Detect::Software' => '0',
                                         'Unicode::GCString' => '0'
                                       },
@@ -53,7 +54,6 @@ do { my $x = {
                                       'IPC::Open2' => '0',
                                       'Module::Load' => '0',
                                       'Path::Tiny' => '0',
-                                      'Pod::Usage' => '0',
                                       'Scalar::Util' => '0',
                                       'Test::Builder' => '0',
                                       'Text::Gitignore' => '0',

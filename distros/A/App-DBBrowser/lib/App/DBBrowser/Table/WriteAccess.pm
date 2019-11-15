@@ -76,7 +76,7 @@ sub table_write_access {
 
         CUSTOMIZE: while ( 1 ) {
             my $choices = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
-            $ax->print_sql( $sql, [ $stmt_type ] );
+            $ax->print_sql( $sql );
             # Choose
             my $idx = $tc->choose(
                 $choices,
@@ -188,20 +188,28 @@ sub __transaction {
         for my $values ( @$rows_to_execute ) {
             $sth->execute( @$values );
         }
-        my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-        $ax->print_sql( $sql );
-        # Choose
-        my $choice = $tc->choose(
-            [ undef,  $commit_ok ],
-            { %{$sf->{i}{lyt_v}} }
-        );
-        $ax->print_sql( $sql, $waiting );
-        if ( ! defined $choice || $choice ne $commit_ok ) {
-            $dbh->rollback;
-            $rolled_back = 1;
-        }
-        else {;
+        if ( $stmt_type eq 'Insert' && $sf->{i}{ct}{skip_confirm_insert} ) {
+            delete $sf->{i}{ct}{skip_confirm_insert};
             $dbh->commit;
+        }
+
+        else {
+            $sf->{i}{occupied_term_height} = 3;
+            my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
+            $ax->print_sql( $sql );
+            # Choose
+            my $choice = $tc->choose(
+                [ undef,  $commit_ok ],
+                { %{$sf->{i}{lyt_v}} }
+            );
+            $ax->print_sql( $sql, $waiting );
+            if ( ! defined $choice || $choice ne $commit_ok ) {
+                $dbh->rollback;
+                $rolled_back = 1;
+            }
+            else {;
+                $dbh->commit;
+            }
         }
         1 }
     ) {
@@ -221,16 +229,22 @@ sub __auto_commit {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
-    my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
-    $ax->print_sql( $sql ); #
-    # Choose
-    my $choice = $tc->choose(
-        [ undef,  $commit_ok ],
-        { %{$sf->{i}{lyt_v}}, prompt => '' }
-    );
-    $ax->print_sql( $sql, $waiting );
-    if ( ! defined $choice || $choice ne $commit_ok ) {
-        return;
+    if ( $stmt_type eq 'insert' && $sf->{i}{ct}{skip_confirm_insert} ) {
+        delete $sf->{i}{ct}{skip_confirm_insert};
+    }
+    else {
+        $sf->{i}{occupied_term_height} = 3;
+        my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $count_affected, $sf->{o}{G}{thsd_sep} ), $stmt_type;
+        $ax->print_sql( $sql ); #
+        # Choose
+        my $choice = $tc->choose(
+            [ undef,  $commit_ok ],
+            { %{$sf->{i}{lyt_v}}, prompt => '' }
+        );
+        $ax->print_sql( $sql, $waiting );
+        if ( ! defined $choice || $choice ne $commit_ok ) {
+            return;
+        }
     }
     if ( ! eval {
         my $sth = $dbh->prepare(
@@ -250,107 +264,48 @@ sub __auto_commit {
 
 sub __build_insert_stmt {
     my ( $sf, $sql ) = @_;
+    require App::DBBrowser::GetContent;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->reset_sql( $sql );
-    my @cu_keys = ( qw/insert_col insert_copy insert_file/ );
-    my %cu = (
-        insert_col  => '- Plain',
-        insert_file => '- From File',
-        insert_copy => '- Copy & Paste',
-    );
-    my $old_idx = 0;
 
-    MENU: while ( 1 ) {
-        my $choices = [ undef, @cu{@cu_keys} ];
-        # Choose
-        my $idx = $tc->choose(
-            $choices,
-            { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, undef => '  <=' }
-        );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
-            return;
-        }
-        my $custom = $choices->[$idx];
-        if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
-                next MENU;
-            }
-            $old_idx = $idx;
-        }
+    REQUIRED_COLS: while ( 1 ) {
         my $cols_ok = $sf->__insert_into_stmt_columns( $sql );
         if ( ! $cols_ok ) {
-            next MENU;
+            return;
         }
-        my $insert_ok;
-        require App::DBBrowser::GetContent;
-        my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        if ( $custom eq $cu{insert_col} ) {
-            $insert_ok = $gc->from_col_by_col( $sql );
+        my $ok = $gc->get_content( $sql, 0 );
+        delete $sf->{i}{gc};
+        if ( ! $ok ) {
+            next REQUIRED_COLS;
         }
-        elsif ( $custom eq $cu{insert_copy} ) {
-            $insert_ok = $gc->from_copy_and_paste( $sql );
-        }
-        elsif ( $custom eq $cu{insert_file} ) {
-            $insert_ok = $gc->from_file( $sql );
-        }
-        if ( ! $insert_ok ) {
-            next MENU;
-        }
-        return 1
+        return 1;
     }
 }
 
 
 sub __insert_into_stmt_columns {
     my ( $sf, $sql ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $sql->{insert_into_cols} = [];
     my @cols = ( @{$sql->{cols}} );
     if ( $plui->first_column_is_autoincrement( $sf->{d}{dbh}, $sf->{d}{schema}, $sf->{d}{table} ) ) {
         shift @cols;
     }
     my $bu_cols = [ @cols ];
-
-    COL_NAMES: while ( 1 ) {
-        $ax->print_sql( $sql );
-        my @pre = ( undef, $sf->{i}{ok} );
-        my $choices = [ @pre, @cols ];
-        # Choose
-        my @idx = $tc->choose(
-            $choices,
-            { %{$sf->{i}{lyt_h}}, prompt => 'Columns:', meta_items => [ 0 .. $#pre ], include_highlighted => 2,
-              index => 1 }
-        );
-        if ( ! $idx[0] ) {
-            if ( ! @{$sql->{insert_into_cols}} ) {
-                return;
-            }
-            $sql->{insert_into_cols} = [];
-            @cols = @$bu_cols;
-            next COL_NAMES;
-        }
-        if ( $idx[0] == 1 ) {
-            shift @idx;
-            push @{$sql->{insert_into_cols}}, @{$choices}[@idx];
-            if ( ! @{$sql->{insert_into_cols}} ) {
-                $sql->{insert_into_cols} = $bu_cols;
-            }
-            return 1;
-        }
-        push @{$sql->{insert_into_cols}}, @{$choices}[@idx];
-        my $c = 0;
-        for my $i ( @idx ) {
-            last if ! @cols;
-            my $ni = $i - ( @pre + $c );
-            splice( @cols, $ni, 1 );
-            ++$c;
-        }
+    my $info = "Table $sql->{table}";
+    $info .= "\nSelect columns to fill:";
+    my $idxs = $tu->choose_a_subset(
+        [ @cols ],
+        { current_selection_label => 'Cols: ', layout => 0, order => 0, all_by_default => 1,
+          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $info }
+    );
+    if ( ! defined $idxs ) {
+        return;
     }
+    $sql->{insert_into_cols} = [ @cols[@$idxs] ];
+    return 1;
 }
 
 

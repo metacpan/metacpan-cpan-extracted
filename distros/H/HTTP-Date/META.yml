@@ -31,14 +31,13 @@ requires:
   Time::Zone: '0'
   perl: '5.006002'
   strict: '0'
-  vars: '0'
 resources:
   IRC: irc://irc.perl.org/#lwp
   MailingList: mailto:libwww@perl.org
   bugtracker: https://github.com/libwww-perl/HTTP-Date/issues
   homepage: https://github.com/libwww-perl/HTTP-Date
   repository: https://github.com/libwww-perl/HTTP-Date.git
-version: '6.03'
+version: '6.04'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -466,7 +465,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.03
+          tag: v6.04
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -627,6 +626,7 @@ x_contributors:
   - 'Hans-H. Froehlich <hfroehlich@co-de-co.de>'
   - 'Ian Kilgore <iank@cpan.org>'
   - 'Jacob J <waif@chaos2.org>'
+  - 'James Raspass <jraspass@gmail.com>'
   - 'jefflee <shaohua@gmail.com>'
   - 'john9art <john9art@yahoo.com>'
   - 'Mark Stosberg <mark@stosberg.com>'

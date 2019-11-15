@@ -4,26 +4,23 @@ package Catalyst::TraitFor::Request::Methods;
 
 use Moose::Role;
 
-use Sub::Util 1.40 qw/ set_subname /;
-
 use namespace::autoclean;
 
 requires 'method';
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.2';
 
 
 foreach my $name (qw/ get head post put delete connect options trace patch /) {
 
-    no strict 'refs'; ## no critic (ProhibitNoStrict)
-
     my $value = uc $name;
-    my $method = __PACKAGE__ . "::is_$name";
+    my $method = "is_$name";
 
-    *{$method} = set_subname $method => sub {
-        my ($self) = @_;
-        return $self->method eq $value;
-    };
+    has $method => (
+        is      => 'ro',
+        lazy    => 1,
+        default => sub { return $_[0]->method eq $value },
+    );
 
 }
 
@@ -42,7 +39,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 =head1 VERSION
 
-version v0.1.1
+version v0.2.2
 
 =head1 SYNOPSIS
 
@@ -75,6 +72,8 @@ In other words, you can use
 instead of
 
   $c->request->method eq "GET"
+
+The methods are implemented as lazy read-only attributes.
 
 =head1 METHODS
 

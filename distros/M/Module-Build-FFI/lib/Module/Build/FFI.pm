@@ -11,8 +11,8 @@ use Text::ParseWords     ();
 use Config;
 use base qw( Module::Build );
 
-# ABSTRACT: Build Perl extensions in C with FFI
-our $VERSION = '0.50'; # VERSION
+# ABSTRACT: (Deprecated) Build Perl extensions in C with FFI
+our $VERSION = '0.52'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_libtest_dir =>
@@ -309,11 +309,11 @@ __END__
 
 =head1 NAME
 
-Module::Build::FFI - Build Perl extensions in C with FFI
+Module::Build::FFI - (Deprecated) Build Perl extensions in C with FFI
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -360,6 +360,9 @@ Finally, use it from your perl script or module:
  Foo::Bar::hello_world();  # prints "hello world\n"
 
 =head1 DESCRIPTION
+
+B<Note>: This module is deprecated, please see L<FFI::Build> for another
+way to bundle C/C++ code with your Perl distribution.
 
 Module::Build variant for writing Perl extensions in C and FFI (sans XS).
 

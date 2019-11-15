@@ -1,9 +1,9 @@
 package Util::Medley::Crypt;
-$Util::Medley::Crypt::VERSION = '0.007';
+$Util::Medley::Crypt::VERSION = '0.008';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
-use Method::Signatures;
+use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use Crypt::CBC;
 use Crypt::Blowfish;
@@ -14,7 +14,7 @@ Util::Medley::Crypt - Class for simple encrypt/descrypt of strings.
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =cut
 
@@ -24,14 +24,24 @@ version 0.007
  my $str = 'foobar';
 
  my $crypt = Util::Medley::Crypt->new;
-  
- my $encrypted_str = $crypt->encryptStr(
+
+ #
+ # positional
+ #
+ my $encryptedStr = $crypt->encryptStr($str, $key);
+
+ my $decryptedStr = $crypt->decryptStr($encryptedStr, $key);
+ 
+ #
+ # named pair
+ # 
+ my $encryptedStr = $crypt->encryptStr(
     str => $str,
     key => $key
  );
 
- my $decrypted_str = $crypt->decryptStr(
-    str => $encrypted_str,
+ my $decryptedStr = $crypt->decryptStr(
+    str => $encryptedStr,
     key => $key
  );
   
@@ -75,8 +85,10 @@ Decrypts the provided string.
 
 =item usage:
 
- my $decrypted_str = $crypt->decryptStr(
-       str => $encrypted_str,
+ my $decryptedStr = $crypt->decryptStr($encryptedStr, $key);
+ 
+ my $decryptedStr = $crypt->decryptStr(
+       str => $encryptedStr,
      [ key => $key ]
  );
       
@@ -98,13 +110,23 @@ Key that was used to encrypt the string.
 
 =cut
 
-method decryptStr (Str :$str!,
-				   Str :$key) {
+multi method decryptStr (Str :$str!,
+				   		 Str :$key) {
 
 	$key = $self->_getKey($key);
 	
     my $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Blowfish');
     return $cipher->decrypt_hex($str);
+}
+
+multi method decryptStr (Str $str,
+				   		 Str $key?) {
+
+	my %a;
+	$a{str} = $str;
+	$a{key} = $key if $key;
+	
+	return $self->decryptStr(%a);
 }
 
 =head2 encryptStr
@@ -113,6 +135,15 @@ Encrypts the provided string.
 
 =over
 
+=item usage:
+
+ my $encryptedStr = $crypt->encryptStr($str, $key);
+ 
+ my $encryptedStr = $crypt->encryptStr(
+     str => $str,
+     [ key => $key ]
+ );
+ 
 =item args:
  
 =over
@@ -131,8 +162,8 @@ Key used to encrypt the string.
 
 =cut
 
-method encryptStr (Str :$str!, 
-				   Str :$key) {
+multi method encryptStr (Str :$str!, 
+	    			   	 Str :$key) {
 
 	$key = $self->_getKey($key);
 
@@ -140,6 +171,16 @@ method encryptStr (Str :$str!,
     return $cipher->encrypt_hex($str);
 }
 
+multi method encryptStr (Str $str, 
+	    			   	 Str $key?) {
+
+	my %a;
+	$a{str} = $str;
+	$a{key} = $key if $key;
+	
+	return $self->encryptStr(%a);	
+}
+	    			   	 	    			   	 	
 #################################################
 
 method _getKey (Str|Undef $key) {

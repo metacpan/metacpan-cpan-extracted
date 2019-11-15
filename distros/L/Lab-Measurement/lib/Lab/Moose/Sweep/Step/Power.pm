@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Power;
-$Lab::Moose::Sweep::Step::Power::VERSION = '3.690';
+$Lab::Moose::Sweep::Step::Power::VERSION = '3.691';
 #ABSTRACT: Power sweep.
 
 
@@ -41,7 +41,7 @@ Lab::Moose::Sweep::Step::Power - Power sweep.
 
 =head1 VERSION
 
-version 3.690
+version 3.691
 
 =head1 Description
 

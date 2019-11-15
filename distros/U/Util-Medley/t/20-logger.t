@@ -38,10 +38,11 @@ done_testing;
 #####################################
 
 sub check_fatal {
-
+	
 	my $msg = 'foobar';
 	my $pid = fork();
 	die if not defined $pid;
+	
 	if ($pid) {
 
 		# parent
@@ -88,11 +89,11 @@ sub check_log_msg {
 	my $write_level = shift;
 	
 	close(STDERR);
-	open( STDERR, '>', \$STDERR ) or die "can't open stderr: $!";
+	open( STDERR, '>', \$STDERR ) or say "can't open stderr: $!";
 	
 	my $log = Util::Medley::Logger->new(
 		logLevel  => $log_level,
-		logDetail => $log_detail
+		logDetailLevel => $log_detail
 	);
 	
 	my $msg = 'foobar';	
@@ -128,30 +129,30 @@ sub check_log_detail {
 	my $stderr = $STDERR;
 	chomp $stderr;
 
-	if ( $log->logDetail == 1 ) {
+	if ( $log->logDetailLevel == 1 ) {
 		ok( $stderr =~ /^\w+$/ );
 	}
-	elsif ($log->logDetail == 2) {
+	elsif ($log->logDetailLevel == 2) {
 		ok($stderr =~ /^\[(\w+)\] \w+$/);
 		ok($1 eq uc($write_level));
 	}
-	elsif ($log->logDetail == 3) {
+	elsif ($log->logDetailLevel == 3) {
 		ok($stderr =~ /^\[(\w+)\] \[([\d\s\-\:]+)\] \w+$/);
 		ok($1 eq uc($write_level));		
 		ok(parsedate($2));
 	}
-	elsif ($log->logDetail == 4) {
+	elsif ($log->logDetailLevel == 4) {
 		ok($stderr =~ /^\[(\w+)\] \[([\d\s\-\:]+)\] \[\d+\] \w+$/);
 		ok($1 eq uc($write_level));		
 		ok(parsedate($2));
 	}
-	elsif ($log->logDetail == 5) {
+	elsif ($log->logDetailLevel == 5) {
 		ok($stderr =~ /^\[(\w+)\] \[([\d\s\-\:]+)\] \[\d+\] \[.+\] \w+$/);
 		ok($1 eq uc($write_level));		
 		ok(parsedate($2));
 	}
 	else {
-		die "unknown detail level: " . $log->logDetail;
+		die "unknown detail level: " . $log->logDetailLevel;
 	}
 }
 

@@ -10,9 +10,11 @@ lib/App/DBBrowser/DB/MariaDB.pm
 lib/App/DBBrowser/DB/mysql.pm
 lib/App/DBBrowser/DB/Pg.pm
 lib/App/DBBrowser/DB/SQLite.pm
+lib/App/DBBrowser/DropTable.pm
 lib/App/DBBrowser/GetContent.pm
 lib/App/DBBrowser/GetContent/Filter.pm
-lib/App/DBBrowser/GetContent/ParseFile.pm
+lib/App/DBBrowser/GetContent/Parse.pm
+lib/App/DBBrowser/GetContent/Read.pm
 lib/App/DBBrowser/Join.pm
 lib/App/DBBrowser/Opt/DBGet.pm
 lib/App/DBBrowser/Opt/DBSet.pm

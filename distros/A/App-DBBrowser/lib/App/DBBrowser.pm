@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.220';
+our $VERSION = '2.221';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -22,6 +22,7 @@ use Term::TablePrint     qw( print_table );
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateTable; # required
 use App::DBBrowser::DB;
+#use App::DBBrowser::DropTable;   # required
 #use App::DBBrowser::Join;        # required
 use App::DBBrowser::Opt::Get;
 #use App::DBBrowser::Opt::Set;    # required
@@ -574,8 +575,6 @@ sub __create_drop_or_attach {
     my $old_idx = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 0;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    require App::DBBrowser::CreateTable;
-    require App::DBBrowser::AttachDB;
 
     HIDDEN: while ( 1 ) {
         my ( $create_table,    $drop_table,      $create_view,    $drop_view,      $attach_databases, $detach_databases ) = (
@@ -611,17 +610,12 @@ sub __create_drop_or_attach {
         }
         die if $idx < @pre;
         my $choice = $choices[$idx-@pre];
-        if ( $choice =~ /^-\ (?:Create|Drop)/i ) {
-            #require App::DBBrowser::CreateTable;
+        if ( $choice =~ /^-\ Create/i ) {
+            require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
             if ( $choice eq $create_table ) {
                 if ( ! eval { $ct->create_table(); 1 } ) {
                     $ax->print_error_message( $@, 'Create Table' );
-                }
-            }
-            elsif ( $choice eq $drop_table ) {
-                if ( ! eval { $ct->drop_table(); 1 } ) {
-                    $ax->print_error_message( $@, 'Drop Table' );
                 }
             }
             elsif ( $choice eq $create_view ) {
@@ -629,22 +623,23 @@ sub __create_drop_or_attach {
                     $ax->print_error_message( $@, 'Create View' );
                 }
             }
+        }
+        elsif ( $choice =~ /^-\ Drop/i ) {
+            require App::DBBrowser::DropTable;
+            my $dt = App::DBBrowser::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            if ( $choice eq $drop_table ) {
+                if ( ! eval { $dt->drop_table(); 1 } ) {
+                    $ax->print_error_message( $@, 'Drop Table' );
+                }
+            }
             elsif ( $choice eq $drop_view ) {
-                if ( ! eval { $ct->drop_view(); 1 } ) {
+                if ( ! eval { $dt->drop_view(); 1 } ) {
                     $ax->print_error_message( $@, 'Drop View' );
                 }
             }
-            if ( defined $sf->{i}{occupied_rows} ) {
-                $sf->{i}{occupied_rows} = undef;
-            }
-            $sf->{old_idx_hidden} = $old_idx;
-            $sf->{redo_db}     = $sf->{d}{db};
-            $sf->{redo_schema} = $sf->{d}{schema};
-            $sf->{redo_table} = $table;
-            return;
         }
         elsif ( $choice =~ /^-\ (?:Attach|Detach)/ ) {
-            #require App::DBBrowser::AttachDB;
+            require App::DBBrowser::AttachDB;
             my $att = App::DBBrowser::AttachDB->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $changed;
             if ( $choice eq $attach_databases ) {
@@ -662,14 +657,12 @@ sub __create_drop_or_attach {
             if ( ! $changed ) {
                 next HIDDEN;
             }
-            else {
-                $sf->{old_idx_hidden} = $old_idx;
-                $sf->{redo_db}     = $sf->{d}{db};
-                $sf->{redo_schema} = $sf->{d}{schema};
-                $sf->{redo_table}  = $table;
-                return;
-            }
         }
+        $sf->{old_idx_hidden} = $old_idx;
+        $sf->{redo_db}     = $sf->{d}{db};
+        $sf->{redo_schema} = $sf->{d}{schema};
+        $sf->{redo_table}  = $table;
+        return;
     }
 }
 
@@ -718,7 +711,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.220
+Version 2.221
 
 =head1 DESCRIPTION
 

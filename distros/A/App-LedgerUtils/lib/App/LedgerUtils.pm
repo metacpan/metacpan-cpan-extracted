@@ -1,7 +1,7 @@
 package App::LedgerUtils;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2019-10-15'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 
@@ -41,7 +41,7 @@ App::LedgerUtils - Command-line utilities related Ledger files
 
 =head1 VERSION
 
-This document describes version 0.03 of App::LedgerUtils (from Perl distribution App-LedgerUtils), released on 2016-01-18.
+This document describes version 0.04 of App::LedgerUtils (from Perl distribution App-LedgerUtils), released on 2019-10-15.
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Ledger
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-LedgerUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-LedgerUtils>.
 
 =head1 BUGS
 
@@ -112,7 +112,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

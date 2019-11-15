@@ -26,7 +26,6 @@ do { my $x = {
                       'requires' => {
                                       'Catalyst' => '5.90090',
                                       'Moose::Role' => '0',
-                                      'Sub::Util' => '1.40',
                                       'namespace::autoclean' => '0'
                                     }
                     },

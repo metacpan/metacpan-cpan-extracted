@@ -90,14 +90,28 @@ sub then {
 # Interfaces for DNS::Unbound to interact with the query’s DNS state.
 # Nothing external should call these other than DNS::Unbound.
 
+my %QUERY_OBJ_DNS;
+
 sub _set_dns {
     my ($self, $dns_hr) = @_;
-    $self->{'_dns'} = $dns_hr;
+
+    $QUERY_OBJ_DNS{$self} = $dns_hr;
+
     return $self;
 }
 
 sub _get_dns {
-    return $_[0]->{'_dns'};
+    return $QUERY_OBJ_DNS{$_[0]};
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    delete $QUERY_OBJ_DNS{$self};
+
+    $self->SUPER::DESTROY() if Promise::ES6->can('DESTROY');
+
+    return;
 }
 
 1;

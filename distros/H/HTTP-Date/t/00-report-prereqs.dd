@@ -38,8 +38,7 @@ do { my $x = {
                                       'Time::Local' => '0',
                                       'Time::Zone' => '0',
                                       'perl' => '5.006002',
-                                      'strict' => '0',
-                                      'vars' => '0'
+                                      'strict' => '0'
                                     }
                     },
        'test' => {

@@ -6,6 +6,7 @@ use 5.010_001;
 
 use Localizer::Style::Gettext;
 use Localizer::BuiltinFunctions;
+use Localizer::Lexicon;
 
 our $BUILTIN_FUNCTIONS = {
     numf     => \&Localizer::BuiltinFunctions::numf,
@@ -25,6 +26,9 @@ sub new {
     unless (exists $args{dictionary}) {
         Carp::confess("Missing mandatory parameter: dictionary");
     }
+
+    $args{dictionary} = Localizer::Lexicon->new($args{dictionary})
+        if ref($args{dictionary}) eq 'HASH';
 
     $args{style} ||= Localizer::Style::Gettext->new();
 
@@ -48,7 +52,7 @@ sub new {
 
     # Compile dictionary data to CodeRef or ScalarRef
     if ($self->precompile) {
-        for my $msgid (keys %{$self->dictionary}) {
+        for my $msgid ($self->dictionary->msgids) {
             $self->_compile($msgid);
         }
     }
@@ -78,8 +82,7 @@ sub _compile {
         return $code;
     }
 
-    my $fmt = $self->dictionary->{$msgid};
-    return unless $fmt;
+    my $fmt = $self->dictionary->msgstr($msgid) || return;
     my $code = $self->style->compile($msgid, $fmt, $self->functions);
     $self->compiled->{$msgid} = $code;
     return $code;

@@ -111,5 +111,11 @@ test_select_sql {
 "select t01.city from weather t01 group by t01.city having max(t01.temp_lo) < 40",
 [];
 
+# func name clash
+sub foofoo { die }
+test_select_sql { return foofoo() }
+"func name clash",
+"select foofoo()",
+[];
 
 done_testing;

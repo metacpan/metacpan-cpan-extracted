@@ -9,7 +9,8 @@ use File::chdir;
 use File::Copy qw( copy );
 use base qw( Module::Build::FFI );
 
-our $VERSION = '0.06';
+# ABSTRACT: (Deprecated) Build Perl extensions in Rust with FFI
+our $VERSION = '0.52'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_rust_extra_compiler_flags =>
@@ -167,20 +168,19 @@ __END__
 
 =head1 NAME
 
-Module::Build::FFI::Rust
+Module::Build::FFI::Rust - (Deprecated) Build Perl extensions in Rust with FFI
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 DESCRIPTION
 
+B<Note>: This module is deprecated, please see L<FFI::Build> for another
+way to bundle Rust code with your Perl distribution.
+
 L<Module::Build::FFI> variant for writing Perl extensions in Rust with
 FFI (sans XS).
-
-=head1 NAME
-
-Module::Build::FFI::Rust - Build Perl extensions in Rust with FFI
 
 =head1 BASE CLASS
 
@@ -241,24 +241,6 @@ fibonacci numbers using Rust.
 
 L<https://github.com/plicease/Fibonacci-FFI>
 
-=head1 SUPPORT
-
-If something does not work as advertised, or the way that you think it
-should, or if you have a feature request, please open an issue on this
-project's GitHub issue tracker:
-
-L<https://github.com/plicease/FFI-Platypus-Lang-Rust/issues>
-
-=head1 CONTRIBUTING
-
-If you have implemented a new feature or fixed a bug then you may make a
-pull request on this project's GitHub repository:
-
-L<https://github.com/plicease/FFI-Platypus-Lang-Rust/issues>
-
-Caution: if you do this too frequently I may nominate you as the new
-maintainer.  Extreme caution: if you like that sort of thing.
-
 =head1 SEE ALSO
 
 =over 4
@@ -272,17 +254,6 @@ The Core Platypus documentation.
 General MB class for FFI / Platypus.
 
 =back
-
-=head1 AUTHOR
-
-Graham Ollis E<lt>plicease@cpan.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by Graham Ollis.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::String;
 use warnings;
 use strict;
 
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
@@ -54,7 +54,7 @@ sub _colored {
     my $text = shift;
     my $rgb  = shift or return $text;
 
-    return $text if $ENV{NO_COLOR};
+    return $text if $ENV{NO_COLOR} || (defined $ENV{COLOR_DEPTH} && !$ENV{COLOR_DEPTH});
 
     $rgb =~ s/^(.)(.)(.)$/$1$1$2$2$3$3/;
     if ($rgb !~ m/^[0-9a-fA-F]{6}$/) {
@@ -136,7 +136,7 @@ App::Codeowners::Formatter::String - Format codeowners output using printf-like 
 
 =head1 VERSION
 
-version 0.43
+version 0.45
 
 =head1 DESCRIPTION
 

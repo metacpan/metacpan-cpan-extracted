@@ -14,8 +14,8 @@ use Test::More;
 
 my $can_git = _can_git();
 
-# Set progname so that pod2usage knows how to find the script after we chdir
-$0 = path($Bin)->parent->child('bin/git-codeowners')->absolute;
+# Set progname so that pod2usage knows how to find the script after we chdir.
+$0 = path($Bin)->parent->child('bin/git-codeowners')->absolute->stringify;
 
 $ENV{NO_COLOR} = 1;
 

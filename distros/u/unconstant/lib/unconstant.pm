@@ -1,4 +1,5 @@
 package unconstant;
+use Sub::Util ();
 use warnings;
 
 use constant ();
@@ -11,7 +12,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 our %declared;
 
@@ -135,6 +136,10 @@ sub constant_import {
 
 		no strict 'refs';
 		my $full_name = "${pkg}::$name";
+
+		# This is required to fool namespace::autoclean
+		my $const_name = "constant::$name";
+
 		$declared{$full_name}++;
 		if ($multiple || @_ == 1) {
 			my $scalar = $multiple ? $constants->{$orig_name} : $_[0];
@@ -142,7 +147,7 @@ sub constant_import {
 			#$symtab->{$name} = sub () { $scalar };
 			{
 				no warnings;
-				*$full_name = sub { $scalar };
+				*$full_name = Sub::Util::set_prototype( '', Sub::Util::set_subname("constant::$name", sub { $scalar } ) );
 			}
 			++$flush_mro->{$pkg};
 		}
@@ -150,14 +155,12 @@ sub constant_import {
 			my @list = @_;
 			{
 				no warnings;
-				*$full_name = sub { @list };
+				*$full_name = Sub::Util::set_prototype( '', Sub::Util::set_subname("constant::$name", sub { @list } ) );
 			}
 			$flush_mro->{$pkg}++;
 		}
 		else {
-			die 'foo';
-			#*$full_name = sub { };
-			*$full_name = sub () { };
+			die 'should never hit this';
 		}
 	}
 	# Flush the cache exactly once if we make any direct symbol table changes.
@@ -204,7 +207,7 @@ B<Note: this module does I<NOT> stop `use` from hoisting the statement to the to
 		sub baz { BAR }
 	}
 
-	# All of these will change the return of `Foo::baz()`
+	# All of these will change the return of `MyTest::baz()`
 	package main {
 		use constant *MyTest::BAR => 42;
 		use constant "MyTest::BAR" => 42;

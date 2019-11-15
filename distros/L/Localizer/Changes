@@ -1,5 +1,10 @@
 Revision history for Perl extension Localizer
 
+0.06 2019-11-15T04:24:54Z
+
+    - Lexicon class to wrap dictionaries #5
+      (diiegok)
+
 0.05 2014-06-16T08:15:47Z
 
     - L::S::Gettext: Do not write multi byte string as string literal in eval string.

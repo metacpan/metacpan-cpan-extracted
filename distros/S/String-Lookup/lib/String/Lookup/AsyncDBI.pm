@@ -1,5 +1,5 @@
 package String::Lookup::AsyncDBI;
-$VERSION= 0.13;
+$VERSION= 0.14;
 
 # what runtime features we need
 use 5.014;
@@ -146,7 +146,7 @@ String::Lookup::AsyncDBI - flush String::Lookup to flat files
 
 =head1 VERSION
 
-This documentation describes version 0.13.
+This documentation describes version 0.14.
 
 =head1 DESCRIPTION
 
@@ -174,7 +174,7 @@ Defaults to the content of the C<STRING_LOOKUP_ASYNC_DIR> environment
 variable.  C<Must be specified> either directly or indirectly with the
 environment variable.
 
-=back 4
+=back
 
 =head1 REQUIRED MODULES
 

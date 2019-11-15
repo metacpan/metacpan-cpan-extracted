@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.1.0",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -28,9 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -60,10 +58,13 @@
    "provides" : {
       "Localizer" : {
          "file" : "lib/Localizer.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Localizer::BuiltinFunctions" : {
          "file" : "lib/Localizer/BuiltinFunctions.pm"
+      },
+      "Localizer::Lexicon" : {
+         "file" : "lib/Localizer/Lexicon.pm"
       },
       "Localizer::Resource" : {
          "file" : "lib/Localizer/Resource.pm"
@@ -86,9 +87,12 @@
          "web" : "https://github.com/tokuhirom/Localizer"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "CPAN:TOKUHIROM",
    "x_contributors" : [
+      "diegok <diego@freekeylabs.com>",
       "moznion <moznion@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400",
+   "x_static_install" : 1
 }

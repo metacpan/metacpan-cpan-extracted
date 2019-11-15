@@ -4,7 +4,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 # VERSION
 
-version v0.1.1
+version v0.2.2
 
 # SYNOPSIS
 
@@ -45,6 +45,8 @@ instead of
 ```
 $c->request->method eq "GET"
 ```
+
+The methods are implemented as lazy read-only attributes.
 
 # METHODS
 

@@ -1,5 +1,11 @@
 Revision history for Module-Build-FFI
 
+0.52      2019-11-14 16:06:07 -0700
+  - Meta fixes.
+
+0.51      2019-11-14 13:09:20 -0700
+  - Officialy deprecated.  See FFI::Build for alternatives.
+
 0.50      2019-11-11 16:25:09 -0700
   - Merge Module::Build::FFI::Rust from FFI-Platypus-Lang-Rust
 

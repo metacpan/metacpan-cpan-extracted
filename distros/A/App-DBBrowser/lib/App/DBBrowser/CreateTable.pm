@@ -5,21 +5,23 @@ use warnings;
 use strict;
 use 5.010001;
 
+use Encode         qw( decode );
 use File::Basename qw( basename );
 
 use List::MoreUtils   qw( none any duplicates );
-#use SQL::Type::Guess qw(); # required
+#use SQL::Type::Guess qw();                 # required
 
 use Term::Choose       qw();
 use Term::Choose::Util qw( insert_sep );
 use Term::Form         qw();
-use Term::TablePrint   qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 use App::DBBrowser::GetContent;
-#use App::DBBrowser::Table::WriteAccess;    # required
+#use App::DBBrowser::DropTable;             # required
 #use App::DBBrowser::Subqueries;            # required
+#use App::DBBrowser::Table::WriteAccess;    # required
+
 
 sub new {
     my ( $class, $info, $options, $data ) = @_;
@@ -28,97 +30,6 @@ sub new {
         o => $options,
         d => $data
     }, $class;
-}
-
-
-sub drop_table {
-    my ( $sf ) = @_;
-    return $sf->__choose_drop_item( 'table' );
-}
-
-
-sub drop_view {
-    my ( $sf ) = @_;
-    return $sf->__choose_drop_item( 'view' );
-}
-
-
-sub __choose_drop_item {
-    my ( $sf, $type ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $sql = {};
-    $ax->reset_sql( $sql );
-    my $tables = [ grep { $sf->{d}{tables_info}{$_}[3] eq uc $type } @{$sf->{d}{user_tables}} ];
-    my $prompt = $sf->{d}{db_string} . "\n" . 'Drop ' . $type;
-    # Choose
-    my $table = $tc->choose(
-        [ undef, map { "- $_" } sort @$tables ],
-        { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
-    );
-    if ( ! defined $table || ! length $table ) {
-        return;
-    }
-    $table =~ s/\-\s//;
-    $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-    my $drop_ok = $sf->__drop( $sql, $type );
-    return $drop_ok;
-}
-
-
-sub __drop {
-    my ( $sf, $sql, $type ) = @_;
-    if ( $type ne 'view' ) {
-        $type = 'table';
-    }
-    my $stmt_type = 'Drop_' . $type;
-    $sf->{i}{stmt_types} = [ $stmt_type ];
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $ax->print_sql( $sql );
-    # Choose
-    my $ok = $tc->choose(
-        [ undef, $sf->{i}{_confirm} . ' Stmt'],
-        { %{$sf->{i}{lyt_v}} }
-    );
-    if ( ! $ok ) {
-        return;
-    }
-    $ax->print_sql( $sql, 'Computing: ... ' );
-    my $prompt = '';
-    if ( ! eval {
-        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
-        $sth->execute();
-        my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
-        my $all_arrayref = $sth->fetchall_arrayref;
-        my $row_count = @$all_arrayref;
-        unshift @$all_arrayref, $col_names;
-        my $prompt_pt = sprintf "DROP %s %s     (on last look at the %s)\n", uc $type, $sql->{table}, $type;
-        my $tp = Term::TablePrint->new( $sf->{o}{table} );
-        $tp->print_table(
-            $all_arrayref,
-            { grid => 2, prompt => $prompt_pt, max_rows => 0, keep_header => 1,
-              table_expand => $sf->{o}{G}{info_expand} }
-        );
-        $prompt = sprintf 'DROP %s %s  (%s %s)', uc $type, $sql->{table}, insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $row_count == 1 ? 'row' : 'rows';
-        1; }
-    ) {
-        $ax->print_error_message( $@, "Drop $type info output" );
-        $prompt = sprintf 'DROP %s %s', uc $type, $sql->{table};
-    }
-    $prompt .= "\n\nCONFIRM:";
-    # Choose
-    my $choice = $tc->choose(
-        [ undef, 'YES' ],
-        { prompt => $prompt, undef => 'NO', clear_screen => 1 }
-    );
-    $ax->print_sql( $sql );
-    if ( defined $choice && $choice eq 'YES' ) {
-        my $stmt = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
-        $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
-        return 1;
-    }
-    return;
 }
 
 
@@ -170,112 +81,101 @@ sub create_view {
     }
 }
 
+
 sub create_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $sql = {};
+    $sql->{table} = '';
     $ax->reset_sql( $sql );
-    my @cu_keys = ( qw/create_table_plain create_table_form_file create_table_form_copy/ );
-    my %cu = ( create_table_plain      => '- Plain',
-               create_table_form_copy  => '- Copy & Paste',
-               create_table_form_file  => '- From File',
-    );
-    my $old_idx = 0;
+    $sf->{i}{stmt_types} = [ 'Create_table' ];
+    my $goto_FILTER = 0;
 
-    MENU: while ( 1 ) {
-        $sql->{table} = '';
-        $sql->{insert_into_args} = [];
-        $sql->{insert_into_cols} = [];
-        $sql->{create_table_cols} = [];
-        $sf->{i}{stmt_types} = [ 'Create_table' ];
-        my $choices = [ undef, @cu{@cu_keys} ];
-        my $prompt = $sf->{d}{db_string} . "\n" . 'Create table';
-        # Choose
-        my $idx = $tc->choose(
-            $choices,
-            { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, index => 1, default => $old_idx, undef => '  <=' }
-        );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
+    CREATE_TABLE: while ( 1 ) {
+        my $ok = $gc->get_content( $sql, $goto_FILTER );
+        if ( ! $ok ) {
+            delete $sf->{i}{gc};
             return;
         }
-        my $custom = $choices->[$idx];
-        if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
-                next MENU;
-            }
-            $old_idx = $idx;
-        }
-        push @{$sf->{i}{stmt_types}}, 'Insert';
+        $goto_FILTER = 0;
+        my $count_table_name_loop = 0;
 
-        GET_DATA: while ( 1 ) {
-            my $ok_input;
-            if ( $custom eq $cu{create_table_plain} ) {
-                $ok_input = $gc->from_col_by_col( $sql );
+        TABLE_NAME: while ( 1 ) {
+            my $no_default_table_name;
+            if ( $count_table_name_loop > 1 ) {
+                $no_default_table_name = 1;
             }
-            elsif ( $custom eq $cu{create_table_form_copy} ) {
-                $ok_input = $gc->from_copy_and_paste( $sql );
-            }
-            elsif ( $custom eq $cu{create_table_form_file} ) {
-                $ok_input = $gc->from_file( $sql );
-            }
-            if ( ! $ok_input ) {
-                next MENU;
+            my $ok_table_name = $sf->__set_table_name( $sql, $no_default_table_name ); # first time print_sql
+            if ( ! $ok_table_name ) {
+                $goto_FILTER = 1;
+                next CREATE_TABLE;
             }
 
-            TABLE_NAME: while ( 1 ) {
-                my $ok_table_name = $sf->__set_table_name( $sql );
-                if ( ! $ok_table_name ) {
-                    next GET_DATA;
+            SET_COLUMNS: while ( 1 ) {
+                my $ok_columns = $sf->__set_columns( $sql );
+                if ( ! $ok_columns ) {
+                    $sql->{table} = '';
+                    if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
+                        unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{backup_first_table_row};
+                    }
+                    $count_table_name_loop++;
+                    next TABLE_NAME;
                 }
-
-                SET_COLUMNS: while ( 1 ) {
-                    my $ok_columns = $sf->__set_columns( $sql );
-                    if ( ! $ok_columns ) {
-                        $sql->{table} = '';
-                        if ( exists $sf->{i}{first_row} ) {
-                            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{first_row};
-                        }
-                        next TABLE_NAME;
+                $count_table_name_loop = 0;
+                my $ok_create_table = $sf->__create( $sql, 'table' );
+                if ( ! defined $ok_create_table ) {
+                    if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
+                        unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{backup_first_table_row};
                     }
-                    my $ok_create_table = $sf->__create( $sql, 'table' );
-                    if ( ! defined $ok_create_table ) {
-                        if ( exists $sf->{i}{first_row} ) {
-                            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{first_row};
-                        }
-                        next SET_COLUMNS;
-                    }
-                    elsif ( ! $ok_create_table ) {
-                        return;
-                    }
-                    if ( @{$sql->{insert_into_args}} ) {
-                        my $ok_insert = $sf->__insert_data( $sql );
-                        if ( ! $ok_insert ) {
-                            my $drop_ok = $sf->__drop( $sql, 'table' );
-                            if ( ! $drop_ok ) {
-                                return;
-                            }
-                        }
-                    }
-                    return 1;
+                    next SET_COLUMNS;
                 }
+                elsif ( ! $ok_create_table ) {
+                    delete $sf->{i}{gc};
+                    return;
+                }
+                delete $sf->{i}{gc};
+                if ( @{$sql->{insert_into_args}} ) {
+                    $sf->{i}{ct}{skip_confirm_insert} = 1;
+                    my $ok_insert = $sf->__insert_data( $sql );
+                    delete $sf->{i}{ct};
+                    delete $sf->{i}{gc};
+                    if ( ! $ok_insert ) {
+                        require App::DBBrowser::DropTable;
+                        my $dt = App::DBBrowser::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                        my $drop_ok = $dt->__drop( $sql, 'table' );
+                        if ( ! $drop_ok ) {
+                            delete $sf->{i}{ct};
+                            return;
+                        }
+                    }
+                }
+                delete $sf->{i}{ct};
+                return 1;
             }
         }
     }
 }
 
+
 sub __create {
     my ( $sf, $sql, $type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    $sf->{i}{occupied_term_height} = 4;
     $ax->print_sql( $sql );
     my ( $no, $yes ) = ( '- NO', '- YES' );
+    my $prompt = "CREATE $type $sql->{table}";
+    if ( @{$sql->{insert_into_args}} ) {
+        my $row_count = @{$sql->{insert_into_args}};
+        $prompt .= "\nINSERT " . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . " row";
+        $prompt .= "s" if @{$sql->{insert_into_args}} > 1;
+    }
     # Choose
     my $create_table_ok = $tc->choose(
-        [ undef, $no, $yes ],
-        { %{$sf->{i}{lyt_v}}, prompt => "Create $type $sql->{table}?", undef => '  ' . $sf->{i}{back} }
+        [ undef, $yes, $no ],
+        { %{$sf->{i}{lyt_v}}, prompt => $prompt, undef => '  ' . $sf->{i}{back} }
     );
     if ( ! defined $create_table_ok ) {
         return;
@@ -284,13 +184,11 @@ sub __create {
         return 0;
     }
     my $stmt = $ax->get_stmt( $sql, 'Create_' . $type, 'prepare' );
+    $sql->{create_table_cols} = [];
     if ( ! eval { $sf->{d}{dbh}->do( $stmt ); 1 } ) {
         $ax->print_error_message( $@, "Create $type" );
         return;
     };
-    if ( exists $sql->{create_table_cols} ) {
-        delete $sql->{create_table_cols};
-    }
     return 1;
 }
 
@@ -308,6 +206,7 @@ sub __insert_data {
         shift @columns;
     }
     $sql->{insert_into_cols} = $ax->quote_simple_many( \@columns );
+    $sf->{i}{occupied_term_height} = 1;
     $ax->print_sql( $sql );
     require App::DBBrowser::Table::WriteAccess;
     my $tw = App::DBBrowser::Table::WriteAccess->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -317,7 +216,7 @@ sub __insert_data {
 
 
 sub __set_table_name {
-    my ( $sf, $sql ) = @_;
+    my ( $sf, $sql, $no_default_table_name ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
@@ -325,20 +224,25 @@ sub __set_table_name {
     my $c = 0;
 
     while ( 1 ) {
-        $ax->print_sql( $sql );
-        my $info;
+        my ( $file_name, $info );
+        if ( $sf->{i}{gc}{source_type} =~ /file/i ) {
+            $file_name = basename decode( 'locale_fs', $sf->{i}{gc}{file_ec} );
+            $info = sprintf "File: '%s'", $file_name;
+        }
+        if ( ! exists $sf->{i}{ct}{default_table_name} && defined $file_name ) {
+            ( $sf->{i}{ct}{default_table_name} = $file_name ) =~ s/\.[^.]{1,4}\z//;
+            if ( defined $sf->{i}{gc}{sheet_name} && length $sf->{i}{gc}{sheet_name} ) {
+                $sf->{i}{ct}{default_table_name} .= '_' . delete $sf->{i}{gc}{sheet_name};
+            }
+            $sf->{i}{ct}{default_table_name} =~ s/ /_/g;
+        }
         my $default;
-        if ( defined $sf->{d}{file_name} ) {
-            my $file = basename delete $sf->{d}{file_name};
-            $info = sprintf "File: '%s'", $file;
-            ( $default = $file ) =~ s/\.[^.]{1,4}\z//;
+        if ( ! $no_default_table_name ) {
+            $default = $sf->{i}{ct}{default_table_name};
         }
-        if ( defined $sf->{d}{sheet_name} && length $sf->{d}{sheet_name} ) {
-            $default .= '_' . delete $sf->{d}{sheet_name};
-        }
-        if ( defined $default ) {
-            $default =~ s/ /_/g;
-        }
+        $sf->{i}{occupied_term_height} = 1;
+        $sf->{i}{occupied_term_height} += 1 if $info;
+        $ax->print_sql( $sql );
         # Readline
         $table = $tf->readline( 'Table name: ',
             { info => $info, default => $default }
@@ -346,10 +250,12 @@ sub __set_table_name {
         if ( ! length $table ) {
             return;
         }
+        $sf->{i}{ct}{default_table_name} = $table;
         $sql->{table} = $ax->quote_table( [ undef, $sf->{d}{schema}, $table ] );
         if ( none { $sql->{table} eq $ax->quote_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
             return 1;
         }
+        $sf->{i}{occupied_term_height} = 3;
         $ax->print_sql( $sql );
         my $prompt = "Table $sql->{table} already exists.";
         my $choice = $tc->choose(
@@ -367,13 +273,13 @@ sub __set_columns {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    if ( exists $sf->{i}{first_row} ) {
-        delete $sf->{i}{first_row};
+    if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
+        delete $sf->{i}{ct}{backup_first_table_row};
     }
 
     HEADER_ROW: while ( 1 ) {
-        if ( exists $sf->{i}{first_row} ) {
-            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{first_row};
+        if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
+            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{backup_first_table_row};
         }
         $sql->{create_table_cols} = [];
         $sql->{insert_into_cols}  = [];
@@ -385,17 +291,17 @@ sub __set_columns {
         AI_COL: while ( 1 ) {
             $sql->{create_table_cols} = [ @$header_row ];  # not quoted
             $sql->{insert_into_cols}  = [ @$header_row ];  # not quoted
-            my $ok_ai = $sf->__autoincrement_column( $sql);
-            if ( ! $ok_ai ) {
+            my $continue = $sf->__autoincrement_column( $sql);
+            if ( ! $continue ) {
                 next HEADER_ROW;
             }
-            my @bu_cols_with_ai = @{$sql->{create_table_cols}};
-            $sf->{i}{occupied_rows} = 11 + @{$sql->{create_table_cols}};
+            my @bu_create_table_cols = @{$sql->{create_table_cols}};
+            $sf->{i}{occupied_term_height} = 11 + @{$sql->{create_table_cols}}; #
 
             COL_NAMES: while ( 1 ) {
                 my $ok_names = $sf->__column_names( $sql );
                 if ( ! $ok_names ) {
-                    $sql->{create_table_cols} = [ @bu_cols_with_ai ];
+                    $sql->{create_table_cols} = [ @bu_create_table_cols ];
                     next AI_COL;
                 }
                 $ax->print_sql( $sql );
@@ -431,15 +337,18 @@ sub __set_columns {
         last HEADER_ROW;
     }
     $ax->print_sql( $sql );
+    $sf->{i}{occupied_term_height} = undef;
     return 1;
 }
+
 
 sub __header_row {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $header_row;
-    my ( $first_row, $user_input ) = ( '- First row', '- Set temp column names' ); # '- Add row'
+    my ( $first_row, $user_input ) = ( '- First row', '- Set temp column names' );
+    $sf->{i}{occupied_term_height} = 4;
     $ax->print_sql( $sql );
     # Choose
     my $choice = $tc->choose(
@@ -451,17 +360,15 @@ sub __header_row {
     }
     elsif ( $choice eq $first_row ) {
         $header_row = shift @{$sql->{insert_into_args}};
-        $sf->{i}{first_row} = $header_row;
+        $sf->{i}{ct}{backup_first_table_row} = $header_row;
     }
     else {
-        for my $col_idx ( @{$sf->{i}{idx_added_cols}||[]} ) { # s
-            $sql->{insert_into_args}->[0][$col_idx] = undef;
-        }
         my $c = 0;
         $header_row = [ map { 'c' . ++$c } @{$sql->{insert_into_args}->[0]} ];
     }
     return $header_row;
 }
+
 
 sub __autoincrement_column {
     my ( $sf, $sql ) = @_;
@@ -474,6 +381,7 @@ sub __autoincrement_column {
     }
     if ( $sf->{col_auto} ) {
         my ( $no, $yes ) = ( '- NO ', '- YES' );
+        $sf->{i}{occupied_term_height} = 4;
         $ax->print_sql( $sql );
         # Choose
         my $choice = $tc->choose(
@@ -499,6 +407,7 @@ sub __column_names {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $col_number = 0;
     my $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @{$sql->{create_table_cols}} ];
+    $sf->{i}{occupied_term_height} = 3 + @{$sql->{create_table_cols}};
     $ax->print_sql( $sql );
     # Fill_form
     my $form = $tf->fill_form(
@@ -541,6 +450,7 @@ sub __data_types {
         unshift @$fields, [ $ax->quote_col_qualified( [ $sf->{col_auto} ] ), $sf->{constraint_auto} ];
         $read_only = [ 0 ];
     }
+    $sf->{i}{occupied_term_height} = 3 + @$fields;
     $ax->print_sql( $sql );
     # Fill_form
     my $col_name_and_type = $tf->fill_form(

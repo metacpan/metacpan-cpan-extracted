@@ -14,7 +14,7 @@ use Encode qw(encode);
 use File::Codeowners;
 use Path::Tiny;
 
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 
 sub main {
@@ -218,7 +218,7 @@ App::Codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.43
+version 0.45
 
 =head1 METHODS
 

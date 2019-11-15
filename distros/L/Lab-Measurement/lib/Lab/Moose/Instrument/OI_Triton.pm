@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.690';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.691';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use 5.010;
@@ -101,6 +101,15 @@ sub set_temp_pid {
     );
 }
 
+sub get_temp_pid {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->oi_getter(
+        cmd => "READ:DEV:T5:TEMP:LOOP:MODE",
+        %args
+    );
+}
+
+
 sub enable_temp_pid {
     my ( $self, %args ) = validated_getter( \@_ );
     return $self->set_temp_pid( value => 'ON', %args );
@@ -109,6 +118,46 @@ sub enable_temp_pid {
 sub disable_temp_pid {
     my ( $self, %args ) = validated_getter( \@_ );
     return $self->set_temp_pid( value => 'OFF', %args );
+}
+
+
+sub set_temp_ramp_status {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/ON OFF/] ) },
+    );
+    return $self->oi_setter(
+        cmd   => "SET:DEV:T5:TEMP:LOOP:RAMP:ENAB",
+        value => $value, %args
+    );
+}
+
+sub get_temp_ramp_status {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->oi_getter(
+        cmd => "READ:DEV:T5:TEMP:LOOP:RAMP:ENAB",
+        %args
+    );
+}
+
+
+sub get_temp_ramp_rate {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->oi_getter(
+        cmd => "READ:DEV:T5:TEMP:LOOP:RAMP:RATE",
+        %args
+    );
+}
+
+sub set_temp_ramp_rate {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => 'Lab::Moose::PosNum' },
+    );
+    return $self->oi_setter(
+        cmd   => "SET:DEV:T5:TEMP:LOOP:RAMP:RATE",
+        value => $value, %args
+    );
 }
 
 
@@ -177,12 +226,6 @@ sub set_T {
         $self->set_max_current( value => 0.01 );
     }
 
-    # Why call t_set twice?
-    # Because of very weird bugs in the OI GHS control software.
-    # If you don't do that you may end up with a setpoint different from
-    # what you really want... :/
-    $self->t_set( value => $value );
-    $self->enable_temp_pid();
     return $self->t_set( value => $value );
 }
 
@@ -218,7 +261,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.690
+version 3.691
 
 =head1 SYNOPSIS
 
@@ -267,12 +310,24 @@ Equivalent to
 
 respectively.
 
-=head2 set_temp_pid/enable_temp_pid/disable_temp_pid
+=head2 set_temp_pid/get_temp_pid/enable_temp_pid/disable_temp_pid
 
  $oi_triton->set_temp_pid(value => 'ON');
  # or $oi_triton->enable_temp_pid();
 
 Set PID control of the mixing chamber temperature to 'ON' or 'OFF'.
+
+=head2 set_temp_ramp_status/get_temp_ramp_status
+
+ $oi_triton->set_temp_ramp_status(value => 'ON');
+ $oi_triton->set_temp_ramp_status(value => 'OFF'); 
+
+ my $status = $oi_triton->get_temp_ramp_status();
+
+=head2 set_temp_ramp_rate/get_temp_ramp_rate
+
+ $oi_triton->set_temp_ramp_rate(value => 1e-3); # 1mk/min
+ my $ramp_rate = $oi_triton->get_temp_ramp_rate();
 
 =head2 get_max_current
 

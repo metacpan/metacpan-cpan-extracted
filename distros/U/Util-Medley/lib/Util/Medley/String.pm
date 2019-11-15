@@ -1,10 +1,9 @@
 package Util::Medley::String;
-$Util::Medley::String::VERSION = '0.007';
+$Util::Medley::String::VERSION = '0.008';
 use Modern::Perl;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
-
+use Kavorka '-all';
 use Data::Printer alias => 'pdump';
 use String::Util 'nocontent';
 
@@ -14,20 +13,15 @@ Util::Medley::String - utility methods for working with strings
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
-=cut
+=head1 SYNOPSIS
 
-#########################################################################################
+...
+ 
+=head1 DESCRIPTION
 
-=pod
-
-use base 'Exporter';
-our @EXPORT      = qw();                      # Symbols to autoexport (:DEFAULT tag)
-our @EXPORT_OK   = qw(is_blank trim undef2str);    # Symbols to export on request
-our %EXPORT_TAGS = (                          # Define names for sets of symbols
-    all => \@EXPORT_OK,
-);
+...
 
 =cut
 
@@ -39,13 +33,29 @@ our %EXPORT_TAGS = (                          # Define names for sets of symbols
 
 Converts a string to camelcase.
 
-=head3 usage
+=over
 
-  camelize(<string>)
+=item usage:
+
+  $camelCase = $util->camelize($str);
+
+  $camelCase = $util->camelize(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string you wish to camelize.
+
+=back
+
+=back
   
 =cut
 
-method camelize (Str $str) {
+multi method camelize (Str $str) {
 
 	my @a = split( /[:_-]+/, $str );
 	my @b = lc shift @a;
@@ -54,7 +64,39 @@ method camelize (Str $str) {
 	return join '', @b;
 }
 
-method isBlank (Str $str) {
+multi method camelize (Str :$str!) {
+	
+	return $self->camelize($str);
+}
+
+
+=head2 isBlank
+
+Checks whether a string is strictly whitespace or empty.
+
+=over
+
+=item usage:
+
+  $bool = $util->isBlank($str);
+
+  $bool = $util->isBlank(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to check.
+
+=back
+ 
+=back
+ 
+=cut
+
+multi method isBlank (Str $str) {
 
 	if ( nocontent($str) ) {
 		return 1;
@@ -63,7 +105,74 @@ method isBlank (Str $str) {
 	return 0;
 }
 
-method pascalize (Str $str) {
+multi method isBlank (Str :$str!) {
+
+	return $self->isBlank($str);
+}
+
+=head2 ltrim
+
+Just a pass-through to String::Util::ltrim.
+
+=over
+
+=item usage:
+
+  $lTrimmed = $util->ltrim($str);
+
+  $lTrimmed = $util->ltrim(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to ltrim.
+
+=back
+
+=back
+ 
+=cut
+
+multi method ltrim (Str $str) {
+
+	return String::Util::ltrim($str);
+}
+
+multi method ltrim (Str :$str!) {
+	
+	return $self->ltrim($str);
+}
+
+=head2 pascalize
+
+Converts a string to Pascal case.
+
+=over
+
+=item usage:
+
+  $pascalCase = $util->pascalize($str);
+
+  $pascalCase = $util->pascalize(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string you wish to camelize.
+
+=back
+
+=back
+ 
+=cut
+
+multi method pascalize (Str $str) {
 
 	my @a = split( /[:_-]+/, $str );
 	my @b;
@@ -72,7 +181,75 @@ method pascalize (Str $str) {
 	return join '', @b;
 }
 
-method snakeize (Str $str) {
+multi method pascalize (Str :$str!) {
+
+	return $self->pascalize($str);
+}
+
+
+=head2 rtrim
+
+Just a pass-through to String::Util::rtrim.
+
+=over
+
+=item usage:
+
+  $rTrimmed = $util->rtrim($str);
+
+  $rTrimmed = $util->rtrim(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to rtrim.
+
+=back
+
+=back
+ 
+=cut
+
+multi method rtrim (Str $str) {
+
+	return String::Util::rtrim($str);
+}
+
+multi method rtrim (Str :$str!) {
+	
+	return $self->rtrim($str);
+}
+
+=head2 snakelize
+
+Converts a string to snake case.
+
+=over
+
+=item usage:
+
+  $snakeCase = $util->snakeize($str);
+
+  $snakeCase = $util->snakeize(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to snakeize.
+
+=back
+
+=back
+ 
+=cut
+
+multi method snakeize (Str $str) {
 
     $str =~ s/:+/_/g;
     $str =~ s/ +/_/g;
@@ -91,31 +268,130 @@ method snakeize (Str $str) {
     return lc join( '_', @b );
 }
 
-method titleize (Str $str) {
+multi method snakeize (Str :$str!) {
+	
+	return $self->snakeize($str);
+}
+
+
+=head2 titleize
+
+Converts a string to title case.
+
+=over
+
+=item usage:
+
+  $titleCase = $util->titleize($str);
+
+  $titleCase = $util->titleize(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to titleize.
+
+=back
+
+=back
+ 
+=cut
+
+multi method titleize (Str $str) {
 
 	return $self->pascalize($str);	
 }
 
+multi method titleize (Str :$str!) {
 
-=head1 trim
+	return $self->pascalize($str);	
+}
 
-This exists because I am tired of hunting down the correct cpan module.
+=head2 trim
 
+Just a pass-through to String::Util::trim.
+
+=over
+
+=item usage:
+
+  $trimmed = $util->trim($str);
+
+  $trimmed = $util->trim(str => $str);
+
+=item args:
+
+=over
+
+=item str [Str]
+
+The string to trim.
+
+=back
+
+=back
+ 
 =cut
 
-method trim (Str $str) {
+multi method trim (Str $str) {
 
 	return String::Util::trim($str);
 }
 
-method undefToString (Str|Undef  $val, 
-                  	  Str  		 $string = '' ) {
+multi method trim (Str :$str!) {
+	
+	return $self->trim($str);
+}
+
+
+=head2 undefToString
+
+Convert scalar to a string if its value is undef.  The string arg
+is optional and defaults to ''.
+
+=over
+
+=item usage:
+
+  $str = $util->undefToString($str);
+
+  $str = $util->undefToString(str => $str);
+
+=item args:
+
+=over
+
+=item val [Str]
+
+The string to check for undef.
+
+=item str [Str]
+
+The string to replace undef with.
+
+=back
+
+=back
+ 
+=cut
+
+multi method undefToString (Str|Undef  $val, 
+                       	  	Str  	   $str = '' ) {
 
 	if ( !defined $val ) {
-		return $string;
+		return $str;
 	}
 
 	return $val;
 }
 
+multi method undefToString (Str|Undef  :$val!, 
+                       	  	Str  	   :$str = '' ) {
+
+	return $self->undefToString($val, $str);	
+}
+                       	  	                       	  		
 1;

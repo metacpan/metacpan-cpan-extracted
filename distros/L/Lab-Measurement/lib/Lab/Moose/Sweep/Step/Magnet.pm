@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Magnet;
-$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.690';
+$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.691';
 #ABSTRACT: Step/list sweep of magnetic field
 
 
@@ -98,7 +98,7 @@ Lab::Moose::Sweep::Step::Magnet - Step/list sweep of magnetic field
 
 =head1 VERSION
 
-version 3.690
+version 3.691
 
 =head1 SYNOPSIS
 

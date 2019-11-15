@@ -10,7 +10,7 @@ require Exporter;
 use base 'Exporter';
 use Keyword::Pluggable;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 @EXPORT = qw(sql);
 @EXPORT_OK = qw(union intersect except subselect);
 %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
@@ -329,6 +329,8 @@ sub gen_sql
 	my ($sub, $operation, %args) = @_;
 
 	$args{quirks} = $non_object_quirks unless $args{quirks};
+	$args{inline} //= 1;
+
 	my $S = DBIx::Perlish::Parse::init(%args, operation => $operation);
 	DBIx::Perlish::Parse::parse_sub($S, $sub);
 	my $sql = "";
@@ -908,7 +910,7 @@ the function might throw any of the exceptions thrown by DBI.
 
 The C<db_insert {}> function is exported by default.
 
-=head3 subselect()
+=head3 subselect {}
 
 This call, formerly known as as internal form of C<db_fetch>, 
 is basically an SQL SELECT statement. See L</Subqueries>.

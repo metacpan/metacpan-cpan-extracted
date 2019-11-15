@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::TSV;
 use warnings;
 use strict;
 
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.45'; # VERSION
 
 use parent 'App::Codeowners::Formatter::CSV';
 
@@ -25,7 +25,7 @@ App::Codeowners::Formatter::TSV - Format codeowners output as tab-separated valu
 
 =head1 VERSION
 
-version 0.43
+version 0.45
 
 =head1 DESCRIPTION
 

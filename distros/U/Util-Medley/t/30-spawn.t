@@ -16,16 +16,55 @@ ok($spawn);
 #####################################
 
 my $cmd = "echo foobar";
-my ($stdout, $stderr, $exit) = $spawn->capture(cmd => $cmd);
-ok(!$exit);
-chomp $stdout;
-ok($stdout eq 'foobar');
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->capture($cmd);
+	ok( !$exit );
+	ok( $stdout eq 'foobar' );
+}
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->capture( cmd => $cmd );
+	ok( !$exit );
+	ok( $stdout eq 'foobar' );
+}
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->spawn($cmd);
+	ok( !$exit );
+}
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->spawn( cmd => $cmd );
+	ok( !$exit );
+}
+
+$cmd = [qw(echo foobar)];
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->capture($cmd);
+	ok( !$exit );
+	ok( $stdout eq 'foobar' );
+}
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->capture( cmd => $cmd );
+	ok( !$exit );
+	ok( $stdout eq 'foobar' );
+}
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->spawn(cmd => $cmd);
+	ok( !$exit );
+}
+
+{
+	my ( $stdout, $stderr, $exit ) = $spawn->spawn( cmd => $cmd );
+	ok( !$exit );
+}
 
 #####################################
 # spawn
 #####################################
-
-$exit = $spawn->spawn(cmd => $cmd);
-ok(!$exit);
 
 done_testing;

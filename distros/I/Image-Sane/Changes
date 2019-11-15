@@ -1,5 +1,9 @@
 Revision history for Perl extension Image::Sane.
 
+5     Fri, 15 Nov 2019 00:00 +0000
+        - Fix tests broken by sane-backends 1.0.28. Closes RT 130933
+          (t/81_scanimage-perl.t test fails with sane-backends-1.0.28)
+
 4     Thu, 12 Sep 2019 00:00 +0000
         - Use Config
           Thanks to Petr Pisar for the patch.

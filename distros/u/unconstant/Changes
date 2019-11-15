@@ -1,5 +1,11 @@
 Revision history for unconstant
 
+0.05    2019-11-14
+				Updated tests to not fail if you don't have namespace::autoclean
+
+0.04    2019-11-14
+        Updated to work with namespace::autoclean.
+
 0.03    2019-11-13
         Updated to work with list constants
 

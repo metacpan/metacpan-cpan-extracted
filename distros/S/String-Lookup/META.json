@@ -22,19 +22,56 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033",
+            "threads" : "0"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Encode" : "0",
+            "Scalar::Util" : "0",
+            "autodie" : "0",
+            "bytes" : "0",
+            "perl" : "5.014",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "String::Lookup" : {
+         "file" : "lib/String/Lookup.pm",
+         "version" : "0.14"
+      },
+      "String::Lookup::AsyncDBI" : {
+         "file" : "lib/String/Lookup/AsyncDBI.pm",
+         "version" : "0.14"
+      },
+      "String::Lookup::DBI" : {
+         "file" : "lib/String/Lookup/DBI.pm",
+         "version" : "0.14"
+      },
+      "String::Lookup::FlatFile" : {
+         "file" : "lib/String/Lookup/FlatFile.pm",
+         "version" : "0.14"
+      },
+      "String::Lookup::PurePerl" : {
+         "file" : "lib/String/Lookup/PurePerl.pm"
       }
    },
    "release_status" : "stable",
-   "version" : 0.13,
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/String-Lookup.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/String-Lookup"
+      }
+   },
+   "version" : 0.14,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

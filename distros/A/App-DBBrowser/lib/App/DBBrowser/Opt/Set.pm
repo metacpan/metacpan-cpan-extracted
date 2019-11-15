@@ -326,14 +326,14 @@ sub set_options {
             elsif ( $opt eq '_parse_file' ) {
                 my $prompt = 'Parsing "File"';
                 my $sub_menu = [
-                    [ 'file_parse_mode', "- Use:", [ 'Text::CSV', 'split', 'Template', 'Spreadsheet::Read' ] ],
+                    [ 'parse_mode_input_file', "- Use:", [ 'Text::CSV', 'split', 'Template', 'Spreadsheet::Read' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_parse_copy' ) {
                 my $prompt = 'Parsing "Copy & Paste"';
                 my $sub_menu = [
-                    [ 'copy_parse_mode', "- Use:", [ 'Text::CSV', 'split', 'Template' ] ],
+                    [ 'parse_mode_input_copy', "- Use:", [ 'Text::CSV', 'split', 'Template' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -602,24 +602,6 @@ sub __group_readline {
         $sf->{write_config}++;
     }
 }
-
-
-#sub __choose_a_dir_wrap {
-#    my ( $sf, $section, $opt ) = @_;
-#    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-#    my $info;
-#    if ( defined $sf->{o}{$section}{$opt} ) {
-#        $info = '<< ' . $sf->{o}{$section}{$opt};
-#    }
-#    # Choose_a_dir
-#    my $dir = $tu->choose_a_directory(
-#        { current_selection_label => 'OK ', info => $info }
-#    );
-#    return if ! length $dir;
-#    $sf->{o}{$section}{$opt} = $dir;
-#    $sf->{write_config}++;
-#    return;
-#}
 
 
 sub __write_config_files {

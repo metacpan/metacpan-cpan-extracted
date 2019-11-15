@@ -3,9 +3,11 @@ abstract: "convert strings to ID's authoritatively and vice-versa"
 author:
   - 'Elizabeth Mattijsen (liz@dijkmat.nl)'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '1.000033'
+  threads: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,6 +19,29 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.13'
+provides:
+  String::Lookup:
+    file: lib/String/Lookup.pm
+    version: '0.14'
+  String::Lookup::AsyncDBI:
+    file: lib/String/Lookup/AsyncDBI.pm
+    version: '0.14'
+  String::Lookup::DBI:
+    file: lib/String/Lookup/DBI.pm
+    version: '0.14'
+  String::Lookup::FlatFile:
+    file: lib/String/Lookup/FlatFile.pm
+    version: '0.14'
+  String::Lookup::PurePerl:
+    file: lib/String/Lookup/PurePerl.pm
+requires:
+  Encode: '0'
+  Scalar::Util: '0'
+  autodie: '0'
+  bytes: '0'
+  perl: '5.014'
+  warnings: '0'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/String-Lookup.git
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

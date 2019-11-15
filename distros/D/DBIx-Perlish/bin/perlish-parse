@@ -9,6 +9,9 @@ my %opt = (
 	flavor  => undef,
 	help    => undef,
 	deparse => undef,
+	beautify => undef,
+	strict   => undef,
+	inline   => 0,
 );
 
 sub usage {
@@ -21,8 +24,11 @@ format:
 options:
     --help
     --flavor   [pg|oracle]
-    --deparse
-
+    --deparse  -- print perl AST
+    --beautify -- print nicer sql
+    --strict   -- if set, no attempt to declare missing variables will be made
+    --inline   -- if set, will try to dereference scalars and generate SQL accordingly
+  
 HELP
 	exit 1;
 }
@@ -31,6 +37,9 @@ GetOptions(\%opt,
 	"help",
 	"flavor=s",
 	"deparse",
+	"beautify",
+	"strict",
+	"inline",
 ) or usage;
 $opt{help} and usage;
 
@@ -45,6 +54,19 @@ sub slurp($)
 		return <F>;
 	}
 }
+
+my $int  = 5;
+my $str  = 'x';
+my $like = 'LIKE%';
+my $rx   = '.*';
+my @arr  = (1,2);
+my %hash = ( a => 1);
+my $arr_ref  = [1, 2];
+my $hash_ref = {a => 1};
+our $our_int  = 5;
+our @our_arr  = (1,2);
+our $arr_our_ref  = [1, 2];
+our $hash_our_ref = {a => 1};
 
 my ( $mode, $text );
 if ( 0 == @ARGV ) {
@@ -64,7 +86,21 @@ if ( 0 == @ARGV ) {
 	usage;
 }
 
-my $sub = eval "sub { $text };";
+my ($sub, $prevars, $last_eval_failure) = (undef, '', '');
+while ( 1 ) {
+	$sub = eval "$prevars sub { $text };";
+	last unless $@;
+	last if $opt{strict};
+	last if $last_eval_failure eq $@;
+	$last_eval_failure = $@;
+	last unless $@ =~ /Global symbol "(.)(.*?)" requires explicit package name/;
+	my ( $sigil, $var ) = ($1, "$1$2");
+	if ( $sigil eq '$') {
+		$prevars .= "my $var = '$var';\n";
+	} else {
+		$prevars .= "my $var;\n";
+	}
+}
 die $@ if $@;
 
 if ( $opt{deparse} ) {
@@ -73,5 +109,18 @@ if ( $opt{deparse} ) {
 
 my ($sql, $bind_values, $nret, %flags) = DBIx::Perlish::gen_sql($sub, $mode,
 	flavor => $opt{flavor},
+	inline => $opt{inline},
 );
+
+if ( $opt{beautify}) {
+	eval "require SQL::Beautify;";
+	if ($@) {
+		warn "SQL::Beautify is required\n";
+	} else {
+		my $b = SQL::Beautify->new;
+		$b->query($sql);
+		$sql = $b->beautify;
+	}
+}
+
 print $sql, "\n";

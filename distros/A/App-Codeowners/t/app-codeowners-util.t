@@ -44,10 +44,10 @@ subtest 'git_toplevel' => sub {
     my $repodir =_setup_git_repo();
 
     my $r = App::Codeowners::Util::git_toplevel($repodir);
-    is($r, $repodir, 'found toplevel directory from toplevel');
+    is($r->canonpath, $repodir->canonpath, 'found toplevel directory from toplevel');
 
     $r = App::Codeowners::Util::git_toplevel($repodir->child('a/b'));
-    is($r, $repodir, 'found toplevel directory');
+    is($r->canonpath, $repodir->canonpath, 'found toplevel directory');
 };
 
 subtest 'find_nearest_codeowners' => sub {

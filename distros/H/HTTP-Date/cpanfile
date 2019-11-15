@@ -3,7 +3,6 @@ requires "Time::Local" => "0";
 requires "Time::Zone" => "0";
 requires "perl" => "5.006002";
 requires "strict" => "0";
-requires "vars" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";

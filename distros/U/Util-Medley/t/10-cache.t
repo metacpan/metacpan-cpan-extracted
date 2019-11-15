@@ -104,7 +104,7 @@ sub test_clear {
 
 	my $c = shift;
 
-	nuke_data();
+	destroy_data();
 	seed_data();
 
 	if ( !$c->ns ) {
@@ -116,10 +116,20 @@ sub test_clear {
 	}
 }
 
-sub nuke_data {
+sub destroy_data {
+
+	state $count = 1;
 
 	my $c = Util::Medley::Cache->new;
-	ok( $c->destroy( ns => $Ns ) );
+
+	if ( $count / 2 ) {
+		ok( $c->destroy( ns => $Ns ) );
+	}
+	else {
+		ok( $c->destroy($Ns) );
+	}
+
+	$count++;
 }
 
 sub seed_data {
@@ -135,8 +145,8 @@ sub test_set {
 
 	my $c = shift;
 
-	nuke_data();
-	
+	destroy_data();
+
 	if ( !$c->ns ) {
 
 		# should succeed
@@ -157,15 +167,15 @@ sub test_getKeys {
 
 	my $c = shift;
 
-	nuke_data();
+	destroy_data();
 	seed_data();
-		
+
 	if ( !$c->ns ) {
 
 		# should succeed
 		ok( my @keys = $c->getKeys( ns => $Ns ) );
-		is(@keys, @Keys);
-		
+		is( @keys, @Keys );
+
 		# should fail
 		eval { $c->getKeys };
 		ok($@);
@@ -182,9 +192,9 @@ sub test_delete {
 
 	my $c = shift;
 
-	nuke_data();
+	destroy_data();
 	seed_data();
-	
+
 	if ( !$c->ns ) {
 
 		# should succeed
@@ -213,14 +223,14 @@ sub test_get {
 
 	my $c = shift;
 
-	nuke_data();
+	destroy_data();
 	seed_data();
-	
+
 	if ( !$c->ns ) {
 
 		# should succeed
 		ok( my $data = $c->get( ns => $Ns, key => $Keys[2] ) );
-		is( $data, $Data[2]);
+		is( $data, $Data[2] );
 
 		# should fail
 		eval { $c->get( key => $Keys[3] ) };

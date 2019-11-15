@@ -1,5 +1,9 @@
 Change history for HTTP-Date
 
+6.04      2019-11-14 22:22:50Z
+    - Replace vars with our (GH#15) (James Raspass)
+    - Tidy lib and t files (GH#16) (Olaf Alders)
+
 6.03      2019-11-13 14:11:51Z
     - RT123557 Fix for DST test issues (GH#14) (@pludlamCVL)
     - Add Travis tests and convert to Dist::Zilla (GH#13) (Olaf Alders)

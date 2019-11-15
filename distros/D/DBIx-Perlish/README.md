@@ -414,7 +414,7 @@ the function might throw any of the exceptions thrown by DBI.
 
 The `db_insert {}` function is exported by default.
 
-### subselect()
+### subselect {}
 
 This call, formerly known as as internal form of `db_fetch`, 
 is basically an SQL SELECT statement. See ["Subqueries"](#subqueries).

@@ -1,5 +1,5 @@
 package Lab::Moose::Plot;
-$Lab::Moose::Plot::VERSION = '3.690';
+$Lab::Moose::Plot::VERSION = '3.691';
 #ABSTRACT: Frontend to L<PDL::Graphics::Gnuplot>
 
 
@@ -49,18 +49,6 @@ has gpwin => (
     init_arg => undef,
     writer   => '_gpwin',
 );
-
-# sub build_terminal_options {
-#     my $self = shift;
-#     my $term = $self->terminal();
-
-#     if ( $term =~ /^(qt|x11)$/ ) {
-#         return { persist => 1, raise => 0, enhanced => 0 };
-#     }
-#     else {
-#         return {};
-#     }
-# }
 
 sub build_plot_options {
     return {};
@@ -146,14 +134,14 @@ Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>
 
 =head1 VERSION
 
-version 3.690
+version 3.691
 
 =head1 SYNOPSIS
 
  use PDL;
  use Lab::Moose::Plot;
 
- # use default terminal 'qt'
+ # use default terminal ('qt' on Linux)
  my $plot = Lab::Moose::Plot->new();
 
  # simple 2-D plot
@@ -211,8 +199,6 @@ terminal-, plot- and curve-options.
  );
 
 Construct a new plotting backend. All arguments are optional. The default for
-C<terminal> is 'qt'. For the 'qt' and 'x11' terminals, C<terminal_options>
-defaults to C<< {persist => 1, raise => 0 } >>. The default for
 C<plot_options> and C<curve_options> is the empty hash.
 
 =head2 plot
@@ -240,7 +226,7 @@ This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2018       Simon Reinhardt
+            2018-2019  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

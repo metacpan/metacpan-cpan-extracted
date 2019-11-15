@@ -1,5 +1,5 @@
 package String::Lookup::DBI;
-$VERSION= 0.13;
+$VERSION= 0.14;
 
 # what runtime features we need
 use 5.014;
@@ -107,7 +107,7 @@ String::Lookup::DBI - flush String::Lookup using DBI compatible database handle
 
 =head1 VERSION
 
-This documentation describes version 0.13.
+This documentation describes version 0.14.
 
 =head1 DESCRIPTION
 
@@ -148,7 +148,7 @@ Indicate the name of the column for storing "id" values.  Defaults to C<id>.
 
 Indicate the name of the column for storing strings.  Defaults to C<name>.
 
-=back 4
+=back
 
 =head1 REQUIRED MODULES
 

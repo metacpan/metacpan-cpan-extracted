@@ -1,9 +1,19 @@
 ==================================================
-Changes from 2018-11-04 00:00:00 +0000 to present.
+Changes from 2018-11-14 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2019-11-04 17:31:38 +0000
+version 0.008 at 2019-11-14 19:24:59 +0000
+------------------------------------------
+
+  Change: b8b48975b40c761618b795f438e5b6a5fc0c3c4b
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-14 13:23:54 +0000
+
+    refactored to use Kavorka 
+
+------------------------------------------
+version 0.007 at 2019-11-04 17:31:20 +0000
 ------------------------------------------
 
   Change: 3d95b3e3a0dab29e6f3616b2c9a3edb731be50e2
@@ -73,18 +83,6 @@ version 0.004 at 2019-11-04 16:35:17 +0000
 
     checkpoint 
 
-  Change: 3935c5594d2a56b6061de5015dda4f2fc77c4f39
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 12:08:36 +0000
-
-    . 
-
-  Change: f337b98384a22f739a9161d811eea3fe1df237e9
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 12:06:39 +0000
-
-    . 
-
   Change: 3089c5c181d84148ef7e1bcd3b216c256362b876
   Author: John Gravatt <john@gravatt.org>
   Date : 2019-10-28 12:05:56 +0000
@@ -96,12 +94,6 @@ version 0.004 at 2019-11-04 16:35:17 +0000
   Date : 2019-10-28 11:59:35 +0000
 
     more files 
-
-  Change: 585dc5f224b8d078c550e809f0f3041ec838cebe
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 11:59:10 +0000
-
-    updated gitignore 
 
   Change: d6b914d578231a3eb8ee18ddef54eead1bcc61f4
   Author: John Gravatt <john@gravatt.org>

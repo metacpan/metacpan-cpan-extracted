@@ -10,6 +10,7 @@ eg/ja.properties
 eg/with_properties_file.pl
 lib/Localizer.pm
 lib/Localizer/BuiltinFunctions.pm
+lib/Localizer/Lexicon.pm
 lib/Localizer/Resource.pm
 lib/Localizer/Style/Gettext.pm
 lib/Localizer/Style/Maketext.pm

@@ -1,4 +1,9 @@
 Revision history for DBIx-Perlish
+1.04 15 Nov 2019
+	Add --beautify, --inline and --struct for perlish-deparse to help with running
+		copy-pasted code that may contain unknown variables.
+	Minor opcode fixes
+	
 1.03 1 May 2019
 	Add CAST support
 	Upgrade to the latest Keyword::Pluggable

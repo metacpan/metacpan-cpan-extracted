@@ -25,6 +25,15 @@ sub new {
     }, $class;
 }
 
+sub __CREATE_TABLE_stmt {
+    my ( $sf, $sql ) = @_;
+    return sprintf "CREATE TABLE $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{create_table_cols}};
+}
+
+sub __INSERT_INTO_stmt_first_part {
+    my ( $sf, $sql ) = @_;
+    return sprintf "INSERT INTO $sql->{table} (%s)", join ', ', map { $_ // '' } @{$sql->{insert_into_cols}}
+}
 
 sub get_stmt {
     my ( $sf, $sql, $stmt_type, $used_for ) = @_;
@@ -38,7 +47,7 @@ sub get_stmt {
         @tmp = ( "DROP VIEW $table" );
     }
     elsif ( $stmt_type eq 'Create_table' ) {
-        @tmp = ( sprintf "CREATE TABLE $table (%s)", join ', ', @{$sql->{create_table_cols}} );
+        @tmp = ( $sf->__CREATE_TABLE_stmt( $sql ) );
     }
     elsif ( $stmt_type eq 'Create_view' ) {
         @tmp = ( sprintf "CREATE VIEW $table AS " . $sql->{view_select_stmt} );
@@ -63,7 +72,7 @@ sub get_stmt {
         push @tmp, $in . $sql->{where_stmt} if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Insert' ) {
-        @tmp = ( sprintf "INSERT INTO $table (%s)", join ', ', @{$sql->{insert_into_cols}} );
+        @tmp = ( $sf->__INSERT_INTO_stmt_first_part( $sql ) );
         if ( $used_for eq 'prepare' ) {
             push @tmp, sprintf " VALUES(%s)", join( ', ', ( '?' ) x @{$sql->{insert_into_cols}} );
         }
@@ -103,23 +112,41 @@ sub get_stmt {
 
 sub insert_into_args_info_format {
     my ( $sf, $sql, $indent ) = @_;
-    my $max = get_term_height() - ( $sf->{i}{occupied_rows} // 14 );
-    if ( $max < 5 ) {
-        $max = 5;
+    my $avail_h;
+    if ( defined $sf->{i}{occupied_term_height} ) {
+        my $count = 0;
+        if ( @{$sf->{i}{stmt_types}} ) {
+            my $str = $sf->__INSERT_INTO_stmt_first_part( $sql );
+            if ( $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
+                $str = $sf->__CREATE_TABLE_stmt( $sql ) . "\n" . $str;
+            }
+            $str = line_fold( $str, get_term_width(), { init_tab => '', subseq => ' ' x 4 } );
+            $count = $str =~ tr/\n// + 1;
+        }
+        $avail_h = get_term_height() - $sf->{i}{occupied_term_height} - $count - 3;
+        if ( @{$sql->{insert_into_args}} > $avail_h ) {
+            $avail_h -= 2;
+        }
     }
-    my $begin = int( $max / 1.5 );
-    my $end = $max - $begin;
-    $begin--;
-    $end--;
+    else {
+        $avail_h = get_term_height() - 14;
+    }
+    if ( $avail_h < 1) {
+        $avail_h = 1;
+    }
+    my $first_part_end = int( $avail_h / 1.5 );
+    my $second_part_begin = $avail_h - $first_part_end;
+    $first_part_end--;
+    $second_part_begin--;
     my $last_i = $#{$sql->{insert_into_args}};
     my $tmp = [];
     my $term_w = get_term_width();
-    if ( @{$sql->{insert_into_args}} > $max ) {
-        for my $row ( @{$sql->{insert_into_args}}[ 0 .. $begin ] ) {
+    if ( @{$sql->{insert_into_args}} > $avail_h ) {
+        for my $row ( @{$sql->{insert_into_args}}[ 0 .. $first_part_end ] ) {
             push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
         push @$tmp, $indent . '[...]';
-        for my $row ( @{$sql->{insert_into_args}}[ $last_i - $end .. $last_i ] ) {
+        for my $row ( @{$sql->{insert_into_args}}[ $last_i - $second_part_begin .. $last_i ] ) {
             push @$tmp, _prepare_table_row( $row, $indent, $term_w );
         }
         my $row_count = scalar( @{$sql->{insert_into_args}} );

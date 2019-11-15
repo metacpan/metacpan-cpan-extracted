@@ -1,5 +1,20 @@
 Version history for Catalyst-TraitFor-Request-Methods:
 
+v0.2.2    2019-11-14 17:34:10+00:00 Europe/London
+  [Enhancements]
+  - The methods have been rewritten as lazy, read-only attributes.
+
+  [Other]
+  - Remove the use of Sub::Util.
+
+v0.2.1    2019-11-13 13:28:00+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Remove the use of MooseX::MungeHas or Sub::Util.
+
+v0.2.0    2019-11-12 08:54:51+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - The methods have been rewritten as lazy, read-only attributes.
+
 v0.1.1    2019-08-12 17:05:57+01:00 Europe/London
   [Bug Fixes]
   - Specify a minimum Catalyst version.

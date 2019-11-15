@@ -7,11 +7,9 @@ build_requires:
   Test::More: '0.98'
   Test::Requires: '0'
 configure_requires:
-  CPAN::Meta: '0'
-  CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,9 +28,11 @@ no_index:
 provides:
   Localizer:
     file: lib/Localizer.pm
-    version: '0.05'
+    version: '0.06'
   Localizer::BuiltinFunctions:
     file: lib/Localizer/BuiltinFunctions.pm
+  Localizer::Lexicon:
+    file: lib/Localizer/Lexicon.pm
   Localizer::Resource:
     file: lib/Localizer/Resource.pm
   Localizer::Style::Gettext:
@@ -46,7 +46,10 @@ resources:
   bugtracker: https://github.com/tokuhirom/Localizer/issues
   homepage: https://github.com/tokuhirom/Localizer
   repository: git://github.com/tokuhirom/Localizer.git
-version: '0.05'
+version: '0.06'
 x_authority: CPAN:TOKUHIROM
 x_contributors:
+  - 'diegok <diego@freekeylabs.com>'
   - 'moznion <moznion@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

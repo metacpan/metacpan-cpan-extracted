@@ -1,5 +1,12 @@
 Revision history for App-Codeowners.
 
+0.45      2019-11-14 22:30:14-07:00 MST7MDT
+  * Pod::Usage is now optional for the benefit of Git for Windows.
+
+0.44      2019-11-14 21:33:01-07:00 MST7MDT
+  * Attempt to fix more compatibility issues (thanks CPAN testers).
+  * Honor COLOR_DEPTH=0 to disable ANSI color codes.
+
 0.43      2019-11-13 10:12:01-07:00 MST7MDT
   * Fix "create" and "update" commands... to actually work.
 

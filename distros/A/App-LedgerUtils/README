@@ -1,17 +1,71 @@
-SYNOPSIS
+NAME
+    App::LedgerUtils - Command-line utilities related Ledger files
 
+VERSION
+    This document describes version 0.04 of App::LedgerUtils (from Perl
+    distribution App-LedgerUtils), released on 2019-10-15.
+
+SYNOPSIS
     This distribution provides the following command-line utilities related
     to Ledger files:
 
-    #INSERT_EXECS_LIST
+    *   parse-ledger
 
     The main purpose of these utilities is tab completion.
 
 FAQ
+  What is the purpose of this distribution? Haven't other similar utilities existed?
+    For example, mpath from Module::Path distribution is similar to pmpath
+    in App::PMUtils, and mversion from Module::Version distribution is
+    similar to pmversion from App::PMUtils distribution, and so on.
 
-    #INSERT_BLOCK: App::PMUtils faq
+    True. The main point of these utilities is shell tab completion, to save
+    typing.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-LedgerUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-LedgerUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-LedgerUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Below is the list of distributions that provide CLI utilities for
+    various purposes, with the focus on providing shell tab completion
+    feature.
 
-    #INSERT_BLOCK: App::PMUtils see_also
+    App::DistUtils, utilities related to Perl distributions.
+
+    App::DzilUtils, utilities related to Dist::Zilla.
+
+    App::GitUtils, utilities related to git.
+
+    App::IODUtils, utilities related to IOD configuration files.
+
+    App::LedgerUtils, utilities related to Ledger CLI files.
+
+    App::PlUtils, utilities related to Perl scripts.
+
+    App::PMUtils, utilities related to Perl modules.
+
+    App::ProgUtils, utilities related to programs.
+
+    App::WeaverUtils, utilities related to Pod::Weaver.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

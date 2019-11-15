@@ -1,15 +1,14 @@
 package Util::Medley::Spawn;
-$Util::Medley::Spawn::VERSION = '0.007';
+$Util::Medley::Spawn::VERSION = '0.008';
 ###############################################################################
 
 use Modern::Perl;
 use Moose;
-use Method::Signatures;
 use namespace::autoclean;
-
 use Data::Printer alias => 'pdump';
 use Carp;
 use IPC::Run3 'run3';
+use Kavorka '-all';
 
 with 'Util::Medley::Roles::Attributes::Logger';
 
@@ -19,11 +18,23 @@ Util::Medley::Spawn - utility methods for system commands
 
 =head1 VERSION
 
-version 0.007
+version 0.008
+
+=head1 SYNOPSIS
+
+...
 
 =cut
 
 ###############################################################################
+
+=head1 ATTRIBUTES
+
+=head2 confessOnError (optional)
+
+Toggle for to enable/disable confess on error.  Default is 1.
+
+=cut
 
 has confessOnError => (
 	is      => 'rw',
@@ -33,21 +44,55 @@ has confessOnError => (
 
 ###############################################################################
 
-method capture (Str|ArrayRef :$cmd!,
-				Str          :$stdinAsString) {
+=head1 METHODS
 
-	my @cmd;
-	if ( ref($cmd) eq 'ARRAY' ) {
-		@cmd = @$cmd;
+=head2 capture
+
+Executes system command and returns the stdout, stderr, and exit values.  Will
+write to log if enabled.
+
+=over
+
+=item usage:
+
+ ($stdout, $stderr, $exit) = $util->capture($cmd, [$stdin])
+ 
+ ($stdout, $stderr, $exit) = $util->capture(cmd   => $cmd, 
+                                           [stdin => $stdin])
+ 
+=item args:
+
+=over
+
+=item cmd [ArrayRef|Str]
+
+System command to invoke.  Can be an arrayref or a string.
+
+=item stdin [ArrayRef|Str] (optional)
+
+Stdin to pass to the command.
+
+=back
+
+=back
+
+=cut
+
+multi method capture (ArrayRef|Str :$cmd!,
+					  ArrayRef|Str :$stdin) {
+
+	my $msg;
+	if (ref($cmd) eq 'ARRAY') {
+		$msg = join(' ', @$cmd);
 	}
 	else {
-		@cmd = split( /\s+/, $cmd );
+		$msg = $cmd;	
 	}
-
-	my ( $stdout, $stdin, $stderr, $exit );
-	$stdin = $stdinAsString if $stdinAsString;
 	
-	$self->Logger->verbose( join( ' ', @cmd ) );
+	$self->Logger->verbose($msg);
+
+	my ( $stdout, $stderr, $exit );
+					 		
 	my $rc = run3 $cmd, \$stdin, \$stdout, \$stderr;
 	
 	$exit = $? >> 8;
@@ -63,10 +108,51 @@ method capture (Str|ArrayRef :$cmd!,
 		}
 	}
 
+	chomp $stdout;
+	chomp $stderr;
+		
 	return ( $stdout, $stderr, $exit );
 }
 
-method spawn (Str|ArrayRef :$cmd!) {
+multi method capture (ArrayRef|Str $cmd,
+					  ArrayRef|Str $stdin?) {
+	
+	my %a;
+	$a{cmd} = $cmd;
+	$a{stdin} = $stdin if $stdin;
+	
+	return $self->capture(%a);
+}
+
+					  					  	
+=head2 spawn
+
+Executes system command and returns the exit value.  Will write to log 
+if enabled.
+
+=over
+
+=item usage:
+
+ $exit = $util->spawn($cmd);
+
+ $exit = $util->spawn(cmd => $cmd);
+  
+=item args:
+
+=over
+
+=item cmd [ArrayRef|Str]
+
+System command to invoke.  Can be an arrayref or a string.
+
+=back
+
+=back
+
+=cut
+
+multi method spawn (ArrayRef|Str :$cmd!) {
 
 	if ( ref($cmd) eq 'ARRAY' ) {
 		$self->Logger->verbose( join( ' ', @$cmd ) );
@@ -87,7 +173,11 @@ method spawn (Str|ArrayRef :$cmd!) {
 	return $exit;
 }
 
-##############################################
+multi method spawn (ArrayRef|Str $cmd) {
 
+	return $self->spawn(cmd => $cmd);	
+}
+
+##############################################
 
 1;

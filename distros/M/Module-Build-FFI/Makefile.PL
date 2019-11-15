@@ -43,7 +43,7 @@ $File::ShareDir::Install::INCLUDE_DOTDIRS  = 1;
 install_share dist => "share";
 
 my %WriteMakefileArgs = (
-  "ABSTRACT"           => "Build Perl extensions in C with FFI",
+  "ABSTRACT"           => "(Deprecated) Build Perl extensions in C with FFI",
   "AUTHOR"             => "Graham Ollis <plicease\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker"     => 0,
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "0.50",
+  "VERSION" => "0.52",
   "test"    => {
     "TESTS" => "t/*.t"
   }

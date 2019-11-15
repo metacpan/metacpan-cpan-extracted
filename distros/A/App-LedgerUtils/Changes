@@ -1,22 +1,25 @@
-Revision history for App-LedgerUtils
+0.04    2019-10-15  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2016-01-18 (PERLANCAR)
+	- Update renamed prereq Data::Clean::JSON -> Data::Clean::ForJSON.
+
+
+0.03    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD rendering.
 
 
-0.02    2016-01-17 (PERLANCAR)
+0.02    2016-01-17  Released-By: PERLANCAR
 
         - parse-ledger: Give clue on how to see error message.
 
 
-0.01    2015-03-26 (PERLANCAR)
+0.01    2015-03-26  Released-By: PERLANCAR
 
         - Add script: parse-ledger.
 
 
-0.00    2015-03-21 (PERLANCAR)
+0.00    2015-03-21  Released-By: PERLANCAR
 
         - First release. Currently empty.

@@ -4,7 +4,7 @@ Types::Const - Types that coerce references to read-only
 
 # VERSION
 
-version v0.3.7
+version v0.3.8
 
 # SYNOPSIS
 
@@ -56,6 +56,8 @@ in 2019.
 [Type::Tiny](https://metacpan.org/pod/Type::Tiny)
 
 [Types::Standard](https://metacpan.org/pod/Types::Standard)
+
+[Types::ReadOnly](https://metacpan.org/pod/Types::ReadOnly)
 
 # KNOWN ISSUES
 

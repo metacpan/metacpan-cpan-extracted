@@ -9,8 +9,8 @@ use File::chdir;
 use File::Copy qw( move );
 use base qw( Module::Build::FFI );
 
-# ABSTRACT: Build Perl extensions in Free Pascal with FFI
-our $VERSION = '0.50'; # VERSION
+# ABSTRACT: (Deprecated) Build Perl extensions in Free Pascal with FFI
+our $VERSION = '0.52'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_pascal_extra_compiler_flags =>
@@ -196,13 +196,16 @@ __END__
 
 =head1 NAME
 
-Module::Build::FFI::Pascal - Build Perl extensions in Free Pascal with FFI
+Module::Build::FFI::Pascal - (Deprecated) Build Perl extensions in Free Pascal with FFI
 
 =head1 VERSION
 
-version 0.50
+version 0.52
 
 =head1 DESCRIPTION
+
+B<Note>: This module is deprecated, please see L<FFI::Build> for another
+way to bundle Pascal code with your Perl distribution.
 
 L<Module::Build::FFI> variant for writing Perl extensions in Pascal with
 FFI (sans XS).

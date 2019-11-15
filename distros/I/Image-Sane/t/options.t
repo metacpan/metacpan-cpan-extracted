@@ -13,19 +13,19 @@ is( $#array, 2, 'get_version' );
 
 try {
     @array = Image::Sane->get_devices;
-    pass 'get_devices'
+    pass 'get_devices';
 }
 catch {
-    fail 'get_devices'
+    fail 'get_devices';
 };
 
 my $test;
 try {
     $test = Image::Sane::Device->open('test');
-    pass 'open'
+    pass 'open';
 }
 catch {
-    fail 'open'
+    fail 'open';
 };
 
 my $n = $test->get_option(0);
@@ -36,10 +36,10 @@ my $status;
 if ( $options->{name} eq 'enable-test-options' ) {
     try {
         $info = $test->set_option( 21, SANE_TRUE );
-        pass 'enable-test-options'
+        pass 'enable-test-options';
     }
     catch {
-        fail 'enable-test-options'
+        fail 'enable-test-options';
     };
 
     for ( my $i = 0 ; $i < $n ; $i++ ) {
@@ -105,7 +105,7 @@ if ( $options->{name} eq 'enable-test-options' ) {
 
                     $status = SANE_STATUS_GOOD;
                     try {
-                        $info = $test->set_option( $i, $in )
+                        $info = $test->set_option( $i, $in );
                     }
                     catch {
                         $status = $_->status;

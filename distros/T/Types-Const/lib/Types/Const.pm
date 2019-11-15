@@ -25,7 +25,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.3.7';
+our $VERSION = 'v0.3.8';
 
 
 sub VERSION { # for older Perls
@@ -126,7 +126,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.3.7
+version v0.3.8
 
 =head1 SYNOPSIS
 
@@ -178,6 +178,8 @@ L<Const::Fast>
 L<Type::Tiny>
 
 L<Types::Standard>
+
+L<Types::ReadOnly>
 
 =head1 KNOWN ISSUES
 
