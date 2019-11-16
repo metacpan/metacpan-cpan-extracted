@@ -1,5 +1,24 @@
 Revision history for FFI-Platypus
 
+1.00      2019-11-15 13:46:15 -0500
+  - Production release identical to 0.99_06
+
+0.99_06   2019-11-12 21:08:23 -0500
+  - Detect Rust or Go modules according to Cargo.toml or go.mod files (gh#197)
+
+0.99_05   2019-10-30 19:25:02 -0600
+  - Add FFI::Build support for build_all method (gh#195)
+
+0.99_03   2019-10-24 10:46:02 -0700
+  - Documentation
+
+0.99_02   2019-10-14 16:16:16 -0600
+  - api = 1 is no longer experimental (gh#193)
+
+0.99_01   2019-10-14 14:39:18 -0600
+  - Convert documentation from api => 0 (implicit) to api => 1 (explicit)
+  - Improved documentation (gh#181, gh#184)
+
 0.98      2019-10-14 13:18:02 -0600
   - Production release identical to 0.97_05
 

@@ -8,7 +8,7 @@ use Text::ParseWords ();
 use FFI::Build::Platform;
 
 # ABSTRACT: Probe runner builder for FFI
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 sub new
@@ -215,7 +215,7 @@ FFI::Probe::Runner::Builder - Probe runner builder for FFI
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 

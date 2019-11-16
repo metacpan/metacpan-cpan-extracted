@@ -2,6 +2,7 @@ Changes
 lib/PGObject/Util/DBChange.pm
 lib/PGObject/Util/DBChange/History.pm
 MANIFEST
+Makefile.PL
 README
 t/00-load.t
 t/10-non-db.t

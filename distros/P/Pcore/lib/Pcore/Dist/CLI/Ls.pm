@@ -31,6 +31,15 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                     width => 10,
                     align => 1,
                 },
+                is_dirty => {
+                    title => 'IS DIRTY',
+                    width => 10,
+                    align => 1,
+                },
+                pushed => {
+                    width => 14,
+                    align => 1,
+                },
                 latest_release => {
                     title => "LATEST\nRELEASE",
                     width => 14,
@@ -44,15 +53,6 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                 release_distance => {
                     title => "UNRELEASED\nCHANGES",
                     width => 12,
-                    align => 1,
-                },
-                is_dirty => {
-                    title => 'IS DIRTY',
-                    width => 10,
-                    align => 1,
-                },
-                pushed => {
-                    width => 14,
                     align => 1,
                 },
             ],
@@ -168,32 +168,6 @@ sub _render_dist ( $self, $tbl, $dist, $data ) {
         push @row, ' - ';
     }
 
-    # latest release
-    my $latest_release = $data->{releases} ? $data->{releases}->[-1] : undef;
-
-    if ($latest_release) {
-        push @row, $latest_release;
-    }
-    else {
-        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
-    }
-
-    # parent release
-    if ( defined $dist_id->{release} ) {
-        if ( $dist_id->{release} eq $latest_release ) {
-            push @row, $dist_id->{release};
-        }
-        else {
-            push @row, $WHITE . $ON_RED . " $dist_id->{release} " . $RESET;
-        }
-    }
-    else {
-        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
-    }
-
-    # parent release distance
-    push @row, !$dist_id->{release_distance} ? ' - ' : $WHITE . $ON_RED . sprintf( ' %3s ', $dist_id->{release_distance} ) . $RESET;
-
     # is dirty
     push @row, !$dist_id->{is_dirty} ? ' - ' : $WHITE . $ON_RED . ' dirty ' . $RESET;
 
@@ -221,6 +195,32 @@ sub _render_dist ( $self, $tbl, $dist, $data ) {
             push @row, q[ - ];
         }
     }
+
+    # latest release
+    my $latest_release = $data->{releases} ? $data->{releases}->[-1] : undef;
+
+    if ($latest_release) {
+        push @row, $latest_release;
+    }
+    else {
+        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
+    }
+
+    # parent release
+    if ( defined $dist_id->{release} ) {
+        if ( $dist_id->{release} eq $latest_release ) {
+            push @row, $dist_id->{release};
+        }
+        else {
+            push @row, $WHITE . $ON_RED . " $dist_id->{release} " . $RESET;
+        }
+    }
+    else {
+        push @row, $WHITE . $ON_RED . ' v0.0.0 ' . $RESET;
+    }
+
+    # parent release distance
+    push @row, !$dist_id->{release_distance} ? ' - ' : $WHITE . $ON_RED . sprintf( ' %3s ', $dist_id->{release_distance} ) . $RESET;
 
     print $tbl->render_row( \@row );
 

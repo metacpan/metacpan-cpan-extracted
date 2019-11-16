@@ -27,7 +27,6 @@
    version 3.55 here for PERL_MAGIC_qr before SvRX.
 */
 #define NEED_SvRX
-#define NEED_sv_2pv_flags
 #include "ppport.h"
 
 
@@ -55,13 +54,14 @@
     (var) = *svptr;                                     \
   } while (0)
 
+
 #define MATCH(target)                                                      \
   do {                                                                     \
     if (regexp) {                                                          \
-      if (CALLREGEXEC (regexp,                                             \
-                       entry_p, entry_p + entry_len,                       \
-                       entry_p, 0, entry, NULL,                            \
-                       REXEC_IGNOREPOS)) {                                 \
+      if (pregexec(regexp,                                                 \
+                   entry_p, entry_p+entry_len,                             \
+                   entry_p, 0, entry,                                      \
+                   REXEC_COPY_STR | REXEC_IGNOREPOS)) {                    \
         goto target;                                                       \
       }                                                                    \
       MY_DEBUG1 (fprintf (stderr, "  no match regexp\n"));                 \

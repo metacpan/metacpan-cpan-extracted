@@ -1,7 +1,10 @@
 Revision history for unconstant
 
+0.07    2019-11-14
+        Fixed pacakaging and removed one of the two prototype tests
+
 0.05    2019-11-14
-				Updated tests to not fail if you don't have namespace::autoclean
+        Updated tests to not fail if you don't have namespace::autoclean
 
 0.04    2019-11-14
         Updated to work with namespace::autoclean.

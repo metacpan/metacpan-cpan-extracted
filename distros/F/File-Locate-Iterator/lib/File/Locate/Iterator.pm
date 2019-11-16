@@ -33,7 +33,7 @@ use Carp;
 use DynaLoader;
 our @ISA = ('DynaLoader');
 
-our $VERSION = 27;
+our $VERSION = 28;
 
 # uncomment this to run the ### lines
 #use Devel::Comments;
@@ -505,14 +505,20 @@ Locate databases normally hold filename strings as a way of finding files by
 name faster than searching through all directories.  Optional glob, suffix
 and regexp options on the iterator can restrict the entries returned.
 
+Although it's called a database, the format is only actually a long list of
+filenames with some "front coding" compression to save space.  There's no
+random access and any search requires a scan through the file from the
+start.  Generally this is still much faster than an equivalent traversal
+through the directory structure of an entire file system (C<find> etc).
+
 See F<examples/native.pl> for a simple sample read, or
 F<examples/mini-locate.pl> for a whole program like the real C<locate>.
 
 Only "LOCATE02" format files are supported, per current versions of GNU
 C<locate>, not the previous "slocate" format.
 
-Iterators from this module are stand-alone and don't need any of the various
-Perl iterator frameworks.  But see L<Iterator::Locate>,
+Iterators from this module are stand-alone and don't need any of the Perl
+iterator frameworks.  But see L<Iterator::Locate>,
 L<Iterator::Simple::Locate> and L<MooseX::Iterator::Locate> to inter-operate
 with those others.  Those frameworks include ways to grep, map and otherwise
 manipulate iterations.
@@ -529,8 +535,8 @@ threads work correctly (but slower), but a C<fork()> is probably doomed.
 
 Iterators using C<mmap> work correctly for both forks and threads, except
 that the size calculation and sharing for C<if_sensible> is not thread-aware
-beyond the mmaps existing when the thread is spawned.  C<File::Map> knows
-the mmaps across all threads, but does not reveal them.
+beyond the mmaps existing when the thread is spawned.  (C<File::Map> knows
+the C<mmap>s across all threads, but currently does not reveal them.)
 
 =head2 Taint Mode
 
@@ -539,10 +545,12 @@ file handle are always tainted, the same as other file input.  Taintedness
 of a C<database_str> string propagates to the entry strings returned.
 
 For C<database_str_ref>, the initial taintedness of the database string
-propagates to the entries.  If you untaint it during iteration (which should
-be unusual) then subsequent entries returned are still tainted because the
-front-coding of the database format means subsequent entries may still use
-data back from when the input was tainted.  A C<rewind()> will reset to the
+propagates to the entries.  If you untaint it during iteration then
+subsequent entries returned are still tainted because the front-coding of
+the database format means subsequent entries may still use data back from
+when the input was tainted.  Perhaps entries should follow an untaint of the
+database string, but normally you'd expect an untaint to be worked out
+before beginning iteration.  In all cases a C<rewind()> will reset to the
 new taintedness of the database string.
 
 For reference, taint mode is only a small slowdown for the XS iterator code,
@@ -554,7 +562,7 @@ The locate database format is only designed to be read forwards, hence no
 C<prev()> method on the iterator.  The start of a previous record can't be
 distinguished by its content, and the "front coding" means the state at a
 given point may depend on records an arbitrary distance back too.  A "tell"
-which gave file position plus state would be possible, though perhaps a
+which gave file position plus state would be possible, though perhaps some
 "clone" of the whole iterator would be more use.
 
 On some systems, C<mmap()> may be a bit too effective, giving a process more
@@ -750,8 +758,7 @@ Iterators let you write your own loop, and can have multiple searches in
 progress simultaneously.
 
 The speed of an iterator is about the same as callbacks when
-C<File::Locate::Iterator> is built with its XS code (which requires Perl
-5.8.0 or higher currently).
+C<File::Locate::Iterator> is built with its XS code.
 
 Iterators are good for cooperative coroutining like C<POE> or C<Gtk> where
 state must be held in some sort of variable to be progressed by calls from
@@ -763,9 +770,9 @@ If you have the recommended C<File::Map> module then iterators share an
 C<mmap()> of the database file.  Otherwise the database file is a separate
 open handle in each iterator, meaning a file descriptor and PerlIO buffering
 each.  Sharing a handle and having each seek to its desired position would
-be possible, but a seek drops buffered data so would be slower.  Some hairy
-C<PerlIO> or C<IO::Handle> trickery might transparently share an fd and keep
-buffered blocks from multiple file positions.
+be possible, but a seek drops buffered data so would be slower.  Maybe some
+hairy C<PerlIO> or C<IO::Handle> trickery could transparently share an fd
+and keep buffered blocks from multiple file positions.
 
 =head1 SEE ALSO
 

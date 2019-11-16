@@ -10,7 +10,7 @@ use FFI::Build::Platform;
 use overload '""' => sub { $_[0]->path }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Base class for File::Build files
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 sub new
@@ -158,7 +158,7 @@ FFI::Build::File::Base - Base class for File::Build files
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -296,6 +296,14 @@ file object is deallocated or falls out of scope.
 
 Builds the file into its natural output type, usually an object file.  It returns a new file instance,
 or if the file is an object file then it returns empty list.
+
+=head2 build_all
+
+ $file->build_all;
+
+If implemented the file in question can directly create a shared or dynamic library
+without needing a link step.  This is useful for languages that have their own build
+systems.
 
 =head2 needs_rebuild
 

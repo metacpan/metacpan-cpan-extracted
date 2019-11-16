@@ -24,11 +24,11 @@ my $worker = $minion->repair->worker;
 isa_ok $worker->minion->app, 'Mojolicious', 'has default application';
 
 # Migrate up and down
-is $minion->backend->pg->migrations->active, 19, 'active version is 19';
+is $minion->backend->pg->migrations->active, 20, 'active version is 20';
 is $minion->backend->pg->migrations->migrate(0)->active, 0,
   'active version is 0';
-is $minion->backend->pg->migrations->migrate->active, 19,
-  'active version is 19';
+is $minion->backend->pg->migrations->migrate->active, 20,
+  'active version is 20';
 
 # Register and unregister
 $worker->register;
@@ -52,7 +52,7 @@ $id     = $minion->enqueue('test');
 my (@finished, @failed);
 my $promise
   = $minion->result_p($id, {interval => 0})->then(sub { @finished = @_ })
-  ->catch(sub                                         { @failed   = @_ });
+  ->catch(sub { @failed = @_ });
 my $job = $worker->dequeue(0);
 is $job->id, $id, 'same id';
 Mojo::IOLoop->one_tick;
@@ -69,7 +69,7 @@ is_deeply \@failed, [], 'not failed';
 my $id2 = $minion->enqueue('test');
 $promise
   = $minion->result_p($id2, {interval => 0})->then(sub { @finished = @_ })
-  ->catch(sub                                          { @failed   = @_ });
+  ->catch(sub { @failed = @_ });
 $job = $worker->dequeue(0);
 is $job->id, $id2, 'same id';
 $job->fail({works => 'too!'});
@@ -217,7 +217,7 @@ ok !$minion->lock('foo', -3600), 'not locked again';
 ok !$minion->lock('foo', 3600),  'not locked again';
 ok $minion->unlock('foo'), 'unlocked';
 ok !$minion->unlock('foo'), 'not unlocked again';
-ok $minion->lock('yada', 3600, {limit => 1}), 'locked';
+ok $minion->lock('yada', 3600,  {limit => 1}), 'locked';
 ok !$minion->lock('yada', 3600, {limit => 1}), 'not locked again';
 
 # Shared lock
@@ -226,7 +226,7 @@ ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
 ok $minion->lock('bar', -3600, {limit => 3}), 'locked again';
 ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
 ok !$minion->lock('bar', 3600, {limit => 2}), 'not locked again';
-ok $minion->lock('baz', 3600, {limit => 3}), 'locked';
+ok $minion->lock('baz', 3600,  {limit => 3}), 'locked';
 ok $minion->unlock('bar'), 'unlocked';
 ok $minion->lock('bar', 3600, {limit => 3}), 'locked again';
 ok $minion->unlock('bar'), 'unlocked again';
@@ -286,14 +286,26 @@ ok !$minion->guard('bar', 3600, {limit => 2}), 'not locked again';
 undef $guard;
 undef $guard3;
 
-# Reset
-$minion->reset->repair;
-ok !$minion->backend->pg->db->query(
-  'select count(id) as count from minion_jobs')->hash->{count}, 'no jobs';
-ok !$minion->backend->pg->db->query(
-  'select count(id) as count from minion_locks')->hash->{count}, 'no locks';
-ok !$minion->backend->pg->db->query(
-  'select count(id) as count from minion_workers')->hash->{count}, 'no workers';
+# Reset (locks)
+$minion->lock('test', 3600);
+$minion->worker->register;
+ok $minion->backend->list_jobs(0, 1)->{total},    'jobs';
+ok $minion->backend->list_locks(0, 1)->{total},   'locks';
+ok $minion->backend->list_workers(0, 1)->{total}, 'workers';
+$minion->reset({locks => 1});
+ok $minion->backend->list_jobs(0, 1)->{total}, 'jobs';
+ok !$minion->backend->list_locks(0, 1)->{total}, 'no locks';
+ok $minion->backend->list_workers(0, 1)->{total}, 'workers';
+
+# Reset (all)
+$minion->lock('test', 3600);
+ok $minion->backend->list_jobs(0, 1)->{total},    'jobs';
+ok $minion->backend->list_locks(0, 1)->{total},   'locks';
+ok $minion->backend->list_workers(0, 1)->{total}, 'workers';
+$minion->reset({all => 1})->repair;
+ok !$minion->backend->list_jobs(0, 1)->{total},    'no jobs';
+ok !$minion->backend->list_locks(0, 1)->{total},   'no locks';
+ok !$minion->backend->list_workers(0, 1)->{total}, 'no workers';
 
 # Stats
 $minion->add_task(
@@ -422,7 +434,7 @@ is $batch->[1]{queue}, 'default', 'right queue';
 is $batch->[2]{queue}, 'default', 'right queue';
 is $batch->[3]{queue}, 'default', 'right queue';
 ok !$batch->[4], 'no more results';
-$id2   = $minion->enqueue('test' => [] => {notes => {is_test => 1}});
+$id2 = $minion->enqueue('test' => [] => {notes => {is_test => 1}});
 $batch = $minion->backend->list_jobs(0, 10, {notes => ['is_test']})->{jobs};
 is $batch->[0]{task}, 'test', 'right task';
 ok !$batch->[4], 'no more results';

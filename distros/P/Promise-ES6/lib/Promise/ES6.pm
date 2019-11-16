@@ -3,7 +3,11 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
+
+use constant _has_current_sub => $^V ge v5.16.0;
+
+use if _has_current_sub(), feature => 'current_sub';
 
 use constant {
 
@@ -153,7 +157,8 @@ process’s global destruction, a warning is triggered.
 
 =item * If your application needs recursive promises (e.g., to poll
 iteratively for completion of a task), the C<current_sub> feature (i.e.,
-C<__SUB__>) may help you avoid memory leaks.
+C<__SUB__>) may help you avoid memory leaks. (See this module’s source code
+for a substitute that works with pre-5.16 perls.)
 
 =item * Garbage collection before Perl 5.18 seems to have been buggy.
 If you work with such versions and end up chasing leaks,
@@ -257,14 +262,31 @@ sub new {
 sub _propagate_if_needed {
     my ($value_sr, $children_ar) = @_;
 
-    my $propagate_cr;
-    $propagate_cr = sub {
+    my $cb;
+    $cb = sub {
         my ($repromise_value_sr) = @_;
 
         if ( _is_promise($$repromise_value_sr) ) {
+
+            # Accommodate Perl versions whose $@ handling is buggy
+            # by forgoing local():
+            my $old_err = $@;
+
+            my $current_sub = do {
+                no strict 'subs';
+
+                # The eval here mimics the “current_sub” feature:
+                # a reference to the current subroutine
+                # without actually closing on that reference.
+                # This helps to prevent memory leaks.
+                _has_current_sub() ? __SUB__ : eval '$cb';
+            };
+
+            $@ = $old_err;
+
             my $in_reprom = $$repromise_value_sr->then(
-                sub { $propagate_cr->( bless \do {my $v = $_[0]}, _RESOLUTION_CLASS ) },
-                sub { $propagate_cr->( bless \do {my $v = $_[0]}, _REJECTION_CLASS ) },
+                sub { $current_sub->( bless \do {my $v = $_[0]}, _RESOLUTION_CLASS ) },
+                sub { $current_sub->( bless \do {my $v = $_[0]}, _REJECTION_CLASS ) },
             );
         }
         else {
@@ -281,7 +303,7 @@ sub _propagate_if_needed {
         }
     };
 
-    $propagate_cr->($value_sr);
+    $cb->($value_sr);
 
     return;
 }
@@ -474,6 +496,9 @@ sub DESTROY {
     return if $$ != $_[0]{'_pid'};
 
     if ($_[0]{'_detect_leak'} && ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT') {
+use Data::Dumper;
+$Data::Dumper::Deparse = 1;
+print STDERR Dumper $_[0];
         warn(
             ('=' x 70) . "\n"
             . 'XXXXXX - ' . ref($_[0]) . " survived until global destruction; memory leak likely!\n"

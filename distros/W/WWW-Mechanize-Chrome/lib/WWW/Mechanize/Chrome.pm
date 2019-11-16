@@ -23,8 +23,9 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
+use POSIX ':sys_wait_h';
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -202,6 +203,13 @@ like:
 Results my vary for your operating system. Use the full path to the browser's
 executable if you are having issues. You can also set the name of the executable
 file with the C<$ENV{CHROME_BIN}> environment variable.
+
+=item B<cleanup_signal>
+
+    cleanup_signal => 'SIGKILL'
+
+The signal that is sent to Chrome to shut it down. On Linuxish OSes, this
+will be C<TERM>, on OSX and Windows it will be C<KILL>.
 
 =item B<start_url>
 
@@ -398,6 +406,9 @@ sub build_command_line {
 
     my( $program, $error) = $class->find_executable(\@program_names);
     croak $error if ! $program;
+
+    # Convert the path to an absolute filename, so we can chdir() later
+    $program = File::Spec->rel2abs( $program ) || $program;
 
     $options->{ launch_arg } ||= [];
 
@@ -861,7 +872,9 @@ sub new($class, %options) {
         $options{ pipe } = 'pipe' eq $connection_style;
     };
 
-    $options{ cleanup_signal } ||= $^O =~ /mswin32/i ? 'SIGKILL' : 'SIGTERM';
+    $options{ cleanup_signal } ||=   $^O =~ /mswin32/i ? 'SIGKILL'
+                                   : $^O =~ /darwin/i  ? 'SIGKILL'
+                                                       : 'SIGTERM';
 
     my $self= bless \%options => $class;
     $self->{log} ||= $self->_build_log;
@@ -1092,7 +1105,8 @@ sub chrome_version_from_stdout( $class, $options={} ) {
 
     # Chromium 58.0.3029.96 Built on Ubuntu , running on Ubuntu 14.04
     # Chromium 76.0.4809.100 built on Debian 10.0, running on Debian 10.0
-    $v =~ /^(\S+)\s+([\d\.]+)\s/
+    # Google Chrome 78.0.3904.97
+    $v =~ /^(.*?)\s+(\d+\.\d+\.\d+\.\d+)\b/
         or return; # we didn't find anything
     return "$1/$2"
 }
@@ -1559,9 +1573,22 @@ sub eval_in_chrome {
 
 =head2 C<< $mech->callFunctionOn( $function, @arguments ) >>
 
-  my ($value, $type) = $mech->callFunctionOn( 'function(greeting) { alert(greeting)}', 'Hello World' );
+  my ($value, $type) = $mech->callFunctionOn(
+      'function(greeting) { window.alert(greeting)}',
+      objectId => $someObjectId,
+      arguments => [{ value => 'Hello World' }]
+  );
 
-Runs the given function with the specified arguments.
+Runs the given function with the specified arguments. This is the only way to
+pass arguments to a function call without doing risky string interpolation.
+The Javascript C<this> object will be set to the object referenced from the
+C<objectId>.
+
+The C<arguments> option expects an arrayref of hashrefs. Each hash describes one
+function argument.
+
+The C<objectId> parameter is optional. Leaving out the C<objectId> parameter
+will create a dummy object on which the function then is called.
 
 This method is special to WWW::Mechanize::Chrome.
 
@@ -1574,8 +1601,22 @@ sub callFunctionOn_future( $self, $str, %options ) {
         = (@Chrome::DevToolsProtocol::CARP_NOT, (ref $self)); # we trust this
     local @CARP_NOT
         = (@CARP_NOT, 'Chrome::DevToolsProtocol', (ref $self)); # we trust this
-    $self->target->callFunctionOn($str, %options)
-    ->then( sub( $result ) {
+
+    my $objId;
+    if( ! $options{ objectId }) {
+        $objId = $self->target->evaluate('new Object',
+            returnByValue => JSON::false
+        )->then(sub($result) {
+            return Future->done( $result->{result}->{objectId});
+        });
+    } else {
+        $objId = Future->done( $options{ objectId });
+    };
+
+    $objId->then( sub( $objectId ) {
+        $options{ objectId } = $objectId;
+        $self->target->callFunctionOn($str, %options)
+    })->then( sub( $result ) {
 
         if( $result->{error} ) {
             $self->signal_condition(
@@ -1672,10 +1713,25 @@ sub close {
     };
     delete $_[0]->{ driver };
 
-    if( $pid ) {
+    if( $pid and kill 0 => $pid) {
         local $SIG{CHLD} = 'IGNORE';
-        kill $_[0]->{cleanup_signal} => $pid;
-        waitpid $pid, 0;
+        if( ! kill $_[0]->{cleanup_signal} => $pid ) {
+            # The child already has gone away?!
+            warn "Couldn't kill browser child process $pid with $_[0]->{cleanup_signal}: $!";
+            # Gobble up any exit status
+            waitpid -1, WNOHANG;
+        } else {
+            waitpid $pid, 0;
+        };
+
+        if( my $path = $_[0]->{wait_file}) {
+            my $timeout = time + 10;
+            while( time < $timeout ) {
+                last unless(-e $path);
+                unlink($path) and last;
+                $_[0]->sleep(0.1);
+            }
+        };
     };
 }
 
@@ -1796,7 +1852,7 @@ sub _fetchFrameId( $self, $ev ) {
         || $ev->{method} eq 'Network.requestWillBeSent'
     ) {
         my $frameId = $ev->{params}->{frameId};
-        $self->log('debug', sprintf "Found frame id as %s", $frameId);
+        $self->log('debug', sprintf "Found frame id as %s", $frameId || '-');
         return  ($frameId);
     }
 };
@@ -1824,7 +1880,8 @@ sub _waitForNavigationEnd( $self, %options ) {
 
     my $frameId = $options{ frameId } || $self->frameId;
     my $requestId = $options{ requestId } || $self->requestId;
-    my $msg = "Capturing events until 'Page.frameStoppedLoading' for frame $frameId";
+    my $msg = sprintf "Capturing events until 'Page.frameStoppedLoading' for frame %s",
+                      $frameId || '-';
     $msg .= " or 'Network.loadingFailed' or 'Network.loadingFinished' for request '$requestId'"
         if $requestId;
 
@@ -2173,7 +2230,9 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
         # Find the request id of the request
         for( @$events ) {
             next unless $_->{method};
-            if( $_->{method} eq 'Network.requestWillBeSent' and $_->{params}->{frameId} eq $frameId ) {
+            if(     defined $frameId
+                and $_->{method} eq 'Network.requestWillBeSent'
+                and $_->{params}->{frameId} eq $frameId ) {
                 if( $url and $_->{params}->{request}->{url} eq $url ) {
                     $requestId = $_->{params}->{requestId};
                 } else {

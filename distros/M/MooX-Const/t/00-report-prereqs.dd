@@ -28,6 +28,7 @@ do { my $x = {
                                         'Types::Const' => 'v0.3.6'
                                       },
                       'requires' => {
+                                      'Devel::StrictMode' => '0',
                                       'Moo' => '1.006000',
                                       'Types::Const' => 'v0.3.3',
                                       'Types::Standard' => '0',

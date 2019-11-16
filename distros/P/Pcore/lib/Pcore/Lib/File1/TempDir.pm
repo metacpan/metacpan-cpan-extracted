@@ -6,7 +6,8 @@ use Clone qw[];
 
 extends qw[Pcore::Lib::Path];
 
-has temp => ();
+has temp => ( init_arg => undef );
+has pid  => ( init_arg => undef );
 
 our @DEFERRED_UNLINK;
 
@@ -17,7 +18,7 @@ END {
 }
 
 sub DESTROY ($self) {
-    return if !defined $self->{temp};
+    return if !defined $self->{temp} || !defined $self->{pid} || $self->{pid} != $$;
 
     File::Path::remove_tree( $self->{temp}, safe => 0 );
 
@@ -31,6 +32,8 @@ around new => sub ( $orig, $self, $path, %args ) {
         $self = $self->SUPER::new( $path, %args )->to_abs;
 
         $self->{temp} = $self->encoded;
+
+        $self->{pid} = $$;
     }
     else {
         $self = $self->SUPER::new( $path, %args );
@@ -43,6 +46,7 @@ sub clone ($self) {
     my $clone = Clone::clone($self);
 
     delete $clone->{temp};
+    delete $clone->{pid};
 
     return $clone;
 }

@@ -6,11 +6,11 @@ use constant 1.32 ();
 use FFI::Platypus;
 
 # ABSTRACT: Define constants in C space for Perl
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 {
-  my $ffi = FFI::Platypus->new( api => 1, experimental => 1 );
+  my $ffi = FFI::Platypus->new( api => 1 );
   $ffi->bundle;
 
   $ffi->type( 'opaque'                => 'ffi_platypus_constant_t' );
@@ -65,9 +65,11 @@ FFI::Platypus::Constant - Define constants in C space for Perl
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
+
+C<ffi/foo.c>:
 
  #include <ffi_platypus_bundle.h>
  
@@ -77,6 +79,21 @@ version 0.98
    c->set_str("FOO", "BAR");       /* sets $package::FOO to "BAR" */
    c->set_str("ABC::DEF", "GHI");  /* sets ABC::DEF to GHI        */
  }
+
+C<lib/Foo.pm>:
+
+ package Foo;
+ 
+ use strict;
+ use warnings;
+ use FFI::Platypus;
+ use base qw( Exporter );
+ 
+ my $ffi = FFI::Platypus->new;
+ # sets constatns Foo::FOO and ABC::DEF from C
+ $ffi->bundle;
+ 
+ 1;
 
 =head1 DESCRIPTION
 

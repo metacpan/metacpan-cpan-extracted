@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 sub new
@@ -121,6 +121,16 @@ sub load_build
     $options = {
       source => ["$dir/*.c", "$dir/*.cxx", "$dir/*.cpp"],
     };
+    # if we see a Go, Rust control file then we assume the
+    # ffi mod is written in that language.
+    foreach my $control_file ("$dir/Cargo.toml", "$dir/go.mod")
+    {
+      if(-f $control_file)
+      {
+        $options->{source} = [$control_file];
+        last;
+      }
+    }
   }
 
   $options->{platform} ||= $platform;
@@ -288,7 +298,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -297,7 +307,7 @@ In your Makefile.PL:
  use ExtUtils::MakeMaker;
  use FFI::Build::MM;
  
- my $fbmm = Alien::Build::MM->new;
+ my $fbmm = FFI::Build::MM->new;
  
  WriteMakefile($fbmm->mm_args(
    ABSTRACT     => 'My FFI extension',

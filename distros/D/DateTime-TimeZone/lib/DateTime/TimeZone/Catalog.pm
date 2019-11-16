@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.37';
+our $VERSION = '2.38';
 
 our @ALL =
 qw(
@@ -2916,6 +2916,10 @@ so that applications can easily present a list of timezones.
 
   Asia/Macau
 
+=head3 Macedonia, The former Yugoslav Republic of (MK)
+
+  Europe/Skopje
+
 =head3 Madagascar (MG)
 
   Indian/Antananarivo
@@ -3060,10 +3064,6 @@ so that applications can easily present a list of timezones.
 =head3 Norfolk Island (NF)
 
   Pacific/Norfolk
-
-=head3 North Macedonia (MK)
-
-  Europe/Skopje
 
 =head3 Northern Mariana Islands (MP)
 
@@ -3312,7 +3312,7 @@ so that applications can easily present a list of timezones.
 
   Asia/Dushanbe
 
-=head3 Tanzania, the United Republic of (TZ)
+=head3 Tanzania, United Republic of (TZ)
 
   Africa/Dar_es_Salaam
 

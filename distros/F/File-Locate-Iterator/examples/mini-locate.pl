@@ -18,9 +18,14 @@
 # with File-Locate-Iterator.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# Usage: perl mini-locate.pl '*.log'
+#
 # This is a poor man's version of the "locate" program, as an example of
-# using iterators.  The head() and igrep() of Iterator::Simple are handy ways
-# to implement the --limit and --existing options.
+# using iterators.  The command line arguments are shell-style glob patterns
+# for locate database entries to print.
+#
+# Iterator::Simple::Locate is used since its head() and igrep() are handy
+# ways to implement the --limit and --existing options.
 #
 
 use 5.006;
@@ -30,7 +35,7 @@ use Getopt::Long;
 use Iterator::Simple 'igrep';
 use Iterator::Simple::Locate;
 
-our $VERSION = 27;
+our $VERSION = 28;
 
 use FindBin;
 my $progname = $FindBin::Script;
@@ -66,7 +71,7 @@ GetOptions('0|null'         => sub { $output_terminator = "\0" },
            'help|?' => sub {
              print <<"HERE";
 $progname [--options] pattern...
-  -0, --null          print \0 after each filename
+  -0, --null          print \0 after each filename (instead of newline)
   -c, --count         print just a count of matches
   -d, --database FILENAME
                       the database file to read

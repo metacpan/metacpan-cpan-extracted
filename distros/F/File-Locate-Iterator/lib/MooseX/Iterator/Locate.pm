@@ -27,7 +27,7 @@ extends
   'Moose::Object'; # does() and stuff
 with 'MooseX::Iterator::Role';
 
-our $VERSION = 27;
+our $VERSION = 28;
 
 # uncomment this to run the ### lines
 #use Devel::Comments;
@@ -209,8 +209,8 @@ and has roles
 =head1 DESCRIPTION
 
 C<MooseX::Iterator::Locate> reads a "locate" database file in the style of
-L<MooseX::Iterator>.  It's implemented as a front-end to
-L<File::Locate::Iterator>.
+L<MooseX::Iterator>.  It allows C<MooseX::Iterator> features to be applied
+to database entries read by an underlying L<File::Locate::Iterator>.
 
 See F<examples/moosex-iterator.pl> for a complete sample program.
 
@@ -221,7 +221,7 @@ See F<examples/moosex-iterator.pl> for a complete sample program.
 =item C<< $it = MooseX::Iterator::Locate->new (key=>value,...) >>
 
 Create and return a new C<MooseX::Iterator::Locate> object.  Optional
-key/value pairs are passed to C<< File::Locate::Iterator->new >>.
+key/value pairs are passed to C<< File::Locate::Iterator->new() >>.
 
     my $it = MooseX::Iterator::Locate->new
                (suffixes => ['.pm', '.pl']);
@@ -233,7 +233,7 @@ Return the next entry from the database.  The first call is the first entry.
 =item C<< $entry = $it->peek() >>
 
 Return the next entry from the database, but don't advance the iterator
-position.  This is what C<$it-E<gt>next> would return.
+position.  This is what C<$it-E<gt>next()> would return.
 
 (This is not the same as C<peek> in the base MooseX::Iterator version 0.11,
 which gives the second next item.  Believe that's a mistake there, though
@@ -248,7 +248,7 @@ Return true if there's a next entry available.
 Move C<$it> back to the start of the database again.  The next call to
 C<$it-E<gt>next> gives the first entry again.
 
-As discussed in C<File::Locate::Iterator> under C<rewind()>, this reset is
+As discussed in L<File::Locate::Iterator> under C<rewind()>, this reset is
 only possible when the underlying database file or handle is seekable.
 
 =back
@@ -271,8 +271,8 @@ The various parameters accepted by C<new> are attributes.  They're all
                         "default", "if_sensible", "if_possible", "0", "1"
 
 C<database_file> default is
-C<< File::Locate::Iterator->default_database_file() >>, in the form of a
-coderef default since C<default_database_file()> looks at C<%ENV>.
+C<< File::Locate::Iterator->default_database_file() >>, and is in the form
+of a coderef default since C<default_database_file()> looks at C<%ENV>.
 
 =head1 SEE ALSO
 

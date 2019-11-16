@@ -15931,7 +15931,7 @@ sub fa_set {
    $fullpath_files{'code'}=$net_path.$fa_code->[0] if $fa_code->[0];
    $fullpath_files{'code'}||='';
    my $argv=join " ",@ARGV;
-   if ($argv!~/--edi*t* *|-e[a-z]|--admin|-V|-v|--VE*R*S*I*O*N*/) {
+   if (!map {/^--edi*t* *|^-e[a-z]|^--admin|^-V|^-v|^--VE*R*S*I*O*N*/} @ARGV) {
       if ($fa_code->[0]) {
          if ($Term::Menus::canload->($fa_code->[0])) {
             require $fa_code->[0];
@@ -15959,7 +15959,7 @@ sub fa_set {
    $fa_conf->[0]||='';
    $fullpath_files{'conf'}=$net_path.$fa_conf->[0] if $fa_conf->[0];
    $fullpath_files{'conf'}||='';
-   if ($argv!~/--edi*t* *|-e[a-z]|--admin|-V|-v|--VE*R*S*I*O*N*/) {
+   if (!map {/^--edi*t* *|^-e[a-z]|^--admin|^-V|^-v|^--VE*R*S*I*O*N*/} @ARGV) {
       if ($fa_conf->[0]) {
          if ($Term::Menus::canload->($fa_conf->[0])) {
             require $fa_conf->[0];
@@ -15987,7 +15987,7 @@ sub fa_set {
    $fa_host->[0]||='';
    $fullpath_files{'host'}=$net_path.$fa_host->[0] if $fa_host->[0];
    $fullpath_files{'host'}||='';
-   if ($argv!~/--edi*t* *|-e[a-z]|--admin|-V|-v|--VE*R*S*I*O*N*/) {
+   if (!map {/^--edi*t* *|^-e[a-z]|^--admin|^-V|^-v|^--VE*R*S*I*O*N*/} @ARGV) {
       if ($fa_host->[0]) {
          if ($Term::Menus::canload->($fa_host->[0])) {
             require $fa_host->[0];
@@ -16015,7 +16015,7 @@ sub fa_set {
    $fa_menu->[0]||='';
    $fullpath_files{'menu'}=$net_path.$fa_menu->[0] if $fa_menu->[0];
    $fullpath_files{'menu'}||='';
-   if ($argv!~/--edi*t* *|-e[a-z]|--admin|-V|-v|--VE*R*S*I*O*N*/) {
+   if (!map {/^--edi*t* *|^-e[a-z]|^--admin|^-V|^-v|^--VE*R*S*I*O*N*/} @ARGV) {
       if ($fa_menu->[0]) {
          if ($Term::Menus::canload->($fa_menu->[0])) {
             require $fa_menu->[0];
@@ -30729,6 +30729,8 @@ print $Net::FullAuto::FA_Core::LOG "OUPPPPPPPPPPPPTTTTTTT=$oup\n" if $Net::FullA
                                  while (1) {
                                     last if $c++==5;
                                     $o=~s/^(.*?)\n(.*)$/$1$2/s;
+                                    $o=~s#\s*-e's/\^/stdout:\s*/'\s*2>&1
+                                         # -e 's/^/stdout: /' 2>&1#xm;
 print $Net::FullAuto::FA_Core::LOG "ONNNNNTTTT=$o\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
                                     my $op=unpack("a$llc",$o);
 print $Net::FullAuto::FA_Core::LOG "OPPPPPPTTTTP=$op<== and LC=$live_command<==\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';

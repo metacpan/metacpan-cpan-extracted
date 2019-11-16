@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.37';
+our $VERSION = '2.38';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB::Rule;
@@ -97,7 +97,7 @@ sub _parse_zone {
     my $name = shift;
 
     my $expect = $name ? 5 : 6;
-    my @items  = grep { defined && length } split /\s+/, $zone, $expect;
+    my @items = grep { defined && length } split /\s+/, $zone, $expect;
 
     my %obs;
     unless ($name) {
@@ -301,7 +301,7 @@ DateTime::TimeZone::OlsonDB - An object to represent an Olson time zone database
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 SYNOPSIS
 

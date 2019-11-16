@@ -24,5 +24,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/EvanCarroll/unconstant.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

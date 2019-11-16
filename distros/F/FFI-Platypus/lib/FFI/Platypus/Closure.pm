@@ -11,7 +11,7 @@ use overload '&{}' => sub {
 }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Platypus closure object
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 sub new
@@ -66,7 +66,7 @@ sub unstick
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 1;
 
@@ -82,7 +82,7 @@ FFI::Platypus::Closure - Platypus closure object
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ create closure with OO interface
 create closure from Platypus object
 
  use FFI::Platypus;
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  my $closure = $ffi->closure(sub { print "hello world\n" });
 
 use closure

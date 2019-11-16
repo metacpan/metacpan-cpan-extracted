@@ -1,5 +1,10 @@
 Revision history for MooX-Const:
 
+v0.4.0    2019-11-15 17:54:30+00:00 Europe/London
+  [Enhancements]
+  - Added "strict" option to only apply read-only constraints in
+    strict mode.
+
 v0.3.1    2019-04-02 18:47:14+01:00 Europe/London
   [Other]
   - Removed unnecessary prerequisites.

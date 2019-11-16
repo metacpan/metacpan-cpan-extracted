@@ -6,6 +6,7 @@ use utf8;
 use v5.10.1;
 
 use Carp qw( croak );
+use Devel::StrictMode;
 use Moo       ();
 use Moo::Role ();
 use Scalar::Util qw/ blessed /;
@@ -17,7 +18,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.4.0';
 
 
 sub import {
@@ -41,6 +42,8 @@ sub import {
 
 sub _process_has {
     my ( $name, %opts ) = @_;
+
+    my $strict = STRICT || ( $opts{strict} // 1 );
 
     my $is = $opts{is};
 
@@ -76,8 +79,10 @@ sub _process_has {
                     croak "isa cannot be a type of Types::Standard::Object";
                 }
 
-                $opts{isa} = Const[$isa];
-                $opts{coerce} = $opts{isa}->coercion;
+                if ($strict) {
+                    $opts{isa} = Const[$isa];
+                    $opts{coerce} = $opts{isa}->coercion;
+                }
 
                 if ($opts{trigger} && ($is ne 'wo')) {
                     croak "triggers are not applicable to const attributes";
@@ -114,7 +119,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -163,6 +168,19 @@ references:
 This allows you to set the attribute I<once>. The value is coerced
 into a constant, and cannot be changed again.
 
+As of v0.4.0, this now supports the C<strict> setting:
+
+  has thing => (
+    is     => 'const',
+    isa    => ArrayRef[HashRef],
+    strict => 0,
+  );
+
+When this is set to a false value, then the read-only constraint will
+only be applied when running in strict mode, see L<Devel::StrictMode>.
+
+If omitted, C<strict> is assumed to be true.
+
 =head1 KNOWN ISSUES
 
 Accessing non-existent keys for hash references will throw an
@@ -175,6 +193,8 @@ Unfortunately, this behaviour is not replicated with array references.
 =head1 SEE ALSO
 
 L<Const::Fast>
+
+L<Devel::StrictMode>
 
 L<Moo>
 

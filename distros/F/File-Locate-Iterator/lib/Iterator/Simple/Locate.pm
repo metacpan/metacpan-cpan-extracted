@@ -24,7 +24,7 @@ use warnings;
 use File::Locate::Iterator;
 use Iterator::Simple;
 
-our $VERSION = 27;
+our $VERSION = 28;
 
 sub new {
   my $class = shift;
@@ -52,11 +52,12 @@ Iterator::Simple::Locate -- read "locate" database with Iterator::Simple
 =head1 DESCRIPTION
 
 C<Iterator::Simple::Locate> reads a "locate" database file in iterator
-style.  It's implemented as a front-end to C<File::Locate::Iterator>,
-allowing the various C<Iterator::Simple> features to be used to filter or
-crunch entries from the locate database.
+style.  It allows the various L<Iterator::Simple> features to be used to
+filter or crunch entries from the locate database read by an underlying
+L<File::Locate::Iterator>.
 
-See F<examples/iterator-simple.pl> for a simple complete program.
+See F<examples/iterator-simple.pl> for a simple complete program and
+F<examples/mini-locate.pl> for a bigger program.
 
 =head1 FUNCTIONS
 
@@ -65,7 +66,7 @@ See F<examples/iterator-simple.pl> for a simple complete program.
 =item C<< $it = Iterator::Simple::Locate->new (key=>value,...) >>
 
 Create and return a new C<Iterator::Simple> object.  Optional key/value
-pairs as passed to C<< File::Locate::Iterator->new >>.
+pairs as passed to C<< File::Locate::Iterator->new() >>.
 
 =item C<< $entry = $it->() >>
 

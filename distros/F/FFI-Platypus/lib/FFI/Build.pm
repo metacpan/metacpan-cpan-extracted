@@ -12,7 +12,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 sub _native_name
@@ -189,6 +189,19 @@ sub build
 
   foreach my $source ($self->source)
   {
+    if($source->can('build_all'))
+    {
+      my $count = scalar $self->source;
+      if($count == 1)
+      {
+        return $source->build_all($self->file);
+      }
+      else
+      {
+        die "@{[ ref $source ]} has build_all method, but there is not exactly one source";
+      }
+    }
+
     $ld = $source->ld if $source->ld;
     my $output;
     while(my $next = $source->build_item)
@@ -276,7 +289,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -291,7 +304,7 @@ version 0.98
  # $lib is an instance of FFI::Build::File::Library
  my $lib = $build->build;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  # The filename will be platform dependant, but something like libfrooble.so or frooble.dll
  $ffi->lib($lib->path);
  

@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "MooX::Const",
   "PREREQ_PM" => {
+    "Devel::StrictMode" => 0,
     "Moo" => "1.006000",
     "Types::Const" => "0.3.3",
     "Types::Standard" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.3.1",
+  "VERSION" => "v0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Devel::StrictMode" => 0,
   "File::Spec" => 0,
   "Module::Metadata" => 0,
   "Moo" => "1.006000",

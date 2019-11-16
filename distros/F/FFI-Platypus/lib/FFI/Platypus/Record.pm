@@ -10,7 +10,33 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
+
+
+sub record_layout_1
+{
+  if(@_ % 2 == 0)
+  {
+    my $ffi = FFI::Platypus->new( api => 1 );
+    unshift @_, $ffi;
+    goto &record_layout;
+  }
+  elsif(defined $_[0] && ref($_[0]) eq 'ARRAY')
+  {
+    my @args = @{ shift @_ };
+    unshift @args, api => 1;
+    unshift @_, \@args;
+    goto &record_layout;
+  }
+  elsif(defined $_[0] && eval { $_[0]->isa('FFI::Platypus') })
+  {
+    goto &record_layout;
+  }
+  else
+  {
+    croak "odd number of arguments, but first argument is not either an array reference or Platypus instance";
+  }
+}
 
 
 sub record_layout
@@ -159,34 +185,6 @@ sub record_layout
   ();
 }
 
-
-# TODO: maybe we should invert this so that record_layout calls record_layout_1
-
-sub record_layout_1
-{
-  if(@_ % 2 == 0)
-  {
-    my $ffi = FFI::Platypus->new( api => 1 );
-    unshift @_, $ffi;
-    goto &record_layout;
-  }
-  elsif(defined $_[0] && ref($_[0]) eq 'ARRAY')
-  {
-    my @args = @{ shift @_ };
-    unshift @args, api => 1;
-    unshift @_, \@args;
-    goto &record_layout;
-  }
-  elsif(defined $_[0] && eval { $_[0]->isa('FFI::Platypus') })
-  {
-    goto &record_layout;
-  }
-  else
-  {
-    croak "odd number of arguments, but first argument is not either an array reference or Platypus instance";
-  }
-}
-
 1;
 
 __END__
@@ -201,7 +199,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -224,7 +222,7 @@ Perl:
  
  use FFI::Platypus::Record;
  
- record_layout(qw(
+ record_layout_1(qw(
    int       age
    string(3) title
    string_rw name
@@ -234,7 +232,7 @@ Perl:
  
  use FFI::Platypus;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib("myperson.so");
  $ffi->type("record(MyPerson)" => 'MyPerson');
  
@@ -244,7 +242,7 @@ Perl:
    name  => "John Smith",
  );
  
- $ffi->attach( process_person => [ 'MyPerson' ] => 'void' );
+ $ffi->attach( process_person => [ 'MyPerson*' ] => 'void' );
  
  process_person($person);
  
@@ -265,32 +263,32 @@ L<FFI::Platypus>, though it may have other applications.
 
 =head1 FUNCTIONS
 
-=head2 record_layout
+=head2 record_layout_1
 
- record_layout($ffi, $type => $name, ... );
- record_layout(\@ffi_args, $type => $name, ... );
- record_layout($type => $name, ... );
+ record_layout_1($ffi, $type => $name, ... );
+ record_layout_1(\@ffi_args, $type => $name, ... );
+ record_layout_1($type => $name, ... );
 
 Define the layout of the record.  You may optionally provide an instance
 of L<FFI::Platypus> as the first argument in order to use its type
 aliases.  Alternatively you may provide constructor arguments that will
 be passed to the internal platypus instance.  Thus this is the same:
 
- my $ffi = FFI::Platypus->new( lang => 'Rust' );
- record_layout( $ffi, ... );
+ my $ffi = FFI::Platypus->new( lang => 'Rust', api => 1 );
+ record_layout_1( $ffi, ... );
  # same as:
- record_layout( [ lang => 'Rust' ], ... );
+ record_layout_1( [ lang => 'Rust' ], ... );
 
 and this is the same:
 
- my $ffi = FFI::Platypus->new;
- record_layout( $ffi, ... );
+ my $ffi = FFI::Platypus->new( api => 1 );
+ record_layout_1( $ffi, ... );
  # same as:
- record_layout( ... );
+ record_layout_1( ... );
 
 Then you provide members as type/name pairs.
 
-For each member you declare, C<record_layout> will create an accessor
+For each member you declare, C<record_layout_1> will create an accessor
 which can be used to read and write its value. For example imagine a
 class C<Foo>:
 
@@ -298,7 +296,7 @@ class C<Foo>:
  
  use FFI::Platypus::Record;
  
- record_layout(
+ record_layout_1(
    int          => 'bar',  #  int bar;
    'string(10)' => 'baz',  #  char baz[10];
  );
@@ -333,7 +331,7 @@ If there are members of a record that you need to account for in terms
 of size and alignment, but do not want to have an accessor for, you can
 use C<:> as a place holder for its name:
 
- record_layout(
+ record_layout_1(
    'int'        => ':',
    'string(10)' => 'baz',
  );
@@ -352,7 +350,7 @@ C<ro>, means that you can get, but not set its value:
 
  package Foo;
  
- record_layout(
+ record_layout_1(
    'string ro' => 'bar',  # same type as 'string' and 'string_ro'
  );
  
@@ -367,7 +365,7 @@ If you specify a field is C<rw>, then you can set its value:
 
  package Foo;
  
- record_layout(
+ record_layout_1(
    'string rw' => 'bar',  # same type as 'string_rw'
  );
  
@@ -394,7 +392,7 @@ Arrays of integer, floating points and opaque pointers are supported.
 
  package Foo;
  
- record_layout(
+ record_layout_1(
    'int[10]' => 'bar',
  );
  
@@ -406,14 +404,15 @@ Arrays of integer, floating points and opaque pointers are supported.
  $foo->bar(5, -6); # sets the 5th element in the array to -6
  my $item = $foo->bar(5); gets the 5th element in the array
 
-=head2 record_layout_1
+=head2 record_layout
 
- record_layout_1($ffi, $type => $name, ... );
- record_layout_1(\@ffi_args, $type => $name, ... );
- record_layout_1($type => $name, ... );
+ record_layout($ffi, $type => $name, ... );
+ record_layout(\@ffi_args, $type => $name, ... );
+ record_layout($type => $name, ... );
 
 This function works like C<record_layout> except that
-C<api =E<gt> 1> is used instead of the legacy API.
+C<api =E<gt> 0> is used instead of C<api =E<gt> 1>.
+All new code should use C<record_layout_1> instead.
 
 =head1 TODO
 

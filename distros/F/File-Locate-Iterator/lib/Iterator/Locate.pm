@@ -24,7 +24,7 @@ use File::Locate::Iterator;
 use base 'Iterator';
 use vars qw($VERSION);
 
-$VERSION = 27;
+$VERSION = 28;
 
 sub new {
   my $class = shift;
@@ -66,9 +66,8 @@ C<Iterator::Locate> is a subclass of C<Iterator>,
 =head1 DESCRIPTION
 
 An C<Iterator::Locate> object reads a "locate" database file in iterator
-style.  It's a front-end to the C<File::Locate::Iterator> module, allowing
-the various C<Iterator> module features to be used for filtering or
-crunching entries from a locate database.
+style.  It allows the various C<Iterator> module features to be used for
+filtering or crunching entries from an underling L<File::Locate::Iterator>.
 
 See F<examples/iterator-pm.pl> for a simple complete program.
 
@@ -81,7 +80,7 @@ See F<examples/iterator-pm.pl> for a simple complete program.
 =item C<$it = Iterator::Locate-E<gt>new (key=E<gt>value,...)>
 
 Create and return a new C<Iterator::Locate> object.  Optional key/value
-arguments are passed to C<File::Locate::Iterator-E<gt>new>.
+arguments are passed to C<File::Locate::Iterator-E<gt>new()>.
 
 =back
 

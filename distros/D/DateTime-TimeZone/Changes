@@ -1,3 +1,9 @@
+2.38    2019-11-15
+
+- Added support for Etc/GMT and Etc/UTC style zones like "Etc/GMT-2" or
+  "Etc/UTC+12". Implemented by kclaggett. GH #38.
+
+
 2.37    2019-09-11
 
 - This release is based on version 2019c of the Olson database. This release

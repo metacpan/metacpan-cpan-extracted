@@ -1,3 +1,12 @@
+v0.100.0 2019-11-15T23:18:07Z
+ - resources updated
+ - win32_create_no_window arg removed from run proc
+ - run_proc use filehandles improved
+ - src jshint filter fixed
+ - run_proc use filehandles by default
+ - ls output improved
+ - check pid before remove temp files
+
 v0.99.6 2019-11-13T22:47:52Z
  - fix for test unreleased version
 

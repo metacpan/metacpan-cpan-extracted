@@ -4,7 +4,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -12,7 +12,8 @@ Chrome::DevToolsProtocol::Transport::Pipe - choose the best pipe transport backe
 
 =cut
 
-our @loops = (
+our @loops;
+push @loops, (
     ['Mojo/IOLoop.pm'   => 'Chrome::DevToolsProtocol::Transport::Pipe::Mojo' ],
     ['IO/Async.pm'      => 'Chrome::DevToolsProtocol::Transport::Pipe::NetAsync'],
     ['IO/Async/Loop.pm' => 'Chrome::DevToolsProtocol::Transport::Pipe::NetAsync'],
@@ -21,7 +22,7 @@ our @loops = (
     # native POE support would be nice
 );
 our $implementation;
-our $default = 'Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent';
+our $default = 'Chrome::DevToolsProtocol::Transport::Pipe::NetAsync';
 
 =head1 METHODS
 
@@ -61,7 +62,7 @@ sub best_implementation( $class, @candidates ) {
     } @candidates;
 
     if( ! @applicable_implementations ) {
-        @applicable_implementations = map {$_->[1]} @candidates;
+        @applicable_implementations = ($default, map {$_->[1]} @candidates);
     }
 
     # Check which one we can load:

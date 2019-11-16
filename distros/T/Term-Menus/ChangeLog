@@ -1,3 +1,17 @@
+2019-11-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.024
+
+        * Restored line deleted in 3.023.
+
+
+2019-11-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.023
+
+        * Using map for command line args handling.
+
+
 2019-11-05  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
 
         * Version 3.022

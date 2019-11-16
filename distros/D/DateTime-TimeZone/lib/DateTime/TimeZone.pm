@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.37';
+our $VERSION = '2.38';
 
 # Note that while we make use of DateTime::Duration in this module if we
 # actually try to load it here all hell breaks loose with circular
@@ -76,6 +76,15 @@ my %SpecialName = map { $_ => 1 }
             }
 
             return DateTime::TimeZone::OffsetOnly->new( offset => $p{name} );
+        }
+
+        if ( $p{name} =~ m{Etc/(?:GMT|UTC)(\+|-)(\d{1,2})}i ) {
+            my $sign  = $1;
+            my $hours = $2;
+            die "The timezone '$p{name}' is an invalid name.\n"
+                unless $hours <= 14;
+            return DateTime::TimeZone::OffsetOnly->new(
+                offset => "${sign}${hours}:00" );
         }
 
         my $subclass = $p{name};
@@ -508,7 +517,7 @@ sub offset_as_seconds {
 
     my $total = $hours * 3600 + $minutes * 60;
     $total += $seconds if $seconds;
-    $total *= -1 if $sign eq '-';
+    $total *= -1       if $sign eq '-';
 
     return $total;
 }
@@ -605,7 +614,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 SYNOPSIS
 
@@ -918,7 +927,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Molchanov Alfie John Andrew Paprocki Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura Mohammad S Anwar Olaf Alders Peter Rabbitson Tom Wyant
+=for stopwords Alexey Molchanov Alfie John Andrew Paprocki Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura kclaggett Mohammad S Anwar Olaf Alders Peter Rabbitson Tom Wyant
 
 =over 4
 
@@ -969,6 +978,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 karupanerura <karupa@cpan.org>
+
+=item *
+
+kclaggett <kclaggett@proofpoint.com>
 
 =item *
 

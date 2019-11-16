@@ -118,7 +118,8 @@ Here are a few “pointers” (heh) to bear in mind:
 process’s global destruction, a warning is triggered.
 - If your application needs recursive promises (e.g., to poll
 iteratively for completion of a task), the `current_sub` feature (i.e.,
-`__SUB__`) may help you avoid memory leaks.
+`__SUB__`) may help you avoid memory leaks. (See this module’s source code
+for a substitute that works with pre-5.16 perls.)
 - Garbage collection before Perl 5.18 seems to have been buggy.
 If you work with such versions and end up chasing leaks,
 try manually deleting as many references/closures as possible. See

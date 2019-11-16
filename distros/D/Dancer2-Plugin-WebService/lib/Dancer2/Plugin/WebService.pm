@@ -5,7 +5,7 @@
 # Joan Ntzougani, gravitalsun@hotmail.com
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.2.5';
+our	$VERSION = '4.2.6';
 use	strict;
 use	warnings;
 use	Dancer2::Plugin;
@@ -130,6 +130,7 @@ print "\nApplication              : $app->{name}\n";
 print "Application version      : ",(exists $app->{config}->{version} ? $app->{config}->{version} : '1.0.0')."\n";
 print "WebService  version      : $Dancer2::Plugin::WebService::VERSION\n";
 print "Dancer2     version      : $Dancer2::VERSION\n";
+print "Perl        version      : $^V\n";
 print 'Run as user              : ', (getpwuid($>))[0]    ,"\n";
 print 'Start time               : ', scalar localtime $^T ,"\n";
 print "Module auth dir scripts  : $module_dir\n";
@@ -759,7 +760,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.2.5
+version 4.2.6
 
 =head1 SYNOPSIS
 

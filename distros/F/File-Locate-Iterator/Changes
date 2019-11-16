@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with File-Locate-Iterator.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 28, November 2019
+    - use pregexec rather than CALLREGEXEC
+
 Version 27, November 2019
     - use XS for Perl <= 5.8 too, helped now by ppport.h
 

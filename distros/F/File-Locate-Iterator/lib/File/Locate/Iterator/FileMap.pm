@@ -25,7 +25,7 @@ use Carp;
 # uncomment this to run the ### lines
 #use Devel::Comments;
 
-our $VERSION = 27;
+our $VERSION = 28;
 
 our %cache;
 
@@ -165,9 +165,9 @@ File::Locate::Iterator::FileMap -- shared mmaps for File::Locate::Iterator
 
 =head1 DESCRIPTION
 
-This is an internal part of C<File::Locate::Iterator>.  A FileMap object
-holds a file mmapped by C<File::Map> and will re-use it rather than mapping
-the same file a second time.
+This is an internal part of C<File::Locate::Iterator> not intended for other
+use.  A FileMap object holds a file mmapped by C<File::Map> and will re-use
+it rather than mapping the same file a second time.
 
 This module shouldn't exist, since C<File::Map> is in a much better position
 to share read-only mmaps, and can do so across threads too.  Almost every

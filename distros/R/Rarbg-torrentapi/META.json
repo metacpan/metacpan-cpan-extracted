@@ -65,9 +65,10 @@
          "web" : "https://github.com/pacoesteban/Rarbg-torrentapi"
       }
    },
-   "version" : "v0.1.9",
+   "version" : "v0.1.10",
    "x_contributors" : [
-      "Baptiste C <baptistecdr@users.noreply.github.com>"
+      "Baptiste C <baptistecdr@users.noreply.github.com>",
+      "Hoffy Can <hoffy@hoffyland.com>"
    ],
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",

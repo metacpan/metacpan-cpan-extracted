@@ -1,3 +1,6 @@
+v0.8.1 2019-11-15T23:12:18Z
+ - win32_create_no_window arg removed from run proc
+
 v0.8.0 2019-11-06T20:29:52Z
  - fix for convert cookies
  - converted to git

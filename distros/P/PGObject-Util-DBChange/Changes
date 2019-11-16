@@ -1,5 +1,10 @@
 Revision history for PGObject-Util-DBChange
 
+0.050.4 2019-11-15
+        Fix missing Makefile.PL
+
+0.050.3 2019-09-19
+        Fix Kwalitee issues
 
 0.050.2 2017-01-09
         Change minimum Perl version dependency (5.10) in Makefile.PL

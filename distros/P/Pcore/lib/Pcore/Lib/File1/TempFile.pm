@@ -4,12 +4,15 @@ use Pcore -class;
 
 extends qw[Pcore::Lib::Path];
 
+has temp => ( init_arg => undef );
+has pid  => ( init_arg => undef );
+
 our @DEFERRED_UNLINK;
 
 END { unlink @DEFERRED_UNLINK if @DEFERRED_UNLINK }    ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
 sub DESTROY ($self) {
-    return if !defined $self->{temp};
+    return if !defined $self->{temp} || !defined $self->{pid} || $self->{pid} != $$;
 
     unlink $self->{temp};                              ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
@@ -23,6 +26,8 @@ around new => sub ( $orig, $self, $path, %args ) {
         $self = $self->SUPER::new( $path, %args )->to_abs;
 
         $self->{temp} = $self->encoded;
+
+        $self->{pid} = $$;
     }
     else {
         $self = $self->SUPER::new( $path, %args );
@@ -35,6 +40,7 @@ sub clone ($self) {
     my $clone = Clone::clone($self);
 
     delete $clone->{temp};
+    delete $clone->{pid};
 
     return $clone;
 }

@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2019-11-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000479 released
+
+        * Using map to handle command line args.
+
+	* Better regex for --arg handling.
+
+
 2019-11-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000478 released

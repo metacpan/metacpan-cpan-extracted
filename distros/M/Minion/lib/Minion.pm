@@ -22,7 +22,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '9.13';
+our $VERSION = '10.0';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -97,7 +97,8 @@ sub perform_jobs {
 }
 
 sub repair { shift->_delegate('repair') }
-sub reset  { shift->_delegate('reset') }
+
+sub reset { shift->_delegate('reset', @_) }
 
 sub result_p {
   my ($self, $id, $options) = (shift, shift, shift // {});
@@ -136,8 +137,8 @@ sub _datetime {
 }
 
 sub _delegate {
-  my ($self, $method) = @_;
-  $self->backend->$method;
+  my ($self, $method) = (shift, shift);
+  $self->backend->$method(@_);
   return $self;
 }
 
@@ -363,8 +364,7 @@ Emitted in the worker process after it has been created.
 
   $minion->on(worker => sub {
     my ($minion, $worker) = @_;
-    my $id = $worker->id;
-    say "Worker $$:$id started.";
+    say "Worker $$ started.";
   });
 
 =head1 ATTRIBUTES
@@ -556,8 +556,7 @@ failed.
 
   my $history = $minion->history;
 
-Get history information for job queue. Note that this method is EXPERIMENTAL and
-might change without warning!
+Get history information for job queue.
 
 These fields are currently available:
 
@@ -681,9 +680,27 @@ Repair worker registry and job queue if necessary.
 
 =head2 reset
 
-  $minion = $minion->reset;
+  $minion = $minion->reset({all => 1});
 
 Reset job queue.
+
+These options are currently available:
+
+=over 2
+
+=item all
+
+  all => 1
+
+Reset everything.
+
+=item locks
+
+  locks => 1
+
+Reset only locks.
+
+=back
 
 =head2 result_p
 
@@ -693,8 +710,7 @@ Reset job queue.
 Return a L<Mojo::Promise> object for the result of a job. The state C<finished>
 will result in the promise being C<fullfilled>, and the state C<failed> in the
 promise being C<rejected>. This operation can be cancelled by resolving the
-promise manually at any time. Note that this method is EXPERIMENTAL and might
-change without warning!
+promise manually at any time.
 
   # Enqueue job and receive the result at some point in the future
   my $id = $minion->enqueue('foo');
@@ -756,8 +772,7 @@ Number of workers that are currently processing a job.
   delayed_jobs => 100
 
 Number of jobs in C<inactive> state that are scheduled to run at specific time
-in the future or have unresolved dependencies. Note that this field is
-EXPERIMENTAL and might change without warning!
+in the future or have unresolved dependencies.
 
 =item enqueued_jobs
 

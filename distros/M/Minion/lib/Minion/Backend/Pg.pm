@@ -218,8 +218,13 @@ sub repair {
 }
 
 sub reset {
-  shift->pg->db->query(
-    'truncate minion_jobs, minion_locks, minion_workers restart identity');
+  my ($self, $options) = (shift, shift // {});
+
+  if ($options->{all}) {
+    $self->pg->db->query(
+      'truncate minion_jobs, minion_locks, minion_workers restart identity');
+  }
+  elsif ($options->{locks}) { $self->pg->db->query('truncate minion_locks') }
 }
 
 sub retry_job {
@@ -500,8 +505,7 @@ Transition from C<active> to C<finished> state with or without a result.
 
   my $history = $backend->history;
 
-Get history information for job queue. Note that this method is EXPERIMENTAL and
-might change without warning!
+Get history information for job queue.
 
 These fields are currently available:
 
@@ -885,9 +889,27 @@ Repair worker registry and job queue if necessary.
 
 =head2 reset
 
-  $backend->reset;
+  $backend->reset({all => 1});
 
 Reset job queue.
+
+These options are currently available:
+
+=over 2
+
+=item all
+
+  all => 1
+
+Reset everything.
+
+=item locks
+
+  locks => 1
+
+Reset only locks.
+
+=back
 
 =head2 retry_job
 
@@ -966,15 +988,13 @@ Number of workers that are currently processing a job.
   delayed_jobs => 100
 
 Number of jobs in C<inactive> state that are scheduled to run at specific time
-in the future. Note that this field is EXPERIMENTAL and might change without
-warning!
+in the future.
 
 =item enqueued_jobs
 
   enqueued_jobs => 100000
 
-Rough estimate of how many jobs have ever been enqueued. Note that this field is
-EXPERIMENTAL and might change without warning!
+Rough estimate of how many jobs have ever been enqueued.
 
 =item failed_jobs
 

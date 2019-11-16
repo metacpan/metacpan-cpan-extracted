@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.8.0;
+package Pcore::Chrome v0.8.1;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
@@ -88,7 +88,7 @@ around new => sub ( $orig, $self, %args ) {
         !$MSWIN ? '2>/dev/null' : (),
     ];
 
-    $self->{_proc} = P->sys->run_proc( join( $SPACE, $cmd->@* ), win32_create_no_window => 1 );
+    $self->{_proc} = P->sys->run_proc( join( $SPACE, $cmd->@* ) );
 
     my $time = time + ( $args{timeout} // $CONNECT_TIMEOUT );
 
@@ -141,6 +141,8 @@ sub new_tab ( $self, $url = undef ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    2 | 79                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 91                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

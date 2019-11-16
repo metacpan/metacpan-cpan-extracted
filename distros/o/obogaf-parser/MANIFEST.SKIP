@@ -2,12 +2,14 @@
 ^blib\/
 ^script\/
 ^cover_db\/
+^dev\/
+^badge\/
 ^.git\/
 ^MYMETA.*
 ^Makefile$
 .bak$
 .md$
+.sh$
 .tar.gz$
 .gitignore$
-.travis.yml$
 _blib$

@@ -8,9 +8,10 @@ README
 t/00_obogaf-parser_checker.pl
 t/01_build_edges.t
 t/02_build_subonto.t
-t/03_make_stat.t
+t/03_get_parents_or_children_list.t
 t/04_gene2biofun.t
-t/05_map_OBOterm_between_release.t
+t/05_make_stat.t
+t/06_map_OBOterm_between_release.t
 t/data/test_goa_chicken.gaf
 t/data/test_goa_chicken.gaf.gz
 t/data/test_goa_chicken_128.gaf

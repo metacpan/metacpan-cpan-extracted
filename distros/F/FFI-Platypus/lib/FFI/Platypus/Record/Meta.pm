@@ -4,14 +4,13 @@ use strict;
 use warnings;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 {
   require FFI::Platypus;
   my $ffi = FFI::Platypus->new(
     api          => 1,
-    experimental => 1,  # okay if used internally
   );
   $ffi->bundle;
   $ffi->mangler(sub {
@@ -83,7 +82,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 DESCRIPTION
 

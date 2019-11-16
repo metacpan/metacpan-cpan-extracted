@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.98'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -49,16 +49,33 @@ sub new
     }
   }
 
-  my $api = $args{api} || 0;
+  my $api          = $args{api} || 0;
+  my $experimental = $args{experimental} || 0;
 
-  if(defined $api && $api > 0 && ($args{experimental}||0) != $api)
+  if($experimental == 1)
+  {
+    Carp::croak("Please do not use the experimental version of api = 1, instead require FFI::Platypus 1.00 or better");
+  }
+
+  if(defined $api && $api > 1 && $experimental != $api)
   {
     Carp::cluck("Enabling development API version $api prior to FFI::Platypus $api.00");
   }
 
-  my $tp = $api < 1
-    ? 'Version0'
-    : 'Version1';
+  my $tp;
+
+  if($api == 0)
+  {
+    $tp = 'Version0';
+  }
+  elsif($api == 1)
+  {
+    $tp = 'Version1';
+  }
+  else
+  {
+    Carp::croak("API version $api not (yet) implemented");
+  }
 
   require "FFI/Platypus/TypeParser/$tp.pm";
   $tp = "FFI::Platypus::TypeParser::$tp";
@@ -434,19 +451,19 @@ sub find_symbol
 }
 
 
-sub package
-{
-  croak "package method only available with api => 0" if $_[0]->{api} > 0;
-  require FFI::Platypus::Legacy;
-  goto &_package;
-}
-
-
 sub bundle
 {
   croak "bundle method only available with api => 1 or better" if $_[0]->{api} < 1;
   require FFI::Platypus::Bundle;
   goto &_bundle;
+}
+
+
+sub package
+{
+  croak "package method only available with api => 0" if $_[0]->{api} > 0;
+  require FFI::Platypus::Legacy;
+  goto &_package;
 }
 
 
@@ -508,13 +525,14 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.98
+version 1.00
 
 =head1 SYNOPSIS
 
  use FFI::Platypus;
  
- my $ffi = FFI::Platypus->new;
+ # for all new code you should use api => 1
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef); # search libc
  
  # call dynamically
@@ -603,13 +621,24 @@ L<EXAMPLES|/EXAMPLES> to get a taste of what you can do with Platypus.
 Platypus has extensive documentation of types at L<FFI::Platypus::Type>
 and its custom types API at L<FFI::Platypus::API>.
 
+You are B<strongly> encouraged to use API level 1 for all new code.
+There are a number of improvements and design fixes that you get
+for free.  You should even consider updating existing modules to
+use API level 1 where feasible.  How do I do that you might ask?
+Simply pass in the API level to the platypus constructor.
+
+ my $ffi = FFI::Platypus->new( api => 1 );
+
+The Platypus documentation has already been updated to assume API
+level 1.
+
 =for stopwords ØMQ
 
 =head1 CONSTRUCTORS
 
 =head2 new
 
- my $ffi = FFI::Platypus->new(%options);
+ my $ffi = FFI::Platypus->new( api => 1, %options);
 
 Create a new instance of L<FFI::Platypus>.
 
@@ -640,6 +669,9 @@ on the differences.
 Enable the next generation type parser which allows pass-by-value records
 and type decoration on basic types.  Using API level 1 prior to Platypus
 version 1.00 will trigger a (noisy) warning.
+
+All new code should be written with C<api => 1>!  The Platypus documentation
+assumes this api level is set.
 
 =back
 
@@ -749,9 +781,9 @@ definitions.
 
 Examples:
 
- $ffi->type('sint32'); # oly checks to see that sint32 is a valid type
+ $ffi->type('sint32');            # oly checks to see that sint32 is a valid type
  $ffi->type('sint32' => 'myint'); # creates an alias myint for sint32
- $ffi->type('bogus'); # dies with appropriate diagnostic
+ $ffi->type('bogus');             # dies with appropriate diagnostic
 
 =head2 custom_type
 
@@ -1040,18 +1072,6 @@ prerequisites appropriately.
 
 Return the address of the given symbol (usually function).
 
-=head2 package
-
-[version 0.15 api = 0]
-
- $ffi->package($package, $file); # usually __PACKAGE__ and __FILE__ can be used
- $ffi->package;                  # autodetect
-
-If you use L<FFI::Build> (or the older deprecated L<Module::Build::FFI>
-to bundle C code with your distribution, you can use this method to tell
-the L<FFI::Platypus> instance to look for symbols that came with the
-dynamic library that was built when your distribution was installed.
-
 =head2 bundle
 
 [version 0.96 api = 1+]
@@ -1061,9 +1081,24 @@ dynamic library that was built when your distribution was installed.
  $ffi->bundle($package);
  $ffi->bundle;
 
-This is a new experimental interface for bundling compiled code with your
+This is an interface for bundling compiled code with your
 distribution intended to eventually replace the C<package> method documented
 above.  See L<FFI::Platypus::Bundle> for details on how this works.
+
+=head2 package
+
+[version 0.15 api = 0]
+
+ $ffi->package($package, $file); # usually __PACKAGE__ and __FILE__ can be used
+ $ffi->package;                  # autodetect
+
+B<Note>: This method is officially discouraged in favor of C<bundle>
+described above.
+
+If you use L<FFI::Build> (or the older deprecated L<Module::Build::FFI>
+to bundle C code with your distribution, you can use this method to tell
+the L<FFI::Platypus> instance to look for symbols that came with the
+dynamic library that was built when your distribution was installed.
 
 =head2 abis
 
@@ -1096,7 +1131,7 @@ that are related to types.
 
  use FFI::Platypus;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
  
  $ffi->attach(puts => ['string'] => 'int');
@@ -1120,7 +1155,7 @@ includes the standard c library.
  # in the old version, and am not really familiar with the libnotify API to
  # say what is the cause.  Patches welcome to fix it.
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(find_lib_or_exit lib => 'notify');
  
  $ffi->attach(notify_init   => ['string'] => 'void');
@@ -1173,7 +1208,7 @@ We are really calling the C function C<notify_notification_new>.
  use FFI::Platypus;
  use FFI::Platypus::Memory qw( malloc free memcpy );
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  my $buffer = malloc 12;
  
  memcpy $buffer, $ffi->cast('string' => 'opaque', "hello there"), length "hello there\0";
@@ -1207,10 +1242,10 @@ L<FFI::Platypus::Memory> module.
      string tm_zone
  ));
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
  # define a record class My::UnixTime and alias it to "tm"
- $ffi->type("record(My::UnixTime)" => 'tm');
+ $ffi->type("record(My::UnixTime)*" => 'tm');
  
  # attach the C localtime function as a constructor
  $ffi->attach( localtime => ['time_t*'] => 'tm', sub {
@@ -1239,16 +1274,21 @@ specific layout.  For more details see L<FFI::Platypus::Record>.
 (L<FFI::Platypus::Type> includes some other ways of manipulating
 structured data records).
 
+The C C<localtime> function takes a pointer to a record, hence we suffix
+the type with a star: C<record(My::UnixTime)*>.  If the function takes
+a record in pass-by-value mode then we'd just say C<record(My::UnixTime)>
+with no star suffix.
+
 =head2 libuuid
 
  use FFI::CheckLib;
  use FFI::Platypus;
  use FFI::Platypus::Memory qw( malloc free );
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(find_lib_or_exit lib => 'uuid');
- $ffi->type('string(37)' => 'uuid_string');
- $ffi->type('record(16)' => 'uuid_t');
+ $ffi->type('string(37)*' => 'uuid_string');
+ $ffi->type('record(16)*' => 'uuid_t');
  
  $ffi->attach(uuid_generate => ['uuid_t'] => 'void');
  $ffi->attach(uuid_unparse  => ['uuid_t','uuid_string'] => 'void');
@@ -1275,7 +1315,7 @@ this case it is simply 16 bytes).  We also know that the strings
 
  use FFI::Platypus;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
  
  $ffi->attach(puts => ['string'] => 'int');
@@ -1291,7 +1331,7 @@ C<getpid> is available on Unix type platforms.
  use FFI::Platypus;
  use FFI::CheckLib;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
  $ffi->attach(puts => ['string'] => 'int');
  $ffi->attach(fdim => ['double','double'] => 'double');
@@ -1344,7 +1384,7 @@ handled seamlessly by Platypus.
  use FFI::TinyCC;
  use FFI::Platypus;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  my $tcc = FFI::TinyCC->new;
  
  $tcc->compile_string(q{
@@ -1384,7 +1424,7 @@ just-in-time (JIT) compilation service for FFI.
  use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
  
  my $endpoint = "ipc://zmq-ffi-$$";
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  
  $ffi->lib(undef); # for puts
  $ffi->attach(puts => ['string'] => 'int');
@@ -1469,82 +1509,71 @@ implemented using FFI called L<ZMQ::FFI>.
 =head2 libarchive
 
  use FFI::Platypus      ();
- use FFI::Platypus::API ();
- use FFI::CheckLib      ();
+ use FFI::CheckLib      qw( find_lib_or_exit );
  
  # This example uses FreeBSD's libarchive to list the contents of any
  # archive format that it suppors.  We've also filled out a part of
  # the ArchiveWrite class that could be used for writing archive formats
  # supported by libarchive
  
- my $ffi = My::Platypus->new;
- $ffi->lib(FFI::CheckLib::find_lib_or_exit lib => 'archive');
- 
- $ffi->custom_type(archive => {
-   native_type    => 'opaque',
-   perl_to_native => sub { ${$_[0]} },
-   native_to_perl => sub {
-     # this works because archive_read_new ignores any arguments
-     # and we pass in the class name which we can get here.
-     my $class = FFI::Platypus::API::arguments_get_string(0);
-     bless \$_[0], $class;
-   },
- });
- 
- $ffi->custom_type(archive_entry => {
-   native_type => 'opaque',
-   perl_to_native => sub { ${$_[0]} },
-   native_to_perl => sub {
-     # works likewise for archive_entry objects
-     my $class = FFI::Platypus::API::arguments_get_string(0);
-     bless \$_[0], $class,
-   },
- });
- 
- package My::Platypus;
- 
- use base qw( FFI::Platypus );
- 
- sub find_symbol
- {
-   my($self, $name) = @_;
-   my $prefix = lcfirst caller(2);
-   $prefix =~ s{([A-Z])}{"_" . lc $1}eg;
-   $self->SUPER::find_symbol(join '_', $prefix, $name);
- }
+ my $ffi = FFI::Platypus->new( api => 1 );
+ $ffi->lib(find_lib_or_exit lib => 'archive');
+ $ffi->type('object(Archive)'      => 'archive_t');
+ $ffi->type('object(ArchiveRead)'  => 'archive_read_t');
+ $ffi->type('object(ArchiveWrite)' => 'archive_write_t');
+ $ffi->type('object(ArchiveEntry)' => 'archive_entry_t');
  
  package Archive;
  
  # base class is "abstract" having no constructor or destructor
  
- $ffi->attach( error_string => ['archive'] => 'string' );
+ $ffi->mangler(sub {
+   my($name) = @_;
+   "archive_$name";
+ });
+ $ffi->attach( error_string => ['archive_t'] => 'string' );
  
  package ArchiveRead;
  
  our @ISA = qw( Archive );
  
- $ffi->attach( new                   => ['string']                    => 'archive' );
- $ffi->attach( [ free => 'DESTROY' ] => ['archive']                   => 'void' );
- $ffi->attach( support_filter_all    => ['archive']                   => 'int' );
- $ffi->attach( support_format_all    => ['archive']                   => 'int' );
- $ffi->attach( open_filename         => ['archive','string','size_t'] => 'int' );
- $ffi->attach( next_header2          => ['archive', 'archive_entry' ] => 'int' );
- $ffi->attach( data_skip             => ['archive']                   => 'int' );
+ $ffi->mangler(sub {
+   my($name) = @_;
+   "archive_read_$name";
+ });
+ 
+ $ffi->attach( new                   => ['string']                        => 'archive_read_t' );
+ $ffi->attach( [ free => 'DESTROY' ] => ['archive_t']                     => 'void' );
+ $ffi->attach( support_filter_all    => ['archive_t']                     => 'int' );
+ $ffi->attach( support_format_all    => ['archive_t']                     => 'int' );
+ $ffi->attach( open_filename         => ['archive_t','string','size_t']   => 'int' );
+ $ffi->attach( next_header2          => ['archive_t', 'archive_entry_t' ] => 'int' );
+ $ffi->attach( data_skip             => ['archive_t']                     => 'int' );
  # ... define additional read methods
  
  package ArchiveWrite;
  
  our @ISA = qw( Archive );
  
- $ffi->attach( new                   => ['string'] => 'archive' );
- $ffi->attach( [ free => 'DESTROY' ] => ['archive'] => 'void' );
+ $ffi->mangler(sub {
+   my($name) = @_;
+   "archive_write_$name";
+ });
+ 
+ $ffi->attach( new                   => ['string'] => 'archive_write_t' );
+ $ffi->attach( [ free => 'DESTROY' ] => ['archive_write_t'] => 'void' );
  # ... define additional write methods
  
  package ArchiveEntry;
  
- $ffi->attach( new => ['string']     => 'archive_entry' );
- $ffi->attach( [ free => 'DESTROY' ] => ['archive_entry'] => 'void' );
- $ffi->attach( pathname              => ['archive_entry'] => 'string' );
+ $ffi->mangler(sub {
+   my($name) = @_;
+   "archive_entry_$name";
+ });
+ 
+ $ffi->attach( new => ['string']     => 'archive_entry_t' );
+ $ffi->attach( [ free => 'DESTROY' ] => ['archive_entry_t'] => 'void' );
+ $ffi->attach( pathname              => ['archive_entry_t'] => 'string' );
  # ... define additional entry methods
  
  package main;
@@ -1585,26 +1614,72 @@ object oriented interface via opaque pointers.  This example creates an
 abstract class C<Archive>, and concrete classes C<ArchiveWrite>,
 C<ArchiveRead> and C<ArchiveEntry>.  The concrete classes can even be
 inherited from and extended just like any Perl classes because of the
-way the custom types are implemented.  For more details on custom types
-see L<FFI::Platypus::Type> and L<FFI::Platypus::API>.
+way the custom types are implemented.  We use Platypus's C<object>
+type for this implementation, which is a wrapper around an C<opaque>
+(can also be an integer) type that is blessed into a particular class.
 
-Another advanced feature of this example is that we extend the
-L<FFI::Platypus> class to define our own find_symbol method that
-prefixes the symbol names depending on the class in which they are
-defined. This means we can do this when we define a method for Archive:
+Another advanced feature of this example is that we define a mangler
+to modify the symbol resolution for each class.  This means we can do
+this when we define a method for Archive:
 
- $ffi->attach( support_filter_all => ['archive'] => 'int' );
+ $ffi->attach( support_filter_all => ['archive_t'] => 'int' );
 
 Rather than this:
 
  $ffi->attach(
    [ archive_read_support_filter_all => 'support_read_filter_all' ] =>
-   ['archive'] => 'int' );
+   ['archive_t'] => 'int' );
  );
 
-If you didn't want to create an entire new class just for this little
-trick you could also use something like L<Object::Method> to extend
-C<find_symbol>.
+=head2 unix open
+
+ use FFI::Platypus;
+ 
+ {
+   package FD;
+ 
+   use constant O_RDONLY => 0;
+   use constant O_WRONLY => 1;
+   use constant O_RDWR   => 2;
+ 
+   use constant IN  => bless \do { my $in=0  }, __PACKAGE__;
+   use constant OUT => bless \do { my $out=1 }, __PACKAGE__;
+   use constant ERR => bless \do { my $err=2 }, __PACKAGE__;
+ 
+   my $ffi = FFI::Platypus->new( api => 1, lib => [undef]);
+ 
+   $ffi->type('object(FD,int)' => 'fd');
+ 
+   $ffi->attach( [ 'open' => 'new' ] => [ 'string', 'int', 'mode_t' ] => 'fd' => sub {
+     my($xsub, $class, $fn, @rest) = @_;
+     my $fd = $xsub->($fn, @rest);
+     die "error opening $fn $!" if $$fd == -1;
+     $fd;
+   });
+ 
+   $ffi->attach( write => ['fd', 'string', 'size_t' ] => 'ssize_t' );
+   $ffi->attach( read  => ['fd', 'string', 'size_t' ] => 'ssize_t' );
+   $ffi->attach( close => ['fd'] => 'int' );
+ }
+ 
+ my $fd = FD->new("$0", FD::O_RDONLY);
+ 
+ my $buffer = "\0" x 10;
+ 
+ while(my $br = $fd->read($buffer, 10))
+ {
+   FD::OUT->write($buffer, $br);
+ }
+ 
+ $fd->close;
+
+B<Discussion>: The Unix file system calls use an integer handle for
+each open file.  We can use the same C<object> type that we used
+for libarchive above, except we let platypus know that the underlying
+type is C<int> instead of C<opaque> (the latter being the default for
+the C<object> type).  Mainly just for demonstration since Perl has much
+better IO libraries, but now we have an OO interface to the Unix IO
+functions.
 
 =head2 bzip2
 
@@ -1613,7 +1688,7 @@ C<find_symbol>.
  use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
  use FFI::Platypus::Memory qw( malloc free );
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(find_lib_or_die lib => 'bz2');
  
  $ffi->attach(
@@ -1688,6 +1763,86 @@ will come in after that.  This allows you to modify / convert the
 arguments to conform to the C API.  What ever value you return from the
 wrapper function will be returned back to the original caller.
 
+=head2 bundle your own code
+
+C<ffi/foo.c>:
+
+ #include <ffi_platypus_bundle.h>
+ #include <string.h>
+ 
+ typedef struct {
+   char *name;
+   int value;
+ } foo_t;
+ 
+ foo_t*
+ foo__new(const char *class_name, const char *name, int value)
+ {
+   (void)class_name;
+   foo_t *self = malloc( sizeof( foo_t ) );
+   self->name = strdup(name);
+   self->value = value;
+   return self;
+ }
+ 
+ const char *
+ foo__name(foo_t *self)
+ {
+   return self->name;
+ }
+ 
+ int
+ foo__value(foo_t *self)
+ {
+   return self->value;
+ }
+ 
+ void
+ foo__DESTROY(foo_t *self)
+ {
+   free(self->name);
+   free(self);
+ }
+
+C<lib/Foo.pm>:
+
+ package Foo;
+ 
+ use strict;
+ use warnings;
+ use FFI::Platypus;
+ 
+ {
+   my $ffi = FFI::Platypus->new( api => 1 );
+ 
+   $ffi->type('object(Foo)' => 'foo_t');
+   $ffi->mangler(sub {
+     my $name = shift;
+     $name =~ s/^/foo__/;
+     $name;
+   });
+ 
+   $ffi->bundle;
+ 
+   $ffi->attach( new =>     [ 'string', 'string', 'int' ] => 'foo_t'  );
+   $ffi->attach( name =>    [ 'foo_t' ]                   => 'string' );
+   $ffi->attach( value =>   [ 'foo_t' ]                   => 'int'    );
+   $ffi->attach( DESTROY => [ 'foo_t' ]                   => 'void'   );
+ }
+ 
+ 1;
+
+You can bundle your own C (or other compiled language) code with your
+Perl extension.  Sometimes this is helpful for smoothing over the
+interface of a C library which is not very FFI friendly.  Sometimes
+you may want to write some code in C for a tight loop.  Either way,
+you can do this with the Platypus bundle interface.  See
+L<FFI::Platypus::Bundle> for more details.
+
+Also related is the bundle constant interface, which allows you to
+define Perl constants in C space.  See L<FFI::Platypus::Constant>
+for details.
+
 =head1 FAQ
 
 =head2 How do I get constants defined as macros in C header files
@@ -1713,6 +1868,52 @@ If there are a lot of these types of constants you might want to consider using
 a tool (L<Convert::Binary::C> can do this) that can extract the constants for you.
 
 See also the "Integer constants" example in L<FFI::Platypus::Type>.
+
+You can also use the new Platypus bundle interface to define Perl constants
+from C space.  This is more reliable, but does require a compiler.  It is
+recommended mainly for writing bindings against libraries that have constants
+that can vary widely from platform to platform.  See L<FFI::Platypus::Constant>
+for details.
+
+=head2 What about enums?
+
+The C enum types are integers.  The underlying type is up to the platform, so
+Platypus provides C<enum> and C<senum> types for unsigned and singed enums
+respectively.  At least some compilers treat signed and unsigned enums as
+different types.  The enum I<values> are essentially the same as macro constants
+described above from an FFI perspective.  Thus the process of defining enum values
+is identical to the process of defining macro constants in Perl.
+
+For more details on enumerated types see L<FFI::Platypus::Type/"Enum types">.
+
+=head2 Memory leaks
+
+There are a couple places where memory is allocated, but never deallocated that may
+look like memory leaks by tools designed to find memory leaks like valgrind.  This
+memory is intended to be used for the lifetime of the perl process so there normally
+this isn't a problem unless you are embedding a Perl interpreter which doesn't closely
+match the lifetime of your overall application.
+
+Specifically:
+
+=over 4
+
+=item type cache
+
+some types are cached and not freed.  These are needed as long as there are FFI
+functions that could be called.
+
+=item attached functions
+
+Attaching a function as an xsub will definitely allocate memory that won't be freed
+because the xsub could be called at any time, including in C<END> blocks.
+
+=back
+
+The Platypus team plans on adding a hook to free some of this "leaked" memory
+for use cases where Perl and Platypus are embedded in a larger application
+where the lifetime of the Perl process is significantly smaller than the
+overall lifetime of the whole process.
 
 =head2 I get seg faults on some platforms but not others with a library using pthreads.
 
@@ -1959,10 +2160,6 @@ Memory functions for FFI.
 =item L<FFI::CheckLib>
 
 Find dynamic libraries in a portable way.
-
-=item L<Module::Build::FFI>
-
-Bundle C code with your FFI extension.
 
 =item L<FFI::TinyCC>
 

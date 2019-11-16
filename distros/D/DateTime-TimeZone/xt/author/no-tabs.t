@@ -401,6 +401,7 @@ my @files = (
     't/20local-subclass.t',
     't/21stack-corruption.t',
     't/22taint-mode.t',
+    't/23etc_zones_offset.t',
     't/check_datetime_version.pl',
     't/lib/T/RequireDateTime.pm'
 );

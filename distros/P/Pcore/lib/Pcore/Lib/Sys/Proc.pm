@@ -4,6 +4,7 @@ use Pcore -const, -class;
 use Pcore::Lib::Scalar qw[is_ref weaken];
 use AnyEvent::Util qw[portable_socketpair];
 use if $MSWIN, 'Win32::Process';
+use if $MSWIN, 'Win32API::File';
 use POSIX qw[:sys_wait_h];
 use Config qw[%Config];
 use overload    #
@@ -14,7 +15,7 @@ use overload    #
 
 has win32_alive_timeout => 0.5;
 has kill_on_destroy     => 1;
-has use_fh              => 0;     # use files instead of sockets to redirect hndles
+has use_fh              => ();    # use file handles to redirect output
 
 has stdin  => ();
 has stdout => ();
@@ -86,7 +87,7 @@ around new => sub ( $orig, $self, $cmd, %args ) {
 
     if ($MSWIN) {
         $self->{win32_alive_timeout} = $args{win32_alive_timeout} if defined $args{win32_alive_timeout};
-        $args{win32_cflags} //= $args{win32_create_no_window} ? Win32::Process::CREATE_NO_WINDOW() : 0;    # NOTE handles redirect not works if not 0, Win32::Process::CREATE_NO_WINDOW(),
+        $args{win32_cflags} //= 0;    # NOTE handles redirect not works if not 0, Win32::Process::CREATE_NO_WINDOW(),
     }
     else {
         $args{setpgid} //= 1;
@@ -102,14 +103,38 @@ around new => sub ( $orig, $self, $cmd, %args ) {
         $self->{stdin} = P->handle($parent_stdin);
 
         # backup and redirect
-        open $backup_stdin, '<&', *STDIN       or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
-        open *STDIN,        '<&', $child_stdin or die $!;
+        open $backup_stdin, '<&', *STDIN or do {    ## no critic qw[InputOutput::RequireBriefOpen]
+
+            # windows os native fh is invalid, reopen STDIN to NUL
+            if ( $MSWIN && Win32API::File::GetOsFHandle(*STDIN) == 18446744073709551614 ) {
+                open $backup_stdin, '<', 'NUL' or die $!;
+            }
+            else {
+                die $!;
+            }
+        };
+
+        open *STDIN, '<&', $child_stdin or die $!;
     }
 
     # redirect STDOUT
     if ( $args{stdout} ) {
+        open $backup_stdout, '>&', *STDOUT or do {    ## no critic qw[InputOutput::RequireBriefOpen]
+
+            # windows os native fh is invalid, reopen STDOUT to NUL
+            if ( $MSWIN && Win32API::File::GetOsFHandle(*STDERR) == 18446744073709551614 ) {
+                open $backup_stdout, '>', 'NUL' or die $!;
+            }
+            else {
+                die $!;
+            }
+        };
+
         if ( $args{use_fh} ) {
             $self->{stdout} = P->file1->tempfile;
+
+            # redirect STDOUT
+            open *STDOUT, '>', $self->{stdout} or die $!;
         }
         else {
             ( my $parent_stdout, $child_stdout ) = portable_socketpair();
@@ -118,16 +143,49 @@ around new => sub ( $orig, $self, $cmd, %args ) {
 
             $self->{stdout} = P->handle($parent_stdout);
 
-            # backup and redirect
-            open $backup_stdout, '>&', *STDOUT       or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
-            open *STDOUT,        '>&', $child_stdout or die $!;
+            # redirect STDOUT
+            open *STDOUT, '>&', $child_stdout or die $!;
         }
     }
 
     # redirect STDERR
     if ( $args{stderr} ) {
+
+        # backup STDERR
+        open $backup_stderr, '>&', *STDERR or do {    ## no critic qw[InputOutput::RequireBriefOpen]
+
+            # windows os native fh is invalid, reopen STDERR to NUL
+            if ( $MSWIN && Win32API::File::GetOsFHandle(*STDERR) == 18446744073709551614 ) {
+                open $backup_stderr, '>', 'NUL' or die $!;
+            }
+            else {
+                die $!;
+            }
+        };
+
         if ( $args{use_fh} ) {
-            $self->{stderr} = P->file1->tempfile if $args{stderr} != 2;
+
+            # redirect STDERR to STDOUT
+            if ( $args{stderr} == 2 ) {
+
+                # redirect STDERR to child STDOUT
+                if ( $args{stdout} ) {
+
+                    # redirect
+                    open *STDERR, '>', $self->{stdout} or die $!;
+                }
+
+                # redirect STDERR to parent STDOUT
+                else {
+                    open *STDERR, '>&', *STDOUT or die $!;
+                }
+            }
+            else {
+                $self->{stderr} = P->file1->tempfile;
+
+                # redirect STDERR
+                open *STDERR, '>', $self->{stderr} or die $!;
+            }
         }
         else {
 
@@ -152,9 +210,8 @@ around new => sub ( $orig, $self, $cmd, %args ) {
                 $self->{stderr} = P->handle($parent_stderr);
             }
 
-            # backup and redirect
-            open $backup_stderr, '>&', *STDERR       or die $!;     ## no critic qw[InputOutput::RequireBriefOpen]
-            open *STDERR,        '>&', $child_stderr or die $!;
+            # redirect STDERR
+            open *STDERR, '>&', $child_stderr or die $!;
         }
     }
 
@@ -163,7 +220,8 @@ around new => sub ( $orig, $self, $cmd, %args ) {
         $cmd,
         \%args,
         sub {
-            # restore old STD* handles
+
+            # restore original STD* handles
             open *STDIN,  '<&', $backup_stdin  or die $! if defined $backup_stdin;
             open *STDOUT, '>&', $backup_stdout or die $! if defined $backup_stdout;
             open *STDERR, '>&', $backup_stderr or die $! if defined $backup_stderr;
@@ -184,23 +242,6 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
 
     my $chdir_guard = $args->{chdir} ? P->file->chdir( $args->{chdir} ) : undef;
 
-    my @fh_redirect;
-
-    if ( $self->{use_fh} ) {
-        if ( $args->{stdout} ) {
-            push @fh_redirect, "1> $self->{stdout}";
-        }
-
-        if ( $args->{stderr} ) {
-            if ( $args->{stderr} == 2 ) {
-                push @fh_redirect, '2>&1';
-            }
-            else {
-                push @fh_redirect, "2> $self->{stderr}";
-            }
-        }
-    }
-
     # run process
     if ($MSWIN) {
 
@@ -209,7 +250,7 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
         Win32::Process::Create(    #
             my $win32_proc,
             $ENV{COMSPEC},
-            '/D /C "' . join( $SPACE, $cmd->@*, @fh_redirect ) . '"',
+            '/D /C "' . join( $SPACE, $cmd->@* ) . '"',
             1,                     # inherit STD* handles
             $args->{win32_cflags},
             '.'
@@ -259,8 +300,6 @@ sub _create_process ( $self, $cmd, $args, $restore ) {
 
             local $SIG{__WARN__} = sub { };
 
-            $cmd = [ join ' ', $cmd->@*, @fh_redirect ] if @fh_redirect;
-
             exec $cmd->@* or do {
                 syswrite $w, "$!\n" or die $!;
 
@@ -306,7 +345,7 @@ sub _set_watcher ($self) {
             if ( waitpid $self->{pid}, WNOHANG ) {
                 undef $self->{_watcher};
 
-                $self->{_win32_proc}->GetExitCode( my $exit_code );
+                ( delete $self->{_win32_proc} )->GetExitCode( my $exit_code );
 
                 $self->_set_exit_code($exit_code);
 
@@ -345,9 +384,9 @@ sub wait ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
 }
 
 sub capture ( $self, %args ) {
-    if ( $self->{use_fh} ) {
-        $self->wait;
+    $self->wait;
 
+    if ( $self->{use_fh} ) {
         $self->{stdout} = \P->file->read_bin( $self->{stdout} ) if defined $self->{stdout};
 
         $self->{stderr} = \P->file->read_bin( $self->{stderr} ) if defined $self->{stderr};
@@ -436,11 +475,9 @@ sub _set_exit_code ( $self, $exit_code, $reason = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (33)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (52)                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 179                  | Subroutines::ProhibitExcessComplexity - Subroutine "_create_process" with high complexity score (22)           |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 262                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 109, 125, 158        | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -457,7 +494,7 @@ Pcore::Lib::Sys::Proc
 
     my $proc = P->sys->run_proc(
         $cmd,
-        win32_create_no_window => 0,
+        use_fh                 => 0,
         stdin                  => 0,
         stdout                 => 0,
         stderr                 => 0,

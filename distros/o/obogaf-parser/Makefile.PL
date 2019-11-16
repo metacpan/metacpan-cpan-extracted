@@ -39,14 +39,17 @@ WriteMakefile(
                     t/data/test_goa_chicken_128_header.gaf
                     t/data/test_chicken_goa_mapped_header.txt
                     t/data/test_goa_chicken_128_unpair.gaf
-                    t/data/test_chicken_goa_mapped_unpair.txt"
+                    t/data/test_chicken_goa_mapped_unpair.txt
+                    t/data/test_gobasic_parents_list.txt
+                    t/data/test_gobasic_children_list.txt
+                    t/data/test_gobasicBP_parents_list.txt
+                    t/data/test_gobasicBP_children_list.txt"
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( 
         META_MERGE => {
             'meta-spec' => { version => 2 },
             resources => {
-                repository => {
-                    homepage  => 'https://obogaf-parser.readthedocs.io',
+                repository => {                    
                     type      => 'git',
                     web       => 'https://github.com/marconotaro/obogaf-parser',
                     url       => 'git://github.com/marconotaro/obogaf-parser.git',

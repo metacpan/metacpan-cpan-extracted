@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.3.1
+version v0.4.0
 
 # SYNOPSIS
 
@@ -59,6 +59,21 @@ has setting => (
 This allows you to set the attribute _once_. The value is coerced
 into a constant, and cannot be changed again.
 
+As of v0.4.0, this now supports the `strict` setting:
+
+```perl
+has thing => (
+  is     => 'const',
+  isa    => ArrayRef[HashRef],
+  strict => 0,
+);
+```
+
+When this is set to a false value, then the read-only constraint will
+only be applied when running in strict mode, see [Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode).
+
+If omitted, `strict` is assumed to be true.
+
 # KNOWN ISSUES
 
 Accessing non-existent keys for hash references will throw an
@@ -71,6 +86,8 @@ Unfortunately, this behaviour is not replicated with array references.
 # SEE ALSO
 
 [Const::Fast](https://metacpan.org/pod/Const::Fast)
+
+[Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode)
 
 [Moo](https://metacpan.org/pod/Moo)
 

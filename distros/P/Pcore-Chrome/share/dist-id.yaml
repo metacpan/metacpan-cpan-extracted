@@ -1,11 +1,11 @@
 ---
 branch: master
-date: 2019-11-06T20:30:25Z
-id: 6708d38446c24233ba04a6ac389f556c004cbece
-id_short: 6708d38
+date: 2019-11-15T23:12:23Z
+hash: fcee2caae3bd662d0b5141f21b03f0ceeb78c924
+hash_short: fcee2ca
 is_dirty: 0
-release: v0.8.0
-release_distance: 0
+release: v0.8.1
+release_distance: ~
 tags:
-- v0.8.0
+- v0.8.1
 - latest

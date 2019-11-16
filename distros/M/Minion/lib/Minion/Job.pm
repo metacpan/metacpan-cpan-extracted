@@ -119,10 +119,9 @@ following new ones.
   });
 
 Emitted in the process performing this job right before the process will exit.
-Note that this event is EXPERIMENTAL and might change without warning!
 
   $job->on(cleanup => sub {
-    my $job  = shift;
+    my $job = shift;
     $job->app->log->debug("Process $$ is about to exit");
   });
 
@@ -148,8 +147,7 @@ after it has transitioned to the C<failed> state.
     ...
   });
 
-Emitted in the process performing this job if the task was successful. Note that
-this event is EXPERIMENTAL and might change without warning!
+Emitted in the process performing this job if the task was successful.
 
   $job->on(finish => sub {
     my $job  = shift;

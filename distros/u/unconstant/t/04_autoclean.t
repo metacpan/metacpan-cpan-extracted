@@ -2,7 +2,7 @@ use Test::More tests => 2;
 
 SKIP: {
 	eval { require namespace::autoclean };
-	skip "namespace_autoclean not installed", 2 if $@;
+	skip "namespace::autoclean not installed", 2 if $@;
 
 	package Foo {
 		use unconstant;
@@ -10,7 +10,7 @@ SKIP: {
 	}
 
 	package Bar {
-		use namespace::autoclean;
+		namespace::autoclean->import();
 		use unconstant;
 		use constant FOO => 42;
 	}

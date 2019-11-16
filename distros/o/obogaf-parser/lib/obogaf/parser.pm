@@ -1,7 +1,7 @@
 package obogaf::parser;
 
 require 5.006;
-our $VERSION= '1.016'; 
+our $VERSION= '1.271'; 
 $VERSION= eval $VERSION;
 
 use strict;
@@ -12,21 +12,33 @@ use PerlIO::gzip;
 
 sub build_edges{
     my ($obofile)= @_;
-    my ($namespace, $source, $destination, $pof, $res);
+    my ($namespace, $idname, $isname, $pofname, $source, $destination, $pof, $res);
     if($obofile=~/.obo$/){ open FH, "<", "$obofile" or die "cannot open $obofile. $!.\n"; } else { die "cannot open $obofile. The extension must be obo.\n"; }
     while(<FH>){
         chomp;
         next if $_=~/^\s*$/;
         if($_=~/^namespace:\s+(\D+)/){
             $namespace=$1;
+        }elsif($_=~/^name:\s+(.+)/){
+            $idname=$1;
         }elsif($_=~/^id:\s+(\D+\d+)/){
             $destination=$1;
         }elsif($_=~/^is_a:\s+(\D+\d+)/){
             $source=$1;
-            if(defined $namespace){ $res .= "$namespace\t$source\t$destination\tis-a\n"; } else { $res .= "$source\t$destination\tis-a\n"; }
+            ($isname)= ($_=~/!\s+(.+)/);
+            if(defined $namespace){ 
+                $res .= "$namespace\t$source\t$destination\t$isname\t$idname\tis-a\n"; 
+            }else{ 
+                $res .= "$source\t$destination\t$isname\t$idname\tis-a\n"; 
+            }
         }elsif($_=~/^relationship: part_of\s+(\D+\d+)/){
             $pof=$1;
-            if(defined $namespace){ $res .= "$namespace\t$pof\t$destination\tpart-of\n"; } else { $res .= "$pof\t$destination\tpart-of\n"; }    
+            ($pofname)= ($_=~/!\s+(.+)/);
+            if(defined $namespace){
+                $res .= "$namespace\t$pof\t$destination\t$pofname\t$idname\tpart-of\n"; 
+            }else{ 
+                $res .= "$pof\t$destination\t$pofname\t$idname\tpart-of\n";
+            }    
         }
     }
     close FH;
@@ -35,18 +47,16 @@ sub build_edges{
 
 sub build_subonto{
     my ($edgesfile, $namespace)= @_;
-    my ($res);
+    my ($res, %checker);
     open FH, "<", $edgesfile or die "cannot open $edgesfile. $!.\n";
     while(<FH>){
         next if $_=~/^[!,#]|^\s*$/;
         my @vals= split(/\t/, $_);
-        if($vals[0] eq $namespace){ 
-            $res .= join("\t", @vals[1..$#vals]);
-        } else { 
-            die "number of columns of $edgesfile must be 4 and $namespace must be in the first column.\n";
-        }
+        $checker{$vals[0]}=1;
+        if($vals[0] eq $namespace){ $res .= join("\t", @vals[1..$#vals]); } 
     }
     close FH;
+    unless(exists($checker{$namespace})){die "$edgesfile does not include $namespace or $namespace is not in the first column of $edgesfile.\n";}
     return \$res;
 }
 
@@ -94,6 +104,25 @@ sub make_stat{
     $stat .= "median degree: $medeg\naverage degree: $avgdeg\ndensity: $den\n";
     $res= "#oboterm <tab> degree <tab> indegree <tab> outdegree\n".$resdeg."\n"."~summary stat~\n".$stat;
     return $res;
+}
+
+sub get_parents_or_children_list{
+    my ($edgesfile, $parentIndex, $childIndex, $chdORpar)= @_;
+    my (%nodelist); 
+    if($chdORpar ne "parents" && $chdORpar ne "children"){ die "$chdORpar can be 'parents' or 'children'.\n";} 
+    open FH, "<", $edgesfile or die "cannot open $edgesfile. $!.\n";
+    while(<FH>){
+        chomp;
+        my @vals= split(/\t/,$_);
+        if($chdORpar eq "parents"){
+            $nodelist{$vals[$childIndex]} .= $vals[$parentIndex]."|";
+        }else{
+            $nodelist{$vals[$parentIndex]} .= $vals[$childIndex]."|";
+        }
+    }
+    close FH;
+    foreach my $term (keys %nodelist){ chop $nodelist{$term}; }
+    return \%nodelist;
 }
 
 sub gene2biofun{
@@ -215,13 +244,15 @@ obogaf::parser - a perl5 module to handle obo and gaf file
 
 use obogaf::parser;
 
-my ($graph, $subonto, $stat, $res);
+my ($graph, $subonto, $stat, $res, $parORchdlist);
  
 $graph= build_edges(obofile);
 
 $subonto= build_subonto(edgesfile, namespace);
 
 $stat= make_stat(edgesfile, parentIndex, childIndex);
+
+$parORchdlist= get_parents_or_children_list(edgesfile, parentIndex, childIndex, parORchd);
 
 ($res, $stat)= gene2biofun(annfile, geneIndex, classIndex);
 
@@ -244,15 +275,13 @@ shown in L<GOA website|https://www.ebi.ac.uk/GOA/downloads> and L<HPO website|ht
 
 B<obofile>: any obo file listed in L<OBO foundry|http://www.obofoundry.org/>. The file extension must be ".obo".
 
-B<output>: the graph is returned as tuple: C<subdomain E<lt>tabE<gt> source E<lt>tabE<gt> destination E<lt>tabE<gt> relationship>. This means that the graph is returned as a list of edges, where each edge is represented as a pair of vertices in the form C<source E<lt>tabE<gt> destination>. For each couple of nodes, the
-subdomain (if any) and the relationships for which is safe group annotations (i.e. C<is_a> and C<part_of>) are returned as well. The graph is stored as an anonymous scalar.
+B<output>: the graph is returned as tuple: C<subdomain E<lt>tabE<gt> source-ID E<lt>tabE<gt> destination-ID E<lt>tabE<gt> relationship E<lt>tabE<gt> source-name E<lt>tabE<gt> destination-name>. This means that the graph is returned as a list of edges, where each edge is represented as a pair of vertices in the form C<source E<lt>tabE<gt> destination>. For each couple of nodes, the subdomain (if any), the relationships for which is safe group annotations (i.e. C<is_a> and C<part_of>) and the names of source/destination obo terms-ID are returned as well. The graph is stored as an anonymous scalar.
 
 =item build_subonto - extract edges of a specified sub-ontology domain.
 
     my $subonto= build_subonto(edgesfile, namespace);
 
-B<edgesfile>: a graph in the form: C<subdomain E<lt>tabE<gt> source E<lt>tabE<gt> destination E<lt>tabE<gt> relationship>.
-This file can be obtained by calling the subroutine C<build_edges>.
+B<edgesfile>: a graph in the form: C<subdomain E<lt>tabE<gt> source E<lt>tabE<gt> destination E<lt>tabE<gt> relationship E<lt>tabE<gt> source-name E<lt>tabE<gt> destination-name>. This file can be obtained by calling the subroutine C<build_edges>. NB: to run this subroutine, the fields C<relationship>, C<source-name> and C<destination-name> are optionals. Instead, the field C<subdomain> is required and must be placed at the first column, otherwise an error message is returned.
 
 B<namespace>: name of the subontology for which the edges must be extracted.
 
@@ -271,6 +300,20 @@ B<childIndex>: index referring to the column containing the I<child> vertices (d
 
 B<output>: statistics about the graph are printed on the shell. More precisely, for each vertex of the graph degree, in-degree and out-degree are printed. The vertex are sorted in a decreasing order on the basis of degree, from the higher degree to the smaller degree. Finally, the following
 statistics are returned as well: 1) number of nodes and edges of the graph; 2) maximum and minimum degree; 3) average and median degree; 4) density of the graph.
+
+=item get_parents_or_children_list - build parents or children list for each node of the graph.
+
+    my $parORchdlist= get_parents_or_children_list(edgesfile, parentIndex, childIndex, parORchd);
+
+B<edgesfile>: a graph represented as a list of edges, where each edge is stored as a pair of vertices E<lt>tabE<gt> separated. This file can be obtained by calling the subroutine C<build_edges>.
+
+B<parentIndex>: index referring to the column containing the I<parent> (source) vertices in I<edgesfile> file.
+
+B<childIndex>: index referring to the column containing the I<child> vertices (destination) in the I<edgesfile> file.
+
+B<parORchd>: must be C<parents> or C<children>. If C<$parORchd=parents> a pipe separated list containing the parents of each node of the graph is returned; if C<$parORchd=children> a pipe separated list containing the children of each node is returned.
+
+B<output>: an anonymous hash storing for each node of the graph the list of its children or parents according to the B<parORchd> parameter.
 
 =item gene2biofun - make annotations adjacency list.
 
